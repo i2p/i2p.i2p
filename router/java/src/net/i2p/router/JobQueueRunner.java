@@ -87,8 +87,8 @@ class JobQueueRunner implements Runnable {
                 _currentJob = null;
                 jobNum++;
                 
-                if ( (jobNum % 10) == 0)
-                    System.gc();
+                //if ( (jobNum % 10) == 0)
+                //    System.gc();
             } catch (Throwable t) {
                 if (_log.shouldLog(Log.CRIT))
                     _log.log(Log.CRIT, "WTF, error running?", t);
