@@ -15,7 +15,7 @@ FreeBSD*)
 esac
 
 echo "Extracting GMP..."
-tar -xzf gmp-4.1.3.tar.gz
+tar -xjf gmp-4.1.3.tar.bz2
 echo "Building..."
 mkdir bin
 mkdir lib
