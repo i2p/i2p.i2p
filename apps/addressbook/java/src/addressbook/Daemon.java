@@ -24,8 +24,9 @@ package addressbook;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.HashMap;
+import java.util.List;
+import java.util.LinkedList;
 import java.io.File;
-import java.io.IOException;
 
 /**
  * Main class of addressbook.  Performs updates, and runs the main loop.
@@ -91,8 +92,13 @@ public class Daemon {
 
         AddressBook master = new AddressBook(masterFile);
         AddressBook router = new AddressBook(routerFile);
+        
+        List defaultSubs = new LinkedList();
+        defaultSubs.add("http://dev.i2p/i2p/hosts.txt");
+        defaultSubs.add("http://duck.i2p/hosts.txt");
+        
         SubscriptionList subscriptions = new SubscriptionList(subscriptionFile,
-                etagsFile, lastModifiedFile);
+                etagsFile, lastModifiedFile, defaultSubs);
         Log log = new Log(logFile);
 
         Daemon.update(master, router, published, subscriptions, log);
@@ -117,11 +123,28 @@ public class Daemon {
         } else {
             home = ".";
         }
-        try {
-            settings = ConfigParser.parse(new File(home, settingsLocation));
-        } catch (IOException exp) {
-            System.out.println("Could not load " + settingsLocation);
+        
+        Map defaultSettings = new HashMap();
+        defaultSettings.put("proxy_host", "localhost");
+        defaultSettings.put("proxy_port", "4444");
+        defaultSettings.put("master_addressbook", "myhosts.txt");
+        defaultSettings.put("router_addressbook", "../userhosts.txt");
+        defaultSettings.put("published_addressbook", "../eepsite/docroot/hosts.txt");
+        defaultSettings.put("log", "log.txt");
+        defaultSettings.put("subscriptions", "subscriptions.txt");
+        defaultSettings.put("etags", "etags");
+        defaultSettings.put("last_modified", "last_modified");
+        defaultSettings.put("update_delay", "1");
+        
+        File homeFile = new File(home);
+        if (!homeFile.exists()) {
+            boolean created = homeFile.mkdirs();
+            if (created)
+                System.out.println("INFO:  Addressbook directory " + homeFile.getName() + " created");
+            else
+                System.out.println("ERROR: Addressbook directory " + homeFile.getName() + " could not be created");
         }
+        settings = ConfigParser.parse(new File(homeFile, settingsLocation), defaultSettings);
 
         System.setProperty("proxySet", "true");
         System.setProperty("http.proxyHost", (String) settings

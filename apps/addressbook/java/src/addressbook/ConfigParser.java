@@ -99,8 +99,9 @@ public class ConfigParser {
     public static Map parse(URL url) throws IOException {
         InputStream urlStream;
         urlStream = url.openConnection().getInputStream();
-        BufferedReader br = new BufferedReader(new InputStreamReader(urlStream));
-        return ConfigParser.parse(br);
+        BufferedReader input = new BufferedReader(new InputStreamReader(
+                urlStream));
+        return ConfigParser.parse(input);
     }
 
     /**
@@ -114,11 +115,75 @@ public class ConfigParser {
      *             if file cannot be read.
      */
     public static Map parse(File file) throws IOException {
-        FileInputStream fileStream;
-        fileStream = new FileInputStream(file);
-        BufferedReader br = new BufferedReader(
-                new InputStreamReader(fileStream));
-        return ConfigParser.parse(br);
+        FileInputStream fileStream = new FileInputStream(file);
+        BufferedReader input = new BufferedReader(new InputStreamReader(
+                fileStream));
+        return ConfigParser.parse(input);
+    }
+
+    /**
+     * Return a Map using the contents of the String string. See
+     * parseBufferedReader for details of the input format.
+     * 
+     * @param string
+     *            A String to parse.
+     * @return A Map containing the key, value pairs from string.
+     * @throws IOException
+     *             if file cannot be read.
+     */
+    public static Map parse(String string) throws IOException {
+        StringReader stringReader = new StringReader(string);
+        BufferedReader input = new BufferedReader(stringReader);
+        return ConfigParser.parse(input);
+    }
+    
+    /**
+     * Return a Map using the contents of the File file. If file cannot be read,
+     * use map instead, and write the result to where file should have been.
+     * 
+     * @param file
+     *            A File to attempt to parse.
+     * @param map
+     *            A Map to use as the default, if file fails.
+     * @return A Map containing the key, value pairs from file, or if file
+     *         cannot be read, map.
+     */
+    public static Map parse(File file, Map map) {
+        Map result = new HashMap();
+        try {
+            result = ConfigParser.parse(file);
+        } catch (IOException exp) {
+            result = map;
+            try {
+                ConfigParser.write(result, file);
+            } catch (IOException exp2) {
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Return a List where each element is a line from the BufferedReader input.
+     * 
+     * @param input
+     *            A BufferedReader to parse.
+     * @return A List consisting of one element for each line in input.
+     * @throws IOException
+     *             if input cannot be read.
+     */
+    public static List parseSubscriptions(BufferedReader input)
+            throws IOException {
+        List result = new LinkedList();
+        String inputLine = input.readLine();
+        while (inputLine != null) {
+            inputLine = ConfigParser.stripComments(inputLine).trim();
+            if (inputLine.length() > 0) {
+                result.add(inputLine);
+            }
+            inputLine = input.readLine();
+        }
+        input.close();
+        return result;
     }
 
     /**
@@ -132,57 +197,127 @@ public class ConfigParser {
      */
     public static List parseSubscriptions(File file) throws IOException {
         FileInputStream fileStream = new FileInputStream(file);
-        BufferedReader br = new BufferedReader(
-                new InputStreamReader(fileStream));
+        BufferedReader input = new BufferedReader(new InputStreamReader(
+                fileStream));
+        return ConfigParser.parseSubscriptions(input);
+    }
+
+    /**
+     * Return a List where each element is a line from the String string.
+     * 
+     * @param string
+     *            A String to parse.
+     * @return A List consisting of one element for each line in string.
+     * @throws IOException
+     *             if string cannot be read.
+     */
+    public static List parseSubscriptions(String string) throws IOException {
+        StringReader stringReader = new StringReader(string);
+        BufferedReader input = new BufferedReader(stringReader);
+        return ConfigParser.parseSubscriptions(input);
+    }
+    
+    /**
+     * Return a List using the contents of the File file. If file cannot be
+     * read, use list instead, and write the result to where file should have
+     * been.
+     * 
+     * @param file
+     *            A File to attempt to parse.
+     * @param string
+     *            A List to use as the default, if file fails.
+     * @return A List consisting of one element for each line in file, or if
+     *         file cannot be read, list.
+     */
+    public static List parseSubscriptions(File file, List list) {
         List result = new LinkedList();
-        String inputLine = br.readLine();
-        while (inputLine != null) {
-            inputLine = ConfigParser.stripComments(inputLine);
-            if (inputLine.trim().length() > 0) {
-                result.add(inputLine.trim());
+        try {
+            result = ConfigParser.parseSubscriptions(file);
+        } catch (IOException exp) {
+            result = list;
+            try {
+                ConfigParser.writeSubscriptions(result, file);
+            } catch (IOException exp2) {
             }
-            inputLine = br.readLine();
         }
-        br.close();
         return result;
     }
 
     /**
-     * Write contents of Map hash to BufferedWriter output. Output is written
+     * Write contents of Map map to BufferedWriter output. Output is written
      * with one key, value pair on each line, in the format: key=value.
      * 
-     * @param hash
+     * @param map
      *            A Map to write to output.
      * @param output
      *            A BufferedWriter to write the Map to.
      * @throws IOException
      *             if the BufferedWriter cannot be written to.
      */
-    public static void write(Map hash, BufferedWriter output)
-            throws IOException {
-        Iterator keyIter = hash.keySet().iterator();
+    public static void write(Map map, BufferedWriter output) throws IOException {
+        Iterator keyIter = map.keySet().iterator();
 
         while (keyIter.hasNext()) {
             String key = (String) keyIter.next();
-            output.write(key + "=" + (String) hash.get(key));
+            output.write(key + "=" + (String) map.get(key));
             output.newLine();
         }
         output.close();
     }
 
     /**
-     * Write contents of Map hash to the file at location. Output is written
+     * Write contents of Map map to the File file. Output is written
      * with one key, value pair on each line, in the format: key=value.
      * 
-     * @param hash
+     * @param map
      *            A Map to write to file.
      * @param file
      *            A File to write the Map to.
      * @throws IOException
      *             if file cannot be written to.
      */
-    public static void write(Map hash, File file) throws IOException {
-        ConfigParser.write(hash,
-                new BufferedWriter(new FileWriter(file, false)));
+    public static void write(Map map, File file) throws IOException {
+        ConfigParser
+                .write(map, new BufferedWriter(new FileWriter(file, false)));
     }
+
+    /**
+     * Write contents of List list to BufferedReader output. Output is written
+     * with each element of list on a new line.
+     * 
+     * @param list
+     *            A List to write to file.
+     * @param output
+     *            A BufferedReader to write list to.
+     * @throws IOException
+     *             if output cannot be written to.
+     */
+    public static void writeSubscriptions(List list, BufferedWriter output)
+            throws IOException {
+        Iterator iter = list.iterator();
+
+        while (iter.hasNext()) {
+            output.write((String) iter.next());
+            output.newLine();
+        }
+        output.close();
+    }
+    
+    /**
+     * Write contents of List list to File file. Output is written with each
+     * element of list on a new line.
+     * 
+     * @param list
+     *            A List to write to file.
+     * @param file
+     *            A File to write list to.
+     * @throws IOException
+     *             if output cannot be written to.
+     */
+    public static void writeSubscriptions(List list, File file)
+            throws IOException {
+        ConfigParser.writeSubscriptions(list, new BufferedWriter(
+                new FileWriter(file, false)));
+    }
+
 }

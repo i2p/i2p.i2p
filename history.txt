@@ -1,4 +1,10 @@
-$Id: history.txt,v 1.122 2004/12/30 17:51:16 jrandom Exp $
+$Id: history.txt,v 1.123 2004/12/31 12:18:05 jrandom Exp $
+
+2004-12-31  ragnarok
+    * Integrated latest addressbook changes (2.0.3) which include support for 
+      deploying as a .war file with no existing addressbook configuration.
+    * Updated main build process to bundle the addressbook.war in the 
+      i2pinstall.jar and i2pupdate.zip.
 
 2004-12-31  jrandom
     * Speling fxi (thanks digum!)

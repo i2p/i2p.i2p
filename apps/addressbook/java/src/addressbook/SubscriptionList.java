@@ -58,7 +58,7 @@ public class SubscriptionList {
      *            GET. The file is in the format "url=leastmodified".
      */
     public SubscriptionList(File locationsFile, File etagsFile,
-            File lastModifiedFile) {
+            File lastModifiedFile, List defaultSubs) {
         this.subscriptions = new LinkedList();
         this.etagsFile = etagsFile;
         this.lastModifiedFile = lastModifiedFile;
@@ -66,11 +66,7 @@ public class SubscriptionList {
         Map etags;
         Map lastModified;
         String location;
-        try {
-            locations = ConfigParser.parseSubscriptions(locationsFile);
-        } catch (IOException exp) {
-            locations = new LinkedList();
-        }
+        locations = ConfigParser.parseSubscriptions(locationsFile, defaultSubs);
         try {
             etags = ConfigParser.parse(etagsFile);
         } catch (IOException exp) {
@@ -90,7 +86,7 @@ public class SubscriptionList {
 
         iter = this.iterator();
     }
-
+    
     /**
      * Return an iterator over the AddressBooks represented by the Subscriptions
      * in this SubscriptionList.

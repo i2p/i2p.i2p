@@ -28,5 +28,16 @@ The addressbook daemon will automatically run while the router is up.
 
 Aside from the daemon itself, the other elements of the addressbook interface
 are the config.txt, myhosts.txt, and subscriptions.txt files found in the addressbook 
-directory.  Those files are largely self-documenting, so if you want to know what they 
-do, just read them.
+directory. 
+
+config.txt is the configuration file for addressbook.
+
+myhosts.txt is the addressbook master address book.  Addresses placed in this file 
+take precidence over those in the router address book and in remote address books.  
+If changes are made to this file, they will be reflected in the router address book 
+and published address book after the next update. Do not make changes directly to the 
+router address book, as they could be lost during an update.
+
+subscriptions.txt is the subscription list for addressbook.  Each entry is an absolute 
+url to a file in hosts.txt format. Since the list is checked in order, url's should be 
+listed in order of trust.

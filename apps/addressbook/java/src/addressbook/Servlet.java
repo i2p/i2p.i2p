@@ -52,6 +52,7 @@ public class Servlet extends GenericServlet {
         String[] args = new String[1];
         args[0] = config.getInitParameter("home");
         DaemonThread thread = new DaemonThread(args);
+        thread.setDaemon(true);
         thread.start();
     }
 
