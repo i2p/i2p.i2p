@@ -1,4 +1,4 @@
-<code>$Id: tunnel.html,v 1.4 2005/01/12 19:57:36 jrandom Exp $</code>
+<code>$Id: tunnel.html,v 1.5 2005/01/14 17:43:44 jrandom Exp $</code>
 <pre>
 1) <a href="#tunnel.overview">Tunnel overview</a>
 2) <a href="#tunnel.operation">Tunnel operation</a>
@@ -19,6 +19,9 @@
 3.1.2) <a href="#tunnel.selection.client">Client tunnel peer selection</a>
 3.2) <a href="#tunnel.request">Request delivery</a>
 3.3) <a href="#tunnel.pooling">Pooling</a>
+3.4) <a href="#tunnel.building.alternatives">Alternatives</a>
+3.4.1) <a href="#tunnel.building.telescoping">Telescopic building</a>
+3.4.2) <a href="#tunnel.building.nonexploratory">Non-exploratory tunnels for management</a>
 4) <a href="#tunnel.throttling">Tunnel throttling</a>
 5) <a href="#tunnel.mixing">Mixing/batching</a>
 </pre>
@@ -365,8 +368,8 @@ along the same peers.</p>
 
 <p>At the moment, the plan is to reuse the existing SHA256 code and build
 all of the checksum and verification hashes as 32 byte SHA256 values.  20
-byte SHA1 would likely be more than sufficient, and perhaps smaller (first
-4 bytes of the SHA256?)</p>
+byte SHA1 would likely be more than sufficient, or perhaps smaller - first
+4 bytes of the SHA256.</p>
 
 <h2>3) <a name="tunnel.building">Tunnel building</a></h2>
 
@@ -456,7 +459,53 @@ how frequently to test the tunnels, how long the tunnels should be, whether thos
 lengths should be randomized, how often replacement tunnels should be built, as 
 well as any of the other settings allowed when configuring individual tunnels.</p>
 
+<h3>3.4) <a name="tunnel.building.alternatives">Alternatives</a></h3>
+
+<h4>3.4.1) <a name="tunnel.building.telescoping">Telescopic building</a></h4>
+
+<p>One question that may arise regarding the use of the exploratory tunnels for
+sending and receiving tunnel creation messages is how that impacts the tunnel's 
+vulnerability to predecessor attacks.  While the endpoints and gateways of 
+those tunnels will be randomly distributed across the network (perhaps even 
+including the tunnel creator in that set), another alternative is to use the
+tunnel pathways themselves to pass along the request and response, as is done
+in <a href="http://tor.eff.org/">TOR</a>.  This, however, may lead to leaks 
+during tunnel creation, allowing peers to discover how many hops there are later
+on in the tunnel by monitoring the timing or packet count as the tunnel is
+built.  Techniques could be used to minimize this issue, such as using each of 
+the hops as endpoints (per <a href="#tunnel.reroute">2.7.2</a>) for a random
+number of messages before continuing on to build the next hop.</p>
+
+<h4>3.4.2) <a name="tunnel.building.nonexploratory">Non-exploratory tunnels for management</a></h4>
+
+<p>A second alternative to the tunnel building process is to give the router 
+an additional set of non-exploratory inbound and outbound pools, using those for
+the tunnel request and response.  Assuming the router has a well integrated view
+of the network, this should not be necessary, but if the router was partitioned
+in some way, using non-exploratory pools for tunnel management would reduce the
+leakage of information about what peers are in the router's partition.</p>
+
 <h2>4) <a name="tunnel.throttling">Tunnel throttling</a></h2>
+
+<p>Even though the tunnels within I2P bear a resemblence to a circuit switched
+network, everything within I2P is strictly message based - tunnels are merely
+accounting tricks to help organize the delivery of messages.  No assumptions are
+made regarding reliability or ordering of messages, and retransmissions are left
+to higher levels (e.g. I2P's client layer streaming library).  This allows I2P
+to take advantage of throttling techniques available to both packet switched and
+circuit switched networks.  For instance, each router may keep track of the 
+moving average of how much data each tunnel is using, combine that with all of 
+the averages used by other tunnels the router is participating in, and be able
+to accept or reject additional tunnel participation requests based on its 
+capacity and utilization.  On the other hand, each router can simply drop 
+messages that are beyond its capacity, exploiting the research used on the 
+normal internet.</p>
 
 <h2>5) <a name="tunnel.mixing">Mixing/batching</a></h2>
 
+<p>What strategies should be used at the gateway and at each hop for delaying,
+reordering, rerouting, or padding messages?  To what extent should this be done
+automatically, how much should be configured as a per tunnel or per hop setting,
+and how should the tunnel's creator (and in turn, user) control this operation?
+All of this is left as unknown, to be worked out for 
+<a href="http://www.i2p.net/roadmap#3.0">I2P 3.0</a></p>
