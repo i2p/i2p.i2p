@@ -19,7 +19,7 @@
  *  along with this program; if not, write to the Free Software
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *  
- * $Revision: 1.1 $
+ * $Revision: 1.2 $
  */
 package i2p.susi.webmail;
 
@@ -1295,7 +1295,7 @@ public class WebMail extends HttpServlet
 				else if( sessionObject.state == STATE_NEW )
 					showCompose( out, sessionObject, request );
 				
-				out.println( "</form>\n<p class=\"footer\">susimail v0." + version +" " + ( RELEASE ? "release" : "development" ) + " &copy; 2004 <a href=\"mailto:susi23@mail.i2p\">susi</a></body>\n</html>");				
+				out.println( "</form>\n<p class=\"footer\">susimail v0." + version +" " + ( RELEASE ? "release" : "development" ) + " &copy; 2004-2005 <a href=\"mailto:susi23@mail.i2p\">susi</a></body>\n</html>");				
 				out.flush();
 			}
 		}
