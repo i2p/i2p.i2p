@@ -113,8 +113,9 @@ public class NewsFetcher implements Runnable, EepGet.StatusListener {
     private static final String VERSION_STRING = "version=\"" + RouterVersion.VERSION + "\"";
     private static final String VERSION_PREFIX = "version=\"";
     private void checkForUpdates() {
+        _updateAvailable = false;
         File news = new File(NEWS_FILE);
-        if (!news.exists()) return;
+        if ( (!news.exists()) || (news.length() <= 0) ) return;
         FileInputStream in = null;
         try {
             in = new FileInputStream(news);
@@ -240,13 +241,20 @@ public class NewsFetcher implements Runnable, EepGet.StatusListener {
     }
     public void transferComplete(long alreadyTransferred, long bytesTransferred, long bytesRemaining, String url, String outputFile) {
         if (_log.shouldLog(Log.INFO))
-            _log.info("News fetched from " + url);
+            _log.info("News fetched from " + url + " with " + (alreadyTransferred+bytesTransferred));
         
         File temp = new File(TEMP_NEWS_FILE);
         if (temp.exists()) {
             boolean copied = FileUtil.copy(TEMP_NEWS_FILE, NEWS_FILE, true);
-            if (copied)
+            if (copied) {
                 temp.delete();
+            } else {
+                if (_log.shouldLog(Log.ERROR))
+                    _log.error("Failed to copy the news file!");
+            }
+        } else {
+            if (_log.shouldLog(Log.ERROR))
+                _log.error("Transfer complete, but no file?");
         }
         checkForUpdates();
     }

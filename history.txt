@@ -1,4 +1,9 @@
-$Id: history.txt,v 1.183 2005/03/29 19:07:40 jrandom Exp $
+$Id: history.txt,v 1.184 2005/04/01 06:28:07 jrandom Exp $
+
+2005-04-01  jrandom
+    * Allow editing I2PTunnel server instances with five digit ports 
+      (thanks nickless_head!)
+    * More NewsFetcher debugging for reported weirdness
 
 2005-04-01  jrandom
     * Fix to check for missing news file (thanks smeghead!)

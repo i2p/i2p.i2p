@@ -77,7 +77,7 @@ if (curTunnel >= 0) {
 </td>
 <td>
 Host: <input type="text" size="20" name="targetHost" value="<%=editBean.getTargetHost(curTunnel)%>" />
-Port: <input type="text" size="4" maxlength="4" name="targetPort" value="<%=editBean.getTargetPort(curTunnel)%>" />
+Port: <input type="text" size="6" maxlength="5" name="targetPort" value="<%=editBean.getTargetPort(curTunnel)%>" />
 </td>
 </tr>
 <% String curType = editBean.getInternalType(curTunnel);
