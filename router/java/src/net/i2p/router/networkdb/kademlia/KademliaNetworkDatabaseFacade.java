@@ -12,11 +12,13 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
@@ -72,6 +74,17 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
     private Set _publishingLeaseSets;
     
     /**
+     * List of keys that we've recently done full searches on and failed.
+     *
+     */
+    private Set _badKeys;
+    /**
+     * Mapping when (Long) to Hash for keys that are in the _badKeys list.
+     *
+     */
+    private Map _badKeyDates;
+    
+    /**
      * for the 10 minutes after startup, don't fail db entries so that if we were
      * offline for a while, we'll have a chance of finding some live peers with the
      * previous references
@@ -94,6 +107,70 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         _peerSelector = new PeerSelector(_context);
         _publishingLeaseSets = new HashSet(8);
         _lastExploreNew = 0;
+        _badKeys = new HashSet();
+        _badKeyDates = new TreeMap();
+    }
+    
+    /** 
+     * if we do a full search for a key and still fail, don't try again 
+     * for another 5 minutes 
+     */
+    private static final long SHITLIST_TIME = 5*60*1000;
+    
+    /**
+     * Are we currently avoiding this key?
+     *
+     */
+    boolean isShitlisted(Hash key) {
+        synchronized (_badKeys) {
+            locked_cleanupShitlist();
+            return !_badKeys.contains(key);
+        }
+    }
+    /**
+     * For some reason, we don't want to try any remote lookups for this key 
+     * anytime soon - for instance, we may have just failed to find it after a
+     * full netDb search.  
+     *
+     */
+    void shitlist(Hash key) {
+        synchronized (_badKeys) {
+            locked_cleanupShitlist();
+            _badKeys.add(key);
+            long when = _context.clock().now();
+            while (_badKeyDates.containsKey(new Long(when)))
+                when++;
+            _badKeyDates.put(new Long(when), key);
+        }
+    }
+    private void locked_cleanupShitlist() {
+        List old = null;
+        long keepAfter = _context.clock().now() - SHITLIST_TIME;
+        for (Iterator iter = _badKeyDates.keySet().iterator(); iter.hasNext(); ) {
+            Long when = (Long)iter.next();
+            Hash key = (Hash)_badKeyDates.get(when);
+            if (when.longValue() < keepAfter) {
+                if (old == null)
+                    old = new ArrayList(4);
+                old.add(when);
+            } else {
+                // ordered
+                break;
+            }
+        }
+        if (old != null) {
+            for (int i = 0; i < old.size(); i++) {
+                Long when = (Long)old.get(i);
+                Hash key = (Hash)_badKeyDates.remove(when);
+                _badKeys.remove(key);
+            }
+        }
+        
+        if (_badKeys.size() > 0) {
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Cleaning up shitlist: " + _badKeys.size() + " remain after removing " 
+                           + (old != null ? old.size() : 0));
+        }
     }
     
     KBucketSet getKBuckets() { return _kb; }
@@ -445,11 +522,15 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
             return null;
         } else if (leaseSet.getEarliestLeaseDate() <= _context.clock().now()) {
             if (_log.shouldLog(Log.WARN))
-                _log.warn("Old leaseSet!  not storing it: " + leaseSet);
+                _log.warn("Old leaseSet!  not storing it: " 
+                          + leaseSet.getDestination().calculateHash().toBase64() 
+                          + " expires on " + new Date(leaseSet.getEarliestLeaseDate()), new Exception("Rejecting store"));
             return null;
         } else if (leaseSet.getEarliestLeaseDate() > _context.clock().now() + MAX_LEASE_FUTURE) {
             if (_log.shouldLog(Log.WARN))
-                _log.warn("LeaseSet to expire too far in the future: " + leaseSet);
+                _log.warn("LeaseSet to expire too far in the future: " 
+                          + leaseSet.getDestination().calculateHash().toBase64() 
+                          + " expires on " + new Date(leaseSet.getEarliestLeaseDate()), new Exception("Rejecting store"));
             return null;
         }
         
@@ -498,7 +579,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
             int existing = _kb.size();
             if (existing >= MIN_REMAINING_ROUTERS) {
                 if (_log.shouldLog(Log.INFO))
-                    _log.info("Not storing expired router for " + key.toBase64());
+                    _log.info("Not storing expired router for " + key.toBase64(), new Exception("Rejecting store"));
                 return null;
             } else {
                 if (_log.shouldLog(Log.WARN))
@@ -508,8 +589,8 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
             }
         } else if (routerInfo.getPublished() > start + Router.CLOCK_FUDGE_FACTOR) {
             if (_log.shouldLog(Log.WARN))
-                _log.warn("Peer " + key.toBase64() + " published their leaseSet in the future?! [" 
-                          + new Date(routerInfo.getPublished()) + "]");
+                _log.warn("Peer " + key.toBase64() + " published their routerInfo in the future?! [" 
+                          + new Date(routerInfo.getPublished()) + "]", new Exception("Rejecting store"));
             return null;
         }
         
@@ -614,6 +695,13 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
      */
     private void search(Hash key, Job onFindJob, Job onFailedLookupJob, long timeoutMs, boolean isLease) {
         if (!_initialized) return;
+        if (isShitlisted(key)) {
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Not searching for a shitlisted key [" + key.toBase64() + "]");
+            if (onFailedLookupJob != null)
+                _context.jobQueue().addJob(onFailedLookupJob);
+            return;
+        }
         // all searching is indirect (through tunnels) now
         _context.jobQueue().addJob(new SearchJob(_context, this, key, onFindJob, onFailedLookupJob, timeoutMs, true, isLease));
     }

@@ -216,6 +216,11 @@ class PersistentDataStore extends TransientDataStore {
                     LeaseSet ls = new LeaseSet();
                     ls.readBytes(fis);
                     _facade.store(ls.getDestination().calculateHash(), ls);
+                    Object accepted = _facade.lookupLeaseSetLocally(ls.getDestination().calculateHash());
+                    if (accepted == null) {
+                        _log.info("Refused locally loaded leaseSet - deleting");
+                        corrupt = true;
+                    }
                 } catch (DataFormatException dfe) {
                     _log.warn("Error reading the leaseSet from " + _leaseFile.getAbsolutePath(), dfe);
                     corrupt = true;
@@ -267,6 +272,11 @@ class PersistentDataStore extends TransientDataStore {
                     RouterInfo ri = new RouterInfo();
                     ri.readBytes(fis);
                     _facade.store(ri.getIdentity().getHash(), ri);
+                    Object accepted = _facade.lookupRouterInfoLocally(ri.getIdentity().getHash());
+                    if (accepted == null) {
+                        _log.info("Refused locally loaded routerInfo - deleting");
+                        corrupt = true;
+                    }
                 } catch (DataFormatException dfe) {
                     _log.warn("Error reading the routerInfo from " + _routerFile.getAbsolutePath(), dfe);
                     corrupt = true;

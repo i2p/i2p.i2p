@@ -44,8 +44,8 @@ class ExpireLeasesJob extends JobImpl {
         for (Iterator iter = toExpire.iterator(); iter.hasNext(); ) {
             Hash key = (Hash)iter.next();
             _facade.fail(key);
-            _log.info("Lease " + key + " is expiring, so lets look for it again", new Exception("Expire and search"));
-            _facade.lookupLeaseSet(key, null, null, RERUN_DELAY_MS);
+            //_log.info("Lease " + key + " is expiring, so lets look for it again", new Exception("Expire and search"));
+            //_facade.lookupLeaseSet(key, null, null, RERUN_DELAY_MS);
         }
         //_facade.queueForExploration(toExpire); // don't do explicit searches, just explore passively
         requeue(RERUN_DELAY_MS);
