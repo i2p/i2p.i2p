@@ -99,9 +99,9 @@ class LogWriter implements Runnable {
         String val = LogRecordFormatter.formatRecord(_manager, rec);
         writeRecord(val);
 
+        // we always add to the console buffer, but only sometimes write to stdout
+        _manager.getBuffer().add(val);
         if (_manager.getDisplayOnScreenLevel() <= rec.getPriority()) {
-            // we always add to the console buffer, but only sometimes write to stdout
-            _manager.getBuffer().add(val);
             if (_manager.displayOnScreen()) {
                 System.out.print(val);
             }
