@@ -47,17 +47,17 @@ public class UrlLauncher {
         if (validateUrlFormat(url)) {
             if (osName.toLowerCase().indexOf("mac") > -1) {
                 if (osName.toLowerCase().startsWith("mac os x")) {
-                    
+
                     if (_shellCommand.executeSilentAndWaitTimed("safari " + url, 5))
                         return true;
-                    
+
                 } else {
                     return false;
                 }
-                
+
                 if (_shellCommand.executeSilentAndWaitTimed("iexplore " + url, 5))
                     return true;
-                
+
             } else if (osName.startsWith("Windows")) {
 
                 if (_shellCommand.executeSilentAndWaitTimed("rundll32 url.dll,FileProtocolHandler " + url, 5))
@@ -65,12 +65,12 @@ public class UrlLauncher {
 
                 if (_shellCommand.executeSilentAndWaitTimed("\"C:\\Program Files\\Internet Explorer\\iexplore.exe\" " + url, 5))
                     return true;
-                
+
             } else {
-                
+
                 if (_shellCommand.executeSilentAndWaitTimed("konqueror " + url, 5))
                     return true;
-                
+
                 if (_shellCommand.executeSilentAndWaitTimed("galeon " + url, 5))
                     return true;
             }
@@ -80,16 +80,16 @@ public class UrlLauncher {
 
             if (_shellCommand.executeSilentAndWaitTimed("firefox " + url, 5))
                 return true;
-            
+
             if (_shellCommand.executeSilentAndWaitTimed("mozilla " + url, 5))
                 return true;
-            
+
             if (_shellCommand.executeSilentAndWaitTimed("netscape " + url, 5))
                 return true;
-            
+
             if (_shellCommand.executeSilentAndWaitTimed("links " + url, 5))
                 return true;
-            
+
             if (_shellCommand.executeSilentAndWaitTimed("lynx " + url, 5))
                 return true;
         }
