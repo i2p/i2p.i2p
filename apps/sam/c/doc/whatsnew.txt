@@ -2,6 +2,8 @@
 
 v1.30
 	* Added SAM_BAD_STYLE error
+	* Added "pinger.sh" shell script example for using i2p-ping
+	* Various minor enhancements and bug fixes
 
 v1.25	2004-07-31
 	* Created I2P-Ping, a new example program (it's a clone of I2Ping).  Works
