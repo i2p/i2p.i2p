@@ -19,6 +19,8 @@ public class RateStat {
     private String _description;
     /** actual rate objects for this statistic */
     private Rate _rates[];
+    /** component we tell about events as they occur */
+    private StatLog _statLog;
 
     public RateStat(String name, String description, String group, long periods[]) {
         _statName = name;
@@ -28,11 +30,13 @@ public class RateStat {
         for (int i = 0; i < periods.length; i++)
             _rates[i] = new Rate(periods[i]);
     }
-
+    public void setStatLog(StatLog sl) { _statLog = sl; }
+    
     /** 
      * update all of the rates for the various periods with the given value.  
      */
     public void addData(long value, long eventDuration) {
+        if (_statLog != null) _statLog.addData(_groupName, _statName, value, eventDuration);
         for (int i = 0; i < _rates.length; i++)
             _rates[i].addData(value, eventDuration);
     }

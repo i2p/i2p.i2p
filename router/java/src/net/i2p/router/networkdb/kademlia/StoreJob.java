@@ -73,9 +73,9 @@ class StoreJob extends JobImpl {
                     DataStructure data, Job onSuccess, Job onFailure, long timeoutMs, Set toSkip) {
         super(context);
         _log = context.logManager().getLog(StoreJob.class);
-        getContext().statManager().createRateStat("netDb.storeSent", "How many netDb store messages have we sent?", "Network Database", new long[] { 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
-        getContext().statManager().createRateStat("netDb.storePeers", "How many peers each netDb must be sent to before success?", "Network Database", new long[] { 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
-        getContext().statManager().createRateStat("netDb.ackTime", "How long does it take for a peer to ack a netDb store?", "Network Database", new long[] { 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
+        getContext().statManager().createRateStat("netDb.storeSent", "How many netDb store messages have we sent?", "NetworkDatabase", new long[] { 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
+        getContext().statManager().createRateStat("netDb.storePeers", "How many peers each netDb must be sent to before success?", "NetworkDatabase", new long[] { 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
+        getContext().statManager().createRateStat("netDb.ackTime", "How long does it take for a peer to ack a netDb store?", "NetworkDatabase", new long[] { 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
         _facade = facade;
         _state = new StoreState(getContext(), key, data, toSkip);
         _onSuccess = onSuccess;

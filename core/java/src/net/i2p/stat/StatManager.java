@@ -27,6 +27,7 @@ public class StatManager {
     private Map _frequencyStats;
     /** stat name to RateStat */
     private Map _rateStats;
+    private StatLog _statLog;
 
     /**
      * The stat manager should only be constructed and accessed through the 
@@ -39,6 +40,18 @@ public class StatManager {
         _context = context;
         _frequencyStats = Collections.synchronizedMap(new HashMap(128));
         _rateStats = Collections.synchronizedMap(new HashMap(128));
+        _statLog = new BufferedStatLog(context);
+    }
+    
+    public StatLog getStatLog() { return _statLog; }
+    public void setStatLog(StatLog log) { 
+        _statLog = log; 
+        synchronized (_rateStats) {
+            for (Iterator iter = _rateStats.values().iterator(); iter.hasNext(); ) {
+                RateStat rs = (RateStat)iter.next();
+                rs.setStatLog(log);
+            }
+        }
     }
 
     /**
@@ -64,7 +77,9 @@ public class StatManager {
      */
     public void createRateStat(String name, String description, String group, long periods[]) {
         if (_rateStats.containsKey(name)) return;
-        _rateStats.put(name, new RateStat(name, description, group, periods));
+        RateStat rs = new RateStat(name, description, group, periods);
+        if (_statLog != null) rs.setStatLog(_statLog);
+        _rateStats.put(name, rs);
     }
 
     /** update the given frequency statistic, taking note that an event occurred (and recalculating all frequencies) */

@@ -45,9 +45,6 @@ public class PeerProfile {
     // does this peer profile contain expanded data, or just the basics?
     private boolean _expanded;
     
-    public PeerProfile(RouterContext context) {
-        this(context, null, true);
-    }
     public PeerProfile(RouterContext context, Hash peer) {
         this(context, peer, true);
     }
@@ -236,28 +233,37 @@ public class PeerProfile {
      *
      */
     public void expandProfile() {
+        String group = (null == _peer ? "profileUnknown" : _peer.toBase64().substring(0,6));
         if (_sendSuccessSize == null)
-            _sendSuccessSize = new RateStat("sendSuccessSize", "How large successfully sent messages are", "profile", new long[] { 60*1000l, 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
+            _sendSuccessSize = new RateStat("sendSuccessSize", "How large successfully sent messages are", group, new long[] { 60*1000l, 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
         if (_sendFailureSize == null)
-            _sendFailureSize = new RateStat("sendFailureSize", "How large messages that could not be sent were", "profile", new long[] { 60*1000l, 60*60*1000l, 24*60*60*1000 } );
+            _sendFailureSize = new RateStat("sendFailureSize", "How large messages that could not be sent were", group, new long[] { 60*1000l, 60*60*1000l, 24*60*60*1000 } );
         if (_receiveSize == null)
-            _receiveSize = new RateStat("receiveSize", "How large received messages are", "profile", new long[] { 60*1000l, 5*60*1000l, 60*60*1000l, 24*60*60*1000 } );
+            _receiveSize = new RateStat("receiveSize", "How large received messages are", group, new long[] { 60*1000l, 5*60*1000l, 60*60*1000l, 24*60*60*1000 } );
         if (_dbResponseTime == null)
-            _dbResponseTime = new RateStat("dbResponseTime", "how long it takes to get a db response from the peer (in milliseconds)", "profile", new long[] { 10*60*1000l, 60*60*1000l, 24*60*60*1000 } );
+            _dbResponseTime = new RateStat("dbResponseTime", "how long it takes to get a db response from the peer (in milliseconds)", group, new long[] { 10*60*1000l, 60*60*1000l, 24*60*60*1000 } );
         if (_tunnelCreateResponseTime == null)
-            _tunnelCreateResponseTime = new RateStat("tunnelCreateResponseTime", "how long it takes to get a tunnel create response from the peer (in milliseconds)", "profile", new long[] { 10*60*1000l, 60*60*1000l, 24*60*60*1000 } );
+            _tunnelCreateResponseTime = new RateStat("tunnelCreateResponseTime", "how long it takes to get a tunnel create response from the peer (in milliseconds)", group, new long[] { 10*60*1000l, 60*60*1000l, 24*60*60*1000 } );
         if (_tunnelTestResponseTime == null)
-            _tunnelTestResponseTime = new RateStat("tunnelTestResponseTime", "how long it takes to successfully test a tunnel this peer participates in (in milliseconds)", "profile", new long[] { 10*60*1000l, 60*60*1000l, 24*60*60*1000 } );
+            _tunnelTestResponseTime = new RateStat("tunnelTestResponseTime", "how long it takes to successfully test a tunnel this peer participates in (in milliseconds)", group, new long[] { 10*60*1000l, 60*60*1000l, 24*60*60*1000 } );
         if (_commError == null)
-            _commError = new RateStat("commErrorRate", "how long between communication errors with the peer (e.g. disconnection)", "profile", new long[] { 60*1000l, 10*60*1000l, 60*60*1000l, 24*60*60*1000 } );
+            _commError = new RateStat("commErrorRate", "how long between communication errors with the peer (e.g. disconnection)", group, new long[] { 60*1000l, 10*60*1000l, 60*60*1000l, 24*60*60*1000 } );
         if (_dbIntroduction == null)
-            _dbIntroduction = new RateStat("dbIntroduction", "how many new peers we get from dbSearchReplyMessages or dbStore messages", "profile", new long[] { 60*60*1000l, 24*60*60*1000l, 7*24*60*60*1000l });
+            _dbIntroduction = new RateStat("dbIntroduction", "how many new peers we get from dbSearchReplyMessages or dbStore messages", group, new long[] { 60*60*1000l, 24*60*60*1000l, 7*24*60*60*1000l });
 
         if (_tunnelHistory == null)
-            _tunnelHistory = new TunnelHistory(_context);
+            _tunnelHistory = new TunnelHistory(_context, group);
         if (_dbHistory == null)
-            _dbHistory = new DBHistory(_context);
+            _dbHistory = new DBHistory(_context, group);
 
+        _sendSuccessSize.setStatLog(_context.statManager().getStatLog());
+        _sendFailureSize.setStatLog(_context.statManager().getStatLog());
+        _receiveSize.setStatLog(_context.statManager().getStatLog());
+        _dbResponseTime.setStatLog(_context.statManager().getStatLog());
+        _tunnelCreateResponseTime.setStatLog(_context.statManager().getStatLog());
+        _tunnelTestResponseTime.setStatLog(_context.statManager().getStatLog());
+        _commError.setStatLog(_context.statManager().getStatLog());
+        _dbIntroduction.setStatLog(_context.statManager().getStatLog());
         _expanded = true;
     }
     

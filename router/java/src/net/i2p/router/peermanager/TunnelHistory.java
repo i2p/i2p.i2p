@@ -23,22 +23,26 @@ public class TunnelHistory {
     private volatile long _lastFailed;
     private RateStat _rejectRate;
     private RateStat _failRate;
+    private String _statGroup;
     
-    public TunnelHistory(RouterContext context) {
+    public TunnelHistory(RouterContext context, String statGroup) {
         _context = context;
         _log = context.logManager().getLog(TunnelHistory.class);
+        _statGroup = statGroup;
         _lifetimeAgreedTo = 0;
         _lifetimeFailed = 0;
         _lifetimeRejected = 0;
         _lastAgreedTo = 0;
         _lastFailed = 0;
         _lastRejected = 0;
-        createRates();
+        createRates(statGroup);
     }
     
-    private void createRates() {
-        _rejectRate = new RateStat("tunnelHistory.rejectRate", "How often does this peer reject a tunnel request?", "tunnelHistory", new long[] { 60*1000l, 10*60*1000l, 30*60*1000l, 60*60*1000l, 24*60*60*1000l });
-        _failRate = new RateStat("tunnelHistory.failRate", "How often do tunnels this peer accepts fail?", "tunnelHistory", new long[] { 60*1000l, 10*60*1000l, 30*60*1000l, 60*60*1000l, 24*60*60*1000l });
+    private void createRates(String statGroup) {
+        _rejectRate = new RateStat("tunnelHistory.rejectRate", "How often does this peer reject a tunnel request?", statGroup, new long[] { 60*1000l, 10*60*1000l, 30*60*1000l, 60*60*1000l, 24*60*60*1000l });
+        _failRate = new RateStat("tunnelHistory.failRate", "How often do tunnels this peer accepts fail?", statGroup, new long[] { 60*1000l, 10*60*1000l, 30*60*1000l, 60*60*1000l, 24*60*60*1000l });
+        _rejectRate.setStatLog(_context.statManager().getStatLog());
+        _failRate.setStatLog(_context.statManager().getStatLog());
     }
     
     /** total tunnels the peer has agreed to participate in */
@@ -126,7 +130,7 @@ public class TunnelHistory {
                 _log.debug("Loading tunnelHistory.failRate");
         } catch (IllegalArgumentException iae) {
             _log.warn("TunnelHistory rates are corrupt, resetting", iae);
-            createRates();
+            createRates(_statGroup);
         }
     }
     

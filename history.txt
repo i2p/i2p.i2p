@@ -1,4 +1,13 @@
-$Id: history.txt,v 1.29 2004/10/02 07:31:16 jrandom Exp $
+$Id: history.txt,v 1.30 2004/10/02 14:05:24 jrandom Exp $
+
+2004-10-03  jrandom
+    * Add a new stat logging component to optionally dump the raw stats to 
+      disk as they are generated, rather than rely upon the summarized data.
+      By default, this is off, but the router property "stat.logFilters" can
+      be set to a comma delimited list of stats (e.g. "client.sendAckTime")
+      which will be written to the file "stats.log" (or whatever the property
+      "stat.logFile" is set to).  This can also log profile related stats,
+      such as "dbResponseTime" or "tunnelTestResponseTime".
 
 2004-10-02  jrandom
     * Assure that we quickly fail messages bound for shitlisted peers.

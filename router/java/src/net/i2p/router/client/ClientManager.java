@@ -52,7 +52,7 @@ public class ClientManager {
         _log = context.logManager().getLog(ClientManager.class);
         _context.statManager().createRateStat("client.receiveMessageSize", 
                                               "How large are messages received by the client?", 
-                                              "Client Messages", 
+                                              "ClientMessages", 
                                               new long[] { 60*1000l, 60*60*1000l, 24*60*60*1000l });
         _runners = new HashMap();
         _pendingRunners = new HashSet();
