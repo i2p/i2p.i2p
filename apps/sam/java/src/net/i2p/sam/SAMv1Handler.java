@@ -758,7 +758,7 @@ public class SAMv1Handler extends SAMHandler implements SAMRawReceiver, SAMDatag
 
         msg.write(("STREAM RECEIVED ID=" + id 
                    +" SIZE=" + len + "\n").getBytes("ISO-8859-1"));
-        msg.write(data);
+        msg.write(data, 0, len);
 
         writeBytes(msg.toByteArray());
     }
