@@ -19,6 +19,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 
 import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
@@ -648,7 +649,10 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
             Hash key = ls.getDestination().calculateHash();
             buf.append("<b>LeaseSet: ").append(key.toBase64()).append("</b><br />\n");
             long exp = ls.getEarliestLeaseDate()-now;
-            buf.append("Earliest expiration date in: <i>").append(DataHelper.formatDuration(exp)).append("</i><br />\n");
+            if (exp > 0)
+                buf.append("Earliest expiration date in: <i>").append(DataHelper.formatDuration(exp)).append("</i><br />\n");
+            else
+                buf.append("Earliest expiration date was: <i>").append(DataHelper.formatDuration(0-exp)).append(" ago</i><br />\n");
             for (int i = 0; i < ls.getLeaseCount(); i++) {
                 buf.append("Lease ").append(i).append(": gateway <i>");
                 buf.append(ls.getLease(i).getRouterIdentity().getHash().toBase64().substring(0,6));
@@ -667,6 +671,10 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         renderRouterInfo(buf, ourInfo, true);
         out.write(buf.toString().getBytes());
         buf.setLength(0);
+        
+        /* coreVersion to Map of routerVersion to Integer */
+        Map versions = new TreeMap();
+        
         for (Iterator iter = routers.iterator(); iter.hasNext(); ) {
             RouterInfo ri = (RouterInfo)iter.next();
             Hash key = ri.getIdentity().getHash();
@@ -675,9 +683,42 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
                 renderRouterInfo(buf, ri, false);
                 out.write(buf.toString().getBytes());
                 buf.setLength(0);
+                String coreVersion = ri.getOptions().getProperty("coreVersion");
+                String routerVersion = ri.getOptions().getProperty("router.version");
+                if ( (coreVersion != null) && (routerVersion != null) ) {
+                    Map routerVersions = (Map)versions.get(coreVersion);
+                    if (routerVersions == null) {
+                        routerVersions = new TreeMap();
+                        versions.put(coreVersion, routerVersions);
+                    }
+                    Integer val = (Integer)routerVersions.get(routerVersion);
+                    if (val == null)
+                        routerVersions.put(routerVersion, new Integer(1));
+                    else
+                        routerVersions.put(routerVersion, new Integer(val.intValue() + 1));
+                }
             }
         }
+            
+        if (versions.size() > 0) {
+            buf.append("<table border=\"1\">\n");
+            buf.append("<tr><td><b>Core version</b></td><td><b>Router version</b></td><td><b>Number</b></td></tr>\n");
+            for (Iterator iter = versions.keySet().iterator(); iter.hasNext(); ) {
+                String coreVersion = (String)iter.next();
+                Map routerVersions = (Map)versions.get(coreVersion);
+                for (Iterator routerIter = routerVersions.keySet().iterator(); routerIter.hasNext(); ) {
+                    String routerVersion = (String)routerIter.next();
+                    Integer num = (Integer)routerVersions.get(routerVersion);
+                    buf.append("<tr><td>").append(coreVersion);
+                    buf.append("</td><td>").append(routerVersion);
+                    buf.append("</td><td>").append(num.intValue()).append("</td></tr>\n");
+                }
+            }
+            buf.append("</table>\n");
+        }
+        out.write(buf.toString().getBytes());
     }
+    
     private void renderRouterInfo(StringBuffer buf, RouterInfo info, boolean isUs) {
         if (isUs) {
             buf.append("<b>Our info: </b><br />\n");
@@ -688,7 +729,10 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         }
         
         long age = _context.clock().now() - info.getPublished();
-        buf.append("Published: <i>").append(DataHelper.formatDuration(age)).append(" ago</i><br />\n");
+        if (age > 0)
+            buf.append("Published: <i>").append(DataHelper.formatDuration(age)).append(" ago</i><br />\n");
+        else
+            buf.append("Published: <i>in ").append(DataHelper.formatDuration(age)).append("???</i><br />\n");
         buf.append("Address(es): <i>");
         for (Iterator iter = info.getAddresses().iterator(); iter.hasNext(); ) {
             RouterAddress addr = (RouterAddress)iter.next();
