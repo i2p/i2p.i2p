@@ -21,6 +21,8 @@ import net.i2p.util.Log;
 public class I2PTunnelRunner extends I2PThread {
     private final static Log _log = new Log(I2PTunnelRunner.class);
 
+    private static volatile long __runnerId;
+    private long _runnerId;
     /** 
      * max bytes streamed in a packet - smaller ones might be filled
      * up to this size. Larger ones are not split (at least not on
@@ -51,7 +53,8 @@ public class I2PTunnelRunner extends I2PThread {
         lastActivityOn = -1;
         startedOn = -1;
         _log.info("I2PTunnelRunner started");
-        setName("I2PTunnelRunner");
+        _runnerId = ++__runnerId;
+        setName("I2PTunnelRunner " + _runnerId);
         start();
     }
 
@@ -129,6 +132,8 @@ public class I2PTunnelRunner extends I2PThread {
         }
     }
 
+    private volatile long __forwarderId = 0;
+    
     private class StreamForwarder extends I2PThread {
 
         InputStream in;
@@ -137,7 +142,7 @@ public class I2PTunnelRunner extends I2PThread {
         private StreamForwarder(InputStream in, OutputStream out) {
             this.in = in;
             this.out = out;
-            setName("StreamForwarder");
+            setName("StreamForwarder " + _runnerId + "." + (++__forwarderId));
             start();
         }
 
