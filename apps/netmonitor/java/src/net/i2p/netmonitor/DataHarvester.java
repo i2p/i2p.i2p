@@ -5,6 +5,7 @@ import net.i2p.util.Log;
 import net.i2p.util.Clock;
 import java.util.Properties;
 import java.util.Iterator;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
 import java.util.Locale;
@@ -21,8 +22,22 @@ class DataHarvester {
     private static final Log _log = new Log(DataHarvester.class);
     private static final DataHarvester _instance = new DataHarvester();
     public static final DataHarvester getInstance() { return _instance; }
+    /**
+     * Contains the list of StatGroup objects loaded from the harvest.config file
+     * {@see StatGroupLoader} where each statGroup defines a set of stats to pull
+     * from each router's options.
+     *
+     */
+    private List _statGroups;
     
-    protected DataHarvester() {}
+    /**
+     * Where are we reading the stat groups from?  For now, "harvester.config".
+     */
+    private static final String STAT_GROUP_CONFIG_FILENAME = "harvester.config";
+    
+    protected DataHarvester() {
+        _statGroups = StatGroupLoader.loadStatGroups(STAT_GROUP_CONFIG_FILENAME);
+    }
     
     /**
      * Harvest all of the data from the peers and store it in the monitor.
@@ -45,9 +60,7 @@ class DataHarvester {
         _log.info("Harvest the data from " + peer.getIdentity().getHash().toBase64());
         harvestRank(monitor, peer, peers);
         harvestRankAs(monitor, peer);
-        harvestEncryptionTime(monitor, peer);
-        harvestDroppedJobs(monitor, peer);
-        harvestProcessingTime(monitor, peer);
+        harvestGroups(monitor, peer);
     }
     
     /**
@@ -138,88 +151,56 @@ class DataHarvester {
     }
     
     /**
-     * How long does it take the peer to perform an elGamal encryption?  Stored in 
-     * the peer summary as "encryptTime", containing 4 doubles (numMs for 1 minute,
-     * quantity in the last minute, numMs for 1 hour, quantity in the last hour)
-     *
-     * @param peer who are we checking the encryption time of
+     * Harvest all data points from the peer 
+     * 
      */
-    private void harvestEncryptionTime(NetMonitor monitor, RouterInfo peer) {
-        double minuteMs = getDouble(peer, "stat_crypto.elGamal.encrypt.60s", 0);
-        double hourMs = getDouble(peer, "stat_crypto.elGamal.encrypt.60m", 0);
-        double minuteQuantity = getDouble(peer, "stat_crypto.elGamal.encrypt.60s", 7);
-        double hourQuantity = getDouble(peer, "stat_crypto.elGamal.encrypt.60m", 7);
-        if ( (minuteMs == -1) || (hourMs == -1) || (minuteQuantity == -1) || (hourQuantity == -1) )
-            return;
-        
-        double times[] = new double[4];
-        times[0] = minuteMs;
-        times[1] = minuteQuantity;
-        times[2] = hourMs;
-        times[3] = hourQuantity;
-        
-        String description = "how long it takes to do an ElGamal encryption";
-        String valDescr[] = new String[4];
-        valDescr[0] = "encryption time avg ms (minute)";
-        valDescr[1] = "# encryptions (minute)";
-        valDescr[2] = "encryption time avg ms (hour)";
-        valDescr[3] = "# encryptions (hour)";
-        monitor.addData(peer.getIdentity().getHash().toBase64(), "encryptTime", description, valDescr, peer.getPublished(), times);
+    private void harvestGroups(NetMonitor monitor, RouterInfo peer) {
+        _log.debug("Harvesting group data for " + peer.getIdentity().getHash().toBase64());
+        for (int i = 0; i < _statGroups.size(); i++) {
+            StatGroup group = (StatGroup)_statGroups.get(i);
+            harvestGroup(monitor, peer, group);
+        }
     }
     
     /**
-     * How jobs has the peer dropped in the last minute / hour?  Stored in 
-     * the peer summary as "droppedJobs", containing 2 doubles (num jobs for 1 minute,
-     * num jobs for 1 hour)
+     * Harvest the data points for the given group from the peer and toss them 
+     * into the monitor
      *
-     * @param peer who are we checking the frequency of dropping jobs for
      */
-    private void harvestDroppedJobs(NetMonitor monitor, RouterInfo peer) {
-        double minute = getDouble(peer, "stat_jobQueue.droppedJobs.60s", 0);
-        double hour = getDouble(peer, "stat_jobQueue.droppedJobs.60m", 0);
-        double quantity[] = new double[2];
-        quantity[0] = minute;
-        quantity[1] = hour;
-        if ( (minute == -1) || (hour == -1) )
-            return;
-        
-        String valDescr[] = new String[2];
-        valDescr[0] = "# dropped jobs (minute)";
-        valDescr[1] = "# dropped jobs (hour)";
-        String description = "how many dropped jobs";
-        monitor.addData(peer.getIdentity().getHash().toBase64(), "droppedJobs", description, valDescr, peer.getPublished(), quantity);
+    private void harvestGroup(NetMonitor monitor, RouterInfo peer, StatGroup group) {
+        _log.debug("Harvesting group data for " + peer.getIdentity().getHash().toBase64() + " / " + group.getDescription());
+        double values[] = harvestGroupValues(peer, group);
+        if (values == null) return;
+           
+        String description = "how long it takes to do an ElGamal encryption";
+        String valDescr[] = new String[group.getStatCount()];
+        for (int i = 0; i < group.getStatCount(); i++)
+            valDescr[i] = group.getStat(i).getStatDescription();
+        monitor.addData(peer.getIdentity().getHash().toBase64(), group.getDescription(), group.getDescription(), valDescr, peer.getPublished(), values);
     }
-
-    /**
-     * How long does it take to process an outbound message?  Stored in 
-     * the peer summary as "processingTime", containing 4 doubles (avg ms for 1 minute,
-     * num messages for 1 minute, avg ms for 1 hour, num messages for 1 hour)
+    
+    /** 
+     * Pull up a list of all values associated with the group (in the order that the 
+     * group specifies).  
      *
-     * @param peer who are we checking the frequency of dropping jobs for
+     * @return values or null on error
      */
-    private void harvestProcessingTime(NetMonitor monitor, RouterInfo peer) {
-        double minuteMs = getDouble(peer, "stat_transport.sendProcessingTime.60s", 0);
-        double minuteFreq = getDouble(peer, "stat_transport.sendProcessingTime.60s", 7);
-        double hourMs = getDouble(peer, "stat_transport.sendProcessingTime.60m", 0);
-        double hourFreq = getDouble(peer, "stat_transport.sendProcessingTime.60m", 7);
-        if ( (minuteMs == -1) || (hourMs == -1) || (minuteFreq == -1) || (hourFreq == -1) )
-            return;
-        
-        double times[] = new double[4];
-        times[0] = minuteMs;
-        times[1] = minuteFreq;
-        times[2] = hourMs;
-        times[3] = hourFreq;
-        
-        String valDescr[] = new String[4];
-        valDescr[0] = "process time avg ms (minute)";
-        valDescr[1] = "process events (minute)";
-        valDescr[2] = "process time avg ms (hour)";
-        valDescr[3] = "process events (hour)";
-        String description = "how long does it take to process a message";
-        monitor.addData(peer.getIdentity().getHash().toBase64(), "processingTime", description, valDescr, peer.getPublished(), times);
+    private double[] harvestGroupValues(RouterInfo peer, StatGroup group) {
+        List values = new ArrayList(8);
+        for (int i = 0; i < group.getStatCount(); i++) {
+            StatGroup.StatDescription stat = group.getStat(i);
+            double val = getDouble(peer, stat.getOptionName(), stat.getOptionField());
+            if (val == -1) 
+                return null;
+            else
+                values.add(new Double(val));
+        }
+        double rv[] = new double[values.size()];
+        for (int i = 0; i < values.size(); i++)
+            rv[i] = ((Double)values.get(i)).doubleValue();
+        return rv;
     }
-
+    
     /**
      * Pull a value from the peer's option as a double, assuming the standard semicolon
      * delimited formatting
