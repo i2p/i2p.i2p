@@ -658,18 +658,21 @@ public class DataHelper {
     }
 
     public static int read(InputStream in, byte target[]) throws IOException {
-        int cur = 0;
-        while (cur < target.length) {
-            int numRead = in.read(target, cur, target.length - cur);
+        return read(in, target, 0, target.length);
+    }
+    public static int read(InputStream in, byte target[], int offset, int length) throws IOException {
+        int cur = offset;
+        while (cur < length) {
+            int numRead = in.read(target, cur, length - cur);
             if (numRead == -1) {
-                if (cur == 0) return -1; // throw new EOFException("EOF Encountered during reading");
-
+                if (cur == offset) return -1; // throw new EOFException("EOF Encountered during reading");
                 return cur;
             }
             cur += numRead;
         }
         return cur;
     }
+    
     
     /**
      * Read a newline delimited line from the stream, returning the line (without

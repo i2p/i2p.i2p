@@ -155,12 +155,13 @@ public class MessageOutputStream extends OutputStream {
         }
         public void timeReached() {
             _enqueued = false;
+            DataReceiver rec = _dataReceiver;
             long timeLeft = (_lastBuffered + _passiveFlushDelay - _context.clock().now());
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("flusher time reached: left = " + timeLeft);
             if (timeLeft > 0)
                 enqueue();
-            else if (_dataReceiver.writeInProcess())
+            else if ( (rec != null) && (rec.writeInProcess()) )
                 enqueue(); // don't passive flush if there is a write being done (unacked outbound)
             else
                 doFlush();

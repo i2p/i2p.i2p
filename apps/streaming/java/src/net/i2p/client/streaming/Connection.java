@@ -394,15 +394,12 @@ public class Connection {
         if (_socket != null)
             _socket.destroy();
         _socket = null;
-        _inputStream = null;
         if (_outputStream != null)
             _outputStream.destroy();
-        _outputStream = null;
-        _outboundQueue = null;
         if (_receiver != null)
             _receiver.destroy();
         if (_activityTimer != null)
-            SimpleTimer.getInstance().addEvent(_activityTimer, 1);
+            SimpleTimer.getInstance().removeEvent(_activityTimer);
         _activityTimer = null;
         
         if (!_disconnectScheduled) {

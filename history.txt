@@ -1,4 +1,12 @@
-$Id: history.txt,v 1.99 2004/12/06 00:03:58 jrandom Exp $
+$Id: history.txt,v 1.100 2004/12/06 20:09:20 jrandom Exp $
+
+2004-12-08  jrandom
+    * Revised the buffering when reading from the SAM client and writing 
+      to the stream.  Also added a thread (sigh) so we don't block the
+      SAM client from giving us more messages for abnormally long periods
+      of time.
+    * Display the router version in the logs on startup (oft requested)
+    * Fix a race during the closing of a messageOutputStream
 
 2004-12-06  jrandom
     * Don't do a 'passive flush' while there are already outbound messages 

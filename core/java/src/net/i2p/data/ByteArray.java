@@ -18,6 +18,7 @@ import java.io.Serializable;
  */
 public class ByteArray implements Serializable, Comparable {
     private byte[] _data;
+    private int _valid;
 
     public ByteArray() {
         this(null);
@@ -25,6 +26,7 @@ public class ByteArray implements Serializable, Comparable {
 
     public ByteArray(byte[] data) {
         _data = data;
+        _valid = 0;
     }
 
     public final byte[] getData() {
@@ -34,6 +36,14 @@ public class ByteArray implements Serializable, Comparable {
     public void setData(byte[] data) {
         _data = data;
     }
+    
+    /** 
+     * how many of the bytes in the array are 'valid'?  
+     * this property does not necessarily have meaning for all byte 
+     * arrays.
+     */
+    public final int getValid() { return _valid; }
+    public final void setValid(int valid) { _valid = valid; }
 
     public final boolean equals(Object o) {
         if (o == null) return false;
