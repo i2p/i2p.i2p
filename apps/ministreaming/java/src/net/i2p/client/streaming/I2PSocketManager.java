@@ -106,8 +106,10 @@ public class I2PSocketManager implements I2PSessionListener {
             String id = toString(new byte[] { msg[1], msg[2], msg[3]});
             byte[] payload = new byte[msg.length - 4];
             System.arraycopy(msg, 4, payload, 0, payload.length);
-            _log.debug("Message read: type = [" + Integer.toHexString(type) + "] id = [" + getReadableForm(id)
-                       + "] payload length: " + payload.length + "]");
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Message read: type = [" + Integer.toHexString(type) 
+                           + "] id = [" + getReadableForm(id)
+                           + "] payload length: [" + payload.length + "]");
             switch (type) {
                 case ACK:
                     ackAvailable(id, payload);
@@ -510,8 +512,9 @@ public class I2PSocketManager implements I2PSessionListener {
             while (iter.hasNext()) {
                 id = (String)iter.next();
                 sock = (I2PSocketImpl)_inSockets.get(id);
-                _log.debug("Closing inSocket \""
-                           + getReadableForm(sock.getLocalID()) + "\"");
+                if (_log.shouldLog(Log.DEBUG))
+                    _log.debug("Closing inSocket \""
+                               + getReadableForm(sock.getLocalID()) + "\"");
                 sock.internalClose();
             }
             
@@ -519,8 +522,9 @@ public class I2PSocketManager implements I2PSessionListener {
             while (iter.hasNext()) {
                 id = (String)iter.next();
                 sock = (I2PSocketImpl)_outSockets.get(id);
-                _log.debug("Closing outSocket \""
-                           + getReadableForm(sock.getLocalID()) + "\"");
+                if (_log.shouldLog(Log.DEBUG))
+                    _log.debug("Closing outSocket \""
+                               + getReadableForm(sock.getLocalID()) + "\"");
                 sock.internalClose();
             }            
         }
@@ -572,7 +576,8 @@ public class I2PSocketManager implements I2PSessionListener {
 
     public void removeSocket(I2PSocketImpl sock) {
         synchronized (lock) {
-            _log.debug("Removing socket \"" + getReadableForm(sock.getLocalID()) + "\"");
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Removing socket \"" + getReadableForm(sock.getLocalID()) + "\"");
             _inSockets.remove(sock.getLocalID());
             _outSockets.remove(sock.getLocalID());
             lock.notify();

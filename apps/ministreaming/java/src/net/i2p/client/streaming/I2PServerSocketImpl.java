@@ -38,7 +38,8 @@ class I2PServerSocketImpl implements I2PServerSocket {
     /**
      * Waits for the next socket connecting.  If a remote user tried to make a 
      * connection and the local application wasn't .accept()ing new connections,
-     * they should get refused (if .accept() doesnt occur in some small period)
+     * they should get refused (if .accept() doesnt occur in some small period -
+     * currently 5 seconds)
      *
      * @return a connected I2PSocket
      *

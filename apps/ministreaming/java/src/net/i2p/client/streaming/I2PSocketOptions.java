@@ -2,7 +2,6 @@ package net.i2p.client.streaming;
 
 /**
  * Define the configuration for streaming and verifying data on the socket.
- * No options available...
  *
  */
 public class I2PSocketOptions {
