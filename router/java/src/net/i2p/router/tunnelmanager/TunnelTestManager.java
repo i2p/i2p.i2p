@@ -32,16 +32,13 @@ class TunnelTestManager {
     private TunnelPool _pool;
     private boolean _stopTesting;
     
-    private final static long MINIMUM_RETEST_DELAY = 60*1000; // dont test tunnels more than once every 30 seconds
-    
-    /** avg # tests per tunnel lifetime that we want */
-    private final static int TESTS_PER_DURATION = 2;
-    /** how many times we'll be able to try the tests (this should take into consideration user prefs, but fsck it for now) */
-    private final static int CHANCES_PER_DURATION = 8;
+    /** dont test any particular tunnel more than once a minute */
+    private final static long MINIMUM_RETEST_DELAY = 60*1000;
     
     public TunnelTestManager(RouterContext ctx, TunnelPool pool) {
         _context = ctx;
         _log = ctx.logManager().getLog(TunnelTestManager.class);
+        ctx.statManager().createRateStat("tunnel.testSuccessTime", "How long do successful tunnel tests take?", "Tunnels", new long[] { 10*60*1000l, 60*60*1000l, 3*60*60*1000l, 24*60*60*1000l });
         _pool = pool;
         _stopTesting = false;
         _context.jobQueue().addJob(new CoordinateTunnelTestingJob());
@@ -61,18 +58,28 @@ class TunnelTestManager {
                     // skip not ready tunnels
                 } else if (info.getSettings().getExpiration() < now + MINIMUM_RETEST_DELAY) {
                     if (_log.shouldLog(Log.DEBUG))
-                        _log.debug("Tunnel " + id.getTunnelId() + " will be expiring within the current period (" + new Date(info.getSettings().getExpiration()) + "), so skip testing it");
+                        _log.debug("Tunnel " + id.getTunnelId() 
+                                   + " will be expiring within the current period (" 
+                                   + new Date(info.getSettings().getExpiration()) 
+                                   + "), so skip testing it");
                 } else if (info.getSettings().getCreated() + MINIMUM_RETEST_DELAY < now) {
-                    double probability = TESTS_PER_DURATION / (allIds.size() * CHANCES_PER_DURATION);
-                    if (_context.random().nextInt(10) <= (probability*10d)) {
-                        toTest.add(id);
-                    } else {
-                        if (_log.shouldLog(Log.DEBUG))
-                            _log.debug("Tunnel " + id.getTunnelId() + " could be tested, but probabilistically isn't going to be");
+                    // we're past the initial buffer period
+                    if (info.getLastTested() + MINIMUM_RETEST_DELAY < now) {
+                        // we haven't tested this tunnel in the minimum delay, so maybe we 
+                        // should.
+                        if (_context.random().nextBoolean()) {
+                            toTest.add(id);
+                        } else {
+                            if (_log.shouldLog(Log.DEBUG))
+                                _log.debug("We could have tested tunnel " + id.getTunnelId() 
+                                           + ", but randomly decided not to.");
+                        }
                     }
                 } else {
                     if (_log.shouldLog(Log.DEBUG))
-                        _log.debug("Tunnel " + id.getTunnelId() + " was just created (" + new Date(info.getSettings().getCreated()) + "), wait until the next pass to test it");
+                        _log.debug("Tunnel " + id.getTunnelId() + " was just created (" 
+                                   + new Date(info.getSettings().getCreated()) 
+                                   + "), wait until the next pass to test it");
                 }
             } else {
                 if (_log.shouldLog(Log.WARN))
@@ -112,11 +119,8 @@ class TunnelTestManager {
         }
         
         private void reschedule() {
-            long minNext = TunnelTestManager.this._context.clock().now() + MINIMUM_RETEST_DELAY;
-            long nxt = minNext + TunnelTestManager.this._context.random().nextInt(60*1000); // test tunnels once every 30-90 seconds
+            long nxt = TunnelTestManager.this._context.clock().now() + 30*1000;
             getTiming().setStartAfter(nxt);
-            if (_log.shouldLog(Log.INFO))
-                _log.info("Rescheduling tunnel tests for " + new Date(nxt));
             TunnelTestManager.this._context.jobQueue().addJob(CoordinateTunnelTestingJob.this);
         }
     }

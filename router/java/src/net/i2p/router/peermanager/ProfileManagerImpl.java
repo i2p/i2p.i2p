@@ -102,6 +102,17 @@ public class ProfileManagerImpl implements ProfileManager {
     }
     
     /**
+     * Note that a tunnel that the router is participating in
+     * was successfully tested with the given round trip latency
+     *
+     */
+    public void tunnelTestSucceeded(Hash peer, long responseTimeMs) {
+        PeerProfile data = getProfile(peer);
+        if (data == null) return;
+        data.getTunnelTestResponseTime().addData(responseTimeMs, responseTimeMs);
+    }
+    
+    /**
      * Note that the peer participated in a tunnel that failed.  Its failure may not have
      * been the peer's fault however.
      *

@@ -48,6 +48,7 @@ public class TunnelInfo extends DataStructureImpl {
     private Properties _options;
     private TunnelSettings _settings;
     private long _created;
+    private long _lastTested;
     private boolean _ready;
     private boolean _wasEverReady;
     
@@ -67,6 +68,7 @@ public class TunnelInfo extends DataStructureImpl {
         _ready = false;
         _wasEverReady = false;
         _created = _context.clock().now();
+        _lastTested = -1;
     }
     
     public TunnelId getTunnelId() { return _id; }
@@ -141,6 +143,10 @@ public class TunnelInfo extends DataStructureImpl {
     public boolean getWasEverReady() { return _wasEverReady; }
     
     public long getCreated() { return _created; }
+    
+    /** when was the peer last tested (or -1 if never)? */
+    public long getLastTested() { return _lastTested; }
+    public void setLastTested(long when) { _lastTested = when; }
     
     /**
      * Number of hops left in the tunnel (including this one)

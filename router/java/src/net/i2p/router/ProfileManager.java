@@ -51,6 +51,13 @@ public interface ProfileManager {
     void tunnelRejected(Hash peer, long responseTimeMs);
     
     /**
+     * Note that a tunnel that the router is participating in
+     * was successfully tested with the given round trip latency
+     *
+     */
+    void tunnelTestSucceeded(Hash peer, long responseTimeMs);
+    
+    /**
      * Note that the peer participated in a tunnel that failed.  Its failure may not have
      * been the peer's fault however.
      *

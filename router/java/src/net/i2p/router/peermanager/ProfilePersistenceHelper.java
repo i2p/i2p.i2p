@@ -123,7 +123,9 @@ class ProfilePersistenceHelper {
             profile.getDbResponseTime().store(out, "dbResponseTime");
             profile.getReceiveSize().store(out, "receiveSize");
             profile.getSendFailureSize().store(out, "sendFailureSize");
-            profile.getSendSuccessSize().store(out, "tunnelCreateResponseTime");
+            profile.getSendSuccessSize().store(out, "sendSuccessSize");
+            profile.getTunnelCreateResponseTime().store(out, "tunnelCreateResponseTime");
+            profile.getTunnelTestResponseTime().store(out, "tunnelTestResponseTime");
         }
     }
     
@@ -154,10 +156,13 @@ class ProfilePersistenceHelper {
             rv.add(files[i]);
         return rv;
     }
-    private PeerProfile readProfile(File file) {
+    public PeerProfile readProfile(File file) {
         Hash peer = getHash(file.getName());
         try {
-            if (peer == null) return null;
+            if (peer == null) {
+                _log.error("The file " + file.getName() + " is not a valid hash");
+                return null;
+            }
             PeerProfile profile = new PeerProfile(_context, peer);
             Properties props = new Properties();
             
@@ -181,7 +186,9 @@ class ProfilePersistenceHelper {
             profile.getDbResponseTime().load(props, "dbResponseTime", true);
             profile.getReceiveSize().load(props, "receiveSize", true);
             profile.getSendFailureSize().load(props, "sendFailureSize", true);
-            profile.getSendSuccessSize().load(props, "tunnelCreateResponseTime", true);
+            profile.getSendSuccessSize().load(props, "sendSuccessSize", true);
+            profile.getTunnelCreateResponseTime().load(props, "tunnelCreateResponseTime", true);
+            profile.getTunnelTestResponseTime().load(props, "tunnelTestResponseTime", true);
             
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Loaded the profile for " + peer.toBase64() + " from " + file.getName());
@@ -222,7 +229,7 @@ class ProfilePersistenceHelper {
                     props.setProperty(key, val);
             }
         } catch (IOException ioe) {
-            _log.error("Error loading properties from " + file.getName(), ioe);
+            _log.warn("Error loading properties from " + file.getName(), ioe);
         } finally {
             if (in != null) try { in.close(); } catch (IOException ioe) {}
         }
@@ -237,6 +244,7 @@ class ProfilePersistenceHelper {
             h.fromBase64(key);
             return h;
         } catch (DataFormatException dfe) {
+            _log.warn("Invalid base64 [" + key + "]", dfe);
             return null;
         }
     }
@@ -247,10 +255,16 @@ class ProfilePersistenceHelper {
     
     private File getProfileDir() {
         if (_profileDir == null) {
-            String dir = _context.router().getConfigSetting(PROP_PEER_PROFILE_DIR);
-            if (dir == null) {
-                _log.info("No peer profile dir specified [" + PROP_PEER_PROFILE_DIR + "], using [" + DEFAULT_PEER_PROFILE_DIR + "]");
-                dir = DEFAULT_PEER_PROFILE_DIR;
+            String dir = null;
+            if (_context.router() == null) {
+                dir = _context.getProperty(PROP_PEER_PROFILE_DIR, DEFAULT_PEER_PROFILE_DIR);
+            } else {
+                dir = _context.router().getConfigSetting(PROP_PEER_PROFILE_DIR);
+                if (dir == null) {
+                    _log.info("No peer profile dir specified [" + PROP_PEER_PROFILE_DIR 
+                              + "], using [" + DEFAULT_PEER_PROFILE_DIR + "]");
+                    dir = DEFAULT_PEER_PROFILE_DIR;
+                }
             }
             _profileDir = new File(dir);
         }

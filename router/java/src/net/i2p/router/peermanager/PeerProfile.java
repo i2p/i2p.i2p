@@ -4,8 +4,9 @@ import net.i2p.data.Hash;
 import net.i2p.stat.RateStat;
 import net.i2p.util.Log;
 import net.i2p.router.RouterContext;
+import java.io.File;
 
-class PeerProfile {
+public class PeerProfile {
     private Log _log;
     private RouterContext _context;
     // whoozaat?
@@ -22,6 +23,7 @@ class PeerProfile {
     private RateStat _receiveSize = null;
     private RateStat _dbResponseTime = null;
     private RateStat _tunnelCreateResponseTime = null;
+    private RateStat _tunnelTestResponseTime = null;
     private RateStat _commError = null;
     private RateStat _dbIntroduction = null;
     // calculation bonuses
@@ -63,7 +65,7 @@ class PeerProfile {
     public void setPeer(Hash peer) { _peer = peer; }
     
     /**
-     * are we keeping an expanded profile on the peer, or just the bare minimum?
+     * are we keeping an expanded profile on the peer, or just the bare minimum.
      * If we aren't keeping the expanded profile, all of the rates as well as the
      * TunnelHistory and DBHistory will not be available.
      *
@@ -123,7 +125,9 @@ class PeerProfile {
     public RateStat getDbResponseTime() { return _dbResponseTime; }
     /** how long it takes to get a tunnel create response from the peer (in milliseconds), calculated over a 1 minute, 1 hour, and 1 day period */
     public RateStat getTunnelCreateResponseTime() { return _tunnelCreateResponseTime; }
-    /** how long between communication errors with the peer (e.g. disconnection), calculated over a 1 minute, 1 hour, and 1 day period */
+    /** how long it takes to successfully test a tunnel this peer participates in (in milliseconds), calculated over a 10 minute, 1 hour, and 1 day period */
+    public RateStat getTunnelTestResponseTime() { return _tunnelTestResponseTime; }
+    /** how long between communication errors with the peer (disconnection, etc), calculated over a 1 minute, 1 hour, and 1 day period */
     public RateStat getCommError() { return _commError; }
     /** how many new peers we get from dbSearchReplyMessages or dbStore messages, calculated over a 1 hour, 1 day, and 1 week period */
     public RateStat getDbIntroduction() { return _dbIntroduction; }
@@ -160,7 +164,7 @@ class PeerProfile {
      */
     public double getSpeedValue() { return _speedValue; }
     /**
-     * How likely are they to stay up and pass on messages over the next few minutes?
+     * How likely are they to stay up and pass on messages over the next few minutes.
      * Positive numbers means more likely, negative numbers means its probably not
      * even worth trying.
      *
@@ -189,6 +193,7 @@ class PeerProfile {
         _receiveSize = null;
         _dbResponseTime = null;
         _tunnelCreateResponseTime = null;
+        _tunnelTestResponseTime = null;
         _commError = null;
         _dbIntroduction = null;
         _tunnelHistory = null;
@@ -212,9 +217,11 @@ class PeerProfile {
         if (_receiveSize == null)
             _receiveSize = new RateStat("receiveSize", "How large received messages are", "profile", new long[] { 60*1000l, 5*60*1000l, 60*60*1000l, 24*60*60*1000 } );
         if (_dbResponseTime == null)
-            _dbResponseTime = new RateStat("dbResponseTime", "how long it takes to get a db response from the peer (in milliseconds)", "profile", new long[] { 60*1000l, 60*60*1000l, 24*60*60*1000 } );
+            _dbResponseTime = new RateStat("dbResponseTime", "how long it takes to get a db response from the peer (in milliseconds)", "profile", new long[] { 10*60*1000l, 60*60*1000l, 24*60*60*1000 } );
         if (_tunnelCreateResponseTime == null)
-            _tunnelCreateResponseTime = new RateStat("tunnelCreateResponseTime", "how long it takes to get a tunnel create response from the peer (in milliseconds)", "profile", new long[] { 60*1000l, 60*60*1000l, 24*60*60*1000 } );
+            _tunnelCreateResponseTime = new RateStat("tunnelCreateResponseTime", "how long it takes to get a tunnel create response from the peer (in milliseconds)", "profile", new long[] { 10*60*1000l, 60*60*1000l, 24*60*60*1000 } );
+        if (_tunnelTestResponseTime == null)
+            _tunnelTestResponseTime = new RateStat("tunnelTestResponseTime", "how long it takes to successfully test a tunnel this peer participates in (in milliseconds)", "profile", new long[] { 10*60*1000l, 60*60*1000l, 24*60*60*1000 } );
         if (_commError == null)
             _commError = new RateStat("commErrorRate", "how long between communication errors with the peer (e.g. disconnection)", "profile", new long[] { 60*1000l, 60*60*1000l, 24*60*60*1000 } );
         if (_dbIntroduction == null)
@@ -238,6 +245,7 @@ class PeerProfile {
         _sendFailureSize.coallesceStats();
         _sendSuccessSize.coallesceStats();
         _tunnelCreateResponseTime.coallesceStats();
+        _tunnelTestResponseTime.coallesceStats();
         _dbHistory.coallesceStats();
         
         _speedValue = calculateSpeed();
@@ -270,7 +278,7 @@ class PeerProfile {
      * for an expanded profile, and ~212 bytes for a compacted one.
      *
      */
-    public static void main(String args[]) {
+    public static void main2(String args[]) {
         RouterContext ctx = new RouterContext(null);
         testProfileSize(ctx, 100, 0); // 560KB
         testProfileSize(ctx, 1000, 0); // 3.9MB
@@ -278,6 +286,36 @@ class PeerProfile {
         testProfileSize(ctx, 0, 10000); // 2.2MB
         testProfileSize(ctx, 0, 100000); // 21MB
         testProfileSize(ctx, 0, 300000);  // 63MB
+    }
+    
+    /**
+     * Read in all of the profiles specified and print out 
+     * their calculated values.  Usage: <pre>
+     *  PeerProfile [filename]*
+     * </pre>
+     */
+    public static void main(String args[]) {
+        RouterContext ctx = new RouterContext(new net.i2p.router.Router());
+        ProfilePersistenceHelper helper = new ProfilePersistenceHelper(ctx);
+        try { Thread.sleep(5*1000); } catch (InterruptedException e) {}
+        StringBuffer buf = new StringBuffer(1024);
+        for (int i = 0; i < args.length; i++) {
+            PeerProfile profile = helper.readProfile(new File(args[i]));
+            if (profile == null) {
+                buf.append("Could not load profile ").append(args[i]).append('\n');
+                continue;
+            }
+            //profile.coallesceStats();
+            buf.append("Peer " + profile.getPeer().toBase64() 
+                       + ":\t Speed:\t" + profile.calculateSpeed()
+                       + " Reliability:\t" + profile.calculateReliability()
+                       + " Integration:\t" + profile.calculateIntegration()
+                       + " Active?\t" + profile.getIsActive() 
+                       + " Failing?\t" + profile.calculateIsFailing()
+                       + '\n');
+        }
+        try { Thread.sleep(5*1000); } catch (InterruptedException e) {}
+        System.out.println(buf.toString());
     }
     
     private static void testProfileSize(RouterContext ctx, int numExpanded, int numCompact) {

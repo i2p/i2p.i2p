@@ -29,8 +29,7 @@ public class ReliabilityCalculator extends Calculator {
         val += profile.getSendSuccessSize().getRate(60*60*1000).getLastEventCount();
         val += profile.getSendSuccessSize().getRate(60*60*1000).getCurrentEventCount();
         
-        val += profile.getTunnelCreateResponseTime().getRate(60*1000).getCurrentEventCount() * 10;
-        val += profile.getTunnelCreateResponseTime().getRate(60*1000).getLastEventCount() * 5;
+        val += profile.getTunnelCreateResponseTime().getRate(10*60*1000).getLastEventCount() * 5;
         val += profile.getTunnelCreateResponseTime().getRate(60*60*1000).getCurrentEventCount();
         val += profile.getTunnelCreateResponseTime().getRate(60*60*1000).getLastEventCount();
         
