@@ -1,4 +1,11 @@
-$Id: history.txt,v 1.90 2004/11/30 18:41:52 jrandom Exp $
+$Id: history.txt,v 1.91 2004/12/01 17:31:56 jrandom Exp $
+
+* 2004-12-01  0.4.2.2 released
+
+2004-12-01  jrandom
+    * Fixed a stupid typo that inadvertantly allowed persistent HTTP 
+      connections to work (thanks duck!)
+    * Make sure we override the inactivity timeout too
 
 * 2004-12-01  0.4.2.1 released
 
