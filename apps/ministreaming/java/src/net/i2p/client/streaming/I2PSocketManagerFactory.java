@@ -22,7 +22,7 @@ import net.i2p.util.Log;
  */
 public class I2PSocketManagerFactory {
     private final static Log _log = new Log(I2PSocketManagerFactory.class);
-    
+
     /**
      * Create a socket manager using a brand new destination connected to the
      * I2CP router on the local machine on the default port (7654).
@@ -30,9 +30,9 @@ public class I2PSocketManagerFactory {
      * @return the newly created socket manager, or null if there were errors
      */
     public static I2PSocketManager createManager() {
-	return createManager("localhost", 7654, new Properties());
+        return createManager("localhost", 7654, new Properties());
     }
-    
+
     /**
      * Create a socket manager using a brand new destination connected to the
      * I2CP router on the given machine reachable through the given port.
@@ -40,21 +40,21 @@ public class I2PSocketManagerFactory {
      * @return the newly created socket manager, or null if there were errors
      */
     public static I2PSocketManager createManager(String i2cpHost, int i2cpPort, Properties opts) {
-	I2PClient client = I2PClientFactory.createClient();
-	ByteArrayOutputStream keyStream = new ByteArrayOutputStream(512);
-	try {
-	    Destination dest = client.createDestination(keyStream);
-	    ByteArrayInputStream in = new ByteArrayInputStream(keyStream.toByteArray());
-	    return createManager(in, i2cpHost, i2cpPort, opts);
-	} catch (IOException ioe) {
-	    _log.error("Error creating the destination for socket manager", ioe);
-	    return null;
-	} catch (I2PException ie) {
-	    _log.error("Error creating the destination for socket manager", ie);
-	    return null;
-	}
+        I2PClient client = I2PClientFactory.createClient();
+        ByteArrayOutputStream keyStream = new ByteArrayOutputStream(512);
+        try {
+            Destination dest = client.createDestination(keyStream);
+            ByteArrayInputStream in = new ByteArrayInputStream(keyStream.toByteArray());
+            return createManager(in, i2cpHost, i2cpPort, opts);
+        } catch (IOException ioe) {
+            _log.error("Error creating the destination for socket manager", ioe);
+            return null;
+        } catch (I2PException ie) {
+            _log.error("Error creating the destination for socket manager", ie);
+            return null;
+        }
     }
-    
+
     /**
      * Create a socket manager using the destination loaded from the given private key
      * stream and connected to the I2CP router on the specified machine on the given
@@ -62,24 +62,25 @@ public class I2PSocketManagerFactory {
      *
      * @return the newly created socket manager, or null if there were errors
      */
-    public static I2PSocketManager createManager(InputStream myPrivateKeyStream, String i2cpHost, int i2cpPort, Properties opts) {
-	I2PClient client = I2PClientFactory.createClient();
-	opts.setProperty(I2PClient.PROP_RELIABILITY, I2PClient.PROP_RELIABILITY_GUARANTEED);
-	opts.setProperty(I2PClient.PROP_TCP_HOST, i2cpHost);
-	opts.setProperty(I2PClient.PROP_TCP_PORT, ""+i2cpPort);
-	try {
-	    I2PSession session = client.createSession(myPrivateKeyStream, opts);
-	    session.connect();
-	    return createManager(session);
-	} catch (I2PSessionException ise) {
-	    _log.error("Error creating session for socket manager", ise);
-	    return null;
-	}
+    public static I2PSocketManager createManager(InputStream myPrivateKeyStream, String i2cpHost, int i2cpPort,
+                                                 Properties opts) {
+        I2PClient client = I2PClientFactory.createClient();
+        opts.setProperty(I2PClient.PROP_RELIABILITY, I2PClient.PROP_RELIABILITY_GUARANTEED);
+        opts.setProperty(I2PClient.PROP_TCP_HOST, i2cpHost);
+        opts.setProperty(I2PClient.PROP_TCP_PORT, "" + i2cpPort);
+        try {
+            I2PSession session = client.createSession(myPrivateKeyStream, opts);
+            session.connect();
+            return createManager(session);
+        } catch (I2PSessionException ise) {
+            _log.error("Error creating session for socket manager", ise);
+            return null;
+        }
     }
-    
+
     private static I2PSocketManager createManager(I2PSession session) {
-	I2PSocketManager mgr = new I2PSocketManager();
-	mgr.setSession(session);
-	return mgr;
+        I2PSocketManager mgr = new I2PSocketManager();
+        mgr.setSession(session);
+        return mgr;
     }
 }

@@ -11,7 +11,7 @@ public interface I2PServerSocket {
      * Closes the socket.
      */
     public void close() throws I2PException;
-    
+
     /**
      * Waits for the next socket connecting.  If a remote user tried to make a 
      * connection and the local application wasn't .accept()ing new connections,

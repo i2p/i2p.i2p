@@ -1,4 +1,5 @@
 package net.i2p.phttprelay;
+
 /*
  * free (adj.): unencumbered; not under the control of others
  * Written by jrandom in 2003 and released into the public domain 
@@ -66,89 +67,92 @@ public class RegisterServlet extends PHTTPRelayServlet {
     /* config params */
     public final static String PARAM_POLL_PATH = "pollPath";
     public final static String PARAM_SEND_PATH = "sendPath";
-    
+
     /* key=val keys sent back on registration */
-    public final static String PROP_STATUS   = "status";
+    public final static String PROP_STATUS = "status";
     public final static String PROP_POLL_URL = "pollURL";
     public final static String PROP_SEND_URL = "sendURL";
     public final static String PROP_TIME_OFFSET = "timeOffset"; // ms (local-remote)
 
     /* values for the PROP_STATUS */
-    public final static String STATUS_FAILED     = "failed";
+    public final static String STATUS_FAILED = "failed";
     public final static String STATUS_REGISTERED = "registered";
-    
-    public void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-	ServletInputStream in = req.getInputStream();
-	RouterIdentity ident = new RouterIdentity();
-	try {
-	    Date remoteTime = DataHelper.readDate(in);
-	    long skew = getSkew(remoteTime);
-	    ident.readBytes(in);
-	    boolean ok = registerIdent(ident);
-	    sendURLs(req, resp, skew, ok);
-	} catch (DataFormatException dfe) {
-	    log("Invalid format for router identity posted", dfe);
-	} finally {
-	    in.close();
-	}
-    }
-    
-    private long getSkew(Date remoteDate) {
-	if (remoteDate == null) {
-	    log("*ERROR: remote date was null");
-	    return Long.MAX_VALUE;
-	} else {
-	    long diff = Clock.getInstance().now() - remoteDate.getTime();
-	    return diff;
-	}
-    }
-    
-    private boolean registerIdent(RouterIdentity ident) throws DataFormatException, IOException {
-	File identDir = getIdentDir(ident.getHash().toBase64());
-	boolean created = identDir.mkdirs();
-	File identFile = new File(identDir, "identity.dat");
-	FileOutputStream fos = null;
-	try {
-	    fos = new FileOutputStream(identFile);
-	    ident.writeBytes(fos);
-	} finally {
-	    if (fos != null) try { fos.close(); } catch (IOException ioe) {}
-	}
-	log("Identity registered into " + identFile.getAbsolutePath());
-	return true;
-    }
-    
-    private void sendURLs(HttpServletRequest req, HttpServletResponse resp, long skew, boolean ok) throws IOException {
-	ServletOutputStream out = resp.getOutputStream();
 
-	log("*Debug: clock skew of " + skew + "ms (local-remote)");
-	
-	StringBuffer buf = new StringBuffer();
-	if (ok) {
-	    buf.append(PROP_POLL_URL).append("=").append(buildURL(req, _pollPath)).append("\n");
-	    buf.append(PROP_SEND_URL).append("=").append(buildURL(req, _sendPath)).append("\n");
-	    buf.append(PROP_TIME_OFFSET).append("=").append(skew).append("\n");
-	    buf.append(PROP_STATUS).append("=").append(STATUS_REGISTERED).append("\n");
-	} else {
-	    buf.append(PROP_TIME_OFFSET).append("=").append(skew).append("\n");
-	    buf.append(PROP_STATUS).append("=").append(STATUS_FAILED).append("\n");
-	}
-	out.write(buf.toString().getBytes());
-	out.close();
+    public void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        ServletInputStream in = req.getInputStream();
+        RouterIdentity ident = new RouterIdentity();
+        try {
+            Date remoteTime = DataHelper.readDate(in);
+            long skew = getSkew(remoteTime);
+            ident.readBytes(in);
+            boolean ok = registerIdent(ident);
+            sendURLs(req, resp, skew, ok);
+        } catch (DataFormatException dfe) {
+            log("Invalid format for router identity posted", dfe);
+        } finally {
+            in.close();
+        }
     }
-    
+
+    private long getSkew(Date remoteDate) {
+        if (remoteDate == null) {
+            log("*ERROR: remote date was null");
+            return Long.MAX_VALUE;
+        } else {
+            long diff = Clock.getInstance().now() - remoteDate.getTime();
+            return diff;
+        }
+    }
+
+    private boolean registerIdent(RouterIdentity ident) throws DataFormatException, IOException {
+        File identDir = getIdentDir(ident.getHash().toBase64());
+        boolean created = identDir.mkdirs();
+        File identFile = new File(identDir, "identity.dat");
+        FileOutputStream fos = null;
+        try {
+            fos = new FileOutputStream(identFile);
+            ident.writeBytes(fos);
+        } finally {
+            if (fos != null) try {
+                fos.close();
+            } catch (IOException ioe) {
+            }
+        }
+        log("Identity registered into " + identFile.getAbsolutePath());
+        return true;
+    }
+
+    private void sendURLs(HttpServletRequest req, HttpServletResponse resp, long skew, boolean ok) throws IOException {
+        ServletOutputStream out = resp.getOutputStream();
+
+        log("*Debug: clock skew of " + skew + "ms (local-remote)");
+
+        StringBuffer buf = new StringBuffer();
+        if (ok) {
+            buf.append(PROP_POLL_URL).append("=").append(buildURL(req, _pollPath)).append("\n");
+            buf.append(PROP_SEND_URL).append("=").append(buildURL(req, _sendPath)).append("\n");
+            buf.append(PROP_TIME_OFFSET).append("=").append(skew).append("\n");
+            buf.append(PROP_STATUS).append("=").append(STATUS_REGISTERED).append("\n");
+        } else {
+            buf.append(PROP_TIME_OFFSET).append("=").append(skew).append("\n");
+            buf.append(PROP_STATUS).append("=").append(STATUS_FAILED).append("\n");
+        }
+        out.write(buf.toString().getBytes());
+        out.close();
+    }
+
     public void init(ServletConfig config) throws ServletException {
-	super.init(config);
-	
-	String pollPath = config.getInitParameter(PARAM_POLL_PATH);
-	if (pollPath == null)
-	    throw new ServletException("Polling path for the registration servlet required [" + PARAM_POLL_PATH + "]");
-	else
-	    _pollPath = pollPath;
-	String sendPath = config.getInitParameter(PARAM_SEND_PATH);
-	if (sendPath == null)
-	    throw new ServletException("Sending path for the registration servlet required [" + PARAM_SEND_PATH + "]");
-	else 
-	    _sendPath = sendPath;
+        super.init(config);
+
+        String pollPath = config.getInitParameter(PARAM_POLL_PATH);
+        if (pollPath == null)
+            throw new ServletException("Polling path for the registration servlet required [" + PARAM_POLL_PATH + "]");
+        else
+            _pollPath = pollPath;
+        String sendPath = config.getInitParameter(PARAM_SEND_PATH);
+        if (sendPath == null)
+            throw new ServletException("Sending path for the registration servlet required [" + PARAM_SEND_PATH + "]");
+        else
+            _sendPath = sendPath;
     }
 }

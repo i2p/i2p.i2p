@@ -1,4 +1,5 @@
 package net.i2p.phttprelay;
+
 /*
  * free (adj.): unencumbered; not under the control of others
  * Written by jrandom in 2003 and released into the public domain 
@@ -18,23 +19,26 @@ import java.util.Set;
  */
 class LockManager {
     private volatile static Set _locks = new HashSet(); // target
-    
+
     public static void lockIdent(String target) {
-	while (true) {
-	    synchronized (_locks) {
-		if (!_locks.contains(target)) {
-		    _locks.add(target);
-		    return;
-		}
-		try { _locks.wait(1000); } catch (InterruptedException ie) {}
-	    }
-	}
+        while (true) {
+            synchronized (_locks) {
+                if (!_locks.contains(target)) {
+                    _locks.add(target);
+                    return;
+                }
+                try {
+                    _locks.wait(1000);
+                } catch (InterruptedException ie) {
+                }
+            }
+        }
     }
-    
+
     public static void unlockIdent(String target) {
-	synchronized (_locks) {
-	    _locks.remove(target);
-	    _locks.notifyAll();
-	}
+        synchronized (_locks) {
+            _locks.remove(target);
+            _locks.notifyAll();
+        }
     }
 }
