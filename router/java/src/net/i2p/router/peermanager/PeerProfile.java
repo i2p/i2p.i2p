@@ -207,25 +207,25 @@ class PeerProfile {
     public void expandProfile() {
         if (_sendSuccessSize == null)
             _sendSuccessSize = new RateStat("sendSuccessSize", "How large successfully sent messages are", "profile", new long[] { 60*1000l, 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
-            if (_sendFailureSize == null)
-                _sendFailureSize = new RateStat("sendFailureSize", "How large messages that could not be sent were", "profile", new long[] { 60*1000l, 60*60*1000l, 24*60*60*1000 } );
-                if (_receiveSize == null)
-                    _receiveSize = new RateStat("receiveSize", "How large received messages are", "profile", new long[] { 60*1000l, 5*60*1000l, 60*60*1000l, 24*60*60*1000 } );
-                    if (_dbResponseTime == null)
-                        _dbResponseTime = new RateStat("dbResponseTime", "how long it takes to get a db response from the peer (in milliseconds)", "profile", new long[] { 60*1000l, 60*60*1000l, 24*60*60*1000 } );
-                        if (_tunnelCreateResponseTime == null)
-                            _tunnelCreateResponseTime = new RateStat("tunnelCreateResponseTime", "how long it takes to get a tunnel create response from the peer (in milliseconds)", "profile", new long[] { 60*1000l, 60*60*1000l, 24*60*60*1000 } );
-                            if (_commError == null)
-                                _commError = new RateStat("commErrorRate", "how long between communication errors with the peer (e.g. disconnection)", "profile", new long[] { 60*1000l, 60*60*1000l, 24*60*60*1000 } );
-                                if (_dbIntroduction == null)
-                                    _dbIntroduction = new RateStat("dbIntroduction", "how many new peers we get from dbSearchReplyMessages or dbStore messages", "profile", new long[] { 60*60*1000l, 24*60*60*1000l, 7*24*60*60*1000l });
-                                    
-                                    if (_tunnelHistory == null)
-                                        _tunnelHistory = new TunnelHistory(_context);
-                                    if (_dbHistory == null)
-                                        _dbHistory = new DBHistory(_context);
-                                    
-                                    _expanded = true;
+        if (_sendFailureSize == null)
+            _sendFailureSize = new RateStat("sendFailureSize", "How large messages that could not be sent were", "profile", new long[] { 60*1000l, 60*60*1000l, 24*60*60*1000 } );
+        if (_receiveSize == null)
+            _receiveSize = new RateStat("receiveSize", "How large received messages are", "profile", new long[] { 60*1000l, 5*60*1000l, 60*60*1000l, 24*60*60*1000 } );
+        if (_dbResponseTime == null)
+            _dbResponseTime = new RateStat("dbResponseTime", "how long it takes to get a db response from the peer (in milliseconds)", "profile", new long[] { 60*1000l, 60*60*1000l, 24*60*60*1000 } );
+        if (_tunnelCreateResponseTime == null)
+            _tunnelCreateResponseTime = new RateStat("tunnelCreateResponseTime", "how long it takes to get a tunnel create response from the peer (in milliseconds)", "profile", new long[] { 60*1000l, 60*60*1000l, 24*60*60*1000 } );
+        if (_commError == null)
+            _commError = new RateStat("commErrorRate", "how long between communication errors with the peer (e.g. disconnection)", "profile", new long[] { 60*1000l, 60*60*1000l, 24*60*60*1000 } );
+        if (_dbIntroduction == null)
+            _dbIntroduction = new RateStat("dbIntroduction", "how many new peers we get from dbSearchReplyMessages or dbStore messages", "profile", new long[] { 60*60*1000l, 24*60*60*1000l, 7*24*60*60*1000l });
+
+        if (_tunnelHistory == null)
+            _tunnelHistory = new TunnelHistory(_context);
+        if (_dbHistory == null)
+            _dbHistory = new DBHistory(_context);
+
+        _expanded = true;
     }
     
     /** update the stats and rates (this should be called once a minute) */
