@@ -678,9 +678,10 @@ public class RequestTunnelJob extends JobImpl {
             getContext().profileManager().tunnelRejected(_tunnel.getThisHop(), responseTime, false);
             getContext().profileManager().messageFailed(_tunnel.getThisHop());
             
-            // one (or both) of the tunnels used to send the request / receive a reply failed
-            _pool.tunnelFailed(_replyTunnelId);
-            _pool.tunnelFailed(_outboundTunnelId);
+            // one (or both) of the tunnels used to send the request / receive 
+            // a reply failed, or the peer failed, or the peer's tunnels failed
+            //_pool.tunnelFailed(_replyTunnelId);
+            //_pool.tunnelFailed(_outboundTunnelId);
             
             Failure.this.getContext().statManager().updateFrequency("tunnel.buildFailFrequency");
             fail();

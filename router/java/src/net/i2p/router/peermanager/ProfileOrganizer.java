@@ -253,12 +253,12 @@ public class ProfileOrganizer {
             locked_selectPeers(_fastPeers, howMany, exclude, matches);
         }
         if (matches.size() < howMany) {
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("selectFastPeers("+howMany+"), not enough fast (" + matches.size() + ") going on to highCap");
+            if (_log.shouldLog(Log.INFO))
+                _log.info("selectFastPeers("+howMany+"), not enough fast (" + matches.size() + ") going on to highCap");
             selectHighCapacityPeers(howMany, exclude, matches);
         } else {
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("selectFastPeers("+howMany+"), found enough fast (" + matches.size() + ")");
+            if (_log.shouldLog(Log.INFO))
+                _log.info("selectFastPeers("+howMany+"), found enough fast (" + matches.size() + ")");
         }
         return;
     }
@@ -279,12 +279,12 @@ public class ProfileOrganizer {
             locked_selectPeers(_highCapacityPeers, howMany, exclude, matches);
         }
         if (matches.size() < howMany) {
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("selectHighCap("+howMany+"), not enough fast (" + matches.size() + ") going on to notFailing");
+            if (_log.shouldLog(Log.INFO))
+                _log.info("selectHighCap("+howMany+"), not enough fast (" + matches.size() + ") going on to notFailing");
             selectNotFailingPeers(howMany, exclude, matches);
         } else {
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("selectHighCap("+howMany+"), found enough highCap (" + matches.size() + ")");
+            if (_log.shouldLog(Log.INFO))
+                _log.info("selectHighCap("+howMany+"), found enough highCap (" + matches.size() + ")");
         }
         return;
     }
@@ -297,12 +297,12 @@ public class ProfileOrganizer {
             locked_selectPeers(_wellIntegratedPeers, howMany, exclude, matches);
         }
         if (matches.size() < howMany) {
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("selectWellIntegrated("+howMany+"), not enough integrated (" + matches.size() + ") going on to notFailing");
+            if (_log.shouldLog(Log.INFO))
+                _log.info("selectWellIntegrated("+howMany+"), not enough integrated (" + matches.size() + ") going on to notFailing");
             selectNotFailingPeers(howMany, exclude, matches);
         } else {            
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("selectWellIntegrated("+howMany+"), found enough well integrated (" + matches.size() + ")");
+            if (_log.shouldLog(Log.INFO))
+                _log.info("selectWellIntegrated("+howMany+"), found enough well integrated (" + matches.size() + ")");
         }
         
         return;
@@ -369,17 +369,17 @@ public class ProfileOrganizer {
                     }
                 }
             }
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Selecting all not failing found " + (matches.size()-orig) + " new peers: " + selected);
+            if (_log.shouldLog(Log.INFO))
+                _log.info("Selecting all not failing found " + (matches.size()-orig) + " new peers: " + selected);
             matches.addAll(selected);
         }
         if (matches.size() < howMany) {
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("selectAllNotFailing("+howMany+"), not enough (" + matches.size() + ") going on to failing");
+            if (_log.shouldLog(Log.INFO))
+                _log.info("selectAllNotFailing("+howMany+"), not enough (" + matches.size() + ") going on to failing");
             selectFailingPeers(howMany, exclude, matches);
         } else {
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("selectAllNotFailing("+howMany+"), enough (" + matches.size() + ")");
+            if (_log.shouldLog(Log.INFO))
+                _log.info("selectAllNotFailing("+howMany+"), enough (" + matches.size() + ")");
         }
         return;
     }
@@ -477,8 +477,8 @@ public class ProfileOrganizer {
         int minFastPeers = getMinimumFastPeers();
         int numToPromote = minFastPeers - _fastPeers.size();
         if (numToPromote > 0) {
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Need to explicitly promote " + numToPromote + " peers to the fast group");
+            if (_log.shouldLog(Log.INFO))
+                _log.info("Need to explicitly promote " + numToPromote + " peers to the fast group");
             for (Iterator iter = _strictCapacityOrder.iterator(); iter.hasNext(); ) {
                 PeerProfile cur = (PeerProfile)iter.next();
                 if ( (!_fastPeers.containsKey(cur.getPeer())) && (!cur.getIsFailing()) ) {
