@@ -1,4 +1,9 @@
-$Id: history.txt,v 1.34 2004/10/05 14:21:47 jrandom Exp $
+$Id: history.txt,v 1.35 2004/10/05 20:12:04 jrandom Exp $
+
+2004-10-06  jrandom
+    * Enable explicit disabling of the systray entirely for windows machines
+      with strange configurations: add -Dsystray.disable=true to the java 
+      command line.  (thanks mihi!)
 
 2004-10-05  jrandom
     * Allow peers on the same LAN to communicate with each other safely even

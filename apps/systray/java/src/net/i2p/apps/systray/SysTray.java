@@ -49,7 +49,7 @@ public class SysTray implements SysTrayMenuListener {
         if (!(new File("router.config")).exists())
             openRouterConsole("http://localhost:" + _portString + "/index.jsp");
 
-        if (System.getProperty("os.name").startsWith("Windows"))
+        if ( (System.getProperty("os.name").startsWith("Windows")) && (!Boolean.getBoolean("systray.disable")) )
             _instance = new SysTray();
     }
 
