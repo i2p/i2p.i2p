@@ -6,7 +6,9 @@
  */
 package net.i2p.i2ptunnel.socks;
 
+import java.io.IOException;
 import java.net.Socket;
+import java.net.SocketException;
 
 import net.i2p.I2PException;
 import net.i2p.client.streaming.I2PSocket;
@@ -88,8 +90,18 @@ public abstract class SOCKSServer {
             }
         } catch (DataFormatException e) {
             throw new SOCKSException("Error in destination format");
+        } catch (SocketException e) {
+            throw new SOCKSException("Error connecting ("
+                                     + e.getMessage() + ")");
+        } catch (IOException e) {
+            throw new SOCKSException("Error connecting ("
+                                     + e.getMessage() + ")");
+        } catch (InterruptedException e) {
+            throw new SOCKSException("Error connecting ("
+                                     + e.getMessage() + ")");
         } catch (I2PException e) {
-            throw new SOCKSException("I2P error (" + e.getMessage() + ")");
+            throw new SOCKSException("Error connecting ("
+                                     + e.getMessage() + ")");
         }
 
         return destSock;

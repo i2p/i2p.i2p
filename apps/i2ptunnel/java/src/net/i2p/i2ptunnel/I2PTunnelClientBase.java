@@ -4,7 +4,9 @@
 package net.i2p.i2ptunnel;
 
 import java.io.IOException;
+import java.net.ConnectException;
 import java.net.InetAddress;
+import java.net.NoRouteToHostException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
@@ -155,7 +157,7 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
      * @param dest The destination to connect to
      * @return a new I2PSocket
      */
-    public I2PSocket createI2PSocket(Destination dest) throws I2PException {
+    public I2PSocket createI2PSocket(Destination dest) throws I2PException, ConnectException, NoRouteToHostException, InterruptedException {
         return createI2PSocket(dest, getDefaultOptions());
     }
 
@@ -167,8 +169,13 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
      * @param dest The destination to connect to
      * @param opt Option to be used to open when opening the socket
      * @return a new I2PSocket
+     *
+     * @throws ConnectException if the peer refuses the connection
+     * @throws NoRouteToHostException if the peer is not found or not reachable
+     * @throws InterruptedException if the connection timeouts
+     * @throws I2PException if there is some other I2P-related problem
      */
-    public I2PSocket createI2PSocket(Destination dest, I2PSocketOptions opt) throws I2PException {
+    public I2PSocket createI2PSocket(Destination dest, I2PSocketOptions opt) throws I2PException, ConnectException, NoRouteToHostException, InterruptedException {
         I2PSocket i2ps;
 
         synchronized (sockLock) {

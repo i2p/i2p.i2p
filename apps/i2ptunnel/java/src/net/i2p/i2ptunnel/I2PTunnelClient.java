@@ -49,9 +49,9 @@ public class I2PTunnelClient extends I2PTunnelClientBase {
         try {
             I2PSocket i2ps = createI2PSocket(dest);
             new I2PTunnelRunner(s, i2ps, sockLock, null);
-        } catch (I2PException ex) {
+        } catch (Exception ex) {
             _log.info("Error connecting", ex);
-            l.log("Unable to reach peer");
+            l.log(ex.getMessage());
             // s has been initialized before the try block...
             closeSocket(s);
         }

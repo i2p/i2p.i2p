@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.Socket;
+import java.net.SocketException;
 import java.util.Date;
 
 import net.i2p.I2PException;
@@ -188,15 +189,28 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
             I2PTunnelRunner runner = new I2PTunnelRunner(s, i2ps, sockLock, data);
             timeoutThread = new InactivityTimeoutThread(runner, out, targetRequest, usingWWWProxy, s);
             timeoutThread.start();
+        } catch (SocketException ex) {
+            if (timeoutThread != null) timeoutThread.disable();
+            _log.info("Error trying to connect", ex);
+            l.log(ex.getMessage());
+            handleHTTPClientException(ex, out, targetRequest, usingWWWProxy, wwwProxy);
+            closeSocket(s);
         } catch (IOException ex) {
             if (timeoutThread != null) timeoutThread.disable();
-            _log.error("Error sending syn", ex);
+            _log.info("Error trying to connect", ex);
+            l.log(ex.getMessage());
+            handleHTTPClientException(ex, out, targetRequest, usingWWWProxy, wwwProxy);
+            closeSocket(s);
+        } catch (InterruptedException ex) {
+            if (timeoutThread != null) timeoutThread.disable();
+            _log.info("Error trying to connect", ex);
+            l.log(ex.getMessage());
             handleHTTPClientException(ex, out, targetRequest, usingWWWProxy, wwwProxy);
             closeSocket(s);
         } catch (I2PException ex) {
             if (timeoutThread != null) timeoutThread.disable();
-            _log.info("Error sending syn", ex);
-            l.log("Unable to reach peer");
+            _log.info("Error trying to connect", ex);
+            l.log(ex.getMessage());
             handleHTTPClientException(ex, out, targetRequest, usingWWWProxy, wwwProxy);
             closeSocket(s);
         }
