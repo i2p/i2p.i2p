@@ -423,7 +423,10 @@ class Socket:
       if bufsize < -1:
         raise ValueError('bufsize must be >= -1 for packets')
       (data, addr) = self.sessobj.recv(timeout, peek)
-      return (data[:bufsize], addr)
+      if bufsize == -1:
+        return (data, addr)
+      else:
+        return (data[:bufsize], addr)
 
   def send(self, string, flags=0):
     """Sends string data to a remote Destination.
