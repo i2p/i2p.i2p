@@ -732,7 +732,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         if (age > 0)
             buf.append("Published: <i>").append(DataHelper.formatDuration(age)).append(" ago</i><br />\n");
         else
-            buf.append("Published: <i>in ").append(DataHelper.formatDuration(age)).append("???</i><br />\n");
+            buf.append("Published: <i>in ").append(DataHelper.formatDuration(0-age)).append("???</i><br />\n");
         buf.append("Address(es): <i>");
         for (Iterator iter = info.getAddresses().iterator(); iter.hasNext(); ) {
             RouterAddress addr = (RouterAddress)iter.next();
