@@ -7,7 +7,7 @@
 # Your operating environment
 #
 
-OS = CYGWIN
+OS = LINUX
 
 #
 # Directories
@@ -57,7 +57,8 @@ OBJS =	$(OBJDIR)/bigint.o \
 		$(OBJDIR)/random.o \
 		$(OBJDIR)/rpc.o \
 		$(OBJDIR)/sam.o \
-		$(OBJDIR)/sha1.o
+		$(OBJDIR)/sha1.o \
+		$(OBJDIR)/thread.o
 
 #
 # Build rules

@@ -81,6 +81,8 @@ using namespace std;
 /*
  * Local includes
  */
+#include "mutex.hpp"  // Mutex (for thread.hpp)
+#include "thread.hpp"  // Thread
 #include "logger.hpp"  // Logger
 #include "config.hpp"  // Config
 #include "sam_error.hpp"  // for sam.hpp

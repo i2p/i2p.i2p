@@ -28,39 +28,33 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef SAM_HPP
-#define SAM_HPP
+#ifndef THREAD_HPP
+#define THREAD_HPP
 
-class Sam {
+class Thread {
 	public:
-		Sam(const string& samhost, uint16_t samport, const string& destname,
-			uint_t tunneldepth);
-		~Sam(void);
+		Thread(void);
+		virtual ~Thread(void);
 
-		const string& get_my_dest(void) const { return my_dest; }
-		const Sha1& get_my_sha1(void) const { return my_sha1; }
-		void naming_lookup(const string& name = "ME") const;
-		void read_buffer(void);
-		void send_dgram(const string& dest, uchar_t *data, size_t size);
-		bool valid_dest(const string& dest);
-
-		Peers* peers;
-
-	//callback-private:
-		void load_peers(void);
-		void parse_dgram(const string& dest, void* data, size_t size);
-		void set_connected(bool connected);
-		void set_my_dest(const sam_pubkey_t pubkey);
+		virtual void *execute(void) = 0;
+		void* get_retval(void);
+		bool is_running(void);
+		void kill(void);
+		void start(void);
 
 	private:
-		void connect(const char* samhost, uint16_t samport,
-			const char* destname, uint_t tunneldepth);
-		bool is_connected(void) const { return connected; }
-
-		bool connected;
-		static bool exists;
-		string my_dest;
-		Sha1 my_sha1;
+#ifdef WINTHREADS
+		static DWORD WINAPI the_thread(void* param);
+		HANDLE handle;
+		DWORD id;
+#else
+		static void* the_thread(void* param);
+		pthread_t id;
+#endif
+		void *retval;
+		bool running;
+		Mutex running_m;
+		Mutex continue_m;
 };
 
-#endif  // SAM_HPP
+#endif  // THREAD_HPP

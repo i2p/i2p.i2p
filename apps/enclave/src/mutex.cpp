@@ -34,7 +34,7 @@
 Mutex::Mutex(void)
 {
 #ifdef WINTHREADS
-	mutex = CreateMutex(NULL, false, NULL);
+	mutex = CreateMutex(NULL, FALSE, NULL);
 	if (mutex == NULL) {
 		LERROR << strerror(rc) << '\n';
 		throw runtime_error(strerror(rc));
@@ -65,6 +65,9 @@ Mutex::~Mutex(void)
 #endif
 }
 
+/*
+ * Locks the mutex
+ */
 void Mutex::lock(void)
 {
 #ifdef WINTHREADS
@@ -82,6 +85,9 @@ void Mutex::lock(void)
 #endif
 }
 
+/*
+ * Unlocks the mutex
+ */
 void Mutex::unlock(void)
 {
 #ifdef WINTHREADS

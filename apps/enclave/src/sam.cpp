@@ -71,7 +71,7 @@ Sam::Sam(const string& samhost, uint16_t samport, const string& destname,
 Sam::~Sam(void)
 {
 	delete peers;  // this must be before set_connected(false)!
-	if (get_connected()) {
+	if (is_connected()) {
 		sam_close();
 		set_connected(false);
 	}
@@ -89,7 +89,7 @@ Sam::~Sam(void)
 void Sam::connect(const char* samhost, uint16_t samport, const char* destname,
 	uint_t tunneldepth)
 {
-	assert(!get_connected());
+	assert(!is_connected());
 	LMINOR << "Connecting to SAM as '" << destname << "'\n";
 	samerr_t rc = sam_connect(samhost, samport, destname, SAM_DGRAM, tunneldepth);
 	if (rc == SAM_OK)
@@ -114,7 +114,7 @@ void Sam::load_peers(void)
  */
 void Sam::naming_lookup(const string& name) const
 {
-	assert(get_connected());
+	assert(is_connected());
 	sam_naming_lookup(name.c_str());
 }
 
@@ -127,7 +127,7 @@ void Sam::naming_lookup(const string& name) const
  */
 void Sam::parse_dgram(const string& dest, void* data, size_t size)
 {
-	assert(get_connected());
+	assert(is_connected());
 	Peer* peer = peers->new_peer(dest);
 	Rpc rpc(peer);
 	rpc.parse(data, size);
@@ -140,7 +140,7 @@ void Sam::parse_dgram(const string& dest, void* data, size_t size)
  */
 void Sam::read_buffer(void)
 {
-	assert(get_connected());
+	assert(is_connected());
 	sam_read_buffer();
 }
 
@@ -153,6 +153,7 @@ void Sam::read_buffer(void)
  */
 void Sam::send_dgram(const string& dest, uchar_t *data, size_t size)
 {
+	assert(is_connected());
 	samerr_t rc = sam_dgram_send(dest.c_str(), data, size);
 	assert(rc == SAM_OK);  // i.e. not SAM_TOO_BIG
 }
@@ -189,10 +190,10 @@ bool Sam::valid_dest(const string& dest)
 {
 	if (dest.size() != 516)
 		return false;
-	if (dest.substr(512, 4) == "AAAA")  // note this AAAA signifies a null
-		return true;					// certificate - may not be true in the
-	else								// future
-		return false;
+	if (dest.substr(512, 4) == "AAAA")  // Note this AAAA signifies a null
+		return true;					// certificate and doesn't actually have
+	else								// any bearing on validity, but we'll
+		return false;					// keep this check here for now anyway
 }
 
 /*

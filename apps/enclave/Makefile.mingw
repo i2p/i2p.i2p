@@ -1,0 +1,88 @@
+#
+# This Makefile is compatible with GNU Make and should work on Linux
+# (Tested on Debian 3.0)
+#
+
+#
+# Your operating environment
+#
+
+OS = MINGW
+
+#
+# Directories
+#
+
+BINDIR = bin
+LOGDIR = log
+OBJDIR = obj
+SRCDIR = src
+
+SAMINCDIR = C:\cygwin\home\Administrator\cvs\i2p\apps\sam\c\inc
+SAMLIBDIR = C:\cygwin\home\Administrator\cvs\i2p\apps\sam\c\lib
+TOMCRYPTDIR = C:\cygwin\home\Administrator\libtomcrypt-0.96
+
+#
+# Programs
+#
+
+CC = C:\Dev-Cpp\bin\g++
+
+#
+# Flags
+#
+
+CFLAGS = -g -march=i486 -pipe -Wall
+CFLAGS += -DOS=$(OS)
+
+#
+# Libraries
+#
+
+CFLAGS += -I$(SAMINCDIR) -I$(TOMCRYPTDIR)
+LDFLAGS = -L$(SAMLIBDIR) -L$(TOMCRYPTDIR)
+LIBS = -lsam -ltomcrypt
+
+#
+# Object files
+#
+
+OBJS =	$(OBJDIR)/bigint.o \
+		$(OBJDIR)/chk.o \
+		$(OBJDIR)/config.o \
+		$(OBJDIR)/logger.o \
+		$(OBJDIR)/main.o \
+		$(OBJDIR)/mutex.o \
+		$(OBJDIR)/peers.o \
+		$(OBJDIR)/random.o \
+		$(OBJDIR)/rpc.o \
+		$(OBJDIR)/sam.o \
+		$(OBJDIR)/sha1.o \
+		$(OBJDIR)/thread.o
+
+#
+# Build rules
+#
+
+all: depend enclave
+
+depend:
+	$(CC) $(CFLAGS) -MM $(SRCDIR)/*.cpp > .depend
+
+$(OBJDIR)/%.o: $(SRCDIR)/%.cpp
+	$(CC) $(CFLAGS) -o $@ -c $<
+
+enclave: $(OBJS)
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $(BINDIR)/enclave $(OBJS) $(LIBS)
+
+#
+# Cleanup rules
+#
+
+clean:
+	-rm -f $(BINDIR)/* $(OBJDIR)/* .depend
+
+clean-logs:
+	-rm -f $(LOGDIR)/*
+
+tidy: clean clean-logs
