@@ -1,4 +1,9 @@
-$Id: history.txt,v 1.20 2004/09/26 10:16:44 jrandom Exp $
+$Id: history.txt,v 1.21 2004/09/27 02:57:43 jrandom Exp $
+
+2004-09-29  jrandom
+    * Always wipe the Jetty work directory on startup, so that web updates
+      are reflected immediately (Jetty does not honor the cache across
+      multiple executions)
 
 2004-09-27  jrandom
     * Limit the number of connection tags saved to 10,000.  This is a huge 

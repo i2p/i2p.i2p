@@ -4,8 +4,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.List;
 
-import net.i2p.data.DataHelper;
 import net.i2p.router.RouterContext;
+import net.i2p.util.FileUtil;
 
 public class ContentHelper {
     private String _page;
@@ -40,14 +40,14 @@ public class ContentHelper {
         }
     } 
     public String getContent() {
-        String str = DataHelper.readTextFile(_page, _maxLines);
+        String str = FileUtil.readTextFile(_page, _maxLines);
         if (str == null) 
             return "";
         else 
             return str;
     } 
     public String getTextContent() {
-        String str = DataHelper.readTextFile(_page, _maxLines);
+        String str = FileUtil.readTextFile(_page, _maxLines);
         if (str == null) 
             return "";
         else 

@@ -38,6 +38,7 @@ import net.i2p.router.message.TunnelMessageHandler;
 import net.i2p.router.startup.StartupJob;
 import net.i2p.stat.Rate;
 import net.i2p.stat.RateStat;
+import net.i2p.util.FileUtil;
 import net.i2p.util.I2PThread;
 import net.i2p.util.Log;
 
@@ -760,7 +761,7 @@ public class Router {
         File updateFile = new File(UPDATE_FILE);
         if (updateFile.exists()) {
             System.out.println("INFO: Update file exists [" + UPDATE_FILE + "] - installing");
-            boolean ok = DataHelper.extractZip(updateFile, new File("."));
+            boolean ok = FileUtil.extractZip(updateFile, new File("."));
             if (ok)
                 System.out.println("INFO: Update installed");
             else

@@ -1,10 +1,12 @@
 package net.i2p.router.web;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
 import net.i2p.router.RouterContext;
 import net.i2p.apps.systray.SysTray;
+import net.i2p.util.FileUtil;
 
 import org.mortbay.jetty.Server;
 import org.mortbay.jetty.servlet.WebApplicationContext;
@@ -35,6 +37,14 @@ public class RouterConsoleRunner {
     }
     
     public void startConsole() {
+        File workDir = new File("work");
+        boolean workDirRemoved = FileUtil.rmdir(workDir, false);
+        if (!workDirRemoved)
+            System.err.println("ERROR: Unable to remove Jetty temporary work directory");
+        boolean workDirCreated = workDir.mkdirs();
+        if (!workDirCreated)
+            System.err.println("ERROR: Unable to create Jetty temporary work directory");
+        
         _server = new Server();
         WebApplicationContext contexts[] = null;
         try {
