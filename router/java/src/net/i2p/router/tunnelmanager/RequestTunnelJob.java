@@ -260,8 +260,8 @@ public class RequestTunnelJob extends JobImpl {
                     _log.info("Sending tunnel create to " + _target.getIdentity().getHash().toBase64() +
                     " to inbound gateway " + _inboundGateway.getGateway().toBase64() +
                     " : " + _inboundGateway.getTunnelId().getTunnelId());
-                ReplyJob onReply = new Success(_participant, _wrappedKey, _wrappedTags, _wrappedTo);
-                Job onFail = new Failure(_participant);
+                ReplyJob onReply = new Success(_participant, _wrappedKey, _wrappedTags, _wrappedTo, _inboundGateway.getTunnelId(), _outboundTunnel);
+                Job onFail = new Failure(_participant, _inboundGateway.getTunnelId(), _outboundTunnel);
                 MessageSelector selector = new Selector(_participant);
                 SendTunnelMessageJob j = new SendTunnelMessageJob(getContext(), _garlicMessage, 
                                                                   _outboundTunnel, _target.getIdentity().getHash(), 
@@ -550,9 +550,11 @@ public class RequestTunnelJob extends JobImpl {
         private SessionKey _wrappedKey;
         private Set _wrappedTags;
         private PublicKey _wrappedTo;
+        private TunnelId _replyTunnelId;
+        private TunnelId _outboundTunnelId;
         private long _started;
         
-        public Success(TunnelInfo tunnel, SessionKey wrappedKey, Set wrappedTags, PublicKey wrappedTo) {
+        public Success(TunnelInfo tunnel, SessionKey wrappedKey, Set wrappedTags, PublicKey wrappedTo, TunnelId replyTunnelId, TunnelId outboundTunnelId) {
             super(RequestTunnelJob.this.getContext());
             _tunnel = tunnel;
             _messages = new LinkedList();
@@ -560,6 +562,8 @@ public class RequestTunnelJob extends JobImpl {
             _wrappedKey = wrappedKey;
             _wrappedTags = wrappedTags;
             _wrappedTo = wrappedTo;
+            _replyTunnelId = replyTunnelId;
+            _outboundTunnelId = outboundTunnelId;
             _started = getContext().clock().now();
         }
         
@@ -644,10 +648,14 @@ public class RequestTunnelJob extends JobImpl {
     
     private class Failure extends JobImpl {
         private TunnelInfo _tunnel;
+        private TunnelId _outboundTunnelId;
+        private TunnelId _replyTunnelId;
         private long _started;
-        public Failure(TunnelInfo tunnel) {
+        public Failure(TunnelInfo tunnel, TunnelId replyTunnelId, TunnelId outboundTunnelId) {
             super(RequestTunnelJob.this.getContext());
             _tunnel = tunnel;
+            _replyTunnelId = replyTunnelId;
+            _outboundTunnelId = outboundTunnelId;
             _started = getContext().clock().now();
         }
         
@@ -669,6 +677,11 @@ public class RequestTunnelJob extends JobImpl {
             // perhaps not an explicit reject, but an implicit one (due to dropped messages, tunnel failure, etc)
             getContext().profileManager().tunnelRejected(_tunnel.getThisHop(), responseTime, false);
             getContext().profileManager().messageFailed(_tunnel.getThisHop());
+            
+            // one (or both) of the tunnels used to send the request / receive a reply failed
+            _pool.tunnelFailed(_replyTunnelId);
+            _pool.tunnelFailed(_outboundTunnelId);
+            
             Failure.this.getContext().statManager().updateFrequency("tunnel.buildFailFrequency");
             fail();
         }

@@ -131,7 +131,7 @@ class ClientTunnelPool {
      *
      */
     public int getSafePoolSize() {
-        return getSafePoolSize(0);
+        return getSafePoolSize(2*60*1000);
     }
     /**
      * Get the safe # pools at some point in the future
@@ -140,7 +140,7 @@ class ClientTunnelPool {
      */
     public int getSafePoolSize(long futureMs) {
         int numSafe = 0;
-        long expireAfter = _context.clock().now() + Router.CLOCK_FUDGE_FACTOR + futureMs;
+        long expireAfter = _context.clock().now() + futureMs;
         for (Iterator iter = getInboundTunnelIds().iterator(); iter.hasNext(); ) {
             TunnelId id = (TunnelId)iter.next();
             TunnelInfo info = getInboundTunnel(id);

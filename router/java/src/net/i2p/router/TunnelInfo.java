@@ -55,6 +55,7 @@ public class TunnelInfo extends DataStructureImpl {
     private boolean _ready;
     private boolean _wasEverReady;
     private int _messagesProcessed;
+    private int _tunnelFailures;
     
     public TunnelInfo(I2PAppContext context) {
         _context = context;
@@ -77,6 +78,7 @@ public class TunnelInfo extends DataStructureImpl {
         _created = _context.clock().now();
         _lastTested = -1;
         _messagesProcessed = 0;
+        _tunnelFailures = 0;
     }
     
     public TunnelId getTunnelId() { return _id; }
@@ -181,6 +183,13 @@ public class TunnelInfo extends DataStructureImpl {
     }
     /** we have just processed a message for this tunnel */
     public void messageProcessed() { _messagesProcessed++; }
+    
+    /** 
+     * the tunnel was (potentially) unable to pass a message through.
+     * 
+     * @return the new number of tunnel failures ever for this tunnel
+     */
+    public int incrementFailures() { return ++_tunnelFailures; }
     
     public void readBytes(InputStream in) throws DataFormatException, IOException {
         _options = DataHelper.readProperties(in);

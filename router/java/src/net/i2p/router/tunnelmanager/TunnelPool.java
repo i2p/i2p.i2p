@@ -524,13 +524,22 @@ class TunnelPool {
         return found;
     }
     
+    private static final int MAX_FAILURES_PER_TUNNEL = 2;
+    
     public void tunnelFailed(TunnelId id) {
         if (!_isLive) return;
-        if (_log.shouldLog(Log.WARN)) 
-            _log.warn("Tunnel " + id + " marked as not ready, since it /failed/", new Exception("Failed tunnel"));
         TunnelInfo info = getTunnelInfo(id);
         if (info == null)
             return;
+        int failures = info.incrementFailures();
+        if (failures <= MAX_FAILURES_PER_TUNNEL) {
+            if (_log.shouldLog(Log.INFO))
+                _log.info("Tunnel " + id + " failure " + failures + ", but not fatal yet");
+            return;
+        }
+        
+        if (_log.shouldLog(Log.WARN)) 
+            _log.warn("Tunnel " + id + " marked as not ready, since it /failed/", new Exception("Failed tunnel"));
         _context.messageHistory().tunnelFailed(info.getTunnelId());
         info.setIsReady(false);
         Hash us = _context.routerHash();

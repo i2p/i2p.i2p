@@ -50,7 +50,7 @@ class ClientTunnelPoolManagerJob extends JobImpl {
                 return;
             }
             int requestedPoolSize = _clientPool.getClientSettings().getNumInboundTunnels();
-            int safePoolSize = _clientPool.getSafePoolSize(POOL_CHECK_DELAY);
+            int safePoolSize = _clientPool.getSafePoolSize(2*60*1000 + POOL_CHECK_DELAY);
             if (safePoolSize < requestedPoolSize) {
                 requestMoreTunnels(requestedPoolSize-safePoolSize);
             }
