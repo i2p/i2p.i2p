@@ -8,6 +8,7 @@ import net.i2p.apps.systray.SysTray;
 
 import org.mortbay.jetty.Server;
 import org.mortbay.jetty.servlet.WebApplicationContext;
+import org.mortbay.http.DigestAuthenticator;
 import org.mortbay.http.handler.SecurityHandler;
 import org.mortbay.http.HashUserRealm;
 import org.mortbay.http.HttpRequest;
@@ -66,6 +67,7 @@ public class RouterConsoleRunner {
             realm.put("admin", password);
             realm.addUserToRole("admin", "routerAdmin");
             context.setRealm(realm);
+            context.setAuthenticator(new DigestAuthenticator());
             context.addHandler(0, new SecurityHandler());
             SecurityConstraint constraint = new SecurityConstraint("admin", "routerAdmin");
             constraint.setAuthenticate(true);
