@@ -280,8 +280,11 @@ public class SAMBridge implements Runnable {
                         if (_log.shouldLog(Log.ERROR))
                             _log.error("SAM Error sending error reply", ioe);
                     }
-                    s.close();
-                }
+                    try { s.close(); } catch (IOException ioe) {}
+                } catch (Exception ee) {
+                    try { s.close(); } catch (IOException ioe) {}
+                    _log.log(Log.CRIT, "Unexpected error handling SAM connection", ee);
+                } 
             }
         } catch (Exception e) {
             if (_log.shouldLog(Log.ERROR))

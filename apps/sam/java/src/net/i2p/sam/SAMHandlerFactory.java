@@ -152,6 +152,8 @@ public class SAMHandlerFactory {
 
     /* Get the major protocol version from a string */
     private static int getMajor(String ver) {
+        if ( (ver == null) || (ver.indexOf('.') < 0) )
+            return -1;
         try {
             String major = ver.substring(0, ver.indexOf("."));
             return Integer.parseInt(major);
@@ -164,6 +166,8 @@ public class SAMHandlerFactory {
 
     /* Get the minor protocol version from a string */
     private static int getMinor(String ver) {
+        if ( (ver == null) || (ver.indexOf('.') < 0) )
+            return -1;
         try {
             String major = ver.substring(ver.indexOf(".") + 1);
             return Integer.parseInt(major);
