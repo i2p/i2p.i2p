@@ -18,7 +18,7 @@ import net.i2p.util.Log;
  * Main driver for the app that harvests data about the performance of the network,
  * building summaries for each peer that change over time. <p />
  *
- * Usage: <code>NetMonitor [configFilename]</code> <p />
+ * Usage: <code>NetMonitor [configFilename] [--routers filename[,filename]*]</code> <p />
  *
  *
  *
@@ -41,15 +41,20 @@ public class NetMonitor {
     private int _exportDelay;
     private String _exportDir;
     private String _netDbDir;
+    private String _explicitRouters;
     private int _summaryDurationHours;
     private boolean _isRunning;
     private Map _peerSummaries;
     
     public NetMonitor() {
-        this(CONFIG_LOCATION_DEFAULT);
+        this(CONFIG_LOCATION_DEFAULT, null);
     }
     public NetMonitor(String configLocation) {
+        this(configLocation, null);
+    }
+    public NetMonitor(String configLocation, String explicitFilenames) {
         _configLocation = configLocation;
+        _explicitRouters = explicitFilenames;
         _peerSummaries = new HashMap(32);
         loadConfig();
     }
@@ -120,6 +125,8 @@ public class NetMonitor {
     public int getSummaryDurationHours() { return _summaryDurationHours; }
     /** where should we read the data from? */
     public String getNetDbDir() { return _netDbDir; }
+    /** if specified, contains a set of filenames we want to harvest routerInfo data from */
+    public String getExplicitRouters() { return _explicitRouters; }
     /** 
      * what peers are we keeping track of?  
      *
@@ -203,10 +210,30 @@ public class NetMonitor {
         }
     }
     
+    /**
+     * main driver for the netMonitor.  the usage is:
+     * <code>NetMonitor [configFilename] [--routers filename[,filename]*]</code> 
+     */
     public static final void main(String args[]) {
-        if (args.length == 1)
-            new NetMonitor(args[0]).startMonitor();
-        else
-            new NetMonitor(CONFIG_LOCATION_DEFAULT).startMonitor();
+        String cfgLocation = CONFIG_LOCATION_DEFAULT;
+        String explicitFilenames = null;
+        switch (args.length) {
+            case 0:
+                break;
+            case 1:
+                cfgLocation = args[0];
+                break;
+            case 2:
+                explicitFilenames = args[1];
+                break;
+            case 3:
+                cfgLocation = args[0];
+                explicitFilenames = args[2];
+                break;
+            default:
+                System.err.println("Usage: NetMonitor [configFilename] [--routers filename[,filename]*]");
+                return;
+        }
+        new NetMonitor(cfgLocation, explicitFilenames).startMonitor();
     }
 }

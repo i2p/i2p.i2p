@@ -7,6 +7,7 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.StringTokenizer;
 
 import net.i2p.data.DataFormatException;
 import net.i2p.data.RouterInfo;
@@ -128,12 +129,35 @@ class NetMonitorRunner implements Runnable {
      * @return list of File objects pointing at the routers around
      */
     private File[] listRouters() { 
-        File dbDir = new File(_monitor.getNetDbDir());
-        File files[] = dbDir.listFiles(new FilenameFilter() {
-            public boolean accept(File f, String name) {
-                return name.startsWith("routerInfo-");
-            }
-        });
+        if (_monitor.getExplicitRouters() != null) {
+            return listRoutersExplicit();
+        } else {
+            File dbDir = new File(_monitor.getNetDbDir());
+            File files[] = dbDir.listFiles(new FilenameFilter() {
+                public boolean accept(File f, String name) {
+                    return name.startsWith("routerInfo-");
+                }
+            });
+            return files;
+        }
+    }
+
+    /**
+     * Get a list of router files that were explicitly specified by the netMonitor
+     *
+     */
+    private File[] listRoutersExplicit() {
+        StringTokenizer tok = new StringTokenizer(_monitor.getExplicitRouters().trim(), ",");
+        List rv = new ArrayList();
+        while (tok.hasMoreTokens()) {
+            String name = tok.nextToken();
+            File cur = new File(name);
+            if (cur.exists())
+                rv.add(cur);
+        }
+        File files[] = new File[rv.size()];
+        for (int i = 0; i < rv.size(); i++)
+            files[i] = (File)rv.get(i);
         return files;
     }
     
