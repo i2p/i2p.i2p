@@ -9,26 +9,28 @@
 #
 # author: hypercubus
 #
-# Uninstalls the Wrapper-based I2P service on various *nix systems. This script
-# must be run as root.
+# Uninstalls the Java Service Wrapper-based I2P service on various *nix systems.
+# This script must be run as root.
 #
-# Wrapper can be found at:
+# Java Service Wrapper can be found at:
 # http://wrapper.tanukisoftware.org/doc/english/introduction.html
 
 if [ $UID -ne 0 ]; then
-    echo 'Sorry, you need root privileges to uninstall services.'
+    echo "Sorry, you need root privileges to uninstall services."
     exit 1
 fi
 
-HOST_OS=`uname -a`
-if [ ! '$HOST_OS' ]; then
-    echo 'Cannot determine operating system type. Please uninstall the service manually.'
+ERROR_MSG="Cannot determine operating system type. Please uninstall the service manually."
+HOST_OS=`./osid`
+
+if [[ ! $HOST_OS || $HOST_OS = "unknown" ]]; then
+    echo "$ERROR_MSG"
     exit 1
 fi
 
-# The following are several different service installation methods covering some
-# of the major *nix operating systems. Most *nix OSes should be able to use one
-# of these styles. TODO: AIX, HP-UX, HP-UX/64, IRIX, OSF/1.
+# The following are several different service uninstallation methods covering
+# some of the major *nix operating systems. Most *nix OSes should be able to use
+# one of these styles. TODO: AIX, HP-UX, HP-UX/64, IRIX, OSF/1.
 
 uninstall_bsd()
 {
@@ -62,55 +64,26 @@ uninstall_sysv()
     rm /etc/rc3.d/S20i2psvc
 }
 
-if [[ `echo "$HOST_OS" | grep Darwin` || `echo "$HOST_OS" | grep Macintosh` ]]; then
-    uninstall_bsd
-    exit 0
-fi
-
-if [[ `echo "$HOST_OS" | grep FreeBSD` ]]; then
-    uninstall_bsd
-    exit 0
-fi
-
-if [[ `echo "$HOST_OS" | grep Linux` ]]; then
-
-    LINUX_DISTRO=`cat /proc/version`
-
-    if [[ `echo "$LINUX_DISTRO" | grep Debian` ]]; then
+case $HOST_OS in
+    debian )
         uninstall_debian
-        exit 0
-    fi
-
-    if [[ `echo "$LINUX_DISTRO" | grep Fedora` ]]; then
+        ;;
+    fedora | mandrake | redhat | suse )
         uninstall_redhat
-        exit 0
-    fi
-
-    if [[ `echo "$LINUX_DISTRO" | grep Gentoo` ]]; then
+        ;;
+    freebsd | osx )
+        uninstall_bsd
+        ;;
+    gentoo )
         uninstall_gentoo
-        exit 0
-    fi
+        ;;
+    solaris )
+        uninstall_sysv
+        ;;
+    * )
+        echo "$ERROR_MSG"
+        exit 1
+        ;;
+esac
 
-    if [[ `echo "$LINUX_DISTRO" | grep Mandrake` ]]; then
-        uninstall_redhat
-        exit 0
-    fi
-
-    if [[ `echo "$LINUX_DISTRO" | grep "Red Hat"` ]]; then
-        uninstall_redhat
-        exit 0
-    fi
-
-    if [[ `echo "$LINUX_DISTRO" | grep Suse` ]]; then
-        uninstall_redhat
-        exit 0
-    fi
-fi
-
-if [[ `echo "$HOST_OS" | grep Solaris` ]]; then
-    uninstall_sysv()
-    exit 0
-fi
-
-echo 'Cannot determine operating system type. Please uninstall the service manually.'
-exit 1
+exit 0

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="iso-8859-1" standalone="yes" ?>
+
+<processing>
+    <job name="Launching I2P...">
+        <os family="windows" />
+        <executefile name="$INSTALL_PATH/postinstall.bat" />
+    </job>
+    <job name="Launching I2P...">
+        <os family="unix" />
+        <executefile name="$INSTALL_PATH/postinstall" />
+    </job>
+</processing>

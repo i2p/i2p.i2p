@@ -9,20 +9,22 @@
 #
 # author: hypercubus
 #
-# Installs I2P as a service on various *nix systems using Wrapper. This script
-# must be run as root.
+# Installs I2P as a service on various *nix systems using Java Service Wrapper.
+# This script must be run as root.
 #
-# Wrapper can be found at:
+# Java Service Wrapper can be found at:
 # http://wrapper.tanukisoftware.org/doc/english/introduction.html
 
 if [ $UID -ne 0 ]; then
-    echo 'Sorry, you need root privileges to install services.'
+    echo "Sorry, you need root privileges to install services."
     exit 1
 fi
 
-HOST_OS=`uname -a`
-if [ ! '$HOST_OS' ]; then
-    echo 'Cannot determine operating system type. Aborting service installation.'
+ERROR_MSG="Cannot determine operating system type. Please install the service manually."
+HOST_OS=`./osid`
+
+if [[ ! $HOST_OS || $HOST_OS = "unknown" ]]; then
+    echo "$ERROR_MSG"
     exit 1
 fi
 
@@ -62,55 +64,26 @@ install_sysv()
     ln -sf /etc/init.d/i2psvc /etc/rc3.d/S20i2psvc
 }
 
-if [[ `echo "$HOST_OS" | grep Darwin` || `echo "$HOST_OS" | grep Macintosh` ]]; then
-    install_bsd
-    exit 0
-fi
-
-if [[ `echo "$HOST_OS" | grep FreeBSD` ]]; then
-    install_bsd
-    exit 0
-fi
-
-if [[ `echo "$HOST_OS" | grep Linux` ]]; then
-
-    LINUX_DISTRO=`cat /proc/version`
-
-    if [[ `echo "$LINUX_DISTRO" | grep Debian` ]]; then
+case $HOST_OS in
+    debian )
         install_debian
-        exit 0
-    fi
-
-    if [[ `echo "$LINUX_DISTRO" | grep Fedora` ]]; then
+        ;;
+    fedora | mandrake | redhat | suse )
         install_redhat
-        exit 0
-    fi
-
-    if [[ `echo "$LINUX_DISTRO" | grep Gentoo` ]]; then
+        ;;
+    freebsd | osx )
+        install_bsd
+        ;;
+    gentoo )
         install_gentoo
-        exit 0
-    fi
+        ;;
+    solaris )
+        install_sysv
+        ;;
+    * )
+        echo "$ERROR_MSG"
+        exit 1
+        ;;
+esac
 
-    if [[ `echo "$LINUX_DISTRO" | grep Mandrake` ]]; then
-        install_redhat
-        exit 0
-    fi
-
-    if [[ `echo "$LINUX_DISTRO" | grep "Red Hat"` ]]; then
-        install_redhat
-        exit 0
-    fi
-
-    if [[ `echo "$LINUX_DISTRO" | grep Suse` ]]; then
-        install_redhat
-        exit 0
-    fi
-fi
-
-if [[ `echo "$HOST_OS" | grep Solaris` ]]; then
-    install_sysv()
-    exit 0
-fi
-
-echo 'Cannot determine operating system type. Aborting service installation.'
-exit 1
+exit 0

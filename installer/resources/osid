@@ -1,0 +1,87 @@
+#!/bin/sh
+
+# I2P Installer - Installs and pre-configures I2P.
+#
+# osid
+# 2004 The I2P Project
+# http://www.i2p.net
+# This code is public domain.
+#
+# author: hypercubus
+#
+# Identifies the host OS by returning the corresponding standardized ID string:
+#
+#     debian   = Debian
+#     fedora   = Fedora
+#     freebsd  = FreeBSD
+#     gentoo   = Gentoo
+#     linux    = unidentified Linux distro
+#     mandrake = Mandrake
+#     osx      = Mac OS X
+#     redhat   = Red Hat
+#     solaris  = Solaris
+#     suse     = SuSE
+#     unknown  = OS could not be determined
+
+HOST_OS=`uname -a`
+
+if [ ! '$HOST_OS' ]; then
+    echo unknown
+    exit 0
+fi
+
+if [[ `echo "$HOST_OS" | grep Darwin` && `echo "$HOST_OS" | grep Mac` ]]; then
+    echo osx
+    exit 0
+fi
+
+if [[ `echo "$HOST_OS" | grep FreeBSD` ]]; then
+    echo freebsd
+    exit 0
+fi
+
+if [[ `echo "$HOST_OS" | grep Linux` ]]; then
+
+    LINUX_DISTRO=`cat /proc/version`
+
+    if [[ `echo "$LINUX_DISTRO" | grep Debian` ]]; then
+        echo debian
+        exit 0
+    fi
+
+    if [[ `echo "$LINUX_DISTRO" | grep Fedora` ]]; then
+        echo fedora
+        exit 0
+    fi
+
+    if [[ `echo "$LINUX_DISTRO" | grep Gentoo` ]]; then
+        echo gentoo
+        exit 0
+    fi
+
+    if [[ `echo "$LINUX_DISTRO" | grep Mandrake` ]]; then
+        echo mandrake
+        exit 0
+    fi
+
+    if [[ `echo "$LINUX_DISTRO" | grep "Red Hat"` ]]; then
+        echo redhat
+        exit 0
+    fi
+
+    if [[ `echo "$LINUX_DISTRO" | grep Suse` ]]; then
+        echo suse
+        exit 0
+    fi
+
+    echo linux
+    exit 0
+fi
+
+if [[ `echo "$HOST_OS" | grep Solaris` ]]; then
+    echo solaris
+    exit 0
+fi
+
+echo unknown
+exit 0
