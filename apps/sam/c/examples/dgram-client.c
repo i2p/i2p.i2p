@@ -32,6 +32,7 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "sam.h"
 
 static void dgramback(sam_pubkey_t dest, void *data, size_t size);
@@ -44,10 +45,14 @@ static void namingback(char *name, sam_pubkey_t pubkey, samerr_t result);
  * datagrams work.  We lookup the name 'dgram-server' then send some data to
  * him.  If everything works, we should get the same data back.
  */
+
+/*
+ * NOTE!!!!!!!! This is currently broken!
+ */
+
 int main(int argc, char* argv[])
 {
 	samerr_t rc;
-	char errstr[SAM_ERRMSG_LEN];
 
 	/* Hook up the callback functions */
 	sam_dgramback = &dgramback;
@@ -55,7 +60,7 @@ int main(int argc, char* argv[])
 	sam_logback = &logback;
 	sam_namingback = &namingback;
 
-	/* Connect to the SAM server */
+	/* Connect to the SAM server -- you can use either an IP or DNS name */
 	rc = sam_connect("localhost", 7656, "dgram-client", SAM_DGRAM, 0);
 	if (rc != SAM_OK) {
 		fprintf(stderr, "SAM connection failed: %s\n", sam_strerror(rc));

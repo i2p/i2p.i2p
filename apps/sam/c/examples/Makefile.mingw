@@ -1,0 +1,42 @@
+#
+# This Makefile is compatible with GNU Make and has Winsock linking
+#
+
+#
+# Programs
+#
+
+CC = C:\Dev-Cpp\bin\gcc
+
+#
+# Flags
+#
+
+CFLAGS = -g -O2 -pipe -std=c99 -Wall
+CFLAGS += -I../inc -L../lib
+LIBS = -lsam -lwsock32
+
+#
+# Build rules
+#
+
+all: dgram-client dgram-server warhammer-dgram
+
+dgram-client:
+	$(CC) $(CFLAGS) -o dgram-client.o -c dgram-client.c
+	$(CC) $(CFLAGS) -o dgram-client dgram-client.o $(LIBS)
+
+dgram-server:
+	$(CC) $(CFLAGS) -o dgram-server.o -c dgram-server.c
+	$(CC) $(CFLAGS) -o dgram-server dgram-server.o $(LIBS)
+
+warhammer-dgram:
+	$(CC) $(CFLAGS) -o warhammer-dgram.o -c warhammer-dgram.c
+	$(CC) $(CFLAGS) -o warhammer-dgram warhammer-dgram.o $(LIBS)
+
+#
+# Cleanup rules
+#
+
+clean:
+	-rm -f *.o *.exe dgram-client dgram-server warhammer-dgram

@@ -99,7 +99,8 @@ bool sam_close(void)
  *
  * samhost - SAM host
  * samport - SAM port
- * destname - destination name for this program, or TRANSIENT for a random dest
+ * destname - destination name for this program, or "TRANSIENT" for a random
+ *		dest
  * tunneldepth - length of the I2P tunnels created by this program (longer is
  *		more anonymous, but slower)
  *
@@ -713,7 +714,7 @@ void sam_sendq_send(sam_sendq_t *sendq, sam_sid_t stream_id)
 /*
  * Sends the second SAM handshake command and checks the reply
  *
- * destname - destination name for this program, or TRANSIENT to create a
+ * destname - destination name for this program, or "TRANSIENT" to create a
  * 		random temporary destination
  * tunneldepth - length of the I2P tunnels created by this program
  *
