@@ -1,4 +1,7 @@
-$Id: history.txt,v 1.72 2004/11/16 08:45:40 jrandom Exp $
+$Id: history.txt,v 1.73 2004/11/16 17:11:12 jrandom Exp $
+
+2004-11-17  jrandom
+    * Minor logging update.
 
 2004-11-16  jrandom
     * Clean up the propogation of i2psocket options so that various streaming

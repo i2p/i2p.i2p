@@ -80,8 +80,8 @@ public class SimpleTimer {
                     synchronized (_events) {
                         if (_events.size() <= 0)
                             _events.wait();
-                        if (_events.size() > 100)
-                            _log.warn("> 100 events!  " + _events.values());
+                        //if (_events.size() > 100)
+                        //    _log.warn("> 100 events!  " + _events.values());
                         long now = System.currentTimeMillis();
                         long nextEventDelay = -1;
                         Object nextEvent = null;
