@@ -538,17 +538,19 @@ public class TCPTransport extends TransportImpl {
             buf.append("<li>");
             RouterIdentity ident = (RouterIdentity)iter.next();
             List curCons = (List)cons.get(ident);
-            buf.append("Connections to ").append(ident.getHash().toBase64()).append(": ").append(curCons.size()).append("<br/><ul>\n");
+            buf.append("Connection to ").append(ident.getHash().toBase64()).append(": ");
+            String lifetime = null;
             for (int i = 0; i < curCons.size(); i++) {
                 TCPConnection con = (TCPConnection)curCons.get(i);
                 if (con.getLifetime() > 0) {
                     established++;
-                    buf.append("<li>Connection ").append(con.getId()).append(": pending # messages to be sent: ").append(con.getPendingMessageCount()).append(" lifetime: ").append(DataHelper.formatDuration(con.getLifetime())).append("</li>\n");
-                } else {
-                    buf.append("<li>Connection ").append(con.getId()).append(": [connection in progress]</li>\n");
+                    lifetime = DataHelper.formatDuration(con.getLifetime());
                 }
             }
-            buf.append("</ul>\n");
+            if (lifetime != null)
+                buf.append(lifetime);
+            else
+                buf.append("[pending]");
             buf.append("</li>\n");
         }
         buf.append("</ul>\n");
