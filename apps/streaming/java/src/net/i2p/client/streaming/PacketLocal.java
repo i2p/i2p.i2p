@@ -34,7 +34,15 @@ public class PacketLocal extends Packet {
     public void setKeyUsed(SessionKey key) { _keyUsed = key; }
     
     public Set getTagsSent() { return _tagsSent; }
-    public void setTagsSent(Set tags) { _tagsSent = tags; }
+    public void setTagsSent(Set tags) { 
+        if ( (_tagsSent != null) && (_tagsSent.size() > 0) && (tags.size() > 0) ) {
+            int old = _tagsSent.size();
+            _tagsSent.addAll(tags);
+            //System.out.println("Dup tags set on " +toString() + " old=" + old + " new=" + tags.size());
+        } else {
+            _tagsSent = tags;
+        }
+    }
     
     public boolean shouldSign() { 
         return isFlagSet(FLAG_SIGNATURE_INCLUDED) ||

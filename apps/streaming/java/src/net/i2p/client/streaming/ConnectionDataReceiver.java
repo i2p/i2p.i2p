@@ -39,8 +39,8 @@ class ConnectionDataReceiver implements MessageOutputStream.DataReceiver {
         if (_connection.getUnackedPacketsReceived() > 0)
             doSend = true;
         
-        if (_log.shouldLog(Log.DEBUG))
-            _log.debug("writeData called: size="+size + " doSend=" + doSend + " con: " + _connection, new Exception("write called by"));
+        //if (_log.shouldLog(Log.DEBUG))
+        //    _log.debug("writeData called: size="+size + " doSend=" + doSend + " con: " + _connection, new Exception("write called by"));
 
         if (doSend) {
             PacketLocal packet = buildPacket(buf, off, size);
@@ -51,11 +51,12 @@ class ConnectionDataReceiver implements MessageOutputStream.DataReceiver {
     }
     
     private boolean isAckOnly(int size) {
-        return ( (size <= 0) && // no data
-                 (_connection.getLastSendId() >= 0) && // not a SYN
-                 ( (!_connection.getOutputStream().getClosed()) || // not a CLOSE
-                 (_connection.getOutputStream().getClosed() && 
-                  _connection.getCloseSentOn() > 0) )); // or it is a dup CLOSE
+        boolean ackOnly = ( (size <= 0) && // no data
+                            (_connection.getLastSendId() >= 0) && // not a SYN
+                            ( (!_connection.getOutputStream().getClosed()) || // not a CLOSE
+                            (_connection.getOutputStream().getClosed() && 
+                             _connection.getCloseSentOn() > 0) )); // or it is a dup CLOSE
+        return ackOnly;
     }
     
     private PacketLocal buildPacket(byte buf[], int off, int size) {

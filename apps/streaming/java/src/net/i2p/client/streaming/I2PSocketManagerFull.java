@@ -45,7 +45,19 @@ public class I2PSocketManagerFull implements I2PSocketManager {
      */
     private static final long ACCEPT_TIMEOUT_DEFAULT = 5*1000;
     
+    public I2PSocketManagerFull() {
+        _context = null;
+        _session = null;
+    }
     public I2PSocketManagerFull(I2PAppContext context, I2PSession session, Properties opts, String name) {
+        this();
+        init(context, session, opts, name);
+    }
+    
+    /**
+     *
+     */
+    public void init(I2PAppContext context, I2PSession session, Properties opts, String name) {
         _context = context;
         _session = session;
         _log = _context.logManager().getLog(I2PSocketManagerFull.class);

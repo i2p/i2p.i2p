@@ -37,8 +37,8 @@ public class MessageOutputStream extends OutputStream {
     }
     
     public void write(byte b[], int off, int len) throws IOException {
-        if (_log.shouldLog(Log.DEBUG))
-            _log.debug("write(b[], " + off + ", " + len + ")");
+        //if (_log.shouldLog(Log.DEBUG))
+        //    _log.debug("write(b[], " + off + ", " + len + ")");
         synchronized (_dataLock) {
             int cur = off;
             int remaining = len;
@@ -49,8 +49,8 @@ public class MessageOutputStream extends OutputStream {
                     _valid += remaining;
                     cur += remaining;
                     remaining = 0;
-                    if (_log.shouldLog(Log.DEBUG))
-                        _log.debug("write(...): appending valid = " + _valid + " remaining=" + remaining);
+                    //if (_log.shouldLog(Log.DEBUG))
+                    //    _log.debug("write(...): appending valid = " + _valid + " remaining=" + remaining);
                 } else {
                     // buffer whatever we can fit then flush,
                     // repeating until we've pushed all of the
@@ -60,14 +60,14 @@ public class MessageOutputStream extends OutputStream {
                     remaining -= toWrite;
                     cur += toWrite;
                     _valid = _buf.length;
-                    if (_log.shouldLog(Log.DEBUG))
-                        _log.debug("write(...): flushing valid = " + _valid + " remaining=" + remaining);
+                    //if (_log.shouldLog(Log.DEBUG))
+                    //    _log.debug("write(...): flushing valid = " + _valid + " remaining=" + remaining);
                     // this blocks until the packet is ack window is open.  it 
                     // also throws InterruptedIOException if the write timeout 
                     // expires
                     _dataReceiver.writeData(_buf, 0, _valid);
-                    if (_log.shouldLog(Log.DEBUG))
-                        _log.debug("write(...): flushing complete valid = " + _valid + " remaining=" + remaining);
+                    //if (_log.shouldLog(Log.DEBUG))
+                    //    _log.debug("write(...): flushing complete valid = " + _valid + " remaining=" + remaining);
                     _valid = 0;                       
                     throwAnyError();
                 }
@@ -83,14 +83,14 @@ public class MessageOutputStream extends OutputStream {
     
     public void flush() throws IOException {
         synchronized (_dataLock) {
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("flush(): valid = " + _valid);
+            //if (_log.shouldLog(Log.DEBUG))
+            //    _log.debug("flush(): valid = " + _valid);
             // this blocks until the packet is ack window is open.  it 
             // also throws InterruptedIOException if the write timeout 
             // expires
             _dataReceiver.writeData(_buf, 0, _valid);
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("flush(): valid = " + _valid + " complete");
+            //if (_log.shouldLog(Log.DEBUG))
+            //    _log.debug("flush(): valid = " + _valid + " complete");
             _valid = 0;
         }
         throwAnyError();

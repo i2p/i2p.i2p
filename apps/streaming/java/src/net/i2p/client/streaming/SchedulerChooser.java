@@ -28,8 +28,8 @@ class SchedulerChooser {
         for (int i = 0; i < _schedulers.size(); i++) {
             TaskScheduler scheduler = (TaskScheduler)_schedulers.get(i);
             if (scheduler.accept(con)) {
-                if (_log.shouldLog(Log.DEBUG))
-                    _log.debug("Scheduling for " + con + " with " + scheduler.getClass().getName());
+                //if (_log.shouldLog(Log.DEBUG))
+                //    _log.debug("Scheduling for " + con + " with " + scheduler.getClass().getName());
                 return scheduler;
             }
         }

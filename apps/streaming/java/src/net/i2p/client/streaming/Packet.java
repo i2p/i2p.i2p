@@ -493,10 +493,21 @@ public class Packet {
     }
     
     public String toString() {
-        return "Packet " + _sequenceNum + " on " + toId(_sendStreamId) 
-               + "<-->" + toId(_receiveStreamId) + ": " + toFlagString() 
-               + " ACK through " + _ackThrough 
-               + " size: " + (_payload != null ? _payload.length : 0);
+        StringBuffer buf = new StringBuffer(64);
+        buf.append(toId(_sendStreamId));
+        //buf.append("<-->");
+        buf.append(toId(_receiveStreamId)).append(": #").append(_sequenceNum);
+        buf.append(" ").append(toFlagString());
+        buf.append(" ACK ").append(_ackThrough);
+        if (_nacks != null) {
+            buf.append(" NACK");
+            for (int i = 0; i < _nacks.length; i++) {
+                buf.append(" ").append(_nacks[i]);
+            }
+        }
+        if ( (_payload != null) && (_payload.length > 0) )
+            buf.append(" data: ").append(_payload.length);
+        return buf.toString();
     }
     
     private static final String toId(byte id[]) {
@@ -512,7 +523,7 @@ public class Packet {
         if (isFlagSet(FLAG_DELAY_REQUESTED)) buf.append(" DELAY");
         if (isFlagSet(FLAG_ECHO)) buf.append(" ECHO");
         if (isFlagSet(FLAG_FROM_INCLUDED)) buf.append(" FROM");
-        if (isFlagSet(FLAG_MAX_PACKET_SIZE_INCLUDED)) buf.append(" MAXSIZE");
+        if (isFlagSet(FLAG_MAX_PACKET_SIZE_INCLUDED)) buf.append(" MS");
         if (isFlagSet(FLAG_PROFILE_INTERACTIVE)) buf.append(" INTERACTIVE");
         if (isFlagSet(FLAG_RESET)) buf.append(" RESET");
         if (isFlagSet(FLAG_SIGNATURE_INCLUDED)) buf.append(" SIG");

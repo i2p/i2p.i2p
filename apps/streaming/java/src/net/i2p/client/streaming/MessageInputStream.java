@@ -149,7 +149,11 @@ public class MessageInputStream extends InputStream {
     
     public void closeReceived() {
         synchronized (_dataLock) {
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Close received, ready size: " + _readyDataBlocks.size() 
+                           + " not ready: " + _notYetReadyBlocks.size(), new Exception("closed"));
             _closeReceived = true;
+            _dataLock.notifyAll();
         }
     }
     

@@ -35,8 +35,12 @@ class PacketQueue {
         else
             size = packet.writePacket(_buf, 0);
         
-        SessionKey keyUsed = new SessionKey();
-        Set tagsSent = new HashSet();
+        SessionKey keyUsed = packet.getKeyUsed();
+        if (keyUsed == null)
+            keyUsed = new SessionKey();
+        Set tagsSent = packet.getTagsSent();
+        if (tagsSent == null)
+            tagsSent = new HashSet();
         try {
             // this should not block!
             boolean sent = _session.sendMessage(packet.getTo(), _buf, 0, size, keyUsed, tagsSent);
@@ -47,6 +51,13 @@ class PacketQueue {
                 packet.setKeyUsed(keyUsed);
                 packet.setTagsSent(tagsSent);
                 packet.incrementSends();
+                if (_log.shouldLog(Log.DEBUG)) {
+                    String msg = packet + " sent" + (tagsSent.size() > 0 
+                                                     ? " with " + tagsSent.size() + " tags"
+                                                     : "")
+                                                     + " send # " + packet.getNumSends();
+                    _log.debug(msg);
+                }
             }
         } catch (I2PSessionException ise) {
             if (_log.shouldLog(Log.WARN))

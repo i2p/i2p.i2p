@@ -169,8 +169,9 @@ public class ConnectionPacketHandler {
                     _log.warn("Received unsigned / forged packet: " + packet);
                 return false;
             }
-            if (packet.isFlagSet(Packet.FLAG_CLOSE))
+            if (packet.isFlagSet(Packet.FLAG_CLOSE)) {
                 con.closeReceived();
+            }
         }
         return true;
     }    

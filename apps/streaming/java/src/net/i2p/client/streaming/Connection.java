@@ -139,16 +139,30 @@ public class Connection {
             packet.setFlag(Packet.FLAG_SIGNATURE_REQUESTED);
         }
         
+        boolean ackOnly = false;
+                
         if ( (packet.getSequenceNum() == 0) && (!packet.isFlagSet(Packet.FLAG_SYNCHRONIZE)) ) {
-            // ACK only, no retries
+            ackOnly = true;
         } else {
             synchronized (_outboundPackets) {
                 _outboundPackets.put(new Long(packet.getSequenceNum()), packet);
             }
             SimpleTimer.getInstance().addEvent(new ResendPacketEvent(packet), _options.getResendDelay());
         }
+
         _lastSendTime = _context.clock().now();
-        _outboundQueue.enqueue(packet);
+        _outboundQueue.enqueue(packet);        
+        
+        if (ackOnly) {
+            // ACK only, don't schedule this packet for retries
+            // however, if we are running low on sessionTags we want to send
+            // something that will get a reply so that we can deliver some new tags -
+            // ACKs don't get ACKed, but pings do.
+            if (packet.getTagsSent().size() > 0) {
+                _log.error("Sending a ping since the ACK we just sent has " + packet.getTagsSent().size() + " tags");
+                _connectionManager.ping(_remotePeer, _options.getRTT()*2, false, packet.getKeyUsed(), packet.getTagsSent());
+            }
+        }
     }
     
     List ackPackets(long ackThrough, long nacks[]) {
@@ -200,6 +214,9 @@ public class Connection {
     public boolean getIsConnected() { return _connected; }
 
     void disconnect(boolean cleanDisconnect) {
+        disconnect(cleanDisconnect, true);
+    }
+    void disconnect(boolean cleanDisconnect, boolean removeFromConMgr) {
         if (!_connected) return;
         _connected = false;
         if (_log.shouldLog(Log.DEBUG))
@@ -219,7 +236,8 @@ public class Connection {
             synchronized (_outboundPackets) {
                 _outboundPackets.clear();
             }
-            _connectionManager.removeConnection(this);
+            if (removeFromConMgr)
+                _connectionManager.removeConnection(this);
         }
     }
     
@@ -347,11 +365,12 @@ public class Connection {
                 _packet.setReceiveStreamId(_receiveStreamId);
                 _packet.setSendStreamId(_sendStreamId);
 
-                if (_log.shouldLog(Log.DEBUG))
-                    _log.debug("Resend packet " + _packet + " on " + Connection.this);
+                int numSends = _packet.getNumSends() + 1;
+                
+                if (_log.shouldLog(Log.ERROR))
+                    _log.error("Resend packet " + _packet + " time " + numSends + " on " + Connection.this);
                 _outboundQueue.enqueue(_packet);
                 
-                int numSends = _packet.getNumSends();
                 if (numSends > _options.getMaxResends()) {
                     if (_log.shouldLog(Log.DEBUG))
                         _log.debug("Too many resends");

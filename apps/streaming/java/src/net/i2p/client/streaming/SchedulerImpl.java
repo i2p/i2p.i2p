@@ -28,8 +28,8 @@ abstract class SchedulerImpl implements TaskScheduler {
             _addedBy = new Exception("added by");
         }
         public void timeReached() {
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("firing event on " + _connection, _addedBy);
+            //if (_log.shouldLog(Log.DEBUG))
+            //    _log.debug("firing event on " + _connection, _addedBy);
             _connection.eventOccurred(); 
         }
     }

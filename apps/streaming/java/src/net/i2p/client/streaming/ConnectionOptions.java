@@ -55,7 +55,7 @@ public class ConnectionOptions extends I2PSocketOptions {
             setRTT(5*1000);
             setReceiveWindow(1);
             setResendDelay(5*1000);
-            setSendAckDelay(1*1000);
+            setSendAckDelay(2*1000);
             setWindowSize(1);
             setMaxResends(10);
         }

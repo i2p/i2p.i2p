@@ -3,6 +3,7 @@ package net.i2p.client.streaming;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.Set;
+import java.text.SimpleDateFormat;
 
 import net.i2p.I2PAppContext;
 import net.i2p.data.Base64;
@@ -36,10 +37,20 @@ public class PacketHandler {
         Connection con = (sendId != null ? _manager.getConnectionByInboundId(sendId) : null); 
         if (con != null) {
             receiveKnownCon(con, packet);
-            System.out.println(new Date() + ": Receive packet " + packet + " on con " + con);
+            displayPacket(packet, con);
         } else {
             receiveUnknownCon(packet, sendId);
-            System.out.println(new Date() + ": Receive packet " + packet + " on an unknown con");
+            displayPacket(packet, null);
+        }
+    }
+    
+    private void displayPacket(Packet packet, Connection con) {
+        if (_log.shouldLog(Log.DEBUG)) {
+            //SimpleDateFormat fmt = new SimpleDateFormat("hh:mm:ss.SSS");
+            //String now = fmt.format(new Date());
+            String msg = packet + (con != null ? " on " + con : " on unknown con");
+            _log.debug(msg);
+            // System.out.println(now + ": " + msg);
         }
     }
     
@@ -95,15 +106,21 @@ public class PacketHandler {
         } else {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Packet received on an unknown stream (and not a SYN): " + packet);
-            if (packet.getSendStreamId() == null) {
+            if (sendId == null) {
                 for (Iterator iter = _manager.listConnections().iterator(); iter.hasNext(); ) {
                     Connection con = (Connection)iter.next();
-                    if (DataHelper.eq(con.getSendStreamId(), packet.getReceiveStreamId()) &&
-                        con.getAckedPackets() <= 0) {
-                        if (_log.shouldLog(Log.DEBUG))
-                            _log.debug("Received additional packets before the syn on " + con + ": " + packet);
-                        receiveKnownCon(con, packet);
-                        return;
+                    if (DataHelper.eq(con.getSendStreamId(), packet.getReceiveStreamId())) {
+                        if (con.getAckedPackets() <= 0) {
+                            if (_log.shouldLog(Log.DEBUG))
+                                _log.debug("Received additional packets before the syn on " + con + ": " + packet);
+                            receiveKnownCon(con, packet);
+                            return;
+                        } else {
+                            if (_log.shouldLog(Log.DEBUG))
+                                _log.debug("hrmph, received while ack of syn was in flight on " + con + ": " + packet + " acked: " + con.getAckedPackets());
+                            receiveKnownCon(con, packet);
+                            return;
+                        }
                     }
                 }
             }
@@ -114,7 +131,9 @@ public class PacketHandler {
                     Connection con = (Connection)iter.next();
                     buf.append(Base64.encode(con.getReceiveStreamId())).append(" ");
                 }
-                _log.warn("Packet belongs to know other cons: " + packet + " connections: " + buf.toString());
+                _log.warn("Packet belongs to no other cons: " + packet + " connections: " 
+                          + buf.toString() + " sendId: " 
+                          + (sendId != null ? Base64.encode(sendId) : " unknown"));
             }
         }
     }
