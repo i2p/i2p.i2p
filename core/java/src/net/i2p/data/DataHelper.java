@@ -552,25 +552,20 @@ public class DataHelper {
     }
 
     /** decompress the GZIP compressed data (returning null on error) */
-    public static byte[] decompress(byte orig[]) {
+    public static byte[] decompress(byte orig[]) throws IOException {
         if ((orig == null) || (orig.length <= 0)) return orig;
-        try {
-            GZIPInputStream in = new GZIPInputStream(new ByteArrayInputStream(orig), orig.length);
-            ByteArrayOutputStream baos = new ByteArrayOutputStream(orig.length * 2);
-            byte buf[] = new byte[4 * 1024];
-            while (true) {
-                int read = in.read(buf);
-                if (read == -1) break;
-                baos.write(buf, 0, read);
-            }
-            byte rv[] = baos.toByteArray();
-            //if (_log.shouldLog(Log.DEBUG))
-            //    _log.debug("Decompression of " + orig.length + " into " + rv.length + " (or " + 100.0d
-            //               * (((double) rv.length) / ((double) orig.length)) + "% savings)");
-            return rv;
-        } catch (IOException ioe) {
-            //_log.error("Error decompressing?", ioe);
-            return null;
+        GZIPInputStream in = new GZIPInputStream(new ByteArrayInputStream(orig), orig.length);
+        ByteArrayOutputStream baos = new ByteArrayOutputStream(orig.length * 2);
+        byte buf[] = new byte[4 * 1024];
+        while (true) {
+            int read = in.read(buf);
+            if (read == -1) break;
+            baos.write(buf, 0, read);
         }
+        byte rv[] = baos.toByteArray();
+        //if (_log.shouldLog(Log.DEBUG))
+        //    _log.debug("Decompression of " + orig.length + " into " + rv.length + " (or " + 100.0d
+        //               * (((double) rv.length) / ((double) orig.length)) + "% savings)");
+        return rv;
     }
 }

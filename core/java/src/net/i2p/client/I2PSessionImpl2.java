@@ -10,6 +10,7 @@ package net.i2p.client;
  */
 
 import java.io.InputStream;
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Properties;
@@ -86,10 +87,15 @@ class I2PSessionImpl2 extends I2PSessionImpl {
      */
     public byte[] receiveMessage(int msgId) throws I2PSessionException {
         byte compressed[] = super.receiveMessage(msgId);
-        if (SHOULD_COMPRESS)
-            return DataHelper.decompress(compressed);
-        else
+        if (SHOULD_COMPRESS) {
+            try {
+                return DataHelper.decompress(compressed);
+            } catch (IOException ioe) {
+                throw new I2PSessionException("Error decompressing message", ioe);
+            }
+        } else {
             return compressed;
+        }
     }
 
     private boolean sendBestEffort(Destination dest, byte payload[], SessionKey keyUsed, Set tagsSent)
