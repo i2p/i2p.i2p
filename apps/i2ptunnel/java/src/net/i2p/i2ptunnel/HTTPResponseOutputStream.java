@@ -12,7 +12,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.FilterOutputStream;
 import java.io.OutputStream;
-import java.util.Properties;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import net.i2p.data.ByteArray;
 import net.i2p.util.ByteCache;
@@ -68,19 +69,6 @@ class HTTPResponseOutputStream extends FilterOutputStream {
         }
     }
     
-    /**
-     * filter any headers (adding or removing as necessary), and tweak
-     * the first response line as necessary.
-     *
-     * @return response line ("200 OK", etc)
-     */
-    protected String filterHeaders(String responseLine, Properties props) {
-        props.setProperty("Connection", "close");
-        props.setProperty("Proxy-Connection", "close");
-        return responseLine;
-    }
-    
-    
     /** grow (and free) the buffer as necessary */
     private void ensureCapacity() {
         if (_headerBuffer.getValid() + 1 >= _headerBuffer.getData().length) {
@@ -105,26 +93,48 @@ class HTTPResponseOutputStream extends FilterOutputStream {
                (isNL(first) && isNL(third));    // \n\r\n
     }
     
+    /**
+     * Tweak that first HTTP response line (HTTP 200 OK, etc)
+     *
+     */
+    protected String filterResponseLine(String line) {
+        return line;
+    }
+    
     /** we ignore any potential \r, since we trim it on write anyway */
     private static final byte NL = '\n';
     private boolean isNL(byte b) { return (b == NL); }
     
     /** ok, received, now munge & write it */
     private void writeHeader() throws IOException {
-        Properties props = new Properties();
         String responseLine = null;
 
+        boolean connectionSent = false;
+        boolean proxyConnectionSent = false;
+        
         int lastEnd = -1;
         for (int i = 0; i < _headerBuffer.getValid(); i++) {
             if (isNL(_headerBuffer.getData()[i])) {
                 if (lastEnd == -1) {
                     responseLine = new String(_headerBuffer.getData(), 0, i+1); // includes NL
+                    responseLine = filterResponseLine(responseLine);
+                    responseLine = (responseLine.trim() + "\n");
+                    out.write(responseLine.getBytes());
                 } else {
                     for (int j = lastEnd+1; j < i; j++) {
                         if (_headerBuffer.getData()[j] == ':') {
                             String key = new String(_headerBuffer.getData(), lastEnd+1, j-(lastEnd+1));
                             String val = new String(_headerBuffer.getData(), j+2, i-(j+2));
-                            props.setProperty(key, val);
+                            
+                            if ("Connection".equals(key)) {
+                                out.write("Connection: close\n".getBytes());
+                                connectionSent = true;
+                            } else if ("Proxy-Connection".equals(key)) {
+                                out.write("Proxy-Connection: close\n".getBytes());
+                                proxyConnectionSent = true;
+                            } else {
+                                out.write((key.trim() + ": " + val.trim() + "\n").getBytes());
+                            }
                             break;
                         }
                     }
@@ -133,34 +143,11 @@ class HTTPResponseOutputStream extends FilterOutputStream {
             }
         }
         
-        if (responseLine == null)
-            throw new IOException("No HTTP response line, with props=" + props);
-
-        responseLine = filterHeaders(responseLine, props);
-        responseLine = (responseLine.trim() + "\n");
-        
-        if (_log.shouldLog(Log.DEBUG)) {
-            StringBuffer msg = new StringBuffer(responseLine.length() + props.size() * 64);
-            msg.append("HTTP response: first line [").append(responseLine.trim());
-            msg.append("] options: \n");
+        if (!connectionSent)
+            out.write("Connection: close\n".getBytes());
+        if (!proxyConnectionSent)
+            out.write("Proxy-Connection: close\n".getBytes());
             
-            for (Iterator iter = props.keySet().iterator(); iter.hasNext(); ) {
-                String key = (String)iter.next();
-                String val = props.getProperty(key);
-                msg.append('[').append(key.trim()).append("]=[").append(val.trim()).append("]\n");
-            }
-
-            _log.debug(msg.toString());
-        }
-        
-        out.write(responseLine.getBytes());
-
-        for (Iterator iter = props.keySet().iterator(); iter.hasNext(); ) {
-            String key = (String)iter.next();
-            String val = props.getProperty(key);
-            String line = key.trim() + ": " + val.trim() + "\n";
-            out.write(line.getBytes());
-        }
         out.write("\n".getBytes()); // end of the headers
         
         // done, shove off

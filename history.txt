@@ -1,4 +1,8 @@
-$Id: history.txt,v 1.165 2005/03/06 19:07:27 jrandom Exp $
+$Id: history.txt,v 1.166 2005/03/06 19:40:45 jrandom Exp $
+
+2005-03-07  jrandom
+    * Fix the HTTP response header filter to allow multiple headers with the
+      same name (thanks duck and spotteri!)
 
 * 2005-03-06  0.5.0.2 released
 
