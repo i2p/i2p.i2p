@@ -43,20 +43,27 @@ public class Clock implements Timestamper.UpdateListener {
     /** if the clock skewed changes by less than 1s, ignore the update (so we don't slide all over the place) */
     public final static long MIN_OFFSET_CHANGE = 10 * 1000;
 
+    public void setOffset(long offsetMs) {
+        setOffset(offsetMs, false);        
+    }
+    
     /**
      * Specify how far away from the "correct" time the computer is - a positive
      * value means that we are slow, while a negative value means we are fast.
      *
      */
-    public void setOffset(long offsetMs) {
-        if ((offsetMs > MAX_OFFSET) || (offsetMs < 0 - MAX_OFFSET)) {
-            getLog().error("Maximum offset shift exceeded [" + offsetMs + "], NOT HONORING IT");
-            return;
-        }
+    public void setOffset(long offsetMs, boolean force) {
         long delta = offsetMs - _offset;
-        if ((delta < MIN_OFFSET_CHANGE) && (delta > 0 - MIN_OFFSET_CHANGE)) {
-            getLog().debug("Not changing offset since it is only " + delta + "ms");
-            return;
+        if (!force) {
+            if ((offsetMs > MAX_OFFSET) || (offsetMs < 0 - MAX_OFFSET)) {
+                getLog().error("Maximum offset shift exceeded [" + offsetMs + "], NOT HONORING IT");
+                return;
+            }
+            
+            if ((delta < MIN_OFFSET_CHANGE) && (delta > 0 - MIN_OFFSET_CHANGE)) {
+                getLog().debug("Not changing offset since it is only " + delta + "ms");
+                return;
+            }
         }
         if (_alreadyChanged)
             getLog().log(Log.CRIT, "Updating clock offset to " + offsetMs + "ms from " + _offset + "ms");
