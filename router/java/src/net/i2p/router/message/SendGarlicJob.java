@@ -104,7 +104,7 @@ public class SendGarlicJob extends JobImpl {
     
     private void sendGarlic() {
         OutNetMessage msg = new OutNetMessage(_context);
-        long when = _message.getMessageExpiration().getTime() + Router.CLOCK_FUDGE_FACTOR;
+        long when = _message.getMessageExpiration().getTime(); // + Router.CLOCK_FUDGE_FACTOR;
         msg.setExpiration(when);
         msg.setMessage(_message);
         msg.setOnFailedReplyJob(_onReplyFailed);
