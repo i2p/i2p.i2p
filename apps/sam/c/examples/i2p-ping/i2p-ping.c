@@ -28,21 +28,26 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-/* Exit Values:
- *   0: Received at least one response from one dest, or help
- *      message was successfully displayed.
- *   1: Received no responses from any dest.
- *   2: Naming lookup failed, or dest unspecified.
- *   3: SAM error.
+/*
+ * I2P-Ping won't compile on Windows because Windows lacks getopt()
  */
 
+/*
+ * Exit values:
+ *	0: Received at least one response from one dest, or help
+ *	   message was successfully displayed
+ *	1: Received no responses from any dest
+ *	2: Naming lookup failed, or dest unspecified
+ *	3: SAM error
+ */
+
+#include <getopt.h>  /* needed on Gentoo Linux */
 #include <limits.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
 #include <unistd.h>
-/* #include <getopt.h> */ /* Needed on Gentoo - the hell? */
 #include "sam.h"
 
 static void usage();
@@ -67,7 +72,7 @@ sam_sid_t laststream = 0;
 bool mihi = false;
 bool bell = false;
 
-int main(int argc, char* argv[])
+int main(int argc, char *argv[])
 {
 	int ch;
 	int count = INT_MAX;  /* number of times to ping */
@@ -98,7 +103,7 @@ int main(int argc, char* argv[])
 				quiet = true;
 				break;
 			case 'v':  /* version */
-				puts("$Id: i2p-ping.c,v 1.3 2004/07/31 23:06:44 mpc Exp $");
+				puts("$Id: i2p-ping.c,v 1.4 2004/09/22 20:05:40 jrandom Exp $");
 				puts("Copyright (c) 2004, Matthew P. Cashdollar <mpc@innographx.com>");
 				break;
 			case '?':
@@ -191,7 +196,7 @@ void usage()
  */
 static void closeback(sam_sess_t *session, sam_sid_t stream_id, samerr_t reason)
 {
-	fprintf(stderr, "Connection closed to stream %d: %s\n", stream_id,
+	fprintf(stderr, "Connection closed to stream %d: %s\n", (int)stream_id,
 		sam_strerror(reason));
 }
 
@@ -251,7 +256,7 @@ static void namingback(char *name, sam_pubkey_t pubkey, samerr_t result)
  * Our connection attempt returned a result
  */
 static void statusback(sam_sess_t *session, sam_sid_t stream_id,
-		samerr_t result)
+	samerr_t result)
 {
 	laststatus = result;
 	laststream = stream_id;

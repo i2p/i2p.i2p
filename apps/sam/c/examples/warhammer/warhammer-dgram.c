@@ -55,7 +55,7 @@ static void namingback(char *name, sam_pubkey_t pubkey, samerr_t result);
 bool gotdest = false;
 sam_pubkey_t dest;
 
-int main(int argc, char* argv[])
+int main(int argc, char *argv[])
 {
 	/*
 	 * The target of our attack is specified on the command line
@@ -142,7 +142,7 @@ int main(int argc, char* argv[])
  * service programs don't need input ;)
  */
 static void dgramback(sam_sess_t *session, sam_pubkey_t dest, void *data,
-		size_t size)
+	size_t size)
 {
 	puts("Received a datagram (ignored)");
 	free(data);
