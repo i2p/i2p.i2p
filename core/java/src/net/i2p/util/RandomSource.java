@@ -42,7 +42,7 @@ public class RandomSource extends SecureRandom {
      * thats what it has been used for.
      *
      */
-    public int nextInt(int n) {
+    public synchronized int nextInt(int n) {
         if (n == 0) return 0;
         int val = super.nextInt(n);
         if (val < 0) val = 0 - val;
@@ -54,19 +54,48 @@ public class RandomSource extends SecureRandom {
      * Like the modified nextInt, nextLong(n) returns a random number from 0 through n,
      * including 0, excluding n.
      */
-    public long nextLong(long n) {
+    public synchronized long nextLong(long n) {
         long v = super.nextLong();
         if (v < 0) v = 0 - v;
         if (v >= n) v = v % n;
         return v;
     }
 
-    /** synchronized for older versions of kaffe */
-    public void nextBytes(byte bytes[]) {
-        synchronized (this) {
-            super.nextBytes(bytes);
-        }
-    }
+    /**
+     * override as synchronized, for those JVMs that don't always pull via
+     * nextBytes (cough ibm)
+     */
+    public synchronized boolean nextBoolean() { return super.nextBoolean(); }
+    /**
+     * override as synchronized, for those JVMs that don't always pull via
+     * nextBytes (cough ibm)
+     */
+    public synchronized void nextBytes(byte buf[]) { super.nextBytes(buf); }
+    /**
+     * override as synchronized, for those JVMs that don't always pull via
+     * nextBytes (cough ibm)
+     */
+    public synchronized double nextDouble() { return super.nextDouble(); }
+    /**
+     * override as synchronized, for those JVMs that don't always pull via
+     * nextBytes (cough ibm)
+     */
+    public synchronized float nextFloat() { return super.nextFloat(); }
+    /**
+     * override as synchronized, for those JVMs that don't always pull via
+     * nextBytes (cough ibm)
+     */
+    public synchronized double nextGaussian() { return super.nextGaussian(); }
+    /**
+     * override as synchronized, for those JVMs that don't always pull via
+     * nextBytes (cough ibm)
+     */
+    public synchronized int nextInt() { return super.nextInt(); }
+    /**
+     * override as synchronized, for those JVMs that don't always pull via
+     * nextBytes (cough ibm)
+     */
+    public synchronized long nextLong() { return super.nextLong(); }
     
     public EntropyHarvester harvester() { return _entropyHarvester; }
  

@@ -24,6 +24,8 @@ class TestJob extends JobImpl {
     private TunnelPool _pool;
     private PooledTunnelCreatorConfig _cfg;
     private boolean _found;
+    private TunnelInfo _outTunnel;
+    private TunnelInfo _replyTunnel;
     
     /** base to randomize the test delay on */
     private static final int TEST_DELAY = 60*1000;
@@ -50,19 +52,19 @@ class TestJob extends JobImpl {
         _found = false;
         // note: testing with exploratory tunnels always, even if the tested tunnel
         // is a client tunnel (per _cfg.getDestination())
-        TunnelInfo replyTunnel = null;
-        TunnelInfo outTunnel = null;
+        _replyTunnel = null;
+        _outTunnel = null;
         if (_cfg.isInbound()) {
-            replyTunnel = _cfg;
-            outTunnel = getContext().tunnelManager().selectOutboundTunnel();
+            _replyTunnel = _cfg;
+            _outTunnel = getContext().tunnelManager().selectOutboundTunnel();
         } else {
-            replyTunnel = getContext().tunnelManager().selectInboundTunnel();
-            outTunnel = _cfg;
+            _replyTunnel = getContext().tunnelManager().selectInboundTunnel();
+            _outTunnel = _cfg;
         }
         
-        if ( (replyTunnel == null) || (outTunnel == null) ) {
+        if ( (_replyTunnel == null) || (_outTunnel == null) ) {
             if (_log.shouldLog(Log.ERROR))
-                _log.error("Insufficient tunnels to test " + _cfg + " with: " + replyTunnel + " / " + outTunnel);
+                _log.error("Insufficient tunnels to test " + _cfg + " with: " + _replyTunnel + " / " + _outTunnel);
             getContext().statManager().addRateData("tunnel.testAborted", _cfg.getLength(), 0);
             scheduleRetest();
         } else {
@@ -77,15 +79,15 @@ class TestJob extends JobImpl {
             OnTestReply onReply = new OnTestReply(getContext());
             OnTestTimeout onTimeout = new OnTestTimeout(getContext());
             getContext().messageRegistry().registerPending(sel, onReply, onTimeout, 3*testPeriod);
-            sendTest(m, outTunnel, replyTunnel);
+            sendTest(m);
         }
     }
     
-    private void sendTest(I2NPMessage m, TunnelInfo outTunnel, TunnelInfo replyTunnel) {
+    private void sendTest(I2NPMessage m) {
         if (false) {
-            getContext().tunnelDispatcher().dispatchOutbound(m, outTunnel.getSendTunnelId(0), 
-                                                             replyTunnel.getReceiveTunnelId(0), 
-                                                             replyTunnel.getPeer(0));
+            getContext().tunnelDispatcher().dispatchOutbound(m, _outTunnel.getSendTunnelId(0), 
+                                                             _replyTunnel.getReceiveTunnelId(0), 
+                                                             _replyTunnel.getPeer(0));
         } else {
             // garlic route that DeliveryStatusMessage to ourselves so the endpoints and gateways
             // can't tell its a test.  to simplify this, we encrypt it with a random key and tag,
@@ -116,20 +118,35 @@ class TestJob extends JobImpl {
             getContext().sessionKeyManager().tagsReceived(encryptKey, encryptTags);
             
             if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Sending garlic test of " + outTunnel + " / " + replyTunnel);
-            getContext().tunnelDispatcher().dispatchOutbound(msg, outTunnel.getSendTunnelId(0),
-                                                             replyTunnel.getReceiveTunnelId(0),
-                                                             replyTunnel.getPeer(0));
+                _log.debug("Sending garlic test of " + _outTunnel + " / " + _replyTunnel);
+            getContext().tunnelDispatcher().dispatchOutbound(msg, _outTunnel.getSendTunnelId(0),
+                                                             _replyTunnel.getReceiveTunnelId(0),
+                                                             _replyTunnel.getPeer(0));
         }
     }
     
     public void testSuccessful(int ms) {
         getContext().statManager().addRateData("tunnel.testSuccessLength", _cfg.getLength(), 0);
         getContext().statManager().addRateData("tunnel.testSuccessTime", ms, 0);
+    
+        noteSuccess(ms, _outTunnel);
+        noteSuccess(ms, _replyTunnel);
+        
         scheduleRetest();
     }
     
+    private void noteSuccess(long ms, TunnelInfo tunnel) {
+        if (tunnel != null)
+            for (int i = 0; i < tunnel.getLength(); i++)
+                getContext().profileManager().tunnelTestSucceeded(tunnel.getPeer(i), ms);
+    }
+    
     private void testFailed(long timeToFail) {
+        if (_found) {
+            // ok, not really a /success/, but we did find it, even though slowly
+            noteSuccess(timeToFail, _outTunnel);
+            noteSuccess(timeToFail, _replyTunnel);
+        }
         if (_pool.getSettings().isExploratory())
             getContext().statManager().addRateData("tunnel.testExploratoryFailedTime", timeToFail, timeToFail);
         else
@@ -144,6 +161,8 @@ class TestJob extends JobImpl {
     /** how long we allow tests to run for before failing them */
     private int getTestPeriod() { return 20*1000; }
     private void scheduleRetest() {
+        _outTunnel = null;
+        _replyTunnel = null;
         int delay = getDelay();
         if (_cfg.getExpiration() > getContext().clock().now() + delay)
             requeue(delay);

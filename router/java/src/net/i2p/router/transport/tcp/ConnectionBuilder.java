@@ -76,7 +76,7 @@ public class ConnectionBuilder {
     private String _error;
     
     /** If the connection hasn't been built in 30 seconds, give up */
-    public static final int CONNECTION_TIMEOUT = 30*1000;
+    public static final int CONNECTION_TIMEOUT = 20*1000;
     
     public static final int WRITE_BUFFER_SIZE = 2*1024;
     

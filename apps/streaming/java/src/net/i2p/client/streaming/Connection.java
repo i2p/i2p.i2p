@@ -71,7 +71,7 @@ public class Connection {
     private long _lifetimeDupMessageSent;
     private long _lifetimeDupMessageReceived;
     
-    public static final long MAX_RESEND_DELAY = 60*1000;
+    public static final long MAX_RESEND_DELAY = 30*1000;
     public static final long MIN_RESEND_DELAY = 10*1000;
 
     /** wait up to 5 minutes after disconnection so we can ack/close packets */

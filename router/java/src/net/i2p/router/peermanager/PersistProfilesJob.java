@@ -46,7 +46,7 @@ class PersistProfilesJob extends JobImpl {
                 PersistProfilesJob.this.getContext().jobQueue().addJob(PersistProfilesJob.this);
             } else {
                 // we've got peers left to persist, so requeue the persist profile job
-                PersistProfilesJob.this.getContext().jobQueue().addJob(PersistProfileJob.this);
+                PersistProfilesJob.PersistProfileJob.this.requeue(1000);
             }
         }
         public String getName() { return "Persist profile"; }

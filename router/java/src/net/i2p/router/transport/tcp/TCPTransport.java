@@ -196,6 +196,7 @@ public class TCPTransport extends TransportImpl {
                         newPeer = true;
                     }
                     msgs.add(msg);
+                    msg.timestamp("TCPTransport.outboundMessageReady queued behind " +(msgs.size()-1));
                     
                     if (newPeer)
                         _connectionLock.notifyAll();

@@ -111,6 +111,7 @@ public class ProfileManagerImpl implements ProfileManager {
     public void tunnelTestSucceeded(Hash peer, long responseTimeMs) {
         PeerProfile data = getProfile(peer);
         if (data == null) return;
+        data.updateTunnelTestTimeAverage(responseTimeMs);
         data.getTunnelTestResponseTime().addData(responseTimeMs, responseTimeMs);
         if (responseTimeMs > getSlowThreshold())
             data.getTunnelTestResponseTimeSlow().addData(responseTimeMs, responseTimeMs);

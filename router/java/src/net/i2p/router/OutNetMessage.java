@@ -89,7 +89,7 @@ public class OutNetMessage {
      */
     public long timestamp(String eventName) {
         long now = _context.clock().now();
-        if (_log.shouldLog(Log.DEBUG)) {
+        if (_log.shouldLog(Log.INFO)) {
             // only timestamp if we are debugging
             synchronized (this) {
                 locked_initTimestamps();
@@ -103,7 +103,7 @@ public class OutNetMessage {
         return now - _created;
     }
     public Map getTimestamps() {
-        if (_log.shouldLog(Log.DEBUG)) {
+        if (_log.shouldLog(Log.INFO)) {
             synchronized (this) {
                 locked_initTimestamps();
                 return (Map)_timestamps.clone();
@@ -112,7 +112,7 @@ public class OutNetMessage {
         return Collections.EMPTY_MAP;
     }
     public Long getTimestamp(String eventName) {
-        if (_log.shouldLog(Log.DEBUG)) {
+        if (_log.shouldLog(Log.INFO)) {
             synchronized (this) {
                 locked_initTimestamps();
                 return (Long)_timestamps.get(eventName);
@@ -301,7 +301,7 @@ public class OutNetMessage {
     }
     
     private void renderTimestamps(StringBuffer buf) {
-        if (_log.shouldLog(Log.DEBUG)) {
+        if (_log.shouldLog(Log.INFO)) {
             synchronized (this) {
                 long lastWhen = -1;
                 for (int i = 0; i < _timestampOrder.size(); i++) {

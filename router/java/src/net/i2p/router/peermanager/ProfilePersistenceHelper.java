@@ -109,6 +109,8 @@ class ProfilePersistenceHelper {
         buf.append("lastFailedSend=").append(profile.getLastSendFailed()).append(NL);
         buf.append("# Last heard from: when did we last get a message from the peer?  (milliseconds from the epoch)").append(NL);
         buf.append("lastHeardFrom=").append(profile.getLastHeardFrom()).append(NL);
+        buf.append("# moving average as to how fast the peer replies").append(NL);
+        buf.append("tunnelTestTimeAverage=").append(profile.getTunnelTestTimeAverage()).append(NL);
         buf.append(NL);
         
         out.write(buf.toString().getBytes());
@@ -178,6 +180,7 @@ class ProfilePersistenceHelper {
             profile.setLastSendSuccessful(getLong(props, "lastSentToSuccessfully"));
             profile.setLastSendFailed(getLong(props, "lastFailedSend"));
             profile.setLastHeardFrom(getLong(props, "lastHeardFrom"));
+            profile.setTunnelTestTimeAverage(getDouble(props, "tunnelTestTimeAverage"));
             
             profile.getTunnelHistory().load(props);
             profile.getDBHistory().load(props);
@@ -213,6 +216,18 @@ class ProfilePersistenceHelper {
             }
         }
         return 0;
+    }
+
+    private final static double getDouble(Properties props, String key) {
+        String val = props.getProperty(key);
+        if (val != null) {
+            try {
+                return Double.parseDouble(val);
+            } catch (NumberFormatException nfe) {
+                return 0.0;
+            }
+        }
+        return 0.0;
     }
     
     private void loadProps(Properties props, File file) {

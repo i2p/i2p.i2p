@@ -38,6 +38,26 @@ public class I2PSocketManagerFactory {
     public static I2PSocketManager createManager() {
         return createManager(getHost(), getPort(), System.getProperties());
     }
+    
+    /**
+     * Create a socket manager using a brand new destination connected to the
+     * I2CP router on the local machine on the default port (7654).
+     * 
+     * @return the newly created socket manager, or null if there were errors
+     */
+    public static I2PSocketManager createManager(Properties opts) {
+        return createManager(getHost(), getPort(), opts);
+    }
+
+    /**
+     * Create a socket manager using a brand new destination connected to the
+     * I2CP router on the specified host and port
+     * 
+     * @return the newly created socket manager, or null if there were errors
+     */
+    public static I2PSocketManager createManager(String host, int port) {
+        return createManager(host, port, System.getProperties());
+    }
 
     /**
      * Create a socket manager using a brand new destination connected to the

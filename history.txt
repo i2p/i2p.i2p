@@ -1,4 +1,20 @@
-$Id: history.txt,v 1.169 2005/03/14 22:47:15 jrandom Exp $
+$Id: history.txt,v 1.170 2005/03/17 00:29:55 jrandom Exp $
+
+2005-03-17  jrandom
+    * Update the old speed calculator and associated profile data points to 
+      use a non-tiered moving average of the tunnel test time, avoiding the 
+      freshness issues of the old tiered speed stats. 
+    * Explicitly synchronize all of the methods on the PRNG, rather than just
+      the feeder methods (sun and kaffe only need the feeder, but it seems ibm
+      needs all of them synchronized).
+    * Properly use the tunnel tests as part of the profile stats.
+    * Don't flood the jobqueue with sequential persist profile tasks, but 
+      instead, inject a brief scheduling delay between them.
+    * Reduce the TCP connection establishment timeout to 20s (which is still
+      absurdly excessive)
+    * Reduced the max resend delay to 30s so we can get some resends in when
+      dealing with client apps that hang up early (e.g. wget)
+    * Added more alternative socketManager factories (good call aum!)
 
 2005-03-16  jrandom
     * Adjust the old speed calculator to include end to end RTT data in its 

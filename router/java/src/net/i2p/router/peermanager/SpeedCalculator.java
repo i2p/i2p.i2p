@@ -38,6 +38,7 @@ public class SpeedCalculator extends Calculator {
     }
     
     public double calc(PeerProfile profile) {
+        if (true) return calcAverage(profile);
         long threshold = getEventThreshold();
         boolean tunnelTestOnly = getUseTunnelTestOnly();
         
@@ -109,16 +110,24 @@ public class SpeedCalculator extends Calculator {
         return rv;
     }
     
+    private double calcAverage(PeerProfile profile) {
+        double avg = profile.getTunnelTestTimeAverage();
+        if (avg == 0) 
+            return 0.0;
+        else
+            return (60.0*1000.0) / avg;
+    }
+    
     private double adjust(long period, double value) {
         switch ((int)period) {
             case 10*60*1000:
                 return value;
             case 60*60*1000:
-                return value * 0.5;
+                return value * 0.75;
             case 24*60*60*1000:
-                return value * 0.001;
+                return value * 0.1;
             default:
-                return value * 0.0001;
+                return value * 0.01;
         }
     }
 

@@ -19,6 +19,7 @@ public class PeerProfile {
     private long _lastSentToSuccessfully;
     private long _lastFailedSend;
     private long _lastHeardFrom;
+    private double _tunnelTestResponseTimeAvg;
     // periodic rates
     private RateStat _sendSuccessSize = null;
     private RateStat _sendFailureSize = null;
@@ -61,6 +62,7 @@ public class PeerProfile {
         _integrationValue = 0;
         _isFailing = false;
         _consecutiveShitlists = 0;
+        _tunnelTestResponseTimeAvg = 0.0d;
         _peer = peer;
         if (expand)
             expandProfile();
@@ -213,6 +215,24 @@ public class PeerProfile {
      * is this peer actively failing (aka not worth touching)?
      */
     public boolean getIsFailing() { return _isFailing; }
+
+    public double getTunnelTestTimeAverage() { return _tunnelTestResponseTimeAvg; }
+    void setTunnelTestTimeAverage(double avg) { _tunnelTestResponseTimeAvg = avg; }
+    
+    void updateTunnelTestTimeAverage(long ms) {
+        if (_tunnelTestResponseTimeAvg <= 0) 
+            _tunnelTestResponseTimeAvg = 30*1000; // should we instead start at $ms?
+        
+        // weighted since we want to let the average grow quickly and shrink slowly
+        if (ms < _tunnelTestResponseTimeAvg)
+            _tunnelTestResponseTimeAvg = 0.95*_tunnelTestResponseTimeAvg + .05*(double)ms;
+        else
+            _tunnelTestResponseTimeAvg = 0.75*_tunnelTestResponseTimeAvg + .25*(double)ms;
+        
+        if ( (_peer != null) && (_log.shouldLog(Log.INFO)) )
+            _log.info("Updating tunnel test time for " + _peer.toBase64().substring(0,6) 
+                      + " to " + _tunnelTestResponseTimeAvg + " via " + ms);
+    }
     
     /**
      * when the given peer is performing so poorly that we don't want to bother keeping
@@ -256,9 +276,9 @@ public class PeerProfile {
         if (_tunnelCreateResponseTime == null)
             _tunnelCreateResponseTime = new RateStat("tunnelCreateResponseTime", "how long it takes to get a tunnel create response from the peer (in milliseconds)", group, new long[] { 10*60*1000l, 30*60*1000l, 60*60*1000l, 24*60*60*1000 } );
         if (_tunnelTestResponseTime == null)
-            _tunnelTestResponseTime = new RateStat("tunnelTestResponseTime", "how long it takes to successfully test a tunnel this peer participates in (in milliseconds)", group, new long[] { 10*60*1000l, 60*60*1000l, 24*60*60*1000 } );
+            _tunnelTestResponseTime = new RateStat("tunnelTestResponseTime", "how long it takes to successfully test a tunnel this peer participates in (in milliseconds)", group, new long[] { 10*60*1000l, 30*60*1000l, 60*60*1000l, 3*60*60*1000l, 24*60*60*1000 } );
         if (_tunnelTestResponseTimeSlow == null)
-            _tunnelTestResponseTimeSlow = new RateStat("tunnelTestResponseTimeSlow", "how long it takes to successfully test a peer when the time exceeds 5s", group, new long[] { 10*60*1000l, 60*60*1000l, 24*60*60*1000l, });
+            _tunnelTestResponseTimeSlow = new RateStat("tunnelTestResponseTimeSlow", "how long it takes to successfully test a peer when the time exceeds 5s", group, new long[] { 10*60*1000l, 30*60*1000l, 60*60*1000l, 3*60*60*1000l, 24*60*60*1000l, });
         if (_commError == null)
             _commError = new RateStat("commErrorRate", "how long between communication errors with the peer (e.g. disconnection)", group, new long[] { 60*1000l, 10*60*1000l, 60*60*1000l, 24*60*60*1000 } );
         if (_dbIntroduction == null)
