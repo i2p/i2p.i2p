@@ -104,7 +104,7 @@ public class EchoTester extends Thread {
             }
         } catch (InterruptedException ex) {
             ex.printStackTrace();
-            System.exit(1); // treat these errors as fatal	    
+            System.exit(1); // treat these errors as fatal          
         } catch (IOException ex) {
             ex.printStackTrace();
             System.exit(1); // treat these errors as fatal
