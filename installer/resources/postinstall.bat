@@ -11,6 +11,7 @@
 :: I2P router as a background service.
 
 @echo off
+setlocal
 set INSTALL_PATH=%~dp0
 copy "%INSTALL_PATH%lib\wrapper\win32\I2Psvc.exe" "%INSTALL_PATH%"
 copy "%INSTALL_PATH%lib\wrapper\win32\wrapper.dll" "%INSTALL_PATH%lib"
