@@ -20,7 +20,7 @@ mkdir lib/freenet
 mkdir lib/freenet/support
 mkdir lib/freenet/support/CPUInformation
 
-CPP="g++"
+CC="gcc"
 
 case `uname -sr` in
 MINGW*)
@@ -43,7 +43,7 @@ esac
 
 echo "Compiling C code..."
 rm -f $LIBFILE
-$CPP $LINKFLAGS $INCLUDES src/*.cpp -o $LIBFILE
+$CC $LINKFLAGS $INCLUDES src/*.c -o $LIBFILE
 strip $LIBFILE
 echo Built $LIBFILE
 
