@@ -187,6 +187,7 @@ class SearchJob extends JobImpl {
             }
         } else {
             _state.addPending(closestHashes);
+            int sent = 0;
             for (Iterator iter = closestHashes.iterator(); iter.hasNext(); ) {
                 Hash peer = (Hash)iter.next();
                 DataStructure ds = _facade.getDataStore().get(peer);
@@ -196,17 +197,30 @@ class SearchJob extends JobImpl {
                                   + peer + " : " + (ds == null ? "null" : ds.getClass().getName()));
                 } else {
                     sendSearch((RouterInfo)ds);
+                    sent++;
                 }
+            }
+            if (sent <= 0) {
+                // the (potentially) last peers being searched for could not be,
+                // er, searched for, so lets retry ASAP (causing either another 
+                // peer to be selected, or the whole search to fail)
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn(getJobId() + ": No new peer queued up, so we are going to requeue " +
+                              "ourselves in our search for " + _state.getTarget().toBase64());
+                requeuePending(0);
             }
         }
     }
     
     private void requeuePending() {
+        requeuePending(5*1000);
+    }
+    private void requeuePending(long ms) {
         if (_pendingRequeueJob == null)
             _pendingRequeueJob = new RequeuePending();
         long now = getContext().clock().now();
         if (_pendingRequeueJob.getTiming().getStartAfter() < now)
-            _pendingRequeueJob.getTiming().setStartAfter(now+5*1000);
+            _pendingRequeueJob.getTiming().setStartAfter(now+ms);
         getContext().jobQueue().addJob(_pendingRequeueJob);
     }
 
