@@ -116,11 +116,11 @@ public class TCPAddress {
         try {
             InetAddress addr = InetAddress.getByName(_host);
             byte quad[] = addr.getAddress();
-            if (quad[0] == (byte)127) return false;
-            if (quad[0] == (byte)10) return false; 
-            if ( (quad[0] == (byte)172) && (quad[1] >= (byte)16) && (quad[1] <= (byte)31) ) return false;
-            if ( (quad[0] == (byte)192) && (quad[1] == (byte)168) ) return false;
-            if (quad[0] >= (byte)224) return false; // no multicast
+            if (quad[0] == (int)127) return false;
+            if (quad[0] == (int)10) return false; 
+            if ( (quad[0] == (int)172) && (quad[1] >= (int)16) && (quad[1] <= (int)31) ) return false;
+            if ( (quad[0] == (int)192) && (quad[1] == (int)168) ) return false;
+            if (quad[0] >= (int)224) return false; // no multicast
             return true; // or at least possible to be true
         } catch (Throwable t) {
             if (_log.shouldLog(Log.WARN))
