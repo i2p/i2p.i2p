@@ -42,7 +42,7 @@ public class LogsHelper {
     }
     
     public String getServiceLogs() {
-        String str = DataHelper.readTextFile("logs/wrapper.log", 500);
+        String str = DataHelper.readTextFile("wrapper.log", 500);
         if (str == null) 
             return "";
         else
