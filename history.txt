@@ -1,4 +1,4 @@
-$Id: history.txt,v 1.164 2005/03/04 21:54:42 jrandom Exp $
+$Id: history.txt,v 1.165 2005/03/06 19:07:27 jrandom Exp $
 
 * 2005-03-06  0.5.0.2 released
 
@@ -10,6 +10,7 @@ $Id: history.txt,v 1.164 2005/03/04 21:54:42 jrandom Exp $
     * Added a startRouter.sh script to new installs which simply calls 
       "sh i2prouter start".  This should make it clear how people should start
       I2P.
+    * Properly expand the HTTP response header buffer (thanks shendaras!)
 
 2005-03-04  jrandom
     * Filter HTTP response headers in the eepproxy, forcing Connection: close

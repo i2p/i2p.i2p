@@ -30,7 +30,7 @@ class HTTPResponseOutputStream extends FilterOutputStream {
     protected ByteArray _headerBuffer;
     private boolean _headerWritten;
     private byte _buf1[];
-    private static final int CACHE_SIZE = 4096;
+    private static final int CACHE_SIZE = 8*1024;
     
     public HTTPResponseOutputStream(OutputStream raw) {
         super(raw);
@@ -86,7 +86,9 @@ class HTTPResponseOutputStream extends FilterOutputStream {
         if (_headerBuffer.getValid() + 1 >= _headerBuffer.getData().length) {
             int newSize = (int)(_headerBuffer.getData().length * 1.5);
             ByteArray newBuf = new ByteArray(new byte[newSize]);
-            System.arraycopy(_headerBuffer.getData(), 0, newBuf, 0, _headerBuffer.getValid());
+            System.arraycopy(_headerBuffer.getData(), 0, newBuf.getData(), 0, _headerBuffer.getValid());
+            newBuf.setValid(_headerBuffer.getValid());
+            newBuf.setOffset(0);
             if (_headerBuffer.getData().length == CACHE_SIZE)
                 _cache.release(_headerBuffer);
             _headerBuffer = newBuf;
