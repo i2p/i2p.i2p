@@ -14,6 +14,8 @@ import java.io.InputStream;
 import java.io.IOException;
 import java.util.HashMap;
 import java.io.OutputStream;
+import java.net.ConnectException;
+import java.net.NoRouteToHostException;
 import java.util.Iterator;
 import java.util.Properties;
 import java.util.Set;
@@ -143,8 +145,16 @@ public class SAMStreamSession {
      * @param id Unique id for the connection
      * @param dest Base64-encoded Destination to connect to
      * @param props Options to be used for connection
+     *
+     * @throws DataFormatException if the destination is not valid
+     * @throws SAMInvalidDirectionException if trying to connect through a
+     *                                      receive-only session
+     * @throws ConnectException if the destination refuses connections
+     * @throws NoRouteToHostException if the destination can't be reached
+     * @throws InterruptedException if the connection timeouts
+     * @throws I2PException if there's another I2P-related error
      */
-    public boolean connect(int id, String dest, Properties props) throws I2PException, DataFormatException, SAMInvalidDirectionException {
+    public boolean connect(int id, String dest, Properties props) throws I2PException, ConnectException, NoRouteToHostException, DataFormatException, InterruptedException, SAMInvalidDirectionException {
         if (!canCreate) {
             _log.debug("Trying to create an outgoing connection using a receive-only session");
             throw new SAMInvalidDirectionException("Trying to create connections through a receive-only session");
@@ -199,6 +209,7 @@ public class SAMStreamSession {
         }
         removeAllSocketHandlers();
         recv.stopStreamReceiving();
+        socketMgr.destroySocketManager();
     }
 
     /**

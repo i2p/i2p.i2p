@@ -17,6 +17,8 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.Socket;
+import java.net.ConnectException;
+import java.net.NoRouteToHostException;
 import java.util.Enumeration;
 import java.util.Properties;
 import java.util.StringTokenizer;
@@ -569,13 +571,25 @@ public class SAMv1Handler extends SAMHandler implements SAMRawReceiver, SAMDatag
                 _log.debug("Invalid destination in STREAM CONNECT message");
                 return writeString("STREAM STATUS RESULT=INVALID_KEY ID="
                                    + id + "\n");
-            } catch (I2PException e) {
-                _log.debug("STREAM CONNECT failed: " + e.getMessage());
-                return writeString("STREAM STATUS RESULT=I2P_ERROR ID="
-                                   + id + "\n");
             } catch (SAMInvalidDirectionException e) {
                 _log.debug("STREAM CONNECT failed: " + e.getMessage());
                 return writeString("STREAM STATUS RESULT=INVALID_DIRECTION ID="
+                                   + id + "\n");
+            } catch (ConnectException e) {
+                _log.debug("STREAM CONNECT failed: " + e.getMessage());
+                return writeString("STREAM STATUS RESULT=CONNECTION_REFUSED ID="
+                                   + id + "\n");
+            } catch (NoRouteToHostException e) {
+                _log.debug("STREAM CONNECT failed: " + e.getMessage());
+                return writeString("STREAM STATUS RESULT=CANT_REACH_PEER ID="
+                                   + id + "\n");
+            } catch (InterruptedException e) {
+                _log.debug("STREAM CONNECT failed: " + e.getMessage());
+                return writeString("STREAM STATUS RESULT=TIMEOUT ID="
+                                   + id + "\n");
+            } catch (I2PException e) {
+                _log.debug("STREAM CONNECT failed: " + e.getMessage());
+                return writeString("STREAM STATUS RESULT=I2P_ERROR ID="
                                    + id + "\n");
             }
         } else if (opcode.equals("CLOSE")) {
