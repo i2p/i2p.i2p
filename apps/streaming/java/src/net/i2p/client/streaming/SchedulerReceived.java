@@ -31,10 +31,15 @@ class SchedulerReceived extends SchedulerImpl {
         
         long timeTillSend = con.getNextSendTime() - _context.clock().now();
         if (timeTillSend <= 0) {
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("received con... send a packet");
-            con.sendAvailable();
-            con.setNextSendTime(-1);
+            if (con.getNextSendTime() > 0) {
+                if (_log.shouldLog(Log.DEBUG))
+                    _log.debug("received con... send a packet");
+                con.sendAvailable();
+                con.setNextSendTime(-1);
+            } else {
+                con.setNextSendTime(_context.clock().now() + con.getOptions().getSendAckDelay());
+                reschedule(con.getOptions().getSendAckDelay(), con);
+            }
         } else {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("received con... time till next send: " + timeTillSend);

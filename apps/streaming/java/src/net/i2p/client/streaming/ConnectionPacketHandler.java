@@ -7,6 +7,7 @@ import net.i2p.I2PException;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
 import net.i2p.util.Log;
+import net.i2p.util.SimpleTimer;
 
 /**
  * Receive a packet for a particular connection - placing the data onto the
@@ -27,6 +28,13 @@ public class ConnectionPacketHandler {
         boolean ok = verifyPacket(packet, con);
         if (!ok) return;
         con.packetReceived();
+        if (con.getInputStream().getTotalQueuedSize() > con.getOptions().getInboundBufferSize()) {
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Inbound buffer exceeded on connection " + con + ": dropping " + packet);
+            con.getOptions().setChoke(5*1000);
+            return;
+        }
+        con.getOptions().setChoke(0);
         boolean isNew = con.getInputStream().messageReceived(packet.getSequenceNum(), packet.getPayload());
 
         // close *after* receiving the data, as well as after verifying the signatures / etc
@@ -53,7 +61,8 @@ public class ConnectionPacketHandler {
                 con.getOptions().setResendDelay(con.getOptions().getResendDelay()*2);
                 //con.getOptions().setWindowSize(con.getOptions().getWindowSize()/2);
                 if (_log.shouldLog(Log.WARN))
-                    _log.warn("congestion.. dup " + packet);   
+                    _log.warn("congestion.. dup " + packet);
+                SimpleTimer.getInstance().addEvent(new AckDup(con), con.getOptions().getSendAckDelay());
                 //con.incrementUnackedPacketsReceived();
                 con.setNextSendTime(_context.clock().now() + con.getOptions().getSendAckDelay());
             } else {
@@ -249,4 +258,22 @@ public class ConnectionPacketHandler {
             }
         }
     }    
+    
+    private class AckDup implements SimpleTimer.TimedEvent {
+        private long _created;
+        private Connection _con;
+        public AckDup(Connection con) {
+            _created = _context.clock().now();
+            _con = con;
+        }
+        public void timeReached() {
+            if (_con.getLastActivityOn() <= _created) {
+                if (_log.shouldLog(Log.DEBUG))
+                    _log.debug("Last activity was a while ago, and we want to ack a dup");
+                // we haven't done anything since receiving the dup, send an
+                // ack now
+                _con.ackImmediately();
+            }
+        }
+    }
 }

@@ -20,6 +20,7 @@ public class ConnectionOptions extends I2PSocketOptions {
     private int _maxResends;
     private int _inactivityTimeout;
     private int _inactivityAction;
+    private int _inboundBufferSize;
 
     public static final int PROFILE_BULK = 1;
     public static final int PROFILE_INTERACTIVE = 2;
@@ -59,6 +60,7 @@ public class ConnectionOptions extends I2PSocketOptions {
             setMaxResends(opts.getMaxResends());
             setInactivityTimeout(opts.getInactivityTimeout());
             setInactivityAction(opts.getInactivityAction());
+            setInboundBufferSize(opts.getInboundBufferSize());
         } else {
             setConnectDelay(2*1000);
             setProfile(PROFILE_BULK);
@@ -72,6 +74,7 @@ public class ConnectionOptions extends I2PSocketOptions {
             setWriteTimeout(-1);
             setInactivityTimeout(5*60*1000);
             setInactivityAction(INACTIVITY_ACTION_SEND);
+            setInboundBufferSize(256*1024);
         }
     }
     
@@ -186,4 +189,11 @@ public class ConnectionOptions extends I2PSocketOptions {
     
     public int getInactivityAction() { return _inactivityAction; }
     public void setInactivityAction(int action) { _inactivityAction = action; }
+    
+    /** 
+     * how much data are we willing to accept in our buffer?
+     *
+     */
+    public int getInboundBufferSize() { return _inboundBufferSize; }
+    public void setInboundBufferSize(int bytes) { _inboundBufferSize = bytes; }
 }
