@@ -87,6 +87,8 @@ class I2PSessionImpl2 extends I2PSessionImpl {
      */
     public byte[] receiveMessage(int msgId) throws I2PSessionException {
         byte compressed[] = super.receiveMessage(msgId);
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("receiving message " + msgId + " with " + compressed.length + " compressed bytes");
         if (SHOULD_COMPRESS) {
             try {
                 return DataHelper.decompress(compressed);
@@ -224,21 +226,23 @@ class I2PSessionImpl2 extends I2PSessionImpl {
         boolean accepted = state.received(MessageStatusMessage.STATUS_SEND_ACCEPTED);
 
         if ((!accepted) || (state.getMessageId() == null)) {
-            if (_log.shouldLog(Log.ERROR))
-                _log.error(getPrefix() + "State with nonce " + state.getNonce()
+            if (_log.shouldLog(Log.CRIT))
+                _log.log(Log.CRIT, getPrefix() + "State with nonce " + state.getNonce()
                            + " was not accepted?  (no messageId!! found=" + found 
-                           + " msgId=" + state.getMessageId() + ")", 
-                           new Exception("Race on accept/success status messages, or reconnected?"));
+                           + " msgId=" + state.getMessageId() + ")");
+            //if (true) 
+            //    throw new OutOfMemoryError("not really an OOM, but more of jr fucking shit up");
             nackTags(state);
-            //if (_log.shouldLog(Log.CRIT))
-            //    _log.log(Log.CRIT, "Disconnecting/reconnecting because we never were accepted!");
-            //disconnect();
             return false;
         }
 
         if (_log.shouldLog(Log.DEBUG))
             _log.debug(getPrefix() + "After waitFor sending state " + state.getMessageId().getMessageId()
                        + " / " + state.getNonce() + " found = " + found);
+        
+        // WARNING: this will always be false for mode=BestEffort, even though the message may go 
+        // through, causing every datagram to be ElGamal encrypted!  
+        // TODO: Fix this to include support for acks received after the sendMessage completes
         if (found) {
             if (_log.shouldLog(Log.INFO))
                 _log.info(getPrefix() + "Message sent after " + state.getElapsed() + "ms with "
