@@ -1,0 +1,67 @@
+$Id$
+
+2004-xx-xx  jrandom
+    * Implemented the new web architecture and router console
+    * Implemented I2PTunnel web interface, and revamped startup process.
+    * Revamped peer selection code to address skew.
+    * Removed all temporary threads from the router and the SDK.
+    * Bugfix dealing with timeouts and resends.
+    * Integrated Iakin's jcpuid library and jbigi update, with modifications.
+
+2004-xx-xx  hypercubus
+    * Implemented the new installation process.
+    * Integrated systray 
+    * Integrated service manager
+
+2004-xx-xx  oOo
+    * Implemented ?i2paddresshelper= hook 
+    * Many small bugfixes to the web interface, router, i2ptunnel, and core.
+
+2004-xx-xx  Nightblade
+    * libSAM updates.
+
+2004-xx-xx  cervantes
+    * Imported i2pProxy.pac proxy script in with the build.
+
+* 2004-08-20  0.3.4.3 released
+* 2004-08-12  0.3.4.2 released
+* 2004-08-08  0.3.4.1 released
+* 2004-07-29  0.3.4 released
+* 2004-07-23  0.3.3 released
+* 2004-07-16  0.3.2.3 released
+* 2004-07-14  0.3.2.2 released
+* 2004-07-11  0.3.2.1 released
+* 2004-07-07  0.3.2 released
+* 2004-06-25  0.3.1.5 released
+* 2004-05-23  0.3.1.4 released
+* 2004-05-20  0.3.1.3 released
+* 2004-05-13  0.3.1.2 released
+* 2004-05-07  0.3.1.1 released
+* 2004-04-30  0.3.1 released
+* 2004-04-20  0.3.0.4 released
+* 2004-04-04  0.3.0.3 released
+* 2004-03-30  0.3.0.2 released
+* 2004-03-25  0.3.0.1 released
+* 2004-03-21  0.3.0 released
+* 2004-03-10  0.2.5.4 released
+* 2004-03-04  0.2.5.3 released
+* 2004-02-28  0.2.5.2 released
+* 2004-02-27  0.2.5.1 released
+* 2004-02-25  0.2.5 released
+* 2004-02-19  0.2.4.2 released
+* 2004-02-15  0.2.4.1 released
+* 2004-02-14  0.2.4 released
+* 2004-01-27  0.2.3.6 released
+* 2004-01-21  0.2.3.5 released
+* 2004-01-14  0.2.3.4 released
+* 2003-12-29  0.2.3.3 released
+* 2003-12-27  0.2.3.2 released
+* 2003-12-25  0.2.3.1 released
+* 2003-12-13  0.2.3 released
+* 2003-12-01  0.2.2 released
+* 2003-11-18  0.2.1.1 released
+* 2003-11-12  0.2.1 released
+* 2003-11-09  0.2.0.3 released
+* 2003-11-08  0.2.0.2 released
+* 2003-11-03  0.2.0.1 released
+* 2003-11-01  0.2 released

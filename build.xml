@@ -239,6 +239,7 @@
         </copy>
         <copy file="hosts.txt" todir="pkg-temp/" />
         <copy file="install-headless.txt" todir="pkg-temp/" />
+        <copy file="history.txt" todir="pkg-temp/" />
         <mkdir dir="pkg-temp/docs" />
         <copy file="readme.html" todir="pkg-temp/docs/" />
     </target>

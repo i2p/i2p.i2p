@@ -49,7 +49,7 @@ public class SummaryHelper {
      *
      */
     public String getVersion() { 
-        return RouterVersion.VERSION;
+        return RouterVersion.VERSION + "-" + RouterVersion.BUILD;
     }
     /**
      * Retrieve a pretty printed uptime count (ala 4d or 7h or 39m)
