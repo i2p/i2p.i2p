@@ -674,7 +674,7 @@ public class ProfileOrganizer {
                 if (prof.getIsActive()) {
                     buf.append("<font color=\"blue\">++").append(peer.toBase64().substring(0,6)).append("</font>");
                 } else {
-                    buf.append("__").append(peer.toBase64());
+                    buf.append("__").append(peer.toBase64().substring(0,6));
                 }
             }
             buf.append("</code></td>");
