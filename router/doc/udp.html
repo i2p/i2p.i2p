@@ -1,4 +1,4 @@
-<code>$Id: udp.html,v 1.6 2005/03/27 17:08:16 jrandom Exp $</code>
+<code>$Id: udp.html,v 1.7 2005/03/29 19:20:07 jrandom Exp $</code>
 
 <h1>Secure Semireliable UDP (SSU)</h1>
 <b>DRAFT</b>
@@ -328,9 +328,11 @@ bits 4-7: total identity fragments</pre></li>
    bit 0: explicit ACKs included
    bit 1: explicit NACKs included
    bit 2: numACKs included
-bits 3-4: reserved for congestion control
+   bit 3: explicit congestion notification
+   bit 4: request previous ACKs
    bit 5: want reply
-bits 6-7: reserved</pre></li>
+   bit 6: extended data included
+   bit 7: reserved</pre></li>
         <li>if explicit ACKs are included:<ul>
 	  <li>a 1 byte number of ACKs</li>
           <li>that many 4 byte MessageIds being fully ACKed</li>
@@ -342,6 +344,9 @@ bits 6-7: reserved</pre></li>
         <li>if numACKs included:<ul>
           <li>a 2 byte number for how many messages were fully 
               received in the last minute.</li></ul></li>
+        <li>If extended data included:<ul>
+          <li>1 byte data size</li>
+          <li>that many bytes of extended data (currently uninterpreted)</li</ul></li>
         <li>1 byte number of fragments</li>
         <li>that many message fragments:<ul>
           <li>4 byte messageId</li>
@@ -385,6 +390,99 @@ bits 6-7: unused</pre></li>
  +----+----+----+----+----+----+----+----+
  | arbitrary amount of uninterpreted data|
  +----+----+----+----+----+----+----+----+
+</pre>
+
+<h2><a name="congestioncontrol">Congestion control</a></h2>
+
+<p>SSU's need for only semireliable delivery, TCP-friendly operation,
+and the capacity for high throughput allows a great deal of latitude in
+congestion control.  The congestion control algorithm outlined below is
+meant to be both efficient in bandwidth as well as simple to implement.</p>
+
+<p>Data is transmitted in volleys of up to 1 second, sending N bytes within
+P packets.  The volley a packet is a part of is defined by the second field
+in the encrypted <a href="#payload">payload</a>.  The receiver of a volley
+should send back a full set of ACKs and NACKs for message IDs received in
+the previous volley - these ACKs and NACKs should be included in all messages
+sent until either the volley changes again or the the receiver gets a message
+in the current volley stating that the previous ACKs are no longer required.
+Subsequent responses from the receiver in the current volley should not 
+contain the ACKs.</p>
+
+<p>After receiving a volley with at least one data message fragment, the 
+receiver should send back at least one message with the ACKs.  Each time
+subsequent messages arrive on the current volley with the "request previous
+ACKs" flag set, if no messages in the current volley have arrived without
+that being set the receiver should send back a data message with the ACKs,
+if the receiver has the bandwidth to do so.</p>
+
+<p>The number of bytes sent in each volley (N) should be initialized as
+8192 bytes (an arbitrarily high value).  At the beginning of a volley, if
+the ACKs/NACKs received for the volley two periods back contain any NACKs,
+N should be set to the minimum of N and the number of bytes fully ACKed,
+though no less than 1/2 of N.  If there were no NACKs and all of the 
+messages sent were ACKed, N is increased by the average packet size.  If 
+a message is received in a volley with the explicit congestion 
+notification bit set, at the beginning of the next volley N is set to 
+1/2 N.</p>
+
+<p>Messages which are partially sent or NACKed have the unsent fragments
+transmitted in the next volley, unless the message expiration occurs, in
+which case it is dropped entirely.</p>
+
+<p>The simplest possible implementation does not need to pad the packets to
+any particular size, but instead just places a single message fragment into
+a packet and sends it off (careful not to exceed the MTU).  A more efficient
+strategy would be to bundle multiple message fragments into the same packet,
+so long as it doesn't exceed the MTU, but this is not necessary.  Eventually,
+a set of fixed packet sizes may be appropriate to further hide the data 
+fragmentation to external adversaries, but the tunnel, garlic, and end to 
+end padding should be sufficient for most needs until then.</p>
+
+<h3><a name="congestionscenarios">Congestion scenarios</a></h3>
+
+<b>Unidirectional transfer</b><br />
+<pre>
+        Alice                         Bob
+    Data 1, volley 1, no ACKs---------&gt;
+    Data 2, volley 1, no ACKs---------&gt;
+    Data 3, volley 1, no ACKs---------&gt;
+    Data 4, volley 1, no ACKs---------&gt;
+    Data 5, volley 2, want ACKs-------&gt;
+    Data 6, volley 2, want ACKs-------&gt;         // want ACK since ACKs not received
+          &lt;------------------ACK 1, 2, 3, 4     // automatically sent
+          &lt;------------------ACK 1, 2, 3, 4     // sent due to Data 6
+    Data 7, volley 2, no ACKs---------&gt;         // no further ACKs required
+    Data 8, volley 2, no ACKs---------&gt;
+    Data 9, volley 3, want ACKs-------&gt;         // new volley, we want ACKs!
+          &lt;------------------ACK 5, 6, 7, 8     // automatically sent
+    Data 10, volley 3, no ACKs---------&gt;
+    Data 11, volley 3, no ACKs---------&gt;
+    Data 12, volley 3, no ACKs---------&gt;
+          &lt;------------------ACK 9, 10, 11, 12  // automatically sent
+</pre>
+
+<b>Bidirectional transfer</b><br />
+<pre>
+        Alice                                        Bob
+    Data 1, volley 1, no ACKs-------------------------&gt;
+          &lt;-----------------------------Data 1, volley 1, no ACKs
+    Data 2, volley 1, no ACKs-------------------------&gt;
+          &lt;-----------------------------Data 2, volley 1, no ACKs
+    Data 3, volley 1, no ACKs-------------------------&gt;
+          &lt;-----------------------------Data 3, volley 1, no ACKs
+    Data 4, volley 1, no ACKs-------------------------&gt;
+          &lt;-----------------------------Data 4, volley 1, no ACKs
+    Data 5, volley 2, want ACKs, ACK 1, 2, 3, 4-------&gt;              // new volley, send ACKs
+          &lt;---------------Data 5, volley 2, no ACKs, ACK 1, 2, 3, 4  // received ACKs, no need to ask for them
+    Data 6, volley 2, no ACKs-------------------------&gt;
+          &lt;-----------------------------Data 6, volley 2, no ACKs
+    Data 7, volley 2, no ACKs-------------------------&gt;
+          &lt;-----------------------------Data 8, volley 2, no ACKs
+    Data 8, volley 2, no ACKs-------------------------&gt;
+          &lt;-----------------------------Data 9, volley 2, no ACKs
+    ACK 5, 6, 7, 8, 9---------------------------------&gt;
+          &lt;-----------------------------------ACK 5, 6, 7, 8
 </pre>
 
 <h2><a name="keys">Keys</a></h2>
