@@ -218,4 +218,29 @@ public class RouterContext extends I2PAppContext {
         buf.append(_reliabilityCalc).append('\n');
         return buf.toString();
     }
+    
+    /**
+     * Tie in the router's config as properties, as well as whatever the 
+     * I2PAppContext says.
+     *
+     */
+    public String getProperty(String propName) {
+        if (_router != null) {
+            String val = _router.getConfigSetting(propName);
+            if (val != null) return val;
+        }
+        return super.getProperty(propName);
+    }
+    /**
+     * Tie in the router's config as properties, as well as whatever the 
+     * I2PAppContext says.
+     *
+     */
+    public String getProperty(String propName, String defaultVal) {
+        if (_router != null) {
+            String val = _router.getConfigSetting(propName);
+            if (val != null) return val;
+        }
+        return super.getProperty(propName, defaultVal);
+    }
 }
