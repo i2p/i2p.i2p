@@ -108,7 +108,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
     private boolean _quiet = false;
     
     public static final String PROP_ENFORCE_NETID = "router.networkDatabase.enforceNetId";
-    private static final boolean DEFAULT_ENFORCE_NETID = false;
+    private static final boolean DEFAULT_ENFORCE_NETID = true;
     private boolean _enforceNetId = DEFAULT_ENFORCE_NETID;
     
     public final static String PROP_DB_DIR = "router.networkDatabase.dbDir";
