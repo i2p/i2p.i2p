@@ -60,7 +60,6 @@
 */
 
 #include "platform.hpp"
-#include "mutex.hpp"
 #include "thread.hpp"
 
 Thread::Thread(void)

@@ -1,6 +1,5 @@
 #
-# This Makefile is compatible with GNU Make and should work on Linux
-# (Tested on Debian 3.0)
+# This Makefile is compatible with GNU Make and should work on Linux (generic)
 #
 
 #
