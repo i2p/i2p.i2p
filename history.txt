@@ -1,4 +1,10 @@
-$Id: history.txt,v 1.131 2005/01/21 20:53:02 jrandom Exp $
+$Id: history.txt,v 1.132 2005/01/23 03:22:11 jrandom Exp $
+
+2005-01-24  smeghead
+    * C#-ification of sam-sharp: interface greatly simplified using delegates
+      and events; SamBaseEventHandler provides basic implementation and helper
+      methods but is now optional.
+    * NAnt buildfile and README added for sam-sharp.
 
 2005-01-23  smeghead
     * Port the java SAM client library to mono/C# and released into the 

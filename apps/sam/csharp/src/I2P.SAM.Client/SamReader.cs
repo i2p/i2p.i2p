@@ -8,19 +8,37 @@ using System.Threading;
 
 namespace I2P.SAM.Client
 {
+	public delegate void DestReplyReceivedHandler(string publicKey, string privateKey);
+	public delegate void HelloReplyReceivedHandler(bool ok);
+	public delegate void NamingReplyReceivedHandler(string name, string result, string valueString, string message);
+	public delegate void SessionStatusReceivedHandler(string result, string destination, string message);
+	public delegate void StreamClosedReceivedHandler(string result, int id, string message);
+	public delegate void StreamConnectedReceivedHandler(string remoteDestination, int id);
+	public delegate void StreamDataReceivedHandler(int id, byte[] data, int offset, int length);
+	public delegate void StreamStatusReceivedHandler(string result, int id, string message);
+	public delegate void UnknownMessageReceivedHandler(string major, string minor, NameValueCollection parameters);
+
 	/// <summary>
-	///   Read from a socket, producing events for any SAM message read.
+	///   Reads from a socket stream, producing events for any SAM message read.
 	/// </summary>
 	public class SamReader
 	{
-		private bool                   _isLive;
-		private SamClientEventListener _listener;
-		private NetworkStream          _samStream;
-		private StreamReader           _streamReader;
+		public event DestReplyReceivedHandler       DestReplyReceived;
+		public event HelloReplyReceivedHandler      HelloReplyReceived;
+		public event NamingReplyReceivedHandler     NamingReplyReceived;
+		public event SessionStatusReceivedHandler   SessionStatusReceived;
+		public event StreamClosedReceivedHandler    StreamClosedReceived;
+		public event StreamConnectedReceivedHandler StreamConnectedReceived;
+		public event StreamDataReceivedHandler      StreamDataReceived;
+		public event StreamStatusReceivedHandler    StreamStatusReceived;
+		public event UnknownMessageReceivedHandler  UnknownMessageReceived;
 
-		public SamReader(NetworkStream samStream, SamClientEventListener listener) {
+		private bool          _isLive;
+		private NetworkStream _samStream;
+		private StreamReader  _samStreamReader;
+
+		public SamReader(NetworkStream samStream) {
 			_samStream = samStream;
-			_listener = listener;
 		}
 
 		public void RunThread() {
@@ -31,11 +49,11 @@ namespace I2P.SAM.Client
 
 				string line = null;
 
-				_streamReader = new StreamReader(_samStream);
+				_samStreamReader = new StreamReader(_samStream);
 
 				try {
-					line = _streamReader.ReadLine();
-					_streamReader.Close();
+					line = _samStreamReader.ReadLine();
+					_samStreamReader.Close();
 				} catch (IOException ioe) {
 					Console.Error.WriteLine("Error reading from SAM: {1}", ioe);
 				} catch (OutOfMemoryException oome) {
@@ -98,11 +116,11 @@ namespace I2P.SAM.Client
 						string result = parameters.Get("RESULT");
 
 						if (result.Equals("OK"))
-							_listener.HelloReplyReceived(true);
+							HelloReplyReceived(true);
 						else
-							_listener.HelloReplyReceived(false);
+							HelloReplyReceived(false);
 					} else {
-						_listener.UnknownMessageReceived(major, minor, parameters);
+						UnknownMessageReceived(major, minor, parameters);
 					}
 
 					break;
@@ -115,9 +133,9 @@ namespace I2P.SAM.Client
 						string destination = parameters.Get("DESTINATION");
 						string message = parameters.Get("MESSAGE");
 
-						_listener.SessionStatusReceived(result, destination, message);
+						SessionStatusReceived(result, destination, message);
 					} else {
-						_listener.UnknownMessageReceived(major, minor, parameters);
+						UnknownMessageReceived(major, minor, parameters);
 					}
 
 					break;
@@ -136,9 +154,9 @@ namespace I2P.SAM.Client
 						string valueString = parameters.Get("VALUE");
 						string message = parameters.Get("MESSAGE");
 
-						_listener.NamingReplyReceived(name, result, valueString, message);
+						NamingReplyReceived(name, result, valueString, message);
 					} else {
-						_listener.UnknownMessageReceived(major, minor, parameters);
+						UnknownMessageReceived(major, minor, parameters);
 					}
 
 					break;
@@ -150,16 +168,16 @@ namespace I2P.SAM.Client
 						string pub = parameters.Get("PUB");
 						string priv = parameters.Get("PRIV");
 
-						_listener.DestReplyReceived(pub, priv);
+						DestReplyReceived(pub, priv);
 					} else {
-						_listener.UnknownMessageReceived(major, minor, parameters);
+						UnknownMessageReceived(major, minor, parameters);
 					}
 
 					break;
 
 				default :
 
-					_listener.UnknownMessageReceived(major, minor, parameters);
+					UnknownMessageReceived(major, minor, parameters);
 					break;
 			}
 		}
@@ -169,8 +187,8 @@ namespace I2P.SAM.Client
 			/*
 			 * Would use another tidy switch() statement here but the Mono
 			 * compiler presently gets variable scopes confused within nested
-			 * switch() contexts. Broken with Mono/mcs 1.0.5, 1.1.3, and SVN
-			 * head.
+			 * switch() contexts. Nested switch() is broken with Mono/mcs 1.0.5,
+			 * 1.1.3, and SVN head.
 			 */
 			if (minor.Equals("STATUS")) {
 
@@ -179,9 +197,9 @@ namespace I2P.SAM.Client
 				string message = parameters.Get("MESSAGE");
 
 				try {
-					_listener.StreamStatusReceived(result, Int32.Parse(id), message);
+					StreamStatusReceived(result, Int32.Parse(id), message);
 				} catch {
-					_listener.UnknownMessageReceived(major, minor, parameters);
+					UnknownMessageReceived(major, minor, parameters);
 				}
 
 			} else if (minor.Equals("CONNECTED")) {
@@ -190,9 +208,9 @@ namespace I2P.SAM.Client
 				string id = parameters.Get("ID");
 
 				try {
-					_listener.StreamConnectedReceived(destination, Int32.Parse(id));
+					StreamConnectedReceived(destination, Int32.Parse(id));
 				} catch {
-					_listener.UnknownMessageReceived(major, minor, parameters);
+					UnknownMessageReceived(major, minor, parameters);
 				}
 
 			} else if (minor.Equals("CLOSED")) {
@@ -202,9 +220,9 @@ namespace I2P.SAM.Client
 				string message = parameters.Get("MESSAGE");
 
 				try {
-					_listener.StreamClosedReceived(result, Int32.Parse(id), message);
+					StreamClosedReceived(result, Int32.Parse(id), message);
 				} catch {
-					_listener.UnknownMessageReceived(major, minor, parameters);
+					UnknownMessageReceived(major, minor, parameters);
 				}
 
 			} else if (minor.Equals("RECEIVED")) {
@@ -224,23 +242,24 @@ namespace I2P.SAM.Client
 							bytesRead = _samStream.Read(data, 0, sizeValue);
 
 							if (bytesRead != sizeValue) {
-								_listener.UnknownMessageReceived(major, minor, parameters);
+								UnknownMessageReceived(major, minor, parameters);
 								return;
 							}
 						} catch {
 							_isLive = false;
-							_listener.UnknownMessageReceived(major, minor, parameters);
+							UnknownMessageReceived(major, minor, parameters);
+							return;
 						}
 
-						_listener.StreamDataReceived(idValue, data, 0, sizeValue);
+						StreamDataReceived(idValue, data, 0, sizeValue);
 					} catch (FormatException fe) {
-						_listener.UnknownMessageReceived(major, minor, parameters);
+						UnknownMessageReceived(major, minor, parameters);
 					}
 				} else {
-					_listener.UnknownMessageReceived(major, minor, parameters);
+					UnknownMessageReceived(major, minor, parameters);
 				}
 			} else {
-				_listener.UnknownMessageReceived(major, minor, parameters);
+				UnknownMessageReceived(major, minor, parameters);
 			}
 		}
 
