@@ -254,9 +254,10 @@ public class JobQueue {
             if (rv != null) {
                 // we found one, but there may be more, so wake up enough
                 // other runners
-                if (_log.shouldLog(Log.DEBUG))
-                    _log.debug("Waking up " + (ready-1) + " job runners (and running one)");
-                awaken(ready-1);
+                
+                //if (_log.shouldLog(Log.DEBUG))
+                //    _log.debug("Waking up " + (ready-1) + " job runners (and running one)");
+                //awaken(ready-1);
                 return rv;
             } else {
                 if (_log.shouldLog(Log.DEBUG))
