@@ -28,6 +28,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include <limits.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -54,21 +55,31 @@ sam_pubkey_t dest;
 bool quiet = false;
 samerr_t laststatus = SAM_NULL;
 sam_sid_t laststream = 0;
+bool mihi = false;
+bool bell = false;
 
 int main(int argc, char* argv[])
 {
 	int ch;
-	int count = 1;  /* number of times to ping */
+	int count = INT_MAX;  /* number of times to ping */
 	char *samhost = "localhost";
 	uint16_t samport = 7656;
 
-	while ((ch = getopt(argc, argv, "c:h:p:qv")) != -1) {
+	while ((ch = getopt(argc, argv, "ac:h:mp:qv")) != -1) {
 		switch (ch) {
+			case 'a':  /* bell */
+				bell = true;
+				break;
 			case 'c':  /* packet count */
 				count = atoi(optarg);
 				break;
 			case 'h':  /* SAM host */
 				samhost = optarg;
+				break;
+			case 'm':  /* I2Ping emulation mode */
+				count = 3;
+				mihi = true;
+				quiet = true;
 				break;
 			case 'p':  /* SAM port */
 				samport = atoi(optarg);
@@ -77,9 +88,9 @@ int main(int argc, char* argv[])
 				quiet = true;
 				break;
 			case 'v':  /* version */
-				puts("$Id$");
+				puts("$Id: i2p-ping.c,v 1.1 2004/07/31 21:38:15 mpc Exp $");
 				puts("Copyright (c) 2004, Matthew P. Cashdollar <mpc@innographx.com>");
-				return 0;
+				break;
 			case '?':
 			default:
 				usage();
@@ -88,9 +99,8 @@ int main(int argc, char* argv[])
 	}
 	argc -= optind;
 	argv += optind;
-	if (argc == 0 || argc > 1) {  /* they forgot to specify a ping target */
-		fprintf(stderr, "Invalid number of targets\n");
-		usage();
+	if (argc == 0) {  /* they forgot to specify a ping target */
+		fprintf(stderr, "Ping who?\n");
 		return 1;
 	}
 
@@ -113,30 +123,42 @@ int main(int argc, char* argv[])
 		return 1;
 	}
 
-	if (strlen(argv[0]) == 516) {
-		memcpy(dest, argv[0], SAM_PUBKEY_LEN);
-		gotdest = true;
-	} else
-		sam_naming_lookup(session, argv[0]);
+	for (int j = 0; j < argc; j++) {
+		if (strlen(argv[j]) == 516) {
+			memcpy(dest, argv[j], SAM_PUBKEY_LEN);
+			gotdest = true;
+		} else
+			sam_naming_lookup(session, argv[j]);
 
-	while (!gotdest)  /* just wait for the naming lookup to complete */
-		sam_read_buffer(session);
+		while (!gotdest)  /* just wait for the naming lookup to complete */
+			sam_read_buffer(session);
 
-	for (int i = 0; i < count; ++i) {
-		time_t start = time(0);
-		sam_sid_t sid = sam_stream_connect(session, dest);
-		while (laststream != sid && laststatus == SAM_NULL)
-			sam_read_buffer(session);  /* wait for the connect */
-		if (laststatus == SAM_OK)
-			sam_stream_close(session, laststream);
-		time_t finish = time(0);
-		laststream = 0;
-		if (laststatus == SAM_OK) {
-			printf("%s: %.0fs\n", argv[0], difftime(finish, start));
-		} else {
-			printf("Ping failed: %s\n", sam_strerror(laststatus));
+		for (int i = 0; i < count; ++i) {
+			time_t start = time(0);
+			sam_sid_t sid = sam_stream_connect(session, dest);
+			while (laststream != sid && laststatus == SAM_NULL)
+				sam_read_buffer(session);  /* wait for the connect */
+			if (laststatus == SAM_OK)
+				sam_stream_close(session, laststream);
+			time_t finish = time(0);
+			laststream = 0;
+			if (laststatus == SAM_OK) {
+				if (bell)
+					printf("\a");  /* putchar() doesn't work for some reason */
+				if (!mihi)
+					printf("%s: %.0fs\n", argv[j], difftime(finish, start));
+				else
+					printf("+ ");
+			} else {
+				if (!mihi)
+					printf("%s: %s\n", argv[j], sam_strerror(laststatus));
+				else
+					printf("- ");
+			}
+			laststatus = SAM_NULL;
 		}
-		laststatus = SAM_NULL;
+		if (mihi)
+			printf("  %s\n", argv[j]);
 	}
 
 	sam_close(session);
@@ -146,7 +168,8 @@ int main(int argc, char* argv[])
 
 void usage()
 {
-	puts("Ha!  Help?  You've got to be kidding!");
+	puts("usage: i2p-ping [-amqv?] [-c count] [-h samhost] [-p samport] " \
+		"<b64dest|name>\n\t[b64dest|name] [b64dest|name] ...");
 }
 
 /*
