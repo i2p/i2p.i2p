@@ -1,5 +1,7 @@
 package net.i2p.client.streaming;
 
+import java.net.ConnectException;
+
 import net.i2p.I2PException;
 
 /**
@@ -17,10 +19,13 @@ public interface I2PServerSocket {
      * connection and the local application wasn't .accept()ing new connections,
      * they should get refused (if .accept() doesnt occur in some small period)
      *
+     * @return a connected I2PSocket
+     *
      * @throws I2PException if there is a problem with reading a new socket
      *         from the data available (aka the I2PSession closed, etc)
+     * @throws ConnectException if the I2PServerSocket is closed
      */
-    public I2PSocket accept() throws I2PException;
+    public I2PSocket accept() throws I2PException, ConnectException;
 
     /**
      * Access the manager which is coordinating the server socket
