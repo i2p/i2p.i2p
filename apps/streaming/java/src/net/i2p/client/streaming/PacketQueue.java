@@ -83,7 +83,9 @@ class PacketQueue {
         if (!sent) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Send failed for " + packet);
-            packet.getConnection().disconnect(false);
+            Connection c = packet.getConnection();
+            if (c != null) // handle race on b0rk
+                c.disconnect(false);
         } else {
             packet.setKeyUsed(keyUsed);
             packet.setTagsSent(tagsSent);

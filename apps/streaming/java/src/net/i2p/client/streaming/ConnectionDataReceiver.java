@@ -107,7 +107,11 @@ class ConnectionDataReceiver implements MessageOutputStream.DataReceiver {
             packet.setOptionalFrom(_connection.getSession().getMyDestination());
         }
         
-        if (_connection.getOutputStream().getClosed()) {
+        // don't set the closed flag if this is a plain ACK and there are outstanding
+        // packets sent, otherwise the other side could receive the CLOSE prematurely,
+        // since this ACK could arrive before the unacked payload message.
+        if (_connection.getOutputStream().getClosed() && 
+            ( (size > 0) || (_connection.getUnackedPacketsSent() <= 0) ) ) {
             packet.setFlag(Packet.FLAG_CLOSE);
             _connection.setCloseSentOn(_context.clock().now());
             if (_log.shouldLog(Log.DEBUG))

@@ -60,6 +60,7 @@ public class MessageOutputStream extends OutputStream {
             // this is the only method that *adds* to the _buf, and all 
             // code that reads from it is synchronized
             synchronized (_dataLock) {
+                if (_buf == null) throw new IOException("closed (buffer went away)");
                 if (_valid + remaining < _buf.length) {
                     // simply buffer the data, no flush
                     System.arraycopy(b, cur, _buf, _valid, remaining);
@@ -106,6 +107,7 @@ public class MessageOutputStream extends OutputStream {
     public void flush() throws IOException {
         WriteStatus ws = null;
         synchronized (_dataLock) {
+            if (_buf == null) throw new IOException("closed (buffer went away)");
             ws = _dataReceiver.writeData(_buf, 0, _valid);
             _written += _valid;
             _valid = 0;
@@ -134,14 +136,22 @@ public class MessageOutputStream extends OutputStream {
         _closed = true;
         flush();
         _log.debug("Output stream closed after writing " + _written);
-        if (_buf != null) {
-            _dataCache.release(new ByteArray(_buf));
-            _buf = null;
+        ByteArray ba = null;
+        synchronized (_dataLock) {
+            if (_buf != null) {
+                ba = new ByteArray(_buf);
+                _buf = null;
+                _valid = 0;
+            }
+        }
+        if (ba != null) {
+            _dataCache.release(ba);
         }
     }
     public void closeInternal() {
         _closed = true;
         _streamError = new IOException("Closed internally");
+        ByteArray ba = null;
         synchronized (_dataLock) {
             // flush any data, but don't wait for it
             if (_valid > 0) {
@@ -149,11 +159,15 @@ public class MessageOutputStream extends OutputStream {
                 _written += _valid;
                 _valid = 0;
             }
+            if (_buf != null) {
+                ba = new ByteArray(_buf);
+                _buf = null;
+                _valid = 0;
+            }
             _dataLock.notifyAll();
         }
-        if (_buf != null) {
-            _dataCache.release(new ByteArray(_buf));
-            _buf = null;
+        if (ba != null) {
+            _dataCache.release(ba);
         }
     }
     
@@ -183,6 +197,7 @@ public class MessageOutputStream extends OutputStream {
     void flushAvailable(DataReceiver target, boolean blocking) throws IOException {
         WriteStatus ws = null;
         synchronized (_dataLock) {
+            if (_buf == null) throw new IOException("closed (buffer went away)");
             ws = target.writeData(_buf, 0, _valid);
             _written += _valid;
             _valid = 0;
