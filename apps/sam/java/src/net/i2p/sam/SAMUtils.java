@@ -108,9 +108,10 @@ public class SAMUtils {
      *
      * @param tok A StringTokenizer pointing to the SAM parameters
      *
-     * @return Properties with the parsed SAM params, or null if none is found
+     * @throws SAMException if the data was formatted incorrectly
+     * @return Properties with the parsed SAM params
      */
-    public static Properties parseParams(StringTokenizer tok) {
+    public static Properties parseParams(StringTokenizer tok) throws SAMException {
         int pos, nprops = 0, ntoks = tok.countTokens();
         String token, param, value;
         Properties props = new Properties();
@@ -121,7 +122,7 @@ public class SAMUtils {
             pos = token.indexOf("=");
             if (pos == -1) {
                 _log.debug("Error in params format");
-                return null;
+                throw new SAMException("Bad formatting for param [" + token + "]");
             }
             param = token.substring(0, pos);
             value = token.substring(pos + 1);
@@ -134,11 +135,7 @@ public class SAMUtils {
             _log.debug("Parsed properties: " + dumpProperties(props));
         }
 
-        if (nprops != 0) {
-            return props;
-        } else {
-            return null;
-        }
+        return props;
     }
 
     /* Dump a Properties object in an human-readable form */

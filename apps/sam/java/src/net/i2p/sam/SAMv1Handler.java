@@ -281,7 +281,7 @@ public class SAMv1Handler extends SAMHandler implements SAMRawReceiver, SAMDatag
     private boolean execDestMessage(String opcode, Properties props) {
 
         if (opcode.equals("GENERATE")) {
-            if (props != null) {
+            if (props.size() > 0) {
                 _log.debug("Properties specified in DEST GENERATE message");
                 return false;
             }
