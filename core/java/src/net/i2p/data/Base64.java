@@ -42,6 +42,10 @@ public class Base64 {
 
     private final static Log _log = new Log(Base64.class);
 
+    /** added by aum */
+    public static String encode(String source) {
+        return encode(source.getBytes());
+    }
     public static String encode(byte[] source) {
         return encode(source, 0, (source != null ? source.length : 0));
     }
@@ -55,6 +59,10 @@ public class Base64 {
         return safeEncode(source, off, len, useStandardAlphabet);
     }
 
+    /** convenience method added by aum */
+    public static String decode(String s) {
+        return new String(decode(s));
+    }
     public static byte[] decode(String s) {
         return safeDecode(s, false);
     }
