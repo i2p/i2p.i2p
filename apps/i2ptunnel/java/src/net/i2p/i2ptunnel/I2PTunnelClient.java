@@ -17,6 +17,8 @@ public class I2PTunnelClient extends I2PTunnelClientBase {
     private static final Log _log = new Log(I2PTunnelClient.class);
 
     protected Destination dest;
+    private static final long DEFAULT_READ_TIMEOUT = -1; // 3*60*1000;
+    protected long readTimeout = DEFAULT_READ_TIMEOUT;
 
     public I2PTunnelClient(int localPort, String destination, Logging l, boolean ownDest, EventDispatcher notifyThis) {
         super(localPort, ownDest, l, notifyThis, "SynSender");
@@ -45,9 +47,13 @@ public class I2PTunnelClient extends I2PTunnelClientBase {
         notifyEvent("openClientResult", "ok");
     }
 
+    public void setReadTimeout(long ms) { readTimeout = ms; }
+    public long getReadTimeout() { return readTimeout; }
+    
     protected void clientConnectionRun(Socket s) {
         try {
             I2PSocket i2ps = createI2PSocket(dest);
+            i2ps.setReadTimeout(readTimeout);
             new I2PTunnelRunner(s, i2ps, sockLock, null);
         } catch (Exception ex) {
             _log.info("Error connecting", ex);

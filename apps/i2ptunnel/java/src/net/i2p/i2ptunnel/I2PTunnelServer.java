@@ -40,8 +40,9 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
 
     private Logging l;
 
+    private static final long DEFAULT_READ_TIMEOUT = -1; // 3*60*1000;
     /** default timeout to 3 minutes - override if desired */
-    private long readTimeout = 3*60*1000;
+    private long readTimeout = DEFAULT_READ_TIMEOUT;
 
     public I2PTunnelServer(InetAddress host, int port, String privData, Logging l, EventDispatcher notifyThis) {
         super(host + ":" + port + " <- " + privData, notifyThis);
