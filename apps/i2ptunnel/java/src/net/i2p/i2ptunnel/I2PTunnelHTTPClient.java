@@ -45,7 +45,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
     private String wwwProxy;
 
     private final static byte[] ERR_REQUEST_DENIED =
-        ("HTTP/1.1 404 Not Found\r\n"+
+        ("HTTP/1.1 403 Access Denied\r\n"+
          "Content-Type: text/html; charset=iso-8859-1\r\n"+
          "Cache-control: no-cache\r\n"+
          "\r\n"+
