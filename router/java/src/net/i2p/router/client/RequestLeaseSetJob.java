@@ -53,11 +53,11 @@ class RequestLeaseSetJob extends JobImpl {
         if (oldReq != null) {
             if (oldReq.getExpiration() > getContext().clock().now()) {
                 _log.info("request of a leaseSet is still active, wait a little bit before asking again");
-                requeue(5*1000);
-                return;
             } else {
-                _log.error("Old *expired* leaseRequest exists!  Why did the old request not get killed? (expiration = " + new Date(oldReq.getExpiration()) + ")", getAddedBy());
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("Old *expired* leaseRequest exists!  Why did the old request not get killed? (expiration = " + new Date(oldReq.getExpiration()) + ")", getAddedBy());
             }
+            return;
         }
         
         LeaseRequestState state = new LeaseRequestState(_onCreate, _onFail, _expiration, _ls);
@@ -121,10 +121,6 @@ class RequestLeaseSetJob extends JobImpl {
                 _runner.disconnectClient("Took too long to request leaseSet");
                 if (_req.getOnFailed() != null)
                     RequestLeaseSetJob.this.getContext().jobQueue().addJob(_req.getOnFailed());
-                
-                // only zero out the request if its the one we know about
-                if (_req == _runner.getLeaseRequest())
-                    _runner.setLeaseRequest(null);
             }
         }
         public String getName() { return "Check LeaseRequest Status"; }

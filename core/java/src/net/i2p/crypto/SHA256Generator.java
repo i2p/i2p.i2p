@@ -72,8 +72,8 @@ public final class SHA256Generator {
         return rv;
     }
     
-    private final SHA256EntryCache.SHA256CacheEntry getNewEntry(int payloadSize) {
-        return new SHA256EntryCache.SHA256CacheEntry(payloadSize);
+    private final SHA256EntryCache.CacheEntry getNewEntry(int payloadSize) {
+        return new SHA256EntryCache.CacheEntry(payloadSize);
     }
     
     /** Calculate the SHA-256 has of the source

@@ -20,13 +20,11 @@ class ConnectionDataReceiver implements MessageOutputStream.DataReceiver {
     private Log _log;
     private Connection _connection;
     private static final MessageOutputStream.WriteStatus _dummyStatus = new DummyStatus();
-    private ByteCache _cache;
     
     public ConnectionDataReceiver(I2PAppContext ctx, Connection con) {
         _context = ctx;
         _log = ctx.logManager().getLog(ConnectionDataReceiver.class);
         _connection = con;
-        _cache = ByteCache.getInstance(128, Packet.MAX_PAYLOAD_SIZE);
     }
     
     public boolean writeInProcess() {
@@ -135,9 +133,11 @@ class ConnectionDataReceiver implements MessageOutputStream.DataReceiver {
     }
     
     private PacketLocal buildPacket(Connection con, byte buf[], int off, int size, boolean forceIncrement) {
+        if (size > Packet.MAX_PAYLOAD_SIZE) throw new IllegalArgumentException("size is too large (" + size + ")");
         boolean ackOnly = isAckOnly(con, size);
         PacketLocal packet = new PacketLocal(_context, con.getRemotePeer(), con);
-        ByteArray data = (size <= Packet.MAX_PAYLOAD_SIZE ? _cache.acquire() : new ByteArray(new byte[size]));
+        //ByteArray data = packet.acquirePayload();
+        ByteArray data = new ByteArray(new byte[size]);
         if (size > 0)
             System.arraycopy(buf, off, data.getData(), 0, size);
         data.setValid(size);

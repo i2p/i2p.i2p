@@ -188,7 +188,8 @@ public class Connection {
     }
     
     void ackImmediately() {
-        _receiver.send(null, 0, 0);
+        PacketLocal packet = _receiver.send(null, 0, 0);
+        //packet.releasePayload();
     }
 
     /**
@@ -871,7 +872,7 @@ public class Connection {
                                       + ") for " + Connection.this.toString());
 
                         // setRTT has its own ceiling
-                        getOptions().setRTT(getOptions().getRTT() + 30*1000);
+                        getOptions().setRTT(getOptions().getRTT() + 10*1000);
                         getOptions().setWindowSize(newWindowSize);
                         windowAdjusted();
                     }

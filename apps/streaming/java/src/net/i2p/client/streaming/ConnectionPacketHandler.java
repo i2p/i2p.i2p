@@ -18,11 +18,9 @@ import net.i2p.util.SimpleTimer;
 public class ConnectionPacketHandler {
     private I2PAppContext _context;
     private Log _log;
-    private ByteCache _cache;
     
     public ConnectionPacketHandler(I2PAppContext context) {
         _context = context;
-        _cache = ByteCache.getInstance(128, Packet.MAX_PAYLOAD_SIZE);
         _log = context.logManager().getLog(ConnectionPacketHandler.class);
         _context.statManager().createRateStat("stream.con.receiveMessageSize", "Size of a message received on a connection", "Stream", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
         _context.statManager().createRateStat("stream.con.receiveDuplicateSize", "Size of a duplicate message received on a connection", "Stream", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
@@ -37,7 +35,7 @@ public class ConnectionPacketHandler {
         if (!ok) {
             if ( (!packet.isFlagSet(Packet.FLAG_RESET)) && (_log.shouldLog(Log.ERROR)) )
                 _log.error("Packet does NOT verify: " + packet);
-            _cache.release(packet.getPayload());
+            packet.releasePayload();
             return;
         }
 
@@ -51,7 +49,7 @@ public class ConnectionPacketHandler {
                 if (_log.shouldLog(Log.WARN))
                     _log.warn("Received a packet after hard disconnect, ignoring: " + packet + " on " + con);
             }
-            _cache.release(packet.getPayload());
+            packet.releasePayload();
             return;
         }
 
@@ -156,9 +154,9 @@ public class ConnectionPacketHandler {
             }
         }
         
-        if (ackOnly) {
+        if (ackOnly || !isNew) {
             // non-ack message payloads are queued in the MessageInputStream
-            _cache.release(packet.getPayload());
+            packet.releasePayload();
         }
     }
     
@@ -220,7 +218,7 @@ public class ConnectionPacketHandler {
                            + ") for " + con);
 
             // setRTT has its own ceiling
-            con.getOptions().setRTT(con.getOptions().getRTT() + 30*1000);
+            con.getOptions().setRTT(con.getOptions().getRTT() + 10*1000);
             con.getOptions().setWindowSize(oldSize);
             
             congested = true;

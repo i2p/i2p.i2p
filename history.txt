@@ -1,4 +1,10 @@
-$Id: history.txt,v 1.158 2005/02/26 14:16:46 jrandom Exp $
+$Id: history.txt,v 1.159 2005/02/26 19:03:42 jrandom Exp $
+
+2005-02-27  jrandom
+    * Don't rerequest leaseSets if there are already pending requests
+    * Reverted the insufficiently tested caching in the DSA/SHA1 impl, and
+      temporary disabled the streaming lib packet caching.
+    * Reduced the resend RTT penalty to 10s
 
 2005-02-26  jrandom
     * Force 1.3-isms on the precompiled jsps too (thanks laberhost)

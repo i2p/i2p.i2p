@@ -348,6 +348,8 @@ public class ClientConnectionRunner {
         if (_dead) return;
         if ( (_currentLeaseSet != null) && (_currentLeaseSet.equals(set)) )
             return; // no change
+        if (_leaseRequest != null)
+            return; // already requesting
         _context.jobQueue().addJob(new RequestLeaseSetJob(_context, this, set, _context.clock().now() + expirationTime, onCreateJob, onFailedJob));
     }
 

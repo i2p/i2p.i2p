@@ -219,9 +219,16 @@ public class Packet {
         return (_payload == null ? 0 : _payload.getValid());
     }
     public void releasePayload() {
-        if (_payload != null)
-            _cache.release(_payload);
+        //if (_payload != null)
+        //    _cache.release(_payload);
         _payload = null;
+    }
+    public ByteArray acquirePayload() {
+        ByteArray old = _payload;
+        _payload = new ByteArray(new byte[Packet.MAX_PAYLOAD_SIZE]); //_cache.acquire();
+        //if (old != null)
+        //    _cache.release(old);
+        return _payload;
     }
 
     /** is a particular flag set on this packet? */

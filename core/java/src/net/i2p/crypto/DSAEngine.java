@@ -33,28 +33,20 @@ import java.math.BigInteger;
 import java.util.Arrays;
 
 import net.i2p.I2PAppContext;
-import net.i2p.data.ByteArray;
 import net.i2p.data.Hash;
 import net.i2p.data.Signature;
 import net.i2p.data.SigningPrivateKey;
 import net.i2p.data.SigningPublicKey;
-import net.i2p.util.ByteCache;
 import net.i2p.util.Log;
 import net.i2p.util.NativeBigInteger;
 
 public class DSAEngine {
     private Log _log;
     private I2PAppContext _context;
-    private SHA1EntryCache _cache;
-    private ByteCache _rbyteCache;
-    private ByteCache _sbyteCache;
 
     public DSAEngine(I2PAppContext context) {
         _log = context.logManager().getLog(DSAEngine.class);
         _context = context;
-        _cache = new SHA1EntryCache();
-        _rbyteCache = ByteCache.getInstance(16, 20);
-        _sbyteCache = ByteCache.getInstance(16, 20);
     }
     public static DSAEngine getInstance() {
         return I2PAppContext.getGlobalContext().dsa();
@@ -67,10 +59,8 @@ public class DSAEngine {
 
         try {
             byte[] sigbytes = signature.getData();
-            ByteArray rbyteBA = _rbyteCache.acquire();
-            ByteArray sbyteBA = _sbyteCache.acquire();
-            byte rbytes[] = rbyteBA.getData(); //new byte[20];
-            byte sbytes[] = sbyteBA.getData(); //new byte[20];
+            byte rbytes[] = new byte[20];
+            byte sbytes[] = new byte[20];
             for (int x = 0; x < 40; x++) {
                 if (x < 20) {
                     rbytes[x] = sigbytes[x];
@@ -80,18 +70,10 @@ public class DSAEngine {
             }
             BigInteger s = new NativeBigInteger(1, sbytes);
             BigInteger r = new NativeBigInteger(1, rbytes);
-            
-            _rbyteCache.release(rbyteBA);
-            _sbyteCache.release(sbyteBA);
-            
             BigInteger y = new NativeBigInteger(1, verifyingKey.getData());
             BigInteger w = s.modInverse(CryptoConstants.dsaq);
-            
-            SHAEntryCache.CacheEntry entry = _cache.acquire(size);
-            byte data[] = calculateHash(signedData, offset, size, entry).getData();
+            byte data[] = calculateHash(signedData, offset, size).getData();
             NativeBigInteger bi = new NativeBigInteger(1, data);
-            _cache.release(entry);
-            
             BigInteger u1 = bi.multiply(w).mod(CryptoConstants.dsaq);
             BigInteger u2 = r.multiply(w).mod(CryptoConstants.dsaq);
             BigInteger modval = CryptoConstants.dsag.modPow(u1, CryptoConstants.dsap);
@@ -128,18 +110,11 @@ public class DSAEngine {
 
         BigInteger r = CryptoConstants.dsag.modPow(k, CryptoConstants.dsap).mod(CryptoConstants.dsaq);
         BigInteger kinv = k.modInverse(CryptoConstants.dsaq);
-        SHAEntryCache.CacheEntry entry = _cache.acquire(length);
-        Hash h = calculateHash(data, offset, length, entry);
+        Hash h = calculateHash(data, offset, length);
 
-        if (h == null) {
-            _cache.release(entry);
-            return null;
-        }
+        if (h == null) return null;
 
         BigInteger M = new NativeBigInteger(1, h.getData());
-        
-        _cache.release(entry);
-        
         BigInteger x = new NativeBigInteger(1, signingKey.getData());
         BigInteger s = (kinv.multiply(M.add(x.multiply(r)))).mod(CryptoConstants.dsaq);
 
@@ -185,17 +160,7 @@ public class DSAEngine {
 
     private int[] H0 = { 0x67452301, 0xefcdab89, 0x98badcfe, 0x10325476, 0xc3d2e1f0};
 
-    static final int getWordlength(int sourceLength) {
-        long length = sourceLength * 8;
-        int k = 448 - (int) ((length + 1) % 512);
-        if (k < 0) {
-            k += 512;
-        }
-        int padbytes = k / 8;
-        return sourceLength / 4 + padbytes / 4 + 3;
-    }
-    
-    private Hash calculateHash(byte[] source, int offset, int len, SHA256EntryCache.CacheEntry entry) {
+    private Hash calculateHash(byte[] source, int offset, int len) {
         long length = len * 8;
         int k = 448 - (int) ((length + 1) % 512);
         if (k < 0) {
@@ -203,7 +168,7 @@ public class DSAEngine {
         }
         int padbytes = k / 8;
         int wordlength = len / 4 + padbytes / 4 + 3;
-        int[] M0 = (entry != null ? entry.M0 : new int[wordlength]);
+        int[] M0 = new int[wordlength];
         int wordcount = 0;
         int x = 0;
         for (x = 0; x < (len / 4) * 4; x += 4) {
@@ -236,13 +201,13 @@ public class DSAEngine {
         }
         M0[wordlength - 2] = (int) (length >>> 32);
         M0[wordlength - 1] = (int) (length);
-        int[] H = (entry != null ? entry.H : new int[5]);
+        int[] H = new int[5];
         for (x = 0; x < 5; x++) {
             H[x] = H0[x];
         }
         int blocks = M0.length / 16;
         
-        int[] W = (entry != null ? entry.W : new int[80]);
+        int[] W = new int[80];
         for (int bl = 0; bl < blocks; bl++) {
             int a = H[0];
             int b = H[1];
@@ -276,15 +241,13 @@ public class DSAEngine {
             H[4] = add(e, H[4]);
         }
 
-        byte[] hashbytes = (entry != null ? entry.hashbytes : new byte[20]);
+        byte[] hashbytes = new byte[20];
         for (x = 0; x < 5; x++) {
             hashbytes[x * 4] = (byte) (H[x] << 0 >>> 24);
             hashbytes[x * 4 + 1] = (byte) (H[x] << 8 >>> 24);
             hashbytes[x * 4 + 2] = (byte) (H[x] << 16 >>> 24);
             hashbytes[x * 4 + 3] = (byte) (H[x] << 24 >>> 24);
         }
-        if (entry != null)
-            return entry.hash;
         Hash hash = new Hash();
         hash.setData(hashbytes);
         return hash;
