@@ -18,6 +18,8 @@ import snoozesoft.systray4j.SysTrayMenuIcon;
 import snoozesoft.systray4j.SysTrayMenuItem;
 import snoozesoft.systray4j.SysTrayMenuListener;
 
+import net.i2p.util.SimpleTimer;
+
 /**
  * A system tray control for launching the I2P router console.
  *
@@ -31,6 +33,7 @@ public class SysTray implements SysTrayMenuListener {
     private static Frame          _frame;
     private static SysTray        _instance;
     private static String         _portString;
+    private static boolean        _showIcon;
     private static UrlLauncher    _urlLauncher    = new UrlLauncher();
 
     static {
@@ -41,9 +44,10 @@ public class SysTray implements SysTrayMenuListener {
 
         _browserString = _configFile.getProperty("browser", "default");
         _portString = _configFile.getProperty("port", "7657");
+        _showIcon = Boolean.valueOf(_configFile.getProperty("visible", "true")).booleanValue();
 
         if (!(new File("router.config")).exists())
-            openRouterConsole("http://localhost:" + _portString + "/");
+            openRouterConsole("http://localhost:" + _portString + "/index.jsp");
 
         if (System.getProperty("os.name").startsWith("Windows"))
             _instance = new SysTray();
@@ -58,6 +62,15 @@ public class SysTray implements SysTrayMenuListener {
     private SysTray() {
         _sysTrayMenuIcon.addSysTrayMenuListener(this);
         createSysTrayMenu();
+        SimpleTimer.getInstance().addEvent(new RefreshDisplayEvent(), REFRESH_DISPLAY_FREQUENCY);
+    }
+    
+    private static final long REFRESH_DISPLAY_FREQUENCY = 30*1000;
+    private class RefreshDisplayEvent implements SimpleTimer.TimedEvent {
+        public void timeReached() {
+            refreshDisplay();
+            SimpleTimer.getInstance().addEvent(RefreshDisplayEvent.this, REFRESH_DISPLAY_FREQUENCY);
+        }
     }
 
     public static synchronized SysTray getInstance() {
@@ -105,14 +118,23 @@ public class SysTray implements SysTrayMenuListener {
         _configFile.setProperty("browser", browser);
     }
 
+    public void refreshDisplay() {
+        if (_showIcon)
+            _sysTrayMenu.showIcon();
+        else
+            _sysTrayMenu.hideIcon();
+    }
+    
     public void hide() {
+        _configFile.setProperty("visible", "false");
+        _showIcon = false;
         _sysTrayMenu.hideIcon();
     }
 
     public void iconLeftClicked(SysTrayMenuEvent e) {}
 
     public void iconLeftDoubleClicked(SysTrayMenuEvent e) {
-        openRouterConsole("http://localhost:" + _portString + "/");
+        openRouterConsole("http://localhost:" + _portString + "/index.jsp");
     }
 
     public void menuItemSelected(SysTrayMenuEvent e) {
@@ -133,11 +155,13 @@ public class SysTray implements SysTrayMenuListener {
             if (!(browser = promptForBrowser("Select browser")).equals("nullnull"))
                 setBrowser(browser);
         } else if (e.getActionCommand().equals("openconsole")) {
-            openRouterConsole("http://localhost:" + _portString + "/");
+            openRouterConsole("http://localhost:" + _portString + "/index.jsp");
         }
     }
 
     public void show() {
+        _configFile.setProperty("visible", "true");
+        _showIcon = true;
         _sysTrayMenu.showIcon();
     }
 
@@ -149,5 +173,6 @@ public class SysTray implements SysTrayMenuListener {
 //        _sysTrayMenu.addSeparator();
         _sysTrayMenu.addItem(_itemSelectBrowser);
         _sysTrayMenu.addItem(_itemOpenConsole);
+        refreshDisplay();
     }
 }
