@@ -83,11 +83,11 @@ public class TunnelHistory {
     public RateStat getRejectionRate() { return _rejectRate; }
     public RateStat getFailedRate() { return _failRate; }
     
-    public void coallesceStats() {
+    public void coalesceStats() {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Coallescing stats");
-        _rejectRate.coallesceStats();
-        _failRate.coallesceStats();
+        _rejectRate.coalesceStats();
+        _failRate.coalesceStats();
     }
     
     private final static String NL = System.getProperty("line.separator");

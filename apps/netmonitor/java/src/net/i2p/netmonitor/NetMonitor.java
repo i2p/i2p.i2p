@@ -206,11 +206,11 @@ public class NetMonitor {
     }
     
     /** drop all the old summary data */
-    public void coallesceData() {
+    public void coalesceData() {
         synchronized (_peerSummaries) {
             for (Iterator iter = _peerSummaries.values().iterator(); iter.hasNext(); ) {
                 PeerSummary summary = (PeerSummary)iter.next();
-                summary.coallesceData(_summaryDurationHours * 60*60*1000);
+                summary.coalesceData(_summaryDurationHours * 60*60*1000);
             }
         }
     }

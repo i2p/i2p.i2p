@@ -52,7 +52,7 @@ class KBucketSet {
             int oldSize = _buckets[bucket].getKeyCount();
             int numInBucket = _buckets[bucket].add(peer);
             if (numInBucket > BUCKET_SIZE) {
-                // perhaps queue up coallesce job?  naaahh.. lets let 'er grow for now
+                // perhaps queue up coalesce job?  naaahh.. lets let 'er grow for now
             }
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Peer " + peer + " added to bucket " + bucket);

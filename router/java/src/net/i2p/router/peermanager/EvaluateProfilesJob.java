@@ -11,7 +11,7 @@ import net.i2p.util.Log;
 
 /**
  * Run across all of the profiles, coallescing the stats and reorganizing them
- * into appropriate groups.  The stat coallesce must be run at least once a minute,
+ * into appropriate groups.  The stat coalesce must be run at least once a minute,
  * so if the group reorg wants to get changed, this may want to be split into two
  * jobs.
  *
@@ -34,14 +34,14 @@ class EvaluateProfilesJob extends JobImpl {
                 Hash peer = (Hash)iter.next();
                 PeerProfile profile = getContext().profileOrganizer().getProfile(peer);
                 if (profile != null)
-                    profile.coallesceStats();
+                    profile.coalesceStats();
             }
-            long afterCoallesce = getContext().clock().now();
+            long afterCoalesce = getContext().clock().now();
             getContext().profileOrganizer().reorganize();
             long afterReorganize = getContext().clock().now();
             
             if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Profiles coallesced and reorganized.  total: " + allPeers.size() + ", selectAll: " + (afterSelect-start) + "ms, coallesce: " + (afterCoallesce-afterSelect) + "ms, reorganize: " + (afterReorganize-afterSelect));
+                _log.debug("Profiles coalesced and reorganized.  total: " + allPeers.size() + ", selectAll: " + (afterSelect-start) + "ms, coalesce: " + (afterCoalesce-afterSelect) + "ms, reorganize: " + (afterReorganize-afterSelect));
         } catch (Throwable t) {
             _log.log(Log.CRIT, "Error evaluating profiles", t);
         } finally {

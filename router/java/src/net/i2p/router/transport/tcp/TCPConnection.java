@@ -209,7 +209,7 @@ public class TCPConnection {
     /** how many Bps we are sending data to the peer (or 2KBps if we don't know) */
     public long getSendRate() {
         if (_sendRate == null) return 2*1024;
-        _sendRate.coallesceStats();
+        _sendRate.coalesceStats();
         Rate r = _sendRate.getRate(60*1000);
         if (r == null) {
             return 2*1024;

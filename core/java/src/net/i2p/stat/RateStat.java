@@ -41,10 +41,10 @@ public class RateStat {
             _rates[i].addData(value, eventDuration);
     }
 
-    /** coallesce all the stats */
-    public void coallesceStats() {
+    /** coalesce all the stats */
+    public void coalesceStats() {
         for (int i = 0; i < _rates.length; i++)
-            _rates[i].coallesce();
+            _rates[i].coalesce();
     }
 
     public String getName() {
@@ -166,7 +166,7 @@ public class RateStat {
             }
             rs.addData(i * 100, 20);
         }
-        rs.coallesceStats();
+        rs.coalesceStats();
         java.io.ByteArrayOutputStream baos = new java.io.ByteArrayOutputStream(2048);
         try {
             rs.store(baos, "rateStat.test");

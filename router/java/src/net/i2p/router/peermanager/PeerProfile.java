@@ -273,18 +273,18 @@ public class PeerProfile {
     }
     
     /** update the stats and rates (this should be called once a minute) */
-    public void coallesceStats() {
+    public void coalesceStats() {
         if (!_expanded) return;
-        _commError.coallesceStats();
-        _dbIntroduction.coallesceStats();
-        _dbResponseTime.coallesceStats();
-        _receiveSize.coallesceStats();
-        _sendFailureSize.coallesceStats();
-        _sendSuccessSize.coallesceStats();
-        _tunnelCreateResponseTime.coallesceStats();
-        _tunnelTestResponseTime.coallesceStats();
-        _dbHistory.coallesceStats();
-        _tunnelHistory.coallesceStats();
+        _commError.coalesceStats();
+        _dbIntroduction.coalesceStats();
+        _dbResponseTime.coalesceStats();
+        _receiveSize.coalesceStats();
+        _sendFailureSize.coalesceStats();
+        _sendSuccessSize.coalesceStats();
+        _tunnelCreateResponseTime.coalesceStats();
+        _tunnelTestResponseTime.coalesceStats();
+        _dbHistory.coalesceStats();
+        _tunnelHistory.coalesceStats();
         
         _speedValue = calculateSpeed();
         _reliabilityValue = calculateReliability();
@@ -293,7 +293,7 @@ public class PeerProfile {
         _isFailing = calculateIsFailing();
         
         if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Coallesced: speed [" + _speedValue + "] reliability [" + _reliabilityValue + "] capacity [" + _capacityValue + "] integration [" + _integrationValue + "] failing? [" + _isFailing + "]");
+            _log.debug("Coalesced: speed [" + _speedValue + "] reliability [" + _reliabilityValue + "] capacity [" + _capacityValue + "] integration [" + _integrationValue + "] failing? [" + _isFailing + "]");
     }
     
     private double calculateSpeed() { return _context.speedCalculator().calc(this); }
@@ -347,7 +347,7 @@ public class PeerProfile {
                 buf.append("Could not load profile ").append(args[i]).append('\n');
                 continue;
             }
-            //profile.coallesceStats();
+            //profile.coalesceStats();
             buf.append("Peer " + profile.getPeer().toBase64() 
                        + ":\t Speed:\t" + fmt.format(profile.calculateSpeed())
                        + " Reliability:\t" + fmt.format(profile.calculateReliability())

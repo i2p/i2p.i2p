@@ -26,10 +26,10 @@ public class FrequencyStat {
             _frequencies[i].eventOccurred();
     }
 
-    /** coallesce all the stats */
-    public void coallesceStats() {
+    /** coalesce all the stats */
+    public void coalesceStats() {
         //for (int i = 0; i < _frequencies.length; i++)
-        //	_frequencies[i].coallesceStats();
+        //	_frequencies[i].coalesceStats();
     }
 
     public String getName() {

@@ -185,7 +185,7 @@ public class Router {
         
         setupHandlers();
         startupQueue();
-        _context.jobQueue().addJob(new CoallesceStatsJob());
+        _context.jobQueue().addJob(new CoalesceStatsJob());
         _context.jobQueue().addJob(new UpdateRoutingKeyModifierJob());
         warmupCrypto();
         _sessionKeyPersistenceHelper.startup();
@@ -261,18 +261,18 @@ public class Router {
     }
     
     /**
-     * coallesce the stats framework every minute
+     * coalesce the stats framework every minute
      *
      */
-    private final class CoallesceStatsJob extends JobImpl {
-        public CoallesceStatsJob() { 
+    private final class CoalesceStatsJob extends JobImpl {
+        public CoalesceStatsJob() { 
             super(Router.this._context); 
             Router.this._context.statManager().createRateStat("bw.receiveBps", "How fast we receive data", "Bandwidth", new long[] { 60*1000, 5*60*1000, 60*60*1000 });
             Router.this._context.statManager().createRateStat("bw.sendBps", "How fast we send data", "Bandwidth", new long[] { 60*1000, 5*60*1000, 60*60*1000 });
         }
-        public String getName() { return "Coallesce stats"; }
+        public String getName() { return "Coalesce stats"; }
         public void runJob() {
-            Router.this._context.statManager().coallesceStats();
+            Router.this._context.statManager().coalesceStats();
             
             RateStat receiveRate = _context.statManager().getRate("transport.receiveMessageSize");
             if (receiveRate != null) {

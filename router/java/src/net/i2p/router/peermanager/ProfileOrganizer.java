@@ -129,7 +129,7 @@ public class ProfileOrganizer {
         
         synchronized (_reorganizeLock) {
             PeerProfile old = locked_getProfile(profile.getPeer());
-            profile.coallesceStats();
+            profile.coalesceStats();
             locked_placeProfile(profile);
             _strictCapacityOrder.add(profile);
             return old;
@@ -383,7 +383,7 @@ public class ProfileOrganizer {
     
     /**
      * Place peers into the correct tier, as well as expand/contract and even drop profiles
-     * according to whatever limits are in place.  Peer profiles are not coallesced during
+     * according to whatever limits are in place.  Peer profiles are not coalesced during
      * this method, but the averages are recalculated.
      *
      */

@@ -27,11 +27,11 @@ public class Rate {
     private volatile long _lifetimeEventCount;
     private volatile long _lifetimeTotalEventTime;
 
-    private volatile long _lastCoallesceDate;
+    private volatile long _lastCoalesceDate;
     private long _creationDate;
     private long _period;
 
-    /** locked during coallesce and addData */
+    /** locked during coalesce and addData */
     private Object _lock = new Object();
 
     /** in the current (partial) period, what is the total value acrued through all events? */
@@ -94,9 +94,9 @@ public class Rate {
         return _lifetimeTotalEventTime;
     }
 
-    /** when was the rate last coallesced? */
-    public long getLastCoallesceDate() {
-        return _lastCoallesceDate;
+    /** when was the rate last coalesced? */
+    public long getLastCoalesceDate() {
+        return _lastCoalesceDate;
     }
 
     /** when was this rate created? */
@@ -130,7 +130,7 @@ public class Rate {
         _lifetimeTotalEventTime = 0;
 
         _creationDate = now();
-        _lastCoallesceDate = _creationDate;
+        _lastCoalesceDate = _creationDate;
         _period = period;
     }
 
@@ -175,23 +175,23 @@ public class Rate {
         }
     }
 
-    public void coallesce() {
+    public void coalesce() {
         synchronized (_lock) {
             long now = now();
-            long measuredPeriod = now - _lastCoallesceDate;
+            long measuredPeriod = now - _lastCoalesceDate;
             if (measuredPeriod < _period) {
-                // no need to coallesce
+                // no need to coalesce
                 return;
             }
     
-            // ok ok, lets coallesce
+            // ok ok, lets coalesce
 
             // how much were we off by?  (so that we can sample down the measured values)
             double periodFactor = measuredPeriod / _period;
             _lastTotalValue = (_currentTotalValue == 0 ? 0.0D : _currentTotalValue / periodFactor);
             _lastEventCount = (_currentEventCount == 0 ? 0L : (long) (_currentEventCount / periodFactor));
             _lastTotalEventTime = (_currentTotalEventTime == 0 ? 0L : (long) (_currentTotalEventTime / periodFactor));
-            _lastCoallesceDate = now;
+            _lastCoalesceDate = now;
 
             if (_lastTotalValue > _extremeTotalValue) {
                 _extremeTotalValue = _lastTotalValue;
@@ -346,25 +346,25 @@ public class Rate {
         PersistenceHelper.add(buf, prefix, ".period", "Number of milliseconds in the period", _period);
         PersistenceHelper.add(buf, prefix, ".creationDate",
                               "When was this rate created?  (milliseconds since the epoch, GMT)", _creationDate);
-        PersistenceHelper.add(buf, prefix, ".lastCoallesceDate",
-                              "When did we last coallesce this rate?  (milliseconds since the epoch, GMT)",
-                              _lastCoallesceDate);
+        PersistenceHelper.add(buf, prefix, ".lastCoalesceDate",
+                              "When did we last coalesce this rate?  (milliseconds since the epoch, GMT)",
+                              _lastCoalesceDate);
         PersistenceHelper.add(buf, prefix, ".currentDate",
                               "When did this data get written?  (milliseconds since the epoch, GMT)", now());
         PersistenceHelper.add(buf, prefix, ".currentTotalValue",
-                              "Total value of data points in the current (uncoallesced) period", _currentTotalValue);
+                              "Total value of data points in the current (uncoalesced) period", _currentTotalValue);
         PersistenceHelper
                          .add(buf, prefix, ".currentEventCount",
-                              "How many events have occurred in the current (uncoallesced) period?", _currentEventCount);
+                              "How many events have occurred in the current (uncoalesced) period?", _currentEventCount);
         PersistenceHelper.add(buf, prefix, ".currentTotalEventTime",
-                              "How many milliseconds have the events in the current (uncoallesced) period consumed?",
+                              "How many milliseconds have the events in the current (uncoalesced) period consumed?",
                               _currentTotalEventTime);
         PersistenceHelper.add(buf, prefix, ".lastTotalValue",
-                              "Total value of data points in the most recent (coallesced) period", _lastTotalValue);
+                              "Total value of data points in the most recent (coalesced) period", _lastTotalValue);
         PersistenceHelper.add(buf, prefix, ".lastEventCount",
-                              "How many events have occurred in the most recent (coallesced) period?", _lastEventCount);
+                              "How many events have occurred in the most recent (coalesced) period?", _lastEventCount);
         PersistenceHelper.add(buf, prefix, ".lastTotalEventTime",
-                              "How many milliseconds have the events in the most recent (coallesced) period consumed?",
+                              "How many milliseconds have the events in the most recent (coalesced) period consumed?",
                               _lastTotalEventTime);
         PersistenceHelper.add(buf, prefix, ".extremeTotalValue",
                               "Total value of data points in the most extreme period", _extremeTotalValue);
@@ -395,7 +395,7 @@ public class Rate {
     public void load(Properties props, String prefix, boolean treatAsCurrent) throws IllegalArgumentException {
         _period = PersistenceHelper.getLong(props, prefix, ".period");
         _creationDate = PersistenceHelper.getLong(props, prefix, ".creationDate");
-        _lastCoallesceDate = PersistenceHelper.getLong(props, prefix, ".lastCoallesceDate");
+        _lastCoalesceDate = PersistenceHelper.getLong(props, prefix, ".lastCoalesceDate");
         _currentTotalValue = PersistenceHelper.getDouble(props, prefix, ".currentTotalValue");
         _currentEventCount = PersistenceHelper.getLong(props, prefix, ".currentEventCount");
         _currentTotalEventTime = PersistenceHelper.getLong(props, prefix, ".currentTotalEventTime");
@@ -409,17 +409,17 @@ public class Rate {
         _lifetimeEventCount = PersistenceHelper.getLong(props, prefix, ".lifetimeEventCount");
         _lifetimeTotalEventTime = PersistenceHelper.getLong(props, prefix, ".lifetimeTotalEventTime");
 
-        if (treatAsCurrent) _lastCoallesceDate = now();
+        if (treatAsCurrent) _lastCoalesceDate = now();
 
         if (_period <= 0) throw new IllegalArgumentException("Period for " + prefix + " is invalid");
-        coallesce();
+        coalesce();
     }
 
     public boolean equals(Object obj) {
         if ((obj == null) || (obj.getClass() != Rate.class)) return false;
         Rate r = (Rate) obj;
         return _period == r.getPeriod() && _creationDate == r.getCreationDate() &&
-        //_lastCoallesceDate == r.getLastCoallesceDate() &&
+        //_lastCoalesceDate == r.getLastCoalesceDate() &&
                _currentTotalValue == r.getCurrentTotalValue() && _currentEventCount == r.getCurrentEventCount()
                && _currentTotalEventTime == r.getCurrentTotalEventTime() && _lastTotalValue == r.getLastTotalValue()
                && _lastEventCount == r.getLastEventCount() && _lastTotalEventTime == r.getLastTotalEventTime()
@@ -466,7 +466,7 @@ public class Rate {
             }
             rate.addData(i * 100, 20);
         }
-        rate.coallesce();
+        rate.coalesce();
         StringBuffer buf = new StringBuffer(1024);
         try {
             rate.store("rate.test", buf);

@@ -44,7 +44,7 @@ class NetMonitorRunner implements Runnable {
         long nextExport = now + _monitor.getExportDelay() * 1000;
         while (_monitor.isRunning()) {
             now = Clock.getInstance().now();
-            _monitor.coallesceData();
+            _monitor.coalesceData();
             if (now >= nextHarvest) {
                 runHarvest();
                 nextHarvest = now + _monitor.getHarvestDelay() * 1000;

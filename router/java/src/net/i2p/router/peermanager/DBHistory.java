@@ -155,10 +155,10 @@ public class DBHistory {
     public void setUnpromptedDbStoreNew(long num) { _unpromptedDbStoreNew = num; }
     public void setUnpromptedDbStoreOld(long num) { _unpromptedDbStoreOld = num; }
     
-    public void coallesceStats() {
+    public void coalesceStats() {
         _log.debug("Coallescing stats");
-        _failedLookupRate.coallesceStats();
-        _invalidReplyRate.coallesceStats();
+        _failedLookupRate.coalesceStats();
+        _invalidReplyRate.coalesceStats();
     }
     
     private final static String NL = System.getProperty("line.separator");

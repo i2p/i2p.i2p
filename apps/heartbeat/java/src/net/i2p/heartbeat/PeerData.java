@@ -274,9 +274,9 @@ public class PeerData {
 
         _lostRate.addData(numTimedOut, 0);
 
-        _receiveRate.coallesceStats();
-        _sendRate.coallesceStats();
-        _lostRate.coallesceStats();
+        _receiveRate.coalesceStats();
+        _sendRate.coalesceStats();
+        _lostRate.coalesceStats();
 
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Peer data cleaned up " + numTimedOut + " timed out pings and removed " + numDropped

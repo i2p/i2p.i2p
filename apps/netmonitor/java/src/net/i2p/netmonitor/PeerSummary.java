@@ -22,7 +22,7 @@ public class PeerSummary {
     /** statName to a List of PeerStat elements (sorted by sample date, earliest first) */
     private Map _stats;
     /** lock on this when accessing stat data */
-    private Object _coallesceLock = new Object();
+    private Object _coalesceLock = new Object();
     
     public PeerSummary(String peer) {
         _peer = peer;
@@ -38,7 +38,7 @@ public class PeerSummary {
      * @param val actual data harvested
      */
     public void addData(String stat, String description, String valueDescriptions[], long when, double val[]) {
-        synchronized (_coallesceLock) {
+        synchronized (_coalesceLock) {
             TreeMap stats = locked_getData(stat);
             stats.put(new Long(when), new PeerStat(stat, description, valueDescriptions, when, val));
         }
@@ -53,7 +53,7 @@ public class PeerSummary {
      * @param val actual data harvested
      */
     public void addData(String stat, String description, String valueDescriptions[], long when, long val[]) {
-        synchronized (_coallesceLock) {
+        synchronized (_coalesceLock) {
             TreeMap stats = locked_getData(stat);
             stats.put(new Long(when), new PeerStat(stat, description, valueDescriptions, when, val));
         }
@@ -68,7 +68,7 @@ public class PeerSummary {
      *
      */
     public List getData(String statName) {
-        synchronized (_coallesceLock) {
+        synchronized (_coalesceLock) {
             return new ArrayList(((TreeMap)_stats.get(statName)).values());
         }
     }
@@ -78,21 +78,21 @@ public class PeerSummary {
      *
      */
     public Set getStatNames() { 
-        synchronized (_coallesceLock) {
+        synchronized (_coalesceLock) {
             return new HashSet(_stats.keySet());
         }
     }
     
     /** drop old data points */
-    public void coallesceData(long summaryDurationMs) {
+    public void coalesceData(long summaryDurationMs) {
         long earliest = Clock.getInstance().now() - summaryDurationMs;
-        synchronized (_coallesceLock) {
-            locked_coallesce(earliest);
+        synchronized (_coalesceLock) {
+            locked_coalesce(earliest);
         }
     }
     
     /** go through all the stats and remove ones from before the given date */
-    private void locked_coallesce(long earliestSampleDate) {
+    private void locked_coalesce(long earliestSampleDate) {
         if (true) return;
         for (Iterator iter = _stats.keySet().iterator(); iter.hasNext(); ) {
             String statName = (String)iter.next();

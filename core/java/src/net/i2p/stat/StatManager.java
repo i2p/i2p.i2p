@@ -94,12 +94,12 @@ public class StatManager {
         if (stat != null) stat.addData(data, eventDuration);
     }
 
-    public void coallesceStats() {
+    public void coalesceStats() {
         synchronized (_frequencyStats) {
             for (Iterator iter = _frequencyStats.values().iterator(); iter.hasNext();) {
                 FrequencyStat stat = (FrequencyStat)iter.next();
                 if (stat != null) {
-                    stat.coallesceStats();
+                    stat.coalesceStats();
                 }
             }
         }
@@ -107,7 +107,7 @@ public class StatManager {
             for (Iterator iter = _rateStats.values().iterator(); iter.hasNext();) {
                 RateStat stat = (RateStat)iter.next();
                 if (stat != null) {
-                    stat.coallesceStats();
+                    stat.coalesceStats();
                 }
             }
         }
