@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project basedir="." default="all" name="i2p_sdk">
+    <target name="all" depends="clean, build" />
+    <target name="build" depends="builddep, jar" />
+    <target name="builddep">
+        <!-- noop, since the core doesnt depend on anything -->
+    </target>
+    <target name="compile">
+        <mkdir dir="./build" />
+        <mkdir dir="./build/obj" />
+        <javac srcdir="./src:./test" debug="true" destdir="./build/obj" />
+    </target>
+    <target name="jar" depends="compile">
+        <jar destfile="./build/i2p.jar" basedir="./build/obj" includes="**/*.class" />
+    </target>
+    <target name="javadoc">
+        <mkdir dir="./build" />
+        <mkdir dir="./build/javadoc" />
+        <javadoc sourcepath="./src:./test" destdir="./build/javadoc" packagenames="*" use="true" splitindex="true" windowtitle="I2P SDK" />
+    </target>
+    <target name="clean">
+        <delete dir="./build" />
+    </target>
+    <target name="cleandep" depends="clean">
+        <!-- noop, since the core doesn't depend on anything -->
+    </target>
+    <target name="distclean" depends="clean">
+        <!-- noop, since the core doesn't depend on anything -->
+    </target>
+</project>
