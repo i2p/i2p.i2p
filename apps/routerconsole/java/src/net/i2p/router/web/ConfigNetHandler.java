@@ -157,7 +157,7 @@ public class ConfigNetHandler extends FormHandler {
     }
     
     private void fetchSeed(String seedURL, String peer) throws Exception {
-        URL url = new URL(seedURL + "/routerInfo-" + peer + ".dat");
+        URL url = new URL(seedURL + (seedURL.endsWith("/") ? "" : "/") + "routerInfo-" + peer + ".dat");
 
         byte data[] = readURL(url);
         writeSeed(peer, data);
