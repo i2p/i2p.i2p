@@ -1,7 +1,7 @@
 package net.i2p.router.transport;
 
-import net.i2p.util.Log;
 import net.i2p.I2PAppContext;
+import net.i2p.util.Log;
 
 class FIFOBandwidthRefiller implements Runnable {
     private Log _log;

@@ -1,6 +1,5 @@
 package net.i2p.router.admin;
 
-import java.io.IOException;
 import java.io.OutputStream;
 
 import net.i2p.router.RouterContext;

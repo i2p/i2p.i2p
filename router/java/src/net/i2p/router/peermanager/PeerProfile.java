@@ -1,7 +1,6 @@
 package net.i2p.router.peermanager;
 
 import java.io.File;
-
 import java.text.DecimalFormat;
 
 import net.i2p.data.Hash;

@@ -8,9 +8,7 @@ package net.i2p.router;
  *
  */
 
-import java.io.IOException;
 import java.io.OutputStream;
-
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.Locale;

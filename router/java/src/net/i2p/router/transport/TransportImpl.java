@@ -8,10 +8,10 @@ package net.i2p.router.transport;
  *
  */
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 

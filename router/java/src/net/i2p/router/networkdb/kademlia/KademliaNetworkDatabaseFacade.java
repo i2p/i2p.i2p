@@ -29,7 +29,6 @@ import net.i2p.data.LeaseSet;
 import net.i2p.data.RouterAddress;
 import net.i2p.data.RouterInfo;
 import net.i2p.data.i2np.DatabaseLookupMessage;
-import net.i2p.data.i2np.DatabaseSearchReplyMessage;
 import net.i2p.data.i2np.DatabaseStoreMessage;
 import net.i2p.router.Job;
 import net.i2p.router.NetworkDatabaseFacade;

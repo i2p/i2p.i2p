@@ -20,7 +20,6 @@ import net.i2p.data.i2np.I2NPMessage;
 import net.i2p.data.i2np.TunnelMessage;
 import net.i2p.router.ClientMessage;
 import net.i2p.router.InNetMessage;
-import net.i2p.router.Job;
 import net.i2p.router.MessageReceptionInfo;
 import net.i2p.router.RouterContext;
 import net.i2p.util.Log;

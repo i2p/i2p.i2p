@@ -8,10 +8,9 @@ package net.i2p.router.transport.tcp;
  *
  */
 
+import java.io.BufferedOutputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.BufferedOutputStream;
-import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.net.Socket;

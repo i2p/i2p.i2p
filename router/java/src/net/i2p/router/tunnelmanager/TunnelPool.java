@@ -2,7 +2,6 @@ package net.i2p.router.tunnelmanager;
 
 import java.io.IOException;
 import java.io.OutputStream;
-
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;

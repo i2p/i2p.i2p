@@ -2,8 +2,8 @@ package net.i2p.router;
 
 import net.i2p.data.Hash;
 import net.i2p.data.i2np.TunnelCreateMessage;
-import net.i2p.stat.RateStat;
 import net.i2p.stat.Rate;
+import net.i2p.stat.RateStat;
 import net.i2p.util.Log;
 
 /**

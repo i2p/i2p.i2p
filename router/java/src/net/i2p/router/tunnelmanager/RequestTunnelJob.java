@@ -17,8 +17,6 @@ import java.util.List;
 import java.util.Set;
 
 import net.i2p.data.Certificate;
-import net.i2p.data.DataFormatException;
-import net.i2p.data.Hash;
 import net.i2p.data.PublicKey;
 import net.i2p.data.RouterInfo;
 import net.i2p.data.SessionKey;
@@ -34,7 +32,6 @@ import net.i2p.router.Job;
 import net.i2p.router.JobImpl;
 import net.i2p.router.MessageHistory;
 import net.i2p.router.MessageSelector;
-import net.i2p.router.PeerSelectionCriteria;
 import net.i2p.router.ReplyJob;
 import net.i2p.router.RouterContext;
 import net.i2p.router.TunnelInfo;

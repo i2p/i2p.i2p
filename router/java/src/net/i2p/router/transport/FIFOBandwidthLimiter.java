@@ -2,9 +2,8 @@ package net.i2p.router.transport;
 
 import java.io.IOException;
 import java.io.OutputStream;
-
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 
 import net.i2p.I2PAppContext;
 import net.i2p.util.I2PThread;

@@ -1,10 +1,11 @@
 package net.i2p.router.client;
 
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
+
+import net.i2p.data.i2cp.I2CPMessage;
 import net.i2p.router.RouterContext;
 import net.i2p.util.Log;
-import net.i2p.data.i2cp.I2CPMessage;
 
 /**
  * Async writer class so that if a client app hangs, they wont take down the
