@@ -21,6 +21,8 @@ public class FIFOBandwidthLimiter {
     private boolean _inboundUnlimited;
     private volatile long _totalAllocatedInboundBytes;
     private volatile long _totalAllocatedOutboundBytes;
+    private volatile long _totalWastedInboundBytes;
+    private volatile long _totalWastedOutboundBytes;
     private int _maxInboundBytes;
     private int _maxOutboundBytes;
     private FIFOBandwidthRefiller _refiller;
@@ -48,6 +50,8 @@ public class FIFOBandwidthLimiter {
     public long getAvailableOutboundBytes() { return _availableOutboundBytes; }
     public long getTotalAllocatedInboundBytes() { return _totalAllocatedInboundBytes; }
     public long getTotalAllocatedOutboundBytes() { return _totalAllocatedOutboundBytes; }
+    public long getTotalWastedInboundBytes() { return _totalWastedInboundBytes; }
+    public long getTotalWastedOutboundBytes() { return _totalWastedOutboundBytes; }
     public long getMaxInboundBytes() { return _maxInboundBytes; }
     public void setMaxInboundBytes(int numBytes) { _maxInboundBytes = numBytes; }
     public long getMaxOutboundBytes() { return _maxOutboundBytes; }
@@ -109,10 +113,14 @@ public class FIFOBandwidthLimiter {
             _log.debug("Refilling the queues with " + bytesInbound + "/" + bytesOutbound);
         _availableInboundBytes += bytesInbound;
         _availableOutboundBytes += bytesOutbound;
-        if (_availableInboundBytes > _maxInboundBytes)
+        if (_availableInboundBytes > _maxInboundBytes) {
+            _totalWastedInboundBytes += (_availableInboundBytes - _maxInboundBytes);
             _availableInboundBytes = _maxInboundBytes;
-        if (_availableOutboundBytes > _maxOutboundBytes)
+        }
+        if (_availableOutboundBytes > _maxOutboundBytes) {
+            _totalWastedOutboundBytes += (_availableOutboundBytes - _maxOutboundBytes);
             _availableOutboundBytes = _maxOutboundBytes;
+        }
         satisfyRequests();
     }
     
