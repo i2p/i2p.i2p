@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project basedir="." default="all" name="jfreechart">
+    <target name="all">
+        <echo message="The code in the JFreeChart software contains LGPL and APL licensed software," />
+        <echo message="and is not necessary for using I2P.  However, there is a seperate GUI for the " />
+        <echo message="heartbeat and netmonitor applications that uses this, so the retrieval of that " />
+        <echo message="code from the JFreeChart distribution is being made available (though we make no" />
+        <echo message="modifications to the code used here whatsoever - it is simply used by the public domain GUIs.  " />
+        <echo message="If you would like to fetch the code, run the ant task 'fetchJfreechart'" />
+        <echo message="If you would like to build the code, run the ant task 'build'" />
+        <echo message="If you would like to delete the code, run the ant task 'clean'" />
+    </target>
+    <target name="build">
+        <ant dir="./jfreechart-0.9.17/" antfile="ant/build.xml" target="compile" />
+    </target>
+    <target name="fetchJfreechart">
+        <mkdir dir="./lib" />
+        <get src="http://www.jfree.org/jfreechart/jfreechart-0.9.17.zip" verbose="true" dest="jfreechart-0.9.17.zip" />
+        <unzip src="jfreechart-0.9.17.zip" dest="." />
+    </target>
+    <target name="builddep" />
+    <target name="compile" />
+    <target name="jar" />
+    <target name="clean">
+        <delete dir="./jfreechart-0.9.17/" />
+    </target>
+    <target name="cleandep" depends="clean" />
+    <target name="distclean" depends="clean" />
+</project>

@@ -5,12 +5,7 @@
     <target name="builddep">
         <ant dir="../../../core/java/" target="build" />
     </target>
-    <target name="fetchJfreechart">
-        <mkdir dir="./lib" />
-        <get src="http://www.jfree.org/jfreechart/jfreechart-0.9.17.zip" verbose="true" dest="lib/jfreechart-0.9.17.zip" />
-        <unzip src="lib/jfreechart-0.9.17.zip" dest="lib/" />
-    </target>
-    <target name="buildGUI" depends="build, jfreechart, jarGUI" />
+    <target name="buildGUI" depends="build, jarGUI" />
     <target name="compile">
         <mkdir dir="./build" />
         <mkdir dir="./build/obj" />
@@ -23,26 +18,23 @@
         <javac debug="true" destdir="./build/obj">
             <src path="src/" />
             <classpath path="../../../core/java/build/i2p.jar" />
-            <classpath path="lib/jfreechart-0.9.17/lib/jcommon-0.9.2.jar" />
-            <classpath path="lib/jfreechart-0.9.17/lib/log4j-1.2.8.jar" />
-            <classpath path="lib/jfreechart-0.9.17/jfreechart-0.9.17.jar" />
+            <classpath path="../../jfreechart/jfreechart-0.9.17/lib/jcommon-0.9.2.jar" />
+            <classpath path="../../jfreechart/jfreechart-0.9.17/lib/log4j-1.2.8.jar" />
+            <classpath path="../../jfreechart/jfreechart-0.9.17/jfreechart-0.9.17.jar" />
         </javac>
-    </target>
-    <target name="jfreechart">
-        <ant dir="./lib/jfreechart-0.9.17/" antfile="ant/build.xml" target="compile" />
     </target>
 
     <target name="jarGUI" depends="compileGUI">
-        <copy file="lib/jfreechart-0.9.17/jfreechart-0.9.17.jar" todir="build/" />
-        <copy file="lib/jfreechart-0.9.17/lib/log4j-1.2.8.jar" todir="build/" />
-        <copy file="lib/jfreechart-0.9.17/lib/jcommon-0.9.2.jar" todir="build/" />
+        <copy file="../../jfreechart/jfreechart-0.9.17/jfreechart-0.9.17.jar" todir="build/" />
+        <copy file="../../jfreechart/jfreechart-0.9.17/lib/log4j-1.2.8.jar" todir="build/" />
+        <copy file="../../jfreechart/jfreechart-0.9.17/lib/jcommon-0.9.2.jar" todir="build/" />
         <jar destfile="./build/netviewer.jar" basedir="./build/obj" includes="**">
             <manifest>
                 <attribute name="Main-Class" value="net.i2p.netmonitor.gui.NetViewer" />
                 <attribute name="Class-Path" value="log4j-1.2.8.jar jcommon-0.9.2.jar jfreechart-0.9.17.jar netviewer.jar i2p.jar" />
             </manifest>
         </jar>
-        <echo message="You will need to copy the log4j, jcommon, and jfreechart jar files from build/ into your lib dir" />
+        <echo message="You will need to copy the log4j, jcommon, and jfreechart jar files into your lib dir" />
     </target>
 
     <target name="jar" depends="compile">
