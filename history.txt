@@ -1,6 +1,6 @@
-$Id: history.txt,v 1.13 2004/09/08 02:25:09 hypercubus Exp $
+$Id: history.txt,v 1.14 2004/09/08 17:05:35 hypercubus Exp $
 
-2004-09-07  hypercubus
+2004-09-08  hypercubus
     * Bugfix: Running the installer as a non-privileged user on Red Hat (and
       hopefully any other affected *nix systems) now properly discards non-
       essential directories after installation.
