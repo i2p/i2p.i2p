@@ -186,6 +186,20 @@ public class JobQueue {
         return;
     }
     
+    public int getReadyCount() { 
+        synchronized (_readyJobs) {
+            return _readyJobs.size();
+        }
+    }
+    public long getMaxLag() { 
+        synchronized (_readyJobs) {
+            if (_readyJobs.size() <= 0) return 0;
+            // first job is the one that has been waiting the longest
+            long startAfter = ((Job)_readyJobs.get(0)).getTiming().getStartAfter();
+            return _context.clock().now() - startAfter;
+        }
+    }
+    
     /** 
      * are we so overloaded that we should drop the given job?  
      * This is driven both by the numReady and waiting jobs, the type of job
