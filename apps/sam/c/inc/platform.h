@@ -129,10 +129,10 @@
 #define SAMLOGS(str) sam_log("%s:%d:%s: " str, __FILE__, __LINE__, __func__)
 
 /*
- * Set this to true if you want the raw SAM commands to be printed on stdout
- * (useful for debugging)
+ * Set this to '1' if you want the raw SAM commands to be printed on stdout
+ * (useful for debugging).  Otherwise, set it to '0'.
  */
-#define SAM_WIRETAP false
+#define SAM_WIRETAP 0
 #if SAM_WIRETAP
 	#include <ctype.h>
 #endif
