@@ -1,0 +1,33 @@
+Title: Main Page
+
+'''Python-I2P''' is a Python interface to [http://www.i2p.net I2P].
+
+== Quick Start ==
+
+Install:
+
+<ul><pre>
+python setup.py install
+</pre></ul>
+
+Use:
+
+<ul><pre>
+>>> from i2p import sam
+>>> s = sam.socket('Alice', sam.SOCK_STREAM)
+>>> s.connect('duck.i2p')
+>>> s.send('GET / HTTP/1.0\r\n\r\n')
+>>> s.recv(1000)
+(HTTP response from duck.i2p)
+</pre></ul>
+
+== User's Guide ==
+
+The following modules are available:
+
+<ul>
+ [[:User's Guide:i2p|i2p]]               (Container package)
+ [[:User's Guide:i2p.sam|i2p.sam]]           (Send and receive across the I2P network)
+ [[:User's Guide:i2p.eep|i2p.eep]]           (Retrieve eepsites)
+ [[:User's Guide:i2p.router|i2p.router]]        (Manage the I2P router)
+</ul>

@@ -1,0 +1,22 @@
+Title: User's Guide:i2p
+
+Package <code>i2p</code> is a container package for more specific modules.
+
+It exports the following names:
+<ul>
+ [[:User's Guide:i2p.sam|sam]]
+ [[:User's Guide:i2p.eep|eep]]
+ [[:User's Guide:i2p.router|router]]
+ [[:User's Guide:i2p#Error|Error]]
+ [[:User's Guide:i2p#RouterError|RouterError]]
+</ul>
+
+class '''Error'''(Exception):
+<ul>
+ Base class for all I2P errors.
+</ul>
+
+class '''RouterError'''(Error):
+<ul>
+ Could not connect to router.
+</ul>

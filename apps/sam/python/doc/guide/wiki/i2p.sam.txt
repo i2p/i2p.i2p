@@ -1,0 +1,202 @@
+Title: User's Guide:i2p.sam
+
+Module <code>i2p.sam</code> allows Python programs to access the [[SAM proxy]].
+
+With this module, a program can send stream data, datagrams, and raw packets across the I2P network.
+
+== Sockets ==
+
+'''socket'''(session, type, samaddr='127.0.0.1:7656', **kwargs)
+<ul><pre>
+ Create a new socket.  Argument session should be a session
+ name -- if the name has not yet been used, an I2P
+ Destination will be created for it, otherwise, the
+ existing Destination will be re-used.  An empty session
+ string causes a transient session to be created.  Argument
+ type is one of SOCK_STREAM, SOCK_DGRAM, or SOCK_RAW.
+ 
+ I2P configuration keyword arguments:
+ 
+   * in_depth  - depth of incoming tunnel (default 2)
+   * out_depth - depth of outgoing tunnel (default 2)
+ 
+ A single session may be shared by more than one socket, if
+ the sockets are the same type, and if the sockets are
+ created within the same Python process.  The socket
+ objects are multithread-safe.
+ 
+ Examples:
+   a = i2p.socket('Alice', i2p.SOCK_STREAM)
+   b = i2p.socket('Bob',   i2p.SOCK_DGRAM, 
+                  in_depth=2, out_depth=5)
+ 
+ The created object behaves identically to a socket from
+ module socket, with the following exceptions:
+ 
+   * I2P Destinations are used as address arguments [1].
+   * bind is a no-op: sockets are always bound.
+   * send* methods send all data and are non-blocking.
+ 
+ A given session name can only be open in a single Python
+ program at a time.  If you need to overcome this
+ limitation, consider patching I2P.
+ 
+ [1]. Alternatively, a host name can be used as an address.
+      It will be resolved using hosts.txt.
+ 
+ For details on how to use socket objects, see
+ http://www.python.org/doc/current/lib/socket-objects.html
+ 
+ See the examples directory for code examples.
+</pre></ul>
+'''socket()''' object properties:
+<ul>
+ dest    - Local I2P Destination of socket
+ session - Session name
+ type    - Socket type: SOCK_STREAM, SOCK_DGRAM, or SOCK_RAW.
+</ul>
+'''poll'''()
+<ul>
+ Returns a polling object.  Works on SAM sockets and Python sockets.
+ See [http://www.python.org/doc/current/lib/module-select.html select.poll()] in the Python library for more information.
+</ul>
+
+'''resolve'''(host, samaddr='127.0.0.1:7656')
+<ul>
+ Resolve I2P host name --> I2P Destination.
+ Returns the same string if host is already a Destination.
+</ul>
+
+'''select'''(readlist, writelist, errlist, timeout=None)
+<ul>
+ Performs a select call.  Works on SAM sockets and Python sockets.
+ See [http://www.python.org/doc/current/lib/module-select.html select.select()] in the Python library for more information.
+</ul>
+
+== Tunnels ==
+
+Tunnels allow stream sockets to be joined, so that connections to a listening socket are relayed to one or more sending sockets.  This allows an ordinary web server to be exposed as an I2P Destination, or an I2P Destination to be bound as a local port, and so on.
+
+class '''Tunnel'''(self, receive, make_send, nconnect=-1, timeout=60.0)
+<ul><pre>
+ A Tunnel relays connections from a 'receive' socket to one
+ or more 'send' sockets.  The receive socket must be bound
+ and listening.  For each incoming connection, a new send
+ socket is created by calling make_send().  Data is then
+ exchanged between the created streams until one socket is
+ closed.  nconnect is the maximum number of simultaneous
+ connections (-1 for infinite), and timeout is the time that
+ a single connection can last for (None allows a connection
+ to last forever).
+ 
+ Sockets must accept stream traffic and support the Python
+ socket interface.  A separate daemonic thread is created to
+ manage the tunnel.  For high performance, make_send() should
+ make a socket and connect in non-blocking mode (you should
+ catch and discard the sam.BlockError or socket.error due to
+ executing connect on a non-blocking socket).
+ 
+ Security Note:
+ A firewall is needed to maintain the end user's anonymity.
+ An attacker could keep a tunnel socket open by pinging it
+ regularly.  The accepted sockets from 'receive' must prevent
+ this by closing down eventually.
+ 
+ Socket errors do not cause the Tunnel to shut down.
+</pre></ul>
+
+'''close'''()
+<ul>
+ Close all connections made for this tunnel.
+</ul>
+
+=== Tunnel Server ===
+
+class '''TunnelServer'''(session, port, samaddr='127.0.0.1:7656', nconnect=-1, timeout=None, **kwargs)
+<ul><pre>
+ Tunnels incoming SAM streams --> localhost:port.
+ 
+ nconnect and timeout are the maximum number of connections
+ and maximum time per connection.  All other arguments are
+ passed to sam.socket().  This call blocks until the tunnel
+ is ready.
+</pre></ul>
+
+'''TunnelServer''' properties:
+<ul><pre>
+ dest       - I2P Destination of server. 
+ session    - Session name for server.
+</pre></ul>
+
+=== Tunnel Client ===
+
+class '''TunnelClient'''(session, port, dest, samaddr='127.0.0.1:7656', nconnect=-1, timeout=None, **kwargs)
+<ul><pre>
+ Derived from Tunnel.
+ Tunnels localhost:port --> I2P Destination dest.
+ 
+ A session named 'session' is created locally, for purposes
+ of routing to 'dest'.  nconnect and timeout are the maximum
+ number of connections and maximum time per connection.  All
+ other arguments are passed to sam.socket().  This call blocks
+ until the tunnel is ready.
+</pre></ul>
+
+'''TunnelClient''' properties:
+<ul><pre>
+ dest       - Local Destination used for routing.
+ remotedest - Remote Destination.
+ session    - Session name for local Destination.
+</pre></ul>
+
+== Errors ==
+
+class '''Error'''(i2p.Error)
+<ul><pre>
+ Base class for all SAM errors.
+</pre></ul>
+class '''BlockError'''(Error) 
+<ul><pre>
+ Socket call would have blocked.
+</pre></ul>
+class '''ClosedError'''(Error) 
+<ul><pre>
+ A command was used on a socket that closed gracefully.
+</pre></ul>
+class '''NetworkError'''(Error) 
+<ul><pre>
+ Network error occurred within I2P.
+
+ The error object is a 2-tuple: (errtag, errdesc).
+ errtag is a SAM error string,
+ errdesc is a human readable error description. 
+</pre></ul>
+
+== Constants ==
+
+'''Socket types'''
+<ul><pre>
+ SOCK_STREAM = 1
+ SOCK_DGRAM = 2
+ SOCK_RAW = 3
+</pre></ul>
+'''Packet sizes'''
+<ul><pre>
+ MAX_DGRAM = 31744        # Maximum size for datagram packet
+ MAX_RAW = 32768          # Maximum size for raw packet
+</pre></ul>
+'''Flags for recv()'''
+<ul><pre>
+ MSG_DONTWAIT = 128       # Don't block 
+ MSG_PEEK = 2             # Peek at incoming data
+ MSG_WAITALL = 64         # Wait for all data or error
+</pre></ul>
+'''Polling flags'''
+<ul><pre>
+ POLLIN = 1
+ POLLOUT = 4
+ POLLERR = 8
+ POLLHUP = 16
+ POLLNVAL = 32
+ POLLPRI = 1
+</pre></ul>
