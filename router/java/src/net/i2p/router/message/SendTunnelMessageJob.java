@@ -187,6 +187,7 @@ public class SendTunnelMessageJob extends JobImpl {
                                + (now - _expiration) + "ms ago)");
                 if (_onFailure != null)
                     getContext().jobQueue().addJob(_onFailure);
+                return;
             }else if (_expiration < now + 15*1000) {
                 if (_log.shouldLog(Log.WARN))
                     _log.warn("Adding a tunnel message that will expire shortly [" 
