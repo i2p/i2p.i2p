@@ -112,6 +112,8 @@ public class Connection {
         _connectLock = new Object();
         _activeResends = 0;
         _context.statManager().createRateStat("stream.con.windowSizeAtCongestion", "How large was our send window when we send a dup?", "Stream", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
+        _context.statManager().createRateStat("stream.chokeSizeBegin", "How many messages were outstanding when we started to choke?", "Stream", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
+        _context.statManager().createRateStat("stream.chokeSizeEnd", "How many messages were outstanding when we stopped being choked?", "Stream", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
     }
     
     public long getNextOutboundPacketNum() { 
@@ -135,9 +137,14 @@ public class Connection {
     boolean packetSendChoke(long timeoutMs) {
         if (false) return true;
         long writeExpire = timeoutMs;
+        long start = _context.clock().now();
+        boolean started = false;
         while (true) {
             long timeLeft = writeExpire - _context.clock().now();
             synchronized (_outboundPackets) {
+                if (!started)
+                    _context.statManager().addRateData("stream.chokeSizeBegin", _outboundPackets.size(), timeoutMs);
+                started = true;
                 if (_outboundPackets.size() >= _options.getWindowSize()) {
                     if (writeExpire > 0) {
                         if (timeLeft <= 0) {
@@ -154,6 +161,7 @@ public class Connection {
                         try { _outboundPackets.wait(); } catch (InterruptedException ie) {}
                     }
                 } else {
+                    _context.statManager().addRateData("stream.chokeSizeEnd", _outboundPackets.size(), _context.clock().now() - start);
                     return true;
                 }
             }
@@ -325,14 +333,19 @@ public class Connection {
             _occurredEventCount++;
         } else {
             _occurredTime = now;
-            if (_occurredEventCount > 100) {
-                _log.log(Log.CRIT, "More than 100 events (" + _occurredEventCount + ") in a second on " 
-                                   + toString() + ": scheduler = " + sched);
+            if ( (_occurredEventCount > 1000) && (_log.shouldLog(Log.WARN)) ) {
+                _log.warn("More than 1000 events (" + _occurredEventCount + ") in a second on " 
+                          + toString() + ": scheduler = " + sched);
             }
             _occurredEventCount = 0;
         }
+        
+        long before = System.currentTimeMillis();
             
         sched.eventOccurred(this);
+        long elapsed = System.currentTimeMillis() - before;
+        if ( (elapsed > 1000) && (_log.shouldLog(Log.WARN)) )
+            _log.warn("Took " + elapsed + "ms to pump through " + sched);
     }
     
     void resetReceived() {
@@ -714,6 +727,7 @@ public class Connection {
         public ResendPacketEvent(PacketLocal packet) {
             _packet = packet;
             _currentIsActiveResend = false;
+            packet.setResendPacketEvent(ResendPacketEvent.this);
         }
         
         public void timeReached() {

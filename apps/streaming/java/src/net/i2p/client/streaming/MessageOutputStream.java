@@ -47,7 +47,7 @@ public class MessageOutputStream extends OutputStream {
         _written = 0;
         _closed = false;
         _writeTimeout = -1;
-        _passiveFlushDelay = 5*1000;
+        _passiveFlushDelay = 2*1000;
         _flusher = new Flusher();
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("MessageOutputStream created");
@@ -83,8 +83,7 @@ public class MessageOutputStream extends OutputStream {
                     remaining = 0;
                     _lastBuffered = _context.clock().now();
                     if (_passiveFlushDelay > 0) {
-                        // if it is already enqueued, this just pushes it further out
-                        SimpleTimer.getInstance().addEvent(_flusher, _passiveFlushDelay);
+                        _flusher.enqueue();
                     }
                 } else {
                     // buffer whatever we can fit then flush,
@@ -115,9 +114,9 @@ public class MessageOutputStream extends OutputStream {
                 ws.waitForAccept(_writeTimeout);
                 if (!ws.writeAccepted()) {
                     if (_writeTimeout > 0)
-                        throw new InterruptedIOException("Write not accepted within timeout");
+                        throw new InterruptedIOException("Write not accepted within timeout: " + ws);
                     else
-                        throw new IOException("Write not accepted into the queue");
+                        throw new IOException("Write not accepted into the queue: " + ws);
                 }
             } else {
                 if (_log.shouldLog(Log.DEBUG))
@@ -140,7 +139,24 @@ public class MessageOutputStream extends OutputStream {
      * period of inactivity
      */
     private class Flusher implements SimpleTimer.TimedEvent {
+        private boolean _enqueued;
+        public void enqueue() {
+            // no need to be overly worried about duplicates - it would just 
+            // push it further out
+            if (!_enqueued)
+                SimpleTimer.getInstance().addEvent(_flusher, _passiveFlushDelay);
+            _enqueued = true;
+        }
         public void timeReached() {
+            _enqueued = false;
+            long timeLeft = (_lastBuffered + _passiveFlushDelay - _context.clock().now());
+            if (timeLeft > 0)
+                enqueue();
+            else
+                doFlush();
+        }
+        
+        private void doFlush() {
             boolean sent = false;
             WriteStatus ws = null;
             synchronized (_dataLock) {
@@ -159,7 +175,6 @@ public class MessageOutputStream extends OutputStream {
             if (sent && _log.shouldLog(Log.DEBUG)) 
                 _log.debug("Passive flush of " + ws);
         }
-        
     }
     
     /** 
@@ -275,6 +290,7 @@ public class MessageOutputStream extends OutputStream {
     }
     void flushAvailable(DataReceiver target, boolean blocking) throws IOException {
         WriteStatus ws = null;
+        long before = System.currentTimeMillis();
         synchronized (_dataLock) {
             // _buf may be null, but the data receiver can handle that just fine,
             // deciding whether or not to send a packet
@@ -284,6 +300,10 @@ public class MessageOutputStream extends OutputStream {
             _dataLock.notifyAll();
             _lastFlushed = _context.clock().now();
         }
+        long afterBuild = System.currentTimeMillis();
+        if ( (afterBuild - before > 1000) && (_log.shouldLog(Log.DEBUG)) )
+            _log.debug("Took " + (afterBuild-before) + "ms to build a packet?  " + ws);
+        
         if (blocking && ws != null) {
             ws.waitForAccept(_writeTimeout);
             if (ws.writeFailed())
@@ -291,6 +311,9 @@ public class MessageOutputStream extends OutputStream {
             else if (!ws.writeAccepted())
                 throw new InterruptedIOException("Flush available timed out");
         }
+        long afterAccept = System.currentTimeMillis();
+        if ( (afterAccept - afterBuild > 1000) && (_log.shouldLog(Log.DEBUG)) )
+            _log.debug("Took " + (afterAccept-afterBuild) + "ms to accept a packet? " + ws);
         return;
     }
     

@@ -242,8 +242,8 @@ public class I2PTunnelRunner extends I2PThread implements I2PSocket.SocketErrorL
                               + ex.getMessage() + "\")");
             } catch (IOException ex) {
                 if (!finished) {
-                    if (_log.shouldLog(Log.ERROR))
-                        _log.error(direction + ": Error forwarding", ex);
+                    if (_log.shouldLog(Log.WARN))
+                        _log.warn(direction + ": Error forwarding", ex);
                 }
                 //else
                 //    _log.warn("You may ignore this", ex);

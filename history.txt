@@ -1,4 +1,33 @@
-$Id: history.txt,v 1.92 2004/12/01 19:27:27 jrandom Exp $
+$Id: history.txt,v 1.93 2004/12/01 22:20:04 jrandom Exp $
+
+2004-12-03  jrandom
+    * Toss in a small pool of threads (3) to execute the events queued up with
+      the SimpleTimer, as we do currently see the occational event 
+      notification spiking up to a second or so.
+    * Implement a SAM client API in java, useful for event based streaming (or
+      for testing the SAM bridge)
+    * Added support to shut down the SAM bridge on OOM (useful if the SAM 
+      bridge is being run outside of the router).
+    * Include the SAM test code in the sam.jar
+    * Remove an irrelevent warning message from SAM, which was caused by 
+      perfectly normal operation due to a session being closed.
+    * Removed some unnecessary synchronization in the streaming lib's 
+      PacketQueue
+    * More quickly clean up the memory used by the streaming lib by 
+      immediately killing each packet's resend job as soon as it is ACKed (or
+      cancelled), so that there are no longer any valid pointers to the 
+      (potentially 32KB) packet.
+    * Fixed the timestamps dumped to stdout when debugging the PacketHandler.
+    * Drop packets that would expand our inbound window beyond our maximum 
+      buffer size (default 32 messages)
+    * Always read the ACK/NACK data from the verified packets received, even
+      if we are going to drop them
+    * Always adjust the window when there are messages ACKed, though do not
+      change its size except as before.
+    * Streamlined some synchronization in the router's I2CP handling
+    * Streamlined some memory allocation in the SAM bridge
+    * Default the streaming lib to disconnect on inactivity, rather than send
+      an empty message.
 
 2004-12-01  jrandom
     * Fix for a race in the streaming lib as caused by some odd SAM activity

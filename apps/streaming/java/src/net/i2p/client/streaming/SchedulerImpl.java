@@ -32,5 +32,6 @@ abstract class SchedulerImpl implements TaskScheduler {
             //    _log.debug("firing event on " + _connection, _addedBy);
             _connection.eventOccurred(); 
         }
+        public String toString() { return "event on " + _connection; }
     }
 }

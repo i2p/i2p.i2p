@@ -64,7 +64,7 @@ class ConnectionDataReceiver implements MessageOutputStream.DataReceiver {
         if (doSend) {
             PacketLocal packet = send(buf, off, size);
             //dont wait for non-acks
-            if ( (packet.getPayloadSize() > 0) || (packet.isFlagSet(Packet.FLAG_SYNCHRONIZE)) )
+            if ( (packet.getSequenceNum() > 0) || (packet.isFlagSet(Packet.FLAG_SYNCHRONIZE)) )
                 return packet;
             else
                 return _dummyStatus;
@@ -95,8 +95,16 @@ class ConnectionDataReceiver implements MessageOutputStream.DataReceiver {
      * @return the packet sent
      */
     public PacketLocal send(byte buf[], int off, int size, boolean forceIncrement) {
+        long before = System.currentTimeMillis();
         PacketLocal packet = buildPacket(buf, off, size, forceIncrement);
+        long built = System.currentTimeMillis();
         _connection.sendPacket(packet);
+        long sent = System.currentTimeMillis();
+        
+        if ( (built-before > 1000) && (_log.shouldLog(Log.WARN)) )
+            _log.warn("wtf, took " + (built-before) + "ms to build a packet: " + packet);
+        if ( (sent-built> 1000) && (_log.shouldLog(Log.WARN)) )
+            _log.warn("wtf, took " + (sent-built) + "ms to send a packet: " + packet);
         return packet;
     }
     

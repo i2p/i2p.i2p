@@ -30,12 +30,22 @@ public class ConnectionPacketHandler {
     /** distribute a packet to the connection specified */
     void receivePacket(Packet packet, Connection con) throws I2PException {
         boolean ok = verifyPacket(packet, con);
-        if (!ok) return;
+        if (!ok) {
+            if ( (!packet.isFlagSet(Packet.FLAG_RESET)) && (_log.shouldLog(Log.ERROR)) )
+                _log.error("Packet does NOT verify: " + packet);
+            return;
+        }
         con.packetReceived();
         
-        if (con.getInputStream().getTotalQueuedSize() > con.getOptions().getInboundBufferSize()) {
+        long ready = con.getInputStream().getHighestReadyBockId();
+        int available = con.getOptions().getInboundBufferSize() - con.getInputStream().getTotalReadySize();
+        int allowedBlocks = available/con.getOptions().getMaxMessageSize();
+        if (packet.getSequenceNum() > ready + allowedBlocks) {
             if (_log.shouldLog(Log.WARN))
-                _log.warn("Inbound buffer exceeded on connection " + con + ": dropping " + packet);
+                _log.warn("Inbound buffer exceeded on connection " + con + " (" 
+                          + ready + "/"+ (ready+allowedBlocks) + "/" + available
+                          + ": dropping " + packet);
+            ack(con, packet.getAckThrough(), packet.getNacks(), null, false);
             con.getOptions().setChoke(5*1000);
             return;
         }
@@ -95,8 +105,20 @@ public class ConnectionPacketHandler {
             }
         }
         
+        boolean fastAck = ack(con, packet.getAckThrough(), packet.getNacks(), packet, isNew);
+        con.eventOccurred();
+        if (fastAck) {
+            if (con.getLastSendTime() + con.getOptions().getRTT() < _context.clock().now()) {
+                if (_log.shouldLog(Log.DEBUG))
+                    _log.debug("Fast ack for dup " + packet);
+                con.ackImmediately();
+            }
+        }
+    }
+    
+    private boolean ack(Connection con, long ackThrough, long nacks[], Packet packet, boolean isNew) {
         int numResends = 0;
-        List acked = con.ackPackets(packet.getAckThrough(), packet.getNacks());
+        List acked = con.ackPackets(ackThrough, nacks);
         if ( (acked != null) && (acked.size() > 0) ) {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug(acked.size() + " of our packets acked with " + packet);
@@ -130,18 +152,15 @@ public class ConnectionPacketHandler {
             _context.statManager().addRateData("stream.con.packetsAckedPerMessageReceived", acked.size(), highestRTT);
         }
 
-        boolean fastAck = adjustWindow(con, isNew, packet.getSequenceNum(), numResends, (acked != null ? acked.size() : 0));
-        con.eventOccurred();
-        if (fastAck) {
-            if (con.getLastSendTime() + con.getOptions().getRTT() < _context.clock().now()) {
-                if (_log.shouldLog(Log.DEBUG))
-                    _log.debug("Fast ack for dup " + packet);
-                con.ackImmediately();
-            }
-        }
+        if (packet != null)
+            return adjustWindow(con, isNew, packet.getSequenceNum(), numResends, (acked != null ? acked.size() : 0));
+        else
+            return adjustWindow(con, false, -1, numResends, (acked != null ? acked.size() : 0));
     }
     
+    
     private boolean adjustWindow(Connection con, boolean isNew, long sequenceNum, int numResends, int acked) {
+        boolean congested = false;
         if ( (!isNew) && (sequenceNum > 0) ) {
             // dup real packet
             int oldSize = con.getOptions().getWindowSize();
@@ -156,64 +175,38 @@ public class ConnectionPacketHandler {
                            + con.getLastCongestionSeenAt() + " (#resends: " + numResends 
                            + ") for " + con);
 
-            return true;
-        //} else if (numResends > 0) {
-            // window sizes are shrunk on resend, not on ack
-        } else {
-            if (acked > 0) { 
-                long lowest = con.getHighestAckedThrough();
-                if (lowest >= con.getCongestionWindowEnd()) {
-                    // new packet that ack'ed uncongested data, or an empty ack
-                    int newWindowSize = con.getOptions().getWindowSize();
-                    
-                    if (numResends <= 0) {
-                        if (newWindowSize > con.getLastCongestionSeenAt() / 2) {
-                            // congestion avoidance
+            congested = true;
+        } 
+        
+        long lowest = con.getHighestAckedThrough();
+        if (lowest >= con.getCongestionWindowEnd()) {
+            // new packet that ack'ed uncongested data, or an empty ack
+            int newWindowSize = con.getOptions().getWindowSize();
 
-                            // we can't use newWindowSize += 1/newWindowSize, since we're
-                            // integers, so lets use a random distribution instead
-                            int shouldIncrement = _context.random().nextInt(newWindowSize);
-                            if (shouldIncrement <= 0)
-                                newWindowSize += 1;
-                        } else {
-                            // slow start
-                            newWindowSize += 1;
-                        }
-                    }
-                    
-                    if (_log.shouldLog(Log.DEBUG))
-                        _log.debug("New window size " + newWindowSize + " congestionSeenAt: "
-                                   + con.getLastCongestionSeenAt() + " (#resends: " + numResends 
-                                   + ") for " + con);
-                    con.getOptions().setWindowSize(newWindowSize);
-                    con.setCongestionWindowEnd(newWindowSize + lowest);
+            if ( (!congested) && (acked > 0) && (numResends <= 0) ) {
+                if (newWindowSize > con.getLastCongestionSeenAt() / 2) {
+                    // congestion avoidance
+
+                    // we can't use newWindowSize += 1/newWindowSize, since we're
+                    // integers, so lets use a random distribution instead
+                    int shouldIncrement = _context.random().nextInt(newWindowSize);
+                    if (shouldIncrement <= 0)
+                        newWindowSize += 1;
+                } else {
+                    // slow start
+                    newWindowSize += 1;
                 }
-            } else {
-                // received a message that doesn't contain a new ack
-                
-                // ehh. cant do this, as we SACK and the acks may be 
-                // received out of order: 
-                // Alice: RECEIVE 2
-                // Alice: SEND    ack 2 nack 1
-                // Alice: RECEIVE 1
-                // Alice: SEND    ack 2
-                // Bob:   RECEIVE ack 2
-                // Bob:   RECEIVE ack 2 nack 1 <-- NOT bad
-                
-                /*
-                if (con.getUnackedPacketsSent() > 0) {
-                    // peer got a dup
-                    int oldSize = con.getOptions().getWindowSize();
-                    oldSize >>>= 1;
-                    if (oldSize <= 0)
-                        oldSize = 1;
-                    con.getOptions().setWindowSize(oldSize);
-                    return false;
-                }
-                */
             }
+                    
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("New window size " + newWindowSize + " congestionSeenAt: "
+                           + con.getLastCongestionSeenAt() + " (#resends: " + numResends 
+                           + ") for " + con);
+            con.getOptions().setWindowSize(newWindowSize);
+            con.setCongestionWindowEnd(newWindowSize + lowest);
         }
-        return false;
+        
+        return congested;
     }
     
     /**

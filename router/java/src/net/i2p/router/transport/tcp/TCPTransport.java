@@ -769,8 +769,8 @@ public class TCPTransport extends TransportImpl {
     /** Make this stuff pretty (only used in the old console) */
     public String renderStatusHTML() { 
         StringBuffer buf = new StringBuffer(1024);
-        buf.append("<b>Connections:</b><ul>\n");
         synchronized (_connectionLock) {
+            buf.append("<b>Connections (").append(_connectionsByIdent.size()).append("):</b><ul>\n");
             for (Iterator iter = _connectionsByIdent.values().iterator(); iter.hasNext(); ) {
                 TCPConnection con = (TCPConnection)iter.next();
                 buf.append("<li>");

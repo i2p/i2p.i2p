@@ -108,6 +108,8 @@ class I2PSessionImpl2 extends I2PSessionImpl {
 
     private boolean sendBestEffort(Destination dest, byte payload[], SessionKey keyUsed, Set tagsSent)
                     throws I2PSessionException {
+        long begin = _context.clock().now();
+        
         SessionKey key = _context.sessionKeyManager().getCurrentKey(dest.getPublicKey());
         if (key == null) key = _context.sessionKeyManager().createSession(dest.getPublicKey());
         SessionTag tag = _context.sessionKeyManager().consumeNextAvailableTag(dest.getPublicKey(), key);
@@ -180,9 +182,17 @@ class I2PSessionImpl2 extends I2PSessionImpl {
                        + " sync took " + (inSendingSync-beforeSendingSync) 
                        + " add took " + (afterSendingSync-inSendingSync));
         _producer.sendMessage(this, dest, nonce, payload, tag, key, sentTags, newKey);
+        
+        // since this is 'best effort', all we're waiting for is a status update 
+        // saying that the router received it - in theory, that should come back
+        // immediately, but in practice can take up to a second (though usually
+        // much quicker).  setting this to false will short-circuit that delay
+        boolean actuallyWait = true;
+        
         long beforeWaitFor = _context.clock().now();
-        state.waitFor(MessageStatusMessage.STATUS_SEND_ACCEPTED, 
-                      _context.clock().now() + getTimeout());
+        if (actuallyWait)
+            state.waitFor(MessageStatusMessage.STATUS_SEND_ACCEPTED, 
+                          _context.clock().now() + getTimeout());
         long afterWaitFor = _context.clock().now();
         long inRemovingSync = 0;
         synchronized (_sendingStates) {
@@ -190,7 +200,7 @@ class I2PSessionImpl2 extends I2PSessionImpl {
             _sendingStates.remove(state);
         }
         long afterRemovingSync = _context.clock().now();
-        boolean found = state.received(MessageStatusMessage.STATUS_SEND_ACCEPTED);
+        boolean found = !actuallyWait || state.received(MessageStatusMessage.STATUS_SEND_ACCEPTED);
         if (_log.shouldLog(Log.DEBUG))
             _log.debug(getPrefix() + "After waitFor sending state " + state.getMessageId()
                        + " / " + state.getNonce() + " found = " + found);
@@ -198,6 +208,13 @@ class I2PSessionImpl2 extends I2PSessionImpl {
         long timeToSend = afterRemovingSync - beforeSendingSync;
         if ( (timeToSend > 10*1000) && (_log.shouldLog(Log.WARN)) ) {
             _log.warn("wtf, took " + timeToSend + "ms to send the message?!", new Exception("baz"));
+        }
+        
+        if ( (afterRemovingSync - begin > 500) && (_log.shouldLog(Log.WARN) ) ) {
+            _log.warn("Took " + (afterRemovingSync-begin) + "ms to sendBestEffort, "
+                      + (afterSendingSync-begin) + "ms to prepare, "
+                      + (beforeWaitFor-afterSendingSync) + "ms to send, "
+                      + (afterRemovingSync-beforeWaitFor) + "ms waiting for reply");
         }
         
         if (found) {

@@ -104,7 +104,7 @@ public class PacketHandler {
         }
     }
     
-    private static final SimpleDateFormat _fmt = new SimpleDateFormat("hh:mm:ss.SSS");
+    private static final SimpleDateFormat _fmt = new SimpleDateFormat("HH:mm:ss.SSS");
     void displayPacket(Packet packet, String prefix) {
         String msg = null;
         synchronized (_fmt) {

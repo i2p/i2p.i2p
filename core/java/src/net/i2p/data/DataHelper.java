@@ -735,7 +735,7 @@ public class DataHelper {
 
     /** decompress the GZIP compressed data (returning null on error) */
     public static byte[] decompress(byte orig[]) throws IOException {
-        return decompress(orig, 0, orig.length);
+        return (orig != null ? decompress(orig, 0, orig.length) : null);
     }
     public static byte[] decompress(byte orig[], int offset, int length) throws IOException {
         if ((orig == null) || (orig.length <= 0)) return orig;

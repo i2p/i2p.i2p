@@ -28,8 +28,10 @@ import net.i2p.client.streaming.I2PSocketManager;
 import net.i2p.client.streaming.I2PSocketManagerFactory;
 import net.i2p.client.streaming.I2PSocketOptions;
 import net.i2p.data.Base64;
+import net.i2p.data.ByteArray;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.Destination;
+import net.i2p.util.ByteCache;
 import net.i2p.util.I2PThread;
 import net.i2p.util.Log;
 
@@ -199,7 +201,7 @@ public class SAMStreamSession {
      *
      * @return True if the data was sent, false otherwise
      */
-    public boolean sendBytes(int id, byte[] data) {
+    public boolean sendBytes(int id, InputStream in, int size) { 
         Destination d = new Destination();
         SAMStreamSessionSocketHandler handler = getSocketHandler(id);
         
@@ -208,7 +210,7 @@ public class SAMStreamSession {
             return false;
         }
 
-        return handler.sendBytes(data);
+        return handler.sendBytes(in, size);
     }
 
     /**
@@ -313,8 +315,7 @@ public class SAMStreamSession {
         }
 
         if (removed == null) {
-            _log.error("BUG! Trying to remove inexistent SAM STREAM session socket handler " + id);
-            recv.stopStreamReceiving();
+            // ignore - likely the socket handler was already removed by removeAllSocketHandlers
         } else {
             removed.stopRunning();
             _log.debug("Removed SAM STREAM session socket handler " + id);
@@ -462,17 +463,29 @@ public class SAMStreamSession {
          *
          * @return True if data has been sent without errors, false otherwise
          */
-        public boolean sendBytes(byte[] data) {
+        public boolean sendBytes(InputStream in, int size) { // byte[] data) {
             if (_log.shouldLog(Log.DEBUG)) {
-                _log.debug("Handler " + id + ": sending " + data.length
+                _log.debug("Handler " + id + ": sending " + size
                            + " bytes");
             }
+            ByteCache cache = ByteCache.getInstance(1024, 4);
+            ByteArray ba = cache.acquire();
             try {
-                i2pSocketOS.write(data);
+                int sent = 0;
+                byte buf[] = ba.getData(); 
+                while (sent < size) {
+                    int read = in.read(buf);
+                    if (read == -1)
+                        throw new IOException("Insufficient data from the SAM client (" + sent + "/" + size + ")");
+                    i2pSocketOS.write(buf, 0, read);
+                    sent += read;
+                }
                 //i2pSocketOS.flush();
             } catch (IOException e) {
                 _log.error("Error sending data through I2P socket", e);
                 return false;
+            } finally {
+                cache.release(ba);
             }
 
             return true;

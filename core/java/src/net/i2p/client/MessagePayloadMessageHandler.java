@@ -16,6 +16,7 @@ import net.i2p.data.i2cp.I2CPMessage;
 import net.i2p.data.i2cp.MessageId;
 import net.i2p.data.i2cp.MessagePayloadMessage;
 import net.i2p.data.i2cp.ReceiveMessageEndMessage;
+import net.i2p.util.Log;
 
 /**
  * Handle I2CP MessagePayloadMessages from the router delivering the contents
@@ -30,7 +31,8 @@ class MessagePayloadMessageHandler extends HandlerImpl {
     }
 
     public void handleMessage(I2CPMessage message, I2PSessionImpl session) {
-        _log.debug("Handle message " + message);
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("Handle message " + message);
         try {
             MessagePayloadMessage msg = (MessagePayloadMessage) message;
             MessageId id = msg.getMessageId();
@@ -55,9 +57,8 @@ class MessagePayloadMessageHandler extends HandlerImpl {
         Payload payload = msg.getPayload();
         byte[] data = _context.elGamalAESEngine().decrypt(payload.getEncryptedData(), session.getDecryptionKey());
         if (data == null) {
-            _log
-                .error("Error decrypting the payload to public key "
-                       + session.getMyDestination().getPublicKey().toBase64() + "\nPayload: " + payload.calculateHash());
+            if (_log.shouldLog(Log.ERROR))
+                _log.error("Error decrypting the payload");
             throw new DataFormatException("Unable to decrypt the payload");
         }
         payload.setUnencryptedData(data);

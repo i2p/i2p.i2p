@@ -44,6 +44,9 @@ public class SAMv1Handler extends SAMHandler implements SAMRawReceiver, SAMDatag
     private SAMDatagramSession datagramSession = null;
     private SAMStreamSession streamSession = null;
 
+    private long _id;
+    private static volatile long __id = 0;
+    
     /**
      * Create a new SAM version 1 handler.  This constructor expects
      * that the SAM HELLO message has been still answered (and
@@ -68,6 +71,7 @@ public class SAMv1Handler extends SAMHandler implements SAMRawReceiver, SAMDatag
      */
     public SAMv1Handler(Socket s, int verMajor, int verMinor, Properties i2cpProps) throws SAMException, IOException {
         super(s, verMajor, verMinor, i2cpProps);
+        _id = ++__id;
         _log.debug("SAM version 1 handler instantiated");
 
         if ((this.verMajor != 1) || (this.verMinor != 0)) {
@@ -82,7 +86,7 @@ public class SAMv1Handler extends SAMHandler implements SAMRawReceiver, SAMDatag
         StringTokenizer tok;
         Properties props;
 
-        this.thread.setName("SAMv1Handler");
+        this.thread.setName("SAMv1Handler " + _id);
         _log.debug("SAM handling started");
 
         try {
@@ -550,12 +554,7 @@ public class SAMv1Handler extends SAMHandler implements SAMRawReceiver, SAMDatag
         }
 
         try {
-            DataInputStream in = new DataInputStream(getClientSocketInputStream());
-            byte[] data = new byte[size];
-
-            in.readFully(data);
-
-            if (!streamSession.sendBytes(id, data)) {
+            if (!streamSession.sendBytes(id, getClientSocketInputStream(), size)) { // data)) {
                 _log.error("STREAM SEND failed");
                 boolean rv = writeString("STREAM CLOSED RESULT=CANT_REACH_PEER ID=" + id + " MESSAGE=\"Send of " + size + " bytes failed\"\n");
                 streamSession.closeConnection(id);
@@ -801,7 +800,7 @@ public class SAMv1Handler extends SAMHandler implements SAMRawReceiver, SAMDatag
     }
 
     public void stopStreamReceiving() {
-        _log.debug("stopStreamReceiving() invoked");
+        _log.debug("stopStreamReceiving() invoked", new Exception("stopped"));
 
         if (streamSession == null) {
             _log.error("BUG! Got stream receiving stop, but session is null!");

@@ -33,9 +33,9 @@ public class MessageInputStream extends InputStream {
     private List _readyDataBlocks;
     private int _readyDataBlockIndex;
     /** highest message ID used in the readyDataBlocks */
-    private long _highestReadyBlockId;
+    private volatile long _highestReadyBlockId;
     /** highest overall message ID */
-    private long _highestBlockId;
+    private volatile long _highestBlockId;
     /** 
      * Message ID (Long) to ByteArray for blocks received
      * out of order when there are lower IDs not yet 
@@ -74,15 +74,13 @@ public class MessageInputStream extends InputStream {
     
     /** What is the highest block ID we've completely received through? */
     public long getHighestReadyBockId() { 
-        synchronized (_dataLock) {
-            return _highestReadyBlockId; 
-        }
+        // not synchronized as it doesnt hurt to read a too-low value
+        return _highestReadyBlockId; 
     }
     
     public long getHighestBlockId() { 
-        synchronized (_dataLock) {
-            return _highestBlockId;
-        }
+        // not synchronized as it doesnt hurt to read a too-low value
+        return _highestBlockId;
     }
     
     /**
@@ -389,6 +387,21 @@ public class MessageInputStream extends InputStream {
             for (Iterator iter = _notYetReadyBlocks.values().iterator(); iter.hasNext(); ) {
                 ByteArray cur = (ByteArray)iter.next();
                 numBytes += cur.getData().length;
+            }
+            return numBytes;
+        }
+    }
+    
+    public int getTotalReadySize() {
+        synchronized (_dataLock) {
+            if (_locallyClosed) return 0;
+            int numBytes = 0;
+            for (int i = 0; i < _readyDataBlocks.size(); i++) {
+                ByteArray cur = (ByteArray)_readyDataBlocks.get(i);
+                if (i == 0)
+                    numBytes += cur.getData().length - _readyDataBlockIndex;
+                else
+                    numBytes += cur.getData().length;
             }
             return numBytes;
         }

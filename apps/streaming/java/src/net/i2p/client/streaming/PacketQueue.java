@@ -24,22 +24,15 @@ class PacketQueue {
     private Log _log;
     private I2PSession _session;
     private ConnectionManager _connectionManager;
-    private byte _buf[];
     private ByteCache _cache = ByteCache.getInstance(64, 36*1024);
     
     public PacketQueue(I2PAppContext context, I2PSession session, ConnectionManager mgr) {
         _context = context;
         _session = session;
         _connectionManager = mgr;
-        _buf = _cache.acquire().getData(); // new byte[36*1024];
         _log = context.logManager().getLog(PacketQueue.class);
         _context.statManager().createRateStat("stream.con.sendMessageSize", "Size of a message sent on a connection", "Stream", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
         _context.statManager().createRateStat("stream.con.sendDuplicateSize", "Size of a message resent on a connection", "Stream", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
-    }
-    
-    protected void finalize() throws Throwable {
-        _cache.release(new ByteArray(_buf));
-        super.finalize();
     }
     
     /**
@@ -53,7 +46,7 @@ class PacketQueue {
             keyUsed = new SessionKey();
         Set tagsSent = packet.getTagsSent();
         if (tagsSent == null)
-            tagsSent = new HashSet();
+            tagsSent = new HashSet(0);
 
         // cache this from before sendMessage
         String conStr = (packet.getConnection() != null ? packet.getConnection().toString() : "");
@@ -63,28 +56,35 @@ class PacketQueue {
         } else {
             _log.debug("Sending... " + packet);
         }
+    
+        ByteArray ba = _cache.acquire();
+        byte buf[] = ba.getData();
 
         long begin = 0;
         long end = 0;
         boolean sent = false;
         try {
             int size = 0;
-            synchronized (this) {
-                Arrays.fill(_buf, (byte)0x0);
-                if (packet.shouldSign())
-                    size = packet.writeSignedPacket(_buf, 0, _context, _session.getPrivateKey());
-                else
-                    size = packet.writePacket(_buf, 0);
+            long beforeWrite = System.currentTimeMillis();
+            if (packet.shouldSign())
+                size = packet.writeSignedPacket(buf, 0, _context, _session.getPrivateKey());
+            else
+                size = packet.writePacket(buf, 0);
+            long writeTime = System.currentTimeMillis() - beforeWrite;
+            if ( (writeTime > 1000) && (_log.shouldLog(Log.WARN)) )
+                _log.warn("took " + writeTime + "ms to write the packet: " + packet);
 
-                // this should not block!
-                begin = _context.clock().now();
-                sent = _session.sendMessage(packet.getTo(), _buf, 0, size, keyUsed, tagsSent);
-                end = _context.clock().now();
-            }
+            // this should not block!
+            begin = _context.clock().now();
+            sent = _session.sendMessage(packet.getTo(), buf, 0, size, keyUsed, tagsSent);
+            end = _context.clock().now();
+            
+            if ( (end-begin > 1000) && (_log.shouldLog(Log.WARN)) ) 
+                _log.warn("Took " + (end-begin) + "ms to sendMessage(...) " + packet);
+            
             _context.statManager().addRateData("stream.con.sendMessageSize", size, packet.getLifetime());
             if (packet.getNumSends() > 1)
                 _context.statManager().addRateData("stream.con.sendDuplicateSize", size, packet.getLifetime());
-            
             
             Connection con = packet.getConnection();
             if (con != null) {
@@ -96,6 +96,8 @@ class PacketQueue {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Unable to send the packet " + packet, ise);
         }
+        
+        _cache.release(ba);
         
         if (!sent) {
             if (_log.shouldLog(Log.WARN))

@@ -25,8 +25,6 @@ class ClientWriterRunner implements Runnable {
     
     private static final long MAX_WAIT = 5*1000;
     
-    /** notify this lock when there are messages to write */
-    private Object _activityLock = new Object();
     /** lock on this when updating the class level data structs */
     private Object _dataLock = new Object();
     
@@ -47,9 +45,7 @@ class ClientWriterRunner implements Runnable {
         synchronized (_dataLock) {
             _messagesToWrite.add(msg);
             _messagesToWriteTimes.add(new Long(_context.clock().now()));
-        }
-        synchronized (_activityLock) {
-            _activityLock.notifyAll();
+            _dataLock.notifyAll();
         }
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("["+_id+"] addMessage completed for " + msg.getClass().getName());
@@ -60,8 +56,8 @@ class ClientWriterRunner implements Runnable {
      *
      */
     public void stopWriting() {
-        synchronized (_activityLock) {
-            _activityLock.notifyAll();
+        synchronized (_dataLock) {
+            _dataLock.notifyAll();
         }
     }
     public void run() {
@@ -70,6 +66,9 @@ class ClientWriterRunner implements Runnable {
             List messageTimes = null;
             
             synchronized (_dataLock) {
+                if (_messagesToWrite.size() <= 0) 
+                    try { _dataLock.wait(); } catch (InterruptedException ie) {}
+                
                 if (_messagesToWrite.size() > 0) {
                     messages = new ArrayList(_messagesToWrite.size());
                     messageTimes = new ArrayList(_messagesToWriteTimes.size());
@@ -80,16 +79,7 @@ class ClientWriterRunner implements Runnable {
                 } 
             }
             
-            if (messages == null) {
-                try {
-                    synchronized (_activityLock) {
-                        _activityLock.wait();
-                    }
-                } catch (InterruptedException ie) {
-                    if (_log.shouldLog(Log.WARN))
-                        _log.warn("Interrupted while waiting for activity", ie);
-                }
-            } else {
+            if (messages != null) {
                 for (int i = 0; i < messages.size(); i++) {
                     I2CPMessage msg = (I2CPMessage)messages.get(i);
                     Long when = (Long)messageTimes.get(i);

@@ -5,6 +5,8 @@ import java.util.Set;
 import net.i2p.I2PAppContext;
 import net.i2p.data.Destination;
 import net.i2p.data.SessionKey;
+import net.i2p.util.Log;
+import net.i2p.util.SimpleTimer;
 
 /**
  * coordinate local attributes about a packet - send time, ack time, number of
@@ -12,6 +14,7 @@ import net.i2p.data.SessionKey;
  */
 public class PacketLocal extends Packet implements MessageOutputStream.WriteStatus {
     private I2PAppContext _context;
+    private Log _log;
     private Connection _connection;
     private Destination _to;
     private SessionKey _keyUsed;
@@ -22,6 +25,7 @@ public class PacketLocal extends Packet implements MessageOutputStream.WriteStat
     private long _acceptedOn;
     private long _ackOn;
     private long _cancelledOn;
+    private SimpleTimer.TimedEvent _resendEvent;
     
     public PacketLocal(I2PAppContext ctx, Destination to) {
         this(ctx, to, null);
@@ -29,6 +33,7 @@ public class PacketLocal extends Packet implements MessageOutputStream.WriteStat
     public PacketLocal(I2PAppContext ctx, Destination to, Connection con) {
         _context = ctx;
         _createdOn = ctx.clock().now();
+        _log = ctx.logManager().getLog(PacketLocal.class);
         _to = to;
         _connection = con;
         _lastSend = -1;
@@ -78,12 +83,16 @@ public class PacketLocal extends Packet implements MessageOutputStream.WriteStat
                 _ackOn = _context.clock().now(); 
             notifyAll();
         }
+        SimpleTimer.getInstance().removeEvent(_resendEvent);
     }
     public void cancelled() { 
         synchronized (this) {
             _cancelledOn = _context.clock().now();
             notifyAll();
         }
+        SimpleTimer.getInstance().removeEvent(_resendEvent);
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("Cancelled! " + toString(), new Exception("cancelled"));
     }
     
     /** how long after packet creation was it acked? */
@@ -97,6 +106,8 @@ public class PacketLocal extends Packet implements MessageOutputStream.WriteStat
     public long getLastSend() { return _lastSend; }
     public Connection getConnection() { return _connection; }
     
+    public void setResendPacketEvent(SimpleTimer.TimedEvent evt) { _resendEvent = evt; }
+    
     public String toString() {
         String str = super.toString();
         if (_ackOn > 0)
@@ -108,12 +119,24 @@ public class PacketLocal extends Packet implements MessageOutputStream.WriteStat
     public void waitForAccept(int maxWaitMs) {
         if (_connection == null) 
             throw new IllegalStateException("Cannot wait for accept with no connection");
-        long expiration = _context.clock().now()+maxWaitMs;
+        long before = _context.clock().now();
+        long expiration = before+maxWaitMs;
+        int queued = _connection.getUnackedPacketsSent();
+        int window = _connection.getOptions().getWindowSize();
         boolean accepted = _connection.packetSendChoke(maxWaitMs);
+        long after = _context.clock().now();
         if (accepted)
-            _acceptedOn = _context.clock().now();
+            _acceptedOn = after;
         else
             _acceptedOn = -1;
+        int afterQueued = _connection.getUnackedPacketsSent();
+        if ( (after - before > 1000) && (_log.shouldLog(Log.DEBUG)) )
+            _log.debug("Took " + (after-before) + "ms to get " 
+                       + (accepted ? " accepted" : " rejected")
+                       + (_cancelledOn > 0 ? " and CANCELLED" : "")
+                       + ", queued behind " + queued +" with a window size of " + window 
+                       + ", finally accepted with " + afterQueued + " queued: " 
+                       + toString());
     }
     
     public void waitForCompletion(int maxWaitMs) {

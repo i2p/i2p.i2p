@@ -100,7 +100,8 @@ public class I2PSocketManagerFactory {
             //p.setProperty("tunnels.depthInbound", "0");
         }
 
-        opts.setProperty(I2PClient.PROP_TCP_HOST, i2cpHost);
+        if (i2cpHost != null)
+            opts.setProperty(I2PClient.PROP_TCP_HOST, i2cpHost);
         opts.setProperty(I2PClient.PROP_TCP_PORT, "" + i2cpPort);
         
         try {
