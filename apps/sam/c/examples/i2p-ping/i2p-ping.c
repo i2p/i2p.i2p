@@ -28,12 +28,21 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+/* Exit Values:
+ *   0: Received at least one response from one dest, or help
+ *      message was successfully displayed.
+ *   1: Received no responses from any dest.
+ *   2: Naming lookup failed, or dest unspecified.
+ *   3: SAM error.
+ */
+
 #include <limits.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
 #include <unistd.h>
+/* #include <getopt.h> */ /* Needed on Gentoo - the hell? */
 #include "sam.h"
 
 static void usage();
@@ -62,6 +71,7 @@ int main(int argc, char* argv[])
 {
 	int ch;
 	int count = INT_MAX;  /* number of times to ping */
+	int pongcount = -1;
 	char *samhost = "localhost";
 	uint16_t samport = 7656;
 
@@ -88,7 +98,7 @@ int main(int argc, char* argv[])
 				quiet = true;
 				break;
 			case 'v':  /* version */
-				puts("$Id: i2p-ping.c,v 1.2 2004/07/31 22:20:22 mpc Exp $");
+				puts("$Id: i2p-ping.c,v 1.3 2004/07/31 23:06:44 mpc Exp $");
 				puts("Copyright (c) 2004, Matthew P. Cashdollar <mpc@innographx.com>");
 				break;
 			case '?':
@@ -101,7 +111,7 @@ int main(int argc, char* argv[])
 	argv += optind;
 	if (argc == 0) {  /* they forgot to specify a ping target */
 		fprintf(stderr, "Ping who?\n");
-		return 1;
+		return 2;
 	}
 
 	/* Hook up the callback functions - required by LibSAM */
@@ -120,9 +130,10 @@ int main(int argc, char* argv[])
 	if (rc != SAM_OK) {
 		fprintf(stderr, "SAM connection failed: %s\n", sam_strerror(rc));
 		sam_session_free(&session);
-		return 1;
+		return 3;
 	}
 
+	pongcount = 0;
 	for (int j = 0; j < argc; j++) {
 		if (strlen(argv[j]) == 516) {
 			memcpy(dest, argv[j], SAM_PUBKEY_LEN);
@@ -144,6 +155,8 @@ int main(int argc, char* argv[])
 			time_t finish = time(0);
 			laststream = 0;
 			if (laststatus == SAM_OK) {
+				pongcount++;
+
 				if (bell)
 					printf("\a");  /* putchar() doesn't work for some reason */
 				if (!mihi)
@@ -164,7 +177,7 @@ int main(int argc, char* argv[])
 
 	sam_close(session);
 	sam_session_free(&session);
-	return 0;
+	return pongcount == 0 ? 1 : 0;
 }
 
 void usage()
@@ -207,7 +220,7 @@ static void databack(sam_sess_t *session, sam_sid_t stream_id, void *data,
 static void diedback(sam_sess_t *session)
 {
 	fprintf(stderr, "Lost SAM connection!\n");
-	exit(1);
+	exit(3);
 }
 
 /*
@@ -228,7 +241,7 @@ static void namingback(char *name, sam_pubkey_t pubkey, samerr_t result)
 {
 	if (result != SAM_OK) {
 		fprintf(stderr, "Naming lookup failed: %s\n", sam_strerror(result));
-		exit(1);
+		exit(2);
 	}
 	memcpy(dest, pubkey, SAM_PUBKEY_LEN);
 	gotdest = true;
