@@ -18,7 +18,7 @@ import net.i2p.util.Log;
  * Main driver for the app that harvests data about the performance of the network,
  * building summaries for each peer that change over time. <p />
  *
- * Usage: <code>NetMonitor [configFilename] [--routers filename[,filename]*]</code> <p />
+ * Usage: <code>NetMonitor [configFilename] [--routers filename[,filename]*] [--netDbURL url] </code> <p />
  *
  *
  *
@@ -27,7 +27,7 @@ public class NetMonitor {
     private static final Log _log = new Log(NetMonitor.class);
     public static final String CONFIG_LOCATION_DEFAULT = "netmonitor.config";
     public static final String HARVEST_DELAY_PROP = "harvestDelaySeconds";
-    public static final int HARVEST_DELAY_DEFAULT = 60;
+    public static final int HARVEST_DELAY_DEFAULT = 5*60;
     public static final String EXPORT_DELAY_PROP = "exportDelaySeconds";
     public static final int EXPORT_DELAY_DEFAULT = 120;
     public static final String SUMMARY_DURATION_PROP = "summaryDurationHours";
@@ -41,20 +41,22 @@ public class NetMonitor {
     private int _exportDelay;
     private String _exportDir;
     private String _netDbDir;
+    private String _netDbURL;
     private String _explicitRouters;
     private int _summaryDurationHours;
     private boolean _isRunning;
     private Map _peerSummaries;
     
     public NetMonitor() {
-        this(CONFIG_LOCATION_DEFAULT, null);
+        this(CONFIG_LOCATION_DEFAULT, null, null);
     }
     public NetMonitor(String configLocation) {
-        this(configLocation, null);
+        this(configLocation, null, null);
     }
-    public NetMonitor(String configLocation, String explicitFilenames) {
+    public NetMonitor(String configLocation, String explicitFilenames, String url) {
         _configLocation = configLocation;
         _explicitRouters = explicitFilenames;
+        _netDbURL = url;
         _peerSummaries = new HashMap(32);
         loadConfig();
     }
@@ -127,6 +129,9 @@ public class NetMonitor {
     public String getNetDbDir() { return _netDbDir; }
     /** if specified, contains a set of filenames we want to harvest routerInfo data from */
     public String getExplicitRouters() { return _explicitRouters; }
+    /** if specified, contains a URL to fetch references from */
+    public String getNetDbURL() { return _netDbURL; }
+    
     /** 
      * what peers are we keeping track of?  
      *
@@ -212,11 +217,12 @@ public class NetMonitor {
     
     /**
      * main driver for the netMonitor.  the usage is:
-     * <code>NetMonitor [configFilename] [--routers filename[,filename]*]</code> 
+     * <code>NetMonitor [configFilename] [--routers filename[,filename]*] [--netDbURL url]</code> 
      */
     public static final void main(String args[]) {
         String cfgLocation = CONFIG_LOCATION_DEFAULT;
         String explicitFilenames = null;
+        String explicitURL = null;
         switch (args.length) {
             case 0:
                 break;
@@ -224,16 +230,22 @@ public class NetMonitor {
                 cfgLocation = args[0];
                 break;
             case 2:
-                explicitFilenames = args[1];
+                if ("--routers".equalsIgnoreCase(args[0]))
+                    explicitFilenames = args[1];
+                else
+                    explicitURL = args[1];
                 break;
             case 3:
                 cfgLocation = args[0];
-                explicitFilenames = args[2];
+                if ("--routers".equalsIgnoreCase(args[1]))
+                    explicitFilenames = args[2];
+                else
+                    explicitURL = args[2];
                 break;
             default:
-                System.err.println("Usage: NetMonitor [configFilename] [--routers filename[,filename]*]");
+                System.err.println("Usage: NetMonitor [configFilename] [--routers filename[,filename]*] [--netDbURL url]");
                 return;
         }
-        new NetMonitor(cfgLocation, explicitFilenames).startMonitor();
+        new NetMonitor(cfgLocation, explicitFilenames, explicitURL).startMonitor();
     }
 }

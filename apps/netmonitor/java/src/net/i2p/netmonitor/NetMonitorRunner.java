@@ -1,12 +1,19 @@
 package net.i2p.netmonitor;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import java.util.StringTokenizer;
 
 import net.i2p.data.DataFormatException;
@@ -64,6 +71,9 @@ class NetMonitorRunner implements Runnable {
      *
      */
     private List getRouters() {
+        if (_monitor.getNetDbURL() != null)
+            return fetchRouters(_monitor.getNetDbURL());
+        
         File routers[] = listRouters();
         List rv = new ArrayList(64);
         if (routers != null) {
@@ -84,6 +94,65 @@ class NetMonitorRunner implements Runnable {
             }
         }
         return rv;
+    }
+    
+    
+    private List fetchRouters(String seedURL) {
+        List rv = new ArrayList();
+        try {
+            URL dir = new URL(seedURL);
+            String content = new String(readURL(dir));
+            Set urls = new HashSet();
+            int cur = 0;
+            while (true) {
+                int start = content.indexOf("href=\"routerInfo-", cur);
+                if (start < 0)
+                    break;
+
+                int end = content.indexOf(".dat\">", start);
+                String name = content.substring(start+"href=\"routerInfo-".length(), end);
+                urls.add(name);
+                cur = end + 1;
+            }
+
+            for (Iterator iter = urls.iterator(); iter.hasNext(); ) {
+                rv.add(fetchSeed((String)iter.next()));
+            }
+        } catch (Throwable t) {
+            _log.error("Error fetching routers from " + seedURL, t);
+        }
+        return rv;
+    }
+    
+    private RouterInfo fetchSeed(String peer) throws Exception {
+        URL url = new URL("http://i2p.net/i2pdb/routerInfo-" + peer + ".dat");
+        if (_log.shouldLog(Log.INFO))
+            _log.info("Fetching seed from " + url.toExternalForm());
+
+        byte data[] = readURL(url);
+        RouterInfo info = new RouterInfo();
+        try {
+            info.fromByteArray(data);
+            return info;
+        } catch (DataFormatException dfe) {
+            _log.error("Router data at " + url.toExternalForm() + " was corrupt", dfe);
+            return null;
+        }
+    }
+    
+    private byte[] readURL(URL url) throws Exception {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream(1024);
+        URLConnection con = url.openConnection();
+        InputStream in = con.getInputStream();
+        byte buf[] = new byte[1024];
+        while (true) {
+            int read = in.read(buf);
+            if (read < 0)
+                break;
+            baos.write(buf, 0, read);
+        }
+        in.close();
+        return baos.toByteArray();
     }
     
     /**
