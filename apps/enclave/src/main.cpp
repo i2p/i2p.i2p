@@ -31,6 +31,7 @@
 #include "platform.hpp"
 #include "main.hpp"
 
+Config *config;  // Configuration options
 Logger logger(LOG_FILE);  // Logging mechanism
 Random prng;  // Random number generator
 Sam *sam;  // SAM connection
@@ -42,7 +43,7 @@ int main(int argc, char* argv[])
 	if (argc != 2) {  // put some getopts stuff in here later
 		LERROR << "Please specify your destination name.  e.g. 'bin/enclave " \
 			"enclave'\n";
-		return -1;
+		return 1;
 	}
 
 	LINFO << "Enclave DHT - Built on " << __DATE__ << ' ' << __TIME__ << '\n';

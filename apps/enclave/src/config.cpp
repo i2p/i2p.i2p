@@ -28,71 +28,66 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef PLATFORM_HPP
-#define PLATFORM_HPP
+#include "platform.hpp"
+#include "bigint.hpp"
+
+Config::Config(const string& file)
+	: file(file)
+{
+	set_defaults();
+	parse();
+	configf.close();
+}
+
+void Config::parse(void)
+{
+	configf.open(file.c_str());
+	if (!configf) {
+		cerr << "Error opening configuration file (" << file.c_str() << ")\n";
+		throw runtime_error("Error opening configuration file");
+	}
+	size_t line = 0;
+	string s;
+	for (getline(configf, s); configf; getline(configf, s)) {
+		line++;
+		if (s[0] == '#')  // comment
+			continue;
+		size_t eqpos = s.find("=");
+		if (eqpos == string::npos) {
+			LERROR << "Error parsing line #" << line << " in " << file << ": " << s << '\n';
+			continue;
+		}
+		string key = s.substr(0, eqpos - 1);
+		string value = s.substr(eqpos + 1);
+		cfgmap.insert(make_pair(key, value));
+	}
+}
 
 /*
- * Operating system
+ * Looks up a configuration option in the table and returns the value
+ *
+ * key - key to lookup
+ *
+ * Returns a pointer to the value associated with the key
  */
-#define FREEBSD 0  // FreeBSD (untested)
-#define MINGW   1  // Windows native (Mingw)
-#define LINUX   2  // Linux
-#define CYGWIN  3  // Cygwin
+const string* Config::get_property(const string& key) const
+{
+	for (cfgmap_ci i = cfgmap.begin(); i != cfgmap.end(); i++) {
+		string s = i->first;
+		if (s == key)
+			return &(i->second);
+	}
+	assert(false);
+	return 0;
+}
 
-/*
- * System includes
- */
-#include <arpa/inet.h>
-#include <cstring>
-#include <fstream>
-#include <iostream>
-#include <list>
-#include <map>
-#include <stdexcept>
-#include <stdint.h>
-#include <string>
-#include <time.h>
-
-using namespace std;
-
-/*
- * Define this to '1' to cause the printing of source code file and line number
- * information with each log message.  Set it to '0' for simple logging.
- */
-#define VERBOSE_LOGS 0
-
-/*
- * The default locations for some files
- */
-#define LOG_FILE "log/main.log"
-#define PEERS_REF_FILE "cfg/peers.ref"
-
-/*
- * Library includes
- */
-#include "mycrypt.h"  // LibTomCrypt
-#include "sam.h"  // LibSAM
-
-/*
- * Local includes
- */
-#include "logger.hpp"  // Logger
-#include "config.hpp"  // Config
-#include "sam_error.hpp"  // for sam.hpp
-#include "bigint.hpp"  // for sha1.hpp
-#include "sha1.hpp"  // for peers.hpp
-#include "peer.hpp"  // for peers.hpp
-#include "near_peer.hpp"  // for peers.hpp
-#include "peers.hpp" // for sam.hpp
-#include "sam.hpp"  // SAM
-#include "random.hpp"  // Random
-
-/*
- * Global variables
- */
-extern Config *config;  // Configuration options
-extern Logger logger;  // Logging mechanism
-extern Random prng;  // Random number generator
-extern Sam *sam;  // Sam connection
-
-#endif  // PLATFORM_HPP
+void Config::set_defaults(void)
+{
+	cfgmap.insert(make_pair("samhost", "localhost"));
+	cfgmap.insert(make_pair("samport", "7656"));
+	cfgmap.insert(make_pair("mydest", "enclave"));
+	cfgmap.insert(make_pair("tunneldepth", "2"));
+	cfgmap.insert(make_pair("references", "cfg/peers.ref"));
+	cfgmap.insert(make_pair("loglevel", "1"));
+	cfgmap.insert(make_pair("logfile", "log/enclave.log"));
+}

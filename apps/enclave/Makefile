@@ -42,6 +42,7 @@ LIBS = -lsam -ltomcrypt
 
 OBJS =	$(OBJDIR)/bigint.o \
 		$(OBJDIR)/chk.o \
+		$(OBJDIR)/config.o \
 		$(OBJDIR)/logger.o \
 		$(OBJDIR)/main.o \
 		$(OBJDIR)/peers.o \

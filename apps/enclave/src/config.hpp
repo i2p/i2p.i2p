@@ -28,71 +28,25 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef PLATFORM_HPP
-#define PLATFORM_HPP
+#ifndef CONFIG_HPP
+#define CONFIG_HPP
 
-/*
- * Operating system
- */
-#define FREEBSD 0  // FreeBSD (untested)
-#define MINGW   1  // Windows native (Mingw)
-#define LINUX   2  // Linux
-#define CYGWIN  3  // Cygwin
+class Config {
+	public:
+		Config(const string& file);
 
-/*
- * System includes
- */
-#include <arpa/inet.h>
-#include <cstring>
-#include <fstream>
-#include <iostream>
-#include <list>
-#include <map>
-#include <stdexcept>
-#include <stdint.h>
-#include <string>
-#include <time.h>
+		const string* get_property(const string& key) const;
 
-using namespace std;
+	private:
+		typedef map<const string, string>::const_iterator cfgmap_ci;
+		typedef map<const string, string>::iterator cfgmap_i;
 
-/*
- * Define this to '1' to cause the printing of source code file and line number
- * information with each log message.  Set it to '0' for simple logging.
- */
-#define VERBOSE_LOGS 0
+		void parse(void);
+		void set_defaults(void);
 
-/*
- * The default locations for some files
- */
-#define LOG_FILE "log/main.log"
-#define PEERS_REF_FILE "cfg/peers.ref"
+		ifstream configf;
+		const string file;
+		map<const string, string> cfgmap;
+};
 
-/*
- * Library includes
- */
-#include "mycrypt.h"  // LibTomCrypt
-#include "sam.h"  // LibSAM
-
-/*
- * Local includes
- */
-#include "logger.hpp"  // Logger
-#include "config.hpp"  // Config
-#include "sam_error.hpp"  // for sam.hpp
-#include "bigint.hpp"  // for sha1.hpp
-#include "sha1.hpp"  // for peers.hpp
-#include "peer.hpp"  // for peers.hpp
-#include "near_peer.hpp"  // for peers.hpp
-#include "peers.hpp" // for sam.hpp
-#include "sam.hpp"  // SAM
-#include "random.hpp"  // Random
-
-/*
- * Global variables
- */
-extern Config *config;  // Configuration options
-extern Logger logger;  // Logging mechanism
-extern Random prng;  // Random number generator
-extern Sam *sam;  // Sam connection
-
-#endif  // PLATFORM_HPP
+#endif  // CONFIG_HPP

@@ -35,7 +35,7 @@ class Chk {
 	public:
 		//Chk(const uchar_t* cypertext, size_t size);
 		Chk(const uchar_t* plaintext, size_t size, const string& mime_type);
-		~Chk(void) { delete ct; }
+		~Chk(void) { delete[] ct; }
 
 	private:
 		static const size_t CRYPT_BLOCK_SIZE = 16;
