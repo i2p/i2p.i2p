@@ -101,7 +101,6 @@ public class SAMStreamSession {
         allprops.putAll(System.getProperties());
         allprops.putAll(props);
 
-        // FIXME: we should setup I2CP host and port, too
         String i2cpHost = allprops.getProperty(I2PClient.PROP_TCP_HOST, "127.0.0.1");
         int i2cpPort = 7654;
         String port = allprops.getProperty(I2PClient.PROP_TCP_PORT, "7654");
@@ -113,6 +112,7 @@ public class SAMStreamSession {
         // streams MUST be mode=guaranteed (though i think the socket manager 
         // enforces this anyway...
         allprops.setProperty(I2PClient.PROP_RELIABILITY, I2PClient.PROP_RELIABILITY_GUARANTEED);
+
         _log.debug("Creating I2PSocketManager...");
         socketMgr = I2PSocketManagerFactory.createManager(destStream,
                                                           i2cpHost,

@@ -30,6 +30,7 @@ import net.i2p.util.Log;
 public class SAMDatagramSession extends SAMMessageSession {
 
     private final static Log _log = new Log(SAMDatagramSession.class);
+    public static int DGRAM_SIZE_MAX = 31*1024;
 
     private SAMDatagramReceiver recv = null;
 
@@ -43,7 +44,8 @@ public class SAMDatagramSession extends SAMMessageSession {
      * @param recv Object that will receive incoming data
      */
     public SAMDatagramSession(String dest, Properties props,
-                         SAMDatagramReceiver recv) throws IOException, DataFormatException, I2PSessionException {
+                              SAMDatagramReceiver recv) throws IOException, 
+                              DataFormatException, I2PSessionException {
         super(dest, props);
 
         this.recv = recv;
@@ -58,7 +60,8 @@ public class SAMDatagramSession extends SAMMessageSession {
      * @param recv Object that will receive incoming data
      */
     public SAMDatagramSession(InputStream destStream, Properties props,
-                         SAMDatagramReceiver recv) throws IOException, DataFormatException, I2PSessionException {
+                              SAMDatagramReceiver recv) throws IOException, 
+                              DataFormatException, I2PSessionException {
         super(destStream, props);
 
         this.recv = recv;
@@ -73,6 +76,9 @@ public class SAMDatagramSession extends SAMMessageSession {
      * @return True if the data was sent, false otherwise
      */
     public boolean sendBytes(String dest, byte[] data) throws DataFormatException {
+        if (data.length > DGRAM_SIZE_MAX)
+            throw new DataFormatException("Datagram size exceeded (" + data.length + ")");
+        
         byte[] dgram = dgramMaker.makeI2PDatagram(data);
 
         return sendBytesThroughMessageSession(dest, dgram);

@@ -30,6 +30,7 @@ public abstract class SAMHandler implements Runnable {
     private final static Log _log = new Log(SAMHandler.class);
 
     protected I2PThread thread = null;
+    protected SAMBridge bridge = null;
 
     private Object socketWLock = new Object(); // Guards writings on socket
     private Socket socket = null;
@@ -70,6 +71,8 @@ public abstract class SAMHandler implements Runnable {
         thread = new I2PThread(this, "SAMHandler");
         thread.start();
     }
+    
+    public void setBridge(SAMBridge bridge) { this.bridge = bridge; }
     
     /**
      * Actually handle the SAM protocol.
@@ -124,7 +127,9 @@ public abstract class SAMHandler implements Runnable {
      *
      */
     protected final void closeClientSocket() throws IOException {
-        socket.close();
+        if (socket != null)
+            socket.close();
+        socket = null;
     }
 
     /**

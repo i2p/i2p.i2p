@@ -33,7 +33,6 @@ import net.i2p.I2PAppContext;
 public class SAMUtils {
 
     private final static Log _log = new Log(SAMUtils.class);
-    private static I2PAppContext _context = new I2PAppContext();
 
     /**
      * Generate a random destination key
@@ -86,7 +85,7 @@ public class SAMUtils {
      * @return the Destination for the specified hostname, or null if not found
      */
     public static Destination lookupHost(String name, OutputStream pubKey) {
-        NamingService ns = _context.namingService();
+        NamingService ns = I2PAppContext.getGlobalContext().namingService();
         Destination dest = ns.lookup(name);
 
         if ((pubKey != null) && (dest != null)) {
@@ -144,13 +143,13 @@ public class SAMUtils {
 
     /* Dump a Properties object in an human-readable form */
     private static String dumpProperties(Properties props) {
-        Enumeration enum = props.propertyNames();
+        Enumeration names = props.propertyNames();
         String msg = "";
         String key, val;
         boolean firstIter = true;
         
-        while (enum.hasMoreElements()) {
-            key = (String)enum.nextElement();
+        while (names.hasMoreElements()) {
+            key = (String)names.nextElement();
             val = props.getProperty(key);
             
             if (!firstIter) {

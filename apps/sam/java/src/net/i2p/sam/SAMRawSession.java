@@ -26,6 +26,7 @@ import net.i2p.util.Log;
 public class SAMRawSession extends SAMMessageSession {
 
     private final static Log _log = new Log(SAMRawSession.class);
+    public static final int RAW_SIZE_MAX = 32*1024;
 
     private SAMRawReceiver recv = null;
     /**
@@ -64,6 +65,8 @@ public class SAMRawSession extends SAMMessageSession {
      * @return True if the data was sent, false otherwise
      */
     public boolean sendBytes(String dest, byte[] data) throws DataFormatException {
+        if (data.length > RAW_SIZE_MAX)
+            throw new DataFormatException("Data size limit exceeded (" + data.length + ")");
         return sendBytesThroughMessageSession(dest, data);
     }
 

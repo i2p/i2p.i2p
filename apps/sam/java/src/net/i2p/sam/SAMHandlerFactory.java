@@ -32,8 +32,8 @@ public class SAMHandlerFactory {
      *
      * @param s Socket attached to SAM client
      * @param i2cpProps config options for our i2cp connection
-     *
-     * @return A SAM protocol handler
+     * @throws SAMException if the connection handshake (HELLO message) was malformed
+     * @return A SAM protocol handler, or null if the client closed before the handshake
      */
     public static SAMHandler createSAMHandler(Socket s, Properties i2cpProps) throws SAMException {
         BufferedReader br;
@@ -66,8 +66,8 @@ public class SAMHandlerFactory {
         {
             String opcode;
             if (!(opcode = tok.nextToken()).equals("VERSION")) {
-                throw new SAMException("Unrecognized HELLO message opcode: \""
-                                       + opcode + "\"");
+                throw new SAMException("Unrecognized HELLO message opcode: '"
+                                       + opcode + "'");
             }
         }
 
@@ -88,22 +88,8 @@ public class SAMHandlerFactory {
         }
 
         String ver = chooseBestVersion(minVer, maxVer);
-        if (ver == null) {
-            // Let's answer negatively
-            try {
-                OutputStream out = s.getOutputStream();
-                out.write("HELLO REPLY RESULT=NOVERSION\n".getBytes("ISO-8859-1"));
-                return null;
-            } catch (UnsupportedEncodingException e) {
-                _log.error("Caught UnsupportedEncodingException ("
-                           + e.getMessage() + ")");
-                throw new SAMException("Character encoding error: "
-                                       + e.getMessage());
-            } catch (IOException e) {
-                throw new SAMException("Error reading from socket: "
-                                       + e.getMessage());
-            }
-        }
+        if (ver == null)
+            throw new SAMException("No version specified");
 
         // Let's answer positively
         try {
@@ -135,8 +121,8 @@ public class SAMHandlerFactory {
                 throw new SAMException("BUG! (in handler instantiation)");
             }
         } catch (IOException e) {
-            _log.error("IOException caught during SAM handler instantiation");
-            return null;
+            _log.error("Error creating the v1 handler", e);
+            throw new SAMException("IOException caught during SAM handler instantiation");
         }
         return handler;
     }

@@ -13,6 +13,14 @@ import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Properties;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.Collections;
+
+import net.i2p.data.Destination;
+import net.i2p.data.DataFormatException;
+import net.i2p.data.PrivateKey;
+import net.i2p.data.SigningPrivateKey;
 
 import net.i2p.util.I2PThread;
 import net.i2p.util.Log;
@@ -27,11 +35,16 @@ public class SAMBridge implements Runnable {
     private final static Log _log = new Log(SAMBridge.class);
     private ServerSocket serverSocket;
     private Properties i2cpProps;
+    /** 
+     * app designated destination name to the base64 of the I2P formatted 
+     * destination keys (Destination+PrivateKey+SigningPrivateKey)
+     */
+    private Map nameToPrivKeys = Collections.synchronizedMap(new HashMap(8));
 
     private boolean acceptConnections = true;
 
     private final static int SAM_LISTENPORT = 7656;
-
+    
     private SAMBridge() {}
     
     /**
@@ -63,6 +76,46 @@ public class SAMBridge implements Runnable {
         this.i2cpProps = i2cpProps;
     }
 
+    /**
+     * Retrieve the destination associated with the given name
+     *
+     * @return null if the name does not exist, or if it is improperly formatted
+     */
+    public Destination getDestination(String name) {
+        String val = (String)nameToPrivKeys.get(name);
+        if (val == null) return null;
+        try {
+            Destination d = new Destination();
+            d.fromBase64(val);
+            return d;
+        } catch (DataFormatException dfe) {
+            _log.error("Error retrieving the destination from " + name, dfe);
+            nameToPrivKeys.remove(name);
+            return null;
+        }
+    }
+    
+    /**
+     * Retrieve the I2P private keystream for the given name, formatted
+     * as a base64 string (Destination+PrivateKey+SessionPrivateKey, as I2CP 
+     * stores it).
+     *
+     * @return null if the name does not exist, else the stream
+     */
+    public String getKeystream(String name) {
+        String val = (String)nameToPrivKeys.get(name);
+        if (val == null) return null;
+        return val;
+    }
+
+    /**
+     * Specify that the given keystream should be used for the given name
+     *
+     */
+    public void addKeystream(String name, String stream) {
+        nameToPrivKeys.put(name, stream);
+    }
+    
     /**
      * Usage:
      *  <pre>SAMBridge [[listenHost ]listenPort[ name=val]*]</pre>
@@ -140,10 +193,18 @@ public class SAMBridge implements Runnable {
                         } catch (IOException e) {}
                         continue;
                     }
+                    handler.setBridge(this);
                     handler.startHandling();
                 } catch (SAMException e) {
                     if (_log.shouldLog(Log.ERROR))
                         _log.error("SAM error: " + e.getMessage(), e);
+                    try {
+                        String reply = "HELLO REPLY RESULT=I2P_ERROR MESSAGE=\"" + e.getMessage() + "\"\n";
+                        s.getOutputStream().write(reply.getBytes("ISO-8859-1"));
+                    } catch (IOException ioe) {
+                        if (_log.shouldLog(Log.ERROR))
+                            _log.error("SAM Error sending error reply", ioe);
+                    }
                     s.close();
                 }
             }

@@ -154,10 +154,10 @@ public class SAMv1Handler extends SAMHandler implements SAMRawReceiver, SAMDatag
             }
         } catch (UnsupportedEncodingException e) {
             _log.error("Caught UnsupportedEncodingException ("
-                       + e.getMessage() + ")");
+                       + e.getMessage() + ")", e);
         } catch (IOException e) {
             _log.debug("Caught IOException ("
-                       + e.getMessage() + ")");
+                       + e.getMessage() + ")", e);
         } catch (Exception e) {
             _log.error("Unexpected exception", e);
         } finally {
@@ -189,32 +189,47 @@ public class SAMv1Handler extends SAMHandler implements SAMRawReceiver, SAMDatag
                 if ((rawSession != null) || (datagramSession != null)
                     || (streamSession != null)) {
                     _log.debug("Trying to create a session, but one still exists");
-                    return false;
+                    return writeString("SESSION STATUS RESULT=I2P_ERROR MESSAGE=\"Session already exists\"\n");
                 }
                 if (props == null) {
                     _log.debug("No parameters specified in SESSION CREATE message");
-                    return false;
+                    return writeString("SESSION STATUS RESULT=I2P_ERROR MESSAGE=\"No parameters for SESSION CREATE\"\n");
                 }
                 
                 dest = props.getProperty("DESTINATION");
                 if (dest == null) {
                     _log.debug("SESSION DESTINATION parameter not specified");
-                    return false;
+                    return writeString("SESSION STATUS RESULT=I2P_ERROR MESSAGE=\"DESTINATION not specified\"\n");
                 }
                 props.remove("DESTINATION");
-
+                
+                String destKeystream = null;
+                
                 if (dest.equals("TRANSIENT")) {
                     _log.debug("TRANSIENT destination requested");
-                    ByteArrayOutputStream priv = new ByteArrayOutputStream();
+                    ByteArrayOutputStream priv = new ByteArrayOutputStream(640);
                     SAMUtils.genRandomKey(priv, null);
                     
-                    dest = Base64.encode(priv.toByteArray());
+                    destKeystream = Base64.encode(priv.toByteArray());
+                } else {
+                    destKeystream = bridge.getKeystream(dest);
+                    if (destKeystream == null) {
+                        if (_log.shouldLog(Log.DEBUG))
+                            _log.debug("Custom destination specified [" + dest + "] but it isnt know, creating a new one");
+                        ByteArrayOutputStream baos = new ByteArrayOutputStream(640);
+                        SAMUtils.genRandomKey(baos, null);
+                        destKeystream = Base64.encode(baos.toByteArray());
+                        bridge.addKeystream(dest, destKeystream);
+                    } else {
+                        if (_log.shouldLog(Log.DEBUG))
+                            _log.debug("Custom destination specified [" + dest + "] and it is already known");
+                    }
                 }
                 
                 String style = props.getProperty("STYLE");
                 if (style == null) {
                     _log.debug("SESSION STYLE parameter not specified");
-                    return false;
+                    return writeString("SESSION STATUS RESULT=I2P_ERROR MESSAGE=\"No SESSION STYLE specified\"\n");
                 }
                 props.remove("STYLE");
                 
@@ -231,34 +246,34 @@ public class SAMv1Handler extends SAMHandler implements SAMRawReceiver, SAMDatag
                     if (!dir.equals("CREATE") && !dir.equals("RECEIVE")
                         && !dir.equals("BOTH")) {
                         _log.debug("Unknow DIRECTION parameter value: [" + dir + "]");
-                        return false;
+                        return writeString("SESSION STATUS RESULT=I2P_ERROR MESSAGE=\"Unknown DIRECTION parameter\"\n");
                     }
                     props.remove("DIRECTION");
                 
-                    streamSession = new SAMStreamSession(dest, dir,props,this);
+                    streamSession = new SAMStreamSession(destKeystream, dir,props,this);
                 } else {
                     _log.debug("Unrecognized SESSION STYLE: \"" + style +"\"");
-                    return false;
+                    return writeString("SESSION STATUS RESULT=I2P_ERROR MESSAGE=\"Unrecognized SESSION STYLE\"\n");
                 }
                 return writeString("SESSION STATUS RESULT=OK DESTINATION="
                                    + dest + "\n");
             } else {
                 _log.debug("Unrecognized SESSION message opcode: \""
                            + opcode + "\"");
-                return false;
+                return writeString("SESSION STATUS RESULT=I2P_ERROR MESSAGE=\"Unrecognized opcode\"\n");
             }
         } catch (DataFormatException e) {
             _log.debug("Invalid destination specified");
-            return writeString("SESSION STATUS RESULT=INVALID_KEY DESTINATION=" + dest + "\n");
+            return writeString("SESSION STATUS RESULT=INVALID_KEY DESTINATION=" + dest + " MESSAGE=\"" + e.getMessage() + "\"\n");
         } catch (I2PSessionException e) {
             _log.debug("I2P error when instantiating session", e);
-            return writeString("SESSION STATUS RESULT=I2P_ERROR DESTINATION=" + dest + "\n");
+            return writeString("SESSION STATUS RESULT=I2P_ERROR DESTINATION=" + dest + " MESSAGE=\"" + e.getMessage() + "\"\n");
         } catch (SAMException e) {
             _log.error("Unexpected SAM error", e);
-            return writeString("SESSION STATUS RESULT=I2P_ERROR DESTINATION=" + dest + "\n");
+            return writeString("SESSION STATUS RESULT=I2P_ERROR DESTINATION=" + dest + " MESSAGE=\"" + e.getMessage() + "\"\n");
         } catch (IOException e) {
             _log.error("Unexpected IOException", e);
-            return writeString("SESSION STATUS RESULT=I2P_ERROR DESTINATION=" + dest + "\n");
+            return writeString("SESSION STATUS RESULT=I2P_ERROR DESTINATION=" + dest + " MESSAGE=\"" + e.getMessage() + "\"\n");
         }
     }
 
@@ -483,158 +498,170 @@ public class SAMv1Handler extends SAMHandler implements SAMRawReceiver, SAMDatag
         }
 
         if (opcode.equals("SEND")) {
-            if (props == null) {
-                _log.debug("No parameters specified in STREAM SEND message");
-                return false;
-            }
-            
-            int id;
-            {
-                String strid = props.getProperty("ID");
-                if (strid == null) {
-                    _log.debug("ID not specified in STREAM SEND message");
-                    return false;
-                }
-                try {
-                    id = Integer.parseInt(strid);
-                } catch (NumberFormatException e) {
-                    _log.debug("Invalid STREAM SEND ID specified: " + strid);
-                    return false;
-                }
-            }
-
-            int size;
-            {
-                String strsize = props.getProperty("SIZE");
-                if (strsize == null) {
-                    _log.debug("Size not specified in STREAM SEND message");
-                    return false;
-                }
-                try {
-                    size = Integer.parseInt(strsize);
-                } catch (NumberFormatException e) {
-                    _log.debug("Invalid STREAM SEND size specified: "+strsize);
-                    return false;
-                }
-                if (!checkSize(size)) {
-                    _log.debug("Specified size (" + size
-                               + ") is out of protocol limits");
-                    return false;
-                }
-            }
-
-            try {
-                DataInputStream in = new DataInputStream(getClientSocketInputStream());
-                byte[] data = new byte[size];
-
-                in.readFully(data);
-
-                if (!streamSession.sendBytes(id, data)) {
-                    _log.error("STREAM SEND failed");
-                    return false;
-                }
-
-                return true;
-            } catch (EOFException e) {
-                _log.debug("Too few bytes with RAW SEND message (expected: "
-                           + size);
-                return false;
-            } catch (IOException e) {
-                _log.debug("Caught IOException while parsing RAW SEND message",
-                           e);
-                return false;
-            }
+            return execStreamSend(props);
         } else if (opcode.equals("CONNECT")) {
-            if (props == null) {
-                _log.debug("No parameters specified in STREAM CONNECT message");
-                return false;
-            }
-            
-            int id;
-            {
-                String strid = props.getProperty("ID");
-                if (strid == null) {
-                    _log.debug("ID not specified in STREAM SEND message");
-                    return false;
-                }
-                try {
-                    id = Integer.parseInt(strid);
-                } catch (NumberFormatException e) {
-                    _log.debug("Invalid STREAM CONNECT ID specified: " +strid);
-                    return false;
-                }
-                if (id < 1) {
-                    _log.debug("Invalid STREAM CONNECT ID specified: " +strid);
-                    return false;
-                }
-                props.remove("ID");
-            }
-
-            String dest = props.getProperty("DESTINATION");
-            if (dest == null) {
-                _log.debug("Destination not specified in RAW SEND message");
-                return false;
-            }
-            props.remove("DESTINATION");
-
-            try {
-                if (!streamSession.connect(id, dest, props)) {
-                    _log.debug("STREAM connection failed");
-                    return false;
-                }
-                return writeString("STREAM STATUS RESULT=OK ID=" + id + "\n");
-            } catch (DataFormatException e) {
-                _log.debug("Invalid destination in STREAM CONNECT message");
-                return writeString("STREAM STATUS RESULT=INVALID_KEY ID="
-                                   + id + "\n");
-            } catch (SAMInvalidDirectionException e) {
-                _log.debug("STREAM CONNECT failed: " + e.getMessage());
-                return writeString("STREAM STATUS RESULT=INVALID_DIRECTION ID="
-                                   + id + "\n");
-            } catch (ConnectException e) {
-                _log.debug("STREAM CONNECT failed: " + e.getMessage());
-                return writeString("STREAM STATUS RESULT=CONNECTION_REFUSED ID="
-                                   + id + "\n");
-            } catch (NoRouteToHostException e) {
-                _log.debug("STREAM CONNECT failed: " + e.getMessage());
-                return writeString("STREAM STATUS RESULT=CANT_REACH_PEER ID="
-                                   + id + "\n");
-            } catch (InterruptedIOException e) {
-                _log.debug("STREAM CONNECT failed: " + e.getMessage());
-                return writeString("STREAM STATUS RESULT=TIMEOUT ID="
-                                   + id + "\n");
-            } catch (I2PException e) {
-                _log.debug("STREAM CONNECT failed: " + e.getMessage());
-                return writeString("STREAM STATUS RESULT=I2P_ERROR ID="
-                                   + id + "\n");
-            }
+            return execStreamConnect(props);
         } else if (opcode.equals("CLOSE")) {
-            if (props == null) {
-                _log.debug("No parameters specified in STREAM CLOSE message");
-                return false;
-            }
-            
-            int id;
-            {
-                String strid = props.getProperty("ID");
-                if (strid == null) {
-                    _log.debug("ID not specified in STREAM CLOSE message");
-                    return false;
-                }
-                try {
-                    id = Integer.parseInt(strid);
-                } catch (NumberFormatException e) {
-                    _log.debug("Invalid STREAM CLOSE ID specified: " +strid);
-                    return false;
-                }
-            }
-
-            return streamSession.closeConnection(id);
+            return execStreamClose(props);
         } else {
             _log.debug("Unrecognized RAW message opcode: \""
                        + opcode + "\"");
             return false;
         }
+    }
+            
+    private boolean execStreamSend(Properties props) {
+        if (props == null) {
+            _log.debug("No parameters specified in STREAM SEND message");
+            return false;
+        }
+
+        int id;
+        {
+            String strid = props.getProperty("ID");
+            if (strid == null) {
+                _log.debug("ID not specified in STREAM SEND message");
+                return false;
+            }
+            try {
+                id = Integer.parseInt(strid);
+            } catch (NumberFormatException e) {
+                _log.debug("Invalid STREAM SEND ID specified: " + strid);
+                return false;
+            }
+        }
+
+        int size;
+        {
+            String strsize = props.getProperty("SIZE");
+            if (strsize == null) {
+                _log.debug("Size not specified in STREAM SEND message");
+                return false;
+            }
+            try {
+                size = Integer.parseInt(strsize);
+            } catch (NumberFormatException e) {
+                _log.debug("Invalid STREAM SEND size specified: "+strsize);
+                return false;
+            }
+            if (!checkSize(size)) {
+                _log.debug("Specified size (" + size
+                           + ") is out of protocol limits");
+                return false;
+            }
+        }
+
+        try {
+            DataInputStream in = new DataInputStream(getClientSocketInputStream());
+            byte[] data = new byte[size];
+
+            in.readFully(data);
+
+            if (!streamSession.sendBytes(id, data)) {
+                _log.error("STREAM SEND failed");
+                return false;
+            }
+
+            return true;
+        } catch (EOFException e) {
+            _log.debug("Too few bytes with RAW SEND message (expected: "
+                       + size);
+            return false;
+        } catch (IOException e) {
+            _log.debug("Caught IOException while parsing RAW SEND message",
+                       e);
+            return false;
+        }
+    }
+
+    private boolean execStreamConnect(Properties props) {
+        if (props == null) {
+            _log.debug("No parameters specified in STREAM CONNECT message");
+            return false;
+        }
+
+        int id;
+        {
+            String strid = props.getProperty("ID");
+            if (strid == null) {
+                _log.debug("ID not specified in STREAM SEND message");
+                return false;
+            }
+            try {
+                id = Integer.parseInt(strid);
+            } catch (NumberFormatException e) {
+                _log.debug("Invalid STREAM CONNECT ID specified: " +strid);
+                return false;
+            }
+            if (id < 1) {
+                _log.debug("Invalid STREAM CONNECT ID specified: " +strid);
+                return false;
+            }
+            props.remove("ID");
+        }
+
+        String dest = props.getProperty("DESTINATION");
+        if (dest == null) {
+            _log.debug("Destination not specified in RAW SEND message");
+            return false;
+        }
+        props.remove("DESTINATION");
+
+        try {
+            if (!streamSession.connect(id, dest, props)) {
+                _log.debug("STREAM connection failed");
+                return false;
+            }
+            return writeString("STREAM STATUS RESULT=OK ID=" + id + "\n");
+        } catch (DataFormatException e) {
+            _log.debug("Invalid destination in STREAM CONNECT message");
+            return writeString("STREAM STATUS RESULT=INVALID_KEY ID="
+                               + id + "\n");
+        } catch (SAMInvalidDirectionException e) {
+            _log.debug("STREAM CONNECT failed: " + e.getMessage());
+            return writeString("STREAM STATUS RESULT=INVALID_DIRECTION ID="
+                               + id + "\n");
+        } catch (ConnectException e) {
+            _log.debug("STREAM CONNECT failed: " + e.getMessage());
+            return writeString("STREAM STATUS RESULT=CONNECTION_REFUSED ID="
+                               + id + "\n");
+        } catch (NoRouteToHostException e) {
+            _log.debug("STREAM CONNECT failed: " + e.getMessage());
+            return writeString("STREAM STATUS RESULT=CANT_REACH_PEER ID="
+                               + id + "\n");
+        } catch (InterruptedIOException e) {
+            _log.debug("STREAM CONNECT failed: " + e.getMessage());
+            return writeString("STREAM STATUS RESULT=TIMEOUT ID="
+                               + id + "\n");
+        } catch (I2PException e) {
+            _log.debug("STREAM CONNECT failed: " + e.getMessage());
+            return writeString("STREAM STATUS RESULT=I2P_ERROR ID="
+                               + id + "\n");
+        }
+    }
+    
+    private boolean execStreamClose(Properties props) {
+        if (props == null) {
+            _log.debug("No parameters specified in STREAM CLOSE message");
+            return false;
+        }
+
+        int id;
+        {
+            String strid = props.getProperty("ID");
+            if (strid == null) {
+                _log.debug("ID not specified in STREAM CLOSE message");
+                return false;
+            }
+            try {
+                id = Integer.parseInt(strid);
+            } catch (NumberFormatException e) {
+                _log.debug("Invalid STREAM CLOSE ID specified: " +strid);
+                return false;
+            }
+        }
+
+        return streamSession.closeConnection(id);
     }
 
     /* Check whether a size is inside the limits allowed by this protocol */
