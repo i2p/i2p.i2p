@@ -291,7 +291,7 @@
 <v t="aum.20040814112703"><vh>spawnproc</vh></v>
 <v t="aum.20040814112703.1"><vh>killproc</vh></v>
 <v t="aum.20040814120624"><vh>i2psocket</vh></v>
-<v t="aum.20040813212609"><vh>usage</vh></v>
+<v t="aum.20040813212609" a="TV"><vh>usage</vh></v>
 <v t="aum.20040814015747"><vh>err</vh></v>
 <v t="aum.20040813211551"><vh>main</vh></v>
 </v>
@@ -306,7 +306,7 @@
 <v t="aum.20040814134235" a="E" tnodeList="aum.20040814134235,aum.20040814140643"><vh>@file-nosent stasher-launch.py</vh>
 <v t="aum.20040814140643"><vh>contents</vh></v>
 </v>
-<v t="aum.20040814133042" a="TV" tnodeList="aum.20040814133042"><vh>@file release.sh</vh></v>
+<v t="aum.20040814133042" tnodeList="aum.20040814133042"><vh>@file release.sh</vh></v>
 <v t="aum.20040814234015" tnodeList="aum.20040814234015"><vh>@file setup-stasher.py</vh></v>
 <v t="aum.20040815001048" a="E" tnodeList="aum.20040815001048,aum.20040815143611,aum.20040815143611.1,aum.20040815143611.2,aum.20040815143611.3"><vh>@file-nosent README.txt</vh>
 <v t="aum.20040815143611"><vh>installing-from-cvs</vh></v>
@@ -5271,7 +5271,7 @@ stasher.logToSocket = 19199
     print "  -C, --clientaddr=host:port - host:port for socket interface to listen on"
     print "                            for clients, default %s" % clientAddr
     print "  -d, --datadir=dir       - directory in which stasher files get written"
-    print "                            default is ~/.i2pstasher"
+    print "                            default is ~/.stasher"
     print "  -f, --foreground        - only valid for 'start' cmd - runs the node"
     print "                            in foreground without spawning - for debugging"
     print
@@ -5305,6 +5305,7 @@ stasher.logToSocket = 19199
     print
 
     sys.exit(0)
+
 
 </t>
 <t tx="aum.20040813232532"></t>

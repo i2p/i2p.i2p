@@ -4032,7 +4032,7 @@ def usage(detailed=False, ret=0):
     print "  -C, --clientaddr=host:port - host:port for socket interface to listen on"
     print "                            for clients, default %s" % clientAddr
     print "  -d, --datadir=dir       - directory in which stasher files get written"
-    print "                            default is ~/.i2pstasher"
+    print "                            default is ~/.stasher"
     print "  -f, --foreground        - only valid for 'start' cmd - runs the node"
     print "                            in foreground without spawning - for debugging"
     print
@@ -4066,6 +4066,7 @@ def usage(detailed=False, ret=0):
     print
 
     sys.exit(0)
+
 
 #@-node:usage
 #@+node:err
