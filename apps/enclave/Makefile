@@ -12,9 +12,9 @@ LOGDIR = log
 OBJDIR = obj
 SRCDIR = src
 
-SAMINCDIR = ../libsam/inc
-SAMLIBDIR = ../libsam/lib
-TOMCRYPTDIR = ../libtomcrypt-0.96
+SAMINCDIR = ../sam/c/inc
+SAMLIBDIR = ../sam/c/lib
+TOMCRYPTDIR = $(HOME)/libtomcrypt-0.96
 
 #
 # Programs

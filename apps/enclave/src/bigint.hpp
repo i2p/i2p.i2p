@@ -39,6 +39,7 @@ class Bigint {
 		Bigint(uint16_t i);
 		Bigint(uint32_t i);
 		~Bigint(void) { mp_clear(&mpi); }
+
 		uchar_t* export_uraw(size_t& size) const;
 		const mp_int& get_mp_int(void) const { return mpi; }
 		void import_uraw(const uchar_t* data, size_t size);
