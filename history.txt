@@ -1,4 +1,8 @@
-$Id: history.txt,v 1.176 2005/03/23 20:51:58 Connelly Exp $
+$Id: history.txt,v 1.177 2005/03/23 20:54:23 connelly Exp $
+
+2005-03-23  jrandom
+    * Added support for Transfer-Encoding: chunked to the EepGet, so that the
+      cvsweb.cgi doesn't puke on us.
 
 2005-03-23  Connelly
     * Fixed Bugzilla Bug #99 in the SAM Bridge, which caused pending

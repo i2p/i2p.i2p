@@ -47,6 +47,7 @@ public class EepGet {
     private long _bytesRemaining;
     private int _currentAttempt;
     private String _etag;
+    private boolean _encodingChunked;
     
     public EepGet(I2PAppContext ctx, String proxyHost, int proxyPort, int numRetries, String outputFile, String url) {
         this(ctx, true, proxyHost, proxyPort, numRetries, outputFile, url);
@@ -304,13 +305,16 @@ public class EepGet {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Headers read completely, reading " + _bytesRemaining);
 
+        int remaining = (int)_bytesRemaining;
         byte buf[] = new byte[1024];
-        while (_keepFetching) {
-            int read = _proxyIn.read(buf);
+        while (_keepFetching && remaining > 0) {
+            int toRead = buf.length;
+            int read = _proxyIn.read(buf, 0, (buf.length > remaining ? remaining : buf.length));
             if (read == -1)
                 break;
             _out.write(buf, 0, read);
             _bytesTransferred += read;
+            remaining -= read;
             if (read > 0) 
                 for (int i = 0; i < _listeners.size(); i++) 
                     ((StatusListener)_listeners.get(i)).bytesTransferred(_alreadyTransferred, read, _bytesTransferred, _bytesRemaining, _url);
@@ -323,7 +327,7 @@ public class EepGet {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Done transferring " + _bytesTransferred);
 
-        if (_bytesRemaining == _bytesTransferred) {
+        if ( (_bytesRemaining == -1) || (remaining == 0) ){
             for (int i = 0; i < _listeners.size(); i++) 
                 ((StatusListener)_listeners.get(i)).transferComplete(_alreadyTransferred, _bytesTransferred, _bytesRemaining, _url, _outputFile);
         } else {
@@ -385,6 +389,9 @@ public class EepGet {
                     if (isEndOfHeaders(lookahead)) {
                         if (!rcOk)
                             throw new IOException("Invalid HTTP response code: " + responseCode);
+                        if (_encodingChunked) {
+                            readChunkLength();
+                        }
                         return;
                     }
                     break;
@@ -395,6 +402,36 @@ public class EepGet {
             
             if (buf.length() > 1024)
                 throw new IOException("Header line too long: " + buf.toString());
+        }
+    }
+    
+    private void readChunkLength() throws IOException {
+        StringBuffer buf = new StringBuffer(8);
+        int nl = 0;
+        while (true) {
+            int cur = _proxyIn.read();
+            switch (cur) {
+                case -1: 
+                    throw new IOException("Chunk ended too soon");
+                case '\n':
+                case '\r':
+                    nl++;
+                default:
+                    buf.append((char)cur);
+            }
+            
+            if (nl >= 2)
+                break;
+        }
+        
+        String len = buf.toString().trim();
+        try {
+            long bytes = Long.parseLong(len, 16);
+            _bytesRemaining = bytes;
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Chunked length: " + bytes);
+        } catch (NumberFormatException nfe) {
+            throw new IOException("Invalid chunk length [" + len + "]");
         }
     }
 
@@ -438,6 +475,9 @@ public class EepGet {
             }
         } else if (key.equalsIgnoreCase("ETag")) {
             _etag = val.trim();
+        } else if (key.equalsIgnoreCase("Transfer-encoding")) {
+            if (val.indexOf("chunked") != -1)
+                _encodingChunked = true;
         } else {
             // ignore the rest
         }
@@ -505,6 +545,7 @@ public class EepGet {
             buf.append(_alreadyTransferred);
             buf.append("-\n");
         }
+        buf.append("Accept-Encoding: identity;q=1, *;q=0\n");
         buf.append("Connection: close\n\n");
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Request: [" + buf.toString() + "]");
