@@ -84,6 +84,7 @@ public class I2PSocketManager implements I2PSessionListener {
 
     public void disconnected(I2PSession session) {
         _log.info("Disconnected from the session");
+        destroySocketManager();
     }
 
     public void errorOccurred(I2PSession session, String message, Throwable error) {
