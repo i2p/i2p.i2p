@@ -27,7 +27,7 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id$
+ * $Id: socket_addr.hpp,v 1.3 2004/07/22 03:54:01 mpc Exp $
  */
 
 #ifndef LIBSOCKTHREAD_SOCKET_ADDR_HPP
@@ -36,21 +36,23 @@
 namespace Libsockthread {
 	class Socket_addr {
 		public:
+			Socket_addr(Socket_addr& rhs);
 			Socket_addr(int domain, int type, string& host, uint16_t port)
 				: domain(domain), host(host), type(type), port(port)
 				{ resolve(); }  // throws Socket_error
 			~Socket_addr()
 				{ delete[] ip; }
 
-			int get_domain() const  // Has nothing to do with DNS domain
-				{ return domain; }
+			int get_domain() const  // Has nothing to do with DNS domain -
+				{ return domain; }  // returns either AF_INET or AF_INET6
 			const char* get_ip() const  // Warning!  This can be NULL!
 				{ return ip; }
 			uint16_t get_port() const
 				{ return port; }
 			int get_type() const
 				{ return type;
-			Socket_addr& Socket_addr::operator=(const Socket_addr& rhs);
+			Socket_addr& operator=(const Socket_addr& rhs);
+			bool operator==(const Socket_addr& rhs);
 			void set_domain(int domain)
 				{ this->domain = domain; }
 			void set_host(string& host)  // throws Socket_error
@@ -60,7 +62,7 @@ namespace Libsockthread {
 			void set_type(int type)
 				{ this->type = type; }
 		private:
-			void resolve();
+			void resolve();  // throws Socket_error
 
 			int domain;
 			string host;

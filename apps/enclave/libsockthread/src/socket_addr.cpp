@@ -27,7 +27,7 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id$
+ * $Id: socket_addr.cpp,v 1.3 2004/07/22 03:54:01 mpc Exp $
  */
 
 #include "platform.hpp"
@@ -35,12 +35,27 @@
 #include "socket_addr.hpp"
 using namespace Libsockthread;
 
+Socket_addr::Socket_addr(Socket_addr& rhs)
+{
+	delete[] ip;
+	if (rhs.domain == AF_INET) {
+		ip = new char[INET_ADDRSTRLEN];
+	else
+		ip = new char[INET6_ADDRSTRLEN];
+	domain = rhs.domain;
+	host = rhs.host;
+	strcpy(ip, rhs.ip);
+	port = rhs.port;
+	type = rhs.type;
+}
+
 Socket_addr& Socket_addr::operator=(const Socket_addr& rhs)
 {
-	if (this == &rhs) // check for self-assignment: a = a
+	if (this == &rhs)  // check for self-assignment: a = a
 		return *this;
 
-	if (rhs.domain == AF_INET) {
+	delete[] ip;
+	if (rhs.domain == AF_INET)
 		ip = new char[INET_ADDRSTRLEN];
 	else
 		ip = new char[INET6_ADDRSTRLEN];
@@ -53,6 +68,9 @@ Socket_addr& Socket_addr::operator=(const Socket_addr& rhs)
 	return *this;
 }
 
+/*
+ * Performs a DNS lookup
+ */
 void Socket_addr::resolve()
 {
 	hostent* hent = gethostbyname(host.c_str());
@@ -60,9 +78,22 @@ void Socket_addr::resolve()
 		throw Socket_error(hstrerror(h_errno));
 	assert(hent->h_addrtype == AF_INET || hent->h_addrtype == AF_INET6);
 	domain = hent->h_addrtype;
+	delete[] ip;
 	if (domain == AF_INET) {
 		ip = new char[INET_ADDRSTRLEN];
 	else
 		ip = new char[INET6_ADDRSTRLEN];
 	strcpy(ip, hent->h_addr_list[0]);
+}
+
+bool Socket_addr::operator==(const Socket_addr& rhs)
+{
+	if (rhs.domain == domain
+			&& rhs.host == host
+			&& strcmp(rhs.ip, ip) == 0
+			&& rhs.port == port
+			&& rhs.type == type)
+		return true;
+	else
+		return false;
 }
