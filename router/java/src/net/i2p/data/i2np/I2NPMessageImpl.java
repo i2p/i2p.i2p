@@ -36,7 +36,7 @@ public abstract class I2NPMessageImpl extends DataStructureImpl implements I2NPM
         _context = context;
         _log = context.logManager().getLog(I2NPMessageImpl.class);
         _expiration = new Date(_context.clock().now() + DEFAULT_EXPIRATION_MS);
-        _uniqueId = _context.random().nextInt(Integer.MAX_VALUE);
+        _uniqueId = _context.random().nextLong(MAX_ID_VALUE);
     }
     
     /**

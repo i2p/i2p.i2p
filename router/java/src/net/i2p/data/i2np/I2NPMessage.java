@@ -20,6 +20,8 @@ import net.i2p.data.DataStructure;
  * @author jrandom
  */
 public interface I2NPMessage extends DataStructure {
+    final long MAX_ID_VALUE = (1l<<32l)-1l;
+    
     /**
      * Read the body into the data structures, after the initial type byte, using
      * the current class's format as defined by the I2NP specification

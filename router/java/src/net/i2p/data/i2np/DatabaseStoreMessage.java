@@ -98,7 +98,18 @@ public class DatabaseStoreMessage extends I2NPMessageImpl {
      * @return positive reply token ID, or 0 if no reply is necessary.
      */
     public long getReplyToken() { return _replyToken; }
-    public void setReplyToken(long token) { _replyToken = token; }
+    /**
+     * Update the reply token.
+     *
+     * @throws IllegalArgumentException if the token is out of range (min=0, max=I2NPMessage.MAX_ID_VALUE)
+     */
+    public void setReplyToken(long token) throws IllegalArgumentException { 
+        if (token > I2NPMessage.MAX_ID_VALUE)
+            throw new IllegalArgumentException("Token too large: " + token + " (max=" + I2NPMessage.MAX_ID_VALUE + ")");
+        else if (token < 0) 
+            throw new IllegalArgumentException("Token too small: " + token);
+        _replyToken = token; 
+    }
     
     public TunnelId getReplyTunnel() { return _replyTunnel; } 
     public void setReplyTunnel(TunnelId id) { _replyTunnel = id; }
