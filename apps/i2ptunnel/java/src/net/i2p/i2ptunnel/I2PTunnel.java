@@ -46,6 +46,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Properties;
 import java.util.Set;
 import java.util.StringTokenizer;
 
@@ -69,6 +70,7 @@ public class I2PTunnel implements Logging, EventDispatcher {
     private I2PAppContext _context;
     private static long __tunnelId = 0;
     private long _tunnelId;
+    private Properties _clientOptions;
 
     public static final int PACKET_DELAY = 100;
 
@@ -104,6 +106,9 @@ public class I2PTunnel implements Logging, EventDispatcher {
         _tunnelId = ++__tunnelId;
         _log = _context.logManager().getLog(I2PTunnel.class);
         _event = new EventDispatcherImpl();
+        _clientOptions = new Properties();
+        _clientOptions.putAll(System.getProperties());
+        
         addConnectionEventListener(lsnr);
         boolean gui = true;
         boolean checkRunByE = true;
@@ -167,6 +172,8 @@ public class I2PTunnel implements Logging, EventDispatcher {
         }
     }
 
+    public Properties getClientOptions() { return _clientOptions; }
+    
     private void addtask(I2PTunnelTask tsk) {
         tsk.setTunnel(this);
         if (tsk.isOpen()) {
@@ -197,6 +204,8 @@ public class I2PTunnel implements Logging, EventDispatcher {
 
         if ("help".equals(cmdname)) {
             runHelp(l);
+        } else if ("clientoptions".equals(cmdname)) {
+            runClientOptions(args, l);
         } else if ("server".equals(cmdname)) {
             runServer(args, l);
         } else if ("textserver".equals(cmdname)) {
@@ -262,6 +271,29 @@ public class I2PTunnel implements Logging, EventDispatcher {
         l.log("list");
         l.log("run <commandfile>");
     }
+    
+    /**
+     * Configure the extra I2CP options to use in any subsequent I2CP sessions.
+     * Usage: "clientoptions[ key=value]*" .  
+     *
+     * Sets the event "clientoptions_onResult" = "ok" after completion.
+     *
+     * @param args each args[i] is a key=value pair to add to the options
+     * @param l logger to receive events and output
+     */
+    public void runClientOptions(String args[], Logging l) {
+        _clientOptions.clear();
+        if (args != null) {
+            for (int i = 0; i < args.length; i++) {
+                int index = args[i].indexOf('=');
+                if (index <= 0) continue;
+                String key = args[i].substring(0, index);
+                String val = args[i].substring(index+1);
+                _clientOptions.setProperty(key, val);
+            }
+        }
+        notifyEvent("clientoptions_onResult", "ok");
+    }
 
     /**
      * Run the server pointing at the host and port specified using the private i2p
@@ -304,7 +336,7 @@ public class I2PTunnel implements Logging, EventDispatcher {
                 notifyEvent("serverTaskId", new Integer(-1));
                 return;
             }
-            I2PTunnelServer serv = new I2PTunnelServer(serverHost, portNum, privKeyFile, args[2], l, (EventDispatcher) this);
+            I2PTunnelServer serv = new I2PTunnelServer(serverHost, portNum, privKeyFile, args[2], l, (EventDispatcher) this, this);
             serv.setReadTimeout(readTimeout);
             serv.startRunning();
             addtask(serv);
@@ -350,7 +382,7 @@ public class I2PTunnel implements Logging, EventDispatcher {
                 return;
             }
 
-            I2PTunnelServer serv = new I2PTunnelServer(serverHost, portNum, args[2], l, (EventDispatcher) this);
+            I2PTunnelServer serv = new I2PTunnelServer(serverHost, portNum, args[2], l, (EventDispatcher) this, this);
             serv.setReadTimeout(readTimeout);
             serv.startRunning();
             addtask(serv);
@@ -386,7 +418,7 @@ public class I2PTunnel implements Logging, EventDispatcher {
                 return;
             }
             I2PTunnelTask task;
-            task = new I2PTunnelClient(port, args[1], l, ownDest, (EventDispatcher) this);
+            task = new I2PTunnelClient(port, args[1], l, ownDest, (EventDispatcher) this, this);
             addtask(task);
             notifyEvent("clientTaskId", new Integer(task.getId()));
         } else {
@@ -423,7 +455,7 @@ public class I2PTunnel implements Logging, EventDispatcher {
                 proxy = args[1];
             }
             I2PTunnelTask task;
-            task = new I2PTunnelHTTPClient(port, l, ownDest, proxy, (EventDispatcher) this);
+            task = new I2PTunnelHTTPClient(port, l, ownDest, proxy, (EventDispatcher) this, this);
             addtask(task);
             notifyEvent("httpclientTaskId", new Integer(task.getId()));
         } else {
@@ -460,7 +492,7 @@ public class I2PTunnel implements Logging, EventDispatcher {
             }
 
             I2PTunnelTask task;
-            task = new I2PSOCKSTunnel(port, l, ownDest, (EventDispatcher) this);
+            task = new I2PSOCKSTunnel(port, l, ownDest, (EventDispatcher) this, this);
             addtask(task);
             notifyEvent("sockstunnelTaskId", new Integer(task.getId()));
         } else {
@@ -779,7 +811,7 @@ public class I2PTunnel implements Logging, EventDispatcher {
         if (allargs.length() != 0) {
             I2PTunnelTask task;
             // pings always use the main destination
-            task = new I2Ping(allargs, l, false, (EventDispatcher) this);
+            task = new I2Ping(allargs, l, false, (EventDispatcher) this, this);
             addtask(task);
             notifyEvent("pingTaskId", new Integer(task.getId()));
         } else {

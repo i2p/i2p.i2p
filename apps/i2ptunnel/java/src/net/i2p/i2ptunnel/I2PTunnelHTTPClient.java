@@ -81,8 +81,8 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
     /** used to assign unique IDs to the threads / clients.  no logic or functionality */
     private static volatile long __clientId = 0;
     
-    public I2PTunnelHTTPClient(int localPort, Logging l, boolean ownDest, String wwwProxy, EventDispatcher notifyThis) {
-        super(localPort, ownDest, l, notifyThis, "HTTPHandler " + (++__clientId));
+    public I2PTunnelHTTPClient(int localPort, Logging l, boolean ownDest, String wwwProxy, EventDispatcher notifyThis, I2PTunnel tunnel) {
+        super(localPort, ownDest, l, notifyThis, "HTTPHandler " + (++__clientId), tunnel);
 
         if (waitEventValue("openBaseClientResult").equals("error")) {
             notifyEvent("openHTTPClientResult", "error");
@@ -127,7 +127,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
                     if (pos == -1) break;
                     method = line.substring(0, pos);
                     String request = line.substring(pos + 1);
-                    if (request.startsWith("/") && System.getProperty("i2ptunnel.noproxy") != null) {
+                    if (request.startsWith("/") && getTunnel().getClientOptions().getProperty("i2ptunnel.noproxy") != null) {
                         request = "http://i2p" + request;
                     }
                     pos = request.indexOf("//");

@@ -60,8 +60,8 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
     //    I2PTunnelClientBase(localPort, ownDest, l, (EventDispatcher)null);
     //}
 
-    public I2PTunnelClientBase(int localPort, boolean ownDest, Logging l, EventDispatcher notifyThis, String handlerName) {
-        super(localPort + " (uninitialized)", notifyThis);
+    public I2PTunnelClientBase(int localPort, boolean ownDest, Logging l, EventDispatcher notifyThis, String handlerName, I2PTunnel tunnel) {
+        super(localPort + " (uninitialized)", notifyThis, tunnel);
         _clientId = ++__clientId;
         this.localPort = localPort;
         this.l = l;
@@ -103,16 +103,25 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
 
     private static I2PSocketManager socketManager;
 
-    protected static synchronized I2PSocketManager getSocketManager() {
+    protected synchronized I2PSocketManager getSocketManager() {
+        return getSocketManager(getTunnel());
+    }
+    protected static synchronized I2PSocketManager getSocketManager(I2PTunnel tunnel) {
         if (socketManager == null) {
-            socketManager = buildSocketManager();
+            socketManager = buildSocketManager(tunnel);
         }
         return socketManager;
     }
 
-    protected static I2PSocketManager buildSocketManager() {
+    protected I2PSocketManager buildSocketManager() {
+        return buildSocketManager(getTunnel());
+    }
+    protected static I2PSocketManager buildSocketManager(I2PTunnel tunnel) {
         Properties props = new Properties();
-        props.putAll(System.getProperties());
+        if (tunnel == null)
+            props.putAll(System.getProperties());
+        else
+            props.putAll(tunnel.getClientOptions());
         I2PSocketManager sockManager = I2PSocketManagerFactory.createManager(I2PTunnel.host, Integer.parseInt(I2PTunnel.port), props);
         sockManager.setName("Client");
         return sockManager;

@@ -45,15 +45,15 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
     /** default timeout to 3 minutes - override if desired */
     private long readTimeout = DEFAULT_READ_TIMEOUT;
 
-    public I2PTunnelServer(InetAddress host, int port, String privData, Logging l, EventDispatcher notifyThis) {
-        super(host + ":" + port + " <- " + privData, notifyThis);
+    public I2PTunnelServer(InetAddress host, int port, String privData, Logging l, EventDispatcher notifyThis, I2PTunnel tunnel) {
+        super(host + ":" + port + " <- " + privData, notifyThis, tunnel);
         ByteArrayInputStream bais = new ByteArrayInputStream(Base64.decode(privData));
         init(host, port, bais, privData, l);
     }
 
     public I2PTunnelServer(InetAddress host, int port, File privkey, String privkeyname, Logging l,
-                           EventDispatcher notifyThis) {
-        super(host + ":" + port + " <- " + privkeyname, notifyThis);
+                           EventDispatcher notifyThis, I2PTunnel tunnel) {
+        super(host + ":" + port + " <- " + privkeyname, notifyThis, tunnel);
         try {
             init(host, port, new FileInputStream(privkey), privkeyname, l);
         } catch (IOException ioe) {
@@ -62,8 +62,8 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
         }
     }
 
-    public I2PTunnelServer(InetAddress host, int port, InputStream privData, String privkeyname, Logging l,  EventDispatcher notifyThis) {
-        super(host + ":" + port + " <- " + privkeyname, notifyThis);
+    public I2PTunnelServer(InetAddress host, int port, InputStream privData, String privkeyname, Logging l,  EventDispatcher notifyThis, I2PTunnel tunnel) {
+        super(host + ":" + port + " <- " + privkeyname, notifyThis, tunnel);
         init(host, port, privData, privkeyname, l);
     }
 
@@ -73,7 +73,7 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
         this.remotePort = port;
         I2PClient client = I2PClientFactory.createClient();
         Properties props = new Properties();
-        props.putAll(System.getProperties());
+        props.putAll(getTunnel().getClientOptions());
         synchronized (slock) {
             sockMgr = I2PSocketManagerFactory.createManager(privData, I2PTunnel.host, Integer.parseInt(I2PTunnel.port),
                                                             props);

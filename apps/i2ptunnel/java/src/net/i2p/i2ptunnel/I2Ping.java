@@ -47,15 +47,15 @@ public class I2Ping extends I2PTunnelTask implements Runnable {
     //	I2Ping(cmd, l, (EventDispatcher)null);
     //}
 
-    public I2Ping(String cmd, Logging l, boolean ownDest, EventDispatcher notifyThis) {
-        super("I2Ping [" + cmd + "]", notifyThis);
+    public I2Ping(String cmd, Logging l, boolean ownDest, EventDispatcher notifyThis, I2PTunnel tunnel) {
+        super("I2Ping [" + cmd + "]", notifyThis, tunnel);
         this.l = l;
         command = cmd;
         synchronized (slock) {
             if (ownDest) {
-                sockMgr = I2PTunnelClient.buildSocketManager();
+                sockMgr = I2PTunnelClient.buildSocketManager(tunnel);
             } else {
-                sockMgr = I2PTunnelClient.getSocketManager();
+                sockMgr = I2PTunnelClient.getSocketManager(tunnel);
             }
         }
         Thread t = new I2PThread(this);

@@ -26,16 +26,19 @@ public abstract class I2PTunnelTask implements EventDispatcher {
     //	I2PTunnelTask(name, (EventDispatcher)null);
     //}
 
-    protected I2PTunnelTask(String name, EventDispatcher notifyThis) {
+    protected I2PTunnelTask(String name, EventDispatcher notifyThis, I2PTunnel tunnel) {
         attachEventDispatcher(notifyThis);
         this.name = name;
         this.id = -1;
+        this.tunnel = tunnel;
     }
 
     /** for apps that use multiple I2PTunnel instances */
     public void setTunnel(I2PTunnel pTunnel) {
         tunnel = pTunnel;
     }
+    
+    public I2PTunnel getTunnel() { return tunnel; }
 
     public int getId() {
         return this.id;

@@ -10,6 +10,7 @@ import java.net.Socket;
 
 import net.i2p.client.streaming.I2PSocket;
 import net.i2p.data.Destination;
+import net.i2p.i2ptunnel.I2PTunnel;
 import net.i2p.i2ptunnel.I2PTunnelClientBase;
 import net.i2p.i2ptunnel.I2PTunnelRunner;
 import net.i2p.i2ptunnel.Logging;
@@ -26,8 +27,8 @@ public class I2PSOCKSTunnel extends I2PTunnelClientBase {
     //	  I2PSOCKSTunnel(localPort, l, ownDest, (EventDispatcher)null);
     //}
 
-    public I2PSOCKSTunnel(int localPort, Logging l, boolean ownDest, EventDispatcher notifyThis) {
-        super(localPort, ownDest, l, notifyThis, "SOCKSHandler");
+    public I2PSOCKSTunnel(int localPort, Logging l, boolean ownDest, EventDispatcher notifyThis, I2PTunnel tunnel) {
+        super(localPort, ownDest, l, notifyThis, "SOCKSHandler", tunnel);
 
         if (waitEventValue("openBaseClientResult").equals("error")) {
             notifyEvent("openSOCKSTunnelResult", "error");

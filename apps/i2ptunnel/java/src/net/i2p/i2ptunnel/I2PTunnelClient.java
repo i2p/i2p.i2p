@@ -19,8 +19,8 @@ public class I2PTunnelClient extends I2PTunnelClientBase {
     private static final long DEFAULT_READ_TIMEOUT = 5*60*1000; // -1
     protected long readTimeout = DEFAULT_READ_TIMEOUT;
 
-    public I2PTunnelClient(int localPort, String destination, Logging l, boolean ownDest, EventDispatcher notifyThis) {
-        super(localPort, ownDest, l, notifyThis, "SynSender");
+    public I2PTunnelClient(int localPort, String destination, Logging l, boolean ownDest, EventDispatcher notifyThis, I2PTunnel tunnel) {
+        super(localPort, ownDest, l, notifyThis, "SynSender", tunnel);
 
         if (waitEventValue("openBaseClientResult").equals("error")) {
             notifyEvent("openClientResult", "error");
