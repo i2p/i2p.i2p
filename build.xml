@@ -37,6 +37,7 @@
         <copy file="router/java/build/router.jar" todir="build/" />
         <copy file="apps/ministreaming/java/build/mstreaming.jar" todir="build/" />
         <copy file="apps/i2ptunnel/java/build/i2ptunnel.jar" todir="build/" />
+        <copy file="apps/i2ptunnel/java/build/i2ptunnel.war" todir="build/" />
         <copy file="apps/httptunnel/java/build/httptunnel.jar" todir="build/" />
         <copy file="apps/phttprelay/java/build/phttprelay.war" todir="build/" />
         <copy file="apps/sam/java/build/sam.jar" todir="build/" />

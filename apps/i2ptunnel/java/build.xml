@@ -22,6 +22,12 @@
                 <attribute name="Class-Path" value="i2p.jar mstreaming.jar" />
             </manifest>
         </jar>
+        <ant target="war" />
+    </target>
+    <target name="war"> 
+        <war destfile="build/i2ptunnel.war" webxml="../jsp/web.xml"
+             basedir="../jsp/" excludes="web.xml">
+        </war>
     </target>
     <target name="javadoc">
         <mkdir dir="./build" />
