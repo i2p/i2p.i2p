@@ -32,15 +32,19 @@ fi
 case $HOST_OS in
     debian | fedora | gentoo | linux | mandrake | redhat | suse )
         wrapperpath="./lib/wrapper/linux"
+        cp $wrapperpath/libwrapper.so ./lib/
         ;;
     freebsd )
         wrapperpath="./lib/wrapper/freebsd"
+        cp $wrapperpath/libwrapper.so ./lib/
         ;;
     osx )
         wrapperpath="./lib/wrapper/macosx"
+        cp $wrapperpath/libwrapper.jnilib ./lib/
         ;;
     solaris )
         wrapperpath="./lib/wrapper/solaris"
+        cp $wrapperpath/libwrapper.so ./lib/
         ;;
     * )
         echo "$ERROR_MSG"
@@ -48,8 +52,8 @@ case $HOST_OS in
         ;;
 esac
 
+cp $wrapperpath/wrapper.jar ./lib/
 cp $wrapperpath/i2psvc .
 chmod 744 ./i2psvc
-cp $wrapperpath/* ./lib/
 ./i2prouter start
 exit 0
