@@ -1,4 +1,4 @@
-$Id: readme.txt,v 1.5 2004/03/21 20:03:54 jrandom Exp $
+$Id: readme.txt,v 1.1.1.1 2004/04/07 23:41:54 jrandom Exp $
 I2P Router 0.3
 
 You have installed a development release of I2P - a variable latency secure 
@@ -25,8 +25,9 @@ windows), and its management console can be seen via http://localhost:7655/
 
 Once your router has started up, it may take a few minutes to get integrated 
 with the network (you'll see a few TCP connections listed on the management 
-console).  At that point, you can start up any of the various proxies:
-* startEepProxy: starts an HTTP proxy to access eepsites.  Set your browser's 
+console).  At that point, you can use any of the various proxies:
+* eepProxy: this proxy is launched automatically 2 minutes after you start
+  your router, it starts an HTTP proxy to access eepsites.  Set your browser's 
   HTTP proxy to localhost:4444 and you can browse various anonymously hosted 
   sites, ala http://duck.i2p/.  In addition, the default proxy is set up to
   tunnel any HTTP requests that don't point at an eepsite (e.g. http://i2p.net/)
@@ -53,13 +54,11 @@ If you still have problems, get in touch with the I2P team (contact info below)
 
 === Resources / contact info
 
-I2P is currently revamping our website, so the two main resources are 
-http://i2p.net/ and http://wiki.invisiblenet.net/iip-wiki?I2P (our website's
-work-in-progress location is http://drupal.i2p.net/ for those who want to see 
-whats coming down the pipe).  The development and user community hangs out on
-a few different linked irc chats - IIP's #i2p, freenode.net's #i2p, and the 
-in-I2P irc network's #i2p (both irc.baffled.i2p and irc.duck.i2p).  All of those
-channels are hooked together, so join whichever one meets your needs.
+Our website can be found at http://www.i2p.net/
+The development and user community hangs out on a few different linked irc
+chats - IIP's #i2p, freenode.net's #i2p, and the in-I2P irc network's #i2p
+(both irc.baffled.i2p and irc.duck.i2p).  All of those channels are hooked
+together, so join whichever one meets your needs.
 
 There is also a relatively low traffic mailing list:
 http://i2p.net/mailman/listinfo/i2p with archives at
@@ -78,11 +77,11 @@ The password is "anoncvs".
 We are a small group of volunteers spread around several continents, working to 
 advance different aspects of the project and discussing the design of the 
 network.  For a current list of team members, please see 
-http://drupal.i2p.net/team
+http://www.i2p.net/team
 
 === Licenses
 
 All code included here is released under an open source license.  To review
-the I2P license policy, please see http://drupal.i2p.net/node/view/66.
+the I2P license policy, please see http://www.i2p.net/node/view/66.
 If there is any confusion, please see the source code or contact the 
 developers on the i2p list.
