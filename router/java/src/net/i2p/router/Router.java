@@ -666,7 +666,7 @@ public class Router {
         if (exp < 0)
             return -1;
         else
-            return exp - _context.clock().now();
+            return exp + 2*CLOCK_FUDGE_FACTOR - _context.clock().now();
     }
     
     /**
