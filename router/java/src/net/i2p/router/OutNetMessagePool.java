@@ -54,7 +54,8 @@ public class OutNetMessagePool {
     private boolean validate(OutNetMessage msg) {
         if (msg == null) return false;
         if (msg.getMessage() == null) {
-            _log.error("Null message in the OutNetMessage: " + msg, new Exception("Someone fucked up"));
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Null message in the OutNetMessage - expired too soon");
             return false;
         }
         if (msg.getTarget() == null) {

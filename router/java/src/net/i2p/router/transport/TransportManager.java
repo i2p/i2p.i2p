@@ -9,6 +9,7 @@ package net.i2p.router.transport;
  */
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -174,7 +175,9 @@ public class TransportManager implements TransportEventListener {
     private List orderBids(HashSet bids, OutNetMessage msg) {
         // db messages should go as fast as possible, while the others
         // should use as little bandwidth as possible.  
-        switch (msg.getMessage().getType()) {
+        I2NPMessage message = msg.getMessage();
+        if (message == null) return Collections.EMPTY_LIST;
+        switch (message.getType()) {
             case DatabaseLookupMessage.MESSAGE_TYPE:
             case DatabaseSearchReplyMessage.MESSAGE_TYPE:
             case DatabaseStoreMessage.MESSAGE_TYPE:

@@ -14,10 +14,9 @@ import net.i2p.router.peermanager.ProfileManagerImpl;
 import net.i2p.router.peermanager.ProfileOrganizer;
 import net.i2p.router.peermanager.ReliabilityCalculator;
 import net.i2p.router.peermanager.SpeedCalculator;
-import net.i2p.router.transport.BandwidthLimiter;
+import net.i2p.router.transport.FIFOBandwidthLimiter;
 import net.i2p.router.transport.CommSystemFacadeImpl;
 import net.i2p.router.transport.OutboundMessageRegistry;
-import net.i2p.router.transport.TrivialBandwidthLimiter;
 import net.i2p.router.transport.VMCommSystem;
 import net.i2p.router.tunnelmanager.PoolingTunnelManagerFacade;
 
@@ -44,7 +43,7 @@ public class RouterContext extends I2PAppContext {
     private ProfileOrganizer _profileOrganizer;
     private PeerManagerFacade _peerManagerFacade;
     private ProfileManager _profileManager;
-    private BandwidthLimiter _bandwidthLimiter;
+    private FIFOBandwidthLimiter _bandwidthLimiter;
     private TunnelManagerFacade _tunnelManager;
     private StatisticsManager _statPublisher;
     private Shitlist _shitlist;
@@ -79,7 +78,7 @@ public class RouterContext extends I2PAppContext {
         _profileOrganizer = new ProfileOrganizer(this);
         _peerManagerFacade = new PeerManagerFacadeImpl(this);
         _profileManager = new ProfileManagerImpl(this);
-        _bandwidthLimiter = new TrivialBandwidthLimiter(this);
+        _bandwidthLimiter = new FIFOBandwidthLimiter(this);
         _tunnelManager = new PoolingTunnelManagerFacade(this);
         _statPublisher = new StatisticsManager(this);
         _shitlist = new Shitlist(this);
@@ -169,7 +168,7 @@ public class RouterContext extends I2PAppContext {
     /**
      * Coordinate this router's bandwidth limits
      */
-    public BandwidthLimiter bandwidthLimiter() { return _bandwidthLimiter; }
+    public FIFOBandwidthLimiter bandwidthLimiter() { return _bandwidthLimiter; }
     /**
      * Coordinate this router's tunnels (its pools, participation, backup, etc).
      * Any configuration for the tunnels is rooted from the context's properties

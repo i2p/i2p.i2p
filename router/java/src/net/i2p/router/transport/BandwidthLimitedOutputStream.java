@@ -18,6 +18,7 @@ import net.i2p.util.Log;
 
 public class BandwidthLimitedOutputStream extends FilterOutputStream {
     private RouterIdentity _peer;
+    private String _peerTarget;
     private RouterContext _context;
     private Log _log;
     
@@ -25,15 +26,14 @@ public class BandwidthLimitedOutputStream extends FilterOutputStream {
         super(source);
         _context = context;
         _peer = peer;
+        _peerTarget = peer.getHash().toBase64();
         _log = context.logManager().getLog(BandwidthLimitedOutputStream.class);
     }
-    
-    private final static int CHUNK_SIZE = 1024;
     
     public void write(int val) throws IOException {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Writing a single byte!", new Exception("Single byte from..."));
-        _context.bandwidthLimiter().delayOutbound(_peer, 1, false);
+        _context.bandwidthLimiter().requestOutbound(1, _peerTarget);
         out.write(val);
     }
     public void write(byte src[]) throws IOException {
@@ -47,21 +47,7 @@ public class BandwidthLimitedOutputStream extends FilterOutputStream {
         if (len + off > src.length)
             throw new IllegalArgumentException("wtf are you thinking?  len=" + len 
                                                + ", off=" + off + ", data=" + src.length);
-        if (len <= CHUNK_SIZE) {
-            _context.bandwidthLimiter().delayOutbound(_peer, len, false);
-            out.write(src, off, len);
-        } else {
-            int i = 0;
-            while (i+CHUNK_SIZE < len) {
-                _context.bandwidthLimiter().delayOutbound(_peer, CHUNK_SIZE, false);
-                out.write(src, off+i, CHUNK_SIZE);
-                i += CHUNK_SIZE;
-            }
-            int remainder = (len % CHUNK_SIZE);
-            if (remainder > 0) {
-                _context.bandwidthLimiter().delayOutbound(_peer, remainder, false);
-                out.write(src, i, remainder);
-            }
-        }
+        _context.bandwidthLimiter().requestOutbound(len, _peerTarget);
+        out.write(src, off, len);
     }
 }

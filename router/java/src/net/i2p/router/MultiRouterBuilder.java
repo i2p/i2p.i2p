@@ -125,8 +125,11 @@ public class MultiRouterBuilder {
         baseDir.mkdirs();
         File cfgFile = new File(baseDir, "router.config");
         StringBuffer buf = new StringBuffer(8*1024);
-        buf.append("i2np.bandwidth.inboundBytesPerMinute=-60\n");
-        buf.append("i2np.bandwidth.outboundBytesPerMinute=-60\n");
+        buf.append("i2np.bandwidth.inboundKBytesPerSecond=8\n");
+        buf.append("i2np.bandwidth.outboundKBytesPerSecond=8\n");
+        buf.append("i2np.bandwidth.inboundBurstKBytes=80\n");
+        buf.append("i2np.bandwidth.outboundBurstKBytes=80\n");
+        buf.append("i2np.bandwidth.replenishFrequencyMs=1000\n");
         buf.append("router.publishPeerRankings=true\n");
         buf.append("router.keepHistory=false\n");
         buf.append("router.submitHistory=false\n");

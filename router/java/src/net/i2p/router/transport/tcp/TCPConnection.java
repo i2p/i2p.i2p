@@ -521,8 +521,9 @@ class TCPConnection implements I2NPMessageReader.I2NPMessageEventListener {
 
                 byte data[] = msg.getMessageData();
                 if (data == null) {
-                    if (_log.shouldLog(Log.ERROR))
-                        _log.error("wtf, for some reason, an I2NPMessage couldn't be serialized...");
+                    if (_log.shouldLog(Log.WARN))
+                        _log.warn("message " + msg.getMessageType() + "/" + msg.getMessageId() + "expired before it could be sent");
+                    _transport.afterSend(msg, false, false);
                     return true;
                 }
                 msg.timestamp("TCPConnection.runner.processSlice before sending " 
@@ -531,6 +532,8 @@ class TCPConnection implements I2NPMessageReader.I2NPMessageEventListener {
                     _log.debug("Sending " + data.length + " bytes in the slice... to " 
                                + _remoteIdentity.getHash().toBase64());
 
+                long exp = msg.getMessage().getMessageExpiration().getTime();
+                
                 long beforeWrite = 0;
                 try {
                     synchronized (_out) {
@@ -545,14 +548,13 @@ class TCPConnection implements I2NPMessageReader.I2NPMessageEventListener {
                     return false;
                 }
 
-                long exp = msg.getMessage().getMessageExpiration().getTime();
                 long end = _context.clock().now();
                 long timeLeft = exp - end;
 
                 msg.timestamp("TCPConnection.runner.processSlice sent and flushed");
                 
                 if (_log.shouldLog(Log.INFO))
-                    _log.info("Message " + msg.getMessage().getClass().getName() 
+                    _log.info("Message " + msg.getMessageType()
                               + " (expiring in " + timeLeft + "ms) sent to " 
                               + _remoteIdentity.getHash().toBase64() + " from " 
                               + _context.routerHash().toBase64()

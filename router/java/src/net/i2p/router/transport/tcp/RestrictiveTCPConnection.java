@@ -10,6 +10,8 @@ package net.i2p.router.transport.tcp;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.BufferedOutputStream;
+import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.net.Socket;
@@ -22,6 +24,8 @@ import net.i2p.data.DataHelper;
 import net.i2p.data.RouterIdentity;
 import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
+import net.i2p.router.transport.BandwidthLimitedInputStream;
+import net.i2p.router.transport.BandwidthLimitedOutputStream;
 import net.i2p.util.I2PThread;
 import net.i2p.util.Log;
 
@@ -43,7 +47,7 @@ class RestrictiveTCPConnection extends TCPConnection {
     private final static long PROTO_ID = 12;
     
     /** read / write buffer size */
-    private final static int BUF_SIZE = 4*1024;
+    private final static int BUF_SIZE = 32*1024;
     
     private boolean validateVersion() throws DataFormatException, IOException {
         if (_log.shouldLog(Log.DEBUG)) _log.debug("Before validating version");
@@ -291,12 +295,9 @@ class RestrictiveTCPConnection extends TCPConnection {
             
             if (_log.shouldLog(Log.INFO))
                 _log.info("TCP connection " + _id + " established with " + _remoteIdentity.getHash().toBase64());
-            //_in = new AESInputStream(_context, new BandwidthLimitedInputStream(_context, _in, _remoteIdentity), _key, _iv);
-            //_out = new AESOutputStream(_context, new BufferedOutputStream(new BandwidthLimitedOutputStream(_context, _out, _remoteIdentity), BUF_SIZE), _key, _iv);
-            //_in = new BandwidthLimitedInputStream(_context, _in, _remoteIdentity);
-            //_out = new BufferedOutputStream(new BandwidthLimitedOutputStream(_context, _out, _remoteIdentity), BUF_SIZE);
-            _in = new AESInputStream(_context, _in, _key, _iv);
-            _out = new AESOutputStream(_context, _out, _key, _iv);
+            
+            _in = new BandwidthLimitedInputStream(_context, new AESInputStream(_context, _in, _key, _iv), _remoteIdentity);
+            _out = new AESOutputStream(_context, new BufferedOutputStream(new BandwidthLimitedOutputStream(_context, _out, _remoteIdentity), BUF_SIZE), _key, _iv);
             _socket.setSoTimeout(0);
             success = _context.clock().now();
             established();

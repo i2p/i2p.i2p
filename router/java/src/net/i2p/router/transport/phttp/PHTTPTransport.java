@@ -160,8 +160,8 @@ public class PHTTPTransport extends TransportImpl {
             _context.router().getRouterInfo().getIdentity().writeBytes(baos);
             int postLength = baos.size();
             
-            _context.bandwidthLimiter().delayOutbound(null, postLength+512, false); // HTTP overhead
-            _context.bandwidthLimiter().delayInbound(null, 2048+512); // HTTP overhead
+            //_context.bandwidthLimiter().delayOutbound(null, postLength+512, false); // HTTP overhead
+            //_context.bandwidthLimiter().delayInbound(null, 2048+512); // HTTP overhead
             
             long now = _context.clock().now();
             _log.debug("Before opening " + _myRegisterURL);

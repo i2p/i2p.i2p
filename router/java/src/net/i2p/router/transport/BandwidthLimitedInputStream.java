@@ -17,6 +17,7 @@ import net.i2p.router.RouterContext;
 
 public class BandwidthLimitedInputStream extends FilterInputStream {
     private RouterIdentity _peer;
+    private String _peerSource;
     private RouterContext _context;
     private boolean _pullFromOutbound;
     
@@ -31,40 +32,41 @@ public class BandwidthLimitedInputStream extends FilterInputStream {
         super(source);
         _context = context;
         _peer = peer;
+        _peerSource = peer.getHash().toBase64();
         _pullFromOutbound = pullFromOutbound;
     }
     
     public int read() throws IOException {
         if (_pullFromOutbound)
-            _context.bandwidthLimiter().delayOutbound(_peer, 1, true);
+            _context.bandwidthLimiter().requestOutbound(1, _peerSource);
         else
-            _context.bandwidthLimiter().delayInbound(_peer, 1);
+            _context.bandwidthLimiter().requestInbound(1, _peerSource);
         return in.read();
     }
     
     public int read(byte dest[]) throws IOException {
         int read = in.read(dest);
         if (_pullFromOutbound)
-            _context.bandwidthLimiter().delayOutbound(_peer, read, true);
+            _context.bandwidthLimiter().requestOutbound(read, _peerSource);
         else
-            _context.bandwidthLimiter().delayInbound(_peer, read);
+            _context.bandwidthLimiter().requestInbound(read, _peerSource);
         return read;
     }
     
     public int read(byte dest[], int off, int len) throws IOException {
         int read = in.read(dest, off, len);
         if (_pullFromOutbound)
-            _context.bandwidthLimiter().delayOutbound(_peer, read, true);
+            _context.bandwidthLimiter().requestOutbound(read, _peerSource);
         else
-            _context.bandwidthLimiter().delayInbound(_peer, read);
+            _context.bandwidthLimiter().requestInbound(read, _peerSource);
         return read;
     }
     public long skip(long numBytes) throws IOException {
         long skip = in.skip(numBytes);
         if (_pullFromOutbound)
-            _context.bandwidthLimiter().delayOutbound(_peer, (int)skip, true);
+            _context.bandwidthLimiter().requestOutbound((int)skip, _peerSource);
         else
-            _context.bandwidthLimiter().delayInbound(_peer, (int)skip);
+            _context.bandwidthLimiter().requestInbound((int)skip, _peerSource);
         return skip;
     }
 }

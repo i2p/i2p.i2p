@@ -261,8 +261,8 @@ public class Router {
             buf.append("<b><font color=\"red\">HIGHER VERSION SEEN</font><b> - please <a href=\"http://i2p.dnsalias.net/\">check</a> to see if there is a new release out<br />\n");
 
         buf.append("<hr /><a name=\"bandwidth\"> </a><h2>Bandwidth</h2>\n");
-        long sent = _context.bandwidthLimiter().getTotalSendBytes();
-        long received = _context.bandwidthLimiter().getTotalReceiveBytes();
+        long sent = _context.bandwidthLimiter().getTotalAllocatedOutboundBytes();
+        long received = _context.bandwidthLimiter().getTotalAllocatedInboundBytes();
         buf.append("<ul>");
 
         buf.append("<li> ").append(sent).append(" bytes sent, ");
@@ -351,6 +351,8 @@ public class Router {
         buf.append("while period averages count how fast the transfers go across the entire period, even when we're not ");
         buf.append("trying to transfer data.  Lifetime averages count how many elephants there are on the moon [like anyone reads this text]</i>");
         buf.append("\n");
+        
+        buf.append(_context.bandwidthLimiter().renderStatusHTML());
 
         buf.append("<hr /><a name=\"clients\"> </a>\n");
         buf.append(_context.clientManager().renderStatusHTML());
