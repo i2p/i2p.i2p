@@ -35,7 +35,7 @@ public class ConnectionPacketHandler {
             if (nextTime <= 0) {
                 con.setNextSendTime(con.getOptions().getSendAckDelay() + _context.clock().now());
                 if (_log.shouldLog(Log.DEBUG))
-                    _log.error("Scheduling ack in " + con.getOptions().getSendAckDelay() + "ms for received packet " + packet);
+                    _log.debug("Scheduling ack in " + con.getOptions().getSendAckDelay() + "ms for received packet " + packet);
             } else {
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("Ack is already scheduled in " + (nextTime-_context.clock().now()) 
