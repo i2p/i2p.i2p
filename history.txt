@@ -1,4 +1,8 @@
-$Id: history.txt,v 1.144 2005/02/17 12:59:29 jrandom Exp $
+$Id: history.txt,v 1.145 2005/02/17 15:55:07 jrandom Exp $
+
+2005-02-17  jrandom
+    * If the clock is adjusted during a job run, don't act as if the job took
+      negative time.
 
 2005-02-17  jrandom
     * Included the GPL'ed susimail 0.13 by default (thanks susi23!)

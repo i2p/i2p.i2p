@@ -499,6 +499,9 @@ public class JobQueue {
         MessageHistory hist = _context.messageHistory();
         long uptime = _context.router().getUptime();
 
+        if (lag < 0) lag = 0;
+        if (duration < 0) duration = 0;
+        
         JobStats stats = null;
         if (!_jobStats.containsKey(key)) {
             _jobStats.put(key, new JobStats(key));
