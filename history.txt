@@ -1,4 +1,25 @@
-$Id: history.txt,v 1.181 2005/03/24 23:07:06 jrandom Exp $
+$Id: history.txt,v 1.182 2005/03/26 02:13:38 jrandom Exp $
+
+* 2005-03-29  0.5.0.5 released
+
+2005-03-29  jrandom
+    * Decreased the initial RTT estimate to 10s to allow more retries.
+    * Increased the default netDb store replication factor from 2 to 6 to take
+      into consideration tunnel failures.
+    * Address some statistical anonymity attacks against the netDb that could 
+      be mounted by an active internal adversary by only answering lookups for 
+      leaseSets we received through an unsolicited store.
+    * Don't throttle lookup responses (we throttle enough elsewhere)
+    * Fix the NewsFetcher so that it doesn't incorrectly resume midway through
+      the file (thanks nickster!)
+    * Updated the I2PTunnel HTML (thanks postman!)
+    * Added support to the I2PTunnel pages for the URL parameter "passphrase",
+      which, if matched against the router.config "i2ptunnel.passphrase" value,
+      skips the nonce check.  If the config prop doesn't exist or is blank, no
+      passphrase is accepted.
+    * Implemented HMAC-SHA256.
+    * Enable the tunnel batching with a 500ms delay by default
+    * Dropped compatability with 0.5.0.3 and earlier releases
 
 2005-03-26  jrandom
     * Added some error handling and fairly safe to cache data to the streaming

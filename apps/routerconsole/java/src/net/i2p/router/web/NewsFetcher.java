@@ -11,6 +11,7 @@ import net.i2p.data.DataHelper;
 import net.i2p.router.RouterContext;
 import net.i2p.router.RouterVersion;
 import net.i2p.util.EepGet;
+import net.i2p.util.FileUtil;
 import net.i2p.util.Log;
 
 /**
@@ -26,6 +27,7 @@ public class NewsFetcher implements Runnable, EepGet.StatusListener {
     public static final NewsFetcher getInstance() { return _instance; }
     
     private static final String NEWS_FILE = "docs/news.xml";
+    private static final String TEMP_NEWS_FILE = "docs/news.xml.temp";
     
     public NewsFetcher(I2PAppContext ctx) {
         _context = ctx;
@@ -82,14 +84,18 @@ public class NewsFetcher implements Runnable, EepGet.StatusListener {
         boolean shouldProxy = Boolean.valueOf(_context.getProperty(ConfigUpdateHandler.PROP_SHOULD_PROXY, ConfigUpdateHandler.DEFAULT_SHOULD_PROXY)).booleanValue();
         String proxyHost = _context.getProperty(ConfigUpdateHandler.PROP_PROXY_HOST, ConfigUpdateHandler.DEFAULT_PROXY_HOST);
         String port = _context.getProperty(ConfigUpdateHandler.PROP_PROXY_PORT, ConfigUpdateHandler.DEFAULT_PROXY_PORT);
+        File tempFile = new File(TEMP_NEWS_FILE);
+        if (tempFile.exists())
+            tempFile.delete();
+        
         int proxyPort = -1;
         try {
             proxyPort = Integer.parseInt(port);
             EepGet get = null;
             if (shouldProxy)
-                get = new EepGet(_context, proxyHost, proxyPort, 10, NEWS_FILE, newsURL);
+                get = new EepGet(_context, proxyHost, proxyPort, 10, TEMP_NEWS_FILE, newsURL);
             else
-                get = new EepGet(_context, 10, NEWS_FILE, newsURL);
+                get = new EepGet(_context, 10, TEMP_NEWS_FILE, newsURL);
             get.addStatusListener(this);
             get.fetch();
         } catch (Throwable t) {
@@ -230,11 +236,20 @@ public class NewsFetcher implements Runnable, EepGet.StatusListener {
     public void transferComplete(long alreadyTransferred, long bytesTransferred, long bytesRemaining, String url, String outputFile) {
         if (_log.shouldLog(Log.INFO))
             _log.info("News fetched from " + url);
+        
+        File temp = new File(TEMP_NEWS_FILE);
+        if (temp.exists()) {
+            boolean copied = FileUtil.copy(TEMP_NEWS_FILE, NEWS_FILE, true);
+            if (copied)
+                temp.delete();
+        }
         checkForUpdates();
     }
     
     public void transferFailed(String url, long bytesTransferred, long bytesRemaining, int currentAttempt) {
         if (_log.shouldLog(Log.ERROR))
             _log.error("Failed to fetch the news from " + url);
+        File temp = new File(TEMP_NEWS_FILE);
+        temp.delete();
     }
 }

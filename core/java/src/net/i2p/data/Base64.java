@@ -329,6 +329,8 @@ public class Base64 {
      * replacing / with ~, and + with -
      */
     private static String safeEncode(byte[] source, int off, int len, boolean useStandardAlphabet) {
+        if (len + off > source.length)
+            throw new ArrayIndexOutOfBoundsException("Trying to encode too much!  source.len=" + source.length + " off=" + off + " len=" + len);
         String encoded = encodeBytes(source, off, len, false);
         if (useStandardAlphabet) {
             // noop

@@ -10,6 +10,7 @@ package net.i2p.router.networkdb;
 
 import java.util.Date;
 import net.i2p.data.Hash;
+import net.i2p.data.LeaseSet;
 import net.i2p.data.RouterIdentity;
 import net.i2p.data.i2np.DatabaseStoreMessage;
 import net.i2p.data.i2np.DeliveryStatusMessage;
@@ -48,8 +49,18 @@ public class HandleDatabaseStoreMessageJob extends JobImpl {
         boolean wasNew = false;
         if (_message.getValueType() == DatabaseStoreMessage.KEY_TYPE_LEASESET) {
             try {
-                Object match = getContext().netDb().store(_message.getKey(), _message.getLeaseSet());
-                wasNew = (null == match);
+                LeaseSet ls = _message.getLeaseSet();
+                // mark it as something we received, so we'll answer queries 
+                // for it.  this flag does NOT get set on entries that we 
+                // receive in response to our own lookups.
+                ls.setReceivedAsPublished(true);
+                LeaseSet match = getContext().netDb().store(_message.getKey(), _message.getLeaseSet());
+                if (match == null) {
+                    wasNew = true;
+                } else {
+                    wasNew = false;
+                    match.setReceivedAsPublished(true);
+                }
             } catch (IllegalArgumentException iae) {
                 invalidMessage = iae.getMessage();
             }

@@ -34,16 +34,18 @@ public class BatchedPreprocessor extends TrivialPreprocessor {
                                          - 1  // 0x00 ending the padding
                                          - 4; // 4 byte checksum
 
+    private static final boolean DISABLE_BATCHING = false;
+    
     /* not final or private so the test code can adjust */
     static long DEFAULT_DELAY = 500;
     /** wait up to 2 seconds before sending a small message */
     protected long getSendDelay() { return DEFAULT_DELAY; }
     
     public boolean preprocessQueue(List pending, TunnelGateway.Sender sender, TunnelGateway.Receiver rec) {
-        if (_log.shouldLog(Log.INFO))
-            _log.info("Preprocess queue with " + pending.size() + " to send");
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("Preprocess queue with " + pending.size() + " to send");
         
-        if (getSendDelay() <= 0) {
+        if (DISABLE_BATCHING || getSendDelay() <= 0) {
             if (_log.shouldLog(Log.INFO))
                 _log.info("No batching, send all messages immediately");
             while (pending.size() > 0) {
@@ -131,8 +133,8 @@ public class BatchedPreprocessor extends TrivialPreprocessor {
             }
         }
         
-        if (_log.shouldLog(Log.INFO))
-            _log.info("Sent everything on the list (pending=" + pending.size() + ")");
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("Sent everything on the list (pending=" + pending.size() + ")");
 
         // sent everything from the pending list, no need to delayed flush
         return false;
@@ -150,15 +152,23 @@ public class BatchedPreprocessor extends TrivialPreprocessor {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Sending " + startAt + ":" + sendThrough + " out of " + pending.size());
         byte preprocessed[] = _dataCache.acquire().getData();
-        ByteArray ivBuf = _ivCache.acquire();
-        byte iv[] = ivBuf.getData(); // new byte[IV_SIZE];
-        _context.random().nextBytes(iv);
         
         int offset = 0;
         offset = writeFragments(pending, startAt, sendThrough, preprocessed, offset);
         // preprocessed[0:offset] now contains the fragments from the pending,
         // so we need to format, pad, and rearrange according to the spec to
         // generate the final preprocessed data
+        
+        if (offset <= 0) {
+            StringBuffer buf = new StringBuffer(128);
+            buf.append("wtf, written offset is ").append(offset);
+            buf.append(" for ").append(startAt).append(" through ").append(sendThrough);
+            for (int i = startAt; i <= sendThrough; i++) {
+                buf.append(" ").append(pending.get(i).toString());
+            }
+            _log.log(Log.CRIT, buf.toString());
+            return;
+        }
         
         preprocess(preprocessed, offset);
         

@@ -45,7 +45,7 @@ public class RequestTunnelJob extends JobImpl {
     private boolean _isFake;
     private boolean _isExploratory;
     
-    static final int HOP_REQUEST_TIMEOUT = 30*1000;
+    static final int HOP_REQUEST_TIMEOUT = 20*1000;
     private static final int LOOKUP_TIMEOUT = 10*1000;
     
     public RequestTunnelJob(RouterContext ctx, TunnelCreatorConfig cfg, Job onCreated, Job onFailed, int hop, boolean isFake, boolean isExploratory) {

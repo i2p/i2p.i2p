@@ -17,7 +17,7 @@ public class BatchedRouterPreprocessor extends BatchedPreprocessor {
      */
     public static final String PROP_BATCH_FREQUENCY = "batchFrequency";
     public static final String PROP_ROUTER_BATCH_FREQUENCY = "router.batchFrequency";
-    public static final int DEFAULT_BATCH_FREQUENCY = 0;
+    public static final int DEFAULT_BATCH_FREQUENCY = 500;
     
     public BatchedRouterPreprocessor(RouterContext ctx) {
         this(ctx, null);

@@ -82,7 +82,7 @@ public class ConnectionOptions extends I2PSocketOptionsImpl {
         setConnectDelay(getInt(opts, PROP_CONNECT_DELAY, -1));
         setProfile(getInt(opts, PROP_PROFILE, PROFILE_BULK));
         setMaxMessageSize(getInt(opts, PROP_MAX_MESSAGE_SIZE, 4*1024));
-        setRTT(getInt(opts, PROP_INITIAL_RTT, 30*1000));
+        setRTT(getInt(opts, PROP_INITIAL_RTT, 10*1000));
         setReceiveWindow(getInt(opts, PROP_INITIAL_RECEIVE_WINDOW, 1));
         setResendDelay(getInt(opts, PROP_INITIAL_RESEND_DELAY, 1000));
         setSendAckDelay(getInt(opts, PROP_INITIAL_ACK_DELAY, 1000));
@@ -107,7 +107,7 @@ public class ConnectionOptions extends I2PSocketOptionsImpl {
         if (opts.containsKey(PROP_MAX_MESSAGE_SIZE))
             setMaxMessageSize(getInt(opts, PROP_MAX_MESSAGE_SIZE, Packet.MAX_PAYLOAD_SIZE));
         if (opts.containsKey(PROP_INITIAL_RTT))
-            setRTT(getInt(opts, PROP_INITIAL_RTT, 30*1000));
+            setRTT(getInt(opts, PROP_INITIAL_RTT, 10*1000));
         if (opts.containsKey(PROP_INITIAL_RECEIVE_WINDOW))
             setReceiveWindow(getInt(opts, PROP_INITIAL_RECEIVE_WINDOW, 1));
         if (opts.containsKey(PROP_INITIAL_RESEND_DELAY))

@@ -40,6 +40,7 @@ public class HandleDatabaseLookupMessageJob extends JobImpl {
     private RouterIdentity _from;
     private Hash _fromHash;
     private final static int MAX_ROUTERS_RETURNED = 3;
+    private final static int CLOSENESS_THRESHOLD = 10; // StoreJob.REDUNDANCY * 2
     private final static int REPLY_TIMEOUT = 60*1000;
     private final static int MESSAGE_PRIORITY = 300;
     
@@ -48,6 +49,9 @@ public class HandleDatabaseLookupMessageJob extends JobImpl {
         _log = getContext().logManager().getLog(HandleDatabaseLookupMessageJob.class);
         getContext().statManager().createRateStat("netDb.lookupsHandled", "How many netDb lookups have we handled?", "NetworkDatabase", new long[] { 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
         getContext().statManager().createRateStat("netDb.lookupsMatched", "How many netDb lookups did we have the data for?", "NetworkDatabase", new long[] { 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
+        getContext().statManager().createRateStat("netDb.lookupsMatchedReceivedPublished", "How many netDb lookups did we have the data for that were published to us?", "NetworkDatabase", new long[] { 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
+        getContext().statManager().createRateStat("netDb.lookupsMatchedLocalClosest", "How many netDb lookups for local data were received where we are the closest peers?", "NetworkDatabase", new long[] { 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
+        getContext().statManager().createRateStat("netDb.lookupsMatchedLocalNotClosest", "How many netDb lookups for local data were received where we are NOT the closest peers?", "NetworkDatabase", new long[] { 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
         _message = receivedMessage;
         _from = from;
         _fromHash = fromHash;
@@ -65,26 +69,26 @@ public class HandleDatabaseLookupMessageJob extends JobImpl {
                           + " (tunnel " + _message.getReplyTunnel() + ")");
         }
 
-        if (getContext().netDb().lookupRouterInfoLocally(_message.getFrom()) == null) {
-            // hmm, perhaps don't always send a lookup for this...
-            // but for now, wtf, why not.  we may even want to adjust it so that 
-            // we penalize or benefit peers who send us that which we can or
-            // cannot lookup
-            getContext().netDb().lookupRouterInfo(_message.getFrom(), null, null, REPLY_TIMEOUT);
-        }
-
-        // whatdotheywant?
-        handleRequest(fromKey);
-    }
-    
-    private void handleRequest(Hash fromKey) {
         LeaseSet ls = getContext().netDb().lookupLeaseSetLocally(_message.getSearchKey());
         if (ls != null) {
-            // send that lease set to the _message.getFromHash peer
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("We do have key " + _message.getSearchKey().toBase64() 
-                           + " locally as a lease set.  sending to " + fromKey.toBase64());
-            sendData(_message.getSearchKey(), ls, fromKey, _message.getReplyTunnel());
+            // only answer a request for a LeaseSet if it has been published
+            // to us, or, if its local, if we would have published to ourselves
+            if (ls.getReceivedAsPublished()) {
+                getContext().statManager().addRateData("netDb.lookupsMatchedReceivedPublished", 1, 0);
+                sendData(_message.getSearchKey(), ls, fromKey, _message.getReplyTunnel());
+            } else {
+                Set routerInfoSet = getContext().netDb().findNearestRouters(_message.getSearchKey(), 
+                                                                            CLOSENESS_THRESHOLD,
+                                                                            _message.getDontIncludePeers());
+                if (getContext().clientManager().isLocal(ls.getDestination()) && 
+                    weAreClosest(routerInfoSet)) {
+                    getContext().statManager().addRateData("netDb.lookupsMatchedLocalClosest", 1, 0);
+                    sendData(_message.getSearchKey(), ls, fromKey, _message.getReplyTunnel());
+                } else {
+                    getContext().statManager().addRateData("netDb.lookupsMatchedLocalNotClosest", 1, 0);
+                    sendClosest(_message.getSearchKey(), routerInfoSet, fromKey, _message.getReplyTunnel());
+                }
+            }
         } else {
             RouterInfo info = getContext().netDb().lookupRouterInfoLocally(_message.getSearchKey());
             if (info != null) {
@@ -104,6 +108,17 @@ public class HandleDatabaseLookupMessageJob extends JobImpl {
                 sendClosest(_message.getSearchKey(), routerInfoSet, fromKey, _message.getReplyTunnel());
             }
         }
+    }
+    
+    private boolean weAreClosest(Set routerInfoSet) {
+        boolean weAreClosest = false;
+        for (Iterator iter = routerInfoSet.iterator(); iter.hasNext(); ) {
+            RouterInfo cur = (RouterInfo)iter.next();
+            if (cur.getIdentity().calculateHash().equals(getContext().routerHash())) {
+                return true;
+            }
+        }
+        return false;
     }
     
     private void sendData(Hash key, DataStructure data, Hash toPeer, TunnelId replyTunnel) {
@@ -129,27 +144,27 @@ public class HandleDatabaseLookupMessageJob extends JobImpl {
             _log.debug("Sending closest routers to key " + key.toBase64() + ": # peers = " 
                        + routerInfoSet.size() + " tunnel " + replyTunnel);
         DatabaseSearchReplyMessage msg = new DatabaseSearchReplyMessage(getContext());
-        msg.setFromHash(getContext().router().getRouterInfo().getIdentity().getHash());
+        msg.setFromHash(getContext().routerHash());
         msg.setSearchKey(key);
         for (Iterator iter = routerInfoSet.iterator(); iter.hasNext(); ) {
             RouterInfo peer = (RouterInfo)iter.next();
             msg.addReply(peer.getIdentity().getHash());
+            if (msg.getNumReplies() >= MAX_ROUTERS_RETURNED)
+                break;
         }
         getContext().statManager().addRateData("netDb.lookupsHandled", 1, 0);
         sendMessage(msg, toPeer, replyTunnel); // should this go via garlic messages instead?
     }
     
     private void sendMessage(I2NPMessage message, Hash toPeer, TunnelId replyTunnel) {
-        Job send = null;
         if (replyTunnel != null) {
             sendThroughTunnel(message, toPeer, replyTunnel);
         } else {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Sending reply directly to " + toPeer);
-            send = new SendMessageDirectJob(getContext(), message, toPeer, REPLY_TIMEOUT, MESSAGE_PRIORITY);
+            Job send = new SendMessageDirectJob(getContext(), message, toPeer, REPLY_TIMEOUT, MESSAGE_PRIORITY);
+            getContext().netDb().lookupRouterInfo(toPeer, send, null, REPLY_TIMEOUT);
         }
-
-        getContext().netDb().lookupRouterInfo(toPeer, send, null, REPLY_TIMEOUT);
     }
     
     private void sendThroughTunnel(I2NPMessage message, Hash toPeer, TunnelId replyTunnel) {
@@ -169,28 +184,6 @@ public class HandleDatabaseLookupMessageJob extends JobImpl {
             SendMessageDirectJob j = new SendMessageDirectJob(getContext(), m, toPeer, 10*1000, 100);
             getContext().jobQueue().addJob(j);
         }
-    }
-    
-    private void sendToGateway(I2NPMessage message, Hash toPeer, TunnelId replyTunnel, TunnelInfo info) {
-        if (_log.shouldLog(Log.INFO))
-            _log.info("Want to reply to a db request via a tunnel, but we're a participant in the reply!  so send it to the gateway");
-
-        if ( (toPeer == null) || (replyTunnel == null) ) {
-            if (_log.shouldLog(Log.ERROR))
-                _log.error("Someone br0ke us.  where is this message supposed to go again?", getAddedBy());
-            return;
-        }
-
-        long expiration = REPLY_TIMEOUT + getContext().clock().now();
-
-        TunnelGatewayMessage msg = new TunnelGatewayMessage(getContext());
-        msg.setMessage(message);
-        msg.setTunnelId(replyTunnel);
-        msg.setMessageExpiration(expiration);
-        getContext().jobQueue().addJob(new SendMessageDirectJob(getContext(), msg, toPeer, null, null, null, null, REPLY_TIMEOUT, MESSAGE_PRIORITY));
-
-        String bodyType = message.getClass().getName();
-        getContext().messageHistory().wrap(bodyType, message.getUniqueId(), TunnelGatewayMessage.class.getName(), msg.getUniqueId());
     }
     
     public String getName() { return "Handle Database Lookup Message"; }

@@ -8,6 +8,7 @@ import net.i2p.data.Hash;
 import net.i2p.data.TunnelId;
 import net.i2p.data.i2np.I2NPMessage;
 import net.i2p.data.i2np.TunnelGatewayMessage;
+import net.i2p.router.Router;
 import net.i2p.util.Log;
 import net.i2p.util.SimpleTimer;
 
@@ -87,7 +88,7 @@ public class TunnelGateway {
         _messagesSent++;
         boolean delayedFlush = false;
         
-        Pending cur = new Pending(msg, toRouter, toTunnel);
+        Pending cur = new PendingImpl(msg, toRouter, toTunnel);
         synchronized (_queue) {
             _queue.add(cur);
             delayedFlush = _preprocessor.preprocessQueue(_queue, _sender, _receiver);
@@ -96,9 +97,9 @@ public class TunnelGateway {
             // expire any as necessary, even if its framented
             for (int i = 0; i < _queue.size(); i++) {
                 Pending m = (Pending)_queue.get(i);
-                if (m.getExpiration() < _lastFlush) {
+                if (m.getExpiration() + Router.CLOCK_FUDGE_FACTOR < _lastFlush) {
                     if (_log.shouldLog(Log.ERROR))
-                        _log.error("Expire on the queue: " + m);
+                        _log.error("Expire on the queue (size=" + _queue.size() + "): " + m);
                     _queue.remove(i);
                     i--;
                 }
@@ -140,13 +141,13 @@ public class TunnelGateway {
     }
     
     public static class Pending {
-        private Hash _toRouter;
-        private TunnelId _toTunnel;
+        protected Hash _toRouter;
+        protected TunnelId _toTunnel;
         private long _messageId;
-        private long _expiration;
-        private byte _remaining[];
-        private int _offset;
-        private int _fragmentNumber;
+        protected long _expiration;
+        protected byte _remaining[];
+        protected int _offset;
+        protected int _fragmentNumber;
         
         public Pending(I2NPMessage message, Hash toRouter, TunnelId toTunnel) {
             _toRouter = toRouter;
@@ -173,6 +174,35 @@ public class TunnelGateway {
         public int getFragmentNumber() { return _fragmentNumber; }
         /** ok, fragment sent, increment what the next will be */
         public void incrementFragmentNumber() { _fragmentNumber++; }
+    }
+    private class PendingImpl extends Pending {
+        private long _created;
+        
+        public PendingImpl(I2NPMessage message, Hash toRouter, TunnelId toTunnel) {
+            super(message, toRouter, toTunnel);
+            _created = _context.clock().now();
+        }        
+        
+        public String toString() {
+            StringBuffer buf = new StringBuffer(64);
+            buf.append("Message on ");
+            buf.append(TunnelGateway.this.toString());
+            if (_toRouter != null) {
+                buf.append(" targetting ");
+                buf.append(_toRouter.toBase64()).append(" ");
+                if (_toTunnel != null)
+                    buf.append(_toTunnel.getTunnelId());
+            }
+            long now = _context.clock().now();
+            buf.append(" actual lifetime ");
+            buf.append(now - _created).append("ms");
+            buf.append(" potential lifetime ");
+            buf.append(_expiration - _created).append("ms");
+            buf.append(" size ").append(_remaining.length);
+            buf.append(" offset ").append(_offset);
+            buf.append(" frag ").append(_fragmentNumber);
+            return buf.toString();
+        }
     }
     
     private class DelayedFlush implements SimpleTimer.TimedEvent {

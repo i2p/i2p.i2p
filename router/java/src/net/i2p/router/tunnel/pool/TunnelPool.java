@@ -37,11 +37,11 @@ public class TunnelPool {
     private long _lastSelectionPeriod;
     
     /**
-     * Only 3 builds per minute per pool, even if we have failing tunnels,
+     * Only 5 builds per minute per pool, even if we have failing tunnels,
      * etc.  On overflow, the necessary additional tunnels are built by the
      * RefreshJob
      */
-    private static final int MAX_BUILDS_PER_MINUTE = 3;
+    private static final int MAX_BUILDS_PER_MINUTE = 5;
     
     public TunnelPool(RouterContext ctx, TunnelPoolManager mgr, TunnelPoolSettings settings, TunnelPeerSelector sel, TunnelBuilder builder) {
         _context = ctx;

@@ -35,6 +35,7 @@ public class LeaseSet extends DataStructureImpl {
     private Signature _signature;
     private volatile Hash _currentRoutingKey;
     private volatile byte[] _routingKeyGenMod;
+    private boolean _receivedAsPublished;
 
     /** um, no lease can last more than a year.  */
     private final static long MAX_FUTURE_EXPIRATION = 365 * 24 * 60 * 60 * 1000L;
@@ -47,6 +48,7 @@ public class LeaseSet extends DataStructureImpl {
         setRoutingKey(null);
         _leases = new ArrayList();
         _routingKeyGenMod = null;
+        _receivedAsPublished = false;
     }
 
     public Destination getDestination() {
@@ -72,6 +74,14 @@ public class LeaseSet extends DataStructureImpl {
     public void setSigningKey(SigningPublicKey key) {
         _signingKey = key;
     }
+    
+    /**
+     * If true, we received this LeaseSet by a remote peer publishing it to
+     * us, rather than by searching for it ourselves or locally creating it.
+     *
+     */
+    public boolean getReceivedAsPublished() { return _receivedAsPublished; }
+    public void setReceivedAsPublished(boolean received) { _receivedAsPublished = received; }
 
     public void addLease(Lease lease) {
         if (lease == null) throw new IllegalArgumentException("erm, null lease");

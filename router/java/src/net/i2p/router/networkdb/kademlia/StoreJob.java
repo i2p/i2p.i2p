@@ -36,8 +36,8 @@ class StoreJob extends JobImpl {
     private long _expiration;
     private PeerSelector _peerSelector;
 
-    private final static int PARALLELIZATION = 1; // how many sent at a time
-    private final static int REDUNDANCY = 2; // we want the data sent to 2 peers
+    private final static int PARALLELIZATION = 2; // how many sent at a time
+    private final static int REDUNDANCY = 6; // we want the data sent to 6 peers
     /**
      * additionally send to 1 outlier(s), in case all of the routers chosen in our
      * REDUNDANCY set are attacking us by accepting DbStore messages but dropping

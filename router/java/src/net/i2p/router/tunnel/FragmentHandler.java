@@ -49,6 +49,8 @@ public class FragmentHandler {
                                               "Tunnels", new long[] { 10*60*1000l, 60*60*1000l, 3*60*60*1000l, 24*60*60*1000 });
         _context.statManager().createRateStat("tunnel.fragmentedDropped", "How many fragments were in a partially received yet failed message?", 
                                               "Tunnels", new long[] { 10*60*1000l, 60*60*1000l, 3*60*60*1000l, 24*60*60*1000 });
+        _context.statManager().createRateStat("tunnel.corruptMessage", "How many corrupted messages arrived?", 
+                                              "Tunnels", new long[] { 10*60*1000l, 60*60*1000l, 3*60*60*1000l, 24*60*60*1000 });
     }
     
     /**
@@ -61,9 +63,11 @@ public class FragmentHandler {
     public void receiveTunnelMessage(byte preprocessed[], int offset, int length) {
         boolean ok = verifyPreprocessed(preprocessed, offset, length);
         if (!ok) {
-            _log.error("Unable to verify preprocessed data (pre.length=" + preprocessed.length 
-                       + " off=" +offset + " len=" + length, new Exception("failed"));
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Unable to verify preprocessed data (pre.length=" 
+                          + preprocessed.length + " off=" +offset + " len=" + length);
             _cache.release(new ByteArray(preprocessed));
+            _context.statManager().addRateData("tunnel.corruptMessage", 1, 1);
             return;
         }
         offset += HopProcessor.IV_LENGTH; // skip the IV
@@ -84,6 +88,7 @@ public class FragmentHandler {
         } catch (RuntimeException e) {
             if (_log.shouldLog(Log.ERROR))
                 _log.error("Corrupt fragment received: offset = " + offset, e);
+            _context.statManager().addRateData("tunnel.corruptMessage", 1, 1);
             throw e;
         } finally {
             // each of the FragmentedMessages populated make a copy out of the
@@ -110,8 +115,19 @@ public class FragmentHandler {
     private boolean verifyPreprocessed(byte preprocessed[], int offset, int length) {
         // now we need to verify that the message was received correctly
         int paddingEnd = HopProcessor.IV_LENGTH + 4;
-        while (preprocessed[offset+paddingEnd] != (byte)0x00)
+        while (preprocessed[offset+paddingEnd] != (byte)0x00) {
             paddingEnd++;
+            if (offset+paddingEnd >= length) {
+                if (_log.shouldLog(Log.ERROR))
+                    _log.error("Corrupt tunnel message padding");
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("cannot verify, going past the end [off=" 
+                              + offset + " len=" + length + " paddingEnd=" 
+                              + paddingEnd + " data:\n"
+                              + Base64.encode(preprocessed, offset, length));
+                return false;
+            }
+        }
         paddingEnd++; // skip the last
         
         ByteArray ba = _validateCache.acquire(); // larger than necessary, but always sufficient
@@ -129,10 +145,11 @@ public class FragmentHandler {
         boolean eq = DataHelper.eq(v.getData(), 0, preprocessed, offset + HopProcessor.IV_LENGTH, 4);
         if (!eq) {
             if (_log.shouldLog(Log.ERROR))
-                _log.error("Endpoint data doesn't match: # pad bytes: " + (paddingEnd-(HopProcessor.IV_LENGTH+4)-1));
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("nomatching endpoint: # pad bytes: " + (paddingEnd-(HopProcessor.IV_LENGTH+4)-1) + "\n" 
-                           + Base64.encode(preprocessed, offset + paddingEnd, preV.length-HopProcessor.IV_LENGTH));
+                _log.error("Corrupt tunnel message - verification fails");
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("nomatching endpoint: # pad bytes: " + (paddingEnd-(HopProcessor.IV_LENGTH+4)-1) + "\n" 
+                           + " offset=" + offset + " length=" + length + " paddingEnd=" + paddingEnd
+                           + Base64.encode(preprocessed, offset, length));
         }
         
         _context.sha().cache().release(cache);
@@ -380,8 +397,8 @@ public class FragmentHandler {
             if (removed && !_msg.getReleased()) {
                 _failed++;
                 noteFailure(_msg.getMessageId());
-                if (_log.shouldLog(Log.ERROR))
-                    _log.error("Dropped failed fragmented message: " + _msg);
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("Dropped failed fragmented message: " + _msg);
                 _context.statManager().addRateData("tunnel.fragmentedDropped", _msg.getFragmentCount(), _msg.getLifetime());
                 _msg.failed();
             } else {

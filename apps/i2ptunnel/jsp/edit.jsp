@@ -1,16 +1,26 @@
-<%@page contentType="text/html" %>
+<%@page contentType="text/html" import="net.i2p.i2ptunnel.web.EditBean" %>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
-
-<html><head>
-<title>I2PTunnel edit</title>
-</head><body>
-
-<a href="index.jsp">Back</a>
-
-<jsp:useBean class="net.i2p.i2ptunnel.WebEditPageHelper" id="helper" scope="request" />
-<jsp:setProperty name="helper" property="*" />
-<b><jsp:getProperty name="helper" property="actionResults" /></b>
-
-<jsp:getProperty name="helper" property="editForm" />
-</body>
-</html>
+<% String tun = request.getParameter("tunnel");
+   if (tun != null) {
+    try {
+      int curTunnel = Integer.parseInt(tun);
+      if (EditBean.staticIsClient(curTunnel)) {
+      %><jsp:include page="editClient.jsp" /><%
+      } else {
+      %><jsp:include page="editServer.jsp" /><%
+      }
+    } catch (NumberFormatException nfe) {
+      %>Invalid tunnel parameter<%
+    }
+  } else {
+    String type = request.getParameter("type");
+    int curTunnel = -1;
+    if ("client".equals(type) || "httpclient".equals(type)) {
+      %><jsp:include page="editClient.jsp" /><%
+    } else if ("server".equals(type) || "httpserver".equals(type)) {
+      %><jsp:include page="editServer.jsp" /><%
+    } else {
+      %>Invalid tunnel type<%
+    }
+  }
+%>
