@@ -3,8 +3,12 @@ package net.i2p.router.web;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.text.DateFormat;
 import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Iterator;
+import java.util.Locale;
 import java.util.Set;
 
 import net.i2p.data.DataHelper;
@@ -70,7 +74,32 @@ public class SummaryHelper {
         else
             return DataHelper.formatDuration(router.getUptime());
     }
-
+    
+    private static final DateFormat _fmt = new java.text.SimpleDateFormat("HH:mm:ss", Locale.UK);
+    public String getTime() {
+        if (_context == null) return "";
+        
+        String now = null;
+        synchronized (_fmt) {
+            now = _fmt.format(new Date(_context.clock().now()));
+        }
+        
+        long ms = _context.clock().getOffset();
+        
+        if (ms < 60 * 1000) {
+            return now + " (" + (ms / 1000) + "s)";
+        } else if (ms < 60 * 1000) {
+            return now + " (" + (ms / (60 * 1000)) + "m)";
+        } else if (ms < 24 * 60 * 60 * 1000) {
+            return now + " (" + (ms / (60 * 60 * 1000)) + "h)";
+        } else {
+            return now + " (" + (ms / (24 * 60 * 60 * 1000)) + "d)";
+        }
+    }
+    
+    public boolean allowReseed() {
+        return (_context.netDb().getKnownRouters() < 10);
+    }
         
     /**
      * Retrieve amount of used memory.

@@ -26,10 +26,10 @@ public class Timestamper implements Runnable {
     private boolean _initialized;
     
     private static final int DEFAULT_QUERY_FREQUENCY = 5*60*1000;
-    private static final String DEFAULT_SERVER_LIST = "pool.ntp.org, pool.ntp.org";
+    private static final String DEFAULT_SERVER_LIST = "pool.ntp.org, pool.ntp.org, pool.ntp.org";
     private static final boolean DEFAULT_DISABLED = true;
     /** how many times do we have to query if we are changing the clock? */
-    private static final int DEFAULT_CONCURRING_SERVERS = 2;
+    private static final int DEFAULT_CONCURRING_SERVERS = 3;
     
     public static final String PROP_QUERY_FREQUENCY = "time.queryFrequencyMs";
     public static final String PROP_SERVER_LIST = "time.sntpServerList";
@@ -109,7 +109,7 @@ public class Timestamper implements Runnable {
 
         if (_log.shouldLog(Log.INFO))
             _log.info("Starting up timestamper");
-        boolean alreadyBitched = false;
+        boolean lastFailed = false;
         try {
             while (true) {
                 updateConfig();
@@ -123,14 +123,16 @@ public class Timestamper implements Runnable {
                     if (_log.shouldLog(Log.DEBUG))
                         _log.debug("Querying servers " + _servers);
                     try {
-                        queryTime(serverList);
+                        lastFailed = !queryTime(serverList);
                     } catch (IllegalArgumentException iae) {
-                        if (!alreadyBitched) 
+                        if (!lastFailed) 
                             _log.log(Log.CRIT, "Unable to reach any of the NTP servers - network disconnected?");
-                        alreadyBitched = true;
+                        lastFailed = true;
                     }
                 }
                 long sleepTime = _context.random().nextInt(_queryFrequency) + _queryFrequency;
+                if (lastFailed)
+                    sleepTime = 30*1000;
                 try { Thread.sleep(sleepTime); } catch (InterruptedException ie) {}
             }
         } catch (Throwable t) {
@@ -138,39 +140,64 @@ public class Timestamper implements Runnable {
         }
     }
     
-    private void queryTime(String serverList[]) throws IllegalArgumentException {
+    /**
+     * True if the time was queried successfully, false if it couldn't be
+     */
+    private boolean queryTime(String serverList[]) throws IllegalArgumentException {
+        long found[] = new long[serverList.length];
         long localTime = -1;
         long now = -1;
         long expectedDelta = 0;
         for (int i = 0; i < _concurringServers; i++) {
+            try { Thread.sleep(10*1000); } catch (InterruptedException ie) {}
             localTime = _context.clock().now();
             now = NtpClient.currentTime(serverList);
             
             long delta = now - localTime;
+            found[i] = delta;
             if (i == 0) {
                 if (Math.abs(delta) < MAX_VARIANCE) {
                     if (_log.shouldLog(Log.INFO))
                         _log.info("a single SNTP query was within the tolerance (" + delta + "ms)");
-                    return;
+                    return true;
                 } else {
                     // outside the tolerance, lets iterate across the concurring queries
                     expectedDelta = delta;
                 }
             } else {
                 if (Math.abs(delta - expectedDelta) > MAX_VARIANCE) {
-                    if (_log.shouldLog(Log.ERROR))
-                        _log.error("SNTP client variance exceeded at query " + i + ".  expected = " + expectedDelta + ", found = " + delta);
-                    return;
+                    if (_log.shouldLog(Log.ERROR)) {
+                        StringBuffer err = new StringBuffer(96);
+                        err.append("SNTP client variance exceeded at query ").append(i);
+                        err.append(".  expected = ");
+                        err.append(expectedDelta);
+                        err.append(", found = ");
+                        err.append(delta);
+                        err.append(" all deltas: ");
+                        for (int j = 0; j < found.length; j++)
+                            err.append(found[j]).append(' ');
+                        _log.error(err.toString());
+                    }
+                    return false;
                 }
             }
         }
         stampTime(now);
+        if (_log.shouldLog(Log.DEBUG)) {
+            StringBuffer buf = new StringBuffer(64);
+            buf.append("Deltas: ");
+            for (int i = 0; i < found.length; i++)
+                buf.append(found[i]).append(' ');
+            _log.debug(buf.toString());
+        }
+        return true;
     }
     
     /**
      * Send an HTTP request to a given URL specifying the current time 
      */
     private void stampTime(long now) {
+        long before = _context.clock().now();
         synchronized (_listeners) {
             for (int i = 0; i < _listeners.size(); i++) {
                 UpdateListener lsnr = (UpdateListener)_listeners.get(i);
@@ -178,7 +205,7 @@ public class Timestamper implements Runnable {
             }
         }
         if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Stamped the time as " + now);
+            _log.debug("Stamped the time as " + now + " (delta=" + (now-before) + ")");
     }
  
     /**

@@ -10,6 +10,7 @@
  <b>Ident:</b> <jsp:getProperty name="helper" property="ident" /><br />
  <b>Version:</b> <jsp:getProperty name="helper" property="version" /><br />
  <b>Uptime:</b> <jsp:getProperty name="helper" property="uptime" /><br />
+ <b>Now:</b> <jsp:getProperty name="helper" property="time" /><br />
  <b>Memory:</b> <jsp:getProperty name="helper" property="memory" /><br />
  <hr />
  
@@ -23,7 +24,7 @@
      if (helper.getActivePeers() <= 0) {
         %><b><a href="config.jsp">check your NAT/firewall</a></b><br /><%
      }
-    if (helper.getActiveProfiles() <= 10) { // 10 is the min fallback
+    if (helper.allowReseed()) {
         if ("true".equals(System.getProperty("net.i2p.router.web.ReseedHandler.reseedInProgress", "false"))) {
             out.print(" <i>reseeding</i>");
         } else {

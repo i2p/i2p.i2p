@@ -60,6 +60,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
     private boolean _initialized;
     /** Clock independent time of when we started up */
     private long _started;
+    private int _knownRouters;
     private StartExplorersJob _exploreJob;
     private HarvesterJob _harvestJob;
     /** when was the last time an exploration found something new? */
@@ -130,6 +131,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         _peerSelector = new PeerSelector(_context);
         _publishingLeaseSets = new HashSet(8);
         _lastExploreNew = 0;
+        _knownRouters = 0;
         _activeRequests = new HashMap(8);
         _enforceNetId = DEFAULT_ENFORCE_NETID;
     }
@@ -358,6 +360,8 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         }
         return rv;
     }
+    
+    public int getKnownRouters() { return _knownRouters; }
     
     public void lookupLeaseSet(Hash key, Job onFindJob, Job onFailedLookupJob, long timeoutMs) {
         if (!_initialized) return;
@@ -639,6 +643,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
             + routerInfo.getOptions().size() + " options on "
             + new Date(routerInfo.getPublished()));
         
+        _knownRouters++;
         _ds.put(key, routerInfo);
         synchronized (_lastSent) {
             if (!_lastSent.containsKey(key))
@@ -699,6 +704,8 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         synchronized (_passiveSendKeys) {
             _passiveSendKeys.remove(dbEntry);
         }
+        if (isRouterInfo)
+            _knownRouters--;
     }
     
     public void unpublish(LeaseSet localLeaseSet) {

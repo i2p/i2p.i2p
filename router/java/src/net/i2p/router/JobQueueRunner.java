@@ -92,9 +92,12 @@ class JobQueueRunner implements Runnable {
                 _state = 13;
                 long diff = _context.clock().now() - beforeUpdate;
 
+                long lag = doStart - origStartAfter;
+                if (lag < 0) lag = 0;
+                
                 _context.statManager().addRateData("jobQueue.jobRunnerInactive", betweenJobs, betweenJobs);
                 _context.statManager().addRateData("jobQueue.jobRun", duration, duration);
-                _context.statManager().addRateData("jobQueue.jobLag", doStart - origStartAfter, 0);
+                _context.statManager().addRateData("jobQueue.jobLag", lag, 0);
                 _context.statManager().addRateData("jobQueue.jobWait", enqueuedTime, enqueuedTime);
 
                 if (duration > 1000) {

@@ -57,6 +57,8 @@ public abstract class NetworkDatabaseFacade implements Service {
     public abstract void publish(LeaseSet localLeaseSet);
     public abstract void unpublish(LeaseSet localLeaseSet);
     public abstract void fail(Hash dbEntry);
+    
+    public int getKnownRouters() { return 0; }
 }
 
 

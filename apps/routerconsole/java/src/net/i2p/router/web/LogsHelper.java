@@ -41,6 +41,22 @@ public class LogsHelper {
         return buf.toString();
     }
     
+    public String getCriticalLogs() {
+        List msgs = _context.logManager().getBuffer().getMostRecentCriticalMessages();
+        StringBuffer buf = new StringBuffer(16*1024); 
+        buf.append("<ul>");
+        buf.append("<code>\n");
+        for (int i = msgs.size(); i > 0; i--) { 
+            String msg = (String)msgs.get(i - 1);
+            buf.append("<li>");
+            buf.append(msg);
+            buf.append("</li>\n");
+        }
+        buf.append("</code></ul>\n");
+        
+        return buf.toString();
+    }
+    
     public String getServiceLogs() {
         String str = FileUtil.readTextFile("wrapper.log", 500, false);
         if (str == null) 

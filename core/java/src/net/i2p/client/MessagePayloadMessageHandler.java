@@ -57,8 +57,8 @@ class MessagePayloadMessageHandler extends HandlerImpl {
         Payload payload = msg.getPayload();
         byte[] data = _context.elGamalAESEngine().decrypt(payload.getEncryptedData(), session.getDecryptionKey());
         if (data == null) {
-            if (_log.shouldLog(Log.ERROR))
-                _log.error("Error decrypting the payload");
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Error decrypting the payload");
             throw new DataFormatException("Unable to decrypt the payload");
         }
         payload.setUnencryptedData(data);

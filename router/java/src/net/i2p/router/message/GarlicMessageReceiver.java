@@ -76,6 +76,9 @@ public class GarlicMessageReceiver {
         } else {
             if (_log.shouldLog(Log.ERROR))
                 _log.error("CloveMessageParser failed to decrypt the message [" + message.getUniqueId() 
+                           + "]");
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("CloveMessageParser failed to decrypt the message [" + message.getUniqueId() 
                            + "]", new Exception("Decrypt garlic failed"));
             _context.statManager().addRateData("crypto.garlic.decryptFail", 1, 0);
             _context.messageHistory().messageProcessingError(message.getUniqueId(), 
@@ -105,6 +108,9 @@ public class GarlicMessageReceiver {
             String howLongAgo = DataHelper.formatDuration(_context.clock().now()-clove.getExpiration().getTime());
             if (_log.shouldLog(Log.ERROR))
                 _log.error("Clove is NOT valid: id=" + clove.getCloveId() 
+                           + " expiration " + howLongAgo + " ago");
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Clove is NOT valid: id=" + clove.getCloveId() 
                            + " expiration " + howLongAgo + " ago", new Exception("Invalid within..."));
             _context.messageHistory().messageProcessingError(clove.getCloveId(), 
                                                              clove.getData().getClass().getName(), 

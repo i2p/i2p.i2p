@@ -17,10 +17,13 @@ class OutboundReceiver implements TunnelGateway.Receiver {
     private RouterContext _context;
     private Log _log;
     private TunnelCreatorConfig _config;
+    private RouterInfo _nextHopCache;
+    
     public OutboundReceiver(RouterContext ctx, TunnelCreatorConfig cfg) {
         _context = ctx;
         _log = ctx.logManager().getLog(OutboundReceiver.class);
         _config = cfg;
+        _nextHopCache = _context.netDb().lookupRouterInfoLocally(_config.getPeer(1));
     }
     
     public void receiveEncrypted(byte encrypted[]) {
@@ -30,8 +33,11 @@ class OutboundReceiver implements TunnelGateway.Receiver {
 
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("received encrypted, sending out " + _config + ": " + msg);
-        RouterInfo ri = _context.netDb().lookupRouterInfoLocally(_config.getPeer(1));
+        RouterInfo ri = _nextHopCache;
+        if (ri == null)
+            ri = _context.netDb().lookupRouterInfoLocally(_config.getPeer(1));
         if (ri != null) {
+            _nextHopCache = ri;
             send(msg, ri);
         } else {
             if (_log.shouldLog(Log.DEBUG))
@@ -65,8 +71,10 @@ class OutboundReceiver implements TunnelGateway.Receiver {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("lookup of " + _config.getPeer(1).toBase64().substring(0,4) 
                            + " successful? " + (ri != null));
-            if (ri != null)
+            if (ri != null) {
+                _nextHopCache = ri;
                 send(_msg, ri);
+            }
         }
     }
     

@@ -137,29 +137,30 @@ public class PacketHandler {
                     if (_log.shouldLog(Log.WARN))
                         _log.warn("Received forged reset for " + con, ie);
                 }
-            } else if (packet.isFlagSet(Packet.FLAG_SYNCHRONIZE)) {
+            } else {
                 if ( (con.getSendStreamId() == null) || 
                      (DataHelper.eq(con.getSendStreamId(), packet.getReceiveStreamId())) ) {
                     byte oldId[] =con.getSendStreamId();
-                    // con fully established, w00t
-                    con.setSendStreamId(packet.getReceiveStreamId());
+                    if (packet.isFlagSet(Packet.FLAG_SYNCHRONIZE)) // con fully established, w00t
+                        con.setSendStreamId(packet.getReceiveStreamId());
+                    
                     try {
                         con.getPacketHandler().receivePacket(packet, con);
                     } catch (I2PException ie) {
                         if (_log.shouldLog(Log.WARN))
-                            _log.warn("Received forged syn for " + con, ie);
+                            _log.warn("Received forged packet for " + con + ": " + packet, ie);
                         con.setSendStreamId(oldId);
                     }
-                } else {
+                } else if (packet.isFlagSet(Packet.FLAG_SYNCHRONIZE)) {
                     if (_log.shouldLog(Log.WARN))
                         _log.warn("Receive a syn packet with the wrong IDs, sending reset: " + packet);
                     sendReset(packet);
-                }
-            } else {
-                if (!con.getResetSent()) {
-                    // someone is sending us a packet on the wrong stream 
-                    if (_log.shouldLog(Log.WARN))
-                        _log.warn("Received a packet on the wrong stream: " + packet + " connection: " + con);
+                } else {
+                    if (!con.getResetSent()) {
+                        // someone is sending us a packet on the wrong stream 
+                        if (_log.shouldLog(Log.WARN))
+                            _log.warn("Received a packet on the wrong stream: " + packet + " connection: " + con);
+                    }
                 }
             }
         }

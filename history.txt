@@ -1,4 +1,20 @@
-$Id: history.txt,v 1.149 2005/02/20 04:12:48 jrandom Exp $
+$Id: history.txt,v 1.150 2005/02/21 14:08:01 jrandom Exp $
+
+2005-02-22  jrandom
+    * Adjusted (and fixed...) the timestamper change detection
+    * Deal with a rare reordering bug at the beginning of a stream (so we 
+      don't drop it unnecessarily)
+    * Cleaned up some dropped message handling in the router
+    * Reduced job queue churn when dealing with a large number of tunnels by
+      sharing an expiration job
+    * Keep a separate list of the most recent CRIT messages (shown on the 
+      logs.jsp).  This way they don't get buried among any other messages.
+    * For clarity, display the tunnel variance config as "Randomization" on 
+      the web console.
+    * If lease republishing fails (boo! hiss!) try it again 
+    * Actually fix the negative jobLag in the right place (this time)
+    * Allow reseeding when there are less than 10 known peer references
+    * Lots of logging updates.
 
 2005-02-20  jrandom
     * Allow the streaming lib resend frequency to drop down to 20s as the

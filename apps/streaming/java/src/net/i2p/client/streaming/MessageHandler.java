@@ -92,7 +92,9 @@ public class MessageHandler implements I2PSessionListener {
      */
     public void errorOccurred(I2PSession session, String message, Throwable error) {
         if (_log.shouldLog(Log.ERROR))
-            _log.error("error occurred: " + message, error);
+            _log.error("error occurred: " + message + "- " + error.getMessage()); 
+        if (_log.shouldLog(Log.WARN))
+            _log.warn("cause", error);
         //_manager.disconnectAllHard();
     }
     

@@ -38,6 +38,7 @@ public class TunnelDispatcher implements Service {
     /** what is the date/time on which the last non-locally-created tunnel expires? */
     private long _lastParticipatingExpiration;
     private BloomFilterIVValidator _validator;
+    private LeaveTunnel _leaveJob;
     
     /** Creates a new instance of TunnelDispatcher */
     public TunnelDispatcher(RouterContext ctx) {
@@ -50,6 +51,7 @@ public class TunnelDispatcher implements Service {
         _participatingConfig = new HashMap();
         _lastParticipatingExpiration = 0;
         _validator = null;
+        _leaveJob = new LeaveTunnel(ctx);
         ctx.statManager().createRateStat("tunnel.participatingTunnels", 
                                          "How many tunnels are we participating in?", "Tunnels", 
                                          new long[] { 10*60*1000l, 60*60*1000l, 3*60*60*1000l, 24*60*60*1000l });
@@ -176,7 +178,7 @@ public class TunnelDispatcher implements Service {
         _context.statManager().addRateData("tunnel.joinParticipant", 1, 0);
         if (cfg.getExpiration() > _lastParticipatingExpiration)
             _lastParticipatingExpiration = cfg.getExpiration();
-        _context.jobQueue().addJob(new LeaveTunnel(_context, cfg));
+        _leaveJob.add(cfg);
     }
     /**
      * We are the outbound endpoint in this tunnel, and did not create it
@@ -200,7 +202,7 @@ public class TunnelDispatcher implements Service {
 
         if (cfg.getExpiration() > _lastParticipatingExpiration)
             _lastParticipatingExpiration = cfg.getExpiration();
-        _context.jobQueue().addJob(new LeaveTunnel(_context, cfg));
+        _leaveJob.add(cfg);
     }
     
     /**
@@ -228,7 +230,7 @@ public class TunnelDispatcher implements Service {
 
         if (cfg.getExpiration() > _lastParticipatingExpiration)
             _lastParticipatingExpiration = cfg.getExpiration();
-        _context.jobQueue().addJob(new LeaveTunnel(_context, cfg));
+        _leaveJob.add(cfg);
     }
 
     public int getParticipatingCount() {
@@ -336,10 +338,11 @@ public class TunnelDispatcher implements Service {
                 _context.statManager().addRateData("tunnel.dispatchEndpoint", 1, 0);
             } else {
                 _context.messageHistory().droppedTunnelDataMessageUnknown(msg.getUniqueId(), msg.getTunnelId().getTunnelId());
-                if (_log.shouldLog(Log.ERROR))
-                    _log.error("no matching participant/endpoint for id=" + msg.getTunnelId().getTunnelId() 
-                               + ": existing = " + _participants.keySet() 
-                               + " / " + _outboundEndpoints.keySet());
+                int level = (_context.router().getUptime() > 10*60*1000 ? Log.ERROR : Log.WARN);
+                if (_log.shouldLog(level))
+                    _log.log(level, "no matching participant/endpoint for id=" + msg.getTunnelId().getTunnelId() 
+                             + " expiring in " + DataHelper.formatDuration(msg.getMessageExpiration()-_context.clock().now())
+                             + ": existing = " + _participants.size() + " / " + _outboundEndpoints.size());
             }
         }
         
@@ -374,8 +377,9 @@ public class TunnelDispatcher implements Service {
             _context.statManager().addRateData("tunnel.dispatchInbound", 1, 0);
         } else {
             _context.messageHistory().droppedTunnelGatewayMessageUnknown(msg.getUniqueId(), msg.getTunnelId().getTunnelId());
-            if (_log.shouldLog(Log.ERROR))
-                _log.error("no matching tunnel for id=" + msg.getTunnelId().getTunnelId() 
+            int level = (_context.router().getUptime() > 10*60*1000 ? Log.ERROR : Log.WARN);
+            if (_log.shouldLog(level))
+                _log.log(level, "no matching tunnel for id=" + msg.getTunnelId().getTunnelId() 
                            + ": gateway message expiring in " 
                            + DataHelper.formatDuration(msg.getMessageExpiration()-_context.clock().now())
                            + "/" 
@@ -383,7 +387,7 @@ public class TunnelDispatcher implements Service {
                            + " messageId " + msg.getUniqueId()
                            + "/" + msg.getMessage().getUniqueId()
                            + " messageType: " + msg.getMessage().getClass().getName()
-                           + " existing = " + _inboundGateways.keySet());
+                           + " existing = " + _inboundGateways.size());
         }
         
         long dispatchTime = _context.clock().now() - before;
@@ -423,7 +427,7 @@ public class TunnelDispatcher implements Service {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("dispatch outbound through " + outboundTunnel.getTunnelId()
                            + ": " + msg);
-            if (msg.getMessageExpiration() < before) {
+            if (msg.getMessageExpiration() < before - Router.CLOCK_FUDGE_FACTOR) {
                 if (_log.shouldLog(Log.ERROR))
                     _log.error("why are you sending a tunnel message that expired " 
                                + (before-msg.getMessageExpiration()) + "ms ago? " 
@@ -438,9 +442,10 @@ public class TunnelDispatcher implements Service {
         } else {
             _context.messageHistory().droppedTunnelGatewayMessageUnknown(msg.getUniqueId(), outboundTunnel.getTunnelId());
 
-            if (_log.shouldLog(Log.ERROR))
-                _log.error("no matching outbound tunnel for id=" + outboundTunnel
-                           + ": existing = " + _outboundGateways.keySet());
+            int level = (_context.router().getUptime() > 10*60*1000 ? Log.ERROR : Log.WARN);
+            if (_log.shouldLog(level))
+                _log.log(level, "no matching outbound tunnel for id=" + outboundTunnel
+                           + ": existing = " + _outboundGateways.size());
         }
         
         long dispatchTime = _context.clock().now() - before;
@@ -473,16 +478,59 @@ public class TunnelDispatcher implements Service {
     public void renderStatusHTML(Writer out) throws IOException {}    
     
     private class LeaveTunnel extends JobImpl {
-        private HopConfig _config;
+        private List _configs;
+        private List _times;
         
-        public LeaveTunnel(RouterContext ctx, HopConfig config) {
+        public LeaveTunnel(RouterContext ctx) {
             super(ctx);
-            _config = config;
-            getTiming().setStartAfter(config.getExpiration() + 2*Router.CLOCK_FUDGE_FACTOR);
+            _configs = new ArrayList(128);
+            _times = new ArrayList(128);
         }
+        
+        public void add(HopConfig cfg) {
+            Long dropTime = new Long(cfg.getExpiration() + 2*Router.CLOCK_FUDGE_FACTOR);
+            synchronized (LeaveTunnel.this) {
+                _configs.add(cfg);
+                _times.add(dropTime);
+            }
+            
+            long oldAfter = getTiming().getStartAfter();
+            if (oldAfter < getContext().clock().now()) {
+                getTiming().setStartAfter(dropTime.longValue());
+                getContext().jobQueue().addJob(LeaveTunnel.this);
+            } else if (oldAfter >= dropTime.longValue()) {
+                getTiming().setStartAfter(dropTime.longValue());
+            } else {
+                // already scheduled for the future, and before this expiration
+            }
+        }
+        
         public String getName() { return "Leave participant"; }
         public void runJob() {
-            remove(_config);
+            HopConfig cur = null;
+            Long nextTime = null;
+            long now = getContext().clock().now();
+            synchronized (LeaveTunnel.this) {
+                if (_configs.size() <= 0)
+                    return;
+                nextTime = (Long)_times.get(0);
+                if (nextTime.longValue() <= now) {
+                    cur = (HopConfig)_configs.remove(0);
+                    _times.remove(0);
+                    if (_times.size() > 0)
+                        nextTime = (Long)_times.get(0);
+                    else
+                        nextTime = null;
+                }
+            }
+            
+            if (cur != null) 
+                remove(cur);
+            
+            if (nextTime != null) {
+                getTiming().setStartAfter(nextTime.longValue());
+                getContext().jobQueue().addJob(LeaveTunnel.this);
+            }
         }
     }
 }

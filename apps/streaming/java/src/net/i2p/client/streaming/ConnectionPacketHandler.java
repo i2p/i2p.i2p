@@ -259,11 +259,15 @@ public class ConnectionPacketHandler {
                     con.setRemotePeer(packet.getOptionalFrom());
                     return true;
                 } else {
-                    // neither RST nor SYN and we dont have the stream id yet?  nuh uh
-                    if (_log.shouldLog(Log.WARN))
-                        _log.warn("Packet without RST or SYN where we dont know stream ID: " 
-                                  + packet);
-                    return false;
+                    // neither RST nor SYN and we dont have the stream id yet?
+                    if (packet.getSequenceNum() <= 2) {
+                        return true;
+                    } else {
+                        if (_log.shouldLog(Log.WARN))
+                            _log.warn("Packet without RST or SYN where we dont know stream ID: " 
+                                      + packet);
+                        return false;
+                    }
                 }
             } else {
                 if (!DataHelper.eq(con.getSendStreamId(), packet.getReceiveStreamId())) {

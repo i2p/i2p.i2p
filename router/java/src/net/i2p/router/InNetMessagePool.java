@@ -20,6 +20,7 @@ import net.i2p.data.RouterIdentity;
 import net.i2p.data.i2np.DeliveryStatusMessage;
 import net.i2p.data.i2np.I2NPMessage;
 import net.i2p.data.i2np.DatabaseSearchReplyMessage;
+import net.i2p.data.i2np.DatabaseLookupMessage;
 import net.i2p.data.i2np.TunnelCreateStatusMessage;
 import net.i2p.data.i2np.TunnelDataMessage;
 import net.i2p.data.i2np.TunnelGatewayMessage;
@@ -35,7 +36,7 @@ import net.i2p.util.Log;
 public class InNetMessagePool implements Service {
     private Log _log;
     private RouterContext _context;
-    private Map _handlerJobBuilders;
+    private HandlerJobBuilder _handlerJobBuilders[];
     private List _pendingDataMessages;
     private List _pendingDataMessagesFrom;
     private List _pendingGatewayMessages;
@@ -57,7 +58,7 @@ public class InNetMessagePool implements Service {
     
     public InNetMessagePool(RouterContext context) {
         _context = context;
-        _handlerJobBuilders = new HashMap();
+        _handlerJobBuilders = new HandlerJobBuilder[20];
         _pendingDataMessages = new ArrayList(16);
         _pendingDataMessagesFrom = new ArrayList(16);
         _pendingGatewayMessages = new ArrayList(16);
@@ -75,11 +76,15 @@ public class InNetMessagePool implements Service {
     }
   
     public HandlerJobBuilder registerHandlerJobBuilder(int i2npMessageType, HandlerJobBuilder builder) {
-        return (HandlerJobBuilder)_handlerJobBuilders.put(new Integer(i2npMessageType), builder);
+        HandlerJobBuilder old = _handlerJobBuilders[i2npMessageType];
+        _handlerJobBuilders[i2npMessageType] = builder;
+        return old;
     }
   
     public HandlerJobBuilder unregisterHandlerJobBuilder(int i2npMessageType) {
-        return (HandlerJobBuilder)_handlerJobBuilders.remove(new Integer(i2npMessageType));
+        HandlerJobBuilder old = _handlerJobBuilders[i2npMessageType];
+        _handlerJobBuilders[i2npMessageType] = null;
+        return old;
     }
     
     /**
@@ -132,7 +137,7 @@ public class InNetMessagePool implements Service {
             shortCircuitTunnelData(messageBody, fromRouterHash);
             allowMatches = false;
         } else {
-            HandlerJobBuilder builder = (HandlerJobBuilder)_handlerJobBuilders.get(new Integer(type));
+            HandlerJobBuilder builder = _handlerJobBuilders[type];
 
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Add message to the inNetMessage pool - builder: " + builder 
@@ -190,12 +195,14 @@ public class InNetMessagePool implements Service {
                         if (_log.shouldLog(Log.INFO))
                             _log.info("Dropping slow db lookup response: " + messageBody);
                         _context.statManager().addRateData("inNetPool.droppedDbLookupResponseMessage", 1, 0);
+                    } else if (type == DatabaseLookupMessage.MESSAGE_TYPE) {
+                        if (_log.shouldLog(Log.DEBUG))
+                            _log.debug("Dropping netDb lookup due to throttling");
                     } else {
-                        if (_log.shouldLog(Log.ERROR))
-                            _log.error("Message " + messageBody + " expiring on " 
-                                       + (messageBody != null ? (messageBody.getMessageExpiration()+"") : " [unknown]")
-                                       + " was not handled by a HandlerJobBuilder - DROPPING: " 
-                                       + messageBody, new Exception("DROPPED MESSAGE"));
+                        if (_log.shouldLog(Log.WARN))
+                            _log.warn("Message expiring on " 
+                                      + (messageBody != null ? (messageBody.getMessageExpiration()+"") : " [unknown]")
+                                      + " was not handled by a HandlerJobBuilder - DROPPING: " + messageBody);
                         _context.statManager().addRateData("inNetPool.dropped", 1, 0);
                     }
                 } else {

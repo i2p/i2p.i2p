@@ -101,6 +101,8 @@ class LogWriter implements Runnable {
 
         // we always add to the console buffer, but only sometimes write to stdout
         _manager.getBuffer().add(val);
+        if (rec.getPriority() >= Log.CRIT)
+            _manager.getBuffer().addCritical(val);
         if (_manager.getDisplayOnScreenLevel() <= rec.getPriority()) {
             if (_manager.displayOnScreen()) {
                 System.out.print(val);

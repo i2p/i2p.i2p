@@ -112,7 +112,7 @@ public class ConfigTunnelsHelper {
         buf.append("</tr>\n");
 
         // tunnel depth variance
-        buf.append("<tr><td>Variance</td>\n");
+        buf.append("<tr><td>Randomization</td>\n");
         buf.append("<td><select name=\"").append(index).append(".varianceInbound\">\n");
         buf.append("<option value=\"0\" ");
         if (in.getLengthVariance() == 0) buf.append(" selected=\"true\" ");
