@@ -59,7 +59,7 @@ public class PeerDataWriter {
         String header = getHeader(data);
 
         out.write(header.getBytes());
-        out.write("#action\tstatus\tdate and time sent   \tsendMs\treplyMs\n".getBytes());
+        out.write("#action\tstatus\tdate and time sent   \tsendMs\treplyMs\troundTrip\n".getBytes());
         for (Iterator iter = data.getDataPoints().iterator(); iter.hasNext();) {
             PeerData.EventDataPoint point = (PeerData.EventDataPoint) iter.next();
             String line = getEvent(point);
@@ -84,12 +84,15 @@ public class PeerDataWriter {
         buf.append("lifetimeSent \t").append(data.getLifetimeSent()).append('\n');
         buf.append("lifetimeRecv \t").append(data.getLifetimeReceived()).append('\n');
         int periods[] = data.getAveragePeriods();
-        buf.append("#averages\tminutes\tsendMs\trecvMs\tnumLost\n");
+        buf.append("#averages\tminutes\tsendMs\trecvMs\tnumLost\troundTrip\n");
         for (int i = 0; i < periods.length; i++) {
             buf.append("periodAverage\t").append(periods[i]).append('\t');
             buf.append(getNum(data.getAverageSendTime(periods[i]))).append('\t');
             buf.append(getNum(data.getAverageReceiveTime(periods[i]))).append('\t');
-            buf.append(getNum(data.getLostMessages(periods[i]))).append('\n');
+            buf.append(getNum(data.getLostMessages(periods[i]))).append('\t');
+            double rtt = data.getAverageSendTime(periods[i]) 
+                         + data.getAverageReceiveTime(periods[i]);
+            buf.append(getNum(rtt)).append('\n');
         }
         return buf.toString();
     }
@@ -105,6 +108,7 @@ public class PeerDataWriter {
         if (point.getWasPonged()) {
             buf.append(point.getPongSent() - point.getPingSent()).append('\t');
             buf.append(point.getPongReceived() - point.getPongSent()).append('\t');
+            buf.append(point.getPongReceived() - point.getPingSent()).append('\t');
         }
         buf.append('\n');
         return buf.toString();
