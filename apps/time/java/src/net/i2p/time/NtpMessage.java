@@ -384,7 +384,7 @@ public class NtpMessage {
         // low order bits of the timestamp with a random, unbiased
         // bitstring, both to avoid systematic roundoff errors and as
         // a means of loop detection and replay detection.
-        array[7] = (byte) (Math.random()*255.0);
+        array[7+pointer] = (byte) (Math.random()*255.0);
     }
     
     
