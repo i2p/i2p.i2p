@@ -30,7 +30,7 @@ class PersistenceHelper {
                 _log.error("Error formatting " + val + " into a long", nfe);
             }
         } else {
-            _log.error("Key " + prefix + name + " does not exist");
+            _log.warn("Key " + prefix + name + " does not exist");
         }
         return 0;
     }

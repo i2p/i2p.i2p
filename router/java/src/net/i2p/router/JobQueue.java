@@ -153,9 +153,9 @@ public class JobQueue {
 
         _context.statManager().addRateData("jobQueue.readyJobs", numReady, 0);
         if (shouldDrop(job, numReady)) {
-            if (_log.shouldLog(Log.ERROR))
-                _log.error("Dropping job due to overload!  # ready jobs: " 
-                           + numReady + ": job = " + job);
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Dropping job due to overload!  # ready jobs: " 
+                          + numReady + ": job = " + job);
             job.dropped();
             _context.statManager().addRateData("jobQueue.droppedJobs", 1, 1);
             awaken(1);
