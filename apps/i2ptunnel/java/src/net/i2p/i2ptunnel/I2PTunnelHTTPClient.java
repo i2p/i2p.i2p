@@ -356,7 +356,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
             String remoteID;
             I2PSocket i2ps = createI2PSocket(dest);
             byte[] data = newRequest.toString().getBytes("ISO-8859-1");
-            I2PTunnelRunner runner = new I2PTunnelRunner(s, i2ps, sockLock, data);
+            I2PTunnelRunner runner = new I2PTunnelRunner(s, i2ps, sockLock, data, mySockets);
             timeoutThread = new InactivityTimeoutThread(runner, out, targetRequest, usingWWWProxy, currentProxy, s, requestId);
             timeoutThread.start();
         } catch (SocketException ex) {

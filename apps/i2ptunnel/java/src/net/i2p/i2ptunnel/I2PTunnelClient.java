@@ -56,14 +56,20 @@ public class I2PTunnelClient extends I2PTunnelClientBase {
     public long getReadTimeout() { return readTimeout; }
     
     protected void clientConnectionRun(Socket s) {
+        I2PSocket i2ps = null;
         try {
-            I2PSocket i2ps = createI2PSocket(dest);
+            i2ps = createI2PSocket(dest);
             i2ps.setReadTimeout(readTimeout);
-            new I2PTunnelRunner(s, i2ps, sockLock, null);
+            new I2PTunnelRunner(s, i2ps, sockLock, null, mySockets);
         } catch (Exception ex) {
             _log.info("Error connecting", ex);
             l.log(ex.getMessage());
             closeSocket(s);
+            if (i2ps != null) {
+                synchronized (sockLock) {
+                    mySockets.remove(sockLock);
+                }
+            }
         }
     }
 }

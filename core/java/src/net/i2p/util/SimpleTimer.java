@@ -25,6 +25,7 @@ public class SimpleTimer {
     private Map _eventTimes;
     
     private SimpleTimer() {
+        _log = I2PAppContext.getGlobalContext().logManager().getLog(SimpleTimer.class);
         _events = new TreeMap();
         _eventTimes = new HashMap();
         I2PThread runner = new I2PThread(new SimpleTimerRunner());
@@ -79,25 +80,34 @@ public class SimpleTimer {
                     synchronized (_events) {
                         if (_events.size() <= 0)
                             _events.wait();
+                        if (_events.size() > 100)
+                            _log.warn("> 100 events!  " + _events.values());
                         long now = System.currentTimeMillis();
                         long nextEventDelay = -1;
+                        Object nextEvent = null;
                         while (true) {
                             if (_events.size() <= 0) break;
                             Long when = (Long)_events.firstKey();
                             if (when.longValue() <= now) {
                                 TimedEvent evt = (TimedEvent)_events.remove(when);
-                                _eventTimes.remove(when);
-                                eventsToFire.add(evt);
+                                if (evt != null) {                            
+                                    _eventTimes.remove(evt);
+                                    eventsToFire.add(evt);
+                                }
                             } else {
                                 nextEventDelay = when.longValue() - now;
+                                nextEvent = _events.get(when);
                                 break;
                             }
                         }
                         if (eventsToFire.size() <= 0) { 
-                            if (nextEventDelay != -1)
+                            if (nextEventDelay != -1) {
+                                if (_log.shouldLog(Log.DEBUG))
+                                    _log.debug("Next event in " + nextEventDelay + ": " + nextEvent);
                                 _events.wait(nextEventDelay);
-                            else
+                            } else {
                                 _events.wait();
+                            }
                         }
                     }
                 } catch (InterruptedException ie) {

@@ -11,6 +11,7 @@ import java.io.OutputStream;
 import java.net.Socket;
 import java.net.SocketException;
 import java.util.HashMap;
+import java.util.List;
 
 import net.i2p.client.streaming.I2PSocket;
 import net.i2p.data.ByteArray;
@@ -44,10 +45,12 @@ public class I2PTunnelRunner extends I2PThread implements I2PSocket.SocketErrorL
     private long lastActivityOn;
     /** when the runner started up */
     private long startedOn;
+    private List sockList;
 
     private volatile long __forwarderId;
     
-    public I2PTunnelRunner(Socket s, I2PSocket i2ps, Object slock, byte[] initialData) {
+    public I2PTunnelRunner(Socket s, I2PSocket i2ps, Object slock, byte[] initialData, List sockList) {
+        this.sockList = sockList;
         this.s = s;
         this.i2ps = i2ps;
         this.slock = slock;
@@ -115,9 +118,7 @@ public class I2PTunnelRunner extends I2PThread implements I2PSocket.SocketErrorL
             }
             // now one connection is dead - kill the other as well.
             s.close();
-            s = null;
             i2ps.close();
-            i2ps = null;
             t1.join();
             t2.join();
         } catch (InterruptedException ex) {
@@ -130,20 +131,34 @@ public class I2PTunnelRunner extends I2PThread implements I2PSocket.SocketErrorL
             if (_log.shouldLog(Log.ERROR))
                 _log.error("Internal error", e);
         } finally {
+            removeRef();
             try {
                 if (s != null) s.close();
-                if (i2ps != null) i2ps.close();
+                if (i2ps != null) {
+                    i2ps.close();
+                    i2ps.setSocketErrorListener(null);
+                }
             } catch (IOException ex) {
                 if (_log.shouldLog(Log.ERROR))
                     _log.error("Could not close socket", ex);
             }
         }
     }
-
+    
     public void errorOccurred() {
         synchronized (finishLock) {
             finished = true;
             finishLock.notifyAll();
+        }
+    }
+    
+    private void removeRef() {
+        if (sockList != null) {
+            synchronized (slock) {
+                boolean removed = sockList.remove(i2ps);
+                System.out.println("Removal of i2psocket " + i2ps + " successful? " 
+                                   + removed + " remaining: " + sockList.size());
+            }
         }
     }
     

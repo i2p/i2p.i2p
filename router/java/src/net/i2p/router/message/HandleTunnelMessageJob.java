@@ -331,7 +331,6 @@ public class HandleTunnelMessageJob extends JobImpl {
     }
     
     private void sendToTunnel(Hash router, TunnelId id, I2NPMessage body) {
-        // TODO: we may want to send it via a tunnel later on, but for now, direct will do.
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Sending on to requested tunnel " + id.getTunnelId() + " on router " 
                        + router.toBase64());
@@ -341,6 +340,11 @@ public class HandleTunnelMessageJob extends JobImpl {
             timeoutMs = FORWARD_TIMEOUT;
 
         TunnelInfo curInfo = getContext().tunnelManager().getTunnelInfo(_message.getTunnelId());
+        if (curInfo == null) {
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Tunnel went away (" + _message.getTunnelId() + ")");
+            return;
+        }
         if (curInfo.getTunnelId().getType() != TunnelId.TYPE_INBOUND) {
             // we are not processing a request at the end of an inbound tunnel, so
             // there's no reason to hide our location.  honor the request directly

@@ -179,7 +179,7 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
                 _handleSocket.setReadTimeout(readTimeout);
                 Socket s = new Socket(remoteHost, remotePort);
                 afterSocket = I2PAppContext.getGlobalContext().clock().now();
-                new I2PTunnelRunner(s, _handleSocket, slock, null);
+                new I2PTunnelRunner(s, _handleSocket, slock, null, null);
             } catch (SocketException ex) {
                 try {
                     _handleSocket.close();

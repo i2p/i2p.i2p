@@ -39,7 +39,7 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
     protected long _clientId;
     protected Object sockLock = new Object(); // Guards sockMgr and mySockets
     private I2PSocketManager sockMgr;
-    private List mySockets = new ArrayList();
+    protected List mySockets = new ArrayList();
 
     protected Destination dest = null;
     private int localPort;
@@ -263,6 +263,9 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
         } catch (IOException ex) {
             _log.error("Error listening for connections", ex);
             notifyEvent("openBaseClientResult", "error");
+            synchronized (sockLock) {
+                mySockets.clear();
+            }
         }
     }
 

@@ -1,4 +1,9 @@
-$Id: history.txt,v 1.69 2004/11/10 07:33:02 jrandom Exp $
+$Id: history.txt,v 1.70 2004/11/13 04:43:35 jrandom Exp $
+
+2004-11-14  jrandom
+    * Fix a long standing leak in I2PTunnel (hanging on to i2psocket objects)
+    * Fix a leak injected into the SimpleTimer
+    * Fix a race condition in the tunnel message handling
 
 2004-11-13  jrandom
     * Added throttles on how many I2PTunnel client connections we open at once
