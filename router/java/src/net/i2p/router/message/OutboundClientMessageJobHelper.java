@@ -52,10 +52,11 @@ class OutboundClientMessageJobHelper {
      * @return garlic, or null if no tunnels were found (or other errors)
      */
     static GarlicMessage createGarlicMessage(RouterContext ctx, long replyToken, long expiration, PublicKey recipientPK, 
-                                             Payload data, Hash from, Destination dest, SessionKey wrappedKey, Set wrappedTags, 
+                                             Payload data, Hash from, Destination dest, TunnelInfo replyTunnel,
+                                             SessionKey wrappedKey, Set wrappedTags, 
                                              boolean requireAck, LeaseSet bundledReplyLeaseSet) {
         PayloadGarlicConfig dataClove = buildDataClove(ctx, data, dest, expiration);
-        return createGarlicMessage(ctx, replyToken, expiration, recipientPK, dataClove, from, dest, wrappedKey, 
+        return createGarlicMessage(ctx, replyToken, expiration, recipientPK, dataClove, from, dest, replyTunnel, wrappedKey, 
                                    wrappedTags, requireAck, bundledReplyLeaseSet);
     }
     /**
@@ -65,9 +66,9 @@ class OutboundClientMessageJobHelper {
      * @return garlic, or null if no tunnels were found (or other errors)
      */
     static GarlicMessage createGarlicMessage(RouterContext ctx, long replyToken, long expiration, PublicKey recipientPK, 
-                                             PayloadGarlicConfig dataClove, Hash from, Destination dest, SessionKey wrappedKey, 
+                                             PayloadGarlicConfig dataClove, Hash from, Destination dest, TunnelInfo replyTunnel, SessionKey wrappedKey, 
                                              Set wrappedTags, boolean requireAck, LeaseSet bundledReplyLeaseSet) {
-        GarlicConfig config = createGarlicConfig(ctx, replyToken, expiration, recipientPK, dataClove, from, dest, requireAck, bundledReplyLeaseSet);
+        GarlicConfig config = createGarlicConfig(ctx, replyToken, expiration, recipientPK, dataClove, from, dest, replyTunnel, requireAck, bundledReplyLeaseSet);
         if (config == null)
             return null;
         GarlicMessage msg = GarlicMessageBuilder.buildMessage(ctx, config, wrappedKey, wrappedTags);
@@ -75,7 +76,7 @@ class OutboundClientMessageJobHelper {
     }
     
     private static GarlicConfig createGarlicConfig(RouterContext ctx, long replyToken, long expiration, PublicKey recipientPK, 
-                                                   PayloadGarlicConfig dataClove, Hash from, Destination dest, boolean requireAck,
+                                                   PayloadGarlicConfig dataClove, Hash from, Destination dest, TunnelInfo replyTunnel, boolean requireAck,
                                                    LeaseSet bundledReplyLeaseSet) {
         Log log = ctx.logManager().getLog(OutboundClientMessageJobHelper.class);
         if (log.shouldLog(Log.DEBUG))
@@ -85,7 +86,7 @@ class OutboundClientMessageJobHelper {
         config.addClove(dataClove);
         
         if (requireAck) {
-            PayloadGarlicConfig ackClove = buildAckClove(ctx, from, replyToken, expiration);
+            PayloadGarlicConfig ackClove = buildAckClove(ctx, from, replyTunnel, replyToken, expiration);
             if (ackClove == null)
                 return null; // no tunnels
             config.addClove(ackClove);
@@ -122,14 +123,13 @@ class OutboundClientMessageJobHelper {
     /**
      * Build a clove that sends a DeliveryStatusMessage to us
      */
-    private static PayloadGarlicConfig buildAckClove(RouterContext ctx, Hash from, long replyToken, long expiration) {
+    private static PayloadGarlicConfig buildAckClove(RouterContext ctx, Hash from, TunnelInfo replyToTunnel, long replyToken, long expiration) {
         Log log = ctx.logManager().getLog(OutboundClientMessageJobHelper.class);
         PayloadGarlicConfig ackClove = new PayloadGarlicConfig();
         
         Hash replyToTunnelRouter = null; // inbound tunnel gateway
         TunnelId replyToTunnelId = null; // tunnel id on that gateway
         
-        TunnelInfo replyToTunnel = ctx.tunnelManager().selectInboundTunnel(from);
         if (replyToTunnel == null) {
             if (log.shouldLog(Log.ERROR))
                 log.error("Unable to send client message from " + from.toBase64() 

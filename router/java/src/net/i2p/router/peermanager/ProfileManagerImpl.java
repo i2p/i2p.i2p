@@ -112,6 +112,13 @@ public class ProfileManagerImpl implements ProfileManager {
         PeerProfile data = getProfile(peer);
         if (data == null) return;
         data.getTunnelTestResponseTime().addData(responseTimeMs, responseTimeMs);
+        if (responseTimeMs > getSlowThreshold())
+            data.getTunnelTestResponseTimeSlow().addData(responseTimeMs, responseTimeMs);
+    }
+    
+    private int getSlowThreshold() {
+        // perhaps we should have this compare vs. tunnel.testSuccessTime?
+        return 5*1000;
     }
     
     /**

@@ -26,6 +26,7 @@ public class PeerProfile {
     private RateStat _dbResponseTime = null;
     private RateStat _tunnelCreateResponseTime = null;
     private RateStat _tunnelTestResponseTime = null;
+    private RateStat _tunnelTestResponseTimeSlow = null;
     private RateStat _commError = null;
     private RateStat _dbIntroduction = null;
     // calculation bonuses
@@ -143,6 +144,8 @@ public class PeerProfile {
     public RateStat getTunnelCreateResponseTime() { return _tunnelCreateResponseTime; }
     /** how long it takes to successfully test a tunnel this peer participates in (in milliseconds), calculated over a 10 minute, 1 hour, and 1 day period */
     public RateStat getTunnelTestResponseTime() { return _tunnelTestResponseTime; }
+    /** how long it takes to successfully test the peer (in milliseconds) when the time exceeds 5s */
+    public RateStat getTunnelTestResponseTimeSlow() { return _tunnelTestResponseTimeSlow; }
     /** how long between communication errors with the peer (disconnection, etc), calculated over a 1 minute, 1 hour, and 1 day period */
     public RateStat getCommError() { return _commError; }
     /** how many new peers we get from dbSearchReplyMessages or dbStore messages, calculated over a 1 hour, 1 day, and 1 week period */
@@ -224,6 +227,7 @@ public class PeerProfile {
         _dbResponseTime = null;
         _tunnelCreateResponseTime = null;
         _tunnelTestResponseTime = null;
+        _tunnelTestResponseTimeSlow = null;
         _commError = null;
         _dbIntroduction = null;
         _tunnelHistory = null;
@@ -253,6 +257,8 @@ public class PeerProfile {
             _tunnelCreateResponseTime = new RateStat("tunnelCreateResponseTime", "how long it takes to get a tunnel create response from the peer (in milliseconds)", group, new long[] { 10*60*1000l, 30*60*1000l, 60*60*1000l, 24*60*60*1000 } );
         if (_tunnelTestResponseTime == null)
             _tunnelTestResponseTime = new RateStat("tunnelTestResponseTime", "how long it takes to successfully test a tunnel this peer participates in (in milliseconds)", group, new long[] { 10*60*1000l, 60*60*1000l, 24*60*60*1000 } );
+        if (_tunnelTestResponseTimeSlow == null)
+            _tunnelTestResponseTimeSlow = new RateStat("tunnelTestResponseTimeSlow", "how long it takes to successfully test a peer when the time exceeds 5s", group, new long[] { 10*60*1000l, 60*60*1000l, 24*60*60*1000l, });
         if (_commError == null)
             _commError = new RateStat("commErrorRate", "how long between communication errors with the peer (e.g. disconnection)", group, new long[] { 60*1000l, 10*60*1000l, 60*60*1000l, 24*60*60*1000 } );
         if (_dbIntroduction == null)
@@ -269,6 +275,7 @@ public class PeerProfile {
         _dbResponseTime.setStatLog(_context.statManager().getStatLog());
         _tunnelCreateResponseTime.setStatLog(_context.statManager().getStatLog());
         _tunnelTestResponseTime.setStatLog(_context.statManager().getStatLog());
+        _tunnelTestResponseTimeSlow.setStatLog(_context.statManager().getStatLog());
         _commError.setStatLog(_context.statManager().getStatLog());
         _dbIntroduction.setStatLog(_context.statManager().getStatLog());
         _expanded = true;
@@ -285,6 +292,7 @@ public class PeerProfile {
         _sendSuccessSize.coalesceStats();
         _tunnelCreateResponseTime.coalesceStats();
         _tunnelTestResponseTime.coalesceStats();
+        _tunnelTestResponseTimeSlow.coalesceStats();
         _dbHistory.coalesceStats();
         _tunnelHistory.coalesceStats();
         

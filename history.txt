@@ -1,4 +1,13 @@
-$Id: history.txt,v 1.168 2005/03/11 17:23:41 jrandom Exp $
+$Id: history.txt,v 1.169 2005/03/14 22:47:15 jrandom Exp $
+
+2005-03-16  jrandom
+    * Adjust the old speed calculator to include end to end RTT data in its 
+      estimates, and use that as the primary speed calculator again.
+    * Use the mean of the high capacity speeds to determine the fast 
+      threshold, rather than the median.  Perhaps we should use the mean of
+      all active non-failing peers?
+    * Updated the profile page to sort by tier, then alphabetically.
+    * Added some alternative socketManager factories (good call aum!)
 
 2005-03-14  jrandom
     * New strict speed calculator that goes off the actual number of messages

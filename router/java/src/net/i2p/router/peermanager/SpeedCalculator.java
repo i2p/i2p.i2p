@@ -72,16 +72,54 @@ public class SpeedCalculator extends Calculator {
         double estimateFactor = getEstimateFactor(threshold, events);
         double rv = (1-estimateFactor)*measuredRTPerMinute + (estimateFactor)*estimatedRTPerMinute;
         
+        long slowCount = 0;
+        RateStat rs = profile.getTunnelTestResponseTimeSlow();
+        if (rs != null) {
+            Rate r = rs.getRate(period);
+            if (r != null)
+                slowCount = r.getCurrentEventCount();
+        }
+        long fastCount = 0;
+        rs = profile.getTunnelTestResponseTime();
+        if (rs != null) {
+            Rate r = rs.getRate(period);
+            if (r != null)
+                fastCount = r.getCurrentEventCount();
+        }
+        double slowPct = 0;
+        if (fastCount > 0)
+            slowPct = slowCount / fastCount;
+        else
+            rv /= 100; // if there are no tunnel tests, weigh against it
+        if (slowPct > 0.01) // if 1% of the traffic is dogshit slow, the peer probably sucks
+            rv /= 100.0*slowPct;
+        
+        rv = adjust(period, rv);
+        
         if (_log.shouldLog(Log.DEBUG)) {
             _log.debug("\n\nrv: " + rv + " events: " + events + " threshold: " + threshold + " period: " + period + " useTunnelTestOnly? " + tunnelTestOnly + "\n"
                        + "measuredRTT: " + measuredRoundTripTime + " measured events per minute: " + measuredRTPerMinute + "\n"
                        + "estimateRTT: " + estimatedRoundTripTime + " estimated events per minute: " + estimatedRTPerMinute + "\n" 
+                       + "slow count: " + slowCount + " fast count: " + fastCount + "\n"
                        + "estimateFactor: " + estimateFactor + "\n"
                        + "for peer: " + profile.getPeer().toBase64());
         }
    
         rv += profile.getSpeedBonus();
         return rv;
+    }
+    
+    private double adjust(long period, double value) {
+        switch ((int)period) {
+            case 10*60*1000:
+                return value;
+            case 60*60*1000:
+                return value * 0.5;
+            case 24*60*60*1000:
+                return value * 0.001;
+            default:
+                return value * 0.0001;
+        }
     }
 
     /**

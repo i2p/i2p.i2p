@@ -116,8 +116,8 @@ public class RouterContext extends I2PAppContext {
         _throttle = new RouterDoSThrottle(this);
         _isFailingCalc = new IsFailingCalculator(this);
         _integrationCalc = new IntegrationCalculator(this);
-        _speedCalc = new StrictSpeedCalculator(this);
-        _oldSpeedCalc = new SpeedCalculator(this);
+        _speedCalc = new SpeedCalculator(this);
+        _oldSpeedCalc = new StrictSpeedCalculator(this);
         _reliabilityCalc = new ReliabilityCalculator(this);
         _capacityCalc = new CapacityCalculator(this);
     }

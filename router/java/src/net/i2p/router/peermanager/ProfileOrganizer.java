@@ -644,6 +644,10 @@ public class ProfileOrganizer {
      *                  (highest first) for active nonfailing peers
      */
     private void locked_calculateSpeedThreshold(Set reordered) {
+        if (true) {
+            locked_calculateSpeedThresholdMean(reordered);
+            return;
+        }
         Set speeds = new TreeSet();
         for (Iterator iter = reordered.iterator(); iter.hasNext(); ) {
             PeerProfile profile = (PeerProfile)iter.next();
@@ -668,6 +672,28 @@ public class ProfileOrganizer {
         if (_log.shouldLog(Log.INFO))
             _log.info("Threshold value for speed: " + _thresholdSpeedValue + " out of speeds: " + speeds);
     }
+    
+    private void locked_calculateSpeedThresholdMean(Set reordered) {
+        double total = 0;
+        int count = 0;
+        for (Iterator iter = reordered.iterator(); iter.hasNext(); ) {
+            PeerProfile profile = (PeerProfile)iter.next();
+            if (profile.getCapacityValue() >= _thresholdCapacityValue) {
+                // duplicates being clobbered is fine by us
+                total += profile.getSpeedValue();
+                count++;
+            } else {
+                // its ordered
+                break;
+            }
+        }
+
+        if (count > 0)
+            _thresholdSpeedValue = total / count;
+        if (_log.shouldLog(Log.INFO))
+            _log.info("Threshold value for speed: " + _thresholdSpeedValue + " out of speeds: " + count);
+    }
+    
     
     /** simple average, or 0 if NaN */
     private final static double avg(double total, double quantity) {

@@ -36,18 +36,7 @@ public class I2PSocketManagerFactory {
      * @return the newly created socket manager, or null if there were errors
      */
     public static I2PSocketManager createManager() {
-        String i2cpHost = System.getProperty(I2PClient.PROP_TCP_HOST, "localhost");
-        int i2cpPort = 7654;
-        String i2cpPortStr = System.getProperty(I2PClient.PROP_TCP_PORT);
-        if (i2cpPortStr != null) {
-            try {
-                i2cpPort = Integer.parseInt(i2cpPortStr);
-            } catch (NumberFormatException nfe) {
-                // gobble gobble
-            }
-        }
-
-        return createManager(i2cpHost, i2cpPort, System.getProperties());
+        return createManager(getHost(), getPort(), System.getProperties());
     }
 
     /**
@@ -72,6 +61,26 @@ public class I2PSocketManagerFactory {
         }
     }
 
+    /**
+     * Create a socket manager using the destination loaded from the given private key
+     * stream and connected to the default I2CP host and port.
+     *
+     * @return the newly created socket manager, or null if there were errors
+     */
+    public static I2PSocketManager createManager(InputStream myPrivateKeyStream) {
+        return createManager(myPrivateKeyStream, getHost(), getPort(), System.getProperties());
+    }
+    
+    /**
+     * Create a socket manager using the destination loaded from the given private key
+     * stream and connected to the default I2CP host and port.
+     *
+     * @return the newly created socket manager, or null if there were errors
+     */
+    public static I2PSocketManager createManager(InputStream myPrivateKeyStream, Properties opts) {
+        return createManager(myPrivateKeyStream, getHost(), getPort(), opts);
+    }
+    
     /**
      * Create a socket manager using the destination loaded from the given private key
      * stream and connected to the I2CP router on the specified machine on the given
@@ -153,5 +162,21 @@ public class I2PSocketManagerFactory {
             }
         }
         
+    }
+
+    private static String getHost() {
+        return System.getProperty(I2PClient.PROP_TCP_HOST, "localhost");
+    }
+    private static int getPort() {
+        int i2cpPort = 7654;
+        String i2cpPortStr = System.getProperty(I2PClient.PROP_TCP_PORT);
+        if (i2cpPortStr != null) {
+            try {
+                i2cpPort = Integer.parseInt(i2cpPortStr);
+            } catch (NumberFormatException nfe) {
+                // gobble gobble
+            }
+        }
+        return i2cpPort;
     }
 }

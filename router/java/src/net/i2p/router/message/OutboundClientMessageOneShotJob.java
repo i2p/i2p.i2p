@@ -61,6 +61,8 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
     private long _start;
     private boolean _finished;
     private long _leaseSetLookupBegin;
+    private TunnelInfo _outTunnel;
+    private TunnelInfo _inTunnel;
     
     /**
      * final timeout (in milliseconds) that the outbound message will fail in.
@@ -312,10 +314,12 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
             replyLeaseSet = getContext().netDb().lookupLeaseSetLocally(_from.calculateHash());
         }
         
+        _inTunnel = selectInboundTunnel();
+        
         GarlicMessage msg = OutboundClientMessageJobHelper.createGarlicMessage(getContext(), token, 
                                                                                _overallExpiration, key, 
                                                                                _clove, _from.calculateHash(), 
-                                                                               _to, 
+                                                                               _to, _inTunnel,
                                                                                sessKey, tags, 
                                                                                true, replyLeaseSet);
         if (msg == null) {
@@ -341,16 +345,16 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
                        + _lease.getTunnelId() + " on " 
                        + _lease.getGateway().toBase64());
         
-        TunnelInfo outTunnel = selectOutboundTunnel();
-        if (outTunnel != null) {
+        _outTunnel = selectOutboundTunnel();
+        if (_outTunnel != null) {
             if (_log.shouldLog(Log.DEBUG))
-                _log.debug(getJobId() + ": Sending tunnel message out " + outTunnel.getSendTunnelId(0) + " to " 
+                _log.debug(getJobId() + ": Sending tunnel message out " + _outTunnel.getSendTunnelId(0) + " to " 
                            + _toString + " at "
                            + _lease.getTunnelId() + " on " 
                            + _lease.getGateway().toBase64());
 
             // dispatch may take 100+ms, so toss it in its own job
-            getContext().jobQueue().addJob(new DispatchJob(getContext(), msg, outTunnel, selector, onReply, onFail, (int)(_overallExpiration-getContext().clock().now())));
+            getContext().jobQueue().addJob(new DispatchJob(getContext(), msg, selector, onReply, onFail, (int)(_overallExpiration-getContext().clock().now())));
         } else {
             if (_log.shouldLog(Log.ERROR))
                 _log.error(getJobId() + ": Could not find any outbound tunnels to send the payload through... wtf?");
@@ -362,15 +366,13 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
 
     private class DispatchJob extends JobImpl {
         private GarlicMessage _msg;
-        private TunnelInfo _outTunnel;
         private ReplySelector _selector;
         private SendSuccessJob _replyFound;
         private SendTimeoutJob _replyTimeout;
         private int _timeoutMs;
-        public DispatchJob(RouterContext ctx, GarlicMessage msg, TunnelInfo out, ReplySelector sel, SendSuccessJob success, SendTimeoutJob timeout, int timeoutMs) {
+        public DispatchJob(RouterContext ctx, GarlicMessage msg, ReplySelector sel, SendSuccessJob success, SendTimeoutJob timeout, int timeoutMs) {
             super(ctx);
             _msg = msg;
-            _outTunnel = out;
             _selector = sel;
             _replyFound = success;
             _replyTimeout = timeout;
@@ -395,6 +397,13 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
      */
     private TunnelInfo selectOutboundTunnel() {
         return getContext().tunnelManager().selectOutboundTunnel(_from.calculateHash());
+    }
+    /**
+     * Pick an arbitrary outbound tunnel for any deliveryStatusMessage to come back in
+     *
+     */
+    private TunnelInfo selectInboundTunnel() {
+        return getContext().tunnelManager().selectInboundTunnel(_from.calculateHash());
     }
     
     /**
@@ -540,8 +549,14 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
             
             getContext().statManager().addRateData("client.sendAckTime", sendTime, 0);
             getContext().statManager().addRateData("client.sendMessageSize", _clientMessageSize, sendTime);
+            if (_outTunnel != null)
+                for (int i = 0; i < _outTunnel.getLength(); i++)
+                    getContext().profileManager().tunnelTestSucceeded(_outTunnel.getPeer(i), sendTime);
+            if (_inTunnel != null)
+                for (int i = 0; i < _inTunnel.getLength(); i++)
+                    getContext().profileManager().tunnelTestSucceeded(_inTunnel.getPeer(i), sendTime);
         }
-        
+
         public void setMessage(I2NPMessage msg) {}
     }
     

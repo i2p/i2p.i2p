@@ -126,6 +126,7 @@ class ProfilePersistenceHelper {
             profile.getSendSuccessSize().store(out, "sendSuccessSize");
             profile.getTunnelCreateResponseTime().store(out, "tunnelCreateResponseTime");
             profile.getTunnelTestResponseTime().store(out, "tunnelTestResponseTime");
+            profile.getTunnelTestResponseTimeSlow().store(out, "tunnelTestResponseTimeSlow");
         }
     }
     
@@ -189,6 +190,7 @@ class ProfilePersistenceHelper {
             profile.getSendSuccessSize().load(props, "sendSuccessSize", true);
             profile.getTunnelCreateResponseTime().load(props, "tunnelCreateResponseTime", true);
             profile.getTunnelTestResponseTime().load(props, "tunnelTestResponseTime", true);
+            profile.getTunnelTestResponseTimeSlow().load(props, "tunnelTestResponseTimeSlow", true);
             
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Loaded the profile for " + peer.toBase64() + " from " + file.getName());

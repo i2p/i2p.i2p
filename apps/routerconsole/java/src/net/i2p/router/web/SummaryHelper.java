@@ -84,7 +84,7 @@ public class SummaryHelper {
         
         if (ms < 60 * 1000) {
             return now + " (" + (ms / 1000) + "s)";
-        } else if (ms < 60 * 1000) {
+        } else if (ms < 60 * 60 * 1000) {
             return now + " (" + (ms / (60 * 1000)) + "m)";
         } else if (ms < 24 * 60 * 60 * 1000) {
             return now + " (" + (ms / (60 * 60 * 1000)) + "h)";

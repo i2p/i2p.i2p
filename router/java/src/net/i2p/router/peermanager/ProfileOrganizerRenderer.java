@@ -6,10 +6,11 @@ import java.io.Writer;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.Locale;
 import java.util.Set;
-import java.util.TreeMap;
+import java.util.TreeSet;
 
 import net.i2p.data.Hash;
 import net.i2p.router.RouterContext;
@@ -21,23 +22,25 @@ import net.i2p.router.RouterContext;
 class ProfileOrganizerRenderer {
     private RouterContext _context;
     private ProfileOrganizer _organizer;
+    private ProfileComparator _comparator;
     
     public ProfileOrganizerRenderer(ProfileOrganizer organizer, RouterContext context) {
         _context = context;
         _organizer = organizer;
+        _comparator = new ProfileComparator();
     }
     public void renderStatusHTML(Writer out) throws IOException {
         Set peers = _organizer.selectAllPeers();
         
         long hideBefore = _context.clock().now() - 3*60*60*1000;
         
-        TreeMap order = new TreeMap();
+        TreeSet order = new TreeSet(_comparator);
         for (Iterator iter = peers.iterator(); iter.hasNext();) {
             Hash peer = (Hash)iter.next();
             if (_organizer.getUs().equals(peer)) continue;
             PeerProfile prof = _organizer.getProfile(peer);
             if (prof.getLastSendSuccessful() <= hideBefore) continue;
-            order.put(peer.toBase64(), prof);
+            order.add(prof);
         }
         
         int fast = 0;
@@ -56,10 +59,34 @@ class ProfileOrganizerRenderer {
         buf.append("<td><b>Failing?</b></td>");
         buf.append("<td>&nbsp;</td>");
         buf.append("</tr>");
-        for (Iterator iter = order.keySet().iterator(); iter.hasNext();) {
-            String name = (String)iter.next();
-            PeerProfile prof = (PeerProfile)order.get(name);
+        int prevTier = 1;
+        for (Iterator iter = order.iterator(); iter.hasNext();) {
+            PeerProfile prof = (PeerProfile)iter.next();
             Hash peer = prof.getPeer();
+            
+            int tier = 0;
+            boolean isIntegrated = false;
+            if (_organizer.isFast(peer)) {
+                tier = 1;
+                fast++;
+                reliable++;
+            } else if (_organizer.isHighCapacity(peer)) {
+                tier = 2;
+                reliable++;
+            } else if (_organizer.isFailing(peer)) {
+                failing++;
+            } else {
+                tier = 3;
+            }
+            
+            if (_organizer.isWellIntegrated(peer)) {
+                isIntegrated = true;
+                integrated++;
+            }
+            
+            if (tier != prevTier)
+                buf.append("<tr><td colspan=\"7\"><hr /></td></tr>\n");
+            prevTier = tier;
             
             buf.append("<tr>");
             buf.append("<td><code>");
@@ -74,25 +101,6 @@ class ProfileOrganizerRenderer {
             }
             buf.append("</code></td>");
             buf.append("<td>");
-            int tier = 0;
-            boolean isIntegrated = false;
-            if (_organizer.isFast(peer)) {
-                tier = 1;
-                fast++;
-                reliable++;
-            } else if (_organizer.isHighCapacity(peer)) {
-                tier = 2;
-                reliable++;
-            } else if (_organizer.isFailing(peer)) {
-                failing++;
-            } else {
-                    tier = 3;
-            }
-            
-            if (_organizer.isWellIntegrated(peer)) {
-                isIntegrated = true;
-                integrated++;
-            }
             
             switch (tier) {
                 case 1: buf.append("Fast"); break;
@@ -129,6 +137,56 @@ class ProfileOrganizerRenderer {
         buf.append("<b>Integration:</b> ").append(num(_organizer.getIntegrationThreshold())).append(" (").append(integrated).append(" well integrated peers)<br />");
         out.write(buf.toString());
         out.flush();
+    }
+    
+    private class ProfileComparator implements Comparator {
+        public int compare(Object lhs, Object rhs) {
+            if ( (lhs == null) || (rhs == null) ) 
+                throw new NullPointerException("lhs=" + lhs + " rhs=" + rhs);
+            if ( !(lhs instanceof PeerProfile) || !(rhs instanceof PeerProfile) ) 
+                throw new ClassCastException("lhs=" + lhs.getClass().getName() + " rhs=" + rhs.getClass().getName());
+            
+            PeerProfile left = (PeerProfile)lhs;
+            PeerProfile right = (PeerProfile)rhs;
+            
+            if (_context.profileOrganizer().isFast(left.getPeer())) {
+                if (_context.profileOrganizer().isFast(right.getPeer())) {
+                    return compareHashes(left, right);
+                } else {
+                    return -1; // fast comes first
+                }
+            } else if (_context.profileOrganizer().isHighCapacity(left.getPeer())) {
+                if (_context.profileOrganizer().isFast(right.getPeer())) {
+                    return 1; 
+                } else if (_context.profileOrganizer().isHighCapacity(right.getPeer())) {
+                    return compareHashes(left, right);
+                } else {
+                    return -1;
+                }
+            } else if (_context.profileOrganizer().isFailing(left.getPeer())) {
+                if (_context.profileOrganizer().isFailing(right.getPeer())) {
+                    return compareHashes(left, right);
+                } else {
+                    return 1;
+                }
+            } else {
+                // left is not failing
+                if (_context.profileOrganizer().isFast(right.getPeer())) {
+                    return 1;
+                } else if (_context.profileOrganizer().isHighCapacity(right.getPeer())) {
+                    return 1;
+                } else if (_context.profileOrganizer().isFailing(right.getPeer())) {
+                    return -1;
+                } else {
+                    return compareHashes(left, right);
+                }
+            }
+        }
+        
+        private int compareHashes(PeerProfile left, PeerProfile right) {
+            return left.getPeer().toBase64().compareTo(right.getPeer().toBase64());
+        }
+        
     }
     
     private final static DecimalFormat _fmt = new DecimalFormat("###,##0.00", new DecimalFormatSymbols(Locale.UK));
