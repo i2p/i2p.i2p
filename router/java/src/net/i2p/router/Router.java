@@ -268,27 +268,21 @@ public class Router {
     }
     
     public void renderStatusHTML(OutputStream out) throws IOException {
-        out.write(("<html><head><title>I2P Router Console</title></head><body>\n" + 
-                   "<h1>Router console</h1>\n" +
-                   "<i><a href=\"/routerConsole.html\">console</a> | <a href=\"/routerStats.html\">stats</a></i><br>\n" +
-                   "<form action=\"/routerConsole.html\">" +
+        out.write(("<h1>Router console</h1>\n" +
+                   "<i><a href=\"/oldconsole.jsp\">console</a> | <a href=\"/oldstats.jsp\">stats</a></i><br>\n" +
+                   "<form action=\"/oldconsole.jsp\">" +
                    "<select name=\"go\" onChange='location.href=this.value'>" +
-                   "<option value=\"/routerConsole.html#bandwidth\">Bandwidth</option>\n" +
-                   "<option value=\"/routerConsole.html#clients\">Clients</option>\n" +
-                   "<option value=\"/routerConsole.html#transports\">Transports</option>\n" +
-                   "<option value=\"/routerConsole.html#profiles\">Peer Profiles</option>\n" +
-                   "<option value=\"/routerConsole.html#tunnels\">Tunnels</option>\n" +
-                   "<option value=\"/routerConsole.html#jobs\">Jobs</option>\n" +
-                   "<option value=\"/routerConsole.html#shitlist\">Shitlist</option>\n" +
-                   "<option value=\"/routerConsole.html#pending\">Pending messages</option>\n" +
-                   "<option value=\"/routerConsole.html#netdb\">Network Database</option>\n" +
-                   "<option value=\"/routerConsole.html#logs\">Log messages</option>\n" +
-                   "</select>" +"</form>" +
-                   "<form action=\"/shutdown\" method=\"GET\">" +
-                   "<b>Shut down the router:</b>" +
-                   "<input type=\"password\" name=\"password\" size=\"8\" />" +
-                   "<input type=\"submit\" value=\"shutdown!\" />" +
-                   "</form>" +
+                   "<option value=\"/oldconsole.jsp#bandwidth\">Bandwidth</option>\n" +
+                   "<option value=\"/oldconsole.jsp#clients\">Clients</option>\n" +
+                   "<option value=\"/oldconsole.jsp#transports\">Transports</option>\n" +
+                   "<option value=\"/oldconsole.jsp#profiles\">Peer Profiles</option>\n" +
+                   "<option value=\"/oldconsole.jsp#tunnels\">Tunnels</option>\n" +
+                   "<option value=\"/oldconsole.jsp#jobs\">Jobs</option>\n" +
+                   "<option value=\"/oldconsole.jsp#shitlist\">Shitlist</option>\n" +
+                   "<option value=\"/oldconsole.jsp#pending\">Pending messages</option>\n" +
+                   "<option value=\"/oldconsole.jsp#netdb\">Network Database</option>\n" +
+                   "<option value=\"/oldconsole.jsp#logs\">Log messages</option>\n" +
+                   "</select> <input type=\"submit\" value=\"GO\" /> </form>" +
                    "<hr />\n").getBytes());
 
         StringBuffer buf = new StringBuffer(32*1024);
@@ -303,7 +297,7 @@ public class Router {
         buf.append("<b>Memory:</b> In use: ").append((tot-free)).append("KB Free: ").append(free).append("KB <br />\n"); 
         buf.append("<b>Version:</b> Router: ").append(RouterVersion.VERSION).append(" / SDK: ").append(CoreVersion.VERSION).append("<br />\n"); 
         if (_higherVersionSeen) 
-            buf.append("<b><font color=\"red\">HIGHER VERSION SEEN</font><b> - please <a href=\"http://i2p.dnsalias.net/\">check</a> to see if there is a new release out<br />\n");
+            buf.append("<b><font color=\"red\">HIGHER VERSION SEEN</font><b> - please <a href=\"http://www.i2p.net/\">check</a> to see if there is a new release out<br />\n");
 
         buf.append("<hr /><a name=\"bandwidth\"> </a><h2>Bandwidth</h2>\n");
         long sent = _context.bandwidthLimiter().getTotalAllocatedOutboundBytes();
@@ -457,8 +451,7 @@ public class Router {
             appendLogMessage(buf, msg);
             buf.append("</pre></td></tr>\n");
         }
-        buf.append("</table>");
-        buf.append("</body></html>\n");
+        buf.append("</table>\n");
         out.write(buf.toString().getBytes());
     }
     

@@ -44,7 +44,7 @@ class AdminRunner implements Runnable {
         _log.debug("Command [" + command + "]");
         if (command.indexOf("favicon") >= 0) {
             reply(out, "this is not a website");
-        } else if (command.indexOf("routerStats.html") >= 0) {
+        } else if ( (command.indexOf("routerStats.html") >= 0) || (command.indexOf("oldstats.jsp") >= 0) ) {
             try {
                 out.write("HTTP/1.1 200 OK\nConnection: close\nCache-control: no-cache\nContent-type: text/html\n\n".getBytes());
                 _generator.generateStatsPage(out);

@@ -29,10 +29,9 @@ public class StatsGenerator {
     
     public void generateStatsPage(OutputStream out) throws IOException {
         StringBuffer buf = new StringBuffer(16*1024);
-        buf.append("<html><head><title>I2P Router Stats</title></head><body>");
         buf.append("<h1>Router statistics</h1>");
-        buf.append("<i><a href=\"/routerConsole.html\">console</a> | <a href=\"/routerStats.html\">stats</a></i><hr />");
-        buf.append("<form action=\"/routerStats.html\">");
+        buf.append("<i><a href=\"/oldconsole.jsp\">console</a> | <a href=\"/oldstats.jsp\">stats</a></i><hr />");
+        buf.append("<form action=\"/oldstats.jsp\">");
         buf.append("<select name=\"go\" onChange='location.href=this.value'>");
         out.write(buf.toString().getBytes());
         buf.setLength(0);
@@ -41,11 +40,11 @@ public class StatsGenerator {
         for (Iterator iter = groups.keySet().iterator(); iter.hasNext(); ) {
             String group = (String)iter.next();
             Set stats = (Set)groups.get(group);
-            buf.append("<option value=\"/routerStats.html#").append(group).append("\">");
+            buf.append("<option value=\"/oldstats.jsp#").append(group).append("\">");
             buf.append(group).append("</option>\n");
             for (Iterator statIter = stats.iterator(); statIter.hasNext(); ) {
                 String stat = (String)statIter.next();
-                buf.append("<option value=\"/routerStats.html#");
+                buf.append("<option value=\"/oldstats.jsp#");
                 buf.append(stat);
                 buf.append("\">...");
                 buf.append(stat);
@@ -54,7 +53,7 @@ public class StatsGenerator {
             out.write(buf.toString().getBytes());
             buf.setLength(0);
         }
-        buf.append("</select>");
+        buf.append("</select> <input type=\"submit\" value=\"GO\" />");
         buf.append("</form>");
         
         buf.append("Statistics gathered during this router's uptime (");
@@ -92,7 +91,6 @@ public class StatsGenerator {
             }
             out.write("</ul><hr />".getBytes());
         }
-        out.write("</body></html>".getBytes());
     }
     
     private void renderFrequency(String name, StringBuffer buf) {
