@@ -36,6 +36,12 @@ public class VMCommSystem extends CommSystemFacade {
         _context.statManager().createFrequencyStat("transport.sendMessageFailureFrequency", "How often do we fail to send messages?", "Transport", new long[] { 60*1000l, 60*60*1000l, 24*60*60*1000l });
         _context.statManager().createRateStat("transport.sendMessageSize", "How large are the messages sent?", "Transport", new long[] { 60*1000l, 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
         _context.statManager().createRateStat("transport.receiveMessageSize", "How large are the messages received?", "Transport", new long[] { 60*1000l, 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
+        _context.statManager().createRateStat("transport.sendMessageSmall", "How many messages under 1KB are sent?", "Transport", new long[] { 60*1000l, 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
+        _context.statManager().createRateStat("transport.receiveMessageSmall", "How many messages under 1KB are received?", "Transport", new long[] { 60*1000l, 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
+        _context.statManager().createRateStat("transport.sendMessageMedium", "How many messages between 1KB and 4KB are sent?", "Transport", new long[] { 60*1000l, 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
+        _context.statManager().createRateStat("transport.receiveMessageMedium", "How many messages between 1KB and 4KB are received?", "Transport", new long[] { 60*1000l, 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
+        _context.statManager().createRateStat("transport.sendMessageLarge", "How many messages over 4KB are sent?", "Transport", new long[] { 60*1000l, 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
+        _context.statManager().createRateStat("transport.receiveMessageLarge", "How many messages over 4KB are received?", "Transport", new long[] { 60*1000l, 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
         _context.statManager().createRateStat("transport.sendProcessingTime", "How long does it take from noticing that we want to send the message to having it completely sent (successfully or failed)?", "Transport", new long[] { 60*1000l, 60*60*1000l, 24*60*60*1000l });
     }
     
@@ -61,6 +67,14 @@ public class VMCommSystem extends CommSystemFacade {
             _context.profileManager().messageSent(msg.getTarget().getIdentity().getHash(), "vm", sendTime, msg.getMessageSize());
             byte data[] = msg.getMessageData();
             _context.statManager().addRateData("transport.sendMessageSize", data.length, sendTime);
+
+            if (data.length < 1024)
+                _context.statManager().addRateData("transport.sendMessageSmall", 1, sendTime);
+            else if (data.length <= 4096)
+                _context.statManager().addRateData("transport.sendMessageMedium", 1, sendTime);
+            else
+                _context.statManager().addRateData("transport.sendMessageLarge", 1, sendTime);
+            
             peerSys.receive(data, _context.routerHash());
             //_context.jobQueue().addJob(new SendJob(peerSys, msg.getMessage(), _context));
             sendSuccessful = true;
@@ -72,6 +86,8 @@ public class VMCommSystem extends CommSystemFacade {
             _context.messageHistory().sendMessage(type, dmsg.getUniqueId(), dmsg.getMessageExpiration(), msg.getTarget().getIdentity().getHash(), sendSuccessful);
         }
 
+        msg.discardData();
+        
         _context.statManager().addRateData("transport.sendProcessingTime", msg.getLifetime(), msg.getLifetime());
     }    
     
@@ -92,11 +108,19 @@ public class VMCommSystem extends CommSystemFacade {
             try {
                 I2NPMessage msg = handler.readMessage(new ByteArrayInputStream(_msg));
                 int size = _msg.length;
-                InNetMessage inMsg = new InNetMessage();
+                InNetMessage inMsg = new InNetMessage(ReceiveJob.this._context);
                 inMsg.setFromRouterHash(_from);
                 inMsg.setMessage(msg);
                 _ctx.profileManager().messageReceived(_from, "vm", 1, size);
                 _ctx.statManager().addRateData("transport.receiveMessageSize", size, 1);
+                
+                if (size < 1024)
+                    ReceiveJob.this._context.statManager().addRateData("transport.receiveMessageSmall", 1, 1);
+                else if (size <= 4096)
+                    ReceiveJob.this._context.statManager().addRateData("transport.receiveMessageMedium", 1, 1);
+                else
+                    ReceiveJob.this._context.statManager().addRateData("transport.receiveMessageLarge", 1, 1);
+
                 _ctx.inNetMessagePool().add(inMsg);
             } catch (Exception e) {
                 _log.error("wtf, error reading/formatting a VM message?", e);
