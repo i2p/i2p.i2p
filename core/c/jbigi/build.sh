@@ -15,7 +15,7 @@ FreeBSD*)
 esac
 
 echo "Extracting GMP..."
-tar -xjf gmp-4.1.3.tar.bz2
+tar -xjf gmp-4.1.4.tar.bz2
 echo "Building..."
 mkdir bin
 mkdir lib
@@ -24,7 +24,7 @@ mkdir lib/net/i2p
 mkdir lib/net/i2p/util
 mkdir bin/local
 cd bin/local
-../../gmp-4.1.3/configure
+../../gmp-4.1.4/configure
 make
 sh ../../build_jbigi.sh static
 case `uname -sr` in
