@@ -316,6 +316,10 @@ static void sam_parse(sam_sess_t *session, char *s)
 									data is sent, the extra NUL character will
 									just be ignored by the client program,
 									because it is not added to the size */
+		if (data == NULL) {
+			SAMLOGS("Out of memory");
+			abort();
+		}
 		if (sam_read2(session, data, size) != -1) {
 			p = data + size;
 			*p = '\0';  /* see above NUL note */
@@ -450,6 +454,10 @@ static void sam_parse(sam_sess_t *session, char *s)
 									data is sent, the extra NUL character will
 									just be ignored by the client program,
 									because it is not added to the size */
+		if (data == NULL) {
+			SAMLOGS("Out of memory");
+			abort();
+		}
 		if (sam_read2(session, data, size) != -1) {
 			p = data + size;
 			*p = '\0';  /* see above NUL note */
@@ -746,7 +754,15 @@ static sam_sendq_t *sam_sendq_create()
 	sam_sendq_t *sendq;
 
 	sendq = malloc(sizeof(sam_sendq_t));
+	if (sendq == NULL) {
+		SAMLOGS("Out of memory");
+		abort();
+	}
 	sendq->data = malloc(SAM_STREAM_PAYLOAD_MAX);
+	if (sendq->data == NULL) {
+		SAMLOGS("Out of memory");
+		abort();
+	}
 	/* ^^ a waste of memory perhaps, but more efficient than realloc'ing every
 	 * time data is added the to queue */
 	sendq->size = 0;
@@ -781,8 +797,13 @@ void sam_sendq_flush(sam_sess_t *session, sam_sid_t stream_id,
  */
 sam_sess_t *sam_session_init(sam_sess_t *session)
 {
-	if (session == NULL)
+	if (session == NULL) {
 		session = malloc(sizeof(sam_sess_t));
+		if (session == NULL) {
+			SAMLOGS("Out of memory");
+			abort();
+		}
+	}
 	session->connected = false;
 	session->prev_id = 0;
 
