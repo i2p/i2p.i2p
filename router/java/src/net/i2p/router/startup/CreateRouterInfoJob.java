@@ -11,6 +11,7 @@ package net.i2p.router.startup;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.HashSet;
+import java.util.Properties;
 
 import net.i2p.data.Certificate;
 import net.i2p.data.DataFormatException;
@@ -50,7 +51,9 @@ public class CreateRouterInfoJob extends JobImpl {
         FileOutputStream fos2 = null;
         try {
             info.setAddresses(getContext().commSystem().createAddresses());
-            info.setOptions(getContext().statPublisher().publishStatistics());
+            Properties stats = getContext().statPublisher().publishStatistics();
+            stats.setProperty(RouterInfo.PROP_NETWORK_ID, Router.NETWORK_ID+"");
+            info.setOptions(stats);
             info.setPeers(new HashSet());
             info.setPublished(getCurrentPublishDate(getContext()));
             RouterIdentity ident = new RouterIdentity();

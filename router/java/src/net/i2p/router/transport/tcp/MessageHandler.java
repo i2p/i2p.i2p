@@ -5,7 +5,7 @@ import net.i2p.data.Hash;
 import net.i2p.data.RouterIdentity;
 import net.i2p.data.i2np.I2NPMessageReader;
 import net.i2p.data.i2np.I2NPMessage;
-import net.i2p.data.i2np.DeliveryStatusMessage;
+import net.i2p.data.i2np.DateMessage;
 import net.i2p.router.Router;
 import net.i2p.util.Log;
 
@@ -39,13 +39,11 @@ public class MessageHandler implements I2NPMessageReader.I2NPMessageEventListene
             _log.debug("Just received message " + message.getUniqueId() + " from " 
                        + _identHash.toBase64().substring(0,6)
                        + " readTime = " + msToRead + "ms type = " + message.getClass().getName());
-        if (message instanceof DeliveryStatusMessage) {
-            DeliveryStatusMessage msg = (DeliveryStatusMessage)message;
-            if ( (msg.getMessageId() == 0) && (msg.getUniqueId() == 0) ) {
-                timeMessageReceived(msg.getArrival().getTime());
-                // dont propogate the message, its just a fake
-                return;
-            }
+        if (message instanceof DateMessage) {
+            DateMessage msg = (DateMessage)message;
+            timeMessageReceived(msg.getNow());
+            // dont propogate the message, its just a fake
+            return;
         }
         _transport.messageReceived(message, _ident, _identHash, msToRead, size);
     }

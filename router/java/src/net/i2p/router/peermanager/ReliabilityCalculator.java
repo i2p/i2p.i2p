@@ -69,7 +69,7 @@ public class ReliabilityCalculator extends Calculator {
         
         long now = _context.clock().now();
         
-        long timeSinceRejection = now - profile.getTunnelHistory().getLastRejected();
+        long timeSinceRejection = 61*60*1000; // now - profile.getTunnelHistory().getLastRejected();
         if (timeSinceRejection > 60*60*1000) {
             // noop.  rejection was over 60 minutes ago
         } else if (timeSinceRejection > 10*60*1000) {

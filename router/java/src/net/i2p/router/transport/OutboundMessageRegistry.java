@@ -23,8 +23,10 @@ import net.i2p.router.Job;
 import net.i2p.router.JobImpl;
 import net.i2p.router.MessageSelector;
 import net.i2p.router.OutNetMessage;
+import net.i2p.router.ReplyJob;
 import net.i2p.router.RouterContext;
 import net.i2p.util.Log;
+import net.i2p.util.SimpleTimer;
 
 public class OutboundMessageRegistry {
     private Log _log;
@@ -38,7 +40,7 @@ public class OutboundMessageRegistry {
         _context = context;
         _log = _context.logManager().getLog(OutboundMessageRegistry.class);
         _pendingMessages = new TreeMap();
-        _context.jobQueue().addJob(new CleanupPendingMessagesJob());
+        //_context.jobQueue().addJob(new CleanupPendingMessagesJob());
     }
     
     public void shutdown() {
@@ -68,73 +70,77 @@ public class OutboundMessageRegistry {
         long beforeSync = _context.clock().now();
 
         Map messages = null;
-        synchronized (_pendingMessages) {
-            messages = (Map)_pendingMessages.clone();
-        }
-
         long matchTime = 0;
         long continueTime = 0;
-        int numMessages = messages.size();
-
+        int numMessages = 0;
+        long afterSync1 = 0;
+        long afterSearch = 0;
+        int matchedRemoveCount = 0;
         StringBuffer slow = null; // new StringBuffer(256);
-        long afterSync1 = _context.clock().now();
 
-        ArrayList matchedRemove = null; // new ArrayList(32);
-        for (Iterator iter = messages.keySet().iterator(); iter.hasNext(); ) {
-            Long exp = (Long)iter.next();
-            OutNetMessage msg = (OutNetMessage)messages.get(exp);
-            MessageSelector selector = msg.getReplySelector();
-            if (selector != null) {
-                long before = _context.clock().now();
-                boolean isMatch = selector.isMatch(message);
-                long after = _context.clock().now();
-                long diff = after-before;
-                if (diff > 100) {
-                    if (_log.shouldLog(Log.WARN))
-                        _log.warn("Matching with selector took too long (" + diff + "ms) : " 
-                                  + selector.getClass().getName());
-                    if (slow == null) slow = new StringBuffer(256);
-                    slow.append(selector.getClass().getName()).append(": ");
-                    slow.append(diff).append(" ");
-                }
-                matchTime += diff;
+        synchronized (_pendingMessages) {
+            messages = _pendingMessages; //(Map)_pendingMessages.clone();
+            
+            numMessages = messages.size();
+            afterSync1 = _context.clock().now();
 
-                if (isMatch) {
-                    if (_log.shouldLog(Log.DEBUG))
-                        _log.debug("Selector matches [" + selector);
-                    if (!matches.contains(msg))
-                        matches.add(msg);
-                    long beforeCon = _context.clock().now();
-                    boolean continueMatching = selector.continueMatching();
-                    long afterCon = _context.clock().now();
-                    long diffCon = afterCon - beforeCon;
-                    if (diffCon > 100) {
+            for (Iterator iter = messages.keySet().iterator(); iter.hasNext(); ) {
+                Long exp = (Long)iter.next();
+                OutNetMessage msg = (OutNetMessage)messages.get(exp);
+                MessageSelector selector = msg.getReplySelector();
+                if (selector != null) {
+                    long before = _context.clock().now();
+                    boolean isMatch = selector.isMatch(message);
+                    long after = _context.clock().now();
+                    long diff = after-before;
+                    if (diff > 100) {
                         if (_log.shouldLog(Log.WARN))
-                            _log.warn("Error continueMatching on a match took too long (" 
-                                      + diffCon + "ms) : " + selector.getClass().getName());
+                            _log.warn("Matching with selector took too long (" + diff + "ms) : " 
+                                      + selector.getClass().getName());
+                        if (slow == null) slow = new StringBuffer(256);
+                        slow.append(selector.getClass().getName()).append(": ");
+                        slow.append(diff).append(" ");
                     }
-                    continueTime += diffCon;
+                    matchTime += diff;
 
-                    if (continueMatching) {
+                    if (isMatch) {
                         if (_log.shouldLog(Log.DEBUG))
-                            _log.debug("Continue matching");
-                        // noop
+                            _log.debug("Selector matches [" + selector);
+                        if (!matches.contains(msg))
+                            matches.add(msg);
+                        long beforeCon = _context.clock().now();
+                        boolean continueMatching = selector.continueMatching();
+                        long afterCon = _context.clock().now();
+                        long diffCon = afterCon - beforeCon;
+                        if (diffCon > 100) {
+                            if (_log.shouldLog(Log.WARN))
+                                _log.warn("Error continueMatching on a match took too long (" 
+                                          + diffCon + "ms) : " + selector.getClass().getName());
+                        }
+                        continueTime += diffCon;
+
+                        if (continueMatching) {
+                            if (_log.shouldLog(Log.DEBUG))
+                                _log.debug("Continue matching");
+                            // noop
+                        } else {
+                            if (_log.shouldLog(Log.DEBUG))
+                                _log.debug("Stop matching selector " + selector + " for message " 
+                                           + msg.getMessageType());
+                            
+                            // i give in mihi, i'll use iter.remove just this once ;)
+                            // (TreeMap supports it, and this synchronized block is a hotspot)
+                            iter.remove();
+
+                            matchedRemoveCount++;
+                        }
                     } else {
-                        if (_log.shouldLog(Log.DEBUG))
-                            _log.debug("Stop matching selector " + selector + " for message " 
-                                       + msg.getMessageType());
-                        if (matchedRemove == null)
-                            matchedRemove = new ArrayList(4);
-                        matchedRemove.add(exp);
+                        //_log.debug("Selector does not match [" + selector + "]");
                     }
-                } else {
-                    //_log.debug("Selector does not match [" + selector + "]");
                 }
             }
+            afterSearch = _context.clock().now();
         }
-        long afterSearch = _context.clock().now();
-
-        doRemove(matchedRemove);
         
         long delay = _context.clock().now() - beforeSync;
         long search = afterSearch - afterSync1;
@@ -149,10 +155,7 @@ public class OutboundMessageRegistry {
             buf.append(search).append("ms (match: ").append(matchTime).append("ms, continue: ");
             buf.append(continueTime).append("ms, #: ").append(numMessages).append(") and sync time of ");
             buf.append(sync).append("ms for ");
-            if (matchedRemove == null) 
-                buf.append(0);
-            else
-                buf.append(matchedRemove.size());
+            buf.append(matchedRemoveCount);
             buf.append(" removed, ").append(matches.size()).append(" matches: slow = ");
             if (slow != null)
                 buf.append(slow.toString());
@@ -162,39 +165,27 @@ public class OutboundMessageRegistry {
         return matches;
     }
     
-    /**
-     * Remove the specified  messages from the pending list
-     *
-     * @param matchedRemove expiration (Long) of the pending message to remove
-     */
-    private void doRemove(List matchedRemove) {
-        if (matchedRemove != null) {
-            for (int i = 0; i < matchedRemove.size(); i++) {
-                Long expiration = (Long)matchedRemove.get(i);
-                OutNetMessage m = null;
-                long before = _context.clock().now();
-                synchronized (_pendingMessages) {
-                    m = (OutNetMessage)_pendingMessages.remove(expiration);
-                }
-                long diff = _context.clock().now() - before;
-                if ( (diff > 500) && (_log.shouldLog(Log.WARN)) )
-                    _log.warn("Took too long syncing on remove (" + diff + "ms");
-
-                if (m != null) {
-                    if (_log.shouldLog(Log.DEBUG))
-                        _log.debug("Removing message with selector " 
-                                   + m.getReplySelector().getClass().getName() 
-                                   + " :" + m.getReplySelector().toString());
-                }
-            }
-        }
+    public OutNetMessage registerPending(MessageSelector replySelector, ReplyJob onReply, Job onTimeout, int timeoutMs) {
+        OutNetMessage msg = new OutNetMessage(_context);
+        msg.setExpiration(_context.clock().now() + timeoutMs);
+        msg.setOnFailedReplyJob(onTimeout);
+        msg.setOnFailedSendJob(onTimeout);
+        msg.setOnReplyJob(onReply);
+        msg.setReplySelector(replySelector);
+        registerPending(msg, true);
+        return msg;
     }
+
     
     public void registerPending(OutNetMessage msg) {
-        if (msg == null) {
+        registerPending(msg, false);
+    }
+    public void registerPending(OutNetMessage msg, boolean allowEmpty) {
+        if (msg == null)
             throw new IllegalArgumentException("Null OutNetMessage specified?  wtf");
-        } else if (msg.getMessage() == null) {
-            throw new IllegalArgumentException("OutNetMessage doesn't contain an I2NPMessage? wtf");
+        if (!allowEmpty) {
+            if (msg.getMessage() == null)
+                throw new IllegalArgumentException("OutNetMessage doesn't contain an I2NPMessage? wtf");
         }
 
         long beforeSync = _context.clock().now();
@@ -202,25 +193,29 @@ public class OutboundMessageRegistry {
         long afterDone = 0;
         try {
             OutNetMessage oldMsg = null;
+            long l = msg.getExpiration();
             synchronized (_pendingMessages) {
                 if (_pendingMessages.containsValue(msg)) {
                     if (_log.shouldLog(Log.DEBUG))
-                        _log.debug("Not adding an already pending message: " 
-                                   + msg.getMessage().getUniqueId() + "\n: " + msg, 
+                        _log.debug("Not adding an already pending message: " + msg, 
                                    new Exception("Duplicate message registration"));
                     return;
-                }                                                                           
+                }               
 
-                long l = msg.getExpiration();
                 while (_pendingMessages.containsKey(new Long(l)))
                     l++;
                 _pendingMessages.put(new Long(l), msg);
             }
             afterSync1 = _context.clock().now();
+            
+            // this may get orphaned if the message is matched or explicitly
+            // removed, but its cheap enough to do an extra remove on the map 
+            // that to poll the list periodically
+            SimpleTimer.getInstance().addEvent(new CleanupExpiredTask(l), l - _context.clock().now());
 
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Register pending: " + msg.getReplySelector().getClass().getName() 
-                           + " for " + msg.getMessage().getClass().getName() + ": " 
+                           + " for " + msg.getMessage() + ": " 
                            + msg.getReplySelector().toString(), new Exception("Register pending"));
             afterDone = _context.clock().now();
         } finally {
@@ -230,9 +225,9 @@ public class OutboundMessageRegistry {
             String warn = delay + "ms (sync = " + sync1 + "ms, done = " + done + "ms)";
             if ( (delay > 1000) && (_log.shouldLog(Log.WARN)) ) {
                 _log.error("Synchronizing in the registry.register took too long!  " + warn);
-                _context.messageHistory().messageProcessingError(msg.getMessage().getUniqueId(), 
-                                                                 msg.getMessage().getClass().getName(), 
-                                                                 "RegisterPending took too long: " + warn);
+                //_context.messageHistory().messageProcessingError(msg.getMessage().getUniqueId(), 
+                //                                                 msg.getMessage().getClass().getName(), 
+                //                                                 "RegisterPending took too long: " + warn);
             } else {
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("Synchronizing in the registry.register was quick:  " + warn);
@@ -329,7 +324,8 @@ public class OutboundMessageRegistry {
             OutNetMessage msg = (OutNetMessage)msgs.get(exp);
             buf.append("<li>").append(msg.getMessageType());
             buf.append(": expiring on ").append(new Date(exp.longValue()));
-            buf.append(" targetting ").append(msg.getTarget().getIdentity().getHash());
+            if (msg.getTarget() != null)
+                buf.append(" targetting ").append(msg.getTarget().getIdentity().getHash());
             if (msg.getReplySelector() != null)
                 buf.append(" with reply selector ").append(msg.getReplySelector().toString());
             else
@@ -340,11 +336,40 @@ public class OutboundMessageRegistry {
         out.write(buf.toString());
         out.flush();
     }
+    
+    private class CleanupExpiredTask implements SimpleTimer.TimedEvent {
+        private long _expiration;
+        public CleanupExpiredTask(long expiration) {
+            _expiration = expiration;
+        }
+        public void timeReached() {
+            OutNetMessage msg = null;
+            synchronized (_pendingMessages) {
+                msg = (OutNetMessage)_pendingMessages.remove(new Long(_expiration));
+            }
+            if (msg != null) {
+                _context.messageHistory().replyTimedOut(msg);
+                Job fail = msg.getOnFailedReplyJob();
+                if (fail != null) {
+                    if (_log.shouldLog(Log.DEBUG))
+                        _log.debug("Removing message with selector " + msg.getReplySelector() 
+                                   + ": " + msg.getMessageType() 
+                                   + " and firing fail job: " + fail.getClass().getName());
+                    _context.jobQueue().addJob(fail);
+                } else {
+                    if (_log.shouldLog(Log.DEBUG))
+                        _log.debug("Removing message with selector " + msg.getReplySelector() 
+                                   + " and not firing any job");
+                }
+            }
+        }
+    }
 
     /**
      * Cleanup any messages that were pending replies but have expired
      *
      */
+    /*
     private class CleanupPendingMessagesJob extends JobImpl { 
         public CleanupPendingMessagesJob() {
             super(OutboundMessageRegistry.this._context);
@@ -361,14 +386,14 @@ public class OutboundMessageRegistry {
                 OutNetMessage msg = (OutNetMessage)removed.get(i);
 
                 if (msg != null) {
-                    ctx.messageHistory().replyTimedOut(msg);
+                    _context.messageHistory().replyTimedOut(msg);
                     Job fail = msg.getOnFailedReplyJob();
                     if (fail != null) {
                         if (_log.shouldLog(Log.DEBUG))
                             _log.debug("Removing message with selector " + msg.getReplySelector() 
                                        + ": " + msg.getMessageType() 
                                        + " and firing fail job: " + fail.getClass().getName());
-                        ctx.jobQueue().addJob(fail);
+                        _context.jobQueue().addJob(fail);
                     } else {
                         if (_log.shouldLog(Log.DEBUG))
                             _log.debug("Removing message with selector " + msg.getReplySelector() 
@@ -384,7 +409,7 @@ public class OutboundMessageRegistry {
          * Remove any messages whose expirations are in the past
          *
          * @return list of OutNetMessage objects that have expired
-         */
+         */ /*
         private List removeMessages() {
             long now = OutboundMessageRegistry.this._context.clock().now();
             List removedMessages = new ArrayList(2);
@@ -416,4 +441,5 @@ public class OutboundMessageRegistry {
             return removedMessages;
         }
     }
+    */
 }

@@ -141,7 +141,7 @@ public class BuildTestMessageJob extends JobImpl {
         ackInstructions.setEncrypted(false);
         
         DeliveryStatusMessage msg = new DeliveryStatusMessage(getContext());
-        msg.setArrival(new Date(getContext().clock().now()));
+        msg.setArrival(getContext().clock().now());
         msg.setMessageId(_testMessageKey);
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Delivery status message key: " + _testMessageKey + " arrival: " + msg.getArrival());

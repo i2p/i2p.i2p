@@ -2,8 +2,10 @@ package net.i2p.router.tunnel;
 
 import net.i2p.I2PAppContext;
 import net.i2p.data.Base64;
+import net.i2p.data.ByteArray;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
+import net.i2p.util.ByteCache;
 import net.i2p.util.Log;
 
 /**
@@ -18,6 +20,7 @@ public class OutboundGatewayProcessor {
     private TunnelCreatorConfig _config;
         
     static final boolean USE_ENCRYPTION = HopProcessor.USE_ENCRYPTION;
+    private static final ByteCache _cache = ByteCache.getInstance(128, HopProcessor.IV_LENGTH);
 
     public OutboundGatewayProcessor(I2PAppContext ctx, TunnelCreatorConfig cfg) {
         _context = ctx;
@@ -34,17 +37,21 @@ public class OutboundGatewayProcessor {
      * @param length how much of orig can we write to (must be a multiple of 16).
      */
     public void process(byte orig[], int offset, int length) {
-        byte iv[] = new byte[HopProcessor.IV_LENGTH];
+        ByteArray ba = _cache.acquire();
+        byte iv[] = ba.getData(); // new byte[HopProcessor.IV_LENGTH];
         //_context.random().nextBytes(iv);
         //System.arraycopy(iv, 0, orig, offset, HopProcessor.IV_LENGTH);
         System.arraycopy(orig, offset, iv, 0, HopProcessor.IV_LENGTH);
         
         if (_log.shouldLog(Log.DEBUG)) {
-            //_log.debug("Original random IV: " + Base64.encode(iv));
+            _log.debug("Orig random IV: " + Base64.encode(iv));
             //_log.debug("data:  " + Base64.encode(orig, iv.length, length - iv.length));
         }
         if (USE_ENCRYPTION)
             decrypt(_context, _config, iv, orig, offset, length);
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("finished processing the preprocessed data");
+        _cache.release(ba);
     }
     
     /**
@@ -53,19 +60,21 @@ public class OutboundGatewayProcessor {
      * and by the inbound endpoint.
      *
      */
-    static void decrypt(I2PAppContext ctx, TunnelCreatorConfig cfg, byte iv[], byte orig[], int offset, int length) {
+    private void decrypt(I2PAppContext ctx, TunnelCreatorConfig cfg, byte iv[], byte orig[], int offset, int length) {
         Log log = ctx.logManager().getLog(OutboundGatewayProcessor.class);
-        byte cur[] = new byte[HopProcessor.IV_LENGTH]; // so we dont malloc
-        for (int i = cfg.getLength()-1; i >= 0; i--) {
+        ByteArray ba = _cache.acquire();
+        byte cur[] = ba.getData(); // new byte[HopProcessor.IV_LENGTH]; // so we dont malloc
+        for (int i = cfg.getLength()-1; i >= 1; i--) { // dont include hop 0, since that is the creator
             decrypt(ctx, iv, orig, offset, length, cur, cfg.getConfig(i));
             if (log.shouldLog(Log.DEBUG)) {
-                //log.debug("IV at hop " + i + ": " + Base64.encode(orig, offset, HopProcessor.IV_LENGTH));
+                log.debug("IV at hop " + i + ": " + Base64.encode(orig, offset, HopProcessor.IV_LENGTH));
                 //log.debug("hop " + i + ": " + Base64.encode(orig, offset + HopProcessor.IV_LENGTH, length - HopProcessor.IV_LENGTH));
             }
         }
+        _cache.release(ba);
     }
     
-    private static void decrypt(I2PAppContext ctx, byte iv[], byte orig[], int offset, int length, byte cur[], HopConfig config) {
+    static void decrypt(I2PAppContext ctx, byte iv[], byte orig[], int offset, int length, byte cur[], HopConfig config) {
         // update the IV for the previous (next?) hop
         ctx.aes().decryptBlock(orig, offset, config.getIVKey(), orig, offset);
         

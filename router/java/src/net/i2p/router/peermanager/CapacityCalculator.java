@@ -66,6 +66,17 @@ public class CapacityCalculator extends Calculator {
         if (tooOld(profile)) 
             capacity = 1;
         
+        // now take into account non-rejection tunnel rejections (which haven't 
+        // incremented the rejection counter, since they were only temporary)
+        long now = _context.clock().now();
+        if (profile.getTunnelHistory().getLastRejectedTransient() > now - 5*60*1000)
+            capacity = 1;
+        else if (profile.getTunnelHistory().getLastRejectedProbabalistic() > now - 5*60*1000)
+            capacity -= _context.random().nextInt(5);
+        
+        if (capacity < 0)
+            capacity = 0;
+        
         capacity += profile.getReliabilityBonus();
         return capacity;
     }

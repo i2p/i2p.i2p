@@ -183,7 +183,8 @@ public class I2PTunnel implements Logging, EventDispatcher {
     void addSession(I2PSession session) { 
         if (session == null) return;
         synchronized (_sessions) {
-            _sessions.add(session);
+            if (!_sessions.contains(session))
+                _sessions.add(session);
         }
     }
     void removeSession(I2PSession session) { 

@@ -75,7 +75,7 @@ class LoadClientAppsJob extends JobImpl {
         
         // fall back to use router.config's clientApp.* lines
         if (!cfgFile.exists()) 
-            return new Properties(getContext().router().getConfigMap());
+            return getContext().router().getConfigMap();
         
         try {
             DataHelper.loadProps(rv, cfgFile);

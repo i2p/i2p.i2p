@@ -111,6 +111,8 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
         }
     }
 
+    public static final int LISTEN_PORT = 7654;
+    
     /**
      * Create a new session, reading the Destination, PrivateKey, and SigningPrivateKey
      * from the destKeyStream, and using the specified options to connect to the router
@@ -145,14 +147,14 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
         _options = new Properties();
         _options.putAll(filter(options));
         _hostname = _options.getProperty(I2PClient.PROP_TCP_HOST, "localhost");
-        String portNum = _options.getProperty(I2PClient.PROP_TCP_PORT, TestServer.LISTEN_PORT + "");
+        String portNum = _options.getProperty(I2PClient.PROP_TCP_PORT, LISTEN_PORT + "");
         try {
             _portNum = Integer.parseInt(portNum);
         } catch (NumberFormatException nfe) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn(getPrefix() + "Invalid port number specified, defaulting to "
-                          + TestServer.LISTEN_PORT, nfe);
-            _portNum = TestServer.LISTEN_PORT;
+                          + LISTEN_PORT, nfe);
+            _portNum = LISTEN_PORT;
         }
     }
 

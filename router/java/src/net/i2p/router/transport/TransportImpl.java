@@ -120,7 +120,10 @@ public abstract class TransportImpl implements Transport {
      */
     protected void afterSend(OutNetMessage msg, boolean sendSuccessful, boolean allowRequeue, long msToSend) {
         boolean log = false;
-        msg.timestamp("afterSend(" + sendSuccessful + ")");
+        if (sendSuccessful)
+            msg.timestamp("afterSend(successful)");
+        else
+            msg.timestamp("afterSend(failed)");
         
         if (!sendSuccessful)
             msg.transportFailed(getStyle());
@@ -201,7 +204,7 @@ public abstract class TransportImpl implements Transport {
         if (log) {
             String type = msg.getMessageType();
             _context.messageHistory().sendMessage(type, msg.getMessageId(), 
-                                                  new Date(msg.getExpiration()),
+                                                  msg.getExpiration(),
                                                   msg.getTarget().getIdentity().getHash(), 
                                                   sendSuccessful);
         }

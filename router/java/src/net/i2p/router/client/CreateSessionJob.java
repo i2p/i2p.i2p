@@ -27,8 +27,6 @@ class CreateSessionJob extends JobImpl {
     private Log _log;
     private ClientConnectionRunner _runner;
     
-    private final static long LEASE_CREATION_TIMEOUT = 30*1000;
-    
     public CreateSessionJob(RouterContext context, ClientConnectionRunner runner) {
         super(context);
         _log = context.logManager().getLog(CreateSessionJob.class);
@@ -65,6 +63,6 @@ class CreateSessionJob extends JobImpl {
         
         // and load 'em up (using anything not yet set as the software defaults)
         settings.readFromProperties(props);
-        getContext().tunnelManager().createTunnels(_runner.getConfig().getDestination(), settings, LEASE_CREATION_TIMEOUT);
+        getContext().tunnelManager().buildTunnels(_runner.getConfig().getDestination(), settings);
     }
 }

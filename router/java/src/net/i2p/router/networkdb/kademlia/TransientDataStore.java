@@ -67,7 +67,8 @@ class TransientDataStore implements DataStore {
     
     public void put(Hash key, DataStructure data) {
         if (data == null) return;
-        _log.debug("Storing key " + key);
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("Storing key " + key);
         Object old = null;
         synchronized (_data) {
             old = _data.put(key, data);

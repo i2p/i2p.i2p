@@ -49,7 +49,8 @@ class RequestLeaseSetJob extends JobImpl {
         LeaseRequestState oldReq = _runner.getLeaseRequest();
         if (oldReq != null) {
             if (oldReq.getExpiration() > getContext().clock().now()) {
-                _log.error("Old *current* leaseRequest already exists!  Why are we trying to request too quickly?", getAddedBy());
+                _log.info("request of a leaseSet is still active, wait a little bit before asking again");
+                requeue(5*1000);
                 return;
             } else {
                 _log.error("Old *expired* leaseRequest exists!  Why did the old request not get killed? (expiration = " + new Date(oldReq.getExpiration()) + ")", getAddedBy());
@@ -70,7 +71,7 @@ class RequestLeaseSetJob extends JobImpl {
         msg.setSessionId(_runner.getSessionId());
         
         for (int i = 0; i < state.getRequested().getLeaseCount(); i++) {
-            msg.addEndpoint(state.getRequested().getLease(i).getRouterIdentity(), state.getRequested().getLease(i).getTunnelId());
+            msg.addEndpoint(state.getRequested().getLease(i).getGateway(), state.getRequested().getLease(i).getTunnelId());
         }
         
         try {

@@ -34,6 +34,8 @@ public class TunnelId extends DataStructureImpl {
     public final static int TYPE_OUTBOUND = 2;
     public final static int TYPE_PARTICIPANT = 3;
     
+    public static final TunnelId INVALID = new TunnelId(0, true);
+    
     public TunnelId() { 
         _tunnelId = -1;
         _type = TYPE_UNSPECIFIED;
@@ -47,6 +49,9 @@ public class TunnelId extends DataStructureImpl {
         if (id <= 0) throw new IllegalArgumentException("wtf, tunnelId " + id);
         _tunnelId = id;
         _type = type;
+    }
+    private TunnelId(long id, boolean forceInvalid) {
+        _tunnelId = id;
     }
     
     public long getTunnelId() { return _tunnelId; }
@@ -87,7 +92,5 @@ public class TunnelId extends DataStructureImpl {
         return (int)getTunnelId(); 
     }
     
-    public String toString() {
-        return "[TunnelID: " + getTunnelId() + "]";
-    }
+    public String toString() { return String.valueOf(getTunnelId()); }
 }

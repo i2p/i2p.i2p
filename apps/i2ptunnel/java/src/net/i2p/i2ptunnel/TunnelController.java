@@ -102,6 +102,7 @@ public class TunnelController implements Logging {
     
     public void startTunnelBackground() {
         if (_running) return;
+        _starting = true;
         new I2PThread(new Runnable() { public void run() { startTunnel(); } }).start();
     }
     

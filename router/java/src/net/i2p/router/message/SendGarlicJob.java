@@ -80,9 +80,11 @@ public class SendGarlicJob extends JobImpl {
         _message = GarlicMessageBuilder.buildMessage(getContext(), _config, _wrappedKey, _wrappedTags);
         long after = getContext().clock().now();
         if ( (after - before) > 1000) {
-            _log.warn("Building the garlic took too long [" + (after-before)+" ms]", getAddedBy());
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Building the garlic took too long [" + (after-before)+" ms]", getAddedBy());
         } else {
-            _log.debug("Building the garlic was fast! " + (after - before) + " ms");
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Building the garlic was fast! " + (after - before) + " ms");
         }
         getContext().jobQueue().addJob(new SendJob(getContext()));
     }
@@ -103,7 +105,7 @@ public class SendGarlicJob extends JobImpl {
     
     private void sendGarlic() {
         OutNetMessage msg = new OutNetMessage(getContext());
-        long when = _message.getMessageExpiration().getTime(); // + Router.CLOCK_FUDGE_FACTOR;
+        long when = _message.getMessageExpiration(); // + Router.CLOCK_FUDGE_FACTOR;
         msg.setExpiration(when);
         msg.setMessage(_message);
         msg.setOnFailedReplyJob(_onReplyFailed);

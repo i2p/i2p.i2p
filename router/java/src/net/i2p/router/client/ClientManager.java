@@ -222,7 +222,15 @@ public class ClientManager {
             runner.requestLeaseSet(set, _ctx.clock().now() + timeout, onCreateJob, onFailedJob);
         }
     }
-    
+
+    private static final int REQUEST_LEASESET_TIMEOUT = 20*1000;
+    public void requestLeaseSet(Hash dest, LeaseSet ls) {
+        ClientConnectionRunner runner = getRunner(dest);
+        if (runner != null)  {
+            // no need to fire off any jobs...
+            runner.requestLeaseSet(ls, REQUEST_LEASESET_TIMEOUT, null, null);
+        }
+    }
     
     public boolean isLocal(Destination dest) { 
         boolean rv = false;
@@ -260,6 +268,15 @@ public class ClientManager {
         }
         return false;
     }
+    
+    public Set listClients() {
+        Set rv = new HashSet();
+        synchronized (_runners) {
+            rv.addAll(_runners.keySet());
+        }
+        return rv;
+    }
+
     
     ClientConnectionRunner getRunner(Destination dest) {
         ClientConnectionRunner rv = null;

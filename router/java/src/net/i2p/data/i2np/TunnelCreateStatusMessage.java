@@ -28,26 +28,22 @@ import net.i2p.util.Log;
 public class TunnelCreateStatusMessage extends I2NPMessageImpl {
     private final static Log _log = new Log(TunnelCreateStatusMessage.class);
     public final static int MESSAGE_TYPE = 7;
-    private TunnelId _tunnelId;
+    private TunnelId _receiveTunnelId;
     private int _status;
-    private Hash _from;
+    private long _nonce;
     
     public final static int STATUS_SUCCESS = 0;
-    public final static int STATUS_FAILED_DUPLICATE_ID = 1;
-    public final static int STATUS_FAILED_OVERLOADED = 2;
-    public final static int STATUS_FAILED_CERTIFICATE = 3;
-    public final static int STATUS_FAILED_DELETED = 100;
     
     public TunnelCreateStatusMessage(I2PAppContext context) {
         super(context);
-        setTunnelId(null);
+        setReceiveTunnelId(null);
         setStatus(-1);
-        setFromHash(null);
+        setNonce(-1);
     }
     
-    public TunnelId getTunnelId() { return _tunnelId; }
-    public void setTunnelId(TunnelId id) { 
-        _tunnelId = id; 
+    public TunnelId getReceiveTunnelId() { return _receiveTunnelId; }
+    public void setReceiveTunnelId(TunnelId id) { 
+        _receiveTunnelId = id; 
         if ( (id != null) && (id.getTunnelId() <= 0) )
             throw new IllegalArgumentException("wtf, tunnelId " + id);
     }
@@ -55,63 +51,57 @@ public class TunnelCreateStatusMessage extends I2NPMessageImpl {
     public int getStatus() { return _status; }
     public void setStatus(int status) { _status = status; }
     
-    /**
-     * Contains the SHA256 Hash of the RouterIdentity sending the message
-     */
-    public Hash getFromHash() { return _from; }
-    public void setFromHash(Hash from) { _from = from; }
+    public long getNonce() { return _nonce; }
+    public void setNonce(long nonce) { _nonce = nonce; }
     
     public void readMessage(byte data[], int offset, int dataSize, int type) throws I2NPMessageException, IOException {
         if (type != MESSAGE_TYPE) throw new I2NPMessageException("Message type is incorrect for this message");
         int curIndex = offset;
         
-        _tunnelId = new TunnelId(DataHelper.fromLong(data, curIndex, 4));
+        _receiveTunnelId = new TunnelId(DataHelper.fromLong(data, curIndex, 4));
         curIndex += 4;
         
-        if (_tunnelId.getTunnelId() <= 0)
-            throw new I2NPMessageException("wtf, negative tunnelId? " + _tunnelId);
+        if (_receiveTunnelId.getTunnelId() <= 0)
+            throw new I2NPMessageException("wtf, negative tunnelId? " + _receiveTunnelId);
         
         _status = (int)DataHelper.fromLong(data, curIndex, 1);
         curIndex++;
-        byte peer[] = new byte[Hash.HASH_LENGTH];
-        System.arraycopy(data, curIndex, peer, 0, Hash.HASH_LENGTH);
-        curIndex += Hash.HASH_LENGTH;
-        _from = new Hash(peer);
+        
+        _nonce = DataHelper.fromLong(data, curIndex, 4);
     }
     
         
     /** calculate the message body's length (not including the header and footer */
     protected int calculateWrittenLength() { 
-        return 4 + 1 + Hash.HASH_LENGTH; // id + status + from
+        return 4 + 1 + 4; // id + status + nonce
     }
     /** write the message body to the output array, starting at the given index */
     protected int writeMessageBody(byte out[], int curIndex) throws I2NPMessageException {
-        if ( (_tunnelId == null) || (_from == null) ) throw new I2NPMessageException("Not enough data to write out");
-        if (_tunnelId.getTunnelId() < 0) throw new I2NPMessageException("Negative tunnelId!? " + _tunnelId);
+        if ( (_receiveTunnelId == null) || (_nonce <= 0) ) throw new I2NPMessageException("Not enough data to write out");
+        if (_receiveTunnelId.getTunnelId() <= 0) throw new I2NPMessageException("Invalid tunnelId!? " + _receiveTunnelId);
         
-        byte id[] = DataHelper.toLong(4, _tunnelId.getTunnelId());
-        System.arraycopy(id, 0, out, curIndex, 4);
+        DataHelper.toLong(out, curIndex, 4, _receiveTunnelId.getTunnelId());
         curIndex += 4;
-        byte status[] = DataHelper.toLong(1, _status);
-        out[curIndex++] = status[0];
-        System.arraycopy(_from.getData(), 0, out, curIndex, Hash.HASH_LENGTH);
-        curIndex += Hash.HASH_LENGTH;
+        DataHelper.toLong(out, curIndex, 1, _status);
+        curIndex++;
+        DataHelper.toLong(out, curIndex, 4, _nonce);
+        curIndex += 4;
         return curIndex;
     }
     
     public int getType() { return MESSAGE_TYPE; }
     
     public int hashCode() {
-        return DataHelper.hashCode(getTunnelId()) +
+        return DataHelper.hashCode(getReceiveTunnelId()) +
                getStatus() +
-               DataHelper.hashCode(getFromHash());
+               (int)getNonce();
     }
     
     public boolean equals(Object object) {
         if ( (object != null) && (object instanceof TunnelCreateStatusMessage) ) {
             TunnelCreateStatusMessage msg = (TunnelCreateStatusMessage)object;
-            return DataHelper.eq(getTunnelId(),msg.getTunnelId()) &&
-                   DataHelper.eq(getFromHash(),msg.getFromHash()) &&
+            return DataHelper.eq(getReceiveTunnelId(),msg.getReceiveTunnelId()) &&
+                   DataHelper.eq(getNonce(),msg.getNonce()) &&
                    (getStatus() == msg.getStatus());
         } else {
             return false;
@@ -121,9 +111,9 @@ public class TunnelCreateStatusMessage extends I2NPMessageImpl {
     public String toString() {
         StringBuffer buf = new StringBuffer();
         buf.append("[TunnelCreateStatusMessage: ");
-        buf.append("\n\tTunnel ID: ").append(getTunnelId());
+        buf.append("\n\tTunnel ID: ").append(getReceiveTunnelId());
         buf.append("\n\tStatus: ").append(getStatus());
-        buf.append("\n\tFrom: ").append(getFromHash());
+        buf.append("\n\tNonce: ").append(getNonce());
         buf.append("]");
         return buf.toString();
     }

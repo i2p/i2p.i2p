@@ -49,7 +49,9 @@ public class SimpleTimer {
      *
      */
     public void addEvent(TimedEvent event, long timeoutMs) {
-        long eventTime = System.currentTimeMillis() + timeoutMs;
+        int totalEvents = 0;
+        long now = System.currentTimeMillis();
+        long eventTime = now + timeoutMs;
         Long time = new Long(eventTime);
         synchronized (_events) {
             // remove the old scheduled position, then reinsert it
@@ -72,8 +74,20 @@ public class SimpleTimer {
                 }
             }
             
+            totalEvents = _events.size();
             _events.notifyAll();
         }
+        if (time.longValue() > eventTime + 5) {
+            if (_log.shouldLog(Log.ERROR))
+                _log.error("Lots of timer congestion, had to push " + event + " back "
+                           + (time.longValue()-eventTime) + "ms (# events: " + totalEvents + ")");
+        }
+        long timeToAdd = System.currentTimeMillis() - now;
+        if (timeToAdd > 50) {
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("timer contention: took " + timeToAdd + "ms to add a job");
+        }
+            
     }
     
     public boolean removeEvent(TimedEvent evt) {

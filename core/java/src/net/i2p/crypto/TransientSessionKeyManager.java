@@ -602,14 +602,15 @@ class TransientSessionKeyManager extends SessionKeyManager {
             long rv = 0;
             if (_key != null) rv = rv * 7 + _key.hashCode();
             rv = rv * 7 + _date;
-            if (_sessionTags != null) rv = rv * 7 + DataHelper.hashCode(_sessionTags);
+            // no need to hashCode the tags, key + date should be enough
             return (int) rv;
         }
 
         public boolean equals(Object o) {
             if ((o == null) || !(o instanceof TagSet)) return false;
             TagSet ts = (TagSet) o;
-            return DataHelper.eq(ts.getAssociatedKey(), getAssociatedKey()) && DataHelper.eq(ts.getTags(), getTags())
+            return DataHelper.eq(ts.getAssociatedKey(), getAssociatedKey()) 
+                   //&& DataHelper.eq(ts.getTags(), getTags())
                    && ts.getDate() == getDate();
         }
     }

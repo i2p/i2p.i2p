@@ -52,38 +52,45 @@ class OutboundClientMessageJobHelper {
      *
      * @param bundledReplyLeaseSet if specified, the given LeaseSet will be packaged with the message (allowing
      *                             much faster replies, since their netDb search will return almost instantly)
+     * @return garlic, or null if no tunnels were found (or other errors)
      */
     static GarlicMessage createGarlicMessage(RouterContext ctx, long replyToken, long expiration, PublicKey recipientPK, 
-                                             Payload data, Destination dest, SessionKey wrappedKey, Set wrappedTags, 
+                                             Payload data, Hash from, Destination dest, SessionKey wrappedKey, Set wrappedTags, 
                                              boolean requireAck, LeaseSet bundledReplyLeaseSet) {
         PayloadGarlicConfig dataClove = buildDataClove(ctx, data, dest, expiration);
-        return createGarlicMessage(ctx, replyToken, expiration, recipientPK, dataClove, dest, wrappedKey, 
+        return createGarlicMessage(ctx, replyToken, expiration, recipientPK, dataClove, from, dest, wrappedKey, 
                                    wrappedTags, requireAck, bundledReplyLeaseSet);
     }
     /**
      * Allow the app to specify the data clove directly, which enables OutboundClientMessage to resend the
      * same payload (including expiration and unique id) in different garlics (down different tunnels)
      *
+     * @return garlic, or null if no tunnels were found (or other errors)
      */
     static GarlicMessage createGarlicMessage(RouterContext ctx, long replyToken, long expiration, PublicKey recipientPK, 
-                                             PayloadGarlicConfig dataClove, Destination dest, SessionKey wrappedKey, 
+                                             PayloadGarlicConfig dataClove, Hash from, Destination dest, SessionKey wrappedKey, 
                                              Set wrappedTags, boolean requireAck, LeaseSet bundledReplyLeaseSet) {
-        GarlicConfig config = createGarlicConfig(ctx, replyToken, expiration, recipientPK, dataClove, dest, requireAck, bundledReplyLeaseSet);
+        GarlicConfig config = createGarlicConfig(ctx, replyToken, expiration, recipientPK, dataClove, from, dest, requireAck, bundledReplyLeaseSet);
+        if (config == null)
+            return null;
         GarlicMessage msg = GarlicMessageBuilder.buildMessage(ctx, config, wrappedKey, wrappedTags);
         return msg;
     }
     
     private static GarlicConfig createGarlicConfig(RouterContext ctx, long replyToken, long expiration, PublicKey recipientPK, 
-                                                   PayloadGarlicConfig dataClove, Destination dest, boolean requireAck,
+                                                   PayloadGarlicConfig dataClove, Hash from, Destination dest, boolean requireAck,
                                                    LeaseSet bundledReplyLeaseSet) {
         Log log = ctx.logManager().getLog(OutboundClientMessageJobHelper.class);
-        log.debug("Reply token: " + replyToken);
+        if (log.shouldLog(Log.DEBUG))
+            log.debug("Reply token: " + replyToken);
         GarlicConfig config = new GarlicConfig();
         
         config.addClove(dataClove);
         
         if (requireAck) {
-            PayloadGarlicConfig ackClove = buildAckClove(ctx, replyToken, expiration);
+            PayloadGarlicConfig ackClove = buildAckClove(ctx, from, replyToken, expiration);
+            if (ackClove == null)
+                return null; // no tunnels
             config.addClove(ackClove);
         }
         
@@ -108,7 +115,9 @@ class OutboundClientMessageJobHelper {
         config.setRecipientPublicKey(recipientPK);
         config.setRequestAck(false);
         
-        log.info("Creating garlic config to be encrypted to " + recipientPK + " for destination " + dest.calculateHash().toBase64());
+        if (log.shouldLog(Log.INFO))
+            log.info("Creating garlic config to be encrypted to " + recipientPK 
+                     + " for destination " + dest.calculateHash().toBase64());
         
         return config;
     }
@@ -116,28 +125,25 @@ class OutboundClientMessageJobHelper {
     /**
      * Build a clove that sends a DeliveryStatusMessage to us
      */
-    private static PayloadGarlicConfig buildAckClove(RouterContext ctx, long replyToken, long expiration) {
+    private static PayloadGarlicConfig buildAckClove(RouterContext ctx, Hash from, long replyToken, long expiration) {
         Log log = ctx.logManager().getLog(OutboundClientMessageJobHelper.class);
         PayloadGarlicConfig ackClove = new PayloadGarlicConfig();
         
         Hash replyToTunnelRouter = null; // inbound tunnel gateway
         TunnelId replyToTunnelId = null; // tunnel id on that gateway
         
-        TunnelSelectionCriteria criteria = new TunnelSelectionCriteria();
-        criteria.setMaximumTunnelsRequired(1);
-        criteria.setMinimumTunnelsRequired(1);
-        criteria.setReliabilityPriority(50); // arbitrary.  fixme
-        criteria.setAnonymityPriority(50);   // arbitrary.  fixme
-        criteria.setLatencyPriority(50);     // arbitrary.  fixme
-        List tunnelIds = ctx.tunnelManager().selectInboundTunnelIds(criteria);
-        if (tunnelIds.size() <= 0) {
-            log.error("No inbound tunnels to receive an ack through!?");
+        TunnelInfo replyToTunnel = ctx.tunnelManager().selectInboundTunnel(from);
+        if (replyToTunnel == null) {
+            if (log.shouldLog(Log.ERROR))
+                log.error("Unable to send client message from " + from.toBase64() 
+                          + ", as there are no inbound tunnels available");
             return null;
         }
-        replyToTunnelId = (TunnelId)tunnelIds.get(0);
-        TunnelInfo info = ctx.tunnelManager().getTunnelInfo(replyToTunnelId);
-        replyToTunnelRouter = info.getThisHop(); // info is the chain, and the first hop is the gateway
-        log.debug("Ack for the data message will come back along tunnel " + replyToTunnelId + ":\n" + info);
+        replyToTunnelId = replyToTunnel.getReceiveTunnelId(0);
+        replyToTunnelRouter = replyToTunnel.getPeer(0);
+        if (log.shouldLog(Log.DEBUG))
+            log.debug("Ack for the data message will come back along tunnel " + replyToTunnelId 
+                      + ":\n" + replyToTunnel);
         
         DeliveryInstructions ackInstructions = new DeliveryInstructions();
         ackInstructions.setDeliveryMode(DeliveryInstructions.DELIVERY_MODE_TUNNEL);
@@ -148,9 +154,10 @@ class OutboundClientMessageJobHelper {
         ackInstructions.setEncrypted(false);
         
         DeliveryStatusMessage msg = new DeliveryStatusMessage(ctx);
-        msg.setArrival(new Date(ctx.clock().now()));
+        msg.setArrival(ctx.clock().now());
         msg.setMessageId(replyToken);
-        log.debug("Delivery status message key: " + replyToken + " arrival: " + msg.getArrival());
+        if (log.shouldLog(Log.DEBUG))
+            log.debug("Delivery status message key: " + replyToken + " arrival: " + msg.getArrival());
         
         ackClove.setCertificate(new Certificate(Certificate.CERTIFICATE_TYPE_NULL, null));
         ackClove.setDeliveryInstructions(ackInstructions);
@@ -160,7 +167,11 @@ class OutboundClientMessageJobHelper {
         ackClove.setRecipient(ctx.router().getRouterInfo());
         ackClove.setRequestAck(false);
         
-        log.debug("Delivery status message is targetting us [" + ackClove.getRecipient().getIdentity().getHash().toBase64() + "] via tunnel " + replyToTunnelId.getTunnelId() + " on " + replyToTunnelRouter.toBase64());
+        if (log.shouldLog(Log.DEBUG))
+            log.debug("Delivery status message is targetting us [" 
+                      + ackClove.getRecipient().getIdentity().getHash().toBase64() 
+                      + "] via tunnel " + replyToTunnelId.getTunnelId() + " on " 
+                      + replyToTunnelRouter.toBase64());
         
         return ackClove;
     }
@@ -211,7 +222,7 @@ class OutboundClientMessageJobHelper {
         clove.setId(ctx.random().nextLong(I2NPMessage.MAX_ID_VALUE));
         DatabaseStoreMessage msg = new DatabaseStoreMessage(ctx);
         msg.setLeaseSet(replyLeaseSet);
-        msg.setMessageExpiration(new Date(expiration));
+        msg.setMessageExpiration(expiration);
         msg.setKey(replyLeaseSet.getDestination().calculateHash());
         clove.setPayload(msg);
         clove.setRecipientPublicKey(null);

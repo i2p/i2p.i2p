@@ -25,14 +25,14 @@ import net.i2p.util.Log;
  */
 public class Lease extends DataStructureImpl {
     private final static Log _log = new Log(Lease.class);
-    private RouterIdentity _routerIdentity;
+    private Hash _gateway;
     private TunnelId _tunnelId;
     private Date _end;
     private int _numSuccess;
     private int _numFailure;
 
     public Lease() {
-        setRouterIdentity(null);
+        setGateway(null);
         setTunnelId(null);
         setEndDate(null);
         setNumSuccess(0);
@@ -42,15 +42,15 @@ public class Lease extends DataStructureImpl {
     /** Retrieve the router at which the destination can be contacted
      * @return identity of the router acting as a gateway
      */
-    public RouterIdentity getRouterIdentity() {
-        return _routerIdentity;
+    public Hash getGateway() {
+        return _gateway;
     }
 
     /** Configure the router at which the destination can be contacted
      * @param ident router acting as the gateway
      */
-    public void setRouterIdentity(RouterIdentity ident) {
-        _routerIdentity = ident;
+    public void setGateway(Hash ident) {
+        _gateway = ident;
     }
 
     /** Tunnel on the gateway to communicate with
@@ -113,18 +113,18 @@ public class Lease extends DataStructureImpl {
     }
 
     public void readBytes(InputStream in) throws DataFormatException, IOException {
-        _routerIdentity = new RouterIdentity();
-        _routerIdentity.readBytes(in);
+        _gateway = new Hash();
+        _gateway.readBytes(in);
         _tunnelId = new TunnelId();
         _tunnelId.readBytes(in);
         _end = DataHelper.readDate(in);
     }
 
     public void writeBytes(OutputStream out) throws DataFormatException, IOException {
-        if ((_routerIdentity == null) || (_tunnelId == null))
+        if ((_gateway == null) || (_tunnelId == null))
             throw new DataFormatException("Not enough data to write out a Lease");
 
-        _routerIdentity.writeBytes(out);
+        _gateway.writeBytes(out);
         _tunnelId.writeBytes(out);
         DataHelper.writeDate(out, _end);
     }
@@ -133,12 +133,13 @@ public class Lease extends DataStructureImpl {
         if ((object == null) || !(object instanceof Lease)) return false;
         Lease lse = (Lease) object;
         return DataHelper.eq(getEndDate(), lse.getEndDate())
-               && DataHelper.eq(getRouterIdentity(), lse.getRouterIdentity());
+               && DataHelper.eq(getTunnelId(), lse.getTunnelId())
+               && DataHelper.eq(getGateway(), lse.getGateway());
 
     }
 
     public int hashCode() {
-        return DataHelper.hashCode(getEndDate()) + DataHelper.hashCode(getRouterIdentity())
+        return DataHelper.hashCode(getEndDate()) + DataHelper.hashCode(getGateway())
                + DataHelper.hashCode(getTunnelId());
     }
 
@@ -146,7 +147,7 @@ public class Lease extends DataStructureImpl {
         StringBuffer buf = new StringBuffer(128);
         buf.append("[Lease: ");
         buf.append("\n\tEnd Date: ").append(getEndDate());
-        buf.append("\n\tRouter Identity: ").append(getRouterIdentity());
+        buf.append("\n\tGateway: ").append(getGateway());
         buf.append("\n\tTunnelId: ").append(getTunnelId());
         buf.append("]");
         return buf.toString();

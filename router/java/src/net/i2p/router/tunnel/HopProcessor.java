@@ -2,8 +2,10 @@ package net.i2p.router.tunnel;
 
 import net.i2p.I2PAppContext;
 import net.i2p.data.Base64;
+import net.i2p.data.ByteArray;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
+import net.i2p.util.ByteCache;
 import net.i2p.util.Log;
 
 /**
@@ -24,15 +26,19 @@ public class HopProcessor {
     /** helpful flag for debugging */
     static final boolean USE_ENCRYPTION = true;
     static final int IV_LENGTH = 16;
+    private static final ByteCache _cache = ByteCache.getInstance(128, IV_LENGTH);
     
     public HopProcessor(I2PAppContext ctx, HopConfig config) {
+        this(ctx, config, createValidator());
+    }
+    public HopProcessor(I2PAppContext ctx, HopConfig config, IVValidator validator) {
         _context = ctx;
         _log = ctx.logManager().getLog(HopProcessor.class);
         _config = config;
-        _validator = createValidator();
+        _validator = validator;
     }
     
-    protected IVValidator createValidator() { 
+    protected static IVValidator createValidator() { 
         // yeah, we'll use an O(1) validator later (e.g. bloom filter)
         return new HashSetIVValidator();
     }
@@ -61,7 +67,8 @@ public class HopProcessor {
             }
         }
         
-        byte iv[] = new byte[IV_LENGTH];
+        ByteArray ba = _cache.acquire();
+        byte iv[] = ba.getData(); // new byte[IV_LENGTH];
         System.arraycopy(orig, offset, iv, 0, IV_LENGTH);
         boolean okIV = _validator.receiveIV(iv);
         if (!okIV) {
@@ -82,6 +89,7 @@ public class HopProcessor {
             //_log.debug("Data after processing: " + Base64.encode(orig, IV_LENGTH, orig.length - IV_LENGTH));
             //_log.debug("IV sent: " + Base64.encode(orig, 0, IV_LENGTH));
         }
+        _cache.release(ba);
         return true;
     }
     

@@ -22,7 +22,8 @@ import net.i2p.router.transport.CommSystemFacadeImpl;
 import net.i2p.router.transport.FIFOBandwidthLimiter;
 import net.i2p.router.transport.OutboundMessageRegistry;
 import net.i2p.router.transport.VMCommSystem;
-import net.i2p.router.tunnelmanager.PoolingTunnelManagerFacade;
+import net.i2p.router.tunnel.pool.TunnelPoolManager;
+import net.i2p.router.tunnel.TunnelDispatcher;
 
 /**
  * Build off the core I2P context to provide a root for a router instance to
@@ -50,6 +51,7 @@ public class RouterContext extends I2PAppContext {
     private ProfileManager _profileManager;
     private FIFOBandwidthLimiter _bandwidthLimiter;
     private TunnelManagerFacade _tunnelManager;
+    private TunnelDispatcher _tunnelDispatcher;
     private StatisticsManager _statPublisher;
     private Shitlist _shitlist;
     private MessageValidator _messageValidator;
@@ -103,7 +105,8 @@ public class RouterContext extends I2PAppContext {
         _peerManagerFacade = new PeerManagerFacadeImpl(this);
         _profileManager = new ProfileManagerImpl(this);
         _bandwidthLimiter = new FIFOBandwidthLimiter(this);
-        _tunnelManager = new PoolingTunnelManagerFacade(this);
+        _tunnelManager = new TunnelPoolManager(this);
+        _tunnelDispatcher = new TunnelDispatcher(this);
         _statPublisher = new StatisticsManager(this);
         _shitlist = new Shitlist(this);
         _messageValidator = new MessageValidator(this);
@@ -215,6 +218,10 @@ public class RouterContext extends I2PAppContext {
      * Any configuration for the tunnels is rooted from the context's properties
      */
     public TunnelManagerFacade tunnelManager() { return _tunnelManager; }
+    /**
+     * Handle tunnel messages, as well as coordinate the gateways
+     */
+    public TunnelDispatcher tunnelDispatcher() { return _tunnelDispatcher; }
     /**
      * If the router is configured to, gather up some particularly tasty morsels
      * regarding the stats managed and offer to publish them into the routerInfo.

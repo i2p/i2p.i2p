@@ -8,11 +8,13 @@ package net.i2p.router.networkdb.kademlia;
  *
  */
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import net.i2p.data.DataHelper;
 import net.i2p.data.DataStructure;
 import net.i2p.data.Hash;
 import net.i2p.data.RouterInfo;
@@ -25,7 +27,6 @@ import net.i2p.router.RouterContext;
 import net.i2p.router.TunnelInfo;
 import net.i2p.router.TunnelSelectionCriteria;
 import net.i2p.router.message.SendMessageDirectJob;
-import net.i2p.router.message.SendTunnelMessageJob;
 import net.i2p.router.peermanager.PeerProfile;
 import net.i2p.util.Log;
 
@@ -46,6 +47,9 @@ class SearchJob extends JobImpl {
     private boolean _isLease;
     private Job _pendingRequeueJob;
     private PeerSelector _peerSelector;
+    private List _deferredSearches;
+    private boolean _deferredCleared;
+    private long _startedOn;
     
     private static final int SEARCH_BREDTH = 3; // 3 peers at a time 
     private static final int SEARCH_PRIORITY = 400; // large because the search is probably for a real search
@@ -80,7 +84,10 @@ class SearchJob extends JobImpl {
         _timeoutMs = timeoutMs;
         _keepStats = keepStats;
         _isLease = isLease;
+        _deferredSearches = new ArrayList(0);
+        _deferredCleared = false;
         _peerSelector = new PeerSelector(getContext());
+        _startedOn = -1;
         _expiration = getContext().clock().now() + timeoutMs;
         getContext().statManager().createRateStat("netDb.successTime", "How long a successful search takes", "NetworkDatabase", new long[] { 60*60*1000l, 24*60*60*1000l });
         getContext().statManager().createRateStat("netDb.failedTime", "How long a failed search takes", "NetworkDatabase", new long[] { 60*60*1000l, 24*60*60*1000l });
@@ -96,12 +103,13 @@ class SearchJob extends JobImpl {
     }
 
     public void runJob() {
+        _startedOn = getContext().clock().now();
         if (_log.shouldLog(Log.INFO))
             _log.info(getJobId() + ": Searching for " + _state.getTarget()); // , getAddedBy());
         getContext().statManager().addRateData("netDb.searchCount", 1, 0);
         searchNext();
     }
-
+    
     protected SearchState getState() { return _state; }
     protected KademliaNetworkDatabaseFacade getFacade() { return _facade; }
     protected long getExpiration() { return _expiration; }
@@ -276,15 +284,15 @@ class SearchJob extends JobImpl {
      *
      */
     protected void sendLeaseSearch(RouterInfo router) {
-        TunnelId inTunnelId = getInboundTunnelId(); 
-        if (inTunnelId == null) {
+        TunnelInfo inTunnel = getInboundTunnelId(); 
+        if (inTunnel == null) {
             _log.error("No tunnels to get search replies through!  wtf!");
             getContext().jobQueue().addJob(new FailedJob(getContext(), router));
             return;
         }
-	
-        TunnelInfo inTunnel = getContext().tunnelManager().getTunnelInfo(inTunnelId);
-        RouterInfo inGateway = getContext().netDb().lookupRouterInfoLocally(inTunnel.getThisHop());
+        TunnelId inTunnelId = inTunnel.getReceiveTunnelId(0);
+
+        RouterInfo inGateway = getContext().netDb().lookupRouterInfoLocally(inTunnel.getPeer(0));
         if (inGateway == null) {
             _log.error("We can't find the gateway to our inbound tunnel?! wtf");
             getContext().jobQueue().addJob(new FailedJob(getContext(), router));
@@ -295,12 +303,14 @@ class SearchJob extends JobImpl {
 
         DatabaseLookupMessage msg = buildMessage(inTunnelId, inGateway, expiration);	
 	
-        TunnelId outTunnelId = getOutboundTunnelId();
-        if (outTunnelId == null) {
+        TunnelInfo outTunnel = getOutboundTunnelId();
+        if (outTunnel == null) {
             _log.error("No tunnels to send search out through!  wtf!");
             getContext().jobQueue().addJob(new FailedJob(getContext(), router));
             return;
-        }
+        }        
+        TunnelId outTunnelId = outTunnel.getSendTunnelId(0);
+
 	
         if (_log.shouldLog(Log.DEBUG))
             _log.debug(getJobId() + ": Sending leaseSet search to " + router.getIdentity().getHash().toBase64() 
@@ -310,10 +320,9 @@ class SearchJob extends JobImpl {
 
         SearchMessageSelector sel = new SearchMessageSelector(getContext(), router, _expiration, _state);
         SearchUpdateReplyFoundJob reply = new SearchUpdateReplyFoundJob(getContext(), router, _state, _facade, this);
-        SendTunnelMessageJob j = new SendTunnelMessageJob(getContext(), msg, outTunnelId, router.getIdentity().getHash(), 
-                                                          null, null, reply, new FailedJob(getContext(), router), sel, 
-                                                          PER_PEER_TIMEOUT, SEARCH_PRIORITY);
-        getContext().jobQueue().addJob(j);
+        
+        getContext().messageRegistry().registerPending(sel, reply, new FailedJob(getContext(), router), PER_PEER_TIMEOUT);
+        getContext().tunnelDispatcher().dispatchOutbound(msg, outTunnelId, router.getIdentity().getHash());
     }
     
     /** we're searching for a router, so we can just send direct */
@@ -338,16 +347,8 @@ class SearchJob extends JobImpl {
      *
      * @return tunnel id (or null if none are found)
      */
-    private TunnelId getOutboundTunnelId() {
-        TunnelSelectionCriteria crit = new TunnelSelectionCriteria();
-        crit.setMaximumTunnelsRequired(1);
-        crit.setMinimumTunnelsRequired(1);
-        List tunnelIds = getContext().tunnelManager().selectOutboundTunnelIds(crit);
-        if (tunnelIds.size() <= 0) {
-            return null;
-        }
-	
-        return (TunnelId)tunnelIds.get(0);
+    private TunnelInfo getOutboundTunnelId() {
+        return getContext().tunnelManager().selectOutboundTunnel();
     }
     
     /**
@@ -355,15 +356,8 @@ class SearchJob extends JobImpl {
      *
      * @return tunnel id (or null if none are found)
      */
-    private TunnelId getInboundTunnelId() {
-        TunnelSelectionCriteria crit = new TunnelSelectionCriteria();
-        crit.setMaximumTunnelsRequired(1);
-        crit.setMinimumTunnelsRequired(1);
-        List tunnelIds = getContext().tunnelManager().selectInboundTunnelIds(crit);
-        if (tunnelIds.size() <= 0) {
-            return null;
-        }
-        return (TunnelId)tunnelIds.get(0);
+    private TunnelInfo getInboundTunnelId() {
+        return getContext().tunnelManager().selectInboundTunnel();
     }
 
     /**
@@ -378,7 +372,7 @@ class SearchJob extends JobImpl {
         msg.setSearchKey(_state.getTarget());
         msg.setFrom(replyGateway.getIdentity().getHash());
         msg.setDontIncludePeers(_state.getAttempted());
-        msg.setMessageExpiration(new Date(expiration));
+        msg.setMessageExpiration(expiration);
         msg.setReplyTunnel(replyTunnelId);
         return msg;
     }
@@ -393,7 +387,7 @@ class SearchJob extends JobImpl {
         msg.setSearchKey(_state.getTarget());
         msg.setFrom(getContext().routerHash());
         msg.setDontIncludePeers(_state.getAttempted());
-        msg.setMessageExpiration(new Date(expiration));
+        msg.setMessageExpiration(expiration);
         msg.setReplyTunnel(null);
         return msg;
     }
@@ -583,6 +577,8 @@ class SearchJob extends JobImpl {
         
         _facade.searchComplete(_state.getTarget());
         
+        handleDeferred(true);
+        
         resend();
     }
     
@@ -605,6 +601,13 @@ class SearchJob extends JobImpl {
      * Search totally failed
      */
     protected void fail() {
+        if (isLocal()) {
+            if (_log.shouldLog(Log.ERROR))
+                _log.error(getJobId() + ": why did we fail if the target is local?: " + _state.getTarget().toBase64(), new Exception("failure cause"));
+            succeed();
+            return;
+        }
+            
         if (_log.shouldLog(Log.INFO))
             _log.info(getJobId() + ": Failed search for key " + _state.getTarget());
         if (_log.shouldLog(Log.DEBUG))
@@ -613,13 +616,81 @@ class SearchJob extends JobImpl {
         if (_keepStats) {
             long time = getContext().clock().now() - _state.getWhenStarted();
             getContext().statManager().addRateData("netDb.failedTime", time, 0);
-            _facade.fail(_state.getTarget());
+            //_facade.fail(_state.getTarget());
         }
         if (_onFailure != null)
             getContext().jobQueue().addJob(_onFailure);
         
         _facade.searchComplete(_state.getTarget());
+        handleDeferred(false);
     }
 
+    public void addDeferred(Job onFind, Job onFail, long expiration, boolean isLease) {
+        Search search = new Search(onFind, onFail, expiration, isLease);
+        boolean ok = true;
+        synchronized (_deferredSearches) {
+            if (_deferredCleared)
+                ok = false;
+            else
+                _deferredSearches.add(search);
+        }
+        
+        if (!ok) {
+            // race between adding deferred and search completing
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Race deferred before searchCompleting?  our onFind=" + _onSuccess + " new one: " + onFind);
+            
+            // the following /shouldn't/ be necessary, but it doesnt hurt 
+            _facade.searchComplete(_state.getTarget());
+            _facade.search(_state.getTarget(), onFind, onFail, expiration - getContext().clock().now(), isLease);
+        }
+    }
+    
+    private void handleDeferred(boolean success) {
+        List deferred = null;
+        synchronized (_deferredSearches) {
+            if (_deferredSearches.size() > 0) {
+                deferred = new ArrayList(_deferredSearches);
+                _deferredSearches.clear();
+            }
+            _deferredCleared = true;
+        }
+        if (deferred != null) {
+            long now = getContext().clock().now();
+            for (int i = 0; i < deferred.size(); i++) {
+                Search cur = (Search)deferred.get(i);
+                if (cur.getExpiration() < now)
+                    getContext().jobQueue().addJob(cur.getOnFail());
+                else if (success)
+                    getContext().jobQueue().addJob(cur.getOnFind());
+                else // failed search, not yet expired, but it took too long to reasonably continue
+                    getContext().jobQueue().addJob(cur.getOnFail());
+            }
+        }
+    }
+    
+    private class Search {
+        private Job _onFind;
+        private Job _onFail;
+        private long _expiration;
+        private boolean _isLease;
+        
+        public Search(Job onFind, Job onFail, long expiration, boolean isLease) {
+            _onFind = onFind;
+            _onFail = onFail;
+            _expiration = expiration;
+            _isLease = isLease;
+        }
+        public Job getOnFind() { return _onFind; }
+        public Job getOnFail() { return _onFail; }
+        public long getExpiration() { return _expiration; }
+        public boolean getIsLease() { return _isLease; }
+    }
+    
     public String getName() { return "Kademlia NetDb Search"; }
+    
+    public String toString() { 
+        return super.toString() + " started " 
+               + DataHelper.formatDuration((getContext().clock().now() - _startedOn)) + " ago";
+    }
 }

@@ -37,7 +37,7 @@ public class FragmentTest {
         _context.random().nextBytes(data);
         m.setData(data);
         m.setUniqueId(42);
-        m.setMessageExpiration(new Date(_context.clock().now() + 60*1000));
+        m.setMessageExpiration(_context.clock().now() + 60*1000);
         ArrayList messages = new ArrayList();
         TunnelGateway.Pending pending = new TunnelGateway.Pending(m, null, null);
         messages.add(pending);
@@ -61,7 +61,7 @@ public class FragmentTest {
         _context.random().nextBytes(data);
         m.setData(data);
         m.setUniqueId(42);
-        m.setMessageExpiration(new Date(_context.clock().now() + 60*1000));
+        m.setMessageExpiration(_context.clock().now() + 60*1000);
         ArrayList messages = new ArrayList();
         TunnelGateway.Pending pending = new TunnelGateway.Pending(m, null, null);
         messages.add(pending);
@@ -86,7 +86,7 @@ public class FragmentTest {
         _context.random().nextBytes(data);
         m.setData(data);
         m.setUniqueId(42);
-        m.setMessageExpiration(new Date(_context.clock().now() + 60*1000));
+        m.setMessageExpiration(_context.clock().now() + 60*1000);
         ArrayList messages = new ArrayList();
         TunnelGateway.Pending pending = new TunnelGateway.Pending(m, null, null);
         messages.add(pending);

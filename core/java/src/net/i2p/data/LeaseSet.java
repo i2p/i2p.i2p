@@ -74,11 +74,17 @@ public class LeaseSet extends DataStructureImpl {
     }
 
     public void addLease(Lease lease) {
+        if (lease == null) throw new IllegalArgumentException("erm, null lease");
+        if (lease.getGateway() == null) throw new IllegalArgumentException("erm, lease has no gateway");
+        if (lease.getTunnelId() == null) throw new IllegalArgumentException("erm, lease has no tunnel");
         _leases.add(lease);
     }
 
     public void removeLease(Lease lease) {
         _leases.remove(lease);
+    }
+    public void removeLease(int index) {
+        _leases.remove(index);
     }
 
     public int getLeaseCount() {
@@ -208,16 +214,19 @@ public class LeaseSet extends DataStructureImpl {
         for (int i = 0; i < cnt; i++) {
             Lease l = getLease(i);
             if (l.getEndDate().getTime() > insane) {
-                _log.warn("LeaseSet" + calculateHash() + " expires an insane amount in the future - skip it: " + l);
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("LeaseSet" + calculateHash() + " expires an insane amount in the future - skip it: " + l);
                 return false;
             }
             // if it hasn't finished, we're current
             if (l.getEndDate().getTime() > now) {
-                _log.debug("LeaseSet " + calculateHash() + " isn't exired: " + l);
+                if (_log.shouldLog(Log.DEBUG))
+                    _log.debug("LeaseSet " + calculateHash() + " isn't exired: " + l);
                 return true;
             } else if (l.getEndDate().getTime() > now - fudge) {
-                _log.debug("LeaseSet " + calculateHash()
-                           + " isn't quite expired, but its within the fudge factor so we'll let it slide: " + l);
+                if (_log.shouldLog(Log.DEBUG))
+                    _log.debug("LeaseSet " + calculateHash()
+                               + " isn't quite expired, but its within the fudge factor so we'll let it slide: " + l);
                 return true;
             }
         }
@@ -225,7 +234,14 @@ public class LeaseSet extends DataStructureImpl {
     }
 
     private byte[] getBytes() {
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        int len = PublicKey.KEYSIZE_BYTES  // dest
+                + SigningPublicKey.KEYSIZE_BYTES // dest
+                + 4 // cert
+                + PublicKey.KEYSIZE_BYTES // encryptionKey
+                + SigningPublicKey.KEYSIZE_BYTES // signingKey
+                + 1
+                + _leases.size() * 44; // leases
+        ByteArrayOutputStream out = new ByteArrayOutputStream(len);
         try {
             if ((_destination == null) || (_encryptionKey == null) || (_signingKey == null) || (_leases == null))
                 return null;
@@ -244,7 +260,8 @@ public class LeaseSet extends DataStructureImpl {
         } catch (DataFormatException dfe) {
             return null;
         }
-        return out.toByteArray();
+        byte rv[] = out.toByteArray();
+        return rv;
     }
 
     public void readBytes(InputStream in) throws DataFormatException, IOException {

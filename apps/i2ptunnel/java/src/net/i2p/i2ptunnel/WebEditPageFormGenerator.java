@@ -186,6 +186,9 @@ class WebEditPageFormGenerator {
         buf.append("<form action=\"edit.jsp\">");
         if (id != null)
             buf.append("<input type=\"hidden\" name=\"num\" value=\"").append(id).append("\" />");
+        long nonce = new Random().nextLong();
+        System.setProperty(WebEditPageHelper.class.getName() + ".nonce", nonce+"");
+        buf.append("<input type=\"hidden\" name=\"nonce\" value=\"").append(nonce).append("\" />");
             
         buf.append("<b>Name:</b> <input type=\"text\" name=\"name\" size=\"20\" ");
         if ( (controller != null) && (controller.getName() != null) )
@@ -253,9 +256,10 @@ class WebEditPageFormGenerator {
         int tunnelDepth = 2;
         int numTunnels = 2;
         int connectDelay = 0;
+        int maxWindowSize = -1;
         Properties opts = getOptions(controller);
         if (opts != null) {
-            String depth = opts.getProperty("tunnels.depthInbound");
+            String depth = opts.getProperty("inbound.length");
             if (depth != null) {
                 try {
                     tunnelDepth = Integer.parseInt(depth);
@@ -263,7 +267,7 @@ class WebEditPageFormGenerator {
                     tunnelDepth = 2;
                 }
             }
-            String num = opts.getProperty("tunnels.numInbound");
+            String num = opts.getProperty("inbound.quantity");
             if (num != null) {
                 try {
                     numTunnels = Integer.parseInt(num);
@@ -277,6 +281,14 @@ class WebEditPageFormGenerator {
                     connectDelay = Integer.parseInt(delay);
                 } catch (NumberFormatException nfe) {
                     connectDelay = 0;
+                }
+            }
+            String max = opts.getProperty("i2p.streaming.maxWindowSize");
+            if (max != null) {
+                try {
+                    maxWindowSize = Integer.parseInt(max);
+                } catch (NumberFormatException nfe) {
+                    maxWindowSize = -1;
                 }
             }
         }
@@ -325,6 +337,14 @@ class WebEditPageFormGenerator {
             buf.append("checked=\"true\" ");
         buf.append("/> (useful for brief request/response connections)<br />\n");
         
+        buf.append("<b>Communication profile:</b>");
+        buf.append("<select name=\"profile\">");
+        if (maxWindowSize <= 0)
+            buf.append("<option value=\"interactive\">Interactive</option><option value=\"bulk\" selected=\"true\">Bulk</option>");
+        else
+            buf.append("<option value=\"interactive\" selected=\"true\">Interactive</option><option value=\"bulk\">Bulk</option>");
+        buf.append("</select><br />\n");
+        
         buf.append("<b>I2CP host:</b> ");
         buf.append("<input type=\"text\" name=\"clientHost\" size=\"20\" value=\"");
         if ( (controller != null) && (controller.getI2CPHost() != null) )
@@ -347,9 +367,14 @@ class WebEditPageFormGenerator {
             for (Iterator iter = opts.keySet().iterator(); iter.hasNext(); ) {
                 String key = (String)iter.next();
                 String val = opts.getProperty(key);
-                if ("tunnels.depthInbound".equals(key)) continue;
-                if ("tunnels.numInbound".equals(key)) continue;
+                if ("inbound.length".equals(key)) continue;
+                if ("outbound.length".equals(key)) continue;
+                if ("inbound.quantity".equals(key)) continue;
+                if ("outbound.quantity".equals(key)) continue;
+                if ("inbound.nickname".equals(key)) continue;
+                if ("outbound.nickname".equals(key)) continue;
                 if ("i2p.streaming.connectDelay".equals(key)) continue;
+                if ("i2p.streaming.maxWindowSize".equals(key)) continue;
                 if (i != 0) buf.append(' ');
                 buf.append(key).append('=').append(val);
                 i++;

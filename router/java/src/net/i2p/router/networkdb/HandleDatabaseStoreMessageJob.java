@@ -18,8 +18,7 @@ import net.i2p.data.i2np.DatabaseStoreMessage;
 import net.i2p.data.i2np.DeliveryStatusMessage;
 import net.i2p.router.JobImpl;
 import net.i2p.router.RouterContext;
-import net.i2p.router.TunnelSelectionCriteria;
-import net.i2p.router.message.SendTunnelMessageJob;
+import net.i2p.router.TunnelInfo;
 import net.i2p.util.Log;
 
 /**
@@ -32,7 +31,7 @@ public class HandleDatabaseStoreMessageJob extends JobImpl {
     private RouterIdentity _from;
     private Hash _fromHash;
 
-    private static final long ACK_TIMEOUT = 15*1000;
+    private static final int ACK_TIMEOUT = 15*1000;
     private static final int ACK_PRIORITY = 100;
     
     public HandleDatabaseStoreMessageJob(RouterContext ctx, DatabaseStoreMessage receivedMessage, RouterIdentity from, Hash fromHash) {
@@ -93,33 +92,19 @@ public class HandleDatabaseStoreMessageJob extends JobImpl {
     private void sendAck() {
         DeliveryStatusMessage msg = new DeliveryStatusMessage(getContext());
         msg.setMessageId(_message.getReplyToken());
-        msg.setArrival(new Date(getContext().clock().now()));
-        TunnelId outTunnelId = selectOutboundTunnel();
-        if (outTunnelId == null) {
+        msg.setArrival(getContext().clock().now());
+        TunnelInfo outTunnel = selectOutboundTunnel();
+        if (outTunnel == null) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("No outbound tunnel could be found");
             return;
         } else {
-            getContext().jobQueue().addJob(new SendTunnelMessageJob(getContext(), msg, outTunnelId, 
-                                           _message.getReplyGateway(), _message.getReplyTunnel(), 
-                                           null, null, null, null, ACK_TIMEOUT, ACK_PRIORITY));
+            getContext().tunnelDispatcher().dispatchOutbound(msg, outTunnel.getSendTunnelId(0), _message.getReplyTunnel(), _message.getReplyGateway());
         }
     }
 
-    private TunnelId selectOutboundTunnel() {
-        TunnelSelectionCriteria criteria = new TunnelSelectionCriteria();
-        criteria.setAnonymityPriority(80);
-        criteria.setLatencyPriority(50);
-        criteria.setReliabilityPriority(20);
-        criteria.setMaximumTunnelsRequired(1);
-        criteria.setMinimumTunnelsRequired(1);
-        List tunnelIds = getContext().tunnelManager().selectOutboundTunnelIds(criteria);
-        if (tunnelIds.size() <= 0) {
-            _log.error("No outbound tunnels?!");
-            return null;
-        } else {
-            return (TunnelId)tunnelIds.get(0);
-        }
+    private TunnelInfo selectOutboundTunnel() {
+        return getContext().tunnelManager().selectOutboundTunnel();
     }
  
     public String getName() { return "Handle Database Store Message"; }

@@ -5,6 +5,7 @@ import java.util.Iterator;
 import java.util.Set;
 import java.util.TreeMap;
 
+import net.i2p.util.DecayingBloomFilter;
 import net.i2p.util.Log;
 
 /**
@@ -18,25 +19,15 @@ import net.i2p.util.Log;
 public class MessageValidator {
     private Log _log;
     private RouterContext _context;
-    /**
-     * Expiration date (as a Long) to message id (as a Long).
-     * The expiration date (key) must be unique, so on collision, increment the value.
-     * This keeps messageIds around longer than they need to be, but hopefully not by much ;)
-     *
-     */
-    private TreeMap _receivedIdExpirations;
-    /** Message id (as a Long) */
-    private Set _receivedIds;
-    /** synchronize on this before adjusting the received id data */
-    private Object _receivedIdLock;
+    private DecayingBloomFilter _filter;
     
     
     public MessageValidator(RouterContext context) {
         _log = context.logManager().getLog(MessageValidator.class);
-        _receivedIdExpirations = new TreeMap();
-        _receivedIds = new HashSet(256);
-        _receivedIdLock = new Object();
+        _filter = null;
         _context = context;
+        context.statManager().createRateStat("router.duplicateMessageId", "Note that a duplicate messageId was received", "Router", 
+                                             new long[] { 10*60*1000l, 60*60*1000l, 3*60*60*1000l, 24*60*60*1000l });
     }
     
     
@@ -51,12 +42,17 @@ public class MessageValidator {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Rejecting message " + messageId + " because it expired " + (now-expiration) + "ms ago");
             return false;
+        } else if (now + 4*Router.CLOCK_FUDGE_FACTOR < expiration) {
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Rejecting message " + messageId + " because it will expire too far in the future (" + (expiration-now) + "ms)");
+            return false;
         }
         
         boolean isDuplicate = noteReception(messageId, expiration);
         if (isDuplicate) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Rejecting message " + messageId + " because it is a duplicate", new Exception("Duplicate origin"));
+            _context.statManager().addRateData("router.duplicateMessageId", 1, 0);
             return false;
         } else {
             if (_log.shouldLog(Log.DEBUG))
@@ -74,75 +70,15 @@ public class MessageValidator {
      * @return true if we HAVE already seen this message, false if not
      */
     private boolean noteReception(long messageId, long messageExpiration) {
-        Long id = new Long(messageId);
-        synchronized (_receivedIdLock) {
-            locked_cleanReceivedIds(_context.clock().now() - Router.CLOCK_FUDGE_FACTOR);
-            if (_receivedIds.contains(id)) {
-                return true;
-            } else {
-                long date = messageExpiration;
-                while (_receivedIdExpirations.containsKey(new Long(date)))
-                    date++;
-                _receivedIdExpirations.put(new Long(date), id);
-                _receivedIds.add(id);
-                return false;
-            }
-        }
+        boolean dup = _filter.add(messageId);
+        return dup;
     }
     
-    /**
-     * Clean the ids that we no longer need to keep track of to prevent replay
-     * attacks.
-     *
-     */
-    private void cleanReceivedIds() {
-        long now = _context.clock().now() - Router.CLOCK_FUDGE_FACTOR ;
-        synchronized (_receivedIdLock) {
-            locked_cleanReceivedIds(now);
-        }
-    }
-    
-    /**
-     * Clean the ids that we no longer need to keep track of to prevent replay
-     * attacks - only call this from within a block synchronized on the received ID lock.
-     *
-     */
-    private void locked_cleanReceivedIds(long now) {
-        Set toRemoveIds = null;
-        Set toRemoveDates = null; 
-        for (Iterator iter = _receivedIdExpirations.keySet().iterator(); iter.hasNext(); ) {
-            Long date = (Long)iter.next();
-            if (date.longValue() <= now) {
-                // no need to keep track of things in the past
-                if (toRemoveIds == null) {
-                    toRemoveIds = new HashSet(2);
-                    toRemoveDates = new HashSet(2);
-                }
-                toRemoveDates.add(date);
-                toRemoveIds.add(_receivedIdExpirations.get(date));
-            } else {
-                // the expiration is in the future, we still need to keep track of
-                // it to prevent replays
-                break;
-            }
-        }
-        if (toRemoveIds != null) {
-            for (Iterator iter = toRemoveDates.iterator(); iter.hasNext(); )
-                _receivedIdExpirations.remove(iter.next());
-            for (Iterator iter = toRemoveIds.iterator(); iter.hasNext(); )
-                _receivedIds.remove(iter.next());
-            if (_log.shouldLog(Log.INFO))
-                _log.info("Cleaned out " + toRemoveDates.size() 
-                          + " expired messageIds, leaving " 
-                          + _receivedIds.size() + " remaining");
-        }
+    public void startup() {
+        _filter = new DecayingBloomFilter(_context, (int)Router.CLOCK_FUDGE_FACTOR * 2, 8);
     }
     
     void shutdown() {
-        if (_log.shouldLog(Log.WARN)) {
-            StringBuffer buf = new StringBuffer(1024);
-            buf.append("Validated messages: ").append(_receivedIds.size());
-            _log.log(Log.WARN, buf.toString());
-        }
+        _filter.stopDecaying();
     }
 }

@@ -22,9 +22,10 @@ public interface RouterThrottle {
     /**
      * Should we accept the request to participate in the given tunnel,
      * taking into account our current load and bandwidth usage commitments?
-     *
+     * 
+     * @return 0 if it should be accepted, higher values for more severe rejection
      */
-    public boolean acceptTunnelRequest(TunnelCreateMessage msg);
+    public int acceptTunnelRequest(TunnelCreateMessage msg);
     /**
      * Should we accept the netDb lookup message, replying either with the 
      * value or some closer peers, or should we simply drop it due to overload?

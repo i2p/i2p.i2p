@@ -18,7 +18,7 @@ import java.util.List;
 
 import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
-import net.i2p.data.RouterIdentity;
+import net.i2p.data.Hash;
 import net.i2p.data.TunnelId;
 import net.i2p.util.Log;
 
@@ -53,7 +53,7 @@ public class RequestLeaseSetMessage extends I2CPMessageImpl {
         return _endpoints.size();
     }
 
-    public RouterIdentity getRouter(int endpoint) {
+    public Hash getRouter(int endpoint) {
         if ((endpoint < 0) || (_endpoints.size() < endpoint)) return null;
         return ((TunnelEndpoint) _endpoints.get(endpoint)).getRouter();
     }
@@ -67,7 +67,9 @@ public class RequestLeaseSetMessage extends I2CPMessageImpl {
         if ((endpoint >= 0) && (endpoint < _endpoints.size())) _endpoints.remove(endpoint);
     }
 
-    public void addEndpoint(RouterIdentity router, TunnelId tunnel) {
+    public void addEndpoint(Hash router, TunnelId tunnel) {
+        if (router == null) throw new IllegalArgumentException("Null router (tunnel=" + tunnel +")");
+        if (tunnel == null) throw new IllegalArgumentException("Null tunnel (router=" + router +")");
         _endpoints.add(new TunnelEndpoint(router, tunnel));
     }
 
@@ -86,7 +88,7 @@ public class RequestLeaseSetMessage extends I2CPMessageImpl {
             int numTunnels = (int) DataHelper.readLong(in, 1);
             _endpoints.clear();
             for (int i = 0; i < numTunnels; i++) {
-                RouterIdentity router = new RouterIdentity();
+                Hash router = new Hash();
                 router.readBytes(in);
                 TunnelId tunnel = new TunnelId();
                 tunnel.readBytes(in);
@@ -106,7 +108,7 @@ public class RequestLeaseSetMessage extends I2CPMessageImpl {
             _sessionId.writeBytes(os);
             DataHelper.writeLong(os, 1, _endpoints.size());
             for (int i = 0; i < _endpoints.size(); i++) {
-                RouterIdentity router = getRouter(i);
+                Hash router = getRouter(i);
                 router.writeBytes(os);
                 TunnelId tunnel = getTunnelId(i);
                 tunnel.writeBytes(os);
@@ -151,7 +153,7 @@ public class RequestLeaseSetMessage extends I2CPMessageImpl {
     }
 
     private class TunnelEndpoint {
-        private RouterIdentity _router;
+        private Hash _router;
         private TunnelId _tunnelId;
 
         public TunnelEndpoint() {
@@ -159,16 +161,16 @@ public class RequestLeaseSetMessage extends I2CPMessageImpl {
             _tunnelId = null;
         }
 
-        public TunnelEndpoint(RouterIdentity router, TunnelId id) {
+        public TunnelEndpoint(Hash router, TunnelId id) {
             _router = router;
             _tunnelId = id;
         }
 
-        public RouterIdentity getRouter() {
+        public Hash getRouter() {
             return _router;
         }
 
-        public void setRouter(RouterIdentity router) {
+        public void setRouter(Hash router) {
             _router = router;
         }
 

@@ -52,7 +52,9 @@ class MessageReceivedJob extends JobImpl {
      *
      */
     public void messageAvailable(MessageId id, long size) {
-        _log.debug("Sending message available: " + id + " to sessionId " + _runner.getSessionId() + " (with nonce=1)", new Exception("available"));
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("Sending message available: " + id + " to sessionId " + _runner.getSessionId() 
+                       + " (with nonce=1)", new Exception("available"));
         MessageStatusMessage msg = new MessageStatusMessage();
         msg.setMessageId(id);
         msg.setSessionId(_runner.getSessionId());
@@ -62,7 +64,8 @@ class MessageReceivedJob extends JobImpl {
         try {
             _runner.doSend(msg);
         } catch (I2CPMessageException ime) {
-            _log.error("Error writing out the message status message", ime);
+            if (_log.shouldLog(Log.ERROR))
+                _log.error("Error writing out the message status message", ime);
         }
     }
 }

@@ -12,7 +12,6 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.Date;
 
 import net.i2p.I2PAppContext;
 import net.i2p.crypto.SHA256EntryCache;
@@ -30,19 +29,20 @@ import net.i2p.util.Log;
 public abstract class I2NPMessageImpl extends DataStructureImpl implements I2NPMessage {
     private Log _log;
     protected I2PAppContext _context;
-    private Date _expiration;
+    private long _expiration;
     private long _uniqueId;
     private byte _data[];
     
     public final static long DEFAULT_EXPIRATION_MS = 1*60*1000; // 1 minute by default
+    public final static int CHECKSUM_LENGTH = 1; //Hash.HASH_LENGTH;
     
     public I2NPMessageImpl(I2PAppContext context) {
         _context = context;
         _log = context.logManager().getLog(I2NPMessageImpl.class);
-        _expiration = new Date(_context.clock().now() + DEFAULT_EXPIRATION_MS);
+        _expiration = _context.clock().now() + DEFAULT_EXPIRATION_MS;
         _uniqueId = _context.random().nextLong(MAX_ID_VALUE);
-        _context.statManager().createRateStat("i2np.writeTime", "How long it takes to write an I2NP message", "I2NP", new long[] { 10*60*1000, 60*60*1000 });
-        _context.statManager().createRateStat("i2np.readTime", "How long it takes to read an I2NP message", "I2NP", new long[] { 10*60*1000, 60*60*1000 });
+        //_context.statManager().createRateStat("i2np.writeTime", "How long it takes to write an I2NP message", "I2NP", new long[] { 10*60*1000, 60*60*1000 });
+        //_context.statManager().createRateStat("i2np.readTime", "How long it takes to read an I2NP message", "I2NP", new long[] { 10*60*1000, 60*60*1000 });
     }
     
     public void readBytes(InputStream in) throws DataFormatException, IOException {
@@ -57,10 +57,14 @@ public abstract class I2NPMessageImpl extends DataStructureImpl implements I2NPM
             if (type < 0)
                 type = (int)DataHelper.readLong(in, 1);
             _uniqueId = DataHelper.readLong(in, 4);
-            _expiration = DataHelper.readDate(in);
+            _expiration = DataHelper.readLong(in, DataHelper.DATE_LENGTH);
             int size = (int)DataHelper.readLong(in, 2);
-            Hash h = new Hash();
-            h.readBytes(in);
+            byte checksum[] = new byte[CHECKSUM_LENGTH];
+            int read = DataHelper.read(in, checksum);
+            if (read != CHECKSUM_LENGTH)
+                throw new I2NPMessageException("checksum is too small [" + read + "]");
+            //Hash h = new Hash();
+            //h.readBytes(in);
             if (buffer.length < size) {
                 if (size > 64*1024) throw new I2NPMessageException("size=" + size);
                 buffer = new byte[size];
@@ -77,18 +81,19 @@ public abstract class I2NPMessageImpl extends DataStructureImpl implements I2NPM
             
             SHA256EntryCache.CacheEntry cache = _context.sha().cache().acquire(size);
             Hash calc = _context.sha().calculateHash(buffer, 0, size, cache);
-            boolean eq = calc.equals(h);
+            //boolean eq = calc.equals(h);
+            boolean eq = DataHelper.eq(checksum, 0, calc.getData(), 0, CHECKSUM_LENGTH);
             _context.sha().cache().release(cache);
             if (!eq)
-                throw new I2NPMessageException("Hash does not match");
+                throw new I2NPMessageException("Hash does not match for " + getClass().getName());
 
             long start = _context.clock().now();
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Reading bytes: type = " + type + " / uniqueId : " + _uniqueId + " / expiration : " + _expiration);
             readMessage(buffer, 0, size, type);
             long time = _context.clock().now() - start;
-            if (time > 50)
-                _context.statManager().addRateData("i2np.readTime", time, time);
+            //if (time > 50)
+            //    _context.statManager().addRateData("i2np.readTime", time, time);
             return size + Hash.HASH_LENGTH + 1 + 4 + DataHelper.DATE_LENGTH;
         } catch (DataFormatException dfe) {
             throw new I2NPMessageException("Error reading the message header", dfe);
@@ -102,19 +107,15 @@ public abstract class I2NPMessageImpl extends DataStructureImpl implements I2NPM
         }
         _uniqueId = DataHelper.fromLong(data, cur, 4);
         cur += 4;
-        try {
-            _expiration = DataHelper.fromDate(data, cur);
-            cur += DataHelper.DATE_LENGTH;
-        } catch (DataFormatException dfe) {
-            throw new I2NPMessageException("Unable to read the expiration", dfe);
-        }
+        _expiration = DataHelper.fromLong(data, cur, DataHelper.DATE_LENGTH);
+        cur += DataHelper.DATE_LENGTH;
         int size = (int)DataHelper.fromLong(data, cur, 2);
         cur += 2;
-        Hash h = new Hash();
-        byte hdata[] = new byte[Hash.HASH_LENGTH];
-        System.arraycopy(data, cur, hdata, 0, Hash.HASH_LENGTH);
-        cur += Hash.HASH_LENGTH;
-        h.setData(hdata);
+        //Hash h = new Hash();
+        byte hdata[] = new byte[CHECKSUM_LENGTH];
+        System.arraycopy(data, cur, hdata, 0, CHECKSUM_LENGTH);
+        cur += CHECKSUM_LENGTH;
+        //h.setData(hdata);
 
         if (cur + size > data.length)
             throw new I2NPMessageException("Payload is too short [" 
@@ -125,10 +126,11 @@ public abstract class I2NPMessageImpl extends DataStructureImpl implements I2NPM
 
         SHA256EntryCache.CacheEntry cache = _context.sha().cache().acquire(size);
         Hash calc = _context.sha().calculateHash(data, cur, size, cache);
-        boolean eq = calc.equals(h);
+        //boolean eq = calc.equals(h);
+        boolean eq = DataHelper.eq(hdata, 0, calc.getData(), 0, CHECKSUM_LENGTH);
         _context.sha().cache().release(cache);
         if (!eq)
-            throw new I2NPMessageException("Hash does not match");
+            throw new I2NPMessageException("Hash does not match for " + getClass().getName());
 
         long start = _context.clock().now();
         if (_log.shouldLog(Log.DEBUG))
@@ -136,14 +138,14 @@ public abstract class I2NPMessageImpl extends DataStructureImpl implements I2NPM
         readMessage(data, cur, size, type);
         cur += size;
         long time = _context.clock().now() - start;
-        if (time > 50)
-            _context.statManager().addRateData("i2np.readTime", time, time);
+        //if (time > 50)
+        //    _context.statManager().addRateData("i2np.readTime", time, time);
         return cur - offset;
     }
     
     public void writeBytes(OutputStream out) throws DataFormatException, IOException {
         int size = getMessageSize();
-        if (size < 47) throw new DataFormatException("Unable to build the message");
+        if (size < 15 + CHECKSUM_LENGTH) throw new DataFormatException("Unable to build the message");
         byte buf[] = new byte[size];
         int read = toByteArray(buf);
         if (read < 0)
@@ -160,18 +162,19 @@ public abstract class I2NPMessageImpl extends DataStructureImpl implements I2NPM
      * Date after which the message should be dropped (and the associated uniqueId forgotten)
      *
      */
-    public Date getMessageExpiration() { return _expiration; }
-    public void setMessageExpiration(Date exp) { _expiration = exp; }
+    public long getMessageExpiration() { return _expiration; }
+    public void setMessageExpiration(long exp) { _expiration = exp; }
     
     public synchronized int getMessageSize() { 
-        return calculateWrittenLength()+47; // 47 bytes in the header
+        return calculateWrittenLength()+15 + CHECKSUM_LENGTH; // 47 bytes in the header
     }
     
     public byte[] toByteArray() {
         byte data[] = new byte[getMessageSize()];
         int written = toByteArray(data);
         if (written != data.length) {
-            _log.error("Error writing out " + data.length + " for " + getClass().getName());
+            _log.log(Log.CRIT, "Error writing out " + data.length + " (written: " + written + ", msgSize: " + getMessageSize() +
+                               ", writtenLen: " + calculateWrittenLength() + ") for " + getClass().getName());
             return null;
         }
         return data;
@@ -180,34 +183,44 @@ public abstract class I2NPMessageImpl extends DataStructureImpl implements I2NPM
     public int toByteArray(byte buffer[]) {
         long start = _context.clock().now();
 
-        byte prefix[][] = new byte[][] { DataHelper.toLong(1, getType()), 
-                                         DataHelper.toLong(4, _uniqueId),
-                                         DataHelper.toDate(_expiration),
-                                         new byte[2], 
-                                         new byte[Hash.HASH_LENGTH]};
-        byte suffix[][] = new byte[][] { };
+        int prefixLen = 1 // type
+                        + 4 // uniqueId
+                        + DataHelper.DATE_LENGTH // expiration
+                        + 2 // payload length
+                        + CHECKSUM_LENGTH; // walnuts
+        //byte prefix[][] = new byte[][] { DataHelper.toLong(1, getType()), 
+        //                                 DataHelper.toLong(4, _uniqueId),
+        //                                 DataHelper.toLong(DataHelper.DATE_LENGTH, _expiration),
+        //                                 new byte[2], 
+        //                                 new byte[CHECKSUM_LENGTH]};
+        //byte suffix[][] = new byte[][] { };
         try {
-            int writtenLen = toByteArray(buffer, prefix, suffix);
+            int writtenLen = writeMessageBody(buffer, prefixLen);
+            int payloadLen = writtenLen - prefixLen;
+            SHA256EntryCache.CacheEntry cache = _context.sha().cache().acquire(payloadLen);
+            Hash h = _context.sha().calculateHash(buffer, prefixLen, payloadLen, cache);
 
-            int prefixLen = 1+4+8+2+Hash.HASH_LENGTH;
-            int suffixLen = 0;
-            int payloadLen = writtenLen  - prefixLen - suffixLen;
-            Hash h = _context.sha().calculateHash(buffer, prefixLen, payloadLen);
-
-            byte len[] = DataHelper.toLong(2, payloadLen);
-            buffer[1+4+8] = len[0];
-            buffer[1+4+8+1] = len[1];
-            for (int i = 0; i < Hash.HASH_LENGTH; i++)
-                System.arraycopy(h.getData(), 0, buffer, 1+4+8+2, Hash.HASH_LENGTH);
+            int off = 0;
+            DataHelper.toLong(buffer, off, 1, getType());
+            off += 1;
+            DataHelper.toLong(buffer, off, 4, _uniqueId);
+            off += 4;
+            DataHelper.toLong(buffer, off, DataHelper.DATE_LENGTH, _expiration);
+            off += DataHelper.DATE_LENGTH;
+            DataHelper.toLong(buffer, off, 2, payloadLen);
+            off += 2;
+            System.arraycopy(h.getData(), 0, buffer, off, CHECKSUM_LENGTH);
+            _context.sha().cache().release(cache);
 
             long time = _context.clock().now() - start;
-            if (time > 50)
-                _context.statManager().addRateData("i2np.writeTime", time, time);
+            //if (time > 50)
+            //    _context.statManager().addRateData("i2np.writeTime", time, time);
 
             return writtenLen;                     
         } catch (I2NPMessageException ime) {
-            _context.logManager().getLog(getClass()).error("Error writing", ime);
-            throw new IllegalStateException("Unable to serialize the message: " + ime.getMessage());
+            _context.logManager().getLog(getClass()).log(Log.CRIT, "Error writing", ime);
+            throw new IllegalStateException("Unable to serialize the message (" + getClass().getName() 
+                                            + "): " + ime.getMessage());
         }
     }
     
@@ -218,7 +231,7 @@ public abstract class I2NPMessageImpl extends DataStructureImpl implements I2NPM
      * @return the index into the array after the last byte written
      */
     protected abstract int writeMessageBody(byte out[], int curIndex) throws I2NPMessageException;
-    
+    /*
     protected int toByteArray(byte out[], byte[][] prefix, byte[][] suffix) throws I2NPMessageException {
         int curIndex = 0;
         for (int i = 0; i < prefix.length; i++) {
@@ -235,4 +248,5 @@ public abstract class I2NPMessageImpl extends DataStructureImpl implements I2NPM
         
         return curIndex;
     }
+     */
 }

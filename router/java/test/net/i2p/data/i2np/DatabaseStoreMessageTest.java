@@ -32,10 +32,12 @@ class DatabaseStoreMessageTest extends StructureTest {
         DatabaseStoreMessage msg = new DatabaseStoreMessage(_context);
         RouterInfo info = (RouterInfo)new RouterInfoTest().createDataStructure();
         msg.setKey(info.getIdentity().getHash());
-        msg.setMessageExpiration(new Date(Clock.getInstance().now()));
+        msg.setMessageExpiration(Clock.getInstance().now());
         msg.setUniqueId(42);
         msg.setRouterInfo(info);
         return msg;
     }
     public DataStructure createStructureToRead() { return new DatabaseStoreMessage(_context); }
+    
+    public static void main(String args[]) { TestData.main(new String[] { "test", "i2np.DatabaseStoreMessage", "foo.dat" }); }
 }

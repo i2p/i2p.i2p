@@ -40,9 +40,11 @@ public class WebEditPageHelper {
     private String _targetPort;
     private String _spoofedHost;
     private String _privKeyFile;
+    private String _profile;
     private boolean _startOnLoad;
     private boolean _privKeyGenerate;
     private boolean _removeConfirmed;
+    private long _nonce;
     
     public WebEditPageHelper() {
         _action = null;
@@ -50,6 +52,14 @@ public class WebEditPageHelper {
         _id = null;
         _removeConfirmed = false;
         _log = I2PAppContext.getGlobalContext().logManager().getLog(WebEditPageHelper.class);
+    }
+    
+    public void setNonce(String nonce) {
+        if (nonce != null) {
+            try { 
+                _nonce = Long.parseLong(nonce); 
+            } catch (NumberFormatException nfe) {}
+        }
     }
     
     /**
@@ -173,6 +183,9 @@ public class WebEditPageHelper {
     public void setConnectDelay(String moo) {
         _connectDelay = true;
     }
+    public void setProfile(String profile) { 
+        _profile = profile; 
+    }
     
     /**
      * Process the form and display any resulting messages
@@ -224,6 +237,9 @@ public class WebEditPageHelper {
     private String processAction() {
         if ( (_action == null) || (_action.trim().length() <= 0) )
             return "";
+        String expected = System.getProperty(getClass().getName() + ".nonce");
+        if ( (expected == null) || (!expected.equals(Long.toString(_nonce))) )
+            return "<b>Invalid nonce, are you being spoofed?</b>";
         if ("Save".equals(_action))
             return save();
         else if ("Remove".equals(_action))
@@ -272,14 +288,26 @@ public class WebEditPageHelper {
                 if (c == cur) continue;
                 if ("httpclient".equals(c.getType()) || "client".equals(c.getType())) {
                     Properties cOpt = c.getConfig("");
-                    if (_tunnelCount != null)
-                        cOpt.setProperty("option.tunnels.numInbound", _tunnelCount);
-                    if (_tunnelDepth != null)
-                        cOpt.setProperty("option.tunnels.depthInbound", _tunnelDepth);
+                    if (_tunnelCount != null) {
+                        cOpt.setProperty("option.inbound.quantity", _tunnelCount);
+                        cOpt.setProperty("option.outbound.quantity", _tunnelCount);
+                    }
+                    if (_tunnelDepth != null) {
+                        cOpt.setProperty("option.inbound.length", _tunnelDepth);
+                        cOpt.setProperty("option.outbound.length", _tunnelDepth);
+                    }
                     if (_connectDelay)
                         cOpt.setProperty("option.i2p.streaming.connectDelay", "1000");
                     else
                         cOpt.setProperty("option.i2p.streaming.connectDelay", "0");
+                    if ("interactive".equals(_profile))
+                        cOpt.setProperty("option.i2p.streaming.maxWindowSize", "1");
+                    else
+                        cOpt.remove("option.i2p.streaming.maxWindowSize");
+                    if (_name != null) {
+                        cOpt.setProperty("option.inbound.nickname", _name);
+                        cOpt.setProperty("option.outbound.nickname", _name);
+                    }
                     c.setConfig(cOpt, "");
                 }
             }
@@ -339,7 +367,6 @@ public class WebEditPageHelper {
         } else {
             return null;
         }
-        
         return config;
     }
     
@@ -363,23 +390,40 @@ public class WebEditPageHelper {
                     continue;
                 String key = pair.substring(0, eq);
                 String val = pair.substring(eq+1);
-                if ("tunnels.numInbound".equals(key)) continue;
-                if ("tunnels.depthInbound".equals(key)) continue;
+                if ("inbound.length".equals(key)) continue;
+                if ("outbound.length".equals(key)) continue;
+                if ("inbound.quantity".equals(key)) continue;
+                if ("outbound.quantity".equals(key)) continue;
+                if ("inbound.nickname".equals(key)) continue;
+                if ("outbound.nickname".equals(key)) continue;
                 if ("i2p.streaming.connectDelay".equals(key)) continue;
+                if ("i2p.streaming.maxWindowSize".equals(key)) continue;
                 config.setProperty("option." + key, val);
             }
         }
 
         config.setProperty("startOnLoad", _startOnLoad + "");
         
-        if (_tunnelCount != null)
-            config.setProperty("option.tunnels.numInbound", _tunnelCount);
-        if (_tunnelDepth != null)
-            config.setProperty("option.tunnels.depthInbound", _tunnelDepth);
+        if (_tunnelCount != null) {
+            config.setProperty("option.inbound.quantity", _tunnelCount);
+            config.setProperty("option.outbound.quantity", _tunnelCount);
+        }
+        if (_tunnelDepth != null) {
+            config.setProperty("option.inbound.length", _tunnelDepth);
+            config.setProperty("option.outbound.length", _tunnelDepth);
+        }
         if (_connectDelay)
             config.setProperty("option.i2p.streaming.connectDelay", "1000");
         else
             config.setProperty("option.i2p.streaming.connectDelay", "0");
+        if (_name != null) {
+            config.setProperty("option.inbound.nickname", _name);
+            config.setProperty("option.outbound.nickname", _name);
+        }
+        if ("interactive".equals(_profile))
+            config.setProperty("option.i2p.streaming.maxWindowSize", "1");
+        else
+            config.remove("option.i2p.streaming.maxWindowSize");
     }
 
     /**

@@ -82,7 +82,7 @@ public class Shitlist {
         }
         
         //_context.netDb().fail(peer);
-        _context.tunnelManager().peerFailed(peer);
+        //_context.tunnelManager().peerFailed(peer);
         _context.messageRegistry().peerFailed(peer);
         return wasAlready;
     }

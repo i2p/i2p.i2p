@@ -78,7 +78,8 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
                 handleDestroySession(reader, (DestroySessionMessage)message);
                 break;
             default:
-                _log.warn("Unhandled I2CP type received: " + message.getType());
+                if (_log.shouldLog(Log.ERROR))
+                    _log.error("Unhandled I2CP type received: " + message.getType());
         }
     }
 
@@ -88,7 +89,8 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
      */
     public void readError(I2CPMessageReader reader, Exception error) {
         if (_runner.isDead()) return;
-        _log.error("Error occurred", error);
+        if (_log.shouldLog(Log.ERROR))
+            _log.error("Error occurred", error);
         _runner.stopRunning();
     }
     
@@ -101,7 +103,8 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
         try {
             _runner.doSend(new SetDateMessage());
         } catch (I2CPMessageException ime) {
-            _log.error("Error writing out the setDate message", ime);
+            if (_log.shouldLog(Log.ERROR))
+                _log.error("Error writing out the setDate message", ime);
         }
     }
     private void handleSetDate(I2CPMessageReader reader, SetDateMessage message) {
@@ -118,7 +121,8 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Signature verified correctly on create session message");
         } else {
-            _log.error("Signature verification *FAILED* on a create session message.  Hijack attempt?");
+            if (_log.shouldLog(Log.ERROR))
+                _log.error("Signature verification *FAILED* on a create session message.  Hijack attempt?");
             _runner.disconnectClient("Invalid signature on CreateSessionMessage");
             return;
         }
@@ -152,12 +156,13 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
      *
      */
     private void handleSendMessage(I2CPMessageReader reader, SendMessageMessage message) {
-        _log.debug("handleSendMessage called");
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("handleSendMessage called");
         long beforeDistribute = _context.clock().now();
         MessageId id = _runner.distributeMessage(message);
         long timeToDistribute = _context.clock().now() - beforeDistribute;
         _runner.ackSendMessage(id, message.getNonce());
-        if (timeToDistribute > 50)
+        if ( (timeToDistribute > 50) && (_log.shouldLog(Log.WARN)) )
             _log.warn("Took too long to distribute the message (which holds up the ack): " + timeToDistribute);
     }
 
@@ -168,14 +173,16 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
      */
     private void handleReceiveBegin(I2CPMessageReader reader, ReceiveMessageBeginMessage message) {
         if (_runner.isDead()) return;
-        _log.debug("Handling recieve begin: id = " + message.getMessageId());
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("Handling recieve begin: id = " + message.getMessageId());
         MessagePayloadMessage msg = new MessagePayloadMessage();
         msg.setMessageId(message.getMessageId());
         msg.setSessionId(_runner.getSessionId());
         Payload payload = _runner.getPayload(message.getMessageId());
         if (payload == null) {
-            _log.error("Payload for message id [" + message.getMessageId() 
-                       + "] is null!  Unknown message id?");
+            if (_log.shouldLog(Log.ERROR))
+                _log.error("Payload for message id [" + message.getMessageId() 
+                           + "] is null!  Unknown message id?");
             return;
         }
         msg.setPayload(payload);
@@ -197,17 +204,21 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
     }
     
     private void handleDestroySession(I2CPMessageReader reader, DestroySessionMessage message) {
-        _log.info("Destroying client session " + _runner.getSessionId());
+        if (_log.shouldLog(Log.INFO))
+            _log.info("Destroying client session " + _runner.getSessionId());
         _runner.stopRunning();
     }
     
     private void handleCreateLeaseSet(I2CPMessageReader reader, CreateLeaseSetMessage message) {	
         if ( (message.getLeaseSet() == null) || (message.getPrivateKey() == null) || (message.getSigningPrivateKey() == null) ) {
-            _log.error("Null lease set granted: " + message);
+            if (_log.shouldLog(Log.ERROR))
+                _log.error("Null lease set granted: " + message);
             return;
         }
 
-        _log.info("New lease set granted for destination " + message.getLeaseSet().getDestination().calculateHash().toBase64());
+        if (_log.shouldLog(Log.INFO))
+            _log.info("New lease set granted for destination " 
+                      + message.getLeaseSet().getDestination().calculateHash().toBase64());
         _context.keyManager().registerKeys(message.getLeaseSet().getDestination(), message.getSigningPrivateKey(), message.getPrivateKey());
         _context.netDb().publish(message.getLeaseSet());
 

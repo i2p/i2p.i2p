@@ -49,6 +49,8 @@ public class RouterInfo extends DataStructureImpl {
     private volatile int _hashCode;
     private volatile boolean _hashCodeInitialized;
 
+    public static final String PROP_NETWORK_ID = "netId";
+    
     public RouterInfo() {
         setIdentity(null);
         setPublished(0);
@@ -243,7 +245,7 @@ public class RouterInfo extends DataStructureImpl {
         if (_options == null) throw new DataFormatException("Router options isn't set? wtf!");
 
         long before = Clock.getInstance().now();
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        ByteArrayOutputStream out = new ByteArrayOutputStream(6*1024);
         try {
             _identity.writeBytes(out);
             DataHelper.writeDate(out, new Date(_published));
@@ -279,6 +281,24 @@ public class RouterInfo extends DataStructureImpl {
         return _isValid;
     }
 
+    /**
+     * which network is this routerInfo a part of.  configured through the property
+     * PROP_NETWORK_ID
+     */
+    public int getNetworkId() {
+        if (_options == null) return -1;
+        String id = null;
+        synchronized (_options) {
+            id = _options.getProperty(PROP_NETWORK_ID);
+        }
+        if (id != null) {
+            try {
+                return Integer.parseInt(id);
+            } catch (NumberFormatException nfe) {}
+        }
+        return -1;
+    }
+        
     /**
      * Get the routing key for the structure using the current modifier in the RoutingKeyGenerator.
      * This only calculates a new one when necessary though (if the generator's key modifier changes)
@@ -422,19 +442,17 @@ public class RouterInfo extends DataStructureImpl {
     public boolean equals(Object object) {
         if ((object == null) || !(object instanceof RouterInfo)) return false;
         RouterInfo info = (RouterInfo) object;
-        return DataHelper.eq(_addresses, info.getAddresses()) 
-               && DataHelper.eq(_identity, info.getIdentity())
-               && DataHelper.eq(_options, info.getOptions()) 
-               && DataHelper.eq(_peers, info.getPeers())
+        return DataHelper.eq(_identity, info.getIdentity())
                && DataHelper.eq(_signature, info.getSignature())
-               && DataHelper.eq(getPublished(), info.getPublished());
+               && DataHelper.eq(getPublished(), info.getPublished())
+               && DataHelper.eq(_addresses, info.getAddresses())
+               && DataHelper.eq(_options, info.getOptions()) 
+               && DataHelper.eq(_peers, info.getPeers());
     }
 
     public int hashCode() {
         if (!_hashCodeInitialized) {
-            _hashCode = DataHelper.hashCode(_addresses) + DataHelper.hashCode(_identity)
-                        + DataHelper.hashCode(_options) + DataHelper.hashCode(_peers)
-                        + DataHelper.hashCode(_signature) + (int) getPublished();
+            _hashCode = DataHelper.hashCode(_identity) + (int) getPublished();
             _hashCodeInitialized = true;
         }
         return _hashCode;

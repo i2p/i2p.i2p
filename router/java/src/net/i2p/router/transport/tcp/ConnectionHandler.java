@@ -799,7 +799,8 @@ public class ConnectionHandler {
             byte ip[] = _from.getBytes();
             _rawOut.write(ip.length);
             _rawOut.write(ip);
-            DataHelper.writeDate(_rawOut, new Date(_context.clock().now()));
+            DataHelper.writeLong(_rawOut, DataHelper.DATE_LENGTH, _context.clock().now());
+            //DataHelper.writeDate(_rawOut, new Date(_context.clock().now()));
             DataHelper.writeProperties(_rawOut, null);
             _rawOut.flush();
             

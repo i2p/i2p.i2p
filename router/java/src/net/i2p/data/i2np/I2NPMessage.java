@@ -10,7 +10,6 @@ package net.i2p.data.i2np;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Date;
 
 import net.i2p.data.DataStructure;
 
@@ -67,7 +66,7 @@ public interface I2NPMessage extends DataStructure {
      * Date after which the message should be dropped (and the associated uniqueId forgotten)
      *
      */
-    public Date getMessageExpiration();
+    public long getMessageExpiration();
     
     /** How large the message is, including any checksums */
     public int getMessageSize();

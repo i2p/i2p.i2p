@@ -115,6 +115,7 @@ public class StreamSinkServer {
         }
         public void run() {
             if (_fos == null) return;
+            long start = System.currentTimeMillis();
             try {
                 InputStream in = _sock.getInputStream();
                 byte buf[] = new byte[4096];
@@ -126,7 +127,8 @@ public class StreamSinkServer {
                     if (_log.shouldLog(Log.DEBUG))
                         _log.debug("read and wrote " + read);
                 }
-                _log.error("Got EOF from client socket [written=" + written + "]");
+                long lifetime = System.currentTimeMillis() - start;
+                _log.error("Got EOF from client socket [written=" + written + " lifetime=" + lifetime + "]");
             } catch (IOException ioe) {
                 _log.error("Error writing the sink", ioe);
             } finally {

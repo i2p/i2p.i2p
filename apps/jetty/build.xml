@@ -3,18 +3,38 @@
         
     <target name="all" depends="build" />
     <target name="fetchJettylib" >
-        <available property="jetty.available" file="jettylib" />
+        <available property="jetty.available" file="jetty-5.1.2.zip" />
         <ant target="doFetchJettylib" />
     </target>
     <target name="doFetchJettylib" unless="jetty.available" >
-        <echo message="The libraries contained within the fetched file are from Jetty's 4.2.21 " />
-        <echo message="distribution (http://jetty.mortbay.org/) which we have copied to our website since" />
-        <echo message="theirs doesn't have direct HTTP access to the libs.  These are not " />
+        <echo message="The libraries contained within the fetched file are from Jetty's 5.1.2" />
+        <echo message="distribution (http://jetty.mortbay.org/).  These are not " />
         <echo message="necessary for using I2P, but are used by some applications on top of I2P," />
         <echo message="such as the routerconsole." />
-        <get src="http://dev.i2p.net/jettylib.tar.bz2" verbose="true" dest="jettylib.tar.bz2" />
-        <untar src="jettylib.tar.bz2" compression="bzip2" dest="." />
-        <delete file="jettylib.tar.bz2" />
+        <get src="http://mesh.dl.sourceforge.net/sourceforge/jetty/jetty-5.1.2.zip" verbose="true" dest="jetty-5.1.2.zip" />
+        <ant target="doExtract" />
+    </target>
+    <target name="doExtract">
+        <unzip src="jetty-5.1.2.zip" dest="." />
+        <mkdir dir="jettylib" />
+        <copy todir="jettylib">
+            <fileset dir="jetty-5.1.2/lib">
+                <include name="*.jar" />
+            </fileset>
+        </copy>
+        <copy todir="jettylib">
+            <fileset dir="jetty-5.1.2/ext">
+                <include name="ant.jar" />
+                <include name="commons-el.jar" />
+                <include name="commons-logging.jar" />
+                <include name="jasper-compiler.jar" />
+                <include name="jasper-runtime.jar" />
+                <include name="javax.servlet.jar" />
+                <include name="org.mortbay.jetty.jar" />
+                <include name="xercesImpl.jar" />
+            </fileset>
+        </copy>
+        <delete dir="jetty-5.1.2" />
     </target>
     <target name="build" depends="fetchJettylib" />
     <target name="builddep" />

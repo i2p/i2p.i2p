@@ -10,6 +10,8 @@ package net.i2p.router;
 
 import java.io.IOException;
 import java.io.Writer;
+import java.util.Collections;
+import java.util.Set;
 
 import net.i2p.data.Destination;
 import net.i2p.data.Hash;
@@ -38,6 +40,9 @@ public abstract class ClientManagerFacade implements Service {
      * @param onFailedJob Job to run after the timeout passes without receiving authorization
      */
     public abstract void requestLeaseSet(Destination dest, LeaseSet set, long timeout, Job onCreateJob, Job onFailedJob);
+
+    public abstract void requestLeaseSet(Hash dest, LeaseSet set);
+
     /**
      * Instruct the client (or all clients) that they are under attack.  This call
      * does not block.
@@ -67,6 +72,14 @@ public abstract class ClientManagerFacade implements Service {
     
     public boolean verifyClientLiveliness() { return true; }
 
+
+    /**
+     * Return the list of locally connected clients
+     *
+     * @return set of Destination objects
+     */
+    public Set listClients() { return Collections.EMPTY_SET; }
+    
     /**
      * Return the client's current config, or null if not connected
      *
@@ -96,4 +109,7 @@ class DummyClientManagerFacade extends ClientManagerFacade {
     public void messageDeliveryStatusUpdate(Destination fromDest, MessageId id, boolean delivered) {}
     
     public SessionConfig getClientSessionConfig(Destination _dest) { return null; }
+    
+    public void requestLeaseSet(Hash dest, LeaseSet set) {}
+    
 }

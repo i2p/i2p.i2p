@@ -46,7 +46,7 @@ class RequestLeaseSetMessageHandler extends HandlerImpl {
         LeaseSet leaseSet = new LeaseSet();
         for (int i = 0; i < msg.getEndpoints(); i++) {
             Lease lease = new Lease();
-            lease.setRouterIdentity(msg.getRouter(i));
+            lease.setGateway(msg.getRouter(i));
             lease.setTunnelId(msg.getTunnelId(i));
             lease.setEndDate(msg.getEndDate());
             //lease.setStartDate(msg.getStartDate());

@@ -126,7 +126,16 @@ public class GarlicClove extends DataStructureImpl {
 
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Wrote instructions: " + _instructions);
-        out.write(_msg.toByteArray());
+        try {
+            byte m[] = _msg.toByteArray();
+            if (m == null)
+                throw new RuntimeException("foo, returned null");
+            if (m.length <= 0)
+                throw new RuntimeException("foo, returned 0 length");
+            out.write(m);
+        } catch (Exception e) {
+            throw new DataFormatException("Unable to write the clove: " + _msg + " to " + out, e);
+        }
         DataHelper.writeLong(out, 4, _cloveId);
         DataHelper.writeDate(out, _expiration);
         if (_log.shouldLog(Log.DEBUG))
@@ -135,6 +144,14 @@ public class GarlicClove extends DataStructureImpl {
         _certificate.writeBytes(out);
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Written cert: " + _certificate);
+    }
+    
+    public int estimateSize() {
+        return 64 // instructions (high estimate)
+               + _msg.getMessageSize() 
+               + 4 // cloveId
+               + DataHelper.DATE_LENGTH
+               + 4; // certificate
     }
     
     public boolean equals(Object obj) {

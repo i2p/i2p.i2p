@@ -87,8 +87,8 @@ public class PacketHandler {
     }
     
     private void receivePacketDirect(Packet packet) {
-        if (_log.shouldLog(Log.DEBUG))
-            _log.debug("packet received: " + packet);
+        //if (_log.shouldLog(Log.DEBUG))
+        //    _log.debug("packet received: " + packet);
         
         byte sendId[] = packet.getSendStreamId();
         if (!isNonZero(sendId))
@@ -118,8 +118,8 @@ public class PacketHandler {
         // the packet is pointed at a stream ID we're receiving on
         if (isValidMatch(con.getSendStreamId(), packet.getReceiveStreamId())) {
             // the packet's receive stream ID also matches what we expect
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("receive valid: " + packet);
+            //if (_log.shouldLog(Log.DEBUG))
+            //    _log.debug("receive valid: " + packet);
             try {
                 con.getPacketHandler().receivePacket(packet, con);
             } catch (I2PException ie) {

@@ -12,6 +12,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.Properties;
 
 import net.i2p.data.Certificate;
 import net.i2p.data.DataFormatException;
@@ -122,7 +123,9 @@ public class RebuildRouterInfoJob extends JobImpl {
             
             try {
                 info.setAddresses(getContext().commSystem().createAddresses());
-                info.setOptions(getContext().statPublisher().publishStatistics());
+                Properties stats = getContext().statPublisher().publishStatistics();
+                stats.setProperty(RouterInfo.PROP_NETWORK_ID, ""+Router.NETWORK_ID);
+                info.setOptions(stats);
                 // info.setPeers(new HashSet()); // this would have the trusted peers
                 info.setPublished(CreateRouterInfoJob.getCurrentPublishDate(getContext()));
                 

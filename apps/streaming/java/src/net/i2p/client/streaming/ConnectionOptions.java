@@ -21,6 +21,7 @@ public class ConnectionOptions extends I2PSocketOptionsImpl {
     private int _inactivityTimeout;
     private int _inactivityAction;
     private int _inboundBufferSize;
+    private int _maxWindowSize;
 
     public static final int PROFILE_BULK = 1;
     public static final int PROFILE_INTERACTIVE = 2;
@@ -43,6 +44,7 @@ public class ConnectionOptions extends I2PSocketOptionsImpl {
     public static final String PROP_INITIAL_RECEIVE_WINDOW = "i2p.streaming.initialReceiveWindow";
     public static final String PROP_INACTIVITY_TIMEOUT = "i2p.streaming.inactivityTimeout";
     public static final String PROP_INACTIVITY_ACTION = "i2p.streaming.inactivityAction";
+    public static final String PROP_MAX_WINDOW_SIZE = "i2p.streaming.maxWindowSize";
     
     public ConnectionOptions() {
         super();
@@ -71,6 +73,7 @@ public class ConnectionOptions extends I2PSocketOptionsImpl {
             setInactivityTimeout(opts.getInactivityTimeout());
             setInactivityAction(opts.getInactivityAction());
             setInboundBufferSize(opts.getInboundBufferSize());
+            setMaxWindowSize(opts.getMaxWindowSize());
         }
     }
     
@@ -78,11 +81,11 @@ public class ConnectionOptions extends I2PSocketOptionsImpl {
         super.init(opts);
         setConnectDelay(getInt(opts, PROP_CONNECT_DELAY, -1));
         setProfile(getInt(opts, PROP_PROFILE, PROFILE_BULK));
-        setMaxMessageSize(getInt(opts, PROP_MAX_MESSAGE_SIZE, Packet.MAX_PAYLOAD_SIZE));
+        setMaxMessageSize(getInt(opts, PROP_MAX_MESSAGE_SIZE, 16*1024));
         setRTT(getInt(opts, PROP_INITIAL_RTT, 30*1000));
         setReceiveWindow(getInt(opts, PROP_INITIAL_RECEIVE_WINDOW, 1));
-        setResendDelay(getInt(opts, PROP_INITIAL_RESEND_DELAY, 500));
-        setSendAckDelay(getInt(opts, PROP_INITIAL_ACK_DELAY, 500));
+        setResendDelay(getInt(opts, PROP_INITIAL_RESEND_DELAY, 1000));
+        setSendAckDelay(getInt(opts, PROP_INITIAL_ACK_DELAY, 1000));
         setWindowSize(getInt(opts, PROP_INITIAL_WINDOW_SIZE, 1));
         setMaxResends(getInt(opts, PROP_MAX_RESENDS, 5));
         setWriteTimeout(getInt(opts, PROP_WRITE_TIMEOUT, -1));
@@ -91,6 +94,7 @@ public class ConnectionOptions extends I2PSocketOptionsImpl {
         setInboundBufferSize((getMaxMessageSize() + 2) * Connection.MAX_WINDOW_SIZE);
         
         setConnectTimeout(getInt(opts, PROP_CONNECT_TIMEOUT, Connection.DISCONNECT_TIMEOUT));
+        setMaxWindowSize(getInt(opts, PROP_MAX_WINDOW_SIZE, Connection.MAX_WINDOW_SIZE));
     }
     
     public void setProperties(Properties opts) {
@@ -124,6 +128,8 @@ public class ConnectionOptions extends I2PSocketOptionsImpl {
         
         if (opts.containsKey(PROP_CONNECT_TIMEOUT))
             setConnectTimeout(getInt(opts, PROP_CONNECT_TIMEOUT, Connection.DISCONNECT_TIMEOUT));
+        if (opts.containsKey(PROP_MAX_WINDOW_SIZE))
+            setMaxWindowSize(getInt(opts, PROP_MAX_WINDOW_SIZE, Connection.MAX_WINDOW_SIZE));
     }
     
     /** 
@@ -152,8 +158,8 @@ public class ConnectionOptions extends I2PSocketOptionsImpl {
      */
     public int getWindowSize() { return _windowSize; }
     public void setWindowSize(int numMsgs) { 
-        if (numMsgs > Connection.MAX_WINDOW_SIZE)
-            numMsgs = Connection.MAX_WINDOW_SIZE;
+        if (numMsgs > _maxWindowSize)
+            numMsgs = _maxWindowSize;
         _windowSize = numMsgs; 
     }
     
@@ -232,6 +238,16 @@ public class ConnectionOptions extends I2PSocketOptionsImpl {
     public int getInactivityAction() { return _inactivityAction; }
     public void setInactivityAction(int action) { _inactivityAction = action; }
     
+    public int getMaxWindowSize() { return _maxWindowSize; }
+    public void setMaxWindowSize(int msgs) { 
+        if (msgs > Connection.MAX_WINDOW_SIZE)
+            _maxWindowSize = Connection.MAX_WINDOW_SIZE;
+        else if (msgs < 1)
+            _maxWindowSize = 1;
+        else
+            _maxWindowSize = msgs; 
+    }
+    
     /** 
      * how much data are we willing to accept in our buffer?
      *
@@ -252,6 +268,7 @@ public class ConnectionOptions extends I2PSocketOptionsImpl {
         buf.append(" writeTimeout=").append(getWriteTimeout());
         buf.append(" inactivityTimeout=").append(_inactivityTimeout);
         buf.append(" inboundBuffer=").append(_inboundBufferSize);
+        buf.append(" maxWindowSize=").append(_maxWindowSize);
         return buf.toString();
     }
     

@@ -15,6 +15,7 @@ import org.mortbay.http.handler.SecurityHandler;
 import org.mortbay.http.HashUserRealm;
 import org.mortbay.http.HttpRequest;
 import org.mortbay.http.SecurityConstraint;
+import org.mortbay.http.Authenticator;
 import org.mortbay.util.MultiException;
 
 public class RouterConsoleRunner {
@@ -64,7 +65,7 @@ public class RouterConsoleRunner {
         }
         try {
             _server.start();
-        } catch (MultiException me) {
+        } catch (Exception me) {
             me.printStackTrace();
         }
         try {

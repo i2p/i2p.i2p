@@ -12,7 +12,7 @@ import java.util.Date;
 
 import net.i2p.data.DataFormatException;
 import net.i2p.data.DataStructure;
-import net.i2p.data.RouterIdentity;
+import net.i2p.data.Hash;
 import net.i2p.data.TunnelId;
 import net.i2p.data.i2cp.RequestLeaseSetMessage;
 import net.i2p.data.i2cp.SessionId;
@@ -30,8 +30,8 @@ class RequestLeaseSetMessageTest extends StructureTest {
         RequestLeaseSetMessage msg = new RequestLeaseSetMessage();
         msg.setSessionId((SessionId)(new SessionIdTest()).createDataStructure());
         msg.setEndDate(new Date(1000*60*60*12));
-	msg.addEndpoint((RouterIdentity)(new RouterIdentityTest()).createDataStructure(), 
-		        (TunnelId)(new TunnelIdTest()).createDataStructure());
+        byte h[] = new byte[Hash.HASH_LENGTH];
+        msg.addEndpoint(new Hash(h), (TunnelId)(new TunnelIdTest()).createDataStructure());
         return msg; 
     }
     public DataStructure createStructureToRead() { return new RequestLeaseSetMessage(); }

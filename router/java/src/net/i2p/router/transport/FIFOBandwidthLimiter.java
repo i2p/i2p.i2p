@@ -75,6 +75,11 @@ public class FIFOBandwidthLimiter {
      *
      */
     public Request requestInbound(int bytesIn, String purpose) {
+        if (_inboundUnlimited) {
+            _totalAllocatedInboundBytes += bytesIn;
+            return _noop;
+        }
+        
         SimpleRequest req = new SimpleRequest(bytesIn, 0, purpose);
         int pending = 0;
         synchronized (_pendingInboundRequests) {
@@ -91,6 +96,11 @@ public class FIFOBandwidthLimiter {
      *
      */
     public Request requestOutbound(int bytesOut, String purpose) {
+        if (_outboundUnlimited) {
+            _totalAllocatedOutboundBytes += bytesOut;
+            return _noop;
+        }
+
         SimpleRequest req = new SimpleRequest(0, bytesOut, purpose);
         int pending = 0;
         synchronized (_pendingOutboundRequests) {
@@ -516,5 +526,18 @@ public class FIFOBandwidthLimiter {
         /** was this request aborted?  */
         public boolean getAborted();
         
+    }
+
+    private static final NoopRequest _noop = new NoopRequest();
+    private static class NoopRequest implements Request {
+        public void abort() {}
+        public boolean getAborted() { return false; }
+        public int getPendingInboundRequested() { return 0; }
+        public int getPendingOutboundRequested() { return 0; }
+        public String getRequestName() { return "noop"; }
+        public long getRequestTime() { return 0; }
+        public int getTotalInboundRequested() { return 0; }
+        public int getTotalOutboundRequested() { return 0; } 
+        public void waitForNextAllocation() {}
     }
 }

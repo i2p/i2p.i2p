@@ -32,9 +32,9 @@ import net.i2p.data.DataHelper;
 import net.i2p.data.RouterInfo;
 import net.i2p.data.SigningPrivateKey;
 import net.i2p.data.i2np.GarlicMessage;
-import net.i2p.data.i2np.TunnelMessage;
+//import net.i2p.data.i2np.TunnelMessage;
 import net.i2p.router.message.GarlicMessageHandler;
-import net.i2p.router.message.TunnelMessageHandler;
+//import net.i2p.router.message.TunnelMessageHandler;
 import net.i2p.router.startup.StartupJob;
 import net.i2p.stat.Rate;
 import net.i2p.stat.RateStat;
@@ -67,6 +67,9 @@ public class Router {
     
     /** let clocks be off by 1 minute */
     public final static long CLOCK_FUDGE_FACTOR = 1*60*1000; 
+
+    /** used to differentiate routerInfo files on different networks */
+    public static final int NETWORK_ID = 1;
     
     public final static String PROP_INFO_FILENAME = "router.info.location";
     public final static String PROP_INFO_FILENAME_DEFAULT = "router.info";
@@ -153,11 +156,33 @@ public class Router {
     public String getConfigFilename() { return _configFilename; }
     public void setConfigFilename(String filename) { _configFilename = filename; }
     
-    public String getConfigSetting(String name) { return _config.getProperty(name); }
-    public void setConfigSetting(String name, String value) { _config.setProperty(name, value); }
-    public void removeConfigSetting(String name) { _config.remove(name); }
-    public Set getConfigSettings() { return new HashSet(_config.keySet()); }
-    public Properties getConfigMap() { return _config; }
+    public String getConfigSetting(String name) { 
+        synchronized (_config) {
+            return _config.getProperty(name); 
+        }
+    }
+    public void setConfigSetting(String name, String value) { 
+        synchronized (_config) {
+            _config.setProperty(name, value); 
+        }
+    }
+    public void removeConfigSetting(String name) { 
+        synchronized (_config) {
+            _config.remove(name); 
+        }
+    }
+    public Set getConfigSettings() { 
+        synchronized (_config) {
+            return new HashSet(_config.keySet()); 
+        }
+    }
+    public Properties getConfigMap() { 
+        Properties rv = new Properties();
+        synchronized (_config) {
+            rv.putAll(_config); 
+        }
+        return rv;
+    }
     
     public RouterInfo getRouterInfo() { return _routerInfo; }
     public void setRouterInfo(RouterInfo info) { 
@@ -191,6 +216,9 @@ public class Router {
         readConfig();
         
         setupHandlers();
+        _context.messageValidator().startup();
+        _context.tunnelDispatcher().startup();
+        _context.inNetMessagePool().startup();
         startupQueue();
         _context.jobQueue().addJob(new CoalesceStatsJob());
         _context.jobQueue().addJob(new UpdateRoutingKeyModifierJob());
@@ -234,7 +262,7 @@ public class Router {
     }
     
     public boolean isAlive() { return _isAlive; }
-
+    
     /**
      * Rebuild and republish our routerInfo since something significant 
      * has changed.
@@ -252,6 +280,7 @@ public class Router {
         try {
             ri.setPublished(_context.clock().now());
             Properties stats = _context.statPublisher().publishStatistics();
+            stats.setProperty(RouterInfo.PROP_NETWORK_ID, NETWORK_ID+"");
             ri.setOptions(stats);
             ri.setAddresses(_context.commSystem().createAddresses());
             SigningPrivateKey key = _context.keyManager().getSigningPrivateKey();
@@ -302,7 +331,7 @@ public class Router {
         }
         System.out.println("INFO:  Restarting the router after removing any old identity files");
         // hard and ugly
-        System.exit(EXIT_GRACEFUL_RESTART);
+        System.exit(EXIT_HARD_RESTART);
     }
     
     /**
@@ -399,7 +428,7 @@ public class Router {
     
     private void setupHandlers() {
         _context.inNetMessagePool().registerHandlerJobBuilder(GarlicMessage.MESSAGE_TYPE, new GarlicMessageHandler(_context));
-        _context.inNetMessagePool().registerHandlerJobBuilder(TunnelMessage.MESSAGE_TYPE, new TunnelMessageHandler(_context));
+        //_context.inNetMessagePool().registerHandlerJobBuilder(TunnelMessage.MESSAGE_TYPE, new TunnelMessageHandler(_context));
     }
     
     public void renderStatusHTML(Writer out) throws IOException {
@@ -687,11 +716,13 @@ public class Router {
         try { _context.statPublisher().shutdown(); } catch (Throwable t) { _log.log(Log.CRIT, "Error shutting down the stats manager", t); }
         try { _context.clientManager().shutdown(); } catch (Throwable t) { _log.log(Log.CRIT, "Error shutting down the client manager", t); }
         try { _context.tunnelManager().shutdown(); } catch (Throwable t) { _log.log(Log.CRIT, "Error shutting down the tunnel manager", t); }
+        try { _context.tunnelDispatcher().shutdown(); } catch (Throwable t) { _log.log(Log.CRIT, "Error shutting down the tunnel dispatcher", t); }
         try { _context.netDb().shutdown(); } catch (Throwable t) { _log.log(Log.CRIT, "Error shutting down the networkDb", t); }
         try { _context.commSystem().shutdown(); } catch (Throwable t) { _log.log(Log.CRIT, "Error shutting down the comm system", t); }
         try { _context.peerManager().shutdown(); } catch (Throwable t) { _log.log(Log.CRIT, "Error shutting down the peer manager", t); }
         try { _context.messageRegistry().shutdown(); } catch (Throwable t) { _log.log(Log.CRIT, "Error shutting down the message registry", t); }
         try { _context.messageValidator().shutdown(); } catch (Throwable t) { _log.log(Log.CRIT, "Error shutting down the message validator", t); }
+        try { _context.inNetMessagePool().shutdown(); } catch (Throwable t) { _log.log(Log.CRIT, "Error shutting down the inbound net pool", t); }
         try { _sessionKeyPersistenceHelper.shutdown(); } catch (Throwable t) { _log.log(Log.CRIT, "Error shutting down the session key manager", t); }
         RouterContext.listContexts().remove(_context);
         dumpStats();

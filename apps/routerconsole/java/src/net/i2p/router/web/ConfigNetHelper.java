@@ -62,6 +62,8 @@ public class ConfigNetHelper {
     public static final String PROP_OUTBOUND_KBPS = "i2np.bandwidth.outboundKBytesPerSecond";
     public static final String PROP_INBOUND_BURST = "i2np.bandwidth.inboundBurstKBytes";
     public static final String PROP_OUTBOUND_BURST = "i2np.bandwidth.outboundBurstKBytes";
+    public static final String PROP_SHARE_PERCENTAGE = "router.sharePercentage";
+    public static final int DEFAULT_SHARE_PERCENTAGE = 80;
 
     public String getInboundRate() {
         String rate = _context.getProperty(PROP_INBOUND_KBPS);
@@ -131,6 +133,28 @@ public class ConfigNetHelper {
             }
             buf.append(">");
             buf.append(i).append(" seconds</option>\n");
+        }
+        buf.append("</select>\n");
+        return buf.toString();
+    }
+    
+    public String getSharePercentageBox() {
+        String pctStr = _context.getProperty(PROP_SHARE_PERCENTAGE);
+        int pct = DEFAULT_SHARE_PERCENTAGE;
+        if (pctStr != null)
+            try { pct = Integer.parseInt(pctStr); } catch (NumberFormatException nfe) {}
+        StringBuffer buf = new StringBuffer(256);
+        buf.append("<select name=\"sharePercentage\">\n");
+        boolean found = false;
+        for (int i = 30; i <= 100; i += 10) {
+            buf.append("<option value=\"").append(i).append("\" ");
+            if (pct == i) {
+                buf.append("selected=\"true\" ");
+                found = true;
+            } else if ( (i == DEFAULT_SHARE_PERCENTAGE) && (!found) ) {
+                buf.append("selected=\"true\" ");
+            }
+            buf.append(">Up to ").append(i).append("%</option>\n");
         }
         buf.append("</select>\n");
         return buf.toString();

@@ -15,6 +15,7 @@
 </div>
 
 <h4>
+ <a href="tunnels.jsp">Tunnels</a> |
  <a href="profiles.jsp">Profiles</a> |
  <a href="netdb.jsp">Network Database</a> |
  <a href="logs.jsp">Logs</a> |

@@ -5,13 +5,16 @@ import java.util.HashMap;
 import java.util.Map;
 
 import net.i2p.I2PAppContext;
+import net.i2p.crypto.SHA256EntryCache;
 import net.i2p.data.Base64;
+import net.i2p.data.ByteArray;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
 import net.i2p.data.TunnelId;
 import net.i2p.data.i2np.I2NPMessage;
 import net.i2p.data.i2np.I2NPMessageException;
 import net.i2p.data.i2np.I2NPMessageHandler;
+import net.i2p.util.ByteCache;
 import net.i2p.util.Log;
 import net.i2p.util.SimpleTimer;
 
@@ -27,14 +30,22 @@ public class FragmentHandler {
     private Map _fragmentedMessages;
     private DefragmentedReceiver _receiver;
     
-    /** don't wait more than 20s to defragment the partial message */
-    private static final long MAX_DEFRAGMENT_TIME = 20*1000; 
+    /** don't wait more than 60s to defragment the partial message */
+    private static final long MAX_DEFRAGMENT_TIME = 60*1000;
     
     public FragmentHandler(I2PAppContext context, DefragmentedReceiver receiver) {
         _context = context;
         _log = context.logManager().getLog(FragmentHandler.class);
         _fragmentedMessages = new HashMap(4);
         _receiver = receiver;
+        _context.statManager().createRateStat("tunnel.smallFragments", "How many pad bytes are in small fragments?", 
+                                              "Tunnels", new long[] { 10*60*1000l, 60*60*1000l, 3*60*60*1000l, 24*60*60*1000 });
+        _context.statManager().createRateStat("tunnel.fullFragments", "How many tunnel messages use the full data area?", 
+                                              "Tunnels", new long[] { 10*60*1000l, 60*60*1000l, 3*60*60*1000l, 24*60*60*1000 });
+        _context.statManager().createRateStat("tunnel.fragmentedComplete", "How many fragments were in a completely received message?", 
+                                              "Tunnels", new long[] { 10*60*1000l, 60*60*1000l, 3*60*60*1000l, 24*60*60*1000 });
+        _context.statManager().createRateStat("tunnel.fragmentedDropped", "How many fragments were in a partially received yet failed message?", 
+                                              "Tunnels", new long[] { 10*60*1000l, 60*60*1000l, 3*60*60*1000l, 24*60*60*1000 });
     }
     
     /**
@@ -47,7 +58,8 @@ public class FragmentHandler {
     public void receiveTunnelMessage(byte preprocessed[], int offset, int length) {
         boolean ok = verifyPreprocessed(preprocessed, offset, length);
         if (!ok) {
-            _log.error("Unable to verify preprocessed data");
+            _log.error("Unable to verify preprocessed data (pre.length=" + preprocessed.length 
+                       + " off=" +offset + " len=" + length, new Exception("failed"));
             return;
         }
         offset += HopProcessor.IV_LENGTH; // skip the IV
@@ -60,16 +72,19 @@ public class FragmentHandler {
         offset++; // skip the final 0x00, terminating the padding
         if (_log.shouldLog(Log.DEBUG)) {
             _log.debug("Fragments begin at offset=" + offset + " padding=" + padding);
-            _log.debug("fragments: " + Base64.encode(preprocessed, offset, preprocessed.length-offset));
+            //_log.debug("fragments: " + Base64.encode(preprocessed, offset, preprocessed.length-offset));
         }
         try {
             while (offset < length)
                 offset = receiveFragment(preprocessed, offset, length);
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             if (_log.shouldLog(Log.ERROR))
                 _log.error("Corrupt fragment received: offset = " + offset, e);
+            throw e;
         }
     }
+    
+    private static final ByteCache _validateCache = ByteCache.getInstance(512, TrivialPreprocessor.PREPROCESSED_SIZE);
     
     /**
      * Verify that the preprocessed data hasn't been modified by checking the 
@@ -87,19 +102,44 @@ public class FragmentHandler {
             paddingEnd++;
         paddingEnd++; // skip the last
         
-        byte preV[] = new byte[length - offset - paddingEnd + HopProcessor.IV_LENGTH];
-        System.arraycopy(preprocessed, offset + paddingEnd, preV, 0, preV.length - HopProcessor.IV_LENGTH);
-        System.arraycopy(preprocessed, 0, preV, preV.length - HopProcessor.IV_LENGTH, HopProcessor.IV_LENGTH);
-        Hash v = _context.sha().calculateHash(preV);
+        ByteArray ba = _validateCache.acquire(); // larger than necessary, but always sufficient
+        byte preV[] = ba.getData();
+        int validLength = length - offset - paddingEnd + HopProcessor.IV_LENGTH;
+        System.arraycopy(preprocessed, offset + paddingEnd, preV, 0, validLength - HopProcessor.IV_LENGTH);
+        System.arraycopy(preprocessed, 0, preV, validLength - HopProcessor.IV_LENGTH, HopProcessor.IV_LENGTH);
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("endpoint IV: " + Base64.encode(preV, validLength - HopProcessor.IV_LENGTH, HopProcessor.IV_LENGTH));
+        
+        SHA256EntryCache.CacheEntry cache = _context.sha().cache().acquire(TrivialPreprocessor.PREPROCESSED_SIZE);
+		Hash v = _context.sha().calculateHash(preV, 0, validLength, cache);
+        
+        //Hash v = _context.sha().calculateHash(preV, 0, validLength);
         boolean eq = DataHelper.eq(v.getData(), 0, preprocessed, offset + HopProcessor.IV_LENGTH, 4);
-        if (!eq) 
-            _log.error("Endpoint data doesn't match:\n" + Base64.encode(preprocessed, offset + paddingEnd, preV.length-HopProcessor.IV_LENGTH));
+        if (!eq) {
+            if (_log.shouldLog(Log.ERROR))
+                _log.error("Endpoint data doesn't match: # pad bytes: " + (paddingEnd-(HopProcessor.IV_LENGTH+4)-1));
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("nomatching endpoint: # pad bytes: " + (paddingEnd-(HopProcessor.IV_LENGTH+4)-1) + "\n" 
+                           + Base64.encode(preprocessed, offset + paddingEnd, preV.length-HopProcessor.IV_LENGTH));
+        }
+        
+        _context.sha().cache().release(cache);
+        _validateCache.release(ba);
+        
+        if (eq) {
+            int excessPadding = paddingEnd - (HopProcessor.IV_LENGTH + 4 + 1);
+            if (excessPadding > 0) // suboptimal fragmentation
+                _context.statManager().addRateData("tunnel.smallFragments", excessPadding, 0);
+            else
+                _context.statManager().addRateData("tunnel.fullFragments", 1, 0);
+        }
+        
         return eq;
     }
     
     /** is this a follw up byte? */
     static final byte MASK_IS_SUBSEQUENT = (byte)(1 << 7);
-    /** how should this be delivered?  shift this 5 the right and get TYPE_* */
+    /** how should this be delivered.  shift this 5 the right and get TYPE_* */
     static final byte MASK_TYPE = (byte)(3 << 5);
     /** is this the first of a fragmented message? */
     static final byte MASK_FRAGMENTED = (byte)(1 << 3);
@@ -157,7 +197,9 @@ public class FragmentHandler {
             messageId = DataHelper.fromLong(preprocessed, offset, 4);
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("reading messageId " + messageId + " at offset "+ offset 
-                           + " type = " + type + "tunnelId = " + tunnelId);
+                           + " type = " + type + " router = " 
+                           + (router != null ? router.toBase64().substring(0,4) : "n/a") 
+                           + " tunnelId = " + tunnelId);
             offset += 4;
         }
         if (extended) {
@@ -184,13 +226,6 @@ public class FragmentHandler {
             msg = new FragmentedMessage(_context);
         }
         
-        if (isNew && fragmented) {
-            RemoveFailed evt = new RemoveFailed(msg);
-            msg.setExpireEvent(evt);
-            _log.debug("In " + MAX_DEFRAGMENT_TIME + " dropping " + messageId);
-            SimpleTimer.getInstance().addEvent(evt, MAX_DEFRAGMENT_TIME);
-        }
-        
         msg.receive(messageId, preprocessed, offset, size, !fragmented, router, tunnelId);
         if (msg.isComplete()) {
             if (fragmented) {
@@ -201,6 +236,16 @@ public class FragmentHandler {
             if (msg.getExpireEvent() != null)
                 SimpleTimer.getInstance().removeEvent(msg.getExpireEvent());
             receiveComplete(msg);
+        } else {
+            noteReception(msg.getMessageId(), 0);
+        }
+        
+        if (isNew && fragmented && !msg.isComplete()) {
+            RemoveFailed evt = new RemoveFailed(msg);
+            msg.setExpireEvent(evt);
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("In " + MAX_DEFRAGMENT_TIME + " dropping " + messageId);
+            SimpleTimer.getInstance().addEvent(evt, MAX_DEFRAGMENT_TIME);
         }
         
         offset += size;
@@ -225,6 +270,10 @@ public class FragmentHandler {
         int size = (int)DataHelper.fromLong(preprocessed, offset, 2);
         offset += 2;
         
+        if (messageId < 0)
+            throw new RuntimeException("Preprocessed message was invalid [messageId =" + messageId + " size=" 
+                                       + size + " offset=" + offset + " fragment=" + fragmentNum);
+        
         boolean isNew = false;
         FragmentedMessage msg = null;
         synchronized (_fragmentedMessages) {
@@ -236,13 +285,6 @@ public class FragmentHandler {
             }
         }
         
-        if (isNew) {
-            RemoveFailed evt = new RemoveFailed(msg);
-            msg.setExpireEvent(evt);
-            _log.debug("In " + MAX_DEFRAGMENT_TIME + " dropping " + msg.getMessageId() + "/" + fragmentNum);
-            SimpleTimer.getInstance().addEvent(evt, MAX_DEFRAGMENT_TIME);
-        }
-        
         msg.receive(messageId, fragmentNum, preprocessed, offset, size, isLast);
         
         if (msg.isComplete()) {
@@ -251,7 +293,18 @@ public class FragmentHandler {
             }
             if (msg.getExpireEvent() != null)
                 SimpleTimer.getInstance().removeEvent(msg.getExpireEvent());
+            _context.statManager().addRateData("tunnel.fragmentedComplete", msg.getFragmentCount(), msg.getLifetime());
             receiveComplete(msg);
+        } else {
+            noteReception(msg.getMessageId(), fragmentNum);
+        }
+        
+        if (isNew && !msg.isComplete()) {
+            RemoveFailed evt = new RemoveFailed(msg);
+            msg.setExpireEvent(evt);
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("In " + MAX_DEFRAGMENT_TIME + " dropping " + msg.getMessageId() + "/" + fragmentNum);
+            SimpleTimer.getInstance().addEvent(evt, MAX_DEFRAGMENT_TIME);
         }
         
         offset += size;
@@ -265,16 +318,21 @@ public class FragmentHandler {
                 _log.debug("RECV(" + data.length + "): " + Base64.encode(data)  
                            + " " + _context.sha().calculateHash(data).toBase64());
             I2NPMessage m = new I2NPMessageHandler(_context).readMessage(data);
+            noteCompletion(m.getUniqueId());
             _receiver.receiveComplete(m, msg.getTargetRouter(), msg.getTargetTunnel());
         } catch (IOException ioe) {
-            if (_log.shouldLog(Log.WARN))
-                _log.warn("Error receiving fragmented message (corrupt?): " + msg, ioe);
+            if (_log.shouldLog(Log.ERROR))
+                _log.error("Error receiving fragmented message (corrupt?): " + msg, ioe);
         } catch (I2NPMessageException ime) {
-            if (_log.shouldLog(Log.WARN))
-                _log.warn("Error receiving fragmented message (corrupt?): " + msg, ime);
+            if (_log.shouldLog(Log.ERROR))
+                _log.error("Error receiving fragmented message (corrupt?): " + msg, ime);
         }
     }
 
+    protected void noteReception(long messageId, int fragmentId) {}
+    protected void noteCompletion(long messageId) {}
+    protected void noteFailure(long messageId) {}
+    
     /**
      * Receive messages out of the tunnel endpoint.  There should be a single 
      * instance of this object per tunnel so that it can tell what tunnel various
@@ -303,9 +361,12 @@ public class FragmentHandler {
             synchronized (_fragmentedMessages) {
                 removed = (null != _fragmentedMessages.remove(new Long(_msg.getMessageId())));
             }
-            if (removed) {
-                if (_log.shouldLog(Log.WARN))
-                    _log.warn("Dropped failed fragmented message: " + _msg);
+            if (removed && !_msg.getReleased()) {
+                noteFailure(_msg.getMessageId());
+                if (_log.shouldLog(Log.ERROR))
+                    _log.error("Dropped failed fragmented message: " + _msg);
+                _context.statManager().addRateData("tunnel.fragmentedDropped", _msg.getFragmentCount(), _msg.getLifetime());
+                _msg.failed();
             } else {
                 // succeeded before timeout
             }

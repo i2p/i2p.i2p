@@ -16,6 +16,7 @@ import net.i2p.data.RouterInfo;
 import net.i2p.data.SigningPrivateKey;
 import net.i2p.router.JobImpl;
 import net.i2p.router.RouterContext;
+import net.i2p.router.Router;
 import net.i2p.util.Log;
 
 /**
@@ -38,6 +39,7 @@ public class PublishLocalRouterInfoJob extends JobImpl {
             _log.debug("Old routerInfo contains " + ri.getAddresses().size() 
                        + " addresses and " + ri.getOptions().size() + " options");
         Properties stats = getContext().statPublisher().publishStatistics();
+        stats.setProperty(RouterInfo.PROP_NETWORK_ID, ""+Router.NETWORK_ID);
         try {
             ri.setPublished(getContext().clock().now());
             ri.setOptions(stats);

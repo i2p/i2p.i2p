@@ -39,12 +39,13 @@
                 <pathelement location="../../jetty/jettylib/jasper-compiler.jar" />
                 <pathelement location="../../jetty/jettylib/jasper-runtime.jar" />
                 <pathelement location="../../jetty/jettylib/javax.servlet.jar" />
+                <pathelement location="../../jetty/jettylib/commons-logging.jar" />
+                <pathelement location="../../jetty/jettylib/commons-el.jar" />
                 <pathelement location="../../jetty/jettylib/ant.jar" />
                 <pathelement location="build/i2ptunnel.jar" />
             </classpath>
             <arg value="-d" />
             <arg value="../jsp/WEB-INF/classes" />
-            <arg value="-v9" />
             <arg value="-p" />
             <arg value="net.i2p.i2ptunnel.jsp" />
             <arg value="-webinc" />
@@ -52,10 +53,12 @@
             <arg value="-webapp" />
             <arg value="../jsp/" />
         </java>
-        <javac destdir="../jsp/WEB-INF/classes/" srcdir="../jsp/WEB-INF/classes" includes="*.java">
+        <javac destdir="../jsp/WEB-INF/classes/" srcdir="../jsp/WEB-INF/classes" includes="**/*.java">
             <classpath>
                 <pathelement location="../../jetty/jettylib/jasper-runtime.jar" />
                 <pathelement location="../../jetty/jettylib/javax.servlet.jar" />
+                <pathelement location="../../jetty/jettylib/commons-logging.jar" />
+                <pathelement location="../../jetty/jettylib/commons-el.jar" />
                 <pathelement location="build/i2ptunnel.jar" />
             </classpath>
         </javac>

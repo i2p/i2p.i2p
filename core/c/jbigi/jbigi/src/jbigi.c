@@ -143,7 +143,9 @@ void convert_j2mp(JNIEnv* env, jbyteArray jvalue, mpz_t* mvalue)
 
 void convert_mp2j(JNIEnv* env, mpz_t mvalue, jbyteArray* jvalue)
 {
-        jsize size;
+        // size_t not jsize to work with 64bit CPUs (do we need to update this
+        // elsewhere, and/or adjust memory alloc sizes?)
+        size_t size; 
         jbyte* buffer;
         jboolean copy;
 		//int i;

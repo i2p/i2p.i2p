@@ -20,7 +20,7 @@
             <classpath>
                 <pathelement location="../../../core/java/build/i2p.jar" />
                 <pathelement location="../../../router/java/build/router.jar" />
-                <pathelement location="../../jetty/jettylib/org.mortbay.jetty-jdk1.2.jar" />
+                <pathelement location="../../jetty/jettylib/org.mortbay.jetty.jar" />
                 <pathelement location="../../jetty/jettylib/javax.servlet.jar" />
                 <pathelement location="../../systray/java/build/systray.jar" />
                 <pathelement location="../../systray/java/lib/systray4j.jar" />
@@ -53,17 +53,19 @@
                 <pathelement location="../../jetty/jettylib/jasper-compiler.jar" />
                 <pathelement location="../../jetty/jettylib/jasper-runtime.jar" />
                 <pathelement location="../../jetty/jettylib/javax.servlet.jar" />
+                <pathelement location="../../jetty/jettylib/commons-logging.jar" />
+                <pathelement location="../../jetty/jettylib/commons-el.jar" />
                 <pathelement location="../../jetty/jettylib/ant.jar" />
                 <pathelement location="../../systray/java/build/obj" />
-                <pathelement location="../../systray/java/lib/systray4j.jar" /> <!-- some javacs resolve recursively... -->
-                <pathelement location="../../../installer/lib/wrapper/win32/wrapper.jar" /> <!-- we dont care if we're not on win32 -->
-                <pathelement location="../../../core/java/build/i2p.jar" />
-                <pathelement location="../../../router/java/build/router.jar" />
+                <pathelement location="../../systray/java/lib/systray4j.jar" />
+                <pathelement location="../../../installer/lib/wrapper/win32/wrapper.jar" />
                 <pathelement location="build/routerconsole.jar" />
+                <pathelement location="../../../router/java/build/router.jar" />
+                <pathelement location="../../../core/java/build/i2p.jar" />
             </classpath>
             <arg value="-d" />
             <arg value="../jsp/WEB-INF/classes" />
-            <arg value="-v9" />
+            <arg value="-v" />
             <arg value="-p" />
             <arg value="net.i2p.router.web.jsp" />
             <arg value="-webinc" />
@@ -71,10 +73,13 @@
             <arg value="-webapp" />
             <arg value="../jsp/" />
         </java>
-        <javac destdir="../jsp/WEB-INF/classes/" srcdir="../jsp/WEB-INF/classes" includes="*.java">
+        
+        <javac destdir="../jsp/WEB-INF/classes/" srcdir="../jsp/WEB-INF/classes" includes="**/*.java">
             <classpath>
                 <pathelement location="../../jetty/jettylib/jasper-runtime.jar" />
                 <pathelement location="../../jetty/jettylib/javax.servlet.jar" />
+                <pathelement location="../../jetty/jettylib/commons-logging.jar" />
+                <pathelement location="../../jetty/jettylib/commons-el.jar" />
                 <pathelement location="build/routerconsole.jar" />
             </classpath>
         </javac>

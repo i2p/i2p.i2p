@@ -10,7 +10,9 @@ package net.i2p.router.client;
 
 import java.io.IOException;
 import java.io.Writer;
+import java.util.Collections;
 import java.util.Iterator;
+import java.util.Set;
 
 import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
@@ -112,6 +114,12 @@ public class ClientManagerFacadeImpl extends ClientManagerFacade {
             _log.error("Null manager on requestLeaseSet!");
     }
     
+    public void requestLeaseSet(Hash dest, LeaseSet set) { 
+        if (_manager != null)
+            _manager.requestLeaseSet(dest, set);
+    }
+
+    
     /**
      * Instruct the client (or all clients) that they are under attack.  This call
      * does not block.
@@ -185,5 +193,17 @@ public class ClientManagerFacadeImpl extends ClientManagerFacade {
     public void renderStatusHTML(Writer out) throws IOException { 
         if (_manager != null)
             _manager.renderStatusHTML(out); 
+    }
+    
+    /**
+     * Return the list of locally connected clients
+     *
+     * @return set of Destination objects
+     */
+    public Set listClients() {
+        if (_manager != null)
+            return _manager.listClients();
+        else
+            return Collections.EMPTY_SET;
     }
 }

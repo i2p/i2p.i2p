@@ -10,12 +10,7 @@ import net.i2p.util.Log;
  */
 public class InboundGatewayProcessor extends HopProcessor {
     public InboundGatewayProcessor(I2PAppContext ctx, HopConfig config) {
-        super(ctx, config);
-    }
-
-    /** we are the gateway, no need to validate the IV */
-    protected IVValidator createValidator() { 
-        return DummyValidator.getInstance();
+        super(ctx, config, DummyValidator.getInstance());
     }
 
     /**

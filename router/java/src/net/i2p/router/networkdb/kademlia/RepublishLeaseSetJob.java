@@ -43,7 +43,7 @@ public class RepublishLeaseSetJob extends JobImpl {
                     if (!ls.isCurrent(Router.CLOCK_FUDGE_FACTOR)) {
                         _log.warn("Not publishing a LOCAL lease that isn't current - " + _dest, new Exception("Publish expired LOCAL lease?"));
                     } else {
-                        getContext().jobQueue().addJob(new StoreJob(getContext(), _facade, _dest, ls, null, null, REPUBLISH_LEASESET_DELAY));
+                        getContext().jobQueue().addJob(new StoreJob(getContext(), _facade, _dest, ls, new OnSuccess(getContext()), new OnFailure(getContext()), REPUBLISH_LEASESET_DELAY));
                     }
                 } else {
                     _log.warn("Client " + _dest + " is local, but we can't find a valid LeaseSet?  perhaps its being rebuilt?");
@@ -58,6 +58,23 @@ public class RepublishLeaseSetJob extends JobImpl {
             _log.error("Uncaught error republishing the leaseSet", re);
             _facade.stopPublishing(_dest);
             throw re;
+        }
+    }
+    
+    private class OnSuccess extends JobImpl {
+        public OnSuccess(RouterContext ctx) { super(ctx); }
+        public String getName() { return "Publish leaseSet successful"; }
+        public void runJob() { 
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("successful publishing of the leaseSet for " + _dest.toBase64());
+        }
+    }
+    private class OnFailure extends JobImpl {
+        public OnFailure(RouterContext ctx) { super(ctx); }
+        public String getName() { return "Publish leaseSet failed"; }
+        public void runJob() { 
+            if (_log.shouldLog(Log.ERROR))
+                _log.error("FAILED publishing of the leaseSet for " + _dest.toBase64());
         }
     }
 }

@@ -110,7 +110,7 @@ class HarvesterJob extends JobImpl {
         long now = getContext().clock().now();
         DatabaseLookupMessage msg = new DatabaseLookupMessage(getContext(), true);
         msg.setFrom(getContext().routerHash());
-        msg.setMessageExpiration(new Date(10*1000+now));
+        msg.setMessageExpiration(10*1000+now);
         msg.setSearchKey(peer);
         msg.setReplyTunnel(null);
         SendMessageDirectJob job = new SendMessageDirectJob(getContext(), msg, peer, 10*1000, PRIORITY);

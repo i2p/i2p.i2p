@@ -12,7 +12,6 @@ import java.util.Properties;
 
 import net.i2p.client.I2PClient;
 
-import net.i2p.router.message.OutboundClientMessageJob;
 import net.i2p.router.message.OutboundClientMessageOneShotJob;
 import net.i2p.util.Log;
 
@@ -59,10 +58,7 @@ public class ClientMessagePool {
         } else {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Adding message for remote delivery");
-            if (isGuaranteed(msg))
-                _context.jobQueue().addJob(new OutboundClientMessageJob(_context, msg));
-            else
-                _context.jobQueue().addJob(new OutboundClientMessageOneShotJob(_context, msg));
+            _context.jobQueue().addJob(new OutboundClientMessageOneShotJob(_context, msg));
         }
     }
     

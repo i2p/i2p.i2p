@@ -57,7 +57,8 @@ class PeerManager {
         if (peer == null) return;
         PeerProfile prof = _organizer.getProfile(peer);
         if (prof == null) return;
-        _persistenceHelper.writeProfile(prof);
+        if (true)
+            _persistenceHelper.writeProfile(prof);
     }
     void loadProfiles() {
         Set profiles = _persistenceHelper.readProfiles();
@@ -83,7 +84,7 @@ class PeerManager {
             case PeerSelectionCriteria.PURPOSE_TEST:
                 // for now, the peers we test will be the reliable ones
                 //_organizer.selectWellIntegratedPeers(criteria.getMinimumRequired(), exclude, curVals);
-                _organizer.selectHighCapacityPeers(criteria.getMinimumRequired(), exclude, peers);
+                _organizer.selectNotFailingPeers(criteria.getMinimumRequired(), exclude, peers);
                 break;
             case PeerSelectionCriteria.PURPOSE_TUNNEL:
                 // pull all of the fast ones, regardless of how many we 

@@ -10,11 +10,13 @@ import java.util.Date;
 import net.i2p.I2PAppContext;
 import net.i2p.data.Base64;
 import net.i2p.data.ByteArray;
+import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
 import net.i2p.data.TunnelId;
 import net.i2p.data.i2np.I2NPMessage;
 import net.i2p.data.i2np.DataMessage;
 import net.i2p.data.i2np.I2NPMessageHandler;
+import net.i2p.util.ByteCache;
 import net.i2p.util.Log;
 import net.i2p.util.SimpleTimer;
 
@@ -29,11 +31,17 @@ public class FragmentedMessage {
     private long _messageId;
     private Hash _toRouter;
     private TunnelId _toTunnel;
-    private Map _fragments;
+    private ByteArray _fragments[];
     private boolean _lastReceived;
     private int _highFragmentNum;
     private long _createdOn;
+    private boolean _completed;
+    private long _releasedAfter;
     private SimpleTimer.TimedEvent _expireEvent;
+    
+    private static final ByteCache _cache = ByteCache.getInstance(512, TrivialPreprocessor.PREPROCESSED_SIZE);
+    // 64 is pretty absurd, 32 is too, most likely
+    private static final int MAX_FRAGMENTS = 64;
     
     public FragmentedMessage(I2PAppContext ctx) {
         _context = ctx;
@@ -41,11 +49,13 @@ public class FragmentedMessage {
         _messageId = -1;
         _toRouter = null;
         _toTunnel = null;
-        _fragments = new HashMap(1);
+        _fragments = new ByteArray[MAX_FRAGMENTS];
         _lastReceived = false;
         _highFragmentNum = -1;
+        _releasedAfter = -1;
         _createdOn = ctx.clock().now();
         _expireEvent = null;
+        _completed = false;
     }
     
     /**
@@ -60,17 +70,26 @@ public class FragmentedMessage {
      * @param isLast is this the last fragment in the message?
      */
     public void receive(long messageId, int fragmentNum, byte payload[], int offset, int length, boolean isLast) {
+        if (fragmentNum < 0) throw new RuntimeException("Fragment # == " + fragmentNum + " for messageId " + messageId);
+        if (payload == null) throw new RuntimeException("Payload is null for messageId " + messageId);
+        if (length <= 0) throw new RuntimeException("Length is impossible (" + length + ") for messageId " + messageId);
+        if (offset + length > payload.length) throw new RuntimeException("Length is impossible (" + length + "/" + offset + " out of " + payload.length + ") for messageId " + messageId);
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Receive message " + messageId + " fragment " + fragmentNum + " with " + length + " bytes (last? " + isLast + ") offset = " + offset);
         _messageId = messageId;
-        ByteArray ba = new ByteArray(new byte[length]);
-        System.arraycopy(payload, offset, ba.getData(), 0, length);
-        _log.debug("fragment[" + fragmentNum + "/" + offset + "/" + length + "]: " + Base64.encode(ba.getData()));
+        // we should just use payload[] and use an offset/length on it
+        ByteArray ba = new ByteArray(payload, offset, length); //new byte[length]);
+        //System.arraycopy(payload, offset, ba.getData(), 0, length);
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("fragment[" + fragmentNum + "/" + offset + "/" + length + "]: " 
+                       + Base64.encode(ba.getData(), ba.getOffset(), ba.getValid()));
 
-        _fragments.put(new Integer(fragmentNum), ba);
+        _fragments[fragmentNum] = ba;
         _lastReceived = isLast;
-        if (isLast)
+        if (fragmentNum > _highFragmentNum)
             _highFragmentNum = fragmentNum;
+        if (isLast && fragmentNum <= 0)
+            throw new RuntimeException("hmm, isLast and fragmentNum=" + fragmentNum + " for message " + messageId);
     }
     
     /**
@@ -86,13 +105,18 @@ public class FragmentedMessage {
      * @param toTunnel what tunnel is this destined for (may be null)
      */
     public void receive(long messageId, byte payload[], int offset, int length, boolean isLast, Hash toRouter, TunnelId toTunnel) {
+        if (payload == null) throw new RuntimeException("Payload is null for messageId " + messageId);
+        if (length <= 0) throw new RuntimeException("Length is impossible (" + length + ") for messageId " + messageId);
+        if (offset + length > payload.length) throw new RuntimeException("Length is impossible (" + length + "/" + offset + " out of " + payload.length + ") for messageId " + messageId);
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Receive message " + messageId + " with " + length + " bytes (last? " + isLast + ") targetting " + toRouter + " / " + toTunnel + " offset=" + offset);
         _messageId = messageId;
-        ByteArray ba = new ByteArray(new byte[length]);
-        System.arraycopy(payload, offset, ba.getData(), 0, length);
-        _log.debug("fragment[0/" + offset + "/" + length + "]: " + Base64.encode(ba.getData()));
-        _fragments.put(new Integer(0), ba);
+        ByteArray ba = new ByteArray(payload, offset, length); // new byte[length]);
+        //System.arraycopy(payload, offset, ba.getData(), 0, length);
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("fragment[0/" + offset + "/" + length + "]: " 
+                       + Base64.encode(ba.getData(), ba.getOffset(), ba.getValid()));
+        _fragments[0] = ba;
         _lastReceived = isLast;
         _toRouter = toRouter;
         _toTunnel = toTunnel;
@@ -103,6 +127,13 @@ public class FragmentedMessage {
     public long getMessageId() { return _messageId; }
     public Hash getTargetRouter() { return _toRouter; }
     public TunnelId getTargetTunnel() { return _toTunnel; }
+    public int getFragmentCount() { 
+        int found = 0;
+        for (int i = 0; i < _fragments.length; i++)
+            if (_fragments[i] != null)
+                found++;
+        return found;
+    }
     /** used in the fragment handler so we can cancel the expire event on success */
     SimpleTimer.TimedEvent getExpireEvent() { return _expireEvent; }
     void setExpireEvent(SimpleTimer.TimedEvent evt) { _expireEvent = evt; }
@@ -112,7 +143,7 @@ public class FragmentedMessage {
         if (!_lastReceived)
             return false;
         for (int i = 0; i <= _highFragmentNum; i++)
-            if (!_fragments.containsKey(new Integer(i)))
+            if (_fragments[i] == null)
                 return false;
         return true;
     }
@@ -121,33 +152,57 @@ public class FragmentedMessage {
             throw new IllegalStateException("wtf, don't get the completed size when we're not complete");
         int size = 0;
         for (int i = 0; i <= _highFragmentNum; i++) {
-            ByteArray ba = (ByteArray)_fragments.get(new Integer(i));
-            size += ba.getData().length;
+            ByteArray ba = _fragments[i];
+            size += ba.getValid();
         }
         return size;
     }
     
     /** how long has this fragmented message been alive?  */
     public long getLifetime() { return _context.clock().now() - _createdOn; }
+    public boolean getReleased() { return _completed; }
     
     
     public void writeComplete(OutputStream out) throws IOException {
         for (int i = 0; i <= _highFragmentNum; i++) {
-            ByteArray ba = (ByteArray)_fragments.get(new Integer(i));
-            out.write(ba.getData());
+            ByteArray ba = _fragments[i];
+            out.write(ba.getData(), ba.getOffset(), ba.getValid());
         }
+        _completed = true;
     }
     public void writeComplete(byte target[], int offset) {
         for (int i = 0; i <= _highFragmentNum; i++) {
-            ByteArray ba = (ByteArray)_fragments.get(new Integer(i));
-            System.arraycopy(ba.getData(), 0, target, offset, ba.getData().length);
-            offset += ba.getData().length;
+            ByteArray ba = _fragments[i];
+            System.arraycopy(ba.getData(), ba.getOffset(), target, offset, ba.getValid());
+            offset += ba.getValid();
         }
+        _completed = true;
     }
     public byte[] toByteArray() {
         byte rv[] = new byte[getCompleteSize()];
         writeComplete(rv, 0);
+        releaseFragments();
         return rv;
+    }
+    
+    public long getReleasedAfter() { return _releasedAfter; }
+    public void failed() {
+        releaseFragments();
+    }
+
+    /**
+     * Called as one of the endpoints for the tunnel cache pipeline (see TunnelDataMessage)
+     *
+     */
+    private void releaseFragments() {
+        _releasedAfter = getLifetime();
+        for (int i = 0; i <= _highFragmentNum; i++) {
+            ByteArray ba = _fragments[i];
+            if ( (ba != null) && (ba.getData().length == TrivialPreprocessor.PREPROCESSED_SIZE) ) {
+                _cache.release(ba);
+                _fragments[i] = null;
+            }
+        }
     }
     
     public InputStream getInputStream() { return new FragmentInputStream(); }
@@ -160,18 +215,43 @@ public class FragmentedMessage {
         }
         public int read() throws IOException {
             while (true) {
-                ByteArray ba = (ByteArray)_fragments.get(new Integer(_fragment));
+                ByteArray ba = _fragments[_fragment];
                 if (ba == null) return -1;
-                if (_offset >= ba.getData().length) {
+                if (_offset >= ba.getValid()) {
                     _fragment++;
                     _offset = 0;
                 } else {
-                    byte rv = ba.getData()[_offset];
+                    byte rv = ba.getData()[ba.getOffset()+_offset];
                     _offset++;
                     return rv;
                 }
             }
         }
+    }
+    
+    public String toString() {
+        StringBuffer buf = new StringBuffer(128);
+        buf.append("Fragments for ").append(_messageId).append(": ");
+        for (int i = 0; i <= _highFragmentNum; i++) {
+            ByteArray ba = _fragments[i];
+            if (ba != null)
+                buf.append(i).append(":").append(ba.getValid()).append(" bytes ");
+            else
+                buf.append(i).append(": missing ");
+        }
+        buf.append(" highest received: ").append(_highFragmentNum);
+        buf.append(" last received? ").append(_lastReceived);
+        buf.append(" lifetime: ").append(DataHelper.formatDuration(_context.clock().now()-_createdOn));
+        if (_toRouter != null) {
+            buf.append(" targetting ").append(_toRouter.toBase64().substring(0,4));
+            if (_toTunnel != null)
+                buf.append(":").append(_toTunnel.getTunnelId());
+        }
+        if (_completed)
+            buf.append(" completed");
+        if (_releasedAfter > 0)
+            buf.append(" released after " + DataHelper.formatDuration(_releasedAfter));
+        return buf.toString();
     }
     
     public static void main(String args[]) {
@@ -180,7 +260,7 @@ public class FragmentedMessage {
             DataMessage m = new DataMessage(ctx);
             m.setData(new byte[1024]);
             java.util.Arrays.fill(m.getData(), (byte)0xFF);
-            m.setMessageExpiration(new Date(ctx.clock().now() + 60*1000));
+            m.setMessageExpiration(ctx.clock().now() + 60*1000);
             m.setUniqueId(ctx.random().nextLong(I2NPMessage.MAX_ID_VALUE));
             byte data[] = m.toByteArray();
             

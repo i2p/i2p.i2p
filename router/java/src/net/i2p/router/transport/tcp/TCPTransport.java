@@ -20,6 +20,7 @@ import net.i2p.router.OutNetMessage;
 import net.i2p.router.RouterContext;
 import net.i2p.router.transport.TransportImpl;
 import net.i2p.router.transport.TransportBid;
+import net.i2p.router.transport.Transport;
 import net.i2p.util.I2PThread;
 import net.i2p.util.Log;
 
@@ -67,6 +68,9 @@ public class TCPTransport extends TransportImpl {
     /** All of the operating TCPConnectionEstablisher objects */
     private List _connectionEstablishers;
     
+    private TransportBid _fastBid;
+    private TransportBid _slowBid;
+    
     /** What is this transport's identifier? */
     public static final String STYLE = "TCP";
     /** Should the TCP listener bind to all interfaces? */
@@ -83,7 +87,7 @@ public class TCPTransport extends TransportImpl {
     public static final int DEFAULT_ESTABLISHERS = 3;
     
     /** Ordered list of supported I2NP protocols */
-    public static final int[] SUPPORTED_PROTOCOLS = new int[] { 1 };
+    public static final int[] SUPPORTED_PROTOCOLS = new int[] { 2 };
     /** blah, people shouldnt use defaults... */
     public static final int DEFAULT_LISTEN_PORT = 8887;
     
@@ -101,6 +105,8 @@ public class TCPTransport extends TransportImpl {
         _connectionLock = new Object();
         _pendingMessages = new HashMap(16);
         _lastConnectionErrors = new ArrayList();
+        _fastBid = new SharedBid(200);
+        _slowBid = new SharedBid(5000);
 
         String str = _context.getProperty(PROP_ESTABLISHERS);
         int establishers = 0;
@@ -134,19 +140,11 @@ public class TCPTransport extends TransportImpl {
         
         if ( (_myAddress != null) && (_myAddress.equals(addr)) ) 
             return null; // dont talk to yourself
-        
-        TransportBid bid = new TransportBid();
-        bid.setBandwidthBytes((int)dataSize);
-        bid.setExpiration(_context.clock().now() + 30*1000);
-        bid.setMessageSize((int)dataSize);
-        bid.setRouter(toAddress);
-        bid.setTransport(this);
-        int latency = 200;
-        if (!getIsConnected(toAddress.getIdentity()))
-            latency += 5000;
-        bid.setLatencyMs(latency);
-        
-        return bid;
+    
+        if (getIsConnected(toAddress.getIdentity()))
+            return _fastBid;
+        else
+            return _slowBid;
     }
     
     private boolean getIsConnected(RouterIdentity ident) {
@@ -174,8 +172,8 @@ public class TCPTransport extends TransportImpl {
             
             TCPConnection con = null;
             boolean newPeer = false;
+            Hash peer = msg.getTarget().getIdentity().calculateHash();
             synchronized (_connectionLock) {
-                Hash peer = msg.getTarget().getIdentity().calculateHash();
                 con = (TCPConnection)_connectionsByIdent.get(peer);
                 if (con == null) {
                     if (_log.shouldLog(Log.DEBUG)) {
@@ -196,10 +194,10 @@ public class TCPTransport extends TransportImpl {
                         newPeer = true;
                     }
                     msgs.add(msg);
+                    
+                    if (newPeer)
+                        _connectionLock.notifyAll();
                 }
-                
-                if (newPeer)
-                    _connectionLock.notifyAll();
             }
             
             if (con != null)
@@ -815,5 +813,14 @@ public class TCPTransport extends TransportImpl {
         
         return buf.toString();
     }
-    
+
+    /**
+     * Cache the bid to reduce object churn
+     */
+    private class SharedBid extends TransportBid {
+        private int _ms;
+        public SharedBid(int ms) { _ms = ms; }
+        public int getLatency() { return _ms; }
+        public Transport getTransport() { return TCPTransport.this; }
+    }    
 }

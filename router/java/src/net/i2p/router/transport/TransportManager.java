@@ -27,7 +27,6 @@ import net.i2p.data.i2np.DatabaseLookupMessage;
 import net.i2p.data.i2np.DatabaseSearchReplyMessage;
 import net.i2p.data.i2np.DatabaseStoreMessage;
 import net.i2p.data.i2np.I2NPMessage;
-import net.i2p.router.InNetMessage;
 import net.i2p.router.OutNetMessage;
 import net.i2p.router.RouterContext;
 import net.i2p.router.transport.tcp.TCPTransport;
@@ -120,14 +119,16 @@ public class TransportManager implements TransportEventListener {
     }
     
     public List getBids(OutNetMessage msg) {
+        List rv = new ArrayList(1);
+        rv.add(getBid(msg));
+        return rv;
+    }
+    public TransportBid getBid(OutNetMessage msg) {
         if (msg == null)
             throw new IllegalArgumentException("Null message?  no bidding on a null outNetMessage!");
         if (_context.router().getRouterInfo().equals(msg.getTarget()))
             throw new IllegalArgumentException("WTF, bids for a message bound to ourselves?");
 
-        HashSet bids = new HashSet();
-
-        Set addrs = msg.getTarget().getAddresses();
         Set failedTransports = msg.getFailedTransports();
         for (int i = 0; i < _transports.size(); i++) {
             Transport t = (Transport)_transports.get(i);
@@ -138,122 +139,23 @@ public class TransportManager implements TransportEventListener {
             // we always want to try all transports, in case there is a faster bidirectional one
             // already connected (e.g. peer only has a public PHTTP address, but they've connected
             // to us via TCP, send via TCP)
-            if (true || isSupported(addrs, t)) { 
-                TransportBid bid = t.bid(msg.getTarget(), msg.getMessageSize());
-                if (bid != null) {
-                    bids.add(bid);
-                    if (_log.shouldLog(Log.DEBUG))
-                        _log.debug("Transport " + t.getStyle() + " bid: " + bid);
-                } else {
-                    if (_log.shouldLog(Log.DEBUG))
-                        _log.debug("Transport " + t.getStyle() + " did not produce a bid");
-                }
-            }
-        }
-        List ordered = orderBids(bids, msg);
-        long delay = _context.clock().now() - msg.getCreated();
-        if (ordered.size() > 0) {
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Winning bid: " + ((TransportBid)ordered.get(0)).getTransport().getStyle());
-            if (delay > 5*1000) {
-                if (_log.shouldLog(Log.INFO))
-                    _log.info("Took too long to find this bid (" + delay + "ms)");
+            TransportBid bid = t.bid(msg.getTarget(), msg.getMessageSize());
+            if (bid != null) {
+                if (_log.shouldLog(Log.DEBUG))
+                    _log.debug("Transport " + t.getStyle() + " bid: " + bid);
+                return bid;
             } else {
                 if (_log.shouldLog(Log.DEBUG))
-                    _log.debug("Took a while to find this bid (" + delay + "ms)");
-            }
-        } else {
-            if (_log.shouldLog(Log.INFO))
-                _log.info("NO WINNING BIDS!  peer: " + msg.getTarget());
-            if (delay > 5*1000) {
-                if (_log.shouldLog(Log.INFO))
-                    _log.info("Took too long to fail (" + delay + "ms)");
-            } else {
-                if (_log.shouldLog(Log.DEBUG))
-                    _log.debug("Took a while to fail (" + delay + "ms)");
+                    _log.debug("Transport " + t.getStyle() + " did not produce a bid");
             }
         }
-        return ordered;
-    }
-    
-    private List orderBids(HashSet bids, OutNetMessage msg) {
-        if (bids.size() <= 1)
-            return new ArrayList(bids);
-        // db messages should go as fast as possible, while the others
-        // should use as little bandwidth as possible.  
-        I2NPMessage message = msg.getMessage();
-        if (message == null) return Collections.EMPTY_LIST;
-        switch (message.getType()) {
-            case DatabaseLookupMessage.MESSAGE_TYPE:
-            case DatabaseSearchReplyMessage.MESSAGE_TYPE:
-            case DatabaseStoreMessage.MESSAGE_TYPE:
-                if (_log.shouldLog(Log.DEBUG))
-                    _log.debug("Ordering by fastest");
-                return orderByFastest(bids, msg);
-            default:
-                if (_log.shouldLog(Log.DEBUG))
-                    _log.debug("Ordering by bandwidth");
-                return orderByBandwidth(bids, msg);
-            }
-    }
-    
-    private int getCost(RouterInfo target, String transportStyle) {
-        for (Iterator iter = target.getAddresses().iterator(); iter.hasNext();) {
-            RouterAddress addr = (RouterAddress)iter.next();
-            if (addr.getTransportStyle().equals(transportStyle))
-                return addr.getCost();
-        }
-        return 1;
-    }
-    
-    private List orderByFastest(HashSet bids, OutNetMessage msg) {
-        Map ordered = new TreeMap();
-        for (Iterator iter = bids.iterator(); iter.hasNext(); ) {
-            TransportBid bid = (TransportBid)iter.next();
-            int cur = bid.getLatencyMs();
-            int cost = getCost(msg.getTarget(), bid.getTransport().getStyle());
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Bid latency: " + (cur*cost) + " for transport " 
-                           + bid.getTransport().getStyle());
-            while (ordered.containsKey(new Integer(cur*cost)))
-                cur++;
-            ordered.put(new Integer(cur*cost), bid);
-        }
-        List bidList = new ArrayList(ordered.size());
-        for (Iterator iter = ordered.keySet().iterator(); iter.hasNext(); ) {
-            Object k = iter.next();
-            bidList.add(ordered.get(k));
-        }
-        return bidList;
-    }
-    private List orderByBandwidth(HashSet bids, OutNetMessage msg) {
-        Map ordered = new TreeMap();
-        for (Iterator iter = bids.iterator(); iter.hasNext(); ) {
-            TransportBid bid = (TransportBid)iter.next();
-            int cur = bid.getBandwidthBytes();
-            int cost = getCost(msg.getTarget(), bid.getTransport().getStyle());
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Bid size: " + (cur*cost) + " for transport " + bid.getTransport().getStyle());
-            while (ordered.containsKey(new Integer(cur*cost)))
-                cur++;
-            ordered.put(new Integer(cur*cost), bid);
-        }
-        List bidList = new ArrayList(ordered.size());
-        for (Iterator iter = ordered.keySet().iterator(); iter.hasNext(); ) {
-            Object k = iter.next();
-            bidList.add(ordered.get(k));
-        }
-        return bidList;
+        return null;
     }
     
     public void messageReceived(I2NPMessage message, RouterIdentity fromRouter, Hash fromRouterHash) {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("I2NPMessage received: " + message.getClass().getName(), new Exception("Where did I come from again?"));
-        InNetMessage msg = new InNetMessage(_context);
-        msg.setFromRouter(fromRouter);
-        msg.setFromRouterHash(fromRouterHash);
-        msg.setMessage(message);
-        int num = _context.inNetMessagePool().add(msg);
+        int num = _context.inNetMessagePool().add(message, fromRouter, fromRouterHash);
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Added to in pool: "+ num);
     }

@@ -136,6 +136,17 @@
       </New>
     </Arg>
   </Call>
+  
+  <Call name="addContext">
+    <Arg>/cgi-bin/*</Arg>
+    <Set name="ResourceBase">./eepsite/cgi-bin</Set>
+    <Call name="addServlet">
+      <Arg>Common Gateway Interface</Arg>
+      <Arg>/</Arg>
+      <Arg>org.mortbay.servlet.CGI</Arg>
+     <Put name="Path">/usr/local/bin:/usr/ucb:/bin:/usr/bin</Put>
+    </Call>
+  </Call>
 
   <!-- =============================================================== -->
   <!-- Configure the Request Log                                       -->

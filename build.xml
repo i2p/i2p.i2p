@@ -34,13 +34,12 @@
         <copy file="apps/routerconsole/java/build/routerconsole.jar" todir="build/" />
         <copy file="apps/routerconsole/java/build/routerconsole.war" todir="build/" />
         <copy file="apps/jetty/jettylib/org.mortbay.jetty.jar" todir="build/" />
-        <copy file="apps/jetty/jettylib/org.mortbay.jetty-jdk1.2.jar" todir="build/" />
         <copy file="apps/jetty/jettylib/ant.jar" todir="build/" />
         <copy file="apps/jetty/jettylib/jasper-compiler.jar" todir="build/" />
         <copy file="apps/jetty/jettylib/jasper-runtime.jar" todir="build/" />
-        <copy file="apps/jetty/jettylib/jnet.jar" todir="build/" />
+        <copy file="apps/jetty/jettylib/commons-logging.jar" todir="build/" />
+        <copy file="apps/jetty/jettylib/commons-el.jar" todir="build/" />
         <copy file="apps/jetty/jettylib/xercesImpl.jar" todir="build/" />
-        <copy file="apps/jetty/jettylib/xml-apis.jar" todir="build/" />
         <copy file="apps/jetty/jettylib/javax.servlet.jar" todir="build/" />
     </target>
     <target name="compile" />
@@ -161,13 +160,13 @@
         <copy file="build/i2ptunnel.jar" todir="pkg-temp/lib/" />
         <copy file="build/jasper-compiler.jar" todir="pkg-temp/lib/" />
         <copy file="build/jasper-runtime.jar" todir="pkg-temp/lib/" />
+        <copy file="build/commons-logging.jar" todir="pkg-temp/lib/" />
+        <copy file="build/commons-el.jar" todir="pkg-temp/lib/" />
         <copy file="build/javax.servlet.jar" todir="pkg-temp/lib/" />
         <copy file="build/jbigi.jar" todir="pkg-temp/lib" />
-        <copy file="build/jnet.jar" todir="pkg-temp/lib/" />
         <copy file="build/mstreaming.jar" todir="pkg-temp/lib/" />
         <copy file="build/streaming.jar" todir="pkg-temp/lib/" />
         <copy file="build/netmonitor.jar" todir="pkg-temp/lib/" />
-        <copy file="build/org.mortbay.jetty-jdk1.2.jar" todir="pkg-temp/lib/" />
         <copy file="build/org.mortbay.jetty.jar" todir="pkg-temp/lib/" />
         <copy file="build/router.jar" todir="pkg-temp/lib/" />
         <copy file="build/routerconsole.jar" todir="pkg-temp/lib/" />
@@ -178,7 +177,6 @@
         <copy file="apps/systray/java/resources/iggy.ico" todir="pkg-temp/icons" />
         <copy file="apps/systray/java/resources/iggy.xpm" todir="pkg-temp/icons" />
         <copy file="build/xercesImpl.jar" todir="pkg-temp/lib/" />
-        <copy file="build/xml-apis.jar" todir="pkg-temp/lib/" />
         <copy file="build/i2ptunnel.war" todir="pkg-temp/webapps/" />
         <copy file="build/routerconsole.war" todir="pkg-temp/webapps/" />
         <copy file="build/addressbook.war" todir="pkg-temp/webapps/" />
@@ -227,6 +225,7 @@
         <mkdir dir="pkg-temp/eepsite/webapps" />
         <mkdir dir="pkg-temp/eepsite/logs" />
         <mkdir dir="pkg-temp/eepsite/docroot" />
+        <mkdir dir="pkg-temp/eepsite/cgi-bin" />
         <copy file="installer/resources/eepsite_index.html" tofile="pkg-temp/eepsite/docroot/index.html" />
         <copy file="installer/resources/favicon.ico" tofile="pkg-temp/eepsite/docroot/favicon.ico" />
         <copy file="installer/resources/jetty.xml" tofile="pkg-temp/eepsite/jetty.xml" />
@@ -245,6 +244,18 @@
         <copy file="build/sam.jar" todir="pkg-temp/lib/" />
         <copy file="build/router.jar" todir="pkg-temp/lib/" />
         <copy file="build/routerconsole.jar" todir="pkg-temp/lib/" />
+        
+        <!-- for the i2p 0.5 release, push jetty 5.2.1 -->
+        <copy file="build/jasper-compiler.jar" todir="pkg-temp/lib/" />
+        <copy file="build/jasper-runtime.jar" todir="pkg-temp/lib/" />
+        <copy file="build/commons-logging.jar" todir="pkg-temp/lib/" />
+        <copy file="build/commons-el.jar" todir="pkg-temp/lib/" />
+        <copy file="build/org.mortbay.jetty.jar" todir="pkg-temp/lib/" />
+        <copy file="build/javax.servlet.jar" todir="pkg-temp/lib/" />
+        <!-- requires commons-* to be added to the classpath (boo, hiss) -->
+        <copy file="installer/resources/wrapper.config" todir="pkg-temp/" />
+        <touch file="pkg-temp/wrapper.config.updated" />
+        
         <copy file="build/i2ptunnel.war" todir="pkg-temp/webapps/" />
         <copy file="build/routerconsole.war" todir="pkg-temp/webapps/" />
         <copy file="build/addressbook.war" todir="pkg-temp/webapps/" />
@@ -252,6 +263,7 @@
         <copy file="hosts.txt" todir="pkg-temp/" />
         <mkdir dir="pkg-temp/eepsite" />
         <mkdir dir="pkg-temp/eepsite/webapps" />
+        <mkdir dir="pkg-temp/eepsite/cgi-bin" />
         <zip destfile="i2pupdate.zip" basedir="pkg-temp" />
     </target>
     <taskdef name="izpack" classpath="${basedir}/installer/lib/izpack/standalone-compiler.jar" classname="com.izforge.izpack.ant.IzPackTask" />

@@ -71,6 +71,11 @@ public class IsFailingCalculator extends Calculator {
             //    return true;
             //}
             
+            // if they have rejected us saying they're totally broken anytime in the last 
+            // 10 minutes, dont bother 'em
+            if (profile.getTunnelHistory().getLastRejectedCritical() > _context.clock().now() - 10*60*1000)
+                return true;
+            
             return false;
         }
     }

@@ -20,17 +20,25 @@ public class Timestamper implements Runnable {
     private List _servers;
     private List _listeners;
     private int _queryFrequency;
+    private int _concurringServers;
     private volatile boolean _disabled;
     private boolean _daemon;
+    private boolean _initialized;
     
     private static final int DEFAULT_QUERY_FREQUENCY = 5*60*1000;
     private static final String DEFAULT_SERVER_LIST = "pool.ntp.org, pool.ntp.org";
     private static final boolean DEFAULT_DISABLED = true;
+    /** how many times do we have to query if we are changing the clock? */
+    private static final int DEFAULT_CONCURRING_SERVERS = 2;
     
     public static final String PROP_QUERY_FREQUENCY = "time.queryFrequencyMs";
     public static final String PROP_SERVER_LIST = "time.sntpServerList";
     public static final String PROP_DISABLED = "time.disabled";
+    public static final String PROP_CONCURRING_SERVERS = "time.concurringServers";
     
+    /** if different SNTP servers differ by more than 10s, someone is b0rked */
+    private static final int MAX_VARIANCE = 10*1000;
+        
     public Timestamper(I2PAppContext ctx) {
         this(ctx, null, true);
     }
@@ -41,6 +49,7 @@ public class Timestamper implements Runnable {
     public Timestamper(I2PAppContext ctx, UpdateListener lsnr, boolean daemon) {
         _context = ctx;
         _daemon = daemon;
+        _initialized = false;
         _servers = new ArrayList(1);
         _listeners = new ArrayList(1);
         if (lsnr != null)
@@ -114,10 +123,7 @@ public class Timestamper implements Runnable {
                     if (_log.shouldLog(Log.DEBUG))
                         _log.debug("Querying servers " + _servers);
                     try {
-                        long now = NtpClient.currentTime(serverList);
-                        if (_log.shouldLog(Log.DEBUG))
-                            _log.debug("Stamp time");
-                        stampTime(now);
+                        queryTime(serverList);
                     } catch (IllegalArgumentException iae) {
                         if (!alreadyBitched) 
                             _log.log(Log.CRIT, "Unable to reach any of the NTP servers - network disconnected?");
@@ -132,6 +138,35 @@ public class Timestamper implements Runnable {
         }
     }
     
+    private void queryTime(String serverList[]) throws IllegalArgumentException {
+        long localTime = -1;
+        long now = -1;
+        long expectedDelta = 0;
+        for (int i = 0; i < _concurringServers; i++) {
+            localTime = _context.clock().now();
+            now = NtpClient.currentTime(serverList);
+            
+            long delta = now - localTime;
+            if (i == 0) {
+                if (Math.abs(delta) < MAX_VARIANCE) {
+                    if (_log.shouldLog(Log.INFO))
+                        _log.info("a single SNTP query was within the tolerance (" + delta + "ms)");
+                    return;
+                } else {
+                    // outside the tolerance, lets iterate across the concurring queries
+                    expectedDelta = delta;
+                }
+            } else {
+                if (Math.abs(delta - expectedDelta) > MAX_VARIANCE) {
+                    if (_log.shouldLog(Log.ERROR))
+                        _log.error("SNTP client variance exceeded at query " + i + ".  expected = " + expectedDelta + ", found = " + delta);
+                    return;
+                }
+            }
+        }
+        stampTime(now);
+    }
+    
     /**
      * Send an HTTP request to a given URL specifying the current time 
      */
@@ -142,6 +177,8 @@ public class Timestamper implements Runnable {
                 lsnr.setNow(now);
             }
         }
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("Stamped the time as " + now);
     }
  
     /**
@@ -185,6 +222,31 @@ public class Timestamper implements Runnable {
         if (disabled == null)
             disabled = DEFAULT_DISABLED + "";
         _disabled = Boolean.valueOf(disabled).booleanValue();
+        
+        String concurring = _context.getProperty(PROP_CONCURRING_SERVERS);
+        if (concurring == null) {
+            _concurringServers = DEFAULT_CONCURRING_SERVERS;
+        } else {
+            try {
+                int servers = Integer.parseInt(concurring);
+                if ( (servers > 0) && (servers < 5) )
+                    _concurringServers = servers;
+                else
+                    _concurringServers = DEFAULT_CONCURRING_SERVERS;
+            } catch (NumberFormatException nfe) {
+                _concurringServers = DEFAULT_CONCURRING_SERVERS;
+            }
+        }
+    }
+    
+    public static void main(String args[]) {
+        System.setProperty(PROP_DISABLED, "false");
+        System.setProperty(PROP_QUERY_FREQUENCY, "30000");
+        I2PAppContext ctx = I2PAppContext.getGlobalContext();
+        long now = ctx.clock().now();
+        for (int i = 0; i < 5*60*1000; i += 61*1000) {
+            try { Thread.sleep(61*1000); } catch (InterruptedException ie) {}
+        }
     }
     
     /**

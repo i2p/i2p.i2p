@@ -39,6 +39,7 @@ public class ConfigNetHandler extends FormHandler {
     private String _outboundRate;
     private String _outboundBurst;
     private String _reseedFrom;
+    private String _sharePct;
     
     public void ConfigNetHandler() {
         _guessRequested = false;
@@ -84,6 +85,9 @@ public class ConfigNetHandler extends FormHandler {
     }
     public void setReseedfrom(String url) { 
         _reseedFrom = (url != null ? url.trim() : null); 
+    }
+    public void setSharePercentage(String pct) {
+        _sharePct = (pct != null ? pct.trim() : null);
     }
 
     private static final String IP_PREFIX = "<h1>Your IP is ";
@@ -228,6 +232,14 @@ public class ConfigNetHandler extends FormHandler {
         }
         
         updateRates();
+        
+        if (_sharePct != null) {
+            String old = _context.router().getConfigSetting(ConfigNetHelper.PROP_SHARE_PERCENTAGE);
+            if ( (old == null) || (!old.equalsIgnoreCase(_sharePct)) ) {
+                _context.router().setConfigSetting(ConfigNetHelper.PROP_SHARE_PERCENTAGE, _sharePct);
+                addFormNotice("Updating bandwidth share percentage");
+            }
+        }
         
         if (_timeSyncEnabled) {
             // Time sync enable, means NOT disabled 

@@ -8,8 +8,6 @@ package net.i2p.router.transport;
  *
  */
 
-import java.util.Date;
-
 import net.i2p.data.RouterInfo;
 
 /**
@@ -22,16 +20,16 @@ public class TransportBid {
     private int _bandwidthBytes;
     private int _msgSize;
     private RouterInfo _router;
-    private Date _bidExpiration;
+    private long _bidExpiration;
     private Transport _transport;
     
     public TransportBid() {
-	setLatencyMs(-1);
-	setBandwidthBytes(-1);
-	setMessageSize(-1);
-	setRouter(null);
-	setExpiration(null);
-	setTransport(null);
+        setLatencyMs(-1);
+        setBandwidthBytes(-1);
+        setMessageSize(-1);
+        setRouter(null);
+        setExpiration(0);
+        setTransport(null);
     }
     
     /**
@@ -65,9 +63,9 @@ public class TransportBid {
     /**
      * Specifies how long this bid is "good for"
      */
-    public Date getExpiration() { return _bidExpiration; }
-    public void setExpiration(Date expirationDate) { _bidExpiration = expirationDate; }
-    public void setExpiration(long expirationDate) { setExpiration(new Date(expirationDate)); }
+    public long getExpiration() { return _bidExpiration; }
+    public void setExpiration(long expirationDate) { _bidExpiration = expirationDate; }
+    //public void setExpiration(long expirationDate) { setExpiration(new Date(expirationDate)); }
     
     /**
      * Specifies the transport that offered this bid

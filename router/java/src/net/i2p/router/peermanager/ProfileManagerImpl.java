@@ -93,15 +93,14 @@ public class ProfileManagerImpl implements ProfileManager {
     /**
      * Note that a router explicitly rejected joining a tunnel.  
      *
-     * @param explicit true if the tunnel request was explicitly rejected, false
-     *                 if we just didn't get a reply back in time.
+     * @param severity how much the peer doesnt want to participate in the 
+     *                 tunnel (large == more severe)
      */
-    public void tunnelRejected(Hash peer, long responseTimeMs, boolean explicit) {
+    public void tunnelRejected(Hash peer, long responseTimeMs, int severity) {
         PeerProfile data = getProfile(peer);
         if (data == null) return;
         data.setLastHeardFrom(_context.clock().now());
-        if (explicit)
-            data.getTunnelHistory().incrementRejected();
+        data.getTunnelHistory().incrementRejected(severity);
     }
     
     /**

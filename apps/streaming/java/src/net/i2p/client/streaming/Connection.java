@@ -12,6 +12,7 @@ import java.util.TreeMap;
 import net.i2p.I2PAppContext;
 import net.i2p.client.I2PSession;
 import net.i2p.data.Base64;
+import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
 import net.i2p.data.SessionTag;
 import net.i2p.util.Log;
@@ -80,8 +81,8 @@ public class Connection {
     /** wait up to 5 minutes after disconnection so we can ack/close packets */
     public static int DISCONNECT_TIMEOUT = 5*60*1000;
     
-    /** lets be sane- no more than 32 packets in the air in each dir */
-    public static final int MAX_WINDOW_SIZE = 32;
+    /** lets be sane- no more than 64 packets in the air in each dir */
+    public static final int MAX_WINDOW_SIZE = 64;
     
     public Connection(I2PAppContext ctx, ConnectionManager manager, SchedulerChooser chooser, PacketQueue queue, ConnectionPacketHandler handler) {
         this(ctx, manager, chooser, queue, handler, null);
@@ -106,7 +107,7 @@ public class Connection {
         _unackedPacketsReceived = 0;
         _congestionWindowEnd = 0;
         _highestAckedThrough = -1;
-        _lastCongestionSeenAt = MAX_WINDOW_SIZE;
+        _lastCongestionSeenAt = MAX_WINDOW_SIZE*2; // lets allow it to grow
         _lastCongestionTime = -1;
         _lastCongestionHighestUnacked = -1;
         _connectionManager = manager;
@@ -767,6 +768,21 @@ public class Connection {
                     buf.append(" ").append(nacks[i]);
             buf.append("]");
         }
+        
+        if (getResetSent())
+            buf.append(" reset sent");
+        if (getResetReceived())
+            buf.append(" reset received");
+        if (getCloseSentOn() > 0) {
+            buf.append(" close sent ");
+            long timeSinceClose = _context.clock().now() - getCloseSentOn();
+            buf.append(DataHelper.formatDuration(timeSinceClose));
+            buf.append(" ago");
+        }
+        if (getCloseReceivedOn() > 0)
+            buf.append(" close received");
+        buf.append(" acked packets ").append(getAckedPackets());
+        
         buf.append("]");
         return buf.toString();
     }

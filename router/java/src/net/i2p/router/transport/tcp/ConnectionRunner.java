@@ -8,7 +8,7 @@ import net.i2p.data.DataHelper;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.RouterInfo;
 import net.i2p.data.i2np.I2NPMessage;
-import net.i2p.data.i2np.DeliveryStatusMessage;
+import net.i2p.data.i2np.DateMessage;
 import net.i2p.router.OutNetMessage;
 import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
@@ -139,13 +139,9 @@ class ConnectionRunner implements Runnable {
      *
      */
     private I2NPMessage buildTimeMessage() {
-        // holy crap this is a kludge - strapping ourselves into a 
-        // deliveryStatusMessage
-        DeliveryStatusMessage tm = new DeliveryStatusMessage(_context);
-        tm.setArrival(new Date(_context.clock().now()));
-        tm.setMessageId(0);
-        tm.setUniqueId(0);
-        return tm;
+        DateMessage dm = new DateMessage(_context);
+        dm.setNow(_context.clock().now());
+        return dm;
     }
     
     /**

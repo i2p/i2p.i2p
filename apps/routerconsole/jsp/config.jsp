@@ -39,14 +39,17 @@
  
  <b>Bandwidth limiter</b><br />
  Inbound rate: 
-    <input name="inboundrate" type="text" size="2" value="<jsp:getProperty name="nethelper" property="inboundRate" />" /> KBytes per second<br />
- Inbound burst duration:
+    <input name="inboundrate" type="text" size="2" value="<jsp:getProperty name="nethelper" property="inboundRate" />" /> KBytes per second
+ bursting up to 
     <jsp:getProperty name="nethelper" property="inboundBurstFactorBox" /><br />
  Outbound rate:
-    <input name="outboundrate" type="text" size="2" value="<jsp:getProperty name="nethelper" property="outboundRate" />" /> KBytes per second<br />
- Outbound burst duration:
+    <input name="outboundrate" type="text" size="2" value="<jsp:getProperty name="nethelper" property="outboundRate" />" /> KBytes per second
+ bursting up to 
   <jsp:getProperty name="nethelper" property="outboundBurstFactorBox" /><br />
  <i>A negative rate means there is no limit</i><br />
+ Bandwidth share percentage:
+   <jsp:getProperty name="nethelper" property="sharePercentageBox" /><br />
+ Sharing a higher percentage will improve your anonymity and help the network
  <hr />
  Enable internal time synchronization? <input type="checkbox" <jsp:getProperty name="nethelper" property="enableTimeSyncChecked" /> name="enabletimesync" /><br />
  <i>If disabled, your machine <b>must</b> be NTP synchronized - your clock must always
@@ -61,17 +64,7 @@
  <hr />
  <b>Advanced network config:</b>
  <p>
- There are two other network settings, but no one reads this text so there's no reason
- to tell you about them.  In case you actually do read this, here's the deal: by default,
- I2P will attempt to guess your IP address by having whomever it talks to tell it what 
- address they think you are.  If and only if you have no working TCP connections and you
- have not overridden the IP address, your router will believe them.  If that doesn't sound
- ok to you, thats fine - go to the <a href="configadvanced.jsp">advanced config</a> page
- and add "i2np.tcp.hostname=yourHostname", then go to the 
- <a href="configservice.jsp">service</a> page and do a graceful restart.  We used to make
- people enter a hostname/IP address on this page, but too many people got it wrong ;)</p>
- 
- <p>The other advanced network option has to do with reseeding - you should never need to 
+ One advanced network option has to do with reseeding - you should never need to 
  reseed your router as long as you can find at least one other peer on the network.  However,
  when you do need to reseed, a link will show up on the left hand side which will
  fetch all of the routerInfo-* files from http://dev.i2p.net/i2pdb/.  That URL is just an

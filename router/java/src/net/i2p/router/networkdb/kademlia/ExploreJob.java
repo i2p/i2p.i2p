@@ -72,7 +72,7 @@ class ExploreJob extends SearchJob {
         msg.setSearchKey(getState().getTarget());
         msg.setFrom(replyGateway.getIdentity().getHash());
         msg.setDontIncludePeers(getState().getAttempted());
-        msg.setMessageExpiration(new Date(expiration));
+        msg.setMessageExpiration(expiration);
         msg.setReplyTunnel(replyTunnelId);
         
         Set attempted = getState().getAttempted();

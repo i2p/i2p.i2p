@@ -4,7 +4,9 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
+import java.io.OutputStream;
 
+import java.net.Socket;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.HashSet;
@@ -103,8 +105,17 @@ public class ReseedHandler {
     
     private static byte[] readURL(URL url) throws Exception {
         ByteArrayOutputStream baos = new ByteArrayOutputStream(1024);
-        URLConnection con = url.openConnection();
-        InputStream in = con.getInputStream();
+        String hostname = url.getHost();
+        int port = url.getPort();
+        if (port < 0)
+            port = 80;
+        Socket s = new Socket(hostname, port);
+        OutputStream out = s.getOutputStream();
+        InputStream in = s.getInputStream();
+        String request = getRequest(url);
+        System.out.println("Sending to " + hostname +":"+ port + ": " + request);
+        out.write(request.getBytes());
+        out.flush();
         byte buf[] = new byte[1024];
         while (true) {
             int read = in.read(buf);
@@ -113,7 +124,22 @@ public class ReseedHandler {
             baos.write(buf, 0, read);
         }
         in.close();
+        s.close();
         return baos.toByteArray();
+    }
+    
+    private static String getRequest(URL url) {
+        StringBuffer buf = new StringBuffer(512);
+        String path = url.getPath();
+        if ("".equals(path))
+            path = "/";
+        buf.append("GET ").append(path).append(" HTTP/1.0\n");
+        buf.append("Host: ").append(url.getHost());
+        int port = url.getPort();
+        if ( (port > 0) && (port != 80) )
+            buf.append(":").append(port);
+        buf.append("\nConnection: close\n\n");
+        return buf.toString();
     }
     
     private static void writeSeed(String name, byte data[]) throws Exception {
@@ -125,5 +151,10 @@ public class ReseedHandler {
         FileOutputStream fos = new FileOutputStream(new File(netDbDir, "routerInfo-" + name + ".dat"));
         fos.write(data);
         fos.close();
+    }
+    
+    public static void main(String args[]) {
+        reseed();
+        System.out.println("Done reseeding");
     }
 }

@@ -18,6 +18,7 @@ public class Clock implements Timestamper.UpdateListener {
     private I2PAppContext _context;
     private Timestamper _timestamper;
     private long _startedOn;
+    private boolean _statCreated;
     
     public Clock(I2PAppContext context) {
         _context = context;
@@ -26,6 +27,7 @@ public class Clock implements Timestamper.UpdateListener {
         _listeners = new HashSet(64);
         _timestamper = new Timestamper(context, this);
         _startedOn = System.currentTimeMillis();
+        _statCreated = false;
     }
     public static Clock getInstance() {
         return I2PAppContext.getGlobalContext().clock();
@@ -78,10 +80,15 @@ public class Clock implements Timestamper.UpdateListener {
                 return;
             }
         }
-        if (_alreadyChanged)
+        if (_alreadyChanged) {
             getLog().log(Log.CRIT, "Updating clock offset to " + offsetMs + "ms from " + _offset + "ms");
-        else
+            if (!_statCreated)
+                _context.statManager().createRateStat("clock.skew", "How far is the already adjusted clock being skewed?", "Clock", new long[] { 10*60*1000, 3*60*60*1000, 24*60*60*60 });
+                _statCreated = true;
+            _context.statManager().addRateData("clock.skew", delta, 0);
+        } else {
             getLog().log(Log.INFO, "Initializing clock offset to " + offsetMs + "ms from " + _offset + "ms");
+        }
         _alreadyChanged = true;
         _offset = offsetMs;
         fireOffsetChanged(delta);

@@ -343,7 +343,9 @@ public class ClientConnectionRunner {
      */
     void requestLeaseSet(LeaseSet set, long expirationTime, Job onCreateJob, Job onFailedJob) {
         if (_dead) return;
-        _context.jobQueue().addJob(new RequestLeaseSetJob(_context, this, set, expirationTime, onCreateJob, onFailedJob));
+        if ( (_currentLeaseSet != null) && (_currentLeaseSet.equals(set)) )
+            return; // no change
+        _context.jobQueue().addJob(new RequestLeaseSetJob(_context, this, set, _context.clock().now() + expirationTime, onCreateJob, onFailedJob));
     }
 
     void disconnected() {

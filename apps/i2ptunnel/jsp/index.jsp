@@ -11,13 +11,6 @@
 <b><jsp:getProperty name="helper" property="actionResults" /></b>
  
 <jsp:getProperty name="helper" property="summaryList" />
-<hr />
-<form action="index.jsp" method="GET">
- <input type="submit" name="action" value="Stop all" />
- <input type="submit" name="action" value="Start all" />
- <input type="submit" name="action" value="Restart all" />
- <input type="submit" name="action" value="Reload config" />
-</form>
 
 <form action="edit.jsp">
 <b>Add new:</b> 

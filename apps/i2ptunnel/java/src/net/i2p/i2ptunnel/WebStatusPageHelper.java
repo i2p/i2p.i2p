@@ -14,14 +14,17 @@ import net.i2p.util.Log;
  *
  */
 public class WebStatusPageHelper {
+    private I2PAppContext _context;
     private Log _log;
     private String _action;
     private int _controllerNum;
+    private long _nonce;
     
     public WebStatusPageHelper() {
+        _context = I2PAppContext.getGlobalContext();
         _action = null;
         _controllerNum = -1;
-        _log = I2PAppContext.getGlobalContext().logManager().getLog(WebStatusPageHelper.class);
+        _log = _context.logManager().getLog(WebStatusPageHelper.class);
     }
     
     public void setAction(String action) {
@@ -34,6 +37,14 @@ public class WebStatusPageHelper {
             } catch (NumberFormatException nfe) {
                 _controllerNum = -1;
             }
+        }
+    }
+    public void setNonce(long nonce) { _nonce = nonce; }
+    public void setNonce(String nonce) {
+        if (nonce != null) {
+            try { 
+                _nonce = Long.parseLong(nonce); 
+            } catch (NumberFormatException nfe) {}
         }
     }
     
@@ -51,28 +62,44 @@ public class WebStatusPageHelper {
         if (group == null)
             return "<b>I2PTunnel instances not yet started - please be patient</b>\n";
             
+        long nonce = _context.random().nextLong();
         StringBuffer buf = new StringBuffer(4*1024);
         buf.append("<ul>");
         List tunnels = group.getControllers();
         for (int i = 0; i < tunnels.size(); i++) {
             buf.append("<li>\n");
-            getSummary(buf, i, (TunnelController)tunnels.get(i));
+            getSummary(buf, i, (TunnelController)tunnels.get(i), nonce);
             buf.append("</li>\n");
         }
         buf.append("</ul>");
+        
+        buf.append("<hr /><form action=\"index.jsp\" method=\"GET\">\n");
+        buf.append("<input type=\"hidden\" name=\"nonce\" value=\"").append(nonce).append("\" />\n");
+        buf.append("<input type=\"submit\" name=\"action\" value=\"Stop all\" />\n");
+        buf.append("<input type=\"submit\" name=\"action\" value=\"Start all\" />\n");
+        buf.append("<input type=\"submit\" name=\"action\" value=\"Restart all\" />\n");
+        buf.append("<input type=\"submit\" name=\"action\" value=\"Reload config\" />\n");        
+        buf.append("</form>\n");
+        
+        System.setProperty(getClass().getName() + ".nonce", nonce+"");
+        
         return buf.toString();
     }
     
-    private void getSummary(StringBuffer buf, int num, TunnelController controller) {
+    private void getSummary(StringBuffer buf, int num, TunnelController controller, long nonce) {
         buf.append("<b>").append(controller.getName()).append("</b>: ");
         if (controller.getIsRunning()) {
             buf.append("<i>running</i> ");
-            buf.append("<a href=\"index.jsp?num=").append(num).append("&action=stop\">stop</a> ");
+            buf.append("<a href=\"index.jsp?num=").append(num);
+            buf.append("&nonce=").append(nonce);
+            buf.append("&action=stop\">stop</a> ");
         } else if (controller.getIsStarting()) {
             buf.append("<i>startup in progress (please be patient)</i>");
         } else {
             buf.append("<i>not running</i> ");
-            buf.append("<a href=\"index.jsp?num=").append(num).append("&action=start\">start</a> ");
+            buf.append("<a href=\"index.jsp?num=").append(num);
+            buf.append("&nonce=").append(nonce);
+            buf.append("&action=start\">start</a> ");
         }
         buf.append("<a href=\"edit.jsp?num=").append(num).append("\">edit</a> ");
         buf.append("<br />\n");
@@ -82,6 +109,9 @@ public class WebStatusPageHelper {
     private String processAction() {
         if ( (_action == null) || (_action.trim().length() <= 0) )
             return getMessages();
+        String expected = System.getProperty(getClass().getName() + ".nonce");
+        if ( (expected == null) || (!expected.equals(Long.toString(_nonce))) )
+            return "<b>Invalid nonce, are you being spoofed?</b>";
         if ("Stop all".equals(_action)) 
             return stopAll();
         else if ("Start all".equals(_action))
@@ -139,7 +169,7 @@ public class WebStatusPageHelper {
         List controllers = group.getControllers();
         if (_controllerNum >= controllers.size()) return "Invalid tunnel";
         TunnelController controller = (TunnelController)controllers.get(_controllerNum);
-        controller.startTunnel();
+        controller.startTunnelBackground();
         return getMessages(controller.clearMessages());
     }
     

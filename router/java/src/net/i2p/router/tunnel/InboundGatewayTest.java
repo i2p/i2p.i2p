@@ -61,7 +61,7 @@ public class InboundGatewayTest {
             DataMessage m = new DataMessage(_context);
             m.setData(new byte[64]);
             java.util.Arrays.fill(m.getData(), (byte)0xFF);
-            m.setMessageExpiration(new Date(_context.clock().now() + 60*1000));
+            m.setMessageExpiration(_context.clock().now() + 60*1000);
             m.setUniqueId(_context.random().nextLong(I2NPMessage.MAX_ID_VALUE));
             _log.debug("Sending " + m.getUniqueId());
             byte data[] = m.toByteArray();
@@ -89,7 +89,7 @@ public class InboundGatewayTest {
             DataMessage m = new DataMessage(_context);
             m.setData(new byte[64]);
             java.util.Arrays.fill(m.getData(), (byte)0xFF);
-            m.setMessageExpiration(new Date(_context.clock().now() + 60*1000));
+            m.setMessageExpiration(_context.clock().now() + 60*1000);
             m.setUniqueId(_context.random().nextLong(I2NPMessage.MAX_ID_VALUE));
             Hash to = new Hash(new byte[Hash.HASH_LENGTH]);
             java.util.Arrays.fill(to.getData(), (byte)0xFF);
@@ -119,7 +119,7 @@ public class InboundGatewayTest {
             DataMessage m = new DataMessage(_context);
             m.setData(new byte[64]);
             java.util.Arrays.fill(m.getData(), (byte)0xFF);
-            m.setMessageExpiration(new Date(_context.clock().now() + 60*1000));
+            m.setMessageExpiration(_context.clock().now() + 60*1000);
             m.setUniqueId(_context.random().nextLong(I2NPMessage.MAX_ID_VALUE));
             Hash to = new Hash(new byte[Hash.HASH_LENGTH]);
             java.util.Arrays.fill(to.getData(), (byte)0xFF);
@@ -150,7 +150,7 @@ public class InboundGatewayTest {
             DataMessage m = new DataMessage(_context);
             m.setData(new byte[1024]);
             java.util.Arrays.fill(m.getData(), (byte)0xFF);
-            m.setMessageExpiration(new Date(_context.clock().now() + 60*1000));
+            m.setMessageExpiration(_context.clock().now() + 60*1000);
             m.setUniqueId(_context.random().nextLong(I2NPMessage.MAX_ID_VALUE));
             _log.debug("Sending " + m.getUniqueId());
             byte data[] = m.toByteArray();
@@ -183,7 +183,7 @@ public class InboundGatewayTest {
         public void receiveEncrypted(byte[] encrypted) {
             // fake all the hops...
             
-            for (int i = 1; i <= _config.getLength() - 1; i++) {
+            for (int i = 1; i <= _config.getLength() - 2; i++) {
                 HopProcessor hop = new HopProcessor(_context, _config.getConfig(i));
                 boolean ok = hop.process(encrypted, 0, encrypted.length, _config.getConfig(i).getReceiveFrom());
                 if (!ok)
@@ -194,7 +194,7 @@ public class InboundGatewayTest {
             
             // now handle it at the endpoint
             InboundEndpointProcessor end = new InboundEndpointProcessor(_context, _config);
-            boolean ok = end.retrievePreprocessedData(encrypted, 0, encrypted.length, _config.getPeer(_config.getLength()-1));
+            boolean ok = end.retrievePreprocessedData(encrypted, 0, encrypted.length, _config.getPeer(_config.getLength()-2));
             if (!ok)
                 _log.error("Error retrieving cleartext at the endpoint");
             

@@ -180,7 +180,7 @@ public class TunnelControllerGroup {
         List msgs = new ArrayList();
         for (int i = 0; i < _controllers.size(); i++) {
             TunnelController controller = (TunnelController)_controllers.get(i);
-            controller.startTunnel();
+            controller.startTunnelBackground();
             msgs.addAll(controller.clearMessages());
         }
 

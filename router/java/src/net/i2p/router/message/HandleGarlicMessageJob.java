@@ -18,8 +18,11 @@ import java.util.Set;
 
 import net.i2p.data.Hash;
 import net.i2p.data.RouterIdentity;
+import net.i2p.data.i2np.DeliveryInstructions;
 import net.i2p.data.i2np.GarlicClove;
 import net.i2p.data.i2np.GarlicMessage;
+import net.i2p.data.i2np.I2NPMessage;
+import net.i2p.data.i2np.TunnelGatewayMessage;
 import net.i2p.router.JobImpl;
 import net.i2p.router.LeaseSetKeys;
 import net.i2p.router.Router;
@@ -33,13 +36,13 @@ import net.i2p.util.Log;
  * need to be. soon)
  *
  */
-public class HandleGarlicMessageJob extends JobImpl {
+public class HandleGarlicMessageJob extends JobImpl implements GarlicMessageReceiver.CloveReceiver {
     private Log _log;
     private GarlicMessage _message;
     private RouterIdentity _from;
     private Hash _fromHash;
     private Map _cloves; // map of clove Id --> Expiration of cloves we've already seen
-    private MessageHandler _handler;
+    //private MessageHandler _handler;
     private GarlicMessageParser _parser;
    
     private final static int FORWARD_PRIORITY = 50;
@@ -54,126 +57,56 @@ public class HandleGarlicMessageJob extends JobImpl {
         _from = from;
         _fromHash = fromHash;
         _cloves = new HashMap();
-        _handler = new MessageHandler(context);
+        //_handler = new MessageHandler(context);
         _parser = new GarlicMessageParser(context);
     }
     
     public String getName() { return "Handle Inbound Garlic Message"; }
     public void runJob() {
-        CloveSet set = _parser.getGarlicCloves(_message, getContext().keyManager().getPrivateKey());
-        if (set == null) {
-            Set keys = getContext().keyManager().getAllKeys();
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Decryption with the router's key failed, now try with the " + keys.size() + " leaseSet keys");
-            // our router key failed, which means that it was either encrypted wrong 
-            // or it was encrypted to a LeaseSet's PublicKey
-            for (Iterator iter = keys.iterator(); iter.hasNext();) {
-                LeaseSetKeys lskeys = (LeaseSetKeys)iter.next();
-                set = _parser.getGarlicCloves(_message, lskeys.getDecryptionKey());
-                if (set != null) {
+        GarlicMessageReceiver recv = new GarlicMessageReceiver(getContext(), this);
+        recv.receive(_message);
+    }
+    
+    public void handleClove(DeliveryInstructions instructions, I2NPMessage data) {
+        switch (instructions.getDeliveryMode()) {
+            case DeliveryInstructions.DELIVERY_MODE_LOCAL:
+                if (_log.shouldLog(Log.DEBUG))
+                    _log.debug("local delivery instructions for clove: " + data);
+                getContext().inNetMessagePool().add(data, null, null);
+                return;
+            case DeliveryInstructions.DELIVERY_MODE_DESTINATION:
+                if (_log.shouldLog(Log.ERROR))
+                    _log.error("this message didn't come down a tunnel, not forwarding to a destination: " 
+                               + instructions + " - " + data);
+                return;
+            case DeliveryInstructions.DELIVERY_MODE_ROUTER:
+                if (getContext().routerHash().equals(instructions.getRouter())) {
                     if (_log.shouldLog(Log.DEBUG))
-                        _log.debug("Decrypted garlic message with lease set key for destination " 
-                                   + lskeys.getDestination().calculateHash().toBase64() + " SUCCEEDED: " + set);
-                    break;
+                        _log.debug("router delivery instructions targetting us");
+                    getContext().inNetMessagePool().add(data, null, null);
                 } else {
                     if (_log.shouldLog(Log.DEBUG))
-                        _log.debug("Decrypting garlic message with lease set key for destination " 
-                                   + lskeys.getDestination().calculateHash().toBase64() + " failed");
+                        _log.debug("router delivery instructions targetting " 
+                                   + instructions.getRouter().toBase64().substring(0,4));
+                    SendMessageDirectJob j = new SendMessageDirectJob(getContext(), data, 
+                                                                      instructions.getRouter(), 
+                                                                      10*1000, 100);
+                    getContext().jobQueue().addJob(j);
                 }
-            }
-        } else {
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Decrypted clove set found " + set.getCloveCount() + " cloves: " + set);
+                return;
+            case DeliveryInstructions.DELIVERY_MODE_TUNNEL:
+                TunnelGatewayMessage gw = new TunnelGatewayMessage(getContext());
+                gw.setMessage(data);
+                gw.setTunnelId(instructions.getTunnelId());
+                gw.setMessageExpiration(data.getMessageExpiration());
+                getContext().jobQueue().addJob(new SendMessageDirectJob(getContext(), gw, 
+                                                                        instructions.getRouter(), 
+                                                                        10*1000, 100));
+                return;
+            default:
+                _log.error("Unknown instruction " + instructions.getDeliveryMode() + ": " + instructions);
+                return;
         }
-        if (set != null) {
-            for (int i = 0; i < set.getCloveCount(); i++) {
-                GarlicClove clove = set.getClove(i);
-                handleClove(clove);
-            }
-        } else {
-            if (_log.shouldLog(Log.ERROR))
-                _log.error("CloveMessageParser failed to decrypt the message [" + _message.getUniqueId() 
-                           + "] to us when received from [" + _fromHash + "] / [" + _from + "]", 
-                           new Exception("Decrypt garlic failed"));
-            getContext().statManager().addRateData("crypto.garlic.decryptFail", 1, 0);
-            getContext().messageHistory().messageProcessingError(_message.getUniqueId(), 
-                                                                _message.getClass().getName(), 
-                                                                "Garlic could not be decrypted");
-        }
-    }
-    
-    private boolean isKnown(long cloveId) {
-        boolean known = false;
-        synchronized (_cloves) {
-            known = _cloves.containsKey(new Long(cloveId));
-        }
-        if (_log.shouldLog(Log.DEBUG))
-            _log.debug("isKnown("+cloveId+"): " + known);
-        return known;
-    }
-    
-    private void cleanupCloves() {
-        // this should be in its own thread perhaps?  and maybe _cloves should be
-        // synced to disk?
-        List toRemove = new ArrayList(32);
-        long now = getContext().clock().now();
-        synchronized (_cloves) {
-            for (Iterator iter = _cloves.keySet().iterator(); iter.hasNext();) {
-                Long id = (Long)iter.next();
-                Date exp = (Date)_cloves.get(id);
-                if (exp == null) continue; // wtf, not sure how this can happen yet, but i've seen it.  grr.
-                if (now > exp.getTime())
-                    toRemove.add(id);
-            }
-            for (int i = 0; i < toRemove.size(); i++)
-                _cloves.remove(toRemove.get(i));
-        }
-    }
-    
-    private boolean isValid(GarlicClove clove) {
-        if (isKnown(clove.getCloveId())) {
-            if (_log.shouldLog(Log.ERROR))
-                _log.error("Duplicate garlic clove received - replay attack in progress? [cloveId = "
-                           + clove.getCloveId() + " expiration = " + clove.getExpiration());
-            return false;
-        } else {
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Clove " + clove.getCloveId() + " expiring on " + clove.getExpiration() 
-                           + " is not known");
-        }
-        long now = getContext().clock().now();
-        if (clove.getExpiration().getTime() < now) {
-            if (clove.getExpiration().getTime() < now + Router.CLOCK_FUDGE_FACTOR) {
-                if (_log.shouldLog(Log.WARN))
-                    _log.warn("Expired garlic received, but within our fudge factor [" 
-                              + clove.getExpiration() + "]");
-            } else {
-                if (_log.shouldLog(Log.DEBUG))
-                    _log.debug("Expired garlic clove received - replay attack in progress? [cloveId = " 
-                               + clove.getCloveId() + " expiration = " + clove.getExpiration() 
-                               + " now = " + (new Date(getContext().clock().now())));
-                return false;
-            }
-        }
-        synchronized (_cloves) {
-            _cloves.put(new Long(clove.getCloveId()), clove.getExpiration());
-        }
-        cleanupCloves();
-        return true;
-    }
-    
-    private void handleClove(GarlicClove clove) {
-        if (!isValid(clove)) {
-            if (_log.shouldLog(Log.DEBUG))
-                _log.warn("Invalid clove " + clove);
-            return;
-        } 
-        long sendExpiration = clove.getExpiration().getTime();
-        // if the clove targets something remote, tunnel route it
-        boolean sendDirect = false; 
-        _handler.handleMessage(clove.getInstructions(), clove.getData(), 
-                               clove.getCloveId(), _from, _fromHash, 
-                               sendExpiration, FORWARD_PRIORITY, sendDirect);
     }
     
     public void dropped() {

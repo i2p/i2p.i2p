@@ -19,42 +19,22 @@ import net.i2p.data.TunnelId;
  *
  */ 
 public interface TunnelManagerFacade extends Service {
-
-    /** 
-     * React to a request to join the specified tunnel.
-     *
-     * @return true if the router will accept participation, else false.
-     */
-    boolean joinTunnel(TunnelInfo info);
     /**
      * Retrieve the information related to a particular tunnel
      *
+     * @param id the tunnelId as seen at the gateway
+     *
      */
     TunnelInfo getTunnelInfo(TunnelId id);
-    /**
-     * Retrieve a set of tunnels from the existing ones for various purposes
-     */
-    List selectOutboundTunnelIds(TunnelSelectionCriteria criteria);
-    /**
-     * Retrieve a set of tunnels from the existing ones for various purposes
-     */
-    List selectInboundTunnelIds(TunnelSelectionCriteria criteria);
+    /** pick an inbound tunnel not bound to a particular destination */
+    TunnelInfo selectInboundTunnel();
+    /** pick an inbound tunnel bound to the given destination */
+    TunnelInfo selectInboundTunnel(Hash destination);
+    /** pick an outbound tunnel not bound to a particular destination */
+    TunnelInfo selectOutboundTunnel();
+    /** pick an outbound tunnel bound to the given destination */
+    TunnelInfo selectOutboundTunnel(Hash destination);
     
-    /**
-     * Make sure appropriate outbound tunnels are in place, builds requested
-     * inbound tunnels, then fire off a job to ask the ClientManagerFacade to 
-     * validate the leaseSet, then publish it in the network database.
-     *
-     */
-    void createTunnels(Destination destination, ClientTunnelSettings clientSettings, long timeoutMs);
-    
-    /**
-     * Called when a peer becomes unreachable - go through all of the current
-     * tunnels and rebuild them if we can, or drop them if we can't.
-     *
-     */
-    void peerFailed(Hash peer);
-
     /**
      * True if the peer currently part of a tunnel
      *
@@ -70,4 +50,21 @@ public interface TunnelManagerFacade extends Service {
     
     /** When does the last tunnel we are participating in expire? */
     public long getLastParticipatingExpiration();
+    
+    /** 
+     * the client connected (or updated their settings), so make sure we have
+     * the tunnels for them, and whenever necessary, ask them to authorize 
+     * leases.
+     *
+     */
+    public void buildTunnels(Destination client, ClientTunnelSettings settings);
+    
+    public TunnelPoolSettings getInboundSettings();
+    public TunnelPoolSettings getOutboundSettings();
+    public TunnelPoolSettings getInboundSettings(Hash client);
+    public TunnelPoolSettings getOutboundSettings(Hash client);
+    public void setInboundSettings(TunnelPoolSettings settings);
+    public void setOutboundSettings(TunnelPoolSettings settings);
+    public void setInboundSettings(Hash client, TunnelPoolSettings settings);
+    public void setOutboundSettings(Hash client, TunnelPoolSettings settings);
 }

@@ -10,7 +10,6 @@ import net.i2p.data.Hash;
 import net.i2p.data.i2np.I2NPMessage;
 import net.i2p.data.i2np.I2NPMessageHandler;
 import net.i2p.router.CommSystemFacade;
-import net.i2p.router.InNetMessage;
 import net.i2p.router.JobImpl;
 import net.i2p.router.OutNetMessage;
 import net.i2p.router.RouterContext;
@@ -110,9 +109,6 @@ public class VMCommSystem extends CommSystemFacade {
             try {
                 I2NPMessage msg = handler.readMessage(new ByteArrayInputStream(_msg));
                 int size = _msg.length;
-                InNetMessage inMsg = new InNetMessage(ReceiveJob.this.getContext());
-                inMsg.setFromRouterHash(_from);
-                inMsg.setMessage(msg);
                 _ctx.profileManager().messageReceived(_from, "vm", 1, size);
                 _ctx.statManager().addRateData("transport.receiveMessageSize", size, 1);
                 
@@ -123,7 +119,7 @@ public class VMCommSystem extends CommSystemFacade {
                 else
                     ReceiveJob.this.getContext().statManager().addRateData("transport.receiveMessageLarge", 1, 1);
 
-                _ctx.inNetMessagePool().add(inMsg);
+                _ctx.inNetMessagePool().add(msg, null, _from);
             } catch (Exception e) {
                 _log.error("wtf, error reading/formatting a VM message?", e);
             }

@@ -20,6 +20,7 @@ import java.util.Set;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.DataStructure;
 import net.i2p.data.Destination;
+import net.i2p.data.Hash;
 import net.i2p.data.PrivateKey;
 import net.i2p.data.PublicKey;
 import net.i2p.data.SigningPrivateKey;
@@ -97,7 +98,7 @@ public class KeyManager {
         _log.info("Registering keys for destination " + dest.calculateHash().toBase64());
         LeaseSetKeys keys = new LeaseSetKeys(dest, leaseRevocationPrivateKey, endpointDecryptionKey);
         synchronized (_leaseSetKeys) {
-            _leaseSetKeys.put(dest, keys);
+            _leaseSetKeys.put(dest.calculateHash(), keys);
         }
         if (dest != null)
             queueWrite();
@@ -116,7 +117,7 @@ public class KeyManager {
             _log.info("Unregistering keys for destination " + dest.calculateHash().toBase64());
         LeaseSetKeys rv = null;
         synchronized (_leaseSetKeys) {
-            rv = (LeaseSetKeys)_leaseSetKeys.remove(dest);
+            rv = (LeaseSetKeys)_leaseSetKeys.remove(dest.calculateHash());
         }
         if (dest != null)
             queueWrite();
@@ -124,6 +125,9 @@ public class KeyManager {
     }
     
     public LeaseSetKeys getKeys(Destination dest) {
+        return getKeys(dest.calculateHash());
+    }
+    public LeaseSetKeys getKeys(Hash dest) {
         synchronized (_leaseSetKeys) {
             return (LeaseSetKeys)_leaseSetKeys.get(dest);
         }

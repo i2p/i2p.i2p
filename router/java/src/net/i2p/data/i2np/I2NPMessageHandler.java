@@ -132,10 +132,14 @@ public class I2NPMessageHandler {
                 return new DatabaseSearchReplyMessage(_context);
             case DeliveryStatusMessage.MESSAGE_TYPE:
                 return new DeliveryStatusMessage(_context);
+            case DateMessage.MESSAGE_TYPE:
+                return new DateMessage(_context);
             case GarlicMessage.MESSAGE_TYPE:
                 return new GarlicMessage(_context);
-            case TunnelMessage.MESSAGE_TYPE:
-                return new TunnelMessage(_context);
+            case TunnelDataMessage.MESSAGE_TYPE:
+                return new TunnelDataMessage(_context);
+            case TunnelGatewayMessage.MESSAGE_TYPE:
+                return new TunnelGatewayMessage(_context);
             case DataMessage.MESSAGE_TYPE:
                 return new DataMessage(_context);
             case TunnelCreateMessage.MESSAGE_TYPE:

@@ -13,7 +13,7 @@ import java.util.Date;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.DataStructure;
 import net.i2p.data.Lease;
-import net.i2p.data.RouterIdentity;
+import net.i2p.data.Hash;
 import net.i2p.data.TunnelId;
 
 /**
@@ -27,12 +27,11 @@ class LeaseTest extends StructureTest {
     }
     public DataStructure createDataStructure() throws DataFormatException {
         Lease lease = new Lease();
-        StructureTest tst = new DestinationTest();
         lease.setEndDate(new Date(1000*60*2));
         //lease.setStartDate(new Date(1000*60));
-        tst = new RouterIdentityTest();
-        lease.setRouterIdentity((RouterIdentity)tst.createDataStructure());
-        tst = new TunnelIdTest();
+        byte h[] = new byte[Hash.HASH_LENGTH];
+        lease.setGateway(new Hash(h));
+        StructureTest tst = new TunnelIdTest();
         lease.setTunnelId((TunnelId)tst.createDataStructure());
         
         return lease; 

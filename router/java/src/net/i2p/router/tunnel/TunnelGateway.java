@@ -7,6 +7,7 @@ import net.i2p.I2PAppContext;
 import net.i2p.data.Hash;
 import net.i2p.data.TunnelId;
 import net.i2p.data.i2np.I2NPMessage;
+import net.i2p.data.i2np.TunnelGatewayMessage;
 import net.i2p.util.Log;
 import net.i2p.util.SimpleTimer;
 
@@ -60,6 +61,15 @@ public class TunnelGateway {
         _flushFrequency = 500;
         _delayedFlush = new DelayedFlush();
         _lastFlush = _context.clock().now();
+    }
+    
+    /**
+     * Add a message to be sent down the tunnel, where we are the inbound gateway.
+     *
+     * @param msg message received to be sent through the tunnel
+     */
+    public void add(TunnelGatewayMessage msg) {
+        add(msg.getMessage(), null, null);
     }
     
     /**
@@ -135,7 +145,7 @@ public class TunnelGateway {
             _toRouter = toRouter;
             _toTunnel = toTunnel;
             _messageId = message.getUniqueId();
-            _expiration = message.getMessageExpiration().getTime();
+            _expiration = message.getMessageExpiration();
             _remaining = message.toByteArray();
             _offset = 0;
             _fragmentNumber = 0;

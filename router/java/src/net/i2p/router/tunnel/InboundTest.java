@@ -40,7 +40,7 @@ public class InboundTest {
         InboundGatewayProcessor p = new InboundGatewayProcessor(_context, config.getConfig(0));
         p.process(message, 0, message.length, null);
         
-        for (int i = 1; i < numHops; i++) {
+        for (int i = 1; i < numHops-1; i++) {
             HopProcessor hop = new HopProcessor(_context, config.getConfig(i));
             Hash prev = config.getConfig(i).getReceiveFrom();
             boolean ok = hop.process(message, 0, message.length, prev);
@@ -51,7 +51,7 @@ public class InboundTest {
         }
         
         InboundEndpointProcessor end = new InboundEndpointProcessor(_context, config);
-        boolean ok = end.retrievePreprocessedData(message, 0, message.length, config.getPeer(numHops-1));
+        boolean ok = end.retrievePreprocessedData(message, 0, message.length, config.getPeer(numHops-2));
         if (!ok) {
             _log.error("Error retrieving cleartext at the endpoint");
             try { Thread.sleep(5*1000); } catch (Exception e) {}

@@ -13,7 +13,6 @@ import java.util.Date;
 import net.i2p.data.Hash;
 import net.i2p.data.RouterInfo;
 import net.i2p.data.i2np.I2NPMessage;
-import net.i2p.router.InNetMessage;
 import net.i2p.router.Job;
 import net.i2p.router.JobImpl;
 import net.i2p.router.MessageSelector;
@@ -141,10 +140,7 @@ public class SendMessageDirectJob extends JobImpl {
             if (_onSend != null)
                 getContext().jobQueue().addJob(_onSend);
 
-            InNetMessage msg = new InNetMessage(getContext());
-            msg.setFromRouter(_router.getIdentity());
-            msg.setMessage(_message);
-            getContext().inNetMessagePool().add(msg);
+            getContext().inNetMessagePool().add(_message, _router.getIdentity(), null);
 
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Adding " + _message.getClass().getName() 

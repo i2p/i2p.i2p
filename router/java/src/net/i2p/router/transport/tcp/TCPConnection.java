@@ -173,10 +173,15 @@ public class TCPConnection {
         List expired = null;
         int remaining = 0;
         long remainingSize = 0;
+        long curSize = msg.getMessageSize(); // so we don't serialize while locked
         synchronized (_pendingMessages) {
             _pendingMessages.add(msg);
             expired = locked_expireOld();
-            locked_throttle();
+            List throttled = locked_throttle();
+            if (expired == null)
+                expired = throttled;
+            else if (throttled != null)
+                expired.addAll(throttled);
             for (int i = 0; i < _pendingMessages.size(); i++) {
                 OutNetMessage cur = (OutNetMessage)_pendingMessages.get(i);
                 remaining++;
@@ -200,16 +205,17 @@ public class TCPConnection {
     }
     
     private boolean shouldDropProbabalistically() {
-        return Boolean.valueOf(_context.getProperty("tcp.dropProbabalistically", "true")).booleanValue();
+        return Boolean.valueOf(_context.getProperty("tcp.dropProbabalistically", "false")).booleanValue();
     }
     
     /**
      * Implement a probabalistic dropping of messages on the queue to the 
      * peer along the lines of RFC2309.
      *
+     * @return list of OutNetMessages that were expired, or null
      */
-    private void locked_throttle() {
-        if (!shouldDropProbabalistically()) return;
+    private List locked_throttle() {
+        if (!shouldDropProbabalistically()) return null;
         int bytesQueued = 0;
         long earliestExpiration = -1;
         for (int i = 0; i < _pendingMessages.size(); i++) {
@@ -230,7 +236,9 @@ public class TCPConnection {
         // drop more than is necessary (leaving a fraction of the queue 'free' for bursts)
         long excessQueued = (long)(bytesQueued - ((double)bytesSendableUntilFirstExpire * (1.0-getQueueFreeFactor()))); 
         if ( (excessQueued > 0) && (_pendingMessages.size() > 1) && (_transport != null) )
-            locked_probabalisticDrop(excessQueued);
+            return locked_probabalisticDrop(excessQueued);
+        else
+            return null;
     }
     
     /** 
@@ -279,7 +287,8 @@ public class TCPConnection {
      * Probabalistically drop messages in relation to their size vs how much
      * we've exceeded our target queue usage.
      */
-    private void locked_probabalisticDrop(long excessBytesQueued) {
+    private List locked_probabalisticDrop(long excessBytesQueued) {
+        List rv = null;
         for (int i = 0; i < _pendingMessages.size() && excessBytesQueued > 0; i++) {
             OutNetMessage msg = (OutNetMessage)_pendingMessages.get(i);
             int p = getDropProbability(msg.getMessageSize(), excessBytesQueued);
@@ -287,13 +296,17 @@ public class TCPConnection {
                 _pendingMessages.remove(i);
                 i--;
                 msg.timestamp("Probabalistically dropped due to queue size " + excessBytesQueued);
-                sent(msg, false, -1);
+                if (rv == null)
+                    rv = new ArrayList(1);
+                rv.add(msg);
+                //sent(msg, false, -1);
                 _context.statManager().addRateData("tcp.probabalisticDropQueueSize", excessBytesQueued, msg.getLifetime());
                 // since we've already dropped down this amount, lets reduce the
                 // number of additional messages dropped
                 excessBytesQueued -= msg.getMessageSize();
             }
         }
+        return rv;
     }
 
     private int getDropProbability(long msgSize, long excessBytesQueued) {

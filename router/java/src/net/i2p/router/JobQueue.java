@@ -12,15 +12,13 @@ import java.io.IOException;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
+import net.i2p.data.DataHelper;
 import net.i2p.router.networkdb.HandleDatabaseLookupMessageJob;
-import net.i2p.router.tunnelmanager.HandleTunnelCreateMessageJob;
-import net.i2p.router.tunnelmanager.RequestTunnelJob;
 import net.i2p.util.Clock;
 import net.i2p.util.I2PThread;
 import net.i2p.util.Log;
@@ -177,6 +175,13 @@ public class JobQueue {
         return;
     }
     
+    public void removeJob(Job job) {
+        synchronized (_jobLock) {
+            _readyJobs.remove(job);
+            _timedJobs.remove(job);
+        }
+    }
+    
     public void timingUpdated() {
         synchronized (_jobLock) {
             _jobLock.notifyAll();
@@ -217,13 +222,6 @@ public class JobQueue {
             if (cls == HandleDatabaseLookupMessageJob.class)
                 return true;
 
-            // tunnels are a bitch, but its dropped() builds a pair of fake ones just in case
-            if (cls == RequestTunnelJob.class)
-                return true;
-
-            // if we're already this loaded, dont take more tunnels
-            if (cls == HandleTunnelCreateMessageJob.class)
-                return true;
         }
         return false;
     }
@@ -624,7 +622,9 @@ public class JobQueue {
         buf.append("# ready/waiting jobs: ").append(readyJobs.size()).append(" <i>(lots of these mean there's likely a big problem)</i><ol>\n");
         for (int i = 0; i < readyJobs.size(); i++) {
             Job j = (Job)readyJobs.get(i);
-            buf.append("<li> [waiting ").append(now-j.getTiming().getStartAfter()).append("ms]: ");
+            buf.append("<li> [waiting ");
+            buf.append(DataHelper.formatDuration(now-j.getTiming().getStartAfter()));
+            buf.append("]: ");
             buf.append(j.toString()).append("</li>\n");
         }
         buf.append("</ol>\n");
@@ -638,8 +638,9 @@ public class JobQueue {
         }
         for (Iterator iter = ordered.values().iterator(); iter.hasNext(); ) {
             Job j = (Job)iter.next();
-            buf.append("<li>").append(j.getName()).append(" @ ");
-            buf.append(new Date(j.getTiming().getStartAfter())).append("</li>\n");
+            long time = j.getTiming().getStartAfter() - now;
+            buf.append("<li>").append(j.getName()).append(" in ");
+            buf.append(DataHelper.formatDuration(time)).append("</li>\n");
         }
         buf.append("</ol>\n");
         

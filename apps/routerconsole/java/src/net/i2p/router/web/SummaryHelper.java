@@ -4,13 +4,18 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.text.DecimalFormat;
+import java.util.Iterator;
+import java.util.Set;
 
 import net.i2p.data.DataHelper;
+import net.i2p.data.Destination;
+import net.i2p.data.LeaseSet;
 import net.i2p.stat.Rate;
 import net.i2p.stat.RateStat;
 import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
 import net.i2p.router.RouterVersion;
+import net.i2p.router.TunnelPoolSettings;
 
 /**
  * Simple helper to query the appropriate router for data necessary to render
@@ -333,16 +338,39 @@ public class SummaryHelper {
      * @return html section summary
      */
     public String getDestinations() {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream(1024);
-        try {
-            OutputStreamWriter osw = new OutputStreamWriter(baos);
-            _context.clientManager().renderStatusHTML(osw);
-            osw.flush();
-            return new String(baos.toByteArray());
-        } catch (IOException ioe) {
-            _context.logManager().getLog(SummaryHelper.class).error("Error rendering client info", ioe);
-            return "";
+        Set clients = _context.clientManager().listClients();
+        
+        StringBuffer buf = new StringBuffer(512);
+        buf.append("<u><b>Local destinations</b></u><br />");
+        
+        for (Iterator iter = clients.iterator(); iter.hasNext(); ) {
+            Destination client = (Destination)iter.next();
+            TunnelPoolSettings in = _context.tunnelManager().getInboundSettings(client.calculateHash());
+            TunnelPoolSettings out = _context.tunnelManager().getOutboundSettings(client.calculateHash());
+            String name = (in != null ? in.getDestinationNickname() : null);
+            if (name == null)
+                name = (out != null ? out.getDestinationNickname() : null);
+            if (name == null)
+                name = client.calculateHash().toBase64().substring(0,6);
+            
+            buf.append("<b>*</b> ").append(name).append("<br />\n");
+            LeaseSet ls = _context.netDb().lookupLeaseSetLocally(client.calculateHash());
+            if (ls != null) {
+                long timeToExpire = ls.getEarliestLeaseDate() - _context.clock().now();
+                if (timeToExpire < 0) {
+                    buf.append("<i>expired ").append(DataHelper.formatDuration(0-timeToExpire));
+                    buf.append(" ago</i><br />\n");
+                }
+            } else {
+                buf.append("<i>No leases</i><br />\n");
+            }
+            buf.append("<a href=\"tunnels.jsp#").append(client.calculateHash().toBase64().substring(0,4));
+            buf.append("\">Details</a> ");
+            buf.append("<a href=\"configtunnels.jsp#").append(client.calculateHash().toBase64().substring(0,4));
+            buf.append("\">Config</a><br />\n");
         }
+        buf.append("<hr />\n");
+        return buf.toString();
     }
     
     /**

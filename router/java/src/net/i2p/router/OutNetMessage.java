@@ -11,10 +11,11 @@ package net.i2p.router;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -72,17 +73,15 @@ public class OutNetMessage {
         setOnReplyJob(null);
         setOnFailedReplyJob(null);
         setReplySelector(null);
-        _timestamps = new HashMap(8);
-        _timestampOrder = new LinkedList();
-        _failedTransports = new HashSet();
+        _failedTransports = null;
         _sendBegin = 0;
-        _createdBy = new Exception("Created by");
+        //_createdBy = new Exception("Created by");
         _created = context.clock().now();
         timestamp("Created");
-        _context.messageStateMonitor().outboundMessageAdded();
-        _context.statManager().createRateStat("outNetMessage.timeToDiscard", 
-                                              "How long until we discard an outbound msg?",
-                                              "OutNetMessage", new long[] { 5*60*1000, 30*60*1000, 60*60*1000 });
+        //_context.messageStateMonitor().outboundMessageAdded();
+        //_context.statManager().createRateStat("outNetMessage.timeToDiscard", 
+        //                                      "How long until we discard an outbound msg?",
+        //                                      "OutNetMessage", new long[] { 5*60*1000, 30*60*1000, 60*60*1000 });
     }
     
     /**
@@ -92,24 +91,43 @@ public class OutNetMessage {
      * @return how long this message has been 'in flight'
      */
     public long timestamp(String eventName) {
-        synchronized (_timestamps) {
-            long now = _context.clock().now();
-            while (_timestamps.containsKey(eventName)) {
-                eventName = eventName + '.';
+        long now = _context.clock().now();
+        if (_log.shouldLog(Log.DEBUG)) {
+            // only timestamp if we are debugging
+            synchronized (this) {
+                locked_initTimestamps();
+                while (_timestamps.containsKey(eventName)) {
+                    eventName = eventName + '.';
+                }
+                _timestamps.put(eventName, new Long(now));
+                _timestampOrder.add(eventName);
             }
-            _timestamps.put(eventName, new Long(now));
-            _timestampOrder.add(eventName);
-            return now - _created;
         }
+        return now - _created;
     }
     public Map getTimestamps() {
-        synchronized (_timestamps) {
-            return (Map)_timestamps.clone();
+        if (_log.shouldLog(Log.DEBUG)) {
+            synchronized (this) {
+                locked_initTimestamps();
+                return (Map)_timestamps.clone();
+            }
         }
+        return Collections.EMPTY_MAP;
     }
     public Long getTimestamp(String eventName) {
-        synchronized (_timestamps) {
-            return (Long)_timestamps.get(eventName);
+        if (_log.shouldLog(Log.DEBUG)) {
+            synchronized (this) {
+                locked_initTimestamps();
+                return (Long)_timestamps.get(eventName);
+            }
+        }
+        return ZERO;
+    }
+    private static final Long ZERO = new Long(0);
+    private void locked_initTimestamps() {
+        if (_timestamps == null) {
+            _timestamps = new HashMap(8);
+            _timestampOrder = new ArrayList(8);
         }
     }
     
@@ -204,8 +222,15 @@ public class OutNetMessage {
     public MessageSelector getReplySelector() { return _replySelector; }
     public void setReplySelector(MessageSelector selector) { _replySelector = selector; }
     
-    public void transportFailed(String transportStyle) { _failedTransports.add(transportStyle); }
-    public Set getFailedTransports() { return new HashSet(_failedTransports); }
+    public void transportFailed(String transportStyle) { 
+        if (_failedTransports == null)
+            _failedTransports = new HashSet(1);
+        _failedTransports.add(transportStyle); 
+    }
+    /** not thread safe - dont fail transports and iterate over this at the same time */
+    public Set getFailedTransports() { 
+        return (_failedTransports == null ? Collections.EMPTY_SET : _failedTransports); 
+    }
     
     /** when did the sending process begin */
     public long getSendBegin() { return _sendBegin; }
@@ -224,10 +249,11 @@ public class OutNetMessage {
             _log.debug("Discard " + _messageSize + "byte " + _messageType + " message after " 
                        + timeToDiscard);
         _message = null;
-        _context.statManager().addRateData("outNetMessage.timeToDiscard", timeToDiscard, timeToDiscard);
-        _context.messageStateMonitor().outboundMessageDiscarded();
+        //_context.statManager().addRateData("outNetMessage.timeToDiscard", timeToDiscard, timeToDiscard);
+        //_context.messageStateMonitor().outboundMessageDiscarded();
     }
     
+    /*
     public void finalize() throws Throwable {
         if (_message != null) {
             if (_log.shouldLog(Log.WARN)) {
@@ -245,7 +271,7 @@ public class OutNetMessage {
         _context.messageStateMonitor().outboundMessageFinalized();
         super.finalize();
     }
-    
+    */
     public String toString() {
         StringBuffer buf = new StringBuffer(128);
         buf.append("[OutNetMessage contains ");
@@ -256,7 +282,8 @@ public class OutNetMessage {
             buf.append(_message.getClass().getName());
         }
         buf.append(" expiring on ").append(new Date(_expiration));
-        buf.append(" failed delivery on transports ").append(_failedTransports);
+        if (_failedTransports != null)
+            buf.append(" failed delivery on transports ").append(_failedTransports);
         if (_target == null)
             buf.append(" targetting no one in particular...");
         else
@@ -277,25 +304,27 @@ public class OutNetMessage {
     }
     
     private void renderTimestamps(StringBuffer buf) {
-        synchronized (_timestamps) {
-            long lastWhen = -1;
-            for (int i = 0; i < _timestampOrder.size(); i++) {
-                String name = (String)_timestampOrder.get(i);
-                Long when = (Long)_timestamps.get(name);
-                buf.append("\t[");
-                long diff = when.longValue() - lastWhen;
-                if ( (lastWhen > 0) && (diff > 500) )
-                    buf.append("**");
-                if (lastWhen > 0)
-                    buf.append(diff);
-                else
-                    buf.append(0);
-                buf.append("ms: \t").append(name);
-                buf.append('=').append(formatDate(when.longValue()));
-                buf.append("]\n");
-                lastWhen = when.longValue();
+        if (_log.shouldLog(Log.DEBUG)) {
+            synchronized (this) {
+                long lastWhen = -1;
+                for (int i = 0; i < _timestampOrder.size(); i++) {
+                    String name = (String)_timestampOrder.get(i);
+                    Long when = (Long)_timestamps.get(name);
+                    buf.append("\t[");
+                    long diff = when.longValue() - lastWhen;
+                    if ( (lastWhen > 0) && (diff > 500) )
+                        buf.append("**");
+                    if (lastWhen > 0)
+                        buf.append(diff);
+                    else
+                        buf.append(0);
+                    buf.append("ms: \t").append(name);
+                    buf.append('=').append(formatDate(when.longValue()));
+                    buf.append("]\n");
+                    lastWhen = when.longValue();
+                }
             }
-        }
+        } 
     }
     
     private final static SimpleDateFormat _fmt = new SimpleDateFormat("HH:mm:ss.SSS");

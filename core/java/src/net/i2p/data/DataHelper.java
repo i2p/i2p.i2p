@@ -35,6 +35,7 @@ import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
 import net.i2p.util.ByteCache;
+import net.i2p.util.CachingByteArrayOutputStream;
 import net.i2p.util.OrderedProperties;
 
 /**
@@ -123,7 +124,70 @@ public class DataHelper {
             writeLong(rawStream, 2, 0);
         }
     }
+    
+    public static int toProperties(byte target[], int offset, Properties props) throws DataFormatException, IOException {
+        if (props != null) {
+            OrderedProperties p = new OrderedProperties();
+            p.putAll(props);
+            ByteArrayOutputStream baos = new ByteArrayOutputStream(32);
+            for (Iterator iter = p.keySet().iterator(); iter.hasNext();) {
+                String key = (String) iter.next();
+                String val = p.getProperty(key);
+                // now make sure they're in UTF-8
+                //key = new String(key.getBytes(), "UTF-8");
+                //val = new String(val.getBytes(), "UTF-8");
+                writeString(baos, key);
+                baos.write(_equalBytes);
+                writeString(baos, val);
+                baos.write(_semicolonBytes);
+            }
+            baos.close();
+            byte propBytes[] = baos.toByteArray();
+            toLong(target, offset, 2, propBytes.length);
+            offset += 2;
+            System.arraycopy(propBytes, 0, target, offset, propBytes.length);
+            offset += propBytes.length;
+            return offset;
+        } else {
+            toLong(target, offset, 2, 0);
+            return offset + 2;
+        }
+    }
+    
+    public static int fromProperties(byte source[], int offset, Properties target) throws DataFormatException, IOException {
+        int size = (int)fromLong(source, offset, 2);
+        offset += 2;
+        ByteArrayInputStream in = new ByteArrayInputStream(source, offset, size);
+        byte eqBuf[] = new byte[_equalBytes.length];
+        byte semiBuf[] = new byte[_semicolonBytes.length];
+        while (in.available() > 0) {
+            String key = readString(in);
+            int read = read(in, eqBuf);
+            if ((read != eqBuf.length) || (!eq(eqBuf, _equalBytes))) {
+                break;
+            }
+            String val = readString(in);
+            read = read(in, semiBuf);
+            if ((read != semiBuf.length) || (!eq(semiBuf, _semicolonBytes))) {
+                break;
+            }
+            target.put(key, val);
+        }
+        return offset + size;
+    }
 
+    public static byte[] toProperties(Properties opts) {
+        try {
+            ByteArrayOutputStream baos = new ByteArrayOutputStream(2);
+            writeProperties(baos, opts);
+            return baos.toByteArray();
+        } catch (DataFormatException dfe) {
+            throw new RuntimeException("Format error writing to memory?! " + dfe.getMessage());
+        } catch (IOException ioe) {
+            throw new RuntimeException("IO error writing to memory?! " + ioe.getMessage());
+        }
+    }
+    
     /**
      * Pretty print the mapping
      *
@@ -147,9 +211,12 @@ public class DataHelper {
      *
      */
     public static void loadProps(Properties props, File file) throws IOException {
+        loadProps(props, new FileInputStream(file));
+    }
+    public static void loadProps(Properties props, InputStream inStr) throws IOException {
         BufferedReader in = null;
         try {
-            in = new BufferedReader(new InputStreamReader(new FileInputStream(file)), 16*1024);
+            in = new BufferedReader(new InputStreamReader(inStr), 16*1024);
             String line = null;
             while ( (line = in.readLine()) != null) {
                 if (line.trim().length() <= 0) continue;
@@ -258,15 +325,32 @@ public class DataHelper {
         throws DataFormatException, IOException {
         if (numBytes > 8)
             throw new DataFormatException("readLong doesn't currently support reading numbers > 8 bytes [as thats bigger than java's long]");
-        byte data[] = new byte[numBytes];
-        int num = read(rawStream, data);
-        if (num != numBytes)
-            throw new DataFormatException("Not enough bytes [" + num + "] as required for the field [" + numBytes + "]");
 
-        UnsignedInteger val = new UnsignedInteger(data);
-        return val.getLong();
+        long rv = 0;
+        for (int i = 0; i < numBytes; i++) {
+            long cur = rawStream.read() & 0xFF;
+            if (cur == -1) throw new DataFormatException("Not enough bytes for the field");
+            // we loop until we find a nonzero byte (or we reach the end)
+            if (cur != 0) {
+                // ok, data found, now iterate through it to fill the rv
+                long remaining = numBytes - i;
+                for (int j = 0; j < remaining; j++) {
+                    long shiftAmount = 8 * (remaining-j-1);
+                    cur = cur << shiftAmount;
+                    rv += cur;
+                    if (j + 1 < remaining) {
+                        cur = rawStream.read() & 0xFF;
+                        if (cur == -1)
+                            throw new DataFormatException("Not enough bytes for the field");
+                    }
+                }
+                break;
+            }
+        }
+        
+        return rv;
     }
-
+    
     /** Write an integer as defined by the I2P data structure specification to the stream.
      * Integers are a fixed number of bytes (numBytes), stored as unsigned integers in network byte order.
      * @param value value to write out
@@ -277,12 +361,10 @@ public class DataHelper {
      */
     public static void writeLong(OutputStream rawStream, int numBytes, long value) 
         throws DataFormatException, IOException {
-        try {
-            UnsignedInteger.writeBytes(rawStream, numBytes, value);
-            //UnsignedInteger i = new UnsignedInteger(value);
-            //rawStream.write(i.getBytes(numBytes));
-        } catch (IllegalArgumentException iae) {
-            throw new DataFormatException("Invalid value (must be positive)", iae);
+            
+        for (int i = numBytes - 1; i >= 0; i--) {
+            byte cur = (byte)( (value >>> (i*8) ) & 0xFF);
+            rawStream.write(cur);
         }
     }
     
@@ -322,7 +404,7 @@ public class DataHelper {
         for (long i = 0; i <= 0xFFFF; i++)
             testLong(2, i);
         System.out.println("Test 2byte passed");
-        for (long i = 0; i <= 0xFFFFFF; i++)
+        for (long i = 0; i <= 0xFFFFFF; i ++)
             testLong(3, i);
         System.out.println("Test 3byte passed");
         for (long i = 0; i <= 0xFFFFFFFF; i++)
@@ -344,6 +426,9 @@ public class DataHelper {
             long read = fromLong(extract, 0, extract.length);
             if (read != value)
                 throw new RuntimeException("testLong("+numBytes+","+value+") FAILED on read (" + read + ")");
+            read = readLong(new ByteArrayInputStream(written), numBytes);
+            if (read != value)
+                throw new RuntimeException("testLong("+numBytes+","+value+") FAILED on readLong (" + read + ")");
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage());
         }
@@ -383,6 +468,9 @@ public class DataHelper {
             return toLong(DATE_LENGTH, 0L);
         else
             return toLong(DATE_LENGTH, date.getTime());
+    }
+    public static void toDate(byte target[], int offset, long when) throws IllegalArgumentException {
+        toLong(target, offset, DATE_LENGTH, when);
     }
     public static Date fromDate(byte src[], int offset) throws DataFormatException {
         if ( (src == null) || (offset + DATE_LENGTH > src.length) )
@@ -479,9 +567,29 @@ public class DataHelper {
             writeLong(out, 1, BOOLEAN_FALSE);
     }
     
+    public static Boolean fromBoolean(byte data[], int offset) {
+        if (data[offset] == BOOLEAN_TRUE)
+            return Boolean.TRUE;
+        else if (data[offset] == BOOLEAN_FALSE)
+            return Boolean.FALSE;
+        else
+            return null;
+    }
+    
+    public static void toBoolean(byte data[], int offset, boolean value) {
+        data[offset] = (value ? BOOLEAN_TRUE : BOOLEAN_FALSE);
+    }
+    public static void toBoolean(byte data[], int offset, Boolean value) {
+        if (value == null)
+            data[offset] = BOOLEAN_UNKNOWN;
+        else
+            data[offset] = (value.booleanValue() ? BOOLEAN_TRUE : BOOLEAN_FALSE);
+    }
+    
     public static final byte BOOLEAN_TRUE = 0x1;
     public static final byte BOOLEAN_FALSE = 0x0;
     public static final byte BOOLEAN_UNKNOWN = 0x2;
+    public static final int BOOLEAN_LENGTH = 1;
 
     //
     // The following comparator helpers make it simpler to write consistently comparing
@@ -762,12 +870,13 @@ public class DataHelper {
     public static byte[] compress(byte orig[], int offset, int size) {
         if ((orig == null) || (orig.length <= 0)) return orig;
         try {
-            ByteArrayOutputStream baos = new ByteArrayOutputStream(size);
+            CachingByteArrayOutputStream baos = new CachingByteArrayOutputStream(16, 40*1024);
             GZIPOutputStream out = new GZIPOutputStream(baos, size);
             out.write(orig, offset, size);
             out.finish();
             out.flush();
             byte rv[] = baos.toByteArray();
+            baos.releaseBuffer();
             //if (_log.shouldLog(Log.DEBUG))
             //    _log.debug("Compression of " + orig.length + " into " + rv.length + " (or " + 100.0d
             //               * (((double) orig.length) / ((double) rv.length)) + "% savings)");
@@ -785,7 +894,7 @@ public class DataHelper {
     public static byte[] decompress(byte orig[], int offset, int length) throws IOException {
         if ((orig == null) || (orig.length <= 0)) return orig;
         GZIPInputStream in = new GZIPInputStream(new ByteArrayInputStream(orig, offset, length), length);
-        ByteArrayOutputStream baos = new ByteArrayOutputStream(length * 2);
+        CachingByteArrayOutputStream baos = new CachingByteArrayOutputStream(16, 40*1024);
         ByteCache cache = ByteCache.getInstance(10, 4*1024);
         ByteArray ba = cache.acquire();
         byte buf[] = ba.getData(); // new byte[4 * 1024];
@@ -796,6 +905,7 @@ public class DataHelper {
         }
         byte rv[] = baos.toByteArray();
         cache.release(ba);
+        baos.releaseBuffer();
         //if (_log.shouldLog(Log.DEBUG))
         //    _log.debug("Decompression of " + orig.length + " into " + rv.length + " (or " + 100.0d
         //               * (((double) rv.length) / ((double) orig.length)) + "% savings)");

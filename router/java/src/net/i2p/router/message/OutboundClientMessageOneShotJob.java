@@ -34,7 +34,7 @@ import net.i2p.router.JobImpl;
 import net.i2p.router.ReplyJob;
 import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
-import net.i2p.router.TunnelSelectionCriteria;
+import net.i2p.router.TunnelInfo;
 import net.i2p.router.MessageSelector;
 
 import net.i2p.util.Log;
@@ -148,8 +148,15 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
             _log.debug(getJobId() + ": Clove built");
         long timeoutMs = _overallExpiration - getContext().clock().now();
         if (_log.shouldLog(Log.DEBUG))
+            _log.debug(getJobId() + ": preparing to search for the leaseSet");
+        Hash key = _to.calculateHash();
+        SendJob success = new SendJob(getContext());
+        LookupLeaseSetFailedJob failed = new LookupLeaseSetFailedJob(getContext());
+        if (_log.shouldLog(Log.DEBUG))
             _log.debug(getJobId() + ": Send outbound client message - sending off leaseSet lookup job");
-        getContext().netDb().lookupLeaseSet(_to.calculateHash(), new SendJob(getContext()), new LookupLeaseSetFailedJob(getContext()), timeoutMs);
+        getContext().netDb().lookupLeaseSet(key, success, failed, timeoutMs);
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug(getJobId() + ": after sending off leaseSet lookup job");
     }
     
     private boolean getShouldBundle() {
@@ -281,10 +288,17 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
         
         GarlicMessage msg = OutboundClientMessageJobHelper.createGarlicMessage(getContext(), token, 
                                                                                _overallExpiration, key, 
-                                                                               _clove, 
+                                                                               _clove, _from.calculateHash(), 
                                                                                _to, 
                                                                                sessKey, tags, 
                                                                                true, replyLeaseSet);
+        if (msg == null) {
+            // set to null if there are no tunnels to ack the reply back through
+            // (should we always fail for this? or should we send it anyway, even if
+            // we dont receive the reply? hmm...)
+            dieFatal();
+            return;
+        }
         
         if (_log.shouldLog(Log.DEBUG))
             _log.debug(getJobId() + ": send() - token expected " + token);
@@ -296,21 +310,17 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug(getJobId() + ": Placing GarlicMessage into the new tunnel message bound for " 
                        + _lease.getTunnelId() + " on " 
-                       + _lease.getRouterIdentity().getHash().toBase64());
+                       + _lease.getGateway().toBase64());
         
-        TunnelId outTunnelId = selectOutboundTunnel();
-        if (outTunnelId != null) {
+        TunnelInfo outTunnel = selectOutboundTunnel();
+        if (outTunnel != null) {
             if (_log.shouldLog(Log.DEBUG))
-                _log.debug(getJobId() + ": Sending tunnel message out " + outTunnelId + " to " 
+                _log.debug(getJobId() + ": Sending tunnel message out " + outTunnel.getSendTunnelId(0) + " to " 
                            + _lease.getTunnelId() + " on " 
-                           + _lease.getRouterIdentity().getHash().toBase64());
-            SendTunnelMessageJob j = new SendTunnelMessageJob(getContext(), msg, outTunnelId, 
-                                                              _lease.getRouterIdentity().getHash(), 
-                                                              _lease.getTunnelId(), null, onReply, 
-                                                              onFail, selector, 
-                                                              _overallExpiration-getContext().clock().now(), 
-                                                              SEND_PRIORITY);
-            getContext().jobQueue().addJob(j);
+                           + _lease.getGateway().toBase64());
+
+            // dispatch may take 100+ms, so toss it in its own job
+            getContext().jobQueue().addJob(new DispatchJob(getContext(), msg, outTunnel, selector, onReply, onFail, (int)(_overallExpiration-getContext().clock().now())));
         } else {
             if (_log.shouldLog(Log.ERROR))
                 _log.error(getJobId() + ": Could not find any outbound tunnels to send the payload through... wtf?");
@@ -319,21 +329,38 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
         _clientMessage = null;
         _clove = null;
     }
+
+    private class DispatchJob extends JobImpl {
+        private GarlicMessage _msg;
+        private TunnelInfo _outTunnel;
+        private ReplySelector _selector;
+        private SendSuccessJob _replyFound;
+        private SendTimeoutJob _replyTimeout;
+        private int _timeoutMs;
+        public DispatchJob(RouterContext ctx, GarlicMessage msg, TunnelInfo out, ReplySelector sel, SendSuccessJob success, SendTimeoutJob timeout, int timeoutMs) {
+            super(ctx);
+            _msg = msg;
+            _outTunnel = out;
+            _selector = sel;
+            _replyFound = success;
+            _replyTimeout = timeout;
+            _timeoutMs = timeoutMs;
+        }
+        public String getName() { return "Dispatch outbound client message"; }
+        public void runJob() {
+            getContext().messageRegistry().registerPending(_selector, _replyFound, _replyTimeout, _timeoutMs);
+            getContext().tunnelDispatcher().dispatchOutbound(_msg, _outTunnel.getSendTunnelId(0), _lease.getTunnelId(), _lease.getGateway());
+
+        }
+    }
     
     /**
      * Pick an arbitrary outbound tunnel to send the message through, or null if
      * there aren't any around
      *
      */
-    private TunnelId selectOutboundTunnel() {
-        TunnelSelectionCriteria crit = new TunnelSelectionCriteria();
-        crit.setMaximumTunnelsRequired(1);
-        crit.setMinimumTunnelsRequired(1);
-        List tunnelIds = getContext().tunnelManager().selectOutboundTunnelIds(crit);
-        if (tunnelIds.size() <= 0)
-            return null;
-        else
-            return (TunnelId)tunnelIds.get(0);
+    private TunnelInfo selectOutboundTunnel() {
+        return getContext().tunnelManager().selectOutboundTunnel(_from.calculateHash());
     }
     
     /**
@@ -405,13 +432,24 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
         private long _pendingToken;
         public ReplySelector(long token) {
             _pendingToken = token;
+            if (_log.shouldLog(Log.INFO))
+                _log.info(OutboundClientMessageOneShotJob.this.getJobId() 
+                           + "Reply selector for client message: token=" + token);
         }
         
-        public boolean continueMatching() { return false; }
+        public boolean continueMatching() { 
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug(OutboundClientMessageOneShotJob.this.getJobId() 
+                           + "dont continue matching for token=" + _pendingToken);
+            return false; 
+        }
         public long getExpiration() { return _overallExpiration; }
         
         public boolean isMatch(I2NPMessage inMsg) {
             if (inMsg.getType() == DeliveryStatusMessage.MESSAGE_TYPE) {
+                if (_log.shouldLog(Log.INFO))
+                    _log.info(OutboundClientMessageOneShotJob.this.getJobId() 
+                               + "delivery status message received: " + inMsg + " our token: " + _pendingToken);
                 return _pendingToken == ((DeliveryStatusMessage)inMsg).getMessageId();
             } else {
                 return false;
@@ -439,7 +477,7 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
             _tags = tags;
         }
         
-        public String getName() { return "Send client message successful to a lease"; }
+        public String getName() { return "Send client message successful"; }
         public void runJob() {
             if (_finished) return;
             _finished = true;
@@ -477,7 +515,7 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
             super(enclosingContext);
         }
         
-        public String getName() { return "Send client message timed out through a lease"; }
+        public String getName() { return "Send client message timed out"; }
         public void runJob() {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug(OutboundClientMessageOneShotJob.this.getJobId()

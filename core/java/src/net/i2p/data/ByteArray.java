@@ -19,6 +19,7 @@ import java.io.Serializable;
 public class ByteArray implements Serializable, Comparable {
     private byte[] _data;
     private int _valid;
+    private int _offset;
 
     public ByteArray() {
         this(null);
@@ -27,6 +28,11 @@ public class ByteArray implements Serializable, Comparable {
     public ByteArray(byte[] data) {
         _data = data;
         _valid = 0;
+    }
+    public ByteArray(byte[] data, int offset, int length) {
+        _data = data;
+        _offset = offset;
+        _valid = length;
     }
 
     public final byte[] getData() {
@@ -44,6 +50,8 @@ public class ByteArray implements Serializable, Comparable {
      */
     public final int getValid() { return _valid; }
     public final void setValid(int valid) { _valid = valid; }
+    public final int getOffset() { return _offset; }
+    public final void setOffset(int offset) { _offset = offset; }
 
     public final boolean equals(Object o) {
         if (o == null) return false;

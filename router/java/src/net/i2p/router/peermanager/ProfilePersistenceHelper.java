@@ -13,6 +13,8 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Properties;
 import java.util.Set;
+import java.util.zip.GZIPInputStream;
+import java.util.zip.GZIPOutputStream;
 
 import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
@@ -50,7 +52,7 @@ class ProfilePersistenceHelper {
         long before = _context.clock().now();
         OutputStream fos = null;
         try {
-            fos = new BufferedOutputStream(new FileOutputStream(f));
+            fos = new BufferedOutputStream(new GZIPOutputStream(new FileOutputStream(f)));
             writeProfile(profile, fos);
         } catch (IOException ioe) {
             _log.error("Error writing profile to " + f);
@@ -215,9 +217,24 @@ class ProfilePersistenceHelper {
     
     private void loadProps(Properties props, File file) {
         try {
-            DataHelper.loadProps(props, file);
+            FileInputStream fin = new FileInputStream(file);
+            int c = fin.read(); 
+            fin.close();
+            fin = new FileInputStream(file); // ghetto mark+reset
+            if (c == '#') {
+                // uncompressed
+                if (_log.shouldLog(Log.INFO))
+                    _log.info("Loading uncompressed profile data from " + file.getName());
+                DataHelper.loadProps(props, fin);
+            } else {
+                // compressed (or corrupt...)
+                if (_log.shouldLog(Log.INFO))
+                    _log.info("Loading compressed profile data from " + file.getName());
+                DataHelper.loadProps(props, new GZIPInputStream(fin));
+            }
         } catch (IOException ioe) {
-            _log.warn("Error loading properties from " + file.getName(), ioe);
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Error loading properties from " + file.getName(), ioe);
         }
     }
     

@@ -103,8 +103,9 @@ class I2CPMessageProducer {
         if (payload == null) throw new I2PSessionException("No payload specified");
 
         Payload data = new Payload();
-        // randomize padding
-        int size = payload.length + RandomSource.getInstance().nextInt(1024);
+        // no padding at this level
+        // the garlic may pad, and the tunnels may pad, and the transports may pad
+        int size = payload.length;
         byte encr[] = _context.elGamalAESEngine().encrypt(payload, dest.getPublicKey(), key, tags, tag, newKey, size);
         // yes, in an intelligent component, newTags would be queued for confirmation along with key, and
         // generateNewTags would only generate tags if necessary

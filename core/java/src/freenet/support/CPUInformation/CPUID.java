@@ -252,6 +252,10 @@ public class CPUID {
                             return "Athlon 64";
                         case 5:
                             return "Athlon 64 FX Opteron";
+                        case 12:
+                            return "Athlon 64";
+                        default: // is this safe?
+                            return "Athlon 64 (unknown)";
                     }
                 }
             }

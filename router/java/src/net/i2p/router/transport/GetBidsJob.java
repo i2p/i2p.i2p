@@ -37,49 +37,59 @@ public class GetBidsJob extends JobImpl {
     
     public String getName() { return "Fetch bids for a message to be delivered"; }
     public void runJob() {
-        Hash to = _msg.getTarget().getIdentity().getHash();
+        getBids(getContext(), _facade, _msg);
+    }
+    
+    static void getBids(RouterContext context, CommSystemFacadeImpl facade, OutNetMessage msg) {
+        Log log = context.logManager().getLog(GetBidsJob.class);
+        Hash to = msg.getTarget().getIdentity().getHash();
         
-        if (getContext().shitlist().isShitlisted(to)) {
-            _log.warn("Attempt to send a message to a shitlisted peer - " + to);
-            getContext().messageRegistry().peerFailed(to);
-            fail();
+        if (context.shitlist().isShitlisted(to)) {
+            if (log.shouldLog(Log.WARN))
+                log.warn("Attempt to send a message to a shitlisted peer - " + to);
+            context.messageRegistry().peerFailed(to);
+            fail(context, msg);
             return;
         }
         
-        Hash us = getContext().routerHash();
+        Hash us = context.routerHash();
         if (to.equals(us)) {
-            _log.error("wtf, send a message to ourselves?  nuh uh. msg = " + _msg, getAddedBy());
-            fail();
+            if (log.shouldLog(Log.ERROR))
+                log.error("wtf, send a message to ourselves?  nuh uh. msg = " + msg);
+            fail(context, msg);
             return;
         }
         
-        List bids = _facade.getBids(_msg);
-        if (bids.size() <= 0) {
-            _log.warn("No bids available for the message " + _msg);
-            getContext().shitlist().shitlistRouter(to, "No bids");
-            getContext().netDb().fail(to);
-            fail();
+        TransportBid bid = facade.getBid(msg);
+        if (bid == null) {
+            // only shitlist them if we couldnt even try a single transport
+            if (msg.getFailedTransports().size() <= 0) {
+                if (log.shouldLog(Log.WARN))
+                    log.warn("No bids available for the message " + msg);
+                context.shitlist().shitlistRouter(to, "No bids");
+                context.netDb().fail(to);
+            }
+            fail(context, msg);
         } else {
-            TransportBid bid = (TransportBid)bids.get(0);
-            bid.getTransport().send(_msg);
+            bid.getTransport().send(msg);
         }
     }
     
     
-    private void fail() {
-        if (_msg.getOnFailedSendJob() != null) {
-            getContext().jobQueue().addJob(_msg.getOnFailedSendJob());
+    private static void fail(RouterContext context, OutNetMessage msg) {
+        if (msg.getOnFailedSendJob() != null) {
+            context.jobQueue().addJob(msg.getOnFailedSendJob());
         }
-        if (_msg.getOnFailedReplyJob() != null) {
-            getContext().jobQueue().addJob(_msg.getOnFailedReplyJob());
+        if (msg.getOnFailedReplyJob() != null) {
+            context.jobQueue().addJob(msg.getOnFailedReplyJob());
         }
-        MessageSelector selector = _msg.getReplySelector();
+        MessageSelector selector = msg.getReplySelector();
         if (selector != null) {
-            getContext().messageRegistry().unregisterPending(_msg);
+            context.messageRegistry().unregisterPending(msg);
         }
         
-        getContext().profileManager().messageFailed(_msg.getTarget().getIdentity().getHash());
+        context.profileManager().messageFailed(msg.getTarget().getIdentity().getHash());
         
-        _msg.discardData();
+        msg.discardData();
     }
 }

@@ -75,9 +75,9 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
     private Set _publishingLeaseSets;   
     
     /** 
-     * Hash of the key currently being searched for, pointing at a List of 
-     * DeferredSearchJob elements for each additional request waiting for that
-     * search to complete.
+     * Hash of the key currently being searched for, pointing the SearchJob that
+     * is currently operating.  Subsequent requests for that same key are simply
+     * added on to the list of jobs fired on success/failure
      *
      */
     private Map _activeRequests;
@@ -87,72 +87,14 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
      *
      */
     void searchComplete(Hash key) {
-        List deferred = null;
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("search Complete: " + key);
+        SearchJob removed = null;
         synchronized (_activeRequests) {
-            deferred = (List)_activeRequests.remove(key);
-        }
-        if (deferred != null) {
-            for (int i = 0; i < deferred.size(); i++) {
-                DeferredSearchJob j = (DeferredSearchJob)deferred.get(i);
-                _context.jobQueue().addJob(j);
-            }
+            removed = (SearchJob)_activeRequests.remove(key);
         }
     }
     
-    /**
-     * We want to search for a given key, but since there is already a job 
-     * out searching for it, we can just sit back and wait for them to finish.
-     * Perhaps we should also queue up a 'wakeup' job, in case that already
-     * active search won't expire/complete until after we time out?  Though in
-     * practice, pretty much all of the searches are the same duration...
-     *
-     * Anyway, this job is fired when that already active search completes -
-     * successfully or not - and either fires off the success task (or the fail
-     * task if we have expired), or it runs up its own search.
-     *
-     */
-    private class DeferredSearchJob extends JobImpl {
-        private Hash _key;
-        private Job _onFind;
-        private Job _onFailed;
-        private long _expiration;
-        private boolean _isLease;
-        
-        public DeferredSearchJob(Hash key, Job onFindJob, Job onFailedLookupJob, long timeoutMs, boolean isLease) {
-            super(KademliaNetworkDatabaseFacade.this._context);
-            _key = key;
-            _onFind = onFindJob;
-            _onFailed = onFailedLookupJob;
-            _isLease = isLease;
-            _expiration = getContext().clock().now() + timeoutMs;
-        }
-        public String getName() { return "Execute deferred search"; }
-        public void runJob() {
-            long remaining = getContext().clock().now() - _expiration;
-            if (remaining <= 0) {
-                if (_log.shouldLog(Log.WARN))
-                    _log.warn("Deferred search for " + _key.toBase64() + " expired prior to sending");
-                if (_onFailed != null)
-                    getContext().jobQueue().addJob(_onFailed);                
-            } else {
-                // ok, didn't time out - either we have the key or we can search
-                // for it
-                LeaseSet ls = lookupLeaseSetLocally(_key);
-                if (ls == null) {
-                    RouterInfo ri = lookupRouterInfoLocally(_key);
-                    if (ri == null) {
-                        search(_key, _onFind, _onFailed, remaining, _isLease);
-                    } else {
-                        if (_onFind != null)
-                            getContext().jobQueue().addJob(_onFind);
-                    }
-                } else {
-                    if (_onFind != null)
-                        getContext().jobQueue().addJob(_onFind);
-                }
-            }
-        }
-    }
 
     
     /**
@@ -164,6 +106,10 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
     
     /** don't probe or broadcast data, just respond and search when explicitly needed */
     private boolean _quiet = false;
+    
+    public static final String PROP_ENFORCE_NETID = "router.networkDatabase.enforceNetId";
+    private static final boolean DEFAULT_ENFORCE_NETID = false;
+    private boolean _enforceNetId = DEFAULT_ENFORCE_NETID;
     
     public final static String PROP_DB_DIR = "router.networkDatabase.dbDir";
     public final static String DEFAULT_DB_DIR = "netDb";
@@ -185,6 +131,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         _publishingLeaseSets = new HashSet(8);
         _lastExploreNew = 0;
         _activeRequests = new HashMap(8);
+        _enforceNetId = DEFAULT_ENFORCE_NETID;
     }
     
     KBucketSet getKBuckets() { return _kb; }
@@ -280,6 +227,11 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
             _log.info("No DB dir specified [" + PROP_DB_DIR + "], using [" + DEFAULT_DB_DIR + "]");
             _dbDir = DEFAULT_DB_DIR;
         }
+        String enforce = _context.getProperty(PROP_ENFORCE_NETID);
+        if (enforce != null) 
+            _enforceNetId = Boolean.valueOf(enforce).booleanValue();
+        else
+            _enforceNetId = DEFAULT_ENFORCE_NETID;
         _ds.restart();
         synchronized (_explicitSendKeys) { _explicitSendKeys.clear(); }
         synchronized (_exploreKeys) { _exploreKeys.clear(); }
@@ -301,6 +253,11 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
             _log.info("No DB dir specified [" + PROP_DB_DIR + "], using [" + DEFAULT_DB_DIR + "]");
             dbDir = DEFAULT_DB_DIR;
         }
+        String enforce = _context.getProperty(PROP_ENFORCE_NETID);
+        if (enforce != null) 
+            _enforceNetId = Boolean.valueOf(enforce).booleanValue();
+        else
+            _enforceNetId = DEFAULT_ENFORCE_NETID;
         
         _kb = new KBucketSet(_context, ri.getIdentity().getHash());
         _ds = new PersistentDataStore(_context, dbDir, this);
@@ -406,11 +363,17 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         if (!_initialized) return;
         LeaseSet ls = lookupLeaseSetLocally(key);
         if (ls != null) {
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("leaseSet found locally, firing " + onFindJob);
             if (onFindJob != null)
                 _context.jobQueue().addJob(onFindJob);
         } else {
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("leaseSet not found locally, running search");
             search(key, onFindJob, onFailedLookupJob, timeoutMs, true);
         }
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("after lookupLeaseSet");
     }
     
     public LeaseSet lookupLeaseSetLocally(Hash key) {
@@ -647,6 +610,10 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
                 _log.warn("Peer " + key.toBase64() + " published their routerInfo in the future?! [" 
                           + new Date(routerInfo.getPublished()) + "]", new Exception("Rejecting store"));
             return "Peer " + key.toBase64() + " published " + DataHelper.formatDuration(age) + " in the future?!";
+        } else if (_enforceNetId && (routerInfo.getNetworkId() != Router.NETWORK_ID) ){
+            String rv = "Peer " + key.toBase64() + " is from another network, not accepting it (id=" 
+                        + routerInfo.getNetworkId() + ", want " + Router.NETWORK_ID + ")";
+            return rv;
         }
         return null;
     }
@@ -764,28 +731,28 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
      * without any match)
      *
      */
-    private void search(Hash key, Job onFindJob, Job onFailedLookupJob, long timeoutMs, boolean isLease) {
+    void search(Hash key, Job onFindJob, Job onFailedLookupJob, long timeoutMs, boolean isLease) {
         if (!_initialized) return;
-        int pendingRequests = 0;
-        boolean allowSearch = false;
+        boolean isNew = true;
+        SearchJob searchJob = null;
         synchronized (_activeRequests) {
-            List pending = (List)_activeRequests.get(key);
-            if (pending == null) {
-                _activeRequests.put(key, new ArrayList(0));
-                allowSearch = true;
+            searchJob = (SearchJob)_activeRequests.get(key);
+            if (searchJob == null) {
+                searchJob = new SearchJob(_context, this, key, onFindJob, onFailedLookupJob, 
+                                         timeoutMs, true, isLease);
+                _activeRequests.put(key, searchJob);
             } else {
-                pending.add(new DeferredSearchJob(key, onFindJob, onFailedLookupJob, timeoutMs, isLease));
-                pendingRequests = pending.size();
-                allowSearch = false;
+                isNew = false;
             }
         }
-        if (allowSearch) {
-            _context.jobQueue().addJob(new SearchJob(_context, this, key, onFindJob, onFailedLookupJob, 
-                                                     timeoutMs, true, isLease));
+        if (isNew) {
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("this is the first search for that key, fire off the SearchJob");
+            _context.jobQueue().addJob(searchJob);
         } else {
             if (_log.shouldLog(Log.INFO))
-                _log.info("Deferring search for " + key.toBase64() + ": there are " + pendingRequests
-                          + " other concurrent requests for it");
+                _log.info("Deferring search for " + key.toBase64() + " with " + onFindJob);
+            searchJob.addDeferred(onFindJob, onFailedLookupJob, timeoutMs, isLease);
         }
     }
     
@@ -839,7 +806,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
                 buf.append("Earliest expiration date was: <i>").append(DataHelper.formatDuration(0-exp)).append(" ago</i><br />\n");
             for (int i = 0; i < ls.getLeaseCount(); i++) {
                 buf.append("Lease ").append(i).append(": gateway <i>");
-                buf.append(ls.getLease(i).getRouterIdentity().getHash().toBase64().substring(0,6));
+                buf.append(ls.getLease(i).getGateway().toBase64().substring(0,6));
                 buf.append("</i> tunnelId <i>").append(ls.getLease(i).getTunnelId().getTunnelId()).append("</i><br />\n");
             }
             buf.append("<hr />\n");

@@ -25,13 +25,12 @@ import net.i2p.data.i2np.DatabaseLookupMessage;
 import net.i2p.data.i2np.DatabaseSearchReplyMessage;
 import net.i2p.data.i2np.DatabaseStoreMessage;
 import net.i2p.data.i2np.I2NPMessage;
-import net.i2p.data.i2np.TunnelMessage;
+import net.i2p.data.i2np.TunnelGatewayMessage;
 import net.i2p.router.Job;
 import net.i2p.router.JobImpl;
 import net.i2p.router.RouterContext;
 import net.i2p.router.TunnelInfo;
 import net.i2p.router.message.SendMessageDirectJob;
-import net.i2p.router.message.SendTunnelMessageJob;
 import net.i2p.util.Log;
 
 /**
@@ -158,17 +157,21 @@ public class HandleDatabaseLookupMessageJob extends JobImpl {
     }
     
     private void sendThroughTunnel(I2NPMessage message, Hash toPeer, TunnelId replyTunnel) {
-        TunnelInfo info = getContext().tunnelManager().getTunnelInfo(replyTunnel);
-	
-        // the sendTunnelMessageJob can't handle injecting into the tunnel anywhere but the beginning
-        // (and if we are the beginning, we have the signing key)
-        if ( (info == null) || (info.getSigningKey() != null)) {
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Sending reply through " + replyTunnel + " on " + toPeer);
-            getContext().jobQueue().addJob(new SendTunnelMessageJob(getContext(), message, replyTunnel, toPeer, null, null, null, null, null, REPLY_TIMEOUT, MESSAGE_PRIORITY));
+        if (getContext().routerHash().equals(toPeer)) {
+            // if we are the gateway, act as if we received it
+            TunnelGatewayMessage m = new TunnelGatewayMessage(getContext());
+            m.setMessage(message);
+            m.setTunnelId(replyTunnel);
+            m.setMessageExpiration(message.getMessageExpiration());
+            getContext().tunnelDispatcher().dispatch(m);
         } else {
-            // its a tunnel we're participating in, but we're NOT the gateway, so 
-            sendToGateway(message, toPeer, replyTunnel, info);
+            // if we aren't the gateway, forward it on
+            TunnelGatewayMessage m = new TunnelGatewayMessage(getContext());
+            m.setMessage(message);
+            m.setMessageExpiration(message.getMessageExpiration());
+            m.setTunnelId(replyTunnel);
+            SendMessageDirectJob j = new SendMessageDirectJob(getContext(), m, toPeer, 10*1000, 100);
+            getContext().jobQueue().addJob(j);
         }
     }
     
@@ -184,14 +187,14 @@ public class HandleDatabaseLookupMessageJob extends JobImpl {
 
         long expiration = REPLY_TIMEOUT + getContext().clock().now();
 
-        TunnelMessage msg = new TunnelMessage(getContext());
-        msg.setData(message.toByteArray());
+        TunnelGatewayMessage msg = new TunnelGatewayMessage(getContext());
+        msg.setMessage(message);
         msg.setTunnelId(replyTunnel);
-        msg.setMessageExpiration(new Date(expiration));
+        msg.setMessageExpiration(expiration);
         getContext().jobQueue().addJob(new SendMessageDirectJob(getContext(), msg, toPeer, null, null, null, null, REPLY_TIMEOUT, MESSAGE_PRIORITY));
 
         String bodyType = message.getClass().getName();
-        getContext().messageHistory().wrap(bodyType, message.getUniqueId(), TunnelMessage.class.getName(), msg.getUniqueId());
+        getContext().messageHistory().wrap(bodyType, message.getUniqueId(), TunnelGatewayMessage.class.getName(), msg.getUniqueId());
     }
     
     public String getName() { return "Handle Database Lookup Message"; }

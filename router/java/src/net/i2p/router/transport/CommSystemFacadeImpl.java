@@ -56,10 +56,14 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
     public List getBids(OutNetMessage msg) {
         return _manager.getBids(msg);
     }
+    public TransportBid getBid(OutNetMessage msg) {
+        return _manager.getBid(msg);
+    }
     
     public void processMessage(OutNetMessage msg) {	
-        GetBidsJob j = new GetBidsJob(_context, this, msg);
-        j.runJob();
+        //GetBidsJob j = new GetBidsJob(_context, this, msg);
+        //j.runJob();
+        GetBidsJob.getBids(_context, this, msg);
     }
     
     public List getMostRecentErrorMessages() { 

@@ -33,6 +33,8 @@ import java.io.InterruptedIOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.util.ArrayList;
+import java.util.Collections;
 
 
 /**
@@ -62,8 +64,12 @@ public class NtpClient {
     public static long currentTime(String serverNames[]) {
         if (serverNames == null) 
             throw new IllegalArgumentException("No NTP servers specified");
-        for (int i = 0; i < serverNames.length; i++) {
-            long now = currentTime(serverNames[i]);
+        ArrayList names = new ArrayList(serverNames.length);
+        for (int i = 0; i < serverNames.length; i++)
+            names.add(serverNames[i]);
+        Collections.shuffle(names);
+        for (int i = 0; i < names.size(); i++) {
+            long now = currentTime((String)names.get(i));
             if (now > 0)
                 return now;
         }
@@ -112,8 +118,9 @@ public class NtpClient {
                                        (msg.transmitTimestamp - destinationTimestamp)) / 2;
             socket.close();
             
-            //System.out.println("host: " + serverName + " rtt: " + roundTripDelay + " offset: " + localClockOffset + " seconds");
-            return (long)(System.currentTimeMillis() + localClockOffset*1000);
+            long rv = (long)(System.currentTimeMillis() + localClockOffset*1000);
+            //System.out.println("host: " + address.getHostAddress() + " rtt: " + roundTripDelay + " offset: " + localClockOffset + " seconds");
+            return rv;
         } catch (IOException ioe) {
             //ioe.printStackTrace();
             return -1;

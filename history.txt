@@ -1,4 +1,60 @@
-$Id: history.txt,v 1.140 2005/02/09 14:28:29 duck Exp $
+$Id: history.txt,v 1.141 2005/02/10 21:44:49 smeghead Exp $
+
+2005-02-16  jrandom
+    * (Merged the 0.5-pre branch back into CVS HEAD)
+    * Replaced the old tunnel routing crypto with the one specified in
+      router/doc/tunnel-alt.html, including updates to the web console to view
+      and tweak it.  
+    * Provide the means for routers to reject tunnel requests with a wider 
+      range of responses:
+        probabalistic rejection, due to approaching overload
+        transient rejection, due to temporary overload
+        bandwidth rejection, due to persistent bandwidth overload
+        critical rejection, due to general router fault (or imminent shutdown)
+      The different responses are factored into the profiles accordingly.
+    * Replaced the old I2CP tunnel related options (tunnels.depthInbound, etc)
+      with a series of new properties, relevent to the new tunnel routing code:
+        inbound.nickname (used on the console)
+        inbound.quantity (# of tunnels to use in any leaseSets)
+        inbound.backupQuantity (# of tunnels to keep in the ready)
+        inbound.length (# of remote peers in the tunnel)
+        inbound.lengthVariance (if > 0, permute the length by adding a random # 
+                                up to the variance.  if < 0, permute the length
+                                by adding or subtracting a random # up to the 
+                                variance)
+        outbound.* (same as the inbound, except for the, uh, outbound tunnels
+                    in that client's pool)
+      There are other options, and more will be added later, but the above are
+      the most relevent ones.
+    * Replaced Jetty 4.2.21 with Jetty 5.1.2
+    * Compress all profile data on disk.
+    * Adjust the reseeding functionality to work even when the JVM's http proxy
+      is set.
+    * Enable a poor-man's interactive-flow in the streaming lib by choking the
+      max window size.
+    * Reduced the default streaming lib max message size to 16KB (though still
+      configurable by the user), also doubling the default maximum window 
+      size.
+    * Replaced the RouterIdentity in a Lease with its SHA256 hash.
+    * Reduced the overall I2NP message checksum from a full 32 byte SHA256 to
+      the first byte of the SHA256.
+    * Added a new "netId" flag to let routers drop references to other routers
+      who we won't be able to talk to.
+    * Extended the timestamper to get a second (or third) opinion whenever it 
+      wants to actually adjust the clock offset.
+    * Replaced that kludge of a timestamp I2NP message with a full blown 
+      DateMessage.
+    * Substantial memory optimizations within the router and the SDK to reduce
+      GC churn.  Client apps and the streaming libs have not been tuned, 
+      however.
+    * More bugfixes thank you can shake a stick at.
+
+2005-02-13  jrandom
+    * Updated jbigi source to handle 64bit CPUs.  The bundled jbigi.jar still 
+      only contains 32bit versions, so build your own, placing libjbigi.so in 
+      your install dir if necessary.  (thanks mule!)
+    * Added support for libjbigi-$os-athlon64 to NativeBigInteger and CPUID
+      (thanks spaetz!)
 
 2005-02-10  smeghead
     * Initial check-in of Pants, a new utility to help us manage our 3rd-party

@@ -2,8 +2,8 @@
  %>Network | <% } else { %><a href="config.jsp">Network</a> | <% }
  if (request.getRequestURI().indexOf("configservice.jsp") != -1) {
  %>Service | <% } else { %><a href="configservice.jsp">Service</a> | <% }
- if (request.getRequestURI().indexOf("configclients.jsp") != -1) {
- %>Clients | <% } else { %><a href="configclients.jsp">Clients</a> | <% }
+ if (request.getRequestURI().indexOf("configtunnels.jsp") != -1) {
+ %>Tunnels | <% } else { %><a href="configtunnels.jsp">Tunnels</a> | <% }
  if (request.getRequestURI().indexOf("configlogging.jsp") != -1) {
  %>Logging | <% } else { %><a href="configlogging.jsp">Logging</a> | <% }
  if (request.getRequestURI().indexOf("configadvanced.jsp") != -1) {
