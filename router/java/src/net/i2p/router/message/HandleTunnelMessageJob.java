@@ -53,6 +53,7 @@ public class HandleTunnelMessageJob extends JobImpl {
         ctx.statManager().createRateStat("tunnel.gatewayMessageSize", "How large are the messages we are forwarding on as an inbound gateway?", "Tunnels", new long[] { 60*1000l, 60*60*1000l, 24*60*60*1000l });
         ctx.statManager().createRateStat("tunnel.relayMessageSize", "How large are the messages we are forwarding on as a participant in a tunnel?", "Tunnels", new long[] { 60*1000l, 60*60*1000l, 24*60*60*1000l });
         ctx.statManager().createRateStat("tunnel.endpointMessageSize", "How large are the messages we are forwarding in as an outbound endpoint?", "Tunnels", new long[] { 60*1000l, 60*60*1000l, 24*60*60*1000l });
+        ctx.statManager().createRateStat("tunnel.expiredAfterAcceptTime", "How long after expiration do we finally start running an expired tunnel message?", "Tunnels", new long[] { 10*60*1000l, 60*60*1000l, 24*60*60*1000l });
         _message = msg;
         _from = from;
         _fromHash = fromHash;
@@ -62,12 +63,15 @@ public class HandleTunnelMessageJob extends JobImpl {
     public void runJob() {
         TunnelId id = _message.getTunnelId();
 
-        if (_context.clock().now() >= _message.getMessageExpiration().getTime()) {
+        long excessLag = _context.clock().now() - _message.getMessageExpiration().getTime();
+        if (excessLag > 0) {
+            // expired while on the queue
             if (_log.shouldLog(Log.ERROR))
                 _log.error("Accepted message (" + _message.getUniqueId() + ") expired on the queue for tunnel " 
                            + id.getTunnelId() + " expiring " 
                            + (_context.clock().now() - _message.getMessageExpiration().getTime())
                            + "ms agp");
+            _context.statManager().addRateData("tunnel.expiredAfterAcceptTime", excessLag, excessLag);
             _context.messageHistory().messageProcessingError(_message.getUniqueId(), 
                                                              TunnelMessage.class.getName(), 
                                                              "tunnel message expired on the queue");
