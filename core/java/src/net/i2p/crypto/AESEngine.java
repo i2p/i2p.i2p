@@ -9,10 +9,7 @@ package net.i2p.crypto;
  *
  */
 
-import java.io.IOException;
-
 import net.i2p.I2PAppContext;
-import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
 import net.i2p.data.SessionKey;

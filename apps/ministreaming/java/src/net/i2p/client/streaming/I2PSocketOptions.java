@@ -1,7 +1,5 @@
 package net.i2p.client.streaming;
 
-import java.util.Properties;
-
 /**
  * Define the configuration for streaming and verifying data on the socket.
  *

@@ -1,9 +1,7 @@
 package net.i2p.client;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Set;
 
 import net.i2p.data.Destination;

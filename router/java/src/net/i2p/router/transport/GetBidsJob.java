@@ -8,8 +8,6 @@ package net.i2p.router.transport;
  *
  */
 
-import java.util.List;
-
 import net.i2p.data.Hash;
 import net.i2p.router.JobImpl;
 import net.i2p.router.MessageSelector;

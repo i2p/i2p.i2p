@@ -1,6 +1,5 @@
 package net.i2p.router.tunnel.pool;
 
-import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -18,7 +17,6 @@ import net.i2p.router.RouterContext;
 import net.i2p.router.TunnelInfo;
 import net.i2p.router.message.PayloadGarlicConfig;
 import net.i2p.router.message.GarlicMessageBuilder;
-import net.i2p.router.tunnel.TunnelCreatorConfig;
 import net.i2p.util.Log;
 
 class TestJob extends JobImpl {

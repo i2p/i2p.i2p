@@ -5,7 +5,6 @@ import java.util.Locale;
 import java.text.SimpleDateFormat;
 
 import net.i2p.data.Base64;
-import net.i2p.data.Destination;
 import net.i2p.data.Hash;
 import net.i2p.data.TunnelId;
 import net.i2p.router.TunnelInfo;

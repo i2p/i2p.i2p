@@ -6,12 +6,9 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.math.BigInteger;
 import java.net.Socket;
 import java.net.SocketException;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Properties;
 
 import net.i2p.crypto.AESInputStream;
@@ -31,7 +28,6 @@ import net.i2p.router.transport.BandwidthLimitedInputStream;
 import net.i2p.router.transport.BandwidthLimitedOutputStream;
 import net.i2p.util.I2PThread;
 import net.i2p.util.Log;
-import net.i2p.util.NativeBigInteger;
 import net.i2p.util.SimpleTimer;
 
 /**

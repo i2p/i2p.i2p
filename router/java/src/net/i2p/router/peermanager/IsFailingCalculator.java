@@ -1,7 +1,6 @@
 package net.i2p.router.peermanager;
 
 import net.i2p.router.RouterContext;
-import net.i2p.stat.Rate;
 import net.i2p.util.Log;
 
 /**

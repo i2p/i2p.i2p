@@ -9,7 +9,6 @@ package net.i2p.router.networkdb.kademlia;
  */
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -25,9 +24,7 @@ import net.i2p.router.Job;
 import net.i2p.router.JobImpl;
 import net.i2p.router.RouterContext;
 import net.i2p.router.TunnelInfo;
-import net.i2p.router.TunnelSelectionCriteria;
 import net.i2p.router.message.SendMessageDirectJob;
-import net.i2p.router.peermanager.PeerProfile;
 import net.i2p.util.Log;
 
 /**

@@ -11,14 +11,11 @@ package net.i2p.router.message;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
 import net.i2p.data.PrivateKey;
-import net.i2p.data.RouterIdentity;
 import net.i2p.data.i2np.DeliveryInstructions;
 import net.i2p.data.i2np.GarlicClove;
 import net.i2p.data.i2np.GarlicMessage;
 import net.i2p.data.i2np.I2NPMessage;
-import net.i2p.router.JobImpl;
 import net.i2p.router.LeaseSetKeys;
-import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
 import net.i2p.util.Log;
 

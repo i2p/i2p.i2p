@@ -8,7 +8,6 @@ import java.util.Properties;
 import java.util.TreeMap;
 
 import net.i2p.data.DataHelper;
-import net.i2p.router.ClientTunnelSettings;
 import net.i2p.router.Router;
 import net.i2p.apps.systray.SysTray;
 import net.i2p.apps.systray.UrlLauncher;
@@ -20,7 +19,6 @@ import org.tanukisoftware.wrapper.WrapperManager;
  *
  */
 public class ConfigServiceHandler extends FormHandler {
-    public void ConfigNetHandler() {}
     
     private class UpdateWrapperManagerTask implements Runnable {
         private int _exitCode;

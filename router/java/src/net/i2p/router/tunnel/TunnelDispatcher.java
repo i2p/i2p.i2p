@@ -11,13 +11,11 @@ import net.i2p.router.RouterContext;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
 import net.i2p.data.TunnelId;
-import net.i2p.data.RouterInfo;
 import net.i2p.data.i2np.I2NPMessage;
 import net.i2p.data.i2np.TunnelDataMessage;
 import net.i2p.data.i2np.TunnelGatewayMessage;
 import net.i2p.router.JobImpl;
 import net.i2p.router.Router;
-import net.i2p.router.RouterContext;
 import net.i2p.router.Service;
 import net.i2p.util.Log;
 

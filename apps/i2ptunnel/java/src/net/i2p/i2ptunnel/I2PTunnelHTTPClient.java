@@ -22,9 +22,7 @@ import net.i2p.client.streaming.I2PSocket;
 import net.i2p.client.streaming.I2PSocketOptions;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.Destination;
-import net.i2p.util.Clock;
 import net.i2p.util.EventDispatcher;
-import net.i2p.util.I2PThread;
 import net.i2p.util.Log;
 
 /**

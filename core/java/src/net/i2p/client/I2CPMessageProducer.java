@@ -30,7 +30,6 @@ import net.i2p.data.i2cp.ReportAbuseMessage;
 import net.i2p.data.i2cp.SendMessageMessage;
 import net.i2p.data.i2cp.SessionConfig;
 import net.i2p.util.Log;
-import net.i2p.util.RandomSource;
 
 /**
  * Produce the various messages the session needs to send to the router.

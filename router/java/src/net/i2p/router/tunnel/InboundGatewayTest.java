@@ -1,13 +1,10 @@
 package net.i2p.router.tunnel;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import net.i2p.I2PAppContext;
 import net.i2p.data.Base64;
-import net.i2p.data.ByteArray;
-import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
 import net.i2p.data.TunnelId;
 import net.i2p.data.i2np.DataMessage;

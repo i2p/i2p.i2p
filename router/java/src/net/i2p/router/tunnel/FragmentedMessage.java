@@ -3,10 +3,6 @@ package net.i2p.router.tunnel;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.InputStream;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Date;
-
 import net.i2p.I2PAppContext;
 import net.i2p.data.Base64;
 import net.i2p.data.ByteArray;

@@ -1,7 +1,5 @@
 package net.i2p.router.tunnel;
 
-import java.util.Date;
-
 import net.i2p.data.Hash;
 import net.i2p.data.RouterInfo;
 import net.i2p.data.TunnelId;

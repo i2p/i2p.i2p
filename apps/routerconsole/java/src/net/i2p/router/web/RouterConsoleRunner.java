@@ -13,10 +13,7 @@ import org.mortbay.jetty.servlet.WebApplicationContext;
 import org.mortbay.http.DigestAuthenticator;
 import org.mortbay.http.handler.SecurityHandler;
 import org.mortbay.http.HashUserRealm;
-import org.mortbay.http.HttpRequest;
 import org.mortbay.http.SecurityConstraint;
-import org.mortbay.http.Authenticator;
-import org.mortbay.util.MultiException;
 
 public class RouterConsoleRunner {
     private Server _server;

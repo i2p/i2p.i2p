@@ -1,11 +1,8 @@
 package net.i2p.router.web;
 
 import java.io.ByteArrayInputStream;
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.Properties;
-import net.i2p.util.Log;
 
 /**
  * Handler to deal with form submissions from the logging config form and act
@@ -20,10 +17,6 @@ public class ConfigLoggingHandler extends FormHandler {
     private String _recordFormat;
     private String _dateFormat;
     private String _fileSize;
-    
-    public void ConfigNetHandler() {
-        _shouldSave = false;
-    }
     
     protected void processForm() {
         if (_shouldSave) {

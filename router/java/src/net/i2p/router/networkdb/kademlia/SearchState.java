@@ -8,7 +8,6 @@ import java.util.Iterator;
 import java.util.Set;
 import java.util.TreeSet;
 
-import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
 import net.i2p.router.RouterContext;
 

@@ -19,11 +19,10 @@
  *  along with this program; if not, write to the Free Software
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *  
- * $Revision: 1.5 $
+ * $Revision: 1.1 $
  */
 package i2p.susi.webmail;
 
-import i2p.susi.debug.Debug;
 import i2p.susi.util.Config;
 import i2p.susi.util.ReadBuffer;
 import i2p.susi.webmail.encoding.Encoding;

@@ -8,14 +8,12 @@ import java.io.OutputStream;
 
 import java.net.Socket;
 import java.net.URL;
-import java.net.URLConnection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
 import net.i2p.I2PAppContext;
 import net.i2p.util.I2PThread;
-import net.i2p.util.Log;
 
 /**
  * Handler to deal with reseed requests.  This reseed from the URL

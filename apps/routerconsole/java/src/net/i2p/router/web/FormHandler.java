@@ -3,10 +3,7 @@ package net.i2p.router.web;
 import java.util.List;
 import java.util.ArrayList;
 
-import net.i2p.util.Log;
-
 import net.i2p.router.RouterContext;
-import net.i2p.router.ClientTunnelSettings;
 
 /**
  * Simple form handler base class - does not depend on servlets or jsp,

@@ -17,11 +17,6 @@ public class ConfigAdvancedHandler extends FormHandler {
     private boolean _shouldSave;
     private String _config;
     
-    public void ConfigNetHandler() {
-        _shouldSave = false;
-        _forceRestart = false;
-    }
-    
     protected void processForm() {
         if (_shouldSave) {
             saveChanges();

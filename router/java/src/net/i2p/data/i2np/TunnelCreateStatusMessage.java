@@ -8,14 +8,9 @@ package net.i2p.data.i2np;
  *
  */
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-
 import net.i2p.I2PAppContext;
-import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
-import net.i2p.data.Hash;
 import net.i2p.data.TunnelId;
 import net.i2p.util.Log;
 

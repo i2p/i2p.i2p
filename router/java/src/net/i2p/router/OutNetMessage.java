@@ -8,8 +8,6 @@ package net.i2p.router;
  *
  */
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -20,7 +18,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
 import net.i2p.data.RouterInfo;
 import net.i2p.data.i2np.I2NPMessage;

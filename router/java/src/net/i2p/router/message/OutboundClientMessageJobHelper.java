@@ -8,8 +8,6 @@ package net.i2p.router.message;
  *
  */
 
-import java.util.Date;
-import java.util.List;
 import java.util.Set;
 
 import net.i2p.data.Certificate;
@@ -29,7 +27,6 @@ import net.i2p.data.i2np.I2NPMessage;
 import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
 import net.i2p.router.TunnelInfo;
-import net.i2p.router.TunnelSelectionCriteria;
 import net.i2p.util.Log;
 
 /**

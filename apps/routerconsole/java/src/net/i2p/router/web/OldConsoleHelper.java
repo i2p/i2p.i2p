@@ -4,8 +4,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
-import java.util.List;
-
 import net.i2p.router.RouterContext;
 import net.i2p.router.admin.StatsGenerator;
 

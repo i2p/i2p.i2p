@@ -1,15 +1,8 @@
 package net.i2p.client.streaming;
 
-import java.io.IOException;
-import java.io.InterruptedIOException;
-import java.io.UnsupportedEncodingException;
-import java.net.ConnectException;
 import java.net.NoRouteToHostException;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Properties;
 import java.util.Set;
 
@@ -17,7 +10,6 @@ import net.i2p.I2PAppContext;
 import net.i2p.I2PException;
 import net.i2p.client.I2PSession;
 import net.i2p.client.I2PSessionException;
-import net.i2p.client.I2PSessionListener;
 import net.i2p.data.Destination;
 import net.i2p.util.Log;
 

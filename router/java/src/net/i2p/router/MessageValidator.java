@@ -1,10 +1,5 @@
 package net.i2p.router;
 
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
-import java.util.TreeMap;
-
 import net.i2p.util.DecayingBloomFilter;
 import net.i2p.util.Log;
 

@@ -3,7 +3,6 @@ package net.i2p.client.streaming;
 import java.util.Set;
 
 import net.i2p.I2PAppContext;
-import net.i2p.data.ByteArray;
 import net.i2p.data.Destination;
 import net.i2p.data.SessionKey;
 import net.i2p.util.ByteCache;

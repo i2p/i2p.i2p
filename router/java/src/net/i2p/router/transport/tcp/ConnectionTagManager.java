@@ -1,7 +1,6 @@
 package net.i2p.router.transport.tcp;
 
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 import net.i2p.data.ByteArray;

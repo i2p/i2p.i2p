@@ -1,6 +1,5 @@
 package net.i2p.router.peermanager;
 
-import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;

@@ -1,19 +1,14 @@
 package net.i2p.router.tunnel;
 
-import java.util.Date;
 import net.i2p.data.Hash;
 import net.i2p.data.TunnelId;
-import net.i2p.data.RouterInfo;
 import net.i2p.data.Payload;
 import net.i2p.data.i2np.DataMessage;
 import net.i2p.data.i2np.DeliveryInstructions;
 import net.i2p.data.i2np.I2NPMessage;
 import net.i2p.data.i2np.GarlicMessage;
-import net.i2p.data.i2np.GarlicClove;
 import net.i2p.data.i2np.TunnelGatewayMessage;
 import net.i2p.router.ClientMessage;
-import net.i2p.router.JobImpl;
-import net.i2p.router.OutNetMessage;
 import net.i2p.router.RouterContext;
 import net.i2p.router.TunnelInfo;
 import net.i2p.router.message.GarlicMessageReceiver;

@@ -3,7 +3,6 @@ package net.i2p.router.web;
 import java.util.Iterator;
 import java.util.Set;
 
-import java.io.ByteArrayOutputStream;
 import java.io.Writer;
 
 import net.i2p.data.Hash;

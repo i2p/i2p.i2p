@@ -1,15 +1,8 @@
 package net.i2p.router.web;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.util.List;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.Properties;
-import java.util.TreeMap;
-
-import net.i2p.util.Log;
-
 import net.i2p.data.Destination;
 import net.i2p.router.RouterContext;
 import net.i2p.router.TunnelPoolSettings;

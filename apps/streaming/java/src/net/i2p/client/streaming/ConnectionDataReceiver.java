@@ -1,10 +1,7 @@
 package net.i2p.client.streaming;
 
-import java.io.InterruptedIOException;
-import java.io.IOException;
 import net.i2p.I2PAppContext;
 import net.i2p.data.ByteArray;
-import net.i2p.util.ByteCache;
 import net.i2p.util.Log;
 
 /**

@@ -1,6 +1,5 @@
 package net.i2p.client.streaming;
 
-import java.util.Arrays;
 import java.util.Set;
 import java.util.HashSet;
 

@@ -10,7 +10,6 @@ package net.i2p.router.peermanager;
 
 import java.io.IOException;
 import java.io.Writer;
-import java.util.ArrayList;
 import java.util.List;
 
 import net.i2p.router.PeerManagerFacade;

@@ -9,7 +9,6 @@ package net.i2p.router.transport.tcp;
  */
 
 import java.io.IOException;
-import java.io.OutputStream;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;

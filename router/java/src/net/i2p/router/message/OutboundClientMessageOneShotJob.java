@@ -15,10 +15,7 @@ import net.i2p.data.Hash;
 import net.i2p.data.Lease;
 import net.i2p.data.LeaseSet;
 import net.i2p.data.PublicKey;
-import net.i2p.data.SessionTag;
 import net.i2p.data.SessionKey;
-import net.i2p.data.TunnelId;
-
 import net.i2p.data.i2cp.MessageId;
 
 import net.i2p.data.i2np.DataMessage;

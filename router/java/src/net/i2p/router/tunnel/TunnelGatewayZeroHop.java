@@ -1,15 +1,11 @@
 package net.i2p.router.tunnel;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import net.i2p.data.Hash;
 import net.i2p.data.TunnelId;
 import net.i2p.data.i2np.I2NPMessage;
 import net.i2p.data.i2np.TunnelGatewayMessage;
 import net.i2p.router.RouterContext;
 import net.i2p.util.Log;
-import net.i2p.util.SimpleTimer;
 
 /**
  * Serve as the gatekeeper for a tunnel with no hops.

@@ -1,9 +1,5 @@
 package net.i2p.router.web;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.util.List;
-
 import net.i2p.router.RouterContext;
 import net.i2p.util.FileUtil;
 

@@ -2,8 +2,6 @@ package net.i2p.client.streaming;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InterruptedIOException;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;

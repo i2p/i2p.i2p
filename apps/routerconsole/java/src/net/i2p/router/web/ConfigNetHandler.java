@@ -13,14 +13,9 @@ import java.net.URLConnection;
 
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Set;
 
-import net.i2p.util.Log;
 import net.i2p.time.Timestamper;
-
-import net.i2p.router.RouterContext;
-import net.i2p.router.ClientTunnelSettings;
 
 /**
  * Handler to deal with form submissions from the main config form and act
@@ -40,13 +35,6 @@ public class ConfigNetHandler extends FormHandler {
     private String _outboundBurst;
     private String _reseedFrom;
     private String _sharePct;
-    
-    public void ConfigNetHandler() {
-        _guessRequested = false;
-        _reseedRequested = false;
-        _saveRequested = false;
-        _timeSyncEnabled = false;
-    }
     
     protected void processForm() {
         if (_guessRequested) {

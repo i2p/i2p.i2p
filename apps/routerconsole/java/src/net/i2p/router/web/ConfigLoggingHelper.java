@@ -1,13 +1,8 @@
 package net.i2p.router.web;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Properties;
 import java.util.TreeSet;
-
-import net.i2p.util.Log;
 
 import net.i2p.router.RouterContext;
 

@@ -8,7 +8,6 @@ package net.i2p.router.message;
  *
  */
 
-import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 

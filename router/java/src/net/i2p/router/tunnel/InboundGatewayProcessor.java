@@ -1,8 +1,6 @@
 package net.i2p.router.tunnel;
 
 import net.i2p.I2PAppContext;
-import net.i2p.data.Hash;
-import net.i2p.util.Log;
 
 /**
  * Override the hop processor to seed the message with a random

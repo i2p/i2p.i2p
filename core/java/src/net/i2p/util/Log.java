@@ -10,7 +10,6 @@ package net.i2p.util;
  */
 
 import net.i2p.I2PAppContext;
-import net.i2p.data.DataHelper;
 
 /**
  * Wrapper class for whatever logging system I2P uses.  This class should be 

@@ -31,7 +31,6 @@ import net.i2p.router.RouterContext;
 import net.i2p.router.transport.BandwidthLimitedInputStream;
 import net.i2p.router.transport.BandwidthLimitedOutputStream;
 import net.i2p.util.Log;
-import net.i2p.util.NativeBigInteger;
 
 /**
  * Class responsible for all of the handshaking necessary to turn a socket into

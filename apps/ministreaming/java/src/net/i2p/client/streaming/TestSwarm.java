@@ -1,24 +1,12 @@
 package net.i2p.client.streaming;
 
-import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileInputStream;
 import java.io.OutputStream;
-import java.net.Socket;
-
-import java.util.Map;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Properties;
-import java.util.StringTokenizer;
-
 import net.i2p.I2PAppContext;
 import net.i2p.client.I2PClientFactory;
-import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
 import net.i2p.util.Log;
 import net.i2p.util.I2PThread;

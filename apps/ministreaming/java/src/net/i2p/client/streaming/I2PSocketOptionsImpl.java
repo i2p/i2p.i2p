@@ -1,6 +1,5 @@
 package net.i2p.client.streaming;
 
-import java.util.Iterator;
 import java.util.Properties;
 
 /**

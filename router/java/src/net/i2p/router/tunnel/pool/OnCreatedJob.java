@@ -2,7 +2,6 @@ package net.i2p.router.tunnel.pool;
 
 import net.i2p.router.JobImpl;
 import net.i2p.router.RouterContext;
-import net.i2p.router.tunnel.TunnelCreatorConfig;
 import net.i2p.util.Log;
 
 /**

@@ -4,15 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.i2p.data.Hash;
-import net.i2p.data.SessionKey;
-import net.i2p.data.SessionTag;
-import net.i2p.stat.Rate;
-import net.i2p.stat.RateStat;
 import net.i2p.router.RouterContext;
 import net.i2p.router.JobImpl;
 import net.i2p.router.tunnel.HopConfig;
-import net.i2p.router.tunnel.TunnelCreatorConfig;
-import net.i2p.router.tunnel.TunnelGateway;
 import net.i2p.router.TunnelPoolSettings;
 import net.i2p.util.Log;
 

@@ -34,8 +34,10 @@
     </target>
     <target name="clean">
         <delete>
-            <fileset dir="src/WEB-INF/classes/" includes="**/*.class, susimail.war" />
+            <fileset dir="src/WEB-INF/classes/" includes="**/*.class" />
         </delete>
+    	<delete dir="src/WEB-INF/classes/i2p"/>
+    	<delete file="susimail.war"/>
     </target>
     <target name="cleandep" depends="clean" />
     <target name="distclean" depends="clean" />

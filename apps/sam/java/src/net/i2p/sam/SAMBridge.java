@@ -17,7 +17,6 @@ import java.io.InputStreamReader;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -221,7 +220,7 @@ public class SAMBridge implements Runnable {
         SAMBridge bridge = new SAMBridge(host, port, opts, keyfile);
         I2PThread t = new I2PThread(bridge, "SAMListener");
         if (Boolean.valueOf(System.getProperty("sam.shutdownOnOOM", "false")).booleanValue()) {
-            t.addOOMEventListener(new I2PThread.OOMEventListener() {
+            I2PThread.addOOMEventListener(new I2PThread.OOMEventListener() {
                 public void outOfMemory(OutOfMemoryError err) {
                     err.printStackTrace();
                     System.err.println("OOMed, die die die");

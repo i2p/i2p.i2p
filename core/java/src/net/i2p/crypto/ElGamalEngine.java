@@ -29,7 +29,6 @@ package net.i2p.crypto;
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-import java.io.ByteArrayInputStream;
 import java.math.BigInteger;
 
 import net.i2p.I2PAppContext;

@@ -10,8 +10,6 @@
 package net.i2p.apps.systray;
 
 import java.awt.Frame;
-import java.io.File;
-
 import snoozesoft.systray4j.SysTrayMenu;
 import snoozesoft.systray4j.SysTrayMenuEvent;
 import snoozesoft.systray4j.SysTrayMenuIcon;

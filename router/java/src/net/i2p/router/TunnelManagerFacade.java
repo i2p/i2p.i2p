@@ -8,8 +8,6 @@ package net.i2p.router;
  *
  */
 
-import java.util.List;
-
 import net.i2p.data.Destination;
 import net.i2p.data.Hash;
 import net.i2p.data.TunnelId;

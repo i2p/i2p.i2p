@@ -2,7 +2,6 @@ package net.i2p.sam.client;
 
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.IOException;
 
 import java.util.Properties;

@@ -8,13 +8,9 @@ package net.i2p.router.networkdb;
  *
  */
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.util.Date;
 import java.util.Iterator;
 import java.util.Set;
 
-import net.i2p.data.DataFormatException;
 import net.i2p.data.DataStructure;
 import net.i2p.data.Hash;
 import net.i2p.data.LeaseSet;

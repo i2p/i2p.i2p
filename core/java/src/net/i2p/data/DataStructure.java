@@ -12,7 +12,6 @@ package net.i2p.data;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.Serializable;
 
 /**
  * Defines the class as a standard object with particular bit representation,
@@ -20,7 +19,7 @@ import java.io.Serializable;
  * 
  * @author jrandom
  */
-public interface DataStructure extends Serializable {
+public interface DataStructure /* extends Serializable */ {
     /**
      * Load up the current object with data from the given stream.  Data loaded 
      * this way must match the I2P data structure specification.

@@ -2,19 +2,15 @@ package net.i2p.client.streaming;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.TreeMap;
 import net.i2p.I2PAppContext;
 import net.i2p.client.I2PSession;
 import net.i2p.data.Base64;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
-import net.i2p.data.SessionTag;
 import net.i2p.util.Log;
 import net.i2p.util.SimpleTimer;
 

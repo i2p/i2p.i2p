@@ -1,13 +1,10 @@
 package net.i2p.router.tunnel.pool;
 
-import java.util.HashSet;
 import java.util.Set;
 
 import net.i2p.data.Certificate;
-import net.i2p.data.Hash;
 import net.i2p.data.RouterInfo;
 import net.i2p.data.SessionKey;
-import net.i2p.data.SessionTag;
 import net.i2p.data.TunnelId;
 import net.i2p.data.i2np.DeliveryInstructions;
 import net.i2p.data.i2np.GarlicMessage;

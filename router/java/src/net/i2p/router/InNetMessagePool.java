@@ -10,11 +10,7 @@ package net.i2p.router;
 
 import java.io.Writer;
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-
 import net.i2p.data.Hash;
 import net.i2p.data.RouterIdentity;
 import net.i2p.data.i2np.DeliveryStatusMessage;

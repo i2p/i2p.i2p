@@ -3,7 +3,6 @@
  */
 package net.i2p.i2ptunnel;
 
-import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InterruptedIOException;

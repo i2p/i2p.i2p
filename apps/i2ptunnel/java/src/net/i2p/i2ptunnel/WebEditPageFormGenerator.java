@@ -1,7 +1,5 @@
 package net.i2p.i2ptunnel;
 
-import java.io.File;
-
 import java.util.Iterator;
 import java.util.Properties;
 import java.util.Random;

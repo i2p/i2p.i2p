@@ -12,7 +12,6 @@ import java.util.List;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
 import net.i2p.data.RouterIdentity;
-import net.i2p.data.RouterInfo;
 import net.i2p.data.i2np.I2NPMessageReader;
 import net.i2p.router.OutNetMessage;
 import net.i2p.router.RouterContext;
