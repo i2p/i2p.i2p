@@ -10,6 +10,9 @@ import java.io.OutputStream;
 import java.net.Socket;
 import java.net.SocketException;
 import java.util.Date;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.StringTokenizer;
 
 import net.i2p.I2PException;
 import net.i2p.client.streaming.I2PSocket;
@@ -20,6 +23,25 @@ import net.i2p.util.EventDispatcher;
 import net.i2p.util.I2PThread;
 import net.i2p.util.Log;
 
+/**
+ * Act as a mini HTTP proxy, handling various different types of requests,
+ * forwarding them through I2P appropriately, and displaying the reply.  Supported
+ * request formats are: <pre>
+ *   $method http://$site[$port]/$path $protocolVersion
+ * or
+ *   $method $path $protocolVersion\nHost: $site
+ * or
+ *   $method http://i2p/$site/$path $protocolVersion
+ * or 
+ *   $method /$site/$path $protocolVersion
+ * </pre>
+ *
+ * If the $site resolves with the I2P naming service, then it is directed towards
+ * that eepsite, otherwise it is directed towards this client's outproxy (typically
+ * "squid.i2p").  Only HTTP is supported (no HTTPS, ftp, mailto, etc).  Both GET
+ * and POST have been tested, though other $methods should work.
+ *
+ */
 public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable {
     private static final Log _log = new Log(I2PTunnelHTTPClient.class);
 
@@ -94,7 +116,13 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
             String line, method = null, protocol = null, host = null, destination = null;
             StringBuffer newRequest = new StringBuffer();
             while ((line = br.readLine()) != null) {
+                if (_log.shouldLog(Log.DEBUG))
+                    _log.debug("Line=[" + line + "]");
+                
                 if (method == null) { // first line (GET /base64/realaddr)
+                    if (_log.shouldLog(Log.DEBUG))
+                        _log.debug("Method is null for [" + line + "]");
+                    
                     int pos = line.indexOf(" ");
                     if (pos == -1) break;
                     method = line.substring(0, pos);
@@ -128,6 +156,8 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
                         // The request must be forwarded to a WWW proxy
                         destination = wwwProxy;
                         usingWWWProxy = true;
+                        if (_log.shouldLog(Log.DEBUG))
+                            _log.debug("Host doesnt end with .i2p and it contains a period [" + host + "]: wwwProxy!");
                     } else {
                         request = request.substring(pos + 1);
                         pos = request.indexOf("/");
@@ -153,13 +183,19 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
                         _log.debug("DEST  :" + destination + ":");
                     }
 
-                } else if (line.startsWith("Host: ") && !usingWWWProxy) {
-                    line = "Host: " + host;
-                    if (_log.shouldLog(Log.INFO)) _log.info("Setting host = " + host);
+                } else {
+                    if (line.startsWith("Host: ") && !usingWWWProxy) {
+                        line = "Host: " + host;
+                        if (_log.shouldLog(Log.INFO)) 
+                            _log.info("Setting host = " + host);
+                    }
                 }
                 newRequest.append(line).append("\r\n"); // HTTP spec
                 if (line.length() == 0) break;
             }
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("NewRequest header: [" + newRequest.toString() + "]");
+            
             while (br.ready()) { // empty the buffer (POST requests)
                 int i = br.read();
                 if (i != -1) {
@@ -178,6 +214,10 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
                 s.close();
                 return;
             }
+            
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Destination: " + destination);
+            
             Destination dest = I2PTunnel.destFromName(destination);
             if (dest == null) {
                 l.log("Could not resolve " + destination + ".");
