@@ -26,9 +26,13 @@
  * LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ * $Id$
  */
 
-// Modelled after JThread by Jori Liesenborgs
+/*
+ * Modelled after JThread by Jori Liesenborgs
+ */
 
 #ifndef LIBSOCKTHREAD_THREAD_HPP
 #define LIBSOCKTHREAD_THREAD_HPP
@@ -36,16 +40,16 @@
 namespace Libsockthread {
 	class Thread {
 		public:
-			Thread(void)
-				: retval(0), running(false) { }
-			virtual ~Thread(void)
+			Thread()
+				: retval(NULL), running(false) { }
+			virtual ~Thread()
 				{ kill(); }
 
-			void* get_retval(void);
-			bool is_running(void);
-			void kill(void);
-			void start(void);
-			virtual void *thread(void) = 0;
+			void* get_retval();
+			bool is_running();
+			void kill();
+			void start();
+			virtual void* thread() = 0;
 		private:
 #ifdef WINTHREAD
 			static DWORD WINAPI the_thread(void* param);
@@ -56,7 +60,7 @@ namespace Libsockthread {
 			pthread_t id;
 #endif
 			Mutex continue_m;
-			void *retval;
+			void* retval;
 			bool running;
 			Mutex running_m;
 	};

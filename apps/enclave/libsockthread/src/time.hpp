@@ -26,6 +26,8 @@
  * LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ * $Id$
  */
 
 #ifndef LIBSOCKTHREAD_TIME_HPP
@@ -44,7 +46,6 @@ namespace Libsockthread {
 			string& utc();
 			string& utc_date();
 			string& utc_time();
-
 		private:
 			string formatted;
 			time_t unixtime;

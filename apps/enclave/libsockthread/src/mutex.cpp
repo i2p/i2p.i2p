@@ -26,31 +26,28 @@
  * LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ * $Id$
  */
 
-// Modelled after JThread by Jori Liesenborgs
+/*
+ * Modelled after JThread by Jori Liesenborgs
+ */
 
-#include <cassert>
 #include "platform.hpp"
-#ifdef WINTHREAD
-	#include <windows.h>
-#else
-	#include <pthread.h>
-#endif
-using namespace std;
 #include "mutex.hpp"
 using namespace Libsockthread;
 
 /*
  * Creates a mutex
  */
-Mutex::Mutex(void)
+Mutex::Mutex()
 {
 #ifdef WINTHREAD
-	mutex = CreateMutex(0, false, 0);
-	assert(mutex != 0);
+	mutex = CreateMutex(NULL, false, NULL);
+	assert(mutex != NULL);
 #else
-	int rc = pthread_mutex_init(&mutex, 0);
+	int rc = pthread_mutex_init(&mutex, NULL);
 	assert(rc == 0);
 #endif
 }
@@ -58,7 +55,7 @@ Mutex::Mutex(void)
 /*
  * Destroys a mutex
  */
-Mutex::~Mutex(void)
+Mutex::~Mutex()
 {
 #ifdef WINTHREAD
 	BOOL rc = CloseHandle(mutex);
@@ -72,7 +69,7 @@ Mutex::~Mutex(void)
 /*
  * Locks the mutex
  */
-void Mutex::lock(void)
+void Mutex::lock()
 {
 #ifdef WINTHREAD
 	DWORD rc = WaitForSingleObject(mutex, INFINITE);
@@ -86,7 +83,7 @@ void Mutex::lock(void)
 /*
  * Unlocks the mutex
  */
-void Mutex::unlock(void)
+void Mutex::unlock()
 {
 #ifdef WINTHREAD
 	BOOL rc = ReleaseMutex(mutex);
@@ -100,13 +97,12 @@ void Mutex::unlock(void)
 #ifdef UNIT_TEST
 // g++ -Wall -c thread.cpp -o thread.o
 // g++ -Wall -DUNIT_TEST -c mutex.cpp -o mutex.o
-// g++ -Wall -DUNIT_TEST mutex.o thread.o -o mutex -lpthread
-#include <iostream>
+// g++ -Wall -DUNIT_TEST mutex.o thread.o -o mutex -pthread
 #include "thread.hpp"
 
 Mutex widget;
 
-int main(void)
+int main()
 {
 	class Mutex_test : public Thread
 	{
@@ -114,7 +110,7 @@ int main(void)
 			Mutex_test(int n)
 				: testval(n) {}
 
-			void* thread(void)
+			void* thread()
 			{
 				widget.lock();
 				cout << "I got it!  thread #" << testval << '\n';
@@ -122,9 +118,11 @@ int main(void)
 				// widget, since it is never unlocked
 				return 0;
 			}
+
 		private:
 			int testval;
 	};
+
 	Mutex_test t1(1);
 	Mutex_test t2(2);
 	Mutex_test t3(3);

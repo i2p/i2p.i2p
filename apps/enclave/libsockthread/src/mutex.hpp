@@ -26,9 +26,13 @@
  * LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ * $Id$
  */
 
-// Modelled after JThread by Jori Liesenborgs
+/*
+ * Modelled after JThread by Jori Liesenborgs
+ */
 
 #ifndef LIBSOCKTHREAD_MUTEX_HPP
 #define LIBSOCKTHREAD_MUTEX_HPP
@@ -36,11 +40,11 @@
 namespace Libsockthread {
 	class Mutex {
 		public:
-			Mutex(void);
-			~Mutex(void);
+			Mutex();
+			~Mutex();
 
-			void lock(void);
-			void unlock(void);
+			void lock();
+			void unlock();
 		private:
 #ifdef WINTHREAD
 			HANDLE mutex;

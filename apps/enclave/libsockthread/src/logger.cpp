@@ -26,13 +26,11 @@
  * LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ * $Id$
  */
 
-#include <cstdarg>
-#include <cstdio>
-#include <iostream>
-#include <string>
-using namespace std;
+#include "platform.hpp"
 #include "mutex.hpp"
 #include "time.hpp"
 #include "logger.hpp"
@@ -41,10 +39,10 @@ using namespace Libsockthread;
 /*
  * Closes the log file
  */
-void Logger::close(void)
+void Logger::close()
 {
 	logf_m.lock();
-	if (logf == 0) {
+	if (logf == NULL) {
 		logf_m.unlock();
 		return;
 	}
@@ -53,7 +51,7 @@ void Logger::close(void)
 		cerr << "fclose() failed: " << strerror(errno) << '\n';
 		cerr_m.unlock();
 	}
-	logf = 0;
+	logf = NULL;
 	logf_m.unlock();
 }
 
@@ -88,15 +86,14 @@ void Logger::log(priority_t priority, const char* format, ...)
 
 	va_list ap;
 	va_start(ap, format);
-	string s;
 	Time t;
 	logf_m.lock();
 
-	if (logf != 0) {
+	if (logf != NULL) {
 		/*
 		 * Remember!  If you change the format here, change it in the else too
 		 */
-		fprintf(logf, "%c %s ", ll, t.utc(s).c_str());
+		fprintf(logf, "%c %s ", ll, t.utc().c_str());
 		vfprintf(logf, format, ap);
 		fputc('\n', logf);
 		if (fflush(logf) == EOF) {
@@ -106,7 +103,7 @@ void Logger::log(priority_t priority, const char* format, ...)
 		}
 	} else {
 		// if they don't have an open log file, just use stderr
-		fprintf(stderr, "%c %s ", ll, t.utc(s).c_str());
+		fprintf(stderr, "%c %s ", ll, t.utc().c_str());
 		vfprintf(stderr, format, ap);
 		fputc('\n', stderr);
 	}
@@ -118,8 +115,8 @@ void Logger::log(priority_t priority, const char* format, ...)
 }
 
 /*
- * Opens a log file for appending.  If there already is an open log file, then
- * it is closed and the new one is opened.
+ * Opens a log file for appending.  If a log file is already open, then it is
+ * closed and the new one is opened.
  *
  * file - file location to open
  */
@@ -145,8 +142,8 @@ bool Logger::open(const string& file)
 // g++ -Wall -c mutex.cpp -o mutex.o
 // g++ -Wall -c time.cpp -o time.o
 // g++ -Wall -DUNIT_TEST -c logger.cpp -o logger.o
-// g++ -Wall -DUNIT_TEST logger.o mutex.o thread.o time.o -o logger -lpthread
-int main(void)
+// g++ -Wall -DUNIT_TEST logger.o mutex.o thread.o time.o -o logger -pthread
+int main()
 {
 	Logger logger;
 

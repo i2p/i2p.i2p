@@ -26,6 +26,8 @@
  * LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ * $Id$
  */
 
 #ifndef LIBSOCKTHREAD_LOGGER_HPP
@@ -40,8 +42,7 @@
  * LWARN - errors we automatically recover from
  * LERROR - major, important errors
  *
- * Obviously, these only work if your Logger object is called "logger" and is
- * global
+ * These only work if your Logger object is called "logger"
  */
 // Prints out the file name, function name, and line number before the message
 #define LDEBUG(format, ...) logger.log(Logger::DEBUG, "%s:%s:%d:" \
@@ -69,16 +70,17 @@
 namespace Libsockthread {
 	class Logger {
 		public:
-			typedef enum {DEBUG = 0, MINOR = 1, INFO = 2, WARN = 3, ERROR = 4}
-				priority_t;
+			enum priority_t {DEBUG = 0, MINOR = 1, INFO = 2, WARN = 3,
+				ERROR = 4};
 
-			Logger(void)
-				: logf(0), loglevel(Logger::DEBUG) { }
-			~Logger(void) { close(); }
+			Logger()
+				: logf(NULL), loglevel(Logger::DEBUG) { }
+			~Logger()
+				{ close(); }
 
-			void close(void);
+			void close();
 			void log(priority_t priority, const char* format, ...);
-			priority_t get_loglevel(void)
+			priority_t get_loglevel()
 				{ loglevel_m.lock(); priority_t ll = loglevel;
 					loglevel_m.unlock(); return ll; }
 			bool open(const string& file);

@@ -26,18 +26,15 @@
  * LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ * $Id$
  */
 
-// Modelled after JThread by Jori Liesenborgs
+/*
+ * Modelled after JThread by Jori Liesenborgs
+ */
 
-#include <cassert>
 #include "platform.hpp"
-#ifdef WINTHREAD
-	#include <windows.h>
-#else
-	#include <pthread.h>
-#endif
-using namespace std;
 #include "mutex.hpp"
 #include "thread.hpp"
 using namespace Libsockthread;
@@ -45,12 +42,12 @@ using namespace Libsockthread;
 /*
  * Gets the return value of a finished thread
  */
-void* Thread::get_retval(void)
+void* Thread::get_retval()
 {
 	void* val;
 	running_m.lock();
 	if (running)
-		val = 0;
+		val = NULL;
 	else
 		val = retval;
 	running_m.unlock();
@@ -60,7 +57,7 @@ void* Thread::get_retval(void)
 /*
  * Checks whether the thread is running
  */
-bool Thread::is_running(void)
+bool Thread::is_running()
 {
 	running_m.lock();
 	bool r = running;
@@ -72,7 +69,7 @@ bool Thread::is_running(void)
  * Stops the thread
  * Generally NOT a good idea
  */
-void Thread::kill(void)
+void Thread::kill()
 {
 	running_m.lock();
 #ifndef NDEBUG
@@ -83,7 +80,7 @@ void Thread::kill(void)
 	}
 #endif
 #ifdef WINTHREAD
-	BOOL rc = TerminateThread(handle, 0);
+	BOOL rc = TerminateThread(handle, NULL);
 	assert(rc);
 #else
 	int rc = pthread_cancel(id);
@@ -96,7 +93,7 @@ void Thread::kill(void)
 /*
  * Starts the thread
  */
-void Thread::start(void)
+void Thread::start()
 {
 #ifndef NDEBUG
 	// check whether the thread is already running
@@ -106,8 +103,8 @@ void Thread::start(void)
 #endif
 	continue_m.lock();
 #ifdef WINTHREAD
-	handle = CreateThread(0, 0, &the_thread, this, 0, &id);
-	assert(handle != 0);
+	handle = CreateThread(NULL, 0, &the_thread, this, 0, &id);
+	assert(handle != NULL);
 #else
 	int rc = pthread_create(&id, 0, &the_thread, this);
 	assert(rc == 0);
@@ -145,10 +142,8 @@ void* Thread::the_thread(void *param)
 #ifdef UNIT_TEST
 // g++ -Wall -c mutex.cpp -o mutex.o
 // g++ -Wall -DUNIT_TEST -c thread.cpp -o thread.o
-// g++ -Wall -DUNIT_TEST mutex.o thread.o -o thread -lpthread
-#include <iostream>
-
-int main(void)
+// g++ -Wall -DUNIT_TEST mutex.o thread.o -o thread -pthread
+int main()
 {
 	class Thread_test : public Thread
 	{
@@ -156,15 +151,14 @@ int main(void)
 			Thread_test(int testval)
 				: testval(testval) { }
 
-			int get_testval(void)
+			int get_testval()
 			{
 				testval_m.lock();
 				int rc = testval;
 				testval_m.unlock();
 				return rc;
 			}
-
-			void *thread(void)
+			void *thread()
 			{
 				// just do something
 				while (true) {
@@ -174,6 +168,7 @@ int main(void)
 				}
 				return 0;
 			}
+
 		private:
 			int testval;
 			Mutex testval_m;

@@ -26,6 +26,8 @@
  * LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ * $Id$
  */
 
 /*
@@ -46,29 +48,22 @@
 #define CYGWIN	3  // Cygwin
 
 #if OS == MINGW
-	#define INET_ADDRSTRLEN 16
-	#define NO_GETHOSTBYNAME2
-	#define NO_INET_ATON  /* implies NO_INET_PTON */
-	#define NO_INET_NTOP
 	#define WINSOCK
 	#define WINTHREAD
 #endif
 
-#if OS == LINUX
-	#define NO_GETHOSTBYNAME2
-#endif
-
-#if OS == CYGWIN
-	#define FAST32_IS_LONG
-	#define INET_ADDRSTRLEN 16
-	#define NO_GETHOSTBYNAME2
-	#define NO_INET_NTOP
-	#define NO_INET_PTON
-#endif
-
+#include <cassert>
+#include <cstdarg>
+#include <cstdio>
 #include <ctime>
 #include <iostream>
+#ifndef WINTHREAD
+	#include <pthread.h>
+#endif
 #include <string>
+#if defined WINSOCK || defined WINTHREAD
+	#include <windows.h>
+#endif
 using namespace std;
 
 #endif  // LIBSOCKTHREAD_PLATFORM_HPP
