@@ -18,6 +18,7 @@
         <ant dir="apps/i2ptunnel/java/" target="jar" />
         <ant dir="apps/httptunnel/java/" target="jar" />
         <ant dir="apps/phttprelay/java/" target="jar" />
+        <ant dir="apps/heartbeat/java/" target="jar" />
         <ant dir="installer/java/" target="jar" />
     </target>
     <target name="compile" />
@@ -28,6 +29,7 @@
         <copy file="apps/i2ptunnel/java/build/i2ptunnel.jar" todir="build/" />
         <copy file="apps/httptunnel/java/build/httptunnel.jar" todir="build/" />
         <copy file="apps/phttprelay/java/build/phttprelay.war" todir="build/" />
+        <copy file="apps/heartbeat/java/build/heartbeat.jar" todir="build/" />
         <copy file="installer/java/build/install.jar" todir="build/" />
         <copy file="installer/java/build/guiinstall.jar" todir="build/" />
         <copy file="installer/java/build/fetchseeds.jar" todir="build/" />
@@ -53,6 +55,7 @@
         <ant dir="apps/i2ptunnel/java/" target="distclean" />
         <ant dir="apps/httptunnel/java/" target="distclean" />
         <ant dir="apps/phttprelay/java/" target="distclean" />
+        <ant dir="apps/heartbeat/java/" target="distclean" />
         <ant dir="installer/java/" target="distclean" />
     </target>
 </project>
