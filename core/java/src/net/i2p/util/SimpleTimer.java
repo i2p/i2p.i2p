@@ -72,6 +72,10 @@ public class SimpleTimer {
         _log.log(Log.CRIT, msg, t);
     }
     
+    private long _occurredTime;
+    private long _occurredEventCount;
+    private TimedEvent _recentEvents[] = new TimedEvent[5];
+    
     private class SimpleTimerRunner implements Runnable {
         public void run() {
             List eventsToFire = new ArrayList(1);
@@ -121,6 +125,9 @@ public class SimpleTimer {
                     }
                 }
                 
+                long now = System.currentTimeMillis();
+                now = now - (now % 1000);
+
                 for (int i = 0; i < eventsToFire.size(); i++) {
                     TimedEvent evt = (TimedEvent)eventsToFire.get(i);
                     try {
@@ -128,7 +135,30 @@ public class SimpleTimer {
                     } catch (Throwable t) {
                         log("wtf, event borked: " + evt, t);
                     }
+                    _recentEvents[4] = _recentEvents[3];
+                    _recentEvents[3] = _recentEvents[2];
+                    _recentEvents[2] = _recentEvents[1];
+                    _recentEvents[1] = _recentEvents[0];
+                    _recentEvents[0] = evt;
                 }
+
+                if (_occurredTime == now) {
+                    _occurredEventCount += eventsToFire.size();
+                } else {
+                    _occurredTime = now;
+                    if (_occurredEventCount > 100) {
+                        StringBuffer buf = new StringBuffer(256);
+                        buf.append("Too many simpleTimerJobs (").append(_occurredEventCount);
+                        buf.append(") in a second!  Last 5: \n");
+                        for (int i = 0; i < _recentEvents.length; i++) {
+                            if (_recentEvents[i] != null)
+                                buf.append(_recentEvents[i]).append('\n');
+                        }
+                        _log.log(Log.CRIT, buf.toString());
+                    }
+                    _occurredEventCount = 0;
+                }
+
                 eventsToFire.clear();
             }
         }

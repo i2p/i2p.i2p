@@ -159,6 +159,10 @@ public class ClientManager {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Message " + msgId + " is targeting a REMOTE destination!  Added to the client message pool");
             runner = getRunner(fromDest);
+            if (runner == null) {
+                // sender went away
+                return;
+            }
             ClientMessage msg = new ClientMessage();
             msg.setDestination(toDest);
             msg.setPayload(payload);

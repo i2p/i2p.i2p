@@ -313,8 +313,26 @@ public class Connection {
         return acked;
     }
 
+    private long _occurredTime;
+    private long _occurredEventCount;
     void eventOccurred() {
-        _chooser.getScheduler(this).eventOccurred(this);
+        long now = System.currentTimeMillis();
+        
+        TaskScheduler sched = _chooser.getScheduler(this);
+        
+        now = now - now % 1000;
+        if (_occurredTime == now) {
+            _occurredEventCount++;
+        } else {
+            _occurredTime = now;
+            if (_occurredEventCount > 5) {
+                _log.log(Log.CRIT, "More than 5 events (" + _occurredEventCount + ") in a second on " 
+                                   + toString() + ": scheduler = " + sched);
+            }
+            _occurredEventCount = 0;
+        }
+            
+        sched.eventOccurred(this);
     }
     
     void resetReceived() {
@@ -376,10 +394,8 @@ public class Connection {
             _outputStream.destroy();
         _outputStream = null;
         _outboundQueue = null;
-        _handler = null;
         if (_receiver != null)
             _receiver.destroy();
-        _receiver = null;
         if (_activityTimer != null)
             SimpleTimer.getInstance().addEvent(_activityTimer, 1);
         _activityTimer = null;

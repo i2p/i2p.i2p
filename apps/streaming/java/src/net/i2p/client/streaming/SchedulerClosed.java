@@ -47,7 +47,8 @@ class SchedulerClosed extends SchedulerImpl {
     }
     
     public void eventOccurred(Connection con) {
-        long timeLeft = con.getCloseSentOn() + Connection.DISCONNECT_TIMEOUT - _context.clock().now();
-        reschedule(timeLeft, con);
+        // noop.  we do the timeout through the simpleTimer anyway
+        //long timeLeft = con.getCloseSentOn() + Connection.DISCONNECT_TIMEOUT - _context.clock().now();
+        //reschedule(timeLeft, con);
     }
 }

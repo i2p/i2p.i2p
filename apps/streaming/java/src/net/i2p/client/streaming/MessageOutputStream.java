@@ -79,6 +79,10 @@ public class MessageOutputStream extends OutputStream {
                     remaining -= toWrite;
                     cur += toWrite;
                     _valid = _buf.length;
+                    if (_dataReceiver == null) {
+                        throwAnyError();
+                        return;
+                    }
                     ws = _dataReceiver.writeData(_buf, 0, _valid);
                     _written += _valid;
                     _valid = 0;                       
@@ -117,6 +121,10 @@ public class MessageOutputStream extends OutputStream {
         WriteStatus ws = null;
         synchronized (_dataLock) {
             if (_buf == null) throw new IOException("closed (buffer went away)");
+            if (_dataReceiver == null) {
+                throwAnyError();
+                return;
+            }
             ws = _dataReceiver.writeData(_buf, 0, _valid);
             _written += _valid;
             _valid = 0;
@@ -164,7 +172,8 @@ public class MessageOutputStream extends OutputStream {
         ByteArray ba = null;
         synchronized (_dataLock) {
             // flush any data, but don't wait for it
-            _dataReceiver.writeData(_buf, 0, _valid);
+            if (_dataReceiver != null)
+                _dataReceiver.writeData(_buf, 0, _valid);
             _written += _valid;
             _valid = 0;
             
