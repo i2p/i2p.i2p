@@ -65,27 +65,27 @@ public class UrlLauncher {
 
             } else if (osName.startsWith("Windows")) {
 
-                String         browserString  = "\"C:\\Program Files\\Internet Explorer\\iexplore.exe\"";
+                String         browserString  = "\"C:\\Program Files\\Internet Explorer\\iexplore.exe\" -nohome";
                 BufferedReader bufferedReader = null;
 
-                _shellCommand.executeSilentAndWaitTimed("regedit /E default_browser.reg \"HKEY_CLASSES_ROOT\\http\\shell\\open\\command\"", 5);
+                _shellCommand.executeSilentAndWait("regedit /E browser.reg \"HKEY_CLASSES_ROOT\\http\\shell\\open\\command\"");
 
                 try {
-                    bufferedReader = new BufferedReader(new InputStreamReader(new FileInputStream("default_browser.reg")));
+                    bufferedReader = new BufferedReader(new InputStreamReader(new FileInputStream("browser.reg"), "UTF-16"));
                     for (String line; (line = bufferedReader.readLine()) != null; ) {
-                        if (line.startsWith("@=\"")) {
-                            browserString = line.substring(3, line.toLowerCase().indexOf(".exe") + 3);
+                        if (line.startsWith("@=")) {
+                            browserString = "\"" + line.substring(3, line.toLowerCase().indexOf(".exe") + 4) + "\"";
                         }
                     }
+                    try {
+                        bufferedReader.close();
+                    } catch (IOException e) {
+                        // No worries.
+                    }
+                    new File("browser.reg").delete();
                 } catch (Exception e) {
                     // Defaults to IE.
                 }
-                try {
-                    bufferedReader.close();
-                } catch (IOException e) {
-                    // No worries.
-                }
-                new File("default_browser.reg").delete();
 
                 if (_shellCommand.executeSilentAndWaitTimed(browserString + " " + url, 5))
                     return true;
