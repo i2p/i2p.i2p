@@ -111,6 +111,8 @@ public class Router {
         };
         _shutdownHook = new ShutdownHook();
         _gracefulShutdownDetector = new I2PThread(new GracefulShutdown());
+        _gracefulShutdownDetector.setDaemon(true);
+        _gracefulShutdownDetector.setName("Graceful shutdown hook");
         _gracefulShutdownDetector.start();
     }
     
