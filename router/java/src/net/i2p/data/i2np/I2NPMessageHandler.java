@@ -49,8 +49,6 @@ public class I2NPMessageHandler {
                 throw ioe;
             } catch (I2NPMessageException ime) {
                 throw ime;
-            } catch (DataFormatException dfe) {
-                throw dfe;
             } catch (Exception e) {
                 if (_log.shouldLog(Log.WARN))
                     _log.warn("Error reading the stream", e);

@@ -629,7 +629,8 @@ public class TCPTransport extends TransportImpl {
                         continue;
                     }
                     if (!allowAddress(tcpAddr)) {
-                        _log.error("Message points at illegal address! "  + msg.getTarget());
+                        _log.error("Message points at illegal address! "  
+                                   + msg.getTarget().getIdentity().calculateHash().toBase64().substring(0,6));
                         
                         iter.remove();
                         _context.shitlist().shitlistRouter(peer, "Invalid addressaddress...");
