@@ -114,7 +114,7 @@ public abstract class Install {
         createLoggerConfig();
         createStartScript();
         createReseedScript();
-        createScripts("startIrcProxy.sh", "startIrcProxy.bat", 6668, "irc.duck.i2p", "log-irc-#.txt", "IRC Proxy", "IRC proxying scripts written to startIrcProxy", "Starting IRC proxy (when you see Ready! you can connect your IRC client to localhost:6668)");
+        //createScripts("startIrcProxy.sh", "startIrcProxy.bat", 6668, "irc.duck.i2p", "log-irc-#.txt", "IRC Proxy", "IRC proxying scripts written to startIrcProxy", "Starting IRC proxy (when you see Ready! you can connect your IRC client to localhost:6668)");
         //createScripts("startI2PCVSProxy.sh", "startI2PCVSProxy.bat", 2401, "i2pcvs.i2p", "log-i2pcvs-#.txt", "CVS Proxy", "Proxying scripts for I2P's CVS server written to startCVSProxy");
         // only pulling them temporarily, duck, until the network is
         // reliable enough

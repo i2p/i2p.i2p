@@ -55,33 +55,6 @@ router.keepHistory=false
 # Again, this is entirely optional, but would be greatly appreciated as it should help 
 # out the development process
 router.submitHistory=false
-	
-# If your router is really slow, you'll need to update the following job parameters
-
-# limit the maximum number of concurrent operations
-router.maxJobRunners=1
-
-# if a job waits more than this amount of time (in
-# milliseconds) before running, spit out a warning
-router.jobLagWarning=8000
-
-# if a job waits more than this amount of time (in
-# milliseconds) before running, kill the router
-router.jobLagFatal=30000
-
-# if a job takes more than this amount of time (in
-# milliseconds) to run, spit out a warning
-router.jobRunWarning=8000
-
-# if a job takes more than this amount of time (in
-# milliseconds) to run, kill the router
-router.jobRunFatal=30000
-
-# wait until the router has been up for this long
-# (in milliseconds) before honoring any fatalities
-# since during startup, jobs are run sequentially 
-# and CPU intensive tasks are needed
-router.jobWarmupTime=600000
 
 # Target clients
 # How many concurrent clients the router should prepare for
@@ -103,13 +76,12 @@ tunnels.numInbound=2
 # XXX Not currently enforced - ignore this setting
 tunnels.numOutbound=2
 
-
 # Depth of inbound tunnels
 # This determines the length of inbound tunnels created - how many remote routers to
 # include (0 means no remote routers, 3 means a total of four routers, including
 # the local one, etc).  This is a key factor in the reliability and anonymity 
 # provided by I2P
-# Users should simply leave this as 2 for now, at least until the tunnels are more reliable (post 0.3)
+# Users should simply leave this as 2 for now
 tunnels.depthInbound=2
 
 # Depth of outbound tunnels
@@ -132,7 +104,6 @@ tunnels.tunnelDuration=600000
 # router through the web interface (using the form provided, or directly via
 # http://localhost:7655/shutdown?password=thisIsASecret)
 #router.shutdownPassword=thisIsASecret
-
 
 #
 # the remaining lines describe how you can get your router to fire up client 
@@ -168,10 +139,11 @@ clientApp.1.main=net.i2p.sam.SAMBridge
 clientApp.1.name=SAMBridge
 clientApp.1.args=sam.keys 0.0.0.0 7656 i2cp.tcp.host=localhost i2cp.tcp.port=##_router_i2cp_port##
 
-# EepProxy (HTTP proxy that lets you browse both eepsites and the normal web via squid.i2p)
+# The eepProxy (HTTP proxy that lets you browse both eepsites and the normal web via squid.i2p) and
+# the ircProxy (which connects to the anonymously hosted ircd at irc.duck.i2p)
 clientApp.2.main=net.i2p.i2ptunnel.I2PTunnel
-clientApp.2.name=EepProxy
-clientApp.2.args=-nocli -e "config localhost ##_router_i2cp_port##" -e "httpclient 4444"
+clientApp.2.name=Tunnels
+clientApp.2.args=-nocli -e "config localhost ##_router_i2cp_port##" -e "httpclient 4444" -e "client 6668 irc.duck.i2p"
 
 # Network monitor (harvests data from the network database and stores it under 
 # monitorData/, and with the netviewer GUI you can browse through its results)
