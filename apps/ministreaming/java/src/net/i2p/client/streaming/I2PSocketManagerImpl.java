@@ -77,7 +77,7 @@ public class I2PSocketManagerImpl implements I2PSocketManager, I2PSessionListene
         _outSockets = new HashMap(16);
         _acceptTimeout = ACCEPT_TIMEOUT_DEFAULT;
         setSession(session);
-        setDefaultOptions(new I2PSocketOptions());
+        setDefaultOptions(buildOptions(opts));
         _context.statManager().createRateStat("streaming.lifetime", "How long before the socket is closed?", "streaming", new long[] { 10*60*1000, 60*60*1000, 24*60*60*1000 });
         _context.statManager().createRateStat("streaming.sent", "How many bytes are sent in the stream?", "streaming", new long[] { 10*60*1000, 60*60*1000, 24*60*60*1000 });
         _context.statManager().createRateStat("streaming.received", "How many bytes are received in the stream?", "streaming", new long[] { 10*60*1000, 60*60*1000, 24*60*60*1000 });
@@ -432,6 +432,11 @@ public class I2PSocketManagerImpl implements I2PSocketManager, I2PSessionListene
 
     public I2PSocketOptions getDefaultOptions() {
         return _defaultOptions;
+    }
+    
+    public I2PSocketOptions buildOptions() { return buildOptions(null); }
+    public I2PSocketOptions buildOptions(Properties opts) {
+        return new I2PSocketOptionsImpl(opts);
     }
 
     public I2PServerSocket getServerSocket() {

@@ -81,7 +81,7 @@ public abstract class SOCKSServer {
             if (connHostName.toLowerCase().endsWith(".i2p")) {
                 _log.debug("connecting to " + connHostName + "...");
                 I2PSocketManager sm = I2PSocketManagerFactory.createManager();
-                destSock = sm.connect(I2PTunnel.destFromName(connHostName), new I2PSocketOptions());
+                destSock = sm.connect(I2PTunnel.destFromName(connHostName), null);
                 confirmConnection();
                 _log.debug("connection confirmed - exchanging data...");
             } else {

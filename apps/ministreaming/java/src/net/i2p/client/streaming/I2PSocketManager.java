@@ -49,6 +49,9 @@ public interface I2PSocketManager {
     public void setDefaultOptions(I2PSocketOptions options);
     public I2PSocketOptions getDefaultOptions();
     public I2PServerSocket getServerSocket();
+    
+    public I2PSocketOptions buildOptions();
+    public I2PSocketOptions buildOptions(Properties opts);
 
     /**
      * Create a new connected socket (block until the socket is created)
