@@ -2648,6 +2648,7 @@ class KNodeClient(KBase):
     
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.sock.connect((self.host, self.port))
+    
         self.rfile = self.sock.makefile("rb")
         self.read = self.rfile.read
         self.readline = self.rfile.readline
@@ -2667,7 +2668,7 @@ class KNodeClient(KBase):
     def close(self):
         
         self.rfile.close()
-        self.wfile.close()
+        #self.wfile.close()
         self.sock.close()
     
     #@-node:close
@@ -2748,12 +2749,12 @@ class KNodeClient(KBase):
         
         res = self.readline().strip()
     
-        self.close()
-    
         if res == "ok":
             ref = self.readline().strip()
+            self.close()
             return ref
         else:
+            self.close()
             return "failed"
     
     #@-node:getref
@@ -2772,6 +2773,7 @@ class KNodeClient(KBase):
     
         return res
     
+    
     #@-node:pingall
     #@+node:kill
     def kill(self):
@@ -2786,6 +2788,7 @@ class KNodeClient(KBase):
                 self.close()
         except:
             pass
+    
     
     #@-node:kill
     #@+node:__getitem__
