@@ -110,6 +110,7 @@ public class ConfigNetHandler extends FormHandler {
             addFormError("Unable to guess the host (NO_PREFIX)");
         } catch (IOException ioe) {
             addFormError("Unable to guess the host (IO_ERROR)");
+            _context.logManager().getLog(ConfigNetHandler.class).error("Unable to guess the host", ioe);
         } finally {
             if (reader != null) try { reader.close(); } catch (IOException ioe) {}
         }
