@@ -58,7 +58,9 @@ public class DatabaseLookupMessage extends I2NPMessageImpl {
             // we do this in the writeMessage so we know that we have all the data
             int dosCount = detectDoS(context);
             if (dosCount > 0) {
-                _log.log(Log.CRIT, "Are we flooding the network with NetDb messages?  (" + dosCount + " messages so far)", new Exception("Flood cause"));
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("Are we flooding the network with NetDb messages?  (" + dosCount 
+                              + " messages so far)", new Exception("Flood cause"));
             }
         }
     }
