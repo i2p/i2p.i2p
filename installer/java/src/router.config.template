@@ -138,6 +138,13 @@ tunnels.tunnelDuration=600000
 # what you're doing
 router.maxWaitingJobs=40
 
+# shutdown password
+# uncomment the following (after changing the value) to allow shutting down the 
+# router through the web interface (using the form provided, or directly via
+# http://localhost:7655/shutdown?password=thisIsASecret)
+#router.shutdownPassword=thisIsASecret
+
+
 #
 # the remaining lines describe how you can get your router to fire up client 
 # applications it is up and running, all within the router's JVM.  Uncomment the
