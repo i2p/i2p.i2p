@@ -51,12 +51,35 @@ class AdminRunner implements Runnable {
         } else if (command.indexOf("/profile/") >= 0) {
             replyText(out, getProfile(command));
         } else if (command.indexOf("setTime") >= 0) {
-            setTime(command);
-            reply(out, "<html><body>Time updated</body></html>");
+            if (allowTimeUpdate(command)) {
+                setTime(command);
+                reply(out, "<html><body>Time updated</body></html>");
+            } else {
+                reply(out, "<html><body>Time not updated</body></html>");
+            }
         } else if (command.indexOf("/shutdown") >= 0) {
             reply(out, shutdown(command));
         } else if (true || command.indexOf("routerConsole.html") > 0) {
             reply(out, _context.router().renderStatusHTML());
+        }
+    }
+    
+    private boolean allowTimeUpdate(String command) {
+        String pass = _context.getProperty("adminTimePassphrase");
+        if ( (pass == null) || (pass.trim().length() <= 0) ) {
+            if (_log.shouldLog(Log.ERROR))
+                _log.error("No passphrase for update time from " + _socket.getInetAddress() 
+                          + ":" + _socket.getPort());
+            return false;
+        }
+        
+        if (command.indexOf(pass) != -1) {
+            return true;
+        } else {
+            if (_log.shouldLog(Log.ERROR))
+                _log.error("Invalid passphrase for update time from " + _socket.getInetAddress() 
+                          + ":" + _socket.getPort());
+            return false;
         }
     }
     

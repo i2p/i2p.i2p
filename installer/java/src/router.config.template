@@ -168,7 +168,13 @@ router.maxWaitingJobs=40
 clientApp.0.main=net.i2p.time.Timestamper
 clientApp.0.name=Timestamper
 clientApp.0.onBoot=true
-clientApp.0.args=http://localhost:7655/setTime?k=v pool.ntp.org pool.ntp.org pool.ntp.org
+clientApp.0.args=http://localhost:7655/setTime?putTheValueFromBelowHere pool.ntp.org pool.ntp.org pool.ntp.org
+
+# The admin time passphrase, used to prevent unauthorized people from updating your
+# routers time.  The value should be included in the timestamper's args above, 
+# otherwise it wont honor timestamp updates.  You shouldnt include any spaces or funky 
+# characters - just pick some random numbers.
+adminTimePassphrase=pleaseSetSomeValueHere
 
 # SAM bridge (a simplified socket based protocol for using I2P - listens on port 7656.  see
 # the specs at http://www.i2p.net/node/view/144 for more info)
