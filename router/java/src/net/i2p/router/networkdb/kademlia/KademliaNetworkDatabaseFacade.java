@@ -428,6 +428,9 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         }
     }
     
+    /** I don't think it'll ever make sense to have a lease last for a full day */
+    private static final long MAX_LEASE_FUTURE = 24*60*60*1000;
+    
     public LeaseSet store(Hash key, LeaseSet leaseSet) {
         long start = _context.clock().now();
         if (!_initialized) return null;
@@ -443,6 +446,10 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         } else if (leaseSet.getEarliestLeaseDate() <= _context.clock().now()) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Old leaseSet!  not storing it: " + leaseSet);
+            return null;
+        } else if (leaseSet.getEarliestLeaseDate() > _context.clock().now() + MAX_LEASE_FUTURE) {
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("LeaseSet to expire too far in the future: " + leaseSet);
             return null;
         }
         
@@ -499,6 +506,11 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
                     + " peers left (curPeer: " + key.toBase64() + " published on "
                     + new Date(routerInfo.getPublished()));
             }
+        } else if (routerInfo.getPublished() > start + Router.CLOCK_FUDGE_FACTOR) {
+            if (_log.shouldLog(Log.ERROR))
+                _log.error("Peer " + key.toBase64() + " published their leaseSet in the future?! [" 
+                          + new Date(routerInfo.getPublished()) + "]");
+            return null;
         }
         
         RouterInfo rv = null;

@@ -215,13 +215,7 @@ class PersistentDataStore extends TransientDataStore {
                     fis = new FileInputStream(_leaseFile);
                     LeaseSet ls = new LeaseSet();
                     ls.readBytes(fis);
-                    if (ls.isCurrent(Router.CLOCK_FUDGE_FACTOR)) {
-                        _log.info("Reading in new LeaseSet: " + ls.getDestination().calculateHash());
-                        accept(ls);
-                    } else {
-                        _log.warn("Expired LeaseSet found for " + ls.getDestination().calculateHash() + ": Deleting");
-                        corrupt = true;
-                    }
+                    _facade.store(ls.getDestination().calculateHash(), ls);
                 } catch (DataFormatException dfe) {
                     _log.warn("Error reading the leaseSet from " + _leaseFile.getAbsolutePath(), dfe);
                     corrupt = true;
@@ -272,13 +266,7 @@ class PersistentDataStore extends TransientDataStore {
                     fis = new FileInputStream(_routerFile);
                     RouterInfo ri = new RouterInfo();
                     ri.readBytes(fis);
-                    if (ri.isValid()) {
-                        _log.info("Reading in new RouterInfo: " + ri.getIdentity().getHash());
-                        accept(ri);
-                    } else {
-                        _log.warn("Invalid routerInfo found for " + ri.getIdentity().getHash() + ": " + ri);
-                        corrupt = true;
-                    }
+                    _facade.store(ri.getIdentity().getHash(), ri);
                 } catch (DataFormatException dfe) {
                     _log.warn("Error reading the routerInfo from " + _routerFile.getAbsolutePath(), dfe);
                     corrupt = true;
