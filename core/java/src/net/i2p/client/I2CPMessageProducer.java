@@ -40,7 +40,6 @@ import net.i2p.util.RandomSource;
  */
 class I2CPMessageProducer {
     private final static Log _log = new Log(I2CPMessageProducer.class);
-    private final static RandomSource _rand = RandomSource.getInstance();
     private I2PAppContext _context;
 
     public I2CPMessageProducer(I2PAppContext context) {
@@ -114,16 +113,6 @@ class I2CPMessageProducer {
         _log.debug("Encrypting the payload to public key " + dest.getPublicKey().toBase64() + "\nPayload: "
                    + data.calculateHash());
         return data;
-    }
-
-    private static Set generateNewTags() {
-        Set tags = new HashSet();
-        for (int i = 0; i < 10; i++) {
-            byte tag[] = new byte[SessionTag.BYTE_LENGTH];
-            RandomSource.getInstance().nextBytes(tag);
-            tags.add(new SessionTag(tag));
-        }
-        return tags;
     }
 
     /**

@@ -248,7 +248,7 @@ public class ElGamalAESEngine {
         //_log.debug("iv for decryption: " + DataHelper.toString(iv, 16));	
         //_log.debug("decrypting AES block.  encr.length = " + (encrypted == null? -1 : encrypted.length) + " sentTag: " + DataHelper.toString(sentTag, 32));
         byte decrypted[] = _context.AESEngine().decrypt(encrypted, key, iv);
-        Hash h = _context.sha().calculateHash(decrypted);
+        //Hash h = _context.sha().calculateHash(decrypted);
         //_log.debug("Hash of entire aes block after decryption: \n" + DataHelper.toString(h.getData(), 32));
         try {
             SessionKey newKey = null;
@@ -501,7 +501,7 @@ public class ElGamalAESEngine {
             aesSrc.write(padding);
 
             byte aesUnencr[] = aesSrc.toByteArray();
-            Hash h = _context.sha().calculateHash(aesUnencr);
+            //Hash h = _context.sha().calculateHash(aesUnencr);
             //_log.debug("Hash of entire aes block before encryption: (len=" + aesUnencr.length + ")\n" + DataHelper.toString(h.getData(), 32));
             byte aesEncr[] = _context.AESEngine().encrypt(aesUnencr, key, iv);
             //_log.debug("Encrypted length: " + aesEncr.length);
