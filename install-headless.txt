@@ -1,4 +1,4 @@
-$Id: install-headless.txt,v 1.1 2004/09/01 21:20:03 jrandom Exp $
+$Id: install-headless.txt,v 1.2 2004/09/02 01:54:37 jrandom Exp $
 Headless I2P installation instructions
 
 1) tar xjf i2p.tar.bz2                     (you've already done this)
@@ -8,9 +8,6 @@ Headless I2P installation instructions
 
 If you're having trouble, swing by http://forum.i2p.net/, check the
 website at http://www.i2p.net/, or get on irc://irc.freenode.net/#i2p
-
-To have I2P run on startup as a daemon, after the above, run:
-   sh install_i2p_service_unix
 
 To run I2P explicitly:
    sh i2prouter start
@@ -23,9 +20,6 @@ To stop the router (immediately):
 
 To uninstall I2P:
    rm -rf $i2pInstallDir
-
-To remove the daemon setup, run:
-   sh uninstall_i2p_service_unix
 
 Supported JVMs:
   Windows: Latest available from http://java.sun.com/ (1.3+ supported)
