@@ -206,6 +206,8 @@ public class HandleTunnelMessageJob extends JobImpl {
                 msg.setMessageExpiration(_message.getMessageExpiration());
                 
                 int timeoutMs = (int)(_message.getMessageExpiration().getTime() - getContext().clock().now());
+                timeoutMs += Router.CLOCK_FUDGE_FACTOR;
+                
                 if (timeoutMs < 1000) {
                     if (_log.shouldLog(Log.ERROR))
                         _log.error("Message " + _message.getUniqueId() + " is valid and we would pass it on through tunnel "
