@@ -2,6 +2,7 @@ package net.i2p.router.tunnelmanager;
 
 import java.io.IOException;
 import java.io.Writer;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -152,7 +153,7 @@ class TunnelPool {
      *
      */
     public Set getManagedTunnelIds() {
-        if (!_isLive) return null;
+        if (!_isLive) return Collections.EMPTY_SET;
         Set ids = new HashSet(64);
         synchronized (_outboundTunnels) {
             ids.addAll(_outboundTunnels.keySet());

@@ -40,6 +40,7 @@ public class TCPConnectionEstablisher implements Runnable {
             if (con != null) {
                 _transport.connectionEstablished(con);
             } else {
+                if (!_context.router().isAlive()) return;
                 _transport.addConnectionErrorMessage(cb.getError());
                 Hash peer = info.getIdentity().getHash();
                 _context.profileManager().commErrorOccurred(peer);

@@ -1,4 +1,7 @@
-$Id: history.txt,v 1.87 2004/11/28 20:58:39 jrandom Exp $
+$Id: history.txt,v 1.88 2004/11/29 16:57:14 jrandom Exp $
+
+2004-11-29  jrandom
+    * Minor fixes to avoid unnecessary errors on shutdown (thanks susi!)
 
 2004-11-29  jrandom
     * Reduced contention for local client delivery
