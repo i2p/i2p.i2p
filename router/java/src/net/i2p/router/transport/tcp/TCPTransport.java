@@ -240,17 +240,9 @@ public class TCPTransport extends TransportImpl {
         
         long start = _context.clock().now();
         SocketCreator creator = new SocketCreator(host, port);
-        I2PThread sockCreator = new I2PThread(creator);
-        sockCreator.setDaemon(true);
-        sockCreator.setName("SocketCreator_:" + _listenPort);
-        //sockCreator.setPriority(I2PThread.MIN_PRIORITY);
-        sockCreator.start();
-        
-        try {
-            synchronized (creator) {
-                creator.wait(SOCKET_CREATE_TIMEOUT);
-            }
-        } catch (InterruptedException ie) {}
+        // blocking call, timing out after the SOCKET_CREATE_TIMEOUT and 
+        // killing the socket if it hasn't established the connection yet
+        creator.establishConnection(SOCKET_CREATE_TIMEOUT);
         
         long finish = _context.clock().now();
         long diff = finish - start;
@@ -258,7 +250,10 @@ public class TCPTransport extends TransportImpl {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Creating a new socket took too long?  wtf?! " + diff + "ms for " + host + ':' + port);
         }
-        return creator.getSocket();
+        if (creator.couldEstablish())
+            return creator.getSocket();
+        else
+            return null;
     }
     
     private boolean isConnected(RouterInfo info) {
@@ -356,7 +351,7 @@ public class TCPTransport extends TransportImpl {
         
         _running = true;
         for (int i = 0; i < _numConnectionEstablishers; i++) {
-            Thread t = new I2PThread(new ConnEstablisher(i));
+            Thread t = new I2PThread(new ConnEstablisher(i), "Conn Establisher" + i + ':' + _listenPort);
             t.setDaemon(true);
             t.start();
         }
@@ -583,8 +578,6 @@ public class TCPTransport extends TransportImpl {
         public int getId() { return _id; }
         
         public void run() {
-            Thread.currentThread().setName("Conn Establisher" + _id + ':' + _listenPort);
-            
             while (_running) {
                 try {
                     PendingMessages pending = nextPeer(this);

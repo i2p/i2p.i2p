@@ -220,26 +220,10 @@ class RestrictiveTCPConnection extends TCPConnection {
     
     private boolean sendsUsData(TCPAddress peer) {
         SocketCreator creator = new SocketCreator(peer.getHost(), peer.getPort(), false);
-        I2PThread sockCreator = new I2PThread(creator);
-        sockCreator.setDaemon(true);
-        sockCreator.setName("PeerCallback:" + _transport.getListenPort());
-        //sockCreator.setPriority(I2PThread.MIN_PRIORITY);
-        sockCreator.start();
-        
-        if (_log.shouldLog(Log.DEBUG)) 
-            _log.debug("Before joining socket creator via peer callback...");
-        try {
-            synchronized (creator) {
-                creator.wait(TCPTransport.SOCKET_CREATE_TIMEOUT);
-            }
-        } catch (InterruptedException ie) {
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Timed out waiting to connect to " + peer.getHost() 
-                           + ':' + peer.getPort());
-        }
-        
-        boolean established = creator.couldEstablish();
-        // returns a socket if and only if the connection was established and the I2P handshake byte sent and received
+        // blocking call, timing out after the SOCKET_CREATE_TIMEOUT if there
+        // isn't a definitive yes or no on whether the peer is running I2NP or not
+        // the call closes the socket created regardless
+        boolean established = creator.verifyReachability(TCPTransport.SOCKET_CREATE_TIMEOUT);
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("After joining socket creator via peer callback [could establish? " + established + "]");
         return established;

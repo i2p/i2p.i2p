@@ -16,9 +16,13 @@ import java.net.Socket;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import net.i2p.router.RouterContext;
 import net.i2p.util.I2PThread;
 import net.i2p.util.Log;
+import net.i2p.util.SimpleTimer;
 
 /**
  * Listen for TCP connections with a listener thread
@@ -31,18 +35,32 @@ class TCPListener {
     private ServerSocket _socket;
     private ListenerRunner _listener;
     private RouterContext _context;
+    private List _pendingSockets;
+    private List _handlers;
     
     public TCPListener(RouterContext context, TCPTransport transport) {
         _context = context;
         _log = context.logManager().getLog(TCPListener.class);
         _myAddress = null;
         _transport = transport;
+        _pendingSockets = new ArrayList(10);
+        _handlers = new ArrayList(CONCURRENT_HANDLERS);
     }
     
     public void setAddress(TCPAddress address) { _myAddress = address; }
     public TCPAddress getAddress() { return _myAddress; }
     
+    private static final int CONCURRENT_HANDLERS = 3;
+    
     public void startListening() {
+        for (int i = 0; i < CONCURRENT_HANDLERS; i++) {
+            SocketHandler handler = new SocketHandler();
+            _handlers.add(handler);
+            Thread t = new I2PThread(handler);
+            t.setName("Handler" + i+" [" + _myAddress.getPort()+"]");
+            t.setDaemon(true);
+            t.start();
+        }
         _listener = new ListenerRunner();
         Thread t = new I2PThread(_listener);
         t.setName("Listener [" + _myAddress.getPort()+"]");
@@ -52,6 +70,11 @@ class TCPListener {
     
     public void stopListening() {
         _listener.stopListening();
+        for (int i = 0; i < _handlers.size(); i++) {
+            SocketHandler h = (SocketHandler)_handlers.get(i);
+            h.stopHandling();
+        }
+        _handlers.clear();
         if (_socket != null)
             try {
                 _socket.close();
@@ -84,7 +107,8 @@ class TCPListener {
         public void stopListening() { _isRunning = false; }
         
         public void run() {
-            _log.info("Beginning TCP listener");
+            if (_log.shouldLog(Log.INFO))
+                _log.info("Beginning TCP listener");
             
             int curDelay = 0;
             while ( (_isRunning) && (curDelay < MAX_FAIL_DELAY) ) {
@@ -94,11 +118,14 @@ class TCPListener {
                     } else {
                         _socket = new ServerSocket(_myAddress.getPort());
                     }
-                    _log.info("Begin looping for host " + _myAddress.getHost() + ":" + _myAddress.getPort());
+                    if (_log.shouldLog(Log.INFO))
+                        _log.info("Begin looping for host " + _myAddress.getHost() + ":" + _myAddress.getPort());
                     curDelay = 0;
                     loop();
                 } catch (IOException ioe) {
-                    _log.error("Error listening to tcp connection " + _myAddress.getHost() + ":" + _myAddress.getPort(), ioe);
+                    if (_log.shouldLog(Log.ERROR))
+                        _log.error("Error listening to tcp connection " + _myAddress.getHost() + ":" 
+                                   + _myAddress.getPort(), ioe);
                 }
                 
                 if (_socket != null) {
@@ -107,12 +134,14 @@ class TCPListener {
                     _socket = null;
                 }
                 
-                _log.error("Error listening, waiting " + _nextFailDelay + "ms before we try again");
+                if (_log.shouldLog(Log.ERROR))
+                    _log.error("Error listening, waiting " + _nextFailDelay + "ms before we try again");
                 try { Thread.sleep(_nextFailDelay); } catch (InterruptedException ie) {}
                 curDelay += _nextFailDelay;
                 _nextFailDelay *= 5;
             }
-            _log.error("CANCELING TCP LISTEN.  delay = " + curDelay, new Exception("TCP Listen cancelled!!!"));
+            if (_log.shouldLog(Log.ERROR))
+                _log.error("CANCELING TCP LISTEN.  delay = " + curDelay);
             _isRunning = false;
         }
         private void loop() {
@@ -128,60 +157,96 @@ class TCPListener {
                     handle(s);
                     
                 } catch (SocketException se) {
-                    _log.error("Error handling a connection - closed?", se);
+                    if (_log.shouldLog(Log.ERROR))
+                        _log.error("Error handling a connection - closed?", se);
                     return;
                 } catch (Throwable t) {
-                    _log.error("Error handling a connection", t);
+                    if (_log.shouldLog(Log.ERROR))
+                        _log.error("Error handling a connection", t);
                 }
             }
         }
     }
     
+    /** 
+     * Just toss it on a queue for our pool of handlers to deal with (but also
+     * queue up a timeout event in case they're swamped)
+     *
+     */
     private void handle(Socket s) {
-        I2PThread t = new I2PThread(new BlockingHandler(s));
-        t.setDaemon(true);
-        t.setName("BlockingHandler:"+_transport.getListenPort());
-        t.start();
-    }
-    
-    private class BlockingHandler implements Runnable {
-        private Socket _handledSocket;
-        public BlockingHandler(Socket socket) {
-            _handledSocket = socket;
-        }
-        public void run() {
-            TimedHandler h = new TimedHandler(_handledSocket);
-            I2PThread t = new I2PThread(h);
-            t.setDaemon(true);
-            t.start();
-            try {
-                synchronized (h) {
-                    h.wait(HANDLE_TIMEOUT);
-                }
-            } catch (InterruptedException ie) {
-                // got through early...
-            }
-            if (h.wasSuccessful()) {
-                if (_log.shouldLog(Log.DEBUG))
-                    _log.debug("Handle successful");
-            } else {
-                if (h.receivedIdentByte()) {
-                    if (_log.shouldLog(Log.WARN))
-                        _log.warn("Unable to handle in the time allotted");
-                } else {
-                    if (_log.shouldLog(Log.DEBUG))
-                        _log.debug("Peer didn't send the ident byte, so either they were testing us, or portscanning");
-                }
-                try { _handledSocket.close(); } catch (IOException ioe) {}
-            }
+        SimpleTimer.getInstance().addEvent(new CloseUnhandled(s), HANDLE_TIMEOUT);
+        synchronized (_pendingSockets) {
+            _pendingSockets.add(s);
+            _pendingSockets.notifyAll();
         }
     }
     
+    /** callback to close an unhandled socket (if the handlers are overwhelmed) */
+    private class CloseUnhandled implements SimpleTimer.TimedEvent {
+        private Socket _cur;
+        public CloseUnhandled(Socket socket) {
+            _cur = socket;
+        }
+        public void timeReached() {
+            boolean removed;
+            synchronized (_pendingSockets) {
+                removed = _pendingSockets.remove(_cur);
+            }
+            if (removed) {
+                // handlers hadn't taken it yet, so close it
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("Closing unhandled socket " + _cur);
+                try { _cur.close(); } catch (IOException ioe) {}
+            }
+        }
+        
+    }
+    
+    /**
+     * Implement a runner for the pool of handlers, pulling sockets out of the
+     * _pendingSockets queue and synchronously pumping them through a 
+     * TimedHandler. 
+     *
+     */
+    private class SocketHandler implements Runnable {
+        private boolean _handle;
+        public SocketHandler() {
+            _handle = true;
+        }
+        public void run () {
+            while (_handle) {
+                Socket cur = null;
+                try {
+                    synchronized (_pendingSockets) {
+                        if (_pendingSockets.size() <= 0)
+                            _pendingSockets.wait();
+                        else
+                            cur = (Socket)_pendingSockets.remove(0);
+                    }
+                } catch (InterruptedException ie) {}
+                
+                if (cur != null) 
+                    handleSocket(cur);
+                cur = null;
+            }
+        }
+        public void stopHandling() { _handle = false; }
+        
+        /** 
+         * blocking call to establish the basic connection, but with a timeout
+         * in the TimedHandler 
+         */
+        private void handleSocket(Socket s) {
+            TimedHandler h = new TimedHandler(s);
+            h.handle();
+        }
+    }
+
     /** if we're not making progress in 30s, drop 'em */
     private final static long HANDLE_TIMEOUT = 10*1000;
     private static volatile int __handlerId = 0;
     
-    private class TimedHandler implements Runnable {
+    private class TimedHandler implements SimpleTimer.TimedEvent {
         private int _handlerId;
         private Socket _socket;
         private boolean _wasSuccessful;
@@ -192,8 +257,9 @@ class TCPListener {
             _handlerId = ++__handlerId;
             _receivedIdentByte = false;
         }
-        public void run() {
-            Thread.currentThread().setName("TimedHandler"+_handlerId + ':' + _transport.getListenPort());
+        public int getHandlerId() { return _handlerId; }
+        public void handle() {
+            SimpleTimer.getInstance().addEvent(TimedHandler.this, HANDLE_TIMEOUT);
             try {
                 OutputStream os = _socket.getOutputStream();
                 os.write(SocketCreator.I2P_FLAG);
@@ -227,11 +293,29 @@ class TCPListener {
                     _log.error("Error handling", t);
                 _wasSuccessful = false;
             }
-            synchronized (TimedHandler.this) {
-                TimedHandler.this.notifyAll();
-            }
         }
         public boolean wasSuccessful() { return _wasSuccessful; }
         public boolean receivedIdentByte() { return _receivedIdentByte; }
+
+        /**
+         * Called after a timeout period - if we haven't already established the
+         * connection, close the socket (interrupting any blocking ops)
+         *
+         */
+        public void timeReached() {
+            if (wasSuccessful()) {
+                if (_log.shouldLog(Log.DEBUG))
+                    _log.debug("Handle successful");
+            } else {
+                if (receivedIdentByte()) {
+                    if (_log.shouldLog(Log.WARN))
+                        _log.warn("Unable to handle in the time allotted");
+                } else {
+                    if (_log.shouldLog(Log.DEBUG))
+                        _log.debug("Peer didn't send the ident byte, so either they were testing us, or portscanning");
+                }
+                try { _socket.close(); } catch (IOException ioe) {}
+            }
+        }
     }
 }
