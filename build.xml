@@ -142,7 +142,7 @@
         <echo message="routerconsole.war file under your i2p install dir as webapps/routerconsole.war and will want " />
         <echo message="to add the RouterConsoleRunner to the router's clientApp list (it must be in the router's JVM)" />
     </target>
-    <target name="pkg" depends="tarball" /> <!-- <target name="pkg" depends="tarball, installer" /> -->
+    <target name="pkg" depends="tarball, installer" />
     <target name="pkgclean">
         <delete dir="pkg-temp" />
         <delete>
@@ -179,11 +179,8 @@
             <tarfileset dir="pkg-temp" includes="**/*" prefix="i2p" />
         </tar>
     </target>
-    <!-- <target name="installer" depends="preppkg">
-        <izpack input="installer/install.xml"
-                output="install.jar"
-                installerType="standard"
-                basedir="installer"
-                izPackDir="installer" />
-    </target> -->
+    <taskdef name="izpack" classpath="${basedir}/installer/lib/standalone-compiler.jar" classname="com.izforge.izpack.ant.IzPackTask" />
+    <target name="installer" depends="preppkg">
+        <izpack input="${basedir}/installer/install.xml" output="${basedir}/install.jar" installerType="standard" basedir="${basedir}" />
+    </target>
 </project>

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="iso-8859-1" standalone="yes" ?>
+
+<installation version="1.0">
+
+    <info>
+        <appname>I2P</appname>
+        <appversion>0.4.0</appversion>
+        <authors>
+            <author name="The I2P Project" email="support@i2p.net"/>
+        </authors>
+        <url>http://www.i2p.net</url>
+    </info>
+
+    <guiprefs width="580" height="356" resizable="no">
+        <laf name="liquid">
+            <os family="unix"/>
+        </laf>
+    </guiprefs>
+
+    <locale>
+        <langpack iso3="eng"/>
+    </locale>
+
+    <resources>
+        <res id="Installer.image" src="installer/resources/i2plogo.png" />
+        <res id="LicencePanel.licence" src="installer/resources/readme.license.txt"/>
+    </resources>
+
+    <panels>
+        <panel classname="HelloPanel"/>
+        <panel classname="LicencePanel"/>
+        <panel classname="TargetPanel"/>
+        <panel classname="InstallPanel"/>
+        <panel classname="FinishPanel"/>
+    </panels>
+
+    <packs>
+        <pack name="Base" required="yes">
+            <description>Base installation files</description>
+            <fileset dir="pkg-temp" includes="**/*" targetdir="$INSTALL_PATH"/>
+        </pack>
+    </packs>
+
+</installation>
