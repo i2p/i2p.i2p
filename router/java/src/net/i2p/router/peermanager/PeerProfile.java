@@ -83,10 +83,18 @@ public class PeerProfile {
      * 5 minutes)
      */
     public boolean getIsActive() {
-        if ( (getSendSuccessSize().getRate(5*60*1000).getCurrentEventCount() > 0) ||
-             (getSendSuccessSize().getRate(5*60*1000).getLastEventCount() > 0) ||
-             (getReceiveSize().getRate(5*60*1000).getCurrentEventCount() > 0) ||
-             (getReceiveSize().getRate(5*60*1000).getLastEventCount() > 0) )
+        return getIsActive(5*60*1000);
+    }
+    
+    /**
+     * Is this peer active at the moment (sending/receiving messages within the 
+     * given period?)
+     */
+    public boolean getIsActive(long period) {
+        if ( (getSendSuccessSize().getRate(period).getCurrentEventCount() > 0) ||
+             (getSendSuccessSize().getRate(period).getLastEventCount() > 0) ||
+             (getReceiveSize().getRate(period).getCurrentEventCount() > 0) ||
+             (getReceiveSize().getRate(period).getLastEventCount() > 0) )
             return true;
         else
             return false;

@@ -68,7 +68,7 @@ public class CapacityCalculator extends Calculator {
      *
      */
     private boolean tooOld(PeerProfile profile) {
-        if (profile.getIsActive()) 
+        if (profile.getIsActive(60*60*1000)) 
             return false;
         else 
             return true;
