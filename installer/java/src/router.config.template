@@ -160,6 +160,15 @@ clientApp.2.args=-nocli -e "config localhost ##_router_i2cp_port##" -e "httpclie
 #clientApp.3.main=net.i2p.router.web.RouterConsoleRunner
 #clientApp.3.name=webConsole
 #clientApp.3.args=7657 127.0.0.1 ./webapps/
+#clientApp.3.onBoot=true
+
+# To require simple HTTP authentication for accessing any of the pages underneath the web console
+# (including any other webapps deployed), uncomment the following line and set the password
+# accordingly (the username is 'admin').  If the following is commented out, or is blank, then
+# no password will be required, and anyone will be able to access your router console (and change 
+# settings, etc).  This is only used for the new jetty console (started in clientApp.3.* above)
+#
+#consolePassword=fooBarBaz
 
 # Network monitor (harvests data from the network database and stores it under 
 # monitorData/, and with the netviewer GUI you can browse through its results)

@@ -1,13 +1,22 @@
 package net.i2p.router.web;
 
 import java.io.IOException;
+import java.util.List;
+
+import net.i2p.router.RouterContext;
+
 import org.mortbay.jetty.Server;
+import org.mortbay.jetty.servlet.WebApplicationContext;
+import org.mortbay.http.handler.SecurityHandler;
+import org.mortbay.http.HashUserRealm;
+import org.mortbay.http.HttpRequest;
+import org.mortbay.http.SecurityConstraint;
 import org.mortbay.util.MultiException;
 
 public class RouterConsoleRunner {
     private Server _server;
     private String _listenPort = "7657";
-    private String _listenHost = "0.0.0.0";
+    private String _listenHost = "127.0.0.1";
     private String _webAppsDir = "./webapps/";
     
     public RouterConsoleRunner(String args[]) {
@@ -25,10 +34,15 @@ public class RouterConsoleRunner {
     
     public void startConsole() {
         _server = new Server();
+        WebApplicationContext contexts[] = null;
         try {
             _server.addListener(_listenHost + ':' + _listenPort);
             _server.setRootWebApp("routerconsole");
-            _server.addWebApplications(_webAppsDir);
+            contexts = _server.addWebApplications(_webAppsDir);
+            if (contexts != null) {
+                for (int i = 0; i < contexts.length; i++) 
+                    initialize(contexts[i]);
+            }
         } catch (IOException ioe) {
             ioe.printStackTrace();
         }
@@ -36,6 +50,41 @@ public class RouterConsoleRunner {
             _server.start();
         } catch (MultiException me) {
             me.printStackTrace();
+        }
+    }
+    
+    private void initialize(WebApplicationContext context) {
+        String password = getPassword();
+        if (password != null) {
+            HashUserRealm realm = new HashUserRealm();
+            realm.put("admin", password);
+            realm.addUserToRole("admin", "routerAdmin");
+            context.setRealm(realm);
+            context.addHandler(0, new SecurityHandler());
+            SecurityConstraint constraint = new SecurityConstraint("admin", "routerAdmin");
+            constraint.setAuthenticate(true);
+            context.addSecurityConstraint("/", constraint);
+        }
+    }
+    
+    private String getPassword() {
+        List contexts = RouterContext.listContexts();
+        if (contexts != null) {
+            for (int i = 0; i < contexts.size(); i++) {
+                RouterContext ctx = (RouterContext)contexts.get(i);
+                String password = ctx.getProperty("consolePassword");
+                if (password != null) {
+                    password = password.trim();
+                    if (password.length() > 0) {
+                        return password;
+                    }
+                }
+            }
+            // no password in any context
+            return null;
+        } else {
+            // no contexts?!
+            return null;
         }
     }
     
