@@ -62,4 +62,17 @@ the <a href="/i2ptunnel/" target="_blank">I2PTunnel configuration interface</a> 
 You can also go to that page if you want to add a new tunnel, such as if you want to run
 your own eepsite.</p>
 
+<h2>Want your own eepsite?</h2>
+<p>In addition, we've configured some software to let you run your own eepsite - a 
+<a href="http://jetty.mortbay.org/">Jetty</a> instance listening on 
+<a href="http://localhost:7658/">http://localhost:7658/</a>.  Simply place your files in
+the <code>eepsite/docroot/</code> directory (or any standard JSP/Servlet <code>.war</code>
+files under <code>eepsite/webapps</code>) and they'll show up.  Your eepsite's 
+<i>destination</i> (which uniquely and securly identifies it) is shown on the I2PTunnel
+<a href="/i2ptunnel/">configuration page</a> - if you want other people to see your eepsite,
+you need to give them that really huge string.  Just paste it into the 
+<a href="http://forum.i2p/viewforum.php?f=16">Eepsite announce</a> forum, add it to
+ugha's <a href="http://ugha.i2p/I2pLinks">wiki</a>, or paste it in the #i2p or #i2p-chat channels on
+IRC (be sure to split it into two lines, as its too long for one).</p>
+
 <p><b>As a note, you can change this page by editing the file "docs/readme.html"</b></p>
