@@ -89,7 +89,7 @@ public class ClientConfig {
     
     /**
      * Create a dummy client config to be fetched from the specified location
-     *
+     * @param location the location to fetch from
      */
     public ClientConfig(String location) {
         this(null, null, location, -1, -1, -1, -1, 0, null, null);

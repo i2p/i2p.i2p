@@ -1,14 +1,13 @@
 package net.i2p.heartbeat.gui;
 
-import net.i2p.heartbeat.PeerData;
-import net.i2p.heartbeat.ClientConfig;
-
-import java.util.Map;
 import java.util.HashMap;
+import java.util.Map;
+
+import net.i2p.heartbeat.ClientConfig;
+import net.i2p.heartbeat.PeerData;
 
 /**
  * Raw data points for a test
- *
  */
 class StaticPeerData extends PeerData {
     private int _pending;
@@ -19,6 +18,10 @@ class StaticPeerData extends PeerData {
     /** Integer (period, in minutes) to Integer (num messages) of how many messages were lost on average */
     private Map _lostMessages;
     
+    /**
+     * Creates a static peer data with a specified client config ... duh
+     * @param config the client config
+     */
     public StaticPeerData(ClientConfig config) {
         super(config);
         _averageSendTimes = new HashMap(4);
@@ -26,16 +29,36 @@ class StaticPeerData extends PeerData {
         _lostMessages = new HashMap(4);
     }
     
-    
+    /**
+     * Adds averaged data
+     * @param minutes the minutes (averaged over)
+     * @param sendMs the send time (ping) in milliseconds
+     * @param recvMs the receive time (pong) in milliseconds
+     * @param lost the number lost
+     */
     public void addAverage(int minutes, int sendMs, int recvMs, int lost) {
         _averageSendTimes.put(new Integer(minutes), new Integer(sendMs));
         _averageReceiveTimes.put(new Integer(minutes), new Integer(recvMs));
         _lostMessages.put(new Integer(minutes), new Integer(lost));
     }
     
+    /**
+     * Sets the number pending
+     * @param numPending the number pending
+     */
     public void setPendingCount(int numPending) { _pending = numPending; }
+
+    /* (non-Javadoc)
+     * @see net.i2p.heartbeat.PeerData#setSessionStart(long)
+     */
     public void setSessionStart(long when) { super.setSessionStart(when); }
     
+    /**
+     * Adds data
+     * @param sendTime the time it was sent
+     * @param sendMs the send time (ping) in milliseconds
+     * @param recvMs the receive time (pong) in milliseconds
+     */
     public void addData(long sendTime, int sendMs, int recvMs) {
         PeerData.EventDataPoint dataPoint = new PeerData.EventDataPoint(sendTime);
         dataPoint.setPongSent(sendTime + sendMs);
@@ -44,14 +67,16 @@ class StaticPeerData extends PeerData {
         addDataPoint(dataPoint);
     }
     
+    /**
+     * Adds data
+     * @param sendTime the time it was sent
+     */
     public void addData(long sendTime) {
         PeerData.EventDataPoint dataPoint = new PeerData.EventDataPoint(sendTime);
         dataPoint.setWasPonged(false);
         addDataPoint(dataPoint);
     }
-    
-    
-    
+
     /** 
      * how many pings are still outstanding?
      * @return the number of pings outstanding
@@ -79,8 +104,7 @@ class StaticPeerData extends PeerData {
     public double getAverageReceiveTime(int period) {
         return ((Integer)_averageReceiveTimes.get(new Integer(period))).doubleValue();
     }
-    
-    
+       
     /** 
      * number of lost messages over the given period.
      *
@@ -91,5 +115,8 @@ class StaticPeerData extends PeerData {
         return ((Integer)_lostMessages.get(new Integer(period))).doubleValue();
     }
         
+    /* (non-Javadoc)
+     * @see net.i2p.heartbeat.PeerData#cleanup()
+     */
     public void cleanup() {}
 }

@@ -2,8 +2,8 @@ package net.i2p.heartbeat;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.OutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.SimpleDateFormat;
@@ -48,6 +48,13 @@ public class PeerDataWriter {
         return true;
     }
     
+    /**
+     * persists the peer state to the output stream
+     * @param data the peer data to persist
+     * @param out where to persist the data
+     * @return true if it was persisted correctly [always (as implemented)], false on error
+     * @throws IOException
+     */
     public boolean persist(PeerData data, OutputStream out) throws IOException {
         String header = getHeader(data);
 

@@ -1,35 +1,29 @@
 package net.i2p.heartbeat.gui;
 
-import net.i2p.util.Log;
-import net.i2p.util.I2PThread;
-
-import net.i2p.data.Destination;
-import net.i2p.data.DataFormatException;
-
-import net.i2p.heartbeat.ClientConfig;
-import net.i2p.heartbeat.PeerData;
-
 import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.IOException;
-import java.io.FileInputStream;
-import java.net.URL;
 import java.net.MalformedURLException;
-
-import java.text.SimpleDateFormat;
+import java.net.URL;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Locale;
-import java.util.List;
-import java.util.ArrayList;
 import java.util.StringTokenizer;
+
+import net.i2p.data.DataFormatException;
+import net.i2p.data.Destination;
+import net.i2p.util.I2PThread;
+import net.i2p.util.Log;
 
 class PeerPlotStateFetcher {
     private final static Log _log = new Log(PeerPlotStateFetcher.class);
     
     /**
      * Fetch and fill the specified state structure
-     *
+     * @param receptor the 'receptor' (callbacks)
+     * @param state the state
      */
     public static void fetchPeerPlotState(FetchStateReceptor receptor, PeerPlotState state) {
         I2PThread t = new I2PThread(new Fetcher(receptor, state));
@@ -38,17 +32,34 @@ class PeerPlotStateFetcher {
         t.start();
     }
     
+    /**
+     * Callback stuff . . .
+     */
     public interface FetchStateReceptor {
+        /**
+         * Called when a peer plot state is fetched
+         * @param state state that was fetched
+         */
         void peerPlotStateFetched(PeerPlotState state);
     }
     
     private static class Fetcher implements Runnable {
         private PeerPlotState _state;
         private FetchStateReceptor _receptor;
+
+        /**
+         * Creates a Fetcher thread
+         * @param receptor the 'receptor' (callbacks)
+         * @param state the state
+         */
         public Fetcher(FetchStateReceptor receptor, PeerPlotState state) {
             _state = state;
             _receptor = receptor;
         }
+        
+        /* (non-Javadoc)
+         * @see java.lang.Runnable#run()
+         */
         public void run() {
             String loc = _state.getPlotConfig().getLocation();
             _log.debug("Load called [" + loc + "]");
@@ -82,7 +93,7 @@ class PeerPlotStateFetcher {
         
         /** 
          * check to make sure we've got everything we need 
-         *
+         * @return true [always]
          */
         boolean valid() {
             return true;
@@ -139,6 +150,8 @@ class PeerPlotStateFetcher {
          * EVENT   LOST    20040409.23:30:22.656
          * EVENT   OK      20040409.23:31:24.305   1843    771
          * </pre>
+         * 
+         * @param line (see above)
          */
         private void handleLine(String line) {
             if (line.startsWith("peerDest"))

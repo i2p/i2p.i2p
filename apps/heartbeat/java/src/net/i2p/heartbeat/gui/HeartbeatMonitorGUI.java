@@ -1,15 +1,15 @@
 package net.i2p.heartbeat.gui;
 
-import javax.swing.JFrame;
-import javax.swing.JMenu;
-import javax.swing.JMenuItem;
-import javax.swing.JMenuBar;
-import javax.swing.JScrollPane;
-
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+import javax.swing.JFrame;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JScrollPane;
 
 class HeartbeatMonitorGUI extends JFrame {
     private HeartbeatMonitor _monitor;
@@ -18,6 +18,10 @@ class HeartbeatMonitorGUI extends JFrame {
     private final static Color WHITE = new Color(255, 255, 255);
     private Color _background = WHITE;
     
+    /**
+     * Creates the GUI for all youz who be too shoopid for text based shitz
+     * @param monitor the monitor the gui operates over
+     */
     public HeartbeatMonitorGUI(HeartbeatMonitor monitor) {
         super("Heartbeat Monitor");
         _monitor = monitor;
@@ -49,6 +53,9 @@ class HeartbeatMonitorGUI extends JFrame {
         initializeMenus();
     }
     
+    /**
+     * Callback:  when the state of the world changes . . .
+     */
     public void stateUpdated() {
         _controlPane.testsUpdated();
         _plotPane.stateUpdated();

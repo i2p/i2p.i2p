@@ -103,7 +103,14 @@ public class PeerData {
     public long getSessionStart() {
         return _sessionStart;
     }
-    public void setSessionStart(long when) { _sessionStart = when; }
+
+    /**
+     * Sets when the test began
+     * @param when the time the session began 
+     */
+    public void setSessionStart(long when) {
+        _sessionStart = when;
+    }
 
     /**
      * how many pings have we sent for this test?

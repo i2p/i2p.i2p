@@ -1,22 +1,27 @@
 package net.i2p.heartbeat.gui;
 
-import javax.swing.JPanel;
-import javax.swing.JLabel;
-import javax.swing.JComboBox;
-import javax.swing.JTextField;
-import javax.swing.JButton;
-import javax.swing.JFileChooser;
-import javax.swing.DefaultComboBoxModel;
-import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JFileChooser;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
 
 class HeartbeatMonitorCommandBar extends JPanel {
     private HeartbeatMonitorGUI _gui;
     private JComboBox _refreshRate;
     private JTextField _location;
     
+    /**
+     * Constructs a command bar onto the gui
+     * @param gui the gui the command bar is associated with
+     */
     public HeartbeatMonitorCommandBar(HeartbeatMonitorGUI gui) {
         _gui = gui;
         initializeComponents();

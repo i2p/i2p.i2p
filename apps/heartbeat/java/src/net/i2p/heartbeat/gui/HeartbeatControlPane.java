@@ -1,15 +1,13 @@
 package net.i2p.heartbeat.gui;
 
-import javax.swing.JPanel;
-import javax.swing.JLabel;
-import javax.swing.JTabbedPane;
-import javax.swing.JScrollPane;
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Dimension;
-
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
+
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
 
 import net.i2p.util.Log;
 
@@ -28,16 +26,29 @@ class HeartbeatControlPane extends JPanel {
     private Color _background = WHITE;
     private Color _foreground = BLACK;
         
+    /**
+     * Constructs a control panel onto the gui
+     * @param gui the gui the panel is associated with
+     */
     public HeartbeatControlPane(HeartbeatMonitorGUI gui) {
         _gui = gui;
         initializeComponents();
     }
     
+    /**
+     * Adds a test to the panel
+     * @param config the configuration for the test
+     */
     public void addTest(PeerPlotConfig config) {
         _configPane.addTab(config.getTitle(), null, new JScrollPane(new PeerPlotConfigPane(config, this)), config.getSummary());
         _configPane.setBackgroundAt(_configPane.getTabCount()-1, _background);
         _configPane.setForegroundAt(_configPane.getTabCount()-1, _foreground);
     }
+    
+    /**
+     * Removes a test from the panel
+     * @param config the configuration for the test
+     */
     public void removeTest(PeerPlotConfig config) {
         _gui.getMonitor().getState().removeTest(config);
         int index = _configPane.indexOfTab(config.getTitle());
@@ -45,6 +56,9 @@ class HeartbeatControlPane extends JPanel {
             _configPane.removeTabAt(index);
     }
     
+    /**
+     * Callback: when tests have changed
+     */
     public void testsUpdated() {
         List knownNames = new ArrayList(8);
         for (int i = 0; i < _gui.getMonitor().getState().getTestCount(); i++) {

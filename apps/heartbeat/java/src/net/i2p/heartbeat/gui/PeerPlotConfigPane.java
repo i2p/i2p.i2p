@@ -1,30 +1,23 @@
 package net.i2p.heartbeat.gui;
 
-import net.i2p.util.Log;
-
-import javax.swing.JPanel;
-import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
-import javax.swing.JLabel;
-import javax.swing.JButton;
-import javax.swing.JTextField;
-import javax.swing.JTextArea;
-import javax.swing.JScrollPane;
-import javax.swing.DefaultComboBoxModel;
-import javax.swing.ComboBoxModel;
-import javax.swing.JColorChooser;
-import javax.swing.border.LineBorder;
-import javax.swing.border.BevelBorder;
-import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-
 import java.util.List;
 import java.util.Random;
+
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JColorChooser;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
+
+import net.i2p.util.Log;
 
 class PeerPlotConfigPane extends JPanel implements PeerPlotConfig.UpdateListener {
     private final static Log _log = new Log(PeerPlotConfigPane.class);
@@ -44,6 +37,11 @@ class PeerPlotConfigPane extends JPanel implements PeerPlotConfig.UpdateListener
     private final static Color WHITE = new Color(255, 255, 255);
     private Color _background = WHITE;
     
+    /**
+     * Constructs a pane
+     * @param config the plot config it represents
+     * @param pane the pane this one is attached to
+     */
     public PeerPlotConfigPane(PeerPlotConfig config, HeartbeatControlPane pane) {
         _config = config;
         _parent = pane;
@@ -66,7 +64,10 @@ class PeerPlotConfigPane extends JPanel implements PeerPlotConfig.UpdateListener
         setBackground(_background);
     }
     
-    /** place all the gui components onto the given panel */
+    /** 
+     * place all the gui components onto the given panel 
+     * @param body the panel to place the components on
+     */
     private void placeComponents(JPanel body) {
         body.setLayout(new GridBagLayout());
         GridBagConstraints cts = new GridBagConstraints();
@@ -206,7 +207,11 @@ class PeerPlotConfigPane extends JPanel implements PeerPlotConfig.UpdateListener
         }
     }
     
-    /** find the right config for the given period, or null if none exist */
+    /** 
+     * find the right config for the given period
+     * @param minutes the minutes to locate the config by
+     * @return the config for the given period, or null
+     */
     private PeerPlotConfig.PlotSeriesConfig getConfig(int minutes) {
         if (minutes <= 0)
             return _config.getCurrentSeriesConfig();
@@ -220,17 +225,27 @@ class PeerPlotConfigPane extends JPanel implements PeerPlotConfig.UpdateListener
         return null;
     }
     
-    /** notified that the config has been updated */
+    /** 
+     * notified that the config has been updated 
+     * @param config the config that was been updated
+     */
     public void configUpdated(PeerPlotConfig config) { refreshView(); }
     
     private class ChooseColor implements ActionListener {
         private int _minutes;
         private JButton _button;
         
+        /**
+         * @param minutes the minutes (line) to change the color of...
+         * @param button the associated button
+         */
         public ChooseColor(int minutes, JButton button) { 
             _minutes = minutes; 
             _button = button;
         }
+        /* (non-Javadoc)
+         * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+         */
         public void actionPerformed(ActionEvent evt) { 
             PeerPlotConfig.PlotSeriesConfig cfg = getConfig(_minutes);
             Color origColor = null;
@@ -253,6 +268,10 @@ class PeerPlotConfigPane extends JPanel implements PeerPlotConfig.UpdateListener
         JCheckBox _all;
         JButton _color;
         
+        /**
+         * Creates an OptionLine.  
+         * @param durationMinutes the minutes =)
+         */
         public OptionLine(int durationMinutes) {
             _durationMinutes = durationMinutes;
             _send = new JCheckBox("send time");
@@ -283,10 +302,20 @@ class PeerPlotConfigPane extends JPanel implements PeerPlotConfig.UpdateListener
     private class UpdateListener implements ActionListener {
         private OptionLine _line;
         private int _minutes;
+
+        /**
+         * Update Listener constructor . . . 
+         * @param line the line
+         * @param minutes the minutes
+         */
         public UpdateListener(OptionLine line, int minutes) {
             _line = line;
             _minutes = minutes;
         }
+        
+        /* (non-Javadoc)
+         * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+         */
         public void actionPerformed(ActionEvent evt) { 
             PeerPlotConfig.PlotSeriesConfig cfg = getConfig(_minutes);
             if (cfg == null) {
@@ -315,12 +344,19 @@ class PeerPlotConfigPane extends JPanel implements PeerPlotConfig.UpdateListener
         } 
     }
     
+    /**
+     * Unit test stuff
+     * @param args da arsg
+     */
     public final static void main(String args[]) {
         Test t = new Test();
         t.runTest();
     }
     
     private final static class Test implements PeerPlotStateFetcher.FetchStateReceptor {
+        /**
+         * Runs da test
+         */
         public void runTest() {
             PeerPlotConfig cfg = new PeerPlotConfig("C:\\testnet\\r2\\heartbeatStat_10s_30kb.txt");
             PeerPlotState state = new PeerPlotState(cfg);
@@ -329,6 +365,9 @@ class PeerPlotConfigPane extends JPanel implements PeerPlotConfig.UpdateListener
             System.exit(-1);
         }
         
+        /* (non-Javadoc)
+         * @see net.i2p.heartbeat.gui.PeerPlotStateFetcher.FetchStateReceptor#peerPlotStateFetched(net.i2p.heartbeat.gui.PeerPlotState)
+         */
         public void peerPlotStateFetched(PeerPlotState state) {
             javax.swing.JFrame f = new javax.swing.JFrame("Test");
             f.getContentPane().add(new JScrollPane(new PeerPlotConfigPane(state.getPlotConfig(), null)));
