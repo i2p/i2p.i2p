@@ -230,6 +230,10 @@ public class PeerTestJob extends JobImpl {
             return false;
         }
     }
+    
+    
+    private boolean getShouldFailTunnels() { return true; }
+    
     /**
      * Called when the peer's response is found
      */
@@ -256,22 +260,25 @@ public class PeerTestJob extends JobImpl {
                            + _replyTunnel.getTunnelId().getTunnelId());
             getContext().profileManager().dbLookupSuccessful(_peer.getIdentity().getHash(), responseTime);
             
-            _sendTunnel.setLastTested(getContext().clock().now());
-            _replyTunnel.setLastTested(getContext().clock().now());
-            
-            TunnelInfo cur = _replyTunnel;
-            while (cur != null) {
-                Hash peer = cur.getThisHop();
-                if ( (peer != null) && (!getContext().routerHash().equals(peer)) )
-                    getContext().profileManager().tunnelTestSucceeded(peer, responseTime);
-                cur = cur.getNextHopInfo();
-            }
-            cur = _sendTunnel;
-            while (cur != null) {
-                Hash peer = cur.getThisHop();
-                if ( (peer != null) && (!getContext().routerHash().equals(peer)) )
-                    getContext().profileManager().tunnelTestSucceeded(peer, responseTime);
-                cur = cur.getNextHopInfo();
+            // only honor success if we also honor failure
+            if (getShouldFailTunnels()) {
+                _sendTunnel.setLastTested(getContext().clock().now());
+                _replyTunnel.setLastTested(getContext().clock().now());
+
+                TunnelInfo cur = _replyTunnel;
+                while (cur != null) {
+                    Hash peer = cur.getThisHop();
+                    if ( (peer != null) && (!getContext().routerHash().equals(peer)) )
+                        getContext().profileManager().tunnelTestSucceeded(peer, responseTime);
+                    cur = cur.getNextHopInfo();
+                }
+                cur = _sendTunnel;
+                while (cur != null) {
+                    Hash peer = cur.getThisHop();
+                    if ( (peer != null) && (!getContext().routerHash().equals(peer)) )
+                        getContext().profileManager().tunnelTestSucceeded(peer, responseTime);
+                    cur = cur.getNextHopInfo();
+                }
             }
         }
         
@@ -294,7 +301,6 @@ public class PeerTestJob extends JobImpl {
             _sendTunnel = sendTunnel;
         }
         public String getName() { return "Peer test failed"; }
-        private boolean getShouldFailTunnels() { return true; }
         private boolean getShouldFailPeer() { return true; }
         public void runJob() {
             if (getShouldFailPeer())
@@ -307,7 +313,6 @@ public class PeerTestJob extends JobImpl {
                            + _replyTunnel.getTunnelId().getTunnelId());
 
             if (getShouldFailTunnels()) {
-                
                 _sendTunnel.setLastTested(getContext().clock().now());
                 _replyTunnel.setLastTested(getContext().clock().now());
 

@@ -32,10 +32,10 @@ import net.i2p.util.Log;
 public class ProfileOrganizer {
     private Log _log;
     private RouterContext _context;
-    /** H(routerIdentity) to PeerProfile for all peers that are fast and reliable */
-    private Map _fastAndReliablePeers;
-    /** H(routerIdentity) to PeerProfile for all peers that are reliable */
-    private Map _reliablePeers;
+    /** H(routerIdentity) to PeerProfile for all peers that are fast and high capacity*/
+    private Map _fastPeers;
+    /** H(routerIdentity) to PeerProfile for all peers that have high capacities */
+    private Map _highCapacityPeers;
     /** H(routerIdentity) to PeerProfile for all peers that well integrated into the network and not failing horribly */
     private Map _wellIntegratedPeers;
     /** H(routerIdentity) to PeerProfile for all peers that are not failing horribly */
@@ -46,27 +46,18 @@ public class ProfileOrganizer {
     private Hash _us;
     private ProfilePersistenceHelper _persistenceHelper;
     
-    /** PeerProfile objects for all peers profiled, orderd by most reliable first */
-    private Set _strictReliabilityOrder;
+    /** PeerProfile objects for all peers profiled, orderd by the ones with the highest capacity first */
+    private Set _strictCapacityOrder;
     
     /** threshold speed value, seperating fast from slow */
     private double _thresholdSpeedValue;
     /** threshold reliability value, seperating reliable from unreliable */
-    private double _thresholdReliabilityValue;
+    private double _thresholdCapacityValue;
     /** integration value, seperating well integrated from not well integrated */
     private double _thresholdIntegrationValue;
     
-    private InverseReliabilityComparator _calc;
-    
-    /**
-     * Defines what percentage of the average reliability will be used as the 
-     * reliability threshold.  For example, .5 means all peers with the reliability
-     * greater than half of the average will be considered "reliable".
-     *
-     */
-    public static final String PROP_RELIABILITY_THRESHOLD_FACTOR = "profileOrganizer.reliabilityThresholdFactor";
-    public static final double DEFAULT_RELIABILITY_THRESHOLD_FACTOR = .5d;
-    
+    private InverseCapacityComparator _comp;
+
     /**
      * Defines the minimum number of 'fast' peers that the organizer should select.  See
      * {@link ProfileOrganizer#getMinimumFastPeers}
@@ -84,28 +75,28 @@ public class ProfileOrganizer {
     public ProfileOrganizer(RouterContext context) {
         _context = context;
         _log = context.logManager().getLog(ProfileOrganizer.class);
-        _calc = new InverseReliabilityComparator();
-        _fastAndReliablePeers = new HashMap(16);
-        _reliablePeers = new HashMap(16);
+        _comp = new InverseCapacityComparator();
+        _fastPeers = new HashMap(16);
+        _highCapacityPeers = new HashMap(16);
         _wellIntegratedPeers = new HashMap(16);
         _notFailingPeers = new HashMap(16);
         _failingPeers = new HashMap(16);
-        _strictReliabilityOrder = new TreeSet(_calc);
+        _strictCapacityOrder = new TreeSet(_comp);
         _thresholdSpeedValue = 0.0d;
-        _thresholdReliabilityValue = 0.0d;
+        _thresholdCapacityValue = 0.0d;
         _thresholdIntegrationValue = 0.0d;
         _persistenceHelper = new ProfilePersistenceHelper(_context);
     }
     
     /**
-     * Order profiles by their reliability, but backwards (most reliable / highest value first).
+     * Order profiles by their capacity, but backwards (highest capacity / value first).
      *
      */
-    private final class InverseReliabilityComparator implements Comparator {
+    private final class InverseCapacityComparator implements Comparator {
         /**
          * Compare the two objects backwards.  The standard comparator returns
          * -1 if lhs is less than rhs, 1 if lhs is greater than rhs, or 0 if they're
-         * equal.  To keep a strict ordering, we measure peers with equal reliability
+         * equal.  To keep a strict ordering, we measure peers with equal capacity
          * values according to their hashes
          *
          * @return -1 if the right hand side is smaller, 1 if the left hand side is
@@ -117,8 +108,8 @@ public class ProfileOrganizer {
             PeerProfile left = (PeerProfile)lhs;
             PeerProfile right= (PeerProfile)rhs;
              
-            double rval = right.getReliabilityValue();
-            double lval = left.getReliabilityValue();
+            double rval = right.getCapacityValue();
+            double lval = left.getCapacityValue();
             
             if (lval == rval) // note the following call inverts right and left (see: classname)
                 return DataHelper.compareTo(right.getPeer().getData(), left.getPeer().getData());
@@ -126,10 +117,11 @@ public class ProfileOrganizer {
             boolean rightBigger = rval > lval;
 
             if (_log.shouldLog(Log.DEBUG))
-                _log.debug("The reliability of " + right.getPeer().toBase64() 
+                _log.debug("The capacity of " + right.getPeer().toBase64() 
                            + " and " + left.getPeer().toBase64() + " marks " + (rightBigger ? "right" : "left")
-                           + " as larger: r=" + right.getReliabilityValue() + " l="
-                           + left.getReliabilityValue());
+                           + " as larger: r=" + right.getCapacityValue() 
+                           + " l="
+                           + left.getCapacityValue());
                            
             if (rightBigger)
                 return 1;
@@ -164,26 +156,26 @@ public class ProfileOrganizer {
             PeerProfile old = locked_getProfile(profile.getPeer());
             profile.coallesceStats();
             locked_placeProfile(profile);
-            _strictReliabilityOrder.add(profile);
+            _strictCapacityOrder.add(profile);
             return old;
         }
     }
     
-    public int countFastAndReliablePeers() { synchronized (_reorganizeLock) { return _fastAndReliablePeers.size(); } }
-    public int countReliablePeers() { synchronized (_reorganizeLock) { return _reliablePeers.size(); } }
+    public int countFastPeers() { synchronized (_reorganizeLock) { return _fastPeers.size(); } }
+    public int countHighCapacityPeers() { synchronized (_reorganizeLock) { return _highCapacityPeers.size(); } }
     public int countWellIntegratedPeers() { synchronized (_reorganizeLock) { return _wellIntegratedPeers.size(); } }
     public int countNotFailingPeers() { synchronized (_reorganizeLock) { return _notFailingPeers.size(); } }
     public int countFailingPeers() { synchronized (_reorganizeLock) { return _failingPeers.size(); } }
     
-    public boolean isFastAndReliable(Hash peer) { synchronized (_reorganizeLock) { return _fastAndReliablePeers.containsKey(peer); } }
-    public boolean isReliable(Hash peer) { synchronized (_reorganizeLock) { return _reliablePeers.containsKey(peer); } }
+    public boolean isFast(Hash peer) { synchronized (_reorganizeLock) { return _fastPeers.containsKey(peer); } }
+    public boolean isHighCapacity(Hash peer) { synchronized (_reorganizeLock) { return _highCapacityPeers.containsKey(peer); } }
     public boolean isWellIntegrated(Hash peer) { synchronized (_reorganizeLock) { return _wellIntegratedPeers.containsKey(peer); } }
     public boolean isFailing(Hash peer) { synchronized (_reorganizeLock) { return _failingPeers.containsKey(peer); } }
     
     /**
      * Return a set of Hashes for peers that are both fast and reliable.  If an insufficient
-     * number of peers are both fast and reliable, fall back onto reliable peers, and if reliable
-     * peers doesn't contain sufficient peers, fall back onto not failing peers, and even THAT doesn't
+     * number of peers are both fast and reliable, fall back onto high capacity peers, and if that
+     * doesn't contain sufficient peers, fall back onto not failing peers, and even THAT doesn't
      * have sufficient peers, fall back onto failing peers.
      *
      * @param howMany how many peers are desired
@@ -191,22 +183,26 @@ public class ProfileOrganizer {
      * @param matches set to store the return value in
      *
      */
-    public void selectFastAndReliablePeers(int howMany, Set exclude, Set matches) {
+    public void selectFastPeers(int howMany, Set exclude, Set matches) {
         synchronized (_reorganizeLock) {
-            locked_selectPeers(_fastAndReliablePeers, howMany, exclude, matches);
+            locked_selectPeers(_fastPeers, howMany, exclude, matches);
         }
         if (matches.size() < howMany)
-            selectReliablePeers(howMany, exclude, matches);
+            selectHighCapacityPeers(howMany, exclude, matches);
         return;
     }
     
     /**
-     * Return a set of Hashes for peers that are reliable.
+     * Return a set of Hashes for peers that have a high capacity
      *
      */
-    public void selectReliablePeers(int howMany, Set exclude, Set matches) {
+    public void selectHighCapacityPeers(int howMany, Set exclude, Set matches) {
         synchronized (_reorganizeLock) {
-            locked_selectPeers(_reliablePeers, howMany, exclude, matches);
+            // we only use selectHighCapacityPeers when we are selecting for PURPOSE_TEST
+            // or we are falling back due to _fastPeers being too small, so we can always 
+            // exclude the fast peers
+            exclude.addAll(_fastPeers.keySet());
+            locked_selectPeers(_highCapacityPeers, howMany, exclude, matches);
         }
         if (matches.size() < howMany)
             selectNotFailingPeers(howMany, exclude, matches);
@@ -274,7 +270,7 @@ public class ProfileOrganizer {
             int needed = howMany - orig;
             List selected = new ArrayList(needed);
             synchronized (_reorganizeLock) {
-                for (Iterator iter = _strictReliabilityOrder.iterator(); selected.size() < needed && iter.hasNext(); ) {
+                for (Iterator iter = _strictCapacityOrder.iterator(); selected.size() < needed && iter.hasNext(); ) {
                     PeerProfile prof = (PeerProfile)iter.next();
                     if (matches.contains(prof.getPeer()) ||
                     (exclude != null && exclude.contains(prof.getPeer())) ||
@@ -309,11 +305,11 @@ public class ProfileOrganizer {
      */
     public Set selectAllPeers() {
         synchronized (_reorganizeLock) {
-            Set allPeers = new HashSet(_failingPeers.size() + _notFailingPeers.size() + _reliablePeers.size() + _fastAndReliablePeers.size());
+            Set allPeers = new HashSet(_failingPeers.size() + _notFailingPeers.size() + _highCapacityPeers.size() + _fastPeers.size());
             allPeers.addAll(_failingPeers.keySet());
             allPeers.addAll(_notFailingPeers.keySet());
-            allPeers.addAll(_reliablePeers.keySet());
-            allPeers.addAll(_fastAndReliablePeers.keySet());
+            allPeers.addAll(_highCapacityPeers.keySet());
+            allPeers.addAll(_fastPeers.keySet());
             return allPeers;
         }
     }
@@ -326,23 +322,23 @@ public class ProfileOrganizer {
      */
     public void reorganize() {
         synchronized (_reorganizeLock) {
-            Set allPeers = new HashSet(_failingPeers.size() + _notFailingPeers.size() + _reliablePeers.size() + _fastAndReliablePeers.size());
+            Set allPeers = new HashSet(_failingPeers.size() + _notFailingPeers.size() + _highCapacityPeers.size() + _fastPeers.size());
             allPeers.addAll(_failingPeers.values());
             allPeers.addAll(_notFailingPeers.values());
-            allPeers.addAll(_reliablePeers.values());
-            allPeers.addAll(_fastAndReliablePeers.values());
+            allPeers.addAll(_highCapacityPeers.values());
+            allPeers.addAll(_fastPeers.values());
             
             _failingPeers.clear();
             _notFailingPeers.clear();
-            _reliablePeers.clear();
-            _fastAndReliablePeers.clear();
+            _highCapacityPeers.clear();
+            _fastPeers.clear();
     
-            Set reordered = new TreeSet(_calc);
-            for (Iterator iter = _strictReliabilityOrder.iterator(); iter.hasNext(); ) {
+            Set reordered = new TreeSet(_comp);
+            for (Iterator iter = _strictCapacityOrder.iterator(); iter.hasNext(); ) {
                 PeerProfile prof = (PeerProfile)iter.next();
                 reordered.add(prof);
             }
-            _strictReliabilityOrder = reordered;
+            _strictCapacityOrder = reordered;
             
             calculateThresholds(allPeers);
             
@@ -355,14 +351,15 @@ public class ProfileOrganizer {
             locked_promoteFastAsNecessary();
             
             if (_log.shouldLog(Log.DEBUG)) {
-                _log.debug("Profiles reorganized.  averages: [integration: " + _thresholdIntegrationValue + ", reliability: " + _thresholdReliabilityValue + ", speed: " + _thresholdSpeedValue + "]");
+                _log.debug("Profiles reorganized.  averages: [integration: " + _thresholdIntegrationValue 
+                           + ", capacity: " + _thresholdCapacityValue + ", speed: " + _thresholdSpeedValue + "]");
                 StringBuffer buf = new StringBuffer(512);
-                for (Iterator iter = _strictReliabilityOrder.iterator(); iter.hasNext(); ) {
+                for (Iterator iter = _strictCapacityOrder.iterator(); iter.hasNext(); ) {
                     PeerProfile prof = (PeerProfile)iter.next();
-                    buf.append('[').append(prof.toString()).append('=').append(prof.getReliabilityValue()).append("] ");
+                    buf.append('[').append(prof.toString()).append('=').append(prof.getCapacityValue()).append("] ");
                 }
-                _log.debug("Strictly organized (most reliable first): " + buf.toString());
-                _log.debug("fast and reliable: " + _fastAndReliablePeers.values());
+                _log.debug("Strictly organized (highest capacity first): " + buf.toString());
+                _log.debug("fast: " + _fastPeers.values());
             }
         }
     }
@@ -370,23 +367,23 @@ public class ProfileOrganizer {
     /**
      * As with locked_unfailAsNecessary, I'm not sure how much I like this - if there
      * aren't enough fast peers, move some of the not-so-fast peers into the fast group.
-     * This picks the not-so-fast peers based on reliability, not speed, and skips over any
+     * This picks the not-so-fast peers based on capacity, not speed, and skips over any
      * failing peers.  Perhaps it should build a seperate strict ordering by speed?  Nah, not
      * worth the maintenance and memory overhead, at least not for now.
      *
      */
     private void locked_promoteFastAsNecessary() {
         int minFastPeers = getMinimumFastPeers();
-        int numToPromote = minFastPeers - _fastAndReliablePeers.size();
+        int numToPromote = minFastPeers - _fastPeers.size();
         if (numToPromote > 0) {
             if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Need to explicitly promote " + numToPromote + " peers to the fast+reliable group");
-            for (Iterator iter = _strictReliabilityOrder.iterator(); iter.hasNext(); ) {
+                _log.debug("Need to explicitly promote " + numToPromote + " peers to the fast group");
+            for (Iterator iter = _strictCapacityOrder.iterator(); iter.hasNext(); ) {
                 PeerProfile cur = (PeerProfile)iter.next();
-                if ( (!_fastAndReliablePeers.containsKey(cur.getPeer())) && (!cur.getIsFailing()) ) {
-                    _fastAndReliablePeers.put(cur.getPeer(), cur);
+                if ( (!_fastPeers.containsKey(cur.getPeer())) && (!cur.getIsFailing()) ) {
+                    _fastPeers.put(cur.getPeer(), cur);
                     // no need to remove it from any of the other groups, since if it is 
-                    // fast and reliable, it is reliable, and it is not failing
+                    // fast, it has a high capacity, and it is not failing
                     numToPromote--;
                     if (numToPromote <= 0)
                         break;
@@ -421,7 +418,7 @@ public class ProfileOrganizer {
         int needToUnfail = MIN_NOT_FAILING_ACTIVE - notFailingActive;
         if (needToUnfail > 0) {
             int unfailed = 0;
-            for (Iterator iter = _strictReliabilityOrder.iterator(); iter.hasNext(); ) {
+            for (Iterator iter = _strictCapacityOrder.iterator(); iter.hasNext(); ) {
                 PeerProfile best = (PeerProfile)iter.next();
                 if ( (best.getIsActive()) && (best.getIsFailing()) ) {
                     if (_log.shouldLog(Log.WARN))
@@ -436,19 +433,23 @@ public class ProfileOrganizer {
         }
     }
     
+    public double getSpeedThreshold() { return _thresholdSpeedValue; }
+    public double getCapacityThreshold() { return _thresholdCapacityValue; }
+    
     ////////
     // no more public stuff below
     ////////
     
     /**
      * Update the thresholds based on the profiles in this set.  currently
-     * implements the reliability threshold based on the median reliability (ignoring
-     * failing peers) with integration and speed thresholds being derived from the average
-     * of the active reliable peers.
+     * implements the capacity threshold based on the median capacity (ignoring
+     * failing or inactive peers), using the median speed from that group to 
+     * define the speed threshold, and use the mean integration value from the 
+     * high capacity group to define the integration threshold.
      *
      */
     private void calculateThresholds(Set allPeers) {
-        Set reordered = new TreeSet(_calc);
+        Set reordered = new TreeSet(_comp);
         for (Iterator iter = allPeers.iterator(); iter.hasNext(); ) {
             PeerProfile profile = (PeerProfile)iter.next();
             
@@ -460,42 +461,54 @@ public class ProfileOrganizer {
         
             reordered.add(profile);
         }
-        int numNotFailing = reordered.size();
-        // how many are in the "top half" of the reliability peers?
-        int topCount = 0;
-        if (numNotFailing != 0)
-            topCount = (int)(numNotFailing / 2);
-
-        if (_log.shouldLog(Log.DEBUG))
-            _log.debug("top count is " + topCount + " out of " + numNotFailing);
         
+        int numNotFailing = reordered.size();
+        // how many are in the "top half" of the high capacity peers?
+        int i = 0;
+        int threshold = 0;
+        if (numNotFailing > 0)
+            threshold = numNotFailing / 2;
+        for (Iterator iter = reordered.iterator(); iter.hasNext(); i++) {
+            PeerProfile profile = (PeerProfile)iter.next();
+            if (i >= threshold) {
+                _thresholdCapacityValue = profile.getCapacityValue();
+                break;
+            }
+        }
+
+        Set speeds = new TreeSet();
         int numActive = 0;
         double totalIntegration = 0;
         double totalSpeed = 0;
-        int i = 0;
         for (Iterator iter = reordered.iterator(); iter.hasNext(); i++) {
             PeerProfile profile = (PeerProfile)iter.next();
-            if (i < topCount) {
+            if (profile.getCapacityValue() >= _thresholdCapacityValue) {
                 if (profile.getIsActive()) {
                     numActive++;
                     if (profile.getIntegrationValue() > 0)
                         totalIntegration += profile.getIntegrationValue();
-                    if (profile.getSpeedValue() > 0)
-                        totalSpeed += profile.getSpeedValue();
+                    // duplicates being clobbered is fine by us
+                    speeds.add(new Double(0-profile.getSpeedValue()));
                 }
-            } else if (i == topCount) {
-                if (profile.getReliabilityValue() < 0)
-                    _thresholdReliabilityValue = 0;
-                else
-                    _thresholdReliabilityValue = profile.getReliabilityValue();
-                break;
             } else {
+                // its ordered
                 break;
             }
         }
+
+        // calc the median speed of high capacity peers
+        i = 0;
+        for (Iterator iter = speeds.iterator(); iter.hasNext(); i++) {
+            Double speed = (Double)iter.next();
+            if (i >= (speeds.size() / 2)) {
+                _thresholdSpeedValue = 0-speed.doubleValue();
+                break;
+            }
+        }
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("Threshold value for speed: " + _thresholdSpeedValue + " with speeds: " + speeds);
         
         _thresholdIntegrationValue = 1.0d * avg(totalIntegration, numActive);
-        _thresholdSpeedValue       = 1.0d * avg(totalSpeed, numActive);
     }
     
     /** simple average, or 0 if NaN */
@@ -543,23 +556,23 @@ public class ProfileOrganizer {
         if (profile.getIsFailing()) {
             if (!shouldDrop(profile))
                 _failingPeers.put(profile.getPeer(), profile);
-            _fastAndReliablePeers.remove(profile.getPeer());
-            _reliablePeers.remove(profile.getPeer());
+            _fastPeers.remove(profile.getPeer());
+            _highCapacityPeers.remove(profile.getPeer());
             _wellIntegratedPeers.remove(profile.getPeer());
             _notFailingPeers.remove(profile.getPeer());
         } else {
             _failingPeers.remove(profile.getPeer());
-            _fastAndReliablePeers.remove(profile.getPeer());
-            _reliablePeers.remove(profile.getPeer());
+            _fastPeers.remove(profile.getPeer());
+            _highCapacityPeers.remove(profile.getPeer());
             _wellIntegratedPeers.remove(profile.getPeer());
             
             _notFailingPeers.put(profile.getPeer(), profile);
-            if (_thresholdReliabilityValue <= profile.getReliabilityValue()) {
-                _reliablePeers.put(profile.getPeer(), profile);
+            if (_thresholdCapacityValue <= profile.getCapacityValue()) { 
+                _highCapacityPeers.put(profile.getPeer(), profile);
                 if (_log.shouldLog(Log.DEBUG))
-                    _log.debug("Reliable: \t" + profile.getPeer().toBase64());
+                    _log.debug("High capacity: \t" + profile.getPeer().toBase64());
                 if (_thresholdSpeedValue <= profile.getSpeedValue()) {
-                    _fastAndReliablePeers.put(profile.getPeer(), profile);
+                    _fastPeers.put(profile.getPeer(), profile);
                     if (_log.shouldLog(Log.DEBUG))
                         _log.debug("Fast: \t" + profile.getPeer().toBase64());
                 }
@@ -570,7 +583,7 @@ public class ProfileOrganizer {
                         _log.debug("Integrated: \t" + profile.getPeer().toBase64());
                 }
             } else {
-                // not reliable, but not failing (yet)
+                // not high capacity, but not failing (yet)
             }
         }
     }
@@ -615,9 +628,10 @@ public class ProfileOrganizer {
         buf.append("<td><b>Peer</b> (").append(order.size()).append(", hiding ").append(peers.size()-order.size()).append(" inactive ones)</td>");
         buf.append("<td><b>Groups</b></td>");
         buf.append("<td><b>Speed</b></td>");
-        buf.append("<td><b>Reliability</b></td>");
+        buf.append("<td><b>Capacity</b></td>");
         buf.append("<td><b>Integration</b></td>");
         buf.append("<td><b>Failing?</b></td>");
+        buf.append("<td><b>Reliability (deprecated)</b></td>");
         buf.append("<td><b>Profile data</b></td>");
         buf.append("</tr>");
         for (Iterator iter = order.keySet().iterator(); iter.hasNext();) {
@@ -641,11 +655,11 @@ public class ProfileOrganizer {
             int tier = 0;
             boolean isIntegrated = false;
             synchronized (_reorganizeLock) {
-                if (_fastAndReliablePeers.containsKey(peer)) {
+                if (_fastPeers.containsKey(peer)) {
                     tier = 1;
                     fast++;
                     reliable++;
-                } else if (_reliablePeers.containsKey(peer)) {
+                } else if (_highCapacityPeers.containsKey(peer)) {
                     tier = 2;
                     reliable++;
                 } else if (_notFailingPeers.containsKey(peer)) {
@@ -661,74 +675,38 @@ public class ProfileOrganizer {
             }
             
             switch (tier) {
-                case 1: buf.append("Fast+Reliable"); break;
-                case 2: buf.append("Reliable"); break;
+                case 1: buf.append("Fast+High Capacity"); break;
+                case 2: buf.append("High Capacity"); break;
                 case 3: buf.append("Not Failing"); break;
                 default: buf.append("Failing"); break;
             }
             if (isIntegrated) buf.append(", Well integrated");
             
             buf.append("<td align=\"right\">").append(num(prof.getSpeedValue())).append("</td>");
-            buf.append("<td align=\"right\">").append(num(prof.getReliabilityValue())).append("</td>");
+            buf.append("<td align=\"right\">").append(num(prof.getCapacityValue())).append("</td>");
             buf.append("<td align=\"right\">").append(num(prof.getIntegrationValue())).append("</td>");
             buf.append("<td align=\"right\">").append(prof.getIsFailing()).append("</td>");
+            buf.append("<td align=\"right\">").append(num(prof.getReliabilityValue())).append("</td>");
             buf.append("<td><a href=\"/profile/").append(prof.getPeer().toBase64().substring(0, 32)).append("\">profile.txt</a> ");
             buf.append("    <a href=\"#").append(prof.getPeer().toBase64().substring(0, 32)).append("\">netDb</a></td>");
             buf.append("</tr>");
         }
         buf.append("</table>");
-        buf.append("<i>Note that the speed, reliability, and integration values are relative");
-        buf.append(" - they do NOT correspond with any particular throughput, latency, uptime, ");
-        buf.append("or other metric.  Higher numbers are better.  ");
+        buf.append("<i>Definitions:<ul>");
+        buf.append("<li><b>speed</b>: how many round trip messages can we pump through the peer per minute?</li>");
+        buf.append("<li><b>capacity</b>: how many tunnels can we ask them to join in an hour?</li>");
+        buf.append("<li><b>integration</b>: how many new peers have they told us about lately?</li>");
+        buf.append("<li><b>failing?</b>: is the peer currently swamped (and if possible we should avoid nagging them)?</li>");
+        buf.append("<li><b>reliability</b>: no sound semantics... just a random kludge of a value.</li>");
+        buf.append("</ul></i>");
         buf.append("Red peers prefixed with '--' means the peer is failing, and blue peers prefixed ");
         buf.append("with '++' means we've sent or received a message from them ");
         buf.append("in the last five minutes</i><br />");
         buf.append("<b>Thresholds:</b><br />");
         buf.append("<b>Speed:</b> ").append(num(_thresholdSpeedValue)).append(" (").append(fast).append(" fast peers)<br />");
-        buf.append("<b>Reliability:</b> ").append(num(_thresholdReliabilityValue)).append(" (").append(reliable).append(" reliable peers)<br />");
+        buf.append("<b>Capacity:</b> ").append(num(_thresholdCapacityValue)).append(" (").append(reliable).append(" high capacity peers)<br />");
         buf.append("<b>Integration:</b> ").append(num(_thresholdIntegrationValue)).append(" (").append(integrated).append(" well integrated peers)<br />");
         out.write(buf.toString().getBytes());
-    }
-    
-    
-    /**
-     * How much should we shrink (or grow) the average reliability to determine the
-     * threshold - numbers greater than 1 increase the threshold, less than 1 decrease
-     * it.  This can be changed during runtime by updating the router.config
-     *
-     * @return factor to multiply the average reliability with to determine the threshold
-     */
-    private double getReliabilityThresholdFactor() {
-        if (_context.router() != null) {
-            String val = _context.router().getConfigSetting(PROP_RELIABILITY_THRESHOLD_FACTOR);
-            if (val != null) {
-                try {
-                    double rv = Double.parseDouble(val);
-                    if (_log.shouldLog(Log.DEBUG)) 
-                        _log.debug("router config said " + PROP_RELIABILITY_THRESHOLD_FACTOR + '=' + val);
-                    return rv;
-                } catch (NumberFormatException nfe) {
-                    if (_log.shouldLog(Log.WARN))
-                        _log.warn("Reliability threshold factor improperly set in the router config [" + val + "]", nfe);
-                }
-            }
-        }
-        String val = _context.getProperty(PROP_RELIABILITY_THRESHOLD_FACTOR, ""+DEFAULT_RELIABILITY_THRESHOLD_FACTOR);
-        if (val != null) {
-            try {
-                double rv = Double.parseDouble(val);
-                if (_log.shouldLog(Log.DEBUG)) 
-                    _log.debug("router context said " + PROP_RELIABILITY_THRESHOLD_FACTOR+ '=' + val);
-                return rv;
-            } catch (NumberFormatException nfe) {
-                if (_log.shouldLog(Log.WARN))
-                    _log.warn("Reliability threshold factor improperly set in the router environment [" + val + "]", nfe);
-            }
-        }
-        
-        if (_log.shouldLog(Log.DEBUG)) 
-            _log.debug("no config for " + PROP_RELIABILITY_THRESHOLD_FACTOR + ", using " + DEFAULT_RELIABILITY_THRESHOLD_FACTOR);
-        return DEFAULT_RELIABILITY_THRESHOLD_FACTOR;
     }
     
     /**
@@ -738,7 +716,7 @@ public class ProfileOrganizer {
      * This parameter should help deal with a lack of diversity in the tunnels created when some 
      * peers are particularly fast.
      *
-     * @return minimum number of peers to be placed in the 'fast+reliable' group
+     * @return minimum number of peers to be placed in the 'fast' group
      */
     protected int getMinimumFastPeers() {
         if (_context.router() != null) {
@@ -775,4 +753,50 @@ public class ProfileOrganizer {
     
     private final static DecimalFormat _fmt = new DecimalFormat("###,##0.00", new DecimalFormatSymbols(Locale.UK));
     private final static String num(double num) { synchronized (_fmt) { return _fmt.format(num); } }
+    
+    /**
+     * Read in all of the profiles specified and print out 
+     * their calculated values.  Usage: <pre>
+     *  ProfileOrganizer [filename]*
+     * </pre>
+     */
+    public static void main(String args[]) {
+        RouterContext ctx = new RouterContext(new net.i2p.router.Router());
+        ProfileOrganizer organizer = new ProfileOrganizer(ctx);
+        organizer.setUs(Hash.FAKE_HASH);
+        ProfilePersistenceHelper helper = new ProfilePersistenceHelper(ctx);
+        for (int i = 0; i < args.length; i++) {
+            PeerProfile profile = helper.readProfile(new java.io.File(args[i]));
+            if (profile == null) {
+                System.err.println("Could not load profile " + args[i]);
+                continue;
+            }
+            organizer.addProfile(profile);
+        }
+        organizer.reorganize();
+        DecimalFormat fmt = new DecimalFormat("0,000.0");
+        fmt.setPositivePrefix("+");
+        
+        for (Iterator iter = organizer.selectAllPeers().iterator(); iter.hasNext(); ) {
+            Hash peer = (Hash)iter.next();
+            PeerProfile profile = organizer.getProfile(peer);
+            if (!profile.getIsActive()) continue;
+            System.out.println("Peer " + profile.getPeer().toBase64().substring(0,4) 
+                       + " [" + (organizer.isFast(peer) ? "F+R" : 
+                                 organizer.isHighCapacity(peer) ? "R  " :
+                                 organizer.isFailing(peer) ? "X  " : "   ") + "]: "
+                       + "\t Speed:\t" + fmt.format(profile.getSpeedValue())
+                       + " Reliability:\t" + fmt.format(profile.getReliabilityValue())
+                       + " Capacity:\t" + fmt.format(profile.getCapacityValue())
+                       + " Integration:\t" + fmt.format(profile.getIntegrationValue())
+                       + " Active?\t" + profile.getIsActive() 
+                       + " Failing?\t" + profile.getIsFailing());
+
+        }
+        
+        System.out.println("Thresholds:");
+        System.out.println("Speed:       " + num(organizer.getSpeedThreshold()) + " (" + organizer.countFastPeers() + " fast peers)");
+        System.out.println("Capacity:    " + num(organizer.getCapacityThreshold()) + " (" + organizer.countHighCapacityPeers() + " reliable peers)");
+    }
+    
 }

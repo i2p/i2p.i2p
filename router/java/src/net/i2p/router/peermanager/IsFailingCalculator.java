@@ -1,6 +1,7 @@
 package net.i2p.router.peermanager;
 
 import net.i2p.router.RouterContext;
+import net.i2p.stat.Rate;
 import net.i2p.util.Log;
 
 /**
@@ -31,40 +32,33 @@ public class IsFailingCalculator extends Calculator {
     public boolean calcBoolean(PeerProfile profile) {
         // have we failed in the last 119 seconds?
         if ( (profile.getCommError().getRate(60*1000).getCurrentEventCount() > 0) ||
-             (profile.getCommError().getRate(60*1000).getLastEventCount() > 0) ) {
+             (profile.getCommError().getRate(60*1000).getLastEventCount() > 0) || 
+             (profile.getCommError().getRate(10*60*1000).getCurrentEventCount() > 0) ) {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Peer " + profile.getPeer().toBase64() 
-                           + " is failing because it had a comm error in the last 2 minutes");
+                           + " is failing because it had a comm error recently ");
             return true;
         } else {
+            
             //if ( (profile.getDBHistory().getFailedLookupRate().getRate(60*1000).getCurrentEventCount() > 0) ||
             //     (profile.getDBHistory().getFailedLookupRate().getRate(60*1000).getLastEventCount() > 0) ) {
             //    // are they overloaded (or disconnected)?
             //    return true;
             //}
             
-            long recently = _context.clock().now() - GRACE_PERIOD;
-            
-            if (false && (profile.getTunnelHistory().getLastRejected() >= recently) ) {
-                // have they refused to participate in a tunnel in the last 5 minutes?
+            Rate rejectRate = profile.getTunnelHistory().getRejectionRate().getRate(10*60*1000);
+            if (rejectRate.getCurrentEventCount() >= 2) {
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("Peer " + profile.getPeer().toBase64() 
-                               + " is failing because it refused to participate in a tunnel in the last few minutes");
+                               + " is failing because they rejected some tunnels recently");
                 return true;
             }
             
-            if (false && (profile.getTunnelHistory().getLastFailed() >= recently) ) {
-                // has a tunnel they participate in failed in the last 5 minutes?
+            Rate failedRate = profile.getTunnelHistory().getFailedRate().getRate(60*1000);
+            if (failedRate.getCurrentEventCount() >= 2) {
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("Peer " + profile.getPeer().toBase64() 
-                               + " is failing because it one of their tunnels failed in the last few minutes");
-                return true;
-            }
-            
-            if (false && profile.getLastSendFailed() >= recently) {
-                if (_log.shouldLog(Log.DEBUG))
-                    _log.debug("Peer " + profile.getPeer().toBase64() 
-                               + " is failing because we couldnt send to it recently");
+                               + " is failing because too many of their tunnels failed recently");
                 return true;
             }
             

@@ -84,16 +84,16 @@ class PeerManager {
                 case PeerSelectionCriteria.PURPOSE_TEST:
                     // for now, the peers we test will be the reliable ones
                     //_organizer.selectWellIntegratedPeers(criteria.getMinimumRequired(), exclude, curVals);
-                    _organizer.selectReliablePeers(criteria.getMinimumRequired(), exclude, curVals);
+                    _organizer.selectHighCapacityPeers(criteria.getMinimumRequired(), exclude, curVals);
                     break;
                 case PeerSelectionCriteria.PURPOSE_TUNNEL:
-                    _organizer.selectFastAndReliablePeers(criteria.getMinimumRequired(), exclude, curVals);
+                    _organizer.selectFastPeers(criteria.getMinimumRequired(), exclude, curVals);
                     break;
                 case PeerSelectionCriteria.PURPOSE_SOURCE_ROUTE:
-                    _organizer.selectReliablePeers(criteria.getMinimumRequired(), exclude, curVals);
+                    _organizer.selectHighCapacityPeers(criteria.getMinimumRequired(), exclude, curVals);
                     break;
                 case PeerSelectionCriteria.PURPOSE_GARLIC:
-                    _organizer.selectReliablePeers(criteria.getMinimumRequired(), exclude, curVals);
+                    _organizer.selectHighCapacityPeers(criteria.getMinimumRequired(), exclude, curVals);
                     break;
                 default:
                     break;
@@ -103,8 +103,8 @@ class PeerManager {
                     _log.warn("We ran out of peers when looking for reachable ones after finding " 
                               + rv.size() + " with "
                               + _organizer.countWellIntegratedPeers() + "/" 
-                              + _organizer.countReliablePeers() + "/" 
-                              + _organizer.countFastAndReliablePeers() + " integrated/reliable/fast peers");
+                              + _organizer.countHighCapacityPeers() + "/" 
+                              + _organizer.countFastPeers() + " integrated/high capacity/fast peers");
                 break;
             } else {
                 for (Iterator iter = curVals.iterator(); iter.hasNext(); ) {

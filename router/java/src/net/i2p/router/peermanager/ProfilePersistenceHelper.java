@@ -65,10 +65,10 @@ class ProfilePersistenceHelper {
         String groups = null;
         if (_context.profileOrganizer().isFailing(profile.getPeer())) {
             groups = "failing";
-        } else if (!_context.profileOrganizer().isReliable(profile.getPeer())) {
+        } else if (!_context.profileOrganizer().isHighCapacity(profile.getPeer())) {
             groups = "not failing";
         } else {
-            if (_context.profileOrganizer().isFastAndReliable(profile.getPeer()))
+            if (_context.profileOrganizer().isFast(profile.getPeer()))
                 groups = "fast and reliable";
             else
                 groups = "reliable";

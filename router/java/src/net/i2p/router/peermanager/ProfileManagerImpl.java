@@ -258,7 +258,7 @@ public class ProfileManagerImpl implements ProfileManager {
         Set peers = new HashSet(numPeers);
         // lets get the fastest ones we've got (this fails over to include just plain reliable,
         // or even notFailing peers if there aren't enough fast ones)
-        _context.profileOrganizer().selectFastAndReliablePeers(numPeers, null, peers);
+        _context.profileOrganizer().selectFastPeers(numPeers, null, peers);
         Properties props = new Properties();
         for (Iterator iter  = peers.iterator(); iter.hasNext(); ) {
             Hash peer = (Hash)iter.next();
@@ -268,10 +268,10 @@ public class ProfileManagerImpl implements ProfileManager {
             StringBuffer buf = new StringBuffer(64);
             
             buf.append("status: ");
-            if (_context.profileOrganizer().isFastAndReliable(peer)) {
-                buf.append("fastReliable");
-            } else if (_context.profileOrganizer().isReliable(peer)) {
-                buf.append("reliable");
+            if (_context.profileOrganizer().isFast(peer)) {
+                buf.append("fast");
+            } else if (_context.profileOrganizer().isHighCapacity(peer)) {
+                buf.append("highCapacity");
             } else if (_context.profileOrganizer().isFailing(peer)) {
                 buf.append("failing");
             } else {
@@ -283,7 +283,7 @@ public class ProfileManagerImpl implements ProfileManager {
             else
                 buf.append(" ");
             
-            buf.append("reliability: ").append(num(prof.getReliabilityValue())).append(" ");
+            buf.append("capacity: ").append(num(prof.getCapacityValue())).append(" ");
             buf.append("speed: ").append(num(prof.getSpeedValue())).append(" ");
             buf.append("integration: ").append(num(prof.getIntegrationValue()));
             

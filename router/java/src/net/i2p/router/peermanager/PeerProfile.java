@@ -32,10 +32,12 @@ public class PeerProfile {
     // calculation bonuses
     private long _speedBonus;
     private long _reliabilityBonus;
+    private long _capacityBonus;
     private long _integrationBonus;
     // calculation values
     private double _speedValue;
     private double _reliabilityValue;
+    private double _capacityValue;
     private double _integrationValue;
     private boolean _isFailing;
     // good vs bad behavior
@@ -56,6 +58,7 @@ public class PeerProfile {
         _expanded = false;
         _speedValue = 0;
         _reliabilityValue = 0;
+        _capacityValue = 0;
         _integrationValue = 0;
         _isFailing = false;
         _peer = peer;
@@ -152,6 +155,14 @@ public class PeerProfile {
     public void setReliabilityBonus(long bonus) { _reliabilityBonus = bonus; }
     
     /**
+     * extra factor added to the capacity ranking - this can be updated in the profile
+     * written to disk to affect how the algorithm ranks capacity.  Negative values are
+     * penalties
+     */
+    public double getCapacityBonus() { return _capacityBonus; }
+    public void setCapacityBonus(long bonus) { _capacityBonus = bonus; }
+    
+    /**
      * extra factor added to the integration ranking - this can be updated in the profile
      * written to disk to affect how the algorithm ranks integration.  Negative values are
      * penalties
@@ -173,6 +184,11 @@ public class PeerProfile {
      *
      */
     public double getReliabilityValue() { return _reliabilityValue; }
+    /**
+     * How many tunnels do we think this peer can handle over the next hour? 
+     *
+     */
+    public double getCapacityValue() { return _capacityValue; }
     /**
      * How well integrated into the network is this peer (as measured by how much they've
      * told us that we didn't already know).  Higher numbers means better integrated
@@ -226,7 +242,7 @@ public class PeerProfile {
         if (_tunnelTestResponseTime == null)
             _tunnelTestResponseTime = new RateStat("tunnelTestResponseTime", "how long it takes to successfully test a tunnel this peer participates in (in milliseconds)", "profile", new long[] { 10*60*1000l, 60*60*1000l, 24*60*60*1000 } );
         if (_commError == null)
-            _commError = new RateStat("commErrorRate", "how long between communication errors with the peer (e.g. disconnection)", "profile", new long[] { 60*1000l, 60*60*1000l, 24*60*60*1000 } );
+            _commError = new RateStat("commErrorRate", "how long between communication errors with the peer (e.g. disconnection)", "profile", new long[] { 60*1000l, 10*60*1000l, 60*60*1000l, 24*60*60*1000 } );
         if (_dbIntroduction == null)
             _dbIntroduction = new RateStat("dbIntroduction", "how many new peers we get from dbSearchReplyMessages or dbStore messages", "profile", new long[] { 60*60*1000l, 24*60*60*1000l, 7*24*60*60*1000l });
 
@@ -250,18 +266,21 @@ public class PeerProfile {
         _tunnelCreateResponseTime.coallesceStats();
         _tunnelTestResponseTime.coallesceStats();
         _dbHistory.coallesceStats();
+        _tunnelHistory.coallesceStats();
         
         _speedValue = calculateSpeed();
         _reliabilityValue = calculateReliability();
+        _capacityValue = calculateCapacity();
         _integrationValue = calculateIntegration();
         _isFailing = calculateIsFailing();
         
         if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Coallesced: speed [" + _speedValue + "] reliability [" + _reliabilityValue + "] integration [" + _integrationValue + "] failing? [" + _isFailing + "]");
+            _log.debug("Coallesced: speed [" + _speedValue + "] reliability [" + _reliabilityValue + "] capacity [" + _capacityValue + "] integration [" + _integrationValue + "] failing? [" + _isFailing + "]");
     }
     
     private double calculateSpeed() { return _context.speedCalculator().calc(this); }
     private double calculateReliability() { return _context.reliabilityCalculator().calc(this); }
+    private double calculateCapacity() { return _context.capacityCalculator().calc(this); }
     private double calculateIntegration() { return _context.integrationCalculator().calc(this); }
     private boolean calculateIsFailing() { return _context.isFailingCalculator().calcBoolean(this); }
     void setIsFailing(boolean val) { _isFailing = val; }
@@ -314,6 +333,7 @@ public class PeerProfile {
             buf.append("Peer " + profile.getPeer().toBase64() 
                        + ":\t Speed:\t" + fmt.format(profile.calculateSpeed())
                        + " Reliability:\t" + fmt.format(profile.calculateReliability())
+                       + " Capacity:\t" + fmt.format(profile.calculateCapacity())
                        + " Integration:\t" + fmt.format(profile.calculateIntegration())
                        + " Active?\t" + profile.getIsActive() 
                        + " Failing?\t" + profile.calculateIsFailing()
