@@ -41,6 +41,7 @@ public class I2PSocketManager implements I2PSessionListener {
     private HashMap _outSockets;
     private HashMap _inSockets;
     private I2PSocketOptions _defaultOptions;
+    private long _acceptTimeout;
     
     public static final short ACK = 0x51;
     public static final short CLOSE_OUT = 0x52;
@@ -50,10 +51,17 @@ public class I2PSocketManager implements I2PSessionListener {
     public static final short DATA_IN = 0xA0;
     public static final short CHAFF = 0xFF;
 
+    /**
+     * How long to wait for the client app to accept() before sending back CLOSE?
+     * This includes the time waiting in the queue.  Currently set to 5 seconds.
+     */
+    private static final long ACCEPT_TIMEOUT_DEFAULT = 5*1000;
+    
     public I2PSocketManager() {
         _session = null;
         _inSockets = new HashMap(16);
         _outSockets = new HashMap(16);
+        _acceptTimeout = ACCEPT_TIMEOUT_DEFAULT;
     }
 
     public I2PSession getSession() {
@@ -64,6 +72,15 @@ public class I2PSocketManager implements I2PSessionListener {
         _session = session;
         if (session != null) session.setSessionListener(this);
     }
+    
+    /**
+     * How long should we wait for the client to .accept() a socket before
+     * sending back a NACK/Close?  
+     *
+     * @param ms milliseconds to wait, maximum
+     */
+    public void setAcceptTimeout(long ms) { _acceptTimeout = ms; }
+    public long getAcceptTimeout() { return _acceptTimeout; }
 
     public void disconnected(I2PSession session) {
         _log.info("Disconnected from the session");
@@ -260,23 +277,25 @@ public class I2PSocketManager implements I2PSessionListener {
             return;
         }
 
-        if (_serverSocket.getNewSocket(s)) {
+        if (_serverSocket.addWaitForAccept(s, _acceptTimeout)) {
             _inSockets.put(newLocalID, s);
             byte[] packet = makePacket((byte) ACK, id, toBytes(newLocalID));
             boolean replySentOk = false;
             replySentOk = _session.sendMessage(d, packet);
             if (!replySentOk) {
-                _log.error("Error sending reply to " + d.calculateHash().toBase64()
-                           + " in response to a new con message",
-                           new Exception("Failed creation"));
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("Error sending reply to " + d.calculateHash().toBase64()
+                               + " in response to a new con message",
+                               new Exception("Failed creation"));
                 s.internalClose();
             }
         } else {
+            // timed out or serverSocket closed
             byte[] packet = toBytes(" " + id);
             packet[0] = CLOSE_OUT;
             boolean nackSent = session.sendMessage(d, packet);
             if (!nackSent) {
-                _log.error("Error sending NACK for session creation");
+                _log.warn("Error sending NACK for session creation");
             }
             s.internalClose();
         }
@@ -461,14 +480,9 @@ public class I2PSocketManager implements I2PSessionListener {
      *
      */
     public void destroySocketManager() {
-
-        try {
-            if (_serverSocket != null) {
-                _serverSocket.close();
-                _serverSocket = null;
-            }
-        } catch (I2PException ex) {
-            _log.error("Error closing I2PServerSocket", ex);
+        if (_serverSocket != null) {
+            _serverSocket.close();
+            _serverSocket = null;
         }
 
         synchronized (lock) {

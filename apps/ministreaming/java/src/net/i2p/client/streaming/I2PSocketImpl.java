@@ -268,6 +268,7 @@ class I2PSocketImpl implements I2PSocket {
         }
     }
 
+    private static volatile long __runnerId = 0;
     public class I2PSocketRunner extends I2PThread {
 
         public InputStream in;
@@ -276,7 +277,7 @@ class I2PSocketImpl implements I2PSocket {
             _log.debug("Runner's input stream is: " + in.hashCode());
             this.in = in;
             String peer = I2PSocketImpl.this.remote.calculateHash().toBase64();
-            setName("SocketRunner from " + peer.substring(0, 4));
+            setName("SocketRunner " + (++__runnerId) + " " + peer.substring(0, 4));
             start();
         }
         
