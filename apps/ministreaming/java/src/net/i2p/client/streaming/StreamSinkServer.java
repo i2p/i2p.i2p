@@ -16,7 +16,7 @@ import net.i2p.util.Log;
 
 /**
  * Listen to a destination, receiving any sockets and writing anything they 
- * send to a new file.
+ * send to a new file. See the {@link #main}
  *
  */
 public class StreamSinkServer {
