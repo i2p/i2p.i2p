@@ -305,8 +305,9 @@ public class ClientConnectionRunner {
             long after = _context.clock().now();
             long lag = after - before;
             if (lag > 300) {
-                _log.error("synchronization on the i2cp message send took too long (" + lag 
-                           + "ms): " + msg, new Exception("I2CP Lag"));
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("synchronization on the i2cp message send took too long (" + lag 
+                              + "ms): " + msg);
             }
         }
     }
