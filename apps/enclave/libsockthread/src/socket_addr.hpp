@@ -28,36 +28,22 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef LIBSOCKTHREAD_PLATFORM_HPP
-#define LIBSOCKTHREAD_PLATFORM_HPP
+#ifndef LIBSOCKTHREAD_SOCKET_ADDR_HPP
+#define LIBSOCKTHREAD_SOCKET_ADDR_HPP
 
-/*
- * Operating system
- */
-#define FREEBSD	0  // FreeBSD (untested)
-#define MINGW	1  // Windows native (Mingw)
-#define LINUX	2  // Linux
-#define CYGWIN	3  // Cygwin
+namespace Libsockthread {
+	class Socket_addr {
+		public:
+			Socket_addr(int domain, const string& host, uint16_t port);
+		private:
+			bool resolve(const char* hostname, char* ipaddr);
 
-#if OS == MINGW
-	#define INET_ADDRSTRLEN 16
-	#define NO_GETHOSTBYNAME2
-	#define NO_INET_ATON  /* implies NO_INET_PTON */
-	#define NO_INET_NTOP
-	#define WINSOCK
-	#define WINTHREAD
-#endif
+			int domain;  // PF_INET or PF_INET6
+			string host;
+			char ipaddr[INET_ADDRSTRLEN];
+			struct sockaddr_in hostaddr;
+			uint16_t port;
+	};
+}
 
-#if OS == LINUX
-	#define NO_GETHOSTBYNAME2
-#endif
-
-#if OS == CYGWIN
-	#define FAST32_IS_LONG
-	#define INET_ADDRSTRLEN 16
-	#define NO_GETHOSTBYNAME2
-	#define NO_INET_NTOP
-	#define NO_INET_PTON
-#endif
-
-#endif  // LIBSOCKTHREAD_PLATFORM_HPP
+#endif  // LIBSOCKTHREAD_SOCKET_ADDR_HPP

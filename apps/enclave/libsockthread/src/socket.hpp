@@ -32,13 +32,18 @@
 #define LIBSOCKTHREAD_SOCKET_HPP
 
 namespace Libsockthread {
+	class Socket_error : public runtime_error {
+		public:
+			Socket_error(const string& s)
+				: runtime_error(s) { }
+	};
 	class Socket {
 		public:
-			Socket(void);  // throws socket error
+			Socket(void);  // throws Socket_error
 			Socket(int domain, int type);  // throws Socket_error
 			~Socket(void);
 
-			void func(void);
+			void close(void);
 		private:
 #ifdef WINSOCK
 			typedef SOCKET socket_t;
@@ -52,13 +57,7 @@ namespace Libsockthread {
 			void create_socket(int domain, int type);  // throws Socket_error
 
 			socket_t sock;
-			static size_t total;
-	};
-
-	class Socket_error : public runtime_error {
-		public:
-			Socket_error(const string& s)
-				: runtime_error(s) { }
+			static size_t total;  // the total number of sockets in memory
 	};
 }
 

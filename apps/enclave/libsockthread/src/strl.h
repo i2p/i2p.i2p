@@ -28,36 +28,20 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef LIBSOCKTHREAD_PLATFORM_HPP
-#define LIBSOCKTHREAD_PLATFORM_HPP
-
 /*
- * Operating system
+ * Note: The strl.c file retains its original license (at the top of strl.c)
  */
-#define FREEBSD	0  // FreeBSD (untested)
-#define MINGW	1  // Windows native (Mingw)
-#define LINUX	2  // Linux
-#define CYGWIN	3  // Cygwin
 
-#if OS == MINGW
-	#define INET_ADDRSTRLEN 16
-	#define NO_GETHOSTBYNAME2
-	#define NO_INET_ATON  /* implies NO_INET_PTON */
-	#define NO_INET_NTOP
-	#define WINSOCK
-	#define WINTHREAD
+#ifndef LIBSOCKTHREAD_STRL_H
+#define LIBSOCKTHREAD_STRL_H
+#ifdef __cplusplus
+extern "C" {
 #endif
 
-#if OS == LINUX
-	#define NO_GETHOSTBYNAME2
-#endif
+extern size_t strlcat(char *dst, const char *src, size_t siz);
+extern size_t strlcpy(char *dst, const char *src, size_t siz);
 
-#if OS == CYGWIN
-	#define FAST32_IS_LONG
-	#define INET_ADDRSTRLEN 16
-	#define NO_GETHOSTBYNAME2
-	#define NO_INET_NTOP
-	#define NO_INET_PTON
+#ifdef __cplusplus
+}
 #endif
-
-#endif  // LIBSOCKTHREAD_PLATFORM_HPP
+#endif  /* LIBSOCKTHREAD_STRL_H */

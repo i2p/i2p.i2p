@@ -28,8 +28,11 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include <cassert>
+using namespace std;
 #include "platform.hpp"
 #include "socket.hpp"
+using namespace Libsockthread;
 
 size_t Socket::total = 0;  // the total number of sockets in use
 
@@ -39,15 +42,20 @@ size_t Socket::total = 0;  // the total number of sockets in use
 Socket::Socket(void)
 {
 	++total;
+	try {
 #ifdef WINSOCK
-	if (total == 1)
-		winsock_startup();
+		if (total == 1)
+			winsock_startup();
 #endif
-	socket(PF_INET, SOCK_STREAM);
+		create_socket(PF_INET, SOCK_STREAM);
+	} catch (const Socket_error& x) {
+		--total;
+		throw;
+	}
 }
 
 /*
- * Constructs a socket
+ * Constructs the socket
  *
  * domain - either PF_INET or PF_INET6
  * type - either SOCK_STREAM or SOCK_DGRAM
@@ -55,24 +63,50 @@ Socket::Socket(void)
 Socket::Socket(int domain, int type)
 {
 	++total;
+	try {
 #ifdef WINSOCK
-	if (total == 1)
-		winsock_startup();
+		if (total == 1)
+			winsock_startup();
 #endif
-	socket(domain, type);
+		create_socket(domain, type);
+	} catch {const Socket_error& x) {
+		--total;
+		throw;
+	}
 }
 
 /*
- * Destroys a socket
+ * Destroys the socket
  */
 Socket::~Socket(void)
 {
-	total--;
-	// TODO: finish me
+	close();
+	--total;
+	assert(total >= 0);
+#ifdef WINSOCK
+	if (total == 0)
+		winsock_cleanup();
+#endif
 }
 
 /*
- * Creates a socket
+ * Closes the socket
+ */
+void Socket::close(void)
+{
+#ifdef WINSOCK
+	if (closesocket(sock) == SOCKET_ERROR) {
+		LERROR("closesocket() failed: %s", winsock_strerror(WSAGetLastError()));
+	}
+#else
+	if (close(sock) == -1) {
+		LERROR("close() failed: %s", strerror(errno));
+	}
+#endif
+}
+
+/*
+ * Creates the socket
  *
  * domain - either PF_INET or PF_INET6
  * type - either SOCK_STREAM or SOCK_DGRAM

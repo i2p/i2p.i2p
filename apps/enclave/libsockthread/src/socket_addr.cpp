@@ -28,36 +28,56 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef LIBSOCKTHREAD_PLATFORM_HPP
-#define LIBSOCKTHREAD_PLATFORM_HPP
+#include <arpa/inet.h>
+#include <cassert>
+using namespace std;
+#include "platform.hpp"
+#include "socket.hpp"
+#include "socket_addr.hpp"
+using namespace Libsockthread;
+
+Socket_addr::Socket_addr(int domain, const string& host, uint16_t port)
+	: domain(domain), host(host), port(port)
+{
+	memset(&hostaddr, 0, sizeof hostaddr);
+	hostaddr.sin_family = domain;
+	hostaddr.sin_port = htons(port);
+	resolve(host.c_str(), ipaddr);
+	int rc;
+#ifdef NO_INET_ATON
+	rc = hostaddr.sin_addr.s_addr = inet_addr(ipaddr);
+#elif defined NO_INET_PTON
+	rc = inet_aton(ipaddr, &hostaddr.sin_addr);
+#else
+	rc = inet_pton(AF_INET, ipaddr, &hostaddr.sin_addr);
+#endif
+	assert(rc != 0 && rc != -1);
+}
 
 /*
- * Operating system
+ * Performs a DNS lookup on `hostname' and puts the result in `ipaddr'
  */
-#define FREEBSD	0  // FreeBSD (untested)
-#define MINGW	1  // Windows native (Mingw)
-#define LINUX	2  // Linux
-#define CYGWIN	3  // Cygwin
-
-#if OS == MINGW
-	#define INET_ADDRSTRLEN 16
-	#define NO_GETHOSTBYNAME2
-	#define NO_INET_ATON  /* implies NO_INET_PTON */
-	#define NO_INET_NTOP
-	#define WINSOCK
-	#define WINTHREAD
+bool Socket::resolve(const char* hostname, char* ipaddr)
+{
+	struct hostent *h;
+#ifdef NO_GETHOSTBYNAME2
+	h = gethostbyname(hostname);
+#else
+	h = gethostbyname2(hostname, domain);
 #endif
-
-#if OS == LINUX
-	#define NO_GETHOSTBYNAME2
+	if (h == 0) {
+		LWARN("DNS resolution failed for %s", hostname);
+		throw Socket_error("DNS resolution failed");
+	}
+	struct in_addr a;
+	a.s_addr = ((struct in_addr *)h->h_addr)->s_addr;
+#ifdef NO_INET_NTOP
+	char *tmp;
+	tmp = inet_ntoa(a);
+	assert(tmp != 0);
+	strlcpy(ipaddr, tmp, INET_ADDRSTRLEN);  // inet_ntoa() was very poorly designed
+#else
+	int rc = inet_ntop(domain, &a, ipaddr, INET_ADDRSTRLEN);
+	assert(rc != 0);
 #endif
-
-#if OS == CYGWIN
-	#define FAST32_IS_LONG
-	#define INET_ADDRSTRLEN 16
-	#define NO_GETHOSTBYNAME2
-	#define NO_INET_NTOP
-	#define NO_INET_PTON
-#endif
-
-#endif  // LIBSOCKTHREAD_PLATFORM_HPP
+}

@@ -35,8 +35,9 @@ using namespace std;
 using namespace Libsockthread;
 
 /*
- * Converts the time to an ISO 8601 standard time and date and puts it in a string
- * Example: 2004-07-01 19:03:47Z
+ * Converts the time to an ISO 8601 standard time and date and puts it in a
+ * string
+ * Example: 2004-07-01T19:03:47Z
  */
 string& Time::utc(string &s) const
 {
