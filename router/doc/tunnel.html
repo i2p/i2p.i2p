@@ -1,4 +1,4 @@
-<code>$Id$</code>
+<code>$Id: tunnel.html,v 1.3 2005/01/12 14:22:40 jrandom Exp $</code>
 <pre>
 1) <a href="#tunnel.overview">Tunnel overview</a>
 2) <a href="#tunnel.operation">Tunnel operation</a>
@@ -15,6 +15,8 @@
 2.7.4) <a href="#tunnel.smallerhashes">Use smaller hashes</a>
 3) <a href="#tunnel.building">Tunnel building</a>
 3.1) <a href="#tunnel.peerselection">Peer selection</a>
+3.1.1) <a href="#tunnel.selection.exploratory">Exploratory tunnel peer selection</a>
+3.1.2) <a href="#tunnel.selection.client">Client tunnel peer selection</a>
 3.2) <a href="#tunnel.request">Request delivery</a>
 3.3) <a href="#tunnel.pooling">Pooling</a>
 4) <a href="#tunnel.throttling">Tunnel throttling</a>
@@ -368,9 +370,91 @@ byte SHA1 would likely be more than sufficient, and perhaps smaller (first
 
 <h2>3) <a name="tunnel.building">Tunnel building</a></h2>
 
+<p>When building a tunnel, the creator must send a request with the necessary
+configuration data to each of the hops, then wait for the potential participant
+to reply stating that they either agree or do not agree.  These tunnel request
+messages and their replies are garlic wrapped so that only the router who knows
+the key can decrypt it, and the path taken in both directions is tunnel routed
+as well.  There are three important dimensions to keep in mind when producing
+the tunnels: what peers are used (and where), how the requests are sent (and 
+replies received), and how they are maintained.</p>
+
 <h3>3.1) <a name="tunnel.peerselection">Peer selection</a></h3>
+
+<p>Beyond the two types of tunnels - inbound and outbound - there are two styles
+of peer selection used for different tunnels - exploratory and client.
+Exploratory tunnels are used for both network database maintenance and tunnel
+maintenance, while client tunnels are used for end to end client messages.  </p>
+
+<h4>3.1.1) <a name="tunnel.selection.exploratory">Exploratory tunnel peer selection</a></h4>
+
+<p>Exploratory tunnels are built out of a random selection of peers from a subset
+of the network.  The particular subset varies on the local router and on what their
+tunnel routing needs are.  In general, the exploratory tunnels are built out of
+randomly selected peers who are in the peer's "not failing but active" profile
+category.  The secondary purpose of the tunnels, beyond merely tunnel routing,
+is to find underutilized high capacity peers so that they can be promoted for
+use in client tunnels.</p>
+
+<h4>3.1.2) <a name="tunnel.selection.client">Client tunnel peer selection</a></h4>
+
+<p>Client tunnels are built with a more stringent set of requirements - the local
+router will select peers out of its "fast and high capacity" profile category so
+that performance and reliability will meet the needs of the client application.
+However, there are several important details beyond that basic selection that 
+should be adhered to, depending upon the client's anonymity needs.</p>
+  
+<p>For some clients who are worried about adversaries mounting a predecessor 
+attack, the tunnel selection can keep the peers selected in a strict order -
+if A, B, and C are in a tunnel, the hop after A is always B, and the hop after
+B is always C.  A less strict ordering is also possible, assuring that while
+the hop after A may be B, B may never be before A.  Other configuration options
+include the ability for just the inbound tunnel gateways and outbound tunnel
+endpoints to be fixed, or rotated on an MTBF rate.</p>
+
 <h3>3.2) <a name="tunnel.request">Request delivery</a></h3>
+
+<p>As mentioned above, once the tunnel creator knows what peers should go into
+a tunnel and in what order, the creator builds a series of tunnel request 
+messages, each containing the necessary information for that peer.  For instance,
+participating tunnels will be given the 4 byte tunnel ID on which they are to
+receive messages, the 4 byte tunnel ID on which they are to send out the messages,
+the 32 byte hash of the next hop's identity, and the 32 byte layer key used to
+remove a layer from the tunnel.  Of course, outbound tunnel endpoints are not 
+given any "next hop" or "next tunnel ID" information.  Inbound tunnel gateways
+are however given the 8 layer keys in the order they should be encrypted (as 
+described above).  To allow replies, the request contains a random session tag
+and a random session key with which the peer may garlic encrypt their decision,
+as well as the tunnel to which that garlic should be sent.  In addition to the
+above information, various client specific options may be included, such as 
+what throttling to place on the tunnel, what padding or batch strategies to use, 
+etc.</p>
+
+<p>After building all of the request messages, they are garlic wrapped for the
+target router and sent out an exploratory tunnel.  Upon receipt, that peer 
+determines whether they can or will participate, creating a reply message and
+both garlic wrapping and tunnel routing the response with the supplied 
+information.  Upon receipt of the reply at the tunnel creator, the tunnel is
+considered valid on that hop (if accepted).  Once all peers have accepted, the
+tunnel is active.</p>
+
 <h3>3.3) <a name="tunnel.pooling">Pooling</a></h3>
+
+<p>To allow efficient operation, the router maintains a series of tunnel pools,
+each managing a group of tunnels used for a specific purpose with their own
+configuration.  When a tunnel is needed for that purpose, the router selects one
+out of the appropriate pool at random.  Overall, there are two exploratory tunnel
+pools - one inbound and one outbound - each using the router's exploration 
+defaults.  In addition, there is a pair of pools for each local destination -
+one inbound and one outbound tunnel.  Those pools use the configuration specified
+when the local destination connected to the router, or the router's defaults if
+not specified.</p>
+
+<p>Each pool has within its configuration a few key settings, defining how many
+tunnels to keep active, how many backup tunnels to maintain in case of failure,
+how frequently to test the tunnels, how long the tunnels should be, whether those
+lengths should be randomized, how often replacement tunnels should be built, as 
+well as any of the other settings allowed when configuring individual tunnels.</p>
 
 <h2>4) <a name="tunnel.throttling">Tunnel throttling</a></h2>
 
