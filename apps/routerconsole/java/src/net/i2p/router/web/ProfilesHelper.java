@@ -32,4 +32,14 @@ public class ProfilesHelper {
         }
         return new String(baos.toByteArray());
     }
+    
+    public String getShitlistSummary() {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream(4*1024);
+        try {
+            _context.shitlist().renderStatusHTML(baos);
+        } catch (IOException ioe) {
+            ioe.printStackTrace();
+        }
+        return new String(baos.toByteArray());
+    }
 }
