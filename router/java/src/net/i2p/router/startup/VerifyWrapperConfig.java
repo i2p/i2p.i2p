@@ -18,7 +18,7 @@ public class VerifyWrapperConfig {
     public static boolean verifyConfig() {
         boolean cpUpdated = VerifyClasspath.updateClasspath();
         boolean pingUpdated = updatePing();
-        return pingUpdated || cpUpdated;
+        return cpUpdated; // dont force the pingUpdated to cause a restart
     }
     
     private static boolean updatePing() {
@@ -32,6 +32,7 @@ public class VerifyWrapperConfig {
             FileWriter out = new FileWriter(configFile, true);
             out.write(NL + "# Adding ping timeout as required by the update" + NL);
             out.write("wrapper.ping.interval=600" + NL);
+            out.write("wrapper.ping.timeout=605" + NL);
             out.close();
             return true;
         } catch (IOException ioe) {
