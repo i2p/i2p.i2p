@@ -226,6 +226,8 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
             Destination dest = I2PTunnel.destFromName(destination);
             if (dest == null) {
                 l.log("Could not resolve " + destination + ".");
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("Unable to resolve " + destination + " (proxy? " + usingWWWProxy + ", request: " + targetRequest);
                 writeErrorMessage(ERR_DESTINATION_UNKNOWN, out, targetRequest, usingWWWProxy, destination);
                 s.close();
                 return;
@@ -365,6 +367,9 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
 
     private void handleHTTPClientException(Exception ex, OutputStream out, String targetRequest,
                                                   boolean usingWWWProxy, String wwwProxy) {
+                                                      
+        if (_log.shouldLog(Log.WARN))
+            _log.warn("Error sending to " + wwwProxy + " (proxy? " + usingWWWProxy + ", request: " + targetRequest, ex);
         if (out != null) {
             try {
                 writeErrorMessage(ERR_DESTINATION_UNKNOWN, out, targetRequest, usingWWWProxy, wwwProxy);

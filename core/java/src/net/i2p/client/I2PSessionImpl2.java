@@ -62,7 +62,6 @@ class I2PSessionImpl2 extends I2PSessionImpl {
     }
 
     public boolean sendMessage(Destination dest, byte[] payload) throws I2PSessionException {
-
         return sendMessage(dest, payload, new SessionKey(), new HashSet(64));
     }
 
@@ -137,18 +136,29 @@ class I2PSessionImpl2 extends I2PSessionImpl {
             }
         }
 
+        long beforeSendingSync = _context.clock().now();
+        long inSendingSync = 0;
         synchronized (_sendingStates) {
+            inSendingSync = _context.clock().now();
             _sendingStates.add(state);
         }
+        long afterSendingSync = _context.clock().now();
         if (_log.shouldLog(Log.DEBUG))
             _log.debug(getPrefix() + "Adding sending state " + state.getMessageId() + " / "
-                       + state.getNonce());
+                       + state.getNonce() 
+                       + " sync took " + (inSendingSync-beforeSendingSync) 
+                       + " add took " + (afterSendingSync-inSendingSync));
         _producer.sendMessage(this, dest, nonce, payload, tag, key, sentTags, newKey);
+        long beforeWaitFor = _context.clock().now();
         state.waitFor(MessageStatusMessage.STATUS_SEND_ACCEPTED, 
                       _context.clock().now() + getTimeout());
+        long afterWaitFor = _context.clock().now();
+        long inRemovingSync = 0;
         synchronized (_sendingStates) {
+            inRemovingSync = _context.clock().now();
             _sendingStates.remove(state);
         }
+        long afterRemovingSync = _context.clock().now();
         boolean found = state.received(MessageStatusMessage.STATUS_SEND_ACCEPTED);
         if (_log.shouldLog(Log.DEBUG))
             _log.debug(getPrefix() + "After waitFor sending state " + state.getMessageId().getMessageId()
@@ -206,22 +216,34 @@ class I2PSessionImpl2 extends I2PSessionImpl {
             }
         }
 
+        long beforeSendingSync = _context.clock().now();
+        long inSendingSync = 0;
         synchronized (_sendingStates) {
+            inSendingSync = _context.clock().now();
             _sendingStates.add(state);
         }
+        long afterSendingSync = _context.clock().now();
         if (_log.shouldLog(Log.DEBUG))
             _log.debug(getPrefix() + "Adding sending state " + state.getMessageId() + " / "
-                       + state.getNonce());
+                       + state.getNonce()
+                       + " sync took " + (inSendingSync-beforeSendingSync) 
+                       + " add took " + (afterSendingSync-inSendingSync));
         _producer.sendMessage(this, dest, nonce, payload, tag, key, sentTags, newKey);
+        long beforeWaitFor = _context.clock().now();
         if (isGuaranteed())
             state.waitFor(MessageStatusMessage.STATUS_SEND_GUARANTEED_SUCCESS, 
                           _context.clock().now() + SEND_TIMEOUT);
         else
             state.waitFor(MessageStatusMessage.STATUS_SEND_ACCEPTED, 
                           _context.clock().now() + SEND_TIMEOUT);
+
+        long afterWaitFor = _context.clock().now();
+        long inRemovingSync = 0;
         synchronized (_sendingStates) {
+            inRemovingSync = _context.clock().now();
             _sendingStates.remove(state);
         }
+        long afterRemovingSync = _context.clock().now();
         boolean found = state.received(MessageStatusMessage.STATUS_SEND_GUARANTEED_SUCCESS);
         boolean accepted = state.received(MessageStatusMessage.STATUS_SEND_ACCEPTED);
 
@@ -229,7 +251,12 @@ class I2PSessionImpl2 extends I2PSessionImpl {
             if (_log.shouldLog(Log.CRIT))
                 _log.log(Log.CRIT, getPrefix() + "State with nonce " + state.getNonce()
                            + " was not accepted?  (no messageId!! found=" + found 
-                           + " msgId=" + state.getMessageId() + ")");
+                           + " msgId=" + state.getMessageId() 
+                           + ", sendingSync=" + (afterSendingSync-beforeSendingSync) 
+                           + ", sendMessage=" + (beforeWaitFor-afterSendingSync)
+                           + ", waitFor=" + (afterWaitFor-beforeWaitFor)
+                           + ", removingSync=" + (afterRemovingSync-afterWaitFor) 
+                           + ")");
             //if (true) 
             //    throw new OutOfMemoryError("not really an OOM, but more of jr fucking shit up");
             nackTags(state);
@@ -280,7 +307,10 @@ class I2PSessionImpl2 extends I2PSessionImpl {
     public void receiveStatus(int msgId, long nonce, int status) {
         if (_log.shouldLog(Log.DEBUG)) _log.debug(getPrefix() + "Received status " + status + " for msgId " + msgId + " / " + nonce);
         MessageState state = null;
+        long beforeSync = _context.clock().now();
+        long inSync = 0;
         synchronized (_sendingStates) {
+            inSync = _context.clock().now();
             for (Iterator iter = _sendingStates.iterator(); iter.hasNext();) {
                 state = (MessageState) iter.next();
                 if (_log.shouldLog(Log.DEBUG)) _log.debug(getPrefix() + "State " + state.getMessageId() + " / " + state.getNonce());
@@ -296,7 +326,12 @@ class I2PSessionImpl2 extends I2PSessionImpl {
                 }
             }
         }
+        long afterSync = _context.clock().now();
 
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("receiveStatus(" + msgId + ", " + nonce + ", " + status+ "): sync: " 
+                       + (inSync-beforeSync) + "ms, check: " + (afterSync-inSync));
+        
         if (state != null) {
             if (state.getMessageId() == null) {
                 MessageId id = new MessageId();

@@ -419,17 +419,25 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
     void sendMessage(I2CPMessage message) throws I2PSessionException {
         if (isClosed()) throw new I2PSessionException("Already closed");
 
+        long beforeSync = _context.clock().now();
+        long inSync = 0;
+        
         try {
             synchronized (_out) {
+                inSync = _context.clock().now();
                 message.writeMessage(_out);
                 _out.flush();
             }
-            if (_log.shouldLog(Log.DEBUG)) _log.debug(getPrefix() + "Message written out and flushed");
         } catch (I2CPMessageException ime) {
             throw new I2PSessionException(getPrefix() + "Error writing out the message", ime);
         } catch (IOException ioe) {
             throw new I2PSessionException(getPrefix() + "Error writing out the message", ioe);
         }
+        long afterSync = _context.clock().now();
+        if (_log.shouldLog(Log.DEBUG)) 
+            _log.debug(getPrefix() + "Message written out and flushed w/ " 
+                       + (inSync-beforeSync) + "ms to sync and "
+                       + (afterSync-inSync) + "ms to send");;
     }
 
     /**

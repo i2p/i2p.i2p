@@ -363,8 +363,9 @@ public class ClientConnectionRunner {
      */
     private class ClientWriterRunner implements Runnable {
         private List _messagesToWrite;
+        private long _lastAdded;
         public ClientWriterRunner() {
-            _messagesToWrite = new ArrayList(2);
+            _messagesToWrite = new ArrayList(4);
         }
         
         /**
@@ -374,7 +375,8 @@ public class ClientConnectionRunner {
         public void addMessage(I2CPMessage msg) {
             synchronized (_messagesToWrite) {
                 _messagesToWrite.add(msg);
-                _messagesToWrite.notify();
+                _lastAdded = _context.clock().now();
+                _messagesToWrite.notifyAll();
             }
         }
         
@@ -384,28 +386,40 @@ public class ClientConnectionRunner {
          */
         public void stopWriting() {
             synchronized (_messagesToWrite) {
-                _messagesToWrite.notify();
+                _messagesToWrite.notifyAll();
             }
         }
         public void run() {
             while (!_dead) {
                 I2CPMessage msg = null;
+                long beforeCheckSync = _context.clock().now();
+                long inCheckSync = 0;
                 synchronized (_messagesToWrite) {
+                    inCheckSync = _context.clock().now();
                     if (_messagesToWrite.size() > 0) {
-                        // we do this test before and after wait, in case more than 
-                        // one message gets enqueued
                         msg = (I2CPMessage)_messagesToWrite.remove(0);
                     } else {
                         try {
                             _messagesToWrite.wait();
-                        } catch (InterruptedException ie) {}
-                        
-                        if (_messagesToWrite.size() > 0)
-                            msg = (I2CPMessage)_messagesToWrite.remove(0);
+                        } catch (InterruptedException ie) {
+                            if (_messagesToWrite.size() > 0)
+                                msg = (I2CPMessage)_messagesToWrite.remove(0);
+                        }
                     }
                 }
-                if (msg != null)
+                
+                long afterCheckSync = _context.clock().now();
+                
+                if (msg != null) {
                     writeMessage(msg);
+                    long afterWriteMessage = _context.clock().now();
+                    if (_log.shouldLog(Log.DEBUG))
+                        _log.debug("writeMessage: check sync took " 
+                                   + (inCheckSync-beforeCheckSync) + "ms, writemessage took "
+                                   + (afterWriteMessage-afterCheckSync) 
+                                   + "ms,  time since addMessage(): " + 
+                                   + (afterCheckSync-_lastAdded));
+                } 
             }
         }
         
@@ -417,7 +431,8 @@ public class ClientConnectionRunner {
                     _out.flush();
                 }
                 if (_log.shouldLog(Log.DEBUG))
-                    _log.debug("after doSend of a "+ msg.getClass().getName() + " message");
+                    _log.debug("after writeMessage("+ msg.getClass().getName() + "): " 
+                               + (_context.clock().now()-before) + "ms");;
             } catch (I2CPMessageException ime) {
                 _log.error("Message exception sending I2CP message", ime);
                 stopRunning();
@@ -456,7 +471,15 @@ public class ClientConnectionRunner {
                            + _config.getDestination().calculateHash().toBase64());
         }
         _writer.addMessage(msg);
-
+        if (_log.shouldLog(Log.DEBUG)) {
+            if ( (_config == null) || (_config.getDestination() == null) ) 
+                _log.debug("after doSend of a "+ msg.getClass().getName() 
+                           + " message on for establishing i2cp con");
+            else
+                _log.debug("after doSend of a "+ msg.getClass().getName() 
+                           + " message on for " 
+                           + _config.getDestination().calculateHash().toBase64());
+        }
     }
     
     // this *should* be mod 65536, but UnsignedInteger is still b0rked.  FIXME

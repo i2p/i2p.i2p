@@ -131,8 +131,11 @@ class I2PSocketImpl implements I2PSocket {
                 } catch (InterruptedException ex) {
                 }
 
-                if ((maxWait >= 0) && (System.currentTimeMillis() >= dieAfter))
-                    throw new InterruptedIOException("Timed out waiting for remote ID");
+                long now = System.currentTimeMillis();
+                if ((maxWait >= 0) && (now >= dieAfter)) {
+                    long waitedExcess = now - dieAfter;
+                    throw new InterruptedIOException("Timed out waiting for remote ID (waited " + waitedExcess + "ms too long [" + maxWait + "ms])");
+                }
              
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("TIMING: RemoteID set to " 
