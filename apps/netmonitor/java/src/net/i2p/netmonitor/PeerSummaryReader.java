@@ -84,6 +84,8 @@ class PeerSummaryReader {
             }
         }
         
+        if (summary == null)
+            return;
         summary.coallesceData(monitor.getSummaryDurationHours() * 60*60*1000);
         monitor.addSummary(summary);
     }
