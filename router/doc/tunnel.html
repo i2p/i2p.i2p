@@ -1,4 +1,4 @@
-<code>$Id: tunnel.html,v 1.6 2005/01/14 19:06:40 jrandom Exp $</code>
+<code>$Id: tunnel.html,v 1.7 2005/01/14 22:53:13 jrandom Exp $</code>
 <pre>
 1) <a href="#tunnel.overview">Tunnel overview</a>
 2) <a href="#tunnel.operation">Tunnel operation</a>
@@ -139,7 +139,7 @@ well as an end to end verification block for the tunnel endpoint to
 verify the integrity of the checksum block.  The specific details follow.</p>
 
 <p>The encryption used is such that decryption
-merely requires running over the data with AES in CTR mode, calculating the
+merely requires running over the data with AES in CBC mode, calculating the
 SHA256 of a certain fixed portion of the message (bytes 16 through $size-288),
 and searching for that hash in the checksum block.  There is a fixed number 
 of hops defined (8 peers) so that we can verify the message
@@ -243,7 +243,7 @@ the end of the previous encrypted block on that row.</p>
 
 <p>With this randomized matrix of checksum blocks, each peer will be able to find
 the hash of the payload, or if it is not there, know that the message is corrupt.
-The entanglement by using CTR mode increases the difficulty in tagging the 
+The entanglement by using CBC mode increases the difficulty in tagging the 
 checksum blocks themselves, but it is still possible for that tagging to go 
 briefly undetected if the columns after the tagged data have already been used
 to check the payload at a peer.  In any case, the tunnel endpoint (peer 7) knows
@@ -261,7 +261,7 @@ peer who is the first hop (usually the peer1.recv row) and forward that entirely
 <h3>2.3) <a name="tunnel.participant">Participant processing</a></h3>
 
 <p>When a participant in a tunnel receives a message, they decrypt a layer with their
-tunnel key using AES256 in CTR mode with the first 16 bytes as the IV.  They then
+tunnel key using AES256 in CBC mode with the first 16 bytes as the IV.  They then
 calculate the hash of what they see as the payload (bytes 16 through $size-288) and
 search for that hash within the decrypted checksum block.  If no match is found, the
 message is discarded.  Otherwise, the IV is updated by decrypting it, XORing that value
