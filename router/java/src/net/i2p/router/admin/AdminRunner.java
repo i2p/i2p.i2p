@@ -15,6 +15,7 @@ import java.util.Set;
 import net.i2p.data.Hash;
 import net.i2p.router.RouterContext;
 import net.i2p.util.Log;
+import net.i2p.util.I2PThread;
 
 class AdminRunner implements Runnable {
     private Log _log;
@@ -52,6 +53,8 @@ class AdminRunner implements Runnable {
         } else if (command.indexOf("setTime") >= 0) {
             setTime(command);
             reply(out, "<html><body>Time updated</body></html>");
+        } else if (command.indexOf("/shutdown") >= 0) {
+            reply(out, shutdown(command));
         } else if (true || command.indexOf("routerConsole.html") > 0) {
             reply(out, _context.router().renderStatusHTML());
         }
@@ -134,5 +137,29 @@ class AdminRunner implements Runnable {
     
     private void setTime(long now) {
         _context.clock().setNow(now);
+    }
+    
+    
+    private static final String SHUTDOWN_PASSWORD_PROP = "router.shutdownPassword";
+    private String shutdown(String cmd) {
+        String password = _context.router().getConfigSetting(SHUTDOWN_PASSWORD_PROP);
+        if (password == null)
+            password = _context.getProperty(SHUTDOWN_PASSWORD_PROP);
+        if (password == null) 
+            return "No shutdown password specified in the config or context - <b>REFUSING SHUTDOWN</b>." +
+                   "<a href=\"/routerConsole.html\">back</a>";
+        if (cmd.indexOf(password) > 0) {
+            I2PThread t = new I2PThread(new Runnable() {
+                public void run() { 
+                    try { Thread.sleep(30*1000); } catch (InterruptedException ie) {}
+                    _context.router().shutdown();
+                }
+            });
+            t.start();
+            return "Shutdown request accepted.  Killing the router in 30 seconds";
+        } else {
+            return "Incorrect shutdown password specified.  Please edit your router.config appropriately." +
+                   "<a href=\"/routerConsole.html\">back</a>";
+        }
     }
 }

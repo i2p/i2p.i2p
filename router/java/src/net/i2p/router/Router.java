@@ -232,6 +232,11 @@ public class Router {
         buf.append("</select>");
         buf.append("</form>");
 
+        buf.append("<form action=\"/shutdown\" method=\"GET\">");
+        buf.append("<b>Shut down the router:</b>");
+        buf.append("<input type=\"password\" name=\"password\" size=\"8\" />");
+        buf.append("<input type=\"submit\" value=\"shutdown!\" />");
+        buf.append("</form>");
         buf.append("<hr />\n");
 
         if ( (_routerInfo != null) && (_routerInfo.getIdentity() != null) )
