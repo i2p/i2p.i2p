@@ -216,20 +216,24 @@ public class StatisticsManager implements Service {
         double recvBytes60m = 0;
         
         RateStat sendRate = _context.statManager().getRate("transport.sendMessageSize");
-        Rate r = sendRate.getRate(5*60*1000);
-        if (r != null)
-            sendBytes5m = r.getLastTotalValue();
-        r = sendRate.getRate(60*60*1000);
-        if (r != null)
-            sendBytes60m = r.getLastTotalValue();
+        if (sendRate != null) {
+            Rate r = sendRate.getRate(5*60*1000);
+            if (r != null)
+                sendBytes5m = r.getLastTotalValue();
+            r = sendRate.getRate(60*60*1000);
+            if (r != null)
+                sendBytes60m = r.getLastTotalValue();
+        }
         
         RateStat recvRate = _context.statManager().getRate("transport.receiveMessageSize");
-        r = recvRate.getRate(5*60*1000);
-        if (r != null)
-            recvBytes5m = r.getLastTotalValue();
-        r = recvRate.getRate(60*60*1000);
-        if (r != null)
-            recvBytes60m = r.getLastTotalValue();
+        if (recvRate != null) {
+            Rate r = recvRate.getRate(5*60*1000);
+            if (r != null)
+                recvBytes5m = r.getLastTotalValue();
+            r = recvRate.getRate(60*60*1000);
+            if (r != null)
+                recvBytes60m = r.getLastTotalValue();
+        }
         
         String throughputRate = renderThroughput(sendBytes5m, 5*60*1000);
         stats.setProperty("stat_bandwidthSendBps.5m", throughputRate);
