@@ -223,12 +223,14 @@ class I2PSessionImpl2 extends I2PSessionImpl {
         if ((!accepted) || (state.getMessageId() == null)) {
             if (_log.shouldLog(Log.ERROR))
                 _log.error("State with nonce " + state.getNonce()
-                           + " was not accepted?  (no messageId!!)");
+                           + " was not accepted?  (no messageId!! found=" + found 
+                           + " msgId=" + state.getMessageId() + ")", 
+                           new Exception("Race on accept/success status messages?"));
             nackTags(state);
-            if (_log.shouldLog(Log.CRIT))
-                _log.log(Log.CRIT, "Disconnecting/reconnecting because we never were accepted!");
-            disconnect();
-            return false;
+            //if (_log.shouldLog(Log.CRIT))
+            //    _log.log(Log.CRIT, "Disconnecting/reconnecting because we never were accepted!");
+            //disconnect();
+            //return false;
         }
 
         if (_log.shouldLog(Log.DEBUG))
