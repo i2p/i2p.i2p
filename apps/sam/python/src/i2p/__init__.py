@@ -12,6 +12,7 @@ __all__ = [
  'socket',
  'SocketServer',
  'tunnel',
+ 'stasher',
 ]
 
 class Error(Exception):
