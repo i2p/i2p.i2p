@@ -1,4 +1,4 @@
-$Id: history.txt,v 1.8 2004/09/06 00:20:42 jrandom Exp $
+$Id: history.txt,v 1.9 2004/09/07 02:17:03 jrandom Exp $
 
 2004-09-07  jrandom
     * Write the native libraries to the current directory when they are loaded 
@@ -10,7 +10,6 @@ $Id: history.txt,v 1.8 2004/09/06 00:20:42 jrandom Exp $
       use this for integration with the service manager, since otherwise a 
       graceful shutdown would cause a timeout, followed by a forced hard 
       shutdown.
-    * Handle a bug in the SimpleTimer with requeued tasks.
     * Made the capacity calculator a bit more dynamic by not outright ignoring
       the otherwise valid capacity data for a period with a single rejected
       tunnel (except for the 10 minute period).  In addition, peers with an
