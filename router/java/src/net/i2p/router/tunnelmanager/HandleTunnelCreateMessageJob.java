@@ -155,7 +155,11 @@ public class HandleTunnelCreateMessageJob extends JobImpl {
         GarlicMessage reply = createReply(msg);
         
         TunnelId outTunnelId = selectReplyTunnel();
-        
+        if (outTunnelId == null) {
+            if (_log.shouldLog(Log.ERROR))
+                _log.error("No tunnel to send reply through");
+            return;
+        }
         SendTunnelMessageJob job = new SendTunnelMessageJob(getContext(), reply, outTunnelId, 
                                                             _message.getReplyPeer(), 
                                                             _message.getReplyTunnel(), 
