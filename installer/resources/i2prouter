@@ -126,7 +126,7 @@ getpid() {
             if [ "X$pid" != "X" ]
             then
                 # Verify that a process with this pid is still running.
-                pid=`$PSEXE -p $pid | grep $pid | grep -v grep | awk '{print $1}' | tail -1`
+                pid=`$PSEXE -p $pid | grep $pid | grep -v grep | awk '{print $1}' | tail -n 1`
                 if [ "X$pid" = "X" ]
                 then
                     # This is a stale pid file.
@@ -142,7 +142,7 @@ getpid() {
 }
 
 testpid() {
-    pid=`$PSEXE -p $pid | grep $pid | grep -v grep | awk '{print $1}' | tail -1`
+    pid=`$PSEXE -p $pid | grep $pid | grep -v grep | awk '{print $1}' | tail -n 1`
     if [ "X$pid" = "X" ]
     then
         # Process is gone so remove the pid file.
