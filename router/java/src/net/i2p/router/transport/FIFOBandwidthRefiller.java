@@ -37,7 +37,7 @@ class FIFOBandwidthRefiller implements Runnable {
     /** Updating the bandwidth more than once a second is silly.  once every 2 or 5 seconds is less so. */
     public static final long MIN_REPLENISH_FREQUENCY = 1000;
     
-    private static final long DEFAULT_REPLENISH_FREQUENCY = 10*1000;
+    private static final long DEFAULT_REPLENISH_FREQUENCY = 1*1000;
     
     public FIFOBandwidthRefiller(I2PAppContext context, FIFOBandwidthLimiter limiter) {
         _limiter = limiter;
