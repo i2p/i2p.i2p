@@ -206,6 +206,8 @@
         <copy file="history.txt" todir="pkg-temp/" />
         <mkdir dir="pkg-temp/docs" />
         <copy file="readme.html" todir="pkg-temp/docs/" />
+        <mkdir dir="pkg-temp/work" />
+        <touch file="pkg-temp/work/ignore.this" />
     </target>
     <target name="tarball" depends="preppkg">
         <tar compression="bzip2" destfile="i2p.tar.bz2">

@@ -1,4 +1,14 @@
-$Id: history.txt,v 1.5 2004/09/03 14:46:08 jrandom Exp $
+$Id: history.txt,v 1.6 2004/09/04 00:41:42 jrandom Exp $
+
+2004-09-04  jrandom
+    * Added some basic guards to prevent multiple instances from running.
+      Specifically, a file "router.ping" in the install directory which is
+      written to once a minute - if that file exists and has been modified
+      within the last minute, refuse to start up.  In turn, adjust the 
+      service wrapper to wait a minute before restarting a crashed JVM.
+    * Create a "work" directory in the I2P install dir which Jetty will
+      use for all of its temporary files.
+    * Tell the browser not to cache most of the router console's pages.
 
 2004-09-04  jrandom
     * Update the SDK to automatically reconnect indefinitely with an 

@@ -82,6 +82,14 @@ public class Router {
     public Router(Properties envProps) { this(null, envProps); }
     public Router(String configFilename) { this(configFilename, null); }
     public Router(String configFilename, Properties envProps) {
+        if (!beginMarkingLiveliness(envProps)) {
+            System.err.println("ERROR: There appears to be another router already running!");
+            System.err.println("       Please make sure to shut down old instances before starting up");
+            System.err.println("       a new one.  If you are positive that no other instance is running,");
+            System.err.println("       please delete the file " + getPingFile(envProps));
+            System.exit(-1);
+        }
+
         _config = new Properties();
         _context = new RouterContext(this, envProps);
         if (configFilename == null)
@@ -554,6 +562,8 @@ public class Router {
         dumpStats();
         _log.log(Log.CRIT, "Shutdown(" + exitCode + ") complete", new Exception("Shutdown"));
         try { _context.logManager().shutdown(); } catch (Throwable t) { }
+        File f = new File(getPingFile());
+        f.delete();
         if (_killVMOnEnd) {
             try { Thread.sleep(1000); } catch (InterruptedException ie) {}
             Runtime.getRuntime().halt(exitCode);
@@ -683,6 +693,77 @@ public class Router {
     public static void main(String args[]) {
         Router r = new Router();
         r.runRouter();
+    }
+    
+    private static String getPingFile(Properties envProps) {
+        if (envProps != null) 
+            return envProps.getProperty("router.pingFile", "router.ping");
+        else
+            return "router.ping";
+    }
+    private String getPingFile() {
+        return _context.getProperty("router.pingFile", "router.ping");
+    }
+    
+    private static final long LIVELINESS_DELAY = 60*1000;
+    
+    /** 
+     * Start a thread that will periodically update the file "router.ping", but if 
+     * that file already exists and was recently written to, return false as there is
+     * another instance running
+     * 
+     * @return true if the router is the only one running 
+     */
+    private boolean beginMarkingLiveliness(Properties envProps) {
+        String filename = getPingFile(envProps);
+        File f = new File(filename);
+        if (f.exists()) {
+            long lastWritten = f.lastModified();
+            if (System.currentTimeMillis()-lastWritten > LIVELINESS_DELAY) {
+                System.err.println("WARN: Old router was not shut down gracefully, deleting router.ping");
+                f.delete();
+            } else {
+                return false;
+            }
+        }
+        // not an I2PThread for context creation issues
+        Thread t = new Thread(new MarkLiveliness(f));
+        t.setName("Mark router liveliness");
+        t.setDaemon(true);
+        t.start();
+        return true;
+    }
+    
+    private class MarkLiveliness implements Runnable {
+        private File _pingFile;
+        public MarkLiveliness(File f) {
+            _pingFile = f;
+        }
+        public void run() {
+            _pingFile.deleteOnExit();
+            do {
+                ping();
+                try { Thread.sleep(LIVELINESS_DELAY); } catch (InterruptedException ie) {}
+            } while (_isAlive);
+            _pingFile.delete();
+        }
+        
+        private void ping() {
+            FileOutputStream fos = null;
+            try { 
+                fos = new FileOutputStream(_pingFile);
+                fos.write(("" + System.currentTimeMillis()).getBytes());
+            } catch (IOException ioe) {
+                if (_log != null) {
+                    _log.log(Log.CRIT, "Error writing to ping file", ioe);
+                } else {
+                    System.err.println("Error writing to ping file");
+                    ioe.printStackTrace();
+                }
+            } finally {
+                if (fos != null) try { fos.close(); } catch (IOException ioe) {}
+            }
+        }
     }
     
     
