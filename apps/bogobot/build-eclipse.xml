@@ -3,7 +3,7 @@
 <!-- ********************************************************** -->
 <!-- bogobot - A simple join/part stats logger bot for I2P IRC. -->
 <!--                                                            -->
-<!-- build.xml                                                  -->
+<!-- build-eclipse.xml                                          -->
 <!-- 2004 The I2P Project                                       -->
 <!-- This code is public domain.                                -->
 <!--                                                            -->
@@ -11,7 +11,7 @@
 <!-- version 0.4                                                -->
 <!-- ********************************************************** -->
 
-<project basedir="." default="compile" name="Bogobot">
+<project basedir="." default="dist" name="Bogobot">
 
     <!-- init:
     Create distribution directory if missing and initialize time stamp for
@@ -23,17 +23,11 @@
         </tstamp>
     </target>
 
-    <!-- compile:
-    Compile source code -->
-    <target depends="init" description="Compile source code" name="compile">
-        <javac classpath="${basedir};log4j-1.2.8.jar;pircbot.jar" source="1.4" srcdir="." />
-    </target>
-
     <!-- dist.bin:
     Create the binary distribution archive -->
-    <target depends="init,compile" description="Create the binary distribution archive" name="dist.bin">
+    <target depends="init" description="Create the binary distribution archive" name="dist.bin">
         <zip destfile="dist/Bogobot_${DSTAMP}.zip">
-            <zipfileset dir="${basedir}" includes="bogobot.bat bogobot.config Bogobot.class Bogobot$BogobotTickTask.class bogobot.sh Bogoparser.class LICENSE_log4j.txt LICENSE_pircbot.txt log4j-1.2.8.jar pircbot.jar" />
+            <zipfileset dir="${basedir}" includes="bogobot.bat bogobot.config Bogobot.class bogobot.sh Bogoparser.class LICENSE_log4j.txt LICENSE_pircbot.txt log4j-1.2.8.jar pircbot.jar" />
         </zip>
     </target>
 

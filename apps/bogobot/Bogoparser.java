@@ -17,7 +17,7 @@ import java.util.regex.Pattern;
 
 /**
  * @author hypercubus
- * @version 0.3.1
+ * @version 0.4
  */
 public class Bogoparser {
 
