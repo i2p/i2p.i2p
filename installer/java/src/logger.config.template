@@ -15,7 +15,7 @@ logger.dateFormat=HH:mm:ss.SSS
 # This is the log file name before being rotated
 # '#' is replaced with the current log number for that day
 # If # is not specified, logs are not rotated
-logger.logFileName=log-#.txt
+logger.logFileName=logs/log-#.txt
 
 # Log file size:
 # Maximum size of each log file:

@@ -2,7 +2,7 @@
 cd ##_scripts_installdir##
 export LD_LIBRARY_PATH=.:$LD_LIBRARY_PATH
 # the -XX args are workarounds for bugs in java 1.4.2's garbage collector
-nohup nice java -cp lib/i2p.jar:lib/router.jar -Djava.library.path=. -DloggerFilenameOverride=logs/log-router-#.txt -XX:NewSize=4M -XX:MaxNewSize=8M -XX:PermSize=8M -XX:MaxPermSize=32M net.i2p.router.Router --quiet > /dev/null &
+nohup nice java -cp lib/i2p.jar:lib/router.jar:lib/mstreaming.jar:lib/heartbeat.jar:lib/i2ptunnel.jar:lib/netmonitor.jar:lib/sam.jar -Djava.library.path=. -DloggerFilenameOverride=logs/log-router-#.txt -XX:NewSize=4M -XX:MaxNewSize=8M -XX:PermSize=8M -XX:MaxPermSize=32M net.i2p.router.Router --quiet > /dev/null &
 # Save the pid just in case we ever want to stop the router
 echo $! > router.pid
 echo I2P Router started
