@@ -39,15 +39,13 @@ import java
 # i2p-specific imports
 import net.i2p
 import net.i2p.client # to shut up epydoc
-
-# shut up java with a few more imports
+#import net.i2p.client.I2PClient
+#import net.i2p.client.I2PClientFactory
+#import net.i2p.client.I2PSessionListener
+import net.i2p.client.naming
 import net.i2p.client.streaming
 import net.i2p.crypto
 import net.i2p.data
-import net.i2p.client.I2PClient
-import net.i2p.client.I2PClientFactory
-import net.i2p.client.naming
-#import net.i2p.client.I2PSessionListener
 
 # handy shorthand refs
 i2p = net.i2p
@@ -932,10 +930,14 @@ class I2PSocket:
     def connect(self, remdest):
         """
         Connects to a remote destination
+    
+        This has one totally major difference from the normal socket
+        paradigm, and that is that you can have n outbound connections
+        to different dests.
         """
         # sanity check
-        if self.sockmgr:
-            raise I2PSocketError(".sockmgr already present - have you already called listen/connect?")
+        #if self.sockmgr:
+        #    raise I2PSocketError(".sockmgr already present - have you already called listen/connect?")
     
         # create whole new dest if none was provided to constructor
         if self.dest is None:
@@ -949,13 +951,21 @@ class I2PSocket:
     
         opts = net.i2p.client.streaming.I2PSocketOptions()
         try:
-            self.sock = self.sockmgr.connect(remdest._item, opts)
+            sock = self.sock = self.sockmgr.connect(remdest._item, opts)
             self.remdest = remdest
         except:
             logException(2, "apparent exception, continuing...")
-        self.instream = self.sock.getInputStream()
-        self.outstream = self.sock.getOutputStream()
+    
+        self.instream = sock.getInputStream()
+        self.outstream = sock.getOutputStream()
+    
+        sockobj = I2PSocket(dest=self.dest,
+                            remdest=remdest,
+                            sock=sock,
+                            instream=instream,
+                            outstream=outstream)
         self._connected = 1
+        return sockobj
     #@-node:connect
     #@+node:recv
     def recv(self, nbytes):
@@ -1184,6 +1194,9 @@ class I2PSamClientHandler(StreamRequestHandler):
     
         self.samSessionIsOpen = 0
         self.samSessionStyle = ''
+    
+        # localise the id allocator
+        self.samAllocId = self.server.samAllocId
     
         # need a local sending lock
         self.sendLock = threading.Lock()
@@ -1654,7 +1667,8 @@ class I2PSamClientHandler(StreamRequestHandler):
             id = args['ID']
         
             try:
-                self.samSock.connect(remdest)
+                sock = self.samSock.connect(remdest)
+                self.localstreams[id] = sock
                 self.samSend("STREAM", "STATUS",
                              RESULT='OK',
                              ID=id,
@@ -1662,8 +1676,9 @@ class I2PSamClientHandler(StreamRequestHandler):
             except:
                 self.samSend("STREAM", "STATUS",
                              RESULT='I2P_ERROR',
-                             MESSAGE='exception on connect',
+                             MESSAGE='exception_on_connect',
                              )
+    
     
     #@-node:on_STREAM
     #@+node:on_DATAGRAM
@@ -1826,6 +1841,9 @@ class I2PSamClientHandler(StreamRequestHandler):
         destb64 = dest.toBase64()
     
         log(4, "Listening for connections to %s..." % destb64[:40])
+    
+        sock.listen()
+    
         while 1:
             newsock = sock.accept()
             
