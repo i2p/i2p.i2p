@@ -120,9 +120,12 @@ class ClientEngine {
 
                 _data.cleanup();
 
-                try {
-                    Thread.sleep(1000);
-                } catch (InterruptedException ie) {
+                long timeToWait = nextSend - Clock.getInstance().now();
+                if (timeToWait > 0) {
+                    try {
+                        Thread.sleep(timeToWait);
+                    } catch (InterruptedException ie) {
+                    }
                 }
             }
         }

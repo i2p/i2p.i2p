@@ -358,7 +358,7 @@ public class ClientConfig {
             int sendFreq = getInt(sendFrequencyVal);
             int sendSize = getInt(sendSizeVal);
 
-            if ((duration <= 0) || (statFreq <= 0) || (sendFreq <= 0) || (sendSize <= 0)) {
+            if ((duration <= 0) || (statFreq <= 0) || (sendFreq < 0) || (sendSize <= 0)) {
                 if (_log.shouldLog(Log.WARN)) {
                     _log.warn("Invalid client config: duration [" + statDurationVal + "] stat frequency ["
                               + statFrequencyVal + "] send frequency [" + sendFrequencyVal + "] send size ["
@@ -424,7 +424,7 @@ public class ClientConfig {
      * @return true if it was stored correctly, false if there were errors
      */
     public boolean store(Properties clientConfig, int peerNum) {
-        if ((_peer == null) || (_sendFrequency <= 0) || (_sendSize <= 0) || (_statDuration <= 0)
+        if ((_peer == null) || (_sendFrequency < 0) || (_sendSize <= 0) || (_statDuration <= 0)
             || (_statFrequency <= 0) || (_statFile == null)) { return false; }
 
         String comment = _comment;
