@@ -1,4 +1,10 @@
-$Id: history.txt,v 1.118 2004/12/21 13:23:03 jrandom Exp $
+$Id: history.txt,v 1.119 2004/12/29 10:53:30 jrandom Exp $
+
+2004-12-29  jrandom
+    * Add in a new keepalive event on each TCP connection, proactively sending
+      a (tiny) time message every minute or two, as well as killing the 
+      connection if no message has been fully sent within 5 minutes or so.  
+      This should help deal with hung connections from IP address changes.
 
 2004-12-28  jrandom
     * Cleaned up the resending and choking algorithm in the streaming lib.

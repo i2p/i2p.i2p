@@ -4,7 +4,9 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Date;
 
+import net.i2p.data.DataHelper;
 import net.i2p.data.DataFormatException;
+import net.i2p.data.RouterInfo;
 import net.i2p.data.i2np.I2NPMessage;
 import net.i2p.data.i2np.DeliveryStatusMessage;
 import net.i2p.router.OutNetMessage;
@@ -12,6 +14,7 @@ import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
 import net.i2p.util.I2PThread;
 import net.i2p.util.Log;
+import net.i2p.util.SimpleTimer;
 
 /**
  * Push out I2NPMessages across the wire
@@ -24,6 +27,7 @@ class ConnectionRunner implements Runnable {
     private boolean _keepRunning;
     private byte _writeBuffer[];
     private long _lastTimeSend;
+    private long _lastWrite;
     
     private static final long TIME_SEND_FREQUENCY = 60*1000;
     
@@ -32,6 +36,7 @@ class ConnectionRunner implements Runnable {
         _log = ctx.logManager().getLog(ConnectionRunner.class);
         _con = con;
         _keepRunning = false;
+        _lastWrite = ctx.clock().now();
     }
     
     public void startRunning() {
@@ -44,6 +49,9 @@ class ConnectionRunner implements Runnable {
                       + _con.getRemoteRouterIdentity().calculateHash().toBase64().substring(0,6);
         I2PThread t = new I2PThread(this, name);
         t.start();
+        
+        long delay = TIME_SEND_FREQUENCY + _context.random().nextInt(60*1000);
+        SimpleTimer.getInstance().addEvent(new KeepaliveEvent(), delay);
     }
     
     public void stopRunning() {
@@ -54,7 +62,7 @@ class ConnectionRunner implements Runnable {
         while (_keepRunning && !_con.getIsClosed()) {
             OutNetMessage msg = _con.getNextMessage();
             if (msg == null) {
-                if (_keepRunning)
+                if (_keepRunning && !_con.getIsClosed())
                     _log.error("next message is null but we should keep running?");
                 _con.closeConnection();
                 return;
@@ -124,6 +132,7 @@ class ConnectionRunner implements Runnable {
             _con.closeConnection();
         }
         _con.sent(msg, ok, after - before);
+        _lastWrite = after;
     }
 
     /**
@@ -138,5 +147,45 @@ class ConnectionRunner implements Runnable {
         tm.setMessageId(0);
         tm.setUniqueId(0);
         return tm;
+    }
+    
+    /**
+     * Every few minutes, send a (tiny) message to the peer if we haven't
+     * spoken with them recently.  This will help kill off any hung
+     * connections (due to IP address changes, etc).  If we don't get any
+     * messages through in 5 minutes, kill the connection as well.
+     *
+     */
+    private class KeepaliveEvent implements SimpleTimer.TimedEvent {
+        public void timeReached() {
+            if (!_keepRunning) return;
+            if (_con.getIsClosed()) return;
+            long timeSinceWrite = _context.clock().now() - _lastWrite;
+            if (timeSinceWrite > 5*TIME_SEND_FREQUENCY) {
+                TCPTransport t = _con.getTransport();
+                t.addConnectionErrorMessage("Connection closed with "
+                                            + _con.getRemoteRouterIdentity().getHash().toBase64().substring(0,6)
+                                            + " due to " + DataHelper.formatDuration(timeSinceWrite)
+                                            + " of inactivity after " 
+                                            + DataHelper.formatDuration(_con.getLifetime()));
+                _con.closeConnection();
+                return;
+            }
+            if (_lastTimeSend < _context.clock().now() - 2*TIME_SEND_FREQUENCY) 
+                enqueueTimeMessage();
+            long delay = 2*TIME_SEND_FREQUENCY + _context.random().nextInt((int)TIME_SEND_FREQUENCY);
+            SimpleTimer.getInstance().addEvent(KeepaliveEvent.this, delay);
+        }
+    }
+    
+    private void enqueueTimeMessage() {
+        OutNetMessage msg = new OutNetMessage(_context);
+        RouterInfo ri = _context.netDb().lookupRouterInfoLocally(_con.getRemoteRouterIdentity().getHash());
+        if (ri == null) return;
+        msg.setTarget(ri);
+        msg.setExpiration(_context.clock().now() + TIME_SEND_FREQUENCY);
+        msg.setMessage(buildTimeMessage());
+        msg.setPriority(100);
+        _con.addMessage(msg);
     }
 }

@@ -86,6 +86,7 @@ public class TCPConnection {
     /** skew that the other peer has from our clock */
     public long getOffsetReceived() { return _offsetReceived; }
     public void setOffsetReceived(long ms) { _offsetReceived = ms; }
+    public TCPTransport getTransport() { return _transport; }
     
     /** 
      * Actually start processing the messages on the connection (and reading
