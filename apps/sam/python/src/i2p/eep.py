@@ -33,9 +33,8 @@ def urlopen(url, eepaddr=eepaddr):
   eepaddr = eepaddr.rstrip('/')
 
   proxy    = urllib2.ProxyHandler(                                 \
-             {'http': 'http://anonymous:passwd@' + eepaddr})
-  opener   = urllib2.build_opener(proxy,                           \
-             urllib2.HTTPBasicAuthHandler(), urllib2.HTTPHandler)
+             {'http': 'http://' + eepaddr})
+  opener   = urllib2.build_opener(proxy, urllib2.HTTPHandler)
   return opener.open(url)
 
 def urlget(url, eepaddr=eepaddr):
