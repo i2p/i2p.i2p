@@ -41,6 +41,8 @@ class RouterThrottleImpl implements RouterThrottle {
         _context.statManager().createRateStat("router.throttleTunnelProcessingTime1m", "How long it takes to process a message (1 minute average) when we throttle a tunnel?", "Throttle", new long[] { 60*1000, 10*60*1000, 60*60*1000, 24*60*60*1000 });
         _context.statManager().createRateStat("router.throttleTunnelProcessingTime10m", "How long it takes to process a message (10 minute average) when we throttle a tunnel?", "Throttle", new long[] { 60*1000, 10*60*1000, 60*60*1000, 24*60*60*1000 });
         _context.statManager().createRateStat("router.throttleTunnelMaxExceeded", "How many tunnels we are participating in when we refuse one due to excees?", "Throttle", new long[] { 10*60*1000, 60*60*1000, 24*60*60*1000 });
+        _context.statManager().createRateStat("router.throttleTunnelProbTooFast", "How many tunnels beyond the previous 1h average are we participating in when we throttle?", "Throttle", new long[] { 10*60*1000, 60*60*1000, 24*60*60*1000 });
+        _context.statManager().createRateStat("router.throttleTunnelProbTestSlow", "How slow are our tunnel tests when our average exceeds the old average and we throttle?", "Throttle", new long[] { 10*60*1000, 60*60*1000, 24*60*60*1000 });
     }
     
     public boolean acceptNetworkMessage() {
@@ -128,6 +130,45 @@ class RouterThrottleImpl implements RouterThrottle {
             return false;
         }
         
+        if (numTunnels > getMinThrottleTunnels()) {
+            Rate avgTunnels = _context.statManager().getRate("tunnel.participatingTunnels").getRate(60*60*1000);
+            if (avgTunnels != null) {
+                double avg = avgTunnels.getAverageValue();
+                if (avg < numTunnels) {
+                    // we're accelerating, lets try not to take on too much too fast
+                    double probAccept = avg / numTunnels;
+                    if (_context.random().nextDouble() >= probAccept) {
+                        // ok
+                    } else {
+                        if (_log.shouldLog(Log.WARN))
+                            _log.warn("Probabalistically refusing tunnel request (avg=" + avg
+                                      + " current=" + numTunnels + ")");
+                        _context.statManager().addRateData("router.throttleTunnelProbTooFast", (long)(numTunnels-avg), 0);
+                        return false;
+                    }
+                }
+            }
+            
+            Rate tunnelTestTime10m = _context.statManager().getRate("tunnel.testSuccessTime").getRate(10*60*1000);
+            Rate tunnelTestTime60m = _context.statManager().getRate("tunnel.testSuccessTime").getRate(60*60*1000);
+            if ( (tunnelTestTime10m != null) && (tunnelTestTime60m != null) ) {
+                double avg10m = tunnelTestTime10m.getAverageValue();
+                double avg60m = tunnelTestTime60m.getAverageValue();
+                if (avg10m > avg60m) {
+                    double probAccept = avg60m/avg10m;
+                    if (_context.random().nextDouble() >= probAccept) {
+                        // ok
+                    } else {
+                        if (_log.shouldLog(Log.WARN))
+                            _log.warn("Probabalistically refusing tunnel request (test time avg 10m=" + avg10m
+                                      + " 60m=" + avg60m + ")");
+                        _context.statManager().addRateData("router.throttleTunnelProbTestSlow", (long)(avg10m-avg60m), 0);
+                        return false;
+                    }
+                }
+            }
+        }
+        
         String maxTunnels = _context.getProperty(PROP_MAX_TUNNELS);
         if (maxTunnels != null) {
             try {
@@ -154,6 +195,14 @@ class RouterThrottleImpl implements RouterThrottle {
         return true;
     }
     
+    /** dont ever probabalistically throttle tunnels if we have less than this many */
+    private int getMinThrottleTunnels() { 
+        try {
+            return Integer.parseInt(_context.getProperty("router.minThrottleTunnels", "40"));
+        } catch (NumberFormatException nfe) {
+            return 40;
+        }
+    }
     
     public long getMessageDelay() {
         Rate delayRate = _context.statManager().getRate("transport.sendProcessingTime").getRate(60*1000);

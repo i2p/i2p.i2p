@@ -1,4 +1,18 @@
-$Id: history.txt,v 1.43 2004/10/10 09:57:15 jrandom Exp $
+$Id: history.txt,v 1.44 2004/10/10 14:33:09 jrandom Exp $
+
+2004-10-12  jrandom
+    * Disable the probabalistic drop by default (enable via the router config
+      property "tcp.dropProbabalistically=true")
+    * Disable the actual watchdog shutdown by default, but keep track of more 
+      variables and log a lot more when it occurs (enable via the router 
+      config property "watchdog.haltOnHang=true")
+    * Implement some tunnel participation smoothing by refusing requests 
+      probabalistically as our participating tunnel count exceeds the previous
+      hour's, or when the 10 minute average tunnel test time exceeds the 60 
+      minute average tunnel test time.  The probabilities in both cases are 
+      oldAverage / #current, so if you're suddenly flooded with 200 tunnels
+      and you had previously only participated in 50, you'll have a 25% chance
+      of accepting a subsequent request.
 
 * 2004-10-10  0.4.1.2 released
 

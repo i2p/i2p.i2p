@@ -174,12 +174,17 @@ public class TCPConnection {
         }
     }
     
+    private boolean shouldDropProbabalistically() {
+        return Boolean.valueOf(_context.getProperty("tcp.dropProbabalistically", "false")).booleanValue();
+    }
+    
     /**
      * Implement a probabalistic dropping of messages on the queue to the 
      * peer along the lines of RFC2309.
      *
      */
     private void locked_throttle() {
+        if (!shouldDropProbabalistically()) return;
         int bytesQueued = 0;
         long earliestExpiration = -1;
         for (int i = 0; i < _pendingMessages.size(); i++) {

@@ -1,6 +1,8 @@
 package net.i2p.router;
 
 import net.i2p.data.DataHelper;
+import net.i2p.stat.Rate;
+import net.i2p.stat.RateStat;
 import net.i2p.util.Log;
 
 /**
@@ -45,7 +47,32 @@ class RouterWatchdog implements Runnable {
     }
     
     private boolean shutdownOnHang() {
-        return true;
+        return Boolean.valueOf(_context.getProperty("watchdog.haltOnHang", "false")).booleanValue();
+    }
+    
+    private void dumpStatus() {
+        if (_log.shouldLog(Log.ERROR)) {
+            Job cur = _context.jobQueue().getLastJob();
+            if (cur != null) 
+                _log.error("Most recent job: " + cur);
+            _log.error("Ready and waiting jobs: " + _context.jobQueue().getReadyCount());
+            _log.error("Job lag: " + _context.jobQueue().getMaxLag());
+            _log.error("Participating tunnel count: " + _context.tunnelManager().getParticipatingCount());
+            
+            RateStat rs = _context.statManager().getRate("transport.sendProcessingTime");
+            Rate r = null;
+            if (rs != null)
+                r = rs.getRate(60*1000);
+            double processTime = (r != null ? r.getAverageValue() : 0);
+            _log.error("1minute send processing time: " + processTime);
+            
+            rs = _context.statManager().getRate("bw.sendBps");
+            r = null;
+            if (rs != null)
+                r = rs.getRate(60*1000);
+            double kbps = (r != null ? r.getAverageValue() : 0);
+            _log.error("Outbound send rate: " + kbps + "KBps");
+        }
     }
     
     public void run() {
@@ -59,9 +86,14 @@ class RouterWatchdog implements Runnable {
         boolean ok = verifyJobQueueLiveliness();
         ok = ok && verifyClientLiveliness();
         
-        if (!ok && shutdownOnHang()) {
-            _log.log(Log.CRIT, "Router hung!  hard restart!");
-            System.exit(Router.EXIT_HARD_RESTART);
+        if (!ok) {
+            dumpStatus();
+            if (shutdownOnHang()) {
+                _log.log(Log.CRIT, "Router hung!  hard restart!");
+                try { Thread.sleep(30*1000); } catch (InterruptedException ie) {}
+                // halt and not system.exit, since some of the shutdown hooks might be misbehaving
+                Runtime.getRuntime().halt(Router.EXIT_HARD_RESTART);
+            }
         }
     }
 }
