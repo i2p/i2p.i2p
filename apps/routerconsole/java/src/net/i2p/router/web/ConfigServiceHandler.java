@@ -20,7 +20,7 @@ import org.tanukisoftware.wrapper.WrapperManager;
  */
 public class ConfigServiceHandler extends FormHandler {
     
-    private class UpdateWrapperManagerTask implements Runnable {
+    public static class UpdateWrapperManagerTask implements Runnable {
         private int _exitCode;
         public UpdateWrapperManagerTask(int exitCode) {
             _exitCode = exitCode;

@@ -96,7 +96,7 @@ public class SummaryHelper {
     public boolean allowReseed() {
         return (_context.netDb().getKnownRouters() < 10);
     }
-        
+    
     /**
      * Retrieve amount of used memory.
      *
@@ -467,4 +467,6 @@ public class SummaryHelper {
         
         return _context.throttle().getTunnelLag() + "ms";
     }
+    
+    public boolean updateAvailable() { return true; }
 }

@@ -29,10 +29,13 @@ package net.i2p.crypto;
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+import java.io.InputStream;
+import java.io.IOException;
 import java.math.BigInteger;
 import java.util.Arrays;
 
 import net.i2p.I2PAppContext;
+import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
 import net.i2p.data.Signature;
 import net.i2p.data.SigningPrivateKey;
@@ -55,6 +58,12 @@ public class DSAEngine {
         return verifySignature(signature, signedData, 0, signedData.length, verifyingKey);
     }
     public boolean verifySignature(Signature signature, byte signedData[], int offset, int size, SigningPublicKey verifyingKey) {
+        return verifySignature(signature, calculateHash(signedData, offset, size), verifyingKey);
+    }
+    public boolean verifySignature(Signature signature, InputStream in, SigningPublicKey verifyingKey) {
+        return verifySignature(signature, calculateHash(in), verifyingKey);
+    }
+    public boolean verifySignature(Signature signature, Hash hash, SigningPublicKey verifyingKey) {
         long start = _context.clock().now();
 
         try {
@@ -72,7 +81,7 @@ public class DSAEngine {
             BigInteger r = new NativeBigInteger(1, rbytes);
             BigInteger y = new NativeBigInteger(1, verifyingKey.getData());
             BigInteger w = s.modInverse(CryptoConstants.dsaq);
-            byte data[] = calculateHash(signedData, offset, size).getData();
+            byte data[] = hash.getData();
             NativeBigInteger bi = new NativeBigInteger(1, data);
             BigInteger u1 = bi.multiply(w).mod(CryptoConstants.dsaq);
             BigInteger u2 = r.multiply(w).mod(CryptoConstants.dsaq);
@@ -99,6 +108,18 @@ public class DSAEngine {
     }
     public Signature sign(byte data[], int offset, int length, SigningPrivateKey signingKey) {
         if ((signingKey == null) || (data == null) || (data.length <= 0)) return null;
+        Hash h = calculateHash(data, offset, length);
+        return sign(h, signingKey);
+    }
+    
+    public Signature sign(InputStream in, SigningPrivateKey signingKey) {
+        if ((signingKey == null) || (in == null) ) return null;
+        Hash h = calculateHash(in);
+        return sign(h, signingKey);
+    }
+
+    public Signature sign(Hash hash, SigningPrivateKey signingKey) {
+        if ((signingKey == null) || (hash == null)) return null;
         long start = _context.clock().now();
 
         Signature sig = new Signature();
@@ -110,11 +131,8 @@ public class DSAEngine {
 
         BigInteger r = CryptoConstants.dsag.modPow(k, CryptoConstants.dsap).mod(CryptoConstants.dsaq);
         BigInteger kinv = k.modInverse(CryptoConstants.dsaq);
-        Hash h = calculateHash(data, offset, length);
 
-        if (h == null) return null;
-
-        BigInteger M = new NativeBigInteger(1, h.getData());
+        BigInteger M = new NativeBigInteger(1, hash.getData());
         BigInteger x = new NativeBigInteger(1, signingKey.getData());
         BigInteger s = (kinv.multiply(M.add(x.multiply(r)))).mod(CryptoConstants.dsaq);
 
@@ -157,141 +175,27 @@ public class DSAEngine {
 
         return sig;
     }
-
-    private int[] H0 = { 0x67452301, 0xefcdab89, 0x98badcfe, 0x10325476, 0xc3d2e1f0};
-
-    private Hash calculateHash(byte[] source, int offset, int len) {
-        long length = len * 8;
-        int k = 448 - (int) ((length + 1) % 512);
-        if (k < 0) {
-            k += 512;
-        }
-        int padbytes = k / 8;
-        int wordlength = len / 4 + padbytes / 4 + 3;
-        int[] M0 = new int[wordlength];
-        int wordcount = 0;
-        int x = 0;
-        for (x = 0; x < (len / 4) * 4; x += 4) {
-            M0[wordcount] = source[offset + x] << 24 >>> 24 << 24;
-            M0[wordcount] |= source[offset + x + 1] << 24 >>> 24 << 16;
-            M0[wordcount] |= source[offset + x + 2] << 24 >>> 24 << 8;
-            M0[wordcount] |= source[offset + x + 3] << 24 >>> 24 << 0;
-            wordcount++;
-        }
-
-        switch (len - (wordcount + 1) * 4 + 4) {
-        case 0:
-            M0[wordcount] |= 0x80000000;
-            break;
-        case 1:
-            M0[wordcount] = source[offset + x] << 24 >>> 24 << 24;
-            M0[wordcount] |= 0x00800000;
-            break;
-        case 2:
-            M0[wordcount] = source[offset + x] << 24 >>> 24 << 24;
-            M0[wordcount] |= source[offset + x + 1] << 24 >>> 24 << 16;
-            M0[wordcount] |= 0x00008000;
-            break;
-        case 3:
-            M0[wordcount] = source[offset + x] << 24 >>> 24 << 24;
-            M0[wordcount] |= source[offset + x + 1] << 24 >>> 24 << 16;
-            M0[wordcount] |= source[offset + x + 2] << 24 >>> 24 << 8;
-            M0[wordcount] |= 0x00000080;
-            break;
-        }
-        M0[wordlength - 2] = (int) (length >>> 32);
-        M0[wordlength - 1] = (int) (length);
-        int[] H = new int[5];
-        for (x = 0; x < 5; x++) {
-            H[x] = H0[x];
-        }
-        int blocks = M0.length / 16;
-        
-        int[] W = new int[80];
-        for (int bl = 0; bl < blocks; bl++) {
-            int a = H[0];
-            int b = H[1];
-            int c = H[2];
-            int d = H[3];
-            int e = H[4];
-
-            Arrays.fill(W, 0);
-            
-            for (x = 0; x < 80; x++) {
-                if (x < 16) {
-                    W[x] = M0[bl * 16 + x];
-                } else {
-                    W[x] = ROTL(1, W[x - 3] ^ W[x - 8] ^ W[x - 14] ^ W[x - 16]);
-                }
+    
+    public Hash calculateHash(InputStream in) {
+        SHA1 digest = new SHA1();
+        byte buf[] = new byte[64];
+        int read = 0;
+        try {
+            while ( (read = in.read(buf)) != -1) {
+                digest.engineUpdate(buf, 0, read);
             }
-
-            for (x = 0; x < 80; x++) {
-                int T = add(ROTL(5, a), add(f(x, b, c, d), add(e, add(k(x), W[x]))));
-                e = d;
-                d = c;
-                c = ROTL(30, b);
-                b = a;
-                a = T;
-            }
-
-            H[0] = add(a, H[0]);
-            H[1] = add(b, H[1]);
-            H[2] = add(c, H[2]);
-            H[3] = add(d, H[3]);
-            H[4] = add(e, H[4]);
+        } catch (IOException ioe) {
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Unable to hash the stream", ioe);
+            return null;
         }
-
-        byte[] hashbytes = new byte[20];
-        for (x = 0; x < 5; x++) {
-            hashbytes[x * 4] = (byte) (H[x] << 0 >>> 24);
-            hashbytes[x * 4 + 1] = (byte) (H[x] << 8 >>> 24);
-            hashbytes[x * 4 + 2] = (byte) (H[x] << 16 >>> 24);
-            hashbytes[x * 4 + 3] = (byte) (H[x] << 24 >>> 24);
-        }
-        Hash hash = new Hash();
-        hash.setData(hashbytes);
-        return hash;
+        return new Hash(digest.engineDigest());
     }
 
-    private int k(int t) {
-        if (t > -1 && t < 20) {
-            return 0x5a827999;
-        } else if (t > 19 && t < 40) {
-            return 0x6ed9eba1;
-        } else if (t > 39 && t < 60) {
-            return 0x8f1bbcdc;
-        } else if (t > 59 && t < 80) { return 0xca62c1d6; }
-        return 0x00000000;
-    }
-
-    private int f(int t, int x, int y, int z) {
-        if (t > -1 && t < 20) {
-            return Ch(x, y, z);
-        } else if (t > 19 && t < 40) {
-            return Parity(x, y, z);
-        } else if (t > 39 && t < 60) {
-            return Maj(x, y, z);
-        } else if (t > 59 && t < 80) { return Parity(x, y, z); }
-        return 0x00000000;
-    }
-
-    private int Ch(int x, int y, int z) {
-        return (x & y) ^ (~x & z);
-    }
-
-    private int Parity(int x, int y, int z) {
-        return x ^ y ^ z;
-    }
-
-    private int Maj(int x, int y, int z) {
-        return (x & y) ^ (x & z) ^ (y & z);
-    }
-
-    private int ROTL(int n, int x) {
-        return (x << n) | (x >>> 32 - n);
-    }
-
-    private int add(int x, int y) {
-        return x + y;
+    public static Hash calculateHash(byte[] source, int offset, int len) {
+        SHA1 h = new SHA1();
+        h.engineUpdate(source, offset, len);
+        byte digested[] = h.digest();
+        return new Hash(digested);
     }
 }

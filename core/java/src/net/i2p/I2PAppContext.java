@@ -91,7 +91,6 @@ public class I2PAppContext {
     public static I2PAppContext getGlobalContext() { 
         synchronized (I2PAppContext.class) {
             if (_globalAppContext == null) {
-                System.err.println("*** Building a seperate global context!");
                 _globalAppContext = new I2PAppContext(false, null);
             }
         }

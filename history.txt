@@ -1,4 +1,27 @@
-$Id: history.txt,v 1.173 2005/03/18 17:34:54 jrandom Exp $
+$Id: history.txt,v 1.174 2005/03/21 20:38:21 jrandom Exp $
+
+2005-03-23  jrandom
+    * New /configupdate.jsp page for controlling the update / notification 
+      process, as well as various minor related updates.  Note that not all
+      options are exposed yet, and the update detection code isn't in place
+      in this commit - it currently says there is always an update available.
+    * New EepGet component for reliable downloading, with a CLI exposed in
+      java -cp lib/i2p.jar net.i2p.util.EepGet url
+    * Added a default signing key to the TrustedUpdate component to be used
+      for verifying updates.  This signing key can be authenticated via
+      gpg --verify i2p/core/java/src/net/i2p/crypto/TrustedUpdate.java
+    * New public domain SHA1 implementation for the DSA code so that we can
+      handle signing streams of arbitrary size without excess memory usage
+      (thanks P.Verdy!)
+    * Added some helpers to the TrustedUpdate to work off streams and to offer
+      a minimal CLI: 
+          TrustedUpdate keygen pubKeyFile privKeyFile
+          TrustedUpdate sign origFile signedFile privKeyFile
+          TrustedUpdate verify signedFile
+
+2005-03-22  smeghead
+    * New TrustedUpdate component for signing/verifying files with a DSA 
+      signature.
 
 2005-03-21  jrandom
     * Fixed the tunnel fragmentation handler to deal with multiple fragments 

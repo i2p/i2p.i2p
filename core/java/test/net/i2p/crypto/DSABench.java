@@ -29,6 +29,7 @@ package net.i2p.crypto;
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+import java.io.ByteArrayInputStream;
 import net.i2p.data.Signature;
 import net.i2p.data.SigningPrivateKey;
 import net.i2p.data.SigningPublicKey;
@@ -57,9 +58,13 @@ public class DSABench {
 			long endkeys = System.currentTimeMillis();
 			long startsign = System.currentTimeMillis();
 			Signature s = DSAEngine.getInstance().sign(message, privkey);
+            Signature s1 = DSAEngine.getInstance().sign(new ByteArrayInputStream(message), privkey);
 			long endsignstartverify = System.currentTimeMillis();
 			boolean v = DSAEngine.getInstance().verifySignature(s, message, pubkey);
-			long endverify = System.currentTimeMillis();
+            boolean v1 = DSAEngine.getInstance().verifySignature(s1, new ByteArrayInputStream(message), pubkey);
+			boolean v2 = DSAEngine.getInstance().verifySignature(s1, message, pubkey);
+            boolean v3 = DSAEngine.getInstance().verifySignature(s, new ByteArrayInputStream(message), pubkey);
+            long endverify = System.currentTimeMillis();
 			System.out.print(".");
 			keygentime += endkeys - startkeys;
 			signtime += endsignstartverify - startsign;
@@ -67,6 +72,8 @@ public class DSABench {
 			if (!v) {
 			    throw new RuntimeException("Holy crap, did not verify");
 			}
+            if (!(v1 && v2 && v3))
+                throw new RuntimeException("Stream did not verify");
 			if ( (minKey == 0) && (minS == 0) && (minV == 0) ) {
 			    minKey = endkeys - startkeys;
 			    maxKey = endkeys - startkeys;

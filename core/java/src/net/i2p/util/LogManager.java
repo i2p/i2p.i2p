@@ -245,7 +245,7 @@ public class LogManager {
             if (!_alreadyNoticedMissingConfig) {
                 if (_log.shouldLog(Log.WARN))
                     _log.warn("Log file " + _location + " does not exist");
-                System.err.println("Log file " + _location + " does not exist");
+                //System.err.println("Log file " + _location + " does not exist");
                 _alreadyNoticedMissingConfig = true;
             }
             parseConfig(new Properties());
@@ -644,7 +644,7 @@ public class LogManager {
     }
 
     public void shutdown() {
-        _log.log(Log.CRIT, "Shutting down logger");
+        _log.log(Log.WARN, "Shutting down logger");
         _writer.flushRecords();
     }
 

@@ -4,6 +4,9 @@
 
 <jsp:useBean class="net.i2p.router.web.ReseedHandler" id="reseed" scope="request" />
 <jsp:setProperty name="reseed" property="*" />
+<jsp:useBean class="net.i2p.router.web.UpdateHandler" id="update" scope="request" />
+<jsp:setProperty name="update" property="*" />
+<jsp:setProperty name="update" property="contextId" value="<%=(String)session.getAttribute("i2p.contextId")%>" />
 
 <div class="routersummary">
  <u><b>General</b></u><br />
@@ -11,8 +14,24 @@
  <b>Version:</b> <jsp:getProperty name="helper" property="version" /><br />
  <b>Uptime:</b> <jsp:getProperty name="helper" property="uptime" /><br />
  <b>Now:</b> <jsp:getProperty name="helper" property="time" /><br />
- <b>Memory:</b> <jsp:getProperty name="helper" property="memory" /><br />
- <hr />
+ <b>Memory:</b> <jsp:getProperty name="helper" property="memory" /><br /><%
+    if (helper.updateAvailable()) {
+        if ("true".equals(System.getProperty("net.i2p.router.web.UpdateHandler.updateInProgress", "false"))) {
+            out.print(update.getStatus());
+        } else {
+            long nonce = new java.util.Random().nextLong();
+            String prev = System.getProperty("net.i2p.router.web.UpdateHandler.nonce");
+            if (prev != null) System.setProperty("net.i2p.router.web.UpdateHandler.noncePrev", prev);
+            System.setProperty("net.i2p.router.web.UpdateHandler.nonce", nonce+"");
+            String uri = request.getRequestURI();
+            if (uri.indexOf('?') > 0)
+                uri = uri + "&updateNonce=" + nonce;
+            else
+                uri = uri + "?updateNonce=" + nonce;
+            out.print(" <a href=\"" + uri + "\">Update</a>");
+        }
+    }
+ %><hr />
  
  <u><b>Peers</b></u><br />
  <b>Active:</b> <jsp:getProperty name="helper" property="activePeers" />/<jsp:getProperty name="helper" property="activeProfiles" /><br />
