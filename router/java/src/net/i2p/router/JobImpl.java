@@ -39,7 +39,7 @@ public abstract class JobImpl implements Job {
     }
     
     void addedToQueue() {
-        if (_context.logManager().getLog(JobImpl.class).shouldLog(Log.DEBUG))
+        if (_context.logManager().getLog(getClass()).shouldLog(Log.DEBUG))
             _addedBy = new Exception();
     }
     
