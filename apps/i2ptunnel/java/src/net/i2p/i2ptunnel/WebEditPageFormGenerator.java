@@ -281,6 +281,12 @@ class WebEditPageFormGenerator {
             }
         }
         buf.append("\" /><br />\n");
+        buf.append("<b>Start automatically?</b> \n");
+        buf.append("<input type=\"checkbox\" name=\"startOnLoad\" value=\"true\" ");
+        if (controller.getStartOnLoad())
+            buf.append(" checked=\"true\" />\n<br />\n");
+        else
+            buf.append(" />\n<br />\n");
     }
 
     /**

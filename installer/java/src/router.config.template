@@ -148,6 +148,14 @@ clientApp.1.args=-nocli -e "config localhost ##_router_i2cp_port##" -e "httpclie
 #       -e "listen_on 0.0.0.0"   
 # before the -e "httpclient 4444".  otherwise, both of these proxies will only listen for connections on 127.0.0.1
 
+# The following three lines replace the clientApp.1.* lines above, for use with the new router console.
+# It loads up all of the tunnels (2 minutes later, giving the router time to boot), and starts any defined with
+# startOnLoad.  It can be further controlled at http://localhost:7657/i2ptunnel/
+#
+#clientApp.1.main=net.i2p.i2ptunnel.TunnelControllerGroup
+#clientApp.1.name=Tunnels
+#clientApp.1.args=i2ptunnel.config
+
 # New router console webapp, driven by Jetty
 # to use, you must mkdir ./webapps/ and place the routerconsole.war file in there,
 # and add jetty-all.jar and routerconsole.jar in the router's classpath in the startRouter 

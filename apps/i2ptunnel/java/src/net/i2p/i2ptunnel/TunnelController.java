@@ -55,6 +55,8 @@ public class TunnelController implements Logging {
         _running = false;
         if (createKey)
             createPrivateKey();
+        if (getStartOnLoad())
+            startTunnel();
     }
     
     private void createPrivateKey() {
@@ -241,6 +243,7 @@ public class TunnelController implements Logging {
     public String getListenPort() { return _config.getProperty("listenPort"); }
     public String getTargetDestination() { return _config.getProperty("targetDestination"); }
     public String getProxyList() { return _config.getProperty("proxyList"); }
+    public boolean getStartOnLoad() { return "true".equalsIgnoreCase(_config.getProperty("startOnLoad", "true")); }
     
     public boolean getIsRunning() { return _running; }
     

@@ -17,20 +17,11 @@ public class WebStatusPageHelper {
     private Log _log;
     private String _action;
     private int _controllerNum;
-    private static boolean _configLoaded = false;
-    
-    static final String CONFIG_FILE = "i2ptunnel.cfg";
     
     public WebStatusPageHelper() {
         _action = null;
         _controllerNum = -1;
         _log = I2PAppContext.getGlobalContext().logManager().getLog(WebStatusPageHelper.class);
-        synchronized (WebStatusPageHelper.class) {
-            if (!_configLoaded) {
-                reloadConfig();
-                _configLoaded = true;
-            }
-        }
     }
     
     public void setAction(String action) {
@@ -113,8 +104,7 @@ public class WebStatusPageHelper {
         return getMessages(msgs);
     }
     private String reloadConfig() {
-        TunnelControllerGroup.getInstance().unloadControllers();
-        TunnelControllerGroup.getInstance().loadControllers(CONFIG_FILE);
+        TunnelControllerGroup.getInstance().reloadControllers();
         return "Config reloaded";
     }
     private String start() {

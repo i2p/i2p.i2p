@@ -24,13 +24,36 @@ import net.i2p.util.Log;
  */
 public class TunnelControllerGroup {
     private Log _log;
-    private List _controllers;
-    private static TunnelControllerGroup _instance = new TunnelControllerGroup();
-    public static TunnelControllerGroup getInstance() { return _instance; }
+    private static TunnelControllerGroup _instance;
+    static final String DEFAULT_CONFIG_FILE = "i2ptunnel.config";
     
-    private TunnelControllerGroup() { 
+    private List _controllers;
+    private String _configFile = DEFAULT_CONFIG_FILE;
+    
+    public static TunnelControllerGroup getInstance() { 
+        synchronized (TunnelControllerGroup.class) {
+            if (_instance == null)
+                _instance = new TunnelControllerGroup(DEFAULT_CONFIG_FILE);
+            return _instance; 
+        }
+    }
+
+    private TunnelControllerGroup(String configFile) { 
         _log = I2PAppContext.getGlobalContext().logManager().getLog(TunnelControllerGroup.class);
         _controllers = new ArrayList();
+        _configFile = configFile;
+        loadControllers(_configFile);
+    }
+    
+    public static void main(String args[]) {
+        if ( (args == null) || (args.length <= 0) ) {
+            _instance = new TunnelControllerGroup(DEFAULT_CONFIG_FILE);
+        } else if (args.length == 1) {
+            _instance = new TunnelControllerGroup(args[0]);
+        } else {
+            System.err.println("Usage: TunnelControllerGroup [filename]");
+            return;
+        }
     }
     
     /**
@@ -56,6 +79,11 @@ public class TunnelControllerGroup {
         }
         if (_log.shouldLog(Log.INFO))
             _log.info(i + " controllers loaded from " + configFile);
+    }
+    
+    public void reloadControllers() {
+        unloadControllers();
+        loadControllers(_configFile);
     }
     
     /**
@@ -159,10 +187,19 @@ public class TunnelControllerGroup {
     }
     
     /**
+     * Save the configuration of all known tunnels to the default config 
+     * file
+     *
+     */
+    public void saveConfig() {
+        saveConfig(_configFile);
+    }
+    /**
      * Save the configuration of all known tunnels to the given file
      *
      */
     public void saveConfig(String configFile) {
+        _configFile = configFile;
         File cfgFile = new File(configFile);
         File parent = cfgFile.getParentFile();
         if ( (parent != null) && (!parent.exists()) )
@@ -246,4 +283,5 @@ public class TunnelControllerGroup {
      * @return list of TunnelController objects
      */
     public List getControllers() { return _controllers; }
+    
 }

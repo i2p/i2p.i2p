@@ -38,6 +38,7 @@ public class WebEditPageHelper {
     private String _targetHost;
     private String _targetPort;
     private String _privKeyFile;
+    private boolean _startOnLoad;
     private boolean _privKeyGenerate;
     private boolean _removeConfirmed;
     
@@ -156,6 +157,13 @@ public class WebEditPageHelper {
     public void setRemoveConfirm(String moo) {
         _removeConfirmed = true;
     }
+    /**
+     * If called with any value, we want this tunnel to start whenever it is
+     * loaded (aka right now and whenever the router is started up)
+     */
+    public void setStartOnLoad(String moo) {
+        _startOnLoad = true;
+    }
     
     /**
      * Process the form and display any resulting messages
@@ -248,7 +256,7 @@ public class WebEditPageHelper {
         return getMessages(doSave());
     }
     private List doSave() { 
-        TunnelControllerGroup.getInstance().saveConfig(WebStatusPageHelper.CONFIG_FILE);
+        TunnelControllerGroup.getInstance().saveConfig();
         return TunnelControllerGroup.getInstance().clearAllMessages();
     }
     
@@ -320,6 +328,8 @@ public class WebEditPageHelper {
             }
         }
 
+        config.setProperty("startOnLoad", _startOnLoad + "");
+        
         if (_tunnelCount != null)
             config.setProperty("option.tunnels.numInbound", _tunnelCount);
         if (_tunnelDepth != null)
