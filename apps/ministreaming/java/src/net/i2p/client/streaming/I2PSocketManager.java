@@ -255,10 +255,10 @@ public class I2PSocketManager implements I2PSessionListener {
      *
      * @throws ConnectException if the peer refuses the connection
      * @throws NoRouteToHostException if the peer is not found or not reachable
-     * @throws InterruptedException if the connection timeouts
+     * @throws InterruptedIOException if the connection timeouts
      * @throws I2PException if there is some other I2P-related problem
      */
-    public I2PSocket connect(Destination peer, I2PSocketOptions options) throws I2PException, ConnectException, NoRouteToHostException, InterruptedException {
+    public I2PSocket connect(Destination peer, I2PSocketOptions options) throws I2PException, ConnectException, NoRouteToHostException, InterruptedIOException {
 
         String localID, lcID;
         I2PSocketImpl s;
@@ -294,7 +294,7 @@ public class I2PSocketManager implements I2PSessionListener {
             synchronized (lock) {
                 _outSockets.remove(s.getLocalID());
             }
-            throw new InterruptedException("Timeout waiting for ack");
+            throw new InterruptedIOException("Timeout waiting for ack");
         } catch (ConnectException ex) {
             throw ex;
         } catch (NoRouteToHostException ex) {
@@ -321,10 +321,10 @@ public class I2PSocketManager implements I2PSessionListener {
      *
      * @throws ConnectException if the peer refuses the connection
      * @throws NoRouteToHostException if the peer is not found or not reachable
-     * @throws InterruptedException if the connection timeouts
+     * @throws InterruptedIOException if the connection timeouts
      * @throws I2PException if there is some other I2P-related problem
      */
-    public I2PSocket connect(Destination peer) throws I2PException, ConnectException, NoRouteToHostException, InterruptedException {
+    public I2PSocket connect(Destination peer) throws I2PException, ConnectException, NoRouteToHostException, InterruptedIOException {
         return connect(peer, null);
     }
 
