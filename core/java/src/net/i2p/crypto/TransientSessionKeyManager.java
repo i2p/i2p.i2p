@@ -51,8 +51,8 @@ class TransientSessionKeyManager extends SessionKeyManager {
      * can cause failed decrypts)
      *
      */
-    public final static long SESSION_LIFETIME_MAX_MS = SESSION_TAG_DURATION_MS + 5 * 60 * 1000;
-    public final static int MAX_INBOUND_SESSION_TAGS = 100 * 1000; // this will consume at most 3.2M
+    public final static long SESSION_LIFETIME_MAX_MS = SESSION_TAG_DURATION_MS + 2 * 60 * 1000;
+    public final static int MAX_INBOUND_SESSION_TAGS = 500 * 1000; // this will consume at most a few MB
 
     /** 
      * The session key manager should only be constructed and accessed through the 
