@@ -33,7 +33,7 @@
 
 class Sam {
 	public:
-		Sam(const char* samhost, uint16_t samport, const char* destname,
+		Sam(const string& samhost, uint16_t samport, const string& destname,
 			uint_t tunneldepth);
 		~Sam(void);
 

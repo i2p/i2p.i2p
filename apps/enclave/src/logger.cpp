@@ -34,7 +34,8 @@
 Logger::Logger(const string& file)
 	: file(file)
 {
-	loglevel = priority = debug;
+	set_pri(debug);
+	set_loglevel(static_cast<priority_t>(config->get_iproperty("loglevel")));
 	logf.open(file.c_str(), ios::app);
 	if (!logf) {
 		cerr << "Error opening log file (" << file.c_str() << ")\n";

@@ -32,23 +32,30 @@
 #include "main.hpp"
 
 Config *config;  // Configuration options
-Logger logger(LOG_FILE);  // Logging mechanism
-Random prng;  // Random number generator
+Logger *logger;  // Logging mechanism
+Random *prng;  // Random number generator
 Sam *sam;  // SAM connection
 
 int main(int argc, char* argv[])
 {
-	logger.set_loglevel(Logger::debug);
-
 	if (argc != 2) {  // put some getopts stuff in here later
-		LERROR << "Please specify your destination name.  e.g. 'bin/enclave " \
-			"enclave'\n";
+		cerr << "Please specify the configuration file location.\n" \
+			"e.g. 'bin/enclave cfg/enclave.cfg'\n";
 		return 1;
 	}
 
-	LINFO << "Enclave DHT - Built on " << __DATE__ << ' ' << __TIME__ << '\n';
 	try {
-		sam = new Sam("localhost", 7656, argv[1], 0);
+		config = new Config(argv[1]);
+	} catch (const runtime_error& x) {
+		return 0;
+	}
+	logger = new Logger(config->get_cproperty("logfile"));
+	LINFO << "Enclave DHT - Built on " << __DATE__ << ' ' << __TIME__ << '\n';
+	prng = new Random;
+	try {
+		sam = new Sam(config->get_cproperty("samhost"),
+			config->get_iproperty("samport"), config->get_cproperty("samname"),
+			config->get_iproperty("tunneldepth"));
 	} catch (const Sam_error& x) {
 		LERROR << "SAM error: " << x.what() << '\n';
 		cerr << "SAM error: " << x.what() << '\n';
@@ -70,5 +77,8 @@ int main(int argc, char* argv[])
 		sam->read_buffer();
 
 	delete sam;
+	delete prng;
+	delete logger;
+	delete config;
 	return 0;
 }

@@ -43,8 +43,8 @@ void Chk::encrypt(const uchar_t *pt)
 	assert(rc != -1);
 
 	uchar_t key[CRYPT_KEY_SIZE], iv[CRYPT_BLOCK_SIZE];
-	prng.get_bytes(key, CRYPT_KEY_SIZE);
-	prng.get_bytes(iv, CRYPT_BLOCK_SIZE);	
+	prng->get_bytes(key, CRYPT_KEY_SIZE);
+	prng->get_bytes(iv, CRYPT_BLOCK_SIZE);	
 
 	symmetric_CTR ctr;
 	rc = ctr_start(find_cipher("twofish"), iv, key, CRYPT_KEY_SIZE, 0, &ctr);

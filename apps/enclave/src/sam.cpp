@@ -48,7 +48,7 @@ extern "C" {
  */
 bool Sam::exists = false;
 
-Sam::Sam(const char* samhost, uint16_t samport, const char* destname,
+Sam::Sam(const string& samhost, uint16_t samport, const string& destname,
 	uint_t tunneldepth)
 {
 	// Only allow one Sam object to exist at a time
@@ -65,7 +65,7 @@ Sam::Sam(const char* samhost, uint16_t samport, const char* destname,
 	set_connected(false);
 
 	// now try to connect to SAM
-	connect(samhost, samport, destname, tunneldepth);
+	connect(samhost.c_str(), samport, destname.c_str(), tunneldepth);
 }
 
 Sam::~Sam(void)
@@ -90,6 +90,7 @@ void Sam::connect(const char* samhost, uint16_t samport, const char* destname,
 	uint_t tunneldepth)
 {
 	assert(!get_connected());
+	LMINOR << "Connecting to SAM as '" << destname << "'\n";
 	samerr_t rc = sam_connect(samhost, samport, destname, SAM_DGRAM, tunneldepth);
 	if (rc == SAM_OK)
 		set_connected(true);
@@ -103,7 +104,7 @@ void Sam::connect(const char* samhost, uint16_t samport, const char* destname,
  */
 void Sam::load_peers(void)
 {
-	peers = new Peers(PEERS_REF_FILE);
+	peers = new Peers(config->get_cproperty("references"));
 }
 
 /*

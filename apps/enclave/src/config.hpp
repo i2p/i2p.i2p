@@ -35,7 +35,9 @@ class Config {
 	public:
 		Config(const string& file);
 
-		const string* get_property(const string& key) const;
+		const string& get_cproperty(const string& key) const;
+		int get_iproperty(const string& key) const;
+		string& get_property(const string& key);
 
 	private:
 		typedef map<const string, string>::const_iterator cfgmap_ci;

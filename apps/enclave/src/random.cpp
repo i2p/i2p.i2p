@@ -36,7 +36,7 @@
  */
 Random::Random(void)
 {
-	LINFO << "Initalising PRNG\n";// it could take a bit of time on some systems
+	LMINOR << "Initalising PRNG\n";
 
 	int rc = yarrow_start(&prng);
 	assert(rc == CRYPT_OK);

@@ -43,6 +43,7 @@
  * System includes
  */
 #include <arpa/inet.h>
+#include <cstdlib>
 #include <cstring>
 #include <fstream>
 #include <iostream>
@@ -60,12 +61,6 @@ using namespace std;
  * information with each log message.  Set it to '0' for simple logging.
  */
 #define VERBOSE_LOGS 0
-
-/*
- * The default locations for some files
- */
-#define LOG_FILE "log/main.log"
-#define PEERS_REF_FILE "cfg/peers.ref"
 
 /*
  * Library includes
@@ -91,8 +86,8 @@ using namespace std;
  * Global variables
  */
 extern Config *config;  // Configuration options
-extern Logger logger;  // Logging mechanism
-extern Random prng;  // Random number generator
+extern Logger *logger;  // Logging mechanism
+extern Random *prng;  // Random number generator
 extern Sam *sam;  // Sam connection
 
 #endif  // PLATFORM_HPP
