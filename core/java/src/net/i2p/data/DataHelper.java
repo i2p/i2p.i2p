@@ -559,6 +559,16 @@ public class DataHelper {
         return lhs == rhs;
     }
 
+    public final static boolean eq(byte lhs[], int offsetLeft, byte rhs[], int offsetRight, int length) {
+        if ( (lhs == null) || (rhs == null) ) return false;
+        if (length <= 0) return true;
+        for (int i = 0; i < length; i++) {
+            if (lhs[offsetLeft + i] != rhs[offsetRight + i]) 
+                return false;
+        }
+        return true;
+    }
+    
     public final static int compareTo(byte lhs[], byte rhs[]) {
         if ((rhs == null) && (lhs == null)) return 0;
         if (lhs == null) return -1;

@@ -50,7 +50,7 @@ class RouterThrottleImpl implements RouterThrottle {
     
     public boolean acceptNetworkMessage() {
         long lag = _context.jobQueue().getMaxLag();
-        if (lag > JOB_LAG_LIMIT) {
+        if ( (lag > JOB_LAG_LIMIT) && (_context.router().getUptime() > 60*1000) ) {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Throttling network reader, as the job lag is " + lag);
             _context.statManager().addRateData("router.throttleNetworkCause", lag, lag);

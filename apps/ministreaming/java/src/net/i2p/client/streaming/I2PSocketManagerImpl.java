@@ -10,9 +10,11 @@ import java.io.InterruptedIOException;
 import java.io.UnsupportedEncodingException;
 import java.net.ConnectException;
 import java.net.NoRouteToHostException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Properties;
 import java.util.Set;
 
@@ -46,6 +48,7 @@ class I2PSocketManagerImpl implements I2PSocketManager, I2PSessionListener {
     private I2PSocketOptions _defaultOptions;
     private long _acceptTimeout;
     private String _name;
+    private List _listeners;
     private static int __managerId = 0;
     
     public static final short ACK = 0x51;
@@ -76,6 +79,7 @@ class I2PSocketManagerImpl implements I2PSocketManager, I2PSessionListener {
         _inSockets = new HashMap(16);
         _outSockets = new HashMap(16);
         _acceptTimeout = ACCEPT_TIMEOUT_DEFAULT;
+        _listeners = new ArrayList(1);
         setSession(session);
         setDefaultOptions(buildOptions(opts));
         _context.statManager().createRateStat("streaming.lifetime", "How long before the socket is closed?", "streaming", new long[] { 10*60*1000, 60*60*1000, 24*60*60*1000 });
@@ -109,6 +113,15 @@ class I2PSocketManagerImpl implements I2PSocketManager, I2PSessionListener {
     public void disconnected(I2PSession session) {
         _log.info(getName() + ": Disconnected from the session");
         destroySocketManager();
+        List listeners = null;
+        synchronized (_listeners) {
+            listeners = new ArrayList(_listeners);
+            _listeners.clear();
+        }
+        for (int i = 0; i < listeners.size(); i++) {
+            DisconnectListener lsnr = (DisconnectListener)listeners.get(i);
+            lsnr.sessionDisconnected();
+        }
     }
 
     public void errorOccurred(I2PSession session, String message, Throwable error) {
@@ -706,6 +719,17 @@ class I2PSocketManagerImpl implements I2PSocketManager, I2PSessionListener {
 
     public String getName() { return _name; }
     public void setName(String name) { _name = name; }
+    
+    public void addDisconnectListener(DisconnectListener lsnr) { 
+        synchronized (_listeners) {
+            _listeners.add(lsnr);
+        }
+    }
+    public void removeDisconnectListener(DisconnectListener lsnr) {
+        synchronized (_listeners) {
+            _listeners.remove(lsnr);
+        }
+    }
     
     public static String getReadableForm(String id) {
         if (id == null) return "(null)";

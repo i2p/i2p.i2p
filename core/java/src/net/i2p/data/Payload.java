@@ -69,6 +69,7 @@ public class Payload extends DataStructureImpl {
 
     public void readBytes(InputStream in) throws DataFormatException, IOException {
         int size = (int) DataHelper.readLong(in, 4);
+        if (size < 0) throw new DataFormatException("payload size out of range (" + size + ")");
         _encryptedData = new byte[size];
         int read = read(in, _encryptedData);
         if (read != size) throw new DataFormatException("Incorrect number of bytes read in the payload structure");

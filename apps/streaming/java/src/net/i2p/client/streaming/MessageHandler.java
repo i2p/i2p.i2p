@@ -1,5 +1,8 @@
 package net.i2p.client.streaming;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import net.i2p.I2PAppContext;
 import net.i2p.client.I2PSession;
 import net.i2p.client.I2PSessionListener;
@@ -15,10 +18,12 @@ public class MessageHandler implements I2PSessionListener {
     private ConnectionManager _manager;
     private I2PAppContext _context;
     private Log _log;
+    private List _listeners;
     
     public MessageHandler(I2PAppContext ctx, ConnectionManager mgr) {
         _manager = mgr;
         _context = ctx;
+        _listeners = new ArrayList(1);
         _log = ctx.logManager().getLog(MessageHandler.class);
         _context.statManager().createRateStat("stream.packetReceiveFailure", "When do we fail to decrypt or otherwise receive a packet sent to us?", "Stream", new long[] { 60*60*1000, 24*60*60*1000 });
     }
@@ -69,6 +74,16 @@ public class MessageHandler implements I2PSessionListener {
         if (_log.shouldLog(Log.ERROR))
             _log.error("I2PSession disconnected");
         _manager.disconnectAllHard();
+        
+        List listeners = null;
+        synchronized (_listeners) {
+            listeners = new ArrayList(_listeners);
+            _listeners.clear();
+        }
+        for (int i = 0; i < listeners.size(); i++) {
+            I2PSocketManager.DisconnectListener lsnr = (I2PSocketManager.DisconnectListener)listeners.get(i);
+            lsnr.sessionDisconnected();
+        }
     }
 
     /**
@@ -79,5 +94,16 @@ public class MessageHandler implements I2PSessionListener {
         if (_log.shouldLog(Log.ERROR))
             _log.error("error occurred: " + message, error);
         //_manager.disconnectAllHard();
+    }
+    
+    public void addDisconnectListener(I2PSocketManager.DisconnectListener lsnr) { 
+        synchronized (_listeners) {
+            _listeners.add(lsnr);
+        }
+    }
+    public void removeDisconnectListener(I2PSocketManager.DisconnectListener lsnr) {
+        synchronized (_listeners) {
+            _listeners.remove(lsnr);
+        }
     }
 }

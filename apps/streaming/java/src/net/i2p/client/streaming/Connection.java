@@ -33,6 +33,7 @@ public class Connection {
     private long _lastSendId;
     private boolean _resetReceived;
     private boolean _resetSent;
+    private long _resetSentOn;
     private boolean _connected;
     private boolean _hardDisconnected;
     private MessageInputStream _inputStream;
@@ -113,6 +114,7 @@ public class Connection {
         _ackSinceCongestion = true;
         _connectLock = new Object();
         _activeResends = 0;
+        _resetSentOn = -1;
         _context.statManager().createRateStat("stream.con.windowSizeAtCongestion", "How large was our send window when we send a dup?", "Stream", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
         _context.statManager().createRateStat("stream.chokeSizeBegin", "How many messages were outstanding when we started to choke?", "Stream", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
         _context.statManager().createRateStat("stream.chokeSizeEnd", "How many messages were outstanding when we stopped being choked?", "Stream", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
@@ -185,6 +187,8 @@ public class Connection {
      */
     void sendReset() {
         _resetSent = true;
+        if (_resetSentOn <= 0)
+            _resetSentOn = _context.clock().now();
         if ( (_remotePeer == null) || (_sendStreamId == null) ) return;
         PacketLocal reply = new PacketLocal(_context, _remotePeer);
         reply.setFlag(Packet.FLAG_RESET);
@@ -388,6 +392,7 @@ public class Connection {
     public boolean getIsConnected() { return _connected; }
     public boolean getHardDisconnected() { return _hardDisconnected; }
     public boolean getResetSent() { return _resetSent; }
+    public long getResetSentOn() { return _resetSentOn; }
 
     void disconnect(boolean cleanDisconnect) {
         disconnect(cleanDisconnect, true);

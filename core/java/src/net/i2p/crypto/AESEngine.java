@@ -127,6 +127,21 @@ public class AESEngine {
         _log.warn("Warning: AES is disabled");
     }
 
+    
+    public void encryptBlock(byte payload[], int inIndex, SessionKey sessionKey, byte out[], int outIndex) {
+        System.arraycopy(payload, inIndex, out, outIndex, out.length - outIndex);
+    }
+
+    /** decrypt the data with the session key provided
+     * @param payload encrypted data
+     * @param sessionKey private session key
+     * @return unencrypted data
+     */
+    public void decryptBlock(byte payload[], int inIndex, SessionKey sessionKey, byte rv[], int outIndex) {
+        System.arraycopy(payload, inIndex, rv, outIndex, rv.length - outIndex);
+    }
+    
+    
     public static void main(String args[]) {
         I2PAppContext ctx = new I2PAppContext();
         SessionKey key = ctx.keyGenerator().generateSessionKey();

@@ -261,10 +261,48 @@ public class Router {
             }
             ri.sign(key);
             setRouterInfo(ri);
-            _context.netDb().publish(ri);
+            try {
+                _context.netDb().publish(ri);
+            } catch (IllegalArgumentException iae) {
+                _log.log(Log.CRIT, "Local router info is invalid?  rebuilding a new identity", iae);
+                rebuildNewIdentity();
+            }
         } catch (DataFormatException dfe) {
             _log.log(Log.CRIT, "Internal error - unable to sign our own address?!", dfe);
         }
+    }
+
+    /**
+     * Ugly list of files that we need to kill if we are building a new identity
+     *
+     */
+    private static final String _rebuildFiles[] = new String[] { "router.info", 
+                                                                 "router.keys",
+                                                                 "connectionTag.keys",
+                                                                 "keyBackup/privateEncryption.key",
+                                                                 "keyBackup/privateSigning.key",
+                                                                 "keyBackup/publicEncryption.key",
+                                                                 "keyBackup/publicSigning.key",
+                                                                 "sessionKeys.dat" };
+    /**
+     * Rebuild a new identity the hard way - delete all of our old identity 
+     * files, then reboot the router.
+     *
+     */
+    public void rebuildNewIdentity() {
+        for (int i = 0; i < _rebuildFiles.length; i++) {
+            File f = new File(_rebuildFiles[i]);
+            if (f.exists()) {
+                boolean removed = f.delete();
+                if (removed)
+                    System.out.println("INFO:  Removing old identity file: " + _rebuildFiles[i]);
+                else
+                    System.out.println("ERROR: Could not remove old identity file: " + _rebuildFiles[i]);
+            }
+        }
+        System.out.println("INFO:  Restarting the router after removing any old identity files");
+        // hard and ugly
+        System.exit(EXIT_GRACEFUL_RESTART);
     }
     
     /**
@@ -813,7 +851,11 @@ public class Router {
         installUpdates();
         verifyWrapperConfig();
         Router r = new Router();
-        r.runRouter();
+        if ( (args != null) && (args.length == 1) && ("rebuild".equals(args[0])) ) {
+            r.rebuildNewIdentity();
+        } else {
+            r.runRouter();
+        }
     }
     
     private static final String UPDATE_FILE = "i2pupdate.zip";

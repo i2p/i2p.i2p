@@ -5,9 +5,11 @@ import java.io.InterruptedIOException;
 import java.io.UnsupportedEncodingException;
 import java.net.ConnectException;
 import java.net.NoRouteToHostException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Properties;
 import java.util.Set;
 
@@ -225,4 +227,12 @@ public class I2PSocketManagerFull implements I2PSocketManager {
 
     public String getName() { return _name; }
     public void setName(String name) { _name = name; }
+    
+    
+    public void addDisconnectListener(DisconnectListener lsnr) { 
+        _connectionManager.getMessageHandler().addDisconnectListener(lsnr);
+    }
+    public void removeDisconnectListener(DisconnectListener lsnr) {
+        _connectionManager.getMessageHandler().removeDisconnectListener(lsnr);
+    }
 }

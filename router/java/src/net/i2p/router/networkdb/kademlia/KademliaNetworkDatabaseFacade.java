@@ -487,18 +487,17 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         }
     }
     
-    public void publish(RouterInfo localRouterInfo) {
+    /**
+     * @throws IllegalArgumentException if the local router info is invalid
+     */
+    public void publish(RouterInfo localRouterInfo) throws IllegalArgumentException {
         if (!_initialized) return;
         Hash h = localRouterInfo.getIdentity().getHash();
-        try {
-            store(h, localRouterInfo);
-            synchronized (_explicitSendKeys) {
-                _explicitSendKeys.add(h);
-            }
-            writeMyInfo(localRouterInfo);
-        } catch (IllegalArgumentException iae) {
-            _log.error("Local routerInfo was invalid?  "+ iae.getMessage(), iae);
+        store(h, localRouterInfo);
+        synchronized (_explicitSendKeys) {
+            _explicitSendKeys.add(h);
         }
+        writeMyInfo(localRouterInfo);
     }
 
     /**

@@ -43,10 +43,16 @@ public class Base64 {
     private final static Log _log = new Log(Base64.class);
 
     public static String encode(byte[] source) {
-        return encode(source, false);
+        return encode(source, 0, (source != null ? source.length : 0));
+    }
+    public static String encode(byte[] source, int off, int len) {
+        return encode(source, off, len, false);
     }
     public static String encode(byte[] source, boolean useStandardAlphabet) {
-        return safeEncode(source, useStandardAlphabet);
+        return encode(source, 0, (source != null ? source.length : 0), useStandardAlphabet);
+    }
+    public static String encode(byte[] source, int off, int len, boolean useStandardAlphabet) {
+        return safeEncode(source, off, len, useStandardAlphabet);
     }
 
     public static byte[] decode(String s) {
@@ -318,8 +324,8 @@ public class Base64 {
      * Same as encodeBytes, except uses a filesystem / URL friendly set of characters,
      * replacing / with ~, and + with -
      */
-    private static String safeEncode(byte[] source, boolean useStandardAlphabet) {
-        String encoded = encodeBytes(source);
+    private static String safeEncode(byte[] source, int off, int len, boolean useStandardAlphabet) {
+        String encoded = encodeBytes(source, off, len, false);
         if (useStandardAlphabet) {
             // noop
         } else {

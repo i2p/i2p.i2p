@@ -138,6 +138,11 @@ public class I2NPMessageReader {
                             _log.warn("IO Error handling message", ioe);
                         _listener.disconnected(I2NPMessageReader.this);
                         cancelRunner();
+                    } catch (Exception e) {
+                        _log.log(Log.CRIT, "wtf, error reading", e);
+                        _listener.readError(I2NPMessageReader.this, e);
+                        _listener.disconnected(I2NPMessageReader.this);
+                        cancelRunner();
                     }
                 }
                 if (!_doRun) {

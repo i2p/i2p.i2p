@@ -105,4 +105,11 @@ public interface I2PSocketManager {
     public void setName(String name);
 
     public void init(I2PAppContext context, I2PSession session, Properties opts, String name);
+    
+    public void addDisconnectListener(DisconnectListener lsnr);
+    public void removeDisconnectListener(DisconnectListener lsnr);
+    
+    public static interface DisconnectListener {
+        public void sessionDisconnected();
+    }
 }

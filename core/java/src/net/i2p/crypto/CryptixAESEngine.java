@@ -85,14 +85,14 @@ public class CryptixAESEngine extends AESEngine {
         if (length % 16 != 0) numblock++;
 
         decryptBlock(payload, payloadIndex, sessionKey, out, outIndex);
-		DataHelper.xor(out, outIndex, iv, 0, out, outIndex, 16);
+        DataHelper.xor(out, outIndex, iv, 0, out, outIndex, 16);
         for (int x = 1; x < numblock; x++) {
             decryptBlock(payload, payloadIndex + (x * 16), sessionKey, out, outIndex + (x * 16));
             DataHelper.xor(out, outIndex + x * 16, payload, payloadIndex + (x - 1) * 16, out, outIndex + x * 16, 16);
         }
     }
 
-    final void encryptBlock(byte payload[], int inIndex, SessionKey sessionKey, byte out[], int outIndex) {
+    public final void encryptBlock(byte payload[], int inIndex, SessionKey sessionKey, byte out[], int outIndex) {
         CryptixAESKeyCache.KeyCacheEntry keyData = _cache.acquireKey();
         try {
             Object key = CryptixRijndael_Algorithm.makeKey(sessionKey.getData(), 16, keyData);
@@ -109,7 +109,7 @@ public class CryptixAESEngine extends AESEngine {
      * @param sessionKey private session key
      * @return unencrypted data
      */
-    final void decryptBlock(byte payload[], int inIndex, SessionKey sessionKey, byte rv[], int outIndex) {
+    public final void decryptBlock(byte payload[], int inIndex, SessionKey sessionKey, byte rv[], int outIndex) {
         if ( (payload == null) || (rv == null) )
             throw new IllegalArgumentException("null block args [payload=" + payload + " rv="+rv);
         if (payload.length - inIndex > rv.length - outIndex)
@@ -131,9 +131,11 @@ public class CryptixAESEngine extends AESEngine {
         I2PAppContext ctx = new I2PAppContext();
         try {
             testEDBlock(ctx);
+            testEDBlock2(ctx);
             testED(ctx);
-            testFake(ctx);
-            testNull(ctx);
+            testED2(ctx);
+            //testFake(ctx);
+            //testNull(ctx);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -151,6 +153,21 @@ public class CryptixAESEngine extends AESEngine {
         aes.encrypt(orig, 0, encrypted, 0, key, iv, orig.length);
         aes.decrypt(encrypted, 0, decrypted, 0, key, iv, encrypted.length);
         if (!DataHelper.eq(decrypted,orig))
+            throw new RuntimeException("full D(E(orig)) != orig");
+        else
+            System.out.println("full D(E(orig)) == orig");
+    }
+    private static void testED2(I2PAppContext ctx) {
+        SessionKey key = ctx.keyGenerator().generateSessionKey();
+        byte iv[] = new byte[16];
+        byte orig[] = new byte[128];
+        byte data[] = new byte[128];
+        ctx.random().nextBytes(iv);
+        ctx.random().nextBytes(orig);
+        CryptixAESEngine aes = new CryptixAESEngine(ctx);
+        aes.encrypt(orig, 0, data, 0, key, iv, data.length);
+        aes.decrypt(data, 0, data, 0, key, iv, data.length);
+        if (!DataHelper.eq(data,orig))
             throw new RuntimeException("full D(E(orig)) != orig");
         else
             System.out.println("full D(E(orig)) == orig");
@@ -203,6 +220,21 @@ public class CryptixAESEngine extends AESEngine {
         aes.encryptBlock(orig, 0, key, encrypted, 0);
         aes.decryptBlock(encrypted, 0, key, decrypted, 0);
         if (!DataHelper.eq(decrypted,orig))
+            throw new RuntimeException("block D(E(orig)) != orig");
+        else
+            System.out.println("block D(E(orig)) == orig");
+    }
+    private static void testEDBlock2(I2PAppContext ctx) {
+        SessionKey key = ctx.keyGenerator().generateSessionKey();
+        byte iv[] = new byte[16];
+        byte orig[] = new byte[16];
+        byte data[] = new byte[16];
+        ctx.random().nextBytes(iv);
+        ctx.random().nextBytes(orig);
+        CryptixAESEngine aes = new CryptixAESEngine(ctx);
+        aes.encryptBlock(orig, 0, key, data, 0);
+        aes.decryptBlock(data, 0, key, data, 0);
+        if (!DataHelper.eq(data,orig))
             throw new RuntimeException("block D(E(orig)) != orig");
         else
             System.out.println("block D(E(orig)) == orig");

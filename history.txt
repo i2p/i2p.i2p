@@ -1,4 +1,17 @@
-$Id: history.txt,v 1.123 2004/12/31 12:18:05 jrandom Exp $
+$Id: history.txt,v 1.124 2004/12/31 19:57:01 jrandom Exp $
+
+2005-01-05  jrandom
+    * Handle unexpected network read errors more carefully (thanks parg!)
+    * Added more methods to partially compare (DataHelper) and display 
+      arrays (Base64.encode).
+    * Exposed the AES encryptBlock/decryptBlock on the context.aes()
+    * Be more generous on the throttle when just starting up the router
+    * Fix a missing scheduled event in the streaming lib (caused after reset)
+    * Add a new DisconnectListener on the I2PSocketManager to allow 
+      notification of session destruction.
+    * Make sure our own router identity is valid, and if it isn't, build a new
+      one and restart the router.  Alternately, you can run the Router with 
+      the single command line argument "rebuild" and it will do the same.
 
 2004-12-31  ragnarok
     * Integrated latest addressbook changes (2.0.3) which include support for 

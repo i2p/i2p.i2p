@@ -54,7 +54,12 @@ public class PublishLocalRouterInfoJob extends JobImpl {
                 _log.info("Newly updated routerInfo is published with " + stats.size() 
                           + "/" + ri.getOptions().size() + " options on " 
                           + new Date(ri.getPublished()));
-            getContext().netDb().publish(ri);
+            try {
+                getContext().netDb().publish(ri);
+            } catch (IllegalArgumentException iae) {
+                _log.log(Log.CRIT, "Error publishing our identity - corrupt?", iae);
+                getContext().router().rebuildNewIdentity();
+            }
         } catch (DataFormatException dfe) {
             _log.error("Error signing the updated local router info!", dfe);
         }

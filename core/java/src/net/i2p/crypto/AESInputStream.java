@@ -161,7 +161,7 @@ public class AESInputStream extends FilterInputStream {
      *
      */
     private void refill() throws IOException {
-        if (!_eofFound) {
+        if ( (!_eofFound) && (_writesSinceDecrypt < BLOCK_SIZE) ) {
             int read = in.read(_encryptedBuf, _writesSinceDecrypt, _encryptedBuf.length - _writesSinceDecrypt);
             if (read == -1) {
                 _eofFound = true;

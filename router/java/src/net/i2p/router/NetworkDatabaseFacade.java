@@ -50,7 +50,10 @@ public abstract class NetworkDatabaseFacade implements Service {
      * @throws IllegalArgumentException if the data is not valid
      */
     public abstract RouterInfo store(Hash key, RouterInfo routerInfo) throws IllegalArgumentException;
-    public abstract void publish(RouterInfo localRouterInfo);
+    /**
+     * @throws IllegalArgumentException if the local router is not valid
+     */
+    public abstract void publish(RouterInfo localRouterInfo) throws IllegalArgumentException;
     public abstract void publish(LeaseSet localLeaseSet);
     public abstract void unpublish(LeaseSet localLeaseSet);
     public abstract void fail(Hash dbEntry);
