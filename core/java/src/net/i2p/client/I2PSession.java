@@ -17,10 +17,17 @@ import net.i2p.data.SessionKey;
 import net.i2p.data.SigningPrivateKey;
 
 /**
- * Define the standard means of sending and receiving messages on the 
- * I2P Network.
+ * <p>Define the standard means of sending and receiving messages on the 
+ * I2P network by using the I2CP (the client protocol).  This is done over a 
+ * bidirectional TCP socket and never sends any private keys - all end to end 
+ * encryption is done transparently within the client's I2PSession
+ * itself.  Periodically the router will ask the client to authorize a new set of
+ * tunnels to be allocated to the client, which the client can accept by sending a
+ * {@link net.i2p.data.LeaseSet} signed by the {@link net.i2p.data.Destination}.  
+ * In addition, the router may on occation provide the client with an updated 
+ * clock offset so that the client can stay in sync with the network (even if 
+ * the host computer's clock is off).</p>
  *
- * @author jrandom
  */
 public interface I2PSession {
     /** Send a new message to the given destination, containing the specified
