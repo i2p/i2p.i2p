@@ -3,7 +3,8 @@ i2p -- I2P Python interface
 """
 
 __all__ = ['Error', 'RouterError', 'sam', 'eep', 'router',
-    'SocketServer', 'BaseHTTPServer', 'SimpleHTTPServer', 'CGIHTTPServer',
+    'I2PSocketServer', 'I2PBaseHTTPServer',
+    'I2PSimpleHTTPServer', 'I2PCGIHTTPServer',
     ]
 
 class Error(Exception):
