@@ -25,6 +25,8 @@
  <b>Used:</b> <jsp:getProperty name="helper" property="inboundTransferred" />/<jsp:getProperty name="helper" property="outboundTransferred" /><br />
  <hr />
  
+ <jsp:getProperty name="helper" property="destinations" />
+ 
  <u><b>Tunnels</b></u><br />
  <b>Inbound:</b> <jsp:getProperty name="helper" property="inboundTunnels" /><br />
  <b>Outbound:</b> <jsp:getProperty name="helper" property="outboundTunnels" /><br />

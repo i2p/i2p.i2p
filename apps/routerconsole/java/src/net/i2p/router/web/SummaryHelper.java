@@ -1,5 +1,7 @@
 package net.i2p.router.web;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.text.DecimalFormat;
 
 import net.i2p.data.DataHelper;
@@ -302,10 +304,24 @@ public class SummaryHelper {
     }
     
     /**
+     * How many client destinations are connected locally.
+     *
+     * @return html section summary
+     */
+    public String getDestinations() {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream(1024);
+        try {
+            _context.clientManager().renderStatusHTML(baos);
+            return new String(baos.toByteArray());
+        } catch (IOException ioe) {
+            _context.logManager().getLog(SummaryHelper.class).error("Error rendering client info", ioe);
+            return "";
+        }
+    }
+    
+    /**
      * How many free inbound tunnels we have.
      *
-     * @param contextId begging few characters of the routerHash, or null to pick
-     *                  the first one we come across.
      */
     public int getInboundTunnels() { 
         if (_context == null) 
