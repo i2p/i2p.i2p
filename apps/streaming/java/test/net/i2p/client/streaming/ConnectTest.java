@@ -70,7 +70,7 @@ public class ConnectTest {
                 while (true) {
                     I2PSocket socket = ssocket.accept();
                     _log.debug("socket accepted: " + socket);
-                    try { Thread.sleep(10*1000); } catch (InterruptedException ie) {}
+                    try { Thread.sleep(60*1000); } catch (InterruptedException ie) {}
                     socket.close();
                 }
             } catch (Exception e) {
@@ -97,6 +97,7 @@ public class ConnectTest {
                 _log.debug("manager created");
                 I2PSocket socket = mgr.connect(_server.getMyDestination());
                 _log.debug("socket created");
+                try { Thread.sleep(5*1000); } catch (InterruptedException ie) {}
                 socket.close();
                 _log.debug("socket closed");
             } catch (Exception e) {
@@ -111,7 +112,7 @@ public class ConnectTest {
             I2PClient client = I2PClientFactory.createClient();
             ByteArrayOutputStream baos = new ByteArrayOutputStream(512);
             Destination dest = client.createDestination(baos);
-            I2PSession sess = client.createSession(new ByteArrayInputStream(baos.toByteArray()), new Properties());
+            I2PSession sess = client.createSession(new ByteArrayInputStream(baos.toByteArray()), System.getProperties());
             sess.connect();
             return sess;
         } catch (Exception e) {
@@ -121,6 +122,8 @@ public class ConnectTest {
     }
     
     public static void main(String args[]) {
+        System.setProperty(I2PClient.PROP_TCP_HOST, "localhost");
+        System.setProperty(I2PClient.PROP_TCP_PORT, "10001");       
         ConnectTest ct = new ConnectTest();
         ct.test();
     }

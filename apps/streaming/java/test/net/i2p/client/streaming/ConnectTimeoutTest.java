@@ -39,65 +39,11 @@ public class ConnectTimeoutTest {
         while (true) { synchronized (this) { try { wait(); } catch (Exception e) {} } }
     }
     
-    public void test() {
-        try {
-            I2PAppContext context = I2PAppContext.getGlobalContext();
-            _log = context.logManager().getLog(ConnectTest.class);
-            _log.debug("creating server session");
-            _server = createSession();
-            _log.debug("running server");
-            runServer(context, _server);
-            _log.debug("creating client session");
-            _client = createSession();
-            _log.debug("running client");
-            runClient(context, _client);
-        } catch (Exception e) {
-            _log.error("error running", e);
-        }
-        try { Thread.sleep(30*1000); } catch (Exception e) {}
-    }
-    
     private void runClient(I2PAppContext ctx, I2PSession session) {
         Thread t = new Thread(new ClientRunner(ctx, session));
         t.setName("client");
         t.setDaemon(true);
         t.start();
-    }
-    
-    private void runServer(I2PAppContext ctx, I2PSession session) {
-        Thread t = new Thread(new ServerRunner(ctx, session));
-        t.setName("server");
-        t.setDaemon(true);
-        t.start();
-    }
-    
-    private class ServerRunner implements Runnable {
-        private I2PAppContext _context;
-        private I2PSession _session;
-        private Log _log;
-        public ServerRunner(I2PAppContext ctx, I2PSession session) {
-            _context = ctx;
-            _session = session;
-            _log = ctx.logManager().getLog(ServerRunner.class);
-        }
-        
-        public void run() {
-            try {
-                I2PSocketManager mgr = I2PSocketManagerFactory.createManager("localhost", 10001, getProps());
-                _log.debug("manager created");
-                I2PServerSocket ssocket = mgr.getServerSocket();
-                _log.debug("server socket created");
-                while (true) {
-                    I2PSocket socket = ssocket.accept();
-                    _log.debug("socket accepted: " + socket);
-                    try { Thread.sleep(10*1000); } catch (InterruptedException ie) {}
-                    socket.close();
-                }
-            } catch (Exception e) {
-                _log.error("error running", e);
-            }
-        }
-        
     }
     
     private class ClientRunner implements Runnable {
@@ -114,6 +60,7 @@ public class ConnectTimeoutTest {
             try {
                 I2PSocketManager mgr = I2PSocketManagerFactory.createManager("localhost", 10001, getProps());
                 _log.debug("manager created");
+                _log.debug("options: " + mgr.getDefaultOptions());
                 I2PSocket socket = mgr.connect(_serverDest);
                 _log.debug("socket created");
                 socket.getOutputStream().write("you smell".getBytes());
@@ -155,6 +102,9 @@ public class ConnectTimeoutTest {
         p.setProperty("tunnels.depthInbound", "0");
         p.setProperty(I2PClient.PROP_TCP_HOST, "localhost");
         p.setProperty(I2PClient.PROP_TCP_PORT, "10001");
+        p.setProperty(ConnectionOptions.PROP_CONNECT_TIMEOUT, "30000");
+        //p.setProperty(ConnectionOptions.PROP_CONNECT_DELAY, "10000");
+        p.setProperty(ConnectionOptions.PROP_CONNECT_DELAY, "0");
         return p;
     }
 }
