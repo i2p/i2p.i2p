@@ -114,9 +114,9 @@ bool Sha1::operator==(const Sha1& rhs) const
  * rhs - sha1 to xor this one with
  * result - will be filled with the result
  */
-void Sha1::xor(const Sha1& rhs, Bigint& result) const
+void Sha1::x_or(const Sha1& rhs, Bigint& result) const
 {
 	Bigint lhsnum(binhashed, SHA1BIN_LEN);
 	Bigint rhsnum(rhs.binhash(), SHA1BIN_LEN);
-	lhsnum.xor(rhsnum, result);
+	lhsnum.x_or(rhsnum, result);
 }

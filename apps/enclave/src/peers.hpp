@@ -54,8 +54,6 @@ class Peers {
 	private:
 		typedef map<const Sha1, Peer>::const_iterator peersmap_ci;
 		typedef map<const Sha1, Peer>::iterator peersmap_i;
-		typedef list<Near_peer>::const_iterator near_peers_ci;
-		typedef list<Near_peer>::iterator near_peers_i;
 
 		void load(void);
 		void save(void);

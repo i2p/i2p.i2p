@@ -39,17 +39,17 @@
  * LERROR - major, important errors
  */
 #if VERBOSE_LOGS
-	#define LDEBUG logger.set_pri(Logger::debug); logger << "(D)" << __FILE__ << ':' << __LINE__ << ':' << __func__ << "(): "
-	#define LMINOR logger.set_pri(Logger::minor); logger << "(M)" << __FILE__ << ':' << __LINE__ << ':' << __func__ << "(): "
-	#define LINFO  logger.set_pri(Logger::info);  logger << "(I)" << __FILE__ << ':' << __LINE__ << ':' << __func__ << "(): "
-	#define LWARN  logger.set_pri(Logger::warn);  logger << "(W)" << __FILE__ << ':' << __LINE__ << ':' << __func__ << "(): "
-	#define LERROR logger.set_pri(Logger::error); logger << "(E)" << __FILE__ << ':' << __LINE__ << ':' << __func__ << "(): "
+	#define LDEBUG logger.set_pri(Logger::debug); logger << "(D)" << __FILE__ << ':' << __LINE__ << ':' << __func__ << ": "
+	#define LMINOR logger.set_pri(Logger::minor); logger << "(M)" << __FILE__ << ':' << __LINE__ << ':' << __func__ << ": "
+	#define LINFO  logger.set_pri(Logger::info);  logger << "(I)" << __FILE__ << ':' << __LINE__ << ':' << __func__ << ": "
+	#define LWARN  logger.set_pri(Logger::warn);  logger << "(W)" << __FILE__ << ':' << __LINE__ << ':' << __func__ << ": "
+	#define LERROR logger.set_pri(Logger::error); logger << "(E)" << __FILE__ << ':' << __LINE__ << ':' << __func__ << ": "
 #else
-	#define LDEBUG logger.set_pri(Logger::debug); logger
-	#define LMINOR logger.set_pri(Logger::minor); logger
-	#define LINFO  logger.set_pri(Logger::info);  logger
-	#define LWARN  logger.set_pri(Logger::warn);  logger
-	#define LERROR logger.set_pri(Logger::error); logger
+	#define LDEBUG logger.set_pri(Logger::debug); logger << "(D)"
+	#define LMINOR logger.set_pri(Logger::minor); logger << "(M)"
+	#define LINFO  logger.set_pri(Logger::info);  logger << "(I)"
+	#define LWARN  logger.set_pri(Logger::warn);  logger << "(W)"
+	#define LERROR logger.set_pri(Logger::error); logger << "(E)"
 #endif
 
 class Logger {

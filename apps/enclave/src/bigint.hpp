@@ -47,7 +47,7 @@ class Bigint {
 		Bigint& operator=(const Bigint& rhs);
 		bool operator==(const Bigint& rhs) const;
 		bool operator>(const Bigint& rhs) const;
-		void xor(const Bigint& rhs, Bigint& result) const;
+		void x_or(const Bigint& rhs, Bigint& result) const;
 
 	protected:
 		mp_int mpi;

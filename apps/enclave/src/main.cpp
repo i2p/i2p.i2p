@@ -46,12 +46,16 @@ int main(int argc, char* argv[])
 
 	LINFO << "Enclave DHT - Built on " << __DATE__ << ' ' << __TIME__ << '\n';
 	try {
-		sam = new Sam("eldritch", 7656, argv[1], 0);
+		sam = new Sam("localhost", 7656, argv[1], 0);
 	} catch (const Sam_error& x) {
 		LERROR << "SAM error: " << x.what() << '\n';
-		if (x.code() == SAM_SOCKET_ERROR)
+		cerr << "SAM error: " << x.what() << '\n';
+		if (x.code() == SAM_SOCKET_ERROR) {
 			LERROR << "Check whether you have specified the correct SAM host " \
-				"and port number\n";
+				"and port number, and that\nI2P is running.\n";
+			cerr << "Check whether you have specified the correct SAM host " \
+				"and port number, and that\nI2P is running.\n";
+		}
 		return 1;
 	}
 	sam->naming_lookup();

@@ -42,7 +42,8 @@ void Peers::advertise_self(void)
 {
 	list<Near_peer> near_peers;
 	get_nearest(sam->get_my_sha1(), PAR_RPCS, near_peers);
-	for (near_peers_ci i = near_peers.begin(); i != near_peers.end(); i++) {
+	for (list<Near_peer>::const_iterator i = near_peers.begin();
+			i != near_peers.end(); i++) {
 		Rpc rpc(i->get_peer());
 		rpc.find_peers(sam->get_my_sha1());
 	}
@@ -61,7 +62,7 @@ void Peers::get_nearest(const Sha1& sha1, size_t n,	list<Near_peer>& near_peers)
 	for (peersmap_i i = peersmap.begin(); i != peersmap.end(); i++) {
 		const Sha1& kaddr = i->first;
 		Bigint distance;
-		sha1.xor(kaddr, distance);
+		sha1.x_or(kaddr, distance);
 		Near_peer np(distance, &(i->second));
 		near_peers.insert(near_peers.end(), np);
 	}
@@ -211,7 +212,8 @@ void Peers::store(const Sha1& sha1)
 {
 	list<Near_peer> near_peers;
 	get_nearest(sam->get_my_sha1(), PAR_RPCS, near_peers);
-	for (near_peers_ci i = near_peers.begin(); i != near_peers.end(); i++) {
+	for (list<Near_peer>::const_iterator i = near_peers.begin();
+			i != near_peers.end(); i++) {
 		Rpc rpc(i->get_peer());
 		rpc.store(sha1);
 	}

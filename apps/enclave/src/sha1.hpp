@@ -43,7 +43,7 @@ class Sha1 {
 		bool operator<(const Sha1& rhs) const;
 		Sha1& operator=(const Sha1& rhs);
 		bool operator==(const Sha1& rhs) const;
-		void xor(const Sha1& rhs, Bigint& result) const;
+		void x_or(const Sha1& rhs, Bigint& result) const;
 
 	private:
 		void b64(void);

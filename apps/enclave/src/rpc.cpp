@@ -80,8 +80,8 @@ void Rpc::found_peers(const Sha1& sha1)
 	p++;
 	*p = near_peers.size();
 	p++;
-	for (Peers::near_peers_ci i = near_peers.begin(); i != near_peers.end();
-			i++) {
+	for (list<Near_peer>::const_iterator i = near_peers.begin();
+			i != near_peers.end(); i++) {
 		const Peer* peer = i->get_peer();
 		memcpy(p, peer->get_dest().c_str(), (SAM_PUBKEY_LEN - 1));
 		p += SAM_PUBKEY_LEN - 1;

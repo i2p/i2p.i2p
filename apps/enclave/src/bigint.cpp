@@ -154,12 +154,14 @@ bool Bigint::operator>(const Bigint& rhs) const
 }
 
 /*
- * Xors another Bigint with this Bigint and puts the result in Bigint `result'
+ * Xors another Bigint with this Bigint and puts the result in Bigint `result'.
+ * We can't name it "xor" because that word is reserved in C++ (see Appendex C,
+ * section 3.1 in TC++PL).
  *
  * rhs - the bigint to xor with
  * result - will be filled with the result of the xor
  */
-void Bigint::xor(const Bigint& rhs, Bigint& result) const
+void Bigint::x_or(const Bigint& rhs, Bigint& result) const
 {
 	int rc = mp_xor(const_cast<mp_int*>(&mpi), const_cast<mp_int*>(&rhs.mpi),
 		&result.mpi);
