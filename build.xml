@@ -225,8 +225,8 @@
         <copy file="installer/resources/install_i2p_service_unix" todir="pkg-temp/" />
         <copy file="installer/resources/install_i2p_service_winnt.bat" todir="pkg-temp/" />
         <copy file="installer/resources/osid" todir="pkg-temp/" />
-        <copy file="installer/resources/postinstall.sh" todir="pkg-temp/" />
         <copy file="installer/resources/postinstall.bat" todir="pkg-temp/" />
+        <copy file="installer/resources/postinstall.sh" todir="pkg-temp/" />
         <copy file="installer/resources/systray.config" todir="pkg-temp/" />
         <copy file="installer/resources/uninstall_i2p_service_unix" todir="pkg-temp/" />
         <copy file="installer/resources/uninstall_i2p_service_winnt.bat" todir="pkg-temp/" />

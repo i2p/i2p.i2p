@@ -7,8 +7,8 @@
     </job>
     <job name="Launching I2P...">
         <os family="unix" />
-        <executefile name="$INSTALL_PATH/sh">
-            <arg>postinstall.sh</arg>
+        <executefile name="/bin/sh">
+            <arg>$INSTALL_PATH/postinstall.sh</arg><arg>$INSTALL_PATH</arg>
         </executefile>
     </job>
 </processing>
