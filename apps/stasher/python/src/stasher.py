@@ -3668,6 +3668,8 @@ def usage(detailed=False, ret=0):
     print "                            for clients, default %s" % clientAddr
     print "  -d, --datadir=dir       - directory in which stasher files get written"
     print "                            default is ~/.i2pstasher"
+    print "  -f, --foreground        - only valid for 'start' cmd - runs the node"
+    print "                            in foreground without spawning - for debugging"
     print
     print "Commands:"
     print "  start [<nodename>]"
@@ -3714,9 +3716,9 @@ def main():
 
     try:
         opts, args = getopt.getopt(sys.argv[1:],
-                                   "h?vV:S:C:sd:",
+                                   "h?vV:S:C:sd:f",
                                    ['help', 'version', 'samaddr=', 'clientaddr=',
-                                    'verbosity=', 'status', 'datadir=',
+                                    'verbosity=', 'status', 'datadir=', 'foreground',
                                     ])
     except:
         traceback.print_exc(file=sys.stdout)
@@ -3725,6 +3727,7 @@ def main():
     daemonise = True
     verbosity = 2
     debug = False
+    foreground = False
 
     for opt, val in opts:
         
@@ -3738,6 +3741,9 @@ def main():
         elif opt in ['-V', '--verbosity']:
             logVerbosity = int(val)
 
+        elif opt in ['-f', '--foreground']:
+            foreground = True
+        
         elif opt in ['-S', '--samaddr']:
             samAddr = val
 
@@ -3772,6 +3778,10 @@ def main():
 
     if cmd == 'help':
         usage()
+
+    # dirty hack
+    if foreground and cmd == 'start':
+        cmd = '_start'
 
     # magic undocumented command name - starts node, launches its client server,
     # this should only happen if we're spawned from a 'start' command
