@@ -88,7 +88,7 @@ int main(int argc, char* argv[])
 				quiet = true;
 				break;
 			case 'v':  /* version */
-				puts("$Id: i2p-ping.c,v 1.1 2004/07/31 21:38:15 mpc Exp $");
+				puts("$Id: i2p-ping.c,v 1.2 2004/07/31 22:20:22 mpc Exp $");
 				puts("Copyright (c) 2004, Matthew P. Cashdollar <mpc@innographx.com>");
 				break;
 			case '?':
@@ -132,6 +132,7 @@ int main(int argc, char* argv[])
 
 		while (!gotdest)  /* just wait for the naming lookup to complete */
 			sam_read_buffer(session);
+		gotdest = false;
 
 		for (int i = 0; i < count; ++i) {
 			time_t start = time(0);

@@ -22,7 +22,7 @@ LIBS = -lsam
 
 all: warhammer-dgram
 
-warhammer-dgram:
+warhammer-dgram: warhammer-dgram.c
 	$(CC) $(CFLAGS) -o warhammer-dgram.o -c warhammer-dgram.c
 	$(CC) $(CFLAGS) -o warhammer-dgram warhammer-dgram.o $(LIBS)
 

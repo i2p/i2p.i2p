@@ -7,6 +7,7 @@
 #
 
 CC = gcc
+INSTALL = install
 
 #
 # Flags
@@ -22,9 +23,12 @@ LIBS = -lsam
 
 all: i2p-ping
 
-i2p-ping:
+i2p-ping: i2p-ping.c
 	$(CC) $(CFLAGS) -o i2p-ping.o -c i2p-ping.c
 	$(CC) $(CFLAGS) -o i2p-ping i2p-ping.o $(LIBS)
+
+install: i2p-ping
+	$(INSTALL) i2p-ping $(HOME)/bin
 
 #
 # Cleanup rules
