@@ -452,6 +452,7 @@ public class JobQueue {
      * a warning (and if its really excessive, kill the router)
      */ 
     void updateStats(Job job, long doStart, long origStartAfter, long duration) {
+        if (_context.router() == null) return;
         String key = job.getName();
         long lag = doStart - origStartAfter; // how long were we ready and waiting?
         MessageHistory hist = _context.messageHistory();
@@ -511,6 +512,10 @@ public class JobQueue {
      *
      */
     private void updateMaxLimit() {
+        if (_context.router() == null) {
+            _maxRunners = DEFAULT_MAX_RUNNERS;
+            return;
+        }
         String str = _context.router().getConfigSetting(PROP_MAX_RUNNERS);
         if (str != null) {
             try {
@@ -531,6 +536,15 @@ public class JobQueue {
      *
      */
     private void updateTimingLimits() {
+        if (_context.router() == null) {
+            _lagWarning = DEFAULT_LAG_WARNING;
+            _lagFatal = DEFAULT_LAG_FATAL;
+            _runWarning = DEFAULT_RUN_WARNING;
+            _runFatal = DEFAULT_RUN_FATAL;
+            _warmupTime = DEFAULT_WARMUP_TIME;
+            _maxWaitingJobs = DEFAULT_MAX_WAITING_JOBS;
+            return;
+        }
         String str = _context.router().getConfigSetting(PROP_LAG_WARNING);
         if (str != null) {
             try {
