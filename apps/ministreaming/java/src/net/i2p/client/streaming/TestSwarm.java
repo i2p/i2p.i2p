@@ -72,7 +72,7 @@ public class TestSwarm {
             }
         }
         try {
-            _manager = I2PSocketManagerFactory.createManager(new FileInputStream(_destFile), "localhost", 10001, null);
+            _manager = I2PSocketManagerFactory.createManager(new FileInputStream(_destFile), "localhost", 7654, null);
         } catch (Exception e) {
             _log.error("Error creatign the manager", e);
             return;
