@@ -5,6 +5,7 @@ from CGIHTTPServer import nobody_uid, executable
 
 import I2PBaseHTTPServer, I2PSimpleHTTPServer
 
+HTTPServer = I2PBaseHTTPServer.HTTPServer
 class CGIHTTPRequestHandler(CGIHTTPServer.CGIHTTPRequestHandler):
     pass
 def test(HandlerClass = CGIHTTPRequestHandler,

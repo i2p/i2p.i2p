@@ -8,6 +8,7 @@ __version__ = "0.1.0"
 
 __all__ = ["SimpleHTTPRequestHandler"]
 
+HTTPServer = I2PBaseHTTPServer.HTTPServer
 class SimpleHTTPRequestHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
     pass
 
