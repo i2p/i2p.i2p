@@ -66,11 +66,11 @@ public class HandleTunnelMessageJob extends JobImpl {
         long excessLag = _context.clock().now() - _message.getMessageExpiration().getTime();
         if (excessLag > 0) {
             // expired while on the queue
-            if (_log.shouldLog(Log.ERROR))
-                _log.error("Accepted message (" + _message.getUniqueId() + ") expired on the queue for tunnel " 
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Accepted message (" + _message.getUniqueId() + ") expired on the queue for tunnel " 
                            + id.getTunnelId() + " expiring " 
                            + (_context.clock().now() - _message.getMessageExpiration().getTime())
-                           + "ms agp");
+                           + "ms ago");
             _context.statManager().addRateData("tunnel.expiredAfterAcceptTime", excessLag, excessLag);
             _context.messageHistory().messageProcessingError(_message.getUniqueId(), 
                                                              TunnelMessage.class.getName(), 
