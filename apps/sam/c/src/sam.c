@@ -125,22 +125,22 @@ bool sam_close(sam_sess_t *session)
  *		for use.
  */
 samerr_t sam_connect(sam_sess_t *session, const char *samhost, uint16_t samport,
-		const char *destname, sam_conn_t style, uint_t tunneldepth)
+	const char *destname, sam_conn_t style, uint_t tunneldepth)
 {
 	assert(session != NULL);
 	samerr_t rc;
 
 	if (style == SAM_STREAM) {
-		if (sam_closeback == NULL || sam_connectback == NULL ||
-				sam_databack == NULL || sam_diedback == NULL ||
-				sam_logback == NULL || sam_namingback == NULL ||
-				sam_statusback == NULL) {
+		if (sam_closeback == NULL || sam_connectback == NULL
+				|| sam_databack == NULL || sam_diedback == NULL
+				|| sam_logback == NULL || sam_namingback == NULL
+				|| sam_statusback == NULL) {
 			SAMLOGS("Please set callback functions before connecting");
 			return SAM_CALLBACKS_UNSET;
 		}
 	} else if (style == SAM_DGRAM) {
-		if (sam_dgramback == NULL || sam_diedback == NULL ||
-				sam_logback == NULL || sam_namingback == NULL) {
+		if (sam_dgramback == NULL || sam_diedback == NULL
+				|| sam_logback == NULL || sam_namingback == NULL) {
 			SAMLOGS("Please set callback functions before connecting");
 			return SAM_CALLBACKS_UNSET;
 		}
@@ -189,7 +189,7 @@ samerr_t sam_connect(sam_sess_t *session, const char *samhost, uint16_t samport,
  * Returns: true on success, false on failure
  */
 samerr_t sam_dgram_send(sam_sess_t *session, const sam_pubkey_t dest,
-		const void *data, size_t size)
+	const void *data, size_t size)
 {
 	assert(session != NULL);
 	char cmd[SAM_PKCMD_LEN];
@@ -667,7 +667,6 @@ static bool sam_readable(sam_sess_t *session)
 		sam_diedback(session);
 		return false;
 	}
-	/* it seems like there should be a better way to do this (i.e. not select)*/
 	FD_ZERO(&rset);
 	FD_SET(session->sock, &rset);
 	tv.tv_sec = 0;
@@ -698,7 +697,7 @@ static bool sam_readable(sam_sess_t *session)
  * Returns: true on success, false on error
  */
 void sam_sendq_add(sam_sess_t *session, sam_sid_t stream_id,
-		sam_sendq_t **sendq, const void *data, size_t dsize)
+	sam_sendq_t **sendq, const void *data, size_t dsize)
 {
 	assert(session != NULL);
 	assert(dsize >= 0);
@@ -762,7 +761,7 @@ static sam_sendq_t *sam_sendq_create()
  * sendq - the send queue
  */
 void sam_sendq_flush(sam_sess_t *session, sam_sid_t stream_id,
-		sam_sendq_t **sendq)
+	sam_sendq_t **sendq)
 {
 	assert(session != NULL);
 	sam_stream_send(session, stream_id, (*sendq)->data, (*sendq)->size);
@@ -957,10 +956,11 @@ retry:
 	}
 	a.s_addr = ((struct in_addr *)h->h_addr)->s_addr;
 #ifdef NO_INET_NTOP
+	/* inet_ntoa() was very poorly designed! */
 	char *tmp;
 	tmp = inet_ntoa(a);
 	assert(tmp != NULL);
-	strlcpy(ipaddr, tmp, INET_ADDRSTRLEN);  /* inet_ntoa() was very poorly designed */
+	strlcpy(ipaddr, tmp, INET_ADDRSTRLEN);
 	return true;
 #else
 	if (inet_ntop(AF_INET, &a, ipaddr, INET_ADDRSTRLEN) != NULL) {
@@ -1027,7 +1027,7 @@ sam_sid_t sam_stream_connect(sam_sess_t *session, const sam_pubkey_t dest)
  * Returns: true on success, false on failure
  */
 samerr_t sam_stream_send(sam_sess_t *session, sam_sid_t stream_id,
-		const void *data, size_t size)
+	const void *data, size_t size)
 {
 	assert(session != NULL);
 	char cmd[SAM_CMD_LEN];
@@ -1251,7 +1251,7 @@ const char *sam_winsock_strerror(int code)
 			return "This is a nonrecoverable error";
 		case WSANO_DATA:
 			return "Valid name, no data record of requested type";
-/* None of this shit compiles under Mingw - who knows why...
+		/* None of this shit compiles under Mingw - who knows why...
 		case WSA_INVALID_HANDLE:
 			return "Specified event object handle is invalid";
 		case WSA_INVALID_PARAMETER:
@@ -1269,8 +1269,7 @@ const char *sam_winsock_strerror(int code)
 		case WSAINVALIDPROVIDER:
 			return "Invalid service provider version number";
 		case WSAPROVIDERFAILEDINIT:
-			return "Unable to initialize a service provider";
-*/
+			return "Unable to initialize a service provider"; */
 		case WSASYSCALLFAILURE:
 			return "System call failure";
 		default:
