@@ -57,6 +57,9 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
 
     private String handlerName;
 
+    private Object conLock = new Object();
+    private int pendingConnections = 0;
+    
     //public I2PTunnelClientBase(int localPort, boolean ownDest,
     //		       Logging l) {
     //    I2PTunnelClientBase(localPort, ownDest, l, (EventDispatcher)null);
@@ -269,7 +272,16 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
      * @param s Socket to take care of
      */
     protected void manageConnection(Socket s) {
-        new ClientConnectionRunner(s, handlerName);
+        boolean useBlocking = false;
+        synchronized (conLock) {
+            pendingConnections++;
+            if (pendingConnections > 5)
+                useBlocking = true;
+        }
+        if (useBlocking)
+            clientConnectionRun(s);
+        else
+            new ClientConnectionRunner(s, handlerName);
     }
 
     public boolean close(boolean forced) {
@@ -326,6 +338,9 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
 
         public void run() {
             clientConnectionRun(s);
+            synchronized (conLock) {
+                pendingConnections--;
+            }
         }
     }
 

@@ -34,6 +34,7 @@ import java.util.TreeMap;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
+import net.i2p.util.ByteCache;
 import net.i2p.util.OrderedProperties;
 
 /**
@@ -737,13 +738,16 @@ public class DataHelper {
         if ((orig == null) || (orig.length <= 0)) return orig;
         GZIPInputStream in = new GZIPInputStream(new ByteArrayInputStream(orig, offset, length), length);
         ByteArrayOutputStream baos = new ByteArrayOutputStream(length * 2);
-        byte buf[] = new byte[4 * 1024];
+        ByteCache cache = ByteCache.getInstance(10, 4*1024);
+        ByteArray ba = cache.acquire();
+        byte buf[] = ba.getData(); // new byte[4 * 1024];
         while (true) {
             int read = in.read(buf);
             if (read == -1) break;
             baos.write(buf, 0, read);
         }
         byte rv[] = baos.toByteArray();
+        cache.release(ba);
         //if (_log.shouldLog(Log.DEBUG))
         //    _log.debug("Decompression of " + orig.length + " into " + rv.length + " (or " + 100.0d
         //               * (((double) rv.length) / ((double) orig.length)) + "% savings)");
