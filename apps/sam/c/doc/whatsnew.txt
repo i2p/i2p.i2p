@@ -1,12 +1,14 @@
 /* vi:set ts=4: */
 
-v1.25
+v1.25	2004-07-31
+	* Created I2P-Ping, a new example program (it's a clone of I2Ping).  Works
+		on Posix only, because it uses getopt().
 	* Removed the old broken examples and added more comments to
 		warhammer-dgram.c
 	* Added support for sessions - now LibSAM can have multiple SAM sessions
 		going at once (with different destinations)
 	* Rewrote sendq functions to automatically send big packets, for better
-		network performance
+		network performance (still considered experimental)
 
 v1.20	2004-07-11
 	* Ported to FreeBSD (Makefile.freebsd)
