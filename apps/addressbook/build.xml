@@ -1,0 +1,46 @@
+<?xml version="1.0"?>
+<project name="addressbook" default="war" basedir=".">
+
+	<property name="src" value="java/src/addressbook"/>
+	<property name="build" value="build"/>
+	<property name="dist"  location="dist"/>
+	<property name="jar" value="addressbook.jar"/>
+	<property name="war" value="addressbook.war"/>
+	<property name="servlet" value="../jetty/jettylib/javax.servlet.jar"/>
+
+	<target name="init">
+		<mkdir dir="${build}"/>
+		<mkdir dir="${dist}"/>
+	</target>
+
+	<target name="clean">
+		<delete dir="${build}"/>
+		<delete dir="${dist}"/>
+	</target>
+
+	<target name="distclean" depends="clean" />
+
+	<target name="compile" depends="init">
+		<javac srcdir="${src}" destdir="${build}" classpath="${servlet}"/>
+	</target>
+
+	<target name="jar" depends="compile">
+		<jar basedir="${build}" destfile="${dist}/${jar}">
+			<manifest>
+				<attribute name="Main-Class" value="addressbook.Daemon"/>
+			</manifest>
+		</jar>
+	</target>
+	
+	<target name="war" depends="compile">
+		<mkdir dir="${dist}/tmp"/>
+		<mkdir dir="${dist}/tmp/WEB-INF"/>
+		<mkdir dir="${dist}/tmp/WEB-INF/classes"/>
+		<copy todir="${dist}/tmp/WEB-INF/classes">
+			<fileset dir="${build}"/>
+		</copy>
+		<war basedir="${dist}/tmp" webxml="web.xml" destfile="${dist}/${war}"/>
+		<delete dir="${dist}/tmp"/>
+	</target>
+	
+</project>

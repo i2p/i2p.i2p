@@ -1,0 +1,7 @@
+# Subscription list for addressbook
+#
+# Each entry is an absolute url to a file in hosts.txt format.
+# Since the list is checked in order, url's should be listed in order of trust.
+#
+http://dev.i2p/i2p/hosts.txt
+http://duck.i2p/hosts.txt

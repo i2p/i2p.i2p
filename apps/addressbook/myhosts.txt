@@ -1,0 +1,10 @@
+# addressbook master address book.  Addresses placed in this file take precidence
+# over those in the router address book and in remote address books.  If changes
+# are made to this file, they will be reflected in the router address book and 
+# published address book after the next update.
+#
+# Do not make changes directly to the router address book, as they could be lost
+# during an update.
+#
+# This file takes addresses in the hosts.txt format, i.e.
+# example.i2p=somereallylongbase64thingAAAA
