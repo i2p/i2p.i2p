@@ -464,7 +464,12 @@ class TCPConnection implements I2NPMessageReader.I2NPMessageEventListener {
         
         private OutNetMessage getNext() {
             OutNetMessage msg = null;
-            while ( (msg == null) && (_running) ) {
+            // _running is kept seperate from _closed, since _running refers
+            // to the ConnectionRunner, while _closed refers to the TCPConnection
+            // (in case we want to pause running, etc).  they both need to be
+            // checked here, since the connection may be closed before this 
+            // thread even gets started up
+            while ( (msg == null) && (_running) && (!_closed) ) {
                 synchronized (_toBeSent) {
                     if (_toBeSent.size() <= 0) {
                         try {
