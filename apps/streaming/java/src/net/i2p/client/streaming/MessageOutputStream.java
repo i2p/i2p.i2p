@@ -10,7 +10,9 @@ import net.i2p.util.ByteCache;
 import net.i2p.util.Log;
 
 /**
- *
+ * A stream that we can shove data into that fires off those bytes
+ * on flush or when the buffer is full.  It also blocks according
+ * to the data receiver's needs.
  */
 public class MessageOutputStream extends OutputStream {
     private I2PAppContext _context;
@@ -104,6 +106,13 @@ public class MessageOutputStream extends OutputStream {
         throwAnyError();
     }
     
+    /** 
+     * Flush the data already queued up, blocking until it has been
+     * delivered.
+     *
+     * @throws IOException if the write fails
+     * @throws InterruptedIOException if the write times out
+     */
     public void flush() throws IOException {
         WriteStatus ws = null;
         synchronized (_dataLock) {
@@ -148,6 +157,7 @@ public class MessageOutputStream extends OutputStream {
             _dataCache.release(ba);
         }
     }
+    /** nonblocking close */
     public void closeInternal() {
         _closed = true;
         _streamError = new IOException("Closed internally");
@@ -217,6 +227,7 @@ public class MessageOutputStream extends OutputStream {
         _dataReceiver = null;
     }
     
+    /** Define a component to receive data flushed from this stream */
     public interface DataReceiver {
         /**
          * Nonblocking write
@@ -224,6 +235,7 @@ public class MessageOutputStream extends OutputStream {
         public WriteStatus writeData(byte buf[], int off, int size);
     }
     
+    /** Define a way to detect the status of a write */
     public interface WriteStatus {
         /** wait until the data written either fails or succeeds */
         public void waitForCompletion(int maxWaitMs);

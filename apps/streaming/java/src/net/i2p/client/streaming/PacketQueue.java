@@ -13,6 +13,10 @@ import net.i2p.util.ByteCache;
 import net.i2p.util.Log;
 
 /**
+ * Queue out packets to be sent through the session.  
+ * Well, thats the theory at least... in practice we just
+ * send them immediately with no blocking, since the 
+ * mode=bestEffort doesnt block in the SDK.
  *
  */
 class PacketQueue {

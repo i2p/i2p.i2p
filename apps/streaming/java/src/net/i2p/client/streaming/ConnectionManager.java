@@ -91,6 +91,7 @@ public class ConnectionManager {
     public void setAllowIncomingConnections(boolean allow) { 
         _connectionHandler.setActive(allow);
     }
+    /** should we acceot connections, or just reject everyone? */
     public boolean getAllowIncomingConnections() {
         return _connectionHandler.getActive();
     }
@@ -262,6 +263,10 @@ public class ConnectionManager {
         }
     }
     
+    /**
+     * Drop the (already closed) connection on the floor.
+     *
+     */
     public void removeConnection(Connection con) {
         boolean removed = false;
         synchronized (_connectionLock) {
@@ -287,6 +292,7 @@ public class ConnectionManager {
         }
     }
     
+    /** return a set of Connection objects */
     public Set listConnections() {
         synchronized (_connectionLock) {
             return new HashSet(_connectionByInboundId.values());

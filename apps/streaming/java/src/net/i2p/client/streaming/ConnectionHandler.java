@@ -50,6 +50,14 @@ class ConnectionHandler {
         }
     }
     
+    /**
+     * Receive an incoming connection (built from a received SYN)
+     *
+     * @param timeoutMs max amount of time to wait for a connection (if less 
+     *                  than 1ms, wait indefinitely)
+     * @return connection received, or null if there was a timeout or the 
+     *                    handler was shut down
+     */
     public Connection accept(long timeoutMs) {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Accept("+ timeoutMs+") called");

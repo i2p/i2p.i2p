@@ -6,6 +6,11 @@ import net.i2p.I2PAppContext;
 import net.i2p.util.Log;
 
 /**
+ * Receive data from the MessageOutputStream, build a packet,
+ * and send it through a connection.  The write calls on this
+ * do NOT block, but they also do not necessary imply immediate
+ * delivery, or even the generation of a new packet.  This class
+ * is the only one that builds useful outbound Packet objects.
  *
  */
 class ConnectionDataReceiver implements MessageOutputStream.DataReceiver {
@@ -21,6 +26,17 @@ class ConnectionDataReceiver implements MessageOutputStream.DataReceiver {
         _dummyStatus = new DummyStatus();
     }
     
+    /**
+     * Send some data through the connection, or if there is no new data, this
+     * may generate a packet with a plain ACK/NACK or CLOSE, or nothing whatsoever
+     * if there's nothing new to send.
+     *
+     * @param buf data to be sent - may be null
+     * @param off offset into the buffer to start writing from
+     * @param size how many bytes of the buffer to write (may be 0)
+     * @return an object to allow optional blocking for data acceptance or 
+     *         delivery.
+     */
     public MessageOutputStream.WriteStatus writeData(byte[] buf, int off, int size) {
         boolean doSend = true;
         if ( (size <= 0) && (_connection.getLastSendId() >= 0) ) {
@@ -54,12 +70,25 @@ class ConnectionDataReceiver implements MessageOutputStream.DataReceiver {
     }
     
     
+    /**
+     * Send some data through the connection, attaching any appropriate flags
+     * onto the packet.
+     *
+     * @param buf data to be sent - may be null
+     * @param off offset into the buffer to start writing from
+     * @param size how many bytes of the buffer to write (may be 0)
+     * @return the packet sent
+     */
     public PacketLocal send(byte buf[], int off, int size) {
         return send(buf, off, size, false);
     }
     /** 
+     * @param buf data to be sent - may be null
+     * @param off offset into the buffer to start writing from
+     * @param size how many bytes of the buffer to write (may be 0)
      * @param forceIncrement even if the buffer is empty, increment the packetId
      *                       so we get an ACK back
+     * @return the packet sent
      */
     public PacketLocal send(byte buf[], int off, int size, boolean forceIncrement) {
         PacketLocal packet = buildPacket(buf, off, size, forceIncrement);
@@ -123,7 +152,9 @@ class ConnectionDataReceiver implements MessageOutputStream.DataReceiver {
         return packet;
     }
 
-    
+    /**
+     * Used if no new packet was sent.
+     */
     private static final class DummyStatus implements MessageOutputStream.WriteStatus {
         public final void waitForAccept(int maxWaitMs) { return; }
         public final void waitForCompletion(int maxWaitMs) { return; }
