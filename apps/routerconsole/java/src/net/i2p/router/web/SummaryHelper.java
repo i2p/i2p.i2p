@@ -335,7 +335,9 @@ public class SummaryHelper {
     public String getDestinations() {
         ByteArrayOutputStream baos = new ByteArrayOutputStream(1024);
         try {
-            _context.clientManager().renderStatusHTML(new OutputStreamWriter(baos));
+            OutputStreamWriter osw = new OutputStreamWriter(baos);
+            _context.clientManager().renderStatusHTML(osw);
+            osw.flush();
             return new String(baos.toByteArray());
         } catch (IOException ioe) {
             _context.logManager().getLog(SummaryHelper.class).error("Error rendering client info", ioe);

@@ -246,8 +246,8 @@ public class LogManager {
         File cfgFile = new File(_location);
         if (!cfgFile.exists()) {
             if (!_alreadyNoticedMissingConfig) {
-                if (_log.shouldLog(Log.ERROR))
-                    _log.error("Log file " + _location + " does not exist");
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("Log file " + _location + " does not exist");
                 System.err.println("Log file " + _location + " does not exist");
                 _alreadyNoticedMissingConfig = true;
             }

@@ -1,0 +1,160 @@
+<?xml version="1.0"?> 
+<!DOCTYPE Configure PUBLIC "-//Mort Bay Consulting//DTD Configure 1.2//EN" "http://jetty.mortbay.org/configure_1_2.dtd">
+
+
+<!-- =============================================================== -->
+<!-- Configure the Jetty Server                                      -->
+<!-- =============================================================== -->
+<Configure class="org.mortbay.jetty.Server">
+
+  <!-- =============================================================== -->
+  <!-- Configure the Request Listeners                                 -->
+  <!-- =============================================================== -->
+
+  <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+  <!-- Add and configure a HTTP listener to port 8080                  -->
+  <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+  <Call name="addListener">
+    <Arg>
+      <New class="org.mortbay.http.SocketListener">
+        <Arg>
+          <New class="org.mortbay.util.InetAddrPort">
+            <Set name="host">127.0.0.1</Set>
+            <Set name="port">7658</Set>
+          </New>
+        </Arg>
+        <Set name="MinThreads">3</Set>
+        <Set name="MaxThreads">10</Set>
+        <Set name="MaxIdleTimeMs">30000</Set>
+        <Set name="LowResourcePersistTimeMs">1000</Set>
+        <Set name="ConfidentialPort">8443</Set>
+        <Set name="IntegralPort">8443</Set>
+        <Set name="PoolName">main</Set>
+      </New>
+    </Arg>
+  </Call>
+
+
+
+  <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+  <!-- Add a HTTPS SSL listener on port 8443                           -->
+  <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+  <!-- UNCOMMENT TO ACTIVATE
+  <Call name="addListener">
+    <Arg>
+      <New class="org.mortbay.http.SunJsseListener">
+        <Set name="Port">8443</Set>
+        <Set name="PoolName">main</Set>
+        <Set name="Keystore"><SystemProperty name="jetty.home" default="."/>/etc/demokeystore</Set>
+	<Set name="Password">OBF:1vny1zlo1x8e1vnw1vn61x8g1zlu1vn4</Set>
+	<Set name="KeyPassword">OBF:1u2u1wml1z7s1z7a1wnl1u2g</Set>
+        <Set name="NonPersistentUserAgent">MSIE 5</Set>
+      </New>
+    </Arg>
+  </Call>
+  -->
+
+  <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+  <!-- Add a AJP13 listener on port 8009                               -->
+  <!-- This protocol can be used with mod_jk in apache, IIS etc.       -->
+  <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+  <!--
+  <Call name="addListener">
+    <Arg>
+      <New class="org.mortbay.http.ajp.AJP13Listener">
+        <Set name="PoolName">ajp</Set>
+        <Set name="Port">8009</Set>
+        <Set name="MinThreads">3</Set>
+        <Set name="MaxThreads">20</Set>
+        <Set name="MaxIdleTimeMs">0</Set>
+        <Set name="confidentialPort">443</Set>
+      </New>
+    </Arg>
+  </Call>
+  -->
+
+
+  <!-- =============================================================== -->
+  <!-- Configure the Contexts                                          -->
+  <!-- =============================================================== -->
+
+
+  <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+  <!-- Add a all web application within the webapps directory.         -->
+  <!-- + No virtual host specified                                     -->
+  <!-- + Look in the webapps directory relative to jetty.home or .     -->
+  <!-- + Use the webdefault.xml resource for the defaults descriptor   -->
+  <!-- + Upack the war file                                            -->
+  <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+  <Set name="rootWebApp">root</Set>
+  <Call name="addWebApplications">
+    <Arg></Arg>
+    <Arg>./eepsite/webapps/</Arg>
+    <Arg>./eepsite/webdefault.xml</Arg>
+    <Arg type="boolean">true</Arg>
+  </Call>
+
+
+  <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+  <!-- Add and configure a specific web application                    -->
+  <!-- + Set Unpack WAR files                                          -->
+  <!-- + Set Default Descriptor.  Resource, file or URL                -->
+  <!-- + Set Virtual Hosts. A Null host or empty array means all hosts -->
+  <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+  <!-- UNCOMMENT TO ACTIVATE
+  <Call name="addWebApplication">
+    <Arg>/context</Arg>
+    <Arg>./webapps/root</Arg>
+
+    <Set name="extractWAR">false</Set> 
+
+    <Set name="defaultsDescriptor">org/mortbay/jetty/servlet/webdefault.xml</Set>
+
+    <Set name="virtualHosts">
+      <Array type="java.lang.String">
+        <Item></Item>
+        <Item>127.0.0.1</Item>
+        <Item>localhost</Item>
+        <Item>www.acme.com</Item>
+      </Array>
+    </Set>
+  </Call>
+  -->
+
+  <Call name="addContext">
+    <Arg>
+      <New class="org.mortbay.http.HttpContext">
+        <Set name="contextPath">/</Set>
+        <Set name="resourceBase">./eepsite/docroot</Set>
+        <Call name="addHandler">
+          <Arg>
+            <New class="org.mortbay.http.handler.ResourceHandler">
+              <Set name="redirectWelcome">FALSE</Set>
+	    </New>
+          </Arg>
+        </Call>
+      </New>
+    </Arg>
+  </Call>
+
+  <!-- =============================================================== -->
+  <!-- Configure the Request Log                                       -->
+  <!-- =============================================================== -->
+  <Set name="RequestLog">
+    <New class="org.mortbay.http.NCSARequestLog">
+      <Arg>./eepsite/logs/yyyy_mm_dd.request.log</Arg>
+      <Set name="retainDays">90</Set>
+      <Set name="append">true</Set>
+      <Set name="extended">false</Set>
+      <Set name="buffered">false</Set>
+      <Set name="LogTimeZone">GMT</Set>
+    </New>
+  </Set>
+
+  <!-- =============================================================== -->
+  <!-- Configure the Other Server Options                              -->
+  <!-- =============================================================== -->
+  <Set name="requestsPerGC">2000</Set>
+  <Set name="statsOn">false</Set>
+
+</Configure>

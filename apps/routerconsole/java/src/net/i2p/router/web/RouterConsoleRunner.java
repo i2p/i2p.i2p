@@ -23,6 +23,10 @@ public class RouterConsoleRunner {
     private String _listenHost = "127.0.0.1";
     private String _webAppsDir = "./webapps/";
     
+    static {
+        System.setProperty("org.mortbay.http.Version.paranoid", "true");
+    }
+    
     public RouterConsoleRunner(String args[]) {
         if (args.length == 3) {
             _listenPort = args[0].trim();

@@ -6,7 +6,7 @@
         <echo message="  dist:      distclean then package everything up (installer, clean tarball, update tarball)" />
         <echo message="  installer: build the GUI installer" />
         <echo message="  tarball:   tar the full install into i2p.tar.bz2 (extracts to build a new clean install)" />
-        <echo message="  updater:   tar the built i2p specific files into an i2pupdate.tar.bz2 (extracts safely over existing installs)" />
+        <echo message="  updater:   tar the built i2p specific files into an i2pupdate.zip (extracts safely over existing installs)" />
         <echo message="  distclean: clean up all derived files" />
         <echo message="  javadoc:   generate javadoc for the entire project into ./build/javadoc" />
     </target>
@@ -143,7 +143,7 @@
     <target name="pkgclean">
         <delete dir="pkg-temp" />
         <delete>
-            <fileset dir="." includes="i2p.tar.bz2 install.jar i2pupdate.tar.bz2" />
+            <fileset dir="." includes="i2p.tar.bz2 install.jar i2pupdate.zip" />
         </delete>
     </target>
     <target name="preppkg" depends="build">
@@ -207,8 +207,12 @@
         <copy file="history.txt" todir="pkg-temp/" />
         <mkdir dir="pkg-temp/docs" />
         <copy file="readme.html" todir="pkg-temp/docs/" />
-        <mkdir dir="pkg-temp/work" />
-        <touch file="pkg-temp/work/ignore.this" />
+        <mkdir dir="pkg-temp/eepsite" />
+        <mkdir dir="pkg-temp/eepsite/webapps" />
+        <mkdir dir="pkg-temp/eepsite/logs" />
+        <mkdir dir="pkg-temp/eepsite/docroot" />
+        <copy file="installer/resources/eepsite_index.html" tofile="pkg-temp/eepsite/docroot/index.html" />
+        <copy file="installer/resources/jetty.xml" tofile="pkg-temp/eepsite/jetty.xml" />
     </target>
     <target name="tarball" depends="preppkg">
         <tar compression="bzip2" destfile="i2p.tar.bz2">
@@ -226,6 +230,12 @@
         <copy file="build/routerconsole.war" todir="pkg-temp/webapps/" />
         <copy file="history.txt" todir="pkg-temp/" />
         <copy file="hosts.txt" todir="pkg-temp/" />
+        <mkdir dir="pkg-temp/eepsite" />
+        <mkdir dir="pkg-temp/eepsite/webapps" />
+        <mkdir dir="pkg-temp/eepsite/logs" />
+        <mkdir dir="pkg-temp/eepsite/docroot" />
+        <copy file="installer/resources/eepsite_index.html" tofile="pkg-temp/eepsite/docroot/index.html" />
+        <copy file="installer/resources/jetty.xml" tofile="pkg-temp/eepsite/jetty.xml" />
         <zip destfile="i2pupdate.zip" basedir="pkg-temp" />
     </target>
     <taskdef name="izpack" classpath="${basedir}/installer/lib/izpack/standalone-compiler.jar" classname="com.izforge.izpack.ant.IzPackTask" />
