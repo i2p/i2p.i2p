@@ -13,6 +13,7 @@ import net.i2p.router.peermanager.PeerManagerFacadeImpl;
 import net.i2p.router.peermanager.ProfileManagerImpl;
 import net.i2p.router.peermanager.ProfileOrganizer;
 import net.i2p.router.peermanager.ReliabilityCalculator;
+import net.i2p.router.peermanager.CapacityCalculator;
 import net.i2p.router.peermanager.SpeedCalculator;
 import net.i2p.router.transport.FIFOBandwidthLimiter;
 import net.i2p.router.transport.CommSystemFacadeImpl;
@@ -54,6 +55,7 @@ public class RouterContext extends I2PAppContext {
     private Calculator _integrationCalc;
     private Calculator _speedCalc;
     private Calculator _reliabilityCalc;
+    private Calculator _capacityCalc;
     
     public RouterContext(Router router) { this(router, null); }
     public RouterContext(Router router, Properties envProps) { 
@@ -89,6 +91,7 @@ public class RouterContext extends I2PAppContext {
         _integrationCalc = new IntegrationCalculator(this);
         _speedCalc = new SpeedCalculator(this);
         _reliabilityCalc = new ReliabilityCalculator(this);
+        _capacityCalc = new CapacityCalculator(this);
     }
     
     /** what router is this context working for? */
@@ -204,6 +207,8 @@ public class RouterContext extends I2PAppContext {
     public Calculator speedCalculator() { return _speedCalc; } 
     /** how do we rank the reliability of profiles? */
     public Calculator reliabilityCalculator() { return _reliabilityCalc; }
+    /** how do we rank the capacity of profiles? */
+    public Calculator capacityCalculator() { return _capacityCalc; }
     
     public String toString() {
         StringBuffer buf = new StringBuffer(512);
