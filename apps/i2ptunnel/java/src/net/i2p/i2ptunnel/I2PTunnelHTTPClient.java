@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.StringTokenizer;
+import java.util.HashMap;
 
 import net.i2p.I2PAppContext;
 import net.i2p.I2PException;
@@ -47,6 +48,8 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
     private static final Log _log = new Log(I2PTunnelHTTPClient.class);
 
     private List proxyList;
+
+    private HashMap addressHelpers = new HashMap();
 
     private final static byte[] ERR_REQUEST_DENIED =
         ("HTTP/1.1 403 Access Denied\r\n"+
@@ -196,6 +199,34 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
                     if (host.toLowerCase().endsWith(".i2p")) {
                         destination = host;
                         host = getHostName(destination);
+                        if (host == "i2p") {
+                            int pos2;
+                            if ((pos2 = line.indexOf("?")) != -1) {
+                                // Try to find an address helper in the fragments
+                                String fragments = line.substring(pos2 + 1);
+                                pos2 = fragments.indexOf(" ");
+                                fragments = fragments.substring(0, pos2);
+                                fragments = fragments + "&";
+                                String fragment;
+                                while(fragments.length() > 0) {
+                                    pos2 = fragments.indexOf("&");
+                                    fragment = fragments.substring(0, pos2);
+                                    fragments = fragments.substring(pos2 + 1);
+                                    if (fragment.startsWith("i2paddresshelper")) {
+                                        pos2 = fragment.indexOf("=");
+                                        if (pos2 >= 0) {
+                                            addressHelpers.put(destination,fragment.substring(pos2 + 1));
+                                        }
+                                    }
+                                }
+                            }
+
+                            String addressHelper = (String) addressHelpers.get(destination);
+                            if (addressHelper != null) {
+                                destination = addressHelper;
+                                host = getHostName(destination);
+                            }
+                        }
                         line = method + " " + request.substring(pos);
                     } else if (host.indexOf(".") != -1) {
                         // The request must be forwarded to a WWW proxy
