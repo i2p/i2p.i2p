@@ -7,6 +7,7 @@
         <ant dir="../../router/java/" target="build" />
         <ant dir="../../apps/ministreaming/java/" target="build" />
         <ant dir="../../apps/i2ptunnel/java/" target="build" />
+        <ant dir="../../apps/sam/java/" target="build" />
     </target>
     <target name="compile">
         <mkdir dir="./build" />
@@ -33,6 +34,7 @@
             <fileset file="../../router/java/build/router.jar" />
             <fileset file="../../apps/ministreaming/java/build/mstreaming.jar" />
             <fileset file="../../apps/i2ptunnel/java/build/i2ptunnel.jar" />
+            <fileset file="../../apps/sam/java/build/sam.jar" />
             <fileset file="../doc/COPYING" />
             <fileset file="../../readme.txt" />
             <fileset file="../../hosts.txt" />
@@ -51,6 +53,7 @@
             <fileset file="../../router/java/build/router.jar" />
             <fileset file="../../apps/ministreaming/java/build/mstreaming.jar" />
             <fileset file="../../apps/i2ptunnel/java/build/i2ptunnel.jar" />
+            <fileset file="../../apps/sam/java/build/sam.jar" />
             <fileset file="../doc/COPYING" />
             <fileset file="../../readme.txt" />
             <fileset file="../../hosts.txt" />
@@ -67,11 +70,13 @@
         <ant dir="../../router/java/" target="cleandep" />
         <ant dir="../../apps/ministreaming/java/" target="cleandep" />
         <ant dir="../../apps/i2ptunnel/java/" target="cleandep" />
+        <ant dir="../../apps/sam/java/" target="cleandep" />
     </target>
     <target name="distclean" depends="clean">
         <ant dir="../../core/java/" target="distclean" />
         <ant dir="../../router/java/" target="distclean" />
         <ant dir="../../apps/ministreaming/java/" target="distclean" />
         <ant dir="../../apps/i2ptunnel/java/" target="distclean" />
+        <ant dir="../../apps/sam/java/" target="distclean" />
     </target>
 </project>
