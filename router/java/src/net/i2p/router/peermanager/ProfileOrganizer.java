@@ -67,7 +67,7 @@ public class ProfileOrganizer {
     
     /**
      * Defines the minimum number of 'fast' peers that the organizer should select.  See
-     * {@see getMinimumFastPeers}
+     * {@link ProfileOrganizer#getMinimumFastPeers}
      *
      */
     public static final String PROP_MINIMUM_FAST_PEERS = "profileOrganizer.minFastPeers";
@@ -714,7 +714,7 @@ public class ProfileOrganizer {
      *
      * @return minimum number of peers to be placed in the 'fast+reliable' group
      */
-    private int getMinimumFastPeers() {
+    protected int getMinimumFastPeers() {
         if (_context.router() != null) {
             String val = _context.router().getConfigSetting(PROP_MINIMUM_FAST_PEERS);
             if (val != null) {
