@@ -121,7 +121,7 @@ class TestTunnelJob extends JobImpl {
         
         TestFailedJob failureJob = new TestFailedJob();
         MessageSelector selector = new TestMessageSelector(msg.getMessageId(), info.getTunnelId().getTunnelId());
-        SendTunnelMessageJob j = new SendTunnelMessageJob(_context, msg, _secondaryId, info.getThisHop(), info.getTunnelId(), null, new TestSuccessfulJob(), failureJob, selector, _context.clock().now()+TEST_TIMEOUT, TEST_PRIORITY);
+        SendTunnelMessageJob j = new SendTunnelMessageJob(_context, msg, _secondaryId, info.getThisHop(), info.getTunnelId(), null, new TestSuccessfulJob(), failureJob, selector, TEST_TIMEOUT, TEST_PRIORITY);
         _context.jobQueue().addJob(j);
     }
     
