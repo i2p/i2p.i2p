@@ -65,6 +65,14 @@ public class ProfileOrganizer {
     public static final String PROP_RELIABILITY_THRESHOLD_FACTOR = "profileOrganizer.reliabilityThresholdFactor";
     public static final double DEFAULT_RELIABILITY_THRESHOLD_FACTOR = .5d;
     
+    /**
+     * Defines the minimum number of 'fast' peers that the organizer should select.  See
+     * {@see getMinimumFastPeers}
+     *
+     */
+    public static final String PROP_MINIMUM_FAST_PEERS = "profileOrganizer.minFastPeers";
+    public static final int DEFAULT_MINIMUM_FAST_PEERS = 4;
+    
     /** synchronized against this lock when updating the tier that peers are located in (and when fetching them from a peer) */
     private Object _reorganizeLock = new Object();
     
@@ -323,12 +331,42 @@ public class ProfileOrganizer {
             _strictReliabilityOrder = reordered;
             
             locked_unfailAsNecessary();
+            locked_promoteFastAsNecessary();
         }
         
         if (_log.shouldLog(Log.DEBUG)) {
             _log.debug("Profiles reorganized.  averages: [integration: " + _thresholdIntegrationValue + ", reliability: " + _thresholdReliabilityValue + ", speed: " + _thresholdSpeedValue + "]");
             _log.debug("Strictly organized: " + _strictReliabilityOrder);
         }
+    }
+    
+    /**
+     * As with locked_unfailAsNecessary, I'm not sure how much I like this - if there
+     * aren't enough fast peers, move some of the not-so-fast peers into the fast group.
+     * This picks the not-so-fast peers based on reliability, not speed, and skips over any
+     * failing peers.  Perhaps it should build a seperate strict ordering by speed?  Nah, not
+     * worth the maintenance and memory overhead, at least not for now.
+     *
+     */
+    private void locked_promoteFastAsNecessary() {
+        int minFastPeers = getMinimumFastPeers();
+        int numToPromote = minFastPeers - _fastAndReliablePeers.size();
+        if (numToPromote > 0) {
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Need to explicitly promote " + numToPromote + " peers to the fast+reliable group");
+            for (Iterator iter = _strictReliabilityOrder.iterator(); iter.hasNext(); ) {
+                PeerProfile cur = (PeerProfile)iter.next();
+                if ( (!_fastAndReliablePeers.containsKey(cur.getPeer())) && (!cur.getIsFailing()) ) {
+                    _fastAndReliablePeers.put(cur.getPeer(), cur);
+                    // no need to remove it from any of the other groups, since if it is 
+                    // fast and reliable, it is reliable, and it is not failing
+                    numToPromote--;
+                    if (numToPromote <= 0)
+                        break;
+                }
+            }
+        }
+        return;
     }
     
     /** how many not failing/active peers must we have? */
@@ -655,6 +693,7 @@ public class ProfileOrganizer {
                 double rv = Double.parseDouble(val);
                 if (_log.shouldLog(Log.DEBUG)) 
                     _log.debug("router context said " + PROP_RELIABILITY_THRESHOLD_FACTOR+ '=' + val);
+                return rv;
             } catch (NumberFormatException nfe) {
                 if (_log.shouldLog(Log.WARN))
                     _log.warn("Reliability threshold factor improperly set in the router environment [" + val + "]", nfe);
@@ -664,6 +703,48 @@ public class ProfileOrganizer {
         if (_log.shouldLog(Log.DEBUG)) 
             _log.debug("no config for " + PROP_RELIABILITY_THRESHOLD_FACTOR + ", using " + DEFAULT_RELIABILITY_THRESHOLD_FACTOR);
         return DEFAULT_RELIABILITY_THRESHOLD_FACTOR;
+    }
+    
+    /**
+     * Defines the minimum number of 'fast' peers that the organizer should select.  If
+     * the profile calculators derive a threshold that does not select at least this many peers,
+     * the threshold will be overridden to make sure this many peers are in the fast+reliable group.
+     * This parameter should help deal with a lack of diversity in the tunnels created when some 
+     * peers are particularly fast.
+     *
+     * @return minimum number of peers to be placed in the 'fast+reliable' group
+     */
+    private int getMinimumFastPeers() {
+        if (_context.router() != null) {
+            String val = _context.router().getConfigSetting(PROP_MINIMUM_FAST_PEERS);
+            if (val != null) {
+                try {
+                    int rv = Integer.parseInt(val);
+                    if (_log.shouldLog(Log.DEBUG)) 
+                        _log.debug("router config said " + PROP_MINIMUM_FAST_PEERS + '=' + val);
+                    return rv;
+                } catch (NumberFormatException nfe) {
+                    if (_log.shouldLog(Log.WARN))
+                        _log.warn("Minimum fast peers improperly set in the router config [" + val + "]", nfe);
+                }
+            }
+        }
+        String val = _context.getProperty(PROP_MINIMUM_FAST_PEERS, ""+DEFAULT_MINIMUM_FAST_PEERS);
+        if (val != null) {
+            try {
+                int rv = Integer.parseInt(val);
+                if (_log.shouldLog(Log.DEBUG)) 
+                    _log.debug("router context said " + PROP_MINIMUM_FAST_PEERS + '=' + val);
+                return rv;
+            } catch (NumberFormatException nfe) {
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("Minimum fast peers improperly set in the router environment [" + val + "]", nfe);
+            }
+        }
+        
+        if (_log.shouldLog(Log.DEBUG)) 
+            _log.debug("no config for " + PROP_MINIMUM_FAST_PEERS + ", using " + DEFAULT_MINIMUM_FAST_PEERS);
+        return DEFAULT_MINIMUM_FAST_PEERS;
     }
     
     private final static DecimalFormat _fmt = new DecimalFormat("###,##0.00", new DecimalFormatSymbols(Locale.UK));

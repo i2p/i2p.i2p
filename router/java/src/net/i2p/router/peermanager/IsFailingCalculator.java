@@ -34,16 +34,21 @@ public class IsFailingCalculator extends Calculator {
              (profile.getCommError().getRate(60*1000).getLastEventCount() > 0) ) {
             return true;
         } else {
-            if ( (profile.getDBHistory().getFailedLookupRate().getRate(60*1000).getCurrentEventCount() > 0) ||
-                 (profile.getDBHistory().getFailedLookupRate().getRate(60*1000).getLastEventCount() > 0) ) {
-                // are they overloaded (or disconnected)?
-                return true;
-            }
+            //if ( (profile.getDBHistory().getFailedLookupRate().getRate(60*1000).getCurrentEventCount() > 0) ||
+            //     (profile.getDBHistory().getFailedLookupRate().getRate(60*1000).getLastEventCount() > 0) ) {
+            //    // are they overloaded (or disconnected)?
+            //    return true;
+            //}
             
             long recently = _context.clock().now() - GRACE_PERIOD;
             
             if (profile.getTunnelHistory().getLastRejected() >= recently) {
                 // have they refused to participate in a tunnel in the last 5 minutes?
+                return true;
+            }
+            
+            if (profile.getTunnelHistory().getLastFailed() >= recently) {
+                // has a tunnel they participate in failed in the last 5 minutes?
                 return true;
             }
             

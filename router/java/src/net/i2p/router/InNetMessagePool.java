@@ -14,6 +14,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import net.i2p.data.i2np.DeliveryStatusMessage;
 import net.i2p.util.Log;
 
 /**
@@ -34,6 +35,7 @@ public class InNetMessagePool {
         _handlerJobBuilders = new HashMap();
         _log = _context.logManager().getLog(InNetMessagePool.class);
         _context.statManager().createRateStat("inNetPool.dropped", "How often do we drop a message", "InNetPool", new long[] { 60*1000l, 60*60*1000l, 24*60*60*1000l });
+        _context.statManager().createRateStat("inNetPool.droppedDeliveryStatusDelay", "How long after a delivery status message is created do we receive it back again (for messages that are too slow to be handled)", "InNetPool", new long[] { 60*1000l, 60*60*1000l, 24*60*60*1000l });
         _context.statManager().createRateStat("inNetPool.duplicate", "How often do we receive a duplicate message", "InNetPool", new long[] { 60*1000l, 60*60*1000l, 24*60*60*1000l });
     }
   
@@ -119,10 +121,18 @@ public class InNetMessagePool {
             if (size == -1) { 
                 // was not handled via HandlerJobBuilder
                 _context.messageHistory().droppedOtherMessage(msg.getMessage());
-                if (_log.shouldLog(Log.ERROR))
-                    _log.error("Message " + msg.getMessage() + " was not handled by a HandlerJobBuilder - DROPPING: " 
-                               + msg, new Exception("DROPPED MESSAGE"));
-                _context.statManager().addRateData("inNetPool.dropped", 1, 0);
+                if (msg.getMessage().getType() == DeliveryStatusMessage.MESSAGE_TYPE) {
+                    long timeSinceSent = _context.clock().now() - 
+                                        ((DeliveryStatusMessage)msg.getMessage()).getArrival().getTime();
+                    if (_log.shouldLog(Log.INFO))
+                        _log.info("Dropping unhandled delivery status message created " + timeSinceSent + "ms ago: " + msg);
+                    _context.statManager().addRateData("inNetPool.droppedDeliveryStatusDelay", timeSinceSent, timeSinceSent);
+                } else {
+                    if (_log.shouldLog(Log.ERROR))
+                        _log.error("Message " + msg.getMessage() + " was not handled by a HandlerJobBuilder - DROPPING: " 
+                                   + msg, new Exception("DROPPED MESSAGE"));
+                    _context.statManager().addRateData("inNetPool.dropped", 1, 0);
+                }
             } else {
                 String mtype = msg.getMessage().getClass().getName();
                 _context.messageHistory().receiveMessage(mtype, msg.getMessage().getUniqueId(), 

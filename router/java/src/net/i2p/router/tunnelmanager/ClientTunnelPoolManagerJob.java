@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.TreeMap;
+import java.util.Date;
 
 import net.i2p.data.TunnelId;
 import net.i2p.router.JobImpl;
@@ -96,6 +97,8 @@ class ClientTunnelPoolManagerJob extends JobImpl {
     private void requestMoreTunnels(int numTunnels) {
         if (_clientPool.getClientSettings().getDepthInbound() < 1) {
             // the client wants 0-hop tunnels, so don't waste longer tunnels on them
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("0 hop tunnels wanted - create custom ones");
             requestCustomTunnels(numTunnels);
             return;
         }
@@ -103,6 +106,9 @@ class ClientTunnelPoolManagerJob extends JobImpl {
         int allocated = allocateExisting(numTunnels);
         
         if (allocated < numTunnels) {
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("insufficient tunnels available (wanted: " + numTunnels 
+                           + ", allocated: " + allocated + ", requesting custom ones");
             requestCustomTunnels(numTunnels - allocated);
         } else {
             if (_log.shouldLog(Log.DEBUG))
@@ -169,10 +175,14 @@ class ClientTunnelPoolManagerJob extends JobImpl {
             return false;
         }
 
-        long expireAfter = _context.clock().now() + POOL_CHECK_DELAY + _tunnelPool.getTunnelCreationTimeout()*2;
+        // (furthest in the future) - (rebuild buffer time)
+        long expireAfter = _context.clock().now() + _tunnelPool.getPoolSettings().getInboundDuration() 
+                           - POOL_CHECK_DELAY - _tunnelPool.getTunnelCreationTimeout()*2;
         if (info.getSettings().getExpiration() <= expireAfter) {
             if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Refusing tunnel " + info.getTunnelId() + " because it is going to expire soon");
+                _log.debug("Refusing tunnel " + info.getTunnelId() + " because it is going to expire soon (" 
+                           + new Date(info.getSettings().getExpiration()) 
+                           + ", before " + new Date(expireAfter) + ")");
             return false;
         }
 

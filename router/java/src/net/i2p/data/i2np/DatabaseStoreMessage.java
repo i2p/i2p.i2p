@@ -19,6 +19,7 @@ import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
 import net.i2p.data.LeaseSet;
 import net.i2p.data.RouterInfo;
+import net.i2p.data.TunnelId;
 import net.i2p.util.Log;
 
 /**
@@ -34,6 +35,9 @@ public class DatabaseStoreMessage extends I2NPMessageImpl {
     private int _type;
     private LeaseSet _leaseSet;
     private RouterInfo _info;
+    private long _replyToken;
+    private TunnelId _replyTunnel;
+    private Hash _replyGateway;
     
     public final static int KEY_TYPE_ROUTERINFO = 0;
     public final static int KEY_TYPE_LEASESET = 1;
@@ -44,6 +48,9 @@ public class DatabaseStoreMessage extends I2NPMessageImpl {
         setKey(null);
         setLeaseSet(null);
         setRouterInfo(null);
+        setReplyToken(0);
+        setReplyTunnel(null);
+        setReplyGateway(null);
     }
     
     /**
@@ -83,6 +90,22 @@ public class DatabaseStoreMessage extends I2NPMessageImpl {
     public int getValueType() { return _type; }
     public void setValueType(int type) { _type = type; }
     
+    /**
+     * If a reply is desired, this token specifies the message ID that should
+     * be used for a DeliveryStatusMessage to be sent to the reply tunnel on the
+     * reply gateway.  
+     *
+     * @return positive reply token ID, or 0 if no reply is necessary.
+     */
+    public long getReplyToken() { return _replyToken; }
+    public void setReplyToken(long token) { _replyToken = token; }
+    
+    public TunnelId getReplyTunnel() { return _replyTunnel; } 
+    public void setReplyTunnel(TunnelId id) { _replyTunnel = id; }
+    
+    public Hash getReplyGateway() { return _replyGateway; }
+    public void setReplyGateway(Hash peer) { _replyGateway = peer; }
+    
     public void readMessage(InputStream in, int type) throws I2NPMessageException, IOException {
         if (type != MESSAGE_TYPE) throw new I2NPMessageException("Message type is incorrect for this message");
         try {
@@ -91,6 +114,16 @@ public class DatabaseStoreMessage extends I2NPMessageImpl {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Hash read: " + _key.toBase64());
             _type = (int)DataHelper.readLong(in, 1);
+            _replyToken = DataHelper.readLong(in, 4);
+            if (_replyToken > 0) {
+                _replyTunnel = new TunnelId();
+                _replyTunnel.readBytes(in);
+                _replyGateway = new Hash();
+                _replyGateway.readBytes(in);
+            } else {
+                _replyTunnel = null;
+                _replyGateway = null;
+            }
             if (_type == KEY_TYPE_LEASESET) {
                 _leaseSet = new LeaseSet();
                 _leaseSet.readBytes(in);
@@ -121,6 +154,13 @@ public class DatabaseStoreMessage extends I2NPMessageImpl {
         try {
             _key.writeBytes(os);
             DataHelper.writeLong(os, 1, _type);
+            DataHelper.writeLong(os, 4, _replyToken);
+            if (_replyToken > 0) {
+                _replyTunnel.writeBytes(os);
+                _replyGateway.writeBytes(os);
+            } else {
+                // noop
+            }
             if (_type == KEY_TYPE_LEASESET) {
                 _leaseSet.writeBytes(os);
             } else if (_type == KEY_TYPE_ROUTERINFO) {
@@ -143,7 +183,10 @@ public class DatabaseStoreMessage extends I2NPMessageImpl {
         return DataHelper.hashCode(getKey()) +
                DataHelper.hashCode(getLeaseSet()) +
                DataHelper.hashCode(getRouterInfo()) +
-               getValueType();
+               getValueType() +
+               (int)getReplyToken() +
+               DataHelper.hashCode(getReplyTunnel()) +
+               DataHelper.hashCode(getReplyGateway());
     }
     
     public boolean equals(Object object) {
@@ -152,7 +195,10 @@ public class DatabaseStoreMessage extends I2NPMessageImpl {
             return DataHelper.eq(getKey(),msg.getKey()) &&
                    DataHelper.eq(getLeaseSet(),msg.getLeaseSet()) &&
                    DataHelper.eq(getRouterInfo(),msg.getRouterInfo()) &&
-                   DataHelper.eq(getValueType(),msg.getValueType());
+                   DataHelper.eq(getValueType(),msg.getValueType()) &&
+                   getReplyToken() == msg.getReplyToken() &&
+                   DataHelper.eq(getReplyTunnel(), msg.getReplyTunnel()) &&
+                   DataHelper.eq(getReplyGateway(), msg.getReplyGateway());
         } else {
             return false;
         }
@@ -167,6 +213,9 @@ public class DatabaseStoreMessage extends I2NPMessageImpl {
         buf.append("\n\tValue Type: ").append(getValueType());
         buf.append("\n\tRouter Info: ").append(getRouterInfo());
         buf.append("\n\tLease Set: ").append(getLeaseSet());
+        buf.append("\n\tReply token: ").append(getReplyToken());
+        buf.append("\n\tReply tunnel: ").append(getReplyTunnel());
+        buf.append("\n\tReply gateway: ").append(getReplyGateway());
         buf.append("]");
         return buf.toString();
     }

@@ -85,7 +85,7 @@ public class VMCommSystem extends CommSystemFacade {
             _from = from;
             _msg = msg;
             // bah, ueberspeed!  
-            //getTiming().setStartAfter(us.clock().now() + 50);
+            getTiming().setStartAfter(us.clock().now() + 200);
         }
         public void runJob() {
             I2NPMessageHandler handler = new I2NPMessageHandler(_ctx);
