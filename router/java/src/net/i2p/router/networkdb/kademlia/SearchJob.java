@@ -355,7 +355,7 @@ class SearchJob extends JobImpl {
      * @param expiration when the search should stop 
      */
     protected DatabaseLookupMessage buildMessage(TunnelId replyTunnelId, RouterInfo replyGateway, long expiration) {
-        DatabaseLookupMessage msg = new DatabaseLookupMessage(getContext());
+        DatabaseLookupMessage msg = new DatabaseLookupMessage(getContext(), true);
         msg.setSearchKey(_state.getTarget());
         msg.setFrom(replyGateway.getIdentity().getHash());
         msg.setDontIncludePeers(_state.getAttempted());
@@ -370,7 +370,7 @@ class SearchJob extends JobImpl {
      *
      */
     protected DatabaseLookupMessage buildMessage(long expiration) {
-        DatabaseLookupMessage msg = new DatabaseLookupMessage(getContext());
+        DatabaseLookupMessage msg = new DatabaseLookupMessage(getContext(), true);
         msg.setSearchKey(_state.getTarget());
         msg.setFrom(getContext().routerHash());
         msg.setDontIncludePeers(_state.getAttempted());

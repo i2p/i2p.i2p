@@ -43,17 +43,23 @@ public class DatabaseLookupMessage extends I2NPMessageImpl {
     private static final long LOOKUP_THROTTLE_MAX = 50;
     
     public DatabaseLookupMessage(I2PAppContext context) {
+        this(context, false);
+    }
+    public DatabaseLookupMessage(I2PAppContext context, boolean locallyCreated) {
         super(context);
         setSearchKey(null);
         setFrom(null);
         setDontIncludePeers(null);
         
         context.statManager().createRateStat("router.throttleNetDbDoSSend", "How many netDb lookup messages we are sending during a period with a DoS detected", "Throttle", new long[] { 60*1000, 10*60*1000, 60*60*1000, 24*60*60*1000 });
-                
-        // we do this in the writeMessage so we know that we have all the data
-        int dosCount = detectDoS(context);
-        if (dosCount > 0) {
-            _log.log(Log.CRIT, "Are we flooding the network with NetDb messages?  (" + dosCount + " messages so far)", new Exception("Flood cause"));
+    
+        // only check DoS generation if we are creating the message...
+        if (locallyCreated) {
+            // we do this in the writeMessage so we know that we have all the data
+            int dosCount = detectDoS(context);
+            if (dosCount > 0) {
+                _log.log(Log.CRIT, "Are we flooding the network with NetDb messages?  (" + dosCount + " messages so far)", new Exception("Flood cause"));
+            }
         }
     }
     

@@ -108,7 +108,7 @@ class HarvesterJob extends JobImpl {
      */
     private void harvest(Hash peer) {
         long now = getContext().clock().now();
-        DatabaseLookupMessage msg = new DatabaseLookupMessage(getContext());
+        DatabaseLookupMessage msg = new DatabaseLookupMessage(getContext(), true);
         msg.setFrom(getContext().routerHash());
         msg.setMessageExpiration(new Date(10*1000+now));
         msg.setSearchKey(peer);

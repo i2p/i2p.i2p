@@ -68,7 +68,7 @@ class ExploreJob extends SearchJob {
      * @param expiration when the search should stop
      */
     protected DatabaseLookupMessage buildMessage(TunnelId replyTunnelId, RouterInfo replyGateway, long expiration) {
-        DatabaseLookupMessage msg = new DatabaseLookupMessage(getContext());
+        DatabaseLookupMessage msg = new DatabaseLookupMessage(getContext(), true);
         msg.setSearchKey(getState().getTarget());
         msg.setFrom(replyGateway.getIdentity().getHash());
         msg.setDontIncludePeers(getState().getAttempted());
