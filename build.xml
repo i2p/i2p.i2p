@@ -238,7 +238,8 @@
             <fileset dir="installer/lib/wrapper/win32/" />
         </copy>
         <copy file="hosts.txt" todir="pkg-temp/" />
-        <copy file="readme.html" todir="pkg-temp/" />
+        <mkdir dir="pkg-temp/docs" />
+        <copy file="readme.html" todir="pkg-temp/docs/" />
     </target>
     <target name="tarball" depends="preppkg">
         <tar compression="bzip2" destfile="i2p.tar.bz2">

@@ -12,7 +12,7 @@
 
 <div class="main" id="main">
  <jsp:useBean class="net.i2p.router.web.ContentHelper" id="contenthelper" scope="request" />
- <jsp:setProperty name="contenthelper" property="page" value="readme.html" />
+ <jsp:setProperty name="contenthelper" property="page" value="docs/readme.html" />
  <jsp:setProperty name="contenthelper" property="maxLines" value="300" />
  <jsp:getProperty name="contenthelper" property="content" />
 </div>
