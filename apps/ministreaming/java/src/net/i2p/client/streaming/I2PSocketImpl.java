@@ -352,7 +352,9 @@ class I2PSocketImpl implements I2PSocket {
         }
 
         public int available() {
-            return bc.getCurrentSize();
+            synchronized (bc) {
+                return bc.getCurrentSize();
+            }
         }
 
         public void queueData(byte[] data) {
@@ -366,13 +368,13 @@ class I2PSocketImpl implements I2PSocket {
                 bc.append(data, off, len);
             }
             synchronized (I2PInputStream.this) {
-                notifyAll();
+                I2PInputStream.this.notifyAll();
             }
         }
 
-        public synchronized void notifyClosed() {
+        public void notifyClosed() {
             synchronized (I2PInputStream.this) {
-                notifyAll();
+                I2PInputStream.this.notifyAll();
             }
         }
         
