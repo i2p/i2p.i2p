@@ -44,23 +44,7 @@ public class I2PSocketOptions {
         _readTimeout = getInt(opts, PROP_READ_TIMEOUT, -1);
         _writeTimeout = getInt(opts, PROP_WRITE_TIMEOUT, DEFAULT_WRITE_TIMEOUT);
     }
-    /*
     
-    protected Properties getEnvProps() {
-        Properties rv = new Properties();
-        for (Iterator iter = System.getProperties().keySet().iterator(); iter.hasNext(); ) {
-            String name = (String)iter.next();
-            rv.setProperty(name, System.getProperty(name));
-        }
-        return rv;
-    }
-    
-    public static void main(String args[]) {
-        System.out.println("System props: " + System.getProperties());
-        System.out.println("Env props:    " + new I2PSocketOptions().getEnvProps());
-    }
-
-    */
     protected int getInt(Properties opts, String name, int defaultVal) {
         if (opts == null) return defaultVal;
         String val = opts.getProperty(name);
