@@ -372,15 +372,8 @@ class I2PSocketImpl implements I2PSocket {
             if (len != -1) {
                 bc.append(buffer, len);
             } else if (bcsize == 0) {
-                // nothing left in the buffer, but the read(..) didn't EOF (-1)
-                // this used to be 'break' (aka return false), though that seems
-                // odd to me - shouldn't it keep reading packets until EOF?  
-                // but perhaps there's something funky in the stream's operation,
-                // or some other dependency within the rest of the ministreaming
-                // lib, so for the moment, return false.  --jr
-                // --
-                // hehe, look at the else. This case is only used iff len == -1
-                // and bcsize == 0 (i.e. there is an EOF)  --mihi
+                // nothing left in the buffer, and read(..) got EOF (-1).
+                // the bart the
                 return false;
             }
             if ((bcsize < MAX_PACKET_SIZE) && (in.available() == 0)) {
