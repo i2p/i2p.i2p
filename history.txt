@@ -1,4 +1,9 @@
-$Id$
+$Id: history.txt,v 1.1 2004/09/02 15:00:28 jrandom Exp $
+
+2004-09-02  jrandom
+    * Cleaned up the base build.xml, adding a new target ("updater") which 
+      builds the file i2pupdate.tar.bz2 which can be safely extracted over 
+      existing installs.
 
 2004-xx-xx  jrandom
     * Implemented the new web architecture and router console
