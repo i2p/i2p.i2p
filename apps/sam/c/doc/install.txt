@@ -1,0 +1,32 @@
+=====================
+How to Install LibSAM
+=====================
+
+1) Be sure you have GNU Make installed.
+
+2) Find the Makefile for your operating system in the LibSAM root.  For example,
+if you are on FreeBSD, you'd use Makefile.freebsd.
+
+3) Run gmake with the -f option to build LibSAM.  For example, on FreeBSD, you'd
+run "gmake -f Makefile.freebsd".  On Linux, GNU Make is just called 'make', so
+you'd run "make -f Makefile.linux".
+
+4) If that worked, you can now try to compile some of the example programs.
+They are compiled in the same way as LibSAM, but the Makefile names are
+different.
+
+I2P-Ping should compile on any Unix system using the default Makefile.  It won't
+work on Win32, however, because Win32 doesn't have the getopt() function.
+
+The Warhammer example should run on any OS.  Use the Makefile.posix for Unix
+sytems or the Makefile.mingw for Win32.
+
+*** If you have trouble ***
+
+If you have trouble compiling LibSAM, try to edit the Makefiles to fix the
+problem.  The "Makefile.common" is shared by all systems, and you shouldn't have
+to touch it.  Just copy the Makefile of the OS most similar to your own and
+start hacking on it.  Send me a patch if you get it working.
+
+I realise this build system is horrible, and in the future I will probably
+replace it entirely.
