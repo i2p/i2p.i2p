@@ -726,6 +726,8 @@ public class TCPTransport extends TransportImpl {
                             return rv;
                         }
                     }
+                    // all of the messages refer to a connection being established
+                    try { _msgs.wait(); } catch (InterruptedException ie) {}
                 }
             }
         }
