@@ -309,6 +309,8 @@ class TCPConnection implements I2NPMessageReader.I2NPMessageEventListener {
         }
 
         if (slicesTooLong()) {
+            msg.timestamp("TCPTransport.addMessage noticed slices were taking too long");
+            
             if (_log.shouldLog(Log.ERROR)) {
                 long sliceTime = _context.clock().now()-_lastSliceRun;
                 _log.error("onAdd: Slices are taking too long (" + sliceTime 
