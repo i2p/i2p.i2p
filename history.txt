@@ -1,4 +1,14 @@
-$Id: history.txt,v 1.12 2004/09/07 17:13:12 jrandom Exp $
+$Id: history.txt,v 1.13 2004/09/08 02:25:09 hypercubus Exp $
+
+2004-09-07  hypercubus
+    * Bugfix: Running the installer as a non-privileged user on Red Hat (and
+      hopefully any other affected *nix systems) now properly discards non-
+      essential directories after installation.
+    * Support for Win9x in the installer and postinstall.bat.
+    * Changed the name of the default installation directory on all platforms
+      from "I2P" to "i2p" in the installer.
+    * Changed "wrapper.conf" to "wrapper.config" for naming consistency with the
+      other configuration files.
 
 2004-09-07  cervantes:
     * Proxy recursion disabled by default (strict)

@@ -185,7 +185,7 @@
         <copy file="installer/resources/systray.config" todir="pkg-temp/" />
         <!-- <copy file="installer/resources/uninstall_i2p_service_unix" todir="pkg-temp/" /> -->
         <copy file="installer/resources/uninstall_i2p_service_winnt.bat" todir="pkg-temp/" />
-        <copy file="installer/resources/wrapper.conf" todir="pkg-temp/" />
+        <copy file="installer/resources/wrapper.config" todir="pkg-temp/" />
         <copy todir="pkg-temp/lib/wrapper/freebsd/">
             <fileset dir="installer/lib/wrapper/freebsd/" />
         </copy>
@@ -228,7 +228,7 @@
         <copy file="build/routerconsole.war" todir="pkg-temp/webapps/" />
         <copy file="history.txt" todir="pkg-temp/" />
         <copy file="hosts.txt" todir="pkg-temp/" />
-        <copy file="installer/resources/wrapper.conf" todir="pkg-temp/" />        
+        <copy file="installer/resources/wrapper.config" todir="pkg-temp/" />        
         <tar compression="bzip2" destfile="i2pupdate.tar.bz2">
             <tarfileset dir="pkg-temp" includes="**/*" prefix="i2p" />
         </tar>

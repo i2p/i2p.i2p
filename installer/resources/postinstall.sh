@@ -56,8 +56,8 @@ esac
 cp $wrapperpath/wrapper.jar ./lib/
 cp $wrapperpath/i2psvc .
 chmod 744 ./i2psvc
-rm -rdf ./icons
-rm -rdf ./lib/wrapper
+rm -rf ./icons
+rm -rf ./lib/wrapper
 rm -f ./lib/*.dll
 rm -f ./*.bat
 ./i2prouter start
