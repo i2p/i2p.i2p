@@ -1,4 +1,6 @@
-$Id: history.txt,v 1.178 2005/03/23 21:38:10 jrandom Exp $
+$Id: history.txt,v 1.179 2005/03/23 22:18:16 jrandom Exp $
+
+* 2005-03-24  0.5.0.4 released
 
 2005-03-23  jrandom
     * Added more intelligent version checking in news.xml, in case we have a 

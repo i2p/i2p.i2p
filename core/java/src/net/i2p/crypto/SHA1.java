@@ -178,7 +178,7 @@ public final class SHA1 extends MessageDigest implements Cloneable {
      * java.security.MessageDigestSpi.
      * @param input  the array of bytes to use for the update.
      * @param offset  the offset to start from in the array of bytes.
-     * @param length  the number of bytes to use, starting at offset.
+     * @param len  the number of bytes to use, starting at offset.
      */
     public void engineUpdate(byte[] input, int offset, int len) {
         if (offset >= 0 && len >= 0 && offset + len <= input.length) {

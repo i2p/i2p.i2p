@@ -88,7 +88,7 @@ public class TCPTransport extends TransportImpl {
     
     /** Ordered list of supported I2NP protocols */
     public static final int[] SUPPORTED_PROTOCOLS = new int[] { 3
-                                                               };
+                                                              , 4}; // forward compat, to drop <= 0.5.0.3
     /** blah, people shouldnt use defaults... */
     public static final int DEFAULT_LISTEN_PORT = 8887;
     
