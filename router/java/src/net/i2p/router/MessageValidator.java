@@ -131,8 +131,10 @@ public class MessageValidator {
     }
     
     void shutdown() {
-        StringBuffer buf = new StringBuffer(1024);
-        buf.append("Validated messages: ").append(_receivedIds.size());
-        _log.log(Log.CRIT, buf.toString());
+        if (_log.shouldLog(Log.WARN)) {
+            StringBuffer buf = new StringBuffer(1024);
+            buf.append("Validated messages: ").append(_receivedIds.size());
+            _log.log(Log.WARN, buf.toString());
+        }
     }
 }

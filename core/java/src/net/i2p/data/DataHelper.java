@@ -24,12 +24,15 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
+import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
 import java.util.TreeMap;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 
 import net.i2p.util.OrderedProperties;
 
@@ -635,5 +638,63 @@ public class DataHelper {
         } finally {
             if (fis != null) try { fis.close(); } catch (IOException ioe) {}
         }
+    }
+    
+    public static boolean extractZip(File zipfile, File targetDir) {
+        try {
+            byte buf[] = new byte[16*1024];
+            ZipFile zip = new ZipFile(zipfile);
+            Enumeration entries = zip.entries();
+            while (entries.hasMoreElements()) {
+                ZipEntry entry = (ZipEntry)entries.nextElement();
+                if (entry.getName().indexOf("..") != -1) {
+                    System.err.println("ERROR: Refusing to extract a zip entry with '..' in it [" + entry.getName() + "]");
+                    return false;
+                }
+                File target = new File(targetDir, entry.getName());
+                File parent = target.getParentFile();
+                if ( (parent != null) && (!parent.exists()) ) {
+                    boolean parentsOk = parent.mkdirs();
+                    if (!parentsOk) {
+                        System.err.println("ERROR: Unable to create the parent dir for " + entry.getName() + ": [" + parent.getAbsolutePath() + "]");
+                        return false;
+                    }
+                }
+                if (entry.isDirectory()) {
+                    if (!target.exists()) {
+                        boolean created = target.mkdirs();
+                        if (!created) {
+                            System.err.println("ERROR: Unable to create the directory [" + entry.getName() + "]");
+                            return false;
+                        } else {
+                            System.err.println("INFO: Creating directory [" + entry.getName() + "]");
+                        }
+                    }
+                } else {
+                    try {
+                        InputStream in = zip.getInputStream(entry);
+                        FileOutputStream fos = new FileOutputStream(target);
+                        int read = 0;
+                        while ( (read = in.read(buf)) != -1) {
+                            fos.write(buf, 0, read);
+                        }
+                        fos.close();
+                        in.close();
+                        
+                        System.err.println("INFO: File [" + entry.getName() + "] extracted");
+                    } catch (IOException ioe) {
+                        System.err.println("ERROR: Error extracting the zip entry (" + entry.getName() + "]");
+                        ioe.printStackTrace();
+                        return false;
+                    }
+                }
+            }
+            zip.close();
+            return true;
+        } catch (IOException ioe) {
+            System.err.println("ERROR: Unable to extract the zip file");
+            ioe.printStackTrace();
+            return false;
+        } 
     }
 }

@@ -124,6 +124,14 @@ public class TransportManager implements TransportEventListener {
         return false;
     }
     
+    public int countActivePeers() { 
+        int peers = 0;
+        for (int i = 0; i < _transports.size(); i++) {
+            peers += ((Transport)_transports.get(i)).countActivePeers();
+        }
+        return peers;
+    }
+    
     public List getBids(OutNetMessage msg) {
         if (msg == null)
             throw new IllegalArgumentException("Null message?  no bidding on a null outNetMessage!");

@@ -23,7 +23,7 @@ rem
 :conf
 set _WRAPPER_CONF="%~f1"
 if not %_WRAPPER_CONF%=="" goto startup
-set _WRAPPER_CONF="%_REALPATH%wrapper.conf"
+set _WRAPPER_CONF="%_REALPATH%wrapper.config"
 
 rem
 rem Install the Wrapper as an NT service.

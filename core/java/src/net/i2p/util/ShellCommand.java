@@ -339,6 +339,20 @@ public class ShellCommand {
         return _outputStream;
     }
 
+    public static void main(String args[]) {
+        if (args.length <= 0) {
+            System.err.println("Usage: ShellCommand commandline");
+            return;
+        }
+        ShellCommand cmd = new ShellCommand();
+        StringBuffer command = new StringBuffer(64);
+        for (int i = 0; i < args.length; i++) {
+            command.append("\"").append(args[i]).append("\" ");
+        }
+        cmd.execute(command.toString());
+        return;
+    }
+    
     private boolean execute(String shellCommand, boolean consumeOutput, boolean waitForExitStatus) {
 
         StreamConsumer processStderrConsumer;

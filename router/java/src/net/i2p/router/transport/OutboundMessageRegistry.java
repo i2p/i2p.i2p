@@ -40,12 +40,14 @@ public class OutboundMessageRegistry {
     }
     
     public void shutdown() {
-        StringBuffer buf = new StringBuffer(1024);
-        buf.append("Pending messages: ").append(_pendingMessages.size()).append("\n");
-        for (Iterator iter = _pendingMessages.values().iterator(); iter.hasNext(); ) {
-            buf.append(iter.next().toString()).append("\n\t");
+        if (_log.shouldLog(Log.WARN)) {
+            StringBuffer buf = new StringBuffer(1024);
+            buf.append("Pending messages: ").append(_pendingMessages.size()).append("\n");
+            for (Iterator iter = _pendingMessages.values().iterator(); iter.hasNext(); ) {
+                buf.append(iter.next().toString()).append("\n\t");
+            }
+            _log.log(Log.WARN, buf.toString());
         }
-        _log.log(Log.CRIT, buf.toString());
     }
     
     /**

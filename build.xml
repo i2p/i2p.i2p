@@ -176,6 +176,7 @@
         <copy file="installer/resources/clients.config" todir="pkg-temp/" />
         <copy file="installer/resources/i2prouter" todir="pkg-temp/" />
         <copy file="installer/resources/i2prouter.bat" todir="pkg-temp/" />
+        <copy file="installer/resources/i2prouter_win9x.bat" todir="pkg-temp/" />
         <copy file="installer/resources/i2ptunnel.config" todir="pkg-temp/" />
         <!-- <copy file="installer/resources/install_i2p_service_unix" todir="pkg-temp/" /> -->
         <copy file="installer/resources/install_i2p_service_winnt.bat" todir="pkg-temp/" />
@@ -228,10 +229,13 @@
         <copy file="build/routerconsole.war" todir="pkg-temp/webapps/" />
         <copy file="history.txt" todir="pkg-temp/" />
         <copy file="hosts.txt" todir="pkg-temp/" />
-        <copy file="installer/resources/wrapper.config" todir="pkg-temp/" />        
-        <tar compression="bzip2" destfile="i2pupdate.tar.bz2">
-            <tarfileset dir="pkg-temp" includes="**/*" prefix="i2p" />
-        </tar>
+        <copy file="installer/resources/install_i2p_service_winnt.bat" todir="pkg-temp/" />
+        <copy file="installer/resources/uninstall_i2p_service_winnt.bat" todir="pkg-temp/" />
+        <copy file="installer/resources/i2prouter" todir="pkg-temp/" />
+        <copy file="installer/resources/i2prouter.bat" todir="pkg-temp/" />
+        <copy file="installer/resources/i2prouter_win9x.bat" todir="pkg-temp/" />
+        <copy file="installer/resources/wrapper.config" todir="pkg-temp/" />
+        <zip destfile="i2pupdate.zip" basedir="pkg-temp" />
     </target>
     <taskdef name="izpack" classpath="${basedir}/installer/lib/izpack/standalone-compiler.jar" classname="com.izforge.izpack.ant.IzPackTask" />
     <target name="installer" depends="preppkg">

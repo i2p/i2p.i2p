@@ -25,6 +25,8 @@ public abstract class CommSystemFacade implements Service {
     
     /** Create the set of RouterAddress structures based on the router's config */
     public Set createAddresses() { return new HashSet(); }
+    
+    public int countActivePeers() { return 0; }
 }
 
 class DummyCommSystemFacade extends CommSystemFacade {

@@ -251,39 +251,41 @@ public class JobQueue {
     
     void shutdown() { 
         _alive = false; 
-        StringBuffer buf = new StringBuffer(1024);
-        buf.append("current jobs: \n");
-        for (Iterator iter = _queueRunners.values().iterator(); iter.hasNext(); ) {
-            JobQueueRunner runner = (JobQueueRunner)iter.next();
-            Job j = runner.getCurrentJob();
-            
-            buf.append("Runner ").append(runner.getRunnerId()).append(": ");
-            if (j == null) {
-                buf.append("no current job ");
-            } else {
-                buf.append(j.toString());
-                buf.append(" started ").append(_context.clock().now() - j.getTiming().getActualStart());
-                buf.append("ms ago");
+        if (_log.shouldLog(Log.WARN)) {
+            StringBuffer buf = new StringBuffer(1024);
+            buf.append("current jobs: \n");
+            for (Iterator iter = _queueRunners.values().iterator(); iter.hasNext(); ) {
+                JobQueueRunner runner = (JobQueueRunner)iter.next();
+                Job j = runner.getCurrentJob();
+
+                buf.append("Runner ").append(runner.getRunnerId()).append(": ");
+                if (j == null) {
+                    buf.append("no current job ");
+                } else {
+                    buf.append(j.toString());
+                    buf.append(" started ").append(_context.clock().now() - j.getTiming().getActualStart());
+                    buf.append("ms ago");
+                }
+
+                j = runner.getLastJob();
+                if (j == null) {
+                    buf.append("no last job");
+                } else {
+                    buf.append(j.toString());
+                    buf.append(" started ").append(_context.clock().now() - j.getTiming().getActualStart());
+                    buf.append("ms ago and finished ");
+                    buf.append(_context.clock().now() - j.getTiming().getActualEnd());
+                    buf.append("ms ago");
+                }
             }
-            
-            j = runner.getLastJob();
-            if (j == null) {
-                buf.append("no last job");
-            } else {
-                buf.append(j.toString());
-                buf.append(" started ").append(_context.clock().now() - j.getTiming().getActualStart());
-                buf.append("ms ago and finished ");
-                buf.append(_context.clock().now() - j.getTiming().getActualEnd());
-                buf.append("ms ago");
-            }
+            buf.append("\nready jobs: ").append(_readyJobs.size()).append("\n\t");
+            for (int i = 0; i < _readyJobs.size(); i++) 
+                buf.append(_readyJobs.get(i).toString()).append("\n\t");
+            buf.append("\n\ntimed jobs: ").append(_timedJobs.size()).append("\n\t");
+            for (int i = 0; i < _timedJobs.size(); i++) 
+                buf.append(_timedJobs.get(i).toString()).append("\n\t");
+            _log.log(Log.WARN, buf.toString());
         }
-        buf.append("\nready jobs: ").append(_readyJobs.size()).append("\n\t");
-        for (int i = 0; i < _readyJobs.size(); i++) 
-            buf.append(_readyJobs.get(i).toString()).append("\n\t");
-        buf.append("\n\ntimed jobs: ").append(_timedJobs.size()).append("\n\t");
-        for (int i = 0; i < _timedJobs.size(); i++) 
-            buf.append(_timedJobs.get(i).toString()).append("\n\t");
-        _log.log(Log.CRIT, buf.toString());
     }
     boolean isAlive() { return _alive; }
     

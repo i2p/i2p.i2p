@@ -716,8 +716,30 @@ public class Router {
     }
     
     public static void main(String args[]) {
+        installUpdates();
         Router r = new Router();
         r.runRouter();
+    }
+    
+    private static final String UPDATE_FILE = "i2pupdate.zip";
+    
+    private static void installUpdates() {
+        File updateFile = new File(UPDATE_FILE);
+        if (updateFile.exists()) {
+            System.out.println("INFO: Update file exists [" + UPDATE_FILE + "] - installing");
+            boolean ok = DataHelper.extractZip(updateFile, new File("."));
+            if (ok)
+                System.out.println("INFO: Update installed");
+            else
+                System.out.println("ERROR: Update failed!");
+            boolean deleted = updateFile.delete();
+            if (!deleted) {
+                System.out.println("ERROR: Unable to delete the update file!");
+                updateFile.deleteOnExit();
+            }
+            System.out.println("INFO: Restarting after update");
+            System.exit(EXIT_HARD_RESTART);
+        }
     }
     
     private static String getPingFile(Properties envProps) {

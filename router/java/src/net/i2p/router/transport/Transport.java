@@ -37,5 +37,7 @@ public interface Transport {
     public void setListener(TransportEventListener listener);
     public String getStyle();
     
+    public int countActivePeers();
+    
     public String renderStatusHTML();
 }

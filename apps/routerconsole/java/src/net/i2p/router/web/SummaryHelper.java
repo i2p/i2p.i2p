@@ -78,10 +78,20 @@ public class SummaryHelper {
     }
     
     /**
-     * How many active peers the router has.
+     * How many peers we are talking to now
      *
      */
     public int getActivePeers() { 
+        if (_context == null) 
+            return 0;
+        else
+            return _context.commSystem().countActivePeers();
+    }
+    /**
+     * How many active identities have we spoken with recently
+     *
+     */
+    public int getActiveProfiles() { 
         if (_context == null) 
             return 0;
         else

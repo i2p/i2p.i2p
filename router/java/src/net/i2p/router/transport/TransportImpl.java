@@ -52,6 +52,8 @@ public abstract class TransportImpl implements Transport {
         _currentAddresses = new HashSet();
     }
     
+    public int countActivePeers() { return 0; }
+    
     public OutNetMessage getNextMessage() {
         OutNetMessage msg = null;
         synchronized (_sendPool) {

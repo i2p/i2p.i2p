@@ -103,6 +103,13 @@ public class TCPTransport extends TransportImpl {
     SigningPrivateKey getMySigningKey() { return _context.keyManager().getSigningPrivateKey(); }
     int getListenPort() { return _listenPort; }
     
+    
+    public int countActivePeers() { 
+        synchronized (_connections) {
+            return _connections.size(); 
+        }
+    }
+    
     /** fetch all of our TCP listening addresses */
     TCPAddress[] getMyAddresses() {
         if (_address != null) {

@@ -1,4 +1,17 @@
-$Id: history.txt,v 1.14 2004/09/08 17:05:35 hypercubus Exp $
+$Id: history.txt,v 1.15 2004/09/08 17:15:43 hypercubus Exp $
+
+* 2004-09-08  0.4.0.1 released
+
+2004-09-08  jrandom
+    * Updated the "Active:" peer count to display the # of connections as well
+      as the number of recently active router identities.
+    * Implement some basic updating code - on startup, if there is a file named 
+      "i2pupdate.zip" in the I2P installation directory, extract it, delete it,
+      then restart.
+    * Added an ugly little script to allow launching the router on win9x 
+      machines without a dos box (using javaw to run a .bat file).
+    * Logging updates.
+    * Updated VERSION constants to 0.4.0.1
 
 2004-09-08  hypercubus
     * Bugfix: Running the installer as a non-privileged user on Red Hat (and

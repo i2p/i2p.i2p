@@ -52,6 +52,8 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
             _manager.restart();
     }
     
+    public int countActivePeers() { return _manager.countActivePeers(); }
+    
     public List getBids(OutNetMessage msg) {
         return _manager.getBids(msg);
     }
