@@ -8,7 +8,7 @@ import java.util.Random;
 import java.util.StringTokenizer;
 
 /**
- * Uuuugly... generate the edit/add forms for the various 
+ * Uuuugly code to generate the edit/add forms for the various 
  * I2PTunnel types (httpclient/client/server)
  *
  */

@@ -234,7 +234,7 @@ class I2PSocketImpl implements I2PSocket {
     }
 
     /**
-     * Close the socket from the I2P side, e. g. by a close packet.
+     * Close the socket from the I2P side (by a close packet)
      */
     protected void internalClose() {
         synchronized (flagLock) {
