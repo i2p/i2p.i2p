@@ -82,32 +82,24 @@ public class PacketLocal extends Packet implements MessageOutputStream.WriteStat
         _numSends++;
         _lastSend = _context.clock().now();
     }
-    public void ackReceived() { 
-        ByteArray ba = null;
+    public void ackReceived() {
         synchronized (this) {
             if (_ackOn <= 0)
-                _ackOn = _context.clock().now(); 
-            ba = getPayload();
-            setPayload(null);
+                _ackOn = _context.clock().now();
+            releasePayload();
             notifyAll();
         }
         SimpleTimer.getInstance().removeEvent(_resendEvent);
-        if (ba != null)
-            _cache.release(ba);
     }
     public void cancelled() { 
-        ByteArray ba = null;
         synchronized (this) {
             _cancelledOn = _context.clock().now();
-            ba = getPayload();
-            setPayload(null);
+            releasePayload();
             notifyAll();
         }
         SimpleTimer.getInstance().removeEvent(_resendEvent);
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Cancelled! " + toString(), new Exception("cancelled"));
-        if (ba != null)
-            _cache.release(ba);
     }
     
     /** how long after packet creation was it acked? */
@@ -144,10 +136,12 @@ public class PacketLocal extends Packet implements MessageOutputStream.WriteStat
         int window = _connection.getOptions().getWindowSize();
         boolean accepted = _connection.packetSendChoke(maxWaitMs);
         long after = _context.clock().now();
-        if (accepted)
+        if (accepted) {
             _acceptedOn = after;
-        else
+        } else {
             _acceptedOn = -1;
+            releasePayload();
+        }
         int afterQueued = _connection.getUnackedPacketsSent();
         if ( (after - before > 1000) && (_log.shouldLog(Log.DEBUG)) )
             _log.debug("Took " + (after-before) + "ms to get " 
@@ -162,11 +156,11 @@ public class PacketLocal extends Packet implements MessageOutputStream.WriteStat
         long expiration = _context.clock().now()+maxWaitMs;
         while (true) {
             long timeRemaining = expiration - _context.clock().now();
-            if ( (timeRemaining <= 0) && (maxWaitMs > 0) ) return;
+            if ( (timeRemaining <= 0) && (maxWaitMs > 0) ) break;
             try {
                 synchronized (this) {
-                    if (_ackOn > 0) return;
-                    if (_cancelledOn > 0) return;
+                    if (_ackOn > 0) break;
+                    if (_cancelledOn > 0) break;
                     if (timeRemaining > 60*1000)
                         timeRemaining = 60*1000;
                     else if (timeRemaining <= 0)
@@ -175,6 +169,8 @@ public class PacketLocal extends Packet implements MessageOutputStream.WriteStat
                 }
             } catch (InterruptedException ie) {}
         }
+        if (!writeSuccessful())
+            releasePayload();
     }
     
     public boolean writeAccepted() { return _acceptedOn > 0 && _cancelledOn <= 0; }

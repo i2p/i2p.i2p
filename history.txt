@@ -1,4 +1,16 @@
-$Id: history.txt,v 1.156 2005/02/24 13:05:26 jrandom Exp $
+$Id: history.txt,v 1.157 2005/02/24 18:53:35 jrandom Exp $
+
+2005-02-26  jrandom
+    * Further streaming lib caching improvements
+    * Reduce the minimum RTT (used to calculate retry timeouts), but also 
+      increase the RTT on resends.
+    * Lower the default message size to 4KB from 16KB to further reduce the
+      chance of failed fragmentation.
+    * Extend tunnel rebuild throttling to include fallback rebuilds
+    * If there are less than 20 routers known, don't drop the last 20 (to help
+      avoid dropping all peers under catastrophic failures)
+    * New stats for end to end messages - "client.leaseSetFoundLocally",
+      "client.leaseSetFoundRemoteTime", and "client.leaseSetFailedRemoteTime"
 
 2005-02-24  jrandom
     * Throttle the number of tunnel rebuilds per minute, preventing CPU 

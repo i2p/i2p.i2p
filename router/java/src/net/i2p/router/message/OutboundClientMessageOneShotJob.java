@@ -62,6 +62,7 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
     private long _cloveId;
     private long _start;
     private boolean _finished;
+    private long _leaseSetLookupBegin;
     
     /**
      * final timeout (in milliseconds) that the outbound message will fail in.
@@ -110,13 +111,16 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
         ctx.statManager().createRateStat("client.timeoutCongestionTunnel", "How lagged our tunnels are when a send times out?", "ClientMessages", new long[] { 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
         ctx.statManager().createRateStat("client.timeoutCongestionMessage", "How fast we process messages locally when a send times out?", "ClientMessages", new long[] { 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
         ctx.statManager().createRateStat("client.timeoutCongestionInbound", "How much faster we are receiving data than our average bps when a send times out?", "ClientMessages", new long[] { 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
-
+        ctx.statManager().createRateStat("client.leaseSetFoundLocally", "How often we tried to look for a leaseSet and found it locally?", "ClientMessages", new long[] { 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
+        ctx.statManager().createRateStat("client.leaseSetFoundRemoteTime", "How long we tried to look fora remote leaseSet (when we succeeded)?", "ClientMessages", new long[] { 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
+        ctx.statManager().createRateStat("client.leaseSetFailedRemoteTime", "How long we tried to look for a remote leaseSet (when we failed)?", "ClientMessages", new long[] { 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
         long timeoutMs = OVERALL_TIMEOUT_MS_DEFAULT;
         _clientMessage = msg;
         _clientMessageId = msg.getMessageId();
         _clientMessageSize = msg.getPayload().getSize();
         _from = msg.getFromDestination();
         _to = msg.getDestination();
+        _leaseSetLookupBegin = -1;
         
         String param = msg.getSenderConfig().getOptions().getProperty(OVERALL_TIMEOUT_MS_PARAM);
         if (param == null)
@@ -154,9 +158,15 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
         LookupLeaseSetFailedJob failed = new LookupLeaseSetFailedJob(getContext());
         if (_log.shouldLog(Log.DEBUG))
             _log.debug(getJobId() + ": Send outbound client message - sending off leaseSet lookup job");
-        getContext().netDb().lookupLeaseSet(key, success, failed, timeoutMs);
-        if (_log.shouldLog(Log.DEBUG))
-            _log.debug(getJobId() + ": after sending off leaseSet lookup job");
+        LeaseSet ls = getContext().netDb().lookupLeaseSetLocally(key);
+        if (ls != null) {
+            getContext().statManager().addRateData("client.leaseSetFoundLocally", 1, 0);
+            _leaseSetLookupBegin = -1;
+            success.runJob();
+        } else {
+            _leaseSetLookupBegin = getContext().clock().now();
+            getContext().netDb().lookupLeaseSet(key, success, failed, timeoutMs);
+        }
     }
     
     private boolean getShouldBundle() {
@@ -189,6 +199,10 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
         }
         public String getName() { return "Send outbound client message through the lease"; }
         public void runJob() {
+            if (_leaseSetLookupBegin > 0) {
+                long lookupTime = getContext().clock().now() - _leaseSetLookupBegin;
+                getContext().statManager().addRateData("client.leaseSetFoundRemoteTime", lookupTime, lookupTime);
+            }
             boolean ok = getNextLease();
             if (ok)
                 send();
@@ -262,7 +276,12 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
             super(enclosingContext);
         }
         public String getName() { return "Lookup for outbound client message failed"; }
-        public void runJob() { 
+        public void runJob() {
+            if (_leaseSetLookupBegin > 0) {
+                long lookupTime = getContext().clock().now() - _leaseSetLookupBegin;
+                getContext().statManager().addRateData("client.leaseSetFailedRemoteTime", lookupTime, lookupTime);
+            }
+
             dieFatal();
         }
     }

@@ -155,12 +155,14 @@ public class PacketHandler {
                     if (_log.shouldLog(Log.WARN))
                         _log.warn("Receive a syn packet with the wrong IDs, sending reset: " + packet);
                     sendReset(packet);
+                    packet.releasePayload();
                 } else {
                     if (!con.getResetSent()) {
                         // someone is sending us a packet on the wrong stream 
                         if (_log.shouldLog(Log.WARN))
                             _log.warn("Received a packet on the wrong stream: " + packet + " connection: " + con);
                     }
+                    packet.releasePayload();
                 }
             }
         }
@@ -187,6 +189,7 @@ public class PacketHandler {
                 if (_log.shouldLog(Log.WARN))
                     _log.warn("Echo packet received with no stream IDs: " + packet);
             }
+            packet.releasePayload();
         } else {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Packet received on an unknown stream (and not an ECHO): " + packet);
@@ -221,6 +224,7 @@ public class PacketHandler {
                               + buf.toString() + " sendId: " 
                               + (sendId != null ? Base64.encode(sendId) : " unknown"));
                 }
+                packet.releasePayload();
             }
         }
     }

@@ -115,8 +115,8 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
     public final static String PROP_DB_DIR = "router.networkDatabase.dbDir";
     public final static String DEFAULT_DB_DIR = "netDb";
     
-    /** if we have less than 5 routers left, don't drop any more, even if they're failing or doing bad shit */
-    private final static int MIN_REMAINING_ROUTERS = 5;
+    /** if we have less than 20 routers left, don't drop any more, even if they're failing or doing bad shit */
+    private final static int MIN_REMAINING_ROUTERS = 20;
     
     /** 
      * dont accept any dbDtore of a router over 6 hours old (unless we dont 

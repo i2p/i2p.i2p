@@ -77,7 +77,7 @@ public class SimpleTimer {
             totalEvents = _events.size();
             _events.notifyAll();
         }
-        if (time.longValue() > eventTime + 5) {
+        if (time.longValue() > eventTime + 100) {
             if (_log.shouldLog(Log.ERROR))
                 _log.error("Lots of timer congestion, had to push " + event + " back "
                            + (time.longValue()-eventTime) + "ms (# events: " + totalEvents + ")");

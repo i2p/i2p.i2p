@@ -81,7 +81,7 @@ public class ConnectionOptions extends I2PSocketOptionsImpl {
         super.init(opts);
         setConnectDelay(getInt(opts, PROP_CONNECT_DELAY, -1));
         setProfile(getInt(opts, PROP_PROFILE, PROFILE_BULK));
-        setMaxMessageSize(getInt(opts, PROP_MAX_MESSAGE_SIZE, 16*1024));
+        setMaxMessageSize(getInt(opts, PROP_MAX_MESSAGE_SIZE, 4*1024));
         setRTT(getInt(opts, PROP_INITIAL_RTT, 30*1000));
         setReceiveWindow(getInt(opts, PROP_INITIAL_RECEIVE_WINDOW, 1));
         setResendDelay(getInt(opts, PROP_INITIAL_RESEND_DELAY, 1000));

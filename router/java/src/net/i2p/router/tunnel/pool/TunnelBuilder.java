@@ -37,9 +37,6 @@ public class TunnelBuilder {
         
         PooledTunnelCreatorConfig cfg = configTunnel(ctx, pool, zeroHop);
         if (cfg == null) {
-            RetryJob j = new RetryJob(ctx, pool);
-            j.getTiming().setStartAfter(ctx.clock().now() + ctx.random().nextInt(30*1000));
-            ctx.jobQueue().addJob(j);
             return;
         }
         OnCreatedJob onCreated = new OnCreatedJob(ctx, pool, cfg);

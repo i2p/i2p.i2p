@@ -338,8 +338,8 @@ public class TunnelPool {
             _log.info(toString() + ": building a fallback tunnel (usable: " + usable + " needed: " + quantity + ")");
         if ( (usable == 0) && (_settings.getAllowZeroHop()) )
             _builder.buildTunnel(_context, this, true);
-        else
-            _builder.buildTunnel(_context, this);
+        //else
+        //    _builder.buildTunnel(_context, this);
         refreshBuilders();
     }
     
@@ -433,7 +433,7 @@ public class TunnelPool {
             if (!_alive) return;
             int added = refreshBuilders();
             if ( (added > 0) && (_log.shouldLog(Log.WARN)) )
-                _log.warn("Passive rebuilding a tunnel");
+                _log.warn("Passive rebuilding a tunnel for " + TunnelPool.this.toString());
             requeue(60*1000);
         }
     }

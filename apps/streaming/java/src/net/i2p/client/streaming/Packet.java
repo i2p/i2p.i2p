@@ -209,12 +209,19 @@ public class Packet {
     /** get the actual payload of the message.  may be null */
     public ByteArray getPayload() { return _payload; }
     public void setPayload(ByteArray payload) { 
+        if ( (_payload != null) && (_payload != payload) )
+            _cache.release(_payload);
         _payload = payload; 
         if ( (payload != null) && (payload.getValid() > MAX_PAYLOAD_SIZE) )
             throw new IllegalArgumentException("Too large payload: " + payload.getValid());
     }
     public int getPayloadSize() {
         return (_payload == null ? 0 : _payload.getValid());
+    }
+    public void releasePayload() {
+        if (_payload != null)
+            _cache.release(_payload);
+        _payload = null;
     }
 
     /** is a particular flag set on this packet? */

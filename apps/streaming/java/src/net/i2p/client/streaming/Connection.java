@@ -76,7 +76,7 @@ public class Connection {
     private long _lifetimeDupMessageReceived;
     
     public static final long MAX_RESEND_DELAY = 60*1000;
-    public static final long MIN_RESEND_DELAY = 20*1000;
+    public static final long MIN_RESEND_DELAY = 10*1000;
 
     /** wait up to 5 minutes after disconnection so we can ack/close packets */
     public static int DISCONNECT_TIMEOUT = 5*60*1000;
@@ -870,6 +870,8 @@ public class Connection {
                             _log.warn("Congestion resending packet " + _packet.getSequenceNum() + ": new windowSize " + newWindowSize 
                                       + ") for " + Connection.this.toString());
 
+                        // setRTT has its own ceiling
+                        getOptions().setRTT(getOptions().getRTT() + 30*1000);
                         getOptions().setWindowSize(newWindowSize);
                         windowAdjusted();
                     }

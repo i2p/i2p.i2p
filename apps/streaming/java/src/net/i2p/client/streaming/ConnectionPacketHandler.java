@@ -77,7 +77,7 @@ public class ConnectionPacketHandler {
                           + ": dropping " + packet);
             ack(con, packet.getAckThrough(), packet.getNacks(), null, false);
             con.getOptions().setChoke(5*1000);
-            _cache.release(packet.getPayload());
+            packet.releasePayload();
             return;
         }
         con.getOptions().setChoke(0);
@@ -219,6 +219,8 @@ public class ConnectionPacketHandler {
                            + con.getLastCongestionSeenAt() + " (#resends: " + numResends 
                            + ") for " + con);
 
+            // setRTT has its own ceiling
+            con.getOptions().setRTT(con.getOptions().getRTT() + 30*1000);
             con.getOptions().setWindowSize(oldSize);
             
             congested = true;

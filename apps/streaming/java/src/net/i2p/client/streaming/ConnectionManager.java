@@ -328,6 +328,7 @@ public class ConnectionManager {
         }
         
         _outboundQueue.enqueue(packet);
+        packet.releasePayload();
         
         if (blocking) {
             synchronized (req) {

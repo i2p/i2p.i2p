@@ -25,7 +25,6 @@ class PacketQueue {
     private I2PSession _session;
     private ConnectionManager _connectionManager;
     private ByteCache _cache = ByteCache.getInstance(64, 36*1024);
-    private ByteCache _packetCache = ByteCache.getInstance(128, Packet.MAX_PAYLOAD_SIZE);
     
     public PacketQueue(I2PAppContext context, I2PSession session, ConnectionManager mgr) {
         _context = context;
@@ -129,7 +128,13 @@ class PacketQueue {
         
         if ( (packet.getSequenceNum() == 0) && (!packet.isFlagSet(Packet.FLAG_SYNCHRONIZE)) ) {
             // ack only, so release it asap
-            _packetCache.release(packet.getPayload());
+            packet.releasePayload();
+        } else if (packet.isFlagSet(Packet.FLAG_ECHO) && !packet.isFlagSet(Packet.FLAG_SIGNATURE_INCLUDED) ) {
+            // pong
+            packet.releasePayload();
+        } else if (packet.isFlagSet(Packet.FLAG_RESET)) {
+            // reset
+            packet.releasePayload();
         }
     }
     
