@@ -1,5 +1,8 @@
 package net.i2p.router.admin;
 
+import java.io.IOException;
+import java.io.OutputStream;
+
 import net.i2p.router.RouterContext;
 import net.i2p.router.Service;
 import net.i2p.util.I2PThread;
@@ -18,7 +21,7 @@ public class AdminManager implements Service {
         _log = context.logManager().getLog(AdminManager.class);
     }
     
-    public String renderStatusHTML() { return ""; }
+    public void renderStatusHTML(OutputStream out) { }
     
     public void shutdown() {
         if (_listener != null) {

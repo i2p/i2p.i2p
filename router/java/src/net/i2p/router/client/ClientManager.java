@@ -8,6 +8,9 @@ package net.i2p.router.client;
  *
  */
 
+import java.io.IOException;
+import java.io.OutputStream;
+
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -305,8 +308,8 @@ public class ClientManager {
         }
     }
     
-    public String renderStatusHTML() {
-        StringBuffer buf = new StringBuffer();
+    public void renderStatusHTML(OutputStream out) throws IOException {
+        StringBuffer buf = new StringBuffer(8*1024);
         buf.append("<h2>Clients</h2><ul>");
         Map runners = null;
         synchronized (_runners) {
@@ -325,7 +328,7 @@ public class ClientManager {
             buf.append(runner.getLeaseSet()).append("</pre>\n");
         }
         buf.append("</ul>\n");
-        return buf.toString();
+        out.write(buf.toString().getBytes());
     }
     
     public void messageReceived(ClientMessage msg) {

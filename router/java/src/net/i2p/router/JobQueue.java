@@ -8,6 +8,9 @@ package net.i2p.router;
  *
  */
 
+import java.io.IOException;
+import java.io.OutputStream;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -534,7 +537,7 @@ public class JobQueue {
     // the remainder are utility methods for dumping status info
     ////
     
-    public String renderStatusHTML() {
+    public void renderStatusHTML(OutputStream out) throws IOException {
         ArrayList readyJobs = null;
         ArrayList timedJobs = null;
         ArrayList activeJobs = new ArrayList(1);
@@ -553,7 +556,8 @@ public class JobQueue {
                 }
             }
         }
-        StringBuffer buf = new StringBuffer(20*1024);
+        
+        StringBuffer buf = new StringBuffer(32*1024);
         buf.append("<h2>JobQueue</h2>");
         buf.append("# runners: ");
         synchronized (_queueRunners) {
@@ -597,13 +601,12 @@ public class JobQueue {
             buf.append(new Date(j.getTiming().getStartAfter())).append("</li>\n");
         }
         buf.append("</ol>\n");
-        buf.append(getJobStats());
-        return buf.toString();
+        getJobStats(buf);
+        out.write(buf.toString().getBytes());
     }
     
     /** render the HTML for the job stats */
-    private String getJobStats() { 
-        StringBuffer buf = new StringBuffer(16*1024);
+    private void getJobStats(StringBuffer buf) { 
         buf.append("<table border=\"1\">\n");
         buf.append("<tr><td><b>Job</b></td><td><b>Runs</b></td>");
         buf.append("<td><b>Time</b></td><td><b><i>Avg</i></b></td><td><b><i>Max</i></b></td><td><b><i>Min</i></b></td>");
@@ -672,6 +675,5 @@ public class JobQueue {
         buf.append("</tr>\n");
 	
         buf.append("</table>\n");
-        return buf.toString();
     }
 }

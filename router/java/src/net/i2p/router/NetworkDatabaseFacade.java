@@ -8,6 +8,9 @@ package net.i2p.router;
  *
  */
 
+import java.io.IOException;
+import java.io.OutputStream;
+
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -44,7 +47,6 @@ public abstract class NetworkDatabaseFacade implements Service {
     public abstract void publish(LeaseSet localLeaseSet);
     public abstract void unpublish(LeaseSet localLeaseSet);
     public abstract void fail(Hash dbEntry);
-    public String renderStatusHTML() { return ""; }
 }
 
 
@@ -84,4 +86,6 @@ class DummyNetworkDatabaseFacade extends NetworkDatabaseFacade {
     public void fail(Hash dbEntry) {}    
     
     public Set findNearestRouters(Hash key, int maxNumRouters, Set peersToIgnore) { return new HashSet(_routers.values()); }
+
+    public void renderStatusHTML(OutputStream out) throws IOException {}
 }

@@ -10,6 +10,7 @@ package net.i2p.router;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.text.DecimalFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -220,34 +221,32 @@ public class Router {
         _context.inNetMessagePool().registerHandlerJobBuilder(SourceRouteReplyMessage.MESSAGE_TYPE, new SourceRouteReplyMessageHandler(_context));
     }
     
-    public String renderStatusHTML() {
-        StringBuffer buf = new StringBuffer();
-        buf.append("<html><head><title>I2P Router Console</title></head><body>\n");
-        buf.append("<h1>Router console</h1>\n");
-        buf.append("<i><a href=\"/routerConsole.html\">console</a> | <a href=\"/routerStats.html\">stats</a></i><br>\n");
+    public void renderStatusHTML(OutputStream out) throws IOException {
+        out.write(("<html><head><title>I2P Router Console</title></head><body>\n" + 
+                   "<h1>Router console</h1>\n" +
+                   "<i><a href=\"/routerConsole.html\">console</a> | <a href=\"/routerStats.html\">stats</a></i><br>\n" +
+                   "<form action=\"/routerConsole.html\">" +
+                   "<select name=\"go\" onChange='location.href=this.value'>" +
+                   "<option value=\"/routerConsole.html#bandwidth\">Bandwidth</option>\n" +
+                   "<option value=\"/routerConsole.html#clients\">Clients</option>\n" +
+                   "<option value=\"/routerConsole.html#transports\">Transports</option>\n" +
+                   "<option value=\"/routerConsole.html#profiles\">Peer Profiles</option>\n" +
+                   "<option value=\"/routerConsole.html#tunnels\">Tunnels</option>\n" +
+                   "<option value=\"/routerConsole.html#jobs\">Jobs</option>\n" +
+                   "<option value=\"/routerConsole.html#shitlist\">Shitlist</option>\n" +
+                   "<option value=\"/routerConsole.html#pending\">Pending messages</option>\n" +
+                   "<option value=\"/routerConsole.html#netdb\">Network Database</option>\n" +
+                   "<option value=\"/routerConsole.html#logs\">Log messages</option>\n" +
+                   "</select>" +"</form>" +
+                   "<form action=\"/shutdown\" method=\"GET\">" +
+                   "<b>Shut down the router:</b>" +
+                   "<input type=\"password\" name=\"password\" size=\"8\" />" +
+                   "<input type=\"submit\" value=\"shutdown!\" />" +
+                   "</form>" +
+                   "<hr />\n").getBytes());
 
-        buf.append("<form action=\"/routerConsole.html\">");
-        buf.append("<select name=\"go\" onChange='location.href=this.value'>");
-        buf.append("<option value=\"/routerConsole.html#bandwidth\">Bandwidth</option>\n");
-        buf.append("<option value=\"/routerConsole.html#clients\">Clients</option>\n");
-        buf.append("<option value=\"/routerConsole.html#transports\">Transports</option>\n");
-        buf.append("<option value=\"/routerConsole.html#profiles\">Peer Profiles</option>\n");
-        buf.append("<option value=\"/routerConsole.html#tunnels\">Tunnels</option>\n");
-        buf.append("<option value=\"/routerConsole.html#jobs\">Jobs</option>\n");
-        buf.append("<option value=\"/routerConsole.html#shitlist\">Shitlist</option>\n");
-        buf.append("<option value=\"/routerConsole.html#pending\">Pending messages</option>\n");
-        buf.append("<option value=\"/routerConsole.html#netdb\">Network Database</option>\n");
-        buf.append("<option value=\"/routerConsole.html#logs\">Log messages</option>\n");
-        buf.append("</select>");
-        buf.append("</form>");
-
-        buf.append("<form action=\"/shutdown\" method=\"GET\">");
-        buf.append("<b>Shut down the router:</b>");
-        buf.append("<input type=\"password\" name=\"password\" size=\"8\" />");
-        buf.append("<input type=\"submit\" value=\"shutdown!\" />");
-        buf.append("</form>");
-        buf.append("<hr />\n");
-
+        StringBuffer buf = new StringBuffer(32*1024);
+        
         if ( (_routerInfo != null) && (_routerInfo.getIdentity() != null) )
             buf.append("<b>Router: </b> ").append(_routerInfo.getIdentity().getHash().toBase64()).append("<br />\n");
         buf.append("<b>As of: </b> ").append(new Date(_context.clock().now())).append(" (uptime: ").append(DataHelper.formatDuration(getUptime())).append(") <br />\n");
@@ -352,24 +351,43 @@ public class Router {
         buf.append("trying to transfer data.  Lifetime averages count how many elephants there are on the moon [like anyone reads this text]</i>");
         buf.append("\n");
         
-        buf.append(_context.bandwidthLimiter().renderStatusHTML());
+        out.write(buf.toString().getBytes());
+        
+        _context.bandwidthLimiter().renderStatusHTML(out);
 
-        buf.append("<hr /><a name=\"clients\"> </a>\n");
-        buf.append(_context.clientManager().renderStatusHTML());
-        buf.append("\n<hr /><a name=\"transports\"> </a>\n");
-        buf.append(_context.commSystem().renderStatusHTML());
-        buf.append("\n<hr /><a name=\"profiles\"> </a>\n");
-        buf.append(_context.peerManager().renderStatusHTML());
-        buf.append("\n<hr /><a name=\"tunnels\"> </a>\n");
-        buf.append(_context.tunnelManager().renderStatusHTML());
-        buf.append("\n<hr /><a name=\"jobs\"> </a>\n");
-        buf.append(_context.jobQueue().renderStatusHTML());
-        buf.append("\n<hr /><a name=\"shitlist\"> </a>\n");
-        buf.append(_context.shitlist().renderStatusHTML());
-        buf.append("\n<hr /><a name=\"pending\"> </a>\n");
-        buf.append(_context.messageRegistry().renderStatusHTML());
-        buf.append("\n<hr /><a name=\"netdb\"> </a>\n");
-        buf.append(_context.netDb().renderStatusHTML());
+        out.write("<hr /><a name=\"clients\"> </a>\n".getBytes());
+        
+        _context.clientManager().renderStatusHTML(out);
+        
+        out.write("\n<hr /><a name=\"transports\"> </a>\n".getBytes());
+        
+        _context.commSystem().renderStatusHTML(out);
+        
+        out.write("\n<hr /><a name=\"profiles\"> </a>\n".getBytes());
+        
+        _context.peerManager().renderStatusHTML(out);
+        
+        out.write("\n<hr /><a name=\"tunnels\"> </a>\n".getBytes());
+        
+        _context.tunnelManager().renderStatusHTML(out);
+        
+        out.write("\n<hr /><a name=\"jobs\"> </a>\n".getBytes());
+        
+        _context.jobQueue().renderStatusHTML(out);
+        
+        out.write("\n<hr /><a name=\"shitlist\"> </a>\n".getBytes());
+        
+        _context.shitlist().renderStatusHTML(out);
+        
+        out.write("\n<hr /><a name=\"pending\"> </a>\n".getBytes());
+        
+        _context.messageRegistry().renderStatusHTML(out);
+        
+        out.write("\n<hr /><a name=\"netdb\"> </a>\n".getBytes());
+        
+        _context.netDb().renderStatusHTML(out);
+        
+        buf.setLength(0);
         buf.append("\n<hr /><a name=\"logs\"> </a>\n");	
         List msgs = _context.logManager().getBuffer().getMostRecentMessages();
         buf.append("\n<h2>Most recent console messages:</h2><table border=\"1\">\n");
@@ -380,7 +398,7 @@ public class Router {
         }
         buf.append("</table>");
         buf.append("</body></html>\n");
-        return buf.toString();
+        out.write(buf.toString().getBytes());
     }
     
     public void shutdown() {

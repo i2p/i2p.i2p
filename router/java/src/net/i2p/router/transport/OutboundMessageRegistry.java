@@ -8,6 +8,9 @@ package net.i2p.router.transport;
  *
  */
 
+import java.io.IOException;
+import java.io.OutputStream;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
@@ -271,7 +274,7 @@ public class OutboundMessageRegistry {
         }
     }
     
-    public String renderStatusHTML() {
+    public void renderStatusHTML(OutputStream out) throws IOException {
         StringBuffer buf = new StringBuffer(8192);
         buf.append("<h2>Pending messages</h2>\n");
         Map msgs = null;
@@ -291,7 +294,7 @@ public class OutboundMessageRegistry {
             buf.append("</li>\n");
         }
         buf.append("</ul>");
-        return buf.toString();
+        out.write(buf.toString().getBytes());
     }
 
     /**

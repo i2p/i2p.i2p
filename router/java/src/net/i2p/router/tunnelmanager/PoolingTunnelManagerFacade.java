@@ -1,5 +1,8 @@
 package net.i2p.router.tunnelmanager;
 
+import java.io.IOException;
+import java.io.OutputStream;
+
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -210,10 +213,8 @@ public class PoolingTunnelManagerFacade implements TunnelManagerFacade {
      * Aint she pretty?
      *
      */
-    public String renderStatusHTML() {
+    public void renderStatusHTML(OutputStream out) throws IOException {
         if (_pool != null)
-            return _pool.renderStatusHTML();
-        else
-            return "<h2>Tunnel Manager not initialized</h2>\n";
+            _pool.renderStatusHTML(out);
     }
 }

@@ -8,6 +8,9 @@ package net.i2p.router;
  *
  */
 
+import java.io.IOException;
+import java.io.OutputStream;
+
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.Locale;
@@ -259,5 +262,5 @@ public class StatisticsManager implements Service {
     private final String num(double num) { synchronized (_fmt) { return _fmt.format(num); } }
     private final String pct(double num) { synchronized (_pct) { return _pct.format(num); } }
    
-    public String renderStatusHTML() { return ""; }
+    public void renderStatusHTML(OutputStream out) { }
 }

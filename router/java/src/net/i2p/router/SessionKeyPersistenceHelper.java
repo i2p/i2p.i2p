@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 
 import net.i2p.crypto.PersistentSessionKeyManager;
 import net.i2p.crypto.SessionKeyManager;
@@ -89,7 +90,7 @@ public class SessionKeyPersistenceHelper implements Service {
         }
     }
     
-    public String renderStatusHTML() { return ""; }
+    public void renderStatusHTML(OutputStream out) { }
     
     private class SessionKeyWriterJob extends JobImpl {
         public SessionKeyWriterJob() {

@@ -8,6 +8,9 @@ package net.i2p.router;
  *
  */
 
+import java.io.IOException;
+import java.io.OutputStream;
+
 import net.i2p.data.Destination;
 import net.i2p.data.Hash;
 import net.i2p.data.LeaseSet;
@@ -67,7 +70,7 @@ public abstract class ClientManagerFacade implements Service {
      *
      */
     public abstract SessionConfig getClientSessionConfig(Destination dest);
-    public String renderStatusHTML() { return ""; }
+    public void renderStatusHTML(OutputStream out) throws IOException { }
 }
 
 class DummyClientManagerFacade extends ClientManagerFacade {

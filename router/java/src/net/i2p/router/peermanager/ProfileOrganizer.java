@@ -563,7 +563,7 @@ public class ProfileOrganizer {
             _persistenceHelper.writeProfile(prof, out);
     }
     
-    public String renderStatusHTML() {
+    public void renderStatusHTML(OutputStream out) throws IOException {
         Set peers = selectAllPeers();
         
         long hideBefore = _context.clock().now() - 6*60*60*1000;
@@ -581,7 +581,7 @@ public class ProfileOrganizer {
         int reliable = 0;
         int integrated = 0;
         int failing = 0;
-        StringBuffer buf = new StringBuffer(8*1024);
+        StringBuffer buf = new StringBuffer(16*1024);
         buf.append("<h2>Peer Profiles</h2>\n");
         buf.append("<table border=\"1\">");
         buf.append("<tr>");
@@ -660,7 +660,7 @@ public class ProfileOrganizer {
         buf.append("<b>Speed:</b> ").append(num(_thresholdSpeedValue)).append(" (").append(fast).append(" fast peers)<br />");
         buf.append("<b>Reliability:</b> ").append(num(_thresholdReliabilityValue)).append(" (").append(reliable).append(" reliable peers)<br />");
         buf.append("<b>Integration:</b> ").append(num(_thresholdIntegrationValue)).append(" (").append(integrated).append(" well integrated peers)<br />");
-        return buf.toString();
+        out.write(buf.toString().getBytes());
     }
     
     

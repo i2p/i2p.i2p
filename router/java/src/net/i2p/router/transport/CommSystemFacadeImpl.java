@@ -8,6 +8,9 @@ package net.i2p.router.transport;
  *
  */
 
+import java.io.IOException;
+import java.io.OutputStream;
+
 import java.util.HashSet;
 import java.util.List;
 import java.util.Properties;
@@ -52,7 +55,9 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
         j.runJob();
     }
     
-    public String renderStatusHTML() { return _manager.renderStatusHTML(); }
+    public void renderStatusHTML(OutputStream out) throws IOException { 
+        _manager.renderStatusHTML(out); 
+    }
     
     public Set createAddresses() {
         Set addresses = new HashSet();

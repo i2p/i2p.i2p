@@ -8,6 +8,9 @@ package net.i2p.router.transport;
  *
  */
 
+import java.io.IOException;
+import java.io.OutputStream;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -252,8 +255,8 @@ public class TransportManager implements TransportEventListener {
             _log.debug("Added to in pool: "+ num);
     }
     
-    public String renderStatusHTML() {
-        StringBuffer buf = new StringBuffer();
+    public void renderStatusHTML(OutputStream out) throws IOException {
+        StringBuffer buf = new StringBuffer(8*1024);
         buf.append("<h2>Transport Manager</h2>\n");
         buf.append("Listening on: <br /><pre>\n");
         for (Iterator iter = _addresses.iterator(); iter.hasNext(); ) {
@@ -269,6 +272,6 @@ public class TransportManager implements TransportEventListener {
                 buf.append("<li>").append(str).append("</li>\n");
         }
         buf.append("</ul>\n");
-        return buf.toString();
+        out.write(buf.toString().getBytes());
     }
 }

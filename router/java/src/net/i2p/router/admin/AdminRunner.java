@@ -47,7 +47,15 @@ class AdminRunner implements Runnable {
         if (command.indexOf("favicon") >= 0) {
             reply(out, "this is not a website");
         } else if (command.indexOf("routerStats.html") >= 0) {
-            reply(out, _generator.generateStatsPage());
+            try {
+                out.write("HTTP/1.1 200 OK\nConnection: close\nCache-control: no-cache\nContent-type: text/html\n\n".getBytes());
+                _generator.generateStatsPage(out);
+                out.close();
+            } catch (IOException ioe) {
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("Error writing out the admin reply");
+                throw ioe;
+            }
         } else if (command.indexOf("/profile/") >= 0) {
             replyText(out, getProfile(command));
         } else if (command.indexOf("setTime") >= 0) {
@@ -60,7 +68,15 @@ class AdminRunner implements Runnable {
         } else if (command.indexOf("/shutdown") >= 0) {
             reply(out, shutdown(command));
         } else if (true || command.indexOf("routerConsole.html") > 0) {
-            reply(out, _context.router().renderStatusHTML());
+            try {
+                out.write("HTTP/1.1 200 OK\nConnection: close\nCache-control: no-cache\nContent-type: text/html\n\n".getBytes());
+                _context.router().renderStatusHTML(out);
+                out.close();
+            } catch (IOException ioe) {
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("Error writing out the admin reply");
+                throw ioe;
+            }
         }
     }
     

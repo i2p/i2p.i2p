@@ -8,6 +8,9 @@ package net.i2p.router;
  *
  */
 
+import java.io.IOException;
+import java.io.OutputStream;
+
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -79,8 +82,8 @@ public class Shitlist {
         }
     }
     
-    public String renderStatusHTML() {
-        StringBuffer buf = new StringBuffer();
+    public void renderStatusHTML(OutputStream out) throws IOException {
+        StringBuffer buf = new StringBuffer(1024);
         buf.append("<h2>Shitlist</h2>");
         Map shitlist = new HashMap();
         synchronized (_shitlist) {
@@ -99,6 +102,6 @@ public class Shitlist {
                 buf.append("<li><b>").append(key.toBase64()).append("</b> was shitlisted on ").append(shitDate).append("</li>\n");
         }
         buf.append("</ul>\n");
-        return buf.toString();
+        out.write(buf.toString().getBytes());
     }
 }

@@ -1,5 +1,8 @@
 package net.i2p.router.tunnelmanager;
 
+import java.io.IOException;
+import java.io.OutputStream;
+
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -621,32 +624,34 @@ class TunnelPool {
         return settings;
     }
  
-    public String renderStatusHTML() {
-        if (!_isLive) return "";
-        StringBuffer buf = new StringBuffer();
-        buf.append("<h2>Tunnel Pool</h2>\n");
-        renderTunnels(buf, "Free inbound tunnels", getFreeTunnels());
-        renderTunnels(buf, "Outbound tunnels", getOutboundTunnels());
-        renderTunnels(buf, "Participating tunnels", getParticipatingTunnels());
+    public void renderStatusHTML(OutputStream out) throws IOException {
+        if (!_isLive) return;
+        out.write("<h2>Tunnel Pool</h2>\n".getBytes());
+        StringBuffer buf = new StringBuffer(4096);
+        renderTunnels(out, buf, "Free inbound tunnels", getFreeTunnels());
+        renderTunnels(out, buf, "Outbound tunnels", getOutboundTunnels());
+        renderTunnels(out, buf, "Participating tunnels", getParticipatingTunnels());
         for (Iterator iter = getClientPools().iterator(); iter.hasNext(); ) {
             Destination dest = (Destination)iter.next();
             ClientTunnelPool pool = getClientPool(dest);
-            renderTunnels(buf, "Inbound tunnels for " + dest.calculateHash() + " - (still connected? " + (!pool.isStopped()) + ")", pool.getInboundTunnelIds());
+            renderTunnels(out, buf, "Inbound tunnels for " + dest.calculateHash() + " - (still connected? " + (!pool.isStopped()) + ")", pool.getInboundTunnelIds());
         }
-        return buf.toString();
     }
     
-    private void renderTunnels(StringBuffer buf, String msg, Set tunnelIds) {
+    private void renderTunnels(OutputStream out, StringBuffer buf, String msg, Set tunnelIds) throws IOException {
         buf.append("<b>").append(msg).append(":</b> <i>(").append(tunnelIds.size()).append(" tunnels)</i><ul>\n");
+        out.write(buf.toString().getBytes());
+        buf.setLength(0);
         for (Iterator iter = tunnelIds.iterator(); iter.hasNext(); ) {
             TunnelId id = (TunnelId)iter.next();
             TunnelInfo tunnel = getTunnelInfo(id);
-            renderTunnel(buf, id, tunnel);
+            renderTunnel(out, buf, id, tunnel);
         }
-        buf.append("</ul>\n");
+        out.write("</ul>\n".getBytes());
     }
     
-    private final static void renderTunnel(StringBuffer buf, TunnelId id, TunnelInfo tunnel) {
+    private final static void renderTunnel(OutputStream out, StringBuffer buf, TunnelId id, TunnelInfo tunnel) throws IOException {
+        buf.setLength(0);
         if (tunnel == null) {
             buf.append("<li>Tunnel: ").append(id.getTunnelId()).append(" is not known</li>\n");
         } else {
@@ -675,6 +680,8 @@ class TunnelPool {
 
             buf.append("\n</pre>");
         }
+        out.write(buf.toString().getBytes());
+        buf.setLength(0);
     }
     
     private final static String getStyle(TunnelId id) {

@@ -11,6 +11,7 @@ package net.i2p.router.networkdb.kademlia;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
@@ -605,16 +606,19 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         return routers;
     }
     
-    public String renderStatusHTML() {
-        StringBuffer buf = new StringBuffer();
+    public void renderStatusHTML(OutputStream out) throws IOException {
+        StringBuffer buf = new StringBuffer(10*1024);
         buf.append("<h2>Kademlia Network DB Contents</h2>\n");
         if (!_initialized) {
             buf.append("<i>Not initialized</i>\n");
-            return buf.toString();
+            out.write(buf.toString().getBytes());
+            return;
         }
         Set leases = getLeases();
         buf.append("<h3>Leases</h3>\n");
         buf.append("<table border=\"1\">\n");
+        out.write(buf.toString().getBytes());
+        buf.setLength(0);
         for (Iterator iter = leases.iterator(); iter.hasNext(); ) {
             LeaseSet ls = (LeaseSet)iter.next();
             Hash key = ls.getDestination().calculateHash();
@@ -625,6 +629,8 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
             else
                 buf.append("<td valign=\"top\" align=\"left\"><b>Last sent successfully:</b> never</td></tr>");
             buf.append("<tr><td valign=\"top\" align=\"left\" colspan=\"2\"><pre>\n").append(ls.toString()).append("</pre></td></tr>\n");
+            out.write(buf.toString().getBytes());
+            buf.setLength(0);
         }
         buf.append("</table>\n");
         
@@ -632,6 +638,9 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         Set routers = getRouters();
         buf.append("<h3>Routers</h3>\n");
         buf.append("<table border=\"1\">\n");
+        out.write(buf.toString().getBytes());
+        buf.setLength(0);
+        
         for (Iterator iter = routers.iterator(); iter.hasNext(); ) {
             RouterInfo ri = (RouterInfo)iter.next();
             Hash key = ri.getIdentity().getHash();
@@ -648,10 +657,10 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
                 buf.append("<td valign=\"top\" align=\"left\"><a href=\"/profile/").append(key.toBase64().substring(0, 32)).append("\">Profile</a></td></tr>");
             }
             buf.append("<tr><td valign=\"top\" align=\"left\" colspan=\"3\"><pre>\n").append(ri.toString()).append("</pre></td></tr>\n");
+            out.write(buf.toString().getBytes());
+            buf.setLength(0);
         }
-        buf.append("</table>\n");
-        
-        return buf.toString();
+        out.write("</table>\n".getBytes());
     }
     
 }

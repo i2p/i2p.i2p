@@ -8,6 +8,9 @@ package net.i2p.router.client;
  *
  */
 
+import java.io.IOException;
+import java.io.OutputStream;
+
 import net.i2p.data.Destination;
 import net.i2p.data.Hash;
 import net.i2p.data.LeaseSet;
@@ -148,12 +151,8 @@ public class ClientManagerFacadeImpl extends ClientManagerFacade {
         }
     }
     
-    public String renderStatusHTML() { 
+    public void renderStatusHTML(OutputStream out) throws IOException { 
         if (_manager != null)
-            return _manager.renderStatusHTML(); 
-        else {
-            _log.error("Null manager on renderStatusHTML!");
-            return null;
-        }
+            _manager.renderStatusHTML(out); 
     }
 }
