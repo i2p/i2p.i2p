@@ -21,6 +21,9 @@ public class BandwidthLimiter {
     private Log _log;
     protected RouterContext _context;
     
+    protected Object _outboundWaitLock = new Object();
+    protected Object _inboundWaitLock = new Object();
+    
     protected BandwidthLimiter(RouterContext context) {
         _context = context;
         _log = context.logManager().getLog(BandwidthLimiter.class);
@@ -57,11 +60,14 @@ public class BandwidthLimiter {
      * from the peer will not violate the bandwidth limits
      */
     public void delayInbound(RouterIdentity peer, int numBytes) {
-        long ms = calculateDelayInbound(peer, numBytes);
-        if (ms > 0) {
-            _log.debug("Delaying inbound " + ms +"ms for " + numBytes +" bytes");
-            try { Thread.sleep(ms); } catch (InterruptedException ie) {}
+        while (calculateDelayInbound(peer, numBytes) > 0) {
+            try {
+                synchronized (_inboundWaitLock) {
+                    _inboundWaitLock.wait(10*1000);
+                }
+            } catch (InterruptedException ie) {}
         }
+        synchronized (_inboundWaitLock) { _inboundWaitLock.notify(); }
         consumeInbound(peer, numBytes);
     }
     /**
@@ -69,12 +75,14 @@ public class BandwidthLimiter {
      * to the peer will not violate the bandwidth limits
      */
     public void delayOutbound(RouterIdentity peer, int numBytes) {
-        long ms = calculateDelayOutbound(peer, numBytes);
-        if (ms > 0) {
-            _log.debug("Delaying outbound " + ms + "ms for " + numBytes + " bytes");
-            try { Thread.sleep(ms); } catch (InterruptedException ie) {}
+        while (calculateDelayOutbound(peer, numBytes) > 0) {
+            try {
+                synchronized (_outboundWaitLock) {
+                    _outboundWaitLock.wait(10*1000);
+                }
+            } catch (InterruptedException ie) {}
         }
-        
+        synchronized (_outboundWaitLock) { _outboundWaitLock.notify(); }
         consumeOutbound(peer, numBytes);
     }
 }
