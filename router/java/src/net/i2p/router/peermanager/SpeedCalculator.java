@@ -297,22 +297,12 @@ public class SpeedCalculator extends Calculator {
         if (_context.router() != null) {
             String val = _context.router().getConfigSetting(PROP_USE_INSTANTANEOUS_RATES);
             if (val != null) {
-                try {
-                    return Boolean.getBoolean(val);
-                } catch (NumberFormatException nfe) {
-                    if (_log.shouldLog(Log.WARN))
-                        _log.warn("Instantaneous rate for speed improperly set in the router config [" + val + "]", nfe);
-                }
+                return Boolean.valueOf(val).booleanValue();
             }
         }
         String val = _context.getProperty(PROP_USE_INSTANTANEOUS_RATES, ""+DEFAULT_USE_INSTANTANEOUS_RATES);
         if (val != null) {
-            try {
-                return Boolean.getBoolean(val);
-            } catch (NumberFormatException nfe) {
-                if (_log.shouldLog(Log.WARN))
-                    _log.warn("Instantaneous rate for speed improperly set in the router environment [" + val + "]", nfe);
-            }
+            return Boolean.valueOf(val).booleanValue();
         }
         return DEFAULT_USE_INSTANTANEOUS_RATES;
     }
