@@ -448,13 +448,13 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
             if (_log.shouldLog(Log.ERROR))
                 _log.error("Invalid leaseSet signature!  leaseSet = " + leaseSet);
             return false;
-        } else if (leaseSet.getEarliestLeaseDate() <= _context.clock().now()) {
+        } else if (leaseSet.getEarliestLeaseDate() <= _context.clock().now() - Router.CLOCK_FUDGE_FACTOR) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Old leaseSet!  not storing it: " 
                           + leaseSet.getDestination().calculateHash().toBase64() 
                           + " expires on " + new Date(leaseSet.getEarliestLeaseDate()), new Exception("Rejecting store"));
             return false;
-        } else if (leaseSet.getEarliestLeaseDate() > _context.clock().now() + MAX_LEASE_FUTURE) {
+        } else if (leaseSet.getEarliestLeaseDate() > _context.clock().now() + Router.CLOCK_FUDGE_FACTOR + MAX_LEASE_FUTURE) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("LeaseSet to expire too far in the future: " 
                           + leaseSet.getDestination().calculateHash().toBase64() 
@@ -518,7 +518,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         } else if (!routerInfo.isValid()) {
             _log.error("Invalid routerInfo signature!  forged router structure!  router = " + routerInfo);
             return false;
-        } else if (!routerInfo.isCurrent(ExpireRoutersJob.EXPIRE_DELAY)) {
+        } else if (!routerInfo.isCurrent(Router.CLOCK_FUDGE_FACTOR + ExpireRoutersJob.EXPIRE_DELAY)) {
             int existing = _kb.size();
             if (existing >= MIN_REMAINING_ROUTERS) {
                 if (_log.shouldLog(Log.INFO))
