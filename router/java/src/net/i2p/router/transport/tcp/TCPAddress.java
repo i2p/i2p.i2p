@@ -41,6 +41,8 @@ public class TCPAddress {
             _host = null;
             _port = -1;
             _addr = null;
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Unknown host [" + host + "] for port [" + port + "]", uhe);
         }
     }
     

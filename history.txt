@@ -1,4 +1,10 @@
-$Id: history.txt,v 1.85 2004/11/27 00:17:06 jrandom Exp $
+$Id: history.txt,v 1.86 2004/11/27 16:02:06 jrandom Exp $
+
+2004-11-28  jrandom
+    * Accept IP address detection changes with a 2-out-of-3 minimum.
+    * As long as the router is up, keep retrying to bind the I2CP listener.
+    * Decrease the java service wrapper ping frequency to once every 10 
+      minutes, rather than once every 5 seconds.
 
 2004-11-27  jrandom
     * Some cleanup and bugfixes for the IP address detection code where we 

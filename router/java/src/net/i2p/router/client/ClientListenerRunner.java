@@ -42,9 +42,6 @@ public class ClientListenerRunner implements Runnable {
     public void setPort(int port) { _port = port; }
     public int getPort() { return _port; }
     
-    /** max time to bind */
-    private final static int MAX_FAIL_DELAY = 5*60*1000;
-    
     /** 
      * Start up the socket listener, listens for connections, and
      * fires those connections off via {@link #runConnection runConnection}.  
@@ -55,7 +52,7 @@ public class ClientListenerRunner implements Runnable {
     public void runServer() {
         _running = true;
         int curDelay = 0;
-        while ( (_running) && (curDelay < MAX_FAIL_DELAY) ) {
+        while (_running) {
             try {
                 _log.info("Starting up listening for connections on port " + _port);
                 _socket = new ServerSocket(_port);

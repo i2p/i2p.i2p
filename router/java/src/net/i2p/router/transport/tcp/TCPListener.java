@@ -69,6 +69,10 @@ class TCPListener {
             
         if (addr.getPort() > 0) {
             if (_listener != null) {
+                if ( (_listener.getMyAddress().getPort() == addr.getPort()) &&
+                     (_listener.getMyAddress().getHost() == null) ) {
+                    _listener.getMyAddress().setHost(addr.getHost());
+                }
                 if (_log.shouldLog(Log.WARN))
                     _log.warn("Not starting another listener on " + addr 
                               + " while already listening on " + _listener.getMyAddress());

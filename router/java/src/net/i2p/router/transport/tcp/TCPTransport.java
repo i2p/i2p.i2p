@@ -340,8 +340,10 @@ public class TCPTransport extends TransportImpl {
      * @param address address that the remote host said was ours
      */
     void ourAddressReceived(String address) {
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("Address received [" + address + "] our address: [" + _myAddress + "]");
         synchronized (_listener) { // no need to lock on the whole TCPTransport
-            if (allowAddressUpdate()) {
+            if (allowAddressUpdate(address)) {
                 int port = getPort();
                 TCPAddress addr = new TCPAddress(address, port);
                 if (addr.getPort() > 0) {
@@ -357,6 +359,9 @@ public class TCPTransport extends TransportImpl {
                         if (_log.shouldLog(Log.INFO))
                             _log.info("Update our local address to " + address);
                         updateAddress(addr);
+                    } else {
+                        if (_log.shouldLog(Log.WARN))
+                            _log.warn("Address received is NOT a valid address! [" + addr + "]");
                     }
                 } else {
                     if (_log.shouldLog(Log.ERROR))
@@ -455,9 +460,16 @@ public class TCPTransport extends TransportImpl {
      *
      */
     boolean allowAddress(TCPAddress address) {
-        if (address == null) return false;
-        if ( (address.getPort() <= 0) || (address.getPort() > 65535) )
+        if (address == null) {
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Address is null?!");
             return false;
+        }
+        if ( (address.getPort() <= 0) || (address.getPort() > 65535) ) {
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Port is invalid?  " + address.getPort());
+            return false;
+        }
         if (!address.isPubliclyRoutable()) {
             String allowLocal = _context.getProperty(LISTEN_ALLOW_LOCAL, "false");
             if (Boolean.valueOf(allowLocal).booleanValue()) {
@@ -508,7 +520,7 @@ public class TCPTransport extends TransportImpl {
      * have no fully established connections.
      *
      */
-    private boolean allowAddressUpdate() {
+    private boolean allowAddressUpdate(String proposedAddress) {
         int connectedPeers = countActivePeers();
         boolean addressSpecified = (null != _context.getProperty(LISTEN_ADDRESS));
         if (addressSpecified) {
@@ -516,10 +528,26 @@ public class TCPTransport extends TransportImpl {
                 _log.debug("Not allowing address update, sicne we have one specified (#cons=" + connectedPeers + ")");
             return false;
         }
-        if (connectedPeers <= 0) {
+        if (connectedPeers < 3) {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Allowing address update, since the # of connected peers is " + connectedPeers);
             return true;
+        } else if (connectedPeers == 3) {
+            // ok, now comes the vote:
+            // if we agree with the majority, allow the update
+            // otherwise, reject the update
+            int agreed = countActiveAgreeingPeers(proposedAddress);
+            if (agreed > 1) {
+                if (_log.shouldLog(Log.DEBUG))
+                    _log.debug("Most common address selected, allowing address update w/ # of connected peers is " + connectedPeers);
+                return true;
+            } else {
+                if (_log.shouldLog(Log.DEBUG))
+                    _log.debug("Proposed address [" + proposedAddress + "] is only used by " + agreed
+                               + ", rejecting address update w/ # of connected peers is " 
+                               + connectedPeers);
+                return false;
+            }
         } else {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Not allowing address update, since the # of connected peers is " + connectedPeers);
@@ -575,6 +603,28 @@ public class TCPTransport extends TransportImpl {
             _log.debug("Inactive peers: " + numInactive + " active: " + numActive);
         
         return numActive;
+    }
+    
+    /**
+     * How many peers that we are connected to think we are reachable at the given
+     * address?
+     *
+     */
+    public int countActiveAgreeingPeers(String address) { 
+        int agreed = 0;
+        synchronized (_connectionLock) {
+            if (_connectionsByIdent.size() <= 0) return 0;
+            for (Iterator iter = _connectionsByIdent.values().iterator(); iter.hasNext(); ) {
+                TCPConnection con = (TCPConnection)iter.next();
+                if (con.getIsActive()) {
+                    String shown = con.getShownAddress();
+                    if ( (shown != null) && (shown.equals(address)) )
+                        agreed++;
+                }
+            }
+        }
+        
+        return agreed;
     }
     
     /**
