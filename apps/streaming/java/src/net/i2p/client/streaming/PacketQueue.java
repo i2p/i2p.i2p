@@ -48,6 +48,8 @@ class PacketQueue {
             if (packet.getAckTime() > 0) {
                 _log.debug("Not resending " + packet);
                 return;
+            } else {
+                _log.debug("Sending... " + packet);
             }
             // this should not block!
             long begin = _context.clock().now();
@@ -56,6 +58,7 @@ class PacketQueue {
             if (!sent) {
                 if (_log.shouldLog(Log.WARN))
                     _log.warn("Send failed for " + packet);
+                packet.getConnection().disconnect(false);
             } else {
                 packet.setKeyUsed(keyUsed);
                 packet.setTagsSent(tagsSent);

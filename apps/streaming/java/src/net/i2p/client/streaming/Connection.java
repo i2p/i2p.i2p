@@ -54,6 +54,8 @@ public class Connection {
     /** set to an error cause if the connection could not be established */
     private String _connectionError;
     
+    public static final long MAX_RESEND_DELAY = 60*1000;
+    
     public Connection(I2PAppContext ctx, ConnectionManager manager, SchedulerChooser chooser, PacketQueue queue, ConnectionPacketHandler handler) {
         this(ctx, manager, chooser, queue, handler, null);
     }
@@ -175,9 +177,14 @@ public class Connection {
                 _log.debug("Requesting ack delay of " + delay + "ms for packet " + packet);
             }
             packet.setFlag(Packet.FLAG_DELAY_REQUESTED);
+            
+            long timeout = (_options.getRTT() < 10000 ? 10000 : _options.getRTT());
+            if (timeout > MAX_RESEND_DELAY)
+                timeout = MAX_RESEND_DELAY;
             if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Resend in " + (_options.getRTT()*2) + " for " + packet);
-            SimpleTimer.getInstance().addEvent(new ResendPacketEvent(packet), (_options.getRTT()*2 < 5000 ? 5000 : _options.getRTT()*2));
+                _log.debug("Resend in " + timeout + " for " + packet);
+
+            SimpleTimer.getInstance().addEvent(new ResendPacketEvent(packet), timeout);
         }
 
         _lastSendTime = _context.clock().now();
@@ -439,6 +446,8 @@ public class Connection {
         }
         
         public void timeReached() {
+            if (!_connected) return;
+            
             //if (_log.shouldLog(Log.DEBUG))
             //    _log.debug("Resend period reached for " + _packet);
             boolean resend = false;
@@ -477,6 +486,8 @@ public class Connection {
                 } else {
                     //long timeout = _options.getResendDelay() << numSends;
                     long timeout = _options.getRTT() << (numSends-1);
+                    if ( (timeout > MAX_RESEND_DELAY) || (timeout <= 0) )
+                        timeout = MAX_RESEND_DELAY;
                     if (_log.shouldLog(Log.DEBUG))
                         _log.debug("Scheduling resend in " + timeout + "ms for " + _packet);
                     SimpleTimer.getInstance().addEvent(ResendPacketEvent.this, timeout);
