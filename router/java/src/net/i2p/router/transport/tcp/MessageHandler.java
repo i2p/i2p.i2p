@@ -25,7 +25,8 @@ public class MessageHandler implements I2NPMessageReader.I2NPMessageEventListene
         _con = con;
         _ident = con.getRemoteRouterIdentity();
         _identHash = _ident.calculateHash();
-        _log = con.getRouterContext().logManager().getLog(MessageHandler.class);
+        _log = con.getRouterContext().logManager().getLog(MessageHandler.class);   
+        transport.getContext().statManager().createRateStat("tcp.disconnectAfterSkew", "How skewed a connection became before we killed it?", "TCP", new long[] { 10*60*1000l, 60*60*1000l, 24*60*60*1000l } );
     }
     
     public void disconnected(I2NPMessageReader reader) {
@@ -52,15 +53,20 @@ public class MessageHandler implements I2NPMessageReader.I2NPMessageEventListene
     private void timeMessageReceived(long remoteTime) {
         long delta = _con.getRouterContext().clock().now() - remoteTime;
         if ( (delta > Router.CLOCK_FUDGE_FACTOR) || (delta < 0 - Router.CLOCK_FUDGE_FACTOR) ) {
-            _log.error("Peer " + _identHash.toBase64().substring(0,6) + " is too far skewed (" 
-                       + DataHelper.formatDuration(delta) + ") after uptime of " 
-                       + DataHelper.formatDuration(_con.getLifetime()) );
             _con.closeConnection();
+            _transport.addConnectionErrorMessage("Peer " + _identHash.toBase64().substring(0,6) 
+                                                 + " is too far skewed (" 
+                                                 + DataHelper.formatDuration(delta) + ") after uptime of " 
+                                                 + DataHelper.formatDuration(_con.getLifetime())); 
+            _transport.getContext().statManager().addRateData("tcp.disconnectAfterSkew", delta, _con.getLifetime());
         } else {
-            if (_log.shouldLog(Log.INFO))
-                _log.info("Peer " + _identHash.toBase64().substring(0,6) + " is only skewed by (" 
-                           + DataHelper.formatDuration(delta) + ") after uptime of " 
-                           + DataHelper.formatDuration(_con.getLifetime()) );
+            int level = Log.DEBUG;
+            if ( (delta > Router.CLOCK_FUDGE_FACTOR/2) || (delta < 0 - Router.CLOCK_FUDGE_FACTOR/2) )
+                level = Log.WARN;
+            if (_log.shouldLog(level))
+                _log.log(level, "Peer " + _identHash.toBase64().substring(0,6) + " is only skewed by (" 
+                                + DataHelper.formatDuration(delta) + ") after uptime of " 
+                                + DataHelper.formatDuration(_con.getLifetime()) );
         }   
     }
     

@@ -32,6 +32,8 @@ public class I2PSocketFull implements I2PSocket {
         destroy();
     }
     
+    Connection getConnection() { return _connection; }
+    
     public InputStream getInputStream() {
         return _connection.getInputStream();
     }

@@ -37,7 +37,7 @@ class SchedulerConnecting extends SchedulerImpl {
     public boolean accept(Connection con) {
         if (con == null) return false;
         boolean notYetConnected = (con.getIsConnected()) &&
-                                  (con.getSendStreamId() == null) &&
+                                  //(con.getSendStreamId() == null) && // not null on recv
                                   (con.getLastSendId() >= 0) &&
                                   (con.getAckedPackets() <= 0) && 
                                   (!con.getResetReceived());
@@ -55,6 +55,7 @@ class SchedulerConnecting extends SchedulerImpl {
                 _log.debug("waited too long: " + waited);
             return;
         } else {
+            // should we be doing a con.sendAvailable here?
             if (con.getOptions().getConnectTimeout() > 0)
                 reschedule(con.getOptions().getConnectTimeout(), con);
         }

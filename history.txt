@@ -1,4 +1,21 @@
-$Id: history.txt,v 1.106 2004/12/14 06:54:39 jrandom Exp $
+$Id: history.txt,v 1.107 2004/12/14 11:42:35 jrandom Exp $
+
+2004-12-15  jrandom
+    * Handle hard disconnects more gracefully within the streaming lib, and
+      log unmonitored events more aggressively.
+    * If we drop a peer after connection due to clock skew, log it to the
+      /logs.jsp#connectionlogs with relevent info.  In addition, toss it in
+      the stat 'tcp.disconnectAfterSkew'.
+    * Fixed the formatting in the skew display
+    * Added an ERROR message that is fired once after we run out of 
+      routerInfo files (thanks susi!)
+    * Set the connect timeout equal to the streaming lib's disconnect timeout
+      if not already specified (the I2PTunnel httpclient already enforces a
+      60s connect timeout)
+    * Fix for another connection startup problem in the streaming lib.
+    * Fix for a stupid error in the probabalistic drop (rand <= P, not > P)
+    * Adjust the capacity calculations so that tunnel failures alone in the 
+      last 10m will not trigger a 0 capacity rank.
 
 2004-12-14  jrandom
     * Periodically send a message along all I2NP connections with the router's

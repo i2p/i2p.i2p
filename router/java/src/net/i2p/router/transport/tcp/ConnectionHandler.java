@@ -440,7 +440,7 @@ public class ConnectionHandler {
             } else if ( (clockSkew > Router.CLOCK_FUDGE_FACTOR) 
                         || (clockSkew < 0 - Router.CLOCK_FUDGE_FACTOR) ) {
                 status = STATUS_SKEWED;
-                SimpleDateFormat fmt = new SimpleDateFormat("yyyyMMddhhmmssSSS");
+                SimpleDateFormat fmt = new SimpleDateFormat("yyyyMMddHHmmssSSS");
                 props.setProperty("SKEW", fmt.format(new Date(_context.clock().now())));
             } else {
                 try {
@@ -603,7 +603,7 @@ public class ConnectionHandler {
             } else if ( (clockSkew > Router.CLOCK_FUDGE_FACTOR) 
                         || (clockSkew < 0 - Router.CLOCK_FUDGE_FACTOR) ) {
                 status = STATUS_SKEWED;
-                SimpleDateFormat fmt = new SimpleDateFormat("yyyyMMddhhmmssSSS");
+                SimpleDateFormat fmt = new SimpleDateFormat("yyyyMMddHHmmssSSS");
                 props.setProperty("SKEW", fmt.format(new Date(_context.clock().now())));
             } else if (!sigOk) {
                 status = STATUS_SIGNATURE_FAILED;

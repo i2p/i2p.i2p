@@ -268,7 +268,7 @@ public class TCPConnection {
         for (int i = 0; i < _pendingMessages.size() && excessBytesQueued > 0; i++) {
             OutNetMessage msg = (OutNetMessage)_pendingMessages.get(i);
             int p = getDropProbability(msg.getMessageSize(), excessBytesQueued);
-            if (_context.random().nextInt(100) > p) {
+            if (_context.random().nextInt(100) < p) {
                 _pendingMessages.remove(i);
                 i--;
                 msg.timestamp("Probabalistically dropped due to queue size " + excessBytesQueued);

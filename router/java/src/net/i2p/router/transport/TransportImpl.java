@@ -364,5 +364,5 @@ public abstract class TransportImpl implements Transport {
     /** Make this stuff pretty (only used in the old console) */
     public String renderStatusHTML() { return null; }
     
-    protected RouterContext getContext() { return _context; }
+    public RouterContext getContext() { return _context; }
 }

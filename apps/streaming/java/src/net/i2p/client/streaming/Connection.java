@@ -33,6 +33,7 @@ public class Connection {
     private long _lastSendId;
     private boolean _resetReceived;
     private boolean _connected;
+    private boolean _hardDisconnected;
     private MessageInputStream _inputStream;
     private MessageOutputStream _outputStream;
     private SchedulerChooser _chooser;
@@ -170,6 +171,22 @@ public class Connection {
     
     void ackImmediately() {
         _receiver.send(null, 0, 0);
+    }
+
+    /**
+     * got a packet we shouldn't have, send 'em a reset
+     *
+     */
+    void sendReset() {
+        if ( (_remotePeer == null) || (_sendStreamId == null) ) return;
+        PacketLocal reply = new PacketLocal(_context, _remotePeer);
+        reply.setFlag(Packet.FLAG_RESET);
+        reply.setFlag(Packet.FLAG_SIGNATURE_INCLUDED);
+        reply.setSendStreamId(_sendStreamId);
+        reply.setReceiveStreamId(_receiveStreamId);
+        reply.setOptionalFrom(_connectionManager.getSession().getMyDestination());
+        // this just sends the packet - no retries or whatnot
+        _outboundQueue.enqueue(reply);
     }
     
     /**
@@ -362,6 +379,7 @@ public class Connection {
     public boolean getResetReceived() { return _resetReceived; }
     
     public boolean getIsConnected() { return _connected; }
+    public boolean getHardDisconnected() { return _hardDisconnected; }
 
     void disconnect(boolean cleanDisconnect) {
         disconnect(cleanDisconnect, true);
@@ -370,6 +388,13 @@ public class Connection {
         synchronized (_connectLock) { _connectLock.notifyAll(); }
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Disconnecting " + toString(), new Exception("discon"));
+        
+        if (!cleanDisconnect) {
+            _hardDisconnected = true;
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Hard disconnecting and sending a reset on " + toString(), new Exception("cause"));
+            sendReset();
+        }
         
         if (cleanDisconnect && _connected) {
             // send close packets and schedule stuff...

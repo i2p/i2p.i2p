@@ -107,10 +107,11 @@ public class CapacityCalculator extends Calculator {
         } else
             val -= stretch * (curRejected.getCurrentEventCount() + curRejected.getLastEventCount());
         
+        val += GROWTH_FACTOR;
+        
         if (val >= 0) {
-            return (val + GROWTH_FACTOR);
+            return val;
         } else {
-            // failed too much, don't grow
             return 0.0d;
         }
     }

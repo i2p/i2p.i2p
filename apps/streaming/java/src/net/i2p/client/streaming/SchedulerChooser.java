@@ -38,6 +38,7 @@ class SchedulerChooser {
     
     private List createSchedulers() {
         List rv = new ArrayList(8);
+        rv.add(new SchedulerHardDisconnected(_context));
         rv.add(new SchedulerPreconnect(_context));
         rv.add(new SchedulerConnecting(_context));
         rv.add(new SchedulerReceived(_context));
@@ -54,8 +55,7 @@ class SchedulerChooser {
         }
         
         public void eventOccurred(Connection con) {
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Event occurred on " + con, new Exception("source"));
+            _log.log(Log.CRIT, "Yell at jrandom: Event occurred on " + con, new Exception("source"));
         }
         public boolean accept(Connection con) { return true; }
     };

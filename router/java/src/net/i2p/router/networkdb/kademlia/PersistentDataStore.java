@@ -147,8 +147,10 @@ class PersistentDataStore extends TransientDataStore {
     }
     
     private class ReadJob extends JobImpl {
+        private boolean _alreadyWarned;
         public ReadJob() {
             super(PersistentDataStore.this._context);
+            _alreadyWarned = false;
         }
         public String getName() { return "DB Read Job"; }
         public void runJob() {
@@ -158,6 +160,7 @@ class PersistentDataStore extends TransientDataStore {
         }
         
         private void readFiles() {
+            int routerCount = 0;
             try {
                 File dbDir = getDbDir();
                 File leaseSetFiles[] = dbDir.listFiles(LeaseSetFilter.getInstance());
@@ -170,6 +173,9 @@ class PersistentDataStore extends TransientDataStore {
                 }
                 File routerInfoFiles[] = dbDir.listFiles(RouterInfoFilter.getInstance());
                 if (routerInfoFiles != null) {
+                    routerCount += routerInfoFiles.length;
+                    if (routerInfoFiles.length > 5)
+                        _alreadyWarned = false;
                     for (int i = 0; i < routerInfoFiles.length; i++) {
                         Hash key = getRouterInfoHash(routerInfoFiles[i].getName());
                         if ( (key != null) && (!isKnown(key)) )
@@ -178,6 +184,11 @@ class PersistentDataStore extends TransientDataStore {
                 }
             } catch (IOException ioe) {
                 _log.error("Error reading files in the db dir", ioe);
+            }
+            
+            if ( (routerCount <= 5) && (!_alreadyWarned) ) {
+                _log.error("Very few routerInfo files remaining - please reseed");
+                _alreadyWarned = true;
             }
         }
     }

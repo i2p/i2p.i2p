@@ -152,7 +152,8 @@ public class PacketHandler {
                     }
                 } else {
                     if (_log.shouldLog(Log.WARN))
-                        _log.warn("Receive a syn packet with the wrong IDs: " + packet);
+                        _log.warn("Receive a syn packet with the wrong IDs, sending reset: " + packet);
+                    sendReset(packet);
                 }
             } else {
                 // someone is sending us a packet on the wrong stream 
@@ -160,6 +161,17 @@ public class PacketHandler {
                     _log.warn("Received a packet on the wrong stream: " + packet + " connection: " + con);
             }
         }
+    }
+    
+    private void sendReset(Packet packet) {
+        PacketLocal reply = new PacketLocal(_context, packet.getOptionalFrom());
+        reply.setFlag(Packet.FLAG_RESET);
+        reply.setFlag(Packet.FLAG_SIGNATURE_INCLUDED);
+        reply.setSendStreamId(packet.getReceiveStreamId());
+        reply.setReceiveStreamId(packet.getSendStreamId());
+        reply.setOptionalFrom(_manager.getSession().getMyDestination());
+        // this just sends the packet - no retries or whatnot
+        _manager.getPacketQueue().enqueue(reply);
     }
     
     private void receiveUnknownCon(Packet packet, byte sendId[]) {

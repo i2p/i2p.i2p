@@ -103,6 +103,7 @@ public class StatisticsManager implements Service {
 
             includeThroughput(stats);
             includeRate("transport.sendProcessingTime", stats, new long[] { 60*60*1000 });
+            includeRate("tcp.probabalisticDropQueueSize", stats, new long[] { 60*1000l, 60*60*1000l });
             //includeRate("tcp.queueSize", stats);
             //includeRate("jobQueue.jobLag", stats, new long[] { 60*1000, 60*60*1000 });
             //includeRate("jobQueue.jobRun", stats, new long[] { 60*1000, 60*60*1000 });

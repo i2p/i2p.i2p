@@ -25,6 +25,7 @@ public class ConnectionPacketHandler {
         _context.statManager().createRateStat("stream.con.receiveDuplicateSize", "Size of a duplicate message received on a connection", "Stream", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
         _context.statManager().createRateStat("stream.con.packetsAckedPerMessageReceived", "Size of a duplicate message received on a connection", "Stream", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
         _context.statManager().createRateStat("stream.sendsBeforeAck", "How many times a message was sent before it was ACKed?", "Stream", new long[] { 10*60*1000, 60*60*1000 });
+        _context.statManager().createRateStat("stream.resetReceived", "How many messages had we sent successfully before receiving a RESET?", "Stream", new long[] { 60*60*1000, 24*60*60*1000 });
     }
     
     /** distribute a packet to the connection specified */
@@ -35,6 +36,21 @@ public class ConnectionPacketHandler {
                 _log.error("Packet does NOT verify: " + packet);
             return;
         }
+
+        if (con.getHardDisconnected()) {
+            if ( (packet.getSequenceNum() > 0) || (packet.getPayloadSize() > 0) || 
+                 (packet.isFlagSet(Packet.FLAG_SYNCHRONIZE)) || (packet.isFlagSet(Packet.FLAG_CLOSE)) ) {
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("Received a data packet after hard disconnect: " + packet + " on " + con);
+                con.sendReset();
+            } else {
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("Received a packet after hard disconnect, ignoring: " + packet + " on " + con);
+            }
+            return;
+        }
+        
+
         con.packetReceived();
         
         long ready = con.getInputStream().getHighestReadyBockId();
@@ -84,7 +100,8 @@ public class ConnectionPacketHandler {
                     _log.debug("Scheduling ack in " + delay + "ms for received packet " + packet);
             }
         } else {
-            if ( (packet.getSequenceNum() > 0) || (packet.getPayloadSize() > 0) ) {
+            if ( (packet.getSequenceNum() > 0) || (packet.getPayloadSize() > 0) || 
+                 (packet.isFlagSet(Packet.FLAG_SYNCHRONIZE)) ) {
                 _context.statManager().addRateData("stream.con.receiveDuplicateSize", packet.getPayloadSize(), 0);
                 con.incrementDupMessagesReceived(1);
         
@@ -267,6 +284,8 @@ public class ConnectionPacketHandler {
                 con.resetReceived();
                 con.eventOccurred();
 
+                _context.statManager().addRateData("stream.resetReceived", con.getHighestAckedThrough(), con.getLifetime());
+                
                 // no further processing
                 return;
             }
