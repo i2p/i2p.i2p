@@ -58,7 +58,7 @@ extern "C" {
 /* The maximum length of a SAM command with a public key */
 #define SAM_PKCMD_LEN (SAM_PUBKEY_LEN + SAM_CMD_LEN)
 /* The maximum size of a single raw packet */
-#define SAM_RAW_LEN (32 * 1024)
+#define SAM_RAW_PAYLOAD_MAX (32 * 1024)
 /* The maximum length a SAM non-data reply can be */
 #define SAM_REPLY_LEN 1024
 
