@@ -64,6 +64,11 @@ public class Connection {
     /** how many messages have been resent and not yet ACKed? */
     private int _activeResends;
     
+    private long _lifetimeBytesSent;
+    private long _lifetimeBytesReceived;
+    private long _lifetimeDupMessageSent;
+    private long _lifetimeDupMessageReceived;
+    
     public static final long MAX_RESEND_DELAY = 60*1000;
     public static final long MIN_RESEND_DELAY = 20*1000;
 
@@ -106,6 +111,7 @@ public class Connection {
         _ackSinceCongestion = true;
         _connectLock = new Object();
         _activeResends = 0;
+        _context.statManager().createRateStat("stream.con.windowSizeAtCongestion", "How large was our send window when we send a dup?", "Stream", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
     }
     
     public long getNextOutboundPacketNum() { 
@@ -454,9 +460,23 @@ public class Connection {
     public String getConnectionError() { return _connectionError; }
     public void setConnectionError(String err) { _connectionError = err; }
     
-    public long getLifetime() { return _context.clock().now() - _createdOn; }
+    public long getLifetime() { 
+        if (_closeSentOn <= 0)
+            return _context.clock().now() - _createdOn; 
+        else
+            return _closeSentOn - _createdOn;
+    }
     
     public ConnectionPacketHandler getPacketHandler() { return _handler; }
+    
+    public long getLifetimeBytesSent() { return _lifetimeBytesSent; }
+    public long getLifetimeBytesReceived() { return _lifetimeBytesReceived; }
+    public long getLifetimeDupMessagesSent() { return _lifetimeDupMessageSent; }
+    public long getLifetimeDupMessagesReceived() { return _lifetimeDupMessageReceived; }
+    public void incrementBytesSent(int bytes) { _lifetimeBytesSent += bytes; }
+    public void incrementDupMessagesSent(int msgs) { _lifetimeDupMessageSent += msgs; }
+    public void incrementBytesReceived(int bytes) { _lifetimeBytesReceived += bytes; }
+    public void incrementDupMessagesReceived(int msgs) { _lifetimeDupMessageReceived += msgs; }
     
     /** 
      * Time when the scheduler next want to send a packet, or -1 if 
@@ -720,6 +740,7 @@ public class Connection {
                 // shrink the window
                 int newWindowSize = getOptions().getWindowSize();
                 congestionOccurred();
+                _context.statManager().addRateData("stream.con.windowSizeAtCongestion", newWindowSize, _packet.getLifetime());
                 newWindowSize /= 2;
                 if (newWindowSize <= 0)
                     newWindowSize = 1;

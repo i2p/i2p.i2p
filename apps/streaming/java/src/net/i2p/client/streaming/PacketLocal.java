@@ -67,6 +67,7 @@ public class PacketLocal extends Packet implements MessageOutputStream.WriteStat
     }
     
     public long getCreatedOn() { return _createdOn; }
+    public long getLifetime() { return _context.clock().now() - _createdOn; }
     public void incrementSends() { 
         _numSends++;
         _lastSend = _context.clock().now();

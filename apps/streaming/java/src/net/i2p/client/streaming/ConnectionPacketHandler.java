@@ -21,6 +21,10 @@ public class ConnectionPacketHandler {
     public ConnectionPacketHandler(I2PAppContext context) {
         _context = context;
         _log = context.logManager().getLog(ConnectionPacketHandler.class);
+        _context.statManager().createRateStat("stream.con.receiveMessageSize", "Size of a message received on a connection", "Stream", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
+        _context.statManager().createRateStat("stream.con.receiveDuplicateSize", "Size of a duplicate message received on a connection", "Stream", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
+        _context.statManager().createRateStat("stream.con.packetsAckedPerMessageReceived", "Size of a duplicate message received on a connection", "Stream", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
+        _context.statManager().createRateStat("stream.sendsBeforeAck", "How many times a message was sent before it was ACKed?", "Stream", new long[] { 10*60*1000, 60*60*1000 });
     }
     
     /** distribute a packet to the connection specified */
@@ -28,6 +32,7 @@ public class ConnectionPacketHandler {
         boolean ok = verifyPacket(packet, con);
         if (!ok) return;
         con.packetReceived();
+        
         if (con.getInputStream().getTotalQueuedSize() > con.getOptions().getInboundBufferSize()) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Inbound buffer exceeded on connection " + con + ": dropping " + packet);
@@ -35,6 +40,9 @@ public class ConnectionPacketHandler {
             return;
         }
         con.getOptions().setChoke(0);
+
+        _context.statManager().addRateData("stream.con.receiveMessageSize", packet.getPayloadSize(), 0);
+        
         boolean isNew = con.getInputStream().messageReceived(packet.getSequenceNum(), packet.getPayload());
         
         if ( (packet.getSequenceNum() == 0) && (packet.getPayloadSize() > 0) ) {
@@ -49,6 +57,8 @@ public class ConnectionPacketHandler {
         
         if (isNew) {
             con.incrementUnackedPacketsReceived();
+            con.incrementBytesReceived(packet.getPayloadSize());
+            
             if (packet.isFlagSet(Packet.FLAG_DELAY_REQUESTED) && (packet.getOptionalDelay() <= 0) ) {
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("Scheduling immediate ack for " + packet);
@@ -63,6 +73,9 @@ public class ConnectionPacketHandler {
             }
         } else {
             if ( (packet.getSequenceNum() > 0) || (packet.getPayloadSize() > 0) ) {
+                _context.statManager().addRateData("stream.con.receiveDuplicateSize", packet.getPayloadSize(), 0);
+                con.incrementDupMessagesReceived(1);
+        
                 // take note of congestion
                 //con.getOptions().setResendDelay(con.getOptions().getResendDelay()*2);
                 //con.getOptions().setWindowSize(con.getOptions().getWindowSize()/2);
@@ -96,6 +109,7 @@ public class ConnectionPacketHandler {
                     //if (p.getNumSends() <= 1)
                     highestRTT = p.getAckTime();
                 }
+                _context.statManager().addRateData("stream.sendsBeforeAck", p.getNumSends(), p.getAckTime());
                 
                 if (p.getNumSends() > 1)
                     numResends++;
@@ -113,6 +127,7 @@ public class ConnectionPacketHandler {
             if (highestRTT > 0) {
                 con.getOptions().updateRTT(highestRTT);
             }
+            _context.statManager().addRateData("stream.con.packetsAckedPerMessageReceived", acked.size(), highestRTT);
         }
 
         boolean fastAck = adjustWindow(con, isNew, packet.getSequenceNum(), numResends, (acked != null ? acked.size() : 0));

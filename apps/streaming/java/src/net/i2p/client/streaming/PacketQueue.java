@@ -29,6 +29,8 @@ class PacketQueue {
         _connectionManager = mgr;
         _buf = _cache.acquire().getData(); // new byte[36*1024];
         _log = context.logManager().getLog(PacketQueue.class);
+        _context.statManager().createRateStat("stream.con.sendMessageSize", "Size of a message sent on a connection", "Stream", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
+        _context.statManager().createRateStat("stream.con.sendDuplicateSize", "Size of a message resent on a connection", "Stream", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
     }
     
     protected void finalize() throws Throwable {
@@ -62,9 +64,9 @@ class PacketQueue {
         long end = 0;
         boolean sent = false;
         try {
+            int size = 0;
             synchronized (this) {
                 Arrays.fill(_buf, (byte)0x0);
-                int size = 0;
                 if (packet.shouldSign())
                     size = packet.writeSignedPacket(_buf, 0, _context, _session.getPrivateKey());
                 else
@@ -74,6 +76,17 @@ class PacketQueue {
                 begin = _context.clock().now();
                 sent = _session.sendMessage(packet.getTo(), _buf, 0, size, keyUsed, tagsSent);
                 end = _context.clock().now();
+            }
+            _context.statManager().addRateData("stream.con.sendMessageSize", size, packet.getLifetime());
+            if (packet.getNumSends() > 1)
+                _context.statManager().addRateData("stream.con.sendDuplicateSize", size, packet.getLifetime());
+            
+            
+            Connection con = packet.getConnection();
+            if (con != null) {
+                con.incrementBytesSent(size);
+                if (packet.getNumSends() > 1)
+                    con.incrementDupMessagesSent(1);
             }
         } catch (I2PSessionException ise) {
             if (_log.shouldLog(Log.WARN))

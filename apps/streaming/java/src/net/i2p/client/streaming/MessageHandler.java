@@ -18,6 +18,7 @@ public class MessageHandler implements I2PSessionListener {
         _manager = mgr;
         _context = ctx;
         _log = ctx.logManager().getLog(MessageHandler.class);
+        _context.statManager().createRateStat("stream.packetReceiveFailure", "When do we fail to decrypt or otherwise receive a packet sent to us?", "Stream", new long[] { 60*60*1000, 24*60*60*1000 });
     }
         
     /** Instruct the client that the given session has received a message with
@@ -31,6 +32,7 @@ public class MessageHandler implements I2PSessionListener {
         try {
             data = session.receiveMessage(msgId);
         } catch (I2PSessionException ise) {
+            _context.statManager().addRateData("stream.packetReceiveFailure", 1, 0);
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Error receiving the message", ise);
             return;
@@ -40,6 +42,7 @@ public class MessageHandler implements I2PSessionListener {
             packet.readPacket(data, 0, data.length);
             _manager.getPacketHandler().receivePacket(packet);
         } catch (IllegalArgumentException iae) {
+            _context.statManager().addRateData("stream.packetReceiveFailure", 1, 0);
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Received an invalid packet", iae);
         }
