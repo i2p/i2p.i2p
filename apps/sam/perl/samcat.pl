@@ -12,7 +12,7 @@ $sam->send($me,"fooquux");
 
 $sam->readprocess();
 ($source, $message) = @{ $sam->receive() };
-print "$source -- $message";
+print "$source -- $message"; 
 
 
 
