@@ -52,8 +52,12 @@ class NetMonitorRunner implements Runnable {
     }
     
     private void runHarvest() {
-        List routers = getRouters();
-        DataHarvester.getInstance().harvestData(_monitor, routers);
+        try {
+            List routers = getRouters();
+            DataHarvester.getInstance().harvestData(_monitor, routers);
+        } catch (Throwable t) {
+            _log.error("Unhandled exception harvesting the data", t);
+        }
     }
     
     /**
@@ -103,6 +107,8 @@ class NetMonitorRunner implements Runnable {
                 _log.debug("Peer summary written to " + summaryFile.getAbsolutePath());
             } catch (IOException ioe) {
                 _log.error("Error exporting the peer summary for " + peerName, ioe);
+            } catch (Throwable t) {
+                _log.error("Unhandled exception exporting the data", t);
             } finally {
                 if (fos != null) try { fos.close(); } catch (IOException ioe) {}
             }
