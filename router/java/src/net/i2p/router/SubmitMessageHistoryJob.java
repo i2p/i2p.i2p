@@ -60,13 +60,13 @@ public class SubmitMessageHistoryJob extends JobImpl {
         I2PThread t = new I2PThread(new Runnable() {
             public void run() {
                 _log.debug("Submitting data");
-                _context.messageHistory().setPauseFlushes(true);
-                String filename = _context.messageHistory().getFilename();
+                getContext().messageHistory().setPauseFlushes(true);
+                String filename = getContext().messageHistory().getFilename();
                 send(filename);
-                _context.messageHistory().setPauseFlushes(false);
-                Job job = new SubmitMessageHistoryJob(_context);
-                job.getTiming().setStartAfter(_context.clock().now() + getRequeueDelay());
-                _context.jobQueue().addJob(job);
+                getContext().messageHistory().setPauseFlushes(false);
+                Job job = new SubmitMessageHistoryJob(getContext());
+                job.getTiming().setStartAfter(getContext().clock().now() + getRequeueDelay());
+                getContext().jobQueue().addJob(job);
             }
         });
         t.setName("SubmitData");
@@ -88,7 +88,7 @@ public class SubmitMessageHistoryJob extends JobImpl {
             if (size > 0)
                 expectedSend += (int)size/10; // compression
             FileInputStream fin = new FileInputStream(dataFile);
-            BandwidthLimitedInputStream in = new BandwidthLimitedInputStream(_context, fin, null, true);
+            BandwidthLimitedInputStream in = new BandwidthLimitedInputStream(getContext(), fin, null, true);
             boolean sent = HTTPSendData.postData(url, size, in);
             fin.close();
             boolean deleted = dataFile.delete();
@@ -99,7 +99,7 @@ public class SubmitMessageHistoryJob extends JobImpl {
     }
     
     private String getURL() {
-        String str = _context.router().getConfigSetting(PARAM_SUBMIT_URL);
+        String str = getContext().router().getConfigSetting(PARAM_SUBMIT_URL);
         if ( (str == null) || (str.trim().length() <= 0) )
             return DEFAULT_SUBMIT_URL;
         else
@@ -107,7 +107,7 @@ public class SubmitMessageHistoryJob extends JobImpl {
     }
     
     private boolean shouldSubmit() {
-        String str = _context.router().getConfigSetting(PARAM_SUBMIT_DATA);
+        String str = getContext().router().getConfigSetting(PARAM_SUBMIT_DATA);
         if (str == null) {
             _log.debug("History submit config not specified [" + PARAM_SUBMIT_DATA + "], default = " + DEFAULT_SUBMIT_DATA);
             return DEFAULT_SUBMIT_DATA;
