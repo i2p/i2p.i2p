@@ -32,7 +32,8 @@ public class BandwidthLimitedInputStream extends FilterInputStream {
         super(source);
         _context = context;
         _peer = peer;
-        _peerSource = peer.getHash().toBase64();
+        if (peer != null)
+            _peerSource = peer.getHash().toBase64();
         _pullFromOutbound = pullFromOutbound;
     }
     
