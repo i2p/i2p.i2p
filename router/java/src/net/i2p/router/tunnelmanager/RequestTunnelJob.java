@@ -82,7 +82,6 @@ public class RequestTunnelJob extends JobImpl {
 
         _pool = pool;
         _tunnelGateway = tunnelGateway;
-        _toBeRequested = new ArrayList();
         _timeoutMs = timeoutMs;
         _expiration = -1;
         _isInbound = isInbound;
@@ -112,8 +111,15 @@ public class RequestTunnelJob extends JobImpl {
 
         // work backwards (end point, then the router pointing at the endpoint, then the router pointing at that, etc, until the gateway
         _toBeRequested = new ArrayList(participants.size());
-        for (int i = participants.size()-1; i >= 0; i--) 
-            _toBeRequested.add(participants.get(i));
+        for (int i = participants.size()-1; i >= 0; i--) {
+            TunnelInfo peer = (TunnelInfo)participants.get(i);
+            if (null != _context.netDb().lookupRouterInfoLocally(peer.getThisHop())) {
+                _toBeRequested.add(participants.get(i));
+            } else {
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("ok who the fuck requested someone we don't know about? (dont answer that");
+            }
+        }
     }
     
     public String getName() { return "Request Tunnel"; }
