@@ -16,7 +16,6 @@ import net.i2p.util.Log;
  */
 public class ConnectTest {
     private Log _log;
-    private I2PSession _client;
     private I2PSession _server;
     public void test() {
         try {
@@ -26,14 +25,14 @@ public class ConnectTest {
             _server = createSession();
             _log.debug("running server");
             runServer(context, _server);
-            _log.debug("creating client session");
-            _client = createSession();
-            _log.debug("running client");
-            runClient(context, _client);
+            for (int i = 0; i < 5; i++) {
+                _log.debug("running client");
+                runClient(context, createSession());
+            }
         } catch (Exception e) {
             _log.error("error running", e);
         }
-        try { Thread.sleep(30*1000); } catch (Exception e) {}
+        try { Thread.sleep(10*60*1000); } catch (Exception e) {}
     }
     
     private void runClient(I2PAppContext ctx, I2PSession session) {
@@ -70,7 +69,7 @@ public class ConnectTest {
                 while (true) {
                     I2PSocket socket = ssocket.accept();
                     _log.debug("socket accepted: " + socket);
-                    try { Thread.sleep(60*1000); } catch (InterruptedException ie) {}
+                    try { Thread.sleep(5*1000); } catch (InterruptedException ie) {}
                     socket.close();
                 }
             } catch (Exception e) {
@@ -100,6 +99,9 @@ public class ConnectTest {
                 try { Thread.sleep(5*1000); } catch (InterruptedException ie) {}
                 socket.close();
                 _log.debug("socket closed");
+                mgr.destroySocketManager();
+                mgr = null;
+                socket = null;
             } catch (Exception e) {
                 _log.error("error running", e);
             }
@@ -123,7 +125,7 @@ public class ConnectTest {
     
     public static void main(String args[]) {
         System.setProperty(I2PClient.PROP_TCP_HOST, "localhost");
-        System.setProperty(I2PClient.PROP_TCP_PORT, "10001");       
+        System.setProperty(I2PClient.PROP_TCP_PORT, "11001");       
         ConnectTest ct = new ConnectTest();
         ct.test();
     }
