@@ -9,10 +9,15 @@
 
 package net.i2p.apps.systray;
 
-import net.i2p.util.ShellCommand;
-
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
+
+import net.i2p.util.ShellCommand;
 
 /**
  * A quick and simple multi-platform URL launcher. It attempts to launch the
@@ -60,10 +65,29 @@ public class UrlLauncher {
 
             } else if (osName.startsWith("Windows")) {
 
-                if (_shellCommand.executeSilentAndWaitTimed("rundll32 url.dll,FileProtocolHandler " + url, 5))
-                    return true;
+                String         browserString  = "\"C:\\Program Files\\Internet Explorer\\iexplore.exe\"";
+                BufferedReader bufferedReader = null;
 
-                if (_shellCommand.executeSilentAndWaitTimed("\"C:\\Program Files\\Internet Explorer\\iexplore.exe\" " + url, 5))
+                _shellCommand.executeSilentAndWaitTimed("regedit /E default_browser.reg \"HKEY_CLASSES_ROOT\\http\\shell\\open\\command\"", 5);
+
+                try {
+                    bufferedReader = new BufferedReader(new InputStreamReader(new FileInputStream("default_browser.reg")));
+                    for (String line; (line = bufferedReader.readLine()) != null; ) {
+                        if (line.startsWith("@=\"")) {
+                            browserString = line.substring(3, line.toLowerCase().indexOf(".exe") + 3);
+                        }
+                    }
+                } catch (Exception e) {
+                    // Defaults to IE.
+                }
+                try {
+                    bufferedReader.close();
+                } catch (IOException e) {
+                    // No worries.
+                }
+                new File("default_browser.reg").delete();
+
+                if (_shellCommand.executeSilentAndWaitTimed(browserString + " " + url, 5))
                     return true;
 
             } else {
