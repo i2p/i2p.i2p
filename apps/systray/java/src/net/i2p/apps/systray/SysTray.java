@@ -23,7 +23,6 @@ import snoozesoft.systray4j.SysTrayMenuListener;
  * @author hypercubus
  */
 public class SysTray implements SysTrayMenuListener {
-
     private BrowserChooser  _browserChooser;
     private String          _browserString;
     private ConfigFile      _configFile        = new ConfigFile();
@@ -36,7 +35,6 @@ public class SysTray implements SysTrayMenuListener {
     private UrlLauncher     _urlLauncher       = new UrlLauncher();
 
     public SysTray() {
-
         if (!_configFile.init("systray.config"))
             _configFile.setProperty("browser", "default");
 
@@ -47,7 +45,6 @@ public class SysTray implements SysTrayMenuListener {
     }
 
     public static void main(String[] args) {
-
         if (System.getProperty("os.name").startsWith("Windows"))
             new SysTray();
     }
@@ -59,7 +56,6 @@ public class SysTray implements SysTrayMenuListener {
     }
 
     public void menuItemSelected(SysTrayMenuEvent e) {
-
         String browser = null;
 
         if (e.getActionCommand().equals("shutdown")) {
@@ -73,10 +69,8 @@ public class SysTray implements SysTrayMenuListener {
             _frame = null;
             System.exit(0);
         } else if (e.getActionCommand().equals("selectbrowser")) {
-
             if (!(browser = promptForBrowser("Select browser")).equals("nullnull"))
                 setBrowser(browser);
-
         } else if (e.getActionCommand().equals("openconsole")) {
             openRouterConsole();
         }
@@ -93,24 +87,19 @@ public class SysTray implements SysTrayMenuListener {
     }
 
     private void openRouterConsole() {
-
         String browser = null;
 
         if (_browserString == null || _browserString.equals("default")) {
             try {
-
                 if (_urlLauncher.openUrl("http://localhost:7657/"))
                     return;
-
             } catch (Exception ex) {
                 // Fall through.
             }
         } else {
             try {
-
                 if (_urlLauncher.openUrl("http://localhost:7657/", _browserString))
                     return;
-
             } catch (Exception ex) {
                 // Fall through.
             }
@@ -121,9 +110,7 @@ public class SysTray implements SysTrayMenuListener {
     }
 
     private String promptForBrowser(String windowTitle) {
-
         String browser = null;
-
         _frame = new Frame();
         _browserChooser = new BrowserChooser(_frame, windowTitle);
         browser = _browserChooser.getDirectory() + _browserChooser.getFile();
