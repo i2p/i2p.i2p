@@ -83,7 +83,7 @@ import freenet.support.CPUInformation.UnknownCPUException;
  * </pre>
  *
  */
-public class NativeBigInteger_new extends BigInteger {
+public class NativeBigInteger extends BigInteger {
     /** did we load the native lib correctly? */
     private static boolean _nativeOk = false;
     /** 
@@ -169,33 +169,33 @@ public class NativeBigInteger_new extends BigInteger {
 
     private byte[] cachedBa;
 
-    public NativeBigInteger_new(byte[] val) {
+    public NativeBigInteger(byte[] val) {
         super(val);
     }
 
-    public NativeBigInteger_new(int signum, byte[] magnitude) {
+    public NativeBigInteger(int signum, byte[] magnitude) {
         super(signum, magnitude);
     }
 
-    public NativeBigInteger_new(int bitlen, int certainty, Random rnd) {
+    public NativeBigInteger(int bitlen, int certainty, Random rnd) {
         super(bitlen, certainty, rnd);
     }
 
-    public NativeBigInteger_new(int numbits, Random rnd) {
+    public NativeBigInteger(int numbits, Random rnd) {
         super(numbits, rnd);
     }
 
-    public NativeBigInteger_new(String val) {
+    public NativeBigInteger(String val) {
         super(val);
     }
 
-    public NativeBigInteger_new(String val, int radix) {
+    public NativeBigInteger(String val, int radix) {
         super(val, radix);
     }
     /**Creates a new NativeBigInteger with the same value
     *  as the supplied BigInteger. Warning!, not very efficent
     */
-    public NativeBigInteger_new(BigInteger integer) {
+    public NativeBigInteger(BigInteger integer) {
         //Now, why doesn't sun provide a constructor
         //like this one in BigInteger?
         this(integer.toByteArray());
