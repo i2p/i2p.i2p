@@ -33,7 +33,6 @@ import net.i2p.util.Log;
  * @author jrandom
  */
 class RequestLeaseSetMessageHandler extends HandlerImpl {
-    private final static Log _log = new Log(RequestLeaseSetMessageHandler.class);
     private Map _existingLeaseSets;
 
     public RequestLeaseSetMessageHandler(I2PAppContext context) {

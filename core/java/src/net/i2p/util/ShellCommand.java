@@ -104,6 +104,8 @@ public class ShellCommand {
         }
     }
 
+    private final static int BUFFER_SIZE = 1024;
+
     /**
      * Reads data from a <code>java.io.InputStream</code> and writes it to
      * <code>STDOUT</code>.
@@ -111,8 +113,6 @@ public class ShellCommand {
      * @author hypercubus
      */
     private class StreamReader extends Thread {
-
-        final int BUFFER_SIZE = 1024;
 
         private BufferedReader    bufferedReader;
         private InputStreamReader inputStreamReader;

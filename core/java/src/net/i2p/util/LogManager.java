@@ -447,19 +447,18 @@ public class LogManager {
             if (!Character.isDigit(mod)) v = size.substring(0, size.length() - 1);
             int val = Integer.parseInt(v);
             switch (mod) {
-            case 'K':
-                val *= 1024;
-                break;
-            case 'M':
-                val *= 1024 * 1024;
-                break;
-            case 'G':
-                val *= 1024 * 1024 * 1024;
-                break;
-            case 'T':
-                // because we can
-                val *= 1024 * 1024 * 1024 * 1024;
-                break;
+                case 'K':
+                    val *= 1024;
+                    break;
+                case 'M':
+                    val *= 1024 * 1024;
+                    break;
+                case 'G':
+                    val *= 1024 * 1024 * 1024;
+                    break;
+                default:
+                    // blah, noop
+                    break;
             }
             return val;
         } catch (Throwable t) {

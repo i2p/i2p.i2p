@@ -377,12 +377,12 @@ public class AESInputStream extends FilterInputStream {
             long endE = Clock.getInstance().now();
 
             ByteArrayInputStream encryptedStream = new ByteArrayInputStream(encrypted);
-            AESInputStream in = new AESInputStream(ctx, encryptedStream, key, iv);
+            AESInputStream sin = new AESInputStream(ctx, encryptedStream, key, iv);
             ByteArrayOutputStream baos = new ByteArrayOutputStream(512);
             byte buf[] = new byte[1024 * 32];
-            int read = DataHelper.read(in, buf);
+            int read = DataHelper.read(sin, buf);
             if (read > 0) baos.write(buf, 0, read);
-            in.close();
+            sin.close();
             byte fin[] = baos.toByteArray();
             long end = Clock.getInstance().now();
             Hash origHash = SHA256Generator.getInstance().calculateHash(orig);
@@ -422,15 +422,15 @@ public class AESInputStream extends FilterInputStream {
             System.arraycopy(encrypted, 0, encryptedSegment, 0, 40);
 
             ByteArrayInputStream encryptedStream = new ByteArrayInputStream(encryptedSegment);
-            AESInputStream in = new AESInputStream(ctx, encryptedStream, key, iv);
+            AESInputStream sin = new AESInputStream(ctx, encryptedStream, key, iv);
             ByteArrayOutputStream baos = new ByteArrayOutputStream(512);
             byte buf[] = new byte[1024 * 32];
-            int read = DataHelper.read(in, buf);
-            int remaining = in.remainingBytes();
-            int readyBytes = in.readyBytes();
+            int read = DataHelper.read(sin, buf);
+            int remaining = sin.remainingBytes();
+            int readyBytes = sin.readyBytes();
             log.info("Read: " + read);
             if (read > 0) baos.write(buf, 0, read);
-            in.close();
+            sin.close();
             byte fin[] = baos.toByteArray();
             log.info("fin.length: " + fin.length + " remaining: " + remaining + " ready: " + readyBytes);
             long end = Clock.getInstance().now();
