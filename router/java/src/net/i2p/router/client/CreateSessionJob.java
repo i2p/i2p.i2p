@@ -33,12 +33,18 @@ class CreateSessionJob extends JobImpl {
         super(context);
         _log = context.logManager().getLog(CreateSessionJob.class);
         _runner = runner;
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("CreateSessionJob for runner " + _runner + " / config: " + _runner.getConfig());
     }
     
     public String getName() { return "Request tunnels for a new client"; }
     public void runJob() {
         SessionConfig cfg = _runner.getConfig();
-        if ( (cfg == null) || (cfg.getDestination() == null) ) return;
+        if ( (cfg == null) || (cfg.getDestination() == null) ) {
+            if (_log.shouldLog(Log.ERROR))
+                _log.error("No session config on runner " + _runner);
+            return;
+        }
         if (_log.shouldLog(Log.INFO))
             _log.info("Requesting lease set for destination " + cfg.getDestination().calculateHash().toBase64());
         ClientTunnelSettings settings = new ClientTunnelSettings();
