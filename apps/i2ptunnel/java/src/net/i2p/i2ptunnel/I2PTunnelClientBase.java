@@ -113,7 +113,9 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
     protected static I2PSocketManager buildSocketManager() {
         Properties props = new Properties();
         props.putAll(System.getProperties());
-        return I2PSocketManagerFactory.createManager(I2PTunnel.host, Integer.parseInt(I2PTunnel.port), props);
+        I2PSocketManager sockManager = I2PSocketManagerFactory.createManager(I2PTunnel.host, Integer.parseInt(I2PTunnel.port), props);
+        sockManager.setName("Client");
+        return sockManager;
     }
 
     public final int getLocalPort() {

@@ -79,6 +79,7 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
                                                             props);
 
         }
+        sockMgr.setName("Server");
         l.log("Ready!");
         notifyEvent("openServerResult", "ok");
         open = true;
