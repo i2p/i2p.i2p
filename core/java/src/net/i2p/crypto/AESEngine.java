@@ -9,8 +9,6 @@ package net.i2p.crypto;
  *
  */
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
 import net.i2p.I2PAppContext;
@@ -52,25 +50,26 @@ public class AESEngine {
     public byte[] safeEncrypt(byte payload[], SessionKey sessionKey, byte iv[], int paddedSize) {
         if ((iv == null) || (payload == null) || (sessionKey == null) || (iv.length != 16)) return null;
 
-        ByteArrayOutputStream baos = new ByteArrayOutputStream(paddedSize + 64);
+        int size = Hash.HASH_LENGTH 
+                 + 4 // sizeof(payload)
+                 + payload.length;
+        int padding = ElGamalAESEngine.getPaddingSize(size, paddedSize);
+        
+        byte data[] = new byte[size + padding];
         Hash h = _context.sha().calculateHash(iv);
-        try {
-            h.writeBytes(baos);
-            DataHelper.writeLong(baos, 4, payload.length);
-            baos.write(payload);
-            byte tv[] = baos.toByteArray();
-            baos.write(ElGamalAESEngine.getPadding(_context, tv.length, paddedSize));
-        } catch (IOException ioe) {
-            _log.error("Error writing data", ioe);
-            return null;
-        } catch (DataFormatException dfe) {
-            _log.error("Error writing data", dfe);
-            return null;
-        }
-        byte orig[] = baos.toByteArray();
-        byte rv[] = new byte[orig.length];
-        encrypt(orig, 0, rv, 0, sessionKey, iv, rv.length);
-        return rv;
+        
+        int cur = 0;
+        System.arraycopy(h.getData(), 0, data, cur, Hash.HASH_LENGTH);
+        cur += Hash.HASH_LENGTH;
+        DataHelper.toLong(data, cur, 4, payload.length);
+        cur += 4;
+        System.arraycopy(payload, 0, data, cur, payload.length);
+        cur += payload.length;
+        byte paddingData[] = ElGamalAESEngine.getPadding(_context, size, paddedSize);
+        System.arraycopy(paddingData, 0, data, cur, paddingData.length);
+        
+        encrypt(data, 0, data, 0, sessionKey, iv, data.length);
+        return data;
     }
 
     public byte[] safeDecrypt(byte payload[], SessionKey sessionKey, byte iv[]) {
@@ -82,31 +81,29 @@ public class AESEngine {
             _log.error("Error decrypting the data - payload " + payload.length + " decrypted to null");
             return null;
         }
-        ByteArrayInputStream bais = new ByteArrayInputStream(decr);
-        Hash h = _context.sha().calculateHash(iv);
-        try {
-            Hash rh = new Hash();
-            rh.readBytes(bais);
-            if (!h.equals(rh)) {
+
+        int cur = 0;
+        byte h[] = _context.sha().calculateHash(iv).getData();
+        for (int i = 0; i < Hash.HASH_LENGTH; i++) {
+            if (decr[i] != h[i]) {
                 _log.error("Hash does not match [key=" + sessionKey + " / iv =" + DataHelper.toString(iv, iv.length)
                            + "]", new Exception("Hash error"));
                 return null;
             }
-            long len = DataHelper.readLong(bais, 4);
-            byte data[] = new byte[(int) len];
-            int read = bais.read(data);
-            if (read != len) {
-                _log.error("Not enough to read");
-                return null;
-            }
-            return data;
-        } catch (IOException ioe) {
-            _log.error("Error writing data", ioe);
-            return null;
-        } catch (DataFormatException dfe) {
-            _log.error("Error writing data", dfe);
+        }
+        cur += Hash.HASH_LENGTH;
+        
+        long len = DataHelper.fromLong(decr, cur, 4);
+        cur += 4;
+        
+        if (cur + len > decr.length) {
+            _log.error("Not enough to read");
             return null;
         }
+        
+        byte data[] = new byte[(int)len];
+        System.arraycopy(decr, cur, data, 0, (int)len);
+        return data;
     }
 
 

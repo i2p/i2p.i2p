@@ -123,7 +123,7 @@ class ElGamalAESEngineTest {
             _log.debug("** Encryption complete.  Beginning decryption");
             Set foundTags = new HashSet();
             SessionKey foundKey = new SessionKey();
-            byte decrypted[] = _context.elGamalAESEngine().decryptAESBlock(encrypted, sessionKey, iv, null, foundTags, foundKey);
+            byte decrypted[] = _context.elGamalAESEngine().decryptAESBlock(encrypted, 0, encrypted.length, sessionKey, iv, null, foundTags, foundKey);
             if (decrypted == null) throw new Exception("Decryption failed");
             String read = new String(decrypted);
             _log.debug("read: " + read);

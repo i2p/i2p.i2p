@@ -1,4 +1,18 @@
-$Id: history.txt,v 1.57 2004/10/27 21:11:52 jrandom Exp $
+$Id: history.txt,v 1.58 2004/10/29 21:40:52 jrandom Exp $
+
+2004-10-30  jrandom
+    * Cache the temporary objects used in the AES encryption/decryption
+      process so that AES doesn't require any memory allocation to process
+      data.
+    * Dramatically reduce memory usage within various crypto implementations
+      by avoiding unnecessary (though simplifying) buffers.
+    * If we specify some tags to be sent in an I2CP message explicitly, use
+      only those, not those plus a new set (otherwise we aren't sure on ACK
+      which set was delivered)
+    * Allow configuration for the partial send timeout (how long before 
+      resending a message down a different tunnel in a lease).  This can be
+      updated with the "router.clientPartialSendTimeout" router config prop.
+    * Logging
 
 2004-10-29  jrandom
     * Strip the Referer, Via, and From headers completely, rather than 

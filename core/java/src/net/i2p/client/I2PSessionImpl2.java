@@ -114,17 +114,21 @@ class I2PSessionImpl2 extends I2PSessionImpl {
         Set sentTags = null;
         int oldTags = _context.sessionKeyManager().getAvailableTags(dest.getPublicKey(), key);
         long availTimeLeft = _context.sessionKeyManager().getAvailableTimeLeft(dest.getPublicKey(), key);
-        if (oldTags < 10) {
-            sentTags = createNewTags(50);
-            //_log.error("** sendBestEffort only had " + oldTags + " adding 50");
-        } else if (availTimeLeft < 30 * 1000) {
-            // if we have > 10 tags, but they expire in under 30 seconds, we want more
-            sentTags = createNewTags(50);
-            if (_log.shouldLog(Log.DEBUG)) _log.debug(getPrefix() + "Tags are almost expired, adding 50 new ones");
-            //_log.error("** sendBestEffort available time left " + availTimeLeft);
-        } else {
-            //_log.error("sendBestEffort old tags: " + oldTags + " available time left: " + availTimeLeft);
+        
+        if ( (tagsSent == null) || (tagsSent.size() <= 0) ) {
+            if (oldTags < 10) {
+                sentTags = createNewTags(50);
+                //_log.error("** sendBestEffort only had " + oldTags + " adding 50");
+            } else if (availTimeLeft < 30 * 1000) {
+                // if we have > 10 tags, but they expire in under 30 seconds, we want more
+                sentTags = createNewTags(50);
+                if (_log.shouldLog(Log.DEBUG)) _log.debug(getPrefix() + "Tags are almost expired, adding 50 new ones");
+                //_log.error("** sendBestEffort available time left " + availTimeLeft);
+            } else {
+                //_log.error("sendBestEffort old tags: " + oldTags + " available time left: " + availTimeLeft);
+            }
         }
+        
         SessionKey newKey = null;
         if (false) // rekey
             newKey = _context.keyGenerator().generateSessionKey();

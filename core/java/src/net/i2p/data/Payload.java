@@ -81,6 +81,13 @@ public class Payload extends DataStructureImpl {
         out.write(_encryptedData);
         _log.debug("wrote payload: " + _encryptedData.length);
     }
+    public int writeBytes(byte target[], int offset) {
+        if (_encryptedData == null) throw new IllegalStateException("Not yet encrypted.  Please set the encrypted data");
+        DataHelper.toLong(target, offset, 4, _encryptedData.length);
+        offset += 4;
+        System.arraycopy(_encryptedData, 0, target, offset, _encryptedData.length);
+        return 4 + _encryptedData.length;
+    }
 
     public boolean equals(Object object) {
         if ((object == null) || !(object instanceof Payload)) return false;
@@ -94,6 +101,7 @@ public class Payload extends DataStructureImpl {
     }
 
     public String toString() {
+        if (true) return "[Payload]";
         StringBuffer buf = new StringBuffer(128);
         buf.append("[Payload: ");
         if (getUnencryptedData() != null)

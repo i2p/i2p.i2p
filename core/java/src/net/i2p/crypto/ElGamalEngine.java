@@ -30,7 +30,6 @@ package net.i2p.crypto;
  */
 
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.math.BigInteger;
 
 import net.i2p.I2PAppContext;
@@ -98,19 +97,12 @@ public class ElGamalEngine {
 
         long start = _context.clock().now();
 
-        ByteArrayOutputStream baos = new ByteArrayOutputStream(256);
-        try {
-            baos.write(0xFF);
-            Hash hash = _context.sha().calculateHash(data);
-            hash.writeBytes(baos);
-            baos.write(data);
-            baos.flush();
-        } catch (Exception e) {
-            if (_log.shouldLog(Log.ERROR)) _log.error("Internal error writing to buffer", e);
-            return null;
-        }
-
-        byte d2[] = baos.toByteArray();
+        byte d2[] = new byte[1+Hash.HASH_LENGTH+data.length];
+        d2[0] = (byte)0xFF;
+        Hash hash = _context.sha().calculateHash(data);
+        System.arraycopy(hash.getData(), 0, d2, 1, Hash.HASH_LENGTH);
+        System.arraycopy(data, 0, d2, 1+Hash.HASH_LENGTH, data.length);
+        
         long t0 = _context.clock().now();
         BigInteger m = new NativeBigInteger(1, d2);
         long t1 = _context.clock().now();

@@ -85,9 +85,9 @@ public class StreamSinkSend {
                 }   
             }
             fis.close();
+            sock.close();
             long afterSending = System.currentTimeMillis();
             System.out.println("Sent " + (size / 1024) + "KB in " + (afterSending-beforeSending) + "ms");
-            sock.close();
         } catch (InterruptedIOException iie) {
             _log.error("Timeout connecting to the peer", iie);
             return;

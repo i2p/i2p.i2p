@@ -36,7 +36,7 @@ import net.i2p.util.Log;
 /**
  * Send a client message, taking into consideration the fact that there may be
  * multiple inbound tunnels that the target provides.  This job sends it to one
- * of them and if it doesnt get a confirmation within 15 seconds (SEND_TIMEOUT_MS),
+ * of them and if it doesnt get a confirmation within a few seconds (getSendTimeout()),
  * it tries the next, continuing on until a confirmation is received, the full
  * timeout has been reached (60 seconds, or the ms defined in the client's or
  * router's "clientMessageTimeout" option).
@@ -63,7 +63,9 @@ public class OutboundClientMessageJob extends JobImpl {
     private final static long OVERALL_TIMEOUT_MS_DEFAULT = 60*1000;
     
     /** how long for each send do we allow before going on to the next? */
-    private final static long SEND_TIMEOUT_MS = 10*1000;
+    private final static long DEFAULT_SEND_PARTIAL_TIMEOUT = 10*1000;
+    private static final String PROP_SEND_PARTIAL_TIMEOUT = "router.clientPartialSendTimeout";
+    
     /** priority of messages, that might get honored some day... */
     private final static int SEND_PRIORITY = 500;
     
@@ -130,6 +132,15 @@ public class OutboundClientMessageJob extends JobImpl {
         _nextStep = new NextStepJob();
         _lookupLeaseSetFailed = new LookupLeaseSetFailedJob();
         _shouldBundle = getShouldBundle();
+    }
+    
+    private long getSendTimeout() { 
+        String timeout = getContext().getProperty(PROP_SEND_PARTIAL_TIMEOUT, ""+DEFAULT_SEND_PARTIAL_TIMEOUT);
+        try {
+            return Long.parseLong(timeout);
+        } catch (NumberFormatException nfe) {
+            return DEFAULT_SEND_PARTIAL_TIMEOUT;
+        }
     }
     
     public String getName() { return "Outbound client message"; }
@@ -375,7 +386,7 @@ public class OutboundClientMessageJob extends JobImpl {
             SendTunnelMessageJob j = new SendTunnelMessageJob(getContext(), msg, outTunnelId, 
                                                               lease.getRouterIdentity().getHash(), 
                                                               lease.getTunnelId(), null, onReply, 
-                                                              onFail, selector, SEND_TIMEOUT_MS, 
+                                                              onFail, selector, getSendTimeout(), 
                                                               SEND_PRIORITY);
             getContext().jobQueue().addJob(j);
         } else {

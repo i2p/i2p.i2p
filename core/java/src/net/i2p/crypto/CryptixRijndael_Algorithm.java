@@ -453,6 +453,11 @@ public final class CryptixRijndael_Algorithm // implicit no-argument constructor
      * @param  sessionKey The session key to use for decryption.
      */
     public static final void blockDecrypt(byte[] in, byte[] result, int inOffset, int outOffset, Object sessionKey) {
+        if (in.length - inOffset > result.length - outOffset)
+            throw new IllegalArgumentException("result too small: in.len=" + in.length + " in.offset=" + inOffset
+                                               + " result.len=" + result.length + " result.offset=" + outOffset);
+        if (in.length - inOffset <= 15)
+            throw new IllegalArgumentException("data too small: " + in.length + " inOffset: " + inOffset);
         if (_RDEBUG) trace(_IN, "blockDecrypt(" + in + ", " + inOffset + ", " + sessionKey + ")");
         int[][] Kd = (int[][]) ((Object[]) sessionKey)[1]; // extract decryption round keys
         int ROUNDS = Kd.length - 1;
@@ -534,18 +539,31 @@ public final class CryptixRijndael_Algorithm // implicit no-argument constructor
      * @exception  InvalidKeyException  If the key is invalid.
      */
     public static final/* synchronized */Object makeKey(byte[] k, int blockSize) throws InvalidKeyException {
+        return makeKey(k, blockSize, null);
+    }
+    public static final/* synchronized */Object makeKey(byte[] k, int blockSize, CryptixAESKeyCache.KeyCacheEntry keyData) throws InvalidKeyException {
         if (_RDEBUG) trace(_IN, "makeKey(" + k + ", " + blockSize + ")");
         if (k == null) throw new InvalidKeyException("Empty key");
         if (!(k.length == 16 || k.length == 24 || k.length == 32))
             throw new InvalidKeyException("Incorrect key length");
         int ROUNDS = getRounds(k.length, blockSize);
         int BC = blockSize / 4;
-        int[][] Ke = new int[ROUNDS + 1][BC]; // encryption round keys
-        int[][] Kd = new int[ROUNDS + 1][BC]; // decryption round keys
+        int[][] Ke = null; // new int[ROUNDS + 1][BC]; // encryption round keys
+        int[][] Kd = null; // new int[ROUNDS + 1][BC]; // decryption round keys
         int ROUND_KEY_COUNT = (ROUNDS + 1) * BC;
         int KC = k.length / 4;
-        int[] tk = new int[KC];
+        int[] tk = null; // new int[KC];
         int i, j;
+        
+        if (keyData == null) {
+            Ke = new int[ROUNDS + 1][BC];
+            Kd = new int[ROUNDS + 1][BC];
+            tk = new int[KC];
+        } else {
+            Ke = keyData.Ke;
+            Kd = keyData.Kd;
+            tk = keyData.tk;
+        }
 
         // copy user material bytes into temporary ints
         for (i = 0, j = 0; i < KC;)
@@ -604,7 +622,11 @@ public final class CryptixRijndael_Algorithm // implicit no-argument constructor
             }
         // assemble the encryption (Ke) and decryption (Kd) round keys into
         // one sessionKey object
-        Object[] sessionKey = new Object[] { Ke, Kd};
+        Object[] sessionKey = null;
+        if (keyData == null)
+            sessionKey = new Object[] { Ke, Kd};
+        else
+            sessionKey = keyData.key;
         if (_RDEBUG) trace(_OUT, "makeKey()");
         return sessionKey;
     }

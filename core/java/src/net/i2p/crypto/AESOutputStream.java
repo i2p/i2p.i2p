@@ -9,7 +9,6 @@ package net.i2p.crypto;
  *
  */
 
-import java.io.ByteArrayOutputStream;
 import java.io.FilterOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;

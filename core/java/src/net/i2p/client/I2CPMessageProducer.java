@@ -109,8 +109,8 @@ class I2CPMessageProducer {
         // generateNewTags would only generate tags if necessary
 
         data.setEncryptedData(encr);
-        _log.debug("Encrypting the payload to public key " + dest.getPublicKey().toBase64() + "\nPayload: "
-                   + data.calculateHash());
+        //_log.debug("Encrypting the payload to public key " + dest.getPublicKey().toBase64() + "\nPayload: "
+        //           + data.calculateHash());
         return data;
     }
 
