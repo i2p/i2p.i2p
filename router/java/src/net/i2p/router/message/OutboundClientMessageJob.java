@@ -91,7 +91,7 @@ public class OutboundClientMessageJob extends JobImpl {
      * How often do messages include the reply leaseSet (out of every 100 tries).  
      * Including it each time is probably overkill, but who knows.  
      */
-    private static final int BUNDLE_PROBABILITY_DEFAULT = 80;
+    private static final int BUNDLE_PROBABILITY_DEFAULT = 100;
     
     /**
      * Send the sucker
