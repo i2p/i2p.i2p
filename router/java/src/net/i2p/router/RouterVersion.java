@@ -15,8 +15,8 @@ import net.i2p.CoreVersion;
  *
  */
 public class RouterVersion {
-    public final static String ID = "$Revision: 1.12 $ $Date: 2004/07/16 16:12:27 $";
-    public final static String VERSION = "0.3.3";
+    public final static String ID = "$Revision: 1.13 $ $Date: 2004/07/23 21:13:37 $";
+    public final static String VERSION = "0.3.4";
     public static void main(String args[]) {
         System.out.println("I2P Router version: " + VERSION);
         System.out.println("Router ID: " + RouterVersion.ID);
