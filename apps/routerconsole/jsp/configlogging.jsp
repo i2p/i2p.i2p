@@ -14,6 +14,13 @@
 
 <div class="main" id="main">
  <%@include file="confignav.jsp" %>
+ 
+ <jsp:useBean class="net.i2p.router.web.ConfigLoggingHandler" id="formhandler" scope="request" />
+ <jsp:setProperty name="formhandler" property="*" />
+ <jsp:setProperty name="formhandler" property="contextId" value="<%=(String)session.getAttribute("i2p.contextId")%>" />
+ <font color="red"><jsp:getProperty name="formhandler" property="errors" /></font>
+ <i><jsp:getProperty name="formhandler" property="notices" /></i>
+  
  <form action="configlogging.jsp" method="POST">
  <b>Logging filename:</b> 
     <input type="text" name="logfilename" size="40" value="<jsp:getProperty name="logginghelper" property="logFilePattern" />" /><br />
@@ -28,9 +35,12 @@
     <input type="text" name="logfilesize" size="4" value="<jsp:getProperty name="logginghelper" property="maxFileSize" />" /><br />
   <hr />
   <b>Log levels:</b> <br />
+  <b>Default log level:</b>
+   <jsp:getProperty name="logginghelper" property="defaultLogLevelBox" /><br />
    <jsp:getProperty name="logginghelper" property="logLevelTable" />
  <hr />
- <input type="submit" value="Apply changes" /> <input type="submit" value="Apply and Save" /> <input type="reset" value="Cancel" />
+ <input type="submit" name="shouldsave" value="Save changes" /> 
+ <input type="reset" value="Cancel" />
  </form>
 </div>
 

@@ -2,9 +2,10 @@ package net.i2p.router.web;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.List;
 import java.util.Iterator;
-import java.util.TreeMap;
+import java.util.List;
+import java.util.Properties;
+import java.util.TreeSet;
 
 import net.i2p.util.Log;
 
@@ -49,65 +50,49 @@ public class ConfigLoggingHelper {
     }
     public String getLogLevelTable() {
         StringBuffer buf = new StringBuffer(32*1024);
-        buf.append("<textarea rows=\"20\" cols=\"80\">");
-        List logs = _context.logManager().getLogs();
-        TreeMap sortedLogs = new TreeMap();
-        for (int i = 0; i < logs.size(); i++) {
-            Log l = (Log)logs.get(i);
-            sortedLogs.put(l.getName(), l);
+        Properties limits = _context.logManager().getLimits();
+        TreeSet sortedLogs = new TreeSet();
+        for (Iterator iter = limits.keySet().iterator(); iter.hasNext(); ) {
+            String prefix = (String)iter.next();
+            sortedLogs.add(prefix);
         }
-        int i = 0;
-        for (Iterator iter = sortedLogs.values().iterator(); iter.hasNext(); i++) {
-            Log l = (Log)iter.next();
-            buf.append(l.getName()).append('=');
-            buf.append(Log.toLevelString(l.getMinimumPriority()));
-            buf.append("\n");
+        
+        buf.append("<textarea name=\"levels\" rows=\"20\" cols=\"70\">");
+        for (Iterator iter = sortedLogs.iterator(); iter.hasNext(); ) {
+            String prefix = (String)iter.next();
+            String level = limits.getProperty(prefix);
+            buf.append(prefix).append('=').append(level).append('\n');
         }
         buf.append("</textarea><br />\n");
         buf.append("<i>Valid levels are DEBUG, INFO, WARN, ERROR, CRIT</i>\n");
         return buf.toString();
     }
-    public String getLogLevelTableDetail() {
-        StringBuffer buf = new StringBuffer(8*1024);
-        buf.append("<table border=\"1\">\n");
-        buf.append("<tr><td>Package/class</td><td>Level</td></tr>\n");
-        List logs = _context.logManager().getLogs();
-        TreeMap sortedLogs = new TreeMap();
-        for (int i = 0; i < logs.size(); i++) {
-            Log l = (Log)logs.get(i);
-            sortedLogs.put(l.getName(), l);
-        }
-        int i = 0;
-        for (Iterator iter = sortedLogs.values().iterator(); iter.hasNext(); i++) {
-            Log l = (Log)iter.next();
-            buf.append("<tr>\n <td><input size=\"50\" type=\"text\" name=\"logrecord.");
-            buf.append(i).append(".package\" value=\"").append(l.getName());
-            buf.append("\" /></td>\n");
-            buf.append("<td><select name=\"logrecord.").append(i);
-            buf.append(".level\">\n\t");
-            buf.append("<option value=\"DEBUG\" ");
-            if (l.getMinimumPriority() == Log.DEBUG)
-                buf.append("selected=\"true\" ");
-            buf.append(">Debug</option>\n\t");
-            buf.append("<option value=\"INFO\" ");
-            if (l.getMinimumPriority() == Log.INFO)
-                buf.append("selected=\"true\" ");
-            buf.append(">Info</option>\n\t");
-            buf.append("<option value=\"WARN\" ");
-            if (l.getMinimumPriority() == Log.WARN)
-                buf.append("selected=\"true\" ");
-            buf.append(">Warn</option>\n\t");
-            buf.append("<option value=\"ERROR\" ");
-            if (l.getMinimumPriority() == Log.ERROR)
-                buf.append("selected=\"true\" ");
-            buf.append(">Error</option>\n\t");
-            buf.append("<option value=\"CRIT\" ");
-            if (l.getMinimumPriority() == Log.CRIT)
-                buf.append("selected=\"true\" ");
-            buf.append(">Critical</option>\n\t");
-            buf.append("</select></td>\n</tr>\n");
-        }
-        buf.append("</table>\n");
+    public String getDefaultLogLevelBox() {
+        String cur = _context.logManager().getDefaultLimit();
+        StringBuffer buf = new StringBuffer(128);
+        buf.append("<select name=\"defaultloglevel\">\n");
+        
+        buf.append("<option value=\"DEBUG\" ");
+        if ("DEFAULT".equals(cur)) buf.append(" selected=\"true\" ");
+        buf.append(">DEBUG</option>\n");
+        
+        buf.append("<option value=\"INFO\" ");
+        if ("INFO".equals(cur)) buf.append(" selected=\"true\" ");
+        buf.append(">INFO</option>\n");
+        
+        buf.append("<option value=\"WARN\" ");
+        if ("WARN".equals(cur)) buf.append(" selected=\"true\" ");
+        buf.append(">WARN</option>\n");
+        
+        buf.append("<option value=\"ERROR\" ");
+        if ("WARN".equals(cur)) buf.append(" selected=\"true\" ");
+        buf.append(">ERROR</option>\n");
+        
+        buf.append("<option value=\"CRIT\" ");
+        if ("CRIT".equals(cur)) buf.append(" selected=\"true\" ");
+        buf.append(">CRIT</option>\n");
+        
+        buf.append("</select>\n");
         return buf.toString();
     }
 }
