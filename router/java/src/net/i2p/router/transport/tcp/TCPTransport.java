@@ -101,6 +101,7 @@ public class TCPTransport extends TransportImpl {
     
     boolean getListenAddressIsValid() { return _listenAddressIsValid; }
     SigningPrivateKey getMySigningKey() { return _context.keyManager().getSigningPrivateKey(); }
+    int getListenPort() { return _listenPort; }
     
     /** fetch all of our TCP listening addresses */
     TCPAddress[] getMyAddresses() {
@@ -235,7 +236,7 @@ public class TCPTransport extends TransportImpl {
         SocketCreator creator = new SocketCreator(host, port);
         I2PThread sockCreator = new I2PThread(creator);
         sockCreator.setDaemon(true);
-        sockCreator.setName("SocketCreator");
+        sockCreator.setName("SocketCreator_:" + _listenPort);
         sockCreator.setPriority(I2PThread.MIN_PRIORITY);
         sockCreator.start();
         
@@ -432,7 +433,7 @@ public class TCPTransport extends TransportImpl {
         }
         
         if (_log.shouldLog(Log.INFO))
-            _log.info("Connection established with " + ident);
+            _log.info("Connection established with " + ident + " after " + (afterEstablish-start) + "ms");
         if (target != null) {
             if (!target.getIdentity().equals(ident)) {
                 _context.statManager().updateFrequency("tcp.acceptFailureFrequency");
@@ -574,7 +575,7 @@ public class TCPTransport extends TransportImpl {
         public int getId() { return _id; }
         
         public void run() {
-            Thread.currentThread().setName("Conn Establisher" + _id);
+            Thread.currentThread().setName("Conn Establisher" + _id + ':' + _listenPort);
             
             while (_running) {
                 try {

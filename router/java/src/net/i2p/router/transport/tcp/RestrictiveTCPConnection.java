@@ -223,7 +223,7 @@ class RestrictiveTCPConnection extends TCPConnection {
         SocketCreator creator = new SocketCreator(peer.getHost(), peer.getPort(), false);
         I2PThread sockCreator = new I2PThread(creator);
         sockCreator.setDaemon(true);
-        sockCreator.setName("PeerCallback");
+        sockCreator.setName("PeerCallback:" + _transport.getListenPort());
         sockCreator.setPriority(I2PThread.MIN_PRIORITY);
         sockCreator.start();
         
@@ -294,8 +294,12 @@ class RestrictiveTCPConnection extends TCPConnection {
             
             if (_log.shouldLog(Log.INFO))
                 _log.info("TCP connection " + _id + " established with " + _remoteIdentity.getHash().toBase64());
-            _in = new AESInputStream(_context, new BandwidthLimitedInputStream(_context, _in, _remoteIdentity), _key, _iv);
-            _out = new AESOutputStream(_context, new BufferedOutputStream(new BandwidthLimitedOutputStream(_context, _out, _remoteIdentity), BUF_SIZE), _key, _iv);
+            //_in = new AESInputStream(_context, new BandwidthLimitedInputStream(_context, _in, _remoteIdentity), _key, _iv);
+            //_out = new AESOutputStream(_context, new BufferedOutputStream(new BandwidthLimitedOutputStream(_context, _out, _remoteIdentity), BUF_SIZE), _key, _iv);
+            //_in = new BandwidthLimitedInputStream(_context, _in, _remoteIdentity);
+            //_out = new BufferedOutputStream(new BandwidthLimitedOutputStream(_context, _out, _remoteIdentity), BUF_SIZE);
+            _in = new AESInputStream(_context, _in, _key, _iv);
+            _out = new AESOutputStream(_context, _out, _key, _iv);
             _socket.setSoTimeout(0);
             success = _context.clock().now();
             established();

@@ -9,6 +9,7 @@ package net.i2p.router.transport.tcp;
  */
 
 import java.io.IOException;
+import java.io.OutputStream;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -124,26 +125,8 @@ class TCPListener {
                     if (_log.shouldLog(Log.INFO))
                         _log.info("Connection handled on " + _myAddress.getHost() + ":" + _myAddress.getPort() + " with " + s.getInetAddress().toString() + ":" + s.getPort());
                     
-                    TimedHandler h = new TimedHandler(s);
-                    I2PThread t = new I2PThread(h);
-                    t.setDaemon(true);
-                    t.start();
-                    synchronized (h) {
-                        h.wait(HANDLE_TIMEOUT);
-                    }
-                    if (h.wasSuccessful()) {
-                        if (_log.shouldLog(Log.DEBUG))
-                            _log.debug("Handle successful");
-                    } else {
-                        if (h.receivedIdentByte()) {
-                            if (_log.shouldLog(Log.ERROR))
-                                _log.error("Unable to handle in the time allotted");
-                        } else {
-                            if (_log.shouldLog(Log.DEBUG))
-                                _log.debug("Peer didn't send the ident byte, so either they were testing us, or portscanning");
-                        }
-                        try { s.close(); } catch (IOException ioe) {}
-                    }
+                    handle(s);
+                    
                 } catch (SocketException se) {
                     _log.error("Error handling a connection - closed?", se);
                     return;
@@ -154,8 +137,48 @@ class TCPListener {
         }
     }
     
+    private void handle(Socket s) {
+        I2PThread t = new I2PThread(new BlockingHandler(s));
+        t.setDaemon(true);
+        t.setName("BlockingHandler:"+_transport.getListenPort());
+        t.start();
+    }
+    
+    private class BlockingHandler implements Runnable {
+        private Socket _handledSocket;
+        public BlockingHandler(Socket socket) {
+            _handledSocket = socket;
+        }
+        public void run() {
+            TimedHandler h = new TimedHandler(_handledSocket);
+            I2PThread t = new I2PThread(h);
+            t.setDaemon(true);
+            t.start();
+            try {
+                synchronized (h) {
+                    h.wait(HANDLE_TIMEOUT);
+                }
+            } catch (InterruptedException ie) {
+                // got through early...
+            }
+            if (h.wasSuccessful()) {
+                if (_log.shouldLog(Log.DEBUG))
+                    _log.debug("Handle successful");
+            } else {
+                if (h.receivedIdentByte()) {
+                    if (_log.shouldLog(Log.ERROR))
+                        _log.error("Unable to handle in the time allotted");
+                } else {
+                    if (_log.shouldLog(Log.DEBUG))
+                        _log.debug("Peer didn't send the ident byte, so either they were testing us, or portscanning");
+                }
+                try { _handledSocket.close(); } catch (IOException ioe) {}
+            }
+        }
+    }
+    
     /** if we're not making progress in 30s, drop 'em */
-    private final static long HANDLE_TIMEOUT = 30*1000;
+    private final static long HANDLE_TIMEOUT = 10*1000;
     private static volatile int __handlerId = 0;
     
     private class TimedHandler implements Runnable {
@@ -170,9 +193,11 @@ class TCPListener {
             _receivedIdentByte = false;
         }
         public void run() {
-            Thread.currentThread().setName("TimedHandler"+_handlerId);
+            Thread.currentThread().setName("TimedHandler"+_handlerId + ':' + _transport.getListenPort());
             try {
-                _socket.getOutputStream().write(SocketCreator.I2P_FLAG);
+                OutputStream os = _socket.getOutputStream();
+                os.write(SocketCreator.I2P_FLAG);
+                os.flush();
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("listener: I2P flag sent");
                 int val = _socket.getInputStream().read();

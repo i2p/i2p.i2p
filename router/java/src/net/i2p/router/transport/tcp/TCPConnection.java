@@ -244,7 +244,7 @@ class TCPConnection implements I2NPMessageReader.I2NPMessageEventListener {
         t.setName("Run Conn [" + _id + "]");
         t.setDaemon(true);
         t.start();
-        _reader = new I2NPMessageReader(_context, _in, this, "TCP Read [" + _id + "]");
+        _reader = new I2NPMessageReader(_context, _in, this, "TCP Read [" + _id + ":" + _transport.getListenPort() + "]");
         _reader.startReading();
     }
     
@@ -351,7 +351,8 @@ class TCPConnection implements I2NPMessageReader.I2NPMessageEventListener {
                     OutNetMessage msg = (OutNetMessage)iter.next();
                     msg.timestamp("TCPTransport.closeConnection caused fail");
                     if (_log.shouldLog(Log.WARN))
-                        _log.warn("Connection closed while the message was sitting on the TCP Connection's queue!  too slow by: " 
+                        _log.warn("Connection closed to " + _remoteIdentity.getHash().toBase64() 
+                                  + " while the message was sitting on the TCP Connection's queue!  too slow by: " 
                                   + (now-msg.getExpiration()) + "ms: " + msg);
                     _transport.afterSend(msg, false, false);
                 }

@@ -1,6 +1,7 @@
 package net.i2p.router.transport.tcp;
 
 import java.io.IOException;
+import java.io.OutputStream;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
@@ -31,6 +32,8 @@ class SocketCreator implements Runnable {
     
     /** the first byte sent and received must be 0x2A */
     public final static int I2P_FLAG = 0x2A;
+    /** sent if we arent trying to talk */
+    private final static int NOT_I2P_FLAG = 0x2B;
     
     public void run() {
         if (_keepOpen) {
@@ -45,7 +48,9 @@ class SocketCreator implements Runnable {
             _socket = new Socket(_host, _port);
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Socket created");
-            _socket.getOutputStream().write(I2P_FLAG);
+            OutputStream os = _socket.getOutputStream();
+            os.write(I2P_FLAG);
+            os.flush();
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("I2P flag sent");
             int val = _socket.getInputStream().read();
@@ -86,6 +91,11 @@ class SocketCreator implements Runnable {
             _socket = new Socket(_host, _port);
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Socket created (but we're not sending the flag, since we're just testing them)");
+            
+            OutputStream os = _socket.getOutputStream();
+            os.write(NOT_I2P_FLAG);
+            os.flush();
+            
             int val = _socket.getInputStream().read();
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Value read: [" + val + "] == flag? [" + I2P_FLAG + "]");
