@@ -14,6 +14,7 @@ import net.i2p.util.RandomSource;
 import net.i2p.util.Log;
 import net.i2p.util.NativeBigInteger;
 import net.i2p.util.Clock;
+import net.i2p.util.I2PThread;
 import java.math.BigInteger;
 
 import java.util.ArrayList;
@@ -84,7 +85,7 @@ public class DHSessionKeyBuilder {
 	
 	if (_log.shouldLog(Log.DEBUG)) _log.debug("DH Precalc (minimum: " + MIN_NUM_BUILDERS + " max: " + MAX_NUM_BUILDERS + ", delay: " + CALC_DELAY + ")");
 	
-	_precalcThread = new Thread(new DHSessionKeyBuilderPrecalcRunner(MIN_NUM_BUILDERS, MAX_NUM_BUILDERS));
+	_precalcThread = new I2PThread(new DHSessionKeyBuilderPrecalcRunner(MIN_NUM_BUILDERS, MAX_NUM_BUILDERS));
 	_precalcThread.setName("DH Precalc");
 	_precalcThread.setDaemon(true);
 	_precalcThread.setPriority(Thread.MIN_PRIORITY);

@@ -208,6 +208,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase
 		_targetRequest = targetRequest;
 		_useWWWProxy = useWWWProxy;
 		_disabled = false;
+		setName("InactivityThread");
 	    }
 	    public void disable() { 
 		_disabled = true; 

@@ -9,6 +9,7 @@ import net.i2p.I2PException;
 import net.i2p.client.I2PSessionException;
 import net.i2p.data.Destination;
 import net.i2p.util.Log;
+import net.i2p.util.I2PThread;
 
 /**
  * Initial stub implementation for the socket
@@ -227,13 +228,14 @@ class I2PSocketImpl implements I2PSocket {
 	}
     }
 
-    public class I2PSocketRunner extends Thread {
+    public class I2PSocketRunner extends I2PThread {
 
 	public InputStream in;
 
 	public I2PSocketRunner(InputStream in) {
 	    _log.debug("Runner's input stream is: "+in.hashCode());
 	    this.in=in;
+	    setName("SocketRunner from " + I2PSocketImpl.this.remote.calculateHash().toBase64().substring(0, 4));
 	    start();
 	}
 

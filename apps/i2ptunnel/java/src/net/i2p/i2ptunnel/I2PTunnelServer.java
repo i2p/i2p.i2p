@@ -23,6 +23,7 @@ import net.i2p.client.streaming.I2PSocketManagerFactory;
 import net.i2p.data.Base64;
 import net.i2p.util.EventDispatcher;
 import net.i2p.util.Log;
+import net.i2p.util.I2PThread;
 
 public class I2PTunnelServer extends I2PTunnelTask
     implements Runnable {
@@ -82,7 +83,7 @@ public class I2PTunnelServer extends I2PTunnelTask
 	l.log("Ready!");
 	notifyEvent("openServerResult", "ok");
 	open=true;
-	Thread t = new Thread(this);
+	Thread t = new I2PThread(this);
 	t.setName("Server");
 	t.start();
     }

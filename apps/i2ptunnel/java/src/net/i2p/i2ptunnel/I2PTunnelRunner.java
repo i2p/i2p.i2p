@@ -15,8 +15,9 @@ import net.i2p.client.I2PSession;
 import net.i2p.client.streaming.I2PSocket;
 import net.i2p.util.Log;
 import net.i2p.util.Clock;
+import net.i2p.util.I2PThread;
 
-public class I2PTunnelRunner extends Thread {
+public class I2PTunnelRunner extends I2PThread {
     private final static Log _log = new Log(I2PTunnelRunner.class);
     
     /** 
@@ -121,7 +122,7 @@ public class I2PTunnelRunner extends Thread {
 	}
     }
 
-    private class StreamForwarder extends Thread {
+    private class StreamForwarder extends I2PThread {
 
 	InputStream in;
 	OutputStream out;

@@ -21,6 +21,7 @@ import net.i2p.client.streaming.I2PSocketOptions;
 import net.i2p.data.Destination;
 import net.i2p.util.EventDispatcher;
 import net.i2p.util.Log;
+import net.i2p.util.I2PThread;
 
 public abstract class I2PTunnelClientBase extends I2PTunnelTask 
     implements Runnable {
@@ -73,7 +74,7 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask
 	if (sockMgr == null) throw new NullPointerException();
 	l.log("I2P session created");
         
-	Thread t = new Thread(this);
+	Thread t = new I2PThread(this);
 	t.setName("Client");
 	listenerReady=false;
 	t.start();
@@ -270,7 +271,7 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask
 	}
     }
 
-    public class ClientConnectionRunner extends Thread {
+    public class ClientConnectionRunner extends I2PThread {
 	private Socket s;
 	
 	public ClientConnectionRunner(Socket s, String name) {

@@ -192,7 +192,7 @@ public class TunnelManager implements Runnable {
 	}
 
 	TunnelManager mgr = new TunnelManager(host, port);
-	Thread t = new Thread(mgr, "Listener");
+	Thread t = new I2PThread(mgr, "Listener");
 	t.start();
     }
     

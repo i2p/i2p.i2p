@@ -14,6 +14,7 @@ import java.util.List;
 
 import net.i2p.util.Clock;
 import net.i2p.util.Log;
+import net.i2p.util.I2PThread;
 import net.i2p.util.NativeBigInteger;
 import net.i2p.util.RandomSource;
 
@@ -78,7 +79,7 @@ class YKGenerator {
 	
 	if (_log.shouldLog(Log.DEBUG)) _log.debug("ElGamal YK Precalc (minimum: " + MIN_NUM_BUILDERS + " max: " + MAX_NUM_BUILDERS + ", delay: " + CALC_DELAY + ")");
 	
-	_precalcThread = new Thread(new YKPrecalcRunner(MIN_NUM_BUILDERS, MAX_NUM_BUILDERS));
+	_precalcThread = new I2PThread(new YKPrecalcRunner(MIN_NUM_BUILDERS, MAX_NUM_BUILDERS));
 	_precalcThread.setName("YK Precalc");
 	_precalcThread.setDaemon(true);
 	_precalcThread.setPriority(Thread.MIN_PRIORITY);
