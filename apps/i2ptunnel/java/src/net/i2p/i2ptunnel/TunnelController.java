@@ -57,7 +57,7 @@ public class TunnelController implements Logging {
         setConfig(config, prefix);
         _messages = new ArrayList(4);
         _running = false;
-        if (createKey && ("server".equals(getType())) )
+        if (createKey && ("server".equals(getType()) || "httpserver".equals(getType())) )
             createPrivateKey();
         _starting = getStartOnLoad();
     }
@@ -132,6 +132,8 @@ public class TunnelController implements Logging {
             startClient();
         } else if ("server".equals(type)) {
             startServer();
+        } else if ("httpserver".equals(type)) {
+            startHttpServer();
         } else {
             if (_log.shouldLog(Log.ERROR))
                 _log.error("Cannot start tunnel - unknown type [" + type + "]");
@@ -202,6 +204,18 @@ public class TunnelController implements Logging {
         String targetPort = getTargetPort(); 
         String privKeyFile = getPrivKeyFile(); 
         _tunnel.runServer(new String[] { targetHost, targetPort, privKeyFile }, this);
+        acquire();
+        _running = true;
+    }
+    
+    private void startHttpServer() {
+        setI2CPOptions();
+        setSessionOptions();
+        String targetHost = getTargetHost(); 
+        String targetPort = getTargetPort(); 
+        String spoofedHost = getSpoofedHost(); 
+        String privKeyFile = getPrivKeyFile(); 
+        _tunnel.runHttpServer(new String[] { targetHost, targetPort, spoofedHost, privKeyFile }, this);
         acquire();
         _running = true;
     }
@@ -297,6 +311,7 @@ public class TunnelController implements Logging {
     public String getListenOnInterface() { return _config.getProperty("interface"); }
     public String getTargetHost() { return _config.getProperty("targetHost"); }
     public String getTargetPort() { return _config.getProperty("targetPort"); }
+    public String getSpoofedHost() { return _config.getProperty("spoofedHost"); }
     public String getPrivKeyFile() { return _config.getProperty("privKeyFile"); }
     public String getListenPort() { return _config.getProperty("listenPort"); }
     public String getTargetDestination() { return _config.getProperty("targetDestination"); }
@@ -314,6 +329,8 @@ public class TunnelController implements Logging {
             getClientSummary(buf);
         else if ("server".equals(type))
             getServerSummary(buf);
+        else if ("httpserver".equals(type))
+            getHttpServerSummary(buf);
         else
             buf.append("Unknown type ").append(type);
     }
@@ -367,6 +384,18 @@ public class TunnelController implements Logging {
         getOptionSummary(buf);
     }
     
+    private void getHttpServerSummary(StringBuffer buf) {
+        String description = getDescription();
+        if ( (description != null) && (description.trim().length() > 0) )
+            buf.append("<i>").append(description).append("</i><br />\n");
+        buf.append("Server tunnel pointing at port ").append(getTargetPort());
+        buf.append(" on ").append(getTargetHost());
+        buf.append(" for the site ").append(getSpoofedHost());
+        buf.append("<br />\n");
+        buf.append("Private destination loaded from ").append(getPrivKeyFile()).append("<br />\n");
+        getOptionSummary(buf);
+    }
+    
     private void getOptionSummary(StringBuffer buf) {
         String opts = getClientOptions();
         if ( (opts != null) && (opts.length() > 0) )
@@ -378,7 +407,7 @@ public class TunnelController implements Logging {
                 Destination dest = session.getMyDestination();
                 if (dest != null) {
                     buf.append("Destination hash: ").append(dest.calculateHash().toBase64()).append("<br />\n");
-                    if ("server".equals(getType())) {
+                    if ( ("server".equals(getType())) || ("httpserver".equals(getType())) ) {
                         buf.append("Full destination: ");
                         buf.append("<input type=\"text\" size=\"10\" onclick=\"this.select();\" ");
                         buf.append("value=\"").append(dest.toBase64()).append("\" />\n");

@@ -1,4 +1,10 @@
-$Id: history.txt,v 1.111 2004/12/17 23:07:13 jrandom Exp $
+$Id: history.txt,v 1.112 2004/12/19 01:25:27 scintilla Exp $
+
+2004-12-19  jrandom
+    * Added a new i2ptunnel type: 'httpserver', allowing you to specify what
+      hostname should be sent to the webserver.  By default, new installs will
+      have an httpserver pointing at their jetty instance with the spoofed 
+      name 'mysite.i2p' (editable on the /i2ptunnel/edit.jsp page).
 
 2004-12-19  scintilla
     * Convert native jcpuid code from C++ to C. This should alleviate build

@@ -680,7 +680,19 @@ public class DataHelper {
      */
     public static String readLine(InputStream in) throws IOException {
         StringBuffer buf = new StringBuffer(128);
-
+        boolean ok = readLine(in, buf);
+        if (ok)
+            return buf.toString();
+        else
+            return null;
+    }
+    /**
+     * Read in a line, placing it into the buffer (excluding the newline).
+     *
+     * @return true if the line was read, false if eof was reached before a 
+     *              newline was found
+     */
+    public static boolean readLine(InputStream in, StringBuffer buf) throws IOException {
         int c = -1;
         while ( (c = in.read()) != -1) {
             if (c == '\n')
@@ -688,9 +700,9 @@ public class DataHelper {
             buf.append((char)c);
         }
         if (c == -1) 
-            return null;
+            return false;
         else
-            return buf.toString();
+            return true;
     }
     
 

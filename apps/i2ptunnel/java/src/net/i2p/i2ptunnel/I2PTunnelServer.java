@@ -31,19 +31,20 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
 
     private final static Log _log = new Log(I2PTunnelServer.class);
 
-    private I2PSocketManager sockMgr;
-    private I2PServerSocket i2pss;
+    protected I2PSocketManager sockMgr;
+    protected I2PServerSocket i2pss;
 
-    private Object lock = new Object(), slock = new Object();
+    private Object lock = new Object();
+    protected Object slock = new Object();
 
-    private InetAddress remoteHost;
-    private int remotePort;
+    protected InetAddress remoteHost;
+    protected int remotePort;
 
     private Logging l;
 
     private static final long DEFAULT_READ_TIMEOUT = -1; // 3*60*1000;
     /** default timeout to 3 minutes - override if desired */
-    private long readTimeout = DEFAULT_READ_TIMEOUT;
+    protected long readTimeout = DEFAULT_READ_TIMEOUT;
 
     public I2PTunnelServer(InetAddress host, int port, String privData, Logging l, EventDispatcher notifyThis, I2PTunnel tunnel) {
         super(host + ":" + port + " <- " + privData, notifyThis, tunnel);

@@ -38,6 +38,7 @@ public class WebEditPageHelper {
     private String _targetDestination;
     private String _targetHost;
     private String _targetPort;
+    private String _spoofedHost;
     private String _privKeyFile;
     private boolean _startOnLoad;
     private boolean _privKeyGenerate;
@@ -138,6 +139,10 @@ public class WebEditPageHelper {
     /** What port does this server tunnel point at */
     public void setTargetPort(String port) { 
         _targetPort = (port != null ? port.trim() : null);
+    }
+    /** What host does this http server tunnel spoof */
+    public void setSpoofedHost(String host) { 
+        _spoofedHost = (host != null ? host.trim() : null);
     }
     /** What filename is this server tunnel's private keys stored in */
     public void setPrivKeyFile(String file) { 
@@ -320,6 +325,15 @@ public class WebEditPageHelper {
                 config.setProperty("targetPort", _targetPort);
             if (_privKeyFile != null)
                 config.setProperty("privKeyFile", _privKeyFile);
+        } else if ("httpserver".equals(_type)) {
+            if (_targetHost != null)
+                config.setProperty("targetHost", _targetHost);
+            if (_targetPort != null)
+                config.setProperty("targetPort", _targetPort);
+            if (_privKeyFile != null)
+                config.setProperty("privKeyFile", _privKeyFile);
+            if (_spoofedHost != null)
+                config.setProperty("spoofedHost", _spoofedHost);
         } else {
             return null;
         }

@@ -18,6 +18,7 @@ class WebEditPageFormGenerator {
       "<option value=\"httpclient\">HTTP proxy</option>" +
       "<option value=\"client\">Client tunnel</option>" +
       "<option value=\"server\">Server tunnel</option>" +
+      "<option value=\"httpserver\">HTTP server tunnel</option>" +
       "</select> <input type=\"submit\" value=\"GO\" />" +
       "</form>\n";
     
@@ -42,6 +43,8 @@ class WebEditPageFormGenerator {
             return getEditClientForm(controller, id);
         else if ("server".equals(type))
             return getEditServerForm(controller, id);
+        else if ("httpserver".equals(type))
+            return getEditHttpServerForm(controller, id);
         else
             return "WTF, unknown type [" + type + "]";
     }
@@ -111,6 +114,48 @@ class WebEditPageFormGenerator {
             buf.append("value=\"").append(controller.getTargetPort()).append("\" ");
         else
             buf.append("value=\"80\" ");
+        buf.append(" /><br />\n");
+        
+        buf.append("<b>Private key file:</b> <input type=\"text\" name=\"privKeyFile\" value=\"");
+        if ( (controller != null) && (controller.getPrivKeyFile() != null) ) {
+            buf.append(controller.getPrivKeyFile()).append("\" /><br />");
+        } else {
+            buf.append("myServer.privKey\" /><br />");
+            buf.append("<input type=\"hidden\" name=\"privKeyGenerate\" value=\"true\" />");
+        }
+        
+        addOptions(buf, controller);
+        buf.append("<input type=\"submit\" name=\"action\" value=\"Save\">\n");
+        buf.append("<input type=\"submit\" name=\"action\" value=\"Remove\">\n");
+        buf.append(" <i>confirm removal:</i> <input type=\"checkbox\" name=\"removeConfirm\" value=\"true\" />\n");
+        buf.append("</form>\n");
+        return buf.toString();
+    }
+    
+    private static String getEditHttpServerForm(TunnelController controller, String id) {
+        StringBuffer buf = new StringBuffer(1024);
+        addGeneral(buf, controller, id);
+        buf.append("<b>Type:</b> <i>HTTP server tunnel</i><input type=\"hidden\" name=\"type\" value=\"httpserver\" /><br />\n");
+        
+        buf.append("<b>Target host:</b> <input type=\"text\" size=\"40\" name=\"targetHost\" ");
+        if ( (controller != null) && (controller.getTargetHost() != null) )
+            buf.append("value=\"").append(controller.getTargetHost()).append("\" ");
+        else
+            buf.append("value=\"127.0.0.1\" ");
+        buf.append(" /><br />\n");
+        
+        buf.append("<b>Target port:</b> <input type=\"text\" size=\"4\" name=\"targetPort\" ");
+        if ( (controller != null) && (controller.getTargetPort() != null) )
+            buf.append("value=\"").append(controller.getTargetPort()).append("\" ");
+        else
+            buf.append("value=\"80\" ");
+        buf.append(" /><br />\n");
+        
+        buf.append("<b>Website hostname:</b> <input type=\"text\" size=\"16\" name=\"spoofedHost\" ");
+        if ( (controller != null) && (controller.getSpoofedHost() != null) )
+            buf.append("value=\"").append(controller.getSpoofedHost()).append("\" ");
+        else
+            buf.append("value=\"mysite.i2p\" ");
         buf.append(" /><br />\n");
         
         buf.append("<b>Private key file:</b> <input type=\"text\" name=\"privKeyFile\" value=\"");

@@ -40,7 +40,8 @@ public class I2PTunnelRunner extends I2PThread implements I2PSocket.SocketErrorL
     Object slock, finishLock = new Object();
     boolean finished = false;
     HashMap ostreams, sockets;
-    byte[] initialData;
+    byte[] initialI2PData;
+    byte[] initialSocketData;
     /** when the last data was sent/received (or -1 if never) */
     private long lastActivityOn;
     /** when the runner started up */
@@ -53,15 +54,22 @@ public class I2PTunnelRunner extends I2PThread implements I2PSocket.SocketErrorL
 
     private volatile long __forwarderId;
     
-    public I2PTunnelRunner(Socket s, I2PSocket i2ps, Object slock, byte[] initialData, List sockList) {
-        this(s, i2ps, slock, initialData, sockList, null);
+    public I2PTunnelRunner(Socket s, I2PSocket i2ps, Object slock, byte[] initialI2PData, List sockList) {
+        this(s, i2ps, slock, initialI2PData, null, sockList, null);
     }
-    public I2PTunnelRunner(Socket s, I2PSocket i2ps, Object slock, byte[] initialData, List sockList, Runnable onTimeout) {
+    public I2PTunnelRunner(Socket s, I2PSocket i2ps, Object slock, byte[] initialI2PData, byte[] initialSocketData, List sockList) {
+        this(s, i2ps, slock, initialI2PData, initialSocketData, sockList, null);
+    }
+    public I2PTunnelRunner(Socket s, I2PSocket i2ps, Object slock, byte[] initialI2PData, List sockList, Runnable onTimeout) {
+        this(s, i2ps, slock, initialI2PData, null, sockList, onTimeout);
+    }
+    public I2PTunnelRunner(Socket s, I2PSocket i2ps, Object slock, byte[] initialI2PData, byte[] initialSocketData, List sockList, Runnable onTimeout) {
         this.sockList = sockList;
         this.s = s;
         this.i2ps = i2ps;
         this.slock = slock;
-        this.initialData = initialData;
+        this.initialI2PData = initialI2PData;
+        this.initialSocketData = initialSocketData;
         this.onTimeout = onTimeout;
         lastActivityOn = -1;
         startedOn = Clock.getInstance().now();
@@ -111,15 +119,19 @@ public class I2PTunnelRunner extends I2PThread implements I2PSocket.SocketErrorL
             i2ps.setSocketErrorListener(this);
             InputStream i2pin = i2ps.getInputStream();
             OutputStream i2pout = i2ps.getOutputStream(); //new BufferedOutputStream(i2ps.getOutputStream(), MAX_PACKET_SIZE);
-            if (initialData != null) {
+            if (initialI2PData != null) {
                 synchronized (slock) {
-                    i2pout.write(initialData);
+                    i2pout.write(initialI2PData);
                     //i2pout.flush();
                 }
             }
+            if (initialSocketData != null) {
+                out.write(initialSocketData);
+            }
             if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Initial data " + (initialData != null ? initialData.length : 0) 
-                           + " written, starting forwarders");
+                _log.debug("Initial data " + (initialI2PData != null ? initialI2PData.length : 0) 
+                           + " written to I2P, " + (initialSocketData != null ? initialSocketData.length : 0)
+                           + " written to the socket, starting forwarders");
             Thread t1 = new StreamForwarder(in, i2pout, true);
             Thread t2 = new StreamForwarder(i2pin, out, false);
             synchronized (finishLock) {
