@@ -37,9 +37,9 @@ namespace Libsockthread {
 
 	class Thread {
 	public:
-		Thread(void)  // throws Mutex_error
+		Thread(void)  // throws Mutex_error (a mutex is created)
 			: retval(0), running(false) { }
-		virtual ~Thread(void)  // throws Thread_error
+		virtual ~Thread(void)
 			{ kill(); }
 
 		virtual void *execute(void) = 0;
@@ -49,7 +49,7 @@ namespace Libsockthread {
 		void start(void);  // throws Thread_error
 
 	private:
-#ifdef WINTHREADS
+#ifdef WINTHREAD
 		static DWORD WINAPI the_thread(void* param);
 		HANDLE handle;
 		DWORD id;

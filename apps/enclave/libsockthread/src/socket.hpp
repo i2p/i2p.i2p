@@ -28,76 +28,28 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-// Modelled after JThread by Jori Liesenborgs
+#ifndef SOCKET_HPP
+#define SOCKET_HPP
 
-#include "platform.hpp"
-#include "mutex.hpp"
+namespace Libsockthread {
 
-/*
- * Creates a mutex
- */
-Mutex::Mutex(void)
-{
-#ifdef WINTHREAD
-	mutex = CreateMutex(NULL, FALSE, NULL);
-	if (mutex == NULL) {
-		TCHAR str[80];
-		throw Mutex_error(win_strerror(str, sizeof str));
-	}
-#else
-	int rc = pthread_mutex_init(&mutex, NULL);
-	if (!rc)
-		throw Mutex_error(strerror(rc));
+	class Socket {
+	public:
+		Socket(int type);  // throws Socket error
+
+		void func(void);
+	private:
+#ifdef WINSOCK
+		void winsock_cleanup(void);
+		void winsock_startup(void);  // throws Socket_error
+		const char* Socket::winsock_strerror(int code);
 #endif
+	};
+
+	class Socket_error : public runtime_error {
+		Socket_error(const string& s) : runtime_error(s) { }
+	};
+
 }
 
-/*
- * Destroys a mutex
- */
-Mutex::~Mutex(void)
-{
-#ifdef WINTHREAD
-	if (!CloseHandle(mutex)) {
-		TCHAR str[80];
-		throw Mutex_error(win_strerror(str, sizeof str));  // TODO: log instead
-	}
-#else
-	int rc = pthread_mutex_destroy(&mutex);
-	if (!rc)
-		throw Mutex_error(strerror(rc));  // TODO: log instead
-#endif
-}
-
-/*
- * Locks the mutex
- */
-void Mutex::lock(void)
-{
-#ifdef WINTHREAD
-	if (WaitForSingleObject(mutex, INFINITE) == WAIT_FAILED) {
-		TCHAR str[80];
-		throw Mutex_error(win_strerror(str, sizeof str));
-	}
-#else
-	int rc = pthread_mutex_lock(&mutex);
-	if (!rc)
-		throw Mutex_error(strerror(rc));
-#endif
-}
-
-/*
- * Unlocks the mutex
- */
-void Mutex::unlock(void)
-{
-#ifdef WINTHREAD
-	if (!ReleaseMutex(mutex)) {
-		TCHAR str[80];
-		throw Mutex_error(win_strerror(str, sizeof str));
-	}
-#else
-	int rc = pthread_mutex_unlock(&mutex);
-	if (!rc)
-		throw Mutex_error(strerror(rc));
-#endif
-}
+#endif  // MUTEX_HPP

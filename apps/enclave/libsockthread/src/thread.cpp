@@ -72,15 +72,15 @@ bool Thread::kill(void)
 		running_m.unlock();
 		return false;
 	}
-#ifdef WINTHREADS
+#ifdef WINTHREAD
 	if (!TerminateThread(handle, 0)) {
 		TCHAR str[80];
-		throw Thread_error(win_strerror(str, sizeof str));
+		throw Thread_error(win_strerror(str, sizeof str));  // TODO: log instead
 	}
 #else
 	int rc = pthread_cancel(id);
 	if (!rc)
-		throw Thread_error(strerror(rc));
+		throw Thread_error(strerror(rc));  // TODO: log instead
 #endif
 	running = false;
 	running_m.unlock();
@@ -99,7 +99,7 @@ void Thread::start(void)
 		running_m.unlock();
 	#endif
 	continue_m.lock();
-#ifdef WINTHREADS
+#ifdef WINTHREAD
 	handle = CreateThread(NULL, 0, &the_thread, this, 0, &id);
 	if (handle == NULL) {
 		TCHAR str[80];

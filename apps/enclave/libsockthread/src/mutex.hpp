@@ -38,12 +38,12 @@ namespace Libsockthread {
 	class Mutex {
 	public:
 		Mutex(void);  // throws Mutex_error
-		~Mutex(void);  // throws Mutex_error
+		~Mutex(void);
 
 		void lock(void);  // throws Mutex_error
 		void unlock(void);  // throws Mutex_error
 	private:
-	#ifdef WINTHREADS
+	#ifdef WINTHREAD
 		HANDLE mutex;
 	#else
 		pthread_mutex_t mutex;
