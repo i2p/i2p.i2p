@@ -59,7 +59,7 @@ public class StreamSinkSend {
             _log.error("Peer destination is not valid in " + _peerDestFile, dfe);
             return;
         } finally {
-            if (fis == null) try { fis.close(); } catch (IOException ioe) {}
+            if (fis != null) try { fis.close(); } catch (IOException ioe) {}
         }
         
         

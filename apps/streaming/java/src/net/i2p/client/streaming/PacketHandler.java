@@ -116,14 +116,6 @@ public class PacketHandler {
                 if (_log.shouldLog(Log.WARN))
                     _log.warn("Echo packet received with no stream IDs: " + packet);
             }
-        } else if (packet.isFlagSet(Packet.FLAG_SYNCHRONIZE)) {
-            if (sendId == null) {
-                // this is the initial SYN to establish a connection
-                _manager.getConnectionHandler().receiveNewSyn(packet);
-            } else {
-                if (_log.shouldLog(Log.WARN))
-                    _log.warn("Syn packet reply on a stream we don't know about: " + packet);
-            }
         } else {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Packet received on an unknown stream (and not a SYN): " + packet);
@@ -145,16 +137,21 @@ public class PacketHandler {
                     }
                 }
             }
-            if (_log.shouldLog(Log.WARN)) {
-                StringBuffer buf = new StringBuffer(128);
-                Set cons = _manager.listConnections();
-                for (Iterator iter = cons.iterator(); iter.hasNext(); ) {
-                    Connection con = (Connection)iter.next();
-                    buf.append(Base64.encode(con.getReceiveStreamId())).append(" ");
+            
+            if (packet.isFlagSet(Packet.FLAG_SYNCHRONIZE)) {
+                _manager.getConnectionHandler().receiveNewSyn(packet);
+            } else {
+                if (_log.shouldLog(Log.WARN)) {
+                    StringBuffer buf = new StringBuffer(128);
+                    Set cons = _manager.listConnections();
+                    for (Iterator iter = cons.iterator(); iter.hasNext(); ) {
+                        Connection con = (Connection)iter.next();
+                        buf.append(Base64.encode(con.getReceiveStreamId())).append(" ");
+                    }
+                    _log.warn("Packet belongs to no other cons: " + packet + " connections: " 
+                              + buf.toString() + " sendId: " 
+                              + (sendId != null ? Base64.encode(sendId) : " unknown"));
                 }
-                _log.warn("Packet belongs to no other cons: " + packet + " connections: " 
-                          + buf.toString() + " sendId: " 
-                          + (sendId != null ? Base64.encode(sendId) : " unknown"));
             }
         }
     }

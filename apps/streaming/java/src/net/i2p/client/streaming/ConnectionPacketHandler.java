@@ -29,6 +29,11 @@ public class ConnectionPacketHandler {
         boolean ok = verifyPacket(packet, con);
         if (!ok) return;
         boolean isNew = con.getInputStream().messageReceived(packet.getSequenceNum(), packet.getPayload());
+
+        // close *after* receiving the data, as well as after verifying the signatures / etc
+        if (packet.isFlagSet(Packet.FLAG_CLOSE) && packet.isFlagSet(Packet.FLAG_SIGNATURE_INCLUDED))
+            con.closeReceived();
+        
         if (isNew) {
             con.incrementUnackedPacketsReceived();
             long nextTime = con.getNextSendTime();
@@ -66,8 +71,8 @@ public class ConnectionPacketHandler {
             for (int i = 0; i < acked.size(); i++) {
                 PacketLocal p = (PacketLocal)acked.get(i);
                 if ( (lowestRtt < 0) || (p.getAckTime() < lowestRtt) ) {
-                    if (p.getNumSends() <= 1)
-                        lowestRtt = p.getAckTime();
+                    //if (p.getNumSends() <= 1)
+                    lowestRtt = p.getAckTime();
                 }
                 
                 if (p.getNumSends() > 1)
@@ -81,7 +86,7 @@ public class ConnectionPacketHandler {
                                                                p.getTagsSent());
                 }
                 if (_log.shouldLog(Log.DEBUG))
-                    _log.debug("Packet acked: " + p);
+                    _log.debug("Packet acked after " + p.getAckTime() + "ms: " + p);
             }
             if (lowestRtt > 0) {
                 int oldRTT = con.getOptions().getRTT();
@@ -215,9 +220,6 @@ public class ConnectionPacketHandler {
                 if (_log.shouldLog(Log.WARN))
                     _log.warn("Received unsigned / forged packet: " + packet);
                 return false;
-            }
-            if (packet.isFlagSet(Packet.FLAG_CLOSE)) {
-                con.closeReceived();
             }
         }
         return true;

@@ -18,6 +18,7 @@ public class MessageOutputStream extends OutputStream {
     private DataReceiver _dataReceiver;
     private IOException _streamError;
     private boolean _closed;
+    private long _written;
     
     public MessageOutputStream(I2PAppContext ctx, DataReceiver receiver) {
         this(ctx, receiver, Packet.MAX_PAYLOAD_SIZE);
@@ -29,6 +30,7 @@ public class MessageOutputStream extends OutputStream {
         _buf = new byte[bufSize];
         _dataReceiver = receiver;
         _dataLock = new Object();
+        _written = 0;
         _closed = false;
     }
     
@@ -48,6 +50,7 @@ public class MessageOutputStream extends OutputStream {
                     System.arraycopy(b, cur, _buf, _valid, remaining);
                     _valid += remaining;
                     cur += remaining;
+                    _written += remaining;
                     remaining = 0;
                     //if (_log.shouldLog(Log.DEBUG))
                     //    _log.debug("write(...): appending valid = " + _valid + " remaining=" + remaining);
@@ -68,6 +71,7 @@ public class MessageOutputStream extends OutputStream {
                     _dataReceiver.writeData(_buf, 0, _valid);
                     //if (_log.shouldLog(Log.DEBUG))
                     //    _log.debug("write(...): flushing complete valid = " + _valid + " remaining=" + remaining);
+                    _written += _valid;
                     _valid = 0;                       
                     throwAnyError();
                 }
@@ -89,9 +93,11 @@ public class MessageOutputStream extends OutputStream {
             // also throws InterruptedIOException if the write timeout 
             // expires
             _dataReceiver.writeData(_buf, 0, _valid);
+            _written += _valid;
             //if (_log.shouldLog(Log.DEBUG))
             //    _log.debug("flush(): valid = " + _valid + " complete");
             _valid = 0;
+            _dataLock.notifyAll();
         }
         throwAnyError();
     }
@@ -99,6 +105,7 @@ public class MessageOutputStream extends OutputStream {
     public void close() throws IOException {
         _closed = true;
         flush();
+        _log.debug("Output stream closed after writing " + _written);
     }
     
     public boolean getClosed() { return _closed; }
@@ -123,7 +130,9 @@ public class MessageOutputStream extends OutputStream {
     void flushAvailable(DataReceiver target) throws IOException {
         synchronized (_dataLock) {
             target.writeData(_buf, 0, _valid);
+            _written += _valid;
             _valid = 0;
+            _dataLock.notifyAll();
         }
     }
     

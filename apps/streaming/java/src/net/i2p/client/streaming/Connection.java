@@ -152,6 +152,7 @@ public class Connection {
         } else {
             synchronized (_outboundPackets) {
                 _outboundPackets.put(new Long(packet.getSequenceNum()), packet);
+                _outboundPackets.notifyAll();
             }
             SimpleTimer.getInstance().addEvent(new ResendPacketEvent(packet), _options.getRTT()*2);
         }
@@ -241,6 +242,7 @@ public class Connection {
             doClose();
             synchronized (_outboundPackets) {
                 _outboundPackets.clear();
+                _outboundPackets.notifyAll();
             }
             if (removeFromConMgr)
                 _connectionManager.removeConnection(this);

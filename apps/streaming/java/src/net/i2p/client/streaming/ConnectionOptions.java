@@ -51,13 +51,14 @@ public class ConnectionOptions extends I2PSocketOptions {
         } else {
             setConnectDelay(2*1000);
             setProfile(PROFILE_BULK);
-            setMaxMessageSize(32*1024);
+            setMaxMessageSize(Packet.MAX_PAYLOAD_SIZE);
             setRTT(5*1000);
             setReceiveWindow(1);
             setResendDelay(5*1000);
-            setSendAckDelay(2*1000);
+            setSendAckDelay(1*1000);
             setWindowSize(1);
             setMaxResends(10);
+            setWriteTimeout(-1);
         }
     }
     

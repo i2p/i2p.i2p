@@ -51,6 +51,7 @@ public class MessageInputStream extends InputStream {
     private boolean _locallyClosed;
     private int _readTimeout;
     private IOException _streamError;
+    private long _readTotal;
     
     private Object _dataLock;
     
@@ -62,6 +63,7 @@ public class MessageInputStream extends InputStream {
         _highestReadyBlockId = -1;
         _highestBlockId = -1;
         _readTimeout = -1;
+        _readTotal = 0;
         _notYetReadyBlocks = new HashMap(4);
         _dataLock = new Object();
         _closeReceived = false;
@@ -149,9 +151,32 @@ public class MessageInputStream extends InputStream {
     
     public void closeReceived() {
         synchronized (_dataLock) {
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Close received, ready size: " + _readyDataBlocks.size() 
-                           + " not ready: " + _notYetReadyBlocks.size(), new Exception("closed"));
+            if (_log.shouldLog(Log.DEBUG)) {
+                StringBuffer buf = new StringBuffer(128);
+                buf.append("Close received, ready bytes: ");
+                long available = 0;
+                for (int i = 0; i < _readyDataBlocks.size(); i++) 
+                    available += ((ByteArray)_readyDataBlocks.get(i)).getData().length;
+                available -= _readyDataBlockIndex;
+                buf.append(available);
+                buf.append(" blocks: ").append(_readyDataBlocks.size());
+                
+                buf.append(" not ready blocks: ");
+                long notAvailable = 0;
+                for (Iterator iter = _notYetReadyBlocks.keySet().iterator(); iter.hasNext(); ) {
+                    Long id = (Long)iter.next();
+                    ByteArray ba = (ByteArray)_notYetReadyBlocks.get(id);
+                    buf.append(id).append(" ");
+                    
+                    if (ba.getData() != null)
+                        notAvailable += ba.getData().length;
+                }
+                
+                buf.append("not ready bytes: ").append(notAvailable);
+                buf.append(" highest ready block: ").append(_highestReadyBlockId);
+                
+                _log.debug(buf.toString(), new Exception("closed"));
+            }
             _closeReceived = true;
             _dataLock.notifyAll();
         }
@@ -182,15 +207,17 @@ public class MessageInputStream extends InputStream {
                     _readyDataBlocks.add(new ByteArray(payload));
                 }
                 _highestReadyBlockId = messageId;
+                long cur = _highestReadyBlockId + 1;
                 // now pull in any previously pending blocks
-                while (_notYetReadyBlocks.containsKey(new Long(_highestReadyBlockId + 1))) {
-                    ByteArray ba = (ByteArray)_notYetReadyBlocks.get(new Long(_highestReadyBlockId + 1));
+                while (_notYetReadyBlocks.containsKey(new Long(cur))) {
+                    ByteArray ba = (ByteArray)_notYetReadyBlocks.remove(new Long(cur));
                     if ( (ba != null) && (ba.getData() != null) && (ba.getData().length > 0) ) {
                         _readyDataBlocks.add(ba);
                     }
                     
                     if (_log.shouldLog(Log.DEBUG))
-                        _log.debug("making ready the block " + _highestReadyBlockId);
+                        _log.debug("making ready the block " + cur);
+                    cur++;
                     _highestReadyBlockId++;
                 }
                 _dataLock.notifyAll();
@@ -219,7 +246,7 @@ public class MessageInputStream extends InputStream {
                 
                 if ( (_notYetReadyBlocks.size() <= 0) && (_closeReceived) ) {
                     if (_log.shouldLog(Log.DEBUG))
-                        _log.debug("read() got EOF: " + toString());
+                        _log.debug("read() got EOF after " + _readTotal + " " + toString());
                     return -1;
                 } else {
                     if (_readTimeout < 0) {
@@ -259,6 +286,7 @@ public class MessageInputStream extends InputStream {
                 _readyDataBlockIndex = 0;
                 _readyDataBlocks.remove(0);
             }
+            _readTotal++;
             return (rv < 0 ? rv + 256 : rv);
         }
     }

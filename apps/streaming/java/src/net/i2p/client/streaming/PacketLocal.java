@@ -68,4 +68,12 @@ public class PacketLocal extends Packet {
     }
     public int getNumSends() { return _numSends; }
     public long getLastSend() { return _lastSend; }
+    
+    public String toString() {
+        String str = super.toString();
+        if (_ackOn > 0)
+            return str + " ack after " + getAckTime();
+        else
+            return str;
+    }
 }
