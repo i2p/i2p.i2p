@@ -5,6 +5,8 @@ import java.io.OutputStream;
 import java.util.Properties;
 
 import net.i2p.router.RouterContext;
+import net.i2p.stat.RateStat;
+import net.i2p.util.Log;
 
 /**
  * Tunnel related history information
@@ -12,21 +14,29 @@ import net.i2p.router.RouterContext;
  */
 public class TunnelHistory {
     private RouterContext _context;
+    private Log _log;
     private volatile long _lifetimeAgreedTo;
     private volatile long _lifetimeRejected;
     private volatile long _lastAgreedTo;
     private volatile long _lastRejected;
     private volatile long _lifetimeFailed;
     private volatile long _lastFailed;
+    private RateStat _rejectRate;
     
     public TunnelHistory(RouterContext context) {
         _context = context;
+        _log = context.logManager().getLog(TunnelHistory.class);
         _lifetimeAgreedTo = 0;
         _lifetimeFailed = 0;
         _lifetimeRejected = 0;
         _lastAgreedTo = 0;
         _lastFailed = 0;
         _lastRejected = 0;
+        createRates();
+    }
+    
+    private void createRates() {
+        _rejectRate = new RateStat("tunnelHistory.rejectRate", "How often does this peer reject a tunnel request?", "tunnelHistory", new long[] { 60*1000l, 60*60*1000l, 24*60*60*1000l });
     }
     
     /** total tunnels the peer has agreed to participate in */
@@ -48,6 +58,7 @@ public class TunnelHistory {
     }
     public void incrementRejected() {
         _lifetimeRejected++;
+        _rejectRate.addData(1, 1);
         _lastRejected = _context.clock().now();
     }
     public void incrementFailed() {
@@ -61,6 +72,8 @@ public class TunnelHistory {
     public void setLastAgreedTo(long when) { _lastAgreedTo = when; }
     public void setLastRejected(long when) { _lastRejected = when; }
     public void setLastFailed(long when) { _lastFailed = when; }
+    
+    public RateStat getRejectionRate() { return _rejectRate; }
     
     private final static String NL = System.getProperty("line.separator");
     
@@ -77,6 +90,7 @@ public class TunnelHistory {
         add(buf, "lifetimeFailed", _lifetimeFailed, "How many tunnels has the peer ever agreed to participate in that failed prematurely?");
         add(buf, "lifetimeRejected", _lifetimeRejected, "How many tunnels has the peer ever refused to participate in?");
         out.write(buf.toString().getBytes());
+        _rejectRate.store(out, "tunnelHistory.rejectRate");
     }
     
     private void add(StringBuffer buf, String name, long val, String description) {
@@ -91,6 +105,14 @@ public class TunnelHistory {
         _lifetimeAgreedTo = getLong(props, "tunnels.lifetimeAgreedTo");
         _lifetimeFailed = getLong(props, "tunnels.lifetimeFailed");
         _lifetimeRejected = getLong(props, "tunnels.lifetimeRejected");
+        try {
+            _rejectRate.load(props, "tunnelHistory.rejectRate", true);
+            _log.debug("Loading tunnelHistory.rejectRate");
+        } catch (IllegalArgumentException iae) {
+            _log.warn("TunnelHistory reject rate is corrupt, resetting", iae);
+            createRates();
+        }
+
     }
     
     private final static long getLong(Properties props, String key) {

@@ -32,9 +32,14 @@ public class ReliabilityCalculator extends Calculator {
         val += profile.getTunnelCreateResponseTime().getRate(60*60*1000).getCurrentEventCount();
         val += profile.getTunnelCreateResponseTime().getRate(60*60*1000).getLastEventCount();
         
-        val -= profile.getSendFailureSize().getRate(60*1000).getLastEventCount() * 5;
-        val -= profile.getSendFailureSize().getRate(60*60*1000).getCurrentEventCount()*2;
-        val -= profile.getSendFailureSize().getRate(60*60*1000).getLastEventCount()*2;
+        //val -= profile.getSendFailureSize().getRate(60*1000).getLastEventCount() * 5;
+        //val -= profile.getSendFailureSize().getRate(60*60*1000).getCurrentEventCount()*2;
+        //val -= profile.getSendFailureSize().getRate(60*60*1000).getLastEventCount()*2;
+        
+        val -= profile.getTunnelHistory().getRejectionRate().getRate(60*1000).getCurrentEventCount() * 50;
+        val -= profile.getTunnelHistory().getRejectionRate().getRate(60*1000).getLastEventCount() * 25;
+        val -= profile.getTunnelHistory().getRejectionRate().getRate(60*60*1000).getCurrentEventCount() * 5;
+        val -= profile.getTunnelHistory().getRejectionRate().getRate(60*60*1000).getLastEventCount() * 1;
         
         // penalize them heavily for dropping netDb requests
         val -= profile.getDBHistory().getFailedLookupRate().getRate(60*1000).getCurrentEventCount() * 10;
