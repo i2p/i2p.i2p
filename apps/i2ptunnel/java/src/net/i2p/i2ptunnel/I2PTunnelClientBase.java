@@ -209,8 +209,24 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
             props.putAll(System.getProperties());
         else
             props.putAll(tunnel.getClientOptions());
-        I2PSocketManager sockManager = I2PSocketManagerFactory.createManager(tunnel.host, Integer.parseInt(tunnel.port), props);
-        if (sockManager == null) return null;
+        int portNum = 7654;
+        if (tunnel.port != null) {
+            try {
+                portNum = Integer.parseInt(tunnel.port);
+            } catch (NumberFormatException nfe) {
+                _log.log(Log.CRIT, "Invalid port specified [" + tunnel.port + "], reverting to " + portNum);
+            }
+        }
+        
+        I2PSocketManager sockManager = null;
+        while (sockManager == null) {
+            sockManager = I2PSocketManagerFactory.createManager(tunnel.host, portNum, props);
+            
+            if (sockManager == null) {
+                _log.log(Log.CRIT, "Unable to create socket manager");
+                try { Thread.sleep(10*1000); } catch (InterruptedException ie) {}
+            }
+        }
         sockManager.setName("Client");
         return sockManager;
     }

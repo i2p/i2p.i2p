@@ -75,9 +75,18 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
         I2PClient client = I2PClientFactory.createClient();
         Properties props = new Properties();
         props.putAll(getTunnel().getClientOptions());
+        int portNum = 7654;
+        if (getTunnel().port != null) {
+            try {
+                portNum = Integer.parseInt(getTunnel().port);
+            } catch (NumberFormatException nfe) {
+                _log.log(Log.CRIT, "Invalid port specified [" + getTunnel().port + "], reverting to " + portNum);
+            }
+        }
+
         while (sockMgr == null) {
             synchronized (slock) {
-                sockMgr = I2PSocketManagerFactory.createManager(privData, getTunnel().host, Integer.parseInt(getTunnel().port),
+                sockMgr = I2PSocketManagerFactory.createManager(privData, getTunnel().host, portNum,
                                                                 props);
 
             }

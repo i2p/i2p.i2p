@@ -311,6 +311,14 @@ public class IndexBean {
         else return internalType;
     }
     
+    public String getInternalType(int tunnel) {
+        TunnelController tun = getController(tunnel);
+        if (tun != null)
+            return tun.getType();
+        else
+            return "";
+    }
+    
     public String getClientInterface(int tunnel) {
         TunnelController tun = getController(tunnel);
         if (tun != null)
@@ -532,8 +540,10 @@ public class IndexBean {
             config.setProperty("description", _description);
         if (_i2cpHost != null)
             config.setProperty("i2cpHost", _i2cpHost);
-        if (_i2cpPort != null)
+        if ( (_i2cpPort != null) && (_i2cpPort.trim().length() > 0) )
             config.setProperty("i2cpPort", _i2cpPort);
+        else
+            config.setProperty("i2cpPort", "7654");
         
         if (_customOptions != null) {
             StringTokenizer tok = new StringTokenizer(_customOptions);

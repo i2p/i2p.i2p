@@ -269,8 +269,10 @@ public class TunnelPoolManager implements TunnelManagerFacade {
         synchronized (this) {
             if (_outstandingBuilds >= _maxOutstandingBuilds) {
                 // ok, as a failsafe, always let one through
-                _outstandingBuilds++;
-                return 1;
+                // nah, its failsafe for a reason.  fix the cause.
+                //_outstandingBuilds++;
+                //return 1;
+                return 0;
             }
             if (_outstandingBuilds + wanted < _maxOutstandingBuilds) {
                 _outstandingBuilds += wanted;

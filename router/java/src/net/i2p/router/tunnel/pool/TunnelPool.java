@@ -475,7 +475,7 @@ public class TunnelPool {
             int added = refreshBuilders();
             if ( (added > 0) && (_log.shouldLog(Log.WARN)) )
                 _log.warn("Passive rebuilding a tunnel for " + TunnelPool.this.toString());
-            requeue(60*1000);
+            requeue(30*1000);
         }
     }
 }

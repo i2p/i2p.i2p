@@ -118,6 +118,9 @@
      case IndexBean.RUNNING:
 %><b><span style="color:#00dd00">Running</span></b>
 <a href="index.jsp?nonce=<%=indexBean.getNextNonce()%>&action=stop&tunnel=<%=curServer%>">[STOP]</a><%
+         if ("httpserver".equals(indexBean.getInternalType(curServer))) { 
+%> (<a href="http://<%=(new java.util.Random()).nextLong()%>.i2p/?i2paddresshelper=<%=indexBean.getDestinationBase64(curServer)%>">preview</a>)<%
+         }
          break;
      case IndexBean.NOT_RUNNING:
 %><b><span style="color:#dd0000">Not Running</span></b>

@@ -1,4 +1,9 @@
-$Id: history.txt,v 1.186 2005/04/03 07:50:12 jrandom Exp $
+$Id: history.txt,v 1.187 2005/04/05 11:06:16 jrandom Exp $
+
+2005-04-05  jrandom
+    * Retry I2PTunnel startup if we are unable to build a socketManager for a
+      client or httpclient tunnel.
+    * Add some basic sanity checking on the I2CP settings (thanks duck!)
 
 2005-04-05  jrandom
     * After a successfull netDb search for a leaseSet, republish it to all of 

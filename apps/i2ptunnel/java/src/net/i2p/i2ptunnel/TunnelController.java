@@ -258,8 +258,16 @@ public class TunnelController implements Logging {
         if ("localhost".equals(_tunnel.host)) 
             _tunnel.host = "127.0.0.1";
         String port = getI2CPPort();
-        if ( (port != null) && (port.length() > 0) ) 
-            _tunnel.port = port;
+        if ( (port != null) && (port.length() > 0) ) {
+            try {
+                int portNum = Integer.parseInt(port);
+                _tunnel.port = String.valueOf(portNum);
+            } catch (NumberFormatException nfe) {
+                _tunnel.port = "7654";
+            }
+        } else {
+            _tunnel.port = "7654";
+        }
     }
     
     public void stopTunnel() {

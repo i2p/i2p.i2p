@@ -36,14 +36,6 @@ public class EditBean extends IndexBean {
         }
     }
     
-    public String getInternalType(int tunnel) {
-        TunnelController tun = getController(tunnel);
-        if (tun != null)
-            return tun.getType();
-        else
-            return "";
-    }
-    
     public String getTargetHost(int tunnel) {
         TunnelController tun = getController(tunnel);
         if (tun != null)
