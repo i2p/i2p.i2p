@@ -80,7 +80,8 @@ class SearchJob extends JobImpl {
         _context.statManager().createRateStat("netDb.successTime", "How long a successful search takes", "Network Database", new long[] { 60*60*1000l, 24*60*60*1000l });
         _context.statManager().createRateStat("netDb.failedTime", "How long a failed search takes", "Network Database", new long[] { 60*60*1000l, 24*60*60*1000l });
         _context.statManager().createRateStat("netDb.successPeers", "How many peers are contacted in a successful search", "Network Database", new long[] { 60*60*1000l, 24*60*60*1000l });
-        _context.statManager().createRateStat("netDb.failedPeers", "How many peers are contacted in a failed search", "Network Database", new long[] { 60*60*1000l, 24*60*60*1000l });
+        _context.statManager().createRateStat("netDb.failedPeers", "How many peers fail to respond to a lookup?", "Network Database", new long[] { 60*60*1000l, 24*60*60*1000l });
+        _context.statManager().createRateStat("netDb.searchCount", "Overall number of searches sent", "Network Database", new long[] { 60*60*1000l, 3*60*60*1000l, 24*60*60*1000l });
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Search (" + getClass().getName() + " for " + key.toBase64(), new Exception("Search enqueued by"));
     }
@@ -88,6 +89,7 @@ class SearchJob extends JobImpl {
     public void runJob() {
         if (_log.shouldLog(Log.INFO))
             _log.info(getJobId() + ": Searching for " + _state.getTarget()); // , getAddedBy());
+        _context.statManager().addRateData("netDb.searchCount", 1, 0);
         searchNext();
     }
 
@@ -474,6 +476,7 @@ class SearchJob extends JobImpl {
                 if (_log.shouldLog(Log.ERROR))
                     _log.error("NOT (!!) Penalizing peer for timeout on search: " + _peer.toBase64());
             }
+            _context.statManager().addRateData("netDb.failedPeers", 1, 0);
             searchNext();
         }
         public String getName() { return "Kademlia Search Failed"; }
@@ -509,7 +512,6 @@ class SearchJob extends JobImpl {
         if (_keepStats) {
             long time = _context.clock().now() - _state.getWhenStarted();
             _context.statManager().addRateData("netDb.failedTime", time, 0);
-            _context.statManager().addRateData("netDb.failedPeers", _state.getAttempted().size(), time);
         }
         if (_onFailure != null)
             _context.jobQueue().addJob(_onFailure);

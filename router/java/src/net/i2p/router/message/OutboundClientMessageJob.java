@@ -60,6 +60,7 @@ public class OutboundClientMessageJob extends JobImpl {
     private NextStepJob _nextStep;
     private LookupLeaseSetFailedJob _lookupLeaseSetFailed;
     private long _overallExpiration;
+    private boolean _shouldBundle;
     
     /**
      * final timeout (in milliseconds) that the outbound message will fail in.
@@ -76,6 +77,29 @@ public class OutboundClientMessageJob extends JobImpl {
     
     /** dont search for the lease more than 6 times */
     private final static int MAX_LEASE_LOOKUPS = 6;
+    
+    /**
+     * If the client's config specifies shouldBundleReplyInfo=true, messages sent from
+     * that client to any peers will probabalistically include the sending destination's
+     * current LeaseSet (allowing the recipient to reply without having to do a full
+     * netDb lookup).  This should improve performance during the initial negotiations,
+     * but is not necessary for communication that isn't bidirectional.
+     *
+     */
+    public static final String BUNDLE_REPLY_LEASESET = "shouldBundleReplyInfo";
+    /**
+     * Allow the override of the frequency of bundling the reply info in with a message.
+     * The client app can specify bundleReplyInfoProbability=80 (for instance) and that
+     * will cause the router to include the sender's leaseSet with 80% of the messages
+     * sent to the peer.
+     *
+     */
+    public static final String BUNDLE_PROBABILITY = "bundleReplyInfoProbability";
+    /** 
+     * How often do messages include the reply leaseSet (out of every 100 tries).  
+     * Including it each time is probably overkill, but who knows.  
+     */
+    private static final int BUNDLE_PROBABILITY_DEFAULT = 30;
     
     /**
      * Send the sucker
@@ -104,6 +128,8 @@ public class OutboundClientMessageJob extends JobImpl {
                 timeoutMs = OVERALL_TIMEOUT_MS_DEFAULT;
             }
         }
+        
+        _shouldBundle = getShouldBundle();
         
         _overallExpiration = timeoutMs + _context.clock().now();
         _status = new OutboundClientMessageStatus(msg);
@@ -253,6 +279,25 @@ public class OutboundClientMessageJob extends JobImpl {
         }
     }
     
+    private boolean getShouldBundle() {
+        String wantBundle = _status.getMessage().getSenderConfig().getOptions().getProperty(BUNDLE_REPLY_LEASESET, "true");
+        if ("true".equals(wantBundle)) {
+            int probability = BUNDLE_PROBABILITY_DEFAULT;
+            String str = _status.getMessage().getSenderConfig().getOptions().getProperty(BUNDLE_PROBABILITY);
+            try { 
+                if (str != null) 
+                    probability = Integer.parseInt(str);
+            } catch (NumberFormatException nfe) {
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("Bundle leaseSet probability overridden incorrectly [" + str + "]", nfe);
+            }
+            if (probability >= _context.random().nextInt(100))
+                return true;
+            else
+                return false;
+        }
+    }
+    
     /**
      * Send the message to the specified tunnel by creating a new garlic message containing
      * the (already created) payload clove as well as a new delivery status message.  This garlic
@@ -267,11 +312,16 @@ public class OutboundClientMessageJob extends JobImpl {
         PublicKey key = _status.getLeaseSet().getEncryptionKey();
         SessionKey sessKey = new SessionKey();
         Set tags = new HashSet();
+        LeaseSet replyLeaseSet = null;
+        if (_shouldBundle) {
+            replyLeaseSet = _context.netDb().lookupLeaseSetLocally(_status.getFrom().calculateHash());
+        }
+        
         GarlicMessage msg = OutboundClientMessageJobHelper.createGarlicMessage(_context, token, 
                                                                                _overallExpiration, key, 
                                                                                _status.getClove(), 
                                                                                _status.getTo(), sessKey, 
-                                                                               tags, true);
+                                                                               tags, true, replyLeaseSet);
         
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("send(lease) - token expected " + token);

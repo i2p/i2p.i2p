@@ -19,9 +19,11 @@ import net.i2p.data.Payload;
 import net.i2p.data.PublicKey;
 import net.i2p.data.SessionKey;
 import net.i2p.data.TunnelId;
+import net.i2p.data.LeaseSet;
 import net.i2p.data.i2np.DataMessage;
 import net.i2p.data.i2np.DeliveryInstructions;
 import net.i2p.data.i2np.DeliveryStatusMessage;
+import net.i2p.data.i2np.DatabaseStoreMessage;
 import net.i2p.data.i2np.GarlicMessage;
 import net.i2p.router.Router;
 import net.i2p.router.TunnelInfo;
@@ -50,23 +52,32 @@ class OutboundClientMessageJobHelper {
      *
      * For now, its just a tunneled DeliveryStatusMessage
      *
+     * @param bundledReplyLeaseSet if specified, the given LeaseSet will be packaged with the message (allowing
+     *                             much faster replies, since their netDb search will return almost instantly)
      */
-    static GarlicMessage createGarlicMessage(RouterContext ctx, long replyToken, long expiration, PublicKey recipientPK, Payload data, Destination dest, SessionKey wrappedKey, Set wrappedTags, boolean requireAck) {
+    static GarlicMessage createGarlicMessage(RouterContext ctx, long replyToken, long expiration, PublicKey recipientPK, 
+                                             Payload data, Destination dest, SessionKey wrappedKey, Set wrappedTags, 
+                                             boolean requireAck, LeaseSet bundledReplyLeaseSet) {
         PayloadGarlicConfig dataClove = buildDataClove(ctx, data, dest, expiration);
-        return createGarlicMessage(ctx, replyToken, expiration, recipientPK, dataClove, dest, wrappedKey, wrappedTags, requireAck);
+        return createGarlicMessage(ctx, replyToken, expiration, recipientPK, dataClove, dest, wrappedKey, 
+                                   wrappedTags, requireAck, bundledReplyLeaseSet);
     }
     /**
      * Allow the app to specify the data clove directly, which enables OutboundClientMessage to resend the
      * same payload (including expiration and unique id) in different garlics (down different tunnels)
      *
      */
-    static GarlicMessage createGarlicMessage(RouterContext ctx, long replyToken, long expiration, PublicKey recipientPK, PayloadGarlicConfig dataClove, Destination dest, SessionKey wrappedKey, Set wrappedTags, boolean requireAck) {
-        GarlicConfig config = createGarlicConfig(ctx, replyToken, expiration, recipientPK, dataClove, dest, requireAck);
+    static GarlicMessage createGarlicMessage(RouterContext ctx, long replyToken, long expiration, PublicKey recipientPK, 
+                                             PayloadGarlicConfig dataClove, Destination dest, SessionKey wrappedKey, 
+                                             Set wrappedTags, boolean requireAck, LeaseSet bundledReplyLeaseSet) {
+        GarlicConfig config = createGarlicConfig(ctx, replyToken, expiration, recipientPK, dataClove, dest, requireAck, bundledReplyLeaseSet);
         GarlicMessage msg = GarlicMessageBuilder.buildMessage(ctx, config, wrappedKey, wrappedTags);
         return msg;
     }
     
-    private static GarlicConfig createGarlicConfig(RouterContext ctx, long replyToken, long expiration, PublicKey recipientPK, PayloadGarlicConfig dataClove, Destination dest, boolean requireAck) {
+    private static GarlicConfig createGarlicConfig(RouterContext ctx, long replyToken, long expiration, PublicKey recipientPK, 
+                                                   PayloadGarlicConfig dataClove, Destination dest, boolean requireAck,
+                                                   LeaseSet bundledReplyLeaseSet) {
         Log log = ctx.logManager().getLog(OutboundClientMessageJobHelper.class);
         log.debug("Reply token: " + replyToken);
         GarlicConfig config = new GarlicConfig();
@@ -76,6 +87,11 @@ class OutboundClientMessageJobHelper {
         if (requireAck) {
             PayloadGarlicConfig ackClove = buildAckClove(ctx, replyToken, expiration);
             config.addClove(ackClove);
+        }
+        
+        if (bundledReplyLeaseSet != null) {
+            PayloadGarlicConfig leaseSetClove = buildLeaseSetClove(ctx, expiration, bundledReplyLeaseSet);
+            config.addClove(leaseSetClove);
         }
         
         DeliveryInstructions instructions = new DeliveryInstructions();
@@ -171,6 +187,34 @@ class OutboundClientMessageJobHelper {
         clove.setId(ctx.random().nextInt(Integer.MAX_VALUE));
         DataMessage msg = new DataMessage(ctx);
         msg.setData(data.getEncryptedData());
+        clove.setPayload(msg);
+        clove.setRecipientPublicKey(null);
+        clove.setRequestAck(false);
+        
+        return clove;
+    }
+    
+    
+    /**
+     * Build a clove that stores the leaseSet locally 
+     */
+    static PayloadGarlicConfig buildLeaseSetClove(RouterContext ctx, long expiration, LeaseSet replyLeaseSet) {
+        PayloadGarlicConfig clove = new PayloadGarlicConfig();
+        
+        DeliveryInstructions instructions = new DeliveryInstructions();
+        instructions.setDeliveryMode(DeliveryInstructions.DELIVERY_MODE_LOCAL);
+        instructions.setDelayRequested(false);
+        instructions.setDelaySeconds(0);
+        instructions.setEncrypted(false);
+        
+        clove.setCertificate(new Certificate(Certificate.CERTIFICATE_TYPE_NULL, null));
+        clove.setDeliveryInstructions(instructions);
+        clove.setExpiration(expiration);
+        clove.setId(ctx.random().nextInt(Integer.MAX_VALUE));
+        DatabaseStoreMessage msg = new DatabaseStoreMessage(ctx);
+        msg.setLeaseSet(replyLeaseSet);
+        msg.setMessageExpiration(new Date(expiration));
+        msg.setKey(replyLeaseSet.getDestination().calculateHash());
         clove.setPayload(msg);
         clove.setRecipientPublicKey(null);
         clove.setRequestAck(false);

@@ -109,6 +109,8 @@ public class StatisticsManager implements Service {
             includeRate("netDb.lookupsMatched", stats, new long[] { 5*60*1000, 60*60*1000 });
             includeRate("netDb.storeSent", stats, new long[] { 5*60*1000, 60*60*1000 });
             includeRate("netDb.successPeers", stats, new long[] { 60*60*1000 });
+            includeRate("netDb.failedPeers", stats, new long[] { 60*60*1000 });
+            includeRate("netDb.searchCount", stats, new long[] { 3*60*60*1000});
             includeRate("transport.receiveMessageSize", stats, new long[] { 5*60*1000, 60*60*1000 });
             includeRate("transport.sendMessageSize", stats, new long[] { 5*60*1000, 60*60*1000 });
             includeRate("client.sendAckTime", stats, new long[] { 60*60*1000, 24*60*60*1000l }, true);
