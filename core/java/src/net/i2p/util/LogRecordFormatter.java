@@ -27,7 +27,10 @@ class LogRecordFormatter {
     private final static int MAX_PRIORITY_LENGTH = 5;
 
     public static String formatRecord(LogManager manager, LogRecord rec) {
-        StringBuffer buf = new StringBuffer(1024);
+        int size = 64 + rec.getMessage().length();
+        if (rec.getThrowable() != null)
+            size += 512;
+        StringBuffer buf = new StringBuffer(size);
         char format[] = manager._getFormat();
         for (int i = 0; i < format.length; ++i) {
             switch ((int) format[i]) {
@@ -53,7 +56,7 @@ class LogRecordFormatter {
         }
         buf.append(NL);
         if (rec.getThrowable() != null) {
-            ByteArrayOutputStream baos = new ByteArrayOutputStream(1024);
+            ByteArrayOutputStream baos = new ByteArrayOutputStream(512);
             PrintWriter pw = new PrintWriter(baos, true);
             rec.getThrowable().printStackTrace(pw);
             try {
