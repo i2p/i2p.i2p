@@ -57,31 +57,32 @@ public class ConfigFile {
         try {
             fileInputStream = new FileInputStream(_configFile);
             _properties.load(fileInputStream);
-        } catch (IOException e) {
+        } catch (Exception e) {
             return false;
         }
         try {
             fileInputStream.close();
-        } catch (IOException e1) {
+        } catch (IOException e) {
             // No worries.
         }
         return true;
     }
 
-    private void writeConfigFile() {
+    private boolean writeConfigFile() {
 
         FileOutputStream fileOutputStream = null;
 
         try {
             fileOutputStream = new FileOutputStream(_configFile);
             _properties.store(fileOutputStream, null);
-        } catch (IOException e) {
-            System.exit(1);
+        } catch (Exception e) {
+            return false;
         }
         try {
             fileOutputStream.close();
-        } catch (IOException e1) {
+        } catch (IOException e) {
             // No worries.
         }
+        return true;
     }
 }

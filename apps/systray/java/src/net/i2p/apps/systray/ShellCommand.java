@@ -338,7 +338,7 @@ public class ShellCommand {
         return _outputStream;
     }
 
-    private synchronized boolean execute(String shellCommand, boolean consumeOutput, boolean waitForExitStatus) {
+    private boolean execute(String shellCommand, boolean consumeOutput, boolean waitForExitStatus) {
 
         StreamConsumer processStderrConsumer;
         StreamConsumer processStdoutConsumer;

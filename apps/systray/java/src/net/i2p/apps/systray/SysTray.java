@@ -27,15 +27,15 @@ public class SysTray implements SysTrayMenuListener {
     private String          _browserString;
     private ConfigFile      _configFile        = new ConfigFile();
     private Frame           _frame;
-    private SysTrayMenuItem _itemExit          = new SysTrayMenuItem("Exit I2P systray", "exit");
-    private SysTrayMenuItem _itemSelectBrowser = new SysTrayMenuItem("Select preferred browser...", "selectbrowser");
-    private SysTrayMenuIcon _sysTrayMenuIcon   = new SysTrayMenuIcon("../icons/iggy");
+    private SysTrayMenuItem _itemSelectBrowser = new SysTrayMenuItem("Select browser...", "selectbrowser");
+    private SysTrayMenuItem _itemShutdown      = new SysTrayMenuItem("Shut down I2P router", "shutdown");
+    private SysTrayMenuIcon _sysTrayMenuIcon   = new SysTrayMenuIcon("icons/iggy");
     private SysTrayMenu     _sysTrayMenu       = new SysTrayMenu(_sysTrayMenuIcon, "I2P Router Console");
     private UrlLauncher     _urlLauncher       = new UrlLauncher();
 
     public SysTray() {
 
-        if (!_configFile.init("../systray.config"))
+        if (!_configFile.init("systray.config"))
             _configFile.setProperty("browser", "default");
 
         _browserString = _configFile.getProperty("browser", "default");
@@ -74,16 +74,18 @@ public class SysTray implements SysTrayMenuListener {
             }
         }
 
-        if ((browser = promptForBrowser("Please select another browser")) != null)
+        if (!(browser = promptForBrowser("Please select another browser")).equals("nullnull"))
             setBrowser(browser);
-
     }
 
     public void menuItemSelected(SysTrayMenuEvent e) {
-        if (e.getActionCommand().equals("exit")) {
+
+        String browser = null;
+
+        if (e.getActionCommand().equals("shutdown")) {
             _browserChooser = null;
             _frame = null;
-            _itemExit = null;
+            _itemShutdown = null;
             _itemSelectBrowser = null;
             _sysTrayMenuIcon = null;
             _sysTrayMenu = null;
@@ -91,14 +93,16 @@ public class SysTray implements SysTrayMenuListener {
             _frame = null;
             System.exit(0);
         } else if (e.getActionCommand().equals("selectbrowser")) {
-            setBrowser(promptForBrowser("Select preferred browser"));
+
+            if (!(browser = promptForBrowser("Select browser")).equals("nullnull"))
+                setBrowser(browser);
         }
     }
 
     private void createSysTrayMenu() {
         _itemSelectBrowser.addSysTrayMenuListener(this);
-        _itemExit.addSysTrayMenuListener(this);
-        _sysTrayMenu.addItem(_itemExit);
+        _itemShutdown.addSysTrayMenuListener(this);
+        _sysTrayMenu.addItem(_itemShutdown);
         _sysTrayMenu.addSeparator();
         _sysTrayMenu.addItem(_itemSelectBrowser);
     }
