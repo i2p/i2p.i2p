@@ -10,7 +10,7 @@
         <echo message="  distclean: clean up all derived files" />
         <echo message="  javadoc:   generate javadoc for the entire project into ./build/javadoc" />
     </target>
-    <target name="dist" depends="distclean, pkg, javadoc">
+    <target name="dist" depends="pkg, javadoc">
     </target>
     <target name="build" depends="builddep, jar, buildWEB" />
     <target name="buildclean" depends="distclean, build" />
@@ -224,7 +224,7 @@
             <tarfileset dir="pkg-temp" includes="**/*" prefix="i2p" />
         </tar>
     </target>
-    <target name="updater" depends="build">
+    <target name="updater" depends="distclean, build">
         <delete dir="pkg-temp" />
         <copy file="build/i2p.jar" todir="pkg-temp/lib/" />
         <copy file="build/i2ptunnel.jar" todir="pkg-temp/lib/" />
