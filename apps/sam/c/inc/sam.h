@@ -42,8 +42,8 @@ extern "C" {
  */
 /* The maximum length a SAM command can be */
 #define SAM_CMD_LEN 128
-/*The maximum size of a single datagram packet (-30 temporary bug fix for SAM)*/
-#define SAM_DGRAM_PAYLOAD_MAX ((31 * 1024) - 30)
+/* The maximum size of a single datagram packet */
+#define SAM_DGRAM_PAYLOAD_MAX (31 * 1024)
 /* The longest log message */
 #define SAM_LOGMSG_LEN 256
 /* The longest `name' arg for the naming lookup callback */
