@@ -269,13 +269,14 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
      *
      */
     private void send() {
+        if (_finished) return;
         long token = getContext().random().nextLong(I2NPMessage.MAX_ID_VALUE);
         PublicKey key = _leaseSet.getEncryptionKey();
         SessionKey sessKey = new SessionKey();
         Set tags = new HashSet();
         LeaseSet replyLeaseSet = null;
         if (_shouldBundle) {
-            replyLeaseSet = getContext().netDb().lookupLeaseSetLocally(_clientMessage.getFromDestination().calculateHash());
+            replyLeaseSet = getContext().netDb().lookupLeaseSetLocally(_from.calculateHash());
         }
         
         GarlicMessage msg = OutboundClientMessageJobHelper.createGarlicMessage(getContext(), token, 
