@@ -1,9 +1,8 @@
 package net.i2p.router;
 
-import net.i2p.util.Log;
-import net.i2p.util.Clock;
-
 import net.i2p.stat.StatManager;
+import net.i2p.util.Clock;
+import net.i2p.util.Log;
 
 /** a do run run run a do run run */
 class JobQueueRunner implements Runnable {

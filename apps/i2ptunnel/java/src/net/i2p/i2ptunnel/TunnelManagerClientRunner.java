@@ -3,15 +3,14 @@
  */
 package net.i2p.i2ptunnel;
 
-import net.i2p.util.Log;
-
-import java.util.StringTokenizer;
-
-import java.net.Socket;
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.BufferedReader;
 import java.io.OutputStream;
+import java.net.Socket;
+import java.util.StringTokenizer;
+
+import net.i2p.util.Log;
 
 /**
  * Runner thread that reads commands from the socket and fires off commands to

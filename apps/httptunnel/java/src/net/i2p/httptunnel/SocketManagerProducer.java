@@ -1,7 +1,12 @@
 package net.i2p.httptunnel;
 
-import java.util.*;
-import net.i2p.client.streaming.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Properties;
+
+import net.i2p.client.streaming.I2PSocketManager;
+import net.i2p.client.streaming.I2PSocketManagerFactory;
 
 /**
  * Produces SocketManagers in a thread and gives them to those who

@@ -50,7 +50,6 @@ import java.util.Set;
 import java.util.StringTokenizer;
 
 import net.i2p.I2PException;
-import net.i2p.i2ptunnel.socks.I2PSOCKSTunnel;
 import net.i2p.client.I2PClient;
 import net.i2p.client.I2PClientFactory;
 import net.i2p.client.naming.NamingService;
@@ -58,6 +57,7 @@ import net.i2p.data.Base64;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
+import net.i2p.i2ptunnel.socks.I2PSOCKSTunnel;
 import net.i2p.util.EventDispatcher;
 import net.i2p.util.EventDispatcherImpl;
 import net.i2p.util.Log;

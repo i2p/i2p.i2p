@@ -8,8 +8,8 @@ package net.i2p.router.peermanager;
  *
  */
 
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 
 import net.i2p.router.PeerManagerFacade;
 import net.i2p.router.PeerSelectionCriteria;

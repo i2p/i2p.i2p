@@ -36,16 +36,15 @@ import net.i2p.router.InNetMessage;
 import net.i2p.router.InNetMessagePool;
 import net.i2p.router.JobImpl;
 import net.i2p.router.JobQueue;
+import net.i2p.router.MessageHistory;
 import net.i2p.router.MessageReceptionInfo;
+import net.i2p.router.MessageValidator;
 import net.i2p.router.Router;
 import net.i2p.router.TunnelInfo;
 import net.i2p.router.TunnelManagerFacade;
-import net.i2p.router.MessageHistory;
-import net.i2p.router.MessageValidator;
-import net.i2p.util.Log;
-import net.i2p.util.Clock;
-
 import net.i2p.stat.StatManager;
+import net.i2p.util.Clock;
+import net.i2p.util.Log;
 
 public class HandleTunnelMessageJob extends JobImpl {
     private final static Log _log = new Log(HandleTunnelMessageJob.class);

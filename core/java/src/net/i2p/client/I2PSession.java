@@ -1,4 +1,5 @@
 package net.i2p.client;
+
 /*
  * free (adj.): unencumbered; not under the control of others
  * Written by jrandom in 2003 and released into the public domain 
@@ -11,8 +12,8 @@ package net.i2p.client;
 import java.util.Set;
 
 import net.i2p.data.Destination;
-import net.i2p.data.SessionKey;
 import net.i2p.data.PrivateKey;
+import net.i2p.data.SessionKey;
 import net.i2p.data.SigningPrivateKey;
 
 /**
@@ -30,6 +31,7 @@ public interface I2PSession {
      * @return whether it was accepted by the router for delivery or not
      */
     public boolean sendMessage(Destination dest, byte[] payload) throws I2PSessionException;
+
     /**
      * Like sendMessage above, except the key used and the tags sent are exposed to the 
      * application.  <p /> 
@@ -57,15 +59,16 @@ public interface I2PSession {
      *                 the contents of the set is ignored during the call, but afterwards it contains a set of SessionTag 
      *                 objects that were sent along side the given keyUsed.
      */
-    public boolean sendMessage(Destination dest, byte[] payload, SessionKey keyUsed, Set tagsSent) throws I2PSessionException;
-    
+    public boolean sendMessage(Destination dest, byte[] payload, SessionKey keyUsed, Set tagsSent)
+                                                                                                  throws I2PSessionException;
+
     /** Receive a message that the router has notified the client about, returning
      * the payload.
      * @param msgId message to fetch
      * @return unencrypted body of the message
      */
     public byte[] receiveMessage(int msgId) throws I2PSessionException;
-    
+
     /** Instruct the router that the message received was abusive (including how
      * abusive on a 1-100 scale) in the hopes the router can do something to
      * minimize receiving abusive messages like that in the future.
@@ -73,37 +76,37 @@ public interface I2PSession {
      * @param severity how abusive
      */
     public void reportAbuse(int msgId, int severity) throws I2PSessionException;
-    
+
     /** Instruct the I2PSession where it should send event notifications
      * @param lsnr listener to retrieve events
      */
     public void setSessionListener(I2PSessionListener lsnr);
-    
+
     /**
      * Tear down the session and release any resources.
      *
      */
     public void destroySession() throws I2PSessionException;
-    
+
     /**
      * Actually connect the session and start recieving/sending messages
      *
      */
     public void connect() throws I2PSessionException;
-    
+
     /**
      * Retrieve the Destination this session serves as the endpoint for.
      * Returns null if no destination is available.
      *
      */
     public Destination getMyDestination();
-    
+
     /**
      * Retrieve the decryption PrivateKey associated with the Destination
      *
      */
     public PrivateKey getDecryptionKey();
-    
+
     /**
      * Retrieve the signing SigningPrivateKey associated with the Destination
      */

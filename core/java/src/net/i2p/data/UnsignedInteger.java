@@ -1,4 +1,5 @@
 package net.i2p.data;
+
 /*
  * free (adj.): unencumbered; not under the control of others
  * Written by jrandom in 2003 and released into the public domain 
@@ -8,9 +9,9 @@ package net.i2p.data;
  *
  */
 
-import net.i2p.util.Log;
-
 import java.math.BigInteger;
+
+import net.i2p.util.Log;
 
 /**
  * Manage an arbitrarily large unsigned integer, using the first bit and first byte
@@ -26,7 +27,7 @@ public class UnsignedInteger {
     private final static Log _log = new Log(UnsignedInteger.class);
     private byte[] _data;
     private long _value;
-    
+
     /**
      * Construct the integer from the bytes given, making the value accessible 
      * immediately.
@@ -46,11 +47,11 @@ public class UnsignedInteger {
         }
         _data = new byte[data.length - start];
         for (int i = 0; i < _data.length; i++)
-            _data[i] = data[i+start];
+            _data[i] = data[i + start];
         // done stripping excess bytes, now calc
         _value = calculateValue(_data);
     }
-    
+
     /**
      * Construct the integer with the java number given, making the bytes
      * available immediately.
@@ -61,114 +62,132 @@ public class UnsignedInteger {
         _value = value;
         _data = calculateBytes(value);
     }
-    
+
     /**
      * Calculate the value of the array of bytes, treating it as an unsigned integer 
      * with the most significant bit and byte first
      *
      */
     private static long calculateValue(byte[] data) {
-	if (data == null) {
-	    _log.error("Null data to be calculating for", new Exception("Argh"));
-	    return 0;
-	} else if (data.length == 0) {
-	    return 0;
-	}
+        if (data == null) {
+            _log.error("Null data to be calculating for", new Exception("Argh"));
+            return 0;
+        } else if (data.length == 0) { return 0; }
         BigInteger bi = new BigInteger(1, data);
         return bi.longValue();
     }
-    
+
     /**
      * hexify the byte array
      *
      */
     private final static String toString(byte[] val) {
-	return "0x" + DataHelper.toString(val, val.length);
+        return "0x" + DataHelper.toString(val, val.length);
     }
-    
+
     /**
      * Calculate the bytes as an unsigned integer with the most significant bit and byte in the first position
      */
     private static byte[] calculateBytes(long value) {
-        BigInteger bi = new BigInteger(""+value);
-	byte buf[] = bi.toByteArray();
-	if ( (buf == null) || (buf.length <= 0) )
-	    throw new IllegalArgumentException("Value [" + value + "] cannot be transformed");
-	int trim = 0;
-	while ( (trim < buf.length) && (buf[trim] == 0x00) )
-	    trim++;
-	byte rv[] = new byte[buf.length - trim];
-	System.arraycopy(buf, trim, rv, 0, rv.length);
-	return rv;
+        BigInteger bi = new BigInteger("" + value);
+        byte buf[] = bi.toByteArray();
+        if ((buf == null) || (buf.length <= 0))
+            throw new IllegalArgumentException("Value [" + value + "] cannot be transformed");
+        int trim = 0;
+        while ((trim < buf.length) && (buf[trim] == 0x00))
+            trim++;
+        byte rv[] = new byte[buf.length - trim];
+        System.arraycopy(buf, trim, rv, 0, rv.length);
+        return rv;
     }
-    
+
     /**
      * Get the unsigned bytes, most significant bit and bytes first, without any padding
      *
      */
-    public byte[] getBytes() { return _data; }
+    public byte[] getBytes() {
+        return _data;
+    }
+
     /**
      * Get the unsigned bytes, most significant bit and bytes first, zero padded to the
      * specified number of bytes
      *
      * @throws IllegalArgumentException if numBytes < necessary number of bytes
      */
-    public byte[] getBytes(int numBytes) throws IllegalArgumentException { 
-        if ( (_data == null) || (numBytes < _data.length) ) 
-            throw new IllegalArgumentException("Value (" +_value+") is greater than the requested number of bytes ("+numBytes+")");
-        
+    public byte[] getBytes(int numBytes) throws IllegalArgumentException {
+        if ((_data == null) || (numBytes < _data.length))
+            throw new IllegalArgumentException("Value (" + _value + ") is greater than the requested number of bytes ("
+                                               + numBytes + ")");
+
         byte[] data = new byte[numBytes];
-	System.arraycopy(_data, 0, data, numBytes - _data.length, _data.length);
-        return data; 
+        System.arraycopy(_data, 0, data, numBytes - _data.length, _data.length);
+        return data;
     }
-    
-    public BigInteger getBigInteger() { return new BigInteger(1, _data); }
-    public long getLong() { return _value; }
-    public int getInt() { return (int)_value; }
-    public short getShort() { return (short)_value; }
-    
+
+    public BigInteger getBigInteger() {
+        return new BigInteger(1, _data);
+    }
+
+    public long getLong() {
+        return _value;
+    }
+
+    public int getInt() {
+        return (int) _value;
+    }
+
+    public short getShort() {
+        return (short) _value;
+    }
+
     public boolean equals(Object obj) {
-        if ( (obj != null) && (obj instanceof UnsignedInteger) ) {
-            return DataHelper.eq(_data, ((UnsignedInteger)obj)._data) && 
-                   DataHelper.eq(_value, ((UnsignedInteger)obj)._value);
+        if ((obj != null) && (obj instanceof UnsignedInteger)) {
+            return DataHelper.eq(_data, ((UnsignedInteger) obj)._data)
+                   && DataHelper.eq(_value, ((UnsignedInteger) obj)._value);
         } else {
             return false;
         }
     }
-    
-    public int hashCode() { 
-        return DataHelper.hashCode(_data) + (int)_value;
+
+    public int hashCode() {
+        return DataHelper.hashCode(_data) + (int) _value;
     }
-    
+
     public String toString() {
         return "UnsignedInteger: " + getLong() + "/" + toString(getBytes());
     }
-        
+
     public static void main(String args[]) {
         _log.debug("Testing 1024");
         testNum(1024L);
         _log.debug("Testing 1025");
         testNum(1025L);
         _log.debug("Testing 2Gb-1");
-        testNum(1024*1024*1024*2L-1L);
+        testNum(1024 * 1024 * 1024 * 2L - 1L);
         _log.debug("Testing 4Gb-1");
-        testNum(1024*1024*1024*4L-1L);
+        testNum(1024 * 1024 * 1024 * 4L - 1L);
         _log.debug("Testing 4Gb");
-        testNum(1024*1024*1024*4L);
+        testNum(1024 * 1024 * 1024 * 4L);
         _log.debug("Testing 4Gb+1");
-        testNum(1024*1024*1024*4L+1L);
+        testNum(1024 * 1024 * 1024 * 4L + 1L);
         _log.debug("Testing MaxLong");
         testNum(Long.MAX_VALUE);
-	try { Thread.sleep(1000); } catch (Throwable t) {}
+        try {
+            Thread.sleep(1000);
+        } catch (Throwable t) {
+        }
     }
-    
+
     private static void testNum(long num) {
         UnsignedInteger i = new UnsignedInteger(num);
-        _log.debug(num + " turned into an unsigned integer: " + i + " (" + i.getLong() + "/" + toString(i.getBytes()) + ")");
+        _log.debug(num + " turned into an unsigned integer: " + i + " (" + i.getLong() + "/" + toString(i.getBytes())
+                   + ")");
         _log.debug(num + " turned into an BigInteger: " + i.getBigInteger());
         byte[] val = i.getBytes();
         UnsignedInteger val2 = new UnsignedInteger(val);
-        _log.debug(num + " turned into a byte array and back again: " + val2 + " (" + val2.getLong() + "/" + toString(val2.getBytes()) + ")");
+        _log.debug(num + " turned into a byte array and back again: " + val2 + " (" + val2.getLong() + "/"
+                   + toString(val2.getBytes()) + ")");
         _log.debug(num + " As an 8 byte array: " + toString(val2.getBytes(8)));
     }
 }

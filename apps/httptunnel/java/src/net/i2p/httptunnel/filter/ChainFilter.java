@@ -1,9 +1,11 @@
 package net.i2p.httptunnel.filter;
 
-import net.i2p.util.Log;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.util.Collection;
+import java.util.Iterator;
 
-import java.io.*;
-import java.util.*;
+import net.i2p.util.Log;
 
 /**
  * Chain multiple filters. Decorator pattern...

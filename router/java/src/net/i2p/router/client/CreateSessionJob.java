@@ -10,10 +10,10 @@ package net.i2p.router.client;
 
 import java.util.Properties;
 
+import net.i2p.data.i2cp.SessionConfig;
 import net.i2p.router.ClientTunnelSettings;
 import net.i2p.router.JobImpl;
 import net.i2p.router.TunnelManagerFacade;
-import net.i2p.data.i2cp.SessionConfig;
 import net.i2p.util.Log;
 
 /**

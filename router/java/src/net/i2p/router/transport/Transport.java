@@ -8,12 +8,12 @@ package net.i2p.router.transport;
  *
  */
 
-import net.i2p.data.RouterInfo;
-import net.i2p.data.RouterAddress;
-import net.i2p.router.OutNetMessage;
-
 import java.util.Properties;
 import java.util.Set;
+
+import net.i2p.data.RouterAddress;
+import net.i2p.data.RouterInfo;
+import net.i2p.router.OutNetMessage;
 
 /**
  * Defines a way to send a message to another peer and start listening for messages

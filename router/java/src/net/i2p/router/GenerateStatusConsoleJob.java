@@ -8,10 +8,10 @@ package net.i2p.router;
  *
  */
 
-import net.i2p.util.Log;
-
 import java.io.FileOutputStream;
 import java.io.IOException;
+
+import net.i2p.util.Log;
 
 public class GenerateStatusConsoleJob extends JobImpl {
     private final static Log _log = new Log(GenerateStatusConsoleJob.class);

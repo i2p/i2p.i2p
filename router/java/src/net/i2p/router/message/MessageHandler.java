@@ -30,8 +30,8 @@ import net.i2p.router.MessageHistory;
 import net.i2p.router.MessageReceptionInfo;
 import net.i2p.router.MessageValidator;
 import net.i2p.router.Router;
-import net.i2p.util.Log;
 import net.i2p.util.Clock;
+import net.i2p.util.Log;
 
 /**
  * Implement the inbound message processing logic to forward based on delivery instructions and

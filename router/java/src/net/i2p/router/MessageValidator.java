@@ -1,12 +1,12 @@
 package net.i2p.router;
 
-import net.i2p.util.Log;
-import net.i2p.util.Clock;
-
-import java.util.TreeMap;
-import java.util.Set;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Set;
+import java.util.TreeMap;
+
+import net.i2p.util.Clock;
+import net.i2p.util.Log;
 
 /**
  * Singleton to manage the logic (and historical data) to determine whether a message

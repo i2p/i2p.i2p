@@ -35,11 +35,10 @@ import net.i2p.router.ReplyJob;
 import net.i2p.router.Router;
 import net.i2p.router.TunnelManagerFacade;
 import net.i2p.router.TunnelSelectionCriteria;
+import net.i2p.stat.StatManager;
 import net.i2p.util.Clock;
 import net.i2p.util.Log;
 import net.i2p.util.RandomSource;
-
-import net.i2p.stat.StatManager;
 
 /**
  * Send a client message, taking into consideration the fact that there may be

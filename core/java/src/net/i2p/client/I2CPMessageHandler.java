@@ -1,4 +1,5 @@
 package net.i2p.client;
+
 /*
  * free (adj.): unencumbered; not under the control of others
  * Written by jrandom in 2003 and released into the public domain 
@@ -17,5 +18,6 @@ import net.i2p.data.i2cp.I2CPMessage;
  */
 interface I2CPMessageHandler {
     public int getType();
+
     public void handleMessage(I2CPMessage message, I2PSessionImpl session);
 }

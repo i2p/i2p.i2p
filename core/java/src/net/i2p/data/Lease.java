@@ -1,4 +1,5 @@
 package net.i2p.data;
+
 /*
  * free (adj.): unencumbered; not under the control of others
  * Written by jrandom in 2003 and released into the public domain 
@@ -13,8 +14,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Date;
 
-import net.i2p.util.Log;
 import net.i2p.util.Clock;
+import net.i2p.util.Log;
 
 /**
  * Defines the proof that a particular router / tunnel is allowed to receive
@@ -29,58 +30,88 @@ public class Lease extends DataStructureImpl {
     private Date _end;
     private int _numSuccess;
     private int _numFailure;
-    
-    public Lease() { 
+
+    public Lease() {
         setRouterIdentity(null);
         setTunnelId(null);
         setEndDate(null);
-	setNumSuccess(0);
-	setNumFailure(0);
+        setNumSuccess(0);
+        setNumFailure(0);
     }
-    
+
     /** Retrieve the router at which the destination can be contacted
      * @return identity of the router acting as a gateway
-     */    
-    public RouterIdentity getRouterIdentity() { return _routerIdentity; }
+     */
+    public RouterIdentity getRouterIdentity() {
+        return _routerIdentity;
+    }
+
     /** Configure the router at which the destination can be contacted
      * @param ident router acting as the gateway
-     */    
-    public void setRouterIdentity(RouterIdentity ident) { _routerIdentity = ident; }
+     */
+    public void setRouterIdentity(RouterIdentity ident) {
+        _routerIdentity = ident;
+    }
+
     /** Tunnel on the gateway to communicate with
      * @return tunnel ID
-     */    
-    public TunnelId getTunnelId() { return _tunnelId; }
+     */
+    public TunnelId getTunnelId() {
+        return _tunnelId;
+    }
+
     /** Configure the tunnel on the gateway to communicate with
      * @param id tunnel ID
-     */    
-    public void setTunnelId(TunnelId id) { _tunnelId = id; }
-    public Date getEndDate() { return _end; }
-    public void setEndDate(Date date) { _end = date; }
-    
+     */
+    public void setTunnelId(TunnelId id) {
+        _tunnelId = id;
+    }
+
+    public Date getEndDate() {
+        return _end;
+    }
+
+    public void setEndDate(Date date) {
+        _end = date;
+    }
+
     /**
      * Transient attribute of the lease, used to note how many times messages sent
      * to the destination through the current lease were successful.
      *
      */
-    public int getNumSuccess() { return _numSuccess; }
-    public void setNumSuccess(int num) { _numSuccess = num; }
-    
+    public int getNumSuccess() {
+        return _numSuccess;
+    }
+
+    public void setNumSuccess(int num) {
+        _numSuccess = num;
+    }
+
     /**
      * Transient attribute of the lease, used to note how many times messages sent
      * to the destination through the current lease failed.
      *
      */
-    public int getNumFailure() { return _numFailure; }
-    public void setNumFailure(int num) { _numFailure = num; }
-    
+    public int getNumFailure() {
+        return _numFailure;
+    }
+
+    public void setNumFailure(int num) {
+        _numFailure = num;
+    }
+
     /** has this lease already expired? */
-    public boolean isExpired() { return isExpired(0); }
+    public boolean isExpired() {
+        return isExpired(0);
+    }
+
     /** has this lease already expired (giving allowing up the fudgeFactor milliseconds for clock skew)? */
     public boolean isExpired(long fudgeFactor) {
-	if (_end == null) return true;
-	return _end.getTime() < Clock.getInstance().now() - fudgeFactor;
+        if (_end == null) return true;
+        return _end.getTime() < Clock.getInstance().now() - fudgeFactor;
     }
-    
+
     public void readBytes(InputStream in) throws DataFormatException, IOException {
         _routerIdentity = new RouterIdentity();
         _routerIdentity.readBytes(in);
@@ -88,31 +119,29 @@ public class Lease extends DataStructureImpl {
         _tunnelId.readBytes(in);
         _end = DataHelper.readDate(in);
     }
-    
+
     public void writeBytes(OutputStream out) throws DataFormatException, IOException {
-        if ( (_routerIdentity == null) || (_tunnelId == null) )
+        if ((_routerIdentity == null) || (_tunnelId == null))
             throw new DataFormatException("Not enough data to write out a Lease");
-        
+
         _routerIdentity.writeBytes(out);
         _tunnelId.writeBytes(out);
         DataHelper.writeDate(out, _end);
     }
 
     public boolean equals(Object object) {
-        if ( (object == null) || !(object instanceof Lease) )
-            return false;
-        Lease lse = (Lease)object;
-        return DataHelper.eq(getEndDate(), lse.getEndDate()) &&
-               DataHelper.eq(getRouterIdentity(), lse.getRouterIdentity());
-               
+        if ((object == null) || !(object instanceof Lease)) return false;
+        Lease lse = (Lease) object;
+        return DataHelper.eq(getEndDate(), lse.getEndDate())
+               && DataHelper.eq(getRouterIdentity(), lse.getRouterIdentity());
+
     }
-    
+
     public int hashCode() {
-        return DataHelper.hashCode(getEndDate()) +
-               DataHelper.hashCode(getRouterIdentity()) +
-               DataHelper.hashCode(getTunnelId());
+        return DataHelper.hashCode(getEndDate()) + DataHelper.hashCode(getRouterIdentity())
+               + DataHelper.hashCode(getTunnelId());
     }
-    
+
     public String toString() {
         StringBuffer buf = new StringBuffer(128);
         buf.append("[Lease: ");

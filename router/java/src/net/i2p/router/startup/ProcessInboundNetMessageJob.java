@@ -12,8 +12,8 @@ import net.i2p.router.InNetMessage;
 import net.i2p.router.InNetMessagePool;
 import net.i2p.router.JobImpl;
 import net.i2p.router.JobQueue;
-import net.i2p.util.Log;
 import net.i2p.util.Clock;
+import net.i2p.util.Log;
 
 /**
  * Pull a message off the inbound net message pool and begin its processing. 

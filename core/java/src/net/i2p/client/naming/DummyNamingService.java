@@ -14,10 +14,10 @@ import net.i2p.data.Destination;
  */
 class DummyNamingService extends NamingService {
     public Destination lookup(String hostname) {
-	return lookupBase64(hostname);
+        return lookupBase64(hostname);
     }
-	
+
     public String reverseLookup(Destination dest) {
-	return null;
+        return null;
     }
 }

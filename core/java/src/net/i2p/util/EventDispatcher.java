@@ -1,4 +1,5 @@
 package net.i2p.util;
+
 /*
  * free (adj.): unencumbered; not under the control of others Written
  * by human in 2004 and released into the public domain with no
@@ -33,13 +34,13 @@ import java.util.Set;
  * @author human
  */
 public interface EventDispatcher {
-    
+
     /**
      * Get an object to be used to deliver events (usually
      * <code>this</code>, but YMMV).
      */
     public EventDispatcher getEventDispatcher();
-    
+
     /**
      * Attach an EventDispatcher object to the events dispatching chain.  Note
      * that notification is not bidirectional (i.e. events notified to
@@ -49,14 +50,14 @@ public interface EventDispatcher {
      * @param iev Event object to be attached
      */
     public void attachEventDispatcher(EventDispatcher iev);
-    
+
     /**
      * Detach the specified EventDispatcher object from the events dispatching chain.
      *
      * @param iev Event object to be detached
      */
     public void detachEventDispatcher(EventDispatcher iev);
-    
+
     /**
      * Deliver an event
      * 
@@ -64,7 +65,7 @@ public interface EventDispatcher {
      * @param args data being stored for that event
      */
     public void notifyEvent(String event, Object args);
-    
+
     /**
      * Retrieve the value currently associated with the specified
      * event value
@@ -73,26 +74,26 @@ public interface EventDispatcher {
      * @return value (or null if none are available)
      */
     public Object getEventValue(String name);
-    
+
     /**
      * Retrieve the names of all the events that have been received
      *
      * @return A set of event names
      */
     public Set getEvents();
-    
+
     /**
      * Ignore further event notifications
      *
      */
     public void ignoreEvents();
-    
+
     /**
      * Almost like the method above :-)
      *
      */
     public void unIgnoreEvents();
-    
+
     /**
      * Wait until the given event has received a value
      *

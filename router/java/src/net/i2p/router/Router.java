@@ -26,28 +26,28 @@ import java.util.TimeZone;
 import net.i2p.CoreVersion;
 import net.i2p.crypto.DHSessionKeyBuilder;
 import net.i2p.data.DataFormatException;
+import net.i2p.data.DataHelper;
 import net.i2p.data.RouterInfo;
 import net.i2p.data.RoutingKeyGenerator;
-import net.i2p.data.DataHelper;
 import net.i2p.data.i2np.GarlicMessage;
 import net.i2p.data.i2np.SourceRouteReplyMessage;
 import net.i2p.data.i2np.TunnelMessage;
+import net.i2p.router.admin.StatsGenerator;
 import net.i2p.router.message.GarlicMessageHandler;
 import net.i2p.router.message.SourceRouteReplyMessageHandler;
 import net.i2p.router.message.TunnelMessageHandler;
 import net.i2p.router.startup.StartupJob;
 import net.i2p.router.transport.BandwidthLimiter;
 import net.i2p.router.transport.OutboundMessageRegistry;
+import net.i2p.stat.Rate;
+import net.i2p.stat.RateStat;
+import net.i2p.stat.StatManager;
 import net.i2p.util.Clock;
 import net.i2p.util.I2PThread;
 import net.i2p.util.Log;
 import net.i2p.util.LogConsoleBuffer;
 import net.i2p.util.LogManager;
 import net.i2p.util.RandomSource;
-import net.i2p.stat.StatManager;
-import net.i2p.stat.Rate;
-import net.i2p.stat.RateStat;
-import net.i2p.router.admin.StatsGenerator;
 
 /**
  * Main driver for the router.

@@ -8,19 +8,18 @@ package net.i2p.router.networkdb.kademlia;
  *
  */
 
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
+
+import net.i2p.data.DataStructure;
 import net.i2p.data.Hash;
 import net.i2p.data.LeaseSet;
-import net.i2p.data.DataStructure;
 import net.i2p.router.JobImpl;
 import net.i2p.router.JobQueue;
 import net.i2p.router.Router;
-
-import net.i2p.util.Log;
 import net.i2p.util.Clock;
-
-import java.util.Set;
-import java.util.HashSet;
-import java.util.Iterator;
+import net.i2p.util.Log;
 
 class DataPublisherJob extends JobImpl {
     private final static Log _log = new Log(DataPublisherJob.class);

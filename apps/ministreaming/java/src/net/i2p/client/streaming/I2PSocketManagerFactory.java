@@ -1,19 +1,18 @@
 package net.i2p.client.streaming;
 
-import net.i2p.client.I2PSession;
-import net.i2p.client.I2PClient;
-import net.i2p.client.I2PClientFactory;
-import net.i2p.client.I2PSessionException;
-import net.i2p.I2PException;
-import net.i2p.data.Destination;
-import net.i2p.util.Log;
-
-import java.io.InputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-
+import java.io.InputStream;
 import java.util.Properties;
+
+import net.i2p.I2PException;
+import net.i2p.client.I2PClient;
+import net.i2p.client.I2PClientFactory;
+import net.i2p.client.I2PSession;
+import net.i2p.client.I2PSessionException;
+import net.i2p.data.Destination;
+import net.i2p.util.Log;
 
 /**
  * Simplify the creation of I2PSession and transient I2P Destination objects if 

@@ -8,10 +8,10 @@ package net.i2p.router;
  *
  */
 
-import net.i2p.router.transport.CommSystemFacadeImpl;
-
 import java.util.HashSet;
 import java.util.Set;
+
+import net.i2p.router.transport.CommSystemFacadeImpl;
 
 /**
  * Manages the communication subsystem between peers, including connections, 

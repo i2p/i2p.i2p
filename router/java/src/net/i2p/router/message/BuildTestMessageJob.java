@@ -8,31 +8,28 @@ package net.i2p.router.message;
  *
  */
 
-import net.i2p.router.Job;
-import net.i2p.router.ReplyJob;
-import net.i2p.router.JobImpl;
-import net.i2p.router.JobQueue;
-import net.i2p.router.Router;
-import net.i2p.router.MessageSelector;
-
-import net.i2p.data.RouterInfo;
-import net.i2p.data.Certificate;
-import net.i2p.data.PublicKey;
-import net.i2p.data.SessionKey;
-import net.i2p.data.Hash;
-import net.i2p.data.i2np.I2NPMessage;
-import net.i2p.data.i2np.DeliveryInstructions;
-import net.i2p.data.i2np.DeliveryStatusMessage;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 import net.i2p.crypto.SessionKeyManager;
-
-import net.i2p.util.Log;
+import net.i2p.data.Certificate;
+import net.i2p.data.Hash;
+import net.i2p.data.PublicKey;
+import net.i2p.data.RouterInfo;
+import net.i2p.data.SessionKey;
+import net.i2p.data.i2np.DeliveryInstructions;
+import net.i2p.data.i2np.DeliveryStatusMessage;
+import net.i2p.data.i2np.I2NPMessage;
+import net.i2p.router.Job;
+import net.i2p.router.JobImpl;
+import net.i2p.router.JobQueue;
+import net.i2p.router.MessageSelector;
+import net.i2p.router.ReplyJob;
+import net.i2p.router.Router;
 import net.i2p.util.Clock;
+import net.i2p.util.Log;
 import net.i2p.util.RandomSource;
-
-import java.util.Date;
-import java.util.Set;
-import java.util.HashSet;
 
 /**
  * Build a test message that will be sent to the target to make sure they're alive.

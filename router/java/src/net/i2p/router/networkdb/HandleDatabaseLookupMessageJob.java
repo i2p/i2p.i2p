@@ -8,24 +8,26 @@ package net.i2p.router.networkdb;
  *
  */
 
-import java.util.Set;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.Date;
+import java.util.Set;
 
+import net.i2p.data.DataFormatException;
 import net.i2p.data.DataStructure;
 import net.i2p.data.Hash;
 import net.i2p.data.LeaseSet;
 import net.i2p.data.RouterIdentity;
 import net.i2p.data.RouterInfo;
 import net.i2p.data.TunnelId;
-import net.i2p.data.DataFormatException;
 import net.i2p.data.i2np.DatabaseLookupMessage;
 import net.i2p.data.i2np.DatabaseSearchReplyMessage;
 import net.i2p.data.i2np.DatabaseStoreMessage;
 import net.i2p.data.i2np.I2NPMessage;
 import net.i2p.data.i2np.TunnelMessage;
 import net.i2p.router.Job;
-import net.i2p.router.JobQueue;
 import net.i2p.router.JobImpl;
+import net.i2p.router.JobQueue;
 import net.i2p.router.MessageHistory;
 import net.i2p.router.NetworkDatabaseFacade;
 import net.i2p.router.Router;
@@ -33,11 +35,8 @@ import net.i2p.router.TunnelInfo;
 import net.i2p.router.TunnelManagerFacade;
 import net.i2p.router.message.SendMessageDirectJob;
 import net.i2p.router.message.SendTunnelMessageJob;
-import net.i2p.util.Log;
 import net.i2p.util.Clock;
-
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
+import net.i2p.util.Log;
 
 /**
  * Handle a lookup for a key received from a remote peer.  Needs to be implemented

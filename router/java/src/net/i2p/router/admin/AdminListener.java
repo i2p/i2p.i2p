@@ -8,13 +8,12 @@ package net.i2p.router.admin;
  *
  */
 
+import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-import java.io.IOException;
-
-import net.i2p.util.Log;
 import net.i2p.util.I2PThread;
+import net.i2p.util.Log;
 
 /**
  * Listen for connections on the specified port, and toss them onto the client manager's

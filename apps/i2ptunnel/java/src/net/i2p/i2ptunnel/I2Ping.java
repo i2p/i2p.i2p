@@ -14,8 +14,8 @@ import net.i2p.I2PException;
 import net.i2p.client.streaming.I2PSocketManager;
 import net.i2p.data.Destination;
 import net.i2p.util.EventDispatcher;
-import net.i2p.util.Log;
 import net.i2p.util.I2PThread;
+import net.i2p.util.Log;
 
 public class I2Ping extends I2PTunnelTask implements Runnable {
     private final static Log _log = new Log(I2Ping.class);

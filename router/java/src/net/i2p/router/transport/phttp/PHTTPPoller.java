@@ -24,12 +24,12 @@ import net.i2p.data.Signature;
 import net.i2p.data.i2np.I2NPMessage;
 import net.i2p.data.i2np.I2NPMessageException;
 import net.i2p.data.i2np.I2NPMessageHandler;
-import net.i2p.util.Log;
-import net.i2p.util.RandomSource;
+import net.i2p.router.Router;
+import net.i2p.router.transport.BandwidthLimiter;
 import net.i2p.util.Clock;
 import net.i2p.util.I2PThread;
-import net.i2p.router.transport.BandwidthLimiter;
-import net.i2p.router.Router;
+import net.i2p.util.Log;
+import net.i2p.util.RandomSource;
 
 class PHTTPPoller {
     private final static Log _log = new Log(PHTTPPoller.class);

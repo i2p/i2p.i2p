@@ -21,8 +21,8 @@ import net.i2p.data.SigningPublicKey;
 import net.i2p.router.JobImpl;
 import net.i2p.router.JobQueue;
 import net.i2p.router.KeyManager;
-import net.i2p.router.Router;
 import net.i2p.router.MessageHistory;
+import net.i2p.router.Router;
 import net.i2p.util.Log;
 
 public class LoadRouterInfoJob extends JobImpl {

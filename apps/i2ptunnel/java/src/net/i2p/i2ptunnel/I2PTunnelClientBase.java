@@ -20,8 +20,8 @@ import net.i2p.client.streaming.I2PSocketManagerFactory;
 import net.i2p.client.streaming.I2PSocketOptions;
 import net.i2p.data.Destination;
 import net.i2p.util.EventDispatcher;
-import net.i2p.util.Log;
 import net.i2p.util.I2PThread;
+import net.i2p.util.Log;
 
 public abstract class I2PTunnelClientBase extends I2PTunnelTask 
     implements Runnable {

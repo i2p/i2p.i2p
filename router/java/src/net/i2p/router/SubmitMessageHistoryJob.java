@@ -1,15 +1,14 @@
 package net.i2p.router;
 
-import net.i2p.util.Log;
-import net.i2p.util.Clock;
-import net.i2p.util.HTTPSendData;
-import net.i2p.util.I2PThread;
-
-import net.i2p.router.transport.BandwidthLimiter;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+
+import net.i2p.router.transport.BandwidthLimiter;
+import net.i2p.util.Clock;
+import net.i2p.util.HTTPSendData;
+import net.i2p.util.I2PThread;
+import net.i2p.util.Log;
 
 /**
  * Job that, if its allowed to, will submit the data gathered by the MessageHistory

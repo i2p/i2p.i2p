@@ -1,10 +1,10 @@
 package net.i2p.router.transport.tcp;
 
-import net.i2p.util.Log;
-
+import java.io.IOException;
 import java.net.Socket;
 import java.net.UnknownHostException;
-import java.io.IOException;
+
+import net.i2p.util.Log;
 
 class SocketCreator implements Runnable {
     private final static Log _log = new Log(SocketCreator.class);

@@ -8,10 +8,10 @@ package net.i2p.router;
  *
  */
 
+import net.i2p.data.Hash;
+import net.i2p.data.RouterIdentity;
 import net.i2p.data.i2np.I2NPMessage;
 import net.i2p.data.i2np.SourceRouteBlock;
-import net.i2p.data.RouterIdentity;
-import net.i2p.data.Hash;
 
 /**
  * Defines a class that builds jobs to handle a particular message - these

@@ -1,4 +1,5 @@
 package net.i2p.data.i2cp;
+
 /*
  * free (adj.): unencumbered; not under the control of others
  * Written by jrandom in 2003 and released into the public domain 
@@ -8,15 +9,14 @@ package net.i2p.data.i2cp;
  *
  */
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.IOException;
 
-import net.i2p.util.Log;
-
+import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
 import net.i2p.data.DataStructureImpl;
-import net.i2p.data.DataFormatException;
+import net.i2p.util.Log;
 
 /**
  * Defines the token passed between the router and client to associate messages
@@ -27,31 +27,37 @@ import net.i2p.data.DataFormatException;
 public class SessionId extends DataStructureImpl {
     private final static Log _log = new Log(SessionId.class);
     private int _sessionId;
-    
-    public SessionId() { setSessionId(-1); }
-    
-    public int getSessionId() { return _sessionId; }
-    public void setSessionId(int id) { _sessionId = id; }
-    
-    public void readBytes(InputStream in) throws DataFormatException, IOException {
-        _sessionId = (int)DataHelper.readLong(in, 2);
+
+    public SessionId() {
+        setSessionId(-1);
     }
-    
+
+    public int getSessionId() {
+        return _sessionId;
+    }
+
+    public void setSessionId(int id) {
+        _sessionId = id;
+    }
+
+    public void readBytes(InputStream in) throws DataFormatException, IOException {
+        _sessionId = (int) DataHelper.readLong(in, 2);
+    }
+
     public void writeBytes(OutputStream out) throws DataFormatException, IOException {
         if (_sessionId < 0) throw new DataFormatException("Invalid session ID: " + _sessionId);
         DataHelper.writeLong(out, 2, _sessionId);
     }
-    
+
     public boolean equals(Object obj) {
-        if ( (obj == null) || !(obj instanceof SessionId))
-            return false;
-        return getSessionId() == ((SessionId)obj).getSessionId();
+        if ((obj == null) || !(obj instanceof SessionId)) return false;
+        return getSessionId() == ((SessionId) obj).getSessionId();
     }
-    
+
     public int hashCode() {
-        return getSessionId(); 
+        return getSessionId();
     }
-    
+
     public String toString() {
         return "[SessionId: " + getSessionId() + "]";
     }

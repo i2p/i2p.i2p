@@ -13,9 +13,9 @@ import java.util.HashMap;
 
 import net.i2p.client.I2PSession;
 import net.i2p.client.streaming.I2PSocket;
-import net.i2p.util.Log;
 import net.i2p.util.Clock;
 import net.i2p.util.I2PThread;
+import net.i2p.util.Log;
 
 public class I2PTunnelRunner extends I2PThread {
     private final static Log _log = new Log(I2PTunnelRunner.class);

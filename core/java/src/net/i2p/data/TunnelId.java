@@ -8,9 +8,9 @@ package net.i2p.data;
  *
  */
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.IOException;
 
 import net.i2p.util.Log;
 

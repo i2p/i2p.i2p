@@ -1,4 +1,5 @@
 package net.i2p.data.i2cp;
+
 /*
  * free (adj.): unencumbered; not under the control of others
  * Written by jrandom in 2003 and released into the public domain 
@@ -26,14 +27,19 @@ public class DisconnectMessage extends I2CPMessageImpl {
     private final static Log _log = new Log(DisconnectMessage.class);
     public final static int MESSAGE_TYPE = 30;
     private String _reason;
-    
-    public DisconnectMessage() { 
+
+    public DisconnectMessage() {
         setReason(null);
     }
-    
-    public String getReason() { return _reason; }
-    public void setReason(String reason) { _reason = reason; }
-    
+
+    public String getReason() {
+        return _reason;
+    }
+
+    public void setReason(String reason) {
+        _reason = reason;
+    }
+
     protected void doReadMessage(InputStream in, int size) throws I2CPMessageException, IOException {
         try {
             _reason = DataHelper.readString(in);
@@ -41,7 +47,7 @@ public class DisconnectMessage extends I2CPMessageImpl {
             throw new I2CPMessageException("Unable to load the message data", dfe);
         }
     }
-    
+
     protected byte[] doWriteMessage() throws I2CPMessageException, IOException {
         ByteArrayOutputStream os = new ByteArrayOutputStream(64);
         try {
@@ -51,19 +57,21 @@ public class DisconnectMessage extends I2CPMessageImpl {
         }
         return os.toByteArray();
     }
-    
-    public int getType() { return MESSAGE_TYPE; }
-    
+
+    public int getType() {
+        return MESSAGE_TYPE;
+    }
+
     public boolean equals(Object object) {
-        if ( (object != null) && (object instanceof DisconnectMessage) ) {
-            DisconnectMessage msg = (DisconnectMessage)object;
-            return DataHelper.eq(getReason(),msg.getReason());
+        if ((object != null) && (object instanceof DisconnectMessage)) {
+            DisconnectMessage msg = (DisconnectMessage) object;
+            return DataHelper.eq(getReason(), msg.getReason());
         } else {
             return false;
         }
     }
-    
-    public String toString() { 
+
+    public String toString() {
         StringBuffer buf = new StringBuffer();
         buf.append("[DisconnectMessage: ");
         buf.append("\n\tReason: ").append(getReason());

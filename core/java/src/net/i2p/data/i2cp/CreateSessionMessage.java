@@ -1,4 +1,5 @@
 package net.i2p.data.i2cp;
+
 /*
  * free (adj.): unencumbered; not under the control of others
  * Written by jrandom in 2003 and released into the public domain 
@@ -26,13 +27,23 @@ public class CreateSessionMessage extends I2CPMessageImpl {
     private final static Log _log = new Log(CreateSessionMessage.class);
     public final static int MESSAGE_TYPE = 1;
     private SessionConfig _sessionConfig;
-    
-    public CreateSessionMessage(SessionConfig config) { setSessionConfig(config); }
-    public CreateSessionMessage() { setSessionConfig(new SessionConfig()); }
-    
-    public SessionConfig getSessionConfig() { return _sessionConfig; }
-    public void setSessionConfig(SessionConfig config) { _sessionConfig = config; }
-    
+
+    public CreateSessionMessage(SessionConfig config) {
+        setSessionConfig(config);
+    }
+
+    public CreateSessionMessage() {
+        setSessionConfig(new SessionConfig());
+    }
+
+    public SessionConfig getSessionConfig() {
+        return _sessionConfig;
+    }
+
+    public void setSessionConfig(SessionConfig config) {
+        _sessionConfig = config;
+    }
+
     protected void doReadMessage(InputStream in, int size) throws I2CPMessageException, IOException {
         SessionConfig config = new SessionConfig();
         try {
@@ -42,7 +53,7 @@ public class CreateSessionMessage extends I2CPMessageImpl {
         }
         setSessionConfig(config);
     }
-    
+
     protected byte[] doWriteMessage() throws I2CPMessageException, IOException {
         if (_sessionConfig == null)
             throw new I2CPMessageException("Unable to write out the message as there is not enough data");
@@ -54,19 +65,21 @@ public class CreateSessionMessage extends I2CPMessageImpl {
         }
         return os.toByteArray();
     }
-    
-    public int getType() { return MESSAGE_TYPE; }
-    
+
+    public int getType() {
+        return MESSAGE_TYPE;
+    }
+
     public boolean equals(Object object) {
-        if ( (object != null) && (object instanceof CreateSessionMessage) ) {
-            CreateSessionMessage msg = (CreateSessionMessage)object;
+        if ((object != null) && (object instanceof CreateSessionMessage)) {
+            CreateSessionMessage msg = (CreateSessionMessage) object;
             return DataHelper.eq(getSessionConfig(), msg.getSessionConfig());
         } else {
             return false;
         }
     }
-    
-    public String toString() { 
+
+    public String toString() {
         StringBuffer buf = new StringBuffer();
         buf.append("[CreateSessionMessage: ");
         buf.append("\n\tConfig: ").append(getSessionConfig());

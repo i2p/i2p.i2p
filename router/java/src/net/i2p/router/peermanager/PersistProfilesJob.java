@@ -1,12 +1,12 @@
 package net.i2p.router.peermanager;
 
-import java.util.Set;
 import java.util.Iterator;
+import java.util.Set;
 
 import net.i2p.data.Hash;
-import net.i2p.util.Clock;
 import net.i2p.router.JobImpl;
 import net.i2p.router.JobQueue;
+import net.i2p.util.Clock;
 
 class PersistProfilesJob extends JobImpl {
     private PeerManager _mgr;

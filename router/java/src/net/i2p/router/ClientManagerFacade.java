@@ -8,14 +8,12 @@ package net.i2p.router;
  *
  */
 
-import net.i2p.router.client.ClientManagerFacadeImpl;
-
+import net.i2p.data.Destination;
+import net.i2p.data.Hash;
+import net.i2p.data.LeaseSet;
 import net.i2p.data.i2cp.MessageId;
 import net.i2p.data.i2cp.SessionConfig;
-
-import net.i2p.data.Destination;
-import net.i2p.data.LeaseSet;
-import net.i2p.data.Hash;
+import net.i2p.router.client.ClientManagerFacadeImpl;
 
 /**
  * Manage all interactions with clients 

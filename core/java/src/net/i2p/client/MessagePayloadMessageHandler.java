@@ -1,4 +1,5 @@
 package net.i2p.client;
+
 /*
  * free (adj.): unencumbered; not under the control of others
  * Written by jrandom in 2003 and released into the public domain 
@@ -27,36 +28,39 @@ class MessagePayloadMessageHandler extends HandlerImpl {
     public MessagePayloadMessageHandler() {
         super(MessagePayloadMessage.MESSAGE_TYPE);
     }
+
     public void handleMessage(I2CPMessage message, I2PSessionImpl session) {
         _log.debug("Handle message " + message);
         try {
-            MessagePayloadMessage msg = (MessagePayloadMessage)message;
+            MessagePayloadMessage msg = (MessagePayloadMessage) message;
             MessageId id = msg.getMessageId();
             Payload payload = decryptPayload(msg, session);
             session.addNewMessage(msg);
-	    
-	    ReceiveMessageEndMessage m = new ReceiveMessageEndMessage();
-	    m.setMessageId(id);
-	    m.setSessionId(msg.getSessionId());
-	    session.sendMessage(m);
+
+            ReceiveMessageEndMessage m = new ReceiveMessageEndMessage();
+            m.setMessageId(id);
+            m.setSessionId(msg.getSessionId());
+            session.sendMessage(m);
         } catch (DataFormatException dfe) {
             session.propogateError("Error handling a new payload message", dfe);
         } catch (I2PSessionException ise) {
             session.propogateError("Error handling a new payload message", ise);
-	}
+        }
     }
-    
+
     /**
      * Decrypt the payload
      */
     private Payload decryptPayload(MessagePayloadMessage msg, I2PSessionImpl session) throws DataFormatException {
         Payload payload = msg.getPayload();
         byte[] data = ElGamalAESEngine.decrypt(payload.getEncryptedData(), session.getDecryptionKey());
-	if (data == null) {
-	    _log.error("Error decrypting the payload to public key " + session.getMyDestination().getPublicKey().toBase64() + "\nPayload: " + payload.calculateHash());
-	    throw new DataFormatException("Unable to decrypt the payload");
-	}
-	payload.setUnencryptedData(data);
+        if (data == null) {
+            _log
+                .error("Error decrypting the payload to public key "
+                       + session.getMyDestination().getPublicKey().toBase64() + "\nPayload: " + payload.calculateHash());
+            throw new DataFormatException("Unable to decrypt the payload");
+        }
+        payload.setUnencryptedData(data);
         return payload;
     }
 }

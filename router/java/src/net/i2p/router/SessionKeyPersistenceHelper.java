@@ -1,13 +1,13 @@
 package net.i2p.router;
 
-import net.i2p.util.Log;
-import net.i2p.crypto.SessionKeyManager;
-import net.i2p.crypto.PersistentSessionKeyManager;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+
+import net.i2p.crypto.PersistentSessionKeyManager;
+import net.i2p.crypto.SessionKeyManager;
+import net.i2p.util.Log;
 
 /**
  * Centralize the sessionKeyManager persistence (rather than leave it to a private

@@ -10,6 +10,7 @@ package net.i2p.router.message;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.Date;
 
 import net.i2p.crypto.AESEngine;
 import net.i2p.crypto.KeyGenerator;
@@ -43,10 +44,8 @@ import net.i2p.router.Router;
 import net.i2p.router.TunnelInfo;
 import net.i2p.router.TunnelManagerFacade;
 import net.i2p.router.transport.OutboundMessageRegistry;
-import net.i2p.util.Log;
 import net.i2p.util.Clock;
-
-import java.util.Date;
+import net.i2p.util.Log;
 
 /**
  * Send a message down a tunnel that we are the gateway for

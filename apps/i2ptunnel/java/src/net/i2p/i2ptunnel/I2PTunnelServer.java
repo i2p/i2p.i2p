@@ -11,7 +11,8 @@ import java.io.InputStream;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.net.SocketException;
-import java.util.*;
+import java.util.Iterator;
+import java.util.Properties;
 
 import net.i2p.I2PException;
 import net.i2p.client.I2PClient;
@@ -22,8 +23,8 @@ import net.i2p.client.streaming.I2PSocketManager;
 import net.i2p.client.streaming.I2PSocketManagerFactory;
 import net.i2p.data.Base64;
 import net.i2p.util.EventDispatcher;
-import net.i2p.util.Log;
 import net.i2p.util.I2PThread;
+import net.i2p.util.Log;
 
 public class I2PTunnelServer extends I2PTunnelTask
     implements Runnable {

@@ -9,6 +9,7 @@ package net.i2p.router.transport.tcp;
  */
 
 import java.net.InetAddress;
+
 import net.i2p.data.DataHelper;
 import net.i2p.data.RouterAddress;
 import net.i2p.util.Log;

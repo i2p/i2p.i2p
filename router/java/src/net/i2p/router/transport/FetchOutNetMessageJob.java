@@ -12,8 +12,8 @@ import net.i2p.router.JobImpl;
 import net.i2p.router.JobQueue;
 import net.i2p.router.OutNetMessage;
 import net.i2p.router.OutNetMessagePool;
-import net.i2p.util.Log;
 import net.i2p.util.Clock;
+import net.i2p.util.Log;
 
 /**
  * Fetch an outbound message from the outbound pool, check its validity, get a bid

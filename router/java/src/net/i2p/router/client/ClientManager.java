@@ -25,11 +25,10 @@ import net.i2p.router.ClientMessagePool;
 import net.i2p.router.Job;
 import net.i2p.router.JobImpl;
 import net.i2p.router.JobQueue;
+import net.i2p.stat.StatManager;
+import net.i2p.util.Clock;
 import net.i2p.util.I2PThread;
 import net.i2p.util.Log;
-import net.i2p.util.Clock;
-
-import net.i2p.stat.StatManager;
 
 /**
  * Coordinate connections and various tasks

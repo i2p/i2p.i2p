@@ -10,10 +10,10 @@ package net.i2p.router.networkdb.kademlia;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
-import java.io.FileNotFoundException;
 
 import net.i2p.data.DataFormatException;
 import net.i2p.data.DataStructure;

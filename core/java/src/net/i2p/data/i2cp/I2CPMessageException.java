@@ -1,4 +1,5 @@
 package net.i2p.data.i2cp;
+
 /*
  * free (adj.): unencumbered; not under the control of others
  * Written by jrandom in 2003 and released into the public domain 
@@ -18,10 +19,11 @@ import net.i2p.util.Log;
  */
 public class I2CPMessageException extends I2PException {
     private final static Log _log = new Log(I2CPMessageException.class);
-    
+
     public I2CPMessageException(String message, Throwable parent) {
         super(message, parent);
     }
+
     public I2CPMessageException(String message) {
         super(message);
     }

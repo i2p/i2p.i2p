@@ -25,42 +25,44 @@ public class HostsTxtNamingService extends NamingService {
      * given file for hostname=destKey values when resolving names
      */
     public final static String PROP_HOSTS_FILE = "i2p.hostsfile";
-    
+
     /** default hosts.txt filename */
     public final static String DEFAULT_HOSTS_FILE = "hosts.txt";
 
     private final static Log _log = new Log(HostsTxtNamingService.class);
-    
+
     public Destination lookup(String hostname) {
-	// Try to look it up in hosts.txt 
-	// Reload file each time to catch changes.
-	// (and it's easier :P
-	String hostsfile=System.getProperty(PROP_HOSTS_FILE,
-					    DEFAULT_HOSTS_FILE );
-	Properties hosts=new Properties();
-	FileInputStream fis = null;
-	try {
-	    File f = new File(hostsfile);
-	    if(f.canRead()) {
-		fis = new FileInputStream(f);
-		hosts.load(fis);
-	    } else {
-		_log.error("Hosts file " + hostsfile + " does not exist.");
-	    }
-	} catch (Exception ioe) {
-	    _log.error("Error loading hosts file " + hostsfile, ioe );
-	} finally {
-	    if (fis != null) try {fis.close();} catch (IOException ioe) {}
-	}	
-	String res = hosts.getProperty(hostname);
-	// If we can't find name in hosts, assume it's a key.
-	if ((res == null) || (res.trim().length() == 0)) {
-	    res = hostname;
-	}
-	return lookupBase64(res);
+        // Try to look it up in hosts.txt 
+        // Reload file each time to catch changes.
+        // (and it's easier :P
+        String hostsfile = System.getProperty(PROP_HOSTS_FILE, DEFAULT_HOSTS_FILE);
+        Properties hosts = new Properties();
+        FileInputStream fis = null;
+        try {
+            File f = new File(hostsfile);
+            if (f.canRead()) {
+                fis = new FileInputStream(f);
+                hosts.load(fis);
+            } else {
+                _log.error("Hosts file " + hostsfile + " does not exist.");
+            }
+        } catch (Exception ioe) {
+            _log.error("Error loading hosts file " + hostsfile, ioe);
+        } finally {
+            if (fis != null) try {
+                fis.close();
+            } catch (IOException ioe) {
+            }
+        }
+        String res = hosts.getProperty(hostname);
+        // If we can't find name in hosts, assume it's a key.
+        if ((res == null) || (res.trim().length() == 0)) {
+            res = hostname;
+        }
+        return lookupBase64(res);
     }
-    
+
     public String reverseLookup(Destination dest) {
-	return null;
-    }    
+        return null;
+    }
 }

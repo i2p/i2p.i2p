@@ -8,10 +8,10 @@ package net.i2p.router.transport;
  *
  */
 
-import java.util.LinkedList;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
@@ -22,15 +22,14 @@ import net.i2p.data.RouterInfo;
 import net.i2p.data.i2np.I2NPMessage;
 import net.i2p.router.Job;
 import net.i2p.router.JobQueue;
+import net.i2p.router.MessageHistory;
 import net.i2p.router.MessageSelector;
 import net.i2p.router.OutNetMessage;
 import net.i2p.router.OutNetMessagePool;
 import net.i2p.router.ProfileManager;
-import net.i2p.router.MessageHistory;
-import net.i2p.util.Log;
-import net.i2p.util.Clock;
-
 import net.i2p.stat.StatManager;
+import net.i2p.util.Clock;
+import net.i2p.util.Log;
 
 /**
  * Defines a way to send a message to another peer and start listening for messages

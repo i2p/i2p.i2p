@@ -8,11 +8,11 @@ package net.i2p.router;
  *
  */
 
-import net.i2p.data.Payload;
 import net.i2p.data.Destination;
 import net.i2p.data.Hash;
-import net.i2p.data.i2cp.SessionConfig;
+import net.i2p.data.Payload;
 import net.i2p.data.i2cp.MessageId;
+import net.i2p.data.i2cp.SessionConfig;
 
 /**
  * Wrap a message either destined for a local client or received from one.

@@ -1,4 +1,5 @@
 package net.i2p.client;
+
 /*
  * free (adj.): unencumbered; not under the control of others
  * Written by jrandom in 2003 and released into the public domain 
@@ -27,9 +28,11 @@ public class TestServer implements Runnable {
     private final static Log _log = new Log(TestServer.class);
     private ServerSocket _socket;
     public static int LISTEN_PORT = 7654;
-    
-    protected void setPort(int port) { LISTEN_PORT = port; }
-    
+
+    protected void setPort(int port) {
+        LISTEN_PORT = port;
+    }
+
     /** 
      * Start up the socket listener, listens for connections, and
      * fires those connections off via {@link #runConnection runConnection}.  
@@ -38,47 +41,49 @@ public class TestServer implements Runnable {
      *
      */
     public void runServer() {
-	try {
-	    _socket = new ServerSocket(LISTEN_PORT);
-	} catch (IOException ioe) {
-	    _log.error("Error listening", ioe);
-	    return;
-	}
-	while (true) {
-	    try {
-		Socket socket = _socket.accept();
-		runConnection(socket);
-	    } catch (IOException ioe) {
-		_log.error("Server error accepting", ioe);
-	    }
-	}
+        try {
+            _socket = new ServerSocket(LISTEN_PORT);
+        } catch (IOException ioe) {
+            _log.error("Error listening", ioe);
+            return;
+        }
+        while (true) {
+            try {
+                Socket socket = _socket.accept();
+                runConnection(socket);
+            } catch (IOException ioe) {
+                _log.error("Server error accepting", ioe);
+            }
+        }
     }
-    
+
     /**
      * Handle the connection by passing it off to a ConnectionRunner
      *
      */
     protected void runConnection(Socket socket) throws IOException {
-	ConnectionRunner runner = new ConnectionRunner(socket);
-	runner.doYourThing();
+        ConnectionRunner runner = new ConnectionRunner(socket);
+        runner.doYourThing();
     }
-    
-    public void run() { runServer(); }
-    
+
+    public void run() {
+        runServer();
+    }
+
     /** 
      * Fire up the router
-     */ 
+     */
     public static void main(String args[]) {
-	if (args.length == 1) {
-	} else if (args.length == 2) {
-	    try {
-		LISTEN_PORT = Integer.parseInt(args[1]);
-	    } catch (NumberFormatException nfe) {
-		_log.error("Invalid port number specified (" + args[1] + "), using " + LISTEN_PORT, nfe);
-	    }
-	}
-	TestServer server = new TestServer();
-	Thread t = new I2PThread(server);
-	t.start();
+        if (args.length == 1) {
+        } else if (args.length == 2) {
+            try {
+                LISTEN_PORT = Integer.parseInt(args[1]);
+            } catch (NumberFormatException nfe) {
+                _log.error("Invalid port number specified (" + args[1] + "), using " + LISTEN_PORT, nfe);
+            }
+        }
+        TestServer server = new TestServer();
+        Thread t = new I2PThread(server);
+        t.start();
     }
 }

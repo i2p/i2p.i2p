@@ -8,10 +8,10 @@ package net.i2p.router.networkdb.kademlia;
  *
  */
 
-import net.i2p.data.Hash;
-import net.i2p.data.DataStructure;
-
 import java.util.Set;
+
+import net.i2p.data.DataStructure;
+import net.i2p.data.Hash;
 
 public interface DataStore {
     public boolean isKnown(Hash key);

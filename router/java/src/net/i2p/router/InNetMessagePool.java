@@ -16,8 +16,8 @@ import java.util.List;
 import java.util.Map;
 
 import net.i2p.router.transport.OutboundMessageRegistry;
-import net.i2p.util.Log;
 import net.i2p.stat.StatManager;
+import net.i2p.util.Log;
 
 /**
  * Manage a pool of inbound InNetMessages.  This pool is filled by the 

@@ -1,4 +1,5 @@
 package net.i2p.client;
+
 /*
  * free (adj.): unencumbered; not under the control of others
  * Written by jrandom in 2003 and released into the public domain 
@@ -8,8 +9,8 @@ package net.i2p.client;
  *
  */
 
-import net.i2p.util.Log;
 import net.i2p.I2PException;
+import net.i2p.util.Log;
 
 /**
  * Thrown when there is a problem doing something on the session
@@ -18,10 +19,11 @@ import net.i2p.I2PException;
  */
 public class I2PSessionException extends I2PException {
     private final static Log _log = new Log(I2PSessionException.class);
-    
+
     public I2PSessionException(String msg, Throwable t) {
         super(msg, t);
     }
+
     public I2PSessionException(String msg) {
         super(msg);
     }

@@ -8,16 +8,15 @@ package net.i2p.router.client;
  *
  */
 
-import net.i2p.router.JobImpl;
-import net.i2p.data.Payload;
+import java.io.IOException;
+
 import net.i2p.data.Destination;
+import net.i2p.data.Payload;
+import net.i2p.data.i2cp.I2CPMessageException;
 import net.i2p.data.i2cp.MessageId;
 import net.i2p.data.i2cp.MessageStatusMessage;
-import net.i2p.data.i2cp.I2CPMessageException;
-
+import net.i2p.router.JobImpl;
 import net.i2p.util.Log;
-
-import java.io.IOException;
 
 /**
  * Async job to notify the client that a new message is available for them

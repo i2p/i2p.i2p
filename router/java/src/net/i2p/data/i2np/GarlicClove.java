@@ -8,18 +8,16 @@ package net.i2p.data.i2np;
  *
  */
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.IOException;
+import java.util.Date;
 
-import net.i2p.util.Log;
-
+import net.i2p.data.Certificate;
+import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
 import net.i2p.data.DataStructureImpl;
-import net.i2p.data.DataFormatException;
-import net.i2p.data.Certificate;
-
-import java.util.Date;
+import net.i2p.util.Log;
 
 /**
  * Contains one deliverable message encrypted to a router along with instructions

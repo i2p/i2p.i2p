@@ -8,16 +8,15 @@ package net.i2p.data.i2np;
  *
  */
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.IOException;
 
-import net.i2p.util.Log;
-
+import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
 import net.i2p.data.DataStructureImpl;
-import net.i2p.data.DataFormatException;
 import net.i2p.data.PrivateKey;
+import net.i2p.util.Log;
 
 /**
  * Contains the private key which matches the EndPointPublicKey which, in turn,

@@ -1,7 +1,7 @@
 package net.i2p.router.peermanager;
 
-import net.i2p.util.Log;
 import net.i2p.util.Clock;
+import net.i2p.util.Log;
 
 /**
  * Determine how reliable the peer is - how likely they'll be able to respond or

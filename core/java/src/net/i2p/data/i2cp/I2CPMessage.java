@@ -1,4 +1,5 @@
 package net.i2p.data.i2cp;
+
 /*
  * free (adj.): unencumbered; not under the control of others
  * Written by jrandom in 2003 and released into the public domain 
@@ -34,6 +35,7 @@ public interface I2CPMessage extends DataStructure {
      * @throws IOException if there is a problem reading from the stream
      */
     public void readMessage(InputStream in, int size, int type) throws I2CPMessageException, IOException;
+
     /**
      * Read the contents from the input stream into the current class's format.
      * The stream should be the message header and body as defined by the I2CP 
@@ -45,7 +47,7 @@ public interface I2CPMessage extends DataStructure {
      * @throws IOException if there is a problem reading from the stream
      */
     public void readMessage(InputStream in) throws I2CPMessageException, IOException;
-    
+
     /**
      * Write the current message to the output stream as a full message following
      * the specification from the I2CP definition.
@@ -55,7 +57,7 @@ public interface I2CPMessage extends DataStructure {
      * @throws IOException if there is a problem writing to the stream
      */
     public void writeMessage(OutputStream out) throws I2CPMessageException, IOException;
-    
+
     /**
      * Return the unique identifier for this type of APIMessage, as specified in the 
      * network specification document under #ClientAccessLayerMessages

@@ -8,22 +8,21 @@ package net.i2p.router.networkdb.kademlia;
  *
  */
 
-import net.i2p.data.DataHelper;
-import net.i2p.data.Hash;
-import net.i2p.data.DataStructure;
-import net.i2p.data.RouterInfo;
-import net.i2p.data.LeaseSet;
-import net.i2p.util.Log;
-import net.i2p.util.Clock;
-
-import net.i2p.router.ProfileManager;
-
-import java.util.Map;
+import java.util.Date;
 import java.util.HashMap;
-import java.util.Set;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.Date;
+import java.util.Map;
+import java.util.Set;
+
+import net.i2p.data.DataHelper;
+import net.i2p.data.DataStructure;
+import net.i2p.data.Hash;
+import net.i2p.data.LeaseSet;
+import net.i2p.data.RouterInfo;
+import net.i2p.router.ProfileManager;
+import net.i2p.util.Clock;
+import net.i2p.util.Log;
 
 class TransientDataStore implements DataStore {
     private final static Log _log = new Log(TransientDataStore.class);

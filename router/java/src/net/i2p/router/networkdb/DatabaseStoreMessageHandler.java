@@ -8,13 +8,13 @@ package net.i2p.router.networkdb;
  *
  */
 
+import net.i2p.data.Hash;
+import net.i2p.data.RouterIdentity;
+import net.i2p.data.i2np.DatabaseStoreMessage;
+import net.i2p.data.i2np.I2NPMessage;
+import net.i2p.data.i2np.SourceRouteBlock;
 import net.i2p.router.HandlerJobBuilder;
 import net.i2p.router.Job;
-import net.i2p.data.RouterIdentity;
-import net.i2p.data.Hash;
-import net.i2p.data.i2np.I2NPMessage;
-import net.i2p.data.i2np.DatabaseStoreMessage;
-import net.i2p.data.i2np.SourceRouteBlock;
 
 /**
  * Create a HandleDatabaseStoreMessageJob whenever a DatabaseStoreMessage arrives

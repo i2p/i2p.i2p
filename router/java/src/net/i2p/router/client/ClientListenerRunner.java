@@ -8,10 +8,9 @@ package net.i2p.router.client;
  *
  */
 
+import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
-
-import java.io.IOException;
 
 import net.i2p.client.I2PClient;
 import net.i2p.util.Log;

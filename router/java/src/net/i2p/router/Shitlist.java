@@ -8,14 +8,14 @@ package net.i2p.router;
  *
  */
 
-import net.i2p.data.Hash;
-import net.i2p.util.Log;
-import net.i2p.util.Clock;
-
-import java.util.Map;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Date;
+import java.util.Map;
+
+import net.i2p.data.Hash;
+import net.i2p.util.Clock;
+import net.i2p.util.Log;
 
 /**
  * Manage in memory the routers we are oh so fond of.

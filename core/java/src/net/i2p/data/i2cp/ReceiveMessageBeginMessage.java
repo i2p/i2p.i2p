@@ -1,4 +1,5 @@
 package net.i2p.data.i2cp;
+
 /*
  * free (adj.): unencumbered; not under the control of others
  * Written by jrandom in 2003 and released into the public domain 
@@ -27,17 +28,28 @@ public class ReceiveMessageBeginMessage extends I2CPMessageImpl {
     public final static int MESSAGE_TYPE = 6;
     private SessionId _sessionId;
     private MessageId _messageId;
-    
-    public ReceiveMessageBeginMessage() { 
+
+    public ReceiveMessageBeginMessage() {
         setSessionId(null);
         setMessageId(null);
     }
-    
-    public SessionId getSessionId() { return _sessionId; }
-    public void setSessionId(SessionId id) { _sessionId = id; }
-    public MessageId getMessageId() { return _messageId; }
-    public void setMessageId(MessageId id) { _messageId = id; }
-    
+
+    public SessionId getSessionId() {
+        return _sessionId;
+    }
+
+    public void setSessionId(SessionId id) {
+        _sessionId = id;
+    }
+
+    public MessageId getMessageId() {
+        return _messageId;
+    }
+
+    public void setMessageId(MessageId id) {
+        _messageId = id;
+    }
+
     protected void doReadMessage(InputStream in, int size) throws I2CPMessageException, IOException {
         try {
             _sessionId = new SessionId();
@@ -48,9 +60,9 @@ public class ReceiveMessageBeginMessage extends I2CPMessageImpl {
             throw new I2CPMessageException("Unable to load the message data", dfe);
         }
     }
-    
+
     protected byte[] doWriteMessage() throws I2CPMessageException, IOException {
-        if ( (_sessionId == null) || (_messageId == null) ) 
+        if ((_sessionId == null) || (_messageId == null))
             throw new I2CPMessageException("Unable to write out the message as there is not enough data");
         ByteArrayOutputStream os = new ByteArrayOutputStream(64);
         try {
@@ -61,20 +73,22 @@ public class ReceiveMessageBeginMessage extends I2CPMessageImpl {
         }
         return os.toByteArray();
     }
-    
-    public int getType() { return MESSAGE_TYPE; }
-    
+
+    public int getType() {
+        return MESSAGE_TYPE;
+    }
+
     public boolean equals(Object object) {
-        if ( (object != null) && (object instanceof ReceiveMessageBeginMessage) ) {
-            ReceiveMessageBeginMessage msg = (ReceiveMessageBeginMessage)object;
-            return DataHelper.eq(getSessionId(),msg.getSessionId()) && 
-                   DataHelper.eq(getMessageId(),msg.getMessageId());
+        if ((object != null) && (object instanceof ReceiveMessageBeginMessage)) {
+            ReceiveMessageBeginMessage msg = (ReceiveMessageBeginMessage) object;
+            return DataHelper.eq(getSessionId(), msg.getSessionId())
+                   && DataHelper.eq(getMessageId(), msg.getMessageId());
         } else {
             return false;
         }
     }
-    
-    public String toString() { 
+
+    public String toString() {
         StringBuffer buf = new StringBuffer();
         buf.append("[ReceiveMessageBeginMessage: ");
         buf.append("\n\tSessionId: ").append(getSessionId());

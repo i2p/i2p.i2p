@@ -45,8 +45,8 @@ import net.i2p.router.message.GarlicConfig;
 import net.i2p.router.message.PayloadGarlicConfig;
 import net.i2p.router.message.SendGarlicJob;
 import net.i2p.router.message.SendTunnelMessageJob;
-import net.i2p.util.Log;
 import net.i2p.util.Clock;
+import net.i2p.util.Log;
 import net.i2p.util.RandomSource;
 
 class StoreJob extends JobImpl {

@@ -27,11 +27,10 @@ import net.i2p.router.Router;
 import net.i2p.router.Shitlist;
 import net.i2p.router.transport.BandwidthLimitedInputStream;
 import net.i2p.router.transport.BandwidthLimitedOutputStream;
+import net.i2p.stat.StatManager;
 import net.i2p.util.Clock;
 import net.i2p.util.I2PThread;
 import net.i2p.util.Log;
-
-import net.i2p.stat.StatManager;
 
 /**
  * TCPConnection that validates the time and protocol version, dropping connection if

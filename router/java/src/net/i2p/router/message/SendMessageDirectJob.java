@@ -8,27 +8,25 @@ package net.i2p.router.message;
  *
  */
 
-import net.i2p.router.JobImpl;
+import java.util.Date;
+
+import net.i2p.data.Hash;
+import net.i2p.data.RouterInfo;
+import net.i2p.data.i2np.I2NPMessage;
+import net.i2p.router.InNetMessage;
+import net.i2p.router.InNetMessagePool;
 import net.i2p.router.Job;
-import net.i2p.router.ReplyJob;
+import net.i2p.router.JobImpl;
 import net.i2p.router.JobQueue;
 import net.i2p.router.MessageSelector;
 import net.i2p.router.NetworkDatabaseFacade;
 import net.i2p.router.OutNetMessage;
 import net.i2p.router.OutNetMessagePool;
-import net.i2p.router.transport.OutboundMessageRegistry;
-import net.i2p.router.InNetMessage;
-import net.i2p.router.InNetMessagePool;
+import net.i2p.router.ReplyJob;
 import net.i2p.router.Router;
-
-import net.i2p.data.i2np.I2NPMessage;
-import net.i2p.data.Hash;
-import net.i2p.data.RouterInfo;
-
-import net.i2p.util.Log;
+import net.i2p.router.transport.OutboundMessageRegistry;
 import net.i2p.util.Clock;
-
-import java.util.Date;
+import net.i2p.util.Log;
 
 public class SendMessageDirectJob extends JobImpl {
     private final static Log _log = new Log(SendMessageDirectJob.class);

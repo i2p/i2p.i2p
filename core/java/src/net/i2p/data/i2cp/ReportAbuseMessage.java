@@ -1,4 +1,5 @@
 package net.i2p.data.i2cp;
+
 /*
  * free (adj.): unencumbered; not under the control of others
  * Written by jrandom in 2003 and released into the public domain 
@@ -29,23 +30,46 @@ public class ReportAbuseMessage extends I2CPMessageImpl {
     private AbuseSeverity _severity;
     private AbuseReason _reason;
     private MessageId _messageId;
-    
+
     public ReportAbuseMessage() {
         setSessionId(null);
         setSeverity(null);
         setReason(null);
         setMessageId(null);
     }
-    
-    public SessionId getSessionId() { return _sessionId; }
-    public void setSessionId(SessionId id) { _sessionId = id; }
-    public AbuseSeverity getSeverity() { return _severity; }
-    public void setSeverity(AbuseSeverity severity) { _severity = severity; }
-    public AbuseReason getReason() { return _reason; }
-    public void setReason(AbuseReason reason) { _reason = reason; }
-    public MessageId getMessageId() { return _messageId; }
-    public void setMessageId(MessageId id) { _messageId = id; }
-    
+
+    public SessionId getSessionId() {
+        return _sessionId;
+    }
+
+    public void setSessionId(SessionId id) {
+        _sessionId = id;
+    }
+
+    public AbuseSeverity getSeverity() {
+        return _severity;
+    }
+
+    public void setSeverity(AbuseSeverity severity) {
+        _severity = severity;
+    }
+
+    public AbuseReason getReason() {
+        return _reason;
+    }
+
+    public void setReason(AbuseReason reason) {
+        _reason = reason;
+    }
+
+    public MessageId getMessageId() {
+        return _messageId;
+    }
+
+    public void setMessageId(MessageId id) {
+        _messageId = id;
+    }
+
     protected void doReadMessage(InputStream in, int size) throws I2CPMessageException, IOException {
         try {
             _sessionId = new SessionId();
@@ -60,9 +84,9 @@ public class ReportAbuseMessage extends I2CPMessageImpl {
             throw new I2CPMessageException("Unable to load the message data", dfe);
         }
     }
-    
+
     protected byte[] doWriteMessage() throws I2CPMessageException, IOException {
-        if ( (_sessionId == null) || (_severity == null) || (_reason == null) ) 
+        if ((_sessionId == null) || (_severity == null) || (_reason == null))
             throw new I2CPMessageException("Not enough information to construct the message");
         ByteArrayOutputStream os = new ByteArrayOutputStream(32);
         try {
@@ -70,7 +94,7 @@ public class ReportAbuseMessage extends I2CPMessageImpl {
             _severity.writeBytes(os);
             _reason.writeBytes(os);
             if (_messageId == null) {
-                _messageId = new MessageId(); 
+                _messageId = new MessageId();
                 _messageId.setMessageId(0);
             }
             _messageId.writeBytes(os);
@@ -79,22 +103,22 @@ public class ReportAbuseMessage extends I2CPMessageImpl {
         }
         return os.toByteArray();
     }
-    
-    public int getType() { return MESSAGE_TYPE; }
-    
+
+    public int getType() {
+        return MESSAGE_TYPE;
+    }
+
     public boolean equals(Object object) {
-        if ( (object != null) && (object instanceof ReportAbuseMessage) ) {
-            ReportAbuseMessage msg = (ReportAbuseMessage)object;
-            return DataHelper.eq(getSessionId(),msg.getSessionId()) &&
-                   DataHelper.eq(getSeverity(),msg.getSeverity()) &&
-                   DataHelper.eq(getReason(),msg.getReason()) &&
-                   DataHelper.eq(getMessageId(),msg.getMessageId());
+        if ((object != null) && (object instanceof ReportAbuseMessage)) {
+            ReportAbuseMessage msg = (ReportAbuseMessage) object;
+            return DataHelper.eq(getSessionId(), msg.getSessionId()) && DataHelper.eq(getSeverity(), msg.getSeverity())
+                   && DataHelper.eq(getReason(), msg.getReason()) && DataHelper.eq(getMessageId(), msg.getMessageId());
         } else {
             return false;
         }
     }
-    
-    public String toString() { 
+
+    public String toString() {
         StringBuffer buf = new StringBuffer();
         buf.append("[ReportAbuseMessage: ");
         buf.append("\n\tSessionID: ").append(getSessionId());

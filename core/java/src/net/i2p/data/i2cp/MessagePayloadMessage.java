@@ -1,4 +1,5 @@
 package net.i2p.data.i2cp;
+
 /*
  * free (adj.): unencumbered; not under the control of others
  * Written by jrandom in 2003 and released into the public domain 
@@ -29,20 +30,37 @@ public class MessagePayloadMessage extends I2CPMessageImpl {
     private SessionId _sessionId;
     private MessageId _messageId;
     private Payload _payload;
-    
-    public MessagePayloadMessage() { 
+
+    public MessagePayloadMessage() {
         setSessionId(null);
         setMessageId(null);
         setPayload(null);
     }
-    
-    public SessionId getSessionId() { return _sessionId; }
-    public void setSessionId(SessionId id) { _sessionId = id; }
-    public MessageId getMessageId() { return _messageId; }
-    public void setMessageId(MessageId id) { _messageId = id; }
-    public Payload getPayload() { return _payload; }
-    public void setPayload(Payload payload) { _payload = payload; }
-    
+
+    public SessionId getSessionId() {
+        return _sessionId;
+    }
+
+    public void setSessionId(SessionId id) {
+        _sessionId = id;
+    }
+
+    public MessageId getMessageId() {
+        return _messageId;
+    }
+
+    public void setMessageId(MessageId id) {
+        _messageId = id;
+    }
+
+    public Payload getPayload() {
+        return _payload;
+    }
+
+    public void setPayload(Payload payload) {
+        _payload = payload;
+    }
+
     protected void doReadMessage(InputStream in, int size) throws I2CPMessageException, IOException {
         try {
             _sessionId = new SessionId();
@@ -55,15 +73,15 @@ public class MessagePayloadMessage extends I2CPMessageImpl {
             throw new I2CPMessageException("Unable to load the message data", dfe);
         }
     }
-    
+
     protected byte[] doWriteMessage() throws I2CPMessageException, IOException {
-	if (_sessionId == null)
-	    throw new I2CPMessageException("Unable to write out the message, as the session ID has not been defined");
-	if (_messageId == null)
-	    throw new I2CPMessageException("Unable to write out the message, as the message ID has not been defined");
-	if (_payload == null)
-	    throw new I2CPMessageException("Unable to write out the message, as the payload has not been defined");
-	
+        if (_sessionId == null)
+            throw new I2CPMessageException("Unable to write out the message, as the session ID has not been defined");
+        if (_messageId == null)
+            throw new I2CPMessageException("Unable to write out the message, as the message ID has not been defined");
+        if (_payload == null)
+            throw new I2CPMessageException("Unable to write out the message, as the payload has not been defined");
+
         ByteArrayOutputStream os = new ByteArrayOutputStream(512);
         try {
             _sessionId.writeBytes(os);
@@ -74,21 +92,23 @@ public class MessagePayloadMessage extends I2CPMessageImpl {
         }
         return os.toByteArray();
     }
-    
-    public int getType() { return MESSAGE_TYPE; }
-    
+
+    public int getType() {
+        return MESSAGE_TYPE;
+    }
+
     public boolean equals(Object object) {
-        if ( (object != null) && (object instanceof MessagePayloadMessage) ) {
-            MessagePayloadMessage msg = (MessagePayloadMessage)object;
-            return DataHelper.eq(getSessionId(),msg.getSessionId()) &&
-                   DataHelper.eq(getMessageId(),msg.getMessageId()) &&
-                   DataHelper.eq(getPayload(),msg.getPayload());
+        if ((object != null) && (object instanceof MessagePayloadMessage)) {
+            MessagePayloadMessage msg = (MessagePayloadMessage) object;
+            return DataHelper.eq(getSessionId(), msg.getSessionId())
+                   && DataHelper.eq(getMessageId(), msg.getMessageId())
+                   && DataHelper.eq(getPayload(), msg.getPayload());
         } else {
             return false;
         }
     }
-    
-    public String toString() { 
+
+    public String toString() {
         StringBuffer buf = new StringBuffer();
         buf.append("[MessagePayloadMessage: ");
         buf.append("\n\tSessionId: ").append(getSessionId());

@@ -1,4 +1,5 @@
 package net.i2p.client;
+
 /*
  * free (adj.): unencumbered; not under the control of others
  * Written by jrandom in 2003 and released into the public domain 
@@ -22,20 +23,20 @@ public interface I2PSessionListener {
      * @param size size of the message
      */
     void messageAvailable(I2PSession session, int msgId, long size);
-    
+
     /** Instruct the client that the session specified seems to be under attack
      * and that the client may wish to move its destination to another router.
      * @param session session to report abuse to
      * @param severity how bad the abuse is
      */
     void reportAbuse(I2PSession session, int severity);
-    
+
     /**
      * Notify the client that the session has been terminated
      *
      */
     void disconnected(I2PSession session);
-    
+
     /**
      * Notify the client that some error occurred
      *

@@ -8,8 +8,8 @@ import java.io.OutputStream;
 import net.i2p.I2PException;
 import net.i2p.client.I2PSessionException;
 import net.i2p.data.Destination;
-import net.i2p.util.Log;
 import net.i2p.util.I2PThread;
+import net.i2p.util.Log;
 
 /**
  * Initial stub implementation for the socket

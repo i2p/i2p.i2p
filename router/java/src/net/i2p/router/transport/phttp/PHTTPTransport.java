@@ -28,8 +28,8 @@ import net.i2p.router.Router;
 import net.i2p.router.transport.BandwidthLimiter;
 import net.i2p.router.transport.TransportBid;
 import net.i2p.router.transport.TransportImpl;
-import net.i2p.util.Log;
 import net.i2p.util.Clock;
+import net.i2p.util.Log;
 
 /**
  *

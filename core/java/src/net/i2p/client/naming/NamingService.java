@@ -19,9 +19,8 @@ public abstract class NamingService {
     private final static Log _log = new Log(NamingService.class);
 
     private static final String PROP_IMPL = "i2p.naming.impl";
-    private static final String DEFAULT_IMPL=
-	"net.i2p.client.naming.HostsTxtNamingService";
-    
+    private static final String DEFAULT_IMPL = "net.i2p.client.naming.HostsTxtNamingService";
+
     /**
      * Look up a host name.
      * @return the Destination for this host name, or
@@ -43,19 +42,18 @@ public abstract class NamingService {
      * implementations.
      */
     protected Destination lookupBase64(String hostname) {
-	try {
-	    Destination result = new Destination();
-	    result.fromBase64(hostname);
-	    return result;
-	} catch (DataFormatException dfe) {
-	    if (_log.shouldLog(Log.WARN))
-		_log.warn("Error translating [" + hostname + "]", dfe);
-	    return null;
-	}
+        try {
+            Destination result = new Destination();
+            result.fromBase64(hostname);
+            return result;
+        } catch (DataFormatException dfe) {
+            if (_log.shouldLog(Log.WARN)) _log.warn("Error translating [" + hostname + "]", dfe);
+            return null;
+        }
     }
 
     private static NamingService instance = null;
-    
+
     /**
      * Get a naming service instance. This method ensures that there
      * will be only one naming service instance (singleton) as well as
@@ -63,16 +61,15 @@ public abstract class NamingService {
      * property.
      */
     public static synchronized NamingService getInstance() {
-	if (instance == null) {
-	    String impl = System.getProperty(PROP_IMPL,
-					     DEFAULT_IMPL);
-	    try {
-		instance = (NamingService) Class.forName(impl).newInstance();
-	    } catch (Exception ex) {
-		_log.error("Cannot loadNaming service implementation", ex);
-		instance = new DummyNamingService(); // fallback
-	    }
-	}
-	return instance;
+        if (instance == null) {
+            String impl = System.getProperty(PROP_IMPL, DEFAULT_IMPL);
+            try {
+                instance = (NamingService) Class.forName(impl).newInstance();
+            } catch (Exception ex) {
+                _log.error("Cannot loadNaming service implementation", ex);
+                instance = new DummyNamingService(); // fallback
+            }
+        }
+        return instance;
     }
 }

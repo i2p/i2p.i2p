@@ -1,4 +1,5 @@
 package net.i2p.data.i2cp;
+
 /*
  * free (adj.): unencumbered; not under the control of others
  * Written by jrandom in 2003 and released into the public domain 
@@ -26,14 +27,19 @@ public class DestroySessionMessage extends I2CPMessageImpl {
     private final static Log _log = new Log(DestroySessionMessage.class);
     public final static int MESSAGE_TYPE = 3;
     private SessionId _sessionId;
-    
-    public DestroySessionMessage() { 
+
+    public DestroySessionMessage() {
         setSessionId(null);
     }
-    
-    public SessionId getSessionId() { return _sessionId; }
-    public void setSessionId(SessionId id) { _sessionId = id; }
-    
+
+    public SessionId getSessionId() {
+        return _sessionId;
+    }
+
+    public void setSessionId(SessionId id) {
+        _sessionId = id;
+    }
+
     protected void doReadMessage(InputStream in, int size) throws I2CPMessageException, IOException {
         SessionId id = new SessionId();
         try {
@@ -43,7 +49,7 @@ public class DestroySessionMessage extends I2CPMessageImpl {
         }
         setSessionId(id);
     }
-    
+
     protected byte[] doWriteMessage() throws I2CPMessageException, IOException {
         if (_sessionId == null)
             throw new I2CPMessageException("Unable to write out the message as there is not enough data");
@@ -55,19 +61,21 @@ public class DestroySessionMessage extends I2CPMessageImpl {
         }
         return os.toByteArray();
     }
-    
-    public int getType() { return MESSAGE_TYPE; }
-    
+
+    public int getType() {
+        return MESSAGE_TYPE;
+    }
+
     public boolean equals(Object object) {
-        if ( (object != null) && (object instanceof DestroySessionMessage) ) {
-            DestroySessionMessage msg = (DestroySessionMessage)object;
-            return DataHelper.eq(getSessionId(),msg.getSessionId());
+        if ((object != null) && (object instanceof DestroySessionMessage)) {
+            DestroySessionMessage msg = (DestroySessionMessage) object;
+            return DataHelper.eq(getSessionId(), msg.getSessionId());
         } else {
             return false;
         }
     }
-    
-    public String toString() { 
+
+    public String toString() {
         StringBuffer buf = new StringBuffer();
         buf.append("[DestroySessionMessage: ");
         buf.append("\n\tSessionId: ").append(getSessionId());

@@ -27,8 +27,8 @@ import net.i2p.router.Router;
 import net.i2p.router.TunnelInfo;
 import net.i2p.router.TunnelManagerFacade;
 import net.i2p.router.TunnelSelectionCriteria;
-import net.i2p.util.Log;
 import net.i2p.util.Clock;
+import net.i2p.util.Log;
 import net.i2p.util.RandomSource;
 
 /**

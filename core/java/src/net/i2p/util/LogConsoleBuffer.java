@@ -1,7 +1,7 @@
 package net.i2p.util;
 
-import java.util.List;
 import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Offer a glimpse into the last few console messages generated
@@ -9,22 +9,25 @@ import java.util.LinkedList;
  */
 public class LogConsoleBuffer {
     private final static LogConsoleBuffer _instance = new LogConsoleBuffer();
-    public final static LogConsoleBuffer getInstance() { return _instance; }
+
+    public final static LogConsoleBuffer getInstance() {
+        return _instance;
+    }
     private List _buffer;
-    
+
     private LogConsoleBuffer() {
-	_buffer = new LinkedList();
+        _buffer = new LinkedList();
     }
-    
+
     void add(String msg) {
-	int lim = LogManager.getInstance().getConsoleBufferSize();
-	synchronized (_buffer) {
-	    while (_buffer.size() >= lim)
-		_buffer.remove(0);
-	    _buffer.add(msg);
-	}
+        int lim = LogManager.getInstance().getConsoleBufferSize();
+        synchronized (_buffer) {
+            while (_buffer.size() >= lim)
+                _buffer.remove(0);
+            _buffer.add(msg);
+        }
     }
-    
+
     /**
      * Retrieve the currently bufferd messages, earlier values were generated...
      * earlier.  All values are strings with no formatting (as they are written
@@ -32,8 +35,8 @@ public class LogConsoleBuffer {
      *
      */
     public List getMostRecentMessages() {
-	synchronized (_buffer) {
-	    return new LinkedList(_buffer);
-	}
+        synchronized (_buffer) {
+            return new LinkedList(_buffer);
+        }
     }
 }

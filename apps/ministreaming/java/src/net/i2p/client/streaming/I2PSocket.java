@@ -1,10 +1,10 @@
 package net.i2p.client.streaming;
 
-import net.i2p.data.Destination;
-
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.IOException;
+
+import net.i2p.data.Destination;
 
 /**
  * Minimalistic adapter between the socket api and I2PTunnel's way.

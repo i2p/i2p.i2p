@@ -1,4 +1,5 @@
 package net.i2p.data;
+
 /*
  * free (adj.): unencumbered; not under the control of others
  * Written by jrandom in 2003 and released into the public domain 
@@ -26,30 +27,41 @@ public class Destination extends DataStructureImpl {
     private SigningPublicKey _signingKey;
     private PublicKey _publicKey;
     private Hash __calculatedHash;
-    
-    public Destination() { 
+
+    public Destination() {
         setCertificate(null);
         setSigningPublicKey(null);
         setPublicKey(null);
-	__calculatedHash = null;
+        __calculatedHash = null;
     }
-    
-    public Certificate getCertificate() { return _certificate; }
-    public void setCertificate(Certificate cert) { 
-	_certificate = cert; 
-	__calculatedHash = null;
+
+    public Certificate getCertificate() {
+        return _certificate;
     }
-    public PublicKey getPublicKey() { return _publicKey; }
-    public void setPublicKey(PublicKey key) { 
-	_publicKey = key; 
-	__calculatedHash = null;
+
+    public void setCertificate(Certificate cert) {
+        _certificate = cert;
+        __calculatedHash = null;
     }
-    public SigningPublicKey getSigningPublicKey() { return _signingKey; }
-    public void setSigningPublicKey(SigningPublicKey key) { 
-	_signingKey = key; 
-	__calculatedHash = null;
+
+    public PublicKey getPublicKey() {
+        return _publicKey;
     }
-    
+
+    public void setPublicKey(PublicKey key) {
+        _publicKey = key;
+        __calculatedHash = null;
+    }
+
+    public SigningPublicKey getSigningPublicKey() {
+        return _signingKey;
+    }
+
+    public void setSigningPublicKey(SigningPublicKey key) {
+        _signingKey = key;
+        __calculatedHash = null;
+    }
+
     public void readBytes(InputStream in) throws DataFormatException, IOException {
         _publicKey = new PublicKey();
         _publicKey.readBytes(in);
@@ -57,32 +69,30 @@ public class Destination extends DataStructureImpl {
         _signingKey.readBytes(in);
         _certificate = new Certificate();
         _certificate.readBytes(in);
-	__calculatedHash = null;
+        __calculatedHash = null;
     }
-    
+
     public void writeBytes(OutputStream out) throws DataFormatException, IOException {
-        if ( (_certificate == null) || (_publicKey == null) || (_signingKey == null) ) 
+        if ((_certificate == null) || (_publicKey == null) || (_signingKey == null))
             throw new DataFormatException("Not enough data to format the destination");
         _publicKey.writeBytes(out);
         _signingKey.writeBytes(out);
         _certificate.writeBytes(out);
     }
- 
+
     public boolean equals(Object object) {
-        if ( (object == null) || !(object instanceof Destination))
-            return false;
-        Destination dst = (Destination)object;
-        return DataHelper.eq(getCertificate(), dst.getCertificate()) && 
-               DataHelper.eq(getSigningPublicKey(), dst.getSigningPublicKey()) && 
-               DataHelper.eq(getPublicKey(), dst.getPublicKey());
+        if ((object == null) || !(object instanceof Destination)) return false;
+        Destination dst = (Destination) object;
+        return DataHelper.eq(getCertificate(), dst.getCertificate())
+               && DataHelper.eq(getSigningPublicKey(), dst.getSigningPublicKey())
+               && DataHelper.eq(getPublicKey(), dst.getPublicKey());
     }
- 
+
     public int hashCode() {
-        return DataHelper.hashCode(getCertificate()) +
-               DataHelper.hashCode(getSigningPublicKey()) + 
-               DataHelper.hashCode(getPublicKey());
+        return DataHelper.hashCode(getCertificate()) + DataHelper.hashCode(getSigningPublicKey())
+               + DataHelper.hashCode(getPublicKey());
     }
-    
+
     public String toString() {
         StringBuffer buf = new StringBuffer(128);
         buf.append("[Destination: ");
@@ -93,10 +103,9 @@ public class Destination extends DataStructureImpl {
         buf.append("]");
         return buf.toString();
     }
-    
+
     public Hash calculateHash() {
-	if (__calculatedHash == null) 
-	    __calculatedHash = super.calculateHash();
-	return __calculatedHash;
+        if (__calculatedHash == null) __calculatedHash = super.calculateHash();
+        return __calculatedHash;
     }
 }

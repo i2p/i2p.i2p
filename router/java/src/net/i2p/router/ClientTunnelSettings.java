@@ -8,8 +8,8 @@ package net.i2p.router;
  *
  */
 
-import java.util.Properties;
 import java.util.Iterator;
+import java.util.Properties;
 
 /**
  * Wrap up the client settings specifying their tunnel criteria

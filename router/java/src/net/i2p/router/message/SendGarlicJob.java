@@ -21,8 +21,8 @@ import net.i2p.router.OutNetMessage;
 import net.i2p.router.OutNetMessagePool;
 import net.i2p.router.ReplyJob;
 import net.i2p.router.Router;
-import net.i2p.util.Log;
 import net.i2p.util.Clock;
+import net.i2p.util.Log;
 
 /**
  * Build a garlic message from config, encrypt it, and enqueue it for delivery.

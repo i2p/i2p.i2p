@@ -1,4 +1,5 @@
 package net.i2p.client;
+
 /*
  * free (adj.): unencumbered; not under the control of others
  * Written by jrandom in 2003 and released into the public domain 
@@ -19,5 +20,5 @@ public class I2PClientFactory {
      */
     public static I2PClient createClient() {
         return new I2PClientImpl();
-    }   
+    }
 }

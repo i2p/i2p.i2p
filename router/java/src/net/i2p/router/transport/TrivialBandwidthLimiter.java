@@ -12,9 +12,8 @@ import net.i2p.data.RouterIdentity;
 import net.i2p.router.JobImpl;
 import net.i2p.router.JobQueue;
 import net.i2p.router.Router;
-
-import net.i2p.util.Log;
 import net.i2p.util.Clock;
+import net.i2p.util.Log;
 
 /**
  * Coordinate the bandwidth limiting across all classes of peers.  Currently 

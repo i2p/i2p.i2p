@@ -20,26 +20,25 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
+import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
 import net.i2p.data.RouterAddress;
 import net.i2p.data.RouterIdentity;
 import net.i2p.data.RouterInfo;
 import net.i2p.data.SigningPrivateKey;
-import net.i2p.data.DataHelper;
 import net.i2p.router.JobImpl;
 import net.i2p.router.JobQueue;
 import net.i2p.router.NetworkDatabaseFacade;
 import net.i2p.router.OutNetMessage;
+import net.i2p.router.ProfileManager;
 import net.i2p.router.Router;
 import net.i2p.router.Shitlist;
 import net.i2p.router.transport.TransportBid;
 import net.i2p.router.transport.TransportImpl;
-import net.i2p.router.ProfileManager;
+import net.i2p.stat.StatManager;
 import net.i2p.util.Clock;
 import net.i2p.util.I2PThread;
 import net.i2p.util.Log;
-
-import net.i2p.stat.StatManager;
 
 /**
  * Defines a way to send a message to another peer and start listening for messages

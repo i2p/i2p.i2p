@@ -1,4 +1,5 @@
 package net.i2p.data;
+
 /*
  * free (adj.): unencumbered; not under the control of others
  * Written by jrandom in 2003 and released into the public domain 
@@ -8,17 +9,16 @@ package net.i2p.data;
  *
  */
 
-import net.i2p.crypto.SHA256Generator;
-
-import net.i2p.util.Log;
-import net.i2p.util.RandomSource;
-import net.i2p.util.Clock;
-
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.TimeZone;
-import java.util.Date;
-import java.text.SimpleDateFormat;
+
+import net.i2p.crypto.SHA256Generator;
+import net.i2p.util.Clock;
+import net.i2p.util.Log;
+import net.i2p.util.RandomSource;
 
 /**
  * Component to manage the munging of hashes into routing keys - given a hash, 
@@ -41,41 +41,47 @@ import java.text.SimpleDateFormat;
  */
 public class RoutingKeyGenerator {
     private final static RoutingKeyGenerator _instance = new RoutingKeyGenerator();
-    public static RoutingKeyGenerator getInstance() { return _instance; }
+
+    public static RoutingKeyGenerator getInstance() {
+        return _instance;
+    }
     private final static Log _log = new Log(RoutingKeyGenerator.class);
     private byte _currentModData[];
-    
+
     private final static Calendar _cal = GregorianCalendar.getInstance(TimeZone.getTimeZone("GMT"));
     private final static SimpleDateFormat _fmt = new SimpleDateFormat("yyyyMMdd");
-    
-    public byte[] getModData() { return _currentModData; }
-    public void setModData(byte modData[]) {
-	_currentModData = modData;
+
+    public byte[] getModData() {
+        return _currentModData;
     }
-    
+
+    public void setModData(byte modData[]) {
+        _currentModData = modData;
+    }
+
     /**
      * Update the current modifier data with some bytes derived from the current
      * date (yyyyMMdd in GMT)
      *
      */
     public void generateDateBasedModData() {
-	Date today = null;
-	synchronized (_cal) {
-	    _cal.setTime(new Date(Clock.getInstance().now()));
-	    _cal.set(Calendar.HOUR_OF_DAY, 0);
-	    _cal.set(Calendar.MINUTE, 0);
-	    _cal.set(Calendar.SECOND, 0);
-	    _cal.set(Calendar.MILLISECOND, 0);
-	    today = _cal.getTime();
-	}
-	byte mod[] = null;
-	synchronized (_fmt) {
-	    mod = _fmt.format(today).getBytes();
-	}
-	_log.info("Routing modifier generated: " + new String(mod));
-	setModData(mod);
+        Date today = null;
+        synchronized (_cal) {
+            _cal.setTime(new Date(Clock.getInstance().now()));
+            _cal.set(Calendar.HOUR_OF_DAY, 0);
+            _cal.set(Calendar.MINUTE, 0);
+            _cal.set(Calendar.SECOND, 0);
+            _cal.set(Calendar.MILLISECOND, 0);
+            today = _cal.getTime();
+        }
+        byte mod[] = null;
+        synchronized (_fmt) {
+            mod = _fmt.format(today).getBytes();
+        }
+        _log.info("Routing modifier generated: " + new String(mod));
+        setModData(mod);
     }
-    
+
     /**
      * Generate a modified (yet consistent) hash from the origKey by generating the
      * SHA256 of the targetKey with the current modData appended to it, *then* 
@@ -86,27 +92,29 @@ public class RoutingKeyGenerator {
      * @throws IllegalArgumentException if origKey is null
      */
     public Hash getRoutingKey(Hash origKey) {
-	if (origKey == null)
-	    throw new IllegalArgumentException("Original key is null");
-	if (_currentModData == null) generateDateBasedModData();
-	byte modVal[] = new byte[Hash.HASH_LENGTH+_currentModData.length];
-	System.arraycopy(origKey.getData(), 0, modVal, 0, Hash.HASH_LENGTH);
-	System.arraycopy(_currentModData, 0, modVal, Hash.HASH_LENGTH, _currentModData.length);
-	return SHA256Generator.getInstance().calculateHash(modVal);
+        if (origKey == null) throw new IllegalArgumentException("Original key is null");
+        if (_currentModData == null) generateDateBasedModData();
+        byte modVal[] = new byte[Hash.HASH_LENGTH + _currentModData.length];
+        System.arraycopy(origKey.getData(), 0, modVal, 0, Hash.HASH_LENGTH);
+        System.arraycopy(_currentModData, 0, modVal, Hash.HASH_LENGTH, _currentModData.length);
+        return SHA256Generator.getInstance().calculateHash(modVal);
     }
-    
-    public static void main(String args[]) {
-	Hash k1 = new Hash();
-	byte k1d[] = new byte[Hash.HASH_LENGTH];
-	RandomSource.getInstance().nextBytes(k1d);
-	k1.setData(k1d);
 
-	for (int i = 0; i < 10; i++) {
-	    System.out.println("K1:  " + k1);
-	    Hash k1m = RoutingKeyGenerator.getInstance().getRoutingKey(k1);
-	    System.out.println("MOD: " + new String(RoutingKeyGenerator.getInstance().getModData()));
-	    System.out.println("K1M: " + k1m);
-	}
-	try { Thread.sleep(2000); } catch (Throwable t) {}
+    public static void main(String args[]) {
+        Hash k1 = new Hash();
+        byte k1d[] = new byte[Hash.HASH_LENGTH];
+        RandomSource.getInstance().nextBytes(k1d);
+        k1.setData(k1d);
+
+        for (int i = 0; i < 10; i++) {
+            System.out.println("K1:  " + k1);
+            Hash k1m = RoutingKeyGenerator.getInstance().getRoutingKey(k1);
+            System.out.println("MOD: " + new String(RoutingKeyGenerator.getInstance().getModData()));
+            System.out.println("K1M: " + k1m);
+        }
+        try {
+            Thread.sleep(2000);
+        } catch (Throwable t) {
+        }
     }
 }

@@ -8,10 +8,11 @@ package net.i2p.router.transport;
  *
  */
 
-import net.i2p.data.RouterIdentity;
 import java.io.FilterOutputStream;
-import java.io.OutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
+
+import net.i2p.data.RouterIdentity;
 
 public class BandwidthLimitedOutputStream extends FilterOutputStream {
     private RouterIdentity _peer;

@@ -8,15 +8,14 @@ package net.i2p.data.i2np;
  *
  */
 
-import java.io.InputStream;
-import java.io.IOException;
 import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 
-import net.i2p.data.DataHelper;
 import net.i2p.data.DataFormatException;
-
-import net.i2p.util.Log;
+import net.i2p.data.DataHelper;
 import net.i2p.util.Clock;
+import net.i2p.util.Log;
 
 /**
  * Handle messages from router to router

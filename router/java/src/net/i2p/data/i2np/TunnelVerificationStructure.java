@@ -8,20 +8,19 @@ package net.i2p.data.i2np;
  *
  */
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.IOException;
 
-import net.i2p.util.Log;
-
+import net.i2p.crypto.DSAEngine;
+import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
 import net.i2p.data.DataStructureImpl;
-import net.i2p.data.DataFormatException;
 import net.i2p.data.Hash;
 import net.i2p.data.Signature;
 import net.i2p.data.SigningPrivateKey;
 import net.i2p.data.SigningPublicKey;
-import net.i2p.crypto.DSAEngine;
+import net.i2p.util.Log;
 
 /**
  *

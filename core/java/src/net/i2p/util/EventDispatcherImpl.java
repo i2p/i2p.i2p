@@ -1,4 +1,5 @@
 package net.i2p.util;
+
 /*
  * free (adj.): unencumbered; not under the control of others Written
  * by human & jrandom in 2004 and released into the public domain with
@@ -38,107 +39,104 @@ public class EventDispatcherImpl implements EventDispatcher {
     private ArrayList _attached = new ArrayList();
 
     public EventDispatcher getEventDispatcher() {
-	return this;
+        return this;
     }
 
     public void attachEventDispatcher(EventDispatcher ev) {
-	if (ev == null) return;
-	synchronized (_attached) {
-	    _log.debug(this.hashCode() + ": attaching EventDispatcher "
-		       + ev.hashCode());
-	    _attached.add(ev);
-	}
+        if (ev == null) return;
+        synchronized (_attached) {
+            _log.debug(this.hashCode() + ": attaching EventDispatcher " + ev.hashCode());
+            _attached.add(ev);
+        }
     }
 
     public void detachEventDispatcher(EventDispatcher ev) {
-	if (ev == null) return;
-	synchronized (_attached) {
-	    ListIterator it = _attached.listIterator();
-	    while (it.hasNext()) {
-		if (((EventDispatcher)it.next()) == ev) {
-		    it.remove();
-		    break;
-		}
-	    }
-	}
+        if (ev == null) return;
+        synchronized (_attached) {
+            ListIterator it = _attached.listIterator();
+            while (it.hasNext()) {
+                if (((EventDispatcher) it.next()) == ev) {
+                    it.remove();
+                    break;
+                }
+            }
+        }
     }
 
-    public void notifyEvent(String eventName, Object args) { 
-	if (_ignore) return;
-	if (args == null) {
-	    args = "[null value]";
-	}
-	_log.debug(this.hashCode() + ": got notification ["
-		   + eventName + "] = [" + args + "]");
-	synchronized (_events) {
-	    _events.put(eventName, args);
-	    _events.notifyAll();
-	    synchronized (_attached) {
-		Iterator it = _attached.iterator();
-		EventDispatcher e;
-		while (it.hasNext()) {
-		    e = (EventDispatcher)it.next();
-		    _log.debug(this.hashCode()
-			       + ": notifying attached EventDispatcher "
-			       + e.hashCode() + ": ["
-			       + eventName + "] = [" + args + "]");
-		    e.notifyEvent(eventName, args);
-		}
-	    }
-	}
+    public void notifyEvent(String eventName, Object args) {
+        if (_ignore) return;
+        if (args == null) {
+            args = "[null value]";
+        }
+        _log.debug(this.hashCode() + ": got notification [" + eventName + "] = [" + args + "]");
+        synchronized (_events) {
+            _events.put(eventName, args);
+            _events.notifyAll();
+            synchronized (_attached) {
+                Iterator it = _attached.iterator();
+                EventDispatcher e;
+                while (it.hasNext()) {
+                    e = (EventDispatcher) it.next();
+                    _log.debug(this.hashCode() + ": notifying attached EventDispatcher " + e.hashCode() + ": ["
+                               + eventName + "] = [" + args + "]");
+                    e.notifyEvent(eventName, args);
+                }
+            }
+        }
     }
 
     public Object getEventValue(String name) {
-	if (_ignore) return null;
-	Object val;
+        if (_ignore) return null;
+        Object val;
 
-	synchronized (_events) {
-	    val = _events.get(name);
-	}
+        synchronized (_events) {
+            val = _events.get(name);
+        }
 
-	return val;
+        return val;
     }
 
     public Set getEvents() {
-	if (_ignore) return Collections.EMPTY_SET;
-	Set set;
+        if (_ignore) return Collections.EMPTY_SET;
+        Set set;
 
-	synchronized (_events) {
-	    set = new HashSet(_events.keySet());
-	}
+        synchronized (_events) {
+            set = new HashSet(_events.keySet());
+        }
 
-	return set;
+        return set;
     }
 
     public void ignoreEvents() {
-	_ignore = true;
-	synchronized (_events) {
-	    _events.clear();
-	}
-	_events = null;
+        _ignore = true;
+        synchronized (_events) {
+            _events.clear();
+        }
+        _events = null;
     }
 
     public void unIgnoreEvents() {
-	_ignore = false;
+        _ignore = false;
     }
 
     public Object waitEventValue(String name) {
-	if (_ignore) return null;
-	Object val;
+        if (_ignore) return null;
+        Object val;
 
-	_log.debug(this.hashCode() + ": waiting for [" + name + "]");
-	do {
-	    synchronized (_events) {
-		if (_events.containsKey(name)) {
-		    val = _events.get(name);
-		    break;
-		}
-		try {
-		    _events.wait(1*1000);
-		} catch (InterruptedException e) {}
-	    }
-	} while (true);
+        _log.debug(this.hashCode() + ": waiting for [" + name + "]");
+        do {
+            synchronized (_events) {
+                if (_events.containsKey(name)) {
+                    val = _events.get(name);
+                    break;
+                }
+                try {
+                    _events.wait(1 * 1000);
+                } catch (InterruptedException e) {
+                }
+            }
+        } while (true);
 
-	return val;
+        return val;
     }
 }

@@ -1,4 +1,5 @@
 package net.i2p.data.i2cp;
+
 /*
  * free (adj.): unencumbered; not under the control of others
  * Written by jrandom in 2003 and released into the public domain 
@@ -27,32 +28,43 @@ public class SessionStatusMessage extends I2CPMessageImpl {
     public final static int MESSAGE_TYPE = 20;
     private SessionId _sessionId;
     private int _status;
-    
+
     public final static int STATUS_DESTROYED = 0;
     public final static int STATUS_CREATED = 1;
     public final static int STATUS_UPDATED = 2;
     public final static int STATUS_INVALID = 3;
-    
-    public SessionStatusMessage() { 
+
+    public SessionStatusMessage() {
         setSessionId(null);
         setStatus(STATUS_INVALID);
     }
-    
-    public SessionId getSessionId() { return _sessionId; }
-    public void setSessionId(SessionId id) { _sessionId = id; }
-    public int getStatus() { return _status; }
-    public void setStatus(int status) { _status = status; }
-    
+
+    public SessionId getSessionId() {
+        return _sessionId;
+    }
+
+    public void setSessionId(SessionId id) {
+        _sessionId = id;
+    }
+
+    public int getStatus() {
+        return _status;
+    }
+
+    public void setStatus(int status) {
+        _status = status;
+    }
+
     protected void doReadMessage(InputStream in, int size) throws I2CPMessageException, IOException {
         try {
             _sessionId = new SessionId();
             _sessionId.readBytes(in);
-            _status = (int)DataHelper.readLong(in, 1);
+            _status = (int) DataHelper.readLong(in, 1);
         } catch (DataFormatException dfe) {
             throw new I2CPMessageException("Unable to load the message data", dfe);
         }
     }
-    
+
     protected byte[] doWriteMessage() throws I2CPMessageException, IOException {
         if (_sessionId == null)
             throw new I2CPMessageException("Unable to write out the message as there is not enough data");
@@ -65,20 +77,21 @@ public class SessionStatusMessage extends I2CPMessageImpl {
         }
         return os.toByteArray();
     }
-    
-    public int getType() { return MESSAGE_TYPE; }
-    
+
+    public int getType() {
+        return MESSAGE_TYPE;
+    }
+
     public boolean equals(Object object) {
-        if ( (object != null) && (object instanceof SessionStatusMessage) ) {
-            SessionStatusMessage msg = (SessionStatusMessage)object;
-            return DataHelper.eq(getSessionId(),msg.getSessionId()) &&
-                   DataHelper.eq(getStatus(),msg.getStatus());
+        if ((object != null) && (object instanceof SessionStatusMessage)) {
+            SessionStatusMessage msg = (SessionStatusMessage) object;
+            return DataHelper.eq(getSessionId(), msg.getSessionId()) && DataHelper.eq(getStatus(), msg.getStatus());
         } else {
             return false;
         }
     }
-    
-    public String toString() { 
+
+    public String toString() {
         StringBuffer buf = new StringBuffer();
         buf.append("[SessionStatusMessage: ");
         buf.append("\n\tSessionId: ").append(getSessionId());

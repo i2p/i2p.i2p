@@ -1,25 +1,23 @@
 package net.i2p.router.admin;
 
-import net.i2p.util.Log;
-import net.i2p.stat.StatManager;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.PrintWriter;
+import java.text.DecimalFormat;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
+
+import net.i2p.data.DataHelper;
+import net.i2p.router.Router;
 import net.i2p.stat.Frequency;
 import net.i2p.stat.FrequencyStat;
 import net.i2p.stat.Rate;
 import net.i2p.stat.RateStat;
-import net.i2p.router.Router;
-import net.i2p.data.DataHelper;
-
-import java.util.Set;
-import java.util.Map;
-import java.util.Iterator;
-import java.util.Arrays;
-
-import java.text.DecimalFormat;
-
-import java.io.OutputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.PrintWriter;
-import java.io.IOException;
+import net.i2p.stat.StatManager;
+import net.i2p.util.Log;
 
 /**
  * Dump the stats to the web admin interface

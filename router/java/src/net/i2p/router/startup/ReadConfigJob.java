@@ -8,17 +8,17 @@ package net.i2p.router.startup;
  *
  */
 
-import net.i2p.router.JobImpl;
-import net.i2p.router.Router;
-import net.i2p.router.JobQueue;
-import net.i2p.util.Log;
-import net.i2p.util.Clock;
-
-import java.util.Properties;
-import java.util.Iterator;
-import java.io.FileInputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.Iterator;
+import java.util.Properties;
+
+import net.i2p.router.JobImpl;
+import net.i2p.router.JobQueue;
+import net.i2p.router.Router;
+import net.i2p.util.Clock;
+import net.i2p.util.Log;
 
 /**
  * Simply read the router config

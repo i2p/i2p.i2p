@@ -1,4 +1,5 @@
 package net.i2p.client;
+
 /*
  * free (adj.): unencumbered; not under the control of others
  * Written by jrandom in 2003 and released into the public domain 
@@ -8,7 +9,8 @@ package net.i2p.client;
  *
  */
 
-import net.i2p.data.i2cp.*;
+import net.i2p.data.i2cp.DisconnectMessage;
+import net.i2p.data.i2cp.I2CPMessage;
 
 /**
  * Handle I2CP disconnect messages from the router
@@ -19,6 +21,7 @@ class DisconnectMessageHandler extends HandlerImpl {
     public DisconnectMessageHandler() {
         super(DisconnectMessage.MESSAGE_TYPE);
     }
+
     public void handleMessage(I2CPMessage message, I2PSessionImpl session) {
         _log.debug("Handle message " + message);
         session.destroySession(false);

@@ -1,19 +1,15 @@
 package net.i2p.router.peermanager;
 
-import net.i2p.data.Hash;
-import net.i2p.data.DataHelper;
-import net.i2p.util.Clock;
-import net.i2p.util.Log;
-
+import java.io.IOException;
+import java.io.OutputStream;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
-
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -22,8 +18,10 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
-import java.io.IOException;
-import java.io.OutputStream;
+import net.i2p.data.DataHelper;
+import net.i2p.data.Hash;
+import net.i2p.util.Clock;
+import net.i2p.util.Log;
 
 /**
  * Keep the peer profiles organized according to the tiered model.  This does not 

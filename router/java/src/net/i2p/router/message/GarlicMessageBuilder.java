@@ -24,8 +24,8 @@ import net.i2p.data.SessionKey;
 import net.i2p.data.SessionTag;
 import net.i2p.data.i2np.GarlicClove;
 import net.i2p.data.i2np.GarlicMessage;
-import net.i2p.data.i2np.SourceRouteBlock;
 import net.i2p.data.i2np.I2NPMessage;
+import net.i2p.data.i2np.SourceRouteBlock;
 import net.i2p.router.MessageHistory;
 import net.i2p.util.Log;
 

@@ -8,18 +8,17 @@ package net.i2p.router.client;
  *
  */
 
+import java.io.IOException;
+import java.util.Date;
+
+import net.i2p.data.LeaseSet;
+import net.i2p.data.i2cp.I2CPMessageException;
+import net.i2p.data.i2cp.RequestLeaseSetMessage;
 import net.i2p.router.Job;
 import net.i2p.router.JobImpl;
 import net.i2p.router.JobQueue;
-
-import net.i2p.data.LeaseSet;
-import net.i2p.data.i2cp.RequestLeaseSetMessage;
-import net.i2p.data.i2cp.I2CPMessageException;
-
 import net.i2p.util.Clock;
 import net.i2p.util.Log;
-import java.io.IOException;
-import java.util.Date;
 
 /**
  * Async job to walk the client through generating a lease set.  First sends it

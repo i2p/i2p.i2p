@@ -8,15 +8,14 @@ package net.i2p.router.client;
  *
  */
 
+import java.io.IOException;
+
 import net.i2p.data.i2cp.AbuseReason;
 import net.i2p.data.i2cp.AbuseSeverity;
-import net.i2p.data.i2cp.ReportAbuseMessage;
 import net.i2p.data.i2cp.I2CPMessageException;
-
+import net.i2p.data.i2cp.ReportAbuseMessage;
 import net.i2p.router.JobImpl;
 import net.i2p.util.Log;
-
-import java.io.IOException;
 
 /**
  * Async job to send an abuse message to the client

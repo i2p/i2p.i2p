@@ -1,14 +1,14 @@
 package net.i2p.router.networkdb.kademlia;
 
-import net.i2p.data.Hash;
-import net.i2p.util.Clock;
-
-import java.util.Set;
-import java.util.HashSet;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
+
+import net.i2p.data.Hash;
+import net.i2p.util.Clock;
 
 /**
  * Data related to a particular search

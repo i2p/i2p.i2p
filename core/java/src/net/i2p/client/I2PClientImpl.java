@@ -1,4 +1,5 @@
 package net.i2p.client;
+
 /*
  * free (adj.): unencumbered; not under the control of others
  * Written by jrandom in 2003 and released into the public domain 
@@ -37,7 +38,7 @@ class I2PClientImpl implements I2PClient {
         cert.setPayload(null);
         return createDestination(destKeyStream, cert);
     }
-    
+
     /** 
      * Create the destination with the given payload and write it out along with
      * the PrivateKey and SigningPrivateKey to the destKeyStream
@@ -48,28 +49,28 @@ class I2PClientImpl implements I2PClient {
         d.setCertificate(cert);
         PublicKey publicKey = new PublicKey();
         Object keypair[] = KeyGenerator.getInstance().generatePKIKeypair();
-        publicKey = (PublicKey)keypair[0];
-        PrivateKey privateKey = (PrivateKey)keypair[1];
-	Object signingKeys[] = KeyGenerator.getInstance().generateSigningKeypair();
-	SigningPublicKey signingPubKey = (SigningPublicKey)signingKeys[0];
-	SigningPrivateKey signingPrivKey = (SigningPrivateKey)signingKeys[1];
+        publicKey = (PublicKey) keypair[0];
+        PrivateKey privateKey = (PrivateKey) keypair[1];
+        Object signingKeys[] = KeyGenerator.getInstance().generateSigningKeypair();
+        SigningPublicKey signingPubKey = (SigningPublicKey) signingKeys[0];
+        SigningPrivateKey signingPrivKey = (SigningPrivateKey) signingKeys[1];
         d.setPublicKey(publicKey);
         d.setSigningPublicKey(signingPubKey);
-        
+
         d.writeBytes(destKeyStream);
         privateKey.writeBytes(destKeyStream);
         signingPrivKey.writeBytes(destKeyStream);
         destKeyStream.flush();
-        
+
         return d;
     }
-    
+
     /**
      * Create a new session (though do not connect it yet)
      *
      */
     public I2PSession createSession(InputStream destKeyStream, Properties options) throws I2PSessionException {
         //return new I2PSessionImpl(destKeyStream, options); // not thread safe
-	return new I2PSessionImpl2(destKeyStream, options); // thread safe
+        return new I2PSessionImpl2(destKeyStream, options); // thread safe
     }
 }

@@ -1,4 +1,5 @@
 package net.i2p.data.i2cp;
+
 /*
  * free (adj.): unencumbered; not under the control of others
  * Written by jrandom in 2003 and released into the public domain 
@@ -11,13 +12,12 @@ package net.i2p.data.i2cp;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Date;
 
 import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
-import net.i2p.util.Log;
 import net.i2p.util.Clock;
-
-import java.util.Date;
+import net.i2p.util.Log;
 
 /**
  * Tell the other side what time it is
@@ -27,23 +27,28 @@ public class SetDateMessage extends I2CPMessageImpl {
     private final static Log _log = new Log(SetDateMessage.class);
     public final static int MESSAGE_TYPE = 33;
     private Date _date;
-    
+
     public SetDateMessage() {
-	super();
-	setDate(new Date(Clock.getInstance().now()));
+        super();
+        setDate(new Date(Clock.getInstance().now()));
     }
-    
-    public Date getDate() { return _date; }
-    public void setDate(Date date) { _date = date; }
-    
+
+    public Date getDate() {
+        return _date;
+    }
+
+    public void setDate(Date date) {
+        _date = date;
+    }
+
     protected void doReadMessage(InputStream in, int size) throws I2CPMessageException, IOException {
-	try {
+        try {
             _date = DataHelper.readDate(in);
         } catch (DataFormatException dfe) {
             throw new I2CPMessageException("Unable to load the message data", dfe);
         }
     }
-    
+
     protected byte[] doWriteMessage() throws I2CPMessageException, IOException {
         if (_date == null)
             throw new I2CPMessageException("Unable to write out the message as there is not enough data");
@@ -55,19 +60,21 @@ public class SetDateMessage extends I2CPMessageImpl {
         }
         return os.toByteArray();
     }
-    
-    public int getType() { return MESSAGE_TYPE; }
-    
+
+    public int getType() {
+        return MESSAGE_TYPE;
+    }
+
     public boolean equals(Object object) {
-        if ( (object != null) && (object instanceof SetDateMessage) ) {
-	    SetDateMessage msg = (SetDateMessage)object;
-	    return DataHelper.eq(getDate(), msg.getDate());
+        if ((object != null) && (object instanceof SetDateMessage)) {
+            SetDateMessage msg = (SetDateMessage) object;
+            return DataHelper.eq(getDate(), msg.getDate());
         } else {
             return false;
         }
     }
-    
-    public String toString() { 
+
+    public String toString() {
         StringBuffer buf = new StringBuffer();
         buf.append("[SetDateMessage");
         buf.append("\n\tDate: ").append(getDate());

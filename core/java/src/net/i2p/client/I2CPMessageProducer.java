@@ -1,4 +1,5 @@
 package net.i2p.client;
+
 /*
  * free (adj.): unencumbered; not under the control of others
  * Written by jrandom in 2003 and released into the public domain 
@@ -40,7 +41,7 @@ import net.i2p.util.RandomSource;
 class I2CPMessageProducer {
     private final static Log _log = new Log(I2CPMessageProducer.class);
     private final static RandomSource _rand = RandomSource.getInstance();
-    
+
     /** 
      * Send all the messages that a client needs to send to a router to establish
      * a new session.  
@@ -58,68 +59,69 @@ class I2CPMessageProducer {
         msg.setSessionConfig(cfg);
         session.sendMessage(msg);
     }
-    
+
     /**
      * Send messages to the router destroying the session and disconnecting
      *
      */
     public void disconnect(I2PSessionImpl session) throws I2PSessionException {
-	DestroySessionMessage dmsg = new DestroySessionMessage();
-	dmsg.setSessionId(session.getSessionId());
-	session.sendMessage(dmsg);
-	// use DisconnectMessage only if we fail and drop connection... 
-	// todo: update the code to fire off DisconnectMessage on socket error
+        DestroySessionMessage dmsg = new DestroySessionMessage();
+        dmsg.setSessionId(session.getSessionId());
+        session.sendMessage(dmsg);
+        // use DisconnectMessage only if we fail and drop connection... 
+        // todo: update the code to fire off DisconnectMessage on socket error
         //DisconnectMessage msg = new DisconnectMessage();
         //msg.setReason("Destroy called");
         //session.sendMessage(msg);
     }
-    
+
     /**
      * Package up and send the payload to the router for delivery
      *
      */
-    public void sendMessage(I2PSessionImpl session, Destination dest, long nonce, byte[] payload, SessionTag tag, SessionKey key, Set tags, SessionKey newKey) throws I2PSessionException {
+    public void sendMessage(I2PSessionImpl session, Destination dest, long nonce, byte[] payload, SessionTag tag,
+                            SessionKey key, Set tags, SessionKey newKey) throws I2PSessionException {
         SendMessageMessage msg = new SendMessageMessage();
         msg.setDestination(dest);
         msg.setSessionId(session.getSessionId());
-	msg.setNonce(nonce);
+        msg.setNonce(nonce);
         Payload data = createPayload(dest, payload, tag, key, tags, newKey);
         msg.setPayload(data);
         session.sendMessage(msg);
     }
-    
+
     /**
      * Create a new signed payload and send it off to the destination
      *
      */
-    private Payload createPayload(Destination dest, byte[] payload, SessionTag tag, SessionKey key, Set tags, SessionKey newKey) throws I2PSessionException {
-	if (dest == null)
-	    throw new I2PSessionException("No destination specified");
-	if (payload == null)
-	    throw new I2PSessionException("No payload specified");
+    private Payload createPayload(Destination dest, byte[] payload, SessionTag tag, SessionKey key, Set tags,
+                                  SessionKey newKey) throws I2PSessionException {
+        if (dest == null) throw new I2PSessionException("No destination specified");
+        if (payload == null) throw new I2PSessionException("No payload specified");
 
-	Payload data = new Payload();
-	// randomize padding
-	int size = payload.length + RandomSource.getInstance().nextInt(1024);
-	byte encr[] = ElGamalAESEngine.encrypt(payload, dest.getPublicKey(), key, tags, tag, newKey, size); 
-	// yes, in an intelligent component, newTags would be queued for confirmation along with key, and
-	// generateNewTags would only generate tags if necessary
-	
-	data.setEncryptedData(encr);
-	_log.debug("Encrypting the payload to public key " + dest.getPublicKey().toBase64() + "\nPayload: " + data.calculateHash());
-	return data;
+        Payload data = new Payload();
+        // randomize padding
+        int size = payload.length + RandomSource.getInstance().nextInt(1024);
+        byte encr[] = ElGamalAESEngine.encrypt(payload, dest.getPublicKey(), key, tags, tag, newKey, size);
+        // yes, in an intelligent component, newTags would be queued for confirmation along with key, and
+        // generateNewTags would only generate tags if necessary
+
+        data.setEncryptedData(encr);
+        _log.debug("Encrypting the payload to public key " + dest.getPublicKey().toBase64() + "\nPayload: "
+                   + data.calculateHash());
+        return data;
     }
-    
+
     private static Set generateNewTags() {
-	Set tags = new HashSet();
-	for (int i = 0; i < 10; i++) {
-	    byte tag[] = new byte[SessionTag.BYTE_LENGTH];
-	    RandomSource.getInstance().nextBytes(tag);
-	    tags.add(new SessionTag(tag));
-	}
-	return tags;
+        Set tags = new HashSet();
+        for (int i = 0; i < 10; i++) {
+            byte tag[] = new byte[SessionTag.BYTE_LENGTH];
+            RandomSource.getInstance().nextBytes(tag);
+            tags.add(new SessionTag(tag));
+        }
+        return tags;
     }
-    
+
     /**
      * Send an abuse message to the router
      */
@@ -136,18 +138,19 @@ class I2CPMessageProducer {
         msg.setSeverity(sv);
         session.sendMessage(msg);
     }
-    
+
     /**
      * Create a new signed leaseSet in response to a request to do so and send it
      * to the router
      * 
      */
-    public void createLeaseSet(I2PSessionImpl session, LeaseSet leaseSet, SigningPrivateKey signingPriv, PrivateKey priv) throws I2PSessionException {
+    public void createLeaseSet(I2PSessionImpl session, LeaseSet leaseSet, SigningPrivateKey signingPriv, PrivateKey priv)
+                                                                                                                         throws I2PSessionException {
         CreateLeaseSetMessage msg = new CreateLeaseSetMessage();
-	msg.setLeaseSet(leaseSet);
-	msg.setPrivateKey(priv);
-	msg.setSigningPrivateKey(signingPriv);
-	msg.setSessionId(session.getSessionId());
+        msg.setLeaseSet(leaseSet);
+        msg.setPrivateKey(priv);
+        msg.setSigningPrivateKey(signingPriv);
+        msg.setSessionId(session.getSessionId());
         session.sendMessage(msg);
     }
 }

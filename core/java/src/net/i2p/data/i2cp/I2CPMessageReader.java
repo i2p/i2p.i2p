@@ -1,4 +1,5 @@
 package net.i2p.data.i2cp;
+
 /*
  * free (adj.): unencumbered; not under the control of others
  * Written by jrandom in 2003 and released into the public domain 
@@ -29,40 +30,56 @@ public class I2CPMessageReader {
     private I2CPMessageEventListener _listener;
     private I2CPMessageReaderRunner _reader;
     private Thread _readerThread;
-    
+
     public I2CPMessageReader(InputStream stream, I2CPMessageEventListener lsnr) {
         _stream = stream;
         setListener(lsnr);
         _reader = new I2CPMessageReaderRunner();
         _readerThread = new I2PThread(_reader);
-	_readerThread.setDaemon(true);
-	_readerThread.setName("I2CP Reader");
+        _readerThread.setDaemon(true);
+        _readerThread.setName("I2CP Reader");
     }
-    
-    public void setListener(I2CPMessageEventListener lsnr) { _listener = lsnr; }
-    public I2CPMessageEventListener getListener() { return _listener; }
-    
+
+    public void setListener(I2CPMessageEventListener lsnr) {
+        _listener = lsnr;
+    }
+
+    public I2CPMessageEventListener getListener() {
+        return _listener;
+    }
+
     /**
      * Instruct the reader to begin reading messages off the stream
      *
      */
-    public void startReading() { _readerThread.start(); }    
+    public void startReading() {
+        _readerThread.start();
+    }
+
     /**
      * Have the already started reader pause its reading indefinitely
      *
      */
-    public void pauseReading() { _reader.pauseRunner(); }
+    public void pauseReading() {
+        _reader.pauseRunner();
+    }
+
     /**
      * Resume reading after a pause
      *
      */
-    public void resumeReading() { _reader.resumeRunner(); }
+    public void resumeReading() {
+        _reader.resumeRunner();
+    }
+
     /**
      * Cancel reading.  
      *
      */
-    public void stopReading() { _reader.cancelRunner(); }
-    
+    public void stopReading() {
+        _reader.cancelRunner();
+    }
+
     /**
      * Defines the different events the reader produces while reading the stream
      *
@@ -74,41 +91,52 @@ public class I2CPMessageReader {
          *
          */
         public void messageReceived(I2CPMessageReader reader, I2CPMessage message);
+
         /**
          * Notify the listener that an exception was thrown while reading from the given
          * reader
          *
          */
         public void readError(I2CPMessageReader reader, Exception error);
+
         /**
          * Notify the listener that the stream the given reader was running off
          * closed
          *
          */
         public void disconnected(I2CPMessageReader reader);
-    }   
-    
+    }
+
     private class I2CPMessageReaderRunner implements Runnable {
-        private boolean _doRun; 
+        private boolean _doRun;
         private boolean _stayAlive;
+
         public I2CPMessageReaderRunner() {
             _doRun = true;
             _stayAlive = true;
         }
-        public void pauseRunner() { _doRun = false; }
-        public void resumeRunner() { _doRun = true; }
-        public void cancelRunner() { 
+
+        public void pauseRunner() {
             _doRun = false;
-            _stayAlive = false; 
-	    if (_stream != null) {
-		try {
-		    _stream.close();
-		} catch (IOException ioe) {
-		    _log.error("Error closing the stream", ioe);
-		}
-	    }
-	    _stream = null;
         }
+
+        public void resumeRunner() {
+            _doRun = true;
+        }
+
+        public void cancelRunner() {
+            _doRun = false;
+            _stayAlive = false;
+            if (_stream != null) {
+                try {
+                    _stream.close();
+                } catch (IOException ioe) {
+                    _log.error("Error closing the stream", ioe);
+                }
+            }
+            _stream = null;
+        }
+
         public void run() {
             while (_stayAlive) {
                 while (_doRun) {
@@ -116,27 +144,30 @@ public class I2CPMessageReader {
                     try {
                         I2CPMessage msg = I2CPMessageHandler.readMessage(_stream);
                         if (msg != null) {
-			    _log.debug("Before handling the newly received message");
+                            _log.debug("Before handling the newly received message");
                             _listener.messageReceived(I2CPMessageReader.this, msg);
-			    _log.debug("After handling the newly received message");
-			}
+                            _log.debug("After handling the newly received message");
+                        }
                     } catch (I2CPMessageException ime) {
-			_log.error("Error handling message", ime);
+                        _log.error("Error handling message", ime);
                         _listener.readError(I2CPMessageReader.this, ime);
-			cancelRunner();
+                        cancelRunner();
                     } catch (IOException ioe) {
-			_log.error("IO Error handling message", ioe);
+                        _log.error("IO Error handling message", ioe);
                         _listener.disconnected(I2CPMessageReader.this);
                         cancelRunner();
                     } catch (Throwable t) {
-			_log.log(Log.CRIT, "Unhandled error reading I2CP stream", t);
-			_listener.disconnected(I2CPMessageReader.this);
-			cancelRunner();
-		    }
+                        _log.log(Log.CRIT, "Unhandled error reading I2CP stream", t);
+                        _listener.disconnected(I2CPMessageReader.this);
+                        cancelRunner();
+                    }
                 }
                 if (!_doRun) {
                     // pause .5 secs when we're paused
-                    try { Thread.sleep(500); } catch (InterruptedException ie) {}
+                    try {
+                        Thread.sleep(500);
+                    } catch (InterruptedException ie) {
+                    }
                 }
             }
             // boom bye bye bad bwoy

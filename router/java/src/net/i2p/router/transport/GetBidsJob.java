@@ -10,14 +10,14 @@ package net.i2p.router.transport;
 
 import java.util.List;
 
+import net.i2p.data.Hash;
 import net.i2p.router.JobImpl;
 import net.i2p.router.JobQueue;
 import net.i2p.router.MessageSelector;
 import net.i2p.router.OutNetMessage;
 import net.i2p.router.ProfileManager;
-import net.i2p.router.Shitlist;
 import net.i2p.router.Router;
-import net.i2p.data.Hash;
+import net.i2p.router.Shitlist;
 import net.i2p.util.Log;
 
 /**

@@ -8,15 +8,15 @@ package net.i2p.phttprelay;
  *
  */
 
-import net.i2p.util.Log;
-
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.ServletConfig;
-import javax.servlet.ServletException;
-
 import java.io.File;
 import java.io.IOException;
+
+import javax.servlet.ServletConfig;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+
+import net.i2p.util.Log;
 
 abstract class PHTTPRelayServlet extends HttpServlet {
     private Log _log = new Log(getClass());
