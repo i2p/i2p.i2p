@@ -4,6 +4,7 @@
     <target name="build" depends="builddep, jar" />
     <target name="builddep">
         <ant dir="../../ministreaming/java/" target="build" />
+        <ant dir="../../jetty/" target="build" />
 	<!-- ministreaming will build core -->
     </target>
     <target name="compile">
@@ -15,7 +16,7 @@
             destdir="./build/obj" 
             classpath="../../../core/java/build/i2p.jar:../../ministreaming/java/build/mstreaming.jar" />
     </target>
-    <target name="jar" depends="compile">
+    <target name="jar" depends="builddep, compile">
         <jar destfile="./build/i2ptunnel.jar" basedir="./build/obj" includes="**/*.class">
             <manifest>
                 <attribute name="Main-Class" value="net.i2p.i2ptunnel.I2PTunnel" />
