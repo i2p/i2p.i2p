@@ -127,20 +127,6 @@ tunnels.depthOutbound=2
 # You should not change this setting unless you really know what you're doing
 tunnels.tunnelDuration=600000
 
-# Max waiting jobs
-# If your router is getting heavily overloaded (due to slow CPU or excess network
-# activity), your router's performance will seriously degrade, increasing its 
-# load further and delaying any messages sent through your router.  The max waiting
-# jobs configuration parameter is a throttle, saying that if there are more than
-# that many 'jobs' that want to run ASAP at any given time, additional jobs may
-# be summarily dropped.  That will reduce your load and cause others to reduce
-# their dependence on you (further reducing your load).  The default value of 40
-# should be sufficient, but may be increased if desired.  Less than 20 is not
-# recommended, as certain normal events can queue up 10 or so jobs at a time
-# (all of which only take a few milliseconds).  Leave this alone unless you know
-# what you're doing
-router.maxWaitingJobs=40
-
 # shutdown password
 # uncomment the following (after changing the value) to allow shutting down the 
 # router through the web interface (using the form provided, or directly via
