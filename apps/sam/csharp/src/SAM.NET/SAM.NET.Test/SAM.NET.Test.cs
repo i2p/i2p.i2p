@@ -35,14 +35,12 @@ namespace SAM.NET
 			while (session2.getStreams().Count == 0) Thread.Sleep(1000);
 
 			Thread.Sleep(1000);
-			while (true) {}
 			foreach (SAMStream stream in session2.getStreams().Values) 
 			{
 				Console.WriteLine("Text received on " + stream.getID() + " at " + DateTime.Now.ToLongTimeString());
 				Console.WriteLine(Encoding.ASCII.GetString(stream.ReadToEnd()));
 				stream.Close();
 			}
-			while (true) {}
 
 			stream1.Close();
 			connection1.Close();
