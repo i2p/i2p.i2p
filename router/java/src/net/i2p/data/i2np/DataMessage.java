@@ -27,6 +27,8 @@ public class DataMessage extends I2NPMessageImpl {
     public final static int MESSAGE_TYPE = 20;
     private byte _data[];
     
+    private static final int MAX_SIZE = 64*1024;
+    
     public DataMessage(I2PAppContext context) {
         super(context);
         _data = null;
@@ -41,6 +43,8 @@ public class DataMessage extends I2NPMessageImpl {
         if (type != MESSAGE_TYPE) throw new I2NPMessageException("Message type is incorrect for this message");
         try {
             int size = (int)DataHelper.readLong(in, 4);
+            if ( (size <= 0) || (size > MAX_SIZE) )
+                throw new I2NPMessageException("wtf, size out of range?  " + size);
             _data = new byte[size];
             int read = read(in, _data);
             if (read != size)
