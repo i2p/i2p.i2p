@@ -130,8 +130,12 @@ public class PoolingTunnelManagerFacade implements TunnelManagerFacade {
     public void createTunnels(Destination destination, ClientTunnelSettings clientSettings, long timeoutMs) {
         ClientTunnelPool pool = _pool.getClientPool(destination);
         if (pool != null) {
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("createTunnels for destination " + destination.calculateHash().toBase64() + " where the client pool exists");
             pool.setClientSettings(clientSettings);
         } else {
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("createTunnels for destination " + destination.calculateHash().toBase64() + " where the client pool does NOT exist");
             _pool.createClientPool(destination, clientSettings);
         }
     }

@@ -53,11 +53,14 @@ class ClientLeaseSetManagerJob extends JobImpl {
         _lastCreated = -1;
     }
     
-    public void forceRequestLease() { _forceRequestLease = true; }
+    public void forceRequestLease() { 
+        _currentLeaseSet = null;
+        _forceRequestLease = true; 
+    }
     
     public String getName() { return "Manage Client Lease Set"; }
     public void runJob() {
-        if (_pool.isStopped()) {
+        if ((!_forceRequestLease) && (_pool.isStopped()) ) {
             if ( (_pool.getInactiveInboundTunnelIds().size() <= 0) &&
                  (_pool.getInboundTunnelIds().size() <= 0) ) {
                 if (_log.shouldLog(Log.INFO))

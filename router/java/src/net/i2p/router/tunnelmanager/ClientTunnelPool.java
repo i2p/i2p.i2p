@@ -43,32 +43,43 @@ class ClientTunnelPool {
     }
     
     public void startPool() {
-        if (!_isStopped) {
-            if (_log.shouldLog(Log.WARN))
-                _log.warn("Pool " + _poolId +": Not starting the pool /again/ (its already running)");
-            return;
-        } else {
+        //if (!_isStopped) {
+        //    if (_log.shouldLog(Log.ERROR))
+        //        _log.error("Pool " + _poolId +": Not starting the pool /again/ (its already running)");
+        //    return;
+        //} else {
             if (_log.shouldLog(Log.INFO))
                 _log.info("Pool " + _poolId +": Starting up the pool ");
-        }
+        //}
         _isStopped = false;
+        
         if (_mgrJob == null) {
             _mgrJob = new ClientTunnelPoolManagerJob(_context, _pool, this);
             _context.jobQueue().addJob(_mgrJob);
+        } else {
+            _mgrJob.getTiming().setStartAfter(_context.clock().now());
+            _context.jobQueue().addJob(_mgrJob);
         }
+        
         if (_leaseMgrJob == null) {
             _leaseMgrJob = new ClientLeaseSetManagerJob(_context, this);
             _context.jobQueue().addJob(_leaseMgrJob);
         } else {
             // we just restarted, so make sure we ask for a new leaseSet ASAP
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("restarting the client pool and requesting a new leaseSet");
             _leaseMgrJob.forceRequestLease();
             _leaseMgrJob.getTiming().setStartAfter(_context.clock().now());
             _context.jobQueue().addJob(_leaseMgrJob);
         }
+        
         if (_tunnelExpirationJob == null) {
             _tunnelExpirationJob = new ClientTunnelPoolExpirationJob(_context, this, _pool);
             _context.jobQueue().addJob(_tunnelExpirationJob);
-        }
+        } else {
+            _tunnelExpirationJob.getTiming().setStartAfter(_context.clock().now());
+            _context.jobQueue().addJob(_tunnelExpirationJob);
+        } 
     }
     public void stopPool() { _isStopped = true; }
     public boolean isStopped() { return _isStopped; }
