@@ -51,6 +51,8 @@ class ClientLeaseSetManagerJob extends JobImpl {
         _pool = pool;
         _currentLeaseSet = null;
         _lastCreated = -1;
+        context.statManager().createRateStat("client.leaseSetExpired", "How long ago did our leaseSet expire?", "ClientMessages", new long[] { 60*60*1000l, 24*60*60*1000l });
+
     }
     
     public void forceRequestLease() { 
@@ -106,6 +108,13 @@ class ClientLeaseSetManagerJob extends JobImpl {
             _log.warn("Insufficient safe inbound tunnels exist for the client (" + available 
                       + " available, " + _pool.getClientSettings().getNumInboundTunnels() 
                       + " required) - no leaseSet requested");
+            if (_currentLeaseSet != null) {
+                long howOld = getContext().clock().now() - _currentLeaseSet.getEarliestLeaseDate();
+                if (howOld > 0) {
+                    // expired
+                    getContext().statManager().addRateData("client.leaseSetExpired", howOld, 0);
+                }
+            }
         }
         requeue(RECHECK_DELAY);
     }

@@ -1,4 +1,9 @@
-$Id: history.txt,v 1.116 2004/12/20 00:14:56 jrandom Exp $
+$Id: history.txt,v 1.117 2004/12/21 11:32:50 jrandom Exp $
+
+* 2004-12-21  0.4.2.5 released
+
+2004-12-21  jrandom
+    * Track a new stat for expired client leases (client.leaseSetExpired).
 
 2004-12-21  jrandom
     * Cleaned up the postinstall/startup scripts a bit more to handle winME,
