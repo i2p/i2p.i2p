@@ -4110,6 +4110,8 @@ def main():
             err("getref: bad argument count")
             usage()
 
+        res = client.getref()
+
         if argc == 1:
             # try to open output file
             path = args[0]
@@ -4121,7 +4123,6 @@ def main():
         else:
             outfile = sys.stdout
 
-        res = client.getref()
         if res == None:
             err("Failed to retrieve node ref")
             sys.exit(1)
