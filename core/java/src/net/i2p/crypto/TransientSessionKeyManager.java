@@ -33,7 +33,7 @@ import net.i2p.util.Log;
  *
  */
 class TransientSessionKeyManager extends SessionKeyManager {
-    private final static Log _log = new Log(TransientSessionKeyManager.class);
+    private Log _log;
     private Map _outboundSessions; // PublicKey --> OutboundSession
     private Map _inboundTagSets; // SessionTag --> TagSet
 
@@ -61,10 +61,11 @@ class TransientSessionKeyManager extends SessionKeyManager {
      */
     public TransientSessionKeyManager(I2PAppContext context) {
         super(context);
+        _log = context.logManager().getLog(TransientSessionKeyManager.class);
         _outboundSessions = new HashMap(64);
         _inboundTagSets = new HashMap(1024);
     }
-    private TransientSessionKeyManager() { super(null); }
+    private TransientSessionKeyManager() { this(null); }
 
     /** TagSet */
     protected Set getInboundTagSets() {
@@ -81,8 +82,9 @@ class TransientSessionKeyManager extends SessionKeyManager {
     }
 
     protected void setData(Set inboundTagSets, Set outboundSessions) {
-        _log.info("Loading " + inboundTagSets.size() + " inbound tag sets, and " + outboundSessions.size()
-                  + " outbound sessions");
+        if (_log.shouldLog(Log.INFO))
+            _log.info("Loading " + inboundTagSets.size() + " inbound tag sets, and " 
+                      + outboundSessions.size() + " outbound sessions");
         Map tagSets = new HashMap(inboundTagSets.size());
         for (Iterator iter = inboundTagSets.iterator(); iter.hasNext();) {
             TagSet ts = (TagSet) iter.next();
@@ -116,8 +118,10 @@ class TransientSessionKeyManager extends SessionKeyManager {
         if (sess == null) return null;
         long now = Clock.getInstance().now();
         if (sess.getEstablishedDate() < now - SESSION_LIFETIME_MAX_MS) {
-            _log.info("Expiring old session key established on " + new Date(sess.getEstablishedDate())
-                      + " with target " + target);
+            if (_log.shouldLog(Log.INFO))
+                _log.info("Expiring old session key established on " 
+                          + new Date(sess.getEstablishedDate())
+                          + " with target " + target);
             return null;
         } else {
             return sess.getCurrentKey();
@@ -145,15 +149,18 @@ class TransientSessionKeyManager extends SessionKeyManager {
     public SessionTag consumeNextAvailableTag(PublicKey target, SessionKey key) {
         OutboundSession sess = getSession(target);
         if (sess == null) {
-            _log.debug("No session for " + target);
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("No session for " + target);
             return null;
         }
         if (sess.getCurrentKey().equals(key)) {
             SessionTag nxt = sess.consumeNext();
-            _log.debug("Tag consumed: " + nxt);
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Tag consumed: " + nxt);
             return nxt;
         } else {
-            _log.debug("Key does not match existing key, no tag");
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Key does not match existing key, no tag");
             return null;
         }
     }
@@ -202,7 +209,8 @@ class TransientSessionKeyManager extends SessionKeyManager {
         sess.setCurrentKey(key);
         TagSet set = new TagSet(sessionTags, key);
         sess.addTags(set);
-        _log.debug("Tags delivered to set " + set + " on session " + sess);
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("Tags delivered to set " + set + " on session " + sess);
     }
 
     /**
@@ -223,7 +231,8 @@ class TransientSessionKeyManager extends SessionKeyManager {
         TagSet tagSet = new TagSet(sessionTags, key);
         for (Iterator iter = sessionTags.iterator(); iter.hasNext();) {
             SessionTag tag = (SessionTag) iter.next();
-            _log.debug("Receiving tag " + tag + " for key " + key);
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Receiving tag " + tag + " for key " + key);
             synchronized (_inboundTagSets) {
                 _inboundTagSets.put(tag, tagSet);
             }
@@ -232,7 +241,8 @@ class TransientSessionKeyManager extends SessionKeyManager {
             // todo: make this limit the tags by sessionKey and actually enforce the limit!
             int overage = _inboundTagSets.size() - MAX_INBOUND_SESSION_TAGS;
             if (overage > 0) {
-                _log.error("TOO MANY SESSION TAGS! " + (_inboundTagSets.size()));
+                if (_log.shouldLog(Log.ERROR))
+                    _log.error("TOO MANY SESSION TAGS! " + (_inboundTagSets.size()));
             }
         }
 
@@ -250,13 +260,15 @@ class TransientSessionKeyManager extends SessionKeyManager {
         synchronized (_inboundTagSets) {
             TagSet tagSet = (TagSet) _inboundTagSets.remove(tag);
             if (tagSet == null) {
-                _log.debug("Cannot consume tag " + tag + " as it is not known");
+                if (_log.shouldLog(Log.DEBUG))
+                    _log.debug("Cannot consume tag " + tag + " as it is not known");
                 return null;
             } else {
                 tagSet.consume(tag);
             }
             SessionKey key = tagSet.getAssociatedKey();
-            _log.debug("Consuming tag " + tag + " for sessionKey " + key);
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Consuming tag " + tag + " for sessionKey " + key);
             return key;
         }
     }
@@ -370,7 +382,7 @@ class TransientSessionKeyManager extends SessionKeyManager {
         return buf.toString();
     }
 
-    static class OutboundSession {
+    class OutboundSession {
         private PublicKey _target;
         private SessionKey _currentKey;
         private long _established;
@@ -414,7 +426,9 @@ class TransientSessionKeyManager extends SessionKeyManager {
                         TagSet set = (TagSet) sets.get(i);
                         dropped += set.getTags().size();
                     }
-                    _log.info("Rekeyed from " + _currentKey + " to " + key + ": dropping " + dropped + " session tags");
+                    if (_log.shouldLog(Log.INFO))
+                        _log.info("Rekeyed from " + _currentKey + " to " + key 
+                                  + ": dropping " + dropped + " session tags");
                 }
             }
             _currentKey = key;
@@ -456,7 +470,8 @@ class TransientSessionKeyManager extends SessionKeyManager {
                         SessionTag tag = set.consumeNext();
                         if (tag != null) return tag;
                     } else {
-                        _log.info("TagSet from " + new Date(set.getDate()) + " expired");
+                        if (_log.shouldLog(Log.INFO))
+                            _log.info("TagSet from " + new Date(set.getDate()) + " expired");
                     }
                     _tagSets.remove(0);
                 }

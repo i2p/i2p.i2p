@@ -36,8 +36,7 @@ import net.i2p.I2PAppContext;
  *
  */
 public class PersistentSessionKeyManager extends TransientSessionKeyManager {
-    private final static Log _log = new Log(PersistentSessionKeyManager.class);
-
+    private Log _log;
     private Object _yk = YKGenerator.class;
 
     
@@ -49,9 +48,10 @@ public class PersistentSessionKeyManager extends TransientSessionKeyManager {
      */
     public PersistentSessionKeyManager(I2PAppContext context) {
         super(context);
+        _log = context.logManager().getLog(PersistentSessionKeyManager.class);
     }
     private PersistentSessionKeyManager() {
-        super(null);
+        this(null);
     }
     /**
      * Write the session key data to the given stream
@@ -60,8 +60,9 @@ public class PersistentSessionKeyManager extends TransientSessionKeyManager {
     public void saveState(OutputStream out) throws IOException, DataFormatException {
         Set tagSets = getInboundTagSets();
         Set sessions = getOutboundSessions();
-        _log.info("Saving state with " + tagSets.size() + " inbound tagSets and " + sessions.size()
-                  + " outbound sessions");
+        if (_log.shouldLog(Log.INFO))
+            _log.info("Saving state with " + tagSets.size() + " inbound tagSets and " 
+                      + sessions.size() + " outbound sessions");
 
         DataHelper.writeLong(out, 4, tagSets.size());
         for (Iterator iter = tagSets.iterator(); iter.hasNext();) {
@@ -93,8 +94,9 @@ public class PersistentSessionKeyManager extends TransientSessionKeyManager {
             sessions.add(sess);
         }
 
-        _log.info("Loading state with " + tagSets.size() + " inbound tagSets and " + sessions.size()
-                  + " outbound sessions");
+        if (_log.shouldLog(Log.INFO))
+            _log.info("Loading state with " + tagSets.size() + " inbound tagSets and " 
+                      + sessions.size() + " outbound sessions");
         setData(tagSets, sessions);
     }
 
@@ -161,6 +163,7 @@ public class PersistentSessionKeyManager extends TransientSessionKeyManager {
 
     public static void main(String args[]) {
         I2PAppContext ctx = new I2PAppContext();
+        Log log = ctx.logManager().getLog(PersistentSessionKeyManager.class);
         PersistentSessionKeyManager mgr = (PersistentSessionKeyManager)ctx.sessionKeyManager();
         try {
             mgr.loadState(new FileInputStream("sessionKeys.dat"));
@@ -169,13 +172,13 @@ public class PersistentSessionKeyManager extends TransientSessionKeyManager {
             fos.write(state.getBytes());
             fos.close();
             int expired = mgr.aggressiveExpire();
-            _log.error("Expired: " + expired);
+            log.error("Expired: " + expired);
             String stateAfter = mgr.renderStatusHTML();
             FileOutputStream fos2 = new FileOutputStream("sessionKeysAfterExpire.html");
             fos2.write(stateAfter.getBytes());
             fos2.close();
         } catch (Throwable t) {
-            _log.error("Error loading/storing sessionKeys", t);
+            log.error("Error loading/storing sessionKeys", t);
         }
         try {
             Thread.sleep(3000);
