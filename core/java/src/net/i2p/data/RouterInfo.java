@@ -322,6 +322,22 @@ public class RouterInfo extends DataStructureImpl {
 
         return true;
     }
+    
+    
+    /**
+     * Pull the first workable target address for the given transport
+     *
+     */
+    public RouterAddress getTargetAddress(String transportStyle) {
+        synchronized (_addresses) {
+            for (Iterator iter = _addresses.iterator(); iter.hasNext(); ) {
+                RouterAddress addr = (RouterAddress)iter.next();
+                if (addr.getTransportStyle().equals(transportStyle)) 
+                    return addr;
+            }
+        }
+        return null;
+    }
 
     /**
      * Actually validate the signature

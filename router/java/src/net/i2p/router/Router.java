@@ -30,6 +30,7 @@ import net.i2p.crypto.DHSessionKeyBuilder;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
 import net.i2p.data.RouterInfo;
+import net.i2p.data.SigningPrivateKey;
 import net.i2p.data.i2np.GarlicMessage;
 import net.i2p.data.i2np.TunnelMessage;
 import net.i2p.router.message.GarlicMessageHandler;
@@ -220,6 +221,38 @@ public class Router {
     }
     
     public boolean isAlive() { return _isAlive; }
+
+    /**
+     * Rebuild and republish our routerInfo since something significant 
+     * has changed.
+     */
+    public void rebuildRouterInfo() {
+        if (_log.shouldLog(Log.INFO))
+            _log.info("Rebuilding new routerInfo");
+        
+        RouterInfo ri = null;
+        if (_routerInfo != null)
+            ri = new RouterInfo(_routerInfo);
+        else
+            ri = new RouterInfo();
+        
+        try {
+            ri.setPublished(_context.clock().now());
+            Properties stats = _context.statPublisher().publishStatistics();
+            ri.setOptions(stats);
+            ri.setAddresses(_context.commSystem().createAddresses());
+            SigningPrivateKey key = _context.keyManager().getSigningPrivateKey();
+            if (key == null) {
+                _log.log(Log.CRIT, "Internal error - signing private key not known?  wtf");
+                return;
+            }
+            ri.sign(key);
+            setRouterInfo(ri);
+            _context.netDb().publish(ri);
+        } catch (DataFormatException dfe) {
+            _log.log(Log.CRIT, "Internal error - unable to sign our own address?!", dfe);
+        }
+    }
     
     /**
      * coallesce the stats framework every minute

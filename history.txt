@@ -1,4 +1,20 @@
-$Id: history.txt,v 1.18 2004/09/16 18:55:12 jrandom Exp $
+$Id: history.txt,v 1.19 2004/09/21 19:10:26 jrandom Exp $
+
+2004-09-26  jrandom
+    * Complete rewrite of the TCP transport with IP autodetection and 
+      low CPU overhead reconnections.  More concise connectivity errors
+      are listed on the /oldconsole.jsp as well.  The IP autodetection works
+      by listening to the first person who tells you what your IP address is
+      when you have not defined one yourself and you have no other TCP 
+      connections.
+    * Update to the I2NP message format to add transparent verification at
+      the I2NP level (beyond standard TCP verification).
+    * Remove a potential weakness in our AESEngine's safeEncrypt and safeDecrypt
+      implementation (rather than verifying with E(H(key)), we now verify with
+      E(H(iv))).
+    * The above changes are NOT BACKWARDS COMPATIBLE.
+    * Removed all of the old unused PHTTP code.
+    * Refactor various methods and clean up some javadoc.
 
 2004-09-21  jrandom
     * Have two tiers of hosts.txt files - the standard "hosts.txt" and

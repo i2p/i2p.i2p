@@ -1,968 +1,559 @@
 package net.i2p.router.transport.tcp;
-/*
- * free (adj.): unencumbered; not under the control of others
- * Written by jrandom in 2003 and released into the public domain
- * with no warranty of any kind, either expressed or implied.
- * It probably won't make your computer catch on fire, or eat
- * your children, but it might.  Use at your own risk.
- *
- */
 
-import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.Set;
+
+import java.text.SimpleDateFormat;
 
 import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
 import net.i2p.data.RouterAddress;
 import net.i2p.data.RouterIdentity;
 import net.i2p.data.RouterInfo;
-import net.i2p.data.SigningPrivateKey;
-import net.i2p.router.JobImpl;
 import net.i2p.router.OutNetMessage;
 import net.i2p.router.RouterContext;
-import net.i2p.router.transport.TransportBid;
 import net.i2p.router.transport.TransportImpl;
+import net.i2p.router.transport.TransportBid;
 import net.i2p.util.I2PThread;
 import net.i2p.util.Log;
 
 /**
- * Defines a way to send a message to another peer and start listening for messages
+ * TCP Transport implementation, coordinating the connections 
+ * between peers and the transmission of messages across those 
+ * connections.
  *
  */
 public class TCPTransport extends TransportImpl {
-    private Log _log;
-    public final static String STYLE = "TCP";
-    private List _listeners;
-    /** RouterIdentity to List of TCPConnections */
-    private Map _connections;
-    /** TCPAddress (w/ IP not hostname) to List of TCPConnections */
-    private Map _connectionAddresses;
-    private String _listenHost;
-    private int _listenPort;
-    private RouterAddress _address;
-    private TCPAddress _tcpAddress;
-    private boolean _listenAddressIsValid;
-    /** H(ident) to PendingMessages for unestablished connections */
-    private Map _msgs; 
-    private boolean _running;
+    private final Log _log;
+    /** Our local TCP address, if known */
+    private TCPAddress _myAddress;
+    /** How we receive connections */
+    private TCPListener _listener;
+    /** Coordinate the agreed connection tags */
+    private ConnectionTagManager _tagManager;
     
-    private int _numConnectionEstablishers;
-    private final static String PROP_ESTABLISHERS = "i2np.tcp.concurrentEstablishers";
-    private final static int DEFAULT_ESTABLISHERS = 3;
+    /** H(RouterIdentity) to TCPConnection for fully established connections */
+    private Map _connectionsByIdent;
+    /** TCPAddress::toString() to TCPConnection for fully established connections */
+    private Map _connectionsByAddress;
     
-    public static String PROP_LISTEN_IS_VALID = "i2np.tcp.listenAddressIsValid";
+    /** H(RouterIdentity) for not yet established connections */
+    private Set _pendingConnectionsByIdent;
+    /** TCPAddress::toString() for not yet established connections */
+    private Set _pendingConnectionsByAddress;
     
-    /**
-     * pre 1.4 java doesn't have a way to timeout the creation of sockets (which
-     * can take up to 3 minutes), so we do it on a seperate thread and wait for
-     * either that thread to complete, or for this timeout to be reached.
+    /** 
+     * H(RouterIdentity) to List of OutNetMessage for messages targetting 
+     * not yet established connections
      */
-    final static long SOCKET_CREATE_TIMEOUT = 10*1000;
+    private Map _pendingMessages;
+    /** 
+     * Object to lock on when touching the _connection maps or 
+     * the pendingMessages map.  In addition, this lock is notified whenever
+     * a brand new peer is added to the pendingMessages map
+     */
+    private Object _connectionLock;
+    /** 
+     * List of the most recent connection establishment error messages (where the 
+     * message includes the time) 
+     */
+    private List _lastConnectionErrors;
+    /** All of the operating TCPConnectionEstablisher objects */
+    private List _connectionEstablishers;
     
-    public TCPTransport(RouterContext context, RouterAddress address) {
+    /** What is this transport's identifier? */
+    public static final String STYLE = "TCP";
+    /** Should the TCP listener bind to all interfaces? */
+    public static final String BIND_ALL_INTERFACES = "i2np.tcp.bindAllInterfaces";
+    /** What host/ip should we be addressed as? */
+    public static final String LISTEN_ADDRESS = "i2np.tcp.hostname";
+    /** What port number should we listen to? */
+    public static final String LISTEN_PORT = "i2np.tcp.port";
+    /** Should we allow the transport to listen on a non routable address? */
+    public static final String LISTEN_ALLOW_LOCAL = "i2np.tcp.allowLocal";
+    /** Keep track of the last 10 error messages wrt establishing a connection */
+    public static final int MAX_ERR_MESSAGES = 10;
+    public static final String PROP_ESTABLISHERS = "i2np.tcp.concurrentEstablishers";
+    public static final int DEFAULT_ESTABLISHERS = 3;
+    
+    /** Ordered list of supported I2NP protocols */
+    public static final int[] SUPPORTED_PROTOCOLS = new int[] { 1 };
+    
+    /** Creates a new instance of TCPTransport */
+    public TCPTransport(RouterContext context) {
         super(context);
         _log = context.logManager().getLog(TCPTransport.class);
-        if (_context == null) throw new RuntimeException("Context is null");
-        if (_context.statManager() == null) throw new RuntimeException("Stat manager is null");
-        _context.statManager().createFrequencyStat("tcp.attemptFailureFrequency", "How often do we attempt to contact someone, and fail?", "TCP Transport", new long[] { 60*1000l, 60*60*1000l, 24*60*60*1000l });
-        _context.statManager().createFrequencyStat("tcp.attemptSuccessFrequency", "How often do we attempt to contact someone, and succeed?", "TCP Transport", new long[] { 60*1000l, 60*60*1000l, 24*60*60*1000l });
-        _context.statManager().createFrequencyStat("tcp.acceptFailureFrequency", "How often do we reject someone who contacts us?", "TCP Transport", new long[] { 60*1000l, 60*60*1000l, 24*60*60*1000l });
-        _context.statManager().createFrequencyStat("tcp.acceptSuccessFrequency", "How often do we accept someone who contacts us?", "TCP Transport", new long[] { 60*1000l, 60*60*1000l, 24*60*60*1000l });
-        _context.statManager().createRateStat("tcp.connectionLifetime", "How long do connections last (measured when they close)?", "TCP Transport", new long[] { 60*1000l, 60*60*1000l, 24*60*60*1000l });
+        _listener = new TCPListener(context, this);
+        _myAddress = null;
+        _tagManager = new ConnectionTagManager(context);
+        _connectionsByIdent = new HashMap(16);
+        _connectionsByAddress = new HashMap(16);
+        _pendingConnectionsByIdent = new HashSet(16);
+        _pendingConnectionsByAddress = new HashSet(16);
+        _connectionLock = new Object();
+        _pendingMessages = new HashMap(16);
+        _lastConnectionErrors = new ArrayList();
 
-        _listeners = new ArrayList();
-        _connections = new HashMap();
-        _connectionAddresses = new HashMap();
-        _msgs = new HashMap();
-        _address = address;
-        if (address != null) {
-            _listenHost = address.getOptions().getProperty(TCPAddress.PROP_HOST);
-            String portStr = address.getOptions().getProperty(TCPAddress.PROP_PORT);
-            try {
-                _listenPort = Integer.parseInt(portStr);
-            } catch (NumberFormatException nfe) {
-                _log.error("Invalid port: " + portStr + " Address: \n" + address, nfe);
-            }
-            _tcpAddress = new TCPAddress(_listenHost, _listenPort);
-        }
-        _listenAddressIsValid = false;
-        try {
-            String setting = _context.router().getConfigSetting(PROP_LISTEN_IS_VALID);
-            _listenAddressIsValid = Boolean.TRUE.toString().equalsIgnoreCase(setting);
-        } catch (Throwable t) {
-            _listenAddressIsValid = false;
-            if (_log.shouldLog(Log.WARN))
-                _log.warn("Unable to determine whether TCP listening address is valid, so we're assuming it isn't.  Set " + PROP_LISTEN_IS_VALID + " otherwise");
-        }
-        _running = false;
-    }
-    
-    boolean getListenAddressIsValid() { return _listenAddressIsValid; }
-    SigningPrivateKey getMySigningKey() { return _context.keyManager().getSigningPrivateKey(); }
-    int getListenPort() { return _listenPort; }
-    
-    
-    public int countActivePeers() { 
-        synchronized (_connections) {
-            return _connections.size(); 
-        }
-    }
-    
-    /** fetch all of our TCP listening addresses */
-    TCPAddress[] getMyAddresses() {
-        if (_address != null) {
-            TCPAddress rv[] = new TCPAddress[1];
-            rv[0] = new TCPAddress(_listenHost, _listenPort);
-            return rv;
-        } else {
-            return new TCPAddress[0];
-        }
-    }
-    
-    /**
-     * This message is called whenever a new message is added to the send pool,
-     * and it should not block
-     */
-    protected void outboundMessageReady() {
-        //_context.jobQueue().addJob(new NextJob());
-        NextJob j = new NextJob();
-        j.runJob();
-    }
-    
-    private class NextJob extends JobImpl {
-        public NextJob() {
-            super(TCPTransport.this._context);
-        }
-        public void runJob() {
-            OutNetMessage msg = getNextMessage();
-            if (msg != null) {
-                handleOutbound(msg); // this just adds to either the establish thread's queue or the conn's queue
-            } else {
-                if (_log.shouldLog(Log.DEBUG))
-                    _log.debug("OutboundMessageReady called, but none were available");
-            }
-        }
-        public String getName() { return "TCP Message Ready to send"; }
-    }
-    
-    /**
-     * Return a random connection to the peer from the set of known connections
-     *
-     */
-    private TCPConnection getConnection(RouterIdentity peer) {
-        synchronized (_connections) {
-            if (!_connections.containsKey(peer))
-                return null;
-            List cons = (List)_connections.get(peer);
-            if (cons.size() <= 0)
-                return null;
-            TCPConnection first = (TCPConnection)cons.get(0);
-            return first;
-        }
-    }
-    
-    protected void handleOutbound(OutNetMessage msg) {
-        msg.timestamp("TCPTransport.handleOutbound before handleConnection");
-        TCPConnection con = getConnection(msg.getTarget().getIdentity());
-        if (con == null) {
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Handling outbound message to an unestablished peer");
-            msg.timestamp("TCPTransport.handleOutbound to addPending");
-            addPending(msg);
-        } else {
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Toss the message onto an established peer's connection");
-            msg.timestamp("TCPTransport.handleOutbound to con.addMessage");
-            con.addMessage(msg);
-        }
-    }
-    
-    protected boolean establishConnection(RouterInfo target) {
-        long startEstablish = 0;
-        long socketCreated = 0;
-        long conCreated = 0;
-        long conEstablished = 0;
-        try {
-            for (Iterator iter = target.getAddresses().iterator(); iter.hasNext(); ) {
-                RouterAddress addr = (RouterAddress)iter.next();
-                startEstablish = _context.clock().now();
-                if (getStyle().equals(addr.getTransportStyle())) {
-
-                    TCPAddress tcpAddr = new TCPAddress(addr);
-                    synchronized (_connectionAddresses) {
-                        if (_connectionAddresses.containsKey(tcpAddr)) {
-                            if (_log.shouldLog(Log.WARN))
-                                _log.warn("We already have a connection to another router at " + tcpAddr);
-                            _context.shitlist().shitlistRouter(target.getIdentity().getHash(), "Duplicate TCP address (changed identities?)");
-                            _context.netDb().fail(target.getIdentity().getHash());
-                            return false;
-                        }
-                    }
-                    
-                    if (tcpAddr.equals(_tcpAddress)) {
-                        if (_log.shouldLog(Log.WARN))
-                            _log.warn("Peer " + target.getIdentity().getHash().toBase64() 
-                                      + " has OUR address [" + tcpAddr + "]");
-                        _context.profileManager().commErrorOccurred(target.getIdentity().getHash());
-                        _context.shitlist().shitlistRouter(target.getIdentity().getHash(), "Points at us");
-                        _context.netDb().fail(target.getIdentity().getHash());
-                        return false;
-                    }
-
-                    if (!tcpAddr.isPubliclyRoutable() && false) {
-                        if (_log.shouldLog(Log.WARN))
-                            _log.warn("Peer " + target.getIdentity().getHash().toBase64() 
-                                      + " has an unroutable address [" + tcpAddr + "]");
-                        _context.profileManager().commErrorOccurred(target.getIdentity().getHash());
-                        _context.shitlist().shitlistRouter(target.getIdentity().getHash(), "Unroutable address");
-                        _context.netDb().fail(target.getIdentity().getHash());
-                        return false;
-                    }
-                    
-                    if (_log.shouldLog(Log.DEBUG))
-                        _log.debug("Establishing a connection with address " + addr);
-                    Socket s = createSocket(addr);
-                    socketCreated = _context.clock().now();
-                    if (s == null) {
-                        if (_log.shouldLog(Log.WARN))
-                            _log.warn("Unable to establish a socket in time to " + addr);
-                        _context.profileManager().commErrorOccurred(target.getIdentity().getHash());
-                        _context.shitlist().shitlistRouter(target.getIdentity().getHash(), "Unable to contact host");
-                        return false;
-                    }
-                    if (_log.shouldLog(Log.DEBUG))
-                        _log.debug("Socket created");
-                    
-                    TCPConnection con = new RestrictiveTCPConnection(_context, s, true);
-                    conCreated = _context.clock().now();
-                    if (_log.shouldLog(Log.DEBUG))
-                        _log.debug("TCPConnection created");
-                    boolean established = handleConnection(con, target);
-                    conEstablished = _context.clock().now();
-                    if (_log.shouldLog(Log.DEBUG))
-                        _log.debug("connection handled");
-                    return established;
-                }
-            }
-
-            _context.shitlist().shitlistRouter(target.getIdentity().getHash(), "No addresses we can handle");
-            return false;
-        } catch (Throwable t) {
-            if (_log.shouldLog(Log.WARN))
-                _log.warn("Unexpected error establishing the connection", t);
-            _context.shitlist().shitlistRouter(target.getIdentity().getHash(), "Internal error connecting");
-            return false;
-        } finally {
-            long diff = conEstablished - startEstablish;
-            if ( ( (diff > 6000) || (conEstablished == 0) ) && (_log.shouldLog(Log.WARN)) )  {
-                _log.warn("establishConnection took too long: socketCreate: " +
-                (socketCreated-startEstablish) + "ms conCreated: " +
-                (conCreated-socketCreated) + "ms conEstablished: " +
-                (conEstablished - conCreated) + "ms overall: " + diff);
-            }
-        }        
-    }
-    
-    protected Socket createSocket(RouterAddress addr) {
-        String host = addr.getOptions().getProperty(TCPAddress.PROP_HOST);
-        String portStr = addr.getOptions().getProperty(TCPAddress.PROP_PORT);
-        int port = -1;
-        try {
-            port = Integer.parseInt(portStr);
-        } catch (NumberFormatException nfe) {
-            if (_log.shouldLog(Log.ERROR))
-                _log.error("Invalid port number in router address: " + portStr, nfe);
-            return null;
-        }
-        
-        long start = _context.clock().now();
-        SocketCreator creator = new SocketCreator(host, port);
-        // blocking call, timing out after the SOCKET_CREATE_TIMEOUT and 
-        // killing the socket if it hasn't established the connection yet
-        creator.establishConnection(SOCKET_CREATE_TIMEOUT);
-        
-        long finish = _context.clock().now();
-        long diff = finish - start;
-        if (diff > 6000) {
-            if (_log.shouldLog(Log.WARN))
-                _log.warn("Creating a new socket took too long?  wtf?! " + diff + "ms for " + host + ':' + port);
-        }
-        if (creator.couldEstablish())
-            return creator.getSocket();
-        else
-            return null;
-    }
-    
-    private boolean isConnected(RouterInfo info) {
-        return (null != getConnection(info.getIdentity()));
-    }
-    
-    public TransportBid bid(RouterInfo toAddress, long dataSize) {
-        TCPConnection con = getConnection(toAddress.getIdentity());
-        int latencyStartup = 0;
-        if (con == null)
-            latencyStartup = 2000;
-        else
-            latencyStartup = 0;
-        
-        int sendTime = (int)((dataSize)/(16*1024)); // 16K/sec
-        int bytes = (int)dataSize+8;
-        
-        if (con != null)
-            sendTime += 50000 * con.getPendingMessageCount(); // try to avoid backed up (throttled) connections
-        
-        TransportBid bid = new TransportBid();
-        bid.setBandwidthBytes(bytes);
-        bid.setExpiration(new Date(_context.clock().now()+1000*60)); // 1 minute
-        bid.setLatencyMs(latencyStartup + sendTime);
-        bid.setMessageSize((int)dataSize);
-        bid.setRouter(toAddress);
-        bid.setTransport(this);
-        
-        RouterAddress addr = getTargetAddress(toAddress);
-        if (addr == null) {
-            if (con == null) {
-                if (_log.shouldLog(Log.INFO))
-                    _log.info("No address or connection to " + toAddress.getIdentity().getHash().toBase64());
-                // don't bid if we can't send them a message
-                return null;
-            } else {
-                if (_log.shouldLog(Log.DEBUG))
-                    _log.debug("No address, but we're connected to " + toAddress.getIdentity().getHash().toBase64());
-            }
-        }
-        
-        return bid;
-    }
-    
-    public void rotateAddresses() {
-        // noop
-    }
-    public void addAddressInfo(Properties infoForNewAddress) {
-        // noop
-    }
-    
-    
-    public RouterAddress startListening() {
-        RouterAddress address = new RouterAddress();
-        
-        address.setTransportStyle(getStyle());
-        address.setCost(10);
-        address.setExpiration(null);
-        Properties options = new Properties();
-        if (_address != null) {
-            options.setProperty(TCPAddress.PROP_HOST, _listenHost);
-            options.setProperty(TCPAddress.PROP_PORT, _listenPort+"");
-        }
-        address.setOptions(options);
-        
-        if (_address != null) {
-            try {
-                TCPAddress addr = new TCPAddress();
-                addr.setHost(_listenHost);
-                addr.setPort(_listenPort);
-                TCPListener listener = new TCPListener(_context, this);
-                listener.setAddress(addr);
-                _listeners.add(listener);
-                listener.startListening();
-            } catch (NumberFormatException nfe) {
-                if (_log.shouldLog(Log.ERROR))
-                    _log.error("Error parsing port number", nfe);
-            }
-            
-            addCurrentAddress(address);
-        }
-        
-        String str = _context.router().getConfigSetting(PROP_ESTABLISHERS);
+        String str = _context.getProperty(PROP_ESTABLISHERS);
+        int establishers = 0;
         if (str != null) {
             try {
-                _numConnectionEstablishers = Integer.parseInt(str);
+                establishers = Integer.parseInt(str);
             } catch (NumberFormatException nfe) {
                 if (_log.shouldLog(Log.ERROR))
                     _log.error("Invalid number of connection establishers [" + str + "]");
-                _numConnectionEstablishers = DEFAULT_ESTABLISHERS;
+                establishers = DEFAULT_ESTABLISHERS;
             }
         } else {
-            _numConnectionEstablishers = DEFAULT_ESTABLISHERS;
+            establishers = DEFAULT_ESTABLISHERS;
         }
-        
-        _running = true;
-        for (int i = 0; i < _numConnectionEstablishers; i++) {
-            Thread t = new I2PThread(new ConnEstablisher(i), "Conn Establisher" + i + ':' + _listenPort);
+
+        _connectionEstablishers = new ArrayList(establishers);
+        for (int i = 0; i < establishers; i++) {
+            TCPConnectionEstablisher est = new TCPConnectionEstablisher(_context, this);
+            _connectionEstablishers.add(est);
+            String name = _context.routerHash().toBase64().substring(0,6) + " Est" + i;
+            I2PThread t = new I2PThread(est, name);
             t.setDaemon(true);
             t.start();
         }
+    }
+    
+    public TransportBid bid(RouterInfo toAddress, long dataSize) {
+        TransportBid bid = new TransportBid();
+        bid.setBandwidthBytes((int)dataSize);
+        bid.setExpiration(_context.clock().now() + 30*1000);
+        bid.setMessageSize((int)dataSize);
+        bid.setRouter(toAddress);
+        bid.setTransport(this);
+        int latency = 200;
+        if (!getIsConnected(toAddress.getIdentity()))
+            latency += 5000;
+        bid.setLatencyMs(latency);
+        return bid;
+    }
+    
+    private boolean getIsConnected(RouterIdentity ident) {
+        Hash peer = ident.calculateHash();
+        synchronized (_connectionLock) {
+            return _connectionsByIdent.containsKey(peer);
+        }
+    }
+    
+    /**
+     * Called whenever a new message is ready to be sent.  This should
+     * not block.
+     *
+     */
+    protected void outboundMessageReady() {
+        OutNetMessage msg = getNextMessage();
+        //if (_log.shouldLog(Log.DEBUG))
+        //    _log.debug("Outbound message ready: " + msg);
         
-        return address;
+        if (msg != null) {
+            TCPConnection con = null;
+            boolean newPeer = false;
+            synchronized (_connectionLock) {
+                Hash peer = msg.getTarget().getIdentity().calculateHash();
+                con = (TCPConnection)_connectionsByIdent.get(peer);
+                if (con == null) {
+                    if (_log.shouldLog(Log.DEBUG))
+                        _log.debug("No connections to " + peer.toBase64() 
+                                   + ", request one");
+                    List msgs = (List)_pendingMessages.get(peer);
+                    if (msgs == null) {
+                        msgs = new ArrayList(4);
+                        _pendingMessages.put(peer, msgs);
+                        newPeer = true;
+                    }
+                    msgs.add(msg);
+                }
+                
+                if (newPeer)
+                    _connectionLock.notifyAll();
+            }
+            
+            if (con != null)
+                con.addMessage(msg);
+        }
+    }
+    
+    
+    /**
+     * The connection specified has been fully built
+     */
+    void connectionEstablished(TCPConnection con) {
+        TCPAddress remAddr = con.getRemoteAddress();
+        RouterIdentity ident = con.getRemoteRouterIdentity();
+        if ( (remAddr == null) || (ident == null) ) {
+            con.closeConnection();
+            return;
+        }
+        
+        List waitingMsgs = null;
+        List oldCons = null;
+        synchronized (_connectionLock) {
+            if (_connectionsByAddress.containsKey(remAddr.toString())) {
+                if (oldCons == null)
+                    oldCons = new ArrayList(1);
+                oldCons.add(_connectionsByAddress.remove(remAddr.toString()));
+            }
+            _connectionsByAddress.put(remAddr.toString(), con);
+            
+            if (_connectionsByIdent.containsKey(ident.calculateHash())) {
+                if (oldCons == null)
+                    oldCons = new ArrayList(1);
+                oldCons.add(_connectionsByIdent.remove(ident.calculateHash()));
+            }
+            _connectionsByIdent.put(ident.calculateHash(), con);
+            
+            // just drop the _pending connections - the establisher should fail
+            // them accordingly.
+            _pendingConnectionsByAddress.remove(remAddr.toString());
+            _pendingConnectionsByIdent.remove(ident.calculateHash());
+            
+            waitingMsgs = (List)_pendingMessages.remove(ident.calculateHash());
+        }
+        
+        // close any old connections, moving any queued messages to the new one
+        if (oldCons != null) {
+            for (int i = 0; i < oldCons.size(); i++) {
+                TCPConnection cur = (TCPConnection)oldCons.get(i);
+                List msgs = cur.clearPendingMessages();
+                for (int j = 0; j < msgs.size(); j++) {
+                    con.addMessage((OutNetMessage)msgs.get(j));
+                }
+                cur.closeConnection();
+            }
+        }
+        
+        if (waitingMsgs != null) {
+            for (int i = 0; i < waitingMsgs.size(); i++) {
+                con.addMessage((OutNetMessage)waitingMsgs.get(i));
+            }
+        }
+        
+        _context.shitlist().unshitlistRouter(ident.calculateHash());
+        
+        con.setTransport(this);
+        con.runConnection();
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("Connection set to run");
+    }
+    
+    /**
+     * Blocking call from when a remote peer tells us what they think our 
+     * IP address is.  This may do absolutely nothing, or it may fire up a 
+     * new socket listener after stopping an existing one.
+     *
+     * @param address address that the remote host said was ours
+     */
+    void ourAddressReceived(String address) {
+        if (allowAddressUpdate()) {
+            int port = getPort();
+            TCPAddress addr = new TCPAddress(address, port);
+            if (addr.getPort() > 0) {
+                if (allowAddress(addr)) {
+                    if (_myAddress != null) {
+                        if (addr.getAddress().equals(_myAddress.getAddress())) {
+                            // ignore, since there is no change
+                            return;
+                        }
+                    }
+                    updateAddress(addr);
+                }
+            } else {
+                if (_log.shouldLog(Log.ERROR))
+                    _log.error("Address specified is not valid [" + address + ":" + port + "]");
+            }
+        }
+    }
+    
+    public RouterAddress startListening() { 
+        configureLocalAddress();
+        if (_myAddress != null) {
+            _listener.startListening();
+            return _myAddress.toRouterAddress();
+        } else {
+            return null;
+        }
     }
     
     public void stopListening() {
-        if (_log.shouldLog(Log.ERROR))
-            _log.error("Stop listening called!  No more TCP", new Exception("Die tcp, die"));
-        _running = false;
-        
-        for (int i = 0; i < _listeners.size(); i++) {
-            TCPListener lsnr = (TCPListener)_listeners.get(i);
-            lsnr.stopListening();
+        _listener.stopListening();
+    }
+    
+    /**
+     * Should we listen to all interfaces, or just the one specified in
+     * our TCPAddress?
+     *
+     */
+    boolean shouldListenToAllInterfaces() { 
+        String val = getContext().getProperty(BIND_ALL_INTERFACES, "TRUE");
+        return Boolean.valueOf(val).booleanValue();
+    }
+    
+    private SimpleDateFormat _fmt = new SimpleDateFormat("dd MMM HH:mm:ss");
+    
+    /**
+     * Add the given message to the list of most recent connection 
+     * establishment error messages.  This should include a timestamp of 
+     * some sort in it.
+     *
+     */
+    void addConnectionErrorMessage(String msg) {
+        synchronized (_fmt) {
+            msg = _fmt.format(new Date(_context.clock().now())) + ": " + msg;
         }
-        Set allCons = new HashSet();
-        synchronized (_connections) {
-            for (Iterator iter = _connections.values().iterator(); iter.hasNext(); ) {
-                List cons = (List)iter.next();
-                for (Iterator citer = cons.iterator(); citer.hasNext(); ) {
-                    TCPConnection con = (TCPConnection)citer.next();
-                    allCons.add(con);
-                }
-            }
-            _connectionAddresses.clear();
-        }
-        for (Iterator iter = allCons.iterator(); iter.hasNext(); ) {
-            TCPConnection con = (TCPConnection)iter.next();
-            con.closeConnection();
+        synchronized (_lastConnectionErrors) {
+            while (_lastConnectionErrors.size() >= MAX_ERR_MESSAGES)
+                _lastConnectionErrors.remove(0);
+            _lastConnectionErrors.add(msg);
         }
     }
     
-    public RouterIdentity getMyIdentity() { return _context.router().getRouterInfo().getIdentity(); }
+    TCPAddress getMyAddress() { return _myAddress; }
+    public String getStyle() { return STYLE; }
+    ConnectionTagManager getTagManager() { return _tagManager; }
     
-    void connectionClosed(TCPConnection con) {
-        if (_log.shouldLog(Log.INFO))
-            _log.info("Connection closed with " + con.getRemoteRouterIdentity());
-        StringBuffer buf = new StringBuffer(256);
-        buf.append("Still connected to: ");
-        synchronized (_connections) {
-            List cons = (List)_connections.get(con.getRemoteRouterIdentity());
-            if ( (cons != null) && (cons.size() > 0) ) {
-                cons.remove(con);
-                long lifetime = con.getLifetime();
-                if (_log.shouldLog(Log.INFO))
-                    _log.info("Connection closed (with remaining) after lifetime " + lifetime);
-                _context.statManager().addRateData("tcp.connectionLifetime", lifetime, 0);
+    /**
+     * Initialize the _myAddress var with our local address (if possible)
+     *
+     */
+    private void configureLocalAddress() {
+        String addr = _context.getProperty(LISTEN_ADDRESS);
+        int port = getPort();
+        if (port != -1) {
+            TCPAddress address = new TCPAddress(addr, port);
+            boolean ok = allowAddress(address);
+            if (ok) {
+                _myAddress = address;
+            } else {
+                if (_log.shouldLog(Log.ERROR))
+                    _log.error("External address " + addr + " is not valid");
             }
-            Set toRemove = new HashSet();
-            for (Iterator iter = _connections.keySet().iterator(); iter.hasNext();) {
-                RouterIdentity ident = (RouterIdentity)iter.next();
-                List all = (List)_connections.get(ident);
-                if (all.size() > 0)
-                    buf.append(ident.getHash().toBase64()).append(" ");
-                else
-                    toRemove.add(ident);
-            }
-            for (Iterator iter = toRemove.iterator(); iter.hasNext(); ) {
-                _connections.remove(iter.next());
-            }
-        }
-        
-        TCPAddress address = con.getRemoteAddress();
-        if (address != null) {
-            synchronized (_connectionAddresses) {
-                _connectionAddresses.remove(address);
-            }
-        }
-        if (_log.shouldLog(Log.INFO))
-            _log.info(buf.toString());
-        //if (con.getRemoteRouterIdentity() != null)
+        } else {
+            if (_log.shouldLog(Log.ERROR))
+                _log.error("External port is not valid");
+        }   
     }
     
-    boolean handleConnection(TCPConnection con, RouterInfo target) {
-        con.setTransport(this);
-        if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Before establishing connection");
-        TCPAddress remAddr = con.getRemoteAddress();
-        if (remAddr != null) {
-            synchronized (_connectionAddresses) {
-                if (_connectionAddresses.containsKey(remAddr)) {
-                    if (_log.shouldLog(Log.WARN))
-                        _log.warn("refusing connection from " + remAddr + " as it is a dup");
-                    con.closeConnection();
-                    return false;
-                }
-            }
-        
-            if (_tcpAddress.equals(remAddr)) {
-                if (_log.shouldLog(Log.WARN))
-                    _log.warn("refusing connection to ourselves...");
-                _context.shitlist().shitlistRouter(target.getIdentity().getHash(), "Our old address");
-                _context.netDb().fail(target.getIdentity().getHash());
-                con.closeConnection();
+    /**
+     * Is the given address a valid one that we could listen to? 
+     *
+     */
+    private boolean allowAddress(TCPAddress address) {
+        if (address == null) return false;
+        if ( (address.getPort() <= 0) || (address.getPort() > 65535) )
+            return false;
+        if (!address.isPubliclyRoutable()) {
+            String allowLocal = _context.getProperty(LISTEN_ALLOW_LOCAL, "false");
+            if (Boolean.valueOf(allowLocal).booleanValue()) {
+                return true;
+            } else {
+                if (_log.shouldLog(Log.ERROR))
+                    _log.error("External address " + address + " is not publicly routable");
                 return false;
             }
         } else {
-            //if (_log.shouldLog(Log.WARN))
-            //    _log.warn("Why do we not have a remoteAddress for " + con, new Exception("hrm"));
+            return true;
         }
-        
-        long start = _context.clock().now();
-        RouterIdentity ident = con.establishConnection();
-        long afterEstablish = _context.clock().now();
-        long startRunning = 0;
-        
-        if (ident == null) {
-            _context.statManager().updateFrequency("tcp.acceptFailureFrequency");
-            con.closeConnection();
-            return false;
-        }
-        
-        if (ident.equals(_context.router().getRouterInfo().getIdentity())) {
-            if (_log.shouldLog(Log.WARN))
-                _log.warn("Dropping established connection with *cough* ourselves: listenHost=[" 
-                          + _tcpAddress.getHost() + "] listenPort=[" +_tcpAddress.getPort()+ "] remoteHost=["
-                          + remAddr.getHost() + "] remPort=[" + remAddr.getPort() + "]");
-            con.closeConnection();
-            return false;
-        }
-        
-        if (_log.shouldLog(Log.INFO))
-            _log.info("Connection established with " + ident + " after " + (afterEstablish-start) + "ms");
-        if (target != null) {
-            if (!target.getIdentity().equals(ident)) {
-                //_context.statManager().updateFrequency("tcp.acceptFailureFrequency");
-                if (_log.shouldLog(Log.WARN))
-                    _log.warn("Target changed identities!  was " + target.getIdentity().getHash().toBase64() + ", now is " + ident.getHash().toBase64() + "!");
-                // remove the old ref, since they likely just created a new identity
-                _context.netDb().fail(target.getIdentity().getHash());
-                _context.shitlist().shitlistRouter(target.getIdentity().getHash(), "Peer changed identities");
-                //return false;
-            } else {
-                if (_log.shouldLog(Log.DEBUG))
-                    _log.debug("Target is the same as who we connected with");
-            }
-        }
-        if (ident != null) {
-            Set toClose = new HashSet(4);
-            List toAdd = new ArrayList(1);
-            List cons = null;
-            synchronized (_connections) {
-                if (!_connections.containsKey(ident))
-                    _connections.put(ident, new ArrayList(2));
-                cons = (List)_connections.get(ident);
-                if (cons.size() > 0) {
-                    if (_log.shouldLog(Log.WARN)) {
-                        _log.warn("Attempted to open additional connections with " + ident.getHash() + ": closing older connections", new Exception("multiple cons"));
+    }
 
-                        StringBuffer buf = new StringBuffer(128);
-                        if (remAddr == null)
-                            remAddr = con.getRemoteAddress();
-                        buf.append("Connection address: [").append(remAddr.toString()).append(']');
-                        synchronized (_connectionAddresses) {
-                            if (_connectionAddresses.containsKey(remAddr)) {
-                                buf.append(" NOT KNOWN in: ");
-                            } else {
-                                buf.append(" KNOWN IN: ");
-                            }
-                            for (Iterator iter = _connectionAddresses.keySet().iterator(); iter.hasNext(); ) {
-                                TCPAddress curAddr = (TCPAddress)iter.next();
-                                buf.append('[').append(curAddr.toString()).append("] ");
-                            }
-                        }
-                        _log.warn(buf.toString());
-                    }
-            
-                    while (cons.size() > 0) {
-                        TCPConnection oldCon = (TCPConnection)cons.remove(0);
-                        toAdd.addAll(oldCon.getPendingMessages());
-                        toClose.add(oldCon);
-                    }
-                }
-                cons.add(con);
-                
-                Set toRemove = new HashSet();
-                for (Iterator iter = _connections.keySet().iterator(); iter.hasNext();) {
-                    RouterIdentity cur = (RouterIdentity)iter.next();
-                    List all = (List)_connections.get(cur);
-                    if (all.size() <= 0)
-                        toRemove.add(ident);
-                }
-                for (Iterator iter = toRemove.iterator(); iter.hasNext(); ) {
-                    _connections.remove(iter.next());
-                }
-            }
-            
-            synchronized (_connectionAddresses) {
-                _connectionAddresses.put(con.getRemoteAddress(), cons);
-            }
-            
-            if (toAdd.size() > 0) {
-                for (Iterator iter = toAdd.iterator(); iter.hasNext(); ) {
-                    OutNetMessage msg = (OutNetMessage)iter.next();
-                    con.addMessage(msg);
-                }
-                if (_log.shouldLog(Log.INFO))
-                    _log.info("Transferring " + toAdd.size() + " messages from old cons to the newly established con");
-            }
-            
-            _context.shitlist().unshitlistRouter(ident.getHash());
-            con.runConnection();
-            startRunning = _context.clock().now();
-            
-            if (toClose.size() > 0) {
-                for (Iterator iter = toClose.iterator(); iter.hasNext(); ) {
-                    TCPConnection oldCon = (TCPConnection)iter.next();
-                    if (_log.shouldLog(Log.INFO))
-                        _log.info("Closing old duplicate connection " + oldCon.toString(), new Exception("Closing old con"));
-                    oldCon.closeConnection();
-                    _context.statManager().addRateData("tcp.connectionLifetime", oldCon.getLifetime(), 0);
-                }
-            }
-            long done = _context.clock().now();
-            
-            long diff = done - start;
-            if ( (diff > 3*1000) && (_log.shouldLog(Log.WARN)) ) {
-                _log.warn("handleConnection took too long: " + diff + "ms with " +
-                (afterEstablish-start) + "ms to establish " +
-                (startRunning-afterEstablish) + "ms to start running " +
-                (done-startRunning) + "ms to cleanup");
-            }
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("runConnection called on the con");
-        }
+    /**
+     * Blocking call to unconditionally update our listening address to the 
+     * one specified, updating the routerInfo, etc.
+     *
+     */
+    private void updateAddress(TCPAddress addr) {
+        RouterAddress routerAddr = addr.toRouterAddress();
+        _myAddress = addr;
+        _listener.stopListening();
+        _listener.startListening();
         
-        _context.statManager().updateFrequency("tcp.acceptSuccessFrequency");
-        return true;
-    }
-    
-    public String getStyle() { return STYLE; }
-    
-    public String renderStatusHTML() {
-        StringBuffer buf = new StringBuffer();
-        Map cons = new HashMap();
-        synchronized (_connections) {
-            cons.putAll(_connections);
-        }
-        int established = 0;
-        buf.append("<b>TCP Transport</b> <i>(").append(cons.size()).append(" connections)</i><br />\n");
-        buf.append("<ul>");
-        for (Iterator iter = cons.keySet().iterator(); iter.hasNext(); ) {
-            buf.append("<li>");
-            RouterIdentity ident = (RouterIdentity)iter.next();
-            List curCons = (List)cons.get(ident);
-            buf.append("Connection to ").append(ident.getHash().toBase64()).append(": ");
-            String lifetime = null;
-            for (int i = 0; i < curCons.size(); i++) {
-                TCPConnection con = (TCPConnection)curCons.get(i);
-                if (con.getLifetime() > 30*1000) {
-                    established++;
-                    lifetime = DataHelper.formatDuration(con.getLifetime());
-                }
+        Set addresses = getCurrentAddresses();
+        List toRemove = null;
+        for (Iterator iter = addresses.iterator(); iter.hasNext(); ) {
+            RouterAddress cur = (RouterAddress)iter.next();
+            if (STYLE.equals(cur.getTransportStyle())) {
+                if (toRemove == null)
+                    toRemove = new ArrayList(1);
+                toRemove.add(cur);
             }
-            if (lifetime != null)
-                buf.append(lifetime);
-            else
-                buf.append("[pending]");
-            
-            buf.append("</li>\n");
         }
-        buf.append("</ul>\n");
+        if (toRemove != null) {
+            for (int i = 0; i < toRemove.size(); i++) {
+                addresses.remove(toRemove.get(i));
+            }
+        }
+        addresses.add(routerAddr);
         
-        if (established == 0) {
-            buf.append("<b><font color=\"red\">No TCP connections</font></b><ul>");
-            buf.append("<li>Is your publicly reachable IP address / hostname <b>").append(_listenHost).append("</b>?</li>\n");
-            buf.append("<li>Is your firewall / NAT open to receive connections on port <b>").append(_listenPort).append("</b>?</li>\n");
-            buf.append("<li>Do you have any reachable peer references (see down below for \"Routers\", ");
-            buf.append("    or check your netDb directory - you want at least two routers, since one of them is your own)</li>\n");
-            buf.append("</ul>\n");
-        }
-        return buf.toString();
+        _context.router().rebuildRouterInfo();
+        
+        _listener.startListening();
     }
     
     /**
-     * only establish one connection at a time, and if multiple requests are pooled
-     * for the same one, once one is established send all the messages through
+     * Determine whether we should listen to the peer when they give us what they
+     * say our IP address is.  We should allow a peer to specify our IP address 
+     * if and only if we have not configured our own address explicitly and we 
+     * have no fully established connections.
      *
      */
-    private class ConnEstablisher implements Runnable {
-        private int _id;
+    private boolean allowAddressUpdate() {
+        boolean addressSpecified = (null != _context.getProperty(LISTEN_ADDRESS));
+        if (addressSpecified) 
+            return false;
+        int connectedPeers = countActivePeers();
+        return (connectedPeers == 0);
+    }
         
-        public ConnEstablisher(int id) {
-            _id = id;
-        }
+    /**
+     * What port should we be reachable on?  
+     *
+     * @return the port number, or -1 if there is no valid port
+     */
+    private int getPort() {
+        if ( (_myAddress != null) && (_myAddress.getPort() > 0) )
+            return _myAddress.getPort();
         
-        public int getId() { return _id; }
-        
-        public void run() {
-            while (_running) {
-                try {
-                    PendingMessages pending = nextPeer(this);
-                    
-                    long start = _context.clock().now();
-                    
-                    if (_log.shouldLog(Log.INFO))
-                        _log.info("Beginning establishment with " + pending.getPeer().toBase64() + " [not error]");
-                    
-                    TCPConnection con = getConnection(pending.getPeerInfo().getIdentity());
-                    long conFetched = _context.clock().now();
-                    long sentPending = 0;
-                    long establishedCon = 0;
-                    long refetchedCon = 0;
-                    long sentRefetched = 0;
-                    long failedPending = 0;
-                    
-                    if (con != null) {
-                        sendPending(con, pending);
-                        sentPending = _context.clock().now();
-                    } else {
-                        boolean established = establishConnection(pending.getPeerInfo());
-                        establishedCon = _context.clock().now();
-                        if (established) {
-                            _context.statManager().updateFrequency("tcp.attemptSuccessFrequency");
-                            if (_log.shouldLog(Log.DEBUG))
-                                _log.debug("Connection established");
-                            con = getConnection(pending.getPeerInfo().getIdentity());
-                            refetchedCon = _context.clock().now();
-                            if (con == null) {
-                                if (_log.shouldLog(Log.ERROR))
-                                    _log.error("Connection established to " + pending.getPeer().toBase64() + " but they aren't who we wanted");
-                                _context.shitlist().shitlistRouter(pending.getPeer(), "Old address of a new peer");
-                                failPending(pending);
-                            } else {
-                                _context.shitlist().unshitlistRouter(pending.getPeer());
-                                sendPending(con, pending);
-                                sentRefetched = _context.clock().now();
-                            }
-                        } else {
-                            _context.statManager().updateFrequency("tcp.attemptFailureFrequency");
-                            if (_log.shouldLog(Log.INFO))
-                                _log.info("Unable to establish a connection to " + pending.getPeer());
-                            failPending(pending);
-                            
-                            // shitlisted by establishConnection with a more detailed reason
-                            //_context.shitlist().shitlistRouter(pending.getPeer(), "Unable to contact host");
-                            //ProfileManager.getInstance().commErrorOccurred(pending.getPeer());
-                            failedPending = _context.clock().now();
-                        }
-                    }
-                    
-                    long end = _context.clock().now();
-                    long diff = end - start;
-                    
-                    StringBuffer buf = new StringBuffer(128);
-                    buf.append("Time to establish with ").append(pending.getPeer().toBase64()).append(": ").append(diff).append("ms");
-                    buf.append(" fetched: ").append(conFetched-start).append(" ms");
-                    if (sentPending != 0)
-                        buf.append(" sendPending: ").append(sentPending - conFetched).append("ms");
-                    if (establishedCon != 0) {
-                        buf.append(" established: ").append(establishedCon - conFetched).append("ms");
-                        if (refetchedCon != 0) {
-                            buf.append(" refetched: ").append(refetchedCon - establishedCon).append("ms");
-                            if (sentRefetched != 0) {
-                                buf.append(" sentRefetched: ").append(sentRefetched - refetchedCon).append("ms");
-                            }
-                        } else {
-                            buf.append(" failedPending: ").append(failedPending - establishedCon).append("ms");
-                        }
-                    }
-                    if (diff > 6000) {
-                        if (_log.shouldLog(Log.WARN))
-                            _log.warn(buf.toString());
-                    } else {
-                        if (_log.shouldLog(Log.INFO))
-                            _log.info(buf.toString());
-                    }
-                } catch (Throwable t) {
-                    if (_log.shouldLog(Log.CRIT))
-                        _log.log(Log.CRIT, "Error in connection establisher thread - NO MORE CONNECTIONS", t);
-                }
+        String port = _context.getProperty(LISTEN_PORT);
+        if (port != null) {
+            try {
+                int portNum = Integer.parseInt(port);
+                if ( (portNum >= 1) && (portNum < 65535) ) 
+                    return portNum;
+            } catch (NumberFormatException nfe) {
+                // fallthrough
             }
+        } 
+          
+        return -1;
+    }
+
+    
+    /**
+     * How many peers can we talk to right now?
+     *
+     */
+    public int countActivePeers() { 
+        synchronized (_connectionLock) {
+            return _connectionsByIdent.size();
         }
     }
     
     /**
-     * Add a new message to the outbound pool to be established asap (may be sent
-     * along existing connections if they appear later)
+     * The transport is done sending this message.  This exposes the 
+     * superclass's protected method to the current package.
      *
+     * @param msg message in question
+     * @param sendSuccessful true if the peer received it
+     * @param msToSend how long it took to transfer the data to the peer
+     * @param allowRequeue true if we should try other transports if available
      */
-    public void addPending(OutNetMessage msg) {
-        synchronized (_msgs) {
-            Hash target = msg.getTarget().getIdentity().getHash();
-            PendingMessages msgs = (PendingMessages)_msgs.get(target);
-            if (msgs == null) {
-                msgs = new PendingMessages(msg.getTarget());
-                msgs.addPending(msg);
-                _msgs.put(target, msgs);
-                if (_log.shouldLog(Log.DEBUG))
-                    _log.debug("Adding a pending to new " + target.toBase64());
-            } else {
-                msgs.addPending(msg);
-                if (_log.shouldLog(Log.DEBUG))
-                    _log.debug("Adding a pending to existing " + target.toBase64());
-            }
-            int level = Log.INFO;
-            if (msgs.getMessageCount() > 2)
-                level = Log.WARN;
-            if (_log.shouldLog(level))
-                _log.log(level, "Add message to " + target.toBase64() + ", making a total of " + msgs.getMessageCount() + " for them, with another " + (_msgs.size() -1) + " peers pending establishment");
-            _msgs.notifyAll();
-        }
-        msg.timestamp("TCPTransport.addPending finished and notified");
+    public void afterSend(OutNetMessage msg, boolean sendSuccessful, boolean allowRequeue, long msToSend) {
+        super.afterSend(msg, sendSuccessful, allowRequeue, msToSend);
     }
     
     /**
-     * blocking call to claim the next available targeted peer.   does a wait on
-     * the _msgs pool which should be notified from addPending.
+     * Blocking call to retrieve the next peer that we want to establish a 
+     * connection with.
      *
      */
-    private PendingMessages nextPeer(ConnEstablisher establisher) {
-        PendingMessages rv = null;
+    RouterInfo getNextPeer() {
         while (true) {
-            synchronized (_msgs) {
-                if (_msgs.size() <= 0) {
-                    try { _msgs.wait(); } catch (InterruptedException ie) {}
-                } 
-                if (_msgs.size() > 0) {
-                    for (Iterator iter = _msgs.keySet().iterator(); iter.hasNext(); ) {
-                        Object key = iter.next();
-                        rv = (PendingMessages)_msgs.get(key);
-                        if (!rv.setEstablisher(establisher)) {
-                            // unable to claim this peer
-                            if (_log.shouldLog(Log.INFO))
-                                _log.info("Peer is still in process: " + rv.getPeer() + " on establisher " + rv.getEstablisher().getId());
-                            rv = null;
-                        } else {
-                            if (_log.shouldLog(Log.INFO))
-                                _log.info("Returning next peer " + rv.getPeer().toBase64());
-                            return rv;
-                        }
-                    }
-                    // all of the messages refer to a connection being established
-                    try { _msgs.wait(); } catch (InterruptedException ie) {}
+            synchronized (_connectionLock) {
+                for (Iterator iter = _pendingMessages.keySet().iterator(); iter.hasNext(); ) {
+                    Hash peer = (Hash)iter.next();
+                    List msgs = (List)_pendingMessages.get(peer);
+                    if (_pendingConnectionsByIdent.contains(peer))
+                        continue; // we're already trying to talk to them
+
+                    if (msgs.size() <= 0) 
+                        continue; // uh...
+                    OutNetMessage msg = (OutNetMessage)msgs.get(0);
+                    RouterAddress addr = msg.getTarget().getTargetAddress(STYLE);
+                    TCPAddress tcpAddr = new TCPAddress(addr);
+                    if (tcpAddr.getPort() <= 0)
+                        continue; // invalid
+                    if (_pendingConnectionsByAddress.contains(tcpAddr.toString()))
+                        continue; // we're already trying to talk to someone at their address
+
+                    // ok, this is someone we can try to contact.  mark it as ours.
+                    _pendingConnectionsByIdent.add(peer);
+                    _pendingConnectionsByAddress.add(tcpAddr.toString());
+                    return msg.getTarget();
                 }
+                
+                try {
+                    _connectionLock.wait();
+                } catch (InterruptedException ie) {}
             }
+        }
+    }
+    
+    /** Called after an establisher finished (or failed) connecting to the peer */
+    void establishmentComplete(RouterInfo info) {
+        TCPAddress addr = new TCPAddress(info.getTargetAddress(STYLE));
+        Hash peer = info.getIdentity().calculateHash();
+        List msgs = null;
+        synchronized (_connectionLock) {
+            _pendingConnectionsByAddress.remove(addr.toString());
+            _pendingConnectionsByIdent.remove(peer);
+            
+            msgs = (List)_pendingMessages.remove(peer);
         }
         
-    }
-    
-    /**
-     * Send all the messages targetting the given location
-     * over the established connection
-     *
-     */
-    private void sendPending(TCPConnection con, PendingMessages pending) {
-        if (con == null) {
-            if (_log.shouldLog(Log.ERROR))
-                _log.error("Send pending to null con?", new Exception("Hmm"));
-            return;
-        }
-        if (pending == null) {
-            if (_log.shouldLog(Log.ERROR))
-                _log.error("Null pending, 'eh?", new Exception("Hmm.."));
-            return;
-        }
-        if (_log.shouldLog(Log.INFO))
-            _log.info("Connection established, now queueing up " + pending.getMessageCount() + " messages to be sent");
-        synchronized (_msgs) {
-            _msgs.remove(pending.getPeer());
-        }
-        if (pending.getPeer().equals(con.getRemoteRouterIdentity().calculateHash())) {
-            OutNetMessage msg = null;
-            while ( (msg = pending.getNextMessage()) != null) {
-                msg.timestamp("TCPTransport.sendPending to con.addMessage");
-                con.addMessage(msg);
-            }
-        } else {
-            // we connected to someone we didn't try to connect to...
-            OutNetMessage msg = null;
-            while ( (msg = pending.getNextMessage()) != null) {
-                msg.timestamp("TCPTransport.sendPending connected to a different peer");
-                afterSend(msg, false, false);
-            }
-        }
-    }
-    
-    /**
-     * Fail out all messages pending to the specified peer
-     */
-    private void failPending(PendingMessages pending) {
-        if (pending != null) {
-            synchronized (_msgs) {
-                _msgs.remove(pending.getPeer());
-            }
-            
-            OutNetMessage msg = null;
-            while ( (msg = pending.getNextMessage()) != null) {
+        if (msgs != null) {
+            // messages are only available if the connection failed (since 
+            // connectionEstablished clears them otherwise)
+            for (int i = 0; i < msgs.size(); i++) {
+                OutNetMessage msg = (OutNetMessage)msgs.get(i);
                 afterSend(msg, false);
             }
         }
     }
     
-    /**
-     * Coordinate messages for a particular peer that hasn't been established yet
-     *
-     */
-    private static class PendingMessages {
-        private List _messages;
-        private Hash _peer;
-        private RouterInfo _peerInfo;
-        private ConnEstablisher _establisher;
-        
-        public PendingMessages(RouterInfo peer) {
-            _messages = new ArrayList(2);
-            _peerInfo = peer;
-            _peer = peer.getIdentity().getHash();
-            _establisher = null;
+    /** Make this stuff pretty (only used in the old console) */
+    public String renderStatusHTML() { 
+        StringBuffer buf = new StringBuffer(1024);
+        buf.append("<b>Connections:</b><ul>\n");
+        synchronized (_connectionLock) {
+            for (Iterator iter = _connectionsByIdent.values().iterator(); iter.hasNext(); ) {
+                TCPConnection con = (TCPConnection)iter.next();
+                buf.append("<li>");
+                buf.append(con.getRemoteRouterIdentity().getHash().toBase64().substring(0,6));
+                buf.append(": up for ").append(DataHelper.formatDuration(con.getLifetime()));
+                buf.append("</li>\n");
+            }
+            buf.append("</ul>\n");
+            
+            buf.append("<b>Connections being built:</b><ul>\n");
+            for (Iterator iter = _pendingConnectionsByIdent.iterator(); iter.hasNext(); ) {
+                Hash peer = (Hash)iter.next();
+                buf.append("<li>");
+                buf.append(peer.toBase64().substring(0,6));
+                buf.append("</li>\n");
+            }
+            buf.append("</ul>\n");
         }
         
-        /**
-         * Claim a peer for a specific establisher
-         *
-         * @return true if the claim was successful, false if someone beat us to it
-         */
-        public boolean setEstablisher(ConnEstablisher establisher) {
-            synchronized (PendingMessages.this) {
-                if (_establisher == null) {
-                    _establisher = establisher;
-                    return true;
-                } else {
-                    return false;
-                }
+        buf.append("<b>Most recent connection errors:</b><ul>");
+        synchronized (_lastConnectionErrors) {
+            for (int i = _lastConnectionErrors.size()-1; i >= 0; i--) {
+                String msg = (String)_lastConnectionErrors.get(i);
+                buf.append("<li>").append(msg).append("</li>\n");
             }
         }
-        public ConnEstablisher getEstablisher() {
-            return _establisher;
-        }
+        buf.append("</ul>");
         
-        /**
-         * Add a new message to this to-be-established connection
-         */
-        public void addPending(OutNetMessage msg) {
-            synchronized (_messages) {
-                _messages.add(msg);
-            }
-        }
-        
-        /**
-         * Get the next message queued up for delivery on this connection being established
-         *
-         */
-        public OutNetMessage getNextMessage() {
-            synchronized (_messages) {
-                if (_messages.size() <= 0)
-                    return null;
-                else
-                    return (OutNetMessage)_messages.remove(0);
-            }
-        }
-        
-        /**
-         * Get the number of messages queued up for this to be established connection
-         *
-         */
-        public int getMessageCount() {
-            synchronized (_messages) {
-                return _messages.size();
-            }
-        }
-        
-        /** who are we going to establish with? */
-        public Hash getPeer() { return _peer; }
-        /** who are we going to establish with? */
-        public RouterInfo getPeerInfo() { return _peerInfo; }
+        return buf.toString();
     }
+    
 }

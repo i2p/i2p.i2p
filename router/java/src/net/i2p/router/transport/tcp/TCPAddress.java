@@ -10,6 +10,7 @@ package net.i2p.router.transport.tcp;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.Properties;
 
 import net.i2p.data.DataHelper;
 import net.i2p.data.RouterAddress;
@@ -44,17 +45,18 @@ public class TCPAddress {
     }
     
     public TCPAddress() {
-	_host = null;
-	_port = -1;
-	_addr = null;
+        _host = null;
+        _port = -1;
+        _addr = null;
     }
     
     public TCPAddress(InetAddress addr, int port) {
         if (addr != null)
             _host = addr.getHostAddress();
-	_addr = addr;
-	_port = port;
+        _addr = addr;
+        _port = port;
     }
+    
     public TCPAddress(RouterAddress addr) {
 	if (addr == null) throw new IllegalArgumentException("Null router address");
         String host = addr.getOptions().getProperty(PROP_HOST);
@@ -80,6 +82,21 @@ public class TCPAddress {
         }
     }
     
+    public RouterAddress toRouterAddress() {
+        if ( (_host == null) || (_port <= 0) ) 
+            return null;
+        
+        RouterAddress addr = new RouterAddress();
+        
+        Properties props = new Properties();
+        props.setProperty(PROP_HOST, _host);
+        props.setProperty(PROP_PORT, ""+_port);
+        
+        addr.setOptions(props);
+        addr.setTransportStyle(TCPTransport.STYLE);
+        return addr;
+    }
+    
     public String getHost() { return _host; }
     public void setHost(String host) { _host = host; }
     public InetAddress getAddress() { return _addr; }
@@ -88,44 +105,46 @@ public class TCPAddress {
     public void setPort(int port) { _port = port; }
     
     public boolean isPubliclyRoutable() {
-	if (_host == null) return false;
-	try {
-	    InetAddress addr = InetAddress.getByName(_host);
-	    byte quad[] = addr.getAddress();
-	    if (quad[0] == (byte)127) return false;
-	    if (quad[0] == (byte)10) return false; 
-	    if ( (quad[0] == (byte)172) && (quad[1] >= (byte)16) && (quad[1] <= (byte)31) ) return false;
-	    if ( (quad[0] == (byte)192) && (quad[1] == (byte)168) ) return false;
-	    if (quad[0] >= (byte)224) return false; // no multicast
-	    return true; // or at least possible to be true
-	} catch (Throwable t) {
-	    _log.error("Error checking routability", t);
-	    return false;
-	}
+        if (_host == null) return false;
+        try {
+            InetAddress addr = InetAddress.getByName(_host);
+            byte quad[] = addr.getAddress();
+            if (quad[0] == (byte)127) return false;
+            if (quad[0] == (byte)10) return false; 
+            if ( (quad[0] == (byte)172) && (quad[1] >= (byte)16) && (quad[1] <= (byte)31) ) return false;
+            if ( (quad[0] == (byte)192) && (quad[1] == (byte)168) ) return false;
+            if (quad[0] >= (byte)224) return false; // no multicast
+            return true; // or at least possible to be true
+        } catch (Throwable t) {
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Error checking routability", t);
+            return false;
+        }
     }
     
     public String toString() { return _host + ":" + _port; }
     
     public int hashCode() {
-	int rv = 0;
-	rv += _port;
-	if (_addr != null) rv += _addr.getHostAddress().hashCode();
-	else
-	    if (_host != null) rv += _host.hashCode();
-	return rv;
+        int rv = 0;
+        rv += _port;
+        if (_addr != null) 
+            rv += _addr.getHostAddress().hashCode();
+        else
+            if (_host != null) rv += _host.hashCode();
+        return rv;
     }
     
     public boolean equals(Object val) {
-	if ( (val != null) && (val instanceof TCPAddress) ) {
-	    TCPAddress addr = (TCPAddress)val;
-	    if ( (_addr != null) && (_addr.getHostAddress() != null) ) {
-		return DataHelper.eq(getAddress().getHostAddress(), addr.getAddress().getHostAddress()) &&
- 		       (getPort() == addr.getPort());
+        if ( (val != null) && (val instanceof TCPAddress) ) {
+            TCPAddress addr = (TCPAddress)val;
+            if ( (_addr != null) && (_addr.getHostAddress() != null) ) {
+                return DataHelper.eq(getAddress().getHostAddress(), addr.getAddress().getHostAddress())
+                       && (getPort() == addr.getPort());
             } else {
-		return DataHelper.eq(getHost(), addr.getHost()) &&
-		       (getPort() == addr.getPort());
+                return DataHelper.eq(getHost(), addr.getHost())
+                       && (getPort() == addr.getPort());
             }
-	} 
-	return false;
+        } 
+        return false;
     }
 }

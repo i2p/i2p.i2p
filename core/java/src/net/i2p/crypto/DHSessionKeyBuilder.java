@@ -13,8 +13,13 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+
 import net.i2p.I2PAppContext;
 import net.i2p.data.ByteArray;
+import net.i2p.data.DataHelper;
 import net.i2p.data.SessionKey;
 import net.i2p.util.Clock;
 import net.i2p.util.I2PThread;
@@ -135,7 +140,62 @@ public class DHSessionKeyBuilder {
         _sessionKey = null;
         _extraExchangedBytes = new ByteArray();
     }
-
+    
+    /**
+     * Conduct a DH exchange over the streams, returning the resulting data.
+     *
+     * @return exchanged data
+     * @throws IOException if there is an error (but does not close the streams
+     */
+    public static DHSessionKeyBuilder exchangeKeys(InputStream in, OutputStream out) throws IOException {
+        DHSessionKeyBuilder builder = new DHSessionKeyBuilder();
+        
+        // send: X
+        writeBigI(out, builder.getMyPublicValue());
+        
+        // read: Y
+        BigInteger Y = readBigI(in);
+        if (Y == null) return null;
+        builder.setPeerPublicValue(Y);
+        return builder;
+    }
+    
+    static BigInteger readBigI(InputStream in) throws IOException {
+        byte Y[] = new byte[256];
+        int read = DataHelper.read(in, Y);
+        if (read != 256) {
+            return null;
+        }
+        if (1 == (Y[0] & 0x80)) {
+            // high bit set, need to inject an additional byte to keep 2s complement
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("High bit set");
+            byte Y2[] = new byte[257];
+            System.arraycopy(Y, 0, Y2, 1, 256);
+            Y = Y2;
+        }
+        return new NativeBigInteger(Y);
+    }
+    
+    /**
+     * Write out the integer as a 256 byte value.  This left pads with 0s so 
+     * to keep in 2s complement, and if it is already 257 bytes (due to
+     * the sign bit) ignore that first byte.
+     */
+    static void writeBigI(OutputStream out, BigInteger val) throws IOException {
+        byte x[] = val.toByteArray();
+        for (int i = x.length; i < 256; i++) 
+            out.write(0);
+        if (x.length == 257)
+            out.write(x, 1, 256);
+        else if (x.length == 256)
+            out.write(x);
+        else if (x.length > 257)
+            throw new IllegalArgumentException("Value is too large!  length="+x.length);
+        
+        out.flush();
+    }
+    
     private static final int getSize() {
         synchronized (_builders) {
             return _builders.size();

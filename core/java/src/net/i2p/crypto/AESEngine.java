@@ -58,7 +58,7 @@ public class AESEngine {
         if ((iv == null) || (payload == null) || (sessionKey == null) || (iv.length != 16)) return null;
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream(paddedSize + 64);
-        Hash h = _context.sha().calculateHash(sessionKey.getData());
+        Hash h = _context.sha().calculateHash(iv);
         try {
             h.writeBytes(baos);
             DataHelper.writeLong(baos, 4, payload.length);
@@ -84,7 +84,7 @@ public class AESEngine {
             return null;
         }
         ByteArrayInputStream bais = new ByteArrayInputStream(decr);
-        Hash h = _context.sha().calculateHash(sessionKey.getData());
+        Hash h = _context.sha().calculateHash(iv);
         try {
             Hash rh = new Hash();
             rh.readBytes(bais);

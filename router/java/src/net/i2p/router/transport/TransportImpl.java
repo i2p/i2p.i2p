@@ -37,6 +37,10 @@ public abstract class TransportImpl implements Transport {
     private List _sendPool;
     protected RouterContext _context;
 
+    /**
+     * Initialize the new transport
+     *
+     */
     public TransportImpl(RouterContext context) {
         _context = context;
         _log = _context.logManager().getLog(TransportImpl.class);
@@ -52,8 +56,18 @@ public abstract class TransportImpl implements Transport {
         _currentAddresses = new HashSet();
     }
     
+    /**
+     * How many peers can we talk to right now?
+     *
+     */
     public int countActivePeers() { return 0; }
     
+    /**
+     * Nonblocking call to pull the next outbound message
+     * off the queue.  
+     *
+     * @return the next message or null if none are available
+     */
     public OutNetMessage getNextMessage() {
         OutNetMessage msg = null;
         synchronized (_sendPool) {
@@ -64,16 +78,45 @@ public abstract class TransportImpl implements Transport {
         return msg;
     }
     
-    public void afterSend(OutNetMessage msg, boolean sendSuccessful) {
+    /**
+     * The transport is done sending this message
+     *
+     * @param msg message in question
+     * @param sendSuccessful true if the peer received it
+     */
+    protected void afterSend(OutNetMessage msg, boolean sendSuccessful) {
         afterSend(msg, sendSuccessful, true, 0);
     }
-    public void afterSend(OutNetMessage msg, boolean sendSuccessful, boolean allowRequeue) {
+    /**
+     * The transport is done sending this message
+     *
+     * @param msg message in question
+     * @param sendSuccessful true if the peer received it
+     * @param allowRequeue true if we should try other transports if available
+     */
+    protected void afterSend(OutNetMessage msg, boolean sendSuccessful, boolean allowRequeue) {
         afterSend(msg, sendSuccessful, allowRequeue, 0);
     }
-    public void afterSend(OutNetMessage msg, boolean sendSuccessful, long msToSend) {
+    /**
+     * The transport is done sending this message
+     *
+     * @param msg message in question
+     * @param sendSuccessful true if the peer received it
+     * @param msToSend how long it took to transfer the data to the peer
+     */
+    protected void afterSend(OutNetMessage msg, boolean sendSuccessful, long msToSend) {
         afterSend(msg, sendSuccessful, true, msToSend);
     }
-    public void afterSend(OutNetMessage msg, boolean sendSuccessful, boolean allowRequeue, long msToSend) {
+    /**
+     * The transport is done sending this message.  This is the method that actually
+     * does all of the cleanup - firing off jobs, requeueing, updating stats, etc. 
+     *
+     * @param msg message in question
+     * @param sendSuccessful true if the peer received it
+     * @param msToSend how long it took to transfer the data to the peer
+     * @param allowRequeue true if we should try other transports if available
+     */
+    protected void afterSend(OutNetMessage msg, boolean sendSuccessful, boolean allowRequeue, long msToSend) {
         boolean log = false;
         msg.timestamp("afterSend(" + sendSuccessful + ")");
         
@@ -225,6 +268,10 @@ public abstract class TransportImpl implements Transport {
      */
     protected abstract void outboundMessageReady();
     
+    /**
+     * Message received from the I2NPMessageReader - send it to the listener
+     *
+     */
     public void messageReceived(I2NPMessage inMsg, RouterIdentity remoteIdent, Hash remoteIdentHash, long msToReceive, int bytesReceived) {
         int level = Log.INFO;
         if (msToReceive > 5000)
@@ -273,25 +320,17 @@ public abstract class TransportImpl implements Transport {
                 _log.error("WTF! Null listener! this = " + toString(), new Exception("Null listener"));
         }
     }
- 
-    /**
-     * Pull the first workable target address for this transport
-     *
-     */
-    protected RouterAddress getTargetAddress(RouterInfo address) {
-        if (address == null) return null;
-        for (Iterator iter = address.getAddresses().iterator(); iter.hasNext(); ) {
-            RouterAddress addr = (RouterAddress)iter.next();
-            if (getStyle().equals(addr.getTransportStyle())) 
-                return addr;
-        }
-        return null;
-    }
-	
+ 	
+    /** What addresses are we currently listening to? */
     public Set getCurrentAddresses() { return _currentAddresses; }
+    /** Add an address to our listening set */
     protected void addCurrentAddress(RouterAddress address) { _currentAddresses.add(address); }
+    /** Remove an address from our listening set */
     protected void removeCurrentAddress(RouterAddress address) { _currentAddresses.remove(address); }
+    /** Who to notify on message availability */
     public void setListener(TransportEventListener listener) { _listener = listener; }
-    
+    /** Make this stuff pretty (only used in the old console) */
     public String renderStatusHTML() { return null; }
+    
+    protected RouterContext getContext() { return _context; }
 }

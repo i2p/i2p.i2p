@@ -30,7 +30,6 @@ import net.i2p.data.i2np.I2NPMessage;
 import net.i2p.router.InNetMessage;
 import net.i2p.router.OutNetMessage;
 import net.i2p.router.RouterContext;
-import net.i2p.router.transport.phttp.PHTTPTransport;
 import net.i2p.router.transport.tcp.TCPTransport;
 import net.i2p.util.Log;
 
@@ -62,31 +61,14 @@ public class TransportManager implements TransportEventListener {
     }
 
     private void configTransports() {
-        RouterIdentity ident = _context.router().getRouterInfo().getIdentity();
-        Set addresses = _context.commSystem().createAddresses();
-        RouterAddress tcpAddr = null;
-        RouterAddress phttpAddr = null;
-        for (Iterator iter = addresses.iterator(); iter.hasNext();) {
-            RouterAddress addr = (RouterAddress)iter.next();
-            if (TCPTransport.STYLE.equals(addr.getTransportStyle())) {
-                tcpAddr = addr;
-            }
-            if (PHTTPTransport.STYLE.equals(addr.getTransportStyle())) {
-                phttpAddr = addr;
-            }
-        }
-
         String disableTCP = _context.router().getConfigSetting(PROP_DISABLE_TCP);
         if ( (disableTCP != null) && (Boolean.TRUE.toString().equalsIgnoreCase(disableTCP)) ) {
             _log.info("Explicitly disabling the TCP transport!");
         } else {
-            Transport t = new TCPTransport(_context, tcpAddr);
+            Transport t = new TCPTransport(_context);
             t.setListener(this);
             _transports.add(t);
         }
-        Transport t = new PHTTPTransport(_context, phttpAddr);
-        t.setListener(this);
-        _transports.add(t);
     }
     
     public void startListening() {

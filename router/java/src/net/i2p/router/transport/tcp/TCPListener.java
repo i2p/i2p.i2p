@@ -31,41 +31,52 @@ import net.i2p.util.SimpleTimer;
 class TCPListener {
     private Log _log;
     private TCPTransport _transport;
-    private TCPAddress _myAddress;
     private ServerSocket _socket;
     private ListenerRunner _listener;
     private RouterContext _context;
     private List _pendingSockets;
     private List _handlers;
     
+    /**
+     * How many concurrent connection attempts from peers we will try to
+     * deal with at once.
+     */
+    private static final int CONCURRENT_HANDLERS = 3;
+    /** 
+     * When things really suck, how long should we wait between attempts to
+     * listen to the socket?
+     */
+    private final static int MAX_FAIL_DELAY = 5*60*1000;
+    /** if we're not making progress in 10s, drop 'em */
+    private final static long HANDLE_TIMEOUT = 10*1000;
+    /** id generator for the connections */
+    private static volatile int __handlerId = 0;
+    
+    
     public TCPListener(RouterContext context, TCPTransport transport) {
         _context = context;
         _log = context.logManager().getLog(TCPListener.class);
-        _myAddress = null;
         _transport = transport;
         _pendingSockets = new ArrayList(10);
         _handlers = new ArrayList(CONCURRENT_HANDLERS);
     }
-    
-    public void setAddress(TCPAddress address) { _myAddress = address; }
-    public TCPAddress getAddress() { return _myAddress; }
-    
-    private static final int CONCURRENT_HANDLERS = 3;
-    
+        
     public void startListening() {
-        for (int i = 0; i < CONCURRENT_HANDLERS; i++) {
-            SocketHandler handler = new SocketHandler();
-            _handlers.add(handler);
-            Thread t = new I2PThread(handler);
-            t.setName("Handler" + i+" [" + _myAddress.getPort()+"]");
+        TCPAddress addr = _transport.getMyAddress();
+        if (addr != null) {
+            _listener = new ListenerRunner(addr);
+            Thread t = new I2PThread(_listener, "Listener [" + addr.getPort()+"]");
             t.setDaemon(true);
             t.start();
+            
+            for (int i = 0; i < CONCURRENT_HANDLERS; i++) {
+                SocketHandler handler = new SocketHandler();
+                _handlers.add(handler);            
+                Thread th = new I2PThread(handler, "Handler " + addr.getPort() + ": " + i);
+                th.setDaemon(true);
+                th.start();
+            }
         }
-        _listener = new ListenerRunner();
-        Thread t = new I2PThread(_listener);
-        t.setName("Listener [" + _myAddress.getPort()+"]");
-        t.setDaemon(true);
-        t.start();
     }
     
     public void stopListening() {
@@ -75,11 +86,13 @@ class TCPListener {
             h.stopHandling();
         }
         _handlers.clear();
-        if (_socket != null)
+        
+        if (_socket != null) {
             try {
                 _socket.close();
                 _socket = null;
             } catch (IOException ioe) {}
+        }
     }
     
     private InetAddress getInetAddress(String host) {
@@ -96,13 +109,13 @@ class TCPListener {
         }
     }
     
-    private final static int MAX_FAIL_DELAY = 5*60*1000;
-    
     class ListenerRunner implements Runnable {
         private boolean _isRunning;
         private int _nextFailDelay = 1000;
-        public ListenerRunner() {
+        private TCPAddress _myAddress;
+        public ListenerRunner(TCPAddress address) {
             _isRunning = true;
+            _myAddress = address;
         }
         public void stopListening() { _isRunning = false; }
         
@@ -111,34 +124,36 @@ class TCPListener {
                 _log.info("Beginning TCP listener");
             
             int curDelay = 0;
-            while ( (_isRunning) && (curDelay < MAX_FAIL_DELAY) ) {
+            while (_isRunning) {
                 try {
-                    if (_transport.getListenAddressIsValid()) {
-                        _socket = new ServerSocket(_myAddress.getPort(), 5, getInetAddress(_myAddress.getHost()));
-                    } else {
+                    if (_transport.shouldListenToAllInterfaces()) {
                         _socket = new ServerSocket(_myAddress.getPort());
+                    } else {
+                        InetAddress listenAddr = getInetAddress(_myAddress.getHost());
+                        _socket = new ServerSocket(_myAddress.getPort(), 5, listenAddr);
                     }
                     if (_log.shouldLog(Log.INFO))
                         _log.info("Begin looping for host " + _myAddress.getHost() + ":" + _myAddress.getPort());
                     curDelay = 0;
                     loop();
                 } catch (IOException ioe) {
-                    if (_log.shouldLog(Log.ERROR))
-                        _log.error("Error listening to tcp connection " + _myAddress.getHost() + ":" 
+                    if (_log.shouldLog(Log.WARN))
+                        _log.warn("Error listening to tcp connection " + _myAddress.getHost() + ":" 
                                    + _myAddress.getPort(), ioe);
                 }
                 
                 if (_socket != null) {
-                    stopListening();
                     try { _socket.close(); } catch (IOException ioe) {}
                     _socket = null;
                 }
                 
-                if (_log.shouldLog(Log.ERROR))
-                    _log.error("Error listening, waiting " + _nextFailDelay + "ms before we try again");
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("Error listening, waiting " + _nextFailDelay + "ms before we try again");
                 try { Thread.sleep(_nextFailDelay); } catch (InterruptedException ie) {}
                 curDelay += _nextFailDelay;
                 _nextFailDelay *= 5;
+                if (_nextFailDelay > MAX_FAIL_DELAY)
+                    _nextFailDelay = MAX_FAIL_DELAY;
             }
             if (_log.shouldLog(Log.ERROR))
                 _log.error("CANCELING TCP LISTEN.  delay = " + curDelay);
@@ -242,60 +257,31 @@ class TCPListener {
         }
     }
 
-    /** if we're not making progress in 30s, drop 'em */
-    private final static long HANDLE_TIMEOUT = 10*1000;
-    private static volatile int __handlerId = 0;
-    
     private class TimedHandler implements SimpleTimer.TimedEvent {
         private int _handlerId;
         private Socket _socket;
         private boolean _wasSuccessful;
-        private boolean _receivedIdentByte;
         public TimedHandler(Socket socket) {
             _socket = socket;
             _wasSuccessful = false;
             _handlerId = ++__handlerId;
-            _receivedIdentByte = false;
         }
         public int getHandlerId() { return _handlerId; }
         public void handle() {
             SimpleTimer.getInstance().addEvent(TimedHandler.this, HANDLE_TIMEOUT);
-            try {
-                OutputStream os = _socket.getOutputStream();
-                os.write(SocketCreator.I2P_FLAG);
-                os.flush();
-                if (_log.shouldLog(Log.DEBUG))
-                    _log.debug("listener: I2P flag sent");
-                int val = _socket.getInputStream().read();
-                if (_log.shouldLog(Log.DEBUG))
-                    _log.debug("listener: Value read: [" + val + "] == flag? [" + SocketCreator.I2P_FLAG + "]");
-                if (val == -1)
-                    throw new UnsupportedOperationException("Peer disconnected while we were looking for the I2P flag");
-                if (val != SocketCreator.I2P_FLAG) {
-                    throw new UnsupportedOperationException("Peer connecting to us didn't send the right I2P byte [" + val + "]");
-                }
-                
-                _receivedIdentByte = true;
-                
-                TCPConnection c = new RestrictiveTCPConnection(_context, _socket, false);
-                _transport.handleConnection(c, null);
+            ConnectionHandler ch = new ConnectionHandler(_context, _transport, _socket);
+            TCPConnection con = ch.receiveConnection();
+            if (con != null) {
                 _wasSuccessful = true;
-            } catch (UnsupportedOperationException uoe) {
-                if (_log.shouldLog(Log.DEBUG))
-                    _log.debug("Failed to state they wanted to connect as I2P", uoe);
-                _wasSuccessful = false;
-            } catch (IOException ioe) {
-                if (_log.shouldLog(Log.DEBUG))
-                    _log.debug("Error listening to the peer", ioe);
-                _wasSuccessful = false;
-            } catch (Throwable t) {
-                if (_log.shouldLog(Log.ERROR))
-                    _log.error("Error handling", t);
-                _wasSuccessful = false;
+                _transport.connectionEstablished(con);
+            } else if (ch.getTestComplete()) {
+                // not a connection, but we verified the test
+                _wasSuccessful = true;
             }
+            if (!_wasSuccessful)
+                _transport.addConnectionErrorMessage(ch.getError());
         }
         public boolean wasSuccessful() { return _wasSuccessful; }
-        public boolean receivedIdentByte() { return _receivedIdentByte; }
 
         /**
          * Called after a timeout period - if we haven't already established the
@@ -307,13 +293,8 @@ class TCPListener {
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("Handle successful");
             } else {
-                if (receivedIdentByte()) {
-                    if (_log.shouldLog(Log.WARN))
-                        _log.warn("Unable to handle in the time allotted");
-                } else {
-                    if (_log.shouldLog(Log.DEBUG))
-                        _log.debug("Peer didn't send the ident byte, so either they were testing us, or portscanning");
-                }
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("Unable to handle in the time allotted");
                 try { _socket.close(); } catch (IOException ioe) {}
             }
         }

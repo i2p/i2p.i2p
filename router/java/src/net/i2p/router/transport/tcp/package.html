@@ -1,0 +1,140 @@
+<html><body>
+<p>Implements the transport for communicating with other routers via TCP/IP.</p>
+
+<h1>Connection protocol</h1>
+
+<p>The protocol used to establish the connection between the peers is 
+implemented in the {@link net.i2p.router.transport.tcp.ConnectionBuilder}
+for "Alice", the initiator, and in 
+{@link net.i2p.router.transport.tcp.ConnectionHandler} for "Bob", the
+receiving peer.  <i>(+ implies concatenation)</i></p>
+
+<h2>Common case:</h2>
+<p><b>1) </b> <i>Alice to Bob</i>: <br />
+   <code>#bytesFollowing + #versions + v1 [+ v2 [etc]] + tag? + tagData + properties</code></p>
+<p><b>2) </b> <i>Bob to Alice</i>: <br />
+   <code>#bytesFollowing + versionOk + #bytesIP + IP + tagOk? + nonce + properties</code></p>
+
+<ul>
+<li><code>#bytesFollowing</code> is a 2 byte unsigned integer specifying how many 
+    bytes there are (after the current pair) in the line sent.  0xFFFF is reserved</li>
+<li><code>#versions</code> is a 1 byte unsigned integer specifying how many 
+    acceptable 1 byte version numbers follow (preferred value first).</li>
+<li><code>v1</code> (etc) is a 1 byte unsigned integer specifying a protocol 
+    version.  The value 0x0 is not allowed.</li>
+<li><code>tag?</code> is a 1 byte value specifying whether a tag follows - 0x0 means
+    no tag follows, 0x1 means a 32 byte tag follows.</li>
+<li><code>tagData</code> is a 32 byte tag, if necessary</li>
+<li><code>properties</code> is a name=value mapping, formatted as the other I2P
+    mappings (via {@link net.i2p.data.DataHelper#readProperties})</li>
+<li><code>versionOk</code> is a 1 byte value specifying the protocol version 
+    that is agreed upon, or 0x0 if no compatible protocol versions are available.</li>
+<li><code>#bytesIP</code> is a 2 byte unsigned integer specifying how many bytes
+    following make up the IP address</li>
+<li><code>IP</code> is made up of <code>#bytesIP</code> bytes formatting the 
+    peer who established the connection's IP address as a string (e.g. "192.168.1.1")</li>
+<li><code>tagOk?</code> is a 1 byte value specifying whether the tag provided
+    is available for use - 0x0 means no, 0x1 means yes.</li>
+<li><code>nonce</code> is a 4 byte random value</li>
+</ul>
+
+<p>Whether or not the <code>tagData</code> is specified by Alice and is accepted
+by Bob determines which of the scenarios below are used.  In addition, the IP 
+address provided by Bob gives Alice the opportunity to fire up a socket listener
+on that interface and include it in her list of reachable addresses.  The 
+<code>properties</code> mappings are left for future expansion.</p>
+
+<h2>Connection establishment with a valid tag:</h2>
+<p>With a valid <code>tag</code> and <code>nonce</code> received, both Alice and
+Bob load up the previously negotiated <code>sessionKey</code> and set the 
+<code>iv</code> to the first 16 bytes of <code>H(tag + nonce)</code>.  The 
+remainder of the communication is AES256 encrypted per 
+{@link net.i2p.crypto.AESInputStream} and {@link net.i2p.crypto.AESOutputStream}</p>
+
+<p><b>3) </b> <i>Alice to Bob</i>: <br />
+   <code>H(nonce)</code></p>
+<p><b>4) </b> <i>Bob to Alice</i>: <br />
+   <code>H(tag)</code></p>
+<p><b>5) </b> If the hashes are not correct, disconnect immediately and do not 
+   consume the tag</p>
+<p><b>6) </b> <i>Alice to Bob</i>: <br />
+   <code>routerInfo + currentTime + H(routerInfo + currentTime + nonce + tag)</code></p>
+<p><b>7) </b> Bob should now verify that he can establish a connection to her through one of the
+   routerAddresses specified in her RouterInfo.  The testing process is described below.</p>
+<p><b>8) </b> <i>Bob to Alice</i>: <br />
+   <code>routerInfo + status + properties + H(routerInfo + status + properties + nonce + tag)</code></p>
+<p><b>9) </b> If the <code>status</code> is ok, both Alice and Bob consume the 
+   <code>tagData</code>, updating the next tag to be <code>H(E(nonce + tag, sessionKey))</code>.
+   Otherwise, both sides disconnect and do not consume the tag.  In addition, on error the 
+   <code>properties</code> mapping has a more detailed reason under the key "MESSAGE".</p>
+   
+<ul>
+<li><code>H(x)</code> is the SHA256 hash of x, formatted per {@link net.i2p.data.Hash#writeBytes}.</li>
+<li><code>routerInfo</code> is the serialization of the local router's info
+    per {@link net.i2p.data.RouterInfo#writeBytes}.</li>
+<li><code>currentTime</code> is what the local router thinks the current network time
+    is, formatted per {@link net.i2p.data.DataHelper#writeDate}.</li>
+<li><code>status</code> is a 1 byte value:<ul>
+    <li><b>0x0</b> means OK</li>
+    <li><b>0x1</b> means Alice was not reachable</li>
+    <li><b>0x2</b> means the clock was skewed (Bob's current time may be available
+                   in the properties mapping under "SKEW", formatted as "yyyyMMddhhmmssSSS",
+                   per {@link java.text.SimpleDateFormat}).</li>
+    <li><b>0x3</b> means the signature is invalid (only used by steps 9 and 11 below)</li>
+    <li>Other values are currently undefined (yet fatal) errors</li>
+    </ul></li>
+</ul>
+
+<h2>Connection establishment without a vald tag:</h2>
+
+<p><b>3) </b> <i>Alice to Bob</i> <br />
+   X</p>
+<p><b>4) </b> <i>Bob to Alice</i> <br />
+   Y</p>
+<p><b>5) </b> Both sides complete the Diffie-Hellman exchange, setting the 
+   <code>sessionKey</code> to the first 32 bytes of the result (e.g. (X^y mod p)),
+   <code>iv</code> to the next 16 bytes, and the <code>nextTag</code> to the 32 
+   bytes after that. The rest of the data is AES256 encrypted with those settings per 
+   {@link net.i2p.crypto.AESInputStream} and {@link net.i2p.crypto.AESOutputStream}</p>
+<p><b>6) </b> <i>Alice to Bob</i> <br />
+   <code>H(nonce)</code></p>
+<p><b>7) </b> <i>Bob to Alice</i> <br />
+   <code>H(nextTag)</code></p>
+<p><b>8) </b> If they disagree, disconnect immediately and do not persist the tags or keys</p>
+<p><b>9) </b> <i>Alice to Bob</i> <br />
+   <code>routerInfo + currentTime 
+   + S(routerInfo + currentTime + nonce + nextTag, routerIdent.signingKey)</code></p>
+<p><b>10) </b> Bob should now verify that he can establish a connection to her through one of the
+   routerAddresses specified in her RouterInfo.  The testing process is described below.</p>
+<p><b>11) </b> <i>Bob to Alice</i> <br />
+   <code>routerInfo + status + properties 
+   + S(routerInfo + status + properties + nonce + nextTag, routerIdent.signingKey)</code></p>
+<p><b>12) </b> If the signature matches on both sides and <code>status</code> is ok, both sides
+   save the <code>sessionKey</code> negotiated as well as the <code>nextTag</code>.
+   Otherwise, the keys and tags are discarded and both sides drop the connection.</p>
+
+<ul>
+<li><code>X</code> is a 256 byte unsigned integer in 2s complement, representing
+    </code>g^x mod p</code> (where <code>g</code> and <code>p</code> are defined
+    in {@link net.i2p.crypto.CryptoConstants} and x is a randomly chosen value</li>
+<li><code>Y</code> is a 256 byte unsigned integer in 2s complement, representing
+    </code>g^y mod p</code> (where <code>g</code> and <code>p</code> are defined
+    in {@link net.i2p.crypto.CryptoConstants} and y is a randomly chosen value</li>
+<li><code>S(val, key)</code> is the DSA signature of the <code>val</code> using the
+    given signing <code>key</code> (in this case, the router's signing keys to provide
+    authentication that they are who they say they are).  The signature is formatted
+    per {@link net.i2p.data.Signature}.</li>
+</ul>
+
+<h2>Peer testing</h2>
+<p>As mentioned in steps 7 and 10 above, Bob should verify that Alice is reachable 
+to prevent a restricted route from being formed (he may decide not to do this once 
+I2P supports restricted routes)</p>
+
+<p><b>1) </b> <i>Bob to Alice</i> <br />
+   <code>0xFFFF + #versions + v1 [+ v2 [etc]] + properties</p>
+<p><b>2) </b> <i>Alice to Bob</i> <br />
+   <code>0xFFFF + versionOk + #bytesIP + IP + currentTime + properties</code></p>
+<p><b>3) </b> Both sides close the socket</p>
+
+</body></html>

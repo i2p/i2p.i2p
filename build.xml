@@ -57,7 +57,7 @@
     <target name="javadoc">
         <mkdir dir="./build" />
         <mkdir dir="./build/javadoc" />
-        <javadoc 
+        <javadoc access="package" 
             destdir="./build/javadoc" 
             packagenames="*" 
             use="true" 

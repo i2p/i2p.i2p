@@ -8,6 +8,7 @@ package net.i2p.data.i2np;
  *
  */
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -17,6 +18,7 @@ import net.i2p.I2PAppContext;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
 import net.i2p.data.DataStructureImpl;
+import net.i2p.data.Hash;
 import net.i2p.util.Log;
 
 /**
@@ -72,12 +74,23 @@ public abstract class I2NPMessageImpl extends DataStructureImpl implements I2NPM
                 type = (int)DataHelper.readLong(in, 1);
             _uniqueId = DataHelper.readLong(in, 4);
             _expiration = DataHelper.readDate(in);
+            int size = (int)DataHelper.readLong(in, 2);
+            Hash h = new Hash();
+            h.readBytes(in);
+            byte data[] = new byte[size];
+            int read = DataHelper.read(in, data);
+            if (read != size)
+                throw new I2NPMessageException("Payload is too short [" + read + ", wanted " + size + "]");
+            Hash calc = _context.sha().calculateHash(data);
+            if (!calc.equals(h))
+                throw new I2NPMessageException("Hash does not match");
+
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Reading bytes: type = " + type + " / uniqueId : " + _uniqueId + " / expiration : " + _expiration);
+            readMessage(new ByteArrayInputStream(data), type);
         } catch (DataFormatException dfe) {
             throw new I2NPMessageException("Error reading the message header", dfe);
         }
-        if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Reading bytes: type = " + type + " / uniqueId : " + _uniqueId + " / expiration : " + _expiration);
-        readMessage(in, type);
     }
     public void writeBytes(OutputStream out) throws DataFormatException, IOException {
         try {
@@ -87,6 +100,9 @@ public abstract class I2NPMessageImpl extends DataStructureImpl implements I2NPM
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Writing bytes: type = " + getType() + " / uniqueId : " + _uniqueId + " / expiration : " + _expiration);
             byte[] data = writeMessage();
+            DataHelper.writeLong(out, 2, data.length);
+            Hash h = _context.sha().calculateHash(data);
+            h.writeBytes(out);
             out.write(data);
         } catch (I2NPMessageException ime) {
             throw new DataFormatException("Error writing out the I2NP message data", ime);
@@ -105,4 +121,15 @@ public abstract class I2NPMessageImpl extends DataStructureImpl implements I2NPM
      */
     public Date getMessageExpiration() { return _expiration; }
     public void setMessageExpiration(Date exp) { _expiration = exp; }
+    
+    public int getSize() { 
+        try {
+            byte msg[] = writeMessage();
+            return msg.length + 43;
+        } catch (IOException ioe) {
+            return 0;
+        } catch (I2NPMessageException ime) {
+            return 0;
+        }
+    }
 }

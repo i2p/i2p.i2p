@@ -99,24 +99,28 @@ public class DataHelper {
      */
     public static void writeProperties(OutputStream rawStream, Properties props) 
             throws DataFormatException, IOException {
-        OrderedProperties p = new OrderedProperties();
-        if (props != null) p.putAll(props);
-        ByteArrayOutputStream baos = new ByteArrayOutputStream(32);
-        for (Iterator iter = p.keySet().iterator(); iter.hasNext();) {
-            String key = (String) iter.next();
-            String val = p.getProperty(key);
-            // now make sure they're in UTF-8
-            //key = new String(key.getBytes(), "UTF-8");
-            //val = new String(val.getBytes(), "UTF-8");
-            writeString(baos, key);
-            baos.write(_equalBytes);
-            writeString(baos, val);
-            baos.write(_semicolonBytes);
+        if (props != null) {
+            OrderedProperties p = new OrderedProperties();
+            p.putAll(props);
+            ByteArrayOutputStream baos = new ByteArrayOutputStream(32);
+            for (Iterator iter = p.keySet().iterator(); iter.hasNext();) {
+                String key = (String) iter.next();
+                String val = p.getProperty(key);
+                // now make sure they're in UTF-8
+                //key = new String(key.getBytes(), "UTF-8");
+                //val = new String(val.getBytes(), "UTF-8");
+                writeString(baos, key);
+                baos.write(_equalBytes);
+                writeString(baos, val);
+                baos.write(_semicolonBytes);
+            }
+            baos.close();
+            byte propBytes[] = baos.toByteArray();
+            writeLong(rawStream, 2, propBytes.length);
+            rawStream.write(propBytes);
+        } else {
+            writeLong(rawStream, 2, 0);
         }
-        baos.close();
-        byte propBytes[] = baos.toByteArray();
-        writeLong(rawStream, 2, propBytes.length);
-        rawStream.write(propBytes);
     }
 
     /**
