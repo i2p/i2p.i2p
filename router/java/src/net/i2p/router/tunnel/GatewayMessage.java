@@ -11,122 +11,9 @@ import net.i2p.data.SessionKey;
 import net.i2p.util.Log;
 
 /**
- * <p>Turn some raw data into something we can pass down the tunnel, decrypting
- * and verifying along the way.  The encryption used is such that decryption
- * merely requires running over the data with AES in CTR mode, calculating the
- * SHA256 of a certain fixed portion of the message (bytes 16 through $size-288),
- * and searching for that hash in the checksum block.  There is a fixed number 
- * of hops defined (8 peers after the gateway) so that we can verify the message
- * without either leaking the position in the tunnel or having the message 
- * continually "shrink" as layers are peeled off.  For tunnels shorter than 9
- * hops, the tunnel creator will take the place of the excess hops, decrypting 
- * with their keys (for outbound tunnels, this is done at the beginning, and for
- * inbound tunnels, the end).</p>
- *
- * <p>The hard part in the encryption is building that entangled checksum block, 
- * which requires essentially finding out what the hash of the payload will look 
- * like at each step, randomly ordering those hashes, then building a matrix of 
- * what each of those randomly ordered hashes will look like at each step.  
- * To visualize this a bit:</p>
- *
- * <table border="1">
- *  <tr><td colspan="2"></td>
- *      <td><b>IV</b></td><td><b>Payload</b></td>
- *      <td><b>eH[0]</b></td><td><b>eH[1]</b></td>
- *      <td><b>eH[2]</b></td><td><b>eH[3]</b></td>
- *      <td><b>eH[4]</b></td><td><b>eH[5]</b></td>
- *      <td><b>eH[6]</b></td><td><b>eH[7]</b></td>
- *      <td><b>V</b></td>
- *  </tr>
- *  <tr><td rowspan="2"><b>peer0</b><br /><font size="-2">key=K[0]</font></td><td><b>recv</b></td>
- *      <td>IV[0]</td><td>P[0]</td>
- *      <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
- *      <td>V[0]</td>
- *  </tr>
- *  <tr><td><b>send</b></td>
- *      <td rowspan="2">IV[1]</td><td rowspan="2">P[1]</td>
- *      <td rowspan="2"></td><td rowspan="2"></td><td rowspan="2"></td><td rowspan="2">H(P[1])</td>
- *      <td rowspan="2"></td><td rowspan="2"></td><td rowspan="2"></td><td rowspan="2"></td>
- *      <td rowspan="2">V[1]</td>
- *  </tr>
- *  <tr><td rowspan="2"><b>peer1</b><br /><font size="-2">key=K[1]</font></td><td><b>recv</b></td>
- *  </tr>
- *  <tr><td><b>send</b></td>
- *      <td rowspan="2">IV[2]</td><td rowspan="2">P[2]</td>
- *      <td rowspan="2"></td><td rowspan="2"></td><td rowspan="2"></td><td rowspan="2"></td>
- *      <td rowspan="2"></td><td rowspan="2"></td><td rowspan="2">H(P[2])</td><td rowspan="2"></td>
- *      <td rowspan="2">V[2]</td>
- *  </tr>
- *  <tr><td rowspan="2"><b>peer2</b><br /><font size="-2">key=K[2]</font></td><td><b>recv</b></td>
- *  </tr>
- *  <tr><td><b>send</b></td>
- *      <td rowspan="2">IV[3]</td><td rowspan="2">P[3]</td>
- *      <td rowspan="2"></td><td rowspan="2"></td><td rowspan="2"></td><td rowspan="2"></td>
- *      <td rowspan="2"></td><td rowspan="2"></td><td rowspan="2"></td><td rowspan="2">H(P[3])</td>
- *      <td rowspan="2">V[3]</td>
- *  </tr>
- *  <tr><td rowspan="2"><b>peer3</b><br /><font size="-2">key=K[3]</font></td><td><b>recv</b></td>
- *  </tr>
- *  <tr><td><b>send</b></td>
- *      <td rowspan="2">IV[4]</td><td rowspan="2">P[4]</td>
- *      <td rowspan="2">H(P[4])</td><td rowspan="2"></td><td rowspan="2"></td><td rowspan="2"></td>
- *      <td rowspan="2"></td><td rowspan="2"></td><td rowspan="2"></td><td rowspan="2"></td>
- *      <td rowspan="2">V[4]</td>
- *  </tr>
- *  <tr><td rowspan="2"><b>peer4</b><br /><font size="-2">key=K[4]</font></td><td><b>recv</b></td>
- *  </tr>
- *  <tr><td><b>send</b></td>
- *      <td rowspan="2">IV[5]</td><td rowspan="2">P[5]</td>
- *      <td rowspan="2"></td><td rowspan="2"></td><td rowspan="2">H(P[5])</td><td rowspan="2"></td>
- *      <td rowspan="2"></td><td rowspan="2"></td><td rowspan="2"></td><td rowspan="2"></td>
- *      <td rowspan="2">V[5]</td>
- *  </tr>
- *  <tr><td rowspan="2"><b>peer5</b><br /><font size="-2">key=K[5]</font></td><td><b>recv</b></td>
- *  </tr>
- *  <tr><td><b>send</b></td>
- *      <td rowspan="2">IV[6]</td><td rowspan="2">P[6]</td>
- *      <td rowspan="2"></td><td rowspan="2">H(P[6])</td><td rowspan="2"></td><td rowspan="2"></td>
- *      <td rowspan="2"></td><td rowspan="2"></td><td rowspan="2"></td><td rowspan="2"></td>
- *      <td rowspan="2">V[6]</td>
- *  </tr>
- *  <tr><td rowspan="2"><b>peer6</b><br /><font size="-2">key=K[6]</font></td><td><b>recv</b></td>
- *  </tr>
- *  <tr><td><b>send</b></td>
- *      <td rowspan="2">IV[7]</td><td rowspan="2">P[7]</td>
- *      <td rowspan="2"></td><td rowspan="2"></td><td rowspan="2"></td><td rowspan="2"></td>
- *      <td rowspan="2"></td><td rowspan="2">H(P[7])</td><td rowspan="2"></td><td rowspan="2"></td>
- *      <td rowspan="2">V[7]</td>
- *  </tr>
- *  <tr><td rowspan="2"><b>peer7</b><br /><font size="-2">key=K[7]</font></td><td><b>recv</b></td>
- *  </tr>
- *  <tr><td><b>send</b></td>
- *      <td>IV[8]</td><td>P[8]</td>
- *      <td></td><td></td><td></td><td></td><td>H(P[8])</td><td></td><td></td><td></td>
- *      <td>V[8]</td>
- *  </tr>
- * </table>
- *
- * <p>In the above, P[8] is the same as the original data being passed through the
- * tunnel, and V[8] is the SHA256 of eH[0-8] as seen on peer7 after decryption.  For
- * cells in the matrix "higher up" than the hash, their value is derived by encrypting
- * the cell below it with the key for the peer below it, using the end of the column 
- * to the left of it as the IV.  For cells in the matrix "lower down" than the hash, 
- * they're equal to the cell above them, decrypted by the current peer's key, using 
- * the end of the previous encrypted block on that row.</p>
- * 
- * <p>With this randomized matrix of checksum blocks, each peer will be able to find
- * the hash of the payload, or if it is not there, know that the message is corrupt.
- * The entanglement by using CTR mode increases the difficulty in tagging the 
- * checksum blocks themselves, but it is still possible for that tagging to go 
- * briefly undetected if the columns after the tagged data have already been used
- * to check the payload at a peer.  In any case, the tunnel endpoint (peer 7) knows
- * for certain whether any of the checksum blocks have been tagged, as that would
- * corrupt the verification block (V[8]).</p>
- *
- * <p>The IV[0] is a random 16 byte value, and IV[i] is the first 16 bytes of 
- * H(D(IV[i-1], K[i-1])).  We don't use the same IV along the path, as that would
- * allow trivial collusion, and we use the hash of the decrypted value to propogate 
- * the IV so as to hamper key leakage.</p>
+ * <p>Manage the actual encryption necessary to turn a message into what the 
+ * gateway needs to know so that it can send out a tunnel message.  See the doc
+ * "tunnel.html" for more details on the algorithm and motivation.</p>
  * 
  */
 public class GatewayMessage {
@@ -159,12 +46,13 @@ public class GatewayMessage {
     private boolean _encrypted;
     /** if true, someone gave us a payload */
     private boolean _payloadSet;
-    
+    /** includes the gateway and endpoint */
     static final int HOPS = 8;
+    /** aes256 */
     static final int IV_SIZE = 16;
     private static final byte EMPTY[] = new byte[0];
     private static final int COLUMNS = HOPS;
-    private static final int HASH_ROWS = HOPS + 1;
+    private static final int HASH_ROWS = HOPS;
     
     public GatewayMessage(I2PAppContext ctx) {
         _context = ctx;
@@ -173,8 +61,8 @@ public class GatewayMessage {
     }
     
     private void initialize() {
-        _iv = new byte[HOPS][IV_SIZE];
-        _eIV = new byte[HOPS][IV_SIZE];
+        _iv = new byte[HOPS-1][IV_SIZE];
+        _eIV = new byte[HOPS-1][IV_SIZE];
         _H = new byte[HOPS][Hash.HASH_LENGTH];
         _eH = new byte[COLUMNS][HASH_ROWS][Hash.HASH_LENGTH];
         _preV = new byte[HOPS*Hash.HASH_LENGTH];
@@ -242,23 +130,23 @@ public class GatewayMessage {
     private final void encryptIV(GatewayTunnelConfig cfg) {
         _context.random().nextBytes(_iv[0]);
         
-        for (int i = 0; i < HOPS - 1; i++) {
+        for (int i = 1; i < HOPS - 1; i++) {
             SessionKey key = cfg.getSessionKey(i);
             
             // decrypt, since we're simulating what the participants do
-            _context.aes().decryptBlock(_iv[i], 0, key, _iv[i+1], 0);
-            Hash h = _context.sha().calculateHash(_iv[i+1]);
-            System.arraycopy(h.getData(), 0, _iv[i+1], 0, IV_SIZE);
+            _context.aes().decryptBlock(_iv[i-1], 0, key, _iv[i], 0);
+            Hash h = _context.sha().calculateHash(_iv[i]);
+            System.arraycopy(h.getData(), 0, _iv[i], 0, IV_SIZE);
         }
         
         if (_log.shouldLog(Log.DEBUG)) {
-            for (int i = 0; i < HOPS; i++)
+            for (int i = 0; i < HOPS-1; i++)
                 _log.debug("_iv[" + i + "] = " + Base64.encode(_iv[i]));
         }
     }
     
     /** 
-     * Encrypt the payload and IV blocks, overwriting _iv and _payload, 
+     * Encrypt the payload and IV blocks, overwriting the _payload, 
      * populating _H[] with the SHA256(payload) along the way and placing
      * the last 16 bytes of the encrypted payload into eIV[] at each step.
      *
@@ -269,7 +157,7 @@ public class GatewayMessage {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("# payload blocks: " + numBlocks);
         
-        for (int i = HOPS - 1; i >= 0; i--) {
+        for (int i = HOPS - 1; i > 0; i--) {
             SessionKey key = cfg.getSessionKey(i);
             
             if ( (_payload != null) && (_payload.length > 0) ) {
@@ -278,7 +166,7 @@ public class GatewayMessage {
                 System.arraycopy(h.getData(), 0, _H[i], 0, Hash.HASH_LENGTH);
             
                 // first block, use the IV
-                DataHelper.xor(_iv[i], 0, _payload, 0, _payload, 0, IV_SIZE);
+                DataHelper.xor(_iv[i-1], 0, _payload, 0, _payload, 0, IV_SIZE);
                 _context.aes().encryptBlock(_payload, 0, key, _payload, 0);
                 
                 for (int j = 1; j < numBlocks; j++) {
@@ -287,18 +175,29 @@ public class GatewayMessage {
                     _context.aes().encryptBlock(_payload, j*IV_SIZE, key, _payload, j*IV_SIZE);
                 }
                 
-                System.arraycopy(_payload, _payload.length - IV_SIZE, _eIV[i], 0, IV_SIZE);
+                System.arraycopy(_payload, _payload.length - IV_SIZE, _eIV[i-1], 0, IV_SIZE);
             } else {
                 Hash h = _context.sha().calculateHash(EMPTY); 
                 System.arraycopy(h.getData(), 0, _H[i], 0, Hash.HASH_LENGTH);
                 
                 // nothing to encrypt... pass on the IV to the checksum blocks
-                System.arraycopy(_iv, 0, _eIV[i], 0, IV_SIZE);
+                System.arraycopy(_iv, 0, _eIV[i-1], 0, IV_SIZE);
             }
         }
+        
+        // we need to know what the gateway would "decrypt" to, even though they
+        // aren't actually doing any decrypting (so the first peer can't look 
+        // back and say "hey, the previous peer had no match, they must be the
+        // gateway")
+        Hash h0 = null;
+        if ( (_payload != null) && (_payload.length > 0) )
+            h0 = _context.sha().calculateHash(_payload);
+        else
+            h0 = _context.sha().calculateHash(EMPTY);
+        System.arraycopy(h0.getData(), 0, _H[0], 0, Hash.HASH_LENGTH);
 
         if (_log.shouldLog(Log.DEBUG)) {
-            for (int i = 0; i < HOPS; i++)
+            for (int i = 0; i < HOPS-1; i++)
                 _log.debug("_eIV["+ i + "] = " + Base64.encode(_eIV[i]));
             for (int i = 0; i < HOPS; i++)
                 _log.debug("_H["+ i + "] = " + Base64.encode(_H[i]));
@@ -306,36 +205,36 @@ public class GatewayMessage {
     }
     
     /**
-     * Fill in the _eH[column][step+1] matrix with the encrypted _H values so
+     * Fill in the _eH[column][step] matrix with the encrypted _H values so
      * that at each step, exactly one column will contain the _H value for
      * that step in the clear.  _eH[column][0] will contain what is sent from
-     * the gateway to the first hop.  The encryption uses the _eIV for each 
+     * the gateway (peer0) to the first hop (peer1).  The encryption uses the _eIV for each 
      * step so that a plain AES/CTR decrypt of the entire message will expose
-     * the layer.  _eH[column][_order[i]+1] == _H[_order[i]]
+     * the layer.  The columns are ordered according to _order
      */
     private final void encryptChecksumBlocks(GatewayTunnelConfig cfg) {
         for (int column = 0; column < COLUMNS; column++) {
             // which _H[hash] value are we rendering in this column?
             int hash = _order[column];
             // fill in the cleartext version for this column
-            System.arraycopy(_H[hash], 0, _eH[column][hash+1], 0, Hash.HASH_LENGTH);
+            System.arraycopy(_H[hash], 0, _eH[column][hash], 0, Hash.HASH_LENGTH);
             
-            // now fill in the "earlier" _eH[column][row] values for earlier hops 
-            // by encrypting _eH[column][row+1] with the peer's key, using the end 
-            // of the previous column (or _eIV[row]) as the IV
-            for (int row = hash; row >= 0; row--) {
+            // now fill in the "earlier" _eH[column][row-1] values for earlier hops 
+            // by encrypting _eH[column][row] with the peer's key, using the end 
+            // of the previous column (or _eIV[row-1]) as the IV
+            for (int row = hash; row > 0; row--) {
                 SessionKey key = cfg.getSessionKey(row);
                 // first half
                 if (column == 0) {
-                    DataHelper.xor(_eIV[row], 0, _eH[column][row+1], 0, _eH[column][row], 0, IV_SIZE);
+                    DataHelper.xor(_eIV[row-1], 0, _eH[column][row], 0, _eH[column][row-1], 0, IV_SIZE);
                 } else {
-                    DataHelper.xor(_eH[column-1][row], IV_SIZE, _eH[column][row+1], 0, _eH[column][row], 0, IV_SIZE);
+                    DataHelper.xor(_eH[column-1][row-1], IV_SIZE, _eH[column][row], 0, _eH[column][row-1], 0, IV_SIZE);
                 }
-                _context.aes().encryptBlock(_eH[column][row], 0, key, _eH[column][row], 0);
+                _context.aes().encryptBlock(_eH[column][row-1], 0, key, _eH[column][row-1], 0);
                 
                 // second half
-                DataHelper.xor(_eH[column][row], 0, _eH[column][row+1], IV_SIZE, _eH[column][row], IV_SIZE, IV_SIZE);
-                _context.aes().encryptBlock(_eH[column][row], IV_SIZE, key, _eH[column][row], IV_SIZE);
+                DataHelper.xor(_eH[column][row-1], 0, _eH[column][row], IV_SIZE, _eH[column][row-1], IV_SIZE, IV_SIZE);
+                _context.aes().encryptBlock(_eH[column][row-1], IV_SIZE, key, _eH[column][row-1], IV_SIZE);
             }
             
             // fill in the "later" rows by encrypting the previous rows with the 
@@ -343,7 +242,7 @@ public class GatewayMessage {
             // as the IV
             for (int row = hash + 1; row < HASH_ROWS; row++) {
                 // row is the one we are *writing* to
-                SessionKey key = cfg.getSessionKey(row-1);
+                SessionKey key = cfg.getSessionKey(row);
                 
                 _context.aes().decryptBlock(_eH[column][row-1], 0, key, _eH[column][row], 0);
                 if (column == 0)
@@ -373,7 +272,7 @@ public class GatewayMessage {
     }
     
     /**
-     * Build the _V hash as the SHA256 of _eH[*][8], then encrypt it on top of
+     * Build the _V hash as the SHA256 of _eH[*][7], then encrypt it on top of
      * itself using the last 16 bytes of _eH[7][*] as the IV.
      *
      */
@@ -386,11 +285,11 @@ public class GatewayMessage {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("_V final = " + Base64.encode(_V));
         
-        for (int i = HOPS - 1; i >= 0; i--) {
+        for (int i = HOPS - 1; i > 0; i--) {
             SessionKey key = cfg.getSessionKey(i);
             // xor the last block of the encrypted payload with the first block of _V to
             // continue the CTR operation
-            DataHelper.xor(_V, 0, _eH[HOPS-1][i], IV_SIZE, _V, 0, IV_SIZE);
+            DataHelper.xor(_V, 0, _eH[COLUMNS-1][i-1], IV_SIZE, _V, 0, IV_SIZE);
             _context.aes().encryptBlock(_V, 0, key, _V, 0);
             DataHelper.xor(_V, 0, _V, IV_SIZE, _V, IV_SIZE, IV_SIZE);
             _context.aes().encryptBlock(_V, IV_SIZE, key, _V, IV_SIZE);
@@ -417,6 +316,7 @@ public class GatewayMessage {
     
     /**
      * Write out the fully encrypted tunnel message to the target
+     * (starting with what peer1 should see)
      *
      * @param target array to write to, which must be large enough 
      * @param offset offset into the array to start writing
@@ -455,9 +355,9 @@ public class GatewayMessage {
         
         int off = message.length - (COLUMNS + 1) * Hash.HASH_LENGTH;
         for (int column = 0; column < COLUMNS; column++) {
-            boolean ok = DataHelper.eq(_eH[column][peer+1], 0, message, off, Hash.HASH_LENGTH);
+            boolean ok = DataHelper.eq(_eH[column][peer], 0, message, off, Hash.HASH_LENGTH);
             if (log.shouldLog(Log.DEBUG))
-                log.debug("checksum[" + column + "][" + (peer+1) + "] matches?  " + ok);
+                log.debug("checksum[" + column + "][" + (peer) + "] matches?  " + ok);
             
             off += Hash.HASH_LENGTH;
             match = match && ok;

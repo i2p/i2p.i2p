@@ -42,7 +42,7 @@ out to the remote endpoint.</p>
 <p>The tunnel's creator selects exactly which peers will participate
 in the tunnel, and provides each with the necessary confiruration
 data.  They may vary in length from 0 hops (where the gateway
-is also the endpoint) to 9 hops (where there are 7 peers after
+is also the endpoint) to 8 hops (where there are 6 peers after
 the gateway and before the endpoint).  It is the intent to make
 it hard for either participants or third parties to determine
 the length of a tunnel, or even for colluding participants to 
@@ -136,9 +136,9 @@ verify the integrity of the checksum block.  The specific details follow.</p>
 merely requires running over the data with AES in CTR mode, calculating the
 SHA256 of a certain fixed portion of the message (bytes 16 through $size-288),
 and searching for that hash in the checksum block.  There is a fixed number 
-of hops defined (8 peers after the gateway) so that we can verify the message
+of hops defined (8 peers) so that we can verify the message
 without either leaking the position in the tunnel or having the message 
-continually "shrink" as layers are peeled off.  For tunnels shorter than 9
+continually "shrink" as layers are peeled off.  For tunnels shorter than 8
 hops, the tunnel creator will take the place of the excess hops, decrypting 
 with their keys (for outbound tunnels, this is done at the beginning, and for
 inbound tunnels, the end).</p>
@@ -146,7 +146,9 @@ inbound tunnels, the end).</p>
 <p>The hard part in the encryption is building that entangled checksum block, 
 which requires essentially finding out what the hash of the payload will look 
 like at each step, randomly ordering those hashes, then building a matrix of 
-what each of those randomly ordered hashes will look like at each step.  
+what each of those randomly ordered hashes will look like at each step.  The
+gateway itself must pretend that it is one of the peers within the checksum
+block so that the first hop cannot tell that the previous hop was the gateway.
 To visualize this a bit:</p>
 
 <table border="1">
@@ -159,75 +161,73 @@ To visualize this a bit:</p>
      <td><b>V</b></td>
  </tr>
  <tr><td rowspan="2"><b>peer0</b><br /><font size="-2">key=K[0]</font></td><td><b>recv</b></td>
-     <td>IV[0]</td><td>P[0]</td>
-     <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
-     <td>V[0]</td>
+     <td colspan="11"><hr /></td>
  </tr>
  <tr><td><b>send</b></td>
-     <td rowspan="2">IV[1]</td><td rowspan="2">P[1]</td>
-     <td rowspan="2"></td><td rowspan="2"></td><td rowspan="2"></td><td rowspan="2">H(P[1])</td>
+     <td rowspan="2">IV[0]</td><td rowspan="2">P[0]</td>
+     <td rowspan="2"></td><td rowspan="2"></td><td rowspan="2"></td><td rowspan="2">H(P[0])</td>
      <td rowspan="2"></td><td rowspan="2"></td><td rowspan="2"></td><td rowspan="2"></td>
-     <td rowspan="2">V[1]</td>
+     <td rowspan="2">V[0]</td>
  </tr>
  <tr><td rowspan="2"><b>peer1</b><br /><font size="-2">key=K[1]</font></td><td><b>recv</b></td>
  </tr>
  <tr><td><b>send</b></td>
-     <td rowspan="2">IV[2]</td><td rowspan="2">P[2]</td>
+     <td rowspan="2">IV[1]</td><td rowspan="2">P[1]</td>
      <td rowspan="2"></td><td rowspan="2"></td><td rowspan="2"></td><td rowspan="2"></td>
-     <td rowspan="2"></td><td rowspan="2"></td><td rowspan="2">H(P[2])</td><td rowspan="2"></td>
-     <td rowspan="2">V[2]</td>
+     <td rowspan="2"></td><td rowspan="2"></td><td rowspan="2">H(P[1])</td><td rowspan="2"></td>
+     <td rowspan="2">V[1]</td>
  </tr>
  <tr><td rowspan="2"><b>peer2</b><br /><font size="-2">key=K[2]</font></td><td><b>recv</b></td>
  </tr>
  <tr><td><b>send</b></td>
-     <td rowspan="2">IV[3]</td><td rowspan="2">P[3]</td>
+     <td rowspan="2">IV[2]</td><td rowspan="2">P[2]</td>
      <td rowspan="2"></td><td rowspan="2"></td><td rowspan="2"></td><td rowspan="2"></td>
-     <td rowspan="2"></td><td rowspan="2"></td><td rowspan="2"></td><td rowspan="2">H(P[3])</td>
-     <td rowspan="2">V[3]</td>
+     <td rowspan="2"></td><td rowspan="2"></td><td rowspan="2"></td><td rowspan="2">H(P[2])</td>
+     <td rowspan="2">V[2]</td>
  </tr>
  <tr><td rowspan="2"><b>peer3</b><br /><font size="-2">key=K[3]</font></td><td><b>recv</b></td>
  </tr>
  <tr><td><b>send</b></td>
-     <td rowspan="2">IV[4]</td><td rowspan="2">P[4]</td>
-     <td rowspan="2">H(P[4])</td><td rowspan="2"></td><td rowspan="2"></td><td rowspan="2"></td>
+     <td rowspan="2">IV[3]</td><td rowspan="2">P[3]</td>
+     <td rowspan="2">H(P[3])</td><td rowspan="2"></td><td rowspan="2"></td><td rowspan="2"></td>
      <td rowspan="2"></td><td rowspan="2"></td><td rowspan="2"></td><td rowspan="2"></td>
-     <td rowspan="2">V[4]</td>
+     <td rowspan="2">V[3]</td>
  </tr>
  <tr><td rowspan="2"><b>peer4</b><br /><font size="-2">key=K[4]</font></td><td><b>recv</b></td>
  </tr>
  <tr><td><b>send</b></td>
-     <td rowspan="2">IV[5]</td><td rowspan="2">P[5]</td>
-     <td rowspan="2"></td><td rowspan="2"></td><td rowspan="2">H(P[5])</td><td rowspan="2"></td>
+     <td rowspan="2">IV[4]</td><td rowspan="2">P[4]</td>
+     <td rowspan="2"></td><td rowspan="2"></td><td rowspan="2">H(P[4])</td><td rowspan="2"></td>
      <td rowspan="2"></td><td rowspan="2"></td><td rowspan="2"></td><td rowspan="2"></td>
-     <td rowspan="2">V[5]</td>
+     <td rowspan="2">V[4]</td>
  </tr>
  <tr><td rowspan="2"><b>peer5</b><br /><font size="-2">key=K[5]</font></td><td><b>recv</b></td>
  </tr>
  <tr><td><b>send</b></td>
-     <td rowspan="2">IV[6]</td><td rowspan="2">P[6]</td>
-     <td rowspan="2"></td><td rowspan="2">H(P[6])</td><td rowspan="2"></td><td rowspan="2"></td>
+     <td rowspan="2">IV[5]</td><td rowspan="2">P[5]</td>
+     <td rowspan="2"></td><td rowspan="2">H(P[5])</td><td rowspan="2"></td><td rowspan="2"></td>
      <td rowspan="2"></td><td rowspan="2"></td><td rowspan="2"></td><td rowspan="2"></td>
-     <td rowspan="2">V[6]</td>
+     <td rowspan="2">V[5]</td>
  </tr>
  <tr><td rowspan="2"><b>peer6</b><br /><font size="-2">key=K[6]</font></td><td><b>recv</b></td>
  </tr>
  <tr><td><b>send</b></td>
-     <td rowspan="2">IV[7]</td><td rowspan="2">P[7]</td>
+     <td rowspan="2">IV[6]</td><td rowspan="2">P[6]</td>
      <td rowspan="2"></td><td rowspan="2"></td><td rowspan="2"></td><td rowspan="2"></td>
-     <td rowspan="2"></td><td rowspan="2">H(P[7])</td><td rowspan="2"></td><td rowspan="2"></td>
-     <td rowspan="2">V[7]</td>
+     <td rowspan="2"></td><td rowspan="2">H(P[6])</td><td rowspan="2"></td><td rowspan="2"></td>
+     <td rowspan="2">V[6]</td>
  </tr>
  <tr><td rowspan="2"><b>peer7</b><br /><font size="-2">key=K[7]</font></td><td><b>recv</b></td>
  </tr>
  <tr><td><b>send</b></td>
-     <td>IV[8]</td><td>P[8]</td>
-     <td></td><td></td><td></td><td></td><td>H(P[8])</td><td></td><td></td><td></td>
-     <td>V[8]</td>
+     <td>IV[7]</td><td>P[7]</td>
+     <td></td><td></td><td></td><td></td><td>H(P[7])</td><td></td><td></td><td></td>
+     <td>V[7]</td>
  </tr>
 </table>
 
-<p>In the above, P[8] is the same as the original data being passed through the
-tunnel (the preprocessed messages), and V[8] is the SHA256 of eH[0-7] as seen on
+<p>In the above, P[7] is the same as the original data being passed through the
+tunnel (the preprocessed messages), and V[7] is the SHA256 of eH[0-7] as seen on
 peer7 after decryption.  For
 cells in the matrix "higher up" than the hash, their value is derived by encrypting
 the cell below it with the key for the peer below it, using the end of the column 
@@ -242,12 +242,15 @@ checksum blocks themselves, but it is still possible for that tagging to go
 briefly undetected if the columns after the tagged data have already been used
 to check the payload at a peer.  In any case, the tunnel endpoint (peer 7) knows
 for certain whether any of the checksum blocks have been tagged, as that would
-corrupt the verification block (V[8]).</p>
+corrupt the verification block (V[7]).</p>
 
 <p>The IV[0] is a random 16 byte value, and IV[i] is the first 16 bytes of 
 H(D(IV[i-1], K[i-1])).  We don't use the same IV along the path, as that would
 allow trivial collusion, and we use the hash of the decrypted value to propogate 
 the IV so as to hamper key leakage.</p>
+
+<p>When the gateway wants to send the message, they export the right row for the
+peer who is the first hop (usually the peer1.recv row) and forward that entirely.</p>
 
 <h3>2.3) <a name="tunnel.participant">Participant processing</a></h3>
 
@@ -359,7 +362,8 @@ along the same peers.</p>
 
 <p>At the moment, the plan is to reuse the existing SHA256 code and build
 all of the checksum and verification hashes as 32 byte SHA256 values.  20
-byte SHA1 would likely be more than sufficient, and perhaps smaller.</p>
+byte SHA1 would likely be more than sufficient, and perhaps smaller (first
+4 bytes of the SHA256?)</p>
 
 <h2>3) <a name="tunnel.building">Tunnel building</a></h2>
 

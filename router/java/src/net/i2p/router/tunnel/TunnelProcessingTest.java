@@ -55,7 +55,7 @@ public class TunnelProcessingTest {
         if (exp != size) throw new RuntimeException("Foo!");
         
         TunnelMessageProcessor proc = new TunnelMessageProcessor();
-        for (int i = 0; i < GatewayMessage.HOPS; i++) {
+        for (int i = 1; i < GatewayMessage.HOPS; i++) {
             log.debug("\n\nUnwrapping step " + i);
             boolean ok = proc.unwrapMessage(ctx, message, cfg.getSessionKey(i));
             if (!ok) 
