@@ -63,7 +63,7 @@ class WebEditPageFormGenerator {
         addOptions(buf, controller);
         buf.append("<input type=\"submit\" name=\"action\" value=\"Save\">\n");
         buf.append("<input type=\"submit\" name=\"action\" value=\"Remove\">\n");
-        buf.append(" <i>confirm</i> <input type=\"checkbox\" name=\"removeConfirm\" value=\"true\" />\n");
+        buf.append(" <i>confirm removal:</i> <input type=\"checkbox\" name=\"removeConfirm\" value=\"true\" />\n");
         buf.append("</form>\n");
         return buf.toString();
     }
@@ -83,7 +83,7 @@ class WebEditPageFormGenerator {
         addOptions(buf, controller);
         buf.append("<input type=\"submit\" name=\"action\" value=\"Save\"><br />\n");
         buf.append("<input type=\"submit\" name=\"action\" value=\"Remove\">\n");
-        buf.append(" <i>confirm</i> <input type=\"checkbox\" name=\"removeConfirm\" value=\"true\" />\n");
+        buf.append(" <i>confirm removal:</i> <input type=\"checkbox\" name=\"removeConfirm\" value=\"true\" />\n");
         buf.append("</form>\n");
         return buf.toString();
     }
@@ -118,7 +118,7 @@ class WebEditPageFormGenerator {
         addOptions(buf, controller);
         buf.append("<input type=\"submit\" name=\"action\" value=\"Save\">\n");
         buf.append("<input type=\"submit\" name=\"action\" value=\"Remove\">\n");
-        buf.append(" <i>confirm</i> <input type=\"checkbox\" name=\"removeConfirm\" value=\"true\" />\n");
+        buf.append(" <i>confirm removal:</i> <input type=\"checkbox\" name=\"removeConfirm\" value=\"true\" />\n");
         buf.append("</form>\n");
         return buf.toString();
     }
