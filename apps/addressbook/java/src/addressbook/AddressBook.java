@@ -188,7 +188,7 @@ public class AddressBook {
             String otherKey = (String) otherIter.next();
             String otherValue = (String) other.addresses.get(otherKey);
 
-            if (otherValue.length() >= 516) {
+            if (otherKey.endsWith(".i2p") && otherValue.length() >= 516) {
                 if (this.addresses.containsKey(otherKey)) {
                     if (!this.addresses.get(otherKey).equals(otherValue)
                             && log != null) {
@@ -243,27 +243,4 @@ public class AddressBook {
     public void write() {
         this.write(new File(this.location));
     }
-	
-    /**
-     * Filter out bad addresses in this addressbook, and write them to log.
-     * Returns the number of addresses removed.
-     *
-     * @author Sugadude
-     */
-    public int filter(Log log) {
-        Iterator iter = this.addresses.keySet().iterator();
-        int removed = 0;
-        while(iter.hasNext()) {
-            String aKey = (String) iter.next();
-            if(!aKey.endsWith(".i2p")) {
-                iter.remove();
-                removed++;
-                if(log != null)
-                    log.append("Invalid address " + aKey + " filtered out.");
-            }
-        }
-        if(removed > 0)
-            this.modified = true;
-        return removed;
-     }
 }
