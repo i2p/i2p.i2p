@@ -120,8 +120,8 @@ public class I2PTunnelRunner extends I2PThread implements I2PSocket.SocketErrorL
             // now one connection is dead - kill the other as well.
             s.close();
             i2ps.close();
-            t1.join();
-            t2.join();
+            t1.join(30*1000);
+            t2.join(30*1000);
             closedCleanly = true;
         } catch (InterruptedException ex) {
             if (_log.shouldLog(Log.ERROR))

@@ -143,6 +143,8 @@ public class StatisticsManager implements Service {
             //includeRate("transport.receiveMessageMedium", stats, new long[] { 5*60*1000, 60*60*1000 });
             //includeRate("transport.receiveMessageLarge", stats, new long[] { 5*60*1000, 60*60*1000 });
             includeRate("client.sendAckTime", stats, new long[] { 60*60*1000 }, true);
+            includeRate("stream.con.sendDuplicateSize", stats, new long[] { 60*60*1000 });
+            includeRate("stream.con.receiveDuplicateSize", stats, new long[] { 60*60*1000 });
             //includeRate("client.sendsPerFailure", stats, new long[] { 60*60*1000, 24*60*60*1000l }, true);
             //includeRate("client.timeoutCongestionTunnel", stats, new long[] { 60*60*1000, 24*60*60*1000l }, true);
             //includeRate("client.timeoutCongestionMessage", stats, new long[] { 60*60*1000, 24*60*60*1000l }, true);

@@ -1,4 +1,9 @@
-$Id: history.txt,v 1.83 2004/11/26 10:20:14 jrandom Exp $
+$Id: history.txt,v 1.84 2004/11/26 22:54:18 jrandom Exp $
+
+2004-11-27  jrandom
+    * Removed the I2PTunnel inactivity timeout thread, since the new streaming
+      lib can do that (without an additional per-connection thread).
+    * Close the I2PTunnel forwarder threads more aggressively
 
 2004-11-27  jrandom
     * Fix for a fast loop caused by a race in the new streaming library (thanks

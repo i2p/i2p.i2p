@@ -14,6 +14,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.StringTokenizer;
 import java.util.HashMap;
+import java.util.Properties;
 
 import net.i2p.I2PAppContext;
 import net.i2p.I2PException;
@@ -149,7 +150,6 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
         String targetRequest = null;
         boolean usingWWWProxy = false;
         String currentProxy = null;
-        InactivityTimeoutThread timeoutThread = null;
         long requestId = ++__requestId;
         try {
             out = s.getOutputStream();
@@ -354,113 +354,29 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
                 return;
             }
             String remoteID;
-            I2PSocket i2ps = createI2PSocket(dest);
+            
+            Properties opts = new Properties();
+            opts.setProperty("i2p.streaming.inactivityTimeout", ""+120*1000);
+            // 1 == disconnect.  see ConnectionOptions in the new streaming lib, which i
+            // dont want to hard link to here
+            opts.setProperty("i2p.streaming.inactivityTimeoutAction", ""+1);
+            I2PSocket i2ps = createI2PSocket(dest, getDefaultOptions(opts));
             byte[] data = newRequest.toString().getBytes("ISO-8859-1");
             I2PTunnelRunner runner = new I2PTunnelRunner(s, i2ps, sockLock, data, mySockets);
-            timeoutThread = new InactivityTimeoutThread(runner, out, targetRequest, usingWWWProxy, currentProxy, s, requestId);
-            timeoutThread.start();
         } catch (SocketException ex) {
-            if (timeoutThread != null) timeoutThread.disable();
             _log.info(getPrefix(requestId) + "Error trying to connect", ex);
             l.log(ex.getMessage());
             handleHTTPClientException(ex, out, targetRequest, usingWWWProxy, currentProxy, requestId);
             closeSocket(s);
         } catch (IOException ex) {
-            if (timeoutThread != null) timeoutThread.disable();
             _log.info(getPrefix(requestId) + "Error trying to connect", ex);
             l.log(ex.getMessage());
             handleHTTPClientException(ex, out, targetRequest, usingWWWProxy, currentProxy, requestId);
             closeSocket(s);
         } catch (I2PException ex) {
-            if (timeoutThread != null) timeoutThread.disable();
             _log.info("getPrefix(requestId) + Error trying to connect", ex);
             l.log(ex.getMessage());
             handleHTTPClientException(ex, out, targetRequest, usingWWWProxy, currentProxy, requestId);
-            closeSocket(s);
-        }
-    }
-
-    private static final long INACTIVITY_TIMEOUT = 120 * 1000;
-    private static volatile long __timeoutId = 0;
-
-    private class InactivityTimeoutThread extends I2PThread {
-        
-        private Socket s;
-        private I2PTunnelRunner _runner;
-        private OutputStream _out;
-        private String _targetRequest;
-        private boolean _useWWWProxy;
-        private String _currentProxy;
-        private long _requestId;
-        private boolean _disabled;
-        private Object _disableLock = new Object();
-
-        public InactivityTimeoutThread(I2PTunnelRunner runner, OutputStream out, String targetRequest,
-                                       boolean useWWWProxy, String currentProxy, Socket s, long requestId) {
-            this.s = s;
-            _runner = runner;
-            _out = out;
-            _targetRequest = targetRequest;
-            _useWWWProxy = useWWWProxy;
-            _currentProxy = currentProxy;
-            _disabled = false;
-            _requestId = requestId;
-            long timeoutId = ++__timeoutId;
-            setName("InactivityThread " + getPrefix(requestId) + timeoutId);
-        }
-
-        public void disable() {
-            _disabled = true;
-            synchronized (_disableLock) {
-                _disableLock.notifyAll();
-            }
-        }
-
-        public void run() {
-            while (!_disabled) {
-                if (_runner.isFinished()) {
-                    if (_log.shouldLog(Log.INFO)) _log.info(getPrefix(_requestId) + "HTTP client request completed prior to timeout");
-                    return;
-                }
-                if (_runner.getLastActivityOn() < Clock.getInstance().now() - INACTIVITY_TIMEOUT) {
-                    if (_runner.getStartedOn() < Clock.getInstance().now() - INACTIVITY_TIMEOUT) {
-                        if (_log.shouldLog(Log.WARN))
-                            _log.warn(getPrefix(_requestId) + "HTTP client request timed out (lastActivity: "
-                                      + new Date(_runner.getLastActivityOn()) + ", startedOn: "
-                                      + new Date(_runner.getStartedOn()) + ")");
-                        timeout();
-                        return;
-                    } else {
-                        // runner hasn't been going to long enough
-                    }
-                } else {
-                    // there has been activity in the period
-                }
-                synchronized (_disableLock) {
-                    try {
-                        _disableLock.wait(INACTIVITY_TIMEOUT);
-                    } catch (InterruptedException ie) {
-                    }
-                }
-            }
-        }
-
-        private void timeout() {
-            _log.info(getPrefix(_requestId) + "Inactivity timeout reached");
-            l.log("Inactivity timeout reached");
-            if (_out != null) {
-                try {
-                    if (_runner.getLastActivityOn() > 0) {
-                        // some  data has been sent, so don't 404 it
-                    } else {
-                        writeErrorMessage(ERR_TIMEOUT, _out, _targetRequest, _useWWWProxy, _currentProxy);
-                    }
-                } catch (IOException ioe) {
-                    _log.warn(getPrefix(_requestId) + "Error writing out the 'timeout' message", ioe);
-                }
-            } else {
-                _log.warn(getPrefix(_requestId) + "Client disconnected before we could say we timed out");
-            }
             closeSocket(s);
         }
     }

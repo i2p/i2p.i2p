@@ -184,8 +184,21 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
      * create the default options (using the default timeout, etc)
      *
      */
-    private I2PSocketOptions getDefaultOptions() {
+    protected I2PSocketOptions getDefaultOptions() {
         Properties defaultOpts = getTunnel().getClientOptions();
+        I2PSocketOptions opts = sockMgr.buildOptions(defaultOpts);
+        if (!defaultOpts.containsKey(I2PSocketOptions.PROP_CONNECT_TIMEOUT))
+            opts.setConnectTimeout(DEFAULT_CONNECT_TIMEOUT);
+        return opts;
+    }
+    
+    /** 
+     * create the default options (using the default timeout, etc)
+     *
+     */
+    protected I2PSocketOptions getDefaultOptions(Properties overrides) {
+        Properties defaultOpts = getTunnel().getClientOptions();
+        defaultOpts.putAll(overrides);
         I2PSocketOptions opts = sockMgr.buildOptions(defaultOpts);
         if (!defaultOpts.containsKey(I2PSocketOptions.PROP_CONNECT_TIMEOUT))
             opts.setConnectTimeout(DEFAULT_CONNECT_TIMEOUT);
