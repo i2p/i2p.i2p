@@ -42,9 +42,13 @@ public class MessageHistory {
     /** config property determining where we want to log the message history, if we're keeping one */
     public final static String PROP_MESSAGE_HISTORY_FILENAME = "router.historyFilename";
     public final static String DEFAULT_MESSAGE_HISTORY_FILENAME = "messageHistory.txt";
-    
+
+    private final SimpleDateFormat _fmt;
+
     public MessageHistory(RouterContext context) {
         _context = context;
+         _fmt = new SimpleDateFormat("yy/MM/dd.HH:mm:ss.SSS");
+        _fmt.setTimeZone(TimeZone.getTimeZone("GMT"));
         _reinitializeJob = new ReinitializeJob();
         _writeJob = new WriteJob();
         _submitMessageHistoryJob = new SubmitMessageHistoryJob(_context);
@@ -441,11 +445,7 @@ public class MessageHistory {
         return buf.toString();
     }
     
-    private final static SimpleDateFormat _fmt = new SimpleDateFormat("yy/MM/dd.HH:mm:ss.SSS");
-    static {
-        _fmt.setTimeZone(TimeZone.getTimeZone("GMT"));
-    }
-    private final static String getTime(Date when) {
+    private final String getTime(Date when) {
         synchronized (_fmt) {
             return _fmt.format(when);
         }
