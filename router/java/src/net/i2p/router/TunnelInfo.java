@@ -31,11 +31,14 @@ import net.i2p.data.i2np.TunnelSessionKey;
 import net.i2p.data.i2np.TunnelSigningPrivateKey;
 import net.i2p.data.i2np.TunnelSigningPublicKey;
 
+import net.i2p.util.Log;
+
 /**
  * Defines the information associated with a tunnel
  */
 public class TunnelInfo extends DataStructureImpl {
     private I2PAppContext _context;
+    private static Log _log;
     private TunnelId _id;
     private Hash _nextHop;
     private Hash _thisHop;
@@ -51,9 +54,12 @@ public class TunnelInfo extends DataStructureImpl {
     private long _lastTested;
     private boolean _ready;
     private boolean _wasEverReady;
+    private int _messagesProcessed;
     
     public TunnelInfo(I2PAppContext context) {
         _context = context;
+        if (_log == null)
+            _log = context.logManager().getLog(TunnelInfo.class);
         setTunnelId(null);
         setThisHop(null);
         setNextHop(null);
@@ -69,6 +75,7 @@ public class TunnelInfo extends DataStructureImpl {
         _wasEverReady = false;
         _created = _context.clock().now();
         _lastTested = -1;
+        _messagesProcessed = 0;
     }
     
     public TunnelId getTunnelId() { return _id; }
@@ -161,6 +168,15 @@ public class TunnelInfo extends DataStructureImpl {
         }
         return len;
     }
+    
+    /** how many messages have passed through this tunnel in its lifetime? */
+    public int getMessagesProcessed() { 
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("Tunnel " + _id.getTunnelId() + " processed " + _messagesProcessed + " messages");
+        return _messagesProcessed; 
+    }
+    /** we have just processed a message for this tunnel */
+    public void messageProcessed() { _messagesProcessed++; }
     
     public void readBytes(InputStream in) throws DataFormatException, IOException {
         _options = DataHelper.readProperties(in);
