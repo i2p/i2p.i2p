@@ -83,14 +83,14 @@
   <!-- Add a all web application within the webapps directory.         -->
   <!-- + No virtual host specified                                     -->
   <!-- + Look in the webapps directory relative to jetty.home or .     -->
-  <!-- + Use the webdefault.xml resource for the defaults descriptor   -->
+  <!-- + Use the default webdefault.xml in jetty's install             -->
   <!-- + Upack the war file                                            -->
   <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
   <Set name="rootWebApp">root</Set>
   <Call name="addWebApplications">
     <Arg></Arg>
     <Arg>./eepsite/webapps/</Arg>
-    <Arg>./eepsite/webdefault.xml</Arg>
+    <Arg></Arg>
     <Arg type="boolean">true</Arg>
   </Call>
 
