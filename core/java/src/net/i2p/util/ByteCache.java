@@ -25,11 +25,14 @@ public final class ByteCache {
      */
     public static ByteCache getInstance(int cacheSize, int size) {
         Integer sz = new Integer(size);
+        ByteCache cache = null;
         synchronized (_caches) {
             if (!_caches.containsKey(sz))
                 _caches.put(sz, new ByteCache(cacheSize, size));
-            return (ByteCache)_caches.get(sz);
+            cache = (ByteCache)_caches.get(sz);
         }
+        cache.resize(cacheSize);
+        return cache;
     }
     private Log _log;
     /** list of available and available entries */
@@ -54,6 +57,11 @@ public final class ByteCache {
         _lastOverflow = -1;
         SimpleTimer.getInstance().addEvent(new Cleanup(), CLEANUP_FREQUENCY);
         _log = I2PAppContext.getGlobalContext().logManager().getLog(ByteCache.class);
+    }
+    
+    private void resize(int maxCachedEntries) {
+        if (_maxCached >= maxCachedEntries) return;
+        _maxCached = maxCachedEntries;
     }
     
     /**

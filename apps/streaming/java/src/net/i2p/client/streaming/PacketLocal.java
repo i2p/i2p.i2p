@@ -3,8 +3,10 @@ package net.i2p.client.streaming;
 import java.util.Set;
 
 import net.i2p.I2PAppContext;
+import net.i2p.data.ByteArray;
 import net.i2p.data.Destination;
 import net.i2p.data.SessionKey;
+import net.i2p.util.ByteCache;
 import net.i2p.util.Log;
 import net.i2p.util.SimpleTimer;
 
@@ -26,6 +28,7 @@ public class PacketLocal extends Packet implements MessageOutputStream.WriteStat
     private long _ackOn;
     private long _cancelledOn;
     private SimpleTimer.TimedEvent _resendEvent;
+    private ByteCache _cache = ByteCache.getInstance(128, MAX_PAYLOAD_SIZE);
     
     public PacketLocal(I2PAppContext ctx, Destination to) {
         this(ctx, to, null);
@@ -80,21 +83,31 @@ public class PacketLocal extends Packet implements MessageOutputStream.WriteStat
         _lastSend = _context.clock().now();
     }
     public void ackReceived() { 
+        ByteArray ba = null;
         synchronized (this) {
             if (_ackOn <= 0)
                 _ackOn = _context.clock().now(); 
+            ba = getPayload();
+            setPayload(null);
             notifyAll();
         }
         SimpleTimer.getInstance().removeEvent(_resendEvent);
+        if (ba != null)
+            _cache.release(ba);
     }
     public void cancelled() { 
+        ByteArray ba = null;
         synchronized (this) {
             _cancelledOn = _context.clock().now();
+            ba = getPayload();
+            setPayload(null);
             notifyAll();
         }
         SimpleTimer.getInstance().removeEvent(_resendEvent);
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Cancelled! " + toString(), new Exception("cancelled"));
+        if (ba != null)
+            _cache.release(ba);
     }
     
     /** how long after packet creation was it acked? */

@@ -25,6 +25,7 @@ class PacketQueue {
     private I2PSession _session;
     private ConnectionManager _connectionManager;
     private ByteCache _cache = ByteCache.getInstance(64, 36*1024);
+    private ByteCache _packetCache = ByteCache.getInstance(128, Packet.MAX_PAYLOAD_SIZE);
     
     public PacketQueue(I2PAppContext context, I2PSession session, ConnectionManager mgr) {
         _context = context;
@@ -124,6 +125,11 @@ class PacketQueue {
             Connection c = packet.getConnection();
             String suffix = (c != null ? "wsize " + c.getOptions().getWindowSize() : null);
             _connectionManager.getPacketHandler().displayPacket(packet, "SEND", suffix);
+        }
+        
+        if ( (packet.getSequenceNum() == 0) && (!packet.isFlagSet(Packet.FLAG_SYNCHRONIZE)) ) {
+            // ack only, so release it asap
+            _packetCache.release(packet.getPayload());
         }
     }
     

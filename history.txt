@@ -1,4 +1,10 @@
-$Id: history.txt,v 1.154 2005/02/23 00:00:53 jrandom Exp $
+$Id: history.txt,v 1.155 2005/02/23 16:44:32 jrandom Exp $
+
+2005-02-24  jrandom
+    * Cache temporary memory allocation in the DSA's SHA1 impl, and the packet
+      data in the streaming lib.
+    * Fixed a streaming lib bug where the connection initiator would fail the
+      stream if the ACK to their SYN was lost.
 
 2005-02-23  jrandom 
     * Now that we don't get stale SAM sessions, it'd be nice if we didn't

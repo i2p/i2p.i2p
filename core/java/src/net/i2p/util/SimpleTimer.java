@@ -30,7 +30,7 @@ public class SimpleTimer {
         _context = I2PAppContext.getGlobalContext();
         _log = _context.logManager().getLog(SimpleTimer.class);
         _events = new TreeMap();
-        _eventTimes = new HashMap();
+        _eventTimes = new HashMap(1024);
         _readyEvents = new ArrayList(4);
         I2PThread runner = new I2PThread(new SimpleTimerRunner());
         runner.setName("SimpleTimer");

@@ -3,11 +3,13 @@ package net.i2p.client.streaming;
 import java.util.Arrays;
 import net.i2p.I2PAppContext;
 import net.i2p.data.Base64;
+import net.i2p.data.ByteArray;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
 import net.i2p.data.Signature;
 import net.i2p.data.SigningPrivateKey;
+import net.i2p.util.ByteCache;
 
 /**
  * Contain a single packet transferred as part of a streaming connection.  
@@ -56,12 +58,13 @@ public class Packet {
     private long _nacks[];
     private int _resendDelay;
     private int _flags;
-    private byte _payload[];
+    private ByteArray _payload;
     // the next four are set only if the flags say so
     private Signature _optionSignature;
     private Destination _optionFrom;
     private int _optionDelay;
     private int _optionMaxSize;
+    private ByteCache _cache;
     
     /** 
      * The receiveStreamId will be set to this when the packet doesn't know 
@@ -135,6 +138,10 @@ public class Packet {
 
     public static final int DEFAULT_MAX_SIZE = 32*1024;
     private static final int MAX_DELAY_REQUEST = 65535;
+
+    public Packet() {
+        _cache = ByteCache.getInstance(128, MAX_PAYLOAD_SIZE);
+    }
     
     /** what stream is this packet a part of? */
     public byte[] getSendStreamId() { 
@@ -200,14 +207,14 @@ public class Packet {
     public static final int MAX_PAYLOAD_SIZE = 32*1024;
     
     /** get the actual payload of the message.  may be null */
-    public byte[] getPayload() { return _payload; }
-    public void setPayload(byte payload[]) { 
+    public ByteArray getPayload() { return _payload; }
+    public void setPayload(ByteArray payload) { 
         _payload = payload; 
-        if ( (payload != null) && (payload.length > MAX_PAYLOAD_SIZE) )
-            throw new IllegalArgumentException("Too large payload: " + payload.length);
+        if ( (payload != null) && (payload.getValid() > MAX_PAYLOAD_SIZE) )
+            throw new IllegalArgumentException("Too large payload: " + payload.getValid());
     }
     public int getPayloadSize() {
-        return (_payload == null ? 0 : _payload.length);
+        return (_payload == null ? 0 : _payload.getValid());
     }
 
     /** is a particular flag set on this packet? */
@@ -340,12 +347,12 @@ public class Packet {
         
         if (_payload != null) {
             try {
-                System.arraycopy(_payload, 0, buffer, cur, _payload.length);
+                System.arraycopy(_payload.getData(), _payload.getOffset(), buffer, cur, _payload.getValid());
             } catch (ArrayIndexOutOfBoundsException aioobe) {
-                System.err.println("payload.length: " + _payload.length + " buffer.length: " + buffer.length + " cur: " + cur);
+                System.err.println("payload.length: " + _payload.getValid() + " buffer.length: " + buffer.length + " cur: " + cur);
                 throw aioobe;
             }
-            cur += _payload.length;
+            cur += _payload.getValid();
         }
                 
         return cur - offset;
@@ -382,7 +389,7 @@ public class Packet {
         size += 2; // option size
         
         if (_payload != null) {
-            size += _payload.length;
+            size += _payload.getValid();
         }
         
         return size;
@@ -445,8 +452,10 @@ public class Packet {
             throw new IllegalArgumentException("length: " + length + " offset: " + offset + " begin: " + payloadBegin);
         
         // skip ahead to the payload
-        _payload = new byte[payloadSize];
-        System.arraycopy(buffer, payloadBegin, _payload, 0, payloadSize);
+        _payload = _cache.acquire(); //new ByteArray(new byte[payloadSize]);
+        System.arraycopy(buffer, payloadBegin, _payload.getData(), 0, payloadSize);
+        _payload.setValid(payloadSize);
+        _payload.setOffset(0);
         
         // ok now lets go back and deal with the options
         if (isFlagSet(FLAG_DELAY_REQUESTED)) {
@@ -545,8 +554,8 @@ public class Packet {
                 buf.append(" ").append(_nacks[i]);
             }
         }
-        if ( (_payload != null) && (_payload.length > 0) )
-            buf.append(" data: ").append(_payload.length);
+        if ( (_payload != null) && (_payload.getValid() > 0) )
+            buf.append(" data: ").append(_payload.getValid());
         return buf.toString();
     }
     

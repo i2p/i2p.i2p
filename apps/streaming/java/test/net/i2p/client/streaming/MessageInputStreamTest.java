@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 import net.i2p.I2PAppContext;
+import net.i2p.data.ByteArray;
 import net.i2p.data.DataHelper;
 import net.i2p.util.Log;
 
@@ -29,7 +30,7 @@ public class MessageInputStreamTest {
         for (int i = 0; i < orig.length / 1024; i++) {
             byte msg[] = new byte[1024];
             System.arraycopy(orig, i*1024, msg, 0, 1024);
-            in.messageReceived(i, msg);
+            in.messageReceived(i, new ByteArray(msg));
         }
         
         byte read[] = new byte[orig.length];
@@ -59,7 +60,7 @@ public class MessageInputStreamTest {
             byte msg[] = new byte[1024];
             Integer cur = (Integer)order.get(i);
             System.arraycopy(orig, cur.intValue()*1024, msg, 0, 1024);
-            in.messageReceived(cur.intValue(), msg);
+            in.messageReceived(cur.intValue(), new ByteArray(msg));
             _log.debug("Injecting " + cur);
         }
         
@@ -91,7 +92,7 @@ public class MessageInputStreamTest {
                 byte msg[] = new byte[1024];
                 Integer cur = (Integer)order.get(i);
                 System.arraycopy(orig, cur.intValue()*1024, msg, 0, 1024);
-                in.messageReceived(cur.intValue(), msg);
+                in.messageReceived(cur.intValue(), new ByteArray(msg));
                 _log.debug("Injecting " + cur);
             }
         }
@@ -126,7 +127,7 @@ public class MessageInputStreamTest {
             byte msg[] = new byte[1024];
             Integer cur = (Integer)order.get(i);
             System.arraycopy(orig, cur.intValue()*1024, msg, 0, 1024);
-            in.messageReceived(cur.intValue(), msg);
+            in.messageReceived(cur.intValue(), new ByteArray(msg));
             _log.debug("Injecting " + cur);
             
             try {

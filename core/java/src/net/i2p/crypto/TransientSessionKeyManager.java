@@ -66,8 +66,8 @@ class TransientSessionKeyManager extends SessionKeyManager {
         super(context);
         _log = context.logManager().getLog(TransientSessionKeyManager.class);
         _context = context;
-        _outboundSessions = new HashMap(64);
-        _inboundTagSets = new HashMap(1024);
+        _outboundSessions = new HashMap(1024);
+        _inboundTagSets = new HashMap(64*1024);
     }
     private TransientSessionKeyManager() { this(null); }
 

@@ -6,6 +6,7 @@ import net.i2p.I2PAppContext;
 import net.i2p.I2PException;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
+import net.i2p.util.ByteCache;
 import net.i2p.util.Log;
 import net.i2p.util.SimpleTimer;
 
@@ -17,9 +18,11 @@ import net.i2p.util.SimpleTimer;
 public class ConnectionPacketHandler {
     private I2PAppContext _context;
     private Log _log;
+    private ByteCache _cache;
     
     public ConnectionPacketHandler(I2PAppContext context) {
         _context = context;
+        _cache = ByteCache.getInstance(128, Packet.MAX_PAYLOAD_SIZE);
         _log = context.logManager().getLog(ConnectionPacketHandler.class);
         _context.statManager().createRateStat("stream.con.receiveMessageSize", "Size of a message received on a connection", "Stream", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
         _context.statManager().createRateStat("stream.con.receiveDuplicateSize", "Size of a duplicate message received on a connection", "Stream", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
@@ -34,6 +37,7 @@ public class ConnectionPacketHandler {
         if (!ok) {
             if ( (!packet.isFlagSet(Packet.FLAG_RESET)) && (_log.shouldLog(Log.ERROR)) )
                 _log.error("Packet does NOT verify: " + packet);
+            _cache.release(packet.getPayload());
             return;
         }
 
@@ -47,6 +51,7 @@ public class ConnectionPacketHandler {
                 if (_log.shouldLog(Log.WARN))
                     _log.warn("Received a packet after hard disconnect, ignoring: " + packet + " on " + con);
             }
+            _cache.release(packet.getPayload());
             return;
         }
 
@@ -72,6 +77,7 @@ public class ConnectionPacketHandler {
                           + ": dropping " + packet);
             ack(con, packet.getAckThrough(), packet.getNacks(), null, false);
             con.getOptions().setChoke(5*1000);
+            _cache.release(packet.getPayload());
             return;
         }
         con.getOptions().setChoke(0);
@@ -91,6 +97,7 @@ public class ConnectionPacketHandler {
             con.closeReceived();
         
         boolean fastAck = false;
+        boolean ackOnly = false;
         
         if (isNew) {
             con.incrementUnackedPacketsReceived();
@@ -127,11 +134,19 @@ public class ConnectionPacketHandler {
                 } else {
                     if (_log.shouldLog(Log.DEBUG))
                         _log.debug("ACK only packet received: " + packet);
+                    ackOnly = true;
                 }
             }
         }
-        
-        fastAck = fastAck || ack(con, packet.getAckThrough(), packet.getNacks(), packet, isNew);
+
+        if (packet.isFlagSet(Packet.FLAG_SYNCHRONIZE) && 
+            ((packet.getSendStreamId() == null) ||
+              DataHelper.eq(packet.getSendStreamId(), Packet.STREAM_ID_UNKNOWN) ) ) {
+            // don't honor the ACK 0 in SYN packets received when the other side
+            // has obviously not seen our messages
+        } else {
+            fastAck = fastAck || ack(con, packet.getAckThrough(), packet.getNacks(), packet, isNew);
+        }
         con.eventOccurred();
         if (fastAck) {
             if (con.getLastSendTime() + 2000 < _context.clock().now()) {
@@ -139,6 +154,11 @@ public class ConnectionPacketHandler {
                     _log.debug("Fast ack for dup " + packet);
                 con.ackImmediately();
             }
+        }
+        
+        if (ackOnly) {
+            // non-ack message payloads are queued in the MessageInputStream
+            _cache.release(packet.getPayload());
         }
     }
     
