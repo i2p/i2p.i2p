@@ -14,27 +14,16 @@ import net.i2p.util.Log;
  *  
  */
 public class ClientConfig {
-
     private static final Log _log = new Log(ClientConfig.class);
-
     private Destination _peer;
-
     private Destination _us;
-
     private String _statFile;
-
     private int _statDuration;
-
     private int _statFrequency;
-
     private int _sendFrequency;
-
     private int _sendSize;
-
     private int _numHops;
-
     private String _comment;
-
     private int _averagePeriods[];
 
     /**
@@ -370,8 +359,8 @@ public class ClientConfig {
             if ((duration <= 0) || (statFreq <= 0) || (sendFreq <= 0) || (sendSize <= 0)) {
                 if (_log.shouldLog(Log.WARN)) {
                     _log.warn("Invalid client config: duration [" + statDurationVal + "] stat frequency ["
-                            + statFrequencyVal + "] send frequency [" + sendFrequencyVal + "] send size [" + sendSizeVal
-                            + "]");
+                            + statFrequencyVal + "] send frequency [" + sendFrequencyVal + "] send size ["
+                            + sendSizeVal + "]");
                 }
                 return false;
             }
@@ -436,8 +425,8 @@ public class ClientConfig {
      * @return true if it was stored correctly, false if there were errors
      */
     public boolean store(Properties clientConfig, int peerNum) {
-        if ((_peer == null) || (_sendFrequency <= 0) || (_sendSize <= 0) || (_statDuration <= 0) || (_statFrequency <= 0)
-                || (_statFile == null)) { return false; }
+        if ((_peer == null) || (_sendFrequency <= 0) || (_sendSize <= 0) || (_statDuration <= 0)
+                || (_statFrequency <= 0) || (_statFile == null)) { return false; }
 
         String comment = _comment;
         if (comment == null) {
