@@ -89,7 +89,7 @@ public interface I2PSession {
     public void destroySession() throws I2PSessionException;
 
     /**
-     * Actually connect the session and start recieving/sending messages
+     * Actually connect the session and start receiving/sending messages
      *
      */
     public void connect() throws I2PSessionException;

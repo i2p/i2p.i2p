@@ -135,7 +135,7 @@ class ConnectionRunner implements I2CPMessageReader.I2CPMessageEventListener {
     }
 
     /**
-     * Recieve notifiation that the peer disconnected
+     * Receive notifiation that the peer disconnected
      */
     public void disconnected(I2CPMessageReader reader) {
         _log.info("Disconnected");
@@ -146,7 +146,7 @@ class ConnectionRunner implements I2CPMessageReader.I2CPMessageEventListener {
      *
      */
     public void messageReceived(I2CPMessageReader reader, I2CPMessage message) {
-        _log.info("Message recieved: \n" + message);
+        _log.info("Message received: \n" + message);
         switch (message.getType()) {
         case CreateSessionMessage.MESSAGE_TYPE:
             handleCreateSession(reader, (CreateSessionMessage) message);
@@ -240,7 +240,7 @@ class ConnectionRunner implements I2CPMessageReader.I2CPMessageEventListener {
         Destination dest = message.getDestination();
         MessageId id = new MessageId();
         id.setMessageId(getNextMessageId());
-        _log.debug("** Recieving message [" + id.getMessageId() + "] with payload: " + "[" + payload + "]");
+        _log.debug("** Receiving message [" + id.getMessageId() + "] with payload: " + "[" + payload + "]");
         _messages.put(id, payload);
         MessageStatusMessage status = new MessageStatusMessage();
         status.setMessageId(id);
@@ -318,7 +318,7 @@ class ConnectionRunner implements I2CPMessageReader.I2CPMessageEventListener {
      *
      */
     public void handleReceiveBegin(I2CPMessageReader reader, ReceiveMessageBeginMessage message) {
-        _log.debug("Handling recieve begin: id = " + message.getMessageId());
+        _log.debug("Handling receive begin: id = " + message.getMessageId());
         MessagePayloadMessage msg = new MessagePayloadMessage();
         msg.setMessageId(message.getMessageId());
         msg.setSessionId(_sessionId);
@@ -344,7 +344,7 @@ class ConnectionRunner implements I2CPMessageReader.I2CPMessageEventListener {
     }
 
     /**
-     * The client told us that the message has been recieved completely.  This currently
+     * The client told us that the message has been received completely.  This currently
      * does not do any security checking prior to removing the message from the 
      * pending queue, though it should.
      *

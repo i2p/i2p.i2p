@@ -262,7 +262,7 @@ public class ClientConnectionRunner {
         }
         
         if (_log.shouldLog(Log.DEBUG))
-            _log.debug("** Recieving message [" + id.getMessageId() + "] with payload of size [" 
+            _log.debug("** Receiving message [" + id.getMessageId() + "] with payload of size [" 
                        + payload.getSize() + "]" + " for session [" + _sessionId.getSessionId() 
                        + "]");
         long beforeDistribute = _context.clock().now();
