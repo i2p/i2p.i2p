@@ -462,10 +462,18 @@ public class SendTunnelMessageJob extends JobImpl {
         //_log.info("Fudging the message send so it expires in the fudge factor...");
         //}
 
-        if (_expiration - 10*1000 < now) {
+        long timeLeft = _expiration - now;
+        
+        if (timeLeft < 10*1000) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Why are we trying to send a " + _message.getClass().getName() 
                            + " message with " + (_expiration-now) + "ms left?", getAddedBy());
+            if (timeLeft < 0) {
+                _log.error("Timed out honoring request to send a " + _message.getClass().getName() 
+                           + " message remotely [" + _message.getUniqueId() + "] expired "
+                           + (0-timeLeft) + "ms ago");
+                return;
+            }
         }
 
         String bodyType = _message.getClass().getName();
@@ -475,7 +483,7 @@ public class SendTunnelMessageJob extends JobImpl {
         //  don't specify a selector, since createFakeOutNetMessage already does that
         SendMessageDirectJob j = new SendMessageDirectJob(getContext(), msg, _destRouter, 
                                                           _onSend, _onReply, _onFailure, 
-                                                          null, (int)(_expiration-getContext().clock().now()), 
+                                                          null, (int)(timeLeft), 
                                                           _priority);
         getContext().jobQueue().addJob(j);
     }
