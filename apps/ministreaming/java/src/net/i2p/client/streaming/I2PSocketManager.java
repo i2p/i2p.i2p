@@ -176,7 +176,7 @@ public class I2PSocketManager implements I2PSessionListener {
         }
 
         if (s == null) {
-            _log.warn(getName() + ": No socket responsible for ACK packet");
+            _log.warn(getName() + ": No socket responsible for ACK packet for id " + getReadableForm(id));
             return;
         }
 
@@ -223,7 +223,8 @@ public class I2PSocketManager implements I2PSessionListener {
             s = (I2PSocketImpl) _outSockets.get(id);
         }
         
-        _log.debug(getName() + ": *Disconnect outgoing for socket " + s);
+        _log.debug(getName() + ": *Disconnect outgoing for socket " + s + " on id "
+                   + getReadableForm(id));
         try {
             if (s != null) {
                 if (payload.length > 0) {
@@ -259,7 +260,8 @@ public class I2PSocketManager implements I2PSessionListener {
 
         // packet send outgoing
         if (_log.shouldLog(Log.DEBUG))
-            _log.debug(getName() + ": *Packet send outgoing [" + payload.length + "] for socket " + s);
+            _log.debug(getName() + ": *Packet send outgoing [" + payload.length + "] for socket " 
+                       + s + " on id " + getReadableForm(id));
         if (s != null) {
             s.queueData(payload);
             return;
@@ -293,7 +295,8 @@ public class I2PSocketManager implements I2PSessionListener {
                 s.setRemoteID(id);
             }
         }    
-        _log.debug(getName() + ": *Syn! for socket " + s);
+        _log.debug(getName() + ": *Syn! for socket " + s + " on id " + getReadableForm(newLocalID) 
+                   + " from " + d.calculateHash().toBase64().substring(0,6));
         
         if (!acceptConnections) {
             // The app did not instantiate an I2PServerSocket
@@ -454,6 +457,10 @@ public class I2PSocketManager implements I2PSessionListener {
             s = new I2PSocketImpl(peer, this, true, localID);
             _outSockets.put(localID, s);
         }
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug(getName() + ": connect(" + peer.calculateHash().toBase64().substring(0,6)
+                       + ", ...): localID = " + lcID);
+        
         try {
             ByteArrayOutputStream pubkey = new ByteArrayOutputStream();
             _session.getMyDestination().writeBytes(pubkey);
@@ -462,17 +469,29 @@ public class I2PSocketManager implements I2PSessionListener {
             boolean sent = false;
             sent = _session.sendMessage(peer, packet);
             if (!sent) {
-                _log.info(getName() + ": Unable to send & receive ack for SYN packet for socket " + s);
+                _log.info(getName() + ": Unable to send & receive ack for SYN packet for socket " 
+                          + s + " with localID = " + lcID);
                 synchronized (lock) {
                     _outSockets.remove(s.getLocalID());
                 }
                 _context.statManager().addRateData("streaming.synNoAck", 1, 1);
                 throw new I2PException("Error sending through I2P network");
+            } else {
+                if (_log.shouldLog(Log.DEBUG))
+                    _log.debug(getName() + ": syn sent ok to " 
+                               + peer.calculateHash().toBase64().substring(0,6) 
+                               + " with localID = " + lcID);
             }
             if (options != null)
                 remoteID = s.getRemoteID(true, options.getConnectTimeout());
             else
                 remoteID = s.getRemoteID(true, getDefaultOptions().getConnectTimeout());
+            
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug(getName() + ": remoteID received from " 
+                           + peer.calculateHash().toBase64().substring(0,6) 
+                           + ": " + getReadableForm(remoteID) 
+                           + " with localID = " + lcID);
             
             if (remoteID == null) {
                 _context.statManager().addRateData("streaming.nackReceived", 1, 1);
@@ -490,7 +509,8 @@ public class I2PSocketManager implements I2PSessionListener {
         } catch (InterruptedIOException ioe) {
             if (_log.shouldLog(Log.ERROR))
                 _log.error(getName() + ": Timeout waiting for ack from syn for id " 
-                           + getReadableForm(lcID) + " for socket " + s, ioe);
+                           + lcID + " to " + peer.calculateHash().toBase64().substring(0,6) 
+                           + " for socket " + s, ioe);
             synchronized (lock) {
                 _outSockets.remove(s.getLocalID());
             }
@@ -498,14 +518,24 @@ public class I2PSocketManager implements I2PSessionListener {
             _context.statManager().addRateData("streaming.synNoAck", 1, 1);
             throw new InterruptedIOException("Timeout waiting for ack");
         } catch (ConnectException ex) {
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug(getName() + ": Connection error waiting for ack from syn for id " 
+                           + lcID + " to " + peer.calculateHash().toBase64().substring(0,6) 
+                           + " for socket " + s, ex);
             s.internalClose();
             throw ex;
         } catch (NoRouteToHostException ex) {
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug(getName() + ": No route to host waiting for ack from syn for id " 
+                           + lcID + " to " + peer.calculateHash().toBase64().substring(0,6) 
+                           + " for socket " + s, ex);
             s.internalClose();
             throw ex;
         } catch (IOException ex) {
             if (_log.shouldLog(Log.ERROR))
-                _log.error(getName() + ": Error sending syn on id " + getReadableForm(lcID) + " for socket " + s, ex);
+                _log.error(getName() + ": Error sending syn on id " 
+                           + lcID + " to " + peer.calculateHash().toBase64().substring(0,6) 
+                           + " for socket " + s, ex);
             synchronized (lock) {
                 _outSockets.remove(s.getLocalID());
             }
@@ -513,7 +543,9 @@ public class I2PSocketManager implements I2PSessionListener {
             throw new I2PException("Unhandled IOException occurred");
         } catch (I2PException ex) {
             if (_log.shouldLog(Log.INFO))
-                _log.info(getName() + ": Error sending syn on id " + getReadableForm(lcID) + " for socket " + s, ex);
+                _log.info(getName() + ": Error sending syn on id " 
+                          + lcID + " to " + peer.calculateHash().toBase64().substring(0,6) 
+                          + " for socket " + s, ex);
             synchronized (lock) {
                 _outSockets.remove(s.getLocalID());
             }
@@ -521,7 +553,9 @@ public class I2PSocketManager implements I2PSessionListener {
             throw ex;
         } catch (Exception e) {
             s.internalClose();
-            _log.error(getName() + ": Unhandled error connecting", e);
+            _log.error(getName() + ": Unhandled error connecting on "
+                       + lcID + " to " + peer.calculateHash().toBase64().substring(0,6) 
+                       + " for socket " + s, e);
             throw new ConnectException("Unhandled error connecting: " + e.getMessage());
         }
     }
@@ -624,9 +658,11 @@ public class I2PSocketManager implements I2PSessionListener {
     }
 
     public void removeSocket(I2PSocketImpl sock) {
+        String localId = sock.getLocalID();
+        boolean removed = false;
         synchronized (lock) {
-            _inSockets.remove(sock.getLocalID());
-            _outSockets.remove(sock.getLocalID());
+            removed = (null != _inSockets.remove(localId));
+            removed = removed || (null != _outSockets.remove(localId));
             lock.notify();
         }
 
@@ -637,9 +673,10 @@ public class I2PSocketManager implements I2PSessionListener {
         long recv = sock.getBytesReceived();
 
         if (_log.shouldLog(Log.DEBUG)) {
-            _log.debug(getName() + ": Removing socket \"" + getReadableForm(sock.getLocalID()) + "\" [" + sock 
+            _log.debug(getName() + ": Removing socket \"" + getReadableForm(localId) + "\" [" + sock 
                        + ", send: " + sent + ", recv: " + recv
-                       + ", lifetime: " + lifetime + "ms, time since close: " + timeSinceClose + ")]",
+                       + ", lifetime: " + lifetime + "ms, time since close: " + timeSinceClose 
+                       + " removed? " + removed + ")]",
                        new Exception("removeSocket called"));
         }
 
