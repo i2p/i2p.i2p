@@ -24,7 +24,7 @@ class I2PSocketImpl implements I2PSocket {
     public static final int MAX_PACKET_SIZE = 1024 * 32;
     public static final int PACKET_DELAY = 100;
 
-    private I2PSocketManager manager;
+    private I2PSocketManagerImpl manager;
     private Destination local;
     private Destination remote;
     private String localID;
@@ -69,7 +69,7 @@ class I2PSocketImpl implements I2PSocket {
      * @param outgoing did we initiate the connection (true) or did we receive it (false)?
      * @param localID what is our half of the socket ID?
      */
-    public I2PSocketImpl(Destination peer, I2PSocketManager mgr, boolean outgoing, String localID) {
+    public I2PSocketImpl(Destination peer, I2PSocketManagerImpl mgr, boolean outgoing, String localID) {
         this.outgoing = outgoing;
         manager = mgr;
         remote = peer;
@@ -157,7 +157,7 @@ class I2PSocketImpl implements I2PSocket {
              
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("TIMING: RemoteID set to " 
-                               + I2PSocketManager.getReadableForm(remoteID) + " for "
+                               + I2PSocketManagerImpl.getReadableForm(remoteID) + " for "
                                + this.hashCode());
             }
             return remoteID;
@@ -249,9 +249,9 @@ class I2PSocketImpl implements I2PSocket {
 
     private byte getMask(int add) {
         if (outgoing)
-            return (byte)(I2PSocketManager.DATA_IN + (byte)add);
+            return (byte)(I2PSocketManagerImpl.DATA_IN + (byte)add);
         else
-            return (byte)(I2PSocketManager.DATA_OUT + (byte)add);
+            return (byte)(I2PSocketManagerImpl.DATA_OUT + (byte)add);
     }
 
     public void setOptions(I2PSocketOptions options) {
@@ -614,7 +614,7 @@ class I2PSocketImpl implements I2PSocket {
                         _log.info(getPrefix() + ":" + Thread.currentThread().getName() 
                                   + "Sending close packet: (we started? " + outgoing 
                                   + ") after reading " + _bytesRead + " and writing " + _bytesWritten);
-                    byte[] packet = I2PSocketManager.makePacket(getMask(0x02), remoteID, new byte[0]);
+                    byte[] packet = I2PSocketManagerImpl.makePacket(getMask(0x02), remoteID, new byte[0]);
                     boolean sent = manager.getSession().sendMessage(remote, packet);
                     if (!sent) {
                         if (_log.shouldLog(Log.WARN))
@@ -645,7 +645,7 @@ class I2PSocketImpl implements I2PSocket {
                 _log.error(getPrefix() + "NULL REMOTEID");
                 return false;
             }
-            byte[] packet = I2PSocketManager.makePacket(getMask(0x00), remoteID, data);
+            byte[] packet = I2PSocketManagerImpl.makePacket(getMask(0x00), remoteID, data);
             boolean sent;
             synchronized (flagLock) {
                 if (closed2) return false;

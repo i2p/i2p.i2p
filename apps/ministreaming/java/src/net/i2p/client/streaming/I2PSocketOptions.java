@@ -1,5 +1,7 @@
 package net.i2p.client.streaming;
 
+import java.util.Properties;
+
 /**
  * Define the configuration for streaming and verifying data on the socket.
  *
@@ -19,7 +21,18 @@ public class I2PSocketOptions {
         _writeTimeout = DEFAULT_WRITE_TIMEOUT;
         _maxBufferSize = DEFAULT_BUFFER_SIZE;
     }
+    
+    public I2PSocketOptions(I2PSocketOptions opts) {
+        _connectTimeout = opts.getConnectTimeout();
+        _readTimeout = opts.getReadTimeout();
+        _writeTimeout = opts.getWriteTimeout();
+        _maxBufferSize = opts.getMaxBufferSize();
+    }
 
+    public I2PSocketOptions(Properties opts) {
+        
+    }
+    
     /**
      * How long we will wait for the ACK from a SYN, in milliseconds.
      *

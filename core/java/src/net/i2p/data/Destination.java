@@ -102,10 +102,11 @@ public class Destination extends DataStructureImpl {
         _signingKey = new SigningPublicKey();
         buf = new byte[SigningPublicKey.KEYSIZE_BYTES];
         System.arraycopy(source, cur, buf, 0, SigningPublicKey.KEYSIZE_BYTES);
+        _signingKey.setData(buf);
         cur += SigningPublicKey.KEYSIZE_BYTES;
         
         _certificate = new Certificate();
-        cur += _certificate.readBytes(buf, cur);
+        cur += _certificate.readBytes(source, cur);
         
         return cur - offset;
     }

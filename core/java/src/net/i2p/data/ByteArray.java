@@ -15,9 +15,8 @@ import java.io.Serializable;
  * Wrap up an array of bytes so that they can be compared and placed in hashes,
  * maps, and the like.
  *
- * @author jrandom
  */
-public class ByteArray implements Serializable {
+public class ByteArray implements Serializable, Comparable {
     private byte[] _data;
 
     public ByteArray() {
@@ -28,7 +27,7 @@ public class ByteArray implements Serializable {
         _data = data;
     }
 
-    public byte[] getData() {
+    public final byte[] getData() {
         return _data;
     }
 
@@ -36,7 +35,7 @@ public class ByteArray implements Serializable {
         _data = data;
     }
 
-    public boolean equals(Object o) {
+    public final boolean equals(Object o) {
         if (o == null) return false;
         if (o instanceof ByteArray) {
             return compare(getData(), ((ByteArray) o).getData());
@@ -50,15 +49,20 @@ public class ByteArray implements Serializable {
         }
     }
 
-    private boolean compare(byte[] lhs, byte[] rhs) {
+    private static final boolean compare(byte[] lhs, byte[] rhs) {
         return DataHelper.eq(lhs, rhs);
     }
+    
+    public final int compareTo(Object obj) {
+        if (obj.getClass() != getClass()) throw new ClassCastException("invalid object: " + obj);
+        return DataHelper.compareTo(_data, ((ByteArray)obj).getData());
+    }
 
-    public int hashCode() {
+    public final int hashCode() {
         return DataHelper.hashCode(getData());
     }
 
-    public String toString() {
+    public final String toString() {
         return DataHelper.toString(getData(), 32);
     }
 }

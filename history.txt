@@ -1,4 +1,9 @@
-$Id: history.txt,v 1.53 2004/10/17 16:03:06 jrandom Exp $
+$Id: history.txt,v 1.54 2004/10/18 14:08:01 jrandom Exp $
+
+2004-10-23  jrandom
+    * Minor ministreaming lib refactoring to simplify integration of the full
+      streaming lib.
+    * Minor bugfixes to data structure serialization.
 
 * 2004-10-18  0.4.1.3 released
 
