@@ -25,32 +25,33 @@ import snoozesoft.systray4j.SysTrayMenuListener;
  */
 public class SysTray implements SysTrayMenuListener {
 
-    private static SysTray _instance = new SysTray();
+    private static BrowserChooser _browserChooser;
+    private static String         _browserString;
+    private static ConfigFile     _configFile     = new ConfigFile();
+    private static Frame          _frame;
+    private static SysTray        _instance;
+    private static UrlLauncher    _urlLauncher    = new UrlLauncher();
 
-    private BrowserChooser  _browserChooser;
-    private String          _browserString;
-    private ConfigFile      _configFile        = new ConfigFile();
-    private Frame           _frame;
-    private SysTrayMenuItem _itemOpenConsole   = new SysTrayMenuItem("Open router console", "openconsole");
-    private SysTrayMenuItem _itemSelectBrowser = new SysTrayMenuItem("Select browser...", "selectbrowser");
-    private SysTrayMenuItem _itemShutdown      = new SysTrayMenuItem("Shut down I2P router", "shutdown");
-    private SysTrayMenuIcon _sysTrayMenuIcon   = new SysTrayMenuIcon("icons/iggy");
-    private SysTrayMenu     _sysTrayMenu       = new SysTrayMenu(_sysTrayMenuIcon, "I2P Control");
-    private UrlLauncher     _urlLauncher       = new UrlLauncher();
-
-    private SysTray() {
+    static {
         if (!_configFile.init("systray.config"))
             _configFile.setProperty("browser", "default");
 
         _browserString = _configFile.getProperty("browser", "default");
 
-        if (! (new File("router.config")).exists())
+        if (!(new File("router.config")).exists())
             openRouterConsole();
 
-        if (!System.getProperty("os.name").startsWith("Windows")) {
-            _instance = null;
-            return;
-        }
+        if (System.getProperty("os.name").startsWith("Windows"))
+            _instance = new SysTray();
+    }
+
+    private SysTrayMenuItem _itemOpenConsole   = new SysTrayMenuItem("Open router console", "openconsole");
+    private SysTrayMenuItem _itemSelectBrowser = new SysTrayMenuItem("Select browser...", "selectbrowser");
+//    private SysTrayMenuItem _itemShutdown      = new SysTrayMenuItem("Shut down I2P router", "shutdown");
+    private SysTrayMenuIcon _sysTrayMenuIcon   = new SysTrayMenuIcon("icons/iggy");
+    private SysTrayMenu     _sysTrayMenu       = new SysTrayMenu(_sysTrayMenuIcon, "I2P Control");
+
+    private SysTray() {
         _sysTrayMenuIcon.addSysTrayMenuListener(this);
         createSysTrayMenu();
     }
@@ -59,53 +60,7 @@ public class SysTray implements SysTrayMenuListener {
         return _instance;
     }
 
-    public void hide() {
-        _sysTrayMenu.hideIcon();
-    }
-
-    public void iconLeftClicked(SysTrayMenuEvent e) {}
-
-    public void iconLeftDoubleClicked(SysTrayMenuEvent e) {
-        openRouterConsole();
-    }
-
-    public void menuItemSelected(SysTrayMenuEvent e) {
-
-        String browser = null;
-
-        if (e.getActionCommand().equals("shutdown")) {
-            _browserChooser = null;
-            _frame = null;
-            _itemShutdown = null;
-            _itemSelectBrowser = null;
-            _sysTrayMenuIcon = null;
-            _sysTrayMenu = null;
-            _browserChooser = null;
-            _frame = null;
-            System.exit(0);
-        } else if (e.getActionCommand().equals("selectbrowser")) {
-            if (!(browser = promptForBrowser("Select browser")).equals("nullnull"))
-                setBrowser(browser);
-        } else if (e.getActionCommand().equals("openconsole")) {
-            openRouterConsole();
-        }
-    }
-
-    public void show() {
-        _sysTrayMenu.showIcon();
-    }
-
-    private void createSysTrayMenu() {
-        _itemShutdown.addSysTrayMenuListener(this);
-        _itemSelectBrowser.addSysTrayMenuListener(this);
-        _itemOpenConsole.addSysTrayMenuListener(this);
-        _sysTrayMenu.addItem(_itemShutdown);
-        _sysTrayMenu.addSeparator();
-        _sysTrayMenu.addItem(_itemSelectBrowser);
-        _sysTrayMenu.addItem(_itemOpenConsole);
-    }
-
-    private void openRouterConsole() {
+    private static void openRouterConsole() {
 
         String browser = null;
 
@@ -129,7 +84,7 @@ public class SysTray implements SysTrayMenuListener {
             setBrowser(browser);
     }
 
-    private String promptForBrowser(String windowTitle) {
+    private static String promptForBrowser(String windowTitle) {
 
         String browser = null;
 
@@ -141,8 +96,54 @@ public class SysTray implements SysTrayMenuListener {
         return browser;
     }
 
-    private void setBrowser(String browser) {
+    private static void setBrowser(String browser) {
         _browserString = browser;
         _configFile.setProperty("browser", browser);
+    }
+
+    public void hide() {
+        _sysTrayMenu.hideIcon();
+    }
+
+    public void iconLeftClicked(SysTrayMenuEvent e) {}
+
+    public void iconLeftDoubleClicked(SysTrayMenuEvent e) {
+        openRouterConsole();
+    }
+
+    public void menuItemSelected(SysTrayMenuEvent e) {
+
+        String browser = null;
+
+//        if (e.getActionCommand().equals("shutdown")) {
+//            _browserChooser = null;
+//            _frame = null;
+//            _itemShutdown = null;
+//            _itemSelectBrowser = null;
+//            _sysTrayMenuIcon = null;
+//            _sysTrayMenu = null;
+//            _browserChooser = null;
+//            _frame = null;
+//            System.exit(0);
+        if (e.getActionCommand().equals("selectbrowser")) {
+            if (!(browser = promptForBrowser("Select browser")).equals("nullnull"))
+                setBrowser(browser);
+        } else if (e.getActionCommand().equals("openconsole")) {
+            openRouterConsole();
+        }
+    }
+
+    public void show() {
+        _sysTrayMenu.showIcon();
+    }
+
+    private void createSysTrayMenu() {
+//        _itemShutdown.addSysTrayMenuListener(this);
+        _itemSelectBrowser.addSysTrayMenuListener(this);
+        _itemOpenConsole.addSysTrayMenuListener(this);
+//        _sysTrayMenu.addItem(_itemShutdown);
+//        _sysTrayMenu.addSeparator();
+        _sysTrayMenu.addItem(_itemSelectBrowser);
+        _sysTrayMenu.addItem(_itemOpenConsole);
     }
 }
