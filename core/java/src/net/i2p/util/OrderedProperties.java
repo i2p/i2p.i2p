@@ -238,8 +238,8 @@ public class OrderedProperties extends Properties {
 
         public int compareTo(Object o) {
             if (o == null) return -1;
-            if (o instanceof StringMapEntry) return ((String) getKey()).compareTo(((StringMapEntry) o).getKey());
-            if (o instanceof String) return ((String) getKey()).compareTo(o);
+            if (o instanceof StringMapEntry) return ((String) getKey()).compareTo((String)((StringMapEntry) o).getKey());
+            if (o instanceof String) return ((String) getKey()).compareTo((String)o);
             return -2;
         }
 

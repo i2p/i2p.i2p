@@ -42,7 +42,7 @@ class OutboundReceiver implements TunnelGateway.Receiver {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("lookup of " + _config.getPeer(1).toBase64().substring(0,4) 
                            + " required for " + msg);
-            _context.netDb().lookupRouterInfo(_config.getPeer(1), new SendJob(msg), new FailedJob(), 10*1000);
+            _context.netDb().lookupRouterInfo(_config.getPeer(1), new SendJob(_context, msg), new FailedJob(_context), 10*1000);
         }
     }
 
@@ -60,8 +60,8 @@ class OutboundReceiver implements TunnelGateway.Receiver {
 
     private class SendJob extends JobImpl {
         private TunnelDataMessage _msg;
-        public SendJob(TunnelDataMessage msg) {
-            super(_context);
+        public SendJob(RouterContext ctx, TunnelDataMessage msg) {
+            super(ctx);
             _msg = msg;
         }
         public String getName() { return "forward a tunnel message"; }
@@ -78,8 +78,8 @@ class OutboundReceiver implements TunnelGateway.Receiver {
     }
     
     private class FailedJob extends JobImpl {
-        public FailedJob() {
-            super(_context);
+        public FailedJob(RouterContext ctx) {
+            super(ctx);
         }
         public String getName() { return "failed looking for our outbound gateway"; }
         public void runJob() {

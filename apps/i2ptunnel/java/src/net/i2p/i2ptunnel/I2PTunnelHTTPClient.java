@@ -416,7 +416,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
             I2PSocket i2ps = createI2PSocket(dest, getDefaultOptions(opts));
             byte[] data = newRequest.toString().getBytes("ISO-8859-1");
             Runnable onTimeout = new OnTimeout(s, s.getOutputStream(), targetRequest, usingWWWProxy, currentProxy, requestId);
-            I2PTunnelRunner runner = new I2PTunnelRunner(s, i2ps, sockLock, data, mySockets, onTimeout);
+            I2PTunnelRunner runner = new I2PTunnelHTTPClientRunner(s, i2ps, sockLock, data, mySockets, onTimeout);
         } catch (SocketException ex) {
             _log.info(getPrefix(requestId) + "Error trying to connect", ex);
             l.log(ex.getMessage());

@@ -134,8 +134,8 @@ public class Timestamper implements Runnable {
                     try {
                         lastFailed = !queryTime(serverList);
                     } catch (IllegalArgumentException iae) {
-                        if (!lastFailed) 
-                            _log.log(Log.CRIT, "Unable to reach any of the NTP servers - network disconnected?");
+                        if ( (!lastFailed) && (_log.shouldLog(Log.ERROR)) )
+                            _log.error("Unable to reach any of the NTP servers - network disconnected?");
                         lastFailed = true;
                     }
                 }

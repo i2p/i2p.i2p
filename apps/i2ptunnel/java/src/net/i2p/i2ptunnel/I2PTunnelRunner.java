@@ -111,10 +111,13 @@ public class I2PTunnelRunner extends I2PThread implements I2PSocket.SocketErrorL
         return startedOn;
     }
 
+    protected InputStream getSocketIn() throws IOException { return s.getInputStream(); }
+    protected OutputStream getSocketOut() throws IOException { return s.getOutputStream(); }
+    
     public void run() {
         try {
-            InputStream in = s.getInputStream();
-            OutputStream out = s.getOutputStream(); // = new BufferedOutputStream(s.getOutputStream(), NETWORK_BUFFER_SIZE);
+            InputStream in = getSocketIn();
+            OutputStream out = getSocketOut(); // = new BufferedOutputStream(s.getOutputStream(), NETWORK_BUFFER_SIZE);
             i2ps.setSocketErrorListener(this);
             InputStream i2pin = i2ps.getInputStream();
             OutputStream i2pout = i2ps.getOutputStream(); //new BufferedOutputStream(i2ps.getOutputStream(), MAX_PACKET_SIZE);

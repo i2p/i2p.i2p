@@ -77,7 +77,7 @@ public class TunnelParticipant {
                 if (_log.shouldLog(Log.WARN))
                     _log.warn("Lookup the nextHop (" + _config.getSendTo().toBase64().substring(0,4) 
                               + " for " + msg);
-                _context.netDb().lookupRouterInfo(_config.getSendTo(), new SendJob(msg), new TimeoutJob(msg), 10*1000);
+                _context.netDb().lookupRouterInfo(_config.getSendTo(), new SendJob(_context, msg), new TimeoutJob(_context, msg), 10*1000);
             }
         } else {
             _inboundEndpointProcessor.getConfig().incrementProcessedMessages();
@@ -112,8 +112,8 @@ public class TunnelParticipant {
 
     private class SendJob extends JobImpl {
         private TunnelDataMessage _msg;
-        public SendJob(TunnelDataMessage msg) {
-            super(_context);
+        public SendJob(RouterContext ctx, TunnelDataMessage msg) {
+            super(ctx);
             _msg = msg;
         }
         public String getName() { return "forward a tunnel message"; }
@@ -132,8 +132,8 @@ public class TunnelParticipant {
 
     private class TimeoutJob extends JobImpl {
         private TunnelDataMessage _msg;
-        public TimeoutJob(TunnelDataMessage msg) {
-            super(_context);
+        public TimeoutJob(RouterContext ctx, TunnelDataMessage msg) {
+            super(ctx);
             _msg = msg;
         }
         public String getName() { return "timeout looking for next hop info"; }

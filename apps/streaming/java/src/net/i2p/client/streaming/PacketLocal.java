@@ -160,6 +160,7 @@ public class PacketLocal extends Packet implements MessageOutputStream.WriteStat
                 synchronized (this) {
                     if (_ackOn > 0) break;
                     if (_cancelledOn > 0) break;
+                    if (!_connection.getIsConnected()) break;
                     if (timeRemaining > 60*1000)
                         timeRemaining = 60*1000;
                     else if (timeRemaining <= 0)

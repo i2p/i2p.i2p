@@ -27,7 +27,7 @@ public class InboundGatewayReceiver implements TunnelGateway.Receiver {
             if (_target == null) {
                 ReceiveJob j = null;
                 if (!alreadySearched)
-                    j = new ReceiveJob(encrypted);
+                    j = new ReceiveJob(_context, encrypted);
                 _context.netDb().lookupRouterInfo(_config.getSendTo(), j, j, 5*1000);
                 return;
             }
@@ -47,8 +47,8 @@ public class InboundGatewayReceiver implements TunnelGateway.Receiver {
     
     private class ReceiveJob extends JobImpl {
         private byte[] _encrypted;
-        public ReceiveJob(byte data[]) {
-            super(_context);
+        public ReceiveJob(RouterContext ctx, byte data[]) {
+            super(ctx);
             _encrypted = data;
         }
         public String getName() { return "lookup first hop"; }

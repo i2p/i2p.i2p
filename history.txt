@@ -1,4 +1,13 @@
-$Id: history.txt,v 1.162 2005/03/02 22:36:52 jrandom Exp $
+$Id: history.txt,v 1.163 2005/03/04 01:09:51 jrandom Exp $
+
+2005-03-04  jrandom
+    * Filter HTTP response headers in the eepproxy, forcing Connection: close
+      so that broken (/malicious) webservers can't allow persistent 
+      connections.  All HTTP compliant browsers should now always close the 
+      socket.
+    * Enabled the GZIPInputStream's cache (they were'nt cached before)
+    * Make sure our first send is always a SYN (duh)
+    * Workaround for some buggy compilers
 
 2005-03-03  jrandom
     * Loop while starting up the I2PTunnel instances, in case the I2CP 

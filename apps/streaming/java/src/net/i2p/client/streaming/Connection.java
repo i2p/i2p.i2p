@@ -584,6 +584,7 @@ public class Connection {
         }
     }
     
+    /** how many packets have we sent and the other side has ACKed? */
     public long getAckedPackets() { return _ackedPackets; }
     public long getCreatedOn() { return _createdOn; }
     public long getCloseSentOn() { return _closeSentOn; }
@@ -599,6 +600,7 @@ public class Connection {
     
     public void incrementUnackedPacketsReceived() { _unackedPacketsReceived++; }
     public int getUnackedPacketsReceived() { return _unackedPacketsReceived; }
+    /** how many packets have we sent but not yet received an ACK for? */
     public int getUnackedPacketsSent() { 
         synchronized (_outboundPackets) { 
             return _outboundPackets.size(); 

@@ -132,6 +132,8 @@ class ConnectionDataReceiver implements MessageOutputStream.DataReceiver {
     private PacketLocal buildPacket(Connection con, byte buf[], int off, int size, boolean forceIncrement) {
         if (size > Packet.MAX_PAYLOAD_SIZE) throw new IllegalArgumentException("size is too large (" + size + ")");
         boolean ackOnly = isAckOnly(con, size);
+        boolean isFirst = (con.getAckedPackets() <= 0) && (con.getUnackedPacketsSent() <= 0);
+        
         PacketLocal packet = new PacketLocal(_context, con.getRemotePeer(), con);
         //ByteArray data = packet.acquirePayload();
         ByteArray data = new ByteArray(new byte[size]);
@@ -140,7 +142,7 @@ class ConnectionDataReceiver implements MessageOutputStream.DataReceiver {
         data.setValid(size);
         data.setOffset(0);
         packet.setPayload(data);
-		if (ackOnly && !forceIncrement)
+		if ( (ackOnly && !forceIncrement) && (!isFirst) )
 			packet.setSequenceNum(0);
         else
             packet.setSequenceNum(con.getNextOutboundPacketNum());
@@ -158,7 +160,8 @@ class ConnectionDataReceiver implements MessageOutputStream.DataReceiver {
         
         packet.setFlag(Packet.FLAG_SIGNATURE_REQUESTED, con.getOptions().getRequireFullySigned());
         
-        if ( (!ackOnly) && (packet.getSequenceNum() <= 0) ) {
+        //if ( (!ackOnly) && (packet.getSequenceNum() <= 0) ) {
+        if (isFirst) {
             packet.setFlag(Packet.FLAG_SYNCHRONIZE);
             packet.setOptionalFrom(con.getSession().getMyDestination());
             packet.setOptionalMaxSize(con.getOptions().getMaxMessageSize());

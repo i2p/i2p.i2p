@@ -865,7 +865,7 @@ public class DataHelper {
         ReusableGZIPInputStream in = ReusableGZIPInputStream.acquire();
         in.initialize(new ByteArrayInputStream(orig, offset, length));
         
-        ByteCache cache = ByteCache.getInstance(16, MAX_UNCOMPRESSED);
+        ByteCache cache = ByteCache.getInstance(8, MAX_UNCOMPRESSED);
         ByteArray outBuf = cache.acquire();
         int written = 0;
         while (true) {
@@ -877,6 +877,7 @@ public class DataHelper {
         byte rv[] = new byte[written];
         System.arraycopy(outBuf.getData(), 0, rv, 0, written);
         cache.release(outBuf);
+        ReusableGZIPInputStream.release(in);
         return rv;
     }
     
