@@ -118,6 +118,8 @@ class LoadClientAppsJob extends JobImpl {
     private void runClient(String className, String clientName, String args[]) {
         _log.info("Loading up the client application " + clientName + ": " + className + " " + args);
         I2PThread t = new I2PThread(new RunApp(className, clientName, args));
+        if (clientName == null) 
+            clientName = className + " client";
         t.setName(clientName);
         t.setDaemon(true);
         t.start();
