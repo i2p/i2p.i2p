@@ -1,4 +1,10 @@
-$Id: history.txt,v 1.27 2004/10/01 09:35:49 jrandom Exp $
+$Id: history.txt,v 1.28 2004/10/01 12:23:00 jrandom Exp $
+
+2004-10-02  jrandom
+    * Command line utility to verify a peer's reachability - simply run
+      net.i2p.router.transport.tcp.ConnectionHandler hostname port# and it
+      will print out whether that peer is reachable or not (using a simple
+      verification handshake).
 
 * 2004-10-01  0.4.1.1 released
 

@@ -678,49 +678,8 @@ public class ConnectionHandler {
         if (!_transport.allowAddress(_remoteAddress))
             return false;
         
-        //if (true) return true;
-        Socket s = null;
         try {
-            s = new Socket(_remoteAddress.getAddress(), _remoteAddress.getPort());
-            OutputStream out = s.getOutputStream();
-            InputStream in = s.getInputStream();
-            
-            try { s.setSoTimeout(TCPListener.HANDLE_TIMEOUT); } catch (SocketException se) {}
-            
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Beginning verification of reachability");
-            
-            // send: 0xFFFF + #versions + v1 [+ v2 [etc]] + properties
-            DataHelper.writeLong(out, 2, FLAG_TEST);
-            out.write(TCPTransport.SUPPORTED_PROTOCOLS.length);
-            for (int i = 0; i < TCPTransport.SUPPORTED_PROTOCOLS.length; i++) 
-                out.write(TCPTransport.SUPPORTED_PROTOCOLS[i]);
-            DataHelper.writeProperties(out, null);
-            out.flush();
-            
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Verification of reachability request sent");
-            
-            // read: 0xFFFF + versionOk + #bytesIP + IP + currentTime + properties
-            int flag = (int)DataHelper.readLong(in, 2);
-            if (flag != FLAG_TEST)
-                throw new IOException("Unable to verify the peer - invalid response");
-            int version = in.read();
-            if (version == -1)
-                throw new IOException("Unable to verify the peer - invalid version");
-            if (version == FLAG_PROTOCOL_NONE)
-                throw new IOException("Unable to verify the peer - no matching version");
-            int numBytes = in.read();
-            if ( (numBytes == -1) || (numBytes > 32) )
-                throw new IOException("Unable to verify the peer - invalid num bytes");
-            byte ip[] = new byte[numBytes];
-            int read = DataHelper.read(in, ip);
-            if (read != numBytes)
-                throw new IOException("Unable to verify the peer - invalid num bytes");
-            Date now = DataHelper.readDate(in);
-            Properties opts = DataHelper.readProperties(in);
-            
-            return true;
+            return verifyReachability(_remoteAddress);
         } catch (IOException ioe) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Error verifying " 
@@ -734,6 +693,50 @@ public class ConnectionHandler {
                           + "at " + _remoteAddress, dfe);
             return false;
         }
+    }
+    
+    private static boolean verifyReachability(TCPAddress address) throws IOException, DataFormatException { 
+        //if (true) return true;
+        Socket s = new Socket(address.getAddress(), address.getPort());
+        OutputStream out = s.getOutputStream();
+        InputStream in = s.getInputStream();
+
+        try { s.setSoTimeout(TCPListener.HANDLE_TIMEOUT); } catch (SocketException se) {}
+
+        //if (_log.shouldLog(Log.DEBUG))
+        //    _log.debug("Beginning verification of reachability");
+
+        // send: 0xFFFF + #versions + v1 [+ v2 [etc]] + properties
+        DataHelper.writeLong(out, 2, FLAG_TEST);
+        out.write(TCPTransport.SUPPORTED_PROTOCOLS.length);
+        for (int i = 0; i < TCPTransport.SUPPORTED_PROTOCOLS.length; i++) 
+            out.write(TCPTransport.SUPPORTED_PROTOCOLS[i]);
+        DataHelper.writeProperties(out, null);
+        out.flush();
+
+        //if (_log.shouldLog(Log.DEBUG))
+        //    _log.debug("Verification of reachability request sent");
+
+        // read: 0xFFFF + versionOk + #bytesIP + IP + currentTime + properties
+        int flag = (int)DataHelper.readLong(in, 2);
+        if (flag != FLAG_TEST)
+            throw new IOException("Unable to verify the peer - invalid response");
+        int version = in.read();
+        if (version == -1)
+            throw new IOException("Unable to verify the peer - invalid version");
+        if (version == FLAG_PROTOCOL_NONE)
+            throw new IOException("Unable to verify the peer - no matching version");
+        int numBytes = in.read();
+        if ( (numBytes == -1) || (numBytes > 32) )
+            throw new IOException("Unable to verify the peer - invalid num bytes");
+        byte ip[] = new byte[numBytes];
+        int read = DataHelper.read(in, ip);
+        if (read != numBytes)
+            throw new IOException("Unable to verify the peer - invalid num bytes");
+        Date now = DataHelper.readDate(in);
+        Properties opts = DataHelper.readProperties(in);
+
+        return true;
     }
     
     /**
@@ -850,5 +853,31 @@ public class ConnectionHandler {
         
         if (_log.shouldLog(Log.WARN))
             _log.warn(error, e);
+    }
+    
+    /**
+     * Verify the reachability of a peer.  
+     *   Usage: <code>ConnectionHandler hostname portNum</code>
+     */
+    public static void main(String args[]) {
+        if (false) args = new String[] { "dev.i2p.net", "4108" };
+        
+        if ( (args == null) || (args.length != 2) ) {
+            System.out.println("Usage: ConnectionHandler hostname portNum");
+            System.exit(0);
+        }
+        
+        try {
+            int port = Integer.parseInt(args[1]);
+            TCPAddress addr = new TCPAddress(args[0], port);
+            boolean ok = verifyReachability(addr);
+            if (ok) 
+                System.out.println("Peer is reachable: " + addr.toString());
+            else
+                System.out.println("Peer is not reachable: " + addr.toString());
+        } catch (Exception e) {
+            System.out.println("Peer is not reachable: " + args[0] + ":" + args[1]);
+            e.printStackTrace();
+        }
     }
 }
