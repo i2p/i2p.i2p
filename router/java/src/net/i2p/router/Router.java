@@ -272,6 +272,9 @@ public class Router {
             super(Router.this._context); 
             Router.this._context.statManager().createRateStat("bw.receiveBps", "How fast we receive data", "Bandwidth", new long[] { 60*1000, 5*60*1000, 60*60*1000 });
             Router.this._context.statManager().createRateStat("bw.sendBps", "How fast we send data", "Bandwidth", new long[] { 60*1000, 5*60*1000, 60*60*1000 });
+            Router.this._context.statManager().createRateStat("router.activePeers", "How many peers we are actively talking with", "Throttle", new long[] { 5*60*1000, 60*60*1000 });
+            Router.this._context.statManager().createRateStat("router.highCapacityPeers", "How many high capacity peers we know", "Throttle", new long[] { 5*60*1000, 60*60*1000 });
+            Router.this._context.statManager().createRateStat("router.fastPeers", "How many fast peers we know", "Throttle", new long[] { 5*60*1000, 60*60*1000 });
         }
         public String getName() { return "Coalesce stats"; }
         public void runJob() {
@@ -296,6 +299,15 @@ public class Router {
                     Router.this._context.statManager().addRateData("bw.sendBps", (long)bps, 60*1000);
                 }
             }
+            
+            int active = Router.this._context.commSystem().countActivePeers();
+            Router.this._context.statManager().addRateData("router.activePeers", active, 60*1000);
+            
+            int fast = Router.this._context.profileOrganizer().countFastPeers();
+            Router.this._context.statManager().addRateData("router.fastPeers", fast, 60*1000);
+            
+            int highCap = Router.this._context.profileOrganizer().countHighCapacityPeers();
+            Router.this._context.statManager().addRateData("router.highCapacityPeers", highCap, 60*1000);
 
             requeue(60*1000);
         }

@@ -1,4 +1,8 @@
-$Id: history.txt,v 1.112 2004/12/19 01:25:27 scintilla Exp $
+$Id: history.txt,v 1.113 2004/12/19 06:04:57 jrandom Exp $
+
+2004-12-19  jrandom
+    * Added three new stats - router.activePeers, router.fastPeers, and 
+      router.highCapacityPeers, updated every minute
 
 2004-12-19  jrandom
     * Added a new i2ptunnel type: 'httpserver', allowing you to specify what
