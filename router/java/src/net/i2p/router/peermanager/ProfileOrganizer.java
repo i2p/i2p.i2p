@@ -535,6 +535,10 @@ public class ProfileOrganizer {
             if (profile.getIsFailing() || (!profile.getIsActive()))
                 continue;
         
+            // dont bother trying to make sense of things below the baseline
+            if (profile.getCapacityValue() <= CapacityCalculator.GROWTH_FACTOR)
+                continue;
+            
             totalCapacity += profile.getCapacityValue();
             totalIntegration += profile.getIntegrationValue();
             reordered.add(profile);
