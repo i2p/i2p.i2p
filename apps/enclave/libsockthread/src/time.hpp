@@ -34,13 +34,19 @@
 namespace Libsockthread {
 	class Time {
 		public:
-			Time(void) { now(); }
+			Time()
+				{ now(); }
 
-			void now(void) { unixtime = time(0); }
-			string& utc(string &s) const;
-			string& utc_date(string &s) const;
-			string& utc_time(string &s) const;
+			string& get_formatted()
+				{ return formatted; }
+			void now()
+				{ unixtime = time(0); }
+			string& utc();
+			string& utc_date();
+			string& utc_time();
+
 		private:
+			string formatted;
 			time_t unixtime;
 	};
 }

@@ -28,13 +28,19 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+/*
+ * Global includes and platform configuration.  This is used to compile the
+ * library, but is not intended for use by users of the library in their
+ * programs.
+ */
+
 #ifndef LIBSOCKTHREAD_PLATFORM_HPP
 #define LIBSOCKTHREAD_PLATFORM_HPP
 
 /*
  * Operating system
  */
-#define FREEBSD	0  // FreeBSD (untested)
+#define FREEBSD	0  // FreeBSD
 #define MINGW	1  // Windows native (Mingw)
 #define LINUX	2  // Linux
 #define CYGWIN	3  // Cygwin
@@ -59,5 +65,10 @@
 	#define NO_INET_NTOP
 	#define NO_INET_PTON
 #endif
+
+#include <ctime>
+#include <iostream>
+#include <string>
+using namespace std;
 
 #endif  // LIBSOCKTHREAD_PLATFORM_HPP

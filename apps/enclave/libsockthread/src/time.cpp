@@ -28,66 +28,55 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <ctime>
-#include <string>
-using namespace std;
+#include "platform.hpp"
 #include "time.hpp"
 using namespace Libsockthread;
 
 /*
- * Converts the time to an ISO 8601 standard time and date and puts it in a
- * string
+ * Converts the time to an ISO 8601 standard date and time
  * Example: 2004-07-01T19:03:47Z
  */
-string& Time::utc(string &s) const
+string& Time::utc()
 {
-	struct tm* tm;
-
-	tm = gmtime(&unixtime);
+	struct tm* tm = gmtime(&unixtime);
 	char t[21];
 	strftime(t, sizeof t, "%Y-%m-%dT%H:%M:%SZ", tm);
-	return s = t;
+	return formatted = t;
 }
 
 /*
- * Converts the time to an ISO 8601 standard date and puts it in a string
+ * Converts the time to an ISO 8601 standard date
  * Example: 2004-07-01Z
  */
-string& Time::utc_date(string &s) const
+string& Time::utc_date()
 {
-	struct tm* tm;
-
-	tm = gmtime(&unixtime);
+	struct tm* tm = gmtime(&unixtime);
 	char t[12];
 	strftime(t, sizeof t, "%Y-%m-%dZ", tm);
-	return s = t;
+	return formatted = t;
 }
 
 /*
- * Converts the time to an ISO 8601 standard time and puts it in a string
+ * Converts the time to an ISO 8601 standard time
  * Example: 19:03:47Z
  */
-string& Time::utc_time(string &s) const
+string& Time::utc_time()
 {
-	struct tm* tm;
-
-	tm = gmtime(&unixtime);
+	struct tm* tm = gmtime(&unixtime);
 	char t[10];
 	strftime(t, sizeof t, "%H:%M:%SZ", tm);
-	return s = t;
+	return formatted = t;
 }
 
 #ifdef UNIT_TEST
 // g++ -Wall -DUNIT_TEST time.cpp -o time
-#include <iostream>
-
-int main(void)
+int main()
 {
 	Time t;
-	string s;
-	cout << "Current date and time is " << t.utc(s) << '\n';
-	cout << "Current date is " << t.utc_date(s) << '\n';
-	cout << "Current time is " << t.utc_time(s) << '\n';
+	cout << "Current date and time is " << t.utc() << '\n';
+	cout << "Current date is " << t.utc_date() << '\n';
+	cout << "Current time is " << t.utc_time() << '\n';
+	cout << "Formatted time is " << t.get_formatted() << " (should be the same)\n";
 
 	return 0;
 }
