@@ -51,13 +51,6 @@ import net.i2p.util.RandomSource;
 public class I2PAppContext {
     /** the context that components without explicit root are bound */
     protected static I2PAppContext _globalAppContext;
-    /** 
-     * Determine if the app context been initialized.  If this is false 
-     * and something asks for the globalAppContext, a new one is created, 
-     * otherwise the existing one is used.
-     *
-     */
-    protected static volatile boolean _globalAppContextInitialized;
     
     private Properties _overrideProps;
     
@@ -96,12 +89,10 @@ public class I2PAppContext {
      *
      */
     public static I2PAppContext getGlobalContext() { 
-        if (!_globalAppContextInitialized) {
-            synchronized (I2PAppContext.class) {
-                System.err.println("*** Building seperate global context!");
-                if (_globalAppContext == null)
-                    _globalAppContext = new I2PAppContext(false, null);
-                _globalAppContextInitialized = true;
+        synchronized (I2PAppContext.class) {
+            if (_globalAppContext == null) {
+                System.err.println("*** Building a seperate global context!");
+                _globalAppContext = new I2PAppContext(false, null);
             }
         }
         return _globalAppContext; 
@@ -125,15 +116,10 @@ public class I2PAppContext {
      * @param doInit should this context be used as the global one (if necessary)?
      */
     private I2PAppContext(boolean doInit, Properties envProps) {
-        //System.out.println("App context created: " + this);
         if (doInit) {
-            if (!_globalAppContextInitialized) {
-                synchronized (I2PAppContext.class) { 
-                    if (_globalAppContext == null) {
-                        _globalAppContext = this;
-                        _globalAppContextInitialized = true;
-                    }
-                }
+            synchronized (I2PAppContext.class) { 
+                if (_globalAppContext == null)
+                    _globalAppContext = this;
             }
         }
         _overrideProps = envProps;
