@@ -1,5 +1,5 @@
 ; TC's hosts.txt guaranteed freshness
-; $Id: hosts.txt,v 1.22 2004/08/02 16:09:21 jrandom Exp $
+; $Id: hosts.txt,v 1.23 2004/08/04 20:12:06 jrandom Exp $
 ; changelog:
 ; (1.49) added ems.i2p
 ; (1.48) added ooo.i2p
@@ -10,7 +10,7 @@
 ; (1.43) added files.hypercubus.i2p
 ; (1.42) added www1.squid.i2p
 ; (1.41) added quadn.i2p
-; (1.40) added nickster2.i2p and irc.nickster.i2p (pointing at iip)
+; (1.40) added nickster2.i2p and irc.nickster.i2p (pointing at IIP)
 ; (1.39) added jdot.i2p
 ; (1.38) added forum.i2p
 ; (1.36) added ferret.i2p
