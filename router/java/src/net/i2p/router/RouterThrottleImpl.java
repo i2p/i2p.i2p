@@ -241,7 +241,7 @@ class RouterThrottleImpl implements RouterThrottle {
         
         double allocatedKBps = toAllocate / (10 * 60 * 1024);
         
-        if (_context.random().nextInt(100) > 100 * pctFull) {
+        if (pctFull < 1.0) { // (_context.random().nextInt(100) > 100 * pctFull) {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Probabalistically allowing the tunnel w/ " + pctFull + " of our " + bytesAllowed
                            + "bytes/" + allocatedKBps + "KBps allocated through " + numTunnels + " tunnels");

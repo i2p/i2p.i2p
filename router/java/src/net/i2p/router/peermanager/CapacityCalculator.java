@@ -101,10 +101,10 @@ public class CapacityCalculator extends Calculator {
             val -= failed * stretch;
         }
         
-        if ( (period <= 10*60*1000) && (curRejected.getCurrentEventCount() + curRejected.getLastEventCount() > 0) ) {
-            //System.out.println("10m period has rejected " + (curRejected.getCurrentEventCount() + curRejected.getLastEventCount()) + " times");
-            return 0.0d;
-        } else
+        //if ( (period <= 10*60*1000) && (curRejected.getCurrentEventCount() + curRejected.getLastEventCount() > 0) ) {
+        //    //System.out.println("10m period has rejected " + (curRejected.getCurrentEventCount() + curRejected.getLastEventCount()) + " times");
+        //    return 0.0d;
+        //} else
             val -= stretch * (curRejected.getCurrentEventCount() + curRejected.getLastEventCount());
         
         val += GROWTH_FACTOR;

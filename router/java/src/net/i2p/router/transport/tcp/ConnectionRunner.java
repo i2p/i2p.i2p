@@ -92,11 +92,9 @@ class ConnectionRunner implements Runnable {
         
         msg.timestamp("ConnectionRunner.sendMessage data");
 
-        I2NPMessage timeMessage = null;
-        if (_lastTimeSend < _context.clock().now() - TIME_SEND_FREQUENCY) {
-            timeMessage = buildTimeMessage();
-            _lastTimeSend = _context.clock().now();
-        }
+        boolean sendTime = false;
+        if (_lastTimeSend < _context.clock().now() - TIME_SEND_FREQUENCY)
+            sendTime = true;
         
         OutputStream out = _con.getOutputStream();
         boolean ok = false;
@@ -106,8 +104,10 @@ class ConnectionRunner implements Runnable {
             synchronized (out) {
                 before = _context.clock().now();
                 out.write(buf, 0, written);
-                if (timeMessage != null)
-                    out.write(timeMessage.toByteArray());
+                if (sendTime) {
+                    out.write(buildTimeMessage().toByteArray());
+                    _lastTimeSend = _context.clock().now();
+                }
                 out.flush();
                 after = _context.clock().now();
             }

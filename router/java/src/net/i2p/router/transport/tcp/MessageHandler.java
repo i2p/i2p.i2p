@@ -54,10 +54,12 @@ public class MessageHandler implements I2NPMessageReader.I2NPMessageEventListene
         long delta = _con.getRouterContext().clock().now() - remoteTime;
         if ( (delta > Router.CLOCK_FUDGE_FACTOR) || (delta < 0 - Router.CLOCK_FUDGE_FACTOR) ) {
             _con.closeConnection();
-            _transport.addConnectionErrorMessage("Peer " + _identHash.toBase64().substring(0,6) 
-                                                 + " is too far skewed (" 
-                                                 + DataHelper.formatDuration(delta) + ") after uptime of " 
-                                                 + DataHelper.formatDuration(_con.getLifetime())); 
+            String msg = "Peer " + _identHash.toBase64().substring(0,6) + " is too far skewed (" 
+                         + DataHelper.formatDuration(delta) + ") after uptime of " 
+                         + DataHelper.formatDuration(_con.getLifetime());
+            if (_log.shouldLog(Log.WARN))
+                _log.warn(msg);
+            _transport.addConnectionErrorMessage(msg); 
             _transport.getContext().statManager().addRateData("tcp.disconnectAfterSkew", delta, _con.getLifetime());
         } else {
             int level = Log.DEBUG;

@@ -1,4 +1,12 @@
-$Id: history.txt,v 1.107 2004/12/14 11:42:35 jrandom Exp $
+$Id: history.txt,v 1.108 2004/12/15 21:45:56 jrandom Exp $
+
+2004-12-16  jrandom
+    * Remove the randomized factor in the tunnel rejection by bandwidth -
+      we now accept the request if we've allocated less than our limit
+      and reject it if we've allocated more.
+    * Stick to the standard capacity scale on tunnel rejection, even for 
+      the 10m period.
+    * Build the time message at the very last possible moment
 
 2004-12-15  jrandom
     * Handle hard disconnects more gracefully within the streaming lib, and
