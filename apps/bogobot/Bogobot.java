@@ -42,7 +42,7 @@ public class Bogobot extends PircBot {
      */
     private String  _botPrimaryNick           = "somebot";
     private String  _botSecondaryNick         = "somebot_";
-    private String  _botShutdownCommand       = "take off eh";
+    private String  _botShutdownPassword      = "take off eh";
     private long    _commandAntiFloodInterval = 60;
     private String  _ircChannel               = "#i2p-chat";
     private String  _ircServer                = "irc.duck.i2p";
@@ -131,7 +131,7 @@ public class Bogobot extends PircBot {
          * Nobody else except the bot's owner can shut it down, unless of
          * course the owner's nick isn't registered and someone's spoofing it.
          */
-        if ((sender.equals(_ownerPrimaryNick) || sender.equals(_ownerSecondaryNick)) && message.equals(_botShutdownCommand)) {
+        if ((sender.equals(_ownerPrimaryNick) || sender.equals(_ownerSecondaryNick)) && message.equals(_botShutdownPassword)) {
 
             if (_isLoggerEnabled)
                 _logger.info(System.currentTimeMillis() + " quits *** " + this.getName() + " ***");
