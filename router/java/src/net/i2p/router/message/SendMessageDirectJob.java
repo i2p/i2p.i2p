@@ -42,6 +42,7 @@ public class SendMessageDirectJob extends JobImpl {
     private MessageSelector _selector;
     private boolean _alreadySearched;
     private boolean _sent;
+    private long _searchOn;
     
     private final static long DEFAULT_TIMEOUT = 60*1000;
     
@@ -62,6 +63,7 @@ public class SendMessageDirectJob extends JobImpl {
         _router = null;
         _expiration = expiration;
         _priority = priority;
+        _searchOn = 0;
         _alreadySearched = false;
         _onSend = onSend;
         _onSuccess = onSuccess;
@@ -111,11 +113,13 @@ public class SendMessageDirectJob extends JobImpl {
                         _log.debug("Router not specified, so we're looking for it...");
                     _context.netDb().lookupRouterInfo(_targetHash, this, this, 
                                                       _expiration - _context.clock().now());
+                    _searchOn = _context.clock().now();
                     _alreadySearched = true;
                 } else {
-                    if (_log.shouldLog(Log.ERROR))
-                        _log.error("Unable to find the router to send to: " + _targetHash 
-                                   + " message: " + _message, getAddedBy());
+                    if (_log.shouldLog(Log.WARN))
+                        _log.warn("Unable to find the router to send to: " + _targetHash 
+                                   + " after searching for " + (_context.clock().now()-_searchOn) 
+                                   + "ms, message: " + _message, getAddedBy());
                 }
             }
         }
