@@ -58,10 +58,15 @@ class TunnelPoolExpirationJob extends JobImpl {
             TunnelInfo info = _pool.getFreeTunnel(id);
             if ( (info != null) && (info.getSettings() != null) ) {
                 if (info.getSettings().getExpiration() < expire) {
-                    _log.info("Expiring free inbound tunnel " + id + " [" + new Date(info.getSettings().getExpiration()) + "] (expire = " + new Date(expire) + ")");
+                    if (_log.shouldLog(Log.INFO))
+                        _log.info("Expiring free inbound tunnel " + id + " [" 
+                                  + new Date(info.getSettings().getExpiration()) 
+                                  + "] (expire = " + new Date(expire) + ")");
                     _pool.removeFreeTunnel(id);
                 } else if (info.getSettings().getExpiration() < now) {
-                    _log.info("It is past the expiration for free inbound tunnel " + id + " but not yet the buffer, mark it as no longer ready");
+                    if (_log.shouldLog(Log.INFO))
+                        _log.info("It is past the expiration for free inbound tunnel " + id 
+                                  + " but not yet the buffer, mark it as no longer ready");
                     info.setIsReady(false);
                 }
             }
@@ -81,10 +86,14 @@ class TunnelPoolExpirationJob extends JobImpl {
             TunnelInfo info = _pool.getOutboundTunnel(id);
             if ( (info != null) && (info.getSettings() != null) ) {
                 if (info.getSettings().getExpiration() < expire) {
-                    _log.info("Expiring outbound tunnel " + id + " [" + new Date(info.getSettings().getExpiration()) + "]");
+                    if (_log.shouldLog(Log.INFO))
+                        _log.info("Expiring outbound tunnel " + id + " [" 
+                                  + new Date(info.getSettings().getExpiration()) + "]");
                     _pool.removeOutboundTunnel(id);
                 } else if (info.getSettings().getExpiration() < now) {
-                    _log.info("It is past the expiration for outbound tunnel " + id + " but not yet the buffer, mark it as no longer ready");
+                    if (_log.shouldLog(Log.INFO))
+                        _log.info("It is past the expiration for outbound tunnel " + id 
+                                  + " but not yet the buffer, mark it as no longer ready");
                     info.setIsReady(false);
                 }
             }
@@ -104,7 +113,9 @@ class TunnelPoolExpirationJob extends JobImpl {
             TunnelInfo info = _pool.getParticipatingTunnel(id);
             if ( (info != null) && (info.getSettings() != null) ) {
                 if (info.getSettings().getExpiration() < expire) {
-                    _log.info("Expiring participation in tunnel " + id + " [" + new Date(info.getSettings().getExpiration()) + "]");
+                    if (_log.shouldLog(Log.INFO))
+                        _log.info("Expiring participation in tunnel " + id + " [" 
+                                  + new Date(info.getSettings().getExpiration()) + "]");
                     _pool.removeParticipatingTunnel(id);
                 }
             }
@@ -124,7 +135,9 @@ class TunnelPoolExpirationJob extends JobImpl {
             TunnelInfo info = _pool.getPendingTunnel(id);
             if ( (info != null) && (info.getSettings() != null) ) {
                 if (info.getSettings().getExpiration() < expire) {
-                    _log.info("Expiring pending tunnel " + id + " [" + new Date(info.getSettings().getExpiration()) + "]");
+                    if (_log.shouldLog(Log.INFO))
+                        _log.info("Expiring pending tunnel " + id + " [" 
+                                  + new Date(info.getSettings().getExpiration()) + "]");
                     _pool.removePendingTunnel(id);
                 }
             }

@@ -59,7 +59,9 @@ class PoolingTunnelSelector {
         for (Iterator iter = ordered.iterator(); iter.hasNext() && (rv.size() < criteria.getMinimumTunnelsRequired()); ) {
             rv.add(iter.next());
         }
-        _log.info("Selecting outbound tunnelIds [all outbound tunnels: " + outIds.size() + ", tunnelIds ready: " + ordered.size() + ", rv: " + rv + "]");
+        if (_log.shouldLog(Log.INFO))
+            _log.info("Selecting outbound tunnelIds [all outbound tunnels: " + outIds.size() 
+                      + ", tunnelIds ready: " + ordered.size() + ", rv: " + rv + "]");
         return rv;
     }
     
@@ -79,7 +81,9 @@ class PoolingTunnelSelector {
             if (info.getIsReady()) {
                 tunnels.add(id);
             } else {
-                _log.debug("Inbound tunnel " + id + " is not ready?! " + new Date(info.getSettings().getExpiration()));
+                if (_log.shouldLog(Log.DEBUG))
+                    _log.debug("Inbound tunnel " + id + " is not ready?! " 
+                               + new Date(info.getSettings().getExpiration()));
             }
         }
         
@@ -88,7 +92,9 @@ class PoolingTunnelSelector {
         for (Iterator iter = ordered.iterator(); iter.hasNext() && (rv.size() < criteria.getMinimumTunnelsRequired()); ) {
             rv.add(iter.next());
         }
-        _log.info("Selecting inbound tunnelIds [tunnelIds ready: " + tunnels.size() + ", rv: " + rv + "]");
+        if (_log.shouldLog(Log.INFO))
+            _log.info("Selecting inbound tunnelIds [tunnelIds ready: " 
+                      + tunnels.size() + ", rv: " + rv + "]");
         return rv;
     }
     
@@ -115,7 +121,10 @@ class PoolingTunnelSelector {
         if (info.getSettings() == null) return true;
         if (info.getSettings().getExpiration() <= 0) return true;
         if (info.getSettings().getExpiration() - safetyMargin <= _context.clock().now()) {
-            _log.debug("Expiration of tunnel " + id.getTunnelId() + " has almost been reached [" + new Date(info.getSettings().getExpiration()) + "]");
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Expiration of tunnel " + id.getTunnelId() 
+                           + " has almost been reached [" 
+                           + new Date(info.getSettings().getExpiration()) + "]");
             return true;
         } else {
             return false;

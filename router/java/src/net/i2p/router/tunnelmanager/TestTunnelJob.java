@@ -300,8 +300,9 @@ class TestTunnelJob extends JobImpl {
             StringBuffer buf = new StringBuffer(256);
             buf.append(super.toString());
             buf.append(": TestMessageSelector: tunnel ").append(_tunnelId);
-            buf.append(" looking for ").append(_id).append(" expiring on ");
-            buf.append(new Date(_expiration));
+            buf.append(" looking for ").append(_id).append(" expiring in ");
+            buf.append(_expiration - _context.clock().now());
+            buf.append("ms");
             return buf.toString();
         }
     }
