@@ -157,7 +157,7 @@ public class ConnectionPacketHandler {
                            + ") for " + con);
 
             return true;
-        } else if (numResends > 0) {
+        //} else if (numResends > 0) {
             // window sizes are shrunk on resend, not on ack
         } else {
             if (acked > 0) { 
@@ -166,17 +166,19 @@ public class ConnectionPacketHandler {
                     // new packet that ack'ed uncongested data, or an empty ack
                     int newWindowSize = con.getOptions().getWindowSize();
                     
-                    if (newWindowSize > con.getLastCongestionSeenAt() / 2) {
-                        // congestion avoidance
-                        
-                        // we can't use newWindowSize += 1/newWindowSize, since we're
-                        // integers, so lets use a random distribution instead
-                        int shouldIncrement = _context.random().nextInt(newWindowSize);
-                        if (shouldIncrement <= 0)
+                    if (numResends <= 0) {
+                        if (newWindowSize > con.getLastCongestionSeenAt() / 2) {
+                            // congestion avoidance
+
+                            // we can't use newWindowSize += 1/newWindowSize, since we're
+                            // integers, so lets use a random distribution instead
+                            int shouldIncrement = _context.random().nextInt(newWindowSize);
+                            if (shouldIncrement <= 0)
+                                newWindowSize += 1;
+                        } else {
+                            // slow start
                             newWindowSize += 1;
-                    } else {
-                        // slow start
-                        newWindowSize += 1;
+                        }
                     }
                     
                     if (_log.shouldLog(Log.DEBUG))

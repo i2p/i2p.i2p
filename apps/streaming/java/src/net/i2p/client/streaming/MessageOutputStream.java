@@ -8,6 +8,7 @@ import net.i2p.I2PAppContext;
 import net.i2p.data.ByteArray;
 import net.i2p.util.ByteCache;
 import net.i2p.util.Log;
+import net.i2p.util.SimpleTimer;
 
 /**
  * A stream that we can shove data into that fires off those bytes
@@ -26,6 +27,11 @@ public class MessageOutputStream extends OutputStream {
     private long _written;
     private int _writeTimeout;
     private ByteCache _dataCache;
+    private Flusher _flusher;
+    private long _lastFlushed;
+    private long _lastBuffered;
+    /** if we enqueue data but don't flush it in this period, flush it passively */
+    private int _passiveFlushDelay;
     
     public MessageOutputStream(I2PAppContext ctx, DataReceiver receiver) {
         this(ctx, receiver, Packet.MAX_PAYLOAD_SIZE);
@@ -41,6 +47,10 @@ public class MessageOutputStream extends OutputStream {
         _written = 0;
         _closed = false;
         _writeTimeout = -1;
+        _passiveFlushDelay = 5*1000;
+        _flusher = new Flusher();
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("MessageOutputStream created");
     }
     
     public void setWriteTimeout(int ms) { _writeTimeout = ms; }
@@ -51,10 +61,11 @@ public class MessageOutputStream extends OutputStream {
     }
     
     public void write(byte b[], int off, int len) throws IOException {
-        //if (_log.shouldLog(Log.DEBUG))
-        //    _log.debug("write(b[], " + off + ", " + len + ")");
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("write(b[], " + off + ", " + len + ") ");
         int cur = off;
         int remaining = len;
+        long begin = _context.clock().now();
         while (remaining > 0) {
             WriteStatus ws = null;
             // we do any waiting outside the synchronized() block because we
@@ -70,6 +81,11 @@ public class MessageOutputStream extends OutputStream {
                     cur += remaining;
                     _written += remaining;
                     remaining = 0;
+                    _lastBuffered = _context.clock().now();
+                    if (_passiveFlushDelay > 0) {
+                        // if it is already enqueued, this just pushes it further out
+                        SimpleTimer.getInstance().addEvent(_flusher, _passiveFlushDelay);
+                    }
                 } else {
                     // buffer whatever we can fit then flush,
                     // repeating until we've pushed all of the
@@ -87,9 +103,12 @@ public class MessageOutputStream extends OutputStream {
                     _written += _valid;
                     _valid = 0;                       
                     throwAnyError();
+                    _lastFlushed = _context.clock().now();
                 }
             }
             if (ws != null) {
+                if (_log.shouldLog(Log.DEBUG))
+                    _log.debug("Waiting " + _writeTimeout + "ms for accept of " + ws);
                 // ok, we've actually added a new packet - lets wait until
                 // its accepted into the queue before moving on (so that we 
                 // dont fill our buffer instantly)
@@ -100,14 +119,47 @@ public class MessageOutputStream extends OutputStream {
                     else
                         throw new IOException("Write not accepted into the queue");
                 }
+            } else {
+                if (_log.shouldLog(Log.DEBUG))
+                    _log.debug("Queued " + len + " without sending to the receiver");
             }
         }
+        long elapsed = _context.clock().now() - begin;
+        if ( (elapsed > 10*1000) && (_log.shouldLog(Log.DEBUG)) )
+            _log.debug("wtf, took " + elapsed + "ms to write to the stream?", new Exception("foo"));
         throwAnyError();
     }
     
     public void write(int b) throws IOException {
         write(new byte[] { (byte)b }, 0, 1);
         throwAnyError();
+    }
+    
+    /**
+     * Flush data that has been enqued but not flushed after a certain 
+     * period of inactivity
+     */
+    private class Flusher implements SimpleTimer.TimedEvent {
+        public void timeReached() {
+            boolean sent = false;
+            WriteStatus ws = null;
+            synchronized (_dataLock) {
+                if ( (_valid > 0) && (_lastBuffered + _passiveFlushDelay > _context.clock().now()) ) {
+                    if ( (_buf != null) && (_dataReceiver != null) ) {
+                        ws = _dataReceiver.writeData(_buf, 0, _valid);
+                        _written += _valid;
+                        _valid = 0;
+                        _lastFlushed = _context.clock().now();
+                        _dataLock.notifyAll();
+                        sent = true;
+                    }
+                }
+            }
+            // ignore the ws
+            if (sent && _log.shouldLog(Log.DEBUG)) 
+                _log.debug("Passive flush of " + ws);
+        }
+        
     }
     
     /** 
@@ -118,6 +170,7 @@ public class MessageOutputStream extends OutputStream {
      * @throws InterruptedIOException if the write times out
      */
     public void flush() throws IOException {
+        long begin = _context.clock().now();
         WriteStatus ws = null;
         synchronized (_dataLock) {
             if (_buf == null) throw new IOException("closed (buffer went away)");
@@ -128,6 +181,7 @@ public class MessageOutputStream extends OutputStream {
             ws = _dataReceiver.writeData(_buf, 0, _valid);
             _written += _valid;
             _valid = 0;
+            _lastFlushed = _context.clock().now();
             _dataLock.notifyAll();
         }
         
@@ -137,6 +191,8 @@ public class MessageOutputStream extends OutputStream {
             ( (_writeTimeout > Connection.DISCONNECT_TIMEOUT) ||
               (_writeTimeout <= 0) ) )
             ws.waitForCompletion(Connection.DISCONNECT_TIMEOUT);
+        else if ( (_writeTimeout <= 0) || (_writeTimeout > Connection.DISCONNECT_TIMEOUT) )
+            ws.waitForCompletion(Connection.DISCONNECT_TIMEOUT);
         else
             ws.waitForCompletion(_writeTimeout);
         if (_log.shouldLog(Log.DEBUG))
@@ -145,6 +201,10 @@ public class MessageOutputStream extends OutputStream {
             throw new InterruptedIOException("Timed out during write");
         else if (ws.writeFailed())
             throw new IOException("Write failed");
+        
+        long elapsed = _context.clock().now() - begin;
+        if ( (elapsed > 10*1000) && (_log.shouldLog(Log.DEBUG)) )
+            _log.debug("wtf, took " + elapsed + "ms to flush the stream?\n" + ws, new Exception("bar"));
         throwAnyError();
     }
     
@@ -182,6 +242,7 @@ public class MessageOutputStream extends OutputStream {
                 _buf = null;
                 _valid = 0;
             }
+            _lastFlushed = _context.clock().now();
             _dataLock.notifyAll();
         }
         if (ba != null) {
@@ -221,6 +282,7 @@ public class MessageOutputStream extends OutputStream {
             _written += _valid;
             _valid = 0;
             _dataLock.notifyAll();
+            _lastFlushed = _context.clock().now();
         }
         if (blocking && ws != null) {
             ws.waitForAccept(_writeTimeout);

@@ -272,6 +272,9 @@ public class MessageInputStream extends InputStream {
                     // at least one byte
                     
                     while (_readyDataBlocks.size() <= 0) {
+                        if (_locallyClosed)
+                            throw new IOException("Already closed, you wanker");
+                        
                         if ( (_notYetReadyBlocks.size() <= 0) && (_closeReceived) ) {
                             if (_log.shouldLog(Log.INFO))
                                 _log.info("read(...," + offset + ", " + length + ")[" + i 
@@ -402,6 +405,7 @@ public class MessageInputStream extends InputStream {
                 ba.setData(null);
             }
             _locallyClosed = true;
+            _dataLock.notifyAll();
         }
     }
     

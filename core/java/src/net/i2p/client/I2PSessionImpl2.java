@@ -194,6 +194,12 @@ class I2PSessionImpl2 extends I2PSessionImpl {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug(getPrefix() + "After waitFor sending state " + state.getMessageId()
                        + " / " + state.getNonce() + " found = " + found);
+        
+        long timeToSend = afterRemovingSync - beforeSendingSync;
+        if ( (timeToSend > 10*1000) && (_log.shouldLog(Log.WARN)) ) {
+            _log.warn("wtf, took " + timeToSend + "ms to send the message?!", new Exception("baz"));
+        }
+        
         if (found) {
             if (_log.shouldLog(Log.INFO))
                 _log.info(getPrefix() + "Message sent after " + state.getElapsed() + "ms with "

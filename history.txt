@@ -1,4 +1,17 @@
-$Id: history.txt,v 1.88 2004/11/29 16:57:14 jrandom Exp $
+$Id: history.txt,v 1.89 2004/11/29 18:24:50 jrandom Exp $
+
+2004-11-30  jrandom
+    * Render the burst rate fields on /config.jsp properly (thanks ugha!)
+    * Build in a simple timeout to flush data queued into the I2PSocket but
+      not yet flushed.
+    * Don't explicitly flush after each SAM stream write, but leave it up to 
+      the [nonblocking] passive flush.
+    * Don't whine about 10-99 connection events occurring in a second
+    * Don't wait for completion of packets that will not be ACKed (duh)
+    * Adjust the congestion window, even if the packet was resent (duh)
+    * Make sure to wake up any blocking read()'s when the MessageInputStream
+      is close()ed (duh)
+    * Never wait more than the disconnect timeout for a write to complete
 
 2004-11-29  jrandom
     * Minor fixes to avoid unnecessary errors on shutdown (thanks susi!)

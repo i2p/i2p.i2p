@@ -110,6 +110,9 @@ public class I2PTunnelRunner extends I2PThread implements I2PSocket.SocketErrorL
                     //i2pout.flush();
                 }
             }
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Initial data " + (initialData != null ? initialData.length : 0) 
+                           + " written, starting forwarders");
             Thread t1 = new StreamForwarder(in, i2pout, "toI2P");
             Thread t2 = new StreamForwarder(i2pin, out, "fromI2P");
             synchronized (finishLock) {
@@ -117,6 +120,8 @@ public class I2PTunnelRunner extends I2PThread implements I2PSocket.SocketErrorL
                     finishLock.wait();
                 }
             }
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("At least one forwarder completed, closing and joining");
             // now one connection is dead - kill the other as well.
             s.close();
             i2ps.close();

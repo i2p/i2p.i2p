@@ -32,6 +32,8 @@ class ConnectionHandler {
     }
     
     public void setActive(boolean active) { 
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("setActive(" + active + ") called");
         synchronized (_synQueue) {
             _active = active; 
             _synQueue.notifyAll(); // so we break from the accept()

@@ -120,10 +120,15 @@ public class ConfigNetHelper {
     private static String getBurstFactor(int numSeconds, String name) {
         StringBuffer buf = new StringBuffer(256);
         buf.append("<select name=\"").append(name).append("\">\n");
+        boolean found = false;
         for (int i = 10; i <= 60; i += 10) {
             buf.append("<option value=\"").append(i).append("\" ");
-            if ( (i == numSeconds) || (i == 60) )
+            if (i == numSeconds) {
                 buf.append("selected ");
+                found = true;
+            } else if ( (i == 60) && (!found) ) {
+                buf.append("selected ");
+            }
             buf.append(">");
             buf.append(i).append(" seconds</option>\n");
         }

@@ -391,6 +391,8 @@ public class SAMStreamSession {
             while (stillRunning) {
                 try {
                     i2ps = serverSocket.accept();
+                    if (i2ps == null)
+                        break;
 
                     _log.debug("New incoming connection");
 
@@ -467,6 +469,7 @@ public class SAMStreamSession {
             }
             try {
                 i2pSocketOS.write(data);
+                //i2pSocketOS.flush();
             } catch (IOException e) {
                 _log.error("Error sending data through I2P socket", e);
                 return false;

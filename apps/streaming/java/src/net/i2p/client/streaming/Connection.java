@@ -70,7 +70,7 @@ public class Connection {
     private long _lifetimeDupMessageReceived;
     
     public static final long MAX_RESEND_DELAY = 60*1000;
-    public static final long MIN_RESEND_DELAY = 20*1000;
+    public static final long MIN_RESEND_DELAY = 40*1000;
 
     /** wait up to 5 minutes after disconnection so we can ack/close packets */
     public static int DISCONNECT_TIMEOUT = 5*60*1000;
@@ -325,8 +325,8 @@ public class Connection {
             _occurredEventCount++;
         } else {
             _occurredTime = now;
-            if (_occurredEventCount > 10) {
-                _log.log(Log.CRIT, "More than 10 events (" + _occurredEventCount + ") in a second on " 
+            if (_occurredEventCount > 100) {
+                _log.log(Log.CRIT, "More than 100 events (" + _occurredEventCount + ") in a second on " 
                                    + toString() + ": scheduler = " + sched);
             }
             _occurredEventCount = 0;
