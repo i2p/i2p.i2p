@@ -37,7 +37,7 @@ import java.util.Random;
  * <p>If jbigi.enable is set to false, this class won't even attempt to use the 
  * native library, but if it is set to true (or is not specified), it will first 
  * check the platform specific library path for the "jbigi" library, as defined by 
- * {@link Runtime#loadLibrary} - e.g. C:\windows\jbigi.dll or /lib/libjbigi.so.  
+ * {@link java.lang.Runtime#loadLibrary} - e.g. C:\windows\jbigi.dll or /lib/libjbigi.so.  
  * If that fails, it reviews the jbigi.impl environment property - if that is set,
  * it checks all of the components in the CLASSPATH for the file specified and
  * attempts to load it as the native library.  If jbigi.impl is not set, if there
