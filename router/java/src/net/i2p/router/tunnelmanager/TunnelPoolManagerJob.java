@@ -4,6 +4,7 @@ import java.util.Iterator;
 import java.util.Set;
 
 import net.i2p.data.TunnelId;
+import net.i2p.router.ClientTunnelSettings;
 import net.i2p.router.JobImpl;
 import net.i2p.router.RouterContext;
 import net.i2p.router.TunnelInfo;
@@ -44,6 +45,18 @@ class TunnelPoolManagerJob extends JobImpl {
     
             boolean built = false;
     
+            ClientTunnelSettings settings = new ClientTunnelSettings();
+            settings.readFromProperties(getContext().router().getConfigMap());
+            _pool.setPoolSettings(settings);
+        
+            try {
+                String str = getContext().router().getConfigSetting(TunnelPool.TARGET_CLIENTS_PARAM);
+                int clients = Integer.parseInt(str);
+                _pool.setTargetClients(clients);
+            } catch (NumberFormatException nfe) {
+                // ignore
+            }
+            
             int targetClients = _pool.getTargetClients();
             int targetInboundTunnels = targetClients*_pool.getPoolSettings().getNumInboundTunnels() + 1;
             int targetOutboundTunnels = targetClients*_pool.getPoolSettings().getNumOutboundTunnels() + 1;
