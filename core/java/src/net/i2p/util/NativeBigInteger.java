@@ -512,13 +512,12 @@ public class NativeBigInteger extends BigInteger {
     }
     
     private static final String getResourceName(boolean optimized) {
-        String pname = NativeBigInteger.class.getPackage().getName().replace('.','/');
         String pref = getLibraryPrefix();
         String middle = getMiddleName(optimized);
         String suff = getLibrarySuffix();
         if(pref == null || middle == null || suff == null)
             return null;
-        return pname+"/"+pref+middle+"."+suff;
+        return pref+middle+"."+suff;
     }
     
     private static final String getMiddleName(boolean optimized){

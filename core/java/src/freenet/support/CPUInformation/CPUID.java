@@ -516,8 +516,7 @@ public class CPUID {
     
     private static final String getResourceName()
     {
-        String pname = CPUID.class.getPackage().getName().replace('.','/');
-        return pname+"/"+getLibraryPrefix()+getLibraryMiddlePart()+"."+getLibrarySuffix();
+        return getLibraryPrefix()+getLibraryMiddlePart()+"."+getLibrarySuffix();
     }
     
     private static final String getLibraryPrefix()
