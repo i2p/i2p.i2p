@@ -423,7 +423,15 @@ class TCPConnection implements I2NPMessageReader.I2NPMessageEventListener {
      */
     private boolean slicesTooLong() {
         if (_lastSliceRun <= 0) return false;
+        synchronized (_toBeSent) {
+            // if there's nothing pending, dont worry about it
+            if (_toBeSent.size() <= 0)
+                return false;
+        }
         long diff = _context.clock().now() - _lastSliceRun;
+        boolean tooLong = diff > MAX_SLICE_DURATION;
+        if (tooLong)
+            _log.warn("Slices are taking " + diff + "ms");
         return (diff > MAX_SLICE_DURATION);
     }
     
@@ -542,7 +550,7 @@ class TCPConnection implements I2NPMessageReader.I2NPMessageEventListener {
                               + " bytes in " + (end - afterExpire) + "ms (write took "
                               + (end - beforeWrite) + "ms, prepare took "
                               + (beforeWrite - afterExpire) + "ms)");
-                if (timeLeft < 10*1000) {
+                if (timeLeft < 2*1000) {
                     if (_log.shouldLog(Log.DEBUG))
                         _log.warn("Very little time left... time to send [" + (end-start) 
                                   + "] time left [" + timeLeft + "] to "
