@@ -1,4 +1,6 @@
-$Id: history.txt,v 1.187 2005/04/05 11:06:16 jrandom Exp $
+$Id: history.txt,v 1.188 2005/04/05 17:24:32 jrandom Exp $
+
+* 2005-04-06  0.5.0.6 released
 
 2005-04-05  jrandom
     * Retry I2PTunnel startup if we are unable to build a socketManager for a
