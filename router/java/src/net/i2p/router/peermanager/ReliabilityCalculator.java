@@ -1,6 +1,7 @@
 package net.i2p.router.peermanager;
 
 import net.i2p.router.RouterContext;
+import net.i2p.stat.RateStat;
 import net.i2p.util.Log;
 
 /**
@@ -36,27 +37,24 @@ public class ReliabilityCalculator extends Calculator {
         //val -= profile.getSendFailureSize().getRate(60*60*1000).getCurrentEventCount()*2;
         //val -= profile.getSendFailureSize().getRate(60*60*1000).getLastEventCount()*2;
         
-        long rejectionPenalties = 
-              (profile.getTunnelHistory().getRejectionRate().getRate(60*1000).getCurrentEventCount() * 200)
-            + (profile.getTunnelHistory().getRejectionRate().getRate(60*1000).getLastEventCount() * 100)
-            + (profile.getTunnelHistory().getRejectionRate().getRate(10*60*1000).getCurrentEventCount() * 10)
-            + (profile.getTunnelHistory().getRejectionRate().getRate(10*60*1000).getLastEventCount() * 5)
-            + (profile.getTunnelHistory().getRejectionRate().getRate(60*60*1000).getCurrentEventCount() * 1);
-        if ( (rejectionPenalties > 0) && (_log.shouldLog(Log.INFO)) )
-            _log.info("Rejection penalties for peer " + profile.getPeer().toBase64() + ": " + rejectionPenalties);
-        val -= rejectionPenalties;
-        //val -= profile.getTunnelHistory().getRejectionRate().getRate(60*60*1000).getLastEventCount() * 1;
+        RateStat rejRate = profile.getTunnelHistory().getRejectionRate();
+        if (rejRate.getRate(60*1000).getCurrentEventCount() > 0)
+            val -= 200;
+        if (rejRate.getRate(60*1000).getLastEventCount() > 0)
+            val -= 100;
+        if (rejRate.getRate(10*60*1000).getCurrentEventCount() > 0)
+            val -= 10;
+        if (rejRate.getRate(10*60*1000).getCurrentEventCount() > 0)
+            val -= 5;
         
-        // penalize them heavily for dropping netDb requests
+        // penalize them heavily for dropping netDb requests (though these could have
+        // failed due to tunnel timeouts, so don't be too mean)
         if (profile.getDBHistory().getFailedLookupRate().getRate(60*1000).getCurrentEventCount() > 0)
             val -= 10;
         if (profile.getDBHistory().getFailedLookupRate().getRate(60*1000).getLastEventCount() > 0)
-        val -= 5;
-        //val -= profile.getDBHistory().getFailedLookupRate().getRate(60*60*1000).getCurrentEventCount();
-        //val -= profile.getDBHistory().getFailedLookupRate().getRate(60*60*1000).getLastEventCount();
-        //val -= profile.getDBHistory().getFailedLookupRate().getRate(24*60*60*1000).getCurrentEventCount() * 50;
-        //val -= profile.getDBHistory().getFailedLookupRate().getRate(24*60*60*1000).getLastEventCount() * 20;
+            val -= 5;
         
+        // scream and shout on network errors
         if (profile.getCommError().getRate(60*1000).getCurrentEventCount() > 0)
             val -= 200;
         if (profile.getCommError().getRate(60*1000).getLastEventCount() > 0)
