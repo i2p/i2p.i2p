@@ -13,6 +13,8 @@ import java.net.SocketException;
 import java.util.HashMap;
 
 import net.i2p.client.streaming.I2PSocket;
+import net.i2p.data.ByteArray;
+import net.i2p.util.ByteCache;
 import net.i2p.util.Clock;
 import net.i2p.util.I2PThread;
 import net.i2p.util.Log;
@@ -94,7 +96,7 @@ public class I2PTunnelRunner extends I2PThread implements I2PSocket.SocketErrorL
     public void run() {
         try {
             InputStream in = s.getInputStream();
-            OutputStream out = new BufferedOutputStream(s.getOutputStream(), NETWORK_BUFFER_SIZE);
+            OutputStream out = s.getOutputStream(); // = new BufferedOutputStream(s.getOutputStream(), NETWORK_BUFFER_SIZE);
             i2ps.setSocketErrorListener(this);
             InputStream i2pin = i2ps.getInputStream();
             OutputStream i2pout = i2ps.getOutputStream(); //new BufferedOutputStream(i2ps.getOutputStream(), MAX_PACKET_SIZE);
@@ -150,11 +152,13 @@ public class I2PTunnelRunner extends I2PThread implements I2PSocket.SocketErrorL
         InputStream in;
         OutputStream out;
         String direction;
+        private ByteCache _cache;
 
         private StreamForwarder(InputStream in, OutputStream out, String dir) {
             this.in = in;
             this.out = out;
             direction = dir;
+            _cache = ByteCache.getInstance(256, NETWORK_BUFFER_SIZE);
             setName("StreamForwarder " + _runnerId + "." + (++__forwarderId));
             start();
         }
@@ -170,7 +174,8 @@ public class I2PTunnelRunner extends I2PThread implements I2PSocket.SocketErrorL
                            + to);
             }
             
-            byte[] buffer = new byte[NETWORK_BUFFER_SIZE];
+            ByteArray ba = _cache.acquire();
+            byte[] buffer = ba.getData(); // new byte[NETWORK_BUFFER_SIZE];
             try {
                 int len;
                 while ((len = in.read(buffer)) != -1) {
@@ -227,6 +232,7 @@ public class I2PTunnelRunner extends I2PThread implements I2PSocket.SocketErrorL
                     finishLock.notifyAll();
                     // the main thread will close sockets etc. now
                 }
+                _cache.release(ba);
             }
         }
     }

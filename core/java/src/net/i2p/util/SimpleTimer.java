@@ -20,7 +20,7 @@ public class SimpleTimer {
     public static SimpleTimer getInstance() { return _instance; }
     private Log _log;
     /** event time (Long) to event (TimedEvent) mapping */
-    private Map _events;
+    private TreeMap _events;
     /** event (TimedEvent) to event time (Long) mapping */
     private Map _eventTimes;
     
@@ -74,7 +74,6 @@ public class SimpleTimer {
     private class SimpleTimerRunner implements Runnable {
         public void run() {
             List eventsToFire = new ArrayList(1);
-            List timesToRemove = new ArrayList(1);
             while (true) {
                 try {
                     synchronized (_events) {
@@ -82,23 +81,19 @@ public class SimpleTimer {
                             _events.wait();
                         long now = System.currentTimeMillis();
                         long nextEventDelay = -1;
-                        for (Iterator iter = _events.keySet().iterator(); iter.hasNext(); ) {
-                            Long when = (Long)iter.next();
+                        while (true) {
+                            if (_events.size() <= 0) break;
+                            Long when = (Long)_events.firstKey();
                             if (when.longValue() <= now) {
-                                TimedEvent evt = (TimedEvent)_events.get(when);
+                                TimedEvent evt = (TimedEvent)_events.remove(when);
+                                _eventTimes.remove(when);
                                 eventsToFire.add(evt);
-                                timesToRemove.add(when);
                             } else {
                                 nextEventDelay = when.longValue() - now;
                                 break;
                             }
                         }
-                        if (timesToRemove.size() > 0) { 
-                            for (int i = 0; i < timesToRemove.size(); i++) 
-                                _events.remove(timesToRemove.get(i));
-                            for (int i = 0; i < eventsToFire.size(); i++)
-                                _eventTimes.remove(eventsToFire.get(i));
-                        } else { 
+                        if (eventsToFire.size() <= 0) { 
                             if (nextEventDelay != -1)
                                 _events.wait(nextEventDelay);
                             else
@@ -125,7 +120,6 @@ public class SimpleTimer {
                     }
                 }
                 eventsToFire.clear();
-                timesToRemove.clear();
             }
         }
     }

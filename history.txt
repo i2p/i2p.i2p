@@ -1,4 +1,12 @@
-$Id: history.txt,v 1.68 2004/11/08 00:40:21 jrandom Exp $
+$Id: history.txt,v 1.69 2004/11/10 07:33:02 jrandom Exp $
+
+2004-11-13  jrandom
+    * Added throttles on how many I2PTunnel client connections we open at once
+    * Replaced some buffered streams in I2PTunnel with unbuffered streams, as 
+      the streaming library used should take care of any buffering.
+    * Added a cache for some objects used in I2PTunnel, especially useful when
+      there are many short lived connections.
+    * Trimmed the SimpleTimer's processing a bit
 
 2004-11-10  jrandom
     * Allow loading the (mini)streaming connection options from the 
