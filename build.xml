@@ -179,7 +179,7 @@
             <tarfileset dir="pkg-temp" includes="**/*" prefix="i2p" />
         </tar>
     </target>
-    <taskdef name="izpack" classpath="${basedir}/installer/lib/standalone-compiler.jar" classname="com.izforge.izpack.ant.IzPackTask" />
+    <taskdef name="izpack" classpath="${basedir}/installer/lib/izpack/standalone-compiler.jar" classname="com.izforge.izpack.ant.IzPackTask" />
     <target name="installer" depends="preppkg">
         <izpack input="${basedir}/installer/install.xml" output="${basedir}/install.jar" installerType="standard" basedir="${basedir}" />
     </target>
