@@ -59,7 +59,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
          "Cache-control: no-cache\r\n"+
          "\r\n"+
          "<html><body><H1>I2P ERROR: DESTINATION NOT FOUND</H1>"+
-         "That I2P Desitination was not found. Perhaps you pasted in the "+
+         "That I2P Destination was not found. Perhaps you pasted in the "+
          "wrong BASE64 I2P Destination or the link you are following is "+
          "bad. The host (or the WWW proxy, if you're using one) could also "+
 	 "be temporarily offline.  You may want to <b>retry</b>.  "+
@@ -71,7 +71,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
          "Content-Type: text/html; charset=iso-8859-1\r\n"+
          "Cache-control: no-cache\r\n\r\n"+
          "<html><body><H1>I2P ERROR: TIMEOUT</H1>"+
-         "That Desitination was reachable, but timed out getting a "+
+         "That Destination was reachable, but timed out getting a "+
          "response.  This is likely a temporary error, so you should simply "+
          "try to refresh, though if the problem persists, the remote "+
          "destination may have issues.  Could not get a response from "+
