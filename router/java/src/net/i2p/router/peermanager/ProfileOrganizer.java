@@ -690,7 +690,7 @@ public class ProfileOrganizer {
         buf.append("<td><b>Capacity</b></td>");
         buf.append("<td><b>Integration</b></td>");
         buf.append("<td><b>Failing?</b></td>");
-        //buf.append("<td><b>Profile data</b></td>");
+        buf.append("<td>&nbsp;</td>");
         buf.append("</tr>");
         for (Iterator iter = order.keySet().iterator(); iter.hasNext();) {
             String name = (String)iter.next();
@@ -746,6 +746,7 @@ public class ProfileOrganizer {
             buf.append("<td align=\"right\">").append(prof.getIsFailing()).append("</td>");
             //buf.append("<td><a href=\"/profile/").append(prof.getPeer().toBase64().substring(0, 32)).append("\">profile.txt</a> ");
             //buf.append("    <a href=\"#").append(prof.getPeer().toBase64().substring(0, 32)).append("\">netDb</a></td>");
+            buf.append("<td><a href=\"netdb.jsp#").append(peer.toBase64().substring(0,6)).append("\">netDb</a></td>\n");
             buf.append("</tr>");
         }
         buf.append("</table>");
