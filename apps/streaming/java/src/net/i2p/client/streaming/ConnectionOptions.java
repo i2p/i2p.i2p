@@ -74,7 +74,7 @@ public class ConnectionOptions extends I2PSocketOptions {
             setWriteTimeout(-1);
             setInactivityTimeout(5*60*1000);
             setInactivityAction(INACTIVITY_ACTION_SEND);
-            setInboundBufferSize(256*1024);
+            setInboundBufferSize((Packet.MAX_PAYLOAD_SIZE + 2) * Connection.MAX_WINDOW_SIZE);
         }
     }
     
@@ -103,15 +103,14 @@ public class ConnectionOptions extends I2PSocketOptions {
     public boolean getRequireFullySigned() { return _fullySigned; }
     public void setRequireFullySigned(boolean sign) { _fullySigned = sign; }
     
-    private static final int MAX_WINDOW_SIZE = 32;
     /** 
      * How many messages will we send before waiting for an ACK?
      *
      */
     public int getWindowSize() { return _windowSize; }
     public void setWindowSize(int numMsgs) { 
-        if (numMsgs > MAX_WINDOW_SIZE)
-            numMsgs = MAX_WINDOW_SIZE;
+        if (numMsgs > Connection.MAX_WINDOW_SIZE)
+            numMsgs = Connection.MAX_WINDOW_SIZE;
         _windowSize = numMsgs; 
     }
     

@@ -56,12 +56,18 @@ public class Connection {
     private boolean _disconnectScheduled;
     private long _lastReceivedOn;
     private ActivityTimer _activityTimer;
+    /** window size when we last saw congestion */
+    private int _lastCongestionSeenAt;
+    private boolean _ackSinceCongestion;
     
     public static final long MAX_RESEND_DELAY = 60*1000;
     public static final long MIN_RESEND_DELAY = 20*1000;
 
     /** wait up to 5 minutes after disconnection so we can ack/close packets */
     public static long DISCONNECT_TIMEOUT = 5*60*1000;
+    
+    /** lets be sane.. no more than 32 packets in the air in each dir */
+    public static final int MAX_WINDOW_SIZE = 32;
     
     public Connection(I2PAppContext ctx, ConnectionManager manager, SchedulerChooser chooser, PacketQueue queue, ConnectionPacketHandler handler) {
         this(ctx, manager, chooser, queue, handler, null);
@@ -86,12 +92,14 @@ public class Connection {
         _unackedPacketsReceived = 0;
         _congestionWindowEnd = 0;
         _highestAckedThrough = -1;
+        _lastCongestionSeenAt = MAX_WINDOW_SIZE;
         _connectionManager = manager;
         _resetReceived = false;
         _connected = true;
         _disconnectScheduled = false;
         _lastReceivedOn = -1;
         _activityTimer = new ActivityTimer();
+        _ackSinceCongestion = true;
     }
     
     public long getNextOutboundPacketNum() { 
@@ -275,6 +283,8 @@ public class Connection {
             }
             _outboundPackets.notifyAll();
         }
+        if ((acked != null) && (acked.size() > 0) )
+            _ackSinceCongestion = true;
         return acked;
     }
 
@@ -438,6 +448,17 @@ public class Connection {
         return (_lastSendTime > _lastReceivedOn ? _lastSendTime : _lastReceivedOn);
     }
     
+    public int getLastCongestionSeenAt() { return _lastCongestionSeenAt; }
+    
+    void congestionOccurred() {
+        // if we hit congestion and e.g. 5 packets are resent,
+        // dont set the size to (winSize >> 4).  only set the
+        if (_ackSinceCongestion) {
+            _lastCongestionSeenAt = _options.getWindowSize();
+            _ackSinceCongestion = false;
+        }
+    }
+    
     void packetReceived() {
         _lastReceivedOn = _context.clock().now();
         resetActivityTimer();
@@ -563,6 +584,7 @@ public class Connection {
                 
                 // shrink the window
                 int newWindowSize = getOptions().getWindowSize();
+                _lastCongestionSeenAt = newWindowSize;
                 newWindowSize /= 2;
                 if (newWindowSize <= 0)
                     newWindowSize = 1;

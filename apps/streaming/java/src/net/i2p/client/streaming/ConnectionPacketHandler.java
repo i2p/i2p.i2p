@@ -124,10 +124,17 @@ public class ConnectionPacketHandler {
         if ( (!isNew) && (sequenceNum > 0) ) {
             // dup real packet
             int oldSize = con.getOptions().getWindowSize();
+            con.congestionOccurred();
             oldSize >>>= 1;
             if (oldSize <= 0)
                 oldSize = 1;
             con.getOptions().setWindowSize(oldSize);
+            
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Congestion occurred - new windowSize " + oldSize + " congestionSeenAt: "
+                           + con.getLastCongestionSeenAt() + " (#resends: " + numResends 
+                           + ") for " + con);
+
             return true;
         } else if (numResends > 0) {
             // window sizes are shrunk on resend, not on ack
@@ -137,9 +144,23 @@ public class ConnectionPacketHandler {
                 if (lowest >= con.getCongestionWindowEnd()) {
                     // new packet that ack'ed uncongested data, or an empty ack
                     int newWindowSize = con.getOptions().getWindowSize();
-                    newWindowSize += 1; // acked; // 1
+                    
+                    if (newWindowSize > con.getLastCongestionSeenAt() / 2) {
+                        // congestion avoidance
+                        
+                        // we can't use newWindowSize += 1/newWindowSize, since we're
+                        // integers, so lets use a random distribution instead
+                        int shouldIncrement = _context.random().nextInt(newWindowSize);
+                        if (shouldIncrement <= 0)
+                            newWindowSize += 1;
+                    } else {
+                        // slow start
+                        newWindowSize += 1;
+                    }
+                    
                     if (_log.shouldLog(Log.DEBUG))
-                        _log.debug("New window size " + newWindowSize + " (#resends: " + numResends 
+                        _log.debug("New window size " + newWindowSize + " congestionSeenAt: "
+                                   + con.getLastCongestionSeenAt() + " (#resends: " + numResends 
                                    + ") for " + con);
                     con.getOptions().setWindowSize(newWindowSize);
                     con.setCongestionWindowEnd(newWindowSize + lowest);
@@ -267,9 +288,9 @@ public class ConnectionPacketHandler {
             _con = con;
         }
         public void timeReached() {
-            if (_con.getLastActivityOn() <= _created) {
+            if (_con.getLastSendTime() <= _created) {
                 if (_log.shouldLog(Log.DEBUG))
-                    _log.debug("Last activity was a while ago, and we want to ack a dup");
+                    _log.debug("Last sent was a while ago, and we want to ack a dup");
                 // we haven't done anything since receiving the dup, send an
                 // ack now
                 _con.ackImmediately();
