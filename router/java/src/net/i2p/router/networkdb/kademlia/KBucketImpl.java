@@ -55,6 +55,8 @@ class KBucketImpl implements KBucket {
     public Hash getLocal() { return _local; }
     private void setLocal(Hash local) {
         _local = local; 
+        // we want to make sure we've got the cache in place before calling cachedXor
+        _local.prepareCache();
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Local hash reset to " + (local == null ? "null" : DataHelper.toHexString(local.getData())));
     }
@@ -343,7 +345,9 @@ class KBucketImpl implements KBucket {
         int low = 1;
         int high = 3;
         Log log = I2PAppContext.getGlobalContext().logManager().getLog(KBucketImpl.class);
-        KBucketImpl bucket = new KBucketImpl(I2PAppContext.getGlobalContext(), Hash.FAKE_HASH);
+        Hash local = Hash.FAKE_HASH;
+        local.prepareCache();
+        KBucketImpl bucket = new KBucketImpl(I2PAppContext.getGlobalContext(), local);
         bucket.setRange(low, high);
         Hash lowerBoundKey = bucket.getRangeBeginKey();
         Hash upperBoundKey = bucket.getRangeEndKey();
@@ -378,7 +382,9 @@ class KBucketImpl implements KBucket {
         int high = 200;
         byte hash[] = new byte[Hash.HASH_LENGTH];
         RandomSource.getInstance().nextBytes(hash);
-        KBucketImpl bucket = new KBucketImpl(I2PAppContext.getGlobalContext(), new Hash(hash));
+        Hash local = new Hash(hash);
+        local.prepareCache();
+        KBucketImpl bucket = new KBucketImpl(I2PAppContext.getGlobalContext(), local);
         bucket.setRange(low, high);
         Hash lowerBoundKey = bucket.getRangeBeginKey();
         Hash upperBoundKey = bucket.getRangeEndKey();

@@ -58,22 +58,30 @@ public class Hash extends DataStructureImpl {
     }
 
     /**
+     * Prepare this hash's cache for xor values - very few hashes will need it,
+     * so we don't want to waste the memory, and lazy initialization would incur
+     * online overhead to verify the initialization.
+     *
+     */
+    public void prepareCache() {
+        synchronized (this) {
+            if (_xorCache == null)
+                _xorCache = new HashMap(MAX_CACHED_XOR);
+        }
+    }
+    
+    /**
      * Calculate the xor with the current object and the specified hash, 
      * caching values where possible.  Currently this keeps up to MAX_CACHED_XOR
      * (1024) entries, and uses an essentially random ejection policy.  Later 
-     * perhaps go for an LRU or FIFO?
+     * perhaps go for an LRU or FIFO?  
      *
+     * @throws IllegalStateException if you try to use the cache without first 
+     *                               preparing this object's cache via .prepareCache()
      */
-    public byte[] cachedXor(Hash key) {
-        if (_xorCache == null) {
-            // we dont want to create two of these
-            synchronized (this) {
-                if (_xorCache == null)
-                    _xorCache = new HashMap(MAX_CACHED_XOR);
-            }
-        }
-
-        // i think we can get away with this being outside the synchronized block
+    public byte[] cachedXor(Hash key) throws IllegalStateException {
+        if (_xorCache == null)
+            throw new IllegalStateException("To use the cache, you must first prepare it");
         byte[] distance = (byte[])_xorCache.get(key);
         
         if (distance == null) {
@@ -85,7 +93,8 @@ public class Hash extends DataStructureImpl {
                     Set keys = new HashSet(toRemove);
                     // this removes essentially random keys - we dont maintain any sort
                     // of LRU or age.  perhaps we should?
-                    for (Iterator iter = _xorCache.keySet().iterator(); iter.hasNext(); ) 
+                    int removed = 0;
+                    for (Iterator iter = _xorCache.keySet().iterator(); iter.hasNext() && removed < toRemove; removed++) 
                         keys.add(iter.next());
                     for (Iterator iter = keys.iterator(); iter.hasNext(); ) 
                         _xorCache.remove(iter.next());
@@ -94,7 +103,7 @@ public class Hash extends DataStructureImpl {
                 _xorCache.put(key, (Object)distance);
                 cached = _xorCache.size();
             }
-            if (false && (_log.shouldLog(Log.DEBUG))) {
+            if (_log.shouldLog(Log.DEBUG)) {
                 // explicit buffer, since the compiler can't guess how long it'll be
                 StringBuffer buf = new StringBuffer(128);
                 buf.append("miss [").append(cached).append("] from ");
@@ -103,7 +112,7 @@ public class Hash extends DataStructureImpl {
                 _log.debug(buf.toString(), new Exception());
             }
         } else {
-            if (false && (_log.shouldLog(Log.DEBUG))) {
+            if (_log.shouldLog(Log.DEBUG)) {
                 // explicit buffer, since the compiler can't guess how long it'll be
                 StringBuffer buf = new StringBuffer(128);
                 buf.append("hit from ");
@@ -172,6 +181,7 @@ public class Hash extends DataStructureImpl {
     
     private static void testFill() {
         Hash local = new Hash(new byte[HASH_LENGTH]); // all zeroes
+        local.prepareCache();
         for (int i = 0; i < MAX_CACHED_XOR; i++) {
             byte t[] = new byte[HASH_LENGTH];
             for (int j = 0; j < HASH_LENGTH; j++)
@@ -184,9 +194,11 @@ public class Hash extends DataStructureImpl {
                 return;
             }
         }
+        _log.debug("Fill test passed");
     }
     private static void testOverflow() {
         Hash local = new Hash(new byte[HASH_LENGTH]); // all zeroes
+        local.prepareCache();
         for (int i = 0; i < MAX_CACHED_XOR*2; i++) {
             byte t[] = new byte[HASH_LENGTH];
             for (int j = 0; j < HASH_LENGTH; j++)
@@ -207,10 +219,12 @@ public class Hash extends DataStructureImpl {
                 }
             }
         }
+        _log.debug("overflow test passed");
     }
     private static void testFillCheck() {
         Set hashes = new HashSet();
         Hash local = new Hash(new byte[HASH_LENGTH]); // all zeroes
+        local.prepareCache();
         // fill 'er up
         for (int i = 0; i < MAX_CACHED_XOR; i++) {
             byte t[] = new byte[HASH_LENGTH];
@@ -248,5 +262,6 @@ public class Hash extends DataStructureImpl {
                 return;
             }
         }
+        _log.debug("Fill check test passed");
     }
 }
