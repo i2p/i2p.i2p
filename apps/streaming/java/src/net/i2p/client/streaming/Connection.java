@@ -93,16 +93,18 @@ public class Connection {
      * @return true if the packet should be sent
      */
     boolean packetSendChoke() {
-        if (true) return true;
+        if (false) return true;
         long writeExpire = _options.getWriteTimeout();
-        if (writeExpire > 0)
-            writeExpire += _context.clock().now();
         while (true) {
             long timeLeft = writeExpire - _context.clock().now();
             synchronized (_outboundPackets) {
                 if (_outboundPackets.size() >= _options.getWindowSize()) {
                     if (writeExpire > 0) {
-                        if (timeLeft <= 0) return false;
+                        if (timeLeft <= 0) {
+                            _log.error("Outbound window is full of " + _outboundPackets.size() 
+                                       + " and we've waited too long (" + writeExpire + "ms)");
+                            return false;
+                        }
                         if (_log.shouldLog(Log.DEBUG))
                             _log.debug("Outbound window is full (" + _outboundPackets.size() + "/" + _options.getWindowSize() + "), waiting " + timeLeft);
                         try { _outboundPackets.wait(timeLeft); } catch (InterruptedException ie) {}
@@ -116,6 +118,10 @@ public class Connection {
                 }
             }
         }
+    }
+    
+    void ackImmediately() {
+        _receiver.send(null, 0, 0);
     }
     
     /**
@@ -147,7 +153,7 @@ public class Connection {
             synchronized (_outboundPackets) {
                 _outboundPackets.put(new Long(packet.getSequenceNum()), packet);
             }
-            SimpleTimer.getInstance().addEvent(new ResendPacketEvent(packet), _options.getResendDelay());
+            SimpleTimer.getInstance().addEvent(new ResendPacketEvent(packet), _options.getRTT()*2);
         }
 
         _lastSendTime = _context.clock().now();
@@ -159,7 +165,7 @@ public class Connection {
             // something that will get a reply so that we can deliver some new tags -
             // ACKs don't get ACKed, but pings do.
             if (packet.getTagsSent().size() > 0) {
-                _log.error("Sending a ping since the ACK we just sent has " + packet.getTagsSent().size() + " tags");
+                _log.warn("Sending a ping since the ACK we just sent has " + packet.getTagsSent().size() + " tags");
                 _connectionManager.ping(_remotePeer, _options.getRTT()*2, false, packet.getKeyUsed(), packet.getTagsSent());
             }
         }
@@ -327,6 +333,8 @@ public class Connection {
             buf.append(Base64.encode(_sendStreamId));
         else
             buf.append("unknown");
+        buf.append(" wsize: ").append(_options.getWindowSize());
+        buf.append(" rtt: ").append(_options.getRTT());
         buf.append(" unacked outbound: ");
         synchronized (_outboundPackets) {
             buf.append(_outboundPackets.size()).append(" [");
@@ -367,8 +375,8 @@ public class Connection {
 
                 int numSends = _packet.getNumSends() + 1;
                 
-                if (_log.shouldLog(Log.ERROR))
-                    _log.error("Resend packet " + _packet + " time " + numSends + " on " + Connection.this);
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("Resend packet " + _packet + " time " + numSends + " on " + Connection.this);
                 _outboundQueue.enqueue(_packet);
                 
                 if (numSends > _options.getMaxResends()) {
@@ -376,7 +384,8 @@ public class Connection {
                         _log.debug("Too many resends");
                     disconnect(false);
                 } else {
-                    long timeout = _options.getResendDelay() << numSends;
+                    //long timeout = _options.getResendDelay() << numSends;
+                    long timeout = _options.getRTT() << numSends;
                     if (_log.shouldLog(Log.DEBUG))
                         _log.debug("Scheduling resend in " + timeout + "ms");
                     SimpleTimer.getInstance().addEvent(ResendPacketEvent.this, timeout);

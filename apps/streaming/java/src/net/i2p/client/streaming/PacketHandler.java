@@ -26,7 +26,28 @@ public class PacketHandler {
         _log = ctx.logManager().getLog(PacketHandler.class);
     }
     
+    private boolean choke(Packet packet) {
+        if (false) {
+            // artificial choke: 2% random drop and a 1s
+            // random delay
+            if (_context.random().nextInt(100) >= 98) {
+                _log.error("DROP: " + packet);
+                return false;
+            } else {
+                int delay = _context.random().nextInt(1000);
+                try { Thread.sleep(delay); } catch (InterruptedException ie) {}
+                _log.debug("OK  : " + packet + " delay = " + delay);
+                return true;
+            }
+        } else {
+            return true;
+        }
+    }
+    
     void receivePacket(Packet packet) {
+        boolean ok = choke(packet);
+        if (!ok) return;
+        
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("packet received: " + packet);
         
@@ -46,11 +67,11 @@ public class PacketHandler {
     
     private void displayPacket(Packet packet, Connection con) {
         if (_log.shouldLog(Log.DEBUG)) {
-            //SimpleDateFormat fmt = new SimpleDateFormat("hh:mm:ss.SSS");
-            //String now = fmt.format(new Date());
+            SimpleDateFormat fmt = new SimpleDateFormat("hh:mm:ss.SSS");
+            String now = fmt.format(new Date());
             String msg = packet + (con != null ? " on " + con : " on unknown con");
-            _log.debug(msg);
-            // System.out.println(now + ": " + msg);
+            //_log.debug(msg);
+            System.out.println(now + ": " + msg);
         }
     }
     

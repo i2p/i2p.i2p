@@ -47,12 +47,15 @@ public class ConnectionPacketHandler {
                 con.getOptions().setResendDelay(con.getOptions().getResendDelay()*2);
                 //con.getOptions().setWindowSize(con.getOptions().getWindowSize()/2);
                 if (_log.shouldLog(Log.WARN))
-                    _log.warn("congestion.. dup " + packet);
+                    _log.warn("congestion.. dup " + packet);   
+                con.incrementUnackedPacketsReceived();
             } else {
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("ACK only packet received: " + packet);
             }
         }
+        
+        int numResends = 0;
         List acked = con.ackPackets(packet.getAckThrough(), packet.getNacks());
         if ( (acked != null) && (acked.size() > 0) ) {
             if (_log.shouldLog(Log.DEBUG))
@@ -62,8 +65,13 @@ public class ConnectionPacketHandler {
             int lowestRtt = -1;
             for (int i = 0; i < acked.size(); i++) {
                 PacketLocal p = (PacketLocal)acked.get(i);
-                if ( (lowestRtt < 0) || (p.getAckTime() < lowestRtt) )
-                    lowestRtt = p.getAckTime();
+                if ( (lowestRtt < 0) || (p.getAckTime() < lowestRtt) ) {
+                    if (p.getNumSends() <= 1)
+                        lowestRtt = p.getAckTime();
+                }
+                
+                if (p.getNumSends() > 1)
+                    numResends++;
                 
                 // ACK the tags we delivered so we can use them
                 if ( (p.getKeyUsed() != null) && (p.getTagsSent() != null) 
@@ -75,12 +83,51 @@ public class ConnectionPacketHandler {
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("Packet acked: " + p);
             }
-            int oldRTT = con.getOptions().getRTT();
-            int newRTT = (int)(RTT_DAMPENING*oldRTT + (1-RTT_DAMPENING)*lowestRtt);
-            con.getOptions().setRTT(newRTT);
+            if (lowestRtt > 0) {
+                int oldRTT = con.getOptions().getRTT();
+                int newRTT = (int)(RTT_DAMPENING*oldRTT + (1-RTT_DAMPENING)*lowestRtt);
+                con.getOptions().setRTT(newRTT);
+            }
         }
-        
+
+        boolean fastAck = adjustWindow(con, isNew, packet.getSequenceNum(), numResends);
         con.eventOccurred();
+        if (fastAck) {
+            if (con.getLastSendTime() + con.getOptions().getRTT() < _context.clock().now()) {
+                _log.error("Fast ack for dup " + packet);
+                con.ackImmediately();
+            }
+        }
+    }
+    
+    private boolean adjustWindow(Connection con, boolean isNew, long sequenceNum, int numResends) {
+        if ( (!isNew) && (sequenceNum > 0) ) {
+            // dup real packet
+            int oldSize = con.getOptions().getWindowSize();
+            oldSize >>>= 1;
+            if (oldSize <= 0)
+                oldSize = 1;
+            con.getOptions().setWindowSize(oldSize);
+            return true;
+        } else if (numResends > 0) {
+            int newWindowSize = con.getOptions().getWindowSize();
+            newWindowSize /= 2; // >>>= numResends;
+            if (newWindowSize <= 0)
+                newWindowSize = 1;
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Shrink the window to " + newWindowSize + " (#resends: " + numResends 
+                           + ") for " + con);
+            con.getOptions().setWindowSize(newWindowSize);
+        } else {
+            // new packet that ack'ed uncongested data, or an empty ack
+            int newWindowSize = con.getOptions().getWindowSize();
+            newWindowSize += 1; //acked.size();
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("New window size " + newWindowSize + " (#resends: " + numResends 
+                           + ") for " + con);
+            con.getOptions().setWindowSize(newWindowSize);
+        }
+        return false;
     }
     
     /**

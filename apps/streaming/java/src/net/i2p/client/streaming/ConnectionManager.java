@@ -218,7 +218,7 @@ public class ConnectionManager {
             _packet = packet;
         }
         public void pong() { 
-            _log.error("Ping successful");
+            _log.debug("Ping successful");
             _context.sessionKeyManager().tagsDelivered(_peer.getPublicKey(), _packet.getKeyUsed(), _packet.getTagsSent());
             synchronized (ConnectionManager.PingRequest.this) {
                 _ponged = true; 

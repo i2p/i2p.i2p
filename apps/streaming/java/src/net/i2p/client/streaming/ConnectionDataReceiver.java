@@ -39,15 +39,21 @@ class ConnectionDataReceiver implements MessageOutputStream.DataReceiver {
         if (_connection.getUnackedPacketsReceived() > 0)
             doSend = true;
         
-        //if (_log.shouldLog(Log.DEBUG))
-        //    _log.debug("writeData called: size="+size + " doSend=" + doSend + " con: " + _connection, new Exception("write called by"));
+        if (_log.shouldLog(Log.ERROR) && !doSend)
+            _log.error("writeData called: size="+size + " doSend=" + doSend 
+                       + " unackedReceived: " + _connection.getUnackedPacketsReceived()
+                       + " con: " + _connection, new Exception("write called by"));
 
         if (doSend) {
-            PacketLocal packet = buildPacket(buf, off, size);
-            _connection.sendPacket(packet);
+            send(buf, off, size);
         } else {
             //_connection.flushPackets();
         }
+    }
+    
+    public void send(byte buf[], int off, int size) {
+        PacketLocal packet = buildPacket(buf, off, size);
+        _connection.sendPacket(packet);
     }
     
     private boolean isAckOnly(int size) {
@@ -63,7 +69,8 @@ class ConnectionDataReceiver implements MessageOutputStream.DataReceiver {
         boolean ackOnly = isAckOnly(size);
         PacketLocal packet = new PacketLocal(_context, _connection.getRemotePeer());
         byte data[] = new byte[size];
-        System.arraycopy(buf, off, data, 0, size);
+        if (size > 0)
+            System.arraycopy(buf, off, data, 0, size);
         packet.setPayload(data);
 		if (ackOnly)
 			packet.setSequenceNum(0);

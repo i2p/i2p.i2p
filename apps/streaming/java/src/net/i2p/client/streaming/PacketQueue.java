@@ -52,7 +52,7 @@ class PacketQueue {
                 packet.setTagsSent(tagsSent);
                 packet.incrementSends();
                 if (_log.shouldLog(Log.DEBUG)) {
-                    String msg = packet + " sent" + (tagsSent.size() > 0 
+                    String msg = "SEND " + packet + (tagsSent.size() > 0 
                                                      ? " with " + tagsSent.size() + " tags"
                                                      : "")
                                                      + " send # " + packet.getNumSends();
