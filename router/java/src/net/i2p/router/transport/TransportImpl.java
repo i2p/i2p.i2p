@@ -226,7 +226,7 @@ public abstract class TransportImpl implements Transport {
     public void messageReceived(I2NPMessage inMsg, RouterIdentity remoteIdent, Hash remoteIdentHash, long msToReceive, int bytesReceived) {
         int level = Log.INFO;
         if (msToReceive > 5000)
-            level = Log.ERROR;
+            level = Log.WARN;
         if (_log.shouldLog(level)) {
             StringBuffer buf = new StringBuffer(128);
             buf.append("Message received: ").append(inMsg.getClass().getName());

@@ -85,7 +85,11 @@ public class SendTunnelMessageJob extends JobImpl {
                           new Exception("SendTunnel from"));
         }
         //_log.info("Send tunnel message " + msg.getClass().getName() + " to " + _destRouter + " over " + _tunnelId + " targetting tunnel " + _targetTunnelId, new Exception("SendTunnel from"));
-        _expiration = getContext().clock().now() + timeoutMs;
+        if (timeoutMs < 30) {
+            _expiration = getContext().clock().now() + 30*1000;
+        } else {
+            _expiration = getContext().clock().now() + timeoutMs;
+        }
     }
     
     public void runJob() {

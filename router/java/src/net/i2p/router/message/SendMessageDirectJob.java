@@ -46,12 +46,15 @@ public class SendMessageDirectJob extends JobImpl {
     }
     public SendMessageDirectJob(RouterContext ctx, I2NPMessage message, Hash toPeer, Job onSend, ReplyJob onSuccess, Job onFail, MessageSelector selector, int timeoutMs, int priority) {
         super(ctx);
-        if (timeoutMs <= 0) throw new IllegalArgumentException("specify a timeout (" + timeoutMs + ")");
         _log = getContext().logManager().getLog(SendMessageDirectJob.class);
         _message = message;
         _targetHash = toPeer;
         _router = null;
-        _expiration = timeoutMs + ctx.clock().now();
+        if (timeoutMs <= 30) {
+            _expiration = ctx.clock().now() + 30*1000;
+        } else {
+            _expiration = timeoutMs + ctx.clock().now();
+        }
         _priority = priority;
         _searchOn = 0;
         _alreadySearched = false;
@@ -99,14 +102,14 @@ public class SendMessageDirectJob extends JobImpl {
                     if (_log.shouldLog(Log.DEBUG))
                         _log.debug("Router not specified, so we're looking for it...");
                     getContext().netDb().lookupRouterInfo(_targetHash, this, this, 
-                                                      _expiration - getContext().clock().now());
+                                                          _expiration - getContext().clock().now());
                     _searchOn = getContext().clock().now();
                     _alreadySearched = true;
                 } else {
-                    if (_log.shouldLog(Log.ERROR))
-                        _log.error("Unable to find the router to send to: " + _targetHash 
-                                   + " after searching for " + (getContext().clock().now()-_searchOn) 
-                                   + "ms, message: " + _message, getAddedBy());
+                    if (_log.shouldLog(Log.WARN))
+                        _log.warn("Unable to find the router to send to: " + _targetHash 
+                                  + " after searching for " + (getContext().clock().now()-_searchOn) 
+                                  + "ms, message: " + _message, getAddedBy());
                     if (_onFail != null)
                         getContext().jobQueue().addJob(_onFail);
                 }
