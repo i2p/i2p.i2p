@@ -46,7 +46,10 @@
  also run the <code>install_i2p_service_winnt.bat</code> (or 
  <code>uninstall_i2p_service_winnt.bat</code>) from the command line, if you prefer.<br />
  <input type="submit" name="action" value="Run I2P on startup" />
- <input type="submit" name="action" value="Don't run I2P on startup" />
+ <input type="submit" name="action" value="Don't run I2P on startup" /><br />
+ <b>Note:</b> If you are running I2P as service right now, removing it will shut 
+ down your router immediately.  You may want to consider shutting down gracefully, as
+ above, then running uninstall_i2p_service_winnt.bat.
  <% } %>
  <h4>Debugging</h4>
  At times, it may be helpful to debug I2P by getting a thread dump.  To do so, 
