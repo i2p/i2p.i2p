@@ -61,7 +61,7 @@ class PoolingTunnelSelector {
         for (int i = outIds.size(); i < criteria.getMinimumTunnelsRequired(); i++) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Building fake tunnels because the outbound tunnels weren't sufficient");
-            pool.buildFakeTunnels();
+            pool.buildFakeTunnels(true);
             rebuilt = true;
         }
         if (rebuilt && recurse)
@@ -106,7 +106,7 @@ class PoolingTunnelSelector {
         for (int i = tunnels.size(); i < criteria.getMinimumTunnelsRequired(); i++) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Building fake tunnels because the inbound tunnels weren't sufficient");
-            pool.buildFakeTunnels();
+            pool.buildFakeTunnels(true);
             rebuilt = true;
         }
         if (rebuilt && recurse)

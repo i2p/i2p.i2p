@@ -470,14 +470,17 @@ class TunnelPool {
      *
      */
     public void buildFakeTunnels() {
-        if (getFreeValidTunnelCount() < 3) {
+        buildFakeTunnels(false);
+    }
+    public void buildFakeTunnels(boolean force) {
+        if (force || getFreeValidTunnelCount() < 3) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Running low on valid inbound tunnels, building another");
             TunnelInfo inTunnelGateway = _tunnelBuilder.configureInboundTunnel(null, getPoolSettings(), true);
             RequestTunnelJob inReqJob = new RequestTunnelJob(_context, this, inTunnelGateway, true, getTunnelCreationTimeout());
             inReqJob.runJob();
         }
-        if (getOutboundValidTunnelCount() < 3) {
+        if (force || getOutboundValidTunnelCount() < 3) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Running low on valid outbound tunnels, building another");
             TunnelInfo outTunnelGateway = _tunnelBuilder.configureOutboundTunnel(getPoolSettings(), true);
