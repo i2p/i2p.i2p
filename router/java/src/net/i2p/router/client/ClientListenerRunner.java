@@ -65,7 +65,7 @@ public class ClientListenerRunner implements Runnable {
                 if (_bindAllInterfaces)
                     _socket = new ServerSocket(_port);
                 else
-                    _socket = new ServerSocket(_port, 5, InetAddress.getLocalHost());
+                    _socket = new ServerSocket(_port, 0, InetAddress.getByName("127.0.0.1"));
                 
                 curDelay = 0;
                 while (_running) {

@@ -1,4 +1,8 @@
-$Id: history.txt,v 1.96 2004/12/05 10:32:34 jrandom Exp $
+$Id: history.txt,v 1.97 2004/12/05 19:54:08 jrandom Exp $
+
+2004-12-05  jrandom
+    * Explicitly use "127.0.0.1" to bind the I2CP listener, not the JVM's
+      getLocalhost call
 
 2004-12-05  jrandom
     * Default the I2CP listener to localhost only, unless overridden by 
