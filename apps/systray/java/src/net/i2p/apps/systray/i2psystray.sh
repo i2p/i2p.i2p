@@ -1,1 +1,1 @@
-java -cp systray4j.jar:. -Djava.library.path=. SysTray
+java -cp systray4j.jar:. -Djava.library.path=. -jar systray.jar

@@ -12,20 +12,18 @@ import java.awt.FileDialog;
 import java.awt.Frame;
 
 /**
- * A rather nasty AWT file chooser dialog (thanks, Kaffe!) which allows the user
- * to select their preferred browser with.
+ * A simple file chooser dialog.
  * 
  * @author hypercubus
  */
 public class BrowserChooser extends FileDialog {
 
-	public BrowserChooser(Frame owner, String windowTitle) {
-		super(owner, windowTitle);
-		initialize();
-	}
+    public BrowserChooser(Frame owner, String windowTitle) {
+        super(owner, windowTitle);
+        initialize();
+    }
 
-	public void initialize(){
-		this.setSize(300,400);
+    public void initialize(){
         this.show();
-	}
+    }
 }

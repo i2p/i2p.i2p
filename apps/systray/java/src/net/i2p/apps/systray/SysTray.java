@@ -32,7 +32,7 @@ public class SysTray implements SysTrayMenuListener {
     private SysTrayMenuItem _itemExit          = new SysTrayMenuItem("Exit systray", "exit");
     private SysTrayMenuItem _itemSelectBrowser = new SysTrayMenuItem("Select preferred browser...", "selectbrowser");
     private SysTrayMenuIcon _sysTrayMenuIcon   = new SysTrayMenuIcon("../icons/iggy");
-    private SysTrayMenu     _sysTrayMenu       = new SysTrayMenu(_sysTrayMenuIcon, "I2P Console");
+    private SysTrayMenu     _sysTrayMenu       = new SysTrayMenu(_sysTrayMenuIcon, "I2P Router Console");
 
     public SysTray() {
         _sysTrayMenuIcon.addSysTrayMenuListener(this);
@@ -78,7 +78,9 @@ public class SysTray implements SysTrayMenuListener {
             _itemExit = null;
             _itemSelectBrowser = null;
             _sysTrayMenuIcon = null;
-            _sysTrayMenu = null;       
+            _sysTrayMenu = null;
+            _browserChooser = null;
+            _frame = null;
             System.exit(0);
         } else if (e.getActionCommand().equals("selectbrowser")) {
             setBrowser(promptForBrowser("Select preferred browser"));
