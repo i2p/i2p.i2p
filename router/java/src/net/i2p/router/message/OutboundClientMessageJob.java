@@ -74,8 +74,8 @@ public class OutboundClientMessageJob extends JobImpl {
     /** priority of messages, that might get honored some day... */
     private final static int SEND_PRIORITY = 500;
     
-    /** dont search for the lease more than 3 times */
-    private final static int MAX_LEASE_LOOKUPS = 3;
+    /** dont search for the lease more than 6 times */
+    private final static int MAX_LEASE_LOOKUPS = 6;
     
     /**
      * Send the sucker
@@ -98,7 +98,8 @@ public class OutboundClientMessageJob extends JobImpl {
                 timeoutMs = Long.parseLong(param);
             } catch (NumberFormatException nfe) {
                 if (_log.shouldLog(Log.WARN))
-                    _log.warn("Invalid client message timeout specified [" + param + "], defaulting to " + OVERALL_TIMEOUT_MS_DEFAULT, nfe);
+                    _log.warn("Invalid client message timeout specified [" + param 
+                              + "], defaulting to " + OVERALL_TIMEOUT_MS_DEFAULT, nfe);
                 timeoutMs = OVERALL_TIMEOUT_MS_DEFAULT;
             }
         }
@@ -155,11 +156,14 @@ public class OutboundClientMessageJob extends JobImpl {
         Lease nextLease = getNextLease();
         
         if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Send outbound client message - next lease found for [" + _status.getTo().calculateHash().toBase64() + "] - " + nextLease);
+            _log.debug("Send outbound client message - next lease found for [" 
+                       + _status.getTo().calculateHash().toBase64() + "] - " 
+                       + nextLease);
         
         if (nextLease == null) {
             if (_log.shouldLog(Log.WARN))
-                _log.warn("No more leases, and we still haven't heard back from the peer, refetching the leaseSet to try again");
+                _log.warn("No more leases, and we still haven't heard back from the peer"
+                          + ", refetching the leaseSet to try again");
             _status.setLeaseSet(null);
             long remainingMs = _overallExpiration - _context.clock().now();
             if (_status.getNumLookups() < MAX_LEASE_LOOKUPS) {
@@ -171,7 +175,8 @@ public class OutboundClientMessageJob extends JobImpl {
                 return;
             } else {
                 if (_log.shouldLog(Log.WARN))
-                    _log.warn("sendNext() - max # lease lookups exceeded! " + _status.getNumLookups());
+                    _log.warn("sendNext() - max # lease lookups exceeded! " 
+                              + _status.getNumLookups());
                 dieFatal();
                 return;
             }
@@ -218,7 +223,8 @@ public class OutboundClientMessageJob extends JobImpl {
                 leases.add(lease);
             } else {
                 if (_log.shouldLog(Log.DEBUG))
-                    _log.debug("getNextLease() - skipping lease we've already sent it down - " + lease);
+                    _log.debug("getNextLease() - skipping lease we've already sent it down - " 
+                               + lease);
             }
         }
         
@@ -260,7 +266,11 @@ public class OutboundClientMessageJob extends JobImpl {
         PublicKey key = _status.getLeaseSet().getEncryptionKey();
         SessionKey sessKey = new SessionKey();
         Set tags = new HashSet();
-        GarlicMessage msg = OutboundClientMessageJobHelper.createGarlicMessage(_context, token, _overallExpiration, key, _status.getClove(), _status.getTo(), sessKey, tags, true);
+        GarlicMessage msg = OutboundClientMessageJobHelper.createGarlicMessage(_context, token, 
+                                                                               _overallExpiration, key, 
+                                                                               _status.getClove(), 
+                                                                               _status.getTo(), sessKey, 
+                                                                               tags, true);
         
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("send(lease) - token expected " + token);
@@ -272,13 +282,21 @@ public class OutboundClientMessageJob extends JobImpl {
         ReplySelector selector = new ReplySelector(token);
         
         if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Placing GarlicMessage into the new tunnel message bound for " + lease.getTunnelId() + " on " + lease.getRouterIdentity().getHash().toBase64());
+            _log.debug("Placing GarlicMessage into the new tunnel message bound for " 
+                       + lease.getTunnelId() + " on " 
+                       + lease.getRouterIdentity().getHash().toBase64());
         
         TunnelId outTunnelId = selectOutboundTunnel();
         if (outTunnelId != null) {
             if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Sending tunnel message out " + outTunnelId + " to " + lease.getTunnelId() + " on " + lease.getRouterIdentity().getHash().toBase64());
-            SendTunnelMessageJob j = new SendTunnelMessageJob(_context, msg, outTunnelId, lease.getRouterIdentity().getHash(), lease.getTunnelId(), null, onReply, onFail, selector, SEND_TIMEOUT_MS, SEND_PRIORITY);
+                _log.debug("Sending tunnel message out " + outTunnelId + " to " 
+                           + lease.getTunnelId() + " on " 
+                           + lease.getRouterIdentity().getHash().toBase64());
+            SendTunnelMessageJob j = new SendTunnelMessageJob(_context, msg, outTunnelId, 
+                                                              lease.getRouterIdentity().getHash(), 
+                                                              lease.getTunnelId(), null, onReply, 
+                                                              onFail, selector, SEND_TIMEOUT_MS, 
+                                                              SEND_PRIORITY);
             _context.jobQueue().addJob(j);
         } else {
             if (_log.shouldLog(Log.ERROR))
@@ -315,11 +333,15 @@ public class OutboundClientMessageJob extends JobImpl {
         ClientMessage msg = _status.getMessage();
         if (alreadyFailed) {
             if (_log.shouldLog(Log.DEBUG))
-                _log.debug("dieFatal() - already failed sending " + msg.getMessageId()+ ", no need to do it again", new Exception("Duplicate death?"));
+                _log.debug("dieFatal() - already failed sending " + msg.getMessageId() 
+                           + ", no need to do it again", new Exception("Duplicate death?"));
             return;
         } else {
             if (_log.shouldLog(Log.ERROR))
-                _log.error("Failed to send the message " + msg.getMessageId() + " after " + _status.getNumSent() + " sends and " + _status.getNumLookups() + " lookups (and " + sendTime + "ms)", new Exception("Message send failure"));
+                _log.error("Failed to send the message " + msg.getMessageId() + " after " 
+                           + _status.getNumSent() + " sends and " + _status.getNumLookups() 
+                           + " lookups (and " + sendTime + "ms)", 
+                           new Exception("Message send failure"));
         }
         
         _context.messageHistory().sendPayloadMessage(msg.getMessageId().getMessageId(), false, sendTime);
@@ -510,13 +532,19 @@ public class OutboundClientMessageJob extends JobImpl {
         public void runJob() { sendNext(); }
     }
     
-    /** we couldn't even find the leaseSet, fuck off */
+    /** 
+     * we couldn't even find the leaseSet, but try again (or die 
+     * if we've already tried too hard)
+     *
+     */
     private class LookupLeaseSetFailedJob extends JobImpl {
         public LookupLeaseSetFailedJob()  {
             super(OutboundClientMessageJob.this._context);
         }
         public String getName() { return "Lookup for outbound client message failed"; }
-        public void runJob() { dieFatal(); }
+        public void runJob() { 
+            sendNext();
+        }
     }
     
     /** send a message to a lease */
@@ -558,24 +586,28 @@ public class OutboundClientMessageJob extends JobImpl {
             boolean alreadySuccessful = _status.success();
             MessageId msgId = _status.getMessage().getMessageId();
             if (_log.shouldLog(Log.DEBUG))
-                _log.debug("SUCCESS!  Message delivered completely for message " + msgId + " after " + sendTime + "ms [for " +  _status.getMessage().getMessageId() + "]");
+                _log.debug("SUCCESS!  Message delivered completely for message " + msgId 
+                           + " after " + sendTime + "ms [for " 
+                           +  _status.getMessage().getMessageId() + "]");
             
             if ( (_key != null) && (_tags != null) && (_tags.size() > 0) ) {
-                SendSuccessJob.this._context.sessionKeyManager().tagsDelivered(_status.getLeaseSet().getEncryptionKey(), _key, _tags);
+                _context.sessionKeyManager().tagsDelivered(_status.getLeaseSet().getEncryptionKey(),
+                                                           _key, _tags);
             }
             
             if (alreadySuccessful) {
                 if (_log.shouldLog(Log.DEBUG))
-                    _log.debug("Success is a duplicate for " +  _status.getMessage().getMessageId() + ", dont notify again...");
+                    _log.debug("Success is a duplicate for " +  _status.getMessage().getMessageId() 
+                               + ", dont notify again...");
                 return;
             }
             long dataMsgId = _status.getClove().getId();
-            SendSuccessJob.this._context.messageHistory().sendPayloadMessage(dataMsgId, true, sendTime);
-            SendSuccessJob.this._context.clientManager().messageDeliveryStatusUpdate(_status.getFrom(), msgId, true);
+            _context.messageHistory().sendPayloadMessage(dataMsgId, true, sendTime);
+            _context.clientManager().messageDeliveryStatusUpdate(_status.getFrom(), msgId, true);
             _lease.setNumSuccess(_lease.getNumSuccess()+1);
             
-            SendSuccessJob.this._context.statManager().addRateData("client.sendMessageSize", _status.getMessage().getPayload().getSize(), sendTime);
-            SendSuccessJob.this._context.statManager().addRateData("client.sendAttemptAverage", _status.getNumSent(), sendTime);
+            _context.statManager().addRateData("client.sendMessageSize", _status.getMessage().getPayload().getSize(), sendTime);
+            _context.statManager().addRateData("client.sendAttemptAverage", _status.getNumSent(), sendTime);
         }
         
         public void setMessage(I2NPMessage msg) {}
