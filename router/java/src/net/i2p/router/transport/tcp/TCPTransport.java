@@ -190,26 +190,31 @@ public class TCPTransport extends TransportImpl {
                         if (_log.shouldLog(Log.WARN))
                             _log.warn("Unable to establish a socket in time to " + addr);
                         _context.profileManager().commErrorOccurred(target.getIdentity().getHash());
+                        _context.shitlist().shitlistRouter(target.getIdentity().getHash(), "Unable to contact host");
                         return false;
                     }
                     if (_log.shouldLog(Log.DEBUG))
                         _log.debug("Socket created");
-                    if (s != null) {
-                        TCPConnection con = new RestrictiveTCPConnection(_context, s, true);
-                        conCreated = _context.clock().now();
-                        if (_log.shouldLog(Log.DEBUG))
-                            _log.debug("TCPConnection created");
-                        boolean established = handleConnection(con, target);
-                        conEstablished = _context.clock().now();
-                        if (_log.shouldLog(Log.DEBUG))
-                            _log.debug("connection handled");
-                        return established;
-                    }
+                    
+                    TCPConnection con = new RestrictiveTCPConnection(_context, s, true);
+                    conCreated = _context.clock().now();
+                    if (_log.shouldLog(Log.DEBUG))
+                        _log.debug("TCPConnection created");
+                    boolean established = handleConnection(con, target);
+                    conEstablished = _context.clock().now();
+                    if (_log.shouldLog(Log.DEBUG))
+                        _log.debug("connection handled");
+                    return established;
                 }
             }
+
+            _context.shitlist().shitlistRouter(target.getIdentity().getHash(), "No addresses we can handle");
+            return false;
         } catch (Throwable t) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Unexpected error establishing the connection", t);
+            _context.shitlist().shitlistRouter(target.getIdentity().getHash(), "Internal error connecting");
+            return false;
         } finally {
             long diff = conEstablished - startEstablish;
             if ( ( (diff > 6000) || (conEstablished == 0) ) && (_log.shouldLog(Log.WARN)) )  {
@@ -218,8 +223,7 @@ public class TCPTransport extends TransportImpl {
                 (conCreated-socketCreated) + "ms conEstablished: " +
                 (conEstablished - conCreated) + "ms overall: " + diff);
             }
-        }
-        return false;
+        }        
     }
     
     protected Socket createSocket(RouterAddress addr) {
@@ -444,7 +448,7 @@ public class TCPTransport extends TransportImpl {
                 con.closeConnection();
                 // remove the old ref, since they likely just created a new identity
                 _context.netDb().fail(target.getIdentity().getHash());
-                _context.shitlist().shitlistRouter(target.getIdentity().getHash());
+                _context.shitlist().shitlistRouter(target.getIdentity().getHash(), "Peer changed identities");
                 return false;
             } else {
                 if (_log.shouldLog(Log.DEBUG))
@@ -623,7 +627,9 @@ public class TCPTransport extends TransportImpl {
                             if (_log.shouldLog(Log.INFO))
                                 _log.info("Unable to establish a connection to " + pending.getPeer());
                             failPending(pending);
-                            _context.shitlist().shitlistRouter(pending.getPeer());
+                            
+                            // shitlisted by establishConnection with a more detailed reason
+                            //_context.shitlist().shitlistRouter(pending.getPeer(), "Unable to contact host");
                             //ProfileManager.getInstance().commErrorOccurred(pending.getPeer());
                             failedPending = _context.clock().now();
                         }

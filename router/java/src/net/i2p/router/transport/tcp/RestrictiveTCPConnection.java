@@ -272,7 +272,7 @@ class RestrictiveTCPConnection extends TCPConnection {
                 // not only do we remove the reference to the invalid peer
                 _context.netDb().fail(_remoteIdentity.getHash());
                 // but we make sure that we don't try to talk to them soon even if we get a new ref
-                _context.shitlist().shitlistRouter(_remoteIdentity.getHash());
+                _context.shitlist().shitlistRouter(_remoteIdentity.getHash(), "Invalid protocol version");
                 throw new DataFormatException("Peer uses an invalid version!  dropping");
             }
             
@@ -280,7 +280,7 @@ class RestrictiveTCPConnection extends TCPConnection {
             boolean timeOk = validateTime();
             if (_log.shouldLog(Log.DEBUG)) _log.debug("after validateTime [" + timeOk + "]...");
             if (!timeOk) {
-                _context.shitlist().shitlistRouter(_remoteIdentity.getHash());
+                _context.shitlist().shitlistRouter(_remoteIdentity.getHash(), "Time too far out of sync");
                 throw new DataFormatException("Peer is too far out of sync with the current router's clock!  dropping");
             }
             
@@ -288,7 +288,7 @@ class RestrictiveTCPConnection extends TCPConnection {
             boolean peerReachable = validatePeerAddress();
             if (_log.shouldLog(Log.DEBUG)) _log.debug("after validatePeerAddress [" + peerReachable + "]...");
             if (!peerReachable) {
-                _context.shitlist().shitlistRouter(_remoteIdentity.getHash());
+                _context.shitlist().shitlistRouter(_remoteIdentity.getHash(), "Unreachable address");
                 throw new DataFormatException("Peer provided us with an unreachable router address, and we can't handle restricted routes yet!  dropping");
             }
             
