@@ -165,7 +165,7 @@ class LogWriter implements Runnable {
     private File getNextFile(String pattern) {
         File f = null;
 
-        if (pattern.indexOf('#') < 0) {
+        if ( (pattern.indexOf('#') < 0) && (pattern.indexOf('@') <= 0) ) {
             return new File(pattern);
         }
         
@@ -214,7 +214,7 @@ class LogWriter implements Runnable {
         char c[] = pattern.toCharArray();
         StringBuffer buf = new StringBuffer();
         for (int i = 0; i < c.length; i++) {
-            if (c[i] != '#')
+            if ( (c[i] != '#') && (c[i] != '@') )
                 buf.append(c[i]);
             else
                 buf.append(num);
