@@ -1,6 +1,11 @@
 #! /usr/bin/env python
 """Simple HTTP Server.
 
+Hacked by aum from standard python module of the same name,
+modified for compatibility with sunshine's 'i2p.sam.socket'.
+
+--
+
 This module builds on SAMBaseHTTPServer by implementing the standard GET
 and HEAD requests in a fairly straightforward manner.
 
