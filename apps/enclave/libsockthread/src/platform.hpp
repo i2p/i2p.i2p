@@ -27,7 +27,7 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: platform.hpp,v 1.4 2004/07/16 23:54:45 mpc Exp $
+ * $Id: platform.hpp,v 1.5 2004/07/22 03:54:01 mpc Exp $
  */
 
 /*
@@ -56,6 +56,7 @@
 #endif
 #include <cassert>
 #include <cstdarg>
+#include <cstddef>
 #include <cstdio>
 #include <ctime>
 #include <iostream>
@@ -65,10 +66,12 @@
 #ifndef WINTHREAD
 	#include <pthread.h>
 #endif
+#include <stdint.h>  // TODO replace with Boost's version
 #include <string>
 #if defined WINSOCK || defined WINTHREAD
 	#include <windows.h>
 #endif
 using namespace std;
+#include "types.hpp"
 
 #endif  // LIBSOCKTHREAD_PLATFORM_HPP

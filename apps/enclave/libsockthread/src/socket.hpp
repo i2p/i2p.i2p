@@ -27,7 +27,7 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: socket.hpp,v 1.7 2004/07/22 03:54:01 mpc Exp $
+ * $Id: socket.hpp,v 1.8 2004/07/22 22:08:20 mpc Exp $
  */
 
 #ifndef LIBSOCKTHREAD_SOCKET_HPP
@@ -36,19 +36,32 @@
 namespace Libsockthread {
 	class Socket {
 		public:
+			#ifdef WINSOCK
+				typedef SOCKET socket_t;
+				enum { SERR = SOCKET_ERROR };
+			#else
+				typedef int socket_t;
+				enum { SERR = -1 };
+			#endif
+
+			Socket()
+				: addr(), sock(SERR) {}
 			Socket(Socket_addr& addr)  // throws Socket_error
-				: addr(addr) { setup_socket(); }
+				: addr(addr), sock(SERR) { setup_socket(); }
 
 			void close();
-			size_t read(string& buf, size_t max);
-			void set_addr(Socket_addr& addr)  // throws Socket_error
-				{ this->addr = addr; setup_socket(); }
+			size_t read(vector<uchar_t>& buf, size_t max = 0);
+			size_t read_until(vector<uchar_t>& buf, uchar_t delim = '\n');
+			void set_addr(Socket_addr& addr);  // throws Socket_error
 			void set_blocking(bool blocking);
+			size_t write(vector<uchar_t>& buf);
+			void write_all(vector<uchar_t>& buf);
+			size_t write_until(vector<uchar_t& buf, uchar_t delim = '\n');
 		private:
 			void setup_socket();  // throws Socket_error
 
 			Socket_addr addr;
-			int sock;
+			socket_t sock;
 	};
 }
 

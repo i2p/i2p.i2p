@@ -27,46 +27,19 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: socket.cpp,v 1.8 2004/07/22 22:08:20 mpc Exp $
+ * $Id$
  */
 
-#include "platform.hpp"
-#include "socket_error.hpp"
-#include "socket.hpp"
-using namespace Libsockthread;
+#ifndef LIBSOCKTHREAD_TYPES_HPP
+#define LIBSOCKTHREAD_TYPES_HPP
 
 /*
- * Closes the socket
+ * Shorten some standard variable types
  */
-void Socket::close()
-{
-	if (sock != SERR) {
-		if (close(sock) == -1)
-			;  // FIXME log the error
-	}
-	sock = SERR;
-}
+typedef signed char schar_t;
+typedef unsigned char uchar_t;
+typedef unsigned int uint_t;
+typedef unsigned long ulong_t;
+typedef unsigned short ushort_t;
 
-/*
- * Changes the address associated with the socket
- */
-void Socket::set_addr(Socket_addr& addr)
-{
-	close();
-	this->addr = addr;
-	setup_socket();
-}
-
-/*
- * Prepares the socket for use
- */
-void Socket::setup_socket()
-{
-	assert(sock == SERR);  // the descriptor shouldn't be active
-	if (!addr.is_ready())
-		throw Socket_error("Couldn't create socket: address isn't ready");
-
-	sock = socket(addr.get_family(), addr.get_type(), 0);
-	if (sock == SERR)
-		throw Socket_error(strerror(errno));
-}
+#endif  // LIBSOCKTHREAD_TYPES_HPP
