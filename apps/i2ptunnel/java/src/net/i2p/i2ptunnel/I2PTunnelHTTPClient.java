@@ -54,20 +54,20 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
         .getBytes();
     
     private final static byte[] ERR_DESTINATION_UNKNOWN =
-        ("HTTP/1.1 404 Not Found\r\n"+
+        ("HTTP/1.1 503 Service Unavailable\r\n"+
          "Content-Type: text/html; charset=iso-8859-1\r\n"+
          "Cache-control: no-cache\r\n"+
          "\r\n"+
-         "<html><body><H1>I2P ERROR: NOT FOUND</H1>"+
-         "That Desitination was not found. Perhaps you pasted in the wrong "+
-         "BASE64 I2P Destination or the link you are following is bad.  "+
-         "The host (or the WWW proxy, if you're using one) could also be "+
-         "temporarily offline.  You may want to <b>retry</b>.  "+
+         "<html><body><H1>I2P ERROR: DESTINATION NOT FOUND</H1>"+
+         "That I2P Desitination was not found. Perhaps you pasted in the "+
+         "wrong BASE64 I2P Destination or the link you are following is "+
+         "bad. The host (or the WWW proxy, if you're using one) could also "+
+	 "be temporarily offline.  You may want to <b>retry</b>.  "+
          "Could not find the following Destination:<BR><BR>")
         .getBytes();
     
     private final static byte[] ERR_TIMEOUT =
-        ("HTTP/1.1 404 Not Found\r\n"+
+        ("HTTP/1.1 504 Gateway Timeout\r\n"+
          "Content-Type: text/html; charset=iso-8859-1\r\n"+
          "Cache-control: no-cache\r\n\r\n"+
          "<html><body><H1>I2P ERROR: TIMEOUT</H1>"+
