@@ -48,11 +48,11 @@ public class ShellCommand {
      */
     private class CommandThread extends Thread {
 
-        Thread  caller;
+        Object  caller;
         boolean consumeOutput;
         String  shellCommand;
 
-        CommandThread(Thread caller, String shellCommand, boolean consumeOutput) {
+        CommandThread(Object caller, String shellCommand, boolean consumeOutput) {
             super("CommandThread");
             this.caller = caller;
             this.shellCommand = shellCommand;
@@ -63,7 +63,7 @@ public class ShellCommand {
             _commandSuccessful = execute(shellCommand, consumeOutput, WAIT_FOR_EXIT_STATUS);
             if (_isTimerRunning) {
                 synchronized(caller) {
-                    caller.interrupt();  // In case the caller is still in the wait() state.
+                    caller.notifyAll();  // In case the caller is still in the wait() state.
                 }
             }
         }
@@ -236,7 +236,7 @@ public class ShellCommand {
      */
     public synchronized boolean executeAndWaitTimed(String shellCommand, int seconds) {
 
-        _commandThread = new CommandThread(Thread.currentThread(), shellCommand, NO_CONSUME_OUTPUT);
+        _commandThread = new CommandThread(this, shellCommand, NO_CONSUME_OUTPUT);
         _commandThread.start();
         try {
 
@@ -305,7 +305,7 @@ public class ShellCommand {
      */
     public synchronized boolean executeSilentAndWaitTimed(String shellCommand, int seconds) {
 
-        _commandThread = new CommandThread(Thread.currentThread(), shellCommand, CONSUME_OUTPUT);
+        _commandThread = new CommandThread(this, shellCommand, CONSUME_OUTPUT);
         _commandThread.start();
         try {
 
