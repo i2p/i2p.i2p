@@ -151,9 +151,9 @@ runCore = True
 
 # timeouts - calibrate as needed
 timeout = {
-    'ping' : 120,
-    'findNode' : 30,
-    'findData' : 30,
+    'ping' : 60,
+    'findNode' : 60,
+    'findData' : 60,
     'store' : 120,
     }
 
@@ -172,6 +172,7 @@ else:
 
 # ----------------------------------------------
 # hack anything below this line at your own risk
+
 #@-node:constants
 #@+node:globals
 # keep a dict of existing nodes, so we can prevent

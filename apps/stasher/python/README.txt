@@ -3,11 +3,20 @@ STASHER README
 -----------------------
 INSTALLING STASHER
 
+Prerequisite:
+
+Before you can install/run Stasher, you will first need to have installed
+the I2P Python modules - available in cvs at i2p/apps/sam/python.
+
 To install stasher, just make sure you've got the latest cvs, then type
   python setup.py install
+as root.
 
 This installs the stasher engine, plus a wrapper client script called
 'stasher', which setup.py will install into your execution path.
+
+If you don't like the thought of becoming root, you could just put stasher.py
+on your execution path, and/or create a symlink called 'stasher'.
 
 Test your installation by typing 'stasher -h' - this should display
 a help message.
