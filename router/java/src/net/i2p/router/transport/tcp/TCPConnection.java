@@ -393,7 +393,7 @@ class TCPConnection implements I2NPMessageReader.I2NPMessageEventListener {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Message received from " + _remoteIdentity.getHash().toBase64());
         try {
-            ByteArrayOutputStream baos = new ByteArrayOutputStream(32*1024);
+            ByteArrayOutputStream baos = new ByteArrayOutputStream(2*1024);
             message.writeBytes(baos);
             int size = baos.size();
             // this is called by the I2NPMessageReader's thread, so it delays the reading from this peer only
