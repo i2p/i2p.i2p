@@ -37,13 +37,11 @@ import net.i2p.util.Log;
  *      <td><b>eH[4]</b></td><td><b>eH[5]</b></td>
  *      <td><b>eH[6]</b></td><td><b>eH[7]</b></td>
  *      <td><b>V</b></td>
- *      <td><b>Key</b></td>
  *  </tr>
- *  <tr><td rowspan="2"><b>peer0</b></td><td><b>recv</b></td>
+ *  <tr><td rowspan="2"><b>peer0</b><br /><font size="-2">key=K[0]</font></td><td><b>recv</b></td>
  *      <td>IV[0]</td><td>P[0]</td>
  *      <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
  *      <td>V[0]</td>
- *      <td rowspan="2">K[0]</td>
  *  </tr>
  *  <tr><td><b>send</b></td>
  *      <td rowspan="2">IV[1]</td><td rowspan="2">P[1]</td>
@@ -51,8 +49,7 @@ import net.i2p.util.Log;
  *      <td rowspan="2"></td><td rowspan="2"></td><td rowspan="2"></td><td rowspan="2"></td>
  *      <td rowspan="2">V[1]</td>
  *  </tr>
- *  <tr><td rowspan="2"><b>peer1</b></td><td><b>recv</b></td>
- *      <td rowspan="2">K[1]</td>
+ *  <tr><td rowspan="2"><b>peer1</b><br /><font size="-2">key=K[1]</font></td><td><b>recv</b></td>
  *  </tr>
  *  <tr><td><b>send</b></td>
  *      <td rowspan="2">IV[2]</td><td rowspan="2">P[2]</td>
@@ -60,8 +57,7 @@ import net.i2p.util.Log;
  *      <td rowspan="2"></td><td rowspan="2"></td><td rowspan="2">H(P[2])</td><td rowspan="2"></td>
  *      <td rowspan="2">V[2]</td>
  *  </tr>
- *  <tr><td rowspan="2"><b>peer2</b></td><td><b>recv</b></td>
- *      <td rowspan="2">K[2]</td>
+ *  <tr><td rowspan="2"><b>peer2</b><br /><font size="-2">key=K[2]</font></td><td><b>recv</b></td>
  *  </tr>
  *  <tr><td><b>send</b></td>
  *      <td rowspan="2">IV[3]</td><td rowspan="2">P[3]</td>
@@ -69,8 +65,7 @@ import net.i2p.util.Log;
  *      <td rowspan="2"></td><td rowspan="2"></td><td rowspan="2"></td><td rowspan="2">H(P[3])</td>
  *      <td rowspan="2">V[3]</td>
  *  </tr>
- *  <tr><td rowspan="2"><b>peer3</b></td><td><b>recv</b></td>
- *      <td rowspan="2">K[3]</td>
+ *  <tr><td rowspan="2"><b>peer3</b><br /><font size="-2">key=K[3]</font></td><td><b>recv</b></td>
  *  </tr>
  *  <tr><td><b>send</b></td>
  *      <td rowspan="2">IV[4]</td><td rowspan="2">P[4]</td>
@@ -78,8 +73,7 @@ import net.i2p.util.Log;
  *      <td rowspan="2"></td><td rowspan="2"></td><td rowspan="2"></td><td rowspan="2"></td>
  *      <td rowspan="2">V[4]</td>
  *  </tr>
- *  <tr><td rowspan="2"><b>peer4</b></td><td><b>recv</b></td>
- *      <td rowspan="2">K[4]</td>
+ *  <tr><td rowspan="2"><b>peer4</b><br /><font size="-2">key=K[4]</font></td><td><b>recv</b></td>
  *  </tr>
  *  <tr><td><b>send</b></td>
  *      <td rowspan="2">IV[5]</td><td rowspan="2">P[5]</td>
@@ -87,8 +81,7 @@ import net.i2p.util.Log;
  *      <td rowspan="2"></td><td rowspan="2"></td><td rowspan="2"></td><td rowspan="2"></td>
  *      <td rowspan="2">V[5]</td>
  *  </tr>
- *  <tr><td rowspan="2"><b>peer5</b></td><td><b>recv</b></td>
- *      <td rowspan="2">K[5]</td>
+ *  <tr><td rowspan="2"><b>peer5</b><br /><font size="-2">key=K[5]</font></td><td><b>recv</b></td>
  *  </tr>
  *  <tr><td><b>send</b></td>
  *      <td rowspan="2">IV[6]</td><td rowspan="2">P[6]</td>
@@ -96,8 +89,7 @@ import net.i2p.util.Log;
  *      <td rowspan="2"></td><td rowspan="2"></td><td rowspan="2"></td><td rowspan="2"></td>
  *      <td rowspan="2">V[6]</td>
  *  </tr>
- *  <tr><td rowspan="2"><b>peer6</b></td><td><b>recv</b></td>
- *      <td rowspan="2">K[6]</td>
+ *  <tr><td rowspan="2"><b>peer6</b><br /><font size="-2">key=K[6]</font></td><td><b>recv</b></td>
  *  </tr>
  *  <tr><td><b>send</b></td>
  *      <td rowspan="2">IV[7]</td><td rowspan="2">P[7]</td>
@@ -105,8 +97,7 @@ import net.i2p.util.Log;
  *      <td rowspan="2"></td><td rowspan="2">H(P[7])</td><td rowspan="2"></td><td rowspan="2"></td>
  *      <td rowspan="2">V[7]</td>
  *  </tr>
- *  <tr><td rowspan="2"><b>peer7</b></td><td><b>recv</b></td>
- *      <td rowspan="2">K[7]</td>
+ *  <tr><td rowspan="2"><b>peer7</b><br /><font size="-2">key=K[7]</font></td><td><b>recv</b></td>
  *  </tr>
  *  <tr><td><b>send</b></td>
  *      <td>IV[8]</td><td>P[8]</td>
