@@ -80,8 +80,14 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
 
     /** used to assign unique IDs to the threads / clients.  no logic or functionality */
     private static volatile long __clientId = 0;
-    
-    public I2PTunnelHTTPClient(int localPort, Logging l, boolean ownDest, String wwwProxy, EventDispatcher notifyThis, I2PTunnel tunnel) {
+
+    /**
+     * @throws IllegalArgumentException if the I2PTunnel does not contain
+     *                                  valid config to contact the router
+     */
+    public I2PTunnelHTTPClient(int localPort, Logging l, boolean ownDest, 
+                               String wwwProxy, EventDispatcher notifyThis, 
+                               I2PTunnel tunnel) throws IllegalArgumentException {
         super(localPort, ownDest, l, notifyThis, "HTTPHandler " + (++__clientId), tunnel);
 
         if (waitEventValue("openBaseClientResult").equals("error")) {

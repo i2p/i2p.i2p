@@ -74,13 +74,13 @@ public class I2PTunnel implements Logging, EventDispatcher {
 
     public static final int PACKET_DELAY = 100;
 
-    public static boolean ownDest = false;
+    public boolean ownDest = false;
 
-    public static String port = System.getProperty(I2PClient.PROP_TCP_PORT, "7654");
-    public static String host = System.getProperty(I2PClient.PROP_TCP_HOST, "127.0.0.1");
-    public static String listenHost = host;
+    public String port = System.getProperty(I2PClient.PROP_TCP_PORT, "7654");
+    public String host = System.getProperty(I2PClient.PROP_TCP_HOST, "127.0.0.1");
+    public String listenHost = host;
 
-    public static long readTimeout = -1;
+    public long readTimeout = -1;
 
     private static final String nocli_args[] = { "-nocli", "-die"};
 
@@ -408,9 +408,9 @@ public class I2PTunnel implements Logging, EventDispatcher {
      */
     public void runClient(String args[], Logging l) {
         if (args.length == 2) {
-            int port = -1;
+            int portNum = -1;
             try {
-                port = Integer.parseInt(args[0]);
+                portNum = Integer.parseInt(args[0]);
             } catch (NumberFormatException nfe) {
                 l.log("invalid port");
                 _log.error(getPrefix() + "Port specified is not valid: " + args[0], nfe);
@@ -418,9 +418,15 @@ public class I2PTunnel implements Logging, EventDispatcher {
                 return;
             }
             I2PTunnelTask task;
-            task = new I2PTunnelClient(port, args[1], l, ownDest, (EventDispatcher) this, this);
-            addtask(task);
-            notifyEvent("clientTaskId", new Integer(task.getId()));
+            try {
+                task = new I2PTunnelClient(portNum, args[1], l, ownDest, (EventDispatcher) this, this);
+                addtask(task);
+                notifyEvent("clientTaskId", new Integer(task.getId()));
+            } catch (IllegalArgumentException iae) {
+                _log.error(getPrefix() + "Invalid I2PTunnel config to create a client [" + host + ":"+ port + "]", iae);
+                l.log("Invalid I2PTunnel configuration [" + host + ":" + port + "]");
+                notifyEvent("clientTaskId", new Integer(-1));
+            }
         } else {
             l.log("client <port> <pubkey>|file:<pubkeyfile>");
             l.log("  creates a client that forwards port to the pubkey.\n"
@@ -455,9 +461,15 @@ public class I2PTunnel implements Logging, EventDispatcher {
                 proxy = args[1];
             }
             I2PTunnelTask task;
-            task = new I2PTunnelHTTPClient(port, l, ownDest, proxy, (EventDispatcher) this, this);
-            addtask(task);
-            notifyEvent("httpclientTaskId", new Integer(task.getId()));
+            try {
+                task = new I2PTunnelHTTPClient(port, l, ownDest, proxy, (EventDispatcher) this, this);
+                addtask(task);
+                notifyEvent("httpclientTaskId", new Integer(task.getId()));
+            } catch (IllegalArgumentException iae) {
+                _log.error(getPrefix() + "Invalid I2PTunnel config to create an httpclient [" + host + ":"+ port + "]", iae);
+                l.log("Invalid I2PTunnel configuration [" + host + ":" + port + "]");
+                notifyEvent("httpclientTaskId", new Integer(-1));
+            }
         } else {
             l.log("httpclient <port> [<proxy>]");
             l.log("  creates a client that distributes HTTP requests.");

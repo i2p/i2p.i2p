@@ -75,7 +75,7 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
         Properties props = new Properties();
         props.putAll(getTunnel().getClientOptions());
         synchronized (slock) {
-            sockMgr = I2PSocketManagerFactory.createManager(privData, I2PTunnel.host, Integer.parseInt(I2PTunnel.port),
+            sockMgr = I2PSocketManagerFactory.createManager(privData, getTunnel().host, Integer.parseInt(getTunnel().port),
                                                             props);
 
         }

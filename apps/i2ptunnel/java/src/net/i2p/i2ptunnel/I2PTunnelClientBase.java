@@ -60,7 +60,13 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
     //    I2PTunnelClientBase(localPort, ownDest, l, (EventDispatcher)null);
     //}
 
-    public I2PTunnelClientBase(int localPort, boolean ownDest, Logging l, EventDispatcher notifyThis, String handlerName, I2PTunnel tunnel) {
+    /**
+     * @throws IllegalArgumentException if the I2CP configuration is b0rked so
+     *                                  badly that we cant create a socketManager
+     */
+    public I2PTunnelClientBase(int localPort, boolean ownDest, Logging l, 
+                               EventDispatcher notifyThis, String handlerName, 
+                               I2PTunnel tunnel) throws IllegalArgumentException{
         super(localPort + " (uninitialized)", notifyThis, tunnel);
         _clientId = ++__clientId;
         this.localPort = localPort;
@@ -74,7 +80,10 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
                 sockMgr = getSocketManager();
             }
         }
-        if (sockMgr == null) throw new NullPointerException();
+        if (sockMgr == null) {
+            l.log("Invalid I2CP configuration");
+            throw new IllegalArgumentException("Socket manager could not be created");
+        }
         l.log("I2P session created");
 
         Thread t = new I2PThread(this);
@@ -122,7 +131,8 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
             props.putAll(System.getProperties());
         else
             props.putAll(tunnel.getClientOptions());
-        I2PSocketManager sockManager = I2PSocketManagerFactory.createManager(I2PTunnel.host, Integer.parseInt(I2PTunnel.port), props);
+        I2PSocketManager sockManager = I2PSocketManagerFactory.createManager(tunnel.host, Integer.parseInt(tunnel.port), props);
+        if (sockManager == null) return null;
         sockManager.setName("Client");
         return sockManager;
     }
@@ -133,9 +143,9 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
 
     protected final InetAddress getListenHost(Logging l) {
         try {
-            return InetAddress.getByName(I2PTunnel.listenHost);
+            return InetAddress.getByName(getTunnel().listenHost);
         } catch (UnknownHostException uhe) {
-            l.log("Could not find listen host to bind to [" + I2PTunnel.host + "]");
+            l.log("Could not find listen host to bind to [" + getTunnel().host + "]");
             _log.error("Error finding host to bind", uhe);
             notifyEvent("openBaseClientResult", "error");
             return null;
@@ -212,7 +222,7 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
                 localPort = ss.getLocalPort();
             }
             notifyEvent("clientLocalPort", new Integer(ss.getLocalPort()));
-            l.log("Listening for clients on port " + localPort + " of " + I2PTunnel.listenHost);
+            l.log("Listening for clients on port " + localPort + " of " + getTunnel().listenHost);
 
             // Notify constructor that port is ready
             synchronized (this) {
