@@ -33,7 +33,7 @@ public class RandomSource extends SecureRandom {
      * According to the java docs (http://java.sun.com/j2se/1.4.1/docs/api/java/util/Random.html#nextInt(int))
      * nextInt(n) should return a number between 0 and n (including 0 and excluding n).  However, their pseudocode,
      * as well as sun's, kaffe's, and classpath's implementation INCLUDES NEGATIVE VALUES.
-     * WTF.  Ok, so we're going to have it return between 0 and n, since 
+     * WTF.  Ok, so we're going to have it return between 0 and n (including 0, excluding n), since 
      * thats what it has been used for.
      *
      */
@@ -41,18 +41,18 @@ public class RandomSource extends SecureRandom {
         if (n == 0) return 0;
         int val = super.nextInt(n);
         if (val < 0) val = 0 - val;
-        if (val > n) val = val % n;
+        if (val >= n) val = val % n;
         return val;
     }
 
     /**
      * Like the modified nextInt, nextLong(n) returns a random number from 0 through n,
-     * inclusive.
+     * including 0, excluding n.
      */
     public long nextLong(long n) {
         long v = super.nextLong();
         if (v < 0) v = 0 - v;
-        if (v > n) v = v % n;
+        if (v >= n) v = v % n;
         return v;
     }
 

@@ -67,7 +67,7 @@ class DataPublisherJob extends JobImpl {
         
         // if there's nothing we *need* to send, only send 10% of the time
         if (explicit.size() <= 0) {
-            if (getContext().random().nextInt(9) <= 8)
+            if (getContext().random().nextInt(10) > 0)
                 return toSend;
         }
         

@@ -71,7 +71,7 @@ class TunnelPoolManagerJob extends JobImpl {
                 built = true;
             } else {
                 // 10% chance of building a new tunnel
-                if (getContext().random().nextInt(9) > 0) {
+                if (getContext().random().nextInt(10) > 0) {
                     // all good, no need for more inbound tunnels
                     if (_log.shouldLog(Log.DEBUG))
                         _log.debug("Sufficient inbound tunnels (" + curFreeInboundTunnels + ")");
@@ -93,7 +93,7 @@ class TunnelPoolManagerJob extends JobImpl {
                 built = true;
             } else {
                 // 10% chance of building a new tunnel
-                if (getContext().random().nextInt(9) > 0) {
+                if (getContext().random().nextInt(10) > 0) {
                     // all good, no need for more outbound tunnels
                     if (_log.shouldLog(Log.DEBUG))
                         _log.debug("Sufficient outbound tunnels (" + curOutboundTunnels + ")");

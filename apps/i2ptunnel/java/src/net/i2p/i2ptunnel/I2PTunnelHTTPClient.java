@@ -138,8 +138,6 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
                 return null;
             }
             int index = I2PAppContext.getGlobalContext().random().nextInt(size);
-            if (index >= size) index = size - 1;
-            if (index < 0) return null;
             String proxy = (String)proxyList.get(index);
             return proxy;
         }
