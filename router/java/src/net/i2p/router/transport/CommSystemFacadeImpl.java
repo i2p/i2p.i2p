@@ -9,7 +9,7 @@ package net.i2p.router.transport;
  */
 
 import java.io.IOException;
-import java.io.OutputStream;
+import java.io.Writer;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Properties;
@@ -66,7 +66,7 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
         return _manager.getMostRecentErrorMessages(); 
     }
     
-    public void renderStatusHTML(OutputStream out) throws IOException { 
+    public void renderStatusHTML(Writer out) throws IOException { 
         _manager.renderStatusHTML(out); 
     }
     

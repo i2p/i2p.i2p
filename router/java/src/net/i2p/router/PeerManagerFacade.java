@@ -8,7 +8,7 @@ package net.i2p.router;
  *
  */
 
-import java.io.OutputStream;
+import java.io.Writer;
 import java.util.List;
 
 /**
@@ -31,6 +31,6 @@ class DummyPeerManagerFacade implements PeerManagerFacade {
     public void shutdown() {}    
     public void startup() {}
     public void restart() {}
-    public void renderStatusHTML(OutputStream out) { }    
+    public void renderStatusHTML(Writer out) { }    
     public List selectPeers(PeerSelectionCriteria criteria) { return null; }
 }
