@@ -4,6 +4,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.List;
 
+import net.i2p.data.DataHelper;
 import net.i2p.router.RouterContext;
 
 public class LogsHelper {
@@ -38,5 +39,13 @@ public class LogsHelper {
         buf.append("</code></ul>\n");
         
         return buf.toString();
+    }
+    
+    public String getServiceLogs() {
+        String str = DataHelper.readTextFile("logs/wrapper.log", 500);
+        if (str == null) 
+            return "";
+        else
+            return "<pre>" + str + "</pre>";
     }
 }

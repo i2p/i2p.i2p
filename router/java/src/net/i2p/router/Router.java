@@ -539,6 +539,7 @@ public class Router {
     public static final int EXIT_GRACEFUL = 2;
     public static final int EXIT_HARD = 3;
     public static final int EXIT_OOM = 10;
+    public static final int EXIT_HARD_RESTART = 4;
     
     public void shutdown(int exitCode) {
         _isAlive = false;

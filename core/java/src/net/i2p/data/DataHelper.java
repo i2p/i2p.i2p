@@ -606,4 +606,34 @@ public class DataHelper {
         //               * (((double) rv.length) / ((double) orig.length)) + "% savings)");
         return rv;
     }
+    
+    /**
+     * Read in the last few lines of a (newline delimited) textfile, or null if
+     * the file doesn't exist.
+     *
+     */
+    public static String readTextFile(String filename, int maxNumLines) {
+        File f = new File(filename);
+        if (!f.exists()) return null;
+        FileInputStream fis = null;
+        try {
+            fis = new FileInputStream(f);
+            BufferedReader in = new BufferedReader(new InputStreamReader(fis));
+            List lines = new ArrayList(maxNumLines);
+            String line = null;
+            while ( (line = in.readLine()) != null) {
+                lines.add(line);
+                while (lines.size() > maxNumLines)
+                    lines.remove(0);
+            }
+            StringBuffer buf = new StringBuffer(lines.size() * 80);
+            for (int i = 0; i < lines.size(); i++)
+                buf.append((String)lines.get(i)).append('\n');
+            return buf.toString();
+        } catch (IOException ioe) {
+            return null;
+        } finally {
+            if (fis != null) try { fis.close(); } catch (IOException ioe) {}
+        }
+    }
 }

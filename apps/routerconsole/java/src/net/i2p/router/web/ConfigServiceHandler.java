@@ -28,15 +28,28 @@ public class ConfigServiceHandler extends FormHandler {
         } else if ("Cancel graceful shutdown".equals(_action)) {
             _context.router().cancelGracefulShutdown();
             addFormNotice("Graceful shutdown cancelled");
+        } else if ("Hard restart".equals(_action)) {
+            _context.router().shutdown(Router.EXIT_HARD_RESTART);
+            addFormNotice("Hard restart requested");
         } else if ("Dump threads".equals(_action)) {
             WrapperManager.requestThreadDump();
             addFormNotice("Threads dumped to logs/wrapper.log");
         } else if ("Show systray icon".equals(_action)) {
-            SysTray.getInstance().show();
-            addFormNotice("Systray icon enabled (if possible)");
+            SysTray tray = SysTray.getInstance();
+            if (tray != null) {
+                tray.show();
+                addFormNotice("Systray enabled");
+            } else {
+                addFormNotice("Systray not supported on this platform");
+            }
         } else if ("Hide systray icon".equals(_action)) {
-            SysTray.getInstance().hide();
-            addFormNotice("Systray icon disabled");
+            SysTray tray = SysTray.getInstance();
+            if (tray != null) {
+                tray.hide();
+                addFormNotice("Systray disabled");
+            } else {
+                addFormNotice("Systray not supported on this platform");
+            }
         } else {
             addFormNotice("Blah blah blah.  whatever.  I'm not going to " + _action);
         }

@@ -20,33 +20,51 @@ import java.util.Set;
  *
  */
 public class I2PThread extends Thread {
-    private static Log _log;
+    private static volatile Log _log;
     private static Set _listeners = new HashSet(4);
+    private String _name;
+    private Exception _createdBy;
 
     public I2PThread() {
         super();
+        if ( (_log == null) || (_log.shouldLog(Log.DEBUG)) )
+            _createdBy = new Exception("Created by");
     }
 
     public I2PThread(String name) {
         super(name);
+        if ( (_log == null) || (_log.shouldLog(Log.DEBUG)) )
+            _createdBy = new Exception("Created by");
     }
 
     public I2PThread(Runnable r) {
         super(r);
+        if ( (_log == null) || (_log.shouldLog(Log.DEBUG)) )
+            _createdBy = new Exception("Created by");
     }
 
     public I2PThread(Runnable r, String name) {
         super(r, name);
+        if ( (_log == null) || (_log.shouldLog(Log.DEBUG)) )
+            _createdBy = new Exception("Created by");
+    }
+    
+    private void log(int level, String msg) { log(level, msg, null); }
+    private void log(int level, String msg, Throwable t) {
+        // we cant assume log is created
+        if (_log == null) _log = new Log(I2PThread.class);
+        if (_log.shouldLog(level))
+            _log.log(level, msg, t);
     }
 
     public void run() {
+        _name = Thread.currentThread().getName();
+        log(Log.DEBUG, "New thread started: " + _name, _createdBy);
         try {
             super.run();
         } catch (Throwable t) {
             try {
-                // we cant assume log is created
-                if (_log == null) _log = new Log(I2PThread.class);
-                _log.log(Log.CRIT, "Killing thread " + getName(), t);
+                log(Log.CRIT, "Killing thread " + getName(), t);
             } catch (Throwable woof) {
                 System.err.println("Died within the OOM itself");
                 t.printStackTrace();
@@ -54,6 +72,12 @@ public class I2PThread extends Thread {
             if (t instanceof OutOfMemoryError)
                 fireOOM((OutOfMemoryError)t);
         }
+        log(Log.DEBUG, "Thread finished gracefully: " + _name);
+    }
+    
+    protected void finalize() throws Throwable {
+        log(Log.DEBUG, "Thread finalized: " + _name);
+        super.finalize();
     }
     
     private void fireOOM(OutOfMemoryError oom) {

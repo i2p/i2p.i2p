@@ -31,6 +31,7 @@
  <input type="submit" name="action" value="Shutdown gracefully" />
  <input type="submit" name="action" value="Shutdown immediately" />
  <input type="submit" name="action" value="Cancel graceful shutdown" />
+ <input type="submit" name="action" value="Hard restart" />
  <h4>Systray integration</h4>
  On the windows platform, there is a small application to sit in the system 
  tray, allowing you to view the router's status (later on, I2P client applications
@@ -50,7 +51,8 @@
  <input type="submit" name="action" value="Don't run I2P on startup" />
  <h4>Debugging</h4>
  At times, it may be helpful to debug I2P by getting a thread dump.  To do so, 
- please select the following option and review the thread dumped to logs/wrapper.log.<br />
+ please select the following option and review the thread dumped to 
+<a href="logs.jsp#servicelogs">logs/wrapper.log</a>.<br />
  <input type="submit" name="action" value="Dump threads" />
  </form>
 </div>
