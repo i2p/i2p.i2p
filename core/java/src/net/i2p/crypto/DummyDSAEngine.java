@@ -1,0 +1,29 @@
+package net.i2p.crypto;
+
+import net.i2p.I2PAppContext;
+import net.i2p.data.Hash;
+import net.i2p.data.Signature;
+import net.i2p.data.SigningPrivateKey;
+import net.i2p.data.SigningPublicKey;
+import net.i2p.util.Log;
+import net.i2p.util.NativeBigInteger;
+
+/**
+ * Stub that offers no authentication.
+ *
+ */
+public class DummyDSAEngine extends DSAEngine {
+    public DummyDSAEngine(I2PAppContext context) {
+        super(context);
+    }
+    
+    public boolean verifySignature(Signature signature, byte signedData[], SigningPublicKey verifyingKey) {
+        return true;
+    }
+
+    public Signature sign(byte data[], SigningPrivateKey signingKey) {
+        Signature sig = new Signature();
+        sig.setData(Signature.FAKE_SIGNATURE);
+        return sig;
+    }
+}

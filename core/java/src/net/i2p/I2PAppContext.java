@@ -8,6 +8,7 @@ import net.i2p.client.naming.NamingService;
 import net.i2p.crypto.AESEngine;
 import net.i2p.crypto.CryptixAESEngine;
 import net.i2p.crypto.DSAEngine;
+import net.i2p.crypto.DummyDSAEngine;
 import net.i2p.crypto.DummyElGamalEngine;
 import net.i2p.crypto.ElGamalAESEngine;
 import net.i2p.crypto.ElGamalEngine;
@@ -373,8 +374,12 @@ public class I2PAppContext {
     }
     private void initializeDSA() {
         synchronized (this) {
-            if (_dsa == null)
-                _dsa = new DSAEngine(this);
+            if (_dsa == null) {
+                if ("off".equals(getProperty("i2p.encryption", "on")))
+                    _dsa = new DummyDSAEngine(this);
+                else
+                    _dsa = new DSAEngine(this);
+            }
             _dsaInitialized = true;
         }
     }
