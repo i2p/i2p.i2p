@@ -17,9 +17,9 @@ if [ ! "X$1" = "X" ]; then
 fi
 
 chmod 744 ./i2prouter
-chmod 744 ./install_i2p_service_unix
+# chmod 744 ./install_i2p_service_unix
 chmod 744 ./osid
-chmod 744 ./uninstall_i2p_service_unix
+# chmod 744 ./uninstall_i2p_service_unix
 
 ERROR_MSG="Cannot determine operating system type. From the subdirectory in lib/wrapper matching your operating system, please move i2psvc to your base I2P directory, and move the remaining two files to the lib directory."
 
@@ -56,6 +56,10 @@ esac
 cp $wrapperpath/wrapper.jar ./lib/
 cp $wrapperpath/i2psvc .
 chmod 744 ./i2psvc
+rm -rdf ./icons
+rm -rdf ./lib/wrapper
+rm -f ./lib/*.dll
+rm -f ./*.bat
 ./i2prouter start
 exit 0
 

@@ -1,4 +1,11 @@
-$Id: history.txt,v 1.2 2004/09/02 16:26:03 jrandom Exp $
+$Id: history.txt,v 1.3 2004/09/03 02:22:24 jrandom Exp $
+
+2004-09-03  hypercubus
+    * Bugfix: Installer launches postinstall.bat on WinNT/2K properly.
+    * Temporarily removed install_i2p_service_unix and
+      uninstall_i2p_service_unix from distribution packages.
+    * postinstall.bat/postinstall.sh cleans installation directory of all files
+      not applicable to the host OS.
 
 2004-09-03  oOo
     * Added some filters to the HTTP request, replacing the User-Agent,

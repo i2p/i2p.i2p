@@ -3,7 +3,7 @@
 <processing>
     <job name="Launching I2P...">
         <os family="windows" />
-        <executefile name="C:\Windows\System32\cmd.exe">
+        <executefile name="cmd.exe">
             <arg>/c</arg><arg>"$INSTALL_PATH\postinstall.bat"</arg>
         </executefile>
     </job>
