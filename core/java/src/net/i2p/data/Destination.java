@@ -39,7 +39,7 @@ public class Destination extends DataStructureImpl {
      * alternative constructor which takes a base64 string representation
      * @param s a Base64 representation of the destination, as (eg) is used in hosts.txt
      */
-    public Destination(String s) {
+    public Destination(String s) throws DataFormatException {
         this();
         fromBase64(s);
     }
