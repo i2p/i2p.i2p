@@ -32,8 +32,8 @@
  * Note: The strl.c file retains its original license (at the top of strl.c)
  */
 
-#ifndef STRL_H
-#define STRL_H
+#ifndef LIBSAM_STRL_H
+#define LIBSAM_STRL_H
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -44,4 +44,4 @@ extern size_t strlcpy(char *dst, const char *src, size_t siz);
 #ifdef __cplusplus
 }
 #endif
-#endif  /* STRL_H */
+#endif  /* LIBSAM_STRL_H */

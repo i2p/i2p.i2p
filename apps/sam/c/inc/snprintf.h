@@ -33,8 +33,8 @@
  * snprintf.c)
  */
 
-#ifndef SNPRINTF_H
-#define SNPRINTF_H
+#ifndef LIBSAM_SNPRINTF_H
+#define LIBSAM_SNPRINTF_H
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -46,4 +46,4 @@ int vsnprintf (char *str, size_t count, const char *fmt, va_list arg);
 #ifdef __cplusplus
 }
 #endif
-#endif  /* SNPRINTF_H */
+#endif  /* LIBSAM_SNPRINTF_H */

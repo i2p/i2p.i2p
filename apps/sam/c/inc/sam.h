@@ -28,17 +28,19 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef SAM_H
-#define SAM_H
+#ifndef LIBSAM_SAM_H
+#define LIBSAM_SAM_H
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-/*
- * Standard C99 includes - if your compiler doesn't have these, it's time to
- * upgrade
- */
-#include <stdbool.h>  // bool
+#ifdef NO_STDBOOL_H
+	typedef int bool;
+	#define true 0
+	#define false 1
+#else
+	#include <stdbool.h>
+#endif
 #include <stddef.h>  // size_t
 
 
@@ -70,12 +72,6 @@ extern "C" {
  * Some LibSAM variable types
  */
 
-#ifdef WINSOCK
-	typedef SOCKET socket_t;
-#else
-	typedef int socket_t;
-#endif
-
 typedef enum {SAM_STREAM, SAM_DGRAM, SAM_RAW} sam_conn_t;  /* SAM connection */
 
 typedef char sam_pubkey_t[SAM_PUBKEY_LEN];  /* base 64 public key */
@@ -88,7 +84,7 @@ typedef struct {
 typedef long sam_sid_t;  /* stream id number */
 
 typedef struct {
-	socket_t sock;  /* the socket used for communications with SAM */
+	int sock;  /* the socket used for communications with SAM */
 	bool connected;  /* whether the socket is connected */
 	sam_sid_t prev_id;  /* the last stream id number we used */
 } sam_sess_t;  /* a SAM session */
@@ -166,4 +162,4 @@ void		(*sam_rawback)(sam_sess_t *session, void *data, size_t size);
 #ifdef __cplusplus
 }
 #endif
-#endif  /* SAM_H */
+#endif  /* LIBSAM_SAM_H */

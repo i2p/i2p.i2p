@@ -28,33 +28,17 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef PLATFORM_H
-#define PLATFORM_H
+#ifndef LIBSAM_PLATFORM_H
+#define LIBSAM_PLATFORM_H
 
 /*
  * Operating system
  */
 #define FREEBSD	0  // FreeBSD
-#define MINGW	1  // Windows native (Mingw)
+#define CYGWIN	1  // Cygwin
 #define LINUX	2  // Linux
-#define CYGWIN	3  // Cygwin
-
-#if OS == MINGW
-	#define INET_ADDRSTRLEN 16
-	#define NO_GETHOSTBYNAME2
-	#define NO_INET_ATON  /* implies NO_INET_PTON */
-	#define NO_INET_NTOP
-	#define NO_SSIZE_T
-	#define NO_STRL
-	#define NO_Z_FORMAT
-	#define WINSOCK
-#endif
-
-#if OS == LINUX
-	#define NO_GETHOSTBYNAME2
-	#define NO_STRL
-	#define NO_Z_FORMAT
-#endif
+#define MINGW	3  // Windows native (Mingw)
+#define MSVC	4  // Windows native (Visual C++ 2003)
 
 #if OS == CYGWIN
 	#define INET_ADDRSTRLEN 16
@@ -67,12 +51,29 @@
 	#define NO_Z_FORMAT
 #endif
 
-/*
- * Standard C99 includes - if your compiler doesn't have these, it's time to
- * upgrade
- */
-#include <stdbool.h>  // bool
-#include <stddef.h>  // size_t
+#if OS == LINUX
+	#define NO_GETHOSTBYNAME2
+	#define NO_STRL
+	#define NO_Z_FORMAT
+#endif
+
+#if OS == MINGW
+	#define INET_ADDRSTRLEN 16
+	#define NO_GETHOSTBYNAME2
+	#define NO_INET_ATON  // implies NO_INET_PTON
+	#define NO_INET_NTOP
+	#define NO_SSIZE_T
+	#define NO_STRL
+	#define NO_Z_FORMAT
+	#define WINSOCK
+#endif
+
+#if OS == MSVC  // FIXME: doesn't work
+	#define NO_STDBOOL_H
+	#define NO_SSIZE_T
+	#define NO_STRL
+	#define WINSOCK
+#endif
 
 /*
  * System includes
@@ -141,4 +142,4 @@ typedef unsigned short ushort;
 	#include <ctype.h>
 #endif
 
-#endif  /* PLATFORM_H */
+#endif  /* LIBSAM_PLATFORM_H */
