@@ -1,19 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project basedir="." default="all" name="i2p">
+    <available property="jettylib.available" file="apps/jetty/jettylib" />
+    
     <target name="all" >
         <echo message="Useful targets: " />
         <echo message="  build:     build existing code into ./build/, but dont clean" />
         <echo message="  javadoc:   generate javadoc for the entire project into ./build/javadoc" />
         <echo message="  clean:     clean up the ./build/ dir" />
         <echo message="  distclean: clean up all derived files" />
-        <echo message="  dist:      distclean, then build and javadoc" />
+        <echo message="  dist:      distclean, then build and javadoc (including the web app and associated libs)" />
         <echo message="  prepGUI:   pull the LGPL and APL code for JFreeChart that we use in the GUIs" />
         <echo message="  buildGUI:  build the heartbeat and netmonitor GUIs (must have run prepGUI already)" />
-        <echo message="  buildWEB:  build the Jetty instance and router console web application" />
+        <echo message="  prepWEB:   pull down the Jetty libraries and whatever they depend on for the router console web application" />
+        <echo message="  buildWEB:  build the router console web application (depends upon prepWEB)" />
     </target>
-    <target name="dist" depends="distclean, build, javadoc" />
+    <target name="dist" depends="distclean, build, buildWEB, javadoc" />
     <target name="build" depends="builddep, jar" />
-    <target name="buildclean" depends="distclean, builddep, jar" />
+    <target name="buildclean" depends="distclean, build" />
     <target name="builddep">
 	<!-- build *everything* here, but only once -->
         <ant dir="core/java/" target="jar" />
@@ -26,6 +29,7 @@
         <ant dir="apps/heartbeat/java/" target="jar" />
         <ant dir="apps/netmonitor/java/" target="jar" />
         <ant dir="apps/time/java/" target="jar" />
+        <ant dir="apps/routerconsole/java/" target="jar" />
         <ant dir="installer/java/" target="jar" />
     </target>
     <target name="compile" />
@@ -48,7 +52,8 @@
         <mkdir dir="./build" />
         <mkdir dir="./build/javadoc" />
         <javadoc 
-            sourcepath="core/java/src:core/java/test:router/java/src:router/java/test:apps/ministreaming/java/src:apps/i2ptunnel/java/src:apps/httptunnel/java/src" 
+            sourcepath="core/java/src:core/java/test:router/java/src:router/java/test:apps/ministreaming/java/src:apps/i2ptunnel/java/src:apps/httptunnel/java/src:apps/routerconsole/java/src" 
+            classpath="apps/jetty/jettylib/org.mortbay.jetty.jar" 
             destdir="./build/javadoc" 
             packagenames="*" 
             use="true" 
@@ -68,6 +73,7 @@
         <ant dir="apps/sam/java/" target="distclean" />
         <ant dir="apps/heartbeat/java/" target="distclean" />
         <ant dir="apps/netmonitor/java/" target="distclean" />
+        <ant dir="apps/routerconsole/java/" target="distclean" />
         <ant dir="apps/time/java/" target="distclean" />
         <ant dir="installer/java/" target="distclean" />
         <delete>
@@ -109,20 +115,25 @@
         <echo message="To run the netmonitor GUI: java -cp jfreechart-0.9.17.jar:log4j-1.2.8.jar:jcommon-0.9.2.jar -jar netviewer.jar" />
         <echo message="To run the heartbeat GUI: java -cp jfreechart-0.9.17.jar:log4j-1.2.8.jar:jcommon-0.9.2.jar -jar heartbeatGUI.jar" />
     </target>
-    <target name="buildWEB">
+    <target name="prepWEB">
+        <ant dir="apps/jetty" target="fetchJettylib" />
+    </target>
+    <target name="buildWEB" if="jettylib.available">
         <ant dir="apps/routerconsole/java" target="build" />
         <copy file="apps/routerconsole/java/build/routerconsole.jar" todir="build/" />
         <copy file="apps/routerconsole/java/build/routerconsole.war" todir="build/" />
-        <copy file="apps/routerconsole/java/jetty-4.2.21-min/extra/lib/org.mortbay.jetty-jdk1.2.jar" todir="build/" />
-        <copy file="apps/routerconsole/java/jetty-4.2.21-min/ext/ant.jar" todir="build/" />
-        <copy file="apps/routerconsole/java/jetty-4.2.21-min/ext/jasper-compiler.jar" todir="build/" />
-        <copy file="apps/routerconsole/java/jetty-4.2.21-min/ext/jasper-runtime.jar" todir="build/" />
-        <copy file="apps/routerconsole/java/jetty-4.2.21-min/ext/jcert.jar" todir="build/" />
-        <copy file="apps/routerconsole/java/jetty-4.2.21-min/ext/jnet.jar" todir="build/" />
-        <copy file="apps/routerconsole/java/jetty-4.2.21-min/ext/xercesImpl.jar" todir="build/" />
-        <copy file="apps/routerconsole/java/jetty-4.2.21-min/ext/xml-apis.jar" todir="build/" />
-        <copy file="apps/routerconsole/java/jetty-4.2.21-min/ext/javax.servlet.jar" todir="build/" />
-        <echo message="You will need the org.*, ant.jar, jasper-*.jar, jcert.jar, jnet.jar, xerces.jar, xml-apis.jar, and routerconsole.jar in your router's classpath" />
-        <echo message="In addition, you will need to place the routerconsole.war file under your i2p install dir as webapps/routerconsole.war" />
+        <copy file="apps/jetty/jettylib/org.mortbay.jetty.jar" todir="build/" />
+        <copy file="apps/jetty/jettylib/org.mortbay.jetty-jdk1.2.jar" todir="build/" />
+        <copy file="apps/jetty/jettylib/ant.jar" todir="build/" />
+        <copy file="apps/jetty/jettylib/jasper-compiler.jar" todir="build/" />
+        <copy file="apps/jetty/jettylib/jasper-runtime.jar" todir="build/" />
+        <copy file="apps/jetty/jettylib/jnet.jar" todir="build/" />
+        <copy file="apps/jetty/jettylib/xercesImpl.jar" todir="build/" />
+        <copy file="apps/jetty/jettylib/xml-apis.jar" todir="build/" />
+        <copy file="apps/jetty/jettylib/javax.servlet.jar" todir="build/" />
+        <echo message="You will need the org.*, ant.jar, jasper-*.jar, jnet.jar, xercesImpl.jar, xml-apis.jar, " />
+        <echo message="and routerconsole.jar in your router's classpath.  In addition, you will need to place the " />
+        <echo message="routerconsole.war file under your i2p install dir as webapps/routerconsole.war and will want " />
+        <echo message="to add the RouterConsoleRunner to the router's clientApp list (it must be in the router's JVM)" />
     </target>
 </project>

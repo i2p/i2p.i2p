@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project basedir="." default="all" name="jetty">
+    <available property="jetty.available" file="jettylib" />
+        
+    <target name="all" depends="build" />
+    <target name="fetchJettylib" unless="jetty.available" >
+        <echo message="The libraries contained within the fetched file are from Jetty's 4.2.21 " />
+        <echo message="distribution (http://jetty.mortbay.org/) which we have copied to our website since" />
+        <echo message="theirs doesn't have direct HTTP access to the libs.  These are not " />
+        <echo message="necessary for using I2P, but are used by some applications on top of I2P," />
+        <echo message="such as the routerconsole." />
+        <get src="http://dev.i2p.net/jettylib.tar.bz2" verbose="true" dest="jettylib.tar.bz2" />
+        <untar src="jettylib.tar.bz2" compression="bzip2" dest="." />
+        <delete file="jettylib.tar.bz2" />
+    </target>
+    <target name="build" depends="fetchJettylib" />
+    <target name="builddep" />
+    <target name="compile" />
+    <target name="jar" />
+    <target name="clean" />
+    <target name="cleandep" depends="clean" />
+    <target name="distclean" depends="clean">
+        <echo message="Not actually deleting the jetty libs (since they're so large)" />
+    </target>
+</project>
