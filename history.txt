@@ -1,4 +1,6 @@
-$Id: history.txt,v 1.152 2005/02/22 18:13:00 jrandom Exp $
+$Id: history.txt,v 1.153 2005/02/22 23:20:29 jrandom Exp $
+
+* 2005-02-23  0.5.0.1 released
 
 2005-02-22  jrandom
     * Reworked the tunnel (re)building process to remove the tokens and 
