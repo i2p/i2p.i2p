@@ -14,6 +14,8 @@ import net.i2p.util.Log;
 public class TunnelMessageProcessor {
     private static final int IV_SIZE = GatewayMessage.IV_SIZE;
     private static final int HOPS = GatewayMessage.HOPS;
+    private static final int COLUMN_WIDTH = GatewayMessage.COLUMN_WIDTH;
+    private static final int VERIFICATION_WIDTH = GatewayMessage.VERIFICATION_WIDTH;
     
     /**
      * Unwrap the tunnel message, overwriting it with the decrypted version.
@@ -28,8 +30,8 @@ public class TunnelMessageProcessor {
         
         int payloadLength = data.length 
                             - IV_SIZE // IV
-                            - HOPS * Hash.HASH_LENGTH // checksum blocks 
-                            - Hash.HASH_LENGTH; // verification of the checksum blocks
+                            - HOPS * COLUMN_WIDTH // checksum blocks 
+                            - VERIFICATION_WIDTH; // verification of the checksum blocks
         
         Hash recvPayloadHash = ctx.sha().calculateHash(data, IV_SIZE, payloadLength);
         if (log.shouldLog(Log.DEBUG))
@@ -60,7 +62,7 @@ public class TunnelMessageProcessor {
         
         int numBlocks = (data.length - IV_SIZE) / IV_SIZE;
         // for debugging, so we can compare eIV
-        int numPayloadBlocks = (data.length - IV_SIZE - 2 * IV_SIZE * (GatewayMessage.HOPS + 1)) / IV_SIZE;
+        int numPayloadBlocks = (data.length - IV_SIZE - COLUMN_WIDTH * HOPS - VERIFICATION_WIDTH) / IV_SIZE;
         
         // prev == previous encrypted block (or IV for the first block)
         byte prev[] = new byte[IV_SIZE];
@@ -103,23 +105,23 @@ public class TunnelMessageProcessor {
         Log log = getLog(ctx);
         int matchFound = -1;
         
-        int off = data.length - (GatewayMessage.HOPS + 1) * Hash.HASH_LENGTH;
-        for (int i = 0; i < GatewayMessage.HOPS; i++) {
-            if (DataHelper.eq(payloadHash.getData(), 0, data, off, Hash.HASH_LENGTH)) {
+        int off = data.length - HOPS * COLUMN_WIDTH - VERIFICATION_WIDTH;
+        for (int i = 0; i < HOPS; i++) {
+            if (DataHelper.eq(payloadHash.getData(), 0, data, off, COLUMN_WIDTH)) {
                 matchFound = i;
                 break;
             }
             
-            off += Hash.HASH_LENGTH;
+            off += COLUMN_WIDTH;
         }
         
         if (log.shouldLog(Log.DEBUG)) {
-            off = data.length - (GatewayMessage.HOPS + 1) * Hash.HASH_LENGTH;
+            off = data.length - HOPS * COLUMN_WIDTH - VERIFICATION_WIDTH;
             for (int i = 0; i < HOPS; i++)
-                log.debug("checksum[" + i + "] = " + Base64.encode(data, off + i*Hash.HASH_LENGTH, Hash.HASH_LENGTH)
+                log.debug("checksum[" + i + "] = " + Base64.encode(data, off + i*COLUMN_WIDTH, COLUMN_WIDTH)
                           + (i == matchFound ? " * MATCH" : ""));
             
-            log.debug("verification = " + Base64.encode(data, data.length - Hash.HASH_LENGTH, Hash.HASH_LENGTH));
+            log.debug("verification = " + Base64.encode(data, data.length - VERIFICATION_WIDTH, VERIFICATION_WIDTH));
         }
         
         return matchFound != -1;
@@ -132,15 +134,15 @@ public class TunnelMessageProcessor {
      * @return true if the checksum is valid, false if it has been modified
      */
     public boolean verifyChecksum(I2PAppContext ctx, byte message[]) {
-        int checksumSize = GatewayMessage.HOPS * Hash.HASH_LENGTH;
-        int offset = message.length - (checksumSize + Hash.HASH_LENGTH);
+        int checksumSize = HOPS * COLUMN_WIDTH;
+        int offset = message.length - (checksumSize + VERIFICATION_WIDTH);
         Hash checksumHash = ctx.sha().calculateHash(message, offset, checksumSize);
         getLog(ctx).debug("Measured checksum: " + checksumHash.toBase64());
-        byte expected[] = new byte[Hash.HASH_LENGTH];
-        System.arraycopy(message, message.length-Hash.HASH_LENGTH, expected, 0, Hash.HASH_LENGTH);
+        byte expected[] = new byte[VERIFICATION_WIDTH];
+        System.arraycopy(message, message.length-VERIFICATION_WIDTH, expected, 0, VERIFICATION_WIDTH);
         getLog(ctx).debug("Expected checksum: " + Base64.encode(expected));
         
-        return DataHelper.eq(checksumHash.getData(), 0, message, message.length-Hash.HASH_LENGTH, Hash.HASH_LENGTH);
+        return DataHelper.eq(checksumHash.getData(), 0, message, message.length-VERIFICATION_WIDTH, VERIFICATION_WIDTH);
     }
     
     private static final Log getLog(I2PAppContext ctx) { 

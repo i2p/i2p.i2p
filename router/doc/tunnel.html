@@ -1,4 +1,4 @@
-<code>$Id: tunnel.html,v 1.8 2005/01/15 01:43:35 jrandom Exp $</code>
+<code>$Id: tunnel.html,v 1.9 2005/01/15 19:08:14 jrandom Exp $</code>
 <pre>
 1) <a href="#tunnel.overview">Tunnel overview</a>
 2) <a href="#tunnel.operation">Tunnel operation</a>
@@ -146,8 +146,8 @@ verify the integrity of the checksum block.  The specific details follow.</p>
 
 <p>The encryption used is such that decryption
 merely requires running over the data with AES in CBC mode, calculating the
-SHA256 of a certain fixed portion of the message (bytes 16 through $size-288),
-and searching for that hash in the checksum block.  There is a fixed number 
+SHA256 of a certain fixed portion of the message (bytes 16 through $size-144),
+and searching for the first 16 bytes of that hash in the checksum block.  There is a fixed number 
 of hops defined (8 peers) so that we can verify the message
 without either leaking the position in the tunnel or having the message 
 continually "shrink" as layers are peeled off.  For tunnels shorter than 8
@@ -239,7 +239,7 @@ To visualize this a bit:</p>
 </table>
 
 <p>In the above, P[7] is the same as the original data being passed through the
-tunnel (the preprocessed messages), and V[7] is the SHA256 of eH[0-7] as seen on
+tunnel (the preprocessed messages), and V[7] is the first 16 bytes of the SHA256 of eH[0-7] as seen on
 peer7 after decryption.  For
 cells in the matrix "higher up" than the hash, their value is derived by encrypting
 the cell below it with the key for the peer below it, using the end of the column 
@@ -268,8 +268,8 @@ peer who is the first hop (usually the peer1.recv row) and forward that entirely
 
 <p>When a participant in a tunnel receives a message, they decrypt a layer with their
 tunnel key using AES256 in CBC mode with the first 16 bytes as the IV.  They then
-calculate the hash of what they see as the payload (bytes 16 through $size-288) and
-search for that hash within the decrypted checksum block.  If no match is found, the
+calculate the hash of what they see as the payload (bytes 16 through $size-144) and
+search for that first 16 bytes of that hash within the decrypted checksum block.  If no match is found, the
 message is discarded.  Otherwise, the IV is updated by decrypting it, XORing that value
 with the IV_WHITENER, and replacing it with the first 16 bytes of its hash.  The 
 resulting message is then forwarded on to the next peer for processing.</p>
@@ -287,7 +287,7 @@ contained in the tunnel.</p>
 <p>When a message reaches the tunnel endpoint, they decrypts and verifies it like
 a normal participant.  If the checksum block has a valid match, the endpoint then
 computes the hash of the checksum block itself (as seen after decryption) and compares
-that to the decrypted verification hash (the last 32 bytes).  If that verification
+that to the decrypted verification hash (the last 16 bytes).  If that verification
 hash does not match, the endpoint takes note of the tagging attempt by one of the
 tunnel participants and perhaps discards the message.</p>
 
@@ -328,7 +328,7 @@ and handling fragmentation will not immediately be implemented.</p>
 
 <p>One alternative to the above process is to remove the checksum block
 completely and replace the verification hash with a plain hash of the payload.
-This would simplify processing at the tunnel gateway and save 256 bytes of
+This would simplify processing at the tunnel gateway and save 144 bytes of
 bandwidth at each hop.  On the other hand, attackers within the tunnel could
 trivially adjust the message size to one which is easily traceable by 
 colluding external observers in addition to later tunnel participants.  The
@@ -344,7 +344,7 @@ there are three alternatives that can be explored:</p>
 <ul>
 <li>Delay a message within a tunnel at an arbitrary hop for either a specified
 amount of time or a randomized period.  This could be achieved by replacing the
-hash in the checksum block with e.g. the first 16 bytes of the hash, followed by
+hash in the checksum block with e.g. the first 8 bytes of the hash, followed by
 some delay instructions.  Alternately, the instructions could tell the 
 participant to actually interpret the raw payload as it is, and either discard
 the message or continue to forward it down the path (where it would be
@@ -378,12 +378,14 @@ minimize the worries of the predecessor attack, though if it were desired,
 it wouldn't be much trouble to build both the inbound and outbound tunnels
 along the same peers.</p>
 
-<h4>2.7.4) <a name="tunnel.smallerhashes">Use smaller hashes</a></h4>
+<h4>2.7.4) <a name="tunnel.smallerhashes">Use smaller blocksize</a></h4>
 
-<p>At the moment, the plan is to reuse the existing SHA256 code and build
-all of the checksum and verification hashes as 32 byte SHA256 values.  20
-byte SHA1 would likely be more than sufficient, or perhaps smaller - first
-4 bytes of the SHA256.</p>
+<p>At the moment, our use of AES limits our block size to 16 bytes, which
+in turn provides the minimum size for each of the checksum block columns.
+If another algorithm was used with a smaller block size, or could otherwise
+allow the safe building of the checksum block with smaller portions of the
+hash, it might be worth exploring.  The 16 bytes used now at each hop should
+be more than sufficient.</p>
 
 <h2>3) <a name="tunnel.building">Tunnel building</a></h2>
 

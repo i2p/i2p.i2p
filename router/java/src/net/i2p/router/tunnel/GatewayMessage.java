@@ -53,6 +53,10 @@ public class GatewayMessage {
     private static final byte EMPTY[] = new byte[0];
     private static final int COLUMNS = HOPS;
     private static final int HASH_ROWS = HOPS;
+    /** # bytes of the hash to maintain in each column */
+    static final int COLUMN_WIDTH = IV_SIZE;
+    /** # bytes of the verification hash to maintain */
+    static final int VERIFICATION_WIDTH = IV_SIZE;
     
     /** used to munge the IV during per-hop translations */
     static final byte IV_WHITENER[] = new byte[] { (byte)0x31, (byte)0xd6, (byte)0x74, (byte)0x17, 
@@ -70,9 +74,9 @@ public class GatewayMessage {
         _iv = new byte[HOPS-1][IV_SIZE];
         _eIV = new byte[HOPS-1][IV_SIZE];
         _H = new byte[HOPS][Hash.HASH_LENGTH];
-        _eH = new byte[COLUMNS][HASH_ROWS][Hash.HASH_LENGTH];
-        _preV = new byte[HOPS*Hash.HASH_LENGTH];
-        _V = new byte[Hash.HASH_LENGTH];
+        _eH = new byte[COLUMNS][HASH_ROWS][COLUMN_WIDTH];
+        _preV = new byte[HOPS*COLUMN_WIDTH];
+        _V = new byte[VERIFICATION_WIDTH];
         _order = new int[HOPS];
         _encrypted = false;
         _payloadSet = false;
@@ -224,24 +228,19 @@ public class GatewayMessage {
             // which _H[hash] value are we rendering in this column?
             int hash = _order[column];
             // fill in the cleartext version for this column
-            System.arraycopy(_H[hash], 0, _eH[column][hash], 0, Hash.HASH_LENGTH);
+            System.arraycopy(_H[hash], 0, _eH[column][hash], 0, COLUMN_WIDTH);
             
             // now fill in the "earlier" _eH[column][row-1] values for earlier hops 
-            // by encrypting _eH[column][row] with the peer's key, using the end 
-            // of the previous column (or _eIV[row-1]) as the IV
+            // by encrypting _eH[column][row] with the peer's key, using the 
+            // previous column (or _eIV[row-1]) as the IV
             for (int row = hash; row > 0; row--) {
                 SessionKey key = cfg.getSessionKey(row);
-                // first half
                 if (column == 0) {
                     DataHelper.xor(_eIV[row-1], 0, _eH[column][row], 0, _eH[column][row-1], 0, IV_SIZE);
                 } else {
-                    DataHelper.xor(_eH[column-1][row-1], IV_SIZE, _eH[column][row], 0, _eH[column][row-1], 0, IV_SIZE);
+                    DataHelper.xor(_eH[column-1][row-1], 0, _eH[column][row], 0, _eH[column][row-1], 0, IV_SIZE);
                 }
                 _context.aes().encryptBlock(_eH[column][row-1], 0, key, _eH[column][row-1], 0);
-                
-                // second half
-                DataHelper.xor(_eH[column][row-1], 0, _eH[column][row], IV_SIZE, _eH[column][row-1], IV_SIZE, IV_SIZE);
-                _context.aes().encryptBlock(_eH[column][row-1], IV_SIZE, key, _eH[column][row-1], IV_SIZE);
             }
             
             // fill in the "later" rows by encrypting the previous rows with the 
@@ -255,10 +254,7 @@ public class GatewayMessage {
                 if (column == 0)
                     DataHelper.xor(_eIV[row-1], 0, _eH[column][row], 0, _eH[column][row], 0, IV_SIZE);
                 else
-                    DataHelper.xor(_eH[column-1][row-1], IV_SIZE, _eH[column][row], 0, _eH[column][row], 0, IV_SIZE);
-                
-                _context.aes().decryptBlock(_eH[column][row-1], IV_SIZE, key, _eH[column][row], IV_SIZE);
-                DataHelper.xor(_eH[column][row-1], 0, _eH[column][row], IV_SIZE, _eH[column][row], IV_SIZE, IV_SIZE);
+                    DataHelper.xor(_eH[column-1][row-1], 0, _eH[column][row], 0, _eH[column][row], 0, IV_SIZE);
             }
         }
         
@@ -268,7 +264,7 @@ public class GatewayMessage {
                 for (int column = 0; column < COLUMNS; column++) {
                     try {
                         _log.debug("_eH[" + column + "][" + peer + "] = " + Base64.encode(_eH[column][peer]) 
-                                   + (peer == 0 ? "" : DataHelper.eq(_H[peer-1], _eH[column][peer]) ? " CLEARTEXT" : ""));
+                                   + (peer == 0 ? "" : DataHelper.eq(_H[peer-1], 0, _eH[column][peer], 0, COLUMN_WIDTH) ? " CLEARTEXT" : ""));
                     } catch (Exception e) {
                         e.printStackTrace();
                         System.out.println("column="+column + " peer=" + peer);
@@ -285,9 +281,9 @@ public class GatewayMessage {
      */
     private final void encryptVerificationHash(GatewayTunnelConfig cfg) {
         for (int i = 0; i < COLUMNS; i++)
-            System.arraycopy(_eH[i][HASH_ROWS-1], 0, _preV, i * Hash.HASH_LENGTH, Hash.HASH_LENGTH);
+            System.arraycopy(_eH[i][HASH_ROWS-1], 0, _preV, i * COLUMN_WIDTH, COLUMN_WIDTH);
         Hash v = _context.sha().calculateHash(_preV);
-        System.arraycopy(v.getData(), 0, _V, 0, Hash.HASH_LENGTH);
+        System.arraycopy(v.getData(), 0, _V, 0, VERIFICATION_WIDTH);
 
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("_V final = " + Base64.encode(_V));
@@ -296,10 +292,8 @@ public class GatewayMessage {
             SessionKey key = cfg.getSessionKey(i);
             // xor the last block of the encrypted payload with the first block of _V to
             // continue the CTR operation
-            DataHelper.xor(_V, 0, _eH[COLUMNS-1][i-1], IV_SIZE, _V, 0, IV_SIZE);
+            DataHelper.xor(_V, 0, _eH[COLUMNS-1][i-1], 0, _V, 0, IV_SIZE);
             _context.aes().encryptBlock(_V, 0, key, _V, 0);
-            DataHelper.xor(_V, 0, _V, IV_SIZE, _V, IV_SIZE, IV_SIZE);
-            _context.aes().encryptBlock(_V, IV_SIZE, key, _V, IV_SIZE);
             
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("_V at peer " + i + " = " + Base64.encode(_V));
@@ -317,8 +311,8 @@ public class GatewayMessage {
     public final int getExportedSize() { 
         return IV_SIZE +
                _payload.length +
-               COLUMNS * Hash.HASH_LENGTH +
-               Hash.HASH_LENGTH; // verification hash
+               COLUMNS * COLUMN_WIDTH +
+               VERIFICATION_WIDTH; // verification hash
     }
     
     /**
@@ -343,11 +337,11 @@ public class GatewayMessage {
         System.arraycopy(_payload, 0, target, cur, _payload.length);
         cur += _payload.length;
         for (int column = 0; column < COLUMNS; column++) {
-            System.arraycopy(_eH[column][0], 0, target, cur, Hash.HASH_LENGTH);
-            cur += Hash.HASH_LENGTH;
+            System.arraycopy(_eH[column][0], 0, target, cur, COLUMN_WIDTH);
+            cur += COLUMN_WIDTH;
         }
-        System.arraycopy(_V, 0, target, cur, Hash.HASH_LENGTH);
-        cur += Hash.HASH_LENGTH;
+        System.arraycopy(_V, 0, target, cur, VERIFICATION_WIDTH);
+        cur += VERIFICATION_WIDTH;
         return cur;
     }
     
@@ -360,13 +354,13 @@ public class GatewayMessage {
         Log log = ctx.logManager().getLog(GatewayMessage.class);
         boolean match = true;
         
-        int off = message.length - (COLUMNS + 1) * Hash.HASH_LENGTH;
+        int off = message.length - (COLUMNS + 1) * COLUMN_WIDTH;
         for (int column = 0; column < COLUMNS; column++) {
-            boolean ok = DataHelper.eq(_eH[column][peer], 0, message, off, Hash.HASH_LENGTH);
+            boolean ok = DataHelper.eq(_eH[column][peer], 0, message, off, COLUMN_WIDTH);
             if (log.shouldLog(Log.DEBUG))
                 log.debug("checksum[" + column + "][" + (peer) + "] matches?  " + ok);
             
-            off += Hash.HASH_LENGTH;
+            off += COLUMN_WIDTH;
             match = match && ok;
         }
         
