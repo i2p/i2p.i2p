@@ -103,19 +103,19 @@ class I2PSessionImpl2 extends I2PSessionImpl {
         } else if (_context.sessionKeyManager().getAvailableTimeLeft(dest.getPublicKey(), key) < 30 * 1000) {
             // if we have > 10 tags, but they expire in under 30 seconds, we want more
             sentTags = createNewTags(50);
-            if (_log.shouldLog(Log.DEBUG)) _log.debug("Tags are almost expired, adding 50 new ones");
+            if (_log.shouldLog(Log.DEBUG)) _log.debug(getPrefix() + "Tags are almost expired, adding 50 new ones");
         }
         SessionKey newKey = null;
         if (false) // rekey
             newKey = _context.keyGenerator().generateSessionKey();
 
         long nonce = (long)_context.random().nextInt(Integer.MAX_VALUE);
-        MessageState state = new MessageState(nonce);
+        MessageState state = new MessageState(nonce, getPrefix());
         state.setKey(key);
         state.setTags(sentTags);
         state.setNewKey(newKey);
         state.setTo(dest);
-        if (_log.shouldLog(Log.DEBUG)) _log.debug("Setting key = " + key);
+        if (_log.shouldLog(Log.DEBUG)) _log.debug(getPrefix() + "Setting key = " + key);
 
         if (keyUsed != null) {
             if (newKey != null)
@@ -133,7 +133,7 @@ class I2PSessionImpl2 extends I2PSessionImpl {
             _sendingStates.add(state);
         }
         if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Adding sending state " + state.getMessageId() + " / "
+            _log.debug(getPrefix() + "Adding sending state " + state.getMessageId() + " / "
                        + state.getNonce());
         _producer.sendMessage(this, dest, nonce, payload, tag, key, sentTags, newKey);
         state.waitFor(MessageStatusMessage.STATUS_SEND_ACCEPTED, 
@@ -143,18 +143,18 @@ class I2PSessionImpl2 extends I2PSessionImpl {
         }
         boolean found = state.received(MessageStatusMessage.STATUS_SEND_ACCEPTED);
         if (_log.shouldLog(Log.DEBUG))
-            _log.debug("After waitFor sending state " + state.getMessageId().getMessageId()
+            _log.debug(getPrefix() + "After waitFor sending state " + state.getMessageId().getMessageId()
                        + " / " + state.getNonce() + " found = " + found);
         if (found) {
             if (_log.shouldLog(Log.INFO))
-                _log.info("Message sent after " + state.getElapsed() + "ms with "
+                _log.info(getPrefix() + "Message sent after " + state.getElapsed() + "ms with "
                           + payload.length + " bytes");
         } else {
             if (_log.shouldLog(Log.INFO))
-                _log.info("Message send failed after " + state.getElapsed() + "ms with "
+                _log.info(getPrefix() + "Message send failed after " + state.getElapsed() + "ms with "
                           + payload.length + " bytes");
             if (_log.shouldLog(Log.ERROR))
-                _log.error("Never received *accepted* from the router!  dropping and reconnecting");
+                _log.error(getPrefix() + "Never received *accepted* from the router!  dropping and reconnecting");
             disconnect();
             return false;
         }
@@ -172,19 +172,19 @@ class I2PSessionImpl2 extends I2PSessionImpl {
         } else if (_context.sessionKeyManager().getAvailableTimeLeft(dest.getPublicKey(), key) < 30 * 1000) {
             // if we have > 10 tags, but they expire in under 30 seconds, we want more
             sentTags = createNewTags(50);
-            if (_log.shouldLog(Log.DEBUG)) _log.debug("Tags are almost expired, adding 50 new ones");
+            if (_log.shouldLog(Log.DEBUG)) _log.debug(getPrefix() + "Tags are almost expired, adding 50 new ones");
         }
         SessionKey newKey = null;
         if (false) // rekey
             newKey = _context.keyGenerator().generateSessionKey();
 
         long nonce = (long)_context.random().nextInt(Integer.MAX_VALUE);
-        MessageState state = new MessageState(nonce);
+        MessageState state = new MessageState(nonce, getPrefix());
         state.setKey(key);
         state.setTags(sentTags);
         state.setNewKey(newKey);
         state.setTo(dest);
-        if (_log.shouldLog(Log.DEBUG)) _log.debug("Setting key = " + key);
+        if (_log.shouldLog(Log.DEBUG)) _log.debug(getPrefix() + "Setting key = " + key);
 
         if (keyUsed != null) {
             if (newKey != null)
@@ -202,7 +202,7 @@ class I2PSessionImpl2 extends I2PSessionImpl {
             _sendingStates.add(state);
         }
         if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Adding sending state " + state.getMessageId() + " / "
+            _log.debug(getPrefix() + "Adding sending state " + state.getMessageId() + " / "
                        + state.getNonce());
         _producer.sendMessage(this, dest, nonce, payload, tag, key, sentTags, newKey);
         if (isGuaranteed())
@@ -219,7 +219,7 @@ class I2PSessionImpl2 extends I2PSessionImpl {
 
         if ((!accepted) || (state.getMessageId() == null)) {
             if (_log.shouldLog(Log.ERROR))
-                _log.error("State with nonce " + state.getNonce()
+                _log.error(getPrefix() + "State with nonce " + state.getNonce()
                            + " was not accepted?  (no messageId!! found=" + found 
                            + " msgId=" + state.getMessageId() + ")", 
                            new Exception("Race on accept/success status messages, or reconnected?"));
@@ -231,16 +231,16 @@ class I2PSessionImpl2 extends I2PSessionImpl {
         }
 
         if (_log.shouldLog(Log.DEBUG))
-            _log.debug("After waitFor sending state " + state.getMessageId().getMessageId()
+            _log.debug(getPrefix() + "After waitFor sending state " + state.getMessageId().getMessageId()
                        + " / " + state.getNonce() + " found = " + found);
         if (found) {
             if (_log.shouldLog(Log.INFO))
-                _log.info("Message sent after " + state.getElapsed() + "ms with "
+                _log.info(getPrefix() + "Message sent after " + state.getElapsed() + "ms with "
                           + payload.length + " bytes");
             ackTags(state);
         } else {
             if (_log.shouldLog(Log.INFO))
-                _log.info("Message send failed after " + state.getElapsed() + "ms with "
+                _log.info(getPrefix() + "Message send failed after " + state.getElapsed() + "ms with "
                           + payload.length + " bytes");
             nackTags(state);
         }
@@ -249,7 +249,7 @@ class I2PSessionImpl2 extends I2PSessionImpl {
 
     private void ackTags(MessageState state) {
         if (_log.shouldLog(Log.DEBUG))
-            _log.debug("ack tags for msgId " + state.getMessageId() + " / "
+            _log.debug(getPrefix() + "ack tags for msgId " + state.getMessageId() + " / "
                        + state.getNonce() + " key = " + state.getKey() + ", tags = "
                        + state.getTags());
         if ((state.getTags() != null) && (state.getTags().size() > 0)) {
@@ -262,26 +262,26 @@ class I2PSessionImpl2 extends I2PSessionImpl {
 
     private void nackTags(MessageState state) {
         if (_log.shouldLog(Log.INFO))
-            _log.info("nack tags for msgId " + state.getMessageId() + " / " + state.getNonce()
+            _log.info(getPrefix() + "nack tags for msgId " + state.getMessageId() + " / " + state.getNonce()
                       + " key = " + state.getKey());
         _context.sessionKeyManager().failTags(state.getTo().getPublicKey());
     }
 
     public void receiveStatus(int msgId, long nonce, int status) {
-        if (_log.shouldLog(Log.DEBUG)) _log.debug("Received status " + status + " for msgId " + msgId + " / " + nonce);
+        if (_log.shouldLog(Log.DEBUG)) _log.debug(getPrefix() + "Received status " + status + " for msgId " + msgId + " / " + nonce);
         MessageState state = null;
         synchronized (_sendingStates) {
             for (Iterator iter = _sendingStates.iterator(); iter.hasNext();) {
                 state = (MessageState) iter.next();
-                if (_log.shouldLog(Log.DEBUG)) _log.debug("State " + state.getMessageId() + " / " + state.getNonce());
+                if (_log.shouldLog(Log.DEBUG)) _log.debug(getPrefix() + "State " + state.getMessageId() + " / " + state.getNonce());
                 if (state.getNonce() == nonce) {
-                    if (_log.shouldLog(Log.DEBUG)) _log.debug("Found a matching state");
+                    if (_log.shouldLog(Log.DEBUG)) _log.debug(getPrefix() + "Found a matching state");
                     break;
                 } else if ((state.getMessageId() != null) && (state.getMessageId().getMessageId() == msgId)) {
-                    if (_log.shouldLog(Log.DEBUG)) _log.debug("Found a matching state by msgId");
+                    if (_log.shouldLog(Log.DEBUG)) _log.debug(getPrefix() + "Found a matching state by msgId");
                     break;
                 } else {
-                    if (_log.shouldLog(Log.DEBUG)) _log.debug("State does not match");
+                    if (_log.shouldLog(Log.DEBUG)) _log.debug(getPrefix() + "State does not match");
                     state = null;
                 }
             }
@@ -296,7 +296,7 @@ class I2PSessionImpl2 extends I2PSessionImpl {
             state.receive(status);
         } else {
             if (_log.shouldLog(Log.INFO))
-                _log.info("No matching state for messageId " + msgId + " / " + nonce
+                _log.info(getPrefix() + "No matching state for messageId " + msgId + " / " + nonce
                           + " w/ status = " + status);
         }
     }
@@ -319,7 +319,7 @@ class I2PSessionImpl2 extends I2PSessionImpl {
                 MessageState state = (MessageState) iter.next();
                 state.cancel();
             }
-            if (_log.shouldLog(Log.INFO)) _log.info("Disconnecting " + _sendingStates.size() + " states");
+            if (_log.shouldLog(Log.INFO)) _log.info(getPrefix() + "Disconnecting " + _sendingStates.size() + " states");
             _sendingStates.clear();
         }
     }

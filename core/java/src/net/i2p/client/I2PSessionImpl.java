@@ -147,7 +147,7 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
             _portNum = Integer.parseInt(portNum);
         } catch (NumberFormatException nfe) {
             if (_log.shouldLog(Log.WARN))
-                _log.warn("Invalid port number specified, defaulting to "
+                _log.warn(getPrefix() + "Invalid port number specified, defaulting to "
                           + TestServer.LISTEN_PORT, nfe);
             _portNum = TestServer.LISTEN_PORT;
         }
@@ -172,7 +172,7 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
                 if (_log.shouldLog(Log.DEBUG)) _log.debug("Skipping line.* property: " + key);
             } else if ((key.length() > 255) || (val.length() > 255)) {
                 if (_log.shouldLog(Log.WARN))
-                    _log.warn("Not passing on property ["
+                    _log.warn(getPrefix() + "Not passing on property ["
                               + key
                               + "] in the session configuration as the value is too long (max = 255): "
                               + val);
@@ -222,7 +222,7 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
         _closed = false;
         long startConnect = _context.clock().now();
         try {
-            if (_log.shouldLog(Log.DEBUG)) _log.debug("connect begin to " + _hostname + ":" + _portNum);
+            if (_log.shouldLog(Log.DEBUG)) _log.debug(getPrefix() + "connect begin to " + _hostname + ":" + _portNum);
             _socket = new Socket(_hostname, _portNum);
             _out = _socket.getOutputStream();
             synchronized (_out) {
@@ -230,12 +230,12 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
             }
             InputStream in = _socket.getInputStream();
             _reader = new I2CPMessageReader(in, this);
-            if (_log.shouldLog(Log.DEBUG)) _log.debug("before startReading");
+            if (_log.shouldLog(Log.DEBUG)) _log.debug(getPrefix() + "before startReading");
             _reader.startReading();
 
-            if (_log.shouldLog(Log.DEBUG)) _log.debug("Before getDate");
+            if (_log.shouldLog(Log.DEBUG)) _log.debug(getPrefix() + "Before getDate");
             sendMessage(new GetDateMessage());
-            if (_log.shouldLog(Log.DEBUG)) _log.debug("After getDate / begin waiting for a response");
+            if (_log.shouldLog(Log.DEBUG)) _log.debug(getPrefix() + "After getDate / begin waiting for a response");
             while (!_dateReceived) {
                 try {
                     synchronized (_dateReceivedLock) {
@@ -244,11 +244,11 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
                 } catch (InterruptedException ie) {
                 }
             }
-            if (_log.shouldLog(Log.DEBUG)) _log.debug("After received a SetDate response");
+            if (_log.shouldLog(Log.DEBUG)) _log.debug(getPrefix() + "After received a SetDate response");
 
-            if (_log.shouldLog(Log.DEBUG)) _log.debug("Before producer.connect()");
+            if (_log.shouldLog(Log.DEBUG)) _log.debug(getPrefix() + "Before producer.connect()");
             _producer.connect(this);
-            if (_log.shouldLog(Log.DEBUG)) _log.debug("After  producer.connect()");
+            if (_log.shouldLog(Log.DEBUG)) _log.debug(getPrefix() + "After  producer.connect()");
 
             // wait until we have created a lease set
             while (_leaseSet == null) {
@@ -261,15 +261,15 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
             }
             long connected = _context.clock().now();
             if (_log.shouldLog(Log.INFO))
-                                         _log.info("Lease set created with inbound tunnels after "
-                                                   + (connected - startConnect)
-                                                   + "ms - ready to participate in the network!");
+                 _log.info(getPrefix() + "Lease set created with inbound tunnels after "
+                           + (connected - startConnect)
+                           + "ms - ready to participate in the network!");
         } catch (UnknownHostException uhe) {
             _closed = true;
-            throw new I2PSessionException("Invalid session configuration", uhe);
+            throw new I2PSessionException(getPrefix() + "Invalid session configuration", uhe);
         } catch (IOException ioe) {
             _closed = true;
-            throw new I2PSessionException("Problem connecting to " + _hostname + " on port " + _portNum, ioe);
+            throw new I2PSessionException(getPrefix() + "Problem connecting to " + _hostname + " on port " + _portNum, ioe);
         }
     }
 
@@ -288,7 +288,7 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
      * Report abuse with regards to the given messageId
      */
     public void reportAbuse(int msgId, int severity) throws I2PSessionException {
-        if (isClosed()) throw new I2PSessionException("Already closed");
+        if (isClosed()) throw new I2PSessionException(getPrefix() + "Already closed");
         _producer.reportAbuse(this, msgId, severity);
     }
 
@@ -328,7 +328,7 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
         byte data[] = msg.getPayload().getUnencryptedData();
         if ((data == null) || (data.length <= 0)) {
             if (_log.shouldLog(Log.ERROR))
-                _log.error("addNewMessage of a message with no unencrypted data",
+                _log.error(getPrefix() + "addNewMessage of a message with no unencrypted data",
                            new Exception("Empty message"));
         } else {
             final long size = data.length;
@@ -343,7 +343,7 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
             notifier.setDaemon(true);
             notifier.start();
             if (_log.shouldLog(Log.INFO))
-                _log.info("Notifier " + nid + " is for session " + _sessionId + ", message " + id + "]");
+                _log.info(getPrefix() + "Notifier " + nid + " is for session " + _sessionId + ", message " + id + "]");
         }
     }
 
@@ -355,11 +355,11 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
         I2CPMessageHandler handler = _handlerMap.getHandler(message.getType());
         if (handler == null) {
             if (_log.shouldLog(Log.WARN))
-                _log.warn("Unknown message or unhandleable message received: type = "
+                _log.warn(getPrefix() + "Unknown message or unhandleable message received: type = "
                           + message.getType());
         } else {
             if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Message received of type " + message.getType()
+                _log.debug(getPrefix() + "Message received of type " + message.getType()
                            + " to be handled by " + handler);
             handler.handleMessage(message, this);
         }
@@ -424,11 +424,11 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
                 message.writeMessage(_out);
                 _out.flush();
             }
-            if (_log.shouldLog(Log.DEBUG)) _log.debug("Message written out and flushed");
+            if (_log.shouldLog(Log.DEBUG)) _log.debug(getPrefix() + "Message written out and flushed");
         } catch (I2CPMessageException ime) {
-            throw new I2PSessionException("Error writing out the message", ime);
+            throw new I2PSessionException(getPrefix() + "Error writing out the message", ime);
         } catch (IOException ioe) {
-            throw new I2PSessionException("Error writing out the message", ioe);
+            throw new I2PSessionException(getPrefix() + "Error writing out the message", ioe);
         }
     }
 
@@ -436,7 +436,7 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
      * Pass off the error to the listener
      */
     void propogateError(String msg, Throwable error) {
-        if (_log.shouldLog(Log.ERROR)) _log.error("Error occurred: " + msg, error);
+        if (_log.shouldLog(Log.ERROR)) _log.error(getPrefix() + "Error occurred: " + msg, error);
         if (_sessionListener != null) _sessionListener.errorOccurred(this, msg, error);
     }
 
@@ -450,7 +450,7 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
     public void destroySession(boolean sendDisconnect) {
         if (_closed) return;
         
-        if (_log.shouldLog(Log.DEBUG)) _log.debug("Destroy the session", new Exception("DestroySession()"));
+        if (_log.shouldLog(Log.DEBUG)) _log.debug(getPrefix() + "Destroy the session", new Exception("DestroySession()"));
         if (sendDisconnect) {
             try {
                 _producer.disconnect(this);
@@ -468,7 +468,7 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
      *
      */
     private void closeSocket() {
-        if (_log.shouldLog(Log.DEBUG)) _log.debug("Closing the socket", new Exception("closeSocket"));
+        if (_log.shouldLog(Log.DEBUG)) _log.debug(getPrefix() + "Closing the socket", new Exception("closeSocket"));
         _closed = true;
         if (_reader != null) _reader.stopReading();
         _reader = null;
@@ -488,24 +488,24 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
      * Recieve notification that the I2CP connection was disconnected
      */
     public void disconnected(I2CPMessageReader reader) {
-        if (_log.shouldLog(Log.DEBUG)) _log.debug("Disconnected", new Exception("Disconnected"));
+        if (_log.shouldLog(Log.DEBUG)) _log.debug(getPrefix() + "Disconnected", new Exception("Disconnected"));
         disconnect();
     }
 
     protected void disconnect() {
         if (_closed) return;
-        if (_log.shouldLog(Log.DEBUG)) _log.debug("Disconnect() called", new Exception("Disconnect"));
+        if (_log.shouldLog(Log.DEBUG)) _log.debug(getPrefix() + "Disconnect() called", new Exception("Disconnect"));
         if (shouldReconnect()) {
             if (reconnect()) {
-                if (_log.shouldLog(Log.INFO)) _log.info("I2CP reconnection successful");
+                if (_log.shouldLog(Log.INFO)) _log.info(getPrefix() + "I2CP reconnection successful");
                 return;
             } else {
-                if (_log.shouldLog(Log.ERROR)) _log.error("I2CP reconnection failed");
+                if (_log.shouldLog(Log.ERROR)) _log.error(getPrefix() + "I2CP reconnection failed");
             }
         }
 
         if (_log.shouldLog(Log.ERROR))
-            _log.error("Disconned from the router, and not trying to reconnect further.  I hope you're not hoping anything else will happen");
+            _log.error(getPrefix() + "Disconned from the router, and not trying to reconnect further.  I hope you're not hoping anything else will happen");
         if (_sessionListener != null) _sessionListener.disconnected(this);
 
         _closed = true;
@@ -525,19 +525,21 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
             _totalReconnectAttempts++;
         } else {
             if (_log.shouldLog(Log.CRIT))
-                _log.log(Log.CRIT, "Max number of reconnects exceeded ["
+                _log.log(Log.CRIT, getPrefix() + "Max number of reconnects exceeded ["
                                    + _totalReconnectAttempts + "], we give up!");
             return false;
         }
-        if (_log.shouldLog(Log.INFO)) _log.info("Reconnecting...");
+        if (_log.shouldLog(Log.INFO)) _log.info(getPrefix() + "Reconnecting...");
         for (int i = 0; i < MAX_RECONNECT_ATTEMPTS; i++) {
             try {
                 connect();
                 return true;
             } catch (I2PSessionException ise) {
-                if (_log.shouldLog(Log.ERROR)) _log.error("Error reconnecting on attempt " + i, ise);
+                if (_log.shouldLog(Log.ERROR)) _log.error(getPrefix() + "Error reconnecting on attempt " + i, ise);
             }
         }
         return false;
     }
+    
+    protected String getPrefix() { return "[" + (_sessionId == null ? -1 : _sessionId.getSessionId()) + "]: "; }
 }

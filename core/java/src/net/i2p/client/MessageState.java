@@ -20,6 +20,7 @@ import net.i2p.util.Log;
 class MessageState {
     private final static Log _log = new Log(MessageState.class);
     private long _nonce;
+    private String _prefix;
     private MessageId _id;
     private Set _receivedStatus;
     private SessionKey _key;
@@ -30,8 +31,9 @@ class MessageState {
     private long _created;
     private Object _lock = new Object();
 
-    public MessageState(long nonce) {
+    public MessageState(long nonce, String prefix) {
         _nonce = nonce;
+        _prefix = prefix;
         _id = null;
         _receivedStatus = new HashSet();
         _cancelled = false;
@@ -64,7 +66,8 @@ class MessageState {
     }
 
     public void setKey(SessionKey key) {
-        if (_log.shouldLog(Log.DEBUG)) _log.debug("Setting key [" + _key + "] to [" + key + "]");
+        if (_log.shouldLog(Log.DEBUG)) 
+            _log.debug(_prefix + "Setting key [" + _key + "] to [" + key + "]");
         _key = key;
     }
 
@@ -105,11 +108,13 @@ class MessageState {
             if (_cancelled) return;
             long timeToWait = expiration - Clock.getInstance().now();
             if (timeToWait <= 0) {
-                if (_log.shouldLog(Log.WARN)) _log.warn("Expired waiting for the status [" + status + "]");
+                if (_log.shouldLog(Log.WARN)) 
+                    _log.warn(_prefix + "Expired waiting for the status [" + status + "]");
                 return;
             }
             if (isSuccess(status) || isFailure(status)) {
-                if (_log.shouldLog(Log.DEBUG)) _log.debug("Received a confirm (one way or the other)");
+                if (_log.shouldLog(Log.DEBUG)) 
+                    _log.debug(_prefix + "Received a confirm (one way or the other)");
                 return;
             }
             if (timeToWait > 5000) {
@@ -133,21 +138,22 @@ class MessageState {
 
         boolean rv = false;
 
-        if (_log.shouldLog(Log.DEBUG)) _log.debug("isSuccess(" + wantedStatus + "): " + received);
+        if (_log.shouldLog(Log.DEBUG)) 
+            _log.debug(_prefix + "isSuccess(" + wantedStatus + "): " + received);
         for (Iterator iter = received.iterator(); iter.hasNext();) {
             Integer val = (Integer) iter.next();
             int recv = val.intValue();
             switch (recv) {
             case MessageStatusMessage.STATUS_SEND_BEST_EFFORT_FAILURE:
                 if (_log.shouldLog(Log.WARN))
-                                             _log.warn("Received best effort failure after " + getElapsed() + " from "
-                                                       + this.toString());
+                     _log.warn(_prefix + "Received best effort failure after " + getElapsed() + " from "
+                               + toString());
                 rv = false;
                 break;
             case MessageStatusMessage.STATUS_SEND_GUARANTEED_FAILURE:
                 if (_log.shouldLog(Log.WARN))
-                                             _log.warn("Received guaranteed failure after " + getElapsed() + " from "
-                                                       + this.toString());
+                     _log.warn(_prefix + "Received guaranteed failure after " + getElapsed() + " from "
+                               + toString());
                 rv = false;
                 break;
             case MessageStatusMessage.STATUS_SEND_ACCEPTED:
@@ -155,35 +161,36 @@ class MessageState {
                     return true; // if we're only looking for accepted, take it directly (don't let any GUARANTEED_* override it)
                 } else {
                     if (_log.shouldLog(Log.DEBUG))
-                                                  _log.debug("Got accepted, but we're waiting for more from "
-                                                             + this.toString());
+                        _log.debug(_prefix + "Got accepted, but we're waiting for more from "
+                                   + toString());
                     continue;
                     // ignore accepted, as we want something better
                 }
             case MessageStatusMessage.STATUS_SEND_BEST_EFFORT_SUCCESS:
                 if (_log.shouldLog(Log.DEBUG))
-                                              _log.debug("Received best effort success after " + getElapsed()
-                                                         + " from " + this.toString());
+                    _log.debug(_prefix + "Received best effort success after " + getElapsed()
+                               + " from " + toString());
                 if (wantedStatus == recv) {
                     rv = true;
                 } else {
                     if (_log.shouldLog(Log.DEBUG))
-                                                  _log.debug("Not guaranteed success, but best effort after "
-                                                             + getElapsed() + " will do... from " + this.toString());
+                        _log.debug(_prefix + "Not guaranteed success, but best effort after "
+                                   + getElapsed() + " will do... from " + toString());
                     rv = true;
                 }
                 break;
             case MessageStatusMessage.STATUS_SEND_GUARANTEED_SUCCESS:
                 if (_log.shouldLog(Log.DEBUG))
-                                              _log.debug("Received guaranteed success after " + getElapsed() + " from "
-                                                         + this.toString());
+                    _log.debug(_prefix + "Received guaranteed success after " + getElapsed() + " from "
+                               + toString());
                 // even if we're waiting for best effort success, guaranteed is good enough
                 rv = true;
                 break;
             case -1:
                 continue;
             default:
-                if (_log.shouldLog(Log.DEBUG)) _log.debug("Received something else [" + recv + "]...");
+                if (_log.shouldLog(Log.DEBUG)) 
+                    _log.debug(_prefix + "Received something else [" + recv + "]...");
             }
         }
         return rv;
@@ -197,21 +204,22 @@ class MessageState {
         }
         boolean rv = false;
 
-        if (_log.shouldLog(Log.DEBUG)) _log.debug("isFailure(" + wantedStatus + "): " + received);
+        if (_log.shouldLog(Log.DEBUG)) 
+            _log.debug(_prefix + "isFailure(" + wantedStatus + "): " + received);
         for (Iterator iter = received.iterator(); iter.hasNext();) {
             Integer val = (Integer) iter.next();
             int recv = val.intValue();
             switch (recv) {
             case MessageStatusMessage.STATUS_SEND_BEST_EFFORT_FAILURE:
                 if (_log.shouldLog(Log.DEBUG))
-                                              _log.warn("Received best effort failure after " + getElapsed() + " from "
-                                                        + this.toString());
+                    _log.warn(_prefix + "Received best effort failure after " + getElapsed() + " from "
+                              + toString());
                 rv = true;
                 break;
             case MessageStatusMessage.STATUS_SEND_GUARANTEED_FAILURE:
                 if (_log.shouldLog(Log.DEBUG))
-                                              _log.warn("Received guaranteed failure after " + getElapsed() + " from "
-                                                        + this.toString());
+                    _log.warn(_prefix + "Received guaranteed failure after " + getElapsed() + " from "
+                              + toString());
                 rv = true;
                 break;
             case MessageStatusMessage.STATUS_SEND_ACCEPTED:
@@ -219,36 +227,37 @@ class MessageState {
                     rv = false;
                 } else {
                     if (_log.shouldLog(Log.DEBUG))
-                                                  _log.debug("Got accepted, but we're waiting for more from "
-                                                             + this.toString());
+                        _log.debug(_prefix + "Got accepted, but we're waiting for more from "
+                                   + toString());
                     continue;
                     // ignore accepted, as we want something better
                 }
                 break;
             case MessageStatusMessage.STATUS_SEND_BEST_EFFORT_SUCCESS:
                 if (_log.shouldLog(Log.DEBUG))
-                                              _log.debug("Received best effort success after " + getElapsed()
-                                                         + " from " + this.toString());
+                    _log.debug(_prefix + "Received best effort success after " + getElapsed()
+                               + " from " + toString());
                 if (wantedStatus == recv) {
                     rv = false;
                 } else {
                     if (_log.shouldLog(Log.DEBUG))
-                                                  _log.debug("Not guaranteed success, but best effort after "
-                                                             + getElapsed() + " will do... from " + this.toString());
+                        _log.debug(_prefix + "Not guaranteed success, but best effort after "
+                                   + getElapsed() + " will do... from " + toString());
                     rv = false;
                 }
                 break;
             case MessageStatusMessage.STATUS_SEND_GUARANTEED_SUCCESS:
                 if (_log.shouldLog(Log.DEBUG))
-                                              _log.debug("Received guaranteed success after " + getElapsed() + " from "
-                                                         + this.toString());
+                    _log.debug(_prefix + "Received guaranteed success after " + getElapsed() + " from "
+                               + toString());
                 // even if we're waiting for best effort success, guaranteed is good enough
                 rv = false;
                 break;
             case -1:
                 continue;
             default:
-                if (_log.shouldLog(Log.DEBUG)) _log.debug("Received something else [" + recv + "]...");
+                if (_log.shouldLog(Log.DEBUG)) 
+                    _log.debug(_prefix + "Received something else [" + recv + "]...");
             }
         }
         return rv;
