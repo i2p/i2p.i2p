@@ -225,8 +225,8 @@ public class SAMv1Handler extends SAMHandler implements SAMRawReceiver, SAMDatag
                 } else if (style.equals("STREAM")) {
                     String dir = props.getProperty("DIRECTION");
                     if (dir == null) {
-                        _log.debug("No DIRECTION parameter in STREAM session");
-                        return false;
+                        _log.debug("No DIRECTION parameter in STREAM session, defaulting to BOTH");
+                        dir = "BOTH";
                     }
                     if (!dir.equals("CREATE") && !dir.equals("RECEIVE")
                         && !dir.equals("BOTH")) {
