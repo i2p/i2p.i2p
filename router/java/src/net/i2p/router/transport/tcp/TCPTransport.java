@@ -524,7 +524,7 @@ public class TCPTransport extends TransportImpl {
         String port = _context.getProperty(LISTEN_PORT, DEFAULT_LISTEN_PORT+"");
         if (port != null) {
             try {
-                int portNum = Integer.parseInt(port);
+                int portNum = Integer.parseInt(port.trim());
                 if ( (portNum >= 1) && (portNum < 65535) ) 
                     return portNum;
             } catch (NumberFormatException nfe) {

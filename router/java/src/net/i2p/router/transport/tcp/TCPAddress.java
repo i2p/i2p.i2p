@@ -64,25 +64,30 @@ public class TCPAddress {
             return;
         }
         String host = addr.getOptions().getProperty(PROP_HOST);
-        try {
-            InetAddress iaddr = InetAddress.getByName(host);
-            _host = iaddr.getHostAddress();
-            _addr = iaddr;
-            
-            String port = addr.getOptions().getProperty(PROP_PORT);
-            if ( (port != null) && (port.trim().length() > 0) ) {
-                try {
-                    _port = Integer.parseInt(port);
-                } catch (NumberFormatException nfe) {
-                    _log.error("Invalid port [" + port + "]", nfe);
-                    _port = -1;
-                }
-            } else {
-                _port = -1;
-            }
-        } catch (UnknownHostException uhe) {
+        if (host == null) {
             _host = null;
             _port = -1;
+        } else { 
+            try {
+                InetAddress iaddr = InetAddress.getByName(host.trim());
+                _host = iaddr.getHostAddress();
+                _addr = iaddr;
+
+                String port = addr.getOptions().getProperty(PROP_PORT);
+                if ( (port != null) && (port.trim().length() > 0) ) {
+                    try {
+                        _port = Integer.parseInt(port.trim());
+                    } catch (NumberFormatException nfe) {
+                        _log.error("Invalid port [" + port + "]", nfe);
+                        _port = -1;
+                    }
+                } else {
+                    _port = -1;
+                }
+            } catch (UnknownHostException uhe) {
+                _host = null;
+                _port = -1;
+            }
         }
     }
     
@@ -146,21 +151,20 @@ public class TCPAddress {
         if (_addr != null) 
             rv += _addr.getHostAddress().hashCode();
         else
-            if (_host != null) rv += _host.hashCode();
+            if (_host != null) rv += _host.trim().hashCode();
         return rv;
     }
     
     public boolean equals(Object val) {
         if ( (val != null) && (val instanceof TCPAddress) ) {
             TCPAddress addr = (TCPAddress)val;
-            if ( (_addr != null) && (_addr.getHostAddress() != null) 
-                 && (addr.getAddress() != null) && (addr.getAddress().getHostAddress() != null) ) {
-                return DataHelper.eq(getAddress().getHostAddress(), addr.getAddress().getHostAddress())
-                       && (getPort() == addr.getPort());
-            } else {
-                return DataHelper.eq(getHost(), addr.getHost())
-                       && (getPort() == addr.getPort());
-            }
+            String hostname = null;
+            if (addr.getHost() != null)
+                hostname = addr.getHost().trim();
+            String ourHost = getHost();
+            if (ourHost != null)
+                ourHost = ourHost.trim();
+            return DataHelper.eq(hostname, ourHost) && getPort() == addr.getPort();
         } 
         return false;
     }

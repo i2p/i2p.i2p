@@ -1,4 +1,7 @@
-$Id: history.txt,v 1.51 2004/10/16 22:58:09 jrandom Exp $
+$Id: history.txt,v 1.52 2004/10/16 23:00:21 jrandom Exp $
+
+2004-10-17  jrandom
+    * Don't b0rk on whitespace in the router address.
 
 2004-10-16  jrandom
     * More aggressively reduce the capacity of peers if their tunnels are
