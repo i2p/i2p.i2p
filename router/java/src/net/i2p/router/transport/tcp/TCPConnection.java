@@ -43,6 +43,7 @@ public class TCPConnection {
     private boolean _closed;
     private long _lastRead;
     private long _lastWrite;
+    private long _offsetReceived;
     
     public TCPConnection(RouterContext ctx) {
         _context = ctx;
@@ -59,6 +60,7 @@ public class TCPConnection {
         _closed = false;
         _lastRead = 0;
         _lastWrite = 0;
+        _offsetReceived = 0;
         _runner = new ConnectionRunner(_context, this);
         _context.statManager().createRateStat("tcp.probabalisticDropQueueSize", "How many bytes were queued to be sent when a message as dropped probabalistically?", "TCP", new long[] { 60*1000l, 10*60*1000l, 60*60*1000l, 24*60*60*1000l } );
         _context.statManager().createRateStat("tcp.queueSize", "How many bytes were queued on a connection?", "TCP", new long[] { 60*1000l, 10*60*1000l, 60*60*1000l, 24*60*60*1000l } );
@@ -81,6 +83,9 @@ public class TCPConnection {
     public void setShownAddress(String ip) { _shownAddress = ip; }
     /** What address the peer said we are reachable on */
     public String getShownAddress() { return _shownAddress; } 
+    /** skew that the other peer has from our clock */
+    public long getOffsetReceived() { return _offsetReceived; }
+    public void setOffsetReceived(long ms) { _offsetReceived = ms; }
     
     /** 
      * Actually start processing the messages on the connection (and reading

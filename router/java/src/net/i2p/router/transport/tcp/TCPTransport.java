@@ -770,6 +770,7 @@ public class TCPTransport extends TransportImpl {
     public String renderStatusHTML() { 
         StringBuffer buf = new StringBuffer(1024);
         synchronized (_connectionLock) {
+            long offsetTotal = 0;
             buf.append("<b>Connections (").append(_connectionsByIdent.size()).append("):</b><ul>\n");
             for (Iterator iter = _connectionsByIdent.values().iterator(); iter.hasNext(); ) {
                 TCPConnection con = (TCPConnection)iter.next();
@@ -782,9 +783,17 @@ public class TCPTransport extends TransportImpl {
                     buf.append(bps).append("Bps");
                 else 
                     buf.append((int)(bps/1024)).append("KBps");
+                buf.append(" with a ").append(con.getOffsetReceived()).append("ms clock offset");
                 buf.append("</li>\n");
+                offsetTotal += con.getOffsetReceived();
             }
             buf.append("</ul>\n");
+            
+            buf.append("<b>Average clock skew: ");
+            if (_connectionsByIdent.size() > 0)
+                buf.append(offsetTotal / _connectionsByIdent.size()).append("ms</b><br />\n");
+            else
+                buf.append("n/a</b><br />\n");
             
             buf.append("<b>Connections being built:</b><ul>\n");
             for (Iterator iter = _pendingConnectionsByIdent.iterator(); iter.hasNext(); ) {

@@ -1,4 +1,6 @@
-$Id: history.txt,v 1.109 2004/12/16 00:42:04 jrandom Exp $
+$Id: history.txt,v 1.110 2004/12/16 05:21:24 jrandom Exp $
+
+* 2004-12-18  0.4.2.4 released
 
 2004-12-16  jrandom
     * Catch another oddball case for a reset connection in the streaming lib.

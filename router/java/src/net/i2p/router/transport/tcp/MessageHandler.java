@@ -69,6 +69,7 @@ public class MessageHandler implements I2NPMessageReader.I2NPMessageEventListene
                 _log.log(level, "Peer " + _identHash.toBase64().substring(0,6) + " is only skewed by (" 
                                 + DataHelper.formatDuration(delta) + ") after uptime of " 
                                 + DataHelper.formatDuration(_con.getLifetime()) );
+            _con.setOffsetReceived(delta);
         }   
     }
     
