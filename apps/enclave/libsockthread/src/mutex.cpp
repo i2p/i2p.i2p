@@ -43,7 +43,7 @@ Mutex::Mutex(void)
 	assert(mutex != NULL);
 #else
 	int rc = pthread_mutex_init(&mutex, NULL);
-	assert(!rc);
+	assert(rc == 0);
 #endif
 }
 
@@ -54,10 +54,10 @@ Mutex::~Mutex(void)
 {
 #ifdef WINTHREAD
 	BOOL rc = CloseHandle(mutex);
-	assert(!rc);
+	assert(rc);
 #else
 	int rc = pthread_mutex_destroy(&mutex);
-	assert(!rc);
+	assert(rc == 0);
 #endif
 }
 
@@ -71,7 +71,7 @@ void Mutex::lock(void)
 	assert(rc != WAIT_FAILED);
 #else
 	int rc = pthread_mutex_lock(&mutex);
-	assert(!rc);
+	assert(rc == 0);
 #endif
 }
 
@@ -82,9 +82,9 @@ void Mutex::unlock(void)
 {
 #ifdef WINTHREAD
 	BOOL rc = ReleaseMutex(mutex);
-	assert(!rc);
+	assert(rc);
 #else
 	int rc = pthread_mutex_unlock(&mutex);
-	assert(!rc);
+	assert(rc == 0);
 #endif
 }

@@ -75,10 +75,10 @@ void Thread::kill(void)
 #endif
 #ifdef WINTHREAD
 	BOOL rc = TerminateThread(handle, 0);
-	assert(!rc);
+	assert(rc);
 #else
 	int rc = pthread_cancel(id);
-	assert(!rc);
+	assert(rc == 0);
 #endif
 	running = false;
 	running_m.unlock();
@@ -101,7 +101,7 @@ void Thread::start(void)
 	assert(handle != NULL);
 #else
 	int rc = pthread_create(&id, NULL, &the_thread, this);
-	assert(!rc);
+	assert(rc == 0);
 #endif
 	// Wait until `running' is set
 	running_m.lock();
