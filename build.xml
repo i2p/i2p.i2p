@@ -219,8 +219,16 @@
         <copy file="build/i2ptunnel.war" todir="pkg-temp/webapps/" />
         <copy file="build/routerconsole.war" todir="pkg-temp/webapps/" />
         <copy file="hosts.txt" todir="pkg-temp/" />
-        <copy file="installer/resources/i2ptunnel.config" todir="pkg-temp/" />
         <copy file="installer/resources/clients.config" todir="pkg-temp/" />
+        <copy file="installer/resources/i2prouter" todir="pkg-temp/" />
+        <copy file="installer/resources/i2prouter.bat" todir="pkg-temp/" />
+        <copy file="installer/resources/i2ptunnel.config" todir="pkg-temp/" />
+        <copy file="installer/resources/install_i2p_service_unix" todir="pkg-temp/" />
+        <copy file="installer/resources/install_i2p_service_winnt.bat" todir="pkg-temp/" />
+        <copy file="installer/resources/systray.config" todir="pkg-temp/" />
+        <copy file="installer/resources/uninstall_i2p_service_unix" todir="pkg-temp/" />
+        <copy file="installer/resources/uninstall_i2p_service_winnt.bat" todir="pkg-temp/" />
+        <copy file="installer/resources/wrapper.conf" todir="pkg-temp/" />
         <copy file="readme.txt" todir="pkg-temp/" />
     </target>
     <target name="tarball" depends="preppkg">
