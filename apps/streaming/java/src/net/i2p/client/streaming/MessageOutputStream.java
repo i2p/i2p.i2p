@@ -143,13 +143,21 @@ public class MessageOutputStream extends OutputStream {
         public void enqueue() {
             // no need to be overly worried about duplicates - it would just 
             // push it further out
-            if (!_enqueued)
+            if (!_enqueued) {
                 SimpleTimer.getInstance().addEvent(_flusher, _passiveFlushDelay);
+                if (_log.shouldLog(Log.DEBUG))
+                    _log.debug("Enqueueing the flusher for " + _passiveFlushDelay + "ms out");
+            } else {
+                if (_log.shouldLog(Log.DEBUG))
+                    _log.debug("NOT enqueing the flusher");
+            }
             _enqueued = true;
         }
         public void timeReached() {
             _enqueued = false;
             long timeLeft = (_lastBuffered + _passiveFlushDelay - _context.clock().now());
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("flusher time reached: left = " + timeLeft);
             if (timeLeft > 0)
                 enqueue();
             else
@@ -160,7 +168,10 @@ public class MessageOutputStream extends OutputStream {
             boolean sent = false;
             WriteStatus ws = null;
             synchronized (_dataLock) {
-                if ( (_valid > 0) && (_lastBuffered + _passiveFlushDelay > _context.clock().now()) ) {
+                long flushTime = _lastBuffered + _passiveFlushDelay;
+                if ( (_valid > 0) && (flushTime < _context.clock().now()) ) {
+                    if (_log.shouldLog(Log.DEBUG))
+                        _log.debug("doFlush() valid = " + _valid);
                     if ( (_buf != null) && (_dataReceiver != null) ) {
                         ws = _dataReceiver.writeData(_buf, 0, _valid);
                         _written += _valid;
@@ -169,6 +180,9 @@ public class MessageOutputStream extends OutputStream {
                         _dataLock.notifyAll();
                         sent = true;
                     }
+                } else {
+                    if (_log.shouldLog(Log.DEBUG))
+                        _log.debug("doFlush() rejected... valid = " + _valid);
                 }
             }
             // ignore the ws

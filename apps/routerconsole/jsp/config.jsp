@@ -66,9 +66,9 @@
  I2P will attempt to guess your IP address by having whomever it talks to tell it what 
  address they think you are.  If and only if you have no working TCP connections and you
  have not overridden the IP address, your router will believe them.  If that doesn't sound
- ok to you, thats fine - go to the <a href="/configadvanced.jsp">advanced config</a> page
+ ok to you, thats fine - go to the <a href="configadvanced.jsp">advanced config</a> page
  and add "i2np.tcp.hostname=yourHostname", then go to the 
- <a href="/configservice.jsp">service</a> page and do a graceful restart.  We used to make
+ <a href="configservice.jsp">service</a> page and do a graceful restart.  We used to make
  people enter a hostname/IP address on this page, but too many people got it wrong ;)</p>
  
  <p>The other advanced network option has to do with reseeding - you should never need to 

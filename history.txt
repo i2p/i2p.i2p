@@ -1,4 +1,9 @@
-$Id: history.txt,v 1.93 2004/12/01 22:20:04 jrandom Exp $
+$Id: history.txt,v 1.94 2004/12/04 18:40:53 jrandom Exp $
+
+2004-12-05  jrandom
+    * Fixed some links in the console (thanks ugha!) and the javadoc 
+      (thanks dinoman!)
+    * Fix the stream's passive flush timer (oh, its supposed to work?)
 
 2004-12-03  jrandom
     * Toss in a small pool of threads (3) to execute the events queued up with

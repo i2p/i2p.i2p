@@ -150,7 +150,7 @@ public class TestStreamTransfer {
                     _log.error("Incorrect size read - expected " + payloadSize + " got " + read);
                     return;
                 }
-                _log.info("Received from the stream " + id + ": [" + new String(payload) + "]");
+                _log.info("\n== Received from the stream " + id + ": [" + new String(payload) + "]");
                 try { Thread.sleep(5*1000); } catch (InterruptedException ie) {}
                 /*
                 // now echo it back
@@ -217,7 +217,12 @@ public class TestStreamTransfer {
             }
             try { Thread.sleep(5*1000) ; } catch (InterruptedException ie) {}
             req = "STREAM SEND ID=42 SIZE=10\nBlahBlah!!";
-            _log.info("Sending data");
+            _log.info("\n** Sending BlahBlah!!");
+            out.write(req.getBytes());
+            out.flush();
+            try { Thread.sleep(5*1000) ; } catch (InterruptedException ie) {}
+            req = "STREAM SEND ID=42 SIZE=10\nFooBarBaz!";
+            _log.info("\n** Sending FooBarBaz!");
             out.write(req.getBytes());
             out.flush();
             try { Thread.sleep(20*1000); } catch (InterruptedException ie) {}
