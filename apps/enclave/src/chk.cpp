@@ -29,15 +29,28 @@
  */
 
 #include "platform.hpp"
-#include "logger.hpp"
+#include "chk.hpp"
 
-Logger::Logger(const string& file)
-	: file(file)
+Chk::Chk(const uchar_t* plaintext, size_t size, const string& mime_type)
+	: data_size(size), mime_type(mime_type)
 {
-	loglevel = priority = debug;
-	logf.open(file.c_str(), ios::app);
-	if (!logf) {
-		cerr << "Error opening log file (" << file.c_str() << ")\n";
-		throw runtime_error("Error opening log file");
-	}
+	encrypt(plaintext);
+}
+
+void Chk::encrypt(const uchar_t *pt)
+{
+	int rc = register_cipher(&twofish_desc);
+	assert(rc != -1);
+
+	uchar_t key[CRYPT_KEY_SIZE], iv[CRYPT_BLOCK_SIZE];
+	prng.get_bytes(key, CRYPT_KEY_SIZE);
+	prng.get_bytes(iv, CRYPT_BLOCK_SIZE);	
+
+	symmetric_CTR ctr;
+	rc = ctr_start(find_cipher("twofish"), iv, key, CRYPT_KEY_SIZE, 0, &ctr);
+	assert(rc == CRYPT_OK);
+
+	ct = new uchar_t[data_size];
+	rc = ctr_encrypt(pt, ct, data_size, &ctr);
+	assert(rc == CRYPT_OK);
 }

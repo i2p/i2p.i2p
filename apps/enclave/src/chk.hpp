@@ -28,16 +28,24 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "platform.hpp"
-#include "logger.hpp"
+#ifndef CHK_HPP
+#define CHK_HPP
 
-Logger::Logger(const string& file)
-	: file(file)
-{
-	loglevel = priority = debug;
-	logf.open(file.c_str(), ios::app);
-	if (!logf) {
-		cerr << "Error opening log file (" << file.c_str() << ")\n";
-		throw runtime_error("Error opening log file");
-	}
-}
+class Chk {
+	public:
+		//Chk(const uchar_t* cypertext, size_t size);
+		Chk(const uchar_t* plaintext, size_t size, const string& mime_type);
+		~Chk(void) { delete ct; }
+
+	private:
+		static const size_t CRYPT_BLOCK_SIZE = 16;
+		static const size_t CRYPT_KEY_SIZE = 32;
+
+		void encrypt(const uchar_t *pt);
+
+		uchar_t* ct;  // cyphertext
+		const size_t data_size;
+		const string& mime_type;  // I hate mimes.
+};
+
+#endif  // CHK_HPP
