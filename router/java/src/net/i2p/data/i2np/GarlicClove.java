@@ -34,24 +34,7 @@ public class GarlicClove extends DataStructureImpl {
     private long _cloveId;
     private Date _expiration;
     private Certificate _certificate;
-    private int _replyAction;
-    private SourceRouteBlock _sourceRouteBlock;
     private I2NPMessageHandler _handler;
-    
-    /** No action requested with the source route block */
-    public final static int ACTION_NONE = 0;
-    /**
-     * A DeliveryStatusMessage is requested with the source route block using
-     * the cloveId as the id received
-     *
-     */
-    public final static int ACTION_STATUS = 1;
-    /**
-     * No DeliveryStatusMessage is requested, but the source route block is
-     * included for message specific replies
-     *
-     */
-    public final static int ACTION_MESSAGE_SPECIFIC = 2;
     
     public GarlicClove(RouterContext context) {
         _context = context;
@@ -62,8 +45,6 @@ public class GarlicClove extends DataStructureImpl {
         setCloveId(-1);
         setExpiration(null);
         setCertificate(null);
-        setSourceRouteBlockAction(ACTION_NONE);
-        setSourceRouteBlock(null);
     }
     
     public DeliveryInstructions getInstructions() { return _instructions; }
@@ -76,10 +57,6 @@ public class GarlicClove extends DataStructureImpl {
     public void setExpiration(Date exp) { _expiration = exp; }
     public Certificate getCertificate() { return _certificate; }
     public void setCertificate(Certificate cert) { _certificate = cert; }
-    public int getSourceRouteBlockAction() { return _replyAction; }
-    public void setSourceRouteBlockAction(int action) { _replyAction = action; }
-    public SourceRouteBlock getSourceRouteBlock() { return _sourceRouteBlock; }
-    public void setSourceRouteBlock(SourceRouteBlock block) { _sourceRouteBlock = block; }
     
     public void readBytes(InputStream in) throws DataFormatException, IOException {
         _instructions = new DeliveryInstructions();
@@ -99,12 +76,6 @@ public class GarlicClove extends DataStructureImpl {
         _certificate.readBytes(in);
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Read cert: " + _certificate);
-        int replyStyle = (int)DataHelper.readLong(in, 1);
-        setSourceRouteBlockAction(replyStyle);
-        if (replyStyle != ACTION_NONE) {
-            _sourceRouteBlock = new SourceRouteBlock();
-            _sourceRouteBlock.readBytes(in);
-        }
     }
     
     public void writeBytes(OutputStream out) throws DataFormatException, IOException {
@@ -119,28 +90,23 @@ public class GarlicClove extends DataStructureImpl {
             error.append("Expiration is null ");
         if (_certificate == null)
             error.append("Certificate is null ");
-        if (_replyAction < 0)
-            error.append("Reply action is < 0 [").append(_replyAction).append("] ");;
-            if (error.length() > 0)
-                throw new DataFormatException(error.toString());
-            if ( (_replyAction != 0) && (_sourceRouteBlock == null) )
-                throw new DataFormatException("Source route block must be specified for non-null action");
-            _instructions.writeBytes(out);
-            
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Wrote instructions: " + _instructions);
-            _msg.writeBytes(out);
-            DataHelper.writeLong(out, 4, _cloveId);
-            DataHelper.writeDate(out, _expiration);
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("CloveID written: " + _cloveId + " expiration written: " 
-                           + _expiration);
-            _certificate.writeBytes(out);
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Written cert: " + _certificate);
-            DataHelper.writeLong(out, 1, _replyAction);
-            if ( (_replyAction != 0) && (_sourceRouteBlock != null) )
-                _sourceRouteBlock.writeBytes(out);
+        
+        if (error.length() > 0)
+            throw new DataFormatException(error.toString());
+
+        _instructions.writeBytes(out);
+
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("Wrote instructions: " + _instructions);
+        _msg.writeBytes(out);
+        DataHelper.writeLong(out, 4, _cloveId);
+        DataHelper.writeDate(out, _expiration);
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("CloveID written: " + _cloveId + " expiration written: " 
+                       + _expiration);
+        _certificate.writeBytes(out);
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("Written cert: " + _certificate);
     }
     
     public boolean equals(Object obj) {
@@ -148,22 +114,18 @@ public class GarlicClove extends DataStructureImpl {
             return false;
         GarlicClove clove = (GarlicClove)obj;
         return DataHelper.eq(getCertificate(), clove.getCertificate()) &&
-        DataHelper.eq(getCloveId(), clove.getCloveId()) &&
-        DataHelper.eq(getData(), clove.getData()) &&
-        DataHelper.eq(getExpiration(), clove.getExpiration()) &&
-        DataHelper.eq(getInstructions(),  clove.getInstructions()) &&
-        DataHelper.eq(getSourceRouteBlock(), clove.getSourceRouteBlock()) &&
-        (getSourceRouteBlockAction() == clove.getSourceRouteBlockAction());
+               DataHelper.eq(getCloveId(), clove.getCloveId()) &&
+               DataHelper.eq(getData(), clove.getData()) &&
+               DataHelper.eq(getExpiration(), clove.getExpiration()) &&
+               DataHelper.eq(getInstructions(),  clove.getInstructions());
     }
     
     public int hashCode() {
         return DataHelper.hashCode(getCertificate()) +
-        (int)getCloveId() +
-        DataHelper.hashCode(getData()) +
-        DataHelper.hashCode(getExpiration()) +
-        DataHelper.hashCode(getInstructions()) +
-        DataHelper.hashCode(getSourceRouteBlock()) +
-        getSourceRouteBlockAction();
+               (int)getCloveId() +
+               DataHelper.hashCode(getData()) +
+               DataHelper.hashCode(getExpiration()) +
+               DataHelper.hashCode(getInstructions());
     }
     
     public String toString() {
@@ -173,8 +135,6 @@ public class GarlicClove extends DataStructureImpl {
         buf.append("\n\tCertificate: ").append(getCertificate());
         buf.append("\n\tClove ID: ").append(getCloveId());
         buf.append("\n\tExpiration: ").append(getExpiration());
-        buf.append("\n\tSource route style: ").append(getSourceRouteBlockAction());
-        buf.append("\n\tSource route block: ").append(getSourceRouteBlock());
         buf.append("\n\tData: ").append(getData());
         buf.append("]");
         return buf.toString();

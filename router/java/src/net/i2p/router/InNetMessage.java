@@ -11,7 +11,6 @@ package net.i2p.router;
 import net.i2p.data.Hash;
 import net.i2p.data.RouterIdentity;
 import net.i2p.data.i2np.I2NPMessage;
-import net.i2p.data.i2np.SourceRouteBlock;
 
 /**
  * Wrap an I2NP message received from the network prior to handling and processing.
@@ -22,7 +21,6 @@ public class InNetMessage {
     private I2NPMessage _message;
     private RouterIdentity _fromRouter;
     private Hash _fromRouterHash;
-    private SourceRouteBlock _replyBlock;
     private long _created;
     
     public InNetMessage(RouterContext context) {
@@ -30,7 +28,6 @@ public class InNetMessage {
         setMessage(null);
         setFromRouter(null);
         setFromRouterHash(null);
-        setReplyBlock(null);
         context.messageStateMonitor().inboundMessageAdded();
         _created = context.clock().now();
         _context.statManager().createRateStat("inNetMessage.timeToDiscard", 
@@ -58,15 +55,6 @@ public class InNetMessage {
      */
     public RouterIdentity getFromRouter() { return _fromRouter; }
     public void setFromRouter(RouterIdentity router) { _fromRouter = router; }
-    
-    /**
-     * Retrieve any source route block supplied with this message for replies
-     *
-     * @return source route block, or null if it was not supplied /or/ if it was already
-     *         used in an ack
-     */
-    public SourceRouteBlock getReplyBlock() { return _replyBlock; }
-    public void setReplyBlock(SourceRouteBlock block) { _replyBlock = block; }
     
     /**
      * Call this after we're done dealing with this message (when we no

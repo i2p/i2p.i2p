@@ -28,10 +28,8 @@ import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
 import net.i2p.data.RouterInfo;
 import net.i2p.data.i2np.GarlicMessage;
-import net.i2p.data.i2np.SourceRouteReplyMessage;
 import net.i2p.data.i2np.TunnelMessage;
 import net.i2p.router.message.GarlicMessageHandler;
-import net.i2p.router.message.SourceRouteReplyMessageHandler;
 import net.i2p.router.message.TunnelMessageHandler;
 import net.i2p.router.startup.StartupJob;
 import net.i2p.stat.Rate;
@@ -218,7 +216,6 @@ public class Router {
     private void setupHandlers() {
         _context.inNetMessagePool().registerHandlerJobBuilder(GarlicMessage.MESSAGE_TYPE, new GarlicMessageHandler(_context));
         _context.inNetMessagePool().registerHandlerJobBuilder(TunnelMessage.MESSAGE_TYPE, new TunnelMessageHandler(_context));
-        _context.inNetMessagePool().registerHandlerJobBuilder(SourceRouteReplyMessage.MESSAGE_TYPE, new SourceRouteReplyMessageHandler(_context));
     }
     
     public void renderStatusHTML(OutputStream out) throws IOException {

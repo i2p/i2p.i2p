@@ -128,11 +128,10 @@ public class MessageHistory {
      * @param outTunnel tunnel we are sending this request out
      * @param peerRequested peer asked to participate in the tunnel
      * @param nextPeer who peerRequested should forward messages to (or null if it is the endpoint)
-     * @param sourceRoutePeer to whom peerRequested should forward its TunnelCreateStatusMessage through
      * @param replyTunnel the tunnel sourceRoutePeer should forward the source routed message to
      * @param replyThrough the gateway of the tunnel that the sourceRoutePeer will be sending to
      */
-    public void requestTunnelCreate(TunnelId createTunnel, TunnelId outTunnel, Hash peerRequested, Hash nextPeer, Hash sourceRoutePeer, TunnelId replyTunnel, Hash replyThrough) {
+    public void requestTunnelCreate(TunnelId createTunnel, TunnelId outTunnel, Hash peerRequested, Hash nextPeer, TunnelId replyTunnel, Hash replyThrough) {
         if (!_doLog) return;
         StringBuffer buf = new StringBuffer(128);
         buf.append(getPrefix());
@@ -142,8 +141,6 @@ public class MessageHistory {
             buf.append("(next [").append(getName(nextPeer)).append("]) ");
         if (outTunnel != null)
             buf.append("via [").append(outTunnel.getTunnelId()).append("] ");
-        if (sourceRoutePeer != null)
-            buf.append("with replies routed through [").append(getName(sourceRoutePeer)).append("] ");
         if ( (replyTunnel != null) && (replyThrough != null) ) 
             buf.append("who forwards it through [").append(replyTunnel.getTunnelId()).append("] on [").append(getName(replyThrough)).append("]");
         addEntry(buf.toString());
@@ -258,15 +255,13 @@ public class MessageHistory {
      * of a timeout or an explicit refusal).
      *
      */
-    public void tunnelRequestTimedOut(Hash peer, TunnelId tunnel, Hash replyThrough) {
+    public void tunnelRequestTimedOut(Hash peer, TunnelId tunnel) {
         if (!_doLog) return;
         if ( (tunnel == null) || (peer == null) ) return;
         StringBuffer buf = new StringBuffer(128);
         buf.append(getPrefix());
         buf.append("tunnel [").append(tunnel.getTunnelId()).append("] timed out on [");
         buf.append(getName(peer)).append("]");
-        if (replyThrough != null)
-            buf.append(" with their reply intended to come through [").append(getName(replyThrough)).append("]");
         addEntry(buf.toString());
     }
     

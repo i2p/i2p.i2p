@@ -22,7 +22,6 @@ import net.i2p.data.SessionTag;
 import net.i2p.data.i2np.GarlicClove;
 import net.i2p.data.i2np.GarlicMessage;
 import net.i2p.data.i2np.I2NPMessage;
-import net.i2p.data.i2np.SourceRouteBlock;
 import net.i2p.router.RouterContext;
 import net.i2p.util.Log;
 
@@ -36,9 +35,6 @@ public class GarlicMessageBuilder {
     }
     public static GarlicMessage buildMessage(RouterContext ctx, GarlicConfig config, SessionKey wrappedKey, Set wrappedTags) {
         Log log = ctx.logManager().getLog(GarlicMessageBuilder.class);
-        if (config == null)
-            throw new IllegalArgumentException("Null config specified");
-        
         PublicKey key = config.getRecipientPublicKey();
         if (key == null) {
             if (config.getRecipient() == null) {
@@ -50,20 +46,16 @@ public class GarlicMessageBuilder {
             } else
                 key = config.getRecipient().getIdentity().getPublicKey();
         }
-        GarlicMessage msg = new GarlicMessage(ctx);
-        
-        noteWrap(ctx, msg, config);
         
         if (log.shouldLog(Log.INFO))
             log.info("Encrypted with public key " + key + " to expire on " + new Date(config.getExpiration()));
         
-        byte cloveSet[] = buildCloveSet(ctx, config);
-        
         SessionKey curKey = ctx.sessionKeyManager().getCurrentKey(key);
         if (curKey == null)
             curKey = ctx.sessionKeyManager().createSession(key);
-        wrappedKey.setData(curKey.getData());
         
+        SessionTag curTag = ctx.sessionKeyManager().consumeNextAvailableTag(key, curKey);
+
         int availTags = ctx.sessionKeyManager().getAvailableTags(key, curKey);
         if (log.shouldLog(Log.DEBUG))
             log.debug("Available tags for encryption to " + key + ": " + availTags);
@@ -83,8 +75,34 @@ public class GarlicMessageBuilder {
             // always tack on at least one more - not necessary.
             //wrappedTags.add(new SessionTag(true));
         }
-        SessionTag curTag = ctx.sessionKeyManager().consumeNextAvailableTag(key, curKey);
-        byte encData[] = ctx.elGamalAESEngine().encrypt(cloveSet, key, curKey, wrappedTags, curTag, 256);
+        
+        wrappedKey.setData(curKey.getData());
+        
+        return buildMessage(ctx, config, wrappedKey, wrappedTags, key, curKey, curTag);
+    }
+    
+    /**
+     * @param ctx scope
+     * @param config how/what to wrap
+     * @param wrappedKey output parameter that will be filled with the sessionKey used
+     * @param wrappedTags output parameter that will be filled with the sessionTags used
+     * @param target public key of the location being garlic routed to (may be null if we 
+     *               know the encryptKey and encryptTag)
+     * @param encryptKey sessionKey used to encrypt the current message
+     * @param encryptTag sessionTag used to encrypt the current message
+     */
+    public static GarlicMessage buildMessage(RouterContext ctx, GarlicConfig config, SessionKey wrappedKey, Set wrappedTags, PublicKey target, SessionKey encryptKey, SessionTag encryptTag) {
+        Log log = ctx.logManager().getLog(GarlicMessageBuilder.class);
+        if (config == null)
+            throw new IllegalArgumentException("Null config specified");
+        
+        GarlicMessage msg = new GarlicMessage(ctx);
+        
+        noteWrap(ctx, msg, config);
+        
+        byte cloveSet[] = buildCloveSet(ctx, config);
+        
+        byte encData[] = ctx.elGamalAESEngine().encrypt(cloveSet, target, encryptKey, wrappedTags, encryptTag, 128);
         msg.setData(encData);
         Date exp = new Date(config.getExpiration());
         msg.setMessageExpiration(exp);
@@ -168,46 +186,8 @@ public class GarlicMessageBuilder {
         clove.setCloveId(config.getId());
         clove.setExpiration(new Date(config.getExpiration()));
         clove.setInstructions(config.getDeliveryInstructions());
-        specifySourceRouteBlock(ctx, clove, config);
         ByteArrayOutputStream baos = new ByteArrayOutputStream(1024);
         clove.writeBytes(baos);
         return baos.toByteArray();
-    }
-    
-    private static void specifySourceRouteBlock(RouterContext ctx, GarlicClove clove, GarlicConfig config) throws DataFormatException {
-        Log log = ctx.logManager().getLog(GarlicMessageBuilder.class);
-        boolean includeBlock = false;
-        if (config.getRequestAck()) {
-            clove.setSourceRouteBlockAction(GarlicClove.ACTION_STATUS);
-            includeBlock = true;
-        } else if (config.getReplyInstructions() != null) {
-            clove.setSourceRouteBlockAction(GarlicClove.ACTION_MESSAGE_SPECIFIC);
-            includeBlock = true;
-        } else {
-            clove.setSourceRouteBlockAction(GarlicClove.ACTION_NONE);
-        }
-        
-        if (includeBlock) {
-            log.debug("Specifying source route block");
-            
-            SessionKey replySessionKey = ctx.keyGenerator().generateSessionKey();
-            SessionTag tag = new SessionTag(true);
-            
-            // make it so we'll read the session tag correctly and use the right session key
-            HashSet tags = new HashSet(1);
-            tags.add(tag);
-            ctx.sessionKeyManager().tagsReceived(replySessionKey, tags);
-            
-            SourceRouteBlock block = new SourceRouteBlock();
-            PublicKey pk = config.getReplyThroughRouter().getIdentity().getPublicKey();
-            block.setData(ctx, config.getReplyInstructions(), config.getReplyBlockMessageId(),
-                          config.getReplyBlockCertificate(), config.getReplyBlockExpiration(), pk);
-            block.setRouter(config.getReplyThroughRouter().getIdentity().getHash());
-            block.setKey(replySessionKey);
-            block.setTag(tag);
-            clove.setSourceRouteBlock(block);
-        } else {
-            clove.setSourceRouteBlock(null);
-        }
     }
 }

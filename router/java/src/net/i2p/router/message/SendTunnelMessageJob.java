@@ -488,7 +488,6 @@ public class SendTunnelMessageJob extends JobImpl {
             msg.setFromRouter(ident);
             msg.setFromRouterHash(ident.getHash());
             msg.setMessage(_message);
-            msg.setReplyBlock(null);
             getContext().inNetMessagePool().add(msg);
         } else {
             if (_log.shouldLog(Log.DEBUG))

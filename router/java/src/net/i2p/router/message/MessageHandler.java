@@ -17,7 +17,6 @@ import net.i2p.data.TunnelId;
 import net.i2p.data.i2np.DataMessage;
 import net.i2p.data.i2np.DeliveryInstructions;
 import net.i2p.data.i2np.I2NPMessage;
-import net.i2p.data.i2np.SourceRouteBlock;
 import net.i2p.data.i2np.TunnelMessage;
 import net.i2p.router.ClientMessage;
 import net.i2p.router.InNetMessage;
@@ -41,7 +40,6 @@ class MessageHandler {
     }
 
     public void handleMessage(DeliveryInstructions instructions, I2NPMessage message, 
-                              boolean requestAck, SourceRouteBlock replyBlock, 
                               long replyId, RouterIdentity from, Hash fromHash, 
                               long expiration, int priority) {
         switch (instructions.getDeliveryMode()) {
@@ -50,7 +48,7 @@ class MessageHandler {
                 if (message.getType() == DataMessage.MESSAGE_TYPE) {
                     handleLocalDestination(instructions, message, fromHash);
                 } else {
-                    handleLocalRouter(message, from, fromHash, replyBlock, requestAck);
+                    handleLocalRouter(message, from, fromHash);
                 }
                 break;
             case DeliveryInstructions.DELIVERY_MODE_ROUTER:
@@ -58,7 +56,7 @@ class MessageHandler {
                     _log.debug("Instructions for ROUTER DELIVERY to " 
                                + instructions.getRouter().toBase64());
                 if (_context.routerHash().equals(instructions.getRouter())) {
-                    handleLocalRouter(message, from, fromHash, replyBlock, requestAck);
+                    handleLocalRouter(message, from, fromHash);
                 } else {
                     handleRemoteRouter(message, instructions, expiration, priority);
                 }
@@ -84,28 +82,14 @@ class MessageHandler {
                 _log.error("Message has instructions that are not yet implemented: mode = " + instructions.getDeliveryMode());
         }
 
-        if (requestAck) {
-            _log.debug("SEND ACK REQUESTED");
-            sendAck(replyBlock, replyId);
-        } else {
-            _log.debug("No ack requested");
-        }
     }
-    
-    private void sendAck(SourceRouteBlock replyBlock, long replyId) {
-        _log.info("Queueing up ack job via reply block " + replyBlock);
-        Job ackJob = new SendMessageAckJob(_context, replyBlock, replyId);
-        _context.jobQueue().addJob(ackJob);
-    }
-    
-    private void handleLocalRouter(I2NPMessage message, RouterIdentity from, Hash fromHash, SourceRouteBlock replyBlock, boolean ackUsed) {
+
+    private void handleLocalRouter(I2NPMessage message, RouterIdentity from, Hash fromHash) {
         _log.info("Handle " + message.getClass().getName() + " to a local router - toss it on the inbound network pool");
         InNetMessage msg = new InNetMessage(_context);
         msg.setFromRouter(from);
         msg.setFromRouterHash(fromHash);
         msg.setMessage(message);
-        if (!ackUsed)
-            msg.setReplyBlock(replyBlock);
         _context.inNetMessagePool().add(msg);
     }
     

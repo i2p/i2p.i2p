@@ -28,7 +28,6 @@ import net.i2p.data.i2np.DeliveryInstructions;
 import net.i2p.data.i2np.DeliveryStatusMessage;
 import net.i2p.data.i2np.GarlicMessage;
 import net.i2p.data.i2np.I2NPMessage;
-import net.i2p.data.i2np.SourceRouteBlock;
 import net.i2p.data.i2np.TunnelCreateMessage;
 import net.i2p.data.i2np.TunnelCreateStatusMessage;
 import net.i2p.router.Job;
@@ -162,19 +161,9 @@ public class RequestTunnelJob extends JobImpl {
             fail();
             return;
         }
-        
-        // select reply peer [peer to which SourceRouteReply should be sent, and 
-        // from which the reply will be forwarded to an inbound tunnel]
-        RouterInfo replyPeer = selectReplyPeer(participant);
-        if (replyPeer == null) {
-            if (_log.shouldLog(Log.WARN))
-                _log.warn("No reply peers available!  unable to request a new tunnel!");
-            fail();
-            return;
-        }
             
         // select inbound tunnel gateway
-        TunnelGateway inboundGateway = selectInboundGateway(participant, replyPeer);
+        TunnelGateway inboundGateway = selectInboundGateway(participant);
         if (inboundGateway == null) {
             if (_log.shouldLog(Log.ERROR))
                 _log.error("Unable to find an inbound gateway");
@@ -187,7 +176,7 @@ public class RequestTunnelJob extends JobImpl {
         PublicKey wrappedTo = new PublicKey();
             
         RequestState state = new RequestState(wrappedKey, wrappedTags, wrappedTo, 
-                                              participant, inboundGateway, replyPeer, 
+                                              participant, inboundGateway, 
                                               outboundTunnel, target);
         Request r = new Request(state);
         getContext().jobQueue().addJob(r);	
@@ -217,7 +206,6 @@ public class RequestTunnelJob extends JobImpl {
                                          _state.getOutboundTunnel(), 
                                          _state.getParticipant().getThisHop(), 
                                          _state.getParticipant().getNextHop(), 
-                                         _state.getReplyPeer().getIdentity().getHash(), 
                                          _state.getInboundGateway().getTunnelId(), 
                                          _state.getInboundGateway().getGateway());
             }
@@ -239,54 +227,45 @@ public class RequestTunnelJob extends JobImpl {
         private Set _wrappedTags;
         private PublicKey _wrappedTo;
         private TunnelCreateMessage _createMsg;
-        private DeliveryStatusMessage _statusMsg;
         private GarlicMessage _garlicMessage;
         private TunnelInfo _participant;
         private TunnelGateway _inboundGateway;
-        private RouterInfo _replyPeer;
         private TunnelId _outboundTunnel;
         private RouterInfo _target;
             
         public RequestState(SessionKey wrappedKey, Set wrappedTags, PublicKey wrappedTo, 
                             TunnelInfo participant, TunnelGateway inboundGateway, 
-                            RouterInfo replyPeer, TunnelId outboundTunnel, RouterInfo target) {
+                            TunnelId outboundTunnel, RouterInfo target) {
             _wrappedKey = wrappedKey;
             _wrappedTags = wrappedTags;
             _wrappedTo = wrappedTo;
             _participant = participant;
             _inboundGateway = inboundGateway;
-            _replyPeer = replyPeer;
             _outboundTunnel = outboundTunnel;
             _target = target;
         }
         
         public TunnelId getOutboundTunnel() { return _outboundTunnel; }
         public TunnelInfo getParticipant() { return _participant; }
-        public RouterInfo getReplyPeer() { return _replyPeer; }
         public TunnelGateway getInboundGateway() { return _inboundGateway; }
         
         public boolean doNext() {
             if (_createMsg == null) {
-                _createMsg = buildTunnelCreate(_participant, _inboundGateway, _replyPeer);
-                return true;
-            } else if (_statusMsg == null) {
-                _statusMsg = buildDeliveryStatusMessage();
+                _createMsg = buildTunnelCreate(_participant, _inboundGateway);
                 return true;
             } else if (_garlicMessage == null) {
-                _garlicMessage = buildGarlicMessage(_createMsg, _statusMsg, _replyPeer, 
-                                                    _inboundGateway, _target, _wrappedKey, 
-                                                    _wrappedTags, _wrappedTo);
+                _garlicMessage = buildGarlicMessage(_createMsg, _inboundGateway, _target,
+                                                    _wrappedKey, _wrappedTags, _wrappedTo);
                 return true;
             } else {
                 // send the GarlicMessage
                 if (_log.shouldLog(Log.INFO))
                     _log.info("Sending tunnel create to " + _target.getIdentity().getHash().toBase64() +
-                    " with replies through " + _replyPeer.getIdentity().getHash().toBase64() +
                     " to inbound gateway " + _inboundGateway.getGateway().toBase64() +
                     " : " + _inboundGateway.getTunnelId().getTunnelId());
                 ReplyJob onReply = new Success(_participant, _wrappedKey, _wrappedTags, _wrappedTo);
-                Job onFail = new Failure(_participant, _replyPeer.getIdentity().getHash());
-                MessageSelector selector = new Selector(_participant, _statusMsg.getMessageId());
+                Job onFail = new Failure(_participant);
+                MessageSelector selector = new Selector(_participant);
                 SendTunnelMessageJob j = new SendTunnelMessageJob(getContext(), _garlicMessage, 
                                                                   _outboundTunnel, _target.getIdentity().getHash(), 
                                                                   null, null, onReply, onFail, 
@@ -330,47 +309,10 @@ public class RequestTunnelJob extends JobImpl {
     }
     
     /**
-     * Select a peer to which the tunnelParticipant will send the SourceRouteReplyMessage
-     * containing a garlic wrapped TunnelCreateStatusMessage destined for the local router.
-     *
-     * Currently just a random peer
-     */
-    private RouterInfo selectReplyPeer(TunnelInfo tunnelParticipant) {
-        PeerSelectionCriteria criteria = new PeerSelectionCriteria();
-        criteria.setMaximumRequired(1);
-        criteria.setMinimumRequired(1);
-        criteria.setPurpose(PeerSelectionCriteria.PURPOSE_SOURCE_ROUTE);
-        List peerHashes = getContext().peerManager().selectPeers(criteria);
-        
-        RouterInfo peerInfo = null;
-        for (int i = 0; (i < peerHashes.size()) && (peerInfo == null); i++) {
-            Hash peerHash = (Hash)peerHashes.get(i);
-            peerInfo = getContext().netDb().lookupRouterInfoLocally(peerHash);
-            if (peerInfo == null) {
-                if (_log.shouldLog(Log.DEBUG))
-                    _log.debug("Selected a peer [" + peerHash + "] we don't have info on locally... trying another");
-            } else {
-                if (_log.shouldLog(Log.DEBUG))
-                    _log.debug("Peer [" + peerHash.toBase64() + "] is known locally, keep it in the list of replyPeers");
-                break;
-            }
-        }
-        
-        if (peerInfo == null) {
-            if (_log.shouldLog(Log.WARN))
-                _log.warn("No peers know for a reply (out of " + peerHashes.size() + ") - using ourself");
-            return getContext().router().getRouterInfo();
-        } else {
-            return peerInfo;
-        }
-    }
-    
-    /**
-     * Select an inbound tunnel to receive replies and acks from the participant by means of the
-     * replyPeer
+     * Select an inbound tunnel to receive replies and acks from the participant 
      *
      */
-    private TunnelGateway selectInboundGateway(TunnelInfo participant, RouterInfo replyPeer) {
+    private TunnelGateway selectInboundGateway(TunnelInfo participant) {
         TunnelSelectionCriteria criteria = new TunnelSelectionCriteria();
         criteria.setAnonymityPriority(66);
         criteria.setReliabilityPriority(66);
@@ -408,7 +350,7 @@ public class RequestTunnelJob extends JobImpl {
     /**
      * Build a TunnelCreateMessage to the participant
      */
-    private TunnelCreateMessage buildTunnelCreate(TunnelInfo participant, TunnelGateway replyGateway, RouterInfo replyPeer) {
+    private TunnelCreateMessage buildTunnelCreate(TunnelInfo participant, TunnelGateway replyGateway) {
         TunnelCreateMessage msg = new TunnelCreateMessage(getContext());
         msg.setCertificate(new Certificate(Certificate.CERTIFICATE_TYPE_NULL, null));
         msg.setConfigurationKey(participant.getConfigurationKey());
@@ -418,6 +360,9 @@ public class RequestTunnelJob extends JobImpl {
         msg.setMaxPeakBytesPerMin(participant.getSettings().getBytesPerMinutePeak());
         msg.setMaxPeakMessagesPerMin(participant.getSettings().getMessagesPerMinutePeak());
         msg.setNextRouter(participant.getNextHop());
+        // TODO: update the TunnelInfo structure so we can have the tunnel contain
+        // different tunnelIds per hop
+        msg.setNextTunnelId(participant.getTunnelId());
         if (participant.getNextHop() == null)
             msg.setParticipantType(TunnelCreateMessage.PARTICIPANT_TYPE_ENDPOINT);
         else if (participant.getSigningKey() != null)
@@ -426,11 +371,19 @@ public class RequestTunnelJob extends JobImpl {
             msg.setParticipantType(TunnelCreateMessage.PARTICIPANT_TYPE_OTHER);
         msg.setReorderMessages(participant.getSettings().getReorder());
         
-        SourceRouteBlock replyBlock = buildReplyBlock(replyGateway, replyPeer);
-        if (replyBlock == null)
-            return null;
         
-        msg.setReplyBlock(replyBlock);
+        SessionKey replySessionKey = getContext().keyGenerator().generateSessionKey();
+        SessionTag tag = new SessionTag(true);
+        Set tags = new HashSet();
+        tags.add(tag);
+        // make it so we'll read the session tag correctly and use the right session key
+        getContext().sessionKeyManager().tagsReceived(replySessionKey, tags);
+        
+        msg.setReplyPeer(replyGateway.getGateway());
+        msg.setReplyTunnel(replyGateway.getTunnelId());
+        msg.setReplyKey(replySessionKey);
+        msg.setReplyTag(tag);
+        
         long duration = participant.getSettings().getExpiration() - getContext().clock().now();
         if (duration == 0) duration = 1;
         msg.setTunnelDurationSeconds(duration/1000);
@@ -443,96 +396,15 @@ public class RequestTunnelJob extends JobImpl {
     }
     
     /**
-     * Build a source route block directing the reply through the gateway by means of the
-     * replyPeer
-     *
-     */
-    private SourceRouteBlock buildReplyBlock(TunnelGateway gateway, RouterInfo replyPeer) {
-        if (replyPeer == null) {
-            if (_log.shouldLog(Log.ERROR))
-                _log.error("No peer specified for reply!");
-            return null;
-        }
-        
-        SessionKey replySessionKey = getContext().keyGenerator().generateSessionKey();
-        SessionTag tag = new SessionTag(true);
-        Set tags = new HashSet();
-        tags.add(tag);
-        // make it so we'll read the session tag correctly and use the right session key
-        getContext().sessionKeyManager().tagsReceived(replySessionKey, tags);
-        
-        PublicKey pk = replyPeer.getIdentity().getPublicKey();
-        
-        DeliveryInstructions instructions = new DeliveryInstructions();
-        instructions.setDelayRequested(false);
-        instructions.setDelaySeconds(0);
-        instructions.setDeliveryMode(DeliveryInstructions.DELIVERY_MODE_TUNNEL);
-        instructions.setDestination(null);
-        instructions.setEncrypted(false);
-        instructions.setEncryptionKey(null);
-        instructions.setRouter(gateway.getGateway());
-        instructions.setTunnelId(gateway.getTunnelId());
-        
-        long replyId = getContext().random().nextLong(I2NPMessage.MAX_ID_VALUE);
-        
-        Certificate replyCert = new Certificate(Certificate.CERTIFICATE_TYPE_NULL, null);
-        
-        long expiration = getContext().clock().now() + _timeoutMs; // _expiration;
-        if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Setting the expiration on the reply block to " + (new Date(expiration)));
-        SourceRouteBlock block = new SourceRouteBlock();
-        try {
-            long begin = getContext().clock().now();
-            block.setData(getContext(), instructions, replyId, replyCert, expiration, pk);
-            long end = getContext().clock().now();
-            if ( (end - begin) > 1000) {
-                if (_log.shouldLog(Log.WARN))
-                    _log.warn("Took too long (" + (end-begin) + "ms) to build source route block");
-            } else {
-                if (_log.shouldLog(Log.DEBUG))
-                    _log.debug("did NOT take long (" + (end-begin) + "ms) to build source route block!");
-            }
-        } catch (DataFormatException dfe) {
-            if (_log.shouldLog(Log.ERROR))
-                _log.error("Error building the reply block", dfe);
-            return null;
-        }
-        
-        block.setRouter(replyPeer.getIdentity().getHash());
-        block.setKey(replySessionKey);
-        block.setTag(tag);
-        
-        return block;
-    }
-    
-    /**
-     * Create a message containing a random id to check for after garlic routing
-     * it out so that we know the other message in the garlic has been received
-     *
-     */
-    private DeliveryStatusMessage buildDeliveryStatusMessage() {
-        DeliveryStatusMessage msg = new DeliveryStatusMessage(getContext());
-        msg.setArrival(new Date(getContext().clock().now()));
-        msg.setMessageId(getContext().random().nextLong(I2NPMessage.MAX_ID_VALUE));
-        Date exp = new Date(getContext().clock().now() + _timeoutMs); // _expiration);
-        if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Setting the expiration on the delivery status message to " + exp);
-        msg.setMessageExpiration(exp);
-        return msg;
-    }
-    
-    
-    /**
      * Build a garlic message wrapping the data and status as cloves with both to be routed
-     * through the target, where the data is destined.  The status however is to continue on
-     * to the replyPeer, where it is then sent down the replyTunnel to the local router.
+     * through the target, where the data is destined.
      *
      */
-    private GarlicMessage buildGarlicMessage(I2NPMessage data, I2NPMessage status, 
-                                             RouterInfo replyPeer, TunnelGateway replyTunnel, 
+    private GarlicMessage buildGarlicMessage(I2NPMessage data, 
+                                             TunnelGateway replyTunnel, 
                                              RouterInfo target, SessionKey wrappedKey, 
                                              Set wrappedTags, PublicKey wrappedTo) {
-        GarlicConfig config = buildGarlicConfig(data, status, replyPeer, replyTunnel, target);
+        GarlicConfig config = buildGarlicConfig(data, replyTunnel, target);
         
         PublicKey rcptKey = config.getRecipientPublicKey();
         if (rcptKey == null) {
@@ -562,16 +434,13 @@ public class RequestTunnelJob extends JobImpl {
         return message;
     }
     
-    private GarlicConfig buildGarlicConfig(I2NPMessage data, I2NPMessage status, 
-                                          RouterInfo replyPeer, TunnelGateway replyTunnel, 
-                                          RouterInfo target) {
+    private GarlicConfig buildGarlicConfig(I2NPMessage data, 
+                                          TunnelGateway replyTunnel, RouterInfo target) {
         GarlicConfig config = new GarlicConfig();
         
         long garlicExpiration = getContext().clock().now() + _timeoutMs;
         PayloadGarlicConfig dataClove = buildDataClove(data, target, garlicExpiration);
         config.addClove(dataClove);
-        PayloadGarlicConfig ackClove = buildAckClove(status, replyPeer, replyTunnel, garlicExpiration);
-        config.addClove(ackClove);
         
         DeliveryInstructions instructions = new DeliveryInstructions();
         instructions.setDeliveryMode(DeliveryInstructions.DELIVERY_MODE_ROUTER);
@@ -590,38 +459,8 @@ public class RequestTunnelJob extends JobImpl {
         config.setId(getContext().random().nextLong(I2NPMessage.MAX_ID_VALUE));
         config.setExpiration(garlicExpiration);
         config.setRecipientPublicKey(target.getIdentity().getPublicKey());
-        config.setRequestAck(false);
         
         return config;
-    }
-    
-    /**
-     * Build a clove that sends a DeliveryStatusMessage to us
-     */
-    private PayloadGarlicConfig buildAckClove(I2NPMessage ackMsg, RouterInfo replyPeer, 
-                                              TunnelGateway replyTunnel, long expiration) {
-        PayloadGarlicConfig ackClove = new PayloadGarlicConfig();
-        
-        Hash replyToTunnelRouter = replyTunnel.getGateway();  // inbound tunnel gateway
-        TunnelId replyToTunnelId = replyTunnel.getTunnelId(); // tunnel id on that gateway
-        
-        DeliveryInstructions ackInstructions = new DeliveryInstructions();
-        ackInstructions.setDeliveryMode(DeliveryInstructions.DELIVERY_MODE_TUNNEL);
-        ackInstructions.setRouter(replyToTunnelRouter);
-        ackInstructions.setTunnelId(replyToTunnelId);
-        ackInstructions.setDelayRequested(false);
-        ackInstructions.setDelaySeconds(0);
-        ackInstructions.setEncrypted(false);
-        
-        ackClove.setCertificate(new Certificate(Certificate.CERTIFICATE_TYPE_NULL, null));
-        ackClove.setDeliveryInstructions(ackInstructions);
-        ackClove.setExpiration(expiration);
-        ackClove.setId(getContext().random().nextLong(I2NPMessage.MAX_ID_VALUE));
-        ackClove.setPayload(ackMsg);
-        ackClove.setRecipient(replyPeer);
-        ackClove.setRequestAck(false);
-        
-        return ackClove;
     }
     
     /**
@@ -808,12 +647,10 @@ public class RequestTunnelJob extends JobImpl {
     
     private class Failure extends JobImpl {
         private TunnelInfo _tunnel;
-        private Hash _replyThrough;
         private long _started;
-        public Failure(TunnelInfo tunnel, Hash replyThrough) {
+        public Failure(TunnelInfo tunnel) {
             super(RequestTunnelJob.this.getContext());
             _tunnel = tunnel;
-            _replyThrough = replyThrough;
             _started = getContext().clock().now();
         }
         
@@ -829,9 +666,8 @@ public class RequestTunnelJob extends JobImpl {
             }
             synchronized (_failedTunnelParticipants) {
                 _failedTunnelParticipants.add(_tunnel.getThisHop());
-                _failedTunnelParticipants.add(_replyThrough);
             }
-            Failure.this.getContext().messageHistory().tunnelRequestTimedOut(_tunnel.getThisHop(), _tunnel.getTunnelId(), _replyThrough);
+            Failure.this.getContext().messageHistory().tunnelRequestTimedOut(_tunnel.getThisHop(), _tunnel.getTunnelId());
             long responseTime = getContext().clock().now() - _started;
             // perhaps not an explicit reject, but an implicit one (due to dropped messages, tunnel failure, etc)
             getContext().profileManager().tunnelRejected(_tunnel.getThisHop(), responseTime, false);
@@ -843,26 +679,20 @@ public class RequestTunnelJob extends JobImpl {
     
     private class Selector implements MessageSelector {
         private TunnelInfo _tunnel;
-        private long _ackId;
         private boolean _statusFound;
-        private boolean _ackFound;
         private long _attemptExpiration;
         
-        public Selector(TunnelInfo tunnel, long ackId) {
+        public Selector(TunnelInfo tunnel) {
             _tunnel = tunnel;
-            _ackId = ackId;
             _statusFound = false;
-            _ackFound = false;
             _attemptExpiration = getContext().clock().now() + _timeoutMs;
         }
         
         public boolean continueMatching() {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("ContinueMatching looking for tunnel " + _tunnel.getTunnelId().getTunnelId() 
-                           + " from " + _tunnel.getThisHop().toBase64() + ": found? " + _statusFound 
-                           + " ackFound? " + _ackFound);
-            return !_statusFound || !_ackFound;
-            //return !_statusFound; // who cares about the ack if we get the status OK?
+                           + " from " + _tunnel.getThisHop().toBase64() + ": found? " + _statusFound);
+            return !_statusFound;
         }
         public long getExpiration() { return _attemptExpiration; }
         public boolean isMatch(I2NPMessage message) {
@@ -890,17 +720,6 @@ public class RequestTunnelJob extends JobImpl {
                                    + _tunnel.getThisHop().toBase64() + "]");
                     return false;
                 }
-            } else if (message.getType() == DeliveryStatusMessage.MESSAGE_TYPE) {
-                if (((DeliveryStatusMessage)message).getMessageId() == _ackId) {
-                    if (_log.shouldLog(Log.DEBUG))
-                        _log.debug("Matches the ping message tied to the tunnel create status message");
-                    _ackFound = true;
-                    return true;
-                } else {
-                    if (_log.shouldLog(Log.DEBUG))
-                        _log.debug("Message is a delivery status message, but with the wrong id");
-                    return false;
-                }
             } else {
                 //_log.debug("Message " + message.getClass().getName() 
                 //           + " is not a delivery status or tunnel create status message [waiting for ok for tunnel " 
@@ -911,8 +730,8 @@ public class RequestTunnelJob extends JobImpl {
         
         public String toString() { 
             return "Build Tunnel Job Selector for tunnel " + _tunnel.getTunnelId().getTunnelId() 
-                   + " at " + _tunnel.getThisHop().toBase64() + " [found=" + _statusFound + ", ack=" 
-                   + _ackFound + "] (@" + (new Date(getExpiration())) + ")"; 
+                   + " at " + _tunnel.getThisHop().toBase64() + " [found=" + _statusFound + "] (@" 
+                   + (new Date(getExpiration())) + ")"; 
         }
     }
 }

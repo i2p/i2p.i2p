@@ -165,10 +165,8 @@ public class HandleGarlicMessageJob extends JobImpl {
                 _log.warn("Invalid clove " + clove);
             return;
         } 
-        boolean requestAck = (clove.getSourceRouteBlockAction() == GarlicClove.ACTION_STATUS);
         long sendExpiration = clove.getExpiration().getTime();
         _handler.handleMessage(clove.getInstructions(), clove.getData(), 
-                               requestAck, clove.getSourceRouteBlock(), 
                                clove.getCloveId(), _from, _fromHash, 
                                sendExpiration, FORWARD_PRIORITY);
     }

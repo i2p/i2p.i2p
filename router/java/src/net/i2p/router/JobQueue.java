@@ -19,7 +19,6 @@ import java.util.Iterator;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
-import net.i2p.router.message.HandleSourceRouteReplyMessageJob;
 import net.i2p.router.networkdb.HandleDatabaseLookupMessageJob;
 import net.i2p.router.tunnelmanager.HandleTunnelCreateMessageJob;
 import net.i2p.router.tunnelmanager.RequestTunnelJob;
@@ -221,14 +220,6 @@ public class JobQueue {
         if (!_allowParallelOperation) return false; // dont drop during startup [duh]
         Class cls = job.getClass();
         if (numReady > _maxWaitingJobs) {
-
-            // heavy cpu load, plus we're allowed to be unreliable with these two
-            // [but garlics can contain our payloads, so lets not drop them]
-            //if (cls == HandleGarlicMessageJob.class)
-            //    return true;
-            if (cls == HandleSourceRouteReplyMessageJob.class)
-                return true;
-
             // lets not try to drop too many tunnel messages...
             //if (cls == HandleTunnelMessageJob.class)
             //    return true;

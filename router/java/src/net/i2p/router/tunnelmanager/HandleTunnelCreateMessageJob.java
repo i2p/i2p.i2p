@@ -9,20 +9,32 @@ package net.i2p.router.tunnelmanager;
  */
 
 import java.util.Date;
+import java.util.List;
 
+import net.i2p.data.Certificate;
 import net.i2p.data.Hash;
 import net.i2p.data.RouterIdentity;
 import net.i2p.data.RouterInfo;
 import net.i2p.data.TunnelId;
-import net.i2p.data.i2np.SourceRouteBlock;
 import net.i2p.data.i2np.TunnelCreateMessage;
+import net.i2p.data.i2np.DeliveryInstructions;
+import net.i2p.data.i2np.GarlicClove;
+import net.i2p.data.i2np.GarlicMessage;
+import net.i2p.data.i2np.I2NPMessage;
 import net.i2p.data.i2np.TunnelCreateStatusMessage;
+import net.i2p.router.Job;
 import net.i2p.router.JobImpl;
+import net.i2p.router.MessageSelector;
+import net.i2p.router.ReplyJob;
 import net.i2p.router.RouterContext;
 import net.i2p.router.TunnelInfo;
 import net.i2p.router.TunnelSettings;
+import net.i2p.router.TunnelSelectionCriteria;
 import net.i2p.router.message.BuildTestMessageJob;
-import net.i2p.router.message.SendReplyMessageJob;
+import net.i2p.router.message.GarlicConfig;
+import net.i2p.router.message.GarlicMessageBuilder;
+import net.i2p.router.message.PayloadGarlicConfig;
+import net.i2p.router.message.SendTunnelMessageJob;
 import net.i2p.util.Log;
 
 public class HandleTunnelCreateMessageJob extends JobImpl {
@@ -30,20 +42,18 @@ public class HandleTunnelCreateMessageJob extends JobImpl {
     private TunnelCreateMessage _message;
     private RouterIdentity _from;
     private Hash _fromHash;
-    private SourceRouteBlock _replyBlock;
     
     private final static long TIMEOUT = 30*1000; // 30 secs to contact a peer that will be our next hop
     private final static int PRIORITY = 123;
     
     HandleTunnelCreateMessageJob(RouterContext ctx, TunnelCreateMessage receivedMessage, 
-                                 RouterIdentity from, Hash fromHash, SourceRouteBlock replyBlock) {
+                                 RouterIdentity from, Hash fromHash) {
         super(ctx);
         _log = ctx.logManager().getLog(HandleTunnelCreateMessageJob.class);
         ctx.statManager().createRateStat("tunnel.rejectOverloaded", "How many tunnels did we deny due to throttling?", "Tunnels", new long[] { 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
         _message = receivedMessage;
         _from = from;
         _fromHash = fromHash;
-        _replyBlock = replyBlock;
     }
     
     public void runJob() {
@@ -119,15 +129,16 @@ public class HandleTunnelCreateMessageJob extends JobImpl {
         }
     }
     
-    
+    private static final long REPLY_TIMEOUT = 10*1000;
     private void sendReply(boolean ok) {
         if (_log.shouldLog(Log.DEBUG)) 
             _log.debug("Sending reply to a tunnel create of id " + _message.getTunnelId() 
-                       + " with ok (" + ok + ") to router " + _message.getReplyBlock().getRouter().toBase64());
+                       + " with ok (" + ok + ") to tunnel " + _message.getReplyTunnel()
+                       + " on router " + _message.getReplyPeer());
     
         getContext().messageHistory().receiveTunnelCreate(_message.getTunnelId(), _message.getNextRouter(), 
-                                                      new Date(getContext().clock().now() + 1000*_message.getTunnelDurationSeconds()), 
-                                                      ok, _message.getReplyBlock().getRouter());
+                                                          new Date(getContext().clock().now() + 1000*_message.getTunnelDurationSeconds()), 
+                                                          ok, _message.getReplyPeer());
 
         TunnelCreateStatusMessage msg = new TunnelCreateStatusMessage(getContext());
         msg.setFromHash(getContext().routerHash());
@@ -139,8 +150,86 @@ public class HandleTunnelCreateMessageJob extends JobImpl {
             msg.setStatus(TunnelCreateStatusMessage.STATUS_FAILED_OVERLOADED);
         }
         msg.setMessageExpiration(new Date(getContext().clock().now()+60*1000));
-        SendReplyMessageJob job = new SendReplyMessageJob(getContext(), _message.getReplyBlock(), msg, PRIORITY);
+        
+        // put that message into a garlic
+        GarlicMessage reply = createReply(msg);
+        
+        TunnelId outTunnelId = selectReplyTunnel();
+        
+        SendTunnelMessageJob job = new SendTunnelMessageJob(getContext(), reply, outTunnelId, 
+                                                            _message.getReplyPeer(), 
+                                                            _message.getReplyTunnel(), 
+                                                            (Job)null, (ReplyJob)null, 
+                                                            (Job)null, (MessageSelector)null, 
+                                                            REPLY_TIMEOUT, PRIORITY);
         getContext().jobQueue().addJob(job);
+    }
+    
+    private GarlicMessage createReply(TunnelCreateStatusMessage body) {
+        GarlicConfig cfg = createReplyConfig(body);
+        return GarlicMessageBuilder.buildMessage(getContext(), cfg, null, null, null, 
+                                                 _message.getReplyKey(), _message.getReplyTag());
+    }
+    
+    private GarlicConfig createReplyConfig(TunnelCreateStatusMessage body) {
+        GarlicConfig config = new GarlicConfig();
+        
+        PayloadGarlicConfig replyClove = buildReplyClove(body);
+        config.addClove(replyClove);
+        
+        DeliveryInstructions instructions = new DeliveryInstructions();
+        instructions.setDeliveryMode(DeliveryInstructions.DELIVERY_MODE_LOCAL);
+        instructions.setDelayRequested(false);
+        instructions.setDelaySeconds(0);
+        instructions.setEncrypted(false);
+        instructions.setEncryptionKey(null);
+        instructions.setRouter(null);
+        instructions.setTunnelId(null);
+        
+        config.setCertificate(new Certificate(Certificate.CERTIFICATE_TYPE_NULL, null));
+        config.setDeliveryInstructions(instructions);
+        config.setId(getContext().random().nextLong(I2NPMessage.MAX_ID_VALUE));
+        config.setExpiration(REPLY_TIMEOUT+getContext().clock().now());
+        config.setRecipient(null);
+        config.setRequestAck(false);
+        
+        return config;
+    }
+
+    /**
+     * Build a clove that sends the tunnel create reply 
+     */
+    private PayloadGarlicConfig buildReplyClove(TunnelCreateStatusMessage body) {
+        PayloadGarlicConfig replyClove = new PayloadGarlicConfig();
+        
+        DeliveryInstructions instructions = new DeliveryInstructions();
+        instructions.setDeliveryMode(DeliveryInstructions.DELIVERY_MODE_LOCAL);
+        instructions.setRouter(null);
+        instructions.setDelayRequested(false);
+        instructions.setDelaySeconds(0);
+        instructions.setEncrypted(false);
+        
+        replyClove.setCertificate(new Certificate(Certificate.CERTIFICATE_TYPE_NULL, null));
+        replyClove.setDeliveryInstructions(instructions);
+        replyClove.setExpiration(REPLY_TIMEOUT+getContext().clock().now());
+        replyClove.setId(getContext().random().nextLong(I2NPMessage.MAX_ID_VALUE));
+        replyClove.setPayload(body);
+        replyClove.setRecipient(null);
+        replyClove.setRequestAck(false);
+        
+        return replyClove;
+    }
+    
+    
+    private TunnelId selectReplyTunnel() {
+        TunnelSelectionCriteria crit = new TunnelSelectionCriteria();
+        crit.setMinimumTunnelsRequired(1);
+        crit.setMaximumTunnelsRequired(1);
+        List ids = getContext().tunnelManager().selectOutboundTunnelIds(crit);
+        if ( (ids != null) && (ids.size() > 0) )
+            return (TunnelId)ids.get(0);
+        else
+            return null;
     }
     
     public String getName() { return "Handle Tunnel Create Message"; }

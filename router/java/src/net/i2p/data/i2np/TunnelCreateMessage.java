@@ -18,6 +18,8 @@ import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
 import net.i2p.data.TunnelId;
+import net.i2p.data.SessionKey;
+import net.i2p.data.SessionTag;
 import net.i2p.util.Log;
 
 /**
@@ -30,8 +32,9 @@ public class TunnelCreateMessage extends I2NPMessageImpl {
     private final static Log _log = new Log(TunnelCreateMessage.class);
     public final static int MESSAGE_TYPE = 6;
     private int _participantType;
-    private Hash _nextRouter;
     private TunnelId _tunnelId;
+    private Hash _nextRouter;
+    private TunnelId _nextTunnelId;
     private long _tunnelDuration;
     private TunnelConfigurationSessionKey _configKey;
     private long _maxPeakMessagesPerMin;
@@ -44,7 +47,10 @@ public class TunnelCreateMessage extends I2NPMessageImpl {
     private TunnelSigningPrivateKey _verificationPrivKey;
     private TunnelSessionKey _tunnelKey;
     private Certificate _certificate;
-    private SourceRouteBlock _replyBlock;
+    private SessionTag _replyTag;
+    private SessionKey _replyKey;
+    private TunnelId _replyTunnel;
+    private Hash _replyPeer;
     
     public static final int PARTICIPANT_TYPE_GATEWAY = 1;
     public static final int PARTICIPANT_TYPE_ENDPOINT = 2;
@@ -57,6 +63,7 @@ public class TunnelCreateMessage extends I2NPMessageImpl {
         super(context);
         setParticipantType(-1);
         setNextRouter(null);
+        setNextTunnelId(null);
         setTunnelId(null);
         setTunnelDurationSeconds(-1);
         setConfigurationKey(null);
@@ -70,13 +77,18 @@ public class TunnelCreateMessage extends I2NPMessageImpl {
         setVerificationPrivateKey(null);
         setTunnelKey(null);
         setCertificate(null);
-        setReplyBlock(null);
+        setReplyTag(null);
+        setReplyKey(null);
+        setReplyTunnel(null);
+        setReplyPeer(null);
     }
     
     public void setParticipantType(int type) { _participantType = type; }
     public int getParticipantType() { return _participantType; }
     public void setNextRouter(Hash routerIdentityHash) { _nextRouter = routerIdentityHash; }
     public Hash getNextRouter() { return _nextRouter; }
+    public void setNextTunnelId(TunnelId id) { _nextTunnelId = id; }
+    public TunnelId getNextTunnelId() { return _nextTunnelId; }
     public void setTunnelId(TunnelId id) { _tunnelId = id; }
     public TunnelId getTunnelId() { return _tunnelId; }
     public void setTunnelDurationSeconds(long durationSeconds) { _tunnelDuration = durationSeconds; }
@@ -103,8 +115,14 @@ public class TunnelCreateMessage extends I2NPMessageImpl {
     public TunnelSessionKey getTunnelKey() { return _tunnelKey; }
     public void setCertificate(Certificate cert) { _certificate = cert; }
     public Certificate getCertificate() { return _certificate; }
-    public void setReplyBlock(SourceRouteBlock block) { _replyBlock = block; }
-    public SourceRouteBlock getReplyBlock() { return _replyBlock; }
+    public void setReplyTag(SessionTag tag) { _replyTag = tag; }
+    public SessionTag getReplyTag() { return _replyTag; }
+    public void setReplyKey(SessionKey key) { _replyKey = key; }
+    public SessionKey getReplyKey() { return _replyKey; }
+    public void setReplyTunnel(TunnelId id) { _replyTunnel = id; }
+    public TunnelId getReplyTunnel() { return _replyTunnel; }
+    public void setReplyPeer(Hash peer) { _replyPeer = peer; }
+    public Hash getReplyPeer() { return _replyPeer; }
     
     public void readMessage(InputStream in, int type) throws I2NPMessageException, IOException {
         if (type != MESSAGE_TYPE) throw new I2NPMessageException("Message type is incorrect for this message");
@@ -113,6 +131,8 @@ public class TunnelCreateMessage extends I2NPMessageImpl {
             if (_participantType != PARTICIPANT_TYPE_ENDPOINT) {
                 _nextRouter = new Hash();
                 _nextRouter.readBytes(in);
+                _nextTunnelId = new TunnelId();
+                _nextTunnelId.readBytes(in);
             }
             _tunnelId = new TunnelId();
             _tunnelId.readBytes(in);
@@ -140,8 +160,14 @@ public class TunnelCreateMessage extends I2NPMessageImpl {
             }
             _certificate = new Certificate();
             _certificate.readBytes(in);
-            _replyBlock = new SourceRouteBlock();
-            _replyBlock.readBytes(in);
+            _replyTag = new SessionTag();
+            _replyTag.readBytes(in);
+            _replyKey = new SessionKey();
+            _replyKey.readBytes(in);
+            _replyTunnel = new TunnelId();
+            _replyTunnel.readBytes(in);
+            _replyPeer = new Hash();
+            _replyPeer.readBytes(in);
         } catch (DataFormatException dfe) {
             throw new I2NPMessageException("Unable to load the message data", dfe);
         }
@@ -153,6 +179,7 @@ public class TunnelCreateMessage extends I2NPMessageImpl {
             DataHelper.writeLong(os, 1, _participantType);
             if (_participantType != PARTICIPANT_TYPE_ENDPOINT) {
                 _nextRouter.writeBytes(os);
+                _nextTunnelId.writeBytes(os);
             }
             _tunnelId.writeBytes(os);
             DataHelper.writeLong(os, 4, _tunnelDuration);
@@ -174,7 +201,10 @@ public class TunnelCreateMessage extends I2NPMessageImpl {
                 _tunnelKey.writeBytes(os);
             }
             _certificate.writeBytes(os);
-            _replyBlock.writeBytes(os);
+            _replyTag.writeBytes(os);
+            _replyKey.writeBytes(os);
+            _replyTunnel.writeBytes(os);
+            _replyPeer.writeBytes(os);
         } catch (Throwable t) {
             throw new I2NPMessageException("Error writing out the message data", t);
         }
@@ -201,21 +231,23 @@ public class TunnelCreateMessage extends I2NPMessageImpl {
     
     public int hashCode() {
         return (int)(DataHelper.hashCode(getCertificate()) +
-        DataHelper.hashCode(getConfigurationKey()) +
-        DataHelper.hashCode(getNextRouter()) +
-        DataHelper.hashCode(getReplyBlock()) +
-        DataHelper.hashCode(getTunnelId()) +
-        DataHelper.hashCode(getTunnelKey()) +
-        DataHelper.hashCode(getVerificationPrivateKey()) +
-        DataHelper.hashCode(getVerificationPublicKey()) +
-        (getIncludeDummyTraffic() ? 1 : 0) +
-        getMaxAvgBytesPerMin() +
-        getMaxAvgMessagesPerMin() +
-        getMaxPeakBytesPerMin() +
-        getMaxPeakMessagesPerMin() +
-        getParticipantType() +
-        (getReorderMessages() ? 1 : 0) +
-        getTunnelDurationSeconds());
+                    DataHelper.hashCode(getConfigurationKey()) +
+                    DataHelper.hashCode(getNextRouter()) +
+                    DataHelper.hashCode(getNextTunnelId()) +
+                    DataHelper.hashCode(getReplyPeer()) +
+                    DataHelper.hashCode(getReplyTunnel()) +
+                    DataHelper.hashCode(getTunnelId()) +
+                    DataHelper.hashCode(getTunnelKey()) +
+                    DataHelper.hashCode(getVerificationPrivateKey()) +
+                    DataHelper.hashCode(getVerificationPublicKey()) +
+                    (getIncludeDummyTraffic() ? 1 : 0) +
+                    getMaxAvgBytesPerMin() +
+                    getMaxAvgMessagesPerMin() +
+                    getMaxPeakBytesPerMin() +
+                    getMaxPeakMessagesPerMin() +
+                    getParticipantType() +
+                    (getReorderMessages() ? 1 : 0) +
+                    getTunnelDurationSeconds());
     }
     
     public boolean equals(Object object) {
@@ -224,7 +256,11 @@ public class TunnelCreateMessage extends I2NPMessageImpl {
             return DataHelper.eq(getCertificate(), msg.getCertificate()) &&
             DataHelper.eq(getConfigurationKey(), msg.getConfigurationKey()) &&
             DataHelper.eq(getNextRouter(),  msg.getNextRouter()) &&
-            DataHelper.eq(getReplyBlock(), msg.getReplyBlock()) &&
+            DataHelper.eq(getNextTunnelId(),  msg.getNextTunnelId()) &&
+            DataHelper.eq(getReplyTag(), msg.getReplyTag()) &&
+            DataHelper.eq(getReplyKey(), msg.getReplyKey()) &&
+            DataHelper.eq(getReplyTunnel(), msg.getReplyTunnel()) &&
+            DataHelper.eq(getReplyPeer(), msg.getReplyPeer()) &&
             DataHelper.eq(getTunnelId(), msg.getTunnelId()) &&
             DataHelper.eq(getTunnelKey(), msg.getTunnelKey()) &&
             DataHelper.eq(getVerificationPrivateKey(), msg.getVerificationPrivateKey()) &&
@@ -249,7 +285,11 @@ public class TunnelCreateMessage extends I2NPMessageImpl {
         buf.append("\n\tCertificate: ").append(getCertificate());
         buf.append("\n\tConfiguration Key: ").append(getConfigurationKey());
         buf.append("\n\tNext Router: ").append(getNextRouter());
-        buf.append("\n\tReply Block: ").append(getReplyBlock());
+        buf.append("\n\tNext Tunnel: ").append(getNextTunnelId());
+        buf.append("\n\tReply Tag: ").append(getReplyTag());
+        buf.append("\n\tReply Key: ").append(getReplyKey());
+        buf.append("\n\tReply Tunnel: ").append(getReplyTunnel());
+        buf.append("\n\tReply Peer: ").append(getReplyPeer());
         buf.append("\n\tTunnel ID: ").append(getTunnelId());
         buf.append("\n\tTunnel Key: ").append(getTunnelKey());
         buf.append("\n\tVerification Private Key: ").append(getVerificationPrivateKey());

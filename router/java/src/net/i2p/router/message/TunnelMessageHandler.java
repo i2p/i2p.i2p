@@ -11,7 +11,6 @@ package net.i2p.router.message;
 import net.i2p.data.Hash;
 import net.i2p.data.RouterIdentity;
 import net.i2p.data.i2np.I2NPMessage;
-import net.i2p.data.i2np.SourceRouteBlock;
 import net.i2p.data.i2np.TunnelMessage;
 import net.i2p.router.HandlerJobBuilder;
 import net.i2p.router.Job;
@@ -27,8 +26,7 @@ public class TunnelMessageHandler implements HandlerJobBuilder {
     public TunnelMessageHandler(RouterContext context) {
         _context = context;
     }
-    public Job createJob(I2NPMessage receivedMessage, RouterIdentity from, Hash fromHash, SourceRouteBlock replyBlock) {
-        // ignore the replyBlock for now
+    public Job createJob(I2NPMessage receivedMessage, RouterIdentity from, Hash fromHash) {
         HandleTunnelMessageJob job = new HandleTunnelMessageJob(_context, (TunnelMessage)receivedMessage, from, fromHash);
         return job;
     }

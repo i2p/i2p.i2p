@@ -12,7 +12,6 @@ import net.i2p.data.Hash;
 import net.i2p.data.RouterIdentity;
 import net.i2p.data.i2np.DatabaseStoreMessage;
 import net.i2p.data.i2np.I2NPMessage;
-import net.i2p.data.i2np.SourceRouteBlock;
 import net.i2p.router.HandlerJobBuilder;
 import net.i2p.router.Job;
 import net.i2p.router.RouterContext;
@@ -26,8 +25,7 @@ public class DatabaseStoreMessageHandler implements HandlerJobBuilder {
     public DatabaseStoreMessageHandler(RouterContext context) {
         _context = context;
     }
-    public Job createJob(I2NPMessage receivedMessage, RouterIdentity from, Hash fromHash, SourceRouteBlock replyBlock) {
-        // ignore the reply block for the moment
+    public Job createJob(I2NPMessage receivedMessage, RouterIdentity from, Hash fromHash) {
         return new HandleDatabaseStoreMessageJob(_context, (DatabaseStoreMessage)receivedMessage, from, fromHash);
     }
 }

@@ -144,7 +144,8 @@ public class DatabaseStoreMessage extends I2NPMessageImpl {
                 byte compressed[] = new byte[compressedSize];
                 int read = DataHelper.read(in, compressed);
                 if (read != compressedSize)
-                    throw new I2NPMessageException("Invalid compressed data size");
+                    throw new I2NPMessageException("Invalid compressed data size (expected " 
+                                                   + compressedSize + " read " + read + ")");
                 ByteArrayInputStream bais = new ByteArrayInputStream(DataHelper.decompress(compressed));
                 _info.readBytes(bais);
             } else {

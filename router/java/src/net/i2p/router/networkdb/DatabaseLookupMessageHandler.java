@@ -12,7 +12,6 @@ import net.i2p.data.Hash;
 import net.i2p.data.RouterIdentity;
 import net.i2p.data.i2np.DatabaseLookupMessage;
 import net.i2p.data.i2np.I2NPMessage;
-import net.i2p.data.i2np.SourceRouteBlock;
 import net.i2p.router.HandlerJobBuilder;
 import net.i2p.router.Job;
 import net.i2p.router.RouterContext;
@@ -32,7 +31,7 @@ public class DatabaseLookupMessageHandler implements HandlerJobBuilder {
         _context.statManager().createRateStat("netDb.lookupsDropped", "How many netDb lookups did we drop due to throttling?", "Network Database", new long[] { 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
     }
 
-    public Job createJob(I2NPMessage receivedMessage, RouterIdentity from, Hash fromHash, SourceRouteBlock replyBlock) {
+    public Job createJob(I2NPMessage receivedMessage, RouterIdentity from, Hash fromHash) {
         _context.statManager().addRateData("netDb.lookupsReceived", 1, 0);
 
         if (_context.throttle().acceptNetDbLookupRequest(((DatabaseLookupMessage)receivedMessage).getSearchKey())) {

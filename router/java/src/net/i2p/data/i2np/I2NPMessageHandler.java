@@ -73,8 +73,6 @@ public class I2NPMessageHandler {
                 return new TunnelMessage(_context);
             case DataMessage.MESSAGE_TYPE:
                 return new DataMessage(_context);
-            case SourceRouteReplyMessage.MESSAGE_TYPE:
-                return new SourceRouteReplyMessage(_context);
             case TunnelCreateMessage.MESSAGE_TYPE:
                 return new TunnelCreateMessage(_context);
             case TunnelCreateStatusMessage.MESSAGE_TYPE:

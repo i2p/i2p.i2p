@@ -88,7 +88,7 @@ public class InNetMessagePool {
 
         if (builder != null) {
             Job job = builder.createJob(messageBody, msg.getFromRouter(), 
-                                        msg.getFromRouterHash(), msg.getReplyBlock());
+                                        msg.getFromRouterHash());
             if (job != null) {
                 _context.jobQueue().addJob(job);
                 synchronized (_messages) { 
