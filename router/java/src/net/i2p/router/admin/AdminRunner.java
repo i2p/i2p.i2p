@@ -14,8 +14,8 @@ import java.util.Set;
 
 import net.i2p.data.Hash;
 import net.i2p.router.RouterContext;
-import net.i2p.util.Log;
 import net.i2p.util.I2PThread;
+import net.i2p.util.Log;
 
 class AdminRunner implements Runnable {
     private Log _log;

@@ -14,8 +14,8 @@ import java.net.SocketException;
 import java.util.Iterator;
 import java.util.Properties;
 
-import net.i2p.I2PException;
 import net.i2p.I2PAppContext;
+import net.i2p.I2PException;
 import net.i2p.client.I2PClient;
 import net.i2p.client.I2PClientFactory;
 import net.i2p.client.streaming.I2PServerSocket;

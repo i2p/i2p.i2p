@@ -1,10 +1,10 @@
 package net.i2p.router.tunnelmanager;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.TreeMap;
-import java.util.Date;
 
 import net.i2p.data.TunnelId;
 import net.i2p.router.JobImpl;
