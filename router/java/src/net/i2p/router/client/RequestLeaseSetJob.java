@@ -85,12 +85,6 @@ class RequestLeaseSetJob extends JobImpl {
             _runner.setLeaseRequest(null);
             _runner.disconnectClient("I2CP error requesting leaseSet");
             return;
-        } catch (IOException ioe) {
-            _log.error("Error sending I2CP message requesting the lease set", ioe);
-            state.setIsSuccessful(false);
-            _runner.setLeaseRequest(null);
-            _runner.disconnectClient("IO error requesting leaseSet");
-            return;
         }
     }
     

@@ -104,8 +104,6 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
             _runner.doSend(new SetDateMessage());
         } catch (I2CPMessageException ime) {
             _log.error("Error writing out the setDate message", ime);
-        } catch (IOException ioe) {
-            _log.error("Error writing out the setDate message", ioe);
         }
     }
     private void handleSetDate(I2CPMessageReader reader, SetDateMessage message) {
@@ -119,7 +117,8 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
      */
     private void handleCreateSession(I2CPMessageReader reader, CreateSessionMessage message) {
         if (message.getSessionConfig().verifySignature()) {
-            _log.debug("Signature verified correctly on create session message");
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Signature verified correctly on create session message");
         } else {
             _log.error("Signature verification *FAILED* on a create session message.  Hijack attempt?");
             _runner.disconnectClient("Invalid signature on CreateSessionMessage");
@@ -143,8 +142,6 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
                 _log.debug("after sessionEstablished for " + message.getSessionConfig().getDestination().calculateHash().toBase64());
         } catch (I2CPMessageException ime) {
             _log.error("Error writing out the session status message", ime);
-        } catch (IOException ioe) {
-            _log.error("Error writing out the session status message", ioe);
         }
 
         _context.jobQueue().addJob(new CreateSessionJob(_context, _runner));
@@ -158,8 +155,12 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
      */
     private void handleSendMessage(I2CPMessageReader reader, SendMessageMessage message) {
         _log.debug("handleSendMessage called");
+        long beforeDistribute = _context.clock().now();
         MessageId id = _runner.distributeMessage(message);
+        long timeToDistribute = _context.clock().now() - beforeDistribute;
         _runner.ackSendMessage(id, message.getNonce());
+        if (timeToDistribute > 50)
+            _log.warn("Took too long to distribute the message (which holds up the ack): " + timeToDistribute);
     }
 
     
@@ -182,8 +183,6 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
         msg.setPayload(payload);
         try {
             _runner.doSend(msg);
-        } catch (IOException ioe) {
-            _log.error("Error delivering the payload", ioe);
         } catch (I2CPMessageException ime) {
             _log.error("Error delivering the payload", ime);
         }

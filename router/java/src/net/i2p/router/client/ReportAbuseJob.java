@@ -51,8 +51,6 @@ class ReportAbuseJob extends JobImpl {
             _runner.doSend(msg);
         } catch (I2CPMessageException ime) {
             _log.error("Error reporting abuse", ime);
-        } catch (IOException ioe) {
-            _log.error("Error reporting abuse", ioe);
         }
     }
 }

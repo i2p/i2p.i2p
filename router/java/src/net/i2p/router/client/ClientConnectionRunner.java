@@ -13,7 +13,7 @@ import java.io.OutputStream;
 import java.net.Socket;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -35,6 +35,7 @@ import net.i2p.router.JobImpl;
 import net.i2p.router.RouterContext;
 import net.i2p.util.Log;
 import net.i2p.util.RandomSource;
+import net.i2p.util.I2PThread;
 
 /**
  * Bridge the router and the client - managing state for a client.
@@ -68,6 +69,7 @@ public class ClientConnectionRunner {
      * delivered to the client (so that we can be sure only to update when necessary)
      */
     private List _alreadyProcessed;
+    private ClientWriterRunner _writer;
     /** are we, uh, dead */
     private boolean _dead;
     
@@ -82,11 +84,12 @@ public class ClientConnectionRunner {
         _socket = socket;
         _config = null;
         _messages = new HashMap();
-        _alreadyProcessed = new LinkedList();
+        _alreadyProcessed = new ArrayList();
         _acceptedPending = new HashSet();
         _dead = false;
     }
     
+    private static int __id = 0;
     /**
      * Actually run the connection - listen for I2CP messages and respond.  This
      * is the main driver for this class, though it gets all its meat from the
@@ -96,6 +99,12 @@ public class ClientConnectionRunner {
     public void startRunning() {
         try {
             _reader = new I2CPMessageReader(_socket.getInputStream(), new ClientMessageEventListener(_context, this));
+            _writer = new ClientWriterRunner();
+            I2PThread t = new I2PThread(_writer);
+            t.setName("Writer " + ++__id);
+            t.setDaemon(true);
+            t.setPriority(I2PThread.MIN_PRIORITY);
+            t.start();
             _out = _socket.getOutputStream();
             _reader.startReading();
         } catch (IOException ioe) {
@@ -112,6 +121,7 @@ public class ClientConnectionRunner {
         _dead = true;
         // we need these keys to unpublish the leaseSet
         if (_reader != null) _reader.stopReading();
+        if (_writer != null) _writer.stopWriting();
         if (_socket != null) try { _socket.close(); } catch (IOException ioe) { }
         synchronized (_messages) {
             _messages.clear();
@@ -143,9 +153,50 @@ public class ClientConnectionRunner {
     /** already closed? */
     boolean isDead() { return _dead; }
     /** message body */
-    Payload getPayload(MessageId id) { synchronized (_messages) { return (Payload)_messages.get(id); } }
-    void setPayload(MessageId id, Payload payload) { synchronized (_messages) { _messages.put(id, payload); } }
-    void removePayload(MessageId id) { synchronized (_messages) { _messages.remove(id); } }
+    Payload getPayload(MessageId id) { 
+        Payload rv = null;
+        long beforeLock = _context.clock().now();
+        long inLock = 0;
+        synchronized (_messages) { 
+            inLock = _context.clock().now();
+            rv = (Payload)_messages.get(id); 
+        } 
+        long afterLock = _context.clock().now();
+        
+        if (afterLock - beforeLock > 50) {
+            _log.warn("alreadyAccepted.locking took too long: " + (afterLock-beforeLock)
+                      + " overall, synchronized took " + (inLock - beforeLock));
+        }
+        return rv;
+    }
+    void setPayload(MessageId id, Payload payload) { 
+        long beforeLock = _context.clock().now();
+        long inLock = 0;
+        synchronized (_messages) { 
+            inLock = _context.clock().now();
+            _messages.put(id, payload); 
+        } 
+        long afterLock = _context.clock().now();
+        
+        if (afterLock - beforeLock > 50) {
+            _log.warn("setPayload.locking took too long: " + (afterLock-beforeLock)
+                      + " overall, synchronized took " + (inLock - beforeLock));
+        }
+    }
+    void removePayload(MessageId id) { 
+        long beforeLock = _context.clock().now();
+        long inLock = 0;
+        synchronized (_messages) { 
+            inLock = _context.clock().now();
+            _messages.remove(id); 
+        } 
+        long afterLock = _context.clock().now();
+        
+        if (afterLock - beforeLock > 50) {
+            _log.warn("removePayload.locking took too long: " + (afterLock-beforeLock)
+                      + " overall, synchronized took " + (inLock - beforeLock));
+        }
+    }
     
     void sessionEstablished(SessionConfig config) {
         if (_log.shouldLog(Log.DEBUG))
@@ -183,8 +234,6 @@ public class ClientConnectionRunner {
             doSend(msg);
         } catch (I2CPMessageException ime) {
             _log.error("Error writing out the disconnect message", ime);
-        } catch (IOException ioe) {
-            _log.error("Error writing out the disconnect message", ioe);
         }
         stopRunning();
     }
@@ -200,15 +249,31 @@ public class ClientConnectionRunner {
         Destination dest = message.getDestination();
         MessageId id = new MessageId();
         id.setMessageId(getNextMessageId()); 
+        long beforeLock = _context.clock().now();
+        long inLock = 0;
         synchronized (_acceptedPending) {
+            inLock = _context.clock().now();
             _acceptedPending.add(id);
         }
+        long afterLock = _context.clock().now();
+        
+        if (afterLock - beforeLock > 50) {
+            _log.warn("distributeMessage.locking took too long: " + (afterLock-beforeLock)
+                      + " overall, synchronized took " + (inLock - beforeLock));
+        }
+        
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("** Recieving message [" + id.getMessageId() + "] with payload of size [" 
                        + payload.getSize() + "]" + " for session [" + _sessionId.getSessionId() 
                        + "]");
+        long beforeDistribute = _context.clock().now();
         // the following blocks as described above
         _manager.distributeMessage(_config.getDestination(), message.getDestination(), message.getPayload(), id);
+        long timeToDistribute = _context.clock().now() - beforeDistribute;
+        if (timeToDistribute > 50)
+            _log.warn("Took too long to distribute in the manager to " 
+                      + message.getDestination().calculateHash().toBase64() + ": " 
+                      + timeToDistribute);
         return id;
     }
     
@@ -229,13 +294,20 @@ public class ClientConnectionRunner {
         status.setStatus(MessageStatusMessage.STATUS_SEND_ACCEPTED);
         try {
             doSend(status);
+            long beforeLock = _context.clock().now();
+            long inLock = 0;
             synchronized (_acceptedPending) {
+                inLock = _context.clock().now();
                 _acceptedPending.remove(id);
+            }
+            long afterLock = _context.clock().now();
+
+            if (afterLock - beforeLock > 50) {
+                _log.warn("ackSendMessage.locking took too long: " + (afterLock-beforeLock)
+                          + " overall, synchronized took " + (inLock - beforeLock));
             }
         } catch (I2CPMessageException ime) {
             _log.error("Error writing out the message status message", ime);
-        } catch (IOException ioe) {
-            _log.error("Error writing out the message status message", ioe);
         }
     }
     
@@ -283,10 +355,95 @@ public class ClientConnectionRunner {
     ////
        
     /**
+     * Async writer class so that if a client app hangs, they wont take down the
+     * whole router with them (since otherwise the JobQueue would block until
+     * the client reads from their i2cp socket, causing all sorts of bad shit to
+     * happen)
+     *
+     */
+    private class ClientWriterRunner implements Runnable {
+        private List _messagesToWrite;
+        public ClientWriterRunner() {
+            _messagesToWrite = new ArrayList(2);
+        }
+        
+        /**
+         * Add this message to the writer's queue
+         *
+         */
+        public void addMessage(I2CPMessage msg) {
+            synchronized (_messagesToWrite) {
+                _messagesToWrite.add(msg);
+                _messagesToWrite.notify();
+            }
+        }
+        
+        /**
+         * No more messages - dont even try to send what we have
+         *
+         */
+        public void stopWriting() {
+            synchronized (_messagesToWrite) {
+                _messagesToWrite.notify();
+            }
+        }
+        public void run() {
+            while (!_dead) {
+                I2CPMessage msg = null;
+                synchronized (_messagesToWrite) {
+                    if (_messagesToWrite.size() > 0) {
+                        // we do this test before and after wait, in case more than 
+                        // one message gets enqueued
+                        msg = (I2CPMessage)_messagesToWrite.remove(0);
+                    } else {
+                        try {
+                            _messagesToWrite.wait();
+                        } catch (InterruptedException ie) {}
+                        
+                        if (_messagesToWrite.size() > 0)
+                            msg = (I2CPMessage)_messagesToWrite.remove(0);
+                    }
+                }
+                if (msg != null)
+                    writeMessage(msg);
+            }
+        }
+        
+        private void writeMessage(I2CPMessage msg) {
+            long before = _context.clock().now();
+            try {
+                synchronized (_out) {
+                    msg.writeMessage(_out);
+                    _out.flush();
+                }
+                if (_log.shouldLog(Log.DEBUG))
+                    _log.debug("after doSend of a "+ msg.getClass().getName() + " message");
+            } catch (I2CPMessageException ime) {
+                _log.error("Message exception sending I2CP message", ime);
+                stopRunning();
+            } catch (IOException ioe) {
+                _log.error("IO exception sending I2CP message", ioe);
+                stopRunning();
+            } catch (Throwable t) {
+                _log.log(Log.CRIT, "Unhandled exception sending I2CP message", t);
+                stopRunning();
+            } finally {
+                long after = _context.clock().now();
+                long lag = after - before;
+                if (lag > 300) {
+                    if (_log.shouldLog(Log.WARN))
+                        _log.warn("synchronization on the i2cp message send took too long (" + lag 
+                                  + "ms): " + msg);
+                }
+            }
+        }
+    }
+    
+    /**
      * Actually send the I2CPMessage to the peer through the socket
      *
      */
-    void doSend(I2CPMessage msg) throws I2CPMessageException, IOException {
+    void doSend(I2CPMessage msg) throws I2CPMessageException {
         if (_out == null) throw new I2CPMessageException("Output stream is not initialized");
         if (msg == null) throw new I2CPMessageException("Null message?!");
         if (_log.shouldLog(Log.DEBUG)) {
@@ -298,32 +455,8 @@ public class ClientConnectionRunner {
                            + " message on for " 
                            + _config.getDestination().calculateHash().toBase64());
         }
-        long before = _context.clock().now();
-        try {
-            synchronized (_out) {
-                msg.writeMessage(_out);
-                _out.flush();
-            }
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("after doSend of a "+ msg.getClass().getName() + " message");
-        } catch (I2CPMessageException ime) {
-            _log.error("Message exception sending I2CP message", ime);
-            throw ime;
-        } catch (IOException ioe) {
-            _log.error("IO exception sending I2CP message", ioe);
-            throw ioe;
-        } catch (Throwable t) {
-            _log.log(Log.CRIT, "Unhandled exception sending I2CP message", t);
-            throw new IOException("Unhandled exception sending I2CP message: " + t.getMessage());
-        } finally {
-            long after = _context.clock().now();
-            long lag = after - before;
-            if (lag > 300) {
-                if (_log.shouldLog(Log.WARN))
-                    _log.warn("synchronization on the i2cp message send took too long (" + lag 
-                              + "ms): " + msg);
-            }
-        }
+        _writer.addMessage(msg);
+
     }
     
     // this *should* be mod 65536, but UnsignedInteger is still b0rked.  FIXME
@@ -350,11 +483,20 @@ public class ClientConnectionRunner {
         boolean isPending = false;
         int pending = 0;
         String buf = null;
+        long beforeLock = _context.clock().now();
+        long inLock = 0;
         synchronized (_acceptedPending) {
+            inLock = _context.clock().now();
             if (_acceptedPending.contains(id))
                 isPending = true;
             pending = _acceptedPending.size();
             buf = _acceptedPending.toString();
+        }
+        long afterLock = _context.clock().now();
+        
+        if (afterLock - beforeLock > 50) {
+            _log.warn("alreadyAccepted.locking took too long: " + (afterLock-beforeLock)
+                      + " overall, synchronized took " + (inLock - beforeLock));
         }
         if (pending >= 1) {
             _log.warn("Pending acks: " + pending + ": " + buf);
@@ -405,16 +547,28 @@ public class ClientConnectionRunner {
                 return;
             }
 
+            boolean alreadyProcessed = false;
+            long beforeLock = MessageDeliveryStatusUpdate.this._context.clock().now();
+            long inLock = 0;
             synchronized (_alreadyProcessed) {
+                inLock = MessageDeliveryStatusUpdate.this._context.clock().now();
                 if (_alreadyProcessed.contains(_messageId)) {
                     _log.warn("Status already updated");
-                    return;
+                    alreadyProcessed = true;
                 } else {
                     _alreadyProcessed.add(_messageId);
                     while (_alreadyProcessed.size() > 10)
                         _alreadyProcessed.remove(0);
                 }
             }
+            long afterLock = MessageDeliveryStatusUpdate.this._context.clock().now();
+
+            if (afterLock - beforeLock > 50) {
+                _log.warn("MessageDeliveryStatusUpdate.locking took too long: " + (afterLock-beforeLock)
+                          + " overall, synchronized took " + (inLock - beforeLock));
+            }
+            
+            if (alreadyProcessed) return;
 
             if (_lastTried > 0) {
                 if (_log.shouldLog(Log.DEBUG))
@@ -435,8 +589,6 @@ public class ClientConnectionRunner {
                 doSend(msg);
             } catch (I2CPMessageException ime) {
                 _log.warn("Error updating the status for message ID " + _messageId, ime);
-            } catch (IOException ioe) {
-                _log.warn("Error updating the status for message ID " + _messageId, ioe);
             }
         }
     }

@@ -65,8 +65,6 @@ class MessageReceivedJob extends JobImpl {
             _runner.doSend(msg);
         } catch (I2CPMessageException ime) {
             _log.error("Error writing out the message status message", ime);
-        } catch (IOException ioe) {
-            _log.error("Error writing out the message status message", ioe);
         }
     }
 }

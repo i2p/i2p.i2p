@@ -35,12 +35,26 @@ public class ClientMessagePool {
      *
      */
     public void add(ClientMessage msg) {
-        if ( (_context.clientManager().isLocal(msg.getDestination())) ||
+        add(msg, false);
+    }
+    /**
+     * If we're coming from the client subsystem itself, we already know whether
+     * the target is definitely remote and as such don't need to recheck 
+     * ourselves, but if we aren't certain, we want it to check for us.
+     *
+     * @param isDefinitelyRemote true if we know for sure that the target is not local
+     *
+     */
+    public void add(ClientMessage msg, boolean isDefinitelyRemote) {
+        if ( !isDefinitelyRemote ||
+             (_context.clientManager().isLocal(msg.getDestination())) ||
              (_context.clientManager().isLocal(msg.getDestinationHash())) ) {
-            _log.debug("Adding message for local delivery");
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Adding message for local delivery");
             _context.clientManager().messageReceived(msg);
         } else {
-            _log.debug("Adding message for remote delivery");
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Adding message for remote delivery");
             _context.jobQueue().addJob(new OutboundClientMessageJob(_context, msg));
         }
     }

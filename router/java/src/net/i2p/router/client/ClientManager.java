@@ -116,7 +116,8 @@ public class ClientManager {
         // check if there is a runner for it
         ClientConnectionRunner runner = getRunner(toDest);
         if (runner != null) {
-            _log.debug("Message " + msgId + " is targeting a local destination.  distribute it as such");
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Message " + msgId + " is targeting a local destination.  distribute it as such");
             runner.receiveMessage(toDest, fromDest, payload);
             if (fromDest != null) {
                 ClientConnectionRunner sender = getRunner(fromDest);
@@ -128,7 +129,8 @@ public class ClientManager {
             }
         } else {
             // remote.  w00t
-            _log.debug("Message " + msgId + " is targeting a REMOTE destination!  Added to the client message pool");
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Message " + msgId + " is targeting a REMOTE destination!  Added to the client message pool");
             runner = getRunner(fromDest);
             ClientMessage msg = new ClientMessage();
             msg.setDestination(toDest);
@@ -137,7 +139,7 @@ public class ClientManager {
             msg.setSenderConfig(runner.getConfig());
             msg.setFromDestination(runner.getConfig().getDestination());
             msg.setMessageId(msgId);
-            _context.clientMessagePool().add(msg);
+            _context.clientMessagePool().add(msg, true);
         }
     }
     
@@ -169,15 +171,34 @@ public class ClientManager {
     
     
     public boolean isLocal(Destination dest) { 
+        boolean rv = false;
+        long beforeLock = _context.clock().now();
+        long inLock = 0;
         synchronized (_runners) {
-            return (_runners.containsKey(dest));
+            inLock = _context.clock().now();
+            rv = _runners.containsKey(dest);
         }
+        long afterLock = _context.clock().now();
+
+        if (afterLock - beforeLock > 50) {
+            _log.warn("isLocal(Destination).locking took too long: " + (afterLock-beforeLock)
+                      + " overall, synchronized took " + (inLock - beforeLock));
+        }
+        return rv;
     }
     public boolean isLocal(Hash destHash) { 
         if (destHash == null) return false;
         Set dests = new HashSet();
+        long beforeLock = _context.clock().now();
+        long inLock = 0;
         synchronized (_runners) {
+            inLock = _context.clock().now();
             dests.addAll(_runners.keySet());
+        }
+        long afterLock = _context.clock().now();
+        if (afterLock - beforeLock > 50) {
+            _log.warn("isLocal(Hash).locking took too long: " + (afterLock-beforeLock)
+                      + " overall, synchronized took " + (inLock - beforeLock));
         }
         for (Iterator iter = dests.iterator(); iter.hasNext();) {
             Destination d = (Destination)iter.next();
@@ -187,9 +208,19 @@ public class ClientManager {
     }
     
     private ClientConnectionRunner getRunner(Destination dest) {
+        ClientConnectionRunner rv = null;
+        long beforeLock = _context.clock().now();
+        long inLock = 0;
         synchronized (_runners) {
-            return (ClientConnectionRunner)_runners.get(dest);
+            inLock = _context.clock().now();
+            rv = (ClientConnectionRunner)_runners.get(dest);
         }
+        long afterLock = _context.clock().now();
+        if (afterLock - beforeLock > 50) {
+            _log.warn("getRunner(Dest).locking took too long: " + (afterLock-beforeLock)
+                      + " overall, synchronized took " + (inLock - beforeLock));
+        }
+        return rv;
     }
     
     /**
@@ -208,9 +239,18 @@ public class ClientManager {
         if (destHash == null) 
             return null;
         Set dests = new HashSet();
+        long beforeLock = _context.clock().now();
+        long inLock = 0;
         synchronized (_runners) {
+            inLock = _context.clock().now();
             dests.addAll(_runners.keySet());
         }
+        long afterLock = _context.clock().now();
+        if (afterLock - beforeLock > 50) {
+            _log.warn("getRunner(Hash).locking took too long: " + (afterLock-beforeLock)
+                      + " overall, synchronized took " + (inLock - beforeLock));
+        }
+        
         for (Iterator iter = dests.iterator(); iter.hasNext(); ) {
             Destination d = (Destination)iter.next();
             if (d.calculateHash().equals(destHash))
@@ -235,9 +275,18 @@ public class ClientManager {
     
     private Set getRunnerDestinations() {
         Set dests = new HashSet();
+        long beforeLock = _context.clock().now();
+        long inLock = 0;
         synchronized (_runners) {
+            inLock = _context.clock().now();
             dests.addAll(_runners.keySet());
         }
+        long afterLock = _context.clock().now();
+        if (afterLock - beforeLock > 50) {
+            _log.warn("getRunnerDestinations().locking took too long: " + (afterLock-beforeLock)
+                      + " overall, synchronized took " + (inLock - beforeLock));
+        }
+        
         return dests;
     }
     
