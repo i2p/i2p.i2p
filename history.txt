@@ -1,4 +1,9 @@
-$Id: history.txt,v 1.150 2005/02/21 14:08:01 jrandom Exp $
+$Id: history.txt,v 1.151 2005/02/22 02:07:34 jrandom Exp $
+
+2005-02-22  jrandom
+    * Temporary workaround for the I2CP disconnect bug (have the streaminglib
+      try to automatically reconnect on accept()/connect(..)).
+    * Loop check for expired lease republishing (just in case)
 
 2005-02-22  jrandom
     * Adjusted (and fixed...) the timestamper change detection
