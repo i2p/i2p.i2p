@@ -1,4 +1,17 @@
-$Id: history.txt,v 1.45 2004/10/12 16:29:42 jrandom Exp $
+$Id: history.txt,v 1.46 2004/10/13 14:40:47 jrandom Exp $
+
+2004-10-14  jrandom
+    * Allow for a configurable tunnel "growth factor", rather than trying
+      to achieve a steady state.  This will let us grow gradually when
+      the router is needed more, rather than blindly accepting the request
+      or arbitrarily choking it at an averaged value.  Configure this with
+      "router.tunnelGrowthFactor" in the router.config (default "1.5").
+    * Adjust the tunnel test timeouts dynamically - rather than the old
+      flat 30s (!!!) timeout, we set the timeout to 2x the average tunnel
+      test time (the deviation factor can be adjusted by setting 
+      "router.tunnelTestDeviation" to "3.0" or whatever).  This should help
+      find the 'good' tunnels.
+    * Added some crazy debugging to try and track down an intermittent hang.
 
 2004-10-13  jrandom
     * Fix the probabalistic tunnel reject (we always accepted everything, 

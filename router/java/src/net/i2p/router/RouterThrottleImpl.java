@@ -131,6 +131,7 @@ class RouterThrottleImpl implements RouterThrottle {
         }
         
         if (numTunnels > getMinThrottleTunnels()) {
+            double growthFactor = getTunnelGrowthFactor();
             Rate avgTunnels = _context.statManager().getRate("tunnel.participatingTunnels").getRate(60*60*1000);
             if (avgTunnels != null) {
                 double avg = 0;
@@ -138,9 +139,9 @@ class RouterThrottleImpl implements RouterThrottle {
                     avg = avgTunnels.getAverageValue();
                 else
                     avg = avgTunnels.getLifetimeAverageValue();
-                if ( (avg > 0) && (avg < numTunnels) ) {
+                if ( (avg > 0) && (avg*growthFactor < numTunnels) ) {
                     // we're accelerating, lets try not to take on too much too fast
-                    double probAccept = avg / numTunnels;
+                    double probAccept = (avg*growthFactor) / numTunnels;
                     int v = _context.random().nextInt(100);
                     if (v < probAccept*100) {
                         // ok
@@ -171,8 +172,8 @@ class RouterThrottleImpl implements RouterThrottle {
                 else
                     avg60m = tunnelTestTime60m.getLifetimeAverageValue();
                 
-                if ( (avg60m > 0) && (avg10m > avg60m) ) {
-                    double probAccept = avg60m/avg10m;
+                if ( (avg60m > 0) && (avg10m > avg60m * growthFactor) ) {
+                    double probAccept = (avg60m*growthFactor)/avg10m;
                     int v = _context.random().nextInt(100);
                     if (v < probAccept*100) {
                         // ok
@@ -222,6 +223,14 @@ class RouterThrottleImpl implements RouterThrottle {
             return Integer.parseInt(_context.getProperty("router.minThrottleTunnels", "40"));
         } catch (NumberFormatException nfe) {
             return 40;
+        }
+    }
+    
+    private double getTunnelGrowthFactor() {
+        try {
+            return Double.parseDouble(_context.getProperty("router.tunnelGrowthFactor", "1.5"));
+        } catch (NumberFormatException nfe) {
+            return 1.5;
         }
     }
     

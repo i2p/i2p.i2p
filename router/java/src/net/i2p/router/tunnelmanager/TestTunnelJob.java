@@ -22,6 +22,8 @@ import net.i2p.router.RouterContext;
 import net.i2p.router.TunnelInfo;
 import net.i2p.router.TunnelSelectionCriteria;
 import net.i2p.router.message.SendTunnelMessageJob;
+import net.i2p.stat.RateStat;
+import net.i2p.stat.Rate;
 import net.i2p.util.Log;
 
 class TestTunnelJob extends JobImpl {
@@ -71,8 +73,42 @@ class TestTunnelJob extends JobImpl {
             return false;
     }
     
-    private final static long TEST_TIMEOUT = 30*1000; // 30 seconds for a test to succeed
+    private final static long DEFAULT_TEST_TIMEOUT = 10*1000; // 10 seconds for a test to succeed
+    private final static long MINIMUM_TEST_TIMEOUT = 1*1000; // 1 second min
     private final static int TEST_PRIORITY = 100;
+    
+    /** 
+     * how long should we let tunnel tests go on for? 
+     */
+    private long getTunnelTestTimeout() {
+        long rv = DEFAULT_TEST_TIMEOUT;
+        RateStat rs = getContext().statManager().getRate("tunnel.testSuccessTime");
+        if (rs != null) {
+            Rate r = rs.getRate(10*60*1000);
+            if (r != null) {
+                if (r.getLifetimeEventCount() > 0) {
+                    if (r.getLastEventCount() <= 0)
+                        rv = (long)(r.getLifetimeAverageValue() * getTunnelTestDeviationLimit());
+                    else
+                        rv = (long)(r.getAverageValue() * getTunnelTestDeviationLimit());
+                }
+            }
+        }
+        if (rv < MINIMUM_TEST_TIMEOUT)
+            rv = MINIMUM_TEST_TIMEOUT;
+        return rv;
+    }
+    
+    /** 
+     * How much greater than the current average tunnel test time should we accept?
+     */
+    private double getTunnelTestDeviationLimit() {
+        try {
+            return Double.parseDouble(getContext().getProperty("router.tunnelTestDeviation", "2.0"));
+        } catch (NumberFormatException nfe) {
+            return 2.0;
+        }
+    }
     
     /**
      * Send a message out the tunnel with instructions to send the message back
@@ -96,7 +132,7 @@ class TestTunnelJob extends JobImpl {
         
         TestFailedJob failureJob = new TestFailedJob();
         MessageSelector selector = new TestMessageSelector(msg.getMessageId(), info.getTunnelId().getTunnelId());
-        SendTunnelMessageJob testJob = new SendTunnelMessageJob(getContext(), msg, info.getTunnelId(), us, _secondaryId, null, new TestSuccessfulJob(), failureJob, selector, TEST_TIMEOUT, TEST_PRIORITY);
+        SendTunnelMessageJob testJob = new SendTunnelMessageJob(getContext(), msg, info.getTunnelId(), us, _secondaryId, null, new TestSuccessfulJob(), failureJob, selector, getTunnelTestTimeout(), TEST_PRIORITY);
         getContext().jobQueue().addJob(testJob);
     }
 
@@ -121,7 +157,7 @@ class TestTunnelJob extends JobImpl {
         
         TestFailedJob failureJob = new TestFailedJob();
         MessageSelector selector = new TestMessageSelector(msg.getMessageId(), info.getTunnelId().getTunnelId());
-        SendTunnelMessageJob j = new SendTunnelMessageJob(getContext(), msg, _secondaryId, info.getThisHop(), info.getTunnelId(), null, new TestSuccessfulJob(), failureJob, selector, TEST_TIMEOUT, TEST_PRIORITY);
+        SendTunnelMessageJob j = new SendTunnelMessageJob(getContext(), msg, _secondaryId, info.getThisHop(), info.getTunnelId(), null, new TestSuccessfulJob(), failureJob, selector, getTunnelTestTimeout(), TEST_PRIORITY);
         getContext().jobQueue().addJob(j);
     }
     
@@ -216,6 +252,11 @@ class TestTunnelJob extends JobImpl {
             if (_log.shouldLog(Log.INFO))
                 _log.info("Test of tunnel " + _primaryId+ " successfull after " 
                           + time + "ms waiting for " + _nonce);
+            
+            if (time > getTunnelTestTimeout()) {
+                return; // the test failed job should already have run
+            }
+            
             TunnelInfo info = _pool.getTunnelInfo(_primaryId);
             if (info != null) {
                 TestTunnelJob.this.getContext().messageHistory().tunnelValid(info, time);
@@ -254,7 +295,7 @@ class TestTunnelJob extends JobImpl {
             _id = id;
             _tunnelId = tunnelId;
             _found = false;
-            _expiration = getContext().clock().now() + TEST_TIMEOUT;
+            _expiration = getContext().clock().now() + getTunnelTestTimeout();
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("the expiration while testing tunnel " + tunnelId 
                            + " waiting for nonce " + id + ": " + new Date(_expiration));
