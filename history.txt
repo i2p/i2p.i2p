@@ -1,4 +1,8 @@
-$Id: history.txt,v 1.41 2004/10/08 17:53:03 jrandom Exp $
+$Id: history.txt,v 1.42 2004/10/09 19:03:27 jrandom Exp $
+
+2004-10-10  cervantes
+    * Update the I2PTunnel HTTP proxy to strip out the i2paddresshelper from
+      the request.
 
 2004-10-09  jrandom
     * Added a watchdog timer to do some baseline liveliness checking to help 

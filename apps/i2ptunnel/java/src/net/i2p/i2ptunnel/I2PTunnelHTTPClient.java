@@ -199,10 +199,14 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
                         host = getHostName(destination);
                         if ( (host != null) && ("i2p".equals(host)) ) {
                             int pos2;
-                            if ((pos2 = line.indexOf("?")) != -1) {
+                            if ((pos2 = request.indexOf("?")) != -1) {
                                 // Try to find an address helper in the fragments
-                                String fragments = line.substring(pos2 + 1);
+                                // and split the request into it's component parts for rebuilding later
+                                String fragments = request.substring(pos2 + 1);
+                                String uriPath = request.substring(0, pos2);
                                 pos2 = fragments.indexOf(" ");
+                                String protocolVersion = fragments.substring(pos2 + 1);
+                                String urlEncoding = "";
                                 fragments = fragments.substring(0, pos2);
                                 fragments = fragments + "&";
                                 String fragment;
@@ -215,8 +219,17 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
                                         if (pos2 >= 0) {
                                             addressHelpers.put(destination,fragment.substring(pos2 + 1));
                                         }
-                                    }
+                                    } else {
+                                        // append each fragment unless it's the address helper
+                                        if ("".equals(urlEncoding)) {
+                                            urlEncoding = "?" + fragment;
+                                        } else {
+                                            urlEncoding = urlEncoding + "&" + fragment; 
+                                        }
+				    }
                                 }
+                                // reconstruct the request minus the i2paddresshelper GET var
+                                request = uriPath + urlEncoding + " " + protocolVersion;
                             }
 
                             String addressHelper = (String) addressHelpers.get(destination);
