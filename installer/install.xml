@@ -23,12 +23,12 @@
 
     <resources>
         <res id="Installer.image" src="installer/resources/i2plogo.png" />
-        <res id="LicencePanel.licence" src="installer/resources/readme.license.txt"/>
+        <res id="InfoPanel.info" src="installer/resources/readme.license.txt"/>
     </resources>
 
     <panels>
         <panel classname="HelloPanel"/>
-        <panel classname="LicencePanel"/>
+        <panel classname="InfoPanel"/>
         <panel classname="TargetPanel"/>
         <panel classname="InstallPanel"/>
         <panel classname="FinishPanel"/>
