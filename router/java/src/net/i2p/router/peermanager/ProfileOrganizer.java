@@ -217,7 +217,7 @@ public class ProfileOrganizer {
         PeerProfile profile = getProfile(peer);
         if (profile != null) {
             RateStat invalidReplyRateStat = profile.getDBHistory().getInvalidReplyRate();
-            Rate invalidReplyRate = invalidReplyRateStat.getRate(60*60*1000l);
+            Rate invalidReplyRate = invalidReplyRateStat.getRate(30*60*1000l);
             if ( (invalidReplyRate.getCurrentTotalValue() > MAX_BAD_REPLIES_PER_HOUR) ||
                  (invalidReplyRate.getLastTotalValue() > MAX_BAD_REPLIES_PER_HOUR) ) {
                 return true;

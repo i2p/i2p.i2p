@@ -48,16 +48,14 @@ public class HandleDatabaseStoreMessageJob extends JobImpl {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Handling database store message");
 
-        boolean invalid = false;
+        String invalidMessage = null;
         boolean wasNew = false;
         if (_message.getValueType() == DatabaseStoreMessage.KEY_TYPE_LEASESET) {
             try {
                 Object match = getContext().netDb().store(_message.getKey(), _message.getLeaseSet());
                 wasNew = (null == match);
             } catch (IllegalArgumentException iae) {
-                if (_log.shouldLog(Log.WARN))
-                    _log.warn("Not storing a leaseSet", iae);
-                invalid = true;
+                invalidMessage = iae.getMessage();
             }
         } else if (_message.getValueType() == DatabaseStoreMessage.KEY_TYPE_ROUTERINFO) {
             if (_log.shouldLog(Log.INFO))
@@ -68,9 +66,7 @@ public class HandleDatabaseStoreMessageJob extends JobImpl {
                 wasNew = (null == match);
                 getContext().profileManager().heardAbout(_message.getKey());
             } catch (IllegalArgumentException iae) {
-                if (_log.shouldLog(Log.WARN))
-                    _log.warn("Not storing a routerInfo", iae);
-                invalid = true;
+                invalidMessage = iae.getMessage();
             }
         } else {
             if (_log.shouldLog(Log.ERROR))
@@ -84,9 +80,12 @@ public class HandleDatabaseStoreMessageJob extends JobImpl {
         if (_from != null)
             _fromHash = _from.getHash();
         if (_fromHash != null) {
-            if (!invalid) {
+            if (invalidMessage == null) {
                 getContext().profileManager().dbStoreReceived(_fromHash, wasNew);
                 getContext().statManager().addRateData("netDb.storeHandled", 1, 0);
+            } else {
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("Peer " + _fromHash.toBase64() + " sent bad data: " + invalidMessage);
             }
         }
     }

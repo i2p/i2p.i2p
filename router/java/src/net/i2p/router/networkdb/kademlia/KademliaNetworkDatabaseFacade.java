@@ -437,31 +437,36 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
      * Determine whether this leaseSet will be accepted as valid and current
      * given what we know now.
      *
+     * @return reason why the entry is not valid, or null if it is valid
      */
-    boolean validate(Hash key, LeaseSet leaseSet) {
+    String validate(Hash key, LeaseSet leaseSet) {
         if (!key.equals(leaseSet.getDestination().calculateHash())) {
-            if (_log.shouldLog(Log.ERROR))
-                _log.error("Invalid store attempt! key does not match leaseSet.destination!  key = "
-                + key + ", leaseSet = " + leaseSet);
-            return false;
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Invalid store attempt! key does not match leaseSet.destination!  key = "
+                          + key + ", leaseSet = " + leaseSet);
+            return "Key does not match leaseSet.destination - " + key.toBase64();
         } else if (!leaseSet.verifySignature()) {
-            if (_log.shouldLog(Log.ERROR))
-                _log.error("Invalid leaseSet signature!  leaseSet = " + leaseSet);
-            return false;
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Invalid leaseSet signature!  leaseSet = " + leaseSet);
+            return "Invalid leaseSet signature on " + leaseSet.getDestination().calculateHash().toBase64();
         } else if (leaseSet.getEarliestLeaseDate() <= _context.clock().now() - Router.CLOCK_FUDGE_FACTOR) {
+            long age = _context.clock().now() - leaseSet.getEarliestLeaseDate();
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Old leaseSet!  not storing it: " 
                           + leaseSet.getDestination().calculateHash().toBase64() 
                           + " expires on " + new Date(leaseSet.getEarliestLeaseDate()), new Exception("Rejecting store"));
-            return false;
+            return "Expired leaseSet for " + leaseSet.getDestination().calculateHash().toBase64() 
+                   + " expired " + DataHelper.formatDuration(age) + " ago";
         } else if (leaseSet.getEarliestLeaseDate() > _context.clock().now() + Router.CLOCK_FUDGE_FACTOR + MAX_LEASE_FUTURE) {
+            long age = leaseSet.getEarliestLeaseDate() - _context.clock().now();
             if (_log.shouldLog(Log.WARN))
                 _log.warn("LeaseSet to expire too far in the future: " 
                           + leaseSet.getDestination().calculateHash().toBase64() 
                           + " expires on " + new Date(leaseSet.getEarliestLeaseDate()), new Exception("Rejecting store"));
-            return false;
+            return "Expired leaseSet for " + leaseSet.getDestination().calculateHash().toBase64() 
+                   + " expiring in " + DataHelper.formatDuration(age);
         }
-        return true;
+        return null;
     }
     
     /**
@@ -472,8 +477,9 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
     public LeaseSet store(Hash key, LeaseSet leaseSet) throws IllegalArgumentException {
         if (!_initialized) return null;
         
-        boolean valid = validate(key, leaseSet);
-        if (!valid) throw new IllegalArgumentException("LeaseSet is not valid");
+        String err = validate(key, leaseSet);
+        if (err != null)
+            throw new IllegalArgumentException("Invalid store attempt - " + err);
         
         LeaseSet rv = null;
         if (_ds.isKnown(key))
@@ -509,21 +515,24 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
      * given what we know now.
      *
      */
-    boolean validate(Hash key, RouterInfo routerInfo) {
+    String validate(Hash key, RouterInfo routerInfo) throws IllegalArgumentException {
         long now = _context.clock().now();
         
         if (!key.equals(routerInfo.getIdentity().getHash())) {
-            _log.error("Invalid store attempt! key does not match routerInfo.identity!  key = " + key + ", router = " + routerInfo);
-            return false;
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Invalid store attempt! key does not match routerInfo.identity!  key = " + key + ", router = " + routerInfo);
+            return "Key does not match routerInfo.identity - " + key.toBase64();
         } else if (!routerInfo.isValid()) {
-            _log.error("Invalid routerInfo signature!  forged router structure!  router = " + routerInfo);
-            return false;
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Invalid routerInfo signature!  forged router structure!  router = " + routerInfo);
+            return "Invalid routerInfo signature on " + key.toBase64();
         } else if (!routerInfo.isCurrent(Router.CLOCK_FUDGE_FACTOR + ExpireRoutersJob.EXPIRE_DELAY)) {
+            long age = _context.clock().now() - routerInfo.getPublished();
             int existing = _kb.size();
             if (existing >= MIN_REMAINING_ROUTERS) {
                 if (_log.shouldLog(Log.INFO))
                     _log.info("Not storing expired router for " + key.toBase64(), new Exception("Rejecting store"));
-                return false;
+                return "Peer " + key.toBase64() + " expired " + DataHelper.formatDuration(age) + "ms ago";
             } else {
                 if (_log.shouldLog(Log.WARN))
                     _log.warn("Even though the peer is old, we have only " + existing
@@ -531,12 +540,13 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
                     + new Date(routerInfo.getPublished()));
             }
         } else if (routerInfo.getPublished() > now + Router.CLOCK_FUDGE_FACTOR) {
+            long age = routerInfo.getPublished() - _context.clock().now();
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Peer " + key.toBase64() + " published their routerInfo in the future?! [" 
                           + new Date(routerInfo.getPublished()) + "]", new Exception("Rejecting store"));
-            return false;
+            return "Peer " + key.toBase64() + " published " + DataHelper.formatDuration(age) + " in the future?!";
         }
-        return true;
+        return null;
     }
     
     /**
@@ -547,8 +557,9 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
     public RouterInfo store(Hash key, RouterInfo routerInfo) throws IllegalArgumentException {
         if (!_initialized) return null;
         
-        boolean valid = validate(key, routerInfo);
-        if (!valid) throw new IllegalArgumentException("LeaseSet is not valid");
+        String err = validate(key, routerInfo);
+        if (err != null)
+            throw new IllegalArgumentException("Invalid store attempt - " + err);
         
         RouterInfo rv = null;
         if (_ds.isKnown(key))

@@ -50,6 +50,8 @@ class SearchUpdateReplyFoundJob extends JobImpl implements ReplyJob {
                     _facade.store(msg.getKey(), msg.getLeaseSet());
                     getContext().profileManager().dbLookupSuccessful(_peer, timeToReply);
                 } catch (IllegalArgumentException iae) {
+                    if (_log.shouldLog(Log.ERROR))
+                        _log.warn("Peer " + _peer + " sent us an invalid leaseSet: " + iae.getMessage());
                     getContext().profileManager().dbLookupReply(_peer, 0, 0, 1, 0, timeToReply);
                 }
             } else if (msg.getValueType() == DatabaseStoreMessage.KEY_TYPE_ROUTERINFO) {
@@ -61,6 +63,8 @@ class SearchUpdateReplyFoundJob extends JobImpl implements ReplyJob {
                     _facade.store(msg.getKey(), msg.getRouterInfo());
                     getContext().profileManager().dbLookupSuccessful(_peer, timeToReply);
                 } catch (IllegalArgumentException iae) {
+                    if (_log.shouldLog(Log.ERROR))
+                        _log.warn("Peer " + _peer + " sent us an invalid routerInfo: " + iae.getMessage());
                     getContext().profileManager().dbLookupReply(_peer, 0, 0, 1, 0, timeToReply);
                 }
             } else {
