@@ -90,11 +90,13 @@ typedef struct {
 } sam_sess_t;  /* a SAM session */
 
 typedef enum {  /* see sam_strerror() for detailed descriptions of these */
+	/* no error code - not used by me (you can use it in your program) */
+	SAM_NULL = 0,
 	/* error codes from SAM itself (SAM_OK is not an actual "error") */
 	SAM_OK, SAM_CANT_REACH_PEER, SAM_DUPLICATED_DEST, SAM_I2P_ERROR,
 	SAM_INVALID_KEY, SAM_KEY_NOT_FOUND, SAM_PEER_NOT_FOUND, SAM_TIMEOUT,
 	SAM_UNKNOWN,
-	/* error codes from libsam */
+	/* error codes from LibSAM */
 	SAM_BAD_VERSION, SAM_CALLBACKS_UNSET, SAM_SOCKET_ERROR, SAM_TOO_BIG
 } samerr_t;
 
@@ -127,14 +129,14 @@ extern sam_sid_t sam_stream_connect(sam_sess_t *session,
 extern samerr_t	sam_stream_send(sam_sess_t *session, sam_sid_t stream_id,
 					const void *data, size_t size);
 /* Stream commands - callbacks */
-extern void		(*sam_closeback)(const sam_sess_t *session, sam_sid_t stream_id,
+extern void		(*sam_closeback)(sam_sess_t *session, sam_sid_t stream_id,
 					samerr_t reason);
-extern void		(*sam_connectback)(const sam_sess_t *session,
-					sam_sid_t stream_id, sam_pubkey_t dest);
-extern void		(*sam_databack)(const sam_sess_t *session, sam_sid_t stream_id,
+extern void		(*sam_connectback)(sam_sess_t *session, sam_sid_t stream_id,
+					sam_pubkey_t dest);
+extern void		(*sam_databack)(sam_sess_t *session, sam_sid_t stream_id,
 					void *data, size_t size);
-extern void		(*sam_statusback)(const sam_sess_t *session,
-					sam_sid_t stream_id, samerr_t result);
+extern void		(*sam_statusback)(sam_sess_t *session, sam_sid_t stream_id,
+					samerr_t result);
 
 /* Stream send queue (experimental) */
 extern void		sam_sendq_add(sam_sess_t *session, sam_sid_t stream_id,
@@ -147,7 +149,7 @@ extern samerr_t	sam_dgram_send(sam_sess_t *session, const sam_pubkey_t dest,
 					const void *data, size_t size);
 
 /* Datagram commands - callbacks */
-extern void		(*sam_dgramback)(const sam_sess_t *session, sam_pubkey_t dest,
+extern void		(*sam_dgramback)(sam_sess_t *session, sam_pubkey_t dest,
 					void *data, size_t size);
 
 #ifdef __cplusplus

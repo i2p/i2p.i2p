@@ -1,4 +1,8 @@
+/* vi:set ts=4: */
+
 v1.25
+	* Removed the old broken examples and added more comments to
+		warhammer-dgram.c
 	* Added support for sessions - now LibSAM can have multiple SAM sessions
 		going at once (with different destinations)
 	* Rewrote sendq functions to automatically send big packets, for better

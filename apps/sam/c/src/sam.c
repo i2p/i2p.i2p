@@ -56,26 +56,25 @@ static ssize_t		sam_write(sam_sess_t *session, const void *buf, size_t n);
  * Note: if you add a new callback be sure to check for non-NULL in sam_connect
  */
 /* a peer closed the connection */
-void (*sam_closeback)(const sam_sess_t *session, sam_sid_t stream_id,
-	samerr_t reason) = NULL;
+void (*sam_closeback)(sam_sess_t *session, sam_sid_t stream_id, samerr_t reason)
+	= NULL;
 /* a peer connected to us */
-void (*sam_connectback)(const sam_sess_t *session, sam_sid_t stream_id,
+void (*sam_connectback)(sam_sess_t *session, sam_sid_t stream_id,
 	sam_pubkey_t dest) = NULL;
 /* a peer sent some stream data (`data' MUST be freed) */
-void (*sam_databack)(const sam_sess_t *session, sam_sid_t stream_id, void *data,
+void (*sam_databack)(sam_sess_t *session, sam_sid_t stream_id, void *data,
 	size_t size) = NULL;
 /* a peer sent some datagram data (`data' MUST be freed) */
-void (*sam_dgramback)(const sam_sess_t *session, sam_pubkey_t dest, void *data,
+void (*sam_dgramback)(sam_sess_t *session, sam_pubkey_t dest, void *data,
 	size_t size) = NULL;
 /* we lost the connection to the SAM host */
 void (*sam_diedback)(sam_sess_t *session) = NULL;
 /* logging callback */
 void (*sam_logback)(char *str) = NULL;
 /* naming lookup reply - `pubkey' will be NULL if `result' isn't SAM_OK */
-void (*sam_namingback)(char *name, sam_pubkey_t pubkey,
-	samerr_t result) = NULL;
+void (*sam_namingback)(char *name, sam_pubkey_t pubkey, samerr_t result) = NULL;
 /* our connection to a peer has completed */
-void (*sam_statusback)(const sam_sess_t *session, sam_sid_t stream_id,
+void (*sam_statusback)(sam_sess_t *session, sam_sid_t stream_id,
 	samerr_t result) = NULL;
 
 /*
