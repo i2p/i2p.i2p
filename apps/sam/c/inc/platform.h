@@ -112,11 +112,6 @@
 /*
  * Platform-dependent variable types
  */
-#ifdef WINSOCK
-	typedef SOCKET socket_t;
-#else
-	typedef int socket_t;
-#endif
 #ifdef NO_SSIZE_T
 	typedef signed long ssize_t;
 #endif

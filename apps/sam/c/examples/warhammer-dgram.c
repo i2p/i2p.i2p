@@ -34,15 +34,17 @@
  * Use only with the utmost courtesy.
  */
 
-#include <stdbool.h>
-#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include "sam.h"
 
-static void dgramback(sam_pubkey_t dest, void *data, size_t size);
-static void diedback(void);
+/*
+ * LibSAM callbacks
+ */
+static void dgramback(const sam_sess_t *session, sam_pubkey_t dest, void *data,
+	size_t size);
+static void diedback(sam_sess_t *session);
 static void logback(char *s);
 static void namingback(char *name, sam_pubkey_t pubkey, samerr_t result);
 
@@ -61,47 +63,65 @@ int main(int argc, char* argv[])
 	sam_logback = &logback;
 	sam_namingback = &namingback;
 
-	/* a tunnel length of 2 is the default - adjust to your preference   vv */
-	samerr_t rc = sam_connect("localhost", 7656, "TRANSIENT", SAM_DGRAM, 2);
+	/*
+	 * This tool would be more destructive if multiple session were used, but
+	 * they aren't - at least for now.
+	 */
+	sam_sess_t *session = NULL;
+	session = sam_session_init(session);
+
+	/* a tunnel length of 2 is the default - adjust to your preference */
+	samerr_t rc = sam_connect(session, "localhost", 7656, "TRANSIENT",
+		SAM_DGRAM, 2);
 	if (rc != SAM_OK) {
 		fprintf(stderr, "SAM connection failed: %s\n", sam_strerror(rc));
-		exit(1);
+		sam_session_free(&session);
+		return 1;
 	}
 
+	/*
+	 * Check whether they've supplied a name or a base 64 destination
+	 *
+	 * Note that this is a hack.  Jrandom says that once certificates are added,
+	 * the length could be different depending on the certificate.
+	 */
 	if (strlen(argv[1]) == 516) {
 		memcpy(dest, argv[1], SAM_PUBKEY_LEN);
 		gotdest = true;
 	}
 	else
-		sam_naming_lookup(argv[1]);
+		sam_naming_lookup(session, argv[1]);
 
 	while (!gotdest)
-		sam_read_buffer();
+		sam_read_buffer(session);
 
 	char data[SAM_DGRAM_PAYLOAD_MAX];
 	memset(data, '#', SAM_DGRAM_PAYLOAD_MAX);
 	size_t sentbytes = 0;
 	while (true) {
-		rc = sam_dgram_send(dest, data, SAM_DGRAM_PAYLOAD_MAX);
+		rc = sam_dgram_send(session, dest, data, SAM_DGRAM_PAYLOAD_MAX);
 		if (rc != SAM_OK) {
 			fprintf(stderr, "sam_dgram_send() failed: %s\n", sam_strerror(rc));
+			sam_session_free(&session);
 			return 1;
 		}
 		sentbytes += SAM_DGRAM_PAYLOAD_MAX;
 		printf("Bombs away! (%u kbytes sent so far)\n", sentbytes / 1024);
-		sam_read_buffer();
+		sam_read_buffer(session);
 	}
 
+	sam_session_free(&session);
 	return 0;
 }
 
-static void dgramback(sam_pubkey_t dest, void *data, size_t size)
+static void dgramback(const sam_sess_t *session, sam_pubkey_t dest, void *data,
+		size_t size)
 {
 	puts("Received a datagram (ignored)");
 	free(data);
 }
 
-static void diedback(void)
+static void diedback(sam_sess_t *session)
 {
 	fprintf(stderr, "Lost SAM connection!\n");
 	exit(1);

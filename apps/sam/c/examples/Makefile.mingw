@@ -14,6 +14,7 @@ CC = C:\Dev-Cpp\bin\gcc
 
 CFLAGS = -g -O2 -pipe -std=c99 -Wall
 CFLAGS += -I../inc -L../lib
+CFLAGS += -DWINSOCK
 LIBS = -lsam -lwsock32
 
 #

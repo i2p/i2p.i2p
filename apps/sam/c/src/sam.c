@@ -85,6 +85,7 @@ void (*sam_statusback)(const sam_sess_t *session, sam_sid_t stream_id,
  */
 bool sam_close(sam_sess_t *session)
 {
+	assert(session != NULL);
 	if (!session->connected)
 		return true;
 
@@ -127,6 +128,7 @@ bool sam_close(sam_sess_t *session)
 samerr_t sam_connect(sam_sess_t *session, const char *samhost, uint16_t samport,
 		const char *destname, sam_conn_t style, uint_t tunneldepth)
 {
+	assert(session != NULL);
 	samerr_t rc;
 
 	if (style == SAM_STREAM) {
@@ -190,13 +192,14 @@ samerr_t sam_connect(sam_sess_t *session, const char *samhost, uint16_t samport,
 samerr_t sam_dgram_send(sam_sess_t *session, const sam_pubkey_t dest,
 		const void *data, size_t size)
 {
+	assert(session != NULL);
 	char cmd[SAM_PKCMD_LEN];
 
 	if (size < 1 || size > SAM_DGRAM_PAYLOAD_MAX) {
 #ifdef NO_Z_FORMAT
 		SAMLOG("Invalid data send size (%u bytes)", size);
 #else
-		SAMLOG("Invalid data send size (%dz bytes)", size);
+		SAMLOG("Invalid data send size (%zu bytes)", size);
 #endif
 		return SAM_TOO_BIG;
 	}
@@ -204,7 +207,7 @@ samerr_t sam_dgram_send(sam_sess_t *session, const sam_pubkey_t dest,
 	snprintf(cmd, sizeof cmd, "DATAGRAM SEND DESTINATION=%s SIZE=%u\n",
 		dest, size);
 #else
-	snprintf(cmd, sizeof cmd, "DATAGRAM SEND DESTINATION=%s SIZE=%dz\n",
+	snprintf(cmd, sizeof cmd, "DATAGRAM SEND DESTINATION=%s SIZE=%zu\n",
 		dest, size);
 #endif
 	sam_write(session, cmd, strlen(cmd));
@@ -221,6 +224,7 @@ samerr_t sam_dgram_send(sam_sess_t *session, const sam_pubkey_t dest,
  */
 static bool sam_hello(sam_sess_t *session)
 {
+	assert(session != NULL);
 #define SAM_HELLO_CMD	"HELLO VERSION MIN=1.0 MAX=1.0\n"
 #define SAM_HELLO_REPLY	"HELLO REPLY RESULT=OK VERSION=1.0"
 	char reply[SAM_REPLY_LEN];
@@ -259,6 +263,7 @@ static void sam_log(const char *format, ...)
  */
 void sam_naming_lookup(sam_sess_t *session, const char *name)
 {
+	assert(session != NULL);
 	char cmd[SAM_CMD_LEN];
 
 	snprintf(cmd, sizeof cmd, "NAMING LOOKUP NAME=%s\n", name);
@@ -274,6 +279,7 @@ void sam_naming_lookup(sam_sess_t *session, const char *name)
  */
 static void sam_parse(sam_sess_t *session, char *s)
 {
+	assert(session != NULL);
 #define SAM_DGRAM_RECEIVED_REPLY "DATAGRAM RECEIVED"
 #define SAM_NAMING_REPLY "NAMING REPLY"
 #define SAM_NAMING_REPLY_OK "NAMING REPLY RESULT=OK"
@@ -501,6 +507,7 @@ static void sam_parse(sam_sess_t *session, char *s)
  */
 bool sam_read_buffer(sam_sess_t *session)
 {
+	assert(session != NULL);
 	bool read_something = false;
 	char reply[SAM_REPLY_LEN];
 
@@ -531,6 +538,7 @@ bool sam_read_buffer(sam_sess_t *session)
  */
 static ssize_t sam_read1(sam_sess_t *session, char *buf, size_t n)
 {
+	assert(session != NULL);
 	size_t nleft;
 	ssize_t nread;
 	char *p;
@@ -598,6 +606,7 @@ static ssize_t sam_read1(sam_sess_t *session, char *buf, size_t n)
  */
 static ssize_t sam_read2(sam_sess_t *session, void *buf, size_t n)
 {
+	assert(session != NULL);
 	size_t nleft;
 	ssize_t nread;
 	void *p;
@@ -649,6 +658,7 @@ static ssize_t sam_read2(sam_sess_t *session, void *buf, size_t n)
  */
 static bool sam_readable(sam_sess_t *session)
 {
+	assert(session != NULL);
 	fd_set rset;  /* set of readable descriptors */
 	struct timeval tv;
 	int rc;
@@ -691,6 +701,7 @@ static bool sam_readable(sam_sess_t *session)
 void sam_sendq_add(sam_sess_t *session, sam_sid_t stream_id,
 		sam_sendq_t **sendq, const void *data, size_t dsize)
 {
+	assert(session != NULL);
 	assert(dsize >= 0);
 	if (dsize == 0) {
 		SAMLOGS("dsize is 0 - doing nothing");
@@ -754,6 +765,7 @@ static sam_sendq_t *sam_sendq_create()
 void sam_sendq_flush(sam_sess_t *session, sam_sid_t stream_id,
 		sam_sendq_t **sendq)
 {
+	assert(session != NULL);
 	sam_stream_send(session, stream_id, (*sendq)->data, (*sendq)->size);
 	/* we now free it in case they aren't going to use it anymore */
 	free((*sendq)->data);
@@ -786,7 +798,8 @@ sam_sess_t *sam_session_init(sam_sess_t *session)
  */
 void sam_session_free(sam_sess_t **session)
 {
-	free(session);
+	assert(*session != NULL);
+	free(*session);
 	*session = NULL;
 }
 
@@ -803,6 +816,7 @@ void sam_session_free(sam_sess_t **session)
 static samerr_t sam_session_create(sam_sess_t *session, const char *destname,
 	sam_conn_t style, uint_t tunneldepth)
 {
+	assert(session != NULL);
 #define SAM_SESSTATUS_REPLY_OK "SESSION STATUS RESULT=OK"
 #define SAM_SESSTATUS_REPLY_DD "SESSION STATUS RESULT=DUPLICATED_DEST"
 #define SAM_SESSTATUS_REPLY_I2E "SESSION STATUS RESULT=I2P_ERROR"
@@ -855,6 +869,7 @@ static samerr_t sam_session_create(sam_sess_t *session, const char *destname,
  */
 bool sam_socket_connect(sam_sess_t *session, const char *host, uint16_t port)
 {
+	assert(session != NULL);
 	struct sockaddr_in hostaddr;
 	int rc;
 	char ipaddr[INET_ADDRSTRLEN];
@@ -965,6 +980,7 @@ retry:
  */
 void sam_stream_close(sam_sess_t *session, sam_sid_t stream_id)
 {
+	assert(session != NULL);
 	char cmd[SAM_CMD_LEN];
 
 #ifdef FAST32_IS_LONG
@@ -986,6 +1002,7 @@ void sam_stream_close(sam_sess_t *session, sam_sid_t stream_id)
  */
 sam_sid_t sam_stream_connect(sam_sess_t *session, const sam_pubkey_t dest)
 {
+	assert(session != NULL);
 	char cmd[SAM_PKCMD_LEN];
 
 	session->prev_id++;  /* increment the id for the connection */
@@ -1013,6 +1030,7 @@ sam_sid_t sam_stream_connect(sam_sess_t *session, const sam_pubkey_t dest)
 samerr_t sam_stream_send(sam_sess_t *session, sam_sid_t stream_id,
 		const void *data, size_t size)
 {
+	assert(session != NULL);
 	char cmd[SAM_CMD_LEN];
 
 	if (size < 1 || size > SAM_STREAM_PAYLOAD_MAX) {
@@ -1020,7 +1038,7 @@ samerr_t sam_stream_send(sam_sess_t *session, sam_sid_t stream_id,
 		SAMLOG("Invalid data send size (%u bytes) for stream %d",
 			size, stream_id);
 #else
-		SAMLOG("Invalid data send size (%dz bytes) for stream %d",
+		SAMLOG("Invalid data send size (%zu bytes) for stream %d",
 			size, stream_id);
 #endif
 		return SAM_TOO_BIG;
@@ -1034,7 +1052,7 @@ samerr_t sam_stream_send(sam_sess_t *session, sam_sid_t stream_id,
 			stream_id, size);
 	#endif
 #else
-	snprintf(cmd, sizeof cmd, "STREAM SEND ID=%d SIZE=%dz\n",
+	snprintf(cmd, sizeof cmd, "STREAM SEND ID=%d SIZE=%zu\n",
 		stream_id, size);
 #endif
 	sam_write(session, cmd, strlen(cmd));
@@ -1272,6 +1290,7 @@ const char *sam_winsock_strerror(int code)
  */
 static ssize_t sam_write(sam_sess_t *session, const void *buf, size_t n)
 {
+	assert(session != NULL);
 	size_t nleft;
 	ssize_t nwritten;
 	const char *p;

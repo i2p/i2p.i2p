@@ -66,6 +66,12 @@ typedef unsigned int uint_t;
 typedef unsigned long ulong_t;
 typedef unsigned short ushort_t;
 
+#ifdef WINSOCK
+	typedef SOCKET socket_t;
+#else
+	typedef int socket_t;
+#endif
+
 typedef enum {SAM_STREAM, SAM_DGRAM, SAM_RAW} sam_conn_t;  /* SAM connection */
 
 typedef char sam_pubkey_t[SAM_PUBKEY_LEN];  /* base 64 public key */
