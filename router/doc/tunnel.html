@@ -1,0 +1,373 @@
+<pre>
+1) <a href="#tunnel.overview">Tunnel overview</a>
+2) <a href="#tunnel.operation">Tunnel operation</a>
+2.1) <a href="#tunnel.preprocessing">Message preprocessing</a>
+2.2) <a href="#tunnel.gateway">Gateway processing</a>
+2.3) <a href="#tunnel.participant">Participant processing</a>
+2.4) <a href="#tunnel.endpoint">Endpoint processing</a>
+2.5) <a href="#tunnel.padding">Padding</a>
+2.6) <a href="#tunnel.fragmentation">Tunnel fragmentation</a>
+2.7) <a href="#tunnel.alternatives">Alternatives</a>
+2.7.1) <a href="#tunnel.nochecksum">Don't use a checksum block</a>
+2.7.2) <a href="#tunnel.reroute">Adjust tunnel processing midstream</a>
+2.7.3) <a href="#tunnel.bidirectional">Use bidirectional tunnels</a>
+2.7.4) <a href="#tunnel.smallerhashes">Use smaller hashes</a>
+3) <a href="#tunnel.building">Tunnel building</a>
+3.1) <a href="#tunnel.peerselection">Peer selection</a>
+3.2) <a href="#tunnel.request">Request delivery</a>
+3.3) <a href="#tunnel.pooling">Pooling</a>
+4) <a href="#tunnel.throttling">Tunnel throttling</a>
+5) <a href="#tunnel.mixing">Mixing/batching</a>
+</pre>
+
+<h2>1) <a name="tunnel.overview">Tunnel overview</a></h2>
+
+<p>Within I2P, messages are passed in one direction through a virtual
+tunnel of peers, using whatever means are available to pass the 
+message on to the next hop.  Messages arrive at the tunnel's 
+gateway, get bundled up for the path, and are forwarded on to the
+next hop in the tunnel, which processes and verifies the validity
+of the message and sends it on to the next hop, and so on, until
+it reaches the tunnel endpoint.  That endpoint takes the messages
+bundled up by the gateway and forwards them as instructed - either
+to another router, to another tunnel on another router, or locally.</p>
+
+<p>Tunnels all work the same, but can be segmented into two different
+groups - inbound tunnels and outbound tunnels.  The inbound tunnels
+have an untrusted gateway which passes messages down towards the 
+tunnel creator, which serves as the tunnel endpoint.  For outbound 
+tunnels, the tunnel creator serves as the gateway, passing messages
+out to the remote endpoint.</p>
+
+<p>The tunnel's creator selects exactly which peers will participate
+in the tunnel, and provides each with the necessary confiruration
+data.  They may vary in length from 0 hops (where the gateway
+is also the endpoint) to 9 hops (where there are 7 peers after
+the gateway and before the endpoint).  It is the intent to make
+it hard for either participants or third parties to determine
+the length of a tunnel, or even for colluding participants to 
+determine whether they are a part of the same tunnel at all 
+(barring the situation where colluding peers are next to each other
+in the tunnel).  Messages that have been corrupted are also dropped
+as soon as possible, reducing network load.</p>
+
+<p>Beyond their length, there are additional configurable parameters
+for each tunnel that can be used, such as a throttle on the size or
+frequency of messages delivered, how padding should be used, how 
+long a tunnel should be in operation, whether to inject chaff 
+messages, whether to use fragmentation, and what, if any, batching
+strategies should be employed.</p>
+
+<p>In practice, a series of tunnel pools are used for different
+purposes - each local client destination has its own set of inbound
+tunnels and outbound tunnels, configured to meet its anonymity and
+performance needs.  In addition, the router itself maintains a series
+of pools for participating in the network database and for managing
+the tunnels themselves.</p>
+
+<p>I2P is an inherently packet switched network, even with these 
+tunnels, allowing it to take advantage of multiple tunnels running 
+in parallel, increasing resiliance and balancing load.  Outside of
+the core I2P layer, there is an optional end to end streaming library 
+available for client applications, exposing TCP-esque operation,
+including message reordering, retransmission, congestion control, etc.</p>
+
+<h2>2) <a name="tunnel.operation">Tunnel operation</a></h2>
+
+<p>Tunnel operation has four distinct processes, taken on by various 
+peers in the tunnel.  First, the tunnel gateway accumulates a number
+of tunnel messages and preprocesses them into something for tunnel
+delivery.  Next, that gateway encrypts that preprocessed data, then
+forwards it to the first hop.  That peer, and subsequent tunnel 
+participants, unwrap a layer of the encryption, verifying the 
+integrity of the message, then forward it on to the next peer.  
+Eventually, the message arrives at the endpoint where the messages
+bundled by the gateway are split out again and forwarded on as 
+requested.</p>
+
+<h3>2.1) <a name="tunnel.preprocessing">Message preprocessing</a></h3>
+
+<p>When the gateway wants to deliver data through the tunnel, it first
+gathers zero or more I2NP messages (no more than 32KB worth), 
+selects how much padding will be used, and decides how each I2NP
+message should be handled by the tunnel endpoint, encoding that
+data into the raw tunnel payload:</p>
+<ul>
+<li>2 byte unsigned integer specifying the # of padding bytes</li>
+<li>that many random bytes</li>
+<li>a series of zero or more { instructions, message } pairs</li>
+</ul>
+
+<p>The instructions are encoded as follows:</p>
+<ul>
+<li>1 byte value:<pre>
+   bits 0-1: delivery type
+             (0x0 = LOCAL, 0x01 = TUNNEL, 0x02 = ROUTER)
+      bit 2: delay included?  (1 = true, 0 = false)
+      bit 3: fragmented?  (1 = true, 0 = false)
+      bit 4: extended options?  (1 = true, 0 = false)
+   bits 5-7: reserved</pre></li>
+<li>if the delivery type was TUNNEL, a 4 byte tunnel ID</li>
+<li>if the delivery type was TUNNEL or ROUTER, a 32 byte router hash</li>
+<li>if the delay included flag is true, a 1 byte value:<pre>
+      bit 0: type (0 = strict, 1 = randomized)
+   bits 1-7: delay exponent (2^value minutes)</pre></li>
+<li>if the fragmented flag is true, a 4 byte message ID, and a 1 byte value:<pre>
+   bits 0-6: fragment number
+      bit 7: is last?  (1 = true, 0 = false)</pre></li>
+<li>if the extended options flag is true:<pre>
+   = a 1 byte option size (in bytes)
+   = that many bytes</pre></li>
+<li>2 byte size of the I2NP message</li>
+</ul>
+
+<p>The I2NP message is encoded in its standard form, and the 
+preprocessed payload must be padded to a multiple of 16 bytes.</p>
+
+<h3>2.2) <a name="tunnel.gateway">Gateway processing</a></h3>
+
+<p>After the preprocessing of messages into a padded payload, the gateway
+encrypts the payload with the eight keys, building a checksum block so
+that each peer can verify the integrity of the payload at any time, as
+well as an end to end verification block for the tunnel endpoint to
+verify the integrity of the checksum block.  The specific details follow.</p>
+
+<p>The encryption used is such that decryption
+merely requires running over the data with AES in CTR mode, calculating the
+SHA256 of a certain fixed portion of the message (bytes 16 through $size-288),
+and searching for that hash in the checksum block.  There is a fixed number 
+of hops defined (8 peers after the gateway) so that we can verify the message
+without either leaking the position in the tunnel or having the message 
+continually "shrink" as layers are peeled off.  For tunnels shorter than 9
+hops, the tunnel creator will take the place of the excess hops, decrypting 
+with their keys (for outbound tunnels, this is done at the beginning, and for
+inbound tunnels, the end).</p>
+
+<p>The hard part in the encryption is building that entangled checksum block, 
+which requires essentially finding out what the hash of the payload will look 
+like at each step, randomly ordering those hashes, then building a matrix of 
+what each of those randomly ordered hashes will look like at each step.  
+To visualize this a bit:</p>
+
+<table border="1">
+ <tr><td colspan="2"></td>
+     <td><b>IV</b></td><td><b>Payload</b></td>
+     <td><b>eH[0]</b></td><td><b>eH[1]</b></td>
+     <td><b>eH[2]</b></td><td><b>eH[3]</b></td>
+     <td><b>eH[4]</b></td><td><b>eH[5]</b></td>
+     <td><b>eH[6]</b></td><td><b>eH[7]</b></td>
+     <td><b>V</b></td>
+ </tr>
+ <tr><td rowspan="2"><b>peer0</b><br /><font size="-2">key=K[0]</font></td><td><b>recv</b></td>
+     <td>IV[0]</td><td>P[0]</td>
+     <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+     <td>V[0]</td>
+ </tr>
+ <tr><td><b>send</b></td>
+     <td rowspan="2">IV[1]</td><td rowspan="2">P[1]</td>
+     <td rowspan="2"></td><td rowspan="2"></td><td rowspan="2"></td><td rowspan="2">H(P[1])</td>
+     <td rowspan="2"></td><td rowspan="2"></td><td rowspan="2"></td><td rowspan="2"></td>
+     <td rowspan="2">V[1]</td>
+ </tr>
+ <tr><td rowspan="2"><b>peer1</b><br /><font size="-2">key=K[1]</font></td><td><b>recv</b></td>
+ </tr>
+ <tr><td><b>send</b></td>
+     <td rowspan="2">IV[2]</td><td rowspan="2">P[2]</td>
+     <td rowspan="2"></td><td rowspan="2"></td><td rowspan="2"></td><td rowspan="2"></td>
+     <td rowspan="2"></td><td rowspan="2"></td><td rowspan="2">H(P[2])</td><td rowspan="2"></td>
+     <td rowspan="2">V[2]</td>
+ </tr>
+ <tr><td rowspan="2"><b>peer2</b><br /><font size="-2">key=K[2]</font></td><td><b>recv</b></td>
+ </tr>
+ <tr><td><b>send</b></td>
+     <td rowspan="2">IV[3]</td><td rowspan="2">P[3]</td>
+     <td rowspan="2"></td><td rowspan="2"></td><td rowspan="2"></td><td rowspan="2"></td>
+     <td rowspan="2"></td><td rowspan="2"></td><td rowspan="2"></td><td rowspan="2">H(P[3])</td>
+     <td rowspan="2">V[3]</td>
+ </tr>
+ <tr><td rowspan="2"><b>peer3</b><br /><font size="-2">key=K[3]</font></td><td><b>recv</b></td>
+ </tr>
+ <tr><td><b>send</b></td>
+     <td rowspan="2">IV[4]</td><td rowspan="2">P[4]</td>
+     <td rowspan="2">H(P[4])</td><td rowspan="2"></td><td rowspan="2"></td><td rowspan="2"></td>
+     <td rowspan="2"></td><td rowspan="2"></td><td rowspan="2"></td><td rowspan="2"></td>
+     <td rowspan="2">V[4]</td>
+ </tr>
+ <tr><td rowspan="2"><b>peer4</b><br /><font size="-2">key=K[4]</font></td><td><b>recv</b></td>
+ </tr>
+ <tr><td><b>send</b></td>
+     <td rowspan="2">IV[5]</td><td rowspan="2">P[5]</td>
+     <td rowspan="2"></td><td rowspan="2"></td><td rowspan="2">H(P[5])</td><td rowspan="2"></td>
+     <td rowspan="2"></td><td rowspan="2"></td><td rowspan="2"></td><td rowspan="2"></td>
+     <td rowspan="2">V[5]</td>
+ </tr>
+ <tr><td rowspan="2"><b>peer5</b><br /><font size="-2">key=K[5]</font></td><td><b>recv</b></td>
+ </tr>
+ <tr><td><b>send</b></td>
+     <td rowspan="2">IV[6]</td><td rowspan="2">P[6]</td>
+     <td rowspan="2"></td><td rowspan="2">H(P[6])</td><td rowspan="2"></td><td rowspan="2"></td>
+     <td rowspan="2"></td><td rowspan="2"></td><td rowspan="2"></td><td rowspan="2"></td>
+     <td rowspan="2">V[6]</td>
+ </tr>
+ <tr><td rowspan="2"><b>peer6</b><br /><font size="-2">key=K[6]</font></td><td><b>recv</b></td>
+ </tr>
+ <tr><td><b>send</b></td>
+     <td rowspan="2">IV[7]</td><td rowspan="2">P[7]</td>
+     <td rowspan="2"></td><td rowspan="2"></td><td rowspan="2"></td><td rowspan="2"></td>
+     <td rowspan="2"></td><td rowspan="2">H(P[7])</td><td rowspan="2"></td><td rowspan="2"></td>
+     <td rowspan="2">V[7]</td>
+ </tr>
+ <tr><td rowspan="2"><b>peer7</b><br /><font size="-2">key=K[7]</font></td><td><b>recv</b></td>
+ </tr>
+ <tr><td><b>send</b></td>
+     <td>IV[8]</td><td>P[8]</td>
+     <td></td><td></td><td></td><td></td><td>H(P[8])</td><td></td><td></td><td></td>
+     <td>V[8]</td>
+ </tr>
+</table>
+
+<p>In the above, P[8] is the same as the original data being passed through the
+tunnel (the preprocessed messages), and V[8] is the SHA256 of eH[0-7] as seen on
+peer7 after decryption.  For
+cells in the matrix "higher up" than the hash, their value is derived by encrypting
+the cell below it with the key for the peer below it, using the end of the column 
+to the left of it as the IV.  For cells in the matrix "lower down" than the hash, 
+they're equal to the cell above them, decrypted by the current peer's key, using 
+the end of the previous encrypted block on that row.</p>
+
+<p>With this randomized matrix of checksum blocks, each peer will be able to find
+the hash of the payload, or if it is not there, know that the message is corrupt.
+The entanglement by using CTR mode increases the difficulty in tagging the 
+checksum blocks themselves, but it is still possible for that tagging to go 
+briefly undetected if the columns after the tagged data have already been used
+to check the payload at a peer.  In any case, the tunnel endpoint (peer 7) knows
+for certain whether any of the checksum blocks have been tagged, as that would
+corrupt the verification block (V[8]).</p>
+
+<p>The IV[0] is a random 16 byte value, and IV[i] is the first 16 bytes of 
+H(D(IV[i-1], K[i-1])).  We don't use the same IV along the path, as that would
+allow trivial collusion, and we use the hash of the decrypted value to propogate 
+the IV so as to hamper key leakage.</p>
+
+<h3>2.3) <a name="tunnel.participant">Participant processing</a></h3>
+
+<p>When a participant in a tunnel receives a message, they decrypt a layer with their
+tunnel key using AES256 in CTR mode with the first 16 bytes as the IV.  They then
+calculate the hash of what they see as the payload (bytes 16 through $size-288) and
+search for that hash within the decrypted checksum block.  If no match is found, the
+message is discarded.  Otherwise, the IV is updated by decrypting it and replacing it
+with the first 16 bytes of its hash.  The resulting message is then forwarded on to 
+the next peer for processing.</p>
+
+<h3>2.4) <a name="tunnel.endpoint">Endpoint processing</a></h3>
+
+<p>When a message reaches the tunnel endpoint, they decrypts and verifies it like
+a normal participant.  If the checksum block has a valid match, the endpoint then
+computes the hash of the checksum block itself (as seen after decryption) and compares
+that to the decrypted verification hash (the last 32 bytes).  If that verification
+hash does not match, the endpoint takes note of the tagging attempt by one of the
+tunnel participants and perhaps discards the message.</p>
+
+<p>At this point, the tunnel endpoint has the preprocessed data sent by the gateway,
+which it may then parse out into the included I2NP messages and forwards them as
+requested in their delivery instructions.</p>
+
+<h3>2.5) <a name="tunnel.padding">Padding</a></h3>
+
+<p>Several tunnel padding strategies are possible, each with their own merits:</p>
+
+<ul>
+<li>No padding</li>
+<li>Padding to a random size</li>
+<li>Padding to a fixed size</li>
+<li>Padding to the closest KB</li>
+<li>Padding to the closest exponential size (2^n bytes)</li>
+</ul>
+
+<p><i>Which to use?  no padding is most efficient, random padding is what
+we have now, fixed size would either be an extreme waste or force us to
+implement fragmentation.  Padding to the closest exponential size (ala freenet)
+seems promising.  Perhaps we should gather some stats on the net as to what size
+messages are, then see what costs and benefits would arise from different 
+strategies?</i></p>
+
+<h3>2.6) <a name="tunnel.fragmentation">Tunnel fragmentation</a></h3>
+
+<p>For various padding and mixing schemes, it may be useful from an anonymity
+perspective to fragment a single I2NP message into multiple parts, each delivered
+seperately through different tunnel messages.  The endpoint may or may not 
+support that fragmentation (discarding or hanging on to fragments as needed),
+and handling fragmentation will not immediately be implemented.</p>
+
+<h3>2.7) <a name="tunnel.alternatives">Alternatives</a></h3>
+
+<h4>2.7.1) <a name="tunnel.nochecksum">Don't use a checksum block</a></h4>
+
+<p>One alternative to the above process is to remove the checksum block
+completely and replace the verification hash with a plain hash of the payload.
+This would simplify processing at the tunnel gateway and save 256 bytes of
+bandwidth at each hop.  On the other hand, attackers within the tunnel could
+trivially adjust the message size to one which is easily traceable by 
+colluding external observers in addition to later tunnel participants.  The
+corruption would also incur the waste of the entire bandwidth necessary to 
+pass on the message.  Without the per-hop validation, it would also be possible
+to consume excess network resources by building extremely long tunnels, or by
+building loops into the tunnel.</p>
+
+<h4>2.7.2) <a name="tunnel.reroute">Adjust tunnel processing midstream</a></h4>
+
+<p>While the simple tunnel routing algorithm should be sufficient for most cases,
+there are three alternatives that can be explored:</p>
+<ul>
+<li>Delay a message within a tunnel at an arbitrary hop for either a specified
+amount of time or a randomized period.  This could be achieved by replacing the
+hash in the checksum block with e.g. the first 16 bytes of the hash, followed by
+some delay instructions.  Alternately, the instructions could tell the 
+participant to actually interpret the raw payload as it is, and either discard
+the message or continue to forward it down the path (where it would be
+interpreted by the endpoint as a chaff message).  The later part of this would
+require the gateway to adjust its encryption algorithm to produce the cleartext
+payload on a different hop, but it shouldn't be much trouble.</li>
+<li>Allow routers participating in a tunnel to remix the message before 
+forwarding it on - bouncing it through one of that peer's own outbound tunnels,
+bearing instructions for delivery to the next hop.  This could be used in either
+a controlled manner (with en-route instructions like the delays above) or 
+probabalistically.</li>
+<li>Implement code for the tunnel creator to redefine a peer's "next hop" in
+the tunnel, allowing further dynamic redirection.</li>
+</ul>
+
+<h4>2.7.3) <a name="tunnel.bidirectional">Use bidirectional tunnels</a></h4>
+
+<p>The current strategy of using two seperate tunnels for inbound and outbound
+communication is not the only technique available, and it does have anonymity
+implications.  On the positive side, by using separate tunnels it lessens the
+traffic data exposed for analysis to participants in a tunnel - for instance,
+peers in an outbound tunnel from a web browser would only see the traffic of
+an HTTP GET, while the peers in an inbound tunnel would see the payload 
+delivered along the tunnel.  With bidirectional tunnels, all participants would
+have access to the fact that e.g. 1KB was sent in one direction, then 100KB
+in the other.  On the negative side, using unidirectional tunnels means that
+there are two sets of peers which need to be profiled and accounted for, and
+additional care must be taken to address the increased speed of predecessor
+attacks.  The tunnel pooling and building process outlined below should
+minimize the worries of the predecessor attack, though if it were desired,
+it wouldn't be much trouble to build both the inbound and outbound tunnels
+along the same peers.</p>
+
+<h4>2.7.4) <a name="tunnel.smallerhashes">Use smaller hashes</a></h4>
+
+<p>At the moment, the plan is to reuse the existing SHA256 code and build
+all of the checksum and verification hashes as 32 byte SHA256 values.  20
+byte SHA1 would likely be more than sufficient, and perhaps smaller.</p>
+
+<h2>3) <a name="tunnel.building">Tunnel building</a></h2>
+
+<h3>3.1) <a name="tunnel.peerselection">Peer selection</a></h3>
+<h3>3.2) <a name="tunnel.request">Request delivery</a></h3>
+<h3>3.3) <a name="tunnel.pooling">Pooling</a></h3>
+
+<h2>4) <a name="tunnel.throttling">Tunnel throttling</a></h2>
+
+<h2>5) <a name="tunnel.mixing">Mixing/batching</a></h2>
+
