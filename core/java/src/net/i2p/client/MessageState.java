@@ -31,9 +31,13 @@ class MessageState {
     private long _created;
     private Object _lock = new Object();
 
+    private static long __stateId = 0;
+    private long _stateId;
+    
     public MessageState(long nonce, String prefix) {
+        _stateId = ++__stateId;
         _nonce = nonce;
-        _prefix = prefix;
+        _prefix = prefix + "[" + _stateId + "]: ";
         _id = null;
         _receivedStatus = new HashSet();
         _cancelled = false;
