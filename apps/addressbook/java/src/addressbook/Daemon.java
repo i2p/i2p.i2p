@@ -128,8 +128,8 @@ public class Daemon {
         Map defaultSettings = new HashMap();
         defaultSettings.put("proxy_host", "localhost");
         defaultSettings.put("proxy_port", "4444");
-        defaultSettings.put("master_addressbook", "myhosts.txt");
-        defaultSettings.put("router_addressbook", "../userhosts.txt");
+        defaultSettings.put("master_addressbook", "../userhosts.txt");
+        defaultSettings.put("router_addressbook", "../hosts.txt");
         defaultSettings.put("published_addressbook", "../eepsite/docroot/hosts.txt");
         defaultSettings.put("log", "log.txt");
         defaultSettings.put("subscriptions", "subscriptions.txt");
