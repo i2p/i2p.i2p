@@ -21,6 +21,5 @@ libsam: $(OBJS)
 # Cleanup rules
 #
 
-# WTF doesn't this remove the .depend ?!?
 clean:
 	-$(RM) -f $(LIBDIR)/libsam.a $(OBJDIR)/*.o .depend
