@@ -30,14 +30,32 @@ public class TestStreamTransfer {
     private static Log _log = new Log(TestStreamTransfer.class);
     private static String _alice = null;
     private static boolean _dead = false;
+    private static Object _counterLock = new Object();
+    private static int _recvCounter = 0, _closeCounter = 0;
     
     private static void runTest(String samHost, int samPort, String conOptions) {
+        int nTests = 20;
         startAlice(samHost, samPort, conOptions);
-        for (int i = 0; i < 20; i++) {
+        /* Start up nTests different test threads. */
+        for (int i = 0; i < nTests; i++) {
             testBob("bob" + i, samHost, samPort, conOptions);
             if (i % 2 == 1)
                 try { Thread.sleep(10*1000); } catch (InterruptedException ie) {}
         }
+        /* Wait until the correct number of messages have been received
+           by Alices and the correct number of streams have been closed
+           by Bobs. */
+        while (true) {
+            synchronized (_counterLock) {
+                if (_recvCounter == nTests * 2 && _closeCounter == nTests) {
+                    break;
+                }
+            }
+            try { Thread.sleep(1000); } catch (InterruptedException ie) {}
+            _log.info("Receive counter is: " + _recvCounter + " Close counter is: " + _closeCounter);
+        }
+        /* Return, assuming the test has passed. */
+        _log.info("Unit test passed.");
     }
     
     private static void startAlice(String host, int port, String conOptions) {
@@ -151,6 +169,9 @@ public class TestStreamTransfer {
                     return;
                 }
                 _log.info("\n== Received from the stream " + id + ": [" + new String(payload) + "]");
+                synchronized (_counterLock) {
+                    _recvCounter++;
+                }
                 try { Thread.sleep(5*1000); } catch (InterruptedException ie) {}
                 /*
                 // now echo it back
@@ -225,11 +246,15 @@ public class TestStreamTransfer {
             _log.info("\n** Sending FooBarBaz!");
             out.write(req.getBytes());
             out.flush();
-            try { Thread.sleep(20*1000); } catch (InterruptedException ie) {}
+            /* Don't delay here, so we can test whether all data is
+               sent even if we do a STREAM CLOSE immediately. */
             _log.info("Sending close");
             req = "STREAM CLOSE ID=42\n";
             out.write(req.getBytes());
             out.flush();
+            synchronized (_counterLock) {
+                _closeCounter++;
+            }
             try { Thread.sleep(30*1000); } catch (InterruptedException ie) {}
             //_dead = true;
             s.close();
