@@ -71,9 +71,10 @@ public class SummaryHelper {
      *
      */
     public String getMemory() {
+        DecimalFormat integerFormatter = new DecimalFormat("###,###,##0");
         long used = (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory())/1024;
         long usedPc = 100 - ((Runtime.getRuntime().freeMemory() * 100) / Runtime.getRuntime().totalMemory());
-        return used + "KB (" + usedPc + "%)"; 
+        return integerFormatter.format(used) + "KB (" + usedPc + "%)"; 
     }
     
     /**

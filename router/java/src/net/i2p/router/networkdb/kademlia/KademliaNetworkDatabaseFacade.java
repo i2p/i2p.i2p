@@ -74,17 +74,6 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
     private Set _publishingLeaseSets;
     
     /**
-     * List of keys that we've recently done full searches on and failed.
-     *
-     */
-    private Set _badKeys;
-    /**
-     * Mapping when (Long) to Hash for keys that are in the _badKeys list.
-     *
-     */
-    private Map _badKeyDates;
-    
-    /**
      * for the 10 minutes after startup, don't fail db entries so that if we were
      * offline for a while, we'll have a chance of finding some live peers with the
      * previous references
@@ -107,78 +96,6 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         _peerSelector = new PeerSelector(_context);
         _publishingLeaseSets = new HashSet(8);
         _lastExploreNew = 0;
-        _badKeys = new HashSet();
-        _badKeyDates = new TreeMap();
-    }
-    
-    /** 
-     * if we do a full search for a key and still fail, don't try again 
-     * for another 5 minutes 
-     */
-    private static final long SHITLIST_TIME = 5*60*1000;
-    
-    /**
-     * Are we currently avoiding this key?
-     *
-     */
-    boolean isShitlisted(Hash key) {
-        synchronized (_badKeys) {
-            locked_cleanupShitlist();
-            boolean isShitlisted = _badKeys.contains(key);
-            if (!isShitlisted) return false;
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Key " + key.toBase64() + " is shitlisted");
-            return true;
-        }
-    }
-    /**
-     * For some reason, we don't want to try any remote lookups for this key 
-     * anytime soon - for instance, we may have just failed to find it after a
-     * full netDb search.  
-     *
-     */
-    void shitlist(Hash key) {
-        synchronized (_badKeys) {
-            locked_cleanupShitlist();
-            boolean wasNew = _badKeys.add(key);
-            if (wasNew) {
-                long when = _context.clock().now();
-                while (_badKeyDates.containsKey(new Long(when)))
-                    when++;
-                _badKeyDates.put(new Long(when), key);
-                _log.info("Shitlist " + key.toBase64() + " - new shitlist");
-            } else {
-                _log.info("Shitlist " + key.toBase64() + " - already shitlisted");
-            }
-        }
-    }
-    private void locked_cleanupShitlist() {
-        List old = null;
-        long keepAfter = _context.clock().now() - SHITLIST_TIME;
-        for (Iterator iter = _badKeyDates.keySet().iterator(); iter.hasNext(); ) {
-            Long when = (Long)iter.next();
-            Hash key = (Hash)_badKeyDates.get(when);
-            if (when.longValue() < keepAfter) {
-                if (old == null)
-                    old = new ArrayList(4);
-                old.add(when);
-            } else {
-                // ordered
-                break;
-            }
-        }
-        if (old != null) {
-            for (int i = 0; i < old.size(); i++) {
-                Long when = (Long)old.get(i);
-                Hash key = (Hash)_badKeyDates.remove(when);
-                _badKeys.remove(key);
-            }
-        }
-        
-        
-        if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Cleaning up shitlist: " + _badKeys.size() + " remain after removing " 
-                       + (old != null ? old.size() : 0));
     }
     
     KBucketSet getKBuckets() { return _kb; }
@@ -828,10 +745,11 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
     }
     
     private void renderRouterInfo(StringBuffer buf, RouterInfo info, boolean isUs) {
+        String hash = info.getIdentity().getHash().toBase64();
         if (isUs) {
+            buf.append("<a name=\"").append(hash.substring(0, 6)).append("\" />");
             buf.append("<b>Our info: </b><br />\n");
         } else {
-            String hash = info.getIdentity().getHash().toBase64();
             buf.append("<a name=\"").append(hash.substring(0, 6)).append("\" />");
             buf.append("<b>Peer info for:</b> ").append(hash).append("<br />\n");
         }

@@ -29,8 +29,8 @@ public class LogsHelper {
         StringBuffer buf = new StringBuffer(16*1024); 
         buf.append("<h2>Most recent console messages:</h2><ul>");
         buf.append("<code>\n");
-        for (int i = 0; i < msgs.size(); i++) { 
-            String msg = (String)msgs.get(i);
+        for (int i = msgs.size(); i > 0; i--) { 
+            String msg = (String)msgs.get(i - 1);
             buf.append("<li>");
             buf.append(msg);
             buf.append("</li>\n");

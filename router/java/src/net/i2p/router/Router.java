@@ -123,6 +123,7 @@ public class Router {
     
     public String getConfigSetting(String name) { return _config.getProperty(name); }
     public void setConfigSetting(String name, String value) { _config.setProperty(name, value); }
+    public void removeConfigSetting(String name) { _config.remove(name); }
     public Set getConfigSettings() { return new HashSet(_config.keySet()); }
     public Properties getConfigMap() { return _config; }
     

@@ -4,6 +4,8 @@ import java.io.ByteArrayInputStream;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.HashSet;
+import java.util.Iterator;
 
 /**
  * Handler to deal with form submissions from the advanced config form and act
@@ -41,6 +43,7 @@ public class ConfigAdvancedHandler extends FormHandler {
      *
      */
     private void saveChanges() {
+        HashSet unsetKeys = new HashSet(_context.router().getConfigMap().keySet());
         if (_config != null) {
             BufferedReader reader = new BufferedReader(new InputStreamReader(new ByteArrayInputStream(_config.getBytes())));
             String line = null;
@@ -52,12 +55,19 @@ public class ConfigAdvancedHandler extends FormHandler {
                     String key = line.substring(0, eq).trim();
                     String val = line.substring(eq + 1).trim();
                     _context.router().setConfigSetting(key, val);
+                    unsetKeys.remove(key);
                 }
             } catch (IOException ioe) {
                 addFormError("Error updating the configuration (IOERROR) - please see the error logs");
                 return;
             }
-            
+
+            Iterator cleaner = unsetKeys.iterator();
+            while (cleaner.hasNext()) {
+                String unsetKey = (String)cleaner.next();
+                _context.router().removeConfigSetting(unsetKey);
+            }
+
             boolean saved = _context.router().saveConfig();
             if (saved) 
                 addFormNotice("Configuration saved successfully");

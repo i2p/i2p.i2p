@@ -40,6 +40,7 @@ public class Shitlist {
     }
     
     public int getRouterCount() {
+        purge();
         synchronized (_shitlist) {
             return _shitlist.size();
         }
@@ -98,16 +99,17 @@ public class Shitlist {
         }
     }
     
-    public void renderStatusHTML(OutputStream out) throws IOException {
-        StringBuffer buf = new StringBuffer(1024);
-        buf.append("<h2>Shitlist</h2>");
+    /**
+     * We already unshitlist on isShitlisted, but this purge
+     * lets us get the correct value when rendering the HTML or
+     * getting the shitlist count.  wheee
+     *
+     */
+    private void purge()  {
         Map shitlist = null;
-        Map causes = null;
         synchronized (_shitlist) {
             shitlist = new HashMap(_shitlist);
-            causes = new HashMap(_shitlistCause);
         }
-        buf.append("<ul>");
         
         long limit = _context.clock().now() - SHITLIST_DURATION_MS;
         
@@ -116,16 +118,38 @@ public class Shitlist {
             Date shitDate = (Date)shitlist.get(key);
             if (shitDate.getTime() < limit) {
                 unshitlistRouter(key);
-            } else {
-                buf.append("<li><b>").append(key.toBase64()).append("</b> was shitlisted on ");
-                buf.append(shitDate);
-                String cause = (String)causes.get(key);
-                if (cause != null) {
-                    buf.append("<br />\n");
-                    buf.append(cause);
-                }
-                buf.append("</li>\n");
             }
+        }
+    }
+
+    
+    public void renderStatusHTML(OutputStream out) throws IOException {
+        StringBuffer buf = new StringBuffer(1024);
+        buf.append("<h2>Shitlist</h2>");
+        Map shitlist = null;
+        Map causes = null;
+        
+        purge();
+        
+        synchronized (_shitlist) {
+            shitlist = new HashMap(_shitlist);
+            causes = new HashMap(_shitlistCause);
+        }
+        buf.append("<ul>");
+        
+        for (Iterator iter = shitlist.keySet().iterator(); iter.hasNext(); ) {
+            Hash key = (Hash)iter.next();
+            Date shitDate = (Date)shitlist.get(key);
+            buf.append("<li><b>").append(key.toBase64()).append("</b>");
+            buf.append(" <a href=\"netdb.jsp#").append(key.toBase64().substring(0, 6)).append("\">(?)</a>");
+            buf.append(" was shitlisted on ");
+            buf.append(shitDate);
+            String cause = (String)causes.get(key);
+            if (cause != null) {
+                buf.append("<br />\n");
+                buf.append(cause);
+            }
+            buf.append("</li>\n");
         }
         buf.append("</ul>\n");
         out.write(buf.toString().getBytes());

@@ -531,9 +531,6 @@ class SearchJob extends JobImpl {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug(getJobId() + ": State of failed search: " + _state);
         
-        // ok, we totally failed, so don't try again for that key too quickly
-        _facade.shitlist(_state.getTarget());
-            
         if (_keepStats) {
             long time = getContext().clock().now() - _state.getWhenStarted();
             getContext().statManager().addRateData("netDb.failedTime", time, 0);

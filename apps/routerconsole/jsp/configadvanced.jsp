@@ -23,7 +23,7 @@
  <i><jsp:getProperty name="formhandler" property="notices" /></i>
  
  <form action="configadvanced.jsp" method="POST">
- <textarea rows="20" cols="80" name="config"><jsp:getProperty name="advancedhelper" property="settings" /></textarea><br />
+ <textarea rows="20" cols="100" name="config"><jsp:getProperty name="advancedhelper" property="settings" /></textarea><br />
  <input type="submit" name="shouldsave" value="Apply" /> <input type="reset" value="Cancel" /> <br />
  <b>Force restart:</b> <input type="checkbox" name="restart" value="force" /> <i>(specify this
  if the changes made above require the router to reset itself - e.g. you are updating TCP ports 
