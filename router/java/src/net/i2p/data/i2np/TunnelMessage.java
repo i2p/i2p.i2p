@@ -146,6 +146,8 @@ public class TunnelMessage extends I2NPMessageImpl {
     public String toString() {
         StringBuffer buf = new StringBuffer();
         buf.append("[TunnelMessage: ");
+        buf.append("\n\tMessageId: ").append(getUniqueId());
+        buf.append("\n\tExpiration: ").append(getMessageExpiration());
         buf.append("\n\tTunnel ID: ").append(getTunnelId());
         buf.append("\n\tVerification Structure: ").append(getVerificationStructure());
         buf.append("\n\tEncrypted Instructions: ").append(getEncryptedDeliveryInstructions());
