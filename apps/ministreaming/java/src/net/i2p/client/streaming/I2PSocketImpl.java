@@ -31,7 +31,25 @@ class I2PSocketImpl implements I2PSocket {
     private I2POutputStream out;
     private boolean outgoing;
     private Object flagLock = new Object();
-    private boolean closed = false, sendClose = true, closed2 = false;
+
+    /**
+     * Whether the I2P socket has already been closed.
+     */
+    private boolean closed = false;
+
+    /**
+     * Whether to send out a close packet when the socket is
+     * closed. (If the socket is closed because of an incoming close
+     * packet, we need not send one.)
+     */
+    private boolean sendClose = true;
+
+    /**
+     * Whether the I2P socket has already been closed and all data
+     * (from I2P to the app, dunno whether to call this incoming or
+     * outgoing) has been processed.
+     */
+    private boolean closed2 = false;
 
     /**
      * @param peer who this socket is (or should be) connected to 
@@ -169,7 +187,8 @@ class I2PSocketImpl implements I2PSocket {
     }
 
     /**
-     * Closes the socket if not closed yet
+     * Closes the socket if not closed yet (from the Application
+     * side).
      */
     public void close() throws IOException {
         synchronized (flagLock) {
@@ -180,7 +199,10 @@ class I2PSocketImpl implements I2PSocket {
         in.notifyClosed();
     }
 
-    public void internalClose() {
+    /**
+     * Close the socket from the I2P side, e. g. by a close packet.
+     */
+    protected void internalClose() {
         synchronized (flagLock) {
             closed = true;
             closed2 = true;
@@ -389,7 +411,7 @@ class I2PSocketImpl implements I2PSocket {
             boolean keepHandling = true;
             int packetsHandled = 0;
             try {
-                //		try {
+                //              try {
                 while (keepHandling) {
                     keepHandling = handleNextPacket(bc, buffer);
                     packetsHandled++;
