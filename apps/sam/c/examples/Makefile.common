@@ -1,0 +1,20 @@
+#
+# This Makefile contains instructions common to all platforms
+#
+
+#
+# Build rules
+#
+
+all: clean warhammer-dgram
+
+warhammer-dgram: warhammer-dgram.c
+	$(CC) $(CFLAGS) -o warhammer-dgram.o -c warhammer-dgram.c
+	$(CC) $(CFLAGS) -o warhammer-dgram warhammer-dgram.o $(LIBS)
+
+#
+# Cleanup rules
+#
+
+clean:
+	-$(RM) -f warhammer-dgram *.exe *.o

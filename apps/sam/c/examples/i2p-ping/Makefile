@@ -1,5 +1,5 @@
 #
-# This Makefile is compatible with GNU Make
+# This Makefile is compatible with GNU Make and should work on POSIX systems
 #
 
 #
@@ -8,6 +8,7 @@
 
 CC = gcc
 INSTALL = install
+RM = rm
 
 #
 # Flags
@@ -21,7 +22,7 @@ LIBS = -lsam
 # Build rules
 #
 
-all: i2p-ping
+all: clean i2p-ping
 
 i2p-ping: i2p-ping.c
 	$(CC) $(CFLAGS) -o i2p-ping.o -c i2p-ping.c
@@ -35,4 +36,4 @@ install: i2p-ping
 #
 
 clean:
-	-rm -f *.o *.exe i2p-ping
+	-$(RM) -f i2p-ping *.o
