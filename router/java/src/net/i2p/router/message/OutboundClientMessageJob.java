@@ -129,12 +129,11 @@ public class OutboundClientMessageJob extends JobImpl {
             }
         }
         
-        _shouldBundle = getShouldBundle();
-        
         _overallExpiration = timeoutMs + _context.clock().now();
         _status = new OutboundClientMessageStatus(msg);
         _nextStep = new NextStepJob();
         _lookupLeaseSetFailed = new LookupLeaseSetFailedJob();
+        _shouldBundle = getShouldBundle();
     }
     
     public String getName() { return "Outbound client message"; }
