@@ -1,4 +1,9 @@
-$Id: history.txt,v 1.67 2004/11/07 22:18:01 jrandom Exp $
+$Id: history.txt,v 1.68 2004/11/08 00:40:21 jrandom Exp $
+
+2004-11-10  jrandom
+    * Allow loading the (mini)streaming connection options from the 
+      environment.
+    * More defensive programming in the DSA implementation.
 
 2004-11-08  jrandom
     * Remove spurious flush calls from I2PTunnel, and work with the 

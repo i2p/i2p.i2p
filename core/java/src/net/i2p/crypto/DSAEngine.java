@@ -57,37 +57,41 @@ public class DSAEngine {
     public boolean verifySignature(Signature signature, byte signedData[], int offset, int size, SigningPublicKey verifyingKey) {
         long start = _context.clock().now();
 
-        byte[] sigbytes = signature.getData();
-        byte rbytes[] = new byte[20];
-        byte sbytes[] = new byte[20];
-        for (int x = 0; x < 40; x++) {
-            if (x < 20) {
-                rbytes[x] = sigbytes[x];
-            } else {
-                sbytes[x - 20] = sigbytes[x];
+        try {
+            byte[] sigbytes = signature.getData();
+            byte rbytes[] = new byte[20];
+            byte sbytes[] = new byte[20];
+            for (int x = 0; x < 40; x++) {
+                if (x < 20) {
+                    rbytes[x] = sigbytes[x];
+                } else {
+                    sbytes[x - 20] = sigbytes[x];
+                }
             }
+            BigInteger s = new NativeBigInteger(1, sbytes);
+            BigInteger r = new NativeBigInteger(1, rbytes);
+            BigInteger y = new NativeBigInteger(1, verifyingKey.getData());
+            BigInteger w = s.modInverse(CryptoConstants.dsaq);
+            byte data[] = calculateHash(signedData, offset, size).getData();
+            NativeBigInteger bi = new NativeBigInteger(1, data);
+            BigInteger u1 = bi.multiply(w).mod(CryptoConstants.dsaq);
+            BigInteger u2 = r.multiply(w).mod(CryptoConstants.dsaq);
+            BigInteger modval = CryptoConstants.dsag.modPow(u1, CryptoConstants.dsap);
+            BigInteger modmulval = modval.multiply(y.modPow(u2,CryptoConstants.dsap));
+            BigInteger v = (modmulval).mod(CryptoConstants.dsap).mod(CryptoConstants.dsaq);
+
+            boolean ok = v.compareTo(r) == 0;
+
+            long diff = _context.clock().now() - start;
+            if (diff > 1000) {
+                if (_log.shouldLog(Log.WARN)) 
+                    _log.warn("Took too long to verify the signature (" + diff + "ms)");
+            }
+            return ok;
+        } catch (Exception e) {
+            _log.log(Log.CRIT, "Error verifying the signature", e);
+            return false;
         }
-        BigInteger s = new NativeBigInteger(1, sbytes);
-        BigInteger r = new NativeBigInteger(1, rbytes);
-        BigInteger y = new NativeBigInteger(1, verifyingKey.getData());
-        BigInteger w = s.modInverse(CryptoConstants.dsaq);
-        byte data[] = calculateHash(signedData, offset, size).getData();
-        NativeBigInteger bi = new NativeBigInteger(1, data);
-        BigInteger u1 = bi.multiply(w).mod(CryptoConstants.dsaq);
-        BigInteger u2 = r.multiply(w).mod(CryptoConstants.dsaq);
-        BigInteger modval = CryptoConstants.dsag.modPow(u1, CryptoConstants.dsap);
-        BigInteger modmulval = modval.multiply(y.modPow(u2,CryptoConstants.dsap));
-        BigInteger v = (modmulval).mod(CryptoConstants.dsap).mod(CryptoConstants.dsaq);
-
-        boolean ok = v.compareTo(r) == 0;
-
-        long diff = _context.clock().now() - start;
-        if (diff > 1000) {
-            if (_log.shouldLog(Log.WARN)) 
-                _log.warn("Took too long to verify the signature (" + diff + "ms)");
-        }
-
-        return ok;
     }
 
     public Signature sign(byte data[], SigningPrivateKey signingKey) {

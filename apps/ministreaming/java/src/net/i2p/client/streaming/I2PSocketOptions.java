@@ -1,5 +1,6 @@
 package net.i2p.client.streaming;
 
+import java.util.Iterator;
 import java.util.Properties;
 
 /**
@@ -14,15 +15,19 @@ public class I2PSocketOptions {
 
     public static final int DEFAULT_BUFFER_SIZE = 1024*64;
     public static final int DEFAULT_WRITE_TIMEOUT = 60*1000;
+    public static final int DEFAULT_CONNECT_TIMEOUT = 60*1000;
+    
+    public static final String PROP_BUFFER_SIZE = "i2p.streaming.bufferSize";
+    public static final String PROP_CONNECT_TIMEOUT = "i2p.streaming.connectTimeout";
+    public static final String PROP_READ_TIMEOUT = "i2p.streaming.readTimeout";
+    public static final String PROP_WRITE_TIMEOUT = "i2p.streaming.writeTimeout";
     
     public I2PSocketOptions() {
-        _connectTimeout = -1;
-        _readTimeout = -1;
-        _writeTimeout = DEFAULT_WRITE_TIMEOUT;
-        _maxBufferSize = DEFAULT_BUFFER_SIZE;
+        this(System.getProperties());
     }
     
     public I2PSocketOptions(I2PSocketOptions opts) {
+        this(System.getProperties());
         _connectTimeout = opts.getConnectTimeout();
         _readTimeout = opts.getReadTimeout();
         _writeTimeout = opts.getWriteTimeout();
@@ -30,7 +35,44 @@ public class I2PSocketOptions {
     }
 
     public I2PSocketOptions(Properties opts) {
-        
+        init(opts);
+    }
+    
+    protected void init(Properties opts) {
+        _maxBufferSize = getInt(opts, PROP_BUFFER_SIZE, DEFAULT_BUFFER_SIZE);
+        _connectTimeout = getInt(opts, PROP_CONNECT_TIMEOUT, DEFAULT_CONNECT_TIMEOUT);
+        _readTimeout = getInt(opts, PROP_READ_TIMEOUT, -1);
+        _writeTimeout = getInt(opts, PROP_WRITE_TIMEOUT, DEFAULT_WRITE_TIMEOUT);
+    }
+    /*
+    
+    protected Properties getEnvProps() {
+        Properties rv = new Properties();
+        for (Iterator iter = System.getProperties().keySet().iterator(); iter.hasNext(); ) {
+            String name = (String)iter.next();
+            rv.setProperty(name, System.getProperty(name));
+        }
+        return rv;
+    }
+    
+    public static void main(String args[]) {
+        System.out.println("System props: " + System.getProperties());
+        System.out.println("Env props:    " + new I2PSocketOptions().getEnvProps());
+    }
+
+    */
+    protected int getInt(Properties opts, String name, int defaultVal) {
+        if (opts == null) return defaultVal;
+        String val = opts.getProperty(name);
+        if (val == null) {
+            return defaultVal;
+        } else {
+            try {
+                return Integer.parseInt(val);
+            } catch (NumberFormatException nfe) {
+                return defaultVal;
+            }
+        }
     }
     
     /**
