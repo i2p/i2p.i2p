@@ -12,12 +12,19 @@ public class ChainFilter implements Filter {
 
     private static final Log _log = new Log(ChainFilter.class);
     
-    public Collection filters;
+    private Collection filters;  // perhaps protected?
     
+    
+    /**
+     * @param filters A collection (list) of filters to chain to
+     */
     public ChainFilter(Collection filters) {
 	this.filters=filters;
     }
 
+    /* (non-Javadoc)
+     * @see net.i2p.httptunnel.filter.Filter#filter(byte[])
+     */
     public byte[] filter(byte[] toFilter) {
 	byte[] buf = toFilter;
 	for (Iterator it = filters.iterator(); it.hasNext();) {
@@ -27,6 +34,9 @@ public class ChainFilter implements Filter {
 	return buf;
     }
 
+    /* (non-Javadoc)
+     * @see net.i2p.httptunnel.filter.Filter#finish()
+     */
     public byte[] finish() {
 	// this is a bit complicated. Think about it...
 	try {

@@ -12,11 +12,14 @@ public interface Filter {
 
     /**
      * Filter some data. Not all filtered data need to be returned.
+     * @param toFilter the bytes that are to be filtered.
+     * @return the filtered data
      */
     public byte[] filter(byte[] toFilter);
 
     /**
      * Data stream has finished. Return all of the rest data.
+     * @return the rest of the data
      */
     public byte[] finish();
 }

@@ -69,6 +69,11 @@ public class HTTPTunnel {
 	new HTTPListener(smp, listenPort, "127.0.0.1");
     }
     
+    /**
+     * The all important main function, allowing HTTPTunnel to be 
+     * stand-alone, a program in it's own right, and all that jazz.
+     * @param args A list of String passed to the program
+     */
     public static void main(String[] args) {
 	String host = "127.0.0.1";
 	int port = 7654, max = 1;

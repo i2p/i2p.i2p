@@ -27,6 +27,10 @@ public class RootHandler {
     
     private static RootHandler instance;
 
+    /**
+     * Singleton stuff . . .
+     * @return the one and only instance, yay!
+     */
     public static synchronized RootHandler getInstance() {
 	if (instance == null) {
 	    instance = new RootHandler();
@@ -34,14 +38,21 @@ public class RootHandler {
 	return instance;
     }
     
+    /**
+     * The _ROOT_ handler:  it passes its workload off to the other handlers.
+     * @param req a Request
+     * @param httpl an HTTPListener
+     * @param out where to write the results
+     * @throws IOException
+     */
     public void handle(Request req, HTTPListener httpl,
 		       OutputStream out) throws IOException {
 	String url=req.getURL();
 	System.out.println(url);
-	boolean byProxy = false;
+	/* boolean byProxy = false; */
 	int pos;
 	if (url.startsWith("http://")) { // access via proxy
-	    byProxy=true;
+	    /* byProxy=true; */
 	    if (httpl.firstProxyUse()) {
 		localHandler.handleProxyConfWarning(req,httpl,out);
 		return;
@@ -66,7 +77,7 @@ public class RootHandler {
 		    return;
 		} else {
 		    // this is for proxying to the real web
-		    proxyHandler.handle(req, httpl, out, true);
+		    proxyHandler.handle(req, httpl, out /*, true */);
 		    return;
 		}
 	    }
@@ -92,18 +103,18 @@ public class RootHandler {
 	if (dest.equals("_")) { // no eepsite
 	    if (url.startsWith("/local/")) { // local request
 		req.setURL(url.substring(6));
-		localHandler.handle(req, httpl, out, byProxy);
+		localHandler.handle(req, httpl, out /*, byProxy */);
 	    } else if (url.startsWith("/http/")) {  // http warning
-		localHandler.handleHTTPWarning(req, httpl, out, byProxy);
+		localHandler.handleHTTPWarning(req, httpl, out /*, byProxy */);
 	    } else if (url.startsWith("/proxy/")) { // http proxying
 		req.setURL("http://"+url.substring(7));
-		proxyHandler.handle(req, httpl, out, byProxy);
+		proxyHandler.handle(req, httpl, out /*, byProxy */);
 	    } else {
 		errorHandler.handle(req, httpl, out,
 				    "No local handler for this URL: "+url);
 	    }
 	} else {
-	    eepHandler.handle(req, httpl, out, byProxy, dest);
+	    eepHandler.handle(req, httpl, out, /* byProxy, */ dest);
 	}
     }
 }

@@ -15,11 +15,16 @@ public class LocalHandler {
     private static final Log _log = new Log(LocalHandler.class);
 
     /* package private */ LocalHandler() {
-
     }
     
-    public void handle(Request req, HTTPListener httpl, OutputStream out,
-		       boolean fromProxy) throws IOException {
+    /**
+     * @param req the Request
+     * @param httpl an HTTPListener 
+     * @param out where to write the results
+     * @throws IOException
+     */
+    public void handle(Request req, HTTPListener httpl, OutputStream out
+		       /*, boolean fromProxy */) throws IOException {
 	//FIXME: separate multiple pages, not only a start page
 	//FIXME: provide some info on this page
 	out.write(("HTTP/1.1 200 Document following\r\n"+
@@ -31,6 +36,13 @@ public class LocalHandler {
 	out.flush();
     }
 
+    /**
+     * Currently always throws an IO Exception
+     * @param req the Request
+     * @param httpl an HTTPListener
+     * @param out where to write the results
+     * @throws IOException
+     */
     public void handleProxyConfWarning(Request req, HTTPListener httpl,
 				       OutputStream out) throws IOException {
 	//FIXME
@@ -39,8 +51,15 @@ public class LocalHandler {
 
     }
 
+    /**
+     * Currently always throws an IO Exception
+     * @param req the Request
+     * @param httpl an HTTPListener
+     * @param out where to write the results
+     * @throws IOException
+     */
     public void handleHTTPWarning(Request req, HTTPListener httpl,
-				  OutputStream out, boolean fromProxy)
+				  OutputStream out /*, boolean fromProxy */)
     throws IOException {
 	// FIXME
         throw new IOException("jrandom ate the deprecated method. mooo");

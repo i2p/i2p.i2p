@@ -23,6 +23,11 @@ public class Request {
     private String params;
     private String postData;
     
+    /**
+     * A constructor, creating a request from an InputStream
+     * @param in InputStream from which we "read-in" a Request
+     * @throws IOException
+     */
     public Request(InputStream in) throws IOException {
 	BufferedReader br = new BufferedReader
 	    (new InputStreamReader(in, "ISO-8859-1"));
@@ -70,6 +75,10 @@ public class Request {
 	}
     }
 
+    /**
+     * @return A Request as an array of bytes of a String in ISO-8859-1 format
+     * @throws IOException
+     */
     public byte[] toByteArray() throws IOException {
 	if (method == null) return null;
 	return toISO8859_1String().getBytes("ISO-8859-1");
@@ -81,14 +90,26 @@ public class Request {
 	return method+" "+url+proto+"\r\n"+params+"\r\n"+postData;
     }
 
+    /**
+     * @return the URL of the request
+     */
     public String getURL() {
 	return url;
     }
 
+    /**
+     * Sets the URL of the Request
+     * @param newURL the new URL
+     */
     public void setURL(String newURL) {
 	url=newURL;
     }
 
+    /**
+     * Retrieves the value of a param.
+     * @param name The name of the param
+     * @return The value of the param, or null
+     */
     public String getParam(String name) {
 	try {
 	    BufferedReader br= new BufferedReader(new StringReader(params));
@@ -105,6 +126,11 @@ public class Request {
 	}
     }
 
+    /**
+     * Sets the value of a param.
+     * @param name the name of the param
+     * @param value the value to be set
+     */
     public void setParam(String name, String value) {
 	try {
 	    StringBuffer sb = new StringBuffer(params.length()+value.length());

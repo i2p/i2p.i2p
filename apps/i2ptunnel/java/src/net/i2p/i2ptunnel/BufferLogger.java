@@ -45,6 +45,7 @@ class BufferLogger implements Logging {
     
     /**
      * Pass in some random data 
+     * @param s String containing what we're logging.
      */
     public void log(String s) {
 	if (_ignore) return;

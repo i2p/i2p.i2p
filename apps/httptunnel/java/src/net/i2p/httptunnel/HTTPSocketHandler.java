@@ -21,6 +21,11 @@ public class HTTPSocketHandler extends Thread {
     private HTTPListener httpl;
     private RootHandler h;
 
+    /**
+     * A public constructor.
+     * @param httpl An HTTPListener, to listen for HTTP, no doubt
+     * @param s A socket.
+     */
     public HTTPSocketHandler(HTTPListener httpl, Socket s) {
 	this.httpl = httpl;
 	this.s=s;
@@ -28,6 +33,10 @@ public class HTTPSocketHandler extends Thread {
 	start();
     }
     
+    
+    /* (non-Javadoc)
+     * @see java.lang.Thread#run()
+     */
     public void run() {
 	InputStream in = null;
 	OutputStream out = null;

@@ -31,8 +31,16 @@ public class EepHandler {
 	errorHandler=eh;
     }
     
+    /**
+     * @param req the Request
+     * @param httpl an HTTPListener
+     * @param out where to write the results
+     * @param destination destination as a string, (subject to naming
+     *  service lookup)
+     * @throws IOException
+     */
     public void handle(Request req, HTTPListener httpl, OutputStream out,
-		       boolean fromProxy, String destination)
+		       /* boolean fromProxy, */ String destination)
 	throws IOException {
 	SocketManagerProducer smp = httpl.getSMP();
 	Destination dest = NamingService.getInstance().lookup(destination);
@@ -49,6 +57,15 @@ public class EepHandler {
 	}
     }
 
+    /**
+     * @param req the Request to send out
+     * @param f a Filter to apply to the bytes retrieved from the Destination
+     * @param out where to write the results
+     * @param dest the Destination of the Request
+     * @param sm an I2PSocketManager, to get a socket for the Destination
+     * @return boolean, true if something was written, false otherwise.
+     * @throws IOException
+     */
     public boolean handle(Request req, Filter f, OutputStream out,
 		       Destination dest, I2PSocketManager sm)
     throws IOException {

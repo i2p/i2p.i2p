@@ -19,6 +19,15 @@ public class HTTPListener extends Thread {
     private String listenHost;
     private SocketManagerProducer smp;
 
+    /**
+     * A public constructor.  It contstructs things.  In this case, 
+     * it constructs a nice HTTPListener, for all your listening on
+     * HTTP needs.  Yep.  That's right.
+     * @param smp A SocketManagerProducer, producing Sockets, no doubt
+     * @param port A port, to connect to.
+     * @param listenHost A host, to connect to.
+     */
+    
     public HTTPListener(SocketManagerProducer smp, int port,
 			String listenHost) {
 	this.smp = smp;
@@ -26,6 +35,9 @@ public class HTTPListener extends Thread {
 	start();
     }
     
+    /* (non-Javadoc)
+     * @see java.lang.Thread#run()
+     */
     public void run() {
 	try {
 	    InetAddress lh = listenHost == null
@@ -43,6 +55,10 @@ public class HTTPListener extends Thread {
 
     private boolean proxyUsed=false;
     
+    /**
+     * Query whether this is the first use of the proxy or not . . .
+     * @return Whether this is the first proxy use, no doubt.
+     */
     public boolean firstProxyUse() {
 	// FIXME: check a config option here
 	if (true) return false;
@@ -54,11 +70,19 @@ public class HTTPListener extends Thread {
 	}
     }
 
+    /**
+     * @return The SocketManagerProducer being used.
+     */
     public SocketManagerProducer getSMP() {
 	return smp;
     }
 
-    /** @deprecated */
+    /** 
+     * Outputs with HTTP 1.1 flair that a feature isn't implemented.
+     * @param out The stream the text goes to.
+     * @deprecated
+     * @throws IOException
+     */
     public void handleNotImplemented(OutputStream out) throws IOException {
 	out.write(("HTTP/1.1 200 Document following\n\n"+
 		  "<h1>Feature not implemented</h1>").getBytes("ISO-8859-1"));

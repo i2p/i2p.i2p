@@ -17,6 +17,13 @@ public class ErrorHandler {
 
     }
     
+    /**
+     * @param req the Request
+     * @param httpl an HTTPListener
+     * @param out where to write the results
+     * @param error the error that happened
+     * @throws IOException
+     */
     public void handle(Request req, HTTPListener httpl,
 		       OutputStream out, String error) throws IOException {
 	// FIXME: Make nicer messages for more likely errors.

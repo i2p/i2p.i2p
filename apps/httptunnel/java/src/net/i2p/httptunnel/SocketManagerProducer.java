@@ -16,6 +16,14 @@ public class SocketManagerProducer extends Thread {
     private int maxManagers;
     private boolean mcDonalds;
 
+    /**
+     * Public constructor creating a SocketManagerProducer 
+     * @param initialManagers a list of socket managers to use
+     * @param maxManagers how many managers to have in the cache
+     * @param mcDonaldsMode whether to throw away a manager after use
+     * @param host which host to listen on
+     * @param port which port to listen on
+     */
     public SocketManagerProducer(I2PSocketManager[] initialManagers,
 				 int maxManagers,
 				 boolean mcDonaldsMode,
@@ -101,6 +109,9 @@ public class SocketManagerProducer extends Thread {
 	return result;
     }
 
+    /**
+     * Wait until InterruptedException
+     */
     public void myWait() {
 	try {
 	    wait();

@@ -23,8 +23,14 @@ public class ProxyHandler extends EepHandler {
 	super(eh);
     }
     
-    public void handle(Request req, HTTPListener httpl, OutputStream out,
-		       boolean fromProxy) throws IOException {
+    /**
+     * @param req a Request
+     * @param httpl an HTTPListener
+     * @param out where to write the results
+     * @throws IOException
+     */
+    public void handle(Request req, HTTPListener httpl, OutputStream out
+		       /*, boolean fromProxy */) throws IOException {
 	SocketManagerProducer smp = httpl.getSMP();
 	Destination dest = findProxy();
 	if (dest == null) {
