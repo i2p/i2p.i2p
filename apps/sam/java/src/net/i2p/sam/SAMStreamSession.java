@@ -26,6 +26,7 @@ import net.i2p.client.streaming.I2PSocket;
 import net.i2p.client.streaming.I2PSocketManager;
 import net.i2p.client.streaming.I2PSocketManagerFactory;
 import net.i2p.client.streaming.I2PSocketOptions;
+import net.i2p.client.I2PClient;
 import net.i2p.data.Base64;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.Destination;
@@ -101,10 +102,22 @@ public class SAMStreamSession {
         allprops.putAll(props);
 
         // FIXME: we should setup I2CP host and port, too
+        String i2cpHost = allprops.getProperty(I2PClient.PROP_TCP_HOST, "127.0.0.1");
+        int i2cpPort = 7654;
+        String port = allprops.getProperty(I2PClient.PROP_TCP_PORT, "7654");
+        try {
+            i2cpPort = Integer.parseInt(port);
+        } catch (NumberFormatException nfe) {
+            throw new SAMException("Invalid I2CP port specified [" + port + "]");
+        }
+        // streams MUST be mode=guaranteed (though i think the socket manager 
+        // enforces this anyway...
+        allprops.setProperty(I2PClient.PROP_RELIABILITY, I2PClient.PROP_RELIABILITY_GUARANTEED);
         _log.debug("Creating I2PSocketManager...");
         socketMgr = I2PSocketManagerFactory.createManager(destStream,
-                                                          "127.0.0.1",
-                                                          7654, allprops);
+                                                          i2cpHost,
+                                                          i2cpPort, 
+                                                          allprops);
         if (socketMgr == null) {
             throw new SAMException("Error creating I2PSocketManager");
         }
