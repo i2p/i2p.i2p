@@ -35,7 +35,8 @@ import java.io.File;
  *
  */
 public class Daemon {
-
+    public static final String VERSION = "2.0.3";
+    
     /**
      * Update the router and published address books using remote data from the
      * subscribed address books listed in subscriptions.
@@ -144,18 +145,22 @@ public class Daemon {
             else
                 System.out.println("ERROR: Addressbook directory " + homeFile.getName() + " could not be created");
         }
-        settings = ConfigParser.parse(new File(homeFile, settingsLocation), defaultSettings);
-
-        System.setProperty("proxySet", "true");
-        System.setProperty("http.proxyHost", (String) settings
-                .get("proxy_host"));
-        System.setProperty("http.proxyPort", (String) settings
-                .get("proxy_port"));
-        long delay = Long.parseLong((String) settings.get("update_delay"));
-        if (delay < 1) {
-            delay = 1;
-        }
+        
+        File settingsFile = new File(homeFile, settingsLocation);
+        
         while (true) {
+            settings = ConfigParser.parse(settingsFile, defaultSettings);
+
+            System.setProperty("proxySet", "true");
+            System.setProperty("http.proxyHost", (String) settings
+                    .get("proxy_host"));
+            System.setProperty("http.proxyPort", (String) settings
+                    .get("proxy_port"));
+            long delay = Long.parseLong((String) settings.get("update_delay"));
+            if (delay < 1) {
+                delay = 1;
+            }
+            
             Daemon.update(settings, home);
             try {
                 Thread.sleep(delay * 60 * 60 * 1000);

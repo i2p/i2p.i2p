@@ -1,4 +1,12 @@
-$Id: history.txt,v 1.124 2004/12/31 19:57:01 jrandom Exp $
+$Id: history.txt,v 1.125 2005/01/05 19:17:53 jrandom Exp $
+
+* 2005-01-06  0.4.2.6 released
+
+2005-01-06  jrandom
+    * Added a startup message to the addressbook, printing its version number
+      to stdout (which is sent to wrapper.config) when it loads.
+    * Updated the addressbook to reread the config file periodically
+    * Added orion.i2p to the list of eepsites on the default homepage
 
 2005-01-05  jrandom
     * Handle unexpected network read errors more carefully (thanks parg!)
