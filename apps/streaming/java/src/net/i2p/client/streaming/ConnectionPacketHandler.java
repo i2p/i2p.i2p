@@ -26,6 +26,7 @@ public class ConnectionPacketHandler {
     void receivePacket(Packet packet, Connection con) throws I2PException {
         boolean ok = verifyPacket(packet, con);
         if (!ok) return;
+        con.packetReceived();
         boolean isNew = con.getInputStream().messageReceived(packet.getSequenceNum(), packet.getPayload());
 
         // close *after* receiving the data, as well as after verifying the signatures / etc

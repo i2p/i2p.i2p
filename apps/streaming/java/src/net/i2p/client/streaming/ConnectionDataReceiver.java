@@ -55,7 +55,14 @@ class ConnectionDataReceiver implements MessageOutputStream.DataReceiver {
     
     
     public PacketLocal send(byte buf[], int off, int size) {
-        PacketLocal packet = buildPacket(buf, off, size);
+        return send(buf, off, size, false);
+    }
+    /** 
+     * @param forceIncrement even if the buffer is empty, increment the packetId
+     *                       so we get an ACK back
+     */
+    public PacketLocal send(byte buf[], int off, int size, boolean forceIncrement) {
+        PacketLocal packet = buildPacket(buf, off, size, forceIncrement);
         _connection.sendPacket(packet);
         return packet;
     }
@@ -69,14 +76,14 @@ class ConnectionDataReceiver implements MessageOutputStream.DataReceiver {
         return ackOnly;
     }
     
-    private PacketLocal buildPacket(byte buf[], int off, int size) {
+    private PacketLocal buildPacket(byte buf[], int off, int size, boolean forceIncrement) {
         boolean ackOnly = isAckOnly(size);
         PacketLocal packet = new PacketLocal(_context, _connection.getRemotePeer(), _connection);
         byte data[] = new byte[size];
         if (size > 0)
             System.arraycopy(buf, off, data, 0, size);
         packet.setPayload(data);
-		if (ackOnly)
+		if (ackOnly && !forceIncrement)
 			packet.setSequenceNum(0);
         else
             packet.setSequenceNum(_connection.getNextOutboundPacketNum());

@@ -53,9 +53,15 @@ public class Connection {
     private I2PSocketFull _socket;
     /** set to an error cause if the connection could not be established */
     private String _connectionError;
+    private boolean _disconnectScheduled;
+    private long _lastReceivedOn;
+    private ActivityTimer _activityTimer;
     
     public static final long MAX_RESEND_DELAY = 60*1000;
     public static final long MIN_RESEND_DELAY = 20*1000;
+
+    /** wait up to 5 minutes after disconnection so we can ack/close packets */
+    public static long DISCONNECT_TIMEOUT = 5*60*1000;
     
     public Connection(I2PAppContext ctx, ConnectionManager manager, SchedulerChooser chooser, PacketQueue queue, ConnectionPacketHandler handler) {
         this(ctx, manager, chooser, queue, handler, null);
@@ -83,6 +89,9 @@ public class Connection {
         _connectionManager = manager;
         _resetReceived = false;
         _connected = true;
+        _disconnectScheduled = false;
+        _lastReceivedOn = -1;
+        _activityTimer = new ActivityTimer();
     }
     
     public long getNextOutboundPacketNum() { 
@@ -190,6 +199,7 @@ public class Connection {
 
         _lastSendTime = _context.clock().now();
         _outboundQueue.enqueue(packet);        
+        resetActivityTimer();
         
         if (ackOnly) {
             // ACK only, don't schedule this packet for retries
@@ -304,13 +314,39 @@ public class Connection {
                 _outboundPackets.clear();
                 _outboundPackets.notifyAll();
             }
-            if (removeFromConMgr)
-                _connectionManager.removeConnection(this);
+            if (removeFromConMgr) {
+                if (!_disconnectScheduled) {
+                    _disconnectScheduled = true;
+                    SimpleTimer.getInstance().addEvent(new DisconnectEvent(), DISCONNECT_TIMEOUT);
+                }
+            }
         }
     }
     
     void disconnectComplete() {
-        _connectionManager.removeConnection(this);
+        _connected = false;
+        if (!_disconnectScheduled) {
+            _disconnectScheduled = true;
+            
+            if (_log.shouldLog(Log.INFO))
+                _log.info("Connection disconnect complete from dead, drop the con "
+                          + toString());
+            _connectionManager.removeConnection(this);
+        }
+    }
+    
+    private class DisconnectEvent implements SimpleTimer.TimedEvent {
+        public DisconnectEvent() {
+            if (_log.shouldLog(Log.INFO))
+                _log.info("Connection disconnect timer initiated: 5 minutes to drop " 
+                          + Connection.this.toString());
+        }
+        public void timeReached() {
+            if (_log.shouldLog(Log.INFO))
+                _log.info("Connection disconnect timer complete, drop the con "
+                          + Connection.this.toString());
+            _connectionManager.removeConnection(Connection.this);
+        }
     }
     
     private void doClose() {
@@ -397,6 +433,64 @@ public class Connection {
     public void setCongestionWindowEnd(long endMsg) { _congestionWindowEnd = endMsg; }
     public long getHighestAckedThrough() { return _highestAckedThrough; }
     public void setHighestAckedThrough(long msgNum) { _highestAckedThrough = msgNum; }
+    
+    public long getLastActivityOn() {
+        return (_lastSendTime > _lastReceivedOn ? _lastSendTime : _lastReceivedOn);
+    }
+    
+    void packetReceived() {
+        _lastReceivedOn = _context.clock().now();
+        resetActivityTimer();
+    }
+    
+    private void resetActivityTimer() {
+        if (_options.getInactivityTimeout() <= 0) return;
+        long howLong = _activityTimer.getTimeLeft();
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("Resetting the inactivity timer to " + howLong);
+        // this will get rescheduled, and rescheduled, and rescheduled...
+        SimpleTimer.getInstance().addEvent(_activityTimer, howLong);
+    }
+    
+    private class ActivityTimer implements SimpleTimer.TimedEvent {
+        public void timeReached() {
+            // uh, nothing more to do...
+            if (!_connected) return;
+            // we got rescheduled already
+            if (getTimeLeft() > 0) return;
+            // these are either going to time out or cause further rescheduling
+            if (getUnackedPacketsSent() > 0) return;
+            // wtf, this shouldn't have been scheduled
+            if (_options.getInactivityTimeout() <= 0) return;
+            
+            // bugger it, might as well do the hard work now
+            switch (_options.getInactivityAction()) {
+                case ConnectionOptions.INACTIVITY_ACTION_SEND:
+                    if (_log.shouldLog(Log.WARN))
+                        _log.warn("Sending some data due to inactivity");
+                    _receiver.send(null, 0, 0, true);
+                    break;
+                case ConnectionOptions.INACTIVITY_ACTION_NOOP:
+                    if (_log.shouldLog(Log.WARN))
+                        _log.warn("Inactivity timer expired, but we aint doin' shit");
+                    break;
+                case ConnectionOptions.INACTIVITY_ACTION_DISCONNECT:
+                    // fall through
+                default:
+                    if (_log.shouldLog(Log.WARN))
+                        _log.warn("Closing connection due to inactivity");
+                    disconnect(true);
+                    break;
+            }
+        }
+        
+        public final long getTimeLeft() {
+            if (getLastActivityOn() > 0)
+                return getLastActivityOn() + _options.getInactivityTimeout() - _context.clock().now();
+            else
+                return _createdOn + _options.getInactivityTimeout() - _context.clock().now();
+        }
+    }
     
     /** stream that the local peer receives data on */
     public MessageInputStream getInputStream() { return _inputStream; }

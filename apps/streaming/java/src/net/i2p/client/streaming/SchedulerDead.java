@@ -37,7 +37,7 @@ class SchedulerDead extends SchedulerImpl {
                       (con.getCloseReceivedOn() > 0) &&
                       (con.getUnackedPacketsReceived() <= 0) &&
                       (con.getUnackedPacketsSent() <= 0) &&
-                      (con.getCloseSentOn() + SchedulerClosed.CLOSE_TIMEOUT <= _context.clock().now()));
+                      (con.getCloseSentOn() + Connection.DISCONNECT_TIMEOUT <= _context.clock().now()));
         return ok;
     }
     

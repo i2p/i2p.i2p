@@ -45,9 +45,14 @@ class SchedulerClosing extends SchedulerImpl {
         if (con.getNextSendTime() <= 0)
             con.setNextSendTime(_context.clock().now() + con.getOptions().getSendAckDelay());
         long remaining = con.getNextSendTime() - _context.clock().now();
-        if (remaining <= 0)
+        if (remaining <= 0) {
             con.sendAvailable();
-        else
+            con.setNextSendTime(_context.clock().now() + con.getOptions().getSendAckDelay());
+        } else {
+            //if (remaining < 5*1000)
+            //    remaining = 5*1000;
+            //con.setNextSendTime(when
             reschedule(remaining, con);
+        }
     }
 }

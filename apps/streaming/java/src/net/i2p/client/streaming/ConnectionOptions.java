@@ -18,9 +18,18 @@ public class ConnectionOptions extends I2PSocketOptions {
     private int _maxMessageSize;
     private int _choke;
     private int _maxResends;
+    private int _inactivityTimeout;
+    private int _inactivityAction;
 
     public static final int PROFILE_BULK = 1;
     public static final int PROFILE_INTERACTIVE = 2;
+    
+    /** on inactivity timeout, do nothing */
+    public static final int INACTIVITY_ACTION_NOOP = 0;
+    /** on inactivity timeout, close the connection */
+    public static final int INACTIVITY_ACTION_DISCONNECT = 1;
+    /** on inactivity timeout, send a payload message */
+    public static final int INACTIVITY_ACTION_SEND = 2;
     
     public ConnectionOptions() {
         super();
@@ -48,6 +57,8 @@ public class ConnectionOptions extends I2PSocketOptions {
             setMaxMessageSize(opts.getMaxMessageSize());
             setChoke(opts.getChoke());
             setMaxResends(opts.getMaxResends());
+            setInactivityTimeout(opts.getInactivityTimeout());
+            setInactivityAction(opts.getInactivityAction());
         } else {
             setConnectDelay(2*1000);
             setProfile(PROFILE_BULK);
@@ -59,6 +70,8 @@ public class ConnectionOptions extends I2PSocketOptions {
             setWindowSize(1);
             setMaxResends(5);
             setWriteTimeout(-1);
+            setInactivityTimeout(5*60*1000);
+            setInactivityAction(INACTIVITY_ACTION_SEND);
         }
     }
     
@@ -151,7 +164,11 @@ public class ConnectionOptions extends I2PSocketOptions {
      *
      */
     public int getProfile() { return _profile; }
-    public void setProfile(int profile) { _profile = profile; }
+    public void setProfile(int profile) { 
+        if (profile != PROFILE_BULK) 
+            throw new IllegalArgumentException("Only bulk is supported so far");
+        _profile = profile; 
+    }
     
     /**
      * How many times will we try to send a message before giving up?
@@ -159,4 +176,14 @@ public class ConnectionOptions extends I2PSocketOptions {
      */
     public int getMaxResends() { return _maxResends; }
     public void setMaxResends(int numSends) { _maxResends = numSends; }
+    
+    /**
+     * What period of inactivity qualifies as "too long"?
+     *
+     */
+    public int getInactivityTimeout() { return _inactivityTimeout; }
+    public void setInactivityTimeout(int timeout) { _inactivityTimeout = timeout; }
+    
+    public int getInactivityAction() { return _inactivityAction; }
+    public void setInactivityAction(int action) { _inactivityAction = action; }
 }

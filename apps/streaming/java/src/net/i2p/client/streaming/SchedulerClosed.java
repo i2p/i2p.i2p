@@ -31,8 +31,6 @@ class SchedulerClosed extends SchedulerImpl {
         _log = ctx.logManager().getLog(SchedulerClosed.class);
     }
     
-    static final long CLOSE_TIMEOUT = 30*1000;
-    
     public boolean accept(Connection con) {
         boolean ok = (con != null) && 
                      (con.getCloseSentOn() > 0) &&
@@ -40,12 +38,12 @@ class SchedulerClosed extends SchedulerImpl {
                      (con.getUnackedPacketsReceived() <= 0) &&
                      (con.getUnackedPacketsSent() <= 0) &&
                      (!con.getResetReceived()) &&
-                     (con.getCloseSentOn() + CLOSE_TIMEOUT > _context.clock().now());
+                     (con.getCloseSentOn() + Connection.DISCONNECT_TIMEOUT > _context.clock().now());
         return ok;
     }
     
     public void eventOccurred(Connection con) {
-        long timeLeft = con.getCloseSentOn() + CLOSE_TIMEOUT - _context.clock().now();
+        long timeLeft = con.getCloseSentOn() + Connection.DISCONNECT_TIMEOUT - _context.clock().now();
         reschedule(timeLeft, con);
     }
 }
