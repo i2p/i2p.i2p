@@ -33,6 +33,8 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
 
     private static final long DEFAULT_CONNECT_TIMEOUT = 60 * 1000;
 
+    private static volatile long __clientId = 0;
+    private long _clientId;
     protected Object sockLock = new Object(); // Guards sockMgr and mySockets
     private I2PSocketManager sockMgr;
     private List mySockets = new ArrayList();
@@ -60,9 +62,10 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
 
     public I2PTunnelClientBase(int localPort, boolean ownDest, Logging l, EventDispatcher notifyThis, String handlerName) {
         super(localPort + " (uninitialized)", notifyThis);
+        _clientId = ++__clientId;
         this.localPort = localPort;
         this.l = l;
-        this.handlerName = handlerName;
+        this.handlerName = handlerName + _clientId;
 
         synchronized (sockLock) {
             if (ownDest) {
@@ -75,7 +78,7 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
         l.log("I2P session created");
 
         Thread t = new I2PThread(this);
-        t.setName("Client");
+        t.setName("Client " + _clientId);
         listenerReady = false;
         t.start();
         open = true;
@@ -179,8 +182,8 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
     public I2PSocket createI2PSocket(Destination dest, I2PSocketOptions opt) throws I2PException, ConnectException, NoRouteToHostException, InterruptedIOException {
         I2PSocket i2ps;
 
+        i2ps = sockMgr.connect(dest, opt);
         synchronized (sockLock) {
-            i2ps = sockMgr.connect(dest, opt);
             mySockets.add(i2ps);
         }
 
