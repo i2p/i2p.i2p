@@ -303,7 +303,7 @@ public class OutboundClientMessageJob extends JobImpl {
      *
      */
     private void send(Lease lease) {
-        long token = _context.random().nextInt(Integer.MAX_VALUE);
+        long token = _context.random().nextLong(I2NPMessage.MAX_ID_VALUE);
         PublicKey key = _status.getLeaseSet().getEncryptionKey();
         SessionKey sessKey = new SessionKey();
         Set tags = new HashSet();
@@ -411,7 +411,7 @@ public class OutboundClientMessageJob extends JobImpl {
         clove.setCertificate(new Certificate(Certificate.CERTIFICATE_TYPE_NULL, null));
         clove.setDeliveryInstructions(instructions);
         clove.setExpiration(_overallExpiration);
-        clove.setId(_context.random().nextInt(Integer.MAX_VALUE));
+        clove.setId(_context.random().nextLong(I2NPMessage.MAX_ID_VALUE));
         
         DataMessage msg = new DataMessage(_context);
         msg.setData(_status.getMessage().getPayload().getEncryptedData());

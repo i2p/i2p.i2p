@@ -38,7 +38,7 @@ class TestTunnelJob extends JobImpl {
         _log = ctx.logManager().getLog(TestTunnelJob.class);
         _primaryId = id;
         _pool = pool;
-        _nonce = ctx.random().nextInt(Integer.MAX_VALUE);
+        _nonce = ctx.random().nextLong(I2NPMessage.MAX_ID_VALUE);
     }
     public String getName() { return "Test Tunnel"; }
     public void runJob() {

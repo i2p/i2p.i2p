@@ -20,6 +20,7 @@ import net.i2p.data.SessionKey;
 import net.i2p.data.SigningPrivateKey;
 import net.i2p.data.SigningPublicKey;
 import net.i2p.data.TunnelId;
+import net.i2p.data.i2np.I2NPMessage;
 import net.i2p.router.ClientTunnelSettings;
 import net.i2p.router.PeerSelectionCriteria;
 import net.i2p.router.RouterContext;
@@ -284,7 +285,7 @@ class TunnelBuilder {
         tunnelSettings.setReorder(settings.getReorderInbound());
         
         TunnelId id = new TunnelId();
-        id.setTunnelId(_context.random().nextInt(Integer.MAX_VALUE));
+        id.setTunnelId(_context.random().nextLong(TunnelId.MAX_ID_VALUE));
         id.setType(TunnelId.TYPE_INBOUND);
         
         TunnelInfo first = null;
@@ -363,7 +364,7 @@ class TunnelBuilder {
         tunnelSettings.setReorder(settings.getReorderInbound());
         
         TunnelId id = new TunnelId();
-        id.setTunnelId(_context.random().nextInt(Integer.MAX_VALUE));
+        id.setTunnelId(_context.random().nextLong(TunnelId.MAX_ID_VALUE));
         id.setType(TunnelId.TYPE_OUTBOUND);
         
         TunnelInfo first = new TunnelInfo(_context);

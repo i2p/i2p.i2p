@@ -25,6 +25,7 @@ import net.i2p.data.i2np.DatabaseStoreMessage;
 import net.i2p.data.i2np.DeliveryInstructions;
 import net.i2p.data.i2np.DeliveryStatusMessage;
 import net.i2p.data.i2np.GarlicMessage;
+import net.i2p.data.i2np.I2NPMessage;
 import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
 import net.i2p.router.TunnelInfo;
@@ -102,7 +103,7 @@ class OutboundClientMessageJobHelper {
         
         config.setCertificate(new Certificate(Certificate.CERTIFICATE_TYPE_NULL, null));
         config.setDeliveryInstructions(instructions);
-        config.setId(ctx.random().nextInt(Integer.MAX_VALUE));
+        config.setId(ctx.random().nextLong(I2NPMessage.MAX_ID_VALUE));
         config.setExpiration(expiration+2*Router.CLOCK_FUDGE_FACTOR);
         config.setRecipientPublicKey(recipientPK);
         config.setRequestAck(false);
@@ -154,7 +155,7 @@ class OutboundClientMessageJobHelper {
         ackClove.setCertificate(new Certificate(Certificate.CERTIFICATE_TYPE_NULL, null));
         ackClove.setDeliveryInstructions(ackInstructions);
         ackClove.setExpiration(expiration);
-        ackClove.setId(ctx.random().nextInt(Integer.MAX_VALUE));
+        ackClove.setId(ctx.random().nextLong(I2NPMessage.MAX_ID_VALUE));
         ackClove.setPayload(msg);
         ackClove.setRecipient(ctx.router().getRouterInfo());
         ackClove.setRequestAck(false);
@@ -181,7 +182,7 @@ class OutboundClientMessageJobHelper {
         clove.setCertificate(new Certificate(Certificate.CERTIFICATE_TYPE_NULL, null));
         clove.setDeliveryInstructions(instructions);
         clove.setExpiration(expiration);
-        clove.setId(ctx.random().nextInt(Integer.MAX_VALUE));
+        clove.setId(ctx.random().nextLong(I2NPMessage.MAX_ID_VALUE));
         DataMessage msg = new DataMessage(ctx);
         msg.setData(data.getEncryptedData());
         clove.setPayload(msg);
@@ -207,7 +208,7 @@ class OutboundClientMessageJobHelper {
         clove.setCertificate(new Certificate(Certificate.CERTIFICATE_TYPE_NULL, null));
         clove.setDeliveryInstructions(instructions);
         clove.setExpiration(expiration);
-        clove.setId(ctx.random().nextInt(Integer.MAX_VALUE));
+        clove.setId(ctx.random().nextLong(I2NPMessage.MAX_ID_VALUE));
         DatabaseStoreMessage msg = new DatabaseStoreMessage(ctx);
         msg.setLeaseSet(replyLeaseSet);
         msg.setMessageExpiration(new Date(expiration));

@@ -460,7 +460,7 @@ public class RequestTunnelJob extends JobImpl {
         instructions.setRouter(gateway.getGateway());
         instructions.setTunnelId(gateway.getTunnelId());
         
-        long replyId = _context.random().nextInt(Integer.MAX_VALUE);
+        long replyId = _context.random().nextLong(I2NPMessage.MAX_ID_VALUE);
         
         Certificate replyCert = new Certificate(Certificate.CERTIFICATE_TYPE_NULL, null);
         
@@ -500,7 +500,7 @@ public class RequestTunnelJob extends JobImpl {
     private DeliveryStatusMessage buildDeliveryStatusMessage() {
         DeliveryStatusMessage msg = new DeliveryStatusMessage(_context);
         msg.setArrival(new Date(_context.clock().now()));
-        msg.setMessageId(_context.random().nextInt(Integer.MAX_VALUE));
+        msg.setMessageId(_context.random().nextLong(I2NPMessage.MAX_ID_VALUE));
         Date exp = new Date(_expiration);
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Setting the expiration on the delivery status message to " + exp);
@@ -567,7 +567,7 @@ public class RequestTunnelJob extends JobImpl {
         
         config.setCertificate(new Certificate(Certificate.CERTIFICATE_TYPE_NULL, null));
         config.setDeliveryInstructions(instructions);
-        config.setId(_context.random().nextInt(Integer.MAX_VALUE));
+        config.setId(_context.random().nextLong(I2NPMessage.MAX_ID_VALUE));
         config.setExpiration(_expiration);
         config.setRecipientPublicKey(target.getIdentity().getPublicKey());
         config.setRequestAck(false);
@@ -595,7 +595,7 @@ public class RequestTunnelJob extends JobImpl {
         ackClove.setCertificate(new Certificate(Certificate.CERTIFICATE_TYPE_NULL, null));
         ackClove.setDeliveryInstructions(ackInstructions);
         ackClove.setExpiration(expiration);
-        ackClove.setId(_context.random().nextInt(Integer.MAX_VALUE));
+        ackClove.setId(_context.random().nextLong(I2NPMessage.MAX_ID_VALUE));
         ackClove.setPayload(ackMsg);
         ackClove.setRecipient(replyPeer);
         ackClove.setRequestAck(false);
@@ -620,7 +620,7 @@ public class RequestTunnelJob extends JobImpl {
         clove.setCertificate(new Certificate(Certificate.CERTIFICATE_TYPE_NULL, null));
         clove.setDeliveryInstructions(instructions);
         clove.setExpiration(expiration);
-        clove.setId(_context.random().nextInt(Integer.MAX_VALUE));
+        clove.setId(_context.random().nextLong(I2NPMessage.MAX_ID_VALUE));
         clove.setPayload(data);
         clove.setRecipientPublicKey(null);
         clove.setRequestAck(false);
@@ -771,18 +771,25 @@ public class RequestTunnelJob extends JobImpl {
         private TunnelInfo _tunnel;
         private Hash _replyThrough;
         private long _started;
+        private Exception _by;
         public Failure(TunnelInfo tunnel, Hash replyThrough) {
             super(RequestTunnelJob.this._context);
             _tunnel = tunnel;
             _replyThrough = replyThrough;
             _started = _context.clock().now();
+            _by = new Exception("Failure created");
         }
         
         public String getName() { return "Create Tunnel Failed"; }
         public void runJob() {
             // update the tunnel so its known to be not working
-            if (_log.shouldLog(Log.WARN))
-                _log.warn("Tunnel creation timed out for tunnel " + _tunnel.getTunnelId() + " at router " + _tunnel.getThisHop().toBase64() + " with expiration " + new Date(_expiration));
+            if (_log.shouldLog(Log.ERROR)) {
+                _log.error("Tunnel creation timed out for tunnel " + _tunnel.getTunnelId() + " at router " 
+                           + _tunnel.getThisHop().toBase64() + " from router " 
+                           + _context.routerHash().toBase64() + " after waiting " 
+                           + (_context.clock().now()-_started) + "ms", _by);
+                _log.error("Added by", Failure.this.getAddedBy());
+            }
             synchronized (_failedTunnelParticipants) {
                 _failedTunnelParticipants.add(_tunnel.getThisHop());
                 _failedTunnelParticipants.add(_replyThrough);

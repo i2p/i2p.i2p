@@ -210,7 +210,7 @@ class StoreJob extends JobImpl {
     }
 
     private void sendStoreThroughGarlic(DatabaseStoreMessage msg, RouterInfo peer, long expiration) {
-        long token = _context.random().nextInt(Integer.MAX_VALUE);
+        long token = _context.random().nextLong(I2NPMessage.MAX_ID_VALUE);
         
         TunnelId replyTunnelId = selectInboundTunnel();
         TunnelInfo replyTunnel = _context.tunnelManager().getTunnelInfo(replyTunnelId);

@@ -86,7 +86,7 @@ public class BuildTestMessageJob extends JobImpl {
     }
     
     private GarlicConfig buildGarlicCloveConfig() {
-        _testMessageKey = _context.random().nextInt(Integer.MAX_VALUE);
+        _testMessageKey = _context.random().nextLong(I2NPMessage.MAX_ID_VALUE);
         if (_log.shouldLog(Log.INFO))
             _log.info("Test message key: " + _testMessageKey);
         GarlicConfig config = new GarlicConfig();
@@ -105,7 +105,7 @@ public class BuildTestMessageJob extends JobImpl {
         
         config.setCertificate(new Certificate(Certificate.CERTIFICATE_TYPE_NULL, null));
         config.setDeliveryInstructions(instructions);
-        config.setId(_context.random().nextInt(Integer.MAX_VALUE));
+        config.setId(_context.random().nextLong(I2NPMessage.MAX_ID_VALUE));
         config.setExpiration(_timeoutMs+_context.clock().now()+2*Router.CLOCK_FUDGE_FACTOR);
         config.setRecipient(_target);
         config.setRequestAck(false);
@@ -135,7 +135,7 @@ public class BuildTestMessageJob extends JobImpl {
         ackClove.setCertificate(new Certificate(Certificate.CERTIFICATE_TYPE_NULL, null));
         ackClove.setDeliveryInstructions(ackInstructions);
         ackClove.setExpiration(_timeoutMs+_context.clock().now());
-        ackClove.setId(_context.random().nextInt(Integer.MAX_VALUE));
+        ackClove.setId(_context.random().nextLong(I2NPMessage.MAX_ID_VALUE));
         ackClove.setPayload(msg);
         ackClove.setRecipient(_target);
         ackClove.setRequestAck(false);
