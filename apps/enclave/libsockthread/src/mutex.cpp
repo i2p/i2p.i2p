@@ -79,7 +79,7 @@ void Mutex::lock(void)
 	assert(rc != WAIT_FAILED);
 #else
 	int rc = pthread_mutex_lock(&mutex);
-	assert(rc == 0);  // if it stops here, it is probably from a deadlock
+	assert(rc == 0);
 #endif
 }
 
@@ -102,7 +102,6 @@ void Mutex::unlock(void)
 // g++ -Wall -DUNIT_TEST -c mutex.cpp -o mutex.o
 // g++ -Wall -DUNIT_TEST mutex.o thread.o -o mutex -lpthread
 #include <iostream>
-#include <ctime>
 #include "thread.hpp"
 
 Mutex widget;
@@ -119,7 +118,8 @@ int main(void)
 			{
 				widget.lock();
 				cout << "I got it!  thread #" << testval << '\n';
-				widget.unlock();
+				// If this works, only one thread should be able to lock the
+				// widget, since it is never unlocked
 				return 0;
 			}
 		private:
@@ -128,6 +128,8 @@ int main(void)
 	Mutex_test t1(1);
 	Mutex_test t2(2);
 	Mutex_test t3(3);
+	t1.start(); t2.start(); t3.start();
+	while (true);
 
 	return 0;
 }
