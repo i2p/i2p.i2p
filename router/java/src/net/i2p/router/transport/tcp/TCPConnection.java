@@ -249,7 +249,7 @@ class TCPConnection implements I2NPMessageReader.I2NPMessageEventListener {
     
     public void runConnection() {
         if (_log.shouldLog(Log.DEBUG))
-            log.debug("Run connection");
+            _log.debug("Run connection");
         _runner = new ConnectionRunner();
         Thread t = new I2PThread(_runner);
         t.setName("Run Conn [" + _id + "]");
