@@ -57,7 +57,7 @@ public class SysTray implements SysTrayMenuListener {
         if (_browserString == null || _browserString.equals("default")) {
             try {
 
-                if (_urlLauncher.openUrl("http://localhost:7657"))
+                if (_urlLauncher.openUrl("http://localhost:7657/"))
                     return;
 
             } catch (Exception ex) {
@@ -66,7 +66,7 @@ public class SysTray implements SysTrayMenuListener {
         } else {
             try {
 
-                if (_urlLauncher.openUrl("http://localhost:7657", _browserString))
+                if (_urlLauncher.openUrl("http://localhost:7657/", _browserString))
                     return;
 
             } catch (Exception ex) {
