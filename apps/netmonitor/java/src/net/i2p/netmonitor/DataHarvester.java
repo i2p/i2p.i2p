@@ -72,7 +72,7 @@ class DataHarvester {
      */
     private void harvestRankAs(NetMonitor monitor, RouterInfo peer) {
         int numFast = 0;
-        int numReliable = 0;
+        int numHighCapacity = 0;
         int numNotFailing = 0;
         int numFailing = 0;
         
@@ -81,10 +81,10 @@ class DataHarvester {
             String key = (String)iter.next();
             if (key.startsWith("profile.")) {
                 String val = (String)props.get(key);
-                if (val.indexOf("fastReliable") != -1)
+                if (val.indexOf("fast") != -1)
                     numFast++;
-                else if (val.indexOf("reliable") != -1)
-                    numReliable++;
+                else if (val.indexOf("highCapacity") != -1)
+                    numHighCapacity++;
                 else if (val.indexOf("notFailing") != -1)
                     numNotFailing++;
                 else if (val.indexOf("failing") != -1)
@@ -94,13 +94,13 @@ class DataHarvester {
         
         long rankAs[] = new long[4];
         rankAs[0] = numFast;
-        rankAs[1] = numReliable;
+        rankAs[1] = numHighCapacity;
         rankAs[2] = numNotFailing;
         rankAs[3] = numFailing;
         String description = "how we rank peers"; 
         String valDescr[] = new String[4];
         valDescr[0] = "# peers we rank as fast";
-        valDescr[1] = "# peers we rank as reliable";
+        valDescr[1] = "# peers we rank as high capacity";
         valDescr[2] = "# peers we rank as not failing";
         valDescr[3] = "# peers we rank as failing";
         monitor.addData(peer.getIdentity().getHash().toBase64(), "rankAs", description, valDescr, peer.getPublished(), rankAs);
@@ -115,7 +115,7 @@ class DataHarvester {
      */
     private void harvestRank(NetMonitor monitor, RouterInfo peer, List peers) {
         int numFast = 0;
-        int numReliable = 0;
+        int numHighCapacity = 0;
         int numNotFailing = 0;
         int numFailing = 0;
         
@@ -126,10 +126,10 @@ class DataHarvester {
             String prop = "profile." + peer.getIdentity().getHash().toBase64().replace('=', '_');
             String val = cur.getOptions().getProperty(prop);
             if ( (val == null) || (val.length() <= 0) ) continue;
-            if (val.indexOf("fastReliable") != -1)
+            if (val.indexOf("fast") != -1)
                 numFast++;
-            else if (val.indexOf("reliable") != -1)
-                numReliable++;
+            else if (val.indexOf("highCapacity") != -1)
+                numHighCapacity++;
             else if (val.indexOf("notFailing") != -1)
                 numNotFailing++;
             else if (val.indexOf("failing") != -1)
@@ -138,13 +138,13 @@ class DataHarvester {
         
         long rank[] = new long[4];
         rank[0] = numFast;
-        rank[1] = numReliable;
+        rank[1] = numHighCapacity;
         rank[2] = numNotFailing;
         rank[3] = numFailing;
         String description = "how peers rank us";
         String valDescr[] = new String[4];
         valDescr[0] = "# peers ranking us as fast";
-        valDescr[1] = "# peers ranking us as reliable";
+        valDescr[1] = "# peers ranking us as high capacity";
         valDescr[2] = "# peers ranking us as not failing";
         valDescr[3] = "# peers ranking us as failing";
         // we use the current date, not the published date, since this sample doesnt come from them
@@ -173,7 +173,6 @@ class DataHarvester {
         double values[] = harvestGroupValues(peer, group);
         if (values == null) return;
            
-        String description = "how long it takes to do an ElGamal encryption";
         String valDescr[] = new String[group.getStatCount()];
         for (int i = 0; i < group.getStatCount(); i++)
             valDescr[i] = group.getStat(i).getStatDescription();
