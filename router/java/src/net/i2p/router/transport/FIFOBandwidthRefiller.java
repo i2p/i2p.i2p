@@ -56,9 +56,10 @@ class FIFOBandwidthRefiller implements Runnable {
                 _lastCheckConfigTime = now;
             }
             
-            updateQueues(now);
-            
-            _lastRefillTime = now;
+            boolean updated = updateQueues(now);
+            if (updated) {
+                _lastRefillTime = now;
+            }
             
             try { Thread.sleep(_replenishFrequency); } catch (InterruptedException ie) {}
         }
@@ -70,7 +71,7 @@ class FIFOBandwidthRefiller implements Runnable {
         _lastCheckConfigTime = _lastRefillTime;
     }
     
-    private void updateQueues(long now) {
+    private boolean updateQueues(long now) {
         long numMs = (now - _lastRefillTime);
         if (_log.shouldLog(Log.INFO))
             _log.info("Updating bandwidth after " + numMs + " (available in=" 
@@ -78,7 +79,7 @@ class FIFOBandwidthRefiller implements Runnable {
                        + _limiter.getAvailableOutboundBytes()+ ", rate in=" 
                        + _inboundKBytesPerSecond + ", out=" 
                        + _outboundKBytesPerSecond  +")");
-        if (numMs > 1000) {
+        if (numMs >= 1000) {
             long inboundToAdd = 1024*_inboundKBytesPerSecond * (numMs/1000);
             long outboundToAdd = 1024*_outboundKBytesPerSecond * (numMs/1000);
 
@@ -104,6 +105,9 @@ class FIFOBandwidthRefiller implements Runnable {
                 _log.debug("Adding " + inboundToAdd + " bytes to inboundAvailable");
                 _log.debug("Adding " + outboundToAdd + " bytes to outboundAvailable");
             }
+            return true;
+        } else {
+            return false;
         }
     }
     
