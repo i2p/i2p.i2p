@@ -177,6 +177,8 @@ public class TransportManager implements TransportEventListener {
     }
     
     private List orderBids(HashSet bids, OutNetMessage msg) {
+        if (bids.size() <= 1)
+            return new ArrayList(bids);
         // db messages should go as fast as possible, while the others
         // should use as little bandwidth as possible.  
         I2NPMessage message = msg.getMessage();

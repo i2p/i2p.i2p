@@ -95,10 +95,10 @@ public class CapacityCalculator extends Calculator {
         if (curFailed != null)
             failed = curFailed.getCurrentEventCount() + curFailed.getLastEventCount();
         if (failed > 0) {
-            if ( (period <= 10*60*1000) && (curFailed.getCurrentEventCount() > 0) )
-                return 0.0d; // their tunnels have failed in the last 0-10 minutes
-            else
-                val -= failed * stretch;
+            //if ( (period <= 10*60*1000) && (curFailed.getCurrentEventCount() > 0) )
+            //    return 0.0d; // their tunnels have failed in the last 0-10 minutes
+            //else
+            val -= failed * stretch;
         }
         
         if ( (period <= 10*60*1000) && (curRejected.getCurrentEventCount() + curRejected.getLastEventCount() > 0) ) {

@@ -410,11 +410,12 @@ public class ConnectionBuilder {
             RouterInfo peer = new RouterInfo();
             peer.readBytes(_rawIn);
             int status = (int)_rawIn.read() & 0xFF;
-            boolean ok = validateStatus(status);
-            if (!ok) return false;
             
             Properties props = DataHelper.readProperties(_rawIn);
             // ignore these now
+            
+            boolean ok = validateStatus(status, props);
+            if (!ok) return false;
             
             Hash readHash = new Hash();
             readHash.readBytes(_rawIn);
@@ -564,11 +565,12 @@ public class ConnectionBuilder {
             RouterInfo peer = new RouterInfo();
             peer.readBytes(_rawIn);
             int status = (int)_rawIn.read() & 0xFF;
-            boolean ok = validateStatus(status);
-            if (!ok) return false;
             
             Properties props = DataHelper.readProperties(_rawIn);
             // ignore these now
+            
+            boolean ok = validateStatus(status, props);
+            if (!ok) return false;
             
             Signature sig = new Signature();
             sig.readBytes(_rawIn);
@@ -620,7 +622,7 @@ public class ConnectionBuilder {
      *
      * @return true if ok, false if fail()ed
      */
-    private boolean validateStatus(int status) {
+    private boolean validateStatus(int status, Properties props) {
         switch (status) {
             case -1: // EOF
                 fail("Error reading the status from " 
@@ -636,7 +638,7 @@ public class ConnectionBuilder {
             case ConnectionHandler.STATUS_SKEWED:
                 fail("According to " 
                      + _target.getIdentity().calculateHash().toBase64().substring(0,6)
-                     + ", our clock is off");
+                     + ", our clock is off (they think it is " + props.getProperty("SKEW") + ")");
                 return false;
             case ConnectionHandler.STATUS_SIGNATURE_FAILED: // (only for new sessions)
                 fail("Signature failure talking to " 

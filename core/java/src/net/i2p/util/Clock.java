@@ -42,8 +42,8 @@ public class Clock implements Timestamper.UpdateListener {
 
     /** if the clock is skewed by 3+ days, fuck 'em */
     public final static long MAX_OFFSET = 3 * 24 * 60 * 60 * 1000;
-    /** after we've started up and shifted the clock, don't allow shifts of more than a minute */
-    public final static long MAX_LIVE_OFFSET = 60 * 1000;
+    /** after we've started up and shifted the clock, don't allow shifts of more than 10 minutes */
+    public final static long MAX_LIVE_OFFSET = 10 * 60 * 1000;
     /** if the clock skewed changes by less than 1s, ignore the update (so we don't slide all over the place) */
     public final static long MIN_OFFSET_CHANGE = 10 * 1000;
 

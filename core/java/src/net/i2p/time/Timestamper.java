@@ -124,7 +124,8 @@ public class Timestamper implements Runnable {
                         alreadyBitched = true;
                     }
                 }
-                try { Thread.sleep(_queryFrequency); } catch (InterruptedException ie) {}
+                long sleepTime = _context.random().nextInt(_queryFrequency) + _queryFrequency;
+                try { Thread.sleep(sleepTime); } catch (InterruptedException ie) {}
             }
         } catch (Throwable t) {
             _log.log(Log.CRIT, "Timestamper died!", t);

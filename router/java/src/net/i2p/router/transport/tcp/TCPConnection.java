@@ -185,7 +185,7 @@ public class TCPConnection {
     }
     
     private boolean shouldDropProbabalistically() {
-        return Boolean.valueOf(_context.getProperty("tcp.dropProbabalistically", "false")).booleanValue();
+        return Boolean.valueOf(_context.getProperty("tcp.dropProbabalistically", "true")).booleanValue();
     }
     
     /**
@@ -210,10 +210,32 @@ public class TCPConnection {
         long sendRate = getSendRate();
         long bytesSendableUntilFirstExpire = sendRate * (earliestExpiration - _context.clock().now()) / 1000;
         
-        // try to keep the queue less than half full
-        long excessQueued = bytesQueued - (bytesSendableUntilFirstExpire/2); 
+        // pretend that instead of being able to push bytesSendableUntilFirstExpire,
+        // that we can only push a fraction of that amount, causing us to probabalistically
+        // drop more than is necessary (leaving a fraction of the queue 'free' for bursts)
+        long excessQueued = (long)(bytesQueued - ((double)bytesSendableUntilFirstExpire * (1.0-getQueueFreeFactor()))); 
         if ( (excessQueued > 0) && (_pendingMessages.size() > 1) && (_transport != null) )
             locked_probabalisticDrop(excessQueued);
+    }
+    
+    /** 
+     * by default, try to keep the queue completely full, but this can be overridden
+     * with the property 'tcp.queueFreeFactor'
+     *
+     */
+    public static final double DEFAULT_QUEUE_FREE_FACTOR = 0.0;
+    
+    private double getQueueFreeFactor() {
+        String factor = _context.getProperty("tcp.queueFreeFactor");
+        if (factor != null) {
+            try {
+                return Double.parseDouble(factor); 
+            } catch (NumberFormatException nfe) {
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("Invalid tcp.queueFreeFactor [" + factor + "]", nfe);
+            }
+        }
+        return DEFAULT_QUEUE_FREE_FACTOR;
     }
     
     /** how many Bps we are sending data to the peer (or 2KBps if we don't know) */

@@ -366,7 +366,8 @@ public class ConnectionManager {
             if (removed) {
                 if (_notifier != null)
                     _notifier.pingComplete(false);
-                _log.error("Ping failed");
+                if (_log.shouldLog(Log.INFO))
+                    _log.info("Ping failed");
             }
         }
     }

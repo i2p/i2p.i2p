@@ -65,6 +65,8 @@ public class ConnectionPacketHandler {
         if (packet.isFlagSet(Packet.FLAG_CLOSE) && packet.isFlagSet(Packet.FLAG_SIGNATURE_INCLUDED))
             con.closeReceived();
         
+        boolean fastAck = false;
+        
         if (isNew) {
             con.incrementUnackedPacketsReceived();
             con.incrementBytesReceived(packet.getPayloadSize());
@@ -93,7 +95,8 @@ public class ConnectionPacketHandler {
                     _log.warn("congestion.. dup " + packet);
                 SimpleTimer.getInstance().addEvent(new AckDup(con), con.getOptions().getSendAckDelay());
                 //con.incrementUnackedPacketsReceived();
-                con.setNextSendTime(_context.clock().now() + con.getOptions().getSendAckDelay());
+                //con.setNextSendTime(_context.clock().now() + con.getOptions().getSendAckDelay());
+                fastAck = true;
             } else {
                 if (packet.isFlagSet(Packet.FLAG_SYNCHRONIZE)) {
                     //con.incrementUnackedPacketsReceived();
@@ -105,10 +108,10 @@ public class ConnectionPacketHandler {
             }
         }
         
-        boolean fastAck = ack(con, packet.getAckThrough(), packet.getNacks(), packet, isNew);
+        fastAck = fastAck || ack(con, packet.getAckThrough(), packet.getNacks(), packet, isNew);
         con.eventOccurred();
         if (fastAck) {
-            if (con.getLastSendTime() + con.getOptions().getRTT() < _context.clock().now()) {
+            if (con.getLastSendTime() + 1000 < _context.clock().now()) {
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("Fast ack for dup " + packet);
                 con.ackImmediately();

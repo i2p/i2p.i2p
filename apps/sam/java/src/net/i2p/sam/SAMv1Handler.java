@@ -547,7 +547,8 @@ public class SAMv1Handler extends SAMHandler implements SAMRawReceiver, SAMDatag
 
         try {
             if (!streamSession.sendBytes(id, getClientSocketInputStream(), size)) { // data)) {
-                _log.error("STREAM SEND [" + size + "] failed");
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("STREAM SEND [" + size + "] failed");
                 boolean rv = writeString("STREAM CLOSED RESULT=CANT_REACH_PEER ID=" + id + " MESSAGE=\"Send of " + size + " bytes failed\"\n");
                 streamSession.closeConnection(id);
                 return rv;
@@ -698,7 +699,8 @@ public class SAMv1Handler extends SAMHandler implements SAMRawReceiver, SAMDatag
         try {
             closeClientSocket();
         } catch (IOException e) {
-            _log.error("Error closing socket: " + e.getMessage());
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Error closing socket", e);
         }
     }
 
@@ -733,7 +735,8 @@ public class SAMv1Handler extends SAMHandler implements SAMRawReceiver, SAMDatag
         try {
             closeClientSocket();
         } catch (IOException e) {
-            _log.error("Error closing socket: " + e.getMessage());
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Error closing socket", e);
         }
     }
 
@@ -802,7 +805,8 @@ public class SAMv1Handler extends SAMHandler implements SAMRawReceiver, SAMDatag
         try {
             closeClientSocket();
         } catch (IOException e) {
-            _log.error("Error closing socket: " + e.getMessage());
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Error closing socket", e);
         }
     }
 }
