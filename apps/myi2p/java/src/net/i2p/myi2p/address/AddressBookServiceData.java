@@ -8,6 +8,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -54,6 +55,8 @@ public class AddressBookServiceData {
             AddressBook addressBook = new AddressBook(_context);
             addressBook.read(fis);
             _addressBook = addressBook;
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Address book: " + addressBook);
             Properties props = DataHelper.readProperties(fis);
             Map log = new HashMap(props.size());
             for (Iterator iter = props.keySet().iterator(); iter.hasNext(); ) {
@@ -65,6 +68,8 @@ public class AddressBookServiceData {
                     while (log.containsKey(new Long(when)))
                         when++;
                     log.put(new Long(when), event);
+                    if (_log.shouldLog(Log.DEBUG))
+                        _log.debug("Activity log: on " + new Date(when) + ": " + event);
                 } catch (NumberFormatException nfe) {
                     if (_log.shouldLog(Log.WARN))
                         _log.warn("Corrupt activity log entry: when=" + key, nfe);

@@ -119,4 +119,8 @@ public class AddressBook {
             throw new IOException("Corrupt address book - " + dfe.getMessage());
         }
     }
+    
+    public String toString() {
+        return "Entries: " + _entries.size() + " conflicting: " + _conflictingReferences.size();
+    }
 }
