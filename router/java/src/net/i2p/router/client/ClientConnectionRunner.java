@@ -89,7 +89,7 @@ public class ClientConnectionRunner {
         _dead = false;
     }
     
-    private static int __id = 0;
+    private static volatile int __id = 0;
     /**
      * Actually run the connection - listen for I2CP messages and respond.  This
      * is the main driver for this class, though it gets all its meat from the
@@ -99,7 +99,7 @@ public class ClientConnectionRunner {
     public void startRunning() {
         try {
             _reader = new I2CPMessageReader(_socket.getInputStream(), new ClientMessageEventListener(_context, this));
-            _writer = new ClientWriterRunner();
+            _writer = new ClientWriterRunner(_context, this);
             I2PThread t = new I2PThread(_writer);
             t.setName("Writer " + ++__id);
             t.setDaemon(true);
@@ -352,103 +352,34 @@ public class ClientConnectionRunner {
     
     ////
     ////
-       
-    /**
-     * Async writer class so that if a client app hangs, they wont take down the
-     * whole router with them (since otherwise the JobQueue would block until
-     * the client reads from their i2cp socket, causing all sorts of bad shit to
-     * happen)
-     *
-     */
-    private class ClientWriterRunner implements Runnable {
-        private List _messagesToWrite;
-        private long _lastAdded;
-        public ClientWriterRunner() {
-            _messagesToWrite = new ArrayList(4);
-        }
-        
-        /**
-         * Add this message to the writer's queue
-         *
-         */
-        public void addMessage(I2CPMessage msg) {
-            synchronized (_messagesToWrite) {
-                _messagesToWrite.add(msg);
-                _lastAdded = _context.clock().now();
-                _messagesToWrite.notifyAll();
+    boolean getIsDead() { return _dead; }
+
+    void writeMessage(I2CPMessage msg) {
+        long before = _context.clock().now();
+        try {
+            synchronized (_out) {
+                msg.writeMessage(_out);
+                _out.flush();
             }
-        }
-        
-        /**
-         * No more messages - dont even try to send what we have
-         *
-         */
-        public void stopWriting() {
-            synchronized (_messagesToWrite) {
-                _messagesToWrite.notifyAll();
-            }
-        }
-        public void run() {
-            while (!_dead) {
-                I2CPMessage msg = null;
-                long beforeCheckSync = _context.clock().now();
-                long inCheckSync = 0;
-                synchronized (_messagesToWrite) {
-                    inCheckSync = _context.clock().now();
-                    if (_messagesToWrite.size() > 0) {
-                        msg = (I2CPMessage)_messagesToWrite.remove(0);
-                    } else {
-                        try {
-                            _messagesToWrite.wait();
-                        } catch (InterruptedException ie) {
-                            if (_messagesToWrite.size() > 0)
-                                msg = (I2CPMessage)_messagesToWrite.remove(0);
-                        }
-                    }
-                }
-                
-                long afterCheckSync = _context.clock().now();
-                
-                if (msg != null) {
-                    writeMessage(msg);
-                    long afterWriteMessage = _context.clock().now();
-                    if (_log.shouldLog(Log.DEBUG))
-                        _log.debug("writeMessage: check sync took " 
-                                   + (inCheckSync-beforeCheckSync) + "ms, writemessage took "
-                                   + (afterWriteMessage-afterCheckSync) 
-                                   + "ms,  time since addMessage(): " + 
-                                   + (afterCheckSync-_lastAdded));
-                } 
-            }
-        }
-        
-        private void writeMessage(I2CPMessage msg) {
-            long before = _context.clock().now();
-            try {
-                synchronized (_out) {
-                    msg.writeMessage(_out);
-                    _out.flush();
-                }
-                if (_log.shouldLog(Log.DEBUG))
-                    _log.debug("after writeMessage("+ msg.getClass().getName() + "): " 
-                               + (_context.clock().now()-before) + "ms");;
-            } catch (I2CPMessageException ime) {
-                _log.error("Message exception sending I2CP message", ime);
-                stopRunning();
-            } catch (IOException ioe) {
-                _log.error("IO exception sending I2CP message", ioe);
-                stopRunning();
-            } catch (Throwable t) {
-                _log.log(Log.CRIT, "Unhandled exception sending I2CP message", t);
-                stopRunning();
-            } finally {
-                long after = _context.clock().now();
-                long lag = after - before;
-                if (lag > 300) {
-                    if (_log.shouldLog(Log.WARN))
-                        _log.warn("synchronization on the i2cp message send took too long (" + lag 
-                                  + "ms): " + msg);
-                }
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("after writeMessage("+ msg.getClass().getName() + "): " 
+                           + (_context.clock().now()-before) + "ms");;
+        } catch (I2CPMessageException ime) {
+            _log.error("Message exception sending I2CP message", ime);
+            stopRunning();
+        } catch (IOException ioe) {
+            _log.error("IO exception sending I2CP message", ioe);
+            stopRunning();
+        } catch (Throwable t) {
+            _log.log(Log.CRIT, "Unhandled exception sending I2CP message", t);
+            stopRunning();
+        } finally {
+            long after = _context.clock().now();
+            long lag = after - before;
+            if (lag > 300) {
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("synchronization on the i2cp message send took too long (" + lag 
+                              + "ms): " + msg);
             }
         }
     }
