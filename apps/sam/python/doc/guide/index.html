@@ -1,0 +1,76 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+        "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en"><head><title>Main Page - Wikipedia</title>
+<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+<meta name="robots" content="index,follow">
+<link rel="shortcut icon" href="/favicon.ico">
+<script type="text/javascript" src="/~barnesc/wiki/stylesheets/wikibits.js"></script>
+<style type='text/css'><!--
+@import url("/~barnesc/wiki/stylesheets/wikiprintable.css");
+/*/*/
+a.new, #quickbar a.new { color: #CC2200; }
+#quickbar { position: absolute; top: 4px; left: 4px; border-right: 1px solid gray; }
+#article { margin-left: 152px; margin-right: 4px; }
+/* */
+//--></style>
+</head>
+
+<body bgcolor='#FFFFFF' onload=''>
+<h1 class='pagetitle'>Main Page</h1><p class='subtitle'>From Python-I2P.
+
+
+<div class='bodytext'>
+<strong>Python-I2P</strong> is a Python interface to <a href='http://www.i2p.net' class='printable' title="http://www.i2p.net">I2P</a>.
+
+
+<p>
+
+<h2><a name="Quick_Start"> Quick Start </a></h2>
+
+<p>
+Install:
+
+<p>
+<ul ><pre>
+python setup.py install
+</pre>
+</ul >
+
+<p>
+Use:
+
+<p>
+
+<ul ><pre>
+&gt;&gt;&gt; from i2p import sam
+&gt;&gt;&gt; s = sam.socket('Alice', sam.SOCK_STREAM)
+&gt;&gt;&gt; s.connect('duck.i2p')
+&gt;&gt;&gt; s.send('GET / HTTP/1.0\r\n\r\n')
+&gt;&gt;&gt; s.recv(1000)
+(HTTP response from duck.i2p)
+</pre>
+</ul >
+
+<p>
+
+<h2><a name="User's_Guide"> User's Guide </a></h2>
+
+<p>
+The following modules are available:
+
+<p>
+<ul >
+
+<pre> <a href="./i2p.html" class='printable' title ="User's Guide:i2p">i2p</a>               (Container package)
+ <a href="./i2p.sam.html" class='printable' title ="User's Guide:i2p.sam">i2p.sam</a>           (Send and receive across the I2P network)
+ <a href="./i2p.eep.html" class='printable' title ="User's Guide:i2p.eep">i2p.eep</a>           (Retrieve eepsites)
+ <a href="./i2p.router.html" class='printable' title ="User's Guide:i2p.router">i2p.router</a>        (Manage the I2P router)
+
+</pre>
+</ul >
+
+<p>
+</div>
+<p><em>
+</em><!-- Time since request: 0.78 secs. -->
+</body></html>

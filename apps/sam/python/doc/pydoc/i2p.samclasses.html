@@ -1,0 +1,314 @@
+
+<!doctype html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html><head><title>Python: module i2p.samclasses</title>
+</head><body bgcolor="#f0f0f8">
+
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="heading">
+<tr bgcolor="#7799ee">
+<td valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial">&nbsp;<br><big><big><strong><a href="i2p.html"><font color="#ffffff">i2p</font></a>.samclasses</strong></big></big></font></td
+><td align=right valign=bottom
+><font color="#ffffff" face="helvetica, arial"><a href=".">index</a><br><a href="file:///D|/code/i2p/i2p/samclasses.py">d:\code\i2p\i2p\samclasses.py</a></font></td></tr></table>
+    <p><tt>Lower-level&nbsp;SAM&nbsp;API,&nbsp;interfaces&nbsp;with&nbsp;SAM&nbsp;Bridge.<br>
+&nbsp;<br>
+For&nbsp;internal&nbsp;use&nbsp;only.<br>
+&nbsp;<br>
+Use&nbsp;the&nbsp;higher&nbsp;level&nbsp;i2p.sam&nbsp;module&nbsp;for&nbsp;your&nbsp;own&nbsp;programs.<br>
+&nbsp;<br>
+For&nbsp;details&nbsp;on&nbsp;SAM,&nbsp;see&nbsp;"Simple&nbsp;Anonymous&nbsp;Messaging&nbsp;(SAM)&nbsp;v1.0,"<br>
+as&nbsp;published&nbsp;by&nbsp;jrandom.<br>
+&nbsp;<br>
+Class&nbsp;Overview:<br>
+&nbsp;<br>
+&nbsp;&nbsp;<a href="#SAMTerminal">SAMTerminal</a>:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Message&nbsp;sender/reader,&nbsp;talks&nbsp;to&nbsp;SAM&nbsp;Bridge<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;through&nbsp;a&nbsp;single&nbsp;socket.<br>
+&nbsp;&nbsp;<a href="#StringBuffer">StringBuffer</a>:&nbsp;&nbsp;&nbsp;&nbsp;Queue&nbsp;for&nbsp;character&nbsp;data.<br>
+&nbsp;&nbsp;<a href="#BaseSession">BaseSession</a>:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SAM&nbsp;session&nbsp;classes&nbsp;are&nbsp;derived&nbsp;from&nbsp;this.<br>
+&nbsp;&nbsp;<a href="#StreamSession">StreamSession</a>:&nbsp;&nbsp;&nbsp;Manipulate&nbsp;a&nbsp;SAM&nbsp;stream&nbsp;session&nbsp;through&nbsp;a<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;threadsafe,&nbsp;high-level&nbsp;interface.<br>
+&nbsp;&nbsp;<a href="#DatagramSession">DatagramSession</a>:&nbsp;SAM&nbsp;datagram&nbsp;session,&nbsp;threadsafe,&nbsp;high&nbsp;level.<br>
+&nbsp;&nbsp;<a href="#RawSession">RawSession</a>:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SAM&nbsp;raw&nbsp;session,&nbsp;threadsafe,&nbsp;high&nbsp;level.<br>
+&nbsp;<br>
+Note&nbsp;that&nbsp;a&nbsp;'None'&nbsp;timeout&nbsp;is&nbsp;an&nbsp;infinite&nbsp;timeout:&nbsp;it<br>
+blocks&nbsp;forever&nbsp;if&nbsp;necessary.<br>
+&nbsp;<br>
+Todo:<br>
+&nbsp;&nbsp;*&nbsp;Error&nbsp;handling&nbsp;is&nbsp;a&nbsp;huge&nbsp;mess.&nbsp;&nbsp;Neaten&nbsp;it&nbsp;up.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Subclass&nbsp;a&nbsp;ErrorMixin&nbsp;class,&nbsp;then&nbsp;use&nbsp;set_error(e),<br>
+&nbsp;&nbsp;&nbsp;&nbsp;check_error(),&nbsp;get_error().<br>
+&nbsp;&nbsp;*&nbsp;Streams&nbsp;are&nbsp;a&nbsp;huge&nbsp;mess.&nbsp;&nbsp;Neaten&nbsp;them&nbsp;up.<br>
+&nbsp;&nbsp;*&nbsp;This&nbsp;whole&nbsp;interface&nbsp;is&nbsp;a&nbsp;tad&nbsp;confusing.&nbsp;&nbsp;Neaten&nbsp;it&nbsp;up.</tt></p>
+<p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#aa55cc">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#fffff" face="helvetica, arial"><big><strong>Modules</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#aa55cc"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><table width="100%" summary="list"><tr><td width="25%" valign=top><a href="Queue.html">Queue</a><br>
+<a href="i2p.html">i2p</a><br>
+<a href="random.html">random</a><br>
+</td><td width="25%" valign=top><a href="shlex.html">shlex</a><br>
+<a href="socket.html">socket</a><br>
+<a href="string.html">string</a><br>
+</td><td width="25%" valign=top><a href="sys.html">sys</a><br>
+<a href="thread.html">thread</a><br>
+<a href="threading.html">threading</a><br>
+</td><td width="25%" valign=top><a href="time.html">time</a><br>
+<a href="traceback.html">traceback</a><br>
+</td></tr></table></td></tr></table><p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ee77aa">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Classes</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#ee77aa"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><dl>
+<dt><font face="helvetica, arial"><a href="i2p.samclasses.html#BaseSession">BaseSession</a>
+</font></dt><dd>
+<dl>
+<dt><font face="helvetica, arial"><a href="i2p.samclasses.html#DatagramSession">DatagramSession</a>
+</font></dt><dt><font face="helvetica, arial"><a href="i2p.samclasses.html#RawSession">RawSession</a>
+</font></dt><dt><font face="helvetica, arial"><a href="i2p.samclasses.html#StreamSession">StreamSession</a>
+</font></dt></dl>
+</dd>
+<dt><font face="helvetica, arial"><a href="i2p.samclasses.html#Deque">Deque</a>
+</font></dt><dd>
+<dl>
+<dt><font face="helvetica, arial"><a href="i2p.samclasses.html#StringBuffer">StringBuffer</a>
+</font></dt></dl>
+</dd>
+<dt><font face="helvetica, arial"><a href="i2p.samclasses.html#SAMTerminal">SAMTerminal</a>
+</font></dt><dt><font face="helvetica, arial"><a href="i2p.samclasses.html#Stream">Stream</a>
+</font></dt></dl>
+ <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="BaseSession">class <strong>BaseSession</strong></a></font></td></tr>
+    
+<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
+<td colspan=2><tt>Base&nbsp;session,&nbsp;from&nbsp;which&nbsp;<a href="#StreamSession">StreamSession</a>,&nbsp;<a href="#DatagramSession">DatagramSession</a>,<br>
+and&nbsp;<a href="#RawSession">RawSession</a>&nbsp;are&nbsp;derived.<br>&nbsp;</tt></td></tr>
+<tr><td>&nbsp;</td>
+<td width="100%">Methods defined here:<br>
+<dl><dt><a name="BaseSession-__init__"><strong>__init__</strong></a>(self, addr<font color="#909090">=''</font>)</dt></dl>
+
+<dl><dt><a name="BaseSession-close"><strong>close</strong></a>(self)</dt><dd><tt>Close&nbsp;the&nbsp;session.</tt></dd></dl>
+
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="DatagramSession">class <strong>DatagramSession</strong></a>(<a href="i2p.samclasses.html#BaseSession">BaseSession</a>)</font></td></tr>
+    
+<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
+<td colspan=2><tt>Datagram&nbsp;session.&nbsp;&nbsp;All&nbsp;methods&nbsp;are&nbsp;blocking&nbsp;and&nbsp;threadsafe.<br>&nbsp;</tt></td></tr>
+<tr><td>&nbsp;</td>
+<td width="100%">Methods defined here:<br>
+<dl><dt><a name="DatagramSession-__init__"><strong>__init__</strong></a>(self, name, addr<font color="#909090">=''</font>, **kwargs)</dt></dl>
+
+<dl><dt><a name="DatagramSession-__len__"><strong>__len__</strong></a>(self)</dt><dd><tt>Number&nbsp;of&nbsp;packets&nbsp;in&nbsp;read&nbsp;buffer.</tt></dd></dl>
+
+<dl><dt><a name="DatagramSession-recv"><strong>recv</strong></a>(self, timeout<font color="#909090">=None</font>, peek<font color="#909090">=False</font>)</dt><dd><tt>Get&nbsp;a&nbsp;single&nbsp;packet.&nbsp;&nbsp;Blocks&nbsp;for&nbsp;up&nbsp;to&nbsp;timeout&nbsp;seconds&nbsp;if<br>
+n&nbsp;&gt;&nbsp;0&nbsp;and&nbsp;no&nbsp;packet&nbsp;is&nbsp;available&nbsp;(timeout=None&nbsp;means&nbsp;wait<br>
+forever).&nbsp;&nbsp;If&nbsp;still&nbsp;no&nbsp;packet&nbsp;is&nbsp;available,&nbsp;raises&nbsp;BlockError<br>
+or&nbsp;Timeout.&nbsp;&nbsp;Returns&nbsp;the&nbsp;pair&nbsp;(data,&nbsp;address).&nbsp;&nbsp;If&nbsp;peek&nbsp;is<br>
+True,&nbsp;the&nbsp;data&nbsp;is&nbsp;not&nbsp;removed.</tt></dd></dl>
+
+<dl><dt><a name="DatagramSession-send"><strong>send</strong></a>(self, s, dest)</dt><dd><tt>Send&nbsp;packet&nbsp;with&nbsp;contents&nbsp;s&nbsp;to&nbsp;given&nbsp;destination.</tt></dd></dl>
+
+<hr>
+Methods inherited from <a href="i2p.samclasses.html#BaseSession">BaseSession</a>:<br>
+<dl><dt><a name="DatagramSession-close"><strong>close</strong></a>(self)</dt><dd><tt>Close&nbsp;the&nbsp;session.</tt></dd></dl>
+
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="Deque">class <strong>Deque</strong></a></font></td></tr>
+    
+<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
+<td colspan=2><tt>A&nbsp;double-ended&nbsp;queue.<br>&nbsp;</tt></td></tr>
+<tr><td>&nbsp;</td>
+<td width="100%">Methods defined here:<br>
+<dl><dt><a name="Deque-__init__"><strong>__init__</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="Deque-__len__"><strong>__len__</strong></a>(self)</dt><dd><tt>Number&nbsp;of&nbsp;items&nbsp;in&nbsp;the&nbsp;deque.</tt></dd></dl>
+
+<dl><dt><a name="Deque-pop_first"><strong>pop_first</strong></a>(self)</dt><dd><tt>Pop&nbsp;an&nbsp;item&nbsp;off&nbsp;the&nbsp;beginning&nbsp;of&nbsp;the&nbsp;deque,&nbsp;and&nbsp;return&nbsp;it.</tt></dd></dl>
+
+<dl><dt><a name="Deque-pop_last"><strong>pop_last</strong></a>(self)</dt><dd><tt>Pop&nbsp;an&nbsp;item&nbsp;off&nbsp;the&nbsp;end&nbsp;of&nbsp;the&nbsp;deque,&nbsp;and&nbsp;return&nbsp;it.</tt></dd></dl>
+
+<dl><dt><a name="Deque-push_first"><strong>push_first</strong></a>(self, obj)</dt><dd><tt>Prepend&nbsp;obj&nbsp;to&nbsp;the&nbsp;beginning&nbsp;of&nbsp;the&nbsp;deque.</tt></dd></dl>
+
+<dl><dt><a name="Deque-push_last"><strong>push_last</strong></a>(self, obj)</dt><dd><tt>Append&nbsp;obj&nbsp;to&nbsp;the&nbsp;end&nbsp;of&nbsp;the&nbsp;deque.</tt></dd></dl>
+
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="RawSession">class <strong>RawSession</strong></a>(<a href="i2p.samclasses.html#BaseSession">BaseSession</a>)</font></td></tr>
+    
+<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
+<td colspan=2><tt>Raw&nbsp;session.&nbsp;&nbsp;All&nbsp;methods&nbsp;are&nbsp;blocking&nbsp;and&nbsp;threadsafe.<br>&nbsp;</tt></td></tr>
+<tr><td>&nbsp;</td>
+<td width="100%">Methods defined here:<br>
+<dl><dt><a name="RawSession-__init__"><strong>__init__</strong></a>(self, name, addr<font color="#909090">=''</font>, **kwargs)</dt></dl>
+
+<dl><dt><a name="RawSession-__len__"><strong>__len__</strong></a>(self)</dt><dd><tt>Number&nbsp;of&nbsp;packets&nbsp;in&nbsp;read&nbsp;buffer.</tt></dd></dl>
+
+<dl><dt><a name="RawSession-recv"><strong>recv</strong></a>(self, timeout<font color="#909090">=None</font>, peek<font color="#909090">=False</font>)</dt><dd><tt>Identical&nbsp;to&nbsp;DatagramSocket.recv.&nbsp;&nbsp;The&nbsp;from&nbsp;address&nbsp;is&nbsp;an<br>
+empty&nbsp;string.</tt></dd></dl>
+
+<dl><dt><a name="RawSession-send"><strong>send</strong></a>(self, s, dest)</dt><dd><tt>Send&nbsp;packet&nbsp;with&nbsp;contents&nbsp;s&nbsp;to&nbsp;given&nbsp;destination.</tt></dd></dl>
+
+<hr>
+Methods inherited from <a href="i2p.samclasses.html#BaseSession">BaseSession</a>:<br>
+<dl><dt><a name="RawSession-close"><strong>close</strong></a>(self)</dt><dd><tt>Close&nbsp;the&nbsp;session.</tt></dd></dl>
+
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="SAMTerminal">class <strong>SAMTerminal</strong></a></font></td></tr>
+    
+<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
+<td colspan=2><tt>Message-by-message&nbsp;communication&nbsp;with&nbsp;SAM&nbsp;through&nbsp;a&nbsp;single<br>
+socket.&nbsp;&nbsp;_on_*&nbsp;messages&nbsp;are&nbsp;dispatched&nbsp;to&nbsp;msgobj.<br>&nbsp;</tt></td></tr>
+<tr><td>&nbsp;</td>
+<td width="100%">Methods defined here:<br>
+<dl><dt><a name="SAMTerminal-__init__"><strong>__init__</strong></a>(self, addr, msgobj)</dt></dl>
+
+<dl><dt><a name="SAMTerminal-check"><strong>check</strong></a>(self)</dt><dd><tt>Raise&nbsp;an&nbsp;error&nbsp;if&nbsp;terminal&nbsp;was&nbsp;closed,&nbsp;otherwise&nbsp;do<br>
+nothing.</tt></dd></dl>
+
+<dl><dt><a name="SAMTerminal-check_message"><strong>check_message</strong></a>(self, kwargs)</dt><dd><tt>Raises&nbsp;an&nbsp;error&nbsp;if&nbsp;kwargs['RESULT']&nbsp;!=&nbsp;'OK'.</tt></dd></dl>
+
+<dl><dt><a name="SAMTerminal-close"><strong>close</strong></a>(self)</dt><dd><tt>Close&nbsp;the&nbsp;SAM&nbsp;terminal.</tt></dd></dl>
+
+<dl><dt><a name="SAMTerminal-on_message"><strong>on_message</strong></a>(self, msg, kwargs)</dt><dd><tt>Process&nbsp;a&nbsp;SAM&nbsp;message&nbsp;that&nbsp;was&nbsp;received.&nbsp;&nbsp;Dispatch&nbsp;to<br>
+_on_MESSAGE_NAME(**kwargs).</tt></dd></dl>
+
+<dl><dt><a name="SAMTerminal-queue_get"><strong>queue_get</strong></a>(self, q)</dt><dd><tt>Identical&nbsp;to&nbsp;q.get()&nbsp;unless&nbsp;a&nbsp;call&nbsp;to&nbsp;<a href="#SAMTerminal-check">check</a>()&nbsp;fails,<br>
+in&nbsp;which&nbsp;case&nbsp;the&nbsp;waiting&nbsp;is&nbsp;cut&nbsp;short&nbsp;with&nbsp;an&nbsp;error.</tt></dd></dl>
+
+<dl><dt><a name="SAMTerminal-send_message"><strong>send_message</strong></a>(self, msg)</dt><dd><tt>Send&nbsp;a&nbsp;message&nbsp;to&nbsp;the&nbsp;SAM&nbsp;bridge.&nbsp;&nbsp;A&nbsp;newline&nbsp;will&nbsp;be<br>
+automatically&nbsp;added&nbsp;if&nbsp;none&nbsp;is&nbsp;present.</tt></dd></dl>
+
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="Stream">class <strong>Stream</strong></a></font></td></tr>
+    
+<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
+<td colspan=2><tt>Receives&nbsp;and&nbsp;sends&nbsp;data&nbsp;for&nbsp;an&nbsp;individual&nbsp;stream.<br>&nbsp;</tt></td></tr>
+<tr><td>&nbsp;</td>
+<td width="100%">Methods defined here:<br>
+<dl><dt><a name="Stream-__del__"><strong>__del__</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="Stream-__init__"><strong>__init__</strong></a>(self, parent, remotedest, id, didconnect<font color="#909090">=True</font>)</dt></dl>
+
+<dl><dt><a name="Stream-__len__"><strong>__len__</strong></a>(self)</dt><dd><tt>Current&nbsp;length&nbsp;of&nbsp;read&nbsp;buffer.</tt></dd></dl>
+
+<dl><dt><a name="Stream-close"><strong>close</strong></a>(self)</dt><dd><tt>Close&nbsp;the&nbsp;stream.&nbsp;&nbsp;Threadsafe.</tt></dd></dl>
+
+<dl><dt><a name="Stream-on_close"><strong>on_close</strong></a>(self, e)</dt></dl>
+
+<dl><dt><a name="Stream-on_receive"><strong>on_receive</strong></a>(self, s)</dt></dl>
+
+<dl><dt><a name="Stream-recv"><strong>recv</strong></a>(self, n, timeout<font color="#909090">=None</font>, peek<font color="#909090">=False</font>, waitall<font color="#909090">=False</font>)</dt><dd><tt>Reads&nbsp;up&nbsp;to&nbsp;n&nbsp;bytes&nbsp;in&nbsp;a&nbsp;manner&nbsp;identical&nbsp;to&nbsp;socket.recv.<br>
+Blocks&nbsp;for&nbsp;up&nbsp;to&nbsp;timeout&nbsp;seconds&nbsp;if&nbsp;n&nbsp;&gt;&nbsp;0&nbsp;and&nbsp;no&nbsp;data&nbsp;is<br>
+available&nbsp;(timeout=None&nbsp;means&nbsp;wait&nbsp;forever).&nbsp;&nbsp;If&nbsp;still&nbsp;no&nbsp;data<br>
+is&nbsp;available,&nbsp;raises&nbsp;BlockError&nbsp;or&nbsp;Timeout.&nbsp;&nbsp;For&nbsp;a&nbsp;closed<br>
+stream,&nbsp;recv&nbsp;will&nbsp;read&nbsp;the&nbsp;data&nbsp;stored&nbsp;in&nbsp;the&nbsp;buffer&nbsp;until<br>
+EOF,&nbsp;at&nbsp;which&nbsp;point&nbsp;the&nbsp;read&nbsp;data&nbsp;will&nbsp;be&nbsp;truncated.&nbsp;&nbsp;If&nbsp;peek<br>
+is&nbsp;True,&nbsp;the&nbsp;data&nbsp;is&nbsp;not&nbsp;removed.&nbsp;&nbsp;If&nbsp;waitall&nbsp;is&nbsp;True,&nbsp;reads<br>
+exactly&nbsp;n&nbsp;bytes,&nbsp;or&nbsp;raises&nbsp;BlockError&nbsp;or&nbsp;Timeout&nbsp;as<br>
+appropriate.&nbsp;&nbsp;Returns&nbsp;data.</tt></dd></dl>
+
+<dl><dt><a name="Stream-send"><strong>send</strong></a>(self, s)</dt><dd><tt>Sends&nbsp;the&nbsp;string&nbsp;s,&nbsp;blocking&nbsp;if&nbsp;necessary.</tt></dd></dl>
+
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="StreamSession">class <strong>StreamSession</strong></a>(<a href="i2p.samclasses.html#BaseSession">BaseSession</a>)</font></td></tr>
+    
+<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
+<td colspan=2><tt><a href="#Stream">Stream</a>&nbsp;session.&nbsp;&nbsp;All&nbsp;methods&nbsp;are&nbsp;blocking&nbsp;and&nbsp;threadsafe.<br>&nbsp;</tt></td></tr>
+<tr><td>&nbsp;</td>
+<td width="100%">Methods defined here:<br>
+<dl><dt><a name="StreamSession-__init__"><strong>__init__</strong></a>(self, name, addr<font color="#909090">=''</font>, **kwargs)</dt></dl>
+
+<dl><dt><a name="StreamSession-__len__"><strong>__len__</strong></a>(self)</dt><dd><tt>Unconnected&nbsp;session;&nbsp;has&nbsp;no&nbsp;read&nbsp;data&nbsp;available.</tt></dd></dl>
+
+<dl><dt><a name="StreamSession-accept"><strong>accept</strong></a>(self, timeout<font color="#909090">=None</font>)</dt><dd><tt>Wait&nbsp;for&nbsp;incoming&nbsp;connection,&nbsp;and&nbsp;return&nbsp;a&nbsp;<a href="#Stream">Stream</a>&nbsp;object<br>
+for&nbsp;it.</tt></dd></dl>
+
+<dl><dt><a name="StreamSession-connect"><strong>connect</strong></a>(self, dest, timeout<font color="#909090">=None</font>)</dt><dd><tt>Create&nbsp;a&nbsp;stream&nbsp;connected&nbsp;to&nbsp;remote&nbsp;destination&nbsp;'dest'.&nbsp;&nbsp;The<br>
+id&nbsp;is&nbsp;random.&nbsp;&nbsp;If&nbsp;the&nbsp;timeout&nbsp;is&nbsp;exceeded,&nbsp;do&nbsp;NOT&nbsp;raise&nbsp;an<br>
+error;&nbsp;rather,&nbsp;return&nbsp;a&nbsp;<a href="#Stream">Stream</a>&nbsp;object&nbsp;with&nbsp;.didconnect&nbsp;set<br>
+to&nbsp;False.</tt></dd></dl>
+
+<dl><dt><a name="StreamSession-listen"><strong>listen</strong></a>(self, backlog)</dt><dd><tt>Set&nbsp;maximum&nbsp;number&nbsp;of&nbsp;queued&nbsp;connections.</tt></dd></dl>
+
+<hr>
+Methods inherited from <a href="i2p.samclasses.html#BaseSession">BaseSession</a>:<br>
+<dl><dt><a name="StreamSession-close"><strong>close</strong></a>(self)</dt><dd><tt>Close&nbsp;the&nbsp;session.</tt></dd></dl>
+
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="StringBuffer">class <strong>StringBuffer</strong></a>(<a href="i2p.samclasses.html#Deque">Deque</a>)</font></td></tr>
+    
+<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
+<td colspan=2><tt>A&nbsp;FIFO&nbsp;for&nbsp;characters.&nbsp;&nbsp;Strings&nbsp;can&nbsp;be&nbsp;efficiently<br>
+appended&nbsp;to&nbsp;the&nbsp;end,&nbsp;and&nbsp;read&nbsp;from&nbsp;the&nbsp;beginning.<br>
+&nbsp;<br>
+Example:<br>
+&nbsp;&nbsp;B&nbsp;=&nbsp;<a href="#StringBuffer">StringBuffer</a>('Hello&nbsp;W')<br>
+&nbsp;&nbsp;B.<a href="#StringBuffer-append">append</a>('orld!')<br>
+&nbsp;&nbsp;print&nbsp;B.<a href="#StringBuffer-read">read</a>(5)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;#&nbsp;'Hello'<br>
+&nbsp;&nbsp;print&nbsp;B.<a href="#StringBuffer-read">read</a>()&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;#&nbsp;'World!'<br>&nbsp;</tt></td></tr>
+<tr><td>&nbsp;</td>
+<td width="100%">Methods defined here:<br>
+<dl><dt><a name="StringBuffer-__init__"><strong>__init__</strong></a>(self, s<font color="#909090">=''</font>)</dt></dl>
+
+<dl><dt><a name="StringBuffer-__len__"><strong>__len__</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="StringBuffer-__repr__"><strong>__repr__</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="StringBuffer-__str__"><strong>__str__</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="StringBuffer-append"><strong>append</strong></a>(self, s)</dt><dd><tt>Append&nbsp;string&nbsp;data&nbsp;to&nbsp;the&nbsp;end&nbsp;of&nbsp;the&nbsp;buffer.</tt></dd></dl>
+
+<dl><dt><a name="StringBuffer-peek"><strong>peek</strong></a>(self, n<font color="#909090">=None</font>)</dt><dd><tt>Like&nbsp;<a href="#StringBuffer-read">read</a>(),&nbsp;but&nbsp;do&nbsp;not&nbsp;remove&nbsp;the&nbsp;data&nbsp;that&nbsp;is&nbsp;returned.</tt></dd></dl>
+
+<dl><dt><a name="StringBuffer-prepend"><strong>prepend</strong></a>(self, s)</dt><dd><tt>Prepend&nbsp;string&nbsp;data&nbsp;to&nbsp;the&nbsp;beginning&nbsp;of&nbsp;the&nbsp;buffer.</tt></dd></dl>
+
+<dl><dt><a name="StringBuffer-read"><strong>read</strong></a>(self, n<font color="#909090">=None</font>)</dt><dd><tt>Read&nbsp;n&nbsp;bytes&nbsp;of&nbsp;data&nbsp;(or&nbsp;less&nbsp;if&nbsp;less&nbsp;data&nbsp;available)&nbsp;from&nbsp;the<br>
+beginning&nbsp;of&nbsp;the&nbsp;buffer.&nbsp;&nbsp;The&nbsp;data&nbsp;is&nbsp;removed.&nbsp;&nbsp;If&nbsp;n&nbsp;is<br>
+omitted,&nbsp;read&nbsp;the&nbsp;entire&nbsp;buffer.</tt></dd></dl>
+
+<hr>
+Methods inherited from <a href="i2p.samclasses.html#Deque">Deque</a>:<br>
+<dl><dt><a name="StringBuffer-pop_first"><strong>pop_first</strong></a>(self)</dt><dd><tt>Pop&nbsp;an&nbsp;item&nbsp;off&nbsp;the&nbsp;beginning&nbsp;of&nbsp;the&nbsp;deque,&nbsp;and&nbsp;return&nbsp;it.</tt></dd></dl>
+
+<dl><dt><a name="StringBuffer-pop_last"><strong>pop_last</strong></a>(self)</dt><dd><tt>Pop&nbsp;an&nbsp;item&nbsp;off&nbsp;the&nbsp;end&nbsp;of&nbsp;the&nbsp;deque,&nbsp;and&nbsp;return&nbsp;it.</tt></dd></dl>
+
+<dl><dt><a name="StringBuffer-push_first"><strong>push_first</strong></a>(self, obj)</dt><dd><tt>Prepend&nbsp;obj&nbsp;to&nbsp;the&nbsp;beginning&nbsp;of&nbsp;the&nbsp;deque.</tt></dd></dl>
+
+<dl><dt><a name="StringBuffer-push_last"><strong>push_last</strong></a>(self, obj)</dt><dd><tt>Append&nbsp;obj&nbsp;to&nbsp;the&nbsp;end&nbsp;of&nbsp;the&nbsp;deque.</tt></dd></dl>
+
+</td></tr></table></td></tr></table><p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#55aa55">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Data</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#55aa55"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><strong>sam_log</strong> = False</td></tr></table>
+</body></html>

@@ -1,0 +1,18 @@
+
+Known Bugs:
+  * TunnelServer may crash the I2P router in the following
+    ways when a large file is downloaded:
+
+    * Out of memory exception (for large files)
+    * Mysterious router death with no errors in the router logs
+      (more recently)
+    * BUG! in SAM proxy
+      See http://oregonstate.edu/~barnesc/temp/sam_crash.txt
+  * A small number of datagram packets sent are lost (even in a local
+    loopback).  This is apparently a bug in I2P.
+  * Errors raised for sockets are non entirely consistent.
+    See todo.txt for how to fix this.
+  * A session does not close until a program exits.
+    This should be fine once I2P is patched to allow multiple
+    programs to use a single session at once.
+  * i2p.router.start() does not work.

@@ -1,0 +1,374 @@
+
+<!doctype html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html><head><title>Python: module i2p.sam</title>
+</head><body bgcolor="#f0f0f8">
+
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="heading">
+<tr bgcolor="#7799ee">
+<td valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial">&nbsp;<br><big><big><strong><a href="i2p.html"><font color="#ffffff">i2p</font></a>.sam</strong></big></big></font></td
+><td align=right valign=bottom
+><font color="#ffffff" face="helvetica, arial"><a href=".">index</a><br><a href="file:///D|/code/i2p/i2p/sam.py">d:\code\i2p\i2p\sam.py</a></font></td></tr></table>
+    <p><tt>SAM&nbsp;Python&nbsp;API</tt></p>
+<p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#aa55cc">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#fffff" face="helvetica, arial"><big><strong>Modules</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#aa55cc"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><table width="100%" summary="list"><tr><td width="25%" valign=top><a href="Queue.html">Queue</a><br>
+<a href="copy.html">copy</a><br>
+<a href="i2p.html">i2p</a><br>
+</td><td width="25%" valign=top><a href="select.html">select</a><br>
+<a href="socket.html">socket</a><br>
+<a href="i2p.samclasses.html">i2p.samclasses</a><br>
+</td><td width="25%" valign=top><a href="thread.html">thread</a><br>
+<a href="threading.html">threading</a><br>
+<a href="time.html">time</a><br>
+</td><td width="25%" valign=top></td></tr></table></td></tr></table><p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ee77aa">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Classes</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#ee77aa"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><dl>
+<dt><font face="helvetica, arial"><a href="i2p.html#Error">i2p.Error</a>(<a href="exceptions.html#Exception">exceptions.Exception</a>)
+</font></dt><dd>
+<dl>
+<dt><font face="helvetica, arial"><a href="i2p.sam.html#Error">Error</a>
+</font></dt><dd>
+<dl>
+<dt><font face="helvetica, arial"><a href="i2p.sam.html#BlockError">BlockError</a>
+</font></dt><dt><font face="helvetica, arial"><a href="i2p.sam.html#ClosedError">ClosedError</a>
+</font></dt><dt><font face="helvetica, arial"><a href="i2p.sam.html#NetworkError">NetworkError</a>
+</font></dt><dt><font face="helvetica, arial"><a href="i2p.sam.html#Timeout">Timeout</a>
+</font></dt></dl>
+</dd>
+</dl>
+</dd>
+<dt><font face="helvetica, arial"><a href="i2p.sam.html#Poll">Poll</a>
+</font></dt><dt><font face="helvetica, arial"><a href="i2p.sam.html#Socket">Socket</a>
+</font></dt><dt><font face="helvetica, arial"><a href="i2p.sam.html#Tunnel">Tunnel</a>
+</font></dt><dd>
+<dl>
+<dt><font face="helvetica, arial"><a href="i2p.sam.html#TunnelClient">TunnelClient</a>
+</font></dt><dt><font face="helvetica, arial"><a href="i2p.sam.html#TunnelServer">TunnelServer</a>
+</font></dt></dl>
+</dd>
+</dl>
+ <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="BlockError">class <strong>BlockError</strong></a>(<a href="i2p.sam.html#Error">Error</a>)</font></td></tr>
+    
+<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
+<td colspan=2><tt><a href="#Socket">Socket</a>&nbsp;call&nbsp;would&nbsp;have&nbsp;blocked.<br>&nbsp;</tt></td></tr>
+<tr><td>&nbsp;</td>
+<td width="100%"><dl><dt>Method resolution order:</dt>
+<dd><a href="i2p.sam.html#BlockError">BlockError</a></dd>
+<dd><a href="i2p.sam.html#Error">Error</a></dd>
+<dd><a href="i2p.html#Error">i2p.Error</a></dd>
+<dd><a href="exceptions.html#Exception">exceptions.Exception</a></dd>
+</dl>
+<hr>
+Methods inherited from <a href="exceptions.html#Exception">exceptions.Exception</a>:<br>
+<dl><dt><a name="BlockError-__getitem__"><strong>__getitem__</strong></a>(...)</dt></dl>
+
+<dl><dt><a name="BlockError-__init__"><strong>__init__</strong></a>(...)</dt></dl>
+
+<dl><dt><a name="BlockError-__str__"><strong>__str__</strong></a>(...)</dt></dl>
+
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="ClosedError">class <strong>ClosedError</strong></a>(<a href="i2p.sam.html#Error">Error</a>)</font></td></tr>
+    
+<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
+<td colspan=2><tt>A&nbsp;command&nbsp;was&nbsp;used&nbsp;on&nbsp;a&nbsp;socket&nbsp;that&nbsp;closed&nbsp;gracefully.<br>&nbsp;</tt></td></tr>
+<tr><td>&nbsp;</td>
+<td width="100%"><dl><dt>Method resolution order:</dt>
+<dd><a href="i2p.sam.html#ClosedError">ClosedError</a></dd>
+<dd><a href="i2p.sam.html#Error">Error</a></dd>
+<dd><a href="i2p.html#Error">i2p.Error</a></dd>
+<dd><a href="exceptions.html#Exception">exceptions.Exception</a></dd>
+</dl>
+<hr>
+Methods inherited from <a href="exceptions.html#Exception">exceptions.Exception</a>:<br>
+<dl><dt><a name="ClosedError-__getitem__"><strong>__getitem__</strong></a>(...)</dt></dl>
+
+<dl><dt><a name="ClosedError-__init__"><strong>__init__</strong></a>(...)</dt></dl>
+
+<dl><dt><a name="ClosedError-__str__"><strong>__str__</strong></a>(...)</dt></dl>
+
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="Error">class <strong>Error</strong></a>(<a href="i2p.html#Error">i2p.Error</a>)</font></td></tr>
+    
+<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
+<td colspan=2><tt>Base&nbsp;class&nbsp;for&nbsp;all&nbsp;SAM&nbsp;errors.<br>&nbsp;</tt></td></tr>
+<tr><td>&nbsp;</td>
+<td width="100%"><dl><dt>Method resolution order:</dt>
+<dd><a href="i2p.sam.html#Error">Error</a></dd>
+<dd><a href="i2p.html#Error">i2p.Error</a></dd>
+<dd><a href="exceptions.html#Exception">exceptions.Exception</a></dd>
+</dl>
+<hr>
+Methods inherited from <a href="exceptions.html#Exception">exceptions.Exception</a>:<br>
+<dl><dt><a name="Error-__getitem__"><strong>__getitem__</strong></a>(...)</dt></dl>
+
+<dl><dt><a name="Error-__init__"><strong>__init__</strong></a>(...)</dt></dl>
+
+<dl><dt><a name="Error-__str__"><strong>__str__</strong></a>(...)</dt></dl>
+
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="NetworkError">class <strong>NetworkError</strong></a>(<a href="i2p.sam.html#Error">Error</a>)</font></td></tr>
+    
+<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
+<td colspan=2><tt>Network&nbsp;error&nbsp;occurred&nbsp;within&nbsp;I2P.<br>
+The&nbsp;error&nbsp;object&nbsp;is&nbsp;a&nbsp;2-tuple:&nbsp;(errtag,&nbsp;errdesc).<br>
+errtag&nbsp;is&nbsp;a&nbsp;SAM&nbsp;error&nbsp;string,<br>
+errdesc&nbsp;is&nbsp;a&nbsp;human&nbsp;readable&nbsp;error&nbsp;description.<br>&nbsp;</tt></td></tr>
+<tr><td>&nbsp;</td>
+<td width="100%"><dl><dt>Method resolution order:</dt>
+<dd><a href="i2p.sam.html#NetworkError">NetworkError</a></dd>
+<dd><a href="i2p.sam.html#Error">Error</a></dd>
+<dd><a href="i2p.html#Error">i2p.Error</a></dd>
+<dd><a href="exceptions.html#Exception">exceptions.Exception</a></dd>
+</dl>
+<hr>
+Methods inherited from <a href="exceptions.html#Exception">exceptions.Exception</a>:<br>
+<dl><dt><a name="NetworkError-__getitem__"><strong>__getitem__</strong></a>(...)</dt></dl>
+
+<dl><dt><a name="NetworkError-__init__"><strong>__init__</strong></a>(...)</dt></dl>
+
+<dl><dt><a name="NetworkError-__str__"><strong>__str__</strong></a>(...)</dt></dl>
+
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="Poll">class <strong>Poll</strong></a></font></td></tr>
+    
+<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
+<td colspan=2><tt>Class&nbsp;implementing&nbsp;poll&nbsp;interface.&nbsp;&nbsp;Works&nbsp;for&nbsp;Python&nbsp;sockets<br>
+and&nbsp;SAM&nbsp;sockets.<br>&nbsp;</tt></td></tr>
+<tr><td>&nbsp;</td>
+<td width="100%">Methods defined here:<br>
+<dl><dt><a name="Poll-__init__"><strong>__init__</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="Poll-poll"><strong>poll</strong></a>(self, timeout<font color="#909090">=None</font>)</dt></dl>
+
+<dl><dt><a name="Poll-register"><strong>register</strong></a>(self, fd, eventmask<font color="#909090">=13</font>)</dt></dl>
+
+<dl><dt><a name="Poll-unregister"><strong>unregister</strong></a>(self, fd)</dt></dl>
+
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="Socket">class <strong>Socket</strong></a></font></td></tr>
+    
+<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
+<td colspan=2><tt>A&nbsp;socket&nbsp;object.<br>&nbsp;</tt></td></tr>
+<tr><td>&nbsp;</td>
+<td width="100%">Methods defined here:<br>
+<dl><dt><a name="Socket-__deepcopy__"><strong>__deepcopy__</strong></a>(self, memo)</dt></dl>
+
+<dl><dt><a name="Socket-__init__"><strong>__init__</strong></a>(self, session, type, samaddr<font color="#909090">='127.0.0.1:7656'</font>, **kwargs)</dt><dd><tt>Equivalent&nbsp;to&nbsp;socket().</tt></dd></dl>
+
+<dl><dt><a name="Socket-accept"><strong>accept</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="Socket-bind"><strong>bind</strong></a>(self, address)</dt></dl>
+
+<dl><dt><a name="Socket-close"><strong>close</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="Socket-connect"><strong>connect</strong></a>(self, address)</dt></dl>
+
+<dl><dt><a name="Socket-connect_ex"><strong>connect_ex</strong></a>(self, address)</dt></dl>
+
+<dl><dt><a name="Socket-getpeername"><strong>getpeername</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="Socket-getsockname"><strong>getsockname</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="Socket-gettimeout"><strong>gettimeout</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="Socket-listen"><strong>listen</strong></a>(self, backlog)</dt></dl>
+
+<dl><dt><a name="Socket-makefile"><strong>makefile</strong></a>(self, mode<font color="#909090">='r'</font>, bufsize<font color="#909090">=-1</font>)</dt></dl>
+
+<dl><dt><a name="Socket-recv"><strong>recv</strong></a>(self, bufsize, flags<font color="#909090">=0</font>)</dt></dl>
+
+<dl><dt><a name="Socket-recvfrom"><strong>recvfrom</strong></a>(self, bufsize, flags<font color="#909090">=0</font>)</dt><dd><tt>For&nbsp;a&nbsp;datagram&nbsp;or&nbsp;raw&nbsp;socket,&nbsp;bufsize&nbsp;=&nbsp;-1&nbsp;indicates&nbsp;that&nbsp;the<br>
+entire&nbsp;packet&nbsp;should&nbsp;be&nbsp;retrieved.</tt></dd></dl>
+
+<dl><dt><a name="Socket-send"><strong>send</strong></a>(self, string, flags<font color="#909090">=0</font>)</dt></dl>
+
+<dl><dt><a name="Socket-sendall"><strong>sendall</strong></a>(self, string, flags<font color="#909090">=0</font>)</dt></dl>
+
+<dl><dt><a name="Socket-sendto"><strong>sendto</strong></a>(self, string, flags, address)</dt></dl>
+
+<dl><dt><a name="Socket-setblocking"><strong>setblocking</strong></a>(self, flag)</dt></dl>
+
+<dl><dt><a name="Socket-settimeout"><strong>settimeout</strong></a>(self, value)</dt></dl>
+
+<hr>
+Properties defined here:<br>
+<dl><dt><strong>dest</strong></dt>
+<dd><tt>Local&nbsp;I2P&nbsp;Destination&nbsp;of&nbsp;socket</tt></dd>
+</dl>
+<dl><dt><strong>session</strong></dt>
+<dd><tt>Session&nbsp;name</tt></dd>
+</dl>
+<dl><dt><strong>type</strong></dt>
+<dd><tt><a href="#Socket">Socket</a>&nbsp;type:&nbsp;SOCK_STREAM,&nbsp;SOCK_DGRAM,&nbsp;or&nbsp;SOCK_RAW.</tt></dd>
+</dl>
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="Timeout">class <strong>Timeout</strong></a>(<a href="i2p.sam.html#Error">Error</a>)</font></td></tr>
+    
+<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
+<td colspan=2><tt>Time&nbsp;out&nbsp;occurred&nbsp;for&nbsp;a&nbsp;socket&nbsp;which&nbsp;had&nbsp;timeouts&nbsp;enabled<br>
+via&nbsp;a&nbsp;prior&nbsp;call&nbsp;to&nbsp;settimeout().<br>&nbsp;</tt></td></tr>
+<tr><td>&nbsp;</td>
+<td width="100%"><dl><dt>Method resolution order:</dt>
+<dd><a href="i2p.sam.html#Timeout">Timeout</a></dd>
+<dd><a href="i2p.sam.html#Error">Error</a></dd>
+<dd><a href="i2p.html#Error">i2p.Error</a></dd>
+<dd><a href="exceptions.html#Exception">exceptions.Exception</a></dd>
+</dl>
+<hr>
+Methods inherited from <a href="exceptions.html#Exception">exceptions.Exception</a>:<br>
+<dl><dt><a name="Timeout-__getitem__"><strong>__getitem__</strong></a>(...)</dt></dl>
+
+<dl><dt><a name="Timeout-__init__"><strong>__init__</strong></a>(...)</dt></dl>
+
+<dl><dt><a name="Timeout-__str__"><strong>__str__</strong></a>(...)</dt></dl>
+
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="Tunnel">class <strong>Tunnel</strong></a></font></td></tr>
+    
+<tr><td bgcolor="#ffc8d8"><tt>&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%">Methods defined here:<br>
+<dl><dt><a name="Tunnel-__init__"><strong>__init__</strong></a>(self, receive, make_send, nconnect<font color="#909090">=-1</font>, timeout<font color="#909090">=60.0</font>)</dt><dd><tt>A&nbsp;<a href="#Tunnel">Tunnel</a>&nbsp;relays&nbsp;connections&nbsp;from&nbsp;a&nbsp;'receive'&nbsp;socket&nbsp;to&nbsp;one<br>
+or&nbsp;more&nbsp;'send'&nbsp;sockets.&nbsp;&nbsp;The&nbsp;receive&nbsp;socket&nbsp;must&nbsp;be&nbsp;bound<br>
+and&nbsp;listening.&nbsp;&nbsp;For&nbsp;each&nbsp;incoming&nbsp;connection,&nbsp;a&nbsp;new&nbsp;send<br>
+socket&nbsp;is&nbsp;created&nbsp;by&nbsp;calling&nbsp;make_send().&nbsp;&nbsp;Data&nbsp;is&nbsp;then<br>
+exchanged&nbsp;between&nbsp;the&nbsp;created&nbsp;streams&nbsp;until&nbsp;one&nbsp;socket&nbsp;is<br>
+closed.&nbsp;&nbsp;nconnect&nbsp;is&nbsp;the&nbsp;maximum&nbsp;number&nbsp;of&nbsp;simultaneous<br>
+connections&nbsp;(-1&nbsp;for&nbsp;infinite),&nbsp;and&nbsp;timeout&nbsp;is&nbsp;the&nbsp;time&nbsp;that<br>
+a&nbsp;single&nbsp;connection&nbsp;can&nbsp;last&nbsp;for&nbsp;(None&nbsp;allows&nbsp;a&nbsp;connection<br>
+to&nbsp;last&nbsp;forever).<br>
+&nbsp;<br>
+Sockets&nbsp;must&nbsp;accept&nbsp;stream&nbsp;traffic&nbsp;and&nbsp;support&nbsp;the&nbsp;Python<br>
+socket&nbsp;interface.&nbsp;&nbsp;A&nbsp;separate&nbsp;daemonic&nbsp;thread&nbsp;is&nbsp;created&nbsp;to<br>
+manage&nbsp;the&nbsp;tunnel.&nbsp;&nbsp;For&nbsp;high&nbsp;performance,&nbsp;make_send()&nbsp;should<br>
+make&nbsp;a&nbsp;socket&nbsp;and&nbsp;connect&nbsp;in&nbsp;non-blocking&nbsp;mode&nbsp;(you&nbsp;should<br>
+catch&nbsp;and&nbsp;discard&nbsp;the&nbsp;sam.<a href="#BlockError">BlockError</a>&nbsp;or&nbsp;socket.error&nbsp;due&nbsp;to<br>
+executing&nbsp;connect&nbsp;on&nbsp;a&nbsp;non-blocking&nbsp;socket).<br>
+&nbsp;<br>
+Security&nbsp;Note:<br>
+A&nbsp;firewall&nbsp;is&nbsp;needed&nbsp;to&nbsp;maintain&nbsp;the&nbsp;end&nbsp;user's&nbsp;anonymity.<br>
+An&nbsp;attacker&nbsp;could&nbsp;keep&nbsp;a&nbsp;tunnel&nbsp;socket&nbsp;open&nbsp;by&nbsp;pinging&nbsp;it<br>
+regularly.&nbsp;&nbsp;The&nbsp;accepted&nbsp;sockets&nbsp;from&nbsp;'receive'&nbsp;must&nbsp;prevent<br>
+this&nbsp;by&nbsp;closing&nbsp;down&nbsp;eventually.<br>
+&nbsp;<br>
+<a href="#Socket">Socket</a>&nbsp;errors&nbsp;do&nbsp;not&nbsp;cause&nbsp;the&nbsp;<a href="#Tunnel">Tunnel</a>&nbsp;to&nbsp;shut&nbsp;down.</tt></dd></dl>
+
+<dl><dt><a name="Tunnel-close"><strong>close</strong></a>(self)</dt><dd><tt>Close&nbsp;all&nbsp;connections&nbsp;made&nbsp;for&nbsp;this&nbsp;tunnel.</tt></dd></dl>
+
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="TunnelClient">class <strong>TunnelClient</strong></a>(<a href="i2p.sam.html#Tunnel">Tunnel</a>)</font></td></tr>
+    
+<tr><td bgcolor="#ffc8d8"><tt>&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%">Methods defined here:<br>
+<dl><dt><a name="TunnelClient-__init__"><strong>__init__</strong></a>(self, session, port, dest, samaddr<font color="#909090">='127.0.0.1:7656'</font>, nconnect<font color="#909090">=-1</font>, timeout<font color="#909090">=None</font>, **kwargs)</dt><dd><tt>Tunnels&nbsp;localhost:port&nbsp;--&gt;&nbsp;I2P&nbsp;Destination&nbsp;dest.<br>
+&nbsp;<br>
+A&nbsp;session&nbsp;named&nbsp;'session'&nbsp;is&nbsp;created&nbsp;locally,&nbsp;for&nbsp;purposes<br>
+of&nbsp;routing&nbsp;to&nbsp;'dest'.&nbsp;&nbsp;nconnect&nbsp;and&nbsp;timeout&nbsp;are&nbsp;the&nbsp;maximum<br>
+number&nbsp;of&nbsp;connections&nbsp;and&nbsp;maximum&nbsp;time&nbsp;per&nbsp;connection.&nbsp;&nbsp;All<br>
+other&nbsp;arguments&nbsp;are&nbsp;passed&nbsp;to&nbsp;sam.socket().&nbsp;&nbsp;This&nbsp;call&nbsp;blocks<br>
+until&nbsp;the&nbsp;tunnel&nbsp;is&nbsp;ready.</tt></dd></dl>
+
+<hr>
+Properties defined here:<br>
+<dl><dt><strong>dest</strong></dt>
+<dd><strong><em>get</em></strong> = 'Local Destination used for routing.'</dd>
+</dl>
+<dl><dt><strong>remotedest</strong></dt>
+<dd><tt>Remote&nbsp;Destination.</tt></dd>
+</dl>
+<dl><dt><strong>session</strong></dt>
+<dd><strong><em>get</em></strong> = 'Session name for local Destination.'</dd>
+</dl>
+<hr>
+Methods inherited from <a href="i2p.sam.html#Tunnel">Tunnel</a>:<br>
+<dl><dt><a name="TunnelClient-close"><strong>close</strong></a>(self)</dt><dd><tt>Close&nbsp;all&nbsp;connections&nbsp;made&nbsp;for&nbsp;this&nbsp;tunnel.</tt></dd></dl>
+
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="TunnelServer">class <strong>TunnelServer</strong></a>(<a href="i2p.sam.html#Tunnel">Tunnel</a>)</font></td></tr>
+    
+<tr><td bgcolor="#ffc8d8"><tt>&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%">Methods defined here:<br>
+<dl><dt><a name="TunnelServer-__init__"><strong>__init__</strong></a>(self, session, port, samaddr<font color="#909090">='127.0.0.1:7656'</font>, nconnect<font color="#909090">=-1</font>, timeout<font color="#909090">=None</font>, **kwargs)</dt><dd><tt>Tunnels&nbsp;incoming&nbsp;SAM&nbsp;streams&nbsp;--&gt;&nbsp;localhost:port.<br>
+&nbsp;<br>
+nconnect&nbsp;and&nbsp;timeout&nbsp;are&nbsp;the&nbsp;maximum&nbsp;number&nbsp;of&nbsp;connections<br>
+and&nbsp;maximum&nbsp;time&nbsp;per&nbsp;connection.&nbsp;&nbsp;All&nbsp;other&nbsp;arguments&nbsp;are<br>
+passed&nbsp;to&nbsp;sam.socket().&nbsp;&nbsp;This&nbsp;call&nbsp;blocks&nbsp;until&nbsp;the&nbsp;tunnel<br>
+is&nbsp;ready.</tt></dd></dl>
+
+<hr>
+Properties defined here:<br>
+<dl><dt><strong>dest</strong></dt>
+<dd><tt>I2P&nbsp;Destination&nbsp;of&nbsp;server.</tt></dd>
+</dl>
+<dl><dt><strong>session</strong></dt>
+<dd><tt>Session&nbsp;name&nbsp;for&nbsp;server.</tt></dd>
+</dl>
+<hr>
+Methods inherited from <a href="i2p.sam.html#Tunnel">Tunnel</a>:<br>
+<dl><dt><a name="TunnelServer-close"><strong>close</strong></a>(self)</dt><dd><tt>Close&nbsp;all&nbsp;connections&nbsp;made&nbsp;for&nbsp;this&nbsp;tunnel.</tt></dd></dl>
+
+</td></tr></table></td></tr></table><p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#55aa55">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Data</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#55aa55"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><strong>MAX_DGRAM</strong> = 31744<br>
+<strong>MAX_RAW</strong> = 32768<br>
+<strong>MSG_DONTWAIT</strong> = 128<br>
+<strong>MSG_PEEK</strong> = 2<br>
+<strong>MSG_WAITALL</strong> = 64<br>
+<strong>POLLERR</strong> = 8<br>
+<strong>POLLHUP</strong> = 16<br>
+<strong>POLLIN</strong> = 1<br>
+<strong>POLLNVAL</strong> = 32<br>
+<strong>POLLOUT</strong> = 4<br>
+<strong>POLLPRI</strong> = 1<br>
+<strong>SOCK_DGRAM</strong> = 2<br>
+<strong>SOCK_RAW</strong> = 3<br>
+<strong>SOCK_STREAM</strong> = 1<br>
+<strong>samaddr</strong> = '127.0.0.1:7656'<br>
+<strong>samver</strong> = 1.0</td></tr></table>
+</body></html>
