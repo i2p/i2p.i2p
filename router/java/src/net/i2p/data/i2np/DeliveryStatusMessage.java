@@ -86,7 +86,8 @@ public class DeliveryStatusMessage extends I2NPMessageImpl {
         StringBuffer buf = new StringBuffer();
         buf.append("[DeliveryStatusMessage: ");
         buf.append("\n\tMessage ID: ").append(getMessageId());
-        buf.append("\n\tArrival: ").append(getArrival());
+        buf.append("\n\tArrival: ").append(_context.clock().now() - _arrival.getTime());
+        buf.append("ms in the past");
         buf.append("]");
         return buf.toString();
     }
