@@ -251,6 +251,15 @@ public class TransportManager implements TransportEventListener {
             _log.debug("Added to in pool: "+ num);
     }
     
+    public List getMostRecentErrorMessages() { 
+        List rv = new ArrayList(16);
+        for (int i = 0; i < _transports.size(); i++) {
+            Transport t = (Transport)_transports.get(i);
+            rv.addAll(t.getMostRecentErrorMessages());
+        }
+        return rv;
+    }
+    
     public void renderStatusHTML(OutputStream out) throws IOException {
         StringBuffer buf = new StringBuffer(8*1024);
         buf.append("<h2>Transport Manager</h2>\n");

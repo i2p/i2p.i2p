@@ -9,6 +9,7 @@ package net.i2p.router.transport;
  */
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -62,6 +63,7 @@ public abstract class TransportImpl implements Transport {
      */
     public int countActivePeers() { return 0; }
     
+    public List getMostRecentErrorMessages() { return Collections.EMPTY_LIST; }
     /**
      * Nonblocking call to pull the next outbound message
      * off the queue.  

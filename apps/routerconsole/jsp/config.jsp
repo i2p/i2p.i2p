@@ -35,8 +35,11 @@
      <input name="port" type="text" size="4" value="<jsp:getProperty name="nethelper" property="port" />" /> <br />
  <i>The hostname/IP address and TCP port must be reachable from the outside world.  If
  you are behind a firewall or NAT, this means you must poke a hole for this port.  If
- you are using DHCP and do not have a static IP address, you must use a service like
- <a href="http://dyndns.org/">dyndns</a>.  The "guess" functionality makes an HTTP request
+ you are using DHCP and do not have a static IP address, you should either use a service like
+ <a href="http://dyndns.org/">dyndns</a> or leave the hostname blank.  If you leave it blank,
+ your router will autodetect the 'correct' IP address by asking a peer (and unconditionally 
+ believing them if the address is routable and you don't have any established connections yet).
+ The "guess" functionality makes an HTTP request 
  to <a href="http://www.whatismyip.com/">www.whatismyip.com</a>.</i>
  <hr />
  <b>Enable internal time synchronization?</b> <input type="checkbox" <jsp:getProperty name="nethelper" property="enableTimeSyncChecked" /> name="enabletimesync" /><br />

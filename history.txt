@@ -1,4 +1,11 @@
-$Id: history.txt,v 1.19 2004/09/21 19:10:26 jrandom Exp $
+$Id: history.txt,v 1.20 2004/09/26 10:16:44 jrandom Exp $
+
+2004-09-27  jrandom
+    * Limit the number of connection tags saved to 10,000.  This is a huge 
+      limit, but consumes no more than 1MB of RAM.  For now, we drop them 
+      randomly after reaching that size, forcing those dropped peers to use
+      a full DH negotiation.
+    * HTML cleanup in the console.
 
 2004-09-26  jrandom
     * Complete rewrite of the TCP transport with IP autodetection and 

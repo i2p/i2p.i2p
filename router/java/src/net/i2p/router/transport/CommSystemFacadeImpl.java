@@ -62,6 +62,10 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
         j.runJob();
     }
     
+    public List getMostRecentErrorMessages() { 
+        return _manager.getMostRecentErrorMessages(); 
+    }
+    
     public void renderStatusHTML(OutputStream out) throws IOException { 
         _manager.renderStatusHTML(out); 
     }

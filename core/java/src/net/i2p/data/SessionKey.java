@@ -28,7 +28,10 @@ public class SessionKey extends DataStructureImpl {
     public final static int KEYSIZE_BYTES = 32;
 
     public SessionKey() {
-        setData(null);
+        this(null);
+    } 
+    public SessionKey(byte data[]) {
+        setData(data);
     }
 
     public byte[] getData() {

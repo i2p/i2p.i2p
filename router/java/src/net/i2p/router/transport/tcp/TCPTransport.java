@@ -91,7 +91,7 @@ public class TCPTransport extends TransportImpl {
         _log = context.logManager().getLog(TCPTransport.class);
         _listener = new TCPListener(context, this);
         _myAddress = null;
-        _tagManager = new ConnectionTagManager(context);
+        _tagManager = new PersistentConnectionTagManager(context);
         _connectionsByIdent = new HashMap(16);
         _connectionsByAddress = new HashMap(16);
         _pendingConnectionsByIdent = new HashSet(16);
@@ -453,6 +453,9 @@ public class TCPTransport extends TransportImpl {
         return -1;
     }
 
+    public List getMostRecentErrorMessages() { 
+        return _lastConnectionErrors; 
+    }
     
     /**
      * How many peers can we talk to right now?

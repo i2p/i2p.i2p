@@ -10,7 +10,9 @@ package net.i2p.router;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -27,6 +29,7 @@ public abstract class CommSystemFacade implements Service {
     public Set createAddresses() { return new HashSet(); }
     
     public int countActivePeers() { return 0; }
+    public List getMostRecentErrorMessages() { return Collections.EMPTY_LIST; }
 }
 
 class DummyCommSystemFacade extends CommSystemFacade {

@@ -326,7 +326,9 @@ public class ConnectionBuilder {
         System.arraycopy(h.getData(), 0, _iv, 0, 16);
      
         updateNextTagExisting();
-        
+
+        _rawOut = new BufferedOutputStream(_rawOut, ConnectionBuilder.WRITE_BUFFER_SIZE);
+
         _rawOut = new AESOutputStream(_context, _rawOut, _key, _iv);
         _rawIn = new AESInputStream(_context, _rawIn, _key, _iv);
         
@@ -474,7 +476,9 @@ public class ConnectionBuilder {
             _log.debug("\nNew session[X]: key=" + _key.toBase64() + " iv=" 
                        + Base64.encode(_iv) + " nonce=" + Base64.encode(_nonce.getData())
                        + " socket: " + _socket);
-        
+
+        _rawOut = new BufferedOutputStream(_rawOut, ConnectionBuilder.WRITE_BUFFER_SIZE);
+
         _rawOut = new AESOutputStream(_context, _rawOut, _key, _iv);
         _rawIn = new AESInputStream(_context, _rawIn, _key, _iv);
         
@@ -498,7 +502,7 @@ public class ConnectionBuilder {
             byte val[] = new byte[32];
             int read = DataHelper.read(_rawIn, val);
             if (read != 32) {
-                fail("Not enough data to read the verification from " 
+                fail("Not enough data (" + read + ") to read the verification from " 
                      + _target.getIdentity().calculateHash().toBase64().substring(0,6));
                 return false;
             }
@@ -632,7 +636,7 @@ public class ConnectionBuilder {
     private void establishComplete() {
         _connectionIn = new BandwidthLimitedInputStream(_context, _rawIn, _actualPeer.getIdentity());
         OutputStream blos = new BandwidthLimitedOutputStream(_context, _rawOut, _actualPeer.getIdentity());
-        _connectionOut = new BufferedOutputStream(blos, WRITE_BUFFER_SIZE);
+        _connectionOut = blos;
         
         Hash peer = _actualPeer.getIdentity().getHash();
         _context.netDb().store(peer, _actualPeer);

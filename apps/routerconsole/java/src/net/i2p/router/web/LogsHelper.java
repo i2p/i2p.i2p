@@ -28,7 +28,7 @@ public class LogsHelper {
     public String getLogs() {
         List msgs = _context.logManager().getBuffer().getMostRecentMessages();
         StringBuffer buf = new StringBuffer(16*1024); 
-        buf.append("<h2>Most recent console messages:</h2><ul>");
+        buf.append("<ul>");
         buf.append("<code>\n");
         for (int i = msgs.size(); i > 0; i--) { 
             String msg = (String)msgs.get(i - 1);
@@ -47,5 +47,21 @@ public class LogsHelper {
             return "";
         else
             return "<pre>" + str + "</pre>";
+    }
+    
+    public String getConnectionLogs() {
+        List msgs = _context.commSystem().getMostRecentErrorMessages();
+        StringBuffer buf = new StringBuffer(16*1024); 
+        buf.append("<ul>");
+        buf.append("<code>\n");
+        for (int i = msgs.size(); i > 0; i--) { 
+            String msg = (String)msgs.get(i - 1);
+            buf.append("<li>");
+            buf.append(msg);
+            buf.append("</li>\n");
+        }
+        buf.append("</code></ul>\n");
+        
+        return buf.toString();
     }
 }

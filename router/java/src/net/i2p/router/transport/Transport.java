@@ -8,6 +8,7 @@ package net.i2p.router.transport;
  *
  */
 
+import java.util.List;
 import java.util.Properties;
 import java.util.Set;
 
@@ -35,7 +36,8 @@ public interface Transport {
     public void setListener(TransportEventListener listener);
     public String getStyle();
     
-    public int countActivePeers();
+    public int countActivePeers();    
+    public List getMostRecentErrorMessages();
     
     public String renderStatusHTML();
 }
