@@ -298,7 +298,8 @@ public class TunnelPool {
                 if (_log.shouldLog(Log.WARN))
                     _log.warn(toString() + ": unable to build a new leaseSet on failure (" + remaining 
                               + " remaining), request a new tunnel");
-                buildFake(false);
+                if (remaining < _settings.getBackupQuantity() + _settings.getQuantity())
+                    buildFake(false);
             }
         }
         refreshBuilders();
@@ -320,8 +321,9 @@ public class TunnelPool {
                 if (_log.shouldLog(Log.WARN))
                     _log.warn(toString() + ": unable to build a new leaseSet on expire (" + remaining 
                               + " remaining), request a new tunnel");
-                if (_settings.getAllowZeroHop())
-                    buildFake();
+                if ( (remaining < _settings.getBackupQuantity() + _settings.getQuantity()) 
+                   && (_settings.getAllowZeroHop()) )
+                        buildFake();
             }
         }
     }

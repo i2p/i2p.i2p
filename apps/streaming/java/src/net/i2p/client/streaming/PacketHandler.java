@@ -156,9 +156,11 @@ public class PacketHandler {
                     sendReset(packet);
                 }
             } else {
-                // someone is sending us a packet on the wrong stream 
-                if (_log.shouldLog(Log.WARN))
-                    _log.warn("Received a packet on the wrong stream: " + packet + " connection: " + con);
+                if (!con.getResetSent()) {
+                    // someone is sending us a packet on the wrong stream 
+                    if (_log.shouldLog(Log.WARN))
+                        _log.warn("Received a packet on the wrong stream: " + packet + " connection: " + con);
+                }
             }
         }
     }

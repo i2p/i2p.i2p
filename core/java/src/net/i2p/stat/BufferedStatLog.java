@@ -99,7 +99,7 @@ public class BufferedStatLog implements StatLog {
             if (_out != null) try { _out.close(); } catch (IOException ioe) {}
             _outFile = filename;
             try {
-                _out = new BufferedWriter(new FileWriter(_outFile, true));
+                _out = new BufferedWriter(new FileWriter(_outFile, true), 32*1024);
             } catch (IOException ioe) { ioe.printStackTrace(); }
         }
     }
@@ -147,12 +147,16 @@ public class BufferedStatLog implements StatLog {
                         _out.write(when);
                         _out.write(" ");
                         if (_events[cur].getScope() == null)
-                            _out.write("noScope ");
+                            _out.write("noScope");
                         else
-                            _out.write(_events[cur].getScope() + " ");
-                        _out.write(_events[cur].getStat()+" ");
-                        _out.write(_events[cur].getValue()+" ");
-                        _out.write(_events[cur].getDuration()+"\n");
+                            _out.write(_events[cur].getScope());
+                        _out.write(" ");
+                        _out.write(_events[cur].getStat());
+                        _out.write(" ");
+                        _out.write(Long.toString(_events[cur].getValue()));
+                        _out.write(" ");
+                        _out.write(Long.toString(_events[cur].getDuration()));
+                        _out.write("\n");
                     }
                     cur = (cur + 1) % _events.length;
                 }

@@ -26,10 +26,14 @@ abstract class TunnelPeerSelector {
         if (settings.getLengthVariance() != 0) {
             int skew = settings.getLengthVariance();
             if (skew > 0)
-                length += ctx.random().nextInt(skew);
+                length += ctx.random().nextInt(skew+1);
             else {
-                skew = 0 - skew;
-                length += ctx.random().nextInt(2*skew) - skew;
+                skew = 1 - skew;
+                int off = ctx.random().nextInt(skew);
+                if (ctx.random().nextBoolean())
+                    length += off;
+                else
+                    length -= off;
             }
             if (length < 0)
                 length = 0;

@@ -1,4 +1,18 @@
-$Id: history.txt,v 1.146 2005/02/17 17:57:53 jrandom Exp $
+$Id: history.txt,v 1.147 2005/02/18 10:58:20 jrandom Exp $
+
+2005-02-19  jrandom
+    * Only build new extra tunnels on failure if we don't have enough
+    * Fix a fencepost in the tunnel building so that e.g. a variance of
+      2 means +/- 2, not +/- 1 (thanks dm!)
+    * Avoid an NPE on client disconnect
+    * Never select a shitlisted peer to participate in a tunnel
+    * Have netDb store messages timeout after 10s, not the full 60s (duh)
+    * Keep session tags around for a little longer, just in case (grr)
+    * Cleaned up some closing event issues on the streaming lib
+    * Stop bundling the jetty 5.1.2 and updated wrapper.config in the update
+      so that 0.4.* users will need to do a clean install, but we don't need 
+      to shove an additional 2MB in each update to those already on 0.5.
+    * Imported the susimail css (oops, thanks susi!)
 
 * 2005-02-18  0.5 released
 

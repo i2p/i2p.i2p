@@ -1,0 +1,96 @@
+body {
+	background-color:white;
+}
+
+li {
+	font-family:Verdana,Tahoma,Arial,Helvetica;
+	color:black;
+	line-height:12pt;
+	font-size:10pt;
+	margin-left:5mm;
+	margin-right:5mm;
+}
+
+p {
+	font-family:Verdana,Tahoma,Arial,Helvetica;
+	color:black;
+	line-height:12pt;
+	margin-left:5mm;
+	margin-right:5mm;
+	font-size:10pt;
+}
+
+p.hl {
+	font-size:12pt;
+	letter-spacing:2pt;
+	line-height:18pt;
+	font-weight:bold;
+}
+
+p.text {
+	margin-left:10mm;
+	margin-right:10mm;
+}
+
+p.error {
+	color:#ff0000;
+}
+
+p.info {
+	color:#327BBF;
+}
+
+span.coloured {
+	color:#327BBF;
+}
+
+p.footer {
+	margin-left:10mm;
+	margin-right:10mm;
+    	font-size:8pt;
+    	line-height:10pt;
+}
+
+p.mailbody {
+	font-family:Courier-Fixed;
+	margin-left:1cm;
+	margin-right:1cm;
+}
+
+a {
+	color:#327BBF;
+	text-decoration:none;
+}
+
+a:hover {
+	text-decoration:underline;
+}
+
+td {
+	font-family:Verdana,Tahoma,Arial,Helvetica;
+	color:black;
+	line-height:12pt;
+	margin-left:5mm;
+	margin-right:5mm;
+	font-size:10pt;
+}
+
+tr.list0 {
+	background-color:#e0e0e0;
+}
+
+tr.list1 {
+	background-color:#ffffff;
+}
+
+table.noborder {
+	margin-left:0mm;
+	margin-top:0mm;
+	margin-right:0mm;
+}
+
+pre {
+	font-family:Courier-Fixed;
+	margin-left:1cm;
+	margin-right:1cm;
+}

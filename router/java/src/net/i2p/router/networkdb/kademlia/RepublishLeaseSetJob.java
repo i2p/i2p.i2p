@@ -22,7 +22,8 @@ import net.i2p.util.Log;
  */
 public class RepublishLeaseSetJob extends JobImpl {
     private Log _log;
-    private final static long REPUBLISH_LEASESET_DELAY = 60*1000; // 5 mins
+    private final static long REPUBLISH_LEASESET_DELAY = 5*60*1000; // 5 mins
+    private final static long REPUBLISH_LEASESET_TIMEOUT = 60*1000;
     private Hash _dest;
     private KademliaNetworkDatabaseFacade _facade;
     
@@ -43,7 +44,7 @@ public class RepublishLeaseSetJob extends JobImpl {
                     if (!ls.isCurrent(Router.CLOCK_FUDGE_FACTOR)) {
                         _log.warn("Not publishing a LOCAL lease that isn't current - " + _dest, new Exception("Publish expired LOCAL lease?"));
                     } else {
-                        getContext().jobQueue().addJob(new StoreJob(getContext(), _facade, _dest, ls, new OnSuccess(getContext()), new OnFailure(getContext()), REPUBLISH_LEASESET_DELAY));
+                        getContext().jobQueue().addJob(new StoreJob(getContext(), _facade, _dest, ls, new OnSuccess(getContext()), new OnFailure(getContext()), REPUBLISH_LEASESET_TIMEOUT));
                     }
                 } else {
                     _log.warn("Client " + _dest + " is local, but we can't find a valid LeaseSet?  perhaps its being rebuilt?");

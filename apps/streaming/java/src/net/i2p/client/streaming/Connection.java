@@ -57,7 +57,7 @@ public class Connection {
     private I2PSocketFull _socket;
     /** set to an error cause if the connection could not be established */
     private String _connectionError;
-    private boolean _disconnectScheduled;
+    private long _disconnectScheduledOn;
     private long _lastReceivedOn;
     private ActivityTimer _activityTimer;
     /** window size when we last saw congestion */
@@ -113,7 +113,7 @@ public class Connection {
         _connectionManager = manager;
         _resetReceived = false;
         _connected = true;
-        _disconnectScheduled = false;
+        _disconnectScheduledOn = -1;
         _lastReceivedOn = -1;
         _activityTimer = new ActivityTimer();
         _ackSinceCongestion = true;
@@ -191,6 +191,10 @@ public class Connection {
      *
      */
     void sendReset() {
+        if (_disconnectScheduledOn < 0) {
+            _disconnectScheduledOn = _context.clock().now();
+            SimpleTimer.getInstance().addEvent(new DisconnectEvent(), DISCONNECT_TIMEOUT);
+        }
         _resetSent = true;
         if (_resetSentOn <= 0)
             _resetSentOn = _context.clock().now();
@@ -382,6 +386,10 @@ public class Connection {
     }
     
     void resetReceived() {
+        if (_disconnectScheduledOn < 0) {
+            _disconnectScheduledOn = _context.clock().now();
+            SimpleTimer.getInstance().addEvent(new DisconnectEvent(), DISCONNECT_TIMEOUT);
+        }
         _resetReceived = true;
         MessageOutputStream mos = _outputStream;
         MessageInputStream mis = _inputStream;
@@ -398,6 +406,7 @@ public class Connection {
     public boolean getHardDisconnected() { return _hardDisconnected; }
     public boolean getResetSent() { return _resetSent; }
     public long getResetSentOn() { return _resetSentOn; }
+    public long getDisconnectScheduledOn() { return _disconnectScheduledOn; }
 
     void disconnect(boolean cleanDisconnect) {
         disconnect(cleanDisconnect, true);
@@ -424,8 +433,8 @@ public class Connection {
             killOutstandingPackets();
         }
         if (removeFromConMgr) {
-            if (!_disconnectScheduled) {
-                _disconnectScheduled = true;
+            if (_disconnectScheduledOn < 0) {
+                _disconnectScheduledOn = _context.clock().now();
                 SimpleTimer.getInstance().addEvent(new DisconnectEvent(), DISCONNECT_TIMEOUT);
             }
         }
@@ -445,8 +454,8 @@ public class Connection {
             SimpleTimer.getInstance().removeEvent(_activityTimer);
         _activityTimer = null;
         
-        if (!_disconnectScheduled) {
-            _disconnectScheduled = true;
+        if (_disconnectScheduledOn < 0) {
+            _disconnectScheduledOn = _context.clock().now();
             
             if (_log.shouldLog(Log.INFO))
                 _log.info("Connection disconnect complete from dead, drop the con "
@@ -576,7 +585,13 @@ public class Connection {
     public long getAckedPackets() { return _ackedPackets; }
     public long getCreatedOn() { return _createdOn; }
     public long getCloseSentOn() { return _closeSentOn; }
-    public void setCloseSentOn(long when) { _closeSentOn = when; }
+    public void setCloseSentOn(long when) { 
+        _closeSentOn = when;
+        if (_disconnectScheduledOn < 0) {
+            _disconnectScheduledOn = _context.clock().now();
+            SimpleTimer.getInstance().addEvent(new DisconnectEvent(), DISCONNECT_TIMEOUT);
+        }
+    }
     public long getCloseReceivedOn() { return _closeReceivedOn; }
     public void setCloseReceivedOn(long when) { _closeReceivedOn = when; }
     

@@ -199,7 +199,7 @@ class StoreJob extends JobImpl {
             //    _log.debug(getJobId() + ": Send store to " + router.getIdentity().getHash().toBase64());
         }
 
-        sendStore(msg, router, _expiration);
+        sendStore(msg, router, getContext().clock().now() + STORE_TIMEOUT_MS);
     }
     
     private void sendStore(DatabaseStoreMessage msg, RouterInfo peer, long expiration) {
@@ -315,7 +315,7 @@ class StoreJob extends JobImpl {
             
             sendNext();
         }
-        public String getName() { return "Kademlia Store Failed"; }
+        public String getName() { return "Kademlia Store Peer Failed"; }
     }
 
     /**
