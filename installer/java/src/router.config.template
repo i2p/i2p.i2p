@@ -5,24 +5,11 @@
 ##_router_hn##
 ##_router_port##
 ##_router_lavalid##
-# unless you really really know what you're doing, keep listenAddressIsValid=false
-##_router_tcpdisable##
 
 # maximum number of TCP connections we will want to
 # attempt to establish at once (each of which
 # requires a 2048bit DH exchange)
 i2np.tcp.concurrentEstablishers=5
-	
-# Polling HTTP configuration, which is used to keep your router's clock in sync
-# [also for communication when no inbound connections are possible, once its fixed up again]
-##_router_phttpreg##
-##_router_phttpsend##
-
-# The following option specifies whether the router wants to keep the router's internal time in sync
-# with the PHTTP relay's clock (which should be NTP synced).  If however you are sure your local machine
-# always has the correct time, you can set this to false (but your clock MUST be synced - see 
-# http://wiki.invisiblenet.net/iip-wiki?I2PTiming for more info.
-i2np.phttp.trustRelayTime=true
 
 # I2CP client port, for client connections
 i2cp.port=##_router_i2cp_port##
@@ -158,16 +145,25 @@ router.maxWaitingJobs=40
 
 # Keep the router's clock in sync by querying one of the specified NTP servers once
 # a minute (uses UDP port 123)
+# Please change the NTP server specified to include ones closer to you - see 
+# http://www.eecis.udel.edu/~mills/ntp/clock2a.html for a list (you can specify as
+# many as you want on the args= line - they'll be tried in order until one answers).
+# Some example servers you may want to try: 
+#  US: dewey.lib.ci.phoenix.az.us
+#  US: clock.fmt.he.net
+#  BR: ntp1.pucpr.br
+#  BE: ntp2.belbone.be
+#  AU: ntp.saard.net
 clientApp.0.main=net.i2p.time.Timestamper
 clientApp.0.name=Timestamper
 clientApp.0.onBoot=true
-clientApp.0.args=http://localhost:7655/setTime?k=v ntp1.sth.netnod.se ntp2.sth.netnod.se
+clientApp.0.args=http://localhost:7655/setTime?k=v clock.fmt.he.net ntp2.belbone.be
 
 # SAM bridge (a simplified socket based protocol for using I2P - listens on port 7656.  see
 # the specs at http://www.i2p.net/node/view/144 for more info)
 clientApp.1.main=net.i2p.sam.SAMBridge
 clientApp.1.name=SAMBridge
-clientApp.1.args=0.0.0.0 7656 i2cp.tcp.host=localhost i2cp.tcp.port=##_router_i2cp_port##
+clientApp.1.args=sam.keys 0.0.0.0 7656 i2cp.tcp.host=localhost i2cp.tcp.port=##_router_i2cp_port##
 
 # EepProxy (HTTP proxy that lets you browse both eepsites and the normal web via squid.i2p)
 clientApp.2.main=net.i2p.i2ptunnel.I2PTunnel
