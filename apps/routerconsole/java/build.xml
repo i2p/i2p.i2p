@@ -28,10 +28,13 @@
     </target>
     <target name="war" depends="precompilejsp">
         <war destfile="build/routerconsole.war" webxml="../jsp/web-out.xml"
-             basedir="../jsp/" excludes="web.xml, *.java, *.jsp">
+             basedir="../jsp/" excludes="web.xml, *.java, *.jsp, web-fragment.xml">
         </war>
     </target>
     <target name="precompilejsp">
+        <delete dir="../jsp/WEB-INF/" />
+        <delete dir="../jsp/web-fragment.xml" />
+        <delete dir="../jsp/web-out.xml" />
         <mkdir dir="../jsp/WEB-INF/" />
         <mkdir dir="../jsp/WEB-INF/classes" />
         <!-- there are various jspc ant tasks, but they all seem a bit flakey -->

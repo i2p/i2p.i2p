@@ -64,6 +64,17 @@ public class SummaryHelper {
         else
             return DataHelper.formatDuration(router.getUptime());
     }
+
+        
+    /**
+     * Retrieve amount of used memory.
+     *
+     */
+    public String getMemory() {
+        long used = (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory())/1024;
+        long usedPc = 100 - ((Runtime.getRuntime().freeMemory() * 100) / Runtime.getRuntime().totalMemory());
+        return used + "KB (" + usedPc + "%)"; 
+    }
     
     /**
      * How many active peers the router has.

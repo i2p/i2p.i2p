@@ -7,6 +7,7 @@
  <b>Ident:</b> <jsp:getProperty name="helper" property="ident" /><br />
  <b>Version:</b> <jsp:getProperty name="helper" property="version" /><br />
  <b>Uptime:</b> <jsp:getProperty name="helper" property="uptime" /><br />
+ <b>Memory:</b> <jsp:getProperty name="helper" property="memory" /><br />
  <hr />
  
  <u><b>Peers</b></u><br />
