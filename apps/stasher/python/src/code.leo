@@ -2,7 +2,7 @@
 <leo_file>
 <leo_header file_format="2" tnodes="0" max_tnode_index="35" clone_windows="0"/>
 <globals body_outline_ratio="0.34387755102">
-	<global_window_position top="146" left="194" height="709" width="980"/>
+	<global_window_position top="157" left="189" height="709" width="980"/>
 	<global_log_window_position top="0" left="0" height="0" width="0"/>
 </globals>
 <preferences>
@@ -291,9 +291,9 @@
 <v t="aum.20040814112703"><vh>spawnproc</vh></v>
 <v t="aum.20040814112703.1"><vh>killproc</vh></v>
 <v t="aum.20040814120624"><vh>i2psocket</vh></v>
-<v t="aum.20040813212609" a="TV"><vh>usage</vh></v>
+<v t="aum.20040813212609"><vh>usage</vh></v>
 <v t="aum.20040814015747"><vh>err</vh></v>
-<v t="aum.20040813211551"><vh>main</vh></v>
+<v t="aum.20040813211551" a="TV"><vh>main</vh></v>
 </v>
 <v t="aum.20040803141131" a="E"><vh>MAINLINE</vh>
 <v t="aum.20040812110124"><vh>mainline</vh></v>
@@ -766,6 +766,10 @@ except:
             - a KHash object
             - a raw string which will be hashed into a KHash object
         - val - a string, the value associated with the key
+
+    Keywords:
+        - local - default False - if True, limits the insert to the
+          local node
 
     If the value is larger than L{maxValueSize}, a L{KValueTooLarge}
     exception will occur.
@@ -4976,10 +4980,10 @@ stasher.logToSocket = 19199
 
     try:
         opts, args = getopt.getopt(sys.argv[1:],
-                                   "h?vV:S:C:sd:f",
+                                   "h?vV:S:C:sd:fl",
                                    ['help', 'version', 'samaddr=', 'clientaddr=',
                                     'verbosity=', 'status', 'datadir=', 'foreground',
-                                    'shortversion',
+                                    'shortversion', 'localonly',
                                     ])
     except:
         traceback.print_exc(file=sys.stdout)
@@ -4989,6 +4993,7 @@ stasher.logToSocket = 19199
     verbosity = 2
     debug = False
     foreground = False
+    localOnly = False
 
     for opt, val in opts:
         
@@ -5021,6 +5026,9 @@ stasher.logToSocket = 19199
             sys.stdout.write("%s" % version)
             sys.stdout.flush()
             sys.exit(0)
+
+        elif opt in ['-l', '--localonly']:
+            localOnly = True
 
     #print "Debug - bailing"
     #print repr(opts)
@@ -5147,7 +5155,10 @@ stasher.logToSocket = 19199
         else:
             outfile = sys.stdout
 
-        res = client.get(key)
+        if logVerbosity &gt;= 3:
+            sys.stderr.write("Searching for key - may take up to %s seconds or more\n" % (
+                timeout['findData']))
+        res = client.get(key, local=localOnly)
         if res == None:
             err("Failed to retrieve '%s'" % key)
             sys.exit(1)
@@ -5179,7 +5190,10 @@ stasher.logToSocket = 19199
         if len(val) &gt; maxValueSize:
             err("File is too big - please trim to %s" % maxValueSize)
 
-        res = client.put(key, val)
+        if logVerbosity &gt;= 3:
+            sys.stderr.write("Inserting key - may take up to %s seconds\n" % (
+                timeout['findNode'] + timeout['store']))
+        res = client.put(key, val, local=localOnly)
         if res == None:
             err("Failed to insert '%s'" % key)
             sys.exit(1)
@@ -5274,6 +5288,8 @@ stasher.logToSocket = 19199
     print "                            default is ~/.stasher"
     print "  -f, --foreground        - only valid for 'start' cmd - runs the node"
     print "                            in foreground without spawning - for debugging"
+    print "  -l, --localonly         - only valid for get/put - restricts the get/put"
+    print "                            operation to the local node only"
     print
     print "Commands:"
     print "  start [&lt;nodename&gt;]"
@@ -5305,7 +5321,6 @@ stasher.logToSocket = 19199
     print
 
     sys.exit(0)
-
 
 </t>
 <t tx="aum.20040813232532"></t>
@@ -5351,8 +5366,9 @@ stasher.logToSocket = 19199
 
     self.log(3, "cmd=%s args=%s" % (repr(cmd), repr(args)))
     
-    if cmd == "get":
-        value = node.get(args)
+    if cmd in ["get", "getlocal"]:
+        isLocal = cmd == "getlocal"
+        value = node.get(args, local=isLocal)
         if value == None:
             write("notfound\n")
         else:
@@ -5362,11 +5378,12 @@ stasher.logToSocket = 19199
         finish()
         return
     
-    elif cmd == "put":
+    elif cmd in ["put", "putlocal"]:
+        isLocal = cmd == "putlocal"
         try:
             size = int(readline())
             value = read(size)
-            res = node.put(args, value)
+            res = node.put(args, value, local=isLocal)
             if res:
                 write("ok\n")
             else:
@@ -5490,14 +5507,27 @@ stasher.logToSocket = 19199
         raise Exception("Not connected to valid stasher interface")
 
 </t>
-<t tx="aum.20040814001456.2">def get(self, key):
+<t tx="aum.20040814001456.2">def get(self, key, **kw):
     """
     sends a get command to stasher socket, and retrieves
     and interprets result
+    
+    Arguments:
+        - key - key to retrieve
+    
+    Keywords:
+        - local - default False - if True, only looks in local storage
+    
+    Returns key's value if found, or None if key not found
     """
+    if kw.get('local', False):
+        cmd = 'getlocal'
+    else:
+        cmd = 'get'
+
     self.connect()
     
-    self.write("get %s\n" % key)
+    self.write("%s %s\n" % (cmd, key))
     self.flush()
 
     #print "waiting for resp line"
@@ -5525,12 +5555,25 @@ stasher.logToSocket = 19199
     self.connect()
     self.close()
 </t>
-<t tx="aum.20040814002236">def put(self, key, val):
+<t tx="aum.20040814002236">def put(self, key, val, **kw):
     """
     Tells remote stasher port to insert a file into the network
+
+    Arguments:
+        - key - key to insert under
+        - val - value to insert under this key
+    
+    Keywords:
+        - local - default False - if True, only looks in local storage
+    
     """
+    if kw.get('local', False):
+        cmd = 'putlocal'
+    else:
+        cmd = 'put'
+
     self.connect()
-    self.write("put %s\n" % key)
+    self.write("%s %s\n" % (cmd, key))
     self.write("%s\n" % len(val))
     self.write(val)
     self.flush()

@@ -2753,8 +2753,9 @@ class KNodeReqHandler(KBase, SocketServer.StreamRequestHandler):
     
         self.log(3, "cmd=%s args=%s" % (repr(cmd), repr(args)))
         
-        if cmd == "get":
-            value = node.get(args)
+        if cmd in ["get", "getlocal"]:
+            isLocal = cmd == "getlocal"
+            value = node.get(args, local=isLocal)
             if value == None:
                 write("notfound\n")
             else:
@@ -2764,11 +2765,12 @@ class KNodeReqHandler(KBase, SocketServer.StreamRequestHandler):
             finish()
             return
         
-        elif cmd == "put":
+        elif cmd in ["put", "putlocal"]:
+            isLocal = cmd == "putlocal"
             try:
                 size = int(readline())
                 value = read(size)
-                res = node.put(args, value)
+                res = node.put(args, value, local=isLocal)
                 if res:
                     write("ok\n")
                 else:
@@ -2884,14 +2886,27 @@ class KNodeClient(KBase):
     
     #@-node:close
     #@+node:get
-    def get(self, key):
+    def get(self, key, **kw):
         """
         sends a get command to stasher socket, and retrieves
         and interprets result
+        
+        Arguments:
+            - key - key to retrieve
+        
+        Keywords:
+            - local - default False - if True, only looks in local storage
+        
+        Returns key's value if found, or None if key not found
         """
+        if kw.get('local', False):
+            cmd = 'getlocal'
+        else:
+            cmd = 'get'
+    
         self.connect()
         
-        self.write("get %s\n" % key)
+        self.write("%s %s\n" % (cmd, key))
         self.flush()
     
         #print "waiting for resp line"
@@ -2908,12 +2923,25 @@ class KNodeClient(KBase):
     
     #@-node:get
     #@+node:put
-    def put(self, key, val):
+    def put(self, key, val, **kw):
         """
         Tells remote stasher port to insert a file into the network
+    
+        Arguments:
+            - key - key to insert under
+            - val - value to insert under this key
+        
+        Keywords:
+            - local - default False - if True, only looks in local storage
+        
         """
+        if kw.get('local', False):
+            cmd = 'putlocal'
+        else:
+            cmd = 'put'
+    
         self.connect()
-        self.write("put %s\n" % key)
+        self.write("%s %s\n" % (cmd, key))
         self.write("%s\n" % len(val))
         self.write(val)
         self.flush()
@@ -3219,6 +3247,10 @@ class KNode(KBase):
                 - a KHash object
                 - a raw string which will be hashed into a KHash object
             - val - a string, the value associated with the key
+    
+        Keywords:
+            - local - default False - if True, limits the insert to the
+              local node
     
         If the value is larger than L{maxValueSize}, a L{KValueTooLarge}
         exception will occur.
@@ -4035,6 +4067,8 @@ def usage(detailed=False, ret=0):
     print "                            default is ~/.stasher"
     print "  -f, --foreground        - only valid for 'start' cmd - runs the node"
     print "                            in foreground without spawning - for debugging"
+    print "  -l, --localonly         - only valid for get/put - restricts the get/put"
+    print "                            operation to the local node only"
     print
     print "Commands:"
     print "  start [<nodename>]"
@@ -4067,7 +4101,6 @@ def usage(detailed=False, ret=0):
 
     sys.exit(0)
 
-
 #@-node:usage
 #@+node:err
 def err(msg):
@@ -4085,10 +4118,10 @@ def main():
 
     try:
         opts, args = getopt.getopt(sys.argv[1:],
-                                   "h?vV:S:C:sd:f",
+                                   "h?vV:S:C:sd:fl",
                                    ['help', 'version', 'samaddr=', 'clientaddr=',
                                     'verbosity=', 'status', 'datadir=', 'foreground',
-                                    'shortversion',
+                                    'shortversion', 'localonly',
                                     ])
     except:
         traceback.print_exc(file=sys.stdout)
@@ -4098,6 +4131,7 @@ def main():
     verbosity = 2
     debug = False
     foreground = False
+    localOnly = False
 
     for opt, val in opts:
         
@@ -4130,6 +4164,9 @@ def main():
             sys.stdout.write("%s" % version)
             sys.stdout.flush()
             sys.exit(0)
+
+        elif opt in ['-l', '--localonly']:
+            localOnly = True
 
     #print "Debug - bailing"
     #print repr(opts)
@@ -4256,7 +4293,10 @@ def main():
         else:
             outfile = sys.stdout
 
-        res = client.get(key)
+        if logVerbosity >= 3:
+            sys.stderr.write("Searching for key - may take up to %s seconds or more\n" % (
+                timeout['findData']))
+        res = client.get(key, local=localOnly)
         if res == None:
             err("Failed to retrieve '%s'" % key)
             sys.exit(1)
@@ -4288,7 +4328,10 @@ def main():
         if len(val) > maxValueSize:
             err("File is too big - please trim to %s" % maxValueSize)
 
-        res = client.put(key, val)
+        if logVerbosity >= 3:
+            sys.stderr.write("Inserting key - may take up to %s seconds\n" % (
+                timeout['findNode'] + timeout['store']))
+        res = client.put(key, val, local=localOnly)
         if res == None:
             err("Failed to insert '%s'" % key)
             sys.exit(1)
