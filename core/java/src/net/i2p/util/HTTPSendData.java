@@ -50,7 +50,7 @@ public class HTTPSendData {
             con.setRequestProperty("Content-length", "" + length);
 
             OutputStream out = con.getOutputStream();
-            byte buf[] = new byte[64 * 1024];
+            byte buf[] = new byte[1 * 1024];
             int read;
             long sent = 0;
             GZIPOutputStream zipOut = new GZIPOutputStream(out);
@@ -79,7 +79,7 @@ public class HTTPSendData {
         for (int i = 0; i < data.length; i++)
             data[i] = (byte) ((i % 26) + 'a');
 
-        boolean sent = HTTPSendData.postData("http://i2p.dnsalias.net/cgi-bin/submitMessageHistory", data.length,
+        boolean sent = HTTPSendData.postData("http://dev.i2p.net/cgi-bin/submitMessageHistory", data.length,
                                              new ByteArrayInputStream(data));
         _log.debug("Sent? " + sent);
         try {
