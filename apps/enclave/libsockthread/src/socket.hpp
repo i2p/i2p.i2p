@@ -39,10 +39,15 @@ namespace Libsockthread {
 			void func(void);
 		private:
 #ifdef WINSOCK
+			typedef SOCKET socket_t;
+
 			void winsock_cleanup(void);
 			void winsock_startup(void);  // throws Socket_error
 			const char* winsock_strerror(int code);
+#else
+			typedef int socket_t;
 #endif
+			socket_t sock;
 	};
 
 	class Socket_error : public runtime_error {

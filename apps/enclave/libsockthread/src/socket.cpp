@@ -41,6 +41,14 @@ Socket::Socket(int type)
 #ifdef WINSOCK
 	winsock_startup();
 #endif
+	sock = socket(PF_INET, type, 0);
+#ifdef WINSOCK
+	if (sock == INVALID_SOCKET)
+		throw Socket_error(sam_winsock_strerror(WSAGetLastError()));
+#else
+	if (sock == -1)
+		throw Socket_error(strerror(errno));
+#endif
 }
 
 #ifdef WINSOCK
@@ -62,7 +70,7 @@ void Socket::winsock_startup(void)
 	WSADATA wsaData;
 	int rc = WSAStartup(wVersionRequested, &wsaData);
 	if (rc != 0)
-		throw Socket_error("WSAStartup() failed (" + winsock_strerror(rc) +")");
+		throw Socket_error(winsock_strerror(rc));
 	if (LOBYTE(wsaData.wVersion) != 2 || HIBYTE(wsaData.wVersion) != 2) {
 		winsock_cleanup();
 		throw Socket_error("Bad Winsock version");
