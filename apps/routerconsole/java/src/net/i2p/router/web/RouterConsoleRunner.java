@@ -73,7 +73,8 @@ public class RouterConsoleRunner {
             t.printStackTrace();
         }
         
-        I2PThread t = new I2PThread(new NewsFetcher(I2PAppContext.getGlobalContext()), "NewsFetcher");
+        NewsFetcher fetcher = NewsFetcher.getInstance(I2PAppContext.getGlobalContext());
+        I2PThread t = new I2PThread(fetcher, "NewsFetcher");
         t.setDaemon(true);
         t.start();
     }

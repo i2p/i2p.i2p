@@ -24,12 +24,18 @@ public class NewsFetcher implements Runnable, EepGet.StatusListener {
     private boolean _updateAvailable;
     private long _lastFetch;
     private static NewsFetcher _instance;
-    public static final NewsFetcher getInstance() { return _instance; }
+    //public static final synchronized NewsFetcher getInstance() { return _instance; }
+    public static final synchronized NewsFetcher getInstance(I2PAppContext ctx) { 
+        if (_instance != null)
+            return _instance;
+        _instance = new NewsFetcher(ctx);
+        return _instance;
+    }
     
     private static final String NEWS_FILE = "docs/news.xml";
     private static final String TEMP_NEWS_FILE = "docs/news.xml.temp";
     
-    public NewsFetcher(I2PAppContext ctx) {
+    private NewsFetcher(I2PAppContext ctx) {
         _context = ctx;
         _log = ctx.logManager().getLog(NewsFetcher.class);
         _instance = this;

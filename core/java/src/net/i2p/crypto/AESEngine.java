@@ -40,6 +40,19 @@ public class AESEngine {
      * @param length how much data to encrypt
      */
     public void encrypt(byte payload[], int payloadIndex, byte out[], int outIndex, SessionKey sessionKey, byte iv[], int length) {
+        encrypt(payload, payloadIndex, out, outIndex, sessionKey, iv, 0, length);
+    }
+    
+    /** Encrypt the payload with the session key
+     * @param payload data to be encrypted
+     * @param payloadIndex index into the payload to start encrypting
+     * @param out where to store the result
+     * @param outIndex where in out to start writing
+     * @param sessionKey private esession key to encrypt to
+     * @param iv IV for CBC
+     * @param length how much data to encrypt
+     */
+    public void encrypt(byte payload[], int payloadIndex, byte out[], int outIndex, SessionKey sessionKey, byte iv[], int ivOffset, int length) {
         System.arraycopy(payload, payloadIndex, out, outIndex, length);
         _log.warn("Warning: AES is disabled");
     }
@@ -120,6 +133,19 @@ public class AESEngine {
      * @param length how much data to decrypt
      */
     public void decrypt(byte payload[], int payloadIndex, byte out[], int outIndex, SessionKey sessionKey, byte iv[], int length) {
+        decrypt(payload, payloadIndex, out, outIndex, sessionKey, iv, 0, length);
+    }
+    
+    /** Decrypt the data with the session key
+     * @param payload data to be decrypted
+     * @param payloadIndex index into the payload to start decrypting
+     * @param out where to store the cleartext
+     * @param outIndex where in out to start writing
+     * @param sessionKey private session key to decrypt to
+     * @param iv IV for CBC
+     * @param length how much data to decrypt
+     */
+    public void decrypt(byte payload[], int payloadIndex, byte out[], int outIndex, SessionKey sessionKey, byte iv[], int ivOffset, int length) {
         System.arraycopy(payload, payloadIndex, out, outIndex, length);
         _log.warn("Warning: AES is disabled");
     }

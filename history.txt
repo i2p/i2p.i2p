@@ -1,4 +1,15 @@
-$Id: history.txt,v 1.185 2005/04/01 08:29:27 jrandom Exp $
+$Id: history.txt,v 1.186 2005/04/03 07:50:12 jrandom Exp $
+
+2005-04-05  jrandom
+    * After a successfull netDb search for a leaseSet, republish it to all of 
+      the peers we have tried so far who did not give us the key (up to 10),
+      rather than the old K closest (which may include peers who had given us
+      the key)
+    * Don't wait 5 minutes to publish a leaseSet (duh!), and rather than 
+      republish it every 5 minutes, republish it every 3.  In addition, always
+      republish as soon as the leaseSet changes (duh^2).
+    * Minor fix for oddball startup race (thanks travis_bickle!)
+    * Minor AES update to allow in-place decryption.
 
 2005-04-03  jrandom
     * EepGet fix for open-ended HTTP fetches (such as the news.xml 

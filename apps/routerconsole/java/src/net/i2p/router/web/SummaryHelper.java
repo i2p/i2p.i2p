@@ -469,6 +469,6 @@ public class SummaryHelper {
     }
     
     public boolean updateAvailable() { 
-        return NewsFetcher.getInstance().updateAvailable();
+        return NewsFetcher.getInstance(_context).updateAvailable();
     }
 }

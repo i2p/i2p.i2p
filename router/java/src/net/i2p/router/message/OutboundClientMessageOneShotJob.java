@@ -289,8 +289,8 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
             }
             
             if (!_finished) {
-                if (_log.shouldLog(Log.ERROR))
-                    _log.error("Unable to send to " + _toString + " because we couldn't find their leaseSet");
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("Unable to send to " + _toString + " because we couldn't find their leaseSet");
             }
 
             dieFatal();

@@ -12,8 +12,10 @@ package net.i2p.crypto;
 import java.security.InvalidKeyException;
 
 import net.i2p.I2PAppContext;
+import net.i2p.data.ByteArray;
 import net.i2p.data.DataHelper;
 import net.i2p.data.SessionKey;
+import net.i2p.util.ByteCache;
 import net.i2p.util.Log;
 
 /** 
@@ -31,14 +33,20 @@ public class CryptixAESEngine extends AESEngine {
     private final static byte FAKE_KEY = 0x2A;
     private CryptixAESKeyCache _cache;
     
+    private static final ByteCache _prevCache = ByteCache.getInstance(16, 16);
+    
     public CryptixAESEngine(I2PAppContext context) {
         super(context);
         _log = context.logManager().getLog(CryptixAESEngine.class);
         _cache = new CryptixAESKeyCache();
     }
-    
+
     public void encrypt(byte payload[], int payloadIndex, byte out[], int outIndex, SessionKey sessionKey, byte iv[], int length) {
-        if ( (payload == null) || (out == null) || (sessionKey == null) || (iv == null) || (iv.length != 16) ) 
+        encrypt(payload, payloadIndex, out, outIndex, sessionKey, iv, 0, length);
+    }
+    
+    public void encrypt(byte payload[], int payloadIndex, byte out[], int outIndex, SessionKey sessionKey, byte iv[], int ivOffset, int length) {
+        if ( (payload == null) || (out == null) || (sessionKey == null) || (iv == null) ) 
             throw new NullPointerException("invalid args to aes");
         if (payload.length < payloadIndex + length)
             throw new IllegalArgumentException("Payload is too short");
@@ -57,7 +65,7 @@ public class CryptixAESEngine extends AESEngine {
 
         int numblock = length / 16;
         
-        DataHelper.xor(iv, 0, payload, payloadIndex, out, outIndex, 16);
+        DataHelper.xor(iv, ivOffset, payload, payloadIndex, out, outIndex, 16);
         encryptBlock(out, outIndex, sessionKey, out, outIndex);
         for (int x = 1; x < numblock; x++) {
             DataHelper.xor(out, outIndex + (x-1) * 16, payload, payloadIndex + x * 16, out, outIndex + x * 16, 16);
@@ -66,8 +74,10 @@ public class CryptixAESEngine extends AESEngine {
     }
 
     public void decrypt(byte payload[], int payloadIndex, byte out[], int outIndex, SessionKey sessionKey, byte iv[], int length) {
-        if ((iv== null) || (payload == null) || (payload.length <= 0) || (sessionKey == null)
-            || (iv.length != 16) ) 
+        decrypt(payload, payloadIndex, out, outIndex, sessionKey, iv, 0, length);
+    }
+    public void decrypt(byte payload[], int payloadIndex, byte out[], int outIndex, SessionKey sessionKey, byte iv[], int ivOffset, int length) {
+        if ((iv== null) || (payload == null) || (payload.length <= 0) || (sessionKey == null) ) 
             throw new IllegalArgumentException("bad setup");
         else if (out == null)
             throw new IllegalArgumentException("out is null");
@@ -84,12 +94,32 @@ public class CryptixAESEngine extends AESEngine {
         int numblock = length / 16;
         if (length % 16 != 0) numblock++;
 
+        ByteArray prevA = _prevCache.acquire();
+        byte prev[] = prevA.getData();
+        ByteArray curA = _prevCache.acquire();
+        byte cur[] = curA.getData();
+        System.arraycopy(iv, ivOffset, prev, 0, 16);
+        
+        for (int x = 0; x < numblock; x++) {
+            System.arraycopy(payload, payloadIndex + (x * 16), cur, 0, 16);
+            decryptBlock(payload, payloadIndex + (x * 16), sessionKey, out, outIndex + (x * 16));
+            DataHelper.xor(out, outIndex + x * 16, prev, 0, out, outIndex + x * 16, 16);
+            iv = prev; // just use IV to switch 'em around
+            prev = cur;
+            cur = iv;
+        }
+        
+        /*
         decryptBlock(payload, payloadIndex, sessionKey, out, outIndex);
         DataHelper.xor(out, outIndex, iv, 0, out, outIndex, 16);
         for (int x = 1; x < numblock; x++) {
             decryptBlock(payload, payloadIndex + (x * 16), sessionKey, out, outIndex + (x * 16));
             DataHelper.xor(out, outIndex + x * 16, payload, payloadIndex + (x - 1) * 16, out, outIndex + x * 16, 16);
         }
+         */
+        
+        _prevCache.release(prevA);
+        _prevCache.release(curA);
     }
 
     public final void encryptBlock(byte payload[], int inIndex, SessionKey sessionKey, byte out[], int outIndex) {

@@ -65,9 +65,18 @@ public class HMACSHA256Generator {
     public Hash calculate(SessionKey key, byte data[]) {
         if ((key == null) || (key.getData() == null) || (data == null))
             throw new NullPointerException("Null arguments for HMAC");
+        return calculate(key, data, 0, data.length);
+    }
+    
+    /**
+     * Calculate the HMAC of the data with the given key
+     */
+    public Hash calculate(SessionKey key, byte data[], int offset, int length) {
+        if ((key == null) || (key.getData() == null) || (data == null))
+            throw new NullPointerException("Null arguments for HMAC");
         
-        Buffer buf = new Buffer(data.length);
-        calculate(key, data, buf);
+        Buffer buf = new Buffer(length);
+        calculate(key, data, offset, length, buf);
         Hash rv = new Hash(buf.rv);
         buf.releaseCached();
         return rv;
@@ -77,10 +86,17 @@ public class HMACSHA256Generator {
      * Calculate the HMAC of the data with the given key
      */
     public void calculate(SessionKey key, byte data[], Buffer buf) {
+        calculate(key, data, 0, data.length, buf);
+    }
+    
+    /**
+     * Calculate the HMAC of the data with the given key
+     */
+    public void calculate(SessionKey key, byte data[], int offset, int length, Buffer buf) {
         // inner hash
         padKey(key.getData(), _IPAD, buf.padded);
         System.arraycopy(buf.padded, 0, buf.innerBuf, 0, PAD_LENGTH);
-        System.arraycopy(data, 0, buf.innerBuf, PAD_LENGTH, data.length);
+        System.arraycopy(data, offset, buf.innerBuf, PAD_LENGTH, length);
         
         Hash h = _context.sha().calculateHash(buf.innerBuf, buf.innerEntry);
         

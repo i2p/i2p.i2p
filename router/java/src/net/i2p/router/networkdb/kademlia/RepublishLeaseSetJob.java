@@ -22,7 +22,7 @@ import net.i2p.util.Log;
  */
 public class RepublishLeaseSetJob extends JobImpl {
     private Log _log;
-    private final static long REPUBLISH_LEASESET_DELAY = 5*60*1000; // 5 mins
+    private final static long REPUBLISH_LEASESET_DELAY = 3*60*1000; // 3 mins
     private final static long REPUBLISH_LEASESET_TIMEOUT = 60*1000;
     private Hash _dest;
     private KademliaNetworkDatabaseFacade _facade;
@@ -32,7 +32,7 @@ public class RepublishLeaseSetJob extends JobImpl {
         _log = ctx.logManager().getLog(RepublishLeaseSetJob.class);
         _facade = facade;
         _dest = destHash;
-        getTiming().setStartAfter(ctx.clock().now()+REPUBLISH_LEASESET_DELAY);
+        //getTiming().setStartAfter(ctx.clock().now()+REPUBLISH_LEASESET_DELAY);
     }
     public String getName() { return "Republish a local leaseSet"; }
     public void runJob() {
@@ -40,23 +40,29 @@ public class RepublishLeaseSetJob extends JobImpl {
             if (getContext().clientManager().isLocal(_dest)) {
                 LeaseSet ls = _facade.lookupLeaseSetLocally(_dest);
                 if (ls != null) {
-                    _log.warn("Client " + _dest + " is local, so we're republishing it");
+                    if (_log.shouldLog(Log.INFO))
+                        _log.info("Client " + _dest + " is local, so we're republishing it");
                     if (!ls.isCurrent(Router.CLOCK_FUDGE_FACTOR)) {
-                        _log.warn("Not publishing a LOCAL lease that isn't current - " + _dest, new Exception("Publish expired LOCAL lease?"));
+                        if (_log.shouldLog(Log.WARN))
+                            _log.warn("Not publishing a LOCAL lease that isn't current - " + _dest, new Exception("Publish expired LOCAL lease?"));
                     } else {
                         getContext().jobQueue().addJob(new StoreJob(getContext(), _facade, _dest, ls, new OnSuccess(getContext()), new OnFailure(getContext()), REPUBLISH_LEASESET_TIMEOUT));
                     }
                 } else {
-                    _log.warn("Client " + _dest + " is local, but we can't find a valid LeaseSet?  perhaps its being rebuilt?");
+                    if (_log.shouldLog(Log.WARN))
+                        _log.warn("Client " + _dest + " is local, but we can't find a valid LeaseSet?  perhaps its being rebuilt?");
                 }
-                requeue(REPUBLISH_LEASESET_DELAY);
+                long republishDelay = getContext().random().nextLong(2*REPUBLISH_LEASESET_DELAY);
+                requeue(republishDelay);
                 return;
             } else {
-                _log.info("Client " + _dest + " is no longer local, so no more republishing their leaseSet");
+                if (_log.shouldLog(Log.INFO))
+                    _log.info("Client " + _dest + " is no longer local, so no more republishing their leaseSet");
             }                
             _facade.stopPublishing(_dest);
         } catch (RuntimeException re) {
-            _log.error("Uncaught error republishing the leaseSet", re);
+            if (_log.shouldLog(Log.ERROR))
+                _log.error("Uncaught error republishing the leaseSet", re);
             _facade.stopPublishing(_dest);
             throw re;
         }

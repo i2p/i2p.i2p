@@ -65,12 +65,12 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
     private PeerSelector _peerSelector;
     private RouterContext _context;
     /** 
-     * set of Hash objects of leases we're already managing (via RepublishLeaseSetJob).
+     * Map of Hash to RepublishLeaseSetJob for leases we'realready managing.
      * This is added to when we create a new RepublishLeaseSetJob, and the values are 
      * removed when the job decides to stop running.
      *
      */
-    private Set _publishingLeaseSets;   
+    private Map _publishingLeaseSets;   
     
     /** 
      * Hash of the key currently being searched for, pointing the SearchJob that
@@ -126,7 +126,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         _log = _context.logManager().getLog(KademliaNetworkDatabaseFacade.class);
         _initialized = false;
         _peerSelector = new PeerSelector(_context);
-        _publishingLeaseSets = new HashSet(8);
+        _publishingLeaseSets = new HashMap(8);
         _lastExploreNew = 0;
         _knownRouters = 0;
         _activeRequests = new HashMap(8);
@@ -440,14 +440,16 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         synchronized (_explicitSendKeys) {
             _explicitSendKeys.add(h);
         }
-        Job j = null;
+        RepublishLeaseSetJob j = null;
         synchronized (_publishingLeaseSets) {
-            boolean isNew = _publishingLeaseSets.add(h);
-            if (isNew)
+            j = (RepublishLeaseSetJob)_publishingLeaseSets.get(h);
+            if (j == null) {
                 j = new RepublishLeaseSetJob(_context, this, h);
+                _publishingLeaseSets.put(h, j);
+            }
         }
-        if (j != null)
-            _context.jobQueue().addJob(j);
+        j.getTiming().setStartAfter(_context.clock().now());
+        _context.jobQueue().addJob(j);
     }
     
     void stopPublishing(Hash target) {

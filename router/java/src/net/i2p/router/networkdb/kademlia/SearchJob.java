@@ -16,10 +16,12 @@ import java.util.Set;
 import net.i2p.data.DataHelper;
 import net.i2p.data.DataStructure;
 import net.i2p.data.Hash;
+import net.i2p.data.LeaseSet;
 import net.i2p.data.RouterInfo;
 import net.i2p.data.TunnelId;
 import net.i2p.data.i2np.DatabaseLookupMessage;
 import net.i2p.data.i2np.DatabaseSearchReplyMessage;
+import net.i2p.data.i2np.DatabaseStoreMessage;
 import net.i2p.router.Job;
 import net.i2p.router.JobImpl;
 import net.i2p.router.RouterContext;
@@ -97,6 +99,7 @@ class SearchJob extends JobImpl {
         getContext().statManager().createRateStat("netDb.searchReplyValidated", "How many search replies we get that we are able to validate (fetch)", "NetworkDatabase", new long[] { 5*60*1000l, 10*60*1000l, 60*60*1000l, 3*60*60*1000l, 24*60*60*1000l });
         getContext().statManager().createRateStat("netDb.searchReplyNotValidated", "How many search replies we get that we are NOT able to validate (fetch)", "NetworkDatabase", new long[] { 5*60*1000l, 10*60*1000l, 60*60*1000l, 3*60*60*1000l, 24*60*60*1000l });
         getContext().statManager().createRateStat("netDb.searchReplyValidationSkipped", "How many search replies we get from unreliable peers that we skip?", "NetworkDatabase", new long[] { 5*60*1000l, 10*60*1000l, 60*60*1000l, 3*60*60*1000l, 24*60*60*1000l });
+        getContext().statManager().createRateStat("netDb.republishQuantity", "How many peers do we need to send a found leaseSet to?", "NetworkDatabase", new long[] { 10*60*1000l, 60*60*1000l, 3*60*60*1000l, 24*60*60*1000l });
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Search (" + getClass().getName() + " for " + key.toBase64(), new Exception("Search enqueued by"));
     }
@@ -587,18 +590,69 @@ class SearchJob extends JobImpl {
     }
     
     /**
+     * After a successful search for a leaseSet, we resend that leaseSet to all
+     * of the peers we tried and failed to query.  This var bounds how many of
+     * those peers will get the data, in case a search had to crawl about 
+     * substantially.
+     *
+     */
+    private static final int MAX_LEASE_RESEND = 10;
+    
+    /**
      * After we get the data we were searching for, rebroadcast it to the peers
      * we would query first if we were to search for it again (healing the network).
      *
      */
     private void resend() {
         DataStructure ds = _facade.lookupLeaseSetLocally(_state.getTarget());
-        if (ds == null)
+        if (ds == null) {
             ds = _facade.lookupRouterInfoLocally(_state.getTarget());
-        if (ds != null)
-            getContext().jobQueue().addJob(new StoreJob(getContext(), _facade, _state.getTarget(), 
-                                                    ds, null, null, RESEND_TIMEOUT,
-                                                    _state.getSuccessful()));
+            if (ds != null)
+                getContext().jobQueue().addJob(new StoreJob(getContext(), _facade, _state.getTarget(), 
+                                                            ds, null, null, RESEND_TIMEOUT,
+                                                            _state.getSuccessful()));
+        } else {
+            Set sendTo = _state.getFailed();
+            sendTo.addAll(_state.getPending());
+            int numSent = 0;
+            for (Iterator iter = sendTo.iterator(); iter.hasNext(); ) {
+                Hash peer = (Hash)iter.next();
+                RouterInfo peerInfo = _facade.lookupRouterInfoLocally(peer);
+                if (peerInfo == null) continue;
+                if (resend(peerInfo, (LeaseSet)ds))
+                    numSent++;
+                if (numSent >= MAX_LEASE_RESEND)
+                    break;
+            }
+            getContext().statManager().addRateData("netDb.republishQuantity", numSent, numSent);
+        }
+    }
+
+    /**
+     * Resend the leaseSet to the peer who had previously failed to 
+     * provide us with the data when we asked them.  
+     */
+    private boolean resend(RouterInfo toPeer, LeaseSet ls) {
+        DatabaseStoreMessage msg = new DatabaseStoreMessage(getContext());
+        msg.setKey(ls.getDestination().calculateHash());
+        msg.setLeaseSet(ls);
+        msg.setMessageExpiration(getContext().clock().now() + RESEND_TIMEOUT);
+
+        TunnelInfo outTunnel = getContext().tunnelManager().selectOutboundTunnel();
+
+        if (outTunnel != null) {
+            TunnelId targetTunnelId = null; // not needed
+            Job onSend = null; // not wanted
+            
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("resending leaseSet out to " + toPeer.getIdentity().getHash() + " through " + outTunnel + ": " + msg);
+            getContext().tunnelDispatcher().dispatchOutbound(msg, outTunnel.getSendTunnelId(0), null, toPeer.getIdentity().getHash());
+            return true;
+        } else {
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("unable to resend a leaseSet - no outbound exploratory tunnels!");
+            return false;
+        }
     }
 
     /**

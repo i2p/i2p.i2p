@@ -267,8 +267,11 @@ public class TunnelPoolManager implements TunnelManagerFacade {
      */
     int allocateBuilds(int wanted) {
         synchronized (this) {
-            if (_outstandingBuilds >= _maxOutstandingBuilds)
-                return 0;
+            if (_outstandingBuilds >= _maxOutstandingBuilds) {
+                // ok, as a failsafe, always let one through
+                _outstandingBuilds++;
+                return 1;
+            }
             if (_outstandingBuilds + wanted < _maxOutstandingBuilds) {
                 _outstandingBuilds += wanted;
                 return wanted;
