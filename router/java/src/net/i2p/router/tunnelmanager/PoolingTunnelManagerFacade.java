@@ -202,6 +202,10 @@ public class PoolingTunnelManagerFacade implements TunnelManagerFacade {
         return false;
     }
     
+    public int getParticipatingCount() {
+        return _pool.getParticipatingTunnelCount();
+    }
+    
     /**
      * Aint she pretty?
      *

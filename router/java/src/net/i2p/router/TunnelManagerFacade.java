@@ -60,4 +60,7 @@ public interface TunnelManagerFacade extends Service {
      *
      */
     boolean isInUse(Hash peer);
+    
+    /** how many tunnels are we participating in? */
+    public int getParticipatingCount();
 }
