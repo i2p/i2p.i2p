@@ -9,6 +9,7 @@
         <echo message="  dist:      distclean, then build and javadoc" />
         <echo message="  prepGUI:   pull the LGPL and APL code for JFreeChart that we use in the GUIs" />
         <echo message="  buildGUI:  build the heartbeat and netmonitor GUIs (must have run prepGUI already)" />
+        <echo message="  buildWEB:  build the Jetty instance and router console web application" />
     </target>
     <target name="dist" depends="distclean, build, javadoc" />
     <target name="build" depends="builddep, jar" />
@@ -107,5 +108,21 @@
         <echo message="jfreechart-0.9.17.jar log4j-1.2.8.jar jcommon-0.9.2.jar" />
         <echo message="To run the netmonitor GUI: java -cp jfreechart-0.9.17.jar:log4j-1.2.8.jar:jcommon-0.9.2.jar -jar netviewer.jar" />
         <echo message="To run the heartbeat GUI: java -cp jfreechart-0.9.17.jar:log4j-1.2.8.jar:jcommon-0.9.2.jar -jar heartbeatGUI.jar" />
+    </target>
+    <target name="buildWEB">
+        <ant dir="apps/routerconsole/java" target="build" />
+        <copy file="apps/routerconsole/java/build/routerconsole.jar" todir="build/" />
+        <copy file="apps/routerconsole/java/build/routerconsole.war" todir="build/" />
+        <copy file="apps/routerconsole/java/jetty-4.2.21-min/extra/lib/org.mortbay.jetty-jdk1.2.jar" todir="build/" />
+        <copy file="apps/routerconsole/java/jetty-4.2.21-min/ext/ant.jar" todir="build/" />
+        <copy file="apps/routerconsole/java/jetty-4.2.21-min/ext/jasper-compiler.jar" todir="build/" />
+        <copy file="apps/routerconsole/java/jetty-4.2.21-min/ext/jasper-runtime.jar" todir="build/" />
+        <copy file="apps/routerconsole/java/jetty-4.2.21-min/ext/jcert.jar" todir="build/" />
+        <copy file="apps/routerconsole/java/jetty-4.2.21-min/ext/jnet.jar" todir="build/" />
+        <copy file="apps/routerconsole/java/jetty-4.2.21-min/ext/xercesImpl.jar" todir="build/" />
+        <copy file="apps/routerconsole/java/jetty-4.2.21-min/ext/xml-apis.jar" todir="build/" />
+        <copy file="apps/routerconsole/java/jetty-4.2.21-min/ext/javax.servlet.jar" todir="build/" />
+        <echo message="You will need the org.*, ant.jar, jasper-*.jar, jcert.jar, jnet.jar, xerces.jar, xml-apis.jar, and routerconsole.jar in your router's classpath" />
+        <echo message="In addition, you will need to place the routerconsole.war file under your i2p install dir as webapps/routerconsole.war" />
     </target>
 </project>
