@@ -28,12 +28,12 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <cassert>
 #include <cstdarg>
 #include <cstdio>
 #include <iostream>
 #include <string>
 using namespace std;
+#include "mutex.hpp"
 #include "time.hpp"
 #include "logger.hpp"
 using namespace Libsockthread;
@@ -91,19 +91,27 @@ void Logger::log(priority_t priority, const char* format, ...)
 	string s;
 	Time t;
 	logger_m.lock();
-	assert(logf != 0);
 
-	fprintf(logf, "%c@%s: ", ll, t.utc(s).c_str());
-	vfprintf(logf, format, ap);
-	fputc('\n', logf);
+	if (logf != 0) {
+		/*
+		 * Remember!  If you change the format here, change it in the else too
+		 */
+		fprintf(logf, "%c %s ", ll, t.utc(s).c_str());
+		vfprintf(logf, format, ap);
+		fputc('\n', logf);
+		if (fflush(logf) == EOF) {
+			cerr_m.lock();
+			cerr << "fflush() failed: " << strerror(errno) << '\n';
+			cerr_m.unlock();
+		}
+	} else {
+		// if they don't have an open log file, just use stderr
+		fprintf(stderr, "%c %s ", ll, t.utc(s).c_str());
+		vfprintf(stderr, format, ap);
+		fputc('\n', stderr);
+	}
 
 	va_end(ap);
-
-	if (fflush(logf) == EOF) {
-		cerr_m.lock();
-		cerr << "fflush() failed: " << strerror(errno) << '\n';
-		cerr_m.unlock();
-	}
 	logger_m.unlock();
 
 	return;
@@ -115,16 +123,40 @@ void Logger::log(priority_t priority, const char* format, ...)
  *
  * file - file location to open
  */
-void Logger::open(const string& file)
+bool Logger::open(const string& file)
 {
 	close();
 	logger_m.lock();
 	logf = fopen(file.c_str(), "a");
 	logger_m.unlock();
-	if (logf == NULL) {
+	if (logf != NULL) {
+		return true;
+	} else {
 		cerr_m.lock();
 		cerr << "fopen() failed (" << file << "): " << strerror(errno) << '\n';
 		cerr_m.unlock();
-		throw Logger_error("Error opening log file");
+		return false;
 	}
 }
+
+#ifdef UNIT_TEST
+// g++ -Wall -c thread.cpp -o thread.o
+// g++ -Wall -c mutex.cpp -o mutex.o
+// g++ -Wall -c time.cpp -o time.o
+// g++ -Wall -DUNIT_TEST -c logger.cpp -o logger.o
+// g++ -Wall -DUNIT_TEST logger.o mutex.o thread.o time.o -o logger -lpthread
+int main(void)
+{
+	Logger logger;
+
+	logger.open("delete.me");
+	logger.set_loglevel(Logger::MINOR);
+	logger.close();
+	LWARNS("This should appear on stderr");
+	logger.open("delete.me.also");
+	LINFO("%s\n", "hey it works");
+	LDEBUGS("This shouldn't be saved in the file.");
+
+	return 0;
+}
+#endif  // UNIT_TEST

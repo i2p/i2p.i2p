@@ -31,6 +31,41 @@
 #ifndef LIBSOCKTHREAD_LOGGER_HPP
 #define LIBSOCKTHREAD_LOGGER_HPP
 
+/*
+ * Some helpful macros:
+ *
+ * LDEBUG - debugging messages
+ * LMINOR - unimportant messages
+ * LINFO - informational messages
+ * LWARN - errors we automatically recover from
+ * LERROR - major, important errors
+ *
+ * Obviously, these only work if your Logger object is called "logger" and is
+ * global
+ */
+// Prints out the file name, function name, and line number before the message
+#define LDEBUG(format, ...) logger.log(Logger::DEBUG, "%s:%s:%d:" \
+	format, __FILE__, __func__, __LINE__, __VA_ARGS__)
+// This is the same as above, except it doesn't accept varargs
+#define LDEBUGS(str) logger.log(Logger::DEBUG, "%s:%s:%d:" \
+	str, __FILE__, __func__, __LINE__);
+#define LMINOR(format, ...) logger.log(Logger::MINOR, "%s:%s:%d:" \
+	format, __FILE__, __func__, __LINE__, __VA_ARGS__)
+#define LMINORS(str) logger.log(Logger::MINOR, "%s:%s:%d:" \
+	str, __FILE__, __func__, __LINE__);
+#define LINFO(format, ...) logger.log(Logger::INFO, "%s:%s:%d:" \
+	format, __FILE__, __func__, __LINE__, __VA_ARGS__)
+#define LINFOS(str) logger.log(Logger::INFO, "%s:%s:%d:" \
+	str, __FILE__, __func__, __LINE__);
+#define LWARN(format, ...) logger.log(Logger::WARN, "%s:%s:%d:" \
+	format, __FILE__, __func__, __LINE__, __VA_ARGS__)
+#define LWARNS(str) logger.log(Logger::WARN, "%s:%s:%d:" \
+	str, __FILE__, __func__, __LINE__);
+#define LERROR(format, ...) logger.log(Logger::ERROR, "%s:%s:%d:" \
+	format, __FILE__, __func__, __LINE__, __VA_ARGS__)
+#define LERRORS(str) logger.log(Logger::ERROR, "%s:%s:%d:" \
+	str, __FILE__, __func__, __LINE__);
+
 namespace Libsockthread {
 	class Logger {
 		public:
@@ -43,22 +78,17 @@ namespace Libsockthread {
 
 			void close(void);
 			void log(priority_t priority, const char* format, ...);
-			priority_t get_loglevel(void) const
-				{ mutex.lock(); priority_t ll = loglevel; mutex.unlock(); return ll; }
-			void open(const string& file);  // throws Logger_error
+			priority_t get_loglevel(void)
+				{ logger_m.lock(); priority_t ll = loglevel; logger_m.unlock();
+					return ll; }
+			bool open(const string& file);
 			void set_loglevel(priority_t priority)
-				{ mutex.lock(); loglevel = priority; mutex.unlock(); }
+				{ logger_m.lock(); loglevel = priority; logger_m.unlock(); }
 		private:
 			Mutex cerr_m;
 			FILE* logf;
 			priority_t loglevel;
 			Mutex logger_m;
-	};
-
-	class Logger_error : public runtime_error {
-		public:
-			Logger_error(const string& s)
-				: runtime_error(s) { }
 	};
 }
 

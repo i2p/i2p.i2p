@@ -44,7 +44,7 @@ string& Time::utc(string &s) const
 
 	tm = gmtime(&unixtime);
 	char t[21];
-	strftime(t, sizeof t, "%Y-%m-%d %H:%M:%SZ", tm);
+	strftime(t, sizeof t, "%Y-%m-%dT%H:%M:%SZ", tm);
 	return s = t;
 }
 
