@@ -438,8 +438,14 @@ public class LogManager {
         _writer.flushRecords();
     }
 
+    private static int __id = 0;
     private class ShutdownHook extends Thread {
+        private int _id;
+        public ShutdownHook() {
+            _id = ++__id;
+        }
         public void run() {
+            setName("Log " + _id + " shutdown ");
             shutdown();
         }
     }
