@@ -27,37 +27,36 @@ public class HTTPSocketHandler extends Thread {
      * @param s A socket.
      */
     public HTTPSocketHandler(HTTPListener httpl, Socket s) {
-	this.httpl = httpl;
-	this.s=s;
-	h = RootHandler.getInstance();
-	start();
+        this.httpl = httpl;
+        this.s = s;
+        h = RootHandler.getInstance();
+        start();
     }
-    
-    
+
     /* (non-Javadoc)
      * @see java.lang.Thread#run()
      */
     public void run() {
-	InputStream in = null;
-	OutputStream out = null;
-	try {
-	    in = new BufferedInputStream(s.getInputStream());
-	    out = new BufferedOutputStream(s.getOutputStream());
-	    Request req = new Request(in);
-	    h.handle(req, httpl, out);
-	} catch (IOException ex) {
-	    _log.error("Error while handling data", ex);
-	} finally {
-	    try {
-		if (in != null) in.close();
-		if (out != null) {
-		    out.flush();
-		    out.close();
-		}
-		s.close();
-	    } catch (IOException ex) {
-		_log.error("IOException in finalizer", ex);
-	    }
-	}
+        InputStream in = null;
+        OutputStream out = null;
+        try {
+            in = new BufferedInputStream(s.getInputStream());
+            out = new BufferedOutputStream(s.getOutputStream());
+            Request req = new Request(in);
+            h.handle(req, httpl, out);
+        } catch (IOException ex) {
+            _log.error("Error while handling data", ex);
+        } finally {
+            try {
+                if (in != null) in.close();
+                if (out != null) {
+                    out.flush();
+                    out.close();
+                }
+                s.close();
+            } catch (IOException ex) {
+                _log.error("IOException in finalizer", ex);
+            }
+        }
     }
 }

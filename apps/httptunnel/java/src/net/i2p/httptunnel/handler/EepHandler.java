@@ -1,4 +1,5 @@
 package net.i2p.httptunnel.handler;
+
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.IOException;
@@ -26,11 +27,11 @@ public class EepHandler {
     private static final Log _log = new Log(EepHandler.class);
 
     protected ErrorHandler errorHandler;
-    
-    /* package private */ EepHandler(ErrorHandler eh) {
-	errorHandler=eh;
+
+    /* package private */EepHandler(ErrorHandler eh) {
+        errorHandler = eh;
     }
-    
+
     /**
      * @param req the Request
      * @param httpl an HTTPListener
@@ -40,21 +41,19 @@ public class EepHandler {
      * @throws IOException
      */
     public void handle(Request req, HTTPListener httpl, OutputStream out,
-		       /* boolean fromProxy, */ String destination)
-	throws IOException {
-	SocketManagerProducer smp = httpl.getSMP();
-	Destination dest = NamingService.getInstance().lookup(destination);
-	if (dest == null) {
-	    errorHandler.handle(req, httpl, out,
-				"Could not lookup host: "+destination);
-	    return;
-	}
-	I2PSocketManager sm = smp.getManager(destination);
-	Filter f = new NullFilter(); //FIXME: use other filter
-	req.setParam("Host: ", dest.toBase64());
-	if (!handle(req, f, out, dest, sm)) {
-	    errorHandler.handle(req, httpl, out, "Unable to reach peer");
-	}
+    /* boolean fromProxy, */String destination) throws IOException {
+        SocketManagerProducer smp = httpl.getSMP();
+        Destination dest = NamingService.getInstance().lookup(destination);
+        if (dest == null) {
+            errorHandler.handle(req, httpl, out, "Could not lookup host: " + destination);
+            return;
+        }
+        I2PSocketManager sm = smp.getManager(destination);
+        Filter f = new NullFilter(); //FIXME: use other filter
+        req.setParam("Host: ", dest.toBase64());
+        if (!handle(req, f, out, dest, sm)) {
+            errorHandler.handle(req, httpl, out, "Unable to reach peer");
+        }
     }
 
     /**
@@ -66,45 +65,44 @@ public class EepHandler {
      * @return boolean, true if something was written, false otherwise.
      * @throws IOException
      */
-    public boolean handle(Request req, Filter f, OutputStream out,
-		       Destination dest, I2PSocketManager sm)
-    throws IOException {
-	I2PSocket s = null;
-	boolean written = false;
-	try {
-	    synchronized(sm) {
-		s = sm.connect(dest, new I2PSocketOptions());
-	    }
-	    InputStream in = new BufferedInputStream(s.getInputStream());
-	    OutputStream sout = new BufferedOutputStream(s.getOutputStream());
-	    sout.write(req.toByteArray());
-	    sout.flush();
-	    byte[] buffer = new byte[16384], filtered;
-	    int len;
-	    while ((len=in.read(buffer)) != -1) {
-		if (len != buffer.length) {
-		    byte[] b2 = new byte[len];
-		    System.arraycopy(buffer, 0, b2, 0, len);
-		    filtered=f.filter(b2);
-		} else {
-		    filtered=f.filter(buffer);
-		}
-		written=true;
-		out.write(filtered);
-	    }
-	    filtered=f.finish();
-	    written=true;
-	    out.write(filtered);
-	    out.flush();
-	} catch (IOException ex) {
-	    _log.error("Error while handling eepsite request");
-	    return written;
-	} catch (I2PException ex) {
-	    _log.error("Error while handling eepsite request");
-	    return written;
-	} finally {
-	    if (s != null) s.close();
-	}
-	return true;
+    public boolean handle(Request req, Filter f, OutputStream out, Destination dest, I2PSocketManager sm)
+                                                                                                         throws IOException {
+        I2PSocket s = null;
+        boolean written = false;
+        try {
+            synchronized (sm) {
+                s = sm.connect(dest, new I2PSocketOptions());
+            }
+            InputStream in = new BufferedInputStream(s.getInputStream());
+            OutputStream sout = new BufferedOutputStream(s.getOutputStream());
+            sout.write(req.toByteArray());
+            sout.flush();
+            byte[] buffer = new byte[16384], filtered;
+            int len;
+            while ((len = in.read(buffer)) != -1) {
+                if (len != buffer.length) {
+                    byte[] b2 = new byte[len];
+                    System.arraycopy(buffer, 0, b2, 0, len);
+                    filtered = f.filter(b2);
+                } else {
+                    filtered = f.filter(buffer);
+                }
+                written = true;
+                out.write(filtered);
+            }
+            filtered = f.finish();
+            written = true;
+            out.write(filtered);
+            out.flush();
+        } catch (IOException ex) {
+            _log.error("Error while handling eepsite request");
+            return written;
+        } catch (I2PException ex) {
+            _log.error("Error while handling eepsite request");
+            return written;
+        } finally {
+            if (s != null) s.close();
+        }
+        return true;
     }
 }

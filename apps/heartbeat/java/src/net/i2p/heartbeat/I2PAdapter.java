@@ -61,120 +61,129 @@ class I2PAdapter {
     private static final String I2CP_PORT_PROP = "i2cpPort";
     /** by default, the I2CP port is 7654 */
     private static final int I2CP_PORT_DEFAULT = 7654;
-    
+
     /** This property defines how many hops we want in our tunnels. */
     public static final String NUMHOPS_PROP = "numHops";
     /** by default, use 2 hop tunnels */
     public static final int NUMHOPS_DEFAULT = 2;
-    
+
     /**
      * Constructs an I2PAdapter . . .
      */
     public I2PAdapter() {
-	_privateDestFile = null;
-	_i2cpHost = null;
-	_i2cpPort = -1;
-	_localDest = null;
-	_listener = null;
-	_session = null;
-	_numHops = 0;
+        _privateDestFile = null;
+        _i2cpHost = null;
+        _i2cpPort = -1;
+        _localDest = null;
+        _listener = null;
+        _session = null;
+        _numHops = 0;
     }
-    
+
     /**
      * who are we?
      * @return the destination (us)
      */
-    public Destination getLocalDestination() { return _localDest; }
-    
+    public Destination getLocalDestination() {
+        return _localDest;
+    }
+
     /** 
      * who gets notified when we receive a ping or a pong? 
      * @return the event listener who gets notified
      */
-    public PingPongEventListener getListener() { return _listener; }
-    
-    
+    public PingPongEventListener getListener() {
+        return _listener;
+    }
+
     /**
      * Sets who gets notified when we receive a ping or a pong
      * @param listener the event listener to get notified
      */
-    public void setListener(PingPongEventListener listener) { _listener = listener; }
-    
+    public void setListener(PingPongEventListener listener) {
+        _listener = listener;
+    }
+
     /** 
      * how many hops do we want in our tunnels?
      * @return the number of hops
      */
-    public int getNumHops() { return _numHops; }
-    
+    public int getNumHops() {
+        return _numHops;
+    }
+
     /**
      * are we connected?
      * @return true or false . . .
      */
-    public boolean getIsConnected() { return _session != null; }
-    
+    public boolean getIsConnected() {
+        return _session != null;
+    }
+
     /**
      * Read in all of the config data
      * @param props the properties to load from
      */
     void loadConfig(Properties props) {
-	String privDestFile = props.getProperty(DEST_FILE_PROP, DEST_FILE_DEFAULT);
-	String host = props.getProperty(I2CP_HOST_PROP, I2CP_HOST_DEFAULT);
-	String port = props.getProperty(I2CP_PORT_PROP, ""+I2CP_PORT_DEFAULT);
-	String numHops = props.getProperty(NUMHOPS_PROP, ""+NUMHOPS_DEFAULT);
-	
-	int portNum = -1;
-	try {
-	    portNum = Integer.parseInt(port);
-	} catch (NumberFormatException nfe) {
-	    if (_log.shouldLog(Log.WARN)) {
-		    _log.warn("Invalid I2CP port specified [" + port + "]");
+        String privDestFile = props.getProperty(DEST_FILE_PROP, DEST_FILE_DEFAULT);
+        String host = props.getProperty(I2CP_HOST_PROP, I2CP_HOST_DEFAULT);
+        String port = props.getProperty(I2CP_PORT_PROP, "" + I2CP_PORT_DEFAULT);
+        String numHops = props.getProperty(NUMHOPS_PROP, "" + NUMHOPS_DEFAULT);
+
+        int portNum = -1;
+        try {
+            portNum = Integer.parseInt(port);
+        } catch (NumberFormatException nfe) {
+            if (_log.shouldLog(Log.WARN)) {
+                _log.warn("Invalid I2CP port specified [" + port + "]");
+            }
+            portNum = I2CP_PORT_DEFAULT;
         }
-	    portNum = I2CP_PORT_DEFAULT;
-	}
-	int hops = -1;
-	try {
-	    hops = Integer.parseInt(numHops);
-	} catch (NumberFormatException nfe) {
-	    if (_log.shouldLog(Log.WARN)) {
-		    _log.warn("Invalid # hops specified [" + numHops + "]");
+        int hops = -1;
+        try {
+            hops = Integer.parseInt(numHops);
+        } catch (NumberFormatException nfe) {
+            if (_log.shouldLog(Log.WARN)) {
+                _log.warn("Invalid # hops specified [" + numHops + "]");
+            }
+            hops = NUMHOPS_DEFAULT;
         }
-	    hops = NUMHOPS_DEFAULT;
-	}
-	
-	_numHops = hops;
-	_privateDestFile = privDestFile;
-	_i2cpHost = host;
-	_i2cpPort = portNum;
+
+        _numHops = hops;
+        _privateDestFile = privDestFile;
+        _i2cpHost = host;
+        _i2cpPort = portNum;
     }
-    
+
     /**
      * write out the config to the props
      * @param props the properties to write to 
      */
     void storeConfig(Properties props) {
-	if (_privateDestFile != null) {
-	    props.setProperty(DEST_FILE_PROP, _privateDestFile);
-    } else {
-	    props.setProperty(DEST_FILE_PROP, DEST_FILE_DEFAULT);
-    }
+        if (_privateDestFile != null) {
+            props.setProperty(DEST_FILE_PROP, _privateDestFile);
+        } else {
+            props.setProperty(DEST_FILE_PROP, DEST_FILE_DEFAULT);
+        }
 
-    if (_i2cpHost != null) {
-	    props.setProperty(I2CP_HOST_PROP, _i2cpHost);
-    } else {
-	    props.setProperty(I2CP_HOST_PROP, I2CP_HOST_DEFAULT);
-    }
-	
-    if (_i2cpPort > 0) {
-	    props.setProperty(I2CP_PORT_PROP, ""+_i2cpPort);
-    } else {
-	    props.setProperty(I2CP_PORT_PROP, ""+I2CP_PORT_DEFAULT);
-    }
-	
-    props.setProperty(NUMHOPS_PROP, ""+_numHops);
+        if (_i2cpHost != null) {
+            props.setProperty(I2CP_HOST_PROP, _i2cpHost);
+        } else {
+            props.setProperty(I2CP_HOST_PROP, I2CP_HOST_DEFAULT);
+        }
+
+        if (_i2cpPort > 0) {
+            props.setProperty(I2CP_PORT_PROP, "" + _i2cpPort);
+        } else {
+            props.setProperty(I2CP_PORT_PROP, "" + I2CP_PORT_DEFAULT);
+        }
+
+        props.setProperty(NUMHOPS_PROP, "" + _numHops);
     }
 
     private static final int TYPE_PING = 0;
     private static final int TYPE_PONG = 1;
-    
+
     /** 
      * send a ping message to the peer
      *
@@ -186,43 +195,44 @@ class I2PAdapter {
      * @throws IllegalStateException if we are not connected to the router
      */
     public void sendPing(Destination peer, int seriesNum, long now, int size) {
-	if (_session == null) throw new IllegalStateException("Not connected to the router");
-	ByteArrayOutputStream baos = new ByteArrayOutputStream(size);
-	try {
-	    _localDest.writeBytes(baos);
-	    DataHelper.writeLong(baos, 2, seriesNum);
-	    DataHelper.writeLong(baos, 1, TYPE_PING);
-	    DataHelper.writeDate(baos, new Date(now));
-	    int padding = size - baos.size();
-	    byte paddingData[] = new byte[padding];
-	    Arrays.fill(paddingData, (byte)0x2A);
-	    DataHelper.writeLong(baos, 2, padding);
-	    baos.write(paddingData);
-	    boolean sent = _session.sendMessage(peer, baos.toByteArray());
-	    if (!sent) {
-		if (_log.shouldLog(Log.ERROR)) {
-		    _log.error("Error sending the ping to " + peer.calculateHash().toBase64() + " for series " + seriesNum);
+        if (_session == null) throw new IllegalStateException("Not connected to the router");
+        ByteArrayOutputStream baos = new ByteArrayOutputStream(size);
+        try {
+            _localDest.writeBytes(baos);
+            DataHelper.writeLong(baos, 2, seriesNum);
+            DataHelper.writeLong(baos, 1, TYPE_PING);
+            DataHelper.writeDate(baos, new Date(now));
+            int padding = size - baos.size();
+            byte paddingData[] = new byte[padding];
+            Arrays.fill(paddingData, (byte) 0x2A);
+            DataHelper.writeLong(baos, 2, padding);
+            baos.write(paddingData);
+            boolean sent = _session.sendMessage(peer, baos.toByteArray());
+            if (!sent) {
+                if (_log.shouldLog(Log.ERROR)) {
+                    _log.error("Error sending the ping to " + peer.calculateHash().toBase64() + " for series "
+                               + seriesNum);
+                }
+            } else {
+                if (_log.shouldLog(Log.INFO)) {
+                    _log.info("Ping sent to " + peer.calculateHash().toBase64() + " for series " + seriesNum);
+                }
+            }
+        } catch (IOException ioe) {
+            if (_log.shouldLog(Log.ERROR)) {
+                _log.error("Error sending the ping", ioe);
+            }
+        } catch (DataFormatException dfe) {
+            if (_log.shouldLog(Log.ERROR)) {
+                _log.error("Error writing out the ping message", dfe);
+            }
+        } catch (I2PSessionException ise) {
+            if (_log.shouldLog(Log.ERROR)) {
+                _log.error("Error writing out the ping message", ise);
+            }
         }
-	    } else {
-		if (_log.shouldLog(Log.INFO)) {
-		    _log.info("Ping sent to " + peer.calculateHash().toBase64() + " for series " + seriesNum);
-        }
-	    }
-	} catch (IOException ioe) {
-	    if (_log.shouldLog(Log.ERROR)) {
-		    _log.error("Error sending the ping", ioe);
-        }
-	} catch (DataFormatException dfe) {
-	    if (_log.shouldLog(Log.ERROR)) {
-		    _log.error("Error writing out the ping message", dfe);
-        }
-	} catch (I2PSessionException ise) {
-	    if (_log.shouldLog(Log.ERROR)) {
-		    _log.error("Error writing out the ping message", ise);
-        }
-	} 
     }
-    
+
     /** 
      * send a pong message to the peer
      *
@@ -234,98 +244,101 @@ class I2PAdapter {
      * @throws IllegalStateException if we are not connected to the router
      */
     public void sendPong(Destination peer, int seriesNum, Date sentOn, byte data[]) {
-	if (_session == null) throw new IllegalStateException("Not connected to the router");
-	ByteArrayOutputStream baos = new ByteArrayOutputStream(data.length + 768);
-	try {
-	    _localDest.writeBytes(baos);
-	    DataHelper.writeLong(baos, 2, seriesNum);
-	    DataHelper.writeLong(baos, 1, TYPE_PONG);
-	    DataHelper.writeDate(baos, sentOn);
-	    DataHelper.writeDate(baos, new Date(Clock.getInstance().now()));
-	    DataHelper.writeLong(baos, 2, data.length);
-	    baos.write(data);
-	    boolean sent = _session.sendMessage(peer, baos.toByteArray());
-	    if (!sent) {
-		if (_log.shouldLog(Log.ERROR)) {
-		    _log.error("Error sending the pong to " + peer.calculateHash().toBase64() + " for series " + seriesNum + " which was sent on " + sentOn);
+        if (_session == null) throw new IllegalStateException("Not connected to the router");
+        ByteArrayOutputStream baos = new ByteArrayOutputStream(data.length + 768);
+        try {
+            _localDest.writeBytes(baos);
+            DataHelper.writeLong(baos, 2, seriesNum);
+            DataHelper.writeLong(baos, 1, TYPE_PONG);
+            DataHelper.writeDate(baos, sentOn);
+            DataHelper.writeDate(baos, new Date(Clock.getInstance().now()));
+            DataHelper.writeLong(baos, 2, data.length);
+            baos.write(data);
+            boolean sent = _session.sendMessage(peer, baos.toByteArray());
+            if (!sent) {
+                if (_log.shouldLog(Log.ERROR)) {
+                    _log.error("Error sending the pong to " + peer.calculateHash().toBase64() + " for series "
+                               + seriesNum + " which was sent on " + sentOn);
+                }
+            } else {
+                if (_log.shouldLog(Log.INFO)) {
+                    _log.info("Pong sent to " + peer.calculateHash().toBase64() + " for series " + seriesNum
+                              + " which was sent on " + sentOn);
+                }
+            }
+        } catch (IOException ioe) {
+            if (_log.shouldLog(Log.ERROR)) {
+                _log.error("Error sending the ping", ioe);
+            }
+        } catch (DataFormatException dfe) {
+            if (_log.shouldLog(Log.ERROR)) {
+                _log.error("Error writing out the pong message", dfe);
+            }
+        } catch (I2PSessionException ise) {
+            if (_log.shouldLog(Log.ERROR)) {
+                _log.error("Error writing out the pong message", ise);
+            }
         }
-	    } else {
-		if (_log.shouldLog(Log.INFO)) {
-		    _log.info("Pong sent to " + peer.calculateHash().toBase64() + " for series " + seriesNum + " which was sent on " + sentOn);
-        }
-	    }
-	} catch (IOException ioe) {
-	    if (_log.shouldLog(Log.ERROR)) {
-		    _log.error("Error sending the ping", ioe);
-        }
-	} catch (DataFormatException dfe) {
-	    if (_log.shouldLog(Log.ERROR)) {
-		    _log.error("Error writing out the pong message", dfe);
-        }
-	} catch (I2PSessionException ise) {
-	    if (_log.shouldLog(Log.ERROR)) {
-		    _log.error("Error writing out the pong message", ise);
-        }
-	} 
     }
-    
+
     /**
      * We've received this data from I2P - parse it into a ping or a pong 
      * and notify accordingly
      * @param data the data to handle
      */
     private void handleMessage(byte data[]) {
-	ByteArrayInputStream bais = new ByteArrayInputStream(data);
-	try {
-	    Destination from = new Destination();
-	    from.readBytes(bais);
-	    int series = (int)DataHelper.readLong(bais, 2);
-	    long type = DataHelper.readLong(bais, 1);
-	    Date sentOn = DataHelper.readDate(bais);
-	    Date receivedOn = null;
-	    if (type == TYPE_PONG) {
-		    receivedOn = DataHelper.readDate(bais);
-	    }
-	    int size = (int)DataHelper.readLong(bais, 2);
-	    byte payload[] = new byte[size];
-	    int read = DataHelper.read(bais, payload);
-	    if (read != size) {
-		    throw new IOException("Malformed payload - read " + read + " instead of " + size);
+        ByteArrayInputStream bais = new ByteArrayInputStream(data);
+        try {
+            Destination from = new Destination();
+            from.readBytes(bais);
+            int series = (int) DataHelper.readLong(bais, 2);
+            long type = DataHelper.readLong(bais, 1);
+            Date sentOn = DataHelper.readDate(bais);
+            Date receivedOn = null;
+            if (type == TYPE_PONG) {
+                receivedOn = DataHelper.readDate(bais);
+            }
+            int size = (int) DataHelper.readLong(bais, 2);
+            byte payload[] = new byte[size];
+            int read = DataHelper.read(bais, payload);
+            if (read != size) { throw new IOException("Malformed payload - read " + read + " instead of " + size); }
+
+            if (_listener == null) {
+                if (_log.shouldLog(Log.ERROR)) {
+                    _log.error("Listener isn't set, but we received a valid message of type " + type + " sent from "
+                               + from.calculateHash().toBase64());
+                }
+                return;
+            }
+
+            if (type == TYPE_PING) {
+                if (_log.shouldLog(Log.INFO)) {
+                    _log.info("Ping received from " + from.calculateHash().toBase64() + " on series " + series
+                              + " sent on " + sentOn + " containing " + size + " bytes");
+                }
+                _listener.receivePing(from, series, sentOn, payload);
+            } else if (type == TYPE_PONG) {
+                if (_log.shouldLog(Log.INFO)) {
+                    _log.info("Pong received from " + from.calculateHash().toBase64() + " on series " + series
+                              + " sent on " + sentOn + " with pong sent on " + receivedOn + " containing " + size
+                              + " bytes");
+                }
+                _listener.receivePong(from, series, sentOn, receivedOn, payload);
+            } else {
+                throw new IOException("Invalid message type " + type);
+            }
+
+        } catch (IOException ioe) {
+            if (_log.shouldLog(Log.ERROR)) {
+                _log.error("Error handling the message", ioe);
+            }
+        } catch (DataFormatException dfe) {
+            if (_log.shouldLog(Log.ERROR)) {
+                _log.error("Error parsing the message", dfe);
+            }
         }
-	    
-	    if (_listener == null) {
-		if (_log.shouldLog(Log.ERROR)) {
-		    _log.error("Listener isn't set, but we received a valid message of type " + type + " sent from " + from.calculateHash().toBase64());
-        }
-		return;
-	    }
-	    
-	    if (type == TYPE_PING) {
-		if (_log.shouldLog(Log.INFO)) {
-		    _log.info("Ping received from " + from.calculateHash().toBase64() + " on series " + series + " sent on " + sentOn + " containing " + size + " bytes");
-        }
-		_listener.receivePing(from, series, sentOn, payload);
-	    } else if (type == TYPE_PONG) {
-		if (_log.shouldLog(Log.INFO)) {
-		    _log.info("Pong received from " + from.calculateHash().toBase64() + " on series " + series + " sent on " + sentOn + " with pong sent on " + receivedOn + " containing " + size + " bytes");
-        }
-		_listener.receivePong(from, series, sentOn, receivedOn, payload);
-	    } else {
-		    throw new IOException("Invalid message type " + type);
-	    }
-	    
-	} catch (IOException ioe) {
-	    if (_log.shouldLog(Log.ERROR)) {
-		    _log.error("Error handling the message", ioe);
-        }
-	} catch (DataFormatException dfe) {
-	    if (_log.shouldLog(Log.ERROR)) {
-		    _log.error("Error parsing the message", dfe);
-        }
-	}
     }
-    
-    
+
     /** 
      * connect to the I2P router and either authenticate ourselves with the 
      * destination we're given, or create a new one and write that to the 
@@ -334,44 +347,47 @@ class I2PAdapter {
      * @return true if we connect successfully, false otherwise
      */
     boolean connect() {
-	I2PClient client = I2PClientFactory.createClient();
-	Destination us = null;
-	File destFile = new File(_privateDestFile);
-	us = verifyDestination(client, destFile);
-	if (us == null) return false;
-	
-	// if we're here, we got a destination.  lets connect
-	FileInputStream fin = null;
-	try {
-	    fin = new FileInputStream(destFile);
-	    Properties options = getOptions();
-	    I2PSession session = client.createSession(fin, options);
-	    I2PListener lsnr = new I2PListener();
-	    session.setSessionListener(lsnr);
-	    session.connect();
-	    _localDest = session.getMyDestination();
-	    if (_log.shouldLog(Log.INFO)) {
-		    _log.info("I2CP Session created and connected as " + _localDest.calculateHash().toBase64());
+        I2PClient client = I2PClientFactory.createClient();
+        Destination us = null;
+        File destFile = new File(_privateDestFile);
+        us = verifyDestination(client, destFile);
+        if (us == null) return false;
+
+        // if we're here, we got a destination.  lets connect
+        FileInputStream fin = null;
+        try {
+            fin = new FileInputStream(destFile);
+            Properties options = getOptions();
+            I2PSession session = client.createSession(fin, options);
+            I2PListener lsnr = new I2PListener();
+            session.setSessionListener(lsnr);
+            session.connect();
+            _localDest = session.getMyDestination();
+            if (_log.shouldLog(Log.INFO)) {
+                _log.info("I2CP Session created and connected as " + _localDest.calculateHash().toBase64());
+            }
+            _session = session;
+            _i2pListener = lsnr;
+        } catch (I2PSessionException ise) {
+            if (_log.shouldLog(Log.ERROR)) {
+                _log.error("Error connecting", ise);
+            }
+            return false;
+        } catch (IOException ioe) {
+            if (_log.shouldLog(Log.ERROR)) {
+                _log.error("Error loading the destionation", ioe);
+            }
+            return false;
+        } finally {
+            if (fin != null) try {
+                fin.close();
+            } catch (IOException ioe) {
+            }
         }
-	    _session = session;
-	    _i2pListener = lsnr;
-	} catch (I2PSessionException ise) {
-	    if (_log.shouldLog(Log.ERROR)) {
-		    _log.error("Error connecting", ise);
-        }
-	    return false;
-	} catch (IOException ioe) {
-	    if (_log.shouldLog(Log.ERROR)) {
-		    _log.error("Error loading the destionation", ioe);
-        }
-	    return false;
-	} finally {
-	    if (fin != null) try { fin.close(); } catch (IOException ioe) {}
-	}
-	    
-	return true;
+
+        return true;
     }
-    
+
     /**
      * load, verify, or create a destination 
      *
@@ -380,84 +396,96 @@ class I2PAdapter {
      * @return the destination loaded, or null if there was an error
      */
     private Destination verifyDestination(I2PClient client, File destFile) {
-	Destination us = null;
-	FileInputStream fin = null;
-	if (destFile.exists()) {
-	    try {
-		fin = new FileInputStream(destFile);
-		us = new Destination();
-		us.readBytes(fin);
-		if (_log.shouldLog(Log.INFO)) {
-		    _log.info("Existing destination loaded: [" + us.toBase64() + "]");
+        Destination us = null;
+        FileInputStream fin = null;
+        if (destFile.exists()) {
+            try {
+                fin = new FileInputStream(destFile);
+                us = new Destination();
+                us.readBytes(fin);
+                if (_log.shouldLog(Log.INFO)) {
+                    _log.info("Existing destination loaded: [" + us.toBase64() + "]");
+                }
+            } catch (IOException ioe) {
+                if (fin != null) try {
+                    fin.close();
+                } catch (IOException ioe2) {
+                }
+                fin = null;
+                destFile.delete();
+                us = null;
+            } catch (DataFormatException dfe) {
+                if (fin != null) try {
+                    fin.close();
+                } catch (IOException ioe2) {
+                }
+                fin = null;
+                destFile.delete();
+                us = null;
+            } finally {
+                if (fin != null) try {
+                    fin.close();
+                } catch (IOException ioe2) {
+                }
+                fin = null;
+            }
         }
-	    } catch (IOException ioe) {
-		if (fin != null) try { fin.close(); } catch (IOException ioe2) {}
-		fin = null;
-		destFile.delete();
-		us = null;
-	    } catch (DataFormatException dfe) {
-		if (fin != null) try { fin.close(); } catch (IOException ioe2) {}
-		fin = null;
-		destFile.delete();
-		us = null;
-	    } finally {
-		if (fin != null) try { fin.close(); } catch (IOException ioe2) {}
-		fin = null;
-	    }
-	}
-	
-	if (us == null) {
-	    // need to create a new one
-	    FileOutputStream fos = null;
-	    try {
-		fos = new FileOutputStream(destFile);
-		us = client.createDestination(fos);
-		if (_log.shouldLog(Log.INFO)) {
-		    _log.info("New destination created: [" + us.toBase64() + "]");
+
+        if (us == null) {
+            // need to create a new one
+            FileOutputStream fos = null;
+            try {
+                fos = new FileOutputStream(destFile);
+                us = client.createDestination(fos);
+                if (_log.shouldLog(Log.INFO)) {
+                    _log.info("New destination created: [" + us.toBase64() + "]");
+                }
+            } catch (IOException ioe) {
+                if (_log.shouldLog(Log.ERROR)) {
+                    _log.error("Error writing out the destination keys being created", ioe);
+                }
+                return null;
+            } catch (I2PException ie) {
+                if (_log.shouldLog(Log.ERROR)) {
+                    _log.error("Error creating the destination", ie);
+                }
+                return null;
+            } finally {
+                if (fos != null) try {
+                    fos.close();
+                } catch (IOException ioe) {
+                }
+            }
         }
-	    } catch (IOException ioe) {
-		if (_log.shouldLog(Log.ERROR)) {
-		    _log.error("Error writing out the destination keys being created", ioe);
-        }
-		return null;
-	    } catch (I2PException ie) {
-		if (_log.shouldLog(Log.ERROR)) {
-		    _log.error("Error creating the destination", ie);
-        }
-		return null;
-	    } finally {
-		if (fos != null) try { fos.close(); } catch (IOException ioe) {}
-	    }
-	}
-	return us;
+        return us;
     }
-    
+
     /**
      * I2PSession connect options
      * @return the options as Properties
      */
-    private Properties getOptions() { 
-	Properties props = new Properties(); 
-	props.setProperty(I2PClient.PROP_RELIABILITY, I2PClient.PROP_RELIABILITY_BEST_EFFORT);
-	props.setProperty(I2PClient.PROP_TCP_HOST, _i2cpHost);
-	props.setProperty(I2PClient.PROP_TCP_PORT, _i2cpPort + "");
-	props.setProperty("tunnels.depthInbound", ""+_numHops);
-	props.setProperty("tunnels.depthOutbound", ""+_numHops);
-	return props;
+    private Properties getOptions() {
+        Properties props = new Properties();
+        props.setProperty(I2PClient.PROP_RELIABILITY, I2PClient.PROP_RELIABILITY_BEST_EFFORT);
+        props.setProperty(I2PClient.PROP_TCP_HOST, _i2cpHost);
+        props.setProperty(I2PClient.PROP_TCP_PORT, _i2cpPort + "");
+        props.setProperty("tunnels.depthInbound", "" + _numHops);
+        props.setProperty("tunnels.depthOutbound", "" + _numHops);
+        return props;
     }
-    
+
     /** disconnect from the I2P router */
     void disconnect() {
-	if (_session != null) {
-	    try {
-		_session.destroySession();
-	    } catch (I2PSessionException ise) {
-		if (_log.shouldLog(Log.ERROR)) {
-		    _log.error("Error destroying the session", ise);
+        if (_session != null) {
+            try {
+                _session.destroySession();
+            } catch (I2PSessionException ise) {
+                if (_log.shouldLog(Log.ERROR)) {
+                    _log.error("Error destroying the session", ise);
+                }
+            }
+            _session = null;
         }
-	    }
-	    _session = null;
-	}
     }
 
     /**
@@ -465,70 +493,69 @@ class I2PAdapter {
      * 
      */
     public interface PingPongEventListener {
-	/** 
-	 * receive a ping message from the peer
-	 *
-	 * @param from peer that sent us the ping
-	 * @param seriesNum id the peer sent us in the ping
-	 * @param sentOn date the peer said they sent us the message
-	 * @param data payload from the ping
-	 */
-	void receivePing(Destination from, int seriesNum, Date sentOn, byte data[]);
-	
-	/** 
-	 * receive a pong message from the peer
-	 *
-	 * @param from peer that sent us the pong
-	 * @param seriesNum id the peer sent us in the pong (that we sent them in the ping)
-	 * @param sentOn when we sent out the ping
-	 * @param replyOn when they sent out the pong
-	 * @param data payload from the ping/pong
-	 */
-	void receivePong(Destination from, int seriesNum, Date sentOn, Date replyOn, byte data[]);
+        /** 
+         * receive a ping message from the peer
+         *
+         * @param from peer that sent us the ping
+         * @param seriesNum id the peer sent us in the ping
+         * @param sentOn date the peer said they sent us the message
+         * @param data payload from the ping
+         */
+        void receivePing(Destination from, int seriesNum, Date sentOn, byte data[]);
+
+        /** 
+         * receive a pong message from the peer
+         *
+         * @param from peer that sent us the pong
+         * @param seriesNum id the peer sent us in the pong (that we sent them in the ping)
+         * @param sentOn when we sent out the ping
+         * @param replyOn when they sent out the pong
+         * @param data payload from the ping/pong
+         */
+        void receivePong(Destination from, int seriesNum, Date sentOn, Date replyOn, byte data[]);
     }
-    
+
     /**
      * Receive data from the session and pass it along to handleMessage for parsing/dispersal
      *
      */
     private class I2PListener implements I2PSessionListener {
-	
-    /* (non-Javadoc)
-     * @see net.i2p.client.I2PSessionListener#disconnected(net.i2p.client.I2PSession)
-     */
-    public void disconnected(I2PSession session) { 
-	    if (_log.shouldLog(Log.ERROR)) {
-		    _log.error("Session disconnected");
+
+        /* (non-Javadoc)
+         * @see net.i2p.client.I2PSessionListener#disconnected(net.i2p.client.I2PSession)
+         */
+        public void disconnected(I2PSession session) {
+            if (_log.shouldLog(Log.ERROR)) {
+                _log.error("Session disconnected");
+            }
+            disconnect();
         }
-	    disconnect();
-	}
-	/* (non-Javadoc)
-	 * @see net.i2p.client.I2PSessionListener#errorOccurred(net.i2p.client.I2PSession, java.lang.String, java.lang.Throwable)
-	 */
-	public void errorOccurred(I2PSession session, String message, Throwable error) { 
-	    if (_log.shouldLog(Log.ERROR))
-		_log.error("Error occurred", error); 
-	}
-	/* (non-Javadoc)
-	 * @see net.i2p.client.I2PSessionListener#reportAbuse(net.i2p.client.I2PSession, int)
-	 */
-	public void reportAbuse(I2PSession session, int severity) { 
-	    if (_log.shouldLog(Log.ERROR))
-		_log.error("Abuse reported"); 
-	}
-	
-	/* (non-Javadoc)
-	 * @see net.i2p.client.I2PSessionListener#messageAvailable(net.i2p.client.I2PSession, int, long)
-	 */
-	public void messageAvailable(I2PSession session, int msgId, long size) {
-	    try {
-		byte data[] = session.receiveMessage(msgId);
-		handleMessage(data);
-	    } catch (I2PSessionException ise) {
-		if (_log.shouldLog(Log.ERROR))
-		    _log.error("Error receiving the message", ise);
-		disconnect();
-	    }
-	}
+
+        /* (non-Javadoc)
+         * @see net.i2p.client.I2PSessionListener#errorOccurred(net.i2p.client.I2PSession, java.lang.String, java.lang.Throwable)
+         */
+        public void errorOccurred(I2PSession session, String message, Throwable error) {
+            if (_log.shouldLog(Log.ERROR)) _log.error("Error occurred", error);
+        }
+
+        /* (non-Javadoc)
+         * @see net.i2p.client.I2PSessionListener#reportAbuse(net.i2p.client.I2PSession, int)
+         */
+        public void reportAbuse(I2PSession session, int severity) {
+            if (_log.shouldLog(Log.ERROR)) _log.error("Abuse reported");
+        }
+
+        /* (non-Javadoc)
+         * @see net.i2p.client.I2PSessionListener#messageAvailable(net.i2p.client.I2PSession, int, long)
+         */
+        public void messageAvailable(I2PSession session, int msgId, long size) {
+            try {
+                byte data[] = session.receiveMessage(msgId);
+                handleMessage(data);
+            } catch (I2PSessionException ise) {
+                if (_log.shouldLog(Log.ERROR)) _log.error("Error receiving the message", ise);
+                disconnect();
+            }
+        }
     }
 }

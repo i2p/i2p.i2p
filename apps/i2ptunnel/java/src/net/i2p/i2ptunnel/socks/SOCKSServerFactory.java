@@ -27,27 +27,26 @@ public class SOCKSServerFactory {
      * @param s a Socket used to choose the SOCKS server type
      */
     public static SOCKSServer createSOCKSServer(Socket s) throws SOCKSException {
-	SOCKSServer serv;
+        SOCKSServer serv;
 
-	try {
-	    DataInputStream in = new DataInputStream(s.getInputStream());
-	    int socksVer = in.readByte();
-	    
-	    switch (socksVer) {
-	    case 0x05: // SOCKS version 5
-		serv = new SOCKS5Server(s);
-		break;
-	    default:
-		_log.debug("SOCKS protocol version not supported ("
-			   + Integer.toHexString(socksVer) + ")");
-		return null;
-	    }
-	} catch (IOException e) {
-	    _log.debug("error reading SOCKS protocol version");
-	    throw new SOCKSException("Connection error ("
-				     + e.getMessage() + ")");
-	}
+        try {
+            DataInputStream in = new DataInputStream(s.getInputStream());
+            int socksVer = in.readByte();
 
-	return serv;
+            switch (socksVer) {
+            case 0x05:
+                // SOCKS version 5
+                serv = new SOCKS5Server(s);
+                break;
+            default:
+                _log.debug("SOCKS protocol version not supported (" + Integer.toHexString(socksVer) + ")");
+                return null;
+            }
+        } catch (IOException e) {
+            _log.debug("error reading SOCKS protocol version");
+            throw new SOCKSException("Connection error (" + e.getMessage() + ")");
+        }
+
+        return serv;
     }
 }

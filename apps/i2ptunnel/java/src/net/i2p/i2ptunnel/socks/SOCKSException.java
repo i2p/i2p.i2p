@@ -14,10 +14,10 @@ package net.i2p.i2ptunnel.socks;
 public class SOCKSException extends Exception {
 
     public SOCKSException() {
-	super();
+        super();
     }
-    
+
     public SOCKSException(String s) {
-	super(s);
+        super(s);
     }
 }

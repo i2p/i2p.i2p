@@ -151,283 +151,285 @@ public class TunnelManager implements Runnable {
     private I2PTunnel _tunnel;
     private ServerSocket _socket;
     private boolean _keepAccepting;
-    
+
     public TunnelManager(int listenPort) {
-	this(null, listenPort);
+        this(null, listenPort);
     }
+
     public TunnelManager(String listenHost, int listenPort) {
-	_tunnel = new I2PTunnel();
-	_keepAccepting = true;
-	try {
-	    if (listenHost != null) {
-		_socket = new ServerSocket(listenPort, 0, InetAddress.getByName(listenHost));
-		_log.info("Listening for tunnel management clients on " + listenHost + ":" + listenPort);
-	    } else {
-		_socket = new ServerSocket(listenPort);
-		_log.info("Listening for tunnel management clients on localhost:" + listenPort);
-	    }
-	} catch (Exception e) {
-	    _log.error("Error starting up tunnel management listener on " + listenPort, e);
-	}
+        _tunnel = new I2PTunnel();
+        _keepAccepting = true;
+        try {
+            if (listenHost != null) {
+                _socket = new ServerSocket(listenPort, 0, InetAddress.getByName(listenHost));
+                _log.info("Listening for tunnel management clients on " + listenHost + ":" + listenPort);
+            } else {
+                _socket = new ServerSocket(listenPort);
+                _log.info("Listening for tunnel management clients on localhost:" + listenPort);
+            }
+        } catch (Exception e) {
+            _log.error("Error starting up tunnel management listener on " + listenPort, e);
+        }
     }
 
     public static void main(String args[]) {
-	int port = 7676;
-	String host = null;
-	if (args.length == 1) {
-	    try {
-		port = Integer.parseInt(args[0]);
-	    } catch (NumberFormatException nfe) {
-		_log.error("Usage: TunnelManager [host] [port]");
-		return;
-	    }
-	} else if (args.length == 2) {
-	    host = args[0];
-	    try {
-		port = Integer.parseInt(args[1]);
-	    } catch (NumberFormatException nfe) {
-		_log.error("Usage: TunnelManager [host] [port]");
-		return;
-	    }
-	}
+        int port = 7676;
+        String host = null;
+        if (args.length == 1) {
+            try {
+                port = Integer.parseInt(args[0]);
+            } catch (NumberFormatException nfe) {
+                _log.error("Usage: TunnelManager [host] [port]");
+                return;
+            }
+        } else if (args.length == 2) {
+            host = args[0];
+            try {
+                port = Integer.parseInt(args[1]);
+            } catch (NumberFormatException nfe) {
+                _log.error("Usage: TunnelManager [host] [port]");
+                return;
+            }
+        }
 
-	TunnelManager mgr = new TunnelManager(host, port);
-	Thread t = new I2PThread(mgr, "Listener");
-	t.start();
+        TunnelManager mgr = new TunnelManager(host, port);
+        Thread t = new I2PThread(mgr, "Listener");
+        t.start();
     }
-    
+
     public void run() {
-	if (_socket == null) {
-	    _log.error("Unable to start listening, since the socket was not bound.  Already running?");
-	    return;
-	}
-	_log.debug("Running");
-	try {
-	    while (_keepAccepting) {
-		Socket socket = _socket.accept();
-		_log.debug("Client accepted");
-		if (socket != null) {
-		    Thread t = new I2PThread(new TunnelManagerClientRunner(this, socket));
-		    t.setName("TunnelManager Client");
-		    t.setPriority(I2PThread.MIN_PRIORITY);
-		    t.start();
-		}
-	    }
-	} catch (IOException ioe) {
-	    _log.error("Error accepting connections", ioe);
-	} catch (Exception e) {
-	    _log.error("Other error?!", e);
-	} finally {
-	    if (_socket != null) try { _socket.close(); } catch (IOException ioe) {}
-	} 
-	try { Thread.sleep(5000); } catch (InterruptedException ie) {}
+        if (_socket == null) {
+            _log.error("Unable to start listening, since the socket was not bound.  Already running?");
+            return;
+        }
+        _log.debug("Running");
+        try {
+            while (_keepAccepting) {
+                Socket socket = _socket.accept();
+                _log.debug("Client accepted");
+                if (socket != null) {
+                    Thread t = new I2PThread(new TunnelManagerClientRunner(this, socket));
+                    t.setName("TunnelManager Client");
+                    t.setPriority(I2PThread.MIN_PRIORITY);
+                    t.start();
+                }
+            }
+        } catch (IOException ioe) {
+            _log.error("Error accepting connections", ioe);
+        } catch (Exception e) {
+            _log.error("Other error?!", e);
+        } finally {
+            if (_socket != null) try {
+                _socket.close();
+            } catch (IOException ioe) {
+            }
+        }
+        try {
+            Thread.sleep(5000);
+        } catch (InterruptedException ie) {
+        }
     }
 
     public void error(String msg, OutputStream out) throws IOException {
-	out.write(msg.getBytes());
-	out.write('\n');
+        out.write(msg.getBytes());
+        out.write('\n');
     }
-	
+
     public void processQuit(OutputStream out) throws IOException {
-	out.write("Nice try".getBytes());
-	out.write('\n');
+        out.write("Nice try".getBytes());
+        out.write('\n');
     }
-    
+
     public void processList(OutputStream out) throws IOException {
-	BufferLogger buf = new BufferLogger();
-	long startCommand = Clock.getInstance().now();
-	_tunnel.runCommand("list", buf);
-	Object obj = _tunnel.waitEventValue("listDone");
-	long endCommand = Clock.getInstance().now();
-	String str = buf.getBuffer();
-	_log.debug("ListDone complete after " + (endCommand-startCommand) + "ms: [" + str + "]");
-	out.write(str.getBytes());
-	out.write('\n');
-	buf.ignoreFurtherActions();
+        BufferLogger buf = new BufferLogger();
+        long startCommand = Clock.getInstance().now();
+        _tunnel.runCommand("list", buf);
+        Object obj = _tunnel.waitEventValue("listDone");
+        long endCommand = Clock.getInstance().now();
+        String str = buf.getBuffer();
+        _log.debug("ListDone complete after " + (endCommand - startCommand) + "ms: [" + str + "]");
+        out.write(str.getBytes());
+        out.write('\n');
+        buf.ignoreFurtherActions();
     }
 
     public void processListenOn(String ip, OutputStream out) throws IOException {
-	BufferLogger buf = new BufferLogger();
-	_tunnel.runCommand("listen_on " + ip, buf);
-	String status = (String)_tunnel.waitEventValue("listen_onResult");
-	out.write((status + "\n").getBytes());
-	buf.ignoreFurtherActions();
+        BufferLogger buf = new BufferLogger();
+        _tunnel.runCommand("listen_on " + ip, buf);
+        String status = (String) _tunnel.waitEventValue("listen_onResult");
+        out.write((status + "\n").getBytes());
+        buf.ignoreFurtherActions();
     }
-    
+
     /**
      * "lookup <name>" returns with the result in base64, else "Unknown host" [or something like that],
      * then a newline.
      *
      */
     public void processLookup(String name, OutputStream out) throws IOException {
-	BufferLogger buf = new BufferLogger();
-	_tunnel.runCommand("lookup " + name, buf);
-	String rv = (String)_tunnel.waitEventValue("lookupResult");
-	out.write(rv.getBytes());
-	out.write('\n');
-	buf.ignoreFurtherActions();
+        BufferLogger buf = new BufferLogger();
+        _tunnel.runCommand("lookup " + name, buf);
+        String rv = (String) _tunnel.waitEventValue("lookupResult");
+        out.write(rv.getBytes());
+        out.write('\n');
+        buf.ignoreFurtherActions();
     }
 
     public void processTestDestination(String destKey, OutputStream out) throws IOException {
-	try { 
-	    Destination d = new Destination(); 
-	    d.fromBase64(destKey); 
-	    out.write("valid\n".getBytes());
-	} catch (DataFormatException dfe) { 
-	    out.write("invalid\n".getBytes());
-	}
-	out.flush();
+        try {
+            Destination d = new Destination();
+            d.fromBase64(destKey);
+            out.write("valid\n".getBytes());
+        } catch (DataFormatException dfe) {
+            out.write("invalid\n".getBytes());
+        }
+        out.flush();
     }
-    
+
     public void processConvertPrivate(String priv, OutputStream out) throws IOException {
-	try {
-	    Destination dest = new Destination();
-	    dest.fromBase64(priv);
-	    String str = dest.toBase64();
-	    out.write(str.getBytes());
-	    out.write('\n');
-	} catch (DataFormatException dfe) {
-	    _log.error("Error converting private data", dfe);
-	    out.write("Error converting private key\n".getBytes());
-	}
+        try {
+            Destination dest = new Destination();
+            dest.fromBase64(priv);
+            String str = dest.toBase64();
+            out.write(str.getBytes());
+            out.write('\n');
+        } catch (DataFormatException dfe) {
+            _log.error("Error converting private data", dfe);
+            out.write("Error converting private key\n".getBytes());
+        }
     }
-    
+
     public void processClose(String which, boolean forced, OutputStream out) throws IOException {
-	BufferLogger buf = new BufferLogger();
-	_tunnel.runCommand((forced?"close forced ":"close ") + which, buf);
-	String str = (String)_tunnel.waitEventValue("closeResult");
-	out.write((str + "\n").getBytes());
-	buf.ignoreFurtherActions();
+        BufferLogger buf = new BufferLogger();
+        _tunnel.runCommand((forced ? "close forced " : "close ") + which, buf);
+        String str = (String) _tunnel.waitEventValue("closeResult");
+        out.write((str + "\n").getBytes());
+        buf.ignoreFurtherActions();
     }
-    
+
     /**
      * "genkey" returns with the base64 of the destination, followed by a tab, then the base64 of that
      * destination's private keys, then a newline.
      *
      */
     public void processGenKey(OutputStream out) throws IOException {
-	BufferLogger buf = new BufferLogger();
-	_tunnel.runCommand("gentextkeys", buf);
-	String priv = (String)_tunnel.waitEventValue("privateKey");
-	String pub = (String)_tunnel.waitEventValue("publicDestination");
-	out.write((pub + "\t" + priv).getBytes());
-	out.write('\n');
-	buf.ignoreFurtherActions();
+        BufferLogger buf = new BufferLogger();
+        _tunnel.runCommand("gentextkeys", buf);
+        String priv = (String) _tunnel.waitEventValue("privateKey");
+        String pub = (String) _tunnel.waitEventValue("publicDestination");
+        out.write((pub + "\t" + priv).getBytes());
+        out.write('\n');
+        buf.ignoreFurtherActions();
     }
-    
+
     public void processOpenClient(int listenPort, String peer, OutputStream out) throws IOException {
-	BufferLogger buf = new BufferLogger();
-	_tunnel.runCommand("client " + listenPort + " " + peer, buf);
-	Integer taskId = (Integer)_tunnel.waitEventValue("clientTaskId");
-	if (taskId.intValue() < 0) {
-	    out.write("error\n".getBytes());
-	    buf.ignoreFurtherActions();
-	    return;
-	}
-	String rv = (String)_tunnel.waitEventValue("openClientResult");
-	if (rv.equals("error")) {
-	    out.write((rv + "\n").getBytes());
-	    buf.ignoreFurtherActions();
-	    return;
-	}
+        BufferLogger buf = new BufferLogger();
+        _tunnel.runCommand("client " + listenPort + " " + peer, buf);
+        Integer taskId = (Integer) _tunnel.waitEventValue("clientTaskId");
+        if (taskId.intValue() < 0) {
+            out.write("error\n".getBytes());
+            buf.ignoreFurtherActions();
+            return;
+        }
+        String rv = (String) _tunnel.waitEventValue("openClientResult");
+        if (rv.equals("error")) {
+            out.write((rv + "\n").getBytes());
+            buf.ignoreFurtherActions();
+            return;
+        }
 
-	if (listenPort != 0) {
-	    out.write((rv + " [" + taskId.intValue() + "]\n").getBytes());
-	    buf.ignoreFurtherActions();
-	    return;
-	}
-	Integer port = (Integer)_tunnel.waitEventValue("clientLocalPort");
-	out.write((rv + " " + port.intValue() + " [" + taskId.intValue()
-		   + "]\n").getBytes());
-	buf.ignoreFurtherActions();
+        if (listenPort != 0) {
+            out.write((rv + " [" + taskId.intValue() + "]\n").getBytes());
+            buf.ignoreFurtherActions();
+            return;
+        }
+        Integer port = (Integer) _tunnel.waitEventValue("clientLocalPort");
+        out.write((rv + " " + port.intValue() + " [" + taskId.intValue() + "]\n").getBytes());
+        buf.ignoreFurtherActions();
     }
 
-    public void processOpenHTTPClient(int listenPort,
-				      String proxy,
-				      OutputStream out) throws IOException {
-	BufferLogger buf = new BufferLogger();
-	_tunnel.runCommand("httpclient " + listenPort + " " + proxy, buf);
-	Integer taskId = (Integer)_tunnel.waitEventValue("httpclientTaskId");
-	if (taskId.intValue() < 0) {
-	    out.write("error\n".getBytes());
-	    buf.ignoreFurtherActions();
-	    return;
-	}
-	String rv = (String)_tunnel.waitEventValue("openHTTPClientResult");
-	if (rv.equals("error")) {
-	    out.write((rv + "\n").getBytes());
-	    buf.ignoreFurtherActions();
-	    return;
-	}
+    public void processOpenHTTPClient(int listenPort, String proxy, OutputStream out) throws IOException {
+        BufferLogger buf = new BufferLogger();
+        _tunnel.runCommand("httpclient " + listenPort + " " + proxy, buf);
+        Integer taskId = (Integer) _tunnel.waitEventValue("httpclientTaskId");
+        if (taskId.intValue() < 0) {
+            out.write("error\n".getBytes());
+            buf.ignoreFurtherActions();
+            return;
+        }
+        String rv = (String) _tunnel.waitEventValue("openHTTPClientResult");
+        if (rv.equals("error")) {
+            out.write((rv + "\n").getBytes());
+            buf.ignoreFurtherActions();
+            return;
+        }
 
-	if (listenPort != 0) {
-	    out.write((rv + " [" + taskId.intValue() + "]\n").getBytes());
-	    buf.ignoreFurtherActions();
-	    return;
-	}
-	Integer port = (Integer)_tunnel.waitEventValue("clientLocalPort");
-	out.write((rv + " " + port.intValue() + " [" + taskId.intValue()
-		   + "]\n").getBytes());
-	buf.ignoreFurtherActions();
-    }
-    
-    public void processOpenSOCKSTunnel(int listenPort,
-				       OutputStream out) throws IOException {
-	BufferLogger buf = new BufferLogger();
-	_tunnel.runCommand("sockstunnel " + listenPort, buf);
-	Integer taskId = (Integer)_tunnel.waitEventValue("sockstunnelTaskId");
-	if (taskId.intValue() < 0) {
-	    out.write("error\n".getBytes());
-	    buf.ignoreFurtherActions();
-	    return;
-	}
-	String rv = (String)_tunnel.waitEventValue("openSOCKSTunnelResult");
-	if (rv.equals("error")) {
-	    out.write((rv + "\n").getBytes());
-	    buf.ignoreFurtherActions();
-	    return;
-	}
-
-	if (listenPort != 0) {
-	    out.write((rv + " [" + taskId.intValue() + "]\n").getBytes());
-	    buf.ignoreFurtherActions();
-	    return;
-	}
-	Integer port = (Integer)_tunnel.waitEventValue("clientLocalPort");
-	out.write((rv + " " + port.intValue() + " [" + taskId.intValue()
-		   + "]\n").getBytes());
-	buf.ignoreFurtherActions();
+        if (listenPort != 0) {
+            out.write((rv + " [" + taskId.intValue() + "]\n").getBytes());
+            buf.ignoreFurtherActions();
+            return;
+        }
+        Integer port = (Integer) _tunnel.waitEventValue("clientLocalPort");
+        out.write((rv + " " + port.intValue() + " [" + taskId.intValue() + "]\n").getBytes());
+        buf.ignoreFurtherActions();
     }
 
-    public void processOpenServer(String serverHost, int serverPort, String privateKeys, OutputStream out) throws IOException {
-	BufferLogger buf = new BufferLogger();
-	_tunnel.runCommand("textserver " + serverHost + " " + serverPort + " " + privateKeys, buf);
-	Integer taskId = (Integer)_tunnel.waitEventValue("serverTaskId");
-	if (taskId.intValue() < 0) {
-	    out.write("error\n".getBytes());
-	    buf.ignoreFurtherActions();
-	    return;
-	}
-	
-	String rv = (String)_tunnel.waitEventValue("openServerResult");
+    public void processOpenSOCKSTunnel(int listenPort, OutputStream out) throws IOException {
+        BufferLogger buf = new BufferLogger();
+        _tunnel.runCommand("sockstunnel " + listenPort, buf);
+        Integer taskId = (Integer) _tunnel.waitEventValue("sockstunnelTaskId");
+        if (taskId.intValue() < 0) {
+            out.write("error\n".getBytes());
+            buf.ignoreFurtherActions();
+            return;
+        }
+        String rv = (String) _tunnel.waitEventValue("openSOCKSTunnelResult");
+        if (rv.equals("error")) {
+            out.write((rv + "\n").getBytes());
+            buf.ignoreFurtherActions();
+            return;
+        }
 
-	if (rv.equals("error")) {
-	    out.write((rv + "\n").getBytes());
-	    buf.ignoreFurtherActions();
-	    return;
-	}
-
-	out.write((rv + " [" + taskId.intValue() + "]\n").getBytes());
-	buf.ignoreFurtherActions();
+        if (listenPort != 0) {
+            out.write((rv + " [" + taskId.intValue() + "]\n").getBytes());
+            buf.ignoreFurtherActions();
+            return;
+        }
+        Integer port = (Integer) _tunnel.waitEventValue("clientLocalPort");
+        out.write((rv + " " + port.intValue() + " [" + taskId.intValue() + "]\n").getBytes());
+        buf.ignoreFurtherActions();
     }
-    
+
+    public void processOpenServer(String serverHost, int serverPort, String privateKeys, OutputStream out)
+                                                                                                          throws IOException {
+        BufferLogger buf = new BufferLogger();
+        _tunnel.runCommand("textserver " + serverHost + " " + serverPort + " " + privateKeys, buf);
+        Integer taskId = (Integer) _tunnel.waitEventValue("serverTaskId");
+        if (taskId.intValue() < 0) {
+            out.write("error\n".getBytes());
+            buf.ignoreFurtherActions();
+            return;
+        }
+
+        String rv = (String) _tunnel.waitEventValue("openServerResult");
+
+        if (rv.equals("error")) {
+            out.write((rv + "\n").getBytes());
+            buf.ignoreFurtherActions();
+            return;
+        }
+
+        out.write((rv + " [" + taskId.intValue() + "]\n").getBytes());
+        buf.ignoreFurtherActions();
+    }
+
     /**
      * Frisbee.
      *
      */
     public void unknownCommand(String command, OutputStream out) throws IOException {
-	out.write("Unknown command: ".getBytes());
-	out.write(command.getBytes());
-	out.write("\n".getBytes());
+        out.write("Unknown command: ".getBytes());
+        out.write(command.getBytes());
+        out.write("\n".getBytes());
     }
 }

@@ -8,16 +8,17 @@ import net.i2p.heartbeat.ClientConfig;
  */
 class PeerPlotConfig {
     private ClientConfig _config;
-    
+
     private final static void foo() {
-	// bar
-	if (true) {
-	    // baz
-	}
-	// baf
-    } 
+        // bar
+        if (true) {
+            // baz
+        }
+        // baf
+    }
+
     // moo
-    
+
     private final static void biff() {
         // b0nk
         if (false) {

@@ -26,31 +26,30 @@ public class I2PSOCKSTunnel extends I2PTunnelClientBase {
     //	  I2PSOCKSTunnel(localPort, l, ownDest, (EventDispatcher)null);
     //}
 
-    public I2PSOCKSTunnel(int localPort, Logging l, boolean ownDest,
-			  EventDispatcher notifyThis) {
-	super(localPort, ownDest, l, notifyThis, "SOCKSHandler");
+    public I2PSOCKSTunnel(int localPort, Logging l, boolean ownDest, EventDispatcher notifyThis) {
+        super(localPort, ownDest, l, notifyThis, "SOCKSHandler");
 
-	if (waitEventValue("openBaseClientResult").equals("error")) {
-	    notifyEvent("openSOCKSTunnelResult", "error");
-	    return;
-	}
-	
-	setName(getLocalPort() + " -> SOCKSTunnel");
+        if (waitEventValue("openBaseClientResult").equals("error")) {
+            notifyEvent("openSOCKSTunnelResult", "error");
+            return;
+        }
 
-	startRunning();
+        setName(getLocalPort() + " -> SOCKSTunnel");
 
-	notifyEvent("openSOCKSTunnelResult", "ok");
+        startRunning();
+
+        notifyEvent("openSOCKSTunnelResult", "ok");
     }
 
     protected void clientConnectionRun(Socket s) {
-	try {
-	    SOCKSServer serv = SOCKSServerFactory.createSOCKSServer(s);
-	    Socket clientSock = serv.getClientSocket();
-	    I2PSocket destSock = serv.getDestinationI2PSocket();
-	    new I2PTunnelRunner (clientSock, destSock, sockLock, null);
-	} catch (SOCKSException e) {
-	    _log.error("Error from SOCKS connection: " + e.getMessage());
-	    closeSocket(s);
-	}
+        try {
+            SOCKSServer serv = SOCKSServerFactory.createSOCKSServer(s);
+            Socket clientSock = serv.getClientSocket();
+            I2PSocket destSock = serv.getDestinationI2PSocket();
+            new I2PTunnelRunner(clientSock, destSock, sockLock, null);
+        } catch (SOCKSException e) {
+            _log.error("Error from SOCKS connection: " + e.getMessage());
+            closeSocket(s);
+        }
     }
 }

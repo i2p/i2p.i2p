@@ -1,4 +1,5 @@
 package net.i2p.httptunnel.handler;
+
 import java.io.IOException;
 import java.io.OutputStream;
 
@@ -14,9 +15,9 @@ public class LocalHandler {
 
     private static final Log _log = new Log(LocalHandler.class);
 
-    /* package private */ LocalHandler() {
+    /* package private */LocalHandler() {
     }
-    
+
     /**
      * @param req the Request
      * @param httpl an HTTPListener 
@@ -24,16 +25,16 @@ public class LocalHandler {
      * @throws IOException
      */
     public void handle(Request req, HTTPListener httpl, OutputStream out
-		       /*, boolean fromProxy */) throws IOException {
-	//FIXME: separate multiple pages, not only a start page
-	//FIXME: provide some info on this page
-	out.write(("HTTP/1.1 200 Document following\r\n"+
-		   "Content-Type: text/html; charset=iso-8859-1\r\n\r\n"+
-		   "<html><head><title>Welcome to I2P HTTPTunnel</title>"+
-		   "</head><body><h1>Welcome to I2P HTTPTunnel</h1>You can "+
-		   "browse Eepsites by adding an eepsite name to the request."+
-		   "</body></html>").getBytes("ISO-8859-1"));
-	out.flush();
+    /*, boolean fromProxy */) throws IOException {
+        //FIXME: separate multiple pages, not only a start page
+        //FIXME: provide some info on this page
+        out
+           .write(("HTTP/1.1 200 Document following\r\n" + "Content-Type: text/html; charset=iso-8859-1\r\n\r\n"
+                   + "<html><head><title>Welcome to I2P HTTPTunnel</title>"
+                   + "</head><body><h1>Welcome to I2P HTTPTunnel</h1>You can "
+                   + "browse Eepsites by adding an eepsite name to the request." + "</body></html>")
+                                                                                                    .getBytes("ISO-8859-1"));
+        out.flush();
     }
 
     /**
@@ -43,11 +44,10 @@ public class LocalHandler {
      * @param out where to write the results
      * @throws IOException
      */
-    public void handleProxyConfWarning(Request req, HTTPListener httpl,
-				       OutputStream out) throws IOException {
-	//FIXME
+    public void handleProxyConfWarning(Request req, HTTPListener httpl, OutputStream out) throws IOException {
+        //FIXME
         throw new IOException("jrandom ate the deprecated method. mooo");
-	//httpl.handleNotImplemented(out);
+        //httpl.handleNotImplemented(out);
 
     }
 
@@ -58,11 +58,10 @@ public class LocalHandler {
      * @param out where to write the results
      * @throws IOException
      */
-    public void handleHTTPWarning(Request req, HTTPListener httpl,
-				  OutputStream out /*, boolean fromProxy */)
-    throws IOException {
-	// FIXME
+    public void handleHTTPWarning(Request req, HTTPListener httpl, OutputStream out /*, boolean fromProxy */)
+                                                                                                              throws IOException {
+        // FIXME
         throw new IOException("jrandom ate the deprecated method. mooo");
-	//httpl.handleNotImplemented(out);
+        //httpl.handleNotImplemented(out);
     }
 }

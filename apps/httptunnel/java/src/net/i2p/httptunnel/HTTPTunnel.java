@@ -44,10 +44,9 @@ public class HTTPTunnel {
      * @param shouldThrowAwayManagers whether to throw away a manager after use
      * @param listenPort which port to listen on
      */
-    public HTTPTunnel(I2PSocketManager[] initialManagers, int maxManagers,
-		      boolean shouldThrowAwayManagers, int listenPort) {
-	this(initialManagers, maxManagers, shouldThrowAwayManagers, listenPort,
-	     "127.0.0.1", 7654);
+    public HTTPTunnel(I2PSocketManager[] initialManagers, int maxManagers, boolean shouldThrowAwayManagers,
+                      int listenPort) {
+        this(initialManagers, maxManagers, shouldThrowAwayManagers, listenPort, "127.0.0.1", 7654);
     }
 
     /**
@@ -60,56 +59,50 @@ public class HTTPTunnel {
      * @param i2cpAddress the I2CP address
      * @param i2cpPort the I2CP port
      */
-    public HTTPTunnel(I2PSocketManager[] initialManagers, int maxManagers,
-		      boolean shouldThrowAwayManagers, int listenPort,
-		      String i2cpAddress, int i2cpPort) {
-	SocketManagerProducer smp = 
-	    new SocketManagerProducer(initialManagers, maxManagers,
-				      shouldThrowAwayManagers, i2cpAddress, i2cpPort);
-	new HTTPListener(smp, listenPort, "127.0.0.1");
+    public HTTPTunnel(I2PSocketManager[] initialManagers, int maxManagers, boolean shouldThrowAwayManagers,
+                      int listenPort, String i2cpAddress, int i2cpPort) {
+        SocketManagerProducer smp = new SocketManagerProducer(initialManagers, maxManagers, shouldThrowAwayManagers,
+                                                              i2cpAddress, i2cpPort);
+        new HTTPListener(smp, listenPort, "127.0.0.1");
     }
-    
+
     /**
      * The all important main function, allowing HTTPTunnel to be 
      * stand-alone, a program in it's own right, and all that jazz.
      * @param args A list of String passed to the program
      */
     public static void main(String[] args) {
-	String host = "127.0.0.1";
-	int port = 7654, max = 1;
-	boolean throwAwayManagers = false;
-	if (args.length >1) {
-	    if (args.length == 4) {
-		host = args[2];
-		port = Integer.parseInt(args[3]);
-	    } else if (args.length != 2) {
-		showInfo(); return;
-	    }
-	    max = Integer.parseInt(args[1]);
-	} else if (args.length != 1) {
-	    showInfo(); return;
-	}
-	if (max == 0) {
-	    max = 1;
-	} else if (max <0) {
-	    max = -max;
-	    throwAwayManagers = true;
-	}
-	new HTTPTunnel(null, max, throwAwayManagers, Integer.parseInt(args[0]), host, port);
+        String host = "127.0.0.1";
+        int port = 7654, max = 1;
+        boolean throwAwayManagers = false;
+        if (args.length > 1) {
+            if (args.length == 4) {
+                host = args[2];
+                port = Integer.parseInt(args[3]);
+            } else if (args.length != 2) {
+                showInfo();
+                return;
+            }
+            max = Integer.parseInt(args[1]);
+        } else if (args.length != 1) {
+            showInfo();
+            return;
+        }
+        if (max == 0) {
+            max = 1;
+        } else if (max < 0) {
+            max = -max;
+            throwAwayManagers = true;
+        }
+        new HTTPTunnel(null, max, throwAwayManagers, Integer.parseInt(args[0]), host, port);
     }
-	    
+
     private static void showInfo() {
-	System.out.println
-	    ("Usage: java HTTPTunnel <listenPort> [<max> "+
-	     "[<i2cphost> <i2cpport>]]\n"+
-	     "  <listenPort>  port to listen for browsers\n"+
-	     "  <max>         max number of SocketMangers in pool, "+
-	     "use neg. number\n"+
-	     "                to use each SocketManager only once "+
-	     "(default: 1)\n"+
-	     "  <i2cphost>    host to connect to the router "+
-	     "(default: 127.0.0.1)\n"+
-	     "  <i2cpport>    port to connect to the router "+
-	     "(default: 7654)");
+        System.out.println("Usage: java HTTPTunnel <listenPort> [<max> " + "[<i2cphost> <i2cpport>]]\n"
+                           + "  <listenPort>  port to listen for browsers\n"
+                           + "  <max>         max number of SocketMangers in pool, " + "use neg. number\n"
+                           + "                to use each SocketManager only once " + "(default: 1)\n"
+                           + "  <i2cphost>    host to connect to the router " + "(default: 127.0.0.1)\n"
+                           + "  <i2cpport>    port to connect to the router " + "(default: 7654)");
     }
 }

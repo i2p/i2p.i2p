@@ -19,30 +19,30 @@ public class I2PTunnelGUI extends Frame implements ActionListener, Logging {
     TextField input;
     TextArea log;
     I2PTunnel t;
-    
+
     public I2PTunnelGUI(I2PTunnel t) {
-	super("I2PTunnel control panel");
-	this.t=t;
-	setLayout(new BorderLayout());
-	add("South", input=new TextField());
-	input.addActionListener(this);
-	Font font = new Font("Monospaced",Font.PLAIN,12);
-	add("Center",log=new TextArea("",20,80,TextArea.SCROLLBARS_VERTICAL_ONLY));
-	log.setFont(font);
-	log.setEditable(false);
-	log("enter 'help' for help.");
-	pack();
-	show();
+        super("I2PTunnel control panel");
+        this.t = t;
+        setLayout(new BorderLayout());
+        add("South", input = new TextField());
+        input.addActionListener(this);
+        Font font = new Font("Monospaced", Font.PLAIN, 12);
+        add("Center", log = new TextArea("", 20, 80, TextArea.SCROLLBARS_VERTICAL_ONLY));
+        log.setFont(font);
+        log.setEditable(false);
+        log("enter 'help' for help.");
+        pack();
+        show();
     }
 
     public void log(String s) {
-	log.append(s+"\n");
+        log.append(s + "\n");
     }
 
     public void actionPerformed(ActionEvent evt) {
-	log("I2PTunnel>"+input.getText());
-	t.runCommand(input.getText(), this);
-	log("---");
-	input.setText("");
+        log("I2PTunnel>" + input.getText());
+        t.runCommand(input.getText(), this);
+        log("---");
+        input.setText("");
     }
 }

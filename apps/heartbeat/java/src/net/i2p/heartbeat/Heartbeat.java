@@ -55,7 +55,7 @@ import net.i2p.util.Log;
  * </pre>
  *
  */
-public class Heartbeat  {
+public class Heartbeat {
     private static final Log _log = new Log(Heartbeat.class);
     /** location containing this heartbeat's config */
     private String _configFile;
@@ -67,47 +67,51 @@ public class Heartbeat  {
     private I2PAdapter _adapter;
     /** our own callback that the I2PAdapter notifies on ping or pong messages */
     private PingPongAdapter _eventAdapter;
-    
+
     /** if there are no command line arguments, load the config from "heartbeat.config" */
     public static final String CONFIG_FILE_DEFAULT = "heartbeat.config";
-    
+
     /**
      * build up a new heartbeat manager, but don't actually do anything
      * @param configFile the name of the configuration file
      */
     public Heartbeat(String configFile) {
-	_configFile = configFile;
-	_clientConfigs = new HashMap();
-	_clientEngines = new HashMap();
-	_eventAdapter = new PingPongAdapter();
-	_adapter = new I2PAdapter();
-	_adapter.setListener(_eventAdapter);
+        _configFile = configFile;
+        _clientConfigs = new HashMap();
+        _clientEngines = new HashMap();
+        _eventAdapter = new PingPongAdapter();
+        _adapter = new I2PAdapter();
+        _adapter.setListener(_eventAdapter);
     }
-    private Heartbeat() {}
-    
+
+    private Heartbeat() {
+    }
+
     /** load up the config data (but don't build any engines or start them up) */
     public void loadConfig() {
-	Properties props = new Properties();
-	FileInputStream fin = null;
-	File configFile = new File (_configFile);
-	if (configFile.exists()) {
-	    try {
-		fin = new FileInputStream(_configFile);
-		props.load(fin);
-	    } catch (IOException ioe) {
-		if (_log.shouldLog(Log.ERROR)) {
-		    _log.error("Error reading the config data", ioe);
+        Properties props = new Properties();
+        FileInputStream fin = null;
+        File configFile = new File(_configFile);
+        if (configFile.exists()) {
+            try {
+                fin = new FileInputStream(_configFile);
+                props.load(fin);
+            } catch (IOException ioe) {
+                if (_log.shouldLog(Log.ERROR)) {
+                    _log.error("Error reading the config data", ioe);
+                }
+            } finally {
+                if (fin != null) try {
+                    fin.close();
+                } catch (IOException ioe) {
+                }
+            }
         }
-	    } finally {
-		if (fin != null) try { fin.close(); } catch (IOException ioe) {}
-	    }
-	}
-	
-	loadBaseConfig(props);
-	loadClientConfigs(props);
+
+        loadBaseConfig(props);
+        loadClientConfigs(props);
     }
-    
-    
+
     /** 
      * send a ping message to the peer
      *
@@ -117,65 +121,65 @@ public class Heartbeat  {
      * @param size total message size to send
      */
     void sendPing(Destination peer, int seriesNum, long now, int size) {
-	if (_adapter.getIsConnected())
-	    _adapter.sendPing(peer, seriesNum, now, size);
+        if (_adapter.getIsConnected()) _adapter.sendPing(peer, seriesNum, now, size);
     }
-    
+
     /**
      * load up the base data (I2CP config, etc)
      * @param props the properties to load from 
      */
     private void loadBaseConfig(Properties props) {
-	_adapter.loadConfig(props);
+        _adapter.loadConfig(props);
     }
-    
+
     /** 
      * load up all of the test config data 
      * @param props the properties to load from
      * */
     private void loadClientConfigs(Properties props) {
-	int i = 0;
-	while (true) {
-	    ClientConfig config = new ClientConfig();
-	    if (!config.load(props, i)) {
-		    break;
+        int i = 0;
+        while (true) {
+            ClientConfig config = new ClientConfig();
+            if (!config.load(props, i)) {
+                break;
+            }
+            _clientConfigs.put(new Integer(i), config);
+            i++;
         }
-	    _clientConfigs.put(new Integer(i), config);
-	    i++;
-	}
     }
 
     /** connect to the network */
     private void connect() {
-	boolean connected = _adapter.connect();
-	if (!connected)
-	    _log.error("Unable to connect to the router");
+        boolean connected = _adapter.connect();
+        if (!connected) _log.error("Unable to connect to the router");
     }
+
     /** disconnect from the network */
     private void disconnect() {
-	_adapter.disconnect();
+        _adapter.disconnect();
     }
-    
+
     /** start up all of the tests */
     public void startEngines() {
-	for (Iterator iter = _clientConfigs.values().iterator(); iter.hasNext(); ) {
-	    ClientConfig config = (ClientConfig)iter.next();
-	    ClientEngine engine = new ClientEngine(this, config);
-	    config.setUs(_adapter.getLocalDestination());
-	    config.setNumHops(_adapter.getNumHops());
-	    _clientEngines.put(new Integer(engine.getSeriesNum()), engine);
-	    engine.startEngine();
-	}
+        for (Iterator iter = _clientConfigs.values().iterator(); iter.hasNext();) {
+            ClientConfig config = (ClientConfig) iter.next();
+            ClientEngine engine = new ClientEngine(this, config);
+            config.setUs(_adapter.getLocalDestination());
+            config.setNumHops(_adapter.getNumHops());
+            _clientEngines.put(new Integer(engine.getSeriesNum()), engine);
+            engine.startEngine();
+        }
     }
+
     /** stop all of the tests */
     public void stopEngines() {
-	for (Iterator iter = _clientEngines.values().iterator(); iter.hasNext(); ) {
-	    ClientEngine engine = (ClientEngine)iter.next();
-	    engine.stopEngine();
-	}
-	_clientEngines.clear();
+        for (Iterator iter = _clientEngines.values().iterator(); iter.hasNext();) {
+            ClientEngine engine = (ClientEngine) iter.next();
+            engine.stopEngine();
+        }
+        _clientEngines.clear();
     }
-    
+
     /**
      * Fire up a new heartbeat system, waiting until, well, forever.  Builds
      * a new heartbeat system, loads the config, connects to the network, starts
@@ -186,62 +190,63 @@ public class Heartbeat  {
      * @param args the list of args passed to the program from the command-line
      */
     public static void main(String args[]) {
-	String configFile = CONFIG_FILE_DEFAULT;
-	if (args.length == 1) {
-	    configFile = args[0];
+        String configFile = CONFIG_FILE_DEFAULT;
+        if (args.length == 1) {
+            configFile = args[0];
+        }
+
+        if (_log.shouldLog(Log.INFO)) {
+            _log.info("Starting up with config file " + configFile);
+        }
+        Heartbeat heartbeat = new Heartbeat(configFile);
+        heartbeat.loadConfig();
+        heartbeat.connect();
+        heartbeat.startEngines();
+        Object o = new Object();
+        while (true) {
+            try {
+                synchronized (o) {
+                    o.wait();
+                }
+            } catch (InterruptedException ie) {
+            }
+        }
     }
-	
-	if (_log.shouldLog(Log.INFO)) {
-	    _log.info("Starting up with config file " + configFile);
-    }
-	Heartbeat heartbeat = new Heartbeat(configFile);
-	heartbeat.loadConfig();
-	heartbeat.connect();
-	heartbeat.startEngines();
-	Object o = new Object();
-	while (true) {
-	    try {
-		synchronized (o) {
-		    o.wait();
-		}
-	    } catch (InterruptedException ie) {}
-	}
-    }
- 
+
     /**
      * Receive event notification from the I2PAdapter
      *
      */
     private class PingPongAdapter implements I2PAdapter.PingPongEventListener {
-	/**
-	 * We were pinged, so always just send a pong back.
-	 * 
-	 * @param from who sent us the ping?
-	 * @param seriesNum what series did the sender specify?
-	 * @param sentOn when did the sender say they sent their ping?
-	 * @param data arbitrary payload data
-	 */
-	public void receivePing(Destination from, int seriesNum, Date sentOn, byte[] data) {
-	    if (_adapter.getIsConnected()) {
-		    _adapter.sendPong(from, seriesNum, sentOn, data);
+        /**
+         * We were pinged, so always just send a pong back.
+         * 
+         * @param from who sent us the ping?
+         * @param seriesNum what series did the sender specify?
+         * @param sentOn when did the sender say they sent their ping?
+         * @param data arbitrary payload data
+         */
+        public void receivePing(Destination from, int seriesNum, Date sentOn, byte[] data) {
+            if (_adapter.getIsConnected()) {
+                _adapter.sendPong(from, seriesNum, sentOn, data);
+            }
         }
-	}
 
-	/**
-	 * We received a pong, so find the right client engine and tell it about the pong.
-	 *
-	 * @param from who sent us the pong
-	 * @param seriesNum our client ID
-	 * @param sentOn when did we send the ping?
-	 * @param replyOn when did they send their pong?
-	 * @param data the arbitrary data we sent in the ping (that they sent back in the pong)
-	 */
-	public void receivePong(Destination from, int seriesNum, Date sentOn, Date replyOn, byte[] data) {
-	    ClientEngine engine = (ClientEngine)_clientEngines.get(new Integer(seriesNum));
-	    if (engine.getPeer().equals(from)) {
-		    engine.receivePong(sentOn.getTime(), replyOn.getTime());
+        /**
+         * We received a pong, so find the right client engine and tell it about the pong.
+         *
+         * @param from who sent us the pong
+         * @param seriesNum our client ID
+         * @param sentOn when did we send the ping?
+         * @param replyOn when did they send their pong?
+         * @param data the arbitrary data we sent in the ping (that they sent back in the pong)
+         */
+        public void receivePong(Destination from, int seriesNum, Date sentOn, Date replyOn, byte[] data) {
+            ClientEngine engine = (ClientEngine) _clientEngines.get(new Integer(seriesNum));
+            if (engine.getPeer().equals(from)) {
+                engine.receivePong(sentOn.getTime(), replyOn.getTime());
+            }
         }
-	}
     }
-    
+
 }

@@ -47,7 +47,6 @@ public abstract class SOCKSServer {
      */
     public abstract Socket getClientSocket() throws SOCKSException;
 
-
     /**
      * Confirm to the client that the connection has succeeded
      */
@@ -60,40 +59,39 @@ public abstract class SOCKSServer {
      * @return an I2PSocket connected with the destination
      */
     public I2PSocket getDestinationI2PSocket() throws SOCKSException {
-	setupServer();
+        setupServer();
 
-	if (connHostName == null) {
-	    _log.error("BUG: destination host name has not been initialized!");
-	    throw new SOCKSException("BUG! See the logs!");
-	}
-	if (connPort == 0) {
-	    _log.error("BUG: destination port has not been initialized!");
-	    throw new SOCKSException("BUG! See the logs!");
-	}
+        if (connHostName == null) {
+            _log.error("BUG: destination host name has not been initialized!");
+            throw new SOCKSException("BUG! See the logs!");
+        }
+        if (connPort == 0) {
+            _log.error("BUG: destination port has not been initialized!");
+            throw new SOCKSException("BUG! See the logs!");
+        }
 
-	// FIXME: here we should read our config file, select an
-	// outproxy, and instantiate the proper socket class that
-	// handles the outproxy itself (SOCKS4a, SOCKS5, HTTP CONNECT...).
-	I2PSocket destSock;
+        // FIXME: here we should read our config file, select an
+        // outproxy, and instantiate the proper socket class that
+        // handles the outproxy itself (SOCKS4a, SOCKS5, HTTP CONNECT...).
+        I2PSocket destSock;
 
-	try {
-	    if (connHostName.toLowerCase().endsWith(".i2p")) {
-		_log.debug("connecting to " + connHostName + "...");
-		I2PSocketManager sm = I2PSocketManagerFactory.createManager();
-		destSock = sm.connect(I2PTunnel.destFromName(connHostName),
-				      new I2PSocketOptions());
-		confirmConnection();
-		_log.debug("connection confirmed - exchanging data...");
-	    } else {
-		_log.error("We don't support outproxies (yet)");
-		throw new SOCKSException("Ouproxies not supported (yet)");
-	    }
-	} catch (DataFormatException e) {
-	    throw new SOCKSException("Error in destination format");
-	} catch (I2PException e) {
-	    throw new SOCKSException("I2P error (" + e.getMessage() + ")");
-	}
-	
-	return destSock;
+        try {
+            if (connHostName.toLowerCase().endsWith(".i2p")) {
+                _log.debug("connecting to " + connHostName + "...");
+                I2PSocketManager sm = I2PSocketManagerFactory.createManager();
+                destSock = sm.connect(I2PTunnel.destFromName(connHostName), new I2PSocketOptions());
+                confirmConnection();
+                _log.debug("connection confirmed - exchanging data...");
+            } else {
+                _log.error("We don't support outproxies (yet)");
+                throw new SOCKSException("Ouproxies not supported (yet)");
+            }
+        } catch (DataFormatException e) {
+            throw new SOCKSException("Error in destination format");
+        } catch (I2PException e) {
+            throw new SOCKSException("I2P error (" + e.getMessage() + ")");
+        }
+
+        return destSock;
     }
 }

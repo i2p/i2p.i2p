@@ -3,7 +3,6 @@
  */
 package net.i2p.i2ptunnel;
 
-
 public interface Logging {
     public void log(String s);
 }
