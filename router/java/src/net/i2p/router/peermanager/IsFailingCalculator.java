@@ -20,8 +20,8 @@ public class IsFailingCalculator extends Calculator {
     private Log _log;
     private RouterContext _context;
     
-    /** if they haven't b0rked in the last 5 minutes, they're ok */
-    private final static long GRACE_PERIOD = 5*60*1000;
+    /** if they haven't b0rked in the last 2 minutes, they're ok */
+    private final static long GRACE_PERIOD = 2*60*1000;
     
     public IsFailingCalculator(RouterContext context) {
         _context = context;
@@ -32,6 +32,9 @@ public class IsFailingCalculator extends Calculator {
         // have we failed in the last 119 seconds?
         if ( (profile.getCommError().getRate(60*1000).getCurrentEventCount() > 0) ||
              (profile.getCommError().getRate(60*1000).getLastEventCount() > 0) ) {
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Peer " + profile.getPeer().toBase64() 
+                           + " is failing because it had a comm error in the last 2 minutes");
             return true;
         } else {
             //if ( (profile.getDBHistory().getFailedLookupRate().getRate(60*1000).getCurrentEventCount() > 0) ||
@@ -44,16 +47,26 @@ public class IsFailingCalculator extends Calculator {
             
             if (profile.getTunnelHistory().getLastRejected() >= recently) {
                 // have they refused to participate in a tunnel in the last 5 minutes?
+                if (_log.shouldLog(Log.DEBUG))
+                    _log.debug("Peer " + profile.getPeer().toBase64() 
+                               + " is failing because it refused to participate in a tunnel in the last few minutes");
                 return true;
             }
             
             if (profile.getTunnelHistory().getLastFailed() >= recently) {
                 // has a tunnel they participate in failed in the last 5 minutes?
+                if (_log.shouldLog(Log.DEBUG))
+                    _log.debug("Peer " + profile.getPeer().toBase64() 
+                               + " is failing because it one of their tunnels failed in the last few minutes");
                 return true;
             }
             
-            if (profile.getLastSendFailed() >= recently)
+            if (profile.getLastSendFailed() >= recently) {
+                if (_log.shouldLog(Log.DEBUG))
+                    _log.debug("Peer " + profile.getPeer().toBase64() 
+                               + " is failing because we couldnt send to it recently");
                 return true;
+            }
             
             return false;
         }
