@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project basedir="." default="all" name="heartbeat">
+    <target name="all" depends="clean, build" />
+    <target name="build" depends="builddep, jar" />
+    <target name="builddep">
+        <ant dir="../../../core/java/" target="build" />
+    </target>
+    <target name="compile">
+        <mkdir dir="./build" />
+        <mkdir dir="./build/obj" />
+        <javac srcdir="./src" debug="true" destdir="./build/obj" classpath="../../../core/java/build/i2p.jar" />
+    </target>
+    <target name="jar" depends="compile">
+        <jar destfile="./build/heartbeat.jar" basedir="./build/obj" includes="**/*.class">
+            <manifest>
+                <attribute name="Main-Class" value="net.i2p.heartbeat.Heartbeat" />
+                <attribute name="Class-Path" value="i2p.jar heartbeat.jar" />
+            </manifest>
+        </jar>
+    </target>
+    <target name="javadoc">
+        <mkdir dir="./build" />
+        <mkdir dir="./build/javadoc" />
+        <javadoc 
+            sourcepath="./src:../../../core/java/src:../../../core/java/test" destdir="./build/javadoc" 
+            packagenames="*" 
+            use="true" 
+            access="package"
+            splitindex="true" 
+            windowtitle="I2P heartbeat monitor" />
+    </target>
+    <target name="clean">
+        <delete dir="./build" />
+    </target>
+    <target name="cleandep" depends="clean">
+        <ant dir="../../../core/java/" target="cleandep" />
+    </target>
+    <target name="distclean" depends="clean">
+        <ant dir="../../../core/java/" target="distclean" />
+    </target>
+</project>
