@@ -46,6 +46,17 @@ public class TunnelParticipant {
 
         if ( (_config != null) && (_config.getSendTo() != null) ) {
             _nextHopCache = _context.netDb().lookupRouterInfoLocally(_config.getSendTo());
+            if (_nextHopCache == null)
+                _context.netDb().lookupRouterInfo(_config.getSendTo(), new Found(_context), null, 60*1000);
+        }
+    }
+    
+    private class Found extends JobImpl {
+        public Found(RouterContext ctx) { super(ctx); }
+        public String getName() { return "Next hop info found"; }
+        public void runJob() {
+            if (_nextHopCache == null)
+                _nextHopCache = _context.netDb().lookupRouterInfoLocally(_config.getSendTo());
         }
     }
     

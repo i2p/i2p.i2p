@@ -51,6 +51,7 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
     private int _clientMessageSize;
     private Destination _from;
     private Destination _to;
+    private String _toString;
     /** target destination's leaseSet, if known */
     private LeaseSet _leaseSet;
     /** Actual lease the message is being routed through */
@@ -117,6 +118,7 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
         _clientMessageSize = msg.getPayload().getSize();
         _from = msg.getFromDestination();
         _to = msg.getDestination();
+        _toString = _to.calculateHash().toBase64().substring(0,4);
         _leaseSetLookupBegin = -1;
         
         String param = msg.getSenderConfig().getOptions().getProperty(OVERALL_TIMEOUT_MS_PARAM);
@@ -146,22 +148,24 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
             _log.debug(getJobId() + ": Send outbound client message job beginning");
         buildClove();
         if (_log.shouldLog(Log.DEBUG))
-            _log.debug(getJobId() + ": Clove built");
+            _log.debug(getJobId() + ": Clove built to " + _toString);
         long timeoutMs = _overallExpiration - getContext().clock().now();
         if (_log.shouldLog(Log.DEBUG))
-            _log.debug(getJobId() + ": preparing to search for the leaseSet");
+            _log.debug(getJobId() + ": preparing to search for the leaseSet for " + _toString);
         Hash key = _to.calculateHash();
         SendJob success = new SendJob(getContext());
         LookupLeaseSetFailedJob failed = new LookupLeaseSetFailedJob(getContext());
-        if (_log.shouldLog(Log.DEBUG))
-            _log.debug(getJobId() + ": Send outbound client message - sending off leaseSet lookup job");
         LeaseSet ls = getContext().netDb().lookupLeaseSetLocally(key);
         if (ls != null) {
             getContext().statManager().addRateData("client.leaseSetFoundLocally", 1, 0);
             _leaseSetLookupBegin = -1;
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug(getJobId() + ": Send outbound client message - leaseSet found locally for " + _toString);
             success.runJob();
         } else {
             _leaseSetLookupBegin = getContext().clock().now();
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug(getJobId() + ": Send outbound client message - sending off leaseSet lookup job for " + _toString);
             getContext().netDb().lookupLeaseSet(key, success, failed, timeoutMs);
         }
     }
@@ -203,8 +207,11 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
             boolean ok = getNextLease();
             if (ok)
                 send();
-            else
+            else {
+                if (_log.shouldLog(Log.ERROR))
+                    _log.error("Unable to send on a random lease, as getNext returned null (to=" + _toString + ")");
                 dieFatal();
+            }
         }
     }
     
@@ -218,7 +225,7 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
         _leaseSet = getContext().netDb().lookupLeaseSetLocally(_to.calculateHash());
         if (_leaseSet == null) {
             if (_log.shouldLog(Log.WARN))
-                _log.warn(getJobId() + ": Lookup locally didn't find the leaseSet");
+                _log.warn(getJobId() + ": Lookup locally didn't find the leaseSet for " + _toString);
             return false;
         } 
         long now = getContext().clock().now();
@@ -229,7 +236,7 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
             Lease lease = _leaseSet.getLease(i);
             if (lease.isExpired(Router.CLOCK_FUDGE_FACTOR)) {
                 if (_log.shouldLog(Log.WARN))
-                    _log.warn(getJobId() + ": getNextLease() - expired lease! - " + lease);
+                    _log.warn(getJobId() + ": getNextLease() - expired lease! - " + lease + " for " + _toString);
                 continue;
             } else {
                 leases.add(lease);
@@ -278,6 +285,9 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
                 long lookupTime = getContext().clock().now() - _leaseSetLookupBegin;
                 getContext().statManager().addRateData("client.leaseSetFailedRemoteTime", lookupTime, lookupTime);
             }
+            
+            if (_log.shouldLog(Log.ERROR))
+                _log.error("Unable to send to " + _toString + " because we couldn't find their leaseSet");
 
             dieFatal();
         }
@@ -312,12 +322,14 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
             // set to null if there are no tunnels to ack the reply back through
             // (should we always fail for this? or should we send it anyway, even if
             // we dont receive the reply? hmm...)
+            if (_log.shouldLog(Log.ERROR))
+                _log.error(getJobId() + ": Unable to create the garlic message (no tunnels left) to " + _toString);
             dieFatal();
             return;
         }
         
         if (_log.shouldLog(Log.DEBUG))
-            _log.debug(getJobId() + ": send() - token expected " + token);
+            _log.debug(getJobId() + ": send() - token expected " + token + " to " + _toString);
         
         SendSuccessJob onReply = new SendSuccessJob(getContext(), sessKey, tags);
         SendTimeoutJob onFail = new SendTimeoutJob(getContext());
@@ -325,6 +337,7 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
         
         if (_log.shouldLog(Log.DEBUG))
             _log.debug(getJobId() + ": Placing GarlicMessage into the new tunnel message bound for " 
+                       + _toString + " at "
                        + _lease.getTunnelId() + " on " 
                        + _lease.getGateway().toBase64());
         
@@ -332,6 +345,7 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
         if (outTunnel != null) {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug(getJobId() + ": Sending tunnel message out " + outTunnel.getSendTunnelId(0) + " to " 
+                           + _toString + " at "
                            + _lease.getTunnelId() + " on " 
                            + _lease.getGateway().toBase64());
 
@@ -365,7 +379,11 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
         public String getName() { return "Dispatch outbound client message"; }
         public void runJob() {
             getContext().messageRegistry().registerPending(_selector, _replyFound, _replyTimeout, _timeoutMs);
+            if (_log.shouldLog(Log.INFO))
+                _log.info("Dispatching message to " + _toString + ": " + _msg);
             getContext().tunnelDispatcher().dispatchOutbound(_msg, _outTunnel.getSendTunnelId(0), _lease.getTunnelId(), _lease.getGateway());
+            if (_log.shouldLog(Log.INFO))
+                _log.info("Dispatching message to " + _toString + " complete");
 
         }
     }
@@ -427,6 +445,7 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
         
         DataMessage msg = new DataMessage(getContext());
         msg.setData(_clientMessage.getPayload().getEncryptedData());
+        msg.setMessageExpiration(_overallExpiration);
         
         clove.setPayload(msg);
         clove.setRecipientPublicKey(null);
@@ -470,6 +489,11 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
             } else {
                 return false;
             }
+        }
+        
+        public String toString() {
+            return "sending " + _toString + " waiting for token " + _pendingToken
+                   + " for cloveId " + _cloveId;
         }
     }
     

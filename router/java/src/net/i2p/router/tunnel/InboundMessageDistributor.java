@@ -90,6 +90,8 @@ public class InboundMessageDistributor implements GarlicMessageReceiver.CloveRec
                                + " failing to distribute " + msg);
                 return;
             }
+            if (msg.getMessageExpiration() < _context.clock().now() + 10*1000)
+                msg.setMessageExpiration(_context.clock().now() + 10*1000);
             _context.tunnelDispatcher().dispatchOutbound(msg, outId, tunnel, target);
         }
     }

@@ -31,20 +31,20 @@ public class MessageValidator {
     /**
      * Determine if this message should be accepted as valid (not expired, not a duplicate)
      *
-     * @return true if the message should be accepted as valid, false otherwise
+     * @return reason why the message is invalid (or null if the message is valid)
      */
-    public boolean validateMessage(long messageId, long expiration) {
+    public String validateMessage(long messageId, long expiration) {
         long now = _context.clock().now();
         if (now - Router.CLOCK_FUDGE_FACTOR >= expiration) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Rejecting message " + messageId + " because it expired " + (now-expiration) + "ms ago");
             _context.statManager().addRateData("router.invalidMessageTime", (now-expiration), 0);
-            return false;
+            return "expired " + (now-expiration) + "ms ago";
         } else if (now + 4*Router.CLOCK_FUDGE_FACTOR < expiration) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Rejecting message " + messageId + " because it will expire too far in the future (" + (expiration-now) + "ms)");
             _context.statManager().addRateData("router.invalidMessageTime", (now-expiration), 0);
-            return false;
+            return "expire too far in the future (" + (expiration-now) + "ms)";
         }
         
         boolean isDuplicate = noteReception(messageId, expiration);
@@ -52,11 +52,11 @@ public class MessageValidator {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Rejecting message " + messageId + " because it is a duplicate", new Exception("Duplicate origin"));
             _context.statManager().addRateData("router.duplicateMessageId", 1, 0);
-            return false;
+            return "duplicate";
         } else {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Accepting message " + messageId + " because it is NOT a duplicate", new Exception("Original origin"));
-            return true;
+            return null;
         }
     }
     

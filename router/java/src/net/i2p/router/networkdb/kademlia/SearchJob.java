@@ -264,8 +264,9 @@ class SearchJob extends JobImpl {
                 _log.error(getJobId() + ": Dont send search to ourselves - why did we try?");
             return;
         } else {
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug(getJobId() + ": Send search to " + router.getIdentity().getHash().toBase64());
+            if (_log.shouldLog(Log.INFO))
+                _log.info(getJobId() + ": Send search to " + router.getIdentity().getHash().toBase64()
+                          + " for " + _state.getTarget().toBase64());
         }
 
         getContext().statManager().addRateData("netDb.searchMessageCount", 1, 0);
@@ -330,8 +331,8 @@ class SearchJob extends JobImpl {
 
         DatabaseLookupMessage msg = buildMessage(expiration);
 
-        if (_log.shouldLog(Log.INFO))
-            _log.info(getJobId() + ": Sending router search to " + router.getIdentity().getHash().toBase64() 
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug(getJobId() + ": Sending router search to " + router.getIdentity().getHash().toBase64() 
                       + " for " + msg.getSearchKey().toBase64() + " w/ replies to us [" 
                       + msg.getFrom().toBase64() + "]");
         SearchMessageSelector sel = new SearchMessageSelector(getContext(), router, _expiration, _state);

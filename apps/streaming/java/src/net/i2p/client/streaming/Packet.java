@@ -552,6 +552,11 @@ public class Packet {
     }
     
     public String toString() {
+        StringBuffer str = formatAsString();
+        return str.toString();
+    }
+    
+    protected StringBuffer formatAsString() {
         StringBuffer buf = new StringBuffer(64);
         buf.append(toId(_sendStreamId));
         //buf.append("<-->");
@@ -570,7 +575,7 @@ public class Packet {
         }
         if ( (_payload != null) && (_payload.getValid() > 0) )
             buf.append(" data: ").append(_payload.getValid());
-        return buf.toString();
+        return buf;
     }
     
     private static final String toId(byte id[]) {

@@ -258,7 +258,7 @@ public class Connection {
             }
             packet.setFlag(Packet.FLAG_DELAY_REQUESTED);
             
-            long timeout = (_options.getRTT() < MIN_RESEND_DELAY ? MIN_RESEND_DELAY : _options.getRTT());
+            long timeout = _options.getRTT() + MIN_RESEND_DELAY;
             if (timeout > MAX_RESEND_DELAY)
                 timeout = MAX_RESEND_DELAY;
             if (_log.shouldLog(Log.DEBUG))

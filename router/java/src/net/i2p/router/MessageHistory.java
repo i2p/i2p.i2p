@@ -318,7 +318,7 @@ public class MessageHistory {
      */
     public void sendMessage(String messageType, long messageId, long expiration, Hash peer, boolean sentOk) {
         if (!_doLog) return;
-        if (true) return;
+        if (false) return;
         StringBuffer buf = new StringBuffer(256);
         buf.append(getPrefix());
         buf.append("send [").append(messageType).append("] message [").append(messageId).append("] ");
@@ -344,7 +344,7 @@ public class MessageHistory {
      */
     public void receiveMessage(String messageType, long messageId, long expiration, Hash from, boolean isValid) {
         if (!_doLog) return;
-        if (true) return;
+        if (false) return;
         StringBuffer buf = new StringBuffer(256);
         buf.append(getPrefix());
         buf.append("receive [").append(messageType).append("] with id [").append(messageId).append("] ");

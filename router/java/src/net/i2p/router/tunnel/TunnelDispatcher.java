@@ -431,6 +431,12 @@ public class TunnelDispatcher implements Service {
                                + (before-msg.getMessageExpiration()) + "ms ago? " 
                                + msg, new Exception("cause"));
                 return;
+            } else if (msg.getMessageExpiration() < before) {
+                // nonfatal, as long as it was remotely created
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("why are you sending a tunnel message that expired " 
+                               + (before-msg.getMessageExpiration()) + "ms ago? " 
+                               + msg, new Exception("cause"));
             }
             gw.add(msg, targetPeer, targetTunnel);
             if (targetTunnel == null)

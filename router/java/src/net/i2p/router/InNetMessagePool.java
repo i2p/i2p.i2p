@@ -17,6 +17,7 @@ import net.i2p.data.i2np.DeliveryStatusMessage;
 import net.i2p.data.i2np.I2NPMessage;
 import net.i2p.data.i2np.DatabaseSearchReplyMessage;
 import net.i2p.data.i2np.DatabaseLookupMessage;
+import net.i2p.data.i2np.TunnelCreateMessage;
 import net.i2p.data.i2np.TunnelCreateStatusMessage;
 import net.i2p.data.i2np.TunnelDataMessage;
 import net.i2p.data.i2np.TunnelGatewayMessage;
@@ -103,11 +104,15 @@ public class InNetMessagePool implements Service {
         if (messageBody instanceof TunnelDataMessage) {
             // do not validate the message with the validator - the IV validator is sufficient
         } else { 
-            boolean valid = _context.messageValidator().validateMessage(messageBody.getUniqueId(), exp);
-            if (!valid) {
-                if (_log.shouldLog(Log.WARN))
-                    _log.warn("Duplicate message received [" + messageBody.getUniqueId() 
-                              + " expiring on " + exp + "]: " + messageBody.getClass().getName());
+            String invalidReason = _context.messageValidator().validateMessage(messageBody.getUniqueId(), exp);
+            if (invalidReason != null) {
+                int level = Log.WARN;
+                if (messageBody instanceof TunnelCreateMessage)
+                    level = Log.INFO;
+                if (_log.shouldLog(level))
+                    _log.log(level, "Duplicate message received [" + messageBody.getUniqueId() 
+                              + " expiring on " + exp + "]: " + messageBody.getClass().getName() + ": " + invalidReason 
+                              + ": " + messageBody);
                 _context.statManager().addRateData("inNetPool.dropped", 1, 0);
                 _context.statManager().addRateData("inNetPool.duplicate", 1, 0);
                 _context.messageHistory().droppedOtherMessage(messageBody);

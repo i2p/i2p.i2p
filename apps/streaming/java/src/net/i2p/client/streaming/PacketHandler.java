@@ -107,11 +107,15 @@ public class PacketHandler {
     private static final SimpleDateFormat _fmt = new SimpleDateFormat("HH:mm:ss.SSS");
     void displayPacket(Packet packet, String prefix, String suffix) {
         if (!_log.shouldLog(Log.DEBUG)) return;
-        String msg = null;
+        StringBuffer buf = new StringBuffer(256);
         synchronized (_fmt) {
-            msg = _fmt.format(new Date()) + ": " + prefix + " " + packet.toString() + (suffix != null ? " " + suffix : "");
+            buf.append(_fmt.format(new Date()));
         }
-        System.out.println(msg);
+        buf.append(": ").append(prefix).append(" ");
+        buf.append(packet.toString());
+        if (suffix != null)
+            buf.append(" ").append(suffix);
+        System.out.println(buf.toString());
     }
     
     private void receiveKnownCon(Connection con, Packet packet) {

@@ -1,4 +1,31 @@
-$Id: history.txt,v 1.166 2005/03/06 19:40:45 jrandom Exp $
+$Id: history.txt,v 1.167 2005/03/07 21:45:14 jrandom Exp $
+
+2005-03-11  jrandom
+    * Rather than the fixed resend timeout floor (10s), use 10s+RTT as the 
+      minimum (increased on resends as before, of course).
+    * Always prod the clock update listeners, even if just to tell them that 
+      the time hasn't changed much.
+    * Added support for explicit peer selection for individual tunnel pools,
+      which will be useful in debugging but not recommended for use by normal
+      end users.
+    * More aggressively search for the next hop's routerInfo on tunnel join.
+    * Give messages received via inbound tunnels that are bound to remote
+      locations sufficient time (taking into account clock skew).
+    * Give alternate direct send messages sufficient time (10s min, not 5s)
+    * Always give the end to end data message the explicit timeout (though the
+      old default was sufficient before)
+    * No need to give end to end messages an insane expiration (+2m), as we 
+      are already handling skew on the receiving side.
+    * Don't complain too loudly about expired TunnelCreateMessages (at least,
+      not until after all those 0.5 and 0.5.0.1 users upgrade ;)
+    * Properly keep the sendBps stat
+    * When running the router with router.keepHistory=true, log more data to
+      messageHistory.txt
+    * Logging updates
+    * Minor formatting updates
+
+2005-03-08  jrandom
+    * More aggressively adjust the clock
 
 2005-03-07  jrandom
     * Fix the HTTP response header filter to allow multiple headers with the

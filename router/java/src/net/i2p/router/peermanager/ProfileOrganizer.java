@@ -357,7 +357,7 @@ public class ProfileOrganizer {
                         // we dont want the good peers, just random ones
                         continue;
                     } else {
-                        if (isOk(cur))
+                        if (isSelectable(cur))
                             selected.add(cur);
                     }
                 }
@@ -474,7 +474,7 @@ public class ProfileOrganizer {
             for (Iterator iter = _strictCapacityOrder.iterator(); iter.hasNext(); ) {
                 PeerProfile cur = (PeerProfile)iter.next();
                 if ( (!_fastPeers.containsKey(cur.getPeer())) && (!cur.getIsFailing()) ) {
-                    if (!isOk(cur.getPeer())) {
+                    if (!isSelectable(cur.getPeer())) {
                         // skip peers we dont have in the netDb
                         if (_log.shouldLog(Log.INFO))
                             _log.info("skip unknown peer from fast promotion: " + cur.getPeer().toBase64());
@@ -701,7 +701,7 @@ public class ProfileOrganizer {
         Collections.shuffle(all, _random);
         for (int i = 0; (matches.size() < howMany) && (i < all.size()); i++) {
             Hash peer = (Hash)all.get(i);
-            boolean ok = isOk(peer);
+            boolean ok = isSelectable(peer);
             if (ok)
                 matches.add(peer);
             else
@@ -709,7 +709,7 @@ public class ProfileOrganizer {
         }
     }
     
-    private boolean isOk(Hash peer) {
+    public boolean isSelectable(Hash peer) {
         NetworkDatabaseFacade netDb = _context.netDb();
         // the CLI shouldn't depend upon the netDb
         if (netDb == null) return true;
@@ -755,7 +755,7 @@ public class ProfileOrganizer {
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("High capacity: \t" + profile.getPeer().toBase64());
                 if (_thresholdSpeedValue <= profile.getSpeedValue()) {
-                    if (!isOk(profile.getPeer())) {
+                    if (!isSelectable(profile.getPeer())) {
                         if (_log.shouldLog(Log.INFO))
                             _log.info("Skipping fast mark [!ok] for " + profile.getPeer().toBase64());
                     } else if (!profile.getIsActive()) {

@@ -305,17 +305,18 @@ public class TCPTransport extends TransportImpl {
     void connectionClosed(TCPConnection con) {
         synchronized (_connectionLock) {
             TCPConnection cur = (TCPConnection)_connectionsByIdent.remove(con.getRemoteRouterIdentity().getHash());
-            if (cur != con)
+            if ( (cur != null) && (cur != con) )
                 _connectionsByIdent.put(cur.getRemoteRouterIdentity().getHash(), cur);
             cur = (TCPConnection)_connectionsByAddress.remove(con.getRemoteAddress().toString());
-            if (cur != con)
+            if ( (cur != null) && (cur != con) )
                 _connectionsByAddress.put(cur.getRemoteAddress().toString(), cur);
             
             if (_log.shouldLog(Log.DEBUG)) {
                 StringBuffer buf = new StringBuffer(256);
                 buf.append("\nCLOSING ").append(con.getRemoteRouterIdentity().getHash().toBase64().substring(0,6));
                 buf.append(".");
-                buf.append("\nconnectionsByAddress: (cur=").append(con.getRemoteAddress().toString()).append(") ");
+                if (cur != null)
+                    buf.append("\nconnectionsByAddress: (cur=").append(con.getRemoteAddress().toString()).append(") ");
                 for (Iterator iter = _connectionsByAddress.keySet().iterator(); iter.hasNext(); ) {
                     String addr = (String)iter.next();
                     buf.append(addr).append(" ");

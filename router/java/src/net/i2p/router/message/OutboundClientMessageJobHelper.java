@@ -108,7 +108,7 @@ class OutboundClientMessageJobHelper {
         config.setCertificate(new Certificate(Certificate.CERTIFICATE_TYPE_NULL, null));
         config.setDeliveryInstructions(instructions);
         config.setId(ctx.random().nextLong(I2NPMessage.MAX_ID_VALUE));
-        config.setExpiration(expiration+2*Router.CLOCK_FUDGE_FACTOR);
+        config.setExpiration(expiration); // +2*Router.CLOCK_FUDGE_FACTOR);
         config.setRecipientPublicKey(recipientPK);
         config.setRequestAck(false);
         

@@ -172,7 +172,7 @@ public class Timestamper implements Runnable {
                 if (Math.abs(delta) < MAX_VARIANCE) {
                     if (_log.shouldLog(Log.INFO))
                         _log.info("a single SNTP query was within the tolerance (" + delta + "ms)");
-                    return true;
+                    break;
                 } else {
                     // outside the tolerance, lets iterate across the concurring queries
                     expectedDelta = delta;

@@ -371,7 +371,7 @@ public class Router {
 
             RateStat sendRate = _context.statManager().getRate("transport.sendMessageSize");
             if (sendRate != null) {
-                Rate rate = receiveRate.getRate(60*1000);
+                Rate rate = sendRate.getRate(60*1000);
                 if (rate != null) {
                     double bytes = rate.getLastTotalValue();
                     double bps = (bytes*1000.0d)/(rate.getPeriod()*1024.0d); 

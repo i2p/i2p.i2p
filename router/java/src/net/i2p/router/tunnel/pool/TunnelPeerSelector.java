@@ -1,6 +1,12 @@
 package net.i2p.router.tunnel.pool;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Properties;
+import java.util.StringTokenizer;
+import net.i2p.data.DataFormatException;
+import net.i2p.data.Hash;
 import net.i2p.router.RouterContext;
 import net.i2p.router.TunnelPoolSettings;
 import net.i2p.util.Log;
@@ -53,5 +59,59 @@ abstract class TunnelPeerSelector {
             }
         }
         return length;
+    }
+    
+    protected boolean shouldSelectExplicit(TunnelPoolSettings settings) {
+        Properties opts = settings.getUnknownOptions();
+        if (opts != null) {
+            String peers = opts.getProperty("explicitPeers");
+            if (peers != null)
+                return true;
+        }
+        return false;
+    }
+    
+    protected List selectExplicit(RouterContext ctx, TunnelPoolSettings settings, int length) {
+        String peers = null;
+        Properties opts = settings.getUnknownOptions();
+        if (opts != null)
+            peers = opts.getProperty("explicitPeers");
+        
+        Log log = ctx.logManager().getLog(ClientPeerSelector.class);
+        List rv = new ArrayList();
+        StringTokenizer tok = new StringTokenizer(peers, ",");
+        Hash h = new Hash();
+        while (tok.hasMoreTokens()) {
+            String peerStr = tok.nextToken();
+            Hash peer = new Hash();
+            try {
+                peer.fromBase64(peerStr);
+                
+                if (ctx.profileOrganizer().isSelectable(peer)) {
+                    rv.add(peer);
+                } else {
+                    if (log.shouldLog(Log.WARN))
+                        log.warn("Explicit peer is not selectable: " + peerStr);
+                }
+            } catch (DataFormatException dfe) {
+                if (log.shouldLog(Log.ERROR))
+                    log.error("Explicit peer is improperly formatted (" + peerStr + ")", dfe);
+            }
+        }
+        
+        Collections.shuffle(rv, ctx.random());
+        
+        
+        while (rv.size() > length)
+            rv.remove(0);
+        
+        if (settings.isInbound())
+            rv.add(0, ctx.routerHash());
+        else
+            rv.add(ctx.routerHash());
+        
+        if (log.shouldLog(Log.INFO))
+            log.info(toString() + ": Selecting peers explicitly: " + rv);
+        return rv;
     }
 }

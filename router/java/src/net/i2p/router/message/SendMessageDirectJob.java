@@ -48,10 +48,10 @@ public class SendMessageDirectJob extends JobImpl {
         _message = message;
         _targetHash = toPeer;
         _router = null;
-        if (timeoutMs < 5*1000) {
+        if (timeoutMs < 10*1000) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Very little time given [" + timeoutMs + "], resetting to 5s", new Exception("stingy bastard"));
-            _expiration = ctx.clock().now() + 5*1000;
+            _expiration = ctx.clock().now() + 10*1000;
         } else {
             _expiration = timeoutMs + ctx.clock().now();
         }

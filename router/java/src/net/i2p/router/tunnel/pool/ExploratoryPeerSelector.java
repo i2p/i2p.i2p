@@ -17,6 +17,10 @@ class ExploratoryPeerSelector extends TunnelPeerSelector {
         int length = getLength(ctx, settings);
         if (length < 0)
             return null;
+        
+        if (shouldSelectExplicit(settings))
+            return selectExplicit(ctx, settings, length);
+        
         HashSet matches = new HashSet(length);
         ctx.profileOrganizer().selectNotFailingPeers(length, null, matches, true);
         

@@ -67,6 +67,8 @@ public interface I2NPMessage extends DataStructure {
      *
      */
     public long getMessageExpiration();
+    public void setMessageExpiration(long exp);
+
     
     /** How large the message is, including any checksums */
     public int getMessageSize();

@@ -114,16 +114,44 @@ public class PacketLocal extends Packet implements MessageOutputStream.WriteStat
     
     public void setResendPacketEvent(SimpleTimer.TimedEvent evt) { _resendEvent = evt; }
     
-    public String toString() {
-        String str = super.toString();
+    public StringBuffer formatAsString() {
+        StringBuffer buf = super.formatAsString();
+        
+        Connection con = _connection;
+        if (con != null)
+            buf.append(" rtt ").append(con.getOptions().getRTT());
         
         if ( (_tagsSent != null) && (_tagsSent.size() > 0) ) 
-            str = str + " with tags";
+            buf.append(" with tags");
 
         if (_ackOn > 0)
-            return str + " ack after " + getAckTime() + (_numSends <= 1 ? "" : " sent " + _numSends + " times");
-        else
-            return str + (_numSends <= 1 ? "" : " sent " + _numSends + " times");
+            buf.append(" ack after ").append(getAckTime());
+        
+        if (_numSends > 1)
+            buf.append(" sent ").append(_numSends).append(" times");
+        
+        if (isFlagSet(Packet.FLAG_SYNCHRONIZE) ||
+            isFlagSet(Packet.FLAG_CLOSE) ||
+            isFlagSet(Packet.FLAG_RESET)) {
+         
+            if (con != null) {
+                buf.append(" from ");
+                Destination local = con.getSession().getMyDestination();
+                if (local != null)
+                    buf.append(local.calculateHash().toBase64().substring(0,4));
+                else
+                    buf.append("unknown");
+                
+                buf.append(" to ");
+                Destination remote = con.getRemotePeer();
+                if (remote != null)
+                    buf.append(remote.calculateHash().toBase64().substring(0,4));
+                else
+                    buf.append("unknown");
+                
+            }
+        }
+        return buf;
     }
     
     public void waitForAccept(int maxWaitMs) {

@@ -99,13 +99,13 @@ public class GarlicMessageReceiver {
     }
     
     private boolean isValid(GarlicClove clove) {
-        boolean valid = _context.messageValidator().validateMessage(clove.getCloveId(), 
-                                                                    clove.getExpiration().getTime());
-        if (!valid) {
+        String invalidReason = _context.messageValidator().validateMessage(clove.getCloveId(), 
+                                                                          clove.getExpiration().getTime());
+        if (invalidReason != null) {
             String howLongAgo = DataHelper.formatDuration(_context.clock().now()-clove.getExpiration().getTime());
             if (_log.shouldLog(Log.ERROR))
                 _log.error("Clove is NOT valid: id=" + clove.getCloveId() 
-                           + " expiration " + howLongAgo + " ago");
+                           + " expiration " + howLongAgo + " ago: " + invalidReason + ": " + clove);
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Clove is NOT valid: id=" + clove.getCloveId() 
                            + " expiration " + howLongAgo + " ago", new Exception("Invalid within..."));
@@ -113,6 +113,6 @@ public class GarlicMessageReceiver {
                                                              clove.getData().getClass().getName(), 
                                                              "Clove is not valid (expiration " + howLongAgo + " ago)");
         }
-        return valid;
+        return (invalidReason == null);
     }
 }
