@@ -407,7 +407,8 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
             opts.setProperty("i2p.streaming.inactivityTimeoutAction", ""+1);
             I2PSocket i2ps = createI2PSocket(dest, getDefaultOptions(opts));
             byte[] data = newRequest.toString().getBytes("ISO-8859-1");
-            I2PTunnelRunner runner = new I2PTunnelRunner(s, i2ps, sockLock, data, mySockets);
+            Runnable onTimeout = new OnTimeout(s, s.getOutputStream(), targetRequest, usingWWWProxy, currentProxy, requestId);
+            I2PTunnelRunner runner = new I2PTunnelRunner(s, i2ps, sockLock, data, mySockets, onTimeout);
         } catch (SocketException ex) {
             _log.info(getPrefix(requestId) + "Error trying to connect", ex);
             l.log(ex.getMessage());
@@ -437,6 +438,30 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
         }
     }
 
+    private class OnTimeout implements Runnable {
+        private Socket _socket;
+        private OutputStream _out;
+        private String _target;
+        private boolean _usingProxy;
+        private String _wwwProxy;
+        private long _requestId;
+        public OnTimeout(Socket s, OutputStream out, String target, boolean usingProxy, String wwwProxy, long id) {
+            _socket = s;
+            _out = out;
+            _target = target;
+            _usingProxy = usingProxy;
+            _wwwProxy = wwwProxy;
+            _requestId = id;
+        }
+        public void run() {
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Timeout occured requesting " + _target);
+            handleHTTPClientException(new RuntimeException("Timeout"), _out, 
+                                      _target, _usingProxy, _wwwProxy, _requestId);
+            closeSocket(_socket);
+        }
+    }
+    
     private static void writeErrorMessage(byte[] errMessage, OutputStream out, String targetRequest,
                                           boolean usingWWWProxy, String wwwProxy) throws IOException {
         if (out != null) {

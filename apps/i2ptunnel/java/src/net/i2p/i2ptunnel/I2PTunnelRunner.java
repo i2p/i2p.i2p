@@ -46,15 +46,23 @@ public class I2PTunnelRunner extends I2PThread implements I2PSocket.SocketErrorL
     /** when the runner started up */
     private long startedOn;
     private List sockList;
+    /** if we die before receiving any data, run this job */
+    private Runnable onTimeout;
+    private long totalSent;
+    private long totalReceived;
 
     private volatile long __forwarderId;
     
     public I2PTunnelRunner(Socket s, I2PSocket i2ps, Object slock, byte[] initialData, List sockList) {
+        this(s, i2ps, slock, initialData, sockList, null);
+    }
+    public I2PTunnelRunner(Socket s, I2PSocket i2ps, Object slock, byte[] initialData, List sockList, Runnable onTimeout) {
         this.sockList = sockList;
         this.s = s;
         this.i2ps = i2ps;
         this.slock = slock;
         this.initialData = initialData;
+        this.onTimeout = onTimeout;
         lastActivityOn = -1;
         startedOn = Clock.getInstance().now();
         if (_log.shouldLog(Log.INFO))
@@ -97,7 +105,6 @@ public class I2PTunnelRunner extends I2PThread implements I2PSocket.SocketErrorL
     }
 
     public void run() {
-        boolean closedCleanly = false;
         try {
             InputStream in = s.getInputStream();
             OutputStream out = s.getOutputStream(); // = new BufferedOutputStream(s.getOutputStream(), NETWORK_BUFFER_SIZE);
@@ -113,8 +120,8 @@ public class I2PTunnelRunner extends I2PThread implements I2PSocket.SocketErrorL
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Initial data " + (initialData != null ? initialData.length : 0) 
                            + " written, starting forwarders");
-            Thread t1 = new StreamForwarder(in, i2pout, "toI2P");
-            Thread t2 = new StreamForwarder(i2pin, out, "fromI2P");
+            Thread t1 = new StreamForwarder(in, i2pout, true);
+            Thread t2 = new StreamForwarder(i2pin, out, false);
             synchronized (finishLock) {
                 while (!finished) {
                     finishLock.wait();
@@ -122,12 +129,21 @@ public class I2PTunnelRunner extends I2PThread implements I2PSocket.SocketErrorL
             }
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("At least one forwarder completed, closing and joining");
+            
+            // this task is useful for the httpclient
+            if (onTimeout != null) {
+                if (_log.shouldLog(Log.DEBUG))
+                    _log.debug("runner has a timeout job, totalReceived = " + totalReceived
+                               + " totalSent = " + totalSent + " job = " + onTimeout);
+                if ( (totalSent <= 0) && (totalReceived <= 0) )
+                    onTimeout.run();
+            }
+            
             // now one connection is dead - kill the other as well.
             s.close();
             i2ps.close();
             t1.join(30*1000);
             t2.join(30*1000);
-            closedCleanly = true;
         } catch (InterruptedException ex) {
             if (_log.shouldLog(Log.ERROR))
                 _log.error("Interrupted", ex);
@@ -140,21 +156,20 @@ public class I2PTunnelRunner extends I2PThread implements I2PSocket.SocketErrorL
         } finally {
             removeRef();
             try {
-                if ( (s != null) && (!closedCleanly) )
+                if (s != null)
                     s.close();
             } catch (IOException ex) {
                 if (_log.shouldLog(Log.ERROR))
                     _log.error("Could not close java socket", ex);
             }
-            try {
-                if (i2ps != null) {
-                    if (!closedCleanly)
-                        i2ps.close();
-                    i2ps.setSocketErrorListener(null);
+            if (i2ps != null) {
+                try {
+                    i2ps.close();
+                } catch (IOException ex) {
+                    if (_log.shouldLog(Log.ERROR))
+                        _log.error("Could not close I2PSocket", ex);
                 }
-            } catch (IOException ex) {
-                if (_log.shouldLog(Log.ERROR))
-                    _log.error("Could not close I2PSocket", ex);
+                i2ps.setSocketErrorListener(null);
             }
         }
     }
@@ -181,12 +196,14 @@ public class I2PTunnelRunner extends I2PThread implements I2PSocket.SocketErrorL
         InputStream in;
         OutputStream out;
         String direction;
+        private boolean _toI2P;
         private ByteCache _cache;
 
-        private StreamForwarder(InputStream in, OutputStream out, String dir) {
+        private StreamForwarder(InputStream in, OutputStream out, boolean toI2P) {
             this.in = in;
             this.out = out;
-            direction = dir;
+            _toI2P = toI2P;
+            direction = (toI2P ? "toI2P" : "fromI2P");
             _cache = ByteCache.getInstance(256, NETWORK_BUFFER_SIZE);
             setName("StreamForwarder " + _runnerId + "." + (++__forwarderId));
             start();
@@ -207,6 +224,10 @@ public class I2PTunnelRunner extends I2PThread implements I2PSocket.SocketErrorL
                 int len;
                 while ((len = in.read(buffer)) != -1) {
                     out.write(buffer, 0, len);
+                    if (_toI2P)
+                        totalSent += len;
+                    else
+                        totalReceived += len;
 
                     if (len > 0) updateActivity();
 
@@ -259,10 +280,10 @@ public class I2PTunnelRunner extends I2PThread implements I2PSocket.SocketErrorL
                         _log.warn(direction + ": Error closing input stream", ex);
                 }
                 try {
-                    out.close();
-                } catch (IOException ex) {
+                    out.flush();
+                } catch (IOException ioe) {
                     if (_log.shouldLog(Log.WARN))
-                        _log.warn(direction + ": Error closing output stream", ex);
+                        _log.warn(direction + ": Error flushing to close", ioe);
                 }
                 synchronized (finishLock) {
                     finished = true;

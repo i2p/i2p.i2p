@@ -304,8 +304,8 @@ public class Connection {
                     _ackedPackets++;
                     if (p.getNumSends() > 1) {
                         _activeResends--;
-                        if (_log.shouldLog(Log.WARN))
-                            _log.warn("Active resend of " + p + " successful, # active left: " + _activeResends);
+                        if (_log.shouldLog(Log.INFO))
+                            _log.info("Active resend of " + p + " successful, # active left: " + _activeResends);
                     }
                 }
             }

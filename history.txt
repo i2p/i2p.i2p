@@ -1,4 +1,12 @@
-$Id: history.txt,v 1.102 2004/12/08 16:08:11 jrandom Exp $
+$Id: history.txt,v 1.103 2004/12/11 02:05:12 jrandom Exp $
+
+2004-12-11  jrandom
+    * Fix the missing HTTP timeout, which was caused by the deferred syn used
+      by default.  This, in turn, meant the I2PSocket creation doesn't fail
+      on .connect, but is unable to transfer any data in any direction.  We now
+      detect that condition for the I2PTunnelHTTPClient and throw up the right
+      error page.
+    * Logging
 
 2004-12-11  jrandom
     * Use a simpler and less memory intensive job for processing outbound 
