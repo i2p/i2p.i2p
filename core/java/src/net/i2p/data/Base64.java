@@ -43,11 +43,14 @@ public class Base64 {
     private final static Log _log = new Log(Base64.class);
 
     public static String encode(byte[] source) {
-        return safeEncode(source);
+        return encode(source, false);
+    }
+    public static String encode(byte[] source, boolean useStandardAlphabet) {
+        return safeEncode(source, useStandardAlphabet);
     }
 
     public static byte[] decode(String s) {
-        return safeDecode(s);
+        return safeDecode(s, false);
     }
 
     /** Maximum line length (76) of Base64 output. */
@@ -315,10 +318,14 @@ public class Base64 {
      * Same as encodeBytes, except uses a filesystem / URL friendly set of characters,
      * replacing / with ~, and + with -
      */
-    private static String safeEncode(byte[] source) {
+    private static String safeEncode(byte[] source, boolean useStandardAlphabet) {
         String encoded = encodeBytes(source);
-        encoded = encoded.replace('/', '~');
-        encoded = encoded.replace('+', '-');
+        if (useStandardAlphabet) {
+            // noop
+        } else {
+            encoded = encoded.replace('/', '~');
+            encoded = encoded.replace('+', '-');
+        }
         return encoded;
     }
 
@@ -326,9 +333,14 @@ public class Base64 {
      * Same as decode, except from a filesystem / URL friendly set of characters,
      * replacing / with ~, and + with -
      */
-    private static byte[] safeDecode(String source) {
-        String toDecode = source.replace('~', '/');
-        toDecode = toDecode.replace('-', '+');
+    private static byte[] safeDecode(String source, boolean useStandardAlphabet) {
+        String toDecode = null;
+        if (useStandardAlphabet) {
+            toDecode = source;
+        } else {
+            toDecode = source.replace('~', '/');
+            toDecode = toDecode.replace('-', '+');
+        }
         return standardDecode(toDecode);
     }
 
