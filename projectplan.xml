@@ -51,75 +51,75 @@
             </task>
         </task>
         <task id="66" name="0.4.3" color="#8cb6ce" meeting="true" start="31/10/2004" duration="1" complete="0" fixed-start="false" priority="1" expand="true">
+            <depend id="69" type="2"/>
+        </task>
+        <task id="68" name="UDP transport" color="#8cb6ce" meeting="false" start="31/10/2004" duration="19" complete="0" fixed-start="false" priority="1" expand="true">
+            <task id="69" name="Packet spec" color="#8cb6ce" meeting="false" start="31/10/2004" duration="3" complete="0" fixed-start="false" priority="1" expand="true">
+                <depend id="70" type="2"/>
+            </task>
+            <task id="70" name="Implementation" color="#8cb6ce" meeting="false" start="2/11/2004" duration="10" complete="0" fixed-start="false" priority="1" expand="true">
+                <depend id="71" type="2"/>
+            </task>
+            <task id="71" name="QA&#47;support" color="#8cb6ce" meeting="false" start="12/11/2004" duration="5" complete="0" fixed-start="false" priority="1" expand="true">
+                <depend id="72" type="2"/>
+                <depend id="170" type="2"/>
+            </task>
+        </task>
+        <task id="170" name="0.4.4" color="#8cb6ce" meeting="true" start="17/11/2004" duration="1" complete="0" fixed-start="false" priority="1" expand="true">
             <depend id="122" type="2"/>
         </task>
-        <task id="55" name="Cleanup" color="#8cb6ce" meeting="false" start="31/10/2004" duration="18" complete="0" fixed-start="false" priority="1" expand="true">
-            <task id="122" name="Code refactoring" color="#8cb6ce" meeting="false" start="31/10/2004" duration="10" complete="0" fixed-start="false" priority="1" expand="true">
+        <task id="55" name="Cleanup" color="#8cb6ce" meeting="false" start="18/11/2004" duration="21" complete="0" fixed-start="false" priority="1" expand="true">
+            <task id="122" name="Code refactoring" color="#8cb6ce" meeting="false" start="18/11/2004" duration="7" complete="0" fixed-start="false" priority="1" expand="true">
                 <depend id="56" type="2"/>
             </task>
-            <task id="56" name="Site docs" color="#8cb6ce" meeting="false" start="9/11/2004" duration="3" complete="0" fixed-start="false" priority="1" expand="true">
+            <task id="56" name="Site docs" color="#8cb6ce" meeting="false" start="25/11/2004" duration="7" complete="0" fixed-start="false" priority="1" expand="true">
                 <depend id="57" type="2"/>
             </task>
-            <task id="57" name="Code docs" color="#8cb6ce" meeting="false" start="12/11/2004" duration="5" complete="0" fixed-start="false" priority="1" expand="true">
+            <task id="57" name="Code docs" color="#8cb6ce" meeting="false" start="2/12/2004" duration="7" complete="0" fixed-start="false" priority="1" expand="true">
                 <depend id="54" type="2"/>
             </task>
         </task>
-        <task id="54" name="1.0" color="#8cb6ce" meeting="true" start="17/11/2004" duration="2" complete="0" fixed-start="false" priority="1" expand="true">
+        <task id="54" name="1.0" color="#8cb6ce" meeting="true" start="9/12/2004" duration="2" complete="0" fixed-start="false" priority="1" expand="true">
             <depend id="67" type="2"/>
         </task>
-        <task id="67" name="Support" color="#8cb6ce" meeting="false" start="19/11/2004" duration="10" complete="0" fixed-start="false" priority="1" expand="true">
-            <depend id="69" type="2"/>
-        </task>
-        <task id="68" name="UDP transport" color="#8cb6ce" meeting="false" start="29/11/2004" duration="18" complete="0" fixed-start="false" priority="1" expand="true">
-            <task id="69" name="Packet spec" color="#8cb6ce" meeting="false" start="29/11/2004" duration="3" complete="0" fixed-start="false" priority="1" expand="true">
-                <depend id="70" type="2"/>
-            </task>
-            <task id="70" name="Implementation" color="#8cb6ce" meeting="false" start="2/12/2004" duration="10" complete="0" fixed-start="false" priority="1" expand="true">
-                <depend id="71" type="2"/>
-            </task>
-            <task id="71" name="QA&#47;support" color="#8cb6ce" meeting="false" start="12/12/2004" duration="5" complete="0" fixed-start="false" priority="1" expand="true">
-                <depend id="72" type="2"/>
-            </task>
-        </task>
-        <task id="72" name="1.1 (UDP)" color="#8cb6ce" meeting="true" start="17/12/2004" duration="1" complete="0" fixed-start="false" priority="1" expand="true">
-            <depend id="109" type="2"/>
+        <task id="67" name="Support" color="#8cb6ce" meeting="false" start="11/12/2004" duration="10" complete="0" fixed-start="false" priority="1" expand="true">
             <depend id="110" type="2"/>
         </task>
-        <task id="109" name="Restricted routes" color="#8cb6ce" meeting="false" start="18/12/2004" duration="25" complete="0" fixed-start="false" priority="1" expand="true">
-            <task id="110" name="Basic restricted routes" color="#8cb6ce" meeting="false" start="18/12/2004" duration="10" complete="0" fixed-start="false" priority="1" expand="true">
+        <task id="109" name="Restricted routes" color="#8cb6ce" meeting="false" start="21/12/2004" duration="25" complete="0" fixed-start="false" priority="1" expand="true">
+            <task id="110" name="Basic restricted routes" color="#8cb6ce" meeting="false" start="21/12/2004" duration="10" complete="0" fixed-start="false" priority="1" expand="true">
                 <depend id="111" type="2"/>
             </task>
-            <task id="111" name="Trusted links" color="#8cb6ce" meeting="false" start="28/12/2004" duration="5" complete="0" fixed-start="false" priority="1" expand="true">
+            <task id="111" name="Trusted links" color="#8cb6ce" meeting="false" start="31/12/2004" duration="5" complete="0" fixed-start="false" priority="1" expand="true">
                 <depend id="112" type="2"/>
             </task>
-            <task id="112" name="QA&#47;support" color="#8cb6ce" meeting="false" start="2/1/2005" duration="10" complete="0" fixed-start="false" priority="1" expand="true">
+            <task id="112" name="QA&#47;support" color="#8cb6ce" meeting="false" start="5/1/2005" duration="10" complete="0" fixed-start="false" priority="1" expand="true">
                 <depend id="113" type="2"/>
             </task>
         </task>
-        <task id="113" name="2.0" color="#8cb6ce" meeting="true" start="12/1/2005" duration="1" complete="0" fixed-start="false" priority="1" expand="true">
+        <task id="113" name="2.0" color="#8cb6ce" meeting="true" start="15/1/2005" duration="1" complete="0" fixed-start="false" priority="1" expand="true">
             <depend id="120" type="2"/>
         </task>
-        <task id="120" name="Support" color="#8cb6ce" meeting="false" start="13/1/2005" duration="10" complete="0" fixed-start="false" priority="1" expand="true">
+        <task id="120" name="Support" color="#8cb6ce" meeting="false" start="16/1/2005" duration="10" complete="0" fixed-start="false" priority="1" expand="true">
             <depend id="115" type="2"/>
         </task>
-        <task id="114" name="Mixing" color="#8cb6ce" meeting="false" start="23/1/2005" duration="26" complete="0" fixed-start="false" priority="1" expand="true">
-            <task id="115" name="Tunnel throttles" color="#8cb6ce" meeting="false" start="23/1/2005" duration="3" complete="0" fixed-start="false" priority="1" expand="true">
+        <task id="114" name="Mixing" color="#8cb6ce" meeting="false" start="26/1/2005" duration="26" complete="0" fixed-start="false" priority="1" expand="true">
+            <task id="115" name="Tunnel throttles" color="#8cb6ce" meeting="false" start="26/1/2005" duration="3" complete="0" fixed-start="false" priority="1" expand="true">
                 <depend id="116" type="2"/>
             </task>
-            <task id="116" name="Tunnel pooling" color="#8cb6ce" meeting="false" start="26/1/2005" duration="5" complete="0" fixed-start="false" priority="1" expand="true">
+            <task id="116" name="Tunnel pooling" color="#8cb6ce" meeting="false" start="29/1/2005" duration="5" complete="0" fixed-start="false" priority="1" expand="true">
                 <depend id="117" type="2"/>
             </task>
-            <task id="117" name="Tunnel chaffing" color="#8cb6ce" meeting="false" start="31/1/2005" duration="3" complete="0" fixed-start="false" priority="1" expand="true">
+            <task id="117" name="Tunnel chaffing" color="#8cb6ce" meeting="false" start="3/2/2005" duration="3" complete="0" fixed-start="false" priority="1" expand="true">
                 <depend id="118" type="2"/>
             </task>
-            <task id="118" name="Garlic delays" color="#8cb6ce" meeting="false" start="3/2/2005" duration="5" complete="0" fixed-start="false" priority="1" expand="true">
+            <task id="118" name="Garlic delays" color="#8cb6ce" meeting="false" start="6/2/2005" duration="5" complete="0" fixed-start="false" priority="1" expand="true">
                 <depend id="119" type="2"/>
             </task>
-            <task id="119" name="QA&#47;support" color="#8cb6ce" meeting="false" start="8/2/2005" duration="10" complete="0" fixed-start="false" priority="1" expand="true">
+            <task id="119" name="QA&#47;support" color="#8cb6ce" meeting="false" start="11/2/2005" duration="10" complete="0" fixed-start="false" priority="1" expand="true">
                 <depend id="121" type="2"/>
             </task>
         </task>
-        <task id="121" name="3.0" color="#8cb6ce" meeting="true" start="18/2/2005" duration="1" complete="0" fixed-start="false" priority="1" expand="true"/>
+        <task id="121" name="3.0" color="#8cb6ce" meeting="true" start="21/2/2005" duration="1" complete="0" fixed-start="false" priority="1" expand="true"/>
     </tasks>
 
     <resources>
