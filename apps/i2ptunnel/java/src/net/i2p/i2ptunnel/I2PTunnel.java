@@ -67,6 +67,8 @@ public class I2PTunnel implements Logging, EventDispatcher {
     private Log _log;
     private EventDispatcherImpl _event;
     private I2PAppContext _context;
+    private static long __tunnelId = 0;
+    private long _tunnelId;
 
     public static final int PACKET_DELAY = 100;
 
@@ -98,7 +100,8 @@ public class I2PTunnel implements Logging, EventDispatcher {
     }
 
     public I2PTunnel(String[] args, ConnectionEventListener lsnr) {
-        _context = new I2PAppContext();
+        _context = I2PAppContext.getGlobalContext(); // new I2PAppContext();
+        _tunnelId = ++__tunnelId;
         _log = _context.logManager().getLog(I2PTunnel.class);
         _event = new EventDispatcherImpl();
         addConnectionEventListener(lsnr);
@@ -114,7 +117,7 @@ public class I2PTunnel implements Logging, EventDispatcher {
                 checkRunByE = false;
             } else if (args[i].equals("-nogui")) {
                 gui = false;
-                _log.warn("The `-nogui' option of I2PTunnel is deprecated.\n"
+                _log.warn(getPrefix() + "The `-nogui' option of I2PTunnel is deprecated.\n"
                           + "Use `-cli', `-nocli' (aka `-wait') or `-die' instead.");
             } else if (args[i].equals("-cli")) {
                 gui = false;
@@ -280,7 +283,7 @@ public class I2PTunnel implements Logging, EventDispatcher {
                 serverHost = InetAddress.getByName(args[0]);
             } catch (UnknownHostException uhe) {
                 l.log("unknown host");
-                _log.error("Error resolving " + args[0], uhe);
+                _log.error(getPrefix() + "Error resolving " + args[0], uhe);
                 notifyEvent("serverTaskId", new Integer(-1));
                 return;
             }
@@ -289,7 +292,7 @@ public class I2PTunnel implements Logging, EventDispatcher {
                 portNum = Integer.parseInt(args[1]);
             } catch (NumberFormatException nfe) {
                 l.log("invalid port");
-                _log.error("Port specified is not valid: " + args[1], nfe);
+                _log.error(getPrefix() + "Port specified is not valid: " + args[1], nfe);
                 notifyEvent("serverTaskId", new Integer(-1));
                 return;
             }
@@ -297,7 +300,7 @@ public class I2PTunnel implements Logging, EventDispatcher {
             privKeyFile = new File(args[2]);
             if (!privKeyFile.canRead()) {
                 l.log("private key file does not exist");
-                _log.error("Private key file does not exist or is not readable: " + args[2]);
+                _log.error(getPrefix() + "Private key file does not exist or is not readable: " + args[2]);
                 notifyEvent("serverTaskId", new Integer(-1));
                 return;
             }
@@ -333,7 +336,7 @@ public class I2PTunnel implements Logging, EventDispatcher {
                 serverHost = InetAddress.getByName(args[0]);
             } catch (UnknownHostException uhe) {
                 l.log("unknown host");
-                _log.error("Error resolving " + args[0], uhe);
+                _log.error(getPrefix() + "Error resolving " + args[0], uhe);
                 notifyEvent("serverTaskId", new Integer(-1));
                 return;
             }
@@ -342,7 +345,7 @@ public class I2PTunnel implements Logging, EventDispatcher {
                 portNum = Integer.parseInt(args[1]);
             } catch (NumberFormatException nfe) {
                 l.log("invalid port");
-                _log.error("Port specified is not valid: " + args[1], nfe);
+                _log.error(getPrefix() + "Port specified is not valid: " + args[1], nfe);
                 notifyEvent("serverTaskId", new Integer(-1));
                 return;
             }
@@ -378,7 +381,7 @@ public class I2PTunnel implements Logging, EventDispatcher {
                 port = Integer.parseInt(args[0]);
             } catch (NumberFormatException nfe) {
                 l.log("invalid port");
-                _log.error("Port specified is not valid: " + args[0], nfe);
+                _log.error(getPrefix() + "Port specified is not valid: " + args[0], nfe);
                 notifyEvent("clientTaskId", new Integer(-1));
                 return;
             }
@@ -410,7 +413,7 @@ public class I2PTunnel implements Logging, EventDispatcher {
                 port = Integer.parseInt(args[0]);
             } catch (NumberFormatException nfe) {
                 l.log("invalid port");
-                _log.error("Port specified is not valid: " + args[0], nfe);
+                _log.error(getPrefix() + "Port specified is not valid: " + args[0], nfe);
                 notifyEvent("httpclientTaskId", new Integer(-1));
                 return;
             }
@@ -451,7 +454,7 @@ public class I2PTunnel implements Logging, EventDispatcher {
                 port = Integer.parseInt(args[0]);
             } catch (NumberFormatException nfe) {
                 l.log("invalid port");
-                _log.error("Port specified is not valid: " + args[0], nfe);
+                _log.error(getPrefix() + "Port specified is not valid: " + args[0], nfe);
                 notifyEvent("sockstunnelTaskId", new Integer(-1));
                 return;
             }
@@ -565,7 +568,7 @@ public class I2PTunnel implements Logging, EventDispatcher {
                 pubdest = new FileOutputStream(args[1]);
             } catch (IOException ioe) {
                 l.log("Error opening output stream");
-                _log.error("Error generating keys to out", ioe);
+                _log.error(getPrefix() + "Error generating keys to out", ioe);
                 notifyEvent("genkeysResult", "error");
                 return;
             }
@@ -588,7 +591,7 @@ public class I2PTunnel implements Logging, EventDispatcher {
         } catch (IOException ioe) {
             l.log("Error generating keys - " + ioe.getMessage());
             notifyEvent("genkeysResult", "error");
-            _log.error("Error generating keys", ioe);
+            _log.error(getPrefix() + "Error generating keys", ioe);
         }
     }
 
@@ -722,7 +725,7 @@ public class I2PTunnel implements Logging, EventDispatcher {
                 notifyEvent("runResult", "ok");
             } catch (IOException ioe) {
                 l.log("IO error running the file");
-                _log.error("Error running the file", ioe);
+                _log.error(getPrefix() + "Error running the file", ioe);
                 notifyEvent("runResult", "error");
             }
         } else {
@@ -796,12 +799,12 @@ public class I2PTunnel implements Logging, EventDispatcher {
     private boolean closetask(int num, boolean forced, Logging l) {
         boolean closed = false;
 
-        _log.debug("closetask(): looking for task " + num);
+        _log.debug(getPrefix() + "closetask(): looking for task " + num);
         synchronized (tasks) {
             for (Iterator it = tasks.iterator(); it.hasNext();) {
                 I2PTunnelTask t = (I2PTunnelTask) it.next();
                 int id = t.getId();
-                _log.debug("closetask(): parsing task " + id + " (" + t.toString() + ")");
+                _log.debug(getPrefix() + "closetask(): parsing task " + id + " (" + t.toString() + ")");
                 if (id == num) {
                     closed = closetask(t, forced, l);
                     break;
@@ -836,7 +839,7 @@ public class I2PTunnel implements Logging, EventDispatcher {
             for (Iterator it = tasks.iterator(); it.hasNext();) {
                 I2PTunnelTask t = (I2PTunnelTask) it.next();
                 if (!t.isOpen()) {
-                    _log.debug("Purging inactive tunnel: [" + t.getId() + "] " + t.toString());
+                    _log.debug(getPrefix() + "Purging inactive tunnel: [" + t.getId() + "] " + t.toString());
                     it.remove();
                 }
             }
@@ -849,7 +852,7 @@ public class I2PTunnel implements Logging, EventDispatcher {
      */
     public void log(String s) {
         System.out.println(s);
-        _log.info("Display: " + s);
+        _log.info(getPrefix() + "Display: " + s);
     }
 
     /**
@@ -982,6 +985,8 @@ public class I2PTunnel implements Logging, EventDispatcher {
             listeners.remove(lsnr);
         }
     }
+    
+    private String getPrefix() { return '[' + _tunnelId + "]: "; }
 
     /**
      * Call this whenever we lose touch with the router involuntarily (aka the router
@@ -989,7 +994,7 @@ public class I2PTunnel implements Logging, EventDispatcher {
      *
      */
     void routerDisconnected() {
-        _log.error("Router disconnected - firing notification events");
+        _log.error(getPrefix() + "Router disconnected - firing notification events");
         synchronized (listeners) {
             for (Iterator iter = listeners.iterator(); iter.hasNext();) {
                 ConnectionEventListener lsnr = (ConnectionEventListener) iter.next();

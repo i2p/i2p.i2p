@@ -34,7 +34,7 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
     private static final long DEFAULT_CONNECT_TIMEOUT = 60 * 1000;
 
     private static volatile long __clientId = 0;
-    private long _clientId;
+    protected long _clientId;
     protected Object sockLock = new Object(); // Guards sockMgr and mySockets
     private I2PSocketManager sockMgr;
     private List mySockets = new ArrayList();

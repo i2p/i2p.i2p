@@ -98,6 +98,8 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
         notifyEvent("openHTTPClientResult", "ok");
     }
 
+    private String getPrefix() { return "Client[" + _clientId + "]: "; }
+    
     protected void clientConnectionRun(Socket s) {
         OutputStream out = null;
         String targetRequest = null;
@@ -110,7 +112,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
             StringBuffer newRequest = new StringBuffer();
             while ((line = br.readLine()) != null) {
                 if (_log.shouldLog(Log.DEBUG))
-                    _log.debug("Line=[" + line + "]");
+                    _log.debug(getPrefix() + "Line=[" + line + "]");
                 
                 if (line.startsWith("Connection: ") || 
                     line.startsWith("Keep-Alive: ") || 
@@ -119,7 +121,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
                 
                 if (method == null) { // first line (GET /base64/realaddr)
                     if (_log.shouldLog(Log.DEBUG))
-                        _log.debug("Method is null for [" + line + "]");
+                        _log.debug(getPrefix() + "Method is null for [" + line + "]");
                     
                     int pos = line.indexOf(" ");
                     if (pos == -1) break;
@@ -155,7 +157,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
                         destination = wwwProxy;
                         usingWWWProxy = true;
                         if (_log.shouldLog(Log.DEBUG))
-                            _log.debug("Host doesnt end with .i2p and it contains a period [" + host + "]: wwwProxy!");
+                            _log.debug(getPrefix() + "Host doesnt end with .i2p and it contains a period [" + host + "]: wwwProxy!");
                     } else {
                         request = request.substring(pos + 1);
                         pos = request.indexOf("/");
@@ -165,27 +167,27 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
 
                     boolean isValid = usingWWWProxy || isSupportedAddress(host, protocol);
                     if (!isValid) {
-                        if (_log.shouldLog(Log.INFO)) _log.info("notValid(" + host + ")");
+                        if (_log.shouldLog(Log.INFO)) _log.info(getPrefix() + "notValid(" + host + ")");
                         method = null;
                         destination = null;
                         break;
                     } else if (!usingWWWProxy) {
-                        if (_log.shouldLog(Log.INFO)) _log.info("host=getHostName(" + destination + ")");
+                        if (_log.shouldLog(Log.INFO)) _log.info(getPrefix() + "host=getHostName(" + destination + ")");
                         host = getHostName(destination); // hide original host
                     }
 
                     if (_log.shouldLog(Log.DEBUG)) {
-                        _log.debug("METHOD:" + method + ":");
-                        _log.debug("PROTOC:" + protocol + ":");
-                        _log.debug("HOST  :" + host + ":");
-                        _log.debug("DEST  :" + destination + ":");
+                        _log.debug(getPrefix() + "METHOD:" + method + ":");
+                        _log.debug(getPrefix() + "PROTOC:" + protocol + ":");
+                        _log.debug(getPrefix() + "HOST  :" + host + ":");
+                        _log.debug(getPrefix() + "DEST  :" + destination + ":");
                     }
                     
                 } else {
                     if (line.startsWith("Host: ") && !usingWWWProxy) {
                         line = "Host: " + host;
                         if (_log.shouldLog(Log.INFO)) 
-                            _log.info("Setting host = " + host);
+                            _log.info(getPrefix() + "Setting host = " + host);
                     }
                 }
                 
@@ -197,7 +199,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
                 }
             }
             if (_log.shouldLog(Log.DEBUG))
-                _log.debug("NewRequest header: [" + newRequest.toString() + "]");
+                _log.debug(getPrefix() + "NewRequest header: [" + newRequest.toString() + "]");
             
             while (br.ready()) { // empty the buffer (POST requests)
                 int i = br.read();
@@ -219,7 +221,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
             }
             
             if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Destination: " + destination);
+                _log.debug(getPrefix() + "Destination: " + destination);
             
             Destination dest = I2PTunnel.destFromName(destination);
             if (dest == null) {
@@ -236,19 +238,19 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
             timeoutThread.start();
         } catch (SocketException ex) {
             if (timeoutThread != null) timeoutThread.disable();
-            _log.info("Error trying to connect", ex);
+            _log.info(getPrefix() + "Error trying to connect", ex);
             l.log(ex.getMessage());
             handleHTTPClientException(ex, out, targetRequest, usingWWWProxy, wwwProxy);
             closeSocket(s);
         } catch (IOException ex) {
             if (timeoutThread != null) timeoutThread.disable();
-            _log.info("Error trying to connect", ex);
+            _log.info(getPrefix() + "Error trying to connect", ex);
             l.log(ex.getMessage());
             handleHTTPClientException(ex, out, targetRequest, usingWWWProxy, wwwProxy);
             closeSocket(s);
         } catch (I2PException ex) {
             if (timeoutThread != null) timeoutThread.disable();
-            _log.info("Error trying to connect", ex);
+            _log.info("getPrefix() + Error trying to connect", ex);
             l.log(ex.getMessage());
             handleHTTPClientException(ex, out, targetRequest, usingWWWProxy, wwwProxy);
             closeSocket(s);
@@ -277,7 +279,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
             _useWWWProxy = useWWWProxy;
             _disabled = false;
             long timeoutId = ++__timeoutId;
-            setName("InactivityThread " + timeoutId);
+            setName("InactivityThread " + getPrefix() + timeoutId);
         }
 
         public void disable() {
@@ -290,15 +292,15 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
         public void run() {
             while (!_disabled) {
                 if (_runner.isFinished()) {
-                    if (_log.shouldLog(Log.INFO)) _log.info("HTTP client request completed prior to timeout");
+                    if (_log.shouldLog(Log.INFO)) _log.info(getPrefix() + "HTTP client request completed prior to timeout");
                     return;
                 }
                 if (_runner.getLastActivityOn() < Clock.getInstance().now() - INACTIVITY_TIMEOUT) {
                     if (_runner.getStartedOn() < Clock.getInstance().now() - INACTIVITY_TIMEOUT) {
                         if (_log.shouldLog(Log.WARN))
-                            _log.warn("HTTP client request timed out (lastActivity: "
+                            _log.warn(getPrefix() + "HTTP client request timed out (lastActivity: "
                                       + new Date(_runner.getLastActivityOn()) + ", startedOn: "
-                                      + new Date(_runner.getLastActivityOn()) + ")");
+                                      + new Date(_runner.getStartedOn()) + ")");
                         timeout();
                         return;
                     } else {
@@ -317,7 +319,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
         }
 
         private void timeout() {
-            _log.info("Inactivity timeout reached");
+            _log.info(getPrefix() + "Inactivity timeout reached");
             l.log("Inactivity timeout reached");
             if (_out != null) {
                 try {
@@ -327,10 +329,10 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
                         writeErrorMessage(ERR_TIMEOUT, _out, _targetRequest, _useWWWProxy, wwwProxy);
                     }
                 } catch (IOException ioe) {
-                    _log.warn("Error writing out the 'timeout' message", ioe);
+                    _log.warn(getPrefix() + "Error writing out the 'timeout' message", ioe);
                 }
             } else {
-                _log.warn("Client disconnected before we could say we timed out");
+                _log.warn(getPrefix() + "Client disconnected before we could say we timed out");
             }
             closeSocket(s);
         }
@@ -361,16 +363,16 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
         }
     }
 
-    private static void handleHTTPClientException(Exception ex, OutputStream out, String targetRequest,
+    private void handleHTTPClientException(Exception ex, OutputStream out, String targetRequest,
                                                   boolean usingWWWProxy, String wwwProxy) {
         if (out != null) {
             try {
                 writeErrorMessage(ERR_DESTINATION_UNKNOWN, out, targetRequest, usingWWWProxy, wwwProxy);
             } catch (IOException ioe) {
-                _log.warn("Error writing out the 'destination was unknown' " + "message", ioe);
+                _log.warn(getPrefix() + "Error writing out the 'destination was unknown' " + "message", ioe);
             }
         } else {
-            _log.warn("Client disconnected before we could say that destination " + "was unknown", ex);
+            _log.warn(getPrefix() + "Client disconnected before we could say that destination " + "was unknown", ex);
         }
     }
 

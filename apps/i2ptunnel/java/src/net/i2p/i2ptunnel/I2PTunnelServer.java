@@ -15,6 +15,7 @@ import java.util.Iterator;
 import java.util.Properties;
 
 import net.i2p.I2PException;
+import net.i2p.I2PAppContext;
 import net.i2p.client.I2PClient;
 import net.i2p.client.I2PClientFactory;
 import net.i2p.client.streaming.I2PServerSocket;
@@ -144,20 +145,51 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
             I2PServerSocket i2pss = sockMgr.getServerSocket();
             while (true) {
                 I2PSocket i2ps = i2pss.accept();
-                //local is fast, so synchronously. Does not need that many
-                //threads.
-                try {
-                    i2ps.setReadTimeout(readTimeout);
-                    Socket s = new Socket(remoteHost, remotePort);
-                    new I2PTunnelRunner(s, i2ps, slock, null);
-                } catch (SocketException ex) {
-                    i2ps.close();
-                }
+                I2PThread t = new I2PThread(new Handler(i2ps));
+                t.start();
             }
         } catch (I2PException ex) {
             _log.error("Error while waiting for I2PConnections", ex);
         } catch (IOException ex) {
             _log.error("Error while waiting for I2PConnections", ex);
+        }
+    }
+    
+    /**
+     * Async handler to keep .accept() from blocking too long.  
+     * todo: replace with a thread pool so we dont get overrun by threads if/when
+     * receiving a lot of connection requests concurrently.
+     *
+     */
+    private class Handler implements Runnable { 
+        private I2PSocket _handleSocket;
+        public Handler(I2PSocket socket) {
+            _handleSocket = socket;
+        }
+        public void run() {
+            long afterAccept = I2PAppContext.getGlobalContext().clock().now();
+            long afterSocket = -1;
+            //local is fast, so synchronously. Does not need that many
+            //threads.
+            try {
+                _handleSocket.setReadTimeout(readTimeout);
+                Socket s = new Socket(remoteHost, remotePort);
+                afterSocket = I2PAppContext.getGlobalContext().clock().now();
+                new I2PTunnelRunner(s, _handleSocket, slock, null);
+            } catch (SocketException ex) {
+                try {
+                    _handleSocket.close();
+                } catch (IOException ioe) {
+                    _log.error("Error while closing the received i2p con", ex);
+                }
+            } catch (IOException ex) {
+                _log.error("Error while waiting for I2PConnections", ex);
+            }
+            
+            long afterHandle = I2PAppContext.getGlobalContext().clock().now();
+            long timeToHandle = afterHandle - afterAccept;
+            if (timeToHandle > 1000)
+                _log.warn("Took a while to handle the request [" + timeToHandle + ", socket create: " + (afterSocket-afterAccept) + "]");
         }
     }
 }

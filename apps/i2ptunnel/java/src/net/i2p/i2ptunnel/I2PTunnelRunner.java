@@ -18,7 +18,7 @@ import net.i2p.util.Clock;
 import net.i2p.util.I2PThread;
 import net.i2p.util.Log;
 
-public class I2PTunnelRunner extends I2PThread {
+public class I2PTunnelRunner extends I2PThread implements I2PSocket.SocketErrorListener {
     private final static Log _log = new Log(I2PTunnelRunner.class);
 
     private static volatile long __runnerId;
@@ -51,8 +51,9 @@ public class I2PTunnelRunner extends I2PThread {
         this.slock = slock;
         this.initialData = initialData;
         lastActivityOn = -1;
-        startedOn = -1;
-        _log.info("I2PTunnelRunner started");
+        startedOn = Clock.getInstance().now();
+        if (_log.shouldLog(Log.INFO))
+            _log.info("I2PTunnelRunner started");
         _runnerId = ++__runnerId;
         setName("I2PTunnelRunner " + _runnerId);
         start();
@@ -90,10 +91,10 @@ public class I2PTunnelRunner extends I2PThread {
     }
 
     public void run() {
-        startedOn = Clock.getInstance().now();
         try {
             InputStream in = s.getInputStream();
             OutputStream out = new BufferedOutputStream(s.getOutputStream(), NETWORK_BUFFER_SIZE);
+            i2ps.setSocketErrorListener(this);
             InputStream i2pin = i2ps.getInputStream();
             OutputStream i2pout = new BufferedOutputStream(i2ps.getOutputStream(), MAX_PACKET_SIZE);
             if (initialData != null) {
@@ -134,6 +135,13 @@ public class I2PTunnelRunner extends I2PThread {
         }
     }
 
+    public void errorOccurred() {
+        synchronized (finishLock) {
+            finished = true;
+            finishLock.notifyAll();
+        }
+    }
+    
     private volatile long __forwarderId = 0;
     
     private class StreamForwarder extends I2PThread {
@@ -189,7 +197,8 @@ public class I2PTunnelRunner extends I2PThread {
                     out.close();
                     in.close();
                 } catch (IOException ex) {
-                    _log.error("Error closing streams", ex);
+                    if (_log.shouldLog(Log.WARN))
+                        _log.warn("Error closing streams", ex);
                 }
                 synchronized (finishLock) {
                     finished = true;
