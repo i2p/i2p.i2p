@@ -2,9 +2,11 @@ package net.i2p.router.transport.tcp;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Date;
 
 import net.i2p.data.DataFormatException;
 import net.i2p.data.i2np.I2NPMessage;
+import net.i2p.data.i2np.DeliveryStatusMessage;
 import net.i2p.router.OutNetMessage;
 import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
@@ -21,6 +23,9 @@ class ConnectionRunner implements Runnable {
     private TCPConnection _con;
     private boolean _keepRunning;
     private byte _writeBuffer[];
+    private long _lastTimeSend;
+    
+    private static final long TIME_SEND_FREQUENCY = 60*1000;
     
     public ConnectionRunner(RouterContext ctx, TCPConnection con) {
         _context = ctx;
@@ -32,6 +37,7 @@ class ConnectionRunner implements Runnable {
     public void startRunning() {
         _keepRunning = true;
         _writeBuffer = new byte[38*1024]; // expansion factor 
+        _lastTimeSend = -1;
         
         String name = "TCP " + _context.routerHash().toBase64().substring(0,6) 
                       + " to " 
@@ -39,6 +45,7 @@ class ConnectionRunner implements Runnable {
         I2PThread t = new I2PThread(this, name);
         t.start();
     }
+    
     public void stopRunning() {
         _keepRunning = false;
     }
@@ -85,6 +92,12 @@ class ConnectionRunner implements Runnable {
         
         msg.timestamp("ConnectionRunner.sendMessage data");
 
+        I2NPMessage timeMessage = null;
+        if (_lastTimeSend < _context.clock().now() - TIME_SEND_FREQUENCY) {
+            timeMessage = buildTimeMessage();
+            _lastTimeSend = _context.clock().now();
+        }
+        
         OutputStream out = _con.getOutputStream();
         boolean ok = false;
         long before = -1;
@@ -93,6 +106,8 @@ class ConnectionRunner implements Runnable {
             synchronized (out) {
                 before = _context.clock().now();
                 out.write(buf, 0, written);
+                if (timeMessage != null)
+                    out.write(timeMessage.toByteArray());
                 out.flush();
                 after = _context.clock().now();
             }
@@ -109,5 +124,19 @@ class ConnectionRunner implements Runnable {
             _con.closeConnection();
         }
         _con.sent(msg, ok, after - before);
+    }
+
+    /**
+     * Build up a new message to be sent with the current router's time
+     *
+     */
+    private I2NPMessage buildTimeMessage() {
+        // holy crap this is a kludge - strapping ourselves into a 
+        // deliveryStatusMessage
+        DeliveryStatusMessage tm = new DeliveryStatusMessage(_context);
+        tm.setArrival(new Date(_context.clock().now()));
+        tm.setMessageId(0);
+        tm.setUniqueId(0);
+        return tm;
     }
 }

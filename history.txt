@@ -1,4 +1,12 @@
-$Id: history.txt,v 1.105 2004/12/13 08:45:52 jrandom Exp $
+$Id: history.txt,v 1.106 2004/12/14 06:54:39 jrandom Exp $
+
+2004-12-14  jrandom
+    * Periodically send a message along all I2NP connections with the router's
+      current time, allowing the receiving peer to determine that the clock 
+      has skewed too much, and hence, disconnect.  For backwards compatability
+      reasons, this is being kludged into a DeliveryStatusMessage (ewww).  The
+      next time we have a backwards compatability break, we can put in a proper
+      message setup for it.
 
 2004-12-14  jrandom
     * Reenable the probabalistic drop on the TCP queues to deal with good old
