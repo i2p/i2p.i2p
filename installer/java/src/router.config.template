@@ -156,27 +156,29 @@ router.maxWaitingJobs=40
 # applications it is up and running, all within the router's JVM.  Uncomment the
 # ones you want (revising the numbers and ports accordingly)
 
-clientApp=0.main=net.i2p.time.Timestamper
+# Keep the router's clock in sync by querying one of the specified NTP servers once
+# a minute (uses UDP port 123)
+clientApp.0.main=net.i2p.time.Timestamper
 clientApp.0.name=Timestamper
 clientApp.0.onBoot=true
 clientApp.0.args=http://localhost:7655/setTime?k=v ntp1.sth.netnod.se ntp2.sth.netnod.se
 
-# Network monitor (harvests data from the network database and stores it under 
-# monitorData/, and with the netviewer GUI you can browse through its results)
-clientApp.1.main=net.i2p.netmonitor.NetMonitor
-clientApp.1.name=NetMonitor
-clientApp.1.args=
-
 # SAM bridge (a simplified socket based protocol for using I2P - listens on port 7656.  see
 # the specs at http://www.i2p.net/node/view/144 for more info)
-clientApp.2.main=net.i2p.sam.SAMBridge
-clientApp.2.name=SAMBridge
-clientApp.2.args=0.0.0.0 7656 i2cp.tcp.host=localhost i2cp.tcp.port=##_router_i2cp_port##
+clientApp.1.main=net.i2p.sam.SAMBridge
+clientApp.1.name=SAMBridge
+clientApp.1.args=0.0.0.0 7656 i2cp.tcp.host=localhost i2cp.tcp.port=##_router_i2cp_port##
 
 # EepProxy (HTTP proxy that lets you browse both eepsites and the normal web via squid.i2p)
-clientApp.3.main=net.i2p.i2ptunnel.I2PTunnel
-clientApp.3.name=EepProxy
-clientApp.3.args=-nocli -e "config localhost ##_router_i2cp_port##" -e "httpclient 4444"
+clientApp.2.main=net.i2p.i2ptunnel.I2PTunnel
+clientApp.2.name=EepProxy
+clientApp.2.args=-nocli -e "config localhost ##_router_i2cp_port##" -e "httpclient 4444"
+
+# Network monitor (harvests data from the network database and stores it under 
+# monitorData/, and with the netviewer GUI you can browse through its results)
+#clientApp.3.main=net.i2p.netmonitor.NetMonitor
+#clientApp.3.name=NetMonitor
+#clientApp.3.args=
 
 # Heartbeat engine (ueber-simple ping/pong system, configured in heartbeat.config.  By itself
 # it just writes out stat data where its told to, but there's a seperate HeartbeatMonitor 
