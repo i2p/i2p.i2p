@@ -40,7 +40,9 @@
 #define CYGWIN  3  // Cygwin
 
 #if OS == MINGW
+	#define NO_SSIZE_T
 	#define WIN_STRERROR
+	#define WINSOCK
 	#define WINTHREADS
 #endif
 
@@ -65,6 +67,10 @@
 #include <time.h>
 
 using namespace std;
+
+#ifdef NO_SSIZE_T
+	typedef signed long ssize_t;
+#endif
 
 /*
  * Define this to '1' to cause the printing of source code file and line number
