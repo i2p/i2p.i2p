@@ -473,6 +473,11 @@ public class Connection {
                 
                 int numSends = _packet.getNumSends() + 1;
                 
+                // in case things really suck, the other side may have lost thier
+                // session tags (e.g. they restarted), so jump back to ElGamal.
+                if ( (newWindowSize == 1) && (numSends > 2) )
+                    _context.sessionKeyManager().failTags(_remotePeer.getPublicKey());
+                
                 if (_log.shouldLog(Log.WARN))
                     _log.warn("Resend packet " + _packet + " time " + numSends + " (wsize "
                               + newWindowSize + " lifetime " 
