@@ -3,7 +3,7 @@ package net.i2p.router.web;
 import net.i2p.router.ClientTunnelSettings;
 import net.i2p.router.Router;
 
-//import net.i2p.apps.systray.SysTray;
+import net.i2p.apps.systray.SysTray;
 import org.tanukisoftware.wrapper.WrapperManager;
 
 /**
@@ -31,12 +31,12 @@ public class ConfigServiceHandler extends FormHandler {
         } else if ("Dump threads".equals(_action)) {
             WrapperManager.requestThreadDump();
             addFormNotice("Threads dumped to logs/wrapper.log");
-        //} else if ("Show systray icon".equals(_action)) {
-        //    SysTray.instance().show();
-        //    addFormNotice("Systray icon enabled (if possible)");
-        //} else if ("Hide systray icon".equals(_action)) {
-        //    SysTray.instance().hide();
-        //    addFormNotice("Systray icon disabled");
+        } else if ("Show systray icon".equals(_action)) {
+            SysTray.getInstance().show();
+            addFormNotice("Systray icon enabled (if possible)");
+        } else if ("Hide systray icon".equals(_action)) {
+            SysTray.getInstance().hide();
+            addFormNotice("Systray icon disabled");
         } else {
             addFormNotice("Blah blah blah.  whatever.  I'm not going to " + _action);
         }

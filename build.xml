@@ -13,7 +13,7 @@
         <echo message="  buildWEB:  build the router console web application" />
         <echo message="  pkg:       make the tarball and installer jar (depends upon preppkg)" />
         <echo message="  pkgclean:  delete the ./pkg-temp/ dir, tarball and installer jar" />
-        <echo message="  preppkg:   gather built files for tarball and installer (depends upon prepWEB)" />
+        <echo message="  preppkg:   gather built files for tarball and installer" />
         <echo message="  tarball:   tar the built files and compress with bz2 (depends upon preppkg)" />
         <echo message="  installer: build the GUI installer (depends upon preppkg)" />
     </target>
@@ -75,6 +75,7 @@
         <ant dir="apps/sam/java/" target="jar" />
         <ant dir="apps/heartbeat/java/" target="jar" />
         <ant dir="apps/netmonitor/java/" target="jar" />
+        <ant dir="apps/systray/java/" target="jar" />
         <ant dir="apps/routerconsole/java/" target="jar" />
         <ant dir="installer/java/" target="jar" />
     </target>
@@ -88,6 +89,7 @@
         <copy file="apps/sam/java/build/sam.jar" todir="build/" />
         <copy file="apps/heartbeat/java/build/heartbeat.jar" todir="build/" />
         <copy file="apps/netmonitor/java/build/netmonitor.jar" todir="build/" />
+        <copy file="apps/systray/java/build/systray.jar" todir="build/" />
         <copy file="installer/java/build/install.jar" todir="build/" />
         <copy file="installer/java/build/guiinstall.jar" todir="build/" />
         <copy file="installer/java/build/fetchseeds.jar" todir="build/" />
@@ -97,8 +99,8 @@
         <mkdir dir="./build" />
         <mkdir dir="./build/javadoc" />
         <javadoc 
-            sourcepath="core/java/src:core/java/test:router/java/src:router/java/test:apps/ministreaming/java/src:apps/i2ptunnel/java/src:apps/httptunnel/java/src:apps/routerconsole/java/src" 
-            classpath="apps/jetty/jettylib/org.mortbay.jetty.jar:installer/lib/wrapper/win32/wrapper.jar" 
+            sourcepath="core/java/src:core/java/test:router/java/src:router/java/test:apps/ministreaming/java/src:apps/i2ptunnel/java/src:apps/httptunnel/java/src:apps/systray/java/src:apps/routerconsole/java/src" 
+            classpath="apps/jetty/jettylib/org.mortbay.jetty.jar:apps/systray/java/lib/systray4j.jar:installer/lib/wrapper/win32/wrapper.jar" 
             destdir="./build/javadoc" 
             packagenames="*" 
             use="true" 
@@ -117,6 +119,7 @@
         <ant dir="apps/heartbeat/java/" target="distclean" />
         <ant dir="apps/netmonitor/java/" target="distclean" />
         <ant dir="apps/routerconsole/java/" target="distclean" />
+        <ant dir="apps/systray/java/" target="distclean" />
         <ant dir="installer/java/" target="distclean" />
         <delete>
             <fileset dir="." includes="**/*.class" />
@@ -197,6 +200,7 @@
         <copy file="build/jasper-compiler.jar" todir="pkg-temp/lib/" />
         <copy file="build/jasper-runtime.jar" todir="pkg-temp/lib/" />
         <copy file="build/javax.servlet.jar" todir="pkg-temp/lib/" />
+        <copy file="build/jbigi.jar" todir="pkg-temp/lib" />
         <copy file="build/jnet.jar" todir="pkg-temp/lib/" />
         <copy file="build/mstreaming.jar" todir="pkg-temp/lib/" />
         <copy file="build/netmonitor.jar" todir="pkg-temp/lib/" />
@@ -205,9 +209,13 @@
         <copy file="build/router.jar" todir="pkg-temp/lib/" />
         <copy file="build/routerconsole.jar" todir="pkg-temp/lib/" />
         <copy file="build/sam.jar" todir="pkg-temp/lib/" />
+        <copy file="build/systray.jar" todir="pkg-temp/lib" />
+        <copy file="apps/systray/java/lib/systray4j.jar" todir="pkg-temp/lib" />
+        <copy file="apps/systray/java/lib/systray4j.dll" todir="pkg-temp/lib" />
+        <copy file="apps/systray/java/resources/iggy.ico" todir="pkg-temp/icons" />
+        <copy file="apps/systray/java/resources/iggy.xpm" todir="pkg-temp/icons" />
         <copy file="build/xercesImpl.jar" todir="pkg-temp/lib/" />
         <copy file="build/xml-apis.jar" todir="pkg-temp/lib/" />
-        <copy file="build/jbigi.jar" todir="pkg-temp/lib" />
         <copy file="build/i2ptunnel.war" todir="pkg-temp/webapps/" />
         <copy file="build/routerconsole.war" todir="pkg-temp/webapps/" />
         <copy file="hosts.txt" todir="pkg-temp/" />

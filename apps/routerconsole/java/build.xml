@@ -4,7 +4,7 @@
     <target name="build" depends="builddep, jar" />
     <target name="builddep">
         <ant dir="../../../router/java/" target="build" />
-        <!-- <ant dir="../../systray/java/" target="build" /> -->
+        <ant dir="../../systray/java/" target="build" />
 	<!-- router will build core -->
     </target>
     <target name="prepare">
@@ -21,8 +21,8 @@
                 <pathelement location="../../../core/java/build/i2p.jar" />
                 <pathelement location="../../../router/java/build/router.jar" />
                 <pathelement location="../../jetty/jettylib/org.mortbay.jetty-jdk1.2.jar" />
-                <!-- <pathelement location="../../systray/java/build/lib/systray.jar" /> -->
-                <!-- <pathelement location="../../systray/java/lib/systray4j.jar" /> -->
+                <pathelement location="../../systray/java/build/systray.jar" />
+                <pathelement location="../../systray/java/lib/systray4j.jar" />
                 <pathelement location="../../../installer/lib/wrapper/win32/wrapper.jar" /> <!-- we dont care if we're not on win32 -->
             </classpath>
         </javac>
@@ -88,7 +88,7 @@
         <mkdir dir="./build" />
         <mkdir dir="./build/javadoc" />
         <javadoc 
-            sourcepath="./src:../../../core/java/src:../../router/java/src" destdir="./build/javadoc" 
+            sourcepath="./src:../../../core/java/src:../../../router/java/src:../../systray/java/src" destdir="./build/javadoc" 
             packagenames="*" 
             use="true" 
             splitindex="true" 
@@ -100,11 +100,11 @@
     <target name="cleandep" depends="clean">
 	<!-- router will clean core -->
         <ant dir="../../../router/java/" target="cleandep" />
-        <!-- <ant dir="../../systray/java/" target="cleandep" /> -->
+        <ant dir="../../systray/java/" target="cleandep" />
     </target>
     <target name="distclean" depends="clean">
 	<!-- router will clean core -->
         <ant dir="../../../router/java/" target="distclean" />
-        <!-- <ant dir="../../systray/java/" target="distclean" /> -->
+        <ant dir="../../systray/java/" target="distclean" />
     </target>
 </project>
