@@ -529,6 +529,20 @@ class TunnelPool {
     }
     
     private static final int MAX_FAILURES_PER_TUNNEL = 0;
+    public static final String PROP_MAX_TUNNEL_FAILURES = "tunnel.maxTunnelFailures";
+    
+    private int getMaxTunnelFailures() {
+        String max = _context.getProperty(PROP_MAX_TUNNEL_FAILURES);
+        if (max != null) {
+            try {
+                return Integer.parseInt(max);
+            } catch (NumberFormatException nfe) {
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("Max tunnel failures property is invalid [" + max + "]");
+            }
+        }
+        return MAX_FAILURES_PER_TUNNEL;
+    }
     
     public void tunnelFailed(TunnelId id) {
         if (!_isLive) return;
@@ -536,7 +550,7 @@ class TunnelPool {
         if (info == null)
             return;
         int failures = info.incrementFailures();
-        if (failures <= MAX_FAILURES_PER_TUNNEL) {
+        if (failures <= getMaxTunnelFailures()) {
             if (_log.shouldLog(Log.INFO))
                 _log.info("Tunnel " + id + " failure " + failures + ", but not fatal yet");
             return;

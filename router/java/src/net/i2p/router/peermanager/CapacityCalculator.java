@@ -45,18 +45,25 @@ public class CapacityCalculator extends Calculator {
     private static long ESTIMATE_PERIOD = 60*60*1000;
     
     public double calc(PeerProfile profile) {
-        double capacity = 0;
-        
         RateStat acceptStat = profile.getTunnelCreateResponseTime();
         RateStat rejectStat = profile.getTunnelHistory().getRejectionRate();
         RateStat failedStat = profile.getTunnelHistory().getFailedRate();
         
-        capacity += estimatePartial(acceptStat, rejectStat, failedStat, 10*60*1000);
-        capacity += estimatePartial(acceptStat, rejectStat, failedStat, 30*60*1000);
-        capacity += estimatePartial(acceptStat, rejectStat, failedStat, 60*60*1000);
-        capacity += estimatePartial(acceptStat, rejectStat, failedStat, 24*60*60*1000);
+        double capacity10m = estimateCapacity(acceptStat, rejectStat, failedStat, 10*60*1000);
+        double capacity30m = estimateCapacity(acceptStat, rejectStat, failedStat, 30*60*1000);
+        double capacity60m = estimateCapacity(acceptStat, rejectStat, failedStat, 60*60*1000);
+        double capacity1d  = estimateCapacity(acceptStat, rejectStat, failedStat, 24*60*60*1000);
         
-        if (tooOld(profile))
+        double capacity = capacity10m * periodWeight(10*60*1000) + 
+                          capacity30m * periodWeight(30*60*1000) + 
+                          capacity60m * periodWeight(60*60*1000) + 
+                          capacity1d  * periodWeight(24*60*60*1000);
+        
+        // if we actively know they're bad, who cares if they used to be good?
+        if (capacity10m <= 0)
+            capacity = 0;
+        
+        if (tooOld(profile)) 
             capacity = 1;
         
         capacity += profile.getReliabilityBonus();
@@ -74,7 +81,7 @@ public class CapacityCalculator extends Calculator {
             return true;
     }
     
-    private double estimatePartial(RateStat acceptStat, RateStat rejectStat, RateStat failedStat, int period) {
+    private double estimateCapacity(RateStat acceptStat, RateStat rejectStat, RateStat failedStat, int period) {
         Rate curAccepted = acceptStat.getRate(period);
         Rate curRejected = rejectStat.getRate(period);
         Rate curFailed = failedStat.getRate(period);
@@ -82,25 +89,26 @@ public class CapacityCalculator extends Calculator {
         long eventCount = 0;
         if (curAccepted != null)
             eventCount = curAccepted.getCurrentEventCount() + curAccepted.getLastEventCount();
-        double stretch = ESTIMATE_PERIOD / period;
+        double stretch = ((double)ESTIMATE_PERIOD) / period;
         double val = eventCount * stretch;
         long failed = 0;
         if (curFailed != null)
             failed = curFailed.getCurrentEventCount() + curFailed.getLastEventCount();
         if (failed > 0) {
-            if ( (period == 10*60*1000) && (curFailed.getCurrentEventCount() > 0) )
+            if ( (period <= 10*60*1000) && (curFailed.getCurrentEventCount() > 0) )
                 return 0.0d; // their tunnels have failed in the last 0-10 minutes
             else
                 val -= failed * stretch;
         }
         
-        if ( (period == 10*60*1000) && (curRejected.getCurrentEventCount() + curRejected.getLastEventCount() > 0) )
+        if ( (period <= 10*60*1000) && (curRejected.getCurrentEventCount() + curRejected.getLastEventCount() > 0) ) {
+            //System.out.println("10m period has rejected " + (curRejected.getCurrentEventCount() + curRejected.getLastEventCount()) + " times");
             return 0.0d;
-        else
+        } else
             val -= stretch * (curRejected.getCurrentEventCount() + curRejected.getLastEventCount());
         
         if (val >= 0) {
-            return (val + GROWTH_FACTOR) * periodWeight(period);
+            return (val + GROWTH_FACTOR);
         } else {
             // failed too much, don't grow
             return 0.0d;

@@ -1,4 +1,17 @@
-$Id: history.txt,v 1.103 2004/12/11 02:05:12 jrandom Exp $
+$Id: history.txt,v 1.104 2004/12/11 04:26:24 jrandom Exp $
+
+2004-12-13  jrandom
+    * Added some error checking on the new client send job (thanks duck!)
+    * Implemented tunnel rejection based on bandwidth usage (rejecting tunnels
+      proportional to the bytes allocated in existing tunnels vs the bytes 
+      allowed through the bandwidth limiter).
+    * Enable a new configuration parameter for triggering a tunnel rebuild 
+      (tunnel.maxTunnelFailures), where that is the max allowed test failures
+      before killing the tunnel (default 0).
+    * Gather more data that we rank capacity by (now we monitor and balance the
+      data from 10m/30m/60m/1d instead of just 10m/60m/1d).
+    * Fix a truncation/type conversion problem on the long term capacity 
+      values (we were ignoring the daily stats outright)
 
 2004-12-11  jrandom
     * Fix the missing HTTP timeout, which was caused by the deferred syn used

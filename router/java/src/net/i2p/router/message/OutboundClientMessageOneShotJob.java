@@ -53,6 +53,7 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
     private MessageId _clientMessageId;
     private int _clientMessageSize;
     private Destination _from;
+    private Destination _to;
     /** target destination's leaseSet, if known */
     private LeaseSet _leaseSet;
     /** Actual lease the message is being routed through */
@@ -60,6 +61,7 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
     private PayloadGarlicConfig _clove;
     private long _cloveId;
     private long _start;
+    private boolean _finished;
     
     /**
      * final timeout (in milliseconds) that the outbound message will fail in.
@@ -114,6 +116,7 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
         _clientMessageId = msg.getMessageId();
         _clientMessageSize = msg.getPayload().getSize();
         _from = msg.getFromDestination();
+        _to = msg.getDestination();
         
         String param = msg.getSenderConfig().getOptions().getProperty(OVERALL_TIMEOUT_MS_PARAM);
         if (param == null)
@@ -132,6 +135,7 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
         _start = getContext().clock().now();
         _overallExpiration = timeoutMs + _start;
         _shouldBundle = getShouldBundle();
+        _finished = false;
     }
     
     public String getName() { return "Outbound client message"; }
@@ -142,11 +146,10 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
         buildClove();
         if (_log.shouldLog(Log.DEBUG))
             _log.debug(getJobId() + ": Clove built");
-        Hash to = _clientMessage.getDestination().calculateHash();
         long timeoutMs = _overallExpiration - getContext().clock().now();
         if (_log.shouldLog(Log.DEBUG))
             _log.debug(getJobId() + ": Send outbound client message - sending off leaseSet lookup job");
-        getContext().netDb().lookupLeaseSet(to, new SendJob(), new LookupLeaseSetFailedJob(), timeoutMs);
+        getContext().netDb().lookupLeaseSet(_to.calculateHash(), new SendJob(), new LookupLeaseSetFailedJob(), timeoutMs);
     }
     
     private boolean getShouldBundle() {
@@ -194,7 +197,7 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
      *
      */
     private boolean getNextLease() {
-        _leaseSet = getContext().netDb().lookupLeaseSetLocally(_clientMessage.getDestination().calculateHash());
+        _leaseSet = getContext().netDb().lookupLeaseSetLocally(_to.calculateHash());
         if (_leaseSet == null) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn(getJobId() + ": Lookup locally didn't find the leaseSet");
@@ -278,7 +281,7 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
         GarlicMessage msg = OutboundClientMessageJobHelper.createGarlicMessage(getContext(), token, 
                                                                                _overallExpiration, key, 
                                                                                _clove, 
-                                                                               _clientMessage.getDestination(), 
+                                                                               _to, 
                                                                                sessKey, tags, 
                                                                                true, replyLeaseSet);
         
@@ -338,6 +341,9 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
      * this is safe to call multiple times (only tells the client once)
      */
     private void dieFatal() {
+        if (_finished) return;
+        _finished = true;
+        
         long sendTime = getContext().clock().now() - _start;
         if (_log.shouldLog(Log.WARN))
             _log.warn(getJobId() + ": Failed to send the message " + _clientMessageId + " after " 
@@ -364,7 +370,7 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
         
         DeliveryInstructions instructions = new DeliveryInstructions();
         instructions.setDeliveryMode(DeliveryInstructions.DELIVERY_MODE_DESTINATION);
-        instructions.setDestination(_clientMessage.getDestination().calculateHash());
+        instructions.setDestination(_to.calculateHash());
         
         instructions.setDelayRequested(false);
         instructions.setDelaySeconds(0);
@@ -434,6 +440,8 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
         
         public String getName() { return "Send client message successful to a lease"; }
         public void runJob() {
+            if (_finished) return;
+            _finished = true;
             long sendTime = getContext().clock().now() - _start;
             if (_log.shouldLog(Log.INFO))
                 _log.info(OutboundClientMessageOneShotJob.this.getJobId() 
