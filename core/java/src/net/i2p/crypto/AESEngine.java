@@ -45,7 +45,11 @@ public class AESEngine {
         if ((initializationVector == null) || (payload == null) || (sessionKey == null)
             || (initializationVector.length != 16)) return null;
 
-        byte cyphertext[] = new byte[payload.length + (16 - (payload.length % 16))];
+        byte cyphertext[] = null;
+        if ((payload.length % 16) == 0) 
+            cyphertext = new byte[payload.length];
+        else
+            cyphertext = new byte[payload.length + (16 - (payload.length % 16))];
         System.arraycopy(payload, 0, cyphertext, 0, payload.length);
         return cyphertext;
     }
