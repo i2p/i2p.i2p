@@ -399,6 +399,10 @@ public class Packet {
      * @throws IllegalArgumentException if the data is b0rked
      */
     public void readPacket(byte buffer[], int offset, int length) throws IllegalArgumentException {
+        if (buffer.length - offset < length) 
+            throw new IllegalArgumentException("len=" + buffer.length + " off=" + offset + " length=" + length);
+        if (length < 22) // min header size
+            throw new IllegalArgumentException("Too small: len=" + buffer.length);
         int cur = offset;
         _sendStreamId = new byte[4];
         System.arraycopy(buffer, cur, _sendStreamId, 0, 4);
@@ -412,6 +416,8 @@ public class Packet {
         cur += 4;
         int numNacks = (int)DataHelper.fromLong(buffer, cur, 1);
         cur++;
+        if (length < 22 + numNacks*4)
+            throw new IllegalArgumentException("Too small with " + numNacks + " nacks: " + length);
         if (numNacks > 0) {
             _nacks = new long[numNacks];
             for (int i = 0; i < numNacks; i++) {
@@ -428,6 +434,11 @@ public class Packet {
         
         int optionSize = (int)DataHelper.fromLong(buffer, cur, 2);
         cur += 2;
+        
+        if (length < 22 + numNacks*4 + optionSize)
+            throw new IllegalArgumentException("Too small with " + numNacks + " nacks and "
+                                               + optionSize + " options: " + length);
+        
         int payloadBegin = cur + optionSize;
         int payloadSize = length - payloadBegin;
         if ( (payloadSize < 0) || (payloadSize > MAX_PAYLOAD_SIZE) ) 
