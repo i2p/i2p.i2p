@@ -54,6 +54,11 @@ public class GetBidsJob extends JobImpl {
         List bids = _facade.getBids(_msg);
         if (bids.size() <= 0) {
             _log.warn("No bids available for the message " + _msg);
+            Hash target = _msg.getTargetHash();
+            if (target == null)
+                target = _msg.getTarget().getIdentity().getHash();
+            getContext().shitlist().shitlistRouter(target, "No bids");
+            getContext().netDb().fail(target);
             fail();
         } else {
             TransportBid bid = (TransportBid)bids.get(0);
@@ -74,7 +79,10 @@ public class GetBidsJob extends JobImpl {
             getContext().messageRegistry().unregisterPending(_msg);
         }
         
-        getContext().profileManager().messageFailed(_msg.getTarget().getIdentity().getHash());
+        if (_msg.getTargetHash() != null)
+            getContext().profileManager().messageFailed(_msg.getTargetHash());
+        else
+            getContext().profileManager().messageFailed(_msg.getTarget().getIdentity().getHash());
         
         _msg.discardData();
     }

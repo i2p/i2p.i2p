@@ -501,6 +501,7 @@ public class Router {
         }
         buf.append("</table>\n");
         out.write(buf.toString());
+        out.flush();
     }
     
     private static int MAX_MSG_LENGTH = 120;

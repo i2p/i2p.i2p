@@ -816,6 +816,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         if (!_initialized) {
             buf.append("<i>Not initialized</i>\n");
             out.write(buf.toString());
+            out.flush();
             return;
         }
         Set leases = getLeases();
@@ -896,6 +897,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
             buf.append("</table>\n");
         }
         out.write(buf.toString());
+        out.flush();
     }
     
     private void renderRouterInfo(StringBuffer buf, RouterInfo info, boolean isUs) {

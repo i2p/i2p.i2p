@@ -49,7 +49,10 @@ public class OutNetMessagePool {
                           + " of type " + msg.getMessageType());
         
         boolean valid = validate(msg);
-        if (!valid) return;
+        if (!valid) {
+            _context.messageRegistry().unregisterPending(msg);
+            return;
+        }        
         MessageSelector selector = msg.getReplySelector();
         if (selector != null) {
             _context.messageRegistry().registerPending(msg);

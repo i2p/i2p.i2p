@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.i2p.data.DataHelper;
+import net.i2p.data.Hash;
 import net.i2p.data.RouterIdentity;
 import net.i2p.data.RouterInfo;
 import net.i2p.data.i2np.I2NPMessageReader;
@@ -25,6 +26,7 @@ public class TCPConnection {
     private Log _log;
     private RouterContext _context;
     private RouterIdentity _ident;
+    private Hash _attemptedPeer;
     private TCPAddress _remoteAddress;
     private List _pendingMessages;
     private InputStream _in;
@@ -55,10 +57,14 @@ public class TCPConnection {
     public RouterIdentity getRemoteRouterIdentity() { return _ident; }
     /** What is the peer's TCP address (using the IP address not hostname) */
     public TCPAddress getRemoteAddress() { return _remoteAddress; }
+    /** Who we initially were trying to contact */
+    public Hash getAttemptedPeer() { return _attemptedPeer; }
     /** Who are we talking with (or null if not identified) */
     public void setRemoteRouterIdentity(RouterIdentity ident) { _ident = ident; }
     /** What is the peer's TCP address (using the IP address not hostname) */
     public void setRemoteAddress(TCPAddress addr) { _remoteAddress = addr; }
+    /** Who we initially were trying to contact */
+    public void setAttemptedPeer(Hash peer) { _attemptedPeer = peer; }
     
     /** 
      * Actually start processing the messages on the connection (and reading
@@ -80,10 +86,21 @@ public class TCPConnection {
      *
      */
     public synchronized void closeConnection() {
-        if (_log.shouldLog(Log.INFO))
-            _log.info("Connection closed", new Exception("Closed by"));
+        if (_log.shouldLog(Log.INFO)) {
+            if (_ident != null)
+                _log.info("Connection between " + _ident.getHash().toBase64().substring(0,6) 
+                          + " and " + _context.routerHash().toBase64().substring(0,6)
+                          + " closed", new Exception("Closed by"));
+            else
+                _log.info("Connection between " + _remoteAddress 
+                          + " and " + _context.routerHash().toBase64().substring(0,6)
+                          + " closed", new Exception("Closed by"));
+        }
         if (_closed) return;
         _closed = true;
+        synchronized (_pendingMessages) {
+            _pendingMessages.notifyAll();
+        }
         if (_runner != null)
             _runner.stopRunning();
         if (_reader != null)
@@ -112,6 +129,7 @@ public class TCPConnection {
         synchronized (_pendingMessages) {
             rv = new ArrayList(_pendingMessages);
             _pendingMessages.clear();
+            _pendingMessages.notifyAll();
         }
         return rv;
     }
@@ -172,7 +190,7 @@ public class TCPConnection {
     }
     
     /** How long has this connection been active for? */
-    public long getLifetime() { return _context.clock().now() - _started; }
+    public long getLifetime() { return (_started <= 0 ? -1 : _context.clock().now() - _started); }
     
     void setTransport(TCPTransport transport) { _transport = transport; }
     

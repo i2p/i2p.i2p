@@ -671,6 +671,7 @@ class TunnelPool {
             ClientTunnelPool pool = getClientPool(dest);
             renderTunnels(out, buf, "Inbound tunnels for " + dest.calculateHash() + " - (still connected? " + (!pool.isStopped()) + ")", pool.getInboundTunnelIds());
         }
+        out.flush();
     }
     
     private void renderTunnels(Writer out, StringBuffer buf, String msg, Set tunnelIds) throws IOException {

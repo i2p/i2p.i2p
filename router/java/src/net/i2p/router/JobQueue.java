@@ -617,6 +617,7 @@ public class JobQueue {
             buf.append(j.toString()).append("</li>\n");
         }
         buf.append("</ol>\n");
+        out.flush();
 
         buf.append("# timed jobs: ").append(timedJobs.size()).append("<ol>\n");
         TreeMap ordered = new TreeMap();

@@ -140,6 +140,7 @@ public class ConnectionBuilder {
             con.setSocket(_socket);
             con.setRemoteRouterIdentity(_actualPeer.getIdentity());
             con.setRemoteAddress(_remoteAddress);
+            con.setAttemptedPeer(_target.getIdentity().getHash());
             if (_error == null) {
                 if (_log.shouldLog(Log.INFO))
                     _log.info("Establishment successful!  returning the con");

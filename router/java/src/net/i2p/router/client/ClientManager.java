@@ -377,6 +377,7 @@ public class ClientManager {
         
         buf.append("\n<hr />\n");
         out.write(buf.toString());
+        out.flush();
     }
     
     public void messageReceived(ClientMessage msg) {

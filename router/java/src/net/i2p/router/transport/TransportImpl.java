@@ -183,13 +183,13 @@ public abstract class TransportImpl implements Transport {
                     msg.discardData();
                 }
             } else {
+                MessageSelector selector = msg.getReplySelector();
                 if (_log.shouldLog(Log.INFO))
                     _log.info("Failed and no requeue allowed for a " 
                               + msg.getMessageSize() + " byte " 
-                              + msg.getMessageType() + " message");
+                              + msg.getMessageType() + " message with selector " + selector, new Exception("fail cause"));
                 if (msg.getOnFailedSendJob() != null)
                     _context.jobQueue().addJob(msg.getOnFailedSendJob());
-                MessageSelector selector = msg.getReplySelector();
                 if (selector != null)
                     _context.messageRegistry().unregisterPending(msg);
                 log = true;

@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import net.i2p.data.Hash;
 import net.i2p.data.i2np.I2NPMessage;
 import net.i2p.router.Job;
 import net.i2p.router.JobImpl;
@@ -27,6 +28,7 @@ import net.i2p.util.Log;
 
 public class OutboundMessageRegistry {
     private Log _log;
+    /** Expiration date (Long) to OutNetMessage */
     private TreeMap _pendingMessages;
     private RouterContext _context;
     
@@ -274,6 +276,30 @@ public class OutboundMessageRegistry {
             }
         }
     }
+
+    public void peerFailed(Hash peer) {
+        List failed = null;
+        synchronized (_pendingMessages) {
+            for (Iterator iter = _pendingMessages.values().iterator(); iter.hasNext(); ) {
+                OutNetMessage msg = (OutNetMessage)iter.next();
+                if ( (msg.getTargetHash() != null) && (msg.getTargetHash().equals(peer)) ) {
+                    if (failed == null)
+                        failed = new ArrayList(4);
+                    failed.add(msg);
+                    iter.remove();
+                }
+            }
+        }
+        if (failed != null) {
+            for (int i = 0; i < failed.size(); i++) {
+                OutNetMessage msg = (OutNetMessage)failed.get(i);
+                msg.discardData();
+                if (msg.getOnFailedSendJob() != null)
+                    _context.jobQueue().addJob(msg.getOnFailedSendJob());
+            }
+        }
+        
+    }
     
     public void renderStatusHTML(Writer out) throws IOException {
         StringBuffer buf = new StringBuffer(8192);
@@ -296,6 +322,7 @@ public class OutboundMessageRegistry {
         }
         buf.append("</ul>");
         out.write(buf.toString());
+        out.flush();
     }
 
     /**

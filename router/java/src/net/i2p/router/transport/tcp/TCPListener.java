@@ -309,8 +309,8 @@ class TCPListener {
          */
         public void timeReached() {
             if (wasSuccessful()) {
-                if (_log.shouldLog(Log.DEBUG))
-                    _log.debug("Handle successful");
+                //if (_log.shouldLog(Log.DEBUG))
+                //    _log.debug("Handle successful");
             } else {
                 if (_log.shouldLog(Log.WARN))
                     _log.warn("Unable to handle in the time allotted");

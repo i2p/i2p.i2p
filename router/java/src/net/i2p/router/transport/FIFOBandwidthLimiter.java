@@ -437,6 +437,7 @@ public class FIFOBandwidthLimiter {
         }
         buf.append("</ol></li></ul>\n");
         out.write(buf.toString());
+        out.flush();
     }
     
     private static long __requestId = 0;

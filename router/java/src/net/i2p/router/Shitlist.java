@@ -50,7 +50,10 @@ public class Shitlist {
         return shitlistRouter(peer, null);
     }
     public boolean shitlistRouter(Hash peer, String reason) {
-        if (peer == null) return false;
+        if (peer == null) {
+            _log.error("wtf, why did we try to shitlist null?", new Exception("shitfaced"));
+            return false;
+        }
         if (_context.routerHash().equals(peer)) {
             _log.error("wtf, why did we try to shitlist ourselves?", new Exception("shitfaced"));
             return false;
@@ -71,6 +74,7 @@ public class Shitlist {
         
         //_context.netDb().fail(peer);
         _context.tunnelManager().peerFailed(peer);
+        _context.messageRegistry().peerFailed(peer);
         return wasAlready;
     }
     
@@ -153,5 +157,6 @@ public class Shitlist {
         }
         buf.append("</ul>\n");
         out.write(buf.toString());
+        out.flush();
     }
 }

@@ -599,6 +599,11 @@ public class ConnectionHandler {
             } else {
                 status = STATUS_OK;
             }
+         
+            if (_actualPeer.getIdentity().getHash().equals(_context.routerHash())) {
+                status = STATUS_UNKNOWN;
+                props.setProperty("REASON", "wtf, talking to myself?");
+            }
             
             baos.write(status);
              

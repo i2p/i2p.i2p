@@ -174,9 +174,17 @@ public class TCPTransport extends TransportImpl {
                 Hash peer = msg.getTarget().getIdentity().calculateHash();
                 con = (TCPConnection)_connectionsByIdent.get(peer);
                 if (con == null) {
-                    if (_log.shouldLog(Log.DEBUG))
-                        _log.debug("No connections to " + peer.toBase64() 
-                                   + ", request one");
+                    if (_log.shouldLog(Log.DEBUG)) {
+                        StringBuffer buf = new StringBuffer(128);
+                        buf.append("No connections to ");
+                        buf.append(peer.toBase64().substring(0,6));
+                        buf.append(", but we are connected to ");
+                        for (Iterator iter = _connectionsByIdent.keySet().iterator(); iter.hasNext(); ) {
+                            Hash cur = (Hash)iter.next();
+                            buf.append(cur.toBase64().substring(0,6)).append(", ");
+                        }
+                        _log.debug(buf.toString());
+                    }
                     List msgs = (List)_pendingMessages.get(peer);
                     if (msgs == null) {
                         msgs = new ArrayList(4);
@@ -208,60 +216,112 @@ public class TCPTransport extends TransportImpl {
         }
         
         List waitingMsgs = null;
-        List oldCons = null;
+        List changedMsgs = null;
+        boolean alreadyConnected = false;
+        boolean changedIdents = false;
         synchronized (_connectionLock) {
             if (_connectionsByAddress.containsKey(remAddr.toString())) {
-                if (oldCons == null)
-                    oldCons = new ArrayList(1);
-                oldCons.add(_connectionsByAddress.remove(remAddr.toString()));
+                alreadyConnected = true;
+            } else {
+                _connectionsByAddress.put(remAddr.toString(), con);
             }
-            _connectionsByAddress.put(remAddr.toString(), con);
             
             if (_connectionsByIdent.containsKey(ident.calculateHash())) {
-                if (oldCons == null)
-                    oldCons = new ArrayList(1);
-                oldCons.add(_connectionsByIdent.remove(ident.calculateHash()));
+                alreadyConnected = true;
+            } else {
+                _connectionsByIdent.put(ident.calculateHash(), con);
             }
-            _connectionsByIdent.put(ident.calculateHash(), con);
             
             // just drop the _pending connections - the establisher should fail
             // them accordingly.
             _pendingConnectionsByAddress.remove(remAddr.toString());
             _pendingConnectionsByIdent.remove(ident.calculateHash());
+            if ( (con.getAttemptedPeer() != null) && (!ident.getHash().equals(con.getAttemptedPeer())) ) {
+                changedIdents = true;
+                _pendingConnectionsByIdent.remove(con.getAttemptedPeer());
+                changedMsgs = (List)_pendingMessages.remove(con.getAttemptedPeer());
+            }
             
-            waitingMsgs = (List)_pendingMessages.remove(ident.calculateHash());
-        }
-        
-        // close any old connections, moving any queued messages to the new one
-        if (oldCons != null) {
-            for (int i = 0; i < oldCons.size(); i++) {
-                TCPConnection cur = (TCPConnection)oldCons.get(i);
-                List msgs = cur.clearPendingMessages();
-                for (int j = 0; j < msgs.size(); j++) {
-                    con.addMessage((OutNetMessage)msgs.get(j));
+            if (!alreadyConnected)
+                waitingMsgs = (List)_pendingMessages.remove(ident.calculateHash());
+            
+            if (_log.shouldLog(Log.DEBUG)) {
+                StringBuffer buf = new StringBuffer(256);
+                buf.append("\nConnection to ").append(ident.getHash().toBase64().substring(0,6));
+                buf.append(" built.  Already connected? ");
+                buf.append(alreadyConnected);
+                buf.append("\nconnectionsByAddress: (cur=").append(remAddr.toString()).append(") ");
+                for (Iterator iter = _connectionsByAddress.keySet().iterator(); iter.hasNext(); ) {
+                    String addr = (String)iter.next();
+                    buf.append(addr).append(" ");
                 }
-                cur.closeConnection();
+                buf.append("\nconnectionsByIdent: ");
+                for (Iterator iter = _connectionsByIdent.keySet().iterator(); iter.hasNext(); ) {
+                    Hash h = (Hash)iter.next();
+                    buf.append(h.toBase64().substring(0,6)).append(" ");
+                }
+                
+                _log.debug(buf.toString());
             }
         }
         
-        if (waitingMsgs != null) {
-            for (int i = 0; i < waitingMsgs.size(); i++) {
-                con.addMessage((OutNetMessage)waitingMsgs.get(i));
+        if (changedIdents) {
+            _context.shitlist().shitlistRouter(con.getAttemptedPeer(), "Changed identities");
+            if (changedMsgs != null) {
+                for (int i = 0; i < changedMsgs.size(); i++) {
+                    afterSend((OutNetMessage)changedMsgs.get(i), false, false, 0);
+                }
             }
         }
         
-        _context.shitlist().unshitlistRouter(ident.calculateHash());
+        if (alreadyConnected) {
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Closing new duplicate");
+            con.setTransport(this);
+            con.closeConnection();
+        } else {
         
-        con.setTransport(this);
-        con.runConnection();
-        if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Connection set to run");
+            if (waitingMsgs != null) {
+                for (int i = 0; i < waitingMsgs.size(); i++) {
+                    con.addMessage((OutNetMessage)waitingMsgs.get(i));
+                }
+            }
+
+            _context.shitlist().unshitlistRouter(ident.calculateHash());
+
+            con.setTransport(this);
+            con.runConnection();
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Connection set to run");
+        }
     }
     
     void connectionClosed(TCPConnection con) {
         synchronized (_connectionLock) {
-            _connectionsByIdent.remove(con.getRemoteRouterIdentity().getHash());
-            _connectionsByAddress.remove(con.getRemoteAddress().toString());
+            TCPConnection cur = (TCPConnection)_connectionsByIdent.remove(con.getRemoteRouterIdentity().getHash());
+            if (cur != con)
+                _connectionsByIdent.put(cur.getRemoteRouterIdentity().getHash(), cur);
+            cur = (TCPConnection)_connectionsByAddress.remove(con.getRemoteAddress().toString());
+            if (cur != con)
+                _connectionsByAddress.put(cur.getRemoteAddress().toString(), cur);
+            
+            if (_log.shouldLog(Log.DEBUG)) {
+                StringBuffer buf = new StringBuffer(256);
+                buf.append("\nCLOSING ").append(con.getRemoteRouterIdentity().getHash().toBase64().substring(0,6));
+                buf.append(".");
+                buf.append("\nconnectionsByAddress: (cur=").append(con.getRemoteAddress().toString()).append(") ");
+                for (Iterator iter = _connectionsByAddress.keySet().iterator(); iter.hasNext(); ) {
+                    String addr = (String)iter.next();
+                    buf.append(addr).append(" ");
+                }
+                buf.append("\nconnectionsByIdent: ");
+                for (Iterator iter = _connectionsByIdent.keySet().iterator(); iter.hasNext(); ) {
+                    Hash h = (Hash)iter.next();
+                    buf.append(h.toBase64().substring(0,6)).append(" ");
+                }
+                
+                _log.debug(buf.toString(), new Exception("Closed by"));
+            }
         }
     }
     
@@ -407,9 +467,15 @@ public class TCPTransport extends TransportImpl {
      *
      */
     private void updateAddress(TCPAddress addr) {
+        boolean restartListener = true;
+        if ( (addr.getPort() == getPort()) && (shouldListenToAllInterfaces()) )
+            restartListener = false;
+        
         RouterAddress routerAddr = addr.toRouterAddress();
         _myAddress = addr;
-        _listener.stopListening();
+        
+        if (restartListener)
+            _listener.stopListening();
         
         replaceAddress(routerAddr);
         
@@ -420,6 +486,7 @@ public class TCPTransport extends TransportImpl {
                       + " and modified our routerInfo to have: " 
                       + _context.router().getRouterInfo().getAddresses());
         
+        // safe to do multiple times
         _listener.startListening();
     }
     
@@ -509,17 +576,71 @@ public class TCPTransport extends TransportImpl {
                     if (addr == null) {
                         _log.error("Message target has no TCP addresses! "  + msg.getTarget());
                         iter.remove();
+                        _context.shitlist().shitlistRouter(peer, "Peer " 
+                                                           + msg.getTarget().getIdentity().calculateHash().toBase64().substring(0,6) 
+                                                           + " has no addresses");
+                        _context.netDb().fail(peer);
+                        for (int i = 0; i < msgs.size(); i++) {
+                            OutNetMessage cur = (OutNetMessage)msgs.get(i);
+                            afterSend(cur, false, false, 0);
+                        }
                         continue;
                     }
                     TCPAddress tcpAddr = new TCPAddress(addr);
-                    if (tcpAddr.getPort() <= 0)
+                    if (tcpAddr.getPort() <= 0) {
+                        iter.remove();
+                        _context.shitlist().shitlistRouter(peer, "Peer " 
+                                                           + msg.getTarget().getIdentity().calculateHash().toBase64().substring(0,6) 
+                                                           + " has only invalid addresses");
+                        _context.netDb().fail(peer);
+                        for (int i = 0; i < msgs.size(); i++) {
+                            OutNetMessage cur = (OutNetMessage)msgs.get(i);
+                            afterSend(cur, false, false, 0);
+                        }
                         continue; // invalid
+                    }
                     if (_pendingConnectionsByAddress.contains(tcpAddr.toString()))
                         continue; // we're already trying to talk to someone at their address
+                    
+                    if (_context.routerHash().equals(peer)) {
+                        _log.error("Message points at us! "  + msg.getTarget());
+                        iter.remove();
+                        _context.netDb().fail(peer);
+                        for (int i = 0; i < msgs.size(); i++) {
+                            OutNetMessage cur = (OutNetMessage)msgs.get(i);
+                            afterSend(cur, false, false, 0);
+                        }
+                        continue;
+                    }
+                    if ( (_myAddress != null) && (_myAddress.equals(tcpAddr)) ) {
+                        _log.error("Message points at our old TCP addresses! "  + msg.getTarget());
+                        iter.remove();
+                        _context.shitlist().shitlistRouter(peer, "This is our old address...");
+                        _context.netDb().fail(peer);
+                        for (int i = 0; i < msgs.size(); i++) {
+                            OutNetMessage cur = (OutNetMessage)msgs.get(i);
+                            afterSend(cur, false, false, 0);
+                        }
+                        continue;
+                    }
+                    if (!allowAddress(tcpAddr)) {
+                        _log.error("Message points at illegal address! "  + msg.getTarget());
+                        
+                        iter.remove();
+                        _context.shitlist().shitlistRouter(peer, "Invalid addressaddress...");
+                        _context.netDb().fail(peer);
+                        for (int i = 0; i < msgs.size(); i++) {
+                            OutNetMessage cur = (OutNetMessage)msgs.get(i);
+                            afterSend(cur, false, false, 0);
+                        }
+                        continue;
+                    }
 
                     // ok, this is someone we can try to contact.  mark it as ours.
                     _pendingConnectionsByIdent.add(peer);
                     _pendingConnectionsByAddress.add(tcpAddr.toString());
+                    if (_log.shouldLog(Log.DEBUG))
+                        _log.debug("Add pending connection to: " + peer.toBase64().substring(0,6));
                     return msg.getTarget();
                 }
                 

@@ -92,6 +92,7 @@ public class StatsGenerator {
             }
             out.write("</ul><hr />");
         }
+        out.flush();
     }
     
     private void renderFrequency(String name, StringBuffer buf) {

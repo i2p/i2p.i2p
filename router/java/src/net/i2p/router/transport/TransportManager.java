@@ -284,5 +284,6 @@ public class TransportManager implements TransportEventListener {
                 buf.append(str);
         }
         out.write(buf.toString());
+        out.flush();
     }
 }
