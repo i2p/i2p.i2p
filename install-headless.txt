@@ -1,4 +1,4 @@
-$Id: install-headless.txt,v 1.2 2004/09/02 01:54:37 jrandom Exp $
+$Id: install-headless.txt,v 1.3 2004/09/29 14:38:15 jrandom Exp $
 Headless I2P installation instructions
 
 1) tar xjf i2p.tar.bz2                     (you've already done this)
@@ -10,7 +10,8 @@ If you're having trouble, swing by http://forum.i2p.net/, check the
 website at http://www.i2p.net/, or get on irc://irc.freenode.net/#i2p
 
 To run I2P explicitly:
-   sh i2prouter start
+   (*nix): sh i2prouter start
+   (win*): I2Psvc.exe -c wrapper.config
 
 To stop the router (gracefully):
    lynx http://localhost:7657/configservice.jsp ("Shutdown gracefully")

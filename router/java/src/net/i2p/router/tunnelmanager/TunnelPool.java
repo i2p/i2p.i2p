@@ -68,6 +68,8 @@ class TunnelPool {
         _context.statManager().createRateStat("tunnel.outboundMessagesProcessed", "How many messages does an inbound tunnel process in its lifetime?", "Tunnels", new long[] { 10*60*1000l, 60*60*1000l, 24*60*60*1000l });
         _context.statManager().createRateStat("tunnel.participatingMessagesProcessed", "How many messages does an inbound tunnel process in its lifetime?", "Tunnels", new long[] { 10*60*1000l, 60*60*1000l, 24*60*60*1000l });
         _context.statManager().createRateStat("tunnel.participatingMessagesProcessedActive", "How many messages beyond the average were processed in a more-than-average tunnel's lifetime?", "Tunnels", new long[] { 10*60*1000l, 60*60*1000l, 24*60*60*1000l });
+        _context.statManager().createRateStat("tunnel.participatingBytesProcessed", "How many bytes does an inbound tunnel process in its lifetime?", "Tunnels", new long[] { 10*60*1000l, 60*60*1000l, 24*60*60*1000l });
+        _context.statManager().createRateStat("tunnel.participatingBytesProcessedActive", "How many bytes beyond the average were processed in a more-than-average tunnel's lifetime?", "Tunnels", new long[] { 10*60*1000l, 60*60*1000l, 24*60*60*1000l });
         
         _isLive = true;
         _persistenceHelper = new TunnelPoolPersistenceHelper(_context);
@@ -662,6 +664,11 @@ class TunnelPool {
                                                            numMsgs-lastAvg, 
                                                            info.getSettings().getExpiration() -
                                                            info.getSettings().getCreated());
+                    long numBytes = info.getBytesProcessed();
+                    lastAvg = (long)_context.statManager().getRate("tunnel.participatingBytesProcessed").getRate(10*60*1000l).getAverageValue();
+                    _context.statManager().addRateData("tunnel.participatingBytesProcessed", numBytes, numMsgs);
+                    if (numBytes > lastAvg)
+                        _context.statManager().addRateData("tunnel.participatingBytesProcessedActive", numBytes-lastAvg, numMsgs);
                     break;
                 case TunnelId.TYPE_UNSPECIFIED:
                 default:

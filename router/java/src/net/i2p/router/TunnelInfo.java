@@ -56,6 +56,7 @@ public class TunnelInfo extends DataStructureImpl {
     private boolean _wasEverReady;
     private int _messagesProcessed;
     private int _tunnelFailures;
+    private long _bytesProcessed;
     
     public TunnelInfo(I2PAppContext context) {
         _context = context;
@@ -79,6 +80,7 @@ public class TunnelInfo extends DataStructureImpl {
         _lastTested = -1;
         _messagesProcessed = 0;
         _tunnelFailures = 0;
+        _bytesProcessed = 0;
     }
     
     public TunnelId getTunnelId() { return _id; }
@@ -182,7 +184,12 @@ public class TunnelInfo extends DataStructureImpl {
         return _messagesProcessed; 
     }
     /** we have just processed a message for this tunnel */
-    public void messageProcessed() { _messagesProcessed++; }
+    public void messageProcessed(int size) { 
+        _messagesProcessed++; 
+        _bytesProcessed += size;
+    }
+    /** how many bytes have been pumped through this tunnel in its lifetime? */
+    public long getBytesProcessed() { return _bytesProcessed; }
     
     /** 
      * the tunnel was (potentially) unable to pass a message through.

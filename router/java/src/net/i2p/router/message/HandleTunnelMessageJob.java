@@ -240,7 +240,7 @@ public class HandleTunnelMessageJob extends JobImpl {
         if (info == null) 
             return;
         
-        info.messageProcessed();
+        info.messageProcessed(_message.getMessageSize());
         
         //if ( (_message.getVerificationStructure() == null) && (info.getSigningKey() != null) ) {
         if (_message.getVerificationStructure() == null) {

@@ -121,7 +121,7 @@ public class SendTunnelMessageJob extends JobImpl {
             }
         }
         
-        info.messageProcessed();
+        info.messageProcessed(_message.getMessageSize());
         
         if (isEndpoint(info)) {
             if (_log.shouldLog(Log.INFO))

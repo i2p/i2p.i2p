@@ -115,6 +115,8 @@ public class StatisticsManager implements Service {
             //includeRate("jobQueue.droppedJobs", stats, new long[] { 60*60*1000, 24*60*60*1000 });
             //includeRate("inNetPool.dropped", stats, new long[] { 60*60*1000, 24*60*60*1000 });
             includeRate("tunnel.participatingTunnels", stats, new long[] { 5*60*1000, 60*60*1000 });
+            includeRate("tunnel.participatingBytesProcessed", stats, new long[] { 10*60*1000 });
+            includeRate("tunnel.participatingBytesProcessedActive", stats, new long[] { 10*60*1000 });
             includeRate("tunnel.testSuccessTime", stats, new long[] { 60*60*1000l, 24*60*60*1000l });
             //includeRate("tunnel.outboundMessagesProcessed", stats, new long[] { 10*60*1000, 60*60*1000 });
             //includeRate("tunnel.inboundMessagesProcessed", stats, new long[] { 10*60*1000, 60*60*1000 });

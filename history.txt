@@ -1,4 +1,16 @@
-$Id: history.txt,v 1.115 2004/12/19 13:55:09 jrandom Exp $
+$Id: history.txt,v 1.116 2004/12/20 00:14:56 jrandom Exp $
+
+2004-12-21  jrandom
+    * Cleaned up the postinstall/startup scripts a bit more to handle winME,
+      and added windows info to the headless docs. (thanks ardvark!)
+    * Fixed a harmless (yet NPE inspiring) race during the final shutdown of 
+      a stream (thanks frosk!)
+    * Add a pair of new stats for monitoring tunnel participation - 
+      tunnel.participatingBytesProcessed (total # bytes transferred) and
+      tunnel.participatingBytesProcessedActive (total # bytes transferred for
+      tunnels whose byte count exceed the 10m average).  This should help 
+      further monitor congestion issues.
+    * Made the NamingService factory property public (thanks susi!)
 
 2004-12-20  jrandom
     * No longer do a blocking DNS lookup within the jobqueue (thanks mule!)

@@ -33,7 +33,7 @@ del /f /q "%INSTALL_PATH%postinstall.sh"
 :: del /f /q "%INSTALL_PATH%uninstall_i2p_service_unix"
 del /f /q "%INSTALL_PATH%icons\*.xpm"
 rmdir /q /s "%INSTALL_PATH%lib\wrapper"
-start /b /i /d"%INSTALL_PATH%" i2prouter.bat
+start /b /i /d"%INSTALL_PATH%" i2prouter.bat %INSTALL_PATH%
 
 ) else (
 
@@ -47,6 +47,6 @@ del "%INSTALL_PATH%postinstall.sh"
 del "%INSTALL_PATH%uninstall_i2p_service_winnt.bat"
 del "%INSTALL_PATH%icons\*.xpm"
 deltree /Y "%INSTALL_PATH%lib\wrapper"
-start /M "%INSTALL_PATH%i2prouter.bat"
+start /M "%INSTALL_PATH%i2prouter.bat" %INSTALL_PATH%
 
 )

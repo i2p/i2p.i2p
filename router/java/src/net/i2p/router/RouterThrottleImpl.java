@@ -110,22 +110,7 @@ class RouterThrottleImpl implements RouterThrottle {
             return false;
         }
         
-        // ok, we're not hosed, but can we handle the bandwidth requirements 
-        // of another tunnel?
-        rs = _context.statManager().getRate("tunnel.participatingMessagesProcessed");
-        r = null;
-        if (rs != null)
-            r = rs.getRate(10*60*1000);
-        double msgsPerTunnel = (r != null ? r.getAverageValue() : 0);
-        r = null;
-        rs = _context.statManager().getRate("tunnel.relayMessageSize");
-        if (rs != null)
-            r = rs.getRate(10*60*1000);
-        double bytesPerMsg = (r != null ? r.getAverageValue() : 0);
-        double bytesPerTunnel = msgsPerTunnel * bytesPerMsg;
-
         int numTunnels = _context.tunnelManager().getParticipatingCount();
-        double bytesAllocated =  (numTunnels + 1) * bytesPerTunnel;
 
         if (_context.getProperty(Router.PROP_SHUTDOWN_IN_PROGRESS) != null) {
             if (_log.shouldLog(Log.WARN))
@@ -209,6 +194,14 @@ class RouterThrottleImpl implements RouterThrottle {
                 // no default, ignore it
             }
         }
+
+        // ok, we're not hosed, but can we handle the bandwidth requirements 
+        // of another tunnel?
+        rs = _context.statManager().getRate("tunnel.participatingBytesProcessed");
+        r = null;
+        if (rs != null)
+            r = rs.getRate(10*60*1000);
+        double bytesAllocated = r.getCurrentTotalValue();
         
         if (!allowTunnel(bytesAllocated, numTunnels)) {
             _context.statManager().addRateData("router.throttleTunnelBandwidthExceeded", (long)bytesAllocated, 0);
