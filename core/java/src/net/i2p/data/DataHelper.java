@@ -221,8 +221,12 @@ public class DataHelper {
      */
     public static void writeLong(OutputStream rawStream, int numBytes, long value) 
         throws DataFormatException, IOException {
-        UnsignedInteger i = new UnsignedInteger(value);
-        rawStream.write(i.getBytes(numBytes));
+        try {
+            UnsignedInteger i = new UnsignedInteger(value);
+            rawStream.write(i.getBytes(numBytes));
+        } catch (IllegalArgumentException iae) {
+            throw new DataFormatException("Invalid value (must be positive)", iae);
+        }
     }
 
     /** Read in a date from the stream as specified by the I2P data structure spec.
