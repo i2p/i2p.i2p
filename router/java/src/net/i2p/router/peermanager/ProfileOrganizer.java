@@ -448,6 +448,18 @@ public class ProfileOrganizer {
             for (Iterator iter = _strictCapacityOrder.iterator(); iter.hasNext(); ) {
                 PeerProfile cur = (PeerProfile)iter.next();
                 if ( (!_fastPeers.containsKey(cur.getPeer())) && (!cur.getIsFailing()) ) {
+                    if (!isOk(cur.getPeer())) {
+                        // skip peers we dont have in the netDb
+                        if (_log.shouldLog(Log.INFO))
+                            _log.info("skip unknown peer from fast promotion: " + cur.getPeer().toBase64());
+                        continue;
+                    }
+                    if (!cur.getIsActive()) {
+                        // skip inactive
+                        if (_log.shouldLog(Log.INFO))
+                            _log.info("skip inactive peer from fast promotion: " + cur.getPeer().toBase64());
+                        continue;
+                    }
                     _fastPeers.put(cur.getPeer(), cur);
                     // no need to remove it from any of the other groups, since if it is 
                     // fast, it has a high capacity, and it is not failing
@@ -676,13 +688,14 @@ public class ProfileOrganizer {
         NetworkDatabaseFacade netDb = _context.netDb();
         // the CLI shouldn't depend upon the netDb
         if (netDb == null) return true;
+        if (_context.router() == null) return true;
         if (null != netDb.lookupRouterInfoLocally(peer)) {
             if (_log.shouldLog(Log.INFO))
-                _log.info("Peer " + peer.toBase64() + " is locally known, selecting");
+                _log.info("Peer " + peer.toBase64() + " is locally known, allowing its use");
             return true;
         } else {
             if (_log.shouldLog(Log.WARN))
-                _log.warn("Peer " + peer.toBase64() + " is NOT locally known, disallowing its selection");
+                _log.warn("Peer " + peer.toBase64() + " is NOT locally known, disallowing its use");
             return false;
         }
     }
@@ -712,9 +725,17 @@ public class ProfileOrganizer {
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("High capacity: \t" + profile.getPeer().toBase64());
                 if (_thresholdSpeedValue <= profile.getSpeedValue()) {
-                    _fastPeers.put(profile.getPeer(), profile);
-                    if (_log.shouldLog(Log.DEBUG))
-                        _log.debug("Fast: \t" + profile.getPeer().toBase64());
+                    if (!isOk(profile.getPeer())) {
+                        if (_log.shouldLog(Log.INFO))
+                            _log.info("Skipping fast mark [!ok] for " + profile.getPeer().toBase64());
+                    } else if (!profile.getIsActive()) {
+                        if (_log.shouldLog(Log.INFO))
+                            _log.info("Skipping fast mark [!active] for " + profile.getPeer().toBase64());
+                    } else {
+                        _fastPeers.put(profile.getPeer(), profile);
+                        if (_log.shouldLog(Log.DEBUG))
+                            _log.debug("Fast: \t" + profile.getPeer().toBase64());
+                    }
                 }
                 
                 if (_thresholdIntegrationValue <= profile.getIntegrationValue()) {
@@ -804,7 +825,7 @@ public class ProfileOrganizer {
      * </pre>
      */
     public static void main(String args[]) {
-        RouterContext ctx = new RouterContext(new net.i2p.router.Router());
+        RouterContext ctx = new RouterContext(null); // new net.i2p.router.Router());
         ProfileOrganizer organizer = new ProfileOrganizer(ctx);
         organizer.setUs(Hash.FAKE_HASH);
         ProfilePersistenceHelper helper = new ProfilePersistenceHelper(ctx);
@@ -823,18 +844,29 @@ public class ProfileOrganizer {
         for (Iterator iter = organizer.selectAllPeers().iterator(); iter.hasNext(); ) {
             Hash peer = (Hash)iter.next();
             PeerProfile profile = organizer.getProfile(peer);
-            if (!profile.getIsActive()) continue;
-            System.out.println("Peer " + profile.getPeer().toBase64().substring(0,4) 
-                       + " [" + (organizer.isFast(peer) ? "F+R" : 
-                                 organizer.isHighCapacity(peer) ? "R  " :
-                                 organizer.isFailing(peer) ? "X  " : "   ") + "]: "
-                       + "\t Speed:\t" + fmt.format(profile.getSpeedValue())
-                       + " Reliability:\t" + fmt.format(profile.getReliabilityValue())
-                       + " Capacity:\t" + fmt.format(profile.getCapacityValue())
-                       + " Integration:\t" + fmt.format(profile.getIntegrationValue())
-                       + " Active?\t" + profile.getIsActive() 
-                       + " Failing?\t" + profile.getIsFailing());
-
+            if (!profile.getIsActive()) {
+                System.out.println("Peer " + profile.getPeer().toBase64().substring(0,4) 
+                           + " [" + (organizer.isFast(peer) ? "IF+R" : 
+                                     organizer.isHighCapacity(peer) ? "IR  " :
+                                     organizer.isFailing(peer) ? "IX  " : "I   ") + "]: "
+                           + "\t Speed:\t" + fmt.format(profile.getSpeedValue())
+                           + " Reliability:\t" + fmt.format(profile.getReliabilityValue())
+                           + " Capacity:\t" + fmt.format(profile.getCapacityValue())
+                           + " Integration:\t" + fmt.format(profile.getIntegrationValue())
+                           + " Active?\t" + profile.getIsActive() 
+                           + " Failing?\t" + profile.getIsFailing());
+            } else {
+                System.out.println("Peer " + profile.getPeer().toBase64().substring(0,4) 
+                           + " [" + (organizer.isFast(peer) ? "F+R " : 
+                                     organizer.isHighCapacity(peer) ? "R   " :
+                                     organizer.isFailing(peer) ? "X   " : "    ") + "]: "
+                           + "\t Speed:\t" + fmt.format(profile.getSpeedValue())
+                           + " Reliability:\t" + fmt.format(profile.getReliabilityValue())
+                           + " Capacity:\t" + fmt.format(profile.getCapacityValue())
+                           + " Integration:\t" + fmt.format(profile.getIntegrationValue())
+                           + " Active?\t" + profile.getIsActive() 
+                           + " Failing?\t" + profile.getIsFailing());
+            }
         }
         
         System.out.println("Thresholds:");

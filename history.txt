@@ -1,4 +1,11 @@
-$Id: history.txt,v 1.10 2004/09/07 02:23:49 jrandom Exp $
+$Id: history.txt,v 1.11 2004/09/07 04:49:02 jrandom Exp $
+
+2004-09-07  jrandom
+    * Make sure that peers placed in the 'fast' group are ones we both know
+      how to reach and have been able to reach recently.  These peers may 
+      still be placed in the 'high capacity' group however (though that group
+      is only queried if the 'fast' group is too small)
+    * Include some updates to the ProgileOrganizer's CLI.
 
 2004-09-07  jrandom
     * Disable the timestamper by default for all applications except the router
