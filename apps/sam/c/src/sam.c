@@ -85,20 +85,25 @@ bool sam_close(void)
 		return true;
 
 #ifdef WINSOCK
-	if (closesocket(samd) == 0) {
-		samd_connected = false;
+	if (closesocket(samd) == SOCKET_ERROR) {
+		SAMLOG("Failed closing the SAM connection (%s)",
+			sam_winsock_strerror(WSAGetLastError()));
+		return false;
+	}
+	samd_connected = false;
+	if (sam_winsock_cleanup() == SAM_OK)
 		return true;
-	if (sam_winsock_cleanup() != SAM_OK)
+	else
 		return false;
 #else
 	if (close(samd) == 0) {
 		samd_connected = false;
 		return true;
-#endif
 	} else {
 		SAMLOG("Failed closing the SAM connection (%s)", strerror(errno));
 		return false;
 	}
+#endif
 }
 
 /*
@@ -145,8 +150,13 @@ samerr_t sam_connect(const char *samhost, uint16_t samport,
 #endif
 
 	if (!sam_socket_connect(samhost, samport)) {
+#ifdef WINSOCK
+		SAMLOG("Couldn't connect to SAM at %s:%u (%s)",
+			samhost, samport, sam_winsock_strerror(WSAGetLastError()));
+#else
 		SAMLOG("Couldn't connect to SAM at %s:%u (%s)",
 			samhost, samport, strerror(errno));
+#endif
 		SAMLOGS("Is your I2P router running?");
 		return SAM_SOCKET_ERROR;
 	}
@@ -533,7 +543,12 @@ static ssize_t sam_read1(char *buf, size_t n)
 			if (errno == EINTR)  /* see Unix Network Pgming vol 1, Sec. 5.9 */
 				continue;
 			else {
+#ifdef WINSOCK
+				SAMLOG("recv() failed: %s",
+					sam_winsock_strerror(WSAGetLastError()));
+#else
 				SAMLOG("recv() failed: %s", strerror(errno));
+#endif
 				sam_close();
 				sam_diedback();
 				return -1;
@@ -593,7 +608,12 @@ static ssize_t sam_read2(void *buf, size_t n)
 			if (errno == EINTR)  /* see Unix Network Pgming vol 1, Sec. 5.9 */
 				continue;
 			else {
+#ifdef WINSOCK
+				SAMLOG("recv() failed: %s",
+					sam_winsock_strerror(WSAGetLastError()));
+#else
 				SAMLOG("recv() failed: %s", strerror(errno));
+#endif
 				sam_close();
 				sam_diedback();
 				return -1;
@@ -641,7 +661,11 @@ static bool sam_readable(void)
 	else if (rc > 0)
 		return true;
 	else {
+#ifdef WINSOCK
+		SAMLOG("select() failed: %s", sam_winsock_strerror(WSAGetLastError()));
+#else
 		SAMLOG("select() failed: %s", strerror(errno));
+#endif
 		return false;
 	}
 }
@@ -825,16 +849,21 @@ retry:
 	h = gethostbyname2(hostname, AF_INET);
 #endif
 	if (h == NULL) {
-		if (h_errno == TRY_AGAIN) {
 #ifdef WINSOCK
+		if (WSAGetLastError() == WSATRY_AGAIN) {
 			Sleep(1000);
 #else
+		if (h_errno == TRY_AGAIN) {
 			sleep(1);
 #endif
 			goto retry;
 		} else {
 			SAMLOG("DNS resolution failed for %s", hostname);
+#ifdef WINSOCK
+			WSASetLastError(WSAHOST_NOT_FOUND);
+#else
 			errno = ENOENT;
+#endif
 			return false;
 		}
 	}
@@ -842,6 +871,7 @@ retry:
 #ifdef NO_INET_NTOP
 	char *tmp;
 	tmp = inet_ntoa(a);
+	assert(tmp != NULL);
 	strlcpy(ipaddr, tmp, INET_ADDRSTRLEN);  /* inet_ntoa() was very poorly designed */
 	return true;
 #else
@@ -1195,7 +1225,12 @@ static ssize_t sam_write(const void *buf, size_t n)
 			if (errno == EINTR)  /* see Unix Network Pgming vol 1, Sec. 5.9 */
 				continue;
 			else {
+#ifdef WINSOCK
+				SAMLOG("send() failed: %s",
+					sam_winsock_strerror(WSAGetLastError()));
+#else
 				SAMLOG("send() failed: %s", strerror(errno));
+#endif
 				sam_close();
 				sam_diedback();
 				return -1;

@@ -1,3 +1,7 @@
+v1.20
+	* Full winsock compatibility - all Windows functions now return appropriate
+		error strings
+
 v1.15	2004-06-23
 	* Added a new example program, warhammer-dgram (use with caution)
 	* Fixed some fatal bugs in datagram handling

@@ -104,7 +104,6 @@
 #endif
 #ifdef WINSOCK
 	#include <windows.h>
-	#include <winsock2.h>
 #else
 	#include <unistd.h>
 #endif
