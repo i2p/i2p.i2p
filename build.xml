@@ -11,13 +11,14 @@
     <target name="dist" depends="distclean, build, javadoc" />
     <target name="build" depends="builddep, jar" />
     <target name="builddep">
-        <ant dir="core/java/" target="build" />
-        <ant dir="router/java/" target="build" />
-        <ant dir="apps/ministreaming/java/" target="build" />
-        <ant dir="apps/i2ptunnel/java/" target="build" />
-        <ant dir="apps/httptunnel/java/" target="build" />
-        <ant dir="apps/phttprelay/java/" target="build" />
-        <ant dir="installer/java/" target="build" />
+	<!-- build *everything* here, but only once -->
+        <ant dir="core/java/" target="jar" />
+        <ant dir="router/java/" target="jar" />
+        <ant dir="apps/ministreaming/java/" target="jar" />
+        <ant dir="apps/i2ptunnel/java/" target="jar" />
+        <ant dir="apps/httptunnel/java/" target="jar" />
+        <ant dir="apps/phttprelay/java/" target="jar" />
+        <ant dir="installer/java/" target="jar" />
     </target>
     <target name="compile" />
     <target name="jar" depends="compile" >

@@ -4,7 +4,7 @@
     <target name="build" depends="builddep, jar" />
     <target name="builddep">
         <ant dir="../../ministreaming/java/" target="build" />
-        <ant dir="../../../core/java/" target="build" />
+	<!-- ministreaming will build core -->
     </target>
     <target name="compile">
         <mkdir dir="./build" />
@@ -37,11 +37,11 @@
         <delete dir="./build" />
     </target>
     <target name="cleandep" depends="clean">
-        <ant dir="../../../core/java/" target="cleandep" />
+	<!-- ministreaming will clean core -->
         <ant dir="../../ministreaming/java/" target="distclean" />
     </target>
     <target name="distclean" depends="clean">
-        <ant dir="../../../core/java/" target="distclean" />
+	<!-- ministreaming will clean core -->
         <ant dir="../../ministreaming/java/" target="distclean" />
     </target>
 </project>
