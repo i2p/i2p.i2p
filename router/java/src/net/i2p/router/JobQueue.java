@@ -189,6 +189,12 @@ public class JobQueue {
         return;
     }
     
+    public void timingUpdated() {
+        synchronized (_timedJobs) {
+            _timedJobs.notifyAll();
+        }
+    }
+    
     public int getReadyCount() { 
         synchronized (_readyJobs) {
             return _readyJobs.size();

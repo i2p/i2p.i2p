@@ -33,7 +33,15 @@ public class JobTiming implements Clock.ClockUpdateListener {
      *
      */
     public long getStartAfter() { return _start; }
-    public void setStartAfter(long startTime) { _start = startTime; }
+    public void setStartAfter(long startTime) { 
+        _start = startTime; 
+        // sure, this current job object may not already be on the queue, so
+        // telling the queue of the update may be irrelevent...
+        // but...
+        // ...
+        // who cares?   this helps in the case where it is on the queue
+        _context.jobQueue().timingUpdated();
+    }
     
     /**
      * # of milliseconds after the epoch the job actually started
