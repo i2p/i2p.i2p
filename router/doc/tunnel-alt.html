@@ -1,4 +1,4 @@
-<code>$Id: tunnel-alt.html,v 1.2 2005/01/18 11:01:55 jrandom Exp $</code>
+<code>$Id: tunnel-alt.html,v 1.3 2005/01/18 11:21:12 jrandom Exp $</code>
 <pre>
 1) <a href="#tunnel.overview">Tunnel overview</a>
 2) <a href="#tunnel.operation">Tunnel operation</a>
@@ -140,7 +140,7 @@ preprocessed payload must be padded to a multiple of 16 bytes.</p>
 <h3>2.2) <a name="tunnel.gateway">Gateway processing</a></h3>
 
 <p>After the preprocessing of messages into a padded payload, the gateway builds
-a random 4 byte preIV value, iteratively encrypting it and the tunnel message as
+a random 16 byte preIV value, iteratively encrypting it and the tunnel message as
 necessary, selects the next message ID from its outbound PRNG, and forwards the tuple 
 {tunnelID, messageID, preIV, encrypted tunnel message} to the next hop.</p>
 
@@ -155,13 +155,10 @@ the initial preprocessed data.</p>
 
 <p>The preIV postprocessing should be a secure transform of the received value 
 with sufficient expansion to provide the full 16 byte IV necessary for AES256.  
-<i>What transform should be used - HMAC-SHA256(preIV, layerKey), using bytes
-0:15 as the IV, passing on bytes 16-19 as the next step's preIV?  Should
+<i>What transform should be used - E(preIV, layerIVKey), where
 we deliver an additional postprocessing layer key to each peer during the 
 <a href="#tunnel.request">tunnel creation</a> to reduce the potential exposure
-of the layerKey?  Should we replace the 4 byte preIV with a full 16 byte preIV 
-(even though 4 bytes will likely provide a sufficient keyspace in which to
-operate, as a single tunnel pumping 100KBps would only use 60,000 IVs)?</i></p>
+of the layerKey?</i></p>
 
 <h3>2.3) <a name="tunnel.participant">Participant processing</a></h3>
 
