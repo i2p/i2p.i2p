@@ -25,6 +25,7 @@ import net.i2p.client.I2PSessionException;
 import net.i2p.data.Base64;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.Destination;
+import net.i2p.I2PException;
 import net.i2p.util.Log;
 
 /**
@@ -32,7 +33,7 @@ import net.i2p.util.Log;
  *
  * @author human
  */
-public class SAMv1Handler extends SAMHandler implements SAMRawReceiver {
+public class SAMv1Handler extends SAMHandler implements SAMRawReceiver, SAMStreamReceiver {
     
     private final static Log _log = new Log(SAMv1Handler.class);
 
@@ -40,7 +41,7 @@ public class SAMv1Handler extends SAMHandler implements SAMRawReceiver {
 
     private SAMRawSession rawSession = null;
     private SAMRawSession datagramSession = null;
-    private SAMRawSession streamSession = null;
+    private SAMStreamSession streamSession = null;
 
     /**
      * Create a new SAM version 1 handler.  This constructor expects
@@ -69,6 +70,7 @@ public class SAMv1Handler extends SAMHandler implements SAMRawReceiver {
 	boolean canContinue = false;
 	ByteArrayOutputStream buf = new ByteArrayOutputStream(IN_BUFSIZE);
 	StringTokenizer tok;
+	Properties props;
 
 	this.thread.setName("SAMv1Handler");
 	_log.debug("SAM handling started");
@@ -108,17 +110,22 @@ public class SAMv1Handler extends SAMHandler implements SAMRawReceiver {
 		}
 		domain = tok.nextToken();
 		opcode = tok.nextToken();
+		if (_log.shouldLog(Log.DEBUG)) {
+		    _log.debug("Parsing (domain: \"" + domain
+			       + "\"; opcode: \"" + opcode + "\")");
+		}
+		props = SAMUtils.parseParams(tok);
 
-		_log.debug("Parsing (domain: \"" + domain + "\"; opcode: \""
-			   + opcode + "\")");
-		if (domain.equals("RAW")) {
-		    canContinue = execRawMessage(opcode, tok);
+		if (domain.equals("STREAM")) {
+		    canContinue = execStreamMessage(opcode, props);
+		} else if (domain.equals("RAW")) {
+		    canContinue = execRawMessage(opcode, props);
 		} else if (domain.equals("SESSION")) {
-		    canContinue = execSessionMessage(opcode, tok);
+		    canContinue = execSessionMessage(opcode, props);
 		} else if (domain.equals("DEST")) {
-		    canContinue = execDestMessage(opcode, tok);
+		    canContinue = execDestMessage(opcode, props);
 		} else if (domain.equals("NAMING")) {
-		    canContinue = execNamingMessage(opcode, tok);
+		    canContinue = execNamingMessage(opcode, props);
 		} else {
 		    _log.debug("Unrecognized message domain: \""
 			       + domain + "\"");
@@ -157,152 +164,137 @@ public class SAMv1Handler extends SAMHandler implements SAMRawReceiver {
     }
 
     /* Parse and execute a SESSION message */
-    private boolean execSessionMessage(String opcode, StringTokenizer tok) {
-	Properties props = null;
+    private boolean execSessionMessage(String opcode, Properties props) {
 
-	if (opcode.equals("CREATE")) {
+	String dest = "BUG!";
 
-	    if ((rawSession != null) || (datagramSession != null)
-		|| (streamSession != null)) {
-		_log.debug("Trying to create a session, but one still exists");
-		return false;
-	    }
-	    props = SAMUtils.parseParams(tok);
-	    if (props == null) {
-		return false;
-	    }
-	    
-	    String dest = props.getProperty("DESTINATION");
-	    if (dest == null) {
-		_log.debug("SESSION DESTINATION parameter not specified");
-		return false;
-	    }
-	    props.remove("DESTINATION");
-
-	    String style = props.getProperty("STYLE");
-	    if (style == null) {
-		_log.debug("SESSION STYLE parameter not specified");
-		return false;
-	    }
-	    props.remove("STYLE");
-
-	    try {
+	try{
+	    if (opcode.equals("CREATE")) {
+		if ((rawSession != null) || (datagramSession != null)
+		    || (streamSession != null)) {
+		    _log.debug("Trying to create a session, but one still exists");
+		    return false;
+		}
+		if (props == null) {
+		    _log.debug("No parameters specified in SESSION CREATE message");
+		    return false;
+		}
+		
+		dest = props.getProperty("DESTINATION");
+		if (dest == null) {
+		    _log.debug("SESSION DESTINATION parameter not specified");
+		    return false;
+		}
+		props.remove("DESTINATION");
+		
+		if (dest.equals("TRANSIENT")) {
+		    _log.debug("TRANSIENT destination requested");
+		    ByteArrayOutputStream priv = new ByteArrayOutputStream();
+		    SAMUtils.genRandomKey(priv, null);
+		    
+		    dest = Base64.encode(priv.toByteArray());
+		}
+		
+		String style = props.getProperty("STYLE");
+		if (style == null) {
+		    _log.debug("SESSION STYLE parameter not specified");
+		    return false;
+		}
+		props.remove("STYLE");
+		
 		if (style.equals("RAW")) {
-		    try {
-			if (dest.equals("TRANSIENT")) {
-			    _log.debug("TRANSIENT destination requested");
-			    ByteArrayOutputStream priv = new ByteArrayOutputStream();			
-			    SAMUtils.genRandomKey(priv, null);
-			    
-			    dest = Base64.encode(priv.toByteArray());
-			}
-			rawSession = new SAMRawSession (dest, props, this);
-			writeBytes(("SESSION STATUS RESULT=OK DESTINATION=" + dest + "\n").getBytes("ISO-8859-1"));
-		    } catch (DataFormatException e) {
-			_log.debug("Invalid destination specified");
-			writeBytes(("SESSION STATUS RESULT=INVALID_KEY DESTINATION=" + dest + "\n").getBytes("ISO-8859-1"));
-			return true;
-		    } catch (I2PSessionException e) {
-			_log.debug("I2P error when instantiating RAW session", e);
-			writeBytes(("SESSION STATUS RESULT=I2P_ERROR DESTINATION=" + dest + "\n").getBytes("ISO-8859-1"));
-			return true;
-		    }
+		    rawSession = new SAMRawSession(dest, props, this);
+		} else if (style.equals("STREAM")) {
+		    streamSession = new SAMStreamSession(dest, props, this);
 		} else {
 		    _log.debug("Unrecognized SESSION STYLE: \"" + style + "\"");
 		    return false;
 		}
-	    } catch (UnsupportedEncodingException e) {
-		_log.error("Caught UnsupportedEncodingException ("
-			   + e.getMessage() + ")");
-		return false;
-	    } catch (IOException e) {
-		_log.error("Caught IOException while parsing SESSION message ("
-			   + e.getMessage() + ")");
+		return writeString("SESSION STATUS RESULT=OK DESTINATION="
+				   + dest + "\n");
+	    } else {
+		_log.debug("Unrecognized SESSION message opcode: \""
+			   + opcode + "\"");
 		return false;
 	    }
-	    
-	    return true;
-	} else {
-	    _log.debug("Unrecognized SESSION message opcode: \""
-		       + opcode + "\"");
-	    return false;
+	} catch (DataFormatException e) {
+	    _log.debug("Invalid destination specified");
+	    return writeString("SESSION STATUS RESULT=INVALID_KEY DESTINATION=" + dest + "\n");
+	} catch (I2PSessionException e) {
+	    _log.debug("I2P error when instantiating session", e);
+	    return writeString("SESSION STATUS RESULT=I2P_ERROR DESTINATION=" + dest + "\n");
+	} catch (SAMException e) {
+	    _log.error("Unexpected SAM error", e);
+	    return writeString("SESSION STATUS RESULT=I2P_ERROR DESTINATION=" + dest + "\n");
+	} catch (IOException e) {
+	    _log.error("Unexpected IOException", e);
+	    return writeString("SESSION STATUS RESULT=I2P_ERROR DESTINATION=" + dest + "\n");
 	}
     }
 
     /* Parse and execute a DEST message*/
-    private boolean execDestMessage(String opcode, StringTokenizer tok) {
+    private boolean execDestMessage(String opcode, Properties props) {
 
 	if (opcode.equals("GENERATE")) {
-	    if (tok.countTokens() > 0) {
-		_log.debug("Bad format in DEST GENERATE message");
+	    if (props != null) {
+		_log.debug("Properties specified in DEST GENERATE message");
 		return false;
 	    }
 
-	    try {
-		ByteArrayOutputStream priv = new ByteArrayOutputStream();
-		ByteArrayOutputStream pub = new ByteArrayOutputStream();
-		
-		SAMUtils.genRandomKey(priv, pub);
-		writeBytes(("DEST REPLY"
-			    + " PUB="
-			    + Base64.encode(pub.toByteArray())
-			    + " PRIV="
-			    + Base64.encode(priv.toByteArray())
-			    + "\n").getBytes("ISO-8859-1"));
-	    } catch (UnsupportedEncodingException e) {
-		_log.error("Caught UnsupportedEncodingException ("
-			   + e.getMessage() + ")");
-		return false;
-	    } catch (IOException e) {
-		_log.debug("IOException while executing DEST message", e);
-		return false;
-	    }
+	    ByteArrayOutputStream priv = new ByteArrayOutputStream();
+	    ByteArrayOutputStream pub = new ByteArrayOutputStream();
+	    
+	    SAMUtils.genRandomKey(priv, pub);
+	    return writeString("DEST REPLY"
+			       + " PUB="
+			       + Base64.encode(pub.toByteArray())
+			       + " PRIV="
+			       + Base64.encode(priv.toByteArray())
+			       + "\n");
 	} else {
 	    _log.debug("Unrecognized DEST message opcode: \"" + opcode + "\"");
 	    return false;
 	}
-
-	return true;
     }
 
     /* Parse and execute a NAMING message */
-    private boolean execNamingMessage(String opcode, StringTokenizer tok) {
-	Properties props = null;
-
+    private boolean execNamingMessage(String opcode, Properties props) {
 	if (opcode.equals("LOOKUP")) {
-	    props = SAMUtils.parseParams(tok);
 	    if (props == null) {
+		_log.debug("No parameters specified in NAMING LOOKUP message");
 		return false;
 	    }
 	    
 	    String name = props.getProperty("NAME");
 	    if (name == null) {
-		_log.debug("Name to resolve not specified");
+		_log.debug("Name to resolve not specified in NAMING message");
 		return false;
 	    }
 
-	    try {
-		ByteArrayOutputStream pubKey = new ByteArrayOutputStream();
-		Destination dest = SAMUtils.lookupHost(name, pubKey);
-
-		if (dest == null) {
-		    writeBytes("NAMING REPLY RESULT=KEY_NOT_FOUND\n".getBytes("ISP-8859-1"));
-		    return true;
+	    Destination dest;
+	    if (name.equals("ME")) {
+		if (rawSession != null) {
+		    dest = rawSession.getDestination();
+		} else if (streamSession != null) {
+		    dest = streamSession.getDestination();
+		} else if (datagramSession != null) {
+		    dest = datagramSession.getDestination();
+		} else {
+		    _log.debug("Lookup for SESSION destination, but session is null");
+		    return false;
 		}
-		
-		writeBytes(("NAMING REPLY RESULT=OK NAME=" + name
-			    + " VALUE=" + Base64.encode(pubKey.toByteArray())
-			    + "\n").getBytes("ISO-8859-1"));
-		return true;
-	    } catch (UnsupportedEncodingException e) {
-		_log.error("Caught UnsupportedEncodingException ("
-			   + e.getMessage() + ")");
-		return false;
-	    } catch (IOException e) {
-		_log.debug("Caught IOException while parsing NAMING message",
-			   e);
-		return false;
+	    } else {
+		dest = SAMUtils.lookupHost(name, null);
 	    }
+	    
+	    if (dest == null) {
+		return writeString("NAMING REPLY RESULT=KEY_NOT_FOUND\n");
+	    }
+	    
+	    return writeString("NAMING REPLY RESULT=OK NAME=" + name
+			       + " VALUE="
+			       + SAMUtils.getBase64DestinationPubKey(dest)
+			       + "\n");
 	} else {
 	    _log.debug("Unrecognized NAMING message opcode: \""
 		       + opcode + "\"");
@@ -310,24 +302,16 @@ public class SAMv1Handler extends SAMHandler implements SAMRawReceiver {
 	}
     }
 
-    public String toString() {
-	return "SAM v1 handler (client: "
-	    + this.socket.getInetAddress().toString() + ":"
-	    + this.socket.getPort() + ")";
-    }
-
     /* Parse and execute a RAW message */
-    private boolean execRawMessage(String opcode, StringTokenizer tok) {
-	Properties props = null;
-
+    private boolean execRawMessage(String opcode, Properties props) {
 	if (rawSession == null) {
 	    _log.debug("RAW message received, but no RAW session exists");
 	    return false;
 	}
 
 	if (opcode.equals("SEND")) {
-	    props = SAMUtils.parseParams(tok);
 	    if (props == null) {
+		_log.debug("No parameters specified in RAW SEND message");
 		return false;
 	    }
 	    
@@ -389,6 +373,158 @@ public class SAMv1Handler extends SAMHandler implements SAMRawReceiver {
 	}
     }
 
+    /* Parse and execute a STREAM message */
+    private boolean execStreamMessage(String opcode, Properties props) {
+	if (streamSession == null) {
+	    _log.debug("STREAM message received, but no STREAM session exists");
+	    return false;
+	}
+
+	if (opcode.equals("SEND")) {
+	    if (props == null) {
+		_log.debug("No parameters specified in STREAM SEND message");
+		return false;
+	    }
+	    
+	    int id;
+	    {
+		String strid = props.getProperty("ID");
+		if (strid == null) {
+		    _log.debug("ID not specified in STREAM SEND message");
+		    return false;
+		}
+		try {
+		    id = Integer.parseInt(strid);
+		} catch (NumberFormatException e) {
+		    _log.debug("Invalid STREAM SEND ID specified: " + strid);
+		    return false;
+		}
+	    }
+
+	    int size;
+	    {
+		String strsize = props.getProperty("SIZE");
+		if (strsize == null) {
+		    _log.debug("Size not specified in STREAM SEND message");
+		    return false;
+		}
+		try {
+		    size = Integer.parseInt(strsize);
+		} catch (NumberFormatException e) {
+		    _log.debug("Invalid STREAM SEND size specified: "+strsize);
+		    return false;
+		}
+		if (!checkSize(size)) {
+		    _log.debug("Specified size (" + size
+			       + ") is out of protocol limits");
+		    return false;
+		}
+	    }
+
+	    try {
+		DataInputStream in = new DataInputStream(socket.getInputStream());
+		byte[] data = new byte[size];
+
+		in.readFully(data);
+
+		if (!streamSession.sendBytes(id, data)) {
+		    _log.error("STREAM SEND failed");
+		    return false;
+		}
+
+		return true;
+	    } catch (EOFException e) {
+		_log.debug("Too few bytes with RAW SEND message (expected: "
+			   + size);
+		return false;
+	    } catch (IOException e) {
+		_log.debug("Caught IOException while parsing RAW SEND message",
+			   e);
+		return false;
+	    }
+	} else if (opcode.equals("CONNECT")) {
+	    if (props == null) {
+		_log.debug("No parameters specified in STREAM CONNECT message");
+		return false;
+	    }
+	    
+	    int id;
+	    {
+		String strid = props.getProperty("ID");
+		if (strid == null) {
+		    _log.debug("ID not specified in STREAM SEND message");
+		    return false;
+		}
+		try {
+		    id = Integer.parseInt(strid);
+		} catch (NumberFormatException e) {
+		    _log.debug("Invalid STREAM CONNECT ID specified: " +strid);
+		    return false;
+		}
+		if (id < 1) {
+		    _log.debug("Invalid STREAM CONNECT ID specified: " +strid);
+		    return false;
+		}
+		props.remove("ID");
+	    }
+
+	    String dest = props.getProperty("DESTINATION");
+	    if (dest == null) {
+		_log.debug("Destination not specified in RAW SEND message");
+		return false;
+	    }
+	    props.remove("DESTINATION");
+
+	    try {
+		if (!streamSession.connect(id, dest, props)) {
+		    _log.debug("STREAM connection failed");
+		    return false;
+		}
+		return writeString("STREAM STATUS RESULT=OK ID=" + id + "\n");
+	    } catch (DataFormatException e) {
+		_log.debug("Invalid destination in STREAM CONNECT message");
+		return writeString("STREAM STATUS RESULT=INVALID_KEY ID="
+				   + id + "\n");
+	    } catch (I2PException e) {
+		_log.debug("STREAM CONNECT failed: " + e.getMessage());
+		return writeString("STREAM STATUS RESULT=I2P_ERROR ID="
+				   + id + "\n");
+	    }
+	} else if (opcode.equals("CLOSE")) {
+	    if (props == null) {
+		_log.debug("No parameters specified in STREAM CLOSE message");
+		return false;
+	    }
+	    
+	    int id;
+	    {
+		String strid = props.getProperty("ID");
+		if (strid == null) {
+		    _log.debug("ID not specified in STREAM CLOSE message");
+		    return false;
+		}
+		try {
+		    id = Integer.parseInt(strid);
+		} catch (NumberFormatException e) {
+		    _log.debug("Invalid STREAM CLOSE ID specified: " +strid);
+		    return false;
+		}
+	    }
+
+	    return streamSession.closeConnection(id);
+	} else {
+	    _log.debug("Unrecognized RAW message opcode: \""
+		       + opcode + "\"");
+	    return false;
+	}
+    }
+
+    public String toString() {
+	return "SAM v1 handler (client: "
+	    + this.socket.getInetAddress().toString() + ":"
+	    + this.socket.getPort() + ")";
+    }
+
     /* Check whether a size is inside the limits allowed by this protocol */
     private boolean checkSize(int size) {
 	return ((size >= 1) && (size <= 32768));
@@ -397,20 +533,85 @@ public class SAMv1Handler extends SAMHandler implements SAMRawReceiver {
     // SAMRawReceiver implementation
     public void receiveRawBytes(byte data[]) throws IOException {
 	if (rawSession == null) {
-	    _log.error("BUG! Trying to write raw bytes, but session is null!");
+	    _log.error("BUG! Received raw bytes, but session is null!");
 	    throw new NullPointerException("BUG! RAW session is null!");
 	}
 
 	ByteArrayOutputStream msg = new ByteArrayOutputStream();
 
-	msg.write(("RAW RECEIVED SIZE=" + data.length + "\n").getBytes());
+	msg.write(("RAW RECEIVED SIZE=" + data.length
+		   + "\n").getBytes("ISO-8859-1"));
 	msg.write(data);
 
 	writeBytes(msg.toByteArray());
     }
 
-    public void stopReceiving() {
-	_log.debug("stopReceiving() invoked");
+    public void stopRawReceiving() {
+	_log.debug("stopRawReceiving() invoked");
+
+	if (rawSession == null) {
+	    _log.error("BUG! Got raw receiving stop, but session is null!");
+	    throw new NullPointerException("BUG! RAW session is null!");
+	}
+
+	try {
+	    this.socket.close();
+	} catch (IOException e) {
+	    _log.error("Error closing socket: " + e.getMessage());
+	}
+    }
+
+    // SAMStreamReceiver implementation
+    public void notifyStreamConnection(int id, Destination d) throws IOException {
+	if (streamSession == null) {
+	    _log.error("BUG! Received stream connection, but session is null!");
+	    throw new NullPointerException("BUG! STREAM session is null!");
+	}
+
+	if (!writeString("STREAM CONNECTED DESTINATION="
+			 + SAMUtils.getBase64DestinationPubKey(d)
+			 + " ID=" + id + "\n")) {
+	    throw new IOException("Error notifying connection to SAM client");
+	}
+    }
+
+    public void receiveStreamBytes(int id, byte data[], int len) throws IOException {
+	if (streamSession == null) {
+	    _log.error("Received stream bytes, but session is null!");
+	    throw new NullPointerException("BUG! STREAM session is null!");
+	}
+
+	ByteArrayOutputStream msg = new ByteArrayOutputStream();
+
+	msg.write(("STREAM RECEIVED ID=" + id 
+		   +" SIZE=" + len + "\n").getBytes("ISO-8859-1"));
+	msg.write(data);
+
+	writeBytes(msg.toByteArray());
+    }
+
+    public void notifyStreamDisconnection(int id, String result, String msg) throws IOException {
+	if (streamSession == null) {
+	    _log.error("BUG! Received stream disconnection, but session is null!");
+	    throw new NullPointerException("BUG! STREAM session is null!");
+	}
+
+	// FIXME: msg should be escaped!
+	if (!writeString("STREAM CLOSED ID=" + id + " RESULT=" + result
+			 + (msg == null ? "" : (" MESSAGE=" + msg))
+			 + "\n")) {
+	    throw new IOException("Error notifying disconnection to SAM client");
+	}
+    }
+
+    public void stopStreamReceiving() {
+	_log.debug("stopStreamReceiving() invoked");
+
+	if (streamSession == null) {
+	    _log.error("BUG! Got stream receiving stop, but session is null!");
+	    throw new NullPointerException("BUG! STREAM session is null!");
+	}
+
 	try {
 	    this.socket.close();
 	} catch (IOException e) {

@@ -60,7 +60,7 @@ public abstract class SAMHandler implements Runnable {
      *
      * @param data A byte array to be written
      */
-    protected void writeBytes(byte[] data)  throws IOException {
+    protected void writeBytes(byte[] data) throws IOException {
 	synchronized (socketWLock) {
 	    if (socketOS == null) {
 		socketOS = socket.getOutputStream();
@@ -68,6 +68,26 @@ public abstract class SAMHandler implements Runnable {
 	    socketOS.write(data);
 	    socketOS.flush();
 	}
+    }
+
+    /**
+     * Write a string to the handler's socket.  This method must
+     * always be used when writing strings, unless you really know what
+     * you're doing.
+     *
+     * @param str A byte array to be written
+     *
+     * @return True is the string was successfully written, false otherwise
+     */
+    protected boolean writeString(String str) {
+	try {
+	    writeBytes(str.getBytes("ISO-8859-1"));
+	} catch (IOException e) {
+	    _log.debug("Caught IOException", e);
+	    return false;
+	}
+
+	return true;
     }
 
     /**

@@ -49,7 +49,7 @@ public class SAMRawSession {
      * @param recv Object that will receive incoming data
      */
     public SAMRawSession(String dest, Properties props,
-			 SAMRawReceiver recv) throws DataFormatException, I2PSessionException {
+			 SAMRawReceiver recv) throws IOException, DataFormatException, I2PSessionException {
 	ByteArrayInputStream bais;
 
 	bais = new ByteArrayInputStream(Base64.decode(dest));
@@ -65,20 +65,29 @@ public class SAMRawSession {
      * @param recv Object that will receive incoming data
      */
     public SAMRawSession(InputStream destStream, Properties props,
-			 SAMRawReceiver recv) throws I2PSessionException {
+			 SAMRawReceiver recv) throws IOException, DataFormatException, I2PSessionException {
 	initSAMRawSession(destStream, props, recv);
     }
 
     private void initSAMRawSession(InputStream destStream, Properties props,
-				   SAMRawReceiver recv) throws I2PSessionException {
+				   SAMRawReceiver recv) throws IOException, DataFormatException, I2PSessionException {
 	this.recv = recv;
 
 	_log.debug("SAM RAW session instantiated");
 
 	handler = new SAMRawSessionHandler(destStream, props);
-	Thread t = new I2PThread(handler, "SAMRawSessionHandler");
 
+	Thread t = new I2PThread(handler, "SAMRawSessionHandler");
 	t.start();
+    }
+
+    /**
+     * Get the SAM RAW session Destination.
+     *
+     * @return The SAM RAW session Destination.
+     */
+    public Destination getDestination() {
+	return session.getMyDestination();
     }
 
     /**
@@ -91,6 +100,10 @@ public class SAMRawSession {
     public boolean sendBytes(String dest, byte[] data) throws DataFormatException {
 	Destination d = new Destination();
 	d.fromBase64(dest);
+
+	if (_log.shouldLog(Log.DEBUG)) {
+	    _log.debug("Sending " + data.length + " bytes to " + dest);
+	}
 
 	try {
 	    return session.sendMessage(d, data);
@@ -158,17 +171,18 @@ public class SAMRawSession {
 			runningLock.wait();
 		    } catch (InterruptedException ie) {}
 		}
-		_log.debug("Shutting down SAM RAW session handler");
+	    }
 
-		recv.stopReceiving();
-
-		try {
-		    _log.debug("Destroying I2P session...");
-		    session.destroySession();
-		    _log.debug("I2P session destroyed");
-		} catch (I2PSessionException e) {
+	    _log.debug("Shutting down SAM RAW session handler");
+	    
+	    recv.stopRawReceiving();
+	    
+	    try {
+		_log.debug("Destroying I2P session...");
+		session.destroySession();
+		_log.debug("I2P session destroyed");
+	    } catch (I2PSessionException e) {
 		    _log.error("Error destroying I2P session", e);
-		}
 	    }
 	}
 	

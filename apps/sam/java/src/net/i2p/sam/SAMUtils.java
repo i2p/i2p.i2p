@@ -8,6 +8,7 @@ package net.i2p.sam;
  *
  */
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Enumeration;
@@ -54,6 +55,28 @@ public class SAMUtils {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    /**
+     * Get the Base64 representation of a Destination public key
+     *
+     * @param d A Destination
+     *
+     * @return A String representing the Destination public key
+     */
+    public static String getBase64DestinationPubKey(Destination d) {
+	ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
+	try {
+	    d.writeBytes(baos);
+	    return Base64.encode(baos.toByteArray());
+	} catch (IOException e) {
+	    _log.error("getDestinationPubKey(): caught IOException", e);
+	    return null;
+	} catch (DataFormatException e) {
+	    _log.error("getDestinationPubKey(): caught DataFormatException",e);
+	    return null;
+	}
     }
 
     /**
@@ -106,10 +129,10 @@ public class SAMUtils {
      *
      * @param tok A StringTokenizer pointing to the SAM parameters
      *
-     * @return A Properties object with the parsed SAM parameters
+     * @return Properties with the parsed SAM params, or null if none is found
      */
     public static Properties parseParams(StringTokenizer tok) {
-	int pos, ntoks = tok.countTokens();
+	int pos, nprops = 0, ntoks = tok.countTokens();
 	String token, param, value;
 	Properties props = new Properties();
 	
@@ -125,13 +148,18 @@ public class SAMUtils {
 	    value = token.substring(pos + 1);
 
 	    props.setProperty(param, value);
+	    nprops += 1;
 	}
 
 	if (_log.shouldLog(Log.DEBUG)) {
 	    _log.debug("Parsed properties: " + dumpProperties(props));
 	}
 
-	return props;
+	if (nprops != 0) {
+	    return props;
+	} else {
+	    return null;
+	}
     }
 
     /* Dump a Properties object in an human-readable form */

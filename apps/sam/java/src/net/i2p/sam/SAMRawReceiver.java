@@ -19,7 +19,7 @@ public interface SAMRawReceiver {
      * Send a byte array to a SAM client, without informations
      * regarding the sender.
      *
-     * @param data Byte array to be written
+     * @param data Byte array to be received
      */
     public void receiveRawBytes(byte data[]) throws IOException;
 
@@ -27,5 +27,5 @@ public interface SAMRawReceiver {
      * Stop receiving data.
      *
      */
-    public void stopReceiving();
+    public void stopRawReceiving();
 }
