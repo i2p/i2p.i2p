@@ -9,6 +9,10 @@ package net.i2p.data;
  *
  */
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+
 import net.i2p.util.RandomSource;
 
 public class SessionTag extends ByteArray {
@@ -38,4 +42,17 @@ public class SessionTag extends ByteArray {
             throw new IllegalArgumentException("SessionTags must be " + BYTE_LENGTH + " bytes");
         super.setData(val);
     }
+
+    public void readBytes(InputStream in) throws DataFormatException, IOException {
+        byte data[] = new byte[BYTE_LENGTH];
+        int read = DataHelper.read(in, data);
+        if (read != BYTE_LENGTH)
+            throw new DataFormatException("Not enough data (read " + read + " wanted " + BYTE_LENGTH + ")");
+        setData(data);
+    }
+    
+    public void writeBytes(OutputStream out) throws DataFormatException, IOException {
+        out.write(getData());
+    }
+
 }
