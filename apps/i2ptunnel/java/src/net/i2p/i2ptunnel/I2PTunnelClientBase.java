@@ -33,12 +33,12 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
     private static final Log _log = new Log(I2PTunnelClientBase.class);
     protected Logging l;
 
-    private static final long DEFAULT_CONNECT_TIMEOUT = 60 * 1000;
+    static final long DEFAULT_CONNECT_TIMEOUT = 60 * 1000;
 
     private static volatile long __clientId = 0;
     protected long _clientId;
     protected Object sockLock = new Object(); // Guards sockMgr and mySockets
-    private I2PSocketManager sockMgr;
+    protected I2PSocketManager sockMgr;
     protected List mySockets = new ArrayList();
 
     protected Destination dest = null;
