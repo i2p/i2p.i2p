@@ -257,8 +257,8 @@ public class ClientConnectionRunner {
         }
         long afterLock = _context.clock().now();
         
-        if (afterLock - beforeLock > 50) {
-            _log.warn("distributeMessage.locking took too long: " + (afterLock-beforeLock)
+        if (_log.shouldLog(Log.DEBUG)) {
+            _log.warn("distributeMessage.locking took: " + (afterLock-beforeLock)
                       + " overall, synchronized took " + (inLock - beforeLock));
         }
         
@@ -270,8 +270,8 @@ public class ClientConnectionRunner {
         // the following blocks as described above
         _manager.distributeMessage(_config.getDestination(), message.getDestination(), message.getPayload(), id);
         long timeToDistribute = _context.clock().now() - beforeDistribute;
-        if (timeToDistribute > 50)
-            _log.warn("Took too long to distribute in the manager to " 
+        if (_log.shouldLog(Log.DEBUG))
+            _log.warn("Time to distribute in the manager to " 
                       + message.getDestination().calculateHash().toBase64() + ": " 
                       + timeToDistribute);
         return id;
