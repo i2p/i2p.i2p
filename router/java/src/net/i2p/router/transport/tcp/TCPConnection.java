@@ -30,6 +30,7 @@ public class TCPConnection {
     private RouterIdentity _ident;
     private Hash _attemptedPeer;
     private TCPAddress _remoteAddress;
+    private String _shownAddress;
     private List _pendingMessages;
     private InputStream _in;
     private OutputStream _out;
@@ -49,6 +50,7 @@ public class TCPConnection {
         _pendingMessages = new ArrayList(4);
         _ident = null;
         _remoteAddress = null;
+        _shownAddress = null;
         _in = null;
         _out = null;
         _socket = null;
@@ -75,6 +77,10 @@ public class TCPConnection {
     public void setRemoteAddress(TCPAddress addr) { _remoteAddress = addr; }
     /** Who we initially were trying to contact */
     public void setAttemptedPeer(Hash peer) { _attemptedPeer = peer; }
+    /** What address the peer said we are reachable on */
+    public void setShownAddress(String ip) { _shownAddress = ip; }
+    /** What address the peer said we are reachable on */
+    public String getShownAddress() { return _shownAddress; } 
     
     /** 
      * Actually start processing the messages on the connection (and reading
