@@ -3,17 +3,18 @@
 #@+node:@file stasher.py
 #@@first
 """
-Indroduction:
-    - A simple implementation of the
-      U{Kademlia<http://www.infoanarchy.org/wiki/wiki.pl?Kademlia>}
-      P2P distributed storage and retrieval protocol, designed to
-      utilise the U{I2P<http://www.i2p.net>} stealth network as its transport.
+A simple implementation of the
+U{Kademlia<http://www.infoanarchy.org/wiki/wiki.pl?Kademlia>}
+P2P distributed storage and retrieval protocol, designed to
+utilise the U{I2P<http://www.i2p.net>} stealth network as its transport.
 
-I strongly recommend that when editing this file, you use the Leo
-outlining and literate programming editor - http://leo.sf.net
-
-If Leo doesn't agree with your religion, please try to leave the markups intact
+Most application developers will only need to know about the L{KNode} class
 """
+
+# I strongly recommend that when editing this file, you use the Leo
+# outlining and literate programming editor - http://leo.sf.net
+# If Leo doesn't agree with your religion, please try to leave the markups intact
+
 #@+others
 #@+node:explanatory comments
 #@+at
@@ -162,10 +163,10 @@ runCore = True
 
 # timeouts - calibrate as needed
 timeout = {
-    'ping' : 60,
-    'findNode' : 60,
-    'findData' : 60,
-    'store' : 60,
+    'ping' : 120,
+    'findNode' : 120,
+    'findData' : 120,
+    'store' : 120,
     }
 
 logToSocket = None
@@ -190,7 +191,7 @@ else:
 # client progs from creating 2 nodes of the same name
 _nodes = {}
 
-version = "0.0"
+version = "0.0.1"
 
 #@-node:globals
 #@+node:Exceptions
@@ -262,7 +263,7 @@ class KCore(KBase):
     These threads start up when the first node in this process is created,
     and stop when the last node ceases to exist.
 
-    Upon first import, the L{kademlia} module creates one instance of this
+    Upon first import, the L{stasher} module creates one instance of this
     class. Upon creation, L{KNode} objects register themselves with this core.
     """
     #@    @+others
@@ -1001,8 +1002,8 @@ class KPeer(KBase):
     #@+node:__str__
     def __str__(self):
     
-        return "<KPeer:%s=>0x%s...>" % (
-            self.node.name, ("%x" % self.id.value)[:8])
+        return "<KPeer:%s=>0x%s... dest %s...>" % (
+            self.node.name, ("%x" % self.id.value)[:8], self.dest[:8])
     
     #@-node:__str__
     #@+node:__repr__
@@ -1878,7 +1879,7 @@ class KRpcFindNode(KRpc):
         else:
             self.log(3, "no peer recs???")
             for peerRec in self.peerTab:
-                self.log(4, "%s state=%s" % (peerRec, peerRec.state))
+                self.log(4, "%s state=%s, dest=%s..." % (peerRec, peerRec.state, peerRec.dest[:12]))
     
     #@-node:sendSomeQueries
     #@+node:sendOneQuery
@@ -2381,6 +2382,95 @@ class KRpcStore(KRpc):
     #@-others
 #@-node:class KRpcStore
 #@-node:STORE
+#@+node:PINGALL
+#@+node:class KRpcPingAll
+class KRpcPingAll(KRpc):
+    """
+    Pings all peers
+    """
+    #@    @+others
+    #@+node:attribs
+    type = 'pingall'
+    #@-node:attribs
+    #@+node:__init__
+    def __init__(self, localNode, client=None, **kw):
+        """
+        Creates and launches a PINGALL rpc
+    
+        Arguments:
+            - localNode - the node performing this RPC
+            - client - see KRpc.__init__
+    
+        Keywords: none
+        """
+        if kw.has_key('cbArgs'):
+            KRpc.__init__(self, localNode, client, cbArgs=kw['cbArgs'])
+        else:
+            KRpc.__init__(self, localNode, client)
+    
+    #@-node:__init__
+    #@+node:start
+    def start(self):
+        """
+        Kicks off this RPC
+        """
+        # launch a findNode rpc against each of our peers
+        peers = self.localNode.peers
+        self.numSent = self.numPending = len(peers)
+        self.numReplied = self.numFailed = 0
+        for peer in peers:
+            KRpcPing(self.localNode, self.on_reply, peer=peer)
+        return
+    
+    #@-node:start
+    #@+node:on_reply
+    def on_reply(self, result):
+        """
+        callback which fires when we get a reply from a STORE we sent to a
+        peer
+        """
+        log(3, "got %s" % repr(result))
+    
+        if result:
+            self.numReplied += 1
+        else:
+            self.numFailed += 1
+        self.numPending -= 1
+    
+        if self.numPending <= 0:
+            res = "pinged:%s replied:%s timeout:%s" % (
+                    self.numSent, self.numReplied, self.numFailed)
+            self.log(3, res)
+            self.returnValue(res)
+    
+    #@-node:on_reply
+    #@+node:on_tick
+    def on_tick(self):
+    
+        self.log(3, "this shouldn't have happened")
+        self.returnValue(False)
+    
+    #@-node:on_tick
+    #@+node:returnValue
+    def returnValue(self, result):
+        """
+        an override with a nicer call sig
+        """
+        # a hack for testing - save this RPC object into the node
+        # so we can introspect it
+        self.localNode.lastrpc = self
+    
+        try:
+            KRpc.returnValue(self, result, status=result)
+        except:
+            traceback.print_exc()
+            self.log(3, "Failed to return %s" % repr(result))
+            KRpc.returnValue(self, 0, status=0)
+    
+    #@-node:returnValue
+    #@-others
+#@-node:class KRpcPingAll
+#@-node:PINGALL
 #@-node:RPC Classes
 #@+node:Node Socket Server
 #@+node:class KNodeServer
@@ -2496,6 +2586,12 @@ class KNodeReqHandler(KBase, SocketServer.StreamRequestHandler):
             res = node.dest
             write("ok\n")
             write("%s\n" % res)
+            finish()
+            return
+    
+        elif cmd == 'pingall':
+            res = node._pingall()
+            write(res+"\n")
             finish()
             return
     
@@ -2659,6 +2755,22 @@ class KNodeClient(KBase):
             return None
     
     #@-node:getref
+    #@+node:pingall
+    def pingall(self):
+        """
+        Uplifts node's own ref
+        """
+        self.connect()
+        self.write("pingall\n")
+        self.flush()
+        
+        res = self.readline().strip()
+    
+        self.close()
+    
+        return res
+    
+    #@-node:pingall
     #@+node:kill
     def kill(self):
         """
@@ -2705,6 +2817,7 @@ class KNode(KBase):
         - L{stop} - stops the node
         - L{get} - retrieve a key value
         - L{put} - stores a key value
+        - L{addref} - imports a noderef
 
     This class implements a single kademlia node.
     Within a single process, you can create as many nodes as you like.
@@ -2977,6 +3090,18 @@ class KNode(KBase):
             return KRpcPing(self, peer=peer).execute()
     
     #@-node:_ping
+    #@+node:_pingall
+    def _pingall(self, callback=None):
+        """
+        Sends a ping to all peers, returns text string on replies/failures
+        """
+        if callback:
+            KRpcPingAll(self, callback, **kw)
+        else:
+            return KRpcPingAll(self).execute()
+    
+       
+    #@-node:_pingall
     #@+node:_findnode
     def _findnode(self, something=None, callback=None, **kw):
         """
@@ -3715,8 +3840,11 @@ def usage(detailed=False, ret=0):
     print "  getref <file>"
     print "    - uplifts the running node's dest as base64, writing it to file"
     print "      <file> if given, or to stdout"
-    print "  status"
-    print "    - do a status dump - connectivity, stats etc"
+    print "  hello"
+    print "    - checks that local node is running"
+    print "  pingall"
+    print "    - diagnostic tool - pings all peers, waits for replies or timeouts,"
+    print "      reports results"
     print "  help"
     print "    - display this help"
     print
@@ -3743,6 +3871,7 @@ def main():
                                    "h?vV:S:C:sd:f",
                                    ['help', 'version', 'samaddr=', 'clientaddr=',
                                     'verbosity=', 'status', 'datadir=', 'foreground',
+                                    'shortversion',
                                     ])
     except:
         traceback.print_exc(file=sys.stdout)
@@ -3780,6 +3909,11 @@ def main():
         elif opt in ['-d', '--datadir']:
             dataDir = val
 
+        elif opt == '--shortversion':
+            sys.stdout.write("%s" % version)
+            sys.stdout.flush()
+            sys.exit(0)
+
     #print "Debug - bailing"
     #print repr(opts)
     #print repr(args)
@@ -3796,7 +3930,8 @@ def main():
     #print "cmd=%s, args=%s" % (repr(cmd), repr(args))
     
     if cmd not in ['help', '_start', 'start', 'stop',
-                   'hello', 'get', 'put', 'addref', 'getref']:
+                   'hello', 'get', 'put', 'addref', 'getref',
+                   'pingall']:
         err("Illegal command '%s'" % cmd)
         usage(0, 1)
 
@@ -3994,7 +4129,12 @@ def main():
             outfile.close()
             sys.exit(0)
 
-
+    elif cmd == 'pingall':
+        if logVerbosity > 2:
+            print "Pinging all peers, waiting %s seconds for results" % timeout['ping']
+        res = client.pingall()
+        print res
+        sys.exit(0)
 
 #@-node:main
 #@-others
