@@ -114,7 +114,7 @@ public class PeerDataWriter {
         return buf.toString();
     }
 
-    private static final SimpleDateFormat _fmt = new SimpleDateFormat("yyyyMMdd.HH:mm:ss.SSS", Locale.UK);
+    private final SimpleDateFormat _fmt = new SimpleDateFormat("yyyyMMdd.HH:mm:ss.SSS", Locale.UK);
 
     /**
      * Converts a time (long) to text
@@ -127,7 +127,7 @@ public class PeerDataWriter {
         }
     }
 
-    private static final DecimalFormat _numFmt = new DecimalFormat("#0", new DecimalFormatSymbols(Locale.UK));
+    private final DecimalFormat _numFmt = new DecimalFormat("#0", new DecimalFormatSymbols(Locale.UK));
 
     /**
      * Converts a number (double) to text
