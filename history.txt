@@ -1,4 +1,11 @@
-$Id: history.txt,v 1.75 2004/11/17 14:42:53 jrandom Exp $
+$Id: history.txt,v 1.76 2004/11/19 18:04:27 jrandom Exp $
+
+2004-11-21  jrandom
+    * Destroy ElGamal/AES+SessionTag keys after 15 minutes of inactivity 
+      rather that every 15 minutes, and increase the warning period in which
+      we refresh tags from 30s to 2 minutes.
+    * Bugfix for a rare problem closing an I2PTunnel stream where we'd fail
+      to close the I2PSocket (leaving it to timeout).
 
 2004-11-19  jrandom
     * Off-by-one fix to the tunnel pool management code, along side some 

@@ -156,7 +156,7 @@ public class PersistentSessionKeyManager extends TransientSessionKeyManager {
             tag.setData(val);
             tags.add(tag);
         }
-        TagSet ts = new TagSet(tags, key);
+        TagSet ts = new TagSet(tags, key, _context.clock().now());
         ts.setDate(date.getTime());
         return ts;
     }

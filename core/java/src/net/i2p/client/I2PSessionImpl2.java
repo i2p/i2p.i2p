@@ -118,15 +118,23 @@ class I2PSessionImpl2 extends I2PSessionImpl {
         if ( (tagsSent == null) || (tagsSent.size() <= 0) ) {
             if (oldTags < 10) {
                 sentTags = createNewTags(50);
-                //_log.error("** sendBestEffort only had " + oldTags + " adding 50");
-            } else if (availTimeLeft < 30 * 1000) {
-                // if we have > 10 tags, but they expire in under 30 seconds, we want more
+                if (_log.shouldLog(Log.DEBUG))
+                    _log.debug("** sendBestEffort only had " + oldTags + " with " + availTimeLeft + ", adding 50");
+            } else if (availTimeLeft < 2 * 60 * 1000) {
+                // if we have > 10 tags, but they expire in under 2 minutes, we want more
                 sentTags = createNewTags(50);
-                if (_log.shouldLog(Log.DEBUG)) _log.debug(getPrefix() + "Tags are almost expired, adding 50 new ones");
+                if (_log.shouldLog(Log.DEBUG)) 
+                    _log.debug(getPrefix() + "Tags expiring in " + availTimeLeft + ", adding 50 new ones");
                 //_log.error("** sendBestEffort available time left " + availTimeLeft);
             } else {
-                //_log.error("sendBestEffort old tags: " + oldTags + " available time left: " + availTimeLeft);
+                if (_log.shouldLog(Log.DEBUG))
+                    _log.debug("sendBestEffort old tags: " + oldTags + " available time left: " + availTimeLeft);
             }
+        } else {
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("sendBestEffort is sending " + tagsSent.size() + " with " + availTimeLeft 
+                           + "ms left, " + oldTags + " tags known and " 
+                           + (tag == null ? "no tag" : " a valid tag"));
         }
         
         SessionKey newKey = null;
@@ -184,7 +192,7 @@ class I2PSessionImpl2 extends I2PSessionImpl {
         long afterRemovingSync = _context.clock().now();
         boolean found = state.received(MessageStatusMessage.STATUS_SEND_ACCEPTED);
         if (_log.shouldLog(Log.DEBUG))
-            _log.debug(getPrefix() + "After waitFor sending state " + state.getMessageId().getMessageId()
+            _log.debug(getPrefix() + "After waitFor sending state " + state.getMessageId()
                        + " / " + state.getNonce() + " found = " + found);
         if (found) {
             if (_log.shouldLog(Log.INFO))
@@ -210,7 +218,7 @@ class I2PSessionImpl2 extends I2PSessionImpl {
         Set sentTags = null;
         if (_context.sessionKeyManager().getAvailableTags(dest.getPublicKey(), key) < 10) {
             sentTags = createNewTags(50);
-        } else if (_context.sessionKeyManager().getAvailableTimeLeft(dest.getPublicKey(), key) < 30 * 1000) {
+        } else if (_context.sessionKeyManager().getAvailableTimeLeft(dest.getPublicKey(), key) < 2 * 60 * 1000) {
             // if we have > 10 tags, but they expire in under 30 seconds, we want more
             sentTags = createNewTags(50);
             if (_log.shouldLog(Log.DEBUG)) _log.debug(getPrefix() + "Tags are almost expired, adding 50 new ones");
@@ -267,9 +275,10 @@ class I2PSessionImpl2 extends I2PSessionImpl {
             _sendingStates.remove(state);
         }
         long afterRemovingSync = _context.clock().now();
+        boolean guaranteed = isGuaranteed();
         boolean found = false;
         boolean accepted = state.received(MessageStatusMessage.STATUS_SEND_ACCEPTED);
-        if (isGuaranteed())
+        if (guaranteed)
             found = state.received(MessageStatusMessage.STATUS_SEND_GUARANTEED_SUCCESS);
         else
             found = accepted;
@@ -286,7 +295,8 @@ class I2PSessionImpl2 extends I2PSessionImpl {
                            + ")");
             //if (true) 
             //    throw new OutOfMemoryError("not really an OOM, but more of jr fucking shit up");
-            nackTags(state);
+            if (guaranteed)
+                nackTags(state);
             return false;
         }
 
@@ -294,19 +304,24 @@ class I2PSessionImpl2 extends I2PSessionImpl {
             _log.debug(getPrefix() + "After waitFor sending state " + state.getMessageId().getMessageId()
                        + " / " + state.getNonce() + " found = " + found);
         
-        // WARNING: this will always be false for mode=BestEffort, even though the message may go 
-        // through, causing every datagram to be ElGamal encrypted!  
-        // TODO: Fix this to include support for acks received after the sendMessage completes
-        if (found) {
-            if (_log.shouldLog(Log.INFO))
-                _log.info(getPrefix() + "Message sent after " + state.getElapsed() + "ms with "
-                          + payload.length + " bytes");
-            ackTags(state);
+        // the 'found' value is only useful for mode=Guaranteed, as mode=BestEffort 
+        // doesn't block
+        if (guaranteed) {
+            if (found) {
+                if (_log.shouldLog(Log.INFO))
+                    _log.info(getPrefix() + "Message sent after " + state.getElapsed() + "ms with "
+                              + payload.length + " bytes");
+                ackTags(state);
+            } else {
+                if (_log.shouldLog(Log.INFO))
+                    _log.info(getPrefix() + "Message send failed after " + state.getElapsed() + "ms with "
+                              + payload.length + " bytes");
+                nackTags(state);
+            }
         } else {
             if (_log.shouldLog(Log.INFO))
-                _log.info(getPrefix() + "Message send failed after " + state.getElapsed() + "ms with "
+                _log.info(getPrefix() + "Message send enqueued after " + state.getElapsed() + "ms with "
                           + payload.length + " bytes");
-            nackTags(state);
         }
         return found;
     }

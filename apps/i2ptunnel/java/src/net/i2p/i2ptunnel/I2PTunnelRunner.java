@@ -97,6 +97,7 @@ public class I2PTunnelRunner extends I2PThread implements I2PSocket.SocketErrorL
     }
 
     public void run() {
+        boolean closedCleanly = false;
         try {
             InputStream in = s.getInputStream();
             OutputStream out = s.getOutputStream(); // = new BufferedOutputStream(s.getOutputStream(), NETWORK_BUFFER_SIZE);
@@ -121,6 +122,7 @@ public class I2PTunnelRunner extends I2PThread implements I2PSocket.SocketErrorL
             i2ps.close();
             t1.join();
             t2.join();
+            closedCleanly = true;
         } catch (InterruptedException ex) {
             if (_log.shouldLog(Log.ERROR))
                 _log.error("Interrupted", ex);
@@ -133,14 +135,21 @@ public class I2PTunnelRunner extends I2PThread implements I2PSocket.SocketErrorL
         } finally {
             removeRef();
             try {
-                if (s != null) s.close();
+                if ( (s != null) && (!closedCleanly) )
+                    s.close();
+            } catch (IOException ex) {
+                if (_log.shouldLog(Log.ERROR))
+                    _log.error("Could not close java socket", ex);
+            }
+            try {
                 if (i2ps != null) {
-                    i2ps.close();
+                    if (!closedCleanly)
+                        i2ps.close();
                     i2ps.setSocketErrorListener(null);
                 }
             } catch (IOException ex) {
                 if (_log.shouldLog(Log.ERROR))
-                    _log.error("Could not close socket", ex);
+                    _log.error("Could not close I2PSocket", ex);
             }
         }
     }
@@ -179,14 +188,12 @@ public class I2PTunnelRunner extends I2PThread implements I2PSocket.SocketErrorL
         }
 
         public void run() {
+            String from = i2ps.getThisDestination().calculateHash().toBase64().substring(0,6);
+            String to = i2ps.getPeerDestination().calculateHash().toBase64().substring(0,6);
+
             if (_log.shouldLog(Log.DEBUG)) {
-                String from = i2ps.getThisDestination().calculateHash().toBase64().substring(0,6);
-                String to = i2ps.getPeerDestination().calculateHash().toBase64().substring(0,6);
-                
                 _log.debug(direction + ": Forwarding between " 
-                           + from
-                           + " and " 
-                           + to);
+                           + from + " and " + to);
             }
             
             ByteArray ba = _cache.acquire();
@@ -214,6 +221,7 @@ public class I2PTunnelRunner extends I2PThread implements I2PSocket.SocketErrorL
                             out.flush(); // make sure the data get though
                     }
                 }
+                out.flush();
             } catch (SocketException ex) {
                 // this *will* occur when the other threads closes the socket
                 synchronized (finishLock) {
@@ -235,6 +243,10 @@ public class I2PTunnelRunner extends I2PThread implements I2PSocket.SocketErrorL
                 //else
                 //    _log.warn("You may ignore this", ex);
             } finally {
+                if (_log.shouldLog(Log.INFO)) {
+                    _log.info(direction + ": done forwarding between " 
+                              + from + " and " + to);
+                }
                 try {
                     out.close();
                     in.close();
