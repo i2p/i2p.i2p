@@ -68,9 +68,9 @@ public class ClientListenerRunner implements Runnable {
                                 _log.debug("Connection received");
                             runConnection(socket);
                         } else {
-                            socket.close();
                             if (_log.shouldLog(Log.WARN))
                                 _log.warn("Refused connection from " + socket.getInetAddress());
+                            socket.close();
                         }
                     } catch (IOException ioe) {
                         _log.error("Server error accepting", ioe);
