@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project basedir="." default="all" name="systray">
     <target name="all" depends="clean, build" />
-    <target name="build" depends="jar" />
+    <target name="build" depends="builddep, jar" />
+    <target name="builddep">
+        <ant dir="../../../core/java/" target="build" />
+    </target>
     <target name="compile">
         <mkdir dir="./build" />
         <mkdir dir="./build/obj" />
@@ -13,14 +16,14 @@
             target="1.3"
             destdir="./build/obj"
             includes="**/*.java"
-            classpath="./src/net/i2p/apps/systray/lib/systray4j.jar" />
+            classpath="./lib/systray4j.jar:../../../core/java/build/i2p.jar" />
     </target>
     <target name="jar" depends="compile">
         <copy todir="./build/lib">
-            <fileset dir="./src/net/i2p/apps/systray/lib" includes="libsystray4j.so systray4j.dll systray4j.jar" />
+            <fileset dir="./lib" includes="libsystray4j.so systray4j.dll systray4j.jar" />
         </copy>
         <copy todir="./build/icons">
-            <fileset dir="./src/net/i2p/apps/systray/icons" />
+            <fileset dir="./resources/" />
         </copy>
         <mkdir dir="./build/jar_temp" />
         <copy todir="./build/jar_temp">
@@ -39,7 +42,7 @@
         <mkdir dir="./build/javadoc" />
         <javadoc
             sourcepath="./src"
-            classpath="./src:./src/net/i2p/apps/systray/lib/systray4j.jar"
+            classpath="./src:./lib/systray4j.jar"
             destdir="./build/javadoc"
             packagenames="*"
             use="true"
