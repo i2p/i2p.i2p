@@ -16,12 +16,15 @@ i2cp.port=##_router_i2cp_port##
 
 # I2P router administrative web port (currently only responds to /routerConsole.html)
 router.adminPort=7655
+
 # Bandwidth limits
-# These limits are for all i2np connections - tcp or whatever
-# They are hard enforced with no smoothing.
-# XXX Until the 0.3.2 release, these should NOT BE USED.  Their values will be ignored!!!
-i2np.bandwidth.inboundBytesPerMinute=##_router_inbps##
-i2np.bandwidth.outboundBytesPerMinute=##_router_outbps##
+# These limits are for all i2np connections - tcp or whatever to all peers.
+# They are hard enforced with no smoothing.  If they are <= 0, no limits are enforced.
+i2np.bandwidth.inboundKBytesPerSecond=-1
+i2np.bandwidth.outboundKBytesPerSecond=-1
+# How many bytes will we let accumulate due to inactivity (allowing bursts)?
+i2np.bandwidth.inboundBurstKBytes=-1
+i2np.bandwidth.outboundBurstKBytes=-1
 
 # Publish peer rankings
 # If true, include the current liveliness and reliability rankings in one's published RouterInfo data
