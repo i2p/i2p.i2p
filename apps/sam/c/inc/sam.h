@@ -38,9 +38,11 @@ extern "C" {
 #include <stddef.h>
 #include <stdint.h>
 
+
 /*
  * Lengths
  */
+
 /* The maximum length a SAM command can be */
 #define SAM_CMD_LEN 128
 /* The maximum size of a single datagram packet */
@@ -49,18 +51,22 @@ extern "C" {
 #define SAM_LOGMSG_LEN 256
 /* The longest `name' arg for the naming lookup callback */
 #define SAM_NAME_LEN 256
-/* The max size of a single stream packet */
+/* The maximum size of a single stream packet */
 #define SAM_STREAM_PAYLOAD_MAX (32 * 1024)
 /* The length of a base 64 public key - it's actually 516, but +1 for '\0' */
 #define SAM_PUBKEY_LEN 517
-/* A public key SAM command's length */
+/* The maximum length of a SAM command with a public key */
 #define SAM_PKCMD_LEN (SAM_PUBKEY_LEN + SAM_CMD_LEN)
+/* The maximum size of a single raw packet */
+#define SAM_RAW_LEN (32 * 1024)
 /* The maximum length a SAM non-data reply can be */
 #define SAM_REPLY_LEN 1024
 
+
 /*
- * Shorten some standard variable types
+ * Some LibSAM variable types
  */
+
 typedef signed char schar_t;
 typedef unsigned char uchar_t;
 typedef unsigned int uint_t;
@@ -102,57 +108,62 @@ typedef enum {  /* see sam_strerror() for detailed descriptions of these */
 	SAM_TOO_BIG
 } samerr_t;
 
+
 /*
  * Public functions
  */
 
 /* SAM controls - sessions */
-extern sam_sess_t *sam_session_init(sam_sess_t *session);
-extern void		sam_session_free(sam_sess_t **session);
+sam_sess_t *sam_session_init(sam_sess_t *session);
+void		sam_session_free(sam_sess_t **session);
 /* SAM controls - connection */
-extern bool		sam_close(sam_sess_t *session);
-extern samerr_t	sam_connect(sam_sess_t *session, const char *samhost,
-					uint16_t samport, const char *destname, sam_conn_t style,
-					uint_t tunneldepth);
+bool		sam_close(sam_sess_t *session);
+samerr_t	sam_connect(sam_sess_t *session, const char *samhost,
+				uint16_t samport, const char *destname, sam_conn_t style,
+				uint_t tunneldepth);
 /* SAM controls - utilities */
-extern void		sam_naming_lookup(sam_sess_t *session, const char *name);
-extern bool		sam_read_buffer(sam_sess_t *session);
-extern const char *sam_strerror(samerr_t code);
+void		sam_naming_lookup(sam_sess_t *session, const char *name);
+bool		sam_read_buffer(sam_sess_t *session);
+const char *sam_strerror(samerr_t code);
 /* SAM controls - callbacks */
-extern void		(*sam_diedback)(sam_sess_t *session);
-extern void		(*sam_logback)(char *str);
-extern void		(*sam_namingback)(char *name, sam_pubkey_t pubkey,
-					samerr_t result);
+void		(*sam_diedback)(sam_sess_t *session);
+void		(*sam_logback)(char *str);
+void		(*sam_namingback)(char *name, sam_pubkey_t pubkey, samerr_t result);
 
 /* Stream commands */
-extern void		sam_stream_close(sam_sess_t *session, sam_sid_t stream_id);
-extern sam_sid_t sam_stream_connect(sam_sess_t *session,
-					const sam_pubkey_t dest);
-extern samerr_t	sam_stream_send(sam_sess_t *session, sam_sid_t stream_id,
-					const void *data, size_t size);
+void		sam_stream_close(sam_sess_t *session, sam_sid_t stream_id);
+sam_sid_t	sam_stream_connect(sam_sess_t *session, const sam_pubkey_t dest);
+samerr_t	sam_stream_send(sam_sess_t *session, sam_sid_t stream_id,
+				const void *data, size_t size);
 /* Stream commands - callbacks */
-extern void		(*sam_closeback)(sam_sess_t *session, sam_sid_t stream_id,
-					samerr_t reason);
-extern void		(*sam_connectback)(sam_sess_t *session, sam_sid_t stream_id,
-					sam_pubkey_t dest);
-extern void		(*sam_databack)(sam_sess_t *session, sam_sid_t stream_id,
-					void *data, size_t size);
-extern void		(*sam_statusback)(sam_sess_t *session, sam_sid_t stream_id,
-					samerr_t result);
+void		(*sam_closeback)(sam_sess_t *session, sam_sid_t stream_id,
+				samerr_t reason);
+void		(*sam_connectback)(sam_sess_t *session, sam_sid_t stream_id,
+				sam_pubkey_t dest);
+void		(*sam_databack)(sam_sess_t *session, sam_sid_t stream_id,
+				void *data, size_t size);
+void		(*sam_statusback)(sam_sess_t *session, sam_sid_t stream_id,
+				samerr_t result);
 
 /* Stream send queue (experimental) */
-extern void		sam_sendq_add(sam_sess_t *session, sam_sid_t stream_id,
-					sam_sendq_t **sendq, const void *data, size_t dsize);
-extern void		sam_sendq_flush(sam_sess_t *session, sam_sid_t stream_id,
-					sam_sendq_t **sendq);
+void		sam_sendq_add(sam_sess_t *session, sam_sid_t stream_id,
+				sam_sendq_t **sendq, const void *data, size_t dsize);
+void		sam_sendq_flush(sam_sess_t *session, sam_sid_t stream_id,
+				sam_sendq_t **sendq);
 
 /* Datagram commands */
-extern samerr_t	sam_dgram_send(sam_sess_t *session, const sam_pubkey_t dest,
-					const void *data, size_t size);
-
+samerr_t	sam_dgram_send(sam_sess_t *session, const sam_pubkey_t dest,
+				const void *data, size_t size);
 /* Datagram commands - callbacks */
-extern void		(*sam_dgramback)(sam_sess_t *session, sam_pubkey_t dest,
-					void *data, size_t size);
+void		(*sam_dgramback)(sam_sess_t *session, sam_pubkey_t dest, void *data,
+				size_t size);
+
+/* Raw commands */
+samerr_t	sam_raw_send(sam_sess_t *session, const sam_pubkey_t dest,
+				const void *data, size_t size);
+/* Raw commands - callbacks */
+void		(*sam_rawback)(sam_sess_t *session, void *data, size_t size);
+
 
 #ifdef __cplusplus
 }

@@ -55,27 +55,39 @@ static ssize_t		sam_write(sam_sess_t *session, const void *buf, size_t n);
  * Callback functions
  * Note: if you add a new callback be sure to check for non-NULL in sam_connect
  */
+
 /* a peer closed the connection */
 void (*sam_closeback)(sam_sess_t *session, sam_sid_t stream_id, samerr_t reason)
 	= NULL;
+
 /* a peer connected to us */
 void (*sam_connectback)(sam_sess_t *session, sam_sid_t stream_id,
 	sam_pubkey_t dest) = NULL;
+
 /* a peer sent some stream data (`data' MUST be freed) */
 void (*sam_databack)(sam_sess_t *session, sam_sid_t stream_id, void *data,
 	size_t size) = NULL;
+
 /* a peer sent some datagram data (`data' MUST be freed) */
 void (*sam_dgramback)(sam_sess_t *session, sam_pubkey_t dest, void *data,
 	size_t size) = NULL;
+
 /* we lost the connection to the SAM host */
 void (*sam_diedback)(sam_sess_t *session) = NULL;
+
 /* logging callback */
 void (*sam_logback)(char *str) = NULL;
+
 /* naming lookup reply - `pubkey' will be NULL if `result' isn't SAM_OK */
 void (*sam_namingback)(char *name, sam_pubkey_t pubkey, samerr_t result) = NULL;
+
 /* our connection to a peer has completed */
 void (*sam_statusback)(sam_sess_t *session, sam_sid_t stream_id,
 	samerr_t result) = NULL;
+
+/* a peer sent some raw data (`data' MUST be freed) */
+void (*sam_rawback)(sam_sess_t *session, void *data, size_t size) = NULL;
+
 
 /*
  * Closes the connection to the SAM host
@@ -155,7 +167,11 @@ samerr_t sam_connect(sam_sess_t *session, const char *samhost, uint16_t samport,
 			return SAM_CALLBACKS_UNSET;
 		}
 	} else if (style == SAM_RAW) {
-		abort();  /* not implemented yet */
+		if (sam_diedback == NULL || sam_logback == NULL
+				|| sam_namingback == NULL || sam_rawback == NULL) {
+			SAMLOGS("Please set callback functions before connecting");
+			return SAM_CALLBACKS_UNSET;
+		}
 	} else {
 		SAMLOGS("Unknown connection style");
 		return SAM_BAD_STYLE;
@@ -295,6 +311,7 @@ static void sam_parse(sam_sess_t *session, char *s)
 #define SAM_NAMING_REPLY_OK "NAMING REPLY RESULT=OK"
 #define SAM_NAMING_REPLY_IK "NAMING REPLY RESULT=INVALID_KEY"
 #define SAM_NAMING_REPLY_KNF "NAMING REPLY RESULT=KEY_NOT_FOUND"
+#define SAM_RAW_RECEIVED_REPLY "RAW RECEIVED"
 #define SAM_STREAM_CLOSED_REPLY "STREAM CLOSED"
 #define SAM_STREAM_CONNECTED_REPLY "STREAM CONNECTED"
 #define SAM_STREAM_RECEIVED_REPLY "STREAM RECEIVED"
@@ -304,6 +321,10 @@ static void sam_parse(sam_sess_t *session, char *s)
 #define SAM_STREAM_STATUS_REPLY_I2E "STREAM STATUS RESULT=I2P_ERROR"
 #define SAM_STREAM_STATUS_REPLY_IK "STREAM STATUS RESULT=INVALID_KEY"
 #define SAM_STREAM_STATUS_REPLY_TO "STREAM STATUS RESULT=TIMEOUT"
+
+	/*
+	 * TODO: add raw parsing
+	 */
 
 	if (strncmp(s, SAM_DGRAM_RECEIVED_REPLY,
 			strlen(SAM_DGRAM_RECEIVED_REPLY)) == 0) {
@@ -516,6 +537,42 @@ static void sam_parse(sam_sess_t *session, char *s)
 		SAMLOG("Unknown SAM command received: %s", s);
 
 	return;
+}
+
+/*
+ * Sends data to a destination in a raw packet
+ *
+ * dest - base 64 destination of who we're sending to
+ * data - the data we're sending
+ * size - the size of the data
+ *
+ * Returns: SAM_OK on success
+ */
+samerr_t sam_raw_send(sam_sess_t *session, const sam_pubkey_t dest,
+	const void *data, size_t size)
+{
+	assert(session != NULL);
+	char cmd[SAM_PKCMD_LEN];
+
+	if (size < 1 || size > SAM_RAW_PAYLOAD_MAX) {
+#ifdef NO_Z_FORMAT
+		SAMLOG("Invalid data send size (%u bytes)", size);
+#else
+		SAMLOG("Invalid data send size (%zu bytes)", size);
+#endif
+		return SAM_TOO_BIG;
+	}
+#ifdef NO_Z_FORMAT
+	snprintf(cmd, sizeof cmd, "RAW SEND DESTINATION=%s SIZE=%u\n",
+		dest, size);
+#else
+	snprintf(cmd, sizeof cmd, "RAW SEND DESTINATION=%s SIZE=%zu\n",
+		dest, size);
+#endif
+	sam_write(session, cmd, strlen(cmd));
+	sam_write(session, data, size);
+
+	return SAM_OK;
 }
 
 /*
