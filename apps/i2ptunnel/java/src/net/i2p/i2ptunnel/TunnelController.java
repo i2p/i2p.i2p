@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
+import java.util.Random;
 
 import net.i2p.I2PAppContext;
 import net.i2p.I2PException;
@@ -375,10 +376,16 @@ public class TunnelController implements Logging {
                         buf.append("Full destination: ");
                         buf.append("<input type=\"text\" size=\"10\" onclick=\"this.select();\" ");
                         buf.append("value=\"").append(dest.toBase64()).append("\" />\n");
+                        long val = new Random().nextLong();
+                        if (val < 0) val = 0 - val;
+                        buf.append("<br />You can <a href=\"http://temp").append(val);
+                        buf.append(".i2p/?i2paddresshelper=").append(dest.toBase64()).append("\">view</a>");
+                        buf.append(" it in a browser (only when you're using the eepProxy)\n");
                         buf.append("<br />If you are going to share this on IRC, you need to split it up:<br />\n");
                         String str = dest.toBase64();
                         buf.append(str.substring(0, str.length()/2)).append("<br />\n");
                         buf.append(str.substring(str.length()/2)).append("<br />\n");
+                        buf.append("You can also post it to <a href=\"http://forum.i2p/viewforum.php?f=16\">Eepsite announcement forum</a><br />");
                     }
                 }
             }

@@ -1,9 +1,14 @@
-$Id: history.txt,v 1.22 2004/09/29 14:34:02 jrandom Exp $
+$Id: history.txt,v 1.23 2004/09/30 01:57:22 jrandom Exp $
+
+* 2004-09-30  0.4.1 released (not backwards compatible)
 
 2004-09-30  jrandom
     * Bundle the configuration necessary to run an eepsite out of the box
       with Jetty - simply edit ./eepsite/docroot/index.html and give people
       the key listed on the I2PTunnel configuration page, and its up.
+    * Router console cleanup, and some (off by default) tunnels - 
+      smtp.postman.i2p (port 7659), pop.postman.i2p (port 7660), and
+      irc.baffled.i2p (port 7661)
 
 2004-09-29  jrandom
     * Always wipe the Jetty work directory on startup, so that web updates

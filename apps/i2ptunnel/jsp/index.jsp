@@ -7,6 +7,7 @@
 
 <jsp:useBean class="net.i2p.i2ptunnel.WebStatusPageHelper" id="helper" scope="request" />
 <jsp:setProperty name="helper" property="*" />
+<h2>Messages since last page load:</h2>
 <b><jsp:getProperty name="helper" property="actionResults" /></b>
  
 <jsp:getProperty name="helper" property="summaryList" />
