@@ -15,7 +15,7 @@ rem Find the application home.
 rem
 rem %~dp0 is location of current script under NT
 set _REALPATH=%~dp0
-set _WRAPPER_EXE=%_REALPATH%Wrapper.exe
+set _WRAPPER_EXE=%_REALPATH%I2Psvc.exe
 
 rem
 rem Find the wrapper.conf

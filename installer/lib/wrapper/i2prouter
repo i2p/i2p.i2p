@@ -17,7 +17,7 @@ APP_NAME="i2p"
 APP_LONG_NAME="I2P Service"
 
 # Wrapper
-WRAPPER_CMD="wrapper"
+WRAPPER_CMD="i2psvc"
 WRAPPER_CONF="wrapper.conf"
 
 # Priority at which to run the wrapper.  See "man nice" for valid priorities.
@@ -157,9 +157,9 @@ console() {
     then
         if [ "X$IGNORE_SIGNALS" = "X" ]
         then
-            exec $CMDNICE $WRAPPER_CMD $WRAPPER_CONF wrapper.pidfile=$PIDFILE
+            exec $CMDNICE $WRAPPER_CMD $WRAPPER_CONF i2psvc.pidfile=$PIDFILE
         else
-            exec $CMDNICE $WRAPPER_CMD $WRAPPER_CONF wrapper.pidfile=$PIDFILE wrapper.anchorfile=$ANCHORFILE
+            exec $CMDNICE $WRAPPER_CMD $WRAPPER_CONF i2psvc.pidfile=$PIDFILE wrapper.anchorfile=$ANCHORFILE
         fi
     else
         echo "$APP_LONG_NAME is already running."
@@ -176,16 +176,16 @@ start() {
         then
             if [ "X$RUN_AS_USER" = "X" ]
             then
-                exec $CMDNICE $WRAPPER_CMD $WRAPPER_CONF wrapper.pidfile=$PIDFILE wrapper.daemonize=TRUE
+                exec $CMDNICE $WRAPPER_CMD $WRAPPER_CONF i2psvc.pidfile=$PIDFILE wrapper.daemonize=TRUE
             else
-                su -m $RUN_AS_USER -c "exec $CMDNICE $WRAPPER_CMD $WRAPPER_CONF wrapper.pidfile=$PIDFILE wrapper.daemonize=TRUE"
+                su -m $RUN_AS_USER -c "exec $CMDNICE $WRAPPER_CMD $WRAPPER_CONF i2psvc.pidfile=$PIDFILE wrapper.daemonize=TRUE"
             fi
         else
             if [ "X$RUN_AS_USER" = "X" ]
             then
-                exec $CMDNICE $WRAPPER_CMD $WRAPPER_CONF wrapper.pidfile=$PIDFILE wrapper.anchorfile=$ANCHORFILE wrapper.ignore_signals=TRUE wrapper.daemonize=TRUE
+                exec $CMDNICE $WRAPPER_CMD $WRAPPER_CONF i2psvc.pidfile=$PIDFILE wrapper.anchorfile=$ANCHORFILE wrapper.ignore_signals=TRUE wrapper.daemonize=TRUE
             else
-                su -m $RUN_AS_USER -c "exec $CMDNICE $WRAPPER_CMD $WRAPPER_CONF wrapper.pidfile=$PIDFILE wrapper.anchorfile=$ANCHORFILE wrapper.ignore_signals=TRUE wrapper.daemonize=TRUE"
+                su -m $RUN_AS_USER -c "exec $CMDNICE $WRAPPER_CMD $WRAPPER_CONF i2psvc.pidfile=$PIDFILE wrapper.anchorfile=$ANCHORFILE wrapper.ignore_signals=TRUE wrapper.daemonize=TRUE"
             fi
         fi
     else
