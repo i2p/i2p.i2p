@@ -1,0 +1,18 @@
+<html><body>
+<p>Implements a TCP-like (reliable, authenticated, in order) set of sockets for 
+communicating over the IP-like (unreliable, unauthenticated, unordered) I2P
+messages.</p>
+
+<p>When an application wants to use streams, it must fetch an {@link
+net.i2p.client.streaming.I2PSocketManager} from the {@link 
+net.i2p.client.streaming.I2PSocketManagerFactory}, which in turn builds its own
+{@link net.i2p.client.I2PSession} internally.  All communication over that 
+{@link net.i2p.client.I2PSession} is handled by the {@link 
+net.i2p.client.streaming.I2PSocketManager}, as it imposes its own formatting on
+the raw messages sent and received.  If an application wants to receive streams
+from other clients on the network, it should access the blocking {@link
+net.i2p.client.streaming.I2PServerSocket#accept} method, which will provide an
+{@link net.i2p.client.streaming.I2PSocket} when a new one is available.  If an
+application wants to create a new stream to a peer, it should do so with the
+appropriate {@link net.i2p.client.streaming.I2PSocketManager#connect} call.</p>
+</body></html>
