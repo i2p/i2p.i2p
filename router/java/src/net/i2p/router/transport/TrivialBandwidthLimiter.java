@@ -62,7 +62,9 @@ public class TrivialBandwidthLimiter extends BandwidthLimiter {
         
         _context.jobQueue().addJob(new UpdateBWJob());
         updateLimits();
-        _log.info("Initializing the limiter with maximum inbound [" + MAX_IN_POOL + "] outbound [" + MAX_OUT_POOL + "]");
+        if (_log.shouldLog(Log.INFO))
+            _log.info("Initializing the limiter with maximum inbound [" + MAX_IN_POOL 
+                      + "] outbound [" + MAX_OUT_POOL + "]");
     }
     
     public long getTotalSendBytes() { return _totalSendBytes; }
@@ -80,7 +82,9 @@ public class TrivialBandwidthLimiter extends BandwidthLimiter {
             // we don't have sufficient bytes.
             // the delay = (needed/numPerMinute)
             long val = MINUTE*(numBytes-_availableReceive)/_maxReceiveBytesPerMinute;
-            _log.debug("DelayInbound: " + val + " for " + numBytes + " (avail=" + _availableReceive + ", max=" + _maxReceiveBytesPerMinute + ")");
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("DelayInbound: " + val + " for " + numBytes + " (avail=" 
+                           + _availableReceive + ", max=" + _maxReceiveBytesPerMinute + ")");
             return val;
         }
     }
@@ -97,7 +101,9 @@ public class TrivialBandwidthLimiter extends BandwidthLimiter {
             // we don't have sufficient bytes.
             // the delay = (needed/numPerMinute)
             long val = MINUTE*(numBytes-_availableSend)/_maxSendBytesPerMinute;
-            _log.debug("DelayOutbound: " + val + " for " + numBytes + " (avail=" + _availableSend + ", max=" + _maxSendBytesPerMinute + ")");
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("DelayOutbound: " + val + " for " + numBytes + " (avail=" 
+                           + _availableSend + ", max=" + _maxSendBytesPerMinute + ")");
             return val;
         }
     }
@@ -129,7 +135,8 @@ public class TrivialBandwidthLimiter extends BandwidthLimiter {
         long oldReceive = _maxReceiveBytesPerMinute;
         long oldSend = _maxSendBytesPerMinute;
         
-        _log.debug("Read limits ["+inBwStr+" in, " + outBwStr + " out] vs current [" + oldReceive + " in, " + oldSend + " out]");
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("Read limits ["+inBwStr+" in, " + outBwStr + " out] vs current [" + oldReceive + " in, " + oldSend + " out]");
         
         if ( (inBwStr != null) && (inBwStr.trim().length() > 0) ) {
             try {
@@ -179,16 +186,20 @@ public class TrivialBandwidthLimiter extends BandwidthLimiter {
             _availableSend += numMinutes * _maxSendBytesPerMinute;
             _lastResync = now;
             
-            _log.debug("Adding " + (numMinutes*_maxReceiveBytesPerMinute) + " bytes to availableReceive");
-            _log.debug("Adding " + (numMinutes*_maxSendBytesPerMinute) + " bytes to availableSend");
+            if (_log.shouldLog(Log.DEBUG)) {
+                _log.debug("Adding " + (numMinutes*_maxReceiveBytesPerMinute) + " bytes to availableReceive");
+                _log.debug("Adding " + (numMinutes*_maxSendBytesPerMinute) + " bytes to availableSend");
+            }
             
             // if we're huge, trim
             if (_availableReceive > MAX_IN_POOL) {
-                _log.debug("Trimming available receive to " + MAX_IN_POOL);
+                if (_log.shouldLog(Log.DEBUG))
+                    _log.debug("Trimming available receive to " + MAX_IN_POOL);
                 _availableReceive = MAX_IN_POOL;
             }
             if (_availableSend > MAX_OUT_POOL) {
-                _log.debug("Trimming available send to " + MAX_OUT_POOL);
+                if (_log.shouldLog(Log.DEBUG))
+                    _log.debug("Trimming available send to " + MAX_OUT_POOL);
                 _availableSend = MAX_OUT_POOL;
             }
             
