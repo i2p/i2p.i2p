@@ -13,7 +13,7 @@
         <echo message="  prepWEB:   pull down the Jetty libraries and whatever they depend on for the router console web application" />
         <echo message="  buildWEB:  build the router console web application (depends upon prepWEB)" />
     </target>
-    <target name="dist" depends="distclean, build, prepWEB, buildWEB, javadoc" />
+    <target name="dist" depends="distclean, build, buildWEB, javadoc" />
     <target name="build" depends="builddep, jar" />
     <target name="buildclean" depends="distclean, build" />
     <target name="builddep">
