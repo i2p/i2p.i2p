@@ -109,7 +109,7 @@ class JobQueueRunner implements Runnable {
                 if (_log.shouldLog(Log.CRIT))
                     _log.log(Log.CRIT, "Router ran out of memory, shutting down", oom);
                 _log.log(Log.CRIT, _currentJob.getClass().getName());
-                _context.router().shutdown();
+                _context.router().shutdown(Router.EXIT_OOM);
             } catch (Throwable t) {	
                 System.err.println("***Router ran out of memory, shutting down hard");
             }

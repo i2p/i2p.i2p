@@ -106,7 +106,7 @@ public class Router {
                         // gobble
                     }
                 }
-                shutdown(); 
+                shutdown(EXIT_OOM); 
             }
         };
         _shutdownHook = new ShutdownHook();
@@ -534,7 +534,11 @@ public class Router {
         buf.setLength(0);
     }
     
-    public void shutdown() {
+    public static final int EXIT_GRACEFUL = 2;
+    public static final int EXIT_HARD = 3;
+    public static final int EXIT_OOM = 10;
+    
+    public void shutdown(int exitCode) {
         _isAlive = false;
         I2PThread.removeOOMEventListener(_oomListener);
         try { _context.jobQueue().shutdown(); } catch (Throwable t) { _log.log(Log.CRIT, "Error shutting down the job queue", t); }
@@ -550,11 +554,11 @@ public class Router {
         try { _sessionKeyPersistenceHelper.shutdown(); } catch (Throwable t) { _log.log(Log.CRIT, "Error shutting down the session key manager", t); }
         _context.listContexts().remove(_context);
         dumpStats();
-        _log.log(Log.CRIT, "Shutdown complete", new Exception("Shutdown"));
+        _log.log(Log.CRIT, "Shutdown(" + exitCode + ") complete", new Exception("Shutdown"));
         try { _context.logManager().shutdown(); } catch (Throwable t) { }
         if (_killVMOnEnd) {
             try { Thread.sleep(1000); } catch (InterruptedException ie) {}
-            Runtime.getRuntime().halt(-1);
+            Runtime.getRuntime().halt(exitCode);
         }
     }
     
@@ -603,7 +607,7 @@ public class Router {
                     if (_context.tunnelManager().getParticipatingCount() <= 0) {
                         if (_log.shouldLog(Log.CRIT))
                             _log.log(Log.CRIT, "Graceful shutdown progress - no more tunnels, safe to die");
-                        shutdown();
+                        shutdown(EXIT_GRACEFUL);
                         return;
                     } else {
                         try {
@@ -693,7 +697,7 @@ public class Router {
         public void run() {
             setName("Router " + _id + " shutdown");
             _log.log(Log.CRIT, "Shutting down the router...");
-            shutdown();
+            shutdown(EXIT_HARD);
         }
     }
     

@@ -11,6 +11,7 @@ import java.util.Set;
 
 import net.i2p.data.Hash;
 import net.i2p.router.RouterContext;
+import net.i2p.router.Router;
 import net.i2p.util.I2PThread;
 import net.i2p.util.Log;
 
@@ -135,7 +136,7 @@ class AdminRunner implements Runnable {
             I2PThread t = new I2PThread(new Runnable() {
                 public void run() { 
                     try { Thread.sleep(30*1000); } catch (InterruptedException ie) {}
-                    _context.router().shutdown();
+                    _context.router().shutdown(Router.EXIT_HARD);
                 }
             });
             t.start();
