@@ -2,7 +2,7 @@ v1.15	2004-06-23
 	* Added a new example program, warhammer-dgram (use with caution)
 	* Fixed some fatal bugs in datagram handling
 	* Added another error return type named SAM_TOO_BIG - some functions now
-		return samerr_t instead of bool now
+		return samerr_t instead of bool
 
 v1.10	2004-06-16
 	* Changed sam_strerror() to work the same as the standard library strerror()
