@@ -270,6 +270,22 @@ public class DataHelper {
             val[numBytes-i-1] = (byte)(value >>> (i*8));
         return val;
     }
+    
+    public static long fromLong(byte src[], int offset, int numBytes) {
+        if ( (src == null) || (src.length == 0) )
+            return 0;
+        
+        long rv = 0;
+        for (int i = 0; i < numBytes; i++) {
+            long cur = src[offset+i] & 0xFF;
+            if (cur < 0) cur = cur+256;
+            cur = (cur << (8*(numBytes-i-1)));
+            rv += cur;
+        }
+        if (rv < 0)
+            throw new IllegalArgumentException("wtf, fromLong got a negative? " + rv + ": offset="+ offset +" numBytes="+numBytes);
+        return rv;
+    }
 
     public static void main(String args[]) {
         for (int i = 0; i <= 0xFF; i++)
@@ -296,6 +312,10 @@ public class DataHelper {
             byte extract[] = toLong(numBytes, value);
             if (!eq(written, extract))
                 throw new RuntimeException("testLong("+numBytes+","+value+") FAILED");
+            
+            long read = fromLong(extract, 0, extract.length);
+            if (read != value)
+                throw new RuntimeException("testLong("+numBytes+","+value+") FAILED on read (" + read + ")");
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage());
         }
@@ -335,6 +355,13 @@ public class DataHelper {
             return toLong(DATE_LENGTH, 0L);
         else
             return toLong(DATE_LENGTH, date.getTime());
+    }
+    public static Date fromDate(byte src[], int offset) throws IllegalArgumentException {
+        long when = fromLong(src, offset, DATE_LENGTH);
+        if (when <= 0) 
+            return null;
+        else
+            return new Date(when);
     }
     
     public static final int DATE_LENGTH = 8;
@@ -671,9 +698,12 @@ public class DataHelper {
 
     /** decompress the GZIP compressed data (returning null on error) */
     public static byte[] decompress(byte orig[]) throws IOException {
+        return decompress(orig, 0, orig.length);
+    }
+    public static byte[] decompress(byte orig[], int offset, int length) throws IOException {
         if ((orig == null) || (orig.length <= 0)) return orig;
-        GZIPInputStream in = new GZIPInputStream(new ByteArrayInputStream(orig), orig.length);
-        ByteArrayOutputStream baos = new ByteArrayOutputStream(orig.length * 2);
+        GZIPInputStream in = new GZIPInputStream(new ByteArrayInputStream(orig, offset, length), length);
+        ByteArrayOutputStream baos = new ByteArrayOutputStream(length * 2);
         byte buf[] = new byte[4 * 1024];
         while (true) {
             int read = in.read(buf);

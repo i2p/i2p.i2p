@@ -57,27 +57,32 @@ public class DatabaseSearchReplyMessage extends I2NPMessageImpl {
     public Hash getFromHash() { return _from; }
     public void setFromHash(Hash from) { _from = from; }
     
-    public void readMessage(InputStream in, int type) throws I2NPMessageException, IOException {
+    public void readMessage(byte data[], int offset, int dataSize, int type) throws I2NPMessageException, IOException {
         if (type != MESSAGE_TYPE) throw new I2NPMessageException("Message type is incorrect for this message");
-        try {
-            _key = new Hash();
-            _key.readBytes(in);
-            
-            int num = (int)DataHelper.readLong(in, 1);
-            _peerHashes.clear();
-            for (int i = 0; i < num; i++) {
-                Hash peer = new Hash();
-                peer.readBytes(in);
-                addReply(peer);
-            }
-            
-            _from = new Hash();
-            _from.readBytes(in);
-
-            _context.statManager().addRateData("netDb.searchReplyMessageReceive", num*32 + 64, 1);
-        } catch (DataFormatException dfe) {
-            throw new I2NPMessageException("Unable to load the message data", dfe);
+        int curIndex = offset;
+        
+        byte keyData[] = new byte[Hash.HASH_LENGTH];
+        System.arraycopy(data, curIndex, keyData, 0, Hash.HASH_LENGTH);
+        curIndex += Hash.HASH_LENGTH;
+        _key = new Hash(keyData);
+        
+        int num = (int)DataHelper.fromLong(data, curIndex, 1);
+        curIndex++;
+        
+        _peerHashes.clear();
+        for (int i = 0; i < num; i++) {
+            byte peer[] = new byte[Hash.HASH_LENGTH];
+            System.arraycopy(data, curIndex, peer, 0, Hash.HASH_LENGTH);
+            curIndex += Hash.HASH_LENGTH;
+            addReply(new Hash(peer));
         }
+            
+        byte from[] = new byte[Hash.HASH_LENGTH];
+        System.arraycopy(data, curIndex, from, 0, Hash.HASH_LENGTH);
+        curIndex += Hash.HASH_LENGTH;
+        _from = new Hash(from);
+
+        _context.statManager().addRateData("netDb.searchReplyMessageReceive", num*32 + 64, 1);
     }
     
     /** calculate the message body's length (not including the header and footer */

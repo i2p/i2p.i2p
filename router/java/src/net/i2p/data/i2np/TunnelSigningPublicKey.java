@@ -28,7 +28,8 @@ public class TunnelSigningPublicKey extends DataStructureImpl {
     private final static Log _log = new Log(TunnelSigningPublicKey.class);
     private SigningPublicKey _key;
     
-    public TunnelSigningPublicKey() { setKey(null); }
+    public TunnelSigningPublicKey() { this(null); }
+    public TunnelSigningPublicKey(SigningPublicKey key) { setKey(key); }
     
     public SigningPublicKey getKey() { return _key; }
     public void setKey(SigningPublicKey key) { _key= key; }

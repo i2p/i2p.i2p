@@ -35,17 +35,15 @@ public class GarlicMessage extends I2NPMessageImpl {
     public byte[] getData() { return _data; }
     public void setData(byte[] data) { _data = data; }
     
-    public void readMessage(InputStream in, int type) throws I2NPMessageException, IOException {
+    public void readMessage(byte data[], int offset, int dataSize, int type) throws I2NPMessageException, IOException {
         if (type != MESSAGE_TYPE) throw new I2NPMessageException("Message type is incorrect for this message");
-        try {
-            long len = DataHelper.readLong(in, 4);
-            _data = new byte[(int)len];
-            int read = read(in, _data);
-            if (read != len)
-                throw new I2NPMessageException("Incorrect size read [" + read + " read, expected " + len + "]");
-        } catch (DataFormatException dfe) {
-            throw new I2NPMessageException("Unable to load the message data", dfe);
-        }
+        int curIndex = offset;
+        
+        long len = DataHelper.fromLong(data, curIndex, 4);
+        curIndex += 4;
+        if ( (len <= 0) || (len > 64*1024) ) throw new I2NPMessageException("size="+len);
+        _data = new byte[(int)len];
+        System.arraycopy(data, curIndex, _data, 0, (int)len);
     }
     
     /** calculate the message body's length (not including the header and footer */

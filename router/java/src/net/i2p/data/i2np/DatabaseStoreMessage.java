@@ -119,44 +119,57 @@ public class DatabaseStoreMessage extends I2NPMessageImpl {
     public Hash getReplyGateway() { return _replyGateway; }
     public void setReplyGateway(Hash peer) { _replyGateway = peer; }
     
-    public void readMessage(InputStream in, int type) throws I2NPMessageException, IOException {
+    public void readMessage(byte data[], int offset, int dataSize, int type) throws I2NPMessageException, IOException {
         if (type != MESSAGE_TYPE) throw new I2NPMessageException("Message type is incorrect for this message");
-        try {
-            _key = new Hash();
-            _key.readBytes(in);
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Hash read: " + _key.toBase64());
-            _type = (int)DataHelper.readLong(in, 1);
-            _replyToken = DataHelper.readLong(in, 4);
-            if (_replyToken > 0) {
-                _replyTunnel = new TunnelId();
-                _replyTunnel.readBytes(in);
-                _replyGateway = new Hash();
-                _replyGateway.readBytes(in);
-            } else {
-                _replyTunnel = null;
-                _replyGateway = null;
+        int curIndex = offset;
+        
+        byte keyData[] = new byte[Hash.HASH_LENGTH];
+        System.arraycopy(data, curIndex, keyData, 0, Hash.HASH_LENGTH);
+        curIndex += Hash.HASH_LENGTH;
+        _key = new Hash(keyData);
+        
+        _type = (int)DataHelper.fromLong(data, curIndex, 1);
+        curIndex++;
+        
+        _replyToken = DataHelper.fromLong(data, curIndex, 4);
+        curIndex += 4;
+        
+        if (_replyToken > 0) {
+            _replyTunnel = new TunnelId(DataHelper.fromLong(data, curIndex, 4));
+            curIndex += 4;
+            
+            byte gw[] = new byte[Hash.HASH_LENGTH];
+            System.arraycopy(data, curIndex, gw, 0, Hash.HASH_LENGTH);
+            curIndex += Hash.HASH_LENGTH;
+            _replyGateway = new Hash(gw);
+        } else {
+            _replyTunnel = null;
+            _replyGateway = null;
+        }
+        
+        if (_type == KEY_TYPE_LEASESET) {
+            _leaseSet = new LeaseSet();
+            try {
+                _leaseSet.readBytes(new ByteArrayInputStream(data, curIndex, data.length-curIndex));
+            } catch (DataFormatException dfe) {
+                throw new I2NPMessageException("Error reading the leaseSet", dfe);
             }
-            if (_type == KEY_TYPE_LEASESET) {
-                _leaseSet = new LeaseSet();
-                _leaseSet.readBytes(in);
-            } else if (_type == KEY_TYPE_ROUTERINFO) {
-                _info = new RouterInfo();
-                int compressedSize = (int)DataHelper.readLong(in, 2);
-                byte compressed[] = new byte[compressedSize];
-                int read = DataHelper.read(in, compressed);
-                if (read != compressedSize)
-                    throw new I2NPMessageException("Invalid compressed data size (expected " 
-                                                   + compressedSize + " read " + read + ")");
-                ByteArrayInputStream bais = new ByteArrayInputStream(DataHelper.decompress(compressed));
-                _info.readBytes(bais);
-            } else {
-                throw new I2NPMessageException("Invalid type of key read from the structure - " + _type);
+        } else if (_type == KEY_TYPE_ROUTERINFO) {
+            _info = new RouterInfo();
+            int compressedSize = (int)DataHelper.fromLong(data, curIndex, 2);
+            curIndex += 2;
+            
+            byte decompressed[] = DataHelper.decompress(data, curIndex, compressedSize);
+            try {
+                _info.readBytes(new ByteArrayInputStream(decompressed));
+            } catch (DataFormatException dfe) {
+                throw new I2NPMessageException("Error reading the routerInfo", dfe);
             }
-        } catch (DataFormatException dfe) {
-            throw new I2NPMessageException("Unable to load the message data", dfe);
+        } else {
+            throw new I2NPMessageException("Invalid type of key read from the structure - " + _type);
         }
     }
+    
     
     /** calculate the message body's length (not including the header and footer */
     protected int calculateWrittenLength() { 

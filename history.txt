@@ -1,4 +1,11 @@
-$Id: history.txt,v 1.37 2004/10/06 16:03:52 jrandom Exp $
+$Id: history.txt,v 1.38 2004/10/07 14:19:52 jrandom Exp $
+
+2004-10-07  jrandom
+    * Reimplement the I2NP reading with less temporary memory allocation.
+      There is still significant GC churn, especially under load, but this
+      should help.
+    * Catch some oddball errors in the transport (message timeout while 
+      establishing).
 
 2004-10-07  jrandom
     * Expire queued messages even when the writer is blocked.

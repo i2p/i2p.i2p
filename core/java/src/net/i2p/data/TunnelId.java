@@ -35,12 +35,25 @@ public class TunnelId extends DataStructureImpl {
     public final static int TYPE_PARTICIPANT = 3;
     
     public TunnelId() { 
-	setTunnelId(-1); 
-	setType(TYPE_UNSPECIFIED);
+        _tunnelId = -1;
+        _type = TYPE_UNSPECIFIED;
+    }
+    public TunnelId(long id) { 
+        if (id <= 0) throw new IllegalArgumentException("wtf, tunnelId " + id);
+        _tunnelId = id;
+        _type = TYPE_UNSPECIFIED;
+    }
+    public TunnelId(long id, int type) { 
+        if (id <= 0) throw new IllegalArgumentException("wtf, tunnelId " + id);
+        _tunnelId = id;
+        _type = type;
     }
     
     public long getTunnelId() { return _tunnelId; }
-    public void setTunnelId(long id) { _tunnelId = id; }
+    public void setTunnelId(long id) { 
+        _tunnelId = id; 
+        if (id <= 0) throw new IllegalArgumentException("wtf, tunnelId " + id);
+    }
     
     /** 
      * is this tunnel inbound, outbound, or a participant (kept in memory only and used only for the router).s

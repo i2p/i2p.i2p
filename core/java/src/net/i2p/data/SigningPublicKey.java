@@ -29,9 +29,8 @@ public class SigningPublicKey extends DataStructureImpl {
 
     public final static int KEYSIZE_BYTES = 128;
 
-    public SigningPublicKey() {
-        setData(null);
-    }
+    public SigningPublicKey() { this(null); }
+    public SigningPublicKey(byte data[]) { setData(data); }
 
     public byte[] getData() {
         return _data;

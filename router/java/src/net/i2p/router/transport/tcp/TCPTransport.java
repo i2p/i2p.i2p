@@ -287,6 +287,7 @@ public class TCPTransport extends TransportImpl {
             con.setTransport(this);
             con.closeConnection();
         } else {
+            con.setTransport(this);
         
             if (waitingMsgs != null) {
                 for (int i = 0; i < waitingMsgs.size(); i++) {
@@ -296,7 +297,6 @@ public class TCPTransport extends TransportImpl {
 
             _context.shitlist().unshitlistRouter(ident.calculateHash());
 
-            con.setTransport(this);
             con.runConnection();
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Connection set to run");

@@ -28,11 +28,27 @@ public interface I2NPMessage extends DataStructure {
      *
      * @param in stream to read from
      * @param type I2NP message type
+     * @param buffer scratch buffer to be used when reading and parsing
      * @throws I2NPMessageException if the stream doesn't contain a valid message
      *          that this class can read.
      * @throws IOException if there is a problem reading from the stream
      */
-    public void readBytes(InputStream in, int type) throws I2NPMessageException, IOException;
+    public void readBytes(InputStream in, int type, byte buffer[]) throws I2NPMessageException, IOException;
+    
+    /**
+     * Read the body into the data structures, after the initial type byte and
+     * the uniqueId / expiration, using the current class's format as defined by
+     * the I2NP specification
+     *
+     * @param data data to read from
+     * @param offset where to start in the data array
+     * @param dataSize how long into the data to read
+     * @param type I2NP message type
+     * @throws I2NPMessageException if the stream doesn't contain a valid message
+     *          that this class can read.
+     * @throws IOException if there is a problem reading from the stream
+     */
+    public void readMessage(byte data[], int offset, int dataSize, int type) throws I2NPMessageException, IOException;
     
     /**
      * Return the unique identifier for this type of I2NP message, as defined in

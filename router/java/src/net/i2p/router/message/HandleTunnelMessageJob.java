@@ -396,8 +396,8 @@ public class HandleTunnelMessageJob extends JobImpl {
                 _log.error("Error parsing the message body", ime);
         } catch (IOException ioe) {
             if (_log.shouldLog(Log.ERROR))
-                _log.error("Error reading the message body", ioe);
-        } 
+                _log.error("Error parsing the message body", ioe);
+        }
         return null;
     }
     

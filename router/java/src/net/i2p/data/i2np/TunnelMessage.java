@@ -46,7 +46,9 @@ public class TunnelMessage extends I2NPMessageImpl {
     }
     
     public TunnelId getTunnelId() { return _tunnelId; }
-    public void setTunnelId(TunnelId id) { _tunnelId = id; }
+    public void setTunnelId(TunnelId id) { 
+        _tunnelId = id; 
+    }
     
     public byte[] getData() { return _data; }
     public void setData(byte data[]) { 
@@ -61,33 +63,42 @@ public class TunnelMessage extends I2NPMessageImpl {
     public byte[] getEncryptedDeliveryInstructions() { return _encryptedInstructions; }
     public void setEncryptedDeliveryInstructions(byte instructions[]) { _encryptedInstructions = instructions; }
     
-    public void readMessage(InputStream in, int type) throws I2NPMessageException, IOException {
+    public void readMessage(byte data[], int offset, int dataSize, int type) throws I2NPMessageException, IOException {
         if (type != MESSAGE_TYPE) throw new I2NPMessageException("Message type is incorrect for this message");
-        try {
-            _tunnelId = new TunnelId();
-            _tunnelId.readBytes(in);
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Read tunnel message for tunnel " + _tunnelId);
-            _size = DataHelper.readLong(in, 4);
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Read tunnel message size: " + _size);
-            if (_size < 0) throw new I2NPMessageException("Invalid size in the structure: " + _size);
-            _data = new byte[(int)_size];
-            int read = read(in, _data);
-            if (read != _size)
-                throw new I2NPMessageException("Incorrect number of bytes read (" + read + ", expected " + _size);
-            int includeVerification = (int)DataHelper.readLong(in, 1);
-            if (includeVerification == FLAG_INCLUDESTRUCTURE) {
-                _verification = new TunnelVerificationStructure();
-                _verification.readBytes(in);
-                int len = (int)DataHelper.readLong(in, 2);
-                _encryptedInstructions = new byte[len];
-                read = read(in, _encryptedInstructions);
-                if (read != len)
-                    throw new I2NPMessageException("Incorrect number of bytes read for instructions (" + read + ", expected " + len + ")");
-            }
-        } catch (DataFormatException dfe) {
-            throw new I2NPMessageException("Unable to load the message data", dfe);
+        int curIndex = offset;
+        
+        _tunnelId = new TunnelId(DataHelper.fromLong(data, curIndex, 4));
+        curIndex += 4;
+        
+        if (_tunnelId.getTunnelId() <= 0) 
+            throw new I2NPMessageException("Invalid tunnel Id " + _tunnelId);
+        
+        _size = DataHelper.fromLong(data, curIndex, 4);
+        curIndex += 4;
+
+        if (_size < 0) throw new I2NPMessageException("Invalid size in the structure: " + _size);
+        if (_size > 64*1024) throw new I2NPMessageException("Invalid size in the structure: " + _size);
+        _data = new byte[(int)_size];
+        System.arraycopy(data, curIndex, _data, 0, (int)_size);
+        curIndex += _size;
+        
+        int includeVerification = (int)DataHelper.fromLong(data, curIndex, 1);
+        curIndex++;
+        if (includeVerification == FLAG_INCLUDESTRUCTURE) {
+            byte vHash[] = new byte[Hash.HASH_LENGTH];
+            System.arraycopy(data, curIndex, vHash, 0, Hash.HASH_LENGTH);
+            curIndex += Hash.HASH_LENGTH;
+            byte vSig[] = new byte[Signature.SIGNATURE_BYTES];
+            System.arraycopy(data, curIndex, vSig, 0, Signature.SIGNATURE_BYTES);
+            curIndex += Signature.SIGNATURE_BYTES;
+            _verification = new TunnelVerificationStructure(new Hash(vHash), new Signature(vSig));
+            
+            int len = (int)DataHelper.fromLong(data, curIndex, 2);
+            curIndex += 2;
+            if ( (len <= 0) || (len > 4*1024) ) throw new I2NPMessageException("wtf, size of instructions: " + len);
+            _encryptedInstructions = new byte[len];
+            System.arraycopy(data, curIndex, _encryptedInstructions, 0, len);
+            curIndex += len;
         }
     }
     

@@ -124,35 +124,53 @@ public class DatabaseLookupMessage extends I2NPMessageImpl {
             _dontIncludePeers = null;
     }
     
-    public void readMessage(InputStream in, int type) throws I2NPMessageException, IOException {
+    public void readMessage(byte data[], int offset, int dataSize, int type) throws I2NPMessageException, IOException {
         if (type != MESSAGE_TYPE) throw new I2NPMessageException("Message type is incorrect for this message");
-        try {
-            _key = new Hash();
-            _key.readBytes(in);
-            _fromHash = new Hash();
-            _fromHash.readBytes(in);
-            Boolean val = DataHelper.readBoolean(in);
-            if (val == null) 
+        int curIndex = offset;
+        
+        byte keyData[] = new byte[Hash.HASH_LENGTH];
+        System.arraycopy(data, curIndex, keyData, 0, Hash.HASH_LENGTH);
+        curIndex += Hash.HASH_LENGTH;
+        _key = new Hash(keyData);
+        
+        byte fromData[] = new byte[Hash.HASH_LENGTH];
+        System.arraycopy(data, curIndex, fromData, 0, Hash.HASH_LENGTH);
+        curIndex += Hash.HASH_LENGTH;
+        _fromHash = new Hash(fromData);
+        
+        boolean tunnelSpecified = false;
+        switch (data[curIndex]) {
+            case DataHelper.BOOLEAN_TRUE:
+                tunnelSpecified = true;
+                break;
+            case DataHelper.BOOLEAN_FALSE:
+                tunnelSpecified = false;
+                break;
+            default:
                 throw new I2NPMessageException("Tunnel must be explicitly specified (or not)");
-            boolean tunnelSpecified = val.booleanValue();
-            if (tunnelSpecified) {
-                _replyTunnel = new TunnelId();
-                _replyTunnel.readBytes(in);
-            }
-            int numPeers = (int)DataHelper.readLong(in, 2);
-            if ( (numPeers < 0) || (numPeers >= (1<<16) ) )
-                throw new DataFormatException("Invalid number of peers - " + numPeers);
-            Set peers = new HashSet(numPeers);
-            for (int i = 0; i < numPeers; i++) {
-                Hash peer = new Hash();
-                peer.readBytes(in);
-                peers.add(peer);
-            }
-            _dontIncludePeers = peers;
-        } catch (DataFormatException dfe) {
-            throw new I2NPMessageException("Unable to load the message data", dfe);
         }
+        curIndex++;
+        
+        if (tunnelSpecified) {
+            _replyTunnel = new TunnelId(DataHelper.fromLong(data, curIndex, 4));
+            curIndex += 4;
+        }
+        
+        int numPeers = (int)DataHelper.fromLong(data, curIndex, 2);
+        curIndex += 2;
+        
+        if ( (numPeers < 0) || (numPeers >= (1<<16) ) )
+            throw new I2NPMessageException("Invalid number of peers - " + numPeers);
+        Set peers = new HashSet(numPeers);
+        for (int i = 0; i < numPeers; i++) {
+            byte peer[] = new byte[Hash.HASH_LENGTH];
+            System.arraycopy(data, curIndex, peer, 0, Hash.HASH_LENGTH);
+            curIndex += Hash.HASH_LENGTH;
+            peers.add(new Hash(peer));
+        }
+        _dontIncludePeers = peers;
     }
+
     
     protected int calculateWrittenLength() {
         int totalLength = 0;

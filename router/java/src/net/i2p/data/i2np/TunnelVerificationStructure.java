@@ -29,9 +29,10 @@ public class TunnelVerificationStructure extends DataStructureImpl {
     private Hash _msgHash;
     private Signature _authSignature;
     
-    public TunnelVerificationStructure() {
-        setMessageHash(null);
-        setAuthorizationSignature(null);
+    public TunnelVerificationStructure() { this(null, null); }
+    public TunnelVerificationStructure(Hash messageHash, Signature authSig) {
+        setMessageHash(messageHash);
+        setAuthorizationSignature(authSig);
     }
     
     public Hash getMessageHash() { return _msgHash; }

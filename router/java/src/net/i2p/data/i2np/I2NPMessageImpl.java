@@ -44,29 +44,15 @@ public abstract class I2NPMessageImpl extends DataStructureImpl implements I2NPM
         _context.statManager().createRateStat("i2np.readTime", "How long it takes to read an I2NP message", "I2NP", new long[] { 10*60*1000, 60*60*1000 });
     }
     
-    /**
-     * Read the body into the data structures, after the initial type byte and
-     * the uniqueId / expiration, using the current class's format as defined by
-     * the I2NP specification
-     *
-     * @param in stream to read from
-     * @param type I2NP message type
-     * @throws I2NPMessageException if the stream doesn't contain a valid message
-     *          that this class can read.
-     * @throws IOException if there is a problem reading from the stream
-     */
-    protected abstract void readMessage(InputStream in, int type) throws I2NPMessageException, IOException;
-    
     public void readBytes(InputStream in) throws DataFormatException, IOException {
         try {
-            readBytes(in, -1);
+            readBytes(in, -1, new byte[1024]);
         } catch (I2NPMessageException ime) {
             throw new DataFormatException("Bad bytes", ime);
         }
     }
-    public void readBytes(InputStream in, int type) throws I2NPMessageException, IOException {
+    public void readBytes(InputStream in, int type, byte buffer[]) throws I2NPMessageException, IOException {
         try {
-            long start = _context.clock().now();
             if (type < 0)
                 type = (int)DataHelper.readLong(in, 1);
             _uniqueId = DataHelper.readLong(in, 4);
@@ -74,17 +60,28 @@ public abstract class I2NPMessageImpl extends DataStructureImpl implements I2NPM
             int size = (int)DataHelper.readLong(in, 2);
             Hash h = new Hash();
             h.readBytes(in);
-            byte data[] = new byte[size];
-            int read = DataHelper.read(in, data);
-            if (read != size)
-                throw new I2NPMessageException("Payload is too short [" + read + ", wanted " + size + "]");
-            Hash calc = _context.sha().calculateHash(data);
+            if (buffer.length < size) {
+                if (size > 64*1024) throw new I2NPMessageException("size=" + size);
+                buffer = new byte[size];
+            }
+            
+            int cur = 0;
+            while (cur < size) {
+                int numRead = in.read(buffer, cur, size- cur);
+                if (numRead == -1) {
+                    throw new I2NPMessageException("Payload is too short [" + numRead + ", wanted " + size + "]");
+                }
+                cur += numRead;
+            }
+            
+            Hash calc = _context.sha().calculateHash(buffer, 0, size);
             if (!calc.equals(h))
                 throw new I2NPMessageException("Hash does not match");
 
+            long start = _context.clock().now();
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Reading bytes: type = " + type + " / uniqueId : " + _uniqueId + " / expiration : " + _expiration);
-            readMessage(new ByteArrayInputStream(data), type);
+            readMessage(buffer, 0, size, type);
             long time = _context.clock().now() - start;
             if (time > 50)
                 _context.statManager().addRateData("i2np.readTime", time, time);

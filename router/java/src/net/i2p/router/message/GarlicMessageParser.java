@@ -46,7 +46,8 @@ public class GarlicMessageParser {
             _log.warn("Error decrypting", dfe);
         }
         if (decrData == null) {
-            _log.debug("Decryption of garlic message failed");
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Decryption of garlic message failed (data = " + encData + ")", new Exception("Decrypt fail"));
             return null;
         } else {
             return readCloveSet(decrData);

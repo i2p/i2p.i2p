@@ -68,6 +68,10 @@ class ConnectionRunner implements Runnable {
                 buf = m.toByteArray();
                 written = buf.length;
             }
+        } catch (Exception e) {
+            _log.log(Log.CRIT, "getting the message data", e);
+            _con.closeConnection();
+            return;
         }
         if (written <= 0) {
             if (_log.shouldLog(Log.WARN))

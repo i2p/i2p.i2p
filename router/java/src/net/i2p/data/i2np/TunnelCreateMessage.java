@@ -128,54 +128,101 @@ public class TunnelCreateMessage extends I2NPMessageImpl {
     public void setReplyPeer(Hash peer) { _replyPeer = peer; }
     public Hash getReplyPeer() { return _replyPeer; }
     
-    public void readMessage(InputStream in, int type) throws I2NPMessageException, IOException {
+    public void readMessage(byte data[], int offset, int dataSize, int type) throws I2NPMessageException, IOException {
         if (type != MESSAGE_TYPE) throw new I2NPMessageException("Message type is incorrect for this message");
-        try {
-            _participantType = (int)DataHelper.readLong(in, 1);
-            if (_participantType != PARTICIPANT_TYPE_ENDPOINT) {
-                _nextRouter = new Hash();
-                _nextRouter.readBytes(in);
-                _nextTunnelId = new TunnelId();
-                _nextTunnelId.readBytes(in);
-            }
-            _tunnelId = new TunnelId();
-            _tunnelId.readBytes(in);
-            _tunnelDuration = DataHelper.readLong(in, 4);
-            _configKey = new TunnelConfigurationSessionKey();
-            _configKey.readBytes(in);
-            _maxPeakMessagesPerMin = DataHelper.readLong(in, 4);
-            _maxAvgMessagesPerMin = DataHelper.readLong(in, 4);
-            _maxPeakBytesPerMin = DataHelper.readLong(in, 4);
-            _maxAvgBytesPerMin = DataHelper.readLong(in, 4);
+        int curIndex = offset;
+    
+        _participantType = (int)DataHelper.fromLong(data, curIndex, 1);
+        curIndex++;
+        if (_participantType != PARTICIPANT_TYPE_ENDPOINT) {
+            byte peer[] = new byte[Hash.HASH_LENGTH];
+            System.arraycopy(data, curIndex, peer, 0, Hash.HASH_LENGTH);
+            curIndex += Hash.HASH_LENGTH;
+            _nextRouter = new Hash(peer);
             
-            int flags = (int)DataHelper.readLong(in, 1);
-            _includeDummyTraffic = flagsIncludeDummy(flags);
-            _reorderMessages = flagsReorder(flags);
-            
-            _verificationPubKey = new TunnelSigningPublicKey();
-            _verificationPubKey.readBytes(in);
-            if (_participantType == PARTICIPANT_TYPE_GATEWAY) {
-                _verificationPrivKey = new TunnelSigningPrivateKey();
-                _verificationPrivKey.readBytes(in);
-            }
-            if ( (_participantType == PARTICIPANT_TYPE_ENDPOINT) || (_participantType == PARTICIPANT_TYPE_GATEWAY) ) {
-                _tunnelKey = new TunnelSessionKey();
-                _tunnelKey.readBytes(in);
-            }
-            _certificate = new Certificate();
-            _certificate.readBytes(in);
-            _replyTag = new SessionTag();
-            _replyTag.readBytes(in);
-            _replyKey = new SessionKey();
-            _replyKey.readBytes(in);
-            _replyTunnel = new TunnelId();
-            _replyTunnel.readBytes(in);
-            _replyPeer = new Hash();
-            _replyPeer.readBytes(in);
-        } catch (DataFormatException dfe) {
-            throw new I2NPMessageException("Unable to load the message data", dfe);
+            _nextTunnelId = new TunnelId(DataHelper.fromLong(data, curIndex, 4));
+            curIndex += 4;
         }
+        
+        _tunnelId = new TunnelId(DataHelper.fromLong(data, curIndex, 4));
+        curIndex += 4;
+        if (_tunnelId.getTunnelId() <= 0)
+            throw new I2NPMessageException("wtf, tunnelId == " + _tunnelId);
+        
+        _tunnelDuration = DataHelper.fromLong(data, curIndex, 4);
+        curIndex += 4;
+        
+        byte key[] = new byte[SessionKey.KEYSIZE_BYTES];
+        System.arraycopy(data, curIndex, key, 0, SessionKey.KEYSIZE_BYTES);
+        curIndex += SessionKey.KEYSIZE_BYTES;
+        _configKey = new TunnelConfigurationSessionKey(new SessionKey(key));
+        
+        _maxPeakMessagesPerMin = DataHelper.fromLong(data, curIndex, 4); 
+        curIndex += 4;
+        _maxAvgMessagesPerMin =  DataHelper.fromLong(data, curIndex, 4); 
+        curIndex += 4;
+        _maxPeakBytesPerMin =  DataHelper.fromLong(data, curIndex, 4); 
+        curIndex += 4;
+        _maxAvgBytesPerMin =  DataHelper.fromLong(data, curIndex, 4); 
+        curIndex += 4;
+        
+        int flags = (int)DataHelper.fromLong(data, curIndex, 1);
+        curIndex++;
+        _includeDummyTraffic = flagsIncludeDummy(flags);
+        _reorderMessages = flagsReorder(flags);
+            
+        key = new byte[SigningPublicKey.KEYSIZE_BYTES];
+        System.arraycopy(data, curIndex, key, 0, SigningPublicKey.KEYSIZE_BYTES);
+        curIndex += SigningPublicKey.KEYSIZE_BYTES;
+        _verificationPubKey = new TunnelSigningPublicKey(new SigningPublicKey(key)); 
+        
+        if (_participantType == PARTICIPANT_TYPE_GATEWAY) {
+            key = new byte[SigningPrivateKey.KEYSIZE_BYTES];
+            System.arraycopy(data, curIndex, key, 0, SigningPrivateKey.KEYSIZE_BYTES);
+            curIndex += SigningPrivateKey.KEYSIZE_BYTES;
+            _verificationPrivKey = new TunnelSigningPrivateKey(new SigningPrivateKey(key));
+        }
+        
+        if ( (_participantType == PARTICIPANT_TYPE_ENDPOINT) || (_participantType == PARTICIPANT_TYPE_GATEWAY) ) {
+            key = new byte[SessionKey.KEYSIZE_BYTES];
+            System.arraycopy(data, curIndex, key, 0, SessionKey.KEYSIZE_BYTES);
+            curIndex += SessionKey.KEYSIZE_BYTES;
+            _tunnelKey = new TunnelSessionKey(new SessionKey(key));
+        }
+        
+        int certType = (int) DataHelper.fromLong(data, curIndex, 1);
+        curIndex++;
+        int certLength = (int) DataHelper.fromLong(data, curIndex, 2);
+        curIndex += 2;
+        if (certLength <= 0) {
+            _certificate = new Certificate(certType, null);
+        } else {
+            if (certLength > 16*1024) throw new I2NPMessageException("cert size " + certLength);
+            byte certPayload[] = new byte[certLength];
+            System.arraycopy(data, curIndex, certPayload, 0, certLength);
+            curIndex += certLength;
+            _certificate = new Certificate(certType, certPayload);
+        }
+        
+        byte tag[] = new byte[SessionTag.BYTE_LENGTH];
+        System.arraycopy(data, curIndex, tag, 0, SessionTag.BYTE_LENGTH);
+        curIndex += SessionTag.BYTE_LENGTH;
+        _replyTag = new SessionTag(tag);
+        
+        key = new byte[SessionKey.KEYSIZE_BYTES];
+        System.arraycopy(data, curIndex, key, 0, SessionKey.KEYSIZE_BYTES);
+        curIndex += SessionKey.KEYSIZE_BYTES;
+        _replyKey = new SessionKey(key);
+        
+        _replyTunnel = new TunnelId(DataHelper.fromLong(data, curIndex, 4));
+        curIndex += 4;
+        
+        byte peer[] = new byte[Hash.HASH_LENGTH];
+        System.arraycopy(data, curIndex, peer, 0, Hash.HASH_LENGTH);
+        curIndex += Hash.HASH_LENGTH;
+        _replyPeer = new Hash(peer);
     }
+    
     
     /** calculate the message body's length (not including the header and footer */
     protected int calculateWrittenLength() { 

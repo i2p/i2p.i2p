@@ -39,19 +39,15 @@ public class DataMessage extends I2NPMessageImpl {
     
     public int getSize() { return _data.length; }
     
-    public void readMessage(InputStream in, int type) throws I2NPMessageException, IOException {
+    public void readMessage(byte data[], int offset, int dataSize, int type) throws I2NPMessageException, IOException {
         if (type != MESSAGE_TYPE) throw new I2NPMessageException("Message type is incorrect for this message");
-        try {
-            int size = (int)DataHelper.readLong(in, 4);
-            if ( (size <= 0) || (size > MAX_SIZE) )
-                throw new I2NPMessageException("wtf, size out of range?  " + size);
-            _data = new byte[size];
-            int read = read(in, _data);
-            if (read != size)
-                throw new DataFormatException("Not enough bytes to read (read = " + read + ", expected = " + size + ")");
-        } catch (DataFormatException dfe) {
-            throw new I2NPMessageException("Unable to load the message data", dfe);
-        }
+        int curIndex = offset;
+        long size = DataHelper.fromLong(data, curIndex, 4);
+        curIndex += 4;
+        if (size > 64*1024)
+            throw new I2NPMessageException("wtf, size=" + size);
+        _data = new byte[(int)size];
+        System.arraycopy(data, curIndex, _data, 0, (int)size);
     }
     
     /** calculate the message body's length (not including the header and footer */

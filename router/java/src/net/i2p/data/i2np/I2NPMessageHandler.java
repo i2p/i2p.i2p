@@ -26,9 +26,11 @@ public class I2NPMessageHandler {
     private I2PAppContext _context;
     private long _lastReadBegin;
     private long _lastReadEnd;
+    private byte _messageBuffer[];
     public I2NPMessageHandler(I2PAppContext context) {
         _context = context;
         _log = context.logManager().getLog(I2NPMessageHandler.class);
+        _messageBuffer = null;
     }
     
     /**
@@ -39,12 +41,15 @@ public class I2NPMessageHandler {
      *          message - if it is an unknown type or has improper formatting, etc.
      */
     public I2NPMessage readMessage(InputStream in) throws IOException, I2NPMessageException {
+        if (_messageBuffer == null) _messageBuffer = new byte[38*1024]; // more than necessary
         try {
             int type = (int)DataHelper.readLong(in, 1);
             _lastReadBegin = System.currentTimeMillis();
-            I2NPMessage msg = createMessage(in, type);
+            I2NPMessage msg = createMessage(type);
+            if (msg == null)
+                throw new I2NPMessageException("The type "+ type + " is an unknown I2NP message");
             try {
-                msg.readBytes(in, type);
+                msg.readBytes(in, type, _messageBuffer);
             } catch (IOException ioe) {
                 throw ioe;
             } catch (I2NPMessageException ime) {
@@ -61,14 +66,13 @@ public class I2NPMessageHandler {
             throw new I2NPMessageException("Error reading the message", dfe);
         }
     }
-    
     public long getLastReadTime() { return _lastReadEnd - _lastReadBegin; }
     
     /**
      * Yes, this is fairly ugly, but its the only place it ever happens.
      *
      */
-    private I2NPMessage createMessage(InputStream in, int type) throws IOException, I2NPMessageException {
+    private I2NPMessage createMessage(int type) throws I2NPMessageException {
         switch (type) {
             case DatabaseStoreMessage.MESSAGE_TYPE:
                 return new DatabaseStoreMessage(_context);
@@ -89,7 +93,7 @@ public class I2NPMessageHandler {
             case TunnelCreateStatusMessage.MESSAGE_TYPE:
                 return new TunnelCreateStatusMessage(_context);
             default:
-                throw new I2NPMessageException("The type "+ type + " is an unknown I2NP message");
+                return null;
         }
     }
     

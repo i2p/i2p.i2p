@@ -42,14 +42,13 @@ public class DeliveryStatusMessage extends I2NPMessageImpl {
     public Date getArrival() { return _arrival; }
     public void setArrival(Date arrival) { _arrival = arrival; }
     
-    public void readMessage(InputStream in, int type) throws I2NPMessageException, IOException {
+    public void readMessage(byte data[], int offset, int dataSize, int type) throws I2NPMessageException, IOException {
         if (type != MESSAGE_TYPE) throw new I2NPMessageException("Message type is incorrect for this message");
-        try {
-            _id = DataHelper.readLong(in, 4);
-            _arrival = DataHelper.readDate(in);
-        } catch (DataFormatException dfe) {
-            throw new I2NPMessageException("Unable to load the message data", dfe);
-        }
+        int curIndex = offset;
+        
+        _id = DataHelper.fromLong(data, curIndex, 4);
+        curIndex += 4;
+        _arrival = DataHelper.fromDate(data, curIndex);
     }
     
     /** calculate the message body's length (not including the header and footer */

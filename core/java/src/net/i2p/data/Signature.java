@@ -33,9 +33,8 @@ public class Signature extends DataStructureImpl {
             FAKE_SIGNATURE[i] = 0x00;
     }
 
-    public Signature() {
-        setData(null);
-    }
+    public Signature() { this(null); }
+    public Signature(byte data[]) { setData(data); }
 
     public byte[] getData() {
         return _data;

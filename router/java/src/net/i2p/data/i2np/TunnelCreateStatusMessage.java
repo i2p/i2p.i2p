@@ -46,7 +46,11 @@ public class TunnelCreateStatusMessage extends I2NPMessageImpl {
     }
     
     public TunnelId getTunnelId() { return _tunnelId; }
-    public void setTunnelId(TunnelId id) { _tunnelId = id; }
+    public void setTunnelId(TunnelId id) { 
+        _tunnelId = id; 
+        if ( (id != null) && (id.getTunnelId() <= 0) )
+            throw new IllegalArgumentException("wtf, tunnelId " + id);
+    }
     
     public int getStatus() { return _status; }
     public void setStatus(int status) { _status = status; }
@@ -57,19 +61,25 @@ public class TunnelCreateStatusMessage extends I2NPMessageImpl {
     public Hash getFromHash() { return _from; }
     public void setFromHash(Hash from) { _from = from; }
     
-    public void readMessage(InputStream in, int type) throws I2NPMessageException, IOException {
+    public void readMessage(byte data[], int offset, int dataSize, int type) throws I2NPMessageException, IOException {
         if (type != MESSAGE_TYPE) throw new I2NPMessageException("Message type is incorrect for this message");
-        try {
-            _tunnelId = new TunnelId();
-            _tunnelId.readBytes(in);
-            _status = (int)DataHelper.readLong(in, 1);
-            _from = new Hash();
-            _from.readBytes(in);
-        } catch (DataFormatException dfe) {
-            throw new I2NPMessageException("Unable to load the message data", dfe);
-        }
+        int curIndex = offset;
+        
+        _tunnelId = new TunnelId(DataHelper.fromLong(data, curIndex, 4));
+        curIndex += 4;
+        
+        if (_tunnelId.getTunnelId() <= 0)
+            throw new I2NPMessageException("wtf, negative tunnelId? " + _tunnelId);
+        
+        _status = (int)DataHelper.fromLong(data, curIndex, 1);
+        curIndex++;
+        byte peer[] = new byte[Hash.HASH_LENGTH];
+        System.arraycopy(data, curIndex, peer, 0, Hash.HASH_LENGTH);
+        curIndex += Hash.HASH_LENGTH;
+        _from = new Hash(peer);
     }
     
+        
     /** calculate the message body's length (not including the header and footer */
     protected int calculateWrittenLength() { 
         return 4 + 1 + Hash.HASH_LENGTH; // id + status + from
@@ -77,6 +87,7 @@ public class TunnelCreateStatusMessage extends I2NPMessageImpl {
     /** write the message body to the output array, starting at the given index */
     protected int writeMessageBody(byte out[], int curIndex) throws I2NPMessageException {
         if ( (_tunnelId == null) || (_from == null) ) throw new I2NPMessageException("Not enough data to write out");
+        if (_tunnelId.getTunnelId() < 0) throw new I2NPMessageException("Negative tunnelId!? " + _tunnelId);
         
         byte id[] = DataHelper.toLong(4, _tunnelId.getTunnelId());
         System.arraycopy(id, 0, out, curIndex, 4);

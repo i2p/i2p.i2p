@@ -28,7 +28,8 @@ public class TunnelSessionKey extends DataStructureImpl {
     private final static Log _log = new Log(TunnelSessionKey.class);
     private SessionKey _key;
     
-    public TunnelSessionKey() { setKey(null); }
+    public TunnelSessionKey() { this(null); }
+    public TunnelSessionKey(SessionKey key) { setKey(key); }
     
     public SessionKey getKey() { return _key; }
     public void setKey(SessionKey key) { _key= key; }
