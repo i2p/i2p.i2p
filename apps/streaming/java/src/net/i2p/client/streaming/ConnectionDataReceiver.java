@@ -127,4 +127,8 @@ class ConnectionDataReceiver implements MessageOutputStream.DataReceiver {
         public final boolean writeFailed() { return false; }
         public final boolean writeSuccessful() { return true; }
     }    
+    
+    void destroy() {
+        _connection = null;
+    }
 }

@@ -19,12 +19,14 @@ class PacketQueue {
     private I2PAppContext _context;
     private Log _log;
     private I2PSession _session;
+    private ConnectionManager _connectionManager;
     private byte _buf[];
     private ByteCache _cache = ByteCache.getInstance(64, 36*1024);
     
-    public PacketQueue(I2PAppContext context, I2PSession session) {
+    public PacketQueue(I2PAppContext context, I2PSession session, ConnectionManager mgr) {
         _context = context;
         _session = session;
+        _connectionManager = mgr;
         _buf = _cache.acquire().getData(); // new byte[36*1024];
         _log = context.logManager().getLog(PacketQueue.class);
     }
@@ -95,7 +97,7 @@ class PacketQueue {
                              + " con: " + conStr;
                 _log.debug(msg);
             }
-            PacketHandler.displayPacket(packet, "SEND");
+            _connectionManager.getPacketHandler().displayPacket(packet, "SEND");
         }
     }
     

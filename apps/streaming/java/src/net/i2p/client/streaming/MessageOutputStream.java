@@ -198,6 +198,10 @@ public class MessageOutputStream extends OutputStream {
         return;
     }
     
+    void destroy() {
+        _dataReceiver = null;
+    }
+    
     public interface DataReceiver {
         /**
          * Nonblocking write

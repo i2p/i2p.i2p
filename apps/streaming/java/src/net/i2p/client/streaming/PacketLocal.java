@@ -77,12 +77,14 @@ public class PacketLocal extends Packet implements MessageOutputStream.WriteStat
                 _ackOn = _context.clock().now(); 
             notifyAll();
         }
+        _connection = null;
     }
     public void cancelled() { 
         synchronized (this) {
             _cancelledOn = _context.clock().now();
             notifyAll();
         }
+        _connection = null;
     }
     
     /** how long after packet creation was it acked? */
@@ -113,9 +115,11 @@ public class PacketLocal extends Packet implements MessageOutputStream.WriteStat
             _acceptedOn = _context.clock().now();
         else
             _acceptedOn = -1;
+        _connection = null;
     }
     
     public void waitForCompletion(int maxWaitMs) {
+        _connection = null;
         long expiration = _context.clock().now()+maxWaitMs;
         while (true) {
             long timeRemaining = expiration - _context.clock().now();

@@ -36,6 +36,12 @@ public class ConnectionPacketHandler {
         }
         con.getOptions().setChoke(0);
         boolean isNew = con.getInputStream().messageReceived(packet.getSequenceNum(), packet.getPayload());
+        
+        if ( (packet.getSequenceNum() == 0) && (packet.getPayloadSize() > 0) ) {
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("seq=0 && size=" + packet.getPayloadSize() + ": isNew? " + isNew 
+                           + " packet: " + packet + " con: " + con);
+        }
 
         // close *after* receiving the data, as well as after verifying the signatures / etc
         if (packet.isFlagSet(Packet.FLAG_CLOSE) && packet.isFlagSet(Packet.FLAG_SIGNATURE_INCLUDED))
@@ -289,6 +295,8 @@ public class ConnectionPacketHandler {
         }
         public void timeReached() {
             if (_con.getLastSendTime() <= _created) {
+                if (!_con.getIsConnected()) return;
+                
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("Last sent was a while ago, and we want to ack a dup");
                 // we haven't done anything since receiving the dup, send an

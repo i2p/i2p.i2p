@@ -331,17 +331,33 @@ public class Connection {
                 _outboundPackets.clear();
                 _outboundPackets.notifyAll();
             }
-            if (removeFromConMgr) {
-                if (!_disconnectScheduled) {
-                    _disconnectScheduled = true;
-                    SimpleTimer.getInstance().addEvent(new DisconnectEvent(), DISCONNECT_TIMEOUT);
-                }
+        }
+        if (removeFromConMgr) {
+            if (!_disconnectScheduled) {
+                _disconnectScheduled = true;
+                SimpleTimer.getInstance().addEvent(new DisconnectEvent(), DISCONNECT_TIMEOUT);
             }
         }
     }
     
     void disconnectComplete() {
         _connected = false;
+        if (_socket != null)
+            _socket.destroy();
+        _socket = null;
+        _inputStream = null;
+        if (_outputStream != null)
+            _outputStream.destroy();
+        _outputStream = null;
+        _outboundQueue = null;
+        _handler = null;
+        if (_receiver != null)
+            _receiver.destroy();
+        _receiver = null;
+        if (_activityTimer != null)
+            SimpleTimer.getInstance().addEvent(_activityTimer, 1);
+        _activityTimer = null;
+        
         if (!_disconnectScheduled) {
             _disconnectScheduled = true;
             
@@ -539,6 +555,7 @@ public class Connection {
     
     private void resetActivityTimer() {
         if (_options.getInactivityTimeout() <= 0) return;
+        if (_activityTimer == null) return;
         long howLong = _activityTimer.getTimeLeft();
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Resetting the inactivity timer to " + howLong);
@@ -617,12 +634,15 @@ public class Connection {
             buf.append("] ");
         }
         buf.append("unacked inbound? ").append(getUnackedPacketsReceived());
-        buf.append(" [high ").append(_inputStream.getHighestBlockId());
-        long nacks[] = _inputStream.getNacks();
-        if (nacks != null)
-            for (int i = 0; i < nacks.length; i++)
-                buf.append(" ").append(nacks[i]);
-        buf.append("]");
+        if (_inputStream != null) {
+            buf.append(" [high ");
+            buf.append(_inputStream.getHighestBlockId());
+            long nacks[] = _inputStream.getNacks();
+            if (nacks != null)
+                for (int i = 0; i < nacks.length; i++)
+                    buf.append(" ").append(nacks[i]);
+            buf.append("]");
+        }
         buf.append("]");
         return buf.toString();
     }

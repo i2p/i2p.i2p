@@ -148,6 +148,8 @@ public class I2PSocketManagerFull implements I2PSocketManager {
                              throws I2PException, NoRouteToHostException {
         if (_connectionManager.getSession().isClosed()) 
             throw new I2PException("Session is closed");
+        if (options == null)
+            options = _defaultOptions;
         ConnectionOptions opts = null;
         if (options instanceof ConnectionOptions)
             opts = (ConnectionOptions)options;

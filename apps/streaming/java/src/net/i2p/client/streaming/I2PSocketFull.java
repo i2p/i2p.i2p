@@ -19,12 +19,14 @@ public class I2PSocketFull implements I2PSocket {
     }
     
     public void close() throws IOException {
+        if (_connection == null) return;
         if (_connection.getIsConnected()) {
             _connection.getOutputStream().close();
             _connection.disconnect(true);
         } else {
             //throw new IOException("Not connected");
         }
+        destroy();
     }
     
     public InputStream getInputStream() {
@@ -64,5 +66,10 @@ public class I2PSocketFull implements I2PSocket {
     
     public void setSocketErrorListener(I2PSocket.SocketErrorListener lsnr) {
         _listener = lsnr;
+    }
+    
+    void destroy() { 
+        _connection = null; 
+        _listener = null;
     }
 }

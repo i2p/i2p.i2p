@@ -105,12 +105,13 @@ public class PacketHandler {
     }
     
     private static final SimpleDateFormat _fmt = new SimpleDateFormat("hh:mm:ss.SSS");
-    static void displayPacket(Packet packet, String prefix) {
+    void displayPacket(Packet packet, String prefix) {
         String msg = null;
         synchronized (_fmt) {
             msg = _fmt.format(new Date()) + ": " + prefix + " " + packet.toString();
         }
-        System.out.println(msg);
+        if (_log.shouldLog(Log.DEBUG))
+            System.out.println(msg);
     }
     
     private void receiveKnownCon(Connection con, Packet packet) {

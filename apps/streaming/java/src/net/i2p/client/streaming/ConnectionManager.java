@@ -53,7 +53,7 @@ public class ConnectionManager {
         _conPacketHandler = new ConnectionPacketHandler(context);
         _session = session;
         session.setSessionListener(_messageHandler);
-        _outboundQueue = new PacketQueue(context, session);
+        _outboundQueue = new PacketQueue(context, session, this);
         _allowIncoming = false;
         _maxConcurrentStreams = maxConcurrent;
         _numWaiting = 0;
@@ -102,11 +102,12 @@ public class ConnectionManager {
                 reject = true;
             } else { 
                 while (true) {
-                    Connection oldCon = (Connection)_connectionByInboundId.put(new ByteArray(receiveId), con);
+                    ByteArray ba = new ByteArray(receiveId);
+                    Connection oldCon = (Connection)_connectionByInboundId.put(ba, con);
                     if (oldCon == null) {
                         break;
                     } else { 
-                        _connectionByInboundId.put(new ByteArray(receiveId), oldCon);
+                        _connectionByInboundId.put(ba, oldCon);
                         // receiveId already taken, try another
                         _context.random().nextBytes(receiveId);
                     }
@@ -210,15 +211,19 @@ public class ConnectionManager {
     }
 
     private boolean locked_tooManyStreams() {
-        if (_maxConcurrentStreams <= 0) return false;
-        if (_connectionByInboundId.size() < _maxConcurrentStreams) return false;
-        
         int active = 0;
         for (Iterator iter = _connectionByInboundId.values().iterator(); iter.hasNext(); ) {
             Connection con = (Connection)iter.next();
             if (con.getIsConnected())
                 active++;
         }
+        
+        if ( (_connectionByInboundId.size() > 100) && (_log.shouldLog(Log.INFO)) )
+            _log.info("More than 100 connections!  " + active
+                      + " total: " + _connectionByInboundId.size());
+
+        if (_maxConcurrentStreams <= 0) return false;
+        if (_connectionByInboundId.size() < _maxConcurrentStreams) return false;
         return (active >= _maxConcurrentStreams);
     }
     
@@ -245,8 +250,15 @@ public class ConnectionManager {
     }
     
     public void removeConnection(Connection con) {
+        boolean removed = false;
         synchronized (_connectionLock) {
-            _connectionByInboundId.remove(new ByteArray(con.getReceiveStreamId()));
+            Object o = _connectionByInboundId.remove(new ByteArray(con.getReceiveStreamId()));
+            removed = (o == con);
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Connection removed? " + removed + " remaining: " 
+                           + _connectionByInboundId.size() + ": " + con);
+            if (!removed && _log.shouldLog(Log.DEBUG))
+                _log.debug("Failed to remove " + con +"\n" + _connectionByInboundId.values());
             _connectionLock.notifyAll();
         }
     }
