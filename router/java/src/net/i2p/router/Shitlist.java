@@ -9,7 +9,7 @@ package net.i2p.router;
  */
 
 import java.io.IOException;
-import java.io.OutputStream;
+import java.io.Writer;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -123,7 +123,7 @@ public class Shitlist {
     }
 
     
-    public void renderStatusHTML(OutputStream out) throws IOException {
+    public void renderStatusHTML(Writer out) throws IOException {
         StringBuffer buf = new StringBuffer(1024);
         buf.append("<h2>Shitlist</h2>");
         Map shitlist = null;
@@ -152,6 +152,6 @@ public class Shitlist {
             buf.append("</li>\n");
         }
         buf.append("</ul>\n");
-        out.write(buf.toString().getBytes());
+        out.write(buf.toString());
     }
 }

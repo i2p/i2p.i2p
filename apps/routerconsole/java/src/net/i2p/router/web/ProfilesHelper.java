@@ -2,6 +2,7 @@ package net.i2p.router.web;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 
 import net.i2p.router.RouterContext;
 
@@ -26,7 +27,7 @@ public class ProfilesHelper {
     public String getProfileSummary() {
         ByteArrayOutputStream baos = new ByteArrayOutputStream(16*1024);
         try {
-            _context.profileOrganizer().renderStatusHTML(baos);
+            _context.profileOrganizer().renderStatusHTML(new OutputStreamWriter(baos));
         } catch (IOException ioe) {
             ioe.printStackTrace();
         }
@@ -36,7 +37,7 @@ public class ProfilesHelper {
     public String getShitlistSummary() {
         ByteArrayOutputStream baos = new ByteArrayOutputStream(4*1024);
         try {
-            _context.shitlist().renderStatusHTML(baos);
+            _context.shitlist().renderStatusHTML(new OutputStreamWriter(baos));
         } catch (IOException ioe) {
             ioe.printStackTrace();
         }

@@ -1,7 +1,7 @@
 package net.i2p.router.transport;
 
 import java.io.IOException;
-import java.io.OutputStream;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -407,7 +407,7 @@ public class FIFOBandwidthLimiter {
         return satisfied;
     }
     
-    public void renderStatusHTML(OutputStream out) throws IOException {
+    public void renderStatusHTML(Writer out) throws IOException {
         long now = _context.clock().now();
         StringBuffer buf = new StringBuffer(4096);
         buf.append("<br /><b>Pending bandwidth requests (with ");
@@ -436,7 +436,7 @@ public class FIFOBandwidthLimiter {
             }
         }
         buf.append("</ol></li></ul>\n");
-        out.write(buf.toString().getBytes());
+        out.write(buf.toString());
     }
     
     private static long __requestId = 0;

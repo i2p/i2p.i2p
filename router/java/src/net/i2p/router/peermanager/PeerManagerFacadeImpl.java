@@ -9,7 +9,7 @@ package net.i2p.router.peermanager;
  */
 
 import java.io.IOException;
-import java.io.OutputStream;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -59,7 +59,7 @@ public class PeerManagerFacadeImpl implements PeerManagerFacade {
         return _manager.selectPeers(criteria);
     }
     
-    public void renderStatusHTML(OutputStream out) throws IOException { 
+    public void renderStatusHTML(Writer out) throws IOException { 
         _manager.renderStatusHTML(out); 
     }
 }

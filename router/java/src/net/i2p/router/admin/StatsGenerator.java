@@ -2,6 +2,7 @@ package net.i2p.router.admin;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.Writer;
 import java.text.DecimalFormat;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -27,13 +28,13 @@ public class StatsGenerator {
         _log = context.logManager().getLog(StatsGenerator.class);
     }
     
-    public void generateStatsPage(OutputStream out) throws IOException {
+    public void generateStatsPage(Writer out) throws IOException {
         StringBuffer buf = new StringBuffer(16*1024);
         buf.append("<h1>Router statistics</h1>");
         buf.append("<i><a href=\"/oldconsole.jsp\">console</a> | <a href=\"/oldstats.jsp\">stats</a></i><hr />");
         buf.append("<form action=\"/oldstats.jsp\">");
         buf.append("<select name=\"go\" onChange='location.href=this.value'>");
-        out.write(buf.toString().getBytes());
+        out.write(buf.toString());
         buf.setLength(0);
         
         Map groups = _context.statManager().getStatsByGroup();
@@ -50,7 +51,7 @@ public class StatsGenerator {
                 buf.append(stat);
                 buf.append("</option>\n");
             }
-            out.write(buf.toString().getBytes());
+            out.write(buf.toString());
             buf.setLength(0);
         }
         buf.append("</select> <input type=\"submit\" value=\"GO\" />");
@@ -61,7 +62,7 @@ public class StatsGenerator {
         buf.append(DataHelper.formatDuration(uptime));
         buf.append(").  The data gathered is quantized over a 1 minute period, so should just be used as an estimate<p />");
 
-        out.write(buf.toString().getBytes());
+        out.write(buf.toString());
         buf.setLength(0);
         
         for (Iterator iter = groups.keySet().iterator(); iter.hasNext(); ) {
@@ -73,7 +74,7 @@ public class StatsGenerator {
             buf.append(group);
             buf.append("</a></h2>");
             buf.append("<ul>");
-            out.write(buf.toString().getBytes());
+            out.write(buf.toString());
             buf.setLength(0);
             for (Iterator statIter = stats.iterator(); statIter.hasNext(); ) {
                 String stat = (String)statIter.next();
@@ -86,10 +87,10 @@ public class StatsGenerator {
                     renderFrequency(stat, buf);
                 else
                     renderRate(stat, buf);
-                out.write(buf.toString().getBytes());
+                out.write(buf.toString());
                 buf.setLength(0);
             }
-            out.write("</ul><hr />".getBytes());
+            out.write("</ul><hr />");
         }
     }
     

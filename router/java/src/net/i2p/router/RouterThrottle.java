@@ -31,4 +31,15 @@ public interface RouterThrottle {
      *
      */
     public boolean acceptNetDbLookupRequest(Hash key);
+    
+    /** How backed up we are at the moment processing messages (in milliseconds) */
+    public long getMessageDelay();
+    /** How backed up our tunnels are at the moment (in milliseconds) */
+    public long getTunnelLag();
+    /** 
+     * How much faster (or if negative, slower) we are receiving data as 
+     * opposed to our longer term averages?
+     *
+     */
+    public double getInboundRateDelta();
 }

@@ -2,11 +2,14 @@ package net.i2p.router.web;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
 
 import net.i2p.router.RouterContext;
 
 public class NetDbHelper {
     private RouterContext _context;
+    private Writer _out;
     /**
      * Configure this bean to query a particular router context
      *
@@ -23,13 +26,21 @@ public class NetDbHelper {
     
     public NetDbHelper() {}
     
+    public void setWriter(Writer writer) { _out = writer; }
+    
     public String getNetDbSummary() {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream(32*1024);
         try {
-            _context.netDb().renderStatusHTML(baos);
+            if (_out != null) {
+                _context.netDb().renderStatusHTML(_out);
+                return "";
+            } else {
+                ByteArrayOutputStream baos = new ByteArrayOutputStream(32*1024);
+                _context.netDb().renderStatusHTML(new OutputStreamWriter(baos));
+                return new String(baos.toByteArray());
+            }
         } catch (IOException ioe) {
             ioe.printStackTrace();
+            return "";
         }
-        return new String(baos.toByteArray());
     }
 }

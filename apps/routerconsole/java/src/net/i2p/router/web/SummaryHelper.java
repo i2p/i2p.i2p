@@ -2,6 +2,7 @@ package net.i2p.router.web;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.text.DecimalFormat;
 
 import net.i2p.data.DataHelper;
@@ -334,7 +335,7 @@ public class SummaryHelper {
     public String getDestinations() {
         ByteArrayOutputStream baos = new ByteArrayOutputStream(1024);
         try {
-            _context.clientManager().renderStatusHTML(baos);
+            _context.clientManager().renderStatusHTML(new OutputStreamWriter(baos));
             return new String(baos.toByteArray());
         } catch (IOException ioe) {
             _context.logManager().getLog(SummaryHelper.class).error("Error rendering client info", ioe);
@@ -397,8 +398,7 @@ public class SummaryHelper {
         if (_context == null) 
             return "0ms";
         
-        Rate delayRate = _context.statManager().getRate("transport.sendProcessingTime").getRate(60*1000);
-        return ((int)delayRate.getAverageValue()) + "ms";
+        return _context.throttle().getMessageDelay() + "ms";
     }
     
     /**
@@ -410,7 +410,6 @@ public class SummaryHelper {
         if (_context == null) 
             return "0ms";
         
-        Rate lagRate = _context.statManager().getRate("tunnel.testSuccessTime").getRate(10*60*1000);
-        return ((int)lagRate.getAverageValue()) + "ms";
+        return _context.throttle().getTunnelLag() + "ms";
     }
 }

@@ -8,7 +8,7 @@ package net.i2p.router;
  *
  */
 
-import java.io.OutputStream;
+import java.io.Writer;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.Locale;
@@ -107,32 +107,33 @@ public class StatisticsManager implements Service {
             includeRate("jobQueue.jobLag", stats, new long[] { 60*1000, 60*60*1000 });
             includeRate("jobQueue.jobRun", stats, new long[] { 60*1000, 60*60*1000 });
             includeRate("crypto.elGamal.encrypt", stats, new long[] { 60*1000, 60*60*1000 });
-            includeRate("crypto.garlic.decryptFail", stats, new long[] { 60*60*1000, 24*60*60*1000 });
+            //includeRate("crypto.garlic.decryptFail", stats, new long[] { 60*60*1000, 24*60*60*1000 });
             includeRate("tunnel.unknownTunnelTimeLeft", stats, new long[] { 60*60*1000, 24*60*60*1000 });
             includeRate("jobQueue.readyJobs", stats, new long[] { 60*1000, 60*60*1000 });
             //includeRate("jobQueue.droppedJobs", stats, new long[] { 60*60*1000, 24*60*60*1000 });
             includeRate("inNetPool.dropped", stats, new long[] { 60*60*1000, 24*60*60*1000 });
             includeRate("tunnel.participatingTunnels", stats, new long[] { 5*60*1000, 60*60*1000 });
             includeRate("tunnel.testSuccessTime", stats, new long[] { 60*60*1000l, 24*60*60*1000l });
-            includeRate("tunnel.outboundMessagesProcessed", stats, new long[] { 10*60*1000, 60*60*1000 });
-            includeRate("tunnel.inboundMessagesProcessed", stats, new long[] { 10*60*1000, 60*60*1000 });
+            //includeRate("tunnel.outboundMessagesProcessed", stats, new long[] { 10*60*1000, 60*60*1000 });
+            //includeRate("tunnel.inboundMessagesProcessed", stats, new long[] { 10*60*1000, 60*60*1000 });
             includeRate("tunnel.participatingMessagesProcessed", stats, new long[] { 10*60*1000, 60*60*1000 });
-            includeRate("tunnel.expiredAfterAcceptTime", stats, new long[] { 10*60*1000l, 60*60*1000l, 24*60*60*1000l });
+            includeRate("tunnel.participatingMessagesProcessedActive", stats, new long[] { 10*60*1000, 60*60*1000 });
+            //includeRate("tunnel.expiredAfterAcceptTime", stats, new long[] { 10*60*1000l, 60*60*1000l, 24*60*60*1000l });
             includeRate("tunnel.bytesAllocatedAtAccept", stats, new long[] { 10*60*1000l, 60*60*1000l, 24*60*60*1000l });
             includeRate("netDb.lookupsReceived", stats, new long[] { 5*60*1000, 60*60*1000 });
             includeRate("netDb.lookupsHandled", stats, new long[] { 5*60*1000, 60*60*1000 });
             includeRate("netDb.lookupsMatched", stats, new long[] { 5*60*1000, 60*60*1000 });
-            includeRate("netDb.storeSent", stats, new long[] { 5*60*1000, 60*60*1000 });
+            //includeRate("netDb.storeSent", stats, new long[] { 5*60*1000, 60*60*1000 });
             includeRate("netDb.successPeers", stats, new long[] { 60*60*1000 });
             includeRate("netDb.failedPeers", stats, new long[] { 60*60*1000 });
-            includeRate("router.throttleNetDbDoSSend", stats, new long[] { 10*60*1000, 60*60*1000, 24*60*60*1000 });
-            includeRate("router.throttleNetDbDoS", stats, new long[] { 10*60*1000, 60*60*1000 });
+            //includeRate("router.throttleNetDbDoSSend", stats, new long[] { 10*60*1000, 60*60*1000, 24*60*60*1000 });
+            //includeRate("router.throttleNetDbDoS", stats, new long[] { 10*60*1000, 60*60*1000 });
             //includeRate("netDb.searchCount", stats, new long[] { 3*60*60*1000});
             //includeRate("netDb.searchMessageCount", stats, new long[] { 5*60*1000, 10*60*1000, 60*60*1000 });
             //includeRate("inNetMessage.timeToDiscard", stats, new long[] { 5*60*1000, 10*60*1000, 60*60*1000 });
             //includeRate("outNetMessage.timeToDiscard", stats, new long[] { 5*60*1000, 10*60*1000, 60*60*1000 });
-            includeRate("router.throttleNetworkCause", stats, new long[] { 10*60*1000, 60*60*1000 });
-            includeRate("transport.receiveMessageSize", stats, new long[] { 5*60*1000, 60*60*1000 });
+            //includeRate("router.throttleNetworkCause", stats, new long[] { 10*60*1000, 60*60*1000 });
+            //includeRate("transport.receiveMessageSize", stats, new long[] { 5*60*1000, 60*60*1000 });
             //includeRate("transport.sendMessageSize", stats, new long[] { 5*60*1000, 60*60*1000 });
             //includeRate("transport.sendMessageSmall", stats, new long[] { 5*60*1000, 60*60*1000 });
             //includeRate("transport.sendMessageMedium", stats, new long[] { 5*60*1000, 60*60*1000 });
@@ -141,6 +142,10 @@ public class StatisticsManager implements Service {
             //includeRate("transport.receiveMessageMedium", stats, new long[] { 5*60*1000, 60*60*1000 });
             //includeRate("transport.receiveMessageLarge", stats, new long[] { 5*60*1000, 60*60*1000 });
             includeRate("client.sendAckTime", stats, new long[] { 60*60*1000, 24*60*60*1000l }, true);
+            includeRate("client.sendsPerFailure", stats, new long[] { 60*60*1000, 24*60*60*1000l }, true);
+            includeRate("client.timeoutCongestionTunnel", stats, new long[] { 60*60*1000, 24*60*60*1000l }, true);
+            includeRate("client.timeoutCongestionMessage", stats, new long[] { 60*60*1000, 24*60*60*1000l }, true);
+            includeRate("client.timeoutCongestionInbound", stats, new long[] { 60*60*1000, 24*60*60*1000l }, true);
             stats.setProperty("stat_uptime", DataHelper.formatDuration(_context.router().getUptime()));
             stats.setProperty("stat__rateKey", "avg;maxAvg;pctLifetime;[sat;satLim;maxSat;maxSatLim;][num;lifetimeFreq;maxFreq]");
             _log.debug("Publishing peer rankings");
@@ -266,5 +271,5 @@ public class StatisticsManager implements Service {
     private final String num(double num) { synchronized (_fmt) { return _fmt.format(num); } }
     private final String pct(double num) { synchronized (_pct) { return _pct.format(num); } }
    
-    public void renderStatusHTML(OutputStream out) { }
+    public void renderStatusHTML(Writer out) { }
 }

@@ -1,7 +1,7 @@
 package net.i2p.router.peermanager;
 
 import java.io.IOException;
-import java.io.OutputStream;
+import java.io.Writer;
 
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
@@ -27,7 +27,7 @@ class ProfileOrganizerRenderer {
         _context = context;
         _organizer = organizer;
     }
-    public void renderStatusHTML(OutputStream out) throws IOException {
+    public void renderStatusHTML(Writer out) throws IOException {
         Set peers = _organizer.selectAllPeers();
         
         long hideBefore = _context.clock().now() - 3*60*60*1000;
@@ -126,7 +126,7 @@ class ProfileOrganizerRenderer {
         buf.append("<b>Speed:</b> ").append(num(_organizer.getSpeedThreshold())).append(" (").append(fast).append(" fast peers)<br />");
         buf.append("<b>Capacity:</b> ").append(num(_organizer.getCapacityThreshold())).append(" (").append(reliable).append(" high capacity peers)<br />");
         buf.append("<b>Integration:</b> ").append(num(_organizer.getIntegrationThreshold())).append(" (").append(integrated).append(" well integrated peers)<br />");
-        out.write(buf.toString().getBytes());
+        out.write(buf.toString());
     }
     
     private final static DecimalFormat _fmt = new DecimalFormat("###,##0.00", new DecimalFormatSymbols(Locale.UK));

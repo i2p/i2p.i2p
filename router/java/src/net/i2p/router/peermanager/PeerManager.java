@@ -9,7 +9,7 @@ package net.i2p.router.peermanager;
  */
 
 import java.io.IOException;
-import java.io.OutputStream;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -116,7 +116,7 @@ class PeerManager {
         return new ArrayList(peers);
     }
     
-    public void renderStatusHTML(OutputStream out) throws IOException { 
+    public void renderStatusHTML(Writer out) throws IOException { 
         _organizer.renderStatusHTML(out); 
     }
 }

@@ -9,7 +9,7 @@ package net.i2p.router;
  */
 
 import java.io.IOException;
-import java.io.OutputStream;
+import java.io.Writer;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -95,5 +95,5 @@ class DummyNetworkDatabaseFacade extends NetworkDatabaseFacade {
     
     public Set findNearestRouters(Hash key, int maxNumRouters, Set peersToIgnore) { return new HashSet(_routers.values()); }
 
-    public void renderStatusHTML(OutputStream out) throws IOException {}
+    public void renderStatusHTML(Writer out) throws IOException {}
 }

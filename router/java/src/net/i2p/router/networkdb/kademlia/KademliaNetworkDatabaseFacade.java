@@ -11,7 +11,7 @@ package net.i2p.router.networkdb.kademlia;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -810,17 +810,17 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         return routers;
     }
     
-    public void renderStatusHTML(OutputStream out) throws IOException {
+    public void renderStatusHTML(Writer out) throws IOException {
         StringBuffer buf = new StringBuffer(10*1024);
         buf.append("<h2>Kademlia Network DB Contents</h2>\n");
         if (!_initialized) {
             buf.append("<i>Not initialized</i>\n");
-            out.write(buf.toString().getBytes());
+            out.write(buf.toString());
             return;
         }
         Set leases = getLeases();
         buf.append("<h3>Leases</h3>\n");
-        out.write(buf.toString().getBytes());
+        out.write(buf.toString());
         buf.setLength(0);
         long now = _context.clock().now();
         for (Iterator iter = leases.iterator(); iter.hasNext(); ) {
@@ -838,17 +838,17 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
                 buf.append("</i> tunnelId <i>").append(ls.getLease(i).getTunnelId().getTunnelId()).append("</i><br />\n");
             }
             buf.append("<hr />\n");
-            out.write(buf.toString().getBytes());
+            out.write(buf.toString());
             buf.setLength(0);
         }
         
         Hash us = _context.routerHash();
         Set routers = getRouters();
-        out.write("<h3>Routers</h3>\n".getBytes());
+        out.write("<h3>Routers</h3>\n");
         
         RouterInfo ourInfo = _context.router().getRouterInfo();
         renderRouterInfo(buf, ourInfo, true);
-        out.write(buf.toString().getBytes());
+        out.write(buf.toString());
         buf.setLength(0);
         
         /* coreVersion to Map of routerVersion to Integer */
@@ -860,7 +860,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
             boolean isUs = key.equals(us);
             if (!isUs) {
                 renderRouterInfo(buf, ri, false);
-                out.write(buf.toString().getBytes());
+                out.write(buf.toString());
                 buf.setLength(0);
                 String coreVersion = ri.getOptions().getProperty("coreVersion");
                 String routerVersion = ri.getOptions().getProperty("router.version");
@@ -895,7 +895,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
             }
             buf.append("</table>\n");
         }
-        out.write(buf.toString().getBytes());
+        out.write(buf.toString());
     }
     
     private void renderRouterInfo(StringBuffer buf, RouterInfo info, boolean isUs) {

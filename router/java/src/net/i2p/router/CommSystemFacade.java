@@ -9,7 +9,7 @@ package net.i2p.router;
  */
 
 import java.io.IOException;
-import java.io.OutputStream;
+import java.io.Writer;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -23,7 +23,7 @@ import java.util.Set;
 public abstract class CommSystemFacade implements Service {
     public abstract void processMessage(OutNetMessage msg);
     
-    public void renderStatusHTML(OutputStream out) throws IOException { }
+    public void renderStatusHTML(Writer out) throws IOException { }
     
     /** Create the set of RouterAddress structures based on the router's config */
     public Set createAddresses() { return new HashSet(); }

@@ -9,7 +9,7 @@ package net.i2p.router;
  */
 
 import java.io.IOException;
-import java.io.OutputStream;
+import java.io.Writer;
 
 /**
  * Define the manageable service interface for the subsystems in the I2P router
@@ -37,5 +37,5 @@ public interface Service {
      */
     public void restart();
     
-    public void renderStatusHTML(OutputStream out) throws IOException;
+    public void renderStatusHTML(Writer out) throws IOException;
 }

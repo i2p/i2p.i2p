@@ -13,6 +13,7 @@
 <div class="main" id="main">
  <jsp:useBean class="net.i2p.router.web.NetDbHelper" id="netdbHelper" scope="request" />
  <jsp:setProperty name="netdbHelper" property="contextId" value="<%=(String)session.getAttribute("i2p.contextId")%>" />
+ <jsp:setProperty name="netdbHelper" property="writer" value="<%=out%>" />
  <jsp:getProperty name="netdbHelper" property="netDbSummary" />
 </div>
 

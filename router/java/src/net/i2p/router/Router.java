@@ -12,7 +12,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.OutputStream;
+import java.io.Writer;
 import java.text.DecimalFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -315,8 +315,8 @@ public class Router {
         _context.inNetMessagePool().registerHandlerJobBuilder(TunnelMessage.MESSAGE_TYPE, new TunnelMessageHandler(_context));
     }
     
-    public void renderStatusHTML(OutputStream out) throws IOException {
-        out.write(("<h1>Router console</h1>\n" +
+    public void renderStatusHTML(Writer out) throws IOException {
+        out.write("<h1>Router console</h1>\n" +
                    "<i><a href=\"/oldconsole.jsp\">console</a> | <a href=\"/oldstats.jsp\">stats</a></i><br>\n" +
                    "<form action=\"/oldconsole.jsp\">" +
                    "<select name=\"go\" onChange='location.href=this.value'>" +
@@ -331,7 +331,7 @@ public class Router {
                    "<option value=\"/oldconsole.jsp#netdb\">Network Database</option>\n" +
                    "<option value=\"/oldconsole.jsp#logs\">Log messages</option>\n" +
                    "</select> <input type=\"submit\" value=\"GO\" /> </form>" +
-                   "<hr />\n").getBytes());
+                   "<hr />\n");
 
         StringBuffer buf = new StringBuffer(32*1024);
         
@@ -453,39 +453,39 @@ public class Router {
         buf.append("trying to transfer data.  Lifetime averages count how many elephants there are on the moon [like anyone reads this text]</i>");
         buf.append("\n");
         
-        out.write(buf.toString().getBytes());
+        out.write(buf.toString());
         
         _context.bandwidthLimiter().renderStatusHTML(out);
 
-        out.write("<hr /><a name=\"clients\"> </a>\n".getBytes());
+        out.write("<hr /><a name=\"clients\"> </a>\n");
         
         _context.clientManager().renderStatusHTML(out);
         
-        out.write("\n<hr /><a name=\"transports\"> </a>\n".getBytes());
+        out.write("\n<hr /><a name=\"transports\"> </a>\n");
         
         _context.commSystem().renderStatusHTML(out);
         
-        out.write("\n<hr /><a name=\"profiles\"> </a>\n".getBytes());
+        out.write("\n<hr /><a name=\"profiles\"> </a>\n");
         
         _context.peerManager().renderStatusHTML(out);
         
-        out.write("\n<hr /><a name=\"tunnels\"> </a>\n".getBytes());
+        out.write("\n<hr /><a name=\"tunnels\"> </a>\n");
         
         _context.tunnelManager().renderStatusHTML(out);
         
-        out.write("\n<hr /><a name=\"jobs\"> </a>\n".getBytes());
+        out.write("\n<hr /><a name=\"jobs\"> </a>\n");
         
         _context.jobQueue().renderStatusHTML(out);
         
-        out.write("\n<hr /><a name=\"shitlist\"> </a>\n".getBytes());
+        out.write("\n<hr /><a name=\"shitlist\"> </a>\n");
         
         _context.shitlist().renderStatusHTML(out);
         
-        out.write("\n<hr /><a name=\"pending\"> </a>\n".getBytes());
+        out.write("\n<hr /><a name=\"pending\"> </a>\n");
         
         _context.messageRegistry().renderStatusHTML(out);
         
-        out.write("\n<hr /><a name=\"netdb\"> </a>\n".getBytes());
+        out.write("\n<hr /><a name=\"netdb\"> </a>\n");
         
         _context.netDb().renderStatusHTML(out);
         
@@ -500,7 +500,7 @@ public class Router {
             buf.append("</pre></td></tr>\n");
         }
         buf.append("</table>\n");
-        out.write(buf.toString().getBytes());
+        out.write(buf.toString());
     }
     
     private static int MAX_MSG_LENGTH = 120;

@@ -1,7 +1,7 @@
 package net.i2p.router.tunnelmanager;
 
 import java.io.IOException;
-import java.io.OutputStream;
+import java.io.Writer;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -66,7 +66,8 @@ class TunnelPool {
         _context.statManager().createRateStat("tunnel.inboundMessagesProcessed", "How many messages does an inbound tunnel process in its lifetime?", "Tunnels", new long[] { 10*60*1000l, 60*60*1000l, 24*60*60*1000l });
         _context.statManager().createRateStat("tunnel.outboundMessagesProcessed", "How many messages does an inbound tunnel process in its lifetime?", "Tunnels", new long[] { 10*60*1000l, 60*60*1000l, 24*60*60*1000l });
         _context.statManager().createRateStat("tunnel.participatingMessagesProcessed", "How many messages does an inbound tunnel process in its lifetime?", "Tunnels", new long[] { 10*60*1000l, 60*60*1000l, 24*60*60*1000l });
-
+        _context.statManager().createRateStat("tunnel.participatingMessagesProcessedActive", "How many messages beyond the average were processed in a more-than-average tunnel's lifetime?", "Tunnels", new long[] { 10*60*1000l, 60*60*1000l, 24*60*60*1000l });
+        
         _isLive = true;
         _persistenceHelper = new TunnelPoolPersistenceHelper(_context);
         _tunnelBuilder = new TunnelBuilder(_context);
@@ -603,8 +604,8 @@ class TunnelPool {
     
     public void shutdown() {
         if (_log.shouldLog(Log.INFO)) _log.info("Shutting down tunnel pool");
-        if (_persistenceHelper != null)
-            _persistenceHelper.writePool(this);
+        //if (_persistenceHelper != null)
+        //    _persistenceHelper.writePool(this);
         _isLive = false; // the subjobs [should] check getIsLive() on each run 
         _outboundTunnels = null;
         _freeInboundTunnels = null;
@@ -633,10 +634,17 @@ class TunnelPool {
                                                        info.getSettings().getCreated());
                     break;
                 case TunnelId.TYPE_PARTICIPANT:
+                    long numMsgs = info.getMessagesProcessed();
+                    long lastAvg = (long)_context.statManager().getRate("tunnel.participatingMessagesProcessed").getRate(10*60*1000l).getAverageValue();
                     _context.statManager().addRateData("tunnel.participatingMessagesProcessed", 
-                                                       info.getMessagesProcessed(), 
+                                                       numMsgs, 
                                                        info.getSettings().getExpiration() -
                                                        info.getSettings().getCreated());
+                    if (numMsgs > lastAvg)
+                        _context.statManager().addRateData("tunnel.participatingMessagesProcessedActive", 
+                                                           numMsgs-lastAvg, 
+                                                           info.getSettings().getExpiration() -
+                                                           info.getSettings().getCreated());
                     break;
                 case TunnelId.TYPE_UNSPECIFIED:
                 default:
@@ -651,9 +659,9 @@ class TunnelPool {
         return settings;
     }
  
-    public void renderStatusHTML(OutputStream out) throws IOException {
+    public void renderStatusHTML(Writer out) throws IOException {
         if (!_isLive) return;
-        out.write("<h2>Tunnel Pool</h2>\n".getBytes());
+        out.write("<h2>Tunnel Pool</h2>\n");
         StringBuffer buf = new StringBuffer(4096);
         renderTunnels(out, buf, "Free inbound tunnels", getFreeTunnels());
         renderTunnels(out, buf, "Outbound tunnels", getOutboundTunnels());
@@ -665,19 +673,19 @@ class TunnelPool {
         }
     }
     
-    private void renderTunnels(OutputStream out, StringBuffer buf, String msg, Set tunnelIds) throws IOException {
+    private void renderTunnels(Writer out, StringBuffer buf, String msg, Set tunnelIds) throws IOException {
         buf.append("<b>").append(msg).append(":</b> <i>(").append(tunnelIds.size()).append(" tunnels)</i><ul>\n");
-        out.write(buf.toString().getBytes());
+        out.write(buf.toString());
         buf.setLength(0);
         for (Iterator iter = tunnelIds.iterator(); iter.hasNext(); ) {
             TunnelId id = (TunnelId)iter.next();
             TunnelInfo tunnel = getTunnelInfo(id);
             renderTunnel(out, buf, id, tunnel);
         }
-        out.write("</ul>\n".getBytes());
+        out.write("</ul>\n");
     }
     
-    private final void renderTunnel(OutputStream out, StringBuffer buf, TunnelId id, TunnelInfo tunnel) throws IOException {
+    private final void renderTunnel(Writer out, StringBuffer buf, TunnelId id, TunnelInfo tunnel) throws IOException {
         buf.setLength(0);
         if (tunnel == null) {
             buf.append("<li>Tunnel: ").append(id.getTunnelId()).append(" is not known</li>\n");
@@ -713,7 +721,7 @@ class TunnelPool {
 
             buf.append("\n</pre>");
         }
-        out.write(buf.toString().getBytes());
+        out.write(buf.toString());
         buf.setLength(0);
     }
     

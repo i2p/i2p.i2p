@@ -2,6 +2,7 @@ package net.i2p.router.peermanager;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.Writer;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
@@ -203,7 +204,7 @@ public class ProfileOrganizer {
             _persistenceHelper.writeProfile(prof, out);
     }
     
-    public void renderStatusHTML(OutputStream out) throws IOException {
+    public void renderStatusHTML(Writer out) throws IOException {
         ProfileOrganizerRenderer rend = new ProfileOrganizerRenderer(this, _context);
         rend.renderStatusHTML(out);
     }

@@ -9,7 +9,7 @@ package net.i2p.router;
  */
 
 import java.io.IOException;
-import java.io.OutputStream;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -558,18 +558,18 @@ public class JobQueue {
     // the remainder are utility methods for dumping status info
     ////
     
-    public void renderStatusHTML(OutputStream out) throws IOException {
+    public void renderStatusHTML(Writer out) throws IOException {
         ArrayList readyJobs = null;
         ArrayList timedJobs = null;
         ArrayList activeJobs = new ArrayList(1);
         ArrayList justFinishedJobs = new ArrayList(4);
-        out.write("<!-- jobQueue rendering -->\n".getBytes());
+        out.write("<!-- jobQueue rendering -->\n");
         out.flush();
         synchronized (_readyJobs) { readyJobs = new ArrayList(_readyJobs); }
-        out.write("<!-- jobQueue rendering: after readyJobs sync -->\n".getBytes());
+        out.write("<!-- jobQueue rendering: after readyJobs sync -->\n");
         out.flush();
         synchronized (_timedJobs) { timedJobs = new ArrayList(_timedJobs); }
-        out.write("<!-- jobQueue rendering: after timedJobs sync -->\n".getBytes());
+        out.write("<!-- jobQueue rendering: after timedJobs sync -->\n");
         out.flush();
         int numRunners = 0;
         synchronized (_queueRunners) {
@@ -586,7 +586,7 @@ public class JobQueue {
             numRunners = _queueRunners.size();
         }
         
-        out.write("<!-- jobQueue rendering: after queueRunners sync -->\n".getBytes());
+        out.write("<!-- jobQueue rendering: after queueRunners sync -->\n");
         out.flush();
         
         StringBuffer buf = new StringBuffer(32*1024);
@@ -631,15 +631,15 @@ public class JobQueue {
         }
         buf.append("</ol>\n");
         
-        out.write("<!-- jobQueue rendering: after main buffer, before stats -->\n".getBytes());
+        out.write("<!-- jobQueue rendering: after main buffer, before stats -->\n");
         out.flush();
         
         getJobStats(buf);
         
-        out.write("<!-- jobQueue rendering: after stats -->\n".getBytes());
+        out.write("<!-- jobQueue rendering: after stats -->\n");
         out.flush();
         
-        out.write(buf.toString().getBytes());
+        out.write(buf.toString());
     }
     
     /** render the HTML for the job stats */

@@ -104,7 +104,11 @@ public class OutboundClientMessageJob extends JobImpl {
         ctx.statManager().createRateStat("client.sendMessageSize", "How large are messages sent by the client?", "Client Messages", new long[] { 60*1000l, 60*60*1000l, 24*60*60*1000l });
         ctx.statManager().createRateStat("client.sendAttemptAverage", "How many different tunnels do we have to try when sending a client message?", "Client Messages", new long[] { 60*1000l, 60*60*1000l, 24*60*60*1000l });
         ctx.statManager().createRateStat("client.sendAckTime", "How long does it take to get an ACK back from a message?", "Client Messages", new long[] { 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
-        
+        ctx.statManager().createRateStat("client.sendsPerFailure", "How many send attempts do we make when they all fail?", "Client Messages", new long[] { 60*60*1000l, 24*60*60*1000l });
+        ctx.statManager().createRateStat("client.timeoutCongestionTunnel", "How lagged our tunnels are when a send times out?", "Client Messages", new long[] { 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
+        ctx.statManager().createRateStat("client.timeoutCongestionMessage", "How fast we process messages locally when a send times out?", "Client Messages", new long[] { 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
+        ctx.statManager().createRateStat("client.timeoutCongestionInbound", "How much faster we are receiving data than our average bps when a send times out?", "Client Messages", new long[] { 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
+
         long timeoutMs = OVERALL_TIMEOUT_MS_DEFAULT;
         
         String param = msg.getSenderConfig().getOptions().getProperty(OVERALL_TIMEOUT_MS_PARAM);
@@ -122,7 +126,7 @@ public class OutboundClientMessageJob extends JobImpl {
         }
         
         _overallExpiration = timeoutMs + getContext().clock().now();
-        _status = new OutboundClientMessageStatus(msg);
+        _status = new OutboundClientMessageStatus(ctx, msg);
         _nextStep = new NextStepJob();
         _lookupLeaseSetFailed = new LookupLeaseSetFailedJob();
         _shouldBundle = getShouldBundle();
@@ -423,6 +427,7 @@ public class OutboundClientMessageJob extends JobImpl {
         getContext().clientManager().messageDeliveryStatusUpdate(msg.getFromDestination(), msg.getMessageId(), false);
         getContext().statManager().updateFrequency("client.sendMessageFailFrequency");
         getContext().statManager().addRateData("client.sendAttemptAverage", _status.getNumSent(), sendTime);
+        getContext().statManager().addRateData("client.sendsPerFailure", _status.getNumSent(), sendTime);
     }
     
     /** build the payload clove that will be used for all of the messages, placing the clove in the status structure */
@@ -453,126 +458,6 @@ public class OutboundClientMessageJob extends JobImpl {
         
         if (_log.shouldLog(Log.DEBUG))
             _log.debug(getJobId() + ": Built payload clove with id " + clove.getId());
-    }
-    
-    /**
-     * Good ol' fashioned struct with the send status
-     *
-     */
-    private class OutboundClientMessageStatus {
-        private ClientMessage _msg;
-        private PayloadGarlicConfig _clove;
-        private LeaseSet _leaseSet;
-        private Set _sent;
-        private int _numLookups;
-        private boolean _success;
-        private boolean _failure;
-        private long _start;
-        private int _previousSent;
-        
-        public OutboundClientMessageStatus(ClientMessage msg) {
-            _msg = msg;
-            _clove = null;
-            _leaseSet = null;
-            _sent = new HashSet(4);
-            _success = false;
-            _failure = false;
-            _numLookups = 0;
-            _previousSent = 0;
-            _start = getContext().clock().now();
-        }
-        
-        /** raw payload */
-        public Payload getPayload() { return _msg.getPayload(); }
-        /** clove, if we've built it */
-        public PayloadGarlicConfig getClove() { return _clove; }
-        public void setClove(PayloadGarlicConfig clove) { _clove = clove; }
-        public ClientMessage getMessage() { return _msg; }
-        /** date we started the process on */
-        public long getStart() { return _start; }
-        
-        public int getNumLookups() { return _numLookups; }
-        public void incrementLookups() { _numLookups++; }
-        public void clearAlreadySent() {
-            synchronized (_sent) {
-                _previousSent += _sent.size();
-                _sent.clear();
-            }
-        }
-        
-        /** who sent the message? */
-        public Destination getFrom() { return _msg.getFromDestination(); }
-        /** who is the message going to? */
-        public Destination getTo() { return _msg.getDestination(); }
-        /** what is the target's current leaseSet (or null if we don't know yet) */
-        public LeaseSet getLeaseSet() { return _leaseSet; }
-        public void setLeaseSet(LeaseSet ls) { _leaseSet = ls; }
-        /** have we already sent the message down this tunnel? */
-        public boolean alreadySent(Hash gateway, TunnelId tunnelId) {
-            Tunnel t = new Tunnel(gateway, tunnelId);
-            synchronized (_sent) {
-                return _sent.contains(t);
-            }
-        }
-        public void sent(Hash gateway, TunnelId tunnelId) {
-            Tunnel t = new Tunnel(gateway, tunnelId);
-            synchronized (_sent) {
-                _sent.add(t);
-            }
-        }
-        /** how many messages have we sent through various leases? */
-        public int getNumSent() {
-            synchronized (_sent) {
-                return _sent.size() + _previousSent;
-            }
-        }
-        /** did we totally fail? */
-        public boolean getFailure() { return _failure; }
-        /** we failed.  returns true if we had already failed before */
-        public boolean failed() {
-            boolean already = _failure;
-            _failure = true;
-            return already;
-        }
-        /** have we totally succeeded? */
-        public boolean getSuccess() { return _success; }
-        /** we succeeded.  returns true if we had already succeeded before */
-        public boolean success() {
-            boolean already = _success;
-            _success = true;
-            return already;
-        }
-        
-        /** represent a unique tunnel at any given time */
-        private class Tunnel {
-            private Hash _gateway;
-            private TunnelId _tunnel;
-            
-            public Tunnel(Hash tunnelGateway, TunnelId tunnel) {
-                _gateway = tunnelGateway;
-                _tunnel = tunnel;
-            }
-            
-            public Hash getGateway() { return _gateway; }
-            public TunnelId getTunnel() { return _tunnel; }
-            
-            public int hashCode() {
-                int rv = 0;
-                if (_gateway != null)
-                    rv += _gateway.hashCode();
-                if (_tunnel != null)
-                    rv += 7*_tunnel.getTunnelId();
-                return rv;
-            }
-            
-            public boolean equals(Object o) {
-                if (o == null) return false;
-                if (o.getClass() != Tunnel.class) return false;
-                Tunnel t = (Tunnel)o;
-                return (getTunnel() == t.getTunnel()) &&
-                getGateway().equals(t.getGateway());
-            }
-        }
     }
     
     /**
@@ -712,6 +597,14 @@ public class OutboundClientMessageJob extends JobImpl {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug(OutboundClientMessageJob.this.getJobId()
                            + ": Soft timeout through the lease " + _lease);
+            
+            long messageDelay = getContext().throttle().getMessageDelay();
+            long tunnelLag = getContext().throttle().getTunnelLag();
+            long inboundDelta = (long)getContext().throttle().getInboundRateDelta();
+            getContext().statManager().addRateData("client.timeoutCongestionTunnel", tunnelLag, 1);
+            getContext().statManager().addRateData("client.timeoutCongestionMessage", messageDelay, 1);
+            getContext().statManager().addRateData("client.timeoutCongestionInbound", inboundDelta, 1);
+            
             _lease.setNumFailure(_lease.getNumFailure()+1);
             sendNext();
         }

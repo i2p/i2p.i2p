@@ -12,6 +12,7 @@
 
 <jsp:useBean class="net.i2p.router.web.OldConsoleHelper" id="conhelper" scope="request" />
 <jsp:setProperty name="conhelper" property="contextId" value="<%=(String)session.getAttribute("i2p.contextId")%>" />
+<jsp:setProperty name="conhelper" property="writer" value="<%=out%>" />
 
 <div class="main" id="main">
  <jsp:getProperty name="conhelper" property="console" />

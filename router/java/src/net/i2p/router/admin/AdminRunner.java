@@ -5,6 +5,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.net.Socket;
 import java.util.Iterator;
 import java.util.Set;
@@ -47,7 +48,7 @@ class AdminRunner implements Runnable {
         } else if ( (command.indexOf("routerStats.html") >= 0) || (command.indexOf("oldstats.jsp") >= 0) ) {
             try {
                 out.write("HTTP/1.1 200 OK\nConnection: close\nCache-control: no-cache\nContent-type: text/html\n\n".getBytes());
-                _generator.generateStatsPage(out);
+                _generator.generateStatsPage(new OutputStreamWriter(out));
                 out.close();
             } catch (IOException ioe) {
                 if (_log.shouldLog(Log.WARN))
@@ -61,7 +62,7 @@ class AdminRunner implements Runnable {
         } else if (true || command.indexOf("routerConsole.html") > 0) {
             try {
                 out.write("HTTP/1.1 200 OK\nConnection: close\nCache-control: no-cache\nContent-type: text/html\n\n".getBytes());
-                _context.router().renderStatusHTML(out);
+                _context.router().renderStatusHTML(new OutputStreamWriter(out));
                 out.close();
             } catch (IOException ioe) {
                 if (_log.shouldLog(Log.WARN))

@@ -9,7 +9,7 @@ package net.i2p.router.client;
  */
 
 import java.io.IOException;
-import java.io.OutputStream;
+import java.io.Writer;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -332,7 +332,7 @@ public class ClientManager {
         }
     }
     
-    public void renderStatusHTML(OutputStream out) throws IOException {
+    public void renderStatusHTML(Writer out) throws IOException {
         StringBuffer buf = new StringBuffer(8*1024);
         buf.append("<u><b>Local destinations</b></u><br />");
         
@@ -376,7 +376,7 @@ public class ClientManager {
         }
         
         buf.append("\n<hr />\n");
-        out.write(buf.toString().getBytes());
+        out.write(buf.toString());
     }
     
     public void messageReceived(ClientMessage msg) {

@@ -1,7 +1,7 @@
 package net.i2p.router.tunnelmanager;
 
 import java.io.IOException;
-import java.io.OutputStream;
+import java.io.Writer;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -229,7 +229,7 @@ public class PoolingTunnelManagerFacade implements TunnelManagerFacade {
      * Aint she pretty?
      *
      */
-    public void renderStatusHTML(OutputStream out) throws IOException {
+    public void renderStatusHTML(Writer out) throws IOException {
         if (_pool != null)
             _pool.renderStatusHTML(out);
     }
