@@ -176,9 +176,9 @@ clientApp.2.args=0.0.0.0 7656 i2cp.tcp.host=localhost i2cp.tcp.port=##_router_i2
 # EepProxy (HTTP proxy that lets you browse both eepsites and the normal web via squid.i2p)
 clientApp.3.main=net.i2p.i2ptunnel.I2PTunnel
 clientApp.3.name=EepProxy
-clientApp.3.args=-nogui -e "config localhost ##_router_i2cp_port##" -e "httpclient 4444"
+clientApp.3.args=-nocli -e "config localhost ##_router_i2cp_port##" -e "httpclient 4444"
 
-# Heartbeat engine (uber-simple ping/pong system, configured in heartbeat.config.  By itself
+# Heartbeat engine (ueber-simple ping/pong system, configured in heartbeat.config.  By itself
 # it just writes out stat data where its told to, but there's a seperate HeartbeatMonitor 
 # GUI to let you visualize things)
 #clientApp.4.main=net.i2p.heartbeat.Heartbeat

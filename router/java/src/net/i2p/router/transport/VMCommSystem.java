@@ -85,7 +85,7 @@ public class VMCommSystem extends CommSystemFacade {
             _ctx = us;
             _from = from;
             _msg = msg;
-            // bah, uberspeed!  
+            // bah, ueberspeed!  
             //getTiming().setStartAfter(us.clock().now() + 50);
         }
         public void runJob() {
