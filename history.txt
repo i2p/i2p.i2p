@@ -1,4 +1,6 @@
-$Id: history.txt,v 1.100 2004/12/06 20:09:20 jrandom Exp $
+$Id: history.txt,v 1.101 2004/12/08 12:16:17 jrandom Exp $
+
+* 2004-12-08  0.4.2.3 released
 
 2004-12-08  jrandom
     * Revised the buffering when reading from the SAM client and writing 

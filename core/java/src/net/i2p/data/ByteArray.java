@@ -38,7 +38,7 @@ public class ByteArray implements Serializable, Comparable {
     }
     
     /** 
-     * how many of the bytes in the array are 'valid'?  
+     * Count how many of the bytes in the array are 'valid'.  
      * this property does not necessarily have meaning for all byte 
      * arrays.
      */
