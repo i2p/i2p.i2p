@@ -97,7 +97,8 @@ typedef enum {  /* see sam_strerror() for detailed descriptions of these */
 	SAM_INVALID_KEY, SAM_KEY_NOT_FOUND, SAM_PEER_NOT_FOUND, SAM_TIMEOUT,
 	SAM_UNKNOWN,
 	/* error codes from LibSAM */
-	SAM_BAD_VERSION, SAM_CALLBACKS_UNSET, SAM_SOCKET_ERROR, SAM_TOO_BIG
+	SAM_BAD_STYLE, SAM_BAD_VERSION, SAM_CALLBACKS_UNSET, SAM_SOCKET_ERROR,
+	SAM_TOO_BIG
 } samerr_t;
 
 /*

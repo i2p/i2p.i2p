@@ -118,6 +118,7 @@ bool sam_close(sam_sess_t *session)
  * samport - SAM port
  * destname - destination name for this program, or "TRANSIENT" for a random
  *		dest
+ * style - the connection style (stream, datagram, or raw)
  * tunneldepth - length of the I2P tunnels created by this program (longer is
  *		more anonymous, but slower)
  *
@@ -145,9 +146,10 @@ samerr_t sam_connect(sam_sess_t *session, const char *samhost, uint16_t samport,
 			return SAM_CALLBACKS_UNSET;
 		}
 	} else if (style == SAM_RAW) {
-		assert(false);  /* not implemented yet */
+		abort();  /* not implemented yet */
 	} else {
-		assert(false);  /* unknown style */
+		SAMLOGS("Unknown connection style");
+		return SAM_BAD_STYLE;
 	}
 
 #ifdef WINSOCK
@@ -857,7 +859,7 @@ static samerr_t sam_session_create(sam_sess_t *session, const char *destname,
 			"tunnels.depthOutbound=%u\n",
 			destname, tunneldepth, tunneldepth);
 	} else { /* SAM_RAW */
-		assert(false);  /* unimplemented */
+		abort();  /* unimplemented */
 	}
 
 	sam_write(session, cmd, strlen(cmd));
@@ -1115,6 +1117,8 @@ const char *sam_strerror(samerr_t code)
 		/*
 		 * SAM_UNKNOWN deliberately left out (goes to default)
 		 */
+		case SAM_BAD_STYLE:			/* Style must be stream, datagram, or raw */
+			return "Bad connection style";
 		case SAM_BAD_VERSION:		/* sam_hello() had an unexpected reply */
 			return "Bad SAM version";
 		case SAM_CALLBACKS_UNSET:	/* Some callbacks are still set to NULL */
