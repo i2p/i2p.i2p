@@ -17,4 +17,13 @@ class PeerPlotConfig {
 	// baf
     } 
     // moo
+    
+    private final static void biff() {
+        // b0nk
+        if (false) {
+            // boink
+        }
+        // b00m
+    }
+    // baa
 }
