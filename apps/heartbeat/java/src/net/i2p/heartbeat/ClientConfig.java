@@ -26,56 +26,56 @@ public class ClientConfig {
     private int _averagePeriods[];
 
     /**
-     * @see ClientConfig#load
-     * @see ClientConfig#store
+     * @seeRoutine ClientConfig#load
+     * @seeRoutine ClientConfig#store
      */
     public static final String PROP_PREFIX = "peer.";
 
     /**
-     * @see ClientConfig#load
-     * @see ClientConfig#store
+     * @seeRoutine ClientConfig#load
+     * @seeRoutine ClientConfig#store
      */
     public static final String PROP_PEER = ".peer";
 
     /**
-     * @see ClientConfig#load
-     * @see ClientConfig#store
+     * @seeRoutine ClientConfig#load
+     * @seeRoutine ClientConfig#store
      */
     public static final String PROP_STATFILE = ".statFile";
 
     /**
-     * @see ClientConfig#load
-     * @see ClientConfig#store
+     * @seeRoutine ClientConfig#load
+     * @seeRoutine ClientConfig#store
      */
     public static final String PROP_STATDURATION = ".statDuration";
 
     /**
-     * @see ClientConfig#load
-     * @see ClientConfig#store
+     * @seeRoutine ClientConfig#load
+     * @seeRoutine ClientConfig#store
      */
     public static final String PROP_STATFREQUENCY = ".statFrequency";
 
     /**
-     * @see ClientConfig#load
-     * @see ClientConfig#store
+     * @seeRoutine ClientConfig#load
+     * @seeRoutine ClientConfig#store
      */
     public static final String PROP_SENDFREQUENCY = ".sendFrequency";
 
     /**
-     * @see ClientConfig#load
-     * @see ClientConfig#store
+     * @seeRoutine ClientConfig#load
+     * @seeRoutine ClientConfig#store
      */
     public static final String PROP_SENDSIZE = ".sendSize";
 
     /**
-     * @see ClientConfig#load
-     * @see ClientConfig#store
+     * @seeRoutine ClientConfig#load
+     * @seeRoutine ClientConfig#store
      */
     public static final String PROP_COMMENT = ".comment";
 
     /**
-     * @see ClientConfig#load
-     * @see ClientConfig#store
+     * @seeRoutine ClientConfig#load
+     * @seeRoutine ClientConfig#store
      */
     public static final String PROP_AVERAGEPERIODS = ".averagePeriods";
 
@@ -89,7 +89,6 @@ public class ClientConfig {
     /**
      * @param peer who we will test against
      * @param us who we are
-     * @param statFile the file to save stats to
      * @param duration how many minutes to keep events for
      * @param statFreq how often to write out stats
      * @param sendFreq how often to send pings
@@ -98,8 +97,8 @@ public class ClientConfig {
      * @param comment describe this test
      * @param averagePeriods list of minutes to summarize over
      */
-    public ClientConfig(Destination peer, Destination us, String statFile, int duration, int statFreq, int sendFreq,
-                        int sendSize, int numHops, String comment, int averagePeriods[]) {
+    public ClientConfig(Destination peer, Destination us, String statFile, int duration, int statFreq, int sendFreq, int sendSize, int numHops, String comment,
+                        int averagePeriods[]) {
         _peer = peer;
         _us = us;
         _statFile = statFile;
@@ -167,8 +166,7 @@ public class ClientConfig {
     }
 
     /**
-     * Retrieves how many minutes of statistics should be maintained within the
-     * window for this client
+     * Retrieves how many minutes of statistics should be maintained within the window for this client
      * 
      * @return the number of minutes
      */
@@ -177,8 +175,7 @@ public class ClientConfig {
     }
 
     /**
-     * Sets how many minutes of statistics should be maintained within the
-     * window for this client
+     * Sets how many minutes of statistics should be maintained within the window for this client
      * 
      * @param durationMinutes the number of minutes
      */
@@ -223,8 +220,7 @@ public class ClientConfig {
     }
 
     /**
-     * Retrieves how many bytes the ping messages should be (min values ~700,
-     * max ~32KB)
+     * Retrieves how many bytes the ping messages should be (min values ~700, max ~32KB)
      * 
      * @return the size in bytes
      */
@@ -233,8 +229,7 @@ public class ClientConfig {
     }
 
     /**
-     * Sets how many bytes the ping messages should be (min values ~700, max
-     * ~32KB)
+     * Sets how many bytes the ping messages should be (min values ~700, max ~32KB)
      * 
      * @param numBytes the size in bytes
      */
@@ -243,9 +238,8 @@ public class ClientConfig {
     }
 
     /**
-     * Retrieves the brief, 1 line description of the test. Useful comments are
-     * along the lines of "The peer is located on a fast router and connection
-     * with 2 hop tunnels".
+     * Retrieves the brief, 1 line description of the test. Useful comments are along the lines of "The peer is located on a fast router and connection with 2
+     * hop tunnels".
      * 
      * @return the brief comment
      */
@@ -265,8 +259,7 @@ public class ClientConfig {
     /**
      * Retrieves the periods that the client's tests should be averaged over.
      * 
-     * @return list of periods (in minutes) that the data should be averaged
-     *         over, or null
+     * @return list of periods (in minutes) that the data should be averaged over, or null
      */
     public int[] getAveragePeriods() {
         return _averagePeriods;
@@ -275,16 +268,14 @@ public class ClientConfig {
     /**
      * Sets the periods that the client's tests should be averaged over.
      * 
-     * @param periods the list of periods (in minutes) that the data should be
-     *            averaged over, or null
+     * @param periods the list of periods (in minutes) that the data should be averaged over, or null
      */
     public void setAveragePeriods(int periods[]) {
         _averagePeriods = periods;
     }
 
     /**
-     * Retrieves how many hops this test engine is configured to use for its
-     * outbound and inbound tunnels
+     * Retrieves how many hops this test engine is configured to use for its outbound and inbound tunnels
      * 
      * @return the number of hops
      */
@@ -293,8 +284,7 @@ public class ClientConfig {
     }
 
     /**
-     * Sets how many hops this test engine is configured to use for its outbound
-     * and inbound tunnels
+     * Sets how many hops this test engine is configured to use for its outbound and inbound tunnels
      * 
      * @param numHops the number of hops
      */
@@ -303,8 +293,7 @@ public class ClientConfig {
     }
 
     /**
-     * Load the client config from the properties specified, deriving the
-     * current config entry from the peer number.
+     * Load the client config from the properties specified, deriving the current config entry from the peer number.
      * 
      * @param clientConfig the properties to load from
      * @param peerNum the number associated with the peer
@@ -321,8 +310,8 @@ public class ClientConfig {
         String commentVal = clientConfig.getProperty(PROP_PREFIX + peerNum + PROP_COMMENT);
         String periodsVal = clientConfig.getProperty(PROP_PREFIX + peerNum + PROP_AVERAGEPERIODS);
 
-        if ((peerVal == null) || (statFileVal == null) || (statDurationVal == null) || (statFrequencyVal == null)
-            || (sendFrequencyVal == null) || (sendSizeVal == null)) {
+        if ((peerVal == null) || (statFileVal == null) || (statDurationVal == null) || (statFrequencyVal == null) || (sendFrequencyVal == null)
+            || (sendSizeVal == null)) {
             if (_log.shouldLog(Log.DEBUG)) {
                 _log.debug("Peer number " + peerNum + " does not exist");
             }
@@ -337,9 +326,8 @@ public class ClientConfig {
 
             if ((duration <= 0) || (statFreq <= 0) || (sendFreq <= 0) || (sendSize <= 0)) {
                 if (_log.shouldLog(Log.WARN)) {
-                    _log.warn("Invalid client config: duration [" + statDurationVal + "] stat frequency ["
-                              + statFrequencyVal + "] send frequency [" + sendFrequencyVal + "] send size ["
-                              + sendSizeVal + "]");
+                    _log.warn("Invalid client config: duration [" + statDurationVal + "] stat frequency [" + statFrequencyVal + "] send frequency ["
+                              + sendFrequencyVal + "] send size [" + sendSizeVal + "]");
                 }
                 return false;
             }
@@ -394,16 +382,14 @@ public class ClientConfig {
     }
 
     /**
-     * Store the client config to the properties specified, deriving the current
-     * config entry from the peer number.
+     * Store the client config to the properties specified, deriving the current config entry from the peer number.
      * 
      * @param clientConfig the properties to store to
      * @param peerNum the number associated with the peer
      * @return true if it was stored correctly, false if there were errors
      */
     public boolean store(Properties clientConfig, int peerNum) {
-        if ((_peer == null) || (_sendFrequency <= 0) || (_sendSize <= 0) || (_statDuration <= 0)
-            || (_statFrequency <= 0) || (_statFile == null)) { return false; }
+        if ((_peer == null) || (_sendFrequency <= 0) || (_sendSize <= 0) || (_statDuration <= 0) || (_statFrequency <= 0) || (_statFile == null)) { return false; }
 
         String comment = _comment;
         if (comment == null) {
