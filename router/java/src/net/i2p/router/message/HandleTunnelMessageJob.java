@@ -61,6 +61,19 @@ public class HandleTunnelMessageJob extends JobImpl {
     public String getName() { return "Handle Inbound Tunnel Message"; }
     public void runJob() {
         TunnelId id = _message.getTunnelId();
+
+        if (_context.clock().now() >= _message.getMessageExpiration().getTime()) {
+            if (_log.shouldLog(Log.ERROR))
+                _log.error("Accepted message (" + _message.getUniqueId() + ") expired on the queue for tunnel " 
+                           + id.getTunnelId() + " expiring " 
+                           + (_context.clock().now() - _message.getMessageExpiration().getTime())
+                           + "ms agp");
+            _context.messageHistory().messageProcessingError(_message.getUniqueId(), 
+                                                             TunnelMessage.class.getName(), 
+                                                             "tunnel message expired on the queue");
+            return;
+        }
+        
         TunnelInfo info = _context.tunnelManager().getTunnelInfo(id);
 	
         if (info == null) {
