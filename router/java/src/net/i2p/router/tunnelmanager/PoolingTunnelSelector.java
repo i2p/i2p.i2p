@@ -30,6 +30,9 @@ class PoolingTunnelSelector {
     }
     
     public List selectOutboundTunnelIds(TunnelPool pool, TunnelSelectionCriteria criteria) {
+        return selectOutboundTunnelIds(pool, criteria, true);
+    }
+    public List selectOutboundTunnelIds(TunnelPool pool, TunnelSelectionCriteria criteria, boolean recurse) {
         List tunnelIds = new ArrayList(criteria.getMinimumTunnelsRequired());
         
         Set outIds = pool.getOutboundTunnels();
@@ -61,8 +64,8 @@ class PoolingTunnelSelector {
             pool.buildFakeTunnels();
             rebuilt = true;
         }
-        if (rebuilt)
-            return selectOutboundTunnelIds(pool, criteria);
+        if (rebuilt && recurse)
+            return selectOutboundTunnelIds(pool, criteria, false);
         
         List ordered = randomize(pool, tunnelIds);
         List rv = new ArrayList(criteria.getMinimumTunnelsRequired());
@@ -76,6 +79,9 @@ class PoolingTunnelSelector {
     }
     
     public List selectInboundTunnelIds(TunnelPool pool, TunnelSelectionCriteria criteria) {
+        return selectInboundTunnelIds(pool, criteria, true);
+    }
+    public List selectInboundTunnelIds(TunnelPool pool, TunnelSelectionCriteria criteria, boolean recurse) {
         List tunnels = new ArrayList(criteria.getMinimumTunnelsRequired());
         
         for (Iterator iter = pool.getFreeTunnels().iterator(); iter.hasNext(); ) {
@@ -103,8 +109,8 @@ class PoolingTunnelSelector {
             pool.buildFakeTunnels();
             rebuilt = true;
         }
-        if (rebuilt)
-            return selectInboundTunnelIds(pool, criteria);
+        if (rebuilt && recurse)
+            return selectInboundTunnelIds(pool, criteria, false);
         
         List ordered = randomize(pool, tunnels);
         List rv = new ArrayList(criteria.getMinimumTunnelsRequired());
