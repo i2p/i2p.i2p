@@ -4,6 +4,7 @@
     <target name="build" depends="builddep, jar" />
     <target name="builddep">
         <ant dir="../../../router/java/" target="build" />
+        <!-- <ant dir="../../systray/java/" target="build" /> -->
 	<!-- router will build core -->
     </target>
     <target name="prepare">
@@ -15,8 +16,16 @@
         <javac 
             srcdir="./src" 
             debug="true" deprecation="on" source="1.3" target="1.3" 
-            destdir="./build/obj" 
-            classpath="../../../core/java/build/i2p.jar:../../../router/java/build/router.jar:../../jetty/jettylib/org.mortbay.jetty-jdk1.2.jar" />
+            destdir="./build/obj">
+            <classpath>
+                <pathelement location="../../../core/java/build/i2p.jar" />
+                <pathelement location="../../../router/java/build/router.jar" />
+                <pathelement location="../../jetty/jettylib/org.mortbay.jetty-jdk1.2.jar" />
+                <!-- <pathelement location="../../systray/java/build/lib/systray.jar" /> -->
+                <!-- <pathelement location="../../systray/java/lib/systray4j.jar" /> -->
+                <pathelement location="../../../installer/lib/wrapper/win32/wrapper.jar" /> <!-- we dont care if we're not on win32 -->
+            </classpath>
+        </javac>
     </target>
     <target name="jar" depends="compile">
         <jar destfile="./build/routerconsole.jar" basedir="./build/obj" includes="**/*.class">
@@ -44,6 +53,8 @@
                 <pathelement location="../../jetty/jettylib/jasper-runtime.jar" />
                 <pathelement location="../../jetty/jettylib/javax.servlet.jar" />
                 <pathelement location="../../jetty/jettylib/ant.jar" />
+                <pathelement location="../../systray/java/build/obj" />
+                <pathelement location="../../../installer/lib/wrapper/win32/wrapper.jar" /> <!-- we dont care if we're not on win32 -->
                 <pathelement location="build/routerconsole.jar" />
             </classpath>
             <arg value="-d" />
@@ -88,10 +99,12 @@
     </target>
     <target name="cleandep" depends="clean">
 	<!-- router will clean core -->
-        <ant dir="../../../router/java/" target="distclean" />
+        <ant dir="../../../router/java/" target="cleandep" />
+        <!-- <ant dir="../../systray/java/" target="cleandep" /> -->
     </target>
     <target name="distclean" depends="clean">
 	<!-- router will clean core -->
         <ant dir="../../../router/java/" target="distclean" />
+        <!-- <ant dir="../../systray/java/" target="distclean" /> -->
     </target>
 </project>

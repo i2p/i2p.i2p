@@ -36,8 +36,8 @@
  tray, allowing you to view the router's status (later on, I2P client applications
  will be able to integrate their own functionality into the system tray as well).
  If you are on windows, you can either enable or disable that icon here. <br />
- <input type="submit" name="action" value="Enable systray icon" />
- <input type="submit" name="action" value="Disable systray icon" />
+ <input type="submit" name="action" value="Show systray icon" />
+ <input type="submit" name="action" value="Hide systray icon" />
  <h4>Run on startup</h4>
  On the windows platform, you can control whether I2P is run on startup or not by
  selecting one of the following options - I2P will install (or remove) a service 
@@ -48,6 +48,10 @@
  as root.<br />
  <input type="submit" name="action" value="Run I2P on startup" />
  <input type="submit" name="action" value="Don't run I2P on startup" />
+ <h4>Debugging</h4>
+ At times, it may be helpful to debug I2P by getting a thread dump.  To do so, 
+ please select the following option and review the thread dumped to logs/wrapper.log.
+ <input type="submit" name="action" value="Dump threads" />
  </form>
 </div>
 
