@@ -1,4 +1,4 @@
-<code>$Id: udp.html,v 1.5 2005/03/26 04:22:17 jrandom Exp $</code>
+<code>$Id: udp.html,v 1.6 2005/03/27 17:08:16 jrandom Exp $</code>
 
 <h1>Secure Semireliable UDP (SSU)</h1>
 <b>DRAFT</b>
@@ -340,7 +340,7 @@ bits 6-7: reserved</pre></li>
           <li>that many 4 byte MessageIds + 1 byte fragmentNum NACKs</li>
 	  </ul></li>
         <li>if numACKs included:<ul>
-          <li>a 1 byte number for how many messages were fully 
+          <li>a 2 byte number for how many messages were fully 
               received in the last minute.</li></ul></li>
         <li>1 byte number of fragments</li>
         <li>that many message fragments:<ul>
