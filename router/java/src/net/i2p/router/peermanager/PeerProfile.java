@@ -1,0 +1,317 @@
+package net.i2p.router.peermanager;
+
+import net.i2p.data.Hash;
+import net.i2p.stat.RateStat;
+import net.i2p.util.Log;
+
+class PeerProfile {
+    private final static Log _log = new Log(PeerProfile.class);
+    // whoozaat?
+    private Hash _peer;
+    // general peer stats
+    private long _firstHeardAbout;
+    private long _lastHeardAbout;
+    private long _lastSentToSuccessfully;
+    private long _lastFailedSend;
+    private long _lastHeardFrom;
+    // periodic rates
+    private RateStat _sendSuccessSize = null;
+    private RateStat _sendFailureSize = null;
+    private RateStat _receiveSize = null;
+    private RateStat _dbResponseTime = null;
+    private RateStat _tunnelCreateResponseTime = null;
+    private RateStat _commError = null;
+    private RateStat _dbIntroduction = null;
+    // calculation bonuses
+    private long _speedBonus;
+    private long _reliabilityBonus;
+    private long _integrationBonus;
+    // calculation values
+    private double _speedValue;
+    private double _reliabilityValue;
+    private double _integrationValue;
+    private boolean _isFailing;
+    // good vs bad behavior
+    private TunnelHistory _tunnelHistory;
+    private DBHistory _dbHistory;
+    // does this peer profile contain expanded data, or just the basics?
+    private boolean _expanded;
+    
+    public PeerProfile() {
+	this(null, true);
+    }
+    public PeerProfile(Hash peer) {
+	this(peer, true);
+    }
+    public PeerProfile(Hash peer, boolean expand) {
+	_expanded = false;
+	_speedValue = 0;
+	_reliabilityValue = 0;
+	_integrationValue = 0;
+	_isFailing = false;
+	_peer = peer;
+	if (expand)
+	    expandProfile();
+    }
+    
+    /** what peer is being profiled */
+    public Hash getPeer() { return _peer; }
+    public void setPeer(Hash peer) { _peer = peer; }
+    
+    /** 
+     * are we keeping an expanded profile on the peer, or just the bare minimum? 
+     * If we aren't keeping the expanded profile, all of the rates as well as the
+     * TunnelHistory and DBHistory will not be available.
+     *
+     */
+    public boolean getIsExpanded() { return _expanded; }
+
+    /**
+     * Is this peer active at the moment (sending/receiving messages within the last
+     * 5 minutes)
+     */
+    public boolean getIsActive() {
+	if ( (getSendSuccessSize().getRate(5*60*1000).getCurrentEventCount() > 0) ||
+	     (getSendSuccessSize().getRate(5*60*1000).getLastEventCount() > 0) || 
+	     (getReceiveSize().getRate(5*60*1000).getCurrentEventCount() > 0) || 
+	     (getReceiveSize().getRate(5*60*1000).getLastEventCount() > 0) )
+	    return true;
+	else
+	    return false;
+    } 
+			 
+    
+    /** when did we first hear about this peer? */
+    public long getFirstHeardAbout() { return _firstHeardAbout; }
+    public void setFirstHeardAbout(long when) { _firstHeardAbout = when; }
+
+    /** when did we last hear about this peer? */
+    public long getLastHeardAbout() { return _lastHeardAbout; }
+    public void setLastHeardAbout(long when) { _lastHeardAbout = when; }
+    
+    /** when did we last send to this peer successfully? */
+    public long getLastSendSuccessful() { return _lastSentToSuccessfully; }
+    public void setLastSendSuccessful(long when) { _lastSentToSuccessfully = when; }
+    
+    /** when did we last have a problem sending to this peer? */
+    public long getLastSendFailed() { return _lastFailedSend; }
+    public void setLastSendFailed(long when) { _lastFailedSend = when; }
+    
+    /** when did we last hear from the peer? */
+    public long getLastHeardFrom() { return _lastHeardFrom; }
+    public void setLastHeardFrom(long when) { _lastHeardFrom = when; }
+        
+    /** history of tunnel activity with the peer */
+    public TunnelHistory getTunnelHistory() { return _tunnelHistory; }
+    public void setTunnelHistory(TunnelHistory history) { _tunnelHistory = history; }
+    
+    /** history of db activity with the peer */
+    public DBHistory getDBHistory() { return _dbHistory; }
+    public void setDBHistory(DBHistory hist) { _dbHistory = hist; }
+
+    /** how large successfully sent messages are, calculated over a 1 minute, 1 hour, and 1 day period */
+    public RateStat getSendSuccessSize() { return _sendSuccessSize; }
+    /** how large messages that could not be sent were, calculated over a 1 minute, 1 hour, and 1 day period */
+    public RateStat getSendFailureSize() { return _sendFailureSize; }
+    /** how large received messages are, calculated over a 1 minute, 1 hour, and 1 day period */
+    public RateStat getReceiveSize() { return _receiveSize; }
+    /** how long it takes to get a db response from the peer (in milliseconds), calculated over a 1 minute, 1 hour, and 1 day period */
+    public RateStat getDbResponseTime() { return _dbResponseTime; }
+    /** how long it takes to get a tunnel create response from the peer (in milliseconds), calculated over a 1 minute, 1 hour, and 1 day period */
+    public RateStat getTunnelCreateResponseTime() { return _tunnelCreateResponseTime; }
+    /** how long between communication errors with the peer (e.g. disconnection), calculated over a 1 minute, 1 hour, and 1 day period */
+    public RateStat getCommError() { return _commError; }
+    /** how many new peers we get from dbSearchReplyMessages or dbStore messages, calculated over a 1 hour, 1 day, and 1 week period */
+    public RateStat getDbIntroduction() { return _dbIntroduction; }
+    
+    /** 
+     * extra factor added to the speed ranking - this can be updated in the profile 
+     * written to disk to affect how the algorithm ranks speed.  Negative values are
+     * penalties
+     */
+    public long getSpeedBonus() { return _speedBonus; }
+    public void setSpeedBonus(long bonus) { _speedBonus = bonus; }
+    
+    /** 
+     * extra factor added to the reliability ranking - this can be updated in the profile 
+     * written to disk to affect how the algorithm ranks reliability.  Negative values are
+     * penalties
+     */
+    public long getReliabilityBonus() { return _reliabilityBonus; }
+    public void setReliabilityBonus(long bonus) { _reliabilityBonus = bonus; }
+    
+    /** 
+     * extra factor added to the integration ranking - this can be updated in the profile 
+     * written to disk to affect how the algorithm ranks integration.  Negative values are
+     * penalties
+     */
+    public long getIntegrationBonus() { return _integrationBonus; }
+    public void setIntegrationBonus(long bonus) { _integrationBonus = bonus; }
+
+    /**
+     * How fast is the peer, taking into consideration both throughput and latency.
+     * This may even be made to take into consideration current rates vs. estimated
+     * (or measured) max rates, allowing this speed to reflect the speed /available/.
+     *
+     */
+    public double getSpeedValue() { return _speedValue; }
+    /**
+     * How likely are they to stay up and pass on messages over the next few minutes?
+     * Positive numbers means more likely, negative numbers means its probably not 
+     * even worth trying.
+     *
+     */
+    public double getReliabilityValue() { return _reliabilityValue; }
+    /**
+     * How well integrated into the network is this peer (as measured by how much they've
+     * told us that we didn't already know).  Higher numbers means better integrated
+     *
+     */
+    public double getIntegrationValue() { return _integrationValue; }    
+    /** 
+     * is this peer actively failing (aka not worth touching)? 
+     */
+    public boolean getIsFailing() { return _isFailing; }
+    
+    /** 
+     * when the given peer is performing so poorly that we don't want to bother keeping
+     * extensive stats on them, call this to discard excess data points.  Specifically,
+     * this drops the rates, the tunnelHistory, and the dbHistory.
+     *
+     */
+    public void shrinkProfile() {
+	_sendSuccessSize = null;
+	_sendFailureSize = null;
+	_receiveSize = null;
+	_dbResponseTime = null;
+	_tunnelCreateResponseTime = null;
+	_commError = null;
+	_dbIntroduction = null;
+	_tunnelHistory = null;
+	_dbHistory = null;
+	
+	_expanded = false;
+    }
+    
+    /** 
+     * When the given peer is performing well enough that we want to keep detailed 
+     * stats on them again, call this to set up the info we dropped during shrinkProfile.
+     * This will not however overwrite any existing data, so it can be safely called 
+     * repeatedly
+     *
+     */
+    public void expandProfile() {
+	if (_sendSuccessSize == null)
+	    _sendSuccessSize = new RateStat("sendSuccessSize", "How large successfully sent messages are", "profile", new long[] { 60*1000l, 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
+	if (_sendFailureSize == null)
+	    _sendFailureSize = new RateStat("sendFailureSize", "How large messages that could not be sent were", "profile", new long[] { 60*1000l, 60*60*1000l, 24*60*60*1000 } );
+	if (_receiveSize == null)
+	    _receiveSize = new RateStat("receiveSize", "How large received messages are", "profile", new long[] { 60*1000l, 5*60*1000l, 60*60*1000l, 24*60*60*1000 } );
+	if (_dbResponseTime == null)
+	    _dbResponseTime = new RateStat("dbResponseTime", "how long it takes to get a db response from the peer (in milliseconds)", "profile", new long[] { 60*1000l, 60*60*1000l, 24*60*60*1000 } );
+	if (_tunnelCreateResponseTime == null)
+	    _tunnelCreateResponseTime = new RateStat("tunnelCreateResponseTime", "how long it takes to get a tunnel create response from the peer (in milliseconds)", "profile", new long[] { 60*1000l, 60*60*1000l, 24*60*60*1000 } );
+	if (_commError == null)
+	    _commError = new RateStat("commErrorRate", "how long between communication errors with the peer (e.g. disconnection)", "profile", new long[] { 60*1000l, 60*60*1000l, 24*60*60*1000 } );
+	if (_dbIntroduction == null)
+	    _dbIntroduction = new RateStat("dbIntroduction", "how many new peers we get from dbSearchReplyMessages or dbStore messages", "profile", new long[] { 60*60*1000l, 24*60*60*1000l, 7*24*60*60*1000l });
+    
+	if (_tunnelHistory == null)
+	    _tunnelHistory = new TunnelHistory();
+	if (_dbHistory == null)
+	    _dbHistory = new DBHistory();
+	    
+	_expanded = true;
+    }
+    
+    /** update the stats and rates (this should be called once a minute) */
+    public void coallesceStats() {
+	if (!_expanded) return;
+	_commError.coallesceStats();
+	_dbIntroduction.coallesceStats();
+	_dbResponseTime.coallesceStats();
+	_receiveSize.coallesceStats();
+	_sendFailureSize.coallesceStats();
+	_sendSuccessSize.coallesceStats();
+	_tunnelCreateResponseTime.coallesceStats();
+	_dbHistory.coallesceStats();
+	
+	_speedValue = calculateSpeed();
+	_reliabilityValue = calculateReliability();
+	_integrationValue = calculateIntegration();
+	_isFailing = calculateIsFailing();
+	
+	if (_log.shouldLog(Log.DEBUG))
+	    _log.debug("Coallesced: speed [" + _speedValue + "] reliability [" + _reliabilityValue + "] integration [" + _integrationValue + "] failing? [" + _isFailing + "]");
+    }
+    
+    private double calculateSpeed() { return Calculator.getSpeedCalculator().calc(this); }
+    private double calculateReliability() { return Calculator.getReliabilityCalculator().calc(this); }
+    private double calculateIntegration() { return Calculator.getIntegrationCalculator().calc(this); }
+    private boolean calculateIsFailing() { return Calculator.getIsFailingCalculator().calcBoolean(this); }
+    void setIsFailing(boolean val) { _isFailing = val; }
+    
+    public int hashCode() { return (_peer == null ? 0 : _peer.hashCode()); }
+    public boolean equals(Object obj) {
+	if (obj == null) return false;
+	if (obj.getClass() != PeerProfile.class) return false;
+	if (_peer == null) return false;
+	PeerProfile prof = (PeerProfile)obj;
+	return _peer.equals(prof.getPeer());
+    }
+    public String toString() { return "Profile: " + getPeer().toBase64(); }
+    
+    /**
+     * Calculate the memory consumption of profiles.  Measured to be ~3739 bytes
+     * for an expanded profile, and ~212 bytes for a compacted one.
+     *
+     */
+    public static void main(String args[]) {
+	testProfileSize(100, 0); // 560KB
+	testProfileSize(1000, 0); // 3.9MB
+	testProfileSize(10000, 0); // 37MB
+	testProfileSize(0, 10000); // 2.2MB
+	testProfileSize(0, 100000); // 21MB
+	testProfileSize(0, 300000);  // 63MB
+    }
+    
+    private static void testProfileSize(int numExpanded, int numCompact) {
+	Runtime.getRuntime().gc();
+	PeerProfile profs[] = new PeerProfile[numExpanded];
+	PeerProfile profsCompact[] = new PeerProfile[numCompact];
+	long used = Runtime.getRuntime().totalMemory()-Runtime.getRuntime().freeMemory();
+	long usedPer = used / (numExpanded+numCompact);
+	System.out.println(numExpanded + "/" + numCompact + ": create array - Used: " + used + " bytes (or " + usedPer + " bytes per array entry)");
+	
+	int i = 0;
+	int j = 0;
+	try {
+	    for (; i < numExpanded; i++)
+		profs[i] = new PeerProfile(new Hash(new byte[Hash.HASH_LENGTH]));
+	} catch (OutOfMemoryError oom) {
+	    profs = null;
+	    profsCompact = null;
+	    Runtime.getRuntime().gc();
+	    System.out.println("Ran out of memory when creating profile " + i);
+	    return;
+	}
+	try {
+	    for (; i < numCompact; i++)
+		profsCompact[i] = new PeerProfile(new Hash(new byte[Hash.HASH_LENGTH]), false);
+	} catch (OutOfMemoryError oom) {
+	    profs = null;
+	    profsCompact = null;
+	    Runtime.getRuntime().gc();
+	    System.out.println("Ran out of memory when creating compacted profile " + i);
+	    return;
+	}
+	
+	Runtime.getRuntime().gc();
+	long usedObjects = Runtime.getRuntime().totalMemory()-Runtime.getRuntime().freeMemory();
+	usedPer = usedObjects / (numExpanded+numCompact);
+	System.out.println(numExpanded + "/" + numCompact + ": create objects - Used: " + usedObjects + " bytes (or " + usedPer + " bytes per profile)");
+	profs = null;
+	profsCompact = null;
+	Runtime.getRuntime().gc();
+    }
+}

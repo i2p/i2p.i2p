@@ -1,0 +1,3 @@
+#!/bin/sh
+cd ##_scripts_installdir##
+kill `cat router.pid`

@@ -1,0 +1,3 @@
+cd ##_scripts_installdir##
+java -jar lib\fetchseeds.jar netDb
+pause

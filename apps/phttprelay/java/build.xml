@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project basedir="." default="all" name="phttprelay">
+    <target name="all" depends="clean, build" />
+    <target name="build" depends="builddep, jar" />
+    <target name="builddep">
+        <ant dir="../../../core/java/" target="build" />
+    </target>
+    <target name="compile">
+        <mkdir dir="./build" />
+        <mkdir dir="./build/obj" />
+        <javac srcdir="./src" debug="true" destdir="./build/obj" classpath="../../../core/java/build/i2p.jar:lib/javax.servlet.jar" />
+    </target>
+    <target name="jar" depends="compile">
+        <war destfile="./build/phttprelay.war" webxml="web.xml">
+            <classes dir="./build/obj/">
+                <include name="**/*.class" />
+            </classes>
+            <lib dir="../../../core/java/build/">
+                <include name="i2p.jar" />
+            </lib>
+        </war>
+    </target>
+    <target name="javadoc">
+        <mkdir dir="./build" />
+        <mkdir dir="./build/javadoc" />
+        <javadoc 
+            sourcepath="./src:../../../core/java/src" destdir="./build/javadoc" 
+            classpath="./lib/javax.servlet.jar" 
+            packagenames="*" 
+            use="true" 
+            splitindex="true" 
+            windowtitle="I2P phttp relay" />
+    </target>
+    <target name="clean">
+        <delete dir="./build" />
+    </target>
+    <target name="cleandep" depends="clean">
+        <ant dir="../../../core/java/" target="cleandep" />
+    </target>
+    <target name="distclean" depends="clean">
+        <ant dir="../../../core/java/" target="distclean" />
+    </target>
+</project>

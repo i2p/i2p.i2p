@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE web-app
+    PUBLIC "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN"
+    "http://java.sun.com/dtd/web-app_2_3.dtd">
+
+
+<web-app>
+    <display-name>I2P Polling HTTP Relay</display-name>
+
+    <servlet>
+        <servlet-name>Register</servlet-name>
+        <servlet-class>net.i2p.phttprelay.RegisterServlet</servlet-class>
+        <init-param>
+            <param-name>pollPath</param-name>
+            <param-value>/phttpPoll</param-value>
+        </init-param>
+        <init-param>
+            <param-name>sendPath</param-name>
+            <param-value>/phttpSend</param-value>
+        </init-param>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+
+    <servlet>
+        <servlet-name>Send</servlet-name>
+        <servlet-class>net.i2p.phttprelay.SendServlet</servlet-class>
+        <init-param>
+            <param-name>checkPath</param-name>
+            <param-value>/phttpCheckSendStatus</param-value>
+        </init-param>
+        <init-param>
+            <param-name>maxMessagesPerIdent</param-name>
+            <param-value>100</param-value>
+        </init-param>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+ 
+    <servlet>
+        <servlet-name>CheckSendStatus</servlet-name>
+        <servlet-class>net.i2p.phttprelay.CheckSendStatusServlet</servlet-class>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+    
+    <servlet>
+        <servlet-name>Poll</servlet-name>
+        <servlet-class>net.i2p.phttprelay.PollServlet</servlet-class>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>Register</servlet-name>
+        <url-pattern>/phttpRegister</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>Send</servlet-name>
+        <url-pattern>/phttpSend</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>CheckSendStatus</servlet-name>
+        <url-pattern>/phttpCheckSendStatus</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>Poll</servlet-name>
+        <url-pattern>/phttpPoll</url-pattern>
+    </servlet-mapping>
+
+</web-app>

@@ -1,0 +1,66 @@
+# I2P Log Configuration File
+# Format:
+#  d = date
+#  c = class or log name
+#  t = thread name
+#  p = priority level of the log record
+#  m = message
+logger.format=d p [t] c: m
+
+# Date format:
+# uses the java.text.SimpleDateFormat
+logger.dateFormat=HH:mm:ss.SSS
+
+# Log file name:
+# This is the log file name before being rotated
+# '#' is replaced with the current log number for that day
+# If # is not specified, logs are not rotated
+logger.logFileName=log-#.txt
+
+# Log file size:
+# Maximum size of each log file:
+#  32g <-- 32 gigabytes (32*1024*1024*1024 bytes)
+#  10m <-- 10 megabytes (10*1024*1024 bytes)
+#  66k <-- 66 kilobytes (66*1024 bytes)
+#  42  <-- 42 bytes
+logger.logFileSize=3m
+
+# Log rotation limit:
+# Maximum number of logs to keep per day - lower log numbers
+# are reused once the limit is reached.  Ignored if there is no
+# '#' in the logFileName.
+logger.logRotationLimit=3
+
+# Display on screen:
+# In addition to the logging, send filtered log messages to the
+# standard output
+# true or false
+logger.displayOnScreen=true
+
+# Default level:
+# Define the minimum log level to be displayed unless
+# specified otherwise.
+# 
+# Log levels, from least severe to most, are: 
+#  DEBUG : verbose debugging info
+#  INFO  : component status messages
+#  WARN  : bad situation but recoverable
+#  ERROR : component error
+#  CRIT  : your hard drive is on fire
+#
+# Less severe levels always include more severe ones (e.g.
+# if you're listening to debug messages, you'll get info messages
+# too)
+logger.defaultLevel=##_logger_level##
+
+# Minimum log level for a record to be displayed on the screen
+# This check occurs after other filters occur, and only affects what is
+# show on console, and only does anything if displayOnScreen=true
+logger.minimumOnScreenLevel=DEBUG
+
+# Records:
+# Override the defaultLevel for all classes under the given package
+# or class
+logger.record.net.i2p=##_logger_level2##
+##_logger_notverbose##
+

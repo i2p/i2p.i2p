@@ -1,0 +1,9 @@
+@echo off
+title I2P Router
+cd ##_scripts_installdir##
+
+REM the -XX args are workarounds for bugs in java 1.4.2's garbage collector
+REM replace java with javaw if you don't want a window to pop up
+
+java -cp lib\i2p.jar;lib\router.jar -Djava.library.path=. -DloggerFilenameOverride=logs\log-router-#.txt -XX:NewSize=4M -XX:MaxNewSize=8M -XX:PermSize=8M -XX:MaxPermSize=32M net.i2p.router.Router
+pause

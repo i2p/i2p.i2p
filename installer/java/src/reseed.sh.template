@@ -1,0 +1,4 @@
+#!/bin/sh
+cd ##_scripts_installdir##
+java -jar lib/fetchseeds.jar netDb
+echo Router network database reseeded

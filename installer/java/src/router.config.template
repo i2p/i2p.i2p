@@ -1,0 +1,152 @@
+# I2P router configuration
+# Created on ##NOW##
+
+# TCP configuration, for inbound TCP/IP connections
+##_router_hn##
+##_router_port##
+##_router_lavalid##
+# unless you really really know what you're doing, keep listenAddressIsValid=false
+##_router_tcpdisable##
+
+# maximum number of TCP connections we will want to
+# attempt to establish at once (each of which
+# requires a 2048bit DH exchange)
+i2np.tcp.concurrentEstablishers=5
+	
+# Polling HTTP configuration, which is used to keep your router's clock in sync
+# [also for communication when no inbound connections are possible, once its fixed up again]
+##_router_phttpreg##
+##_router_phttpsend##
+
+# The following option specifies whether the router wants to keep the router's internal time in sync
+# with the PHTTP relay's clock (which should be NTP synced).  If however you are sure your local machine
+# always has the correct time, you can set this to false (but your clock MUST be synced - see 
+# http://wiki.invisiblenet.net/iip-wiki?I2PTiming for more info.
+i2np.phttp.trustRelayTime=true
+
+# I2CP client port, for client connections
+i2cp.port=##_router_i2cp_port##
+
+# I2P router administrative web port (currently only responds to /routerConsole.html)
+router.adminPort=7655
+# Bandwidth limits
+# These limits are for all i2np connections - tcp or whatever
+# They are hard enforced with no smoothing.
+# XXX Until the 0.3.2 release, these should NOT BE USED.  Their values will be ignored!!!
+i2np.bandwidth.inboundBytesPerMinute=##_router_inbps##
+i2np.bandwidth.outboundBytesPerMinute=##_router_outbps##
+
+# Publish peer rankings
+# If true, include the current liveliness and reliability rankings in one's published RouterInfo data
+# Setting this to true will help debug the network and is especially useful while we'return still testing
+# However, traffic analysis may be easier with this data published (though there's no reason to think people
+# can't just fake the info in this).
+# Since we're still very much < 1.0, this will be true for the current release by default.  As we get some 
+# network helth information and tune the ranking algorithms, this will become false by default.  
+# You, of course, can change this to either true or false whenever you'd like.  This is only read 
+# on router startup though, so you need to restart the router if you change it.
+router.publishPeerRankings=true
+
+# Keep message history
+# This series of options can help out in debugging the network by keeping a 
+# seperate log of all messages sent over the network (but without any personally identifiable information)
+# This is entirely optional, but would be greatly appreciated during the 
+# development phase of the network since it would allow the developers to detect 
+# errors much more easily
+router.keepHistory=false
+
+# Submit message history
+# This option works only if router.keepHistory is true and periodically sends 
+# in the router history logs to the developers (specifically, it submits the file 
+# via HTTP POST to http://i2p.net/cgi-bin/submitMessageHistory - you can see a sample of what
+# one of those files looks like at http://i2p.net/~jrandom/sampleHist.txt)
+# After submitting this file, it deletes the local copy (otherwise the file will grow 
+# without bound - tens of MB per day)
+# Again, this is entirely optional, but would be greatly appreciated as it should help 
+# out the development process
+router.submitHistory=false
+	
+# If your router is really slow, you'll need to update the following job parameters
+
+# limit the maximum number of concurrent operations
+router.maxJobRunners=1
+
+# if a job waits more than this amount of time (in
+# milliseconds) before running, spit out a warning
+router.jobLagWarning=8000
+
+# if a job waits more than this amount of time (in
+# milliseconds) before running, kill the router
+router.jobLagFatal=30000
+
+# if a job takes more than this amount of time (in
+# milliseconds) to run, spit out a warning
+router.jobRunWarning=8000
+
+# if a job takes more than this amount of time (in
+# milliseconds) to run, kill the router
+router.jobRunFatal=30000
+
+# wait until the router has been up for this long
+# (in milliseconds) before honoring any fatalities
+# since during startup, jobs are run sequentially 
+# and CPU intensive tasks are needed
+router.jobWarmupTime=600000
+
+# Target clients
+# How many concurrent clients the router should prepare for
+# This, factored in with the tunnel settings, determines the size of the pools -
+# too many, and your machine consumes excessive CPU and bandwidth, too few and your 
+# clients take too long to startup.  
+# e.g. If you are running an eepsite, an eepProxy, an irc proxy, and a squid proxy, set this to 4
+router.targetClients=2
+
+# Number of inbound tunnels per client
+# This determines how many inbound tunnels will be allocated per client at a time. 
+# This is a key factor in the reliability of a client receiving messages
+# As above, too many and your machine gets hosed, too few and the pool is slow.  
+# 2 should be sufficient - prior to 0.2.5, we have all had only 1
+tunnels.numInbound=2
+
+# Number of outbound tunnels per client
+# This determines how many outbound tunnels must exist when a client is in operation.
+# XXX Not currently enforced - ignore this setting
+tunnels.numOutbound=2
+
+
+# Depth of inbound tunnels
+# This determines the length of inbound tunnels created - how many remote routers to
+# include (0 means no remote routers, 3 means a total of four routers, including
+# the local one, etc).  This is a key factor in the reliability and anonymity 
+# provided by I2P
+# Users should simply leave this as 2 for now, at least until the tunnels are more reliable (post 0.3)
+tunnels.depthInbound=2
+
+# Depth of outbound tunnels
+# This determines the length of outbound tunnels created - how many remote routers to
+# include (0 means no remote routers, 3 means a total of four routers, including
+# the local one, etc).  This is a key factor in the reliability and anonymity 
+# provided by I2P
+# Users should simply leave this as 2 for now, at least until the tunnels are more reliable (post 0.3)
+tunnels.depthOutbound=2
+
+# Tunnel duration
+# This determines how long tunnels we create should last for (in milliseconds).  Too
+# long and they are more prone to failure, too short and people need to do more network
+# database lookups.  The default of 10 minutes (600000 ms) should be used
+# You should not change this setting unless you really know what you're doing
+tunnels.tunnelDuration=600000
+
+# Max waiting jobs
+# If your router is getting heavily overloaded (due to slow CPU or excess network
+# activity), your router's performance will seriously degrade, increasing its 
+# load further and delaying any messages sent through your router.  The max waiting
+# jobs configuration parameter is a throttle, saying that if there are more than
+# that many 'jobs' that want to run ASAP at any given time, additional jobs may
+# be summarily dropped.  That will reduce your load and cause others to reduce
+# their dependence on you (further reducing your load).  The default value of 20
+# should be sufficient, but may be increased if desired.  Less than 20 is not
+# recommended, as certain normal events can queue up 10 or so jobs at a time
+# (all of which only take a few milliseconds).  Leave this alone unless you know
+# what you're doing
+router.maxWaitingJobs=20

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project basedir="." default="all" name="i2p_router">
+    <target name="all" depends="clean, build" />
+    <target name="build" depends="builddep, jar" />
+    <target name="builddep">
+        <ant dir="../../core/java/" target="build" />
+    </target>
+    <target name="compile">
+        <mkdir dir="./build" />
+        <mkdir dir="./build/obj" />
+        <javac srcdir="./src:./test" debug="true" destdir="./build/obj" classpath="../../core/java/build/i2p.jar" />
+    </target>
+    <target name="jar" depends="compile">
+        <jar destfile="./build/router.jar" basedir="./build/obj" includes="**/*.class" />
+    </target>
+    <target name="javadoc">
+        <mkdir dir="./build" />
+        <mkdir dir="./build/javadoc" />
+        <javadoc 
+            sourcepath="./src:./test:../../core/java/src:../../core/java/test" destdir="./build/javadoc" 
+            packagenames="*" 
+            use="true" 
+            splitindex="true" 
+            windowtitle="I2P Router" />
+    </target>
+    <target name="clean">
+        <delete dir="./build" />
+    </target>
+    <target name="cleandep" depends="clean">
+        <ant dir="../../core/java/" target="cleandep" />
+    </target>
+    <target name="distclean" depends="clean">
+        <ant dir="../../core/java/" target="distclean" />
+    </target>
+</project>
