@@ -33,8 +33,12 @@ public class SysTray implements SysTrayMenuListener {
     private SysTrayMenuIcon _sysTrayMenuIcon   = new SysTrayMenuIcon("icons/iggy");
     private SysTrayMenu     _sysTrayMenu       = new SysTrayMenu(_sysTrayMenuIcon, "I2P Control");
     private UrlLauncher     _urlLauncher       = new UrlLauncher();
+    
+    private static SysTray _instance;
+    public static synchronized SysTray instance() { return _instance; }
 
     public SysTray() {
+        _instance = this;
         if (!_configFile.init("systray.config"))
             _configFile.setProperty("browser", "default");
 
@@ -49,6 +53,9 @@ public class SysTray implements SysTrayMenuListener {
             new SysTray();
     }
 
+    public void show() { _sysTrayMenu.showIcon(); }
+    public void hide() { _sysTrayMenu.hideIcon(); }
+    
     public void iconLeftClicked(SysTrayMenuEvent e) {}
 
     public void iconLeftDoubleClicked(SysTrayMenuEvent e) {
