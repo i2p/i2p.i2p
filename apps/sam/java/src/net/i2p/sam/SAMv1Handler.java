@@ -660,7 +660,10 @@ public class SAMv1Handler extends SAMHandler implements SAMRawReceiver, SAMDatag
             }
         }
 
-        return streamSession.closeConnection(id);
+        boolean closed = streamSession.closeConnection(id);
+        if ( (!closed) && (_log.shouldLog(Log.WARN)) )
+            _log.warn("Stream unable to be closed, but this is non fatal");
+        return true;
     }
 
     /* Check whether a size is inside the limits allowed by this protocol */
