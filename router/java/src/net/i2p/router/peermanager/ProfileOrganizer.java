@@ -57,6 +57,15 @@ public class ProfileOrganizer {
     /** integration value, seperating well integrated from not well integrated */
     private double _thresholdIntegrationValue;
     
+    /**
+     * Defines what percentage of the average reliability will be used as the 
+     * reliability threshold.  For example, .5 means all peers with the reliability
+     * greater than half of the average will be considered "reliable".
+     *
+     */
+    public static final String PROP_RELIABILITY_THRESHOLD_FACTOR = "profileOrganizer.reliabilityThresholdFactor";
+    public static final double DEFAULT_RELIABILITY_THRESHOLD_FACTOR = .5d;
+    
     /** synchronized against this lock when updating the tier that peers are located in (and when fetching them from a peer) */
     private Object _reorganizeLock = new Object();
     
@@ -395,7 +404,7 @@ public class ProfileOrganizer {
             if (profile.getReliabilityValue() > 0)
                 totalReliability += profile.getReliabilityValue();
         }
-        _thresholdReliabilityValue = 0.5d * avg(totalReliability, numActive);
+        _thresholdReliabilityValue = getReliabilityThresholdFactor() * avg(totalReliability, numActive);
         
         // now derive the integration and speed thresholds based ONLY on the reliable
         // and active peers
@@ -618,6 +627,46 @@ public class ProfileOrganizer {
         buf.append("<b>Reliability:</b> ").append(num(_thresholdReliabilityValue)).append(" (").append(reliable).append(" reliable peers)<br />");
         buf.append("<b>Integration:</b> ").append(num(_thresholdIntegrationValue)).append(" (").append(integrated).append(" well integrated peers)<br />");
         return buf.toString();
+    }
+    
+    
+    /**
+     * How much should we shrink (or grow) the average reliability to determine the
+     * threshold - numbers greater than 1 increase the threshold, less than 1 decrease
+     * it.  This can be changed during runtime by updating the router.config
+     *
+     * @return factor to multiply the average reliability with to determine the threshold
+     */
+    private double getReliabilityThresholdFactor() {
+        if (_context.router() != null) {
+            String val = _context.router().getConfigSetting(PROP_RELIABILITY_THRESHOLD_FACTOR);
+            if (val != null) {
+                try {
+                    double rv = Double.parseDouble(val);
+                    if (_log.shouldLog(Log.DEBUG)) 
+                        _log.debug("router config said " + PROP_RELIABILITY_THRESHOLD_FACTOR + '=' + val);
+                    return rv;
+                } catch (NumberFormatException nfe) {
+                    if (_log.shouldLog(Log.WARN))
+                        _log.warn("Reliability threshold factor improperly set in the router config [" + val + "]", nfe);
+                }
+            }
+        }
+        String val = _context.getProperty(PROP_RELIABILITY_THRESHOLD_FACTOR, ""+DEFAULT_RELIABILITY_THRESHOLD_FACTOR);
+        if (val != null) {
+            try {
+                double rv = Double.parseDouble(val);
+                if (_log.shouldLog(Log.DEBUG)) 
+                    _log.debug("router context said " + PROP_RELIABILITY_THRESHOLD_FACTOR+ '=' + val);
+            } catch (NumberFormatException nfe) {
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("Reliability threshold factor improperly set in the router environment [" + val + "]", nfe);
+            }
+        }
+        
+        if (_log.shouldLog(Log.DEBUG)) 
+            _log.debug("no config for " + PROP_RELIABILITY_THRESHOLD_FACTOR + ", using " + DEFAULT_RELIABILITY_THRESHOLD_FACTOR);
+        return DEFAULT_RELIABILITY_THRESHOLD_FACTOR;
     }
     
     private final static DecimalFormat _fmt = new DecimalFormat("###,##0.00", new DecimalFormatSymbols(Locale.UK));
