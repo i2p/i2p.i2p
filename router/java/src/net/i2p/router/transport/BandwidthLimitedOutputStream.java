@@ -33,7 +33,9 @@ public class BandwidthLimitedOutputStream extends FilterOutputStream {
     public void write(int val) throws IOException {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Writing a single byte!", new Exception("Single byte from..."));
-        _context.bandwidthLimiter().requestOutbound(1, _peerTarget);
+        FIFOBandwidthLimiter.Request req = _context.bandwidthLimiter().requestOutbound(1, _peerTarget);
+        // only a single byte, no need to loop
+        req.waitForNextAllocation();
         out.write(val);
     }
     public void write(byte src[]) throws IOException {
@@ -47,7 +49,17 @@ public class BandwidthLimitedOutputStream extends FilterOutputStream {
         if (len + off > src.length)
             throw new IllegalArgumentException("wtf are you thinking?  len=" + len 
                                                + ", off=" + off + ", data=" + src.length);
-        _context.bandwidthLimiter().requestOutbound(len, _peerTarget);
-        out.write(src, off, len);
+        FIFOBandwidthLimiter.Request req = _context.bandwidthLimiter().requestOutbound(len, _peerTarget);
+        
+        int written = 0;
+        while (written < len) {
+            int allocated = len - req.getPendingOutboundRequested();
+            int toWrite = allocated - written;
+            if (toWrite > 0) {
+                out.write(src, off + written, toWrite);
+                written += toWrite;
+            }
+            req.waitForNextAllocation();
+        }
     }
 }

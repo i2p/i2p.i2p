@@ -8,9 +8,9 @@ class FIFOBandwidthRefiller implements Runnable {
     private I2PAppContext _context;
     private FIFOBandwidthLimiter _limiter;
     /** how many KBps do we want to allow? */
-    private long _inboundKBytesPerSecond;
+    private int _inboundKBytesPerSecond;
     /** how many KBps do we want to allow? */
-    private long _outboundKBytesPerSecond;
+    private int _outboundKBytesPerSecond;
     /** how frequently do we want to replenish the available queues? */
     private long _replenishFrequency;
     /** when did we last replenish the queue? */
@@ -27,13 +27,13 @@ class FIFOBandwidthRefiller implements Runnable {
     public static final String PROP_REPLENISH_FREQUENCY = "i2np.bandwidth.replenishFrequencyMs";
  
     /** For now, until there is some tuning and safe throttling, we set the floor at 6KBps inbound */
-    public static final long MIN_INBOUND_BANDWIDTH = 6;
+    public static final int MIN_INBOUND_BANDWIDTH = 6;
     /** For now, until there is some tuning and safe throttling, we set the floor at 6KBps outbound */
-    public static final long MIN_OUTBOUND_BANDWIDTH = 6;
+    public static final int MIN_OUTBOUND_BANDWIDTH = 6;
     /** For now, until there is some tuning and safe throttling, we set the floor at a 10 second burst */
-    public static final long MIN_INBOUND_BANDWIDTH_PEAK = 60;
+    public static final int MIN_INBOUND_BANDWIDTH_PEAK = 6;
     /** For now, until there is some tuning and safe throttling, we set the floor at a 10 second burst */
-    public static final long MIN_OUTBOUND_BANDWIDTH_PEAK = 60;
+    public static final int MIN_OUTBOUND_BANDWIDTH_PEAK = 6;
     /** Updating the bandwidth more than once a second is silly.  once every 2 or 5 seconds is less so. */
     public static final long MIN_REPLENISH_FREQUENCY = 1000;
     
@@ -134,7 +134,7 @@ class FIFOBandwidthRefiller implements Runnable {
              (!(inBwStr.equals(String.valueOf(_inboundKBytesPerSecond)))) ) {
             // bandwidth was specified *and* changed
             try {
-                long in = Long.parseLong(inBwStr);
+                int in = Integer.parseInt(inBwStr);
                 if ( (in <= 0) || (in > MIN_INBOUND_BANDWIDTH) ) 
                     _inboundKBytesPerSecond = in;
                 else
@@ -157,7 +157,7 @@ class FIFOBandwidthRefiller implements Runnable {
              (!(outBwStr.equals(String.valueOf(_outboundKBytesPerSecond)))) ) {
             // bandwidth was specified *and* changed
             try {
-                long out = Long.parseLong(outBwStr);
+                int out = Integer.parseInt(outBwStr);
                 if ( (out <= 0) || (out >= MIN_OUTBOUND_BANDWIDTH) )
                     _outboundKBytesPerSecond = out;
                 else
@@ -180,11 +180,18 @@ class FIFOBandwidthRefiller implements Runnable {
              (!(inBwStr.equals(String.valueOf(_limiter.getMaxInboundBytes())))) ) {
             // peak bw was specified *and* changed
             try {
-                long in = Long.parseLong(inBwStr);
-                if (in >= MIN_INBOUND_BANDWIDTH_PEAK)
-                    _limiter.setMaxInboundBytes(in * 1024);
-                else
-                    _limiter.setMaxInboundBytes(MIN_INBOUND_BANDWIDTH_PEAK * 1024);
+                int in = Integer.parseInt(inBwStr);
+                if (in >= MIN_INBOUND_BANDWIDTH_PEAK) {
+                    if (in < _inboundKBytesPerSecond)
+                        _limiter.setMaxInboundBytes(_inboundKBytesPerSecond * 1024);
+                    else 
+                        _limiter.setMaxInboundBytes(in * 1024);
+                } else {
+                    if (MIN_INBOUND_BANDWIDTH_PEAK < _inboundKBytesPerSecond) 
+                        _limiter.setMaxInboundBytes(_inboundKBytesPerSecond * 1024);
+                    else
+                        _limiter.setMaxInboundBytes(MIN_INBOUND_BANDWIDTH_PEAK * 1024);
+                }
             } catch (NumberFormatException nfe) {
                 if (_log.shouldLog(Log.WARN))
                     _log.warn("Invalid inbound bandwidth burst limit [" + inBwStr 
@@ -203,11 +210,18 @@ class FIFOBandwidthRefiller implements Runnable {
              (!(outBwStr.equals(String.valueOf(_limiter.getMaxOutboundBytes())))) ) {
             // peak bw was specified *and* changed
             try {
-                long out = Long.parseLong(outBwStr);
-                if (out >= MIN_OUTBOUND_BANDWIDTH_PEAK)
-                    _limiter.setMaxOutboundBytes(out * 1024);
-                else
-                    _limiter.setMaxOutboundBytes(MIN_OUTBOUND_BANDWIDTH_PEAK * 1024);
+                int out = Integer.parseInt(outBwStr);
+                if (out >= MIN_OUTBOUND_BANDWIDTH_PEAK) {
+                    if (out < _outboundKBytesPerSecond)
+                        _limiter.setMaxOutboundBytes(_outboundKBytesPerSecond * 1024);
+                    else
+                        _limiter.setMaxOutboundBytes(out * 1024);
+                } else {
+                    if (MIN_OUTBOUND_BANDWIDTH_PEAK < _outboundKBytesPerSecond)
+                        _limiter.setMaxOutboundBytes(_outboundKBytesPerSecond * 1024);
+                    else
+                        _limiter.setMaxOutboundBytes(MIN_OUTBOUND_BANDWIDTH_PEAK * 1024);
+                }
             } catch (NumberFormatException nfe) {
                 if (_log.shouldLog(Log.WARN))
                     _log.warn("Invalid outbound bandwidth burst limit [" + outBwStr 

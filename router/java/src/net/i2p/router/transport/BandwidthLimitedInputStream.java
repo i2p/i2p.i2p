@@ -38,36 +38,50 @@ public class BandwidthLimitedInputStream extends FilterInputStream {
     }
     
     public int read() throws IOException {
+        FIFOBandwidthLimiter.Request req = null;
         if (_pullFromOutbound)
-            _context.bandwidthLimiter().requestOutbound(1, _peerSource);
+            req = _context.bandwidthLimiter().requestOutbound(1, _peerSource);
         else
-            _context.bandwidthLimiter().requestInbound(1, _peerSource);
+            req = _context.bandwidthLimiter().requestInbound(1, _peerSource);
+        
+        // since its only a single byte, we dont need to loop
+        // or check how much was allocated
+        req.waitForNextAllocation();
         return in.read();
     }
     
     public int read(byte dest[]) throws IOException {
-        int read = in.read(dest);
-        if (_pullFromOutbound)
-            _context.bandwidthLimiter().requestOutbound(read, _peerSource);
-        else
-            _context.bandwidthLimiter().requestInbound(read, _peerSource);
-        return read;
+        return read(dest, 0, dest.length);
     }
     
     public int read(byte dest[], int off, int len) throws IOException {
         int read = in.read(dest, off, len);
+        FIFOBandwidthLimiter.Request req = null;
         if (_pullFromOutbound)
-            _context.bandwidthLimiter().requestOutbound(read, _peerSource);
+            req = _context.bandwidthLimiter().requestOutbound(read, _peerSource);
         else
-            _context.bandwidthLimiter().requestInbound(read, _peerSource);
+            req = _context.bandwidthLimiter().requestInbound(read, _peerSource);
+        
+        while ( (req.getPendingInboundRequested() > 0) ||
+                (req.getPendingOutboundRequested() > 0) ) {
+            // we still haven't been authorized for everything, keep on waiting
+            req.waitForNextAllocation();
+        }
         return read;
     }
     public long skip(long numBytes) throws IOException {
         long skip = in.skip(numBytes);
+        FIFOBandwidthLimiter.Request req = null;
         if (_pullFromOutbound)
-            _context.bandwidthLimiter().requestOutbound((int)skip, _peerSource);
+            req = _context.bandwidthLimiter().requestOutbound((int)skip, _peerSource);
         else
-            _context.bandwidthLimiter().requestInbound((int)skip, _peerSource);
+            req = _context.bandwidthLimiter().requestInbound((int)skip, _peerSource);
+        
+        while ( (req.getPendingInboundRequested() > 0) ||
+                (req.getPendingOutboundRequested() > 0) ) {
+            // we still haven't been authorized for everything, keep on waiting
+            req.waitForNextAllocation();
+        }
         return skip;
     }
 }
