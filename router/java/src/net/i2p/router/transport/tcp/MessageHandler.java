@@ -30,6 +30,7 @@ public class MessageHandler implements I2NPMessageReader.I2NPMessageEventListene
     }
     
     public void messageReceived(I2NPMessageReader reader, I2NPMessage message, long msToRead, int size) {
+        _con.messageReceived();
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Just received message " + message.getUniqueId() + " from " 
                        + _identHash.toBase64().substring(0,6)

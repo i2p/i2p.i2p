@@ -325,8 +325,8 @@ public class Connection {
             _occurredEventCount++;
         } else {
             _occurredTime = now;
-            if (_occurredEventCount > 5) {
-                _log.log(Log.CRIT, "More than 5 events (" + _occurredEventCount + ") in a second on " 
+            if (_occurredEventCount > 10) {
+                _log.log(Log.CRIT, "More than 10 events (" + _occurredEventCount + ") in a second on " 
                                    + toString() + ": scheduler = " + sched);
             }
             _occurredEventCount = 0;

@@ -40,6 +40,8 @@ public class TCPConnection {
     private RateStat _sendRate;
     private long _started;
     private boolean _closed;
+    private long _lastRead;
+    private long _lastWrite;
     
     public TCPConnection(RouterContext ctx) {
         _context = ctx;
@@ -53,6 +55,8 @@ public class TCPConnection {
         _transport = null;
         _started = -1;
         _closed = false;
+        _lastRead = 0;
+        _lastWrite = 0;
         _runner = new ConnectionRunner(_context, this);
         _context.statManager().createRateStat("tcp.probabalisticDropQueueSize", "How many bytes were queued to be sent when a message as dropped probabalistically?", "TCP", new long[] { 60*1000l, 10*60*1000l, 60*60*1000l, 24*60*60*1000l } );
         _context.statManager().createRateStat("tcp.queueSize", "How many bytes were queued on a connection?", "TCP", new long[] { 60*1000l, 10*60*1000l, 60*60*1000l, 24*60*60*1000l } );
@@ -359,6 +363,19 @@ public class TCPConnection {
     boolean getIsClosed() { return _closed; }
     RouterContext getRouterContext() { return _context; }
     
+    boolean getIsActive() {
+        if ( (_lastRead <= 0) || (_lastWrite <= 0) ) return false;
+        long recent = (_lastRead > _lastWrite ? _lastRead : _lastWrite);
+        long howLongAgo = _context.clock().now() - recent;
+        if (howLongAgo < 1*60*1000)
+            return true;
+        else
+            return false;
+    }
+    void messageReceived() {
+        _lastRead = _context.clock().now();
+    }
+    
     /** 
      * The message was sent.
      *
@@ -370,5 +387,7 @@ public class TCPConnection {
         _transport.afterSend(msg, ok, true, time);
         if (ok)
             _sendRate.addData(msg.getMessageSize(), msg.getLifetime());
+        if (ok)
+            _lastWrite = _context.clock().now();
     }
 }

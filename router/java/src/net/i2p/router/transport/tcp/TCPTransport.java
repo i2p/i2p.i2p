@@ -349,6 +349,8 @@ public class TCPTransport extends TransportImpl {
                         if (_myAddress != null) {
                             if (addr.getAddress().equals(_myAddress.getAddress())) {
                                 // ignore, since there is no change
+                                if (_log.shouldLog(Log.INFO))
+                                    _log.info("Not updating our local address, as it hasnt changed from " + address);
                                 return;
                             }
                         }
@@ -363,6 +365,8 @@ public class TCPTransport extends TransportImpl {
             } else {
                 // either we have explicitly specified our IP address, or 
                 // we are already connected to some people.
+                if (_log.shouldLog(Log.DEBUG))
+                    _log.debug("Not allowing address update");
             }
         }
     }
@@ -505,11 +509,22 @@ public class TCPTransport extends TransportImpl {
      *
      */
     private boolean allowAddressUpdate() {
-        boolean addressSpecified = (null != _context.getProperty(LISTEN_ADDRESS));
-        if (addressSpecified) 
-            return false;
         int connectedPeers = countActivePeers();
-        return (connectedPeers == 0);
+        boolean addressSpecified = (null != _context.getProperty(LISTEN_ADDRESS));
+        if (addressSpecified) {
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Not allowing address update, sicne we have one specified (#cons=" + connectedPeers + ")");
+            return false;
+        }
+        if (connectedPeers <= 0) {
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Allowing address update, since the # of connected peers is " + connectedPeers);
+            return true;
+        } else {
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Not allowing address update, since the # of connected peers is " + connectedPeers);
+            return false;
+        }
     }
         
     /**
@@ -544,9 +559,22 @@ public class TCPTransport extends TransportImpl {
      *
      */
     public int countActivePeers() { 
+        int numActive = 0;
+        int numInactive = 0;
         synchronized (_connectionLock) {
-            return _connectionsByIdent.size();
+            if (_connectionsByIdent.size() <= 0) return 0;
+            for (Iterator iter = _connectionsByIdent.values().iterator(); iter.hasNext(); ) {
+                TCPConnection con = (TCPConnection)iter.next();
+                if (con.getIsActive())
+                    numActive++;
+                else
+                    numInactive++;
+            }
         }
+        if ( (numInactive > 0) && (_log.shouldLog(Log.DEBUG)) )
+            _log.debug("Inactive peers: " + numInactive + " active: " + numActive);
+        
+        return numActive;
     }
     
     /**

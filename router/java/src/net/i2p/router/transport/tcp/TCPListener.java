@@ -137,7 +137,7 @@ class TCPListener {
         
         public void run() {
             if (_log.shouldLog(Log.INFO))
-                _log.info("Beginning TCP listener");
+                _log.info("Beginning TCP listener on " + _myAddress);
             
             int curDelay = 0;
             while (_isRunning) {

@@ -1,4 +1,10 @@
-$Id: history.txt,v 1.84 2004/11/26 22:54:18 jrandom Exp $
+$Id: history.txt,v 1.85 2004/11/27 00:17:06 jrandom Exp $
+
+2004-11-27  jrandom
+    * Some cleanup and bugfixes for the IP address detection code where we 
+      only consider connections that have actually sent and received messages
+      recently as active, rather than the mere presence of a TCP socket as 
+      activity.
 
 2004-11-27  jrandom
     * Removed the I2PTunnel inactivity timeout thread, since the new streaming
