@@ -26,56 +26,56 @@ public class ClientConfig {
     private int _averagePeriods[];
 
     /**
-     * @seeRoutine ClientConfig#load
-     * @seeRoutine ClientConfig#store
+     * @see ClientConfig#load
+     * @see ClientConfig#store
      */
     public static final String PROP_PREFIX = "peer.";
 
     /**
-     * @seeRoutine ClientConfig#load
-     * @seeRoutine ClientConfig#store
+     * @see ClientConfig#load
+     * @see ClientConfig#store
      */
     public static final String PROP_PEER = ".peer";
 
     /**
-     * @seeRoutine ClientConfig#load
-     * @seeRoutine ClientConfig#store
+     * @see ClientConfig#load
+     * @see ClientConfig#store
      */
     public static final String PROP_STATFILE = ".statFile";
 
     /**
-     * @seeRoutine ClientConfig#load
-     * @seeRoutine ClientConfig#store
+     * @see ClientConfig#load
+     * @see ClientConfig#store
      */
     public static final String PROP_STATDURATION = ".statDuration";
 
     /**
-     * @seeRoutine ClientConfig#load
-     * @seeRoutine ClientConfig#store
+     * @see ClientConfig#load
+     * @see ClientConfig#store
      */
     public static final String PROP_STATFREQUENCY = ".statFrequency";
 
     /**
-     * @seeRoutine ClientConfig#load
-     * @seeRoutine ClientConfig#store
+     * @see ClientConfig#load
+     * @see ClientConfig#store
      */
     public static final String PROP_SENDFREQUENCY = ".sendFrequency";
 
     /**
-     * @seeRoutine ClientConfig#load
-     * @seeRoutine ClientConfig#store
+     * @see ClientConfig#load
+     * @see ClientConfig#store
      */
     public static final String PROP_SENDSIZE = ".sendSize";
 
     /**
-     * @seeRoutine ClientConfig#load
-     * @seeRoutine ClientConfig#store
+     * @see ClientConfig#load
+     * @see ClientConfig#store
      */
     public static final String PROP_COMMENT = ".comment";
 
     /**
-     * @seeRoutine ClientConfig#load
-     * @seeRoutine ClientConfig#store
+     * @see ClientConfig#load
+     * @see ClientConfig#store
      */
     public static final String PROP_AVERAGEPERIODS = ".averagePeriods";
 
