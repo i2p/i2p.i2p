@@ -27,48 +27,42 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: platform.hpp,v 1.4 2004/07/16 23:54:45 mpc Exp $
+ * $Id$
  */
 
-/*
- * Global includes and platform configuration.  This is used to compile the
- * library, but is not intended for use by users of the library in their
- * own programs.
- */
+#include "platform.hpp"
+#include "socket_error.hpp"
+#include "socket_addr.hpp"
+using namespace Libsockthread;
 
-#ifndef LIBSOCKTHREAD_PLATFORM_HPP
-#define LIBSOCKTHREAD_PLATFORM_HPP
+Socket_addr& Socket_addr::operator=(const Socket_addr& rhs)
+{
+	if (this == &rhs) // check for self-assignment: a = a
+		return *this;
 
-/*
- * Operating system
- */
-#define FREEBSD	0  // FreeBSD
-#define WIN32	1  // Windows
-#define LINUX	2  // Linux
+	if (rhs.domain == AF_INET) {
+		ip = new char[INET_ADDRSTRLEN];
+	else
+		ip = new char[INET6_ADDRSTRLEN];
+	domain = rhs.domain;
+	host = rhs.host;
+	strcpy(ip, rhs.ip);
+	port = rhs.port;
+	type = rhs.type;
 
-#if OS == WIN32
-	#define WINSOCK
-	#define WINTHREAD
-#endif
+	return *this;
+}
 
-#ifndef WINSOCK
-	#include <arpa/inet.h>
-#endif
-#include <cassert>
-#include <cstdarg>
-#include <cstdio>
-#include <ctime>
-#include <iostream>
-#ifndef WINSOCK
-	#include <netdb.h>
-#endif
-#ifndef WINTHREAD
-	#include <pthread.h>
-#endif
-#include <string>
-#if defined WINSOCK || defined WINTHREAD
-	#include <windows.h>
-#endif
-using namespace std;
-
-#endif  // LIBSOCKTHREAD_PLATFORM_HPP
+void Socket_addr::resolve()
+{
+	hostent* hent = gethostbyname(host.c_str());
+	if (hent == NULL)
+		throw Socket_error(hstrerror(h_errno));
+	assert(hent->h_addrtype == AF_INET || hent->h_addrtype == AF_INET6);
+	domain = hent->h_addrtype;
+	if (domain == AF_INET) {
+		ip = new char[INET_ADDRSTRLEN];
+	else
+		ip = new char[INET6_ADDRSTRLEN];
+	strcpy(ip, hent->h_addr_list[0]);
+}

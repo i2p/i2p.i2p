@@ -27,48 +27,29 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: platform.hpp,v 1.4 2004/07/16 23:54:45 mpc Exp $
+ * $Id$
  */
 
-/*
- * Global includes and platform configuration.  This is used to compile the
- * library, but is not intended for use by users of the library in their
- * own programs.
- */
+#ifndef LIBSOCKTHREAD_SOCKET_HPP
+#define LIBSOCKTHREAD_SOCKET_HPP
 
-#ifndef LIBSOCKTHREAD_PLATFORM_HPP
-#define LIBSOCKTHREAD_PLATFORM_HPP
+namespace Libsockthread {
+	class Socket {
+		public:
+			Socket(Socket_addr& addr)
+				: addr(addr);
 
-/*
- * Operating system
- */
-#define FREEBSD	0  // FreeBSD
-#define WIN32	1  // Windows
-#define LINUX	2  // Linux
+			void accept();
+			void close();
+			void connect();
+			void listen();
+			size_t read(string& buf, size_t max);
+			void set_addr(Socket_addr& addr)
+				{ this->addr = addr; }
+			void set_blocking(bool blocking);
+		private:
+			Socket_addr addr;
+	};
+}
 
-#if OS == WIN32
-	#define WINSOCK
-	#define WINTHREAD
-#endif
-
-#ifndef WINSOCK
-	#include <arpa/inet.h>
-#endif
-#include <cassert>
-#include <cstdarg>
-#include <cstdio>
-#include <ctime>
-#include <iostream>
-#ifndef WINSOCK
-	#include <netdb.h>
-#endif
-#ifndef WINTHREAD
-	#include <pthread.h>
-#endif
-#include <string>
-#if defined WINSOCK || defined WINTHREAD
-	#include <windows.h>
-#endif
-using namespace std;
-
-#endif  // LIBSOCKTHREAD_PLATFORM_HPP
+#endif  // LIBSOCKTHREAD_SOCKET_HPP

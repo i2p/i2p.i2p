@@ -27,48 +27,47 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: platform.hpp,v 1.4 2004/07/16 23:54:45 mpc Exp $
+ * $Id$
  */
 
-/*
- * Global includes and platform configuration.  This is used to compile the
- * library, but is not intended for use by users of the library in their
- * own programs.
- */
+#ifndef LIBSOCKTHREAD_SOCKET_ADDR_HPP
+#define LIBSOCKTHREAD_SOCKET_ADDR_HPP
 
-#ifndef LIBSOCKTHREAD_PLATFORM_HPP
-#define LIBSOCKTHREAD_PLATFORM_HPP
+namespace Libsockthread {
+	class Socket_addr {
+		public:
+			Socket_addr(int domain, int type, string& host, uint16_t port)
+				: domain(domain), host(host), type(type), port(port)
+				{ resolve(); }  // throws Socket_error
+			~Socket_addr()
+				{ delete[] ip; }
 
-/*
- * Operating system
- */
-#define FREEBSD	0  // FreeBSD
-#define WIN32	1  // Windows
-#define LINUX	2  // Linux
+			int get_domain() const  // Has nothing to do with DNS domain
+				{ return domain; }
+			const char* get_ip() const  // Warning!  This can be NULL!
+				{ return ip; }
+			uint16_t get_port() const
+				{ return port; }
+			int get_type() const
+				{ return type;
+			Socket_addr& Socket_addr::operator=(const Socket_addr& rhs);
+			void set_domain(int domain)
+				{ this->domain = domain; }
+			void set_host(string& host)  // throws Socket_error
+				{ this->host = host; resolve(); }
+			void set_port(uint16_t port)
+				{ this->port = port; }
+			void set_type(int type)
+				{ this->type = type; }
+		private:
+			void resolve();
 
-#if OS == WIN32
-	#define WINSOCK
-	#define WINTHREAD
-#endif
+			int domain;
+			string host;
+			char* ip;
+			uint16_t port;
+			int type;
+	};
+}
 
-#ifndef WINSOCK
-	#include <arpa/inet.h>
-#endif
-#include <cassert>
-#include <cstdarg>
-#include <cstdio>
-#include <ctime>
-#include <iostream>
-#ifndef WINSOCK
-	#include <netdb.h>
-#endif
-#ifndef WINTHREAD
-	#include <pthread.h>
-#endif
-#include <string>
-#if defined WINSOCK || defined WINTHREAD
-	#include <windows.h>
-#endif
-using namespace std;
-
-#endif  // LIBSOCKTHREAD_PLATFORM_HPP
+#endif  // LIBSOCKTHREAD_SOCKET_ADDR_HPP

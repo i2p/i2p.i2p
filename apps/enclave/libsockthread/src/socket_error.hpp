@@ -26,49 +26,17 @@
  * LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- * $Id: platform.hpp,v 1.4 2004/07/16 23:54:45 mpc Exp $
  */
 
-/*
- * Global includes and platform configuration.  This is used to compile the
- * library, but is not intended for use by users of the library in their
- * own programs.
- */
+#ifndef LIBSOCKTHREAD_SOCKET_ERROR_HPP
+#define LIBSOCKTHREAD_SOCKET_ERROR_HPP
 
-#ifndef LIBSOCKTHREAD_PLATFORM_HPP
-#define LIBSOCKTHREAD_PLATFORM_HPP
+namespace Libsockthread {
+	class Socket_error : public runtime_error {
+		public:
+			Socket_error(const string& s)
+				: runtime_error(s) { }
+	};
+}
 
-/*
- * Operating system
- */
-#define FREEBSD	0  // FreeBSD
-#define WIN32	1  // Windows
-#define LINUX	2  // Linux
-
-#if OS == WIN32
-	#define WINSOCK
-	#define WINTHREAD
-#endif
-
-#ifndef WINSOCK
-	#include <arpa/inet.h>
-#endif
-#include <cassert>
-#include <cstdarg>
-#include <cstdio>
-#include <ctime>
-#include <iostream>
-#ifndef WINSOCK
-	#include <netdb.h>
-#endif
-#ifndef WINTHREAD
-	#include <pthread.h>
-#endif
-#include <string>
-#if defined WINSOCK || defined WINTHREAD
-	#include <windows.h>
-#endif
-using namespace std;
-
-#endif  // LIBSOCKTHREAD_PLATFORM_HPP
+#endif  // LIBSOCKTHREAD_SOCKET_ERROR_HPP
