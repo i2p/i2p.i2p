@@ -56,9 +56,9 @@ public class ConnectionPacketHandler {
                     _log.debug("Scheduling ack in " + delay + "ms for received packet " + packet);
             }
         } else {
-            if (packet.getSequenceNum() > 0) {
+            if ( (packet.getSequenceNum() > 0) || (packet.getPayloadSize() > 0) ) {
                 // take note of congestion
-                con.getOptions().setResendDelay(con.getOptions().getResendDelay()*2);
+                //con.getOptions().setResendDelay(con.getOptions().getResendDelay()*2);
                 //con.getOptions().setWindowSize(con.getOptions().getWindowSize()/2);
                 if (_log.shouldLog(Log.WARN))
                     _log.warn("congestion.. dup " + packet);

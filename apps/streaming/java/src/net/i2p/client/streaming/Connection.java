@@ -68,7 +68,7 @@ public class Connection {
     /** wait up to 5 minutes after disconnection so we can ack/close packets */
     public static int DISCONNECT_TIMEOUT = 5*60*1000;
     
-    /** lets be sane.. no more than 32 packets in the air in each dir */
+    /** lets be sane- no more than 32 packets in the air in each dir */
     public static final int MAX_WINDOW_SIZE = 32;
     
     public Connection(I2PAppContext ctx, ConnectionManager manager, SchedulerChooser chooser, PacketQueue queue, ConnectionPacketHandler handler) {
@@ -349,6 +349,15 @@ public class Connection {
                 _log.info("Connection disconnect complete from dead, drop the con "
                           + toString());
             _connectionManager.removeConnection(this);
+        }
+        
+        synchronized (_outboundPackets) {
+            for (Iterator iter = _outboundPackets.values().iterator(); iter.hasNext(); ) {
+                PacketLocal pl = (PacketLocal)iter.next();
+                pl.cancelled();
+            }
+            _outboundPackets.clear();
+            _outboundPackets.notifyAll();
         }
     }
     

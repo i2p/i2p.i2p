@@ -206,6 +206,9 @@ public class Packet {
         if ( (payload != null) && (payload.length > MAX_PAYLOAD_SIZE) )
             throw new IllegalArgumentException("Too large payload: " + payload.length);
     }
+    public int getPayloadSize() {
+        return (_payload == null ? 0 : _payload.length);
+    }
 
     /** is a particular flag set on this packet? */
     public boolean isFlagSet(int flag) { return 0 != (_flags & flag); }

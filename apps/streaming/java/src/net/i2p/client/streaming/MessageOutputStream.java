@@ -5,6 +5,8 @@ import java.io.InterruptedIOException;
 import java.io.OutputStream;
 
 import net.i2p.I2PAppContext;
+import net.i2p.data.ByteArray;
+import net.i2p.util.ByteCache;
 import net.i2p.util.Log;
 
 /**
@@ -21,15 +23,17 @@ public class MessageOutputStream extends OutputStream {
     private boolean _closed;
     private long _written;
     private int _writeTimeout;
+    private ByteCache _dataCache;
     
     public MessageOutputStream(I2PAppContext ctx, DataReceiver receiver) {
         this(ctx, receiver, Packet.MAX_PAYLOAD_SIZE);
     }
     public MessageOutputStream(I2PAppContext ctx, DataReceiver receiver, int bufSize) {
         super();
+        _dataCache = ByteCache.getInstance(128, bufSize);
         _context = ctx;
         _log = ctx.logManager().getLog(MessageOutputStream.class);
-        _buf = new byte[bufSize];
+        _buf = _dataCache.acquire().getData(); // new byte[bufSize];
         _dataReceiver = receiver;
         _dataLock = new Object();
         _written = 0;
@@ -130,6 +134,10 @@ public class MessageOutputStream extends OutputStream {
         _closed = true;
         flush();
         _log.debug("Output stream closed after writing " + _written);
+        if (_buf != null) {
+            _dataCache.release(new ByteArray(_buf));
+            _buf = null;
+        }
     }
     public void closeInternal() {
         _closed = true;
@@ -142,6 +150,10 @@ public class MessageOutputStream extends OutputStream {
                 _valid = 0;
             }
             _dataLock.notifyAll();
+        }
+        if (_buf != null) {
+            _dataCache.release(new ByteArray(_buf));
+            _buf = null;
         }
     }
     

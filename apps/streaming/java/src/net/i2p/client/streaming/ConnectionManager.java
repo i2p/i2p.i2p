@@ -10,6 +10,7 @@ import net.i2p.I2PAppContext;
 import net.i2p.I2PException;
 import net.i2p.client.I2PSession;
 import net.i2p.data.ByteArray;
+import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
 import net.i2p.data.SessionKey;
 import net.i2p.util.SimpleTimer;
@@ -62,6 +63,20 @@ public class ConnectionManager {
         synchronized (_connectionLock) {
             return (Connection)_connectionByInboundId.get(new ByteArray(id));
         }
+    }
+    /** 
+     * not guaranteed to be unique, but in case we receive more than one packet
+     * on an inbound connection that we havent ack'ed yet...
+     */
+    Connection getConnectionByOutboundId(byte[] id) {
+        synchronized (_connectionLock) {
+            for (Iterator iter = _connectionByInboundId.values().iterator(); iter.hasNext(); ) {
+                Connection con = (Connection)iter.next();
+                if (DataHelper.eq(con.getSendStreamId(), id))
+                    return con;
+            }
+        }
+        return null;
     }
     
     public void setAllowIncomingConnections(boolean allow) { 
@@ -138,21 +153,20 @@ public class ConnectionManager {
     public Connection connect(Destination peer, ConnectionOptions opts) {
         Connection con = null;
         byte receiveId[] = new byte[4];
+        _context.random().nextBytes(receiveId);
         long expiration = _context.clock().now() + opts.getConnectTimeout();
         if (opts.getConnectTimeout() <= 0)
             expiration = _context.clock().now() + DEFAULT_STREAM_DELAY_MAX;
         _numWaiting++;
         while (true) {
-            if (expiration < _context.clock().now()) {
+            long remaining = expiration - _context.clock().now();
+            if (remaining <= 0) { 
                 if (_log.shouldLog(Log.WARN))
                 _log.warn("Refusing to connect since we have exceeded our max of " 
                           + _maxConcurrentStreams + " connections");
                 _numWaiting--;
                 return null;
             }
-            con = new Connection(_context, this, _schedulerChooser, _outboundQueue, _conPacketHandler, opts);
-            con.setRemotePeer(peer);
-            _context.random().nextBytes(receiveId);
             boolean reject = false;
             synchronized (_connectionLock) {
                 if (locked_tooManyStreams()) {
@@ -165,18 +179,21 @@ public class ConnectionManager {
                         _numWaiting--;
                         return null;
                     }
-                        
-                    reject = true;
+                    
+                    // no remaining streams, lets wait a bit
+                    try { _connectionLock.wait(remaining); } catch (InterruptedException ie) {}
                 } else { 
+                    con = new Connection(_context, this, _schedulerChooser, _outboundQueue, _conPacketHandler, opts);
+                    con.setRemotePeer(peer);
+            
                     ByteArray ba = new ByteArray(receiveId);
                     while (_connectionByInboundId.containsKey(ba)) {
                         _context.random().nextBytes(receiveId);
                     }
                     _connectionByInboundId.put(ba, con);
+                    break; // stop looping as a psuedo-wait
                 }
             }
-            if (!reject)
-                break;
         }
 
         // ok we're in...
@@ -223,12 +240,14 @@ public class ConnectionManager {
                 con.disconnect(false, false);
             }
             _connectionByInboundId.clear();
+            _connectionLock.notifyAll();
         }
     }
     
     public void removeConnection(Connection con) {
         synchronized (_connectionLock) {
             _connectionByInboundId.remove(new ByteArray(con.getReceiveStreamId()));
+            _connectionLock.notifyAll();
         }
     }
     

@@ -7,7 +7,9 @@ import java.util.HashSet;
 import net.i2p.I2PAppContext;
 import net.i2p.client.I2PSession;
 import net.i2p.client.I2PSessionException;
+import net.i2p.data.ByteArray;
 import net.i2p.data.SessionKey;
+import net.i2p.util.ByteCache;
 import net.i2p.util.Log;
 
 /**
@@ -18,12 +20,18 @@ class PacketQueue {
     private Log _log;
     private I2PSession _session;
     private byte _buf[];
+    private ByteCache _cache = ByteCache.getInstance(64, 36*1024);
     
     public PacketQueue(I2PAppContext context, I2PSession session) {
         _context = context;
         _session = session;
-        _buf = new byte[36*1024];
+        _buf = _cache.acquire().getData(); // new byte[36*1024];
         _log = context.logManager().getLog(PacketQueue.class);
+    }
+    
+    protected void finalize() throws Throwable {
+        _cache.release(new ByteArray(_buf));
+        super.finalize();
     }
     
     /**

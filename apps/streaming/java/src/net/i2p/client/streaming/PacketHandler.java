@@ -175,20 +175,18 @@ public class PacketHandler {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Packet received on an unknown stream (and not an ECHO): " + packet);
             if (sendId == null) {
-                for (Iterator iter = _manager.listConnections().iterator(); iter.hasNext(); ) {
-                    Connection con = (Connection)iter.next();
-                    if (DataHelper.eq(con.getSendStreamId(), packet.getReceiveStreamId())) {
-                        if (con.getAckedPackets() <= 0) {
-                            if (_log.shouldLog(Log.DEBUG))
-                                _log.debug("Received additional packets before the syn on " + con + ": " + packet);
-                            receiveKnownCon(con, packet);
-                            return;
-                        } else {
-                            if (_log.shouldLog(Log.DEBUG))
-                                _log.debug("hrmph, received while ack of syn was in flight on " + con + ": " + packet + " acked: " + con.getAckedPackets());
-                            receiveKnownCon(con, packet);
-                            return;
-                        }
+                Connection con = _manager.getConnectionByOutboundId(packet.getReceiveStreamId());
+                if (con != null) {
+                    if (con.getAckedPackets() <= 0) {
+                        if (_log.shouldLog(Log.DEBUG))
+                            _log.debug("Received additional packets before the syn on " + con + ": " + packet);
+                        receiveKnownCon(con, packet);
+                        return;
+                    } else {
+                        if (_log.shouldLog(Log.DEBUG))
+                            _log.debug("hrmph, received while ack of syn was in flight on " + con + ": " + packet + " acked: " + con.getAckedPackets());
+                        receiveKnownCon(con, packet);
+                        return;
                     }
                 }
             }
