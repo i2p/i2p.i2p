@@ -31,23 +31,25 @@
 #include "platform.h"
 #include "sam.h"
 
-static bool			sam_hello();
+static bool			sam_hello(sam_sess_t *session);
 static void			sam_log(const char *format, ...);
-static void			sam_parse(char *s);
-static ssize_t		sam_read1(char *buf, size_t n);
-static ssize_t		sam_read2(void *buf, size_t n);
-static bool			sam_readable();
+static void			sam_parse(sam_sess_t *session, char *s);
+static ssize_t		sam_read1(sam_sess_t *session, char *buf, size_t n);
+static ssize_t		sam_read2(sam_sess_t *session, void *buf, size_t n);
+static bool			sam_readable(const sam_sess_t *session);
 static sam_sendq_t	*sam_sendq_create();
-static samerr_t		sam_session_create(const char *destname, sam_conn_t style,
+static samerr_t		sam_session_create(sam_sess_t *session,
+						const char *destname, sam_conn_t style,
 						uint_t tunneldepth);
-static bool			sam_socket_connect(const char *host, uint16_t port);
+static bool			sam_socket_connect(sam_sess_t *session, const char *host,
+						uint16_t port);
 static bool			sam_socket_resolve(const char *hostname, char *ipaddr);
 #ifdef WINSOCK
 static samerr_t		sam_winsock_cleanup();
 static samerr_t		sam_winsock_startup();
 static const char	*sam_winsock_strerror(int code);
 #endif
-static ssize_t		sam_write(const void *buf, size_t n);
+static ssize_t		sam_write(sam_sess_t *session, const void *buf, size_t n);
 
 /*
  * Callback functions
@@ -71,34 +73,30 @@ void (*sam_namingback)(char *name, sam_pubkey_t pubkey,
 /* our connection to a peer has completed */
 void (*sam_statusback)(sam_sid_t stream_id, samerr_t result) = NULL;
 
-static socket_t samd;  /* The socket descriptor we're using for
-								communications with SAM */
-static bool samd_connected = false;  /* Whether we're connected with SAM */
-
 /*
  * Closes the connection to the SAM host
  *
  * Returns: true on success, false on failure
  */
-bool sam_close()
+bool sam_close(sam_sess_t *session)
 {
-	if (!samd_connected)
+	if (!session->connected)
 		return true;
 
 #ifdef WINSOCK
-	if (closesocket(samd) == SOCKET_ERROR) {
+	if (closesocket(session->sock) == SOCKET_ERROR) {
 		SAMLOG("Failed closing the SAM connection (%s)",
 			sam_winsock_strerror(WSAGetLastError()));
 		return false;
 	}
-	samd_connected = false;
+	session->connected = false;
 	if (sam_winsock_cleanup() == SAM_OK)
 		return true;
 	else
 		return false;
 #else
-	if (close(samd) == 0) {
-		samd_connected = false;
+	if (close(session->sock) == 0) {
+		session->connected = false;
 		return true;
 	} else {
 		SAMLOG("Failed closing the SAM connection (%s)", strerror(errno));
@@ -110,6 +108,7 @@ bool sam_close()
 /*
  * Connects to the SAM host
  *
+ * session - an unused SAM session created by sam_session_init()
  * samhost - SAM host
  * samport - SAM port
  * destname - destination name for this program, or "TRANSIENT" for a random
@@ -117,9 +116,10 @@ bool sam_close()
  * tunneldepth - length of the I2P tunnels created by this program (longer is
  *		more anonymous, but slower)
  *
- * Returns: true on success, false on failure
+ * Returns: True on success, false on failure.  If true, `session' will be ready
+ *		for use.
  */
-samerr_t sam_connect(const char *samhost, uint16_t samport,
+samerr_t sam_connect(sam_sess_t *session, const char *samhost, uint16_t samport,
 		const char *destname, sam_conn_t style, uint_t tunneldepth)
 {
 	samerr_t rc;
@@ -150,7 +150,7 @@ samerr_t sam_connect(const char *samhost, uint16_t samport,
 		return rc;
 #endif
 
-	if (!sam_socket_connect(samhost, samport)) {
+	if (!sam_socket_connect(session, samhost, samport)) {
 #ifdef WINSOCK
 		SAMLOG("Couldn't connect to SAM at %s:%u (%s)",
 			samhost, samport, sam_winsock_strerror(WSAGetLastError()));
@@ -162,10 +162,10 @@ samerr_t sam_connect(const char *samhost, uint16_t samport,
 		return SAM_SOCKET_ERROR;
 	}
 
-	if (!sam_hello())
+	if (!sam_hello(session))
 		return SAM_BAD_VERSION;
 
-	rc = sam_session_create(destname, style, tunneldepth);
+	rc = sam_session_create(session, destname, style, tunneldepth);
 	if (rc != SAM_OK)
 		return rc;
 
@@ -182,7 +182,8 @@ samerr_t sam_connect(const char *samhost, uint16_t samport,
  *
  * Returns: true on success, false on failure
  */
-samerr_t sam_dgram_send(const sam_pubkey_t dest, const void *data, size_t size)
+samerr_t sam_dgram_send(sam_sess_t *session, const sam_pubkey_t dest,
+		const void *data, size_t size)
 {
 	char cmd[SAM_PKCMD_LEN];
 
@@ -201,8 +202,8 @@ samerr_t sam_dgram_send(const sam_pubkey_t dest, const void *data, size_t size)
 	snprintf(cmd, sizeof cmd, "DATAGRAM SEND DESTINATION=%s SIZE=%dz\n",
 		dest, size);
 #endif
-	sam_write(cmd, strlen(cmd));
-	sam_write(data, size);
+	sam_write(session, cmd, strlen(cmd));
+	sam_write(session, data, size);
 
 	return SAM_OK;
 }
@@ -213,14 +214,14 @@ samerr_t sam_dgram_send(const sam_pubkey_t dest, const void *data, size_t size)
  *
  * Returns: true on success, false on reply failure
  */
-static bool sam_hello()
+static bool sam_hello(sam_sess_t *session)
 {
 #define SAM_HELLO_CMD	"HELLO VERSION MIN=1.0 MAX=1.0\n"
 #define SAM_HELLO_REPLY	"HELLO REPLY RESULT=OK VERSION=1.0"
 	char reply[SAM_REPLY_LEN];
 
-	sam_write(SAM_HELLO_CMD, strlen(SAM_HELLO_CMD));
-	sam_read1(reply, SAM_REPLY_LEN);
+	sam_write(session, SAM_HELLO_CMD, strlen(SAM_HELLO_CMD));
+	sam_read1(session, reply, SAM_REPLY_LEN);
 	if (strncmp(reply, SAM_HELLO_REPLY, strlen(SAM_HELLO_REPLY)) == 0)
 		return true;
 	else {
@@ -251,12 +252,12 @@ static void sam_log(const char *format, ...)
  *
  * name - name to lookup, or ME to lookup our own name
  */
-void sam_naming_lookup(const char *name)
+void sam_naming_lookup(sam_sess_t *session, const char *name)
 {
 	char cmd[SAM_CMD_LEN];
 
 	snprintf(cmd, sizeof cmd, "NAMING LOOKUP NAME=%s\n", name);
-	sam_write(cmd, strlen(cmd));
+	sam_write(session, cmd, strlen(cmd));
 
 	return;
 }
@@ -266,7 +267,7 @@ void sam_naming_lookup(const char *name)
  *
  * s - string of data that we read (read past tense)
  */
-static void sam_parse(char *s)
+static void sam_parse(sam_sess_t *session, char *s)
 {
 #define SAM_DGRAM_RECEIVED_REPLY "DATAGRAM RECEIVED"
 #define SAM_NAMING_REPLY "NAMING REPLY"
@@ -305,7 +306,7 @@ static void sam_parse(char *s)
 									data is sent, the extra NUL character will
 									just be ignored by the client program,
 									because it is not added to the size */
-		if (sam_read2(data, size) != -1) {
+		if (sam_read2(session, data, size) != -1) {
 			p = data + size;
 			*p = '\0';  /* see above NUL note */
 			sam_dgramback(dest, data, size);  /* `data' must be freed */
@@ -439,7 +440,7 @@ static void sam_parse(char *s)
 									data is sent, the extra NUL character will
 									just be ignored by the client program,
 									because it is not added to the size */
-		if (sam_read2(data, size) != -1) {
+		if (sam_read2(session, data, size) != -1) {
 			p = data + size;
 			*p = '\0';  /* see above NUL note */
 			sam_databack(stream_id, data, size);  /* `data' must be freed */
@@ -492,17 +493,17 @@ static void sam_parse(char *s)
  *
  * Returns: true if we read anything, or false if nothing was there
  */
-bool sam_read_buffer()
+bool sam_read_buffer(sam_sess_t *session)
 {
 	bool read_something = false;
 	char reply[SAM_REPLY_LEN];
 
-	if (sam_readable()) {
+	if (sam_readable(session)) {
 		do {
-			sam_read1(reply, SAM_REPLY_LEN);
+			sam_read1(session, reply, SAM_REPLY_LEN);
 			read_something = true;
-			sam_parse(reply);
-		} while (sam_readable());
+			sam_parse(session, reply);
+		} while (sam_readable(session));
 	}
 
 	return read_something;
@@ -522,7 +523,7 @@ bool sam_read_buffer()
  *
  * Returns: number of bytes read, or -1 on error
  */
-static ssize_t sam_read1(char *buf, size_t n)
+static ssize_t sam_read1(sam_sess_t *session, char *buf, size_t n)
 {
 	size_t nleft;
 	ssize_t nread;
@@ -530,7 +531,7 @@ static ssize_t sam_read1(char *buf, size_t n)
 
 	*buf = '\0';  /* this forces `buf' to be a string even if there is a
 					 sam_read1 error return */
-	if (!samd_connected) {
+	if (!session->connected) {
 		SAMLOGS("Cannot read from SAM because the SAM connection is closed");
 		sam_diedback();
 		return -1;
@@ -539,7 +540,7 @@ static ssize_t sam_read1(char *buf, size_t n)
 	p = buf;
 	nleft = n;
 	while (nleft > 0) {
-		nread = recv(samd, p, 1, 0);
+		nread = recv(session->sock, p, 1, 0);
 		if (nread == -1) {
 			if (errno == EINTR)  /* see Unix Network Pgming vol 1, Sec. 5.9 */
 				continue;
@@ -550,13 +551,13 @@ static ssize_t sam_read1(char *buf, size_t n)
 #else
 				SAMLOG("recv() failed: %s", strerror(errno));
 #endif
-				sam_close();
+				sam_close(session);
 				sam_diedback();
 				return -1;
 			}
 		} else if (nread == 0) {  /* EOF */
 			SAMLOGS("Connection closed by the SAM host");
-			sam_close();
+			sam_close(session);
 			sam_diedback();
 			return -1;
 		}
@@ -589,13 +590,13 @@ static ssize_t sam_read1(char *buf, size_t n)
  *
  * Returns: number of bytes read, or -1 on error
  */
-static ssize_t sam_read2(void *buf, size_t n)
+static ssize_t sam_read2(sam_sess_t *session, void *buf, size_t n)
 {
 	size_t nleft;
 	ssize_t nread;
 	void *p;
 
-	if (!samd_connected) {
+	if (!session->connected) {
 		SAMLOGS("Cannot read from SAM because the SAM connection is closed");
 		sam_diedback();
 		return -1;
@@ -604,7 +605,7 @@ static ssize_t sam_read2(void *buf, size_t n)
 	p = buf;
 	nleft = n;
 	while (nleft > 0) {
-		nread = recv(samd, p, nleft, 0);
+		nread = recv(session->sock, p, nleft, 0);
 		if (nread == -1) {
 			if (errno == EINTR)  /* see Unix Network Pgming vol 1, Sec. 5.9 */
 				continue;
@@ -615,13 +616,13 @@ static ssize_t sam_read2(void *buf, size_t n)
 #else
 				SAMLOG("recv() failed: %s", strerror(errno));
 #endif
-				sam_close();
+				sam_close(session);
 				sam_diedback();
 				return -1;
 			}
 		} else if (nread == 0) {  /* EOF */
 			SAMLOGS("Connection closed by the SAM host");
-			sam_close();
+			sam_close(session);
 			sam_diedback();
 			return -1;
 		}
@@ -640,23 +641,23 @@ static ssize_t sam_read2(void *buf, size_t n)
  *
  * Returns: true if data is waiting, false otherwise
  */
-static bool sam_readable()
+static bool sam_readable(const sam_sess_t *session)
 {
 	fd_set rset;  /* set of readable descriptors */
 	struct timeval tv;
 	int rc;
 
-	if (!samd_connected) {
+	if (!session->connected) {
 		SAMLOGS("Cannot read from SAM because the SAM connection is closed");
 		sam_diedback();
 		return false;
 	}
 	/* it seems like there should be a better way to do this (i.e. not select)*/
 	FD_ZERO(&rset);
-	FD_SET(samd, &rset);
+	FD_SET(session->sock, &rset);
 	tv.tv_sec = 0;
 	tv.tv_usec = 10;
-	rc = select(samd + 1, &rset, NULL, NULL, &tv);
+	rc = select(session->sock + 1, &rset, NULL, NULL, &tv);
 	if (rc == 0)
 		return false;
 	else if (rc > 0)
@@ -674,14 +675,15 @@ static bool sam_readable()
 /*
  * Adds data to the send queue
  *
+ * stream_id - stream number to send to if the queue is full
  * sendq - the send queue
  * data - data to add
  * dsize - the size of the data
  *
  * Returns: true on success, false on error
  */
-void sam_sendq_add(sam_sid_t stream_id, sam_sendq_t **sendq, const void *data,
-		size_t dsize)
+void sam_sendq_add(sam_sess_t *session, sam_sid_t stream_id,
+		sam_sendq_t **sendq, const void *data, size_t dsize)
 {
 	assert(dsize >= 0);
 	if (dsize == 0) {
@@ -704,7 +706,7 @@ void sam_sendq_add(sam_sid_t stream_id, sam_sendq_t **sendq, const void *data,
 	if ((*sendq)->size + dsize == SAM_STREAM_PAYLOAD_MAX) {
 		memcpy((*sendq)->data + (*sendq)->size, data, dsize);
 		(*sendq)->size = SAM_STREAM_PAYLOAD_MAX;
-		sam_sendq_flush(stream_id, sendq);
+		sam_sendq_flush(session, stream_id, sendq);
 		return;
 	}	
 
@@ -713,8 +715,8 @@ void sam_sendq_add(sam_sid_t stream_id, sam_sendq_t **sendq, const void *data,
 	memcpy((*sendq)->data + (*sendq)->size, data, s); //append as much as we can
 	dsize -= s;  /* update dsize to the size of whatever data hasn't been sent*/
 	(*sendq)->size = SAM_STREAM_PAYLOAD_MAX;  /* it's a full packet */
-	sam_sendq_flush(stream_id, sendq);  /* send the queued data */
-	sam_sendq_add(stream_id, sendq, data + s, dsize);  /* recurse the rest */
+	sam_sendq_flush(session, stream_id, sendq);  /* send the queued data */
+	sam_sendq_add(session, stream_id, sendq, data + s, dsize);  /* recurse */
 
 	return;
 }
@@ -740,12 +742,13 @@ static sam_sendq_t *sam_sendq_create()
 /*
  * Sends the data in the send queue to the specified stream
  *
- * sendq - the send queue
  * stream_id - stream number to send to
+ * sendq - the send queue
  */
-void sam_sendq_flush(sam_sid_t stream_id, sam_sendq_t **sendq)
+void sam_sendq_flush(sam_sess_t *session, sam_sid_t stream_id,
+		sam_sendq_t **sendq)
 {
-	sam_stream_send(stream_id, (*sendq)->data, (*sendq)->size);
+	sam_stream_send(session, stream_id, (*sendq)->data, (*sendq)->size);
 	/* we now free it in case they aren't going to use it anymore */
 	free((*sendq)->data);
 	free(*sendq);
@@ -755,16 +758,44 @@ void sam_sendq_flush(sam_sid_t stream_id, sam_sendq_t **sendq)
 }
 
 /*
+ * Allocates memory for the session and sets its default values
+ *
+ * session - pointer to a previously allocated sam_sess_t to initalise, or NULL
+ *		if you want memory to be allocated by this function
+ */
+sam_sess_t *sam_session_init(sam_sess_t *session)
+{
+	if (session == NULL)
+		session = malloc(sizeof(sam_sess_t));
+	session->connected = false;
+	session->prev_id = 0;
+
+	return session;
+}
+
+/*
+ * Frees memory used by the session and sets the pointer to NULL
+ *
+ * session - pointer to a pointer to a sam_sess_t
+ */
+void sam_session_free(sam_sess_t **session)
+{
+	free(session);
+	*session = NULL;
+}
+
+/*
  * Sends the second SAM handshake command and checks the reply
  *
  * destname - destination name for this program, or "TRANSIENT" to create a
  * 		random temporary destination
+ * style - type of connection to use (SAM_STREAM, SAM_DGRAM, or SAM_RAW)
  * tunneldepth - length of the I2P tunnels created by this program
  *
  * Returns: SAM error code
  */
-static samerr_t sam_session_create(const char *destname, sam_conn_t style,
-		uint_t tunneldepth)
+static samerr_t sam_session_create(sam_sess_t *session, const char *destname,
+	sam_conn_t style, uint_t tunneldepth)
 {
 #define SAM_SESSTATUS_REPLY_OK "SESSION STATUS RESULT=OK"
 #define SAM_SESSTATUS_REPLY_DD "SESSION STATUS RESULT=DUPLICATED_DEST"
@@ -790,8 +821,8 @@ static samerr_t sam_session_create(const char *destname, sam_conn_t style,
 		assert(false);  /* unimplemented */
 	}
 
-	sam_write(cmd, strlen(cmd));
-	sam_read1(reply, SAM_REPLY_LEN);
+	sam_write(session, cmd, strlen(cmd));
+	sam_read1(session, reply, SAM_REPLY_LEN);
 	if (strncmp(reply, SAM_SESSTATUS_REPLY_OK,
 			strlen(SAM_SESSTATUS_REPLY_OK)) == 0)
 		return SAM_OK;
@@ -816,20 +847,20 @@ static samerr_t sam_session_create(const char *destname, sam_conn_t style,
  *
  * Returns: true on sucess, false on error, with errno set
  */
-bool sam_socket_connect(const char *host, uint16_t port)
+bool sam_socket_connect(sam_sess_t *session, const char *host, uint16_t port)
 {
 	struct sockaddr_in hostaddr;
 	int rc;
 	char ipaddr[INET_ADDRSTRLEN];
 
-	samd = socket(AF_INET, SOCK_STREAM, 0);
+	session->sock = socket(AF_INET, SOCK_STREAM, 0);
 #ifdef WINSOCK
-	if (samd == INVALID_SOCKET) {
+	if (session->sock == INVALID_SOCKET) {
 		SAMLOG("socket() failed: %s", sam_winsock_strerror(WSAGetLastError()));
 		return false;
 	}
 #else
-	if (samd == -1) {
+	if (session->sock == -1) {
 		SAMLOG("socket() failed: %s", strerror(errno));
 		return false;
 	}
@@ -852,7 +883,7 @@ bool sam_socket_connect(const char *host, uint16_t port)
 	} else if (rc == -1)
 		return false;
 
-	rc = connect(samd, (struct sockaddr *)&hostaddr, sizeof hostaddr);
+	rc = connect(session->sock, (struct sockaddr *)&hostaddr, sizeof hostaddr);
 	if (rc == -1) {
 #ifdef WINSOCK
 		SAMLOG("connect() failed: %s", sam_winsock_strerror(WSAGetLastError()));
@@ -862,7 +893,7 @@ bool sam_socket_connect(const char *host, uint16_t port)
 		return false;
 	}
 
-	samd_connected = true;
+	session->connected = true;
 	return true;
 }
 
@@ -926,7 +957,7 @@ retry:
  *
  * stream_id - stream number to close
  */
-void sam_stream_close(sam_sid_t stream_id)
+void sam_stream_close(sam_sess_t *session, sam_sid_t stream_id)
 {
 	char cmd[SAM_CMD_LEN];
 
@@ -935,7 +966,7 @@ void sam_stream_close(sam_sid_t stream_id)
 #else
 	snprintf(cmd, sizeof cmd, "STREAM CLOSE ID=%d\n", stream_id);
 #endif
-	sam_write(cmd, strlen(cmd));
+	sam_write(session, cmd, strlen(cmd));
 
 	return;
 }
@@ -947,22 +978,21 @@ void sam_stream_close(sam_sid_t stream_id)
  *
  * Returns: stream id number
  */
-sam_sid_t sam_stream_connect(const sam_pubkey_t dest)
+sam_sid_t sam_stream_connect(sam_sess_t *session, const sam_pubkey_t dest)
 {
 	char cmd[SAM_PKCMD_LEN];
-	static sam_sid_t id = 0;
 
-	id++;  /* increment the id for the connection */
+	session->prev_id++;  /* increment the id for the connection */
 #ifdef FAST32_IS_LONG
 	snprintf(cmd, sizeof cmd, "STREAM CONNECT ID=%ld DESTINATION=%s\n",
-		id, dest);
+		session->prev_id, dest);
 #else
 	snprintf(cmd, sizeof cmd, "STREAM CONNECT ID=%d DESTINATION=%s\n",
-		id, dest);
+		session->prev_id, dest);
 #endif
-	sam_write(cmd, strlen(cmd));
+	sam_write(session, cmd, strlen(cmd));
 
-	return id;
+	return session->prev_id;
 }
 
 /*
@@ -974,7 +1004,8 @@ sam_sid_t sam_stream_connect(const sam_pubkey_t dest)
  *
  * Returns: true on success, false on failure
  */
-samerr_t sam_stream_send(sam_sid_t stream_id, const void *data, size_t size)
+samerr_t sam_stream_send(sam_sess_t *session, sam_sid_t stream_id,
+		const void *data, size_t size)
 {
 	char cmd[SAM_CMD_LEN];
 
@@ -1000,8 +1031,8 @@ samerr_t sam_stream_send(sam_sid_t stream_id, const void *data, size_t size)
 	snprintf(cmd, sizeof cmd, "STREAM SEND ID=%d SIZE=%dz\n",
 		stream_id, size);
 #endif
-	sam_write(cmd, strlen(cmd));
-	sam_write(data, size);
+	sam_write(session, cmd, strlen(cmd));
+	sam_write(session, data, size);
 
 	return SAM_OK;
 }
@@ -1233,13 +1264,13 @@ const char *sam_winsock_strerror(int code)
  *
  * Returns: `n', or -1 on error
  */
-static ssize_t sam_write(const void *buf, size_t n)
+static ssize_t sam_write(sam_sess_t *session, const void *buf, size_t n)
 {
 	size_t nleft;
 	ssize_t nwritten;
 	const char *p;
 
-	if (!samd_connected) {
+	if (!session->connected) {
 		SAMLOGS("Cannot write to SAM because the SAM connection is closed");
 		sam_diedback();
 		return -1;
@@ -1257,7 +1288,7 @@ static ssize_t sam_write(const void *buf, size_t n)
 	p = buf;
 	nleft = n;
 	while (nleft > 0) {
-		nwritten = send(samd, p, nleft, 0);
+		nwritten = send(session->sock, p, nleft, 0);
 		if (nwritten <= 0) {
 			if (errno == EINTR)  /* see Unix Network Pgming vol 1, Sec. 5.9 */
 				continue;
@@ -1268,7 +1299,7 @@ static ssize_t sam_write(const void *buf, size_t n)
 #else
 				SAMLOG("send() failed: %s", strerror(errno));
 #endif
-				sam_close();
+				sam_close(session);
 				sam_diedback();
 				return -1;
 			}

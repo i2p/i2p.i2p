@@ -1,4 +1,6 @@
 v1.25
+	* Added support for sessions - now LibSAM can have multiple SAM sessions
+		going at once (with different destinations)
 	* Rewrote sendq functions to automatically send big packets, for better
 		network performance
 
