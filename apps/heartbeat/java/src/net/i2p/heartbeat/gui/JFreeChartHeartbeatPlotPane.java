@@ -1,20 +1,13 @@
 package net.i2p.heartbeat.gui;
 
-import javax.swing.JPanel;
-import javax.swing.JTextArea;
-import javax.swing.JScrollPane;
-import javax.swing.JLabel;
 import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Dimension;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-
-import net.i2p.heartbeat.PeerDataWriter;
-import net.i2p.util.Log;
+import javax.swing.JLabel;
+import javax.swing.JScrollPane;
 
 import org.jfree.chart.ChartPanel;
+
+import net.i2p.util.Log;
 
 /**
  * Render the graph and legend

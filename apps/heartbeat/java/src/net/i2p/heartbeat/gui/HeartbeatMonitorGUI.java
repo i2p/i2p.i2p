@@ -10,7 +10,6 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JScrollPane;
-import javax.swing.JSplitPane;
 
 class HeartbeatMonitorGUI extends JFrame {
     private HeartbeatMonitor _monitor;

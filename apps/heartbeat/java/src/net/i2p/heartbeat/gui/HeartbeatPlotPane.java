@@ -1,6 +1,5 @@
 package net.i2p.heartbeat.gui;
 
-import java.awt.Color;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
