@@ -526,8 +526,8 @@ class TunnelPool {
     
     public void tunnelFailed(TunnelId id) {
         if (!_isLive) return;
-        if (_log.shouldLog(Log.ERROR)) 
-            _log.error("Tunnel " + id + " marked as not ready, since it /failed/", new Exception("Failed tunnel"));
+        if (_log.shouldLog(Log.WARN)) 
+            _log.warn("Tunnel " + id + " marked as not ready, since it /failed/", new Exception("Failed tunnel"));
         TunnelInfo info = getTunnelInfo(id);
         if (info == null)
             return;

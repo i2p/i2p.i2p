@@ -149,27 +149,26 @@ public class PoolingTunnelManagerFacade implements TunnelManagerFacade {
      *
      */
     public void peerFailed(Hash peer) {
-        if (true) {
-            _log.error("Peer " + peer.toBase64() + " failed, but we're not going to kill their tunnels", new Exception("wtf"));
-            return;
-        }
         int numFailed = 0;
+        boolean shouldKill = false;
         for (Iterator iter = _pool.getManagedTunnelIds().iterator(); iter.hasNext(); ) {
             TunnelId id = (TunnelId)iter.next();
             TunnelInfo info = (TunnelInfo)_pool.getTunnelInfo(id);
             if (isParticipant(info, peer)) {
                 _log.info("Peer " + peer.toBase64() + " failed and they participate in tunnel " 
                           + id.getTunnelId() + ".  Marking the tunnel as not ready!");
-                info.setIsReady(false);
+                if (shouldKill) {
+                    info.setIsReady(false);
+                    long lifetime = _context.clock().now() - info.getCreated();
+                    _context.statManager().addRateData("tunnel.failAfterTime", lifetime, lifetime);
+                }
                 numFailed++;
-		
-                long lifetime = _context.clock().now() - info.getCreated();
-                _context.statManager().addRateData("tunnel.failAfterTime", lifetime, lifetime);
             }
         }
 
         if (_log.shouldLog(Log.INFO))
-            _log.info("On peer " + peer.toBase64() + " failure, " + numFailed + " tunnels were killed");
+            _log.info("On peer " + peer.toBase64() + " failure, " + numFailed + " tunnels were " 
+                      + (shouldKill ? "" : "NOT ") + "killed");
     }
     
     private boolean isParticipant(TunnelInfo info, Hash peer) {
