@@ -53,7 +53,7 @@ public class ConfigUpdateHelper {
         if (port != null)
             return port;
         else
-            return ConfigUpdateHandler.DEFAULT_PROXY_HOST;
+            return ConfigUpdateHandler.DEFAULT_PROXY_PORT;
     }
     
     public String getUpdateThroughProxy() {

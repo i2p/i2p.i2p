@@ -222,7 +222,7 @@
         <copy file="core/perl/i2ptest.sh" todir="pkg-temp/scripts/" />
         <mkdir dir="pkg-temp/docs" />
         <copy file="readme.html" todir="pkg-temp/docs/" />
-        <copy file="initialNews.xml" todir="pkg-temp/docs/news.xml" />
+        <copy file="initialNews.xml" todir="pkg-temp/docs/" />
         <copy file="installer/resources/startconsole.html" todir="pkg-temp/docs/" />
         <copy file="installer/resources/start.ico" todir="pkg-temp/docs/" />
         <copy file="installer/resources/console.ico" todir="pkg-temp/docs/" />
@@ -272,7 +272,7 @@
         <copy file="build/susimail.war" todir="pkg-temp/webapps/" />
         <copy file="history.txt" todir="pkg-temp/" />
         <mkdir dir="pkg-temp/docs/" />
-        <copy file="news.xml" todir="pkg-temp/docs/news.xml" />
+        <copy file="news.xml" todir="pkg-temp/docs/" />
         <!-- the addressbook handles this for updates -->
         <!-- <copy file="hosts.txt" todir="pkg-temp/" /> -->
         <mkdir dir="pkg-temp/eepsite" />
