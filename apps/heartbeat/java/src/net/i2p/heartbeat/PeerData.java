@@ -1,16 +1,16 @@
 package net.i2p.heartbeat;
 
-import net.i2p.util.Clock;
-import net.i2p.util.Log;
-import net.i2p.stat.Rate;
-import net.i2p.stat.RateStat;
-
-import java.util.Arrays;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+
+import net.i2p.stat.Rate;
+import net.i2p.stat.RateStat;
+import net.i2p.util.Clock;
+import net.i2p.util.Log;
 
 /**
  * Contain the current window of data for a particular series of ping/pong stats 
@@ -42,6 +42,10 @@ public class PeerData {
     /** synchronize on this when updating _dataPoints or _pendingPings */
     private Object _updateLock = new Object();
     
+    /**
+     * Creates a PeerData . . .
+     * @param config configuration to load from
+     */
     public PeerData(ClientConfig config) {
 	_peer = config;
 	_dataPoints = new TreeMap();
@@ -54,7 +58,11 @@ public class PeerData {
 	_lostRate = new RateStat("lostRate", "How frequently we lose messages", "peer", getPeriods(config.getAveragePeriods()));
     }
     
-    /** turn the periods (# minutes) into rate periods (# milliseconds) */
+    /**
+     * turn the periods (# minutes) into rate periods (# milliseconds)
+     * @param periods (in minutes)
+     * @return an array of periods (in milliseconds)
+     */
     private static long[] getPeriods(int periods[]) {
 	long rv[] = null;
 	if (periods == null) periods = new int[0];
@@ -65,22 +73,48 @@ public class PeerData {
 	return rv;
     }
     
-    /** how many pings are still outstanding? */
+    /** 
+     * how many pings are still outstanding?
+     * @return the number of pings outstanding
+     */
     public int getPendingCount() { synchronized (_updateLock) { return _pendingPings.size(); } }
-    /** how many data points are available in the current window? */
+    
+    /**
+     * how many data points are available in the current window?
+     * @return the number of datapoints available 
+     */
     public int getDataPointCount() { synchronized (_updateLock) { return _dataPoints.size(); } }
-    /** when did this test begin? */
+    
+    /**
+     * when did this test begin?
+     * @return when the test began  
+     */
     public long getSessionStart() { return _sessionStart; }
-    /** how many pings have we sent for this test? */
+    
+    /**
+     * how many pings have we sent for this test?
+     * @return the number of pings sent
+     */
     public long getLifetimeSent() { return _lifetimeSent; }
-    /** how many pongs have we received for this test? */
+    
+    /**
+     * how many pongs have we received for this test?
+     * @return the number of pings received
+     */
     public long getLifetimeReceived() { return _lifetimeReceived; }
+    
+    
+    /**
+     * @return the client configuration
+     */
     public ClientConfig getConfig() { return _peer; }
     
     /** 
      * What periods are we averaging the data over (in minutes)?
+     * @return the periods as an array of ints (in minutes)
      */
     public int[] getAveragePeriods() { return (_peer.getAveragePeriods() != null ? _peer.getAveragePeriods() : new int[0]); }
+    
     /** 
      * average time to send over the given period.
      *
@@ -88,6 +122,7 @@ public class PeerData {
      * @return milliseconds average, or -1 if we dont track that period
      */
     public double getAverageSendTime(int period) { return getAverage(_sendRate, period); }
+    
     /** 
      * average time to receive over the given period.
      *
@@ -95,6 +130,7 @@ public class PeerData {
      * @return milliseconds average, or -1 if we dont track that period
      */
     public double getAverageReceiveTime(int period) { return getAverage(_receiveRate, period); }
+    
     /** 
      * number of lost messages over the given period.
      *
@@ -129,7 +165,7 @@ public class PeerData {
     
     /**
      * We have sent the peer a ping on this series (using the send time as given)
-     *
+     * @param dateSent when the ping was sent
      */
     public void addPing(long dateSent) {
 	EventDataPoint sent = new EventDataPoint(dateSent);
@@ -239,9 +275,17 @@ public class PeerData {
 	private long _pongSent;
 	private long _pongReceived;
 	
+	/**
+	 * Creates an EventDataPoint
+	 */
 	public EventDataPoint() {
 	    this(-1);
 	}
+    
+	/**
+     * Creates an EventDataPoint with pingtime associated with it =)
+	 * @param pingSentOn the time a ping was sent
+	 */
 	public EventDataPoint(long pingSentOn) {
 	    _wasPonged = false;
 	    _pingSent = pingSentOn;
@@ -249,20 +293,51 @@ public class PeerData {
 	    _pongReceived = -1;
 	}
 	
-	/** when did we send this ping? */
+	/** 
+     * when did we send this ping?
+     * @return the time the ping was sent
+     */
 	public long getPingSent() { return _pingSent; }
-	public void setPingSent(long when) { _pingSent = when; }
 	
-	/** when did the peer receive the ping? */
+    /**
+     * Set the time the ping was sent
+     * @param when time to set
+     */
+    public void setPingSent(long when) { _pingSent = when; }
+	
+	/**
+     * when did the peer receive the ping?
+     * @return the time the ping was receieved 
+     */
 	public long getPongSent() { return _pongSent; }
+    
+	/**
+     * Set the time the peer received the ping
+	 * @param when the time to set
+	 */
 	public void setPongSent(long when) { _pongSent = when; }
 	
-	/** when did we receive the peer's pong? */
+	/** 
+     * when did we receive the peer's pong?
+     * @return the time we receieved the pong
+     */
 	public long getPongReceived() { return _pongReceived; }
+    
+    /**
+     * Set the time the peer's pong was receieved
+	 * @param when the time to set
+	 */
 	public void setPongReceived(long when) { _pongReceived = when; }
 	
-	/** did the peer reply in time? */
+	/** 
+     * did the peer reply in time? 
+     * @return true or false, whether we got a reply in time */
 	public boolean getWasPonged() { return _wasPonged; }
+    
+    /**
+     * Set whether we receieved the peer's reply in time
+	 * @param pong true or false
+	 */
 	public void setWasPonged(boolean pong) { _wasPonged = pong; }
     }
 }

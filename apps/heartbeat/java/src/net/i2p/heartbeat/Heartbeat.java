@@ -1,18 +1,16 @@
 package net.i2p.heartbeat;
 
-import net.i2p.util.Log;
-import net.i2p.util.Clock;
-import net.i2p.data.Destination;
-
-import java.io.IOException;
 import java.io.File;
 import java.io.FileInputStream;
-
+import java.io.IOException;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
-import java.util.Iterator;
-import java.util.Date;
+
+import net.i2p.data.Destination;
+import net.i2p.util.Log;
 
 /**
  * Main driver for the heartbeat engine, loading 0 or more tests, firing
@@ -73,7 +71,10 @@ public class Heartbeat  {
     /** if there are no command line arguments, load the config from "heartbeat.config" */
     public static final String CONFIG_FILE_DEFAULT = "heartbeat.config";
     
-    /** build up a new heartbeat manager, but don't actually do anything */
+    /**
+     * build up a new heartbeat manager, but don't actually do anything
+     * @param configFile the name of the configuration file
+     */
     public Heartbeat(String configFile) {
 	_configFile = configFile;
 	_clientConfigs = new HashMap();
@@ -94,8 +95,9 @@ public class Heartbeat  {
 		fin = new FileInputStream(_configFile);
 		props.load(fin);
 	    } catch (IOException ioe) {
-		if (_log.shouldLog(Log.ERROR))
+		if (_log.shouldLog(Log.ERROR)) {
 		    _log.error("Error reading the config data", ioe);
+        }
 	    } finally {
 		if (fin != null) try { fin.close(); } catch (IOException ioe) {}
 	    }
@@ -119,18 +121,25 @@ public class Heartbeat  {
 	    _adapter.sendPing(peer, seriesNum, now, size);
     }
     
-    /** load up the base data (I2CP config, etc) */
+    /**
+     * load up the base data (I2CP config, etc)
+     * @param props the properties to load from 
+     */
     private void loadBaseConfig(Properties props) {
 	_adapter.loadConfig(props);
     }
     
-    /** load up all of the test config data */
+    /** 
+     * load up all of the test config data 
+     * @param props the properties to load from
+     * */
     private void loadClientConfigs(Properties props) {
 	int i = 0;
 	while (true) {
 	    ClientConfig config = new ClientConfig();
-	    if (!config.load(props, i))
-		break;
+	    if (!config.load(props, i)) {
+		    break;
+        }
 	    _clientConfigs.put(new Integer(i), config);
 	    i++;
 	}
@@ -174,14 +183,17 @@ public class Heartbeat  {
      * running any tests. <p />
      *
      * <code> <b>Usage: </b> Heartbeat [<i>configFileName</i>]</code> <p />
+     * @param args the list of args passed to the program from the command-line
      */
     public static void main(String args[]) {
 	String configFile = CONFIG_FILE_DEFAULT;
-	if (args.length == 1)
+	if (args.length == 1) {
 	    configFile = args[0];
+    }
 	
-	if (_log.shouldLog(Log.INFO))
+	if (_log.shouldLog(Log.INFO)) {
 	    _log.info("Starting up with config file " + configFile);
+    }
 	Heartbeat heartbeat = new Heartbeat(configFile);
 	heartbeat.loadConfig();
 	heartbeat.connect();
@@ -210,8 +222,9 @@ public class Heartbeat  {
 	 * @param data arbitrary payload data
 	 */
 	public void receivePing(Destination from, int seriesNum, Date sentOn, byte[] data) {
-	    if (_adapter.getIsConnected())
-		_adapter.sendPong(from, seriesNum, sentOn, data);
+	    if (_adapter.getIsConnected()) {
+		    _adapter.sendPong(from, seriesNum, sentOn, data);
+        }
 	}
 
 	/**
@@ -225,8 +238,9 @@ public class Heartbeat  {
 	 */
 	public void receivePong(Destination from, int seriesNum, Date sentOn, Date replyOn, byte[] data) {
 	    ClientEngine engine = (ClientEngine)_clientEngines.get(new Integer(seriesNum));
-	    if (engine.getPeer().equals(from))
-		engine.receivePong(sentOn.getTime(), replyOn.getTime());
+	    if (engine.getPeer().equals(from)) {
+		    engine.receivePong(sentOn.getTime(), replyOn.getTime());
+        }
 	}
     }
     

@@ -1,18 +1,17 @@
 package net.i2p.heartbeat;
 
-import net.i2p.util.Log;
-import net.i2p.util.Clock;
-
-import java.io.IOException;
 import java.io.File;
 import java.io.FileOutputStream;
-
-import java.text.SimpleDateFormat;
+import java.io.IOException;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
-import java.util.Locale;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Iterator;
+import java.util.Locale;
+
+import net.i2p.util.Clock;
+import net.i2p.util.Log;
 
 /**
  * Actually write out the stats for peer test
@@ -24,6 +23,7 @@ class PeerDataWriter {
     /** 
      * persist the peer state to the location specified in the peer config
      *
+     * @param data the peer data to persist
      * @return true if it was persisted correctly, false on error
      */
     public boolean persist(PeerData data) {
@@ -93,12 +93,25 @@ class PeerDataWriter {
     }
     
     private static final SimpleDateFormat _fmt = new SimpleDateFormat("yyyyMMdd.HH:mm:ss.SSS", Locale.UK);
+
+    /**
+     * Converts a time (long) to text
+     * @param when the time to convert
+     * @return the textual representation
+     */
     public String getTime(long when) {
 	synchronized (_fmt) {
 	    return _fmt.format(new Date(when));
 	}
     }
+
     private static final DecimalFormat _numFmt = new DecimalFormat("#0", new DecimalFormatSymbols(Locale.UK));
+
+    /**
+     * Converts a number (double) to text
+     * @param val the number to convert
+     * @return the textual representation
+     */
     public String getNum(double val) {
 	synchronized (_numFmt) {
 	    return _numFmt.format(val);

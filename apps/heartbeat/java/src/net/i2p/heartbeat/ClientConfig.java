@@ -1,13 +1,13 @@
 package net.i2p.heartbeat;
 
-import net.i2p.data.Destination;
-import net.i2p.data.DataFormatException;
-import net.i2p.util.Log;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 import java.util.StringTokenizer;
+
+import net.i2p.data.DataFormatException;
+import net.i2p.data.Destination;
+import net.i2p.util.Log;
 
 /**
  * Define the configuration for testing against one particular peer as a client
@@ -26,17 +26,63 @@ public class ClientConfig {
     private String _comment;
     private int _averagePeriods[];
     
+    /**
+     * @seeRoutine ClientConfig#load
+     * @seeRoutine ClientConfig#store
+     */
     public static final String PROP_PREFIX = "peer.";
     
+    /**
+     * @seeRoutine ClientConfig#load
+     * @seeRoutine ClientConfig#store
+     */
     public static final String PROP_PEER = ".peer";
+    
+    /**
+     * @seeRoutine ClientConfig#load
+     * @seeRoutine ClientConfig#store
+     */
     public static final String PROP_STATFILE = ".statFile";
+
+    /**
+     * @seeRoutine ClientConfig#load
+     * @seeRoutine ClientConfig#store
+     */
     public static final String PROP_STATDURATION = ".statDuration";
+    
+    /**
+     * @seeRoutine ClientConfig#load
+     * @seeRoutine ClientConfig#store
+     */
     public static final String PROP_STATFREQUENCY = ".statFrequency";
+
+    /**
+     * @seeRoutine ClientConfig#load
+     * @seeRoutine ClientConfig#store
+     */
     public static final String PROP_SENDFREQUENCY = ".sendFrequency";
+
+    /**
+     * @seeRoutine ClientConfig#load
+     * @seeRoutine ClientConfig#store
+     */
     public static final String PROP_SENDSIZE = ".sendSize";
+    
+    /**
+     * @seeRoutine ClientConfig#load
+     * @seeRoutine ClientConfig#store
+     */
     public static final String PROP_COMMENT = ".comment";
+    
+    /**
+     * @seeRoutine ClientConfig#load
+     * @seeRoutine ClientConfig#store
+     */
     public static final String PROP_AVERAGEPERIODS = ".averagePeriods";
     
+    /**
+     * Default constructor...
+     */
     public ClientConfig() {
 	this(null, null, null, -1, -1, -1, -1, 0, null, null);
     }
@@ -65,64 +111,135 @@ public class ClientConfig {
 	_averagePeriods = averagePeriods;
     }
 
-    /** peer to test against */
+    /** Retrieves the peer to test against 
+     * @return the Destination (peer)
+     */
     public Destination getPeer() { return _peer; }
+
+    /**
+     * Sets the peer to test against
+     * @param peer the Destination (peer)
+     */
     public void setPeer(Destination peer) { _peer = peer; }
 
-    /** who we are when we test */
+    
+    /** 
+     * Retrieves who we are when we test 
+     * @return the Destination (us)
+     */
     public Destination getUs() { return _us; }
+    
+    /**
+     * Sets who we are when we test
+     * @param us the Destination (us)
+     */
     public void setUs(Destination us) { _us = us; }
 
-    /** location to write the current stats to */
+    /**
+     * Retrieves the location to write the current stats to 
+     * @return the name of the file
+     */
     public String getStatFile() { return _statFile; }
+    
+    /**
+     * Sets the name of the location we write the current stats to
+     * @param statFile the name of the file
+     */
     public void setStatFile(String statFile) { _statFile = statFile; }
     
-    /** how many minutes of statistics should be maintained within the window for this client? */
+    /**
+     * Retrieves how many minutes of statistics should be maintained within the window for this client
+     * @return the number of minutes
+     */
     public int getStatDuration() { return _statDuration; }
+
+    /**
+     * Sets how many minutes of statistics should be maintained within the window for this client
+     * @param durationMinutes the number of minutes
+     */
     public void setStatDuration(int durationMinutes) { _statDuration = durationMinutes; }
     
-    /** how frequenty the stats are written out (in seconds) */
+    /**
+     * Retrieves how frequently the stats are written out (in seconds) 
+     * @return the frequency in seconds
+     */
     public int getStatFrequency() { return _statFrequency; }
+    
+    /**
+     * Sets how frequently the stats are written out (in seconds)
+     * @param freqSeconds the frequency in seconds
+     */
     public void setStatFrequency(int freqSeconds) { _statFrequency = freqSeconds; }
     
-    /** how frequenty we send messages to the peer (in seconds) */
+    /** 
+     * Retrieves how frequenty we send messages to the peer (in seconds) 
+     * @return the frequency in seconds
+     */
     public int getSendFrequency() { return _sendFrequency; }
+    
+    /**
+     * Sets how frequenty we send messages to the peer (in seconds)
+     * @param freqSeconds the frequency in seconds
+     */
     public void setSendFrequency(int freqSeconds) { _sendFrequency = freqSeconds; }
     
     /** 
-     * How many bytes should the ping messages be (min values ~700, max ~32KB)? 
-     *
+     * Retrieves how many bytes the ping messages should be 
+     * (min values ~700, max ~32KB) 
+     * @return the size in bytes
      */
     public int getSendSize() { return _sendSize; }
+
+    /**
+     * Sets how many bytes the ping messages should be
+     * (min values ~700, max ~32KB)
+     * @param numBytes the size in bytes
+     */
     public void setSendSize(int numBytes) { _sendSize = numBytes; }
     
     /**
-     * Brief 1 line description of the test.  Useful comments are along the lines
-     * of "The peer is located on a fast router and connection with 2 hop tunnels".
-     *
+     * Retrieves the brief, 1 line description of the test.  
+     * Useful comments are along the lines of "The peer is located on a fast router and connection with 2 hop tunnels".
+     * 
+     * @return the brief comment
      */
     public String getComment() { return _comment; }
+    /**
+     * Sets a brief, 1 line description (comment) of the test.
+     * @param comment the brief comment
+     */
     public void setComment(String comment) { _comment = comment; }
     
     /**
-     * Periods that the client's tests should be averaged over.
-     *
+     * Retrieves the periods that the client's tests should be averaged over.
      * @return list of periods (in minutes) that the data should be averaged over, or null
      */
     public int[] getAveragePeriods() { return _averagePeriods; }
+
+    /**
+     * Sets the periods that the client's tests should be averaged over.
+     * @param periods the list of periods (in minutes) that the data should be averaged over, or null
+     */
     public void setAveragePeriods(int periods[]) { _averagePeriods = periods; }
     
     /**
-     * How many hops is this test engine configured to use for its outbound and inbound tunnels?
-     *
+     * Retrieves how many hops this test engine is configured to use for its outbound and inbound tunnels
+     * @return the number of hops
      */
     public int getNumHops() { return _numHops; }
+    
+    /**
+     * Sets how many hops this test engine is configured to use for its outbound and inbound tunnels
+     * @param numHops the number of hops
+     */
     public void setNumHops(int numHops) { _numHops = numHops; }
     
     /**
      * Load the client config from the properties specified, deriving the current 
      * config entry from the peer number.
      *
+     * @param clientConfig the properties to load from
+     * @param peerNum the number associated with the peer
      * @return true if it was loaded correctly, false if there were errors
      */
     public boolean load(Properties clientConfig, int peerNum) {
@@ -138,8 +255,9 @@ public class ClientConfig {
 	
 	if ( (peerVal == null) || (statFileVal == null) || (statDurationVal == null) || 
 	     (statFrequencyVal == null) || (sendFrequencyVal == null) || (sendSizeVal == null) ) {
-	    if (_log.shouldLog(Log.DEBUG))
-		_log.debug("Peer number "+ peerNum + " does not exist");
+	    if (_log.shouldLog(Log.DEBUG)) {
+		    _log.debug("Peer number "+ peerNum + " does not exist");
+        }
 	    return false;
 	}
 	
@@ -151,25 +269,29 @@ public class ClientConfig {
 	    int sendSize = getInt(sendSizeVal);
 	    
 	    if ( (duration <= 0) || (statFreq <= 0) || (sendFreq <= 0) || (sendSize <= 0) ) {
-		if (_log.shouldLog(Log.WARN))
+		if (_log.shouldLog(Log.WARN)) {
 		    _log.warn("Invalid client config: duration [" + statDurationVal + "] stat frequency [" + statFrequencyVal + 
 		              "] send frequency [" + sendFrequencyVal + "] send size [" + sendSizeVal + "]");
+        }
 		return false;
 	    }
 	    
 	    statFileVal = statFileVal.trim();
 	    if (statFileVal.length() <= 0) {
-		if (_log.shouldLog(Log.WARN))
+		if (_log.shouldLog(Log.WARN)) {
 		    _log.warn("Stat file is blank for peer " + peerNum);
+        }
 		return false;
 	    }
 	    
 	    Destination d = new Destination();
 	    d.fromBase64(peerVal);
 	    
-	    if (commentVal == null)
-		commentVal = "";
-	    commentVal = commentVal.trim();
+	    if (commentVal == null) {
+		    commentVal = "";
+        }
+	    
+        commentVal = commentVal.trim();
 	    commentVal = commentVal.replace('\n', '_');
 	    
 	    List periods = new ArrayList(4);
@@ -178,13 +300,15 @@ public class ClientConfig {
 		while (tok.hasMoreTokens()) {
 		    String periodVal = tok.nextToken();
 		    int minutes = getInt(periodVal);
-		    if (minutes > 0)
-			periods.add(new Integer(minutes));
+		    if (minutes > 0) {
+			    periods.add(new Integer(minutes));
+            }
 		}
 	    }
 	    int avgPeriods[] = new int[periods.size()];
-	    for (int i = 0; i < periods.size(); i++) 
-		avgPeriods[i] = ((Integer)periods.get(i)).intValue();
+	    for (int i = 0; i < periods.size(); i++) {
+		    avgPeriods[i] = ((Integer)periods.get(i)).intValue();
+        }
 	    
 	    _comment = commentVal;
 	    _statDuration = duration;
@@ -205,6 +329,8 @@ public class ClientConfig {
      * Store the client config to the properties specified, deriving the current 
      * config entry from the peer number.
      *
+     * @param clientConfig the properties to store to
+     * @param peerNum the number associated with the peer
      * @return true if it was stored correctly, false if there were errors
      */
     public boolean store(Properties clientConfig, int peerNum) {
@@ -214,9 +340,11 @@ public class ClientConfig {
 	}
 	
 	String comment = _comment;
-	if (comment == null)
+	if (comment == null) {
 	    comment = "";
-	comment = comment.trim();
+    }
+	
+    comment = comment.trim();
 	comment = comment.replace('\n', '_');
 	
 	StringBuffer buf = new StringBuffer(32);
@@ -243,8 +371,9 @@ public class ClientConfig {
 	    int i = Integer.parseInt(val);
 	    return i;
 	} catch (NumberFormatException nfe) {
-	    if (_log.shouldLog(Log.DEBUG))
-		_log.debug("Value [" + val + "] is not a valid integer");
+	    if (_log.shouldLog(Log.DEBUG)) {
+		    _log.debug("Value [" + val + "] is not a valid integer");
+        }
 	    return -1;
 	}
     }

@@ -2,8 +2,8 @@ package net.i2p.heartbeat;
 
 import net.i2p.data.Destination;
 import net.i2p.util.Clock;
-import net.i2p.util.Log;
 import net.i2p.util.I2PThread;
+import net.i2p.util.Log;
 
 /**
  * Responsible for actually conducting the tests, coordinating the storing of the 
@@ -13,7 +13,7 @@ import net.i2p.util.I2PThread;
  */
 class ClientEngine {
     private static final Log _log = new Log(ClientEngine.class);
-    /** who can send our pings/ */
+    /** who can send our pings? */
     private Heartbeat _heartbeat;
     /** actual test state */
     private PeerData _data;
@@ -28,7 +28,8 @@ class ClientEngine {
     /**
      * Create a new engine that will send its pings through the given heartbeat
      * system, and will coordinate the test according to the configuration specified.
-     *
+     * @param heartbeat the Heartbeat to send pings through
+     * @param config the Configuration to load configuration from =p
      */
     public ClientEngine(Heartbeat heartbeat, ClientConfig config) {
 	_heartbeat = heartbeat;
@@ -50,10 +51,18 @@ class ClientEngine {
 	t.setName("HeartbeatClient " + _id);
 	t.start();
     }
-    /** who are we testing? */
+    /**
+     * Who are we testing? 
+     * @return the Destination (peer) we're testing
+     */
     public Destination getPeer() { return _data.getConfig().getPeer(); }
-    /** what is our series identifier (used to locally identify a test) */
+
+    /**
+     * What is our series identifier (used to locally identify a test) 
+     * @return the series identifier
+     */
     public int getSeriesNum() { return _id; }
+
     /** 
      * receive notification from the heartbeat system that a pong was received in 
      * reply to a ping we have sent.  
@@ -74,6 +83,10 @@ class ClientEngine {
     
     /** our actual heartbeat pumper - this drives the test */
     private class ClientRunner implements Runnable {
+	
+    /* (non-Javadoc)
+	 * @see java.lang.Runnable#run()
+	 */
 	public void run() {
 	    if (_log.shouldLog(Log.INFO))
 		_log.info("Starting engine talking to peer " + _data.getConfig().getPeer().calculateHash().toBase64());
