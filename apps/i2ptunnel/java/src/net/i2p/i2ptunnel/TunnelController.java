@@ -13,6 +13,7 @@ import net.i2p.I2PAppContext;
 import net.i2p.I2PException;
 import net.i2p.client.I2PClient;
 import net.i2p.client.I2PClientFactory;
+import net.i2p.client.I2PSession;
 import net.i2p.data.Destination;
 import net.i2p.util.Log;
 
@@ -39,7 +40,7 @@ public class TunnelController implements Logging {
      * @param prefix beginning of key values that are relevent to this tunnel
      */
     public TunnelController(Properties config, String prefix) {
-        this(config, prefix, false);
+        this(config, prefix, true);
     }
     /**
      * 
@@ -53,7 +54,7 @@ public class TunnelController implements Logging {
         setConfig(config, prefix);
         _messages = new ArrayList(4);
         _running = false;
-        if (createKey)
+        if (createKey && ("server".equals(getType())) )
             createPrivateKey();
         if (getStartOnLoad())
             startTunnel();
@@ -61,6 +62,12 @@ public class TunnelController implements Logging {
     
     private void createPrivateKey() {
         I2PClient client = I2PClientFactory.createClient();
+        String filename = getPrivKeyFile();
+        if ( (filename == null) || (filename.trim().length() <= 0) ) {
+            log("No filename specified for the private key");
+            return;
+        }
+        
         File keyFile = new File(getPrivKeyFile());
         if (keyFile.exists()) {
             log("Not overwriting existing private keys in " + keyFile.getAbsolutePath());
@@ -312,6 +319,24 @@ public class TunnelController implements Logging {
         String opts = getClientOptions();
         if ( (opts != null) && (opts.length() > 0) )
             buf.append("Network options: ").append(opts).append("<br />\n");
+        if (_running) {
+            List sessions = _tunnel.getSessions();
+            for (int i = 0; i < sessions.size(); i++) {
+                I2PSession session = (I2PSession)sessions.get(i);
+                Destination dest = session.getMyDestination();
+                if (dest != null) {
+                    buf.append("Destination hash: ").append(dest.calculateHash().toBase64()).append("<br />\n");
+                    buf.append("Full destination: ");
+                    buf.append("<input type=\"text\" size=\"10\" onclick=\"this.select();\" ");
+                    buf.append("value=\"").append(dest.toBase64()).append("\" />\n");
+                    if ("server".equals(getType())) {
+                        buf.append(" Give that out to people so they can view your service.");
+                        buf.append(" If you are going to share it on irc, be sure to split it on two lines");
+                    }
+                    buf.append("<br />\n");
+                }
+            }
+        }
     }
     
     public void log(String s) {

@@ -86,6 +86,8 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
         }
         l.log("I2P session created");
 
+        getTunnel().addSession(sockMgr.getSession());
+        
         Thread t = new I2PThread(this);
         t.setName("Client " + _clientId);
         listenerReady = false;
@@ -275,6 +277,7 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
                 }
                 return false;
             }
+            getTunnel().removeSession(sockMgr.getSession());
             l.log("Closing client " + toString());
             try {
                 if (ss != null) ss.close();

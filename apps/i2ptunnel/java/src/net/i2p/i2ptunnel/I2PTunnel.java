@@ -54,6 +54,7 @@ import net.i2p.I2PAppContext;
 import net.i2p.I2PException;
 import net.i2p.client.I2PClient;
 import net.i2p.client.I2PClientFactory;
+import net.i2p.client.I2PSession;
 import net.i2p.client.naming.NamingService;
 import net.i2p.data.Base64;
 import net.i2p.data.DataFormatException;
@@ -71,6 +72,7 @@ public class I2PTunnel implements Logging, EventDispatcher {
     private static long __tunnelId = 0;
     private long _tunnelId;
     private Properties _clientOptions;
+    private List _sessions;
 
     public static final int PACKET_DELAY = 100;
 
@@ -108,6 +110,7 @@ public class I2PTunnel implements Logging, EventDispatcher {
         _event = new EventDispatcherImpl();
         _clientOptions = new Properties();
         _clientOptions.putAll(System.getProperties());
+        _sessions = new ArrayList(1);
         
         addConnectionEventListener(lsnr);
         boolean gui = true;
@@ -172,6 +175,24 @@ public class I2PTunnel implements Logging, EventDispatcher {
         }
     }
 
+    List getSessions() { 
+        synchronized (_sessions) {
+            return new ArrayList(_sessions); 
+        }
+    }
+    void addSession(I2PSession session) { 
+        if (session == null) return;
+        synchronized (_sessions) {
+            _sessions.add(session);
+        }
+    }
+    void removeSession(I2PSession session) { 
+        if (session == null) return;
+        synchronized (_sessions) {
+            _sessions.remove(session);
+        }
+    }
+    
     public Properties getClientOptions() { return _clientOptions; }
     
     private void addtask(I2PTunnelTask tsk) {

@@ -64,6 +64,7 @@ public abstract class I2PTunnelTask implements EventDispatcher {
 
     public void disconnected(I2PSession session) {
         routerDisconnected();
+        getTunnel().removeSession(session);
     }
 
     public void errorOccurred(I2PSession session, String message, Throwable error) {

@@ -80,6 +80,7 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
 
         }
         sockMgr.setName("Server");
+        getTunnel().addSession(sockMgr.getSession());
         l.log("Ready!");
         notifyEvent("openServerResult", "ok");
         open = true;
@@ -130,6 +131,7 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
             l.log("Shutting down server " + toString());
             try {
                 if (i2pss != null) i2pss.close();
+                getTunnel().removeSession(sockMgr.getSession());
                 sockMgr.getSession().destroySession();
             } catch (I2PException ex) {
                 _log.error("Error destroying the session", ex);
