@@ -6,13 +6,17 @@ This directory houses the wiki text sources.
 Feel free to move to any other documentation system, if
 it is efficient and easy to maintain.
 
-Ideally, one could patch pydoc to export only certain
-names, in a certain order, like so:
+Do not use the Monobook skin, as it is Copyrighted.
 
-__pydoc__ = ['f', 'g']    # f() and g() documented in order
+-------------------------------------------------------
 
-This could proceed recursively for all namespaces.
+The documentation made by epydoc is pretty nice.
 
-Combine this with a second patch to make pydoc create
-nice CSS, and this whole guide could be generated
-directly from the sources.
+Ideally, one could patch epydoc to use a more condensed
+2-column format (where there are fewer pages, and it is
+easier to read).
+
+With a little work on the output, epydoc could then be
+used solely for documenting this project.
+
+Note that the docs produced by epydoc are huge.

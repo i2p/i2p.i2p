@@ -1,0 +1,276 @@
+Title: User's Guide:i2p.socket
+
+Module <code>i2p.socket</code> allows Python programs to access the [[SAM proxy]].  It emulates the Python module <code>socket</code>.
+
+With this module, a program can send stream data, datagrams, and raw packets across the I2P network.
+
+== Sockets ==
+
+class '''socket'''(session, type, samaddr='127.0.0.1:7656', **kwargs)
+<ul><pre>
+ Create a new socket.  Argument session should be a session
+ name -- if the name has not yet been used, an I2P
+ Destination will be created for it, otherwise, the
+ existing Destination will be re-used.  An empty session
+ string causes a transient session to be created.  Argument
+ type is one of SOCK_STREAM, SOCK_DGRAM, or SOCK_RAW.
+ 
+ I2P configuration keyword arguments:
+ 
+   - in_depth  - depth of incoming tunnel (default 2)
+   - out_depth - depth of outgoing tunnel (default 2)
+ 
+ A single session may be shared by more than one socket, if
+ the sockets are the same type, and if the sockets are
+ created within the same Python process.  The socket
+ objects are multithread-safe.
+ 
+ Examples:
+   >>> a = i2p.socket('Alice', i2p.SOCK_STREAM)
+   >>> b = i2p.socket('Bob',   i2p.SOCK_DGRAM, 
+                      in_depth=2, out_depth=5)
+ 
+ The created object behaves identically to a socket from
+ module socket, with the following exceptions:
+ 
+   * I2P Destinations are used as address arguments [1].
+   * bind is a no-op: sockets are always bound.
+   * send* methods send all data and are non-blocking.
+ 
+ A given session name can only be open in a single Python
+ program at a time.  If you need to overcome this
+ limitation, consider patching I2P.
+ 
+ [1]. Alternatively, a host name can be used as an address.
+      It will be resolved using hosts.txt.
+</pre>
+ For details on how to use socket objects, see
+ http://www.python.org/doc/current/lib/socket-objects.html  
+
+ See the examples directory for code examples.
+</ul>
+The class <code>socket</code> defines the following properties:
+<ul>
+ dest    - Local I2P Destination of socket
+ session - Session name
+ type    - Socket type: SOCK_STREAM, SOCK_DGRAM, or SOCK_RAW.
+</ul>
+
+The class <code>socket</code> defines the following methods:
+
+'''accept'''(self)
+<ul><pre>
+ Accept an incoming connection. The socket must be type SOCK_STREAM, and 
+ listen() must be called prior to this command. The return value is (conn, 
+ remotedest), where conn is a new socket object made for the connection, and 
+ remotedest is the remote Destination from which the connection was made.
+
+ Example:
+
+  >>> from i2p import socket
+  >>> s = socket.socket('Alice', socket.SOCK_STREAM)
+  >>> s.listen(10)
+
+ This prepares the server. Now accept an incoming connection:
+
+  >>> c, remotedest = s.accept()
+  >>> c.send('hello world!')
+
+ If accept() is called on a socket that is in non-blocking mode or has a  
+ timeout, i2p.socket.BlockError or i2p.socket.Timeout may be raised. This 
+ indicates that no incoming connection is currently available.
+</pre></ul>
+'''bind'''(self, address)
+<ul><pre>
+ Does nothing. Provided for compatibility with the Python socket command
+ bind(), which binds a server to a port.
+</pre></ul>
+'''close'''(self)
+<ul><pre>
+ Closes the socket. It is an error to call any method other than recv() or
+ recvfrom() on a closed socket. For streams, the receive methods return data
+ that was received prior to the closing of the socket. For datagram and raw
+ sockets, the receive methods cannot be used on a closed socket.
+</pre></ul>
+'''connect'''(self, address)
+<ul><pre>
+ Connect to a remote dest, identified in local SAM bridge's hosts file as host 
+ 'address'.
+
+ For example:
+
+ >>> s.connect('duck.i2p')
+
+ Alternatively, you can use a full base64 Destination:
+ Example:
+
+ >>> s.connect('238797sdfh2k34kjh....AAAA')
+
+ If connect() is called on a socket that is in non-blocking mode or has a
+ timeout, i2p.socket.BlockError or i2p.socket.Timeout may be raised. This
+ indicates that the connection is still being initiated. Use i2p.select.select()
+ to determine when the connection is ready.
+</pre></ul>
+'''connect_ex'''(self, address)
+<ul><pre>
+ Like connect(), but return any error that is raised. Returns None if no error
+ is raised.
+</pre></ul>
+'''getpeername'''(self)
+<ul><pre>
+ Get the remote Destination associated with the socket. This is equivalent to 
+ s.remotedest, and is provided for compatibility with the Python socket module.
+</pre></ul>
+'''getsockname'''(self)
+<ul><pre>
+ Get the local Destination associated with the socket. This is equivalent to
+ s.dest, and is provided for compatibility with the Python socket module.
+</pre></ul>
+'''gettimeout'''(self)
+<ul><pre>
+ Get the timeout value.
+</pre></ul>
+'''listen'''(self, backlog)
+<ul><pre>
+ Listen for connections made to the socket. This method must be called before 
+ accept(). The backlog argument specifies the maximum number of queued incoming 
+ connections.
+</pre></ul>
+'''makefile'''(self, mode='r', bufsize=-1)
+<ul><pre>
+ Return a file object for the socket. See socket.makefile() in the Python 
+ documentation for more information.
+</pre></ul>
+'''recv'''(self, bufsize, flags=0)
+<ul><pre>
+ Receive string data from the socket.
+
+ The maximum amount of data to be received is given by bufsize. If bufsize is 
+ zero, this function returns an empty string immediately. If bufsize is nonzero,
+ this function blocks until at least one character is available for reading. If 
+ the socket has been closed, an empty string is returned as an end of file  
+ indicator.
+
+ If recv() is called on a socket that is in non-blocking mode or has a timeout, 
+ i2p.socket.BlockError or i2p.socket.Timeout will be raised if data is not 
+ available within the given timeframe.
+
+ For a datagram or raw socket, the first bufsize characters of the packet are 
+ read, and the remainder of the packet is discarded. To read the entire packet, 
+ use bufsize = -1.
+
+ For datagram and raw sockets, the packet may originate from any Destination. 
+ Use recvfrom() with datagrams to determine the Destination from which the 
+ packet was received.
+
+ The flags argument can be a bitwise OR of MSG_PEEK, MSG_WAITALL, and/or 
+ MSG_DONTWAIT. MSG_PEEK indicates that any data read should not be removed from 
+ the socket's incoming buffer. MSG_WAITALL indicates to wait for exactly bufsize
+ characters or an error. MSG_DONTWAIT indicates that the recv() command should 
+ not block execution.
+</pre></ul>
+'''recvfrom'''(self, bufsize, flags=0)
+<ul><pre>
+ Like recv(), but returns a tuple (data, remoteaddr), where data is the string 
+ data received, and remoteaddr is the remote Destination.
+</pre></ul>
+'''send'''(self, string, flags=0)
+<ul><pre>
+ Sends string data to a remote Destination.
+
+ For a stream, connect() must be called prior to send(). Once close() is called, 
+ no further data can be sent, and the stream cannot be re-opened.
+
+ For datagram and raw sockets, connect() only specifies a Destination to which 
+ packets are sent to. send() will then send a packet to the given Destination. 
+ connect() can be used multiple times.
+
+ The send() command never blocks execution. The flags argument is ignored.
+</pre></ul>
+'''sendall'''(self, string, flags=0)
+<ul><pre>
+ Identical to send().
+</pre></ul>
+'''sendto'''(self, string, flags, address)
+<ul><pre>
+ Send a packet to the given Destination.
+
+ Only valid for datagram and raw sockets. The address argument should be either 
+ a name from the hosts file, or a base64 Destination.
+
+ The sendto() command never blocks execution. The flags argument is ignored.
+</pre></ul>
+'''setblocking'''(self, flag)
+<ul><pre>
+ Set blocking or non-blocking mode for the socket.
+
+ If flag is True, any method called on the socket will hang until the method has
+ completed. If flag is False, all methods will raise i2p.socket.BlockError() if
+ they cannot complete instantly.
+
+ s.setblocking(False) is equivalent to s.settimeout(0); s.setblocking(True) is 
+ equivalent to s.settimeout(None).
+</pre></ul>
+'''settimeout'''(self, value)
+<ul><pre>
+ Set a timeout for the socket.
+
+ The value argument should be a timeout value in seconds, or None. None is 
+ equivalent to an infinite timeout.
+
+ A socket operation will raise a i2p.socket.Timeout if the operation cannot 
+ complete within in the specified time limit.
+</pre></ul>
+
+== Functions ==
+
+Functions defined in module <code>i2p.socket</code>:
+
+'''resolve'''(host, samaddr='127.0.0.1:7656')
+<ul>
+ Resolve I2P host name --> I2P Destination.
+ Returns the same string if host is already a Destination.
+</ul>
+
+== Errors ==
+
+class '''Error'''(i2p.Error)
+<ul><pre>
+ Base class for all SAM errors.
+</pre></ul>
+class '''BlockError'''(Error) 
+<ul><pre>
+ Socket call would have blocked.
+</pre></ul>
+class '''ClosedError'''(Error) 
+<ul><pre>
+ A command was used on a socket that closed gracefully.
+</pre></ul>
+class '''NetworkError'''(Error) 
+<ul><pre>
+ Network error occurred within I2P.
+
+ The error object is a 2-tuple: (errtag, errdesc).
+ errtag is a SAM error string,
+ errdesc is a human readable error description. 
+</pre></ul>
+
+== Constants ==
+
+'''Socket types'''
+<ul><pre>
+ SOCK_STREAM = 1
+ SOCK_DGRAM = 2
+ SOCK_RAW = 3
+</pre></ul>
+'''Packet sizes'''
+<ul><pre>
+ MAX_DGRAM = 31744        # Maximum size for datagram packet
+ MAX_RAW = 32768          # Maximum size for raw packet
+</pre></ul>
+'''Flags for recv()'''
+<ul><pre>
+ MSG_DONTWAIT = 128       # Don't block 
+ MSG_PEEK = 2             # Peek at incoming data
+ MSG_WAITALL = 64         # Wait for all data or error
+</pre></ul>

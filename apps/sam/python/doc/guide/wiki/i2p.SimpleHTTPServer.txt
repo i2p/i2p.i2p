@@ -1,0 +1,45 @@
+Title: User's Guide:i2p.SimpleHTTPServer
+
+Emulates Python SimpleHTTPServer module using I2P sockets.
+
+== Overview ==
+
+The Python module is described at http://www.python.org/doc/current/lib/module-SimpleHTTPServer.html
+
+To get a server going, use:
+
+<ul><pre>
+>>> from i2p import SimpleHTTPServer
+>>> SimpleHTTPServer.test().
+</pre></ul>
+
+Consult the documentation for function test() to change basic server settings, such as the session name.
+
+A fully customizable example:
+
+<ul><pre>
+>>> from i2p import BaseHTTPServer, SimpleHTTPServer
+>>> session = "mytestxxx.i2p"      # SAM session name
+>>> class MyServer(BaseHTTPServer.HTTPServer): pass
+>>> class MyRequestHandler(SimpleHTTPServer.SimpleHTTPRequestHandler): pass
+>>> httpd = MyServer(session, MyRequestHandler)
+>>> httpd.socket.dest
+(Base64 Destination of server)
+>>> httpd.serve_forever()
+</pre></ul>
+
+== Classes ==
+
+class '''SimpleHTTPRequestHandler'''
+<ul><pre>
+Same interface as Python class SimpleHTTPServer.SimpleHTTPRequestHandler.
+</pre></ul>
+
+== Functions ==
+
+'''test'''(HandlerClass=SimpleHTTPRequestHandler, ServerClass= i2p.BaseHTTPServer.HTTPServer, session='mytestxxx.i2p')
+<ul><pre>
+Test the HTTP simple request handler class.
+This runs an I2P TCP server under SAM session 'session'. If a single command 
+line argument is given, the argument is used instead as the SAM session name.
+</pre></ul>

@@ -1,0 +1,48 @@
+Title: User's Guide:i2p.CGIHTTPServer
+
+Module <code>i2p.CGIHTTPServer</code> emulates the Python CGIHTTPServer module using I2P sockets.
+
+== Overview ==
+
+The Python module is described at http://www.python.org/doc/current/lib/module-CGIHTTPServer.html
+
+To get a server going, use:
+
+<ul><pre>
+>>> from i2p import CGIHTTPServer
+>>> CGIHTTPServer.test().
+</pre></ul>
+
+Consult the documentation for function test() to change basic server settings, such as the session name.
+
+A fully customizable example:
+
+<ul><pre>
+>>> from i2p import BaseHTTPServer, CGIHTTPServer
+>>> session = "mytestxxx.i2p"      # SAM session name
+>>> class MyServer(BaseHTTPServer.HTTPServer): pass
+>>> class MyRequestHandler(CGIHTTPServer.CGIHTTPRequestHandler): pass
+>>> httpd = MyServer(session, MyRequestHandler)
+>>> httpd.socket.dest
+(Base64 Destination of server)
+>>> httpd.serve_forever()
+</pre></ul>
+
+== Classes ==
+
+class '''CGIHTTPRequestHandler'''
+<ul><pre>
+Same interface as Python class CGIHTTPServer.CGIHTTPRequestHandler.
+</pre></ul>
+
+== Functions ==
+
+'''test'''(HandlerClass=CGIHTTPRequestHandler,
+ServerClass=i2p.BaseHTTPServer.HTTPServer,
+session='mytestxxx.i2p')
+<ul><pre>
+Test the HTTP CGI request handler class.
+This runs an I2P TCP server under SAM session 'session'. If a single
+command line argument is given, the argument is used instead as the SAM session
+name.
+</pre></ul>

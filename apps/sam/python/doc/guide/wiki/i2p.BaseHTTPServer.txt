@@ -1,0 +1,49 @@
+Title: User's Guide:i2p.BaseHTTPServer
+
+Emulates Python BaseHTTPServer module using I2P sockets.
+
+== Overview ==
+
+The Python module is described at http://www.python.org/doc/current/lib/module-BaseHTTPServer.html
+
+To get a server going, use:
+
+<ul><pre>
+>>> from i2p import BaseHTTPServer
+>>> BaseHTTPServer.test().
+</pre></ul>
+
+Consult the documentation for function test() to change basic server settings, such as the session name.
+
+A fully customizable example:
+
+<ul><pre>
+>>> from i2p import BaseHTTPServer
+>>> session = "mytestxxx.i2p"      # SAM session name
+>>> class MyServer(BaseHTTPServer.HTTPServer): pass
+>>> class MyRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler): pass
+>>> httpd = MyServer(session, MyRequestHandler)
+>>> httpd.socket.dest
+(Base64 Destination of server)
+>>> httpd.serve_forever()
+</pre></ul>
+
+== Classes ==
+
+class '''BaseHTTPRequestHandler'''
+<ul><pre>
+Same interface as Python class BaseHTTPServer.BaseHTTPRequestHandler.
+</pre></ul>
+class '''HTTPServer'''
+<ul><pre>
+Same interface as Python class BaseHTTPServer.HTTPServer.
+</pre></ul>
+
+== Functions ==
+
+'''test'''(HandlerClass=BaseHTTPRequestHandler, ServerClass=HTTPServer, protocol='HTTP/1.0', session='mytestxxx.i2p')
+<ul><pre>
+Test the HTTP request handler class.
+This runs an I2P TCP server under SAM session 'session'. If a single command 
+line argument is given, the argument is used instead as the SAM session name.
+</pre></ul>

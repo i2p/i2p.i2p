@@ -1,0 +1,79 @@
+Title: User's Guide:i2p.tunnel
+
+Module <code>i2p.tunnel</code> allows data to be exchanged between traditional TCP sockets and I2P sockets.
+
+== Tunnels ==
+
+Tunnels allow stream sockets to be joined, so that connections to a listening socket are relayed to one or more sending sockets.  This allows an ordinary web server to be exposed as an I2P Destination, or an I2P Destination to be bound as a local port, and so on.
+
+class '''Tunnel'''(self, receive, make_send, nconnect=-1, timeout=60.0)
+<ul><pre>
+ A Tunnel relays connections from a 'receive' socket to one
+ or more 'send' sockets.  The receive socket must be bound
+ and listening.  For each incoming connection, a new send
+ socket is created by calling make_send().  Data is then
+ exchanged between the created streams until one socket is
+ closed.  nconnect is the maximum number of simultaneous
+ connections (-1 for infinite), and timeout is the time that
+ a single connection can last for (None allows a connection
+ to last forever).
+ 
+ Sockets must accept stream traffic and support the Python
+ socket interface.  A separate daemonic thread is created to
+ manage the tunnel.  For high performance, make_send() should
+ make a socket and connect in non-blocking mode (you should
+ catch and discard the i2p.socket.BlockError or socket.error due to
+ executing connect on a non-blocking socket).
+ 
+ Security Note:
+ A firewall is needed to maintain the end user's anonymity.
+ An attacker could keep a tunnel socket open by pinging it
+ regularly.  The accepted sockets from 'receive' must prevent
+ this by closing down eventually.
+ 
+ Socket errors do not cause the Tunnel to shut down.
+</pre></ul>
+
+'''close'''()
+<ul>
+ Close all connections made for this tunnel.
+</ul>
+
+=== Tunnel Server ===
+
+class '''TunnelServer'''(session, port, samaddr='127.0.0.1:7656', nconnect=-1, timeout=None, **kwargs)
+<ul><pre>
+ Tunnels incoming SAM streams --> localhost:port.
+ 
+ nconnect and timeout are the maximum number of connections
+ and maximum time per connection.  All other arguments are
+ passed to i2p.socket.socket().  This call blocks until the
+ tunnel is ready.
+</pre></ul>
+
+'''TunnelServer''' properties:
+<ul><pre>
+ dest       - I2P Destination of server. 
+ session    - Session name for server.
+</pre></ul>
+
+=== Tunnel Client ===
+
+class '''TunnelClient'''(session, port, dest, samaddr='127.0.0.1:7656', nconnect=-1, timeout=None, **kwargs)
+<ul><pre>
+ Derived from Tunnel.
+ Tunnels localhost:port --> I2P Destination dest.
+ 
+ A session named 'session' is created locally, for purposes
+ of routing to 'dest'.  nconnect and timeout are the maximum
+ number of connections and maximum time per connection.  All
+ other arguments are passed to i2p.socket.socket().  This call
+ blocks until the tunnel is ready.
+</pre></ul>
+
+'''TunnelClient''' properties:
+<ul><pre>
+ dest       - Local Destination used for routing.
+ remotedest - Remote Destination.
+ session    - Session name for local Destination.
+</pre></ul>

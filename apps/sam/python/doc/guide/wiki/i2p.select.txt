@@ -1,0 +1,27 @@
+Title: User's Guide:i2p.select
+
+Module <code>i2p.select</code> emulates the Python module <code>select</code>.
+
+With this module, a program can perform select and poll commands on traditional and I2P sockets.
+
+'''poll'''()
+<ul>
+ Returns a polling object.  Works on SAM sockets and Python sockets.
+ See [http://www.python.org/doc/current/lib/module-select.html select.poll()] in the Python library for more information.
+</ul>
+
+'''select'''(readlist, writelist, errlist, timeout=None)
+<ul>
+ Performs a select call.  Works on SAM sockets and Python sockets.
+ See [http://www.python.org/doc/current/lib/module-select.html select.select()] in the Python library for more information.
+</ul>
+
+'''Polling flags'''
+<ul><pre>
+ POLLIN = 1
+ POLLOUT = 4
+ POLLERR = 8
+ POLLHUP = 16
+ POLLNVAL = 32
+ POLLPRI = 1
+</pre></ul>

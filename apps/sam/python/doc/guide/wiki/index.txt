@@ -13,21 +13,29 @@ python setup.py install
 Use:
 
 <ul><pre>
->>> from i2p import sam
->>> s = sam.socket('Alice', sam.SOCK_STREAM)
+>>> from i2p import socket
+>>> s = socket.socket('Alice', socket.SOCK_STREAM)
 >>> s.connect('duck.i2p')
 >>> s.send('GET / HTTP/1.0\r\n\r\n')
 >>> s.recv(1000)
 (HTTP response from duck.i2p)
 </pre></ul>
 
+See the src/examples/ directory for more code examples.
+
 == User's Guide ==
 
 The following modules are available:
 
 <ul>
- [[:User's Guide:i2p|i2p]]               (Container package)
- [[:User's Guide:i2p.sam|i2p.sam]]           (Send and receive across the I2P network)
- [[:User's Guide:i2p.eep|i2p.eep]]           (Retrieve eepsites)
- [[:User's Guide:i2p.router|i2p.router]]        (Manage the I2P router)
+ [[:User's Guide:i2p|i2p]]                  (Container package)
+ [[:User's Guide:i2p.BaseHTTPServer|i2p.BaseHTTPServer]]   (Emulate Python BaseHTTPServer module)
+ [[:User's Guide:i2p.CGIHTTPServer|i2p.CGIHTTPServer]]    (Emulate Python CGIHTTPServer module)
+ [[:User's Guide:i2p.eep|i2p.eep]]              (Retrieve eepsites)
+ [[:User's Guide:i2p.router|i2p.router]]           (Manage the I2P router)
+ [[:User's Guide:i2p.select|i2p.select]]           (Emulate Python select module)
+ [[:User's Guide:i2p.SimpleHTTPServer|i2p.SimpleHTTPServer]] (Emulate Python SimpleHTTPServer module)
+ [[:User's Guide:i2p.socket|i2p.socket]]           (Send and receive across the I2P network)
+ [[:User's Guide:i2p.SocketServer|i2p.SocketServer]]     (Emulate Python SocketServer module)
+ [[:User's Guide:i2p.tunnel|i2p.tunnel]]           (Exchange data between I2P and regular sockets)
 </ul>
