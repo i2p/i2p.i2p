@@ -27,8 +27,7 @@ class SessionConfigTest extends StructureTest {
         TestData.registerTest(new SessionConfigTest(), "SessionConfig");
     }
     public DataStructure createDataStructure() throws DataFormatException {
-        SessionConfig cfg = new SessionConfig();
-        cfg.setDestination((Destination)(new DestinationTest()).createDataStructure());
+        SessionConfig cfg = new SessionConfig((Destination)(new DestinationTest()).createDataStructure());
         cfg.setSignature((Signature)(new SignatureTest()).createDataStructure());
         Properties options = new Properties();
         options.setProperty("routerHost", "localhost");
