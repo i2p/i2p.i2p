@@ -100,6 +100,7 @@ public class Timestamper implements Runnable {
 
         if (_log.shouldLog(Log.INFO))
             _log.info("Starting up timestamper");
+        boolean alreadyBitched = false;
         try {
             while (true) {
                 updateConfig();
@@ -118,7 +119,9 @@ public class Timestamper implements Runnable {
                             _log.debug("Stamp time");
                         stampTime(now);
                     } catch (IllegalArgumentException iae) {
-                        _log.log(Log.CRIT, "Unable to reach any of the NTP servers - network disconnected?");
+                        if (!alreadyBitched) 
+                            _log.log(Log.CRIT, "Unable to reach any of the NTP servers - network disconnected?");
+                        alreadyBitched = true;
                     }
                 }
                 try { Thread.sleep(_queryFrequency); } catch (InterruptedException ie) {}

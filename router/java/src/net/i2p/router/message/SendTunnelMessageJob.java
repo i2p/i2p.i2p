@@ -559,30 +559,10 @@ public class SendTunnelMessageJob extends JobImpl {
         outM.setOnSendJob(_onSend);
         outM.setPriority(_priority);
         outM.setReplySelector(_selector);
-        if (_destRouter != null)
-            outM.setTargetHash(_destRouter);
-        else
-            outM.setTargetHash(getContext().routerHash());
+        outM.setTarget(getContext().netDb().lookupRouterInfoLocally(_destRouter));
         getContext().messageRegistry().registerPending(outM);
-        _onFailure = new FakeOnFailJob(getContext(), outM, _onFailure);
         // we dont really need the data
         outM.discardData();
-    }
-    
-    private class FakeOnFailJob extends JobImpl {
-        private OutNetMessage _fakeMessage;
-        private Job _realOnFailJob;
-        public FakeOnFailJob(RouterContext ctx, OutNetMessage msg, Job realOnFailJob) {
-            super(ctx);
-            _fakeMessage = msg;
-            _realOnFailJob = realOnFailJob;
-        }
-        public String getName() { return "Fake message failure job"; }
-        public void runJob() {
-            getContext().messageRegistry().unregisterPending(_fakeMessage);
-            if (_realOnFailJob != null)
-                getContext().jobQueue().addJob(_realOnFailJob);
-        }
     }
     
     public String getName() { return "Send Tunnel Message"; }

@@ -168,6 +168,9 @@ public class TCPTransport extends TransportImpl {
         //    _log.debug("Outbound message ready: " + msg);
         
         if (msg != null) {
+            if (msg.getTarget() == null) 
+                throw new IllegalStateException("Null target for a ready message?");
+            
             TCPConnection con = null;
             boolean newPeer = false;
             synchronized (_connectionLock) {

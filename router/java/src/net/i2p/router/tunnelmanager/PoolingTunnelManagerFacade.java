@@ -149,6 +149,7 @@ public class PoolingTunnelManagerFacade implements TunnelManagerFacade {
      *
      */
     public void peerFailed(Hash peer) {
+        if (_pool == null) return; // just initialized
         int numFailed = 0;
         boolean shouldKill = false;
         for (Iterator iter = _pool.getManagedTunnelIds().iterator(); iter.hasNext(); ) {

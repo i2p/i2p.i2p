@@ -115,7 +115,7 @@ public class NtpClient {
             //System.out.println("host: " + serverName + " rtt: " + roundTripDelay + " offset: " + localClockOffset + " seconds");
             return (long)(System.currentTimeMillis() + localClockOffset*1000);
         } catch (IOException ioe) {
-            ioe.printStackTrace();
+            //ioe.printStackTrace();
             return -1;
         }
     }

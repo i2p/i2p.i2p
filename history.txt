@@ -1,4 +1,10 @@
-$Id: history.txt,v 1.28 2004/10/01 12:23:00 jrandom Exp $
+$Id: history.txt,v 1.29 2004/10/02 07:31:16 jrandom Exp $
+
+2004-10-02  jrandom
+    * Assure that we quickly fail messages bound for shitlisted peers.
+    * Address a race on startup where the first peer contacted could hang the
+      router (thanks Romster!)
+    * Only whine about an intermittent inability to query the time server once
 
 2004-10-02  jrandom
     * Command line utility to verify a peer's reachability - simply run

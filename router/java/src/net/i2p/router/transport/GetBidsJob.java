@@ -38,14 +38,16 @@ public class GetBidsJob extends JobImpl {
     public String getName() { return "Fetch bids for a message to be delivered"; }
     public void runJob() {
         Hash to = _msg.getTarget().getIdentity().getHash();
+        
         if (getContext().shitlist().isShitlisted(to)) {
             _log.warn("Attempt to send a message to a shitlisted peer - " + to);
+            getContext().messageRegistry().peerFailed(to);
             fail();
             return;
         }
         
         Hash us = getContext().routerHash();
-        if (_msg.getTarget().getIdentity().getHash().equals(us)) {
+        if (to.equals(us)) {
             _log.error("wtf, send a message to ourselves?  nuh uh. msg = " + _msg, getAddedBy());
             fail();
             return;
@@ -54,11 +56,8 @@ public class GetBidsJob extends JobImpl {
         List bids = _facade.getBids(_msg);
         if (bids.size() <= 0) {
             _log.warn("No bids available for the message " + _msg);
-            Hash target = _msg.getTargetHash();
-            if (target == null)
-                target = _msg.getTarget().getIdentity().getHash();
-            getContext().shitlist().shitlistRouter(target, "No bids");
-            getContext().netDb().fail(target);
+            getContext().shitlist().shitlistRouter(to, "No bids");
+            getContext().netDb().fail(to);
             fail();
         } else {
             TransportBid bid = (TransportBid)bids.get(0);
@@ -79,10 +78,7 @@ public class GetBidsJob extends JobImpl {
             getContext().messageRegistry().unregisterPending(_msg);
         }
         
-        if (_msg.getTargetHash() != null)
-            getContext().profileManager().messageFailed(_msg.getTargetHash());
-        else
-            getContext().profileManager().messageFailed(_msg.getTarget().getIdentity().getHash());
+        getContext().profileManager().messageFailed(_msg.getTarget().getIdentity().getHash());
         
         _msg.discardData();
     }

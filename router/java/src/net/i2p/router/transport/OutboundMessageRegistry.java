@@ -279,14 +279,24 @@ public class OutboundMessageRegistry {
 
     public void peerFailed(Hash peer) {
         List failed = null;
+        int numFailed = 0;
         synchronized (_pendingMessages) {
             for (Iterator iter = _pendingMessages.values().iterator(); iter.hasNext(); ) {
                 OutNetMessage msg = (OutNetMessage)iter.next();
-                if ( (msg.getTargetHash() != null) && (msg.getTargetHash().equals(peer)) ) {
-                    if (failed == null)
-                        failed = new ArrayList(4);
-                    failed.add(msg);
-                    iter.remove();
+                if (msg.getTarget() != null) {
+                    Hash to = msg.getTarget().getIdentity().calculateHash();
+                    if (to.equals(peer)) {
+                        if (failed == null)
+                            failed = new ArrayList(4);
+                        failed.add(msg);
+                        iter.remove();
+                        numFailed++;
+                    } else {
+                        if (_log.shouldLog(Log.DEBUG))
+                            _log.debug("Peer failed: " + peer.toBase64().substring(0,6) 
+                                       + " but not killing a message to " 
+                                       + to.toBase64().substring(0,6));
+                    }
                 }
             }
         }
@@ -299,6 +309,8 @@ public class OutboundMessageRegistry {
             }
         }
         
+        if (_log.shouldLog(Log.WARN))
+            _log.warn("Peer failed: " + peer.toBase64().substring(0,6) + " killing " + numFailed);
     }
     
     public void renderStatusHTML(Writer out) throws IOException {
@@ -314,6 +326,7 @@ public class OutboundMessageRegistry {
             OutNetMessage msg = (OutNetMessage)msgs.get(exp);
             buf.append("<li>").append(msg.getMessageType());
             buf.append(": expiring on ").append(new Date(exp.longValue()));
+            buf.append(" targetting ").append(msg.getTarget().getIdentity().getHash());
             if (msg.getReplySelector() != null)
                 buf.append(" with reply selector ").append(msg.getReplySelector().toString());
             else

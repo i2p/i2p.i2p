@@ -21,7 +21,6 @@ import java.util.Set;
 
 import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
-import net.i2p.data.Hash;
 import net.i2p.data.RouterInfo;
 import net.i2p.data.i2np.I2NPMessage;
 import net.i2p.util.Log;
@@ -35,7 +34,6 @@ public class OutNetMessage {
     private Log _log;
     private RouterContext _context;
     private RouterInfo _target;
-    private Hash _targetHash;
     private I2NPMessage _message;
     /** cached message class name, for use after we discard the message */
     private String _messageType;
@@ -123,8 +121,6 @@ public class OutNetMessage {
      */
     public RouterInfo getTarget() { return _target; }
     public void setTarget(RouterInfo target) { _target = target; }
-    public Hash getTargetHash() { return _targetHash; }
-    public void setTargetHash(Hash target) { _targetHash = target; }
     /**
      * Specifies the message to be sent
      *
