@@ -1,4 +1,7 @@
-$Id: history.txt,v 1.23 2004/09/30 01:57:22 jrandom Exp $
+$Id: history.txt,v 1.24 2004/09/30 10:58:55 jrandom Exp $
+
+2004-10-01  jrandom
+    * Additional error handling for a variety of transport layer errors.
 
 * 2004-09-30  0.4.1 released (not backwards compatible)
 

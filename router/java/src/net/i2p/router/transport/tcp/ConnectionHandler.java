@@ -483,6 +483,10 @@ public class ConnectionHandler {
         DHSessionKeyBuilder builder = null;
         try { 
             builder = DHSessionKeyBuilder.exchangeKeys(_rawIn, _rawOut);
+            if (builder == null) {
+                fail("Error exchanging the keys with " + _from);
+                return false;
+            }
         } catch (IOException ioe) {
             fail("Error exchanging keys with " + _from);
             return false;

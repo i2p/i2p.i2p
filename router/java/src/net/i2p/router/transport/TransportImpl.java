@@ -245,6 +245,11 @@ public abstract class TransportImpl implements Transport {
      *
      */
     public void send(OutNetMessage msg) {
+        if (msg.getTarget() == null) {
+            if (_log.shouldLog(Log.ERROR))
+                _log.error("Error - bad message enqueued [target is null]: " + msg, new Exception("Added by"));
+            return;
+        }
         boolean duplicate = false;
         synchronized (_sendPool) {
             if (_sendPool.contains(msg)) 

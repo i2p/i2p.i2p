@@ -26,7 +26,13 @@ public class TCPConnectionEstablisher implements Runnable {
             RouterInfo info = _transport.getNextPeer();
             
             ConnectionBuilder cb = new ConnectionBuilder(_context, _transport, info);
-            TCPConnection con = cb.establishConnection();
+            TCPConnection con = null;
+            try {
+                con = cb.establishConnection();
+            } catch (Exception e) {
+                _log.log(Log.CRIT, "Unhandled exception establishing a connection to " 
+                                   + info.getIdentity().getHash().toBase64(), e);
+            }
             if (con != null) {
                 _transport.connectionEstablished(con);
             } else {

@@ -289,7 +289,12 @@ class TCPListener {
         public void handle() {
             SimpleTimer.getInstance().addEvent(TimedHandler.this, HANDLE_TIMEOUT);
             ConnectionHandler ch = new ConnectionHandler(_context, _transport, _socket);
-            TCPConnection con = ch.receiveConnection();
+            TCPConnection con = null;
+            try {
+                con = ch.receiveConnection();
+            } catch (Exception e) {
+                _log.log(Log.CRIT, "Unhandled exception receiving a connection on " + _socket, e);
+            }
             if (con != null) {
                 _wasSuccessful = true;
                 _transport.connectionEstablished(con);

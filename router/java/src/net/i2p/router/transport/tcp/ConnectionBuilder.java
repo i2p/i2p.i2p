@@ -713,6 +713,11 @@ public class ConnectionBuilder {
         public boolean getCreated() { return _created; }
         
         public void run() {
+            if ( (_target == null) || (_transport == null) ) {
+                fail("Internal error - null while running");
+                _log.log(Log.CRIT, "Internal error - target = " + _target + " _transport = " + _transport);
+                return;
+            }
             RouterAddress addr = _target.getTargetAddress(_transport.getStyle());
             if (addr == null) {
                 fail("Peer " 
