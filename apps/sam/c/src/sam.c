@@ -36,7 +36,7 @@ static void			sam_log(const char *format, ...);
 static void			sam_parse(sam_sess_t *session, char *s);
 static ssize_t		sam_read1(sam_sess_t *session, char *buf, size_t n);
 static ssize_t		sam_read2(sam_sess_t *session, void *buf, size_t n);
-static bool			sam_readable(const sam_sess_t *session);
+static bool			sam_readable(sam_sess_t *session);
 static sam_sendq_t	*sam_sendq_create();
 static samerr_t		sam_session_create(sam_sess_t *session,
 						const char *destname, sam_conn_t style,
@@ -56,22 +56,27 @@ static ssize_t		sam_write(sam_sess_t *session, const void *buf, size_t n);
  * Note: if you add a new callback be sure to check for non-NULL in sam_connect
  */
 /* a peer closed the connection */
-void (*sam_closeback)(sam_sid_t stream_id, samerr_t reason) = NULL;
+void (*sam_closeback)(const sam_sess_t *session, sam_sid_t stream_id,
+	samerr_t reason) = NULL;
 /* a peer connected to us */
-void (*sam_connectback)(sam_sid_t stream_id, sam_pubkey_t dest) = NULL;
+void (*sam_connectback)(const sam_sess_t *session, sam_sid_t stream_id,
+	sam_pubkey_t dest) = NULL;
 /* a peer sent some stream data (`data' MUST be freed) */
-void (*sam_databack)(sam_sid_t stream_id, void *data, size_t size) = NULL;
+void (*sam_databack)(const sam_sess_t *session, sam_sid_t stream_id, void *data,
+	size_t size) = NULL;
 /* a peer sent some datagram data (`data' MUST be freed) */
-void (*sam_dgramback)(sam_pubkey_t dest, void *data, size_t size) = NULL;
+void (*sam_dgramback)(const sam_sess_t *session, sam_pubkey_t dest, void *data,
+	size_t size) = NULL;
 /* we lost the connection to the SAM host */
-void (*sam_diedback)() = NULL;
+void (*sam_diedback)(sam_sess_t *session) = NULL;
 /* logging callback */
 void (*sam_logback)(char *str) = NULL;
 /* naming lookup reply - `pubkey' will be NULL if `result' isn't SAM_OK */
 void (*sam_namingback)(char *name, sam_pubkey_t pubkey,
 	samerr_t result) = NULL;
 /* our connection to a peer has completed */
-void (*sam_statusback)(sam_sid_t stream_id, samerr_t result) = NULL;
+void (*sam_statusback)(const sam_sess_t *session, sam_sid_t stream_id,
+	samerr_t result) = NULL;
 
 /*
  * Closes the connection to the SAM host
@@ -309,7 +314,7 @@ static void sam_parse(sam_sess_t *session, char *s)
 		if (sam_read2(session, data, size) != -1) {
 			p = data + size;
 			*p = '\0';  /* see above NUL note */
-			sam_dgramback(dest, data, size);  /* `data' must be freed */
+			sam_dgramback(session, dest, data, size); /* `data' must be freed */
 		} else
 			free(data);
 
@@ -382,17 +387,17 @@ static void sam_parse(sam_sess_t *session, char *s)
 		assert(p != NULL);
 		p++;
 		if (strncmp(p, "OK", strlen("OK")) == 0)
-			sam_closeback(stream_id, SAM_OK);
+			sam_closeback(session, stream_id, SAM_OK);
 		else if (strncmp(p, "CANT_REACH_PEER", strlen("CANT_REACH_PEER")) == 0)
-			sam_closeback(stream_id, SAM_CANT_REACH_PEER);
+			sam_closeback(session, stream_id, SAM_CANT_REACH_PEER);
 		else if (strncmp(p, "I2P_ERROR", strlen("I2P_ERROR")) == 0)
-			sam_closeback(stream_id, SAM_I2P_ERROR);
+			sam_closeback(session, stream_id, SAM_I2P_ERROR);
 		else if (strncmp(p, "PEER_NOT_FOUND", strlen("PEER_NOT_FOUND")) == 0)
-			sam_closeback(stream_id, SAM_PEER_NOT_FOUND);
+			sam_closeback(session, stream_id, SAM_PEER_NOT_FOUND);
 		else if (strncmp(p, "TIMEOUT", strlen("TIMEOUT")) == 0)
-			sam_closeback(stream_id, SAM_TIMEOUT);
+			sam_closeback(session, stream_id, SAM_TIMEOUT);
 		else
-			sam_closeback(stream_id, SAM_UNKNOWN);
+			sam_closeback(session, stream_id, SAM_UNKNOWN);
 
 		return;
 
@@ -411,7 +416,7 @@ static void sam_parse(sam_sess_t *session, char *s)
 		p = strstr(s, "N=");  /* DESTINATION= */
 		p += 2;
 		strlcpy(dest, p, sizeof dest);
-		sam_connectback(stream_id, dest);
+		sam_connectback(session, stream_id, dest);
 	
 		return;
 
@@ -443,7 +448,8 @@ static void sam_parse(sam_sess_t *session, char *s)
 		if (sam_read2(session, data, size) != -1) {
 			p = data + size;
 			*p = '\0';  /* see above NUL note */
-			sam_databack(stream_id, data, size);  /* `data' must be freed */
+			sam_databack(session, stream_id, data, size);
+			/* ^^^ `data' must be freed ^^^*/
 		} else
 			free(data);
 
@@ -464,21 +470,21 @@ static void sam_parse(sam_sess_t *session, char *s)
 		assert(stream_id != 0);
 		if (strncmp(s, SAM_STREAM_STATUS_REPLY_OK,
 				strlen(SAM_STREAM_STATUS_REPLY_OK)) == 0)
-			sam_statusback(stream_id, SAM_OK);
+			sam_statusback(session, stream_id, SAM_OK);
 		else if (strncmp(s, SAM_STREAM_STATUS_REPLY_CRP,
 				strlen(SAM_STREAM_STATUS_REPLY_CRP)) == 0)
-			sam_statusback(stream_id, SAM_CANT_REACH_PEER);
+			sam_statusback(session, stream_id, SAM_CANT_REACH_PEER);
 		else if (strncmp(s, SAM_STREAM_STATUS_REPLY_I2E,
 				strlen(SAM_STREAM_STATUS_REPLY_I2E)) == 0)
-			sam_statusback(stream_id, SAM_I2P_ERROR);
+			sam_statusback(session, stream_id, SAM_I2P_ERROR);
 		else if (strncmp(s, SAM_STREAM_STATUS_REPLY_IK,
 				strlen(SAM_STREAM_STATUS_REPLY_IK)) == 0)
-			sam_statusback(stream_id, SAM_INVALID_KEY);
+			sam_statusback(session, stream_id, SAM_INVALID_KEY);
 		else if (strncmp(s, SAM_STREAM_STATUS_REPLY_TO,
 				strlen(SAM_STREAM_STATUS_REPLY_TO)) == 0)
-			sam_statusback(stream_id, SAM_TIMEOUT);
+			sam_statusback(session, stream_id, SAM_TIMEOUT);
 		else
-			sam_statusback(stream_id, SAM_UNKNOWN);
+			sam_statusback(session, stream_id, SAM_UNKNOWN);
 
 		return;
 
@@ -533,7 +539,7 @@ static ssize_t sam_read1(sam_sess_t *session, char *buf, size_t n)
 					 sam_read1 error return */
 	if (!session->connected) {
 		SAMLOGS("Cannot read from SAM because the SAM connection is closed");
-		sam_diedback();
+		sam_diedback(session);
 		return -1;
 	}
 	assert(n > 0);
@@ -552,13 +558,13 @@ static ssize_t sam_read1(sam_sess_t *session, char *buf, size_t n)
 				SAMLOG("recv() failed: %s", strerror(errno));
 #endif
 				sam_close(session);
-				sam_diedback();
+				sam_diedback(session);
 				return -1;
 			}
 		} else if (nread == 0) {  /* EOF */
 			SAMLOGS("Connection closed by the SAM host");
 			sam_close(session);
-			sam_diedback();
+			sam_diedback(session);
 			return -1;
 		}
 		assert(nread == 1);
@@ -598,7 +604,7 @@ static ssize_t sam_read2(sam_sess_t *session, void *buf, size_t n)
 
 	if (!session->connected) {
 		SAMLOGS("Cannot read from SAM because the SAM connection is closed");
-		sam_diedback();
+		sam_diedback(session);
 		return -1;
 	}
 	assert(n > 0);
@@ -617,13 +623,13 @@ static ssize_t sam_read2(sam_sess_t *session, void *buf, size_t n)
 				SAMLOG("recv() failed: %s", strerror(errno));
 #endif
 				sam_close(session);
-				sam_diedback();
+				sam_diedback(session);
 				return -1;
 			}
 		} else if (nread == 0) {  /* EOF */
 			SAMLOGS("Connection closed by the SAM host");
 			sam_close(session);
-			sam_diedback();
+			sam_diedback(session);
 			return -1;
 		}
 		nleft -= nread;
@@ -641,7 +647,7 @@ static ssize_t sam_read2(sam_sess_t *session, void *buf, size_t n)
  *
  * Returns: true if data is waiting, false otherwise
  */
-static bool sam_readable(const sam_sess_t *session)
+static bool sam_readable(sam_sess_t *session)
 {
 	fd_set rset;  /* set of readable descriptors */
 	struct timeval tv;
@@ -649,7 +655,7 @@ static bool sam_readable(const sam_sess_t *session)
 
 	if (!session->connected) {
 		SAMLOGS("Cannot read from SAM because the SAM connection is closed");
-		sam_diedback();
+		sam_diedback(session);
 		return false;
 	}
 	/* it seems like there should be a better way to do this (i.e. not select)*/
@@ -1272,7 +1278,7 @@ static ssize_t sam_write(sam_sess_t *session, const void *buf, size_t n)
 
 	if (!session->connected) {
 		SAMLOGS("Cannot write to SAM because the SAM connection is closed");
-		sam_diedback();
+		sam_diedback(session);
 		return -1;
 	}
 #if SAM_WIRETAP
@@ -1300,7 +1306,7 @@ static ssize_t sam_write(sam_sess_t *session, const void *buf, size_t n)
 				SAMLOG("send() failed: %s", strerror(errno));
 #endif
 				sam_close(session);
-				sam_diedback();
+				sam_diedback(session);
 				return -1;
 			}
 		}
