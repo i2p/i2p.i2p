@@ -1,0 +1,9 @@
+I need to do these things:
+
+* SAM raw support
+* Write an instruction manual
+
+Anyone can help with these things:
+
+* Fix the example dgram-client.c
+* Compile on as many platforms as possible

@@ -1,0 +1,26 @@
+v1.15	2004-06-
+	* Fixed some fatal bugs in datagram handling
+	* Added another error return type named SAM_TOO_BIG - some functions now
+		return samerr_t instead of bool now
+
+v1.10	2004-06-16
+	* Changed sam_strerror() to work the same as the standard library strerror()
+	* Ported to native MS Windows (uses the Mingw development environment)
+	* Fixed a probable bug in the Cygwin port
+
+v1.05	2004-06-09
+	* Added an example datagram client/server program in the examples directory
+	* sam_read_buffer() now returns bool true if it read anything
+	* Added repliable datagram support - sam_connect() now has another argument
+	* Replaced strstr() with the more appropriate strncmp() in many places
+	* Fixed a parsing error for STREAM CLOSED
+	* Removed the old sam_naming_lookup() and renamed sam_naming_lookup_async()
+		to sam_naming_lookup() to replace it
+	* Fixed a bug in sam_stream_close() where a '\n' was not being sent after
+		the SAM command
+	* Fixed a bug where the stream ID was being improperly incremented in
+		sam_stream_connect()
+	* Added generic Linux Makefile for non-Debian distributions
+
+v1.00	2004-06-02
+	* First public release

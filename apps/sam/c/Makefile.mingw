@@ -1,0 +1,64 @@
+#
+# This Makefile is compatible with GNU Make and should work on Windows (MingW)
+#
+
+#
+# Your operating system
+#
+
+OS = MINGW
+
+#
+# Directories
+#
+
+INCDIR = inc
+LIBDIR = lib
+OBJDIR = obj
+SRCDIR = src
+
+#
+# Programs
+#
+
+AR = C:\Dev-Cpp\bin\ar
+CC = C:\Dev-Cpp\bin\gcc
+
+#
+# Flags
+#
+
+CFLAGS = -g -march=i486 -O2 -pipe -std=c99 -Wall
+CFLAGS += -DOS=$(OS)
+CFLAGS += -I$(INCDIR)
+
+#
+# Object files
+#
+
+OBJS =	$(OBJDIR)/sam.o \
+		$(OBJDIR)/strl.o
+
+#
+# Build rules
+#
+
+all: depend libsam
+
+depend:
+	$(CC) $(CFLAGS) -MM $(SRCDIR)/*.c > .depend
+
+$(OBJDIR)/%.o: $(SRCDIR)/%.c
+	$(CC) $(CFLAGS) -o $@ -c $<
+
+libsam: $(OBJS)
+	$(AR) rcs $(LIBDIR)/libsam.a $(OBJS)
+
+#
+# Cleanup rules
+#
+
+clean:
+	-rm -f $(LIBDIR)/libsam.a $(OBJDIR)/* .depend
+
+tidy: clean
