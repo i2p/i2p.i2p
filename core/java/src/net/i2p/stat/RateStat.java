@@ -110,16 +110,17 @@ public class RateStat {
         buf.append("# ").append(_description).append(NL);
         buf.append("# ").append(NL).append(NL);
         out.write(buf.toString().getBytes());
-        buf = null;
+        buf.setLength(0);
         for (int i = 0; i < _rates.length; i++) {
-            StringBuffer rbuf = new StringBuffer(1024);
-            rbuf.append("#######").append(NL);
-            rbuf.append("# Period : ").append(DataHelper.formatDuration(_rates[i].getPeriod())).append(" for rate ")
+            buf.append("#######").append(NL);
+            buf.append("# Period : ").append(DataHelper.formatDuration(_rates[i].getPeriod())).append(" for rate ")
                 .append(_groupName).append(" - ").append(_statName).append(NL);
-            rbuf.append(NL);
-            out.write(rbuf.toString().getBytes());
+            buf.append(NL);
+            out.write(buf.toString().getBytes());
             String curPrefix = prefix + "." + DataHelper.formatDuration(_rates[i].getPeriod());
-            _rates[i].store(out, curPrefix);
+            _rates[i].store(curPrefix, buf);
+            out.write(buf.toString().getBytes());
+            buf.setLength(0);
         }
     }
 

@@ -14,7 +14,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
 import net.i2p.I2PAppContext;
@@ -61,7 +61,7 @@ public class AESInputStream extends FilterInputStream {
         _lastBlock = new byte[BLOCK_SIZE];
         System.arraycopy(iv, 0, _lastBlock, 0, BLOCK_SIZE);
         _encryptedBuf = new ByteArrayOutputStream(BLOCK_SIZE);
-        _readyBuf = new LinkedList();
+        _readyBuf = new ArrayList(1024);
         _cumulativePaddingStripped = 0;
         _eofFound = false;
     }

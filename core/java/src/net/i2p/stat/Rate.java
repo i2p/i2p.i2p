@@ -349,8 +349,7 @@ public class Rate {
         }
     }
 
-    public void store(OutputStream out, String prefix) throws IOException {
-        StringBuffer buf = new StringBuffer(16*1048);
+    public void store(String prefix, StringBuffer buf) throws IOException {
         PersistenceHelper.add(buf, prefix, ".period", "Number of milliseconds in the period", _period);
         PersistenceHelper.add(buf, prefix, ".creationDate",
                               "When was this rate created?  (milliseconds since the epoch, GMT)", _creationDate);
@@ -388,7 +387,6 @@ public class Rate {
         PersistenceHelper.add(buf, prefix, ".lifetimeTotalEventTime",
                               "How many milliseconds have the events since this stat was created consumed?",
                               _lifetimeTotalEventTime);
-        out.write(buf.toString().getBytes());
     }
 
     /**
@@ -476,11 +474,11 @@ public class Rate {
             rate.addData(i * 100, 20);
         }
         rate.coallesce();
-        java.io.ByteArrayOutputStream baos = new java.io.ByteArrayOutputStream(2048);
+        StringBuffer buf = new StringBuffer(1024);
         try {
-            rate.store(baos, "rate.test");
-            byte data[] = baos.toByteArray();
-            _log.error("Stored rate: size = " + data.length + "\n" + new String(data));
+            rate.store("rate.test", buf);
+            byte data[] = buf.toString().getBytes();
+            _log.error("Stored rate: size = " + data.length + "\n" + buf.toString());
 
             Properties props = new Properties();
             props.load(new java.io.ByteArrayInputStream(data));
