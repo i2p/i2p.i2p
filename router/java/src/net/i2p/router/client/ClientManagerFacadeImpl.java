@@ -72,6 +72,7 @@ public class ClientManagerFacadeImpl extends ClientManagerFacade {
     
     private static final long MAX_TIME_TO_REBUILD = 5*60*1000;
     public boolean verifyClientLiveliness() {
+        if (_manager == null) return true;
         boolean lively = true;
         for (Iterator iter = _manager.getRunnerDestinations().iterator(); iter.hasNext(); ) {
             Destination dest = (Destination)iter.next();

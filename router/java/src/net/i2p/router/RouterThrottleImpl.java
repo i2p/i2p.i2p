@@ -133,12 +133,20 @@ class RouterThrottleImpl implements RouterThrottle {
         if (numTunnels > getMinThrottleTunnels()) {
             Rate avgTunnels = _context.statManager().getRate("tunnel.participatingTunnels").getRate(60*60*1000);
             if (avgTunnels != null) {
-                double avg = avgTunnels.getAverageValue();
-                if (avg < numTunnels) {
+                double avg = 0;
+                if (avgTunnels.getLastEventCount() > 0) 
+                    avg = avgTunnels.getAverageValue();
+                else
+                    avg = avgTunnels.getLifetimeAverageValue();
+                if ( (avg > 0) && (avg < numTunnels) ) {
                     // we're accelerating, lets try not to take on too much too fast
                     double probAccept = avg / numTunnels;
-                    if (_context.random().nextDouble() < probAccept) {
+                    int v = _context.random().nextInt(100);
+                    if (v < probAccept*100) {
                         // ok
+                        if (_log.shouldLog(Log.INFO))
+                            _log.info("Probabalistically accept tunnel request (p=" + probAccept 
+                                      + " v=" + v + " avg=" + avg + " current=" + numTunnels + ")");
                     } else {
                         if (_log.shouldLog(Log.WARN))
                             _log.warn("Probabalistically refusing tunnel request (avg=" + avg
@@ -146,18 +154,31 @@ class RouterThrottleImpl implements RouterThrottle {
                         _context.statManager().addRateData("router.throttleTunnelProbTooFast", (long)(numTunnels-avg), 0);
                         return false;
                     }
+                } else {
+                    if (_log.shouldLog(Log.INFO))
+                        _log.info("Accepting tunnel request, since the average is " + avg
+                                      + " and we only have " + numTunnels + ")");
                 }
             }
             
             Rate tunnelTestTime10m = _context.statManager().getRate("tunnel.testSuccessTime").getRate(10*60*1000);
             Rate tunnelTestTime60m = _context.statManager().getRate("tunnel.testSuccessTime").getRate(60*60*1000);
-            if ( (tunnelTestTime10m != null) && (tunnelTestTime60m != null) ) {
+            if ( (tunnelTestTime10m != null) && (tunnelTestTime60m != null) && (tunnelTestTime10m.getLastEventCount() > 0) ) {
                 double avg10m = tunnelTestTime10m.getAverageValue();
-                double avg60m = tunnelTestTime60m.getAverageValue();
-                if (avg10m > avg60m) {
+                double avg60m = 0;
+                if (tunnelTestTime60m.getLastEventCount() > 0)
+                    avg60m = tunnelTestTime60m.getAverageValue();
+                else
+                    avg60m = tunnelTestTime60m.getLifetimeAverageValue();
+                
+                if ( (avg60m > 0) && (avg10m > avg60m) ) {
                     double probAccept = avg60m/avg10m;
-                    if (_context.random().nextDouble() < probAccept) {
+                    int v = _context.random().nextInt(100);
+                    if (v < probAccept*100) {
                         // ok
+                        if (_log.shouldLog(Log.INFO))
+                            _log.info("Probabalistically accept tunnel request (p=" + probAccept 
+                                      + " v=" + v + " test time avg 10m=" + avg10m + " 60m=" + avg60m + ")");
                     } else {
                         if (_log.shouldLog(Log.WARN))
                             _log.warn("Probabalistically refusing tunnel request (test time avg 10m=" + avg10m

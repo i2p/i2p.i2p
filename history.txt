@@ -1,4 +1,9 @@
-$Id: history.txt,v 1.44 2004/10/10 14:33:09 jrandom Exp $
+$Id: history.txt,v 1.45 2004/10/12 16:29:42 jrandom Exp $
+
+2004-10-13  jrandom
+    * Fix the probabalistic tunnel reject (we always accepted everything, 
+      since the docs on java.util.Random.nextDouble() are wrong..)
+    * Fixed a race on startup (thanks Quadn!)
 
 2004-10-12  jrandom
     * Disable the probabalistic drop by default (enable via the router config
