@@ -4,9 +4,7 @@
 <meta http-equiv="Content-type" content="text/html; charset=utf-8">
 <meta name="robots" content="index,follow">
 <link rel="shortcut icon" href="/favicon.ico">
-<script type="text/javascript" src="/~barnesc/wiki/stylesheets/wikibits.js"></script>
 <style type='text/css'><!--
-@import url("/~barnesc/wiki/stylesheets/wikiprintable.css");
 /*/*/
 a.new, #quickbar a.new { color: #CC2200; }
 #quickbar { position: absolute; top: 4px; left: 4px; border-right: 1px solid gray; }
@@ -42,14 +40,18 @@ Use:
 <p>
 
 <ul ><pre>
-&gt;&gt;&gt; from i2p import sam
-&gt;&gt;&gt; s = sam.socket('Alice', sam.SOCK_STREAM)
+&gt;&gt;&gt; from i2p import socket
+&gt;&gt;&gt; s = socket.socket('Alice', socket.SOCK_STREAM)
 &gt;&gt;&gt; s.connect('duck.i2p')
 &gt;&gt;&gt; s.send('GET / HTTP/1.0\r\n\r\n')
 &gt;&gt;&gt; s.recv(1000)
 (HTTP response from duck.i2p)
 </pre>
 </ul >
+
+<p>
+
+See the <a href="../../src/examples/">src/examples/</a> directory for more code examples.
 
 <p>
 
@@ -61,16 +63,20 @@ The following modules are available:
 <p>
 <ul >
 
-<pre> <a href="./i2p.html" class='printable' title ="User's Guide:i2p">i2p</a>               (Container package)
- <a href="./i2p.sam.html" class='printable' title ="User's Guide:i2p.sam">i2p.sam</a>           (Send and receive across the I2P network)
- <a href="./i2p.eep.html" class='printable' title ="User's Guide:i2p.eep">i2p.eep</a>           (Retrieve eepsites)
- <a href="./i2p.router.html" class='printable' title ="User's Guide:i2p.router">i2p.router</a>        (Manage the I2P router)
+<pre> <a href="i2p.html" class='printable' title ="User's Guide:i2p">i2p</a>                  (Container package)
+ <a href="i2p.BaseHTTPServer.html" class='printable' title ="User's Guide:i2p.BaseHTTPServer">i2p.BaseHTTPServer</a>   (Emulate Python BaseHTTPServer module)
+ <a href="i2p.CGIHTTPServer.html" class='printable' title ="User's Guide:i2p.CGIHTTPServer">i2p.CGIHTTPServer</a>    (Emulate Python CGIHTTPServer module)
+ <a href="i2p.eep.html" class='printable' title ="User's Guide:i2p.eep">i2p.eep</a>              (Retrieve eepsites)
+ <a href="i2p.router.html" class='printable' title ="User's Guide:i2p.router">i2p.router</a>           (Manage the I2P router)
+ <a href="i2p.select.html" class='printable' title ="User's Guide:i2p.select">i2p.select</a>           (Emulate Python select module)
+ <a href="i2p.SimpleHTTPServer.html" class='printable' title ="User's Guide:i2p.SimpleHTTPServer">i2p.SimpleHTTPServer</a> (Emulate Python SimpleHTTPServer module)
+ <a href="i2p.socket.html" class='printable' title ="User's Guide:i2p.socket">i2p.socket</a>           (Send and receive across the I2P network)
+ <a href="i2p.SocketServer.html" class='printable' title ="User's Guide:i2p.SocketServer">i2p.SocketServer</a>     (Emulate Python SocketServer module)
+ <a href="i2p.tunnel.html" class='printable' title ="User's Guide:i2p.tunnel">i2p.tunnel</a>           (Exchange data between I2P and regular sockets)
 
 </pre>
 </ul >
 
 <p>
 </div>
-<p><em>
-</em><!-- Time since request: 0.78 secs. -->
 </body></html>

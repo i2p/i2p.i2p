@@ -4,9 +4,7 @@
 <meta http-equiv="Content-type" content="text/html; charset=utf-8">
 <meta name="robots" content="index,follow">
 <link rel="shortcut icon" href="/favicon.ico">
-<script type="text/javascript" src="/~barnesc/wiki/stylesheets/wikibits.js"></script>
 <style type='text/css'><!--
-@import url("/~barnesc/wiki/stylesheets/wikiprintable.css");
 /*/*/
 a.new, #quickbar a.new { color: #CC2200; }
 #quickbar { position: absolute; top: 4px; left: 4px; border-right: 1px solid gray; }
@@ -24,19 +22,23 @@ Package <code >i2p</code > is a container package for more specific modules.
 
 
 <p>
-It exports the following names:
+It contains the following modules:
+
+<p>
 <ul >
 
-<pre> <a href="./i2p.sam.html" class='printable' title ="User's Guide:i2p.sam">sam</a>
- <a href="./i2p.eep.html" class='printable' title ="User's Guide:i2p.eep">eep</a>
- <a href="./i2p.router.html" class='printable' title ="User's Guide:i2p.router">router</a>
- <a href="#Error" class='printable' title ="User's Guide:i2p">Error</a>
- <a href="#RouterError" class='printable' title ="User's Guide:i2p">RouterError</a>
+<pre> <a href="i2p.BaseHTTPServer.html" class='printable' title ="User's Guide:i2p.BaseHTTPServer">i2p.BaseHTTPServer</a>   (Emulate Python BaseHTTPServer module)
+ <a href="i2p.CGIHTTPServer.html" class='printable' title ="User's Guide:i2p.CGIHTTPServer">i2p.CGIHTTPServer</a>    (Emulate Python CGIHTTPServer module)
+ <a href="i2p.eep.html" class='printable' title ="User's Guide:i2p.eep">i2p.eep</a>              (Retrieve eepsites)
+ <a href="i2p.router.html" class='printable' title ="User's Guide:i2p.router">i2p.router</a>           (Manage the I2P router)
+ <a href="i2p.select.html" class='printable' title ="User's Guide:i2p.select">i2p.select</a>           (Emulate Python select module)
+ <a href="i2p.SimpleHTTPServer.html" class='printable' title ="User's Guide:i2p.SimpleHTTPServer">i2p.SimpleHTTPServer</a> (Emulate Python SimpleHTTPServer module)
+ <a href="i2p.socket.html" class='printable' title ="User's Guide:i2p.socket">i2p.socket</a>           (Send and receive across the I2P network)
+ <a href="i2p.SocketServer.html" class='printable' title ="User's Guide:i2p.SocketServer">i2p.SocketServer</a>     (Emulate Python SocketServer module)
+ <a href="i2p.tunnel.html" class='printable' title ="User's Guide:i2p.tunnel">i2p.tunnel</a>           (Exchange data between I2P and regular sockets)
 
 </pre>
 </ul >
-
-<p>
 class <strong>Error</strong>(Exception):
 <ul >
 
@@ -46,7 +48,6 @@ class <strong>Error</strong>(Exception):
 
 <p>
 class <strong>RouterError</strong>(Error):
-
 <ul >
 
 <pre> Could not connect to router.
@@ -55,7 +56,4 @@ class <strong>RouterError</strong>(Error):
 
 <p>
 </div>
-<p><em>
-</em><!-- Time since request: 0.85 secs. -->
-
 </body></html>
