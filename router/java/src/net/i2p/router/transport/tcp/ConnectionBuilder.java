@@ -437,7 +437,15 @@ public class ConnectionBuilder {
             }
 
             _actualPeer = peer;
-            return true;
+            
+            try {
+                _context.netDb().store(peer.getIdentity().getHash(), peer);
+                return true;
+            } catch (IllegalArgumentException iae) {
+                fail("Peer sent us bad info - " + _target.getIdentity().getHash().toBase64().substring(0,6)
+                     + ": " + iae.getMessage());
+                return false;
+            }
         } catch (IOException ioe) {
             fail("Error reading the verified info from " 
                  + _target.getIdentity().calculateHash().toBase64().substring(0,6)
@@ -584,7 +592,15 @@ public class ConnectionBuilder {
             }
 
             _actualPeer = peer;
-            return true;
+            
+            try {
+                _context.netDb().store(peer.getIdentity().getHash(), peer);
+                return true;
+            } catch (IllegalArgumentException iae) {
+                fail("Peer sent us bad info - " + _target.getIdentity().getHash().toBase64().substring(0,6)
+                     + ": " + iae.getMessage());
+                return false;
+            }
         } catch (IOException ioe) {
             fail("Error reading the verified info from " 
                  + _target.getIdentity().calculateHash().toBase64().substring(0,6)
@@ -645,7 +661,6 @@ public class ConnectionBuilder {
         //_connectionOut = _rawOut;
         
         Hash peer = _actualPeer.getIdentity().getHash();
-        _context.netDb().store(peer, _actualPeer);
         _transport.getTagManager().replaceTag(peer, _nextConnectionTag, _key);
     }
     

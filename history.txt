@@ -1,4 +1,10 @@
-$Id: history.txt,v 1.38 2004/10/07 14:19:52 jrandom Exp $
+$Id: history.txt,v 1.39 2004/10/07 21:08:11 jrandom Exp $
+
+2004-10-08  jrandom
+    * Don't kill the establisher threads during a soft restart.
+    * Attempt to validate the peer's routerInfo earlier during handshaking.
+    * Revamp the AESOutputStream so it doesn't allocate any temporary objects 
+      during its operation.
 
 2004-10-07  jrandom
     * Reimplement the I2NP reading with less temporary memory allocation.

@@ -226,8 +226,8 @@ public class AESInputStream extends FilterInputStream {
                 _log.warn("Decrypt got odd segment - " + trailing
                           + " bytes pushed back for later decryption - corrupted or slow data stream perhaps?");
         } else {
-            if (_log.shouldLog(Log.INFO))
-                _log.info(encrypted.length + " bytes makes up " + numBlocks + " blocks to decrypt normally");
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug(encrypted.length + " bytes makes up " + numBlocks + " blocks to decrypt normally");
         }
 
         for (int i = 0; i < numBlocks; i++) {
@@ -313,9 +313,22 @@ public class AESInputStream extends FilterInputStream {
     /**
      * Test AESOutputStream/AESInputStream
      */
-    public static void main(String args[]) {
+    public static void main(String args[]) {        
         I2PAppContext ctx = new I2PAppContext();
+
+        try {
+            System.out.println("pwd=" + new java.io.File(".").getAbsolutePath());
+            System.out.println("Beginning");
+            runTest(ctx);
+        } catch (Throwable e) {
+            ctx.logManager().getLog(AESInputStream.class).error("Fail", e);
+        }
+        try { Thread.sleep(30*1000); } catch (InterruptedException ie) {}
+        System.out.println("Done");
+    }
+    private static void runTest(I2PAppContext ctx) {
         Log log = ctx.logManager().getLog(AESInputStream.class);
+        log.setMinimumPriority(Log.DEBUG);
         byte orig[] = new byte[1024 * 32];
         RandomSource.getInstance().nextBytes(orig);
         //byte orig[] = "you are my sunshine, my only sunshine".getBytes();
@@ -351,10 +364,51 @@ public class AESInputStream extends FilterInputStream {
         }
 
         log.info("Done testing 0 byte data");
+  
+        for (int i = 0; i <= 32768; i++) {
+            orig = new byte[i];
+            ctx.random().nextBytes(orig);
+            try {
+                log.info("Testing " + orig.length);
+                runTest(ctx, orig, key, iv);
+            } catch (RuntimeException re) {
+                log.error("Error testing " + orig.length);
+                throw re;
+            }
+        }
+  
+/*
+        orig = new byte[615280];
 
+        RandomSource.getInstance().nextBytes(orig);
+        for (int i = 0; i < 20; i++) {
+            runTest(ctx, orig, key, iv);
+        }
+
+        log.info("Done testing 615280 byte data");
+*/
+        /*
+        for (int i = 0; i < 100; i++) {
+            orig = new byte[ctx.random().nextInt(1024*1024)];
+            ctx.random().nextBytes(orig);
+            try {
+                runTest(ctx, orig, key, iv);
+            } catch (RuntimeException re) {
+                log.error("Error testing " + orig.length);
+                throw re;
+            }
+        }
+         
+        log.info("Done testing 100 random lengths");
+        */
+        
         orig = new byte[32];
         RandomSource.getInstance().nextBytes(orig);
-        runOffsetTest(ctx, orig, key, iv);
+        try {
+            runOffsetTest(ctx, orig, key, iv);
+        } catch (Exception e) { 
+            log.info("Error running offset test", e);
+        }
 
         log.info("Done testing offset test (it should have come back with a statement NOT EQUAL!)");
 
@@ -389,18 +443,19 @@ public class AESInputStream extends FilterInputStream {
 
             Hash newHash = SHA256Generator.getInstance().calculateHash(fin);
             boolean eq = origHash.equals(newHash);
-            if (eq)
-                log.info("Equal hashes.  hash: " + origHash);
-            else
-                log.error("NOT EQUAL!  \norig: \t" + Base64.encode(orig) + "\nnew : \t" + Base64.encode(fin));
+            if (eq) {
+                //log.info("Equal hashes.  hash: " + origHash);
+            } else {
+                throw new RuntimeException("NOT EQUAL!  len=" + orig.length + "\norig: \t" + Base64.encode(orig) + "\nnew : \t" + Base64.encode(fin));
+            }
             boolean ok = DataHelper.eq(orig, fin);
             log.debug("EQ data? " + ok + " origLen: " + orig.length + " fin.length: " + fin.length);
             log.debug("Time to D(E(" + orig.length + ")): " + (end - start) + "ms");
             log.debug("Time to E(" + orig.length + "): " + (endE - start) + "ms");
             log.debug("Time to D(" + orig.length + "): " + (end - endE) + "ms");
 
-        } catch (Throwable t) {
-            log.error("ERROR transferring", t);
+        } catch (IOException ioe) {
+            log.error("ERROR transferring", ioe);
         }
         //try { Thread.sleep(5000); } catch (Throwable t) {}
     }
@@ -441,15 +496,16 @@ public class AESInputStream extends FilterInputStream {
             if (eq)
                 log.info("Equal hashes.  hash: " + origHash);
             else
-                log.error("NOT EQUAL!  \norig: \t" + Base64.encode(orig) + "\nnew : \t" + Base64.encode(fin));
+                throw new RuntimeException("NOT EQUAL!  len=" + orig.length + "\norig: \t" + Base64.encode(orig) + "\nnew : \t" + Base64.encode(fin));
             boolean ok = DataHelper.eq(orig, fin);
             log.debug("EQ data? " + ok + " origLen: " + orig.length + " fin.length: " + fin.length);
             log.debug("Time to D(E(" + orig.length + ")): " + (end - start) + "ms");
             log.debug("Time to E(" + orig.length + "): " + (endE - start) + "ms");
             log.debug("Time to D(" + orig.length + "): " + (end - endE) + "ms");
-
-        } catch (Throwable t) {
-            log.error("ERROR transferring", t);
+        } catch (RuntimeException re) {
+            throw re;
+        } catch (IOException ioe) {
+            log.error("ERROR transferring", ioe);
         }
         //try { Thread.sleep(5000); } catch (Throwable t) {}
     }

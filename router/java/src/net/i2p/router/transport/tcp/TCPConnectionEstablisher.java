@@ -24,6 +24,10 @@ public class TCPConnectionEstablisher implements Runnable {
     public void run() {
         while (true) {
             RouterInfo info = _transport.getNextPeer();
+            if (info == null) {
+                try { Thread.sleep(5*1000); } catch (InterruptedException ie) {}
+                continue;
+            }
             
             ConnectionBuilder cb = new ConnectionBuilder(_context, _transport, info);
             TCPConnection con = null;

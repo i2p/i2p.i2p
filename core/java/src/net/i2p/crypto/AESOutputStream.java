@@ -34,7 +34,15 @@ public class AESOutputStream extends FilterOutputStream {
     private I2PAppContext _context;
     private SessionKey _key;
     private byte[] _lastBlock;
-    private ByteArrayOutputStream _inBuf;
+    /** 
+     * buffer containing the unwritten bytes.  The first unwritten
+     * byte is _lastCommitted+1, and the last unwritten byte is _nextWrite-1
+     * (aka the next byte to be written on the array is _nextWrite)
+     */
+    private byte[] _unencryptedBuf;
+    private byte _writeBlock[];
+    /** how many bytes have we been given since we flushed it to the stream? */
+    private int _writesSinceCommit;
     private long _cumulativeProvided; // how many bytes provided to this stream
     private long _cumulativeWritten; // how many bytes written to the underlying stream
     private long _cumulativePadding; // how many bytes of padding written
@@ -51,31 +59,32 @@ public class AESOutputStream extends FilterOutputStream {
         _key = key;
         _lastBlock = new byte[BLOCK_SIZE];
         System.arraycopy(iv, 0, _lastBlock, 0, BLOCK_SIZE);
-        _inBuf = new ByteArrayOutputStream(MAX_BUF);
+        _unencryptedBuf = new byte[MAX_BUF];
+        _writeBlock = new byte[BLOCK_SIZE];
+        _writesSinceCommit = 0;
     }
 
     public void write(int val) throws IOException {
         _cumulativeProvided++;
-        _inBuf.write(val);
-        if (_inBuf.size() > MAX_BUF) doFlush();
+        _unencryptedBuf[_writesSinceCommit++] = (byte)(val & 0xFF);
+        if (_writesSinceCommit == _unencryptedBuf.length)
+            doFlush();
     }
 
     public void write(byte src[]) throws IOException {
-        _cumulativeProvided += src.length;
-        _inBuf.write(src);
-        if (_inBuf.size() > MAX_BUF) doFlush();
+        write(src, 0, src.length);
     }
 
     public void write(byte src[], int off, int len) throws IOException {
-        _cumulativeProvided += len;
-        _inBuf.write(src, off, len);
-        if (_inBuf.size() > MAX_BUF) doFlush();
+        // i'm too lazy to unroll this into the partial writes (dealing with
+        // wrapping around the buffer size)
+        for (int i = 0; i < len; i++)
+            write(src[i+off]);
     }
 
     public void close() throws IOException {
         flush();
         out.close();
-        _inBuf.reset();
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Cumulative bytes provided to this stream / written out / padded: " 
                        + _cumulativeProvided + "/" + _cumulativeWritten + "/" + _cumulativePadding);
@@ -87,8 +96,10 @@ public class AESOutputStream extends FilterOutputStream {
     }
 
     private void doFlush() throws IOException {
-        writeEncrypted(_inBuf.toByteArray());
-        _inBuf.reset();
+        if (_log.shouldLog(Log.INFO))
+            _log.info("doFlush(): writesSinceCommit=" + _writesSinceCommit);
+        writeEncrypted();
+        _writesSinceCommit = 0;
     }
 
     /**
@@ -101,39 +112,37 @@ public class AESOutputStream extends FilterOutputStream {
      * times).
      *
      */
-    private void writeEncrypted(byte src[]) throws IOException {
-        if ((src == null) || (src.length == 0)) return;
-        int numBlocks = src.length / (BLOCK_SIZE - 1);
+    private void writeEncrypted() throws IOException {
+        int numBlocks = _writesSinceCommit / (BLOCK_SIZE - 1);
 
-        byte block[] = new byte[BLOCK_SIZE];
+        if (_log.shouldLog(Log.INFO))
+            _log.info("writeE(): #=" + _writesSinceCommit + " blocks=" + numBlocks);
+        
         for (int i = 0; i < numBlocks; i++) {
-            DataHelper.xor(src, i * 15, _lastBlock, 0, block, 0, 15);
+            DataHelper.xor(_unencryptedBuf, i * 15, _lastBlock, 0, _writeBlock, 0, 15);
             // the padding byte for "full" blocks
-            block[BLOCK_SIZE - 1] = (byte)(_lastBlock[BLOCK_SIZE - 1] ^ 0x01); 
-            _context.aes().encrypt(block, 0, block, 0, _key, _lastBlock, BLOCK_SIZE);
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Padding block " + i + " of " + numBlocks + " with 1 byte");
-            out.write(block);
-            System.arraycopy(block, 0, _lastBlock, 0, BLOCK_SIZE);
+            _writeBlock[BLOCK_SIZE - 1] = (byte)(_lastBlock[BLOCK_SIZE - 1] ^ 0x01); 
+            _context.aes().encrypt(_writeBlock, 0, _writeBlock, 0, _key, _lastBlock, BLOCK_SIZE);
+            out.write(_writeBlock);
+            System.arraycopy(_writeBlock, 0, _lastBlock, 0, BLOCK_SIZE);
             _cumulativeWritten += BLOCK_SIZE;
             _cumulativePadding++;
         }
 
-        if (src.length % 15 != 0) {
+        if (_writesSinceCommit % 15 != 0) {
             // we need to do non trivial padding
-            int remainingBytes = src.length - numBlocks * 15;
+            int remainingBytes = _writesSinceCommit - numBlocks * 15;
             int paddingBytes = BLOCK_SIZE - remainingBytes;
             if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Padding " + src.length + " with " + paddingBytes + " bytes in " + numBlocks + " blocks");
-            System.arraycopy(src, numBlocks * 15, block, 0, remainingBytes);
-            Arrays.fill(block, remainingBytes, BLOCK_SIZE, (byte) paddingBytes);
-            DataHelper.xor(block, 0, _lastBlock, 0, block, 0, BLOCK_SIZE);
-            _context.aes().encrypt(block, 0, block, 0, _key, _lastBlock, BLOCK_SIZE);
-            out.write(block);
-            System.arraycopy(block, 0, _lastBlock, 0, BLOCK_SIZE);
+                _log.debug("Padding " + _writesSinceCommit + " with " + paddingBytes + " bytes in " + (numBlocks+1) + " blocks");
+            System.arraycopy(_unencryptedBuf, numBlocks * 15, _writeBlock, 0, remainingBytes);
+            Arrays.fill(_writeBlock, remainingBytes, BLOCK_SIZE, (byte) paddingBytes);
+            DataHelper.xor(_writeBlock, 0, _lastBlock, 0, _writeBlock, 0, BLOCK_SIZE);
+            _context.aes().encrypt(_writeBlock, 0, _writeBlock, 0, _key, _lastBlock, BLOCK_SIZE);
+            out.write(_writeBlock);
+            System.arraycopy(_writeBlock, 0, _lastBlock, 0, BLOCK_SIZE);
             _cumulativePadding += paddingBytes;
             _cumulativeWritten += BLOCK_SIZE;
         }
     }
-
 }

@@ -443,7 +443,14 @@ public class ConnectionHandler {
                 SimpleDateFormat fmt = new SimpleDateFormat("yyyyMMddhhmmssSSS");
                 props.setProperty("SKEW", fmt.format(new Date(_context.clock().now())));
             } else {
-                status = STATUS_OK;
+                try {
+                    _context.netDb().store(_actualPeer.getIdentity().getHash(), _actualPeer);
+                    status = STATUS_OK;
+                } catch (IllegalArgumentException iae) {
+                    // bad peer info
+                    status = STATUS_UNKNOWN;
+                    props.setProperty("REASON", "RouterInfoFailed");
+                }
             }
             
             baos.write(status);
@@ -460,7 +467,7 @@ public class ConnectionHandler {
             verification.writeBytes(_rawOut);
             _rawOut.flush();
             
-            return handleStatus(status, clockSkew);
+            return handleStatus(status, clockSkew);            
         } catch (IOException ioe) {
             fail("Error writing the peer info to " + _from
                  + ": " + ioe.getMessage(), ioe);
@@ -601,7 +608,14 @@ public class ConnectionHandler {
             } else if (!sigOk) {
                 status = STATUS_SIGNATURE_FAILED;
             } else {
-                status = STATUS_OK;
+                try {
+                    _context.netDb().store(_actualPeer.getIdentity().getHash(), _actualPeer);
+                    status = STATUS_OK;
+                } catch (IllegalArgumentException iae) {
+                    // bad peer info
+                    status = STATUS_UNKNOWN;
+                    props.setProperty("REASON", "RouterInfoFailed");
+                }
             }
          
             if (_actualPeer.getIdentity().getHash().equals(_context.routerHash())) {
@@ -827,7 +841,6 @@ public class ConnectionHandler {
         //_connectionOut = _rawOut;
         
         Hash peer = _actualPeer.getIdentity().getHash();
-        _context.netDb().store(peer, _actualPeer);
         _transport.getTagManager().replaceTag(peer, _nextConnectionTag, _key);
     }
     
