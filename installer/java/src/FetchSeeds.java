@@ -84,9 +84,15 @@ public class FetchSeeds {
         case 2:
             fetchSeeds(new File(args[0]), args[1]);
             return;
+        case 3:
+            while (true) {
+                fetchSeeds(new File(args[0]), args[1]);
+                try { Thread.sleep(Integer.parseInt(args[2])*1000); } catch (Throwable t) {}
+            }
         default:
             System.out.println("Usage: FetchSeeds <outDir>");
             System.out.println("    or FetchSeeds <outDir> <seedURL>");
+            System.out.println("    or FetchSeeds <outDir> <seedURL> <secondsBetweenFetch>");
             System.out.println("The default seedURL is http://i2p.dnsalias.net/i2pdb/");
             return;
         }
