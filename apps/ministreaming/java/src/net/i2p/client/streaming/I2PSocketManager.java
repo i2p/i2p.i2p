@@ -189,7 +189,7 @@ public class I2PSocketManager implements I2PSessionListener {
             s = (I2PSocketImpl) _outSockets.get(id);
         }
         
-        _log.debug("*Disconnect outgoing!");
+        _log.debug("*Disconnect outgoing for socket " + s);
         try {
             if (s != null) {
                 if (payload.length > 0) {
@@ -207,7 +207,7 @@ public class I2PSocketManager implements I2PSessionListener {
             }
             return;
         } catch (Exception t) {
-            _log.error("Ignoring error on disconnect", t);
+            _log.error("Ignoring error on disconnect for socket " + s, t);
         }
     }
     
@@ -225,7 +225,7 @@ public class I2PSocketManager implements I2PSessionListener {
 
         // packet send outgoing
         if (_log.shouldLog(Log.DEBUG))
-            _log.debug("*Packet send outgoing [" + payload.length + "]");
+            _log.debug("*Packet send outgoing [" + payload.length + "] for socket " + s);
         if (s != null) {
             s.queueData(payload);
             return;
@@ -245,7 +245,6 @@ public class I2PSocketManager implements I2PSessionListener {
      */
     private void synIncomingAvailable(String id, byte payload[], I2PSession session) 
                                       throws DataFormatException, I2PSessionException {
-        _log.debug("*Syn!");
         Destination d = new Destination();
         d.fromByteArray(payload);
 
@@ -259,6 +258,7 @@ public class I2PSocketManager implements I2PSessionListener {
                 s.setRemoteID(id);
             }
         }    
+        _log.debug("*Syn! for socket " + s);
         
         if (!acceptConnections) {
             // The app did not instantiate an I2PServerSocket
@@ -283,7 +283,7 @@ public class I2PSocketManager implements I2PSessionListener {
             if (!replySentOk) {
                 if (_log.shouldLog(Log.WARN))
                     _log.warn("Error sending reply to " + d.calculateHash().toBase64()
-                               + " in response to a new con message",
+                               + " in response to a new con message for socket " + s,
                                new Exception("Failed creation"));
                 s.internalClose();
             }
@@ -293,7 +293,7 @@ public class I2PSocketManager implements I2PSessionListener {
             packet[0] = CLOSE_OUT;
             boolean nackSent = session.sendMessage(d, packet);
             if (!nackSent) {
-                _log.warn("Error sending NACK for session creation");
+                _log.warn("Error sending NACK for session creation for socket " + s);
             }
             s.internalClose();
         }
@@ -306,7 +306,6 @@ public class I2PSocketManager implements I2PSessionListener {
      *
      */
     private void disconnectIncoming(String id, byte payload[]) {
-        _log.debug("*Disconnect incoming!");
         I2PSocketImpl s = null;
         synchronized (lock) {
             s = (I2PSocketImpl) _inSockets.get(id);
@@ -314,6 +313,8 @@ public class I2PSocketManager implements I2PSessionListener {
                 _inSockets.remove(id);
             }
         }
+        
+        _log.debug("*Disconnect incoming for socket " + s);
         
         try {
             if (payload.length == 0 && s != null) {
@@ -339,12 +340,13 @@ public class I2PSocketManager implements I2PSessionListener {
      * @throws IllegalStateException if the socket isn't open or isn't known
      */
     private void sendIncoming(String id, byte payload[]) {
-        if (_log.shouldLog(Log.DEBUG))
-            _log.debug("*Packet send incoming [" + payload.length + "]");
         I2PSocketImpl s = null;
         synchronized (lock) {
             s = (I2PSocketImpl) _inSockets.get(id);
         }
+
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("*Packet send incoming [" + payload.length + "] for socket " + s);
         
         if (s != null) {
             s.queueData(payload);
@@ -422,7 +424,7 @@ public class I2PSocketManager implements I2PSessionListener {
             boolean sent = false;
             sent = _session.sendMessage(peer, packet);
             if (!sent) {
-                _log.info("Unable to send & receive ack for SYN packet");
+                _log.info("Unable to send & receive ack for SYN packet for socket " + s);
                 synchronized (lock) {
                     _outSockets.remove(s.getLocalID());
                 }
@@ -431,18 +433,18 @@ public class I2PSocketManager implements I2PSessionListener {
             remoteID = s.getRemoteID(true, options.getConnectTimeout());
             
             if (remoteID == null) 
-                throw new ConnectException("Connection refused by peer");
+                throw new ConnectException("Connection refused by peer for socket " + s);
             if ("".equals(remoteID)) 
-                throw new NoRouteToHostException("Unable to reach peer");
+                throw new NoRouteToHostException("Unable to reach peer for socket " + s);
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("TIMING: s given out for remoteID " 
-                           + getReadableForm(remoteID));
+                           + getReadableForm(remoteID) + " for socket " + s);
             
             return s;
         } catch (InterruptedIOException ioe) {
             if (_log.shouldLog(Log.ERROR))
                 _log.error("Timeout waiting for ack from syn for id " 
-                           + getReadableForm(lcID), ioe);
+                           + getReadableForm(lcID) + " for socket " + s, ioe);
             synchronized (lock) {
                 _outSockets.remove(s.getLocalID());
             }
@@ -456,7 +458,7 @@ public class I2PSocketManager implements I2PSessionListener {
             throw ex;
         } catch (IOException ex) {
             if (_log.shouldLog(Log.ERROR))
-                _log.error("Error sending syn on id " + getReadableForm(lcID), ex);
+                _log.error("Error sending syn on id " + getReadableForm(lcID) + " for socket " + s, ex);
             synchronized (lock) {
                 _outSockets.remove(s.getLocalID());
             }
@@ -464,7 +466,7 @@ public class I2PSocketManager implements I2PSessionListener {
             throw new I2PException("Unhandled IOException occurred");
         } catch (I2PException ex) {
             if (_log.shouldLog(Log.INFO))
-                _log.info("Error sending syn on id " + getReadableForm(lcID), ex);
+                _log.info("Error sending syn on id " + getReadableForm(lcID) + " for socket " + s, ex);
             synchronized (lock) {
                 _outSockets.remove(s.getLocalID());
             }
@@ -577,7 +579,7 @@ public class I2PSocketManager implements I2PSessionListener {
     public void removeSocket(I2PSocketImpl sock) {
         synchronized (lock) {
             if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Removing socket \"" + getReadableForm(sock.getLocalID()) + "\"");
+                _log.debug("Removing socket \"" + getReadableForm(sock.getLocalID()) + "\" [" + sock + "]");
             _inSockets.remove(sock.getLocalID());
             _outSockets.remove(sock.getLocalID());
             lock.notify();

@@ -89,7 +89,7 @@ class I2PServerSocketImpl implements I2PServerSocket {
      */
     public boolean addWaitForAccept(I2PSocket s, long timeoutMs) {
         if (_log.shouldLog(Log.DEBUG))
-            _log.debug("addWaitForAccept [new socket arrived, pending: " + pendingSockets.size());
+            _log.debug("addWaitForAccept [new socket arrived [" + s.toString() + "], pending: " + pendingSockets.size());
         
         if (closing) {
             if (_log.shouldLog(Log.WARN))
@@ -111,7 +111,7 @@ class I2PServerSocketImpl implements I2PServerSocket {
             long now = clock.now();
             if (now >= end) {
                 if (_log.shouldLog(Log.INFO))
-                    _log.info("Expired while waiting for accept (time elapsed =" + (now - start) + "ms");
+                    _log.info("Expired while waiting for accept (time elapsed =" + (now - start) + "ms) for socket " + s.toString());
                 pendingSockets.remove(s);
                 return false;
             }
@@ -130,7 +130,7 @@ class I2PServerSocketImpl implements I2PServerSocket {
         }
         long now = clock.now();
         if (_log.shouldLog(Log.DEBUG))
-            _log.info("Socket accepted after " + (now-start) + "ms");
+            _log.info("Socket accepted after " + (now-start) + "ms for socket " + s.toString());
         return true;
     }
     

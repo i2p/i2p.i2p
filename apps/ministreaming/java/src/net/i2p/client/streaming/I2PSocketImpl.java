@@ -29,7 +29,12 @@ class I2PSocketImpl implements I2PSocket {
     private Object remoteIDWaiter = new Object();
     private I2PInputStream in;
     private I2POutputStream out;
+    private SocketErrorListener _socketErrorListener;
     private boolean outgoing;
+    private long _socketId;
+    private static long __socketId = 0;
+    private long _bytesRead = 0;
+    private long _bytesWritten = 0;
     private Object flagLock = new Object();
 
     /**
@@ -61,6 +66,7 @@ class I2PSocketImpl implements I2PSocket {
         this.outgoing = outgoing;
         manager = mgr;
         remote = peer;
+        _socketId = ++__socketId;
         local = mgr.getSession().getMyDestination();
         in = new I2PInputStream();
         I2PInputStream pin = new I2PInputStream();
@@ -153,6 +159,7 @@ class I2PSocketImpl implements I2PSocket {
      * @param data the data to inject into our local inputStream
      */
     public void queueData(byte[] data) {
+        _bytesRead += data.length;
         in.queueData(data);
     }
 
@@ -232,6 +239,17 @@ class I2PSocketImpl implements I2PSocket {
         in.setReadTimeout(ms);
     }
 
+    public void setSocketErrorListener(SocketErrorListener lsnr) {
+        _socketErrorListener = lsnr;
+    }
+    
+    void errorOccurred() {
+        if (_socketErrorListener != null)
+            _socketErrorListener.errorOccurred();
+    }
+    
+    private String getPrefix() { return "[" + _socketId + "]: "; }
+    
     //--------------------------------------------------
     private class I2PInputStream extends InputStream {
 
@@ -256,7 +274,8 @@ class I2PSocketImpl implements I2PSocket {
         }
 
         public synchronized int read(byte[] b, int off, int len) throws IOException {
-            _log.debug("Read called: " + this.hashCode());
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug(getPrefix() + "Read called: " + this.hashCode());
             if (len == 0) return 0;
             long dieAfter = System.currentTimeMillis() + readTimeout;
             byte[] read = bc.startToByteArray(len);
@@ -265,7 +284,8 @@ class I2PSocketImpl implements I2PSocket {
             while (read.length == 0) {
                 synchronized (flagLock) {
                     if (closed) {
-                        _log.debug("Closed is set, so closing stream: " + hashCode());
+                        if (_log.shouldLog(Log.DEBUG))
+                            _log.debug(getPrefix() + "Closed is set after reading " + _bytesRead + " and writing " + _bytesWritten + ", so closing stream: " + hashCode());
                         return -1;
                     }
                 }
@@ -279,7 +299,7 @@ class I2PSocketImpl implements I2PSocket {
 
                 if ((readTimeout >= 0)
                     && (System.currentTimeMillis() >= dieAfter)) {
-                    throw new InterruptedIOException("Timeout reading from I2PSocket (" + readTimeout + " msecs)");
+                    throw new InterruptedIOException(getPrefix() + "Timeout reading from I2PSocket (" + readTimeout + " msecs)");
                 }
 
                 read = bc.startToByteArray(len);
@@ -288,7 +308,7 @@ class I2PSocketImpl implements I2PSocket {
             System.arraycopy(read, 0, b, off, read.length);
 
             if (_log.shouldLog(Log.DEBUG)) {
-                _log.debug("Read from I2PInputStream " + hashCode() + " returned " 
+                _log.debug(getPrefix() + "Read from I2PInputStream " + hashCode() + " returned " 
                            + read.length + " bytes");
             }
             //if (_log.shouldLog(Log.DEBUG)) {
@@ -309,7 +329,7 @@ class I2PSocketImpl implements I2PSocket {
 
         public synchronized void queueData(byte[] data, int off, int len) {
             if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Insert " + len + " bytes into queue: " + hashCode());
+                _log.debug(getPrefix() + "Insert " + len + " bytes into queue: " + hashCode());
             bc.append(data, off, len);
             notifyAll();
         }
@@ -338,6 +358,7 @@ class I2PSocketImpl implements I2PSocket {
         }
 
         public void write(byte[] b, int off, int len) throws IOException {
+            _bytesWritten += len;
             sendTo.queueData(b, off, len);
         }
 
@@ -353,10 +374,10 @@ class I2PSocketImpl implements I2PSocket {
 
         public I2PSocketRunner(InputStream in) {
             if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Runner's input stream is: " + in.hashCode());
+                _log.debug(getPrefix() + "Runner's input stream is: " + in.hashCode());
             this.in = in;
             String peer = I2PSocketImpl.this.remote.calculateHash().toBase64();
-            setName("SocketRunner " + (++__runnerId) + " " + peer.substring(0, 4));
+            setName("SocketRunner " + (++__runnerId) + "/" + _socketId + " " + peer.substring(0, 4));
             start();
         }
         
@@ -378,7 +399,7 @@ class I2PSocketImpl implements I2PSocket {
             }
             if ((bcsize < MAX_PACKET_SIZE) && (in.available() == 0)) {
                 if (_log.shouldLog(Log.DEBUG))
-                    _log.debug("Runner Point d: " + hashCode());
+                    _log.debug(getPrefix() + "Runner Point d: " + hashCode());
 
                 try {
                     Thread.sleep(PACKET_DELAY);
@@ -390,10 +411,11 @@ class I2PSocketImpl implements I2PSocket {
                 byte[] data = bc.startToByteArray(MAX_PACKET_SIZE);
                 if (data.length > 0) {
                     if (_log.shouldLog(Log.DEBUG))
-                        _log.debug("Message size is: " + data.length);
+                        _log.debug(getPrefix() + "Message size is: " + data.length);
                     boolean sent = sendBlock(data);
                     if (!sent) {
-                        _log.error("Error sending message to peer.  Killing socket runner");
+                        _log.error(getPrefix() + "Error sending message to peer.  Killing socket runner");
+                        errorOccurred();
                         return false;
                     }
                 }
@@ -413,7 +435,7 @@ class I2PSocketImpl implements I2PSocket {
                     packetsHandled++;
                 }
                 if ((bc.getCurrentSize() > 0) && (packetsHandled > 1)) {
-                    _log.error("A SCARY MONSTER HAS EATEN SOME DATA! " + "(input stream: " 
+                    _log.error(getPrefix() + "A SCARY MONSTER HAS EATEN SOME DATA! " + "(input stream: " 
                                + in.hashCode() + "; "
                                + "queue size: " + bc.getCurrentSize() + ")");
                 }
@@ -426,32 +448,33 @@ class I2PSocketImpl implements I2PSocket {
                 } // FIXME: Race here?
                 if (sc) {
                     if (_log.shouldLog(Log.INFO))
-                        _log.info("Sending close packet: " + outgoing);
+                        _log.info(getPrefix() + "Sending close packet: (we started? " + outgoing + ") after reading " + _bytesRead + " and writing " + _bytesWritten);
                     byte[] packet = I2PSocketManager.makePacket(getMask(0x02), remoteID, new byte[0]);
                     boolean sent = manager.getSession().sendMessage(remote, packet);
                     if (!sent) {
-                        _log.error("Error sending close packet to peer");
+                        _log.error(getPrefix() + "Error sending close packet to peer");
+                        errorOccurred();
                     }
                 }
                 manager.removeSocket(I2PSocketImpl.this);
             } catch (InterruptedIOException ex) {
-                _log.error("BUG! read() operations should not timeout!", ex);
+                _log.error(getPrefix() + "BUG! read() operations should not timeout!", ex);
             } catch (IOException ex) {
                 // WHOEVER removes this event on inconsistent
                 // state before fixing the inconsistent state (a
                 // reference on the socket in the socket manager
                 // etc.) will get hanged by me personally -- mihi
-                _log.error("Error running - **INCONSISTENT STATE!!!**", ex);
+                _log.error(getPrefix() + "Error running - **INCONSISTENT STATE!!!**", ex);
             } catch (I2PException ex) {
-                _log.error("Error running - **INCONSISTENT STATE!!!**", ex);
+                _log.error(getPrefix() + "Error running - **INCONSISTENT STATE!!!**", ex);
             }
         }
 
         private boolean sendBlock(byte data[]) throws I2PSessionException {
             if (_log.shouldLog(Log.DEBUG))
-                _log.debug("TIMING: Block to send for " + I2PSocketImpl.this.hashCode());
+                _log.debug(getPrefix() + "TIMING: Block to send for " + I2PSocketImpl.this.hashCode());
             if (remoteID == null) {
-                _log.error("NULL REMOTEID");
+                _log.error(getPrefix() + "NULL REMOTEID");
                 return false;
             }
             byte[] packet = I2PSocketManager.makePacket(getMask(0x00), remoteID, data);
@@ -463,4 +486,6 @@ class I2PSocketImpl implements I2PSocket {
             return sent;
         }
     }
+    
+    public String toString() { return "" + hashCode(); }
 }
