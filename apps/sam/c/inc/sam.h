@@ -86,7 +86,7 @@ extern samerr_t	sam_connect(const char *samhost, uint16_t samport,
 					const char *destname, sam_conn_t style, uint_t tunneldepth);
 extern void		sam_naming_lookup(const char *name);
 extern bool		sam_read_buffer(void);
-extern char		*sam_strerror(samerr_t code);
+extern const char *sam_strerror(samerr_t code);
 /* SAM controls - callbacks */
 extern void		(*sam_diedback)(void);
 extern void		(*sam_logback)(char *str);

@@ -3,7 +3,7 @@
 #
 
 #
-# Your operating system
+# Your operating environment
 #
 
 OS = CYGWIN

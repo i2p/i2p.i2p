@@ -44,6 +44,7 @@
 	#define NO_GETHOSTBYNAME2
 	#define NO_INET_ATON  /* implies NO_INET_PTON */
 	#define NO_INET_NTOP
+	#define NO_SSIZE_T
 	#define NO_STRL
 	#define NO_Z_FORMAT
 	#define WINSOCK
@@ -103,6 +104,7 @@
 #endif
 #ifdef WINSOCK
 	#include <windows.h>
+	#include <winsock2.h>
 #else
 	#include <unistd.h>
 #endif
@@ -112,9 +114,11 @@
  */
 #ifdef WINSOCK
 	typedef SOCKET socket_t;
-	typedef signed long ssize_t;
 #else
 	typedef int socket_t;
+#endif
+#ifdef NO_SSIZE_T
+	typedef signed long ssize_t;
 #endif
 
 /*
