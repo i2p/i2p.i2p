@@ -49,6 +49,7 @@ public class RouterContext extends I2PAppContext {
     private StatisticsManager _statPublisher;
     private Shitlist _shitlist;
     private MessageValidator _messageValidator;
+    private MessageStateMonitor _messageStateMonitor;
     private Calculator _isFailingCalc;
     private Calculator _integrationCalc;
     private Calculator _speedCalc;
@@ -68,6 +69,7 @@ public class RouterContext extends I2PAppContext {
         _outNetMessagePool = new OutNetMessagePool(this);
         _messageHistory = new MessageHistory(this);
         _messageRegistry = new OutboundMessageRegistry(this);
+        _messageStateMonitor = new MessageStateMonitor(this);
         _netDb = new KademliaNetworkDatabaseFacade(this);
         _keyManager = new KeyManager(this);
         if ("false".equals(getProperty("i2p.vmCommSystem", "false")))
@@ -123,6 +125,13 @@ public class RouterContext extends I2PAppContext {
      * The registry is used by outbound messages to wait for replies.
      */
     public OutboundMessageRegistry messageRegistry() { return _messageRegistry; }
+    /**
+     * The monitor keeps track of inbound and outbound messages currently held in
+     * memory / queued for processing.  We'll use this to throttle the router so
+     * we don't overflow.
+     *
+     */
+    public MessageStateMonitor messageStateMonitor() { return _messageStateMonitor; }
     /**
      * Our db cache
      */
