@@ -261,7 +261,46 @@ public class DataHelper {
             throw new DataFormatException("Invalid value (must be positive)", iae);
         }
     }
+    
+    public static byte[] toLong(int numBytes, long value) throws IllegalArgumentException {
+        if (numBytes <= 0) throw new IllegalArgumentException("Invalid number of bytes");
+        if (value < 0) throw new IllegalArgumentException("Negative value not allowed");
+        byte val[] = new byte[numBytes];
+        for (int i = 0; i < numBytes; i++)
+            val[numBytes-i-1] = (byte)(value >>> (i*8));
+        return val;
+    }
 
+    public static void main(String args[]) {
+        for (int i = 0; i <= 0xFF; i++)
+            testLong(1, i);
+        System.out.println("Test 1byte passed");
+        for (long i = 0; i <= 0xFFFF; i++)
+            testLong(2, i);
+        System.out.println("Test 2byte passed");
+        for (long i = 0; i <= 0xFFFFFF; i++)
+            testLong(3, i);
+        System.out.println("Test 3byte passed");
+        for (long i = 0; i <= 0xFFFFFFFF; i++)
+            testLong(4, i);
+        System.out.println("Test 4byte passed");
+        for (long i = 0; i <= 0xFFFFFFFF; i++)
+            testLong(8, i);
+        System.out.println("Test 8byte passed");
+    }
+    private static void testLong(int numBytes, long value) {
+        try {
+            ByteArrayOutputStream baos = new ByteArrayOutputStream(numBytes);
+            writeLong(baos, numBytes, value);
+            byte written[] = baos.toByteArray();
+            byte extract[] = toLong(numBytes, value);
+            if (!eq(written, extract))
+                throw new RuntimeException("testLong("+numBytes+","+value+") FAILED");
+        } catch (Exception e) {
+            throw new RuntimeException(e.getMessage());
+        }
+    }
+    
     /** Read in a date from the stream as specified by the I2P data structure spec.
      * A date is an 8 byte unsigned integer in network byte order specifying the number of
      * milliseconds since midnight on January 1, 1970 in the GMT timezone. If the number is
@@ -272,7 +311,7 @@ public class DataHelper {
      * @return date read, or null
      */
     public static Date readDate(InputStream in) throws DataFormatException, IOException {
-        long date = readLong(in, 8);
+        long date = readLong(in, DATE_LENGTH);
         if (date == 0L) return null;
 
         return new Date(date);
@@ -287,10 +326,18 @@ public class DataHelper {
     public static void writeDate(OutputStream out, Date date) 
         throws DataFormatException, IOException {
         if (date == null)
-            writeLong(out, 8, 0L);
+            writeLong(out, DATE_LENGTH, 0L);
         else
-            writeLong(out, 8, date.getTime());
+            writeLong(out, DATE_LENGTH, date.getTime());
     }
+    public static byte[] toDate(Date date) throws IllegalArgumentException {
+        if (date == null)
+            return toLong(DATE_LENGTH, 0L);
+        else
+            return toLong(DATE_LENGTH, date.getTime());
+    }
+    
+    public static final int DATE_LENGTH = 8;
 
     /** Read in a string from the stream as specified by the I2P data structure spec.
      * A string is 1 or more bytes where the first byte is the number of bytes (not characters!)
@@ -364,12 +411,16 @@ public class DataHelper {
     public static void writeBoolean(OutputStream out, Boolean bool) 
         throws DataFormatException, IOException {
         if (bool == null)
-            writeLong(out, 1, 2);
+            writeLong(out, 1, BOOLEAN_UNKNOWN);
         else if (Boolean.TRUE.equals(bool))
-            writeLong(out, 1, 1);
+            writeLong(out, 1, BOOLEAN_TRUE);
         else
-            writeLong(out, 1, 0);
+            writeLong(out, 1, BOOLEAN_FALSE);
     }
+    
+    public static final byte BOOLEAN_TRUE = 0x1;
+    public static final byte BOOLEAN_FALSE = 0x0;
+    public static final byte BOOLEAN_UNKNOWN = 0x2;
 
     //
     // The following comparator helpers make it simpler to write consistently comparing

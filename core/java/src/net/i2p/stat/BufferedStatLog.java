@@ -99,7 +99,7 @@ public class BufferedStatLog implements StatLog {
             if (_out != null) try { _out.close(); } catch (IOException ioe) {}
             _outFile = filename;
             try {
-                _out = new BufferedWriter(new FileWriter(_outFile));
+                _out = new BufferedWriter(new FileWriter(_outFile, true));
             } catch (IOException ioe) { ioe.printStackTrace(); }
         }
     }

@@ -62,40 +62,43 @@ public class SHA256Generator {
      * @return hash of the source
      */
     public Hash calculateHash(byte[] source) {
-        long length = source.length * 8;
+        return calculateHash(source, 0, source.length);
+    }
+    public Hash calculateHash(byte[] source, int start, int len) {
+        long length = len * 8;
         int k = 448 - (int) ((length + 1) % 512);
         if (k < 0) {
             k += 512;
         }
         int padbytes = k / 8;
-        int wordlength = source.length / 4 + padbytes / 4 + 3;
+        int wordlength = len / 4 + padbytes / 4 + 3;
         int[] M0 = new int[wordlength];
         int wordcount = 0;
         int x = 0;
-        for (x = 0; x < (source.length / 4) * 4; x += 4) {
-            M0[wordcount] = source[x] << 24 >>> 24 << 24;
-            M0[wordcount] |= source[x + 1] << 24 >>> 24 << 16;
-            M0[wordcount] |= source[x + 2] << 24 >>> 24 << 8;
-            M0[wordcount] |= source[x + 3] << 24 >>> 24 << 0;
+        for (x = 0; x < (len / 4) * 4; x += 4) {
+            M0[wordcount] = source[x+start] << 24 >>> 24 << 24;
+            M0[wordcount] |= source[x+start + 1] << 24 >>> 24 << 16;
+            M0[wordcount] |= source[x+start + 2] << 24 >>> 24 << 8;
+            M0[wordcount] |= source[x+start + 3] << 24 >>> 24 << 0;
             wordcount++;
         }
-        switch (source.length - (wordcount + 1) * 4 + 4) {
+        switch (len - (wordcount + 1) * 4 + 4) {
         case 0:
             M0[wordcount] |= 0x80000000;
             break;
         case 1:
-            M0[wordcount] = source[x] << 24 >>> 24 << 24;
+            M0[wordcount] = source[x+start] << 24 >>> 24 << 24;
             M0[wordcount] |= 0x00800000;
             break;
         case 2:
-            M0[wordcount] = source[x] << 24 >>> 24 << 24;
-            M0[wordcount] |= source[x + 1] << 24 >>> 24 << 16;
+            M0[wordcount] = source[x+start] << 24 >>> 24 << 24;
+            M0[wordcount] |= source[x+start + 1] << 24 >>> 24 << 16;
             M0[wordcount] |= 0x00008000;
             break;
         case 3:
-            M0[wordcount] = source[x] << 24 >>> 24 << 24;
-            M0[wordcount] |= source[x + 1] << 24 >>> 24 << 16;
-            M0[wordcount] |= source[x + 2] << 24 >>> 24 << 8;
+            M0[wordcount] = source[x+start] << 24 >>> 24 << 24;
+            M0[wordcount] |= source[x+start + 1] << 24 >>> 24 << 16;
+            M0[wordcount] |= source[x+start + 2] << 24 >>> 24 << 8;
             M0[wordcount] |= 0x00000080;
             break;
         }
