@@ -85,7 +85,8 @@ class SearchJob extends JobImpl {
         getContext().statManager().createRateStat("netDb.failedTime", "How long a failed search takes", "Network Database", new long[] { 60*60*1000l, 24*60*60*1000l });
         getContext().statManager().createRateStat("netDb.successPeers", "How many peers are contacted in a successful search", "Network Database", new long[] { 60*60*1000l, 24*60*60*1000l });
         getContext().statManager().createRateStat("netDb.failedPeers", "How many peers fail to respond to a lookup?", "Network Database", new long[] { 60*60*1000l, 24*60*60*1000l });
-        getContext().statManager().createRateStat("netDb.searchCount", "Overall number of searches sent", "Network Database", new long[] { 60*60*1000l, 3*60*60*1000l, 24*60*60*1000l });
+        getContext().statManager().createRateStat("netDb.searchCount", "Overall number of searches sent", "Network Database", new long[] { 5*60*1000l, 10*60*1000l, 60*60*1000l, 3*60*60*1000l, 24*60*60*1000l });
+        getContext().statManager().createRateStat("netDb.searchMessageCount", "Overall number of mesages for all searches sent", "Network Database", new long[] { 5*60*1000l, 10*60*1000l, 60*60*1000l, 3*60*60*1000l, 24*60*60*1000l });
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Search (" + getClass().getName() + " for " + key.toBase64(), new Exception("Search enqueued by"));
     }
@@ -240,6 +241,8 @@ class SearchJob extends JobImpl {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug(getJobId() + ": Send search to " + router.getIdentity().getHash().toBase64());
         }
+
+        getContext().statManager().addRateData("netDb.searchMessageCount", 1, 0);
 
         if (_isLease || false) // moo
             sendLeaseSearch(router);
