@@ -17,6 +17,9 @@ class BufferLogger implements Logging {
     private ByteArrayOutputStream _baos;
     private boolean _ignore;
 
+    /**
+     * Constructs a buffered logger.
+     */
     public BufferLogger() {
         _baos = new ByteArrayOutputStream(512);
         _ignore = false;
@@ -24,11 +27,15 @@ class BufferLogger implements Logging {
 
     private final static String EMPTY = "";
 
+    /**
+     * Retrieves the buffer
+     * @return the buffer
+     */
     public String getBuffer() {
         if (_ignore)
             return EMPTY;
-        else
-            return new String(_baos.toByteArray());
+
+        return new String(_baos.toByteArray());
     }
 
     /**

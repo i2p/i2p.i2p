@@ -18,7 +18,7 @@ import net.i2p.util.Log;
  */
 public class ProxyHandler extends EepHandler {
 
-    private static final Log _log = new Log(ErrorHandler.class);
+    private static final Log _log = new Log(ErrorHandler.class); /* UNUSED */
     private static I2PAppContext _context = new I2PAppContext();
 
     /* package private */ProxyHandler(ErrorHandler eh) {

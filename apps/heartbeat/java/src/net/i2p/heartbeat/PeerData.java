@@ -103,6 +103,11 @@ public class PeerData {
      * @return when the test began  
      */
     public long getSessionStart() { return _sessionStart; }
+    
+    /**
+     * sets when the test began
+     * @param when when it began
+     */
     public void setSessionStart(long when) { _sessionStart = when; }
 
     /**
@@ -332,6 +337,11 @@ public class PeerData {
          * @return the time the ping was sent
          */
         public long getPingSent() { return _pingSent; }
+        
+        /**
+         * sets when we sent this ping
+         * @param when when we sent the ping
+         */
         public void setPingSent(long when) { _pingSent = when; }
 
         /**

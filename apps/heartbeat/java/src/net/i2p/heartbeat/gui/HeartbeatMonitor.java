@@ -88,7 +88,9 @@ public class HeartbeatMonitor implements PeerPlotStateFetcher.FetchStateReceptor
         _gui.stateUpdated();
     }
     
-    /** store the config defining what peer tests we are monitoring (and how to render) */
+    /**
+     *  store the config defining what peer tests we are monitoring (and how to render) 
+     */
     void storeConfig() {}
     
     /**
@@ -103,6 +105,10 @@ public class HeartbeatMonitor implements PeerPlotStateFetcher.FetchStateReceptor
             new HeartbeatMonitor().runMonitor();
     }
     
+    /**
+     * Called when the config is updated
+     * @param config the updated config
+     */
     public void configUpdated(PeerPlotConfig config) { 
         _log.debug("Config updated, revamping the gui");
         _gui.stateUpdated(); 

@@ -90,7 +90,7 @@ class ClientEngine {
     /** our actual heartbeat pumper - this drives the test */
     private class ClientRunner implements Runnable {
 
-        /* (non-Javadoc)
+        /**
          * @see java.lang.Runnable#run()
          */
         public void run() {

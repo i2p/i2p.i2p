@@ -12,7 +12,7 @@ import net.i2p.util.Log;
  */
 public class ErrorHandler {
 
-    private static final Log _log = new Log(ErrorHandler.class);
+    private static final Log _log = new Log(ErrorHandler.class); /* UNUSED */
 
     /* package private */ErrorHandler() {
 

@@ -94,8 +94,8 @@ class StaticPeerData extends PeerData {
         Integer i = (Integer)_averageSendTimes.get(new Integer(period));
         if (i == null)
             return -1;
-        else
-            return i.doubleValue();
+
+        return i.doubleValue();
     }
     
     
@@ -109,8 +109,8 @@ class StaticPeerData extends PeerData {
         Integer i = (Integer)_averageReceiveTimes.get(new Integer(period));
         if (i == null)
             return -1;
-        else
-            return i.doubleValue();
+
+        return i.doubleValue();
     }
        
     /** 
@@ -123,8 +123,8 @@ class StaticPeerData extends PeerData {
         Integer i = (Integer)_lostMessages.get(new Integer(period));
         if (i == null)
             return -1;
-        else
-            return i.doubleValue();
+
+        return i.doubleValue();
     }
         
     /* (non-Javadoc)

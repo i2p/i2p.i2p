@@ -243,6 +243,7 @@ class PeerPlotConfigPane extends JPanel implements PeerPlotConfig.UpdateListener
             _minutes = minutes; 
             _button = button;
         }
+
         /* (non-Javadoc)
          * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
          */

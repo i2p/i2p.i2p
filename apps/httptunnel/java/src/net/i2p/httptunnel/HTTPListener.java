@@ -57,14 +57,14 @@ public class HTTPListener extends Thread {
      * @return Whether this is the first proxy use, no doubt.
      */
     public boolean firstProxyUse() {
-        // FIXME: check a config option here
-        if (true) return false;
+        if (true) return false; // FIXME: check a config option here
+        
         if (proxyUsed) {
             return false;
-        } else {
-            proxyUsed = true;
-            return true;
         }
+
+        proxyUsed = true;
+        return true;
     }
 
     /**

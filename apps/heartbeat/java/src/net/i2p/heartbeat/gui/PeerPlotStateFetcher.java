@@ -326,7 +326,7 @@ class PeerPlotStateFetcher {
             }
         }
         
-        private void fakeRun() {
+        private void fakeRun() { /* UNUSED */
             try {
                 Destination peer = new Destination();
                 Destination us = new Destination();

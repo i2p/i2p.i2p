@@ -13,7 +13,7 @@ import net.i2p.util.Log;
  */
 public class LocalHandler {
 
-    private static final Log _log = new Log(LocalHandler.class);
+    private static final Log _log = new Log(LocalHandler.class); /* UNUSED */
 
     /* package private */LocalHandler() {
     }

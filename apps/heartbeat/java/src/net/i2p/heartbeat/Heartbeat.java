@@ -157,7 +157,7 @@ public class Heartbeat {
     }
 
     /** disconnect from the network */
-    private void disconnect() {
+    private void disconnect() { /* UNUSED */
         _adapter.disconnect();
     }
 

@@ -12,7 +12,7 @@ import net.i2p.util.Log;
  */
 public class RootHandler {
 
-    private static final Log _log = new Log(RootHandler.class);
+    private static final Log _log = new Log(RootHandler.class); /* UNUSED */
 
     private RootHandler() {
         errorHandler = new ErrorHandler();
@@ -60,26 +60,24 @@ public class RootHandler {
             url = url.substring(7);
             pos = url.indexOf("/");
             String host;
-            String rest;
+
             if (pos == -1) {
                 errorHandler.handle(req, httpl, out, "No host end in URL");
                 return;
+            }
+            
+            host = url.substring(0, pos);
+            url = url.substring(pos);
+            if ("i2p".equals(host) || "i2p.i2p".equals(host)) {
+                // normal request; go on below...
+            } else if (host.endsWith(".i2p")) {
+                // "old" service request, send a redirect...
+                out.write(("HTTP/1.1 302 Moved\r\nLocation: " + "http://i2p.i2p/" + host + url + "\r\n\r\n").getBytes("ISO-8859-1"));
+                return;
             } else {
-                host = url.substring(0, pos);
-                url = url.substring(pos);
-                if ("i2p".equals(host) || "i2p.i2p".equals(host)) {
-                    // normal request; go on below...
-                } else if (host.endsWith(".i2p")) {
-                    // "old" service request, send a redirect...
-                    out
-                       .write(("HTTP/1.1 302 Moved\r\nLocation: " + "http://i2p.i2p/" + host + url + "\r\n\r\n")
-                                                                                                                .getBytes("ISO-8859-1"));
-                    return;
-                } else {
-                    // this is for proxying to the real web
-                    proxyHandler.handle(req, httpl, out /*, true */);
-                    return;
-                }
+                // this is for proxying to the real web
+                proxyHandler.handle(req, httpl, out /*, true */);
+                return;
             }
         }
         if (url.equals("/")) { // main page

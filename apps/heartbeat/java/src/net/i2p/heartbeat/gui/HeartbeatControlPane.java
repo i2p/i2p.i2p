@@ -21,7 +21,7 @@ class HeartbeatControlPane extends JPanel {
     private HeartbeatMonitorGUI _gui;
     private JTabbedPane _configPane;
     private final static Color WHITE = new Color(255, 255, 255);
-    private final static Color LIGHT_BLUE = new Color(180, 180, 255);
+    private final static Color LIGHT_BLUE = new Color(180, 180, 255); /* UNUSED */
     private final static Color BLACK = new Color(0, 0, 0);
     private Color _background = WHITE;
     private Color _foreground = BLACK;

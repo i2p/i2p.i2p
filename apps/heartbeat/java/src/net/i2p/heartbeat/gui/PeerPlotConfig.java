@@ -18,7 +18,7 @@ import net.i2p.util.Log;
  * Configure how we want to render a particular clientConfig in the GUI
  */
 class PeerPlotConfig {
-    private final static Log _log = new Log(PeerPlotConfig.class);
+    private final static Log _log = new Log(PeerPlotConfig.class); /* UNUSED */
     /** where can we find the current state/data (either as a filename or a URL)? */
     private String _location;
     /** what test are we defining the plot data for? */
@@ -170,8 +170,8 @@ class PeerPlotConfig {
         Destination peer = getClientConfig().getPeer();
         if (peer == null) 
             return "????";
-        else
-            return peer.calculateHash().toBase64().substring(0, 4);
+
+        return peer.calculateHash().toBase64().substring(0, 4);
     }
 
     /**
@@ -196,8 +196,8 @@ class PeerPlotConfig {
         int bytes = getClientConfig().getSendSize();
         if (bytes < 1024)
             return bytes + "b";
-        else 
-            return bytes/1024 + "kb";
+
+        return bytes/1024 + "kb";
     }
 
     /** 

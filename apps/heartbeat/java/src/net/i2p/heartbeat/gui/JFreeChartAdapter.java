@@ -19,7 +19,7 @@ import net.i2p.heartbeat.PeerData;
 import net.i2p.util.Log;
 
 class JFreeChartAdapter {
-    private final static Log _log = new Log(JFreeChartAdapter.class);
+    private final static Log _log = new Log(JFreeChartAdapter.class); /* UNUSED */
     private final static Color WHITE = new Color(255, 255, 255);
     
     ChartPanel createPanel(HeartbeatMonitorState state) {
@@ -45,7 +45,7 @@ class JFreeChartAdapter {
         updateLines(plot, state);
     }
     
-    private long getFirst(HeartbeatMonitorState state) {
+    private long getFirst(HeartbeatMonitorState state) { /* UNUSED */
         long first = -1;
         for (int i = 0; i < state.getTestCount(); i++) {
             List dataPoints = state.getTest(i).getCurrentData().getDataPoints();
@@ -116,6 +116,7 @@ class JFreeChartAdapter {
     }
     
     /**
+     * @param col the collection of xy series to add to
      * @param config preferences for how to display this test
      * @param lineName minimal name of the test (e.g. "jxHa.32KB.60s")
      * @param data List of PeerData.EventDataPoint describing all of the events in the test
@@ -144,6 +145,7 @@ class JFreeChartAdapter {
     /**
      * Add a data series for each average that we're configured to render
      *
+     * @param col the collection of xy series to add to
      * @param config preferences for how to display this test
      * @param lineName minimal name of the test (e.g. "jxHa.32KB.60s")
      * @param data List of PeerData.EventDataPoint describing all of the events in the test

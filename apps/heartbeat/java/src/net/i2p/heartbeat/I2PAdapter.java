@@ -46,7 +46,7 @@ class I2PAdapter {
     /** how do we talk to the router */
     private I2PSession _session;
     /** object that receives our i2cp notifications from the session and tells us */
-    private I2PListener _i2pListener;
+    private I2PListener _i2pListener; /* UNUSED */
 
     /** 
      * This config property tells us where the private destination data for our 
@@ -578,14 +578,14 @@ class I2PAdapter {
          * @see net.i2p.client.I2PSessionListener#errorOccurred(net.i2p.client.I2PSession, java.lang.String, java.lang.Throwable)
          */
         public void errorOccurred(I2PSession session, String message, Throwable error) {
-            if (_log.shouldLog(Log.ERROR)) _log.error("Error occurred", error);
+            if (_log.shouldLog(Log.ERROR)) _log.error("Error occurred: " + message, error);
         }
 
         /* (non-Javadoc)
          * @see net.i2p.client.I2PSessionListener#reportAbuse(net.i2p.client.I2PSession, int)
          */
         public void reportAbuse(I2PSession session, int severity) {
-            if (_log.shouldLog(Log.ERROR)) _log.error("Abuse reported");
+            if (_log.shouldLog(Log.ERROR)) _log.error("Abuse reported with severity " + String.valueOf(severity));
         }
 
         /* (non-Javadoc)

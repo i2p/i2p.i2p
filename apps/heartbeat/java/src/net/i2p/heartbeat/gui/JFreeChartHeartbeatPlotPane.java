@@ -14,14 +14,21 @@ import net.i2p.util.Log;
  *
  */
 class JFreeChartHeartbeatPlotPane extends HeartbeatPlotPane {
-    private final static Log _log = new Log(JFreeChartHeartbeatPlotPane.class);
+    private final static Log _log = new Log(JFreeChartHeartbeatPlotPane.class); /* UNUSED */
     private ChartPanel _panel;
     private JFreeChartAdapter _adapter;
-        
+
+    /**
+     * Creates a JFreeChart plot pane for the given gui
+     * @param gui the heartbeat monitor gui
+     */
     public JFreeChartHeartbeatPlotPane(HeartbeatMonitorGUI gui) {
         super(gui);
     }
     
+    /**
+     * Called when the state is updated
+     */
     public void stateUpdated() {
         if (_panel == null) {
             remove(0); // remove the dummy
