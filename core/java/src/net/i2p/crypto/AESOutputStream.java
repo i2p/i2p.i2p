@@ -76,8 +76,9 @@ public class AESOutputStream extends FilterOutputStream {
         flush();
         out.close();
         _inBuf.reset();
-        _log.debug("Cumulative bytes provided to this stream / written out / padded: " + _cumulativeProvided + "/"
-                   + _cumulativeWritten + "/" + _cumulativePadding);
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("Cumulative bytes provided to this stream / written out / padded: " 
+                       + _cumulativeProvided + "/" + _cumulativeWritten + "/" + _cumulativePadding);
     }
 
     public void flush() throws IOException {
@@ -111,6 +112,10 @@ public class AESOutputStream extends FilterOutputStream {
             byte data[] = DataHelper.xor(block, _lastBlock);
             byte encrypted[] = _context.AESEngine().encrypt(data, _key, _lastBlock);
             _cumulativeWritten += encrypted.length;
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Padding block " + i + " of " + numBlocks + " with 1 byte.  orig= " 
+                           + DataHelper.toHexString(data) + " (size=" + data.length + ") encrypted= " 
+                           + DataHelper.toHexString(encrypted) + " (size=" + encrypted.length + ")");
             out.write(encrypted);
             System.arraycopy(encrypted, encrypted.length - BLOCK_SIZE, _lastBlock, 0, BLOCK_SIZE);
             _cumulativePadding++;
@@ -120,6 +125,8 @@ public class AESOutputStream extends FilterOutputStream {
             // we need to do non trivial padding
             int remainingBytes = src.length - numBlocks * 15;
             int paddingBytes = BLOCK_SIZE - remainingBytes;
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Padding " + src.length + " with " + paddingBytes + " bytes in " + numBlocks + " blocks");
             System.arraycopy(src, numBlocks * 15, block, 0, remainingBytes);
             Arrays.fill(block, remainingBytes, BLOCK_SIZE, (byte) paddingBytes);
             byte data[] = DataHelper.xor(block, _lastBlock);

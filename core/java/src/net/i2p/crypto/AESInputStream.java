@@ -74,7 +74,8 @@ public class AESInputStream extends FilterInputStream {
         if (nval != null) {
             return nval.intValue();
         } else {
-            //_log.debug("No byte available.  eof? " + _eofFound);
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("No byte available.  eof? " + _eofFound);
             if (_eofFound)
                 return -1;
             else {
@@ -97,7 +98,8 @@ public class AESInputStream extends FilterInputStream {
                 dest[i] = (byte) val;
             }
         }
-        _log.debug("Read the full buffer of size " + dest.length);
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("Read the full buffer of size " + dest.length);
         return dest.length;
     }
 
@@ -133,9 +135,10 @@ public class AESInputStream extends FilterInputStream {
         _readyBuf.clear();
         _encryptedBuf.reset();
         in.close();
-        _log.debug("Cumulative bytes read from source/decrypted/stripped: " + _cumulativeRead + "/"
-                   + _cumulativePrepared + "/" + _cumulativePaddingStripped + "] remaining [" + ready + " ready, "
-                   + encrypted + " still encrypted]");
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("Cumulative bytes read from source/decrypted/stripped: " + _cumulativeRead + "/"
+                       + _cumulativePrepared + "/" + _cumulativePaddingStripped + "] remaining [" + ready + " ready, "
+                       + encrypted + " still encrypted]");
     }
 
     public void mark(int readLimit) {
@@ -182,15 +185,20 @@ public class AESInputStream extends FilterInputStream {
         if (false) return; // true to keep the data for decrypt/display on close
         if (_encryptedBuf.size() > 0) {
             if (_encryptedBuf.size() >= DECRYPT_SIZE) {
-                //_log.debug("We have " + _encryptedBuf.size() + " available to decrypt... doing so");
+                if (_log.shouldLog(Log.DEBUG))
+                    _log.debug("We have " + _encryptedBuf.size() + " available to decrypt... doing so");
                 decrypt();
-                //if (_encryptedBuf.size() > 0)
-                //    _log.debug("Bytes left in the encrypted buffer after decrypt: "  + _encryptedBuf.size());
+                if ( (_encryptedBuf.size() > 0) && (_log.shouldLog(Log.DEBUG)) )
+                    _log.debug("Bytes left in the encrypted buffer after decrypt: "  + _encryptedBuf.size());
             } else {
                 if (_eofFound) {
-                    //_log.debug("EOF and not enough bytes to decrypt [size = " + _encryptedBuf.size() + " totalCumulative: " + _cumulativeRead + "/"+_cumulativePrepared +"]!");
+                    if (_log.shouldLog(Log.DEBUG))
+                        _log.debug("EOF and not enough bytes to decrypt [size = " + _encryptedBuf.size() 
+                                   + " totalCumulative: " + _cumulativeRead + "/"+_cumulativePrepared +"]!");
                 } else {
-                    //_log.debug("Not enough bytes to decrypt [size = " + _encryptedBuf.size() + " totalCumulative: " + _cumulativeRead + "/"+_cumulativePrepared +"]");
+                    if (_log.shouldLog(Log.DEBUG))
+                        _log.debug("Not enough bytes to decrypt [size = " + _encryptedBuf.size() 
+                                   + " totalCumulative: " + _cumulativeRead + "/"+_cumulativePrepared +"]");
                 }
             }
         }
@@ -217,10 +225,12 @@ public class AESInputStream extends FilterInputStream {
             byte nencrypted[] = new byte[encrypted.length - trailing];
             System.arraycopy(encrypted, 0, nencrypted, 0, nencrypted.length);
             encrypted = nencrypted;
-            _log.warn("Decrypt got odd segment - " + trailing
-                      + " bytes pushed back for later decryption - corrupted or slow data stream perhaps?");
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Decrypt got odd segment - " + trailing
+                          + " bytes pushed back for later decryption - corrupted or slow data stream perhaps?");
         } else {
-            //_log.info(encrypted.length + " bytes makes up " + numBlocks + " blocks to decrypt normally");
+            if (_log.shouldLog(Log.INFO))
+                _log.info(encrypted.length + " bytes makes up " + numBlocks + " blocks to decrypt normally");
         }
 
         byte block[] = new byte[BLOCK_SIZE];
@@ -244,9 +254,7 @@ public class AESInputStream extends FilterInputStream {
         int remaining = encrypted.length % BLOCK_SIZE;
         if (remaining != 0) {
             _encryptedBuf.write(encrypted, encrypted.length - remaining, remaining);
-            _log
-                .debug("After pushing "
-                       + remaining
+            _log.debug("After pushing " + remaining
                        + " bytes back onto the buffer, lets delay 1s our action so we don't fast busy until the net transfers data");
             try {
                 Thread.sleep(1000);
@@ -273,13 +281,22 @@ public class AESInputStream extends FilterInputStream {
      */
     private int[] stripPadding(byte data[]) throws IOException {
         int numPadBytes = (int) data[data.length - 1];
-        if ((numPadBytes >= data.length) || (numPadBytes <= 0)) throw new IOException("Invalid number of pad bytes");
+        if ((numPadBytes >= data.length) || (numPadBytes <= 0)) {
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("stripPadding from block " + DataHelper.toHexString(data) + " (" + data.length + "bytes): "
+                           + numPadBytes + " is an invalid # of pad bytes");
+            throw new IOException("Invalid number of pad bytes (" + numPadBytes 
+                                  + ") for " + data.length + " bytes");
+        }
+        
         int rv[] = new int[data.length - numPadBytes];
         // optional, but a really good idea: verify the padding
         if (true) {
             for (int i = data.length - numPadBytes; i < data.length; i++) {
-                if (data[i] != (byte) numPadBytes) { throw new IOException("Incorrect padding on decryption: data[" + i
-                                                                           + "] = " + data[i] + " not " + numPadBytes); }
+                if (data[i] != (byte) numPadBytes) { 
+                    throw new IOException("Incorrect padding on decryption: data[" + i
+                                          + "] = " + data[i] + " not " + numPadBytes); 
+                }
             }
         }
         for (int i = 0; i < rv.length; i++)
