@@ -9,6 +9,7 @@ package net.i2p.router;
  */
 
 import net.i2p.util.Clock;
+import net.i2p.util.Log;
 /**
  * Base implementation of a Job
  */
@@ -39,7 +40,8 @@ public abstract class JobImpl implements Job {
     }
     
     void addedToQueue() {
-        _addedBy = new Exception();
+        if (_context.logManager().getLog(JobImpl.class).shouldLog(Log.DEBUG))
+            _addedBy = new Exception();
     }
     
     public Exception getAddedBy() { return _addedBy; }

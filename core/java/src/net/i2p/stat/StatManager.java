@@ -80,18 +80,20 @@ public class StatManager {
     }
 
     public void coallesceStats() {
-        for (Iterator iter = getFrequencyNames().iterator(); iter.hasNext();) {
-            String name = (String) iter.next();
-            FrequencyStat stat = getFrequency(name);
-            if (stat != null) {
-                stat.coallesceStats();
+        synchronized (_frequencyStats) {
+            for (Iterator iter = _frequencyStats.values().iterator(); iter.hasNext();) {
+                FrequencyStat stat = (FrequencyStat)iter.next();
+                if (stat != null) {
+                    stat.coallesceStats();
+                }
             }
         }
-        for (Iterator iter = getRateNames().iterator(); iter.hasNext();) {
-            String name = (String) iter.next();
-            RateStat stat = getRate(name);
-            if (stat != null) {
-                stat.coallesceStats();
+        synchronized (_rateStats) {
+            for (Iterator iter = _rateStats.values().iterator(); iter.hasNext();) {
+                RateStat stat = (RateStat)iter.next();
+                if (stat != null) {
+                    stat.coallesceStats();
+                }
             }
         }
     }
@@ -105,11 +107,11 @@ public class StatManager {
     }
 
     public Set getFrequencyNames() {
-        return Collections.unmodifiableSet(new HashSet(_frequencyStats.keySet()));
+        return new HashSet(_frequencyStats.keySet());
     }
 
     public Set getRateNames() {
-        return Collections.unmodifiableSet(new HashSet(_rateStats.keySet()));
+        return new HashSet(_rateStats.keySet());
     }
 
     /** is the given stat a monitored rate? */

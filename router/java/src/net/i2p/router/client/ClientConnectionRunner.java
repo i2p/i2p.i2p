@@ -109,8 +109,9 @@ public class ClientConnectionRunner {
     /** die a horrible death */
     void stopRunning() {
         if (_dead) return;
-        _log.error("Stop the I2CP connection!  current leaseSet: " 
-                   + _currentLeaseSet, new Exception("Stop client connection"));
+        if (_context.router().isAlive()) 
+            _log.error("Stop the I2CP connection!  current leaseSet: " 
+                       + _currentLeaseSet, new Exception("Stop client connection"));
         _dead = true;
         // we need these keys to unpublish the leaseSet
         if (_reader != null) _reader.stopReading();

@@ -568,7 +568,8 @@ class TunnelPool {
     
     public void shutdown() {
         if (_log.shouldLog(Log.INFO)) _log.info("Shutting down tunnel pool");
-        _persistenceHelper.writePool(this);
+        if (_persistenceHelper != null)
+            _persistenceHelper.writePool(this);
         _isLive = false; // the subjobs [should] check getIsLive() on each run 
         _outboundTunnels = null;
         _freeInboundTunnels = null;

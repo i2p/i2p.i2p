@@ -90,9 +90,6 @@ public class JobQueue {
     private final static int DEFAULT_MAX_WAITING_JOBS = 20;
     private final static String PROP_MAX_WAITING_JOBS = "router.maxWaitingJobs";
     
-    static {
-    }
-    
     /** 
      * queue runners wait on this whenever they're not doing anything, and 
      * this gets notified *once* whenever there are ready jobs
@@ -229,7 +226,17 @@ public class JobQueue {
     }
     
     public void allowParallelOperation() { _allowParallelOperation = true; }
-    void shutdown() { _alive = false; }
+    void shutdown() { 
+        _alive = false; 
+        StringBuffer buf = new StringBuffer(1024);
+        buf.append("jobs: \nready jobs: ").append(_readyJobs.size()).append("\n\t");
+        for (int i = 0; i < _readyJobs.size(); i++) 
+            buf.append(_readyJobs.get(i).toString()).append("\n\t");
+        buf.append("\n\ntimed jobs: ").append(_timedJobs.size()).append("\n\t");
+        for (int i = 0; i < _timedJobs.size(); i++) 
+            buf.append(_timedJobs.get(i).toString()).append("\n\t");
+        _log.log(Log.CRIT, buf.toString());
+    }
     boolean isAlive() { return _alive; }
     
     /**
@@ -276,7 +283,7 @@ public class JobQueue {
     private int checkJobTimings() {
         boolean newJobsReady = false;
         long now = _context.clock().now();
-        ArrayList toAdd = new ArrayList(4);
+        ArrayList toAdd = null;
         synchronized (_timedJobs) {
             for (int i = 0; i < _timedJobs.size(); i++) {
                 Job j = (Job)_timedJobs.get(i);
@@ -285,6 +292,7 @@ public class JobQueue {
                     if (j instanceof JobImpl)
                         ((JobImpl)j).madeReady();
 
+                    if (toAdd == null) toAdd = new ArrayList(4);
                     toAdd.add(j);
                     _timedJobs.remove(i);
                     i--; // so the index stays consistent
@@ -294,7 +302,15 @@ public class JobQueue {
 
         int ready = 0;
         synchronized (_readyJobs) {
-            _readyJobs.addAll(toAdd);
+            if (toAdd != null) {
+                // rather than addAll, which allocs a byte array rv before adding, 
+                // we iterate, since toAdd is usually going to only be 1 or 2 entries
+                // and since readyJobs will often have the space, we can avoid the
+                // extra alloc.  (no, i'm not just being insane - i'm updating this based
+                // on some profiling data ;)
+                for (int i = 0; i < toAdd.size(); i++)
+                    _readyJobs.add(toAdd.get(i));
+            }
             ready = _readyJobs.size();
         }
 
@@ -399,8 +415,36 @@ public class JobQueue {
         public void offsetChanged(long delta) {
             if (_lastLimitUpdated > 0)
                 _lastLimitUpdated += delta;
+            updateJobTimings(delta);
         }
 
+    }
+    
+    /**
+     * Update the clock data for all jobs in process or scheduled for
+     * completion.
+     */
+    private void updateJobTimings(long delta) {
+        synchronized (_timedJobs) {
+            for (int i = 0; i < _timedJobs.size(); i++) {
+                Job j = (Job)_timedJobs.get(i);
+                j.getTiming().offsetChanged(delta);
+            }
+        }
+        synchronized (_readyJobs) {
+            for (int i = 0; i < _readyJobs.size(); i++) {
+                Job j = (Job)_readyJobs.get(i);
+                j.getTiming().offsetChanged(delta);
+            }
+        }
+        synchronized (_runnerLock) {
+            for (Iterator iter = _queueRunners.values().iterator(); iter.hasNext(); ) {
+                JobQueueRunner runner = (JobQueueRunner)iter.next();
+                Job job = runner.getCurrentJob();
+                if (job != null)
+                    job.getTiming().offsetChanged(delta);
+            }
+        }
     }
     
     /**

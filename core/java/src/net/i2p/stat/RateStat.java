@@ -76,7 +76,7 @@ public class RateStat {
     private final static String NL = System.getProperty("line.separator");
 
     public String toString() {
-        StringBuffer buf = new StringBuffer(512);
+        StringBuffer buf = new StringBuffer(4096);
         buf.append(getGroupName()).append('.').append(getName()).append(": ").append(getDescription()).append('\n');
         long periods[] = getPeriods();
         Arrays.sort(periods);
@@ -103,7 +103,7 @@ public class RateStat {
     }
 
     public void store(OutputStream out, String prefix) throws IOException {
-        StringBuffer buf = new StringBuffer(128);
+        StringBuffer buf = new StringBuffer(1024);
         buf.append(NL);
         buf.append("################################################################################").append(NL);
         buf.append("# Rate: ").append(_groupName).append(": ").append(_statName).append(NL);
@@ -112,7 +112,7 @@ public class RateStat {
         out.write(buf.toString().getBytes());
         buf = null;
         for (int i = 0; i < _rates.length; i++) {
-            StringBuffer rbuf = new StringBuffer(256);
+            StringBuffer rbuf = new StringBuffer(1024);
             rbuf.append("#######").append(NL);
             rbuf.append("# Period : ").append(DataHelper.formatDuration(_rates[i].getPeriod())).append(" for rate ")
                 .append(_groupName).append(" - ").append(_statName).append(NL);

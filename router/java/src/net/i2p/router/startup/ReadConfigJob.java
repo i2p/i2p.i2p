@@ -26,6 +26,7 @@ import net.i2p.router.RouterContext;
  */
 public class ReadConfigJob extends JobImpl {
     private final static long DELAY = 30*1000; // reread every 30 seconds
+    private long _lastRead = -1;
 
     public ReadConfigJob(RouterContext ctx) {
         super(ctx);
@@ -33,9 +34,21 @@ public class ReadConfigJob extends JobImpl {
     
     public String getName() { return "Read Router Configuration"; }
     public void runJob() {
-        doRead(_context);
+        if (shouldReread()) {
+            doRead(_context);
+            _lastRead = _context.clock().now();
+        }
         getTiming().setStartAfter(_context.clock().now() + DELAY);
         _context.jobQueue().addJob(this);
+    }
+    
+    private boolean shouldReread() {
+        File configFile = new File(_context.router().getConfigFilename());
+        if (!configFile.exists()) return false;
+        if (configFile.lastModified() > _lastRead) 
+            return true;
+        else
+            return false;
     }
     
     public static void doRead(RouterContext ctx) { 

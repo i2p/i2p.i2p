@@ -73,10 +73,10 @@ public class Signature extends DataStructureImpl {
             buf.append("null signature");
         } else {
             buf.append("size: ").append(_data.length);
-            int len = 32;
-            if (len > _data.length) len = _data.length;
-            buf.append(" first ").append(len).append(" bytes: ");
-            buf.append(DataHelper.toString(_data, len));
+            //int len = 32;
+            //if (len > _data.length) len = _data.length;
+            //buf.append(" first ").append(len).append(" bytes: ");
+            //buf.append(DataHelper.toString(_data, len));
         }
         buf.append("]");
         return buf.toString();

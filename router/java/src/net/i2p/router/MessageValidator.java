@@ -35,7 +35,7 @@ public class MessageValidator {
     public MessageValidator(RouterContext context) {
         _log = context.logManager().getLog(MessageValidator.class);
         _receivedIdExpirations = new TreeMap();
-        _receivedIds = new HashSet(1024);
+        _receivedIds = new HashSet(32*1024);
         _receivedIdLock = new Object();
         _context = context;
     }
@@ -129,5 +129,11 @@ public class MessageValidator {
             _receivedIds.remove(iter.next());
         if (_log.shouldLog(Log.INFO))
             _log.info("Cleaned out " + toRemoveDates.size() + " expired messageIds, leaving " + _receivedIds.size() + " remaining");
+    }
+    
+    void shutdown() {
+        StringBuffer buf = new StringBuffer(1024);
+        buf.append("Validated messages: ").append(_receivedIds.size());
+        _log.log(Log.CRIT, buf.toString());
     }
 }

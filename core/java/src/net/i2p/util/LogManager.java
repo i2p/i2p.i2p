@@ -18,7 +18,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
-import java.util.Set;
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.HashMap;
 
@@ -68,7 +68,7 @@ public class LogManager {
 
     private String _location;
     private List _records;
-    private Set _limits;
+    private List _limits;
     private Map _logs;
     private LogWriter _writer;
 
@@ -88,7 +88,7 @@ public class LogManager {
     public LogManager(I2PAppContext context) {
         _displayOnScreen = true;
         _records = new ArrayList();
-        _limits = new HashSet();
+        _limits = new ArrayList(128);
         _logs = new HashMap(128);
         _defaultLimit = Log.DEBUG;
         _configLastRead = 0;
@@ -197,7 +197,6 @@ public class LogManager {
     //
 
     private void loadConfig() {
-        Properties p = new Properties();
         File cfgFile = new File(_location);
         if ((_configLastRead > 0) && (_configLastRead >= cfgFile.lastModified())) {
             if (_log.shouldLog(Log.DEBUG))
@@ -207,6 +206,7 @@ public class LogManager {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Loading config from " + _location);
         }
+        Properties p = new Properties();
         FileInputStream fis = null;
         try {
             fis = new FileInputStream(cfgFile);
@@ -293,7 +293,8 @@ public class LogManager {
                 LogLimit lim = new LogLimit(name, Log.getLevel(val));
                 //_log.debug("Limit found for " + name + " as " + val);
                 synchronized (_limits) {
-                    _limits.add(lim);
+                    if (!_limits.contains(lim))
+                        _limits.add(lim);
                 }
             }
         }
@@ -366,10 +367,10 @@ public class LogManager {
     }
 
     private List getLimits(Log log) {
-        ArrayList limits = new ArrayList();
+        ArrayList limits = new ArrayList(4);
         synchronized (_limits) {
-            for (Iterator iter = _limits.iterator(); iter.hasNext();) {
-                LogLimit limit = (LogLimit) iter.next();
+            for (int i = 0; i < _limits.size(); i++) {
+                LogLimit limit = (LogLimit)_limits.get(i);
                 if (limit.matches(log)) limits.add(limit);
             }
         }
@@ -395,6 +396,8 @@ public class LogManager {
     List _removeAll() {
         List vals = null;
         synchronized (_records) {
+            if (_records.size() <= 0) 
+                return null;
             vals = new ArrayList(_records);
             _records.clear();
         }
@@ -431,7 +434,7 @@ public class LogManager {
     }
 
     public void shutdown() {
-        _log.log(Log.CRIT, "Shutting down logger", new Exception("Shutdown"));
+        _log.log(Log.CRIT, "Shutting down logger");
         _writer.flushRecords();
     }
 

@@ -350,7 +350,7 @@ public class Rate {
     }
 
     public void store(OutputStream out, String prefix) throws IOException {
-        StringBuffer buf = new StringBuffer(2048);
+        StringBuffer buf = new StringBuffer(16*1048);
         PersistenceHelper.add(buf, prefix, ".period", "Number of milliseconds in the period", _period);
         PersistenceHelper.add(buf, prefix, ".creationDate",
                               "When was this rate created?  (milliseconds since the epoch, GMT)", _creationDate);

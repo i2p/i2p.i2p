@@ -5,7 +5,7 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Iterator;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.TimeZone;
 
@@ -94,7 +94,7 @@ public class MessageHistory {
             _doLog = DEFAULT_KEEP_MESSAGE_HISTORY;
             _historyFile = filename;
             _localIdent = getName(_context.routerHash());
-            _unwrittenEntries = new LinkedList();
+            _unwrittenEntries = new ArrayList(64);
             updateSettings();
             addEntry(getPrefix() + "** Router initialized (started up or changed identities)");
             _context.jobQueue().addJob(_writeJob);
@@ -338,7 +338,7 @@ public class MessageHistory {
      */
     public void sendMessage(String messageType, long messageId, Date expiration, Hash peer, boolean sentOk) {
         if (!_doLog) return;
-        StringBuffer buf = new StringBuffer(128);
+        StringBuffer buf = new StringBuffer(256);
         buf.append(getPrefix());
         buf.append("send [").append(messageType).append("] message [").append(messageId).append("] ");
         buf.append("to [").append(getName(peer)).append("] ");
@@ -363,7 +363,7 @@ public class MessageHistory {
      */
     public void receiveMessage(String messageType, long messageId, Date expiration, Hash from, boolean isValid) {
         if (!_doLog) return;
-        StringBuffer buf = new StringBuffer(128);
+        StringBuffer buf = new StringBuffer(256);
         buf.append(getPrefix());
         buf.append("receive [").append(messageType).append("] with id [").append(messageId).append("] ");
         if (from != null)
@@ -473,7 +473,7 @@ public class MessageHistory {
         if (_doPause) return;
         List entries = null;
         synchronized (_unwrittenEntries) {
-            entries = new LinkedList(_unwrittenEntries);
+            entries = new ArrayList(_unwrittenEntries);
             _unwrittenEntries.clear();
         }
         writeEntries(entries);

@@ -34,12 +34,14 @@ class JobQueueRunner implements Runnable {
     public void stopRunning() { _keepRunning = false; }
     public void run() {
         long lastActive = _context.clock().now();
+        long jobNum = 0;
         while ( (_keepRunning) && (_context.jobQueue().isAlive()) ) { 
             try {
                 Job job = _context.jobQueue().getNext();
                 if (job == null) {
-                    if (_log.shouldLog(Log.ERROR))
-                        _log.error("getNext returned null - dead?");
+                    if (_context.router().isAlive())
+                        if (_log.shouldLog(Log.ERROR))
+                            _log.error("getNext returned null - dead?");
                     continue;
                 }
                 long now = _context.clock().now();
@@ -85,13 +87,18 @@ class JobQueueRunner implements Runnable {
                 lastActive = _context.clock().now();
                 _lastJob = _currentJob;
                 _currentJob = null;
+                jobNum++;
+                
+                if ( (jobNum % 10) == 0)
+                    System.gc();
             } catch (Throwable t) {
                 if (_log.shouldLog(Log.CRIT))
                     _log.log(Log.CRIT, "WTF, error running?", t);
             }
         }
-        if (_log.shouldLog(Log.CRIT))
-            _log.log(Log.CRIT, "Queue runner " + _id + " exiting");
+        if (_context.router().isAlive())
+            if (_log.shouldLog(Log.CRIT))
+                _log.log(Log.CRIT, "Queue runner " + _id + " exiting");
         _context.jobQueue().removeRunner(_id);
     }
     
@@ -102,6 +109,7 @@ class JobQueueRunner implements Runnable {
             try {
                 if (_log.shouldLog(Log.CRIT))
                     _log.log(Log.CRIT, "Router ran out of memory, shutting down", oom);
+                _log.log(Log.CRIT, _currentJob.getClass().getName());
                 _context.router().shutdown();
             } catch (Throwable t) {	
                 System.err.println("***Router ran out of memory, shutting down hard");

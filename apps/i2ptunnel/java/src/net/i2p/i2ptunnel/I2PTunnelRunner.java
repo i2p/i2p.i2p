@@ -121,6 +121,8 @@ public class I2PTunnelRunner extends I2PThread {
         } catch (IOException ex) {
             ex.printStackTrace();
             _log.debug("Error forwarding", ex);
+        } catch (Exception e) {
+            _log.error("Internal error", e);
         } finally {
             try {
                 if (s != null) s.close();

@@ -41,6 +41,15 @@ public class OutboundMessageRegistry {
         _context.jobQueue().addJob(new CleanupPendingMessagesJob());
     }
     
+    public void shutdown() {
+        StringBuffer buf = new StringBuffer(1024);
+        buf.append("Pending messages: ").append(_pendingMessages.size()).append("\n");
+        for (Iterator iter = _pendingMessages.values().iterator(); iter.hasNext(); ) {
+            buf.append(iter.next().toString()).append("\n\t");
+        }
+        _log.log(Log.CRIT, buf.toString());
+    }
+    
     public List getOriginalMessages(I2NPMessage message) {
         HashSet matches = new HashSet(4);
         long beforeSync = _context.clock().now();

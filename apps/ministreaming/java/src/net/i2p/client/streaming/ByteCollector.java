@@ -6,7 +6,7 @@ public class ByteCollector {
     int size;
 
     public ByteCollector() {
-        contents = new byte[80];
+        contents = new byte[1024];
         size = 0;
     }
 

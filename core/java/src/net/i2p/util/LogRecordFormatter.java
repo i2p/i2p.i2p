@@ -27,7 +27,7 @@ class LogRecordFormatter {
     private final static int MAX_PRIORITY_LENGTH = 5;
 
     public static String formatRecord(LogManager manager, LogRecord rec) {
-        StringBuffer buf = new StringBuffer();
+        StringBuffer buf = new StringBuffer(1024);
         char format[] = manager._getFormat();
         for (int i = 0; i < format.length; ++i) {
             switch ((int) format[i]) {

@@ -75,11 +75,11 @@ public class ProfileOrganizer {
     public ProfileOrganizer(RouterContext context) {
         _context = context;
         _log = context.logManager().getLog(ProfileOrganizer.class);
-        _fastAndReliablePeers = new HashMap(64);
-        _reliablePeers = new HashMap(512);
-        _wellIntegratedPeers = new HashMap(256);
-        _notFailingPeers = new HashMap(1024);
-        _failingPeers = new HashMap(4096);
+        _fastAndReliablePeers = new HashMap(16);
+        _reliablePeers = new HashMap(16);
+        _wellIntegratedPeers = new HashMap(16);
+        _notFailingPeers = new HashMap(16);
+        _failingPeers = new HashMap(16);
         _strictReliabilityOrder = new TreeSet(new InverseReliabilityComparator());
         _thresholdSpeedValue = 0.0d;
         _thresholdReliabilityValue = 0.0d;
@@ -466,11 +466,9 @@ public class ProfileOrganizer {
         all.remove(_us);
         howMany -= matches.size();
         Collections.shuffle(all, _random);
-        Set rv = new HashSet(howMany);
         for (int i = 0; i < howMany && i < all.size(); i++) {
-            rv.add(all.get(i));
+            matches.add(all.get(i));
         }
-        matches.addAll(rv);
     }
     
     /**

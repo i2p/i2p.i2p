@@ -115,7 +115,7 @@ public class OutNetMessage {
     public long getMessageSize() {
         if (_messageSize <= 0) {
             try {
-                ByteArrayOutputStream baos = new ByteArrayOutputStream(4096); // large enough to hold most messages
+                ByteArrayOutputStream baos = new ByteArrayOutputStream(2048); // large enough to hold most messages
                 _message.writeBytes(baos);
                 long sz = baos.size();
                 baos.reset();
@@ -136,7 +136,7 @@ public class OutNetMessage {
                 ByteArrayOutputStream baos = new ByteArrayOutputStream(4096); // large enough to hold most messages
                 _message.writeBytes(baos);
                 byte data[] = baos.toByteArray();
-                baos.reset();
+                _messageSize = data.length;
                 return data;
             } catch (DataFormatException dfe) {
                 _log.error("Error serializing the I2NPMessage for the OutNetMessage", dfe);

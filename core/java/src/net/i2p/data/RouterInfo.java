@@ -422,7 +422,7 @@ public class RouterInfo extends DataStructureImpl {
 
     public String toString() {
         if (_stringified != null) return _stringified;
-        StringBuffer buf = new StringBuffer(128);
+        StringBuffer buf = new StringBuffer(5*1024);
         buf.append("[RouterInfo: ");
         buf.append("\n\tIdentity: ").append(getIdentity());
         buf.append("\n\tSignature: ").append(getSignature());

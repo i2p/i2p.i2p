@@ -69,10 +69,10 @@ public class SigningPublicKey extends DataStructureImpl {
             buf.append("null key");
         } else {
             buf.append("size: ").append(_data.length);
-            int len = 32;
-            if (len > _data.length) len = _data.length;
-            buf.append(" first ").append(len).append(" bytes: ");
-            buf.append(DataHelper.toString(_data, len));
+            //int len = 32;
+            //if (len > _data.length) len = _data.length;
+            //buf.append(" first ").append(len).append(" bytes: ");
+            //buf.append(DataHelper.toString(_data, len));
         }
         buf.append("]");
         return buf.toString();

@@ -73,28 +73,34 @@ public class ClientListenerRunner implements Runnable {
                             socket.close();
                         }
                     } catch (IOException ioe) {
-                        _log.error("Server error accepting", ioe);
+                        if (_context.router().isAlive()) 
+                            _log.error("Server error accepting", ioe);
                     } catch (Throwable t) {
-                        _log.error("Fatal error running client listener - killing the thread!", t);
+                        if (_context.router().isAlive()) 
+                            _log.error("Fatal error running client listener - killing the thread!", t);
                         return;
                     }
                 }
             } catch (IOException ioe) {
-                _log.error("Error listening on port " + _port, ioe);
+                if (_context.router().isAlive()) 
+                    _log.error("Error listening on port " + _port, ioe);
             }
 
             if (_socket != null) {
                 try { _socket.close(); } catch (IOException ioe) {}
                 _socket = null; 
             }
-
+            
+            if (!_context.router().isAlive()) break;
+            
             _log.error("Error listening, waiting " + _nextFailDelay + "ms before we try again");
             try { Thread.sleep(_nextFailDelay); } catch (InterruptedException ie) {}
             curDelay += _nextFailDelay;
             _nextFailDelay *= 5;
         }
 
-        _log.error("CANCELING I2CP LISTEN.  delay = " + curDelay, new Exception("I2CP Listen cancelled!!!"));
+        if (_context.router().isAlive())
+            _log.error("CANCELING I2CP LISTEN.  delay = " + curDelay, new Exception("I2CP Listen cancelled!!!"));
         _running = false;
     }
     

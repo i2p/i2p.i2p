@@ -61,8 +61,9 @@ public class VMCommSystem extends CommSystemFacade {
         } else {
             _context.jobQueue().addJob(msg.getOnSendJob());
             _context.profileManager().messageSent(msg.getTarget().getIdentity().getHash(), "vm", sendTime, msg.getMessageSize());
-            _context.statManager().addRateData("transport.sendMessageSize", msg.getMessageSize(), sendTime);
-            peerSys.receive(msg.getMessage().toByteArray(), _context.routerHash());
+            byte data[] = msg.getMessageData();
+            _context.statManager().addRateData("transport.sendMessageSize", data.length, sendTime);
+            peerSys.receive(data, _context.routerHash());
             //_context.jobQueue().addJob(new SendJob(peerSys, msg.getMessage(), _context));
             sendSuccessful = true;
         }

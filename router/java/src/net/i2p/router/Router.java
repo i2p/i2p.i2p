@@ -392,6 +392,8 @@ public class Router {
         try { _context.netDb().shutdown(); } catch (Throwable t) { _log.log(Log.CRIT, "Error shutting down the networkDb", t); }
         try { _context.commSystem().shutdown(); } catch (Throwable t) { _log.log(Log.CRIT, "Error shutting down the comm system", t); }
         try { _context.peerManager().shutdown(); } catch (Throwable t) { _log.log(Log.CRIT, "Error shutting down the peer manager", t); }
+        try { _context.messageRegistry().shutdown(); } catch (Throwable t) { _log.log(Log.CRIT, "Error shutting down the message registry", t); }
+        try { _context.messageValidator().shutdown(); } catch (Throwable t) { _log.log(Log.CRIT, "Error shutting down the message validator", t); }
         try { _sessionKeyPersistenceHelper.shutdown(); } catch (Throwable t) { _log.log(Log.CRIT, "Error shutting down the session key manager", t); }
         dumpStats();
         _log.log(Log.CRIT, "Shutdown complete", new Exception("Shutdown"));
@@ -413,7 +415,7 @@ public class Router {
     
     private class ShutdownHook extends Thread {
         public void run() {
-            _log.log(Log.CRIT, "Shutting down the router...", new Exception("Shutting down"));
+            _log.log(Log.CRIT, "Shutting down the router...");
             shutdown();
         }
     }

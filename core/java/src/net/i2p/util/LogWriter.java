@@ -53,6 +53,7 @@ class LogWriter implements Runnable {
     public void flushRecords() {
         try {
             List records = _manager._removeAll();
+            if (records == null) return;
             for (int i = 0; i < records.size(); i++) {
                 LogRecord rec = (LogRecord) records.get(i);
                 writeRecord(rec);
@@ -64,13 +65,10 @@ class LogWriter implements Runnable {
                     System.err.println("Error flushing the records");
                 }
             }
-            records.clear();
-            try {
-                Thread.sleep(30);
-            } catch (InterruptedException ie) {
-            }
         } catch (Throwable t) {
             t.printStackTrace();
+        } finally {
+            try { Thread.sleep(100); } catch (InterruptedException ie) {}
         }
         long now = Clock.getInstance().now();
         if (now - _lastReadConfig > CONFIG_READ_ITERVAL) {

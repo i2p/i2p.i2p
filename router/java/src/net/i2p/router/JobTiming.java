@@ -25,7 +25,7 @@ public class JobTiming implements Clock.ClockUpdateListener {
         _start = context.clock().now();
         _actualStart = 0;
         _actualEnd = 0;
-        context.clock().addUpdateListener(this);
+        //context.clock().addUpdateListener(this);
     }
     
     /**
