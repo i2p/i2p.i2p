@@ -46,13 +46,16 @@ public class IsFailingCalculator extends Calculator {
             //    return true;
             //}
             
-            Rate rejectRate = profile.getTunnelHistory().getRejectionRate().getRate(10*60*1000);
-            if (rejectRate.getCurrentEventCount() >= 2) {
-                if (_log.shouldLog(Log.DEBUG))
-                    _log.debug("Peer " + profile.getPeer().toBase64() 
-                               + " is failing because they rejected some tunnels recently");
-                return true;
-            }
+            // this doesn't make sense with probabalistic rejections - we should be
+            // adequately dampening the capacity so these peers aren't queried
+            
+            //Rate rejectRate = profile.getTunnelHistory().getRejectionRate().getRate(10*60*1000);
+            //if (rejectRate.getCurrentEventCount() >= 2) {
+            //    if (_log.shouldLog(Log.DEBUG))
+            //        _log.debug("Peer " + profile.getPeer().toBase64() 
+            //                   + " is failing because they rejected some tunnels recently");
+            //    return true;
+            //}
             
             ////
             // the right way to behave would be to use some statistical 

@@ -1,4 +1,9 @@
-$Id: history.txt,v 1.46 2004/10/13 14:40:47 jrandom Exp $
+$Id: history.txt,v 1.47 2004/10/14 15:02:45 jrandom Exp $
+
+2004-10-14  jrandom
+    * Tunnel rejection is no longer a sign of an overwhelmingly loaded
+      peer, so don't use it as a key point of the IsFailing calculator.
+      We still use it as a key point of the Capacity calculator, however.
 
 2004-10-14  jrandom
     * Allow for a configurable tunnel "growth factor", rather than trying
