@@ -295,6 +295,8 @@ public class OutboundClientMessageJob extends JobImpl {
                 return true;
             else
                 return false;
+        } else {
+            return false;
         }
     }
     
