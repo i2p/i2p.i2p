@@ -31,10 +31,11 @@ public class SAMHandlerFactory {
      * required by the client.
      *
      * @param s Socket attached to SAM client
+     * @param i2cpProps config options for our i2cp connection
      *
      * @return A SAM protocol handler
      */
-    public static SAMHandler createSAMHandler(Socket s) throws SAMException {
+    public static SAMHandler createSAMHandler(Socket s, Properties i2cpProps) throws SAMException {
         BufferedReader br;
         String line;
         StringTokenizer tok;
@@ -127,7 +128,7 @@ public class SAMHandlerFactory {
         try {
             switch (verMajor) {
             case 1:
-                handler = new SAMv1Handler(s, verMajor, verMinor);
+                handler = new SAMv1Handler(s, verMajor, verMinor, i2cpProps);
                 break;
             default:
                 _log.error("BUG! Trying to initialize the wrong SAM version!");

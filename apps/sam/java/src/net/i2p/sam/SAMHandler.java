@@ -13,6 +13,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
 
+import java.util.Properties;
+
 import net.i2p.util.I2PThread;
 import net.i2p.util.Log;
 
@@ -35,6 +37,9 @@ public abstract class SAMHandler implements Runnable {
 
     protected int verMajor = 0;
     protected int verMinor = 0;
+    
+    /** I2CP options configuring the I2CP connection (port, host, numHops, etc) */
+    protected Properties i2cpProps = null;
 
     private Object  stopLock = new Object();
     private boolean stopHandler = false;
@@ -45,14 +50,16 @@ public abstract class SAMHandler implements Runnable {
      * @param s Socket attached to a SAM client
      * @param verMajor SAM major version to manage
      * @param verMinor SAM minor version to manage
+     * @param i2cpProps properties to configure the I2CP connection (host, port, etc)
      */
     protected SAMHandler(Socket s,
-                         int verMajor, int verMinor) throws IOException {
+                         int verMajor, int verMinor, Properties i2cpProps) throws IOException {
         socket = s;
         socketOS = socket.getOutputStream();
 
         this.verMajor = verMajor;
         this.verMinor = verMinor;
+        this.i2cpProps = i2cpProps;
     }
 
     /**

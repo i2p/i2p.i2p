@@ -55,7 +55,20 @@ public class SAMv1Handler extends SAMHandler implements SAMRawReceiver, SAMDatag
      * @param verMinor SAM minor version to manage
      */
     public SAMv1Handler(Socket s, int verMajor, int verMinor) throws SAMException, IOException {
-        super(s, verMajor, verMinor);
+        this(s, verMajor, verMinor, new Properties());
+    }
+    /**
+     * Create a new SAM version 1 handler.  This constructor expects
+     * that the SAM HELLO message has been still answered (and
+     * stripped) from the socket input stream.
+     *
+     * @param s Socket attached to a SAM client
+     * @param verMajor SAM major version to manage (should be 1)
+     * @param verMinor SAM minor version to manage
+     * @param i2cpProps properties to configure the I2CP connection (host, port, etc)
+     */
+    public SAMv1Handler(Socket s, int verMajor, int verMinor, Properties i2cpProps) throws SAMException, IOException {
+        super(s, verMajor, verMinor, i2cpProps);
         _log.debug("SAM version 1 handler instantiated");
 
         if ((this.verMajor != 1) || (this.verMinor != 0)) {
@@ -113,6 +126,8 @@ public class SAMv1Handler extends SAMHandler implements SAMRawReceiver, SAMDatag
                                + "\"; opcode: \"" + opcode + "\")");
                 }
                 props = SAMUtils.parseParams(tok);
+                if (i2cpProps != null)
+                    props.putAll(i2cpProps); // make sure we've got the i2cp settings
 
                 if (domain.equals("STREAM")) {
                     canContinue = execStreamMessage(opcode, props);
