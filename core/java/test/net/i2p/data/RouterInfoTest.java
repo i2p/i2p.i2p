@@ -28,7 +28,7 @@ import net.i2p.util.Log;
  *
  * @author jrandom
  */
-class RouterInfoTest extends StructureTest {
+public class RouterInfoTest extends StructureTest {
     private final static Log _log = new Log(RouterInfoTest.class);
     static {
         TestData.registerTest(new RouterInfoTest(), "RouterInfo");

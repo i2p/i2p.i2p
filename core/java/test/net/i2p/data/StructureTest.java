@@ -21,7 +21,7 @@ import net.i2p.util.Log;
  *
  * @author jrandom
  */
-abstract class StructureTest implements TestDataGenerator, TestDataPrinter {
+public abstract class StructureTest implements TestDataGenerator, TestDataPrinter {
     private static final Log _log = new Log(StructureTest.class);
     
     public abstract DataStructure createDataStructure() throws DataFormatException;

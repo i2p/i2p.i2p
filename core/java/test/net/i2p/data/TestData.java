@@ -45,14 +45,14 @@ public class TestData {
         _printers.put("NullType", new TestDataPrinter() { public String testData(InputStream in) { return "Null data read successfully"; } });
     }
     
-    static void registerTest(StructureTest test, String name) {
+    public static void registerTest(StructureTest test, String name) {
         registerGenerator(test, name);
         registerPrinter(test, name);
     }
-    static void registerGenerator(TestDataGenerator test, String name) {
+    public static void registerGenerator(TestDataGenerator test, String name) {
         _generators.put(name, test);
     }
-    static void registerPrinter(TestDataPrinter test, String name) {
+    public static void registerPrinter(TestDataPrinter test, String name) {
         _printers.put(name, test);
     }
     
