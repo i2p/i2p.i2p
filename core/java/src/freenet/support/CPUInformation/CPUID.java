@@ -483,10 +483,11 @@ public class CPUID {
         }
 
         File outFile = null;
+        FileOutputStream fos = null;
         try {
             InputStream libStream = resource.openStream();
             outFile = File.createTempFile(libPrefix + "jcpuid", "lib.tmp" + libSuffix);
-            FileOutputStream fos = new FileOutputStream(outFile);
+            fos = new FileOutputStream(outFile);
             byte buf[] = new byte[4096*1024];
             while (true) {
                 int read = libStream.read(buf);
@@ -494,6 +495,7 @@ public class CPUID {
                 fos.write(buf, 0, read);
             }
             fos.close();
+            fos = null;
             System.load(outFile.getAbsolutePath());//System.load requires an absolute path to the lib
             return true;
         } catch (UnsatisfiedLinkError ule) {
@@ -510,8 +512,12 @@ public class CPUID {
             }
             return false;
         } finally {
+            if (fos != null) {
+                try { fos.close(); } catch (IOException ioe) {}
+            }
             if (outFile != null) {
-                outFile.deleteOnExit();
+                if (!outFile.delete())
+                    outFile.deleteOnExit();
             }
         }
     }
