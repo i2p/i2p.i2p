@@ -99,49 +99,12 @@ public class ProfileOrganizer {
         _persistenceHelper = new ProfilePersistenceHelper(_context);
     }
     
-    /**
-     * Order profiles by their capacity, but backwards (highest capacity / value first).
-     *
-     */
-    private final class InverseCapacityComparator implements Comparator {
-        /**
-         * Compare the two objects backwards.  The standard comparator returns
-         * -1 if lhs is less than rhs, 1 if lhs is greater than rhs, or 0 if they're
-         * equal.  To keep a strict ordering, we measure peers with equal capacity
-         * values according to their hashes
-         *
-         * @return -1 if the right hand side is smaller, 1 if the left hand side is
-         *         smaller, or 0 if they are the same peer (Comparator.compare() inverted)
-         */
-        public int compare(Object lhs, Object rhs) {
-            if ( (lhs == null) || (rhs == null) || (!(lhs instanceof PeerProfile)) || (!(rhs instanceof PeerProfile)) )
-                throw new ClassCastException("Only profiles can be compared - lhs = " + lhs + " rhs = " + rhs);
-            PeerProfile left = (PeerProfile)lhs;
-            PeerProfile right= (PeerProfile)rhs;
-             
-            double rval = right.getCapacityValue();
-            double lval = left.getCapacityValue();
-            
-            if (lval == rval) // note the following call inverts right and left (see: classname)
-                return DataHelper.compareTo(right.getPeer().getData(), left.getPeer().getData());
-            
-            boolean rightBigger = rval > lval;
-
-            //if (_log.shouldLog(Log.DEBUG))
-            //    _log.debug("The capacity of " + right.getPeer().toBase64() 
-            //               + " and " + left.getPeer().toBase64() + " marks " + (rightBigger ? "right" : "left")
-            //               + " as larger: r=" + right.getCapacityValue() 
-            //               + " l="
-            //               + left.getCapacityValue());
-                           
-            if (rightBigger)
-                return 1;
-            else
-                return -1;
-        }
-    }
-    
     public void setUs(Hash us) { _us = us; }
+    Hash getUs() { return _us; }
+    
+    public double getSpeedThreshold() { return _thresholdSpeedValue; }
+    public double getCapacityThreshold() { return _thresholdCapacityValue; }
+    public double getIntegrationThreshold() { return _thresholdIntegrationValue; }
     
     /**
      * Retrieve the profile for the given peer, if one exists (else null)
@@ -207,7 +170,6 @@ public class ProfileOrganizer {
     public boolean isHighCapacity(Hash peer) { synchronized (_reorganizeLock) { return _highCapacityPeers.containsKey(peer); } }
     public boolean isWellIntegrated(Hash peer) { synchronized (_reorganizeLock) { return _wellIntegratedPeers.containsKey(peer); } }
     public boolean isFailing(Hash peer) { synchronized (_reorganizeLock) { return _failingPeers.containsKey(peer); } }
-    
         
     /** 
      * if a peer sends us more than 5 replies in a searchReply that we cannot
@@ -234,8 +196,17 @@ public class ProfileOrganizer {
         }
         return false;
     }
-
     
+    public void exportProfile(Hash profile, OutputStream out) throws IOException {
+        PeerProfile prof = getProfile(profile);
+        if (prof != null)
+            _persistenceHelper.writeProfile(prof, out);
+    }
+    
+    public void renderStatusHTML(OutputStream out) throws IOException {
+        ProfileOrganizerRenderer rend = new ProfileOrganizerRenderer(this, _context);
+        rend.renderStatusHTML(out);
+    }
     
     /**
      * Return a set of Hashes for peers that are both fast and reliable.  If an insufficient
@@ -422,12 +393,7 @@ public class ProfileOrganizer {
             allPeers.addAll(_notFailingPeers.values());
             allPeers.addAll(_highCapacityPeers.values());
             allPeers.addAll(_fastPeers.values());
-            
-            _failingPeers.clear();
-            _notFailingPeers.clear();
-            _highCapacityPeers.clear();
-            _fastPeers.clear();
-    
+
             Set reordered = new TreeSet(_comp);
             for (Iterator iter = _strictCapacityOrder.iterator(); iter.hasNext(); ) {
                 PeerProfile prof = (PeerProfile)iter.next();
@@ -534,9 +500,6 @@ public class ProfileOrganizer {
         }
     }
     
-    public double getSpeedThreshold() { return _thresholdSpeedValue; }
-    public double getCapacityThreshold() { return _thresholdCapacityValue; }
-    
     ////////
     // no more public stuff below
     ////////
@@ -577,7 +540,6 @@ public class ProfileOrganizer {
         
         _thresholdIntegrationValue = 1.0d * avg(totalIntegration, reordered.size());
     }
-    
     
     /**
      * Update the _thresholdCapacityValue by using a few simple formulas run 
@@ -775,116 +737,6 @@ public class ProfileOrganizer {
      */
     private boolean shouldDrop(PeerProfile profile) { return false; }
     
-    public void exportProfile(Hash profile, OutputStream out) throws IOException {
-        PeerProfile prof = getProfile(profile);
-        if (prof != null)
-            _persistenceHelper.writeProfile(prof, out);
-    }
-    
-    public void renderStatusHTML(OutputStream out) throws IOException {
-        Set peers = selectAllPeers();
-        
-        long hideBefore = _context.clock().now() - 6*60*60*1000;
-        
-        TreeMap order = new TreeMap();
-        for (Iterator iter = peers.iterator(); iter.hasNext();) {
-            Hash peer = (Hash)iter.next();
-            if (_us.equals(peer)) continue;
-            PeerProfile prof = getProfile(peer);
-            if (prof.getLastSendSuccessful() <= hideBefore) continue;
-            order.put(peer.toBase64(), prof);
-        }
-        
-        int fast = 0;
-        int reliable = 0;
-        int integrated = 0;
-        int failing = 0;
-        StringBuffer buf = new StringBuffer(16*1024);
-        buf.append("<h2>Peer Profiles</h2>\n");
-        buf.append("<table border=\"1\">");
-        buf.append("<tr>");
-        buf.append("<td><b>Peer</b> (").append(order.size()).append(", hiding ").append(peers.size()-order.size()).append(")</td>");
-        buf.append("<td><b>Groups</b></td>");
-        buf.append("<td><b>Speed</b></td>");
-        buf.append("<td><b>Capacity</b></td>");
-        buf.append("<td><b>Integration</b></td>");
-        buf.append("<td><b>Failing?</b></td>");
-        buf.append("<td>&nbsp;</td>");
-        buf.append("</tr>");
-        for (Iterator iter = order.keySet().iterator(); iter.hasNext();) {
-            String name = (String)iter.next();
-            PeerProfile prof = (PeerProfile)order.get(name);
-            Hash peer = prof.getPeer();
-            
-            buf.append("<tr>");
-            buf.append("<td><code>");
-            if (prof.getIsFailing()) {
-                buf.append("<font color=\"red\">--").append(peer.toBase64().substring(0,6)).append("</font>");
-            } else {
-                if (prof.getIsActive()) {
-                    buf.append("<font color=\"blue\">++").append(peer.toBase64().substring(0,6)).append("</font>");
-                } else {
-                    buf.append("__").append(peer.toBase64().substring(0,6));
-                }
-            }
-            buf.append("</code></td>");
-            buf.append("<td>");
-            int tier = 0;
-            boolean isIntegrated = false;
-            synchronized (_reorganizeLock) {
-                if (_fastPeers.containsKey(peer)) {
-                    tier = 1;
-                    fast++;
-                    reliable++;
-                } else if (_highCapacityPeers.containsKey(peer)) {
-                    tier = 2;
-                    reliable++;
-                } else if (_notFailingPeers.containsKey(peer)) {
-                    tier = 3;
-                } else {
-                    failing++;
-                }
-                
-                if (_wellIntegratedPeers.containsKey(peer)) {
-                    isIntegrated = true;
-                    integrated++;
-                }
-            }
-            
-            switch (tier) {
-                case 1: buf.append("Fast"); break;
-                case 2: buf.append("High Capacity"); break;
-                case 3: buf.append("Not Failing"); break;
-                default: buf.append("Failing"); break;
-            }
-            if (isIntegrated) buf.append(", Integrated");
-            
-            buf.append("<td align=\"right\">").append(num(prof.getSpeedValue())).append("</td>");
-            buf.append("<td align=\"right\">").append(num(prof.getCapacityValue())).append("</td>");
-            buf.append("<td align=\"right\">").append(num(prof.getIntegrationValue())).append("</td>");
-            buf.append("<td align=\"right\">").append(prof.getIsFailing()).append("</td>");
-            //buf.append("<td><a href=\"/profile/").append(prof.getPeer().toBase64().substring(0, 32)).append("\">profile.txt</a> ");
-            //buf.append("    <a href=\"#").append(prof.getPeer().toBase64().substring(0, 32)).append("\">netDb</a></td>");
-            buf.append("<td><a href=\"netdb.jsp#").append(peer.toBase64().substring(0,6)).append("\">netDb</a></td>\n");
-            buf.append("</tr>");
-        }
-        buf.append("</table>");
-        buf.append("<i>Definitions:<ul>");
-        buf.append("<li><b>speed</b>: how many round trip messages can we pump through the peer per minute?</li>");
-        buf.append("<li><b>capacity</b>: how many tunnels can we ask them to join in an hour?</li>");
-        buf.append("<li><b>integration</b>: how many new peers have they told us about lately?</li>");
-        buf.append("<li><b>failing?</b>: is the peer currently swamped (and if possible we should avoid nagging them)?</li>");
-        buf.append("</ul></i>");
-        buf.append("Red peers prefixed with '--' means the peer is failing, and blue peers prefixed ");
-        buf.append("with '++' means we've sent or received a message from them ");
-        buf.append("in the last five minutes</i><br />");
-        buf.append("<b>Thresholds:</b><br />");
-        buf.append("<b>Speed:</b> ").append(num(_thresholdSpeedValue)).append(" (").append(fast).append(" fast peers)<br />");
-        buf.append("<b>Capacity:</b> ").append(num(_thresholdCapacityValue)).append(" (").append(reliable).append(" high capacity peers)<br />");
-        buf.append("<b>Integration:</b> ").append(num(_thresholdIntegrationValue)).append(" (").append(integrated).append(" well integrated peers)<br />");
-        out.write(buf.toString().getBytes());
-    }
-    
     /**
      * Defines the minimum number of 'fast' peers that the organizer should select.  If
      * the profile calculators derive a threshold that does not select at least this many peers,
@@ -895,20 +747,6 @@ public class ProfileOrganizer {
      * @return minimum number of peers to be placed in the 'fast' group
      */
     protected int getMinimumFastPeers() {
-        if (_context.router() != null) {
-            String val = _context.router().getConfigSetting(PROP_MINIMUM_FAST_PEERS);
-            if (val != null) {
-                try {
-                    int rv = Integer.parseInt(val);
-                    if (_log.shouldLog(Log.DEBUG)) 
-                        _log.debug("router config said " + PROP_MINIMUM_FAST_PEERS + '=' + val);
-                    return rv;
-                } catch (NumberFormatException nfe) {
-                    if (_log.shouldLog(Log.WARN))
-                        _log.warn("Minimum fast peers improperly set in the router config [" + val + "]", nfe);
-                }
-            }
-        }
         String val = _context.getProperty(PROP_MINIMUM_FAST_PEERS, ""+DEFAULT_MINIMUM_FAST_PEERS);
         if (val != null) {
             try {
@@ -938,20 +776,6 @@ public class ProfileOrganizer {
      * @return minimum number of peers to be placed in the 'fast' group
      */
     protected int getMinimumHighCapacityPeers() {
-        if (_context.router() != null) {
-            String val = _context.router().getConfigSetting(PROP_MINIMUM_HIGH_CAPACITY_PEERS);
-            if (val != null) {
-                try {
-                    int rv = Integer.parseInt(val);
-                    if (_log.shouldLog(Log.DEBUG)) 
-                        _log.debug("router config said " + PROP_MINIMUM_HIGH_CAPACITY_PEERS + '=' + val);
-                    return rv;
-                } catch (NumberFormatException nfe) {
-                    if (_log.shouldLog(Log.WARN))
-                        _log.warn("Minimum high capacity peers improperly set in the router config [" + val + "]", nfe);
-                }
-            }
-        }
         String val = _context.getProperty(PROP_MINIMUM_HIGH_CAPACITY_PEERS, ""+DEFAULT_MINIMUM_HIGH_CAPACITY_PEERS);
         if (val != null) {
             try {
@@ -969,7 +793,6 @@ public class ProfileOrganizer {
             _log.debug("no config for " + PROP_MINIMUM_HIGH_CAPACITY_PEERS + ", using " + DEFAULT_MINIMUM_HIGH_CAPACITY_PEERS);
         return DEFAULT_MINIMUM_HIGH_CAPACITY_PEERS;
     }
-    
     
     private final static DecimalFormat _fmt = new DecimalFormat("###,##0.00", new DecimalFormatSymbols(Locale.UK));
     private final static String num(double num) { synchronized (_fmt) { return _fmt.format(num); } }

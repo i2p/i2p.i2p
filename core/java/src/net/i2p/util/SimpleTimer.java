@@ -64,6 +64,8 @@ public class SimpleTimer {
     
     private class SimpleTimerRunner implements Runnable {
         public void run() {
+            List eventsToFire = new ArrayList(1);
+            List timesToRemove = new ArrayList(1);
             while (true) {
                 try {
                     synchronized (_events) {
@@ -71,34 +73,48 @@ public class SimpleTimer {
                             _events.wait();
                         long now = System.currentTimeMillis();
                         long nextEventDelay = -1;
-                        List removed = null;
                         for (Iterator iter = _events.keySet().iterator(); iter.hasNext(); ) {
                             Long when = (Long)iter.next();
                             if (when.longValue() <= now) {
                                 TimedEvent evt = (TimedEvent)_events.get(when);
-                                try {
-                                    evt.timeReached();
-                                } catch (Throwable t) {
-                                    log("wtf, event borked: " + evt, t);
-                                }
-                                if (removed == null)
-                                    removed = new ArrayList(1);
-                                removed.add(when);
+                                eventsToFire.add(evt);
+                                timesToRemove.add(when);
                             } else {
                                 nextEventDelay = when.longValue() - now;
                                 break;
                             }
                         }
-                        if (removed != null) {
-                            for (int i = 0; i < removed.size(); i++) 
-                                _events.remove(removed.get(i));
+                        if (timesToRemove.size() > 0) { 
+                            for (int i = 0; i < timesToRemove.size(); i++) 
+                                _events.remove(timesToRemove.get(i));
+                        } else { 
+                            if (nextEventDelay != -1)
+                                _events.wait(nextEventDelay);
+                            else
+                                _events.wait();
                         }
-                        if (nextEventDelay != -1)
-                            _events.wait(nextEventDelay);
-                        else
-                            _events.wait();
                     }
-                } catch (InterruptedException ie) {}
+                } catch (InterruptedException ie) {
+                    // ignore
+                } catch (Throwable t) {
+                    if (_log != null) {
+                        _log.log(Log.CRIT, "Uncaught exception in the SimpleTimer!", t);
+                    } else {
+                        System.err.println("Uncaught exception in SimpleTimer");
+                        t.printStackTrace();
+                    }
+                }
+                
+                for (int i = 0; i < eventsToFire.size(); i++) {
+                    TimedEvent evt = (TimedEvent)eventsToFire.get(i);
+                    try {
+                        evt.timeReached();
+                    } catch (Throwable t) {
+                        log("wtf, event borked: " + evt, t);
+                    }
+                }
+                eventsToFire.clear();
+                timesToRemove.clear();
             }
         }
     }

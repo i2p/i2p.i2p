@@ -17,6 +17,8 @@ import java.util.List;
 import java.util.Properties;
 
 import net.i2p.I2PException;
+import net.i2p.client.I2PSession;
+import net.i2p.client.I2PSessionException;
 import net.i2p.client.streaming.I2PSocket;
 import net.i2p.client.streaming.I2PSocketManager;
 import net.i2p.client.streaming.I2PSocketManagerFactory;
@@ -118,7 +120,16 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
         return getSocketManager(getTunnel());
     }
     protected static synchronized I2PSocketManager getSocketManager(I2PTunnel tunnel) {
-        if (socketManager == null) {
+        if (socketManager != null) {
+            I2PSession s = socketManager.getSession();
+            if ( (s == null) || (s.isClosed()) ) {
+                _log.info("Building a new socket manager since the old one closed [s=" + s + "]");
+                socketManager = buildSocketManager(tunnel);
+            } else {
+                _log.info("Not building a new socket manager since the old one is open [s=" + s + "]");
+            }
+        } else {
+            _log.info("Building a new socket manager since there is no other one");
             socketManager = buildSocketManager(tunnel);
         }
         return socketManager;
@@ -277,7 +288,10 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
                 }
                 return false;
             }
-            getTunnel().removeSession(sockMgr.getSession());
+            I2PSession session = sockMgr.getSession();
+            if (session != null) {
+                getTunnel().removeSession(session);
+            }
             l.log("Closing client " + toString());
             try {
                 if (ss != null) ss.close();

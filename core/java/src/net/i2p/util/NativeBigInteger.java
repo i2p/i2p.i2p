@@ -485,7 +485,7 @@ public class NativeBigInteger extends BigInteger {
         FileOutputStream fos = null;
         try {
             InputStream libStream = resource.openStream();
-            outFile = File.createTempFile(_libPrefix + "jbigi", "lib.tmp" + _libSuffix);
+            outFile = new File(_libPrefix + "jbigi" + _libSuffix);
             fos = new FileOutputStream(outFile);
             byte buf[] = new byte[4096*1024];
             while (true) {
@@ -513,10 +513,6 @@ public class NativeBigInteger extends BigInteger {
         } finally {
             if (fos != null) {
                 try { fos.close(); } catch (IOException ioe) {}
-            }
-            if (outFile != null) {
-                if (!outFile.delete())
-                    outFile.deleteOnExit();
             }
         }
     }

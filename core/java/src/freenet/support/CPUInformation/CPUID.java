@@ -417,17 +417,17 @@ public class CPUID {
         String wantedProp = System.getProperty("jcpuid.enable", "true");
         boolean wantNative = "true".equalsIgnoreCase(wantedProp);
         if (wantNative) {
-            boolean loaded = loadFromResource();
+            boolean loaded = loadGeneric();
             if (loaded) {
                 _nativeOk = true;
                 if (_doLog)
-                    System.err.println("INFO: Native CPUID library '"+getResourceName()+"' loaded from resource");
+                    System.err.println("INFO: Native CPUID library '"+getLibraryMiddlePart()+"' loaded from somewhere in the path");
             } else {
-                loaded = loadGeneric();
+                loaded = loadFromResource();
                 if (loaded) {
                     _nativeOk = true;
                     if (_doLog)
-                        System.err.println("INFO: Native CPUID library '"+getLibraryMiddlePart()+"' loaded from somewhere in the path");
+                        System.err.println("INFO: Native CPUID library '"+getResourceName()+"' loaded from resource");
                 } else {
                     _nativeOk = false;
                     if (_doLog)
@@ -451,6 +451,12 @@ public class CPUID {
      *
      */
     private static final boolean loadGeneric() {
+        try {
+            System.loadLibrary("jcpuid");
+            return true;
+        } catch (UnsatisfiedLinkError ule) {
+            // fallthrough, try the OS-specific filename
+        }
         try {
             System.loadLibrary(getLibraryMiddlePart());
             return true;
@@ -486,7 +492,7 @@ public class CPUID {
         FileOutputStream fos = null;
         try {
             InputStream libStream = resource.openStream();
-            outFile = File.createTempFile(libPrefix + "jcpuid", "lib.tmp" + libSuffix);
+            outFile = new File(libPrefix + "jcpuid" + libSuffix);
             fos = new FileOutputStream(outFile);
             byte buf[] = new byte[4096*1024];
             while (true) {
@@ -514,10 +520,6 @@ public class CPUID {
         } finally {
             if (fos != null) {
                 try { fos.close(); } catch (IOException ioe) {}
-            }
-            if (outFile != null) {
-                if (!outFile.delete())
-                    outFile.deleteOnExit();
             }
         }
     }

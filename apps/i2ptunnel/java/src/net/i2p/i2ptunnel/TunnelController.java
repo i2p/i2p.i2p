@@ -28,6 +28,7 @@ public class TunnelController implements Logging {
     private Properties _config;
     private I2PTunnel _tunnel;
     private List _messages;
+    private List _sessions;
     private boolean _running;
     
     /**
@@ -144,7 +145,40 @@ public class TunnelController implements Logging {
             _tunnel.runHttpClient(new String[] { listenPort }, this);
         else
             _tunnel.runHttpClient(new String[] { listenPort, proxyList }, this);
+        acquire();
         _running = true;
+    }
+    
+    /** 
+     * Note the fact that we are using some sessions, so that they dont get
+     * closed by some other tunnels
+     */
+    private void acquire() {
+        List sessions = _tunnel.getSessions();
+        if (sessions != null) {
+            for (int i = 0; i < sessions.size(); i++) {
+                I2PSession session = (I2PSession)sessions.get(i);
+                TunnelControllerGroup.getInstance().acquire(this, session);
+            }
+            _sessions = sessions;
+        } else {
+            _log.error("No sessions to acquire?");
+        }
+    }
+    
+    /** 
+     * Note the fact that we are no longer using some sessions, and if
+     * no other tunnels are using them, close them.
+     */
+    private void release() {
+        if (_sessions != null) {
+            for (int i = 0; i < _sessions.size(); i++) {
+                I2PSession s = (I2PSession)_sessions.get(i);
+                TunnelControllerGroup.getInstance().release(this, s);
+            }
+        } else {
+            _log.error("No sessions to release?");
+        }
     }
     
     private void startClient() {
@@ -154,6 +188,7 @@ public class TunnelController implements Logging {
         String listenPort = getListenPort(); 
         String dest = getTargetDestination();
         _tunnel.runClient(new String[] { listenPort, dest }, this);
+        acquire();
         _running = true;
     }
 
@@ -164,6 +199,7 @@ public class TunnelController implements Logging {
         String targetPort = getTargetPort(); 
         String privKeyFile = getPrivKeyFile(); 
         _tunnel.runServer(new String[] { targetHost, targetPort, privKeyFile }, this);
+        acquire();
         _running = true;
     }
     
@@ -201,6 +237,7 @@ public class TunnelController implements Logging {
     
     public void stopTunnel() {
         _tunnel.runClose(new String[] { "forced", "all" }, this);
+        release();
         _running = false;
     }
     

@@ -354,7 +354,12 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
             _pendingSizes = new ArrayList(2);
         }
         
-        public void stopNotifying() { _alive = false; }
+        public void stopNotifying() { 
+            _alive = false; 
+            synchronized (AvailabilityNotifier.this) {
+                AvailabilityNotifier.this.notifyAll();
+            }
+        }
         
         public void available(int msgId, int size) {
             synchronized (AvailabilityNotifier.this) {
@@ -499,7 +504,7 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
     public void destroySession(boolean sendDisconnect) {
         if (_closed) return;
         
-        if (_log.shouldLog(Log.DEBUG)) _log.debug(getPrefix() + "Destroy the session", new Exception("DestroySession()"));
+        if (_log.shouldLog(Log.INFO)) _log.info(getPrefix() + "Destroy the session", new Exception("DestroySession()"));
         if (sendDisconnect) {
             try {
                 _producer.disconnect(this);
@@ -518,7 +523,7 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
      *
      */
     private void closeSocket() {
-        if (_log.shouldLog(Log.DEBUG)) _log.debug(getPrefix() + "Closing the socket", new Exception("closeSocket"));
+        if (_log.shouldLog(Log.INFO)) _log.info(getPrefix() + "Closing the socket", new Exception("closeSocket"));
         _closed = true;
         if (_reader != null) _reader.stopReading();
         _reader = null;

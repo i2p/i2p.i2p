@@ -67,9 +67,13 @@ class RequestLeaseSetMessageHandler extends HandlerImpl {
             synchronized (_existingLeaseSets) {
                 _existingLeaseSets.put(session.getMyDestination(), li);
             }
-            _log.debug("Creating new leaseInfo keys", new Exception("new leaseInfo keys"));
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Creating new leaseInfo keys for "  
+                           + session.getMyDestination().calculateHash().toBase64());
         } else {
-            _log.debug("Caching the old leaseInfo keys", new Exception("cached!  w00t"));
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Caching the old leaseInfo keys for " 
+                           + session.getMyDestination().calculateHash().toBase64());
         }
 
         leaseSet.setEncryptionKey(li.getPublicKey());

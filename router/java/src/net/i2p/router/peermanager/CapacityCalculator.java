@@ -78,8 +78,6 @@ public class CapacityCalculator extends Calculator {
         Rate curAccepted = acceptStat.getRate(period);
         Rate curRejected = rejectStat.getRate(period);
         Rate curFailed = failedStat.getRate(period);
-        if (curRejected.getCurrentEventCount() + curRejected.getLastEventCount() > 0)
-            return 0.0d;
 
         long eventCount = 0;
         if (curAccepted != null)
@@ -91,6 +89,12 @@ public class CapacityCalculator extends Calculator {
             failed = curFailed.getCurrentEventCount() + curFailed.getLastEventCount();
         if (failed > 0)
             val -= failed * stretch;
+        
+        if ( (period == 10*60*1000) && (curRejected.getCurrentEventCount() + curRejected.getLastEventCount() > 0) )
+            return 0.0d;
+        else
+            val -= stretch * (curRejected.getCurrentEventCount() + curRejected.getLastEventCount());
+        
         if (val >= 0) {
             return (val + GROWTH_FACTOR) * periodWeight(period);
         } else {

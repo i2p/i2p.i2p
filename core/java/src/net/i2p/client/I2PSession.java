@@ -101,6 +101,13 @@ public interface I2PSession {
      */
     public void connect() throws I2PSessionException;
 
+    /** 
+     * Have we closed the session? 
+     *
+     * @return true if the session is closed
+     */
+    public boolean isClosed();
+    
     /**
      * Retrieve the Destination this session serves as the endpoint for.
      * Returns null if no destination is available.

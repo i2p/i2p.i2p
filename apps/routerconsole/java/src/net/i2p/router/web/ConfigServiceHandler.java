@@ -15,32 +15,40 @@ import org.tanukisoftware.wrapper.WrapperManager;
 public class ConfigServiceHandler extends FormHandler {
     public void ConfigNetHandler() {}
     
+    private class UpdateWrapperManagerTask implements Runnable {
+        private int _exitCode;
+        public UpdateWrapperManagerTask(int exitCode) {
+            _exitCode = exitCode;
+        }
+        public void run() {
+            try {
+                WrapperManager.signalStopped(_exitCode);
+            } catch (Throwable t) {
+                t.printStackTrace();
+            }
+        }
+    }
+    
     protected void processForm() {
         if (_action == null) return;
         
         if ("Shutdown gracefully".equals(_action)) {
-            try { 
-                WrapperManager.signalStopped(Router.EXIT_GRACEFUL);
-            } catch (Throwable t) {
-                addFormError("Warning: unable to contact the service manager - " + t.getMessage());
-            }
+            _context.router().addShutdownTask(new UpdateWrapperManagerTask(Router.EXIT_GRACEFUL));
             _context.router().shutdownGracefully();
             addFormNotice("Graceful shutdown initiated");
         } else if ("Shutdown immediately".equals(_action)) {
-            try {
-                WrapperManager.signalStopped(Router.EXIT_HARD);
-            } catch (Throwable t) {
-                addFormError("Warning: unable to contact the service manager - " + t.getMessage());
-            }
+            _context.router().addShutdownTask(new UpdateWrapperManagerTask(Router.EXIT_HARD));
             _context.router().shutdown(Router.EXIT_HARD);
             addFormNotice("Shutdown immediately!  boom bye bye bad bwoy");
         } else if ("Cancel graceful shutdown".equals(_action)) {
             _context.router().cancelGracefulShutdown();
             addFormNotice("Graceful shutdown cancelled");
         } else if ("Graceful restart".equals(_action)) {
+            _context.router().addShutdownTask(new UpdateWrapperManagerTask(Router.EXIT_GRACEFUL_RESTART));
             _context.router().shutdownGracefully(Router.EXIT_GRACEFUL_RESTART);
             addFormNotice("Graceful restart requested");
         } else if ("Hard restart".equals(_action)) {
+            _context.router().addShutdownTask(new UpdateWrapperManagerTask(Router.EXIT_HARD_RESTART));
             _context.router().shutdown(Router.EXIT_HARD_RESTART);
             addFormNotice("Hard restart requested");
         } else if ("Run I2P on startup".equals(_action)) {

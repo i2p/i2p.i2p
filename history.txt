@@ -1,4 +1,26 @@
-$Id: history.txt,v 1.7 2004/09/04 16:54:09 jrandom Exp $
+$Id: history.txt,v 1.8 2004/09/06 00:20:42 jrandom Exp $
+
+2004-09-07  jrandom
+    * Write the native libraries to the current directory when they are loaded 
+      from a resource, and load them from that file on subsequent runs (in 
+      turn, we no longer *cough* delete the running libraries...)
+    * Added support for a graceful restart.
+    * Added new pseudo-shutdown hook specific to the router, allowing 
+      applications to request tasks to be run when the router shuts down.  We
+      use this for integration with the service manager, since otherwise a 
+      graceful shutdown would cause a timeout, followed by a forced hard 
+      shutdown.
+    * Handle a bug in the SimpleTimer with requeued tasks.
+    * Made the capacity calculator a bit more dynamic by not outright ignoring
+      the otherwise valid capacity data for a period with a single rejected
+      tunnel (except for the 10 minute period).  In addition, peers with an
+      equal capacity are ordered by speed rather than by their hashes.
+    * Cleaned up the SimpleTimer, addressing some threading and synchronization
+      issues.
+    * When an I2PTunnel client or httpclient is explicitly closed, destroy the
+      associated session (unless there are other clients using it), and deal
+      with a closed session when starting a new I2PTunnel instance.
+    * Refactoring and logging.
 
 2004-09-06  jrandom
     * Address a race condition in the key management code that would manifest

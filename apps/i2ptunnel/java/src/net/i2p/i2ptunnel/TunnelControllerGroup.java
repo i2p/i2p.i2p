@@ -8,13 +8,18 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 import java.util.TreeMap;
 
 import net.i2p.I2PAppContext;
+import net.i2p.client.I2PSession;
+import net.i2p.client.I2PSessionException;
 import net.i2p.util.Log;
 
 /**
@@ -30,23 +35,33 @@ public class TunnelControllerGroup {
     private List _controllers;
     private String _configFile = DEFAULT_CONFIG_FILE;
     
+    /** 
+     * Map of I2PSession to a Set of TunnelController objects 
+     * using the session (to prevent closing the session until
+     * no more tunnels are using it)
+     *
+     */
+    private Map _sessions;
+    
     public static TunnelControllerGroup getInstance() { return _instance; }
 
     private TunnelControllerGroup(String configFile) {
         _log = I2PAppContext.getGlobalContext().logManager().getLog(TunnelControllerGroup.class);
+        _instance = this;
         _controllers = new ArrayList();
         _configFile = configFile;
+        _sessions = new HashMap(4);
         loadControllers(_configFile);
     }
 
     public static void main(String args[]) {
         if ( (args == null) || (args.length <= 0) ) {
-            _instance = new TunnelControllerGroup(DEFAULT_CONFIG_FILE);
+            new TunnelControllerGroup(DEFAULT_CONFIG_FILE);
         } else if (args.length == 1) {
             if (DEFAULT_CONFIG_FILE.equals(args[0]))
-                _instance = new TunnelControllerGroup(DEFAULT_CONFIG_FILE);
+                new TunnelControllerGroup(DEFAULT_CONFIG_FILE);
             else
-                _instance = new TunnelControllerGroup(args[0]);
+                new TunnelControllerGroup(args[0]);
         } else {
             System.err.println("Usage: TunnelControllerGroup [filename]");
             return;
@@ -281,4 +296,61 @@ public class TunnelControllerGroup {
      */
     public List getControllers() { return _controllers; }
     
+    
+    /** 
+     * Note the fact that the controller is using the session so that
+     * it isn't destroyed prematurely.
+     *
+     */
+    void acquire(TunnelController controller, I2PSession session) {
+        synchronized (_sessions) {
+            Set owners = (Set)_sessions.get(session);
+            if (owners == null) {
+                owners = new HashSet(1);
+                _sessions.put(session, owners);
+            }
+            owners.add(controller);
+        }
+        if (_log.shouldLog(Log.INFO))
+            _log.info("Acquiring session " + session + " for " + controller);
+
+    }
+    
+    /** 
+     * Note the fact that the controller is no longer using the session, and if
+     * no other controllers are using it, destroy the session.
+     *
+     */
+    void release(TunnelController controller, I2PSession session) {
+        boolean shouldClose = false;
+        synchronized (_sessions) {
+            Set owners = (Set)_sessions.get(session);
+            if (owners != null) {
+                owners.remove(controller);
+                if (owners.size() <= 0) {
+                    if (_log.shouldLog(Log.INFO))
+                        _log.info("After releasing session " + session + " by " + controller + ", no more owners remain");
+                    shouldClose = true;
+                    _sessions.remove(session);
+                } else {
+                    if (_log.shouldLog(Log.INFO))
+                        _log.info("After releasing session " + session + " by " + controller + ", " + owners.size() + " owners remain");
+                    shouldClose = false;
+                }
+            } else {
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("After releasing session " + session + " by " + controller + ", no owners were even known?!");
+                shouldClose = true;
+            }
+        }
+        if (shouldClose) {
+            try {
+                session.destroySession();
+                if (_log.shouldLog(Log.INFO))
+                    _log.info("Session destroyed: " + session);
+            } catch (I2PSessionException ise) {
+                _log.error("Error closing the client session", ise);
+            }
+        }
+    }
 }

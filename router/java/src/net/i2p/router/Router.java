@@ -59,6 +59,7 @@ public class Router {
     private I2PThread.OOMEventListener _oomListener;
     private ShutdownHook _shutdownHook;
     private I2PThread _gracefulShutdownDetector;
+    private Set _shutdownTasks;
     
     public final static String PROP_CONFIG_FILE = "router.configLocation";
     
@@ -123,6 +124,8 @@ public class Router {
         _gracefulShutdownDetector.setDaemon(true);
         _gracefulShutdownDetector.setName("Graceful shutdown hook");
         _gracefulShutdownDetector.start();
+        
+        _shutdownTasks = new HashSet(0);
     }
     
     /**
@@ -542,6 +545,12 @@ public class Router {
         buf.setLength(0);
     }
     
+    public void addShutdownTask(Runnable task) {
+        synchronized (_shutdownTasks) {
+            _shutdownTasks.add(task);
+        }
+    }
+    
     public static final int EXIT_GRACEFUL = 2;
     public static final int EXIT_HARD = 3;
     public static final int EXIT_OOM = 10;
@@ -564,6 +573,14 @@ public class Router {
         try { _sessionKeyPersistenceHelper.shutdown(); } catch (Throwable t) { _log.log(Log.CRIT, "Error shutting down the session key manager", t); }
         _context.listContexts().remove(_context);
         dumpStats();
+        try {
+            for (Iterator iter = _shutdownTasks.iterator(); iter.hasNext(); ) {
+                Runnable task = (Runnable)iter.next();
+                task.run();
+            }
+        } catch (Throwable t) {
+            _log.log(Log.CRIT, "Error running shutdown task", t);
+        }
         _log.log(Log.CRIT, "Shutdown(" + exitCode + ") complete", new Exception("Shutdown"));
         try { _context.logManager().shutdown(); } catch (Throwable t) { }
         File f = new File(getPingFile());
