@@ -120,7 +120,7 @@ public class FragmentedMessage {
         _lastReceived = isLast;
         _toRouter = toRouter;
         _toTunnel = toTunnel;
-        if (isLast)
+        if (_highFragmentNum < 0)
             _highFragmentNum = 0;
     }
     

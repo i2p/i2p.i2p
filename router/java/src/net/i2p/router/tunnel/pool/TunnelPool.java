@@ -278,8 +278,8 @@ public class TunnelPool {
     }
 
     public void tunnelFailed(PooledTunnelCreatorConfig cfg) {
-        if (_log.shouldLog(Log.ERROR))
-            _log.error(toString() + ": Tunnel failed: " + cfg, new Exception("failure cause"));
+        if (_log.shouldLog(Log.WARN))
+            _log.warn(toString() + ": Tunnel failed: " + cfg, new Exception("failure cause"));
         int remaining = 0;
         LeaseSet ls = null;
         synchronized (_tunnels) {
