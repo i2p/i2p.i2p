@@ -250,6 +250,14 @@ class RestrictiveTCPConnection extends TCPConnection {
         long start = _context.clock().now();
         long success = 0;
         if (_log.shouldLog(Log.DEBUG)) _log.debug("Establishing connection...");
+        int port = _socket.getPort();
+        String host = null;
+        // sun keeps the socket's InetAddress around after its been closed, but kaffe (and the rest of classpath)
+        // doesn't, so we've got to check & cache it here if we want to log it later.  (kaffe et al are acting per
+        // spec, btw)
+        if (_socket.isConnected())
+            host = _socket.getInetAddress().getHostName();
+        
         BigInteger myPub = _builder.getMyPublicValue();
         try {
             _socket.setSoTimeout(ESTABLISHMENT_TIMEOUT);
@@ -307,17 +315,17 @@ class RestrictiveTCPConnection extends TCPConnection {
             
         } catch (IOException ioe) {
             if (_log.shouldLog(Log.WARN))
-                _log.warn("Error establishing connection with " + _socket.getInetAddress().getHostAddress() + ":" + _socket.getPort(), ioe);
+                _log.warn("Error establishing connection with " + host + ":" + port, ioe);
             closeConnection();
             return null;
         } catch (DataFormatException dfe) {
             if (_log.shouldLog(Log.WARN))
-                _log.warn("Error establishing connection with " + _socket.getInetAddress().getHostAddress() + ":" + _socket.getPort(), dfe);
+                _log.warn("Error establishing connection with " + host + ":" + port, dfe);
             closeConnection();
             return null;
         } catch (Throwable t) {
             if (_log.shouldLog(Log.ERROR))
-                _log.error("jrandom is paranoid so we're catching it all during establishConnection " + _socket.getInetAddress().getHostAddress() + ":" + _socket.getPort(), t);
+                _log.error("jrandom is paranoid so we're catching it all during establishConnection " + host + ":" + port, t);
             closeConnection();
             return null;
         } finally {
