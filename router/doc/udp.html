@@ -1,4 +1,4 @@
-<code>$Id: udp.html,v 1.4 2005/03/26 04:19:42 jrandom Exp $</code>
+<code>$Id: udp.html,v 1.5 2005/03/26 04:22:17 jrandom Exp $</code>
 
 <h1>Secure Semireliable UDP (SSU)</h1>
 <b>DRAFT</b>
@@ -43,11 +43,12 @@ size payload encrypted with the appropriate key.  The MAC used is
 HMAC-SHA256, truncated to 16 bytes, while the key is a full AES256 
 key.  The specific construct of the MAC is the first 16 bytes from:</p>
 <pre>
-  HMAC-SHA256(payload, HMAC-SHA256(IV || payloadLength, key))
+  HMAC-SHA256(payload || IV || payloadLength, macKey)
 </pre>
 
-<p>The payload itself is AES256/CBC encrypted with the IV and the key,
-with replay prevention addressed within its body, explained below.</p>
+<p>The payload itself is AES256/CBC encrypted with the IV and the 
+sessionKey, with replay prevention addressed within its body, 
+explained below.</p>
 
 <h2><a name="payload">Payload</a></h2>
 
@@ -62,18 +63,19 @@ the following bitfields:</p>
   bits 6-7: reserved
 </pre>
 
-<p>If the rekey flag is set, 32 bytes of keying material follow the 
+<p>If the rekey flag is set, 64 bytes of keying material follow the 
 timestamp.  If the extended options flag is set, a one byte option 
 size value is appended to, followed by that many extended option 
 bytes, which are currently uninterpreted.</p>
 
-<p>When rekeying, the keying material is fed into a SHA256 to produce
-the new key, though that key is not immediately used.  The other 
-side should also reply with the rekey flag set and that same keying
-material.  Once both sides have sent and received those values, the
-new key should be used and the previous key discarded.  It may be
-useful to keep the old key around briefly, to address packet loss 
-and reordering.</p>
+<p>When rekeying, the first 32 bytes of the keying material is fed 
+into a SHA256 to produce the new MAC key, and the next 32 bytes are
+fed into a SHA256 to produce the new session key, though the keys are
+not immediately used.  The other side should also reply with the 
+rekey flag set and that same keying material.  Once both sides have 
+sent and received those values, the new keys should be used and the 
+previous keys discarded.  It may be useful to keep the old keys 
+around briefly, to address packet loss and reordering.</p>
 
 <pre>
  Header: 37+ bytes
@@ -86,7 +88,7 @@ and reordering.</p>
  +----+----+----+----+----+----+----+----+
  |flag|        time       | (optionally  |
  +----+----+----+----+----+              |
- | this may have 32 byte keying material |
+ | this may have 64 byte keying material |
  | and/or a one+N byte extended options) |
  +---------------------------------------|
 </pre>
@@ -388,7 +390,11 @@ bits 6-7: unused</pre></li>
 <h2><a name="keys">Keys</a></h2>
 
 <p>All encryption used is AES256/CBC with 32 byte keys and 16 byte IVs.
-When using the introKey, both the initial message and any subsequent
+The MAC and session keys are negotiated as part of the DH exchange, used
+for the HMAC and encryption, respectively.  Prior to the DH exchange, 
+the publicly knowable introKey is used for the MAC and encryption.</p>
+
+<p>When using the introKey, both the initial message and any subsequent
 reply use the introKey of the responder (Bob) - the responder does 
 not need to know the introKey of the requestor (Alice).  The DSA 
 signing key used by Bob should already be known to Alice when she 
@@ -397,7 +403,7 @@ Bob.</p>
 
 <p>Upon receiving a message, the receiver checks the from IP address 
 with any established sessions - if there is one or more matches,
-those session keys are tested sequentially in the HMAC.  If none
+those session's MAC keys are tested sequentially in the HMAC.  If none
 of those verify or if there are no matching IP addresses, the 
 receiver tries their introKey in the MAC.  If that does not verify,
 the packet is dropped.  If it does verify, it is interpreted 
@@ -405,7 +411,7 @@ according to the message type, though if the receiver is overloaded,
 it may be dropped anyway.</p>
 
 <p>If Alice and Bob have an established session, but Alice loses the 
-key for some reason and she wants to contact Bob, she may at any 
+keys for some reason and she wants to contact Bob, she may at any 
 time simply establish a new session through the SessionRequest and
 related messages.  If Bob has lost the key but Alice does not know
 that, she will first attempt to prod him to reply, by sending a 
