@@ -29,7 +29,7 @@ public class SpeedCalculator extends Calculator {
     public static final boolean DEFAULT_USE_INSTANTANEOUS_RATES = false;
     /** should the calculator use tunnel test time only, or include all data? */
     public static final String PROP_USE_TUNNEL_TEST_ONLY = "speedCalculator.useTunnelTestOnly";
-    public static final boolean DEFAULT_USE_TUNNEL_TEST_ONLY = true;
+    public static final boolean DEFAULT_USE_TUNNEL_TEST_ONLY = false;
     
     public SpeedCalculator(RouterContext context) {
         _context = context;
@@ -118,9 +118,9 @@ public class SpeedCalculator extends Calculator {
             Rate tunnelResponseRate = profile.getTunnelCreateResponseTime().getRate(period);
             Rate tunnelTestRate = profile.getTunnelTestResponseTime().getRate(period);
 
-            long dbResponses = tunnelTestOnly ? 0 : dbResponseRate.getCurrentEventCount();
-            long tunnelResponses = tunnelTestOnly ? 0 : tunnelResponseRate.getCurrentEventCount();
-            long tunnelTests = tunnelTestRate.getCurrentEventCount();
+            long dbResponses = tunnelTestOnly ? 0 : dbResponseRate.getCurrentEventCount() + dbResponseRate.getLastEventCount();
+            long tunnelResponses = tunnelTestOnly ? 0 : tunnelResponseRate.getCurrentEventCount() + tunnelResponseRate.getLastEventCount();
+            long tunnelTests = tunnelTestRate.getCurrentEventCount() + tunnelTestRate.getLastEventCount();
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("TunnelTests for period " + period + ": " + tunnelTests +
                            " last: " + tunnelTestRate.getLastEventCount() + " lifetime: " +
@@ -161,9 +161,9 @@ public class SpeedCalculator extends Calculator {
             Rate tunnelResponseRate = profile.getTunnelCreateResponseTime().getRate(period);
             Rate tunnelTestRate = profile.getTunnelTestResponseTime().getRate(period);
 
-            long dbResponses = tunnelTestOnly ? 0 : dbResponseRate.getCurrentEventCount();
-            long tunnelResponses = tunnelTestOnly ? 0 : tunnelResponseRate.getCurrentEventCount();
-            long tunnelTests = tunnelTestRate.getCurrentEventCount();
+            long dbResponses = tunnelTestOnly ? 0 : dbResponseRate.getCurrentEventCount() + dbResponseRate.getLastEventCount();
+            long tunnelResponses = tunnelTestOnly ? 0 : tunnelResponseRate.getCurrentEventCount() + tunnelResponseRate.getLastEventCount();
+            long tunnelTests = tunnelTestRate.getCurrentEventCount() + tunnelTestRate.getLastEventCount();
 
             double dbResponseTime = tunnelTestOnly ? 0 : dbResponseRate.getAverageValue();
             double tunnelResponseTime = tunnelTestOnly ? 0 : tunnelResponseRate.getAverageValue();
