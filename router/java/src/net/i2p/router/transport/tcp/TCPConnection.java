@@ -399,7 +399,11 @@ class TCPConnection implements I2NPMessageReader.I2NPMessageEventListener {
         _transport.connectionClosed(this);
     }
     
-    List getPendingMessages() { return _toBeSent; }
+    List getPendingMessages() { 
+        synchronized (_toBeSent) {
+            return new ArrayList(_toBeSent); 
+        }
+    }
     
     public void disconnected(I2NPMessageReader reader) {
         if (_log.shouldLog(Log.WARN))
@@ -460,7 +464,7 @@ class TCPConnection implements I2NPMessageReader.I2NPMessageEventListener {
         
         private OutNetMessage getNext() {
             OutNetMessage msg = null;
-            while (msg == null) {
+            while ( (msg == null) && (_running) ) {
                 synchronized (_toBeSent) {
                     if (_toBeSent.size() <= 0) {
                         try {
