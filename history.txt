@@ -1,4 +1,14 @@
-$Id: history.txt,v 1.174 2005/03/21 20:38:21 jrandom Exp $
+$Id: history.txt,v 1.175 2005/03/23 16:13:05 jrandom Exp $
+
+2005-03-23  jrandom
+    * Implemented the news fetch / update policy code, as configurated on
+      /configupdate.jsp.  Defaults are to grab the news every 24h (or if it
+      doesn't exist yet, on startup).  No action is taken however, though if
+      the news.xml specifies that a new release is available, an option to
+      update will be shown on the router console.
+    * New initialNews.xml delivered with new installs, and moved news.xml out
+      of the i2pwww module and into the i2p module so that we can bundle it 
+      within each update.
 
 2005-03-23  jrandom
     * New /configupdate.jsp page for controlling the update / notification 

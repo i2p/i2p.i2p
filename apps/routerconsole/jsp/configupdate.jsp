@@ -38,6 +38,8 @@
  <jsp:getProperty name="updatehelper" property="updatePolicySelectBox" /><br />
  Update anonymously?
  <jsp:getProperty name="updatehelper" property="updateThroughProxy" /><br />
+ Proxy host: <input type="text" size="10" name="proxyHost" value="<jsp:getProperty name="updatehelper" property="proxyHost" />" /><br />
+ Proxy port: <input type="text" size="4" name="proxyPort" value="<jsp:getProperty name="updatehelper" property="proxyPort" />" /><br />
  <!-- prompt for the eepproxy -->
  Trusted keys:
  <textarea name="trustedKeys" disabled="true" cols="60" rows="2"><jsp:getProperty name="updatehelper" property="trustedKeys" /></textarea>

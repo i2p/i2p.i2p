@@ -24,6 +24,12 @@ public class UpdateHandler {
     
     private static final String SIGNED_UPDATE_FILE = "i2pupdate.sud";
 
+    public UpdateHandler() {}
+    public UpdateHandler(RouterContext ctx) {
+        _context = ctx;
+        _log = ctx.logManager().getLog(UpdateHandler.class);
+    }
+    
     /**
      * Configure this bean to query a particular router context
      *
@@ -44,20 +50,25 @@ public class UpdateHandler {
         if (nonce == null) return;
         if (nonce.equals(System.getProperty("net.i2p.router.web.UpdateHandler.nonce")) ||
             nonce.equals(System.getProperty("net.i2p.router.web.UpdateHandler.noncePrev"))) {
-            synchronized (UpdateHandler.class) {
-                if (_updateRunner == null)
-                    _updateRunner = new UpdateRunner();
-                if (_updateRunner.isRunning()) {
-                    return;
-                } else {
-                    System.setProperty("net.i2p.router.web.UpdateHandler.updateInProgress", "true");
-                    I2PThread update = new I2PThread(_updateRunner, "Update");
-                    update.start();
-                }
-            }
+            update();
         }
     }
 
+    public void update() {
+        synchronized (UpdateHandler.class) {
+            if (_updateRunner == null)
+                _updateRunner = new UpdateRunner();
+            if (_updateRunner.isRunning()) {
+                return;
+            } else {
+                System.setProperty("net.i2p.router.web.UpdateHandler.updateInProgress", "true");
+                I2PThread update = new I2PThread(_updateRunner, "Update");
+                update.start();
+            }
+        }
+
+    }
+    
     public String getStatus() {
         return _updateRunner.getStatus();
     }

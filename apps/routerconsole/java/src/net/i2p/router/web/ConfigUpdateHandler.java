@@ -10,13 +10,15 @@ public class ConfigUpdateHandler extends FormHandler {
     private long _refreshFrequency;
     private String _updateURL;
     private String _updatePolicy;
+    private String _proxyHost;
+    private String _proxyPort;
     private boolean _updateThroughProxy;
     private String _trustedKeys;
 
     public static final String PROP_NEWS_URL = "router.newsURL";
-    public static final String DEFAULT_NEWS_URL = "http://www.i2p/routerConsoleNews.xml";
+    public static final String DEFAULT_NEWS_URL = "http://dev.i2p.net/cgi-bin/cvsweb.cgi/i2p/news.xml?rev=HEAD";
     public static final String PROP_REFRESH_FREQUENCY = "router.newsRefreshFrequency";
-    public static final String DEFAULT_REFRESH_FREQUENCY = 24*60*60*1000 + "";
+    public static final String DEFAULT_REFRESH_FREQUENCY = 12*60*60*1000 + "";
     public static final String PROP_UPDATE_URL = "router.updateURL";
     public static final String DEFAULT_UPDATE_URL = "http://dev.i2p.net/i2p/i2pupdate.sud";
     public static final String PROP_UPDATE_POLICY = "router.updatePolicy";
@@ -41,6 +43,22 @@ public class ConfigUpdateHandler extends FormHandler {
             if ( (oldURL == null) || (!_updateURL.equals(oldURL)) ) {
                 _context.router().setConfigSetting(PROP_UPDATE_URL, _updateURL);
                 addFormNotice("Updating update URL to " + _updateURL);
+            }
+        }
+        
+        if ( (_proxyHost != null) && (_proxyHost.length() > 0) ) {
+            String oldHost = _context.router().getConfigSetting(PROP_PROXY_HOST);
+            if ( (oldHost == null) || (!_proxyHost.equals(oldHost)) ) {
+                _context.router().setConfigSetting(PROP_PROXY_HOST, _proxyHost);
+                addFormNotice("Updating proxy host to " + _proxyHost);
+            }
+        }
+        
+        if ( (_proxyPort != null) && (_proxyPort.length() > 0) ) {
+            String oldPort = _context.router().getConfigSetting(PROP_PROXY_PORT);
+            if ( (oldPort == null) || (!_proxyHost.equals(oldPort)) ) {
+                _context.router().setConfigSetting(PROP_PROXY_PORT, _proxyPort);
+                addFormNotice("Updating proxy port to " + _proxyPort);
             }
         }
         
@@ -80,4 +98,6 @@ public class ConfigUpdateHandler extends FormHandler {
     public void setUpdatePolicy(String policy) { _updatePolicy = policy; }
     public void setTrustedKeys(String keys) { _trustedKeys = keys; }
     public void setUpdateThroughProxy(String foo) { _updateThroughProxy = true; }
+    public void setProxyHost(String host) { _proxyHost = host; }
+    public void setProxyPort(String port) { _proxyPort = port; }
 }

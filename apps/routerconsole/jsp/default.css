@@ -60,3 +60,12 @@ div.main {
 	text-align: left;
 	color: inherit;
 }
+
+div.news {
+	margin: 0em 1em 1em 224px;
+	padding: .5em 1em;
+	background-color: #ffffc0;
+	border: medium solid #ffffd0;
+	text-align: left;
+	color: inherit;
+}

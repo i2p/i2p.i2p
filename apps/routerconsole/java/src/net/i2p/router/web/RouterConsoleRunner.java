@@ -4,9 +4,11 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
+import net.i2p.I2PAppContext;
 import net.i2p.router.RouterContext;
 import net.i2p.apps.systray.SysTray;
 import net.i2p.util.FileUtil;
+import net.i2p.util.I2PThread;
 
 import org.mortbay.jetty.Server;
 import org.mortbay.jetty.servlet.WebApplicationContext;
@@ -70,6 +72,10 @@ public class RouterConsoleRunner {
         } catch (Throwable t) {
             t.printStackTrace();
         }
+        
+        I2PThread t = new I2PThread(new NewsFetcher(I2PAppContext.getGlobalContext()), "NewsFetcher");
+        t.setDaemon(true);
+        t.start();
     }
     
     private void initialize(WebApplicationContext context) {

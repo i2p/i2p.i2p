@@ -10,6 +10,13 @@
 <%@include file="nav.jsp" %>
 <%@include file="summary.jsp" %>
 
+<div class="news" id="news">
+ <jsp:useBean class="net.i2p.router.web.ContentHelper" id="newshelper" scope="request" />
+ <jsp:setProperty name="newshelper" property="page" value="docs/news.xml" />
+ <jsp:setProperty name="newshelper" property="maxLines" value="300" />
+ <jsp:getProperty name="newshelper" property="content" />
+</div>
+
 <div class="main" id="main">
  <jsp:useBean class="net.i2p.router.web.ContentHelper" id="contenthelper" scope="request" />
  <jsp:setProperty name="contenthelper" property="page" value="docs/readme.html" />

@@ -1,6 +1,7 @@
 package net.i2p.router.web;
 
 import java.util.List;
+import net.i2p.data.DataHelper;
 import net.i2p.crypto.TrustedUpdate;
 import net.i2p.router.RouterContext;
 
@@ -40,6 +41,20 @@ public class ConfigUpdateHelper {
         else
             return ConfigUpdateHandler.DEFAULT_UPDATE_URL;
     }
+    public String getProxyHost() {
+        String host = _context.getProperty(ConfigUpdateHandler.PROP_PROXY_HOST);
+        if (host != null)
+            return host;
+        else
+            return ConfigUpdateHandler.DEFAULT_PROXY_HOST;
+    }
+    public String getProxyPort() {
+        String port = _context.getProperty(ConfigUpdateHandler.PROP_PROXY_PORT);
+        if (port != null)
+            return port;
+        else
+            return ConfigUpdateHandler.DEFAULT_PROXY_HOST;
+    }
     
     public String getUpdateThroughProxy() {
         String proxy = _context.getProperty(ConfigUpdateHandler.PROP_SHOULD_PROXY, ConfigUpdateHandler.DEFAULT_SHOULD_PROXY);
@@ -50,21 +65,53 @@ public class ConfigUpdateHelper {
             return "<input type=\"checkbox\" value=\"true\" name=\"updateThroughProxy\" >";
     }
     
+    private static final long PERIODS[] = new long[] { 12*60*60*1000l, 24*60*60*1000l, 48*60*60*1000l, -1l };
+    
     public String getRefreshFrequencySelectBox() {
-        return "<select name=\"refreshFrequency\">" +
-                "<option value=\"" + (12*60*60*1000) + "\">Twice daily</option>" +
-                "<option value=\"" + (24*60*60*1000) + "\" selected=\"true\" >Daily</option>" +
-                "<option value=\"" + (48*60*60*1000) + "\">Every two days</option>" +
-                "<option value=\"" + -1 + "\">Never</option>" +
-                "</select>";
+        String freq = _context.getProperty(ConfigUpdateHandler.PROP_REFRESH_FREQUENCY);
+        if (freq == null) freq = ConfigUpdateHandler.DEFAULT_REFRESH_FREQUENCY;
+        long ms = -1;
+        try { 
+            ms = Long.parseLong(freq);
+        } catch (NumberFormatException nfe) {}
+
+        StringBuffer buf = new StringBuffer(256);
+        buf.append("<select name=\"refreshFrequency\">");
+        for (int i = 0; i < PERIODS.length; i++) {
+            buf.append("<option value=\"").append(PERIODS[i]);
+            if (PERIODS[i] == ms)
+                buf.append("\" selected=\"true\"");
+            
+            if (PERIODS[i] == -1)
+                buf.append("\">Never</option>\n");
+            else
+                buf.append("\">Every ").append(DataHelper.formatDuration(PERIODS[i])).append("</option>\n");
+        }
+        buf.append("</select>\n");
+        return buf.toString();
     }
+    
     public String getUpdatePolicySelectBox() {
-        return "<select name=\"updatePolicy\">" +
-                "<option value=\"notify\">Notify only</option>" +
-                "<option value=\"download\">Download but don't install</option>" +
-                "<option value=\"install\">Install</option>" +
-                "</select>";
+        String policy = _context.getProperty(ConfigUpdateHandler.PROP_UPDATE_POLICY);
+        if (policy == null) policy = ConfigUpdateHandler.DEFAULT_UPDATE_POLICY;
+        
+        StringBuffer buf = new StringBuffer(256);
+        buf.append("<select name=\"updatePolicy\">");
+        
+        if ("notify".equals(policy))
+            buf.append("<option value=\"notify\" selected=\"true\">Notify only</option>");
+        else
+            buf.append("<option value=\"notify\">Notify only</option>");
+
+        if ("install".equals(policy))
+            buf.append("<option value=\"install\" selected=\"true\">Download and install</option>");
+        else
+            buf.append("<option value=\"install\">Download and install</option>");
+        
+        buf.append("</select>\n");
+        return buf.toString();
     }
+    
     public String getTrustedKeys() {
         StringBuffer buf = new StringBuffer(1024);
         TrustedUpdate up = new TrustedUpdate(_context);

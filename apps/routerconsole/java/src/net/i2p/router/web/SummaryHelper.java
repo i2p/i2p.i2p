@@ -468,5 +468,7 @@ public class SummaryHelper {
         return _context.throttle().getTunnelLag() + "ms";
     }
     
-    public boolean updateAvailable() { return true; }
+    public boolean updateAvailable() { 
+        return NewsFetcher.getInstance().updateAvailable();
+    }
 }

@@ -28,7 +28,7 @@
                 uri = uri + "&updateNonce=" + nonce;
             else
                 uri = uri + "?updateNonce=" + nonce;
-            out.print(" <a href=\"" + uri + "\">Update</a>");
+            out.print(" <a href=\"" + uri + "\">Update available</a>");
         }
     }
  %><hr />
