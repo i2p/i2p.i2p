@@ -26,6 +26,7 @@ import net.i2p.router.MessageSelector;
 import net.i2p.router.ReplyJob;
 import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
+import net.i2p.router.peermanager.PeerProfile;
 import net.i2p.util.Log;
 
 /**
@@ -69,6 +70,11 @@ public class BuildTestMessageJob extends JobImpl {
     public String getName() { return "Build Test Message"; }
     
     public void runJob() {
+        if (alreadyKnownReachable()) {
+            getContext().jobQueue().addJob(_onSend);
+            return;
+        }
+        
         // This is a test message - build a garlic with a DeliveryStatusMessage that
         // first goes to the peer then back to us.
         if (_log.shouldLog(Log.DEBUG))
@@ -79,6 +85,14 @@ public class BuildTestMessageJob extends JobImpl {
         MessageSelector sel = buildMessageSelector();
         SendGarlicJob job = new SendGarlicJob(getContext(), config, null, _onSendFailed, replyJob, _onSendFailed, _timeoutMs, _priority, sel);
         getContext().jobQueue().addJob(job);
+    }
+    
+    private boolean alreadyKnownReachable() {
+        PeerProfile profile = getContext().profileOrganizer().getProfile(_target.getIdentity().getHash());
+        if ( (profile == null) || (!profile.getIsActive()) )
+            return false;
+        else
+            return true;
     }
     
     private MessageSelector buildMessageSelector() {
