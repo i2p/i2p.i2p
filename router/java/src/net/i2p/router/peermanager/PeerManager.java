@@ -79,7 +79,9 @@ class PeerManager {
             Set curVals = new HashSet(criteria.getMinimumRequired());
             switch (criteria.getPurpose()) {
                 case PeerSelectionCriteria.PURPOSE_TEST:
-                    _organizer.selectWellIntegratedPeers(criteria.getMinimumRequired(), exclude, curVals);
+                    // for now, the peers we test will be the reliable ones
+                    //_organizer.selectWellIntegratedPeers(criteria.getMinimumRequired(), exclude, curVals);
+                    _organizer.selectReliablePeers(criteria.getMinimumRequired(), exclude, curVals);
                     break;
                 case PeerSelectionCriteria.PURPOSE_TUNNEL:
                     _organizer.selectFastAndReliablePeers(criteria.getMinimumRequired(), exclude, curVals);
@@ -95,7 +97,11 @@ class PeerManager {
             }
             if (curVals.size() <= 0) {
                 if (_log.shouldLog(Log.WARN))
-                    _log.warn("We ran out of peers when looking for reachable ones after finding " + rv.size());
+                    _log.warn("We ran out of peers when looking for reachable ones after finding " 
+                              + rv.size() + " with "
+                              + _organizer.countWellIntegratedPeers() + "/" 
+                              + _organizer.countReliablePeers() + "/" 
+                              + _organizer.countFastAndReliablePeers() + " integrated/reliable/fast peers");
                 break;
             } else {
                 for (Iterator iter = curVals.iterator(); iter.hasNext(); ) {
