@@ -34,6 +34,9 @@ public class GarlicMessageBuilder {
         return buildMessage(ctx, config, new SessionKey(), new HashSet());
     }
     public static GarlicMessage buildMessage(RouterContext ctx, GarlicConfig config, SessionKey wrappedKey, Set wrappedTags) {
+        return buildMessage(ctx, config, wrappedKey, wrappedTags, 20);
+    }
+    public static GarlicMessage buildMessage(RouterContext ctx, GarlicConfig config, SessionKey wrappedKey, Set wrappedTags, int numTagsToDeliver) {
         Log log = ctx.logManager().getLog(GarlicMessageBuilder.class);
         PublicKey key = config.getRecipientPublicKey();
         if (key == null) {
@@ -61,16 +64,16 @@ public class GarlicMessageBuilder {
             log.debug("Available tags for encryption to " + key + ": " + availTags);
         
         if (availTags < 10) { // arbitrary threshold
-            for (int i = 0; i < 20; i++)
+            for (int i = 0; i < numTagsToDeliver; i++)
                 wrappedTags.add(new SessionTag(true));
             if (log.shouldLog(Log.INFO))
-                log.info("Less than 10 tags are available (" + availTags + "), so we're including 20 more");
+                log.info("Less than 10 tags are available (" + availTags + "), so we're including more");
         } else if (ctx.sessionKeyManager().getAvailableTimeLeft(key, curKey) < 30*1000) {
             // if we have > 10 tags, but they expire in under 30 seconds, we want more
-            for (int i = 0; i < 20; i++)
+            for (int i = 0; i < numTagsToDeliver; i++)
                 wrappedTags.add(new SessionTag(true));
             if (log.shouldLog(Log.INFO))
-                log.info("Tags are almost expired, adding 20 new ones");
+                log.info("Tags are almost expired, adding new ones");
         } else {
             // always tack on at least one more - not necessary.
             //wrappedTags.add(new SessionTag(true));

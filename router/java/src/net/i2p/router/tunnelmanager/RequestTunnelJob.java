@@ -422,7 +422,7 @@ public class RequestTunnelJob extends JobImpl {
             wrappedTo.setData(rcptKey.getData());
         
         long start = getContext().clock().now();
-        GarlicMessage message = GarlicMessageBuilder.buildMessage(getContext(), config, wrappedKey, wrappedTags);
+        GarlicMessage message = GarlicMessageBuilder.buildMessage(getContext(), config, wrappedKey, wrappedTags, 10);
         long end = getContext().clock().now();
         if ( (end - start) > 1000) {
             if (_log.shouldLog(Log.WARN))

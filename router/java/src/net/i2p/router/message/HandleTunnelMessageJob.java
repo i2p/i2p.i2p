@@ -198,9 +198,24 @@ public class HandleTunnelMessageJob extends JobImpl {
                 getContext().statManager().addRateData("tunnel.relayMessageSize", 
                                                        _message.getData().length, 0);
 
-                SendMessageDirectJob j = new SendMessageDirectJob(getContext(), _message, 
+                TunnelMessage msg = new TunnelMessage(getContext());
+                msg.setData(_message.getData());
+                msg.setEncryptedDeliveryInstructions(_message.getEncryptedDeliveryInstructions());
+                msg.setTunnelId(info.getNextHopId());
+                msg.setVerificationStructure(_message.getVerificationStructure());
+                msg.setMessageExpiration(_message.getMessageExpiration());
+                
+                int timeoutMs = (int)(_message.getMessageExpiration().getTime() - getContext().clock().now());
+                if (timeoutMs < 1000) {
+                    if (_log.shouldLog(Log.ERROR))
+                        _log.error("Message " + _message.getUniqueId() + " is valid and we would pass it on through tunnel "
+                                   + info.getTunnelId().getTunnelId() + ", but its too late (expired " + timeoutMs + "ms ago)");
+                    return;
+                }
+                
+                SendMessageDirectJob j = new SendMessageDirectJob(getContext(), msg, 
                                                                   info.getNextHop(), 
-                                                                  (int)(_message.getMessageExpiration().getTime() - getContext().clock().now()),
+                                                                  timeoutMs,
                                                                   FORWARD_PRIORITY);
                 getContext().jobQueue().addJob(j);
                 return;
@@ -515,7 +530,7 @@ public class HandleTunnelMessageJob extends JobImpl {
                 ReplyJob onReply = null;
                 Hash targetRouter = null;
                 TunnelId targetTunnelId = null;
-                SendTunnelMessageJob j = new SendTunnelMessageJob(ctx, _body, _info.getTunnelId(), targetRouter, targetTunnelId, onSuccess, onReply, onFailure, selector, timeout, FORWARD_PRIORITY);
+                SendTunnelMessageJob j = new SendTunnelMessageJob(ctx, _body, _info.getNextHopId(), targetRouter, targetTunnelId, onSuccess, onReply, onFailure, selector, timeout, FORWARD_PRIORITY);
                 ctx.jobQueue().addJob(j);
             } else {
                 if (_log.shouldLog(Log.WARN))

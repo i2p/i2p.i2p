@@ -66,6 +66,7 @@ public class HandleTunnelCreateMessageJob extends JobImpl {
         info.setConfigurationKey(_message.getConfigurationKey());
         info.setEncryptionKey(_message.getTunnelKey());
         info.setNextHop(_message.getNextRouter());
+        info.setNextHopId(_message.getNextTunnelId());
 	
         TunnelSettings settings = new TunnelSettings(getContext());
         settings.setBytesPerMinuteAverage(_message.getMaxAvgBytesPerMin());
@@ -129,7 +130,6 @@ public class HandleTunnelCreateMessageJob extends JobImpl {
         }
     }
     
-    private static final long REPLY_TIMEOUT = 10*1000;
     private void sendReply(boolean ok) {
         if (_log.shouldLog(Log.DEBUG)) 
             _log.debug("Sending reply to a tunnel create of id " + _message.getTunnelId() 
@@ -149,7 +149,7 @@ public class HandleTunnelCreateMessageJob extends JobImpl {
             // since we don't actually check anything, this is a catch all
             msg.setStatus(TunnelCreateStatusMessage.STATUS_FAILED_OVERLOADED);
         }
-        msg.setMessageExpiration(new Date(getContext().clock().now()+60*1000));
+        msg.setMessageExpiration(new Date(getContext().clock().now()+TIMEOUT));
         
         // put that message into a garlic
         GarlicMessage reply = createReply(msg);
@@ -161,7 +161,7 @@ public class HandleTunnelCreateMessageJob extends JobImpl {
                                                             _message.getReplyTunnel(), 
                                                             (Job)null, (ReplyJob)null, 
                                                             (Job)null, (MessageSelector)null, 
-                                                            REPLY_TIMEOUT, PRIORITY);
+                                                            TIMEOUT, PRIORITY);
         getContext().jobQueue().addJob(job);
     }
     
@@ -189,7 +189,7 @@ public class HandleTunnelCreateMessageJob extends JobImpl {
         config.setCertificate(new Certificate(Certificate.CERTIFICATE_TYPE_NULL, null));
         config.setDeliveryInstructions(instructions);
         config.setId(getContext().random().nextLong(I2NPMessage.MAX_ID_VALUE));
-        config.setExpiration(REPLY_TIMEOUT+getContext().clock().now());
+        config.setExpiration(TIMEOUT+getContext().clock().now());
         config.setRecipient(null);
         config.setRequestAck(false);
         
@@ -211,7 +211,7 @@ public class HandleTunnelCreateMessageJob extends JobImpl {
         
         replyClove.setCertificate(new Certificate(Certificate.CERTIFICATE_TYPE_NULL, null));
         replyClove.setDeliveryInstructions(instructions);
-        replyClove.setExpiration(REPLY_TIMEOUT+getContext().clock().now());
+        replyClove.setExpiration(TIMEOUT+getContext().clock().now());
         replyClove.setId(getContext().random().nextLong(I2NPMessage.MAX_ID_VALUE));
         replyClove.setPayload(body);
         replyClove.setRecipient(null);

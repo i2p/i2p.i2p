@@ -180,7 +180,14 @@ public class SendTunnelMessageJob extends JobImpl {
                 _log.debug("Tunnel message created: " + msg + " out of encrypted message: " 
                            + _message);
             long now = getContext().clock().now();
-            if (_expiration < now + 15*1000) {
+            if (_expiration < now) {
+                if (_log.shouldLog(Log.ERROR))
+                    _log.error("We are the gateway to " + info.getTunnelId().getTunnelId() 
+                               + " and the message " + msg.getUniqueId() + " is valid, but it has timed out (" 
+                               + (now - _expiration) + "ms ago)");
+                if (_onFailure != null)
+                    getContext().jobQueue().addJob(_onFailure);
+            }else if (_expiration < now + 15*1000) {
                 if (_log.shouldLog(Log.WARN))
                     _log.warn("Adding a tunnel message that will expire shortly [" 
                               + new Date(_expiration) + "]", getAddedBy());

@@ -40,6 +40,7 @@ public class TunnelInfo extends DataStructureImpl {
     private static Log _log;
     private TunnelId _id;
     private Hash _nextHop;
+    private TunnelId _nextHopId;
     private Hash _thisHop;
     private TunnelInfo _nextHopInfo;
     private TunnelConfigurationSessionKey _configurationKey;
@@ -62,6 +63,7 @@ public class TunnelInfo extends DataStructureImpl {
         setTunnelId(null);
         setThisHop(null);
         setNextHop(null);
+        setNextHopId(null);
         setNextHopInfo(null);
         _configurationKey = null;
         _verificationKey = null;
@@ -82,6 +84,9 @@ public class TunnelInfo extends DataStructureImpl {
     
     public Hash getNextHop() { return _nextHop; }
     public void setNextHop(Hash nextHopRouterIdentity) { _nextHop = nextHopRouterIdentity; }
+    
+    public TunnelId getNextHopId() { return _nextHopId; }
+    public void setNextHopId(TunnelId id) { _nextHopId = id; }
     
     public Hash getThisHop() { return _thisHop; }
     public void setThisHop(Hash thisHopRouterIdentity) { _thisHop = thisHopRouterIdentity; }
@@ -197,6 +202,8 @@ public class TunnelInfo extends DataStructureImpl {
         if (includeNext.booleanValue()) {
             _nextHop = new Hash();
             _nextHop.readBytes(in);
+            _nextHopId = new TunnelId();
+            _nextHopId.readBytes(in);
         } else {
             _nextHop = null;
         }
@@ -266,6 +273,7 @@ public class TunnelInfo extends DataStructureImpl {
         if (_nextHop != null) {
             DataHelper.writeBoolean(out, Boolean.TRUE);
             _nextHop.writeBytes(out);
+            _nextHopId.writeBytes(out);
         } else {
             DataHelper.writeBoolean(out, Boolean.FALSE);
         }
@@ -321,6 +329,8 @@ public class TunnelInfo extends DataStructureImpl {
                 buf.append("\n Destination: ").append(cur.getDestination().calculateHash().toBase64());
             if (cur.getNextHop() != null)
                 buf.append("\n Next: ").append(cur.getNextHop());
+            if (cur.getNextHop() != null)
+                buf.append("\n NextId: ").append(cur.getNextHopId());
             if (cur.getSettings() == null)
                 buf.append("\n Expiration: ").append("none");
             else
@@ -338,6 +348,7 @@ public class TunnelInfo extends DataStructureImpl {
         rv = 7*rv + DataHelper.hashCode(_options);
         rv = 7*rv + DataHelper.hashCode(_destination);
         rv = 7*rv + DataHelper.hashCode(_nextHop);
+        rv = 7*rv + DataHelper.hashCode(_nextHopId);
         rv = 7*rv + DataHelper.hashCode(_thisHop);
         rv = 7*rv + DataHelper.hashCode(_id);
         rv = 7*rv + DataHelper.hashCode(_configurationKey);
@@ -357,6 +368,7 @@ public class TunnelInfo extends DataStructureImpl {
                    getIsReady() == info.getIsReady() &&
                    DataHelper.eq(getEncryptionKey(), info.getEncryptionKey()) &&
                    DataHelper.eq(getNextHop(), info.getNextHop()) &&
+                   DataHelper.eq(getNextHopId(), info.getNextHopId()) &&
                    DataHelper.eq(getNextHopInfo(), info.getNextHopInfo()) &&
                    DataHelper.eq(getSettings(), info.getSettings()) &&
                    DataHelper.eq(getSigningKey(), info.getSigningKey()) &&
