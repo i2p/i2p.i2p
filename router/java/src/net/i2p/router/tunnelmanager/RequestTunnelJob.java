@@ -766,7 +766,7 @@ public class RequestTunnelJob extends JobImpl {
                             _log.warn("Tunnel creation failed for tunnel " + _tunnel.getTunnelId() 
                                       + " at router " + _tunnel.getThisHop().toBase64() 
                                       + " with status " + msg.getStatus());
-                        getContext().profileManager().tunnelRejected(_tunnel.getThisHop(), responseTime);
+                        getContext().profileManager().tunnelRejected(_tunnel.getThisHop(), responseTime, true);
                         Success.this.getContext().messageHistory().tunnelRejected(_tunnel.getThisHop(), 
                                                                               _tunnel.getTunnelId(), 
                                                                               null, "refused");
@@ -832,8 +832,9 @@ public class RequestTunnelJob extends JobImpl {
                 _failedTunnelParticipants.add(_replyThrough);
             }
             Failure.this.getContext().messageHistory().tunnelRequestTimedOut(_tunnel.getThisHop(), _tunnel.getTunnelId(), _replyThrough);
-            // perhaps not an explicit reject, but an implicit one (due to overload & dropped messages, etc)
-            getContext().profileManager().tunnelRejected(_tunnel.getThisHop(), getContext().clock().now() - _started);
+            long responseTime = getContext().clock().now() - _started;
+            // perhaps not an explicit reject, but an implicit one (due to dropped messages, tunnel failure, etc)
+            getContext().profileManager().tunnelRejected(_tunnel.getThisHop(), responseTime, false);
             getContext().profileManager().messageFailed(_tunnel.getThisHop());
             Failure.this.getContext().statManager().updateFrequency("tunnel.buildFailFrequency");
             fail();

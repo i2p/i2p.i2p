@@ -46,9 +46,13 @@ public interface ProfileManager {
     
     /**
      * Note that a router explicitly rejected joining a tunnel
-     *
+     * 
+     * @param peer who rejected us
+     * @param responseTimeMs how long it took to get the rejection
+     * @param explicit true if the tunnel request was explicitly rejected, false
+     *                 if we just didn't get a reply back in time.
      */
-    void tunnelRejected(Hash peer, long responseTimeMs);
+    void tunnelRejected(Hash peer, long responseTimeMs, boolean explicit);
     
     /**
      * Note that a tunnel that the router is participating in
