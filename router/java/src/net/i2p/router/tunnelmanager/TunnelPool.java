@@ -566,7 +566,7 @@ class TunnelPool {
             _targetClients = TARGET_CLIENTS_DEFAULT;
         }
         buildFakeTunnels();
-        _context.jobQueue().addJob(new WritePoolJob());
+        //_context.jobQueue().addJob(new WritePoolJob());
         _context.jobQueue().addJob(new TunnelPoolManagerJob(_context, this));
         _context.jobQueue().addJob(new TunnelPoolExpirationJob(_context, this));
     }
