@@ -37,7 +37,7 @@ import net.i2p.util.Log;
 class RestrictiveTCPConnection extends TCPConnection {
     private Log _log;
     
-    public RestrictiveTCPConnection(RouterContext context, Socket s, boolean locallyInitiated) {
+    public RestrictiveTCPConnection(RouterContext context, Socket s, boolean locallyInitiated) throws IOException {
         super(context, s, locallyInitiated);
         _log = context.logManager().getLog(RestrictiveTCPConnection.class);
         _context.statManager().createRateStat("tcp.establishConnectionTime", "How long does it take for us to successfully establish a connection (either locally or remotely initiated)?", "TCP Transport", new long[] { 60*1000l, 60*60*1000l, 24*60*60*1000l });
