@@ -39,6 +39,8 @@ public class DatabaseSearchReplyMessage extends I2NPMessageImpl {
     
     public DatabaseSearchReplyMessage(I2PAppContext context) {
         super(context);
+        _context.statManager().createRateStat("netDb.searchReplyMessageSend", "How many search reply messages we send", "Network Database", new long[] { 60*1000, 5*60*1000, 10*60*1000, 60*60*1000 });
+        _context.statManager().createRateStat("netDb.searchReplyMessageReceive", "How many search reply messages we receive", "Network Database", new long[] { 60*1000, 5*60*1000, 10*60*1000, 60*60*1000 });
         setSearchKey(null);
         _routerInfoStructures = new ArrayList();
         setFromHash(null);
@@ -83,6 +85,8 @@ public class DatabaseSearchReplyMessage extends I2NPMessageImpl {
             
             _from = new Hash();
             _from.readBytes(in);
+
+            _context.statManager().addRateData("netDb.searchReplyMessageReceive", compressedLength + 64, 1);
         } catch (DataFormatException dfe) {
             throw new I2NPMessageException("Unable to load the message data", dfe);
         }
@@ -98,6 +102,7 @@ public class DatabaseSearchReplyMessage extends I2NPMessageImpl {
         if (_from == null)
             throw new I2NPMessageException("No 'from' address specified!");
         
+        byte rv[] = null;
         ByteArrayOutputStream os = new ByteArrayOutputStream(32);
         try {
             _key.writeBytes(os);
@@ -113,10 +118,13 @@ public class DatabaseSearchReplyMessage extends I2NPMessageImpl {
             DataHelper.writeLong(os, 2, compressed.length);
             os.write(compressed);
             _from.writeBytes(os);
+
+            rv = os.toByteArray();
+            _context.statManager().addRateData("netDb.searchReplyMessageSendSize", rv.length, 1);
         } catch (DataFormatException dfe) {
             throw new I2NPMessageException("Error writing out the message data", dfe);
         }
-        return os.toByteArray();
+        return rv;
     }
     
     public int getType() { return MESSAGE_TYPE; }
