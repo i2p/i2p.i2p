@@ -30,8 +30,8 @@ public class ConfigNetHelper {
     public ConfigNetHelper() {}
     
     /** copied from various private TCP components */
-    private final static String PROP_I2NP_TCP_HOSTNAME = "i2np.tcp.hostname";
-    private final static String PROP_I2NP_TCP_PORT = "i2np.tcp.port";
+    public final static String PROP_I2NP_TCP_HOSTNAME = "i2np.tcp.hostname";
+    public final static String PROP_I2NP_TCP_PORT = "i2np.tcp.port";
     
     public String getHostname() {
         return _context.getProperty(PROP_I2NP_TCP_HOSTNAME);

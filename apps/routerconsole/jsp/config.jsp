@@ -1,5 +1,4 @@
-<%@page contentType="text/html"%>
-<%@page pageEncoding="UTF-8"%>
+<%@page contentType="text/html" %>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 
 <html><head>
@@ -9,13 +8,19 @@
 
 <%@include file="nav.jsp" %>
 <%@include file="summary.jsp" %>
-<%@include file="notice.jsp" %>
 
 <jsp:useBean class="net.i2p.router.web.ConfigNetHelper" id="nethelper" scope="request" />
 <jsp:setProperty name="nethelper" property="contextId" value="<%=(String)session.getAttribute("i2p.contextId")%>" />
 
 <div class="main" id="main">
  <%@include file="confignav.jsp" %>
+ 
+ <jsp:useBean class="net.i2p.router.web.ConfigNetHandler" id="formhandler" scope="request" />
+ <jsp:setProperty name="formhandler" property="*" />
+ <jsp:setProperty name="formhandler" property="contextId" value="<%=(String)session.getAttribute("i2p.contextId")%>" />
+ <font color="red"><jsp:getProperty name="formhandler" property="errors" /></font>
+ <i><jsp:getProperty name="formhandler" property="notices" /></i>
+
  <form action="config.jsp" method="POST">
  <b>External hostname/IP address:</b> 
     <input name="hostname" type="text" size="32" value="<jsp:getProperty name="nethelper" property="hostname" />" />
@@ -29,7 +34,10 @@
  to <a href="http://www.whatismyip.com/">www.whatismyip.com</a>.</i>
  <hr />
  <b>Enable internal time synchronization?</b> <input type="checkbox" <jsp:getProperty name="nethelper" property="enableTimeSyncChecked" /> name="enabletimesync" /><br />
- <i>If disabled, your machine <b>must</b> be NTP synchronized</i>
+ <i>If disabled, your machine <b>must</b> be NTP synchronized.  This option only 
+    takes effect for the current run - if your machine is always synchronized within
+    (a few seconds), you can update your configuration so that it doesn't start the
+    "Timestamper" app (which would make this option irrelevent)</i>
  <hr />
  <b>Bandwidth limiter</b><br />
  <b>Inbound rate</b>: 
@@ -44,8 +52,12 @@
  <hr />
  <b>Reseed</b> (from <input name="reseedfrom" type="text" size="40" value="http://dev.i2p.net/i2pdb/" />): 
                <input type="submit" name="reseed" value="now" /><br />
+ <i>May take some time to download the peer references</i>
  <hr />
- <input type="submit" value="Save changes" /> <input type="reset" value="Cancel" />
+ <input type="submit" name="save" value="Save changes" /> <input type="reset" value="Cancel" /><br />
+ <i>Changing the hostname or TCP port will force a 'soft restart' - dropping your connections 
+    and clients as if the router was stopped and restarted.  <b>Please be patient</b> - it may take
+    a few seconds to complete.</i>
  </form>
 </div>
 

@@ -9,7 +9,6 @@
 
 <%@include file="nav.jsp" %>
 <%@include file="summary.jsp" %>
-<%@include file="notice.jsp" %>
 
 <div class="main" id="main">
  <h2>Welcome to your router console</h2>

@@ -9,7 +9,6 @@
 
 <%@include file="nav.jsp" %>
 <%@include file="summary.jsp" %>
-<%@include file="notice.jsp" %>
 
 <jsp:useBean class="net.i2p.router.web.ConfigAdvancedHelper" id="advancedhelper" scope="request" />
 <jsp:setProperty name="advancedhelper" property="contextId" value="<%=(String)session.getAttribute("i2p.contextId")%>" />
