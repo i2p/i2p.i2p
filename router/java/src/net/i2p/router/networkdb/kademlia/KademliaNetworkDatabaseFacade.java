@@ -57,6 +57,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
     /** Clock independent time of when we started up */
     private long _started;
     private StartExplorersJob _exploreJob;
+    private HarvesterJob _harvestJob;
     /** when was the last time an exploration found something new? */
     private long _lastExploreNew;
     private PeerSelector _peerSelector;
@@ -235,9 +236,14 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
             _context.jobQueue().addJob(new DataRepublishingSelectorJob(_context, this));
             // fill the search queue with random keys in buckets that are too small
             _context.jobQueue().addJob(new ExploreKeySelectorJob(_context, this));
-            _exploreJob = new StartExplorersJob(_context, this);
+            if (_exploreJob == null)
+                _exploreJob = new StartExplorersJob(_context, this);
             // fire off a group of searches from the explore pool
             _context.jobQueue().addJob(_exploreJob);
+            // if configured to do so, periodically try to get newer routerInfo stats
+            if (_harvestJob == null)
+                _harvestJob = new HarvesterJob(_context, this);
+            _context.jobQueue().addJob(_harvestJob);
         } else {
             _log.warn("Operating in quiet mode - not exploring or pushing data proactively, simply reactively");
             _log.warn("This should NOT be used in production");
