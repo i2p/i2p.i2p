@@ -1,4 +1,10 @@
-$Id: history.txt,v 1.78 2004/11/21 14:42:57 jrandom Exp $
+$Id: history.txt,v 1.79 2004/11/21 17:31:33 jrandom Exp $
+
+2004-11-21  jrandom
+    * Update the I2PTunnel web interface to include an option for the new 
+      streaming lib (which is ignored until the 0.4.2 release).
+    * Revised the I2PTunnel web interface to keep the I2CP options of client 
+      and httpclient tunnels in sync, as they all share the same I2CP session.
 
 2004-11-21  jrandom
     * Only allow small clock skews after the first 10 minutes of operation

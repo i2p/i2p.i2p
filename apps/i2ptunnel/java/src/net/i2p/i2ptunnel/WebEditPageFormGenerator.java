@@ -60,6 +60,9 @@ class WebEditPageFormGenerator {
             buf.append("value=\"squid.i2p\" ");
         buf.append("/><br />\n");
         
+        buf.append("<hr />Note: the following options are shared across all client tunnels and");
+        buf.append(" HTTP proxies<br />\n");
+        
         addOptions(buf, controller);
         buf.append("<input type=\"submit\" name=\"action\" value=\"Save\">\n");
         buf.append("<input type=\"submit\" name=\"action\" value=\"Remove\">\n");
@@ -79,6 +82,9 @@ class WebEditPageFormGenerator {
         if ( (controller != null) && (controller.getTargetDestination() != null) )
             buf.append("value=\"").append(controller.getTargetDestination()).append("\" ");
         buf.append(" /> (either the hosts.txt name or the full base64 destination)<br />\n");
+        
+        buf.append("<hr />Note: the following options are shared across all client tunnels and");
+        buf.append(" HTTP proxies<br />\n");
         
         addOptions(buf, controller);
         buf.append("<input type=\"submit\" name=\"action\" value=\"Save\"><br />\n");
@@ -145,6 +151,13 @@ class WebEditPageFormGenerator {
         if ( (controller != null) && (controller.getDescription() != null) )
             buf.append("value=\"").append(controller.getDescription()).append("\" ");
         buf.append("/><br />\n");
+        
+        buf.append("<b>Start automatically?</b> \n");
+        buf.append("<input type=\"checkbox\" name=\"startOnLoad\" value=\"true\" ");
+        if ( (controller != null) && (controller.getStartOnLoad()) )
+            buf.append(" checked=\"true\" />\n<br />\n");
+        else
+            buf.append(" />\n<br />\n");
     }
 
     /**
@@ -194,6 +207,7 @@ class WebEditPageFormGenerator {
     private static void addOptions(StringBuffer buf, TunnelController controller) {
         int tunnelDepth = 2;
         int numTunnels = 2;
+        int connectDelay = 0;
         Properties opts = getOptions(controller);
         if (opts != null) {
             String depth = opts.getProperty("tunnels.depthInbound");
@@ -210,6 +224,14 @@ class WebEditPageFormGenerator {
                     numTunnels = Integer.parseInt(num);
                 } catch (NumberFormatException nfe) {
                     numTunnels = 2;
+                }
+            }
+            String delay = opts.getProperty("i2p.streaming.connectDelay");
+            if (delay != null) {
+                try {
+                    connectDelay = Integer.parseInt(delay);
+                } catch (NumberFormatException nfe) {
+                    connectDelay = 0;
                 }
             }
         }
@@ -251,6 +273,13 @@ class WebEditPageFormGenerator {
         }
         buf.append("</select><br />\n");
         
+        buf.append("<b>Delay connection briefly? </b> ");
+        buf.append("<input type=\"checkbox\" name=\"connectDelay\" value=\"");
+        buf.append((connectDelay > 0 ? connectDelay : 1000)).append("\" ");
+        if (connectDelay > 0)
+            buf.append("checked=\"true\" ");
+        buf.append("/> (useful for brief request/response connections)<br />\n");
+        
         buf.append("<b>I2CP host:</b> ");
         buf.append("<input type=\"text\" name=\"clientHost\" size=\"20\" value=\"");
         if ( (controller != null) && (controller.getI2CPHost() != null) )
@@ -275,18 +304,13 @@ class WebEditPageFormGenerator {
                 String val = opts.getProperty(key);
                 if ("tunnels.depthInbound".equals(key)) continue;
                 if ("tunnels.numInbound".equals(key)) continue;
+                if ("i2p.streaming.connectDelay".equals(key)) continue;
                 if (i != 0) buf.append(' ');
                 buf.append(key).append('=').append(val);
                 i++;
             }
         }
         buf.append("\" /><br />\n");
-        buf.append("<b>Start automatically?</b> \n");
-        buf.append("<input type=\"checkbox\" name=\"startOnLoad\" value=\"true\" ");
-        if ( (controller != null) && (controller.getStartOnLoad()) )
-            buf.append(" checked=\"true\" />\n<br />\n");
-        else
-            buf.append(" />\n<br />\n");
     }
 
     /**

@@ -29,6 +29,7 @@ public class WebEditPageHelper {
     private String _i2cpPort;
     private String _tunnelDepth;
     private String _tunnelCount;
+    private boolean _connectDelay;
     private String _customOptions;
     private String _proxyList;
     private String _port;
@@ -164,6 +165,9 @@ public class WebEditPageHelper {
     public void setStartOnLoad(String moo) {
         _startOnLoad = true;
     }
+    public void setConnectDelay(String moo) {
+        _connectDelay = true;
+    }
     
     /**
      * Process the form and display any resulting messages
@@ -252,6 +256,27 @@ public class WebEditPageHelper {
             cur.setConfig(config, "");
         }
         
+        if ("httpclient".equals(cur.getType()) || "client".equals(cur.getType())) {
+            // all clients use the same I2CP session, and as such, use the same
+            // I2CP options
+            List controllers = TunnelControllerGroup.getInstance().getControllers();
+            for (int i = 0; i < controllers.size(); i++) {
+                TunnelController c = (TunnelController)controllers.get(i);
+                if (c == cur) continue;
+                if ("httpclient".equals(c.getType()) || "client".equals(c.getType())) {
+                    Properties cOpt = c.getConfig("");
+                    if (_tunnelCount != null)
+                        cOpt.setProperty("option.tunnels.numInbound", _tunnelCount);
+                    if (_tunnelDepth != null)
+                        cOpt.setProperty("option.tunnels.depthInbound", _tunnelDepth);
+                    if (_connectDelay)
+                        cOpt.setProperty("option.i2p.streaming.connectDelay", "1000");
+                    else
+                        cOpt.setProperty("option.i2p.streaming.connectDelay", "0");
+                    c.setConfig(cOpt, "");
+                }
+            }
+        }
         
         return getMessages(doSave());
     }
@@ -324,6 +349,7 @@ public class WebEditPageHelper {
                 String val = pair.substring(eq+1);
                 if ("tunnels.numInbound".equals(key)) continue;
                 if ("tunnels.depthInbound".equals(key)) continue;
+                if ("i2p.streaming.connectDelay".equals(key)) continue;
                 config.setProperty("option." + key, val);
             }
         }
@@ -334,6 +360,10 @@ public class WebEditPageHelper {
             config.setProperty("option.tunnels.numInbound", _tunnelCount);
         if (_tunnelDepth != null)
             config.setProperty("option.tunnels.depthInbound", _tunnelDepth);
+        if (_connectDelay)
+            config.setProperty("option.i2p.streaming.connectDelay", "1000");
+        else
+            config.setProperty("option.i2p.streaming.connectDelay", "0");
     }
 
     /**
