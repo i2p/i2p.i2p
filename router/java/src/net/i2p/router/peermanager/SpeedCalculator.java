@@ -91,6 +91,7 @@ public class SpeedCalculator extends Calculator {
      *
      */
     private double getEstimateFactor(long eventThreshold, long numEvents) {
+        if (true) return 0.0d; // never use the estimate
         if (numEvents > eventThreshold) 
             return 0.0d;
         else
