@@ -67,6 +67,7 @@ class I2CPMessageProducer {
      *
      */
     public void disconnect(I2PSessionImpl session) throws I2PSessionException {
+        if (session.isClosed()) return;
         DestroySessionMessage dmsg = new DestroySessionMessage();
         dmsg.setSessionId(session.getSessionId());
         session.sendMessage(dmsg);

@@ -205,7 +205,8 @@ public class SAMStreamSession {
         SAMStreamSessionSocketHandler handler = getSocketHandler(id);
         
         if (handler == null) {
-            _log.error("Trying to send bytes through inexistent handler " +id);
+            if (_log.shouldLog(Log.WARN))
+                _log.error("Trying to send bytes through inexistent handler " +id);
             // even though it failed, we need to read those bytes! 
             for (int i = 0; i < size; i++) {
                 int c = in.read();
@@ -482,12 +483,30 @@ public class SAMStreamSession {
                 byte buf[] = ba.getData(); 
                 while (remaining > 0) {
                     int read = in.read(buf, 0, remaining > buf.length ? buf.length : remaining);
-                    if (read == -1)
+                    if (read == -1) {
                         throw new IOException("Insufficient data from the SAM client (" + remaining + "/" + size + ")");
-                    else if (read > 0)
-                        i2pSocketOS.write(buf, 0, read);
-                    
-                    remaining -= read;
+                    } else if (read > 0) {
+                        remaining -= read;
+                        try {
+                            i2pSocketOS.write(buf, 0, read);
+                        } catch (IOException ioe) {
+                            // ok, the stream failed, but the SAM client didn't
+                            if (_log.shouldLog(Log.WARN))
+                                _log.warn("Stream failed", ioe);
+                            
+                            removeSocketHandler(id);
+                            
+                            // emtpy the remaining payload so we can continue
+                            for (int i = remaining; i > 0; i--) {
+                                int c = in.read();
+                                if (c == -1)
+                                    throw new IOException("Stream closed, but the SAM client didn't send enough anyway ("
+                                                          + i + " remaining)");
+                            }
+            
+                            return false;
+                        }
+                    }
                 }
             } finally {
                 cache.release(ba);
