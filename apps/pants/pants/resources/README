@@ -1,0 +1,116 @@
+What is Pants?
+--------------
+
+    Pants is an Apache Ant-based package manager for the management of 3rd party
+    dependencies in Java development projects. It's loosely modeled after
+    FreeBSD's Ports and Gentoo Linux's Portage, with two major differences:
+
+    * Pants isn't intended for system-wide package management. It's tailored for
+      per-project 3rd party package management. You will typically have one
+      Pants repository per project and each repository will be located somewhere
+      under your project's root directory. If you're familiar with Ports or
+      Portage, a Pants repository is roughly analogous to /usr/ports or
+      /usr/portage.
+
+    * Pants is extremely portable. It goes anywhere Apache Ant goes.
+
+    Pants takes a modular approach to the standard Ant buildfile, breaking it
+    into 3 files for functionality and convenience:
+
+    1. The Pants public interface, pants/build.xml, provides a single consistent
+       way to access and manipulate dependency packages and relieves some of the
+       developer's burden by providing implementations for some frequently-used
+       and complex Ant operations.
+
+    2. pbuild.xml is a specially-structured and slimmed-down Ant buildfile in
+       which you implement custom handling for a package your project depends
+       on. This is known as the "pbuild" and is roughly analogous to a FreeBSD
+       port or a Gentoo ebuild. A fairly explanatory template for pbuilds,
+       pbuild.template.xml, is provided.
+
+    3. pbuild.properties contains those properties for a specific pbuild which
+       are most likely to change over time. It uses the java.util.Properties
+       format which is more human-friendly for hand-editing than Ant/XML. A
+       fairly explanatory template, pbuild.template.properties, is provided.
+
+    There is one more file that completes the Pants system: the metadata file
+    pants/world is a database for keeping track of all packages managed by Pants
+    for your project.
+
+    Pants automatically handles versioning for your project's dependency
+    packages and keeps track of their recommended versions, currently used
+    versions, and latest available versions. This makes it extremely simple for
+    project developers to switch back and forth between different versions of a
+    dependency, and makes it just as easy to update a dependency. You can even
+    update all your project's Pants-managed packages with a single command.
+
+    Pbuilds are designed to automatically handle the downloading, building,
+    repackaging and deployment of source archives, binary archives, and CVS
+    sources, all in a manner that's completely transparent to the project
+    developer. Pbuilds currently support tar + gzip, tar + bzip2, and zip
+    archives.
+
+    Because it is based on Ant, Pants integrates very well with Ant buildfiles
+    and will fit easily into your project's Ant build framework. However, its
+    interface is simple enough to be called just as easily by more traditional
+    build systems such as GNU Make.
+
+
+Why Should I Use Pants?
+-----------------------
+
+    There are many applications for Pants, but a few use cases should best serve
+    to illustrate its usefulness:
+
+    1. You have a project that you ship with several 3rd party libraries but the
+       versions you're using are stale. With a single command, Pants can
+       automatically discover the latest release versions for all of these, then
+       download, build, and place the fresh libraries where your project's main
+       build system expects them to be at build time.
+
+    2. You want to test multiple versions of a 3rd party library against your
+       project. Pants only requires you to issue a single command to switch
+       library versions, so can spend more time testing and less time hunting
+       packages down, unpackaging them, symlinking, etc.
+
+    3. Pants is public domain. You can ship it with your project if you need to
+       without having to worry about petty intellectual property or licensing
+       issues.
+
+
+Minimum Requirements
+--------------------
+
+    * Apache Ant 1.6.2 or higher is recommended
+
+    * Any Java runtime and operating system that will run Ant
+
+
+Installation
+------------
+
+    Not finished yet.
+
+
+Why the Silly Name?
+-------------------
+
+    Ports + Ant = Pants. Any other explanation is purely a product of your
+    twisted imagination.
+
+
+Miscellaneous Pocket Fluff
+--------------------------
+
+    Author:  smeghead <smeghead@i2pmail.org> <smeghead@mail.i2p>
+
+    License: No license necessary. This work is released into the public domain.
+
+    Price:   Free! But if you really appreciate Pants, or you're just a sicko,
+             please send me a picture of your worst or most unusual pair of
+             pants so I can add it to the Whirling Hall of Pants on pants.i2p,
+             the official Pants eepsite (that's an anonymous website on I2P--see
+             http://www.i2p.net for more information).
+
+
+$Id$

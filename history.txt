@@ -1,4 +1,10 @@
-$Id: history.txt,v 1.139 2005/02/07 05:04:23 jrandom Exp $
+$Id: history.txt,v 1.140 2005/02/09 14:28:29 duck Exp $
+
+2005-02-10  smeghead
+    * Initial check-in of Pants, a new utility to help us manage our 3rd-party
+      dependencies (Fortuna, Jetty, Java Service Wrapper, etc.). Some parts of
+      Pants are still non-functional at this time so don't mess with it yet
+      unless you want to potentially mangle your working copy of CVS.
 
 2005-02-09  duck
     * Allow an unneeded newline in the SAM client connection without

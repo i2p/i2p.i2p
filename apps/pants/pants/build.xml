@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project basedir="." default="build" name="build-pants">
+
+	<target name="build"
+		description="Build the source">
+		<mkdir dir="./java/build"/>
+		<javac srcdir="./java/src" source="1.3" target="1.3" deprecation="on" destdir="./java/build" />
+	</target>
+
+	<target name="clean"
+		description="Remove all object files">
+		<delete dir="./java/build" />
+		<delete dir="./java/jartemp" />
+	</target>
+
+	<target name="dist" depends="build, jar"
+		description="Create the jar and copy it to ../lib">
+		<copy todir="../lib" file="./java/build/pants.jar" />
+	</target>
+
+	<target name="distclean" depends="clean"
+		description="Remove the jar and all object files" >
+		<delete file="../lib/pants.jar" />
+	</target>
+
+	<target name="jar">
+		<delete dir="./java/jartemp" />
+		<mkdir dir="./java/jartemp" />
+		<copy todir="./java/jartemp">
+			<fileset dir="./java/build" includes="**/*.class" />
+		</copy>
+		<jar basedir="./java/jartemp" jarfile="./java/build/pants.jar">
+			<manifest>
+				<section name="net.i2p.pants">
+					<attribute name="Implementation-Title" value="Pants" />
+					<attribute name="Implementation-Version" value="0.0.1" /> 
+					<attribute name="Implementation-Vendor" value="I2P" />
+					<attribute name="Implementation-Vendor-Id" value="I2P" />
+					<attribute name="Implementation-URL" value="http://www.i2p.net" />
+				</section>
+			</manifest>
+		</jar>
+		<delete dir="./java/jartemp" />
+	</target>
+</project>

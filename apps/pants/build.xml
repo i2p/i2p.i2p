@@ -1,0 +1,236 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  Ports + Ant = Pants, a simple Ant-based package manager
+
+  free (adj.): unencumbered; not under the control of others
+
+  Written by smeghead in 2005 and released into the public domain with no
+  warranty of any kind, either expressed or implied.  It probably won't make
+  your computer catch on fire, or eat your children, but it might.  Use at your
+  own risk.
+-->
+
+<project basedir="." default="help" name="pants-interface">
+
+<!-- .......................... Global Properties .......................... -->
+
+
+
+<!-- ........................... Internal Tasks ............................ -->
+
+	<target name="-fetchCvs" unless="cvs.source.available" if="using.cvs">
+		<cvs compressionlevel="${cvs.compression.level}"
+			date="${cvs.date}"
+			dest="./distfiles/cvs-src/${pbuild}"
+			failonerror="true"
+			package="${cvs.package}"
+			passfile="${cvs.passfile}"
+			port="${cvs.port}"
+			cvsRoot="${cvs.root}"
+			cvsRsh="${cvs.rsh}"
+			tag="${cvs.tag}"
+		/>
+	</target>
+
+	<target name="-fetchPackage"  unless="using.cvs">
+		<get src="${package.url}"
+			verbose="true"
+			dest="./distfiles"
+		/>
+	</target>
+
+	<target name="-init">
+		<!--
+		  TODO: Create dist/ and working/ folders for each pbuild subdir in case
+		  they've been wiped.
+		-->
+		<loadproperties srcfile="world" />
+		<taskdef name="mergetypedproperties"
+			classname="net.i2p.pants.MergeTypedPropertiesTask"
+			classpath="./lib/pants.jar"
+		/>
+		<mergetypedproperties input="./pbuilds/${pbuild}/pbuild.properties"
+			output="./pbuilds/${pbuild}/merged-properties.temp"
+			booleanList="version.latest.find.regex.canonicaleq,	version.latest.find.regex.caseinsensitive, version.latest.find.regex.comments, version.latest.find.regex.dotall, version.latest.find.regex.multiline, version.latest.find.regex.unicodecase, version.latest.find.regex.unixlines"
+			stringList="cvs.compression.level, cvs.date, cvs.package, cvs.passfile, cvs.port, cvs.root, cvs.rsh, cvs.tag, package.url, version.latest, version.latest.find.url, version.latest.find.regex"
+		/>
+		<loadproperties srcfile="./pbuilds/${pbuild}/merged-properties.temp" />
+		<delete file="./pbuilds/${pbuild}/merged-properties.temp" />
+		<!--
+		  If '-Dpbuild={name}' isn't specified, the 'build', 'fetch', 'update'
+		  and 'version' commands should default to 'world' behavior.
+		-->
+		<antcall target="-setWorld" />
+		<condition property="using.cvs">
+			<or>
+				<equals arg1="CVS" arg2="${version.using.${pbuild}}" />
+				<equals arg1="cvs" arg2="${version.using.${pbuild}}" />
+			</or>
+		</condition>
+		<!--
+		  If 'version.recommended' isn't defined in pbuild.properties, default
+		  to latest available version.
+		-->
+	</target>
+
+	<target name="-setWorld" unless="pbuild">
+		<property name="pbuild" value="world" />
+	</target>
+
+	<target name="-unpackTarBz2">
+		<untar src="${pbuild.package}"
+			compression="bzip2"
+			dest="./${pbuild}/working"
+		/>
+	</target>
+
+	<target name="-unpackTarGzip">
+		<untar src="${pbuild.package}"
+			compression="gzip"
+			dest="./${pbuild}/working"
+		/>
+	</target>
+
+	<target name="-unpackZip">
+		<unzip src="${pbuild.package}" dest="./${pbuild}/working" />
+	</target>
+
+	<target name="-updateCvs" if="using.cvs">
+		<cvs command="update -d"
+			compressionlevel="${compression.level}"
+			date="${cvs.date}"
+			dest="./distfiles/cvs-src"
+			failonerror="true"
+			package="${cvs.package}"
+			passfile="${cvs.passfile}"
+			port="${cvs.port}"
+			cvsRoot="${cvs.root}"
+			cvsRsh="${cvs.rsh}"
+			tag="${cvs.tag}"
+		/>
+	</target>
+
+	<target name="-updateConfirm" if="confirm.update" unless="no.prompts">
+		<input validargs="y,Y,n,N"
+			defaultvalue="n"
+			addproperty="confirm.update.answer">
+You currently have the recommended version installed. A newer
+version will be installed if you continue and this may break some
+applications which depend on this package. Are you sure you want
+to update? [y/N]
+		</input>
+		<condition property="abort.update">
+			<or>
+				<equals arg1="n" arg2="${confirm.update.answer}" />
+				<equals arg1="N" arg2="${confirm.update.answer}" />
+			</or>
+		</condition>
+		<fail if="abort.update">Update aborted.</fail>
+	</target>
+
+	<target name="-versionLatest">
+		<get src="${version.latest.find.url}"
+			dest="version.latest.in.temp"
+			verbose="true"
+		/>
+		<taskdef name="match"
+			classname="net.i2p.pants.MatchTask"
+			classpath="./lib/pants.jar"
+		/>
+		<match input="version.latest.in.temp"
+			output="version.latest.parsed.temp"
+			regex="${version.latest.find.regex}"
+			canonicaleq="${version.latest.find.regex.canonicaleq}"
+			caseinsensitive="${version.latest.find.regex.caseinsensitive}"
+			comments="${version.latest.find.regex.comments}"
+			dotall="${version.latest.find.regex.dotall}"
+			multiline="${version.latest.find.regex.multiline}"
+			unicodecase="${version.latest.find.regex.unicodecase}"
+			unixlines="${version.latest.find.regex.unixlines}"
+		/>
+		<loadproperties srcFile="version.latest.parsed.temp" />
+		<delete file="version.latest.in.temp" />
+		<delete file="version.latest.parsed.temp" />
+		<property name="version.latest" value="${group.1}" />
+	</target>
+
+	<target name="-versionRecommended">
+		<property name="version.recommended" value="x" />
+	</target>
+
+	<target name="-versionUsing">
+		<property name="version.using" value="x" />
+	</target>
+
+<!-- .......................... Public Interface ........................... -->
+
+	<target name="build" depends="-init,fetch"
+		description="Build a pbuild and its dependencies">
+		<ant antfile="pbuild.xml" dir="./pbuilds/${pbuild}" target="clean" />
+		<ant antfile="pbuild.xml" dir="./pbuilds/${pbuild}" target="build" />
+		<!--
+		  Perform a 'clean' on the target first (but not 'distclean')
+		-->
+	</target>
+
+	<target name="fetch" depends="-init"
+		description="Get package only">
+		<antcall target="-fetchPackage" />
+		<antcall target="-fetchCvs" />
+		<copydir dest="./pbuilds/${pbuild}/working"
+			src="./distfiles/cvs-src/${pbuild}"
+		/>
+	</target>
+
+	<target name="help"
+		description="Display usage synopsis">
+		<echo>
+Pants usage:
+
+    ant [--usejikes] [-Dpbuild={name}] [-Dpbuild.version={version}]
+        [-D{property}={value}] [-Dno.prompts=true] build | fetch |
+        help | install | uninstall | update | version
+
+    build        Build a pbuild and its dependencies
+    fetch        Get package only
+    help         Display usage synopsis
+    install      Fetch, build and install a pbuild
+    uninstall    Uninstall a pbuild
+    update       Update pbuild(s) to the latest version(s)
+    version      Display pbuild version information
+		</echo>
+	</target>
+
+	<!--
+	  Install recommended version by default unless 'version' property is set.
+	  Do not install if package is already installed.
+	-->
+	<target name="install" depends="-init, build"
+		description="Install a pbuild">
+		<ant antfile="pbuild.xml" dir="./pbuilds/${pbuild}" target="dist" />
+		<ant antfile="pbuild.xml" dir="./pbuilds/${pbuild}"
+			target="distclean"
+		/>
+	</target>
+
+	<target name="uninstall" depends="-init"
+		description="Uninstall a pbuild" />
+
+	<target name="update" depends="-init"
+		description="Update pbuild(s) to the latest version(s)">
+		<condition property="${confirm.update}">
+			<equals arg1="${version.using}" arg2="${version.recommended}" />
+		</condition>
+		<antcall target="-updateConfirm" />
+	</target>
+
+	<target name="version"
+		depends="-init, -versionRecommended, -versionUsing, -versionLatest"
+		description="Display pbuild version information">
+		<echo message="Latest version: ${version.recommended}" />
+		<echo message="Latest version: ${version.using}" />
+		<echo message="Latest version: ${version.latest}" />
+	</target>
+
+</project>
