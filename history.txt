@@ -1,4 +1,8 @@
-$Id: history.txt,v 1.73 2004/11/16 17:11:12 jrandom Exp $
+$Id: history.txt,v 1.74 2004/11/17 13:34:25 jrandom Exp $
+
+2004-11-17  jrandom
+    * Fix to propogate i2psocket options into the SAM bridge correctly (thanks
+      Ragnarok!)
 
 2004-11-17  jrandom
     * Minor logging update.

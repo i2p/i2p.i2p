@@ -180,9 +180,9 @@ public class SAMStreamSession {
         Destination d = new Destination();
         d.fromBase64(dest);
 
-        // FIXME: we should config I2PSocketOptions here
-        I2PSocketOptions opts = socketMgr.buildOptions();
-        opts.setConnectTimeout(60 * 1000);
+        I2PSocketOptions opts = socketMgr.buildOptions(props);
+        if (props.getProperty(I2PSocketOptions.PROP_CONNECT_TIMEOUT) == null)
+            opts.setConnectTimeout(60 * 1000);
 
         _log.debug("Connecting new I2PSocket...");
         I2PSocket i2ps = socketMgr.connect(d, opts);
