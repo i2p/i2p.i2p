@@ -97,17 +97,17 @@ public class BandwidthLimiterTest {
     public void testOutbound() {
         prepareLimiter(-1, -1, -1, -1);
         _log.info("Begin unlimited push of " + NUM_MB);
-        long ms = testOutboundThrottle(NUM_MB*1024*1024, 32*1024);
+        long ms = testOutboundThrottle(NUM_MB*1024*1024, 1*1024);
         _log.info("** Unlimited pushed " + NUM_MB + "MB in " + ms + "ms");
-        prepareLimiter(-1, 4, -1, 5*1024*1024);
-        ms = testOutboundThrottle(NUM_MB*1024*1024, 4*1024);
+        prepareLimiter(-1, 4, -1, 4*1024);
+        ms = testOutboundThrottle(NUM_MB*1024*1024, 1*1024);
         _log.info("** 4KBps pushed " + NUM_MB + "MB in " + ms + "ms");
-        prepareLimiter(-1, 32, -1, 5*1024*1024);
-        ms = testOutboundThrottle(NUM_MB*1024*1024, 32*1024);
+        prepareLimiter(-1, 32, -1, 32*1024);
+        ms = testOutboundThrottle(NUM_MB*1024*1024, 1*1024);
         _log.info("** 32KBps pushed " + NUM_MB + "MB in " + ms + "ms");
-        prepareLimiter(-1, 256, -1, 5*1024*1024);
+        prepareLimiter(-1, 256, -1, 256*1024);
         _log.info("Begin 256KBps push of " + NUM_MB);
-        ms = testOutboundThrottle(NUM_MB*1024*1024, 256*1024);
+        ms = testOutboundThrottle(NUM_MB*1024*1024, 1*1024);
         _log.info("** 256KBps pushed " + NUM_MB + "MB in " + ms + "ms");
     }
     
@@ -118,16 +118,16 @@ public class BandwidthLimiterTest {
      */
     public void testInbound() {
         prepareLimiter(-1, -1, -1, -1);
-        long ms = testInboundThrottle(NUM_MB*1024*1024, 32*1024);
+        long ms = testInboundThrottle(NUM_MB*1024*1024, 1*1024);
         _log.info("** Unlimited pulled " + NUM_MB + "MB in " + ms + "ms");
-        prepareLimiter(4, -1, 5*1024*1024, -1);
-        ms = testInboundThrottle(NUM_MB*1024*1024, 32*1024);
+        prepareLimiter(4, -1, 4*1024, -1);
+        ms = testInboundThrottle(NUM_MB*1024*1024, 1*1024);
         _log.info("** 4KBps pulled " + NUM_MB + "MB in " + ms + "ms");
-        prepareLimiter(32, -1, 5*1024*1024, -1);
-        ms = testInboundThrottle(NUM_MB*1024*1024, 32*1024);
+        prepareLimiter(32, -1, 32*1024, -1);
+        ms = testInboundThrottle(NUM_MB*1024*1024, 1*1024);
         _log.info("** 32KBps pulled " + NUM_MB + "MB in " + ms + "ms");
-        prepareLimiter(256, -1, 5*1024*1024, -1);
-        ms = testInboundThrottle(NUM_MB*1024*1024, 256*1024);
+        prepareLimiter(256, -1, 256*1024, -1);
+        ms = testInboundThrottle(NUM_MB*1024*1024, 1*1024);
         _log.info("** 256KBps pulled " + NUM_MB + "MB in " + ms + "ms");
     }
     
@@ -143,12 +143,12 @@ public class BandwidthLimiterTest {
         //runningTimes = testOutboundContention(10, NUM_MB*1024*1024);
         //end = System.currentTimeMillis();
         //_log.info("** Done with 4KBps " + NUM_MB + "MB test with 10 concurrent threads after " + (end-start) + "ms: " + displayTimes(runningTimes));
-        prepareLimiter(-1, 32, -1, 5*1024*1024);
+        prepareLimiter(-1, 32, -1, 32*1024);
         start = System.currentTimeMillis();
         runningTimes = testOutboundContention(10, NUM_MB*1024*1024);
         end = System.currentTimeMillis();
         _log.info("** Done with 32KBps " + NUM_MB + "MB test with 10 concurrent threads after " + (end-start) + "ms: " + displayTimes(runningTimes));
-        prepareLimiter(-1, 256, -1, 5*1024*1024);
+        prepareLimiter(-1, 256, -1, 256*1024);
         start = System.currentTimeMillis();
         runningTimes = testOutboundContention(10, NUM_MB*1024*1024);
         end = System.currentTimeMillis();
@@ -204,9 +204,9 @@ public class BandwidthLimiterTest {
     
     public static void main(String args[]) {
         BandwidthLimiterTest test = new BandwidthLimiterTest();
-        //test.testOutbound();
-        //test.testInbound();
-        test.testOutboundContention();
+        test.testOutbound();
+        test.testInbound();
+        //test.testOutboundContention();
         System.exit(0);
     }
 }
