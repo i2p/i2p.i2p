@@ -171,6 +171,12 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
     /** if we have less than 5 routers left, don't drop any more, even if they're failing or doing bad shit */
     private final static int MIN_REMAINING_ROUTERS = 5;
     
+    /** 
+     * dont accept any dbDtore of a router over 6 hours old (unless we dont 
+     * know anyone or just started up) 
+     */
+    private final static long ROUTER_INFO_EXPIRATION = 6*60*60*1000l;
+    
     public KademliaNetworkDatabaseFacade(RouterContext context) {
         _context = context;
         _log = _context.logManager().getLog(KademliaNetworkDatabaseFacade.class);
@@ -609,7 +615,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Invalid routerInfo signature!  forged router structure!  router = " + routerInfo);
             return "Invalid routerInfo signature on " + key.toBase64();
-        } else if (!routerInfo.isCurrent(Router.CLOCK_FUDGE_FACTOR + ExpireRoutersJob.EXPIRE_DELAY)) {
+        } else if (!routerInfo.isCurrent(ROUTER_INFO_EXPIRATION)) {
             long age = _context.clock().now() - routerInfo.getPublished();
             int existing = _kb.size();
             if (existing >= MIN_REMAINING_ROUTERS) {
