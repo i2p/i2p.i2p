@@ -70,6 +70,7 @@ public class OutboundMessageRegistry {
         long continueTime = 0;
         int numMessages = messages.size();
 
+        StringBuffer slow = new StringBuffer(256);
         long afterSync1 = _context.clock().now();
 
         ArrayList matchedRemove = null; // new ArrayList(32);
@@ -86,6 +87,8 @@ public class OutboundMessageRegistry {
                     if (_log.shouldLog(Log.WARN))
                         _log.warn("Matching with selector took too long (" + diff + "ms) : " 
                                   + selector.getClass().getName());
+                    slow.append(selector.getClass().getName()).append(": ");
+                    slow.append(diff).append(" ");
                 }
                 matchTime += diff;
 
@@ -134,11 +137,17 @@ public class OutboundMessageRegistry {
         if (delay > 1000)
             level = Log.ERROR;
         if (_log.shouldLog(level)) {
-            _log.log(level, "getMessages took " + delay + "ms with search time of " 
-                            + search + "ms (match: " + matchTime + "ms, continue: " 
-                            + continueTime + "ms, #: " + numMessages + ") and sync time of " 
-                            + sync + "ms for " + (matchedRemove == null ? 0 : matchedRemove.size())
-                            + " removed, " + matches.size() + " matches");
+            StringBuffer buf = new StringBuffer(1024);
+            buf.append("getMessages took ").append(delay).append("ms with search time of");
+            buf.append(search).append("ms (match: ").append(matchTime).append("ms, continue: ");
+            buf.append(continueTime).append("ms, #: ").append(numMessages).append(") and sync time of ");
+            buf.append(sync).append("ms for ");
+            if (matchedRemove == null) 
+                buf.append(0);
+            else
+                buf.append(matchedRemove.size());
+            buf.append(" removed, ").append(matches.size()).append(" matches: slow = ").append(slow.toString());
+            _log.log(level, buf.toString());
         }
 
         return matches;

@@ -820,12 +820,12 @@ public class RequestTunnelJob extends JobImpl {
         public String getName() { return "Create Tunnel Failed"; }
         public void runJob() {
             // update the tunnel so its known to be not working
-            if (_log.shouldLog(Log.ERROR)) {
-                _log.error("Tunnel creation timed out for tunnel " + _tunnel.getTunnelId() + " at router " 
+            if (_log.shouldLog(Log.WARN)) {
+                _log.warn("Tunnel creation timed out for tunnel " + _tunnel.getTunnelId() + " at router " 
                            + _tunnel.getThisHop().toBase64() + " from router " 
                            + _context.routerHash().toBase64() + " after waiting " 
                            + (_context.clock().now()-_started) + "ms");
-                _log.error("Added by", Failure.this.getAddedBy());
+                _log.warn("Added by", Failure.this.getAddedBy());
             }
             synchronized (_failedTunnelParticipants) {
                 _failedTunnelParticipants.add(_tunnel.getThisHop());

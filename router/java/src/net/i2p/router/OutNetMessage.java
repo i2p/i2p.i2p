@@ -157,6 +157,7 @@ public class OutNetMessage {
             } catch (IOException ioe) {
                 _log.error("Error serializing the I2NPMessage for the OutNetMessage", ioe);
             }
+            
             return null;
         }
     }
@@ -237,14 +238,16 @@ public class OutNetMessage {
     
     public void finalize() throws Throwable {
         if (_message != null) {
-            StringBuffer buf = new StringBuffer(1024);
-            buf.append("Undiscarded ").append(_messageSize).append("byte ");
-            buf.append(_messageType).append(" message created ");
-            buf.append((_context.clock().now() - _created)).append("ms ago: ");
-            buf.append(_messageId); // .append(" to ").append(_target.calculateHash().toBase64());
-            buf.append(", timing - \n");
-            renderTimestamps(buf);
-            _log.error(buf.toString(), _createdBy);
+            if (_log.shouldLog(Log.WARN)) {
+                StringBuffer buf = new StringBuffer(1024);
+                buf.append("Undiscarded ").append(_messageSize).append("byte ");
+                buf.append(_messageType).append(" message created ");
+                buf.append((_context.clock().now() - _created)).append("ms ago: ");
+                buf.append(_messageId); // .append(" to ").append(_target.calculateHash().toBase64());
+                buf.append(", timing - \n");
+                renderTimestamps(buf);
+                _log.warn(buf.toString(), _createdBy);
+            }
             _context.messageStateMonitor().outboundMessageDiscarded();
         }
         _context.messageStateMonitor().outboundMessageFinalized();

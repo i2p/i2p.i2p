@@ -166,8 +166,8 @@ class TCPListener {
                     _log.debug("Handle successful");
             } else {
                 if (h.receivedIdentByte()) {
-                    if (_log.shouldLog(Log.ERROR))
-                        _log.error("Unable to handle in the time allotted");
+                    if (_log.shouldLog(Log.WARN))
+                        _log.warn("Unable to handle in the time allotted");
                 } else {
                     if (_log.shouldLog(Log.DEBUG))
                         _log.debug("Peer didn't send the ident byte, so either they were testing us, or portscanning");
