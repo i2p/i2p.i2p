@@ -1,0 +1,27 @@
+SAM - Simple Anonymous Messaging - is a protocol which allows
+I2P applications to access the I2P network via an unencrypted
+TCP socket connection.
+
+Interim SAM protocol specification can be found at:
+http://drupal.i2p.net/node/view/144
+
+At time of first writing this README, an implementation of the SAM
+server has been implemented in Jython (www.jython.org).
+
+You can find the server code, and build files, in the ../jython
+directory.
+
+A python client implementation, containing demo functions,
+can be found in the ../python directory.
+
+I2P developers are strongly encouraged to create SAM
+client implementations in other languages, most importantly,
+popular portable languages like C/C++, Perl and Ruby.
+
+The 'code.leo' file in this directory is used by the Leo
+code editor (http://leo.sf.net), to manage the source in a
+flexible tree format. While I can't insist on it, I'd
+massively appreciate it if you could use this editor when
+making additions and changes to the files herein, because
+it will save me a lot of maintenance effort.
+
