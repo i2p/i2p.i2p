@@ -209,8 +209,18 @@ public class LogManager {
      *
      */
     void addRecord(LogRecord record) {
+        int numRecords = 0;
         synchronized (_records) {
             _records.add(record);
+            numRecords = _records.size();
+        }
+        
+        if (numRecords > 100) {
+            // the writer waits 10 seconds *or* until we tell them to wake up
+            // before rereading the config and writing out any log messages
+            synchronized (_writer) {
+                _writer.notifyAll();
+            }
         }
     }
     

@@ -72,11 +72,14 @@ class LogWriter implements Runnable {
             t.printStackTrace();
         } finally {
             try { 
-                Thread.sleep(100); 
+                synchronized (this) {
+                    this.wait(10*1000); 
+                }
             } catch (InterruptedException ie) { // nop
             }
         }
     }
+    
     
     private void rereadConfig() {
         long now = Clock.getInstance().now();
