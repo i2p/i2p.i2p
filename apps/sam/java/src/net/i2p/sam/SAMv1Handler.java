@@ -111,6 +111,11 @@ public class SAMv1Handler extends SAMHandler implements SAMRawReceiver, SAMDatag
                     _log.debug("New message received: [" + msg + "]");
                 }
 
+                if(msg.equals("")) {
+                    _log.debug("Ignoring newline");
+                    continue;
+                }
+
                 tok = new StringTokenizer(msg, " ");
                 if (tok.countTokens() < 2) {
                     // This is not a correct message, for sure
