@@ -1,4 +1,8 @@
-$Id: history.txt,v 1.179 2005/03/23 22:18:16 jrandom Exp $
+$Id: history.txt,v 1.180 2005/03/24 02:29:27 jrandom Exp $
+
+2005-03-25  jrandom
+    * Fixed up building dependencies for the routerconsole on some more 
+      aggressive compilers (thanks polecat!)
 
 * 2005-03-24  0.5.0.4 released
 
