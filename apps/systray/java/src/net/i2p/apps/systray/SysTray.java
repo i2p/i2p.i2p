@@ -51,6 +51,9 @@ public class SysTray implements SysTrayMenuListener {
     public void iconLeftClicked(SysTrayMenuEvent e) {}
 
     public void iconLeftDoubleClicked(SysTrayMenuEvent e) {
+
+        String browser = null;
+
         if (_browserString == null || _browserString.equals("default")) {
             try {
 
@@ -70,7 +73,10 @@ public class SysTray implements SysTrayMenuListener {
                 // Fall through.
             }
         }
-        setBrowser(promptForBrowser("Please select another browser"));
+
+        if ((browser = promptForBrowser("Please select another browser")) != null)
+            setBrowser(browser);
+
     }
 
     public void menuItemSelected(SysTrayMenuEvent e) {
@@ -98,9 +104,15 @@ public class SysTray implements SysTrayMenuListener {
     }
 
     private String promptForBrowser(String windowTitle) {
+
+        String browser = null;
+
         _frame = new Frame();
         _browserChooser = new BrowserChooser(_frame, windowTitle);
-        return _browserChooser.getDirectory() + _browserChooser.getFile();
+        browser = _browserChooser.getDirectory() + _browserChooser.getFile();
+        _browserChooser = null;
+        _frame = null;
+        return browser;
     }
 
     private void setBrowser(String browser) {

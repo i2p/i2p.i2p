@@ -17,7 +17,8 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 
 /**
- * Passes a command to the OS shell for execution and manages the output.
+ * Passes a command to the OS shell for execution and manages the input and
+ * output.
  * <p>
  * This class must be kept <code>gcj</code>-compatible.
  * 
@@ -35,6 +36,7 @@ public class ShellCommand {
     private CommandThread _commandThread;
     private InputStream   _errorStream;
     private InputStream   _inputStream;
+    private boolean       _isTimerRunning;
     private OutputStream  _outputStream;
     private Process       _process;
 
@@ -45,11 +47,11 @@ public class ShellCommand {
      */
     private class CommandThread extends Thread {
 
-        Object  caller;
+        Thread  caller;
         boolean consumeOutput;
         String  shellCommand;
 
-        CommandThread(Object caller, String shellCommand, boolean consumeOutput) {
+        CommandThread(Thread caller, String shellCommand, boolean consumeOutput) {
             super("CommandThread");
             this.caller = caller;
             this.shellCommand = shellCommand;
@@ -58,8 +60,10 @@ public class ShellCommand {
 
         public void run() {
             _commandSuccessful = execute(shellCommand, consumeOutput, WAIT_FOR_EXIT_STATUS);
-            synchronized(caller) {
-                caller.notify();  // In case the caller is still in the wait() state.
+            if (_isTimerRunning) {
+                synchronized(caller) {
+                    caller.interrupt();  // In case the caller is still in the wait() state.
+                }
             }
         }
     }
@@ -236,13 +240,16 @@ public class ShellCommand {
         try {
 
             if (seconds > 0) {
+                _isTimerRunning = true;
                 wait(seconds * 1000);
+                _isTimerRunning = false;
                 return true;
             }
 
         } catch (InterruptedException e) {
             // Wake up, time to die.
         }
+        _isTimerRunning = false;
 
         if (_commandSuccessful)
             return true;
@@ -302,13 +309,16 @@ public class ShellCommand {
         try {
 
             if (seconds > 0) {
+                _isTimerRunning = true;
                 wait(seconds * 1000);
+                _isTimerRunning = false;
                 return true;
             }
 
         } catch (InterruptedException e) {
             // Wake up, time to die.
         }
+        _isTimerRunning = false;
 
         if (_commandSuccessful)
             return true;
