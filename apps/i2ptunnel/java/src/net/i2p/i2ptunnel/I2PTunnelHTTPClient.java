@@ -9,8 +9,12 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.Socket;
 import java.net.SocketException;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+import java.util.StringTokenizer;
 
+import net.i2p.I2PAppContext;
 import net.i2p.I2PException;
 import net.i2p.client.streaming.I2PSocket;
 import net.i2p.data.DataFormatException;
@@ -42,7 +46,7 @@ import net.i2p.util.Log;
 public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable {
     private static final Log _log = new Log(I2PTunnelHTTPClient.class);
 
-    private String wwwProxy;
+    private List proxyList;
 
     private final static byte[] ERR_REQUEST_DENIED =
         ("HTTP/1.1 403 Access Denied\r\n"+
@@ -95,9 +99,14 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
             return;
         }
 
-        this.wwwProxy = wwwProxy;
+        proxyList = new ArrayList();
+        if (wwwProxy != null) {
+            StringTokenizer tok = new StringTokenizer(wwwProxy, ",");
+            while (tok.hasMoreTokens())
+                proxyList.add(tok.nextToken().trim());
+        }
 
-        setName(getLocalPort() + " -> HTTPClient [WWW outproxy: " + this.wwwProxy + "]");
+        setName(getLocalPort() + " -> HTTPClient [WWW outproxy list: " + wwwProxy + "]");
 
         startRunning();
 
@@ -106,10 +115,20 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
 
     private String getPrefix() { return "Client[" + _clientId + "]: "; }
     
+    private String selectProxy() {
+        if (proxyList.size() <= 0) {
+            l.log("Proxy list is emtpy - no outproxy available");
+            return null;
+        }
+        int index = I2PAppContext.getGlobalContext().random().nextInt(proxyList.size()-1);
+        return (String)proxyList.get(index);
+    }
+    
     protected void clientConnectionRun(Socket s) {
         OutputStream out = null;
         String targetRequest = null;
         boolean usingWWWProxy = false;
+        String currentProxy = null;
         InactivityTimeoutThread timeoutThread = null;
         try {
             out = s.getOutputStream();
@@ -160,7 +179,8 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
                         line = method + " " + request.substring(pos);
                     } else if (host.indexOf(".") != -1) {
                         // The request must be forwarded to a WWW proxy
-                        destination = wwwProxy;
+                        currentProxy = selectProxy();
+                        destination = currentProxy;
                         usingWWWProxy = true;
                         if (_log.shouldLog(Log.DEBUG))
                             _log.debug(getPrefix() + "Host doesnt end with .i2p and it contains a period [" + host + "]: wwwProxy!");
@@ -242,25 +262,25 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
             I2PSocket i2ps = createI2PSocket(dest);
             byte[] data = newRequest.toString().getBytes("ISO-8859-1");
             I2PTunnelRunner runner = new I2PTunnelRunner(s, i2ps, sockLock, data);
-            timeoutThread = new InactivityTimeoutThread(runner, out, targetRequest, usingWWWProxy, s);
+            timeoutThread = new InactivityTimeoutThread(runner, out, targetRequest, usingWWWProxy, currentProxy, s);
             timeoutThread.start();
         } catch (SocketException ex) {
             if (timeoutThread != null) timeoutThread.disable();
             _log.info(getPrefix() + "Error trying to connect", ex);
             l.log(ex.getMessage());
-            handleHTTPClientException(ex, out, targetRequest, usingWWWProxy, wwwProxy);
+            handleHTTPClientException(ex, out, targetRequest, usingWWWProxy, currentProxy);
             closeSocket(s);
         } catch (IOException ex) {
             if (timeoutThread != null) timeoutThread.disable();
             _log.info(getPrefix() + "Error trying to connect", ex);
             l.log(ex.getMessage());
-            handleHTTPClientException(ex, out, targetRequest, usingWWWProxy, wwwProxy);
+            handleHTTPClientException(ex, out, targetRequest, usingWWWProxy, currentProxy);
             closeSocket(s);
         } catch (I2PException ex) {
             if (timeoutThread != null) timeoutThread.disable();
             _log.info("getPrefix() + Error trying to connect", ex);
             l.log(ex.getMessage());
-            handleHTTPClientException(ex, out, targetRequest, usingWWWProxy, wwwProxy);
+            handleHTTPClientException(ex, out, targetRequest, usingWWWProxy, currentProxy);
             closeSocket(s);
         }
     }
@@ -275,16 +295,18 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
         private OutputStream _out;
         private String _targetRequest;
         private boolean _useWWWProxy;
+        private String _currentProxy;
         private boolean _disabled;
         private Object _disableLock = new Object();
 
         public InactivityTimeoutThread(I2PTunnelRunner runner, OutputStream out, String targetRequest,
-                                       boolean useWWWProxy, Socket s) {
+                                       boolean useWWWProxy, String currentProxy, Socket s) {
             this.s = s;
             _runner = runner;
             _out = out;
             _targetRequest = targetRequest;
             _useWWWProxy = useWWWProxy;
+            _currentProxy = currentProxy;
             _disabled = false;
             long timeoutId = ++__timeoutId;
             setName("InactivityThread " + getPrefix() + timeoutId);
@@ -334,7 +356,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
                     if (_runner.getLastActivityOn() > 0) {
                         // some  data has been sent, so don't 404 it
                     } else {
-                        writeErrorMessage(ERR_TIMEOUT, _out, _targetRequest, _useWWWProxy, wwwProxy);
+                        writeErrorMessage(ERR_TIMEOUT, _out, _targetRequest, _useWWWProxy, _currentProxy);
                     }
                 } catch (IOException ioe) {
                     _log.warn(getPrefix() + "Error writing out the 'timeout' message", ioe);
