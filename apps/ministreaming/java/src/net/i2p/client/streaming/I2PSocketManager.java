@@ -322,8 +322,10 @@ public class I2PSocketManager implements I2PSessionListener {
                 s.internalClose();
                 return;
             } else {
-                if ( (payload.length > 0) && (_log.shouldLog(Log.WARN)) )
-                    _log.warn("Disconnect packet had " + payload.length + " bytes");
+                if ( (payload.length > 0) && (_log.shouldLog(Log.ERROR)) )
+                    _log.error("Disconnect packet had " + payload.length + " bytes");
+                if (s != null) 
+                    s.internalClose();
                 return;
             }
         } catch (Exception t) {

@@ -242,7 +242,12 @@ class I2PSocketImpl implements I2PSocket {
         }
 
         public synchronized void notifyClosed() {
-            notifyAll();
+            I2PInputStream.this.notifyAll();
+        }
+        
+        public void close() throws IOException {
+            super.close();
+            notifyClosed();
         }
 
     }
