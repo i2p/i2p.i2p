@@ -32,14 +32,18 @@ class SchedulerClosed extends SchedulerImpl {
     }
     
     public boolean accept(Connection con) {
-        boolean ok = (con != null) && 
-                     (con.getCloseSentOn() > 0) &&
+        if (con == null) return false;
+        long timeSinceClose = _context.clock().now() - con.getCloseSentOn();
+        boolean ok = (con.getCloseSentOn() > 0) &&
                      (con.getCloseReceivedOn() > 0) &&
                      (con.getUnackedPacketsReceived() <= 0) &&
                      (con.getUnackedPacketsSent() <= 0) &&
                      (!con.getResetReceived()) &&
-                     (con.getCloseSentOn() + Connection.DISCONNECT_TIMEOUT > _context.clock().now());
-        return ok;
+                     (timeSinceClose < Connection.DISCONNECT_TIMEOUT);
+        boolean conTimeout = (con.getOptions().getConnectTimeout() < con.getLifetime()) && 
+                             con.getSendStreamId() == null &&
+                             con.getLifetime() < Connection.DISCONNECT_TIMEOUT;
+        return (ok || conTimeout);
     }
     
     public void eventOccurred(Connection con) {

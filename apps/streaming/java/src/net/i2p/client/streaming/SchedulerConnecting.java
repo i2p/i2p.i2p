@@ -35,10 +35,13 @@ class SchedulerConnecting extends SchedulerImpl {
     }
     
     public boolean accept(Connection con) {
-        return (con != null) && 
-               (con.getLastSendId() >= 0) &&
-               (con.getAckedPackets() <= 0) && 
-               (!con.getResetReceived());
+        if (con == null) return false;
+        boolean notYetConnected = (con.getIsConnected()) &&
+                                  (con.getSendStreamId() == null) &&
+                                  (con.getLastSendId() >= 0) &&
+                                  (con.getAckedPackets() <= 0) && 
+                                  (!con.getResetReceived());
+        return notYetConnected;
     }
     
     public void eventOccurred(Connection con) {

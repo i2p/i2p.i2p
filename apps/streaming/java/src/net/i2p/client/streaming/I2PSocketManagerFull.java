@@ -134,7 +134,12 @@ public class I2PSocketManagerFull implements I2PSocketManager {
                              throws I2PException, NoRouteToHostException {
         if (_connectionManager.getSession().isClosed()) 
             throw new I2PException("Session is closed");
-        Connection con = _connectionManager.connect(peer, new ConnectionOptions(options));
+        ConnectionOptions opts = null;
+        if (options instanceof ConnectionOptions)
+            opts = (ConnectionOptions)options;
+        else
+            opts = new ConnectionOptions(options);
+        Connection con = _connectionManager.connect(peer, opts);
         I2PSocketFull socket = new I2PSocketFull(con);
         con.setSocket(socket);
         if (con.getConnectionError() != null) { 

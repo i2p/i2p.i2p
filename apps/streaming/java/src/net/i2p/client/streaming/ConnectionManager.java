@@ -103,7 +103,9 @@ public class ConnectionManager {
     }
     
     /**
-     * Build a new connection to the given peer
+     * Build a new connection to the given peer.  This blocks if there is no
+     * connection delay, otherwise it returns immediately.
+     *
      */
     public Connection connect(Destination peer, ConnectionOptions opts) {
         Connection con = new Connection(_context, this, _schedulerChooser, _outboundQueue, _conPacketHandler, opts);
@@ -120,6 +122,11 @@ public class ConnectionManager {
         
         con.setReceiveStreamId(receiveId);        
         con.eventOccurred();
+        
+        _log.debug("Connect() conDelay = " + opts.getConnectDelay());
+        if (opts.getConnectDelay() <= 0) {
+            con.waitForConnect();
+        }
         return con;
     }
 

@@ -59,6 +59,8 @@ public class Connection {
     /** window size when we last saw congestion */
     private int _lastCongestionSeenAt;
     private boolean _ackSinceCongestion;
+    /** Notify this on connection (or connection failure) */
+    private Object _connectLock;
     
     public static final long MAX_RESEND_DELAY = 60*1000;
     public static final long MIN_RESEND_DELAY = 20*1000;
@@ -100,6 +102,7 @@ public class Connection {
         _lastReceivedOn = -1;
         _activityTimer = new ActivityTimer();
         _ackSinceCongestion = true;
+        _connectLock = new Object();
     }
     
     public long getNextOutboundPacketNum() { 
@@ -111,6 +114,7 @@ public class Connection {
     void closeReceived() {
         setCloseReceivedOn(_context.clock().now());
         _inputStream.closeReceived();
+        synchronized (_connectLock) { _connectLock.notifyAll(); }
     }
     
     /**
@@ -296,6 +300,8 @@ public class Connection {
         _resetReceived = true;
         _outputStream.streamErrorOccurred(new IOException("Reset received"));
         _inputStream.streamErrorOccurred(new IOException("Reset received"));
+        _connectionError = "Connection reset";
+        synchronized (_connectLock) { _connectLock.notifyAll(); }
     }
     public boolean getResetReceived() { return _resetReceived; }
     
@@ -307,6 +313,7 @@ public class Connection {
     void disconnect(boolean cleanDisconnect, boolean removeFromConMgr) {
         if (!_connected) return;
         _connected = false;
+        synchronized (_connectLock) { _connectLock.notifyAll(); }
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Disconnecting " + toString(), new Exception("discon"));
         
@@ -362,6 +369,7 @@ public class Connection {
     private void doClose() {
         _outputStream.streamErrorOccurred(new IOException("Hard disconnect"));
         _inputStream.closeReceived();
+        synchronized (_connectLock) { _connectLock.notifyAll(); }
     }
     
     /** who are we talking with */
@@ -374,7 +382,10 @@ public class Connection {
     
     /** stream the peer sends data to us on. (may be null) */
     public byte[] getReceiveStreamId() { return _receiveStreamId; }
-    public void setReceiveStreamId(byte[] id) { _receiveStreamId = id; }
+    public void setReceiveStreamId(byte[] id) { 
+        _receiveStreamId = id; 
+        synchronized (_connectLock) { _connectLock.notifyAll(); }
+    }
     
     /** when did we last send anything to the peer? */
     public long getLastSendTime() { return _lastSendTime; }
@@ -393,6 +404,8 @@ public class Connection {
     
     public String getConnectionError() { return _connectionError; }
     public void setConnectionError(String err) { _connectionError = err; }
+    
+    public long getLifetime() { return _context.clock().now() - _createdOn; }
     
     public ConnectionPacketHandler getPacketHandler() { return _handler; }
     
@@ -462,6 +475,57 @@ public class Connection {
     void packetReceived() {
         _lastReceivedOn = _context.clock().now();
         resetActivityTimer();
+        synchronized (_connectLock) { _connectLock.notifyAll(); }
+    }
+    
+    /** 
+     * wait until a connection is made or the connection fails within the 
+     * timeout period, setting the error accordingly.
+     */
+    void waitForConnect() {
+        long expiration = _context.clock().now() + _options.getConnectTimeout();
+        while (true) {
+            if (_connected && (_receiveStreamId != null) && (_sendStreamId != null) ) {
+                // w00t
+                if (_log.shouldLog(Log.DEBUG))
+                    _log.debug("waitForConnect(): Connected and we have stream IDs");
+                return;
+            }
+            if (_connectionError != null) {
+                if (_log.shouldLog(Log.DEBUG))
+                    _log.debug("waitForConnect(): connection error found: " + _connectionError);
+                return;
+            }
+            if (!_connected) {
+                _connectionError = "Connection failed";
+                if (_log.shouldLog(Log.DEBUG))
+                    _log.debug("waitForConnect(): not connected");
+                return;
+            }
+            
+            long timeLeft = expiration - _context.clock().now();
+            if ( (timeLeft <= 0) && (_options.getConnectTimeout() > 0) ) {
+                if (_connectionError == null) {
+                    _connectionError = "Connection timed out";
+                    disconnect(false);
+                }
+                if (_log.shouldLog(Log.DEBUG))
+                    _log.debug("waitForConnect(): timed out: " + _connectionError);
+                return;
+            }
+            if (timeLeft > 60*1000)
+                timeLeft = 60*1000;
+            if (_options.getConnectTimeout() <= 0)
+                timeLeft = 60*1000;
+            
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("waitForConnect(): wait " + timeLeft);
+            try { 
+                synchronized (_connectLock) {
+                    _connectLock.wait(timeLeft); 
+                }
+            } catch (InterruptedException ie) {}
+        }
     }
     
     private void resetActivityTimer() {
