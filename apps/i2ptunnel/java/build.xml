@@ -31,6 +31,9 @@
         </war>
     </target>
     <target name="precompilejsp">
+        <delete dir="../jsp/WEB-INF/" />
+        <delete file="../jsp/web-fragment.xml" />
+        <delete file="../jsp/web-out.xml" />
         <mkdir dir="../jsp/WEB-INF/" />
         <mkdir dir="../jsp/WEB-INF/classes" />
         <!-- there are various jspc ant tasks, but they all seem a bit flakey -->
