@@ -242,9 +242,13 @@ class I2PSessionImpl2 extends I2PSessionImpl {
             _sendingStates.remove(state);
         }
         long afterRemovingSync = _context.clock().now();
-        boolean found = state.received(MessageStatusMessage.STATUS_SEND_GUARANTEED_SUCCESS);
+        boolean found = false;
         boolean accepted = state.received(MessageStatusMessage.STATUS_SEND_ACCEPTED);
-
+        if (isGuaranteed())
+            found = state.received(MessageStatusMessage.STATUS_SEND_GUARANTEED_SUCCESS);
+        else
+            found = accepted;
+        
         if ((!accepted) || (state.getMessageId() == null)) {
             if (_log.shouldLog(Log.CRIT))
                 _log.log(Log.CRIT, getPrefix() + "State with nonce " + state.getNonce()
