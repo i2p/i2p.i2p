@@ -62,7 +62,8 @@ class TunnelBuilder {
             peerLists = randomizeLists(peerHashes, 1, settings.getDepthInbound());
         }
         if (peerLists.size() <= 0) {
-            _log.info("Configuring local inbound tunnel");
+            if (_log.shouldLog(Log.INFO))
+                _log.info("Configuring local inbound tunnel");
             return configureInboundTunnel(dest, settings, new ArrayList());
         } else {
             List peerHashList = (List)peerLists.get(0);
@@ -83,7 +84,8 @@ class TunnelBuilder {
             peerLists = randomizeLists(peerHashes, 1, settings.getDepthOutbound());
         }
         if (peerLists.size() <= 0) {
-            _log.info("Configuring local outbound tunnel");
+            if (_log.shouldLog(Log.INFO))
+                _log.info("Configuring local outbound tunnel");
             return configureOutboundTunnel(settings, new ArrayList());
         } else {
             List peerHashList = (List)peerLists.get(0);
@@ -112,13 +114,15 @@ class TunnelBuilder {
         Set tunnels = new HashSet();
         int numIn = settings.getNumInboundTunnels();
         if (numIn <= 0) {
-            _log.info("No inbound tunnels requested, but we're creating one anyway");
+            if (_log.shouldLog(Log.INFO))
+                _log.info("No inbound tunnels requested, but we're creating one anyway");
             numIn = 1;
         }
         List peerLists = null;
         if (!useFake) {
             List peerHashes = selectInboundPeers(numIn, settings.getDepthInbound());
-            _log.debug("Peer hashes selected: " + peerHashes.size());
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Peer hashes selected: " + peerHashes.size());
             peerLists = randomizeLists(peerHashes, settings.getNumInboundTunnels(), settings.getDepthInbound());
         } else {
             peerLists = new ArrayList(0);
@@ -127,14 +131,16 @@ class TunnelBuilder {
             for (int i = 0; i < numIn; i++) {
                 TunnelInfo tunnel = configureInboundTunnel(dest, settings, new ArrayList());
                 tunnels.add(tunnel);
-                _log.info("Dummy inbound tunnel " + tunnel.getTunnelId() + " configured (" + tunnel + ")");
+                if (_log.shouldLog(Log.INFO))
+                    _log.info("Dummy inbound tunnel " + tunnel.getTunnelId() + " configured (" + tunnel + ")");
             }
         } else {
             for (Iterator iter = peerLists.iterator(); iter.hasNext();) {
                 List peerList = (List)iter.next();
                 TunnelInfo tunnel = configureInboundTunnel(dest, settings, peerList);
                 tunnels.add(tunnel);
-                _log.info("Real inbound tunnel " + tunnel.getTunnelId() + " configured (" + tunnel + ")");
+                if (_log.shouldLog(Log.INFO))
+                    _log.info("Real inbound tunnel " + tunnel.getTunnelId() + " configured (" + tunnel + ")");
             }
         }
         
@@ -154,7 +160,8 @@ class TunnelBuilder {
         List peerLists = null;
         if (!useFake) {
             List peerHashes = selectOutboundPeers(settings.getNumOutboundTunnels(), settings.getDepthOutbound());
-            _log.debug("Peer hashes selected: " + peerHashes.size());
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Peer hashes selected: " + peerHashes.size());
             peerLists = randomizeLists(peerHashes, settings.getNumOutboundTunnels(), settings.getDepthOutbound());
         } else {
             peerLists = new ArrayList(0);
@@ -163,14 +170,16 @@ class TunnelBuilder {
             for (int i = 0; i < settings.getNumOutboundTunnels(); i++) {
                 TunnelInfo tunnel = configureOutboundTunnel(settings, new ArrayList());
                 tunnels.add(tunnel);
-                _log.info("Dummy outbound tunnel " + tunnel.getTunnelId() + " configured (" + tunnel + ")");
+                if (_log.shouldLog(Log.INFO))
+                    _log.info("Dummy outbound tunnel " + tunnel.getTunnelId() + " configured (" + tunnel + ")");
             }
         } else {
             for (Iterator iter = peerLists.iterator(); iter.hasNext();) {
                 List peerList = (List)iter.next();
                 TunnelInfo tunnel = configureOutboundTunnel(settings, peerList);
                 tunnels.add(tunnel);
-                _log.info("Real outbound tunnel " + tunnel.getTunnelId() + " configured (" + tunnel + ")");
+                if (_log.shouldLog(Log.INFO))
+                    _log.info("Real outbound tunnel " + tunnel.getTunnelId() + " configured (" + tunnel + ")");
             }
         }
         return tunnels;
@@ -206,7 +215,8 @@ class TunnelBuilder {
             if (null != _context.netDb().lookupRouterInfoLocally(peer))
                 rv.add(peer);
             else {
-                _log.warn("peer manager selected a peer we don't know about - drop it");
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("peer manager selected a peer we don't know about - drop it");
             }
         }
         return rv;
@@ -225,10 +235,12 @@ class TunnelBuilder {
         List tunnels = new ArrayList(numTunnels);
         
         if (peerHashes.size() == 0) {
-            _log.info("No peer hashes provided");
+            if (_log.shouldLog(Log.INFO))
+                _log.info("No peer hashes provided");
             return tunnels;
         } else {
-            _log.info("# peers randomizing: " + peerHashes + " into " + numTunnels + " tunnels");
+            if (_log.shouldLog(Log.INFO))
+                _log.info("# peers randomizing: " + peerHashes + " into " + numTunnels + " tunnels");
         }
         
         for (int i = 0; i < numTunnels; i++) {
@@ -240,11 +252,13 @@ class TunnelBuilder {
                 if (!peers.contains(peer))
                     peers.add(peer);
             }
-            _log.info("Tunnel " + i + " [" + numPerTunnel + "/(" + startOn+ ")]: " + peers);
+            if (_log.shouldLog(Log.INFO))
+                _log.info("Tunnel " + i + " [" + numPerTunnel + "/(" + startOn+ ")]: " + peers);
             tunnels.add(peers);
         }
         
-        _log.info("Tunnels: " + tunnels);
+        if (_log.shouldLog(Log.INFO))
+            _log.info("Tunnels: " + tunnels);
         
         return tunnels;
     }
