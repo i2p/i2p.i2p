@@ -48,7 +48,7 @@ public class AdminManager implements Service {
         I2PThread t = new I2PThread(_listener);
         t.setName("Admin Listener:" + port);
         t.setDaemon(true);
-        t.setPriority(Thread.MIN_PRIORITY);
+        //t.setPriority(Thread.MIN_PRIORITY);
         t.start();
     }
 }

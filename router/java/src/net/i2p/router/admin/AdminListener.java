@@ -97,7 +97,7 @@ public class AdminListener implements Runnable {
         AdminRunner runner = new AdminRunner(_context, socket);
         I2PThread t = new I2PThread(runner);
         t.setName("Admin Runner");
-        t.setPriority(Thread.MIN_PRIORITY);
+        //t.setPriority(Thread.MIN_PRIORITY);
         t.setDaemon(true);
         t.start();
     }

@@ -31,6 +31,7 @@ import net.i2p.router.ClientMessage;
 import net.i2p.router.InNetMessage;
 import net.i2p.router.JobImpl;
 import net.i2p.router.MessageReceptionInfo;
+import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
 import net.i2p.router.TunnelInfo;
 import net.i2p.util.Log;
@@ -64,18 +65,25 @@ public class HandleTunnelMessageJob extends JobImpl {
         TunnelId id = _message.getTunnelId();
 
         long excessLag = _context.clock().now() - _message.getMessageExpiration().getTime();
-        if (excessLag > 0) {
+        if (excessLag > Router.CLOCK_FUDGE_FACTOR) {
             // expired while on the queue
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Accepted message (" + _message.getUniqueId() + ") expired on the queue for tunnel " 
                            + id.getTunnelId() + " expiring " 
-                           + (_context.clock().now() - _message.getMessageExpiration().getTime())
+                           + excessLag
                            + "ms ago");
             _context.statManager().addRateData("tunnel.expiredAfterAcceptTime", excessLag, excessLag);
             _context.messageHistory().messageProcessingError(_message.getUniqueId(), 
                                                              TunnelMessage.class.getName(), 
                                                              "tunnel message expired on the queue");
             return;
+        } else if (excessLag > 0) {
+            // almost expired while on the queue
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Accepted message (" + _message.getUniqueId() + ") *almost* expired on the queue for tunnel " 
+                           + id.getTunnelId() + " expiring " 
+                           + excessLag
+                           + "ms ago");
         }
         
         TunnelInfo info = _context.tunnelManager().getTunnelInfo(id);

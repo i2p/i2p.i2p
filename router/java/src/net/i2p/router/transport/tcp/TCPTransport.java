@@ -237,7 +237,7 @@ public class TCPTransport extends TransportImpl {
         I2PThread sockCreator = new I2PThread(creator);
         sockCreator.setDaemon(true);
         sockCreator.setName("SocketCreator_:" + _listenPort);
-        sockCreator.setPriority(I2PThread.MIN_PRIORITY);
+        //sockCreator.setPriority(I2PThread.MIN_PRIORITY);
         sockCreator.start();
         
         try {
@@ -536,7 +536,7 @@ public class TCPTransport extends TransportImpl {
             String lifetime = null;
             for (int i = 0; i < curCons.size(); i++) {
                 TCPConnection con = (TCPConnection)curCons.get(i);
-                if (con.getLifetime() > 0) {
+                if (con.getLifetime() > 30*1000) {
                     established++;
                     lifetime = DataHelper.formatDuration(con.getLifetime());
                 }
@@ -545,6 +545,7 @@ public class TCPTransport extends TransportImpl {
                 buf.append(lifetime);
             else
                 buf.append("[pending]");
+            
             buf.append("</li>\n");
         }
         buf.append("</ul>\n");

@@ -86,7 +86,7 @@ public class JobQueue {
     
     /** max ready and waiting jobs before we start dropping 'em */
     private int _maxWaitingJobs = DEFAULT_MAX_WAITING_JOBS;
-    private final static int DEFAULT_MAX_WAITING_JOBS = 20;
+    private final static int DEFAULT_MAX_WAITING_JOBS = 100;
     private final static String PROP_MAX_WAITING_JOBS = "router.maxWaitingJobs";
     
     /** 
@@ -117,7 +117,7 @@ public class JobQueue {
         I2PThread pumperThread = new I2PThread(_pumper);
         pumperThread.setDaemon(true);
         pumperThread.setName("QueuePumper");
-        pumperThread.setPriority(I2PThread.MIN_PRIORITY);
+        //pumperThread.setPriority(I2PThread.MIN_PRIORITY);
         pumperThread.start();
     }
     
@@ -286,12 +286,12 @@ public class JobQueue {
                 return rv;
             } else {
                 if (_log.shouldLog(Log.DEBUG))
-                    _log.debug("No jobs pending, waiting a second");
+                    _log.debug("No jobs pending, waiting");
             }
             
             try {
                 synchronized (_runnerLock) {
-                    _runnerLock.wait(1000);
+                    _runnerLock.wait();
                 }
             } catch (InterruptedException ie) {}
         }
@@ -367,6 +367,7 @@ public class JobQueue {
                     _queueRunners.put(new Integer(i), runner);
                     Thread t = new I2PThread(runner);
                     t.setName("JobQueue"+(_runnerId++));
+                    //t.setPriority(I2PThread.MAX_PRIORITY-1);
                     t.setDaemon(false);
                     t.start();
                 }
@@ -661,7 +662,7 @@ public class JobQueue {
     public String renderStatusHTML() {
         ArrayList readyJobs = null;
         ArrayList timedJobs = null;
-        ArrayList activeJobs = new ArrayList(4);
+        ArrayList activeJobs = new ArrayList(1);
         ArrayList justFinishedJobs = new ArrayList(4);
         synchronized (_readyJobs) { readyJobs = new ArrayList(_readyJobs); }
         synchronized (_timedJobs) { timedJobs = new ArrayList(_timedJobs); }
@@ -670,10 +671,10 @@ public class JobQueue {
                 JobQueueRunner runner = (JobQueueRunner)iter.next();
                 Job job = runner.getCurrentJob();
                 if (job != null) {
-                    activeJobs.add(job.getName());
+                    activeJobs.add(job);
                 } else {
                     job = runner.getLastJob();
-                    justFinishedJobs.add(job.getName());
+                    justFinishedJobs.add(job);
                 }
             }
         }
@@ -684,19 +685,28 @@ public class JobQueue {
             buf.append(_queueRunners.size());
         }
         buf.append("<br />\n");
+
+        long now = _context.clock().now();
+
         buf.append("# active jobs: ").append(activeJobs.size()).append("<ol>\n");
         for (int i = 0; i < activeJobs.size(); i++) {
-            buf.append("<li>").append(activeJobs.get(i)).append("</li>\n");
+            Job j = (Job)activeJobs.get(i);
+            buf.append("<li> [started ").append(now-j.getTiming().getStartAfter()).append("ms ago]: ");
+            buf.append(j.toString()).append("</li>\n");
         }
         buf.append("</ol>\n");
         buf.append("# just finished jobs: ").append(justFinishedJobs.size()).append("<ol>\n");
         for (int i = 0; i < justFinishedJobs.size(); i++) {
-            buf.append("<li>").append(justFinishedJobs.get(i)).append("</li>\n");
+            Job j = (Job)justFinishedJobs.get(i);
+            buf.append("<li> [finished ").append(now-j.getTiming().getActualEnd()).append("ms ago]: ");
+            buf.append(j.toString()).append("</li>\n");
         }
         buf.append("</ol>\n");
         buf.append("# ready/waiting jobs: ").append(readyJobs.size()).append(" <i>(lots of these mean there's likely a big problem)</i><ol>\n");
         for (int i = 0; i < readyJobs.size(); i++) {
-            buf.append("<li>").append(readyJobs.get(i)).append("</li>\n");
+            Job j = (Job)readyJobs.get(i);
+            buf.append("<li> [waiting ").append(now-j.getTiming().getStartAfter()).append("ms]: ");
+            buf.append(j.toString()).append("</li>\n");
         }
         buf.append("</ol>\n");
 

@@ -224,7 +224,7 @@ class RestrictiveTCPConnection extends TCPConnection {
         I2PThread sockCreator = new I2PThread(creator);
         sockCreator.setDaemon(true);
         sockCreator.setName("PeerCallback:" + _transport.getListenPort());
-        sockCreator.setPriority(I2PThread.MIN_PRIORITY);
+        //sockCreator.setPriority(I2PThread.MIN_PRIORITY);
         sockCreator.start();
         
         if (_log.shouldLog(Log.DEBUG)) 
