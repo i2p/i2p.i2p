@@ -146,7 +146,8 @@ public class TrivialBandwidthLimiter extends BandwidthLimiter {
      * Note that numBytes have been read from the peer
      */
     public void consumeInbound(RouterIdentity peer, int numBytes) {
-        _totalInboundBytes += numBytes;
+        if (numBytes > 0)
+            _totalInboundBytes += numBytes;
         if (_inboundKBytesPerSecond > 0)
             _inboundAvailable -= numBytes;
     }
@@ -155,7 +156,8 @@ public class TrivialBandwidthLimiter extends BandwidthLimiter {
      * Note that numBytes have been sent to the peer
      */
     public void consumeOutbound(RouterIdentity peer, int numBytes) {
-        _totalOutboundBytes += numBytes;
+        if (numBytes > 0)
+            _totalOutboundBytes += numBytes;
         if (_outboundKBytesPerSecond > 0)
             _outboundAvailable -= numBytes;
     }
