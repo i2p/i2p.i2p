@@ -108,7 +108,7 @@ public class SAMv1Handler extends SAMHandler implements SAMRawReceiver, SAMDatag
                     break;
                 }
 
-                msg = buf.toString("ISO-8859-1");
+                msg = buf.toString("ISO-8859-1").trim();
                 if (_log.shouldLog(Log.DEBUG)) {
                     _log.debug("New message received: " + msg);
                 }
@@ -230,7 +230,7 @@ public class SAMv1Handler extends SAMHandler implements SAMRawReceiver, SAMDatag
                     }
                     if (!dir.equals("CREATE") && !dir.equals("RECEIVE")
                         && !dir.equals("BOTH")) {
-                        _log.debug("Unknow DIRECTION parameter value: " + dir);
+                        _log.debug("Unknow DIRECTION parameter value: [" + dir + "]");
                         return false;
                     }
                     props.remove("DIRECTION");
