@@ -81,4 +81,8 @@ class Logger {
 		ofstream logf;
 };
 
+#ifdef WIN_STRERROR
+TCHAR* win_strerror(TCHAR* str, size_t size);
+#endif
+
 #endif  // LOGGER_HPP

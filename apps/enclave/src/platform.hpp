@@ -39,6 +39,11 @@
 #define LINUX   2  // Linux
 #define CYGWIN  3  // Cygwin
 
+#if OS == MINGW
+	#define WIN_STRERROR
+	#define WINTHREADS
+#endif
+
 /*
  * System includes
  */
@@ -49,6 +54,11 @@
 #include <iostream>
 #include <list>
 #include <map>
+#ifdef WINTHREADS
+	#include <windows.h>
+#else
+	#include <pthread.h>
+#endif
 #include <stdexcept>
 #include <stdint.h>
 #include <string>

@@ -42,3 +42,20 @@ Logger::Logger(const string& file)
 		throw runtime_error("Error opening log file");
 	}
 }
+
+#ifdef WIN_STRERROR
+/*
+ * strerror() for primitive operating systems
+ */
+TCHAR* win_strerror(TCHAR* str, size_t size)
+{ 
+	LPVOID lpMsgBuf;
+	DWORD dw = GetLastError();
+	FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM,
+		NULL, dw, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPTSTR)&lpMsgBuf,
+		0, NULL);
+	snprintf(str, size, "%s", lpMsgBuf);
+	LocalFree(lpMsgBuf);
+	return str;
+}
+#endif

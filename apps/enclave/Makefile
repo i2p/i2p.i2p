@@ -34,7 +34,7 @@ CFLAGS = -g -march=i486 -pipe -Wall
 
 CFLAGS += -I$(SAMINCDIR) -I$(TOMCRYPTDIR)
 LDFLAGS = -L$(SAMLIBDIR) -L$(TOMCRYPTDIR)
-LIBS = -lsam -ltomcrypt
+LIBS = -lsam -ltomcrypt -lpthread
 
 #
 # Object files
@@ -45,6 +45,7 @@ OBJS =	$(OBJDIR)/bigint.o \
 		$(OBJDIR)/config.o \
 		$(OBJDIR)/logger.o \
 		$(OBJDIR)/main.o \
+		$(OBJDIR)/mutex.o \
 		$(OBJDIR)/peers.o \
 		$(OBJDIR)/random.o \
 		$(OBJDIR)/rpc.o \
