@@ -47,18 +47,22 @@ public class Timestamper implements Runnable {
     public void run() {
         if (_log.shouldLog(Log.INFO))
             _log.info("Starting up timestamper");
-        while (true) {
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Querying servers " + _serverList);
-            long now = NtpClient.currentTime(_serverList);
-            if (now < 0) {
-                _log.error("Unable to contact any of the NTP servers - network disconnect?");
-            } else {
+        try {
+            while (true) {
                 if (_log.shouldLog(Log.DEBUG))
-                    _log.debug("Stamp time");
-                stampTime(now);
+                    _log.debug("Querying servers " + _serverList);
+                long now = NtpClient.currentTime(_serverList);
+                if (now < 0) {
+                    _log.error("Unable to contact any of the NTP servers - network disconnect?");
+                } else {
+                    if (_log.shouldLog(Log.DEBUG))
+                        _log.debug("Stamp time");
+                    stampTime(now);
+                }
+                try { Thread.sleep(DELAY_MS); } catch (InterruptedException ie) {}
             }
-            try { Thread.sleep(DELAY_MS); } catch (InterruptedException ie) {}
+        } catch (Throwable t) {
+            _log.log(Log.CRIT, "Timestamper died!", t);
         }
     }
     
@@ -67,7 +71,10 @@ public class Timestamper implements Runnable {
      */
     private void stampTime(long now) {
         try {
-            URL url = new URL(_targetURL + "&now=" + getNow(now));
+            String toRequest = _targetURL + "&now=" + getNow(now);
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Stamping [" + toRequest + "]");
+            URL url = new URL(toRequest);
             Object o = url.getContent();
             // ignore the content
         } catch (MalformedURLException mue) {
