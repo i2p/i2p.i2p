@@ -199,11 +199,13 @@ public class LogManager {
     private void loadConfig() {
         Properties p = new Properties();
         File cfgFile = new File(_location);
-        if ((_configLastRead > 0) && (_configLastRead > cfgFile.lastModified())) {
-            _log.debug("Short circuiting config read");
+        if ((_configLastRead > 0) && (_configLastRead >= cfgFile.lastModified())) {
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Short circuiting config read");
             return;
         } else {
-            _log.debug("Loading config from " + _location);
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Loading config from " + _location);
         }
         FileInputStream fis = null;
         try {
