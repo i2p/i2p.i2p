@@ -100,7 +100,7 @@ class LogWriter implements Runnable {
 
         byte b[] = new byte[val.length()];
         for (int i = 0; i < b.length; i++)
-            b[i] = (byte)(val.charAt(i) & 0xFF);
+            b[i] = (byte)val.charAt(i);
         try {
             _currentOut.write(b);
             _numBytesInCurrentFile += b.length;
