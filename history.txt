@@ -1,4 +1,10 @@
-$Id: history.txt,v 1.31 2004/10/03 15:48:43 jrandom Exp $
+$Id: history.txt,v 1.32 2004/10/04 12:30:23 jrandom Exp $
+
+2004-10-05  jrandom
+    * Don't go into a fast busy if an I2PTunnel 'server' is explicitly killed
+      (thanks mule!)
+    * Handle some more error conditions regarding abruptly closing sockets 
+      (thanks Jonva!)
 
 2004-10-04  jrandom
     * Update the shitlist to reject a peer for an exponentially increasing 

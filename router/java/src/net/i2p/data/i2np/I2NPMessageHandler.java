@@ -43,7 +43,20 @@ public class I2NPMessageHandler {
             int type = (int)DataHelper.readLong(in, 1);
             _lastReadBegin = System.currentTimeMillis();
             I2NPMessage msg = createMessage(in, type);
-            msg.readBytes(in, type);
+            try {
+                msg.readBytes(in, type);
+            } catch (IOException ioe) {
+                throw ioe;
+            } catch (I2NPMessageException ime) {
+                throw ime;
+            } catch (DataFormatException dfe) {
+                throw dfe;
+            } catch (Exception e) {
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("Error reading the stream", e);
+                throw new IOException("Unknown error reading the " + msg.getClass().getName() 
+                                      + ": " + e.getMessage());
+            }
             _lastReadEnd = System.currentTimeMillis();
             return msg;
         } catch (DataFormatException dfe) {

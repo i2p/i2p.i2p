@@ -88,15 +88,20 @@ public class Shitlist {
     }
     
     public void unshitlistRouter(Hash peer) {
+        unshitlistRouter(peer, true);
+    }
+    private void unshitlistRouter(Hash peer, boolean realUnshitlist) {
         if (peer == null) return;
         _log.info("Unshitlisting router " + peer.toBase64());
         synchronized (_shitlist) {
             _shitlist.remove(peer);
             _shitlistCause.remove(peer);
         }
-        PeerProfile prof = _context.profileOrganizer().getProfile(peer);
-        if (prof != null)
-            prof.unshitlist();
+        if (realUnshitlist) {
+            PeerProfile prof = _context.profileOrganizer().getProfile(peer);
+            if (prof != null)
+                prof.unshitlist();
+        }
     }
     
     public boolean isShitlisted(Hash peer) {
@@ -110,7 +115,7 @@ public class Shitlist {
         if (shitlistDate.getTime() > _context.clock().now()) {
             return true;
         } else {
-            unshitlistRouter(peer);
+            unshitlistRouter(peer, false);
             return false;
         }
     }
@@ -133,7 +138,7 @@ public class Shitlist {
             Hash key = (Hash)iter.next();
             Date shitDate = (Date)shitlist.get(key);
             if (shitDate.getTime() < limit) {
-                unshitlistRouter(key);
+                unshitlistRouter(key, false);
             }
         }
     }

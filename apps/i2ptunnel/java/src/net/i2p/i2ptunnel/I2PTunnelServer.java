@@ -148,6 +148,7 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
             I2PServerSocket i2pss = sockMgr.getServerSocket();
             while (true) {
                 I2PSocket i2ps = i2pss.accept();
+                if (i2ps == null) throw new I2PException("I2PServerSocket closed");
                 I2PThread t = new I2PThread(new Handler(i2ps));
                 t.start();
             }

@@ -47,6 +47,8 @@ class ConnectionRunner implements Runnable {
             if (msg == null) {
                 if (_keepRunning)
                     _log.error("next message is null but we should keep running?");
+                _con.closeConnection();
+                return;
             } else {
                 sendMessage(msg);
             }
@@ -88,6 +90,7 @@ class ConnectionRunner implements Runnable {
         } catch (IOException ioe) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Error writing out the message", ioe);
+            _con.closeConnection();
         }
         _con.sent(msg, ok, after - before);
     }
