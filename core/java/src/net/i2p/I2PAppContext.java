@@ -58,6 +58,8 @@ public class I2PAppContext {
      */
     protected static volatile boolean _globalAppContextInitialized;
     
+    private Properties _overrideProps;
+    
     private StatManager _statManager;
     private SessionKeyManager _sessionKeyManager;
     private NamingService _namingService;
@@ -97,7 +99,7 @@ public class I2PAppContext {
             synchronized (I2PAppContext.class) {
                 System.err.println("*** Building seperate global context!");
                 if (_globalAppContext == null)
-                    _globalAppContext = new I2PAppContext(false);
+                    _globalAppContext = new I2PAppContext(false, null);
                 _globalAppContextInitialized = true;
             }
         }
@@ -109,12 +111,19 @@ public class I2PAppContext {
      *
      */
     public I2PAppContext() {
-        this(true);
+        this(true, null);
+    }
+    /**
+     * Lets root a brand new context
+     *
+     */
+    public I2PAppContext(Properties envProps) {
+        this(true, envProps);
     }
     /**
      * @param doInit should this context be used as the global one (if necessary)?
      */
-    private I2PAppContext(boolean doInit) {
+    private I2PAppContext(boolean doInit, Properties envProps) {
         //System.out.println("App context created: " + this);
         if (doInit) {
             if (!_globalAppContextInitialized) {
@@ -126,6 +135,7 @@ public class I2PAppContext {
                 }
             }
         }
+        _overrideProps = envProps;
         _statManager = null;
         _sessionKeyManager = null;
         _namingService = null;
@@ -141,32 +151,46 @@ public class I2PAppContext {
     }
     
     /**
-     * Access the configuration attributes of this context (aka System.getProperty)
-     * This can be overloaded by subclasses to allow different system 
-     * properties for different app contexts.
+     * Access the configuration attributes of this context, using properties 
+     * provided during the context construction, or falling back on 
+     * System.getProperty if no properties were provided during construction
+     * (or the specified prop wasn't included).
      *
      */
     public String getProperty(String propName) {
+        if (_overrideProps != null) {
+            if (_overrideProps.containsKey(propName))
+                return _overrideProps.getProperty(propName);
+        }
         return System.getProperty(propName);
     }
+
     /**
-     * Access the configuration attributes of this context (aka System.getProperty)
-     * This can be overloaded by subclasses to allow different system 
-     * properties for different app contexts.
+     * Access the configuration attributes of this context, using properties 
+     * provided during the context construction, or falling back on 
+     * System.getProperty if no properties were provided during construction
+     * (or the specified prop wasn't included).
      *
      */
     public String getProperty(String propName, String defaultValue) {
+        if (_overrideProps != null) {
+            if (_overrideProps.containsKey(propName))
+                return _overrideProps.getProperty(propName, defaultValue);
+        }
         return System.getProperty(propName, defaultValue);
     }
     /**
-     * Access the configuration attributes of this context (aka System.getProperties)
-     * This can be overloaded by subclasses to allow different system 
-     * properties for different app contexts.
+     * Access the configuration attributes of this context, listing the properties 
+     * provided during the context construction, as well as the ones included in
+     * System.getProperties.
      *
      * @return set of Strings containing the names of defined system properties
      */
     public Set getPropertyNames() { 
-        return new HashSet(System.getProperties().keySet());
+        Set names = new HashSet(System.getProperties().keySet());
+        if (_overrideProps != null)
+            names.addAll(_overrideProps.keySet());
+        return names;
     }
     
     /**
