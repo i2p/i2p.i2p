@@ -114,6 +114,9 @@ public class I2NPMessageReader {
         public void run() {
             while (_stayAlive) {
                 while (_doRun) {
+                    while (!_context.throttle().acceptNetworkMessage()) {
+                        try { Thread.sleep(500 + _context.random().nextInt(512)); } catch (InterruptedException ie) {}
+                    }
                     // do read
                     try {
                         I2NPMessage msg = _handler.readMessage(_stream);

@@ -16,6 +16,7 @@ import net.i2p.data.i2np.SourceRouteBlock;
 import net.i2p.router.HandlerJobBuilder;
 import net.i2p.router.Job;
 import net.i2p.router.RouterContext;
+import net.i2p.util.Log;
 
 /**
  * Build a HandleDatabaseLookupMessageJob whenever a DatabaseLookupMessage arrives
@@ -23,14 +24,24 @@ import net.i2p.router.RouterContext;
  */
 public class DatabaseLookupMessageHandler implements HandlerJobBuilder {
     private RouterContext _context;
+    private Log _log;
     public DatabaseLookupMessageHandler(RouterContext context) {
         _context = context;
+        _log = context.logManager().getLog(DatabaseLookupMessageHandler.class);
         _context.statManager().createRateStat("netDb.lookupsReceived", "How many netDb lookups have we received?", "Network Database", new long[] { 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
+        _context.statManager().createRateStat("netDb.lookupsDropped", "How many netDb lookups did we drop due to throttling?", "Network Database", new long[] { 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
     }
 
     public Job createJob(I2NPMessage receivedMessage, RouterIdentity from, Hash fromHash, SourceRouteBlock replyBlock) {
         _context.statManager().addRateData("netDb.lookupsReceived", 1, 0);
-        // ignore the reply block for the moment
-        return new HandleDatabaseLookupMessageJob(_context, (DatabaseLookupMessage)receivedMessage, from, fromHash);
+
+        if (_context.throttle().acceptNetDbLookupRequest(((DatabaseLookupMessage)receivedMessage).getSearchKey())) {
+            return new HandleDatabaseLookupMessageJob(_context, (DatabaseLookupMessage)receivedMessage, from, fromHash);
+        } else {
+            if (_log.shouldLog(Log.INFO)) 
+                _log.info("Dropping lookup request as throttled");
+            _context.statManager().addRateData("netDb.lookupsDropped", 1, 1);
+            return null;
+        }
     }
 }

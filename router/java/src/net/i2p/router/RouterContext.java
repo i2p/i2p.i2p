@@ -49,6 +49,7 @@ public class RouterContext extends I2PAppContext {
     private Shitlist _shitlist;
     private MessageValidator _messageValidator;
     private MessageStateMonitor _messageStateMonitor;
+    private RouterThrottle _throttle;
     private Calculator _isFailingCalc;
     private Calculator _integrationCalc;
     private Calculator _speedCalc;
@@ -83,6 +84,7 @@ public class RouterContext extends I2PAppContext {
         _statPublisher = new StatisticsManager(this);
         _shitlist = new Shitlist(this);
         _messageValidator = new MessageValidator(this);
+        _throttle = new RouterThrottleImpl(this);
         _isFailingCalc = new IsFailingCalculator(this);
         _integrationCalc = new IntegrationCalculator(this);
         _speedCalc = new SpeedCalculator(this);
@@ -188,6 +190,11 @@ public class RouterContext extends I2PAppContext {
      * well as other criteria for "validity".
      */
     public MessageValidator messageValidator() { return _messageValidator; }
+    /**
+     * Component to coordinate our accepting/rejecting of requests under load
+     *
+     */
+    public RouterThrottle throttle() { return _throttle; }
     
     /** how do we rank the failure of profiles? */
     public Calculator isFailingCalculator() { return _isFailingCalc; }

@@ -39,6 +39,7 @@ public class HandleTunnelCreateMessageJob extends JobImpl {
                                  RouterIdentity from, Hash fromHash, SourceRouteBlock replyBlock) {
         super(ctx);
         _log = ctx.logManager().getLog(HandleTunnelCreateMessageJob.class);
+        ctx.statManager().createRateStat("tunnel.rejectOverloaded", "How many tunnels did we deny due to throttling?", "Tunnels", new long[] { 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
         _message = receivedMessage;
         _from = from;
         _fromHash = fromHash;
@@ -83,8 +84,13 @@ public class HandleTunnelCreateMessageJob extends JobImpl {
     }
     
     private boolean isOverloaded() {
-        // hmmm....
-        return false;
+        boolean shouldAccept = _context.throttle().acceptTunnelRequest(_message);
+        if (!shouldAccept) {
+            _context.statManager().addRateData("tunnel.rejectOverloaded", 1, 1);
+            if (_log.shouldLog(Log.INFO))
+                _log.info("Refusing tunnel request due to overload");
+        }
+        return !shouldAccept;
     }
     
     private class TestJob extends JobImpl {
