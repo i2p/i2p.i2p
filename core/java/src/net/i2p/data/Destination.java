@@ -79,7 +79,41 @@ public class Destination extends DataStructureImpl {
         _signingKey.writeBytes(out);
         _certificate.writeBytes(out);
     }
+    
+    public int writeBytes(byte target[], int offset) {
+        int cur = offset;
+        System.arraycopy(_publicKey.getData(), 0, target, cur, PublicKey.KEYSIZE_BYTES);
+        cur += PublicKey.KEYSIZE_BYTES;
+        System.arraycopy(_signingKey.getData(), 0, target, cur, SigningPublicKey.KEYSIZE_BYTES);
+        cur += SigningPublicKey.KEYSIZE_BYTES;
+        cur += _certificate.writeBytes(target, cur);
+        return cur - offset;
+    }
+    
+    public int readBytes(byte source[], int offset) {
+        int cur = offset;
+        
+        _publicKey = new PublicKey();
+        byte buf[] = new byte[PublicKey.KEYSIZE_BYTES];
+        System.arraycopy(source, cur, buf, 0, PublicKey.KEYSIZE_BYTES);
+        _publicKey.setData(buf);
+        cur += PublicKey.KEYSIZE_BYTES;
+        
+        _signingKey = new SigningPublicKey();
+        buf = new byte[SigningPublicKey.KEYSIZE_BYTES];
+        System.arraycopy(source, cur, buf, 0, SigningPublicKey.KEYSIZE_BYTES);
+        cur += SigningPublicKey.KEYSIZE_BYTES;
+        
+        _certificate = new Certificate();
+        cur += _certificate.readBytes(buf, cur);
+        
+        return cur - offset;
+    }
 
+    public int size() {
+        return PublicKey.KEYSIZE_BYTES + SigningPublicKey.KEYSIZE_BYTES + _certificate.size();
+    }
+    
     public boolean equals(Object object) {
         if ((object == null) || !(object instanceof Destination)) return false;
         Destination dst = (Destination) object;

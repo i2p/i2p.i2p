@@ -50,8 +50,10 @@ public class DSAEngine {
     public static DSAEngine getInstance() {
         return I2PAppContext.getGlobalContext().dsa();
     }
-    
     public boolean verifySignature(Signature signature, byte signedData[], SigningPublicKey verifyingKey) {
+        return verifySignature(signature, signedData, 0, signedData.length, verifyingKey);
+    }
+    public boolean verifySignature(Signature signature, byte signedData[], int offset, int size, SigningPublicKey verifyingKey) {
         long start = _context.clock().now();
 
         byte[] sigbytes = signature.getData();
@@ -68,7 +70,7 @@ public class DSAEngine {
         BigInteger r = new NativeBigInteger(1, rbytes);
         BigInteger y = new NativeBigInteger(1, verifyingKey.getData());
         BigInteger w = s.modInverse(CryptoConstants.dsaq);
-        byte data[] = calculateHash(signedData).getData();
+        byte data[] = calculateHash(signedData, offset, size).getData();
         NativeBigInteger bi = new NativeBigInteger(1, data);
         BigInteger u1 = bi.multiply(w).mod(CryptoConstants.dsaq);
         BigInteger u2 = r.multiply(w).mod(CryptoConstants.dsaq);
@@ -88,6 +90,9 @@ public class DSAEngine {
     }
 
     public Signature sign(byte data[], SigningPrivateKey signingKey) {
+        return sign(data, 0, data.length, signingKey);
+    }
+    public Signature sign(byte data[], int offset, int length, SigningPrivateKey signingKey) {
         if ((signingKey == null) || (data == null) || (data.length <= 0)) return null;
         long start = _context.clock().now();
 
@@ -100,7 +105,7 @@ public class DSAEngine {
 
         BigInteger r = CryptoConstants.dsag.modPow(k, CryptoConstants.dsap).mod(CryptoConstants.dsaq);
         BigInteger kinv = k.modInverse(CryptoConstants.dsaq);
-        Hash h = calculateHash(data);
+        Hash h = calculateHash(data, offset, length);
 
         if (h == null) return null;
 
@@ -150,42 +155,42 @@ public class DSAEngine {
 
     private int[] H0 = { 0x67452301, 0xefcdab89, 0x98badcfe, 0x10325476, 0xc3d2e1f0};
 
-    private Hash calculateHash(byte[] source) {
-        long length = source.length * 8;
+    private Hash calculateHash(byte[] source, int offset, int len) {
+        long length = len * 8;
         int k = 448 - (int) ((length + 1) % 512);
         if (k < 0) {
             k += 512;
         }
         int padbytes = k / 8;
-        int wordlength = source.length / 4 + padbytes / 4 + 3;
+        int wordlength = len / 4 + padbytes / 4 + 3;
         int[] M0 = new int[wordlength];
         int wordcount = 0;
         int x = 0;
-        for (x = 0; x < (source.length / 4) * 4; x += 4) {
-            M0[wordcount] = source[x] << 24 >>> 24 << 24;
-            M0[wordcount] |= source[x + 1] << 24 >>> 24 << 16;
-            M0[wordcount] |= source[x + 2] << 24 >>> 24 << 8;
-            M0[wordcount] |= source[x + 3] << 24 >>> 24 << 0;
+        for (x = 0; x < (len / 4) * 4; x += 4) {
+            M0[wordcount] = source[offset + x] << 24 >>> 24 << 24;
+            M0[wordcount] |= source[offset + x + 1] << 24 >>> 24 << 16;
+            M0[wordcount] |= source[offset + x + 2] << 24 >>> 24 << 8;
+            M0[wordcount] |= source[offset + x + 3] << 24 >>> 24 << 0;
             wordcount++;
         }
 
-        switch (source.length - (wordcount + 1) * 4 + 4) {
+        switch (len - (wordcount + 1) * 4 + 4) {
         case 0:
             M0[wordcount] |= 0x80000000;
             break;
         case 1:
-            M0[wordcount] = source[x] << 24 >>> 24 << 24;
+            M0[wordcount] = source[offset + x] << 24 >>> 24 << 24;
             M0[wordcount] |= 0x00800000;
             break;
         case 2:
-            M0[wordcount] = source[x] << 24 >>> 24 << 24;
-            M0[wordcount] |= source[x + 1] << 24 >>> 24 << 16;
+            M0[wordcount] = source[offset + x] << 24 >>> 24 << 24;
+            M0[wordcount] |= source[offset + x + 1] << 24 >>> 24 << 16;
             M0[wordcount] |= 0x00008000;
             break;
         case 3:
-            M0[wordcount] = source[x] << 24 >>> 24 << 24;
-            M0[wordcount] |= source[x + 1] << 24 >>> 24 << 16;
-            M0[wordcount] |= source[x + 2] << 24 >>> 24 << 8;
+            M0[wordcount] = source[offset + x] << 24 >>> 24 << 24;
+            M0[wordcount] |= source[offset + x + 1] << 24 >>> 24 << 16;
+            M0[wordcount] |= source[offset + x + 2] << 24 >>> 24 << 8;
             M0[wordcount] |= 0x00000080;
             break;
         }

@@ -12,6 +12,7 @@ class JobQueueRunner implements Runnable {
     private Job _currentJob;
     private Job _lastJob;
     private long _lastBegin;
+    private long _lastEnd;
     
     public JobQueueRunner(RouterContext context, int id) {
         _context = context;
@@ -33,6 +34,7 @@ class JobQueueRunner implements Runnable {
     public void stopRunning() { _keepRunning = false; }
     public void startRunning() { _keepRunning = true; }
     public long getLastBegin() { return _lastBegin; }
+    public long getLastEnd() { return _lastEnd; }
     public void run() {
         long lastActive = _context.clock().now();
         long jobNum = 0;
@@ -88,6 +90,7 @@ class JobQueueRunner implements Runnable {
                 lastActive = _context.clock().now();
                 _lastJob = _currentJob;
                 _currentJob = null;
+                _lastEnd = lastActive;
                 jobNum++;
                 
                 //if ( (jobNum % 10) == 0)

@@ -86,6 +86,41 @@ public class Certificate extends DataStructureImpl {
             DataHelper.writeLong(out, 2, 0L);
         }
     }
+    
+    
+    public int writeBytes(byte target[], int offset) {
+        int cur = offset;
+        DataHelper.toLong(target, cur, 1, _type);
+        cur++;
+        if (_payload != null) {
+            DataHelper.toLong(target, cur, 2, _payload.length);
+            cur += 2;
+            System.arraycopy(_payload, 0, target, cur, _payload.length);
+            cur += _payload.length;
+        } else {
+            DataHelper.toLong(target, cur, 2, 0);
+            cur += 2;
+        }
+        return cur - offset;
+    }
+    
+    public int readBytes(byte source[], int offset) {
+        int cur = offset;
+        _type = (int)DataHelper.fromLong(source, cur, 1);
+        cur++;
+        int length = (int)DataHelper.fromLong(source, cur, 2);
+        cur += 2;
+        if (length > 0) {
+            _payload = new byte[length];
+            System.arraycopy(source, cur, _payload, 0, length);
+            cur += length;
+        }
+        return cur - offset;
+    }
+    
+    public int size() {
+        return 1 + 2 + (_payload != null ? _payload.length : 0);
+    }
 
     public boolean equals(Object object) {
         if ((object == null) || !(object instanceof Certificate)) return false;

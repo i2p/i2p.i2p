@@ -328,12 +328,12 @@ public class TunnelInfo extends DataStructureImpl {
         int i = 0;
         while (cur != null) {
             buf.append("\n*Hop ").append(i).append(": ").append(cur.getThisHop());
-            if (cur.getEncryptionKey() != null)
-                buf.append("\n Encryption key: ").append(cur.getEncryptionKey());
-            if (cur.getSigningKey() != null)
-                buf.append("\n Signing key: ").append(cur.getSigningKey());
-            if (cur.getVerificationKey() != null)
-                buf.append("\n Verification key: ").append(cur.getVerificationKey());
+            //if (cur.getEncryptionKey() != null)
+            //    buf.append("\n Encryption key: ").append(cur.getEncryptionKey());
+            //if (cur.getSigningKey() != null)
+            //    buf.append("\n Signing key: ").append(cur.getSigningKey());
+            //if (cur.getVerificationKey() != null)
+            //    buf.append("\n Verification key: ").append(cur.getVerificationKey());
             if (cur.getDestination() != null)
                 buf.append("\n Destination: ").append(cur.getDestination().calculateHash().toBase64());
             if (cur.getNextHop() != null)
@@ -344,7 +344,7 @@ public class TunnelInfo extends DataStructureImpl {
                 buf.append("\n Expiration: ").append("none");
             else
                 buf.append("\n Expiration: ").append(new Date(cur.getSettings().getExpiration()));
-            buf.append("\n Ready: ").append(getIsReady());
+            //buf.append("\n Ready: ").append(getIsReady());
             cur = cur.getNextHopInfo();
             i++;
         }

@@ -302,6 +302,19 @@ public class JobQueue {
         }
         return when; 
     }
+    /**
+     * When did the most recently begin job start?
+     */
+    public long getLastJobEnd() { 
+        long when = -1;
+        // not synchronized, so might b0rk if the runners are changed
+        for (Iterator iter = _queueRunners.values().iterator(); iter.hasNext(); ) {
+            long cur = ((JobQueueRunner)iter.next()).getLastEnd();
+            if (cur > when)
+                cur = when;
+        }
+        return when; 
+    }
     /** 
      * retrieve the most recently begin and still currently active job, or null if
      * no jobs are running
