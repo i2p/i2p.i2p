@@ -43,9 +43,9 @@ using namespace Libsockthread;
  */
 void Logger::close(void)
 {
-	logger_m.lock();
+	logf_m.lock();
 	if (logf == 0) {
-		logger_m.unlock();
+		logf_m.unlock();
 		return;
 	}
 	if (fclose(logf) == EOF) {
@@ -54,7 +54,7 @@ void Logger::close(void)
 		cerr_m.unlock();
 	}
 	logf = 0;
-	logger_m.unlock();
+	logf_m.unlock();
 }
 
 /*
@@ -90,7 +90,7 @@ void Logger::log(priority_t priority, const char* format, ...)
 	va_start(ap, format);
 	string s;
 	Time t;
-	logger_m.lock();
+	logf_m.lock();
 
 	if (logf != 0) {
 		/*
@@ -112,7 +112,7 @@ void Logger::log(priority_t priority, const char* format, ...)
 	}
 
 	va_end(ap);
-	logger_m.unlock();
+	logf_m.unlock();
 
 	return;
 }
@@ -126,12 +126,13 @@ void Logger::log(priority_t priority, const char* format, ...)
 bool Logger::open(const string& file)
 {
 	close();
-	logger_m.lock();
+	logf_m.lock();
 	logf = fopen(file.c_str(), "a");
-	logger_m.unlock();
 	if (logf != NULL) {
+		logf_m.unlock();
 		return true;
 	} else {
+		logf_m.unlock();
 		cerr_m.lock();
 		cerr << "fopen() failed (" << file << "): " << strerror(errno) << '\n';
 		cerr_m.unlock();

@@ -79,16 +79,17 @@ namespace Libsockthread {
 			void close(void);
 			void log(priority_t priority, const char* format, ...);
 			priority_t get_loglevel(void)
-				{ logger_m.lock(); priority_t ll = loglevel; logger_m.unlock();
-					return ll; }
+				{ loglevel_m.lock(); priority_t ll = loglevel;
+					loglevel_m.unlock(); return ll; }
 			bool open(const string& file);
 			void set_loglevel(priority_t priority)
-				{ logger_m.lock(); loglevel = priority; logger_m.unlock(); }
+				{ loglevel_m.lock(); loglevel = priority; loglevel_m.unlock(); }
 		private:
 			Mutex cerr_m;
 			FILE* logf;
+			Mutex logf_m;
 			priority_t loglevel;
-			Mutex logger_m;
+			Mutex loglevel_m;
 	};
 }
 
