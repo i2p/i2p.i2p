@@ -352,7 +352,7 @@ public class I2PSocketManager implements I2PSessionListener {
             s.queueData(payload);
             return;
         } else {
-            _log.error("Null socket with data available");
+            _log.info("Null socket with data available");
             throw new IllegalStateException("Null socket with data available");
         }
     }
@@ -431,33 +431,51 @@ public class I2PSocketManager implements I2PSessionListener {
                 throw new I2PException("Error sending through I2P network");
             }
             remoteID = s.getRemoteID(true, options.getConnectTimeout());
-            if (remoteID == null) throw new ConnectException("Connection refused by peer");
-            if ("".equals(remoteID)) throw new NoRouteToHostException("Unable to reach peer");
+            
+            if (remoteID == null) 
+                throw new ConnectException("Connection refused by peer");
+            if ("".equals(remoteID)) 
+                throw new NoRouteToHostException("Unable to reach peer");
             if (_log.shouldLog(Log.DEBUG))
-                _log.debug("TIMING: s given out for remoteID " + getReadableForm(remoteID));
+                _log.debug("TIMING: s given out for remoteID " 
+                           + getReadableForm(remoteID));
+            
             return s;
         } catch (InterruptedIOException ioe) {
-            _log.error("Timeout waiting for ack from syn for id " + getReadableForm(lcID), ioe);
+            if (_log.shouldLog(Log.ERROR))
+                _log.error("Timeout waiting for ack from syn for id " 
+                           + getReadableForm(lcID), ioe);
             synchronized (lock) {
                 _outSockets.remove(s.getLocalID());
             }
+            s.internalClose();
             throw new InterruptedIOException("Timeout waiting for ack");
         } catch (ConnectException ex) {
+            s.internalClose();
             throw ex;
         } catch (NoRouteToHostException ex) {
+            s.internalClose();
             throw ex;
         } catch (IOException ex) {
-            _log.error("Error sending syn on id " + getReadableForm(lcID), ex);
+            if (_log.shouldLog(Log.ERROR))
+                _log.error("Error sending syn on id " + getReadableForm(lcID), ex);
             synchronized (lock) {
                 _outSockets.remove(s.getLocalID());
             }
+            s.internalClose();
             throw new I2PException("Unhandled IOException occurred");
         } catch (I2PException ex) {
-            _log.info("Error sending syn on id " + getReadableForm(lcID), ex);
+            if (_log.shouldLog(Log.INFO))
+                _log.info("Error sending syn on id " + getReadableForm(lcID), ex);
             synchronized (lock) {
                 _outSockets.remove(s.getLocalID());
             }
+            s.internalClose();
             throw ex;
+        } catch (Exception e) {
+            s.internalClose();
+            _log.error("Unhandled error connecting", e);
+            throw new ConnectException("Unhandled error connecting: " + e.getMessage());
         }
     }
 
