@@ -234,9 +234,9 @@ public class SAMv1Handler extends SAMHandler implements SAMRawReceiver, SAMDatag
                 props.remove("STYLE");
                 
                 if (style.equals("RAW")) {
-                    rawSession = new SAMRawSession(dest, props, this);
+                    rawSession = new SAMRawSession(destKeystream, props, this);
                 } else if (style.equals("DATAGRAM")) {
-                    datagramSession = new SAMDatagramSession(dest, props,this);
+                    datagramSession = new SAMDatagramSession(destKeystream, props,this);
                 } else if (style.equals("STREAM")) {
                     String dir = props.getProperty("DIRECTION");
                     if (dir == null) {
