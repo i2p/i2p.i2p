@@ -12,6 +12,7 @@ package net.i2p.router.startup;
 import net.i2p.router.JobImpl;
 import net.i2p.router.JobQueue;
 import net.i2p.router.StatisticsManager;
+import net.i2p.router.admin.AdminManager;
 import net.i2p.util.Log;
 import net.i2p.router.RouterContext;
 
@@ -35,8 +36,10 @@ public class StartupJob extends JobImpl {
     }
 
     public String getName() { return "Startup Router"; }
-    public void runJob() {
+    public void runJob() {        
         ReadConfigJob.doRead(_context);
+        new AdminManager(_context).startup();
+        _context.jobQueue().addJob(new LoadClientAppsJob(_context));
         _context.statPublisher().startup();
         _context.jobQueue().addJob(new LoadRouterInfoJob(_context));
     }
