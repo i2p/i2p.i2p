@@ -40,7 +40,8 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
 
     private Logging l;
 
-    private long readTimeout = -1;
+    /** default timeout to 3 minutes - override if desired */
+    private long readTimeout = 3*60*1000;
 
     public I2PTunnelServer(InetAddress host, int port, String privData, Logging l, EventDispatcher notifyThis) {
         super(host + ":" + port + " <- " + privData, notifyThis);
@@ -81,13 +82,16 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
         open = true;
     }
 
+    
+    private static volatile long __serverId = 0;
+    
     /**
      * Start running the I2PTunnelServer.
      *
      */
     public void startRunning() {
         Thread t = new I2PThread(this);
-        t.setName("Server");
+        t.setName("Server " + (++__serverId));
         t.start();
     }
 
