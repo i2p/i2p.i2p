@@ -57,8 +57,9 @@ public class UnsignedInteger {
      * available immediately.
      *
      * @param value number to represent
+     * @throws IllegalArgumentException if the value is negative
      */
-    public UnsignedInteger(long value) {
+    public UnsignedInteger(long value) throws IllegalArgumentException {
         _value = value;
         _data = calculateBytes(value);
     }
@@ -86,9 +87,42 @@ public class UnsignedInteger {
     }
 
     /**
-     * Calculate the bytes as an unsigned integer with the most significant bit and byte in the first position
+     * Calculate the bytes as an unsigned integer with the most significant 
+     * bit and byte in the first position.  The return value always has at least
+     * one byte in it.
+     *
+     * @throws IllegalArgumentException if the value is negative
      */
-    private static byte[] calculateBytes(long value) {
+    private static byte[] calculateBytes(long value) throws IllegalArgumentException {
+        if (value < 0) 
+            throw new IllegalArgumentException("unsigned integer, and you want a negative? " + value);
+        byte val[] = new byte[8];
+        val[0] = (byte)(value >>> 56);
+        val[1] = (byte)(value >>> 48);
+        val[2] = (byte)(value >>> 40);
+        val[3] = (byte)(value >>> 32);
+        val[4] = (byte)(value >>> 24);
+        val[5] = (byte)(value >>> 16);
+        val[6] = (byte)(value >>> 8);
+        val[7] = (byte)value;
+        
+        int firstNonZero = -1;
+        for (int i = 0; i < val.length; i++) {
+            if (val[i] != 0x00) {
+                firstNonZero = i;
+                break;
+            }
+        }
+        
+        if (firstNonZero == 0) 
+            return val; 
+        if (firstNonZero == -1)
+            return new byte[1]; // initialized as 0
+        
+        byte rv[] = new byte[8-firstNonZero];
+        System.arraycopy(val, firstNonZero, rv, 0, rv.length);
+        return rv;
+        /*
         BigInteger bi = new BigInteger("" + value);
         byte buf[] = bi.toByteArray();
         if ((buf == null) || (buf.length <= 0))
@@ -99,6 +133,7 @@ public class UnsignedInteger {
         byte rv[] = new byte[buf.length - trim];
         System.arraycopy(buf, trim, rv, 0, rv.length);
         return rv;
+         */
     }
 
     /**
@@ -120,6 +155,8 @@ public class UnsignedInteger {
             throw new IllegalArgumentException("Value (" + _value + ") is greater than the requested number of bytes ("
                                                + numBytes + ")");
 
+        if (numBytes == _data.length) return _data;
+        
         byte[] data = new byte[numBytes];
         System.arraycopy(_data, 0, data, numBytes - _data.length, _data.length);
         return data;
@@ -189,5 +226,9 @@ public class UnsignedInteger {
         _log.debug(num + " turned into a byte array and back again: " + val2 + " (" + val2.getLong() + "/"
                    + toString(val2.getBytes()) + ")");
         _log.debug(num + " As an 8 byte array: " + toString(val2.getBytes(8)));
+        BigInteger bi = new BigInteger(num+"");
+        _log.debug(num + " As a bigInteger: 0x" + bi.toString(16));
+        BigInteger tbi = new BigInteger(1, calculateBytes(num));
+        _log.debug(num + " As a shifted   : 0x" + tbi.toString(16));
     }
 }
