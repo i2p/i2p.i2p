@@ -1,4 +1,4 @@
-package net.i2p.data;
+package net.i2p.data.i2np;
 /*
  * free (adj.): unencumbered; not under the control of others
  * Written by jrandom in 2003 and released into the public domain 
@@ -12,7 +12,10 @@ import java.util.Date;
 
 import net.i2p.data.DataFormatException;
 import net.i2p.data.DataStructure;
+import net.i2p.data.StructureTest;
+import net.i2p.data.TestData;
 import net.i2p.data.RouterInfo;
+import net.i2p.data.RouterInfoTest;
 import net.i2p.data.i2np.DatabaseStoreMessage;
 import net.i2p.util.Clock;
 

@@ -1,4 +1,4 @@
-package net.i2p.data;
+package net.i2p.data.i2np;
 /*
  * free (adj.): unencumbered; not under the control of others
  * Written by jrandom in 2003 and released into the public domain 
