@@ -53,7 +53,7 @@ from i2p.pylib import socket as pysocket   # Import Python socket
 # ---------------------------------------------------------
 
 def sleep(): time.sleep(0.01)   # Sleep between thread polls
-def time(): return time.time()  # High resolution timer
+def timer(): return time.time() # High resolution timer
                                 # Do NOT use time.clock() as it
                                 # drops sleep() time on Linux.
 
@@ -405,11 +405,11 @@ class StreamSession(BaseSession):
                            ' DESTINATION=' + str(dest))
 
     # Now wait until the stream's .didconnect flag is set to True.
-    if timeout != None: end = time() + timeout
+    if timeout != None: end = timer() + timeout
     while True:
       self.term.check()
       if ans.didconnect: break
-      if timeout != None and time() >= end: break
+      if timeout != None and timer() >= end: break
       sleep()
 
     return ans
@@ -432,7 +432,7 @@ class StreamSession(BaseSession):
     if self.max_accept <= 0:
       raise i2p.Error('listen(n) must be called before accept ' + 
                       '(n>=1)')
-    if timeout != None: end = time() + timeout
+    if timeout != None: end = timer() + timeout
     while True:
       self.term.check()
       # Synchronized
@@ -442,7 +442,7 @@ class StreamSession(BaseSession):
         if self.qaccept.qsize() > 0:
           return self.term.queue_get(self.qaccept)
       finally: self.lock.release()
-      if timeout != None and time() >= end: break
+      if timeout != None and timer() >= end: break
       sleep()
 
     # Handle timeout and blocking errors
@@ -568,7 +568,7 @@ class Stream:
     minlen = 1
     if waitall: minlen = n
 
-    if timeout != None: end = time() + timeout
+    if timeout != None: end = timer() + timeout
     while True:
       # Synchronized check and read until data available.
       self.parent.term.check()
@@ -583,7 +583,7 @@ class Stream:
         # Ungraceful close: raise an error.
         if self.err != None: raise self.err
       finally: self.lock.release()
-      if timeout != None and time() >= end: break
+      if timeout != None and timer() >= end: break
       sleep()
 
     # Handle timeout and blocking error
@@ -672,7 +672,7 @@ class DatagramSession(BaseSession):
        forever).  If still no packet is available, raises BlockError
        or Timeout.  Returns the pair (data, address).  If peek is
        True, the data is not removed."""
-    if timeout != None: end = time() + timeout
+    if timeout != None: end = timer() + timeout
     while True:
       self.term.check()
       # Synchronized check and read until data available.
@@ -686,7 +686,7 @@ class DatagramSession(BaseSession):
           else:
             return self.buf.pop_first()
       finally: self.lock.release()
-      if timeout != None and time() >= end: break
+      if timeout != None and timer() >= end: break
       sleep()
 
     # Handle timeout and blocking error
@@ -740,7 +740,7 @@ class RawSession(BaseSession):
   def recv(self, timeout=None, peek=False):
     """Identical to DatagramSocket.recv.  The from address is an
        empty string."""
-    if timeout != None: end = time() + timeout
+    if timeout != None: end = timer() + timeout
     while True:
       self.term.check()
       # Synchronized check and read until data available.
@@ -754,7 +754,7 @@ class RawSession(BaseSession):
           else:
             return self.buf.pop_first()
       finally: self.lock.release()
-      if timeout != None and time() >= end: break
+      if timeout != None and timer() >= end: break
       sleep()
 
     # Handle timeout and blocking error
