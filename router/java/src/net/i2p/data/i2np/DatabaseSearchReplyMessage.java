@@ -70,6 +70,8 @@ public class DatabaseSearchReplyMessage extends I2NPMessageImpl {
             if (read != compressedLength)
                 throw new IOException("Not enough data to decompress");
             byte decompressedData[] = DataHelper.decompress(compressedData);
+            if (decompressedData == null)
+                throw new I2NPMessageException("Could not decompress the " + compressedLength + "bytes of data");
             ByteArrayInputStream bais = new ByteArrayInputStream(decompressedData);
             int num = (int)DataHelper.readLong(bais, 1);
             _routerInfoStructures.clear();
