@@ -33,7 +33,7 @@ public class ReadConfigJob extends JobImpl {
     public String getName() { return "Read Router Configuration"; }
     public void runJob() {
         if (shouldReread()) {
-            doRead(getContext());
+            getContext().router().readConfig();
             _lastRead = getContext().clock().now();
         }
         getTiming().setStartAfter(getContext().clock().now() + DELAY);
@@ -47,37 +47,5 @@ public class ReadConfigJob extends JobImpl {
             return true;
         else
             return false;
-    }
-    
-    public static void doRead(RouterContext ctx) { 
-        Router r = ctx.router();
-        String f = r.getConfigFilename();
-        Properties config = getConfig(ctx, f);
-        for (Iterator iter = config.keySet().iterator(); iter.hasNext(); ) {
-            String name = (String)iter.next();
-            String val = config.getProperty(name);
-            r.setConfigSetting(name, val);
-        }
-    }
-    
-    private static Properties getConfig(RouterContext ctx, String filename) {
-        Log log = ctx.logManager().getLog(ReadConfigJob.class);
-        log.debug("Config file: " + filename);
-        Properties props = new Properties();
-        FileInputStream fis = null;
-        try {
-            File f = new File(filename);
-            if (f.canRead()) {
-                fis = new FileInputStream(f);
-                props.load(fis);
-            } else {
-                log.error("Configuration file " + filename + " does not exist");
-            }
-        } catch (Exception ioe) {
-            log.error("Error loading the router configuration from " + filename, ioe);
-        } finally {
-            if (fis != null) try { fis.close(); } catch (IOException ioe) {}
-        }
-        return props;
     }
 }

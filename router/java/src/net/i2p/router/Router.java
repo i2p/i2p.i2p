@@ -8,7 +8,9 @@ package net.i2p.router;
  *
  */
 
+import java.io.File;
 import java.io.FileOutputStream;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.text.DecimalFormat;
@@ -21,6 +23,7 @@ import java.util.List;
 import java.util.Properties;
 import java.util.Set;
 import java.util.TimeZone;
+import java.util.TreeSet;
 
 import net.i2p.CoreVersion;
 import net.i2p.crypto.DHSessionKeyBuilder;
@@ -147,14 +150,49 @@ public class Router {
         _started = _context.clock().now();
         Runtime.getRuntime().addShutdownHook(_shutdownHook);
         I2PThread.addOOMEventListener(_oomListener);
+        
+        readConfig();
+        
         setupHandlers();
         startupQueue();
         _context.jobQueue().addJob(new CoallesceStatsJob());
         _context.jobQueue().addJob(new UpdateRoutingKeyModifierJob());
         warmupCrypto();
         _sessionKeyPersistenceHelper.startup();
-        _context.jobQueue().addJob(new StartupJob(_context));
         _context.adminManager().startup();
+        _context.jobQueue().addJob(new StartupJob(_context));
+    }
+    
+    public void readConfig() {
+        String f = getConfigFilename();
+        Properties config = getConfig(_context, f);
+        for (Iterator iter = config.keySet().iterator(); iter.hasNext(); ) {
+            String name = (String)iter.next();
+            String val = config.getProperty(name);
+            setConfigSetting(name, val);
+        }
+    }
+    
+    private static Properties getConfig(RouterContext ctx, String filename) {
+        Log log = ctx.logManager().getLog(Router.class);
+        if (log.shouldLog(Log.DEBUG))
+            log.debug("Config file: " + filename);
+        Properties props = new Properties();
+        FileInputStream fis = null;
+        try {
+            File f = new File(filename);
+            if (f.canRead()) {
+                fis = new FileInputStream(f);
+                props.load(fis);
+            } else {
+                log.error("Configuration file " + filename + " does not exist");
+            }
+        } catch (Exception ioe) {
+            log.error("Error loading the router configuration from " + filename, ioe);
+        } finally {
+            if (fis != null) try { fis.close(); } catch (IOException ioe) {}
+        }
+        return props;
     }
     
     public boolean isAlive() { return _isAlive; }
@@ -523,7 +561,14 @@ public class Router {
         FileOutputStream fos = null;
         try {
             fos = new FileOutputStream(_configFilename);
-            _config.store(fos, "I2P Router config");
+            TreeSet ordered = new TreeSet(_config.keySet());
+            StringBuffer buf = new StringBuffer(8*1024);
+            for (Iterator iter = ordered.iterator() ; iter.hasNext(); ) {
+                String key = (String)iter.next();
+                String val = _config.getProperty(key);
+                buf.append(key).append('=').append(val).append('\n');
+            }
+            fos.write(buf.toString().getBytes());
         } catch (IOException ioe) {
             if (_log.shouldLog(Log.ERROR))
                 _log.error("Error saving the config to " + _configFilename, ioe);
