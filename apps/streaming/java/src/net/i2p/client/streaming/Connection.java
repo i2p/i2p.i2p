@@ -462,6 +462,8 @@ public class Connection {
             if (getUnackedPacketsSent() > 0) return;
             // wtf, this shouldn't have been scheduled
             if (_options.getInactivityTimeout() <= 0) return;
+            // if one of us can't talk...
+            if ( (_closeSentOn > 0) || (_closeReceivedOn > 0) ) return;
             
             // bugger it, might as well do the hard work now
             switch (_options.getInactivityAction()) {
