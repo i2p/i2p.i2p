@@ -53,7 +53,7 @@ public class ClientManager {
         _pendingRunners = new HashSet();
         _listener = new ClientListenerRunner(_context, this, port);
         Thread t = new I2PThread(_listener);
-        t.setName("ClientListener");
+        t.setName("ClientListener:" + port);
         t.setDaemon(true);
         t.start();
     }
@@ -101,6 +101,9 @@ public class ClientManager {
     }
     
     public void destinationEstablished(ClientConnectionRunner runner) {
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("DestinationEstablished called for destination " + runner.getConfig().getDestination().calculateHash().toBase64());
+
         synchronized (_pendingRunners) {
             _pendingRunners.remove(runner);
         }
