@@ -12,6 +12,11 @@
         <echo message="  buildGUI:  build the heartbeat and netmonitor GUIs (must have run prepGUI already)" />
         <echo message="  prepWEB:   pull down the Jetty libraries and whatever they depend on for the router console web application" />
         <echo message="  buildWEB:  build the router console web application (depends upon prepWEB)" />
+        <echo message="  pkg:       make the tarball and installer jar (depends upon preppkg)" />
+        <echo message="  pkgclean:  delete the ./pkg-temp/ dir, tarball and installer jar" />
+        <echo message="  preppkg:   gather built files for tarball and installer (depends upon prepWEB)" />
+        <echo message="  tarball:   tar the built files and compress with bz2 (depends upon preppkg)" />
+        <echo message="  installer: build the GUI installer (depends upon preppkg)" />
     </target>
     <target name="dist" depends="distclean, build, buildWEB, javadoc" />
     <target name="build" depends="builddep, jar" />
@@ -137,4 +142,48 @@
         <echo message="routerconsole.war file under your i2p install dir as webapps/routerconsole.war and will want " />
         <echo message="to add the RouterConsoleRunner to the router's clientApp list (it must be in the router's JVM)" />
     </target>
+    <target name="pkg" depends="tarball" /> <!-- <target name="pkg" depends="tarball, installer" /> -->
+    <target name="pkgclean">
+        <delete dir="pkg-temp" />
+        <delete>
+            <fileset dir="." includes="i2p.tar.bz2 install.jar" />
+        </delete>
+    </target>
+    <target name="preppkg" depends="build, buildWEB">
+        <copy file="build/ant.jar" todir="pkg-temp/lib/" />
+        <copy file="build/heartbeat.jar" todir="pkg-temp/lib/" />
+        <copy file="build/httptunnel.jar" todir="pkg-temp/lib/" />
+        <copy file="build/i2p.jar" todir="pkg-temp/lib/" />
+        <copy file="build/i2ptunnel.jar" todir="pkg-temp/lib/" />
+        <copy file="build/jasper-compiler.jar" todir="pkg-temp/lib/" />
+        <copy file="build/jasper-runtime.jar" todir="pkg-temp/lib/" />
+        <copy file="build/javax.servlet.jar" todir="pkg-temp/lib/" />
+        <copy file="build/jnet.jar" todir="pkg-temp/lib/" />
+        <copy file="build/mstreaming.jar" todir="pkg-temp/lib/" />
+        <copy file="build/netmonitor.jar" todir="pkg-temp/lib/" />
+        <copy file="build/org.mortbay.jetty-jdk1.2.jar" todir="pkg-temp/lib/" />
+        <copy file="build/org.mortbay.jetty.jar" todir="pkg-temp/lib/" />
+        <copy file="build/router.jar" todir="pkg-temp/lib/" />
+        <copy file="build/routerconsole.jar" todir="pkg-temp/lib/" />
+        <copy file="build/sam.jar" todir="pkg-temp/lib/" />
+        <copy file="build/xercesImpl.jar" todir="pkg-temp/lib/" />
+        <copy file="build/xml-apis.jar" todir="pkg-temp/lib/" />
+        <copy file="build/i2ptunnel.war" todir="pkg-temp/webapps/" />
+        <copy file="build/routerconsole.war" todir="pkg-temp/webapps/" />
+        <copy file="hosts.txt" todir="pkg-temp/" />
+        <copy file="installer/java/src/i2ptunnel.config" todir="pkg-temp/" />
+        <copy file="readme.txt" todir="pkg-temp/" />
+    </target>
+    <target name="tarball" depends="preppkg">
+        <tar compression="bzip2" destfile="i2p.tar.bz2">
+            <tarfileset dir="pkg-temp" includes="**/*" prefix="i2p" />
+        </tar>
+    </target>
+    <!-- <target name="installer" depends="preppkg">
+        <izpack input="installer/install.xml"
+                output="install.jar"
+                installerType="standard"
+                basedir="installer"
+                izPackDir="installer" />
+    </target> -->
 </project>
