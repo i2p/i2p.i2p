@@ -8,6 +8,8 @@
         <ant dir="../../apps/ministreaming/java/" target="build" />
         <ant dir="../../apps/i2ptunnel/java/" target="build" />
         <ant dir="../../apps/sam/java/" target="build" />
+        <ant dir="../../apps/netmonitor/java/" target="build" />
+        <ant dir="../../apps/heartbeat/java/" target="build" />
     </target>
     <target name="compile">
         <mkdir dir="./build" />
@@ -35,9 +37,13 @@
             <fileset file="../../apps/ministreaming/java/build/mstreaming.jar" />
             <fileset file="../../apps/i2ptunnel/java/build/i2ptunnel.jar" />
             <fileset file="../../apps/sam/java/build/sam.jar" />
+            <fileset file="../../apps/heartbeat/java/build/heartbeat.jar" />
+            <fileset file="../../apps/netmonitor/java/build/netmonitor.jar" />
             <fileset file="../doc/COPYING" />
             <fileset file="../../readme.txt" />
             <fileset file="../../hosts.txt" />
+            <fileset file="./src/harvester.config" />
+            <fileset file="./src/heartbeat.config" />
             <manifest>
                 <attribute name="Main-Class" value="Install" />
             </manifest>
@@ -54,9 +60,13 @@
             <fileset file="../../apps/ministreaming/java/build/mstreaming.jar" />
             <fileset file="../../apps/i2ptunnel/java/build/i2ptunnel.jar" />
             <fileset file="../../apps/sam/java/build/sam.jar" />
+            <fileset file="../../apps/heartbeat/java/build/heartbeat.jar" />
+            <fileset file="../../apps/netmonitor/java/build/netmonitor.jar" />
             <fileset file="../doc/COPYING" />
             <fileset file="../../readme.txt" />
             <fileset file="../../hosts.txt" />
+            <fileset file="./src/harvester.config" />
+            <fileset file="./src/heartbeat.config" />
             <manifest>
                 <attribute name="Main-Class" value="GUIInstall" />
             </manifest>
@@ -71,6 +81,8 @@
         <ant dir="../../apps/ministreaming/java/" target="cleandep" />
         <ant dir="../../apps/i2ptunnel/java/" target="cleandep" />
         <ant dir="../../apps/sam/java/" target="cleandep" />
+        <ant dir="../../apps/heartbeat/java" target="cleandep" />
+        <ant dir="../../apps/netmonitor/java" target="cleandep" />
     </target>
     <target name="distclean" depends="clean">
         <ant dir="../../core/java/" target="distclean" />
@@ -78,5 +90,7 @@
         <ant dir="../../apps/ministreaming/java/" target="distclean" />
         <ant dir="../../apps/i2ptunnel/java/" target="distclean" />
         <ant dir="../../apps/sam/java/" target="distclean" />
+        <ant dir="../../apps/heartbeat/java" target="distclean" />
+        <ant dir="../../apps/netmonitor/java" target="distclean" />
     </target>
 </project>
