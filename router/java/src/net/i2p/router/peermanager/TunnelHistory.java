@@ -36,7 +36,7 @@ public class TunnelHistory {
     }
     
     private void createRates() {
-        _rejectRate = new RateStat("tunnelHistory.rejectRate", "How often does this peer reject a tunnel request?", "tunnelHistory", new long[] { 60*1000l, 60*60*1000l, 24*60*60*1000l });
+        _rejectRate = new RateStat("tunnelHistory.rejectRate", "How often does this peer reject a tunnel request?", "tunnelHistory", new long[] { 60*1000l, 10*60*1000l, 60*60*1000l, 24*60*60*1000l });
     }
     
     /** total tunnels the peer has agreed to participate in */

@@ -56,6 +56,8 @@ public class ProfileOrganizer {
     /** integration value, seperating well integrated from not well integrated */
     private double _thresholdIntegrationValue;
     
+    private InverseReliabilityComparator _calc;
+    
     /**
      * Defines what percentage of the average reliability will be used as the 
      * reliability threshold.  For example, .5 means all peers with the reliability
@@ -82,12 +84,13 @@ public class ProfileOrganizer {
     public ProfileOrganizer(RouterContext context) {
         _context = context;
         _log = context.logManager().getLog(ProfileOrganizer.class);
+        _calc = new InverseReliabilityComparator();
         _fastAndReliablePeers = new HashMap(16);
         _reliablePeers = new HashMap(16);
         _wellIntegratedPeers = new HashMap(16);
         _notFailingPeers = new HashMap(16);
         _failingPeers = new HashMap(16);
-        _strictReliabilityOrder = new TreeSet(new InverseReliabilityComparator());
+        _strictReliabilityOrder = new TreeSet(_calc);
         _thresholdSpeedValue = 0.0d;
         _thresholdReliabilityValue = 0.0d;
         _thresholdIntegrationValue = 0.0d;
@@ -98,25 +101,40 @@ public class ProfileOrganizer {
      * Order profiles by their reliability, but backwards (most reliable / highest value first).
      *
      */
-    private static final class InverseReliabilityComparator implements Comparator {
-        private static final Comparator _comparator = new InverseReliabilityComparator();
+    private final class InverseReliabilityComparator implements Comparator {
+        /**
+         * Compare the two objects backwards.  The standard comparator returns
+         * -1 if lhs is less than rhs, 1 if lhs is greater than rhs, or 0 if they're
+         * equal.  To keep a strict ordering, we measure peers with equal reliability
+         * values according to their hashes
+         *
+         * @return -1 if the right hand side is smaller, 1 if the left hand side is
+         *         smaller, or 0 if they are the same peer (Comparator.compare() inverted)
+         */
         public int compare(Object lhs, Object rhs) {
             if ( (lhs == null) || (rhs == null) || (!(lhs instanceof PeerProfile)) || (!(rhs instanceof PeerProfile)) )
                 throw new ClassCastException("Only profiles can be compared - lhs = " + lhs + " rhs = " + rhs);
             PeerProfile left = (PeerProfile)lhs;
             PeerProfile right= (PeerProfile)rhs;
+             
+            double rval = right.getReliabilityValue();
+            double lval = left.getReliabilityValue();
             
-            // note below that yes, we are treating left and right backwards.  see: classname
-            int diff = (int)(right.getReliabilityValue() - left.getReliabilityValue());
-            // we can't just return that, since the set would b0rk on equal values (just because two profiles
-            // rank the same way doesn't mean they're the same peer!)  So if they reliabilities are equal, we
-            // order them by the peer's hash
-            if (diff != 0)
-                return diff;
-            if (left.getPeer().equals(right.getPeer()))
-                return 0;
-            else
+            if (lval == rval) // note the following call inverts right and left (see: classname)
                 return DataHelper.compareTo(right.getPeer().getData(), left.getPeer().getData());
+            
+            boolean rightBigger = rval > lval;
+
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("The reliability of " + right.getPeer().toBase64() 
+                           + " and " + left.getPeer().toBase64() + " marks " + (rightBigger ? "right" : "left")
+                           + " as larger: r=" + right.getReliabilityValue() + " l="
+                           + left.getReliabilityValue());
+                           
+            if (rightBigger)
+                return 1;
+            else
+                return -1;
         }
     }
     
@@ -319,8 +337,11 @@ public class ProfileOrganizer {
             _reliablePeers.clear();
             _fastAndReliablePeers.clear();
     
-            Set reordered = new TreeSet(InverseReliabilityComparator._comparator);
-            reordered.addAll(_strictReliabilityOrder);
+            Set reordered = new TreeSet(_calc);
+            for (Iterator iter = _strictReliabilityOrder.iterator(); iter.hasNext(); ) {
+                PeerProfile prof = (PeerProfile)iter.next();
+                reordered.add(prof);
+            }
             _strictReliabilityOrder = reordered;
             
             calculateThresholds(allPeers);
@@ -332,11 +353,17 @@ public class ProfileOrganizer {
             
             locked_unfailAsNecessary();
             locked_promoteFastAsNecessary();
-        }
-        
-        if (_log.shouldLog(Log.DEBUG)) {
-            _log.debug("Profiles reorganized.  averages: [integration: " + _thresholdIntegrationValue + ", reliability: " + _thresholdReliabilityValue + ", speed: " + _thresholdSpeedValue + "]");
-            _log.debug("Strictly organized: " + _strictReliabilityOrder);
+            
+            if (_log.shouldLog(Log.DEBUG)) {
+                _log.debug("Profiles reorganized.  averages: [integration: " + _thresholdIntegrationValue + ", reliability: " + _thresholdReliabilityValue + ", speed: " + _thresholdSpeedValue + "]");
+                StringBuffer buf = new StringBuffer(512);
+                for (Iterator iter = _strictReliabilityOrder.iterator(); iter.hasNext(); ) {
+                    PeerProfile prof = (PeerProfile)iter.next();
+                    buf.append('[').append(prof.toString()).append('=').append(prof.getReliabilityValue()).append("] ");
+                }
+                _log.debug("Strictly organized (most reliable first): " + buf.toString());
+                _log.debug("fast and reliable: " + _fastAndReliablePeers.values());
+            }
         }
     }
     
@@ -421,7 +448,7 @@ public class ProfileOrganizer {
      *
      */
     private void calculateThresholds(Set allPeers) {
-        Set reordered = new TreeSet(InverseReliabilityComparator._comparator);
+        Set reordered = new TreeSet(_calc);
         for (Iterator iter = allPeers.iterator(); iter.hasNext(); ) {
             PeerProfile profile = (PeerProfile)iter.next();
             

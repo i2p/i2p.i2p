@@ -36,9 +36,15 @@ public class ReliabilityCalculator extends Calculator {
         //val -= profile.getSendFailureSize().getRate(60*60*1000).getCurrentEventCount()*2;
         //val -= profile.getSendFailureSize().getRate(60*60*1000).getLastEventCount()*2;
         
-        val -= profile.getTunnelHistory().getRejectionRate().getRate(60*1000).getCurrentEventCount() * 10;
-        val -= profile.getTunnelHistory().getRejectionRate().getRate(60*1000).getLastEventCount() * 5;
-        val -= profile.getTunnelHistory().getRejectionRate().getRate(60*60*1000).getCurrentEventCount() * 1;
+        long rejectionPenalties = 
+              (profile.getTunnelHistory().getRejectionRate().getRate(60*1000).getCurrentEventCount() * 200)
+            + (profile.getTunnelHistory().getRejectionRate().getRate(60*1000).getLastEventCount() * 100)
+            + (profile.getTunnelHistory().getRejectionRate().getRate(10*60*1000).getCurrentEventCount() * 10)
+            + (profile.getTunnelHistory().getRejectionRate().getRate(10*60*1000).getLastEventCount() * 5)
+            + (profile.getTunnelHistory().getRejectionRate().getRate(60*60*1000).getCurrentEventCount() * 1);
+        if ( (rejectionPenalties > 0) && (_log.shouldLog(Log.INFO)) )
+            _log.info("Rejection penalties for peer " + profile.getPeer().toBase64() + ": " + rejectionPenalties);
+        val -= rejectionPenalties;
         //val -= profile.getTunnelHistory().getRejectionRate().getRate(60*60*1000).getLastEventCount() * 1;
         
         // penalize them heavily for dropping netDb requests
