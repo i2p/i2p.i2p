@@ -29,6 +29,10 @@ class LogLimit {
     public int getLimit() {
         return _limit;
     }
+    
+    public void setLimit(int limit) {
+        _limit = limit;
+    }
 
     public boolean matches(Log log) {
         String name = log.getName();

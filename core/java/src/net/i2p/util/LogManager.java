@@ -11,6 +11,7 @@ package net.i2p.util;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -19,6 +20,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.TreeMap;
 
 import net.i2p.I2PAppContext;
 
@@ -62,26 +64,45 @@ public class LogManager {
     private I2PAppContext _context;
     private Log _log;
     
+    /** when was the config file last read (or -1 if never) */
     private long _configLastRead;
 
+    /** filename of the config file */
     private String _location;
+    /** Ordered list of LogRecord elements that have not been written out yet */
     private List _records;
+    /** List of explicit overrides of log levels (LogLimit objects) */
     private List _limits;
+    /** String (scope) to Log object */
     private Map _logs;
+    /** who clears and writes our records */
     private LogWriter _writer;
 
+    /** 
+     * default log level for logs that aren't explicitly controlled 
+     * through a LogLimit in _limits
+     */
     private int _defaultLimit;
+    /** Log record format string */
     private char[] _format;
+    /** Date format instance */
     private SimpleDateFormat _dateFormat;
+    /** Date format string (for the SimpleDateFormat instance) */
     private String _dateFormatPattern;
+    /** log filename pattern */
     private String _baseLogfilename;
+    /** max # bytes in the logfile before rotation */
     private int _fileSize;
+    /** max # rotated logs */
     private int _rotationLimit;
+    /** minimum log level to be displayed on stdout */
     private int _onScreenLimit;
 
+    /** whether or not we even want to display anything on stdout */
     private boolean _displayOnScreen;
+    /** how many records we want to buffer in the "recent logs" list */
     private int _consoleBufferSize;
-    
+    /** the actual "recent logs" list */
     private LogConsoleBuffer _consoleBuffer;
 
     public LogManager(I2PAppContext context) {
@@ -264,7 +285,7 @@ public class LogManager {
         else
             _baseLogfilename = config.getProperty(PROP_FILENAME, DEFAULT_FILENAME);
 
-        _fileSize = getFilesize(config.getProperty(PROP_FILESIZE, DEFAULT_FILESIZE));
+        _fileSize = getFileSize(config.getProperty(PROP_FILESIZE, DEFAULT_FILESIZE));
         _rotationLimit = -1;
         try {
             String str = config.getProperty(PROP_ROTATIONLIMIT);
@@ -297,15 +318,28 @@ public class LogManager {
     }
 
     private void parseLimits(Properties config) {
+        parseLimits(config, PROP_RECORD_PREFIX);
+    }
+    private void parseLimits(Properties config, String recordPrefix) {
         synchronized (_limits) {
             _limits.clear();
         }
-        for (Iterator iter = config.keySet().iterator(); iter.hasNext();) {
-            String key = (String) iter.next();
-            String val = config.getProperty(key);
-            if (key.startsWith(PROP_RECORD_PREFIX)) {
-                String name = key.substring(PROP_RECORD_PREFIX.length());
-                LogLimit lim = new LogLimit(name, Log.getLevel(val));
+        if (config != null) {
+            for (Iterator iter = config.keySet().iterator(); iter.hasNext();) {
+                String key = (String) iter.next();
+                String val = config.getProperty(key);
+
+                // if we're filtering the records (e.g. logger.record.*) then
+                // filter accordingly (stripping off that prefix for matches)
+                if (recordPrefix != null) {
+                    if (key.startsWith(recordPrefix)) {
+                        key = key.substring(recordPrefix.length());
+                    } else {
+                        continue;
+                    }
+                }
+
+                LogLimit lim = new LogLimit(key, Log.getLevel(val));
                 //_log.debug("Limit found for " + name + " as " + val);
                 synchronized (_limits) {
                     if (!_limits.contains(lim))
@@ -315,8 +349,70 @@ public class LogManager {
         }
         updateLimits();
     }
+    
+    /**
+     * Update the existing limit overrides
+     *
+     * @param limits mapping of prefix to log level string (not the log #) 
+     */
+    public void setLimits(Properties limits) {
+        parseLimits(limits, null);
+    }
+    
+    /**
+     * Update the date format
+     *
+     * @return true if the format was updated, false if it was invalid
+     */
+    public boolean setDateFormat(String format) {
+        if (format == null) return false;
+        
+        try {
+            SimpleDateFormat fmt = new SimpleDateFormat(format);
+            _dateFormatPattern = format;
+            _dateFormat = fmt;
+            return true;
+        } catch (IllegalArgumentException iae) {
+            getLog(LogManager.class).error("Date format is invalid [" + format + "]", iae);
+            return false;
+        }
+    }
+    
+    /**
+     * Update the log file size limit
+     */
+    public void setFileSize(int numBytes) {
+        if (numBytes > 0)
+            _fileSize = numBytes;
+    }
+    
+    public String getDefaultLimit() { return Log.toLevelString(_defaultLimit); }
+    public void setDefaultLimit(String lim) { 
+        _defaultLimit = Log.getLevel(lim);
+        updateLimits();
+    }
+    
+    /**
+     * Return a mapping of the explicit overrides - path prefix to (text 
+     * formatted) limit.
+     *
+     */
+    public Properties getLimits() {
+        Properties rv = new Properties();
+        synchronized (_limits) {
+            for (int i = 0; i < _limits.size(); i++) {
+                LogLimit lim = (LogLimit)_limits.get(i);
+                rv.setProperty(lim.getRootName(), Log.toLevelString(lim.getLimit()));
+            }
+        }
+        return rv;
+    }
 
-    private int getFilesize(String size) {
+    /** 
+     * Determine how many bytes are in the given formatted string (5m, 60g, 100k, etc)
+     *
+     */
+    public int getFileSize(String size) {
         int sz = -1;
         try {
             String v = size;
@@ -398,6 +494,10 @@ public class LogManager {
     public String getBaseLogfilename() {
         return _baseLogfilename;
     }
+    
+    public void setBaseLogfilename(String filenamePattern) {
+        _baseLogfilename = filenamePattern;
+    }
 
     public int getFileSize() {
         return _fileSize;
@@ -407,6 +507,65 @@ public class LogManager {
         return _rotationLimit;
     }
 
+    public boolean saveConfig() {
+        String config = createConfig();
+        FileOutputStream fos = null;
+        try {
+            fos = new FileOutputStream(_location);
+            fos.write(config.getBytes());
+            return true;
+        } catch (IOException ioe) {
+            getLog(LogManager.class).error("Error saving the config", ioe);
+            return false;
+        } finally {
+            if (fos != null) try { fos.close(); } catch (IOException ioe) {}
+        }
+    }
+    
+    private String createConfig() {
+        StringBuffer buf = new StringBuffer(8*1024);
+        buf.append(PROP_FORMAT).append('=').append(new String(_format)).append('\n');
+        buf.append(PROP_DATEFORMAT).append('=').append(_dateFormatPattern).append('\n');
+        buf.append(PROP_DISPLAYONSCREEN).append('=').append((_displayOnScreen ? "TRUE" : "FALSE")).append('\n');
+        String filenameOverride = _context.getProperty(FILENAME_OVERRIDE_PROP);
+        if (filenameOverride == null)
+            buf.append(PROP_FILENAME).append('=').append(_baseLogfilename).append('\n');
+        else // this isn't technically correct - this could mess with some funky scenarios
+            buf.append(PROP_FILENAME).append('=').append(DEFAULT_FILENAME).append('\n');
+        
+        if (_fileSize >= 1024*1024)
+            buf.append(PROP_FILESIZE).append('=').append( (_fileSize / (1024*1024))).append("m\n");
+        else if (_fileSize >= 1024)
+            buf.append(PROP_FILESIZE).append('=').append( (_fileSize / (1024))).append("k\n");
+        else if (_fileSize > 0)
+            buf.append(PROP_FILESIZE).append('=').append(_fileSize).append('\n');
+        // if <= 0, dont specify
+        
+        buf.append(PROP_ROTATIONLIMIT).append('=').append(_rotationLimit).append('\n');
+        buf.append(PROP_DEFALTLEVEL).append('=').append(Log.toLevelString(_defaultLimit)).append('\n');
+        buf.append(PROP_DISPLAYONSCREENLEVEL).append('=').append(Log.toLevelString(_onScreenLimit)).append('\n');
+        buf.append(PROP_CONSOLEBUFFERSIZE).append('=').append(_consoleBufferSize).append('\n');
+
+        buf.append("# log limit overrides:\n");
+        
+        TreeMap limits = new TreeMap();
+        synchronized (_limits) {
+            for (int i = 0; i < _limits.size(); i++) {
+                LogLimit lim = (LogLimit)_limits.get(i);
+                limits.put(lim.getRootName(), Log.toLevelString(lim.getLimit()));
+            }
+        }
+        for (Iterator iter = limits.keySet().iterator(); iter.hasNext(); ) {
+            String path = (String)iter.next();
+            String lim = (String)limits.get(path);
+            buf.append(PROP_RECORD_PREFIX).append(path);
+            buf.append('=').append(lim).append('\n');
+        }
+        
+        return buf.toString();
+    }
+
+    
     //List _getRecords() { return _records; }
     List _removeAll() {
         List vals = null;
@@ -421,6 +580,10 @@ public class LogManager {
 
     public char[] getFormat() {
         return _format;
+    }
+    
+    public void setFormat(char fmt[]) {
+        _format = fmt;
     }
 
     public SimpleDateFormat getDateFormat() {
