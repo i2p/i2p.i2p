@@ -53,7 +53,7 @@ class TunnelPoolManagerJob extends JobImpl {
                 if (_log.shouldLog(Log.INFO))
                     _log.info("Insufficient free inbound tunnels (" + curFreeInboundTunnels + ", not " 
                               + targetInboundTunnels + "), requesting more");
-                requestInboundTunnels(targetInboundTunnels - curFreeInboundTunnels);
+                requestInboundTunnels(2);
                 //requestFakeInboundTunnels(1);
                 built = true;
             } else {
@@ -75,7 +75,7 @@ class TunnelPoolManagerJob extends JobImpl {
                 if (_log.shouldLog(Log.INFO))
                     _log.info("Insufficient outbound tunnels (" + curOutboundTunnels  + ", not " 
                               + targetOutboundTunnels + "), requesting more");
-                requestOutboundTunnels(targetOutboundTunnels - curOutboundTunnels);
+                requestOutboundTunnels(2);
                 //requestFakeOutboundTunnels(1);
                 built = true;
             } else {
