@@ -72,6 +72,9 @@ public class Node {
         node.loadConfig();
         node.startup();
         while (true) {
+            //try { Thread.sleep(10*1000); } catch (InterruptedException ie) {}
+            //node.shutdown();
+            //if (true) return;
             synchronized (node) {
                 try { node.wait(); } catch (InterruptedException ie) {}
             }
@@ -127,6 +130,9 @@ public class Node {
     public void startup() {
         boolean connected = connect();
         if (connected) {
+            Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
+                public void run() { shutdown(); }
+            }));
             loadServices();
             startServices();
             synchronized (_nodes) {
