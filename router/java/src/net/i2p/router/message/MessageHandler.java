@@ -100,7 +100,7 @@ class MessageHandler {
     
     private void handleLocalRouter(I2NPMessage message, RouterIdentity from, Hash fromHash, SourceRouteBlock replyBlock, boolean ackUsed) {
         _log.info("Handle " + message.getClass().getName() + " to a local router - toss it on the inbound network pool");
-        InNetMessage msg = new InNetMessage();
+        InNetMessage msg = new InNetMessage(_context);
         msg.setFromRouter(from);
         msg.setFromRouterHash(fromHash);
         msg.setMessage(message);

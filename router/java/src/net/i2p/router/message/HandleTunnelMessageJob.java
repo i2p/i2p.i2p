@@ -76,6 +76,8 @@ public class HandleTunnelMessageJob extends JobImpl {
             return;
         }
 
+        info.messageProcessed();
+        
         info = getUs(info);
         if (info == null) {
             if (_log.shouldLog(Log.ERROR))
@@ -284,7 +286,7 @@ public class HandleTunnelMessageJob extends JobImpl {
     }
     
     private void sendToLocal(I2NPMessage body) {
-        InNetMessage msg = new InNetMessage();
+        InNetMessage msg = new InNetMessage(_context);
         msg.setMessage(body);
         msg.setFromRouter(_from);
         msg.setFromRouterHash(_fromHash);
@@ -480,7 +482,7 @@ public class HandleTunnelMessageJob extends JobImpl {
                     _log.info("Message for tunnel " + _info.getTunnelId() + 
                               " received at the gateway (us), but its a 0 length tunnel though it is a " 
                               + _body.getClass().getName() + ", so process it locally");
-                InNetMessage msg = new InNetMessage();
+                InNetMessage msg = new InNetMessage(HandleLocallyJob.this._context);
                 msg.setFromRouter(_from);
                 msg.setFromRouterHash(_fromHash);
                 msg.setMessage(_body);

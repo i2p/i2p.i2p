@@ -145,7 +145,7 @@ public class SendMessageDirectJob extends JobImpl {
             if (_onSend != null)
                 _context.jobQueue().addJob(_onSend);
 
-            InNetMessage msg = new InNetMessage();
+            InNetMessage msg = new InNetMessage(_context);
             msg.setFromRouter(_router.getIdentity());
             msg.setMessage(_message);
             _context.inNetMessagePool().add(msg);
