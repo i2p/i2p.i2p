@@ -393,12 +393,89 @@ public class Router {
         buf.append("\n<h2>Most recent console messages:</h2><table border=\"1\">\n");
         for (Iterator iter = msgs.iterator(); iter.hasNext(); ) {
             String msg = (String)iter.next();
-            buf.append("<tr><td valign=\"top\" align=\"left\"><pre>").append(msg);
+            buf.append("<tr><td valign=\"top\" align=\"left\"><pre>");
+            appendLogMessage(buf, msg);
             buf.append("</pre></td></tr>\n");
         }
         buf.append("</table>");
         buf.append("</body></html>\n");
         out.write(buf.toString().getBytes());
+    }
+    
+    private static int MAX_MSG_LENGTH = 120;
+    private static final void appendLogMessage(StringBuffer buf, String msg) {
+        // disable this code for the moment because i think it
+        // looks ugly (on the router console)
+        if (true) {
+            buf.append(msg);
+            return;
+        }
+        if (msg.length() < MAX_MSG_LENGTH) {
+            buf.append(msg);
+            return;
+        }
+        int newline = msg.indexOf('\n');
+        int len = msg.length();
+        while ( (msg != null) && (len > 0) ) {
+            if (newline < 0) {
+                // last line, trim if necessary
+                if (len > MAX_MSG_LENGTH)
+                    msg = msg.substring(len-MAX_MSG_LENGTH);
+                buf.append(msg);
+                return;
+            } else if (newline >= MAX_MSG_LENGTH) {
+                // not the last line, but too long.  
+                // trim the first few chars 
+                String cur = msg.substring(newline-MAX_MSG_LENGTH, newline).trim();
+                msg = msg.substring(newline+1);
+                if (cur.length() > 0)
+                    buf.append(cur).append('\n');
+            } else {
+                // newline <= max_msg_length, so its not the last,
+                // and not too long
+                String cur = msg.substring(0, newline).trim();
+                msg = msg.substring(newline+1);
+                if (cur.length() > 0)
+                    buf.append(cur).append('\n');
+            }
+            newline = msg.indexOf('\n');
+            len = msg.length();
+        }
+    }
+    
+    /** main-ish method for testing appendLogMessage */
+    private static final void testAppendLog() {
+        StringBuffer buf = new StringBuffer(1024);
+        Router.appendLogMessage(buf, "hi\nhow are you\nh0h0h0");
+        System.out.println("line: [" + buf.toString() + "]");
+        buf.setLength(0);
+        Router.appendLogMessage(buf, "\nfine thanks\nh0h0h0");
+        System.out.println("line: [" + buf.toString() + "]");
+        buf.setLength(0);
+        Router.appendLogMessage(buf, "liar\nblah blah\n");
+        System.out.println("line: [" + buf.toString() + "]");
+        buf.setLength(0);
+        Router.appendLogMessage(buf, "\n");
+        System.out.println("line: [" + buf.toString() + "]");
+        buf.setLength(0);
+        Router.appendLogMessage(buf, "");
+        System.out.println("line: [" + buf.toString() + "]");
+        buf.setLength(0);
+        Router.appendLogMessage(buf, ".........10........20........30........40........50........6");
+        System.out.println("line: [" + buf.toString() + "]");
+        buf.setLength(0);
+        Router.appendLogMessage(buf, ".........10........\n20........30........40........50........6");
+        System.out.println("line: [" + buf.toString() + "]");
+        buf.setLength(0);
+        Router.appendLogMessage(buf, ".........10........20\n........30........40........50........6");
+        System.out.println("line: [" + buf.toString() + "]");
+        buf.setLength(0);
+        Router.appendLogMessage(buf, ".........10.......\n.20........30........40........50........6");
+        System.out.println("line: [" + buf.toString() + "]");
+        buf.setLength(0);
+        Router.appendLogMessage(buf, "\n.........10........20........30........40........50........6");
+        System.out.println("line: [" + buf.toString() + "]");
+        buf.setLength(0);
     }
     
     public void shutdown() {
