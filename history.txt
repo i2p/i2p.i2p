@@ -1,4 +1,8 @@
-$Id: history.txt,v 1.170 2005/03/17 00:29:55 jrandom Exp $
+$Id: history.txt,v 1.171 2005/03/17 17:14:31 jrandom Exp $
+
+2005-03-18  jrandom
+    * Eepproxy Fix for corrupted HTTP headers (thanks nickster!)
+    * Fixed case sensitivity issues on the HTTP headers (thanks duck!)
 
 2005-03-17  jrandom
     * Update the old speed calculator and associated profile data points to 

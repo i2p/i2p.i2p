@@ -123,13 +123,17 @@ class HTTPResponseOutputStream extends FilterOutputStream {
                 } else {
                     for (int j = lastEnd+1; j < i; j++) {
                         if (_headerBuffer.getData()[j] == ':') {
-                            String key = new String(_headerBuffer.getData(), lastEnd+1, j-(lastEnd+1));
-                            String val = new String(_headerBuffer.getData(), j+2, i-(j+2));
+                            int keyLen = j-(lastEnd+1);
+                            int valLen = i-(j+2);
+                            if ( (keyLen <= 0) || (valLen <= 0) )
+                                throw new IOException("Invalid header @ " + j);
+                            String key = new String(_headerBuffer.getData(), lastEnd+1, keyLen);
+                            String val = new String(_headerBuffer.getData(), j+2, valLen);
                             
-                            if ("Connection".equals(key)) {
+                            if ("Connection".equalsIgnoreCase(key)) {
                                 out.write("Connection: close\n".getBytes());
                                 connectionSent = true;
-                            } else if ("Proxy-Connection".equals(key)) {
+                            } else if ("Proxy-Connection".equalsIgnoreCase(key)) {
                                 out.write("Proxy-Connection: close\n".getBytes());
                                 proxyConnectionSent = true;
                             } else {
@@ -185,6 +189,17 @@ class HTTPResponseOutputStream extends FilterOutputStream {
         String invalid2 = "HTTP/1.1 200 OK";
         String invalid3 = "HTTP 200 OK\r\n";
         String invalid4 = "HTTP 200 OK\r";
+        String invalid5 = "HTTP/1.1 200 OK\r\n" +
+                          "I am broken, and I smell\r\n" +
+                          "\r\n";
+        String invalid6 = "HTTP/1.1 200 OK\r\n" +
+                          ":I am broken, and I smell\r\n" +
+                          "\r\n";
+        String invalid7 = "HTTP/1.1 200 OK\n" +
+                          "I am broken, and I smell:\n" +
+                          ":asdf\n" +
+                          ":\n" +
+                          "\n";
         String large    = "HTTP/1.1 200 OK\n" +
                           "Last-modified: Tue, 25 Nov 2003 12:05:38 GMT\n" +
                           "Expires: Tue, 25 Nov 2003 12:05:38 GMT\n" +
@@ -192,20 +207,23 @@ class HTTPResponseOutputStream extends FilterOutputStream {
                           "\n" +
                           "hi ho, this is the body";
         /* */
-        test("Simple", simple);
-        test("Filtered", filtered);
-        test("Filtered windows", winfilter);
-        test("Minimal", minimal);
-        test("Windows", winmin);
-        test("Large", large);
-        test("Invalid (short headers)", invalid1);
-        test("Invalid (no headers)", invalid2);
-        test("Invalid (windows with short headers)", invalid3);
-        test("Invalid (windows no headers)", invalid4);
+        test("Simple", simple, true);
+        test("Filtered", filtered, true);
+        test("Filtered windows", winfilter, true);
+        test("Minimal", minimal, true);
+        test("Windows", winmin, true);
+        test("Large", large, true);
+        test("Invalid (short headers)", invalid1, true);
+        test("Invalid (no headers)", invalid2, true);
+        test("Invalid (windows with short headers)", invalid3, true);
+        test("Invalid (windows no headers)", invalid4, true);
+        test("Invalid (bad headers)", invalid5, true);
+        test("Invalid (bad headers2)", invalid6, false);
+        test("Invalid (bad headers3)", invalid7, false);
         /* */
     }
     
-    private static void test(String name, String orig) {
+    private static void test(String name, String orig, boolean shouldPass) {
         System.out.println("====Testing: " + name + "\n" + orig + "\n------------");
         try {
             ByteArrayOutputStream baos = new ByteArrayOutputStream(4096);
@@ -215,7 +233,10 @@ class HTTPResponseOutputStream extends FilterOutputStream {
             String received = new String(baos.toByteArray());
             System.out.println(received);
         } catch (Exception e) {
-            e.printStackTrace();
+            if (shouldPass)
+                e.printStackTrace();
+            else
+                System.out.println("Properly fails with " + e.getMessage());
         }
     }
 }

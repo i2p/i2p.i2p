@@ -194,9 +194,10 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug(getPrefix(requestId) + "Line=[" + line + "]");
                 
-                if (line.startsWith("Connection: ") || 
-                    line.startsWith("Keep-Alive: ") || 
-                    line.startsWith("Proxy-Connection: "))
+                String lowercaseLine = line.toLowerCase();
+                if (lowercaseLine.startsWith("connection: ") || 
+                    lowercaseLine.startsWith("keep-alive: ") || 
+                    lowercaseLine.startsWith("proxy-connection: "))
                     continue;
                 
                 if (method == null) { // first line (GET /base64/realaddr)
@@ -335,29 +336,29 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
                     }
                     
                 } else {
-                    if (line.startsWith("Host: ") && !usingWWWProxy) {
+                    if (lowercaseLine.startsWith("host: ") && !usingWWWProxy) {
                         line = "Host: " + host;
                         if (_log.shouldLog(Log.INFO)) 
                             _log.info(getPrefix(requestId) + "Setting host = " + host);
-                    } else if (line.startsWith("User-Agent: ")) {
+                    } else if (lowercaseLine.startsWith("user-agent: ")) {
                         // always stripped, added back at the end
                         line = null;
                         continue;
-                    } else if (line.startsWith("Accept")) {
+                    } else if (lowercaseLine.startsWith("accept")) {
                         // strip the accept-blah headers, as they vary dramatically from
                         // browser to browser
                         line = null;
                         continue;
-                    } else if (line.startsWith("Referer: ")) {
+                    } else if (lowercaseLine.startsWith("referer: ")) {
                         // Shouldn't we be more specific, like accepting in-site referers ?
                         //line = "Referer: i2p";
                         line = null;
                         continue; // completely strip the line
-                    } else if (line.startsWith("Via: ")) {
+                    } else if (lowercaseLine.startsWith("via: ")) {
                         //line = "Via: i2p";
                         line = null;
                         continue; // completely strip the line
-                    } else if (line.startsWith("From: ")) {
+                    } else if (lowercaseLine.startsWith("from: ")) {
                         //line = "From: i2p";
                         line = null;
                         continue; // completely strip the line
