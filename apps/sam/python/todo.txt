@@ -10,4 +10,4 @@ Todo:
   Try closing a stream at one end, and make sure the other
   end gets all the data sent before closing.
 * Make an event-based socket class.
-  (doesn't need to be asyncore -- but perhaps model it).
+  (eg asyncore).
