@@ -1,4 +1,8 @@
-$Id: history.txt,v 1.62 2004/11/02 06:57:08 jrandom Exp $
+$Id: history.txt,v 1.63 2004/11/05 05:53:41 jrandom Exp $
+
+2004-11-06  jrandom
+    * Fix for a long standing synchronization bug in the SDK that in rare 
+      instances can add a few seconds of lag.
 
 2004-11-05  jrandom
     * Bugfixes and unit tests for the SAM bridge to handle quoted message

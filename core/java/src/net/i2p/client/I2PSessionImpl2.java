@@ -168,7 +168,7 @@ class I2PSessionImpl2 extends I2PSessionImpl {
         long afterSendingSync = _context.clock().now();
         if (_log.shouldLog(Log.DEBUG))
             _log.debug(getPrefix() + "Adding sending state " + state.getMessageId() + " / "
-                       + state.getNonce() 
+                       + state.getNonce() + " for best effort "
                        + " sync took " + (inSendingSync-beforeSendingSync) 
                        + " add took " + (afterSendingSync-inSendingSync));
         _producer.sendMessage(this, dest, nonce, payload, tag, key, sentTags, newKey);
@@ -248,7 +248,7 @@ class I2PSessionImpl2 extends I2PSessionImpl {
         long afterSendingSync = _context.clock().now();
         if (_log.shouldLog(Log.DEBUG))
             _log.debug(getPrefix() + "Adding sending state " + state.getMessageId() + " / "
-                       + state.getNonce()
+                       + state.getNonce() + " for guaranteed "
                        + " sync took " + (inSendingSync-beforeSendingSync) 
                        + " add took " + (afterSendingSync-inSendingSync));
         _producer.sendMessage(this, dest, nonce, payload, tag, key, sentTags, newKey);

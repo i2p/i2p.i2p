@@ -314,6 +314,13 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
     public abstract void receiveStatus(int msgId, long nonce, int status);
 
     protected boolean isGuaranteed() {
+        if (_log.shouldLog(Log.DEBUG)) {
+            String str = _options.getProperty(I2PClient.PROP_RELIABILITY);
+            if (str == null)
+                _log.debug("reliability is not specified, fallback");
+            else
+                _log.debug("reliability is specified: " + str);
+        }
         String reliability = _options.getProperty(I2PClient.PROP_RELIABILITY, I2PClient.PROP_RELIABILITY_GUARANTEED);
         return I2PClient.PROP_RELIABILITY_GUARANTEED.equals(reliability);
     }

@@ -29,7 +29,6 @@ class MessageState {
     private Destination _to;
     private boolean _cancelled;
     private long _created;
-    private Object _lock = new Object();
 
     private static long __stateId = 0;
     private long _stateId;
@@ -51,9 +50,7 @@ class MessageState {
     public void receive(int status) {
         synchronized (_receivedStatus) {
             _receivedStatus.add(new Integer(status));
-        }
-        synchronized (_lock) {
-            _lock.notifyAll();
+            _receivedStatus.notifyAll();
         }
     }
 
@@ -116,150 +113,140 @@ class MessageState {
                     _log.warn(_prefix + "Expired waiting for the status [" + status + "]");
                 return;
             }
-            if (isSuccess(status) || isFailure(status)) {
-                if (_log.shouldLog(Log.DEBUG)) 
-                    _log.debug(_prefix + "Received a confirm (one way or the other)");
-                return;
-            }
-            if (timeToWait > 5000) {
-                timeToWait = 5000;
-            }
-            synchronized (_lock) {
+            synchronized (_receivedStatus) {
+                if (locked_isSuccess(status) || locked_isFailure(status)) {
+                    if (_log.shouldLog(Log.DEBUG)) 
+                        _log.debug(_prefix + "Received a confirm (one way or the other)");
+                    return;
+                }
+                if (timeToWait > 5000) {
+                    timeToWait = 5000;
+                }
                 try {
-                    _lock.wait(timeToWait);
+                    _receivedStatus.wait(timeToWait);
                 } catch (InterruptedException ie) { // nop
                 }
             }
         }
     }
 
-    private boolean isSuccess(int wantedStatus) {
-        List received = null;
-        synchronized (_receivedStatus) {
-            received = new ArrayList(_receivedStatus);
-            //_receivedStatus.clear();
-        }
-
+    private boolean locked_isSuccess(int wantedStatus) {
         boolean rv = false;
 
         if (_log.shouldLog(Log.DEBUG)) 
-            _log.debug(_prefix + "isSuccess(" + wantedStatus + "): " + received);
-        for (Iterator iter = received.iterator(); iter.hasNext();) {
+            _log.debug(_prefix + "isSuccess(" + wantedStatus + "): " + _receivedStatus);
+        for (Iterator iter = _receivedStatus.iterator(); iter.hasNext();) {
             Integer val = (Integer) iter.next();
             int recv = val.intValue();
             switch (recv) {
-            case MessageStatusMessage.STATUS_SEND_BEST_EFFORT_FAILURE:
-                if (_log.shouldLog(Log.WARN))
-                     _log.warn(_prefix + "Received best effort failure after " + getElapsed() + " from "
-                               + toString());
-                rv = false;
-                break;
-            case MessageStatusMessage.STATUS_SEND_GUARANTEED_FAILURE:
-                if (_log.shouldLog(Log.WARN))
-                     _log.warn(_prefix + "Received guaranteed failure after " + getElapsed() + " from "
-                               + toString());
-                rv = false;
-                break;
-            case MessageStatusMessage.STATUS_SEND_ACCEPTED:
-                if (wantedStatus == MessageStatusMessage.STATUS_SEND_ACCEPTED) {
-                    return true; // if we're only looking for accepted, take it directly (don't let any GUARANTEED_* override it)
-                }
-                // ignore accepted, as we want something better
-                if (_log.shouldLog(Log.DEBUG))
-                    _log.debug(_prefix + "Got accepted, but we're waiting for more from " + toString());
-                continue;
-            case MessageStatusMessage.STATUS_SEND_BEST_EFFORT_SUCCESS:
-                if (_log.shouldLog(Log.DEBUG))
-                    _log.debug(_prefix + "Received best effort success after " + getElapsed()
-                               + " from " + toString());
-                if (wantedStatus == recv) {
-                    rv = true;
-                } else {
+                case MessageStatusMessage.STATUS_SEND_BEST_EFFORT_FAILURE:
+                    if (_log.shouldLog(Log.WARN))
+                         _log.warn(_prefix + "Received best effort failure after " + getElapsed() + " from "
+                                   + toString());
+                    rv = false;
+                    break;
+                case MessageStatusMessage.STATUS_SEND_GUARANTEED_FAILURE:
+                    if (_log.shouldLog(Log.WARN))
+                         _log.warn(_prefix + "Received guaranteed failure after " + getElapsed() + " from "
+                                   + toString());
+                    rv = false;
+                    break;
+                case MessageStatusMessage.STATUS_SEND_ACCEPTED:
+                    if (wantedStatus == MessageStatusMessage.STATUS_SEND_ACCEPTED) {
+                        return true; // if we're only looking for accepted, take it directly (don't let any GUARANTEED_* override it)
+                    }
+                    // ignore accepted, as we want something better
                     if (_log.shouldLog(Log.DEBUG))
-                        _log.debug(_prefix + "Not guaranteed success, but best effort after "
-                                   + getElapsed() + " will do... from " + toString());
+                        _log.debug(_prefix + "Got accepted, but we're waiting for more from " + toString());
+                    continue;
+                case MessageStatusMessage.STATUS_SEND_BEST_EFFORT_SUCCESS:
+                    if (_log.shouldLog(Log.DEBUG))
+                        _log.debug(_prefix + "Received best effort success after " + getElapsed()
+                                   + " from " + toString());
+                    if (wantedStatus == recv) {
+                        rv = true;
+                    } else {
+                        if (_log.shouldLog(Log.DEBUG))
+                            _log.debug(_prefix + "Not guaranteed success, but best effort after "
+                                       + getElapsed() + " will do... from " + toString());
+                        rv = true;
+                    }
+                    break;
+                case MessageStatusMessage.STATUS_SEND_GUARANTEED_SUCCESS:
+                    if (_log.shouldLog(Log.DEBUG))
+                        _log.debug(_prefix + "Received guaranteed success after " + getElapsed() + " from "
+                                   + toString());
+                    // even if we're waiting for best effort success, guaranteed is good enough
                     rv = true;
-                }
-                break;
-            case MessageStatusMessage.STATUS_SEND_GUARANTEED_SUCCESS:
-                if (_log.shouldLog(Log.DEBUG))
-                    _log.debug(_prefix + "Received guaranteed success after " + getElapsed() + " from "
-                               + toString());
-                // even if we're waiting for best effort success, guaranteed is good enough
-                rv = true;
-                break;
-            case -1:
-                continue;
-            default:
-                if (_log.shouldLog(Log.DEBUG)) 
-                    _log.debug(_prefix + "Received something else [" + recv + "]...");
+                    break;
+                case -1:
+                    continue;
+                default:
+                    if (_log.shouldLog(Log.DEBUG)) 
+                        _log.debug(_prefix + "Received something else [" + recv + "]...");
             }
         }
         return rv;
     }
 
-    private boolean isFailure(int wantedStatus) {
-        List received = null;
-        synchronized (_receivedStatus) {
-            received = new ArrayList(_receivedStatus);
-            //_receivedStatus.clear();
-        }
+    private boolean locked_isFailure(int wantedStatus) {
         boolean rv = false;
 
         if (_log.shouldLog(Log.DEBUG)) 
-            _log.debug(_prefix + "isFailure(" + wantedStatus + "): " + received);
-        for (Iterator iter = received.iterator(); iter.hasNext();) {
+            _log.debug(_prefix + "isFailure(" + wantedStatus + "): " + _receivedStatus);
+        
+        for (Iterator iter = _receivedStatus.iterator(); iter.hasNext();) {
             Integer val = (Integer) iter.next();
             int recv = val.intValue();
             switch (recv) {
-            case MessageStatusMessage.STATUS_SEND_BEST_EFFORT_FAILURE:
-                if (_log.shouldLog(Log.DEBUG))
-                    _log.warn(_prefix + "Received best effort failure after " + getElapsed() + " from "
-                              + toString());
-                rv = true;
-                break;
-            case MessageStatusMessage.STATUS_SEND_GUARANTEED_FAILURE:
-                if (_log.shouldLog(Log.DEBUG))
-                    _log.warn(_prefix + "Received guaranteed failure after " + getElapsed() + " from "
-                              + toString());
-                rv = true;
-                break;
-            case MessageStatusMessage.STATUS_SEND_ACCEPTED:
-                if (wantedStatus == MessageStatusMessage.STATUS_SEND_ACCEPTED) {
-                    rv = false;
-                } else {
+                case MessageStatusMessage.STATUS_SEND_BEST_EFFORT_FAILURE:
                     if (_log.shouldLog(Log.DEBUG))
-                        _log.debug(_prefix + "Got accepted, but we're waiting for more from "
+                        _log.warn(_prefix + "Received best effort failure after " + getElapsed() + " from "
+                                  + toString());
+                    rv = true;
+                    break;
+                case MessageStatusMessage.STATUS_SEND_GUARANTEED_FAILURE:
+                    if (_log.shouldLog(Log.DEBUG))
+                        _log.warn(_prefix + "Received guaranteed failure after " + getElapsed() + " from "
+                                  + toString());
+                    rv = true;
+                    break;
+                case MessageStatusMessage.STATUS_SEND_ACCEPTED:
+                    if (wantedStatus == MessageStatusMessage.STATUS_SEND_ACCEPTED) {
+                        rv = false;
+                    } else {
+                        if (_log.shouldLog(Log.DEBUG))
+                            _log.debug(_prefix + "Got accepted, but we're waiting for more from "
+                                       + toString());
+                        continue;
+                        // ignore accepted, as we want something better
+                    }
+                    break;
+                case MessageStatusMessage.STATUS_SEND_BEST_EFFORT_SUCCESS:
+                    if (_log.shouldLog(Log.DEBUG))
+                        _log.debug(_prefix + "Received best effort success after " + getElapsed()
+                                   + " from " + toString());
+                    if (wantedStatus == recv) {
+                        rv = false;
+                    } else {
+                        if (_log.shouldLog(Log.DEBUG))
+                            _log.debug(_prefix + "Not guaranteed success, but best effort after "
+                                       + getElapsed() + " will do... from " + toString());
+                        rv = false;
+                    }
+                    break;
+                case MessageStatusMessage.STATUS_SEND_GUARANTEED_SUCCESS:
+                    if (_log.shouldLog(Log.DEBUG))
+                        _log.debug(_prefix + "Received guaranteed success after " + getElapsed() + " from "
                                    + toString());
+                    // even if we're waiting for best effort success, guaranteed is good enough
+                    rv = false;
+                    break;
+                case -1:
                     continue;
-                    // ignore accepted, as we want something better
-                }
-                break;
-            case MessageStatusMessage.STATUS_SEND_BEST_EFFORT_SUCCESS:
-                if (_log.shouldLog(Log.DEBUG))
-                    _log.debug(_prefix + "Received best effort success after " + getElapsed()
-                               + " from " + toString());
-                if (wantedStatus == recv) {
-                    rv = false;
-                } else {
-                    if (_log.shouldLog(Log.DEBUG))
-                        _log.debug(_prefix + "Not guaranteed success, but best effort after "
-                                   + getElapsed() + " will do... from " + toString());
-                    rv = false;
-                }
-                break;
-            case MessageStatusMessage.STATUS_SEND_GUARANTEED_SUCCESS:
-                if (_log.shouldLog(Log.DEBUG))
-                    _log.debug(_prefix + "Received guaranteed success after " + getElapsed() + " from "
-                               + toString());
-                // even if we're waiting for best effort success, guaranteed is good enough
-                rv = false;
-                break;
-            case -1:
-                continue;
-            default:
-                if (_log.shouldLog(Log.DEBUG)) 
-                    _log.debug(_prefix + "Received something else [" + recv + "]...");
+                default:
+                    if (_log.shouldLog(Log.DEBUG)) 
+                        _log.debug(_prefix + "Received something else [" + recv + "]...");
             }
         }
         return rv;
@@ -267,13 +254,15 @@ class MessageState {
 
     /** true if the given status (or an equivilant) was received */
     public boolean received(int status) {
-        return isSuccess(status);
+        synchronized (_receivedStatus) {
+            return locked_isSuccess(status);
+        }
     }
 
     public void cancel() {
         _cancelled = true;
-        synchronized (_lock) {
-            _lock.notifyAll();
+        synchronized (_receivedStatus) {
+            _receivedStatus.notifyAll();
         }
     }
 }

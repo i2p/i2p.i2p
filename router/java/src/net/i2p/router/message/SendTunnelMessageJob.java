@@ -186,6 +186,7 @@ public class SendTunnelMessageJob extends JobImpl {
             _state = 12;
             // we're the gateway, so sign, encrypt, and forward to info.getNextHop()
             TunnelMessage msg = prepareMessage(info);
+            _state = 66;
             if (msg == null) {
                 if (_log.shouldLog(Log.ERROR))
                     _log.error("wtf, unable to prepare a tunnel message to the next hop, when we're the gateway and hops remain?  tunnel: " + info);
@@ -212,13 +213,17 @@ public class SendTunnelMessageJob extends JobImpl {
                     _log.warn("Adding a tunnel message that will expire shortly [" 
                               + new Date(_expiration) + "]", getAddedBy());
             }
+            _state = 67;
             msg.setMessageExpiration(new Date(_expiration));
-            getContext().jobQueue().addJob(new SendMessageDirectJob(getContext(), msg, 
-                                                                    info.getNextHop(), _onSend, 
-                                                                    _onReply, _onFailure, 
-                                                                    _selector, 
-                                                                    (int)(_expiration - getContext().clock().now()), 
-                                                                    _priority));
+            _state = 68;
+            Job j = new SendMessageDirectJob(getContext(), msg, 
+                                             info.getNextHop(), _onSend, 
+                                             _onReply, _onFailure, 
+                                             _selector, 
+                                             (int)(_expiration - getContext().clock().now()), 
+                                             _priority);
+            _state = 69;                    
+            getContext().jobQueue().addJob(j);
             _state = 15;
         }
     }
