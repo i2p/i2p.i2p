@@ -50,7 +50,7 @@
  <input type="submit" name="action" value="Don't run I2P on startup" />
  <h4>Debugging</h4>
  At times, it may be helpful to debug I2P by getting a thread dump.  To do so, 
- please select the following option and review the thread dumped to logs/wrapper.log.
+ please select the following option and review the thread dumped to logs/wrapper.log.<br />
  <input type="submit" name="action" value="Dump threads" />
  </form>
 </div>

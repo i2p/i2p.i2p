@@ -98,7 +98,7 @@
         <mkdir dir="./build/javadoc" />
         <javadoc 
             sourcepath="core/java/src:core/java/test:router/java/src:router/java/test:apps/ministreaming/java/src:apps/i2ptunnel/java/src:apps/httptunnel/java/src:apps/routerconsole/java/src" 
-            classpath="apps/jetty/jettylib/org.mortbay.jetty.jar" 
+            classpath="apps/jetty/jettylib/org.mortbay.jetty.jar:installer/lib/wrapper/win32/wrapper.jar" 
             destdir="./build/javadoc" 
             packagenames="*" 
             use="true" 
