@@ -1,8 +1,8 @@
-$Id: history.txt,v 1.50 2004/10/16 13:00:47 jrandom Exp $
+$Id: history.txt,v 1.51 2004/10/16 22:58:09 jrandom Exp $
 
 2004-10-16  jrandom
-    * More aggressively fail peers if their tunnels are failing so that we 
-      move off them quicker.
+    * More aggressively reduce the capacity of peers if their tunnels are
+      failing so that we move off them quicker.
     * Simplify some data structure serialization for reuse in the streaming
       lib, as well as add support for signing and verifying partial byte 
       arrays.
