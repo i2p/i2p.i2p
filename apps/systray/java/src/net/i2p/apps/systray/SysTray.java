@@ -39,7 +39,7 @@ public class SysTray implements SysTrayMenuListener {
         _browserString = _configFile.getProperty("browser", "default");
 
         if (!(new File("router.config")).exists())
-            openRouterConsole();
+            openRouterConsole("http://localhost:7657/config.jsp");
 
         if (System.getProperty("os.name").startsWith("Windows"))
             _instance = new SysTray();
@@ -60,20 +60,20 @@ public class SysTray implements SysTrayMenuListener {
         return _instance;
     }
 
-    private static void openRouterConsole() {
+    private static void openRouterConsole(String url) {
 
         String browser = null;
 
         if (_browserString == null || _browserString.equals("default")) {
             try {
-                if (_urlLauncher.openUrl("http://localhost:7657/"))
+                if (_urlLauncher.openUrl(url))
                     return;
             } catch (Exception ex) {
                 // Fall through.
             }
         } else {
             try {
-                if (_urlLauncher.openUrl("http://localhost:7657/", _browserString))
+                if (_urlLauncher.openUrl(url, _browserString))
                     return;
             } catch (Exception ex) {
                 // Fall through.
@@ -108,7 +108,7 @@ public class SysTray implements SysTrayMenuListener {
     public void iconLeftClicked(SysTrayMenuEvent e) {}
 
     public void iconLeftDoubleClicked(SysTrayMenuEvent e) {
-        openRouterConsole();
+        openRouterConsole("http://localhost:7657/");
     }
 
     public void menuItemSelected(SysTrayMenuEvent e) {
@@ -129,7 +129,7 @@ public class SysTray implements SysTrayMenuListener {
             if (!(browser = promptForBrowser("Select browser")).equals("nullnull"))
                 setBrowser(browser);
         } else if (e.getActionCommand().equals("openconsole")) {
-            openRouterConsole();
+            openRouterConsole("http://localhost:7657/");
         }
     }
 
