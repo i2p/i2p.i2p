@@ -35,6 +35,8 @@ public class BandwidthLimitedOutputStream extends FilterOutputStream {
         _currentRequest = null;
     }
     
+    public FIFOBandwidthLimiter.Request getCurrentRequest() { return _currentRequest; }
+    
     public void write(int val) throws IOException {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Writing a single byte!", new Exception("Single byte from..."));

@@ -76,12 +76,12 @@ public abstract class TransportImpl implements Transport {
         if (lifetime > 5000) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("afterSend: [success=" + sendSuccessful + "]" + msg.getMessageSize() + "byte " 
-                          + msg.getMessageType() + " from " + _context.routerHash().toBase64().substring(0,6) 
+                          + msg.getMessageType() + " " + msg.getMessageId() + " from " + _context.routerHash().toBase64().substring(0,6) 
                           + " to " + msg.getTarget().getIdentity().calculateHash().toBase64().substring(0,6) + "\n" + msg.toString());
         } else {
             if (_log.shouldLog(Log.INFO))
                 _log.info("afterSend: [success=" + sendSuccessful + "]" + msg.getMessageSize() + "byte " 
-                          + msg.getMessageType() + " from " + _context.routerHash().toBase64().substring(0,6) 
+                          + msg.getMessageType() + " " + msg.getMessageId() + " from " + _context.routerHash().toBase64().substring(0,6) 
                           + " to " + msg.getTarget().getIdentity().calculateHash().toBase64().substring(0,6) + "\n" + msg.toString());
         }
 
