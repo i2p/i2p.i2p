@@ -93,6 +93,15 @@ public class Router {
         _oomListener = new I2PThread.OOMEventListener() { 
             public void outOfMemory(OutOfMemoryError oom) { 
                 _log.log(Log.CRIT, "Thread ran out of memory", oom);
+                for (int i = 0; i < 5; i++) { // try this 5 times, in case it OOMs
+                    try { 
+                        _log.log(Log.CRIT, "free mem: " + Runtime.getRuntime().freeMemory() + 
+                                           " total mem: " + Runtime.getRuntime().totalMemory());
+                        break; // w00t
+                    } catch (OutOfMemoryError oome) {
+                        // gobble
+                    }
+                }
                 shutdown(); 
             }
         };
@@ -310,8 +319,8 @@ public class Router {
         RateStat receiveRate = _context.statManager().getRate("transport.receiveMessageSize");
         for (int i = 0; i < receiveRate.getPeriods().length; i++) {
             Rate rate = receiveRate.getRate(receiveRate.getPeriods()[i]);
-            double bytes = rate.getLastTotalValue() + rate.getCurrentTotalValue();
-            long ms = rate.getLastTotalEventTime() + rate.getLastTotalEventTime();
+            double bytes = rate.getLastTotalValue();
+            long ms = rate.getLastTotalEventTime();
             if (ms <= 0) {
                 bytes = 0;
                 ms = 1;
@@ -330,7 +339,7 @@ public class Router {
             buf.append(DataHelper.formatDuration(rate.getPeriod())).append(" period receive avg: ");
             // we include lastPeriod + current *partial* period, and jrandom is too lazy to calculate how
             // much of that partial is contained here, so 2*period it is.
-            bps = bytes*1000.0d/(2*rate.getPeriod());
+            bps = bytes*1000.0d/(rate.getPeriod());
             if (bps > 2048) {
                 bps /= 1024.0d;
                 buf.append(fmt.format(bps)).append(" KBps");
@@ -407,8 +416,15 @@ public class Router {
         r.runRouter();
     }
     
+    
+    private static int __id = 0;
     private class ShutdownHook extends Thread {
+        private int _id;
+        public ShutdownHook() {
+            _id = ++__id;
+        }
         public void run() {
+            setName("Router " + _id + " shutdown");
             _log.log(Log.CRIT, "Shutting down the router...");
             shutdown();
         }
