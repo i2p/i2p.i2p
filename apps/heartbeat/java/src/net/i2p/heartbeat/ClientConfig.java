@@ -97,8 +97,8 @@ public class ClientConfig {
      * @param comment describe this test
      * @param averagePeriods list of minutes to summarize over
      */
-    public ClientConfig(Destination peer, Destination us, String statFile, int duration, int statFreq, int sendFreq, int sendSize, int numHops, String comment,
-                        int averagePeriods[]) {
+    public ClientConfig(Destination peer, Destination us, String statFile, int duration, int statFreq, int sendFreq,
+                        int sendSize, int numHops, String comment, int averagePeriods[]) {
         _peer = peer;
         _us = us;
         _statFile = statFile;
@@ -310,8 +310,8 @@ public class ClientConfig {
         String commentVal = clientConfig.getProperty(PROP_PREFIX + peerNum + PROP_COMMENT);
         String periodsVal = clientConfig.getProperty(PROP_PREFIX + peerNum + PROP_AVERAGEPERIODS);
 
-        if ((peerVal == null) || (statFileVal == null) || (statDurationVal == null) || (statFrequencyVal == null) || (sendFrequencyVal == null)
-            || (sendSizeVal == null)) {
+        if ((peerVal == null) || (statFileVal == null) || (statDurationVal == null) || (statFrequencyVal == null)
+            || (sendFrequencyVal == null) || (sendSizeVal == null)) {
             if (_log.shouldLog(Log.DEBUG)) {
                 _log.debug("Peer number " + peerNum + " does not exist");
             }
@@ -326,8 +326,9 @@ public class ClientConfig {
 
             if ((duration <= 0) || (statFreq <= 0) || (sendFreq <= 0) || (sendSize <= 0)) {
                 if (_log.shouldLog(Log.WARN)) {
-                    _log.warn("Invalid client config: duration [" + statDurationVal + "] stat frequency [" + statFrequencyVal + "] send frequency ["
-                              + sendFrequencyVal + "] send size [" + sendSizeVal + "]");
+                    _log.warn("Invalid client config: duration [" + statDurationVal + "] stat frequency ["
+                              + statFrequencyVal + "] send frequency [" + sendFrequencyVal + "] send size ["
+                              + sendSizeVal + "]");
                 }
                 return false;
             }
@@ -389,7 +390,8 @@ public class ClientConfig {
      * @return true if it was stored correctly, false if there were errors
      */
     public boolean store(Properties clientConfig, int peerNum) {
-        if ((_peer == null) || (_sendFrequency <= 0) || (_sendSize <= 0) || (_statDuration <= 0) || (_statFrequency <= 0) || (_statFile == null)) { return false; }
+        if ((_peer == null) || (_sendFrequency <= 0) || (_sendSize <= 0) || (_statDuration <= 0)
+            || (_statFrequency <= 0) || (_statFile == null)) { return false; }
 
         String comment = _comment;
         if (comment == null) {
