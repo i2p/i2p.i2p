@@ -70,7 +70,7 @@ class ExploreJob extends SearchJob {
     protected DatabaseLookupMessage buildMessage(TunnelId replyTunnelId, RouterInfo replyGateway, long expiration) {
         DatabaseLookupMessage msg = new DatabaseLookupMessage(getContext());
         msg.setSearchKey(getState().getTarget());
-        msg.setFrom(replyGateway);
+        msg.setFrom(replyGateway.getIdentity().getHash());
         msg.setDontIncludePeers(getState().getAttempted());
         msg.setMessageExpiration(new Date(expiration));
         msg.setReplyTunnel(replyTunnelId);

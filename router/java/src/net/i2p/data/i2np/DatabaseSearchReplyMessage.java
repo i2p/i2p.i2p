@@ -34,7 +34,7 @@ public class DatabaseSearchReplyMessage extends I2NPMessageImpl {
     private final static Log _log = new Log(DatabaseSearchReplyMessage.class);
     public final static int MESSAGE_TYPE = 3;
     private Hash _key;
-    private List _routerInfoStructures;
+    private List _peerHashes;
     private Hash _from;
     
     public DatabaseSearchReplyMessage(I2PAppContext context) {
@@ -42,7 +42,7 @@ public class DatabaseSearchReplyMessage extends I2NPMessageImpl {
         _context.statManager().createRateStat("netDb.searchReplyMessageSend", "How many search reply messages we send", "Network Database", new long[] { 60*1000, 5*60*1000, 10*60*1000, 60*60*1000 });
         _context.statManager().createRateStat("netDb.searchReplyMessageReceive", "How many search reply messages we receive", "Network Database", new long[] { 60*1000, 5*60*1000, 10*60*1000, 60*60*1000 });
         setSearchKey(null);
-        _routerInfoStructures = new ArrayList();
+        _peerHashes = new ArrayList(3);
         setFromHash(null);
     }
     
@@ -52,10 +52,10 @@ public class DatabaseSearchReplyMessage extends I2NPMessageImpl {
     public Hash getSearchKey() { return _key; }
     public void setSearchKey(Hash key) { _key = key; }
     
-    public int getNumReplies() { return _routerInfoStructures.size(); }
-    public RouterInfo getReply(int index) { return (RouterInfo)_routerInfoStructures.get(index); }
-    public void addReply(RouterInfo info) { _routerInfoStructures.add(info); }
-    public void addReplies(Collection replies) { _routerInfoStructures.addAll(replies); }
+    public int getNumReplies() { return _peerHashes.size(); }
+    public Hash getReply(int index) { return (Hash)_peerHashes.get(index); }
+    public void addReply(Hash peer) { _peerHashes.add(peer); }
+    //public void addReplies(Collection replies) { _peerHashes.addAll(replies); }
     
     public Hash getFromHash() { return _from; }
     public void setFromHash(Hash from) { _from = from; }
@@ -66,27 +66,18 @@ public class DatabaseSearchReplyMessage extends I2NPMessageImpl {
             _key = new Hash();
             _key.readBytes(in);
             
-            int compressedLength = (int)DataHelper.readLong(in, 2);
-            byte compressedData[] = new byte[compressedLength];
-            int read = DataHelper.read(in, compressedData);
-            if (read != compressedLength)
-                throw new IOException("Not enough data to decompress");
-            byte decompressedData[] = DataHelper.decompress(compressedData);
-            if (decompressedData == null)
-                throw new I2NPMessageException("Could not decompress the " + compressedLength + "bytes of data");
-            ByteArrayInputStream bais = new ByteArrayInputStream(decompressedData);
-            int num = (int)DataHelper.readLong(bais, 1);
-            _routerInfoStructures.clear();
+            int num = (int)DataHelper.readLong(in, 1);
+            _peerHashes.clear();
             for (int i = 0; i < num; i++) {
-                RouterInfo info = new RouterInfo();
-                info.readBytes(bais);
-                addReply(info);
+                Hash peer = new Hash();
+                peer.readBytes(in);
+                addReply(peer);
             }
             
             _from = new Hash();
             _from.readBytes(in);
 
-            _context.statManager().addRateData("netDb.searchReplyMessageReceive", compressedLength + 64, 1);
+            _context.statManager().addRateData("netDb.searchReplyMessageReceive", num*32 + 64, 1);
         } catch (DataFormatException dfe) {
             throw new I2NPMessageException("Unable to load the message data", dfe);
         }
@@ -95,10 +86,8 @@ public class DatabaseSearchReplyMessage extends I2NPMessageImpl {
     protected byte[] writeMessage() throws I2NPMessageException, IOException {
         if (_key == null)
             throw new I2NPMessageException("Key in reply to not specified");
-        if (_routerInfoStructures == null)
-            throw new I2NPMessageException("RouterInfo replies are null");
-        if (_routerInfoStructures.size() <= 0)
-            throw new I2NPMessageException("No replies specified in SearchReply!  Always include oneself!");
+        if (_peerHashes == null)
+            throw new I2NPMessageException("Peer replies are null");
         if (_from == null)
             throw new I2NPMessageException("No 'from' address specified!");
         
@@ -107,16 +96,12 @@ public class DatabaseSearchReplyMessage extends I2NPMessageImpl {
         try {
             _key.writeBytes(os);
             
-            ByteArrayOutputStream baos = new ByteArrayOutputStream(512);
-            DataHelper.writeLong(baos, 1, _routerInfoStructures.size());
+            DataHelper.writeLong(os, 1, _peerHashes.size());
             for (int i = 0; i < getNumReplies(); i++) {
-                RouterInfo info = getReply(i);
-                info.writeBytes(baos);
+                Hash peer = getReply(i);
+                peer.writeBytes(os);
             }
             
-            byte compressed[] = DataHelper.compress(baos.toByteArray());
-            DataHelper.writeLong(os, 2, compressed.length);
-            os.write(compressed);
             _from.writeBytes(os);
 
             rv = os.toByteArray();
@@ -134,7 +119,7 @@ public class DatabaseSearchReplyMessage extends I2NPMessageImpl {
             DatabaseSearchReplyMessage msg = (DatabaseSearchReplyMessage)object;
             return DataHelper.eq(getSearchKey(),msg.getSearchKey()) &&
             DataHelper.eq(getFromHash(),msg.getFromHash()) &&
-            DataHelper.eq(_routerInfoStructures,msg._routerInfoStructures);
+            DataHelper.eq(_peerHashes,msg._peerHashes);
         } else {
             return false;
         }
@@ -143,7 +128,7 @@ public class DatabaseSearchReplyMessage extends I2NPMessageImpl {
     public int hashCode() {
         return DataHelper.hashCode(getSearchKey()) +
         DataHelper.hashCode(getFromHash()) +
-        DataHelper.hashCode(_routerInfoStructures);
+        DataHelper.hashCode(_peerHashes);
     }
     
     public String toString() {

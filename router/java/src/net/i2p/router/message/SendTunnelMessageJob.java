@@ -136,7 +136,8 @@ public class SendTunnelMessageJob extends JobImpl {
             getContext().jobQueue().addJob(new SendMessageDirectJob(getContext(), msg, 
                                                                 _destRouter, _onSend, 
                                                                 _onReply, _onFailure, 
-                                                                _selector, _expiration, 
+                                                                _selector, 
+                                                                (int)(_expiration-getContext().clock().now()), 
                                                                 _priority));
 
             String bodyType = _message.getClass().getName();
@@ -186,10 +187,11 @@ public class SendTunnelMessageJob extends JobImpl {
             }
             msg.setMessageExpiration(new Date(_expiration));
             getContext().jobQueue().addJob(new SendMessageDirectJob(getContext(), msg, 
-                                                                info.getNextHop(), _onSend, 
-                                                                _onReply, _onFailure, 
-                                                                _selector, _expiration, 
-                                                                _priority));
+                                                                    info.getNextHop(), _onSend, 
+                                                                    _onReply, _onFailure, 
+                                                                    _selector, 
+                                                                    (int)(_expiration - getContext().clock().now()), 
+                                                                    _priority));
         }
     }
     
@@ -234,7 +236,11 @@ public class SendTunnelMessageJob extends JobImpl {
                 if (_log.shouldLog(Log.INFO))
                     _log.info("Message for tunnel " + info.getTunnelId().getTunnelId() + " received where we're not the gateway and there are remaining hops, so forward it on to "
                               + info.getNextHop().toBase64() + " via SendMessageDirectJob");
-                getContext().jobQueue().addJob(new SendMessageDirectJob(getContext(), msg, info.getNextHop(), _onSend, null, _onFailure, null, _message.getMessageExpiration().getTime(), _priority));
+                SendMessageDirectJob j = new SendMessageDirectJob(getContext(), msg, info.getNextHop(), _onSend, 
+                                                                  null, _onFailure, null, 
+                                                                  (int)(_message.getMessageExpiration().getTime() - getContext().clock().now()), 
+                                                                  _priority);
+                getContext().jobQueue().addJob(j);
                 return;
             } else {
                 if (_log.shouldLog(Log.ERROR))
@@ -272,6 +278,9 @@ public class SendTunnelMessageJob extends JobImpl {
         if (us == null) return false;
         return (us.getSigningKey() != null); // only the gateway can sign
     }
+    
+    private static final int INSTRUCTIONS_PADDING = 32;
+    private static final int PAYLOAD_PADDING = 32;
     
     /**
      * Build the tunnel message with appropriate instructions for the
@@ -326,8 +335,8 @@ public class SendTunnelMessageJob extends JobImpl {
             return null;
         }
         
-        byte encryptedInstructions[] = encrypt(instructions, info.getEncryptionKey().getKey(), 512);
-        byte encryptedMessage[] = encrypt(_message, key, 1024);
+        byte encryptedInstructions[] = encrypt(instructions, info.getEncryptionKey().getKey(), INSTRUCTIONS_PADDING);
+        byte encryptedMessage[] = encrypt(_message, key, PAYLOAD_PADDING);
         TunnelVerificationStructure verification = createVerificationStructure(encryptedMessage, info);
         
         String bodyType = _message.getClass().getName();
@@ -457,9 +466,11 @@ public class SendTunnelMessageJob extends JobImpl {
                                        TunnelMessage.class.getName(), msg.getUniqueId());
 
         //  don't specify a selector, since createFakeOutNetMessage already does that
-        getContext().jobQueue().addJob(new SendMessageDirectJob(getContext(), msg, _destRouter, 
-                                                            _onSend, _onReply, _onFailure, 
-                                                            null, _expiration, _priority));
+        SendMessageDirectJob j = new SendMessageDirectJob(getContext(), msg, _destRouter, 
+                                                          _onSend, _onReply, _onFailure, 
+                                                          null, (int)(_expiration-getContext().clock().now()), 
+                                                          _priority);
+        getContext().jobQueue().addJob(j);
     }
 
     /** 

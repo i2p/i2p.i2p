@@ -277,11 +277,13 @@ public class MessageHistory {
      * @param id tunnel ID we received a message for
      * @param from peer that sent us this message (if known)
      */
-    public void droppedTunnelMessage(TunnelId id, Hash from) {
+    public void droppedTunnelMessage(TunnelId id, long msgId, Date expiration, Hash from) {
         if (!_doLog) return;
         StringBuffer buf = new StringBuffer(128);
         buf.append(getPrefix());
-        buf.append("dropped message for unknown tunnel [").append(id.getTunnelId()).append("] from [").append(getName(from)).append("]");
+        buf.append("dropped message ").append(msgId).append(" for unknown tunnel [").append(id.getTunnelId());
+        buf.append("] from [").append(getName(from)).append("]").append(" expiring on ");
+        buf.append(getTime(expiration));
         addEntry(buf.toString());
     }
     

@@ -123,7 +123,8 @@ class MessageHandler {
         if (_log.shouldLog(Log.INFO))
             _log.info("Handle " + message.getClass().getName() + " to a remote router " 
                       + instructions.getRouter().toBase64() + " - fire a SendMessageDirectJob");
-        SendMessageDirectJob j = new SendMessageDirectJob(_context, message, instructions.getRouter(), expiration, priority);
+        int timeoutMs = (int)(expiration-_context.clock().now());
+        SendMessageDirectJob j = new SendMessageDirectJob(_context, message, instructions.getRouter(), timeoutMs, priority);
         _context.jobQueue().addJob(j);
     }
     
@@ -160,7 +161,7 @@ class MessageHandler {
                 _log.debug("Placing message of type " + message.getClass().getName() 
                            + " into the new tunnel message bound for " + tunnelId.getTunnelId() 
                            + " on " + to.toBase64());
-            _context.jobQueue().addJob(new SendMessageDirectJob(_context, msg, to, expiration, priority));
+            _context.jobQueue().addJob(new SendMessageDirectJob(_context, msg, to, (int)timeoutMs, priority));
 
             String bodyType = message.getClass().getName();
             _context.messageHistory().wrap(bodyType, message.getUniqueId(), TunnelMessage.class.getName(), msg.getUniqueId());	

@@ -202,7 +202,6 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         
         _context.inNetMessagePool().registerHandlerJobBuilder(DatabaseLookupMessage.MESSAGE_TYPE, new DatabaseLookupMessageHandler(_context));
         _context.inNetMessagePool().registerHandlerJobBuilder(DatabaseStoreMessage.MESSAGE_TYPE, new DatabaseStoreMessageHandler(_context));
-        _context.inNetMessagePool().registerHandlerJobBuilder(DatabaseSearchReplyMessage.MESSAGE_TYPE, new DatabaseSearchReplyMessageHandler(_context));
         
         _initialized = true;
         _started = System.currentTimeMillis();
@@ -249,9 +248,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
                 if (_log.shouldLog(Log.INFO))
                     _log.info("Selected hash " + rhash.toBase64() + " is not stored locally");
             } else if ( !(ds instanceof RouterInfo) ) {
-                // could be a LeaseSet
-                if (_log.shouldLog(Log.DEBUG))
-                    _log.debug("Selected router hash " + rhash.toBase64() + " is NOT a routerInfo!");
+                // leaseSet
             } else {
                 rv.add(ds);
             }
@@ -274,8 +271,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
                 if (_log.shouldLog(Log.INFO))
                     _log.info("Selected hash " + key.toBase64() + " is not stored locally");
             } else if ( !(ds instanceof RouterInfo) ) {
-                if (_log.shouldLog(Log.WARN))
-                    _log.warn("Selected router hash [" + key.toBase64() + "] is NOT a routerInfo!");
+                // leaseSet 
             } else {
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("getAllRouters(): key is router: " + key.toBase64());

@@ -11,6 +11,7 @@ package net.i2p.router.networkdb;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.Set;
 
 import net.i2p.data.DataFormatException;
@@ -61,7 +62,7 @@ public class HandleDatabaseLookupMessageJob extends JobImpl {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Handling database lookup message for " + _message.getSearchKey());
 
-        Hash fromKey = _message.getFrom().getIdentity().getHash();
+        Hash fromKey = _message.getFrom();
 
         if (_log.shouldLog(Log.DEBUG)) {
             if (_message.getReplyTunnel() != null)
@@ -69,8 +70,13 @@ public class HandleDatabaseLookupMessageJob extends JobImpl {
                           + " (tunnel " + _message.getReplyTunnel() + ")");
         }
 
-        // might as well grab what they sent us
-        getContext().netDb().store(fromKey, _message.getFrom());
+        if (getContext().netDb().lookupRouterInfoLocally(_message.getFrom()) == null) {
+            // hmm, perhaps don't always send a lookup for this...
+            // but for now, wtf, why not.  we may even want to adjust it so that 
+            // we penalize or benefit peers who send us that which we can or
+            // cannot lookup
+            getContext().netDb().lookupRouterInfo(_message.getFrom(), null, null, REPLY_TIMEOUT);
+        }
 
         // whatdotheywant?
         handleRequest(fromKey);
@@ -130,11 +136,10 @@ public class HandleDatabaseLookupMessageJob extends JobImpl {
         DatabaseSearchReplyMessage msg = new DatabaseSearchReplyMessage(getContext());
         msg.setFromHash(getContext().router().getRouterInfo().getIdentity().getHash());
         msg.setSearchKey(key);
-        if (routerInfoSet.size() <= 0) {
-            // always include something, so lets toss ourselves in there
-            routerInfoSet.add(getContext().router().getRouterInfo());
+        for (Iterator iter = routerInfoSet.iterator(); iter.hasNext(); ) {
+            RouterInfo peer = (RouterInfo)iter.next();
+            msg.addReply(peer.getIdentity().getHash());
         }
-        msg.addReplies(routerInfoSet);
         getContext().statManager().addRateData("netDb.lookupsHandled", 1, 0);
         sendMessage(msg, toPeer, replyTunnel); // should this go via garlic messages instead?
     }
@@ -146,7 +151,7 @@ public class HandleDatabaseLookupMessageJob extends JobImpl {
         } else {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Sending reply directly to " + toPeer);
-            send = new SendMessageDirectJob(getContext(), message, toPeer, REPLY_TIMEOUT+getContext().clock().now(), MESSAGE_PRIORITY);
+            send = new SendMessageDirectJob(getContext(), message, toPeer, REPLY_TIMEOUT, MESSAGE_PRIORITY);
         }
 
         getContext().netDb().lookupRouterInfo(toPeer, send, null, REPLY_TIMEOUT);
@@ -186,7 +191,7 @@ public class HandleDatabaseLookupMessageJob extends JobImpl {
             msg.setData(baos.toByteArray());
             msg.setTunnelId(replyTunnel);
             msg.setMessageExpiration(new Date(expiration));
-            getContext().jobQueue().addJob(new SendMessageDirectJob(getContext(), msg, toPeer, null, null, null, null, expiration, MESSAGE_PRIORITY));
+            getContext().jobQueue().addJob(new SendMessageDirectJob(getContext(), msg, toPeer, null, null, null, null, REPLY_TIMEOUT, MESSAGE_PRIORITY));
 
             String bodyType = message.getClass().getName();
             getContext().messageHistory().wrap(bodyType, message.getUniqueId(), TunnelMessage.class.getName(), msg.getUniqueId());

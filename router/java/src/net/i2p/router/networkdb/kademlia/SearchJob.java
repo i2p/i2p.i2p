@@ -53,7 +53,7 @@ class SearchJob extends JobImpl {
      * How long will we give each peer to reply to our search? 
      *
      */
-    private static final long PER_PEER_TIMEOUT = 10*1000;
+    private static final int PER_PEER_TIMEOUT = 10*1000;
     
     /** 
      * give ourselves 30 seconds to send out the value found to the closest 
@@ -283,15 +283,14 @@ class SearchJob extends JobImpl {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug(getJobId() + ": Sending leaseSet search to " + router.getIdentity().getHash().toBase64() 
                        + " for " + msg.getSearchKey().toBase64() + " w/ replies through [" 
-                       + msg.getFrom().getIdentity().getHash().toBase64() + "] via tunnel [" 
+                       + msg.getFrom().toBase64() + "] via tunnel [" 
                        + msg.getReplyTunnel() + "]");
 
         SearchMessageSelector sel = new SearchMessageSelector(getContext(), router, _expiration, _state);
-        long timeoutMs = PER_PEER_TIMEOUT; // getTimeoutMs();
         SearchUpdateReplyFoundJob reply = new SearchUpdateReplyFoundJob(getContext(), router, _state, _facade, this);
         SendTunnelMessageJob j = new SendTunnelMessageJob(getContext(), msg, outTunnelId, router.getIdentity().getHash(), 
                                                           null, null, reply, new FailedJob(router), sel, 
-                                                          timeoutMs, SEARCH_PRIORITY);
+                                                          PER_PEER_TIMEOUT, SEARCH_PRIORITY);
         getContext().jobQueue().addJob(j);
     }
     
@@ -304,12 +303,11 @@ class SearchJob extends JobImpl {
         if (_log.shouldLog(Log.INFO))
             _log.info(getJobId() + ": Sending router search to " + router.getIdentity().getHash().toBase64() 
                       + " for " + msg.getSearchKey().toBase64() + " w/ replies to us [" 
-                      + msg.getFrom().getIdentity().getHash().toBase64() + "]");
+                      + msg.getFrom().toBase64() + "]");
         SearchMessageSelector sel = new SearchMessageSelector(getContext(), router, _expiration, _state);
-        long timeoutMs = PER_PEER_TIMEOUT; 
         SearchUpdateReplyFoundJob reply = new SearchUpdateReplyFoundJob(getContext(), router, _state, _facade, this);
         SendMessageDirectJob j = new SendMessageDirectJob(getContext(), msg, router.getIdentity().getHash(), 
-                                                          reply, new FailedJob(router), sel, expiration, SEARCH_PRIORITY);
+                                                          reply, new FailedJob(router), sel, PER_PEER_TIMEOUT, SEARCH_PRIORITY);
         getContext().jobQueue().addJob(j);
     }
     
@@ -356,7 +354,7 @@ class SearchJob extends JobImpl {
     protected DatabaseLookupMessage buildMessage(TunnelId replyTunnelId, RouterInfo replyGateway, long expiration) {
         DatabaseLookupMessage msg = new DatabaseLookupMessage(getContext());
         msg.setSearchKey(_state.getTarget());
-        msg.setFrom(replyGateway);
+        msg.setFrom(replyGateway.getIdentity().getHash());
         msg.setDontIncludePeers(_state.getAttempted());
         msg.setMessageExpiration(new Date(expiration));
         msg.setReplyTunnel(replyTunnelId);
@@ -371,7 +369,7 @@ class SearchJob extends JobImpl {
     protected DatabaseLookupMessage buildMessage(long expiration) {
         DatabaseLookupMessage msg = new DatabaseLookupMessage(getContext());
         msg.setSearchKey(_state.getTarget());
-        msg.setFrom(getContext().router().getRouterInfo());
+        msg.setFrom(getContext().routerHash());
         msg.setDontIncludePeers(_state.getAttempted());
         msg.setMessageExpiration(new Date(expiration));
         msg.setReplyTunnel(null);
@@ -420,25 +418,28 @@ class SearchJob extends JobImpl {
                 if (_newPeers > 0)
                     newPeersFound(_newPeers);
             } else {
-                RouterInfo ri = _msg.getReply(_curIndex);
-                if (ri.isValid()) {
-                    if (_state.wasAttempted(ri.getIdentity().getHash())) {
-                        _duplicatePeers++;
-                    } 
-                    if (_log.shouldLog(Log.DEBUG))
-                        _log.debug(getJobId() + ": dbSearchReply received on search containing router " 
-                                  + ri.getIdentity().getHash() + " with publishDate of " 
-                                  + new Date(ri.getPublished()));
-                    _facade.store(ri.getIdentity().getHash(), ri);
-                    if (_facade.getKBuckets().add(ri.getIdentity().getHash())) 
-                        _newPeers++;
-                    else
-                        _seenPeers++;
-                } else {
-                    if (_log.shouldLog(Log.ERROR))
-                        _log.error(getJobId() + ": Received an invalid peer from " + _peer + ": " + ri);
-                    _invalidPeers++;
+                Hash peer = _msg.getReply(_curIndex);
+                
+                RouterInfo info = getContext().netDb().lookupRouterInfoLocally(peer);
+                if (info == null) {
+                    // hmm, perhaps don't always send a lookup for this...
+                    // but for now, wtf, why not.  we may even want to adjust it so that 
+                    // we penalize or benefit peers who send us that which we can or
+                    // cannot lookup
+                    getContext().netDb().lookupRouterInfo(peer, null, null, _timeoutMs);
                 }
+            
+                if (_state.wasAttempted(peer)) {
+                    _duplicatePeers++;
+                } 
+                if (_log.shouldLog(Log.DEBUG))
+                    _log.debug(getJobId() + ": dbSearchReply received on search referencing router " 
+                              + peer);
+                if (_facade.getKBuckets().add(peer))
+                    _newPeers++;
+                else
+                    _seenPeers++;
+                
                 _curIndex++;
                 requeue(0);
             }

@@ -56,7 +56,8 @@ public class SendReplyMessageJob extends JobImpl {
      */
     protected void send(I2NPMessage msg) {
         _log.info("Sending reply with " + _message.getClass().getName() + " in a sourceRouteeplyMessage to " + _block.getRouter().toBase64());
-        SendMessageDirectJob j = new SendMessageDirectJob(getContext(), msg, _block.getRouter(), _priority);
+        int timeout = (int)(msg.getMessageExpiration().getTime()-getContext().clock().now());
+        SendMessageDirectJob j = new SendMessageDirectJob(getContext(), msg, _block.getRouter(), timeout, _priority);
         getContext().jobQueue().addJob(j);
     }
     

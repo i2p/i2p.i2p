@@ -42,7 +42,7 @@ public class GarlicMessage extends I2NPMessageImpl {
             _data = new byte[(int)len];
             int read = read(in, _data);
             if (read != len)
-                throw new I2NPMessageException("Incorrect size read");
+                throw new I2NPMessageException("Incorrect size read [" + read + " read, expected " + len + "]");
         } catch (DataFormatException dfe) {
             throw new I2NPMessageException("Unable to load the message data", dfe);
         }

@@ -54,7 +54,8 @@ public class GarlicMessageBuilder {
         
         noteWrap(ctx, msg, config);
         
-        log.info("Encrypted with public key " + key + " to expire on " + new Date(config.getExpiration()));
+        if (log.shouldLog(Log.INFO))
+            log.info("Encrypted with public key " + key + " to expire on " + new Date(config.getExpiration()));
         
         byte cloveSet[] = buildCloveSet(ctx, config);
         
@@ -64,26 +65,34 @@ public class GarlicMessageBuilder {
         wrappedKey.setData(curKey.getData());
         
         int availTags = ctx.sessionKeyManager().getAvailableTags(key, curKey);
-        log.debug("Available tags for encryption to " + key + ": " + availTags);
+        if (log.shouldLog(Log.DEBUG))
+            log.debug("Available tags for encryption to " + key + ": " + availTags);
         
         if (availTags < 10) { // arbitrary threshold
             for (int i = 0; i < 20; i++)
                 wrappedTags.add(new SessionTag(true));
-            log.info("Less than 10 tags are available (" + availTags + "), so we're including 20 more");
+            if (log.shouldLog(Log.INFO))
+                log.info("Less than 10 tags are available (" + availTags + "), so we're including 20 more");
         } else if (ctx.sessionKeyManager().getAvailableTimeLeft(key, curKey) < 30*1000) {
             // if we have > 10 tags, but they expire in under 30 seconds, we want more
             for (int i = 0; i < 20; i++)
                 wrappedTags.add(new SessionTag(true));
-            log.info("Tags are almost expired, adding 20 new ones");
+            if (log.shouldLog(Log.INFO))
+                log.info("Tags are almost expired, adding 20 new ones");
         } else {
             // always tack on at least one more - not necessary.
             //wrappedTags.add(new SessionTag(true));
         }
         SessionTag curTag = ctx.sessionKeyManager().consumeNextAvailableTag(key, curKey);
-        byte encData[] = ctx.elGamalAESEngine().encrypt(cloveSet, key, curKey, wrappedTags, curTag, 1024);
+        byte encData[] = ctx.elGamalAESEngine().encrypt(cloveSet, key, curKey, wrappedTags, curTag, 256);
         msg.setData(encData);
         Date exp = new Date(config.getExpiration());
         msg.setMessageExpiration(exp);
+        
+        if (log.shouldLog(Log.WARN))
+            log.warn("CloveSet size for message " + msg.getUniqueId() + " is " + cloveSet.length
+                     + " and encrypted message data is " + encData.length);
+        
         return msg;
     }
     

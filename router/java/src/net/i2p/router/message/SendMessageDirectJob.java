@@ -37,24 +37,20 @@ public class SendMessageDirectJob extends JobImpl {
     private boolean _sent;
     private long _searchOn;
     
-    private final static long DEFAULT_TIMEOUT = 60*1000;
-    
-    public SendMessageDirectJob(RouterContext ctx, I2NPMessage message, Hash toPeer, long expiration, int priority) {
-        this(ctx, message, toPeer, null, null, null, null, expiration, priority);
+    public SendMessageDirectJob(RouterContext ctx, I2NPMessage message, Hash toPeer, int timeoutMs, int priority) {
+        this(ctx, message, toPeer, null, null, null, null, timeoutMs, priority);
     }
-    public SendMessageDirectJob(RouterContext ctx, I2NPMessage message, Hash toPeer, int priority) {
-        this(ctx, message, toPeer, DEFAULT_TIMEOUT+ctx.clock().now(), priority);
+    public SendMessageDirectJob(RouterContext ctx, I2NPMessage message, Hash toPeer, ReplyJob onSuccess, Job onFail, MessageSelector selector, int timeoutMs, int priority) {
+        this(ctx, message, toPeer, null, onSuccess, onFail, selector, timeoutMs, priority);
     }
-    public SendMessageDirectJob(RouterContext ctx, I2NPMessage message, Hash toPeer, ReplyJob onSuccess, Job onFail, MessageSelector selector, long expiration, int priority) {
-        this(ctx, message, toPeer, null, onSuccess, onFail, selector, expiration, priority);
-    }
-    public SendMessageDirectJob(RouterContext ctx, I2NPMessage message, Hash toPeer, Job onSend, ReplyJob onSuccess, Job onFail, MessageSelector selector, long expiration, int priority) {
+    public SendMessageDirectJob(RouterContext ctx, I2NPMessage message, Hash toPeer, Job onSend, ReplyJob onSuccess, Job onFail, MessageSelector selector, int timeoutMs, int priority) {
         super(ctx);
+        if (timeoutMs <= 0) throw new IllegalArgumentException("specify a timeout (" + timeoutMs + ")");
         _log = getContext().logManager().getLog(SendMessageDirectJob.class);
         _message = message;
         _targetHash = toPeer;
         _router = null;
-        _expiration = expiration;
+        _expiration = timeoutMs + ctx.clock().now();
         _priority = priority;
         _searchOn = 0;
         _alreadySearched = false;
@@ -67,27 +63,22 @@ public class SendMessageDirectJob extends JobImpl {
         if (_targetHash == null)
             throw new IllegalArgumentException("Attempt to send a message to a null peer");
         _sent = false;
-        long remaining = expiration - getContext().clock().now();
-        if (remaining < 50*1000) {
-            _log.info("Sending message to expire in " + remaining + "ms containing " + message.getUniqueId() + " (a " + message.getClass().getName() + ")", new Exception("SendDirect from"));
-        }
     }
     
     public String getName() { return "Send Message Direct"; }
     public void runJob() { 
         long now = getContext().clock().now();
-        if (_expiration == 0) 
-            _expiration = now + DEFAULT_TIMEOUT;
 
         if (_expiration - 30*1000 < now) {
-            _log.info("Soon to expire sendDirect of " + _message.getClass().getName() 
-                      + " [expiring in " + (_expiration-now) + "]", getAddedBy());
+            if (_log.shouldLog(Log.INFO))
+                _log.info("Soon to expire sendDirect of " + _message.getClass().getName() 
+                          + " [expiring in " + (_expiration-now) + "]", getAddedBy());
         }
 
         if (_expiration < now) {
-            if (_log.shouldLog(Log.WARN))
-                _log.warn("Timed out sending message " + _message + " directly (expiration = " 
-                          + new Date(_expiration) + ") to " + _targetHash.toBase64(), getAddedBy());
+            if (_log.shouldLog(Log.ERROR))
+                _log.error("Timed out sending message " + _message + " directly (expiration = " 
+                           + new Date(_expiration) + ") to " + _targetHash.toBase64(), getAddedBy());
             return;
         }
         if (_router != null) {
@@ -109,8 +100,8 @@ public class SendMessageDirectJob extends JobImpl {
                     _searchOn = getContext().clock().now();
                     _alreadySearched = true;
                 } else {
-                    if (_log.shouldLog(Log.WARN))
-                        _log.warn("Unable to find the router to send to: " + _targetHash 
+                    if (_log.shouldLog(Log.ERROR))
+                        _log.error("Unable to find the router to send to: " + _targetHash 
                                    + " after searching for " + (getContext().clock().now()-_searchOn) 
                                    + "ms, message: " + _message, getAddedBy());
                 }

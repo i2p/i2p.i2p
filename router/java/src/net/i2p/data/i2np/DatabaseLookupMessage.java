@@ -33,7 +33,7 @@ public class DatabaseLookupMessage extends I2NPMessageImpl {
     private final static Log _log = new Log(DatabaseLookupMessage.class);
     public final static int MESSAGE_TYPE = 2;
     private Hash _key;
-    private RouterInfo _from;
+    private Hash _fromHash;
     private TunnelId _replyTunnel;
     private Set _dontIncludePeers;
     
@@ -51,11 +51,11 @@ public class DatabaseLookupMessage extends I2NPMessageImpl {
     public void setSearchKey(Hash key) { _key = key; }
     
     /**
-     * Contains the current router info of the router who requested this lookup
+     * Contains the router who requested this lookup
      *
      */
-    public RouterInfo getFrom() { return _from; }
-    public void setFrom(RouterInfo from) { _from = from; }
+    public Hash getFrom() { return _fromHash; }
+    public void setFrom(Hash from) { _fromHash = from; }
     
     /**
      * Contains the tunnel ID a reply should be sent to
@@ -82,8 +82,8 @@ public class DatabaseLookupMessage extends I2NPMessageImpl {
         try {
             _key = new Hash();
             _key.readBytes(in);
-            _from = new RouterInfo();
-            _from.readBytes(in);
+            _fromHash = new Hash();
+            _fromHash.readBytes(in);
             Boolean val = DataHelper.readBoolean(in);
             if (val == null) 
                 throw new I2NPMessageException("Tunnel must be explicitly specified (or not)");
@@ -109,12 +109,12 @@ public class DatabaseLookupMessage extends I2NPMessageImpl {
     
     protected byte[] writeMessage() throws I2NPMessageException, IOException {
         if (_key == null) throw new I2NPMessageException("Key being searched for not specified");
-        if (_from == null) throw new I2NPMessageException("From address not specified");
+        if (_fromHash == null) throw new I2NPMessageException("From address not specified");
         
         ByteArrayOutputStream os = new ByteArrayOutputStream(32);
         try {
             _key.writeBytes(os);
-            _from.writeBytes(os);
+            _fromHash.writeBytes(os);
             if (_replyTunnel != null) {
                 DataHelper.writeBoolean(os, Boolean.TRUE);
                 _replyTunnel.writeBytes(os);

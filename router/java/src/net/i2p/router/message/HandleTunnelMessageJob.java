@@ -29,8 +29,11 @@ import net.i2p.data.i2np.TunnelMessage;
 import net.i2p.data.i2np.TunnelVerificationStructure;
 import net.i2p.router.ClientMessage;
 import net.i2p.router.InNetMessage;
+import net.i2p.router.Job;
 import net.i2p.router.JobImpl;
 import net.i2p.router.MessageReceptionInfo;
+import net.i2p.router.MessageSelector;
+import net.i2p.router.ReplyJob;
 import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
 import net.i2p.router.TunnelInfo;
@@ -43,7 +46,7 @@ public class HandleTunnelMessageJob extends JobImpl {
     private Hash _fromHash;
     private I2NPMessageHandler _handler;
     
-    private final static long FORWARD_TIMEOUT = 60*1000;
+    private final static int FORWARD_TIMEOUT = 60*1000;
     private final static int FORWARD_PRIORITY = 400;
     
     public HandleTunnelMessageJob(RouterContext ctx, TunnelMessage msg, RouterIdentity from, Hash fromHash) {
@@ -60,10 +63,7 @@ public class HandleTunnelMessageJob extends JobImpl {
         _fromHash = fromHash;
     }
     
-    public String getName() { return "Handle Inbound Tunnel Message"; }
-    public void runJob() {
-        TunnelId id = _message.getTunnelId();
-
+    private TunnelInfo validate(TunnelId id) {
         long excessLag = getContext().clock().now() - _message.getMessageExpiration().getTime();
         if (excessLag > Router.CLOCK_FUDGE_FACTOR) {
             // expired while on the queue
@@ -76,7 +76,7 @@ public class HandleTunnelMessageJob extends JobImpl {
             getContext().messageHistory().messageProcessingError(_message.getUniqueId(), 
                                                              TunnelMessage.class.getName(), 
                                                              "tunnel message expired on the queue");
-            return;
+            return null;
         } else if (excessLag > 0) {
             // almost expired while on the queue
             if (_log.shouldLog(Log.WARN))
@@ -84,6 +84,8 @@ public class HandleTunnelMessageJob extends JobImpl {
                            + id.getTunnelId() + " expiring " 
                            + excessLag
                            + "ms ago");
+        } else {
+            // not expired
         }
         
         TunnelInfo info = getContext().tunnelManager().getTunnelInfo(id);
@@ -92,16 +94,19 @@ public class HandleTunnelMessageJob extends JobImpl {
             Hash from = _fromHash;
             if (_from != null)
                 from = _from.getHash();
-            getContext().messageHistory().droppedTunnelMessage(id, from);
+            getContext().messageHistory().droppedTunnelMessage(id, _message.getUniqueId(), 
+                                                               _message.getMessageExpiration(), 
+                                                               from);
             if (_log.shouldLog(Log.ERROR))
                 _log.error("Received a message for an unknown tunnel [" + id.getTunnelId() 
                            + "], dropping it: " + _message, getAddedBy());
             long timeRemaining = _message.getMessageExpiration().getTime() - getContext().clock().now();
             getContext().statManager().addRateData("tunnel.unknownTunnelTimeLeft", timeRemaining, 0);
-            return;
+            long lag = getTiming().getActualStart() - getTiming().getStartAfter();
+            if (_log.shouldLog(Log.ERROR))
+                _log.error("Lag processing a dropped tunnel message: " + lag);
+            return null;
         }
-
-        info.messageProcessed();
         
         info = getUs(info);
         if (info == null) {
@@ -109,91 +114,120 @@ public class HandleTunnelMessageJob extends JobImpl {
                 _log.error("We are not part of a known tunnel?? wtf!  drop.", getAddedBy());
             long timeRemaining = _message.getMessageExpiration().getTime() - getContext().clock().now();
             getContext().statManager().addRateData("tunnel.unknownTunnelTimeLeft", timeRemaining, 0);
-            return;
-        } else {
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Tunnel message received for tunnel: \n" + info);
+            return null;
         }
 
-        //if ( (_message.getVerificationStructure() == null) && (info.getSigningKey() != null) ) {
-        if (_message.getVerificationStructure() == null) {
-            if (info.getSigningKey() != null) {
-                if (info.getNextHop() != null) {
-                    if (_log.shouldLog(Log.DEBUG))
-                        _log.debug("We are the gateway to tunnel " + id.getTunnelId());
-                    byte data[] = _message.getData();
-                    I2NPMessage msg = getBody(data);
-                    getContext().jobQueue().addJob(new HandleGatewayMessageJob(msg, info, data.length));
-                    return;
-                } else {
-                    if (_log.shouldLog(Log.DEBUG))
-                        _log.debug("We are the gateway and the endpoint for tunnel " + id.getTunnelId());
-                    if (_log.shouldLog(Log.DEBUG))
-                        _log.debug("Process locally");
-                    if (info.getDestination() != null) {
-                        if (!getContext().clientManager().isLocal(info.getDestination())) {
-                            if (_log.shouldLog(Log.WARN))
-                                _log.warn("Received a message on a tunnel allocated to a client that has disconnected - dropping it!");
-                            if (_log.shouldLog(Log.DEBUG))
-                                _log.debug("Dropping message for disconnected client: " + _message);
+        return info;
+    }
 
-                            getContext().messageHistory().droppedOtherMessage(_message);
-                            getContext().messageHistory().messageProcessingError(_message.getUniqueId(), 
-                                                                             _message.getClass().getName(), 
-                                                                             "Disconnected client");
-                            return;
-                        }
-                    }
-
-                    I2NPMessage body = getBody(_message.getData());
-                    if (body != null) {
-                        getContext().jobQueue().addJob(new HandleLocallyJob(body, info));
-                        return;
-                    } else {
-                        if (_log.shouldLog(Log.ERROR))
-                            _log.error("Body is null!  content of message.getData() = [" + 
-                                       DataHelper.toString(_message.getData()) + "]", getAddedBy());
+    /**
+     * The current router may be the gateway to the tunnel since there is no
+     * verification data, or it could be a b0rked message.
+     *
+     */
+    private void receiveUnverified(TunnelInfo info) {
+        if (info.getSigningKey() != null) {
+            if (info.getNextHop() != null) {
+                if (_log.shouldLog(Log.DEBUG))
+                    _log.debug("We are the gateway to tunnel " + info.getTunnelId().getTunnelId());
+                byte data[] = _message.getData();
+                I2NPMessage msg = getBody(data);
+                getContext().jobQueue().addJob(new HandleGatewayMessageJob(msg, info, data.length));
+                return;
+            } else {
+                if (_log.shouldLog(Log.DEBUG))
+                    _log.debug("We are the gateway and the endpoint for tunnel " + info.getTunnelId().getTunnelId());
+                if (_log.shouldLog(Log.DEBUG))
+                    _log.debug("Process locally");
+                if (info.getDestination() != null) {
+                    if (!getContext().clientManager().isLocal(info.getDestination())) {
+                        if (_log.shouldLog(Log.WARN))
+                            _log.warn("Received a message on a tunnel allocated to a client that has disconnected - dropping it!");
                         if (_log.shouldLog(Log.DEBUG))
-                            _log.debug("Message that failed: " + _message, getAddedBy());
+                            _log.debug("Dropping message for disconnected client: " + _message);
+
+                        getContext().messageHistory().droppedOtherMessage(_message);
+                        getContext().messageHistory().messageProcessingError(_message.getUniqueId(), 
+                                                                         _message.getClass().getName(), 
+                                                                         "Disconnected client");
                         return;
                     }
                 }
-            } else {
-                if (_log.shouldLog(Log.ERROR))
-                    _log.error("Received a message that we are not the gateway for on tunnel " 
-                               + id.getTunnelId() + " without a verification structure: " + _message, getAddedBy());
-                return;
+
+                I2NPMessage body = getBody(_message.getData());
+                if (body != null) {
+                    getContext().jobQueue().addJob(new HandleLocallyJob(body, info));
+                    return;
+                } else {
+                    if (_log.shouldLog(Log.ERROR))
+                        _log.error("Body is null!  content of message.getData() = [" + 
+                                   DataHelper.toString(_message.getData()) + "]", getAddedBy());
+                    if (_log.shouldLog(Log.DEBUG))
+                        _log.debug("Message that failed: " + _message, getAddedBy());
+                    return;
+                }
             }
         } else {
-            // participant
-            TunnelVerificationStructure struct = _message.getVerificationStructure();
-            boolean ok = struct.verifySignature(getContext(), info.getVerificationKey().getKey());
-            if (!ok) {
-                if (_log.shouldLog(Log.WARN))
-                    _log.warn("Failed tunnel verification!  Spoofing / tagging attack?  " + _message, getAddedBy());
-                return;
-            } else {
-                if (info.getNextHop() != null) {
-                    if (_log.shouldLog(Log.INFO))
-                        _log.info("Message for tunnel " + id.getTunnelId() 
-                                  + " received where we're not the gateway and there are remaining hops, so forward it on to " 
-                                  + info.getNextHop().toBase64() + " via SendTunnelMessageJob");
+            if (_log.shouldLog(Log.ERROR))
+                _log.error("Received a message that we are not the gateway for on tunnel " 
+                           + info.getTunnelId().getTunnelId() 
+                           + " without a verification structure: " + _message, getAddedBy());
+            return;
+        }
+    }
 
-                    getContext().statManager().addRateData("tunnel.relayMessageSize", 
+    /**
+     * We may be a participant in the tunnel, as there is a verification structure.
+     *
+     */
+    private void receiveParticipant(TunnelInfo info) {
+        // participant
+        TunnelVerificationStructure struct = _message.getVerificationStructure();
+        boolean ok = struct.verifySignature(getContext(), info.getVerificationKey().getKey());
+        if (!ok) {
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Failed tunnel verification!  Spoofing / tagging attack?  " + _message, getAddedBy());
+            return;
+        } else {
+            if (info.getNextHop() != null) {
+                if (_log.shouldLog(Log.INFO))
+                    _log.info("Message for tunnel " + info.getTunnelId().getTunnelId() 
+                              + " received where we're not the gateway and there are remaining hops, so forward it on to " 
+                              + info.getNextHop().toBase64() + " via SendTunnelMessageJob");
+
+                getContext().statManager().addRateData("tunnel.relayMessageSize", 
                                                        _message.getData().length, 0);
 
-                    getContext().jobQueue().addJob(new SendMessageDirectJob(getContext(), _message, 
-                                                                        info.getNextHop(), 
-                                                                        getContext().clock().now() + FORWARD_TIMEOUT, 
-                                                                        FORWARD_PRIORITY));
-                    return;
-                } else {
-                    if (_log.shouldLog(Log.DEBUG))
-                        _log.debug("No more hops, unwrap and follow the instructions");
-                    getContext().jobQueue().addJob(new HandleEndpointJob(info));
-                    return;
-                }
+                SendMessageDirectJob j = new SendMessageDirectJob(getContext(), _message, 
+                                                                  info.getNextHop(), 
+                                                                  (int)(_message.getMessageExpiration().getTime() - getContext().clock().now()),
+                                                                  FORWARD_PRIORITY);
+                getContext().jobQueue().addJob(j);
+                return;
+            } else {
+                if (_log.shouldLog(Log.DEBUG))
+                    _log.debug("No more hops, unwrap and follow the instructions");
+                getContext().jobQueue().addJob(new HandleEndpointJob(info));
+                return;
             }
+        }
+    }
+    
+    public String getName() { return "Handle Inbound Tunnel Message"; }
+    public void runJob() {
+        TunnelId id = _message.getTunnelId();
+
+        TunnelInfo info = validate(id);
+        if (info == null) 
+            return;
+        
+        info.messageProcessed();
+        
+        //if ( (_message.getVerificationStructure() == null) && (info.getSigningKey() != null) ) {
+        if (_message.getVerificationStructure() == null) {
+            receiveUnverified(info);
+        } else {
+            receiveParticipant(info);
         }
     }
     
@@ -288,8 +322,7 @@ public class HandleTunnelMessageJob extends JobImpl {
             ByteArrayOutputStream baos = new ByteArrayOutputStream(1024);
             body.writeBytes(baos);
             msg.setData(baos.toByteArray());
-            long exp = getContext().clock().now() + FORWARD_TIMEOUT;
-            getContext().jobQueue().addJob(new SendMessageDirectJob(getContext(), msg, router, exp, FORWARD_PRIORITY));
+            getContext().jobQueue().addJob(new SendMessageDirectJob(getContext(), msg, router, FORWARD_TIMEOUT, FORWARD_PRIORITY));
 
             String bodyType = body.getClass().getName();
             getContext().messageHistory().wrap(bodyType, body.getUniqueId(), TunnelMessage.class.getName(), msg.getUniqueId());	
@@ -306,8 +339,7 @@ public class HandleTunnelMessageJob extends JobImpl {
         // TODO: we may want to send it via a tunnel later on, but for now, direct will do.
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Sending on to requested router " + router.toBase64());
-        long exp = getContext().clock().now() + FORWARD_TIMEOUT;
-        getContext().jobQueue().addJob(new SendMessageDirectJob(getContext(), body, router, exp, FORWARD_PRIORITY));
+        getContext().jobQueue().addJob(new SendMessageDirectJob(getContext(), body, router, FORWARD_TIMEOUT, FORWARD_PRIORITY));
     }
     
     private void sendToLocal(I2NPMessage body) {
@@ -467,11 +499,24 @@ public class HandleTunnelMessageJob extends JobImpl {
         public void runJob() {
             RouterContext ctx = HandleTunnelMessageJob.this.getContext();
             if (_body != null) {
+                long expiration = _body.getMessageExpiration().getTime();
+                long timeout = expiration - ctx.clock().now();
                 ctx.statManager().addRateData("tunnel.gatewayMessageSize", _length, 0);
                 if (_log.shouldLog(Log.INFO))
-                    _log.info("Message for tunnel " + _info.getTunnelId() + " received at the gateway (us), and since its > 0 length, forward the " 
-                              + _body.getClass().getName() + " message on to " + _info.getNextHop().toBase64() + " via SendTunnelMessageJob");
-                ctx.jobQueue().addJob(new SendTunnelMessageJob(ctx, _body, _info.getTunnelId(), null, null, null, null, FORWARD_TIMEOUT, FORWARD_PRIORITY));
+                    _log.info("Message for tunnel " + _info.getTunnelId() 
+                              + " received at the gateway (us), and since its > 0 length, forward the " 
+                              + _body.getClass().getName() + " message on to " 
+                              + _info.getNextHop().toBase64() + " via SendTunnelMessageJob expiring in " 
+                              + timeout + "ms");
+                
+                MessageSelector selector = null;
+                Job onFailure = null;
+                Job onSuccess = null;
+                ReplyJob onReply = null;
+                Hash targetRouter = null;
+                TunnelId targetTunnelId = null;
+                SendTunnelMessageJob j = new SendTunnelMessageJob(ctx, _body, _info.getTunnelId(), targetRouter, targetTunnelId, onSuccess, onReply, onFailure, selector, timeout, FORWARD_PRIORITY);
+                ctx.jobQueue().addJob(j);
             } else {
                 if (_log.shouldLog(Log.WARN))
                     _log.warn("Body of the message for the tunnel could not be parsed");
