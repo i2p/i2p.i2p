@@ -27,7 +27,8 @@ class ConnectionRunner implements Runnable {
     private boolean _keepRunning;
     private byte _writeBuffer[];
     private long _lastTimeSend;
-    private long _lastWrite;
+    private long _lastWriteEnd;
+    private long _lastWriteBegin;
     
     private static final long TIME_SEND_FREQUENCY = 60*1000;
     
@@ -36,7 +37,8 @@ class ConnectionRunner implements Runnable {
         _log = ctx.logManager().getLog(ConnectionRunner.class);
         _con = con;
         _keepRunning = false;
-        _lastWrite = ctx.clock().now();
+        _lastWriteBegin = ctx.clock().now();
+        _lastWriteEnd = _lastWriteBegin;
     }
     
     public void startRunning() {
@@ -106,23 +108,21 @@ class ConnectionRunner implements Runnable {
         
         OutputStream out = _con.getOutputStream();
         boolean ok = false;
-        long before = -1;
-        long after = -1;
         try {
             synchronized (out) {
-                before = _context.clock().now();
+                _lastWriteBegin = _context.clock().now();
                 out.write(buf, 0, written);
                 if (sendTime) {
                     out.write(buildTimeMessage().toByteArray());
                     _lastTimeSend = _context.clock().now();
                 }
                 out.flush();
-                after = _context.clock().now();
+                _lastWriteEnd = _context.clock().now();
             }
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Just sent message " + msg.getMessageId() + " to " 
                          + msg.getTarget().getIdentity().getHash().toBase64().substring(0,6)
-                         + " writeTime = " + (after-before) +"ms"
+                         + " writeTime = " + (_lastWriteEnd - _lastWriteBegin) +"ms"
                          + " lifetime = " + msg.getLifetime() + "ms");
             
             ok = true;
@@ -131,8 +131,7 @@ class ConnectionRunner implements Runnable {
                 _log.warn("Error writing out the message", ioe);
             _con.closeConnection();
         }
-        _con.sent(msg, ok, after - before);
-        _lastWrite = after;
+        _con.sent(msg, ok, _lastWriteEnd - _lastWriteBegin);
     }
 
     /**
@@ -160,7 +159,9 @@ class ConnectionRunner implements Runnable {
         public void timeReached() {
             if (!_keepRunning) return;
             if (_con.getIsClosed()) return;
-            long timeSinceWrite = _context.clock().now() - _lastWrite;
+            long now = _context.clock().now();
+            long timeSinceWrite = now - _lastWriteEnd;
+            long timeSinceWriteBegin = now - _lastWriteBegin;
             if (timeSinceWrite > 5*TIME_SEND_FREQUENCY) {
                 TCPTransport t = _con.getTransport();
                 String msg = "Connection closed with "
@@ -168,6 +169,9 @@ class ConnectionRunner implements Runnable {
                              + " due to " + DataHelper.formatDuration(timeSinceWrite)
                              + " of inactivity after " 
                              + DataHelper.formatDuration(_con.getLifetime());
+                if (_lastWriteBegin > _lastWriteEnd)
+                    msg = msg + " with a message being written for " + 
+                          DataHelper.formatDuration(timeSinceWriteBegin);
                 t.addConnectionErrorMessage(msg);
                 if (_log.shouldLog(Log.INFO))
                     _log.info(msg);

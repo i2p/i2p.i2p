@@ -257,6 +257,8 @@ public class WebEditPageHelper {
             // creating new
             cur = new TunnelController(config, "", _privKeyGenerate);
             TunnelControllerGroup.getInstance().addController(cur);
+            if (cur.getStartOnLoad())
+                cur.startTunnelBackground();
         } else {
             cur.setConfig(config, "");
         }

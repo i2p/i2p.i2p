@@ -1,4 +1,9 @@
-$Id: history.txt,v 1.121 2004/12/29 17:16:42 jrandom Exp $
+$Id: history.txt,v 1.122 2004/12/30 17:51:16 jrandom Exp $
+
+2004-12-31  jrandom
+    * Speling fxi (thanks digum!)
+    * Bugfix for the I2PTunnel web interface so that it now properly launches
+      newly added tunnels that are defined to be run on startup (thanks ugha!)
 
 2004-12-30  jrandom
     * Revised the I2PTunnel client and httpclient connection establishment 
