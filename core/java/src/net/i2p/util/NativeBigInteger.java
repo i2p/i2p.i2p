@@ -13,7 +13,10 @@ import java.util.Random;
 import java.security.SecureRandom;
 
 import java.net.URL;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.io.FileOutputStream;
+import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.IOException;
 import java.io.File;
@@ -25,9 +28,11 @@ import java.io.File;
  * GMP library - a collection of insanely efficient routines for dealing with 
  * big numbers.</p>
  *
- * There are two environmental properties for configuring this component: <ul>
+ * There are three environmental properties for configuring this component: <ul>
  * <li><b>jbigi.enable</b>: whether to use the native library (defaults to "true")</li>
  * <li><b>jbigi.impl</b>: select which resource to use as the native implementation</li>
+ * <li><b>jbigi.ref</b>: the file specified in this parameter may contain a resource
+ *                       name to override jbigi.impl (defaults to "jbigi.cfg")</li>
  * </ul>
  *
  * <p>If jbigi.enable is set to false, this class won't even attempt to use the 
@@ -90,6 +95,8 @@ public class NativeBigInteger extends BigInteger {
      * it easier for other systems to reuse this class
      */
     private static final boolean _doLog = true;
+    
+    private static String DEFAULT_REF_FILENAME = "jbigi.cfg";
     
     static {
         loadNative();
@@ -281,7 +288,7 @@ public class NativeBigInteger extends BigInteger {
      *
      */
     private static final boolean loadFromResource() {
-        String resourceName = System.getProperty("jbigi.impl");
+        String resourceName = getResourceName();
         if (resourceName == null) return false;
         URL resource = NativeBigInteger.class.getClassLoader().getResource(resourceName);
         if (resource == null) {
@@ -322,5 +329,32 @@ public class NativeBigInteger extends BigInteger {
                 outFile.deleteOnExit();
             }
         }
+    }
+    
+    private static final String getResourceName() {
+        String jbigiRefFile = System.getProperty("jbigi.ref");
+        if (jbigiRefFile == null)
+            jbigiRefFile = DEFAULT_REF_FILENAME;
+        
+        File refFile = new File(jbigiRefFile);
+        if (refFile.exists()) {
+            BufferedReader in = null;
+            try {
+                in = new BufferedReader(new InputStreamReader(new FileInputStream(refFile)));
+                String resourceName = in.readLine();
+                if ( (resourceName != null) || (resourceName.trim().length() <= 0) )
+                    return resourceName;
+            } catch (IOException ioe) {
+                if (_doLog) {
+                    System.err.println("WARN: Unable to read the jbigi reference file " + jbigiRefFile);
+                    ioe.printStackTrace();
+                }
+            } finally {
+                if (in != null) try { in.close(); } catch (IOException ioe) {}
+            }
+        }
+        
+        // the file doesnt exist, or it is empty, so use the jbigi.impl system env
+        return System.getProperty("jbigi.impl");
     }
 }
