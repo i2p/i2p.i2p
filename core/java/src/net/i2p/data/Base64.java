@@ -60,7 +60,7 @@ public class Base64 {
     }
 
     /** convenience method added by aum */
-    public static String decode(String s) {
+    public static String decodeToString(String s) {
         return new String(decode(s));
     }
     public static byte[] decode(String s) {
