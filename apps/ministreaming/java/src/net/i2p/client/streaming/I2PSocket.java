@@ -62,6 +62,8 @@ public interface I2PSocket {
      */
     public void close() throws IOException;
     
+    public boolean isClosed();
+
     public void setSocketErrorListener(SocketErrorListener lsnr);
     /**
      * Allow notification of underlying errors communicating across I2P without

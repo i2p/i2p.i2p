@@ -233,6 +233,8 @@ class I2PSocketImpl implements I2PSocket {
         in.notifyClosed();
     }
 
+    public boolean isClosed() { return _closedOn > 0; }
+    
     /**
      * Close the socket from the I2P side (by a close packet)
      */

@@ -1,4 +1,8 @@
-$Id: history.txt,v 1.180 2005/03/24 02:29:27 jrandom Exp $
+$Id: history.txt,v 1.181 2005/03/24 23:07:06 jrandom Exp $
+
+2005-03-26  jrandom
+    * Added some error handling and fairly safe to cache data to the streaming
+      lib (good call Tom!)
 
 2005-03-25  jrandom
     * Fixed up building dependencies for the routerconsole on some more 

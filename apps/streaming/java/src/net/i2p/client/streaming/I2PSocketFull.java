@@ -13,9 +13,15 @@ import net.i2p.data.Destination;
 public class I2PSocketFull implements I2PSocket {
     private Connection _connection;
     private I2PSocket.SocketErrorListener _listener;
+    private Destination _remotePeer;
+    private Destination _localPeer;
     
     public I2PSocketFull(Connection con) {
         _connection = con;
+        if (con != null) {
+            _remotePeer = con.getRemotePeer();
+            _localPeer = con.getSession().getMyDestination();
+        }
     }
     
     public void close() throws IOException {
@@ -35,42 +41,68 @@ public class I2PSocketFull implements I2PSocket {
     Connection getConnection() { return _connection; }
     
     public InputStream getInputStream() {
-        return _connection.getInputStream();
+        Connection c = _connection;
+        if (c != null)
+            return c.getInputStream();
+        else
+            return null;
     }
     
     public I2PSocketOptions getOptions() {
-        return _connection.getOptions();
+        Connection c = _connection;
+        if (c != null)
+            return c.getOptions();
+        else
+            return null;
     }
     
     public OutputStream getOutputStream() throws IOException {
-        return _connection.getOutputStream();
+        Connection c = _connection;
+        if (c != null)
+            return c.getOutputStream();
+        else
+            return null;
     }
     
-    public Destination getPeerDestination() {
-        return _connection.getRemotePeer();
-    }
+    public Destination getPeerDestination() { return _remotePeer; }
     
     public long getReadTimeout() {
-        return _connection.getOptions().getReadTimeout();
+        I2PSocketOptions opts = getOptions();
+        if (opts != null) 
+            return opts.getReadTimeout();
+        else 
+            return -1;
     }
     
-    public Destination getThisDestination() {
-        return _connection.getSession().getMyDestination();
-    }
+    public Destination getThisDestination() { return _localPeer; }
     
     public void setOptions(I2PSocketOptions options) {
+        Connection c = _connection;
+        if (c == null) return;
+        
         if (options instanceof ConnectionOptions)
-            _connection.setOptions((ConnectionOptions)options);
+            c.setOptions((ConnectionOptions)options);
         else
-            _connection.setOptions(new ConnectionOptions(options));
+            c.setOptions(new ConnectionOptions(options));
     }
     
     public void setReadTimeout(long ms) {
-        _connection.getOptions().setReadTimeout(ms);
+        Connection c = _connection;
+        if (c == null) return;
+        
+        c.getOptions().setReadTimeout(ms);
     }
     
     public void setSocketErrorListener(I2PSocket.SocketErrorListener lsnr) {
         _listener = lsnr;
+    }
+    
+    public boolean isClosed() { 
+        Connection c = _connection;
+        return ((c == null) ||
+                (!c.getIsConnected()) || 
+                (c.getResetReceived()) ||
+                (c.getResetSent()));
     }
     
     void destroy() { 
