@@ -37,21 +37,16 @@ public class BandwidthLimitedOutputStream extends FilterOutputStream {
         out.write(val);
     }
     public void write(byte src[]) throws IOException {
-        if (src == null) return;
-        if (src.length > CHUNK_SIZE) {
-            for (int i = 0; i < src.length; ) {
-                write(src, i*CHUNK_SIZE, CHUNK_SIZE);
-                i += CHUNK_SIZE;
-            }
-        } else {
-            write(src, 0, src.length);
-        }
+        write(src, 0, src.length);
     }
     public void write(byte src[], int off, int len) throws IOException {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Writing " + len + " bytes");
         if (src == null) return;
         if (len <= 0) return;
+        if (len + off > src.length)
+            throw new IllegalArgumentException("wtf are you thinking?  len=" + len 
+                                               + ", off=" + off + ", data=" + src.length);
         if (len <= CHUNK_SIZE) {
             _context.bandwidthLimiter().delayOutbound(_peer, len);
             out.write(src, off, len);
@@ -62,10 +57,10 @@ public class BandwidthLimitedOutputStream extends FilterOutputStream {
                 out.write(src, off+i, CHUNK_SIZE);
                 i += CHUNK_SIZE;
             }
-            int remainder = len % CHUNK_SIZE;
-            if (remainder != 0) {
+            int remainder = (len % CHUNK_SIZE);
+            if (remainder > 0) {
                 _context.bandwidthLimiter().delayOutbound(_peer, remainder);
-                out.write(src, off+len-(remainder), remainder);
+                out.write(src, i, remainder);
             }
         }
     }
