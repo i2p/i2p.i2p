@@ -1,7 +1,8 @@
 ; TC's hosts.txt guaranteed freshness
-; $Id: hosts.txt,v 1.101 2005/01/02 21:36:32 scintilla Exp $
+; $Id: hosts.txt,v 1.102 2005/01/04 07:22:38 eco Exp $
 ; changelog:
-; (1.223) added chat.i2p
+; (1.124) removed jap.eco.i2p and bt1.eco.i2p (obsolete)
+; (1.123) added chat.i2p
 ; (1.122) added phonebooth.i2p
 ; (1.121) added up.i2p
 ; (1.120) added dm.i2p
