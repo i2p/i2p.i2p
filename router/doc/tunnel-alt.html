@@ -1,4 +1,4 @@
-<code>$Id: tunnel-alt.html,v 1.1 2005/01/18 10:55:17 jrandom Exp $</code>
+<code>$Id: tunnel-alt.html,v 1.2 2005/01/18 11:01:55 jrandom Exp $</code>
 <pre>
 1) <a href="#tunnel.overview">Tunnel overview</a>
 2) <a href="#tunnel.operation">Tunnel operation</a>
@@ -45,7 +45,7 @@ tunnels, the tunnel creator serves as the gateway, passing messages
 out to the remote endpoint.</p>
 
 <p>The tunnel's creator selects exactly which peers will participate
-in the tunnel, and provides each with the necessary confiruration
+in the tunnel, and provides each with the necessary configuration
 data.  They may have any number of hops, but may be constrained with various
 proof-of-work requests to add on additional steps.  It is the intent to make
 it hard for either participants or third parties to determine the length of 
@@ -70,7 +70,7 @@ the tunnels themselves.</p>
 
 <p>I2P is an inherently packet switched network, even with these 
 tunnels, allowing it to take advantage of multiple tunnels running 
-in parallel, increasing resiliance and balancing load.  Outside of
+in parallel, increasing resilience and balancing load.  Outside of
 the core I2P layer, there is an optional end to end streaming library 
 available for client applications, exposing TCP-esque operation,
 including message reordering, retransmission, congestion control, etc.</p>
@@ -216,7 +216,7 @@ stats</a></b></i></p>
 <h3>2.6) <a name="tunnel.fragmentation">Tunnel fragmentation</a></h3>
 
 <p>To prevent adversaries from tagging the messages along the path by adjusting
-the message size, all tunnel messages are a fixed 1KB in size.  To accomidate 
+the message size, all tunnel messages are a fixed 1KB in size.  To accommodate 
 larger I2NP messages as well as to support smaller ones more efficiently, the
 gateway splits up the larger I2NP messages into fragments contained within each
 tunnel message.  The endpoint will attempt to rebuild the I2NP message from the
@@ -275,7 +275,7 @@ the tunnel, allowing further dynamic redirection.</li>
 
 <h4>2.8.2) <a name="tunnel.bidirectional">Use bidirectional tunnels</a></h4>
 
-<p>The current strategy of using two seperate tunnels for inbound and outbound
+<p>The current strategy of using two separate tunnels for inbound and outbound
 communication is not the only technique available, and it does have anonymity
 implications.  On the positive side, by using separate tunnels it lessens the
 traffic data exposed for analysis to participants in a tunnel - for instance,
@@ -407,7 +407,7 @@ leakage of information about what peers are in the router's partition.</p>
 
 <h2>4) <a name="tunnel.throttling">Tunnel throttling</a></h2>
 
-<p>Even though the tunnels within I2P bear a resemblence to a circuit switched
+<p>Even though the tunnels within I2P bear a resemblance to a circuit switched
 network, everything within I2P is strictly message based - tunnels are merely
 accounting tricks to help organize the delivery of messages.  No assumptions are
 made regarding reliability or ordering of messages, and retransmissions are left
