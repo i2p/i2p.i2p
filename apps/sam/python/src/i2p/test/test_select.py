@@ -48,13 +48,9 @@ def minitest_select(rans, wans, eans, timeout,
   ans2 = [[L.index(x) + 1 for x in ans2[i]] for i in range(3)]
   ans3 = [[L.index(x) + 1 for x in ans3[i]] for i in range(3)]
 
-  print ans1[0], rans
   assert ans1[0] == rans
-  print ans2[1], wans
   assert ans2[1] == wans
-  print ans3[2], eans
   assert ans3[2] == eans
-  print ans, [rans, wans, eans]
   assert ans  == [rans, wans, eans]
   assert T < 4 * timeout + 0.1
 
@@ -77,7 +73,7 @@ def test_select():
     """Connect regular Python socket to Google, and send."""
     connect1(S)
     S.sendall('GET / HTTP/1.0\r\n\r\n')
-    print S.recv(1)
+    S.recv(1)
 
   def full4(S):
     """Connect I2P Python socket to duck.i2p, and send."""
