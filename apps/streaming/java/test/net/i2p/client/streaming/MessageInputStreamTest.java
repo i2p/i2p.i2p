@@ -22,17 +22,17 @@ public class MessageInputStreamTest {
     }
     
     public void testInOrder() {
-        byte orig[] = new byte[32*1024];
+        byte orig[] = new byte[256*1024];
         _context.random().nextBytes(orig);
         
         MessageInputStream in = new MessageInputStream(_context);
-        for (int i = 0; i < 32; i++) {
+        for (int i = 0; i < orig.length / 1024; i++) {
             byte msg[] = new byte[1024];
             System.arraycopy(orig, i*1024, msg, 0, 1024);
             in.messageReceived(i, msg);
         }
         
-        byte read[] = new byte[32*1024];
+        byte read[] = new byte[orig.length];
         try {
             int howMany = DataHelper.read(in, read);
             if (howMany != orig.length)
@@ -47,15 +47,15 @@ public class MessageInputStreamTest {
     }
     
     public void testRandomOrder() {
-        byte orig[] = new byte[32*1024];
+        byte orig[] = new byte[256*1024];
         _context.random().nextBytes(orig);
         
         MessageInputStream in = new MessageInputStream(_context);
         ArrayList order = new ArrayList(32);
-        for (int i = 0; i < 32; i++)
+        for (int i = 0; i < orig.length / 1024; i++)
             order.add(new Integer(i));
         Collections.shuffle(order);
-        for (int i = 0; i < 32; i++) {
+        for (int i = 0; i < orig.length / 1024; i++) {
             byte msg[] = new byte[1024];
             Integer cur = (Integer)order.get(i);
             System.arraycopy(orig, cur.intValue()*1024, msg, 0, 1024);
@@ -63,7 +63,7 @@ public class MessageInputStreamTest {
             _log.debug("Injecting " + cur);
         }
         
-        byte read[] = new byte[32*1024];
+        byte read[] = new byte[orig.length];
         try {
             int howMany = DataHelper.read(in, read);
             if (howMany != orig.length)
@@ -77,11 +77,45 @@ public class MessageInputStreamTest {
         }
     }
     
+    public void testRandomDups() {
+        byte orig[] = new byte[256*1024];
+        _context.random().nextBytes(orig);
+        
+        MessageInputStream in = new MessageInputStream(_context);
+        for (int n = 0; n < 3; n++) {
+            ArrayList order = new ArrayList(32);
+            for (int i = 0; i < orig.length / 1024; i++)
+                order.add(new Integer(i));
+            Collections.shuffle(order);
+            for (int i = 0; i < orig.length / 1024; i++) {
+                byte msg[] = new byte[1024];
+                Integer cur = (Integer)order.get(i);
+                System.arraycopy(orig, cur.intValue()*1024, msg, 0, 1024);
+                in.messageReceived(cur.intValue(), msg);
+                _log.debug("Injecting " + cur);
+            }
+        }
+        
+        byte read[] = new byte[orig.length];
+        try {
+            int howMany = DataHelper.read(in, read);
+            if (howMany != orig.length)
+                throw new RuntimeException("Failed test: not enough bytes read [" + howMany + "]");
+            if (!DataHelper.eq(orig, read))
+                throw new RuntimeException("Failed test: data read is not equal");
+            
+            _log.info("Passed test: random dups");
+        } catch (IOException ioe) {
+            throw new RuntimeException("IOError reading: " + ioe.getMessage());
+        }
+    }
+    
     public static void main(String args[]) {
         MessageInputStreamTest t = new MessageInputStreamTest();
         try {
             t.testInOrder();
             t.testRandomOrder();
+            t.testRandomDups();
         } catch (Exception e) {
             e.printStackTrace();
         }

@@ -93,7 +93,7 @@ public class Connection {
      * @return true if the packet should be sent
      */
     boolean packetSendChoke() {
-        //if (true) return true;
+        if (true) return true;
         long writeExpire = _options.getWriteTimeout();
         if (writeExpire > 0)
             writeExpire += _context.clock().now();
@@ -151,30 +151,6 @@ public class Connection {
         _outboundQueue.enqueue(packet);
     }
     
-    /*    
-    void flushPackets() { 
-        List toSend = null;
-        synchronized (_outboundPackets) {
-            for (Iterator iter = _outboundPackets.values().iterator(); iter.hasNext(); ) {
-                PacketLocal packet = (PacketLocal)iter.next();
-                long nextExpected = _options.getResendDelay() << packet.getNumSends();
-                if (packet.getLastSend() + nextExpected <= _context.clock().now()) {
-                    // we need to resend
-                    if (toSend == null) toSend = new ArrayList(1);
-                    toSend.add(packet);
-                }
-            }
-        }
-        
-        if (toSend != null) {
-            for (int i = 0; i < toSend.size(); i++) {
-                PacketLocal packet = (PacketLocal)toSend.get(i);
-                _lastSendTime = _context.clock().now();
-                _outboundQueue.enqueue(packet);
-            }
-        }
-    }
-    */
     List ackPackets(long ackThrough, long nacks[]) {
         List acked = null;
         synchronized (_outboundPackets) {
@@ -362,6 +338,15 @@ public class Connection {
                     resend = true;
             }
             if ( (resend) && (_packet.getAckTime() < 0) ) {
+                // revamp various fields, in case we need to ack more, etc
+                _packet.setAckThrough(getInputStream().getHighestBlockId());
+                _packet.setNacks(getInputStream().getNacks());
+                _packet.setOptionalDelay(getOptions().getChoke());
+                _packet.setOptionalMaxSize(getOptions().getMaxMessageSize());
+                _packet.setResendDelay(getOptions().getResendDelay());
+                _packet.setReceiveStreamId(_receiveStreamId);
+                _packet.setSendStreamId(_sendStreamId);
+
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("Resend packet " + _packet + " on " + Connection.this);
                 _outboundQueue.enqueue(_packet);

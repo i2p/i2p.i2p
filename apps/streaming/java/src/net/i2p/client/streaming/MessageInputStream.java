@@ -95,7 +95,7 @@ public class MessageInputStream extends InputStream {
                 if (_notYetReadyBlocks.containsKey(l)) {
                     // ACK
                 } else {
-                    if (ids != null)
+                    if (ids == null)
                         ids = new ArrayList(4);
                     ids.add(l);
                 }
@@ -210,8 +210,8 @@ public class MessageInputStream extends InputStream {
             expiration = _readTimeout + System.currentTimeMillis();
         synchronized (_dataLock) {
             while (_readyDataBlocks.size() <= 0) {
-                if (_log.shouldLog(Log.DEBUG))
-                    _log.debug("read() with readyBlocks.size = " + _readyDataBlocks.size() + " on " + toString());
+                //if (_log.shouldLog(Log.DEBUG))
+                //    _log.debug("read() with readyBlocks.size = " + _readyDataBlocks.size() + " on " + toString());
                 
                 if ( (_notYetReadyBlocks.size() <= 0) && (_closeReceived) ) {
                     if (_log.shouldLog(Log.DEBUG))
@@ -244,8 +244,8 @@ public class MessageInputStream extends InputStream {
                 }
             }
             
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("read() readyBlocks = " + _readyDataBlocks.size() + ": " + toString());
+            //if (_log.shouldLog(Log.DEBUG))
+            //    _log.debug("read() readyBlocks = " + _readyDataBlocks.size() + ": " + toString());
             
             // either was already ready, or we wait()ed and it arrived
             ByteArray cur = (ByteArray)_readyDataBlocks.get(0);

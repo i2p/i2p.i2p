@@ -93,15 +93,28 @@ public class PacketHandler {
                     _log.warn("Syn packet reply on a stream we don't know about: " + packet);
             }
         } else {
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Packet received on an unknown stream (and not a SYN): " + packet);
+            if (packet.getSendStreamId() == null) {
+                for (Iterator iter = _manager.listConnections().iterator(); iter.hasNext(); ) {
+                    Connection con = (Connection)iter.next();
+                    if (DataHelper.eq(con.getSendStreamId(), packet.getReceiveStreamId()) &&
+                        con.getAckedPackets() <= 0) {
+                        if (_log.shouldLog(Log.DEBUG))
+                            _log.debug("Received additional packets before the syn on " + con + ": " + packet);
+                        receiveKnownCon(con, packet);
+                        return;
+                    }
+                }
+            }
             if (_log.shouldLog(Log.WARN)) {
-                _log.warn("Packet received on an unknown stream (and not a SYN): " + packet);
                 StringBuffer buf = new StringBuffer(128);
                 Set cons = _manager.listConnections();
                 for (Iterator iter = cons.iterator(); iter.hasNext(); ) {
                     Connection con = (Connection)iter.next();
                     buf.append(Base64.encode(con.getReceiveStreamId())).append(" ");
                 }
-                _log.warn("Other streams: " + buf.toString());
+                _log.warn("Packet belongs to know other cons: " + packet + " connections: " + buf.toString());
             }
         }
     }

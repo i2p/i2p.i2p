@@ -35,16 +35,19 @@ public class ConnectionPacketHandler {
             if (nextTime <= 0) {
                 con.setNextSendTime(con.getOptions().getSendAckDelay() + _context.clock().now());
                 if (_log.shouldLog(Log.DEBUG))
-                    _log.debug("Scheduling ack in " + con.getOptions().getSendAckDelay() + "ms for received packet " + packet);
+                    _log.error("Scheduling ack in " + con.getOptions().getSendAckDelay() + "ms for received packet " + packet);
             } else {
                 if (_log.shouldLog(Log.DEBUG))
-                    _log.debug("Ack is already scheduled in " + nextTime + "ms, though we just received " + packet);
+                    _log.debug("Ack is already scheduled in " + (nextTime-_context.clock().now()) 
+                               + "ms, though we just received " + packet);
             }
         } else {
             if (packet.getSequenceNum() > 0) {
                 // take note of congestion
                 con.getOptions().setResendDelay(con.getOptions().getResendDelay()*2);
                 //con.getOptions().setWindowSize(con.getOptions().getWindowSize()/2);
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("congestion.. dup " + packet);
             } else {
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("ACK only packet received: " + packet);

@@ -131,7 +131,7 @@ public class Packet {
      * ping reply (if receiveStreamId is set).
      */
     public static final int FLAG_ECHO = (1 << 9);
-    
+
     public static final int DEFAULT_MAX_SIZE = 32*1024;
     
     /** what stream is this packet a part of? */
@@ -195,9 +195,15 @@ public class Packet {
     public int getResendDelay() { return _resendDelay; }
     public void setResendDelay(int numSeconds) { _resendDelay = numSeconds; }
     
+    public static final int MAX_PAYLOAD_SIZE = 32*1024;
+    
     /** get the actual payload of the message.  may be null */
     public byte[] getPayload() { return _payload; }
-    public void setPayload(byte payload[]) { _payload = payload; }
+    public void setPayload(byte payload[]) { 
+        _payload = payload; 
+        if ( (payload != null) && (payload.length > MAX_PAYLOAD_SIZE) )
+            throw new IllegalArgumentException("Too large payload: " + payload.length);
+    }
 
     /** is a particular flag set on this packet? */
     public boolean isFlagSet(int flag) { return 0 != (_flags & flag); }
@@ -323,7 +329,12 @@ public class Packet {
         }
         
         if (_payload != null) {
-            System.arraycopy(_payload, 0, buffer, cur, _payload.length);
+            try {
+                System.arraycopy(_payload, 0, buffer, cur, _payload.length);
+            } catch (ArrayIndexOutOfBoundsException aioobe) {
+                System.err.println("payload.length: " + _payload.length + " buffer.length: " + buffer.length + " cur: " + cur);
+                throw aioobe;
+            }
             cur += _payload.length;
         }
                 
@@ -411,6 +422,8 @@ public class Packet {
         
         // skip ahead to the payload
         _payload = new byte[offset + length - payloadBegin];
+        if (_payload.length > MAX_PAYLOAD_SIZE)
+            throw new IllegalArgumentException("length: " + length + " offset: " + offset + " begin: " + payloadBegin);
         System.arraycopy(buffer, payloadBegin, _payload, 0, _payload.length);
         
         // ok now lets go back and deal with the options

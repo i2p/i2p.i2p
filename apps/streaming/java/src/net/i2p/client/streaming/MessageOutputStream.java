@@ -20,7 +20,7 @@ public class MessageOutputStream extends OutputStream {
     private boolean _closed;
     
     public MessageOutputStream(I2PAppContext ctx, DataReceiver receiver) {
-        this(ctx, receiver, 64*1024);
+        this(ctx, receiver, Packet.MAX_PAYLOAD_SIZE);
     }
     public MessageOutputStream(I2PAppContext ctx, DataReceiver receiver, int bufSize) {
         super();
@@ -37,31 +37,38 @@ public class MessageOutputStream extends OutputStream {
     }
     
     public void write(byte b[], int off, int len) throws IOException {
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("write(b[], " + off + ", " + len + ")");
         synchronized (_dataLock) {
+            int cur = off;
             int remaining = len;
             while (remaining > 0) {
                 if (_valid + remaining < _buf.length) {
                     // simply buffer the data, no flush
-                    System.arraycopy(b, off, _buf, _valid, remaining);
+                    System.arraycopy(b, cur, _buf, _valid, remaining);
                     _valid += remaining;
+                    cur += remaining;
                     remaining = 0;
+                    if (_log.shouldLog(Log.DEBUG))
+                        _log.debug("write(...): appending valid = " + _valid + " remaining=" + remaining);
                 } else {
                     // buffer whatever we can fit then flush,
                     // repeating until we've pushed all of the
                     // data through
                     int toWrite = _buf.length - _valid;
-                    System.arraycopy(b, off, _buf, _valid, toWrite);
+                    System.arraycopy(b, cur, _buf, _valid, toWrite);
                     remaining -= toWrite;
+                    cur += toWrite;
                     _valid = _buf.length;
                     if (_log.shouldLog(Log.DEBUG))
-                        _log.debug("write(b[], " + off + ", " + len + "): valid = " + _valid);
+                        _log.debug("write(...): flushing valid = " + _valid + " remaining=" + remaining);
                     // this blocks until the packet is ack window is open.  it 
                     // also throws InterruptedIOException if the write timeout 
                     // expires
                     _dataReceiver.writeData(_buf, 0, _valid);
                     if (_log.shouldLog(Log.DEBUG))
-                        _log.debug("write(b[], " + off + ", " + len + "): valid = " + _valid + " complete");
-                    _valid = 0;
+                        _log.debug("write(...): flushing complete valid = " + _valid + " remaining=" + remaining);
+                    _valid = 0;                       
                     throwAnyError();
                 }
             }
