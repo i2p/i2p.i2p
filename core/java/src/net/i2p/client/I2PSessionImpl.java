@@ -164,11 +164,10 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
                 if (_log.shouldLog(Log.DEBUG)) _log.debug("Skipping line.* property: " + key);
             } else if ((key.length() > 255) || (val.length() > 255)) {
                 if (_log.shouldLog(Log.WARN))
-                                             _log
-                                                 .warn("Not passing on property ["
-                                                       + key
-                                                       + "] in the session configuration as the value is too long (max = 255): "
-                                                       + val);
+                    _log.warn("Not passing on property ["
+                              + key
+                              + "] in the session configuration as the value is too long (max = 255): "
+                              + val);
             } else {
                 rv.setProperty(key, val);
             }
@@ -293,15 +292,14 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
      */
     public abstract boolean sendMessage(Destination dest, byte[] payload) throws I2PSessionException;
 
-    public abstract boolean sendMessage(Destination dest, byte[] payload, SessionKey keyUsed, Set tagsSent)
-                                                                                                           throws I2PSessionException;
+    public abstract boolean sendMessage(Destination dest, byte[] payload, SessionKey keyUsed, 
+                                        Set tagsSent) throws I2PSessionException;
 
     public abstract void receiveStatus(int msgId, long nonce, int status);
 
     protected boolean isGuaranteed() {
-        return I2PClient.PROP_RELIABILITY_GUARANTEED
-                                                    .equals(_options.getProperty(I2PClient.PROP_RELIABILITY,
-                                                                                 I2PClient.PROP_RELIABILITY_GUARANTEED));
+        String reliability = _options.getProperty(I2PClient.PROP_RELIABILITY, I2PClient.PROP_RELIABILITY_GUARANTEED);
+        return I2PClient.PROP_RELIABILITY_GUARANTEED.equals(reliability);
     }
 
     protected static final Set createNewTags(int num) {
@@ -320,13 +318,14 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
         byte data[] = msg.getPayload().getUnencryptedData();
         if ((data == null) || (data.length <= 0)) {
             if (_log.shouldLog(Log.ERROR))
-                                          _log.error("addNewMessage of a message with no unencrypted data",
-                                                     new Exception("Empty message"));
+                _log.error("addNewMessage of a message with no unencrypted data",
+                           new Exception("Empty message"));
         } else {
             final long size = data.length;
             Thread notifier = new I2PThread(new Runnable() {
                 public void run() {
-                    if (_sessionListener != null) _sessionListener.messageAvailable(I2PSessionImpl.this, id, size);
+                    if (_sessionListener != null) 
+                        _sessionListener.messageAvailable(I2PSessionImpl.this, id, size);
                 }
             });
             notifier.setName("Notifier [" + _sessionId + "/" + id + "]");
@@ -343,12 +342,12 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
         I2CPMessageHandler handler = I2PClientMessageHandlerMap.getHandler(message.getType());
         if (handler == null) {
             if (_log.shouldLog(Log.WARN))
-                                         _log.warn("Unknown message or unhandleable message received: type = "
-                                                   + message.getType());
+                _log.warn("Unknown message or unhandleable message received: type = "
+                          + message.getType());
         } else {
             if (_log.shouldLog(Log.DEBUG))
-                                          _log.debug("Message received of type " + message.getType()
-                                                     + " to be handled by " + handler);
+                _log.debug("Message received of type " + message.getType()
+                           + " to be handled by " + handler);
             handler.handleMessage(message, this);
         }
     }
@@ -365,61 +364,39 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
     /**
      * Retrieve the destination of the session
      */
-    public Destination getMyDestination() {
-        return _myDestination;
-    }
+    public Destination getMyDestination() { return _myDestination; }
 
     /**
      * Retrieve the decryption PrivateKey 
      */
-    public PrivateKey getDecryptionKey() {
-        return _privateKey;
-    }
+    public PrivateKey getDecryptionKey() { return _privateKey; }
 
     /**
      * Retrieve the signing SigningPrivateKey
      */
-    public SigningPrivateKey getPrivateKey() {
-        return _signingPrivateKey;
-    }
+    public SigningPrivateKey getPrivateKey() { return _signingPrivateKey; }
 
     /**
      * Retrieve the helper that generates I2CP messages
      */
-    I2CPMessageProducer getProducer() {
-        return _producer;
-    }
+    I2CPMessageProducer getProducer() { return _producer; }
 
     /**
      * Retrieve the configuration options
      */
-    Properties getOptions() {
-        return _options;
-    }
+    Properties getOptions() { return _options; }
 
     /** 
      * Retrieve the session's ID
      */
-    SessionId getSessionId() {
-        return _sessionId;
-    }
-
-    /**
-     * Configure the session's ID
-     */
-    void setSessionId(SessionId id) {
-        _sessionId = id;
-    }
+    SessionId getSessionId() { return _sessionId; }
+    void setSessionId(SessionId id) { _sessionId = id; }
 
     /** configure the listener */
-    public void setSessionListener(I2PSessionListener lsnr) {
-        _sessionListener = lsnr;
-    }
+    public void setSessionListener(I2PSessionListener lsnr) { _sessionListener = lsnr; }
 
     /** has the session been closed (or not yet connected)? */
-    public boolean isClosed() {
-        return _closed;
-    }
+    public boolean isClosed() { return _closed; }
 
     /**
      * Deliver an I2CP message to the router
@@ -458,6 +435,8 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
     }
 
     public void destroySession(boolean sendDisconnect) {
+        if (_closed) return;
+        
         if (_log.shouldLog(Log.DEBUG)) _log.debug("Destroy the session", new Exception("DestroySession()"));
         _closed = true;
         if (sendDisconnect) {
@@ -501,20 +480,22 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
     }
 
     protected void disconnect() {
+        if (_closed) return;
         if (_log.shouldLog(Log.DEBUG)) _log.debug("Disconnect() called", new Exception("Disconnect"));
         if (shouldReconnect()) {
             if (reconnect()) {
                 if (_log.shouldLog(Log.INFO)) _log.info("I2CP reconnection successful");
                 return;
             } else {
-                _log.error("I2CP reconnection failed");
+                if (_log.shouldLog(Log.ERROR)) _log.error("I2CP reconnection failed");
             }
         }
 
-        _log
-            .error("Disconned from the router, and not trying to reconnect further.  I hope you're not hoping anything else will happen");
+        if (_log.shouldLog(Log.ERROR))
+            _log.error("Disconned from the router, and not trying to reconnect further.  I hope you're not hoping anything else will happen");
         if (_sessionListener != null) _sessionListener.disconnected(this);
 
+        _closed = true;
         closeSocket();
     }
 
@@ -531,8 +512,8 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
             _totalReconnectAttempts++;
         } else {
             if (_log.shouldLog(Log.CRIT))
-                                         _log.log(Log.CRIT, "Max number of reconnects exceeded ["
-                                                            + _totalReconnectAttempts + "], we give up!");
+                _log.log(Log.CRIT, "Max number of reconnects exceeded ["
+                                   + _totalReconnectAttempts + "], we give up!");
             return false;
         }
         if (_log.shouldLog(Log.INFO)) _log.info("Reconnecting...");
