@@ -398,12 +398,12 @@ class TCPConnection implements I2NPMessageReader.I2NPMessageEventListener {
     }
     
     /** 
-     * if a slice takes 60 seconds, fuck 'im.  slices at most send one I2NPMessage,
-     * which can be up to 128KB currently.  Basically a minimum 50bps (slower for
+     * if a slice takes 2 minutes, fuck 'im.  slices at most send one I2NPMessage,
+     * which can be up to around 32KB currently.  Basically a minimum 273bps (slower for
      * larger messages - perhaps this min-throughput should be implemented on the
      * output stream as part of the throttling code?  hmmm)
      */
-    private final static long MAX_SLICE_DURATION = 60*1000;
+    private final static long MAX_SLICE_DURATION = 120*1000;
     /**
      * Determine if the connection runner is hanging while running its slices.  This can 
      * occur if there's a broken TCP connection that hasn't timed out yet (3 minutes later..)
