@@ -100,7 +100,7 @@ public class ReseedHandler {
         URL url = new URL(seedURL + (seedURL.endsWith("/") ? "" : "/") + "routerInfo-" + peer + ".dat");
 
         byte data[] = readURL(url);
-        System.out.println("read: " + (data != null ? data.length : -1));
+        //System.out.println("read: " + (data != null ? data.length : -1));
         writeSeed(peer, data);
     }
     
