@@ -8,6 +8,8 @@ import net.i2p.util.HTTPSendData;
 import net.i2p.util.I2PThread;
 import net.i2p.util.Log;
 
+import net.i2p.router.transport.BandwidthLimitedInputStream;
+
 /**
  * Job that, if its allowed to, will submit the data gathered by the MessageHistory
  * component to some URL so that the network can be debugged more easily.  By default
@@ -87,8 +89,8 @@ public class SubmitMessageHistoryJob extends JobImpl {
             if (size > 0)
                 expectedSend += (int)size/10; // compression
             FileInputStream fin = new FileInputStream(dataFile);
-            _context.bandwidthLimiter().delayOutbound(null, expectedSend);
-            boolean sent = HTTPSendData.postData(url, size, fin);
+            BandwidthLimitedInputStream in = new BandwidthLimitedInputStream(_context, fin, null, true);
+            boolean sent = HTTPSendData.postData(url, size, in);
             fin.close();
             boolean deleted = dataFile.delete();
             _log.debug("Submitted " + size + " bytes? " + sent + " and deleted? " + deleted);
