@@ -102,30 +102,30 @@ public class StatisticsManager implements Service {
             stats.putAll(_context.profileManager().summarizePeers(_publishedStats));
 
             includeThroughput(stats);
-            includeRate("transport.sendProcessingTime", stats, new long[] { 60*1000, 60*60*1000 });
+            includeRate("transport.sendProcessingTime", stats, new long[] { 60*60*1000 });
             //includeRate("tcp.queueSize", stats);
-            includeRate("jobQueue.jobLag", stats, new long[] { 60*1000, 60*60*1000 });
-            includeRate("jobQueue.jobRun", stats, new long[] { 60*1000, 60*60*1000 });
-            includeRate("crypto.elGamal.encrypt", stats, new long[] { 60*1000, 60*60*1000 });
+            //includeRate("jobQueue.jobLag", stats, new long[] { 60*1000, 60*60*1000 });
+            //includeRate("jobQueue.jobRun", stats, new long[] { 60*1000, 60*60*1000 });
+            includeRate("crypto.elGamal.encrypt", stats, new long[] { 60*60*1000 });
             //includeRate("crypto.garlic.decryptFail", stats, new long[] { 60*60*1000, 24*60*60*1000 });
-            includeRate("tunnel.unknownTunnelTimeLeft", stats, new long[] { 60*60*1000, 24*60*60*1000 });
-            includeRate("jobQueue.readyJobs", stats, new long[] { 60*1000, 60*60*1000 });
+            includeRate("tunnel.unknownTunnelTimeLeft", stats, new long[] { 60*60*1000 });
+            //includeRate("jobQueue.readyJobs", stats, new long[] { 60*60*1000 });
             //includeRate("jobQueue.droppedJobs", stats, new long[] { 60*60*1000, 24*60*60*1000 });
-            includeRate("inNetPool.dropped", stats, new long[] { 60*60*1000, 24*60*60*1000 });
+            //includeRate("inNetPool.dropped", stats, new long[] { 60*60*1000, 24*60*60*1000 });
             includeRate("tunnel.participatingTunnels", stats, new long[] { 5*60*1000, 60*60*1000 });
             includeRate("tunnel.testSuccessTime", stats, new long[] { 60*60*1000l, 24*60*60*1000l });
             //includeRate("tunnel.outboundMessagesProcessed", stats, new long[] { 10*60*1000, 60*60*1000 });
             //includeRate("tunnel.inboundMessagesProcessed", stats, new long[] { 10*60*1000, 60*60*1000 });
-            includeRate("tunnel.participatingMessagesProcessed", stats, new long[] { 10*60*1000, 60*60*1000 });
-            includeRate("tunnel.participatingMessagesProcessedActive", stats, new long[] { 10*60*1000, 60*60*1000 });
+            //includeRate("tunnel.participatingMessagesProcessed", stats, new long[] { 10*60*1000, 60*60*1000 });
+            //includeRate("tunnel.participatingMessagesProcessedActive", stats, new long[] { 10*60*1000, 60*60*1000 });
             //includeRate("tunnel.expiredAfterAcceptTime", stats, new long[] { 10*60*1000l, 60*60*1000l, 24*60*60*1000l });
-            includeRate("tunnel.bytesAllocatedAtAccept", stats, new long[] { 10*60*1000l, 60*60*1000l, 24*60*60*1000l });
-            includeRate("netDb.lookupsReceived", stats, new long[] { 5*60*1000, 60*60*1000 });
-            includeRate("netDb.lookupsHandled", stats, new long[] { 5*60*1000, 60*60*1000 });
-            includeRate("netDb.lookupsMatched", stats, new long[] { 5*60*1000, 60*60*1000 });
+            includeRate("tunnel.bytesAllocatedAtAccept", stats, new long[] { 60*60*1000l });
+            includeRate("netDb.lookupsReceived", stats, new long[] { 60*60*1000 });
+            //includeRate("netDb.lookupsHandled", stats, new long[] { 60*60*1000 });
+            includeRate("netDb.lookupsMatched", stats, new long[] { 60*60*1000 });
             //includeRate("netDb.storeSent", stats, new long[] { 5*60*1000, 60*60*1000 });
             includeRate("netDb.successPeers", stats, new long[] { 60*60*1000 });
-            includeRate("netDb.failedPeers", stats, new long[] { 60*60*1000 });
+            //includeRate("netDb.failedPeers", stats, new long[] { 60*60*1000 });
             //includeRate("router.throttleNetDbDoSSend", stats, new long[] { 10*60*1000, 60*60*1000, 24*60*60*1000 });
             //includeRate("router.throttleNetDbDoS", stats, new long[] { 10*60*1000, 60*60*1000 });
             //includeRate("netDb.searchCount", stats, new long[] { 3*60*60*1000});
@@ -141,11 +141,11 @@ public class StatisticsManager implements Service {
             //includeRate("transport.receiveMessageSmall", stats, new long[] { 5*60*1000, 60*60*1000 });
             //includeRate("transport.receiveMessageMedium", stats, new long[] { 5*60*1000, 60*60*1000 });
             //includeRate("transport.receiveMessageLarge", stats, new long[] { 5*60*1000, 60*60*1000 });
-            includeRate("client.sendAckTime", stats, new long[] { 60*60*1000, 24*60*60*1000l }, true);
-            includeRate("client.sendsPerFailure", stats, new long[] { 60*60*1000, 24*60*60*1000l }, true);
-            includeRate("client.timeoutCongestionTunnel", stats, new long[] { 60*60*1000, 24*60*60*1000l }, true);
-            includeRate("client.timeoutCongestionMessage", stats, new long[] { 60*60*1000, 24*60*60*1000l }, true);
-            includeRate("client.timeoutCongestionInbound", stats, new long[] { 60*60*1000, 24*60*60*1000l }, true);
+            includeRate("client.sendAckTime", stats, new long[] { 60*60*1000 }, true);
+            //includeRate("client.sendsPerFailure", stats, new long[] { 60*60*1000, 24*60*60*1000l }, true);
+            //includeRate("client.timeoutCongestionTunnel", stats, new long[] { 60*60*1000, 24*60*60*1000l }, true);
+            //includeRate("client.timeoutCongestionMessage", stats, new long[] { 60*60*1000, 24*60*60*1000l }, true);
+            //includeRate("client.timeoutCongestionInbound", stats, new long[] { 60*60*1000, 24*60*60*1000l }, true);
             stats.setProperty("stat_uptime", DataHelper.formatDuration(_context.router().getUptime()));
             stats.setProperty("stat__rateKey", "avg;maxAvg;pctLifetime;[sat;satLim;maxSat;maxSatLim;][num;lifetimeFreq;maxFreq]");
             _log.debug("Publishing peer rankings");
@@ -257,12 +257,12 @@ public class StatisticsManager implements Service {
         
         String throughputRate = renderThroughput(sendBytes5m, 5*60*1000);
         stats.setProperty("stat_bandwidthSendBps.5m", throughputRate);
-        throughputRate = renderThroughput(sendBytes60m, 60*60*1000);
-        stats.setProperty("stat_bandwidthSendBps.60m", throughputRate);
+        //throughputRate = renderThroughput(sendBytes60m, 60*60*1000);
+        //stats.setProperty("stat_bandwidthSendBps.60m", throughputRate);
         throughputRate = renderThroughput(recvBytes5m, 5*60*1000);
         stats.setProperty("stat_bandwidthReceiveBps.5m", throughputRate);
-        throughputRate = renderThroughput(recvBytes60m, 60*60*1000);
-        stats.setProperty("stat_bandwidthReceiveBps.60m", throughputRate);
+        //throughputRate = renderThroughput(recvBytes60m, 60*60*1000);
+        //stats.setProperty("stat_bandwidthReceiveBps.60m", throughputRate);
     }
 
     

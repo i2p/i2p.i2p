@@ -682,11 +682,14 @@ public class DataHelper {
 
     /** compress the data and return a new GZIP compressed array */
     public static byte[] compress(byte orig[]) {
+        return compress(orig, 0, orig.length);
+    }
+    public static byte[] compress(byte orig[], int offset, int size) {
         if ((orig == null) || (orig.length <= 0)) return orig;
         try {
-            ByteArrayOutputStream baos = new ByteArrayOutputStream(orig.length);
-            GZIPOutputStream out = new GZIPOutputStream(baos, orig.length);
-            out.write(orig);
+            ByteArrayOutputStream baos = new ByteArrayOutputStream(size);
+            GZIPOutputStream out = new GZIPOutputStream(baos, size);
+            out.write(orig, offset, size);
             out.finish();
             out.flush();
             byte rv[] = baos.toByteArray();

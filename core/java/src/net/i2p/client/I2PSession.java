@@ -38,6 +38,7 @@ public interface I2PSession {
      * @return whether it was accepted by the router for delivery or not
      */
     public boolean sendMessage(Destination dest, byte[] payload) throws I2PSessionException;
+    public boolean sendMessage(Destination dest, byte[] payload, int offset, int size) throws I2PSessionException;
 
     /**
      * Like sendMessage above, except the key used and the tags sent are exposed to the 
@@ -66,8 +67,8 @@ public interface I2PSession {
      *                 the contents of the set is ignored during the call, but afterwards it contains a set of SessionTag 
      *                 objects that were sent along side the given keyUsed.
      */
-    public boolean sendMessage(Destination dest, byte[] payload, SessionKey keyUsed, Set tagsSent)
-                                                                                                  throws I2PSessionException;
+    public boolean sendMessage(Destination dest, byte[] payload, SessionKey keyUsed, Set tagsSent) throws I2PSessionException;
+    public boolean sendMessage(Destination dest, byte[] payload, int offset, int size, SessionKey keyUsed, Set tagsSent) throws I2PSessionException;
 
     /** Receive a message that the router has notified the client about, returning
      * the payload.

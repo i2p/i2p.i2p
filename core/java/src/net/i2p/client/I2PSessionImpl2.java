@@ -62,13 +62,21 @@ class I2PSessionImpl2 extends I2PSessionImpl {
     }
 
     public boolean sendMessage(Destination dest, byte[] payload) throws I2PSessionException {
-        return sendMessage(dest, payload, new SessionKey(), new HashSet(64));
+        return sendMessage(dest, payload, 0, payload.length);
+    }
+    public boolean sendMessage(Destination dest, byte[] payload, int offset, int size) throws I2PSessionException {
+        return sendMessage(dest, payload, offset, size, new SessionKey(), new HashSet(64));
     }
 
-    public boolean sendMessage(Destination dest, byte[] payload, SessionKey keyUsed, Set tagsSent)
+    public boolean sendMessage(Destination dest, byte[] payload, SessionKey keyUsed, Set tagsSent) throws I2PSessionException {
+        return sendMessage(dest, payload, 0, payload.length, keyUsed, tagsSent);
+    }
+    public boolean sendMessage(Destination dest, byte[] payload, int offset, int size, SessionKey keyUsed, Set tagsSent)
                    throws I2PSessionException {
         if (isClosed()) throw new I2PSessionException("Already closed");
-        if (SHOULD_COMPRESS) payload = DataHelper.compress(payload);
+        if (SHOULD_COMPRESS) payload = DataHelper.compress(payload, offset, size);
+        else throw new IllegalStateException("we need to update sendGuaranteed to support partial send");
+        
         // we always send as guaranteed (so we get the session keys/tags acked), 
         // but only block until the appropriate event has been reached (guaranteed
         // success or accepted).  we may want to break this out into a seperate
