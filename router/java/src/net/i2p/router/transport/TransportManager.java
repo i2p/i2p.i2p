@@ -240,7 +240,7 @@ public class TransportManager implements TransportEventListener {
     public void messageReceived(I2NPMessage message, RouterIdentity fromRouter, Hash fromRouterHash) {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("I2NPMessage received: " + message.getClass().getName(), new Exception("Where did I come from again?"));
-        InNetMessage msg = new InNetMessage();
+        InNetMessage msg = new InNetMessage(_context);
         msg.setFromRouter(fromRouter);
         msg.setFromRouterHash(fromRouterHash);
         msg.setMessage(message);
