@@ -53,10 +53,19 @@ public class MessageOutputStreamTest {
         public Receiver() {
             _data = new ByteArrayOutputStream();
         }
-        public void writeData(byte[] buf, int off, int size) throws IOException {
+        public MessageOutputStream.WriteStatus writeData(byte[] buf, int off, int size) {
             _data.write(buf, off, size);
+			return new DummyWriteStatus();
         }
         public byte[] getData() { return _data.toByteArray(); }
+    }
+
+    private static class DummyWriteStatus implements MessageOutputStream.WriteStatus {        
+        public void waitForAccept(int maxWaitMs) { return; }
+        public void waitForCompletion(int maxWaitMs) { return; }
+        public boolean writeAccepted() { return true; }
+        public boolean writeFailed() { return false; }
+        public boolean writeSuccessful() { return true; }
     }
     
     public static void main(String args[]) {
