@@ -93,8 +93,8 @@ public class Rate {
     
     /**
      * Create a new rate and load its state from the properties, taking data 
-     * from the data points underneath the given prefix (e.g. prefix = 
-     * "profile.dbIntroduction.60m", this will load the associated data points such
+     * from the data points underneath the given prefix.  <p />
+     * (e.g. prefix = "profile.dbIntroduction.60m", this will load the associated data points such
      * as "profile.dbIntroduction.60m.lifetimeEventCount").  The data can be exported
      * through store(outputStream, "profile.dbIntroduction.60m").
      *
@@ -189,7 +189,7 @@ public class Rate {
      * During the last period, how much of the time was spent actually processing events in proportion 
      * to how many events could have occurred if there were no intervals?
      *
-     * If this statistic doesn't use event times, this returns 0.
+     * @return percentage, or 0 if event times aren't used
      */
     public double getLastEventSaturation() {
 	if ( (_lastEventCount > 0) && (_lastTotalEventTime > 0) ) {
@@ -203,10 +203,10 @@ public class Rate {
     }
     
     /** 
-     * During the extreme period, how much of the time was spent actually processing events in proportion 
-     * to how many events could have occurred if there were no intervals?
+     * During the extreme period, how much of the time was spent actually processing events
+     * in proportion to how many events could have occurred if there were no intervals? 
      *
-     * If this statistic doesn't use event times, this returns 0.
+     * @return percentage, or 0 if the statistic doesn't use event times
      */
     public double getExtremeEventSaturation() {
 	if ( (_extremeEventCount > 0) && (_extremeTotalEventTime > 0) ) {
@@ -220,9 +220,9 @@ public class Rate {
     
     /** 
      * During the lifetime of this stat, how much of the time was spent actually processing events in proportion 
-     * to how many events could have occurred if there were no intervals?
+     * to how many events could have occurred if there were no intervals? 
      *
-     * If this statistic doesn't use event times, this returns 0.
+     * @return percentage, or 0 if event times aren't used
      */
     public double getLifetimeEventSaturation() {
 	if ( (_lastEventCount > 0) && (_lifetimeTotalEventTime > 0) ) {
@@ -244,9 +244,10 @@ public class Rate {
     }
     
     /** 
-     * using the last period's rate, what is the total value that could have been sent if events were constant? 
-     * If this statistic's event times are 0, this returns 0.
+     * using the last period's rate, what is the total value that could have been sent 
+     * if events were constant?
      *
+     * @return max total value, or 0 if event times aren't used
      */
     public double getLastSaturationLimit() {
 	if ( (_lastTotalValue != 0) && (_lastEventCount > 0) && (_lastTotalEventTime > 0) ) {
@@ -261,9 +262,10 @@ public class Rate {
     }
     
     /** 
-     * using the extreme period's rate, what is the total value that could have been sent if events were constant? 
-     * If this statistic's event times are 0, this returns 0.
+     * using the extreme period's rate, what is the total value that could have been 
+     * sent if events were constant?
      *
+     * @return event total at saturation, or 0 if no event times are measured
      */
     public double getExtremeSaturationLimit() {
 	if ( (_extremeTotalValue != 0) && (_extremeEventCount > 0) && (_extremeTotalEventTime > 0) ) {

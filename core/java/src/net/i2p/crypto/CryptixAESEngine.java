@@ -20,8 +20,7 @@ import net.i2p.util.Log;
  * Only supports data of size mod 16 bytes - no inherent padding.
  *
  * @author jrandom, thecrypto
- * @license GPL
- */
+  */
 public class CryptixAESEngine extends AESEngine {
     private final static Log _log = new Log(CryptixAESEngine.class);
     private final static CryptixRijndael_Algorithm _algo = new CryptixRijndael_Algorithm();

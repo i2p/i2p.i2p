@@ -55,7 +55,7 @@ public class TestServer implements Runnable {
     }
     
     /**
-     * Handle the connection by passing it off to a {@link ConnectionRunner ConnectionRunner}
+     * Handle the connection by passing it off to a ConnectionRunner
      *
      */
     protected void runConnection(Socket socket) throws IOException {

@@ -28,8 +28,7 @@ public abstract class I2CPMessageImpl extends DataStructureImpl implements I2CPM
     public I2CPMessageImpl() {}
     
     /**
-     * Validate the type and size of the message. and then read the message 
-     * into the data structures. 
+     * Validate the type and size of the message, and then read the message into the data structures.  <p />
      *
      */
     public void readMessage(InputStream in) throws I2CPMessageException, IOException {

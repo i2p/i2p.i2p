@@ -64,7 +64,10 @@ public class DBHistory {
     public long getUnpromptedDbStoreNew() { return _unpromptedDbStoreNew; }
     /** how many times have they sent us data we didn't ask for but that we have seen? */
     public long getUnpromptedDbStoreOld() { return _unpromptedDbStoreOld; }
-    /** how often does the peer fail to reply to a lookup request?  1 hour and 1 day periods */
+    /** 
+     * how often does the peer fail to reply to a lookup request, broken into 1 hour and 1 day periods.
+     *
+     */
     public RateStat getFailedLookupRate() { return _failedLookupRate; }
 
     /**

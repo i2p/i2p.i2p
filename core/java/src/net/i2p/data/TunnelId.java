@@ -41,8 +41,7 @@ public class TunnelId extends DataStructureImpl {
     public void setTunnelId(long id) { _tunnelId = id; }
     
     /** 
-     * contains the metadata for the tunnel - is it inbound, outbound, or a participant? 
-     * This data point is kept in memory only and is useful for the router.
+     * is this tunnel inbound, outbound, or a participant (kept in memory only and used only for the router).s
      *
      * @return type of tunnel (per constants TYPE_UNSPECIFIED, TYPE_INBOUND, TYPE_OUTBOUND, TYPE_PARTICIPANT)
      */

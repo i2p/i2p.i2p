@@ -252,7 +252,7 @@ public class I2PTunnel implements Logging, EventDispatcher {
     
     /**
      * Run the server pointing at the host and port specified using the private i2p
-     * destination loaded from the specified file
+     * destination loaded from the specified file. <p />
      *
      * Sets the event "serverTaskId" = Integer(taskId) after the tunnel has been started (or -1 on error)
      * Also sets the event "openServerResult" = "ok" or "error" (displaying "Ready!" on the logger after
@@ -307,7 +307,7 @@ public class I2PTunnel implements Logging, EventDispatcher {
     
     /**
      * Run the server pointing at the host and port specified using the private i2p
-     * destination loaded from the given base64 stream
+     * destination loaded from the given base64 stream. <p />
      *
      * Sets the event "serverTaskId" = Integer(taskId) after the tunnel has been started (or -1 on error)
      * Also sets the event "openServerResult" = "ok" or "error" (displaying "Ready!" on the logger after
@@ -353,7 +353,7 @@ public class I2PTunnel implements Logging, EventDispatcher {
     
     /**
      * Run the client on the given port number pointing at the specified destination
-     * (either the base64 of the destination or file:fileNameContainingDestination)
+     * (either the base64 of the destination or file:fileNameContainingDestination).
      *
      * Sets the event "clientTaskId" = Integer(taskId) after the tunnel has been started (or -1 on error)
      * Also sets the event "openClientResult" = "error" or "ok" (before setting the value to "ok" it also

@@ -23,8 +23,7 @@ import java.io.ByteArrayInputStream;
  * Wrapper singleton for AES cypher operation.
  *
  * @author jrandom
- * @license GPL
- */
+  */
 public class AESEngine {
     private final static Log _log = new Log(AESEngine.class);
     private static AESEngine _engine;

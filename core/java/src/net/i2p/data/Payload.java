@@ -16,7 +16,7 @@ import net.i2p.util.Log;
 
 /**
  * Defines the actual payload of a message being delivered, including the 
- * standard encryption wrapping, as defined by the I2P data structure spec.<p />
+ * standard encryption wrapping, as defined by the I2P data structure spec.
  *
  * @author jrandom
  */

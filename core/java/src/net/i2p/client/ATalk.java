@@ -225,7 +225,7 @@ public class ATalk implements I2PSessionListener, Runnable {
     /** I2PSessionListener.messageAvailable requires this method to be called whenever
      * I2P wants to tell the session that a message is available.  ATalk always grabs
      * the message immediately and either processes it as a "send file" command (passing
-     * it off to {@link #handleRecieveFile handleRecieveFile}) or simply displays the
+     * it off to handleRecieveFile(..) or simply displays the
      * message to the user.
      *
      */

@@ -39,7 +39,7 @@ public class RouterAddress extends DataStructureImpl {
     
     /**
      * Retrieve the weighted cost of this address, relative to other methods of
-     * contacting this router.  0 means free and 255 means really expensive.
+     * contacting this router.  The value 0 means free and 255 means really expensive.
      * No value above 255 is allowed.
      *
      */

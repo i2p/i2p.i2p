@@ -338,9 +338,10 @@ public class DataHelper {
 
     
     /**
-     * Helper util to compare two objects, treating (null == null) as true, and 
-     * (null == (!null)) as false.
+     * Helper util to compare two objects, including null handling.
+     * <p />
      *
+     * This treats (null == null) as true, and (null == (!null)) as false.
      */
     public final static boolean eq(Object lhs, Object rhs) {
 	try {
@@ -353,8 +354,12 @@ public class DataHelper {
 	}
     }
     /**
-     * Deep compare two collections, treating (null == null) as true,
-     * (null == (!null)) as false, and then comparing each element via eq(object, object).
+     * Run a deep comparison across the two collections.  
+     * <p />
+     *
+     * This treats (null == null) as true, (null == (!null)) as false, and then 
+     * comparing each element via eq(object, object). <p />
+     *
      * If the size of the collections are not equal, the comparison returns false.
      * The collection order should be consistent, as this simply iterates across both and compares
      * based on the value of each at each step along the way.
@@ -373,8 +378,10 @@ public class DataHelper {
     }
     
     /**
-     * Compare the byte arrays byte by byte, treating (null == null) as
-     * true, (null == (!null)) as false, and unequal length arrays as false.
+     * Run a comparison on the byte arrays, byte by byte.  <p />
+     *
+     * This treats (null == null) as true, (null == (!null)) as false, 
+     * and unequal length arrays as false.
      *
      */
     public final static boolean eq(byte lhs[], byte rhs[]) {

@@ -21,7 +21,6 @@ import net.i2p.util.Log;
  * Fake ElG E and D, useful for when performance isn't being tested
  *
  * @author jrandom
- * @license GPL
  */
 public class DummyElGamalEngine extends ElGamalEngine {
     private final static Log _log = new Log(DummyElGamalEngine.class);    

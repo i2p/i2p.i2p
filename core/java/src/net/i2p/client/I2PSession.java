@@ -32,7 +32,9 @@ public interface I2PSession {
     public boolean sendMessage(Destination dest, byte[] payload) throws I2PSessionException;
     /**
      * Like sendMessage above, except the key used and the tags sent are exposed to the 
-     * application, so that if some application layer message delivery confirmation is used,
+     * application.  <p /> 
+     * 
+     * If some application layer message delivery confirmation is used,
      * rather than i2p's (slow) built in confirmation via guaranteed delivery mode, the 
      * application can update the SessionKeyManager, ala:
      * <pre>

@@ -62,8 +62,9 @@ public class I2PTunnelRunner extends Thread {
     public boolean isFinished() { return finished; }
     
     /** 
-     * When was the last data for this runner sent or received?  (-1 if no data
-     * has been transferred yet)
+     * When was the last data for this runner sent or received?  
+     *
+     * @return date (ms since the epoch), or -1 if no data has been transferred yet
      *
      */
     public long getLastActivityOn() { return lastActivityOn; }

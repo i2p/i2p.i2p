@@ -45,10 +45,10 @@ public class SendReplyMessageJob extends JobImpl {
     }
     
     /**
-     * Send the message on its way.<p />
+     * Send the message on its way. <p />
      *
      * This could garlic route the message to the _block.getRouter, or it could
-     * send it there via a tunnel, or it could just send it direct.<p />
+     * send it there via a tunnel, or it could just send it direct. <p />
      *
      * For simplicity, its currently going direct.
      *
