@@ -40,7 +40,7 @@ Socket::Socket(int type)
 {
 #ifdef WINSOCK
 	winsock_startup();
-
+#endif
 }
 
 #ifdef WINSOCK
@@ -49,9 +49,8 @@ Socket::Socket(int type)
  */
 void Socket::winsock_cleanup(void)
 {
-	if (WSACleanup() == SOCKET_ERROR)
-		throw Socket_error("WSACleanup() failed (" +
-			winsock_strerror(WSAGetLastError()) + ")");  // TODO: log instead
+	int rc = WSACleanup();
+	assert(rc != SOCKET_ERROR);
 }
 
 /*

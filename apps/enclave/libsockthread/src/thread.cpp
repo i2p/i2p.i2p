@@ -62,29 +62,26 @@ bool Thread::is_running(void)
 /*
  * Stops the thread
  * Generally NOT a good idea
- *
- * Returns: true if the thread was killed, or false if it was already dead
  */
-bool Thread::kill(void)
+void Thread::kill(void)
 {
 	running_m.lock();
+#ifndef NDEBUG
+	// make sure it as actually running first
 	if (!running) {
 		running_m.unlock();
-		return false;
+		assert(false);
 	}
+#endif
 #ifdef WINTHREAD
-	if (!TerminateThread(handle, 0)) {
-		TCHAR str[80];
-		throw Thread_error(win_strerror(str, sizeof str));  // TODO: log instead
-	}
+	BOOL rc = TerminateThread(handle, 0);
+	assert(!rc);
 #else
 	int rc = pthread_cancel(id);
-	if (!rc)
-		throw Thread_error(strerror(rc));  // TODO: log instead
+	assert(!rc);
 #endif
 	running = false;
 	running_m.unlock();
-	return true;
 }
 
 /*
@@ -92,25 +89,19 @@ bool Thread::kill(void)
  */
 void Thread::start(void)
 {
-	#ifndef NDEBUG
-		// check whether the thread is already running
-		running_m.lock();
-		assert(!running);
-		running_m.unlock();
-	#endif
+#ifndef NDEBUG
+	// check whether the thread is already running
+	running_m.lock();
+	assert(!running);
+	running_m.unlock();
+#endif
 	continue_m.lock();
 #ifdef WINTHREAD
 	handle = CreateThread(NULL, 0, &the_thread, this, 0, &id);
-	if (handle == NULL) {
-		TCHAR str[80];
-		throw Thread_error(win_strerror(str, sizeof str));
-	}
+	assert(handle != NULL);
 #else
 	int rc = pthread_create(&id, NULL, &the_thread, this);
-	if (!rc) {
-		continue_m.unlock();
-		throw Thread_error(strerror(rc));
-	}
+	assert(!rc);
 #endif
 	// Wait until `running' is set
 	running_m.lock();

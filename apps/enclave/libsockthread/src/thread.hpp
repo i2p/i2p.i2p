@@ -34,39 +34,33 @@
 #define THREAD_HPP
 
 namespace Libsockthread {
-
 	class Thread {
-	public:
-		Thread(void)  // throws Mutex_error (a mutex is created)
-			: retval(0), running(false) { }
-		virtual ~Thread(void)
-			{ kill(); }
+		public:
+			Thread(void)
+				: retval(0), running(false) { }
+			virtual ~Thread(void)
+				{ kill(); }
 
-		virtual void *execute(void) = 0;
-		void* get_retval(void);
-		bool is_running(void);
-		bool kill(void);  // throws Thread_error
-		void start(void);  // throws Thread_error
+			virtual void *execute(void) = 0;
+			void* get_retval(void);
+			bool is_running(void);
+			void kill(void);
+			void start(void);
 
-	private:
+		private:
 #ifdef WINTHREAD
-		static DWORD WINAPI the_thread(void* param);
-		HANDLE handle;
-		DWORD id;
+			static DWORD WINAPI the_thread(void* param);
+			HANDLE handle;
+			DWORD id;
 #else
-		static void* the_thread(void* param);
-		pthread_t id;
+			static void* the_thread(void* param);
+			pthread_t id;
 #endif
-		void *retval;
-		bool running;
-		Mutex running_m;
-		Mutex continue_m;
+			void *retval;
+			bool running;
+			Mutex running_m;
+			Mutex continue_m;
 	};
-
-	class Thread_error : public runtime_error {
-		Thread_error(const string& s) : runtime_error(s) { }
-	};
-
 }
 
 #endif  // THREAD_HPP

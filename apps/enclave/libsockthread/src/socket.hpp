@@ -32,24 +32,24 @@
 #define SOCKET_HPP
 
 namespace Libsockthread {
-
 	class Socket {
-	public:
-		Socket(int type);  // throws Socket error
+		public:
+			Socket(int type);  // throws Socket error
 
-		void func(void);
-	private:
+			void func(void);
+		private:
 #ifdef WINSOCK
-		void winsock_cleanup(void);
-		void winsock_startup(void);  // throws Socket_error
-		const char* Socket::winsock_strerror(int code);
+			void winsock_cleanup(void);
+			void winsock_startup(void);  // throws Socket_error
+			const char* winsock_strerror(int code);
 #endif
 	};
 
 	class Socket_error : public runtime_error {
-		Socket_error(const string& s) : runtime_error(s) { }
+		public:
+			Socket_error(const string& s)
+				: runtime_error(s) { }
 	};
-
 }
 
 #endif  // MUTEX_HPP

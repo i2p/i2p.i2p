@@ -40,14 +40,10 @@ Mutex::Mutex(void)
 {
 #ifdef WINTHREAD
 	mutex = CreateMutex(NULL, FALSE, NULL);
-	if (mutex == NULL) {
-		TCHAR str[80];
-		throw Mutex_error(win_strerror(str, sizeof str));
-	}
+	assert(mutex != NULL);
 #else
 	int rc = pthread_mutex_init(&mutex, NULL);
-	if (!rc)
-		throw Mutex_error(strerror(rc));
+	assert(!rc);
 #endif
 }
 
@@ -57,14 +53,11 @@ Mutex::Mutex(void)
 Mutex::~Mutex(void)
 {
 #ifdef WINTHREAD
-	if (!CloseHandle(mutex)) {
-		TCHAR str[80];
-		throw Mutex_error(win_strerror(str, sizeof str));  // TODO: log instead
-	}
+	BOOL rc = CloseHandle(mutex);
+	assert(!rc);
 #else
 	int rc = pthread_mutex_destroy(&mutex);
-	if (!rc)
-		throw Mutex_error(strerror(rc));  // TODO: log instead
+	assert(!rc);
 #endif
 }
 
@@ -74,14 +67,11 @@ Mutex::~Mutex(void)
 void Mutex::lock(void)
 {
 #ifdef WINTHREAD
-	if (WaitForSingleObject(mutex, INFINITE) == WAIT_FAILED) {
-		TCHAR str[80];
-		throw Mutex_error(win_strerror(str, sizeof str));
-	}
+	DWORD rc = WaitForSingleObject(mutex, INFINITE);
+	assert(rc != WAIT_FAILED);
 #else
 	int rc = pthread_mutex_lock(&mutex);
-	if (!rc)
-		throw Mutex_error(strerror(rc));
+	assert(!rc);
 #endif
 }
 
@@ -91,13 +81,10 @@ void Mutex::lock(void)
 void Mutex::unlock(void)
 {
 #ifdef WINTHREAD
-	if (!ReleaseMutex(mutex)) {
-		TCHAR str[80];
-		throw Mutex_error(win_strerror(str, sizeof str));
-	}
+	BOOL rc = ReleaseMutex(mutex);
+	assert(!rc);
 #else
 	int rc = pthread_mutex_unlock(&mutex);
-	if (!rc)
-		throw Mutex_error(strerror(rc));
+	assert(!rc);
 #endif
 }

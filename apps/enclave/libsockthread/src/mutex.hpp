@@ -34,26 +34,20 @@
 #define MUTEX_HPP
 
 namespace Libsockthread {
-
 	class Mutex {
-	public:
-		Mutex(void);  // throws Mutex_error
-		~Mutex(void);
+		public:
+			Mutex(void);
+			~Mutex(void);
 
-		void lock(void);  // throws Mutex_error
-		void unlock(void);  // throws Mutex_error
-	private:
-	#ifdef WINTHREAD
-		HANDLE mutex;
-	#else
-		pthread_mutex_t mutex;
-	#endif
+			void lock(void);
+			void unlock(void);
+		private:
+#ifdef WINTHREAD
+			HANDLE mutex;
+#else
+			pthread_mutex_t mutex;
+#endif
 	};
-
-	class Mutex_error : public runtime_error {
-		Mutex_error(const string& s) : runtime_error(s) { }
-	};
-
 }
 
 #endif  // MUTEX_HPP
