@@ -2,6 +2,7 @@ package net.i2p.router;
 
 import net.i2p.data.Hash;
 import net.i2p.data.i2np.TunnelCreateMessage;
+import net.i2p.stat.Rate;
 import net.i2p.util.Log;
 
 /**
@@ -19,6 +20,13 @@ class RouterThrottleImpl implements RouterThrottle {
      *
      */
     private static int JOB_LAG_LIMIT = 2000;
+    /**
+     * Arbitrary hard limit - if we throttle our network connection this many
+     * times in the previous 10-20 minute period, don't accept requests to 
+     * participate in tunnels.
+     *
+     */
+    private static int THROTTLE_EVENT_LIMIT = 300;
     
     public RouterThrottleImpl(RouterContext context) {
         _context = context;
@@ -54,29 +62,34 @@ class RouterThrottleImpl implements RouterThrottle {
     }
     public boolean acceptTunnelRequest(TunnelCreateMessage msg) { 
         long lag = _context.jobQueue().getMaxLag();
-        if (lag > JOB_LAG_LIMIT) {
+        Rate throttleRate = _context.statManager().getRate("router.throttleNetworkCause").getRate(10*60*1000);
+        long throttleEvents = throttleRate.getCurrentEventCount() + throttleRate.getLastEventCount();
+        if (throttleEvents > THROTTLE_EVENT_LIMIT) {
             if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Refusing tunnel request, as the job lag is " + lag);
+                _log.debug("Refusing tunnel request with the job lag of " + lag 
+                           + " since there have been " + throttleEvents 
+                           + " throttle events in the last 15 minutes or so");
             _context.statManager().addRateData("router.throttleTunnelCause", lag, lag);
             return false;
-        } else {
-            // ok, we're not hosed, but can we handle the bandwidth requirements 
-            // of another tunnel?
-            double msgsPerTunnel = _context.statManager().getRate("tunnel.participatingMessagesProcessed").getRate(10*60*1000).getAverageValue();
-            double bytesPerMsg = _context.statManager().getRate("tunnel.relayMessageSize").getRate(10*60*1000).getAverageValue();
-            double bytesPerTunnel = msgsPerTunnel * bytesPerMsg;
-            
-            
-            int numTunnels = _context.tunnelManager().getParticipatingCount();
-            double bytesAllocated =  (numTunnels + 1) * bytesPerTunnel;
-            
-            _context.statManager().addRateData("tunnel.bytesAllocatedAtAccept", (long)bytesAllocated, msg.getTunnelDurationSeconds()*1000);
-            // todo: um, throttle (include bw usage of the netDb, our own tunnels, the clients,
-            // and check to see that they are less than the bandwidth limits
-            
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Accepting a new tunnel request (now allocating " + bytesAllocated + " bytes across " + numTunnels + " tunnels");
-            return true;          
         }
+        
+        // ok, we're not hosed, but can we handle the bandwidth requirements 
+        // of another tunnel?
+        double msgsPerTunnel = _context.statManager().getRate("tunnel.participatingMessagesProcessed").getRate(10*60*1000).getAverageValue();
+        double bytesPerMsg = _context.statManager().getRate("tunnel.relayMessageSize").getRate(10*60*1000).getAverageValue();
+        double bytesPerTunnel = msgsPerTunnel * bytesPerMsg;
+
+
+        int numTunnels = _context.tunnelManager().getParticipatingCount();
+        double bytesAllocated =  (numTunnels + 1) * bytesPerTunnel;
+
+        _context.statManager().addRateData("tunnel.bytesAllocatedAtAccept", (long)bytesAllocated, msg.getTunnelDurationSeconds()*1000);
+        // todo: um, throttle (include bw usage of the netDb, our own tunnels, the clients,
+        // and check to see that they are less than the bandwidth limits
+
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("Accepting a new tunnel request (now allocating " + bytesAllocated + " bytes across " + numTunnels 
+                       + " tunnels with lag of " + lag + " and " + throttleEvents + " throttle events)");
+        return true;
     }
 }
