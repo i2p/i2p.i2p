@@ -25,51 +25,64 @@
 
 HOST_OS=`uname -a`
 
-if [ ! '$HOST_OS' ]; then
+if [ "X$HOST_OS" = "X" ]; then
     echo unknown
     exit 0
 fi
 
-if [[ `echo "$HOST_OS" | grep Darwin` && `echo "$HOST_OS" | grep Mac` ]]; then
+DARWIN=`echo "$HOST_OS" | grep Darwin`
+MAC=`echo "$HOST_OS" | grep Mac`
+FREEBSD=`echo "$HOST_OS" | grep FreeBSD`
+LINUX=`echo "$HOST_OS" | grep Linux`
+SOLARIS=`echo "$HOST_OS" | grep Solaris`
+SUNOS=`echo "$HOST_OS" | grep SunOS`
+
+if [ ! "X$DARWIN" = "X" -o ! "X$MAC" = "X" ]; then
     echo osx
     exit 0
 fi
 
-if [[ `echo "$HOST_OS" | grep FreeBSD` ]]; then
+if [ ! "X$FREEBSD" = "X" ]; then
     echo freebsd
     exit 0
 fi
 
-if [[ `echo "$HOST_OS" | grep Linux` ]]; then
+if [ ! "X$LINUX" = "X" ]; then
 
     LINUX_DISTRO=`cat /proc/version`
+    DEBIAN=`echo $LINUX_DISTRO | grep Debian`
+    FEDORA=`echo $LINUX_DISTRO | grep Fedora`
+    GENTOO=`echo $LINUX_DISTRO | grep Gentoo`
+    MANDRAKE=`echo $LINUX_DISTRO | grep Mandrake`
+    REDHAT=`echo $LINUX_DISTRO | grep "Red Hat"`
+    SUSE=`echo $LINUX_DISTRO | grep Suse`
 
-    if [[ `echo "$LINUX_DISTRO" | grep Debian` ]]; then
+    if [ ! "X$DEBIAN" = "X" ]; then
         echo debian
         exit 0
     fi
 
-    if [[ `echo "$LINUX_DISTRO" | grep Fedora` ]]; then
+    if [ ! "X$FEDORA" = "X" ]; then
         echo fedora
         exit 0
     fi
 
-    if [[ `echo "$LINUX_DISTRO" | grep Gentoo` ]]; then
+    if [ ! "X$GENTOO" = "X" ]; then
         echo gentoo
         exit 0
     fi
 
-    if [[ `echo "$LINUX_DISTRO" | grep Mandrake` ]]; then
+    if [ ! "X$MANDRAKE" = "X" ]; then
         echo mandrake
         exit 0
     fi
 
-    if [[ `echo "$LINUX_DISTRO" | grep "Red Hat"` ]]; then
+    if [ ! "X$REDHAT" = "X" ]; then
         echo redhat
         exit 0
     fi
 
-    if [[ `echo "$LINUX_DISTRO" | grep Suse` ]]; then
+    if [ ! "X$SUSE" = "X" ]; then
         echo suse
         exit 0
     fi
@@ -78,10 +91,11 @@ if [[ `echo "$HOST_OS" | grep Linux` ]]; then
     exit 0
 fi
 
-if [[ `echo "$HOST_OS" | grep Solaris` ]]; then
+if [ ! "X$SOLARIS" = "X" -o ! "X$SUNOS" = "X" ]; then
     echo solaris
     exit 0
 fi
 
 echo unknown
 exit 0
+

@@ -12,7 +12,7 @@
 # Installs the appropriate set of Java Service Wrapper support files for the
 # user's OS then launches the I2P router as a background service.
 
-if [ $1 ]; then
+if [ ! "X$1" = "X" ]; then
     cd $1
 fi
 
@@ -22,9 +22,10 @@ chmod 744 ./osid
 chmod 744 ./uninstall_i2p_service_unix
 
 ERROR_MSG="Cannot determine operating system type. From the subdirectory in lib/wrapper matching your operating system, please move i2psvc to your base I2P directory, and move the remaining two files to the lib directory."
+
 HOST_OS=`./osid`
 
-if [[ ! $HOST_OS || $HOST_OS = "unknown" ]]; then
+if [ "X$HOST_OS" = "X" -o $HOST_OS = "unknown" ]; then
     echo "$ERROR_MSG"
     exit 1
 fi
@@ -57,3 +58,4 @@ cp $wrapperpath/i2psvc .
 chmod 744 ./i2psvc
 ./i2prouter start
 exit 0
+
