@@ -275,12 +275,14 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
         }
     }
 
+    private static volatile long __runnerId = 0;
+    
     public class ClientConnectionRunner extends I2PThread {
         private Socket s;
 
         public ClientConnectionRunner(Socket s, String name) {
             this.s = s;
-            setName(name);
+            setName(name + '.' + (++__runnerId));
             start();
         }
 
