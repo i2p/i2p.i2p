@@ -243,6 +243,10 @@ class TunnelPool {
         synchronized (_pendingTunnels) {
             _pendingTunnels.remove(tunnel.getTunnelId());
         }
+        if (tunnel.getDestination() != null) {
+            // this one was custom built, so tack 'er on directly
+            allocateTunnel(tunnel.getTunnelId(), tunnel.getDestination());
+        }
     }
     public TunnelInfo removeFreeTunnel(TunnelId id) {
         if (!_isLive) return null;
