@@ -315,7 +315,9 @@ class TCPConnection implements I2NPMessageReader.I2NPMessageEventListener {
         
         if (fail) {
             if (_log.shouldLog(Log.ERROR))
-                _log.error("messages expired on the queue to " + _remoteIdentity.getHash().toBase64() + ": " + pending.toString());
+                _log.error("messages expired on the queue to " + _remoteIdentity.getHash().toBase64() + ": " + totalPending);
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("messages expired on the queue to " + _remoteIdentity.getHash().toBase64() + ": " + pending.toString());
 
             if (_out instanceof BandwidthLimitedOutputStream) {
                 BandwidthLimitedOutputStream o = (BandwidthLimitedOutputStream)_out;
