@@ -1,4 +1,8 @@
-$Id: history.txt,v 1.24 2004/09/30 10:58:55 jrandom Exp $
+$Id: history.txt,v 1.25 2004/10/01 04:39:14 jrandom Exp $
+
+2004-10-01  jrandom
+    * Explicitly refuse IPv6 addresses, since only some peers support 
+      them and we want fully reachable peers.
 
 2004-10-01  jrandom
     * Additional error handling for a variety of transport layer errors.

@@ -116,6 +116,12 @@ public class TCPAddress {
         try {
             InetAddress addr = InetAddress.getByName(_host);
             byte quad[] = addr.getAddress();
+            if (quad.length != 4) {
+                if (_log.shouldLog(Log.ERROR))
+                    _log.error("Refusing IPv6 address (" + _host + " / " + addr.getHostAddress() + ") "
+                               + " since not all peers support it, and we don't support restricted routes");
+                return false;
+            }
             if (quad[0] == (int)127) return false;
             if (quad[0] == (int)10) return false; 
             if ( (quad[0] == (int)172) && (quad[1] >= (int)16) && (quad[1] <= (int)31) ) return false;
