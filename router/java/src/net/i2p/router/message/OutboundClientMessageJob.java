@@ -228,6 +228,7 @@ public class OutboundClientMessageJob extends JobImpl {
             LeaseSet ls = getContext().netDb().lookupLeaseSetLocally(_ls.getDestination().calculateHash());
             if (ls == null) {
                 try {
+                    markTimeout();
                     getContext().netDb().store(_ls.getDestination().calculateHash(), _ls);
                 } catch (IllegalArgumentException iae) {
                     // ignore - it expired anyway
@@ -460,6 +461,21 @@ public class OutboundClientMessageJob extends JobImpl {
             _log.debug(getJobId() + ": Built payload clove with id " + clove.getId());
     }
     
+    /** 
+     * a send or netDb lookup timed out, so lets update some stats to help 
+     * determine why
+     *
+     */
+    private void markTimeout() {
+        long messageDelay = getContext().throttle().getMessageDelay();
+        long tunnelLag = getContext().throttle().getTunnelLag();
+        long inboundDelta = (long)getContext().throttle().getInboundRateDelta();
+            
+        getContext().statManager().addRateData("client.timeoutCongestionTunnel", tunnelLag, 1);
+        getContext().statManager().addRateData("client.timeoutCongestionMessage", messageDelay, 1);
+        getContext().statManager().addRateData("client.timeoutCongestionInbound", inboundDelta, 1);
+    }
+    
     /**
      * Keep an eye out for any of the delivery status message tokens that have been
      * sent down the various tunnels to deliver this message
@@ -503,6 +519,7 @@ public class OutboundClientMessageJob extends JobImpl {
         }
         public String getName() { return "Lookup for outbound client message failed"; }
         public void runJob() { 
+            markTimeout();
             sendNext();
         }
     }
@@ -598,12 +615,7 @@ public class OutboundClientMessageJob extends JobImpl {
                 _log.debug(OutboundClientMessageJob.this.getJobId()
                            + ": Soft timeout through the lease " + _lease);
             
-            long messageDelay = getContext().throttle().getMessageDelay();
-            long tunnelLag = getContext().throttle().getTunnelLag();
-            long inboundDelta = (long)getContext().throttle().getInboundRateDelta();
-            getContext().statManager().addRateData("client.timeoutCongestionTunnel", tunnelLag, 1);
-            getContext().statManager().addRateData("client.timeoutCongestionMessage", messageDelay, 1);
-            getContext().statManager().addRateData("client.timeoutCongestionInbound", inboundDelta, 1);
+            markTimeout();
             
             _lease.setNumFailure(_lease.getNumFailure()+1);
             sendNext();
