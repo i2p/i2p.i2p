@@ -1,4 +1,4 @@
-<code>$Id: tunnel.html,v 1.7 2005/01/14 22:53:13 jrandom Exp $</code>
+<code>$Id: tunnel.html,v 1.8 2005/01/15 01:43:35 jrandom Exp $</code>
 <pre>
 1) <a href="#tunnel.overview">Tunnel overview</a>
 2) <a href="#tunnel.operation">Tunnel operation</a>
@@ -90,6 +90,12 @@ integrity of the message, then forward it on to the next peer.
 Eventually, the message arrives at the endpoint where the messages
 bundled by the gateway are split out again and forwarded on as 
 requested.</p>
+
+<p>Tunnel IDs are 4 byte numbers used at each hop - participants know what
+tunnel ID to listen for messages with and what tunnel ID they should be forwarded
+on as to the next hop.  Tunnels themselves are short lived (10 minutes at the 
+moment), but depending upon the tunnel's purpose, and though subsequent tunnels 
+may be built using the same sequence of peers, each hop's tunnel ID will change.</p>
 
 <h3>2.1) <a name="tunnel.preprocessing">Message preprocessing</a></h3>
 
@@ -267,6 +273,14 @@ search for that hash within the decrypted checksum block.  If no match is found,
 message is discarded.  Otherwise, the IV is updated by decrypting it, XORing that value
 with the IV_WHITENER, and replacing it with the first 16 bytes of its hash.  The 
 resulting message is then forwarded on to the next peer for processing.</p>
+
+<p>To prevent replay attacks at the tunnel level, each participant keeps track of
+the IVs received during the tunnel's lifetime, rejecting duplicates.  The memory 
+usage required should be minor, as each tunnel has only a very short lifespan (10m
+at the moment).  A constant 100KBps through a tunnel with full 32KB messages would
+give 1875 messages, requiring less than 30KB of memory.  Gateways and endpoints 
+handle replay by tracking the message IDs and expirations on the I2NP messages 
+contained in the tunnel.</p>
 
 <h3>2.4) <a name="tunnel.endpoint">Endpoint processing</a></h3>
 
