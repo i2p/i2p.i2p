@@ -56,7 +56,7 @@ public class PeerManagerFacadeImpl implements PeerManagerFacade {
     }
     
     public List selectPeers(PeerSelectionCriteria criteria) {
-        return new ArrayList(_manager.selectPeers(criteria));
+        return _manager.selectPeers(criteria);
     }
     
     public void renderStatusHTML(OutputStream out) throws IOException { 

@@ -10,8 +10,11 @@ package net.i2p.router.peermanager;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
+import java.util.TreeMap;
 import java.util.Set;
 
 import net.i2p.data.Hash;
@@ -72,9 +75,9 @@ class PeerManager {
      * Find some peers that meet the criteria and we have the netDb info for locally
      *
      */
-    Set selectPeers(PeerSelectionCriteria criteria) {
+    List selectPeers(PeerSelectionCriteria criteria) {
         int numPasses = 0;
-        Set rv = new HashSet(criteria.getMinimumRequired());
+        List rv = new ArrayList(criteria.getMinimumRequired());
         Set exclude = new HashSet(1);
         exclude.add(_context.routerHash());
         while (rv.size() < criteria.getMinimumRequired()) {
@@ -86,7 +89,12 @@ class PeerManager {
                     _organizer.selectHighCapacityPeers(criteria.getMinimumRequired(), exclude, curVals);
                     break;
                 case PeerSelectionCriteria.PURPOSE_TUNNEL:
-                    _organizer.selectFastPeers(criteria.getMinimumRequired(), exclude, curVals);
+                    // pull all of the fast ones, regardless of how many we 
+                    // want - we'll whittle them down later (40 lines from now)
+                    int num = _organizer.countFastPeers();
+                    if (num <= 0) 
+                        num = criteria.getMaximumRequired();
+                    _organizer.selectFastPeers(num, exclude, curVals);
                     break;
                 case PeerSelectionCriteria.PURPOSE_SOURCE_ROUTE:
                     _organizer.selectHighCapacityPeers(criteria.getMinimumRequired(), exclude, curVals);
@@ -111,7 +119,8 @@ class PeerManager {
                     if (null != _context.netDb().lookupRouterInfoLocally(peer)) {
                         if (_log.shouldLog(Log.DEBUG))
                             _log.debug("Peer " + peer.toBase64() + " is locally known, so we'll allow its selection");
-                        rv.add(peer);
+                        if (!rv.contains(peer))
+                            rv.add(peer);
                     } else {
                         if (_log.shouldLog(Log.DEBUG))
                             _log.debug("Peer " + peer.toBase64() + " is NOT locally known, disallowing its selection");
@@ -123,6 +132,29 @@ class PeerManager {
         }
         if (_log.shouldLog(Log.INFO))
             _log.info("Peers selected after " + numPasses + ": " + rv);
+        
+        if (criteria.getPurpose() == PeerSelectionCriteria.PURPOSE_TUNNEL) {
+            // we selected extra peers above.  now lets strip that down to the 
+            // minimum requested, ordering it by the least recently agreed to
+            // first
+            TreeMap ordered = new TreeMap();
+            for (Iterator iter = rv.iterator(); iter.hasNext(); ) {
+                Hash peer = (Hash)iter.next();
+                PeerProfile prof = _organizer.getProfile(peer);
+                long when = prof.getTunnelHistory().getLastAgreedTo();
+                while (ordered.containsKey(new Long(when)))
+                    when++;
+                ordered.put(new Long(when), peer);
+            }
+            rv.clear();
+            for (Iterator iter = ordered.values().iterator(); iter.hasNext(); ) {
+                if (rv.size() >= criteria.getMaximumRequired()) break;
+                Hash peer = (Hash)iter.next();
+                rv.add(peer);
+            }
+            if (_log.shouldLog(Log.INFO))
+                _log.info("Peers selected after " + numPasses + ", sorted for a tunnel: " + rv);
+        }
         return rv;
     }
     

@@ -89,7 +89,7 @@ public class PeerTestJob extends JobImpl {
         criteria.setMinimumRequired(getTestConcurrency());
         criteria.setMaximumRequired(getTestConcurrency());
         criteria.setPurpose(PeerSelectionCriteria.PURPOSE_TEST);
-        Set peerHashes = _manager.selectPeers(criteria);
+        List peerHashes = _manager.selectPeers(criteria);
         
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Peer selection found " + peerHashes.size() + " peers");
