@@ -491,6 +491,7 @@ public class Router {
         try { _context.messageRegistry().shutdown(); } catch (Throwable t) { _log.log(Log.CRIT, "Error shutting down the message registry", t); }
         try { _context.messageValidator().shutdown(); } catch (Throwable t) { _log.log(Log.CRIT, "Error shutting down the message validator", t); }
         try { _sessionKeyPersistenceHelper.shutdown(); } catch (Throwable t) { _log.log(Log.CRIT, "Error shutting down the session key manager", t); }
+        _context.listContexts().remove(_context);
         dumpStats();
         _log.log(Log.CRIT, "Shutdown complete", new Exception("Shutdown"));
         try { _context.logManager().shutdown(); } catch (Throwable t) { }

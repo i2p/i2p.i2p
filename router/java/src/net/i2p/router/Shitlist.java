@@ -38,6 +38,12 @@ public class Shitlist {
         _shitlist = new HashMap(100);
     }
     
+    public int getRouterCount() {
+        synchronized (_shitlist) {
+            return _shitlist.size();
+        }
+    }
+    
     public boolean shitlistRouter(Hash peer) {
         if (peer == null) return false;
         if (_context.routerHash().equals(peer)) {

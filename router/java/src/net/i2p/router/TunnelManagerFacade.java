@@ -63,4 +63,8 @@ public interface TunnelManagerFacade extends Service {
     
     /** how many tunnels are we participating in? */
     public int getParticipatingCount();
+    /** how many free inbound tunnels do we have available? */
+    public int getFreeTunnelCount();
+    /** how many outbound tunnels do we have available? */
+    public int getOutboundTunnelCount();
 }

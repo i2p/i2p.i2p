@@ -167,6 +167,31 @@ public class ProfileOrganizer {
     public int countNotFailingPeers() { synchronized (_reorganizeLock) { return _notFailingPeers.size(); } }
     public int countFailingPeers() { synchronized (_reorganizeLock) { return _failingPeers.size(); } }
     
+    public int countActivePeers() {
+        synchronized (_reorganizeLock) {
+            int activePeers = 0;
+            
+            long hideBefore = _context.clock().now() - 6*60*60*1000;
+            
+            for (Iterator iter = _failingPeers.values().iterator(); iter.hasNext(); ) {
+                PeerProfile profile = (PeerProfile)iter.next();
+                if (profile.getLastSendSuccessful() >= hideBefore)
+                    activePeers++;
+                else if (profile.getLastHeardFrom() >= hideBefore)
+                    activePeers++;
+            }
+            for (Iterator iter = _notFailingPeers.values().iterator(); iter.hasNext(); ) {
+                PeerProfile profile = (PeerProfile)iter.next();
+                if (profile.getLastSendSuccessful() >= hideBefore)
+                    activePeers++;
+                else if (profile.getLastHeardFrom() >= hideBefore)
+                    activePeers++;
+            }
+            
+            return activePeers;
+        }
+    }
+    
     public boolean isFast(Hash peer) { synchronized (_reorganizeLock) { return _fastPeers.containsKey(peer); } }
     public boolean isHighCapacity(Hash peer) { synchronized (_reorganizeLock) { return _highCapacityPeers.containsKey(peer); } }
     public boolean isWellIntegrated(Hash peer) { synchronized (_reorganizeLock) { return _wellIntegratedPeers.containsKey(peer); } }
@@ -628,14 +653,13 @@ public class ProfileOrganizer {
         buf.append("<h2>Peer Profiles</h2>\n");
         buf.append("<table border=\"1\">");
         buf.append("<tr>");
-        buf.append("<td><b>Peer</b> (").append(order.size()).append(", hiding ").append(peers.size()-order.size()).append(" inactive ones)</td>");
+        buf.append("<td><b>Peer</b> (").append(order.size()).append(", hiding ").append(peers.size()-order.size()).append(")</td>");
         buf.append("<td><b>Groups</b></td>");
         buf.append("<td><b>Speed</b></td>");
         buf.append("<td><b>Capacity</b></td>");
         buf.append("<td><b>Integration</b></td>");
         buf.append("<td><b>Failing?</b></td>");
-        buf.append("<td><b>Reliability (deprecated)</b></td>");
-        buf.append("<td><b>Profile data</b></td>");
+        //buf.append("<td><b>Profile data</b></td>");
         buf.append("</tr>");
         for (Iterator iter = order.keySet().iterator(); iter.hasNext();) {
             String name = (String)iter.next();
@@ -645,10 +669,10 @@ public class ProfileOrganizer {
             buf.append("<tr>");
             buf.append("<td><code>");
             if (prof.getIsFailing()) {
-                buf.append("<font color=\"red\">--").append(peer.toBase64()).append("</font>");
+                buf.append("<font color=\"red\">--").append(peer.toBase64().substring(0,6)).append("</font>");
             } else {
                 if (prof.getIsActive()) {
-                    buf.append("<font color=\"blue\">++").append(peer.toBase64()).append("</font>");
+                    buf.append("<font color=\"blue\">++").append(peer.toBase64().substring(0,6)).append("</font>");
                 } else {
                     buf.append("__").append(peer.toBase64());
                 }
@@ -678,20 +702,19 @@ public class ProfileOrganizer {
             }
             
             switch (tier) {
-                case 1: buf.append("Fast+High Capacity"); break;
+                case 1: buf.append("Fast"); break;
                 case 2: buf.append("High Capacity"); break;
                 case 3: buf.append("Not Failing"); break;
                 default: buf.append("Failing"); break;
             }
-            if (isIntegrated) buf.append(", Well integrated");
+            if (isIntegrated) buf.append(", Integrated");
             
             buf.append("<td align=\"right\">").append(num(prof.getSpeedValue())).append("</td>");
             buf.append("<td align=\"right\">").append(num(prof.getCapacityValue())).append("</td>");
             buf.append("<td align=\"right\">").append(num(prof.getIntegrationValue())).append("</td>");
             buf.append("<td align=\"right\">").append(prof.getIsFailing()).append("</td>");
-            buf.append("<td align=\"right\">").append(num(prof.getReliabilityValue())).append("</td>");
-            buf.append("<td><a href=\"/profile/").append(prof.getPeer().toBase64().substring(0, 32)).append("\">profile.txt</a> ");
-            buf.append("    <a href=\"#").append(prof.getPeer().toBase64().substring(0, 32)).append("\">netDb</a></td>");
+            //buf.append("<td><a href=\"/profile/").append(prof.getPeer().toBase64().substring(0, 32)).append("\">profile.txt</a> ");
+            //buf.append("    <a href=\"#").append(prof.getPeer().toBase64().substring(0, 32)).append("\">netDb</a></td>");
             buf.append("</tr>");
         }
         buf.append("</table>");
@@ -700,7 +723,6 @@ public class ProfileOrganizer {
         buf.append("<li><b>capacity</b>: how many tunnels can we ask them to join in an hour?</li>");
         buf.append("<li><b>integration</b>: how many new peers have they told us about lately?</li>");
         buf.append("<li><b>failing?</b>: is the peer currently swamped (and if possible we should avoid nagging them)?</li>");
-        buf.append("<li><b>reliability</b>: no sound semantics... just a random kludge of a value.</li>");
         buf.append("</ul></i>");
         buf.append("Red peers prefixed with '--' means the peer is failing, and blue peers prefixed ");
         buf.append("with '++' means we've sent or received a message from them ");

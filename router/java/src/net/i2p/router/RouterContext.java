@@ -1,5 +1,7 @@
 package net.i2p.router;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 
 import net.i2p.I2PAppContext;
@@ -57,11 +59,14 @@ public class RouterContext extends I2PAppContext {
     private Calculator _reliabilityCalc;
     private Calculator _capacityCalc;
     
+    private static List _contexts = new ArrayList(1);
+    
     public RouterContext(Router router) { this(router, null); }
     public RouterContext(Router router, Properties envProps) { 
         super(envProps);
         _router = router;
         initAll();
+        _contexts.add(this);
     }
     private void initAll() {
         _clientManagerFacade = new ClientManagerFacadeImpl(this);
@@ -93,6 +98,15 @@ public class RouterContext extends I2PAppContext {
         _reliabilityCalc = new ReliabilityCalculator(this);
         _capacityCalc = new CapacityCalculator(this);
     }
+    
+    /**
+     * Retrieve the list of router contexts currently instantiated in this JVM.  
+     * This will always contain only one item (except when a simulation per the
+     * MultiRouter is going on), and the list should only be modified when a new
+     * context is created or a router is shut down.
+     *
+     */
+    public static List listContexts() { return _contexts; }
     
     /** what router is this context working for? */
     public Router router() { return _router; }

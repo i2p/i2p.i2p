@@ -21,10 +21,12 @@ import java.util.Map;
 import java.util.Set;
 
 import net.i2p.data.DataFormatException;
+import net.i2p.data.DataHelper;
 import net.i2p.data.DataStructure;
 import net.i2p.data.Hash;
 import net.i2p.data.Lease;
 import net.i2p.data.LeaseSet;
+import net.i2p.data.RouterAddress;
 import net.i2p.data.RouterInfo;
 import net.i2p.data.i2np.DatabaseLookupMessage;
 import net.i2p.data.i2np.DatabaseSearchReplyMessage;
@@ -616,51 +618,73 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         }
         Set leases = getLeases();
         buf.append("<h3>Leases</h3>\n");
-        buf.append("<table border=\"1\">\n");
         out.write(buf.toString().getBytes());
         buf.setLength(0);
+        long now = _context.clock().now();
         for (Iterator iter = leases.iterator(); iter.hasNext(); ) {
             LeaseSet ls = (LeaseSet)iter.next();
             Hash key = ls.getDestination().calculateHash();
-            buf.append("<tr><td valign=\"top\" align=\"left\"><b>").append(key.toBase64()).append("</b></td>");
-            
-            if (getLastSent(key).longValue() > 0)
-                buf.append("<td valign=\"top\" align=\"left\"><b>Last sent successfully:</b> ").append(new Date(getLastSent(key).longValue())).append("</td></tr>");
-            else
-                buf.append("<td valign=\"top\" align=\"left\"><b>Last sent successfully:</b> never</td></tr>");
-            buf.append("<tr><td valign=\"top\" align=\"left\" colspan=\"2\"><pre>\n").append(ls.toString()).append("</pre></td></tr>\n");
+            buf.append("<b>LeaseSet: ").append(key.toBase64()).append("</b><br />\n");
+            long exp = ls.getEarliestLeaseDate()-now;
+            buf.append("Earliest expiration date in: <i>").append(DataHelper.formatDuration(exp)).append("</i><br />\n");
+            for (int i = 0; i < ls.getLeaseCount(); i++) {
+                buf.append("Lease ").append(i).append(": gateway <i>");
+                buf.append(ls.getLease(i).getRouterIdentity().getHash().toBase64().substring(0,6));
+                buf.append("</i> tunnelId <i>").append(ls.getLease(i).getTunnelId().getTunnelId()).append("</i><br />\n");
+            }
+            buf.append("<hr />\n");
             out.write(buf.toString().getBytes());
             buf.setLength(0);
         }
-        buf.append("</table>\n");
         
         Hash us = _context.routerHash();
         Set routers = getRouters();
-        buf.append("<h3>Routers</h3>\n");
-        buf.append("<table border=\"1\">\n");
+        out.write("<h3>Routers</h3>\n".getBytes());
+        
+        RouterInfo ourInfo = _context.router().getRouterInfo();
+        renderRouterInfo(buf, ourInfo, true);
         out.write(buf.toString().getBytes());
         buf.setLength(0);
-        
         for (Iterator iter = routers.iterator(); iter.hasNext(); ) {
             RouterInfo ri = (RouterInfo)iter.next();
             Hash key = ri.getIdentity().getHash();
             boolean isUs = key.equals(us);
-            if (isUs) {
-                buf.append("<tr><td valign=\"top\" align=\"left\"><font color=\"red\"><b>").append(key.toBase64()).append("</b></font></td>");
-                buf.append("<td valign=\"top\" align=\"left\" colspan=\"2\"><b>Last sent successfully:</b> ").append(new Date(getLastSent(key).longValue())).append("</td></tr>");
-            } else {
-                buf.append("<tr><td valign=\"top\" align=\"left\"><a name=\"").append(key.toBase64().substring(0,32)).append("\"><b>").append(key.toBase64()).append("</b></a></td>");
-                if (getLastSent(key).longValue() > 0)
-                    buf.append("<td valign=\"top\" align=\"left\"><b>Last sent successfully:</b> ").append(new Date(getLastSent(key).longValue())).append("</td>");
-                else
-                    buf.append("<td valign=\"top\" align=\"left\"><b>Last sent successfully:</b> never</td>");
-                buf.append("<td valign=\"top\" align=\"left\"><a href=\"/profile/").append(key.toBase64().substring(0, 32)).append("\">Profile</a></td></tr>");
+            if (!isUs) {
+                renderRouterInfo(buf, ri, false);
+                out.write(buf.toString().getBytes());
+                buf.setLength(0);
             }
-            buf.append("<tr><td valign=\"top\" align=\"left\" colspan=\"3\"><pre>\n").append(ri.toString()).append("</pre></td></tr>\n");
-            out.write(buf.toString().getBytes());
-            buf.setLength(0);
         }
-        out.write("</table>\n".getBytes());
+    }
+    private void renderRouterInfo(StringBuffer buf, RouterInfo info, boolean isUs) {
+        if (isUs) {
+            buf.append("<b>Our info: </b><br />\n");
+        } else {
+            String hash = info.getIdentity().getHash().toBase64();
+            buf.append("<a name=\"").append(hash.substring(0, 6)).append("\" />");
+            buf.append("<b>Peer info for:</b> ").append(hash).append("<br />\n");
+        }
+        
+        long age = _context.clock().now() - info.getPublished();
+        buf.append("Published: <i>").append(DataHelper.formatDuration(age)).append(" ago</i><br />\n");
+        buf.append("Address(es): <i>");
+        for (Iterator iter = info.getAddresses().iterator(); iter.hasNext(); ) {
+            RouterAddress addr = (RouterAddress)iter.next();
+            buf.append(addr.getTransportStyle()).append(": ");
+            for (Iterator optIter = addr.getOptions().keySet().iterator(); optIter.hasNext(); ) {
+                String name = (String)optIter.next();
+                String val = addr.getOptions().getProperty(name);
+                buf.append('[').append(name).append('=').append(val).append("] ");
+            }
+        }
+        buf.append("</i><br />\n");
+        buf.append("Stats: <br /><i><code>\n");
+        for (Iterator iter = info.getOptions().keySet().iterator(); iter.hasNext(); ) {
+            String key = (String)iter.next();
+            String val = info.getOptions().getProperty(key);
+            buf.append(key).append(" = ").append(val).append("<br />\n");
+        }
+        buf.append("</code></i><hr />\n");
     }
     
 }
