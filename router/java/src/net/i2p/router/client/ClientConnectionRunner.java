@@ -126,7 +126,8 @@ public class ClientConnectionRunner {
         synchronized (_messages) {
             _messages.clear();
         }
-        _manager.unregisterConnection(this);
+        if (_manager != null)
+            _manager.unregisterConnection(this);
         if (_currentLeaseSet != null)
             _context.netDb().unpublish(_currentLeaseSet);
         _leaseRequest = null;

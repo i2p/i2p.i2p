@@ -1,4 +1,10 @@
-$Id: history.txt,v 1.55 2004/10/23 20:42:35 jrandom Exp $
+$Id: history.txt,v 1.56 2004/10/24 18:00:44 jrandom Exp $
+
+2004-10-27  jrandom
+    * Fix a strange race condition on i2cp client disconnect.
+    * win98 startup fixes (thanks tester-1 and ardvark!)
+    * include build scripts for the new streaming lib (which is NOT ready
+      for use yet, but you can hack around with it)
 
 2004-10-24  jrandom
     * Allow explicit inclusion of session tags in the SDK, enabling the

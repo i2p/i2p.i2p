@@ -19,6 +19,7 @@
         <ant dir="core/java/" target="jar" />
         <ant dir="router/java/" target="jar" />
         <ant dir="apps/ministreaming/java/" target="jar" />
+        <ant dir="apps/streaming/java/" target="jar" />
         <ant dir="apps/i2ptunnel/java/" target="jar" />
         <ant dir="apps/sam/java/" target="jar" />
         <ant dir="apps/heartbeat/java/" target="jar" />
@@ -46,6 +47,7 @@
         <copy file="core/java/build/i2p.jar" todir="build/" />
         <copy file="router/java/build/router.jar" todir="build/" />
         <copy file="apps/ministreaming/java/build/mstreaming.jar" todir="build/" />
+        <copy file="apps/streaming/java/build/streaming.jar" todir="build/" />
         <copy file="apps/i2ptunnel/java/build/i2ptunnel.jar" todir="build/" />
         <copy file="apps/i2ptunnel/java/build/i2ptunnel.war" todir="build/" />
         <copy file="apps/sam/java/build/sam.jar" todir="build/" />
@@ -75,6 +77,7 @@
                 <pathelement location="router/java/src" />
                 <pathelement location="router/java/test" />
                 <pathelement location="apps/ministreaming/java/src" />
+                <pathelement location="apps/streaming/java/src" />
                 <pathelement location="apps/i2ptunnel/java/src" />
                 <pathelement location="apps/systray/java/src" />
                 <pathelement location="apps/routerconsole/java/src" />
@@ -93,6 +96,7 @@
         <ant dir="core/java/" target="distclean" />
         <ant dir="router/java/" target="distclean" />
         <ant dir="apps/ministreaming/java/" target="distclean" />
+        <ant dir="apps/streaming/java/" target="distclean" />
         <ant dir="apps/i2ptunnel/java/" target="distclean" />
         <ant dir="apps/sam/java/" target="distclean" />
         <ant dir="apps/heartbeat/java/" target="distclean" />
@@ -158,6 +162,7 @@
         <copy file="build/jbigi.jar" todir="pkg-temp/lib" />
         <copy file="build/jnet.jar" todir="pkg-temp/lib/" />
         <copy file="build/mstreaming.jar" todir="pkg-temp/lib/" />
+        <copy file="build/streaming.jar" todir="pkg-temp/lib/" />
         <copy file="build/netmonitor.jar" todir="pkg-temp/lib/" />
         <copy file="build/org.mortbay.jetty-jdk1.2.jar" todir="pkg-temp/lib/" />
         <copy file="build/org.mortbay.jetty.jar" todir="pkg-temp/lib/" />
@@ -224,6 +229,7 @@
         <copy file="build/i2p.jar" todir="pkg-temp/lib/" />
         <copy file="build/i2ptunnel.jar" todir="pkg-temp/lib/" />
         <copy file="build/mstreaming.jar" todir="pkg-temp/lib/" />
+        <copy file="build/streaming.jar" todir="pkg-temp/lib/" />
         <copy file="build/router.jar" todir="pkg-temp/lib/" />
         <copy file="build/routerconsole.jar" todir="pkg-temp/lib/" />
         <copy file="build/i2ptunnel.war" todir="pkg-temp/webapps/" />
