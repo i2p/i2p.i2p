@@ -48,18 +48,18 @@ public class LogManager {
     public final static String PROP_DISPLAYONSCREEN = "logger.displayOnScreen";
     public final static String PROP_CONSOLEBUFFERSIZE = "logger.consoleBufferSize";
     public final static String PROP_DISPLAYONSCREENLEVEL = "logger.minimumOnScreenLevel";
-    public final static String PROP_DEFALTLEVEL = "logger.defaultLevel";
+    public final static String PROP_DEFAULTLEVEL = "logger.defaultLevel";
     public final static String PROP_RECORD_PREFIX = "logger.record.";
 
-    public final static String DEFAULT_FORMAT = DATE + ' ' + PRIORITY + " [" + THREAD + "] " + CLASS + ": " + MESSAGE;
-    public final static String DEFAULT_DATEFORMAT = "hh:mm:ss.SSS";
-    public final static String DEFAULT_FILENAME = "log-#.txt";
+    public final static String DEFAULT_FORMAT = DATE + " " + PRIORITY + " [" + THREAD + "] " + CLASS + ": " + MESSAGE;
+    public final static String DEFAULT_DATEFORMAT = "HH:mm:ss.SSS";
+    public final static String DEFAULT_FILENAME = "logs/log-#.txt";
     public final static String DEFAULT_FILESIZE = "10m";
     public final static boolean DEFAULT_DISPLAYONSCREEN = true;
     public final static int DEFAULT_CONSOLEBUFFERSIZE = 20;
     public final static String DEFAULT_ROTATIONLIMIT = "2";
-    public final static String DEFAULT_DEFALTLEVEL = Log.STR_DEBUG;
-    public final static String DEFAULT_ONSCREENLEVEL = Log.STR_DEBUG;
+    public final static String DEFAULT_DEFAULTLEVEL = Log.STR_ERROR;
+    public final static String DEFAULT_ONSCREENLEVEL = Log.STR_ERROR;
 
     private I2PAppContext _context;
     private Log _log;
@@ -104,13 +104,16 @@ public class LogManager {
     private int _consoleBufferSize;
     /** the actual "recent logs" list */
     private LogConsoleBuffer _consoleBuffer;
+    
+    private boolean _alreadyNoticedMissingConfig;
 
     public LogManager(I2PAppContext context) {
         _displayOnScreen = true;
+        _alreadyNoticedMissingConfig = false;
         _records = new ArrayList();
         _limits = new ArrayList(128);
         _logs = new HashMap(128);
-        _defaultLimit = Log.DEBUG;
+        _defaultLimit = Log.ERROR;
         _configLastRead = 0;
         _location = context.getProperty(CONFIG_LOCATION_PROP, CONFIG_LOCATION_DEFAULT);
         _context = context;
@@ -217,7 +220,8 @@ public class LogManager {
      */
     void rereadConfig() {
         // perhaps check modification time
-        _log.debug("Rereading configuration file");
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("Rereading configuration file");
         loadConfig();
     }
 
@@ -230,6 +234,19 @@ public class LogManager {
 
     private void loadConfig() {
         File cfgFile = new File(_location);
+        if (!cfgFile.exists()) {
+            if (!_alreadyNoticedMissingConfig) {
+                if (_log.shouldLog(Log.ERROR))
+                    _log.error("Log file " + _location + " does not exist");
+                System.err.println("Log file " + _location + " does not exist");
+                _alreadyNoticedMissingConfig = true;
+            }
+            parseConfig(new Properties());
+            updateLimits();
+            return;
+        }
+        _alreadyNoticedMissingConfig = false;
+        
         if ((_configLastRead > 0) && (_configLastRead >= cfgFile.lastModified())) {
             if (_log.shouldLog(Log.INFO))
                 _log.info("Short circuiting config read (last read: " 
@@ -260,9 +277,9 @@ public class LogManager {
     }
 
     private void parseConfig(Properties config) {
-        String fmt = config.getProperty(PROP_FORMAT, new String(DEFAULT_FORMAT));
+        String fmt = config.getProperty(PROP_FORMAT, DEFAULT_FORMAT);
         _format = fmt.toCharArray();
-
+        
         String df = config.getProperty(PROP_DATEFORMAT, DEFAULT_DATEFORMAT);
         _dateFormatPattern = df;
         _dateFormat = new SimpleDateFormat(df);
@@ -289,13 +306,13 @@ public class LogManager {
         _rotationLimit = -1;
         try {
             String str = config.getProperty(PROP_ROTATIONLIMIT);
-            if (str == null) System.err.println("Rotation limit not specified");
             _rotationLimit = Integer.parseInt(config.getProperty(PROP_ROTATIONLIMIT, DEFAULT_ROTATIONLIMIT));
         } catch (NumberFormatException nfe) {
             System.err.println("Invalid rotation limit");
             nfe.printStackTrace();
         }
-        _defaultLimit = Log.getLevel(config.getProperty(PROP_DEFALTLEVEL, DEFAULT_DEFALTLEVEL));
+        
+        _defaultLimit = Log.getLevel(config.getProperty(PROP_DEFAULTLEVEL, DEFAULT_DEFAULTLEVEL));
 
         _onScreenLimit = Log.getLevel(config.getProperty(PROP_DISPLAYONSCREENLEVEL, DEFAULT_ONSCREENLEVEL));
 
@@ -542,7 +559,7 @@ public class LogManager {
         // if <= 0, dont specify
         
         buf.append(PROP_ROTATIONLIMIT).append('=').append(_rotationLimit).append('\n');
-        buf.append(PROP_DEFALTLEVEL).append('=').append(Log.toLevelString(_defaultLimit)).append('\n');
+        buf.append(PROP_DEFAULTLEVEL).append('=').append(Log.toLevelString(_defaultLimit)).append('\n');
         buf.append(PROP_DISPLAYONSCREENLEVEL).append('=').append(Log.toLevelString(_onScreenLimit)).append('\n');
         buf.append(PROP_CONSOLEBUFFERSIZE).append('=').append(_consoleBufferSize).append('\n');
 
