@@ -23,6 +23,8 @@ public class MessageValidator {
         _context = context;
         context.statManager().createRateStat("router.duplicateMessageId", "Note that a duplicate messageId was received", "Router", 
                                              new long[] { 10*60*1000l, 60*60*1000l, 3*60*60*1000l, 24*60*60*1000l });
+        context.statManager().createRateStat("router.invalidMessageTime", "Note that a message outside the valid range was received", "Router", 
+                                             new long[] { 10*60*1000l, 60*60*1000l, 3*60*60*1000l, 24*60*60*1000l });
     }
     
     
@@ -36,10 +38,12 @@ public class MessageValidator {
         if (now - Router.CLOCK_FUDGE_FACTOR >= expiration) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Rejecting message " + messageId + " because it expired " + (now-expiration) + "ms ago");
+            _context.statManager().addRateData("router.invalidMessageTime", (now-expiration), 0);
             return false;
         } else if (now + 4*Router.CLOCK_FUDGE_FACTOR < expiration) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Rejecting message " + messageId + " because it will expire too far in the future (" + (expiration-now) + "ms)");
+            _context.statManager().addRateData("router.invalidMessageTime", (now-expiration), 0);
             return false;
         }
         

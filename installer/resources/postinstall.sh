@@ -19,6 +19,7 @@ fi
 chmod 744 ./i2prouter
 # chmod 744 ./install_i2p_service_unix
 chmod 744 ./osid
+chmod 744 ./startRouter.sh
 # chmod 744 ./uninstall_i2p_service_unix
 
 ERROR_MSG="Cannot determine operating system type. From the subdirectory in lib/wrapper matching your operating system, please move i2psvc to your base I2P directory, and move the remaining two files to the lib directory."

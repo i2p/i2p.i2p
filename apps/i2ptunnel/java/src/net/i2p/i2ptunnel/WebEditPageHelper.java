@@ -296,6 +296,10 @@ public class WebEditPageHelper {
                         cOpt.setProperty("option.inbound.length", _tunnelDepth);
                         cOpt.setProperty("option.outbound.length", _tunnelDepth);
                     }
+                    // these are per-proxy settings, not per-session settings, and
+                    // as such don't need to be shared.  the values are propogated
+                    // to the current tunnel's settings via cur.setConfig above
+                    /*
                     if (_connectDelay)
                         cOpt.setProperty("option.i2p.streaming.connectDelay", "1000");
                     else
@@ -304,6 +308,7 @@ public class WebEditPageHelper {
                         cOpt.setProperty("option.i2p.streaming.maxWindowSize", "1");
                     else
                         cOpt.remove("option.i2p.streaming.maxWindowSize");
+                    */
                     if (_name != null) {
                         cOpt.setProperty("option.inbound.nickname", _name);
                         cOpt.setProperty("option.outbound.nickname", _name);

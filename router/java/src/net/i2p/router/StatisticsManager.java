@@ -33,7 +33,7 @@ public class StatisticsManager implements Service {
     public final static String PROP_PUBLISH_RANKINGS = "router.publishPeerRankings";
     public final static String DEFAULT_PROP_PUBLISH_RANKINGS = "true";
     public final static String PROP_MAX_PUBLISHED_PEERS = "router.publishPeerMax";
-    public final static int DEFAULT_MAX_PUBLISHED_PEERS = 20;
+    public final static int DEFAULT_MAX_PUBLISHED_PEERS = 10;
 
     private final DecimalFormat _fmt;
     private final DecimalFormat _pct;
@@ -102,6 +102,7 @@ public class StatisticsManager implements Service {
             stats.putAll(_context.profileManager().summarizePeers(_publishedStats));
 
             includeThroughput(stats);
+            includeRate("router.invalidMessageTime", stats, new long[] { 10*60*1000, 3*60*60*1000 });
             includeRate("router.duplicateMessageId", stats, new long[] { 24*60*60*1000 });
             includeRate("tunnel.duplicateIV", stats, new long[] { 24*60*60*1000 });
             includeRate("tunnel.fragmentedComplete", stats, new long[] { 10*60*1000, 3*60*60*1000 });

@@ -61,6 +61,8 @@ class WebEditPageFormGenerator {
             buf.append("value=\"squid.i2p\" ");
         buf.append("/><br />\n");
         
+        addStreamingOptions(buf, controller);
+        
         buf.append("<hr />Note: the following options are shared across all client tunnels and");
         buf.append(" HTTP proxies<br />\n");
         
@@ -83,6 +85,8 @@ class WebEditPageFormGenerator {
         if ( (controller != null) && (controller.getTargetDestination() != null) )
             buf.append("value=\"").append(controller.getTargetDestination()).append("\" ");
         buf.append(" /> (either the hosts.txt name or the full base64 destination)<br />\n");
+        
+        addStreamingOptions(buf, controller);
         
         buf.append("<hr />Note: the following options are shared across all client tunnels and");
         buf.append(" HTTP proxies<br />\n");
@@ -121,6 +125,8 @@ class WebEditPageFormGenerator {
             buf.append("myServer.privKey\" /><br />");
             buf.append("<input type=\"hidden\" name=\"privKeyGenerate\" value=\"true\" />");
         }
+        
+        addStreamingOptions(buf, controller);
         
         addOptions(buf, controller);
         buf.append("<input type=\"submit\" name=\"action\" value=\"Save\">\n");
@@ -164,6 +170,8 @@ class WebEditPageFormGenerator {
             buf.append("<input type=\"hidden\" name=\"privKeyGenerate\" value=\"true\" />");
         }
         
+        addStreamingOptions(buf, controller);
+        
         addOptions(buf, controller);
         buf.append("<input type=\"submit\" name=\"action\" value=\"Save\">\n");
         buf.append("<input type=\"submit\" name=\"action\" value=\"Remove\">\n");
@@ -204,8 +212,9 @@ class WebEditPageFormGenerator {
             buf.append(" checked=\"true\" />\n<br />\n");
         else
             buf.append(" />\n<br />\n");
+       
     }
-
+    
     /**
      * Generate the fields asking for what port and interface the tunnel should 
      * listen on.
@@ -243,6 +252,46 @@ class WebEditPageFormGenerator {
         buf.append("\"><br />\n");
     }
     
+    private static void addStreamingOptions(StringBuffer buf, TunnelController controller) {
+        int connectDelay = 0;
+        int maxWindowSize = -1;
+
+        Properties opts = getOptions(controller);
+        if (opts != null) {
+            String delay = opts.getProperty("i2p.streaming.connectDelay");
+            if (delay != null) {
+                try {
+                    connectDelay = Integer.parseInt(delay);
+                } catch (NumberFormatException nfe) {
+                    connectDelay = 0;
+                }
+            }
+            String max = opts.getProperty("i2p.streaming.maxWindowSize");
+            if (max != null) {
+                try {
+                    maxWindowSize = Integer.parseInt(max);
+                } catch (NumberFormatException nfe) {
+                    maxWindowSize = -1;
+                }
+            }
+        }
+        
+        buf.append("<b>Delay connection briefly? </b> ");
+        buf.append("<input type=\"checkbox\" name=\"connectDelay\" value=\"");
+        buf.append((connectDelay > 0 ? connectDelay : 1000)).append("\" ");
+        if (connectDelay > 0)
+            buf.append("checked=\"true\" ");
+        buf.append("/> (useful for brief request/response connections)<br />\n");
+        
+        buf.append("<b>Communication profile:</b>");
+        buf.append("<select name=\"profile\">");
+        if (maxWindowSize <= 0)
+            buf.append("<option value=\"interactive\">Interactive</option><option value=\"bulk\" selected=\"true\">Bulk</option>");
+        else
+            buf.append("<option value=\"interactive\" selected=\"true\">Interactive</option><option value=\"bulk\">Bulk</option>");
+        buf.append("</select><br />\n");
+    }
+
     /**
      * Add fields for customizing the I2PSession options, including helpers for
      * tunnel depth and count, as well as I2CP host and port.
@@ -253,8 +302,6 @@ class WebEditPageFormGenerator {
     private static void addOptions(StringBuffer buf, TunnelController controller) {
         int tunnelDepth = 2;
         int numTunnels = 2;
-        int connectDelay = 0;
-        int maxWindowSize = -1;
         Properties opts = getOptions(controller);
         if (opts != null) {
             String depth = opts.getProperty("inbound.length");
@@ -271,22 +318,6 @@ class WebEditPageFormGenerator {
                     numTunnels = Integer.parseInt(num);
                 } catch (NumberFormatException nfe) {
                     numTunnels = 2;
-                }
-            }
-            String delay = opts.getProperty("i2p.streaming.connectDelay");
-            if (delay != null) {
-                try {
-                    connectDelay = Integer.parseInt(delay);
-                } catch (NumberFormatException nfe) {
-                    connectDelay = 0;
-                }
-            }
-            String max = opts.getProperty("i2p.streaming.maxWindowSize");
-            if (max != null) {
-                try {
-                    maxWindowSize = Integer.parseInt(max);
-                } catch (NumberFormatException nfe) {
-                    maxWindowSize = -1;
                 }
             }
         }
@@ -326,21 +357,6 @@ class WebEditPageFormGenerator {
             buf.append(numTunnels);
             buf.append(" inbound tunnels (custom)</option>");
         }
-        buf.append("</select><br />\n");
-        
-        buf.append("<b>Delay connection briefly? </b> ");
-        buf.append("<input type=\"checkbox\" name=\"connectDelay\" value=\"");
-        buf.append((connectDelay > 0 ? connectDelay : 1000)).append("\" ");
-        if (connectDelay > 0)
-            buf.append("checked=\"true\" ");
-        buf.append("/> (useful for brief request/response connections)<br />\n");
-        
-        buf.append("<b>Communication profile:</b>");
-        buf.append("<select name=\"profile\">");
-        if (maxWindowSize <= 0)
-            buf.append("<option value=\"interactive\">Interactive</option><option value=\"bulk\" selected=\"true\">Bulk</option>");
-        else
-            buf.append("<option value=\"interactive\" selected=\"true\">Interactive</option><option value=\"bulk\">Bulk</option>");
         buf.append("</select><br />\n");
         
         buf.append("<b>I2CP host:</b> ");

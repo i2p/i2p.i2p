@@ -1,11 +1,22 @@
-$Id: history.txt,v 1.163 2005/03/04 01:09:51 jrandom Exp $
+$Id: history.txt,v 1.164 2005/03/04 21:54:42 jrandom Exp $
+
+* 2005-03-06  0.5.0.2 released
+
+2005-03-06  jrandom
+    * Allow the I2PTunnel web interface to select streaming lib options for
+      individual client tunnels, rather than sharing them across all of them,
+      as we do with the session options.  This way people can (and should) set
+      the irc proxy to interactive and the eepproxy to bulk.
+    * Added a startRouter.sh script to new installs which simply calls 
+      "sh i2prouter start".  This should make it clear how people should start
+      I2P.
 
 2005-03-04  jrandom
     * Filter HTTP response headers in the eepproxy, forcing Connection: close
       so that broken (/malicious) webservers can't allow persistent 
       connections.  All HTTP compliant browsers should now always close the 
       socket.
-    * Enabled the GZIPInputStream's cache (they were'nt cached before)
+    * Enabled the GZIPInputStream's cache (they weren't cached before)
     * Make sure our first send is always a SYN (duh)
     * Workaround for some buggy compilers
 

@@ -283,6 +283,7 @@ public class I2PTunnelRunner extends I2PThread implements I2PSocket.SocketErrorL
                 //else
                 //    _log.warn("You may ignore this", ex);
             } finally {
+                _cache.release(ba);
                 if (_log.shouldLog(Log.INFO)) {
                     _log.info(direction + ": done forwarding between " 
                               + from + " and " + to);
@@ -304,7 +305,6 @@ public class I2PTunnelRunner extends I2PThread implements I2PSocket.SocketErrorL
                     finishLock.notifyAll();
                     // the main thread will close sockets etc. now
                 }
-                _cache.release(ba);
             }
         }
     }
