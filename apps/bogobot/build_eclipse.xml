@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- ********************************************************** -->
+<!-- bogobot - A simple join/part stats logger bot for I2P IRC. -->
+<!--                                                            -->
+<!-- build_eclipse.xml                                          -->
+<!-- 2004 The I2P Project                                       -->
+<!-- This code is public domain.                                -->
+<!--                                                            -->
+<!-- author hypercubus                                          -->
+<!-- version 0.3.1                                              -->
+<!-- ********************************************************** -->
+
+<project basedir="." default="dist" name="Bogobot">
+
+    <!-- init:
+    Create distribution directory if missing and initialize time stamp for
+    archive naming -->
+    <target name="init">
+        <mkdir dir="dist" />
+        <tstamp>
+            <format pattern="yyyy-MM-dd" property="DSTAMP" />
+        </tstamp>
+    </target>
+
+    <!-- dist.bin:
+    Create the binary distribution archive -->
+    <target depends="init" description="Create the binary distribution archive" name="dist.bin">
+        <zip destfile="dist/Bogobot_${DSTAMP}.zip">
+            <zipfileset dir="${basedir}" includes="bogobot.bat Bogobot.class bogobot.sh Bogoparser.class LICENSE_log4j.txt LICENSE_pircbot.txt log4j-1.2.8.jar pircbot.jar" />
+        </zip>
+    </target>
+
+    <!-- dist.source:
+    Create the source distribution archive -->
+    <target depends="init" description="Create the source distribution archive" name="dist.source">
+        <zip destfile="dist/Bogobot_source_${DSTAMP}.zip">
+            <zipfileset dir="${basedir}" includes="bogobot.bat Bogobot.java bogobot.sh Bogoparser.java build.xml build_eclipse.xml LICENSE_log4j.txt LICENSE_pircbot.txt log4j-1.2.8.jar pircbot.jar" />
+        </zip>
+    </target>
+
+    <!-- dist:
+    Create both the binary and source distribution archives -->
+    <target depends="dist.bin,dist.source" description="Create both the binary and source distribution archives" name="dist">
+        <echo message="Successfully created binary and source distribution archives in directory &apos;dist&apos;." />
+    </target>
+
+    <!-- clean:
+    Delete all class files and temporary directories -->
+    <target description="Delete all class files and temporary directories" name="clean">
+        <delete>
+            <fileset dir="${basedir}" includes="**/*.class" />
+        </delete>
+        <echo message="Clean successful." />
+    </target>
+
+</project>
