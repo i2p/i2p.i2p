@@ -103,7 +103,7 @@ public class LogManager {
         t.setDaemon(true);
         t.start();
         Runtime.getRuntime().addShutdownHook(new ShutdownHook());
-        System.out.println("Created logManager " + this + " with context: " + context);
+        //System.out.println("Created logManager " + this + " with context: " + context);
     }
     private LogManager() {}
     
