@@ -27,7 +27,7 @@ class PersistenceHelper {
             try {
                 return Long.parseLong(val);
             } catch (NumberFormatException nfe) {
-                _log.error("Error formatting " + val + " into a long", nfe);
+                _log.warn("Error formatting " + val + " into a long", nfe);
             }
         } else {
             _log.warn("Key " + prefix + name + " does not exist");
@@ -41,10 +41,10 @@ class PersistenceHelper {
             try {
                 return Double.parseDouble(val);
             } catch (NumberFormatException nfe) {
-                _log.error("Error formatting " + val + " into a double", nfe);
+                _log.warn("Error formatting " + val + " into a double", nfe);
             }
         } else {
-            _log.error("Key " + prefix + name + " does not exist");
+            _log.warn("Key " + prefix + name + " does not exist");
         }
         return 0;
     }
