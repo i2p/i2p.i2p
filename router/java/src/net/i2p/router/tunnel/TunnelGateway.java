@@ -42,6 +42,7 @@ public class TunnelGateway {
     private long _lastFlush;
     private int _flushFrequency;
     private DelayedFlush _delayedFlush;
+    private int _messagesSent;
     
     /**
      * @param preprocessor this pulls Pending messages off a list, builds some
@@ -58,6 +59,7 @@ public class TunnelGateway {
         _preprocessor = preprocessor;
         _sender = sender;
         _receiver = receiver;
+        _messagesSent = 0;
         _flushFrequency = 500;
         _delayedFlush = new DelayedFlush();
         _lastFlush = _context.clock().now();
@@ -82,6 +84,7 @@ public class TunnelGateway {
      * @param toTunnel tunnel to send to after the endpoint (or null for endpoint or router processing)
      */
     public void add(I2NPMessage msg, Hash toRouter, TunnelId toTunnel) {
+        _messagesSent++;
         boolean delayedFlush = false;
         
         Pending cur = new Pending(msg, toRouter, toTunnel);
@@ -104,6 +107,8 @@ public class TunnelGateway {
             SimpleTimer.getInstance().addEvent(_delayedFlush, _flushFrequency);
         }
     }
+    
+    public int getMessagesSent() { return _messagesSent; }
     
     public interface Sender {
         /**

@@ -38,6 +38,7 @@ public class PeerProfile {
     private double _reliabilityValue;
     private double _capacityValue;
     private double _integrationValue;
+    private double _oldSpeedValue;
     private boolean _isFailing;
     // good vs bad behavior
     private TunnelHistory _tunnelHistory;
@@ -186,6 +187,7 @@ public class PeerProfile {
      *
      */
     public double getSpeedValue() { return _speedValue; }
+    public double getOldSpeedValue() { return _oldSpeedValue; }
     /**
      * How likely are they to stay up and pass on messages over the next few minutes.
      * Positive numbers means more likely, negative numbers means its probably not
@@ -287,6 +289,7 @@ public class PeerProfile {
         _tunnelHistory.coalesceStats();
         
         _speedValue = calculateSpeed();
+        _oldSpeedValue = calculateOldSpeed();
         _reliabilityValue = calculateReliability();
         _capacityValue = calculateCapacity();
         _integrationValue = calculateIntegration();
@@ -297,6 +300,7 @@ public class PeerProfile {
     }
     
     private double calculateSpeed() { return _context.speedCalculator().calc(this); }
+    private double calculateOldSpeed() { return _context.oldSpeedCalculator().calc(this); }
     private double calculateReliability() { return _context.reliabilityCalculator().calc(this); }
     private double calculateCapacity() { return _context.capacityCalculator().calc(this); }
     private double calculateIntegration() { return _context.integrationCalculator().calc(this); }

@@ -1,4 +1,13 @@
-$Id: history.txt,v 1.167 2005/03/07 21:45:14 jrandom Exp $
+$Id: history.txt,v 1.168 2005/03/11 17:23:41 jrandom Exp $
+
+2005-03-14  jrandom
+    * New strict speed calculator that goes off the actual number of messages
+      verifiably sent through the peer by way of tunnels.  Initially, this only
+      contains the successful message count on inbound tunnels, but may be 
+      augmented later to include verified outbound messages, peers queried in 
+      the netDb, etc.  The speed calculation decays quickly, but should give
+      a better differential than the previous stat (both values are shown on 
+      the /profiles.jsp page)
 
 2005-03-11  jrandom
     * Rather than the fixed resend timeout floor (10s), use 10s+RTT as the 

@@ -98,6 +98,19 @@ public class TunnelParticipant {
         }
     }
     
+    public int getCompleteCount() { 
+        if (_handler != null)
+            return _handler.getCompleteCount();
+        else
+            return 0;
+    }
+    public int getFailedCount() { 
+        if (_handler != null)
+            return _handler.getFailedCount();
+        else
+            return 0;
+    }
+    
     private class DefragmentedHandler implements FragmentHandler.DefragmentedReceiver {
         public void receiveComplete(I2NPMessage msg, Hash toRouter, TunnelId toTunnel) {
             if (_log.shouldLog(Log.DEBUG))

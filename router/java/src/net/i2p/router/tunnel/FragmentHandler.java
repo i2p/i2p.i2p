@@ -29,6 +29,8 @@ public class FragmentHandler {
     private Log _log;
     private Map _fragmentedMessages;
     private DefragmentedReceiver _receiver;
+    private int _completed;
+    private int _failed;
     
     /** don't wait more than 60s to defragment the partial message */
     private static final long MAX_DEFRAGMENT_TIME = 60*1000;
@@ -83,6 +85,9 @@ public class FragmentHandler {
             throw e;
         }
     }
+    
+    public int getCompleteCount() { return _completed; }
+    public int getFailedCount() { return _failed; }
     
     private static final ByteCache _validateCache = ByteCache.getInstance(512, TrivialPreprocessor.PREPROCESSED_SIZE);
     
@@ -312,6 +317,7 @@ public class FragmentHandler {
     }
     
     private void receiveComplete(FragmentedMessage msg) {
+        _completed++;
         try {
             byte data[] = msg.toByteArray();
             if (_log.shouldLog(Log.DEBUG))
@@ -362,6 +368,7 @@ public class FragmentHandler {
                 removed = (null != _fragmentedMessages.remove(new Long(_msg.getMessageId())));
             }
             if (removed && !_msg.getReleased()) {
+                _failed++;
                 noteFailure(_msg.getMessageId());
                 if (_log.shouldLog(Log.ERROR))
                     _log.error("Dropped failed fragmented message: " + _msg);

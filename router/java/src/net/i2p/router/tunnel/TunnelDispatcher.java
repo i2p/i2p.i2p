@@ -14,6 +14,7 @@ import net.i2p.data.TunnelId;
 import net.i2p.data.i2np.I2NPMessage;
 import net.i2p.data.i2np.TunnelDataMessage;
 import net.i2p.data.i2np.TunnelGatewayMessage;
+import net.i2p.router.peermanager.PeerProfile;
 import net.i2p.router.JobImpl;
 import net.i2p.router.Router;
 import net.i2p.router.Service;
@@ -248,22 +249,37 @@ public class TunnelDispatcher implements Service {
             TunnelId recvId = cfg.getConfig(cfg.getLength()-1).getReceiveTunnel();
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("removing our own inbound " + cfg);
-            boolean removed = false;
+            TunnelParticipant participant = null;
             synchronized (_participants) {
-                removed = (null != _participants.remove(recvId));
+                participant = (TunnelParticipant)_participants.remove(recvId);
             }
-            if (!removed) {
+            if (participant == null) {
                 synchronized (_inboundGateways) {
                     _inboundGateways.remove(recvId);
+                }
+            } else {
+                // update stats based off getCompleteCount() + getFailedCount()
+                for (int i = 0; i < cfg.getLength(); i++) {
+                    Hash peer = cfg.getPeer(i);
+                    PeerProfile profile = _context.profileOrganizer().getProfile(peer);
+                    if (profile != null) {
+                        int ok = participant.getCompleteCount();
+                        int fail = participant.getFailedCount();
+                        profile.getTunnelHistory().incrementProcessed(ok, fail);
+                    }
                 }
             }
         } else {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("removing our own outbound " + cfg);
             TunnelId outId = cfg.getConfig(0).getSendTunnel();
+            TunnelGateway gw = null;
             synchronized (_outboundGateways) {
-                _outboundGateways.remove(outId);
+                gw = (TunnelGateway)_outboundGateways.remove(outId);
             }   
+            if (gw != null) {
+                // update stats based on gw.getMessagesSent()
+            }
         }
     }
     
