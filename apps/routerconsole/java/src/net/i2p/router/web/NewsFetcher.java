@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.List;
+import java.util.StringTokenizer;
 
 import net.i2p.I2PAppContext;
 import net.i2p.data.DataHelper;
@@ -99,7 +100,7 @@ public class NewsFetcher implements Runnable, EepGet.StatusListener {
     }
     
     private static final String VERSION_STRING = "version=\"" + RouterVersion.VERSION + "\"";
-    
+    private static final String VERSION_PREFIX = "version=\"";
     private void checkForUpdates() {
         File news = new File(NEWS_FILE);
         if (!news.exists()) return;
@@ -108,6 +109,26 @@ public class NewsFetcher implements Runnable, EepGet.StatusListener {
             in = new FileInputStream(news);
             StringBuffer buf = new StringBuffer(128);
             while (DataHelper.readLine(in, buf)) {
+                int index = buf.indexOf(VERSION_PREFIX);
+                if (index == -1) {
+                    // skip
+                } else {
+                    int end = buf.indexOf("\"", index + VERSION_PREFIX.length());
+                    if (end > index) {
+                        String ver = buf.substring(index+VERSION_PREFIX.length(), end);
+                        if (_log.shouldLog(Log.DEBUG))
+                            _log.debug("Found version: [" + ver + "]");
+                        if (needsUpdate(ver)) {
+                            if (_log.shouldLog(Log.DEBUG))
+                                _log.debug("Our version is out of date, update!");
+                            break;
+                        } else {
+                            if (_log.shouldLog(Log.DEBUG))
+                                _log.debug("Our version is current");
+                            return;
+                        }
+                    }
+                }
                 if (buf.indexOf(VERSION_STRING) != -1) {
                     if (_log.shouldLog(Log.DEBUG))
                         _log.debug("Our version found, no need to update: " + buf.toString());
@@ -149,6 +170,54 @@ public class NewsFetcher implements Runnable, EepGet.StatusListener {
         } else {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Policy requests manual update, so we do nothing");
+        }
+    }
+    
+    private boolean needsUpdate(String version) {
+        StringTokenizer newTok = new StringTokenizer(sanitize(version), ".");
+        StringTokenizer ourTok = new StringTokenizer(sanitize(RouterVersion.VERSION), ".");
+        
+        while (newTok.hasMoreTokens() && ourTok.hasMoreTokens()) {
+            String newVer = newTok.nextToken();
+            String oldVer = ourTok.nextToken();
+            switch (compare(newVer, oldVer)) {
+                case -1: // newVer is smaller
+                    return false;
+                case 0: // eq
+                    break;
+                case 1: // newVer is larger
+                    return true;
+            }
+        }
+        if (newTok.hasMoreTokens() && !ourTok.hasMoreTokens())
+            return true;
+        return false;
+    }
+    
+    private static final String VALID = "0123456789.";
+    private static final String sanitize(String str) {
+        StringBuffer buf = new StringBuffer(str);
+        for (int i = 0; i < buf.length(); i++) {
+            if (VALID.indexOf(buf.charAt(i)) == -1) {
+                buf.deleteCharAt(i);
+                i--;
+            }
+        }
+        return buf.toString();
+    }
+    
+    private static final int compare(String lhs, String rhs) {
+        try {
+            int left = Integer.parseInt(lhs);
+            int right = Integer.parseInt(rhs);
+            if (left < right) 
+                return -1;
+            else if (left == right)
+                return 0;
+            else
+                return 1;
+        } catch (NumberFormatException nfe) {
+            return 0;
         }
     }
     

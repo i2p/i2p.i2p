@@ -1,4 +1,8 @@
-$Id: history.txt,v 1.177 2005/03/23 20:54:23 connelly Exp $
+$Id: history.txt,v 1.178 2005/03/23 21:38:10 jrandom Exp $
+
+2005-03-23  jrandom
+    * Added more intelligent version checking in news.xml, in case we have a 
+      version newer than the one specified.
 
 2005-03-23  jrandom
     * Added support for Transfer-Encoding: chunked to the EepGet, so that the
