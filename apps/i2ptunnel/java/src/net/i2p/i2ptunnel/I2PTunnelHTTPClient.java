@@ -120,7 +120,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
             l.log("Proxy list is emtpy - no outproxy available");
             return null;
         }
-        int index = I2PAppContext.getGlobalContext().random().nextInt(proxyList.size()-1);
+        int index = I2PAppContext.getGlobalContext().random().nextInt(proxyList.size());
         return (String)proxyList.get(index);
     }
     
