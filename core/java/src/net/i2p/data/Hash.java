@@ -12,14 +12,13 @@ package net.i2p.data;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-
-import net.i2p.util.Log;
-
-import java.util.Map;
 import java.util.HashMap;
-import java.util.Set;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
+
+import net.i2p.util.Log;
 
 /**
  * Defines the hash as defined by the I2P data structure spec.

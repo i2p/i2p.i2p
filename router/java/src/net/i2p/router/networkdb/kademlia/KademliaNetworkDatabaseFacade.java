@@ -8,6 +8,9 @@ package net.i2p.router.networkdb.kademlia;
  *
  */
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
@@ -34,10 +37,6 @@ import net.i2p.router.networkdb.DatabaseSearchReplyMessageHandler;
 import net.i2p.router.networkdb.DatabaseStoreMessageHandler;
 import net.i2p.router.networkdb.PublishLocalRouterInfoJob;
 import net.i2p.util.Log;
-
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.File;
 
 /**
  * Kademlia based version of the network database

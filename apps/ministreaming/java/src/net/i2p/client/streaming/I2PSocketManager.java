@@ -23,7 +23,6 @@ import net.i2p.client.I2PSessionListener;
 import net.i2p.data.Base64;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.Destination;
-import net.i2p.stat.StatManager;
 import net.i2p.util.Log;
 
 

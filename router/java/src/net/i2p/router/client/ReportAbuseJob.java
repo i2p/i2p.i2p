@@ -8,8 +8,6 @@ package net.i2p.router.client;
  *
  */
 
-import java.io.IOException;
-
 import net.i2p.data.i2cp.AbuseReason;
 import net.i2p.data.i2cp.AbuseSeverity;
 import net.i2p.data.i2cp.I2CPMessageException;

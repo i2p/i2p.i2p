@@ -1,12 +1,9 @@
 package net.i2p.crypto;
 
 import net.i2p.I2PAppContext;
-import net.i2p.data.Hash;
 import net.i2p.data.Signature;
 import net.i2p.data.SigningPrivateKey;
 import net.i2p.data.SigningPublicKey;
-import net.i2p.util.Log;
-import net.i2p.util.NativeBigInteger;
 
 /**
  * Stub that offers no authentication.

@@ -30,7 +30,6 @@ import net.i2p.data.i2np.TunnelConfigurationSessionKey;
 import net.i2p.data.i2np.TunnelSessionKey;
 import net.i2p.data.i2np.TunnelSigningPrivateKey;
 import net.i2p.data.i2np.TunnelSigningPublicKey;
-
 import net.i2p.util.Log;
 
 /**

@@ -10,8 +10,6 @@ package net.i2p.router.transport.tcp;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.BufferedOutputStream;
-import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.net.Socket;
@@ -24,8 +22,6 @@ import net.i2p.data.DataHelper;
 import net.i2p.data.RouterIdentity;
 import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
-import net.i2p.router.transport.BandwidthLimitedInputStream;
-import net.i2p.router.transport.BandwidthLimitedOutputStream;
 import net.i2p.util.I2PThread;
 import net.i2p.util.Log;
 

@@ -8,8 +8,6 @@ package net.i2p.router.client;
  *
  */
 
-import java.io.IOException;
-
 import net.i2p.data.Payload;
 import net.i2p.data.i2cp.CreateLeaseSetMessage;
 import net.i2p.data.i2cp.CreateSessionMessage;

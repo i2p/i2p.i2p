@@ -11,9 +11,6 @@ package net.i2p.router.networkdb.kademlia;
 import java.math.BigInteger;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Iterator;
 
 import net.i2p.I2PAppContext;
 import net.i2p.data.DataHelper;

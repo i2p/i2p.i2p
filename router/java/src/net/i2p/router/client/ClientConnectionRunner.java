@@ -11,9 +11,9 @@ package net.i2p.router.client;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -33,9 +33,9 @@ import net.i2p.data.i2cp.SessionId;
 import net.i2p.router.Job;
 import net.i2p.router.JobImpl;
 import net.i2p.router.RouterContext;
+import net.i2p.util.I2PThread;
 import net.i2p.util.Log;
 import net.i2p.util.RandomSource;
-import net.i2p.util.I2PThread;
 
 /**
  * Bridge the router and the client - managing state for a client.

@@ -8,7 +8,6 @@ package net.i2p.router.client;
  *
  */
 
-import java.io.IOException;
 import java.util.Date;
 
 import net.i2p.data.LeaseSet;

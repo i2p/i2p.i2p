@@ -8,18 +8,17 @@ package net.i2p.util;
  *
  */
 
-import java.math.BigInteger;
-import java.util.Random;
-import java.security.SecureRandom;
-
-import java.net.URL;
 import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.io.FileOutputStream;
-import java.io.FileInputStream;
-import java.io.InputStream;
-import java.io.IOException;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.math.BigInteger;
+import java.net.URL;
+import java.security.SecureRandom;
+import java.util.Random;
 
 /**
  * <p>BigInteger that takes advantage of the jbigi library for the modPow operation,

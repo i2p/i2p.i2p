@@ -1,26 +1,26 @@
 package net.i2p.router.peermanager;
 
-import net.i2p.data.Hash;
-import net.i2p.data.RouterInfo;
-import net.i2p.data.TunnelId;
-import net.i2p.data.i2np.DeliveryStatusMessage;
-import net.i2p.data.i2np.DatabaseStoreMessage;
-import net.i2p.data.i2np.I2NPMessage;
-import net.i2p.router.JobImpl;
-import net.i2p.router.RouterContext;
-import net.i2p.router.TunnelInfo;
-import net.i2p.router.ReplyJob;
-import net.i2p.router.MessageSelector;
-import net.i2p.router.PeerSelectionCriteria;
-import net.i2p.router.TunnelSelectionCriteria;
-import net.i2p.router.message.SendTunnelMessageJob;
-import net.i2p.util.Log;
-
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+
+import net.i2p.data.Hash;
+import net.i2p.data.RouterInfo;
+import net.i2p.data.TunnelId;
+import net.i2p.data.i2np.DatabaseStoreMessage;
+import net.i2p.data.i2np.DeliveryStatusMessage;
+import net.i2p.data.i2np.I2NPMessage;
+import net.i2p.router.JobImpl;
+import net.i2p.router.MessageSelector;
+import net.i2p.router.PeerSelectionCriteria;
+import net.i2p.router.ReplyJob;
+import net.i2p.router.RouterContext;
+import net.i2p.router.TunnelInfo;
+import net.i2p.router.TunnelSelectionCriteria;
+import net.i2p.router.message.SendTunnelMessageJob;
+import net.i2p.util.Log;
 
 /**
  * Grab some peers that we want to test and probe them briefly to get some 
