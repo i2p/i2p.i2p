@@ -1,4 +1,9 @@
-$Id: history.txt,v 1.56 2004/10/24 18:00:44 jrandom Exp $
+$Id: history.txt,v 1.57 2004/10/27 21:11:52 jrandom Exp $
+
+2004-10-29  jrandom
+    * Strip the Referer, Via, and From headers completely, rather than 
+      inserting a bogus value ("i2p").  This should help with the use of
+      SnipSnap and Geeklog (thanks nickster and DrWoo!)
 
 2004-10-27  jrandom
     * Fix a strange race condition on i2cp client disconnect.
