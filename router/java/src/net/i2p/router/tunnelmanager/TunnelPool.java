@@ -524,7 +524,7 @@ class TunnelPool {
         return found;
     }
     
-    private static final int MAX_FAILURES_PER_TUNNEL = 2;
+    private static final int MAX_FAILURES_PER_TUNNEL = 0;
     
     public void tunnelFailed(TunnelId id) {
         if (!_isLive) return;
