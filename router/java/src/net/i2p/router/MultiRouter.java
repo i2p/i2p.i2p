@@ -67,13 +67,13 @@ public class MultiRouter {
             router.setKillVMOnEnd(false);
             _routers.add(router);
             _log.info("Router " + i + " created from " + args[i]);
-            try { Thread.sleep(5*1000 + new java.util.Random().nextInt(5)*1000); } catch (InterruptedException ie) {}
+            try { Thread.sleep(2*1000); } catch (InterruptedException ie) {}
         }
         
         for (int i = 0; i < _routers.size(); i++) {
             ((Router)_routers.get(i)).runRouter();
             _log.info("Router " + i + " started");
-            try { Thread.sleep(4*1000 + new java.util.Random().nextInt(4)*1000); } catch (InterruptedException ie) {}
+            try { Thread.sleep(2*1000 + new java.util.Random().nextInt(2)*1000); } catch (InterruptedException ie) {}
         }
         _log.info("All " + _routers.size() + " routers started up");
         waitForCompletion();
