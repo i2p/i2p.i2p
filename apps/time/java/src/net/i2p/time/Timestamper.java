@@ -50,13 +50,13 @@ public class Timestamper implements Runnable {
             while (true) {
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("Querying servers " + _serverList);
-                long now = NtpClient.currentTime(_serverList);
-                if (now < 0) {
-                    _log.error("Unable to contact any of the NTP servers - network disconnect?");
-                } else {
+                try {
+                    long now = NtpClient.currentTime(_serverList);
                     if (_log.shouldLog(Log.DEBUG))
                         _log.debug("Stamp time");
                     stampTime(now);
+                } catch (IllegalArgumentException iae) {
+                    _log.log(Log.CRIT, "Unable to reach any of the NTP servers - network disconnected?");
                 }
                 try { Thread.sleep(DELAY_MS); } catch (InterruptedException ie) {}
             }
