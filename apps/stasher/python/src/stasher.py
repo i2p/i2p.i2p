@@ -165,7 +165,7 @@ timeout = {
     'ping' : 60,
     'findNode' : 60,
     'findData' : 60,
-    'store' : 120,
+    'store' : 60,
     }
 
 logToSocket = None
@@ -1863,15 +1863,18 @@ class KRpcFindNode(KRpc):
         # start our ticker
         self.nextTickTime = time.time() + timeout['findNode']
     
+        numQueriesSent = 0
+    
         # and send them findNode queries
         if len(somePeerRecs) > 0:
             for peerRec in somePeerRecs:
                 self.log(3, "querying %s" % peerRec)
                 if self.numQueriesPending < maxConcurrentQueries:
                     self.sendOneQuery(peerRec)
+                    numQueriesSent += 1
                 else:
                     break
-            self.log(3, "queries sent, awaiting reply")
+            self.log(3, "%s queries sent, awaiting reply" % numQueriesSent)
         else:
             self.log(3, "no peer recs???")
             for peerRec in self.peerTab:
@@ -2317,12 +2320,11 @@ class KRpcStore(KRpc):
     
         self.log(2, "STORE RPC findNode - got peers %s" % repr(peers))
     
-        self.numPeersToStore = min(len(peers), numStorePeers)
+        i = 0
+    
         self.numPeersSucceeded = 0
         self.numPeersFailed = 0
         self.numPeersFinished = 0
-    
-        i = 0
     
         # and fire off store messages for each peer
         for peer in peers:
@@ -2341,7 +2343,12 @@ class KRpcStore(KRpc):
             if i >= numStorePeers:
                 break
     
+        self.nextTickTime = time.time() + timeout['store']
+    
         self.log(2, "Sent store cmd to %s peers, awaiting responses" % i)
+    
+        self.numPeersToStore = i
+    
     
     #@-node:on_doneFindNode
     #@+node:on_reply
@@ -2360,9 +2367,15 @@ class KRpcStore(KRpc):
     #@-node:on_reply
     #@+node:on_tick
     def on_tick(self):
-        self.log(3, "got a timeout tick, what should we do??")
     
-        self.nextTickTime = time.time() + 3
+        self.log(3, "Timeout awaiting store reply from %d out of %d peers" % (
+            self.numPeersToStore - self.numPeersSucceeded, self.numPeersToStore))
+    
+        if self.numPeersSucceeded == 0:
+            self.log(3, "Store timeout - no peers replied, storing locally")
+            self.localNode.storage.putKey(self.keyHashed, self.value, keyIsHashed=True)
+    
+        self.returnValue(True)
     
     #@-node:on_tick
     #@-others
@@ -3262,7 +3275,7 @@ class KNode(KBase):
     
         # check for timed-out RPCs
         for rpc in self.rpcPending[:]:
-            if now >= rpc.nextTickTime:
+            if rpc.nextTickTime != None and now >= rpc.nextTickTime:
                 try:
                     rpc.on_tick()
                 except:
