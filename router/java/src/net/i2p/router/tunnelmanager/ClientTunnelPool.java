@@ -165,9 +165,12 @@ class ClientTunnelPool {
         }
     }
     public TunnelInfo removeInboundTunnel(TunnelId id) {
+        TunnelInfo info = null;
         synchronized (_inboundTunnels) {
-            return (TunnelInfo)_inboundTunnels.remove(id);
+            info = (TunnelInfo)_inboundTunnels.remove(id);
         }
+        _pool.addTunnelStats(id, info);
+        return info;
     }
     
     public Set getInactiveInboundTunnelIds() { 
@@ -186,8 +189,11 @@ class ClientTunnelPool {
         }
     }
     public TunnelInfo removeInactiveInboundTunnel(TunnelId id) {
+        TunnelInfo info = null;
         synchronized (_inactiveInboundTunnels) {
-            return (TunnelInfo)_inactiveInboundTunnels.remove(id);
+            info = (TunnelInfo)_inactiveInboundTunnels.remove(id);
         }
+        _pool.addTunnelStats(id, info);
+        return info;
     }
 }

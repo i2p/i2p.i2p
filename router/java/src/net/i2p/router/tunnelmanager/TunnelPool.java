@@ -61,6 +61,9 @@ class TunnelPool {
 
         _context.statManager().createFrequencyStat("tunnel.failFrequency", "How often do tunnels prematurely fail (after being successfully built)?", "Tunnels", new long[] { 60*1000l, 60*60*1000l, 24*60*60*1000l });
         _context.statManager().createRateStat("tunnel.failAfterTime", "How long do tunnels that fail prematurely last before failing?", "Tunnels", new long[] { 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
+        _context.statManager().createRateStat("tunnel.inboundMessagesProcessed", "How many messages does an inbound tunnel process in its lifetime?", "Tunnels", new long[] { 10*60*1000l, 60*60*1000l, 24*60*60*1000l });
+        _context.statManager().createRateStat("tunnel.outboundMessagesProcessed", "How many messages does an inbound tunnel process in its lifetime?", "Tunnels", new long[] { 10*60*1000l, 60*60*1000l, 24*60*60*1000l });
+        _context.statManager().createRateStat("tunnel.participatingMessagesProcessed", "How many messages does an inbound tunnel process in its lifetime?", "Tunnels", new long[] { 10*60*1000l, 60*60*1000l, 24*60*60*1000l });
 
         _isLive = true;
         _persistenceHelper = new TunnelPoolPersistenceHelper(_context);
@@ -229,10 +232,12 @@ class TunnelPool {
         if (!_isLive) return;
         if (_log.shouldLog(Log.DEBUG)) _log.debug(toString() + ": Removing outbound tunnel " + id);
         int remaining = 0;
+        TunnelInfo info = null;
         synchronized (_outboundTunnels) {
-            _outboundTunnels.remove(id);
+            info = (TunnelInfo)_outboundTunnels.remove(id);
             remaining = _outboundTunnels.size();
         }
+        addTunnelStats(id, info);
         if (remaining <= 0) {
             buildFakeTunnels();
         }
@@ -283,6 +288,7 @@ class TunnelPool {
             rv = (TunnelInfo)_freeInboundTunnels.remove(id);
             remaining = _freeInboundTunnels.size();
         }
+        addTunnelStats(id, rv);
         if (remaining <= 0)
             buildFakeTunnels();
         return rv;
@@ -328,9 +334,12 @@ class TunnelPool {
     public TunnelInfo removeParticipatingTunnel(TunnelId id) {
         if (!_isLive) return null;
         if (_log.shouldLog(Log.DEBUG)) _log.debug(toString() + ": Removing participating tunnel " + id);
+        TunnelInfo info = null;
         synchronized (_participatingTunnels) {
-            return (TunnelInfo)_participatingTunnels.remove(id);
+            info = (TunnelInfo)_participatingTunnels.remove(id);
         }
+        addTunnelStats(id, info);
+        return info;
     }
     
     /**
@@ -418,9 +427,11 @@ class TunnelPool {
     public void removePendingTunnel(TunnelId id) {
         if (!_isLive) return;
         if (_log.shouldLog(Log.DEBUG)) _log.debug(toString() + ": Removing pending tunnel " + id);
+        TunnelInfo info = null;
         synchronized (_pendingTunnels) {
-            _pendingTunnels.remove(id);
+            info = (TunnelInfo)_pendingTunnels.remove(id);
         }
+        addTunnelStats(id, info);
     }
     
     /** fetch the settings for the pool (tunnel settings and quantities) */
@@ -575,6 +586,34 @@ class TunnelPool {
     }
     
     public boolean isLive() { return _isLive; }
+    
+    void addTunnelStats(TunnelId id, TunnelInfo info) {
+        if ( (info != null) && (id != null) ) {
+            switch (id.getType()) {
+                case TunnelId.TYPE_INBOUND:
+                    _context.statManager().addRateData("tunnel.inboundMessagesProcessed", 
+                                                       info.getMessagesProcessed(), 
+                                                       info.getSettings().getExpiration() -
+                                                       info.getSettings().getCreated());
+                    break;
+                case TunnelId.TYPE_OUTBOUND:
+                    _context.statManager().addRateData("tunnel.outboundMessagesProcessed", 
+                                                       info.getMessagesProcessed(), 
+                                                       info.getSettings().getExpiration() -
+                                                       info.getSettings().getCreated());
+                    break;
+                case TunnelId.TYPE_PARTICIPANT:
+                    _context.statManager().addRateData("tunnel.participatingMessagesProcessed", 
+                                                       info.getMessagesProcessed(), 
+                                                       info.getSettings().getExpiration() -
+                                                       info.getSettings().getCreated());
+                    break;
+                case TunnelId.TYPE_UNSPECIFIED:
+                default:
+                    break;
+            }
+        }
+    }
     
     private ClientTunnelSettings createPoolSettings() {
         ClientTunnelSettings settings = new ClientTunnelSettings();
