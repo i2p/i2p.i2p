@@ -290,6 +290,37 @@ public class JobQueue {
     boolean isAlive() { return _alive; }
     
     /**
+     * When did the most recently begin job start?
+     */
+    public long getLastJobBegin() { 
+        long when = -1;
+        // not synchronized, so might b0rk if the runners are changed
+        for (Iterator iter = _queueRunners.values().iterator(); iter.hasNext(); ) {
+            long cur = ((JobQueueRunner)iter.next()).getLastBegin();
+            if (cur > when)
+                cur = when;
+        }
+        return when; 
+    }
+    /** 
+     * retrieve the most recently begin and still currently active job, or null if
+     * no jobs are running
+     */
+    public Job getLastJob() { 
+        Job j = null;
+        long when = -1;
+        // not synchronized, so might b0rk if the runners are changed
+        for (Iterator iter = _queueRunners.values().iterator(); iter.hasNext(); ) {
+            JobQueueRunner cur = (JobQueueRunner)iter.next();
+            if (cur.getLastBegin() > when) {
+                j = cur.getCurrentJob();
+                when = cur.getLastBegin();
+            }
+        }
+        return j;
+    }
+    
+    /**
      * Blocking call to retrieve the next ready job
      *
      */

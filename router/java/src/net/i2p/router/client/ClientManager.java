@@ -234,7 +234,7 @@ public class ClientManager {
         return false;
     }
     
-    private ClientConnectionRunner getRunner(Destination dest) {
+    ClientConnectionRunner getRunner(Destination dest) {
         ClientConnectionRunner rv = null;
         long beforeLock = _context.clock().now();
         long inLock = 0;
@@ -300,7 +300,7 @@ public class ClientManager {
         }
     }
     
-    private Set getRunnerDestinations() {
+    Set getRunnerDestinations() {
         Set dests = new HashSet();
         long beforeLock = _context.clock().now();
         long inLock = 0;

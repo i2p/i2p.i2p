@@ -51,7 +51,7 @@ public abstract class I2NPMessageImpl extends DataStructureImpl implements I2NPM
             throw new DataFormatException("Bad bytes", ime);
         }
     }
-    public void readBytes(InputStream in, int type, byte buffer[]) throws I2NPMessageException, IOException {
+    public int readBytes(InputStream in, int type, byte buffer[]) throws I2NPMessageException, IOException {
         try {
             if (type < 0)
                 type = (int)DataHelper.readLong(in, 1);
@@ -85,6 +85,7 @@ public abstract class I2NPMessageImpl extends DataStructureImpl implements I2NPM
             long time = _context.clock().now() - start;
             if (time > 50)
                 _context.statManager().addRateData("i2np.readTime", time, time);
+            return size + Hash.HASH_LENGTH + 1 + 4 + DataHelper.DATE_LENGTH;
         } catch (DataFormatException dfe) {
             throw new I2NPMessageException("Error reading the message header", dfe);
         }

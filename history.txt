@@ -1,4 +1,11 @@
-$Id: history.txt,v 1.40 2004/10/08 13:38:49 jrandom Exp $
+$Id: history.txt,v 1.41 2004/10/08 17:53:03 jrandom Exp $
+
+2004-10-09  jrandom
+    * Added a watchdog timer to do some baseline liveliness checking to help 
+      debug some odd errors.
+    * Added a pair of summary stats for bandwidth usage, allowing easy export
+      with the other stats ("bw.sendBps" and "bw.receiveBps")
+    * Trimmed another memory allocation on message reception.
 
 2004-10-08  jrandom
     * Revamp the AESInputStream so it doesn't allocate any temporary objects 

@@ -127,6 +127,11 @@ public class Router {
         _gracefulShutdownDetector.setName("Graceful shutdown hook");
         _gracefulShutdownDetector.start();
         
+        I2PThread watchdog = new I2PThread(new RouterWatchdog(_context));
+        watchdog.setName("RouterWatchdog");
+        watchdog.setDaemon(true);
+        watchdog.start();
+        
         _shutdownTasks = new HashSet(0);
     }
     
@@ -260,10 +265,35 @@ public class Router {
      *
      */
     private final class CoallesceStatsJob extends JobImpl {
-        public CoallesceStatsJob() { super(Router.this._context); }
+        public CoallesceStatsJob() { 
+            super(Router.this._context); 
+            Router.this._context.statManager().createRateStat("bw.receiveBps", "How fast we receive data", "Bandwidth", new long[] { 60*1000, 5*60*1000, 60*60*1000 });
+            Router.this._context.statManager().createRateStat("bw.sendBps", "How fast we send data", "Bandwidth", new long[] { 60*1000, 5*60*1000, 60*60*1000 });
+        }
         public String getName() { return "Coallesce stats"; }
         public void runJob() {
             Router.this._context.statManager().coallesceStats();
+            
+            RateStat receiveRate = _context.statManager().getRate("transport.receiveMessageSize");
+            if (receiveRate != null) {
+                Rate rate = receiveRate.getRate(60*1000);
+                if (rate != null) { 
+                    double bytes = rate.getLastTotalValue();
+                    double bps = (bytes*1000.0d)/(rate.getPeriod()*1024.0d); 
+                    Router.this._context.statManager().addRateData("bw.receiveBps", (long)bps, 60*1000);
+                }
+            }
+
+            RateStat sendRate = _context.statManager().getRate("transport.sendMessageSize");
+            if (sendRate != null) {
+                Rate rate = receiveRate.getRate(60*1000);
+                if (rate != null) {
+                    double bytes = rate.getLastTotalValue();
+                    double bps = (bytes*1000.0d)/(rate.getPeriod()*1024.0d); 
+                    Router.this._context.statManager().addRateData("bw.sendBps", (long)bps, 60*1000);
+                }
+            }
+
             requeue(60*1000);
         }
     }

@@ -11,6 +11,7 @@ class JobQueueRunner implements Runnable {
     private long _numJobs;
     private Job _currentJob;
     private Job _lastJob;
+    private long _lastBegin;
     
     public JobQueueRunner(RouterContext context, int id) {
         _context = context;
@@ -31,6 +32,7 @@ class JobQueueRunner implements Runnable {
     public int getRunnerId() { return _id; }
     public void stopRunning() { _keepRunning = false; }
     public void startRunning() { _keepRunning = true; }
+    public long getLastBegin() { return _lastBegin; }
     public void run() {
         long lastActive = _context.clock().now();
         long jobNum = 0;
@@ -103,6 +105,7 @@ class JobQueueRunner implements Runnable {
     
     private void runCurrentJob() {
         try {
+            _lastBegin = _context.clock().now();
             _currentJob.runJob();
         } catch (OutOfMemoryError oom) {
             try {

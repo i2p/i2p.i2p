@@ -69,7 +69,7 @@ class I2NPMessageReaderTest implements I2NPMessageReader.I2NPMessageEventListene
         _log.debug("Disconnected");
     }
     
-    public void messageReceived(I2NPMessageReader reader, I2NPMessage message, long msToRead) {
+    public void messageReceived(I2NPMessageReader reader, I2NPMessage message, long msToRead, int size) {
         _log.debug("Message received: " + message);
     }
     

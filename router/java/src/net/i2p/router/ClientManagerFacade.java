@@ -65,6 +65,8 @@ public abstract class ClientManagerFacade implements Service {
     
     public abstract void messageReceived(ClientMessage msg);
     
+    public boolean verifyClientLiveliness() { return true; }
+
     /**
      * Return the client's current config, or null if not connected
      *

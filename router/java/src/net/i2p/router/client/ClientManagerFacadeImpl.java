@@ -10,7 +10,9 @@ package net.i2p.router.client;
 
 import java.io.IOException;
 import java.io.Writer;
+import java.util.Iterator;
 
+import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
 import net.i2p.data.Hash;
 import net.i2p.data.LeaseSet;
@@ -66,6 +68,27 @@ public class ClientManagerFacadeImpl extends ClientManagerFacade {
             _manager.restart();
         else
             startup();
+    }
+    
+    private static final long MAX_TIME_TO_REBUILD = 5*60*1000;
+    public boolean verifyClientLiveliness() {
+        boolean lively = true;
+        for (Iterator iter = _manager.getRunnerDestinations().iterator(); iter.hasNext(); ) {
+            Destination dest = (Destination)iter.next();
+            ClientConnectionRunner runner = _manager.getRunner(dest);
+            if ( (runner == null) || (runner.getIsDead())) continue;
+            LeaseSet ls = runner.getLeaseSet();
+            if (ls == null)
+                continue; // still building
+            long howLongAgo = _context.clock().now() - ls.getEarliestLeaseDate();
+            if (howLongAgo > MAX_TIME_TO_REBUILD) {
+                if (_log.shouldLog(Log.ERROR))
+                    _log.error("Client " + dest.calculateHash().toBase64().substring(0,6)
+                               + " has a leaseSet that expired " + DataHelper.formatDuration(howLongAgo));
+                lively = false;
+            }
+        }
+        return lively;
     }
     
     /**

@@ -26,11 +26,13 @@ public class I2NPMessageHandler {
     private I2PAppContext _context;
     private long _lastReadBegin;
     private long _lastReadEnd;
+    private int _lastSize;
     private byte _messageBuffer[];
     public I2NPMessageHandler(I2PAppContext context) {
         _context = context;
         _log = context.logManager().getLog(I2NPMessageHandler.class);
         _messageBuffer = null;
+        _lastSize = -1;
     }
     
     /**
@@ -49,7 +51,7 @@ public class I2NPMessageHandler {
             if (msg == null)
                 throw new I2NPMessageException("The type "+ type + " is an unknown I2NP message");
             try {
-                msg.readBytes(in, type, _messageBuffer);
+                _lastSize = msg.readBytes(in, type, _messageBuffer);
             } catch (IOException ioe) {
                 throw ioe;
             } catch (I2NPMessageException ime) {
@@ -67,6 +69,7 @@ public class I2NPMessageHandler {
         }
     }
     public long getLastReadTime() { return _lastReadEnd - _lastReadBegin; }
+    public int getLastSize() { return _lastSize; }
     
     /**
      * Yes, this is fairly ugly, but its the only place it ever happens.

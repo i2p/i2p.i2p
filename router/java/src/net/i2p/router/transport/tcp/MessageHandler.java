@@ -29,12 +29,12 @@ public class MessageHandler implements I2NPMessageReader.I2NPMessageEventListene
         _con.closeConnection();
     }
     
-    public void messageReceived(I2NPMessageReader reader, I2NPMessage message, long msToRead) {
+    public void messageReceived(I2NPMessageReader reader, I2NPMessage message, long msToRead, int size) {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Just received message " + message.getUniqueId() + " from " 
                        + _identHash.toBase64().substring(0,6)
                        + " readTime = " + msToRead + "ms type = " + message.getClass().getName());
-        _transport.messageReceived(message, _ident, _identHash, msToRead, message.getMessageSize());
+        _transport.messageReceived(message, _ident, _identHash, msToRead, size);
     }
     
     public void readError(I2NPMessageReader reader, Exception error) {

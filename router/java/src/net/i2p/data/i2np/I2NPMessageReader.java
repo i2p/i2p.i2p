@@ -81,7 +81,7 @@ public class I2NPMessageReader {
          * reader
          *
          */
-        public void messageReceived(I2NPMessageReader reader, I2NPMessage message, long msToRead);
+        public void messageReceived(I2NPMessageReader reader, I2NPMessage message, long msToRead, int bytesRead);
         /**
          * Notify the listener that an exception was thrown while reading from the given
          * reader
@@ -122,7 +122,8 @@ public class I2NPMessageReader {
                         I2NPMessage msg = _handler.readMessage(_stream);
                         if (msg != null) {
                             long msToRead = _handler.getLastReadTime();
-                            _listener.messageReceived(I2NPMessageReader.this, msg, msToRead);
+                            int bytesRead = _handler.getLastSize();
+                            _listener.messageReceived(I2NPMessageReader.this, msg, msToRead, bytesRead);
                         }
                     } catch (I2NPMessageException ime) {
                         if (_log.shouldLog(Log.WARN))
