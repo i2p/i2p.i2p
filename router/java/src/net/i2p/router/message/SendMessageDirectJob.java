@@ -50,7 +50,7 @@ public class SendMessageDirectJob extends JobImpl {
         _message = message;
         _targetHash = toPeer;
         _router = null;
-        if (timeoutMs <= 30) {
+        if (timeoutMs <= 30*1000) {
             _expiration = ctx.clock().now() + 30*1000;
         } else {
             _expiration = timeoutMs + ctx.clock().now();
