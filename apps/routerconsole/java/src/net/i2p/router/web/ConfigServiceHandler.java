@@ -8,26 +8,11 @@ import net.i2p.router.ClientTunnelSettings;
  *
  */
 public class ConfigServiceHandler extends FormHandler {
-    private String _action;
-    private String _nonce;
-    
-    public void ConfigNetHandler() {
-        _action = null;
-        _nonce = null;
-    }
+    public void ConfigNetHandler() {}
     
     protected void processForm() {
         if (_action == null) return;
-        if (_nonce == null) {
-            addFormError("You trying to mess with me?  Huh?  Are you?");
-            return;
-        }
-        String nonce = System.getProperty(ConfigServiceHandler.class.getName() + ".nonce");
-        String noncePrev = System.getProperty(ConfigServiceHandler.class.getName() + ".noncePrev");
-        if ( (!_nonce.equals(nonce)) && (!_nonce.equals(noncePrev)) ) {
-            addFormError("Invalid nonce?  Hmmm, someone is spoofing you.  prev=["+ noncePrev + "] nonce=[" + nonce + "] param=[" + _nonce + "]");
-            return;
-        }
+        
         if ("Shutdown gracefully".equals(_action)) {
             _context.router().shutdownGracefully();
             addFormNotice("Graceful shutdown initiated");
@@ -41,6 +26,4 @@ public class ConfigServiceHandler extends FormHandler {
             addFormNotice("Blah blah blah.  whatever.  I'm not going to " + _action);
         }
     }
-    public void setAction(String action) { _action = action; }
-    public void setNonce(String nonce) { _nonce = nonce; }
 }

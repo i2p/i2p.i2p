@@ -22,6 +22,11 @@
  <i><jsp:getProperty name="formhandler" property="notices" /></i>
   
  <form action="configlogging.jsp" method="POST">
+ <% String prev = System.getProperty("net.i2p.router.web.ConfigLoggingHandler.nonce");
+    if (prev != null) System.setProperty("net.i2p.router.web.ConfigLoggingHandler.noncePrev", prev);
+    System.setProperty("net.i2p.router.web.ConfigLoggingHandler.nonce", new java.util.Random().nextLong()+""); %>
+ <input type="hidden" name="nonce" value="<%=System.getProperty("net.i2p.router.web.ConfigLoggingHandler.nonce")%>" />
+ <input type="hidden" name="action" value="blah" />
  <b>Logging filename:</b> 
     <input type="text" name="logfilename" size="40" value="<jsp:getProperty name="logginghelper" property="logFilePattern" />" /><br />
     <i>(the symbol '#' will be replaced during log rotation)</i><br />

@@ -19,14 +19,20 @@ import net.i2p.router.ClientTunnelSettings;
  */
 public class FormHandler {
     protected RouterContext _context;
+    private String _nonce;
+    protected String _action;
     private List _errors;
     private List _notices;
     private boolean _processed;
+    private boolean _valid;
     
     public FormHandler() {
         _errors = new ArrayList();
         _notices = new ArrayList();
+        _action = null;
         _processed = false;
+        _valid = true;
+        _nonce = null;
     }
     
     /**
@@ -43,6 +49,9 @@ public class FormHandler {
         }
     }
 
+    public void setNonce(String val) { _nonce = val; }
+    public void setAction(String val) { _action = val; }
+    
     /**
      * Override this to perform the final processing (in turn, adding formNotice
      * and formError messages, etc)
@@ -72,6 +81,7 @@ public class FormHandler {
      *
      */
     public String getErrors() { 
+        validate();
         return render(_errors);
     }
     
@@ -81,12 +91,43 @@ public class FormHandler {
      *
      */
     public String getNotices() { 
+        validate();
         return render(_notices);
+    }
+    
+    /**
+     * Make sure the nonce was set correctly, otherwise someone could just 
+     * create a link like /confignet.jsp?hostname=localhost and break the
+     * user's node (or worse).
+     *
+     */
+    private void validate() {
+        if (_processed) return;
+        
+        _valid = true;
+        if (_action == null) {
+            // not a form submit
+            _valid = false;
+            return;
+        }
+        if (_nonce == null) {
+            addFormError("You trying to mess with me?  Huh?  Are you?");
+            _valid = false;
+            return;
+        }
+        String nonce = System.getProperty(getClass().getName() + ".nonce");
+        String noncePrev = System.getProperty(getClass().getName() + ".noncePrev");
+        if ( ( (nonce == null) || (!_nonce.equals(nonce)) ) &&
+             ( (noncePrev == null) || (!_nonce.equals(noncePrev)) ) ) {
+            addFormError("Invalid nonce, are you being spoofed?");
+            _valid = false;
+        }
     }
     
     private String render(List source) {
         if (!_processed) {
-            processForm();
+            if (_valid)
+                processForm();
             _processed = true;
         }
         if (source.size() <= 0) {

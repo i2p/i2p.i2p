@@ -22,6 +22,12 @@
  <i><jsp:getProperty name="formhandler" property="notices" /></i>
 
  <form action="config.jsp" method="POST">
+ <% String prev = System.getProperty("net.i2p.router.web.ConfigNetHandler.nonce");
+    if (prev != null) System.setProperty("net.i2p.router.web.ConfigNetHandler.noncePrev", prev);
+    System.setProperty("net.i2p.router.web.ConfigNetHandler.nonce", new java.util.Random().nextLong()+""); %>
+ <input type="hidden" name="nonce" value="<%=System.getProperty("net.i2p.router.web.ConfigNetHandler.nonce")%>" />
+ <input type="hidden" name="action" value="blah" />
+
  <b>External hostname/IP address:</b> 
     <input name="hostname" type="text" size="32" value="<jsp:getProperty name="nethelper" property="hostname" />" />
     <input type="submit" name="guesshost" value="Guess" /><br />
