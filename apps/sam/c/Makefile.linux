@@ -28,7 +28,7 @@ CC = gcc
 # Flags
 #
 
-CFLAGS = -g -march=i486 -O2 -pipe -std=c99 -Wall
+CFLAGS = -g -O2 -pipe -std=c99 -Wall
 CFLAGS += -DOS=$(OS)
 CFLAGS += -I$(INCDIR)
 
