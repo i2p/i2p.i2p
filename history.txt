@@ -1,4 +1,10 @@
-$Id: history.txt,v 1.114 2004/12/19 11:27:10 jrandom Exp $
+$Id: history.txt,v 1.115 2004/12/19 13:55:09 jrandom Exp $
+
+2004-12-20  jrandom
+    * No longer do a blocking DNS lookup within the jobqueue (thanks mule!)
+    * Set a 60s dns cache TTL, instead of 0s.  Most users who used to use
+      dyndns/etc now just use IP autodetection, so the old "we need ttl=0"
+      reasoning is gone.
 
 2004-12-19  jrandom
     * Fix for a race on startup wrt the new stats (thanks susi!)

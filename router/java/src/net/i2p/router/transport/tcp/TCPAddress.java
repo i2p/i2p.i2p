@@ -170,4 +170,12 @@ public class TCPAddress {
         } 
         return false;
     }
+    
+    public boolean equals(RouterAddress addr) {
+        if (addr == null) return false;
+        Properties opts = addr.getOptions();
+        if (opts == null) return false;
+        return ( (_host.equals(opts.getProperty(PROP_HOST))) &&
+                 (Integer.toString(_port).equals(opts.getProperty(PROP_PORT))) );
+    }
 }

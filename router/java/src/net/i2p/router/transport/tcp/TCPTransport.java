@@ -132,8 +132,7 @@ public class TCPTransport extends TransportImpl {
         if (addr == null) 
             return null;
         
-        TCPAddress tcpAddr = new TCPAddress(addr);
-        if ( (_myAddress != null) && (tcpAddr.equals(_myAddress)) )
+        if ( (_myAddress != null) && (_myAddress.equals(addr)) ) 
             return null; // dont talk to yourself
         
         TransportBid bid = new TransportBid();

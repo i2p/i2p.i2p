@@ -75,9 +75,13 @@ public class Router {
     public final static String PROP_SHUTDOWN_IN_PROGRESS = "__shutdownInProgress";
         
     static {
-        // grumble about sun's java caching DNS entries *forever*
-        System.setProperty("sun.net.inetaddr.ttl", "0");
-        System.setProperty("networkaddress.cache.ttl", "0");
+        // grumble about sun's java caching DNS entries *forever* by default
+        // so lets just keep 'em for a minute
+        System.setProperty("sun.net.inetaddr.ttl", "60");
+        System.setProperty("networkaddress.cache.ttl", "60");
+        // until we handle restricted routes and/or all peers support v6, try v4 first
+        System.setProperty("java.net.preferIPv4Stack", "true");
+        System.setProperty("http.agent", "I2P");
         // (no need for keepalive)
         System.setProperty("http.keepAlive", "false");
         System.setProperty("user.timezone", "GMT");
