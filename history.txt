@@ -1,4 +1,10 @@
-$Id: history.txt,v 1.48 2004/10/14 20:20:12 jrandom Exp $
+$Id: history.txt,v 1.49 2004/10/15 12:39:19 jrandom Exp $
+
+2004-10-16  jrandom
+    * Increased the default minimum tunnel test time to 5 seconds, since we
+      still see the occational message processing time spike to 2 seconds.
+    * Update the SimpleTimer to allow rescheduling a task thats already 
+      queued (useful for the new streaming lib).
 
 2004-10-15  jrandom
     * Replaced old minimum tunnel test timeout of 1s with a configurable

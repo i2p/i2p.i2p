@@ -74,7 +74,7 @@ class TestTunnelJob extends JobImpl {
     }
     
     private final static long DEFAULT_TEST_TIMEOUT = 10*1000; // 10 seconds for a test to succeed
-    private final static long DEFAULT_MINIMUM_TEST_TIMEOUT = 2*1000; // 2 second min
+    private final static long DEFAULT_MINIMUM_TEST_TIMEOUT = 5*1000; // 5 second min
     private final static int TEST_PRIORITY = 100;
     
     /** 

@@ -2,6 +2,7 @@ package net.i2p.util;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -18,10 +19,14 @@ public class SimpleTimer {
     private static final SimpleTimer _instance = new SimpleTimer();
     public static SimpleTimer getInstance() { return _instance; }
     private Log _log;
+    /** event time (Long) to event (TimedEvent) mapping */
     private Map _events;
+    /** event (TimedEvent) to event time (Long) mapping */
+    private Map _eventTimes;
     
     private SimpleTimer() {
         _events = new TreeMap();
+        _eventTimes = new HashMap();
         I2PThread runner = new I2PThread(new SimpleTimerRunner());
         runner.setName("SimpleTimer");
         runner.setDaemon(true);
@@ -35,9 +40,13 @@ public class SimpleTimer {
     public void addEvent(TimedEvent event, long timeoutMs) {
         long eventTime = System.currentTimeMillis() + timeoutMs;
         synchronized (_events) {
+            // remove the old scheduled position, then reinsert it
+            if (_eventTimes.containsKey(event))
+                _events.remove(_eventTimes.get(event));
             while (_events.containsKey(new Long(eventTime)))
                 eventTime++;
             _events.put(new Long(eventTime), event);
+            _eventTimes.put(event, new Long(eventTime));
             _events.notifyAll();
         }
     }
@@ -87,6 +96,8 @@ public class SimpleTimer {
                         if (timesToRemove.size() > 0) { 
                             for (int i = 0; i < timesToRemove.size(); i++) 
                                 _events.remove(timesToRemove.get(i));
+                            for (int i = 0; i < eventsToFire.size(); i++)
+                                _eventTimes.remove(eventsToFire.get(i));
                         } else { 
                             if (nextEventDelay != -1)
                                 _events.wait(nextEventDelay);
