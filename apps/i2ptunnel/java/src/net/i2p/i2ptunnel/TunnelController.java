@@ -102,6 +102,14 @@ public class TunnelController implements Logging {
      *
      */
     public void startTunnel() {
+        try {
+            doStartTunnel();
+        } catch (Exception e) {
+            _log.error("Error starting up the tunnel", e);
+            log("Error starting up the tunnel - " + e.getMessage());
+        }
+    }
+    private void doStartTunnel() {
         if (_running) {
             if (_log.shouldLog(Log.INFO))
                 _log.info("Already running");
@@ -121,7 +129,7 @@ public class TunnelController implements Logging {
         } else if ("server".equals(type)) {
             startServer();
         } else {
-            if (_log.shouldLog(Log.WARN))
+            if (_log.shouldLog(Log.ERROR))
                 _log.error("Cannot start tunnel - unknown type [" + type + "]");
         }
     }
