@@ -32,6 +32,7 @@
         <panel classname="TargetPanel"/>
         <panel classname="InstallPanel"/>
         <panel classname="SimpleFinishPanel"/>
+        <panel classname="ProcessPanel"/>
     </panels>
 
     <packs>
