@@ -29,45 +29,37 @@
  */
 
 #include "platform.hpp"
-#include "main.hpp"
+#include "random.hpp"
 
-Logger logger(LOG_FILE);  // Logging mechanism
-Random prng;  // Random number generator
-Sam *sam;  // SAM connection
-
-int main(int argc, char* argv[])
+/*
+ * Prepares the Yarrow PRNG for use
+ */
+Random::Random(void)
 {
-	logger.set_loglevel(Logger::debug);
+	LINFO << "Initalising PRNG\n";// it could take a bit of time on some systems
 
-	if (argc != 2) {  // put some getopts stuff in here later
-		LERROR << "Please specify your destination name.  e.g. 'bin/enclave " \
-			"enclave'\n";
-		return -1;
-	}
+	int rc = yarrow_start(&prng);
+	assert(rc == CRYPT_OK);
 
-	LINFO << "Enclave DHT - Built on " << __DATE__ << ' ' << __TIME__ << '\n';
-	try {
-		sam = new Sam("localhost", 7656, argv[1], 0);
-	} catch (const Sam_error& x) {
-		LERROR << "SAM error: " << x.what() << '\n';
-		cerr << "SAM error: " << x.what() << '\n';
-		if (x.code() == SAM_SOCKET_ERROR) {
-			LERROR << "Check whether you have specified the correct SAM host " \
-				"and port number, and that I2P is running.\n";
-			cerr << "Check whether you have specified the correct SAM host " \
-				"and port number, and that\nI2P is running.\n";
-		}
-		return 1;
-	}
-	sam->naming_lookup();
-	while (sam->get_my_dest() == "")
-		sam->read_buffer();  // wait until we get our own dest back from lookup
+	uchar_t entropy[ENTROPY_SIZE];
+	size_t sz = rng_get_bytes(entropy, ENTROPY_SIZE, NULL);
+	assert(sz == ENTROPY_SIZE);
 
-	sam->peers->advertise_self();
+	rc = yarrow_add_entropy(entropy, ENTROPY_SIZE, &prng);
+	assert(rc == CRYPT_OK);
 
-	while (true)
-		sam->read_buffer();
+	rc = yarrow_ready(&prng);
+	assert(rc == CRYPT_OK);
+}
 
-	delete sam;
-	return 0;
+/*
+ * Gets `size' random bytes from the PRNG
+ *
+ * random - space to fill with random bytes
+ * size - size of `random'
+ */
+void Random::get_bytes(uchar_t* random, size_t size)
+{
+	size_t sz = yarrow_read(random, size, &prng);
+	assert(sz == size);
 }

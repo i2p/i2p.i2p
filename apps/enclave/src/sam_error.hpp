@@ -35,6 +35,7 @@ class Sam_error {
 	public:
 		Sam_error(samerr_t error)
 			: errcode(error) {}
+
 		samerr_t code(void) const { return errcode; }
 		const char* what(void) const { return sam_strerror(errcode); }
 

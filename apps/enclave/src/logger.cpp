@@ -31,9 +31,8 @@
 #include "platform.hpp"
 #include "logger.hpp"
 
-Logger::Logger(const string& file)
+Logger::Logger(const string& file): file(file)
 {
-	this->file = file;
 	loglevel = priority = debug;
 	logf.open(file.c_str(), ios::app);
 	if (!logf) {

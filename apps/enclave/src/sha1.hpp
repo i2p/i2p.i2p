@@ -38,6 +38,7 @@ class Sha1 {
 		Sha1(void);
 		Sha1(const string& data);
 		Sha1(const uchar_t binary[SHA1BIN_LEN]);
+
 		const string& b64hash(void) const { return b64hashed; }
 		const uchar_t* binhash(void) const { return binhashed; }
 		bool operator<(const Sha1& rhs) const;

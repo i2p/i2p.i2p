@@ -36,6 +36,7 @@ class Sam {
 		Sam(const char* samhost, uint16_t samport, const char* destname,
 			uint_t tunneldepth);
 		~Sam(void);
+
 		const string& get_my_dest(void) const { return my_dest; }
 		const Sha1& get_my_sha1(void) const { return my_sha1; }
 		void naming_lookup(const string& name = "ME") const;

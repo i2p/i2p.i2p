@@ -28,46 +28,18 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "platform.hpp"
-#include "main.hpp"
+#ifndef RANDOM_HPP
+#define RANDOM_HPP
 
-Logger logger(LOG_FILE);  // Logging mechanism
-Random prng;  // Random number generator
-Sam *sam;  // SAM connection
+class Random {
+	public:
+		Random(void);
 
-int main(int argc, char* argv[])
-{
-	logger.set_loglevel(Logger::debug);
+		void get_bytes(uchar_t* random, size_t size);
 
-	if (argc != 2) {  // put some getopts stuff in here later
-		LERROR << "Please specify your destination name.  e.g. 'bin/enclave " \
-			"enclave'\n";
-		return -1;
-	}
+	private:
+		static const size_t ENTROPY_SIZE = 32;
+		prng_state prng;
+};
 
-	LINFO << "Enclave DHT - Built on " << __DATE__ << ' ' << __TIME__ << '\n';
-	try {
-		sam = new Sam("localhost", 7656, argv[1], 0);
-	} catch (const Sam_error& x) {
-		LERROR << "SAM error: " << x.what() << '\n';
-		cerr << "SAM error: " << x.what() << '\n';
-		if (x.code() == SAM_SOCKET_ERROR) {
-			LERROR << "Check whether you have specified the correct SAM host " \
-				"and port number, and that I2P is running.\n";
-			cerr << "Check whether you have specified the correct SAM host " \
-				"and port number, and that\nI2P is running.\n";
-		}
-		return 1;
-	}
-	sam->naming_lookup();
-	while (sam->get_my_dest() == "")
-		sam->read_buffer();  // wait until we get our own dest back from lookup
-
-	sam->peers->advertise_self();
-
-	while (true)
-		sam->read_buffer();
-
-	delete sam;
-	return 0;
-}
+#endif  // RNG_HPP

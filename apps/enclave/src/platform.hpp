@@ -76,7 +76,7 @@ using namespace std;
 /*
  * Local includes
  */
-#include "logger.hpp"
+#include "logger.hpp"  // Logger
 #include "sam_error.hpp"  // for sam.hpp
 #include "bigint.hpp"  // for sha1.hpp
 #include "sha1.hpp"  // for peers.hpp
@@ -84,11 +84,13 @@ using namespace std;
 #include "near_peer.hpp"  // for peers.hpp
 #include "peers.hpp" // for sam.hpp
 #include "sam.hpp"  // SAM
+#include "random.hpp"  // Random
 
 /*
  * Global variables
  */
-extern Logger logger;
-extern Sam *sam;
+extern Logger logger;  // Logging mechanism
+extern Random prng;  // Random number generator
+extern Sam *sam;  // Sam connection
 
 #endif  // PLATFORM_HPP

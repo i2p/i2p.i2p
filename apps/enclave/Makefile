@@ -44,6 +44,7 @@ OBJS =	$(OBJDIR)/bigint.o \
 		$(OBJDIR)/logger.o \
 		$(OBJDIR)/main.o \
 		$(OBJDIR)/peers.o \
+		$(OBJDIR)/random.o \
 		$(OBJDIR)/rpc.o \
 		$(OBJDIR)/sam.o \
 		$(OBJDIR)/sha1.o

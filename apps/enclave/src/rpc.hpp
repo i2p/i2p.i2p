@@ -48,6 +48,7 @@ class Rpc {
 
 		Rpc(Peer* peer)
 			: peer(peer) {};
+
 		void find_peers(const Sha1& sha1);
 		void parse(const void* data, size_t size);
 		void ping(void);
