@@ -374,39 +374,46 @@ public class NativeBigInteger extends BigInteger {
         String wantedProp = System.getProperty("jbigi.enable", "true");
         boolean wantNative = "true".equalsIgnoreCase(wantedProp);
         if (wantNative) {
-            boolean loaded = loadFromResource("jbigi");
+            boolean loaded = loadGeneric("jbigi");
             if (loaded) {
                 _nativeOk = true;
                 if (_doLog)
-                    System.err.println("INFO: Locally optimized native BigInteger loaded from resource");
+                    System.err.println("INFO: Locally optimized native BigInteger loaded from the library path");
             } else {
-                loaded = loadFromResource(true);
+                loaded = loadFromResource("jbigi");
                 if (loaded) {
                     _nativeOk = true;
                     if (_doLog)
-                        System.err.println("INFO: Optimized native BigInteger library '"+getResourceName(true)+"' loaded from resource");
+                        System.err.println("INFO: Locally optimized native BigInteger loaded from resource");
                 } else {
-                    loaded = loadGeneric(true);
+                    loaded = loadFromResource(true);
                     if (loaded) {
                         _nativeOk = true;
                         if (_doLog)
-                            System.err.println("INFO: Optimized native BigInteger library '"+getMiddleName(true)+"' loaded from somewhere in the path");
+                            System.err.println("INFO: Optimized native BigInteger library '"+getResourceName(true)+"' loaded from resource");
                     } else {
-                        loaded = loadFromResource(false);
+                        loaded = loadGeneric(true);
                         if (loaded) {
                             _nativeOk = true;
                             if (_doLog)
-                                System.err.println("INFO: Non-optimized native BigInteger library '"+getResourceName(false)+"' loaded from resource");
+                                System.err.println("INFO: Optimized native BigInteger library '"+getMiddleName(true)+"' loaded from somewhere in the path");
                         } else {
-                            loaded = loadGeneric(false);
+                            loaded = loadFromResource(false);
                             if (loaded) {
                                 _nativeOk = true;
                                 if (_doLog)
-                                    System.err.println("INFO: Non-optimized native BigInteger library '"+getMiddleName(false)+"' loaded from somewhere in the path");
+                                    System.err.println("INFO: Non-optimized native BigInteger library '"+getResourceName(false)+"' loaded from resource");
                             } else {
-                                _nativeOk = false;          
-                            }
-                        }       
+                                loaded = loadGeneric(false);
+                                if (loaded) {
+                                    _nativeOk = true;
+                                    if (_doLog)
+                                        System.err.println("INFO: Non-optimized native BigInteger library '"+getMiddleName(false)+"' loaded from somewhere in the path");
+                                } else {
+                                    _nativeOk = false;          
+                                }
+                            }       
+                        }
                     }
                 }
             }
@@ -427,8 +434,10 @@ public class NativeBigInteger extends BigInteger {
      *
      */
     private static final boolean loadGeneric(boolean optimized) {
+        return loadGeneric(getMiddleName(optimized));
+    }
+    private static final boolean loadGeneric(String name) {
         try {
-            String name = getMiddleName(optimized);
             if(name == null)
                 return false;
             System.loadLibrary(name);
