@@ -1,11 +1,11 @@
-<code>$Id: udp.html,v 1.2 2005/03/26 00:56:06 jrandom Exp $</code>
+<code>$Id: udp.html,v 1.3 2005/03/26 01:23:57 jrandom Exp $</code>
 
 <h1>Secure Semireliable UDP (SSU)</h1>
 <b>DRAFT</b>
 
 <p>
-The goal of this protocol is to provide secure and authenticated 
-semireliable, unordered message delivery, exposing only a minimal
+The goal of this protocol is to provide secure, authenticated 
+semireliable, and unordered message delivery, exposing only a minimal
 amount of data easily discernible to third parties.  It should 
 support high degree communication as well as TCP-friendly congestion
 control, and may include PMTU detection.   It should be capable of
@@ -15,7 +15,7 @@ obstacles, like most NATs or firewalls.</p>
 
 <h2><a name="addressing">Addressing and introduction</a></h2>
 
-<p>To contact an ESU peer, one of two sets of information is necessary:
+<p>To contact an SSU peer, one of two sets of information is necessary:
 a direct address, for when the peer is publicly reachable, or an 
 indirect address, for using a third party to introduce the peer.  
 There is no restriction on the number of addresses a peer may have.</p>
@@ -423,6 +423,19 @@ MODP group (#14) is used:</p>
 
 <p>The DSA p, q, and g are shared according to the scope of the 
 identity which created them.</p>
+
+<h2><a name="replay">Replay prevention</a></h2>
+
+<p>Replay prevention at the SSU layer occurs by rejecting packets 
+with exceedingly old timestamps or those which reuse an IV.  To
+detect duplicate IVs, a sequence of Bloom filters are employed to
+"decay" periodically so that only recently added IVs are detected.</p>
+
+<p>The messageIds used in DataMessages are defined at layers above
+the SSU transport and are passed through transparently.  These IDs
+are not in any particular order - in fact, they are likely to be
+entirely random.  The SSU layer makes no attempt at messageId 
+replay prevention - higher layers should take that into account.</p>
 
 <h2><a name="messageSequences">Message sequences</a></h2>
 
