@@ -28,22 +28,32 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+// Modelled after JThread by Jori Liesenborgs
+
 #ifndef MUTEX_HPP
 #define MUTEX_HPP
 
-class Mutex {
-	public:
-		Mutex(void);
-		~Mutex(void);
+namespace Libsockthread {
 
-		void lock(void);
-		void unlock(void);
+	class Mutex {
+	public:
+		Mutex(void);  // throws Mutex_error
+		~Mutex(void);  // throws Mutex_error
+
+		void lock(void);  // throws Mutex_error
+		void unlock(void);  // throws Mutex_error
 	private:
-#ifdef WINTHREADS
+	#ifdef WINTHREADS
 		HANDLE mutex;
-#else
+	#else
 		pthread_mutex_t mutex;
-#endif
-};
+	#endif
+	};
+
+	class Mutex_error : public runtime_error {
+		Mutex_error(const string& s) : runtime_error(s) { }
+	};
+
+}
 
 #endif  // MUTEX_HPP

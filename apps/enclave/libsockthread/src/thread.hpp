@@ -28,79 +28,45 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "platform.hpp"
-#include "mutex.hpp"
+// Modelled after JThread by Jori Liesenborgs
 
-Mutex::Mutex(void)
-{
+#ifndef THREAD_HPP
+#define THREAD_HPP
+
+namespace Libsockthread {
+
+	class Thread {
+	public:
+		Thread(void)  // throws Mutex_error
+			: retval(0), running(false) { }
+		virtual ~Thread(void)  // throws Thread_error
+			{ kill(); }
+
+		virtual void *execute(void) = 0;
+		void* get_retval(void);
+		bool is_running(void);
+		bool kill(void);  // throws Thread_error
+		void start(void);  // throws Thread_error
+
+	private:
 #ifdef WINTHREADS
-	mutex = CreateMutex(NULL, FALSE, NULL);
-	if (mutex == NULL) {
-		LERROR << strerror(rc) << '\n';
-		throw runtime_error(strerror(rc));
-	}
+		static DWORD WINAPI the_thread(void* param);
+		HANDLE handle;
+		DWORD id;
 #else
-	int rc = pthread_mutex_init(&mutex, NULL);
-	if (rc != 0) {
-		LERROR << strerror(rc) << '\n';
-		throw runtime_error(strerror(rc));
-	}
+		static void* the_thread(void* param);
+		pthread_t id;
 #endif
+		void *retval;
+		bool running;
+		Mutex running_m;
+		Mutex continue_m;
+	};
+
+	class Thread_error : public runtime_error {
+		Thread_error(const string& s) : runtime_error(s) { }
+	};
+
 }
 
-Mutex::~Mutex(void)
-{
-#ifdef WINTHREADS
-	if (!CloseHandle(mutex)) {
-		TCHAR str[80];
-		LERROR << win_strerror(str, sizeof str) << '\n';
-		throw runtime_error(str);
-	}
-#else
-	int rc = pthread_mutex_destroy(&mutex);
-	if (rc != 0) {
-		LERROR << strerror(rc) << '\n';
-		throw runtime_error(strerror(rc));
-	}
-#endif
-}
-
-/*
- * Locks the mutex
- */
-void Mutex::lock(void)
-{
-#ifdef WINTHREADS
-	if (WaitForSingleObject(mutex, INFINITE) == WAIT_FAILED) {
-		TCHAR str[80];
-		LERROR << win_strerror(str, sizeof str) << '\n';
-		throw runtime_error(str);
-	}
-#else
-	int rc = pthread_mutex_lock(&mutex);
-	if (rc != 0) {
-		LERROR << strerror(rc) << '\n';
-		throw runtime_error(strerror(rc));
-	}
-#endif
-}
-
-/*
- * Unlocks the mutex
- */
-void Mutex::unlock(void)
-{
-#ifdef WINTHREADS
-	if (!ReleaseMutex(mutex)) {
-		TCHAR str[80];
-		LERROR << win_strerror(str, sizeof str) << '\n';
-		throw runtime_error(str);
-	}
-#else
-	int rc = pthread_mutex_unlock(&mutex);
-	if (rc != 0) {
-		LERROR << strerror(rc) << '\n';
-		throw runtime_error(strerror(rc));
-	}
-#endif
-}
+#endif  // THREAD_HPP
