@@ -34,34 +34,34 @@ fi
 
 uninstall_bsd()
 {
-    rm /usr/local/etc/rc.d/i2psvc.sh
+    rm /usr/local/etc/rc.d/i2prouter.sh
 }
 
 uninstall_debian()
 {
-    rm /etc/init.d/i2psvc
-    update-rc.d -f i2psvc remove
+    rm /etc/init.d/i2prouter
+    update-rc.d -f i2prouter remove
 }
 
 uninstall_gentoo()
 {
-    rm /etc/init.d/i2psvc
-    rc-update del i2psvc default
+    rm /etc/init.d/i2prouter
+    rc-update del i2prouter default
 }
 
 uninstall_redhat()
 {
-    rm /etc/rc.d/init.d/i2psvc
-    chkconfig --level 345 i2psvc off
+    rm /etc/rc.d/init.d/i2prouter
+    chkconfig --level 345 i2prouter off
 }
 
 uninstall_sysv()
 {
-    rm /etc/init.d/i2psvc
-    rm /etc/rc0.d/K20i2psvc
-    rm /etc/rc1.d/K20i2psvc
-    rm /etc/rc2.d/S20i2psvc
-    rm /etc/rc3.d/S20i2psvc
+    rm /etc/init.d/i2prouter
+    rm /etc/rc0.d/K20i2prouter
+    rm /etc/rc1.d/K20i2prouter
+    rm /etc/rc2.d/S20i2prouter
+    rm /etc/rc3.d/S20i2prouter
 }
 
 case $HOST_OS in

@@ -34,34 +34,34 @@ fi
 
 install_bsd()
 {
-    ln -sf `pwd`/i2psvc /usr/local/etc/rc.d/i2psvc.sh
+    ln -sf `pwd`/i2prouter /usr/local/etc/rc.d/i2prouter.sh
 }
 
 install_debian()
 {
-    ln -sf `pwd`/i2psvc /etc/init.d/i2psvc
-    update-rc.d i2psvc start 20 2 3 4 5 . stop 20 0 1 6 .
+    ln -sf `pwd`/i2prouter /etc/init.d/i2prouter
+    update-rc.d i2prouter start 20 2 3 4 5 . stop 20 0 1 6 .
 }
 
 install_gentoo()
 {
-    ln -sf `pwd`/i2psvc /etc/init.d/i2psvc
-    rc-update add i2psvc default
+    ln -sf `pwd`/i2prouter /etc/init.d/i2prouter
+    rc-update add i2prouter default
 }
 
 install_redhat()
 {
-    ln -sf `pwd`/i2psvc /etc/rc.d/init.d/i2psvc
-    chkconfig --level 345 i2psvc on
+    ln -sf `pwd`/i2prouter /etc/rc.d/init.d/i2prouter
+    chkconfig --level 345 i2prouter on
 }
 
 install_sysv()
 {
-    ln -sf `pwd`/i2psvc /etc/init.d/i2psvc
-    ln -sf /etc/init.d/i2psvc /etc/rc0.d/K20i2psvc
-    ln -sf /etc/init.d/i2psvc /etc/rc1.d/K20i2psvc
-    ln -sf /etc/init.d/i2psvc /etc/rc2.d/S20i2psvc
-    ln -sf /etc/init.d/i2psvc /etc/rc3.d/S20i2psvc
+    ln -sf `pwd`/i2prouter /etc/init.d/i2prouter
+    ln -sf /etc/init.d/i2prouter /etc/rc0.d/K20i2prouter
+    ln -sf /etc/init.d/i2prouter /etc/rc1.d/K20i2prouter
+    ln -sf /etc/init.d/i2prouter /etc/rc2.d/S20i2prouter
+    ln -sf /etc/init.d/i2prouter /etc/rc3.d/S20i2prouter
 }
 
 case $HOST_OS in
