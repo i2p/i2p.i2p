@@ -198,7 +198,7 @@ public class MessageOutputStream extends OutputStream {
             WriteStatus ws = null;
             synchronized (_dataLock) {
                 long flushTime = _lastBuffered + _passiveFlushDelay;
-                if ( (_valid > 0) && (flushTime < _context.clock().now()) ) {
+                if ( (_valid > 0) && (flushTime <= _context.clock().now()) ) {
                     if (_log.shouldLog(Log.DEBUG))
                         _log.debug("doFlush() valid = " + _valid);
                     if ( (_buf != null) && (_dataReceiver != null) ) {
