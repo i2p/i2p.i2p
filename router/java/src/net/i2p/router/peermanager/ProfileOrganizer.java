@@ -427,8 +427,8 @@ public class ProfileOrganizer {
             
             if (_us.equals(profile.getPeer())) continue;
             
-            // only take into account peers that aren't failing
-            if (profile.getIsFailing())
+            // only take into account active peers that aren't failing
+            if (profile.getIsFailing() || (!profile.getIsActive()))
                 continue;
         
             reordered.add(profile);
