@@ -382,7 +382,6 @@ public final class CryptixRijndael_Algorithm // implicit no-argument constructor
      * @param  result     The resulting ciphertext.
      * @param  inOffset   Index of in from which to start considering data.
      * @param  sessionKey The session key to use for encryption.
-     * @return The ciphertext generated from a plaintext using the session key.
      */
     public static final void blockEncrypt(byte[] in, byte[] result, int inOffset, Object sessionKey) {
         if (_RDEBUG) trace(_IN, "blockEncrypt(" + in + ", " + inOffset + ", " + sessionKey + ")");
@@ -450,10 +449,9 @@ public final class CryptixRijndael_Algorithm // implicit no-argument constructor
      * Rijndael's default block size (128-bit).
      *
      * @param  in         The ciphertext.
-     * @param  result the resulting ciphertext
+     * @param  result     The resulting ciphertext
      * @param  inOffset   Index of in from which to start considering data.
      * @param  sessionKey The session key to use for decryption.
-     * @return The plaintext generated from a ciphertext using the session key.
      */
     public static final void blockDecrypt(byte[] in, byte[] result, int inOffset, Object sessionKey) {
         if (_RDEBUG) trace(_IN, "blockDecrypt(" + in + ", " + inOffset + ", " + sessionKey + ")");
@@ -620,7 +618,6 @@ public final class CryptixRijndael_Algorithm // implicit no-argument constructor
      * @param  inOffset   Index of in from which to start considering data.
      * @param  sessionKey The session key to use for encryption.
      * @param  blockSize  The block size in bytes of this Rijndael.
-     * @return The ciphertext generated from a plaintext using the session key.
      */
     public static final void blockEncrypt(byte[] in, byte[] result, int inOffset, Object sessionKey, int blockSize) {
         if (blockSize == _BLOCK_SIZE) {
@@ -676,7 +673,6 @@ public final class CryptixRijndael_Algorithm // implicit no-argument constructor
      * @param  inOffset   Index of in from which to start considering data.
      * @param  sessionKey The session key to use for decryption.
      * @param  blockSize  The block size in bytes of this Rijndael.
-     * @return The plaintext generated from a ciphertext using the session key.
      */
     public static final void blockDecrypt(byte[] in, byte[] result, int inOffset, Object sessionKey, int blockSize) {
         if (blockSize == _BLOCK_SIZE) {
