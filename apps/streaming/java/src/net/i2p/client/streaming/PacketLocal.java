@@ -56,7 +56,8 @@ public class PacketLocal extends Packet implements MessageOutputStream.WriteStat
     public boolean shouldSign() { 
         return isFlagSet(FLAG_SIGNATURE_INCLUDED) ||
                isFlagSet(FLAG_SYNCHRONIZE) ||
-               isFlagSet(FLAG_CLOSE);
+               isFlagSet(FLAG_CLOSE) ||
+               isFlagSet(FLAG_ECHO);
     }
     
     /** last minute update of ack fields, just before write/sign  */

@@ -43,9 +43,9 @@ class SchedulerConnectedBulk extends SchedulerImpl {
                      (!con.getResetReceived()) &&
                      ( (con.getCloseSentOn() <= 0) || (con.getCloseReceivedOn() <= 0) );
         if (!ok) {
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("con: " + con + " closeSentOn: " + con.getCloseSentOn() 
-                           + " closeReceivedOn: " + con.getCloseReceivedOn());
+            //if (_log.shouldLog(Log.DEBUG))
+            //    _log.debug("con: " + con + " closeSentOn: " + con.getCloseSentOn() 
+            //               + " closeReceivedOn: " + con.getCloseReceivedOn());
         }
         return ok;
     }

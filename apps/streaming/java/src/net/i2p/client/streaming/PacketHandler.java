@@ -173,7 +173,7 @@ public class PacketHandler {
             }
         } else {
             if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Packet received on an unknown stream (and not a SYN): " + packet);
+                _log.debug("Packet received on an unknown stream (and not an ECHO): " + packet);
             if (sendId == null) {
                 for (Iterator iter = _manager.listConnections().iterator(); iter.hasNext(); ) {
                     Connection con = (Connection)iter.next();

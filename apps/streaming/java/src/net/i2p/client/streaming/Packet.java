@@ -273,12 +273,12 @@ public class Packet {
      */
     private int writePacket(byte buffer[], int offset, boolean includeSig) throws IllegalStateException {
         int cur = offset;
-        if (_sendStreamId != null)
+        if ( (_sendStreamId != null) && (_sendStreamId.length == 4) )
             System.arraycopy(_sendStreamId, 0, buffer, cur, _sendStreamId.length);
         else
             System.arraycopy(STREAM_ID_UNKNOWN, 0, buffer, cur, STREAM_ID_UNKNOWN.length);
         cur += 4;
-        if (_receiveStreamId != null)
+        if ( (_receiveStreamId != null) && (_receiveStreamId.length == 4) )
             System.arraycopy(_receiveStreamId, 0, buffer, cur, _receiveStreamId.length);
         else
             System.arraycopy(STREAM_ID_UNKNOWN, 0, buffer, cur, STREAM_ID_UNKNOWN.length);
@@ -354,8 +354,8 @@ public class Packet {
      */
     public int writtenSize() throws IllegalStateException {
         int size = 0;
-        size += _sendStreamId.length;
-        size += _receiveStreamId.length;
+        size += 4; // _sendStreamId.length;
+        size += 4; // _receiveStreamId.length;
         size += 4; // sequenceNum
         size += 4; // ackThrough
         if (_nacks != null) {
@@ -426,12 +426,13 @@ public class Packet {
         int optionSize = (int)DataHelper.fromLong(buffer, cur, 2);
         cur += 2;
         int payloadBegin = cur + optionSize;
+        int payloadSize = length - payloadBegin;
+        if ( (payloadSize < 0) || (payloadSize > MAX_PAYLOAD_SIZE) ) 
+            throw new IllegalArgumentException("length: " + length + " offset: " + offset + " begin: " + payloadBegin);
         
         // skip ahead to the payload
-        _payload = new byte[offset + length - payloadBegin];
-        if (_payload.length > MAX_PAYLOAD_SIZE)
-            throw new IllegalArgumentException("length: " + length + " offset: " + offset + " begin: " + payloadBegin);
-        System.arraycopy(buffer, payloadBegin, _payload, 0, _payload.length);
+        _payload = new byte[payloadSize];
+        System.arraycopy(buffer, payloadBegin, _payload, 0, payloadSize);
         
         // ok now lets go back and deal with the options
         if (isFlagSet(FLAG_DELAY_REQUESTED)) {
@@ -480,7 +481,7 @@ public class Packet {
         }
         boolean ok = ctx.dsa().verifySignature(_optionSignature, buffer, 0, size, from.getSigningPublicKey());
         if (!ok) {
-            ctx.logManager().getLog(Packet.class).error("Signature failed with sig " + Base64.encode(_optionSignature.getData()), new Exception("moo"));
+            ctx.logManager().getLog(Packet.class).error("Signature failed on " + toString(), new Exception("moo"));
         }
         return ok;
     }

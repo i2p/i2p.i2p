@@ -54,11 +54,11 @@ public class ConnectionPacketHandler {
                 //con.getOptions().setWindowSize(con.getOptions().getWindowSize()/2);
                 if (_log.shouldLog(Log.WARN))
                     _log.warn("congestion.. dup " + packet);   
-                con.incrementUnackedPacketsReceived();
+                //con.incrementUnackedPacketsReceived();
                 con.setNextSendTime(_context.clock().now() + con.getOptions().getSendAckDelay());
             } else {
                 if (packet.isFlagSet(Packet.FLAG_SYNCHRONIZE)) {
-                    con.incrementUnackedPacketsReceived();
+                    //con.incrementUnackedPacketsReceived();
                     con.setNextSendTime(_context.clock().now() + con.getOptions().getSendAckDelay());
                 } else {
                     if (_log.shouldLog(Log.DEBUG))
