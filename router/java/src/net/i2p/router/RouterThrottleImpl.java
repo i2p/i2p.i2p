@@ -14,11 +14,11 @@ class RouterThrottleImpl implements RouterThrottle {
     private Log _log;
     
     /** 
-     * arbitrary hard limit of 5 seconds - if its taking this long to get 
+     * arbitrary hard limit of 2 seconds - if its taking this long to get 
      * to a job, we're congested.
      *
      */
-    private static int JOB_LAG_LIMIT = 5000;
+    private static int JOB_LAG_LIMIT = 2000;
     
     public RouterThrottleImpl(RouterContext context) {
         _context = context;
