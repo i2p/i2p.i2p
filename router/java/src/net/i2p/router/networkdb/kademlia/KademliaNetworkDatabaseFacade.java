@@ -506,13 +506,15 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         if (isRouterInfo) {
             int remaining = _kb.size();
             if (remaining < MIN_REMAINING_ROUTERS) {
-                _log.warn("Not removing " + dbEntry + " because we have so few routers left ("
-                + remaining + ") - perhaps a reseed is necessary?");
+                if (_log.shouldLog(Log.ERROR))
+                    _log.error("Not removing " + dbEntry + " because we have so few routers left ("
+                              + remaining + ") - perhaps a reseed is necessary?");
                 return;
             }
             if (System.currentTimeMillis() < _started + DONT_FAIL_PERIOD) {
-                _log.warn("Not failing the key " + dbEntry.toBase64()
-                + " since we've just started up and don't want to drop /everyone/");
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("Not failing the key " + dbEntry.toBase64()
+                              + " since we've just started up and don't want to drop /everyone/");
                 return;
             }
             

@@ -32,7 +32,7 @@ class ExpireRoutersJob extends JobImpl {
     private Log _log;
     private KademliaNetworkDatabaseFacade _facade;
     
-    private final static long RERUN_DELAY_MS = 30*1000;
+    private final static long RERUN_DELAY_MS = 120*1000;
     /**
      * If a routerInfo structure isn't updated within an hour, drop it
      * and search for a later version.  This value should be large enough

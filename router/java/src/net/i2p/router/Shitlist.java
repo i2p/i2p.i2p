@@ -59,7 +59,7 @@ public class Shitlist {
             wasAlready = (null == oldDate);
         }
         
-        _context.netDb().fail(peer);
+        //_context.netDb().fail(peer);
         _context.tunnelManager().peerFailed(peer);
         return wasAlready;
     }
