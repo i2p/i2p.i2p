@@ -650,7 +650,7 @@ class TunnelPool {
         out.write("</ul>\n".getBytes());
     }
     
-    private final static void renderTunnel(OutputStream out, StringBuffer buf, TunnelId id, TunnelInfo tunnel) throws IOException {
+    private final void renderTunnel(OutputStream out, StringBuffer buf, TunnelId id, TunnelInfo tunnel) throws IOException {
         buf.setLength(0);
         if (tunnel == null) {
             buf.append("<li>Tunnel: ").append(id.getTunnelId()).append(" is not known</li>\n");
@@ -658,6 +658,12 @@ class TunnelPool {
             buf.append("<li>Tunnel: ").append(tunnel.getTunnelId()).append("</li><pre>");
             buf.append("\n\tStyle: ").append(getStyle(id));
             buf.append("\n\tReady? ").append(tunnel.getIsReady());
+            buf.append("\n\tMessages processed: ").append(tunnel.getMessagesProcessed());
+            long timeSinceTest = _context.clock().now() - tunnel.getLastTested();
+            if (timeSinceTest < 60*60*1000) 
+                buf.append("\n\tLast tested: ").append(timeSinceTest/1000).append(" seconds ago");
+            else
+                buf.append("\n\tLast tested: never");
             buf.append("\n\tDest? ").append(getDestination(tunnel));
             if (tunnel.getSettings() != null)
                 buf.append("\n\tExpiration: ").append(new Date(tunnel.getSettings().getExpiration()));
