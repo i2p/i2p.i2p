@@ -40,8 +40,8 @@ class ConnectionDataReceiver implements MessageOutputStream.DataReceiver {
         if (_connection.getUnackedPacketsReceived() > 0)
             doSend = true;
         
-        if (_log.shouldLog(Log.ERROR) && !doSend)
-            _log.error("writeData called: size="+size + " doSend=" + doSend 
+        if (_log.shouldLog(Log.INFO) && !doSend)
+            _log.info("writeData called: size="+size + " doSend=" + doSend 
                        + " unackedReceived: " + _connection.getUnackedPacketsReceived()
                        + " con: " + _connection, new Exception("write called by"));
 

@@ -55,6 +55,7 @@ public class Connection {
     private String _connectionError;
     
     public static final long MAX_RESEND_DELAY = 60*1000;
+    public static final long MIN_RESEND_DELAY = 20*1000;
     
     public Connection(I2PAppContext ctx, ConnectionManager manager, SchedulerChooser chooser, PacketQueue queue, ConnectionPacketHandler handler) {
         this(ctx, manager, chooser, queue, handler, null);
@@ -178,7 +179,7 @@ public class Connection {
             }
             packet.setFlag(Packet.FLAG_DELAY_REQUESTED);
             
-            long timeout = (_options.getRTT() < 10000 ? 10000 : _options.getRTT());
+            long timeout = (_options.getRTT() < MIN_RESEND_DELAY ? MIN_RESEND_DELAY : _options.getRTT());
             if (timeout > MAX_RESEND_DELAY)
                 timeout = MAX_RESEND_DELAY;
             if (_log.shouldLog(Log.DEBUG))
@@ -491,6 +492,8 @@ public class Connection {
                 } else {
                     //long timeout = _options.getResendDelay() << numSends;
                     long timeout = _options.getRTT() << (numSends-1);
+                    if (timeout < MIN_RESEND_DELAY)
+                        timeout = MIN_RESEND_DELAY;
                     if ( (timeout > MAX_RESEND_DELAY) || (timeout <= 0) )
                         timeout = MAX_RESEND_DELAY;
                     if (_log.shouldLog(Log.DEBUG))
