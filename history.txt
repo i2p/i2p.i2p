@@ -1,4 +1,14 @@
-$Id: history.txt,v 1.66 2004/11/06 22:00:56 jrandom Exp $
+$Id: history.txt,v 1.67 2004/11/07 22:18:01 jrandom Exp $
+
+2004-11-08  jrandom
+    * Remove spurious flush calls from I2PTunnel, and work with the 
+      I2PSocket's output stream directly (as the various implementations
+      do their own buffering).
+    * Another pass at a long standing JobQueue bug - dramatically simplify
+      the job management synchronization since we dont need to deal with
+      high contention (unlike last year when we had dozens of queue runners
+      going at once).
+    * Logging
 
 2004-11-08  jrandom
     * Make the SAM bridge more resiliant to bad handshakes (thanks duck!)

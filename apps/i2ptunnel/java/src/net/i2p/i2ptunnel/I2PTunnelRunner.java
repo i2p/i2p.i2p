@@ -12,7 +12,6 @@ import java.net.Socket;
 import java.net.SocketException;
 import java.util.HashMap;
 
-import net.i2p.client.I2PSession;
 import net.i2p.client.streaming.I2PSocket;
 import net.i2p.util.Clock;
 import net.i2p.util.I2PThread;
@@ -38,13 +37,14 @@ public class I2PTunnelRunner extends I2PThread implements I2PSocket.SocketErrorL
     Object slock, finishLock = new Object();
     boolean finished = false;
     HashMap ostreams, sockets;
-    I2PSession session;
     byte[] initialData;
     /** when the last data was sent/received (or -1 if never) */
     private long lastActivityOn;
     /** when the runner started up */
     private long startedOn;
 
+    private volatile long __forwarderId;
+    
     public I2PTunnelRunner(Socket s, I2PSocket i2ps, Object slock, byte[] initialData) {
         this.s = s;
         this.i2ps = i2ps;
@@ -55,6 +55,7 @@ public class I2PTunnelRunner extends I2PThread implements I2PSocket.SocketErrorL
         if (_log.shouldLog(Log.INFO))
             _log.info("I2PTunnelRunner started");
         _runnerId = ++__runnerId;
+        __forwarderId = i2ps.hashCode();
         setName("I2PTunnelRunner " + _runnerId);
         start();
     }
@@ -96,15 +97,15 @@ public class I2PTunnelRunner extends I2PThread implements I2PSocket.SocketErrorL
             OutputStream out = new BufferedOutputStream(s.getOutputStream(), NETWORK_BUFFER_SIZE);
             i2ps.setSocketErrorListener(this);
             InputStream i2pin = i2ps.getInputStream();
-            OutputStream i2pout = new BufferedOutputStream(i2ps.getOutputStream(), MAX_PACKET_SIZE);
+            OutputStream i2pout = i2ps.getOutputStream(); //new BufferedOutputStream(i2ps.getOutputStream(), MAX_PACKET_SIZE);
             if (initialData != null) {
                 synchronized (slock) {
                     i2pout.write(initialData);
-                    i2pout.flush();
+                    //i2pout.flush();
                 }
             }
-            Thread t1 = new StreamForwarder(in, i2pout);
-            Thread t2 = new StreamForwarder(i2pin, out);
+            Thread t1 = new StreamForwarder(in, i2pout, "toI2P");
+            Thread t2 = new StreamForwarder(i2pin, out, "fromI2P");
             synchronized (finishLock) {
                 while (!finished) {
                     finishLock.wait();
@@ -118,19 +119,21 @@ public class I2PTunnelRunner extends I2PThread implements I2PSocket.SocketErrorL
             t1.join();
             t2.join();
         } catch (InterruptedException ex) {
-            _log.error("Interrupted", ex);
+            if (_log.shouldLog(Log.ERROR))
+                _log.error("Interrupted", ex);
         } catch (IOException ex) {
-            ex.printStackTrace();
-            _log.debug("Error forwarding", ex);
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Error forwarding", ex);
         } catch (Exception e) {
-            _log.error("Internal error", e);
+            if (_log.shouldLog(Log.ERROR))
+                _log.error("Internal error", e);
         } finally {
             try {
                 if (s != null) s.close();
                 if (i2ps != null) i2ps.close();
             } catch (IOException ex) {
-                ex.printStackTrace();
-                _log.error("Could not close socket", ex);
+                if (_log.shouldLog(Log.ERROR))
+                    _log.error("Could not close socket", ex);
             }
         }
     }
@@ -142,21 +145,31 @@ public class I2PTunnelRunner extends I2PThread implements I2PSocket.SocketErrorL
         }
     }
     
-    private volatile long __forwarderId = 0;
-    
     private class StreamForwarder extends I2PThread {
 
         InputStream in;
         OutputStream out;
+        String direction;
 
-        private StreamForwarder(InputStream in, OutputStream out) {
+        private StreamForwarder(InputStream in, OutputStream out, String dir) {
             this.in = in;
             this.out = out;
+            direction = dir;
             setName("StreamForwarder " + _runnerId + "." + (++__forwarderId));
             start();
         }
 
         public void run() {
+            if (_log.shouldLog(Log.DEBUG)) {
+                String from = i2ps.getThisDestination().calculateHash().toBase64().substring(0,6);
+                String to = i2ps.getPeerDestination().calculateHash().toBase64().substring(0,6);
+                
+                _log.debug(direction + ": Forwarding between " 
+                           + from
+                           + " and " 
+                           + to);
+            }
+            
             byte[] buffer = new byte[NETWORK_BUFFER_SIZE];
             try {
                 int len;
@@ -166,30 +179,39 @@ public class I2PTunnelRunner extends I2PThread implements I2PSocket.SocketErrorL
                     if (len > 0) updateActivity();
 
                     if (in.available() == 0) {
+                        //if (_log.shouldLog(Log.DEBUG))
+                        //    _log.debug("Flushing after sending " + len + " bytes through");
+                        if (_log.shouldLog(Log.DEBUG))
+                            _log.debug(direction + ": " + len + " bytes flushed through to " 
+                                       + i2ps.getPeerDestination().calculateHash().toBase64().substring(0,6));
                         try {
                             Thread.sleep(I2PTunnel.PACKET_DELAY);
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         }
-                    }
-                    if (in.available() == 0) {
-                        out.flush(); // make sure the data get though
+                        
+                        if (in.available() <= 0)
+                            out.flush(); // make sure the data get though
                     }
                 }
             } catch (SocketException ex) {
                 // this *will* occur when the other threads closes the socket
                 synchronized (finishLock) {
                     if (!finished) {
-                        _log.debug("Socket closed - error reading and writing",
-                                   ex);
+                        if (_log.shouldLog(Log.DEBUG))
+                            _log.debug(direction + ": Socket closed - error reading and writing",
+                                       ex);
                     }
                 }
             } catch (InterruptedIOException ex) {
-                _log.warn("Closing connection due to timeout (error: \""
-                          + ex.getMessage() + "\")");
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn(direction + ": Closing connection due to timeout (error: \""
+                              + ex.getMessage() + "\")");
             } catch (IOException ex) {
-                if (!finished)
-                    _log.error("Error forwarding", ex);
+                if (!finished) {
+                    if (_log.shouldLog(Log.ERROR))
+                        _log.error(direction + ": Error forwarding", ex);
+                }
                 //else
                 //    _log.warn("You may ignore this", ex);
             } finally {
@@ -198,7 +220,7 @@ public class I2PTunnelRunner extends I2PThread implements I2PSocket.SocketErrorL
                     in.close();
                 } catch (IOException ex) {
                     if (_log.shouldLog(Log.WARN))
-                        _log.warn("Error closing streams", ex);
+                        _log.warn(direction + ": Error closing streams", ex);
                 }
                 synchronized (finishLock) {
                     finished = true;

@@ -52,6 +52,8 @@ public class JobQueue {
     /** have we been killed or are we alive? */
     private boolean _alive;
     
+    private Object _jobLock;
+    
     /** default max # job queue runners operating */
     private final static int DEFAULT_MAX_RUNNERS = 1;
     /** router.config parameter to override the max runners */
@@ -109,8 +111,9 @@ public class JobQueue {
                                               new long[] { 60*1000l, 60*60*1000l, 24*60*60*1000l });
 
         _alive = true;
-        _readyJobs = new ArrayList();
-        _timedJobs = new ArrayList();
+        _readyJobs = new ArrayList(16);
+        _timedJobs = new ArrayList(64);
+        _jobLock = new Object();
         _queueRunners = new HashMap();
         _jobStats = Collections.synchronizedSortedMap(new TreeMap());
         _allowParallelOperation = false;
@@ -134,68 +137,59 @@ public class JobQueue {
 
         long numReady = 0;
         boolean alreadyExists = false;
-        synchronized (_readyJobs) {
+        synchronized (_jobLock) {
             if (_readyJobs.contains(job))
                 alreadyExists = true;
             numReady = _readyJobs.size();
-        }
-        if (!alreadyExists) {
-            synchronized (_timedJobs) {
+            if (!alreadyExists) {
                 if (_timedJobs.contains(job))
                     alreadyExists = true;
             }
-        }
 
-        _context.statManager().addRateData("jobQueue.readyJobs", numReady, 0);
-        if (shouldDrop(job, numReady)) {
-            if (_log.shouldLog(Log.WARN))
-                _log.warn("Dropping job due to overload!  # ready jobs: " 
-                          + numReady + ": job = " + job);
-            job.dropped();
-            _context.statManager().addRateData("jobQueue.droppedJobs", 1, 1);
-            synchronized (_readyJobs) {
-                _readyJobs.notifyAll();
+            _context.statManager().addRateData("jobQueue.readyJobs", numReady, 0);
+            if (shouldDrop(job, numReady)) {
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("Dropping job due to overload!  # ready jobs: " 
+                              + numReady + ": job = " + job);
+                job.dropped();
+                _context.statManager().addRateData("jobQueue.droppedJobs", 1, 1);
+                _jobLock.notifyAll();
+                return;
             }
-            return;
-        }
 
-        if (!alreadyExists) {
-            if (job.getTiming().getStartAfter() <= _context.clock().now()) {
-                // don't skew us - its 'start after' its been queued, or later
-                job.getTiming().setStartAfter(_context.clock().now());
-                if (job instanceof JobImpl)
-                    ((JobImpl)job).madeReady();
-                synchronized (_readyJobs) {
+            if (!alreadyExists) {
+                if (job.getTiming().getStartAfter() <= _context.clock().now()) {
+                    // don't skew us - its 'start after' its been queued, or later
+                    job.getTiming().setStartAfter(_context.clock().now());
+                    if (job instanceof JobImpl)
+                        ((JobImpl)job).madeReady();
                     _readyJobs.add(job);
-                    _readyJobs.notifyAll();
+                    _jobLock.notifyAll();
+                } else {
+                    _timedJobs.add(job);
+                    _jobLock.notifyAll();
                 }
             } else {
-                synchronized (_timedJobs) {
-                    _timedJobs.add(job);
-                    _timedJobs.notifyAll();
-                }
+                if (_log.shouldLog(Log.DEBUG))
+                    _log.debug("Not adding already enqueued job " + job.getName());
             }
-        } else {
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Not adding already enqueued job " + job.getName());
         }
-
         return;
     }
     
     public void timingUpdated() {
-        synchronized (_timedJobs) {
-            _timedJobs.notifyAll();
+        synchronized (_jobLock) {
+            _jobLock.notifyAll();
         }
     }
     
     public int getReadyCount() { 
-        synchronized (_readyJobs) {
+        synchronized (_jobLock) {
             return _readyJobs.size();
         }
     }
     public long getMaxLag() { 
-        synchronized (_readyJobs) {
+        synchronized (_jobLock) {
             if (_readyJobs.size() <= 0) return 0;
             // first job is the one that has been waiting the longest
             long startAfter = ((Job)_readyJobs.get(0)).getTiming().getStartAfter();
@@ -237,19 +231,17 @@ public class JobQueue {
     public void allowParallelOperation() { _allowParallelOperation = true; }
     
     public void restart() {
-        synchronized (_timedJobs) {
+        synchronized (_jobLock) {
             _timedJobs.clear();
-        }
-        synchronized (_readyJobs) {
             _readyJobs.clear();
-            _readyJobs.notifyAll();
+            _jobLock.notifyAll();
         }
     }
     
     void shutdown() { 
         _alive = false; 
-        synchronized (_readyJobs) {
-            _readyJobs.notifyAll();
+        synchronized (_jobLock) {
+            _jobLock.notifyAll();
         }
         if (_log.shouldLog(Log.WARN)) {
             StringBuffer buf = new StringBuffer(1024);
@@ -339,11 +331,11 @@ public class JobQueue {
      */
     Job getNext() {
         while (_alive) {
-            synchronized (_readyJobs) {
+            synchronized (_jobLock) {
                 if (_readyJobs.size() > 0) {
                     return (Job)_readyJobs.remove(0);
                 } else {
-                    try { _readyJobs.wait(); } catch (InterruptedException ie) {}
+                    try { _jobLock.wait(); } catch (InterruptedException ie) {}
                 }
             }
         }
@@ -413,7 +405,7 @@ public class JobQueue {
                     long now = _context.clock().now();
                     long timeToWait = 0;
                     ArrayList toAdd = null;
-                    synchronized (_timedJobs) {
+                    synchronized (_jobLock) {
                         for (int i = 0; i < _timedJobs.size(); i++) {
                             Job j = (Job)_timedJobs.get(i);
                             // find jobs due to start before now
@@ -431,13 +423,10 @@ public class JobQueue {
                                     timeToWait = timeLeft;
                             }
                         }
-                    }
-                    
 
-                    if (toAdd != null) {
-                        if (_log.shouldLog(Log.DEBUG))
-                            _log.debug("Not waiting - we have " + toAdd.size() + " newly ready jobs");
-                        synchronized (_readyJobs) {
+                        if (toAdd != null) {
+                            if (_log.shouldLog(Log.DEBUG))
+                                _log.debug("Not waiting - we have " + toAdd.size() + " newly ready jobs");
                             // rather than addAll, which allocs a byte array rv before adding, 
                             // we iterate, since toAdd is usually going to only be 1 or 2 entries
                             // and since readyJobs will often have the space, we can avoid the
@@ -445,22 +434,20 @@ public class JobQueue {
                             // on some profiling data ;)
                             for (int i = 0; i < toAdd.size(); i++)
                                 _readyJobs.add(toAdd.get(i));
-                            _readyJobs.notifyAll();
+                            _jobLock.notifyAll();
+                        } else {
+                            if (timeToWait < 100)
+                                timeToWait = 100;
+                            if (timeToWait > 10*1000)
+                                timeToWait = 10*1000;
+                            if (_log.shouldLog(Log.DEBUG))
+                                _log.debug("Waiting " + timeToWait + " before rechecking the timed queue");
+                            try {
+                                _jobLock.wait(timeToWait);
+                            } catch (InterruptedException ie) {}
                         }
-                    } else {
-                        if (timeToWait < 100)
-                            timeToWait = 100;
-                        if (timeToWait > 10*1000)
-                            timeToWait = 10*1000;
-                        if (_log.shouldLog(Log.DEBUG))
-                            _log.debug("Waiting " + timeToWait + " before rechecking the timed queue");
-                        try {
-                            synchronized (_timedJobs) {
-                                _timedJobs.wait(timeToWait);
-                            }
-                        } catch (InterruptedException ie) {}
-                    }
-                }
+                    } // synchronize (_jobLock)
+                } // while (_alive)
             } catch (Throwable t) {
                 _context.clock().removeUpdateListener(this);
                 if (_log.shouldLog(Log.ERROR))
@@ -470,8 +457,8 @@ public class JobQueue {
 
         public void offsetChanged(long delta) {
             updateJobTimings(delta);
-            synchronized (_timedJobs) {
-                _timedJobs.notifyAll();
+            synchronized (_jobLock) {
+                _jobLock.notifyAll();
             }
         }
 
@@ -482,13 +469,11 @@ public class JobQueue {
      * completion.
      */
     private void updateJobTimings(long delta) {
-        synchronized (_timedJobs) {
+        synchronized (_jobLock) {
             for (int i = 0; i < _timedJobs.size(); i++) {
                 Job j = (Job)_timedJobs.get(i);
                 j.getTiming().offsetChanged(delta);
             }
-        }
-        synchronized (_readyJobs) {
             for (int i = 0; i < _readyJobs.size(); i++) {
                 Job j = (Job)_readyJobs.get(i);
                 j.getTiming().offsetChanged(delta);
@@ -605,11 +590,11 @@ public class JobQueue {
         out.write(str.toString());
         out.flush();
         
-        synchronized (_readyJobs) { readyJobs = new ArrayList(_readyJobs); }
-        out.write("<!-- jobQueue rendering: after readyJobs sync -->\n");
-        out.flush();
-        synchronized (_timedJobs) { timedJobs = new ArrayList(_timedJobs); }
-        out.write("<!-- jobQueue rendering: after timedJobs sync -->\n");
+        synchronized (_jobLock) {
+            readyJobs = new ArrayList(_readyJobs); 
+            timedJobs = new ArrayList(_timedJobs);
+        }
+        out.write("<!-- jobQueue rendering: after jobLock sync -->\n");
         out.flush();
         
         StringBuffer buf = new StringBuffer(32*1024);

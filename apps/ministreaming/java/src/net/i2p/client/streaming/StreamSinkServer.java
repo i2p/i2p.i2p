@@ -118,11 +118,15 @@ public class StreamSinkServer {
             try {
                 InputStream in = _sock.getInputStream();
                 byte buf[] = new byte[4096];
+                long written = 0;
                 int read = 0;
                 while ( (read = in.read(buf)) != -1) {
                     _fos.write(buf, 0, read);
+                    written += read;
+                    if (_log.shouldLog(Log.DEBUG))
+                        _log.debug("read and wrote " + read);
                 }
-                _log.error("Got EOF from client socket");
+                _log.error("Got EOF from client socket [written=" + written + "]");
             } catch (IOException ioe) {
                 _log.error("Error writing the sink", ioe);
             } finally {
@@ -143,6 +147,9 @@ public class StreamSinkServer {
     public static void main(String args[]) {
         StreamSinkServer server = null;
         switch (args.length) {
+            case 0:
+                server = new StreamSinkServer("dataDir", "server.key", "localhost", 10001);
+                break;
             case 2:
                 server = new StreamSinkServer(args[0], args[1]);
                 break;
