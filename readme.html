@@ -1,0 +1,61 @@
+<h1>Congratulations on getting I2P installed!</h1>
+
+<p>Next up you'll need to go into the <a href="config.jsp">configuration page</a>
+and provide some info (such as your IP address, etc).  You will also want to
+seed your router on that page as well, and may want to consider reviewing some
+of the other configuration pages.  Alternately, you can update the "router.config"
+file in your I2P installation directory, which is checked for updates periodically.</p>
+
+<p>After your router has been configured and you have reseeded, within a few minutes
+(3-5), you should see the number of active peers increase.  If it doesn't, you may 
+want to verify that the hostname and port number specified on the configuration page
+are correct and reachable from the outside world.</p>
+
+<p>For help, you may want to review the information on the <a href="http://www.i2p.net/">I2P website</a>,
+post up messages to the <a href="http://forum.i2p.net/">I2P discussion forum</a>, or swing by #i2p or
+#i2p-chat on IRC at <a href="irc://irc.freenode.net/#i2p">irc.freenode.net</a>, 
+<a href="http://www.invisiblechat.com/">invisiblechat/IIP</a>, or irc.duck.i2p (they're all 
+linked together).</p>
+
+<h2>Want I2P to run automatically?</h2>
+
+<p>With the I2P install we've bundled some scripts and code (from the cool folks at 
+<a href="http://wrapper.tanukisoftware.org/doc/english/">tanukisoftware</a>) to let you
+run I2P as a service on windows machines (a daemon, for you *nix geeks).  To install it, 
+just run install_i2p_service_winnt.bat (or install_i2p_service_unix, as root).  To uninstall
+it, run uninstall_i2p_service_winnt.bat (or uninstall_i2p_service_unix, as root).  To uninstall
+I2P altogether, simply wipe the I2P installation directory.</p>
+
+<h2>What next?</h2>
+
+<p>By default, I2P comes bundled with the <a href="http://www.i2p.net/i2ptunnel">I2PTunnel</a>
+application configured with an <b>HTTP proxy</b> listening on <b>port 4444</b> and an 
+<b>IRC proxy</b> listening on <b>port 6668</b>.</p>
+
+<p>The HTTP proxy lets you access "eepsites" - anonymously hosted websites - 
+routing your requests and their responses over I2P.  There are also a few "outproxies" -
+gateways onto the normal internet - through which you can browse normal websites 
+anonymously.  Once you've configured your browser to use the proxy, you should be able 
+to reach some of the following sites:</p>
+
+<ul>
+ <li><a href="http://duck.i2p/">duck.i2p</a>: duck's eepsite, with links to other active sites</li>
+ <li><a href="http://ugha.i2p/">ugha.i2p</a>: ugha's eepsite, a wiki that anyone can edit, and lots of links</li>
+ <li><a href="http://forum.i2p/">forum.i2p</a>: an anonymous gateway to <a href="http://forum.i2p.net/">forum.i2p.net</a></li>
+ <li><a href="http://fproxy.i2p/">fproxy.i2p</a> and <a href="http://fproxy2.i2p/">fproxy2.i2p</a>:
+     public gateways into two different freenet nodes</li>
+</ul>
+
+<p>The IRC proxy is a gateway to duck's anonymously hosted IRC server 
+"irc.duck.i2p".  You can treat it like any other IRC server - fire up your IRC client and
+connect to the server at localhost:6668 and join us on #i2p or #i2p-chat!  DCC doesn't
+work at the moment though.</p>
+
+<p>By default, those two proxies listen only on the local interface, which means you 
+cannot access them from other machines on your network (and neither can random strangers :)
+If you want to make them accessible, or want to update them through some other way, go to
+the <a href="/i2ptunnel/" target="_blank">I2PTunnel configuration interface</a> and edit them accordingly.
+You can also go to that page if you want to add a new tunnel, such as if you want to run
+your own eepsite.</p>
+
+<p><b>As a note, you can change this page by editing the file "readme.html"</b></p>
