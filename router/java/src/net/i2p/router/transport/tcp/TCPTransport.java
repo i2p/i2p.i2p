@@ -270,7 +270,7 @@ public class TCPTransport extends TransportImpl {
      *
      * @param address address that the remote host said was ours
      */
-    void ourAddressReceived(String address) {
+    synchronized void ourAddressReceived(String address) {
         if (allowAddressUpdate()) {
             int port = getPort();
             TCPAddress addr = new TCPAddress(address, port);
@@ -282,6 +282,8 @@ public class TCPTransport extends TransportImpl {
                             return;
                         }
                     }
+                    if (_log.shouldLog(Log.INFO))
+                        _log.info("Update our local address to " + address);
                     updateAddress(addr);
                 }
             } else {
@@ -361,10 +363,10 @@ public class TCPTransport extends TransportImpl {
     }
     
     /**
-     * Is the given address a valid one that we could listen to? 
+     * Is the given address a valid one that we could listen to or contact? 
      *
      */
-    private boolean allowAddress(TCPAddress address) {
+    boolean allowAddress(TCPAddress address) {
         if (address == null) return false;
         if ( (address.getPort() <= 0) || (address.getPort() > 65535) )
             return false;
@@ -391,7 +393,6 @@ public class TCPTransport extends TransportImpl {
         RouterAddress routerAddr = addr.toRouterAddress();
         _myAddress = addr;
         _listener.stopListening();
-        _listener.startListening();
         
         Set addresses = getCurrentAddresses();
         List toRemove = null;
@@ -411,6 +412,11 @@ public class TCPTransport extends TransportImpl {
         addresses.add(routerAddr);
         
         _context.router().rebuildRouterInfo();
+      
+        if (_log.shouldLog(Log.INFO))
+            _log.info("Updating our local address to include " + addr.toString() 
+                      + " and modified our routerInfo to have: " 
+                      + _context.router().getRouterInfo().getAddresses());
         
         _listener.startListening();
     }
@@ -435,7 +441,7 @@ public class TCPTransport extends TransportImpl {
      *
      * @return the port number, or -1 if there is no valid port
      */
-    private int getPort() {
+    int getPort() {
         if ( (_myAddress != null) && (_myAddress.getPort() > 0) )
             return _myAddress.getPort();
         

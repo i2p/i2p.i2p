@@ -610,7 +610,7 @@ public class ConnectionBuilder {
             case 1: // not reachable
                 fail("According to " 
                      + _target.getIdentity().calculateHash().toBase64().substring(0,6)
-                     + ", we are not reachable on " + _localIP);
+                     + ", we are not reachable on " + _localIP + ":" + _transport.getPort());
                 return false;
             case 2: // clock skew
                 fail("According to " 

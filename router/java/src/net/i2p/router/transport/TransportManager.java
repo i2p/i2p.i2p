@@ -36,7 +36,6 @@ import net.i2p.util.Log;
 public class TransportManager implements TransportEventListener {
     private Log _log;
     private List _transports;
-    private List _addresses;
     private RouterContext _context;
 
     private final static String PROP_DISABLE_TCP = "i2np.tcp.disable";
@@ -45,7 +44,6 @@ public class TransportManager implements TransportEventListener {
         _context = context;
         _log = _context.logManager().getLog(TransportManager.class);
         _transports = new ArrayList();
-        _addresses = new ArrayList();
     }
     
     public void addTransport(Transport transport) {
@@ -77,7 +75,6 @@ public class TransportManager implements TransportEventListener {
         for (int i = 0; i < _transports.size(); i++) {
             Transport t = (Transport)_transports.get(i);
             RouterAddress addr = t.startListening();
-            if (addr != null) _addresses.add(addr);
             _log.debug("Transport " + i + " (" + t.getStyle() + ") started");
         }
         _log.debug("Done start listening on transports");
@@ -94,7 +91,6 @@ public class TransportManager implements TransportEventListener {
             ((Transport)_transports.get(i)).stopListening();
         }
         _transports.clear();
-        _addresses.clear();
     }
     
     private boolean isSupported(Set addresses, Transport t) {
@@ -112,6 +108,15 @@ public class TransportManager implements TransportEventListener {
             peers += ((Transport)_transports.get(i)).countActivePeers();
         }
         return peers;
+    }
+    
+    List getAddresses() {
+        List rv = new ArrayList(_transports.size());
+        for (int i = 0; i < _transports.size(); i++) {
+            Transport t = (Transport)_transports.get(i);
+            rv.addAll(t.getCurrentAddresses());
+        }
+        return rv;
     }
     
     public List getBids(OutNetMessage msg) {
@@ -264,9 +269,12 @@ public class TransportManager implements TransportEventListener {
         StringBuffer buf = new StringBuffer(8*1024);
         buf.append("<h2>Transport Manager</h2>\n");
         buf.append("Listening on: <br /><pre>\n");
-        for (Iterator iter = _addresses.iterator(); iter.hasNext(); ) {
-            RouterAddress addr = (RouterAddress)iter.next();
-            buf.append(addr.toString()).append("\n\n");
+        for (int i = 0; i < _transports.size(); i++) {
+            Transport t = (Transport)_transports.get(i);
+            for (Iterator iter = t.getCurrentAddresses().iterator(); iter.hasNext(); ) {
+                RouterAddress addr = (RouterAddress)iter.next();
+                buf.append(addr.toString()).append("\n\n");
+            }   
         }
         buf.append("</pre>\n");
         for (Iterator iter = _transports.iterator(); iter.hasNext(); ) {

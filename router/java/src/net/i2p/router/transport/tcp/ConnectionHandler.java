@@ -639,6 +639,9 @@ public class ConnectionHandler {
     private boolean verifyReachability() { 
         if (_actualPeer == null) return false;
         _remoteAddress = new TCPAddress(_actualPeer.getTargetAddress(TCPTransport.STYLE));
+        if (!_transport.allowAddress(_remoteAddress))
+            return false;
+        
         //if (true) return true;
         Socket s = null;
         try {

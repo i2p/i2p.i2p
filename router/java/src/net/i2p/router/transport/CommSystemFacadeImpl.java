@@ -75,6 +75,9 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
         RouterAddress addr = createTCPAddress();
         if (addr != null)
             addresses.add(addr);
+        
+        addresses.addAll(_manager.getAddresses());
+        
         if (_log.shouldLog(Log.INFO))
             _log.info("Creating addresses: " + addresses);
         return addresses;
@@ -91,7 +94,7 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
         String name = _context.router().getConfigSetting(PROP_I2NP_TCP_HOSTNAME);
         String port = _context.router().getConfigSetting(PROP_I2NP_TCP_PORT);
         if ( (name == null) || (port == null) ) {
-            _log.info("TCP Host/Port not specified in config file - skipping TCP transport");
+            //_log.info("TCP Host/Port not specified in config file - skipping TCP transport");
             return null;
         } else {
             _log.info("Creating TCP address on " + name + ":" + port);

@@ -92,6 +92,9 @@ public class TCPAddress {
         
         RouterAddress addr = new RouterAddress();
         
+        addr.setCost(10);
+        addr.setExpiration(null);
+        
         Properties props = new Properties();
         props.setProperty(PROP_HOST, _host);
         props.setProperty(PROP_PORT, ""+_port);
@@ -141,7 +144,8 @@ public class TCPAddress {
     public boolean equals(Object val) {
         if ( (val != null) && (val instanceof TCPAddress) ) {
             TCPAddress addr = (TCPAddress)val;
-            if ( (_addr != null) && (_addr.getHostAddress() != null) ) {
+            if ( (_addr != null) && (_addr.getHostAddress() != null) 
+                 && (addr.getAddress() != null) && (addr.getAddress().getHostAddress() != null) ) {
                 return DataHelper.eq(getAddress().getHostAddress(), addr.getAddress().getHostAddress())
                        && (getPort() == addr.getPort());
             } else {

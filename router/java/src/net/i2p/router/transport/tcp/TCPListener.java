@@ -63,7 +63,14 @@ class TCPListener {
         
     public void startListening() {
         TCPAddress addr = _transport.getMyAddress();
-        if (addr != null) {
+        if ( (addr != null) && (addr.getHost() != null) && (addr.getPort() > 0) ) {
+            if (_listener != null) {
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("Not starting another listener on " + addr 
+                              + " while already listening on " + _listener.getMyAddress());
+                return;
+            }
+            
             _listener = new ListenerRunner(addr);
             Thread t = new I2PThread(_listener, "Listener [" + addr.getPort()+"]");
             t.setDaemon(true);
@@ -80,7 +87,9 @@ class TCPListener {
     }
     
     public void stopListening() {
-        _listener.stopListening();
+        if (_listener != null)
+            _listener.stopListening();
+        
         for (int i = 0; i < _handlers.size(); i++) {
             SocketHandler h = (SocketHandler)_handlers.get(i);
             h.stopHandling();
@@ -93,6 +102,7 @@ class TCPListener {
                 _socket = null;
             } catch (IOException ioe) {}
         }
+        _listener = null;
     }
     
     private InetAddress getInetAddress(String host) {
@@ -118,6 +128,8 @@ class TCPListener {
             _myAddress = address;
         }
         public void stopListening() { _isRunning = false; }
+        
+        public TCPAddress getMyAddress() { return _myAddress; }
         
         public void run() {
             if (_log.shouldLog(Log.INFO))
