@@ -64,7 +64,8 @@ remainder of the communication is AES256 encrypted per
 <p><b>8) </b> <i>Bob to Alice</i>: <br />
    <code>routerInfo + status + properties + H(routerInfo + status + properties + nonce + tag)</code></p>
 <p><b>9) </b> If the <code>status</code> is ok, both Alice and Bob consume the 
-   <code>tagData</code>, updating the next tag to be <code>H(E(nonce + tag, sessionKey))</code>.
+   <code>tagData</code>, updating the next tag to be <code>H(E(nonce + tag, sessionKey))</code>
+   (with nonce+tag padded with 12 bytes of 0x0 at the end).
    Otherwise, both sides disconnect and do not consume the tag.  In addition, on error the 
    <code>properties</code> mapping has a more detailed reason under the key "MESSAGE".</p>
    

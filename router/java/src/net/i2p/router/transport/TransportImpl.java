@@ -324,11 +324,36 @@ public abstract class TransportImpl implements Transport {
     }
  	
     /** What addresses are we currently listening to? */
-    public Set getCurrentAddresses() { return _currentAddresses; }
-    /** Add an address to our listening set */
-    protected void addCurrentAddress(RouterAddress address) { _currentAddresses.add(address); }
-    /** Remove an address from our listening set */
-    protected void removeCurrentAddress(RouterAddress address) { _currentAddresses.remove(address); }
+    public Set getCurrentAddresses() { 
+        synchronized (_currentAddresses) { 
+            return new HashSet(_currentAddresses); 
+        }
+    }
+    /**
+     * Replace any existing addresses for the current transport with the given
+     * one.
+     */
+    protected void replaceAddress(RouterAddress address) {
+        synchronized (_currentAddresses) {
+            Set addresses = _currentAddresses;
+            List toRemove = null;
+            for (Iterator iter = addresses.iterator(); iter.hasNext(); ) {
+                RouterAddress cur = (RouterAddress)iter.next();
+                if (getStyle().equals(cur.getTransportStyle())) {
+                    if (toRemove == null)
+                        toRemove = new ArrayList(1);
+                    toRemove.add(cur);
+                }
+            }
+            if (toRemove != null) {
+                for (int i = 0; i < toRemove.size(); i++) {
+                    addresses.remove(toRemove.get(i));
+                }
+            }
+            _currentAddresses.add(address);
+        }
+    }
+    
     /** Who to notify on message availability */
     public void setListener(TransportEventListener listener) { _listener = listener; }
     /** Make this stuff pretty (only used in the old console) */

@@ -80,6 +80,31 @@ public class ConnectionHandler {
     private SessionKey _key;
     /** initialization vector for the encryption */
     private byte[] _iv;
+
+    /** for reading/comparing, this is the #bytes sent if we are being tested */
+    public static final int FLAG_TEST = 0xFFFF;
+    /** protocol version sent if no protocols are ok */
+    public static final byte FLAG_PROTOCOL_NONE = 0x0;
+    /** alice is sending a tag to bob */
+    public static final byte FLAG_TAG_FOLLOWING = 0x1;
+    /** alice is not sending a tag to bob */
+    public static final byte FLAG_TAG_NOT_FOLLOWING = 0x0;
+    /** the connection tag is ok (we have an available key for it) */
+    public static final byte FLAG_TAG_OK = 0x1;
+    /** the connection tag is not ok (must go with a full DH) */
+    public static final byte FLAG_TAG_NOT_OK = 0x0;
+    /** dunno why the peer is bad */
+    public static final int STATUS_UNKNOWN = -1;
+    /** the peer's public addresses could not be verified */
+    public static final int STATUS_UNREACHABLE = 1;
+    /** the peer's clock is too far skewed */
+    public static final int STATUS_SKEWED = 2;
+    /** the peer's signature failed (either some crazy corruption or MITM) */
+    public static final int STATUS_SIGNATURE_FAILED = 3;
+    /** the peer is fine */
+    public static final int STATUS_OK = 0;
+    
+    private static final int MAX_VERSIONS = 255;
     
     public ConnectionHandler(RouterContext ctx, TCPTransport transport, Socket socket) {
         _context = ctx;
@@ -173,8 +198,8 @@ public class ConnectionHandler {
             int numBytes = (int)DataHelper.readLong(_rawIn, 2);
             if (numBytes <= 0)
                 throw new IOException("Invalid number of bytes in connection");
-            // 0xFFFF is a reserved value identifying the connection as a reachability test
-            if (numBytes == 0xFFFF) {
+            // reachability test
+            if (numBytes == FLAG_TEST) {
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("ReadProtocol[Y]: test called, handle it");
                 handleTest();
@@ -194,7 +219,7 @@ public class ConnectionHandler {
             ByteArrayInputStream bais = new ByteArrayInputStream(line);
             
             int numVersions = (int)DataHelper.readLong(bais, 1);
-            if ( (numVersions <= 0) || (numVersions > 0x8) ) {
+            if ( (numVersions <= 0) || (numVersions > MAX_VERSIONS) ) {
                 fail("Invalid number of protocol versions from " + _from);
                 return false;
             }
@@ -212,7 +237,7 @@ public class ConnectionHandler {
             }
             
             int tag = (int)DataHelper.readLong(bais, 1);
-            if (tag == 0x1) {
+            if (tag == FLAG_TAG_FOLLOWING) {
                 byte tagData[] = new byte[32];
                 read = DataHelper.read(bais, tagData);
                 if (read != 32)
@@ -248,7 +273,7 @@ public class ConnectionHandler {
         try {
             ByteArrayOutputStream baos = new ByteArrayOutputStream(128);
             if (_agreedProtocol <= 0)
-                baos.write(0x0);
+                baos.write(FLAG_PROTOCOL_NONE);
             else
                 baos.write(_agreedProtocol);
             
@@ -257,9 +282,9 @@ public class ConnectionHandler {
             baos.write(ip);
             
             if (_key != null)
-                baos.write(0x1);
+                baos.write(FLAG_TAG_OK);
             else
-                baos.write(0x0);
+                baos.write(FLAG_TAG_NOT_OK);
             
             byte nonce[] = new byte[4];
             _context.random().nextBytes(nonce);
@@ -301,6 +326,8 @@ public class ConnectionHandler {
     /** Set the next tag to <code>H(E(nonce + tag, sessionKey))</code> */
     private void updateNextTagExisting() {
         byte pre[] = new byte[48];
+        System.arraycopy(_nonce.getData(), 0, pre, 0, 4);
+        System.arraycopy(_connectionTag.getData(), 0, pre, 4, 32);
         byte encr[] = _context.AESEngine().encrypt(pre, _key, _iv);
         Hash h = _context.sha().calculateHash(encr);
         _nextConnectionTag = new ByteArray(h.getData());
@@ -313,7 +340,7 @@ public class ConnectionHandler {
      * @return true if the connection went ok, or false if it failed.
      */
     private boolean connectExistingSession() { 
-        // iv to the SHA256 of the tag appended by the nonce.
+        // iv = H(tag+nonce)
         byte data[] = new byte[36];
         System.arraycopy(_connectionTag.getData(), 0, data, 0, 32);
         System.arraycopy(_nonce.getData(), 0, data, 32, 4);
@@ -407,16 +434,16 @@ public class ConnectionHandler {
             
             Properties props = new Properties();
             
-            int status = -1;
+            int status = STATUS_UNKNOWN;
             if (!reachable) {
-                status = 1;
+                status = STATUS_UNREACHABLE;
             } else if ( (clockSkew > Router.CLOCK_FUDGE_FACTOR) 
                         || (clockSkew < 0 - Router.CLOCK_FUDGE_FACTOR) ) {
-                status = 2;
+                status = STATUS_SKEWED;
                 SimpleDateFormat fmt = new SimpleDateFormat("yyyyMMddhhmmssSSS");
                 props.setProperty("SKEW", fmt.format(new Date(_context.clock().now())));
             } else {
-                status = 0;
+                status = STATUS_OK;
             }
             
             baos.write(status);
@@ -559,18 +586,18 @@ public class ConnectionHandler {
             
             Properties props = new Properties();
             
-            int status = -1;
+            int status = STATUS_UNKNOWN;
             if (!reachable) {
-                status = 1;
+                status = STATUS_UNREACHABLE;
             } else if ( (clockSkew > Router.CLOCK_FUDGE_FACTOR) 
                         || (clockSkew < 0 - Router.CLOCK_FUDGE_FACTOR) ) {
-                status = 2;
+                status = STATUS_SKEWED;
                 SimpleDateFormat fmt = new SimpleDateFormat("yyyyMMddhhmmssSSS");
                 props.setProperty("SKEW", fmt.format(new Date(_context.clock().now())));
             } else if (!sigOk) {
-                status = 3;
+                status = STATUS_SIGNATURE_FAILED;
             } else {
-                status = 0;
+                status = STATUS_OK;
             }
             
             baos.write(status);
@@ -608,17 +635,17 @@ public class ConnectionHandler {
      */
     private boolean handleStatus(int status, long clockSkew) {
         switch (status) {
-            case 0: // ok
+            case STATUS_OK:
                 return true;
-            case 1:
+            case STATUS_UNREACHABLE:
                 fail("Peer " + _actualPeer.getIdentity().calculateHash().toBase64().substring(0,6)
                      + " at " + _from + " is unreachable");
                 return false;
-            case 2:
+            case STATUS_SKEWED:
                 fail("Peer " + _actualPeer.getIdentity().calculateHash().toBase64().substring(0,6)
                      + " was skewed by " + DataHelper.formatDuration(clockSkew));
                 return false;
-            case 3:
+            case STATUS_SIGNATURE_FAILED:
                 fail("Forged signature on " + _from + " pretending to be "
                      + _actualPeer.getIdentity().calculateHash().toBase64().substring(0,6));
                 return false;
@@ -655,8 +682,7 @@ public class ConnectionHandler {
                 _log.debug("Beginning verification of reachability");
             
             // send: 0xFFFF + #versions + v1 [+ v2 [etc]] + properties
-            out.write(0xFF);
-            out.write(0xFF);
+            DataHelper.writeLong(out, 2, FLAG_TEST);
             out.write(TCPTransport.SUPPORTED_PROTOCOLS.length);
             for (int i = 0; i < TCPTransport.SUPPORTED_PROTOCOLS.length; i++) 
                 out.write(TCPTransport.SUPPORTED_PROTOCOLS[i]);
@@ -667,16 +693,13 @@ public class ConnectionHandler {
                 _log.debug("Verification of reachability request sent");
             
             // read: 0xFFFF + versionOk + #bytesIP + IP + currentTime + properties
-            int ok = in.read();
-            if (ok != 0xFF)
-                throw new IOException("Unable to verify the peer - invalid response");
-            ok = in.read();
-            if (ok != 0xFF)
+            int flag = (int)DataHelper.readLong(in, 2);
+            if (flag != FLAG_TEST)
                 throw new IOException("Unable to verify the peer - invalid response");
             int version = in.read();
             if (version == -1)
                 throw new IOException("Unable to verify the peer - invalid version");
-            if (version == 0)
+            if (version == FLAG_PROTOCOL_NONE)
                 throw new IOException("Unable to verify the peer - no matching version");
             int numBytes = in.read();
             if ( (numBytes == -1) || (numBytes > 32) )
@@ -715,7 +738,7 @@ public class ConnectionHandler {
             // read: #versions + v1 [+ v2 [etc]] + properties
             int numVersions = _rawIn.read();
             if (numVersions == -1) throw new IOException("Unable to read versions");
-            if (numVersions > 256) throw new IOException("Too many versions");
+            if (numVersions > MAX_VERSIONS) throw new IOException("Too many versions");
             int versions[] = new int[numVersions];
             for (int i = 0; i < numVersions; i++) {
                 versions[i] = _rawIn.read();
@@ -738,8 +761,7 @@ public class ConnectionHandler {
                 _log.debug("HandleTest: version=" + version + " opts=" +opts);
             
             // send: 0xFFFF + versionOk + #bytesIP + IP + currentTime + properties
-            _rawOut.write(0xFF);
-            _rawOut.write(0xFF);
+            DataHelper.writeLong(_rawOut, 2, FLAG_TEST);
             _rawOut.write(version);
             byte ip[] = _from.getBytes();
             _rawOut.write(ip.length);

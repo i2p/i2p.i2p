@@ -44,8 +44,9 @@ class ConnectionRunner implements Runnable {
     public void run() {
         while (_keepRunning && !_con.getIsClosed()) {
             OutNetMessage msg = _con.getNextMessage();
-            if ( (msg == null) && (_keepRunning) ) {
-                _log.error("next message is null but we should keep running?");
+            if (msg == null) {
+                if (_keepRunning)
+                    _log.error("next message is null but we should keep running?");
             } else {
                 sendMessage(msg);
             }

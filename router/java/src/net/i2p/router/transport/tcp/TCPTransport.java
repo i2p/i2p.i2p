@@ -270,25 +270,30 @@ public class TCPTransport extends TransportImpl {
      *
      * @param address address that the remote host said was ours
      */
-    synchronized void ourAddressReceived(String address) {
-        if (allowAddressUpdate()) {
-            int port = getPort();
-            TCPAddress addr = new TCPAddress(address, port);
-            if (addr.getPort() > 0) {
-                if (allowAddress(addr)) {
-                    if (_myAddress != null) {
-                        if (addr.getAddress().equals(_myAddress.getAddress())) {
-                            // ignore, since there is no change
-                            return;
+    void ourAddressReceived(String address) {
+        synchronized (_listener) { // no need to lock on the whole TCPTransport
+            if (allowAddressUpdate()) {
+                int port = getPort();
+                TCPAddress addr = new TCPAddress(address, port);
+                if (addr.getPort() > 0) {
+                    if (allowAddress(addr)) {
+                        if (_myAddress != null) {
+                            if (addr.getAddress().equals(_myAddress.getAddress())) {
+                                // ignore, since there is no change
+                                return;
+                            }
                         }
+                        if (_log.shouldLog(Log.INFO))
+                            _log.info("Update our local address to " + address);
+                        updateAddress(addr);
                     }
-                    if (_log.shouldLog(Log.INFO))
-                        _log.info("Update our local address to " + address);
-                    updateAddress(addr);
+                } else {
+                    if (_log.shouldLog(Log.ERROR))
+                        _log.error("Address specified is not valid [" + address + ":" + port + "]");
                 }
             } else {
-                if (_log.shouldLog(Log.ERROR))
-                    _log.error("Address specified is not valid [" + address + ":" + port + "]");
+                // either we have explicitly specified our IP address, or 
+                // we are already connected to some people.
             }
         }
     }
@@ -321,8 +326,8 @@ public class TCPTransport extends TransportImpl {
     
     /**
      * Add the given message to the list of most recent connection 
-     * establishment error messages.  This should include a timestamp of 
-     * some sort in it.
+     * establishment error messages.  A timestamp is prefixed to it before
+     * being rendered on the router console.
      *
      */
     void addConnectionErrorMessage(String msg) {
@@ -394,22 +399,7 @@ public class TCPTransport extends TransportImpl {
         _myAddress = addr;
         _listener.stopListening();
         
-        Set addresses = getCurrentAddresses();
-        List toRemove = null;
-        for (Iterator iter = addresses.iterator(); iter.hasNext(); ) {
-            RouterAddress cur = (RouterAddress)iter.next();
-            if (STYLE.equals(cur.getTransportStyle())) {
-                if (toRemove == null)
-                    toRemove = new ArrayList(1);
-                toRemove.add(cur);
-            }
-        }
-        if (toRemove != null) {
-            for (int i = 0; i < toRemove.size(); i++) {
-                addresses.remove(toRemove.get(i));
-            }
-        }
-        addresses.add(routerAddr);
+        replaceAddress(routerAddr);
         
         _context.router().rebuildRouterInfo();
       
@@ -492,7 +482,7 @@ public class TCPTransport extends TransportImpl {
      *
      */
     RouterInfo getNextPeer() {
-        while (true) {
+        while (_context.router().isAlive()) {
             synchronized (_connectionLock) {
                 for (Iterator iter = _pendingMessages.keySet().iterator(); iter.hasNext(); ) {
                     Hash peer = (Hash)iter.next();
@@ -526,6 +516,7 @@ public class TCPTransport extends TransportImpl {
                 } catch (InterruptedException ie) {}
             }
         }
+        return null;
     }
     
     /** Called after an establisher finished (or failed) connecting to the peer */

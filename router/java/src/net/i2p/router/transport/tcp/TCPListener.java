@@ -34,7 +34,9 @@ class TCPListener {
     private ServerSocket _socket;
     private ListenerRunner _listener;
     private RouterContext _context;
+    /** Client Sockets that have been received but not yet handled (oldest first) */
     private List _pendingSockets;
+    /** List of SocketHandler runners if we're listening (else an empty list) */
     private List _handlers;
     
     /**
@@ -61,6 +63,7 @@ class TCPListener {
         _handlers = new ArrayList(CONCURRENT_HANDLERS);
     }
         
+    /** Make sure we are listening on the transport's getMyAddress() */
     public void startListening() {
         TCPAddress addr = _transport.getMyAddress();
         if ( (addr != null) && (addr.getHost() != null) && (addr.getPort() > 0) ) {
@@ -149,9 +152,10 @@ class TCPListener {
                     curDelay = 0;
                     loop();
                 } catch (IOException ioe) {
-                    if (_log.shouldLog(Log.WARN))
-                        _log.warn("Error listening to tcp connection " + _myAddress.getHost() + ":" 
-                                   + _myAddress.getPort(), ioe);
+                    if (_isRunning && _context.router().isAlive())
+                        if (_log.shouldLog(Log.ERROR))
+                            _log.error("Error listening to tcp connection " + _myAddress.getHost() + ":" 
+                                       + _myAddress.getPort(), ioe);
                 }
                 
                 if (_socket != null) {
@@ -167,12 +171,13 @@ class TCPListener {
                 if (_nextFailDelay > MAX_FAIL_DELAY)
                     _nextFailDelay = MAX_FAIL_DELAY;
             }
-            if (_log.shouldLog(Log.ERROR))
-                _log.error("CANCELING TCP LISTEN.  delay = " + curDelay);
+            if (_isRunning && _context.router().isAlive())
+                if (_log.shouldLog(Log.ERROR))
+                    _log.error("CANCELING TCP LISTEN.  delay = " + curDelay);
             _isRunning = false;
         }
         private void loop() {
-            while (_isRunning) {
+            while (_isRunning && _context.router().isAlive()) {
                 try {
                     if (_log.shouldLog(Log.INFO))
                         _log.info("Waiting for a connection on " + _myAddress.getHost() + ":" + _myAddress.getPort());

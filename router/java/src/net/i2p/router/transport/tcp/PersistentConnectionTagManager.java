@@ -19,6 +19,8 @@ import net.i2p.router.RouterContext;
 import net.i2p.util.Log;
 
 /**
+ * Simple persistent impl writing the connection tags to connectionTag.keys
+ * (or another file specified via "i2np.tcp.tagFile")
  *
  */
 public class PersistentConnectionTagManager extends ConnectionTagManager {

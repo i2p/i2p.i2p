@@ -168,6 +168,7 @@ public class ConnectionBuilder {
         if (!ok) return;
     }
     
+    
     /**
      * Send <code>#bytesFollowing + #versions + v1 [+ v2 [etc]] + 
      * tag? + tagData + properties</code>
@@ -181,10 +182,10 @@ public class ConnectionBuilder {
                 DataHelper.writeLong(baos, 1, TCPTransport.SUPPORTED_PROTOCOLS[i]);
             }
             if (_connectionTag != null) {
-                baos.write(0x1);
+                baos.write(ConnectionHandler.FLAG_TAG_FOLLOWING);
                 baos.write(_connectionTag.getData());
             } else {
-                baos.write(0x0);
+                baos.write(ConnectionHandler.FLAG_TAG_NOT_FOLLOWING);
             }
             DataHelper.writeProperties(baos, null); // no options atm
             byte line[] = baos.toByteArray();
@@ -219,8 +220,7 @@ public class ConnectionBuilder {
         try {
             // #bytesFollowing + versionOk + #bytesIP + IP + tagOk? + nonce + properties
             int numBytes = (int)DataHelper.readLong(_rawIn, 2);
-            // 0xFFFF is a reserved value
-            if ( (numBytes <= 0) || (numBytes >= 0xFFFF) )
+            if ( (numBytes <= 0) || (numBytes >= ConnectionHandler.FLAG_TEST) )
                 throw new IOException("Invalid number of bytes in response");
             
             byte line[] = new byte[numBytes];
@@ -244,7 +244,7 @@ public class ConnectionBuilder {
                     break;
                 }
             }
-            if (_agreedProtocol == -1) {
+            if (_agreedProtocol == ConnectionHandler.FLAG_PROTOCOL_NONE) {
                 fail("No valid protocol versions to contact "
                      + _target.getIdentity().calculateHash().toBase64().substring(0,6));
                 return false;
@@ -259,7 +259,7 @@ public class ConnectionBuilder {
             _transport.ourAddressReceived(_localIP);
             
             int tagOk = (int)DataHelper.readLong(bais, 1);
-            if ( (tagOk == 0x01) && (_connectionTag != null) ) {
+            if ( (tagOk == ConnectionHandler.FLAG_TAG_OK) && (_connectionTag != null) ) {
                 // tag is ok
             } else {
                 _connectionTag = null;
@@ -305,6 +305,8 @@ public class ConnectionBuilder {
     /** Set the next tag to <code>H(E(nonce + tag, sessionKey))</code> */
     private void updateNextTagExisting() {
         byte pre[] = new byte[48];
+        System.arraycopy(_nonce.getData(), 0, pre, 0, 4);
+        System.arraycopy(_connectionTag.getData(), 0, pre, 4, 32);
         byte encr[] = _context.AESEngine().encrypt(pre, _key, _iv);
         Hash h = _context.sha().calculateHash(encr);
         _nextConnectionTag = new ByteArray(h.getData());
@@ -601,23 +603,23 @@ public class ConnectionBuilder {
      */
     private boolean validateStatus(int status) {
         switch (status) {
-            case -1:
+            case -1: // EOF
                 fail("Error reading the status from " 
                      + _target.getIdentity().calculateHash().toBase64().substring(0,6));
                 return false;
-            case 0: // ok
+            case ConnectionHandler.STATUS_OK:
                 return true;
-            case 1: // not reachable
+            case ConnectionHandler.STATUS_UNREACHABLE:
                 fail("According to " 
                      + _target.getIdentity().calculateHash().toBase64().substring(0,6)
                      + ", we are not reachable on " + _localIP + ":" + _transport.getPort());
                 return false;
-            case 2: // clock skew
+            case ConnectionHandler.STATUS_SKEWED:
                 fail("According to " 
                      + _target.getIdentity().calculateHash().toBase64().substring(0,6)
                      + ", our clock is off");
                 return false;
-            case 3: // signature failure (only for new sessions)
+            case ConnectionHandler.STATUS_SIGNATURE_FAILED: // (only for new sessions)
                 fail("Signature failure talking to " 
                      + _target.getIdentity().calculateHash().toBase64().substring(0,6));
                 return false;
