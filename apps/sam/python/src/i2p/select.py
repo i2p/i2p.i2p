@@ -40,7 +40,7 @@ class Poll:
     del self.fds[self._hash(fd)]
   def poll(self, timeout=None):
     readlist, writelist, errlist = [], [], []
-    for F, mask in self.fds:
+    for F, mask in self.fds.values():
       if mask & POLLIN:  readlist  += [F]
       if mask & POLLOUT: writelist += [F]
       if mask & POLLERR: errlist   += [F]
