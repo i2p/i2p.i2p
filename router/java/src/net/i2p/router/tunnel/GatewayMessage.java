@@ -54,6 +54,12 @@ public class GatewayMessage {
     private static final int COLUMNS = HOPS;
     private static final int HASH_ROWS = HOPS;
     
+    /** used to munge the IV during per-hop translations */
+    static final byte IV_WHITENER[] = new byte[] { (byte)0x31, (byte)0xd6, (byte)0x74, (byte)0x17, 
+                                                   (byte)0xa0, (byte)0xb6, (byte)0x28, (byte)0xed, 
+                                                   (byte)0xdf, (byte)0xee, (byte)0x5b, (byte)0x86, 
+                                                   (byte)0x74, (byte)0x61, (byte)0x50, (byte)0x7d };
+    
     public GatewayMessage(I2PAppContext ctx) {
         _context = ctx;
         _log = ctx.logManager().getLog(GatewayMessage.class);
@@ -135,6 +141,7 @@ public class GatewayMessage {
             
             // decrypt, since we're simulating what the participants do
             _context.aes().decryptBlock(_iv[i-1], 0, key, _iv[i], 0);
+            DataHelper.xor(_iv[i], 0, IV_WHITENER, 0, _iv[i], 0, IV_SIZE);
             Hash h = _context.sha().calculateHash(_iv[i]);
             System.arraycopy(h.getData(), 0, _iv[i], 0, IV_SIZE);
         }

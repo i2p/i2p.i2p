@@ -1,4 +1,4 @@
-<code>$Id: tunnel.html,v 1.3 2005/01/12 14:22:40 jrandom Exp $</code>
+<code>$Id: tunnel.html,v 1.4 2005/01/12 19:57:36 jrandom Exp $</code>
 <pre>
 1) <a href="#tunnel.overview">Tunnel overview</a>
 2) <a href="#tunnel.operation">Tunnel operation</a>
@@ -248,9 +248,9 @@ for certain whether any of the checksum blocks have been tagged, as that would
 corrupt the verification block (V[7]).</p>
 
 <p>The IV[0] is a random 16 byte value, and IV[i] is the first 16 bytes of 
-H(D(IV[i-1], K[i-1])).  We don't use the same IV along the path, as that would
+H(D(IV[i-1], K[i-1]) xor IV_WHITENER).  We don't use the same IV along the path, as that would
 allow trivial collusion, and we use the hash of the decrypted value to propogate 
-the IV so as to hamper key leakage.</p>
+the IV so as to hamper key leakage.  IV_WHITENER is a fixed 16 byte value.</p>
 
 <p>When the gateway wants to send the message, they export the right row for the
 peer who is the first hop (usually the peer1.recv row) and forward that entirely.</p>

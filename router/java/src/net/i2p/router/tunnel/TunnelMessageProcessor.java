@@ -87,7 +87,9 @@ public class TunnelMessageProcessor {
         }
         
         // update the IV for the next layer
+        
         ctx.aes().decryptBlock(data, 0, layerKey, data, 0);
+        DataHelper.xor(data, 0, GatewayMessage.IV_WHITENER, 0, data, 0, IV_SIZE);
         Hash h = ctx.sha().calculateHash(data, 0, IV_SIZE);
         System.arraycopy(h.getData(), 0, data, 0, IV_SIZE);
         
