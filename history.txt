@@ -1,4 +1,10 @@
-$Id: history.txt,v 1.98 2004/12/05 21:08:03 jrandom Exp $
+$Id: history.txt,v 1.99 2004/12/06 00:03:58 jrandom Exp $
+
+2004-12-06  jrandom
+    * Don't do a 'passive flush' while there are already outbound messages 
+      unacked.
+    * Show the reseed link if up to 10 peers profiles are active (thanks 
+      dburton!)
 
 2004-12-06  jrandom
     * Don't propogate streaming connection failures out to the SAM bridge as

@@ -160,6 +160,8 @@ public class MessageOutputStream extends OutputStream {
                 _log.debug("flusher time reached: left = " + timeLeft);
             if (timeLeft > 0)
                 enqueue();
+            else if (_dataReceiver.writeInProcess())
+                enqueue(); // don't passive flush if there is a write being done (unacked outbound)
             else
                 doFlush();
         }
@@ -341,6 +343,7 @@ public class MessageOutputStream extends OutputStream {
          * Nonblocking write
          */
         public WriteStatus writeData(byte buf[], int off, int size);
+        public boolean writeInProcess();
     }
     
     /** Define a way to detect the status of a write */

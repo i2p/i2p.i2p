@@ -23,7 +23,7 @@
      if (helper.getActivePeers() <= 0) {
         %><b><a href="config.jsp">check your NAT/firewall</a></b><br /><%
      }
-    if (helper.getActiveProfiles() <= 4) { // 4 is the min fallback
+    if (helper.getActiveProfiles() <= 10) { // 10 is the min fallback
         if ("true".equals(System.getProperty("net.i2p.router.web.ReseedHandler.reseedInProgress", "false"))) {
             out.print(" <i>reseeding</i>");
         } else {
