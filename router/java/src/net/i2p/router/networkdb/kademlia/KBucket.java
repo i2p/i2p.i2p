@@ -75,5 +75,4 @@ interface KBucket {
     public Hash generateRandomKey();
     
     public Hash getLocal();
-    public void setLocal(Hash local);
 }
