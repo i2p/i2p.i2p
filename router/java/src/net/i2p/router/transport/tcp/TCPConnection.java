@@ -449,7 +449,7 @@ class TCPConnection implements I2NPMessageReader.I2NPMessageEventListener {
         private boolean _running;
         public void run() {
             _running = true;
-            while (_running) {
+            while (_running && !_closed) {
                 OutNetMessage nextMessage = getNext();
                 if (nextMessage != null) {
                     boolean sent = doSend(nextMessage);
