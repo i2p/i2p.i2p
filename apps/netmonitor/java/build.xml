@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project basedir="." default="all" name="netmonitor">
+    <target name="all" depends="clean, build" />
+    <target name="build" depends="builddep, jar" />
+    <target name="builddep">
+        <ant dir="../../../core/java/" target="build" />
+    </target>
+    <target name="fetchJfreechart">
+        <mkdir dir="./lib" />
+        <get src="http://www.jfree.org/jfreechart/jfreechart-0.9.17.zip" verbose="true" dest="lib/jfreechart-0.9.17.zip" />
+        <unzip src="lib/jfreechart-0.9.17.zip" dest="lib/" />
+    </target>
+    <target name="buildGUI" depends="build, jfreechart, jarGUI" />
+    <target name="compile">
+        <mkdir dir="./build" />
+        <mkdir dir="./build/obj" />
+        <javac srcdir="./src" debug="true" destdir="./build/obj" includes="net/**/*.java" excludes="net/i2p/netmonitor/gui/**" classpath="../../../core/java/build/i2p.jar" />
+    </target>
+
+    <target name="compileGUI" depends="builddep">
+        <mkdir dir="./build" />
+        <mkdir dir="./build/obj" />
+        <javac debug="true" destdir="./build/obj">
+            <src path="src/" />
+            <classpath path="../../../core/java/build/i2p.jar" />
+            <classpath path="lib/jfreechart-0.9.17/lib/jcommon-0.9.2.jar" />
+            <classpath path="lib/jfreechart-0.9.17/lib/log4j-1.2.8.jar" />
+            <classpath path="lib/jfreechart-0.9.17/jfreechart-0.9.17.jar" />
+        </javac>
+    </target>
+    <target name="jfreechart">
+        <ant dir="./lib/jfreechart-0.9.17/" antfile="ant/build.xml" target="compile" />
+    </target>
+
+    <target name="jarGUI" depends="compileGUI">
+        <copy file="lib/jfreechart-0.9.17/jfreechart-0.9.17.jar" todir="build/" />
+        <copy file="lib/jfreechart-0.9.17/lib/log4j-1.2.8.jar" todir="build/" />
+        <copy file="lib/jfreechart-0.9.17/lib/jcommon-0.9.2.jar" todir="build/" />
+        <jar destfile="./build/netviewer.jar" basedir="./build/obj" includes="**">
+            <manifest>
+                <attribute name="Main-Class" value="net.i2p.netmonitor.gui.NetViewer" />
+                <attribute name="Class-Path" value="log4j-1.2.8.jar jcommon-0.9.2.jar jfreechart-0.9.17.jar netviewer.jar i2p.jar" />
+            </manifest>
+        </jar>
+        <echo message="You will need to copy the log4j, jcommon, and jfreechart jar files from build/ into your lib dir" />
+    </target>
+
+    <target name="jar" depends="compile">
+        <jar destfile="./build/netmonitor.jar" basedir="./build/obj" includes="**/*.class">
+            <manifest>
+                <attribute name="Main-Class" value="net.i2p.netmonitor.NetMonitor" />
+                <attribute name="Class-Path" value="i2p.jar netmonitor.jar" />
+            </manifest>
+        </jar>
+    </target>
+    <target name="javadoc">
+        <mkdir dir="./build" />
+        <mkdir dir="./build/javadoc" />
+        <javadoc 
+            sourcepath="./src:../../../core/java/src:../../../core/java/test" destdir="./build/javadoc" 
+            packagenames="*" 
+            use="true" 
+            access="package"
+            splitindex="true" 
+            windowtitle="I2P netmonitor" />
+    </target>
+    <target name="clean">
+        <delete dir="./build" />
+    </target>
+    <target name="cleandep" depends="clean">
+        <ant dir="../../../core/java/" target="cleandep" />
+    </target>
+    <target name="distclean" depends="clean">
+        <ant dir="../../../core/java/" target="distclean" />
+        <delete dir="./lib/" />
+    </target>
+</project>
