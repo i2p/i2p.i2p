@@ -34,9 +34,12 @@
 extern "C" {
 #endif
 
-#include <stdbool.h>
-#include <stddef.h>
-#include <stdint.h>
+/*
+ * Standard C99 includes - if your compiler doesn't have these, it's time to
+ * upgrade
+ */
+#include <stdbool.h>  // bool
+#include <stddef.h>  // size_t
 
 
 /*
@@ -67,12 +70,6 @@ extern "C" {
  * Some LibSAM variable types
  */
 
-typedef signed char schar_t;
-typedef unsigned char uchar_t;
-typedef unsigned int uint_t;
-typedef unsigned long ulong_t;
-typedef unsigned short ushort_t;
-
 #ifdef WINSOCK
 	typedef SOCKET socket_t;
 #else
@@ -88,7 +85,7 @@ typedef struct {
 	size_t size;
 } sam_sendq_t;  /* sending queue to encourage large stream packet sizes */
 
-typedef int_fast32_t sam_sid_t;  /* stream id number */
+typedef long sam_sid_t;  /* stream id number */
 
 typedef struct {
 	socket_t sock;  /* the socket used for communications with SAM */
@@ -119,8 +116,8 @@ void		sam_session_free(sam_sess_t **session);
 /* SAM controls - connection */
 bool		sam_close(sam_sess_t *session);
 samerr_t	sam_connect(sam_sess_t *session, const char *samhost,
-				uint16_t samport, const char *destname, sam_conn_t style,
-				uint_t tunneldepth);
+				unsigned short samport, const char *destname, sam_conn_t style,
+				unsigned int tunneldepth);
 /* SAM controls - utilities */
 void		sam_naming_lookup(sam_sess_t *session, const char *name);
 bool		sam_read_buffer(sam_sess_t *session);

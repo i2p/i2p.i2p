@@ -28,8 +28,8 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "platform.h"
 #include "sam.h"
+#include "platform.h"
 
 static bool			sam_hello(sam_sess_t *session);
 static void			sam_log(const char *format, ...);
@@ -40,9 +40,9 @@ static bool			sam_readable(sam_sess_t *session);
 static sam_sendq_t	*sam_sendq_create();
 static samerr_t		sam_session_create(sam_sess_t *session,
 						const char *destname, sam_conn_t style,
-						uint_t tunneldepth);
+						uint tunneldepth);
 static bool			sam_socket_connect(sam_sess_t *session, const char *host,
-						uint16_t port);
+						ushort port);
 static bool			sam_socket_resolve(const char *hostname, char *ipaddr);
 #ifdef WINSOCK
 static samerr_t		sam_winsock_cleanup();
@@ -146,8 +146,8 @@ bool sam_close(sam_sess_t *session)
  *
  * Returns: SAM error code.  If SAM_OK, `session' will be ready for use.
  */
-samerr_t sam_connect(sam_sess_t *session, const char *samhost, uint16_t samport,
-	const char *destname, sam_conn_t style, uint_t tunneldepth)
+samerr_t sam_connect(sam_sess_t *session, const char *samhost, ushort samport,
+	const char *destname, sam_conn_t style, uint tunneldepth)
 {
 	assert(session != NULL);
 	samerr_t rc;
@@ -723,10 +723,10 @@ static ssize_t sam_read2(sam_sess_t *session, void *buf, size_t n)
 	p = buf;
 	printf("*RR* ");
 	for (size_t x = 0; x < n; x++) {
-		if (isprint(((uchar_t*)p)[x]))
-			printf("%c,", ((uchar_t*)p)[x]);
+		if (isprint(((byte*)p)[x]))
+			printf("%c,", ((byte*)p)[x]);
 		else
-			printf("%03d,", ((uint8_t*)p)[x]);
+			printf("%03d,", ((byte*)p)[x]);
 	}
 	printf("\n");
 	printf("*RR* (read2() read %d bytes)\n", n);
@@ -877,7 +877,7 @@ void sam_sendq_flush(sam_sess_t *session, sam_sid_t stream_id,
  * Returns: SAM error code
  */
 static samerr_t sam_session_create(sam_sess_t *session, const char *destname,
-	sam_conn_t style, uint_t tunneldepth)
+	sam_conn_t style, uint tunneldepth)
 {
 	assert(session != NULL);
 #define SAM_SESSTATUS_REPLY_OK "SESSION STATUS RESULT=OK"
@@ -963,7 +963,7 @@ void sam_session_free(sam_sess_t **session)
  *
  * Returns: true on sucess, false on error, with errno set
  */
-bool sam_socket_connect(sam_sess_t *session, const char *host, uint16_t port)
+bool sam_socket_connect(sam_sess_t *session, const char *host, ushort port)
 {
 	assert(session != NULL);
 	struct sockaddr_in hostaddr;
@@ -1080,11 +1080,7 @@ void sam_stream_close(sam_sess_t *session, sam_sid_t stream_id)
 	assert(session != NULL);
 	char cmd[SAM_CMD_LEN];
 
-#ifdef FAST32_IS_LONG
 	snprintf(cmd, sizeof cmd, "STREAM CLOSE ID=%ld\n", stream_id);
-#else
-	snprintf(cmd, sizeof cmd, "STREAM CLOSE ID=%d\n", stream_id);
-#endif
 	sam_write(session, cmd, strlen(cmd));
 
 	return;
@@ -1103,13 +1099,8 @@ sam_sid_t sam_stream_connect(sam_sess_t *session, const sam_pubkey_t dest)
 	char cmd[SAM_PKCMD_LEN];
 
 	session->prev_id++;  /* increment the id for the connection */
-#ifdef FAST32_IS_LONG
 	snprintf(cmd, sizeof cmd, "STREAM CONNECT ID=%ld DESTINATION=%s\n",
 		session->prev_id, dest);
-#else
-	snprintf(cmd, sizeof cmd, "STREAM CONNECT ID=%d DESTINATION=%s\n",
-		session->prev_id, dest);
-#endif
 	sam_write(session, cmd, strlen(cmd));
 
 	return session->prev_id;
@@ -1141,15 +1132,9 @@ samerr_t sam_stream_send(sam_sess_t *session, sam_sid_t stream_id,
 		return SAM_TOO_BIG;
 	}
 #ifdef NO_Z_FORMAT
-	#ifdef FAST32_IS_LONG
-		snprintf(cmd, sizeof cmd, "STREAM SEND ID=%ld SIZE=%u\n",
-			stream_id, size);
-	#else
-		snprintf(cmd, sizeof cmd, "STREAM SEND ID=%d SIZE=%u\n",
-			stream_id, size);
-	#endif
+	snprintf(cmd, sizeof cmd, "STREAM SEND ID=%ld SIZE=%u\n", stream_id, size);
 #else
-	snprintf(cmd, sizeof cmd, "STREAM SEND ID=%d SIZE=%zu\n",
+	snprintf(cmd, sizeof cmd, "STREAM SEND ID=%ld SIZE=%zu\n",
 		stream_id, size);
 #endif
 	sam_write(session, cmd, strlen(cmd));
@@ -1399,7 +1384,7 @@ static ssize_t sam_write(sam_sess_t *session, const void *buf, size_t n)
 		return -1;
 	}
 #if SAM_WIRETAP
-	const uchar_t *cp = buf;
+	const byte *cp = buf;
 	printf("*WW* ");
 	for (size_t x = 0; x < n; x++) {
 		if (isprint(cp[x]))

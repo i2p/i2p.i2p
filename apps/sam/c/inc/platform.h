@@ -57,7 +57,6 @@
 #endif
 
 #if OS == CYGWIN
-	#define FAST32_IS_LONG
 	#define INET_ADDRSTRLEN 16
 	#define NO_GETHOSTBYNAME2
 	#define NO_INET_NTOP
@@ -72,9 +71,8 @@
  * Standard C99 includes - if your compiler doesn't have these, it's time to
  * upgrade
  */
-#include <stdbool.h>
-#include <stddef.h>
-#include <stdint.h>
+#include <stdbool.h>  // bool
+#include <stddef.h>  // size_t
 
 /*
  * System includes
@@ -115,6 +113,13 @@
 #ifdef NO_SSIZE_T
 	typedef signed long ssize_t;
 #endif
+
+/*
+ * I'm too lazy to type "unsigned"
+ */
+typedef unsigned char byte;
+typedef unsigned int uint;
+typedef unsigned short ushort;
 
 /*
  * Prints out the file name, line number, and function name before log message
