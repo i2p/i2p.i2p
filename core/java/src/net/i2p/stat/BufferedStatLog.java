@@ -77,7 +77,7 @@ public class BufferedStatLog implements StatLog {
     }
     
     private class StatLogWriter implements Runnable {
-        private SimpleDateFormat _fmt = new SimpleDateFormat("yyyyMMdd hh:mm:ss.SSS");
+        private SimpleDateFormat _fmt = new SimpleDateFormat("yyyyMMdd HH:mm:ss.SSS");
         public void run() {
             List cur = new ArrayList(1000);
             while (true) {
