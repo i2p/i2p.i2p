@@ -11,7 +11,10 @@
 <%@include file="summary.jsp" %>
 
 <div class="main" id="main">
- <h2>Welcome to your router console</h2>
+ <jsp:useBean class="net.i2p.router.web.ContentHelper" id="contenthelper" scope="request" />
+ <jsp:setProperty name="contenthelper" property="page" value="readme.html" />
+ <jsp:setProperty name="contenthelper" property="maxLines" value="300" />
+ <jsp:getProperty name="contenthelper" property="content" />
 </div>
 
 </body>
