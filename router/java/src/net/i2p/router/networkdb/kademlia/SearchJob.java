@@ -195,6 +195,7 @@ class SearchJob extends JobImpl {
                     if (_log.shouldLog(Log.WARN))
                         _log.warn(getJobId() + ": Error selecting closest hash that wasnt a router! " 
                                   + peer + " : " + (ds == null ? "null" : ds.getClass().getName()));
+                    _state.replyTimeout(peer);
                 } else {
                     sendSearch((RouterInfo)ds);
                     sent++;
