@@ -416,11 +416,14 @@ class Socket:
 
     if self.type == SOCK_STREAM:
       self._verify_connected()
-      if bufsize < 0: raise ValueError('bufsize must be >= 0')
+      if bufsize < 0: raise ValueError('bufsize must be >= 0 for streams')
       return (self.sessobj.recv(bufsize, timeout, peek, waitall), \
               self.remotedest)
     else:
-      return self.sessobj.recv(timeout, peek)[:bufsize]
+      if bufsize < -1:
+        raise ValueError('bufsize must be >= -1 for packets')
+      (data, addr) = self.sessobj.recv(timeout, peek)
+      return (data[:bufsize], addr)
 
   def send(self, string, flags=0):
     """Sends string data to a remote Destination.
