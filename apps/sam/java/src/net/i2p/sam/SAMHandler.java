@@ -100,6 +100,14 @@ public abstract class SAMHandler implements Runnable {
             socketOS.flush();
         }
     }
+    
+    /** 
+     * If you're crazy enough to write to the raw socket, grab the write lock
+     * with getWriteLock(), synchronize against it, and write to the getOut()
+     *
+     */
+    protected Object getWriteLock() { return socketWLock; }
+    protected OutputStream getOut() { return socketOS; }
 
     /**
      * Write a string to the handler's socket.  This method must

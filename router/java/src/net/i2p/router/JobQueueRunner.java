@@ -24,6 +24,7 @@ class JobQueueRunner implements Runnable {
         _lastJob = null;
         _log = _context.logManager().getLog(JobQueueRunner.class);
         _context.statManager().createRateStat("jobQueue.jobRun", "How long jobs take", "JobQueue", new long[] { 60*1000l, 60*60*1000l, 24*60*60*1000l });
+        _context.statManager().createRateStat("jobQueue.jobRunSlow", "How long jobs that take over a second take", "JobQueue", new long[] { 10*60*1000l, 60*60*1000l, 24*60*60*1000l });
         _context.statManager().createRateStat("jobQueue.jobLag", "How long jobs have to wait before running", "JobQueue", new long[] { 60*1000l, 60*60*1000l, 24*60*60*1000l });
         _context.statManager().createRateStat("jobQueue.jobWait", "How long does a job sat on the job queue?", "JobQueue", new long[] { 60*1000l, 60*60*1000l, 24*60*60*1000l });
         _context.statManager().createRateStat("jobQueue.jobRunnerInactive", "How long are runners inactive?", "JobQueue", new long[] { 60*1000l, 60*60*1000l, 24*60*60*1000l });
@@ -96,12 +97,14 @@ class JobQueueRunner implements Runnable {
                 _context.statManager().addRateData("jobQueue.jobLag", doStart - origStartAfter, 0);
                 _context.statManager().addRateData("jobQueue.jobWait", enqueuedTime, enqueuedTime);
 
+                if (duration > 1000) {
+                    _context.statManager().addRateData("jobQueue.jobRunSlow", duration, duration);
+                    if (_log.shouldLog(Log.WARN))
+                        _log.warn("Duration of " + duration + " (lag "+ (doStart-origStartAfter) 
+                                  + ") on job " + _currentJob);
+                }
+                
                 _state = 14;
-                
-                
-                if ( (duration > 1000) && (_log.shouldLog(Log.WARN)) )
-                    _log.warn("Duration of " + duration + " (lag "+ (doStart-origStartAfter) 
-                              + ") on job " + _currentJob);
                 
                 if (diff > 100) {
                     if (_log.shouldLog(Log.WARN))

@@ -14,6 +14,7 @@ import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InterruptedIOException;
+import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.ConnectException;
 import java.net.NoRouteToHostException;
@@ -765,15 +766,24 @@ public class SAMv1Handler extends SAMHandler implements SAMRawReceiver, SAMDatag
             throw new NullPointerException("BUG! STREAM session is null!");
         }
 
-        ByteArrayOutputStream msg = new ByteArrayOutputStream();
-
         String msgText = "STREAM RECEIVED ID=" + id +" SIZE=" + len + "\n";
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("sending to client: " + msgText);
-        msg.write(msgText.getBytes("ISO-8859-1"));
-        msg.write(data, 0, len);
-
-        writeBytes(msg.toByteArray());
+        
+        byte prefix[] = msgText.getBytes("ISO-8859-1");
+        
+        // dont waste so much memory
+        //ByteArrayOutputStream msg = new ByteArrayOutputStream();
+        //msg.write(msgText.getBytes("ISO-8859-1"));
+        //msg.write(data, 0, len);
+        // writeBytes(msg.toByteArray());
+        Object writeLock = getWriteLock();
+        OutputStream out = getOut();
+        synchronized (writeLock) {
+            out.write(prefix);
+            out.write(data, 0, len);
+            out.flush();
+        }
     }
 
     public void notifyStreamDisconnection(int id, String result, String msg) throws IOException {

@@ -1,4 +1,9 @@
-$Id: history.txt,v 1.79 2004/11/21 17:31:33 jrandom Exp $
+$Id: history.txt,v 1.80 2004/11/22 12:57:16 jrandom Exp $
+
+2004-11-22  jrandom
+    * Update to the SAM bridge to reduce some unnecessary memory allocation.
+    * New stat to keep track of slow jobs (ones that take more than a second
+      to excute).  This is published in the netDb as jobQueue.jobRunSlow
 
 2004-11-21  jrandom
     * Update the I2PTunnel web interface to include an option for the new 
