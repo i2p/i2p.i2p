@@ -50,7 +50,7 @@ public class SendMessageDirectJob extends JobImpl {
     }
     public SendMessageDirectJob(RouterContext ctx, I2NPMessage message, Hash toPeer, Job onSend, ReplyJob onSuccess, Job onFail, MessageSelector selector, long expiration, int priority) {
         super(ctx);
-        _log = _context.logManager().getLog(SendMessageDirectJob.class);
+        _log = getContext().logManager().getLog(SendMessageDirectJob.class);
         _message = message;
         _targetHash = toPeer;
         _router = null;
@@ -67,7 +67,7 @@ public class SendMessageDirectJob extends JobImpl {
         if (_targetHash == null)
             throw new IllegalArgumentException("Attempt to send a message to a null peer");
         _sent = false;
-        long remaining = expiration - _context.clock().now();
+        long remaining = expiration - getContext().clock().now();
         if (remaining < 50*1000) {
             _log.info("Sending message to expire in " + remaining + "ms containing " + message.getUniqueId() + " (a " + message.getClass().getName() + ")", new Exception("SendDirect from"));
         }
@@ -75,7 +75,7 @@ public class SendMessageDirectJob extends JobImpl {
     
     public String getName() { return "Send Message Direct"; }
     public void runJob() { 
-        long now = _context.clock().now();
+        long now = getContext().clock().now();
         if (_expiration == 0) 
             _expiration = now + DEFAULT_TIMEOUT;
 
@@ -95,7 +95,7 @@ public class SendMessageDirectJob extends JobImpl {
                 _log.debug("Router specified, sending");
             send();
         } else {
-            _router = _context.netDb().lookupRouterInfoLocally(_targetHash);
+            _router = getContext().netDb().lookupRouterInfoLocally(_targetHash);
             if (_router != null) {
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("Router not specified but lookup found it");
@@ -104,14 +104,14 @@ public class SendMessageDirectJob extends JobImpl {
                 if (!_alreadySearched) {
                     if (_log.shouldLog(Log.DEBUG))
                         _log.debug("Router not specified, so we're looking for it...");
-                    _context.netDb().lookupRouterInfo(_targetHash, this, this, 
-                                                      _expiration - _context.clock().now());
-                    _searchOn = _context.clock().now();
+                    getContext().netDb().lookupRouterInfo(_targetHash, this, this, 
+                                                      _expiration - getContext().clock().now());
+                    _searchOn = getContext().clock().now();
                     _alreadySearched = true;
                 } else {
                     if (_log.shouldLog(Log.WARN))
                         _log.warn("Unable to find the router to send to: " + _targetHash 
-                                   + " after searching for " + (_context.clock().now()-_searchOn) 
+                                   + " after searching for " + (getContext().clock().now()-_searchOn) 
                                    + "ms, message: " + _message, getAddedBy());
                 }
             }
@@ -126,10 +126,10 @@ public class SendMessageDirectJob extends JobImpl {
         }
         _sent = true;
         Hash to = _router.getIdentity().getHash();
-        Hash us = _context.router().getRouterInfo().getIdentity().getHash();
+        Hash us = getContext().router().getRouterInfo().getIdentity().getHash();
         if (us.equals(to)) {
             if (_selector != null) {
-                OutNetMessage outM = new OutNetMessage(_context);
+                OutNetMessage outM = new OutNetMessage(getContext());
                 outM.setExpiration(_expiration);
                 outM.setMessage(_message);
                 outM.setOnFailedReplyJob(_onFail);
@@ -139,23 +139,23 @@ public class SendMessageDirectJob extends JobImpl {
                 outM.setPriority(_priority);
                 outM.setReplySelector(_selector);
                 outM.setTarget(_router);
-                _context.messageRegistry().registerPending(outM);
+                getContext().messageRegistry().registerPending(outM);
             }
 
             if (_onSend != null)
-                _context.jobQueue().addJob(_onSend);
+                getContext().jobQueue().addJob(_onSend);
 
-            InNetMessage msg = new InNetMessage(_context);
+            InNetMessage msg = new InNetMessage(getContext());
             msg.setFromRouter(_router.getIdentity());
             msg.setMessage(_message);
-            _context.inNetMessagePool().add(msg);
+            getContext().inNetMessagePool().add(msg);
 
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Adding " + _message.getClass().getName() 
                            + " to inbound message pool as it was destined for ourselves");
             //_log.debug("debug", _createdBy);
         } else {
-            OutNetMessage msg = new OutNetMessage(_context);
+            OutNetMessage msg = new OutNetMessage(getContext());
             msg.setExpiration(_expiration);
             msg.setMessage(_message);
             msg.setOnFailedReplyJob(_onFail);
@@ -165,7 +165,7 @@ public class SendMessageDirectJob extends JobImpl {
             msg.setPriority(_priority);
             msg.setReplySelector(_selector);
             msg.setTarget(_router);
-            _context.outNetMessagePool().add(msg);
+            getContext().outNetMessagePool().add(msg);
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Adding " + _message.getClass().getName() 
                            + " to outbound message pool targeting " 

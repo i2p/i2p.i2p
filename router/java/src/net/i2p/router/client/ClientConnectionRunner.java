@@ -495,16 +495,16 @@ public class ClientConnectionRunner {
                           + MessageStatusMessage.getStatusString(msg.getStatus()) 
                           + " for session [" + _sessionId.getSessionId() 
                           + "] before they knew the messageId!  delaying .5s");
-                _lastTried = ClientConnectionRunner.this._context.clock().now();
+                _lastTried = _context.clock().now();
                 requeue(REQUEUE_DELAY);
                 return;
             }
 
             boolean alreadyProcessed = false;
-            long beforeLock = MessageDeliveryStatusUpdate.this._context.clock().now();
+            long beforeLock = _context.clock().now();
             long inLock = 0;
             synchronized (_alreadyProcessed) {
-                inLock = MessageDeliveryStatusUpdate.this._context.clock().now();
+                inLock = _context.clock().now();
                 if (_alreadyProcessed.contains(_messageId)) {
                     _log.warn("Status already updated");
                     alreadyProcessed = true;
@@ -514,7 +514,7 @@ public class ClientConnectionRunner {
                         _alreadyProcessed.remove(0);
                 }
             }
-            long afterLock = MessageDeliveryStatusUpdate.this._context.clock().now();
+            long afterLock = _context.clock().now();
 
             if (afterLock - beforeLock > 50) {
                 _log.warn("MessageDeliveryStatusUpdate.locking took too long: " + (afterLock-beforeLock)
@@ -529,7 +529,7 @@ public class ClientConnectionRunner {
                               + MessageStatusMessage.getStatusString(msg.getStatus()) 
                               + " for session [" + _sessionId.getSessionId() 
                               + "] (with nonce=2), retrying after [" 
-                              + (ClientConnectionRunner.this._context.clock().now() - _lastTried) 
+                              + (_context.clock().now() - _lastTried) 
                               + "]", getAddedBy());
             } else {
                 if (_log.shouldLog(Log.DEBUG))

@@ -49,13 +49,13 @@ public class RebuildRouterInfoJob extends JobImpl {
     
     public void runJob() {
         _log.debug("Testing to rebuild router info");
-        String infoFile = _context.router().getConfigSetting(Router.PROP_INFO_FILENAME);
+        String infoFile = getContext().router().getConfigSetting(Router.PROP_INFO_FILENAME);
         if (infoFile == null) {
             _log.debug("Info filename not configured, defaulting to " + Router.PROP_INFO_FILENAME_DEFAULT);
             infoFile = Router.PROP_INFO_FILENAME_DEFAULT;
         }
         
-        String keyFilename = _context.router().getConfigSetting(Router.PROP_KEYS_FILENAME);
+        String keyFilename = getContext().router().getConfigSetting(Router.PROP_KEYS_FILENAME);
         if (keyFilename == null)
             keyFilename = Router.PROP_KEYS_FILENAME_DEFAULT;
         File keyFile = new File(keyFilename);
@@ -67,8 +67,8 @@ public class RebuildRouterInfoJob extends JobImpl {
         } else {
             _log.debug("Router info file [" + info.getAbsolutePath() + "] exists, not rebuilding");
         }
-        getTiming().setStartAfter(_context.clock().now() + REBUILD_DELAY);
-        _context.jobQueue().addJob(this);
+        getTiming().setStartAfter(getContext().clock().now() + REBUILD_DELAY);
+        getContext().jobQueue().addJob(this);
     }
     
     void rebuildRouterInfo() {
@@ -78,18 +78,18 @@ public class RebuildRouterInfoJob extends JobImpl {
         _log.debug("Rebuilding the new router info");
         boolean fullRebuild = false;
         RouterInfo info = null;
-        String infoFilename = _context.router().getConfigSetting(Router.PROP_INFO_FILENAME);
+        String infoFilename = getContext().router().getConfigSetting(Router.PROP_INFO_FILENAME);
         if (infoFilename == null)
             infoFilename = Router.PROP_INFO_FILENAME_DEFAULT;
         
-        String keyFilename = _context.router().getConfigSetting(Router.PROP_KEYS_FILENAME);
+        String keyFilename = getContext().router().getConfigSetting(Router.PROP_KEYS_FILENAME);
         if (keyFilename == null)
             keyFilename = Router.PROP_KEYS_FILENAME_DEFAULT;
         File keyFile = new File(keyFilename);
         
         if (keyFile.exists()) {
             // ok, no need to rebuild a brand new identity, just update what we can
-            info = _context.router().getRouterInfo();
+            info = getContext().router().getRouterInfo();
             if (info == null) {
                 info = new RouterInfo();
                 FileInputStream fis = null;
@@ -121,12 +121,12 @@ public class RebuildRouterInfoJob extends JobImpl {
             }
             
             try {
-                info.setAddresses(_context.commSystem().createAddresses());
-                info.setOptions(_context.statPublisher().publishStatistics());
+                info.setAddresses(getContext().commSystem().createAddresses());
+                info.setOptions(getContext().statPublisher().publishStatistics());
                 // info.setPeers(new HashSet()); // this would have the trusted peers
-                info.setPublished(CreateRouterInfoJob.getCurrentPublishDate(_context));
+                info.setPublished(CreateRouterInfoJob.getCurrentPublishDate(getContext()));
                 
-                info.sign(_context.keyManager().getSigningPrivateKey());
+                info.sign(getContext().keyManager().getSigningPrivateKey());
             } catch (DataFormatException dfe) {
                 _log.error("Error rebuilding the new router info", dfe);
                 return;
@@ -147,13 +147,13 @@ public class RebuildRouterInfoJob extends JobImpl {
         } else {
             _log.warn("Private key file " + keyFile.getAbsolutePath() + " deleted!  Rebuilding a brand new router identity!");
             // this proc writes the keys and info to the file as well as builds the latest and greatest info
-            CreateRouterInfoJob j = new CreateRouterInfoJob(_context, null);
+            CreateRouterInfoJob j = new CreateRouterInfoJob(getContext(), null);
             info = j.createRouterInfo();
             fullRebuild = true;
         }
         
         //MessageHistory.initialize();
-        _context.router().setRouterInfo(info);
+        getContext().router().setRouterInfo(info);
         _log.info("Router info rebuilt and stored at " + infoFilename + " [" + info + "]");
     }
     

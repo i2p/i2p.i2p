@@ -38,13 +38,13 @@ public class GetBidsJob extends JobImpl {
     public String getName() { return "Fetch bids for a message to be delivered"; }
     public void runJob() {
         Hash to = _msg.getTarget().getIdentity().getHash();
-        if (_context.shitlist().isShitlisted(to)) {
+        if (getContext().shitlist().isShitlisted(to)) {
             _log.warn("Attempt to send a message to a shitlisted peer - " + to);
             fail();
             return;
         }
         
-        Hash us = _context.routerHash();
+        Hash us = getContext().routerHash();
         if (_msg.getTarget().getIdentity().getHash().equals(us)) {
             _log.error("wtf, send a message to ourselves?  nuh uh. msg = " + _msg, getAddedBy());
             fail();
@@ -64,17 +64,17 @@ public class GetBidsJob extends JobImpl {
     
     private void fail() {
         if (_msg.getOnFailedSendJob() != null) {
-            _context.jobQueue().addJob(_msg.getOnFailedSendJob());
+            getContext().jobQueue().addJob(_msg.getOnFailedSendJob());
         }
         if (_msg.getOnFailedReplyJob() != null) {
-            _context.jobQueue().addJob(_msg.getOnFailedReplyJob());
+            getContext().jobQueue().addJob(_msg.getOnFailedReplyJob());
         }
         MessageSelector selector = _msg.getReplySelector();
         if (selector != null) {
-            _context.messageRegistry().unregisterPending(_msg);
+            getContext().messageRegistry().unregisterPending(_msg);
         }
         
-        _context.profileManager().messageFailed(_msg.getTarget().getIdentity().getHash());
+        getContext().profileManager().messageFailed(_msg.getTarget().getIdentity().getHash());
         
         _msg.discardData();
     }

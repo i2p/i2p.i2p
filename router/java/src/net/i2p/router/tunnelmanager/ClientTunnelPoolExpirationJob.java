@@ -33,7 +33,7 @@ class ClientTunnelPoolExpirationJob extends JobImpl {
         _log = context.logManager().getLog(ClientTunnelPoolExpirationJob.class);
         _pool = pool;
         _tunnelPool = tunnelPool;
-        getTiming().setStartAfter(_context.clock().now() + EXPIRE_POOL_DELAY);
+        getTiming().setStartAfter(getContext().clock().now() + EXPIRE_POOL_DELAY);
     }
     public String getName() { return "Expire Pooled Client Tunnels"; }
     public void runJob() {
@@ -65,7 +65,7 @@ class ClientTunnelPoolExpirationJob extends JobImpl {
      *
      */
     public void expireInactiveTunnels() {
-        long now = _context.clock().now();
+        long now = getContext().clock().now();
         long expire = now - EXPIRE_BUFFER - 2*Router.CLOCK_FUDGE_FACTOR;
 
         for (Iterator iter = _pool.getInactiveInboundTunnelIds().iterator(); iter.hasNext(); ) {
@@ -92,7 +92,7 @@ class ClientTunnelPoolExpirationJob extends JobImpl {
      *
      */
     public void expireActiveTunnels() {
-        long now = _context.clock().now();
+        long now = getContext().clock().now();
         long expire = now - EXPIRE_BUFFER - 2*Router.CLOCK_FUDGE_FACTOR;
 
         for (Iterator iter = _pool.getInboundTunnelIds().iterator(); iter.hasNext(); ) {

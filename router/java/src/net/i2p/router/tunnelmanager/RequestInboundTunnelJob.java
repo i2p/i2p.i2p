@@ -26,7 +26,7 @@ class RequestInboundTunnelJob extends JobImpl {
     public void runJob() {
         _log.debug("Client pool settings: " + _pool.getPoolSettings().toString());
         TunnelInfo tunnelGateway = _builder.configureInboundTunnel(null, _pool.getPoolSettings(), _useFake);
-        RequestTunnelJob reqJob = new RequestTunnelJob(_context, _pool, tunnelGateway, true, _pool.getTunnelCreationTimeout());
-        _context.jobQueue().addJob(reqJob);
+        RequestTunnelJob reqJob = new RequestTunnelJob(getContext(), _pool, tunnelGateway, true, _pool.getTunnelCreationTimeout());
+        getContext().jobQueue().addJob(reqJob);
     }
 }

@@ -33,15 +33,15 @@ public class ReadConfigJob extends JobImpl {
     public String getName() { return "Read Router Configuration"; }
     public void runJob() {
         if (shouldReread()) {
-            doRead(_context);
-            _lastRead = _context.clock().now();
+            doRead(getContext());
+            _lastRead = getContext().clock().now();
         }
-        getTiming().setStartAfter(_context.clock().now() + DELAY);
-        _context.jobQueue().addJob(this);
+        getTiming().setStartAfter(getContext().clock().now() + DELAY);
+        getContext().jobQueue().addJob(this);
     }
     
     private boolean shouldReread() {
-        File configFile = new File(_context.router().getConfigFilename());
+        File configFile = new File(getContext().router().getConfigFilename());
         if (!configFile.exists()) return false;
         if (configFile.lastModified() > _lastRead) 
             return true;

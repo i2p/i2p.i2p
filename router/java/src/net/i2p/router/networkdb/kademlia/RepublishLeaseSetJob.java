@@ -36,14 +36,14 @@ public class RepublishLeaseSetJob extends JobImpl {
     public String getName() { return "Republish a local leaseSet"; }
     public void runJob() {
         try {
-            if (_context.clientManager().isLocal(_dest)) {
+            if (getContext().clientManager().isLocal(_dest)) {
                 LeaseSet ls = _facade.lookupLeaseSetLocally(_dest);
                 if (ls != null) {
                     _log.warn("Client " + _dest + " is local, so we're republishing it");
                     if (!ls.isCurrent(Router.CLOCK_FUDGE_FACTOR)) {
                         _log.warn("Not publishing a LOCAL lease that isn't current - " + _dest, new Exception("Publish expired LOCAL lease?"));
                     } else {
-                        _context.jobQueue().addJob(new StoreJob(_context, _facade, _dest, ls, null, null, REPUBLISH_LEASESET_DELAY));
+                        getContext().jobQueue().addJob(new StoreJob(getContext(), _facade, _dest, ls, null, null, REPUBLISH_LEASESET_DELAY));
                     }
                 } else {
                     _log.warn("Client " + _dest + " is local, but we can't find a valid LeaseSet?  perhaps its being rebuilt?");

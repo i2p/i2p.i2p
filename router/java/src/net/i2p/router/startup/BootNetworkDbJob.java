@@ -24,8 +24,8 @@ public class BootNetworkDbJob extends JobImpl {
     public void runJob() {
         // start up the network database
         
-        _context.netDb().startup();
+        getContext().netDb().startup();
         
-        _context.jobQueue().addJob(new StartAcceptingClientsJob(_context));
+        getContext().jobQueue().addJob(new StartAcceptingClientsJob(getContext()));
     }
 }

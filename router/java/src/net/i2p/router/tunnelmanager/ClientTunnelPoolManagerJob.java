@@ -41,7 +41,7 @@ class ClientTunnelPoolManagerJob extends JobImpl {
                 return;
             }
 
-            if (!_context.clientManager().isLocal(_clientPool.getDestination())) {
+            if (!getContext().clientManager().isLocal(_clientPool.getDestination())) {
                 if (_log.shouldLog(Log.INFO))
                     _log.info("Client " + _clientPool.getDestination().calculateHash() 
                               + " is no longer connected, stop the pool");
@@ -64,7 +64,7 @@ class ClientTunnelPoolManagerJob extends JobImpl {
      * The pool is stopped, so lets see if we should keep doing anything
      */
     private void handleStopped() {
-        if (_context.clientManager().isLocal(_clientPool.getDestination())) {
+        if (getContext().clientManager().isLocal(_clientPool.getDestination())) {
             // it was stopped, but they've reconnected, so boot 'er up again
             if (_log.shouldLog(Log.INFO))
                 _log.info("Client " + _clientPool.getDestination().calculateHash().toBase64() 
@@ -176,7 +176,7 @@ class ClientTunnelPoolManagerJob extends JobImpl {
         }
 
         // (furthest in the future) - (rebuild buffer time)
-        long expireAfter = _context.clock().now() + _tunnelPool.getPoolSettings().getInboundDuration() 
+        long expireAfter = getContext().clock().now() + _tunnelPool.getPoolSettings().getInboundDuration() 
                            - POOL_CHECK_DELAY - _tunnelPool.getTunnelCreationTimeout()*2;
         if (info.getSettings().getExpiration() <= expireAfter) {
             if (_log.shouldLog(Log.DEBUG))
@@ -240,7 +240,7 @@ class ClientTunnelPoolManagerJob extends JobImpl {
      */
     private void requestCustomTunnels(int numTunnels) {
         for (int i = 0; i < numTunnels; i++) {
-            _context.jobQueue().addJob(new RequestCustomTunnelJob());
+            getContext().jobQueue().addJob(new RequestCustomTunnelJob());
         }
     }
     
@@ -251,13 +251,13 @@ class ClientTunnelPoolManagerJob extends JobImpl {
      */
     private class RequestCustomTunnelJob extends JobImpl {
         public RequestCustomTunnelJob() {
-            super(ClientTunnelPoolManagerJob.this._context);
+            super(ClientTunnelPoolManagerJob.this.getContext());
         }
         public String getName() { return "Request Custom Client Tunnel"; }
         public void runJob() {
             TunnelInfo tunnelGateway = _tunnelBuilder.configureInboundTunnel(_clientPool.getDestination(), _clientPool.getClientSettings());
-            RequestTunnelJob reqJob = new RequestTunnelJob(RequestCustomTunnelJob.this._context, _tunnelPool, tunnelGateway, true, _tunnelPool.getTunnelCreationTimeout());
-            RequestCustomTunnelJob.this._context.jobQueue().addJob(reqJob);
+            RequestTunnelJob reqJob = new RequestTunnelJob(RequestCustomTunnelJob.this.getContext(), _tunnelPool, tunnelGateway, true, _tunnelPool.getTunnelCreationTimeout());
+            RequestCustomTunnelJob.this.getContext().jobQueue().addJob(reqJob);
         }
     }
 }

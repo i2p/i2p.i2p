@@ -19,7 +19,7 @@ class RequestOutboundTunnelJob extends JobImpl {
     public String getName() { return "Request Outbound Tunnel"; }
     public void runJob() {
         TunnelInfo tunnelGateway = _builder.configureOutboundTunnel(_pool.getPoolSettings(), _useFake);
-        RequestTunnelJob reqJob = new RequestTunnelJob(_context, _pool, tunnelGateway, false, _pool.getTunnelCreationTimeout());
-        _context.jobQueue().addJob(reqJob);
+        RequestTunnelJob reqJob = new RequestTunnelJob(getContext(), _pool, tunnelGateway, false, _pool.getTunnelCreationTimeout());
+        getContext().jobQueue().addJob(reqJob);
     }
 }

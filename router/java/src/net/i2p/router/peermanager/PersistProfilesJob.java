@@ -14,7 +14,7 @@ class PersistProfilesJob extends JobImpl {
     public PersistProfilesJob(RouterContext ctx, PeerManager mgr) {
         super(ctx);
         _mgr = mgr;
-        getTiming().setStartAfter(_context.clock().now() + PERSIST_DELAY);
+        getTiming().setStartAfter(getContext().clock().now() + PERSIST_DELAY);
     }
     
     public String getName() { return "Persist profiles"; }
@@ -24,14 +24,14 @@ class PersistProfilesJob extends JobImpl {
         int i = 0;
         for (Iterator iter = peers.iterator(); iter.hasNext(); )
             hashes[i] = (Hash)iter.next();
-        _context.jobQueue().addJob(new PersistProfileJob(hashes));
+        getContext().jobQueue().addJob(new PersistProfileJob(hashes));
     }
     
     private class PersistProfileJob extends JobImpl {
         private Hash _peers[];
         private int _cur;
         public PersistProfileJob(Hash peers[]) {
-            super(PersistProfilesJob.this._context);
+            super(PersistProfilesJob.this.getContext());
             _peers = peers;
             _cur = 0;
         }
@@ -42,11 +42,11 @@ class PersistProfilesJob extends JobImpl {
             }
             if (_cur >= _peers.length) {
                 // no more left, requeue up the main persist-em-all job
-                PersistProfilesJob.this.getTiming().setStartAfter(_context.clock().now() + PERSIST_DELAY);
-                PersistProfilesJob.this._context.jobQueue().addJob(PersistProfilesJob.this);
+                PersistProfilesJob.this.getTiming().setStartAfter(getContext().clock().now() + PERSIST_DELAY);
+                PersistProfilesJob.this.getContext().jobQueue().addJob(PersistProfilesJob.this);
             } else {
                 // we've got peers left to persist, so requeue the persist profile job
-                PersistProfilesJob.this._context.jobQueue().addJob(PersistProfileJob.this);
+                PersistProfilesJob.this.getContext().jobQueue().addJob(PersistProfileJob.this);
             }
         }
         public String getName() { return "Persist profile"; }

@@ -73,11 +73,11 @@ class StoreJob extends JobImpl {
                     DataStructure data, Job onSuccess, Job onFailure, long timeoutMs, Set toSkip) {
         super(context);
         _log = context.logManager().getLog(StoreJob.class);
-        _context.statManager().createRateStat("netDb.storeSent", "How many netDb store messages have we sent?", "Network Database", new long[] { 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
-        _context.statManager().createRateStat("netDb.storePeers", "How many peers each netDb must be sent to before success?", "Network Database", new long[] { 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
-        _context.statManager().createRateStat("netDb.ackTime", "How long does it take for a peer to ack a netDb store?", "Network Database", new long[] { 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
+        getContext().statManager().createRateStat("netDb.storeSent", "How many netDb store messages have we sent?", "Network Database", new long[] { 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
+        getContext().statManager().createRateStat("netDb.storePeers", "How many peers each netDb must be sent to before success?", "Network Database", new long[] { 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
+        getContext().statManager().createRateStat("netDb.ackTime", "How long does it take for a peer to ack a netDb store?", "Network Database", new long[] { 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
         _facade = facade;
-        _state = new StoreState(_context, key, data, toSkip);
+        _state = new StoreState(getContext(), key, data, toSkip);
         _onSuccess = onSuccess;
         _onFailure = onFailure;
         _timeoutMs = timeoutMs;
@@ -91,7 +91,7 @@ class StoreJob extends JobImpl {
     }
 
     private boolean isExpired() { 
-        return _context.clock().now() >= _expiration;
+        return getContext().clock().now() >= _expiration;
     }
 
     /**
@@ -168,7 +168,7 @@ class StoreJob extends JobImpl {
      * @return ordered list of Hash objects
      */
     private List getClosestRouters(Hash key, int numClosest, Set alreadyChecked) {
-        Hash rkey = _context.routingKeyGenerator().getRoutingKey(key);
+        Hash rkey = getContext().routingKeyGenerator().getRoutingKey(key);
         //if (_log.shouldLog(Log.DEBUG))
         //    _log.debug(getJobId() + ": Current routing key for " + key + ": " + rkey);
 
@@ -181,7 +181,7 @@ class StoreJob extends JobImpl {
      *
      */
     private void sendStore(RouterInfo router) {
-        DatabaseStoreMessage msg = new DatabaseStoreMessage(_context);
+        DatabaseStoreMessage msg = new DatabaseStoreMessage(getContext());
         msg.setKey(_state.getTarget());
         if (_state.getData() instanceof RouterInfo) 
             msg.setRouterInfo((RouterInfo)_state.getData());
@@ -189,9 +189,9 @@ class StoreJob extends JobImpl {
             msg.setLeaseSet((LeaseSet)_state.getData());
         else
             throw new IllegalArgumentException("Storing an unknown data type! " + _state.getData());
-        msg.setMessageExpiration(new Date(_context.clock().now() + _timeoutMs));
+        msg.setMessageExpiration(new Date(getContext().clock().now() + _timeoutMs));
 
-        if (router.getIdentity().equals(_context.router().getRouterInfo().getIdentity())) {
+        if (router.getIdentity().equals(getContext().router().getRouterInfo().getIdentity())) {
             // don't send it to ourselves
             if (_log.shouldLog(Log.ERROR))
                 _log.error(getJobId() + ": Dont send store to ourselves - why did we try?");
@@ -205,15 +205,15 @@ class StoreJob extends JobImpl {
     }
     
     private void sendStore(DatabaseStoreMessage msg, RouterInfo peer, long expiration) {
-        _context.statManager().addRateData("netDb.storeSent", 1, 0);
+        getContext().statManager().addRateData("netDb.storeSent", 1, 0);
         sendStoreThroughGarlic(msg, peer, expiration);
     }
 
     private void sendStoreThroughGarlic(DatabaseStoreMessage msg, RouterInfo peer, long expiration) {
-        long token = _context.random().nextLong(I2NPMessage.MAX_ID_VALUE);
+        long token = getContext().random().nextLong(I2NPMessage.MAX_ID_VALUE);
         
         TunnelId replyTunnelId = selectInboundTunnel();
-        TunnelInfo replyTunnel = _context.tunnelManager().getTunnelInfo(replyTunnelId);
+        TunnelInfo replyTunnel = getContext().tunnelManager().getTunnelInfo(replyTunnelId);
         if (replyTunnel == null) {
             _log.error("No reply inbound tunnels available!");
             return;
@@ -229,7 +229,7 @@ class StoreJob extends JobImpl {
         
         SendSuccessJob onReply = new SendSuccessJob(peer);
         FailedJob onFail = new FailedJob(peer);
-        StoreMessageSelector selector = new StoreMessageSelector(_context, getJobId(), peer, token, expiration);
+        StoreMessageSelector selector = new StoreMessageSelector(getContext(), getJobId(), peer, token, expiration);
         
         TunnelId outTunnelId = selectOutboundTunnel();
         if (outTunnelId != null) {
@@ -238,12 +238,12 @@ class StoreJob extends JobImpl {
             //               + peer.getIdentity().getHash().toBase64());
             TunnelId targetTunnelId = null; // not needed
             Job onSend = null; // not wanted
-            SendTunnelMessageJob j = new SendTunnelMessageJob(_context, msg, outTunnelId, 
+            SendTunnelMessageJob j = new SendTunnelMessageJob(getContext(), msg, outTunnelId, 
                                                               peer.getIdentity().getHash(),
                                                               targetTunnelId, onSend, onReply, 
                                                               onFail, selector, STORE_TIMEOUT_MS, 
                                                               STORE_PRIORITY);
-            _context.jobQueue().addJob(j);
+            getContext().jobQueue().addJob(j);
         } else {
             if (_log.shouldLog(Log.ERROR))
                 _log.error("No outbound tunnels to send a dbStore out!");
@@ -258,7 +258,7 @@ class StoreJob extends JobImpl {
         criteria.setReliabilityPriority(20);
         criteria.setMaximumTunnelsRequired(1);
         criteria.setMinimumTunnelsRequired(1);
-        List tunnelIds = _context.tunnelManager().selectOutboundTunnelIds(criteria);
+        List tunnelIds = getContext().tunnelManager().selectOutboundTunnelIds(criteria);
         if (tunnelIds.size() <= 0) {
             _log.error("No outbound tunnels?!");
             return null;
@@ -274,7 +274,7 @@ class StoreJob extends JobImpl {
         criteria.setReliabilityPriority(20);
         criteria.setMaximumTunnelsRequired(1);
         criteria.setMinimumTunnelsRequired(1);
-        List tunnelIds = _context.tunnelManager().selectInboundTunnelIds(criteria);
+        List tunnelIds = getContext().tunnelManager().selectInboundTunnelIds(criteria);
         if (tunnelIds.size() <= 0) {
             _log.error("No inbound tunnels?!");
             return null;
@@ -292,7 +292,7 @@ class StoreJob extends JobImpl {
         private RouterInfo _peer;
         
         public SendSuccessJob(RouterInfo peer) {
-            super(StoreJob.this._context);
+            super(StoreJob.this.getContext());
             _peer = peer;
         }
 
@@ -302,8 +302,8 @@ class StoreJob extends JobImpl {
             if (_log.shouldLog(Log.INFO))
                 _log.info(StoreJob.this.getJobId() + ": Marking store of " + _state.getTarget() 
                           + " to " + _peer.getIdentity().getHash().toBase64() + " successful after " + howLong);
-            _context.profileManager().dbStoreSent(_peer.getIdentity().getHash(), howLong);
-            _context.statManager().addRateData("netDb.ackTime", howLong, howLong);
+            getContext().profileManager().dbStoreSent(_peer.getIdentity().getHash(), howLong);
+            getContext().statManager().addRateData("netDb.ackTime", howLong, howLong);
 
             if (_state.getSuccessful().size() >= REDUNDANCY) {
                 succeed();
@@ -326,14 +326,14 @@ class StoreJob extends JobImpl {
         private RouterInfo _peer;
 
         public FailedJob(RouterInfo peer) {
-            super(StoreJob.this._context);
+            super(StoreJob.this.getContext());
             _peer = peer;
         }
         public void runJob() {
             if (_log.shouldLog(Log.WARN))
                 _log.warn(StoreJob.this.getJobId() + ": Peer " + _peer.getIdentity().getHash().toBase64() + " timed out");
             _state.replyTimeout(_peer.getIdentity().getHash());
-            _context.profileManager().dbStoreFailed(_peer.getIdentity().getHash());
+            getContext().profileManager().dbStoreFailed(_peer.getIdentity().getHash());
             
             sendNext();
         }
@@ -349,9 +349,9 @@ class StoreJob extends JobImpl {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug(getJobId() + ": State of successful send: " + _state);
         if (_onSuccess != null)
-            _context.jobQueue().addJob(_onSuccess);
+            getContext().jobQueue().addJob(_onSuccess);
         _facade.noteKeySent(_state.getTarget());
-        _context.statManager().addRateData("netDb.storePeers", _state.getAttempted().size(), _state.getWhenCompleted()-_state.getWhenStarted());
+        getContext().statManager().addRateData("netDb.storePeers", _state.getAttempted().size(), _state.getWhenCompleted()-_state.getWhenStarted());
     }
 
     /**
@@ -363,6 +363,6 @@ class StoreJob extends JobImpl {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug(getJobId() + ": State of failed send: " + _state, new Exception("Who failed me?"));
         if (_onFailure != null)
-            _context.jobQueue().addJob(_onFailure);
+            getContext().jobQueue().addJob(_onFailure);
     }
 }

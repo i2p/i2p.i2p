@@ -75,18 +75,18 @@ public class BuildTestMessageJob extends JobImpl {
             _log.debug("Building garlic message to test " + _target.getIdentity().getHash().toBase64());
         GarlicConfig config = buildGarlicCloveConfig();
         // TODO: make the last params on this specify the correct sessionKey and tags used
-        ReplyJob replyJob = new JobReplyJob(_context, _onSend, config.getRecipient().getIdentity().getPublicKey(), config.getId(), null, new HashSet());
+        ReplyJob replyJob = new JobReplyJob(getContext(), _onSend, config.getRecipient().getIdentity().getPublicKey(), config.getId(), null, new HashSet());
         MessageSelector sel = buildMessageSelector();
-        SendGarlicJob job = new SendGarlicJob(_context, config, null, _onSendFailed, replyJob, _onSendFailed, _timeoutMs, _priority, sel);
-        _context.jobQueue().addJob(job);
+        SendGarlicJob job = new SendGarlicJob(getContext(), config, null, _onSendFailed, replyJob, _onSendFailed, _timeoutMs, _priority, sel);
+        getContext().jobQueue().addJob(job);
     }
     
     private MessageSelector buildMessageSelector() {
-        return new TestMessageSelector(_testMessageKey, _timeoutMs + _context.clock().now());
+        return new TestMessageSelector(_testMessageKey, _timeoutMs + getContext().clock().now());
     }
     
     private GarlicConfig buildGarlicCloveConfig() {
-        _testMessageKey = _context.random().nextLong(I2NPMessage.MAX_ID_VALUE);
+        _testMessageKey = getContext().random().nextLong(I2NPMessage.MAX_ID_VALUE);
         if (_log.shouldLog(Log.INFO))
             _log.info("Test message key: " + _testMessageKey);
         GarlicConfig config = new GarlicConfig();
@@ -105,8 +105,8 @@ public class BuildTestMessageJob extends JobImpl {
         
         config.setCertificate(new Certificate(Certificate.CERTIFICATE_TYPE_NULL, null));
         config.setDeliveryInstructions(instructions);
-        config.setId(_context.random().nextLong(I2NPMessage.MAX_ID_VALUE));
-        config.setExpiration(_timeoutMs+_context.clock().now()+2*Router.CLOCK_FUDGE_FACTOR);
+        config.setId(getContext().random().nextLong(I2NPMessage.MAX_ID_VALUE));
+        config.setExpiration(_timeoutMs+getContext().clock().now()+2*Router.CLOCK_FUDGE_FACTOR);
         config.setRecipient(_target);
         config.setRequestAck(false);
         
@@ -126,16 +126,16 @@ public class BuildTestMessageJob extends JobImpl {
         ackInstructions.setDelaySeconds(0);
         ackInstructions.setEncrypted(false);
         
-        DeliveryStatusMessage msg = new DeliveryStatusMessage(_context);
-        msg.setArrival(new Date(_context.clock().now()));
+        DeliveryStatusMessage msg = new DeliveryStatusMessage(getContext());
+        msg.setArrival(new Date(getContext().clock().now()));
         msg.setMessageId(_testMessageKey);
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Delivery status message key: " + _testMessageKey + " arrival: " + msg.getArrival());
         
         ackClove.setCertificate(new Certificate(Certificate.CERTIFICATE_TYPE_NULL, null));
         ackClove.setDeliveryInstructions(ackInstructions);
-        ackClove.setExpiration(_timeoutMs+_context.clock().now());
-        ackClove.setId(_context.random().nextLong(I2NPMessage.MAX_ID_VALUE));
+        ackClove.setExpiration(_timeoutMs+getContext().clock().now());
+        ackClove.setId(getContext().random().nextLong(I2NPMessage.MAX_ID_VALUE));
         ackClove.setPayload(msg);
         ackClove.setRecipient(_target);
         ackClove.setRequestAck(false);
@@ -187,9 +187,9 @@ public class BuildTestMessageJob extends JobImpl {
             if ( (_keyDelivered != null) && 
                  (_sessionTagsDelivered != null) && 
                  (_sessionTagsDelivered.size() > 0) )
-                _context.sessionKeyManager().tagsDelivered(_target, _keyDelivered, _sessionTagsDelivered);
+                getContext().sessionKeyManager().tagsDelivered(_target, _keyDelivered, _sessionTagsDelivered);
             
-            _context.jobQueue().addJob(_job);
+            getContext().jobQueue().addJob(_job);
         }
         
         public void setMessage(I2NPMessage message) {

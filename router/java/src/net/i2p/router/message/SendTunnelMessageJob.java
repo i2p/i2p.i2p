@@ -83,11 +83,11 @@ public class SendTunnelMessageJob extends JobImpl {
                           new Exception("SendTunnel from"));
         }
         //_log.info("Send tunnel message " + msg.getClass().getName() + " to " + _destRouter + " over " + _tunnelId + " targetting tunnel " + _targetTunnelId, new Exception("SendTunnel from"));
-        _expiration = _context.clock().now() + timeoutMs;
+        _expiration = getContext().clock().now() + timeoutMs;
     }
     
     public void runJob() {
-        TunnelInfo info = _context.tunnelManager().getTunnelInfo(_tunnelId);
+        TunnelInfo info = getContext().tunnelManager().getTunnelInfo(_tunnelId);
         if (info == null) {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Message for unknown tunnel [" + _tunnelId 
@@ -124,21 +124,21 @@ public class SendTunnelMessageJob extends JobImpl {
      *
      */
     private void forwardToGateway() {
-        TunnelMessage msg = new TunnelMessage(_context);
+        TunnelMessage msg = new TunnelMessage(getContext());
         try {
             ByteArrayOutputStream baos = new ByteArrayOutputStream(1024);
             _message.writeBytes(baos);
             msg.setData(baos.toByteArray());
             msg.setTunnelId(_tunnelId);
             msg.setMessageExpiration(new Date(_expiration));
-            _context.jobQueue().addJob(new SendMessageDirectJob(_context, msg, 
+            getContext().jobQueue().addJob(new SendMessageDirectJob(getContext(), msg, 
                                                                 _destRouter, _onSend, 
                                                                 _onReply, _onFailure, 
                                                                 _selector, _expiration, 
                                                                 _priority));
 
             String bodyType = _message.getClass().getName();
-            _context.messageHistory().wrap(bodyType, _message.getUniqueId(), 
+            getContext().messageHistory().wrap(bodyType, _message.getUniqueId(), 
                                            TunnelMessage.class.getName(), msg.getUniqueId());
         } catch (IOException ioe) {
             if (_log.shouldLog(Log.ERROR))
@@ -162,7 +162,7 @@ public class SendTunnelMessageJob extends JobImpl {
             if (_log.shouldLog(Log.ERROR))
                 _log.error("We are not participating in this /known/ tunnel - was the router reset?");
             if (_onFailure != null)
-                _context.jobQueue().addJob(_onFailure);
+                getContext().jobQueue().addJob(_onFailure);
         } else {
             // we're the gateway, so sign, encrypt, and forward to info.getNextHop()
             TunnelMessage msg = prepareMessage(info);
@@ -170,20 +170,20 @@ public class SendTunnelMessageJob extends JobImpl {
                 if (_log.shouldLog(Log.ERROR))
                     _log.error("wtf, unable to prepare a tunnel message to the next hop, when we're the gateway and hops remain?  tunnel: " + info);
                 if (_onFailure != null)
-                    _context.jobQueue().addJob(_onFailure);
+                    getContext().jobQueue().addJob(_onFailure);
                 return;
             }
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Tunnel message created: " + msg + " out of encrypted message: " 
                            + _message);
-            long now = _context.clock().now();
+            long now = getContext().clock().now();
             if (_expiration < now + 15*1000) {
                 if (_log.shouldLog(Log.WARN))
                     _log.warn("Adding a tunnel message that will expire shortly [" 
                               + new Date(_expiration) + "]", getAddedBy());
             }
             msg.setMessageExpiration(new Date(_expiration));
-            _context.jobQueue().addJob(new SendMessageDirectJob(_context, msg, 
+            getContext().jobQueue().addJob(new SendMessageDirectJob(getContext(), msg, 
                                                                 info.getNextHop(), _onSend, 
                                                                 _onReply, _onFailure, 
                                                                 _selector, _expiration, 
@@ -205,7 +205,7 @@ public class SendTunnelMessageJob extends JobImpl {
             if (_log.shouldLog(Log.ERROR))
                 _log.error("Cannot inject non-tunnel messages as a participant!" + _message, getAddedBy());
             if (_onFailure != null)
-                _context.jobQueue().addJob(_onFailure);
+                getContext().jobQueue().addJob(_onFailure);
             return;
         }
         
@@ -216,29 +216,29 @@ public class SendTunnelMessageJob extends JobImpl {
             if (_log.shouldLog(Log.ERROR))
                 _log.error("No verification key for the participant? tunnel: " + info, getAddedBy());
             if (_onFailure != null)
-                _context.jobQueue().addJob(_onFailure);
+                getContext().jobQueue().addJob(_onFailure);
             return;
         }
         
-        boolean ok = struct.verifySignature(_context, info.getVerificationKey().getKey());
+        boolean ok = struct.verifySignature(getContext(), info.getVerificationKey().getKey());
         if (!ok) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Failed tunnel verification!  Spoofing / tagging attack?  " + _message, getAddedBy());
             if (_onFailure != null)
-                _context.jobQueue().addJob(_onFailure);
+                getContext().jobQueue().addJob(_onFailure);
             return;
         } else {
             if (info.getNextHop() != null) {
                 if (_log.shouldLog(Log.INFO))
                     _log.info("Message for tunnel " + info.getTunnelId().getTunnelId() + " received where we're not the gateway and there are remaining hops, so forward it on to "
                               + info.getNextHop().toBase64() + " via SendMessageDirectJob");
-                _context.jobQueue().addJob(new SendMessageDirectJob(_context, msg, info.getNextHop(), _onSend, null, _onFailure, null, _message.getMessageExpiration().getTime(), _priority));
+                getContext().jobQueue().addJob(new SendMessageDirectJob(getContext(), msg, info.getNextHop(), _onSend, null, _onFailure, null, _message.getMessageExpiration().getTime(), _priority));
                 return;
             } else {
                 if (_log.shouldLog(Log.ERROR))
                     _log.error("Should not be reached - participant, but no more hops?!");
                 if (_onFailure != null)
-                    _context.jobQueue().addJob(_onFailure);
+                    getContext().jobQueue().addJob(_onFailure);
                 return;
             }
         }
@@ -247,7 +247,7 @@ public class SendTunnelMessageJob extends JobImpl {
     
     /** find our place in the tunnel */
     private TunnelInfo getUs(TunnelInfo info) {
-        Hash us = _context.routerHash();
+        Hash us = getContext().routerHash();
         TunnelInfo lastUs = null;
         while (info != null) {
             if (us.equals(info.getThisHop()))
@@ -277,9 +277,9 @@ public class SendTunnelMessageJob extends JobImpl {
      *
      */
     private TunnelMessage prepareMessage(TunnelInfo info) {
-        TunnelMessage msg = new TunnelMessage(_context);
+        TunnelMessage msg = new TunnelMessage(getContext());
         
-        SessionKey key = _context.keyGenerator().generateSessionKey();
+        SessionKey key = getContext().keyGenerator().generateSessionKey();
         
         DeliveryInstructions instructions = new DeliveryInstructions();
         instructions.setDelayRequested(false);
@@ -329,7 +329,7 @@ public class SendTunnelMessageJob extends JobImpl {
         TunnelVerificationStructure verification = createVerificationStructure(encryptedMessage, info);
         
         String bodyType = _message.getClass().getName();
-        _context.messageHistory().wrap(bodyType, _message.getUniqueId(), TunnelMessage.class.getName(), msg.getUniqueId());
+        getContext().messageHistory().wrap(bodyType, _message.getUniqueId(), TunnelMessage.class.getName(), msg.getUniqueId());
  
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Tunnel message prepared: instructions = " + instructions);
@@ -347,8 +347,8 @@ public class SendTunnelMessageJob extends JobImpl {
      */
     private TunnelVerificationStructure createVerificationStructure(byte encryptedMessage[], TunnelInfo info) {
         TunnelVerificationStructure struct = new TunnelVerificationStructure();
-        struct.setMessageHash(_context.sha().calculateHash(encryptedMessage));
-        struct.sign(_context, info.getSigningKey().getKey());
+        struct.setMessageHash(getContext().sha().calculateHash(encryptedMessage));
+        struct.sign(getContext(), info.getSigningKey().getKey());
         return struct;
     }
     
@@ -363,9 +363,9 @@ public class SendTunnelMessageJob extends JobImpl {
             struct.writeBytes(baos);
             
             byte iv[] = new byte[16];
-            Hash h = _context.sha().calculateHash(key.getData());
+            Hash h = getContext().sha().calculateHash(key.getData());
             System.arraycopy(h.getData(), 0, iv, 0, iv.length);
-            return _context.AESEngine().safeEncrypt(baos.toByteArray(), key, iv, paddedSize);
+            return getContext().AESEngine().safeEncrypt(baos.toByteArray(), key, iv, paddedSize);
         } catch (IOException ioe) {
             if (_log.shouldLog(Log.ERROR))
                 _log.error("Error writing out data to encrypt", ioe);
@@ -389,12 +389,12 @@ public class SendTunnelMessageJob extends JobImpl {
         if (_onSend != null) {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Firing onSend as we're honoring the instructions");
-            _context.jobQueue().addJob(_onSend);
+            getContext().jobQueue().addJob(_onSend);
         }
         
         // since we are the gateway, we don't need to decrypt the delivery instructions or the payload
         
-        RouterIdentity ident = _context.router().getRouterInfo().getIdentity();
+        RouterIdentity ident = getContext().router().getRouterInfo().getIdentity();
         
         if (_destRouter != null) {
             honorSendRemote(info, ident);
@@ -416,7 +416,7 @@ public class SendTunnelMessageJob extends JobImpl {
                            + " message off to remote tunnel " 
                            + _targetTunnelId.getTunnelId() + " on router " 
                            + _destRouter.toBase64());
-            TunnelMessage tmsg = new TunnelMessage(_context);
+            TunnelMessage tmsg = new TunnelMessage(getContext());
             tmsg.setEncryptedDeliveryInstructions(null);
             tmsg.setTunnelId(_targetTunnelId);
             tmsg.setVerificationStructure(null);
@@ -438,7 +438,7 @@ public class SendTunnelMessageJob extends JobImpl {
                            + " message off to remote router " + _destRouter.toBase64());
             msg = _message;
         }
-        long now = _context.clock().now();
+        long now = getContext().clock().now();
         //if (_expiration < now) {
         //_expiration = now + Router.CLOCK_FUDGE_FACTOR;
         //_log.info("Fudging the message send so it expires in the fudge factor...");
@@ -451,11 +451,11 @@ public class SendTunnelMessageJob extends JobImpl {
         }
 
         String bodyType = _message.getClass().getName();
-        _context.messageHistory().wrap(bodyType, _message.getUniqueId(), 
+        getContext().messageHistory().wrap(bodyType, _message.getUniqueId(), 
                                        TunnelMessage.class.getName(), msg.getUniqueId());
 
         //  don't specify a selector, since createFakeOutNetMessage already does that
-        _context.jobQueue().addJob(new SendMessageDirectJob(_context, msg, _destRouter, 
+        getContext().jobQueue().addJob(new SendMessageDirectJob(getContext(), msg, _destRouter, 
                                                             _onSend, _onReply, _onFailure, 
                                                             null, _expiration, _priority));
     }
@@ -471,22 +471,22 @@ public class SendTunnelMessageJob extends JobImpl {
             // its a network message targeting us...
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Destination is null or its not a DataMessage - pass it off to the InNetMessagePool");
-            InNetMessage msg = new InNetMessage(_context);
+            InNetMessage msg = new InNetMessage(getContext());
             msg.setFromRouter(ident);
             msg.setFromRouterHash(ident.getHash());
             msg.setMessage(_message);
             msg.setReplyBlock(null);
-            _context.inNetMessagePool().add(msg);
+            getContext().inNetMessagePool().add(msg);
         } else {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Destination is not null and it is a DataMessage - pop it into the ClientMessagePool");
             DataMessage msg = (DataMessage)_message;
-            boolean valid = _context.messageValidator().validateMessage(msg.getUniqueId(), msg.getMessageExpiration().getTime());
+            boolean valid = getContext().messageValidator().validateMessage(msg.getUniqueId(), msg.getMessageExpiration().getTime());
             if (!valid) {
                 if (_log.shouldLog(Log.WARN))
                     _log.warn("Duplicate data message received [" + msg.getUniqueId() + " expiring on " + msg.getMessageExpiration() + "]");
-                _context.messageHistory().droppedOtherMessage(msg);
-                _context.messageHistory().messageProcessingError(msg.getUniqueId(), msg.getClass().getName(), "Duplicate");
+                getContext().messageHistory().droppedOtherMessage(msg);
+                getContext().messageHistory().messageProcessingError(msg.getUniqueId(), msg.getClass().getName(), "Duplicate");
                 return;
             }
 
@@ -501,8 +501,8 @@ public class SendTunnelMessageJob extends JobImpl {
             clientMessage.setDestination(info.getDestination());
             clientMessage.setPayload(payload);
             clientMessage.setReceptionInfo(receptionInfo);
-            _context.clientMessagePool().add(clientMessage);
-            _context.messageHistory().receivePayloadMessage(msg.getUniqueId());
+            getContext().clientMessagePool().add(clientMessage);
+            getContext().messageHistory().receivePayloadMessage(msg.getUniqueId());
         }
     }
     
@@ -510,7 +510,7 @@ public class SendTunnelMessageJob extends JobImpl {
         // now we create a fake outNetMessage to go onto the registry so we can select
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Registering a fake outNetMessage for the message tunneled locally since we have a selector");
-        OutNetMessage outM = new OutNetMessage(_context);
+        OutNetMessage outM = new OutNetMessage(getContext());
         outM.setExpiration(_expiration);
         outM.setMessage(_message);
         outM.setOnFailedReplyJob(_onFailure);
@@ -520,7 +520,7 @@ public class SendTunnelMessageJob extends JobImpl {
         outM.setPriority(_priority);
         outM.setReplySelector(_selector);
         outM.setTarget(null);
-        _context.messageRegistry().registerPending(outM);
+        getContext().messageRegistry().registerPending(outM);
         // we dont really need the data
         outM.discardData();
     }

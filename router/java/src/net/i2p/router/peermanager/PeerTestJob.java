@@ -53,7 +53,7 @@ public class PeerTestJob extends JobImpl {
     public void startTesting(PeerManager manager) { 
         _manager = manager;
         _keepTesting = true;
-        _context.jobQueue().addJob(this); 
+        getContext().jobQueue().addJob(this); 
         if (_log.shouldLog(Log.INFO))
             _log.info("Start testing peers");
     }
@@ -97,7 +97,7 @@ public class PeerTestJob extends JobImpl {
         Set peers = new HashSet(peerHashes.size());
         for (Iterator iter = peerHashes.iterator(); iter.hasNext(); ) {
             Hash peer = (Hash)iter.next();
-            RouterInfo peerInfo = _context.netDb().lookupRouterInfoLocally(peer);
+            RouterInfo peerInfo = getContext().netDb().lookupRouterInfoLocally(peer);
             if (peerInfo != null) {
                 peers.add(peerInfo);
             } else {
@@ -119,17 +119,17 @@ public class PeerTestJob extends JobImpl {
             return;
         }
 	
-        TunnelInfo inTunnel = _context.tunnelManager().getTunnelInfo(inTunnelId);
-        RouterInfo inGateway = _context.netDb().lookupRouterInfoLocally(inTunnel.getThisHop());
+        TunnelInfo inTunnel = getContext().tunnelManager().getTunnelInfo(inTunnelId);
+        RouterInfo inGateway = getContext().netDb().lookupRouterInfoLocally(inTunnel.getThisHop());
         if (inGateway == null) {
             _log.error("We can't find the gateway to our inbound tunnel?! wtf");
             return;
         }
 	
         long timeoutMs = getTestTimeout();
-        long expiration = _context.clock().now() + timeoutMs;
+        long expiration = getContext().clock().now() + timeoutMs;
 
-        long nonce = _context.random().nextLong(I2NPMessage.MAX_ID_VALUE);
+        long nonce = getContext().random().nextLong(I2NPMessage.MAX_ID_VALUE);
         DatabaseStoreMessage msg = buildMessage(peer, inTunnelId, inGateway.getIdentity().getHash(), nonce, expiration);
 	
         TunnelId outTunnelId = getOutboundTunnelId();
@@ -137,7 +137,7 @@ public class PeerTestJob extends JobImpl {
             _log.error("No tunnels to send search out through!  wtf!");
             return;
         }
-        TunnelInfo outTunnel = _context.tunnelManager().getTunnelInfo(outTunnelId);
+        TunnelInfo outTunnel = getContext().tunnelManager().getTunnelInfo(outTunnelId);
 	
         if (_log.shouldLog(Log.DEBUG))
             _log.debug(getJobId() + ": Sending peer test to " + peer.getIdentity().getHash().toBase64() 
@@ -145,12 +145,12 @@ public class PeerTestJob extends JobImpl {
                        + "] via tunnel [" + msg.getReplyTunnel() + "]");
 
         ReplySelector sel = new ReplySelector(peer.getIdentity().getHash(), nonce, expiration);
-        PeerReplyFoundJob reply = new PeerReplyFoundJob(_context, peer, inTunnel, outTunnel);
-        PeerReplyTimeoutJob timeoutJob = new PeerReplyTimeoutJob(_context, peer, inTunnel, outTunnel);
-        SendTunnelMessageJob j = new SendTunnelMessageJob(_context, msg, outTunnelId, peer.getIdentity().getHash(), 
+        PeerReplyFoundJob reply = new PeerReplyFoundJob(getContext(), peer, inTunnel, outTunnel);
+        PeerReplyTimeoutJob timeoutJob = new PeerReplyTimeoutJob(getContext(), peer, inTunnel, outTunnel);
+        SendTunnelMessageJob j = new SendTunnelMessageJob(getContext(), msg, outTunnelId, peer.getIdentity().getHash(), 
                                                           null, null, reply, timeoutJob, sel, 
                                                           timeoutMs, TEST_PRIORITY);
-        _context.jobQueue().addJob(j);
+        getContext().jobQueue().addJob(j);
 
     }
     
@@ -163,7 +163,7 @@ public class PeerTestJob extends JobImpl {
         TunnelSelectionCriteria crit = new TunnelSelectionCriteria();
         crit.setMaximumTunnelsRequired(1);
         crit.setMinimumTunnelsRequired(1);
-        List tunnelIds = _context.tunnelManager().selectOutboundTunnelIds(crit);
+        List tunnelIds = getContext().tunnelManager().selectOutboundTunnelIds(crit);
         if (tunnelIds.size() <= 0) {
             return null;
         }
@@ -180,7 +180,7 @@ public class PeerTestJob extends JobImpl {
         TunnelSelectionCriteria crit = new TunnelSelectionCriteria();
         crit.setMaximumTunnelsRequired(1);
         crit.setMinimumTunnelsRequired(1);
-        List tunnelIds = _context.tunnelManager().selectInboundTunnelIds(crit);
+        List tunnelIds = getContext().tunnelManager().selectInboundTunnelIds(crit);
         if (tunnelIds.size() <= 0) {
             return null;
         }
@@ -191,7 +191,7 @@ public class PeerTestJob extends JobImpl {
      * Build a message to test the peer with 
      */
     private DatabaseStoreMessage buildMessage(RouterInfo peer, TunnelId replyTunnel, Hash replyGateway, long nonce, long expiration) {
-        DatabaseStoreMessage msg = new DatabaseStoreMessage(_context);
+        DatabaseStoreMessage msg = new DatabaseStoreMessage(getContext());
         msg.setKey(peer.getIdentity().getHash());
         msg.setRouterInfo(peer);
         msg.setReplyGateway(replyGateway);
@@ -220,7 +220,7 @@ public class PeerTestJob extends JobImpl {
             if (message instanceof DeliveryStatusMessage) {
                 DeliveryStatusMessage msg = (DeliveryStatusMessage)message;
                 if (_nonce == msg.getMessageId()) {
-                    long timeLeft = _expiration - _context.clock().now();
+                    long timeLeft = _expiration - getContext().clock().now();
                     if (timeLeft < 0)
                         _log.warn("Took too long to get a reply from peer " + _peer.toBase64() 
                                   + ": " + (0-timeLeft) + "ms too slow");
@@ -247,30 +247,30 @@ public class PeerTestJob extends JobImpl {
         }
         public String getName() { return "Peer test successful"; }
         public void runJob() {
-            long responseTime = _context.clock().now() - _testBegin;
+            long responseTime = getContext().clock().now() - _testBegin;
             
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("successful peer test after " + responseTime + " for " 
                            + _peer.getIdentity().getHash().toBase64() + " using outbound tunnel " 
                            + _sendTunnel.getTunnelId().getTunnelId() + " and inbound tunnel " 
                            + _replyTunnel.getTunnelId().getTunnelId());
-            _context.profileManager().dbLookupSuccessful(_peer.getIdentity().getHash(), responseTime);
+            getContext().profileManager().dbLookupSuccessful(_peer.getIdentity().getHash(), responseTime);
             
-            _sendTunnel.setLastTested(_context.clock().now());
-            _replyTunnel.setLastTested(_context.clock().now());
+            _sendTunnel.setLastTested(getContext().clock().now());
+            _replyTunnel.setLastTested(getContext().clock().now());
             
             TunnelInfo cur = _replyTunnel;
             while (cur != null) {
                 Hash peer = cur.getThisHop();
-                if ( (peer != null) && (!_context.routerHash().equals(peer)) )
-                    _context.profileManager().tunnelTestSucceeded(peer, responseTime);
+                if ( (peer != null) && (!getContext().routerHash().equals(peer)) )
+                    getContext().profileManager().tunnelTestSucceeded(peer, responseTime);
                 cur = cur.getNextHopInfo();
             }
             cur = _sendTunnel;
             while (cur != null) {
                 Hash peer = cur.getThisHop();
-                if ( (peer != null) && (!_context.routerHash().equals(peer)) )
-                    _context.profileManager().tunnelTestSucceeded(peer, responseTime);
+                if ( (peer != null) && (!getContext().routerHash().equals(peer)) )
+                    getContext().profileManager().tunnelTestSucceeded(peer, responseTime);
                 cur = cur.getNextHopInfo();
             }
         }
@@ -298,7 +298,7 @@ public class PeerTestJob extends JobImpl {
         private boolean getShouldFailPeer() { return true; }
         public void runJob() {
             if (getShouldFailPeer())
-                _context.profileManager().dbLookupFailed(_peer.getIdentity().getHash());
+                getContext().profileManager().dbLookupFailed(_peer.getIdentity().getHash());
                         
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("failed peer test for " 
@@ -308,21 +308,21 @@ public class PeerTestJob extends JobImpl {
 
             if (getShouldFailTunnels()) {
                 
-                _sendTunnel.setLastTested(_context.clock().now());
-                _replyTunnel.setLastTested(_context.clock().now());
+                _sendTunnel.setLastTested(getContext().clock().now());
+                _replyTunnel.setLastTested(getContext().clock().now());
 
                 TunnelInfo cur = _replyTunnel;
                 while (cur != null) {
                     Hash peer = cur.getThisHop();
-                    if ( (peer != null) && (!_context.routerHash().equals(peer)) )
-                        _context.profileManager().tunnelFailed(peer);
+                    if ( (peer != null) && (!getContext().routerHash().equals(peer)) )
+                        getContext().profileManager().tunnelFailed(peer);
                     cur = cur.getNextHopInfo();
                 }
                 cur = _sendTunnel;
                 while (cur != null) {
                     Hash peer = cur.getThisHop();
-                    if ( (peer != null) && (!_context.routerHash().equals(peer)) )
-                        _context.profileManager().tunnelFailed(peer);
+                    if ( (peer != null) && (!getContext().routerHash().equals(peer)) )
+                        getContext().profileManager().tunnelFailed(peer);
                     cur = cur.getNextHopInfo();
                 }
             }

@@ -48,7 +48,7 @@ class RequestLeaseSetJob extends JobImpl {
         if (_runner.isDead()) return;
         LeaseRequestState oldReq = _runner.getLeaseRequest();
         if (oldReq != null) {
-            if (oldReq.getExpiration() > _context.clock().now()) {
+            if (oldReq.getExpiration() > getContext().clock().now()) {
                 _log.error("Old *current* leaseRequest already exists!  Why are we trying to request too quickly?", getAddedBy());
                 return;
             } else {
@@ -76,7 +76,7 @@ class RequestLeaseSetJob extends JobImpl {
         try {
             _runner.setLeaseRequest(state);
             _runner.doSend(msg);
-            _context.jobQueue().addJob(new CheckLeaseRequestStatus(state));
+            getContext().jobQueue().addJob(new CheckLeaseRequestStatus(state));
             return;
         } catch (I2CPMessageException ime) {
             _log.error("Error sending I2CP message requesting the lease set", ime);
@@ -97,7 +97,7 @@ class RequestLeaseSetJob extends JobImpl {
         private LeaseRequestState _req;
         
         public CheckLeaseRequestStatus(LeaseRequestState state) {
-            super(RequestLeaseSetJob.this._context);
+            super(RequestLeaseSetJob.this.getContext());
             _req = state;
             getTiming().setStartAfter(state.getExpiration());
         }
@@ -111,7 +111,7 @@ class RequestLeaseSetJob extends JobImpl {
                 _log.error("Failed to receive a leaseSet in the time allotted (" + new Date(_req.getExpiration()) + ")");
                 _runner.disconnectClient("Took too long to request leaseSet");
                 if (_req.getOnFailed() != null)
-                    RequestLeaseSetJob.this._context.jobQueue().addJob(_req.getOnFailed());
+                    RequestLeaseSetJob.this.getContext().jobQueue().addJob(_req.getOnFailed());
                 
                 // only zero out the request if its the one we know about
                 if (_req == _runner.getLeaseRequest())

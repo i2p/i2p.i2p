@@ -69,7 +69,7 @@ class ExpireRoutersJob extends JobImpl {
     private Set selectKeysToExpire() {
         Set possible = getNotInUse();
         Set expiring = new HashSet(16);
-        long earliestPublishDate = _context.clock().now() - EXPIRE_DELAY;
+        long earliestPublishDate = getContext().clock().now() - EXPIRE_DELAY;
         
         for (Iterator iter = possible.iterator(); iter.hasNext(); ) {
             Hash key = (Hash)iter.next();
@@ -94,7 +94,7 @@ class ExpireRoutersJob extends JobImpl {
         Set possible = new HashSet(16);
         for (Iterator iter = _facade.getAllRouters().iterator(); iter.hasNext(); ) {
             Hash peer = (Hash)iter.next();
-            if (!_context.tunnelManager().isInUse(peer)) {
+            if (!getContext().tunnelManager().isInUse(peer)) {
                 possible.add(peer);
             } else {
                 if (_log.shouldLog(Log.DEBUG))

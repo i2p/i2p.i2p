@@ -31,7 +31,7 @@ class TunnelPoolExpirationJob extends JobImpl {
         super(ctx);
         _log = ctx.logManager().getLog(TunnelPoolExpirationJob.class);
         _pool = pool;
-        getTiming().setStartAfter(_context.clock().now() + EXPIRE_POOL_DELAY);
+        getTiming().setStartAfter(getContext().clock().now() + EXPIRE_POOL_DELAY);
     }
     public String getName() { return "Expire Pooled Tunnels"; }
     public void runJob() {
@@ -50,7 +50,7 @@ class TunnelPoolExpirationJob extends JobImpl {
      *
      */
     public void expireFree() {
-        long now = _context.clock().now();
+        long now = getContext().clock().now();
         long expire = now - EXPIRE_BUFFER - Router.CLOCK_FUDGE_FACTOR;
         
         for (Iterator iter = _pool.getFreeTunnels().iterator(); iter.hasNext(); ) {
@@ -78,7 +78,7 @@ class TunnelPoolExpirationJob extends JobImpl {
      *
      */
     public void expireOutbound() {
-        long now = _context.clock().now();
+        long now = getContext().clock().now();
         long expire = now - EXPIRE_BUFFER - Router.CLOCK_FUDGE_FACTOR;
         
         for (Iterator iter = _pool.getOutboundTunnels().iterator(); iter.hasNext(); ) {
@@ -105,7 +105,7 @@ class TunnelPoolExpirationJob extends JobImpl {
      *
      */
     public void expireParticipants() {
-        long now = _context.clock().now();
+        long now = getContext().clock().now();
         long expire = now - EXPIRE_BUFFER - Router.CLOCK_FUDGE_FACTOR;
         
         for (Iterator iter = _pool.getParticipatingTunnels().iterator(); iter.hasNext(); ) {
@@ -127,7 +127,7 @@ class TunnelPoolExpirationJob extends JobImpl {
      *
      */
     public void expirePending() {
-        long now = _context.clock().now();
+        long now = getContext().clock().now();
         long expire = now - EXPIRE_BUFFER - Router.CLOCK_FUDGE_FACTOR;
         
         for (Iterator iter = _pool.getPendingTunnels().iterator(); iter.hasNext(); ) {

@@ -98,7 +98,7 @@ public class RequestTunnelJob extends JobImpl {
         _toBeRequested = new ArrayList(participants.size());
         for (int i = participants.size()-1; i >= 0; i--) {
             TunnelInfo peer = (TunnelInfo)participants.get(i);
-            if (null != _context.netDb().lookupRouterInfoLocally(peer.getThisHop())) {
+            if (null != getContext().netDb().lookupRouterInfoLocally(peer.getThisHop())) {
                 _toBeRequested.add(participants.get(i));
             } else {
                 if (_log.shouldLog(Log.WARN))
@@ -109,12 +109,12 @@ public class RequestTunnelJob extends JobImpl {
         // since we request serially, we need to up the timeout serially
         // change this once we go parallel
         //_timeoutMs *= participants.size()+1;
-        _expiration = (_timeoutMs * _toBeRequested.size()) + _context.clock().now();
+        _expiration = (_timeoutMs * _toBeRequested.size()) + getContext().clock().now();
     }
     
     public String getName() { return "Request Tunnel"; }
     public void runJob() {
-        if (_context.clock().now() > _expiration) {
+        if (getContext().clock().now() > _expiration) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Timeout reached building tunnel (timeout = " + _timeoutMs + " expiration = " + new Date(_expiration) + ")");
             fail();
@@ -140,7 +140,7 @@ public class RequestTunnelJob extends JobImpl {
     
     private void requestParticipation(TunnelInfo participant) {
         // find the info about who we're looking for
-        RouterInfo target = _context.netDb().lookupRouterInfoLocally(participant.getThisHop());
+        RouterInfo target = getContext().netDb().lookupRouterInfoLocally(participant.getThisHop());
         if (target == null) {
             if (_log.shouldLog(Log.ERROR))
                 _log.error("Error - no db info known for participant " + participant.getThisHop());
@@ -148,7 +148,7 @@ public class RequestTunnelJob extends JobImpl {
             return;
         }
 
-        if (target.getIdentity().getHash().equals(_context.routerHash())) {
+        if (target.getIdentity().getHash().equals(getContext().routerHash())) {
             // short circuit the ok
             okLocalParticipation(participant);
             return;
@@ -190,7 +190,7 @@ public class RequestTunnelJob extends JobImpl {
                                               participant, inboundGateway, replyPeer, 
                                               outboundTunnel, target);
         Request r = new Request(state);
-        _context.jobQueue().addJob(r);	
+        getContext().jobQueue().addJob(r);	
     }
     
     /**
@@ -203,7 +203,7 @@ public class RequestTunnelJob extends JobImpl {
     public class Request extends JobImpl {
         private RequestState _state;
         Request(RequestState state) {
-            super(RequestTunnelJob.this._context);
+            super(RequestTunnelJob.this.getContext());
             _state = state;
         }
         
@@ -212,7 +212,7 @@ public class RequestTunnelJob extends JobImpl {
             if (needsMore) {
                 requeue(0);
             } else {
-                MessageHistory hist = Request.this._context.messageHistory();
+                MessageHistory hist = Request.this.getContext().messageHistory();
                 hist.requestTunnelCreate(_tunnelGateway.getTunnelId(), 
                                          _state.getOutboundTunnel(), 
                                          _state.getParticipant().getThisHop(), 
@@ -287,11 +287,11 @@ public class RequestTunnelJob extends JobImpl {
                 ReplyJob onReply = new Success(_participant, _wrappedKey, _wrappedTags, _wrappedTo);
                 Job onFail = new Failure(_participant, _replyPeer.getIdentity().getHash());
                 MessageSelector selector = new Selector(_participant, _statusMsg.getMessageId());
-                SendTunnelMessageJob j = new SendTunnelMessageJob(_context, _garlicMessage, 
+                SendTunnelMessageJob j = new SendTunnelMessageJob(getContext(), _garlicMessage, 
                                                                   _outboundTunnel, _target.getIdentity().getHash(), 
                                                                   null, null, onReply, onFail, 
                                                                   selector, _timeoutMs, PRIORITY);
-                _context.jobQueue().addJob(j);
+                getContext().jobQueue().addJob(j);
                 return false;
             }
         }
@@ -320,7 +320,7 @@ public class RequestTunnelJob extends JobImpl {
         crit.setLatencyPriority(50);     // arbitrary
         crit.setReliabilityPriority(50); // arbitrary
         
-        List tunnelIds = _context.tunnelManager().selectOutboundTunnelIds(crit);
+        List tunnelIds = getContext().tunnelManager().selectOutboundTunnelIds(crit);
         TunnelId id = null;
         if (tunnelIds.size() > 0)
             id = (TunnelId)tunnelIds.get(0);
@@ -340,12 +340,12 @@ public class RequestTunnelJob extends JobImpl {
         criteria.setMaximumRequired(1);
         criteria.setMinimumRequired(1);
         criteria.setPurpose(PeerSelectionCriteria.PURPOSE_SOURCE_ROUTE);
-        List peerHashes = _context.peerManager().selectPeers(criteria);
+        List peerHashes = getContext().peerManager().selectPeers(criteria);
         
         RouterInfo peerInfo = null;
         for (int i = 0; (i < peerHashes.size()) && (peerInfo == null); i++) {
             Hash peerHash = (Hash)peerHashes.get(i);
-            peerInfo = _context.netDb().lookupRouterInfoLocally(peerHash);
+            peerInfo = getContext().netDb().lookupRouterInfoLocally(peerHash);
             if (peerInfo == null) {
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("Selected a peer [" + peerHash + "] we don't have info on locally... trying another");
@@ -359,7 +359,7 @@ public class RequestTunnelJob extends JobImpl {
         if (peerInfo == null) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("No peers know for a reply (out of " + peerHashes.size() + ") - using ourself");
-            return _context.router().getRouterInfo();
+            return getContext().router().getRouterInfo();
         } else {
             return peerInfo;
         }
@@ -377,7 +377,7 @@ public class RequestTunnelJob extends JobImpl {
         criteria.setLatencyPriority(33);
         criteria.setMaximumTunnelsRequired(1);
         criteria.setMinimumTunnelsRequired(1);
-        List ids = _context.tunnelManager().selectInboundTunnelIds(criteria);
+        List ids = getContext().tunnelManager().selectInboundTunnelIds(criteria);
         if (ids.size() <= 0) {
             if (_log.shouldLog(Log.ERROR))
                 _log.error("No inbound tunnels to receive the tunnel create messages.  Argh", 
@@ -388,7 +388,7 @@ public class RequestTunnelJob extends JobImpl {
             TunnelId id = null;
             for (int i = 0; i < ids.size(); i++) {
                 id = (TunnelId)ids.get(i);
-                gateway = _context.tunnelManager().getTunnelInfo(id);
+                gateway = getContext().tunnelManager().getTunnelInfo(id);
                 if (gateway != null)
                     break;
             }
@@ -409,7 +409,7 @@ public class RequestTunnelJob extends JobImpl {
      * Build a TunnelCreateMessage to the participant
      */
     private TunnelCreateMessage buildTunnelCreate(TunnelInfo participant, TunnelGateway replyGateway, RouterInfo replyPeer) {
-        TunnelCreateMessage msg = new TunnelCreateMessage(_context);
+        TunnelCreateMessage msg = new TunnelCreateMessage(getContext());
         msg.setCertificate(new Certificate(Certificate.CERTIFICATE_TYPE_NULL, null));
         msg.setConfigurationKey(participant.getConfigurationKey());
         msg.setIncludeDummyTraffic(participant.getSettings().getIncludeDummy());
@@ -431,7 +431,7 @@ public class RequestTunnelJob extends JobImpl {
             return null;
         
         msg.setReplyBlock(replyBlock);
-        long duration = participant.getSettings().getExpiration() - _context.clock().now();
+        long duration = participant.getSettings().getExpiration() - getContext().clock().now();
         if (duration == 0) duration = 1;
         msg.setTunnelDurationSeconds(duration/1000);
         msg.setTunnelId(participant.getTunnelId());
@@ -454,12 +454,12 @@ public class RequestTunnelJob extends JobImpl {
             return null;
         }
         
-        SessionKey replySessionKey = _context.keyGenerator().generateSessionKey();
+        SessionKey replySessionKey = getContext().keyGenerator().generateSessionKey();
         SessionTag tag = new SessionTag(true);
         Set tags = new HashSet();
         tags.add(tag);
         // make it so we'll read the session tag correctly and use the right session key
-        _context.sessionKeyManager().tagsReceived(replySessionKey, tags);
+        getContext().sessionKeyManager().tagsReceived(replySessionKey, tags);
         
         PublicKey pk = replyPeer.getIdentity().getPublicKey();
         
@@ -473,18 +473,18 @@ public class RequestTunnelJob extends JobImpl {
         instructions.setRouter(gateway.getGateway());
         instructions.setTunnelId(gateway.getTunnelId());
         
-        long replyId = _context.random().nextLong(I2NPMessage.MAX_ID_VALUE);
+        long replyId = getContext().random().nextLong(I2NPMessage.MAX_ID_VALUE);
         
         Certificate replyCert = new Certificate(Certificate.CERTIFICATE_TYPE_NULL, null);
         
-        long expiration = _context.clock().now() + _timeoutMs; // _expiration;
+        long expiration = getContext().clock().now() + _timeoutMs; // _expiration;
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Setting the expiration on the reply block to " + (new Date(expiration)));
         SourceRouteBlock block = new SourceRouteBlock();
         try {
-            long begin = _context.clock().now();
-            block.setData(_context, instructions, replyId, replyCert, expiration, pk);
-            long end = _context.clock().now();
+            long begin = getContext().clock().now();
+            block.setData(getContext(), instructions, replyId, replyCert, expiration, pk);
+            long end = getContext().clock().now();
             if ( (end - begin) > 1000) {
                 if (_log.shouldLog(Log.WARN))
                     _log.warn("Took too long (" + (end-begin) + "ms) to build source route block");
@@ -511,10 +511,10 @@ public class RequestTunnelJob extends JobImpl {
      *
      */
     private DeliveryStatusMessage buildDeliveryStatusMessage() {
-        DeliveryStatusMessage msg = new DeliveryStatusMessage(_context);
-        msg.setArrival(new Date(_context.clock().now()));
-        msg.setMessageId(_context.random().nextLong(I2NPMessage.MAX_ID_VALUE));
-        Date exp = new Date(_context.clock().now() + _timeoutMs); // _expiration);
+        DeliveryStatusMessage msg = new DeliveryStatusMessage(getContext());
+        msg.setArrival(new Date(getContext().clock().now()));
+        msg.setMessageId(getContext().random().nextLong(I2NPMessage.MAX_ID_VALUE));
+        Date exp = new Date(getContext().clock().now() + _timeoutMs); // _expiration);
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Setting the expiration on the delivery status message to " + exp);
         msg.setMessageExpiration(exp);
@@ -549,9 +549,9 @@ public class RequestTunnelJob extends JobImpl {
         if (wrappedTo != null)
             wrappedTo.setData(rcptKey.getData());
         
-        long start = _context.clock().now();
-        GarlicMessage message = GarlicMessageBuilder.buildMessage(_context, config, wrappedKey, wrappedTags);
-        long end = _context.clock().now();
+        long start = getContext().clock().now();
+        GarlicMessage message = GarlicMessageBuilder.buildMessage(getContext(), config, wrappedKey, wrappedTags);
+        long end = getContext().clock().now();
         if ( (end - start) > 1000) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Took more than a second (" + (end-start) + "ms) to create the garlic for the tunnel");
@@ -567,7 +567,7 @@ public class RequestTunnelJob extends JobImpl {
                                           RouterInfo target) {
         GarlicConfig config = new GarlicConfig();
         
-        long garlicExpiration = _context.clock().now() + _timeoutMs;
+        long garlicExpiration = getContext().clock().now() + _timeoutMs;
         PayloadGarlicConfig dataClove = buildDataClove(data, target, garlicExpiration);
         config.addClove(dataClove);
         PayloadGarlicConfig ackClove = buildAckClove(status, replyPeer, replyTunnel, garlicExpiration);
@@ -587,7 +587,7 @@ public class RequestTunnelJob extends JobImpl {
         
         config.setCertificate(new Certificate(Certificate.CERTIFICATE_TYPE_NULL, null));
         config.setDeliveryInstructions(instructions);
-        config.setId(_context.random().nextLong(I2NPMessage.MAX_ID_VALUE));
+        config.setId(getContext().random().nextLong(I2NPMessage.MAX_ID_VALUE));
         config.setExpiration(garlicExpiration);
         config.setRecipientPublicKey(target.getIdentity().getPublicKey());
         config.setRequestAck(false);
@@ -616,7 +616,7 @@ public class RequestTunnelJob extends JobImpl {
         ackClove.setCertificate(new Certificate(Certificate.CERTIFICATE_TYPE_NULL, null));
         ackClove.setDeliveryInstructions(ackInstructions);
         ackClove.setExpiration(expiration);
-        ackClove.setId(_context.random().nextLong(I2NPMessage.MAX_ID_VALUE));
+        ackClove.setId(getContext().random().nextLong(I2NPMessage.MAX_ID_VALUE));
         ackClove.setPayload(ackMsg);
         ackClove.setRecipient(replyPeer);
         ackClove.setRequestAck(false);
@@ -641,7 +641,7 @@ public class RequestTunnelJob extends JobImpl {
         clove.setCertificate(new Certificate(Certificate.CERTIFICATE_TYPE_NULL, null));
         clove.setDeliveryInstructions(instructions);
         clove.setExpiration(expiration);
-        clove.setId(_context.random().nextLong(I2NPMessage.MAX_ID_VALUE));
+        clove.setId(getContext().random().nextLong(I2NPMessage.MAX_ID_VALUE));
         clove.setPayload(data);
         clove.setRecipientPublicKey(null);
         clove.setRequestAck(false);
@@ -686,7 +686,7 @@ public class RequestTunnelJob extends JobImpl {
             else
                 _pool.addOutboundTunnel(_tunnelGateway);
             _tunnelGateway.setIsReady(true);
-            _context.statManager().updateFrequency("tunnel.buildFrequency");
+            getContext().statManager().updateFrequency("tunnel.buildFrequency");
         } else {
             if (_log.shouldLog(Log.DEBUG)) {
                 StringBuffer buf = new StringBuffer(128);
@@ -695,7 +695,7 @@ public class RequestTunnelJob extends JobImpl {
                 buf.append(", but ").append(numLeft).append(" are pending");
                 _log.debug(buf.toString());
             }
-            _context.jobQueue().addJob(this);
+            getContext().jobQueue().addJob(this);
         }
     }
     
@@ -717,14 +717,14 @@ public class RequestTunnelJob extends JobImpl {
         private long _started;
         
         public Success(TunnelInfo tunnel, SessionKey wrappedKey, Set wrappedTags, PublicKey wrappedTo) {
-            super(RequestTunnelJob.this._context);
+            super(RequestTunnelJob.this.getContext());
             _tunnel = tunnel;
             _messages = new LinkedList();
             _successCompleted = false;
             _wrappedKey = wrappedKey;
             _wrappedTags = wrappedTags;
             _wrappedTo = wrappedTo;
-            _started = _context.clock().now();
+            _started = getContext().clock().now();
         }
         
         public String getName() { return "Create Tunnel Status Received"; }
@@ -737,7 +737,7 @@ public class RequestTunnelJob extends JobImpl {
                 _messages.clear();
             }
             
-            long responseTime = _context.clock().now() - _started;
+            long responseTime = getContext().clock().now() - _started;
             for (Iterator iter = toProc.iterator(); iter.hasNext(); ) {
                 I2NPMessage msg = (I2NPMessage)iter.next();
                 process(msg, responseTime);
@@ -766,8 +766,8 @@ public class RequestTunnelJob extends JobImpl {
                             _log.warn("Tunnel creation failed for tunnel " + _tunnel.getTunnelId() 
                                       + " at router " + _tunnel.getThisHop().toBase64() 
                                       + " with status " + msg.getStatus());
-                        _context.profileManager().tunnelRejected(_tunnel.getThisHop(), responseTime);
-                        Success.this._context.messageHistory().tunnelRejected(_tunnel.getThisHop(), 
+                        getContext().profileManager().tunnelRejected(_tunnel.getThisHop(), responseTime);
+                        Success.this.getContext().messageHistory().tunnelRejected(_tunnel.getThisHop(), 
                                                                               _tunnel.getTunnelId(), 
                                                                               null, "refused");
                         fail();
@@ -781,14 +781,14 @@ public class RequestTunnelJob extends JobImpl {
                         if ( (_wrappedKey != null) && (_wrappedKey.getData() != null) && 
                              (_wrappedTags != null) && (_wrappedTags.size() > 0) && 
                              (_wrappedTo != null) ) {
-                            Success.this._context.sessionKeyManager().tagsDelivered(_wrappedTo, _wrappedKey, _wrappedTags);
+                            Success.this.getContext().sessionKeyManager().tagsDelivered(_wrappedTo, _wrappedKey, _wrappedTags);
                             if (_log.shouldLog(Log.INFO))
                                 _log.info("Delivered tags successfully to " + _tunnel.getThisHop().toBase64() 
                                           + "!  # tags: " + _wrappedTags.size());
                         }
                         
                         _tunnel.setIsReady(true);
-                        _context.profileManager().tunnelJoined(_tunnel.getThisHop(), responseTime);
+                        getContext().profileManager().tunnelJoined(_tunnel.getThisHop(), responseTime);
                         peerSuccess(_tunnel);
                         _successCompleted = true;
                         break;
@@ -811,10 +811,10 @@ public class RequestTunnelJob extends JobImpl {
         private Hash _replyThrough;
         private long _started;
         public Failure(TunnelInfo tunnel, Hash replyThrough) {
-            super(RequestTunnelJob.this._context);
+            super(RequestTunnelJob.this.getContext());
             _tunnel = tunnel;
             _replyThrough = replyThrough;
-            _started = _context.clock().now();
+            _started = getContext().clock().now();
         }
         
         public String getName() { return "Create Tunnel Failed"; }
@@ -823,19 +823,19 @@ public class RequestTunnelJob extends JobImpl {
             if (_log.shouldLog(Log.WARN)) {
                 _log.warn("Tunnel creation timed out for tunnel " + _tunnel.getTunnelId() + " at router " 
                            + _tunnel.getThisHop().toBase64() + " from router " 
-                           + _context.routerHash().toBase64() + " after waiting " 
-                           + (_context.clock().now()-_started) + "ms");
+                           + getContext().routerHash().toBase64() + " after waiting " 
+                           + (getContext().clock().now()-_started) + "ms");
                 _log.warn("Added by", Failure.this.getAddedBy());
             }
             synchronized (_failedTunnelParticipants) {
                 _failedTunnelParticipants.add(_tunnel.getThisHop());
                 _failedTunnelParticipants.add(_replyThrough);
             }
-            Failure.this._context.messageHistory().tunnelRequestTimedOut(_tunnel.getThisHop(), _tunnel.getTunnelId(), _replyThrough);
+            Failure.this.getContext().messageHistory().tunnelRequestTimedOut(_tunnel.getThisHop(), _tunnel.getTunnelId(), _replyThrough);
             // perhaps not an explicit reject, but an implicit one (due to overload & dropped messages, etc)
-            _context.profileManager().tunnelRejected(_tunnel.getThisHop(), _context.clock().now() - _started);
-            _context.profileManager().messageFailed(_tunnel.getThisHop());
-            Failure.this._context.statManager().updateFrequency("tunnel.buildFailFrequency");
+            getContext().profileManager().tunnelRejected(_tunnel.getThisHop(), getContext().clock().now() - _started);
+            getContext().profileManager().messageFailed(_tunnel.getThisHop());
+            Failure.this.getContext().statManager().updateFrequency("tunnel.buildFailFrequency");
             fail();
         }
     }
@@ -852,7 +852,7 @@ public class RequestTunnelJob extends JobImpl {
             _ackId = ackId;
             _statusFound = false;
             _ackFound = false;
-            _attemptExpiration = _context.clock().now() + _timeoutMs;
+            _attemptExpiration = getContext().clock().now() + _timeoutMs;
         }
         
         public boolean continueMatching() {

@@ -26,10 +26,10 @@ class LoadClientAppsJob extends JobImpl {
     public void runJob() {
         int i = 0;
         while (true) {
-            String className = _context.router().getConfigSetting("clientApp."+i+".main");
-            String clientName = _context.router().getConfigSetting("clientApp."+i+".name");
-            String args = _context.router().getConfigSetting("clientApp."+i+".args");
-            String onBoot = _context.router().getConfigSetting("clientApp." + i + ".onBoot");
+            String className = getContext().router().getConfigSetting("clientApp."+i+".main");
+            String clientName = getContext().router().getConfigSetting("clientApp."+i+".name");
+            String args = getContext().router().getConfigSetting("clientApp."+i+".args");
+            String onBoot = getContext().router().getConfigSetting("clientApp." + i + ".onBoot");
             boolean onStartup = false;
             if (onBoot != null)
                 onStartup = "true".equals(onBoot) || "yes".equals(onBoot);
@@ -43,7 +43,7 @@ class LoadClientAppsJob extends JobImpl {
                 runClient(className, clientName, argVal);
             } else {
                 // wait 2 minutes
-                _context.jobQueue().addJob(new DelayedRunClient(className, clientName, argVal));
+                getContext().jobQueue().addJob(new DelayedRunClient(className, clientName, argVal));
             }
             i++;
         }
@@ -54,11 +54,11 @@ class LoadClientAppsJob extends JobImpl {
         private String _clientName;
         private String _args[];
         public DelayedRunClient(String className, String clientName, String args[]) {
-            super(LoadClientAppsJob.this._context);
+            super(LoadClientAppsJob.this.getContext());
             _className = className;
             _clientName = clientName;
             _args = args;
-            getTiming().setStartAfter(LoadClientAppsJob.this._context.clock().now() + STARTUP_DELAY);
+            getTiming().setStartAfter(LoadClientAppsJob.this.getContext().clock().now() + STARTUP_DELAY);
         }
         public String getName() { return "Delayed client job"; }
         public void runJob() {

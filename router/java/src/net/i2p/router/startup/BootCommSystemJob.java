@@ -28,23 +28,23 @@ public class BootCommSystemJob extends JobImpl {
     public void runJob() {
         // start up the network comm system
         
-        _context.commSystem().startup();
-        _context.tunnelManager().startup();
-        _context.peerManager().startup();
+        getContext().commSystem().startup();
+        getContext().tunnelManager().startup();
+        getContext().peerManager().startup();
         
-        Job bootDb = new BootNetworkDbJob(_context);
+        Job bootDb = new BootNetworkDbJob(getContext());
         boolean useTrusted = false;
-        String useTrustedStr = _context.router().getConfigSetting(PROP_USE_TRUSTED_LINKS);
+        String useTrustedStr = getContext().router().getConfigSetting(PROP_USE_TRUSTED_LINKS);
         if (useTrustedStr != null) {
             useTrusted = Boolean.TRUE.toString().equalsIgnoreCase(useTrustedStr);
         }
         if (useTrusted) {
             _log.debug("Using trusted links...");
-            _context.jobQueue().addJob(new BuildTrustedLinksJob(_context, bootDb));
+            getContext().jobQueue().addJob(new BuildTrustedLinksJob(getContext(), bootDb));
             return;
         } else {
             _log.debug("Not using trusted links - boot db");
-            _context.jobQueue().addJob(bootDb);
+            getContext().jobQueue().addJob(bootDb);
         }
     }
 }

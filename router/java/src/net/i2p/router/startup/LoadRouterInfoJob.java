@@ -39,26 +39,26 @@ public class LoadRouterInfoJob extends JobImpl {
     public void runJob() {
         loadRouterInfo();
         if (_us == null) {
-            RebuildRouterInfoJob r = new RebuildRouterInfoJob(_context);
+            RebuildRouterInfoJob r = new RebuildRouterInfoJob(getContext());
             r.rebuildRouterInfo(false);
-            _context.jobQueue().addJob(this);
+            getContext().jobQueue().addJob(this);
             return;
         } else {
-            _context.router().setRouterInfo(_us);
-            _context.messageHistory().initialize(true);
-            _context.jobQueue().addJob(new BootCommSystemJob(_context));
+            getContext().router().setRouterInfo(_us);
+            getContext().messageHistory().initialize(true);
+            getContext().jobQueue().addJob(new BootCommSystemJob(getContext()));
         }
     }
     
     private void loadRouterInfo() {
-        String routerInfoFile = _context.router().getConfigSetting(Router.PROP_INFO_FILENAME);
+        String routerInfoFile = getContext().router().getConfigSetting(Router.PROP_INFO_FILENAME);
         if (routerInfoFile == null)
             routerInfoFile = Router.PROP_INFO_FILENAME_DEFAULT;
         RouterInfo info = null;
         boolean failedRead = false;
         
         
-        String keyFilename = _context.router().getConfigSetting(Router.PROP_KEYS_FILENAME);
+        String keyFilename = getContext().router().getConfigSetting(Router.PROP_KEYS_FILENAME);
         if (keyFilename == null)
             keyFilename = Router.PROP_KEYS_FILENAME_DEFAULT;
         
@@ -90,10 +90,10 @@ public class LoadRouterInfoJob extends JobImpl {
                 SigningPublicKey signingPubKey = new SigningPublicKey();
                 signingPubKey.readBytes(fis2);
                 
-                _context.keyManager().setPrivateKey(privkey);
-                _context.keyManager().setSigningPrivateKey(signingPrivKey);
-                _context.keyManager().setPublicKey(pubkey); //info.getIdentity().getPublicKey());
-                _context.keyManager().setSigningPublicKey(signingPubKey); // info.getIdentity().getSigningPublicKey());
+                getContext().keyManager().setPrivateKey(privkey);
+                getContext().keyManager().setSigningPrivateKey(signingPrivKey);
+                getContext().keyManager().setPublicKey(pubkey); //info.getIdentity().getPublicKey());
+                getContext().keyManager().setSigningPublicKey(signingPubKey); // info.getIdentity().getSigningPublicKey());
             }
             
             _us = info;

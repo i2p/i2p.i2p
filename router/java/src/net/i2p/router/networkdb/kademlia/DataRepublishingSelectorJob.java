@@ -118,7 +118,7 @@ class DataRepublishingSelectorJob extends JobImpl {
     private long rankPublishNeed(Hash key, Long lastPublished) {
         int bucket = _facade.getKBuckets().pickBucket(key);
         long sendPeriod = (bucket+1) * RESEND_BUCKET_FACTOR;
-        long now = _context.clock().now();
+        long now = getContext().clock().now();
         if (lastPublished.longValue() < now-sendPeriod) {
             RouterInfo ri = _facade.lookupRouterInfoLocally(key);
             if (ri != null) {
@@ -158,7 +158,7 @@ class DataRepublishingSelectorJob extends JobImpl {
                 if (_facade.lookupRouterInfoLocally(key) != null) {
                     // randomize the chance of rebroadcast for leases if we haven't
                     // sent it within 5 minutes
-                    int val = _context.random().nextInt(LEASE_REBROADCAST_PROBABILITY_SCALE);
+                    int val = getContext().random().nextInt(LEASE_REBROADCAST_PROBABILITY_SCALE);
                     if (val <= LEASE_REBROADCAST_PROBABILITY) {
                         if (_log.shouldLog(Log.INFO))
                             _log.info("Randomized rebroadcast of leases tells us to send " 

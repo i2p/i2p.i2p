@@ -55,8 +55,8 @@ class DataPublisherJob extends JobImpl {
                                   new Exception("Publish expired lease?"));
                 }
             }
-            StoreJob store = new StoreJob(_context, _facade, key, data, null, null, STORE_TIMEOUT);
-            _context.jobQueue().addJob(store);
+            StoreJob store = new StoreJob(getContext(), _facade, key, data, null, null, STORE_TIMEOUT);
+            getContext().jobQueue().addJob(store);
         }
         requeue(RERUN_DELAY_MS);
     }

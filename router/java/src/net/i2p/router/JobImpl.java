@@ -13,7 +13,7 @@ import net.i2p.util.Log;
  * Base implementation of a Job
  */
 public abstract class JobImpl implements Job {
-    protected RouterContext _context;
+    private RouterContext _context;
     private JobTiming _timing;
     private static int _idSrc = 0;
     private int _id;
@@ -30,6 +30,8 @@ public abstract class JobImpl implements Job {
     
     public int getJobId() { return _id; }
     public JobTiming getTiming() { return _timing; }
+    
+    public final RouterContext getContext() { return _context; }
     
     public String toString() { 
         StringBuffer buf = new StringBuffer(128);

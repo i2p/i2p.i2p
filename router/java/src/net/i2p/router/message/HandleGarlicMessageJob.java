@@ -47,7 +47,7 @@ public class HandleGarlicMessageJob extends JobImpl {
     public HandleGarlicMessageJob(RouterContext context, GarlicMessage msg, RouterIdentity from, Hash fromHash) {
         super(context);
         _log = context.logManager().getLog(HandleGarlicMessageJob.class);
-        _context.statManager().createRateStat("crypto.garlic.decryptFail", "How often garlic messages are undecryptable", "Encryption", new long[] { 5*60*1000, 60*60*1000, 24*60*60*1000 });
+        getContext().statManager().createRateStat("crypto.garlic.decryptFail", "How often garlic messages are undecryptable", "Encryption", new long[] { 5*60*1000, 60*60*1000, 24*60*60*1000 });
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("New handle garlicMessageJob called w/ message from [" + from + "]", new Exception("Debug"));
         _message = msg;
@@ -60,9 +60,9 @@ public class HandleGarlicMessageJob extends JobImpl {
     
     public String getName() { return "Handle Inbound Garlic Message"; }
     public void runJob() {
-        CloveSet set = _parser.getGarlicCloves(_message, _context.keyManager().getPrivateKey());
+        CloveSet set = _parser.getGarlicCloves(_message, getContext().keyManager().getPrivateKey());
         if (set == null) {
-            Set keys = _context.keyManager().getAllKeys();
+            Set keys = getContext().keyManager().getAllKeys();
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Decryption with the router's key failed, now try with the " + keys.size() + " leaseSet keys");
             // our router key failed, which means that it was either encrypted wrong 
@@ -95,8 +95,8 @@ public class HandleGarlicMessageJob extends JobImpl {
                 _log.error("CloveMessageParser failed to decrypt the message [" + _message.getUniqueId() 
                            + "] to us when received from [" + _fromHash + "] / [" + _from + "]", 
                            new Exception("Decrypt garlic failed"));
-            _context.statManager().addRateData("crypto.garlic.decryptFail", 1, 0);
-            _context.messageHistory().messageProcessingError(_message.getUniqueId(), 
+            getContext().statManager().addRateData("crypto.garlic.decryptFail", 1, 0);
+            getContext().messageHistory().messageProcessingError(_message.getUniqueId(), 
                                                                 _message.getClass().getName(), 
                                                                 "Garlic could not be decrypted");
         }
@@ -116,7 +116,7 @@ public class HandleGarlicMessageJob extends JobImpl {
         // this should be in its own thread perhaps?  and maybe _cloves should be
         // synced to disk?
         List toRemove = new ArrayList(32);
-        long now = _context.clock().now();
+        long now = getContext().clock().now();
         synchronized (_cloves) {
             for (Iterator iter = _cloves.keySet().iterator(); iter.hasNext();) {
                 Long id = (Long)iter.next();
@@ -139,7 +139,7 @@ public class HandleGarlicMessageJob extends JobImpl {
             _log.debug("Clove " + clove.getCloveId() + " expiring on " + clove.getExpiration() 
                        + " is not known");
         }
-        long now = _context.clock().now();
+        long now = getContext().clock().now();
         if (clove.getExpiration().getTime() < now) {
             if (clove.getExpiration().getTime() < now + Router.CLOCK_FUDGE_FACTOR) {
                 _log.warn("Expired garlic received, but within our fudge factor [" 
@@ -148,7 +148,7 @@ public class HandleGarlicMessageJob extends JobImpl {
                 if (_log.shouldLog(Log.DEBUG))
                     _log.error("Expired garlic clove received - replay attack in progress? [cloveId = " 
                                + clove.getCloveId() + " expiration = " + clove.getExpiration() 
-                               + " now = " + (new Date(_context.clock().now())));
+                               + " now = " + (new Date(getContext().clock().now())));
                 return false;
             }
         }
@@ -174,7 +174,7 @@ public class HandleGarlicMessageJob extends JobImpl {
     }
     
     public void dropped() {
-        _context.messageHistory().messageProcessingError(_message.getUniqueId(), 
+        getContext().messageHistory().messageProcessingError(_message.getUniqueId(), 
                                                          _message.getClass().getName(), 
                                                          "Dropped due to overload");
     }

@@ -110,7 +110,7 @@ class TunnelPoolManagerJob extends JobImpl {
         Set freeTunnels = _pool.getFreeTunnels();
         int free = 0;
         int minLength = _pool.getPoolSettings().getDepthInbound();
-        long mustExpireAfter = _context.clock().now() + EXPIRE_FUDGE_PERIOD;
+        long mustExpireAfter = getContext().clock().now() + EXPIRE_FUDGE_PERIOD;
         for (Iterator iter = freeTunnels.iterator(); iter.hasNext(); ) {
             TunnelId id = (TunnelId)iter.next();
             TunnelInfo info = _pool.getFreeTunnel(id);
@@ -148,7 +148,7 @@ class TunnelPoolManagerJob extends JobImpl {
     private int getOutboundTunnelCount() {
         Set outboundTunnels = _pool.getOutboundTunnels();
         int outbound = 0;
-        long mustExpireAfter = _context.clock().now() + EXPIRE_FUDGE_PERIOD;
+        long mustExpireAfter = getContext().clock().now() + EXPIRE_FUDGE_PERIOD;
         for (Iterator iter = outboundTunnels.iterator(); iter.hasNext(); ) {
             TunnelId id = (TunnelId)iter.next();
             TunnelInfo info = _pool.getOutboundTunnel(id);
@@ -166,12 +166,12 @@ class TunnelPoolManagerJob extends JobImpl {
     private void requestInboundTunnels(int numTunnelsToRequest) {
         _log.info("Requesting " + numTunnelsToRequest + " inbound tunnels");
         for (int i = 0; i < numTunnelsToRequest; i++)
-            _context.jobQueue().addJob(new RequestInboundTunnelJob(_context, _pool, false));
+            getContext().jobQueue().addJob(new RequestInboundTunnelJob(getContext(), _pool, false));
     }
     
     private void requestOutboundTunnels(int numTunnelsToRequest) {
         _log.info("Requesting " + numTunnelsToRequest + " outbound tunnels");
         for (int i = 0; i < numTunnelsToRequest; i++)
-            _context.jobQueue().addJob(new RequestOutboundTunnelJob(_context, _pool, false));
+            getContext().jobQueue().addJob(new RequestOutboundTunnelJob(getContext(), _pool, false));
     }        
 }

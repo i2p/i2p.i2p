@@ -25,10 +25,10 @@ public class StartAcceptingClientsJob extends JobImpl {
     public void runJob() {
         // start up the network database
 
-        _context.clientManager().startup();
+        getContext().clientManager().startup();
 
-        _context.jobQueue().addJob(new ReadConfigJob(_context));
-        _context.jobQueue().addJob(new RebuildRouterInfoJob(_context));
-        _context.jobQueue().allowParallelOperation();
+        getContext().jobQueue().addJob(new ReadConfigJob(getContext()));
+        getContext().jobQueue().addJob(new RebuildRouterInfoJob(getContext()));
+        getContext().jobQueue().allowParallelOperation();
     }
 }

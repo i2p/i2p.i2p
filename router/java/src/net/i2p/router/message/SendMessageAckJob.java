@@ -36,7 +36,7 @@ public class SendMessageAckJob extends JobImpl {
     }
     
     public void runJob() {
-        _context.jobQueue().addJob(new SendReplyMessageJob(_context, _block, createAckMessage(), ACK_PRIORITY));
+        getContext().jobQueue().addJob(new SendReplyMessageJob(getContext(), _block, createAckMessage(), ACK_PRIORITY));
     }
     
     /**
@@ -48,8 +48,8 @@ public class SendMessageAckJob extends JobImpl {
      *
      */
     protected I2NPMessage createAckMessage() {
-        DeliveryStatusMessage statusMessage = new DeliveryStatusMessage(_context);
-        statusMessage.setArrival(new Date(_context.clock().now()));
+        DeliveryStatusMessage statusMessage = new DeliveryStatusMessage(getContext());
+        statusMessage.setArrival(new Date(getContext().clock().now()));
         statusMessage.setMessageId(_ackId);
         return statusMessage;
     }

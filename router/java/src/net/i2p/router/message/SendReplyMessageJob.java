@@ -37,7 +37,7 @@ public class SendReplyMessageJob extends JobImpl {
     }
     
     public void runJob() {
-        SourceRouteReplyMessage msg = new SourceRouteReplyMessage(_context);
+        SourceRouteReplyMessage msg = new SourceRouteReplyMessage(getContext());
         msg.setMessage(_message);
         msg.setEncryptedHeader(_block.getData());
         msg.setMessageExpiration(_message.getMessageExpiration());
@@ -56,8 +56,8 @@ public class SendReplyMessageJob extends JobImpl {
      */
     protected void send(I2NPMessage msg) {
         _log.info("Sending reply with " + _message.getClass().getName() + " in a sourceRouteeplyMessage to " + _block.getRouter().toBase64());
-        SendMessageDirectJob j = new SendMessageDirectJob(_context, msg, _block.getRouter(), _priority);
-        _context.jobQueue().addJob(j);
+        SendMessageDirectJob j = new SendMessageDirectJob(getContext(), msg, _block.getRouter(), _priority);
+        getContext().jobQueue().addJob(j);
     }
     
     public String getName() { return "Send Reply Message"; }

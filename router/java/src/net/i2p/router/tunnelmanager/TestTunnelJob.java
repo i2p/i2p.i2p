@@ -52,7 +52,7 @@ class TestTunnelJob extends JobImpl {
         }
         
         // mark it as something we're testing
-        info.setLastTested(_context.clock().now());
+        info.setLastTested(getContext().clock().now());
         if (isOutbound(info)) {
             testOutbound(info);
         } else {
@@ -65,7 +65,7 @@ class TestTunnelJob extends JobImpl {
             _log.error("wtf, null info?", new Exception("Who checked a null tunnel info?"));
             return false;
         }
-        if (_context.routerHash().equals(info.getThisHop()))
+        if (getContext().routerHash().equals(info.getThisHop()))
             return true;
         else
             return false;
@@ -81,23 +81,23 @@ class TestTunnelJob extends JobImpl {
     private void testOutbound(TunnelInfo info) {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Testing outbound tunnel " + info);
-        DeliveryStatusMessage msg = new DeliveryStatusMessage(_context);
-        msg.setArrival(new Date(_context.clock().now()));
+        DeliveryStatusMessage msg = new DeliveryStatusMessage(getContext());
+        msg.setArrival(new Date(getContext().clock().now()));
         msg.setMessageId(_nonce);
-        Hash us = _context.routerHash();
+        Hash us = getContext().routerHash();
         _secondaryId = getReplyTunnel();
         if (_secondaryId == null) {
-            _context.jobQueue().addJob(new TestFailedJob());
+            getContext().jobQueue().addJob(new TestFailedJob());
             return;
         }
         
         TunnelInfo inboundInfo = _pool.getTunnelInfo(_secondaryId);
-        inboundInfo.setLastTested(_context.clock().now());
+        inboundInfo.setLastTested(getContext().clock().now());
         
         TestFailedJob failureJob = new TestFailedJob();
         MessageSelector selector = new TestMessageSelector(msg.getMessageId(), info.getTunnelId().getTunnelId());
-        SendTunnelMessageJob testJob = new SendTunnelMessageJob(_context, msg, info.getTunnelId(), us, _secondaryId, null, new TestSuccessfulJob(), failureJob, selector, TEST_TIMEOUT, TEST_PRIORITY);
-        _context.jobQueue().addJob(testJob);
+        SendTunnelMessageJob testJob = new SendTunnelMessageJob(getContext(), msg, info.getTunnelId(), us, _secondaryId, null, new TestSuccessfulJob(), failureJob, selector, TEST_TIMEOUT, TEST_PRIORITY);
+        getContext().jobQueue().addJob(testJob);
     }
 
     /**
@@ -106,23 +106,23 @@ class TestTunnelJob extends JobImpl {
     private void testInbound(TunnelInfo info) {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Testing inbound tunnel " + info);
-        DeliveryStatusMessage msg = new DeliveryStatusMessage(_context);
-        msg.setArrival(new Date(_context.clock().now()));
+        DeliveryStatusMessage msg = new DeliveryStatusMessage(getContext());
+        msg.setArrival(new Date(getContext().clock().now()));
         msg.setMessageId(_nonce);
         
         _secondaryId = getOutboundTunnel();
         if (_secondaryId == null) {
-            _context.jobQueue().addJob(new TestFailedJob());
+            getContext().jobQueue().addJob(new TestFailedJob());
             return;
         }
         
         TunnelInfo outboundInfo = _pool.getTunnelInfo(_secondaryId);
-        outboundInfo.setLastTested(_context.clock().now());
+        outboundInfo.setLastTested(getContext().clock().now());
         
         TestFailedJob failureJob = new TestFailedJob();
         MessageSelector selector = new TestMessageSelector(msg.getMessageId(), info.getTunnelId().getTunnelId());
-        SendTunnelMessageJob j = new SendTunnelMessageJob(_context, msg, _secondaryId, info.getThisHop(), info.getTunnelId(), null, new TestSuccessfulJob(), failureJob, selector, TEST_TIMEOUT, TEST_PRIORITY);
-        _context.jobQueue().addJob(j);
+        SendTunnelMessageJob j = new SendTunnelMessageJob(getContext(), msg, _secondaryId, info.getThisHop(), info.getTunnelId(), null, new TestSuccessfulJob(), failureJob, selector, TEST_TIMEOUT, TEST_PRIORITY);
+        getContext().jobQueue().addJob(j);
     }
     
     /**
@@ -137,7 +137,7 @@ class TestTunnelJob extends JobImpl {
         crit.setAnonymityPriority(50);
         crit.setLatencyPriority(50);
         crit.setReliabilityPriority(50);
-        List tunnelIds = _context.tunnelManager().selectInboundTunnelIds(crit);
+        List tunnelIds = getContext().tunnelManager().selectInboundTunnelIds(crit);
         
         for (int i = 0; i < tunnelIds.size(); i++) {
             TunnelId id = (TunnelId)tunnelIds.get(i);
@@ -165,7 +165,7 @@ class TestTunnelJob extends JobImpl {
         crit.setAnonymityPriority(50);
         crit.setLatencyPriority(50);
         crit.setReliabilityPriority(50);
-        List tunnelIds = _context.tunnelManager().selectOutboundTunnelIds(crit);
+        List tunnelIds = getContext().tunnelManager().selectOutboundTunnelIds(crit);
         
         for (int i = 0; i < tunnelIds.size(); i++) {
             TunnelId id = (TunnelId)tunnelIds.get(i);
@@ -183,7 +183,7 @@ class TestTunnelJob extends JobImpl {
     
     private class TestFailedJob extends JobImpl {
         public TestFailedJob() {
-            super(TestTunnelJob.this._context);
+            super(TestTunnelJob.this.getContext());
         }
         
         public String getName() { return "Tunnel Test Failed"; }
@@ -206,36 +206,36 @@ class TestTunnelJob extends JobImpl {
     private class TestSuccessfulJob extends JobImpl implements ReplyJob {
         private DeliveryStatusMessage _msg;
         public TestSuccessfulJob() {
-            super(TestTunnelJob.this._context);
+            super(TestTunnelJob.this.getContext());
             _msg = null;
         }
         
         public String getName() { return "Tunnel Test Successful"; }
         public void runJob() {
-            long time = (_context.clock().now() - _msg.getArrival().getTime());
+            long time = (getContext().clock().now() - _msg.getArrival().getTime());
             if (_log.shouldLog(Log.INFO))
                 _log.info("Test of tunnel " + _primaryId+ " successfull after " 
                           + time + "ms waiting for " + _nonce);
             TunnelInfo info = _pool.getTunnelInfo(_primaryId);
             if (info != null) {
-                TestTunnelJob.this._context.messageHistory().tunnelValid(info, time);
+                TestTunnelJob.this.getContext().messageHistory().tunnelValid(info, time);
                 updateProfiles(info, time);
             }
             
             info = _pool.getTunnelInfo(_secondaryId);
             if (info != null) {
-                TestTunnelJob.this._context.messageHistory().tunnelValid(info, time);
+                TestTunnelJob.this.getContext().messageHistory().tunnelValid(info, time);
                 updateProfiles(info, time);
             }
-            _context.statManager().addRateData("tunnel.testSuccessTime", time, time);
+            getContext().statManager().addRateData("tunnel.testSuccessTime", time, time);
         }
         
         private void updateProfiles(TunnelInfo info, long time) {
             TunnelInfo cur = info;
             while (cur != null) {
                 Hash peer = cur.getThisHop();
-                if ( (peer != null) && (!_context.routerHash().equals(peer)) )
-                    _context.profileManager().tunnelTestSucceeded(peer, time);
+                if ( (peer != null) && (!getContext().routerHash().equals(peer)) )
+                    getContext().profileManager().tunnelTestSucceeded(peer, time);
                 cur = cur.getNextHopInfo();
             }
         }
@@ -254,7 +254,7 @@ class TestTunnelJob extends JobImpl {
             _id = id;
             _tunnelId = tunnelId;
             _found = false;
-            _expiration = _context.clock().now() + TEST_TIMEOUT;
+            _expiration = getContext().clock().now() + TEST_TIMEOUT;
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("the expiration while testing tunnel " + tunnelId 
                            + " waiting for nonce " + id + ": " + new Date(_expiration));
@@ -270,7 +270,7 @@ class TestTunnelJob extends JobImpl {
             return !_found;
         }
         public long getExpiration() {
-            if (_expiration < _context.clock().now()) {
+            if (_expiration < getContext().clock().now()) {
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("EXPIRED while looking for nonce " + _id + " for tunnel " + _tunnelId);
             }
@@ -282,7 +282,7 @@ class TestTunnelJob extends JobImpl {
                 if (msg.getMessageId() == _id) {
                     if (_log.shouldLog(Log.DEBUG))
                         _log.debug("Found successful test of tunnel " + _tunnelId + " after " 
-                                   + (_context.clock().now() - msg.getArrival().getTime()) 
+                                   + (getContext().clock().now() - msg.getArrival().getTime()) 
                                    + "ms waiting for " + _id);
                     _found = true;
                     return true;
@@ -301,7 +301,7 @@ class TestTunnelJob extends JobImpl {
             buf.append(super.toString());
             buf.append(": TestMessageSelector: tunnel ").append(_tunnelId);
             buf.append(" looking for ").append(_id).append(" expiring in ");
-            buf.append(_expiration - _context.clock().now());
+            buf.append(_expiration - getContext().clock().now());
             buf.append("ms");
             return buf.toString();
         }

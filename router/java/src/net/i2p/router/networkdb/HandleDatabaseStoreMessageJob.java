@@ -50,15 +50,15 @@ public class HandleDatabaseStoreMessageJob extends JobImpl {
 	
         boolean wasNew = false;
         if (_message.getValueType() == DatabaseStoreMessage.KEY_TYPE_LEASESET) {
-            Object match = _context.netDb().store(_message.getKey(), _message.getLeaseSet());
+            Object match = getContext().netDb().store(_message.getKey(), _message.getLeaseSet());
             wasNew = (null == match);
         } else if (_message.getValueType() == DatabaseStoreMessage.KEY_TYPE_ROUTERINFO) {
             if (_log.shouldLog(Log.INFO))
                 _log.info("Handling dbStore of router " + _message.getKey() + " with publishDate of " 
                           + new Date(_message.getRouterInfo().getPublished()));
-            Object match = _context.netDb().store(_message.getKey(), _message.getRouterInfo());
+            Object match = getContext().netDb().store(_message.getKey(), _message.getRouterInfo());
             wasNew = (null == match);
-            _context.profileManager().heardAbout(_message.getKey());
+            getContext().profileManager().heardAbout(_message.getKey());
         } else {
             if (_log.shouldLog(Log.ERROR))
                 _log.error("Invalid DatabaseStoreMessage data type - " + _message.getValueType() 
@@ -71,16 +71,16 @@ public class HandleDatabaseStoreMessageJob extends JobImpl {
         if (_from != null)
             _fromHash = _from.getHash();
         if (_fromHash != null)
-            _context.profileManager().dbStoreReceived(_fromHash, wasNew);
-        _context.statManager().addRateData("netDb.storeHandled", 1, 0);
+            getContext().profileManager().dbStoreReceived(_fromHash, wasNew);
+        getContext().statManager().addRateData("netDb.storeHandled", 1, 0);
     }
     
     private void sendAck() {
-        DeliveryStatusMessage msg = new DeliveryStatusMessage(_context);
+        DeliveryStatusMessage msg = new DeliveryStatusMessage(getContext());
         msg.setMessageId(_message.getReplyToken());
-        msg.setArrival(new Date(_context.clock().now()));
+        msg.setArrival(new Date(getContext().clock().now()));
         TunnelId outTunnelId = selectOutboundTunnel();
-        _context.jobQueue().addJob(new SendTunnelMessageJob(_context, msg, outTunnelId, 
+        getContext().jobQueue().addJob(new SendTunnelMessageJob(getContext(), msg, outTunnelId, 
                                    _message.getReplyGateway(), _message.getReplyTunnel(), 
                                    null, null, null, null, ACK_TIMEOUT, ACK_PRIORITY));
     }
@@ -92,7 +92,7 @@ public class HandleDatabaseStoreMessageJob extends JobImpl {
         criteria.setReliabilityPriority(20);
         criteria.setMaximumTunnelsRequired(1);
         criteria.setMinimumTunnelsRequired(1);
-        List tunnelIds = _context.tunnelManager().selectOutboundTunnelIds(criteria);
+        List tunnelIds = getContext().tunnelManager().selectOutboundTunnelIds(criteria);
         if (tunnelIds.size() <= 0) {
             _log.error("No outbound tunnels?!");
             return null;
@@ -104,6 +104,6 @@ public class HandleDatabaseStoreMessageJob extends JobImpl {
     public String getName() { return "Handle Database Store Message"; }
     
     public void dropped() {
-        _context.messageHistory().messageProcessingError(_message.getUniqueId(), _message.getClass().getName(), "Dropped due to overload");
+        getContext().messageHistory().messageProcessingError(_message.getUniqueId(), _message.getClass().getName(), "Dropped due to overload");
     }
 }

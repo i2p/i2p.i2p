@@ -38,7 +38,7 @@ public class HandleDatabaseSearchReplyMessageJob extends JobImpl {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Handling database search reply message for key " + _message.getSearchKey().toBase64() + " with " + _message.getNumReplies() + " replies");
         if (_message.getNumReplies() > 0)
-            _context.jobQueue().addJob(new HandlePeerJob(0));
+            getContext().jobQueue().addJob(new HandlePeerJob(0));
     }
     
     /**
@@ -49,7 +49,7 @@ public class HandleDatabaseSearchReplyMessageJob extends JobImpl {
     private final class HandlePeerJob extends JobImpl {
         private int _curReply;
         public HandlePeerJob(int reply) {
-            super(HandleDatabaseSearchReplyMessageJob.this._context);
+            super(HandleDatabaseSearchReplyMessageJob.this.getContext());
             _curReply = reply;
         }
         public void runJob() {
@@ -63,7 +63,7 @@ public class HandleDatabaseSearchReplyMessageJob extends JobImpl {
             if (_log.shouldLog(Log.INFO))
                 _log.info("On search for " + _message.getSearchKey().toBase64() + ", received " + info.getIdentity().getHash().toBase64());
             
-            HandlePeerJob.this._context.netDb().store(info.getIdentity().getHash(), info);
+            HandlePeerJob.this.getContext().netDb().store(info.getIdentity().getHash(), info);
             _curReply++;
             return _message.getNumReplies() > _curReply;
         }

@@ -92,7 +92,7 @@ class ClientLeaseSetManagerJob extends JobImpl {
                     _log.info("Tunnels changed from the old leaseSet - request a new one: [pool = " 
                               + _pool.getInboundTunnelIds() + " old leaseSet: " + _currentLeaseSet);
                 requestNewLeaseSet();
-            } else if (_context.clock().now() > _lastCreated + _pool.getClientSettings().getInboundDuration()) {
+            } else if (getContext().clock().now() > _lastCreated + _pool.getClientSettings().getInboundDuration()) {
                 if (_log.shouldLog(Log.INFO))
                     _log.info("We've exceeded the client's requested duration (limit = " 
                               + new Date(_lastCreated + _pool.getClientSettings().getInboundDuration()) 
@@ -154,7 +154,7 @@ class ClientLeaseSetManagerJob extends JobImpl {
      */
     private void requestNewLeaseSet() {
         LeaseSet proposed = buildNewLeaseSet();
-        _context.clientManager().requestLeaseSet(_pool.getDestination(), proposed, 
+        getContext().clientManager().requestLeaseSet(_pool.getDestination(), proposed, 
                                                  REQUEST_LEASE_TIMEOUT, new LeaseSetCreatedJob(), 
                                                  null);
     }
@@ -165,7 +165,7 @@ class ClientLeaseSetManagerJob extends JobImpl {
     private LeaseSet buildNewLeaseSet() {
         LeaseSet ls = new LeaseSet();
         TreeMap tunnels = new TreeMap();
-        long now = _context.clock().now();
+        long now = getContext().clock().now();
         for (Iterator iter = _pool.getInboundTunnelIds().iterator(); iter.hasNext(); ) {
             TunnelId id = (TunnelId)iter.next();
             TunnelInfo info = _pool.getInboundTunnel(id);
@@ -175,7 +175,7 @@ class ClientLeaseSetManagerJob extends JobImpl {
             long exp = info.getSettings().getExpiration();
             if (now + RECHECK_DELAY + REQUEST_LEASE_TIMEOUT > exp)
                 continue;
-            RouterInfo ri = _context.netDb().lookupRouterInfoLocally(info.getThisHop());
+            RouterInfo ri = getContext().netDb().lookupRouterInfoLocally(info.getThisHop());
             if (ri == null)
                 continue;
 
@@ -205,11 +205,11 @@ class ClientLeaseSetManagerJob extends JobImpl {
     
     private class LeaseSetCreatedJob extends JobImpl {
         public LeaseSetCreatedJob() {
-            super(ClientLeaseSetManagerJob.this._context);
+            super(ClientLeaseSetManagerJob.this.getContext());
         }
         public String getName() { return "LeaseSet created"; }
         public void runJob() { 
-            RouterContext ctx = ClientLeaseSetManagerJob.this._context;
+            RouterContext ctx = ClientLeaseSetManagerJob.this.getContext();
             LeaseSet ls = ctx.netDb().lookupLeaseSetLocally(_pool.getDestination().calculateHash());
             if (ls != null) {
                 _log.info("New leaseSet completely created");

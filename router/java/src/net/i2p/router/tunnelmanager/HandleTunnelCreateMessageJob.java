@@ -52,23 +52,23 @@ public class HandleTunnelCreateMessageJob extends JobImpl {
             sendReply(false);
             return;
         } 
-        TunnelInfo info = new TunnelInfo(_context);
+        TunnelInfo info = new TunnelInfo(getContext());
         info.setConfigurationKey(_message.getConfigurationKey());
         info.setEncryptionKey(_message.getTunnelKey());
         info.setNextHop(_message.getNextRouter());
 	
-        TunnelSettings settings = new TunnelSettings(_context);
+        TunnelSettings settings = new TunnelSettings(getContext());
         settings.setBytesPerMinuteAverage(_message.getMaxAvgBytesPerMin());
         settings.setBytesPerMinutePeak(_message.getMaxPeakBytesPerMin());
         settings.setMessagesPerMinuteAverage(_message.getMaxAvgMessagesPerMin());
         settings.setMessagesPerMinutePeak(_message.getMaxPeakMessagesPerMin());
-        settings.setExpiration(_message.getTunnelDurationSeconds()*1000+_context.clock().now());
+        settings.setExpiration(_message.getTunnelDurationSeconds()*1000+getContext().clock().now());
         settings.setIncludeDummy(_message.getIncludeDummyTraffic());
         settings.setReorder(_message.getReorderMessages());
         info.setSettings(settings);
 
         info.setSigningKey(_message.getVerificationPrivateKey());
-        info.setThisHop(_context.routerHash());
+        info.setThisHop(getContext().routerHash());
         info.setTunnelId(_message.getTunnelId());
         info.setVerificationKey(_message.getVerificationPublicKey());
 	
@@ -76,17 +76,17 @@ public class HandleTunnelCreateMessageJob extends JobImpl {
 	
         if (_message.getNextRouter() == null) {
             if (_log.shouldLog(Log.DEBUG)) _log.debug("We're the endpoint, don't test the \"next\" peer [duh]");
-            boolean ok = _context.tunnelManager().joinTunnel(info);
+            boolean ok = getContext().tunnelManager().joinTunnel(info);
             sendReply(ok);
         } else {
-            _context.netDb().lookupRouterInfo(info.getNextHop(), new TestJob(info), new JoinJob(info, false), TIMEOUT);
+            getContext().netDb().lookupRouterInfo(info.getNextHop(), new TestJob(info), new JoinJob(info, false), TIMEOUT);
         }
     }
     
     private boolean isOverloaded() {
-        boolean shouldAccept = _context.throttle().acceptTunnelRequest(_message);
+        boolean shouldAccept = getContext().throttle().acceptTunnelRequest(_message);
         if (!shouldAccept) {
-            _context.statManager().addRateData("tunnel.rejectOverloaded", 1, 1);
+            getContext().statManager().addRateData("tunnel.rejectOverloaded", 1, 1);
             if (_log.shouldLog(Log.INFO))
                 _log.info("Refusing tunnel request due to overload");
         }
@@ -96,13 +96,13 @@ public class HandleTunnelCreateMessageJob extends JobImpl {
     private class TestJob extends JobImpl {
         private TunnelInfo _target;
         public TestJob(TunnelInfo target) {
-            super(HandleTunnelCreateMessageJob.this._context);
+            super(HandleTunnelCreateMessageJob.this.getContext());
             _target = target;
         }
 
         public String getName() { return "Run a test for peer reachability"; }
         public void runJob() {
-            RouterInfo info = TestJob.this._context.netDb().lookupRouterInfoLocally(_target.getNextHop());
+            RouterInfo info = TestJob.this.getContext().netDb().lookupRouterInfoLocally(_target.getNextHop());
             if (info == null) {
                 if (_log.shouldLog(Log.ERROR)) 
                     _log.error("Error - unable to look up peer " + _target.toBase64() + ", even though we were queued up via onSuccess??");
@@ -110,11 +110,11 @@ public class HandleTunnelCreateMessageJob extends JobImpl {
             } else {
                 if (_log.shouldLog(Log.INFO)) 
                     _log.info("Lookup successful for tested peer " + _target.toBase64() + ", now continue with the test");
-                Hash peer = TestJob.this._context.routerHash();
+                Hash peer = TestJob.this.getContext().routerHash();
                 JoinJob success = new JoinJob(_target, true);
                 JoinJob failure = new JoinJob(_target, false);
-                BuildTestMessageJob test = new BuildTestMessageJob(TestJob.this._context, info, peer, success, failure, TIMEOUT, PRIORITY);
-                TestJob.this._context.jobQueue().addJob(test);
+                BuildTestMessageJob test = new BuildTestMessageJob(TestJob.this.getContext(), info, peer, success, failure, TIMEOUT, PRIORITY);
+                TestJob.this.getContext().jobQueue().addJob(test);
             }
         }
     }
@@ -125,12 +125,12 @@ public class HandleTunnelCreateMessageJob extends JobImpl {
             _log.debug("Sending reply to a tunnel create of id " + _message.getTunnelId() 
                        + " with ok (" + ok + ") to router " + _message.getReplyBlock().getRouter().toBase64());
     
-        _context.messageHistory().receiveTunnelCreate(_message.getTunnelId(), _message.getNextRouter(), 
-                                                      new Date(_context.clock().now() + 1000*_message.getTunnelDurationSeconds()), 
+        getContext().messageHistory().receiveTunnelCreate(_message.getTunnelId(), _message.getNextRouter(), 
+                                                      new Date(getContext().clock().now() + 1000*_message.getTunnelDurationSeconds()), 
                                                       ok, _message.getReplyBlock().getRouter());
 
-        TunnelCreateStatusMessage msg = new TunnelCreateStatusMessage(_context);
-        msg.setFromHash(_context.routerHash());
+        TunnelCreateStatusMessage msg = new TunnelCreateStatusMessage(getContext());
+        msg.setFromHash(getContext().routerHash());
         msg.setTunnelId(_message.getTunnelId());
         if (ok) {
             msg.setStatus(TunnelCreateStatusMessage.STATUS_SUCCESS);
@@ -138,9 +138,9 @@ public class HandleTunnelCreateMessageJob extends JobImpl {
             // since we don't actually check anything, this is a catch all
             msg.setStatus(TunnelCreateStatusMessage.STATUS_FAILED_OVERLOADED);
         }
-        msg.setMessageExpiration(new Date(_context.clock().now()+60*1000));
-        SendReplyMessageJob job = new SendReplyMessageJob(_context, _message.getReplyBlock(), msg, PRIORITY);
-        _context.jobQueue().addJob(job);
+        msg.setMessageExpiration(new Date(getContext().clock().now()+60*1000));
+        SendReplyMessageJob job = new SendReplyMessageJob(getContext(), _message.getReplyBlock(), msg, PRIORITY);
+        getContext().jobQueue().addJob(job);
     }
     
     public String getName() { return "Handle Tunnel Create Message"; }
@@ -149,24 +149,24 @@ public class HandleTunnelCreateMessageJob extends JobImpl {
         private TunnelInfo _info;
         private boolean _isReachable;
         public JoinJob(TunnelInfo info, boolean isReachable) {
-            super(HandleTunnelCreateMessageJob.this._context);
+            super(HandleTunnelCreateMessageJob.this.getContext());
             _info = info;
             _isReachable = isReachable;
         }
 	
         public void runJob() {
             if (!_isReachable) {
-                long before = JoinJob.this._context.clock().now();
+                long before = JoinJob.this.getContext().clock().now();
                 sendReply(false);
-                long after = JoinJob.this._context.clock().now();
+                long after = JoinJob.this.getContext().clock().now();
                 if (_log.shouldLog(Log.DEBUG)) 
                     _log.debug("JoinJob .refuse took " + (after-before) + "ms to refuse " + _info);
             } else {
-                long before = JoinJob.this._context.clock().now();
-                boolean ok = JoinJob.this._context.tunnelManager().joinTunnel(_info);
-                long afterJoin = JoinJob.this._context.clock().now();
+                long before = JoinJob.this.getContext().clock().now();
+                boolean ok = JoinJob.this.getContext().tunnelManager().joinTunnel(_info);
+                long afterJoin = JoinJob.this.getContext().clock().now();
                 sendReply(ok);
-                long after = JoinJob.this._context.clock().now();
+                long after = JoinJob.this.getContext().clock().now();
                 if (_log.shouldLog(Log.DEBUG)) 
                     _log.debug("JoinJob .joinTunnel took " + (afterJoin-before) + "ms and sendReply took " + (after-afterJoin) + "ms");
             }
@@ -175,8 +175,8 @@ public class HandleTunnelCreateMessageJob extends JobImpl {
     }
     
     public void dropped() {
-        _context.messageHistory().messageProcessingError(_message.getUniqueId(), 
-                                                         _message.getClass().getName(), 
-                                                         "Dropped due to overload");
+        getContext().messageHistory().messageProcessingError(_message.getUniqueId(), 
+                                                             _message.getClass().getName(), 
+                                                             "Dropped due to overload");
     }
 }

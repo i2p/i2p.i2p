@@ -338,7 +338,7 @@ public class ClientManager {
     private class HandleJob extends JobImpl {
         private ClientMessage _msg;
         public HandleJob(ClientMessage msg) {
-            super(ClientManager.this._context);
+            super(_context);
             _msg = msg;
         }
         public String getName() { return "Handle Inbound Client Messages"; }
@@ -350,7 +350,7 @@ public class ClientManager {
                 runner = getRunner(_msg.getDestinationHash());
 
             if (runner != null) {
-                HandleJob.this._context.statManager().addRateData("client.receiveMessageSize", 
+                _context.statManager().addRateData("client.receiveMessageSize", 
                                                    _msg.getPayload().getSize(), 0);
                 runner.receiveMessage(_msg.getDestination(), null, _msg.getPayload());
             } else {

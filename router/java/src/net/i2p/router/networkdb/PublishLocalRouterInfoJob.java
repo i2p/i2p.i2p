@@ -32,25 +32,25 @@ public class PublishLocalRouterInfoJob extends JobImpl {
     
     public String getName() { return "Publish Local Router Info"; }
     public void runJob() {
-        RouterInfo ri = new RouterInfo(_context.router().getRouterInfo());
+        RouterInfo ri = new RouterInfo(getContext().router().getRouterInfo());
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Old routerInfo contains " + ri.getAddresses().size() 
                        + " addresses and " + ri.getOptions().size() + " options");
-        Properties stats = _context.statPublisher().publishStatistics();
+        Properties stats = getContext().statPublisher().publishStatistics();
         try {
-            ri.setPublished(_context.clock().now());
+            ri.setPublished(getContext().clock().now());
             ri.setOptions(stats);
-            ri.setAddresses(_context.commSystem().createAddresses());
-            ri.sign(_context.keyManager().getSigningPrivateKey());
-            _context.router().setRouterInfo(ri);
+            ri.setAddresses(getContext().commSystem().createAddresses());
+            ri.sign(getContext().keyManager().getSigningPrivateKey());
+            getContext().router().setRouterInfo(ri);
             if (_log.shouldLog(Log.INFO))
                 _log.info("Newly updated routerInfo is published with " + stats.size() 
                           + "/" + ri.getOptions().size() + " options on " 
                           + new Date(ri.getPublished()));
-            _context.netDb().publish(ri);
+            getContext().netDb().publish(ri);
         } catch (DataFormatException dfe) {
             _log.error("Error signing the updated local router info!", dfe);
         }
-        requeue(PUBLISH_DELAY + _context.random().nextInt((int)PUBLISH_DELAY));
+        requeue(PUBLISH_DELAY + getContext().random().nextInt((int)PUBLISH_DELAY));
     }
 }

@@ -34,10 +34,10 @@ public class StartupJob extends JobImpl {
 
     public String getName() { return "Startup Router"; }
     public void runJob() {        
-        ReadConfigJob.doRead(_context);
-        new AdminManager(_context).startup();
-        _context.jobQueue().addJob(new LoadClientAppsJob(_context));
-        _context.statPublisher().startup();
-        _context.jobQueue().addJob(new LoadRouterInfoJob(_context));
+        ReadConfigJob.doRead(getContext());
+        new AdminManager(getContext()).startup();
+        getContext().jobQueue().addJob(new LoadClientAppsJob(getContext()));
+        getContext().statPublisher().startup();
+        getContext().jobQueue().addJob(new LoadRouterInfoJob(getContext()));
     }
 }

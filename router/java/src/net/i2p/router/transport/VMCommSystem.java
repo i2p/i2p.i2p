@@ -110,18 +110,18 @@ public class VMCommSystem extends CommSystemFacade {
             try {
                 I2NPMessage msg = handler.readMessage(new ByteArrayInputStream(_msg));
                 int size = _msg.length;
-                InNetMessage inMsg = new InNetMessage(ReceiveJob.this._context);
+                InNetMessage inMsg = new InNetMessage(ReceiveJob.this.getContext());
                 inMsg.setFromRouterHash(_from);
                 inMsg.setMessage(msg);
                 _ctx.profileManager().messageReceived(_from, "vm", 1, size);
                 _ctx.statManager().addRateData("transport.receiveMessageSize", size, 1);
                 
                 if (size < 1024)
-                    ReceiveJob.this._context.statManager().addRateData("transport.receiveMessageSmall", 1, 1);
+                    ReceiveJob.this.getContext().statManager().addRateData("transport.receiveMessageSmall", 1, 1);
                 else if (size <= 4096)
-                    ReceiveJob.this._context.statManager().addRateData("transport.receiveMessageMedium", 1, 1);
+                    ReceiveJob.this.getContext().statManager().addRateData("transport.receiveMessageMedium", 1, 1);
                 else
-                    ReceiveJob.this._context.statManager().addRateData("transport.receiveMessageLarge", 1, 1);
+                    ReceiveJob.this.getContext().statManager().addRateData("transport.receiveMessageLarge", 1, 1);
 
                 _ctx.inNetMessagePool().add(inMsg);
             } catch (Exception e) {

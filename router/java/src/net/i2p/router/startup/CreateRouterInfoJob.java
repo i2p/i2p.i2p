@@ -41,7 +41,7 @@ public class CreateRouterInfoJob extends JobImpl {
         _log.debug("Creating the new router info");
         // create a new router info and store it where LoadRouterInfoJob looks
         RouterInfo info = createRouterInfo();
-        _context.jobQueue().addJob(_next);
+        getContext().jobQueue().addJob(_next);
     }
     
     RouterInfo createRouterInfo() {
@@ -49,10 +49,10 @@ public class CreateRouterInfoJob extends JobImpl {
         FileOutputStream fos1 = null;
         FileOutputStream fos2 = null;
         try {
-            info.setAddresses(_context.commSystem().createAddresses());
-            info.setOptions(_context.statPublisher().publishStatistics());
+            info.setAddresses(getContext().commSystem().createAddresses());
+            info.setOptions(getContext().statPublisher().publishStatistics());
             info.setPeers(new HashSet());
-            info.setPublished(getCurrentPublishDate(_context));
+            info.setPublished(getCurrentPublishDate(getContext()));
             RouterIdentity ident = new RouterIdentity();
             Certificate cert = new Certificate();
             cert.setCertificateType(Certificate.CERTIFICATE_TYPE_NULL);
@@ -62,10 +62,10 @@ public class CreateRouterInfoJob extends JobImpl {
             PrivateKey privkey = null;
             SigningPublicKey signingPubKey = null;
             SigningPrivateKey signingPrivKey = null;
-            Object keypair[] = _context.keyGenerator().generatePKIKeypair();
+            Object keypair[] = getContext().keyGenerator().generatePKIKeypair();
             pubkey = (PublicKey)keypair[0];
             privkey = (PrivateKey)keypair[1];
-            Object signingKeypair[] = _context.keyGenerator().generateSigningKeypair();
+            Object signingKeypair[] = getContext().keyGenerator().generateSigningKeypair();
             signingPubKey = (SigningPublicKey)signingKeypair[0];
             signingPrivKey = (SigningPrivateKey)signingKeypair[1];
             ident.setPublicKey(pubkey);
@@ -74,13 +74,13 @@ public class CreateRouterInfoJob extends JobImpl {
             
             info.sign(signingPrivKey);
             
-            String infoFilename = _context.router().getConfigSetting(Router.PROP_INFO_FILENAME);
+            String infoFilename = getContext().router().getConfigSetting(Router.PROP_INFO_FILENAME);
             if (infoFilename == null)
                 infoFilename = Router.PROP_INFO_FILENAME_DEFAULT;
             fos1 = new FileOutputStream(infoFilename);
             info.writeBytes(fos1);
             
-            String keyFilename = _context.router().getConfigSetting(Router.PROP_KEYS_FILENAME);
+            String keyFilename = getContext().router().getConfigSetting(Router.PROP_KEYS_FILENAME);
             if (keyFilename == null)
                 keyFilename = Router.PROP_KEYS_FILENAME_DEFAULT;
             fos2 = new FileOutputStream(keyFilename);
@@ -89,10 +89,10 @@ public class CreateRouterInfoJob extends JobImpl {
             pubkey.writeBytes(fos2);
             signingPubKey.writeBytes(fos2);
             
-            _context.keyManager().setSigningPrivateKey(signingPrivKey);
-            _context.keyManager().setSigningPublicKey(signingPubKey);
-            _context.keyManager().setPrivateKey(privkey);
-            _context.keyManager().setPublicKey(pubkey);
+            getContext().keyManager().setSigningPrivateKey(signingPrivKey);
+            getContext().keyManager().setSigningPublicKey(signingPubKey);
+            getContext().keyManager().setPrivateKey(privkey);
+            getContext().keyManager().setPublicKey(pubkey);
             
             _log.info("Router info created and stored at " + infoFilename + " with private keys stored at " + keyFilename + " [" + info + "]");
         } catch (DataFormatException dfe) {

@@ -19,7 +19,7 @@ public class BuildTrustedLinksJob extends JobImpl {
     
     public BuildTrustedLinksJob(RouterContext context, Job next) {
         super(context);
-        _log = _context.logManager().getLog(BuildTrustedLinksJob.class);
+        _log = getContext().logManager().getLog(BuildTrustedLinksJob.class);
         _next = next;
     }
     
@@ -30,6 +30,6 @@ public class BuildTrustedLinksJob extends JobImpl {
         
         //try { Thread.sleep(5000); } catch (InterruptedException ie) {}
         
-        _context.jobQueue().addJob(_next);
+        getContext().jobQueue().addJob(_next);
     }
 }

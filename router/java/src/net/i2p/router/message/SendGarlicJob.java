@@ -76,20 +76,20 @@ public class SendGarlicJob extends JobImpl {
     public String getName() { return "Build Garlic Message"; }
     
     public void runJob() {
-        long before = _context.clock().now();
-        _message = GarlicMessageBuilder.buildMessage(_context, _config, _wrappedKey, _wrappedTags);
-        long after = _context.clock().now();
+        long before = getContext().clock().now();
+        _message = GarlicMessageBuilder.buildMessage(getContext(), _config, _wrappedKey, _wrappedTags);
+        long after = getContext().clock().now();
         if ( (after - before) > 1000) {
             _log.warn("Building the garlic took too long [" + (after-before)+" ms]", getAddedBy());
         } else {
             _log.debug("Building the garlic was fast! " + (after - before) + " ms");
         }
-        _context.jobQueue().addJob(new SendJob());
+        getContext().jobQueue().addJob(new SendJob());
     }
     
     private class SendJob extends JobImpl {
         public SendJob() {
-            super(SendGarlicJob.this._context);
+            super(SendGarlicJob.this.getContext());
         }
         public String getName() { return "Send Built Garlic Message"; }
         public void runJob() {
@@ -102,7 +102,7 @@ public class SendGarlicJob extends JobImpl {
     }
     
     private void sendGarlic() {
-        OutNetMessage msg = new OutNetMessage(_context);
+        OutNetMessage msg = new OutNetMessage(getContext());
         long when = _message.getMessageExpiration().getTime(); // + Router.CLOCK_FUDGE_FACTOR;
         msg.setExpiration(when);
         msg.setMessage(_message);
@@ -116,7 +116,7 @@ public class SendGarlicJob extends JobImpl {
         //_log.info("Sending garlic message to [" + _config.getRecipient() + "] encrypted with " + _config.getRecipientPublicKey() + " or " + _config.getRecipient().getIdentity().getPublicKey());
         //_log.debug("Garlic config data:\n" + _config);
         //msg.setTarget(_target);
-        _context.outNetMessagePool().add(msg);
+        getContext().outNetMessagePool().add(msg);
         _log.debug("Garlic message added to outbound network message pool");
     }
 }

@@ -58,7 +58,7 @@ class SearchUpdateReplyFoundJob extends JobImpl implements ReplyJob {
                     _log.error(getJobId() + ": Unknown db store type?!@ " + msg.getValueType());
             }
             
-            _context.profileManager().dbLookupSuccessful(_peer, timeToReply);
+            getContext().profileManager().dbLookupSuccessful(_peer, timeToReply);
         } else if (_message instanceof DatabaseSearchReplyMessage) {
             _job.replyFound((DatabaseSearchReplyMessage)_message, _peer);
         } else {

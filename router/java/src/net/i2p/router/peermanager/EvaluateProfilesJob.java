@@ -27,18 +27,18 @@ class EvaluateProfilesJob extends JobImpl {
     public String getName() { return "Evaluate peer profiles"; }
     public void runJob() {
         try {
-            long start = _context.clock().now();
-            Set allPeers = _context.profileOrganizer().selectAllPeers();
-            long afterSelect = _context.clock().now();
+            long start = getContext().clock().now();
+            Set allPeers = getContext().profileOrganizer().selectAllPeers();
+            long afterSelect = getContext().clock().now();
             for (Iterator iter = allPeers.iterator(); iter.hasNext(); ) {
                 Hash peer = (Hash)iter.next();
-                PeerProfile profile = _context.profileOrganizer().getProfile(peer);
+                PeerProfile profile = getContext().profileOrganizer().getProfile(peer);
                 if (profile != null)
                     profile.coallesceStats();
             }
-            long afterCoallesce = _context.clock().now();
-            _context.profileOrganizer().reorganize();
-            long afterReorganize = _context.clock().now();
+            long afterCoallesce = getContext().clock().now();
+            getContext().profileOrganizer().reorganize();
+            long afterReorganize = getContext().clock().now();
             
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Profiles coallesced and reorganized.  total: " + allPeers.size() + ", selectAll: " + (afterSelect-start) + "ms, coallesce: " + (afterCoallesce-afterSelect) + "ms, reorganize: " + (afterReorganize-afterSelect));

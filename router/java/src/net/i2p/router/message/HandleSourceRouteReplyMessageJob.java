@@ -42,7 +42,7 @@ public class HandleSourceRouteReplyMessageJob extends JobImpl {
 
     public HandleSourceRouteReplyMessageJob(RouterContext context, SourceRouteReplyMessage msg, RouterIdentity from, Hash fromHash) {
         super(context);
-        _log = _context.logManager().getLog(HandleSourceRouteReplyMessageJob.class);
+        _log = getContext().logManager().getLog(HandleSourceRouteReplyMessageJob.class);
         _message = msg;
         _from = from;
         _fromHash = fromHash;
@@ -53,9 +53,9 @@ public class HandleSourceRouteReplyMessageJob extends JobImpl {
     public String getName() { return "Handle Source Route Reply Message"; }
     public void runJob() {
         try {
-            long before = _context.clock().now();
-            _message.decryptHeader(_context.keyManager().getPrivateKey());
-            long after = _context.clock().now();
+            long before = getContext().clock().now();
+            _message.decryptHeader(getContext().keyManager().getPrivateKey());
+            long after = getContext().clock().now();
             if ( (after-before) > 1000) {
                 if (_log.shouldLog(Log.WARN))
                     _log.warn("Took more than a second (" + (after-before) 
@@ -71,7 +71,7 @@ public class HandleSourceRouteReplyMessageJob extends JobImpl {
                            + _message.getUniqueId() + ")", dfe);
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Message header could not be decrypted: " + _message, getAddedBy());
-            _context.messageHistory().messageProcessingError(_message.getUniqueId(), 
+            getContext().messageHistory().messageProcessingError(_message.getUniqueId(), 
                                                              _message.getClass().getName(), 
                                                              "Source route message header could not be decrypted");
             return;
@@ -85,7 +85,7 @@ public class HandleSourceRouteReplyMessageJob extends JobImpl {
 
         DeliveryInstructions instructions = _message.getDecryptedInstructions();
 
-        long now = _context.clock().now();
+        long now = getContext().clock().now();
         long expiration = _message.getDecryptedExpiration();
         // if its expiring really soon, jack the expiration 30 seconds
         if (expiration < now+10*1000)
@@ -97,7 +97,7 @@ public class HandleSourceRouteReplyMessageJob extends JobImpl {
     }
     
     private boolean isValid() {
-        long now = _context.clock().now();
+        long now = getContext().clock().now();
         if (_message.getDecryptedExpiration() < now) {
             if (_message.getDecryptedExpiration() < now + Router.CLOCK_FUDGE_FACTOR) {
                 _log.info("Expired message received, but within our fudge factor");
@@ -135,7 +135,7 @@ public class HandleSourceRouteReplyMessageJob extends JobImpl {
         // this should be in its own thread perhaps, or job?  and maybe _seenMessages should be
         // synced to disk?
         List toRemove = new ArrayList(32);
-        long now = _context.clock().now()-Router.CLOCK_FUDGE_FACTOR;
+        long now = getContext().clock().now()-Router.CLOCK_FUDGE_FACTOR;
         synchronized (_seenMessages) {
             for (Iterator iter = _seenMessages.keySet().iterator(); iter.hasNext();) {
                 Long id = (Long)iter.next();
@@ -149,7 +149,7 @@ public class HandleSourceRouteReplyMessageJob extends JobImpl {
     }
 
     public void dropped() {
-        _context.messageHistory().messageProcessingError(_message.getUniqueId(), 
+        getContext().messageHistory().messageProcessingError(_message.getUniqueId(), 
                                                          _message.getClass().getName(), 
                                                          "Dropped due to overload");
     }

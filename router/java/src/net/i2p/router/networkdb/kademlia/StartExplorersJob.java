@@ -47,7 +47,7 @@ class StartExplorersJob extends JobImpl {
         for (Iterator iter = toExplore.iterator(); iter.hasNext(); ) {
             Hash key = (Hash)iter.next();
             //_log.info("Starting explorer for " + key, new Exception("Exploring!"));
-            _context.jobQueue().addJob(new ExploreJob(_context, _facade, key));
+            getContext().jobQueue().addJob(new ExploreJob(getContext(), _facade, key));
         }
         long delay = getNextRunDelay();
         if (_log.shouldLog(Log.DEBUG))
@@ -63,12 +63,12 @@ class StartExplorersJob extends JobImpl {
         long delay = getNextRunDelay();
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Updating exploration schedule with a delay of " + delay);
-        getTiming().setStartAfter(_context.clock().now() + delay);        
+        getTiming().setStartAfter(getContext().clock().now() + delay);        
     }
     
     /** how long should we wait before exploring? */
     private long getNextRunDelay() {
-        long delay = _context.clock().now() - _facade.getLastExploreNewDate();
+        long delay = getContext().clock().now() - _facade.getLastExploreNewDate();
         if (delay < MIN_RERUN_DELAY_MS) 
             return MIN_RERUN_DELAY_MS;
         else if (delay > MAX_RERUN_DELAY_MS)

@@ -68,7 +68,7 @@ class ExploreJob extends SearchJob {
      * @param expiration when the search should stop
      */
     protected DatabaseLookupMessage buildMessage(TunnelId replyTunnelId, RouterInfo replyGateway, long expiration) {
-        DatabaseLookupMessage msg = new DatabaseLookupMessage(_context);
+        DatabaseLookupMessage msg = new DatabaseLookupMessage(getContext());
         msg.setSearchKey(getState().getTarget());
         msg.setFrom(replyGateway);
         msg.setDontIncludePeers(getState().getAttempted());
@@ -95,7 +95,7 @@ class ExploreJob extends SearchJob {
      *
      */
     protected DatabaseLookupMessage buildMessage(long expiration) {
-        return buildMessage(null, _context.router().getRouterInfo(), expiration);
+        return buildMessage(null, getContext().router().getRouterInfo(), expiration);
     }
     
     /** max # of concurrent searches */
@@ -110,7 +110,7 @@ class ExploreJob extends SearchJob {
     protected void newPeersFound(int numNewPeers) {
         // who cares about how many new peers.  well, maybe we do.  but for now,
         // we'll do the simplest thing that could possibly work.
-        _facade.setLastExploreNewDate(_context.clock().now());
+        _facade.setLastExploreNewDate(getContext().clock().now());
     }
     
     /*

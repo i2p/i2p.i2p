@@ -65,6 +65,6 @@ class CreateSessionJob extends JobImpl {
         
         // and load 'em up (using anything not yet set as the software defaults)
         settings.readFromProperties(props);
-        _context.tunnelManager().createTunnels(_runner.getConfig().getDestination(), settings, LEASE_CREATION_TIMEOUT);
+        getContext().tunnelManager().createTunnels(_runner.getConfig().getDestination(), settings, LEASE_CREATION_TIMEOUT);
     }
 }
