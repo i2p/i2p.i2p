@@ -21,15 +21,20 @@ LIBFILE="libjbigi.so"
 #INCLUDELIBS=""
 #STATICLIBS="libgmp.a"
 
+echo "Compiling C code..."
 rm -f jbigi.o $LIBFILE
 $CC -c $COMPILEFLAGS $INCLUDES src/jbigi.c
 $CC $LINKFLAGS $INCLUDES $INCLUDELIBS -o $LIBFILE jbigi.o $STATICLIBS
 
-echo "built, now testing"
+echo ""
+echo "Doing an ant build..."
 (cd ../java/ ; $ANT build)
+
+echo ""
+echo "Built, now testing... This will take a while."
 LD_LIBRARY_PATH=. $JAVA -cp ../java/build/i2p.jar -DloggerConfigLocation=../../installer/java/src/logger.config.template net.i2p.util.NativeBigInteger
 
 
 echo ""
 echo ""
-echo "test complete.  please review the lines 'native run time:', 'java run time:', and 'native = '"
+echo "Test complete. Please review the lines 'native run time:', 'java run time:', and 'native = '"
