@@ -318,6 +318,8 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
         return tags;
     }
 
+    private static volatile long __notifierId = 0;
+    
     /**
      * Recieve a payload message and let the app know its available
      */
@@ -337,9 +339,12 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
                         _sessionListener.messageAvailable(I2PSessionImpl.this, id, size);
                 }
             });
-            notifier.setName("Notifier [" + _sessionId + "/" + id + "]");
+            long nid = ++__notifierId;
+            notifier.setName("Notifier " + nid);
             notifier.setDaemon(true);
             notifier.start();
+            if (_log.shouldLog(Log.INFO))
+                _log.info("Notifier " + nid + " is for session " + _sessionId + ", message " + id + "]");
         }
     }
 

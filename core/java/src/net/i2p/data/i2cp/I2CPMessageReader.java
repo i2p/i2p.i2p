@@ -30,6 +30,8 @@ public class I2CPMessageReader {
     private I2CPMessageEventListener _listener;
     private I2CPMessageReaderRunner _reader;
     private Thread _readerThread;
+    
+    private static volatile long __readerId = 0;
 
     public I2CPMessageReader(InputStream stream, I2CPMessageEventListener lsnr) {
         _stream = stream;
@@ -37,7 +39,7 @@ public class I2CPMessageReader {
         _reader = new I2CPMessageReaderRunner();
         _readerThread = new I2PThread(_reader);
         _readerThread.setDaemon(true);
-        _readerThread.setName("I2CP Reader");
+        _readerThread.setName("I2CP Reader " + (++__readerId));
     }
 
     public void setListener(I2CPMessageEventListener lsnr) {
