@@ -27,52 +27,21 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: socket_addr.hpp,v 1.4 2004/07/22 19:10:59 mpc Exp $
+ * $Id$
  */
 
-#ifndef LIBSOCKTHREAD_SOCKET_ADDR_HPP
-#define LIBSOCKTHREAD_SOCKET_ADDR_HPP
+#ifndef LIBSOCKTHREAD_SOCKET_LISTENER_HPP
+#define LIBSOCKTHREAD_SOCKET_LISTENER_HPP
 
 namespace Libsockthread {
-	class Socket_addr {
+	class Socket_listener {
 		public:
-			Socket_addr()
-				: family(AF_INET), resolved(false) { }
-			Socket_addr(Socket_addr& rhs);
-			Socket_addr(int type, string& host, uint16_t port)
-				: family(AF_INET), host(host), type(type), port(port)
-				{ resolve(); }  // throws Dns_error
-			~Socket_addr()
-				{ delete[] ip; }
+			Socket_listener(Socket_addr& addr)
+				: Socket(addr);
 
-			int get_family() const
-				{ return family; }
-			const char* get_ip() const  // Warning!  This can be NULL!
-				{ return ip; }
-			uint16_t get_port() const
-				{ return port; }
-			int get_type() const
-				{ return type;
-			bool is_ready() const
-				{ return resolved; }
-			Socket_addr& operator=(const Socket_addr& rhs);
-			bool operator==(const Socket_addr& rhs);
-			void set_host(string& host)  // throws Dns_error
-				{ this->host = host; resolve(); }
-			void set_port(uint16_t port)
-				{ this->port = port; }
-			void set_type(int type)
-				{ this->type = type; }
-		private:
-			void resolve();  // throws Dns_error
-
-			int family;  // AF_INET or AF_INET6
-			string host;
-			char* ip;
-			uint16_t port;
-			bool resolved;
-			int type;  // SOCK_STREAM or SOCK_DGRAM
+			void accept();
+			void listen();
 	};
 }
 
-#endif  // LIBSOCKTHREAD_SOCKET_ADDR_HPP
+#endif  // LIBSOCKTHREAD_SOCKET_LISTENER_HPP

@@ -27,7 +27,7 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id$
+ * $Id: socket.hpp,v 1.7 2004/07/22 03:54:01 mpc Exp $
  */
 
 #ifndef LIBSOCKTHREAD_SOCKET_HPP
@@ -36,19 +36,19 @@
 namespace Libsockthread {
 	class Socket {
 		public:
-			Socket(Socket_addr& addr)
-				: addr(addr);
+			Socket(Socket_addr& addr)  // throws Socket_error
+				: addr(addr) { setup_socket(); }
 
-			void accept();
 			void close();
-			void connect();
-			void listen();
 			size_t read(string& buf, size_t max);
-			void set_addr(Socket_addr& addr)
-				{ this->addr = addr; }
+			void set_addr(Socket_addr& addr)  // throws Socket_error
+				{ this->addr = addr; setup_socket(); }
 			void set_blocking(bool blocking);
 		private:
+			void setup_socket();  // throws Socket_error
+
 			Socket_addr addr;
+			int sock;
 	};
 }
 

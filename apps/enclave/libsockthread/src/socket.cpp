@@ -27,9 +27,18 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id$
+ * $Id: socket.cpp,v 1.7 2004/07/22 03:54:01 mpc Exp $
  */
 
 #include "platform.hpp"
+#include "socket_error.hpp"
 #include "socket.hpp"
 using namespace Libsockthread;
+
+void Socket::setup_socket()
+{
+	if (!addr.is_ready())
+		throw Socket_error("Socket isn't ready");
+
+	sock = socket(addr.get_family(), get_type(), 0);
+}

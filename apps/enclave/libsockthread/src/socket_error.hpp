@@ -37,6 +37,11 @@ namespace Libsockthread {
 			Socket_error(const string& s)
 				: runtime_error(s) { }
 	};
+	class Dns_error : public Socket_error {
+		public:
+			Dns_error(const string& s)
+				: Socket_error(s) { }
+	};
 }
 
 #endif  // LIBSOCKTHREAD_SOCKET_ERROR_HPP

@@ -27,7 +27,7 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: socket_addr.cpp,v 1.3 2004/07/22 03:54:01 mpc Exp $
+ * $Id: socket_addr.cpp,v 1.4 2004/07/22 19:10:59 mpc Exp $
  */
 
 #include "platform.hpp"
@@ -38,14 +38,17 @@ using namespace Libsockthread;
 Socket_addr::Socket_addr(Socket_addr& rhs)
 {
 	delete[] ip;
-	if (rhs.domain == AF_INET) {
-		ip = new char[INET_ADDRSTRLEN];
-	else
-		ip = new char[INET6_ADDRSTRLEN];
-	domain = rhs.domain;
+	if (rhs.resolved) {
+		if (rhs.family == AF_INET) {
+			ip = new char[INET_ADDRSTRLEN];
+		else
+			ip = new char[INET6_ADDRSTRLEN];
+		strcpy(ip, rhs.ip);
+	}
+	family = rhs.family;
 	host = rhs.host;
-	strcpy(ip, rhs.ip);
 	port = rhs.port;
+	resolved = rhs.resolved;
 	type = rhs.type;
 }
 
@@ -55,13 +58,15 @@ Socket_addr& Socket_addr::operator=(const Socket_addr& rhs)
 		return *this;
 
 	delete[] ip;
-	if (rhs.domain == AF_INET)
-		ip = new char[INET_ADDRSTRLEN];
-	else
-		ip = new char[INET6_ADDRSTRLEN];
-	domain = rhs.domain;
+	if (rhs.resolved) {
+		if (rhs.family == AF_INET)
+			ip = new char[INET_ADDRSTRLEN];
+		else
+			ip = new char[INET6_ADDRSTRLEN];
+		strcpy(ip, rhs.ip);
+	}
+	family = rhs.family;
 	host = rhs.host;
-	strcpy(ip, rhs.ip);
 	port = rhs.port;
 	type = rhs.type;
 
@@ -73,25 +78,29 @@ Socket_addr& Socket_addr::operator=(const Socket_addr& rhs)
  */
 void Socket_addr::resolve()
 {
+	resolved = false;  // in case they already had a host name but just set a
+					   // new one with set_host()
 	hostent* hent = gethostbyname(host.c_str());
 	if (hent == NULL)
-		throw Socket_error(hstrerror(h_errno));
+		throw Dns_error(hstrerror(h_errno));
 	assert(hent->h_addrtype == AF_INET || hent->h_addrtype == AF_INET6);
-	domain = hent->h_addrtype;
+	family = hent->h_addrtype;
 	delete[] ip;
-	if (domain == AF_INET) {
+	if (family == AF_INET) {
 		ip = new char[INET_ADDRSTRLEN];
 	else
 		ip = new char[INET6_ADDRSTRLEN];
 	strcpy(ip, hent->h_addr_list[0]);
+	resolved = true;
 }
 
 bool Socket_addr::operator==(const Socket_addr& rhs)
 {
-	if (rhs.domain == domain
+	if (rhs.family == family
 			&& rhs.host == host
 			&& strcmp(rhs.ip, ip) == 0
 			&& rhs.port == port
+			&& rhs.resolved == resolved
 			&& rhs.type == type)
 		return true;
 	else
