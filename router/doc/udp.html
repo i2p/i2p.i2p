@@ -1,4 +1,4 @@
-<code>$Id$</code>
+<code>$Id: udp.html,v 1.1 2005/03/26 00:47:40 jrandom Exp $</code>
 
 <h1>Secure Semireliable UDP (SSU)</h1>
 <b>DRAFT</b>
@@ -387,7 +387,7 @@ bits 6-7: unused</pre></li>
 
 <h2><a name="keys">Keys</a></h2>
 
-<p>All encryption used is AES256/CBC with 16 byte keys and 16 byte IVs.
+<p>All encryption used is AES256/CBC with 32 byte keys and 16 byte IVs.
 When using the introKey, both the initial message and any subsequent
 reply use the introKey of the responder (Bob) - the responder does 
 not need to know the introKey of the requestor (Alice).  The DSA 
