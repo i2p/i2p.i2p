@@ -161,7 +161,8 @@ public class Base64 {
 
     private static void encode(InputStream in, OutputStream out) throws IOException {
         String encoded = encode(read(in));
-        out.write(encoded.getBytes());
+        for (int i = 0; i < encoded.length(); i++)
+            out.write((byte)(encoded.charAt(i) & 0xFF));
     }
 
     private static void decode(InputStream in, OutputStream out) throws IOException {
@@ -415,7 +416,10 @@ public class Base64 {
      * @since 1.3
      */
     private static String encodeString(String s, boolean breakLines) {
-        return encodeBytes(s.getBytes(), breakLines);
+        byte src[] = new byte[s.length()];
+        for (int i = 0; i < src.length; i++)
+            src[i] = (byte)(s.charAt(i) & 0xFF);
+        return encodeBytes(src, breakLines);
     } // end encodeString
 
     /* ********  D E C O D I N G   M E T H O D S  ******** */
@@ -526,7 +530,9 @@ public class Base64 {
      * @since 1.4
      */
     private static byte[] standardDecode(String s) {
-        byte[] bytes = s.getBytes();
+        byte[] bytes = new byte[s.length()];
+        for (int i = 0; i < bytes.length; i++)
+            bytes[i] = (byte)(s.charAt(i) & 0xFF);
         return decode(bytes, 0, bytes.length);
     } // end decode
 
