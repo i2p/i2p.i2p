@@ -17,6 +17,7 @@ import java.net.Socket;
 import java.util.Properties;
 import java.util.StringTokenizer;
 
+import net.i2p.data.DataHelper;
 import net.i2p.util.Log;
 
 /**
@@ -36,14 +37,11 @@ public class SAMHandlerFactory {
      * @return A SAM protocol handler, or null if the client closed before the handshake
      */
     public static SAMHandler createSAMHandler(Socket s, Properties i2cpProps) throws SAMException {
-        BufferedReader br;
         String line;
         StringTokenizer tok;
 
         try {
-            br = new BufferedReader(new InputStreamReader(s.getInputStream(),
-                                                          "ISO-8859-1"));
-            line = br.readLine();
+            line = DataHelper.readLine(s.getInputStream());
             if (line == null) {
                 _log.debug("Connection closed by client");
                 return null;

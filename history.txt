@@ -1,4 +1,9 @@
-$Id: history.txt,v 1.95 2004/12/05 05:22:58 jrandom Exp $
+$Id: history.txt,v 1.96 2004/12/05 10:32:34 jrandom Exp $
+
+2004-12-05  jrandom
+    * Default the I2CP listener to localhost only, unless overridden by 
+      i2cp.tcp.bindAllInterfaces=true (thanks dm!)
+    * More SAM fixes for things recently broken (whee)
 
 2004-12-05  jrandom
     * Fix the recently broken SAM bridge (duh)

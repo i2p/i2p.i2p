@@ -26,6 +26,7 @@ import net.i2p.I2PException;
 import net.i2p.client.I2PSessionException;
 import net.i2p.data.Base64;
 import net.i2p.data.DataFormatException;
+import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
 import net.i2p.util.Log;
 
@@ -80,9 +81,10 @@ public class SAMv1Handler extends SAMHandler implements SAMRawReceiver, SAMDatag
     }
 
     public void handle() {
-        String msg, domain, opcode;
+        String msg = null;
+        String domain = null;
+        String opcode = null;
         boolean canContinue = false;
-        ByteArrayOutputStream buf = new ByteArrayOutputStream(IN_BUFSIZE);
         StringTokenizer tok;
         Properties props;
 
@@ -99,22 +101,15 @@ public class SAMv1Handler extends SAMHandler implements SAMRawReceiver, SAMDatag
                     break;
                 }
 
-                while ((b = in.read()) != -1) {
-                    if (b == '\n') {
-                        break;
-                    }
-                    buf.write(b);
-                }
-                if (b == -1) {
+                msg = DataHelper.readLine(in);
+                if (msg == null) {
                     _log.debug("Connection closed by client");
                     break;
                 }
 
-                msg = buf.toString("ISO-8859-1").trim();
                 if (_log.shouldLog(Log.DEBUG)) {
                     _log.debug("New message received: [" + msg + "]");
                 }
-                buf.reset();
 
                 tok = new StringTokenizer(msg, " ");
                 if (tok.countTokens() < 2) {
@@ -154,14 +149,11 @@ public class SAMv1Handler extends SAMHandler implements SAMRawReceiver, SAMDatag
                     break;
                 }
             }
-        } catch (UnsupportedEncodingException e) {
-            _log.error("Caught UnsupportedEncodingException ("
-                       + e.getMessage() + ")", e);
         } catch (IOException e) {
             _log.debug("Caught IOException ("
-                       + e.getMessage() + ")", e);
+                       + e.getMessage() + ") for message [" + msg + "]", e);
         } catch (Exception e) {
-            _log.error("Unexpected exception", e);
+            _log.error("Unexpected exception for message [" + msg + "]", e);
         } finally {
             _log.debug("Stopping handler");
             try {
@@ -555,7 +547,7 @@ public class SAMv1Handler extends SAMHandler implements SAMRawReceiver, SAMDatag
 
         try {
             if (!streamSession.sendBytes(id, getClientSocketInputStream(), size)) { // data)) {
-                _log.error("STREAM SEND failed");
+                _log.error("STREAM SEND [" + size + "] failed");
                 boolean rv = writeString("STREAM CLOSED RESULT=CANT_REACH_PEER ID=" + id + " MESSAGE=\"Send of " + size + " bytes failed\"\n");
                 streamSession.closeConnection(id);
                 return rv;
@@ -563,11 +555,11 @@ public class SAMv1Handler extends SAMHandler implements SAMRawReceiver, SAMDatag
 
             return true;
         } catch (EOFException e) {
-            _log.debug("Too few bytes with RAW SEND message (expected: "
+            _log.debug("Too few bytes with STREAM SEND message (expected: "
                        + size);
             return false;
         } catch (IOException e) {
-            _log.debug("Caught IOException while parsing RAW SEND message",
+            _log.debug("Caught IOException while parsing STREAM SEND message",
                        e);
             return false;
         }

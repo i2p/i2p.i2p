@@ -670,6 +670,26 @@ public class DataHelper {
         }
         return cur;
     }
+    
+    /**
+     * Read a newline delimited line from the stream, returning the line (without
+     * the newline), or null if EOF reached before the newline was found
+     */
+    public static String readLine(InputStream in) throws IOException {
+        StringBuffer buf = new StringBuffer(128);
+
+        int c = -1;
+        while ( (c = in.read()) != -1) {
+            if (c == '\n')
+                break;
+            buf.append((char)c);
+        }
+        if (c == -1) 
+            return null;
+        else
+            return buf.toString();
+    }
+    
 
     public static List sortStructures(Collection dataStructures) {
         if (dataStructures == null) return new ArrayList();

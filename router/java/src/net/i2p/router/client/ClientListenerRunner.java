@@ -9,6 +9,7 @@ package net.i2p.router.client;
  */
 
 import java.io.IOException;
+import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 
@@ -28,15 +29,21 @@ public class ClientListenerRunner implements Runnable {
     private ClientManager _manager;
     private ServerSocket _socket;
     private int _port;
+    private boolean _bindAllInterfaces;
     private boolean _running;
     private long _nextFailDelay = 1000;
     
+    public static final String BIND_ALL_INTERFACES = "i2cp.tcp.bindAllInterfaces";
+
     public ClientListenerRunner(RouterContext context, ClientManager manager, int port) {
         _context = context;
         _log = _context.logManager().getLog(ClientListenerRunner.class);
         _manager = manager;
         _port = port;
         _running = false;
+        
+        String val = context.getProperty(BIND_ALL_INTERFACES, "False");
+        _bindAllInterfaces = Boolean.valueOf(val).booleanValue();
     }
     
     public void setPort(int port) { _port = port; }
@@ -55,7 +62,11 @@ public class ClientListenerRunner implements Runnable {
         while (_running) {
             try {
                 _log.info("Starting up listening for connections on port " + _port);
-                _socket = new ServerSocket(_port);
+                if (_bindAllInterfaces)
+                    _socket = new ServerSocket(_port);
+                else
+                    _socket = new ServerSocket(_port, 5, InetAddress.getLocalHost());
+                
                 curDelay = 0;
                 while (_running) {
                     try {
@@ -82,7 +93,7 @@ public class ClientListenerRunner implements Runnable {
                 if (_context.router().isAlive()) 
                     _log.error("Error listening on port " + _port, ioe);
             }
-
+            
             if (_socket != null) {
                 try { _socket.close(); } catch (IOException ioe) {}
                 _socket = null; 

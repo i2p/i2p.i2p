@@ -201,12 +201,17 @@ public class SAMStreamSession {
      *
      * @return True if the data was sent, false otherwise
      */
-    public boolean sendBytes(int id, InputStream in, int size) { 
-        Destination d = new Destination();
+    public boolean sendBytes(int id, InputStream in, int size) throws IOException { 
         SAMStreamSessionSocketHandler handler = getSocketHandler(id);
         
         if (handler == null) {
             _log.error("Trying to send bytes through inexistent handler " +id);
+            // even though it failed, we need to read those bytes! 
+            for (int i = 0; i < size; i++) {
+                int c = in.read();
+                if (c == -1)
+                    break;
+            }
             return false;
         }
 
@@ -420,6 +425,8 @@ public class SAMStreamSession {
             } catch (I2PException e) {
                 _log.debug("Caught I2PException", e);
             }
+            
+            close();
 
             _log.debug("Shutting down SAM STREAM session server");
         }
@@ -463,27 +470,25 @@ public class SAMStreamSession {
          *
          * @return True if data has been sent without errors, false otherwise
          */
-        public boolean sendBytes(InputStream in, int size) { // byte[] data) {
+        public boolean sendBytes(InputStream in, int size) throws IOException {
             if (_log.shouldLog(Log.DEBUG)) {
                 _log.debug("Handler " + id + ": sending " + size
                            + " bytes");
             }
             ByteCache cache = ByteCache.getInstance(1024, 4);
             ByteArray ba = cache.acquire();
+            int remaining = size;
             try {
-                int remaining = size;
                 byte buf[] = ba.getData(); 
                 while (remaining > 0) {
                     int read = in.read(buf, 0, remaining > buf.length ? buf.length : remaining);
                     if (read == -1)
                         throw new IOException("Insufficient data from the SAM client (" + remaining + "/" + size + ")");
-                    i2pSocketOS.write(buf, 0, read);
+                    else if (read > 0)
+                        i2pSocketOS.write(buf, 0, read);
+                    
                     remaining -= read;
                 }
-                //i2pSocketOS.flush();
-            } catch (IOException e) {
-                _log.error("Error sending data through I2P socket", e);
-                return false;
             } finally {
                 cache.release(ba);
             }

@@ -119,6 +119,8 @@ public abstract class SAMHandler implements Runnable {
      * @return True is the string was successfully written, false otherwise
      */
     protected final boolean writeString(String str) {
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("Sending the client: [" + str + "]");
         try {
             writeBytes(str.getBytes("ISO-8859-1"));
         } catch (IOException e) {
