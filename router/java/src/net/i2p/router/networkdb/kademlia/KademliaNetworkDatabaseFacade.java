@@ -16,6 +16,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
+import net.i2p.data.DataFormatException;
 import net.i2p.data.DataStructure;
 import net.i2p.data.Hash;
 import net.i2p.data.Lease;
@@ -34,6 +35,10 @@ import net.i2p.router.networkdb.DatabaseStoreMessageHandler;
 import net.i2p.router.networkdb.PublishLocalRouterInfoJob;
 import net.i2p.util.Log;
 
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.File;
+
 /**
  * Kademlia based version of the network database
  *
@@ -42,6 +47,8 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
     private Log _log;
     private KBucketSet _kb; // peer hashes sorted into kbuckets, but within kbuckets, unsorted
     private DataStore _ds; // hash to DataStructure mapping, persisted when necessary
+    /** where the data store is pushing the data */
+    private String _dbDir;
     private Set _explicitSendKeys; // set of Hash objects that should be published ASAP
     private Set _passiveSendKeys; // set of Hash objects that should be published when there's time
     private Set _exploreKeys; // set of Hash objects that we should search on (to fill up a bucket, not to get data)
@@ -189,6 +196,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         _passiveSendKeys = new HashSet(64);
         _exploreKeys = new HashSet(64);
         _lastSent = new HashMap(1024);
+        _dbDir = dbDir;
         
         _context.inNetMessagePool().registerHandlerJobBuilder(DatabaseLookupMessage.MESSAGE_TYPE, new DatabaseLookupMessageHandler(_context));
         _context.inNetMessagePool().registerHandlerJobBuilder(DatabaseStoreMessage.MESSAGE_TYPE, new DatabaseStoreMessageHandler(_context));
@@ -366,6 +374,31 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         store(h, localRouterInfo);
         synchronized (_explicitSendKeys) {
             _explicitSendKeys.add(h);
+        }
+        writeMyInfo(localRouterInfo);
+    }
+
+    /**
+     * Persist the local router's info (as updated) into netDb/my.info, since
+     * ./router.info isn't always updated.  This also allows external applications
+     * to easily pick out which router a netDb directory is rooted off, which is handy
+     * for getting the freshest data.
+     *
+     */
+    private final void writeMyInfo(RouterInfo info) {
+        FileOutputStream fos = null;
+        try {
+            fos = new FileOutputStream(new File(new File(_dbDir), "my.info"));
+            info.writeBytes(fos);
+            fos.close();
+        } catch (IOException ioe) {
+            if (_log.shouldLog(Log.ERROR))
+                _log.error("Unable to persist my.info?!", ioe);
+        } catch (DataFormatException dfe) {
+            if (_log.shouldLog(Log.ERROR))
+                _log.error("Error persisting my.info - our structure isn't valid?!", dfe);
+        } finally {
+            if (fos != null) try { fos.close(); } catch (IOException ioe) {}
         }
     }
     
