@@ -25,21 +25,25 @@ public class PeerManagerFacadeImpl implements PeerManagerFacade {
     private PeerManager _manager;
     private RouterContext _context;
     private ProfilePersistenceHelper _persistenceHelper;
+    private PeerTestJob _testJob;
     
     public PeerManagerFacadeImpl(RouterContext ctx) {
         _context = ctx;
         _log = ctx.logManager().getLog(PeerManagerFacadeImpl.class);
         _persistenceHelper = new ProfilePersistenceHelper(ctx);
+        _testJob = new PeerTestJob(_context);
     }
     
     public void startup() {
         _log.info("Starting up the peer manager");
         _manager = new PeerManager(_context);
         _persistenceHelper.setUs(_context.routerHash());
+        _testJob.startTesting(_manager);
     }
     
     public void shutdown() {
         _log.info("Shutting down the peer manager");
+        _testJob.stopTesting();
         _manager.storeProfiles();
     }
     
