@@ -1,4 +1,10 @@
-$Id: history.txt,v 1.133 2005/01/24 17:42:05 smeghead Exp $
+$Id: history.txt,v 1.134 2005/01/26 01:29:19 smeghead Exp $
+
+2005-01-26  smeghead
+    * Added a couple of scripts, i2ptest.sh and i2pbench.sh, to manage the core
+      tests and benchmarks.
+    * Routerconsole now builds under gcj 3.4.3.
+    * Corrected divide by zero error in TunnelId class under gcj (jrandom++).
 
 2005-01-25  smeghead
     * Tweaked some classes to enable gcj 3.4.3 to compile the router and

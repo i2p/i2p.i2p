@@ -48,7 +48,7 @@
         <mkdir dir="../jsp/WEB-INF/" />
         <mkdir dir="../jsp/WEB-INF/classes" />
         <!-- there are various jspc ant tasks, but they all seem a bit flakey -->
-        <java classname="org.apache.jasper.JspC" fork="true" >
+        <java classname="org.apache.jasper.JspC" fork="true">
             <classpath>
                 <pathelement location="../../jetty/jettylib/jasper-compiler.jar" />
                 <pathelement location="../../jetty/jettylib/jasper-runtime.jar" />
@@ -57,6 +57,8 @@
                 <pathelement location="../../systray/java/build/obj" />
                 <pathelement location="../../systray/java/lib/systray4j.jar" /> <!-- some javacs resolve recursively... -->
                 <pathelement location="../../../installer/lib/wrapper/win32/wrapper.jar" /> <!-- we dont care if we're not on win32 -->
+                <pathelement location="../../../core/java/build/i2p.jar" />
+                <pathelement location="../../../router/java/build/router.jar" />
                 <pathelement location="build/routerconsole.jar" />
             </classpath>
             <arg value="-d" />

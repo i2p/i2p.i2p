@@ -27,8 +27,8 @@ public class TunnelId extends DataStructureImpl {
     private long _tunnelId;
     private int _type;
     
-    public static final long MAX_ID_VALUE = (1l<<32l)-1l;
-
+    public static final long MAX_ID_VALUE = (1l<<32l)-2l;
+    
     public final static int TYPE_UNSPECIFIED = 0;
     public final static int TYPE_INBOUND = 1;
     public final static int TYPE_OUTBOUND = 2;
