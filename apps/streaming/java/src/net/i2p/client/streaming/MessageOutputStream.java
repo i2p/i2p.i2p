@@ -154,11 +154,10 @@ public class MessageOutputStream extends OutputStream {
         ByteArray ba = null;
         synchronized (_dataLock) {
             // flush any data, but don't wait for it
-            if (_valid > 0) {
-                _dataReceiver.writeData(_buf, 0, _valid);
-                _written += _valid;
-                _valid = 0;
-            }
+            _dataReceiver.writeData(_buf, 0, _valid);
+            _written += _valid;
+            _valid = 0;
+            
             if (_buf != null) {
                 ba = new ByteArray(_buf);
                 _buf = null;
