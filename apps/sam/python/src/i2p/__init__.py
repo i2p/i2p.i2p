@@ -1,9 +1,10 @@
-
 """
 i2p -- I2P Python interface
 """
 
-__all__ = ['Error', 'RouterError', 'sam', 'eep', 'router']
+__all__ = ['Error', 'RouterError', 'sam', 'eep', 'router',
+    'SocketServer', 'BaseHTTPServer', 'SimpleHTTPServer', 'CGIHTTPServer',
+    ]
 
 class Error(Exception):
   """Base class for all I2P errors."""
@@ -17,4 +18,3 @@ import router
 
 # Internal use only
 #import samclasses as _samclasses
-
