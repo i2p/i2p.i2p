@@ -186,12 +186,12 @@ class ClientTunnelPoolManagerJob extends JobImpl {
             return false;
         }
 
-        int length = info.getLength();
+        int length = info.getLength() - 1; // -1 because .getLength() includes us
         if (_clientPool.getClientSettings().getEnforceStrictMinimumLength()) {
             if (length < _clientPool.getClientSettings().getDepthInbound()) {
                 // we will require at least the client's length, but they dont meet it
                 if (_log.shouldLog(Log.DEBUG))
-                    _log.debug("Refusing tunnel " + info.getTunnelId() 
+                    _log.debug("Strictly refusing tunnel " + info.getTunnelId() 
                                + " because it is too short (length = " + length
                                + ", wanted = " + _clientPool.getClientSettings().getDepthInbound() 
                                + ")");
@@ -205,7 +205,7 @@ class ClientTunnelPoolManagerJob extends JobImpl {
                 // the best we have on hand (which may be less that their requested length)
                 // this tunnel however meets neither criteria
                 if (_log.shouldLog(Log.DEBUG))
-                    _log.debug("Refusing tunnel " + info.getTunnelId() 
+                    _log.debug("Loosely refusing tunnel " + info.getTunnelId() 
                                + " because it is too short (length = " + length
                                + ", wanted = " + _clientPool.getClientSettings().getDepthInbound() 
                                + ")");
@@ -230,7 +230,9 @@ class ClientTunnelPoolManagerJob extends JobImpl {
         }
 
         if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Accepting tunnel " + info.getTunnelId());
+            _log.debug("Accepting tunnel for length=" + _clientPool.getClientSettings().getDepthInbound() +
+                       " and dest=" + _clientPool.getDestination().calculateHash().toBase64().substring(0,6) 
+                       + " for " + info.getTunnelId());
         return true;
     }
     

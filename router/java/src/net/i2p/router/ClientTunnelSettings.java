@@ -68,20 +68,20 @@ public class ClientTunnelSettings {
     public final static boolean DEFAULT_STRICT_MINIMUM_LENGTH = true;
     
     public ClientTunnelSettings() {
-	_numInbound = 0;
-	_numOutbound = 0;
-	_depthInbound = 0;
-	_depthOutbound = 0;
-	_msgsPerMinuteAvgInbound = 0;
-	_bytesPerMinuteAvgInbound = 0;
-	_msgsPerMinutePeakInbound = 0;
-	_bytesPerMinutePeakInbound = 0;
-	_includeDummyInbound = false;
-	_includeDummyOutbound = false;
-	_reorderInbound = false;
-	_reorderOutbound = false;
-	_inboundDuration = -1;
-	_enforceStrictMinimumLength = false;
+        _numInbound = DEFAULT_NUM_INBOUND;
+        _numOutbound = DEFAULT_NUM_OUTBOUND;
+        _depthInbound = DEFAULT_DEPTH_INBOUND;
+        _depthOutbound = DEFAULT_DEPTH_OUTBOUND;
+        _msgsPerMinuteAvgInbound = DEFAULT_MSGS_AVG;
+        _bytesPerMinuteAvgInbound = DEFAULT_BYTES_AVG;
+        _msgsPerMinutePeakInbound = DEFAULT_MSGS_PEAK;
+        _bytesPerMinutePeakInbound = DEFAULT_BYTES_PEAK;
+        _includeDummyInbound = DEFAULT_DUMMY_INBOUND;
+        _includeDummyOutbound = DEFAULT_DUMMY_OUTBOUND;
+        _reorderInbound = DEFAULT_REORDER_INBOUND;
+        _reorderOutbound = DEFAULT_REORDER_OUTBOUND;
+        _inboundDuration = DEFAULT_DURATION;
+        _enforceStrictMinimumLength = DEFAULT_STRICT_MINIMUM_LENGTH;
     }
         
     public int getNumInboundTunnels() { return _numInbound; }
