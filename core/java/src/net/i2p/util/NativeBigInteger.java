@@ -8,22 +8,29 @@ package net.i2p.util;
  *
  */
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.math.BigInteger;
-import java.net.URL;
-import java.security.SecureRandom;
 import java.util.Random;
+import java.security.SecureRandom;
+
+import java.net.URL;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.IOException;
+import java.io.File;
+
+import freenet.support.CPUInformation.AMDCPUInfo;
+import freenet.support.CPUInformation.CPUID;
+import freenet.support.CPUInformation.CPUInfo;
+import freenet.support.CPUInformation.IntelCPUInfo;
+import freenet.support.CPUInformation.UnknownCPUException;
 
 /**
  * <p>BigInteger that takes advantage of the jbigi library for the modPow operation,
  * which accounts for a massive segment of the processing cost of asymmetric 
- * crypto.  The jbigi library itself is basically just a JNI wrapper around the 
+ * crypto. It also takes advantage of the jbigi library for converting a BigInteger
+ * value to a double. Sun's implementation of the 'doubleValue()' method is _very_ lousy.
+ * 
+ * The jbigi library itself is basically just a JNI wrapper around the 
  * GMP library - a collection of insanely efficient routines for dealing with 
  * big numbers.</p>
  *
@@ -37,36 +44,27 @@ import java.util.Random;
  * <p>If jbigi.enable is set to false, this class won't even attempt to use the 
  * native library, but if it is set to true (or is not specified), it will first 
  * check the platform specific library path for the "jbigi" library, as defined by 
- * {@link java.lang.Runtime#loadLibrary} - e.g. C:\windows\jbigi.dll or /lib/libjbigi.so.  
- * If that fails, it reviews the jbigi.impl environment property - if that is set,
- * it checks all of the components in the CLASSPATH for the file specified and
- * attempts to load it as the native library.  If jbigi.impl is not set, if there
- * is no matching resource, or if that resource is not a valid OS/architecture
- * specific library, the NativeBigInteger will revert to using the pure java 
- * implementation.</p>
+ * {@link Runtime#loadLibrary} - e.g. C:\windows\jbigi.dll or /lib/libjbigi.so, as
+ * well as the CLASSPATH for a resource named 'jbigi'.  If that fails, it reviews 
+ * the jbigi.impl environment property - if that is set, it checks all of the 
+ * components in the CLASSPATH for the file specified and attempts to load it as 
+ * the native library.  If jbigi.impl is not set, it uses the jcpuid library 
+ * described below.  If there is still no matching resource, or if that resource 
+ * is not a valid OS/architecture specific library, the NativeBigInteger will 
+ * revert to using the pure java implementation.</p>
  * 
- * <p>That means <b>NativeBigInteger will not attempt to guess the correct 
- * platform/OS/whatever</b> - applications using this class should define that 
- * property prior to <i>referencing</i> the NativeBigInteger (or before loading
- * the JVM, of course).  Alternately, people with custom built jbigi implementations
- * in their OS's standard search path (LD_LIBRARY_PATH, etc) needn't bother.</p>
- *
- * <p>One way to deploy the native library is to create a jbigi.jar file containing 
- * all of the native implementations with filenames such as "win-athlon", "linux-p2",
- * "freebsd-sparcv4", where those files are the OS specific libraries (the contents of
- * the DLL or .so file built for those OSes / architectures).  The user would then
- * simply specify -Djbigi.impl=win-athlon and this component would pick up that 
- * library.</p>
- *
- * <p>Another way is to create a seperate jbigi.jar file for each platform containing
- * one file - "native", where that file is the OS / architecture specific library 
- * implementation, as above.  This way the user would download the correct jbigi.jar
- * (and not all of the libraries for platforms/OSes they don't need) and would specify
- * -Djbigi.impl=native.</p>
+ * <p>When attempting to load the native implementation as a resource from the CLASSPATH,
+ * the NativeBigInteger will make use of the jcpuid component which runs some assembly 
+ * code to determine the current CPU implementation, such as "pentium4" or "k623".
+ * We then use that, combined with the OS, to build an optimized resource name - e.g. 
+ * "net/i2p/util/libjbigi-freebsd-pentium4.so" or "net/i2p/util/jbigi-windows-k623.dll".
+ * If that resource exists, we use it.  If it doesn't (or the jcpuid component fails), 
+ * we try a generic native implementation using "none" for the CPU (ala 
+ * "net/i2p/util/jbigi-windows-none.dll").</p>
  *
  * <p>Running this class by itself does a basic unit test and benchmarks the
- * NativeBigInteger.modPow vs. the BigInteger.modPow by running a 2Kbit op 100
- * times.  At the end, if the native implementation is loaded this will output 
+ * NativeBigInteger.modPow/doubleValue vs. the BigInteger.modPow/doubleValue by running a 2Kbit op 100
+ * times.  At the end of each test, if the native implementation is loaded this will output 
  * something like:</p>
  * <pre>
  *  native run time:        6090ms (60ms each)
@@ -85,7 +83,7 @@ import java.util.Random;
  * </pre>
  *
  */
-public class NativeBigInteger extends BigInteger {
+public class NativeBigInteger_new extends BigInteger {
     /** did we load the native lib correctly? */
     private static boolean _nativeOk = false;
     /** 
@@ -95,60 +93,149 @@ public class NativeBigInteger extends BigInteger {
      */
     private static final boolean _doLog = true;
     
-    private static String DEFAULT_REF_FILENAME = "jbigi.cfg";
+    private final static String JBIGI_OPTIMIZATION_K6         = "k6";
+    private final static String JBIGI_OPTIMIZATION_K6_2       = "k62";
+    private final static String JBIGI_OPTIMIZATION_K6_3       = "k63";
+    private final static String JBIGI_OPTIMIZATION_ATHLON     = "athlon";
+    private final static String JBIGI_OPTIMIZATION_PENTIUM    = "pentium";
+    private final static String JBIGI_OPTIMIZATION_PENTIUMMMX = "pentiummmx";
+    private final static String JBIGI_OPTIMIZATION_PENTIUM2   = "pentium2";
+    private final static String JBIGI_OPTIMIZATION_PENTIUM3   = "pentium3";
+    private final static String JBIGI_OPTIMIZATION_PENTIUM4   = "pentium4";
+
+    private final static String sCPUType; //The CPU Type to optimize for (one of the above strings)
     
     static {
+        sCPUType = resolveCPUType();
         loadNative();
+    }
+    
+     /** Tries to resolve the best type of CPU that we have an optimized jbigi-dll/so for.
+      * @return A string containing the CPU-type or null if CPU type is unknown
+      */
+    private static String resolveCPUType() {
+        try {
+            CPUInfo c = CPUID.getInfo();
+            if (c instanceof AMDCPUInfo) {
+                AMDCPUInfo amdcpu = (AMDCPUInfo) c;
+                if (amdcpu.IsAthlonCompatible())
+                    return JBIGI_OPTIMIZATION_ATHLON;
+                if (amdcpu.IsK6_3_Compatible())
+                    return JBIGI_OPTIMIZATION_K6_3;
+                if (amdcpu.IsK6_2_Compatible())
+                    return JBIGI_OPTIMIZATION_K6_2;
+                if (amdcpu.IsK6Compatible())
+                    return JBIGI_OPTIMIZATION_K6;
+            } else {
+                if (c instanceof IntelCPUInfo) {
+                    IntelCPUInfo intelcpu = (IntelCPUInfo) c;
+                    if (intelcpu.IsPentium4Compatible())
+                        return JBIGI_OPTIMIZATION_PENTIUM4;
+                    if (intelcpu.IsPentium3Compatible())
+                        return JBIGI_OPTIMIZATION_PENTIUM3;
+                    if (intelcpu.IsPentium2Compatible())
+                        return JBIGI_OPTIMIZATION_PENTIUM2;
+                    if (intelcpu.IsPentiumMMXCompatible())
+                        return JBIGI_OPTIMIZATION_PENTIUMMMX;
+                    if (intelcpu.IsPentiumCompatible())
+                        return JBIGI_OPTIMIZATION_PENTIUM;
+                }
+            }
+            return null;
+        } catch (UnknownCPUException e) {
+            return null; //TODO: Log something here maybe..
+        }
     }
 
     /**
      * calculate (base ^ exponent) % modulus.
-     * @param base big endian twos complement representation of the base (but it must be positive)
-     * @param exponent big endian twos complement representation of the exponent
-     * @param modulus big endian twos complement representation of the modulus
+     * 
+     * @param base
+     *            big endian twos complement representation of the base (but it must be positive)
+     * @param exponent
+     *            big endian twos complement representation of the exponent
+     * @param modulus
+     *            big endian twos complement representation of the modulus
      * @return big endian twos complement representation of (base ^ exponent) % modulus
      */
     public native static byte[] nativeModPow(byte base[], byte exponent[], byte modulus[]);
+ 
+    /**
+     * Converts a BigInteger byte-array to a 'double'
+     * @param ba Big endian twos complement representation of the BigInteger to convert to a double
+     * @return The plain double-value represented by 'ba'
+     */
+    public native static double nativeDoubleValue(byte ba[]);
 
-    public NativeBigInteger(byte val[]) {
+    private byte[] cachedBa;
+
+    public NativeBigInteger_new(byte[] val) {
         super(val);
     }
 
-    public NativeBigInteger(int signum, byte magnitude[]) {
+    public NativeBigInteger_new(int signum, byte[] magnitude) {
         super(signum, magnitude);
     }
 
-    public NativeBigInteger(int bitlen, int certainty, Random rnd) {
+    public NativeBigInteger_new(int bitlen, int certainty, Random rnd) {
         super(bitlen, certainty, rnd);
     }
 
-    public NativeBigInteger(int numbits, Random rnd) {
+    public NativeBigInteger_new(int numbits, Random rnd) {
         super(numbits, rnd);
     }
 
-    public NativeBigInteger(String val) {
+    public NativeBigInteger_new(String val) {
         super(val);
     }
 
-    public NativeBigInteger(String val, int radix) {
+    public NativeBigInteger_new(String val, int radix) {
         super(val, radix);
+    }
+    /**Creates a new NativeBigInteger with the same value
+    *  as the supplied BigInteger. Warning!, not very efficent
+    */
+    public NativeBigInteger_new(BigInteger integer) {
+        //Now, why doesn't sun provide a constructor
+        //like this one in BigInteger?
+        this(integer.toByteArray());
     }
 
     public BigInteger modPow(BigInteger exponent, BigInteger m) {
         if (_nativeOk)
             return new NativeBigInteger(nativeModPow(toByteArray(), exponent.toByteArray(), m.toByteArray()));
-       
-        return super.modPow(exponent, m);
+        else
+            return super.modPow(exponent, m);
+    }
+    public byte[] toByteArray(){
+        if(cachedBa == null) //Since we are immutable it is safe to never update the cached ba after it has initially been generated
+            cachedBa = super.toByteArray();
+        return cachedBa;
     }
     
+    public double doubleValue() {
+        if (_nativeOk)
+            return nativeDoubleValue(toByteArray());
+        else
+            return super.doubleValue();
+    }
     /**
-     * <p>Compare the BigInteger.modPow vs the NativeBigInteger.modPow of some 
+     * 
+     * @return True iff native methods will be used by this class
+     */
+    public static boolean isNative(){
+        return _nativeOk;
+    }
+ 
+    /**
+     * <p>Compare the BigInteger.modPow/doubleValue vs the NativeBigInteger.modPow/doubleValue of some 
      * really big (2Kbit) numbers 100 different times and benchmark the 
      * performance (or shit a brick if they don't match).  </p>
      *
      */
     public static void main(String args[]) {
-        runTest(100);
+        runModPowTest(100);
+        runDoubleValueTest(100);
     }
 
     /* the sample numbers are elG generator/prime so we can test with reasonable numbers */
@@ -165,7 +252,7 @@ public class NativeBigInteger extends BigInteger {
                                                               + "DE2BCBF6955817183995497CEA956AE515D2261898FA0510"
                                                               + "15728E5A8AACAA68FFFFFFFFFFFFFFFF", 16).toByteArray();
 
-    private static void runTest(int numRuns) {
+    private static void runModPowTest(int numRuns) {
         System.out.println("DEBUG: Warming up the random number generator...");
         SecureRandom rand = new SecureRandom();
         rand.nextBoolean();
@@ -197,10 +284,10 @@ public class NativeBigInteger extends BigInteger {
                 System.err.println("ERROR: java modPow value: " + jval.toString());
                 System.err.println("ERROR: run time: " + totalTime + "ms (" + (totalTime / (runsProcessed + 1)) + "ms each)");
                 break;
+            } else {
+                System.out.println("DEBUG: current run time: " + (afterModPow - beforeModPow) + "ms (total: " 
+                                   + totalTime + "ms, " + (totalTime / (runsProcessed + 1)) + "ms each)");
             }
-
-            System.out.println("DEBUG: current run time: " + (afterModPow - beforeModPow) + "ms (total: " 
-                               + totalTime + "ms, " + (totalTime / (runsProcessed + 1)) + "ms each)");
         }
         System.out.println("INFO: run time: " + totalTime + "ms (" + (totalTime / (runsProcessed + 1)) + "ms each)");
         if (numRuns == runsProcessed)
@@ -212,44 +299,123 @@ public class NativeBigInteger extends BigInteger {
             System.out.println("native run time: \t" + totalTime + "ms (" + (totalTime / (runsProcessed + 1))
                                + "ms each)");
             System.out.println("java run time:   \t" + javaTime + "ms (" + (javaTime / (runsProcessed + 1)) + "ms each)");
-            System.out.println("native = " + ((totalTime * 100.0D) / javaTime) + "% of pure java time");
+            System.out.println("native = " + ((totalTime * 100.0d) / (double) javaTime) + "% of pure java time");
         } else {
             System.out.println("java run time: \t" + javaTime + "ms (" + (javaTime / (runsProcessed + 1)) + "ms each)");
             System.out.println("However, we couldn't load the native library, so this doesn't test much");
         }
     }
+    
+    private static void runDoubleValueTest(int numRuns) {
+        System.out.println("DEBUG: Warming up the random number generator...");
+        SecureRandom rand = new SecureRandom();
+        rand.nextBoolean();
+        System.out.println("DEBUG: Random number generator warmed up");
 
+        BigInteger jg = new BigInteger(_sampleGenerator);
+
+        long totalTime = 0;
+        long javaTime = 0;
+
+        int MULTIPLICATOR = 50000; //Run the doubleValue() calls within a loop since they are pretty fast.. 
+        int runsProcessed = 0;
+        for (runsProcessed = 0; runsProcessed < numRuns; runsProcessed++) {
+            NativeBigInteger g = new NativeBigInteger(_sampleGenerator);
+            long beforeDoubleValue = System.currentTimeMillis();
+            double dNative=0;
+            for(int mult=0;mult<MULTIPLICATOR;mult++)
+                dNative = g.doubleValue();
+            long afterDoubleValue = System.currentTimeMillis();
+            double jval=0;
+            for(int mult=0;mult<MULTIPLICATOR;mult++)
+                jval = jg.doubleValue();
+            long afterJavaDoubleValue = System.currentTimeMillis();
+
+            totalTime += (afterDoubleValue - beforeDoubleValue);
+            javaTime += (afterJavaDoubleValue - afterDoubleValue);
+            if (dNative!=jval) {
+                System.err.println("ERROR: [" + runsProcessed + "]\tnative double != java double");
+                System.err.println("ERROR: native double value: " + dNative);
+                System.err.println("ERROR: java double value: " + jval);
+                System.err.println("ERROR: run time: " + totalTime + "ms (" + (totalTime / (runsProcessed + 1)) + "ms each)");
+                break;
+            } else {
+                System.out.println("DEBUG: current run time: " + (afterDoubleValue - beforeDoubleValue) + "ms (total: " 
+                                   + totalTime + "ms, " + (totalTime / (runsProcessed + 1)) + "ms each)");
+            }
+        }
+        System.out.println("INFO: run time: " + totalTime + "ms (" + (totalTime / (runsProcessed + 1)) + "ms each)");
+        if (numRuns == runsProcessed)
+            System.out.println("INFO: " + runsProcessed + " runs complete without any errors");
+        else
+            System.out.println("ERROR: " + runsProcessed + " runs until we got an error");
+
+        if (_nativeOk) {
+            System.out.println("native run time: \t" + totalTime + "ms (" + (totalTime / (runsProcessed + 1))
+                               + "ms each)");
+            System.out.println("java run time:   \t" + javaTime + "ms (" + (javaTime / (runsProcessed + 1)) + "ms each)");
+            System.out.println("native = " + ((totalTime * 100.0d) / (double) javaTime) + "% of pure java time");
+        } else {
+            System.out.println("java run time: \t" + javaTime + "ms (" + (javaTime / (runsProcessed + 1)) + "ms each)");
+            System.out.println("However, we couldn't load the native library, so this doesn't test much");
+        }
+    }
+    
+ 
     /**
-     * <p>Do whatever we can to load up the native library backing this BigInteger's modPow.
+     * <p>Do whatever we can to load up the native library backing this BigInteger's native methods.
      * If it can find a custom built jbigi.dll / libjbigi.so, it'll use that.  Otherwise
      * it'll try to look in the classpath for the correct library (see loadFromResource).
      * If the user specifies -Djbigi.enable=false it'll skip all of this.</p>
      *
      */
     private static final void loadNative() {
+        try{
         String wantedProp = System.getProperty("jbigi.enable", "true");
         boolean wantNative = "true".equalsIgnoreCase(wantedProp);
         if (wantNative) {
-            boolean loaded = loadGeneric();
+            boolean loaded = loadFromResource("jbigi");
             if (loaded) {
                 _nativeOk = true;
                 if (_doLog)
-                    System.err.println("INFO: Native BigInteger library jbigi loaded");
+                    System.err.println("INFO: Locally optimized native BigInteger loaded from resource");
             } else {
-                loaded = loadFromResource();
+                loaded = loadFromResource(true);
                 if (loaded) {
                     _nativeOk = true;
                     if (_doLog)
-                        System.err.println("INFO: Native BigInteger library jbigi loaded from resource");
+                        System.err.println("INFO: Optimized native BigInteger library '"+getResourceName(true)+"' loaded from resource");
                 } else {
-                    _nativeOk = false;
-                    if (_doLog)
-                        System.err.println("WARN: Native BigInteger library jbigi not loaded - using pure java");
+                    loaded = loadGeneric(true);
+                    if (loaded) {
+                        _nativeOk = true;
+                        if (_doLog)
+                            System.err.println("INFO: Optimized native BigInteger library '"+getMiddleName(true)+"' loaded from somewhere in the path");
+                    } else {
+                        loaded = loadFromResource(false);
+                        if (loaded) {
+                            _nativeOk = true;
+                            if (_doLog)
+                                System.err.println("INFO: Non-optimized native BigInteger library '"+getResourceName(false)+"' loaded from resource");
+                        } else {
+                            loaded = loadGeneric(false);
+                            if (loaded) {
+                                _nativeOk = true;
+                                if (_doLog)
+                                    System.err.println("INFO: Non-optimized native BigInteger library '"+getMiddleName(false)+"' loaded from somewhere in the path");
+                            } else {
+                                _nativeOk = false;          
+                            }
+                        }       
+                    }
                 }
             }
-        } else {
+        }
+        if (_doLog && !_nativeOk)
+            System.err.println("INFO: Native BigInteger library jbigi not loaded - using pure java");
+        }catch(Exception e){
             if (_doLog)
-                System.err.println("INFO: Native BigInteger library jbigi not loaded - using pure java");
+                System.err.println("INFO: Native BigInteger library jbigi not loaded, reason: '"+e.getMessage()+"' - using pure java");
         }
     }
     
@@ -260,9 +426,12 @@ public class NativeBigInteger extends BigInteger {
      * @return true if it was loaded successfully, else false
      *
      */
-    private static final boolean loadGeneric() {
+    private static final boolean loadGeneric(boolean optimized) {
         try {
-            System.loadLibrary("jbigi");
+            String name = getMiddleName(optimized);
+            if(name == null)
+                return false;
+            System.loadLibrary(name);
             return true;
         } catch (UnsatisfiedLinkError ule) {
             return false;
@@ -286,13 +455,16 @@ public class NativeBigInteger extends BigInteger {
      * @return true if it was loaded successfully, else false
      *
      */
-    private static final boolean loadFromResource() {
-        String resourceName = getResourceName();
+    private static final boolean loadFromResource(boolean optimized) {
+        String resourceName = getResourceName(optimized);
+        return loadFromResource(resourceName);
+    }
+    private static final boolean loadFromResource(String resourceName) {
         if (resourceName == null) return false;
         URL resource = NativeBigInteger.class.getClassLoader().getResource(resourceName);
         if (resource == null) {
             if (_doLog)
-                System.err.println("ERROR: Resource name [" + resourceName + "] was not found");
+                System.err.println("NOTICE: Resource name [" + resourceName + "] was not found");
             return false;
         }
 
@@ -308,7 +480,7 @@ public class NativeBigInteger extends BigInteger {
                 fos.write(buf, 0, read);
             }
             fos.close();
-            System.load(outFile.getPath());
+            System.load(outFile.getAbsolutePath()); //System.load requires an absolute path to the lib
             return true;
         } catch (UnsatisfiedLinkError ule) {
             if (_doLog) {
@@ -330,35 +502,53 @@ public class NativeBigInteger extends BigInteger {
         }
     }
     
-    private static final String getResourceName() {
-        String jbigiRefFile = System.getProperty("jbigi.ref");
-        if (jbigiRefFile == null)
-            jbigiRefFile = DEFAULT_REF_FILENAME;
+    private static final String getResourceName(boolean optimized) {
+        String pname = NativeBigInteger.class.getPackage().getName().replace('.','/');
+        String pref = getLibraryPrefix();
+        String middle = getMiddleName(optimized);
+        String suff = getLibrarySuffix();
+        if(pref == null || middle == null || suff == null)
+            return null;
+        return pname+"/"+pref+middle+"."+suff;
+    }
+    
+    private static final String getMiddleName(boolean optimized){
         
-        File refFile = new File(jbigiRefFile);
-        if (refFile.exists()) {
-            BufferedReader in = null;
-            try {
-                in = new BufferedReader(new InputStreamReader(new FileInputStream(refFile)));
-                String resourceName = in.readLine();
-                if ( (resourceName != null) || (resourceName.trim().length() <= 0) )
-                    return resourceName;
-            } catch (IOException ioe) {
-                if (_doLog) {
-                    System.err.println("WARN: Unable to read the jbigi reference file " + jbigiRefFile);
-                    ioe.printStackTrace();
-                }
-            } finally {
-                if (in != null) {
-                    try {
-                        in.close(); 
-                    } catch (IOException ioe) { // nop
-                    }
-                }
-            }
-        }
-        
-        // the file doesnt exist, or it is empty, so use the jbigi.impl system env
-        return System.getProperty("jbigi.impl");
+        String sAppend;
+        if(optimized)
+        {
+            if(sCPUType == null)
+                return null;
+            else
+                sAppend = "-"+sCPUType;        
+        }else
+               sAppend = "-none";
+
+        boolean isWindows =(System.getProperty("os.name").toLowerCase().indexOf("windows") != -1);
+        boolean isLinux =(System.getProperty("os.name").toLowerCase().indexOf("linux") != -1);
+        boolean isFreebsd =(System.getProperty("os.name").toLowerCase().indexOf("freebsd") != -1);
+        if(isWindows)
+             return "jbigi-windows"+sAppend; // The convention on Windows
+        if(isLinux)
+            return "jbigi-linux"+sAppend; // The convention on linux...
+        if(isFreebsd)
+            return "jbigi-freebsd"+sAppend; // The convention on freebsd...
+        throw new RuntimeException("Dont know jbigi library name for os type '"+System.getProperty("os.name")+"'");
+    }
+    private static final String getLibrarySuffix()
+    {
+        boolean isWindows =System.getProperty("os.name").toLowerCase().indexOf("windows") != -1;
+        if(isWindows)
+            return "dll";
+        else
+            return "so";
+    }
+    private static final String getLibraryPrefix()
+    {
+        boolean isWindows =System.getProperty("os.name").toLowerCase().indexOf("windows") != -1;
+        if(isWindows)
+            return "";
+        else
+            return "lib";
     }
 }
