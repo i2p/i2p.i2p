@@ -8,6 +8,9 @@ import java.io.OutputStream;
 import java.net.Socket;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.Locale;
+import java.text.SimpleDateFormat;
+import java.text.ParseException;
 
 import net.i2p.data.Hash;
 import net.i2p.router.Router;
@@ -48,6 +51,9 @@ class AdminRunner implements Runnable {
             reply(out, _generator.generateStatsPage());
         } else if (command.indexOf("/profile/") >= 0) {
             replyText(out, getProfile(command));
+        } else if (command.indexOf("setTime") >= 0) {
+            setTime(command);
+            reply(out, "<html><body>Time updated</body></html>");
         } else if (true || command.indexOf("routerConsole.html") > 0) {
             reply(out, _context.router().renderStatusHTML());
         }
@@ -104,5 +110,31 @@ class AdminRunner implements Runnable {
         }
         
         return "No such peer is being profiled\n";
+    }
+    
+    
+    private static final String FORMAT_STRING = "yyyyMMdd_HH:mm:ss.SSS";
+    private SimpleDateFormat _fmt = new SimpleDateFormat(FORMAT_STRING, Locale.UK);
+    
+    private long getTime(String now) throws ParseException { 
+        synchronized (_fmt) {
+            return _fmt.parse(now).getTime();
+        }
+    }
+    private void setTime(String cmd) {
+        int start = cmd.indexOf("now=");
+        String str = cmd.substring(start + 4, start+4+FORMAT_STRING.length());
+        try {
+            long now = getTime(str);
+            if (_log.shouldLog(Log.INFO))
+                _log.log(Log.INFO, "Admin time set to " + str);
+            setTime(now);
+        } catch (ParseException pe) {
+            _log.error("Invalid time specified [" + str + "]", pe);
+        }
+    }
+    
+    private void setTime(long now) {
+        _context.clock().setNow(now);
     }
 }
