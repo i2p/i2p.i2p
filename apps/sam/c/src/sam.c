@@ -197,7 +197,7 @@ samerr_t sam_connect(sam_sess_t *session, const char *samhost, uint16_t samport,
  * data - the data we're sending
  * size - the size of the data
  *
- * Returns: true on success, false on failure
+ * Returns: SAM_OK on success
  */
 samerr_t sam_dgram_send(sam_sess_t *session, const sam_pubkey_t dest,
 	const void *data, size_t size)
