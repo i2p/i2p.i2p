@@ -1,4 +1,15 @@
-$Id: history.txt,v 1.120 2004/12/29 15:06:43 jrandom Exp $
+$Id: history.txt,v 1.121 2004/12/29 17:16:42 jrandom Exp $
+
+2004-12-30  jrandom
+    * Revised the I2PTunnel client and httpclient connection establishment 
+      throttles.  There is now a pool of threads that build the I2PSocket
+      connections with a default size of 5, configurable via the I2PTunnel 
+      client option 'i2ptunnel.numConnectionBuilders' (if set to 0, it will
+      not throttle the number of concurrent builders, but will launch a thread
+      per socket during establishment).  In addition, sockets accepted but
+      not yet allocated to one of the connection builders will be destroyed
+      after 30 seconds, configurable via 'i2ptunnel.maxWaitTime' (if set to
+      0, it will wait indefinitely).
 
 2004-12-29  jrandom
     * Imported Ragnarok's addressbook source (2.0.2) which is built but not

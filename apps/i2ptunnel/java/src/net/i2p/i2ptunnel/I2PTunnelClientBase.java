@@ -12,8 +12,10 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 import net.i2p.I2PException;
@@ -26,6 +28,7 @@ import net.i2p.client.streaming.I2PSocketOptions;
 import net.i2p.data.Destination;
 import net.i2p.util.EventDispatcher;
 import net.i2p.util.I2PThread;
+import net.i2p.util.SimpleTimer;
 import net.i2p.util.Log;
 
 public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runnable {
@@ -58,7 +61,30 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
     private String handlerName;
 
     private Object conLock = new Object();
-    private int pendingConnections = 0;
+    
+    /** List of Socket for those accept()ed but not yet started up */
+    private List _waitingSockets;
+    /** How many connections will we allow to be in the process of being built at once? */
+    private int _numConnectionBuilders;
+    /** How long will we allow sockets to sit in the _waitingSockets map before killing them? */
+    private int _maxWaitTime;
+    
+    /**
+     * How many concurrent connections this I2PTunnel instance will allow to be 
+     * in the process of connecting (or if less than 1, there is no limit)?
+     */
+    public static final String PROP_NUM_CONNECTION_BUILDERS = "i2ptunnel.numConnectionBuilders";
+    /**
+     * How long will we let a socket wait after being accept()ed without getting
+     * pumped through a connection builder (in milliseconds).  If this time is 
+     * reached, the socket is unceremoniously closed and discarded.  If the max 
+     * wait time is less than 1, there is no limit.
+     *
+     */
+    public static final String PROP_MAX_WAIT_TIME = "i2ptunnel.maxWaitTime";
+    
+    private static final int DEFAULT_NUM_CONNECTION_BUILDERS = 5;
+    private static final int DEFAULT_MAX_WAIT_TIME = 30*1000;
     
     //public I2PTunnelClientBase(int localPort, boolean ownDest,
     //		       Logging l) {
@@ -108,12 +134,45 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
             }
         }
 
+        configurePool(tunnel);
+        
         if (open && listenerReady) {
             l.log("Ready! Port " + getLocalPort());
             notifyEvent("openBaseClientResult", "ok");
         } else {
             l.log("Error listening - please see the logs!");
             notifyEvent("openBaseClientResult", "error");
+        }
+    }
+    
+    /** 
+     * build and configure the pool handling accept()ed but not yet 
+     * established connections 
+     *
+     */
+    private void configurePool(I2PTunnel tunnel) {
+        _waitingSockets = new ArrayList(4);
+        
+        Properties opts = tunnel.getClientOptions();
+        String maxWait = opts.getProperty(PROP_MAX_WAIT_TIME, DEFAULT_MAX_WAIT_TIME+"");
+        try { 
+            _maxWaitTime = Integer.parseInt(maxWait); 
+        } catch (NumberFormatException nfe) {
+            _maxWaitTime = DEFAULT_MAX_WAIT_TIME;
+        }
+        
+        String numBuild = opts.getProperty(PROP_NUM_CONNECTION_BUILDERS, DEFAULT_NUM_CONNECTION_BUILDERS+"");
+        try {
+            _numConnectionBuilders = Integer.parseInt(numBuild);
+        } catch (NumberFormatException nfe) {
+            _numConnectionBuilders = DEFAULT_NUM_CONNECTION_BUILDERS;
+        }
+
+        for (int i = 0; i < _numConnectionBuilders; i++) {
+            String name = "ClientBuilder" + _clientId + '.' + i;
+            I2PThread b = new I2PThread(new TunnelConnectionBuilder(), name);
+            b.setDaemon(true);
+            b.start();
         }
     }
 
@@ -250,6 +309,7 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
                 synchronized (this) {
                     notifyAll();
                 }
+                synchronized (_waitingSockets) { _waitingSockets.notifyAll(); }
                 return;
             }
             ss = new ServerSocket(localPort, 0, addr);
@@ -292,6 +352,9 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
                 notifyAll();
             }
         }
+        synchronized (_waitingSockets) {
+            _waitingSockets.notifyAll();
+        }
     }
 
     /**
@@ -300,16 +363,52 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
      * @param s Socket to take care of
      */
     protected void manageConnection(Socket s) {
-        boolean useBlocking = false;
-        synchronized (conLock) {
-            pendingConnections++;
-            if (pendingConnections > 5)
-                useBlocking = true;
+        if (s == null) return;
+        if (_numConnectionBuilders <= 0) {
+            new I2PThread(new BlockingRunner(s), "Clinet run").start();
+            return;
         }
-        if (useBlocking)
-            clientConnectionRun(s);
-        else
-            new ClientConnectionRunner(s, handlerName);
+        
+        if (_maxWaitTime > 0)
+            SimpleTimer.getInstance().addEvent(new CloseEvent(s), _maxWaitTime);
+
+        synchronized (_waitingSockets) {
+            _waitingSockets.add(s);
+            _waitingSockets.notifyAll();
+        }
+    }
+
+    /** 
+     * Blocking runner, used during the connection establishment whenever we
+     * are not using the queued builders.
+     *
+     */
+    private class BlockingRunner implements Runnable {
+        private Socket _s;
+        public BlockingRunner(Socket s) { _s = s; }
+        public void run() {
+            clientConnectionRun(_s);
+        }
+    }
+    
+    /**
+     * Remove and close the socket from the waiting list, if it is still there.
+     *
+     */
+    private class CloseEvent implements SimpleTimer.TimedEvent {
+        private Socket _s;
+        public CloseEvent(Socket s) { _s = s; }
+        public void timeReached() {
+            boolean stillWaiting = false;
+            synchronized (_waitingSockets) {
+                stillWaiting = _waitingSockets.remove(_s);
+            }
+            if (stillWaiting) {
+                try { _s.close(); } catch (IOException ioe) {}
+                if (_log.shouldLog(Log.INFO))
+                    _log.info("Closed a waiting socket because of backlog");
+            }
+        }
     }
 
     public boolean close(boolean forced) {
@@ -341,8 +440,10 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
             }
             l.log("Client closed.");
             open = false;
-            return true;
         }
+        
+        synchronized (_waitingSockets) { _waitingSockets.notifyAll(); }
+        return true;
     }
 
     public static void closeSocket(Socket s) {
@@ -352,22 +453,29 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
             _log.error("Could not close socket", ex);
         }
     }
-
-    private static volatile long __runnerId = 0;
     
-    public class ClientConnectionRunner extends I2PThread {
-        private Socket s;
-
-        public ClientConnectionRunner(Socket s, String name) {
-            this.s = s;
-            setName(name + '.' + (++__runnerId));
-            start();
-        }
-
-        public void run() {
-            clientConnectionRun(s);
-            synchronized (conLock) {
-                pendingConnections--;
+    /**
+     * Pool runner pulling sockets off the waiting list and pushing them
+     * through clientConnectionRun.  This dies when the I2PTunnel instance
+     * is closed.
+     *
+     */
+    private class TunnelConnectionBuilder implements Runnable {
+        public void run() { 
+            Socket s = null;
+            while (open) {
+                try {
+                    synchronized (_waitingSockets) {
+                        if (_waitingSockets.size() <= 0)
+                            _waitingSockets.wait();
+                        else
+                            s = (Socket)_waitingSockets.remove(0);
+                    }
+                } catch (InterruptedException ie) {}
+                
+                if (s != null)
+                    clientConnectionRun(s);
+                s = null;
             }
         }
     }

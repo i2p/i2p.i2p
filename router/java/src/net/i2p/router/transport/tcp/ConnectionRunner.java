@@ -163,11 +163,14 @@ class ConnectionRunner implements Runnable {
             long timeSinceWrite = _context.clock().now() - _lastWrite;
             if (timeSinceWrite > 5*TIME_SEND_FREQUENCY) {
                 TCPTransport t = _con.getTransport();
-                t.addConnectionErrorMessage("Connection closed with "
-                                            + _con.getRemoteRouterIdentity().getHash().toBase64().substring(0,6)
-                                            + " due to " + DataHelper.formatDuration(timeSinceWrite)
-                                            + " of inactivity after " 
-                                            + DataHelper.formatDuration(_con.getLifetime()));
+                String msg = "Connection closed with "
+                             + _con.getRemoteRouterIdentity().getHash().toBase64().substring(0,6)
+                             + " due to " + DataHelper.formatDuration(timeSinceWrite)
+                             + " of inactivity after " 
+                             + DataHelper.formatDuration(_con.getLifetime());
+                t.addConnectionErrorMessage(msg);
+                if (_log.shouldLog(Log.INFO))
+                    _log.info(msg);
                 _con.closeConnection(false);
                 return;
             }
@@ -187,5 +190,7 @@ class ConnectionRunner implements Runnable {
         msg.setMessage(buildTimeMessage());
         msg.setPriority(100);
         _con.addMessage(msg);
+        if (_log.shouldLog(Log.INFO))
+            _log.info("Enqueueing time message to " + _con.getRemoteRouterIdentity().getHash().toBase64().substring(0,6));
     }
 }
