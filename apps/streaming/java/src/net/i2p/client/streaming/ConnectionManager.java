@@ -35,9 +35,11 @@ public class ConnectionManager {
     /** Ping ID (ByteArray) to PingRequest */
     private Map _pendingPings;
     private boolean _allowIncoming;
+    private int _maxConcurrentStreams;
+    private volatile int _numWaiting;
     private Object _connectionLock;
     
-    public ConnectionManager(I2PAppContext context, I2PSession session) {
+    public ConnectionManager(I2PAppContext context, I2PSession session, int maxConcurrent) {
         _context = context;
         _log = context.logManager().getLog(ConnectionManager.class);
         _connectionByInboundId = new HashMap(32);
@@ -52,6 +54,8 @@ public class ConnectionManager {
         session.setSessionListener(_messageHandler);
         _outboundQueue = new PacketQueue(context, session);
         _allowIncoming = false;
+        _maxConcurrentStreams = maxConcurrent;
+        _numWaiting = 0;
     }
     
     Connection getConnectionByInboundId(byte[] id) {
@@ -77,17 +81,38 @@ public class ConnectionManager {
         Connection con = new Connection(_context, this, _schedulerChooser, _outboundQueue, _conPacketHandler);
         byte receiveId[] = new byte[4];
         _context.random().nextBytes(receiveId);
+        boolean reject = false;
         synchronized (_connectionLock) {
-            while (true) {
-                Connection oldCon = (Connection)_connectionByInboundId.put(new ByteArray(receiveId), con);
-                if (oldCon == null) {
-                    break;
-                } else { 
-                    _connectionByInboundId.put(new ByteArray(receiveId), oldCon);
-                    // receiveId already taken, try another
-                    _context.random().nextBytes(receiveId);
+            if (locked_tooManyStreams()) {
+                reject = true;
+            } else { 
+                while (true) {
+                    Connection oldCon = (Connection)_connectionByInboundId.put(new ByteArray(receiveId), con);
+                    if (oldCon == null) {
+                        break;
+                    } else { 
+                        _connectionByInboundId.put(new ByteArray(receiveId), oldCon);
+                        // receiveId already taken, try another
+                        _context.random().nextBytes(receiveId);
+                    }
                 }
             }
+        }
+        
+        if (reject) {
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Refusing connection since we have exceeded our max of " 
+                          + _maxConcurrentStreams + " connections");
+            PacketLocal reply = new PacketLocal(_context, synPacket.getOptionalFrom());
+            reply.setFlag(Packet.FLAG_RESET);
+            reply.setFlag(Packet.FLAG_SIGNATURE_INCLUDED);
+            reply.setAckThrough(synPacket.getSequenceNum());
+            reply.setSendStreamId(synPacket.getReceiveStreamId());
+            reply.setReceiveStreamId(null);
+            reply.setOptionalFrom(_session.getMyDestination());
+            // this just sends the packet - no retries or whatnot
+            _outboundQueue.enqueue(reply);
+            return null;
         }
         
         con.setReceiveStreamId(receiveId);
@@ -102,24 +127,59 @@ public class ConnectionManager {
         return con;
     }
     
+    private static final long DEFAULT_STREAM_DELAY_MAX = 10*1000;
+    
     /**
      * Build a new connection to the given peer.  This blocks if there is no
      * connection delay, otherwise it returns immediately.
      *
+     * @return new connection, or null if we have exceeded our limit 
      */
     public Connection connect(Destination peer, ConnectionOptions opts) {
-        Connection con = new Connection(_context, this, _schedulerChooser, _outboundQueue, _conPacketHandler, opts);
-        con.setRemotePeer(peer);
+        Connection con = null;
         byte receiveId[] = new byte[4];
-        _context.random().nextBytes(receiveId);
-        synchronized (_connectionLock) {
-            ByteArray ba = new ByteArray(receiveId);
-            while (_connectionByInboundId.containsKey(ba)) {
-                _context.random().nextBytes(receiveId);
+        long expiration = _context.clock().now() + opts.getConnectTimeout();
+        if (opts.getConnectTimeout() <= 0)
+            expiration = _context.clock().now() + DEFAULT_STREAM_DELAY_MAX;
+        _numWaiting++;
+        while (true) {
+            if (expiration < _context.clock().now()) {
+                if (_log.shouldLog(Log.WARN))
+                _log.warn("Refusing to connect since we have exceeded our max of " 
+                          + _maxConcurrentStreams + " connections");
+                _numWaiting--;
+                return null;
             }
-            _connectionByInboundId.put(ba, con);
+            con = new Connection(_context, this, _schedulerChooser, _outboundQueue, _conPacketHandler, opts);
+            con.setRemotePeer(peer);
+            _context.random().nextBytes(receiveId);
+            boolean reject = false;
+            synchronized (_connectionLock) {
+                if (locked_tooManyStreams()) {
+                    // allow a full buffer of pending/waiting streams
+                    if (_numWaiting > _maxConcurrentStreams) {
+                        if (_log.shouldLog(Log.WARN))
+                            _log.warn("Refusing connection since we have exceeded our max of "
+                                      + _maxConcurrentStreams + " and there are " + _numWaiting
+                                      + " waiting already");
+                        _numWaiting--;
+                        return null;
+                    }
+                        
+                    reject = true;
+                } else { 
+                    ByteArray ba = new ByteArray(receiveId);
+                    while (_connectionByInboundId.containsKey(ba)) {
+                        _context.random().nextBytes(receiveId);
+                    }
+                    _connectionByInboundId.put(ba, con);
+                }
+            }
+            if (!reject)
+                break;
         }
-        
+
+        // ok we're in...
         con.setReceiveStreamId(receiveId);        
         con.eventOccurred();
         
@@ -127,9 +187,24 @@ public class ConnectionManager {
         if (opts.getConnectDelay() <= 0) {
             con.waitForConnect();
         }
+        if (_numWaiting > 0)
+            _numWaiting--;
         return con;
     }
 
+    private boolean locked_tooManyStreams() {
+        if (_maxConcurrentStreams <= 0) return false;
+        if (_connectionByInboundId.size() < _maxConcurrentStreams) return false;
+        
+        int active = 0;
+        for (Iterator iter = _connectionByInboundId.values().iterator(); iter.hasNext(); ) {
+            Connection con = (Connection)iter.next();
+            if (con.getIsConnected())
+                active++;
+        }
+        return (active >= _maxConcurrentStreams);
+    }
+    
     public MessageHandler getMessageHandler() { return _messageHandler; }
     public PacketHandler getPacketHandler() { return _packetHandler; }
     public ConnectionHandler getConnectionHandler() { return _connectionHandler; }

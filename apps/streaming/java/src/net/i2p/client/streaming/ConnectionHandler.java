@@ -54,45 +54,40 @@ class ConnectionHandler {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Accept("+ timeoutMs+") called");
 
-        long expiration = timeoutMs;
-        if (expiration > 0)
-            expiration += _context.clock().now();
-        Packet syn = null;
-        synchronized (_synQueue) {
-            while ( _active && (_synQueue.size() <= 0) ) {
-                if (_log.shouldLog(Log.DEBUG))
-                    _log.debug("Accept("+ timeoutMs+"): active=" + _active + " queue: " + _synQueue.size());
-                if (timeoutMs <= 0) {
-                    try { _synQueue.wait(); } catch (InterruptedException ie) {}
-                } else {
-                    long remaining = expiration - _context.clock().now();
-                    if (remaining < 0)
-                        break;
-                    try { _synQueue.wait(remaining); } catch (InterruptedException ie) {}
+        long expiration = timeoutMs + _context.clock().now();
+        while (true) {
+            if ( (timeoutMs > 0) && (expiration < _context.clock().now()) )
+                return null;
+            if (!_active) 
+                return null;
+            
+            Packet syn = null;
+            synchronized (_synQueue) {
+                while ( _active && (_synQueue.size() <= 0) ) {
+                    if (_log.shouldLog(Log.DEBUG))
+                        _log.debug("Accept("+ timeoutMs+"): active=" + _active + " queue: " 
+                                   + _synQueue.size());
+                    if (timeoutMs <= 0) {
+                        try { _synQueue.wait(); } catch (InterruptedException ie) {}
+                    } else {
+                        long remaining = expiration - _context.clock().now();
+                        if (remaining < 0)
+                            break;
+                        try { _synQueue.wait(remaining); } catch (InterruptedException ie) {}
+                    }
+                }
+                if (_active && _synQueue.size() > 0) {
+                    syn = (Packet)_synQueue.remove(0);
                 }
             }
-            if (_active && _synQueue.size() > 0) {
-                syn = (Packet)_synQueue.remove(0);
+
+            if (syn != null) {
+                // deal with forged / invalid syn packets
+                Connection con = _manager.receiveConnection(syn);
+                if (con != null)
+                    return con;
             }
-        }
-        
-        if (syn != null) {
-            // deal with forged / invalid syn packets
-            Connection con = _manager.receiveConnection(syn);
-            if (con != null) {
-                return con;
-            } else if (timeoutMs > 0) {
-                long remaining = expiration - _context.clock().now();
-                if (remaining <= 0) {
-                    return null;
-                } else {
-                    return accept(remaining);
-                }
-            } else {
-                return accept(timeoutMs);
-            }
-        } else {
-            return null;
+            // keep looping...
         }
     }
     

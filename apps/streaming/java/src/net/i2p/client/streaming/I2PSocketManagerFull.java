@@ -36,6 +36,7 @@ public class I2PSocketManagerFull implements I2PSocketManager {
     private ConnectionOptions _defaultOptions;
     private long _acceptTimeout;
     private String _name;
+    private int _maxStreams;
     private static int __managerId = 0;
     private ConnectionManager _connectionManager;
     
@@ -54,6 +55,9 @@ public class I2PSocketManagerFull implements I2PSocketManager {
         init(context, session, opts, name);
     }
     
+    /** how many streams will we allow at once?  */
+    public static final String PROP_MAX_STREAMS = "i2p.streaming.maxConcurrentStreams";
+    
     /**
      *
      */
@@ -61,7 +65,17 @@ public class I2PSocketManagerFull implements I2PSocketManager {
         _context = context;
         _session = session;
         _log = _context.logManager().getLog(I2PSocketManagerFull.class);
-        _connectionManager = new ConnectionManager(_context, _session);
+        
+        _maxStreams = -1;
+        try {
+            String num = (opts != null ? opts.getProperty(PROP_MAX_STREAMS, "-1") : "-1");
+            _maxStreams = Integer.parseInt(num);
+        } catch (NumberFormatException nfe) {
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Invalid max # of concurrent streams, defaulting to unlimited", nfe);
+            _maxStreams = -1;
+        }
+        _connectionManager = new ConnectionManager(_context, _session, _maxStreams);
         _name = name + " " + (++__managerId);
         _acceptTimeout = ACCEPT_TIMEOUT_DEFAULT;
         _defaultOptions = new ConnectionOptions(opts);
@@ -140,6 +154,8 @@ public class I2PSocketManagerFull implements I2PSocketManager {
         else
             opts = new ConnectionOptions(options);
         Connection con = _connectionManager.connect(peer, opts);
+        if (con == null)
+            throw new TooManyStreamsException("Too many streams (max " + _maxStreams + ")");
         I2PSocketFull socket = new I2PSocketFull(con);
         con.setSocket(socket);
         if (con.getConnectionError() != null) { 
