@@ -231,8 +231,8 @@ class StoreJob extends JobImpl {
         
         _state.addPending(peer.getIdentity().getHash());
         
-        SendSuccessJob onReply = new SendSuccessJob(peer);
-        FailedJob onFail = new FailedJob(peer);
+        SendSuccessJob onReply = new SendSuccessJob(getContext(), peer);
+        FailedJob onFail = new FailedJob(getContext(), peer);
         StoreMessageSelector selector = new StoreMessageSelector(getContext(), getJobId(), peer, token, expiration);
         
         TunnelId outTunnelId = selectOutboundTunnel();
@@ -295,8 +295,8 @@ class StoreJob extends JobImpl {
     private class SendSuccessJob extends JobImpl implements ReplyJob {
         private RouterInfo _peer;
         
-        public SendSuccessJob(RouterInfo peer) {
-            super(StoreJob.this.getContext());
+        public SendSuccessJob(RouterContext enclosingContext, RouterInfo peer) {
+            super(enclosingContext);
             _peer = peer;
         }
 
@@ -329,8 +329,8 @@ class StoreJob extends JobImpl {
     private class FailedJob extends JobImpl {
         private RouterInfo _peer;
 
-        public FailedJob(RouterInfo peer) {
-            super(StoreJob.this.getContext());
+        public FailedJob(RouterContext enclosingContext, RouterInfo peer) {
+            super(enclosingContext);
             _peer = peer;
         }
         public void runJob() {

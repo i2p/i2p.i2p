@@ -89,7 +89,7 @@ public class HandleTunnelCreateMessageJob extends JobImpl {
             boolean ok = getContext().tunnelManager().joinTunnel(info);
             sendReply(ok);
         } else {
-            getContext().netDb().lookupRouterInfo(info.getNextHop(), new TestJob(info), new JoinJob(info, false), TIMEOUT);
+            getContext().netDb().lookupRouterInfo(info.getNextHop(), new TestJob(getContext(), info), new JoinJob(getContext(), info, false), TIMEOUT);
         }
     }
     
@@ -105,8 +105,8 @@ public class HandleTunnelCreateMessageJob extends JobImpl {
     
     private class TestJob extends JobImpl {
         private TunnelInfo _target;
-        public TestJob(TunnelInfo target) {
-            super(HandleTunnelCreateMessageJob.this.getContext());
+        public TestJob(RouterContext enclosingContext, TunnelInfo target) {
+            super(enclosingContext);
             _target = target;
         }
 
@@ -121,8 +121,8 @@ public class HandleTunnelCreateMessageJob extends JobImpl {
                 if (_log.shouldLog(Log.INFO)) 
                     _log.info("Lookup successful for tested peer " + _target.toBase64() + ", now continue with the test");
                 Hash peer = TestJob.this.getContext().routerHash();
-                JoinJob success = new JoinJob(_target, true);
-                JoinJob failure = new JoinJob(_target, false);
+                JoinJob success = new JoinJob(getContext(), _target, true);
+                JoinJob failure = new JoinJob(getContext(), _target, false);
                 BuildTestMessageJob test = new BuildTestMessageJob(TestJob.this.getContext(), info, peer, success, failure, TIMEOUT, PRIORITY);
                 TestJob.this.getContext().jobQueue().addJob(test);
             }
@@ -240,8 +240,8 @@ public class HandleTunnelCreateMessageJob extends JobImpl {
     private class JoinJob extends JobImpl {
         private TunnelInfo _info;
         private boolean _isReachable;
-        public JoinJob(TunnelInfo info, boolean isReachable) {
-            super(HandleTunnelCreateMessageJob.this.getContext());
+        public JoinJob(RouterContext enclosingContext, TunnelInfo info, boolean isReachable) {
+            super(enclosingContext);
             _info = info;
             _isReachable = isReachable;
         }

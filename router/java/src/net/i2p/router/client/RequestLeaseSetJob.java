@@ -76,7 +76,7 @@ class RequestLeaseSetJob extends JobImpl {
         try {
             _runner.setLeaseRequest(state);
             _runner.doSend(msg);
-            getContext().jobQueue().addJob(new CheckLeaseRequestStatus(state));
+            getContext().jobQueue().addJob(new CheckLeaseRequestStatus(getContext(), state));
             return;
         } catch (I2CPMessageException ime) {
             _log.error("Error sending I2CP message requesting the lease set", ime);
@@ -96,8 +96,8 @@ class RequestLeaseSetJob extends JobImpl {
     private class CheckLeaseRequestStatus extends JobImpl {
         private LeaseRequestState _req;
         
-        public CheckLeaseRequestStatus(LeaseRequestState state) {
-            super(RequestLeaseSetJob.this.getContext());
+        public CheckLeaseRequestStatus(RouterContext enclosingContext, LeaseRequestState state) {
+            super(enclosingContext);
             _req = state;
             getTiming().setStartAfter(state.getExpiration());
         }

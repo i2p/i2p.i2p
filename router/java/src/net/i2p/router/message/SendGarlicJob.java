@@ -84,12 +84,12 @@ public class SendGarlicJob extends JobImpl {
         } else {
             _log.debug("Building the garlic was fast! " + (after - before) + " ms");
         }
-        getContext().jobQueue().addJob(new SendJob());
+        getContext().jobQueue().addJob(new SendJob(getContext()));
     }
     
     private class SendJob extends JobImpl {
-        public SendJob() {
-            super(SendGarlicJob.this.getContext());
+        public SendJob(RouterContext enclosingContext) {
+            super(enclosingContext);
         }
         public String getName() { return "Send Built Garlic Message"; }
         public void runJob() {

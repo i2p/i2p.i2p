@@ -235,10 +235,10 @@ public class I2PSocketManagerFull implements I2PSocketManager {
     public void setName(String name) { _name = name; }
     
     
-    public void addDisconnectListener(DisconnectListener lsnr) { 
+    public void addDisconnectListener(I2PSocketManager.DisconnectListener lsnr) { 
         _connectionManager.getMessageHandler().addDisconnectListener(lsnr);
     }
-    public void removeDisconnectListener(DisconnectListener lsnr) {
+    public void removeDisconnectListener(I2PSocketManager.DisconnectListener lsnr) {
         _connectionManager.getMessageHandler().removeDisconnectListener(lsnr);
     }
 }

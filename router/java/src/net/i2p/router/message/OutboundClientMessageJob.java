@@ -129,8 +129,8 @@ public class OutboundClientMessageJob extends JobImpl {
         
         _overallExpiration = timeoutMs + getContext().clock().now();
         _status = new OutboundClientMessageStatus(ctx, msg);
-        _nextStep = new NextStepJob();
-        _lookupLeaseSetFailed = new LookupLeaseSetFailedJob();
+        _nextStep = new NextStepJob(getContext());
+        _lookupLeaseSetFailed = new LookupLeaseSetFailedJob(getContext());
         _shouldBundle = getShouldBundle();
     }
     
@@ -207,7 +207,7 @@ public class OutboundClientMessageJob extends JobImpl {
                 getContext().netDb().fail(to); // so we don't just fetch what we have
                 getContext().netDb().lookupLeaseSet(to, _nextStep, _lookupLeaseSetFailed, remainingMs);
                 if (ls != null)
-                    getContext().jobQueue().addJob(new ShortCircuitSearchJob(ls));
+                    getContext().jobQueue().addJob(new ShortCircuitSearchJob(getContext(), ls));
                 return;
             } else {
                 if (_log.shouldLog(Log.WARN))
@@ -218,7 +218,7 @@ public class OutboundClientMessageJob extends JobImpl {
             }
         }
         
-        getContext().jobQueue().addJob(new SendJob(nextLease));
+        getContext().jobQueue().addJob(new SendJob(getContext(), nextLease));
     }
     
     private static final long MAX_SEARCH_INTERVAL = 10*1000;
@@ -229,8 +229,8 @@ public class OutboundClientMessageJob extends JobImpl {
      */
     private class ShortCircuitSearchJob extends JobImpl {
         private LeaseSet _ls;
-        public ShortCircuitSearchJob(LeaseSet ls) {
-            super(OutboundClientMessageJob.this.getContext());
+        public ShortCircuitSearchJob(RouterContext enclosingContext, LeaseSet ls) {
+            super(enclosingContext);
             _ls = ls;
             ShortCircuitSearchJob.this.getTiming().setStartAfter(getContext().clock().now() + MAX_SEARCH_INTERVAL);
         }
@@ -368,8 +368,8 @@ public class OutboundClientMessageJob extends JobImpl {
         
         _status.sent(lease.getRouterIdentity().getHash(), lease.getTunnelId());
         
-        SendSuccessJob onReply = new SendSuccessJob(lease, sessKey, tags);
-        SendTimeoutJob onFail = new SendTimeoutJob(lease);
+        SendSuccessJob onReply = new SendSuccessJob(getContext(), lease, sessKey, tags);
+        SendTimeoutJob onFail = new SendTimeoutJob(getContext(), lease);
         ReplySelector selector = new ReplySelector(token);
         
         if (_log.shouldLog(Log.DEBUG))
@@ -512,8 +512,8 @@ public class OutboundClientMessageJob extends JobImpl {
     
     /** queued by the db lookup success and the send timeout to get us to try the next lease */
     private class NextStepJob extends JobImpl {
-        public NextStepJob() {
-            super(OutboundClientMessageJob.this.getContext());
+        public NextStepJob(RouterContext enclosingContext) {
+            super(enclosingContext);
         }
         public String getName() { return "Process next step for outbound client message"; }
         public void runJob() { sendNext(); }
@@ -525,8 +525,8 @@ public class OutboundClientMessageJob extends JobImpl {
      *
      */
     private class LookupLeaseSetFailedJob extends JobImpl {
-        public LookupLeaseSetFailedJob()  {
-            super(OutboundClientMessageJob.this.getContext());
+        public LookupLeaseSetFailedJob(RouterContext enclosingContext)  {
+            super(enclosingContext);
         }
         public String getName() { return "Lookup for outbound client message failed"; }
         public void runJob() { 
@@ -538,8 +538,8 @@ public class OutboundClientMessageJob extends JobImpl {
     /** send a message to a lease */
     private class SendJob extends JobImpl {
         private Lease _lease;
-        public SendJob(Lease lease) { 
-            super(OutboundClientMessageJob.this.getContext());
+        public SendJob(RouterContext enclosingContext, Lease lease) { 
+            super(enclosingContext);
             _lease = lease;
         }
         public String getName() { return "Send outbound client message through the lease"; }
@@ -561,8 +561,8 @@ public class OutboundClientMessageJob extends JobImpl {
          * the given session key and bearing the specified tags are confirmed delivered.
          *
          */
-        public SendSuccessJob(Lease lease, SessionKey key, Set tags) {
-            super(OutboundClientMessageJob.this.getContext());
+        public SendSuccessJob(RouterContext enclosingContext, Lease lease, SessionKey key, Set tags) {
+            super(enclosingContext);
             _lease = lease;
             _key = key;
             _tags = tags;
@@ -615,8 +615,8 @@ public class OutboundClientMessageJob extends JobImpl {
     private class SendTimeoutJob extends JobImpl {
         private Lease _lease;
         
-        public SendTimeoutJob(Lease lease) {
-            super(OutboundClientMessageJob.this.getContext());
+        public SendTimeoutJob(RouterContext enclosingContext, Lease lease) {
+            super(enclosingContext);
             _lease = lease;
         }
         

@@ -175,7 +175,7 @@ public class RequestTunnelJob extends JobImpl {
         RequestState state = new RequestState(wrappedKey, wrappedTags, wrappedTo, 
                                               participant, inboundGateway, 
                                               outboundTunnel, target);
-        Request r = new Request(state);
+        Request r = new Request(getContext(), state);
         getContext().jobQueue().addJob(r);	
     }
     
@@ -188,8 +188,8 @@ public class RequestTunnelJob extends JobImpl {
      */
     public class Request extends JobImpl {
         private RequestState _state;
-        Request(RequestState state) {
-            super(RequestTunnelJob.this.getContext());
+        Request(RouterContext enclosingContext, RequestState state) {
+            super(enclosingContext);
             _state = state;
         }
         
@@ -260,8 +260,8 @@ public class RequestTunnelJob extends JobImpl {
                     _log.info("Sending tunnel create to " + _target.getIdentity().getHash().toBase64() +
                     " to inbound gateway " + _inboundGateway.getGateway().toBase64() +
                     " : " + _inboundGateway.getTunnelId().getTunnelId());
-                ReplyJob onReply = new Success(_participant, _wrappedKey, _wrappedTags, _wrappedTo, _inboundGateway.getTunnelId(), _outboundTunnel);
-                Job onFail = new Failure(_participant, _inboundGateway.getTunnelId(), _outboundTunnel);
+                ReplyJob onReply = new Success(getContext(), _participant, _wrappedKey, _wrappedTags, _wrappedTo, _inboundGateway.getTunnelId(), _outboundTunnel);
+                Job onFail = new Failure(getContext(), _participant, _inboundGateway.getTunnelId(), _outboundTunnel);
                 MessageSelector selector = new Selector(_participant);
                 SendTunnelMessageJob j = new SendTunnelMessageJob(getContext(), _garlicMessage, 
                                                                   _outboundTunnel, _target.getIdentity().getHash(), 
@@ -554,8 +554,8 @@ public class RequestTunnelJob extends JobImpl {
         private TunnelId _outboundTunnelId;
         private long _started;
         
-        public Success(TunnelInfo tunnel, SessionKey wrappedKey, Set wrappedTags, PublicKey wrappedTo, TunnelId replyTunnelId, TunnelId outboundTunnelId) {
-            super(RequestTunnelJob.this.getContext());
+        public Success(RouterContext enclosingContext, TunnelInfo tunnel, SessionKey wrappedKey, Set wrappedTags, PublicKey wrappedTo, TunnelId replyTunnelId, TunnelId outboundTunnelId) {
+            super(enclosingContext);
             _tunnel = tunnel;
             _messages = new LinkedList();
             _successCompleted = false;
@@ -651,8 +651,8 @@ public class RequestTunnelJob extends JobImpl {
         private TunnelId _outboundTunnelId;
         private TunnelId _replyTunnelId;
         private long _started;
-        public Failure(TunnelInfo tunnel, TunnelId replyTunnelId, TunnelId outboundTunnelId) {
-            super(RequestTunnelJob.this.getContext());
+        public Failure(RouterContext enclosingContext, TunnelInfo tunnel, TunnelId replyTunnelId, TunnelId outboundTunnelId) {
+            super(enclosingContext);
             _tunnel = tunnel;
             _replyTunnelId = replyTunnelId;
             _outboundTunnelId = outboundTunnelId;

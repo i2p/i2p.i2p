@@ -242,7 +242,7 @@ class ClientTunnelPoolManagerJob extends JobImpl {
      */
     private void requestCustomTunnels(int numTunnels) {
         for (int i = 0; i < numTunnels; i++) {
-            getContext().jobQueue().addJob(new RequestCustomTunnelJob());
+            getContext().jobQueue().addJob(new RequestCustomTunnelJob(getContext()));
         }
     }
     
@@ -252,8 +252,8 @@ class ClientTunnelPoolManagerJob extends JobImpl {
      *
      */
     private class RequestCustomTunnelJob extends JobImpl {
-        public RequestCustomTunnelJob() {
-            super(ClientTunnelPoolManagerJob.this.getContext());
+        public RequestCustomTunnelJob(RouterContext enclosingContext) {
+            super(enclosingContext);
         }
         public String getName() { return "Request Custom Client Tunnel"; }
         public void runJob() {

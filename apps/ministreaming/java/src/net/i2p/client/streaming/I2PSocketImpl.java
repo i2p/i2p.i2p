@@ -32,7 +32,7 @@ class I2PSocketImpl implements I2PSocket {
     private Object remoteIDWaiter = new Object();
     private I2PInputStream in;
     private I2POutputStream out;
-    private SocketErrorListener _socketErrorListener;
+    private I2PSocket.SocketErrorListener _socketErrorListener;
     private boolean outgoing;
     private long _socketId;
     private static long __socketId = 0;
@@ -284,7 +284,7 @@ class I2PSocketImpl implements I2PSocket {
         in.setReadTimeout(ms);
     }
     
-    public void setSocketErrorListener(SocketErrorListener lsnr) {
+    public void setSocketErrorListener(I2PSocket.SocketErrorListener lsnr) {
         _socketErrorListener = lsnr;
     }
     

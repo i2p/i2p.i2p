@@ -134,7 +134,7 @@ public class HandleTunnelMessageJob extends JobImpl {
                     _log.debug("We are the gateway to tunnel " + info.getTunnelId().getTunnelId());
                 byte data[] = _message.getData();
                 I2NPMessage msg = getBody(data);
-                getContext().jobQueue().addJob(new HandleGatewayMessageJob(msg, info, data.length));
+                getContext().jobQueue().addJob(new HandleGatewayMessageJob(getContext(), msg, info, data.length));
                 return;
             } else {
                 if (_log.shouldLog(Log.DEBUG))
@@ -158,7 +158,7 @@ public class HandleTunnelMessageJob extends JobImpl {
 
                 I2NPMessage body = getBody(_message.getData());
                 if (body != null) {
-                    getContext().jobQueue().addJob(new HandleLocallyJob(body, info));
+                    getContext().jobQueue().addJob(new HandleLocallyJob(getContext(), body, info));
                     return;
                 } else {
                     if (_log.shouldLog(Log.ERROR))
@@ -226,7 +226,7 @@ public class HandleTunnelMessageJob extends JobImpl {
             } else {
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("No more hops, unwrap and follow the instructions");
-                getContext().jobQueue().addJob(new HandleEndpointJob(info));
+                getContext().jobQueue().addJob(new HandleEndpointJob(getContext(), info));
                 return;
             }
         }
@@ -280,7 +280,7 @@ public class HandleTunnelMessageJob extends JobImpl {
                     _log.error("Unable to recover the body from the tunnel", getAddedBy());
                 return;
             } else {
-                getContext().jobQueue().addJob(new ProcessBodyLocallyJob(body, instructions, ourPlace));
+                getContext().jobQueue().addJob(new ProcessBodyLocallyJob(getContext(), body, instructions, ourPlace));
             }
         }
     }
@@ -545,8 +545,8 @@ public class HandleTunnelMessageJob extends JobImpl {
         private int _length;
         private TunnelInfo _info;
 
-        public HandleGatewayMessageJob(I2NPMessage body, TunnelInfo tunnel, int length) {
-            super(HandleTunnelMessageJob.this.getContext());
+        public HandleGatewayMessageJob(RouterContext enclosingContext, I2NPMessage body, TunnelInfo tunnel, int length) {
+            super(enclosingContext);
             _body = body;
             _length = length;
             _info = tunnel;
@@ -587,8 +587,8 @@ public class HandleTunnelMessageJob extends JobImpl {
         private I2NPMessage _body;
         private TunnelInfo _info;
 	
-        public HandleLocallyJob(I2NPMessage body, TunnelInfo tunnel) {
-            super(HandleTunnelMessageJob.this.getContext());
+        public HandleLocallyJob(RouterContext enclosingContext, I2NPMessage body, TunnelInfo tunnel) {
+            super(enclosingContext);
             _body = body;
             _info = tunnel;
         }
@@ -622,8 +622,8 @@ public class HandleTunnelMessageJob extends JobImpl {
     /** we're the endpoint of the inbound tunnel */
     private class HandleEndpointJob extends JobImpl {
         private TunnelInfo _info;
-        public HandleEndpointJob(TunnelInfo info) {
-            super(HandleTunnelMessageJob.this.getContext());
+        public HandleEndpointJob(RouterContext enclosingContext, TunnelInfo info) {
+            super(enclosingContext);
             _info = info;
         }
         public void runJob() {
@@ -637,8 +637,8 @@ public class HandleTunnelMessageJob extends JobImpl {
         private I2NPMessage _body;
         private TunnelInfo _ourPlace;
         private DeliveryInstructions _instructions;
-        public ProcessBodyLocallyJob(I2NPMessage body, DeliveryInstructions instructions, TunnelInfo ourPlace) {
-            super(HandleTunnelMessageJob.this.getContext());
+        public ProcessBodyLocallyJob(RouterContext enclosingContext, I2NPMessage body, DeliveryInstructions instructions, TunnelInfo ourPlace) {
+            super(enclosingContext);
             _body = body;
             _instructions = instructions;
             _ourPlace = ourPlace;

@@ -157,7 +157,7 @@ class TestTunnelJob extends JobImpl {
         Hash us = getContext().routerHash();
         _secondaryId = getReplyTunnel();
         if (_secondaryId == null) {
-            getContext().jobQueue().addJob(new TestFailedJob());
+            getContext().jobQueue().addJob(new TestFailedJob(getContext()));
             return;
         }
         
@@ -165,9 +165,9 @@ class TestTunnelJob extends JobImpl {
         inboundInfo.setLastTested(getContext().clock().now());
 
         long timeout = getTunnelTestTimeout();
-        TestFailedJob failureJob = new TestFailedJob();
+        TestFailedJob failureJob = new TestFailedJob(getContext());
         MessageSelector selector = new TestMessageSelector(msg.getMessageId(), info.getTunnelId().getTunnelId(), timeout);
-        SendTunnelMessageJob testJob = new SendTunnelMessageJob(getContext(), msg, info.getTunnelId(), us, _secondaryId, null, new TestSuccessfulJob(timeout), failureJob, selector, timeout, TEST_PRIORITY);
+        SendTunnelMessageJob testJob = new SendTunnelMessageJob(getContext(), msg, info.getTunnelId(), us, _secondaryId, null, new TestSuccessfulJob(getContext(), timeout), failureJob, selector, timeout, TEST_PRIORITY);
         getContext().jobQueue().addJob(testJob);
     }
 
@@ -183,7 +183,7 @@ class TestTunnelJob extends JobImpl {
         
         _secondaryId = getOutboundTunnel();
         if (_secondaryId == null) {
-            getContext().jobQueue().addJob(new TestFailedJob());
+            getContext().jobQueue().addJob(new TestFailedJob(getContext()));
             return;
         }
         
@@ -191,9 +191,9 @@ class TestTunnelJob extends JobImpl {
         outboundInfo.setLastTested(getContext().clock().now());
         
         long timeout = getTunnelTestTimeout();
-        TestFailedJob failureJob = new TestFailedJob();
+        TestFailedJob failureJob = new TestFailedJob(getContext());
         MessageSelector selector = new TestMessageSelector(msg.getMessageId(), info.getTunnelId().getTunnelId(), timeout);
-        SendTunnelMessageJob j = new SendTunnelMessageJob(getContext(), msg, _secondaryId, info.getThisHop(), info.getTunnelId(), null, new TestSuccessfulJob(timeout), failureJob, selector, timeout, TEST_PRIORITY);
+        SendTunnelMessageJob j = new SendTunnelMessageJob(getContext(), msg, _secondaryId, info.getThisHop(), info.getTunnelId(), null, new TestSuccessfulJob(getContext(), timeout), failureJob, selector, timeout, TEST_PRIORITY);
         getContext().jobQueue().addJob(j);
     }
     
@@ -254,8 +254,8 @@ class TestTunnelJob extends JobImpl {
     }
     
     private class TestFailedJob extends JobImpl {
-        public TestFailedJob() {
-            super(TestTunnelJob.this.getContext());
+        public TestFailedJob(RouterContext enclosingContext) {
+            super(enclosingContext);
         }
         
         public String getName() { return "Tunnel Test Failed"; }
@@ -278,8 +278,8 @@ class TestTunnelJob extends JobImpl {
     private class TestSuccessfulJob extends JobImpl implements ReplyJob {
         private DeliveryStatusMessage _msg;
         private long _timeout;
-        public TestSuccessfulJob(long timeout) {
-            super(TestTunnelJob.this.getContext());
+        public TestSuccessfulJob(RouterContext enclosingContext, long timeout) {
+            super(enclosingContext);
             _msg = null;
             _timeout = timeout;
         }

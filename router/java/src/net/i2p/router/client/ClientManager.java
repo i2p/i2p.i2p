@@ -42,21 +42,21 @@ public class ClientManager {
     private ClientListenerRunner _listener;
     private HashMap _runners;        // Destination --> ClientConnectionRunner
     private Set _pendingRunners; // ClientConnectionRunner for clients w/out a Dest yet
-    private RouterContext _context;
+    private RouterContext _ctx;
 
     /** ms to wait before rechecking for inbound messages to deliver to clients */
     private final static int INBOUND_POLL_INTERVAL = 300;
     
     public ClientManager(RouterContext context, int port) {
-        _context = context;
+        _ctx = context;
         _log = context.logManager().getLog(ClientManager.class);
-        _context.statManager().createRateStat("client.receiveMessageSize", 
+        _ctx.statManager().createRateStat("client.receiveMessageSize", 
                                               "How large are messages received by the client?", 
                                               "ClientMessages", 
                                               new long[] { 60*1000l, 60*60*1000l, 24*60*60*1000l });
         _runners = new HashMap();
         _pendingRunners = new HashSet();
-        _listener = new ClientListenerRunner(_context, this, port);
+        _listener = new ClientListenerRunner(_ctx, this, port);
         Thread t = new I2PThread(_listener);
         t.setName("ClientListener:" + port);
         t.setDaemon(true);
@@ -70,7 +70,7 @@ public class ClientManager {
         try { Thread.sleep(2*1000); } catch (InterruptedException ie) {}
         
         int port = ClientManagerFacadeImpl.DEFAULT_PORT;
-        String portStr = _context.router().getConfigSetting(ClientManagerFacadeImpl.PROP_CLIENT_PORT);
+        String portStr = _ctx.router().getConfigSetting(ClientManagerFacadeImpl.PROP_CLIENT_PORT);
         if (portStr != null) {
             try {
                 port = Integer.parseInt(portStr);
@@ -78,7 +78,7 @@ public class ClientManager {
                 _log.error("Error setting the port: " + portStr + " is not valid", nfe);
             }
         } 
-        _listener = new ClientListenerRunner(_context, this, port);
+        _listener = new ClientListenerRunner(_ctx, this, port);
         Thread t = new I2PThread(_listener);
         t.setName("ClientListener:" + port);
         t.setDaemon(true);
@@ -150,7 +150,7 @@ public class ClientManager {
                 // sender went away
                 return;
             }
-            _context.jobQueue().addJob(new DistributeLocal(toDest, runner, sender, fromDest, payload, msgId));
+            _ctx.jobQueue().addJob(new DistributeLocal(toDest, runner, sender, fromDest, payload, msgId));
         } else {
             // remote.  w00t
             if (_log.shouldLog(Log.DEBUG))
@@ -167,7 +167,7 @@ public class ClientManager {
             msg.setSenderConfig(runner.getConfig());
             msg.setFromDestination(runner.getConfig().getDestination());
             msg.setMessageId(msgId);
-            _context.clientMessagePool().add(msg, true);
+            _ctx.clientMessagePool().add(msg, true);
         }
     }
     
@@ -180,7 +180,7 @@ public class ClientManager {
         private MessageId _msgId;
         
         public DistributeLocal(Destination toDest, ClientConnectionRunner to, ClientConnectionRunner from, Destination fromDest, Payload payload, MessageId id) {
-            super(_context);
+            super(_ctx);
             _toDest = toDest;
             _to = to;
             _from = from;
@@ -217,22 +217,22 @@ public class ClientManager {
             if (_log.shouldLog(Log.ERROR))
                 _log.warn("Cannot request the lease set, as we can't find a client runner for " 
                           + dest.calculateHash().toBase64() + ".  disconnected?");
-            _context.jobQueue().addJob(onFailedJob);
+            _ctx.jobQueue().addJob(onFailedJob);
         } else {
-            runner.requestLeaseSet(set, _context.clock().now() + timeout, onCreateJob, onFailedJob);
+            runner.requestLeaseSet(set, _ctx.clock().now() + timeout, onCreateJob, onFailedJob);
         }
     }
     
     
     public boolean isLocal(Destination dest) { 
         boolean rv = false;
-        long beforeLock = _context.clock().now();
+        long beforeLock = _ctx.clock().now();
         long inLock = 0;
         synchronized (_runners) {
-            inLock = _context.clock().now();
+            inLock = _ctx.clock().now();
             rv = _runners.containsKey(dest);
         }
-        long afterLock = _context.clock().now();
+        long afterLock = _ctx.clock().now();
 
         if (afterLock - beforeLock > 50) {
             _log.warn("isLocal(Destination).locking took too long: " + (afterLock-beforeLock)
@@ -243,13 +243,13 @@ public class ClientManager {
     public boolean isLocal(Hash destHash) { 
         if (destHash == null) return false;
         Set dests = new HashSet();
-        long beforeLock = _context.clock().now();
+        long beforeLock = _ctx.clock().now();
         long inLock = 0;
         synchronized (_runners) {
-            inLock = _context.clock().now();
+            inLock = _ctx.clock().now();
             dests.addAll(_runners.keySet());
         }
-        long afterLock = _context.clock().now();
+        long afterLock = _ctx.clock().now();
         if (afterLock - beforeLock > 50) {
             _log.warn("isLocal(Hash).locking took too long: " + (afterLock-beforeLock)
                       + " overall, synchronized took " + (inLock - beforeLock));
@@ -263,13 +263,13 @@ public class ClientManager {
     
     ClientConnectionRunner getRunner(Destination dest) {
         ClientConnectionRunner rv = null;
-        long beforeLock = _context.clock().now();
+        long beforeLock = _ctx.clock().now();
         long inLock = 0;
         synchronized (_runners) {
-            inLock = _context.clock().now();
+            inLock = _ctx.clock().now();
             rv = (ClientConnectionRunner)_runners.get(dest);
         }
-        long afterLock = _context.clock().now();
+        long afterLock = _ctx.clock().now();
         if (afterLock - beforeLock > 50) {
             _log.warn("getRunner(Dest).locking took too long: " + (afterLock-beforeLock)
                       + " overall, synchronized took " + (inLock - beforeLock));
@@ -293,13 +293,13 @@ public class ClientManager {
         if (destHash == null) 
             return null;
         Set dests = new HashSet();
-        long beforeLock = _context.clock().now();
+        long beforeLock = _ctx.clock().now();
         long inLock = 0;
         synchronized (_runners) {
-            inLock = _context.clock().now();
+            inLock = _ctx.clock().now();
             dests.addAll(_runners.keySet());
         }
-        long afterLock = _context.clock().now();
+        long afterLock = _ctx.clock().now();
         if (afterLock - beforeLock > 50) {
             _log.warn("getRunner(Hash).locking took too long: " + (afterLock-beforeLock)
                       + " overall, synchronized took " + (inLock - beforeLock));
@@ -329,13 +329,13 @@ public class ClientManager {
     
     Set getRunnerDestinations() {
         Set dests = new HashSet();
-        long beforeLock = _context.clock().now();
+        long beforeLock = _ctx.clock().now();
         long inLock = 0;
         synchronized (_runners) {
-            inLock = _context.clock().now();
+            inLock = _ctx.clock().now();
             dests.addAll(_runners.keySet());
         }
-        long afterLock = _context.clock().now();
+        long afterLock = _ctx.clock().now();
         if (afterLock - beforeLock > 50) {
             _log.warn("getRunnerDestinations().locking took too long: " + (afterLock-beforeLock)
                       + " overall, synchronized took " + (inLock - beforeLock));
@@ -375,7 +375,7 @@ public class ClientManager {
             if (ls == null) {
                 buf.append("<font color=\"red\"><i>No lease</i></font><br />\n");
             } else { 
-                long leaseAge = ls.getEarliestLeaseDate() - _context.clock().now();
+                long leaseAge = ls.getEarliestLeaseDate() - _ctx.clock().now();
                 if (leaseAge <= 0) { 
                     buf.append("<font color=\"red\"><i>Lease expired ");
                     buf.append(DataHelper.formatDuration(0-leaseAge)).append(" ago</i></font><br />\n");
@@ -385,7 +385,7 @@ public class ClientManager {
                         buf.append("<font color=\"red\"><i>No tunnels</i></font><br />\n");
                     } else {
                         TunnelId id = ls.getLease(0).getTunnelId();
-                        TunnelInfo info = _context.tunnelManager().getTunnelInfo(id);
+                        TunnelInfo info = _ctx.tunnelManager().getTunnelInfo(id);
                         if (info == null) {
                             buf.append("<font color=\"red\"><i>Failed tunnels</i></font><br />\n");
                         } else {
@@ -408,13 +408,13 @@ public class ClientManager {
     }
     
     public void messageReceived(ClientMessage msg) {
-        _context.jobQueue().addJob(new HandleJob(msg));
+        _ctx.jobQueue().addJob(new HandleJob(msg));
     }
 
     private class HandleJob extends JobImpl {
         private ClientMessage _msg;
         public HandleJob(ClientMessage msg) {
-            super(_context);
+            super(_ctx);
             _msg = msg;
         }
         public String getName() { return "Handle Inbound Client Messages"; }
@@ -426,7 +426,7 @@ public class ClientManager {
                 runner = getRunner(_msg.getDestinationHash());
 
             if (runner != null) {
-                _context.statManager().addRateData("client.receiveMessageSize", 
+                _ctx.statManager().addRateData("client.receiveMessageSize", 
                                                    _msg.getPayload().getSize(), 0);
                 runner.receiveMessage(_msg.getDestination(), null, _msg.getPayload());
             } else {

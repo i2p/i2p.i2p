@@ -164,7 +164,7 @@ class ClientLeaseSetManagerJob extends JobImpl {
     private void requestNewLeaseSet() {
         LeaseSet proposed = buildNewLeaseSet();
         getContext().clientManager().requestLeaseSet(_pool.getDestination(), proposed, 
-                                                 REQUEST_LEASE_TIMEOUT, new LeaseSetCreatedJob(), 
+                                                 REQUEST_LEASE_TIMEOUT, new LeaseSetCreatedJob(getContext()), 
                                                  null);
     }
     
@@ -213,8 +213,8 @@ class ClientLeaseSetManagerJob extends JobImpl {
     }
     
     private class LeaseSetCreatedJob extends JobImpl {
-        public LeaseSetCreatedJob() {
-            super(ClientLeaseSetManagerJob.this.getContext());
+        public LeaseSetCreatedJob(RouterContext enclosingContext) {
+            super(enclosingContext);
         }
         public String getName() { return "LeaseSet created"; }
         public void runJob() { 

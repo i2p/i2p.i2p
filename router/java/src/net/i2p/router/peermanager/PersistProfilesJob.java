@@ -24,14 +24,14 @@ class PersistProfilesJob extends JobImpl {
         int i = 0;
         for (Iterator iter = peers.iterator(); iter.hasNext(); )
             hashes[i] = (Hash)iter.next();
-        getContext().jobQueue().addJob(new PersistProfileJob(hashes));
+        getContext().jobQueue().addJob(new PersistProfileJob(getContext(), hashes));
     }
     
     private class PersistProfileJob extends JobImpl {
         private Hash _peers[];
         private int _cur;
-        public PersistProfileJob(Hash peers[]) {
-            super(PersistProfilesJob.this.getContext());
+        public PersistProfileJob(RouterContext enclosingContext, Hash peers[]) {
+            super(enclosingContext);
             _peers = peers;
             _cur = 0;
         }

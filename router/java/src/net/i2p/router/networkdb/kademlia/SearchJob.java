@@ -218,7 +218,7 @@ class SearchJob extends JobImpl {
     }
     private void requeuePending(long ms) {
         if (_pendingRequeueJob == null)
-            _pendingRequeueJob = new RequeuePending();
+            _pendingRequeueJob = new RequeuePending(getContext());
         long now = getContext().clock().now();
         if (_pendingRequeueJob.getTiming().getStartAfter() < now)
             _pendingRequeueJob.getTiming().setStartAfter(now+ms);
@@ -226,8 +226,8 @@ class SearchJob extends JobImpl {
     }
 
     private class RequeuePending extends JobImpl {
-        public RequeuePending() {
-            super(SearchJob.this.getContext());
+        public RequeuePending(RouterContext enclosingContext) {
+            super(enclosingContext);
         }
         public String getName() { return "Requeue search with pending"; }
         public void runJob() { searchNext(); }
@@ -279,7 +279,7 @@ class SearchJob extends JobImpl {
         TunnelId inTunnelId = getInboundTunnelId(); 
         if (inTunnelId == null) {
             _log.error("No tunnels to get search replies through!  wtf!");
-            getContext().jobQueue().addJob(new FailedJob(router));
+            getContext().jobQueue().addJob(new FailedJob(getContext(), router));
             return;
         }
 	
@@ -287,7 +287,7 @@ class SearchJob extends JobImpl {
         RouterInfo inGateway = getContext().netDb().lookupRouterInfoLocally(inTunnel.getThisHop());
         if (inGateway == null) {
             _log.error("We can't find the gateway to our inbound tunnel?! wtf");
-            getContext().jobQueue().addJob(new FailedJob(router));
+            getContext().jobQueue().addJob(new FailedJob(getContext(), router));
             return;
         }
 	
@@ -298,7 +298,7 @@ class SearchJob extends JobImpl {
         TunnelId outTunnelId = getOutboundTunnelId();
         if (outTunnelId == null) {
             _log.error("No tunnels to send search out through!  wtf!");
-            getContext().jobQueue().addJob(new FailedJob(router));
+            getContext().jobQueue().addJob(new FailedJob(getContext(), router));
             return;
         }
 	
@@ -311,7 +311,7 @@ class SearchJob extends JobImpl {
         SearchMessageSelector sel = new SearchMessageSelector(getContext(), router, _expiration, _state);
         SearchUpdateReplyFoundJob reply = new SearchUpdateReplyFoundJob(getContext(), router, _state, _facade, this);
         SendTunnelMessageJob j = new SendTunnelMessageJob(getContext(), msg, outTunnelId, router.getIdentity().getHash(), 
-                                                          null, null, reply, new FailedJob(router), sel, 
+                                                          null, null, reply, new FailedJob(getContext(), router), sel, 
                                                           PER_PEER_TIMEOUT, SEARCH_PRIORITY);
         getContext().jobQueue().addJob(j);
     }
@@ -329,7 +329,7 @@ class SearchJob extends JobImpl {
         SearchMessageSelector sel = new SearchMessageSelector(getContext(), router, _expiration, _state);
         SearchUpdateReplyFoundJob reply = new SearchUpdateReplyFoundJob(getContext(), router, _state, _facade, this);
         SendMessageDirectJob j = new SendMessageDirectJob(getContext(), msg, router.getIdentity().getHash(), 
-                                                          reply, new FailedJob(router), sel, PER_PEER_TIMEOUT, SEARCH_PRIORITY);
+                                                          reply, new FailedJob(getContext(), router), sel, PER_PEER_TIMEOUT, SEARCH_PRIORITY);
         getContext().jobQueue().addJob(j);
     }
     
@@ -401,7 +401,7 @@ class SearchJob extends JobImpl {
     void replyFound(DatabaseSearchReplyMessage message, Hash peer) {
         long duration = _state.replyFound(peer);
         // this processing can take a while, so split 'er up
-        getContext().jobQueue().addJob(new SearchReplyJob((DatabaseSearchReplyMessage)message, peer, duration));
+        getContext().jobQueue().addJob(new SearchReplyJob(getContext(), (DatabaseSearchReplyMessage)message, peer, duration));
     }
     
     /**
@@ -432,8 +432,8 @@ class SearchJob extends JobImpl {
         private int _duplicatePeers;
         private int _repliesPendingVerification;
         private long _duration;
-        public SearchReplyJob(DatabaseSearchReplyMessage message, Hash peer, long duration) {
-            super(SearchJob.this.getContext());
+        public SearchReplyJob(RouterContext enclosingContext, DatabaseSearchReplyMessage message, Hash peer, long duration) {
+            super(enclosingContext);
             _msg = message;
             _peer = peer;
             _curIndex = 0;
@@ -468,7 +468,7 @@ class SearchJob extends JobImpl {
                     
                     boolean sendsBadInfo = getContext().profileOrganizer().peerSendsBadReplies(_peer);
                     if (!sendsBadInfo) {
-                        getContext().netDb().lookupRouterInfo(peer, new ReplyVerifiedJob(peer), new ReplyNotVerifiedJob(peer), _timeoutMs);
+                        getContext().netDb().lookupRouterInfo(peer, new ReplyVerifiedJob(getContext(), peer), new ReplyNotVerifiedJob(getContext(), peer), _timeoutMs);
                         _repliesPendingVerification++;
                     } else {
                         if (_log.shouldLog(Log.WARN))
@@ -496,8 +496,8 @@ class SearchJob extends JobImpl {
         /** the peer gave us a reference to a new router, and we were able to fetch it */
         private final class ReplyVerifiedJob extends JobImpl {
             private Hash _key;
-            public ReplyVerifiedJob(Hash key) {
-                super(SearchReplyJob.this.getContext());
+            public ReplyVerifiedJob(RouterContext enclosingContext, Hash key) {
+                super(enclosingContext);
                 _key = key;
             }
             public String getName() { return "Search reply value verified"; }
@@ -511,8 +511,8 @@ class SearchJob extends JobImpl {
         /** the peer gave us a reference to a new router, and we were NOT able to fetch it */
         private final class ReplyNotVerifiedJob extends JobImpl {
             private Hash _key;
-            public ReplyNotVerifiedJob(Hash key) {
-                super(SearchReplyJob.this.getContext());
+            public ReplyNotVerifiedJob(RouterContext enclosingContext, Hash key) {
+                super(enclosingContext);
                 _key = key;
             }
             public String getName() { return "Search reply value NOT verified"; }
@@ -534,16 +534,16 @@ class SearchJob extends JobImpl {
     protected class FailedJob extends JobImpl {
         private Hash _peer;
         private boolean _penalizePeer;
-        public FailedJob(RouterInfo peer) {
-            this(peer, true);
+        public FailedJob(RouterContext enclosingContext, RouterInfo peer) {
+            this(enclosingContext, peer, true);
         }
         /**
          * Allow the choice as to whether failed searches should count against
          * the peer (such as if we search for a random key)
          *
          */
-        public FailedJob(RouterInfo peer, boolean penalizePeer) {
-            super(SearchJob.this.getContext());
+        public FailedJob(RouterContext enclosingContext, RouterInfo peer, boolean penalizePeer) {
+            super(enclosingContext);
             _penalizePeer = penalizePeer;
             _peer = peer.getIdentity().getHash();
         }

@@ -1,4 +1,9 @@
-$Id: history.txt,v 1.132 2005/01/23 03:22:11 jrandom Exp $
+$Id: history.txt,v 1.133 2005/01/24 17:42:05 smeghead Exp $
+
+2005-01-25  smeghead
+    * Tweaked some classes to enable gcj 3.4.3 to compile the router and
+      supporting apps (except for the routerconsole which is still being
+      investigated).
 
 2005-01-24  smeghead
     * C#-ification of sam-sharp: interface greatly simplified using delegates

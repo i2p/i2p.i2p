@@ -62,7 +62,7 @@ class LoadClientAppsJob extends JobImpl {
                 runClient(className, clientName, argVal);
             } else {
                 // wait before firing it up
-                getContext().jobQueue().addJob(new DelayedRunClient(className, clientName, argVal, delay));
+                getContext().jobQueue().addJob(new DelayedRunClient(getContext(), className, clientName, argVal, delay));
             }
             i++;
         }
@@ -90,8 +90,8 @@ class LoadClientAppsJob extends JobImpl {
         private String _className;
         private String _clientName;
         private String _args[];
-        public DelayedRunClient(String className, String clientName, String args[], long delay) {
-            super(LoadClientAppsJob.this.getContext());
+        public DelayedRunClient(RouterContext enclosingContext, String className, String clientName, String args[], long delay) {
+            super(enclosingContext);
             _className = className;
             _clientName = clientName;
             _args = args;

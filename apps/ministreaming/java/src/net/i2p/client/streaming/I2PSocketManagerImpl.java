@@ -119,7 +119,7 @@ class I2PSocketManagerImpl implements I2PSocketManager, I2PSessionListener {
             _listeners.clear();
         }
         for (int i = 0; i < listeners.size(); i++) {
-            DisconnectListener lsnr = (DisconnectListener)listeners.get(i);
+            I2PSocketManager.DisconnectListener lsnr = (I2PSocketManager.DisconnectListener)listeners.get(i);
             lsnr.sessionDisconnected();
         }
     }
@@ -720,12 +720,12 @@ class I2PSocketManagerImpl implements I2PSocketManager, I2PSessionListener {
     public String getName() { return _name; }
     public void setName(String name) { _name = name; }
     
-    public void addDisconnectListener(DisconnectListener lsnr) { 
+    public void addDisconnectListener(I2PSocketManager.DisconnectListener lsnr) { 
         synchronized (_listeners) {
             _listeners.add(lsnr);
         }
     }
-    public void removeDisconnectListener(DisconnectListener lsnr) {
+    public void removeDisconnectListener(I2PSocketManager.DisconnectListener lsnr) {
         synchronized (_listeners) {
             _listeners.remove(lsnr);
         }

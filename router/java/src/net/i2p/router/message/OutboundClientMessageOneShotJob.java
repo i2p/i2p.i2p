@@ -149,7 +149,7 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
         long timeoutMs = _overallExpiration - getContext().clock().now();
         if (_log.shouldLog(Log.DEBUG))
             _log.debug(getJobId() + ": Send outbound client message - sending off leaseSet lookup job");
-        getContext().netDb().lookupLeaseSet(_to.calculateHash(), new SendJob(), new LookupLeaseSetFailedJob(), timeoutMs);
+        getContext().netDb().lookupLeaseSet(_to.calculateHash(), new SendJob(getContext()), new LookupLeaseSetFailedJob(getContext()), timeoutMs);
     }
     
     private boolean getShouldBundle() {
@@ -177,8 +177,8 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
     
     /** send a message to a random lease */
     private class SendJob extends JobImpl {
-        public SendJob() { 
-            super(OutboundClientMessageOneShotJob.this.getContext());
+        public SendJob(RouterContext enclosingContext) { 
+            super(enclosingContext);
         }
         public String getName() { return "Send outbound client message through the lease"; }
         public void runJob() {
@@ -251,8 +251,8 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
      *
      */
     private class LookupLeaseSetFailedJob extends JobImpl {
-        public LookupLeaseSetFailedJob()  {
-            super(OutboundClientMessageOneShotJob.this.getContext());
+        public LookupLeaseSetFailedJob(RouterContext enclosingContext)  {
+            super(enclosingContext);
         }
         public String getName() { return "Lookup for outbound client message failed"; }
         public void runJob() { 
@@ -289,8 +289,8 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug(getJobId() + ": send() - token expected " + token);
         
-        SendSuccessJob onReply = new SendSuccessJob(sessKey, tags);
-        SendTimeoutJob onFail = new SendTimeoutJob();
+        SendSuccessJob onReply = new SendSuccessJob(getContext(), sessKey, tags);
+        SendTimeoutJob onFail = new SendTimeoutJob(getContext());
         ReplySelector selector = new ReplySelector(token);
         
         if (_log.shouldLog(Log.DEBUG))
@@ -433,8 +433,8 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
          * the given session key and bearing the specified tags are confirmed delivered.
          *
          */
-        public SendSuccessJob(SessionKey key, Set tags) {
-            super(OutboundClientMessageOneShotJob.this.getContext());
+        public SendSuccessJob(RouterContext enclosingContext, SessionKey key, Set tags) {
+            super(enclosingContext);
             _key = key;
             _tags = tags;
         }
@@ -473,8 +473,8 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
      *
      */
     private class SendTimeoutJob extends JobImpl {
-        public SendTimeoutJob() {
-            super(OutboundClientMessageOneShotJob.this.getContext());
+        public SendTimeoutJob(RouterContext enclosingContext) {
+            super(enclosingContext);
         }
         
         public String getName() { return "Send client message timed out through a lease"; }
