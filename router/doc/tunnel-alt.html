@@ -1,4 +1,4 @@
-<code>$Id: tunnel-alt.html,v 1.3 2005/01/18 11:21:12 jrandom Exp $</code>
+<code>$Id: tunnel-alt.html,v 1.4 2005/01/19 01:24:25 jrandom Exp $</code>
 <pre>
 1) <a href="#tunnel.overview">Tunnel overview</a>
 2) <a href="#tunnel.operation">Tunnel operation</a>
@@ -8,10 +8,11 @@
 2.4) <a href="#tunnel.endpoint">Endpoint processing</a>
 2.5) <a href="#tunnel.padding">Padding</a>
 2.6) <a href="#tunnel.fragmentation">Tunnel fragmentation</a>
-2.7) <a href="#tunnel.prng">PRNG pairs</a>
-2.8) <a href="#tunnel.alternatives">Alternatives</a>
-2.8.1) <a href="#tunnel.reroute">Adjust tunnel processing midstream</a>
-2.8.2) <a href="#tunnel.bidirectional">Use bidirectional tunnels</a>
+2.7) <a href="#tunnel.alternatives">Alternatives</a>
+2.7.1) <a href="#tunnel.reroute">Adjust tunnel processing midstream</a>
+2.7.2) <a href="#tunnel.bidirectional">Use bidirectional tunnels</a>
+2.7.3) <a href="#tunnel.backchannel">Backchannel communication</a>
+2.7.4) <a href="#tunnel.variablesize">Variable size tunnel messages</a>
 3) <a href="#tunnel.building">Tunnel building</a>
 3.1) <a href="#tunnel.peerselection">Peer selection</a>
 3.1.1) <a href="#tunnel.selection.exploratory">Exploratory tunnel peer selection</a>
@@ -51,9 +52,7 @@ proof-of-work requests to add on additional steps.  It is the intent to make
 it hard for either participants or third parties to determine the length of 
 a tunnel, or even for colluding participants to determine whether they are a
 part of the same tunnel at all (barring the situation where colluding peers are
-next to each other in the tunnel).  A pair of synchronized PRNGs are used at 
-each hop in the tunnel to validate incoming messages and prevent abuse through
-loops.</p>
+next to each other in the tunnel).</p>
 
 <p>Beyond their length, there are additional configurable parameters
 for each tunnel that can be used, such as a throttle on the frequency of 
@@ -82,15 +81,16 @@ peers in the tunnel.  First, the tunnel gateway accumulates a number
 of tunnel messages and preprocesses them into something for tunnel
 delivery.  Next, that gateway encrypts that preprocessed data, then
 forwards it to the first hop.  That peer, and subsequent tunnel 
-participants, unwrap a layer of the encryption, verifying the 
-integrity of the message, then forward it on to the next peer.  
+participants, unwrap a layer of the encryption, verifying that it isn't
+a duplicate, then forward it on to the next peer.  
 Eventually, the message arrives at the endpoint where the messages
 bundled by the gateway are split out again and forwarded on as 
 requested.</p>
 
 <p>Tunnel IDs are 4 byte numbers used at each hop - participants know what
 tunnel ID to listen for messages with and what tunnel ID they should be forwarded
-on as to the next hop.  Tunnels themselves are short lived (10 minutes at the 
+on as to the next hop, and each hop chooses the tunnel ID which they receive messages
+on.  Tunnels themselves are short lived (10 minutes at the 
 moment), but depending upon the tunnel's purpose, and though subsequent tunnels 
 may be built using the same sequence of peers, each hop's tunnel ID will change.</p>
 
@@ -141,8 +141,7 @@ preprocessed payload must be padded to a multiple of 16 bytes.</p>
 
 <p>After the preprocessing of messages into a padded payload, the gateway builds
 a random 16 byte preIV value, iteratively encrypting it and the tunnel message as
-necessary, selects the next message ID from its outbound PRNG, and forwards the tuple 
-{tunnelID, messageID, preIV, encrypted tunnel message} to the next hop.</p>
+necessary, and forwards the tuple {tunnelID, preIV, encrypted tunnel message} to the next hop.</p>
 
 <p>How encryption at the gateway is done depends on whether the tunnel is an
 inbound or an outbound tunnel.  For inbound tunnels, they simply select a random
@@ -153,28 +152,23 @@ data with the layer keys for all hops in the tunnel.  The result of the outbound
 tunnel encryption is that when each peer encrypts it, the endpoint will recover 
 the initial preprocessed data.</p>
 
-<p>The preIV postprocessing should be a secure transform of the received value 
-with sufficient expansion to provide the full 16 byte IV necessary for AES256.  
-<i>What transform should be used - E(preIV, layerIVKey), where
-we deliver an additional postprocessing layer key to each peer during the 
-<a href="#tunnel.request">tunnel creation</a> to reduce the potential exposure
-of the layerKey?</i></p>
+<p>The preIV postprocessing should be a secure invertible transform of the received value 
+capable of providing the full 16 byte IV necessary for AES256.  At the moment, the
+plan is to use AES256 against the received preIV using that layer's IV key (a seperate
+session key delivered to the tunnel participant by the creator).</p>
 
 <h3>2.3) <a name="tunnel.participant">Participant processing</a></h3>
 
-<p>When a peer receives a tunnel message, it checks the inbound PRNG for that
-tunnel, verifying that the message ID specified is one of the next available IDs,
-thereby removing it from the PRNG and moving the window.  If the message ID is
-not one of the available IDs, it is dropped.  The participant then postprocesses
+<p>When a peer receives a tunnel message, it checks that the message came from
+the same previous hop as before (initialized when the first message comes through
+the tunnel).  If the previous peer is a different router, the message is dropped.
+The participant then postprocesses
 and updates the preIV received to determine the current hop's IV, using that 
-with the layer key to encrypt the tunnel message.  They then select the next 
-selects the next message ID from its outbound PRNG, forwarding the tuple 
-{nextTunnelID, nextMessageID, nextPreIV, encrypted tunnel message} to the next hop.</p>
-
-<p>Each participant also maintains a bloom filter of preIV values used for the 
-lifetime of the tunnel at their hop, allowing them to drop any messages with 
-duplicate preIVs.  <i>The details of the hash functions used in the bloom filter
-are not yet worked out.  Suggestions?</i></p>
+with the layer key to encrypt the tunnel message.  The IV is added to a bloom 
+filter maintained for that tunnel - if it is a duplicate, it is dropped
+<i>The details of the hash functions used in the bloom filter
+are not yet worked out.  Suggestions?</i>.  They then forwarding the tuple 
+{nextTunnelID, nextPreIV, encrypted tunnel message} to the next hop.</p>
 
 <h3>2.4) <a name="tunnel.endpoint">Endpoint processing</a></h3>
 
@@ -184,7 +178,7 @@ the tunnel is an inbound or an outbound tunnel.  For outbound tunnels, the
 endpoint encrypts the message with its layer key just like any other participant, 
 exposing the preprocessed data.  For inbound tunnels, the endpoint is also the 
 tunnel creator so they can merely iteratively decrypt the preIV and message, using the 
-layer keys of each step in reverse order.</p>
+layer keys (both message and IV keys) of each step in reverse order.</p>
 
 <p>At this point, the tunnel endpoint has the preprocessed data sent by the gateway,
 which it may then parse out into the included I2NP messages and forwards them as
@@ -219,41 +213,9 @@ gateway splits up the larger I2NP messages into fragments contained within each
 tunnel message.  The endpoint will attempt to rebuild the I2NP message from the
 fragments for a short period of time, but will discard them as necessary.</p>
 
-<h3>2.7) <a name="tunnel.prng">PRNG pairs</a></h3>
+<h3>2.7) <a name="tunnel.alternatives">Alternatives</a></h3>
 
-<p>To minimize the damage from a DoS attack created by looped tunnels, a series
-of synchronized PRNGs are used across the tunnel - the gateway has one, the 
-endpoint has one, and every participant has two.  These in turn are broken down 
-into the inbound and outbound PRNG for each tunnel - the outbound PRNG is 
-synchronized with the inbound PRNG of the peer after you (obvious exception being
-the endpoint, which has no peer after it).  Outside of the PRNG with which each
-is synchronized with, there is no relationship between any of the other PRNGs.  
-This is accomplished by using a common PRNG algorithm <i>[tbd, perhaps 
-<a href="http://java.sun.com/j2se/1.4.2/docs/api/java/util/Random.html">java.lang.random</a>?]</i>, 
-seeded with the values delivered with the tunnel creation request.  Each peer 
-prefetches the next few values out of the inbound PRNG so that it can handle 
-lost or briefly out of order delivery, using these values to compare against the
-received message IDs.</p>
-
-<p>An adversary can still build loops within the tunnels, but the damage done is
-minimized in two ways.  First, if there is a loop created by providing a later
-hop with its next hop pointing at a previous peer, that loop will need to be 
-seeded with the right value so that its PRNG stays synchronized with the previous
-peer's inbound PRNG.  While some messages would go into the loop, as they start
-to actually loop back, two things would happen.  Either they would be accepted
-by that peer, thereby breaking the synchronization with the other PRNG which is
-really "earlier" in the tunnel, or the messages would be rejected if the real
-"earlier" peer sent enough messages into the loop to break the synchronization.</p>
-
-<p>If the adversary is very well coordinated and is colluding with several 
-participants, they could still build a functioning loop, though that loop would
-expire when the tunnel does.  This still allows an expansion of their work factor
-against the overall network load, but with tunnel throttling this could even
-be a useful positive tool for mitigating active traffic analysis.</p>
-
-<h3>2.8) <a name="tunnel.alternatives">Alternatives</a></h3>
-
-<h4>2.8.1) <a name="tunnel.reroute">Adjust tunnel processing midstream</a></h4>
+<h4>2.7.1) <a name="tunnel.reroute">Adjust tunnel processing midstream</a></h4>
 
 <p>While the simple tunnel routing algorithm should be sufficient for most cases,
 there are three alternatives that can be explored:</p>
@@ -270,7 +232,7 @@ bearing instructions for delivery to the next hop.</li>
 the tunnel, allowing further dynamic redirection.</li>
 </ul>
 
-<h4>2.8.2) <a name="tunnel.bidirectional">Use bidirectional tunnels</a></h4>
+<h4>2.7.2) <a name="tunnel.bidirectional">Use bidirectional tunnels</a></h4>
 
 <p>The current strategy of using two separate tunnels for inbound and outbound
 communication is not the only technique available, and it does have anonymity
@@ -288,11 +250,65 @@ minimize the worries of the predecessor attack, though if it were desired,
 it wouldn't be much trouble to build both the inbound and outbound tunnels
 along the same peers.</p>
 
+<h4>2.7.3) <a name="tunnel.backchannel">Backchannel communication</a></h4>
+
+<p>At the moment, the preIV values used are random values.  However, it is 
+possible for that 16 byte value to be used to send control messages from the 
+gateway to the endpoint, or on outbound tunnels, from the gateway to any of the
+peers.  The inbound gateway could encode certain values in the preIV once, which
+the endpoint would be able to recover (since it knows the endpoint is also the
+creator).  For outbound tunnels, the creator could deliver certain values to the 
+participants during the tunnel creation (e.g. "if you see 0x0 as the preIV, that
+means X", "0x1 means Y", etc).  Since the gateway on the outbound tunnel is also
+the creator, they can build a preIV so that any of the peers will receive the 
+correct value.  The tunnel creator could even give the inbound tunnel gateway
+a series of preIV values which that gateway could use to communicate with 
+individual participants exactly one time (though this would have issues regarding
+collusion detection)</p>
+
+<p>This technique could later be used deliver message mid stream, or to allow the
+inbound gateway to tell the endpoint that it is being DoS'ed or otherwise soon
+to fail.  At the moment, there are no plans to exploit this backchannel.</p>
+
+<h4>2.7.4) <a name="tunnel.variablesize">Variable size tunnel messages</a></h4>
+
+<p>While the transport layer may have its own fixed or variable message size,
+using its own fragmentation, the tunnel layer may instead use variable size
+tunnel messages.  The difference is an issue of threat models - a fixed size 
+at the transport layer helps reduce the information exposed to external 
+adversaries (though overall flow analysis still works), but for internal 
+adversaries (aka tunnel participants) the message size is exposed.  Fixed size
+tunnel messages help reduce the information exposed to tunnel participants, but
+does not hide the information exposed to tunnel endpoints and gateways.  Fixed
+size end to end messages hide the information exposed to all peers in the 
+network.</p>
+
+<p>As always, its a question of who I2P is trying to protect against.  Variable 
+sized tunnel messages are dangerous, as they allow participants to use the 
+message size itself as a backchannel to other participants - e.g. if you see a 
+1337 byte message, you're on the same tunnel as another colluding peer.  Even 
+with a fixed set of allowable sizes (1024, 2048, 4096, etc), that backchannel 
+still exists as peers could use the frequency of each size as the carrier (e.g.
+two 1024 byte messages followed by an 8192).  Smaller messages do incur the 
+overhead of the headers (IV, tunnel ID, hash portion, etc), but larger fixed size
+messages either increase latency (due to batching) or dramatically increase 
+overhead (due to padding).</p>
+
+<p><i>Perhaps we should have I2CP use small fixed size messages which are 
+individually garlic wrapped so that the resulting size fits into a single tunnel
+message so that not even the tunnel endpoint and gateway can see the size.  We'll
+then need to optimize the streaming lib to adjust to the smaller messages, but 
+should be able to squeeze sufficient performance out of it.  However, if the 
+performance is unsatisfactory, we could explore the tradeoff of speed (and hence
+userbase) vs. further exposure of the message size to the gateways and endpoints.
+If even that is too slow, we could then review the tunnel size limitations vs.
+exposure to participating peers.</i></p>
+
 <h2>3) <a name="tunnel.building">Tunnel building</a></h2>
 
 <p>When building a tunnel, the creator must send a request with the necessary
-configuration data to each of the hops, then wait for the potential participant
-to reply stating that they either agree or do not agree.  These tunnel request
+configuration data to each of the hops in turn, starting with the endpoint, 
+waiting for their reply, then moving on to the next earlier hop.  These tunnel request
 messages and their replies are garlic wrapped so that only the router who knows
 the key can decrypt it, and the path taken in both directions is tunnel routed
 as well.  There are three important dimensions to keep in mind when producing
@@ -337,13 +353,12 @@ endpoints to be fixed, or rotated on an MTBF rate.</p>
 <p>As mentioned above, once the tunnel creator knows what peers should go into
 a tunnel and in what order, the creator builds a series of tunnel request 
 messages, each containing the necessary information for that peer.  For instance,
-participating tunnels will be given the 4 byte tunnel ID on which they are to
-receive messages, the 4 byte tunnel ID on which they are to send out the messages,
-the 32 byte hash of the next hop's identity, the pair of PRNG seeds for the inbound
-and outbound PRNG, and the 32 byte layer key used to
-remove a layer from the tunnel.  Of course, outbound tunnel endpoints are not 
-given any "next hop" or "next tunnel ID" information, and neither the inbound 
-tunnel gateways nor the outbound tunnel endpoints need both PRNG seeds.  To allow 
+participating tunnels will be given the 4 byte nonce with which to reply with, 
+the 4 byte tunnel ID on which they are to send out the messages,
+the 32 byte hash of the next hop's identity, the 32 byte layer key used to
+remove a layer from the tunnel, and a 32 byte layer IV key used to transform the
+preIV into the IV.  Of course, outbound tunnel endpoints are not 
+given any "next hop" or "next tunnel ID" information.  To allow 
 replies, the request contains a random session tag and a random session key with 
 which the peer may garlic encrypt their decision, as well as the tunnel to which
 that garlic should be sent.  In addition to the above information, various client
@@ -352,11 +367,13 @@ what padding or batch strategies to use, etc.</p>
 
 <p>After building all of the request messages, they are garlic wrapped for the
 target router and sent out an exploratory tunnel.  Upon receipt, that peer 
-determines whether they can or will participate, creating a reply message and
-both garlic wrapping and tunnel routing the response with the supplied 
-information.  Upon receipt of the reply at the tunnel creator, the tunnel is
-considered valid on that hop (if accepted).  Once all peers have accepted, the
-tunnel is active.</p>
+determines whether they can or will participate, and if it will, it selects the
+tunnel ID on which it will receive messages.  It then garlic wraps and tunnel
+routes that agreement, tunnel ID, and the nonce provided in the request using the 
+supplied information (session tag, garlic session key, tunnel ID to reply to, and
+router on which that tunnel listens). Upon receipt of the reply at the tunnel 
+creator, the tunnel is considered valid on that hop (if accepted).  Once all 
+peers have accepted, the tunnel is active.</p>
 
 <h3>3.3) <a name="tunnel.pooling">Pooling</a></h3>
 
