@@ -15,7 +15,7 @@
     <target name="compile">
         <mkdir dir="./build" />
         <mkdir dir="./build/obj" />
-        <javac srcdir="./src" debug="true" destdir="./build/obj" />
+        <javac srcdir="./src" debug="true" target="1.1" source="1.3" deprecation="on" destdir="./build/obj" />
     </target>
     <target name="jar" depends="installer, guiinstaller" />
     <target name="fetchseeds" depends="compile">

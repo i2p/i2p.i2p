@@ -8,7 +8,7 @@
     <target name="compile">
         <mkdir dir="./build" />
         <mkdir dir="./build/obj" />
-        <javac srcdir="./src:./test" debug="true" destdir="./build/obj" />
+        <javac srcdir="./src:./test" debug="true" target="1.1" source="1.3" deprecation="on" destdir="./build/obj" />
     </target>
     <target name="jar" depends="compile">
         <jar destfile="./build/i2p.jar" basedir="./build/obj" includes="**/*.class" />

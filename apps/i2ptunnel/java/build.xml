@@ -11,7 +11,7 @@
         <mkdir dir="./build/obj" />
         <javac 
             srcdir="./src" 
-            debug="true" 
+            debug="true" target="1.1" source="1.3" deprecation="on" 
             destdir="./build/obj" 
             classpath="../../../core/java/build/i2p.jar:../../ministreaming/java/build/mstreaming.jar" />
     </target>
