@@ -152,6 +152,7 @@ router.maxWaitingJobs=40
 
 # Keep the router's clock in sync by querying one of the specified NTP servers once
 # a minute (uses UDP port 123)
+# This defaults to the DNS round-robin ntp pool - see http://www.pool.ntp.org/
 # Please change the NTP server specified to include ones closer to you - see 
 # http://www.eecis.udel.edu/~mills/ntp/clock2a.html for a list (you can specify as
 # many as you want on the args= line - they'll be tried in order until one answers).
@@ -164,7 +165,7 @@ router.maxWaitingJobs=40
 clientApp.0.main=net.i2p.time.Timestamper
 clientApp.0.name=Timestamper
 clientApp.0.onBoot=true
-clientApp.0.args=http://localhost:7655/setTime?k=v clock.fmt.he.net ntp2.belbone.be
+clientApp.0.args=http://localhost:7655/setTime?k=v pool.ntp.org pool.ntp.org pool.ntp.org
 
 # SAM bridge (a simplified socket based protocol for using I2P - listens on port 7656.  see
 # the specs at http://www.i2p.net/node/view/144 for more info)
