@@ -41,11 +41,13 @@ public class AdminManager implements Service {
             try {
                 int val = Integer.parseInt(str);
                 port = val;
+                _log.info("Starting up admin listener on port " + port);
             } catch (NumberFormatException nfe) {
-                _log.warn("Invalid admin port specified [" + str + "]", nfe);
+                _log.warn("Invalid admin port specified [" + str + "], using the default " + DEFAULT_ADMIN_PORT, nfe);
             }
+        } else {
+            _log.warn("Router admin port not specified, using the default " + DEFAULT_ADMIN_PORT);
         }
-        _log.info("Starting up admin listener on port " + port);
         startup(port);
     }
     
