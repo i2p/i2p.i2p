@@ -15,6 +15,7 @@ import java.util.Properties;
 import java.util.Set;
 
 import net.i2p.data.DataFormatException;
+import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
 import net.i2p.router.RouterContext;
 import net.i2p.util.Log;
@@ -212,26 +213,11 @@ class ProfilePersistenceHelper {
     }
     
     private void loadProps(Properties props, File file) {
-        BufferedReader in = null;
         try {
-            in = new BufferedReader(new InputStreamReader(new FileInputStream(file)), 16*1024);
-            String line = null;
-            while ( (line = in.readLine()) != null) {
-                if (line.trim().length() <= 0) continue;
-                if (line.charAt(0) == '#') continue;
-                int split = line.indexOf('=');
-                if (split <= 0) continue;
-                String key = line.substring(0, split);
-                String val = line.substring(split+1);
-                if ( (key.length() > 0) && (val.length() > 0) )
-                    props.setProperty(key, val);
-            }
+            DataHelper.loadProps(props, file);
         } catch (IOException ioe) {
             _log.warn("Error loading properties from " + file.getName(), ioe);
-        } finally {
-            if (in != null) try { in.close(); } catch (IOException ioe) {}
         }
-        
     }
     
     private Hash getHash(String name) {

@@ -1,9 +1,13 @@
 package net.i2p.router.startup;
 
 import java.lang.reflect.Method;
+import java.io.IOException;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 
+import net.i2p.data.DataHelper;
 import net.i2p.router.JobImpl;
 import net.i2p.router.RouterContext;
 import net.i2p.util.I2PThread;
@@ -19,17 +23,22 @@ class LoadClientAppsJob extends JobImpl {
     private Log _log;
     /** wait 2 minutes before starting up client apps */
     private final static long STARTUP_DELAY = 2*60*1000;
+    
+    private static final String PROP_CLIENT_CONFIG_FILENAME = "router.clientConfigFile";
+    private static final String DEFAULT_CLIENT_CONFIG_FILENAME = "clients.config";
+    
     public LoadClientAppsJob(RouterContext ctx) {
         super(ctx);
         _log = ctx.logManager().getLog(LoadClientAppsJob.class);
     }
     public void runJob() {
+        Properties clientApps = getClientApps();
         int i = 0;
         while (true) {
-            String className = getContext().router().getConfigSetting("clientApp."+i+".main");
-            String clientName = getContext().router().getConfigSetting("clientApp."+i+".name");
-            String args = getContext().router().getConfigSetting("clientApp."+i+".args");
-            String onBoot = getContext().router().getConfigSetting("clientApp." + i + ".onBoot");
+            String className = clientApps.getProperty("clientApp."+i+".main");
+            String clientName = clientApps.getProperty("clientApp."+i+".name");
+            String args = clientApps.getProperty("clientApp."+i+".args");
+            String onBoot = clientApps.getProperty("clientApp." + i + ".onBoot");
             boolean onStartup = false;
             if (onBoot != null)
                 onStartup = "true".equals(onBoot) || "yes".equals(onBoot);
@@ -49,6 +58,24 @@ class LoadClientAppsJob extends JobImpl {
         }
     }
 
+    private Properties getClientApps() {
+        Properties rv = new Properties();
+        String clientConfigFile = getContext().getProperty(PROP_CLIENT_CONFIG_FILENAME, DEFAULT_CLIENT_CONFIG_FILENAME);
+        File cfgFile = new File(clientConfigFile);
+        
+        // fall back to use router.config's clientApp.* lines
+        if (!cfgFile.exists()) 
+            return new Properties(getContext().router().getConfigMap());
+        
+        try {
+            DataHelper.loadProps(rv, cfgFile);
+        } catch (IOException ioe) {
+            _log.warn("Error loading the client app properties from " + cfgFile.getName(), ioe);
+        }
+        
+        return rv;
+    }
+    
     private class DelayedRunClient extends JobImpl {
         private String _className;
         private String _clientName;

@@ -59,7 +59,7 @@ public class LogManager {
     public final static int DEFAULT_CONSOLEBUFFERSIZE = 20;
     public final static String DEFAULT_ROTATIONLIMIT = "2";
     public final static String DEFAULT_DEFAULTLEVEL = Log.STR_ERROR;
-    public final static String DEFAULT_ONSCREENLEVEL = Log.STR_ERROR;
+    public final static String DEFAULT_ONSCREENLEVEL = Log.STR_CRIT;
 
     private I2PAppContext _context;
     private Log _log;

@@ -183,10 +183,9 @@ public class Router {
         try {
             File f = new File(filename);
             if (f.canRead()) {
-                fis = new FileInputStream(f);
-                props.load(fis);
+                DataHelper.loadProps(props, f);
             } else {
-                log.error("Configuration file " + filename + " does not exist");
+                log.warn("Configuration file " + filename + " does not exist");
             }
         } catch (Exception ioe) {
             log.error("Error loading the router configuration from " + filename, ioe);
