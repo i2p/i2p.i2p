@@ -17,17 +17,24 @@ import java.util.Properties;
  * Simple config file handler.
  * 
  * @author hypercubus
- * 
- * TODO Make write operations keep original line comments intact.
  */
 public class ConfigFile {
+
+    // TODO Make write operations keep original line comments intact.
 
     private String     _configFile;
     private Properties _properties = new Properties();
 
-    public ConfigFile(String configFile) {
+    /**
+     * Initializes the {@link ConfigFile} object.
+     * 
+     * @param  configFile The config file to use.
+     * @return            <code>false</code> if the given config file cannot be
+     *                    located or accessed, otherwise <code>true</code>.
+     */
+    public boolean init(String configFile) {
         _configFile = configFile;
-        readConfigFile();
+        return readConfigFile();
     }
 
     public String getProperty(String key) {
@@ -43,7 +50,7 @@ public class ConfigFile {
         writeConfigFile();
     }
 
-    private void readConfigFile() {
+    private boolean readConfigFile() {
 
         FileInputStream fileInputStream = null;
 
@@ -51,16 +58,18 @@ public class ConfigFile {
             fileInputStream = new FileInputStream(_configFile);
             _properties.load(fileInputStream);
         } catch (IOException e) {
-            System.exit(1);
+            return false;
         }
         try {
             fileInputStream.close();
         } catch (IOException e1) {
             // No worries.
         }
+        return true;
     }
 
     private void writeConfigFile() {
+
         FileOutputStream fileOutputStream = null;
 
         try {

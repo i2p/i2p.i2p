@@ -39,7 +39,7 @@
         <mkdir dir="./build/javadoc" />
         <javadoc
             sourcepath="./src"
-            classpath="./src:./src/net/i2p/apps/systray/systray4j.jar"
+            classpath="./src:./src/net/i2p/apps/systray/lib/systray4j.jar"
             destdir="./build/javadoc"
             packagenames="*"
             use="true"

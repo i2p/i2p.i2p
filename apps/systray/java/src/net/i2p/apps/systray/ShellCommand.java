@@ -61,7 +61,6 @@ public class ShellCommand {
             synchronized(caller) {
                 caller.notify();  // In case the caller is still in the wait() state.
             }
-            return;
         }
     }
 
@@ -184,7 +183,7 @@ public class ShellCommand {
      * {@link #getErrorStream()}, respectively. Input can be passed to the
      * <code>STDIN</code> of the shell process via {@link #getInputStream()}.
      * 
-     * @param  _shellCommand The command for the shell to execute.
+     * @param shellCommand The command for the shell to execute.
      */
     public void execute(String shellCommand) {
         execute(shellCommand, NO_CONSUME_OUTPUT, NO_WAIT_FOR_EXIT_STATUS);
@@ -199,7 +198,7 @@ public class ShellCommand {
      * Input can be passed to the <code>STDIN</code> of the shell process via
      * {@link #getInputStream()}.
      * 
-     * @param  _shellCommand The command for the shell to execute.
+     * @param  shellCommand The command for the shell to execute.
      * @return              <code>true</code> if the spawned shell process
      *                      returns an exit status of 0 (indicating success),
      *                      else <code>false</code>.
@@ -221,7 +220,7 @@ public class ShellCommand {
      * {@link #getErrorStream()}, respectively. Input can be passed to the
      * <code>STDIN</code> of the shell process via {@link #getInputStream()}.
      * 
-     * @param  _shellCommand The command for the shell to execute.
+     * @param  shellCommand The command for the shell to execute.
      * @param  seconds      The method will return <code>true</code> if this
      *                      number of seconds elapses without the process
      *                      returning an exit status. A value of <code>0</code>
@@ -256,7 +255,7 @@ public class ShellCommand {
      * without waiting for an exit status. Any output produced by the executed
      * command will not be displayed.
      * 
-     * @param  _shellCommand The command for the shell to execute.
+     * @param  shellCommand The command for the shell to execute.
      * @throws IOException
      */
     public void executeSilent(String shellCommand) throws IOException {
@@ -268,7 +267,7 @@ public class ShellCommand {
      * all of the command's resulting shell processes have completed. Any output
      * produced by the executed command will not be displayed.
      * 
-     * @param  _shellCommand The command for the shell to execute.
+     * @param  shellCommand The command for the shell to execute.
      * @return              <code>true</code> if the spawned shell process
      *                      returns an exit status of 0 (indicating success),
      *                      else <code>false</code>.
@@ -287,7 +286,7 @@ public class ShellCommand {
      * specified number of seconds has elapsed first. Any output produced by the
      * executed command will not be displayed.
      * 
-     * @param  _shellCommand The command for the shell to execute.
+     * @param  shellCommand The command for the shell to execute.
      * @param  seconds      The method will return <code>true</code> if this
      *                      number of seconds elapses without the process
      *                      returning an exit status. A value of <code>0</code>
@@ -356,7 +355,6 @@ public class ShellCommand {
                 processStdoutReader = new StreamReader(_inputStream);
                 processStdoutReader.start();
             }
-
             if (waitForExitStatus) {
                 try {
                     _process.waitFor();
@@ -374,7 +372,6 @@ public class ShellCommand {
                 if (_process.exitValue() > 0)
                     return false;
             }
-
         } catch (Exception e) {
             return false;
         }

@@ -25,7 +25,7 @@ public class SysTray implements SysTrayMenuListener {
 
     private BrowserChooser  _browserChooser;
     private String          _browserString;
-    private ConfigFile      _configFile        = new ConfigFile("../systray.config");
+    private ConfigFile      _configFile        = new ConfigFile();
     private Frame           _frame;
     private SysTrayMenuItem _itemExit          = new SysTrayMenuItem("Exit I2P systray", "exit");
     private SysTrayMenuItem _itemSelectBrowser = new SysTrayMenuItem("Select preferred browser...", "selectbrowser");
@@ -34,7 +34,12 @@ public class SysTray implements SysTrayMenuListener {
     private UrlLauncher     _urlLauncher       = new UrlLauncher();
 
     public SysTray() {
+
+        if (!_configFile.init("../systray.config"))
+            _configFile.setProperty("browser", "default");
+
         _browserString = _configFile.getProperty("browser", "default");
+
         _sysTrayMenuIcon.addSysTrayMenuListener(this);
         createSysTrayMenu();
     }
