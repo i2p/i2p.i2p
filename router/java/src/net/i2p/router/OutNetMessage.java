@@ -85,10 +85,21 @@ public class OutNetMessage {
                                               "OutNetMessage", new long[] { 5*60*1000, 30*60*1000, 60*60*1000 });
     }
     
-    public void timestamp(String eventName) {
+    /**
+     * Stamp the message's progress
+     *
+     * @param eventName what occurred 
+     * @return how long this message has been 'in flight'
+     */
+    public long timestamp(String eventName) {
         synchronized (_timestamps) {
-            _timestamps.put(eventName, new Long(_context.clock().now()));
+            long now = _context.clock().now();
+            while (_timestamps.containsKey(eventName)) {
+                eventName = eventName + '.';
+            }
+            _timestamps.put(eventName, new Long(now));
             _timestampOrder.add(eventName);
+            return now - _created;
         }
     }
     public Map getTimestamps() {

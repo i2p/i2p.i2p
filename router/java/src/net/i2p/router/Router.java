@@ -286,7 +286,7 @@ public class Router {
         if ( (notSent > 0) && (notReceived > 0) ) {
             double notSendKBps = notSent / (lifetime*1024.0);
             double notReceivedKBps = notReceived / (lifetime*1024.0);
-            buf.append("<li>Lifetime rate: ");
+            buf.append("<li>Lifetime unused rate: ");
             buf.append(fmt.format(notSendKBps)).append("KBps outbound unused  ");
             buf.append(fmt.format(notReceivedKBps)).append("KBps inbound unused");
             buf.append("</li>");

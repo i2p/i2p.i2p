@@ -23,7 +23,7 @@ import net.i2p.util.Log;
 class DataPublisherJob extends JobImpl {
     private Log _log;
     private KademliaNetworkDatabaseFacade _facade;
-    private final static long RERUN_DELAY_MS = 60*1000;
+    private final static long RERUN_DELAY_MS = 120*1000;
     private final static int MAX_SEND_PER_RUN = 1; // publish no more than 2 at a time
     private final static long STORE_TIMEOUT = 60*1000; // give 'er a minute to send the data
     

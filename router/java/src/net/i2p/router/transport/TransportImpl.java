@@ -63,15 +63,28 @@ public abstract class TransportImpl implements Transport {
     }
     
     public void afterSend(OutNetMessage msg, boolean sendSuccessful) {
-        afterSend(msg, sendSuccessful, true);
+        afterSend(msg, sendSuccessful, true, 0);
     }
     public void afterSend(OutNetMessage msg, boolean sendSuccessful, boolean allowRequeue) {
+        afterSend(msg, sendSuccessful, allowRequeue, 0);
+    }
+    public void afterSend(OutNetMessage msg, boolean sendSuccessful, long msToSend) {
+        afterSend(msg, sendSuccessful, true, msToSend);
+    }
+    public void afterSend(OutNetMessage msg, boolean sendSuccessful, boolean allowRequeue, long msToSend) {
         boolean log = false;
         msg.timestamp("afterSend(" + sendSuccessful + ")");
         
         if (!sendSuccessful)
             msg.transportFailed(getStyle());
 
+        if (msToSend > 1000) {
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("afterSend: [success=" + sendSuccessful + "] " + msg.getMessageSize() + "byte " 
+                          + msg.getMessageType() + " " + msg.getMessageId() + " from " 
+                          + _context.routerHash().toBase64().substring(0,6) + " took " + msToSend);
+        }
+        
         long lifetime = msg.getLifetime();
         if (lifetime > 5000) {
             if (_log.shouldLog(Log.WARN))
@@ -104,23 +117,31 @@ public abstract class TransportImpl implements Transport {
                 _context.statManager().addRateData("transport.expiredOnQueueLifetime", lifetime, lifetime);
             
             if (allowRequeue) {
-                if ( (msg.getExpiration() <= 0) || (msg.getExpiration() > _context.clock().now()) ) {
-                    // this may not be the last transport available - keep going
-                    _context.outNetMessagePool().add(msg);
-                    // don't discard the data yet!
-                } else {
-                    if (_log.shouldLog(Log.INFO))
-                        _log.info("No more time left (" + new Date(msg.getExpiration()) 
-                                  + ", expiring without sending successfully the " 
-                                  + msg.getMessageType());
-                    if (msg.getOnFailedSendJob() != null)
-                        _context.jobQueue().addJob(msg.getOnFailedSendJob());
-                    MessageSelector selector = msg.getReplySelector();
-                    if (selector != null) {
-                        _context.messageRegistry().unregisterPending(msg);
-                    }
+                if (true) {
+                    if (_log.shouldLog(Log.ERROR))
+                        _log.error("wtf, requeueing message " + msg.getMessageId() + " of type " + msg.getMessageType(), 
+                                   new Exception("requeued by"));
                     log = true;
                     msg.discardData();
+                } else {
+                    if ( (msg.getExpiration() <= 0) || (msg.getExpiration() > _context.clock().now()) ) {
+                        // this may not be the last transport available - keep going
+                        _context.outNetMessagePool().add(msg);
+                        // don't discard the data yet!
+                    } else {
+                        if (_log.shouldLog(Log.INFO))
+                            _log.info("No more time left (" + new Date(msg.getExpiration()) 
+                                      + ", expiring without sending successfully the " 
+                                      + msg.getMessageType());
+                        if (msg.getOnFailedSendJob() != null)
+                            _context.jobQueue().addJob(msg.getOnFailedSendJob());
+                        MessageSelector selector = msg.getReplySelector();
+                        if (selector != null) {
+                            _context.messageRegistry().unregisterPending(msg);
+                        }
+                        log = true;
+                        msg.discardData();
+                    }
                 }
             } else {
                 if (_log.shouldLog(Log.INFO))
@@ -211,9 +232,13 @@ public abstract class TransportImpl implements Transport {
     protected abstract void outboundMessageReady();
     
     public void messageReceived(I2NPMessage inMsg, RouterIdentity remoteIdent, Hash remoteIdentHash, long msToReceive, int bytesReceived) {
-        if (_log.shouldLog(Log.INFO)) {
+        int level = Log.INFO;
+        if (msToReceive > 5000)
+            level = Log.ERROR;
+        if (_log.shouldLog(level)) {
             StringBuffer buf = new StringBuffer(128);
             buf.append("Message received: ").append(inMsg.getClass().getName());
+            buf.append(" / ").append(inMsg.getUniqueId());
             buf.append(" in ").append(msToReceive).append("ms containing ");
             buf.append(bytesReceived).append(" bytes ");
             buf.append(" from ");
@@ -228,7 +253,7 @@ public abstract class TransportImpl implements Transport {
             if (_listener != null)
                 buf.append(_listener);
 
-            _log.info(buf.toString());
+            _log.log(level, buf.toString());
         }
 
         if (remoteIdent != null)
@@ -239,8 +264,9 @@ public abstract class TransportImpl implements Transport {
         }
         
         _context.statManager().addRateData("transport.receiveMessageTime", msToReceive, msToReceive);
-        if (msToReceive > 1000)
+        if (msToReceive > 1000) {
             _context.statManager().addRateData("transport.receiveMessageTimeSlow", msToReceive, msToReceive);
+        }
 
         //// this functionality is built into the InNetMessagePool
         //String type = inMsg.getClass().getName();

@@ -309,7 +309,7 @@ class TCPConnection implements I2NPMessageReader.I2NPMessageEventListener {
             for (int i = 0; i < removed.size(); i++) {
                 OutNetMessage cur = (OutNetMessage)removed.get(i);
                 msg.timestamp("TCPConnection.addMessage expired but not our fault");
-                _transport.afterSend(cur, false);
+                _transport.afterSend(cur, false, false);
             }
         }
         
@@ -331,7 +331,7 @@ class TCPConnection implements I2NPMessageReader.I2NPMessageEventListener {
             _context.profileManager().commErrorOccurred(_remoteIdentity.getHash());
             
             msg.timestamp("TCPConnection.addMessage saw an expired queued message");
-            _transport.afterSend(msg, false);
+            _transport.afterSend(msg, false, false);
             // should we really be closing a connection if they're that slow?  
             // yeah, i think we should.
             closeConnection();
@@ -490,7 +490,19 @@ class TCPConnection implements I2NPMessageReader.I2NPMessageEventListener {
                     timedOut.add(cur);
                     _toBeSent.remove(i);
                     i--;
-                } 
+                } else {
+                    long lifetime = cur.timestamp("TCPConnection.runner.locked_expireOldMessages still ok with " 
+                                                  + (i) + " ahead and " + (_toBeSent.size()-i-1) 
+                                                  + " behind on the queue");
+                    if (lifetime > 5*1000) {
+                        cur.timestamp("TCPConnection.runner.locked_expireOldMessages lifetime too long - " + lifetime);
+                        if (timedOut == null)
+                            timedOut = new ArrayList(2);
+                        timedOut.add(cur);
+                        _toBeSent.remove(i);
+                        i--;
+                    }
+                }
             }
 
             boolean reallySlowFound = false;
@@ -503,8 +515,8 @@ class TCPConnection implements I2NPMessageReader.I2NPMessageEventListener {
                                   + " timed out while sitting on the TCP Connection's queue!  was too slow by: " 
                                   + (now-failed.getExpiration()) + "ms to " 
                                   + _remoteIdentity.getHash().toBase64() + ": " + failed);
-                    failed.timestamp("TCPConnection.runner.locked_expireOldMessages expired");
-                    _transport.afterSend(failed, false);
+                    failed.timestamp("TCPConnection.runner.locked_expireOldMessages expired with " + _toBeSent.size() + " left");
+                    _transport.afterSend(failed, false, false);
                     if (failed.getLifetime() >= MIN_MESSAGE_LIFETIME_FOR_PENALTY)
                         reallySlowFound = true;
                 }
@@ -521,6 +533,15 @@ class TCPConnection implements I2NPMessageReader.I2NPMessageEventListener {
             msg.timestamp("TCPConnection.runner.doSend fetched");
             long afterExpire = _context.clock().now();
 
+            long remaining = msg.getExpiration() - afterExpire;
+            if (remaining < 0) {
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("Message " + msg.getMessageType() + "/" + msg.getMessageId() 
+                              + " expired before doSend (too slow by " + remaining + "ms)");
+                _transport.afterSend(msg, false, false);
+                return true;
+            }
+            
             byte data[] = msg.getMessageData();
             if (data == null) {
                 if (_log.shouldLog(Log.WARN))
@@ -573,7 +594,7 @@ class TCPConnection implements I2NPMessageReader.I2NPMessageEventListener {
                               + "ms) - time left (" + timeLeft + ") to " 
                               + _remoteIdentity.getHash().toBase64() + "\n" + msg.toString());
             }
-            _transport.afterSend(msg, true);
+            _transport.afterSend(msg, true, (end-beforeWrite));
 
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("doSend - message sent completely: " 
