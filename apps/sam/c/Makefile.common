@@ -1,0 +1,26 @@
+#
+# This Makefile contains instructions common to all platforms
+#
+
+
+#
+# Build rules
+#
+
+all: clean depend libsam
+
+depend:
+	$(CC) $(CFLAGS) -MM $(SRCDIR)/*.c > .depend
+
+$(OBJDIR)/%.o: $(SRCDIR)/%.c
+	$(CC) $(CFLAGS) -o $@ -c $<
+
+libsam: $(OBJS)
+	$(AR) rcs $(LIBDIR)/libsam.a $(OBJS)
+
+#
+# Cleanup rules
+#
+
+clean:
+	-$(RM) -f $(LIBDIR)/libsam.a $(OBJDIR)/* .depend

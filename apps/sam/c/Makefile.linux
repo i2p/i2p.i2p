@@ -1,5 +1,5 @@
 #
-# This Makefile is compatible with GNU Make and should work on Linux (generic)
+# This Makefile is compatible with GNU Make and should work on Linux
 #
 
 #
@@ -23,6 +23,7 @@ SRCDIR = src
 
 AR = ar
 CC = gcc
+RM = rm
 
 #
 # Flags
@@ -40,25 +41,7 @@ OBJS =	$(OBJDIR)/sam.o \
 		$(OBJDIR)/strl.o
 
 #
-# Build rules
+# Include the make instructions common to all platforms
 #
 
-all: depend libsam
-
-depend:
-	$(CC) $(CFLAGS) -MM $(SRCDIR)/*.c > .depend
-
-$(OBJDIR)/%.o: $(SRCDIR)/%.c
-	$(CC) $(CFLAGS) -o $@ -c $<
-
-libsam: $(OBJS)
-	$(AR) rcs $(LIBDIR)/libsam.a $(OBJS)
-
-#
-# Cleanup rules
-#
-
-clean:
-	-rm -f $(LIBDIR)/libsam.a $(OBJDIR)/* .depend
-
-tidy: clean
+include Makefile.common

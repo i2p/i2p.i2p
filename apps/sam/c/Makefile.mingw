@@ -23,12 +23,13 @@ SRCDIR = src
 
 AR = C:\Dev-Cpp\bin\ar
 CC = C:\Dev-Cpp\bin\gcc
+RM = C:\Dev-Cpp\bin\rm
 
 #
 # Flags
 #
 
-CFLAGS = -g -march=i486 -O2 -pipe -std=c99 -Wall
+CFLAGS = -g -O2 -pipe -std=c99 -Wall
 CFLAGS += -DOS=$(OS)
 CFLAGS += -I$(INCDIR)
 
@@ -40,25 +41,7 @@ OBJS =	$(OBJDIR)/sam.o \
 		$(OBJDIR)/strl.o
 
 #
-# Build rules
+# Include the make instructions common to all platforms
 #
 
-all: depend libsam
-
-depend:
-	$(CC) $(CFLAGS) -MM $(SRCDIR)/*.c > .depend
-
-$(OBJDIR)/%.o: $(SRCDIR)/%.c
-	$(CC) $(CFLAGS) -o $@ -c $<
-
-libsam: $(OBJS)
-	$(AR) rcs $(LIBDIR)/libsam.a $(OBJS)
-
-#
-# Cleanup rules
-#
-
-clean:
-	-rm -f $(LIBDIR)/libsam.a $(OBJDIR)/* .depend
-
-tidy: clean
+include Makefile.common

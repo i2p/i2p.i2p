@@ -1,5 +1,5 @@
 #
-# This Makefile is compatible with GNU Make (gmake) and should work on FreeBSD
+# This Makefile is compatible with GNU Make and should work on FreeBSD
 #
 
 #
@@ -23,6 +23,7 @@ SRCDIR = src
 
 AR = ar
 CC = gcc
+RM = rm
 
 #
 # Flags
@@ -39,25 +40,7 @@ CFLAGS += -I$(INCDIR)
 OBJS =	$(OBJDIR)/sam.o
 
 #
-# Build rules
+# Include the make instructions common to all platforms
 #
 
-all: depend libsam
-
-depend:
-	$(CC) $(CFLAGS) -MM $(SRCDIR)/*.c > .depend
-
-$(OBJDIR)/%.o: $(SRCDIR)/%.c
-	$(CC) $(CFLAGS) -o $@ -c $<
-
-libsam: $(OBJS)
-	$(AR) rcs $(LIBDIR)/libsam.a $(OBJS)
-
-#
-# Cleanup rules
-#
-
-clean:
-	-rm -f $(LIBDIR)/libsam.a $(OBJDIR)/* .depend
-
-tidy: clean
+include Makefile.common
