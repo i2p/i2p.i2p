@@ -30,8 +30,8 @@ class SocketCreator implements Runnable {
     
     public boolean couldEstablish() { return _established; }
     
-    /** the first byte sent and received must be 0x2A */
-    public final static int I2P_FLAG = 0x2A;
+    /** the first byte sent and received must be 0x42 */
+    public final static int I2P_FLAG = 0x42;
     /** sent if we arent trying to talk */
     private final static int NOT_I2P_FLAG = 0x2B;
     

@@ -44,10 +44,10 @@ class RestrictiveTCPConnection extends TCPConnection {
     }
     
     /** passed in the handshake process for the connection, and only equivilant protocols will be accepted */
-    private final static long PROTO_ID = 12;
+    private final static long PROTO_ID = 13;
     
     /** read / write buffer size */
-    private final static int BUF_SIZE = 32*1024;
+    private final static int BUF_SIZE = 2*1024;
     
     private boolean validateVersion() throws DataFormatException, IOException {
         if (_log.shouldLog(Log.DEBUG)) _log.debug("Before validating version");
