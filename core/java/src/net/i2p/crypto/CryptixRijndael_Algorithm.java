@@ -382,7 +382,7 @@ public final class CryptixRijndael_Algorithm // implicit no-argument constructor
      * @param  inOffset   Index of in from which to start considering data.
      * @param  sessionKey The session key to use for encryption.
      */
-    public static final void blockEncrypt(byte[] in, byte[] result, int inOffset, Object sessionKey) {
+    public static final void blockEncrypt(byte[] in, byte[] result, int inOffset, int outOffset, Object sessionKey) {
         if (_RDEBUG) trace(_IN, "blockEncrypt(" + in + ", " + inOffset + ", " + sessionKey + ")");
         int[][] Ke = (int[][]) ((Object[]) sessionKey)[0]; // extract encryption round keys
         int ROUNDS = Ke.length - 1;
@@ -417,25 +417,25 @@ public final class CryptixRijndael_Algorithm // implicit no-argument constructor
         // last round is special
         Ker = Ke[ROUNDS];
         int tt = Ker[0];
-        result[0] = (byte) (_S[(t0 >>> 24) & 0xFF] ^ (tt >>> 24));
-        result[1] = (byte) (_S[(t1 >>> 16) & 0xFF] ^ (tt >>> 16));
-        result[2] = (byte) (_S[(t2 >>> 8) & 0xFF] ^ (tt >>> 8));
-        result[3] = (byte) (_S[t3 & 0xFF] ^ tt);
+        result[outOffset++] = (byte) (_S[(t0 >>> 24) & 0xFF] ^ (tt >>> 24));
+        result[outOffset++] = (byte) (_S[(t1 >>> 16) & 0xFF] ^ (tt >>> 16));
+        result[outOffset++] = (byte) (_S[(t2 >>> 8) & 0xFF] ^ (tt >>> 8));
+        result[outOffset++] = (byte) (_S[t3 & 0xFF] ^ tt);
         tt = Ker[1];
-        result[4] = (byte) (_S[(t1 >>> 24) & 0xFF] ^ (tt >>> 24));
-        result[5] = (byte) (_S[(t2 >>> 16) & 0xFF] ^ (tt >>> 16));
-        result[6] = (byte) (_S[(t3 >>> 8) & 0xFF] ^ (tt >>> 8));
-        result[7] = (byte) (_S[t0 & 0xFF] ^ tt);
+        result[outOffset++] = (byte) (_S[(t1 >>> 24) & 0xFF] ^ (tt >>> 24));
+        result[outOffset++] = (byte) (_S[(t2 >>> 16) & 0xFF] ^ (tt >>> 16));
+        result[outOffset++] = (byte) (_S[(t3 >>> 8) & 0xFF] ^ (tt >>> 8));
+        result[outOffset++] = (byte) (_S[t0 & 0xFF] ^ tt);
         tt = Ker[2];
-        result[8] = (byte) (_S[(t2 >>> 24) & 0xFF] ^ (tt >>> 24));
-        result[9] = (byte) (_S[(t3 >>> 16) & 0xFF] ^ (tt >>> 16));
-        result[10] = (byte) (_S[(t0 >>> 8) & 0xFF] ^ (tt >>> 8));
-        result[11] = (byte) (_S[t1 & 0xFF] ^ tt);
+        result[outOffset++] = (byte) (_S[(t2 >>> 24) & 0xFF] ^ (tt >>> 24));
+        result[outOffset++] = (byte) (_S[(t3 >>> 16) & 0xFF] ^ (tt >>> 16));
+        result[outOffset++] = (byte) (_S[(t0 >>> 8) & 0xFF] ^ (tt >>> 8));
+        result[outOffset++] = (byte) (_S[t1 & 0xFF] ^ tt);
         tt = Ker[3];
-        result[12] = (byte) (_S[(t3 >>> 24) & 0xFF] ^ (tt >>> 24));
-        result[13] = (byte) (_S[(t0 >>> 16) & 0xFF] ^ (tt >>> 16));
-        result[14] = (byte) (_S[(t1 >>> 8) & 0xFF] ^ (tt >>> 8));
-        result[15] = (byte) (_S[t2 & 0xFF] ^ tt);
+        result[outOffset++] = (byte) (_S[(t3 >>> 24) & 0xFF] ^ (tt >>> 24));
+        result[outOffset++] = (byte) (_S[(t0 >>> 16) & 0xFF] ^ (tt >>> 16));
+        result[outOffset++] = (byte) (_S[(t1 >>> 8) & 0xFF] ^ (tt >>> 8));
+        result[outOffset++] = (byte) (_S[t2 & 0xFF] ^ tt);
         if (_RDEBUG && _debuglevel > 6) {
             System.out.println("CT=" + toString(result));
             System.out.println();
@@ -452,7 +452,7 @@ public final class CryptixRijndael_Algorithm // implicit no-argument constructor
      * @param  inOffset   Index of in from which to start considering data.
      * @param  sessionKey The session key to use for decryption.
      */
-    public static final void blockDecrypt(byte[] in, byte[] result, int inOffset, Object sessionKey) {
+    public static final void blockDecrypt(byte[] in, byte[] result, int inOffset, int outOffset, Object sessionKey) {
         if (_RDEBUG) trace(_IN, "blockDecrypt(" + in + ", " + inOffset + ", " + sessionKey + ")");
         int[][] Kd = (int[][]) ((Object[]) sessionKey)[1]; // extract decryption round keys
         int ROUNDS = Kd.length - 1;
@@ -487,25 +487,25 @@ public final class CryptixRijndael_Algorithm // implicit no-argument constructor
         // last round is special
         Kdr = Kd[ROUNDS];
         int tt = Kdr[0];
-        result[0] = (byte) (_Si[(t0 >>> 24) & 0xFF] ^ (tt >>> 24));
-        result[1] = (byte) (_Si[(t3 >>> 16) & 0xFF] ^ (tt >>> 16));
-        result[2] = (byte) (_Si[(t2 >>> 8) & 0xFF] ^ (tt >>> 8));
-        result[3] = (byte) (_Si[t1 & 0xFF] ^ tt);
+        result[outOffset++] = (byte) (_Si[(t0 >>> 24) & 0xFF] ^ (tt >>> 24));
+        result[outOffset++] = (byte) (_Si[(t3 >>> 16) & 0xFF] ^ (tt >>> 16));
+        result[outOffset++] = (byte) (_Si[(t2 >>> 8) & 0xFF] ^ (tt >>> 8));
+        result[outOffset++] = (byte) (_Si[t1 & 0xFF] ^ tt);
         tt = Kdr[1];
-        result[4] = (byte) (_Si[(t1 >>> 24) & 0xFF] ^ (tt >>> 24));
-        result[5] = (byte) (_Si[(t0 >>> 16) & 0xFF] ^ (tt >>> 16));
-        result[6] = (byte) (_Si[(t3 >>> 8) & 0xFF] ^ (tt >>> 8));
-        result[7] = (byte) (_Si[t2 & 0xFF] ^ tt);
+        result[outOffset++] = (byte) (_Si[(t1 >>> 24) & 0xFF] ^ (tt >>> 24));
+        result[outOffset++] = (byte) (_Si[(t0 >>> 16) & 0xFF] ^ (tt >>> 16));
+        result[outOffset++] = (byte) (_Si[(t3 >>> 8) & 0xFF] ^ (tt >>> 8));
+        result[outOffset++] = (byte) (_Si[t2 & 0xFF] ^ tt);
         tt = Kdr[2];
-        result[8] = (byte) (_Si[(t2 >>> 24) & 0xFF] ^ (tt >>> 24));
-        result[9] = (byte) (_Si[(t1 >>> 16) & 0xFF] ^ (tt >>> 16));
-        result[10] = (byte) (_Si[(t0 >>> 8) & 0xFF] ^ (tt >>> 8));
-        result[11] = (byte) (_Si[t3 & 0xFF] ^ tt);
+        result[outOffset++] = (byte) (_Si[(t2 >>> 24) & 0xFF] ^ (tt >>> 24));
+        result[outOffset++] = (byte) (_Si[(t1 >>> 16) & 0xFF] ^ (tt >>> 16));
+        result[outOffset++] = (byte) (_Si[(t0 >>> 8) & 0xFF] ^ (tt >>> 8));
+        result[outOffset++] = (byte) (_Si[t3 & 0xFF] ^ tt);
         tt = Kdr[3];
-        result[12] = (byte) (_Si[(t3 >>> 24) & 0xFF] ^ (tt >>> 24));
-        result[13] = (byte) (_Si[(t2 >>> 16) & 0xFF] ^ (tt >>> 16));
-        result[14] = (byte) (_Si[(t1 >>> 8) & 0xFF] ^ (tt >>> 8));
-        result[15] = (byte) (_Si[t0 & 0xFF] ^ tt);
+        result[outOffset++] = (byte) (_Si[(t3 >>> 24) & 0xFF] ^ (tt >>> 24));
+        result[outOffset++] = (byte) (_Si[(t2 >>> 16) & 0xFF] ^ (tt >>> 16));
+        result[outOffset++] = (byte) (_Si[(t1 >>> 8) & 0xFF] ^ (tt >>> 8));
+        result[outOffset++] = (byte) (_Si[t0 & 0xFF] ^ tt);
         if (_RDEBUG && _debuglevel > 6) {
             System.out.println("PT=" + toString(result));
             System.out.println();
@@ -618,9 +618,9 @@ public final class CryptixRijndael_Algorithm // implicit no-argument constructor
      * @param  sessionKey The session key to use for encryption.
      * @param  blockSize  The block size in bytes of this Rijndael.
      */
-    public static final void blockEncrypt(byte[] in, byte[] result, int inOffset, Object sessionKey, int blockSize) {
+    public static final void blockEncrypt(byte[] in, byte[] result, int inOffset, int outOffset, Object sessionKey, int blockSize) {
         if (blockSize == _BLOCK_SIZE) {
-            blockEncrypt(in, result, inOffset, sessionKey);
+            blockEncrypt(in, result, inOffset, outOffset, sessionKey);
             return;
         }
         if (_RDEBUG) trace(_IN, "blockEncrypt(" + in + ", " + inOffset + ", " + sessionKey + ", " + blockSize + ")");
@@ -636,7 +636,8 @@ public final class CryptixRijndael_Algorithm // implicit no-argument constructor
         int[] a = new int[BC];
         int[] t = new int[BC]; // temporary work array
         int i;
-        int j = 0, tt;
+        int j = outOffset;
+        int tt;
 
         for (i = 0; i < BC; i++)
             // plaintext to ints + key
@@ -673,9 +674,9 @@ public final class CryptixRijndael_Algorithm // implicit no-argument constructor
      * @param  sessionKey The session key to use for decryption.
      * @param  blockSize  The block size in bytes of this Rijndael.
      */
-    public static final void blockDecrypt(byte[] in, byte[] result, int inOffset, Object sessionKey, int blockSize) {
+    public static final void blockDecrypt(byte[] in, byte[] result, int inOffset, int outOffset, Object sessionKey, int blockSize) {
         if (blockSize == _BLOCK_SIZE) {
-            blockDecrypt(in, result, inOffset, sessionKey);
+            blockDecrypt(in, result, inOffset, outOffset, sessionKey);
             return;
         }
 
@@ -692,7 +693,8 @@ public final class CryptixRijndael_Algorithm // implicit no-argument constructor
         int[] a = new int[BC];
         int[] t = new int[BC]; // temporary work array
         int i;
-        int j = 0, tt;
+        int j = outOffset;
+        int tt;
 
         for (i = 0; i < BC; i++)
             // ciphertext to ints + key
@@ -749,7 +751,7 @@ public final class CryptixRijndael_Algorithm // implicit no-argument constructor
                 System.out.println("PT=" + toString(pt));
             }
             byte[] ct = new byte[_BLOCK_SIZE];
-            blockEncrypt(pt, ct, 0, key, _BLOCK_SIZE);
+            blockEncrypt(pt, ct, 0, 0, key, _BLOCK_SIZE);
 
             if (_RDEBUG && _debuglevel > 6) {
                 System.out.println("Intermediate Plaintext Values (Decryption)");
@@ -757,7 +759,7 @@ public final class CryptixRijndael_Algorithm // implicit no-argument constructor
                 System.out.println("CT=" + toString(ct));
             }
             byte[] cpt = new byte[_BLOCK_SIZE];
-            blockDecrypt(ct, cpt, 0, key, _BLOCK_SIZE);
+            blockDecrypt(ct, cpt, 0, 0, key, _BLOCK_SIZE);
 
             ok = areEqual(pt, cpt);
             if (!ok) throw new RuntimeException("Symmetric operation failed");
