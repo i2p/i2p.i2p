@@ -27,6 +27,7 @@ import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
 import net.i2p.data.RouterIdentity;
+import net.i2p.data.RouterInfo;
 import net.i2p.data.SessionKey;
 import net.i2p.data.Signature;
 import net.i2p.data.i2np.I2NPMessage;
@@ -35,6 +36,7 @@ import net.i2p.router.OutNetMessage;
 import net.i2p.router.RouterContext;
 import net.i2p.router.transport.BandwidthLimitedInputStream;
 import net.i2p.router.transport.BandwidthLimitedOutputStream;
+import net.i2p.router.transport.FIFOBandwidthLimiter;
 import net.i2p.util.I2PThread;
 import net.i2p.util.Log;
 import net.i2p.util.NativeBigInteger;
@@ -150,14 +152,14 @@ class TCPConnection implements I2NPMessageReader.I2NPMessageEventListener {
     }
     
     protected boolean identifyStationToStation() throws IOException, DataFormatException {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream(512);
-        _context.router().getRouterInfo().getIdentity().writeBytes(baos);
+        ByteArrayOutputStream baos = new ByteArrayOutputStream(10*1024);
+        _context.router().getRouterInfo().writeBytes(baos);
         Hash keyHash = _context.sha().calculateHash(_key.getData());
         keyHash.writeBytes(baos);
         Signature sig = _context.dsa().sign(baos.toByteArray(), _context.keyManager().getSigningPrivateKey());
         sig.writeBytes(baos);
     
-        byte encr[] = _context.AESEngine().safeEncrypt(baos.toByteArray(),  _key, _iv, 1024);
+        byte encr[] = _context.AESEngine().safeEncrypt(baos.toByteArray(),  _key, _iv, 10*1024);
         DataHelper.writeLong(_out, 2, encr.length);
         _out.write(encr);
 
@@ -172,8 +174,9 @@ class TCPConnection implements I2NPMessageReader.I2NPMessageEventListener {
             throw new DataFormatException("Unable to decrypt - failed exchange?");
 
         ByteArrayInputStream bais = new ByteArrayInputStream(decr);
-        _remoteIdentity = new RouterIdentity();
-        _remoteIdentity.readBytes(bais);
+        RouterInfo peer = new RouterInfo();
+        peer.readBytes(bais);
+        _remoteIdentity = peer.getIdentity();
         Hash peerKeyHash = new Hash();
         peerKeyHash.readBytes(bais);
 
@@ -187,7 +190,10 @@ class TCPConnection implements I2NPMessageReader.I2NPMessageEventListener {
         rsig.readBytes(bais);
         byte signedData[] = new byte[decr.length - rsig.getData().length];
         System.arraycopy(decr, 0, signedData, 0, signedData.length);
-        return _context.dsa().verifySignature(rsig, signedData, _remoteIdentity.getSigningPublicKey());
+        boolean valid = _context.dsa().verifySignature(rsig, signedData, _remoteIdentity.getSigningPublicKey());
+        if (valid) 
+            _context.netDb().store(_remoteIdentity.getHash(), peer);
+        return valid;
     }
     
     protected final static int ESTABLISHMENT_TIMEOUT = 10*1000; // 10 second lag (not necessarily for the entire establish)
@@ -311,6 +317,16 @@ class TCPConnection implements I2NPMessageReader.I2NPMessageEventListener {
             if (_log.shouldLog(Log.ERROR))
                 _log.error("messages expired on the queue to " + _remoteIdentity.getHash().toBase64() + ": " + pending.toString());
 
+            if (_out instanceof BandwidthLimitedOutputStream) {
+                BandwidthLimitedOutputStream o = (BandwidthLimitedOutputStream)_out;
+                FIFOBandwidthLimiter.Request req = o.getCurrentRequest();
+                if (req != null) {
+                    if (_log.shouldLog(Log.ERROR))
+                        _log.error("When the messages timed out, our outbound con requested " 
+                                   + req.getTotalOutboundRequested() + " bytes (" + req.getPendingOutboundRequested() 
+                                   + " pending) after waiting " + (_context.clock().now() - req.getRequestTime()) + "ms");
+                }
+            }
             // do we really want to give them a comm error because they're so.damn.slow reading their stream?
             _context.profileManager().commErrorOccurred(_remoteIdentity.getHash());
             
@@ -538,7 +554,7 @@ class TCPConnection implements I2NPMessageReader.I2NPMessageEventListener {
             long end = _context.clock().now();
             long timeLeft = exp - end;
 
-            msg.timestamp("TCPConnection.runner.doSend sent and flushed");
+            msg.timestamp("TCPConnection.runner.doSend sent and flushed " + data.length + " bytes");
 
             if (_log.shouldLog(Log.INFO))
                 _log.info("Message " + msg.getMessageType()
