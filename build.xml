@@ -232,9 +232,6 @@
         <copy file="hosts.txt" todir="pkg-temp/" />
         <mkdir dir="pkg-temp/eepsite" />
         <mkdir dir="pkg-temp/eepsite/webapps" />
-        <mkdir dir="pkg-temp/eepsite/logs" />
-        <mkdir dir="pkg-temp/eepsite/docroot" />
-        <copy file="installer/resources/eepsite_index.html" tofile="pkg-temp/eepsite/docroot/index.html" />
         <copy file="installer/resources/jetty.xml" tofile="pkg-temp/eepsite/jetty.xml" />
         <zip destfile="i2pupdate.zip" basedir="pkg-temp" />
     </target>
