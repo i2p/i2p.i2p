@@ -95,17 +95,21 @@ class PeerSelector {
                     failing = new ArrayList(4);
                 failing.add(cur);
             } else if (_context.profileOrganizer().peerSendsBadReplies(cur)) {
-                if (failing == null)
-                    failing = new ArrayList(4);
-                failing.add(cur);
-                if (_log.shouldLog(Log.WARN)) {
-                    PeerProfile profile = _context.profileOrganizer().getProfile(cur);
-                    if (profile != null) {
-                        RateStat invalidReplyRateStat = profile.getDBHistory().getInvalidReplyRate();
-                        Rate invalidReplyRate = invalidReplyRateStat.getRate(60*60*1000l);
-                        _log.warn("Peer " + cur.toBase64() + " sends us bad replies: current hour: " 
-                                  + invalidReplyRate.getCurrentEventCount() + " and last hour: " 
-                                  + invalidReplyRate.getLastEventCount() + ":\n" + invalidReplyRate.toString());
+                if (true) {
+                    _log.warn("Peer " + cur.toBase64() + " sends us bad replies (but we still query them)");
+                } else {
+                    if (failing == null)
+                        failing = new ArrayList(4);
+                    failing.add(cur);
+                    if (_log.shouldLog(Log.WARN)) {
+                        PeerProfile profile = _context.profileOrganizer().getProfile(cur);
+                        if (profile != null) {
+                            RateStat invalidReplyRateStat = profile.getDBHistory().getInvalidReplyRate();
+                            Rate invalidReplyRate = invalidReplyRateStat.getRate(60*60*1000l);
+                            _log.warn("Peer " + cur.toBase64() + " sends us bad replies: current hour: " 
+                                      + invalidReplyRate.getCurrentEventCount() + " and last hour: " 
+                                      + invalidReplyRate.getLastEventCount() + ":\n" + invalidReplyRate.toString());
+                        }
                     }
                 }
             }

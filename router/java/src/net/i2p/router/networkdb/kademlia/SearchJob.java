@@ -566,6 +566,8 @@ class SearchJob extends JobImpl {
         if (_onSuccess != null)
             getContext().jobQueue().addJob(_onSuccess);
         
+        _facade.searchComplete(_state.getTarget());
+        
         resend();
     }
     
@@ -600,6 +602,8 @@ class SearchJob extends JobImpl {
         }
         if (_onFailure != null)
             getContext().jobQueue().addJob(_onFailure);
+        
+        _facade.searchComplete(_state.getTarget());
     }
 
     public String getName() { return "Kademlia NetDb Search"; }
