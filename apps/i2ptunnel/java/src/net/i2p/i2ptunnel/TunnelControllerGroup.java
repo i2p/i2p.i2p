@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -20,6 +21,8 @@ import java.util.TreeMap;
 import net.i2p.I2PAppContext;
 import net.i2p.client.I2PSession;
 import net.i2p.client.I2PSessionException;
+import net.i2p.data.DataHelper;
+import net.i2p.util.I2PThread;
 import net.i2p.util.Log;
 
 /**
@@ -43,28 +46,34 @@ public class TunnelControllerGroup {
      */
     private Map _sessions;
     
-    public static TunnelControllerGroup getInstance() { return _instance; }
+    public static TunnelControllerGroup getInstance() { 
+        synchronized (TunnelControllerGroup.class) {
+            if (_instance == null)
+                _instance = new TunnelControllerGroup(DEFAULT_CONFIG_FILE);
+            return _instance; 
+        }
+    }
 
     private TunnelControllerGroup(String configFile) {
         _log = I2PAppContext.getGlobalContext().logManager().getLog(TunnelControllerGroup.class);
-        _instance = this;
-        _controllers = new ArrayList();
+        _controllers = Collections.synchronizedList(new ArrayList());
         _configFile = configFile;
         _sessions = new HashMap(4);
         loadControllers(_configFile);
     }
 
     public static void main(String args[]) {
-        if ( (args == null) || (args.length <= 0) ) {
-            new TunnelControllerGroup(DEFAULT_CONFIG_FILE);
-        } else if (args.length == 1) {
-            if (DEFAULT_CONFIG_FILE.equals(args[0]))
-                new TunnelControllerGroup(DEFAULT_CONFIG_FILE);
-            else
-                new TunnelControllerGroup(args[0]);
-        } else {
-            System.err.println("Usage: TunnelControllerGroup [filename]");
-            return;
+        synchronized (TunnelControllerGroup.class) {
+            if (_instance != null) return; // already loaded through the web
+            
+            if ( (args == null) || (args.length <= 0) ) {
+                _instance = new TunnelControllerGroup(DEFAULT_CONFIG_FILE);
+            } else if (args.length == 1) {
+                _instance = new TunnelControllerGroup(args[0]);
+            } else {
+                System.err.println("Usage: TunnelControllerGroup [filename]");
+                return;
+            }
         }
     }
     
@@ -89,9 +98,23 @@ public class TunnelControllerGroup {
             _controllers.add(controller);
             i++;
         }
+        I2PThread startupThread = new I2PThread(new StartControllers(), "Startup tunnels");
+        startupThread.start();
+        
         if (_log.shouldLog(Log.INFO))
             _log.info(i + " controllers loaded from " + configFile);
     }
+    
+    private class StartControllers implements Runnable {
+        public void run() {
+            for (int i = 0; i < _controllers.size(); i++) {
+                TunnelController controller = (TunnelController)_controllers.get(i);
+                if (controller.getStartOnLoad())
+                    controller.startTunnel();
+            }
+        }
+    }
+    
     
     public void reloadControllers() {
         unloadControllers();
@@ -143,7 +166,6 @@ public class TunnelControllerGroup {
             controller.stopTunnel();
             msgs.addAll(controller.clearMessages());
         }
-        
         if (_log.shouldLog(Log.INFO))
             _log.info(_controllers.size() + " controllers stopped");
         return msgs;
@@ -161,7 +183,7 @@ public class TunnelControllerGroup {
             controller.startTunnel();
             msgs.addAll(controller.clearMessages());
         }
-        
+
         if (_log.shouldLog(Log.INFO))
             _log.info(_controllers.size() + " controllers started");
         return msgs;
@@ -259,33 +281,13 @@ public class TunnelControllerGroup {
         }
         
         Properties props = new Properties();
-        FileInputStream fis = null;
         try {
-            fis = new FileInputStream(cfgFile);
-            BufferedReader in = new BufferedReader(new InputStreamReader(fis));
-            String line = null;
-            while ( (line = in.readLine()) != null) {
-                line = line.trim();
-                if (line.length() <= 0) continue;
-                if (line.startsWith("#") || line.startsWith(";"))
-                    continue;
-                int eq = line.indexOf('=');
-                if ( (eq <= 0) || (eq >= line.length() - 1) )
-                    continue;
-                String key = line.substring(0, eq);
-                String val = line.substring(eq+1);
-                props.setProperty(key, val);
-            }
-            
-            if (_log.shouldLog(Log.INFO))
-                _log.info("Props loaded with " + props.size() + " lines");
+            DataHelper.loadProps(props, cfgFile);
             return props;
         } catch (IOException ioe) {
             if (_log.shouldLog(Log.ERROR))
                 _log.error("Error reading the controllers from " + configFile, ioe);
             return null;
-        } finally {
-            if (fis != null) try { fis.close(); } catch (IOException ioe) {}
         }
     }
     

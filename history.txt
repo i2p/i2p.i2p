@@ -1,4 +1,16 @@
-$Id: history.txt,v 1.77 2004/11/20 23:08:14 jrandom Exp $
+$Id: history.txt,v 1.78 2004/11/21 14:42:57 jrandom Exp $
+
+2004-11-21  jrandom
+    * Only allow small clock skews after the first 10 minutes of operation
+      (to prevent later network lag bouncing us way off course - yes, we
+      really need an NTP impl to balance out the network burps...)
+    * Revamp the I2PTunnel web interface startup process so that everything
+      is shown immediately, so that different pieces hanging don't hang
+      the rest, and other minor bugfixes.
+    * Take note of SAM startup error (in case you're already running a SAM
+      bridge...)
+    * Increase the bandwidth limiter burst values available to 10-60s (or
+      whatever is placed in /configadvanced.jsp, of course)
 
 2004-11-21  jrandom
     * Allow end of line comments in the hosts.txt and other config files,

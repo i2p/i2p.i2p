@@ -17,6 +17,7 @@ import net.i2p.time.Timestamper;
 public class Clock implements Timestamper.UpdateListener {
     private I2PAppContext _context;
     private Timestamper _timestamper;
+    private long _startedOn;
     
     public Clock(I2PAppContext context) {
         _context = context;
@@ -24,6 +25,7 @@ public class Clock implements Timestamper.UpdateListener {
         _alreadyChanged = false;
         _listeners = new HashSet(64);
         _timestamper = new Timestamper(context, this);
+        _startedOn = System.currentTimeMillis();
     }
     public static Clock getInstance() {
         return I2PAppContext.getGlobalContext().clock();
@@ -40,6 +42,8 @@ public class Clock implements Timestamper.UpdateListener {
 
     /** if the clock is skewed by 3+ days, fuck 'em */
     public final static long MAX_OFFSET = 3 * 24 * 60 * 60 * 1000;
+    /** after we've started up and shifted the clock, don't allow shifts of more than a minute */
+    public final static long MAX_LIVE_OFFSET = 60 * 1000;
     /** if the clock skewed changes by less than 1s, ignore the update (so we don't slide all over the place) */
     public final static long MIN_OFFSET_CHANGE = 10 * 1000;
 
@@ -58,6 +62,15 @@ public class Clock implements Timestamper.UpdateListener {
             if ((offsetMs > MAX_OFFSET) || (offsetMs < 0 - MAX_OFFSET)) {
                 getLog().error("Maximum offset shift exceeded [" + offsetMs + "], NOT HONORING IT");
                 return;
+            }
+            
+            // only allow substantial modifications before the first 10 minutes
+            if (_alreadyChanged && (System.currentTimeMillis() - _startedOn > 10 * 60 * 1000)) {
+                if ( (offsetMs > MAX_LIVE_OFFSET) || (offsetMs < 0 - MAX_LIVE_OFFSET) ) {
+                    getLog().log(Log.CRIT, "The clock has already been updated, but you want to change it by "
+                                           + offsetMs + "?  Did something break?");
+                    return;
+                }
             }
             
             if ((delta < MIN_OFFSET_CHANGE) && (delta > 0 - MIN_OFFSET_CHANGE)) {

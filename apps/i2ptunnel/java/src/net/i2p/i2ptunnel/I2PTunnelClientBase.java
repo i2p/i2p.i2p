@@ -99,7 +99,7 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
         t.start();
         open = true;
         synchronized (this) {
-            while (!listenerReady) {
+            while (!listenerReady && open) {
                 try {
                     wait();
                 } catch (InterruptedException e) {
@@ -112,7 +112,7 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
             l.log("Ready! Port " + getLocalPort());
             notifyEvent("openBaseClientResult", "ok");
         } else {
-            l.log("Error!");
+            l.log("Error listening - please see the logs!");
             notifyEvent("openBaseClientResult", "error");
         }
     }
@@ -232,7 +232,13 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
     public final void run() {
         try {
             InetAddress addr = getListenHost(l);
-            if (addr == null) return;
+            if (addr == null) {
+                open = false;
+                synchronized (this) {
+                    notifyAll();
+                }
+                return;
+            }
             ss = new ServerSocket(localPort, 0, addr);
 
             // If a free port was requested, find out what we got
@@ -263,10 +269,14 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
                 manageConnection(s);
             }
         } catch (IOException ex) {
-            _log.error("Error listening for connections", ex);
+            _log.error("Error listening for connections on " + localPort, ex);
             notifyEvent("openBaseClientResult", "error");
             synchronized (sockLock) {
                 mySockets.clear();
+            }
+            open = false;
+            synchronized (this) {
+                notifyAll();
             }
         }
     }

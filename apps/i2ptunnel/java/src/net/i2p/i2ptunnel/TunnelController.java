@@ -31,6 +31,7 @@ public class TunnelController implements Logging {
     private List _messages;
     private List _sessions;
     private boolean _running;
+    private boolean _starting;
     
     /**
      * Create a new controller for a tunnel out of the specific config options.
@@ -58,8 +59,7 @@ public class TunnelController implements Logging {
         _running = false;
         if (createKey && ("server".equals(getType())) )
             createPrivateKey();
-        if (getStartOnLoad())
-            startTunnel();
+        _starting = getStartOnLoad();
     }
     
     private void createPrivateKey() {
@@ -104,12 +104,14 @@ public class TunnelController implements Logging {
      *
      */
     public void startTunnel() {
+        _starting = true;
         try {
             doStartTunnel();
         } catch (Exception e) {
             _log.error("Error starting up the tunnel", e);
             log("Error starting up the tunnel - " + e.getMessage());
         }
+        _starting = false;
     }
     private void doStartTunnel() {
         if (_running) {
@@ -299,6 +301,7 @@ public class TunnelController implements Logging {
     public boolean getStartOnLoad() { return "true".equalsIgnoreCase(_config.getProperty("startOnLoad", "true")); }
     
     public boolean getIsRunning() { return _running; }
+    public boolean getIsStarting() { return _starting; }
     
     public void getSummary(StringBuffer buf) {
         String type = getType();

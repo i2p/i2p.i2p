@@ -250,6 +250,7 @@ public class SAMBridge implements Runnable {
     }
     
     public void run() {
+        if (serverSocket == null) return;
         try {
             while (acceptConnections) {
                 Socket s = serverSocket.accept();
@@ -293,7 +294,8 @@ public class SAMBridge implements Runnable {
             try {
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("Shutting down, closing server socket");
-                serverSocket.close();
+                if (serverSocket != null)
+                    serverSocket.close();
             } catch (IOException e) {}
         }
     }

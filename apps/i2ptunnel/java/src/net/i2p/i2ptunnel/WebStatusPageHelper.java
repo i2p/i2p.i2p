@@ -68,6 +68,8 @@ public class WebStatusPageHelper {
         if (controller.getIsRunning()) {
             buf.append("<i>running</i> ");
             buf.append("<a href=\"index.jsp?num=").append(num).append("&action=stop\">stop</a> ");
+        } else if (controller.getIsStarting()) {
+            buf.append("<i>startup in progress (please be patient)</i>");
         } else {
             buf.append("<i>not running</i> ");
             buf.append("<a href=\"index.jsp?num=").append(num).append("&action=start\">start</a> ");
