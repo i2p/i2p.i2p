@@ -27,7 +27,7 @@ public class HostsTxtNamingService extends NamingService {
      * appropriate application context itself.
      *
      */
-    protected HostsTxtNamingService(I2PAppContext context) { super(context); }
+    public HostsTxtNamingService(I2PAppContext context) { super(context); }
     private HostsTxtNamingService() { super(null); }
     
     /**
