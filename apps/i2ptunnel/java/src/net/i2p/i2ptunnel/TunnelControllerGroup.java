@@ -47,9 +47,12 @@ public class TunnelControllerGroup {
     
     public static void main(String args[]) {
         if ( (args == null) || (args.length <= 0) ) {
-            _instance = new TunnelControllerGroup(DEFAULT_CONFIG_FILE);
+            _instance = getInstance();
         } else if (args.length == 1) {
-            _instance = new TunnelControllerGroup(args[0]);
+            if (DEFAULT_CONFIG_FILE.equals(args[0]))
+                _instance = getInstance();
+            else
+                _instance = new TunnelControllerGroup(args[0]);
         } else {
             System.err.println("Usage: TunnelControllerGroup [filename]");
             return;
