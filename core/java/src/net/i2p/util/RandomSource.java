@@ -12,6 +12,7 @@ package net.i2p.util;
 import java.security.SecureRandom;
 
 import net.i2p.I2PAppContext;
+import net.i2p.crypto.EntropyHarvester;
 
 /**
  * Singleton for whatever PRNG i2p uses.  
@@ -20,10 +21,14 @@ import net.i2p.I2PAppContext;
  */
 public class RandomSource extends SecureRandom {
     private Log _log;
+    private EntropyHarvester _entropyHarvester;
 
     public RandomSource(I2PAppContext context) {
         super();
         _log = context.logManager().getLog(RandomSource.class);
+        // when we replace to have hooks for fortuna (etc), replace with
+        // a factory (or just a factory method)
+        _entropyHarvester = new DummyEntropyHarvester();
     }
     public static RandomSource getInstance() {
         return I2PAppContext.getGlobalContext().random();
@@ -61,5 +66,13 @@ public class RandomSource extends SecureRandom {
         synchronized (this) {
             super.nextBytes(bytes);
         }
+    }
+    
+    public EntropyHarvester harvester() { return _entropyHarvester; }
+ 
+    // noop
+    private static class DummyEntropyHarvester implements EntropyHarvester {
+        public void feedEntropy(String source, long data, int bitoffset, int bits) {}
+        public void feedEntropy(String source, byte[] data, int offset, int len) {}
     }
 }

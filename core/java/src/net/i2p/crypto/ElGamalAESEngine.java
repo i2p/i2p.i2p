@@ -154,11 +154,14 @@ public class ElGamalAESEngine {
 
         byte preIV[] = null;
         
+        int offset = 0;
         byte key[] = new byte[SessionKey.KEYSIZE_BYTES];
-        System.arraycopy(elgDecr, 0, key, 0, SessionKey.KEYSIZE_BYTES);
+        System.arraycopy(elgDecr, offset, key, 0, SessionKey.KEYSIZE_BYTES);
+        offset += SessionKey.KEYSIZE_BYTES;
         usedKey.setData(key);
         preIV = new byte[32];
-        System.arraycopy(elgDecr, SessionKey.KEYSIZE_BYTES, preIV, 0, 32);
+        System.arraycopy(elgDecr, offset, preIV, 0, 32);
+        offset += 32;
 
         //_log.debug("Pre IV for decryptNewSession: " + DataHelper.toString(preIV, 32));
         //_log.debug("SessionKey for decryptNewSession: " + DataHelper.toString(key.getData(), 32));
@@ -167,6 +170,9 @@ public class ElGamalAESEngine {
         byte iv[] = new byte[16];
         System.arraycopy(ivHash.getData(), 0, iv, 0, 16);
         _context.sha().cache().release(cache);
+
+        // feed the extra bytes into the PRNG
+        _context.random().harvester().feedEntropy("ElG/AES", elgDecr, offset, elgDecr.length - offset); 
 
         byte aesDecr[] = decryptAESBlock(data, 514, data.length-514, usedKey, iv, null, foundTags, foundKey);
 
@@ -403,6 +409,8 @@ public class ElGamalAESEngine {
             elgEncr = elg;
         }
         //_log.debug("ElGamal encrypted length: " + elgEncr.length + " elGamal source length: " + elgSrc.toByteArray().length);
+        
+        // should we also feed the encrypted elG block into the harvester?
 
         SHA256EntryCache.CacheEntry cache = _context.sha().cache().acquire(preIV.length);
         Hash ivHash = _context.sha().calculateHash(preIV, cache);

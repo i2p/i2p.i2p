@@ -48,6 +48,7 @@ import net.i2p.util.RandomSource;
  * @author jrandom
  */
 public class DHSessionKeyBuilder {
+    private static I2PAppContext _context = I2PAppContext.getGlobalContext();
     private final static Log _log = new Log(DHSessionKeyBuilder.class);
     private static int MIN_NUM_BUILDERS = -1;
     private static int MAX_NUM_BUILDERS = -1;
@@ -68,7 +69,7 @@ public class DHSessionKeyBuilder {
     public final static String DEFAULT_DH_PRECALC_DELAY = "1000";
 
     static {
-        I2PAppContext ctx = I2PAppContext.getGlobalContext();
+        I2PAppContext ctx = _context;
         try {
             int val = Integer.parseInt(ctx.getProperty(PROP_DH_PRECALC_MIN, DEFAULT_DH_PRECALC_MIN));
             MIN_NUM_BUILDERS = val;
@@ -305,6 +306,8 @@ public class DHSessionKeyBuilder {
                 _log.debug("Storing " + remaining.length + " bytes from the DH exchange by SHA256 the session key");
         } else { // (buf.length >= val.length) 
             System.arraycopy(buf, 0, val, 0, val.length);
+            // feed the extra bytes into the PRNG
+            _context.random().harvester().feedEntropy("DH", buf, val.length, buf.length-val.length); 
             byte remaining[] = new byte[buf.length - val.length];
             System.arraycopy(buf, val.length, remaining, 0, remaining.length);
             _extraExchangedBytes.setData(remaining);
