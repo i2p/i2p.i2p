@@ -32,6 +32,7 @@
  <input type="submit" name="action" value="Shutdown immediately" />
  <input type="submit" name="action" value="Cancel graceful shutdown" />
  <input type="submit" name="action" value="Hard restart" />
+ <% if ( (System.getProperty("os.name") != null) && (System.getProperty("os.name").startsWith("Win")) ) { %>
  <h4>Systray integration</h4>
  On the windows platform, there is a small application to sit in the system 
  tray, allowing you to view the router's status (later on, I2P client applications
@@ -39,7 +40,6 @@
  If you are on windows, you can either enable or disable that icon here. <br />
  <input type="submit" name="action" value="Show systray icon" />
  <input type="submit" name="action" value="Hide systray icon" />
- <% if ( (System.getProperty("os.name") != null) && (System.getProperty("os.name").startsWith("Win")) ) { %>
  <h4>Run on startup</h4>
  You can control whether I2P is run on startup or not by selecting one of the 
  following options - I2P will install (or remove) a service accordingly.  You can
