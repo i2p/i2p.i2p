@@ -2200,6 +2200,7 @@ class KRpcFindData(KRpcFindNode):
         value = self.localNode.storage.getKey(self.hashWanted.asHex(), keyIsHashed=True)
         if value != None:
             self.log(4, "Found required value in local storage")
+            self.log(4, "VALUE='%s'" % value)
             self.returnValue(value)
             return
     
@@ -2219,6 +2220,20 @@ class KRpcFindData(KRpcFindNode):
             KRpcFindNode.on_reply(self, peer, msgId, **details)
     
     #@-node:on_reply
+    #@+node:returnValue
+    def returnValue(self, items):
+        """
+        override with a nicer call sig
+        """
+        # a hack for testing - save this RPC object into the node
+        # so we can introspect it
+        self.localNode.lastrpc = self
+    
+        self.reportStats()
+    
+        KRpc.returnValue(self, items, nodes=items)
+    
+    #@-node:returnValue
     #@-others
 
 #@-node:class KRpcFindData
