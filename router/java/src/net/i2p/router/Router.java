@@ -264,6 +264,12 @@ public class Router {
         buf.append("<li> ").append(sent).append(" bytes sent, ");
         buf.append(received).append(" bytes received</li>");
 
+        long notSent = _context.bandwidthLimiter().getTotalWastedOutboundBytes();
+        long notReceived = _context.bandwidthLimiter().getTotalWastedInboundBytes();
+
+        buf.append("<li> ").append(notSent).append(" bytes outbound bytes unused, ");
+        buf.append(notReceived).append(" bytes inbound bytes unused</li>");
+
         DecimalFormat fmt = new DecimalFormat("##0.00");
 
         // we use the unadjusted time, since thats what getWhenStarted is based off
@@ -276,7 +282,15 @@ public class Router {
             buf.append(fmt.format(sendKBps)).append("KBps sent ");
             buf.append(fmt.format(receivedKBps)).append("KBps received");
             buf.append("</li>");
-            } 
+        }
+        if ( (notSent > 0) && (notReceived > 0) ) {
+            double notSendKBps = notSent / (lifetime*1024.0);
+            double notReceivedKBps = notReceived / (lifetime*1024.0);
+            buf.append("<li>Lifetime rate: ");
+            buf.append(fmt.format(notSendKBps)).append("KBps outbound unused  ");
+            buf.append(fmt.format(notReceivedKBps)).append("KBps inbound unused");
+            buf.append("</li>");
+        } 
         
         RateStat sendRate = _context.statManager().getRate("transport.sendMessageSize");
         for (int i = 0; i < sendRate.getPeriods().length; i++) {
