@@ -132,21 +132,24 @@ public class HandleGarlicMessageJob extends JobImpl {
     
     private boolean isValid(GarlicClove clove) {
         if (isKnown(clove.getCloveId())) {
-            _log.error("Duplicate garlic clove received - replay attack in progress? [cloveId = "
-                       + clove.getCloveId() + " expiration = " + clove.getExpiration());
+            if (_log.shouldLog(Log.ERROR))
+                _log.error("Duplicate garlic clove received - replay attack in progress? [cloveId = "
+                           + clove.getCloveId() + " expiration = " + clove.getExpiration());
             return false;
         } else {
-            _log.debug("Clove " + clove.getCloveId() + " expiring on " + clove.getExpiration() 
-                       + " is not known");
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Clove " + clove.getCloveId() + " expiring on " + clove.getExpiration() 
+                           + " is not known");
         }
         long now = getContext().clock().now();
         if (clove.getExpiration().getTime() < now) {
             if (clove.getExpiration().getTime() < now + Router.CLOCK_FUDGE_FACTOR) {
-                _log.warn("Expired garlic received, but within our fudge factor [" 
-                          + clove.getExpiration() + "]");
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("Expired garlic received, but within our fudge factor [" 
+                              + clove.getExpiration() + "]");
             } else {
                 if (_log.shouldLog(Log.DEBUG))
-                    _log.error("Expired garlic clove received - replay attack in progress? [cloveId = " 
+                    _log.debug("Expired garlic clove received - replay attack in progress? [cloveId = " 
                                + clove.getCloveId() + " expiration = " + clove.getExpiration() 
                                + " now = " + (new Date(getContext().clock().now())));
                 return false;

@@ -10,6 +10,7 @@ package net.i2p.data;
  */
 
 import java.io.BufferedReader;
+import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -255,8 +256,9 @@ public class DataHelper {
     public static void writeLong(OutputStream rawStream, int numBytes, long value) 
         throws DataFormatException, IOException {
         try {
-            UnsignedInteger i = new UnsignedInteger(value);
-            rawStream.write(i.getBytes(numBytes));
+            UnsignedInteger.writeBytes(rawStream, numBytes, value);
+            //UnsignedInteger i = new UnsignedInteger(value);
+            //rawStream.write(i.getBytes(numBytes));
         } catch (IllegalArgumentException iae) {
             throw new DataFormatException("Invalid value (must be positive)", iae);
         }
@@ -340,7 +342,7 @@ public class DataHelper {
 
         return new Date(date);
     }
-
+    
     /** Write out a date to the stream as specified by the I2P data structure spec.
      * @param out stream to write to
      * @param date date to write (can be null)
@@ -360,12 +362,18 @@ public class DataHelper {
         else
             return toLong(DATE_LENGTH, date.getTime());
     }
-    public static Date fromDate(byte src[], int offset) throws IllegalArgumentException {
-        long when = fromLong(src, offset, DATE_LENGTH);
-        if (when <= 0) 
-            return null;
-        else
-            return new Date(when);
+    public static Date fromDate(byte src[], int offset) throws DataFormatException {
+        if ( (src == null) || (offset + DATE_LENGTH > src.length) )
+            throw new DataFormatException("Not enough data to read a date");
+        try {
+            long when = fromLong(src, offset, DATE_LENGTH);
+            if (when <= 0) 
+                return null;
+            else
+                return new Date(when);
+        } catch (IllegalArgumentException iae) {
+            throw new DataFormatException(iae.getMessage());
+        }
     }
     
     public static final int DATE_LENGTH = 8;

@@ -1,4 +1,9 @@
-$Id: history.txt,v 1.59 2004/10/30 18:44:01 jrandom Exp $
+$Id: history.txt,v 1.60 2004/11/01 08:31:31 jrandom Exp $
+
+2004-11-02  jrandom
+    * Fixed up the configuration overrides for the streaming socket lib 
+      integration so that it properly honors env settings.
+    * More memory usage streamlining (last major revamp for now, i promise)
 
 2004-11-01  jrandom
     * Increase the tunnel test timeout rapidly if our tunnels are failing.

@@ -378,7 +378,11 @@ public class RouterInfo extends DataStructureImpl {
     public synchronized void readBytes(InputStream in) throws DataFormatException, IOException {
         _identity = new RouterIdentity();
         _identity.readBytes(in);
-        _published = DataHelper.readDate(in).getTime();
+        Date when = DataHelper.readDate(in);
+        if (when == null)
+            _published = 0;
+        else
+            _published = when.getTime();
         int numAddresses = (int) DataHelper.readLong(in, 1);
         for (int i = 0; i < numAddresses; i++) {
             RouterAddress address = new RouterAddress();
@@ -402,7 +406,7 @@ public class RouterInfo extends DataStructureImpl {
 
     public synchronized void writeBytes(OutputStream out) throws DataFormatException, IOException {
         if (_identity == null) throw new DataFormatException("Missing identity");
-        if (_published <= 0) throw new DataFormatException("Invalid published date: " + _published);
+        if (_published < 0) throw new DataFormatException("Invalid published date: " + _published);
         if (_signature == null) throw new DataFormatException("Signature is null");
         //if (!isValid())
         //    throw new DataFormatException("Data is not valid");

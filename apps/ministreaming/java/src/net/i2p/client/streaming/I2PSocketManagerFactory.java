@@ -4,6 +4,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Iterator;
 import java.util.Properties;
 
 import net.i2p.I2PAppContext;
@@ -81,6 +82,13 @@ public class I2PSocketManagerFactory {
     public static I2PSocketManager createManager(InputStream myPrivateKeyStream, String i2cpHost, int i2cpPort,
                                                  Properties opts) {
         I2PClient client = I2PClientFactory.createClient();
+        if (opts == null)
+            opts = new Properties();
+        for (Iterator iter = System.getProperties().keySet().iterator(); iter.hasNext(); ) {
+            String name = (String)iter.next();
+            if (!opts.containsKey(name))
+                opts.setProperty(name, System.getProperty(name));
+        }
         if (true) {
             // for the old streaming lib
             opts.setProperty(I2PClient.PROP_RELIABILITY, I2PClient.PROP_RELIABILITY_GUARANTEED);
@@ -88,11 +96,12 @@ public class I2PSocketManagerFactory {
         } else {
             // for new streaming lib:
             opts.setProperty(I2PClient.PROP_RELIABILITY, I2PClient.PROP_RELIABILITY_BEST_EFFORT);
-            //opts.setProperty("tunnels.depthInbound", "0");
+            //p.setProperty("tunnels.depthInbound", "0");
         }
 
         opts.setProperty(I2PClient.PROP_TCP_HOST, i2cpHost);
         opts.setProperty(I2PClient.PROP_TCP_PORT, "" + i2cpPort);
+        
         try {
             I2PSession session = client.createSession(myPrivateKeyStream, opts);
             session.connect();

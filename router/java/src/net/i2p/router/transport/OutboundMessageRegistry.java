@@ -76,7 +76,7 @@ public class OutboundMessageRegistry {
         long continueTime = 0;
         int numMessages = messages.size();
 
-        StringBuffer slow = new StringBuffer(256);
+        StringBuffer slow = null; // new StringBuffer(256);
         long afterSync1 = _context.clock().now();
 
         ArrayList matchedRemove = null; // new ArrayList(32);
@@ -93,6 +93,7 @@ public class OutboundMessageRegistry {
                     if (_log.shouldLog(Log.WARN))
                         _log.warn("Matching with selector took too long (" + diff + "ms) : " 
                                   + selector.getClass().getName());
+                    if (slow == null) slow = new StringBuffer(256);
                     slow.append(selector.getClass().getName()).append(": ");
                     slow.append(diff).append(" ");
                 }
@@ -152,7 +153,9 @@ public class OutboundMessageRegistry {
                 buf.append(0);
             else
                 buf.append(matchedRemove.size());
-            buf.append(" removed, ").append(matches.size()).append(" matches: slow = ").append(slow.toString());
+            buf.append(" removed, ").append(matches.size()).append(" matches: slow = ");
+            if (slow != null)
+                buf.append(slow.toString());
             _log.log(level, buf.toString());
         }
 

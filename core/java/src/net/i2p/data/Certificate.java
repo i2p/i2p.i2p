@@ -104,13 +104,21 @@ public class Certificate extends DataStructureImpl {
         return cur - offset;
     }
     
-    public int readBytes(byte source[], int offset) {
+    public int readBytes(byte source[], int offset) throws DataFormatException {
+        if (source == null) throw new DataFormatException("Cert is null");
+        if (source.length <= offset + 3)
+            throw new DataFormatException("Cert is too small [" + source.length + " off=" + offset + "]");
+
         int cur = offset;
         _type = (int)DataHelper.fromLong(source, cur, 1);
         cur++;
         int length = (int)DataHelper.fromLong(source, cur, 2);
         cur += 2;
         if (length > 0) {
+            if (length + cur > source.length)
+                throw new DataFormatException("Payload on the certificate is insufficient (len=" 
+                                              + source.length + " off=" + offset + " cur=" + cur
+                                              + " payloadLen=" + length);
             _payload = new byte[length];
             System.arraycopy(source, cur, _payload, 0, length);
             cur += length;

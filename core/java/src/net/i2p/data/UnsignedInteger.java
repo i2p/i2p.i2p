@@ -9,6 +9,8 @@ package net.i2p.data;
  *
  */
 
+import java.io.IOException;
+import java.io.OutputStream;
 import java.math.BigInteger;
 
 import net.i2p.util.Log;
@@ -189,6 +191,16 @@ public class UnsignedInteger {
         System.arraycopy(_data, 0, data, numBytes - _data.length, _data.length);
         return data;
     }
+    
+    
+    public static void writeBytes(OutputStream rawStream, int numBytes, long value) 
+        throws DataFormatException, IOException {
+        if (value < 0) throw new DataFormatException("Invalid value (" + value + ")");
+        for (int i = numBytes - 1; i >= 0; i--) {
+            byte cur = (byte)( (value >>> (i*8) ) & 0xFF);
+            rawStream.write(cur);
+        }
+    }
 
     public BigInteger getBigInteger() {
         return new BigInteger(1, _data);
@@ -238,6 +250,7 @@ public class UnsignedInteger {
         testNum(1024 * 1024 * 1024 * 4L + 1L);
         _log.debug("Testing MaxLong");
         testNum(Long.MAX_VALUE);
+        testWrite();
         } catch (Throwable t) { t.printStackTrace(); }
         try {
             Thread.sleep(1000);
@@ -259,5 +272,19 @@ public class UnsignedInteger {
         _log.debug(num + " As a bigInteger: 0x" + bi.toString(16));
         BigInteger tbi = new BigInteger(1, calculateBytes(num));
         _log.debug(num + " As a shifted   : 0x" + tbi.toString(16));
+    }
+    
+    private static void testWrite() throws Exception {
+        java.io.ByteArrayOutputStream baos = new java.io.ByteArrayOutputStream(8);
+        UnsignedInteger i = new UnsignedInteger(12345);
+        baos.write(i.getBytes(8));
+        byte v1[] = baos.toByteArray();
+        baos.reset();
+        UnsignedInteger.writeBytes(baos, 8, 12345);
+        byte v2[] = baos.toByteArray();
+        System.out.println("v1 len: " + v1.length + " v2 len: " + v2.length);
+        System.out.println("v1: " + DataHelper.toHexString(v1));
+        System.out.println("v2: " + DataHelper.toHexString(v2));
+        
     }
 }

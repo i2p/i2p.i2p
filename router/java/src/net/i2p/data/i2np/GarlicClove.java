@@ -77,6 +77,34 @@ public class GarlicClove extends DataStructureImpl {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Read cert: " + _certificate);
     }
+
+    public int readBytes(byte source[], int offset) throws DataFormatException {
+        int cur = offset;
+        _instructions = new DeliveryInstructions();
+        cur += _instructions.readBytes(source, cur);
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("Read instructions: " + _instructions);
+        try {
+            cur += _handler.readMessage(source, cur);
+            _msg = _handler.lastRead();
+        } catch (I2NPMessageException ime) {
+            throw new DataFormatException("Unable to read the message from a garlic clove", ime);
+        } catch (IOException ioe) {
+            throw new DataFormatException("Not enough data to read the clove", ioe);
+        }
+        _cloveId = DataHelper.fromLong(source, cur, 4);
+        cur += 4;
+        _expiration = DataHelper.fromDate(source, cur);
+        cur += DataHelper.DATE_LENGTH;
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("CloveID read: " + _cloveId + " expiration read: " + _expiration);
+        _certificate = new Certificate();
+        cur += _certificate.readBytes(source, cur);
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("Read cert: " + _certificate);
+        return cur - offset;
+    }
+
     
     public void writeBytes(OutputStream out) throws DataFormatException, IOException {
         StringBuffer error = new StringBuffer();

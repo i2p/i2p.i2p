@@ -90,7 +90,10 @@ public class Destination extends DataStructureImpl {
         return cur - offset;
     }
     
-    public int readBytes(byte source[], int offset) {
+    public int readBytes(byte source[], int offset) throws DataFormatException {
+        if (source == null) throw new DataFormatException("Null source");
+        if (source.length <= offset + PublicKey.KEYSIZE_BYTES + SigningPublicKey.KEYSIZE_BYTES) 
+            throw new DataFormatException("Not enough data (len=" + source.length + " off=" + offset + ")");
         int cur = offset;
         
         _publicKey = new PublicKey();

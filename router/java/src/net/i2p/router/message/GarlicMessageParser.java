@@ -40,57 +40,57 @@ public class GarlicMessageParser {
         byte encData[] = message.getData();
         byte decrData[] = null;
         try {
-            _log.debug("Decrypting with private key " + encryptionKey);
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Decrypting with private key " + encryptionKey);
             decrData = _context.elGamalAESEngine().decrypt(encData, encryptionKey);
         } catch (DataFormatException dfe) {
-            _log.warn("Error decrypting", dfe);
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Error decrypting", dfe);
         }
         if (decrData == null) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Decryption of garlic message failed (data = " + encData + ")", new Exception("Decrypt fail"));
             return null;
         } else {
-            return readCloveSet(decrData);
+            try {
+                return readCloveSet(decrData); 
+            } catch (DataFormatException dfe) {
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("Unable to read cloveSet", dfe);
+                return null;
+            }
         }
     }
     
-    private CloveSet readCloveSet(byte data[]) {
+    private CloveSet readCloveSet(byte data[]) throws DataFormatException {
         Set cloves = new HashSet();
-        ByteArrayInputStream bais = new ByteArrayInputStream(data);
-        try {
-            CloveSet set = new CloveSet();
-            
-            int numCloves = (int)DataHelper.readLong(bais, 1);
+        int offset = 0;
+        
+        CloveSet set = new CloveSet();
+
+        int numCloves = (int)DataHelper.fromLong(data, offset, 1);
+        offset++;
+        if (_log.shouldLog(Log.DEBUG))
             _log.debug("# cloves to read: " + numCloves);
-            for (int i = 0; i < numCloves; i++) {
+        for (int i = 0; i < numCloves; i++) {
+            if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Reading clove " + i);
-                try {
-                    GarlicClove clove = new GarlicClove(_context);
-                    clove.readBytes(bais);
-                    set.addClove(clove);
-                } catch (DataFormatException dfe) {
-                    _log.warn("Unable to read clove " + i, dfe);
-                } catch (IOException ioe) {
-                    _log.warn("Unable to read clove " + i, ioe);
-                }
+                GarlicClove clove = new GarlicClove(_context);
+                offset += clove.readBytes(data, offset);
+                set.addClove(clove);
+            if (_log.shouldLog(Log.WARN))
                 _log.debug("After reading clove " + i);
-            }
-            Certificate cert = new Certificate();
-            cert.readBytes(bais);
-            long msgId = DataHelper.readLong(bais, 4);
-            Date expiration = DataHelper.readDate(bais);
-            
-            set.setCertificate(cert);
-            set.setMessageId(msgId);
-            set.setExpiration(expiration.getTime());
-            
-            return set;
-        } catch (IOException ioe) {
-            _log.error("Error reading clove set", ioe);
-            return null;
-        } catch (DataFormatException dfe) {
-            _log.error("Error reading clove set", dfe);
-            return null;
         }
+        Certificate cert = new Certificate();
+        offset += cert.readBytes(data, offset);
+        long msgId = DataHelper.fromLong(data, offset, 4);
+        offset += 4;
+        Date expiration = DataHelper.fromDate(data, offset);
+        offset += DataHelper.DATE_LENGTH;
+
+        set.setCertificate(cert);
+        set.setMessageId(msgId);
+        set.setExpiration(expiration.getTime());
+        return set;
     }
 }

@@ -95,30 +95,36 @@ public abstract class I2NPMessageImpl extends DataStructureImpl implements I2NPM
         }
     }
     public int readBytes(byte data[], int type, int offset) throws I2NPMessageException, IOException {
+        int cur = offset;
         if (type < 0) {
-            type = (int)DataHelper.fromLong(data, offset, 1);
-            offset++;
+            type = (int)DataHelper.fromLong(data, cur, 1);
+            cur++;
         }
-        _uniqueId = DataHelper.fromLong(data, offset, 4);
-        offset += 4;
-        _expiration = DataHelper.fromDate(data, offset);
-        offset += DataHelper.DATE_LENGTH;
-        int size = (int)DataHelper.fromLong(data, offset, 2);
-        offset += 2;
+        _uniqueId = DataHelper.fromLong(data, cur, 4);
+        cur += 4;
+        try {
+            _expiration = DataHelper.fromDate(data, cur);
+            cur += DataHelper.DATE_LENGTH;
+        } catch (DataFormatException dfe) {
+            throw new I2NPMessageException("Unable to read the expiration", dfe);
+        }
+        int size = (int)DataHelper.fromLong(data, cur, 2);
+        cur += 2;
         Hash h = new Hash();
         byte hdata[] = new byte[Hash.HASH_LENGTH];
-        System.arraycopy(data, offset, hdata, 0, Hash.HASH_LENGTH);
-        offset += Hash.HASH_LENGTH;
+        System.arraycopy(data, cur, hdata, 0, Hash.HASH_LENGTH);
+        cur += Hash.HASH_LENGTH;
         h.setData(hdata);
 
-        if (offset + size > data.length)
+        if (cur + size > data.length)
             throw new I2NPMessageException("Payload is too short [" 
                                            + "data.len=" + data.length
-                                           + " offset=" + offset 
+                                           + " offset=" + offset
+                                           + " cur=" + cur 
                                            + " wanted=" + size + "]");
 
         SHA256EntryCache.CacheEntry cache = _context.sha().cache().acquire(size);
-        Hash calc = _context.sha().calculateHash(data, offset, size, cache);
+        Hash calc = _context.sha().calculateHash(data, cur, size, cache);
         boolean eq = calc.equals(h);
         _context.sha().cache().release(cache);
         if (!eq)
@@ -127,11 +133,12 @@ public abstract class I2NPMessageImpl extends DataStructureImpl implements I2NPM
         long start = _context.clock().now();
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Reading bytes: type = " + type + " / uniqueId : " + _uniqueId + " / expiration : " + _expiration);
-        readMessage(data, offset, size, type);
+        readMessage(data, cur, size, type);
+        cur += size;
         long time = _context.clock().now() - start;
         if (time > 50)
             _context.statManager().addRateData("i2np.readTime", time, time);
-        return size + Hash.HASH_LENGTH + 1 + 4 + DataHelper.DATE_LENGTH;
+        return cur - offset;
     }
     
     public void writeBytes(OutputStream out) throws DataFormatException, IOException {

@@ -3,6 +3,7 @@ package net.i2p.client.streaming;
 import java.util.Arrays;
 import net.i2p.I2PAppContext;
 import net.i2p.data.Base64;
+import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
 import net.i2p.data.Signature;
@@ -439,7 +440,11 @@ public class Packet {
         }
         if (isFlagSet(FLAG_FROM_INCLUDED)) {
             _optionFrom = new Destination();
-            cur += _optionFrom.readBytes(buffer, cur);
+            try {
+                cur += _optionFrom.readBytes(buffer, cur);
+            } catch (DataFormatException dfe) {
+                throw new IllegalArgumentException("Bad from field: " + dfe.getMessage());
+            }
         }
         if (isFlagSet(FLAG_MAX_PACKET_SIZE_INCLUDED)) {
             _optionMaxSize = (int)DataHelper.fromLong(buffer, cur, 2);

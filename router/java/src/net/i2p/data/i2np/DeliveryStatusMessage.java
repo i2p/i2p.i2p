@@ -48,7 +48,11 @@ public class DeliveryStatusMessage extends I2NPMessageImpl {
         
         _id = DataHelper.fromLong(data, curIndex, 4);
         curIndex += 4;
-        _arrival = DataHelper.fromDate(data, curIndex);
+        try {
+            _arrival = DataHelper.fromDate(data, curIndex);
+        } catch (DataFormatException dfe) {
+            throw new I2NPMessageException("Unable to read the arrival");
+        }
     }
     
     /** calculate the message body's length (not including the header and footer */
