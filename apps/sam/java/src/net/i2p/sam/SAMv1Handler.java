@@ -392,7 +392,7 @@ public class SAMv1Handler extends SAMHandler implements SAMRawReceiver, SAMDatag
 
                 if (!datagramSession.sendBytes(dest, data)) {
                     _log.error("DATAGRAM SEND failed");
-                    return false;
+                    return true;
                 }
 
                 return true;
@@ -463,7 +463,7 @@ public class SAMv1Handler extends SAMHandler implements SAMRawReceiver, SAMDatag
 
                 if (!rawSession.sendBytes(dest, data)) {
                     _log.error("RAW SEND failed");
-                    return false;
+                    return true;
                 }
 
                 return true;
@@ -556,7 +556,9 @@ public class SAMv1Handler extends SAMHandler implements SAMRawReceiver, SAMDatag
 
             if (!streamSession.sendBytes(id, data)) {
                 _log.error("STREAM SEND failed");
-                return false;
+                boolean rv = writeString("STREAM CLOSED RESULT=CANT_REACH_PEER ID=" + id + " MESSAGE=\"Send of " + size + " bytes failed\"\n");
+                streamSession.closeConnection(id);
+                return rv;
             }
 
             return true;
