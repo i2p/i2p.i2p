@@ -80,10 +80,15 @@ public class RoutingKeyGenerator {
             today = _cal.getTime();
         }
         byte mod[] = null;
+        String modVal = null;
         synchronized (_fmt) {
-            mod = _fmt.format(today).getBytes();
+            modVal = _fmt.format(today);
         }
-        _log.info("Routing modifier generated: " + new String(mod));
+        mod = new byte[modVal.length()];
+        for (int i = 0; i < modVal.length(); i++)
+            mod[i] = (byte)(modVal.charAt(i) & 0xFF);
+        if (_log.shouldLog(Log.INFO))
+            _log.info("Routing modifier generated: " + modVal);
         setModData(mod);
     }
 
