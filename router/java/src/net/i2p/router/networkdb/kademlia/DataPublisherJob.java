@@ -25,8 +25,8 @@ import net.i2p.router.RouterContext;
 class DataPublisherJob extends JobImpl {
     private Log _log;
     private KademliaNetworkDatabaseFacade _facade;
-    private final static long RERUN_DELAY_MS = 30*1000;
-    private final static int MAX_SEND_PER_RUN = 5; // publish no more than 5 at a time
+    private final static long RERUN_DELAY_MS = 60*1000;
+    private final static int MAX_SEND_PER_RUN = 1; // publish no more than 2 at a time
     private final static long STORE_TIMEOUT = 60*1000; // give 'er a minute to send the data
     
     public DataPublisherJob(RouterContext ctx, KademliaNetworkDatabaseFacade facade) {
@@ -39,18 +39,22 @@ class DataPublisherJob extends JobImpl {
     public String getName() { return "Data Publisher Job"; }
     public void runJob() {
         Set toSend = selectKeysToSend();
-        _log.info("Keys being published in this timeslice: " + toSend);
+        if (_log.shouldLog(Log.INFO))
+            _log.info("Keys being published in this timeslice: " + toSend);
         for (Iterator iter = toSend.iterator(); iter.hasNext(); ) {
             Hash key = (Hash)iter.next();
             DataStructure data = _facade.getDataStore().get(key);
             if (data == null) {
-                _log.warn("Trying to send a key we dont have? " + key);
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("Trying to send a key we dont have? " + key);
                 continue;
             }
             if (data instanceof LeaseSet) {
                 LeaseSet ls = (LeaseSet)data;
                 if (!ls.isCurrent(Router.CLOCK_FUDGE_FACTOR)) {
-                    _log.warn("Not publishing a lease that isn't current - " + key, new Exception("Publish expired lease?"));
+                    if (_log.shouldLog(Log.WARN))
+                        _log.warn("Not publishing a lease that isn't current - " + key, 
+                                  new Exception("Publish expired lease?"));
                 }
             }
             StoreJob store = new StoreJob(_context, _facade, key, data, null, null, STORE_TIMEOUT);

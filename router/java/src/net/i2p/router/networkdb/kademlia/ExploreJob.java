@@ -33,10 +33,13 @@ class ExploreJob extends SearchJob {
     private PeerSelector _peerSelector;
     
     /** how long each exploration should run for (currently a trivial 20 seconds) */
-    private final static long MAX_EXPLORE_TIME = 30*1000;
+    private static final long MAX_EXPLORE_TIME = 20*1000;
     
     /** how many of the peers closest to the key being explored do we want to explicitly say "dont send me this"? */
-    private final static int NUM_CLOSEST_TO_IGNORE = 3;
+    private static final int NUM_CLOSEST_TO_IGNORE = 3;
+    
+    /** how many peers to explore through concurrently */
+    private static final int EXPLORE_BREDTH = 1;
     
     /**
      * Create a new search for the routingKey specified
@@ -96,6 +99,20 @@ class ExploreJob extends SearchJob {
         return buildMessage(null, _context.router().getRouterInfo(), expiration);
     }
     
+    /** max # of concurrent searches */
+    protected int getBredth() { return EXPLORE_BREDTH; }
+    
+    
+    /**
+     * We've gotten a search reply that contained the specified
+     * number of peers that we didn't know about before.
+     *
+     */
+    protected void newPeersFound(int numNewPeers) {
+        // who cares about how many new peers.  well, maybe we do.  but for now,
+        // we'll do the simplest thing that could possibly work.
+        _facade.setLastExploreNewDate(_context.clock().now());
+    }
     
     /*
      * We could override searchNext to see if we actually fill up a kbucket before

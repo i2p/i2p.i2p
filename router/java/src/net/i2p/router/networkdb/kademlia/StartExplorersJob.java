@@ -27,8 +27,12 @@ class StartExplorersJob extends JobImpl {
     private Log _log;
     private KademliaNetworkDatabaseFacade _facade;
     
-    private final static long RERUN_DELAY_MS = 3*60*1000; // every 3 minutes, explore MAX_PER_RUN keys
-    private final static int MAX_PER_RUN = 3; // don't explore more than 1 bucket at a time
+    /** don't explore more than 1 bucket at a time */
+    private static final int MAX_PER_RUN = 1;
+    /** dont explore the network more often than once every minute */
+    private static final int MIN_RERUN_DELAY_MS = 60*1000;
+    /** explore the network at least once every thirty minutes */
+    private static final int MAX_RERUN_DELAY_MS = 30*60*1000;
     
     public StartExplorersJob(RouterContext context, KademliaNetworkDatabaseFacade facade) {
         super(context);
@@ -46,7 +50,32 @@ class StartExplorersJob extends JobImpl {
             //_log.info("Starting explorer for " + key, new Exception("Exploring!"));
             _context.jobQueue().addJob(new ExploreJob(_context, _facade, key));
         }
-        requeue(RERUN_DELAY_MS);
+        long delay = getNextRunDelay();
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("Reenqueueing the exploration with a delay of " + delay);
+        requeue(delay);
+    }
+    
+    /** 
+     * the exploration has found some new peers - update the schedule so that 
+     * we'll explore appropriately.
+     */
+    public void updateExploreSchedule() {
+        long delay = getNextRunDelay();
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("Updating exploration schedule with a delay of " + delay);
+        getTiming().setStartAfter(_context.clock().now() + delay);        
+    }
+    
+    /** how long should we wait before exploring? */
+    private long getNextRunDelay() {
+        long delay = _context.clock().now() - _facade.getLastExploreNewDate();
+        if (delay < MIN_RERUN_DELAY_MS) 
+            return MIN_RERUN_DELAY_MS;
+        else if (delay > MAX_RERUN_DELAY_MS)
+            return MAX_RERUN_DELAY_MS;
+        else
+            return delay;
     }
     
     /**

@@ -28,7 +28,7 @@ class DataRepublishingSelectorJob extends JobImpl {
     private KademliaNetworkDatabaseFacade _facade;
     
     private final static long RERUN_DELAY_MS = 1*60*1000;
-    public final static int MAX_PASSIVE_POOL_SIZE = 30; // no need to have the pool be too big
+    public final static int MAX_PASSIVE_POOL_SIZE = 10; // no need to have the pool be too big
     
     /**
      * For every bucket away from us, resend period increases by 5 minutes - so we resend
@@ -60,7 +60,8 @@ class DataRepublishingSelectorJob extends JobImpl {
     public String getName() { return "Data Publisher Job"; }
     public void runJob() {
         Set toSend = selectKeysToSend();
-        _log.info("Keys being queued up for publishing: " + toSend);
+        if (_log.shouldLog(Log.INFO))
+            _log.info("Keys being queued up for publishing: " + toSend);
         _facade.queueForPublishing(toSend);
         requeue(RERUN_DELAY_MS);
     }
@@ -77,7 +78,8 @@ class DataRepublishingSelectorJob extends JobImpl {
         alreadyQueued.addAll(_facade.getPassivelySendKeys());
         
         int toAdd = MAX_PASSIVE_POOL_SIZE - alreadyQueued.size();
-        _log.debug("Keys we need to queue up to fill the passive send pool: " + toAdd);
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("Keys we need to queue up to fill the passive send pool: " + toAdd);
         if (toAdd <= 0) return new HashSet();
         
         alreadyQueued.addAll(_facade.getExplicitSendKeys());
@@ -85,14 +87,16 @@ class DataRepublishingSelectorJob extends JobImpl {
         Set keys = _facade.getDataStore().getKeys();
         keys.removeAll(alreadyQueued);
         
-        _log.debug("Total number of keys in the datastore: " + keys.size());
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("Total number of keys in the datastore: " + keys.size());
         
         TreeMap toSend = new TreeMap();
         for (Iterator iter = keys.iterator(); iter.hasNext(); ) {
             Hash key = (Hash)iter.next();
             Long lastPublished = _facade.getLastSent(key);
             long publishRank = rankPublishNeed(key, lastPublished);
-            _log.debug("Publish rank for " + key + ": " + publishRank);
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Publish rank for " + key + ": " + publishRank);
             if (publishRank > 0) {
                 while (toSend.containsKey(new Long(publishRank)))
                     publishRank++;
@@ -124,7 +128,10 @@ class DataRepublishingSelectorJob extends JobImpl {
                     // last time it was sent was before the last send period
                     return KBucketSet.NUM_BUCKETS - bucket;
                 } else {
-                    _log.info("Not republishing router " + key + " since it is really old [" + (now-ri.getPublished()) + "ms]");
+                    if (_log.shouldLog(Log.INFO))
+                        _log.info("Not republishing router " + key 
+                                  + " since it is really old [" 
+                                  + (now-ri.getPublished()) + "ms]");
                     return -2;
                 }
             } else {
@@ -134,11 +141,15 @@ class DataRepublishingSelectorJob extends JobImpl {
                         // last time it was sent was before the last send period
                         return KBucketSet.NUM_BUCKETS - bucket;
                     } else {
-                        _log.info("Not republishing leaseSet " + key + " since it is really old [" + (now-ls.getEarliestLeaseDate()) + "ms]");
+                        if (_log.shouldLog(Log.INFO))
+                            _log.info("Not republishing leaseSet " + key 
+                                      + " since it is really old [" 
+                                      + (now-ls.getEarliestLeaseDate()) + "ms]");
                         return -3;
                     }
                 } else {
-                    _log.info("Key " + key + " is not a leaseSet or routerInfo, definitely not publishing it");
+                    if (_log.shouldLog(Log.WARN))
+                        _log.warn("Key " + key + " is not a leaseSet or routerInfo, definitely not publishing it");
                     return -5;
                 }
             }
@@ -151,7 +162,9 @@ class DataRepublishingSelectorJob extends JobImpl {
                     // sent it within 5 minutes
                     int val = _context.random().nextInt(LEASE_REBROADCAST_PROBABILITY_SCALE);
                     if (val <= LEASE_REBROADCAST_PROBABILITY) {
-                        _log.info("Randomized rebroadcast of leases tells us to send " + key + ": " + val);
+                        if (_log.shouldLog(Log.INFO))
+                            _log.info("Randomized rebroadcast of leases tells us to send " 
+                                      + key + ": " + val);
                         return 1;
                     }
                 }

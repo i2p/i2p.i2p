@@ -52,6 +52,9 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
     private boolean _initialized;
     /** Clock independent time of when we started up */
     private long _started;
+    private StartExplorersJob _exploreJob;
+    /** when was the last time an exploration found something new? */
+    private long _lastExploreNew;
     private PeerSelector _peerSelector;
     private RouterContext _context;
     /** 
@@ -84,10 +87,18 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         _initialized = false;
         _peerSelector = new PeerSelector(_context);
         _publishingLeaseSets = new HashSet(8);
+        _lastExploreNew = 0;
     }
     
     KBucketSet getKBuckets() { return _kb; }
     DataStore getDataStore() { return _ds; }
+    
+    long getLastExploreNewDate() { return _lastExploreNew; }
+    void setLastExploreNewDate(long when) { 
+        _lastExploreNew = when; 
+        if (_exploreJob != null)
+            _exploreJob.updateExploreSchedule();
+    }
     
     public Set getExplicitSendKeys() {
         if (!_initialized) return null;
@@ -200,8 +211,9 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
             _context.jobQueue().addJob(new DataRepublishingSelectorJob(_context, this));
             // fill the search queue with random keys in buckets that are too small
             _context.jobQueue().addJob(new ExploreKeySelectorJob(_context, this));
+            _exploreJob = new StartExplorersJob(_context, this);
             // fire off a group of searches from the explore pool
-            _context.jobQueue().addJob(new StartExplorersJob(_context, this));
+            _context.jobQueue().addJob(_exploreJob);
         } else {
             _log.warn("Operating in quiet mode - not exploring or pushing data proactively, simply reactively");
             _log.warn("This should NOT be used in production");
@@ -230,8 +242,9 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
                 if (_log.shouldLog(Log.INFO))
                     _log.info("Selected hash " + rhash.toBase64() + " is not stored locally");
             } else if ( !(ds instanceof RouterInfo) ) {
-                if (_log.shouldLog(Log.WARN))
-                    _log.warn("Selected router hash " + rhash.toBase64() + " is NOT a routerInfo!");
+                // could be a LeaseSet
+                if (_log.shouldLog(Log.DEBUG))
+                    _log.debug("Selected router hash " + rhash.toBase64() + " is NOT a routerInfo!");
             } else {
                 rv.add(ds);
             }

@@ -54,7 +54,8 @@ class KBucketSet {
             if (numInBucket > BUCKET_SIZE) {
                 // perhaps queue up coallesce job?  naaahh.. lets let 'er grow for now
             }
-            _log.debug("Peer " + peer + " added to bucket " + bucket);
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Peer " + peer + " added to bucket " + bucket);
             return oldSize != numInBucket;
         } else {
             throw new IllegalArgumentException("Unable to pick a bucket.  wtf!");
