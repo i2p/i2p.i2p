@@ -1,0 +1,13 @@
+***net.i2p.util.NativeBigInteger, native part of the code****
+
+Execute the build.sh script to produce jbigi library files optimized for a number of different CPU-types.
+
+TODO: What is jbigi
+TODO: Document generated folder structure
+TODO: Instructions for adding the libraries to a jar
+
+Linux-specific information:
+Some linux distributions comes bundled with GMP. There is currently no out-of-the-box support for this in the current build-scripts.
+
+Windows-specific information:
+The best way of building the jbigi dll's is to install Mingw {URL} and msys {URL}. The combination of these two should be able to run the included build-scripts without modifications.

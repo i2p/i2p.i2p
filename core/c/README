@@ -1,0 +1,9 @@
+Prior to building the jbigi library, you will need to fetch the GMP source
+from http://www.swox.com/gmp/, saving it to jbigi/gmp-4.1.3.tar.bz2 (it will
+be unpacked and built as necessary).
+
+To build the native jbigi and jcpuid libraries for the current host CPU,
+simply run sh build.sh and the results will be packaged up into jbigi.jar
+
+To build the native jbigi libraries for all supported CPUs (on the current OS),
+go into jbigi/ and run build-all.sh (the results will be under jbigi/lib/)

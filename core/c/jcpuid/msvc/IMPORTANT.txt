@@ -1,0 +1,2 @@
+You will need to rename the 'cpuinformation' par of the output folder '..\lib\freenet\support\cpuinformation' to 'CPUInformation' before importing the files to a .jar.
+Unfortunately MSVC doesn't respect the casing of the entered output folder.

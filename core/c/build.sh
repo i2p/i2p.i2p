@@ -1,40 +1,14 @@
-#!/bin/sh
-# linux settings:
-CC="gcc"
-ANT="ant"
-JAVA="java"
+#/bin/sh
 
-COMPILEFLAGS="-fPIC -Wall"
-LINKFLAGS="-shared -Wl,-soname,libjbigi.so"
+(cd jcpuid ; sh build.sh ; cd ..)
+(cd jbigi ; sh build.sh ; cd ..)
 
-INCLUDES="-Iinclude -I$JAVA_HOME/include -I$JAVA_HOME/include/linux"
-INCLUDELIBS="-lgmp"
-STATICLIBS=""
+mkdir -p t/freenet/support/CPUInformation/
+cp jcpuid/lib/freenet/support/CPUInformation/*jcpuid-* t/freenet/support/CPUInformation/
 
-LIBFILE="libjbigi.so"
+mkdir -p t/net/i2p/util/
+cp jbigi/lib/net/i2p/util/*jbigi-* t/net/i2p/util/
 
-# jrandom's mingw setup:
-#COMPILEFLAGS="-Wall"
-#INCLUDES="-Iinclude -Ic:/software/j2sdk1.4.2/include/win32/ -Ic:/software/j2sdk1.4.2/include/ -Ic:/dev/gmp-4.1.2/"
-#LINKFLAGS="-shared -Wl,--kill-at"
-#LIBFILE="jbigi.dll"
-#INCLUDELIBS=""
-#STATICLIBS="libgmp.a"
+(cd t ; jar cf ../jbigi.jar . ; cd ..)
 
-echo "Compiling C code..."
-rm -f jbigi.o $LIBFILE
-$CC -c $COMPILEFLAGS $INCLUDES src/jbigi.c
-$CC $LINKFLAGS $INCLUDES $INCLUDELIBS -o $LIBFILE jbigi.o $STATICLIBS
-
-echo ""
-echo "Doing an ant build..."
-(cd ../java/ ; $ANT build)
-
-echo ""
-echo "Built, now testing... This will take a while."
-LD_LIBRARY_PATH=. $JAVA -cp ../java/build/i2p.jar -DloggerConfigLocation=../../installer/java/src/logger.config.template net.i2p.util.NativeBigInteger
-
-
-echo ""
-echo ""
-echo "Test complete. Please review the lines 'native run time:', 'java run time:', and 'native = '"
+echo "Native code built into jbigi.jar"
