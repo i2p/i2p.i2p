@@ -1,4 +1,8 @@
-$Id: history.txt,v 1.32 2004/10/04 12:30:23 jrandom Exp $
+$Id: history.txt,v 1.33 2004/10/05 10:38:37 jrandom Exp $
+
+2004-10-05  jrandom
+    * Display how much time is left before the graceful shutdown is complete.
+    * Debug some improperly failed messages on timeout or disconnection.
 
 2004-10-05  jrandom
     * Don't go into a fast busy if an I2PTunnel 'server' is explicitly killed

@@ -274,7 +274,9 @@ public class TCPTransport extends TransportImpl {
             _context.shitlist().shitlistRouter(con.getAttemptedPeer(), "Changed identities");
             if (changedMsgs != null) {
                 for (int i = 0; i < changedMsgs.size(); i++) {
-                    afterSend((OutNetMessage)changedMsgs.get(i), false, false, 0);
+                    OutNetMessage cur = (OutNetMessage)changedMsgs.get(i);
+                    cur.timestamp("changedIdents");
+                    afterSend(cur, false, false, 0);
                 }
             }
         }
@@ -587,6 +589,7 @@ public class TCPTransport extends TransportImpl {
                         _context.netDb().fail(peer);
                         for (int i = 0; i < msgs.size(); i++) {
                             OutNetMessage cur = (OutNetMessage)msgs.get(i);
+                            cur.timestamp("no TCP addresses");
                             afterSend(cur, false, false, 0);
                         }
                         continue;
@@ -600,6 +603,7 @@ public class TCPTransport extends TransportImpl {
                         _context.netDb().fail(peer);
                         for (int i = 0; i < msgs.size(); i++) {
                             OutNetMessage cur = (OutNetMessage)msgs.get(i);
+                            cur.timestamp("invalid addresses");
                             afterSend(cur, false, false, 0);
                         }
                         continue; // invalid
@@ -613,6 +617,7 @@ public class TCPTransport extends TransportImpl {
                         _context.netDb().fail(peer);
                         for (int i = 0; i < msgs.size(); i++) {
                             OutNetMessage cur = (OutNetMessage)msgs.get(i);
+                            cur.timestamp("points at us");
                             afterSend(cur, false, false, 0);
                         }
                         continue;
@@ -624,6 +629,7 @@ public class TCPTransport extends TransportImpl {
                         _context.netDb().fail(peer);
                         for (int i = 0; i < msgs.size(); i++) {
                             OutNetMessage cur = (OutNetMessage)msgs.get(i);
+                            cur.timestamp("points at our ip");
                             afterSend(cur, false, false, 0);
                         }
                         continue;
@@ -637,6 +643,7 @@ public class TCPTransport extends TransportImpl {
                         _context.netDb().fail(peer);
                         for (int i = 0; i < msgs.size(); i++) {
                             OutNetMessage cur = (OutNetMessage)msgs.get(i);
+                            cur.timestamp("points at an illegal address");
                             afterSend(cur, false, false, 0);
                         }
                         continue;
@@ -675,6 +682,7 @@ public class TCPTransport extends TransportImpl {
             // connectionEstablished clears them otherwise)
             for (int i = 0; i < msgs.size(); i++) {
                 OutNetMessage msg = (OutNetMessage)msgs.get(i);
+                msg.timestamp("establishmentComplete(failed)");
                 afterSend(msg, false);
             }
         }

@@ -25,3 +25,7 @@
  <jsp:setProperty name="navhelper" property="contextId" value="<%=(String)session.getAttribute("i2p.contextId")%>" />
  <jsp:getProperty name="navhelper" property="clientAppLinks" />
 </h4>
+
+<jsp:useBean class="net.i2p.router.web.NoticeHelper" id="noticehelper" scope="request" />
+<jsp:setProperty name="noticehelper" property="contextId" value="<%=(String)session.getAttribute("i2p.contextId")%>" />
+<b><jsp:getProperty name="noticehelper" property="systemNotice" /></b>

@@ -234,5 +234,15 @@ public class PoolingTunnelManagerFacade implements TunnelManagerFacade {
         if (_pool != null)
             _pool.renderStatusHTML(out);
     }
-    
+
+    public long getLastParticipatingExpiration() {
+        long last = -1;
+        for (Iterator iter = _pool.getParticipatingTunnels().iterator(); iter.hasNext(); ) {
+            TunnelId id = (TunnelId)iter.next();
+            TunnelInfo info = _pool.getParticipatingTunnel(id);
+            if ( (info != null) && (info.getSettings().getExpiration() > last) )
+                last = info.getSettings().getExpiration();
+        }
+        return last;
+    }
 }

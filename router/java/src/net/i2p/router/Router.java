@@ -660,6 +660,14 @@ public class Router {
     public boolean gracefulShutdownInProgress() {
         return (null != _config.getProperty(PROP_SHUTDOWN_IN_PROGRESS));
     }
+    /** How long until the graceful shutdown will kill us?  */
+    public long getShutdownTimeRemaining() {
+        long exp = _context.tunnelManager().getLastParticipatingExpiration();
+        if (exp < 0)
+            return -1;
+        else
+            return exp - _context.clock().now();
+    }
     
     /**
      * Simple thread that sits and waits forever, managing the

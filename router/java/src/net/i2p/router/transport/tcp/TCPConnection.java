@@ -110,7 +110,8 @@ public class TCPConnection {
         if (_socket != null) try { _socket.close(); } catch (IOException ioe) {}
         List msgs = clearPendingMessages();
         for (int i = 0; i < msgs.size(); i++) {
-            OutNetMessage msg = (OutNetMessage)msgs.get(0);
+            OutNetMessage msg = (OutNetMessage)msgs.get(i);
+            msg.timestamp("closeConnection");
             _transport.afterSend(msg, false, true, -1);
         }
         _context.profileManager().commErrorOccurred(_ident.getHash());
