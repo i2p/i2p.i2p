@@ -164,7 +164,8 @@ public abstract class TransportImpl implements Transport {
                 _context.statManager().addRateData("transport.expiredOnQueueLifetime", lifetime, lifetime);
             
             if (allowRequeue) {
-                if ( (msg.getExpiration() <= 0) || (msg.getExpiration() > _context.clock().now()) ) {
+                if ( ( (msg.getExpiration() <= 0) || (msg.getExpiration() > _context.clock().now()) ) 
+                     && (msg.getMessage() != null) ) {
                     // this may not be the last transport available - keep going
                     _context.outNetMessagePool().add(msg);
                     // don't discard the data yet!

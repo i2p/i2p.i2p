@@ -23,36 +23,44 @@ public class TCPConnectionEstablisher implements Runnable {
     
     public void run() {
         while (true) {
-            RouterInfo info = _transport.getNextPeer();
-            if (info == null) {
-                try { Thread.sleep(5*1000); } catch (InterruptedException ie) {}
-                continue;
-            }
-            
-            ConnectionBuilder cb = new ConnectionBuilder(_context, _transport, info);
-            TCPConnection con = null;
             try {
-                con = cb.establishConnection();
+                loop();
             } catch (Exception e) {
-                _log.log(Log.CRIT, "Unhandled exception establishing a connection to " 
-                                   + info.getIdentity().getHash().toBase64(), e);
+                _log.log(Log.CRIT, "wtf, establisher b0rked.  send this stack trace to jrandom", e);
             }
-            if (con != null) {
-                _transport.connectionEstablished(con);
-            } else {
-                if (!_context.router().isAlive()) return;
-                _transport.addConnectionErrorMessage(cb.getError());
-                Hash peer = info.getIdentity().getHash();
-                _context.profileManager().commErrorOccurred(peer);
-                _context.shitlist().shitlistRouter(peer, "Unable to contact");
-                _context.netDb().fail(peer);
-            }
-            
-            // this removes the _pending block on the address and 
-            // identity we attempted to contact.  if the peer changed
-            // identities, any additional _pending blocks will also have
-            // been cleared above with .connectionEstablished 
-            _transport.establishmentComplete(info);
         }
+    }
+    
+    private void loop() {
+        RouterInfo info = _transport.getNextPeer();
+        if (info == null) {
+            try { Thread.sleep(5*1000); } catch (InterruptedException ie) {}
+            return;
+        }
+
+        ConnectionBuilder cb = new ConnectionBuilder(_context, _transport, info);
+        TCPConnection con = null;
+        try {
+            con = cb.establishConnection();
+        } catch (Exception e) {
+            _log.log(Log.CRIT, "Unhandled exception establishing a connection to " 
+                               + info.getIdentity().getHash().toBase64(), e);
+        }
+        if (con != null) {
+            _transport.connectionEstablished(con);
+        } else {
+            if (!_context.router().isAlive()) return;
+            _transport.addConnectionErrorMessage(cb.getError());
+            Hash peer = info.getIdentity().getHash();
+            _context.profileManager().commErrorOccurred(peer);
+            _context.shitlist().shitlistRouter(peer, "Unable to contact");
+            _context.netDb().fail(peer);
+        }
+
+        // this removes the _pending block on the address and 
+        // identity we attempted to contact.  if the peer changed
+        // identities, any additional _pending blocks will also have
+        // been cleared above with .connectionEstablished 
+        _transport.establishmentComplete(info);
     }
 }

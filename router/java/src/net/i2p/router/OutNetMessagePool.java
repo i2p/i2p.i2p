@@ -41,6 +41,12 @@ public class OutNetMessagePool {
      *
      */
     public void add(OutNetMessage msg) {
+        boolean valid = validate(msg);
+        if (!valid) {
+            _context.messageRegistry().unregisterPending(msg);
+            return;
+        }        
+        
         if (_log.shouldLog(Log.INFO))
                 _log.info("Adding outbound message to " 
                           + msg.getTarget().getIdentity().getHash().toBase64().substring(0,6)
@@ -48,11 +54,6 @@ public class OutNetMessagePool {
                           + " expiring on " + msg.getMessage().getMessageExpiration()
                           + " of type " + msg.getMessageType());
         
-        boolean valid = validate(msg);
-        if (!valid) {
-            _context.messageRegistry().unregisterPending(msg);
-            return;
-        }        
         MessageSelector selector = msg.getReplySelector();
         if (selector != null) {
             _context.messageRegistry().registerPending(msg);

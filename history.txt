@@ -1,4 +1,12 @@
-$Id: history.txt,v 1.125 2005/01/05 19:17:53 jrandom Exp $
+$Id: history.txt,v 1.126 2005/01/06 15:59:13 jrandom Exp $
+
+2005-01-15  jrandom
+    * Caught a series of (previously unhandled) errors caused by requeueing 
+      messages that had timed out on the TCP transport (thanks mae^!)
+    * Reduce the barrier to dropping session tags on streaming lib resends -
+      every fourth send should drop the tags, forcing ElGamal encryption.  This
+      will help speed up the recovery after a disconnect, rather than the drop
+      every fifth send.
 
 * 2005-01-06  0.4.2.6 released
 

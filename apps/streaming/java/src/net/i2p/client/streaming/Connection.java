@@ -831,7 +831,7 @@ public class Connection {
                 
                 // in case things really suck, the other side may have lost thier
                 // session tags (e.g. they restarted), so jump back to ElGamal.
-                int failTagsAt = _options.getMaxResends() - 1;
+                int failTagsAt = _options.getMaxResends() - 2;
                 if ( (newWindowSize == 1) && (numSends == failTagsAt) ) {
                     if (_log.shouldLog(Log.WARN))
                         _log.warn("Optimistically failing tags at resend " + numSends);
