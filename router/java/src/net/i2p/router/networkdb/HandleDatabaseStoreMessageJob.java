@@ -80,9 +80,15 @@ public class HandleDatabaseStoreMessageJob extends JobImpl {
         msg.setMessageId(_message.getReplyToken());
         msg.setArrival(new Date(getContext().clock().now()));
         TunnelId outTunnelId = selectOutboundTunnel();
-        getContext().jobQueue().addJob(new SendTunnelMessageJob(getContext(), msg, outTunnelId, 
-                                   _message.getReplyGateway(), _message.getReplyTunnel(), 
-                                   null, null, null, null, ACK_TIMEOUT, ACK_PRIORITY));
+        if (outTunnelId == null) {
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("No outbound tunnel could be found");
+            return;
+        } else {
+            getContext().jobQueue().addJob(new SendTunnelMessageJob(getContext(), msg, outTunnelId, 
+                                       _message.getReplyGateway(), _message.getReplyTunnel(), 
+                                       null, null, null, null, ACK_TIMEOUT, ACK_PRIORITY));
+        }
     }
 
     private TunnelId selectOutboundTunnel() {

@@ -64,6 +64,8 @@ public class SendTunnelMessageJob extends JobImpl {
         _log = ctx.logManager().getLog(SendTunnelMessageJob.class);
         if (msg == null)
             throw new IllegalArgumentException("wtf, null message?  sod off");
+        if (tunnelId == null)
+            throw new IllegalArgumentException("wtf, no tunnelId? nuh uh");
         _message = msg;
         _destRouter = targetRouter;
         _tunnelId = tunnelId;
