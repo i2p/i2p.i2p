@@ -1,4 +1,10 @@
-$Id: history.txt,v 1.130 2005/01/18 19:08:13 jrandom Exp $
+$Id: history.txt,v 1.131 2005/01/21 20:53:02 jrandom Exp $
+
+2005-01-23  smeghead
+    * Port the java SAM client library to mono/C# and released into the 
+      public domain.  The 0.1 version of this port is available in CVS as
+      i2p/apps/sam/csharp/src/I2P.SAM.Client.  The other nonfunctional C#
+      library has been removed.
 
 2005-01-21  Jhor
     * Updated jbigi build scripts for OSX.
