@@ -222,9 +222,10 @@ public class ConfigNetHandler extends FormHandler {
         updateRates();
         
         if (_timeSyncEnabled) {
+            // Time sync enable, means NOT disabled 
             _context.router().setConfigSetting(Timestamper.PROP_DISABLED, "false");
         } else {
-            _context.router().setConfigSetting(Timestamper.PROP_DISABLED, "false");
+            _context.router().setConfigSetting(Timestamper.PROP_DISABLED, "true");
         }
         
         boolean saved = _context.router().saveConfig();

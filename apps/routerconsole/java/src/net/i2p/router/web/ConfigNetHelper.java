@@ -51,8 +51,8 @@ public class ConfigNetHelper {
     }
     
     public String getEnableTimeSyncChecked() {
-        String enabled = _context.getProperty(Timestamper.PROP_DISABLED, "true");
-        if ( (enabled == null) || (!"true".equalsIgnoreCase(enabled)) )
+        String disabled = _context.getProperty(Timestamper.PROP_DISABLED, "false");
+        if ( (disabled != null) && ("true".equalsIgnoreCase(disabled)) )
             return "";
         else
             return " checked ";

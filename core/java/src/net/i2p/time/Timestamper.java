@@ -180,7 +180,7 @@ public class Timestamper implements Runnable {
         String disabled = _context.getProperty(PROP_DISABLED);
         if (disabled == null)
             disabled = DEFAULT_DISABLED + "";
-        _disabled = Boolean.getBoolean(disabled);
+        _disabled = Boolean.valueOf(disabled).booleanValue();
     }
     
     /**
