@@ -17,7 +17,53 @@
         <echo message="  tarball:   tar the built files and compress with bz2 (depends upon preppkg)" />
         <echo message="  installer: build the GUI installer (depends upon preppkg)" />
     </target>
-    <target name="dist" depends="distclean, build, buildWEB, javadoc" />
+    <target name="dist" depends="distclean, build, buildWEB, javadoc">
+        <delete dir="build/lib" />
+        <delete dir="build/webapps" />
+        <mkdir dir="build/lib" />
+
+        <copy file="core/java/build/i2p.jar" todir="build/lib" />
+        <copy file="router/java/build/router.jar" todir="build/lib" />
+        <copy file="apps/ministreaming/java/build/mstreaming.jar" todir="build/lib" />
+        <copy file="apps/i2ptunnel/java/build/i2ptunnel.jar" todir="build/lib" />
+        <copy file="apps/sam/java/build/sam.jar" todir="build/lib" />
+        <copy file="apps/heartbeat/java/build/heartbeat.jar" todir="build/lib" />
+        <copy file="apps/netmonitor/java/build/netmonitor.jar" todir="build/lib" />
+        <copy file="installer/java/build/fetchseeds.jar" todir="build/lib" />
+        <tar compression="bzip2" destfile="build/lib.tar.bz2">
+            <tarfileset dir="build" includes="lib/*" />
+        </tar>
+
+        <delete dir="build/lib" />
+        <delete dir="build/webapps" />
+        <mkdir dir="build/lib" />
+        <mkdir dir="build/webapps" />
+
+        <copy file="apps/i2ptunnel/java/build/i2ptunnel.war" todir="build/webapps" />
+        <copy file="apps/routerconsole/java/build/routerconsole.war" todir="build/webapps" />
+        <copy file="apps/routerconsole/java/build/routerconsole.jar" todir="build/lib" />
+        <tar compression="bzip2" destfile="build/webapps.tar.bz2">
+            <tarfileset dir="build" includes="lib/* webapps/*" />
+        </tar>
+
+        <delete dir="build/lib" />
+        <delete dir="build/webapps" />
+        <mkdir dir="build/lib" />
+
+        <copy file="apps/jetty/jettylib/org.mortbay.jetty.jar" todir="build/lib" />
+        <copy file="apps/jetty/jettylib/org.mortbay.jetty-jdk1.2.jar" todir="build/lib" />
+        <copy file="apps/jetty/jettylib/ant.jar" todir="build/lib" />
+        <copy file="apps/jetty/jettylib/jasper-compiler.jar" todir="build/lib" />
+        <copy file="apps/jetty/jettylib/jasper-runtime.jar" todir="build/lib" />
+        <copy file="apps/jetty/jettylib/jnet.jar" todir="build/lib" />
+        <copy file="apps/jetty/jettylib/xercesImpl.jar" todir="build/lib" />
+        <copy file="apps/jetty/jettylib/xml-apis.jar" todir="build/lib" />
+        <copy file="apps/jetty/jettylib/javax.servlet.jar" todir="build/lib" />
+        <tar compression="bzip2" destfile="build/weblib.tar.bz2">
+            <tarfileset dir="build" includes="lib/*" />
+        </tar>
+        
+    </target>
     <target name="build" depends="builddep, jar, buildWEB" />
     <target name="buildclean" depends="distclean, build" />
     <target name="builddep">
@@ -26,8 +72,6 @@
         <ant dir="router/java/" target="jar" />
         <ant dir="apps/ministreaming/java/" target="jar" />
         <ant dir="apps/i2ptunnel/java/" target="jar" />
-        <ant dir="apps/httptunnel/java/" target="jar" />
-        <ant dir="apps/phttprelay/java/" target="jar" />
         <ant dir="apps/sam/java/" target="jar" />
         <ant dir="apps/heartbeat/java/" target="jar" />
         <ant dir="apps/netmonitor/java/" target="jar" />
@@ -41,8 +85,6 @@
         <copy file="apps/ministreaming/java/build/mstreaming.jar" todir="build/" />
         <copy file="apps/i2ptunnel/java/build/i2ptunnel.jar" todir="build/" />
         <copy file="apps/i2ptunnel/java/build/i2ptunnel.war" todir="build/" />
-        <copy file="apps/httptunnel/java/build/httptunnel.jar" todir="build/" />
-        <copy file="apps/phttprelay/java/build/phttprelay.war" todir="build/" />
         <copy file="apps/sam/java/build/sam.jar" todir="build/" />
         <copy file="apps/heartbeat/java/build/heartbeat.jar" todir="build/" />
         <copy file="apps/netmonitor/java/build/netmonitor.jar" todir="build/" />
@@ -70,8 +112,6 @@
         <ant dir="router/java/" target="distclean" />
         <ant dir="apps/ministreaming/java/" target="distclean" />
         <ant dir="apps/i2ptunnel/java/" target="distclean" />
-        <ant dir="apps/httptunnel/java/" target="distclean" />
-        <ant dir="apps/phttprelay/java/" target="distclean" />
         <ant dir="apps/sam/java/" target="distclean" />
         <ant dir="apps/heartbeat/java/" target="distclean" />
         <ant dir="apps/netmonitor/java/" target="distclean" />
@@ -151,7 +191,6 @@
     <target name="preppkg" depends="build, buildWEB">
         <copy file="build/ant.jar" todir="pkg-temp/lib/" />
         <copy file="build/heartbeat.jar" todir="pkg-temp/lib/" />
-        <copy file="build/httptunnel.jar" todir="pkg-temp/lib/" />
         <copy file="build/i2p.jar" todir="pkg-temp/lib/" />
         <copy file="build/i2ptunnel.jar" todir="pkg-temp/lib/" />
         <copy file="build/jasper-compiler.jar" todir="pkg-temp/lib/" />
