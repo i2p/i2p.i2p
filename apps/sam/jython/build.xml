@@ -11,6 +11,7 @@
     </target>
 
     <target name="jar">
+        <mkdir dir="./build" />
         <exec executable="jythonc">
             <env key="CLASSPATH" path="../../../core/java/build/i2p.jar:../../ministreaming/java/build/mstreaming.jar"/>
             <arg value="--jar"/>
