@@ -36,7 +36,7 @@ public class BandwidthLimitedInputStream extends FilterInputStream {
     
     public int read() throws IOException {
         if (_pullFromOutbound)
-            _context.bandwidthLimiter().delayOutbound(_peer, 1);
+            _context.bandwidthLimiter().delayOutbound(_peer, 1, true);
         else
             _context.bandwidthLimiter().delayInbound(_peer, 1);
         return in.read();
@@ -45,7 +45,7 @@ public class BandwidthLimitedInputStream extends FilterInputStream {
     public int read(byte dest[]) throws IOException {
         int read = in.read(dest);
         if (_pullFromOutbound)
-            _context.bandwidthLimiter().delayOutbound(_peer, read);
+            _context.bandwidthLimiter().delayOutbound(_peer, read, true);
         else
             _context.bandwidthLimiter().delayInbound(_peer, read);
         return read;
@@ -54,7 +54,7 @@ public class BandwidthLimitedInputStream extends FilterInputStream {
     public int read(byte dest[], int off, int len) throws IOException {
         int read = in.read(dest, off, len);
         if (_pullFromOutbound)
-            _context.bandwidthLimiter().delayOutbound(_peer, read);
+            _context.bandwidthLimiter().delayOutbound(_peer, read, true);
         else
             _context.bandwidthLimiter().delayInbound(_peer, read);
         return read;
@@ -62,7 +62,7 @@ public class BandwidthLimitedInputStream extends FilterInputStream {
     public long skip(long numBytes) throws IOException {
         long skip = in.skip(numBytes);
         if (_pullFromOutbound)
-            _context.bandwidthLimiter().delayOutbound(_peer, (int)skip);
+            _context.bandwidthLimiter().delayOutbound(_peer, (int)skip, true);
         else
             _context.bandwidthLimiter().delayInbound(_peer, (int)skip);
         return skip;

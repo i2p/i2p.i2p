@@ -33,7 +33,7 @@ public class BandwidthLimitedOutputStream extends FilterOutputStream {
     public void write(int val) throws IOException {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Writing a single byte!", new Exception("Single byte from..."));
-        _context.bandwidthLimiter().delayOutbound(_peer, 1);
+        _context.bandwidthLimiter().delayOutbound(_peer, 1, false);
         out.write(val);
     }
     public void write(byte src[]) throws IOException {
@@ -48,18 +48,18 @@ public class BandwidthLimitedOutputStream extends FilterOutputStream {
             throw new IllegalArgumentException("wtf are you thinking?  len=" + len 
                                                + ", off=" + off + ", data=" + src.length);
         if (len <= CHUNK_SIZE) {
-            _context.bandwidthLimiter().delayOutbound(_peer, len);
+            _context.bandwidthLimiter().delayOutbound(_peer, len, false);
             out.write(src, off, len);
         } else {
             int i = 0;
             while (i+CHUNK_SIZE < len) {
-                _context.bandwidthLimiter().delayOutbound(_peer, CHUNK_SIZE);
+                _context.bandwidthLimiter().delayOutbound(_peer, CHUNK_SIZE, false);
                 out.write(src, off+i, CHUNK_SIZE);
                 i += CHUNK_SIZE;
             }
             int remainder = (len % CHUNK_SIZE);
             if (remainder > 0) {
-                _context.bandwidthLimiter().delayOutbound(_peer, remainder);
+                _context.bandwidthLimiter().delayOutbound(_peer, remainder, false);
                 out.write(src, i, remainder);
             }
         }

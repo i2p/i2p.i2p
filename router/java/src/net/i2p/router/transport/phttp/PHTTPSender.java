@@ -113,7 +113,7 @@ class PHTTPSender {
             byte data[] = getData(msg);
             if (data == null) return false;
             
-            _context.bandwidthLimiter().delayOutbound(msg.getTarget().getIdentity(), data.length+512); // HTTP overhead
+            _context.bandwidthLimiter().delayOutbound(msg.getTarget().getIdentity(), data.length+512, false); // HTTP overhead
             
             con.setRequestProperty("Content-length", ""+data.length);
             OutputStream out = con.getOutputStream();
@@ -176,7 +176,7 @@ class PHTTPSender {
             URL checkStatusURL = new URL(checkURLStr);
             long delay = RECHECK_DELAY;
             do {
-                _context.bandwidthLimiter().delayOutbound(msg.getTarget().getIdentity(), 512); // HTTP overhead
+                _context.bandwidthLimiter().delayOutbound(msg.getTarget().getIdentity(), 512, false); // HTTP overhead
                 _context.bandwidthLimiter().delayInbound(msg.getTarget().getIdentity(), 512); // HTTP overhead
                 
                 _log.debug("Checking delivery at " + checkURLStr);

@@ -116,8 +116,10 @@ public class TrivialBandwidthLimiter implements BandwidthLimiter {
     /**
      * Delay the required amount of time before returning so that sending numBytes
      * to the peer will not violate the bandwidth limits
+     * 
+     * FIXME: 'pulled' was added.  See FIXME in BandwidthLimiter  
      */
-    public void delayOutbound(RouterIdentity peer, int numBytes) {
+    public void delayOutbound(RouterIdentity peer, int numBytes, boolean pulled) {
         long delay = 0;
         while ( (delay = calculateDelayOutbound(peer, numBytes)) > 0) {
             try {
@@ -127,7 +129,7 @@ public class TrivialBandwidthLimiter implements BandwidthLimiter {
             } catch (InterruptedException ie) {}
         }
         synchronized (_outboundWaitLock) { _outboundWaitLock.notify(); }
-        consumeOutbound(peer, numBytes);
+        consumeOutbound(peer, numBytes, pulled);
     }
     
     public long getTotalSendBytes() { return _totalOutboundBytes; }
@@ -198,9 +200,15 @@ public class TrivialBandwidthLimiter implements BandwidthLimiter {
     /**
      * Note that numBytes have been sent to the peer
      */
-    private void consumeOutbound(RouterIdentity peer, int numBytes) {
+    private void consumeOutbound(RouterIdentity peer, int numBytes, boolean pulled) {
         if (numBytes > 0)
-            _totalOutboundBytes += numBytes;
+        {
+            if (pulled) { // FIXME:  fix to give the correct value from getTotalReceiveBytes()
+                _totalInboundBytes += numBytes;
+            } else {
+                _totalOutboundBytes += numBytes;
+            }
+        }
         if (_outboundKBytesPerSecond > 0)
             _outboundAvailable -= numBytes;
     }

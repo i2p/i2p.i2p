@@ -26,8 +26,13 @@ public interface BandwidthLimiter {
     /**
      * Delay the required amount of time before returning so that sending numBytes
      * to the peer will not violate the bandwidth limits
+     * 
+     * FIXME: Added 'pulled' to fix an oversight with regards to getTotalReceiveBytes().
+     *        BandwidthLimitedInputStream can pull from the outbound bandwidth, but
+     *        this leads to an incorrect value from getTotalReceiveBytes() with
+     *        TrivialBandwidthLimited.  This is an inelegant solution, so fix it! =)
      */
-    public void delayOutbound(RouterIdentity peer, int numBytes);
+    public void delayOutbound(RouterIdentity peer, int numBytes, boolean pulled);
     
     public long getTotalSendBytes();
     public long getTotalReceiveBytes();

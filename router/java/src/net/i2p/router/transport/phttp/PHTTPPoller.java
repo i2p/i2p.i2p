@@ -128,7 +128,7 @@ class PHTTPPoller {
             byte authData[] = getAuthData();
             if (authData == null) return 0;
             
-            _context.bandwidthLimiter().delayOutbound(null, authData.length + 512); // HTTP overhead
+            _context.bandwidthLimiter().delayOutbound(null, authData.length + 512, false); // HTTP overhead
             
             try {
                 _log.debug("Before opening " + _pollURL.toExternalForm());
