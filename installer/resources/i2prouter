@@ -17,7 +17,7 @@ APP_NAME="i2p"
 APP_LONG_NAME="I2P Service"
 
 # Wrapper
-WRAPPER_CMD="i2psvc"
+WRAPPER_CMD="./i2psvc"
 WRAPPER_CONF="wrapper.conf"
 
 # Priority at which to run the wrapper.  See "man nice" for valid priorities.
