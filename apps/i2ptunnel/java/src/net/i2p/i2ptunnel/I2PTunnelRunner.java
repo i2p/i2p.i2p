@@ -221,7 +221,7 @@ public class I2PTunnelRunner extends I2PThread implements I2PSocket.SocketErrorL
                             out.flush(); // make sure the data get though
                     }
                 }
-                out.flush();
+                //out.flush(); // close() flushes
             } catch (SocketException ex) {
                 // this *will* occur when the other threads closes the socket
                 synchronized (finishLock) {
@@ -248,11 +248,16 @@ public class I2PTunnelRunner extends I2PThread implements I2PSocket.SocketErrorL
                               + from + " and " + to);
                 }
                 try {
-                    out.close();
                     in.close();
                 } catch (IOException ex) {
                     if (_log.shouldLog(Log.WARN))
-                        _log.warn(direction + ": Error closing streams", ex);
+                        _log.warn(direction + ": Error closing input stream", ex);
+                }
+                try {
+                    out.close();
+                } catch (IOException ex) {
+                    if (_log.shouldLog(Log.WARN))
+                        _log.warn(direction + ": Error closing output stream", ex);
                 }
                 synchronized (finishLock) {
                     finished = true;

@@ -31,7 +31,12 @@ class ConnectionHandler {
         _acceptTimeout = DEFAULT_ACCEPT_TIMEOUT;
     }
     
-    public void setActive(boolean active) { _active = active; }
+    public void setActive(boolean active) { 
+        synchronized (_synQueue) {
+            _active = active; 
+            _synQueue.notifyAll(); // so we break from the accept()
+        }
+    }
     public boolean getActive() { return _active; }
     
     public void receiveNewSyn(Packet packet) {
@@ -66,8 +71,17 @@ class ConnectionHandler {
         while (true) {
             if ( (timeoutMs > 0) && (expiration < _context.clock().now()) )
                 return null;
-            if (!_active) 
+            if (!_active) {
+                // fail all the ones we had queued up
+                synchronized (_synQueue) {
+                    for (int i = 0; i < _synQueue.size(); i++) {
+                        Packet packet = (Packet)_synQueue.get(i);
+                        sendReset(packet);
+                    }
+                    _synQueue.clear();
+                }
                 return null;
+            }
             
             Packet syn = null;
             synchronized (_synQueue) {

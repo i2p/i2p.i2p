@@ -145,15 +145,12 @@ public class ClientManager {
         if (runner != null) {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Message " + msgId + " is targeting a local destination.  distribute it as such");
-            runner.receiveMessage(toDest, fromDest, payload);
-            if (fromDest != null) {
-                ClientConnectionRunner sender = getRunner(fromDest);
-                if (sender != null) {
-                    sender.updateMessageDeliveryStatus(msgId, true);
-                } else {
-                    _log.log(Log.CRIT, "Um, wtf, we're sending a local message, but we can't find who sent it?", new Exception("wtf"));
-                }
+            ClientConnectionRunner sender = getRunner(fromDest);
+            if (sender == null) {
+                // sender went away
+                return;
             }
+            _context.jobQueue().addJob(new DistributeLocal(toDest, runner, sender, fromDest, payload, msgId));
         } else {
             // remote.  w00t
             if (_log.shouldLog(Log.DEBUG))
@@ -171,6 +168,32 @@ public class ClientManager {
             msg.setFromDestination(runner.getConfig().getDestination());
             msg.setMessageId(msgId);
             _context.clientMessagePool().add(msg, true);
+        }
+    }
+    
+    private class DistributeLocal extends JobImpl {
+        private Destination _toDest;
+        private ClientConnectionRunner _to;
+        private ClientConnectionRunner _from;
+        private Destination _fromDest;
+        private Payload _payload;
+        private MessageId _msgId;
+        
+        public DistributeLocal(Destination toDest, ClientConnectionRunner to, ClientConnectionRunner from, Destination fromDest, Payload payload, MessageId id) {
+            super(_context);
+            _toDest = toDest;
+            _to = to;
+            _from = from;
+            _fromDest = fromDest;
+            _payload = payload;
+            _msgId = id;
+        }
+        public String getName() { return "Distribute local message"; }
+        public void runJob() {
+            _to.receiveMessage(_toDest, _fromDest, _payload);
+            if (_from != null) {
+                _from.updateMessageDeliveryStatus(_msgId, true);
+            }
         }
     }
     

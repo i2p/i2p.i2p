@@ -1,4 +1,19 @@
-$Id: history.txt,v 1.86 2004/11/27 16:02:06 jrandom Exp $
+$Id: history.txt,v 1.87 2004/11/28 20:58:39 jrandom Exp $
+
+2004-11-29  jrandom
+    * Reduced contention for local client delivery
+    * Drop the new code that munges the wrapper.config.  Instead, updates that
+      need to change it will include their own wrapper.config in the 
+      i2pupdate.zip, overwriting the existing file.  If the file 
+      "wrapper.config.updated" is included, it is deleted at first opportunity
+      and the router shut down, displaying a notice that the router must be 
+      started again cleanly to allow the changes to the wrapper.config to take
+      effect.
+    * Properly stop accept()ing I2PSocket connections if we close down the 
+      session (duh).
+    * Make sure we cancel any outstanding Packets in flight when a connection
+      is terminated (thanks susi!)
+    * Split up the I2PTunnel closing a little further.
 
 2004-11-28  jrandom
     * Accept IP address detection changes with a 2-out-of-3 minimum.

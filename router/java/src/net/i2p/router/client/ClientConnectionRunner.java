@@ -55,7 +55,7 @@ public class ClientConnectionRunner {
     /** user's config */
     private SessionConfig _config;
     /** static mapping of MessageId to Payload, storing messages for retrieval */
-    private static Map _messages; 
+    private Map _messages; 
     /** lease set request state, or null if there is no request pending on at the moment */
     private LeaseRequestState _leaseRequest;
     /** currently allocated leaseSet, or null if none is allocated */
@@ -227,7 +227,7 @@ public class ClientConnectionRunner {
     }
     
     void disconnectClient(String reason) {
-        _log.error("Disconnecting the client: " + reason, new Exception("Disconnecting!"));
+        _log.error("Disconnecting the client: " + reason);
         DisconnectMessage msg = new DisconnectMessage();
         msg.setReason(reason);
         try {

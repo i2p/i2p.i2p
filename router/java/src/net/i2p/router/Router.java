@@ -36,7 +36,6 @@ import net.i2p.data.i2np.TunnelMessage;
 import net.i2p.router.message.GarlicMessageHandler;
 import net.i2p.router.message.TunnelMessageHandler;
 import net.i2p.router.startup.StartupJob;
-import net.i2p.router.startup.VerifyWrapperConfig;
 import net.i2p.stat.Rate;
 import net.i2p.stat.RateStat;
 import net.i2p.util.FileUtil;
@@ -821,8 +820,9 @@ public class Router {
     }
     
     private static void verifyWrapperConfig() {
-        boolean updated = VerifyWrapperConfig.verifyConfig();
-        if (updated) {
+        File cfgUpdated = new File("wrapper.config.updated");
+        if (cfgUpdated.exists()) {
+            cfgUpdated.delete();
             System.out.println("INFO: Wrapper config updated, but the service wrapper requires you to manually restart");
             System.out.println("INFO: Shutting down the router - please rerun it!");
             System.exit(EXIT_HARD);

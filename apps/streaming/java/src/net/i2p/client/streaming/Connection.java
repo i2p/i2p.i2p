@@ -350,31 +350,18 @@ public class Connection {
         disconnect(cleanDisconnect, true);
     }
     void disconnect(boolean cleanDisconnect, boolean removeFromConMgr) {
-        if (!_connected) return;
-        _connected = false;
         synchronized (_connectLock) { _connectLock.notifyAll(); }
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Disconnecting " + toString(), new Exception("discon"));
         
-        if (cleanDisconnect) {
+        if (cleanDisconnect && _connected) {
             // send close packets and schedule stuff...
             _outputStream.closeInternal();
             _inputStream.close();
         } else {
-            doClose();
-            boolean tagsCancelled = false;
-            synchronized (_outboundPackets) {
-                for (Iterator iter = _outboundPackets.values().iterator(); iter.hasNext(); ) {
-                    PacketLocal pl = (PacketLocal)iter.next();
-                    if ( (pl.getTagsSent() != null) && (pl.getTagsSent().size() > 0) )
-                        tagsCancelled = true;
-                    pl.cancelled();
-                }
-                _outboundPackets.clear();
-                _outboundPackets.notifyAll();
-            }
-            if (tagsCancelled)
-                _context.sessionKeyManager().failTags(_remotePeer.getPublicKey());
+            if (_connected)
+                doClose();
+            killOutstandingPackets();
         }
         if (removeFromConMgr) {
             if (!_disconnectScheduled) {
@@ -382,6 +369,7 @@ public class Connection {
                 SimpleTimer.getInstance().addEvent(new DisconnectEvent(), DISCONNECT_TIMEOUT);
             }
         }
+        _connected = false;
     }
     
     void disconnectComplete() {
@@ -409,6 +397,10 @@ public class Connection {
             _connectionManager.removeConnection(this);
         }
 
+        killOutstandingPackets();
+    }
+    
+    private void killOutstandingPackets() {
         boolean tagsCancelled = false;
         synchronized (_outboundPackets) {
             for (Iterator iter = _outboundPackets.values().iterator(); iter.hasNext(); ) {
@@ -422,7 +414,6 @@ public class Connection {
         }            
         if (tagsCancelled)
             _context.sessionKeyManager().failTags(_remotePeer.getPublicKey());
-
     }
     
     private class DisconnectEvent implements SimpleTimer.TimedEvent {
@@ -432,6 +423,7 @@ public class Connection {
                           + Connection.this.toString());
         }
         public void timeReached() {
+            killOutstandingPackets();
             if (_log.shouldLog(Log.INFO))
                 _log.info("Connection disconnect timer complete, drop the con "
                           + Connection.this.toString());
