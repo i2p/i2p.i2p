@@ -1,4 +1,6 @@
-$Id: history.txt,v 1.64 2004/11/06 02:59:54 jrandom Exp $
+$Id: history.txt,v 1.65 2004/11/06 21:25:13 jrandom Exp $
+
+* 2004-11-06  0.4.1.4 released
 
 2004-11-06  jrandom
     * Expose a drop down on the /configclients.jsp to enter the outbound 
