@@ -40,6 +40,8 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
 
     private Logging l;
 
+    private long readTimeout = -1;
+
     public I2PTunnelServer(InetAddress host, int port, String privData, Logging l, EventDispatcher notifyThis) {
         super(host + ":" + port + " <- " + privData, notifyThis);
         ByteArrayInputStream bais = new ByteArrayInputStream(Base64.decode(privData));
@@ -57,8 +59,7 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
         }
     }
 
-    public I2PTunnelServer(InetAddress host, int port, InputStream privData, String privkeyname, Logging l,
-                           EventDispatcher notifyThis) {
+    public I2PTunnelServer(InetAddress host, int port, InputStream privData, String privkeyname, Logging l,  EventDispatcher notifyThis) {
         super(host + ":" + port + " <- " + privkeyname, notifyThis);
         init(host, port, privData, privkeyname, l);
     }
@@ -78,9 +79,35 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
         l.log("Ready!");
         notifyEvent("openServerResult", "ok");
         open = true;
+    }
+
+    /**
+     * Start running the I2PTunnelServer.
+     *
+     */
+    public void startRunning() {
         Thread t = new I2PThread(this);
         t.setName("Server");
         t.start();
+    }
+
+    /**
+     * Set the read idle timeout for newly-created connections (in
+     * milliseconds).  After this time expires without data being reached from
+     * the I2P network, the connection itself will be closed.
+     */
+    public void setReadTimeout(long ms) {
+        readTimeout = ms;
+    }
+    
+    /**
+     * Get the read idle timeout for newly-created connections (in
+     * milliseconds).
+     *
+     * @return The read timeout used for connections
+     */
+    public long getReadTimeout() {
+        return readTimeout;
     }
 
     public boolean close(boolean forced) {
@@ -115,6 +142,7 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
                 //local is fast, so synchronously. Does not need that many
                 //threads.
                 try {
+                    i2ps.setReadTimeout(readTimeout);
                     Socket s = new Socket(remoteHost, remotePort);
                     new I2PTunnelRunner(s, i2ps, slock, null);
                 } catch (SocketException ex) {

@@ -6,6 +6,7 @@ package net.i2p.i2ptunnel;
 import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InterruptedIOException;
 import java.io.OutputStream;
 import java.net.Socket;
 import java.net.SocketException;
@@ -116,7 +117,7 @@ public class I2PTunnelRunner extends I2PThread {
             _log.error("Interrupted", ex);
         } catch (IOException ex) {
             ex.printStackTrace();
-            _log.error("Error forwarding", ex);
+            _log.debug("Error forwarding", ex);
         } finally {
             try {
                 if (s != null) s.close();
@@ -163,11 +164,13 @@ public class I2PTunnelRunner extends I2PThread {
             } catch (SocketException ex) {
                 // this *will* occur when the other threads closes the socket
                 synchronized (finishLock) {
-                    if (!finished)
-                        _log.error("Error reading and writing", ex);
-                    else
-                        _log.warn("You may ignore this", ex);
+                    if (!finished) {
+                        _log.debug("Socket closed - error reading and writing",
+                                   ex);
+                    }
                 }
+            } catch (InterruptedIOException ex) {
+                _log.debug("Socket read timed out - closing StreamForwarder");
             } catch (IOException ex) {
                 if (!finished)
                     _log.error("Error forwarding", ex);

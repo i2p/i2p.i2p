@@ -74,6 +74,8 @@ public class I2PTunnel implements Logging, EventDispatcher {
     public static String host = System.getProperty(I2PClient.PROP_TCP_HOST, "127.0.0.1");
     public static String listenHost = host;
 
+    public static long readTimeout = -1;
+
     private static final String nocli_args[] = { "-nocli", "-die"};
 
     private List tasks = new ArrayList();
@@ -201,6 +203,8 @@ public class I2PTunnel implements Logging, EventDispatcher {
             runConfig(args, l);
         } else if ("listen_on".equals(cmdname)) {
             runListenOn(args, l);
+        } else if ("read_timeout".equals(cmdname)) {
+            runReadTimeout(args, l);
         } else if ("genkeys".equals(cmdname)) {
             runGenKeys(args, l);
         } else if ("gentextkeys".equals(cmdname)) {
@@ -235,6 +239,7 @@ public class I2PTunnel implements Logging, EventDispatcher {
         l.log("Command list:");
         l.log("config <i2phost> <i2pport>");
         l.log("listen_on <ip>");
+        l.log("read_timeout <msecs>");
         l.log("owndest yes|no");
         l.log("ping <args>");
         l.log("server <host> <port> <privkeyfile>");
@@ -291,10 +296,11 @@ public class I2PTunnel implements Logging, EventDispatcher {
                 notifyEvent("serverTaskId", new Integer(-1));
                 return;
             }
-            I2PTunnelTask task;
-            task = new I2PTunnelServer(serverHost, portNum, privKeyFile, args[2], l, (EventDispatcher) this);
-            addtask(task);
-            notifyEvent("serverTaskId", new Integer(task.getId()));
+            I2PTunnelServer serv = new I2PTunnelServer(serverHost, portNum, privKeyFile, args[2], l, (EventDispatcher) this);
+            serv.setReadTimeout(readTimeout);
+            serv.startRunning();
+            addtask(serv);
+            notifyEvent("serverTaskId", new Integer(serv.getId()));
             return;
         } else {
             l.log("server <host> <port> <privkeyfile>");
@@ -336,10 +342,11 @@ public class I2PTunnel implements Logging, EventDispatcher {
                 return;
             }
 
-            I2PTunnelTask task;
-            task = new I2PTunnelServer(serverHost, portNum, args[2], l, (EventDispatcher) this);
-            addtask(task);
-            notifyEvent("serverTaskId", new Integer(task.getId()));
+            I2PTunnelServer serv = new I2PTunnelServer(serverHost, portNum, args[2], l, (EventDispatcher) this);
+            serv.setReadTimeout(readTimeout);
+            serv.startRunning();
+            addtask(serv);
+            notifyEvent("serverTaskId", new Integer(serv.getId()));
         } else {
             l.log("textserver <host> <port> <privkey>");
             l.log("  creates a server that sends all incoming data\n" + "  of its destination to host:port.");
@@ -510,7 +517,31 @@ public class I2PTunnel implements Logging, EventDispatcher {
         } else {
             l.log("listen_on <ip>");
             l.log("  sets the interface to listen for the I2PClient.");
+            notifyEvent("listen_onResult", "error");
+        }
+    }
+
+    /**
+     * Specify the read timeout going to be used for newly-created I2PSockets
+     *
+     * Sets the event "read_timeoutResult" = "ok" or "error" after the interface has been specified
+     *
+     * @param args {hostname}
+     * @param l logger to receive events and output
+     */
+    public void runReadTimeout(String args[], Logging l) {
+        if (args.length == 1) {
+            try {
+                readTimeout = Long.parseLong(args[0]);
+            } catch (NumberFormatException e) {
+                notifyEvent("read_timeoutResult", "error");
+            }
             notifyEvent("listen_onResult", "ok");
+        } else {
+            l.log("read_timeout <msecs>");
+            l.log("  sets the read timeout (in milliseconds) for I2P connections\n"
+                  +"  Negative values will make the connections wait forever");
+            notifyEvent("read_timeoutResult", "error");
         }
     }
 
