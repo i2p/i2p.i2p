@@ -14,6 +14,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 import net.i2p.util.Log;
+import net.i2p.crypto.KeyGenerator;
 
 /**
  * Defines the PrivateKey as defined by the I2P data structure spec.
@@ -77,4 +78,14 @@ public class PrivateKey extends DataStructureImpl {
         buf.append("]");
         return buf.toString();
     }
+
+    /** derives a new PublicKey object derived from the secret contents
+     * of this PrivateKey
+     * @return a PublicKey object
+     * @author aum
+     */
+    public PublicKey toPublic() {
+        return KeyGenerator.getPublicKey(this);
+    }
+
 }

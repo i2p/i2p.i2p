@@ -76,4 +76,5 @@ public class PublicKey extends DataStructureImpl {
         buf.append("]");
         return buf.toString();
     }
+
 }

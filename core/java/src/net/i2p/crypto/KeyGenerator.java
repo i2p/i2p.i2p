@@ -76,6 +76,20 @@ public class KeyGenerator {
         return keys;
     }
 
+    /** Convert a PrivateKey to its corresponding PublicKey
+     * @param a PrivateKey object
+     * @return the corresponding PublicKey object
+     * @author aum
+     */
+    public static PublicKey getPublicKey(PrivateKey priv) {
+        BigInteger a = new NativeBigInteger(priv.toByteArray());
+        BigInteger aalpha = CryptoConstants.elgg.modPow(a, CryptoConstants.elgp);
+        PublicKey pub = new PublicKey();
+        byte [] pubBytes = aalpha.toByteArray();
+        pub.setData(padBuffer(pubBytes, PublicKey.KEYSIZE_BYTES));
+        return pub;
+    }
+
     /** Generate a pair of DSA keys, where index 0 is a SigningPublicKey, and
      * index 1 is a SigningPrivateKey
      * @return pair of keys
@@ -98,6 +112,20 @@ public class KeyGenerator {
         ((SigningPublicKey) keys[0]).setData(k0);
         ((SigningPrivateKey) keys[1]).setData(k1);
         return keys;
+    }
+
+    /** Convert a SigningPrivateKey to a SigningPublicKey
+     * @param a SigningPrivateKey object
+     * @return a SigningPublicKey object
+     * @author aum
+     */
+    public static SigningPublicKey getSigningPublicKey(SigningPrivateKey priv) {
+        BigInteger x = new NativeBigInteger(priv.toByteArray());
+        BigInteger y = CryptoConstants.dsag.modPow(x, CryptoConstants.dsap);
+        SigningPublicKey pub = new SigningPublicKey();
+        byte [] pubBytes = padBuffer(y.toByteArray(), SigningPublicKey.KEYSIZE_BYTES);
+        pub.setData(pubBytes);
+        return pub;
     }
 
     /**
