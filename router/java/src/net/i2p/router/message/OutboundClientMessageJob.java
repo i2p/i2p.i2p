@@ -222,8 +222,13 @@ public class OutboundClientMessageJob extends JobImpl {
         public String getName() { return "Short circuit search"; }
         public void runJob() {
             LeaseSet ls = getContext().netDb().lookupLeaseSetLocally(_ls.getDestination().calculateHash());
-            if (ls == null)
-                getContext().netDb().store(_ls.getDestination().calculateHash(), _ls);
+            if (ls == null) {
+                try {
+                    getContext().netDb().store(_ls.getDestination().calculateHash(), _ls);
+                } catch (IllegalArgumentException iae) {
+                    // ignore - it expired anyway
+                }
+            }
         }
     }
     

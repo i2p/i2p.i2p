@@ -1,4 +1,16 @@
-$Id: history.txt,v 1.6 2004/09/04 00:41:42 jrandom Exp $
+$Id: history.txt,v 1.7 2004/09/04 16:54:09 jrandom Exp $
+
+2004-09-06  jrandom
+    * Address a race condition in the key management code that would manifest
+      itself as a corrupt router identity.
+    * Properly clear old transport addresses from being displayed on the old
+      console after soft restarts.
+    * Properly refuse to load the client applications more than once in the 
+      same JVM.
+    * Added support for a graceful restart (a graceful shutdown followed by a
+      full JVM restart - useful for restarting client apps).
+    * More defensive programming, HTML cleanup, logging
+    * wrapper.config cleanup of duplicate lines
 
 2004-09-04  jrandom
     * Added some basic guards to prevent multiple instances from running.

@@ -112,6 +112,7 @@ public class TransportManager implements TransportEventListener {
             ((Transport)_transports.get(i)).stopListening();
         }
         _transports.clear();
+        _addresses.clear();
     }
     
     private boolean isSupported(Set addresses, Transport t) {

@@ -55,6 +55,7 @@ public class Router {
     private SessionKeyPersistenceHelper _sessionKeyPersistenceHelper;
     private boolean _killVMOnEnd;
     private boolean _isAlive;
+    private int _gracefulExitCode;
     private I2PThread.OOMEventListener _oomListener;
     private ShutdownHook _shutdownHook;
     private I2PThread _gracefulShutdownDetector;
@@ -167,6 +168,8 @@ public class Router {
         _started = _context.clock().now();
         Runtime.getRuntime().addShutdownHook(_shutdownHook);
         I2PThread.addOOMEventListener(_oomListener);
+        
+        _context.keyManager().startup();
         
         readConfig();
         
@@ -543,6 +546,7 @@ public class Router {
     public static final int EXIT_HARD = 3;
     public static final int EXIT_OOM = 10;
     public static final int EXIT_HARD_RESTART = 4;
+    public static final int EXIT_GRACEFUL_RESTART = 5;
     
     public void shutdown(int exitCode) {
         _isAlive = false;
@@ -580,6 +584,10 @@ public class Router {
      *
      */
     public void shutdownGracefully() {
+        shutdownGracefully(EXIT_GRACEFUL);
+    }
+    public void shutdownGracefully(int exitCode) {
+        _gracefulExitCode = exitCode;
         _config.setProperty(PROP_SHUTDOWN_IN_PROGRESS, "true");
         synchronized (_gracefulShutdownDetector) {
             _gracefulShutdownDetector.notifyAll();
@@ -615,7 +623,7 @@ public class Router {
                     if (_context.tunnelManager().getParticipatingCount() <= 0) {
                         if (_log.shouldLog(Log.CRIT))
                             _log.log(Log.CRIT, "Graceful shutdown progress - no more tunnels, safe to die");
-                        shutdown(EXIT_GRACEFUL);
+                        shutdown(_gracefulExitCode);
                         return;
                     } else {
                         try {

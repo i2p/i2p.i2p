@@ -37,6 +37,9 @@ public class ConfigServiceHandler extends FormHandler {
         } else if ("Cancel graceful shutdown".equals(_action)) {
             _context.router().cancelGracefulShutdown();
             addFormNotice("Graceful shutdown cancelled");
+        } else if ("Graceful restart".equals(_action)) {
+            _context.router().shutdownGracefully(Router.EXIT_GRACEFUL_RESTART);
+            addFormNotice("Graceful restart requested");
         } else if ("Hard restart".equals(_action)) {
             _context.router().shutdown(Router.EXIT_HARD_RESTART);
             addFormNotice("Hard restart requested");

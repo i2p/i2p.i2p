@@ -490,11 +490,15 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
     public void publish(RouterInfo localRouterInfo) {
         if (!_initialized) return;
         Hash h = localRouterInfo.getIdentity().getHash();
-        store(h, localRouterInfo);
-        synchronized (_explicitSendKeys) {
-            _explicitSendKeys.add(h);
+        try {
+            store(h, localRouterInfo);
+            synchronized (_explicitSendKeys) {
+                _explicitSendKeys.add(h);
+            }
+            writeMyInfo(localRouterInfo);
+        } catch (IllegalArgumentException iae) {
+            _log.error("Local routerInfo was invalid?  "+ iae.getMessage(), iae);
         }
-        writeMyInfo(localRouterInfo);
     }
 
     /**

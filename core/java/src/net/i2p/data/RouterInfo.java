@@ -221,6 +221,7 @@ public class RouterInfo extends DataStructureImpl {
         if (bytes == null) throw new DataFormatException("Not enough data to sign");
         // now sign with the key 
         Signature sig = DSAEngine.getInstance().sign(bytes, key);
+        if (sig == null) throw new DataFormatException("Not enough data to sign, or other signature failure");
         setSignature(sig);
         //_log.debug("Signed " + SHA256Generator.getInstance().calculateHash(bytes).toBase64() + " with " + key);
         //_log.debug("verify ok? " + DSAEngine.getInstance().verifySignature(sig, bytes, getIdentity().getSigningPublicKey()));

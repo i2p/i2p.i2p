@@ -13,6 +13,7 @@ import java.util.Properties;
 
 import net.i2p.data.DataFormatException;
 import net.i2p.data.RouterInfo;
+import net.i2p.data.SigningPrivateKey;
 import net.i2p.router.JobImpl;
 import net.i2p.router.RouterContext;
 import net.i2p.util.Log;
@@ -41,7 +42,13 @@ public class PublishLocalRouterInfoJob extends JobImpl {
             ri.setPublished(getContext().clock().now());
             ri.setOptions(stats);
             ri.setAddresses(getContext().commSystem().createAddresses());
-            ri.sign(getContext().keyManager().getSigningPrivateKey());
+            SigningPrivateKey key = getContext().keyManager().getSigningPrivateKey();
+            if (key == null) {
+                _log.log(Log.CRIT, "Internal error - signing private key not known?  rescheduling publish for 30s");
+                requeue(30*1000);
+                return;
+            }
+            ri.sign(key);
             getContext().router().setRouterInfo(ri);
             if (_log.shouldLog(Log.INFO))
                 _log.info("Newly updated routerInfo is published with " + stats.size() 

@@ -26,12 +26,17 @@ class LoadClientAppsJob extends JobImpl {
     
     private static final String PROP_CLIENT_CONFIG_FILENAME = "router.clientConfigFile";
     private static final String DEFAULT_CLIENT_CONFIG_FILENAME = "clients.config";
+    private static boolean _loaded = false;
     
     public LoadClientAppsJob(RouterContext ctx) {
         super(ctx);
         _log = ctx.logManager().getLog(LoadClientAppsJob.class);
     }
     public void runJob() {
+        synchronized (LoadClientAppsJob.class) {
+            if (_loaded) return;
+            _loaded = true;
+        }
         Properties clientApps = getClientApps();
         int i = 0;
         while (true) {
