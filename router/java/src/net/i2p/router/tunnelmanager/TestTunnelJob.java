@@ -74,7 +74,7 @@ class TestTunnelJob extends JobImpl {
     }
     
     private final static long DEFAULT_TEST_TIMEOUT = 10*1000; // 10 seconds for a test to succeed
-    private final static long MINIMUM_TEST_TIMEOUT = 1*1000; // 1 second min
+    private final static long DEFAULT_MINIMUM_TEST_TIMEOUT = 2*1000; // 2 second min
     private final static int TEST_PRIORITY = 100;
     
     /** 
@@ -94,8 +94,9 @@ class TestTunnelJob extends JobImpl {
                 }
             }
         }
-        if (rv < MINIMUM_TEST_TIMEOUT)
-            rv = MINIMUM_TEST_TIMEOUT;
+        long min = getMinimumTestTimeout();
+        if (rv < min)
+            rv = min;
         return rv;
     }
     
@@ -107,6 +108,19 @@ class TestTunnelJob extends JobImpl {
             return Double.parseDouble(getContext().getProperty("router.tunnelTestDeviation", "2.0"));
         } catch (NumberFormatException nfe) {
             return 2.0;
+        }
+    }
+    
+    private long getMinimumTestTimeout() {
+        String timeout = getContext().getProperty("router.tunnelTestMinimum", ""+DEFAULT_MINIMUM_TEST_TIMEOUT);
+        if (timeout != null) {
+            try {
+                return Long.parseLong(timeout); 
+            } catch (NumberFormatException nfe) {
+                return DEFAULT_MINIMUM_TEST_TIMEOUT;
+            }
+        } else {
+            return DEFAULT_MINIMUM_TEST_TIMEOUT;
         }
     }
     
