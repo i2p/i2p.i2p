@@ -17,11 +17,12 @@
 <h4>
  <a href="tunnels.jsp">Tunnels</a> |
  <a href="profiles.jsp">Profiles</a> |
- <a href="netdb.jsp">Network Database</a> |
+ <a href="netdb.jsp">NetDB</a> |
  <a href="logs.jsp">Logs</a> |
- <a href="oldconsole.jsp">Old console</a> |
+ <a href="oldconsole.jsp">Internals</a> |
  <a href="oldstats.jsp">Stats</a> |
- <a href="i2ptunnel/" target="_blank">I2PTunnel</a>
+ <a href="i2ptunnel/" target="_blank">I2PTunnel</a> |
+ <a href="susimail/susimail" target="_blank">Susimail</a>
  <jsp:useBean class="net.i2p.router.web.NavHelper" id="navhelper" scope="request" />
  <jsp:setProperty name="navhelper" property="contextId" value="<%=(String)session.getAttribute("i2p.contextId")%>" />
  <jsp:getProperty name="navhelper" property="clientAppLinks" />

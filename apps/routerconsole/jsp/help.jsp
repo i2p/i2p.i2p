@@ -34,7 +34,11 @@ by their binary code license.  This product includes software developed by the A
 
 <p>Another application you can see on this webpage is <a href="http://www.i2p.net/i2ptunnel">I2PTunnel</a>
 (your <a href="i2ptunnel/" target="_blank">web interface</a>) - a GPL'ed application written by mihi that
-lets you tunnel normal TCP/IP traffic over I2P (such as the eepproxy and the irc proxy).</p>
+lets you tunnel normal TCP/IP traffic over I2P (such as the eepproxy and the irc proxy).  There is also a
+<a href="http://susi.i2p/">susimail</a> web based mail client <a href="susimail/susimail">available</a> on
+the console, which is a GPL'ed application written by susi23.  The addressbook application, written by 
+<a href="http://ragnarok.i2p/">Ragnarok</a> helps maintain your hosts.txt files (see ./addressbook/ for
+more information).</p>
 
 <p>The router by default also includes human's public domain <a href="http://www.i2p.net/sam">SAM</a> bridge,
 which other client applications (such the <a href="http://duck.i2p/i2p-bt/">bittorrent port</a>) can use.  

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project basedir="." default="all" name="susimail">
+    <target name="all" depends="clean, build" />
+    <target name="build" depends="builddep, jar" />
+    <target name="builddep">
+        <ant dir="../jetty/" target="build" />
+    </target>
+    <target name="compile" depends="clean">
+        <javac 
+            srcdir="./src/src"
+            debug="true" deprecation="on" source="1.3" target="1.3" 
+            destdir="./src/WEB-INF/classes">
+            <classpath>
+                <pathelement location="../jetty/jettylib/javax.servlet.jar" />
+                <pathelement location="../jetty/jettylib/org.mortbay.jetty.jar" />
+            </classpath>
+        </javac>
+    </target>
+    <target name="jar" depends="compile, war" />
+    <target name="war" depends="compile">
+        <war destfile="susimail.war" webxml="src/WEB-INF/web.xml"
+             basedir="src/" excludes="WEB-INF/web.xml">
+        </war>
+    </target>
+    <target name="javadoc">
+        <mkdir dir="./build" />
+        <mkdir dir="./build/javadoc" />
+        <javadoc 
+            sourcepath="./src/src/" destdir="./build/javadoc" 
+            packagenames="*" 
+            use="true" 
+            splitindex="true" 
+            windowtitle="susimail" />
+    </target>
+    <target name="clean">
+        <delete>
+            <fileset dir="src/WEB-INF/classes/" includes="**/*.class, susimail.war" />
+        </delete>
+    </target>
+    <target name="cleandep" depends="clean" />
+    <target name="distclean" depends="clean" />
+</project>

@@ -1,4 +1,7 @@
-$Id: history.txt,v 1.143 2005/02/16 23:08:34 jrandom Exp $
+$Id: history.txt,v 1.144 2005/02/17 12:59:29 jrandom Exp $
+
+2005-02-17  jrandom
+    * Included the GPL'ed susimail 0.13 by default (thanks susi23!)
 
 2005-02-17  jrandom
     * Fixed the braindead tunnel testing logic
