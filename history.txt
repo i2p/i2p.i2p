@@ -1,4 +1,18 @@
-$Id: history.txt,v 1.148 2005/02/19 18:20:58 jrandom Exp $
+$Id: history.txt,v 1.149 2005/02/20 04:12:48 jrandom Exp $
+
+2005-02-20  jrandom
+    * Allow the streaming lib resend frequency to drop down to 20s as the
+      minimum, so that up to 2 retries can get sent on an http request.
+    * Add further limits to failsafe tunnels.
+    * Keep exploratory and client tunnel testing and building stats separate.
+    * Only use the 60s period for throttling tunnel requests due to transient
+      network overload.
+    * Rebuild tunnels earlier (1-3m before expiration, by default)
+    * Cache the next hop's routerInfo for participating tunnels so that the
+      tunnel participation doesn't depend on the netDb.
+    * Fixed a long standing bug in the streaming lib where we wouldn't always
+      unchoke messages when the window size grows.
+    * Make sure the window size never reaches 0 (duh)
 
 2005-02-20  jrandom
     * Only build failsafe tunnels if we need them
