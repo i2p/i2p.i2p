@@ -160,7 +160,7 @@ public class Log {
         return priority >= _minPriority;
     }
 
-    String getName() {
+    public String getName() {
         if (_class != null)
             return _class.getName();
         else

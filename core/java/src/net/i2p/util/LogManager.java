@@ -73,6 +73,7 @@ public class LogManager {
     private int _defaultLimit;
     private char[] _format;
     private SimpleDateFormat _dateFormat;
+    private String _dateFormatPattern;
     private String _baseLogfilename;
     private int _fileSize;
     private int _rotationLimit;
@@ -125,6 +126,16 @@ public class LogManager {
             }
         }
         updateLimit(rv);
+        return rv;
+    }
+    public List getLogs() {
+        List rv = null;
+        synchronized (_logs) {
+            rv = new ArrayList(_logs.size());
+            for (Iterator iter = _logs.values().iterator(); iter.hasNext(); ) {
+                rv.add(iter.next());
+            }
+        }
         return rv;
     }
     void addLog(Log log) {
@@ -229,6 +240,7 @@ public class LogManager {
         _format = fmt.toCharArray();
 
         String df = config.getProperty(PROP_DATEFORMAT, DEFAULT_DATEFORMAT);
+        _dateFormatPattern = df;
         _dateFormat = new SimpleDateFormat(df);
 
         String disp = config.getProperty(PROP_DISPLAYONSCREEN);
@@ -380,15 +392,15 @@ public class LogManager {
     ///
     /// would be friend methods for LogWriter...
     ///
-    String _getBaseLogfilename() {
+    public String getBaseLogfilename() {
         return _baseLogfilename;
     }
 
-    int _getFileSize() {
+    public int getFileSize() {
         return _fileSize;
     }
 
-    int _getRotationLimit() {
+    public int getRotationLimit() {
         return _rotationLimit;
     }
 
@@ -404,12 +416,15 @@ public class LogManager {
         return vals;
     }
 
-    char[] _getFormat() {
+    public char[] getFormat() {
         return _format;
     }
 
-    SimpleDateFormat _getDateFormat() {
+    public SimpleDateFormat getDateFormat() {
         return _dateFormat;
+    }
+    public String getDateFormatPattern() {
+        return _dateFormatPattern;
     }
 
     public static void main(String args[]) {

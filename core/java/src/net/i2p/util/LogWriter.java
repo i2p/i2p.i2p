@@ -108,7 +108,7 @@ class LogWriter implements Runnable {
             System.err.println("Error writing record, disk full?");
             t.printStackTrace();
         }
-        if (_numBytesInCurrentFile >= _manager._getFileSize()) {
+        if (_numBytesInCurrentFile >= _manager.getFileSize()) {
             rotateFile();
         }
     }
@@ -118,7 +118,7 @@ class LogWriter implements Runnable {
      *
      */
     private void rotateFile() {
-        String pattern = _manager._getBaseLogfilename();
+        String pattern = _manager.getBaseLogfilename();
         File f = getNextFile(pattern);
         _currentFile = f;
         _numBytesInCurrentFile = 0;
@@ -151,7 +151,7 @@ class LogWriter implements Runnable {
         if (pattern.indexOf('#') < 0) {
             return new File(pattern);
         } else {
-            int max = _manager._getRotationLimit();
+            int max = _manager.getRotationLimit();
             if (_rotationNum == -1) {
                 return getFirstFile(pattern, max);
             } else {

@@ -31,7 +31,7 @@ class LogRecordFormatter {
         if (rec.getThrowable() != null)
             size += 512;
         StringBuffer buf = new StringBuffer(size);
-        char format[] = manager._getFormat();
+        char format[] = manager.getFormat();
         for (int i = 0; i < format.length; ++i) {
             switch ((int) format[i]) {
             case (int) LogManager.DATE:
@@ -75,7 +75,7 @@ class LogRecordFormatter {
     }
 
     private static String getWhen(LogManager manager, LogRecord logRecord) {
-        return manager._getDateFormat().format(new Date(logRecord.getDate()));
+        return manager.getDateFormat().format(new Date(logRecord.getDate()));
     }
 
     private static String getPriority(LogRecord rec) {
