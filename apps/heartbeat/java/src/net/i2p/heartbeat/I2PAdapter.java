@@ -11,6 +11,7 @@ import java.util.Date;
 import java.util.Properties;
 
 import net.i2p.I2PException;
+import net.i2p.I2PAppContext;
 import net.i2p.client.I2PClient;
 import net.i2p.client.I2PClientFactory;
 import net.i2p.client.I2PSession;
@@ -219,7 +220,8 @@ class I2PAdapter {
             DataHelper.writeDate(baos, new Date(now));
             int padding = size - baos.size();
             byte paddingData[] = new byte[padding];
-            Arrays.fill(paddingData, (byte) 0x2A);
+            I2PAppContext.getGlobalContext().random().nextBytes(paddingData);
+            //Arrays.fill(paddingData, (byte) 0x2A);
             DataHelper.writeLong(baos, 2, padding);
             baos.write(paddingData);
             boolean sent = _session.sendMessage(peer, baos.toByteArray());
