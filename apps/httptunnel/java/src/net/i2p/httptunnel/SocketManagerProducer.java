@@ -14,31 +14,31 @@ public class SocketManagerProducer extends Thread {
     private int port;
     private String host;
     private int maxManagers;
-    private boolean mcDonalds;
+    private boolean shouldThrowAwayManagers;
 
     /**
      * Public constructor creating a SocketManagerProducer 
      * @param initialManagers a list of socket managers to use
      * @param maxManagers how many managers to have in the cache
-     * @param mcDonaldsMode whether to throw away a manager after use
+     * @param shouldThrowAwayManagers whether to throw away a manager after use
      * @param host which host to listen on
      * @param port which port to listen on
      */
     public SocketManagerProducer(I2PSocketManager[] initialManagers,
 				 int maxManagers,
-				 boolean mcDonaldsMode,
+				 boolean shouldThrowAwayManagers,
 				 String host, int port) {
 	if (maxManagers < 1) {
 	    throw new IllegalArgumentException("maxManagers < 1");
 	}
 	this.host=host;
 	this.port=port;
-	mcDonalds=mcDonaldsMode;
+	this.shouldThrowAwayManagers=shouldThrowAwayManagers;
 	if (initialManagers != null) {
 	    myManagers.addAll(Arrays.asList(initialManagers));
 	}
 	this.maxManagers=maxManagers;
-	mcDonalds=mcDonaldsMode;
+	this.shouldThrowAwayManagers=shouldThrowAwayManagers;
 	setDaemon(true);
 	start();
     }
@@ -52,7 +52,7 @@ public class SocketManagerProducer extends Thread {
 	    synchronized(this) {
 		// without mcDonalds mode, we most probably need no
 		// new managers.
-		while (!mcDonalds && myManagers.size() == maxManagers) {
+		while (!shouldThrowAwayManagers && myManagers.size() == maxManagers) {
 		    myWait();
 		}
 	    }
@@ -102,7 +102,7 @@ public class SocketManagerProducer extends Thread {
 	}
 	int which = (int)(Math.random()*myManagers.size());
 	I2PSocketManager result = (I2PSocketManager) myManagers.get(which);
-	if (mcDonalds) {
+	if (shouldThrowAwayManagers) {
 	    myManagers.remove(which);
 	    notifyAll();
 	}

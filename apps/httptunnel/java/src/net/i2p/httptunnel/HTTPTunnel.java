@@ -41,12 +41,12 @@ public class HTTPTunnel {
      * 
      * @param initialManagers a list of socket managers to use
      * @param maxManagers how many managers to have in the cache
-     * @param mcDonaldsMode whether to throw away a manager after use
+     * @param shouldThrowAwayManagers whether to throw away a manager after use
      * @param listenPort which port to listen on
      */
     public HTTPTunnel(I2PSocketManager[] initialManagers, int maxManagers,
-		      boolean mcDonaldsMode, int listenPort) {
-	this(initialManagers, maxManagers, mcDonaldsMode, listenPort,
+		      boolean shouldThrowAwayManagers, int listenPort) {
+	this(initialManagers, maxManagers, shouldThrowAwayManagers, listenPort,
 	     "127.0.0.1", 7654);
     }
 
@@ -55,17 +55,17 @@ public class HTTPTunnel {
      * 
      * @param initialManagers a list of socket managers to use
      * @param maxManagers how many managers to have in the cache
-     * @param mcDonaldsMode whether to throw away a manager after use
+     * @param shouldThrowAwayManagers whether to throw away a manager after use
      * @param listenPort which port to listen on
      * @param i2cpAddress the I2CP address
      * @param i2cpPort the I2CP port
      */
     public HTTPTunnel(I2PSocketManager[] initialManagers, int maxManagers,
-		      boolean mcDonaldsMode, int listenPort,
+		      boolean shouldThrowAwayManagers, int listenPort,
 		      String i2cpAddress, int i2cpPort) {
 	SocketManagerProducer smp = 
 	    new SocketManagerProducer(initialManagers, maxManagers,
-				      mcDonaldsMode, i2cpAddress, i2cpPort);
+				      shouldThrowAwayManagers, i2cpAddress, i2cpPort);
 	new HTTPListener(smp, listenPort, "127.0.0.1");
     }
     
@@ -77,7 +77,7 @@ public class HTTPTunnel {
     public static void main(String[] args) {
 	String host = "127.0.0.1";
 	int port = 7654, max = 1;
-	boolean mc = false;
+	boolean throwAwayManagers = false;
 	if (args.length >1) {
 	    if (args.length == 4) {
 		host = args[2];
@@ -93,9 +93,9 @@ public class HTTPTunnel {
 	    max = 1;
 	} else if (max <0) {
 	    max = -max;
-	    mc = true;
+	    throwAwayManagers = true;
 	}
-	new HTTPTunnel(null, max, mc, Integer.parseInt(args[0]), host, port);
+	new HTTPTunnel(null, max, throwAwayManagers, Integer.parseInt(args[0]), host, port);
     }
 	    
     private static void showInfo() {
