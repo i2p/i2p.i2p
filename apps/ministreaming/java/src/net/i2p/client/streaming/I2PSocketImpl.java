@@ -63,7 +63,7 @@ class I2PSocketImpl implements I2PSocket {
     public String getRemoteID(boolean wait, long maxWait) throws InterruptedIOException {
         long dieAfter = System.currentTimeMillis() + maxWait;
         synchronized (remoteIDWaiter) {
-            while (wait && remoteID == null) {
+            if (wait) {
                 try {
                     if (maxWait > 0)
                         remoteIDWaiter.wait(maxWait);
@@ -74,8 +74,7 @@ class I2PSocketImpl implements I2PSocket {
 
                 if ((maxWait > 0) && (System.currentTimeMillis() > dieAfter))
                     throw new InterruptedIOException("Timed out waiting for remote ID");
-            }
-            if (wait) {
+             
                 _log.debug("TIMING: RemoteID set to " + I2PSocketManager.getReadableForm(remoteID) + " for "
                            + this.hashCode());
             }

@@ -31,7 +31,7 @@ import net.i2p.util.Log;
 public class I2PSocketManager implements I2PSessionListener {
     private final static Log _log = new Log(I2PSocketManager.class);
     private I2PSession _session;
-    private I2PServerSocketImpl _serverSocket;
+    private I2PServerSocketImpl _serverSocket = null;
     private Object lock = new Object(); // for locking socket lists
     private HashMap _outSockets;
     private HashMap _inSockets;
@@ -41,7 +41,6 @@ public class I2PSocketManager implements I2PSessionListener {
 
     public I2PSocketManager() {
         _session = null;
-        _serverSocket = new I2PServerSocketImpl(this);
         _inSockets = new HashMap(16);
         _outSockets = new HashMap(16);
     }
@@ -106,14 +105,19 @@ public class I2PSocketManager implements I2PSessionListener {
                     _log.debug("*Disconnect outgoing!");
                     try {
                         s = (I2PSocketImpl) _outSockets.get(id);
-                        if (payload.length == 0 && s != null) {
+                        if (s != null) {
+                            if (payload.length > 0) {
+                                _log.debug("Disconnect packet had "
+                                           + payload.length + " bytes");
+                            }
+                            if (s.getRemoteID(false) == null) {
+                                s.setRemoteID(null); // Just to wake up socket
+                                return;
+                            }
                             s.internalClose();
                             _outSockets.remove(id);
-                            return;
-                        } else {
-                            if (payload.length > 0) _log.warn("Disconnect packet had " + payload.length + " bytes");
-                            return;
                         }
+                        return;
                     } catch (Exception t) {
                         _log.error("Ignoring error on disconnect", t);
                     }
@@ -135,6 +139,20 @@ public class I2PSocketManager implements I2PSessionListener {
                         String newLocalID = makeID(_inSockets);
                         Destination d = new Destination();
                         d.readBytes(new ByteArrayInputStream(payload));
+
+                        if (_serverSocket == null) {
+                            // The app did not instantiate an I2PServerSocket
+                            byte[] packet = makePacket((byte) 0x52, id, newLocalID.getBytes("ISO-8859-1"));
+                            boolean replySentOk = false;
+                            synchronized (_session) {
+                                replySentOk = _session.sendMessage(d, packet);
+                            }
+                            if (!replySentOk) {
+                                _log.error("Error sending close to " + d.calculateHash().toBase64()
+                                           + " in response to a new con message", new Exception("Failed creation"));
+                            }
+                            return;
+                        }
 
                         s = new I2PSocketImpl(d, this, false, newLocalID);
                         s.setRemoteID(id);
@@ -227,6 +245,9 @@ public class I2PSocketManager implements I2PSessionListener {
     }
 
     public I2PServerSocket getServerSocket() {
+        if (_serverSocket == null) {
+            _serverSocket = new I2PServerSocketImpl(this);
+        }
         return _serverSocket;
     }
 
@@ -262,6 +283,7 @@ public class I2PSocketManager implements I2PSessionListener {
                 throw new I2PException("Unable to reach peer");
             }
             remoteID = s.getRemoteID(true, options.getConnectTimeout());
+            if (remoteID == null) { throw new I2PException("Peer refused connection"); }
             if ("".equals(remoteID)) { throw new I2PException("Unable to reach peer"); }
             _log.debug("TIMING: s given out for remoteID " + getReadableForm(remoteID));
             return s;
@@ -326,6 +348,7 @@ public class I2PSocketManager implements I2PSessionListener {
 
     public static String getReadableForm(String id) {
         try {
+            if (id == null) return "(null)";
             if (id.length() != 3) return "Bogus";
             return Base64.encode(id.getBytes("ISO-8859-1"));
         } catch (UnsupportedEncodingException ex) {
