@@ -135,7 +135,6 @@ public class ClientConnectionRunner {
         }
         _config = null;
         _manager = null;
-        _context = null;
     }
     
     /** current client's config */
