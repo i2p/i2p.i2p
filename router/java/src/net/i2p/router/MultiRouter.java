@@ -67,7 +67,7 @@ public class MultiRouter {
             router.setKillVMOnEnd(false);
             _routers.add(router);
             _log.info("Router " + i + " created from " + args[i]);
-            try { Thread.sleep(2*1000); } catch (InterruptedException ie) {}
+            //try { Thread.sleep(2*1000); } catch (InterruptedException ie) {}
         }
         
         for (int i = 0; i < _routers.size(); i++) {
