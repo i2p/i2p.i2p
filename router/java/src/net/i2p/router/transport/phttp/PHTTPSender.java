@@ -92,7 +92,7 @@ class PHTTPSender {
     }
     
     private boolean doSend(OutNetMessage msg) throws IOException {
-        long delay = _context.bandwidthLimiter().calculateDelayOutbound(msg.getTarget().getIdentity(), (int)msg.getMessageSize());
+        long delay = 0; // _context.bandwidthLimiter().calculateDelayOutbound(msg.getTarget().getIdentity(), (int)msg.getMessageSize());
         _log.debug("Delaying [" + delay + "ms]");
         try { Thread.sleep(delay); } catch (InterruptedException ie) {}
         _log.debug("Continuing with sending");

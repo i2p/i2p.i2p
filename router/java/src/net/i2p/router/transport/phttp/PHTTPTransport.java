@@ -240,7 +240,7 @@ public class PHTTPTransport extends TransportImpl {
         if (_poller.shouldRejectMessages())
             return null; // we're not using phttp
         
-        long latencyStartup = _context.bandwidthLimiter().calculateDelayOutbound(toAddress.getIdentity(), (int)dataSize);
+        long latencyStartup = 0; //_context.bandwidthLimiter().calculateDelayOutbound(toAddress.getIdentity(), (int)dataSize);
         latencyStartup += _pollFrequencyMs / 2; // average distance until the next poll
         long sendTime = (int)((dataSize)/(16*1024)); // 16K/sec ARBITRARY
         int bytes = (int)dataSize+1024;
@@ -288,7 +288,7 @@ public class PHTTPTransport extends TransportImpl {
         }
         public String getName() { return "Push New PHTTP Message"; }
         public void runJob() {
-            long delay = _context.bandwidthLimiter().calculateDelayOutbound(_msg.getTarget().getIdentity(), (int)_msg.getMessageSize());
+            long delay = 0; // _context.bandwidthLimiter().calculateDelayOutbound(_msg.getTarget().getIdentity(), (int)_msg.getMessageSize());
             if (delay > 0) {
                 getTiming().setStartAfter(delay + _context.clock().now());
                 PHTTPTransport.this._context.jobQueue().addJob(this);
