@@ -10,12 +10,13 @@ public class I2PSocketOptions {
     private long _writeTimeout;
     private int _maxBufferSize;
 
-    public static final int DEFAULT_BUFFER_SIZE = 1024*128;
+    public static final int DEFAULT_BUFFER_SIZE = 1024*64;
+    public static final int DEFAULT_WRITE_TIMEOUT = 60*1000;
     
     public I2PSocketOptions() {
         _connectTimeout = -1;
         _readTimeout = -1;
-        _writeTimeout = -1;
+        _writeTimeout = DEFAULT_WRITE_TIMEOUT;
         _maxBufferSize = DEFAULT_BUFFER_SIZE;
     }
 
