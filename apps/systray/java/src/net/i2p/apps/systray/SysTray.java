@@ -23,6 +23,9 @@ import snoozesoft.systray4j.SysTrayMenuListener;
  * @author hypercubus
  */
 public class SysTray implements SysTrayMenuListener {
+
+    private static final SysTray INSTANCE = System.getProperty("os.name").startsWith("Windows") ? new SysTray() : null;
+
     private BrowserChooser  _browserChooser;
     private String          _browserString;
     private ConfigFile      _configFile        = new ConfigFile();
@@ -33,12 +36,8 @@ public class SysTray implements SysTrayMenuListener {
     private SysTrayMenuIcon _sysTrayMenuIcon   = new SysTrayMenuIcon("icons/iggy");
     private SysTrayMenu     _sysTrayMenu       = new SysTrayMenu(_sysTrayMenuIcon, "I2P Control");
     private UrlLauncher     _urlLauncher       = new UrlLauncher();
-    
-    private static SysTray _instance;
-    public static synchronized SysTray instance() { return _instance; }
 
     public SysTray() {
-        _instance = this;
         if (!_configFile.init("systray.config"))
             _configFile.setProperty("browser", "default");
 
@@ -48,14 +47,14 @@ public class SysTray implements SysTrayMenuListener {
         createSysTrayMenu();
     }
 
-    public static void main(String[] args) {
-        if (System.getProperty("os.name").startsWith("Windows"))
-            new SysTray();
+    public static synchronized SysTray getInstance() {
+        return INSTANCE;
     }
 
-    public void show() { _sysTrayMenu.showIcon(); }
-    public void hide() { _sysTrayMenu.hideIcon(); }
-    
+    public void hide() {
+        _sysTrayMenu.hideIcon();
+    }
+
     public void iconLeftClicked(SysTrayMenuEvent e) {}
 
     public void iconLeftDoubleClicked(SysTrayMenuEvent e) {
@@ -81,6 +80,10 @@ public class SysTray implements SysTrayMenuListener {
         } else if (e.getActionCommand().equals("openconsole")) {
             openRouterConsole();
         }
+    }
+
+    public void show() {
+        _sysTrayMenu.showIcon();
     }
 
     private void createSysTrayMenu() {
