@@ -145,15 +145,23 @@ clientApp.2.main=net.i2p.i2ptunnel.I2PTunnel
 clientApp.2.name=Tunnels
 clientApp.2.args=-nocli -e "config localhost ##_router_i2cp_port##" -e "httpclient 4444" -e "client 6668 irc.duck.i2p"
 
+# New router console webapp, driven by Jetty
+# to use, you must mkdir ./webapps/ and place the routerconsole.war file in there,
+# and add jetty-all.jar and routerconsole.jar in the router's classpath in the startRouter 
+# script
+#clientApp.3.main=net.i2p.router.web.RouterConsoleRunner
+#clientApp.3.name=webConsole
+#clientApp.3.args=7657 127.0.0.1 ./webapps/
+
 # Network monitor (harvests data from the network database and stores it under 
 # monitorData/, and with the netviewer GUI you can browse through its results)
-#clientApp.3.main=net.i2p.netmonitor.NetMonitor
-#clientApp.3.name=NetMonitor
-#clientApp.3.args=
+#clientApp.4.main=net.i2p.netmonitor.NetMonitor
+#clientApp.4.name=NetMonitor
+#clientApp.4.args=
 
 # Heartbeat engine (ueber-simple ping/pong system, configured in heartbeat.config.  By itself
 # it just writes out stat data where its told to, but there's a seperate HeartbeatMonitor 
 # GUI to let you visualize things)
-#clientApp.4.main=net.i2p.heartbeat.Heartbeat
-#clientApp.4.name=Heartbeat
-#clientApp.4.args=heartbeat.config
+#clientApp.5.main=net.i2p.heartbeat.Heartbeat
+#clientApp.5.name=Heartbeat
+#clientApp.5.args=heartbeat.config
