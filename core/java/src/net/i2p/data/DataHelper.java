@@ -528,6 +528,16 @@ public class DataHelper {
             return (ms / (24 * 60 * 60 * 1000)) + "d";
         }
     }
+    
+    /**
+     * Strip out any HTML (simply removing any less than / greater than symbols)
+     */
+    public static String stripHTML(String orig) {
+        if (orig == null) return "";
+        String t1 = orig.replace('<', ' ');
+        String rv = t1.replace('>', ' ');
+        return rv;
+    }
 
     /** compress the data and return a new GZIP compressed array */
     public static byte[] compress(byte orig[]) {

@@ -507,8 +507,8 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
                     + new Date(routerInfo.getPublished()));
             }
         } else if (routerInfo.getPublished() > start + Router.CLOCK_FUDGE_FACTOR) {
-            if (_log.shouldLog(Log.ERROR))
-                _log.error("Peer " + key.toBase64() + " published their leaseSet in the future?! [" 
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Peer " + key.toBase64() + " published their leaseSet in the future?! [" 
                           + new Date(routerInfo.getPublished()) + "]");
             return null;
         }
@@ -721,8 +721,8 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
                 for (Iterator routerIter = routerVersions.keySet().iterator(); routerIter.hasNext(); ) {
                     String routerVersion = (String)routerIter.next();
                     Integer num = (Integer)routerVersions.get(routerVersion);
-                    buf.append("<tr><td>").append(coreVersion);
-                    buf.append("</td><td>").append(routerVersion);
+                    buf.append("<tr><td>").append(DataHelper.stripHTML(coreVersion));
+                    buf.append("</td><td>").append(DataHelper.stripHTML(routerVersion));
                     buf.append("</td><td>").append(num.intValue()).append("</td></tr>\n");
                 }
             }
@@ -752,7 +752,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
             for (Iterator optIter = addr.getOptions().keySet().iterator(); optIter.hasNext(); ) {
                 String name = (String)optIter.next();
                 String val = addr.getOptions().getProperty(name);
-                buf.append('[').append(name).append('=').append(val).append("] ");
+                buf.append('[').append(DataHelper.stripHTML(name)).append('=').append(DataHelper.stripHTML(val)).append("] ");
             }
         }
         buf.append("</i><br />\n");
@@ -760,7 +760,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         for (Iterator iter = info.getOptions().keySet().iterator(); iter.hasNext(); ) {
             String key = (String)iter.next();
             String val = info.getOptions().getProperty(key);
-            buf.append(key).append(" = ").append(val).append("<br />\n");
+            buf.append(DataHelper.stripHTML(key)).append(" = ").append(DataHelper.stripHTML(val)).append("<br />\n");
         }
         buf.append("</code></i><hr />\n");
     }
