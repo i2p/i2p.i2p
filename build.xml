@@ -12,6 +12,7 @@
     </target>
     <target name="dist" depends="distclean, build, javadoc" />
     <target name="build" depends="builddep, jar" />
+    <target name="buildclean" depends="distclean, builddep, jar" />
     <target name="builddep">
 	<!-- build *everything* here, but only once -->
         <ant dir="core/java/" target="jar" />
