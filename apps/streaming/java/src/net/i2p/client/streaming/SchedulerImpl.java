@@ -25,7 +25,7 @@ abstract class SchedulerImpl implements TaskScheduler {
         private Exception _addedBy;
         public ConEvent(Connection con) { 
             _connection = con; 
-            _addedBy = new Exception("added by");
+            //_addedBy = new Exception("added by");
         }
         public void timeReached() {
             //if (_log.shouldLog(Log.DEBUG))

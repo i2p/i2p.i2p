@@ -44,7 +44,11 @@ class PacketQueue {
             tagsSent = new HashSet();
         try {
             // cache this from before sendMessage
-            String conStr = packet.getConnection() + "";
+            String conStr = (packet.getConnection() != null ? packet.getConnection().toString() : "");
+            if (packet.getAckTime() > 0) {
+                _log.debug("Not resending " + packet);
+                return;
+            }
             // this should not block!
             long begin = _context.clock().now();
             boolean sent = _session.sendMessage(packet.getTo(), _buf, 0, size, keyUsed, tagsSent);

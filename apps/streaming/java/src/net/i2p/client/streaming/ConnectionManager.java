@@ -160,9 +160,9 @@ public class ConnectionManager {
         return ping(peer, timeoutMs, true);
     }
     public boolean ping(Destination peer, long timeoutMs, boolean blocking) {
-        return ping(peer, timeoutMs, blocking, null, null);
+        return ping(peer, timeoutMs, blocking, null, null, null);
     }
-    public boolean ping(Destination peer, long timeoutMs, boolean blocking, SessionKey keyToUse, Set tagsToSend) {
+    public boolean ping(Destination peer, long timeoutMs, boolean blocking, SessionKey keyToUse, Set tagsToSend, PingNotifier notifier) {
         byte id[] = new byte[4];
         _context.random().nextBytes(id);
         ByteArray ba = new ByteArray(id);
@@ -176,7 +176,7 @@ public class ConnectionManager {
             packet.setTagsSent(tagsToSend);
         }
         
-        PingRequest req = new PingRequest(peer, packet);
+        PingRequest req = new PingRequest(peer, packet, notifier);
         
         synchronized (_pendingPings) {
             _pendingPings.put(ba, req);
@@ -194,16 +194,25 @@ public class ConnectionManager {
                 _pendingPings.remove(ba);
             }
         } else {
-            SimpleTimer.getInstance().addEvent(new PingFailed(ba), timeoutMs);
+            SimpleTimer.getInstance().addEvent(new PingFailed(ba, notifier), timeoutMs);
         }
         
         boolean ok = req.pongReceived();
         return ok;
     }
+
+    interface PingNotifier {
+        public void pingComplete(boolean ok);
+    }
     
     private class PingFailed implements SimpleTimer.TimedEvent {
         private ByteArray _ba;
-        public PingFailed(ByteArray ba) { _ba = ba; }        
+        private PingNotifier _notifier;
+        public PingFailed(ByteArray ba, PingNotifier notifier) { 
+            _ba = ba; 
+            _notifier = notifier;
+        }
+        
         public void timeReached() {
             boolean removed = false;
             synchronized (_pendingPings) {
@@ -211,8 +220,11 @@ public class ConnectionManager {
                 if (o != null)
                     removed = true;
             }
-            if (removed)
+            if (removed) {
+                if (_notifier != null)
+                    _notifier.pingComplete(false);
                 _log.error("Ping failed");
+            }
         }
     }
     
@@ -220,10 +232,12 @@ public class ConnectionManager {
         private boolean _ponged;
         private Destination _peer;
         private PacketLocal _packet;
-        public PingRequest(Destination peer, PacketLocal packet) { 
+        private PingNotifier _notifier;
+        public PingRequest(Destination peer, PacketLocal packet, PingNotifier notifier) { 
             _ponged = false; 
             _peer = peer;
             _packet = packet;
+            _notifier = notifier;
         }
         public void pong() { 
             _log.debug("Ping successful");
@@ -232,6 +246,8 @@ public class ConnectionManager {
                 _ponged = true; 
                 ConnectionManager.PingRequest.this.notifyAll();
             }
+            if (_notifier != null)
+                _notifier.pingComplete(true);
         }
         public boolean pongReceived() { return _ponged; }
     }

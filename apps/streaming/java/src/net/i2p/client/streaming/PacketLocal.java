@@ -44,9 +44,10 @@ public class PacketLocal extends Packet implements MessageOutputStream.WriteStat
     public Set getTagsSent() { return _tagsSent; }
     public void setTagsSent(Set tags) { 
         if ( (_tagsSent != null) && (_tagsSent.size() > 0) && (tags.size() > 0) ) {
-            int old = _tagsSent.size();
-            _tagsSent.addAll(tags);
-            //System.out.println("Dup tags set on " +toString() + " old=" + old + " new=" + tags.size());
+            //int old = _tagsSent.size();
+            //_tagsSent.addAll(tags);
+            if (!_tagsSent.equals(tags))
+                System.out.println("ERROR: dup tags: old=" + _tagsSent.size() + " new=" + tags.size() + " packet: " + toString());
         } else {
             _tagsSent = tags;
         }

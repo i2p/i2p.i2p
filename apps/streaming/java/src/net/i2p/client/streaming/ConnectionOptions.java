@@ -87,12 +87,17 @@ public class ConnectionOptions extends I2PSocketOptions {
     public boolean getRequireFullySigned() { return _fullySigned; }
     public void setRequireFullySigned(boolean sign) { _fullySigned = sign; }
     
+    private static final int MAX_WINDOW_SIZE = 32;
     /** 
      * How many messages will we send before waiting for an ACK?
      *
      */
     public int getWindowSize() { return _windowSize; }
-    public void setWindowSize(int numMsgs) { _windowSize = numMsgs; }
+    public void setWindowSize(int numMsgs) { 
+        if (numMsgs > MAX_WINDOW_SIZE)
+            numMsgs = MAX_WINDOW_SIZE;
+        _windowSize = numMsgs; 
+    }
     
     /** after how many consecutive messages should we ack? */
     public int getReceiveWindow() { return _receiveWindow; } 
@@ -106,6 +111,13 @@ public class ConnectionOptions extends I2PSocketOptions {
         _rtt = ms; 
         if (_rtt > 60*1000)
             _rtt = 60*1000;
+    }
+    
+    /** rtt = rtt*RTT_DAMPENING + (1-RTT_DAMPENING)*currentPacketRTT */
+    private static final double RTT_DAMPENING = 0.9;
+    
+    public void updateRTT(int measuredValue) {
+        setRTT((int)(RTT_DAMPENING*_rtt + (1-RTT_DAMPENING)*measuredValue));
     }
     
     /** How long after sending a packet will we wait before resending? */

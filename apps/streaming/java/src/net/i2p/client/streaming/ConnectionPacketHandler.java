@@ -17,9 +17,6 @@ public class ConnectionPacketHandler {
     private I2PAppContext _context;
     private Log _log;
     
-    /** rtt = rtt*RTT_DAMPENING + (1-RTT_DAMPENING)*currentPacketRTT */
-    private static final double RTT_DAMPENING = 0.9;
-    
     public ConnectionPacketHandler(I2PAppContext context) {
         _context = context;
         _log = context.logManager().getLog(ConnectionPacketHandler.class);
@@ -98,9 +95,7 @@ public class ConnectionPacketHandler {
                     _log.debug("Packet acked after " + p.getAckTime() + "ms: " + p);
             }
             if (highestRTT > 0) {
-                int oldRTT = con.getOptions().getRTT();
-                int newRTT = (int)(RTT_DAMPENING*oldRTT + (1-RTT_DAMPENING)*highestRTT);
-                con.getOptions().setRTT(newRTT);
+                con.getOptions().updateRTT(highestRTT);
             }
         }
 
@@ -128,13 +123,17 @@ public class ConnectionPacketHandler {
             // window sizes are shrunk on resend, not on ack
         } else {
             if (acked > 0) { 
-                // new packet that ack'ed uncongested data, or an empty ack
-                int newWindowSize = con.getOptions().getWindowSize();
-                newWindowSize += 1; // acked; // 1
-                if (_log.shouldLog(Log.DEBUG))
-                    _log.debug("New window size " + newWindowSize + " (#resends: " + numResends 
-                               + ") for " + con);
-                con.getOptions().setWindowSize(newWindowSize);
+                long lowest = con.getHighestAckedThrough();
+                if (lowest >= con.getCongestionWindowEnd()) {
+                    // new packet that ack'ed uncongested data, or an empty ack
+                    int newWindowSize = con.getOptions().getWindowSize();
+                    newWindowSize += 1; // acked; // 1
+                    if (_log.shouldLog(Log.DEBUG))
+                        _log.debug("New window size " + newWindowSize + " (#resends: " + numResends 
+                                   + ") for " + con);
+                    con.getOptions().setWindowSize(newWindowSize);
+                    con.setCongestionWindowEnd(newWindowSize + lowest);
+                }
             }
         }
         return false;

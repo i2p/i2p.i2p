@@ -34,10 +34,11 @@ public class PacketHandler {
         if (false) {
             // artificial choke: 2% random drop and a 0-30s
             // random tiered delay from 0-30s
-            if (_context.random().nextInt(100) >= 98) {
+            if (_context.random().nextInt(100) >= 95) {
                 displayPacket(packet, "DROP");
                 return false;
             } else {
+                // if (true) return true; // no lag, just drop
                 /*
                 int delay = _context.random().nextInt(5*1000);
                 */

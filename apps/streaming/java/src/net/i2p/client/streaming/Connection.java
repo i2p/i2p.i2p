@@ -3,14 +3,17 @@ package net.i2p.client.streaming;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
 import net.i2p.I2PAppContext;
 import net.i2p.client.I2PSession;
 import net.i2p.data.Base64;
 import net.i2p.data.Destination;
+import net.i2p.data.SessionTag;
 import net.i2p.util.Log;
 import net.i2p.util.SimpleTimer;
 
@@ -39,6 +42,8 @@ public class Connection {
     private long _closeSentOn;
     private long _closeReceivedOn;
     private int _unackedPacketsReceived;
+    private long _congestionWindowEnd;
+    private long _highestAckedThrough;
     /** Packet ID (Long) to PacketLocal for sent but unacked packets */
     private Map _outboundPackets;
     private PacketQueue _outboundQueue;
@@ -70,6 +75,8 @@ public class Connection {
         _closeSentOn = -1;
         _closeReceivedOn = -1;
         _unackedPacketsReceived = 0;
+        _congestionWindowEnd = 0;
+        _highestAckedThrough = -1;
         _connectionManager = manager;
         _resetReceived = false;
         _connected = true;
@@ -183,12 +190,38 @@ public class Connection {
             // ACKs don't get ACKed, but pings do.
             if (packet.getTagsSent().size() > 0) {
                 _log.warn("Sending a ping since the ACK we just sent has " + packet.getTagsSent().size() + " tags");
-                _connectionManager.ping(_remotePeer, 30*1000, false, packet.getKeyUsed(), packet.getTagsSent());
+                _connectionManager.ping(_remotePeer, _options.getRTT()*2, false, packet.getKeyUsed(), packet.getTagsSent(), new PingNotifier());
             }
         }
     }
     
+    private class PingNotifier implements ConnectionManager.PingNotifier {
+        private long _startedPingOn;
+        public PingNotifier() {
+            _startedPingOn = _context.clock().now();
+        }
+        public void pingComplete(boolean ok) {
+            long time = _context.clock().now()-_startedPingOn;
+            if (ok)
+                _options.updateRTT((int)time);
+            else
+                _options.updateRTT((int)time*2);
+        }
+    }
+    
     List ackPackets(long ackThrough, long nacks[]) {
+        if (nacks == null) {
+            _highestAckedThrough = ackThrough;
+        } else {
+            long lowest = -1;
+            for (int i = 0; i < nacks.length; i++) {
+                if ( (lowest < 0) || (nacks[i] < lowest) )
+                    lowest = nacks[i];
+            }
+            if (lowest - 1 > _highestAckedThrough)
+                _highestAckedThrough = lowest - 1;
+        }
+        
         List acked = null;
         synchronized (_outboundPackets) {
             for (Iterator iter = _outboundPackets.keySet().iterator(); iter.hasNext(); ) {
@@ -352,6 +385,11 @@ public class Connection {
         } 
     }
     
+    public long getCongestionWindowEnd() { return _congestionWindowEnd; }
+    public void setCongestionWindowEnd(long endMsg) { _congestionWindowEnd = endMsg; }
+    public long getHighestAckedThrough() { return _highestAckedThrough; }
+    public void setHighestAckedThrough(long msgNum) { _highestAckedThrough = msgNum; }
+    
     /** stream that the local peer receives data on */
     public MessageInputStream getInputStream() { return _inputStream; }
     /** stream that the local peer sends data to the remote peer on */
@@ -370,6 +408,7 @@ public class Connection {
         else
             buf.append("unknown");
         buf.append(" wsize: ").append(_options.getWindowSize());
+        buf.append(" cwin: ").append(_congestionWindowEnd - _highestAckedThrough);
         buf.append(" rtt: ").append(_options.getRTT());
         buf.append(" unacked outbound: ");
         synchronized (_outboundPackets) {
@@ -400,8 +439,8 @@ public class Connection {
         }
         
         public void timeReached() {
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Resend period reached for " + _packet);
+            //if (_log.shouldLog(Log.DEBUG))
+            //    _log.debug("Resend period reached for " + _packet);
             boolean resend = false;
             synchronized (_outboundPackets) {
                 if (_outboundPackets.containsKey(new Long(_packet.getSequenceNum())))
@@ -415,7 +454,7 @@ public class Connection {
                 _packet.setResendDelay(getOptions().getResendDelay());
                 _packet.setReceiveStreamId(_receiveStreamId);
                 _packet.setSendStreamId(_sendStreamId);
-
+                
                 // shrink the window
                 int newWindowSize = getOptions().getWindowSize();
                 newWindowSize /= 2;
@@ -443,9 +482,9 @@ public class Connection {
                     SimpleTimer.getInstance().addEvent(ResendPacketEvent.this, timeout);
                 }
             } else {
-                if (_log.shouldLog(Log.DEBUG))
-                    _log.debug("Packet acked before resend (resend="+ resend + "): " 
-                               + _packet + " on " + Connection.this);
+                //if (_log.shouldLog(Log.DEBUG))
+                //    _log.debug("Packet acked before resend (resend="+ resend + "): " 
+                //               + _packet + " on " + Connection.this);
             }
         }
     }
