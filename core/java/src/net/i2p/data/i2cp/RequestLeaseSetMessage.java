@@ -131,9 +131,9 @@ public class RequestLeaseSetMessage extends I2CPMessageImpl {
                     return false;
             }
             return DataHelper.eq(getSessionId(), msg.getSessionId()) && DataHelper.eq(getEndDate(), msg.getEndDate());
-        } else {
-            return false;
         }
+         
+        return false;
     }
 
     public String toString() {

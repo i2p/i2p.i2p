@@ -25,9 +25,12 @@ import net.i2p.data.SessionTag;
  */
 public class SessionKeyManager {
     /** session key managers must be created through an app context */
-    protected SessionKeyManager(I2PAppContext context) {}
+    protected SessionKeyManager(I2PAppContext context) { // nop
+    }
+
     /** see above */
-    private SessionKeyManager() {}
+    private SessionKeyManager() { // nop
+    }
     
     /**
      * Retrieve the session key currently associated with encryption to the target,
@@ -43,7 +46,7 @@ public class SessionKeyManager {
      * when to expire that key begin with this call.
      *
      */
-    public void createSession(PublicKey target, SessionKey key) {
+    public void createSession(PublicKey target, SessionKey key) { // nop
     }
 
     /**
@@ -90,7 +93,7 @@ public class SessionKeyManager {
      * method after receiving an ack to a message delivering them)
      *
      */
-    public void tagsDelivered(PublicKey target, SessionKey key, Set sessionTags) {
+    public void tagsDelivered(PublicKey target, SessionKey key, Set sessionTags) { // nop
     }
 
     /**
@@ -99,14 +102,14 @@ public class SessionKeyManager {
      * from corrupted tag sets and crashes
      *
      */
-    public void failTags(PublicKey target) {
+    public void failTags(PublicKey target) { // nop
     }
 
     /**
      * Accept the given tags and associate them with the given key for decryption
      *
      */
-    public void tagsReceived(SessionKey key, Set sessionTags) {
+    public void tagsReceived(SessionKey key, Set sessionTags) { // nop
     }
 
     /**
@@ -125,6 +128,6 @@ public class SessionKeyManager {
      * whatever precautions are necessary (saving state, etc)
      *
      */
-    public void shutdown() {
+    public void shutdown() { // nop
     }
 }

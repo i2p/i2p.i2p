@@ -55,20 +55,18 @@ public class Frequency {
     /** calculate how many events would occur in a period given the current average */
     public double getAverageEventsPerPeriod() {
         synchronized (_lock) {
-            if (_avgInterval > 0)
-                return _period / _avgInterval;
-            else
-                return 0;
+            if (_avgInterval > 0) return _period / _avgInterval;
+                
+            return 0;
         }
     }
 
     /** calculate how many events would occur in a period given the maximum average */
     public double getMaxAverageEventsPerPeriod() {
         synchronized (_lock) {
-            if (_minAverageInterval > 0)
-                return _period / _minAverageInterval;
-            else
-                return 0;
+            if (_minAverageInterval > 0) return _period / _minAverageInterval;
+            
+            return 0;
         }
     }
 
@@ -76,10 +74,9 @@ public class Frequency {
     public double getStrictAverageInterval() {
         synchronized (_lock) {
             long duration = now() - _start;
-            if ((duration <= 0) || (_count <= 0))
-                return 0;
-            else
-                return duration / _count;
+            if ((duration <= 0) || (_count <= 0)) return 0;
+           
+            return duration / _count;
         }
     }
 
@@ -87,10 +84,9 @@ public class Frequency {
     public double getStrictAverageEventsPerPeriod() {
         double avgInterval = getStrictAverageInterval();
         synchronized (_lock) {
-            if (avgInterval > 0)
-                return _period / avgInterval;
-            else
-                return 0;
+            if (avgInterval > 0) return _period / avgInterval;
+           
+            return 0;
         }
     }
 

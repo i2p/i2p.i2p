@@ -74,7 +74,7 @@ public class TestServer implements Runnable {
      * Fire up the router
      */
     public static void main(String args[]) {
-        if (args.length == 1) {
+        if (args.length == 1) { // nop
         } else if (args.length == 2) {
             try {
                 LISTEN_PORT = Integer.parseInt(args[1]);

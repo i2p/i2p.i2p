@@ -166,7 +166,7 @@ public class KeyGenerator {
 
         try {
             Thread.sleep(5000);
-        } catch (InterruptedException ie) {
+        } catch (InterruptedException ie) { // nop
         }
     }
 }

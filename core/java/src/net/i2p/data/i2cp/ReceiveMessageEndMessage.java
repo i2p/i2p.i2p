@@ -83,9 +83,9 @@ public class ReceiveMessageEndMessage extends I2CPMessageImpl {
             ReceiveMessageEndMessage msg = (ReceiveMessageEndMessage) object;
             return DataHelper.eq(getSessionId(), msg.getSessionId())
                    && DataHelper.eq(getMessageId(), msg.getMessageId());
-        } else {
-            return false;
         }
+         
+        return false;
     }
 
     public String toString() {

@@ -37,7 +37,9 @@ public class ElGamalAESEngine {
     private final static int MIN_ENCRYPTED_SIZE = 80; // smallest possible resulting size
     private I2PAppContext _context;
 
-    private ElGamalAESEngine() {}
+    private ElGamalAESEngine() { // nop
+    }
+
     public ElGamalAESEngine(I2PAppContext ctx) {
         _context = ctx;
         
@@ -217,13 +219,12 @@ public class ElGamalAESEngine {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Decrypt with a non session tag, but tags read: " + foundTags.size());
             return decryptNewSession(data, targetPrivateKey, foundTags, usedKey, foundKey);
-        } else {
-            // existing session decrypted successfully!
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Decrypt with an EXISTING session tag successfull, # tags read: " + foundTags.size(),
-                           new Exception("Decrypted by"));
-            return decrypted;
         }
+        // existing session decrypted successfully!
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("Decrypt with an EXISTING session tag successfull, # tags read: " + foundTags.size(),
+                       new Exception("Decrypted by"));
+        return decrypted;
     }
 
     /**
@@ -292,9 +293,9 @@ public class ElGamalAESEngine {
                 foundTags.addAll(tags);
                 if (newKey != null) foundKey.setData(newKey.getData());
                 return unencrData;
-            } else {
-                throw new Exception("Hash does not match");
             }
+
+            throw new Exception("Hash does not match");
         } catch (Exception e) {
             if (_log.shouldLog(Log.WARN)) _log.warn("Unable to decrypt AES block", e);
             return null;
@@ -321,12 +322,11 @@ public class ElGamalAESEngine {
                 _log.info("Current tag is null, encrypting as new session", new Exception("encrypt new"));
             _context.statManager().updateFrequency("crypto.elGamalAES.encryptNewSession");
             return encryptNewSession(data, target, key, tagsForDelivery, newKey, paddedSize);
-        } else {
-            if (_log.shouldLog(Log.INFO))
-                _log.info("Current tag is NOT null, encrypting as existing session", new Exception("encrypt existing"));
-            _context.statManager().updateFrequency("crypto.elGamalAES.encryptExistingSession");
-            return encryptExistingSession(data, target, key, tagsForDelivery, currentTag, newKey, paddedSize);
         }
+        if (_log.shouldLog(Log.INFO))
+            _log.info("Current tag is NOT null, encrypting as existing session", new Exception("encrypt existing"));
+        _context.statManager().updateFrequency("crypto.elGamalAES.encryptExistingSession");
+        return encryptExistingSession(data, target, key, tagsForDelivery, currentTag, newKey, paddedSize);
     }
 
     /**

@@ -39,7 +39,9 @@ import net.i2p.data.Hash;
  * @author thecrypto,jrandom
  */
 public class SHA256Generator {
-    public SHA256Generator(I2PAppContext context) {};
+    public SHA256Generator(I2PAppContext context) {  // nop
+    }
+    
     public static SHA256Generator getInstance() {
         return I2PAppContext.getGlobalContext().sha();
     }
@@ -66,7 +68,7 @@ public class SHA256Generator {
             k += 512;
         }
         int padbytes = k / 8;
-        int wordlength = (int) (source.length / 4 + padbytes / 4 + 3);
+        int wordlength = source.length / 4 + padbytes / 4 + 3;
         int[] M0 = new int[wordlength];
         int wordcount = 0;
         int x = 0;

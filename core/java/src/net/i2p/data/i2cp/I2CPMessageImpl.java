@@ -27,7 +27,7 @@ import net.i2p.util.Log;
 public abstract class I2CPMessageImpl extends DataStructureImpl implements I2CPMessage {
     private final static Log _log = new Log(I2CPMessageImpl.class);
 
-    public I2CPMessageImpl() {
+    public I2CPMessageImpl() { // nop
     }
 
     /**

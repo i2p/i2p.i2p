@@ -113,9 +113,9 @@ public class ReportAbuseMessage extends I2CPMessageImpl {
             ReportAbuseMessage msg = (ReportAbuseMessage) object;
             return DataHelper.eq(getSessionId(), msg.getSessionId()) && DataHelper.eq(getSeverity(), msg.getSeverity())
                    && DataHelper.eq(getReason(), msg.getReason()) && DataHelper.eq(getMessageId(), msg.getMessageId());
-        } else {
-            return false;
         }
+         
+        return false;
     }
 
     public String toString() {

@@ -121,8 +121,8 @@ public class LeaseSet extends DataStructureImpl {
         Hash rk = RoutingKeyGenerator.getInstance().getRoutingKey(destKey);
         if (rk.equals(getRoutingKey()))
             return true;
-        else
-            return false;
+
+        return false;
     }
 
     /**
@@ -136,7 +136,7 @@ public class LeaseSet extends DataStructureImpl {
     public long getEarliestLeaseDate() {
         long when = -1;
         for (int i = 0; i < getLeaseCount(); i++) {
-            Lease lse = (Lease) getLease(i);
+            Lease lse = getLease(i);
             if ((lse != null) && (lse.getEndDate() != null)) {
                 if ((when <= 0) || (lse.getEndDate().getTime() < when)) when = lse.getEndDate().getTime();
             }

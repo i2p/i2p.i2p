@@ -182,7 +182,7 @@ public class PersistentSessionKeyManager extends TransientSessionKeyManager {
         }
         try {
             Thread.sleep(3000);
-        } catch (Throwable t) {
+        } catch (Throwable t) { // nop
         }
     }
 }

@@ -46,7 +46,8 @@ public final class I2PDatagramDissector {
     /**
      * Crate a new I2P repliable datagram dissector.
      */
-    public I2PDatagramDissector() {}
+    public I2PDatagramDissector() { // nop
+    }
 
     /**
      * Load an I2P repliable datagram into the dissector.

@@ -76,9 +76,8 @@ class I2PSessionImpl2 extends I2PSessionImpl {
         // as well as the nonblocking sends with application managed keys.  Later.
         if (isGuaranteed() || true) {
             return sendGuaranteed(dest, payload, keyUsed, tagsSent);
-        } else {
-            return sendBestEffort(dest, payload, keyUsed, tagsSent);
         }
+        return sendBestEffort(dest, payload, keyUsed, tagsSent);
     }
 
     /**
@@ -94,9 +93,8 @@ class I2PSessionImpl2 extends I2PSessionImpl {
             } catch (IOException ioe) {
                 throw new I2PSessionException("Error decompressing message", ioe);
             }
-        } else {
-            return compressed;
         }
+        return compressed;
     }
 
     private boolean sendBestEffort(Destination dest, byte payload[], SessionKey keyUsed, Set tagsSent)
@@ -116,7 +114,7 @@ class I2PSessionImpl2 extends I2PSessionImpl {
         if (false) // rekey
             newKey = _context.keyGenerator().generateSessionKey();
 
-        long nonce = (long)_context.random().nextInt(Integer.MAX_VALUE);
+        long nonce = _context.random().nextInt(Integer.MAX_VALUE);
         MessageState state = new MessageState(nonce, getPrefix());
         state.setKey(key);
         state.setTags(sentTags);
@@ -196,7 +194,7 @@ class I2PSessionImpl2 extends I2PSessionImpl {
         if (false) // rekey
             newKey = _context.keyGenerator().generateSessionKey();
 
-        long nonce = (long)_context.random().nextInt(Integer.MAX_VALUE);
+        long nonce = _context.random().nextInt(Integer.MAX_VALUE);
         MessageState state = new MessageState(nonce, getPrefix());
         state.setKey(key);
         state.setTags(sentTags);

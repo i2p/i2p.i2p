@@ -124,7 +124,7 @@ public class RoutingKeyGenerator {
         }
         try {
             Thread.sleep(2000);
-        } catch (Throwable t) {
+        } catch (Throwable t) { // nop
         }
     }
 }

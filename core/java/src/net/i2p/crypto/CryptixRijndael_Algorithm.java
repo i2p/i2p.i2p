@@ -166,14 +166,13 @@ public final class CryptixRijndael_Algorithm // implicit no-argument constructor
                     t++;
                 if (t == 4)
                     throw new RuntimeException("G matrix is not invertible");
-                else {
-                    for (j = 0; j < 8; j++) {
-                        tmp = AA[i][j];
-                        AA[i][j] = AA[t][j];
-                        AA[t][j] = (byte) tmp;
-                    }
-                    pivot = AA[i][i];
+
+                for (j = 0; j < 8; j++) {
+                    tmp = AA[i][j];
+                    AA[i][j] = AA[t][j];
+                    AA[t][j] = tmp;
                 }
+                pivot = AA[i][i];
             }
             for (j = 0; j < 8; j++)
                 if (AA[i][j] != 0) AA[i][j] = (byte) _alog[(255 + _log[AA[i][j] & 0xFF] - _log[pivot & 0xFF]) % 255];

@@ -33,20 +33,20 @@ class LogRecordFormatter {
         StringBuffer buf = new StringBuffer(size);
         char format[] = manager.getFormat();
         for (int i = 0; i < format.length; ++i) {
-            switch ((int) format[i]) {
-            case (int) LogManager.DATE:
+            switch (format[i]) {
+            case LogManager.DATE:
                 buf.append(getWhen(manager, rec));
                 break;
-            case (int) LogManager.CLASS:
+            case LogManager.CLASS:
                 buf.append(getWhere(rec));
                 break;
-            case (int) LogManager.THREAD:
+            case LogManager.THREAD:
                 buf.append(getThread(rec));
                 break;
-            case (int) LogManager.PRIORITY:
+            case LogManager.PRIORITY:
                 buf.append(getPriority(rec));
                 break;
-            case (int) LogManager.MESSAGE:
+            case LogManager.MESSAGE:
                 buf.append(getWhat(rec));
                 break;
             default:
@@ -62,7 +62,7 @@ class LogRecordFormatter {
             try {
                 pw.flush();
                 baos.flush();
-            } catch (IOException ioe) {
+            } catch (IOException ioe) { // nop
             }
             byte tb[] = baos.toByteArray();
             buf.append(new String(tb));

@@ -66,9 +66,9 @@ public class DisconnectMessage extends I2CPMessageImpl {
         if ((object != null) && (object instanceof DisconnectMessage)) {
             DisconnectMessage msg = (DisconnectMessage) object;
             return DataHelper.eq(getReason(), msg.getReason());
-        } else {
-            return false;
         }
+ 
+        return false;
     }
 
     public String toString() {

@@ -168,7 +168,7 @@ public class I2CPMessageReader {
                     // pause .5 secs when we're paused
                     try {
                         Thread.sleep(500);
-                    } catch (InterruptedException ie) {
+                    } catch (InterruptedException ie) { // nop
                     }
                 }
             }

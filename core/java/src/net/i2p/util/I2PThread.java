@@ -86,7 +86,7 @@ public class I2PThread extends Thread {
         t.start();
         try {
             Thread.sleep(10000);
-        } catch (Throwable tt) {
+        } catch (Throwable tt) { // nop
         }
     }
 }

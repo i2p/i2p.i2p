@@ -223,7 +223,7 @@ class ConnectionRunner implements I2CPMessageReader.I2CPMessageEventListener {
 
     }
 
-    protected void sessionCreated() {
+    protected void sessionCreated() { // nop
     }
 
     protected SessionConfig getConfig() {

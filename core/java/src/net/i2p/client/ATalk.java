@@ -187,7 +187,7 @@ public class ATalk implements I2PSessionListener, Runnable {
             }
             try {
                 Thread.sleep(5000);
-            } catch (InterruptedException ie) {
+            } catch (InterruptedException ie) { // nop!
             }
         }
     }
@@ -302,7 +302,7 @@ public class ATalk implements I2PSessionListener, Runnable {
                 _log.debug("Keys generation failed");
             try {
                 Thread.sleep(5000);
-            } catch (InterruptedException ie) {
+            } catch (InterruptedException ie) { // nop
             }
         } else if (args.length == 3) {
             _log.debug("Starting chat");
@@ -320,7 +320,7 @@ public class ATalk implements I2PSessionListener, Runnable {
             System.out.println(MANUAL);
             try {
                 Thread.sleep(5000);
-            } catch (InterruptedException ie) {
+            } catch (InterruptedException ie) { // nop
             }
             System.exit(-1);
         }

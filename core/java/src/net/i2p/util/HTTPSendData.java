@@ -84,7 +84,7 @@ public class HTTPSendData {
         _log.debug("Sent? " + sent);
         try {
             Thread.sleep(2000);
-        } catch (InterruptedException ie) {
+        } catch (InterruptedException ie) { // nop
         }
     }
 }

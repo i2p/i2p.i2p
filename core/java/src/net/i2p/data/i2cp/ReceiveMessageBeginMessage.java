@@ -83,9 +83,9 @@ public class ReceiveMessageBeginMessage extends I2CPMessageImpl {
             ReceiveMessageBeginMessage msg = (ReceiveMessageBeginMessage) object;
             return DataHelper.eq(getSessionId(), msg.getSessionId())
                    && DataHelper.eq(getMessageId(), msg.getMessageId());
-        } else {
-            return false;
         }
+            
+        return false;
     }
 
     public String toString() {

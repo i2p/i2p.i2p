@@ -74,9 +74,9 @@ public class CreateSessionMessage extends I2CPMessageImpl {
         if ((object != null) && (object instanceof CreateSessionMessage)) {
             CreateSessionMessage msg = (CreateSessionMessage) object;
             return DataHelper.eq(getSessionConfig(), msg.getSessionConfig());
-        } else {
-            return false;
         }
+            
+        return false;
     }
 
     public String toString() {

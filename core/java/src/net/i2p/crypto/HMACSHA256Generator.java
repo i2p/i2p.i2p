@@ -11,7 +11,9 @@ import net.i2p.data.SessionKey;
  *
  */
 public class HMACSHA256Generator {
-    public HMACSHA256Generator(I2PAppContext context) {};
+    public HMACSHA256Generator(I2PAppContext context) { // nop
+    }
+    
     public static HMACSHA256Generator getInstance() {
         return I2PAppContext.getGlobalContext().hmac();
     }

@@ -69,9 +69,9 @@ public class OrderedProperties extends Properties {
             synchronized (_lock) {
                 return _data.equals(obj);
             }
-        } else {
-            return false;
-        }
+        } 
+        
+        return false;
     }
 
     public int hashCode() {
@@ -96,10 +96,9 @@ public class OrderedProperties extends Properties {
         if (key == null) return null;
         synchronized (_lock) {
             Object rv = _data.get(key);
-            if ((rv != null) && (rv instanceof String))
-                return (String) rv;
-            else
-                return null;
+            if ((rv != null) && (rv instanceof String)) return (String) rv;
+            
+            return null;
         }
     }
 
@@ -191,17 +190,17 @@ public class OrderedProperties extends Properties {
         return Collections.enumeration(keySet());
     }
 
-    public void list(PrintStream out) {
+    public void list(PrintStream out) { // nop
     }
 
-    public void list(PrintWriter out) {
+    public void list(PrintWriter out) { // nop
     }
 
-    public void load(InputStream in) {
+    public void load(InputStream in) { // nop
     }
 
     //public void save(OutputStream out, String header) {}
-    public void store(OutputStream out, String header) {
+    public void store(OutputStream out, String header) { // nop
     }
 
     private Set buildEntrySet(Set data) {

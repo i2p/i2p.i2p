@@ -42,9 +42,9 @@ public class GetDateMessage extends I2CPMessageImpl {
     public boolean equals(Object object) {
         if ((object != null) && (object instanceof GetDateMessage)) {
             return true;
-        } else {
-            return false;
         }
+        
+        return false;
     }
 
     public String toString() {

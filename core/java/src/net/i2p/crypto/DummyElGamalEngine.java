@@ -97,11 +97,10 @@ public class DummyElGamalEngine extends ElGamalEngine {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Hash matches: " + DataHelper.toString(hash.getData(), hash.getData().length));
             return rv;
-        } else {
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Doesn't match hash [calc=" + calcHash + " sent hash=" + hash + "]\ndata = " + new String(rv),
-                           new Exception("Doesn't match"));
-            return null;
         }
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("Doesn't match hash [calc=" + calcHash + " sent hash=" + hash + "]\ndata = " + new String(rv),
+                       new Exception("Doesn't match"));
+        return null;
     }
 }

@@ -157,7 +157,7 @@ public class DSAEngine {
             k += 512;
         }
         int padbytes = k / 8;
-        int wordlength = (int) (source.length / 4 + padbytes / 4 + 3);
+        int wordlength = source.length / 4 + padbytes / 4 + 3;
         int[] M0 = new int[wordlength];
         int wordcount = 0;
         int x = 0;

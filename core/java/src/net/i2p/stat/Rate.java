@@ -182,27 +182,26 @@ public class Rate {
             if (measuredPeriod < _period) {
                 // no need to coallesce
                 return;
-            } else {
-                // ok ok, lets coallesce
-
-                // how much were we off by?  (so that we can sample down the measured values)
-                double periodFactor = measuredPeriod / _period;
-                _lastTotalValue = (_currentTotalValue == 0 ? 0.0d : _currentTotalValue / periodFactor);
-                _lastEventCount = (_currentEventCount == 0 ? 0l : (long) (_currentEventCount / periodFactor));
-                _lastTotalEventTime = (_currentTotalEventTime == 0 ? 0l
-                                                                  : (long) (_currentTotalEventTime / periodFactor));
-                _lastCoallesceDate = now;
-
-                if (_lastTotalValue > _extremeTotalValue) {
-                    _extremeTotalValue = _lastTotalValue;
-                    _extremeEventCount = _lastEventCount;
-                    _extremeTotalEventTime = _lastTotalEventTime;
-                }
-
-                _currentTotalValue = 0.0d;
-                _currentEventCount = 0;
-                _currentTotalEventTime = 0;
             }
+    
+            // ok ok, lets coallesce
+
+            // how much were we off by?  (so that we can sample down the measured values)
+            double periodFactor = measuredPeriod / _period;
+            _lastTotalValue = (_currentTotalValue == 0 ? 0.0D : _currentTotalValue / periodFactor);
+            _lastEventCount = (_currentEventCount == 0 ? 0L : (long) (_currentEventCount / periodFactor));
+            _lastTotalEventTime = (_currentTotalEventTime == 0 ? 0L : (long) (_currentTotalEventTime / periodFactor));
+            _lastCoallesceDate = now;
+
+            if (_lastTotalValue > _extremeTotalValue) {
+                _extremeTotalValue = _lastTotalValue;
+                _extremeEventCount = _lastEventCount;
+                _extremeTotalEventTime = _lastTotalEventTime;
+            }
+
+            _currentTotalValue = 0.0D;
+            _currentEventCount = 0;
+            _currentTotalEventTime = 0;
         }
     }
 
@@ -210,24 +209,24 @@ public class Rate {
     public double getAverageValue() {
         if ((_lastTotalValue != 0) && (_lastEventCount > 0))
             return _lastTotalValue / _lastEventCount;
-        else
-            return 0.0d;
+            
+        return 0.0D;
     }
 
     /** what was the average value across the events in the most active period? */
     public double getExtremeAverageValue() {
         if ((_extremeTotalValue != 0) && (_extremeEventCount > 0))
             return _extremeTotalValue / _extremeEventCount;
-        else
-            return 0.0d;
+
+        return 0.0D;
     }
 
     /** what was the average value across the events since the stat was created? */
     public double getLifetimeAverageValue() {
         if ((_lifetimeTotalValue != 0) && (_lifetimeEventCount > 0))
             return _lifetimeTotalValue / _lifetimeEventCount;
-        else
-            return 0.0d;
+       
+        return 0.0D;
     }
 
     /** 
@@ -239,12 +238,12 @@ public class Rate {
     public double getLastEventSaturation() {
         if ((_lastEventCount > 0) && (_lastTotalEventTime > 0)) {
             double eventTime = (double) _lastTotalEventTime / (double) _lastEventCount;
-            double maxEvents = (double) _period / eventTime;
+            double maxEvents = _period / eventTime;
             double saturation = _lastEventCount / maxEvents;
             return saturation;
-        } else {
-            return 0.0d;
         }
+        
+        return 0.0D;
     }
 
     /** 
@@ -256,11 +255,10 @@ public class Rate {
     public double getExtremeEventSaturation() {
         if ((_extremeEventCount > 0) && (_extremeTotalEventTime > 0)) {
             double eventTime = (double) _extremeTotalEventTime / (double) _extremeEventCount;
-            double maxEvents = (double) _period / eventTime;
+            double maxEvents = _period / eventTime;
             return _extremeEventCount / maxEvents;
-        } else {
-            return 0.0d;
         }
+        return 0.0D;
     }
 
     /** 
@@ -272,13 +270,12 @@ public class Rate {
     public double getLifetimeEventSaturation() {
         if ((_lastEventCount > 0) && (_lifetimeTotalEventTime > 0)) {
             double eventTime = (double) _lifetimeTotalEventTime / (double) _lifetimeEventCount;
-            double maxEvents = (double) _period / eventTime;
+            double maxEvents = _period / eventTime;
             double numPeriods = getLifetimePeriods();
             double avgEventsPerPeriod = _lifetimeEventCount / numPeriods;
             return avgEventsPerPeriod / maxEvents;
-        } else {
-            return 0.0d;
         }
+        return 0.0D;
     }
 
     /** how many periods have we already completed? */
@@ -297,13 +294,11 @@ public class Rate {
     public double getLastSaturationLimit() {
         if ((_lastTotalValue != 0) && (_lastEventCount > 0) && (_lastTotalEventTime > 0)) {
             double saturation = getLastEventSaturation();
-            if (saturation != 0.0d)
-                return _lastTotalValue / saturation;
-            else
-                return 0.0d;
-        } else {
-            return 0.0d;
+            if (saturation != 0.0D) return _lastTotalValue / saturation;
+                
+            return 0.0D;
         }
+        return 0.0D;
     }
 
     /** 
@@ -315,13 +310,12 @@ public class Rate {
     public double getExtremeSaturationLimit() {
         if ((_extremeTotalValue != 0) && (_extremeEventCount > 0) && (_extremeTotalEventTime > 0)) {
             double saturation = getExtremeEventSaturation();
-            if (saturation != 0.0d)
-                return _extremeTotalValue / saturation;
-            else
-                return 0.0d;
-        } else {
-            return 0.0d;
-        }
+            if (saturation != 0.0d) return _extremeTotalValue / saturation;
+            
+            return 0.0D;
+        } 
+        
+        return 0.0D;
     }
 
     /**
@@ -331,8 +325,8 @@ public class Rate {
     public double getPercentageOfExtremeValue() {
         if ((_lastTotalValue != 0) && (_extremeTotalValue != 0))
             return _lastTotalValue / _extremeTotalValue;
-        else
-            return 0.0d;
+        
+        return 0.0D;
     }
 
     /**
@@ -343,9 +337,9 @@ public class Rate {
         if ((_lastTotalValue != 0) && (_lifetimeTotalValue != 0)) {
             double lifetimePeriodValue = _period * (_lifetimeTotalValue / (now() - _creationDate));
             return _lastTotalValue / lifetimePeriodValue;
-        } else {
-            return 0.0d;
         }
+  
+        return 0.0D;
     }
 
     public void store(String prefix, StringBuffer buf) throws IOException {
@@ -468,7 +462,7 @@ public class Rate {
         for (int i = 0; i < 50; i++) {
             try {
                 Thread.sleep(20);
-            } catch (InterruptedException ie) {
+            } catch (InterruptedException ie) { // nop
             }
             rate.addData(i * 100, 20);
         }
@@ -492,7 +486,7 @@ public class Rate {
         }
         try {
             Thread.sleep(5000);
-        } catch (InterruptedException ie) {
+        } catch (InterruptedException ie) { // nop
         }
     }
 }

@@ -40,13 +40,13 @@ public class ByteArray implements Serializable {
         if (o == null) return false;
         if (o instanceof ByteArray) {
             return compare(getData(), ((ByteArray) o).getData());
-        } else {
-            try {
-                byte val[] = (byte[]) o;
-                return compare(getData(), val);
-            } catch (Throwable t) {
-                return false;
-            }
+        }
+
+        try {
+            byte val[] = (byte[]) o;
+            return compare(getData(), val);
+        } catch (Throwable t) {
+            return false;
         }
     }
 

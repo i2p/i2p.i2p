@@ -108,7 +108,9 @@ public class LogManager {
         }
         //System.out.println("Created logManager " + this + " with context: " + context);
     }
-    private LogManager() {}
+
+    private LogManager() { // nop
+    }
     
     public Log getLog(Class cls) { return getLog(cls, null); }
     public Log getLog(String name) { return getLog(null, name); }
@@ -213,10 +215,11 @@ public class LogManager {
                            + (_context.clock().now() - _configLastRead) + "ms ago, config file modified "
                            + (_context.clock().now() - cfgFile.lastModified()) + "ms ago");
             return;
-        } else {
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Loading config from " + _location);
         }
+
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("Loading config from " + _location);
+
         Properties p = new Properties();
         FileInputStream fis = null;
         try {
@@ -228,7 +231,7 @@ public class LogManager {
         } finally {
             if (fis != null) try {
                 fis.close();
-            } catch (IOException ioe) {
+            } catch (IOException ioe) { // nop
             }
         }
         parseConfig(p);
@@ -320,7 +323,7 @@ public class LogManager {
             char mod = size.toUpperCase().charAt(size.length() - 1);
             if (!Character.isDigit(mod)) v = size.substring(0, size.length() - 1);
             int val = Integer.parseInt(v);
-            switch ((int) mod) {
+            switch (mod) {
             case 'K':
                 val *= 1024;
                 break;
@@ -443,7 +446,7 @@ public class LogManager {
         l1.error("test exception", new Exception("test"));
         try {
             Thread.sleep(2 * 1000);
-        } catch (Throwable t) {
+        } catch (Throwable t) { // nop
         }
         System.exit(0);
     }

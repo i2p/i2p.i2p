@@ -78,9 +78,9 @@ public class Certificate extends DataStructureImpl {
         if (_type < 0) throw new DataFormatException("Invalid certificate type: " + _type);
         if ((_type != 0) && (_payload == null)) throw new DataFormatException("Payload is required for non null type");
 
-        DataHelper.writeLong(out, 1, (long) _type);
+        DataHelper.writeLong(out, 1, _type);
         if (_payload != null) {
-            DataHelper.writeLong(out, 2, (long) _payload.length);
+            DataHelper.writeLong(out, 2, _payload.length);
             out.write(_payload);
         } else {
             DataHelper.writeLong(out, 2, 0L);

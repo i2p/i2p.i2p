@@ -97,9 +97,9 @@ public class RateStat {
             for (int i = 0; i < _rates.length; i++)
                 if (!_rates[i].equals(rs.getRate(_rates[i].getPeriod()))) return false;
             return true;
-        } else {
-            return false;
-        }
+        } 
+        
+        return false;
     }
 
     public void store(OutputStream out, String prefix) throws IOException {
@@ -158,7 +158,7 @@ public class RateStat {
         for (int i = 0; i < 50; i++) {
             try {
                 Thread.sleep(20);
-            } catch (InterruptedException ie) {
+            } catch (InterruptedException ie) { // nop
             }
             rs.addData(i * 100, 20);
         }
@@ -185,7 +185,7 @@ public class RateStat {
         }
         try {
             Thread.sleep(5000);
-        } catch (InterruptedException ie) {
+        } catch (InterruptedException ie) { // nop
         }
     }
 }

@@ -61,7 +61,7 @@ public class HostsTxtNamingService extends NamingService {
         } finally {
             if (fis != null) try {
                 fis.close();
-            } catch (IOException ioe) {
+            } catch (IOException ioe) { // nop
             }
         }
         String res = hosts.getProperty(hostname);

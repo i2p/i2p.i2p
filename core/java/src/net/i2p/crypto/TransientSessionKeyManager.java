@@ -123,9 +123,8 @@ class TransientSessionKeyManager extends SessionKeyManager {
                           + new Date(sess.getEstablishedDate())
                           + " with target " + target);
             return null;
-        } else {
-            return sess.getCurrentKey();
         }
+        return sess.getCurrentKey();
     }
 
     /**
@@ -158,11 +157,10 @@ class TransientSessionKeyManager extends SessionKeyManager {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Tag consumed: " + nxt);
             return nxt;
-        } else {
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Key does not match existing key, no tag");
-            return null;
         }
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("Key does not match existing key, no tag");
+        return null;
     }
 
     /**
@@ -175,9 +173,8 @@ class TransientSessionKeyManager extends SessionKeyManager {
         if (sess == null) { return 0; }
         if (sess.getCurrentKey().equals(key)) {
             return sess.availableTags();
-        } else {
-            return 0;
         }
+        return 0;
     }
 
     /**
@@ -189,9 +186,8 @@ class TransientSessionKeyManager extends SessionKeyManager {
         if (sess == null) { return 0; }
         if (sess.getCurrentKey().equals(key)) {
             return (sess.getLastExpirationDate() + SESSION_TAG_DURATION_MS) - Clock.getInstance().now();
-        } else {
-            return 0;
         }
+        return 0; 
     }
 
     /**
@@ -263,9 +259,9 @@ class TransientSessionKeyManager extends SessionKeyManager {
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("Cannot consume tag " + tag + " as it is not known");
                 return null;
-            } else {
-                tagSet.consume(tag);
             }
+            tagSet.consume(tag);
+
             SessionKey key = tagSet.getAssociatedKey();
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Consuming tag " + tag + " for sessionKey " + key);
@@ -555,11 +551,11 @@ class TransientSessionKeyManager extends SessionKeyManager {
         public SessionTag consumeNext() {
             if (_sessionTags.size() <= 0) {
                 return null;
-            } else {
-                SessionTag first = (SessionTag) _sessionTags.iterator().next();
-                _sessionTags.remove(first);
-                return first;
             }
+
+            SessionTag first = (SessionTag) _sessionTags.iterator().next();
+            _sessionTags.remove(first);
+            return first;
         }
 
         public int hashCode() {

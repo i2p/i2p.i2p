@@ -111,9 +111,9 @@ public class SendMessageMessage extends I2CPMessageImpl {
             return DataHelper.eq(getSessionId(), msg.getSessionId())
                    && DataHelper.eq(getDestination(), msg.getDestination()) && (getNonce() == msg.getNonce())
                    && DataHelper.eq(getPayload(), msg.getPayload());
-        } else {
-            return false;
         }
+         
+        return false;
     }
 
     public String toString() {

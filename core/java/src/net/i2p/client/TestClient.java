@@ -64,7 +64,7 @@ public class TestClient implements I2PSessionListener {
             while ((_dest1 == null) || (_dest2 == null))
                 try {
                     Thread.sleep(500);
-                } catch (InterruptedException ie) {
+                } catch (InterruptedException ie) { // nop
                 }
 
             if (isDest1) {
@@ -79,12 +79,12 @@ public class TestClient implements I2PSessionListener {
                     try {
                         _log.debug("waiting for a message...");
                         Thread.sleep(1000);
-                    } catch (InterruptedException ie) {
+                    } catch (InterruptedException ie) { // nop
                     }
                 }
                 try {
                     Thread.sleep(5000);
-                } catch (InterruptedException ie) {
+                } catch (InterruptedException ie) { // nop
                 }
                 System.exit(0);
             }
@@ -98,7 +98,7 @@ public class TestClient implements I2PSessionListener {
         doTest();
         try {
             Thread.sleep(30 * 1000);
-        } catch (InterruptedException ie) {
+        } catch (InterruptedException ie) { // nop
         }
     }
 

@@ -204,9 +204,9 @@ public class SessionConfig extends DataStructureImpl {
                    && DataHelper.eq(getDestination(), cfg.getDestination())
                    && DataHelper.eq(getCreationDate(), cfg.getCreationDate())
                    && DataHelper.eq(getOptions(), cfg.getOptions());
-        } else {
-            return false;
         }
+         
+        return false;
     }
 
     public String toString() {

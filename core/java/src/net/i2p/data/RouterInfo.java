@@ -302,8 +302,8 @@ public class RouterInfo extends DataStructureImpl {
         Hash rk = RoutingKeyGenerator.getInstance().getRoutingKey(identKey);
         if (rk.equals(getRoutingKey()))
             return true;
-        else
-            return false;
+
+        return false;
     }
 
     /**
@@ -316,11 +316,10 @@ public class RouterInfo extends DataStructureImpl {
      */
     public boolean isCurrent(long maxAgeMs) {
         long earliestExpire = Clock.getInstance().now() - maxAgeMs;
-        if (getPublished() < earliestExpire) {
+        if (getPublished() < earliestExpire)
             return false;
-        } else {
-            return true;
-        }
+
+        return true;
     }
 
     /**

@@ -132,7 +132,7 @@ public class EventDispatcherImpl implements EventDispatcher {
                 }
                 try {
                     _events.wait(1 * 1000);
-                } catch (InterruptedException e) {
+                } catch (InterruptedException e) { // nop
                 }
             }
         } while (true);

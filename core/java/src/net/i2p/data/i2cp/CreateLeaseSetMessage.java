@@ -114,9 +114,9 @@ public class CreateLeaseSetMessage extends I2CPMessageImpl {
                    && DataHelper.eq(getSigningPrivateKey(), msg.getSigningPrivateKey())
                    && DataHelper.eq(getPrivateKey(), msg.getPrivateKey())
                    && DataHelper.eq(getLeaseSet(), msg.getLeaseSet());
-        } else {
-            return false;
         }
+        
+        return false;
     }
 
     public String toString() {

@@ -157,7 +157,7 @@ class YKGenerator {
         RandomSource.getInstance().nextBoolean(); // warm it up
         try {
             Thread.sleep(20 * 1000);
-        } catch (InterruptedException ie) {
+        } catch (InterruptedException ie) { // nop
         }
         _log.debug("\n\n\n\nBegin test\n");
         long negTime = 0;
@@ -169,7 +169,7 @@ class YKGenerator {
         _log.debug("YK fetch time for 5 runs: " + negTime + " @ " + negTime / 5l + "ms each");
         try {
             Thread.sleep(30 * 1000);
-        } catch (InterruptedException ie) {
+        } catch (InterruptedException ie) { // nop
         }
     }
 
@@ -197,7 +197,7 @@ class YKGenerator {
                         // for some relief...
                         try {
                             Thread.sleep(CALC_DELAY);
-                        } catch (InterruptedException ie) {
+                        } catch (InterruptedException ie) { // nop
                         }
                     }
                 }
@@ -211,7 +211,7 @@ class YKGenerator {
                 }
                 try {
                     Thread.sleep(CHECK_DELAY);
-                } catch (InterruptedException ie) {
+                } catch (InterruptedException ie) { // nop
                 }
             }
         }

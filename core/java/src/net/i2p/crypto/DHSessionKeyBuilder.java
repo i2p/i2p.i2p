@@ -266,7 +266,7 @@ public class DHSessionKeyBuilder {
         RandomSource.getInstance().nextBoolean(); // warm it up
         try {
             Thread.sleep(20 * 1000);
-        } catch (InterruptedException ie) {
+        } catch (InterruptedException ie) { // nop
         }
         I2PAppContext ctx = new I2PAppContext();
         _log.debug("\n\n\n\nBegin test\n");
@@ -303,7 +303,7 @@ public class DHSessionKeyBuilder {
         _log.debug("Negotiation time for 5 runs: " + negTime + " @ " + negTime / 5l + "ms each");
         try {
             Thread.sleep(2000);
-        } catch (InterruptedException ie) {
+        } catch (InterruptedException ie) { // nop
         }
     }
 
@@ -329,7 +329,7 @@ public class DHSessionKeyBuilder {
                         // for some relief...
                         try {
                             Thread.sleep(CALC_DELAY);
-                        } catch (InterruptedException ie) {
+                        } catch (InterruptedException ie) { // nop
                         }
                     }
                 }
@@ -343,7 +343,7 @@ public class DHSessionKeyBuilder {
                 }
                 try {
                     Thread.sleep(30 * 1000);
-                } catch (InterruptedException ie) {
+                } catch (InterruptedException ie) { // nop
                 }
             }
         }

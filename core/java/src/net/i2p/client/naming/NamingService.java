@@ -35,7 +35,8 @@ public abstract class NamingService {
     protected NamingService(I2PAppContext context) {
         _context = context;
     }
-    private NamingService() {}
+    private NamingService() { // nop
+    }
     
     /**
      * Look up a host name.

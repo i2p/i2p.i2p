@@ -103,9 +103,9 @@ public class MessagePayloadMessage extends I2CPMessageImpl {
             return DataHelper.eq(getSessionId(), msg.getSessionId())
                    && DataHelper.eq(getMessageId(), msg.getMessageId())
                    && DataHelper.eq(getPayload(), msg.getPayload());
-        } else {
-            return false;
         }
+            
+        return false;
     }
 
     public String toString() {

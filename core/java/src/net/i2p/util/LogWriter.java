@@ -33,7 +33,9 @@ class LogWriter implements Runnable {
 
     private boolean _write;
     
-    private LogWriter() {}
+    private LogWriter() { // nop
+    }
+
     public LogWriter(LogManager manager) {
         _manager = manager;
     }
@@ -69,7 +71,10 @@ class LogWriter implements Runnable {
         } catch (Throwable t) {
             t.printStackTrace();
         } finally {
-            try { Thread.sleep(100); } catch (InterruptedException ie) {}
+            try { 
+                Thread.sleep(100); 
+            } catch (InterruptedException ie) { // nop
+            }
         }
     }
     
@@ -148,19 +153,21 @@ class LogWriter implements Runnable {
      */
     private File getNextFile(String pattern) {
         File f = null;
+
         if (pattern.indexOf('#') < 0) {
             return new File(pattern);
-        } else {
-            int max = _manager.getRotationLimit();
-            if (_rotationNum == -1) {
-                return getFirstFile(pattern, max);
-            } else {
-                // we're in rotation, just go to the next
-                _rotationNum++;
-                if (_rotationNum > max) _rotationNum = 0;
-                return new File(replace(pattern, _rotationNum));
-            }
         }
+        
+        int max = _manager.getRotationLimit();
+        if (_rotationNum == -1) {
+            return getFirstFile(pattern, max);
+        }
+             
+        // we're in rotation, just go to the next  
+        _rotationNum++;
+        if (_rotationNum > max) _rotationNum = 0;
+
+        return new File(replace(pattern, _rotationNum));
     }
 
     /**

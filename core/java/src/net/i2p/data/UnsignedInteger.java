@@ -76,7 +76,7 @@ public class UnsignedInteger {
         } else if (data.length == 0) { return 0; }
         long rv = 0;
         for (int i = 0; i < data.length; i++) {
-            long cur = (long)(data[i]&0xFF);
+            long cur = data[i] & 0xFF;
             if (cur < 0) cur = cur+256;
             cur = (cur << (8*(data.length-i-1)));
             rv += cur;
@@ -90,7 +90,7 @@ public class UnsignedInteger {
                                    + " != \n     " + Long.toBinaryString(rv) + " /\t" + Long.toHexString(rv) 
                                    + " /\t" + rv);
                 for (int i = 0; i < data.length; i++) {
-                    long cur = (long)(data[i]&0xFF);
+                    long cur = data[i] & 0xFF;
                     if (cur < 0) cur = cur+256;
                     long shiftBy = (8*(data.length-i-1));
                     long old = cur;
@@ -210,9 +210,8 @@ public class UnsignedInteger {
         if ((obj != null) && (obj instanceof UnsignedInteger)) {
             return DataHelper.eq(_data, ((UnsignedInteger) obj)._data)
                    && DataHelper.eq(_value, ((UnsignedInteger) obj)._value);
-        } else {
-            return false;
         }
+        return false;
     }
 
     public int hashCode() {
@@ -242,7 +241,7 @@ public class UnsignedInteger {
         } catch (Throwable t) { t.printStackTrace(); }
         try {
             Thread.sleep(1000);
-        } catch (Throwable t) {
+        } catch (Throwable t) { // nop
         }
     }
 

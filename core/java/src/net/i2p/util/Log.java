@@ -161,10 +161,9 @@ public class Log {
     }
 
     public String getName() {
-        if (_class != null)
-            return _class.getName();
-        else
-            return _name;
+        if (_class != null) return _class.getName();
+    
+        return _name;
     }
     
     public Object getScope() { return _scope; }
@@ -189,9 +188,9 @@ public class Log {
                 LogScope s = (LogScope)obj;
                 return DataHelper.eq(s._scopeName, _scopeName) &&
                        DataHelper.eq(s._scopeClass, _scopeClass);
-            } else {
-                return false;
             }
+            
+            return false;
         }
     }
 }

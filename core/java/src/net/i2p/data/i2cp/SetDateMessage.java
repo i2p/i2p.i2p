@@ -69,9 +69,9 @@ public class SetDateMessage extends I2CPMessageImpl {
         if ((object != null) && (object instanceof SetDateMessage)) {
             SetDateMessage msg = (SetDateMessage) object;
             return DataHelper.eq(getDate(), msg.getDate());
-        } else {
-            return false;
         }
+            
+        return false;
     }
 
     public String toString() {

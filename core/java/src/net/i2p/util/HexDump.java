@@ -106,7 +106,7 @@ public class HexDump {
                 if (i >= nextbytes) {
                     out.write("   ".getBytes());
                 } else {
-                    val = ((int) data[dumpoff + i]) & 0xff;
+                    val = data[dumpoff + i] & 0xff;
                     out.write(HEXCHARS[val >>> 4]);
                     out.write(HEXCHARS[val & 0xf]);
                     out.write(" ".getBytes());

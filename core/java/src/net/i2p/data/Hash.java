@@ -99,7 +99,7 @@ public class Hash extends DataStructureImpl {
                         _xorCache.remove(iter.next());
                 }
                 distance = DataHelper.xor(key.getData(), getData());
-                _xorCache.put(key, (Object)distance);
+                _xorCache.put(key, (Object) distance);
                 cached = _xorCache.size();
             }
             if (_log.shouldLog(Log.DEBUG)) {

@@ -127,7 +127,7 @@ class MessageState {
             synchronized (_lock) {
                 try {
                     _lock.wait(timeToWait);
-                } catch (InterruptedException ie) {
+                } catch (InterruptedException ie) { // nop
                 }
             }
         }
@@ -163,13 +163,11 @@ class MessageState {
             case MessageStatusMessage.STATUS_SEND_ACCEPTED:
                 if (wantedStatus == MessageStatusMessage.STATUS_SEND_ACCEPTED) {
                     return true; // if we're only looking for accepted, take it directly (don't let any GUARANTEED_* override it)
-                } else {
-                    if (_log.shouldLog(Log.DEBUG))
-                        _log.debug(_prefix + "Got accepted, but we're waiting for more from "
-                                   + toString());
-                    continue;
-                    // ignore accepted, as we want something better
                 }
+                // ignore accepted, as we want something better
+                if (_log.shouldLog(Log.DEBUG))
+                    _log.debug(_prefix + "Got accepted, but we're waiting for more from " + toString());
+                continue;
             case MessageStatusMessage.STATUS_SEND_BEST_EFFORT_SUCCESS:
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug(_prefix + "Received best effort success after " + getElapsed()

@@ -148,10 +148,9 @@ public class DataHelper {
     }
 
     public static String toString(byte buf[]) {
-        if (buf == null)
-            return "";
-        else
-            return toString(buf, buf.length);
+        if (buf == null) return "";
+
+        return toString(buf, buf.length);
     }
 
     private static final byte[] EMPTY_BUFFER = "".getBytes();
@@ -164,7 +163,7 @@ public class DataHelper {
                 out.append("00");
         }
         for (int i = 0; i < buf.length && i < len; i++) {
-            StringBuffer temp = new StringBuffer(Integer.toHexString((int) buf[i]));
+            StringBuffer temp = new StringBuffer(Integer.toHexString(buf[i]));
             while (temp.length() < 2) {
                 temp.insert(0, '0');
             }
@@ -241,10 +240,9 @@ public class DataHelper {
      */
     public static Date readDate(InputStream in) throws DataFormatException, IOException {
         long date = readLong(in, 8);
-        if (date == 0L)
-            return null;
-        else
-            return new Date(date);
+        if (date == 0L) return null;
+
+        return new Date(date);
     }
 
     /** Write out a date to the stream as specified by the I2P data structure spec.
@@ -448,10 +446,9 @@ public class DataHelper {
      * 
      */
     public static int hashCode(Object obj) {
-        if (obj == null)
-            return 0;
-        else
-            return obj.hashCode();
+        if (obj == null) return 0;
+
+        return obj.hashCode();
     }
 
     /**
@@ -459,10 +456,9 @@ public class DataHelper {
      * 
      */
     public static int hashCode(Date obj) {
-        if (obj == null)
-            return 0;
-        else
-            return (int) obj.getTime();
+        if (obj == null) return 0;
+
+        return (int) obj.getTime();
     }
 
     /**
@@ -495,10 +491,9 @@ public class DataHelper {
         while (cur < target.length) {
             int numRead = in.read(target, cur, target.length - cur);
             if (numRead == -1) {
-                if (cur == 0)
-                    return -1; // throw new EOFException("EOF Encountered during reading");
-                else
-                    return cur;
+                if (cur == 0) return -1; // throw new EOFException("EOF Encountered during reading");
+
+                return cur;
             }
             cur += numRead;
         }

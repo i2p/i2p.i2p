@@ -73,16 +73,15 @@ public class AESInputStream extends FilterInputStream {
         Integer nval = getNext();
         if (nval != null) {
             return nval.intValue();
-        } else {
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("No byte available.  eof? " + _eofFound);
-            if (_eofFound)
-                return -1;
-            else {
-                throw new IOException("Not EOF, but none available?  " + _readyBuf.size() + "/" + _encryptedBuf.size()
-                                      + "/" + _cumulativeRead + "... impossible");
-            }
         }
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("No byte available.  eof? " + _eofFound);
+
+        if (_eofFound)
+            return -1;
+
+        throw new IOException("Not EOF, but none available?  " + _readyBuf.size() + "/" + _encryptedBuf.size()
+                              + "/" + _cumulativeRead + "... impossible");
     }
 
     public int read(byte dest[]) throws IOException {
@@ -90,13 +89,11 @@ public class AESInputStream extends FilterInputStream {
             int val = read();
             if (val == -1) {
                 // no more to read... can they expect more?
-                if (_eofFound && (i == 0))
-                    return -1;
-                else
-                    return i;
-            } else {
-                dest[i] = (byte) val;
+                if (_eofFound && (i == 0)) return -1;
+
+                return i;
             }
+            dest[i] = (byte) val;
         }
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Read the full buffer of size " + dest.length);
@@ -141,7 +138,7 @@ public class AESInputStream extends FilterInputStream {
                        + encrypted + " still encrypted]");
     }
 
-    public void mark(int readLimit) {
+    public void mark(int readLimit) { // nop
     }
 
     public void reset() throws IOException {
@@ -159,9 +156,9 @@ public class AESInputStream extends FilterInputStream {
     private Integer getNext() {
         if (_readyBuf.size() > 0) {
             return (Integer) _readyBuf.remove(0);
-        } else {
-            return null;
         }
+        
+        return null;
     }
 
     /**
@@ -240,7 +237,7 @@ public class AESInputStream extends FilterInputStream {
             byte data[] = DataHelper.xor(decrypted, _lastBlock);
             int cleaned[] = stripPadding(data);
             for (int j = 0; j < cleaned.length; j++) {
-                if (((int) cleaned[j]) <= 0) {
+                if (cleaned[j] <= 0) {
                     cleaned[j] += 256;
                     //_log.error("(modified: " + cleaned[j] + ")");
                 }
@@ -258,7 +255,7 @@ public class AESInputStream extends FilterInputStream {
                        + " bytes back onto the buffer, lets delay 1s our action so we don't fast busy until the net transfers data");
             try {
                 Thread.sleep(1000);
-            } catch (InterruptedException ie) {
+            } catch (InterruptedException ie) { // nop
             }
         } else {
             //_log.debug("No remaining encrypted bytes beyond the block size");
@@ -280,7 +277,7 @@ public class AESInputStream extends FilterInputStream {
      *
      */
     private int[] stripPadding(byte data[]) throws IOException {
-        int numPadBytes = (int) data[data.length - 1];
+        int numPadBytes = data[data.length - 1];
         if ((numPadBytes >= data.length) || (numPadBytes <= 0)) {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("stripPadding from block " + DataHelper.toHexString(data) + " (" + data.length + "bytes): "
@@ -363,7 +360,7 @@ public class AESInputStream extends FilterInputStream {
 
         try {
             Thread.sleep(30 * 1000);
-        } catch (InterruptedException ie) {
+        } catch (InterruptedException ie) { // nop
         }
     }
 

@@ -75,7 +75,9 @@ public class ElGamalEngine {
         _context = context;
         _log = context.logManager().getLog(ElGamalEngine.class);
     }
-    private ElGamalEngine() {}
+
+    private ElGamalEngine() { // nop
+    }
 
     
     private final static BigInteger _two = new NativeBigInteger(1, new byte[] { 0x02});
@@ -215,12 +217,11 @@ public class ElGamalEngine {
         if (ok) {
             //_log.debug("Hash matches: " + DataHelper.toString(hash.getData(), hash.getData().length));
             return rv;
-        } else {
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Doesn't match hash [calc=" + calcHash + " sent hash=" + hash + "]\ndata = "
-                           + Base64.encode(rv), new Exception("Doesn't match"));
-            return null;
         }
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("Doesn't match hash [calc=" + calcHash + " sent hash=" + hash + "]\ndata = "
+                       + Base64.encode(rv), new Exception("Doesn't match"));
+        return null;
     }
 
     public static void main(String args[]) {
@@ -230,12 +231,12 @@ public class ElGamalEngine {
         int numRuns = 100;
         if (args.length > 0) try {
             numRuns = Integer.parseInt(args[0]);
-        } catch (NumberFormatException nfe) {
+        } catch (NumberFormatException nfe) { // nop
         }
 
         try {
             Thread.sleep(30 * 1000);
-        } catch (InterruptedException ie) {
+        } catch (InterruptedException ie) { // nop
         }
 
         RandomSource.getInstance().nextBoolean();

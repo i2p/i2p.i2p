@@ -252,7 +252,7 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
                     synchronized (_dateReceivedLock) {
                         _dateReceivedLock.wait(1000);
                     }
-                } catch (InterruptedException ie) {
+                } catch (InterruptedException ie) { // nop
                 }
             }
             if (_log.shouldLog(Log.DEBUG)) _log.debug(getPrefix() + "After received a SetDate response");
@@ -266,7 +266,7 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
                 synchronized (_leaseSetWait) {
                     try {
                         _leaseSetWait.wait(1000);
-                    } catch (InterruptedException ie) {
+                    } catch (InterruptedException ie) { // nop
                     }
                 }
             }
@@ -375,7 +375,8 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
                     if (_pendingIds.size() <= 0) {
                         try {
                             AvailabilityNotifier.this.wait();
-                        } catch (InterruptedException ie) {}
+                        } catch (InterruptedException ie) { // nop
+                        }
                     }
                     if (_pendingIds.size() > 0) {
                         msgId = (Integer)_pendingIds.remove(0);
@@ -480,7 +481,7 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
         if (_log.shouldLog(Log.DEBUG)) 
             _log.debug(getPrefix() + "Message written out and flushed w/ " 
                        + (inSync-beforeSync) + "ms to sync and "
-                       + (afterSync-inSync) + "ms to send");;
+                       + (afterSync-inSync) + "ms to send");
     }
 
     /**
@@ -551,9 +552,8 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
             if (reconnect()) {
                 if (_log.shouldLog(Log.INFO)) _log.info(getPrefix() + "I2CP reconnection successful");
                 return;
-            } else {
-                if (_log.shouldLog(Log.ERROR)) _log.error(getPrefix() + "I2CP reconnection failed");
             }
+            if (_log.shouldLog(Log.ERROR)) _log.error(getPrefix() + "I2CP reconnection failed");
         }
 
         if (_log.shouldLog(Log.ERROR))

@@ -114,7 +114,7 @@ public class Base64 {
     private final static byte EQUALS_SIGN_ENC = -1; // Indicates equals sign in encoding
 
     /** Defeats instantiation. */
-    private Base64() {
+    private Base64() { // nop
     }
 
     public static void main(String[] args) {

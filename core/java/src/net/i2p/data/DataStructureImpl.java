@@ -29,8 +29,8 @@ public abstract class DataStructureImpl implements DataStructure {
         byte data[] = toByteArray();
         if (data == null)
             return null;
-        else
-            return Base64.encode(data);
+
+        return Base64.encode(data);
     }
 
     public void fromBase64(String data) throws DataFormatException {

@@ -137,8 +137,8 @@ public class NativeBigInteger extends BigInteger {
     public BigInteger modPow(BigInteger exponent, BigInteger m) {
         if (_nativeOk)
             return new NativeBigInteger(nativeModPow(toByteArray(), exponent.toByteArray(), m.toByteArray()));
-        else
-            return super.modPow(exponent, m);
+       
+        return super.modPow(exponent, m);
     }
     
     /**
@@ -197,10 +197,10 @@ public class NativeBigInteger extends BigInteger {
                 System.err.println("ERROR: java modPow value: " + jval.toString());
                 System.err.println("ERROR: run time: " + totalTime + "ms (" + (totalTime / (runsProcessed + 1)) + "ms each)");
                 break;
-            } else {
-                System.out.println("DEBUG: current run time: " + (afterModPow - beforeModPow) + "ms (total: " 
-                                   + totalTime + "ms, " + (totalTime / (runsProcessed + 1)) + "ms each)");
             }
+
+            System.out.println("DEBUG: current run time: " + (afterModPow - beforeModPow) + "ms (total: " 
+                               + totalTime + "ms, " + (totalTime / (runsProcessed + 1)) + "ms each)");
         }
         System.out.println("INFO: run time: " + totalTime + "ms (" + (totalTime / (runsProcessed + 1)) + "ms each)");
         if (numRuns == runsProcessed)
@@ -212,7 +212,7 @@ public class NativeBigInteger extends BigInteger {
             System.out.println("native run time: \t" + totalTime + "ms (" + (totalTime / (runsProcessed + 1))
                                + "ms each)");
             System.out.println("java run time:   \t" + javaTime + "ms (" + (javaTime / (runsProcessed + 1)) + "ms each)");
-            System.out.println("native = " + ((totalTime * 100.0d) / (double) javaTime) + "% of pure java time");
+            System.out.println("native = " + ((totalTime * 100.0D) / javaTime) + "% of pure java time");
         } else {
             System.out.println("java run time: \t" + javaTime + "ms (" + (javaTime / (runsProcessed + 1)) + "ms each)");
             System.out.println("However, we couldn't load the native library, so this doesn't test much");
@@ -349,7 +349,12 @@ public class NativeBigInteger extends BigInteger {
                     ioe.printStackTrace();
                 }
             } finally {
-                if (in != null) try { in.close(); } catch (IOException ioe) {}
+                if (in != null) {
+                    try {
+                        in.close(); 
+                    } catch (IOException ioe) { // nop
+                    }
+                }
             }
         }
         

@@ -146,9 +146,9 @@ public class MessageStatusMessage extends I2CPMessageImpl {
             return DataHelper.eq(getSessionId(), msg.getSessionId())
                    && DataHelper.eq(getMessageId(), msg.getMessageId()) && (getNonce() == msg.getNonce())
                    && DataHelper.eq(getSize(), msg.getSize()) && DataHelper.eq(getStatus(), msg.getStatus());
-        } else {
-            return false;
         }
+            
+        return false;
     }
 
     public String toString() {
