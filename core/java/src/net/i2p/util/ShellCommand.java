@@ -349,7 +349,9 @@ public class ShellCommand {
         for (int i = 0; i < args.length; i++) {
             command.append("\"").append(args[i]).append("\" ");
         }
-        cmd.execute(command.toString());
+	try {
+        cmd.executeSilent(command.toString());
+	} catch (IOException ioe) { ioe.printStackTrace(); } 
         return;
     }
     

@@ -181,7 +181,6 @@
         <copy file="installer/resources/clients.config" todir="pkg-temp/" />
         <copy file="installer/resources/i2prouter" todir="pkg-temp/" />
         <copy file="installer/resources/i2prouter.bat" todir="pkg-temp/" />
-        <copy file="installer/resources/i2prouter_win9x.bat" todir="pkg-temp/" />
         <copy file="installer/resources/i2ptunnel.config" todir="pkg-temp/" />
         <!-- <copy file="installer/resources/install_i2p_service_unix" todir="pkg-temp/" /> -->
         <copy file="installer/resources/install_i2p_service_winnt.bat" todir="pkg-temp/" />
@@ -212,11 +211,16 @@
         <copy file="history.txt" todir="pkg-temp/" />
         <mkdir dir="pkg-temp/docs" />
         <copy file="readme.html" todir="pkg-temp/docs/" />
+        <copy file="installer/resources/startconsole.html" todir="pkg-temp/docs/" />
+        <copy file="installer/resources/start.ico" todir="pkg-temp/docs/" />
+        <copy file="installer/resources/console.ico" todir="pkg-temp/docs/" />
+        <copy file="installer/resources/uninstall.ico" todir="pkg-temp/docs/" />
         <mkdir dir="pkg-temp/eepsite" />
         <mkdir dir="pkg-temp/eepsite/webapps" />
         <mkdir dir="pkg-temp/eepsite/logs" />
         <mkdir dir="pkg-temp/eepsite/docroot" />
         <copy file="installer/resources/eepsite_index.html" tofile="pkg-temp/eepsite/docroot/index.html" />
+        <copy file="installer/resources/favicon.ico" tofile="pkg-temp/eepsite/docroot/favicon.ico" />
         <copy file="installer/resources/jetty.xml" tofile="pkg-temp/eepsite/jetty.xml" />
     </target>
     <target name="tarball" depends="preppkg">
@@ -244,6 +248,15 @@
     </target>
     <taskdef name="izpack" classpath="${basedir}/installer/lib/izpack/standalone-compiler.jar" classname="com.izforge.izpack.ant.IzPackTask" />
     <target name="installer" depends="preppkg">
+        <jar destfile="./pkg-temp/lib/copy.jar" basedir="./core/java/build/obj" includes="net/i2p/util/*.class">
+            <manifest><attribute name="Main-Class" value="net.i2p.util.Copy" /></manifest>
+        </jar>
+        <jar destfile="./pkg-temp/lib/delete.jar" basedir="./core/java/build/obj" includes="net/i2p/util/*.class">
+            <manifest><attribute name="Main-Class" value="net.i2p.util.Delete" /></manifest>
+        </jar>
+        <jar destfile="./pkg-temp/lib/exec.jar" basedir="./core/java/build/obj" includes="net/i2p/util/*.class">
+            <manifest><attribute name="Main-Class" value="net.i2p.util.Exec" /></manifest>
+        </jar>
         <izpack input="${basedir}/installer/install.xml" output="${basedir}/install.jar" installerType="standard" basedir="${basedir}" />
     </target>
 </project>

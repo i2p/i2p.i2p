@@ -147,4 +147,14 @@ public class UrlLauncher {
         }
         return true;
     }
+
+    public static void main(String args[]) {
+        UrlLauncher launcher = new UrlLauncher();
+        try {
+            if (args.length > 0)
+                launcher.openUrl(args[0]);
+            else
+                launcher.openUrl("http://localhost:7657/index.jsp");
+         } catch (Exception e) {}
+    }
 }

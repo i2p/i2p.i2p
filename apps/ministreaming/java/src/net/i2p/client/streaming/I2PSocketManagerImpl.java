@@ -35,7 +35,7 @@ import net.i2p.util.Log;
  * or receive any messages with its .receiveMessage
  *
  */
-public class I2PSocketManagerImpl implements I2PSocketManager, I2PSessionListener {
+class I2PSocketManagerImpl implements I2PSocketManager, I2PSessionListener {
     private I2PAppContext _context;
     private Log _log;
     private I2PSession _session;

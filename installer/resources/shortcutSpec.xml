@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<shortcuts>
+ <programGroup defaultName="I2P" location="startMenu" />
+ <shortcut name="Start I2P" 
+           target="$INSTALL_PATH\I2Psvc.exe" 
+           commandLine="-c wrapper.config"
+           workingDirectory="$INSTALL_PATH"
+           iconFile="$INSTALL_PATH\docs\start.ico"
+           initialState="noShow"
+	   programGroup="yes"
+	   startMenu="no"
+	   desktop="yes"
+           startup="no" />
+ <shortcut name="I2P router console"
+           target="$INSTALL_PATH\docs\startconsole.html"
+           commandLine=""
+           workingDirectory="$INSTALL_PATH"
+           iconFile="$INSTALL_PATH\docs\console.ico"
+           initialState="noShow"
+           programGroup="yes"
+           startMenu="no"
+	   desktop="yes"
+           startup="no" />
+ <shortcut name="Uninstall I2P"
+           target="$INSTALL_PATH\uninstaller\uninstaller.jar"
+           commandLine=""
+           workingDirectory="$INSTALL_PATH"
+           iconFile="$INSTALL_PATH\docs\uninstall.ico"
+           initialState="noShow"
+           startMenu="no"
+           programGroup="yes"
+           startup="no" />
+</shortcuts>

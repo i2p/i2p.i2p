@@ -127,10 +127,13 @@ public class FileUtil {
     
     /**
      * Read in the last few lines of a (newline delimited) textfile, or null if
-     * the file doesn't exist.
+     * the file doesn't exist.  
+     *
+     * @param startAtBeginning if true, read the first maxNumLines, otherwise read
+     *                         the last maxNumLines
      *
      */
-    public static String readTextFile(String filename, int maxNumLines) {
+    public static String readTextFile(String filename, int maxNumLines, boolean startAtBeginning) {
         File f = new File(filename);
         if (!f.exists()) return null;
         FileInputStream fis = null;
@@ -141,8 +144,12 @@ public class FileUtil {
             String line = null;
             while ( (line = in.readLine()) != null) {
                 lines.add(line);
-                while (lines.size() > maxNumLines)
-                    lines.remove(0);
+                if (lines.size() >= maxNumLines) {
+                    if (startAtBeginning)
+                        break;
+                    else
+                        lines.remove(0);
+                }
             }
             StringBuffer buf = new StringBuffer(lines.size() * 80);
             for (int i = 0; i < lines.size(); i++)
@@ -155,9 +162,53 @@ public class FileUtil {
         }
     }
     
-    public static void main(String args[]) {
-        testRmdir();
+    /** return true if it was copied successfully */
+    public static boolean copy(String source, String dest, boolean overwriteExisting) {
+        File src = new File(source);
+        File dst = new File(dest);
+
+	if (dst.exists() && dst.isDirectory())
+            dst = new File(dst, src.getName());
+        
+        if (!src.exists()) return false;
+        if (dst.exists() && !overwriteExisting) return false;
+        
+        byte buf[] = new byte[4096];
+        try {
+            FileInputStream in = new FileInputStream(src);
+            FileOutputStream out = new FileOutputStream(dst);
+            
+            int read = 0;
+            while ( (read = in.read(buf)) != -1)
+                out.write(buf, 0, read);
+            
+            in.close();
+            out.close();
+            return true;
+        } catch (IOException ioe) {
+            ioe.printStackTrace();
+            return false;
+        }
     }
+    
+    /**
+     * Usage: FileUtil (delete path | copy source dest)
+     *
+     */
+    public static void main(String args[]) {
+        if ( (args == null) || (args.length < 2) ) {
+            testRmdir();
+        } else if ("delete".equals(args[0])) {
+            boolean deleted = FileUtil.rmdir(args[1], false);
+            if (!deleted)
+                System.err.println("Error deleting [" + args[1] + "]");
+        } else if ("copy".equals(args[0])) {
+            boolean copied = FileUtil.copy(args[1], args[2], false);
+            if (!copied) 
+                System.err.println("Error copying [" + args[1] + "] to [" + args[2] + "]");
+        }
+    }
+    
     private static void testRmdir() {
         File t = new File("rmdirTest/test/subdir/blah");
         boolean created = t.mkdirs();

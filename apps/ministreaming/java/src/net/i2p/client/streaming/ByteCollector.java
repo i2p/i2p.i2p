@@ -5,7 +5,7 @@ package net.i2p.client.streaming;
  * so care should be taken when using in a multithreaded environment.
  *
  */
-public class ByteCollector {
+class ByteCollector {
     byte[] contents;
     int size;
 

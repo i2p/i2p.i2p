@@ -217,7 +217,10 @@ public class ConfigNetHandler extends FormHandler {
         }
         if ( (_port != null) && (_port.length() > 0) ) {
             String oldPort = _context.router().getConfigSetting(ConfigNetHelper.PROP_I2NP_TCP_PORT);
-            if ( (oldPort == null) || (!oldPort.equalsIgnoreCase(_port)) ) {
+            if ( (oldPort == null) && (_port.equals("8887")) ) {
+                // still on default.. noop
+            } else if ( (oldPort == null) || (!oldPort.equalsIgnoreCase(_port)) ) {
+                // its not the default OR it has changed
                 _context.router().setConfigSetting(ConfigNetHelper.PROP_I2NP_TCP_PORT, _port);
                 addFormNotice("Updating TCP port from " + oldPort + " to " + _port);
                 restartRequired = true;

@@ -10,6 +10,7 @@ import net.i2p.util.FileUtil;
 public class ContentHelper {
     private String _page;
     private int _maxLines;
+    private boolean _startAtBeginning;
     private RouterContext _context;
     /**
      * Configure this bean to query a particular router context
@@ -28,6 +29,10 @@ public class ContentHelper {
     public ContentHelper() {}
     
     public void setPage(String page) { _page = page; }
+    public void setStartAtBeginning(String moo) { 
+        _startAtBeginning = Boolean.valueOf(""+moo).booleanValue(); 
+    }
+    
     public void setMaxLines(String lines) {
         if (lines != null) {
             try {
@@ -40,14 +45,14 @@ public class ContentHelper {
         }
     } 
     public String getContent() {
-        String str = FileUtil.readTextFile(_page, _maxLines);
+        String str = FileUtil.readTextFile(_page, _maxLines, _startAtBeginning);
         if (str == null) 
             return "";
         else 
             return str;
     } 
     public String getTextContent() {
-        String str = FileUtil.readTextFile(_page, _maxLines);
+        String str = FileUtil.readTextFile(_page, _maxLines, _startAtBeginning);
         if (str == null) 
             return "";
         else 

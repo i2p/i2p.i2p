@@ -1,80 +1,71 @@
 <h1>Congratulations on getting I2P installed!</h1>
 
-<p>Next up you'll need to go into the <a href="config.jsp">configuration page</a>
-and provide some info (such as your IP address, etc).  You will also want to
-seed your router on that page as well, and may want to consider reviewing some
-of the other configuration pages.  Alternately, you can update the "router.config"
-file in your I2P installation directory, which is checked for updates periodically.</p>
-
-<p>After your router has been configured and you have reseeded, within a few minutes
-(3-5), you should see the number of active peers increase.  If it doesn't, you may 
-want to verify that the hostname and port number specified on the configuration page
-are correct and reachable from the outside world.</p>
-
-<p>For help, you may want to review the information on the <a href="http://www.i2p.net/">I2P website</a>,
-post up messages to the <a href="http://forum.i2p.net/">I2P discussion forum</a>, or swing by #i2p or
-#i2p-chat on IRC at <a href="irc://irc.freenode.net/#i2p">irc.freenode.net</a>, 
-<a href="http://www.invisiblechat.com/">invisiblechat/IIP</a>, or irc.duck.i2p (they're all 
-linked together).</p>
-
-<h2>Want I2P to run automatically?</h2>
-
-<p>With the I2P install we've bundled some scripts and code (from the cool folks at 
-<a href="http://wrapper.tanukisoftware.org/doc/english/">tanukisoftware</a>) to let you
-run I2P as a service on windows machines (a daemon, for you *nix geeks).  Windows users can 
-add or remove the I2P service on the <a href="/configservice.jsp">service control page</a>, or
-through the install_i2p_service_winnt.bat and uninstall_i2p_service_winnt.bat scripts.  *nix 
-users can script up something to call <code>./i2prouter start</code> with the appropriate 
-environment ($PATH, $JAVA_HOME, etc) and user id (I2P does not require root).  To uninstall 
-I2P altogether, simply wipe the I2P installation directory.</p>
-
-<h2>What next?</h2>
-
-<p>By default, I2P comes bundled with the <a href="http://www.i2p.net/i2ptunnel">I2PTunnel</a>
-application configured with an <b>HTTP proxy</b> listening on <b>port 4444</b> and an 
-<b>IRC proxy</b> listening on <b>port 6668</b>.</p>
-
-<p>The HTTP proxy lets you access "eepsites" - anonymously hosted websites - 
-routing your requests and their responses over I2P.  There are also a few "outproxies" -
-gateways onto the normal internet - through which you can browse normal websites 
-anonymously.  Once you've configured your browser to use the proxy, you should be able 
-to reach some of the following sites:</p>
-
+<p>If this is your first time running I2P, you will see a link on the left hand
+side telling you to "reseed" - click that to get connected to the network (you
+only need to do it if that link shows up).  Within 5 minutes, you should see
+the number of "Active: " peers rise, and you should see some local "destinations"
+listed (if not, <a href="#trouble">see below</a>).  Once those are up, you can:</p>
 <ul>
- <li><a href="http://duck.i2p/">duck.i2p</a>: duck's eepsite, with links to other active sites</li>
- <li><a href="http://ugha.i2p/">ugha.i2p</a>: ugha's eepsite, a wiki that anyone can edit, and lots of links</li>
- <li><a href="http://forum.i2p/">forum.i2p</a>: a secure and anonymous connection to <a href="http://forum.i2p.net/">forum.i2p.net</a></li>
- <li><a href="http://www.i2p/">www.i2p</a>: a secure and anonymous connection to <a href="http://www.i2p.net/">www.i2p.net</a></li>
- <li><a href="http://dev.i2p/">dev.i2p</a>: a secure and anonymous connection to <a href="http://dev.i2p.net/">dev.i2p.net</a></li>
- <li><a href="http://fproxy.i2p/">fproxy.i2p</a>:
-     a secure and anonymous connection to a freenet node</li>
- <li><a href="http://www.postman.i2p/">www.postman.i2p</a>: an anonymous email provider, allowing 
-     mail within I2P, as well as to and from the internet (via @i2pmail.org)</li>
+ <li><b>chat anonymously</b> - fire up your own IRC client and connect to the 
+     server at <b>localhost port 6668</b>.  This points at one of two anonymously hosted
+     IRC servers (irc.duck.i2p and irc.baffled.i2p), but neither you nor they know
+     where the other is.</li>
+ <li><b>browse "eepsites"</b> - on I2P there are anonymously hosted websites - 
+     tell your browser to use the <b>HTTP proxy at localhost port 4444</b>, then
+     browse to an eepsite - 
+     <ul>
+         <li><a href="http://duck.i2p/">duck.i2p</a>: duck's eepsite, with links to other active sites</li>
+         <li><a href="http://ugha.i2p/">ugha.i2p</a>: ugha's eepsite, a wiki that anyone can edit, and lots of links</li>
+         <li><a href="http://files.i2p/">files.i2p</a>: a search engine that tries to keep track of things on I2P</li>
+         <li><a href="http://forum.i2p/">forum.i2p</a>: a secure and anonymous connection to <a href="http://forum.i2p.net/">forum.i2p.net</a></li>
+         <li><a href="http://www.i2p/">www.i2p</a>: a secure and anonymous connection to <a href="http://www.i2p.net/">www.i2p.net</a></li>
+         <li><a href="http://dev.i2p/">dev.i2p</a>: a secure and anonymous connection to <a href="http://dev.i2p.net/">dev.i2p.net</a></li>
+         <li><a href="http://fproxy.i2p/">fproxy.i2p</a>: a secure and anonymous connection to a freenet node</li>
+     </ul>
+     There are many more eepsites - just follow the links from the ones you see,
+     bookmark your favorites, and visit them often!</li>
+ <li><b>browse the web</b> - there are a pair of HTTP "outproxies" in I2P hooked
+     up to your own HTTP proxy on port 4444 - simply set your browser's proxy to
+     use it (as above) and go to any normal URL - your requests will be bounced
+     through the I2P network.</li>
+ <li><b>transfer files</b> - there is an <a href="http://duck.i2p/i2p-bt/">I2P port</a>
+     of the <a href="http://www.bittorrent.com/">BitTorrent</a> application available.</li>
+ <li><b>use anonymous email</b> - postman has created a mail system compatible with normal mail
+     clients (POP3 / SMTP) that allows email within I2P as well as mail from and to the normal
+     internet!  get your account at <a href="http://www.postman.i2p/">www.postman.i2p</a>.</li>
+ <li>and lots more</li>
 </ul>
 
-<p>The IRC proxy is a gateway to duck's anonymously hosted IRC server 
-"irc.duck.i2p".  You can treat it like any other IRC server - fire up your IRC client and
-connect to the server at localhost:6668 and join us on #i2p or #i2p-chat!  DCC doesn't
-work at the moment though.</p>
-
-<p>By default, those two proxies listen only on the local interface, which means you 
-cannot access them from other machines on your network (and neither can random strangers :)
-If you want to make them accessible, or want to update them through some other way, go to
-the <a href="/i2ptunnel/" target="_blank">I2PTunnel configuration interface</a> and edit them accordingly.
-You can also go to that page if you want to add a new tunnel, such as if you want to run
-your own eepsite.</p>
-
 <h2>Want your own eepsite?</h2>
-<p>In addition, we've configured some software to let you run your own eepsite - a 
+
+<p>We've bundled some software to let you run your own eepsite - a 
 <a href="http://jetty.mortbay.org/">Jetty</a> instance listening on 
 <a href="http://localhost:7658/">http://localhost:7658/</a>.  Simply place your files in
 the <code>eepsite/docroot/</code> directory (or any standard JSP/Servlet <code>.war</code>
 files under <code>eepsite/webapps</code>) and they'll show up.  Your eepsite's 
-<i>destination</i> (which uniquely and securly identifies it) is shown on the I2PTunnel
+<i>destination</i> (which uniquely and securely identifies it) is shown on the I2PTunnel
 <a href="/i2ptunnel/">configuration page</a> - if you want other people to see your eepsite,
 you need to give them that really huge string.  Just paste it into the 
 <a href="http://forum.i2p/viewforum.php?f=16">Eepsite announce</a> forum, add it to
 ugha's <a href="http://ugha.i2p/I2pLinks">wiki</a>, or paste it in the #i2p or #i2p-chat channels on
 IRC (be sure to split it into two lines, as its too long for one).</p>
+
+<h2><a name="trouble">Troubleshooting</a></h2>
+
+<p>If the left hand side has a warning, telling you to check your NAT or firewall, please
+see the <a href="/config.jsp">config page</a> and make sure that you can receive <b>inbound
+TCP connections on port 8887</b> (or another port that you specify).  Probelms forwarding
+that port account for the vast majority of issues people run into.  When it says 
+"Active: 72/85", the "72" means how many peers you are connected with now, and "85" means 
+how many you have spoken with recently - if that first number is 0, you can bet that there
+are firewall issues.  If the second number is under 5, you should reseed (a link on the left
+hand side of the page will show up to help you when necessary).</p>
+
+<p>If you are still having problems, you may want to review the information on the 
+<a href="http://www.i2p.net/">I2P website</a>, post up messages to the 
+<a href="http://forum.i2p.net/">I2P discussion forum</a>, or swing by #i2p or
+#i2p-chat on IRC at <a href="irc://irc.freenode.net/#i2p">irc.freenode.net</a>, 
+<a href="http://www.invisiblechat.com/">invisiblechat/IIP</a>, or irc.duck.i2p (they're all 
+linked together).</p>
 
 <p><b>As a note, you can change this page by editing the file "docs/readme.html"</b></p>

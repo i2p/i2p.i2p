@@ -46,8 +46,8 @@ public class SysTray implements SysTrayMenuListener {
         _portString = _configFile.getProperty("port", "7657");
         _showIcon = Boolean.valueOf(_configFile.getProperty("visible", "true")).booleanValue();
 
-        if (!(new File("router.config")).exists())
-            openRouterConsole("http://localhost:" + _portString + "/index.jsp");
+        //if (!(new File("router.config")).exists())
+        //    openRouterConsole("http://localhost:" + _portString + "/index.jsp");
 
         if ( (System.getProperty("os.name").startsWith("Windows")) && (!Boolean.getBoolean("systray.disable")) )
             _instance = new SysTray();

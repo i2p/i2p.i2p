@@ -37,7 +37,9 @@ by their binary code license.  This product includes software developed by the A
 lets you tunnel normal TCP/IP traffic over I2P (such as the eepproxy and the irc proxy).</p>
 
 <p>The router by default also includes human's public domain <a href="http://www.i2p.net/sam">SAM</a> bridge,
-which other client applications (such as aum's <a href="http://stasher.i2p/">stasher</a>) can use.  For 
+which other client applications (such the <a href="http://duck.i2p/i2p-bt/">bittorrent port</a>) can use.  
+There is also an optimized library for doing large number calculations - jbigi - which in turn uses the 
+LGPL licensed <a href="http://swox.com/gmp/">GMP</a> library, tuned for various PC architectures.  For 
 details on other applications available, as well as their licenses, please see the 
 <a href="http://www.i2p.net/licenses">license policy</a>.  Source for the I2P code and most bundled
 client applications can be found on our <a href="http://www.i2p.net/download">download page</a>, and is
@@ -47,7 +49,14 @@ in <a href="http://www.i2p.net/cvs">cvs</a>.</p>
  <jsp:useBean class="net.i2p.router.web.ContentHelper" id="contenthelper" scope="request" />
  <jsp:setProperty name="contenthelper" property="page" value="history.txt" />
  <jsp:setProperty name="contenthelper" property="maxLines" value="500" />
+ <jsp:setProperty name="contenthelper" property="startAtBeginning" value="true" />
  <jsp:getProperty name="contenthelper" property="textContent" />
+ 
+ <p>
+ A more complete list of updates can be found 
+ <a href="http://dev.i2p.net/cgi-bin/cvsweb.cgi/i2p/history.txt?rev=HEAD">online</a> 
+ (<a href="http://dev.i2p/cgi-bin/cvsweb.cgi/i2p/history.txt?rev=HEAD">anonymously</a>)
+ </p>
 </div>
 
 </body>

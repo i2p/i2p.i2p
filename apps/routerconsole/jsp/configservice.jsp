@@ -67,6 +67,14 @@
  please select the following option and review the thread dumped to 
  <a href="logs.jsp#servicelogs">wrapper.log</a>.</p>
  <input type="submit" name="action" value="Dump threads" />
+ 
+ <h4>Launch browser on router startup?</h4>
+ <p>I2P's main configuration interface is this web console, so for your convenience
+ I2P can launch a web browser pointing at 
+ <a href="http://localhost:7657/index.jsp">http://localhost:7657/index.jsp</a> whenever
+ the router starts up.</p>
+ <input type="submit" name="action" value="View console on startup" />
+ <input type="submit" name="action" value="Do not view console on startup" />
  </form>
 </div>
 

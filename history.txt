@@ -1,4 +1,22 @@
-$Id: history.txt,v 1.80 2004/11/22 12:57:16 jrandom Exp $
+$Id: history.txt,v 1.81 2004/11/22 20:12:36 jrandom Exp $
+
+2004-11-25  jrandom
+    * Revised the installer to include start menu and desktop shortcuts for
+      windows platforms, including pretty icons (thanks DrWoo!)
+    * Allow clients specified in clients.config to have an explicit startup
+      delay.
+    * Update the default install to launch a browser pointing at the console
+      whenever I2P starts up, rather than only the first time it starts up
+      (configurable on /configservice.jsp, or in clients.config)
+    * Bugfix to the clock skew checking code to monitor the delta between
+      offsets, not the offset itself (duh)
+    * Router console html update
+    * New (and uuuuugly) code to verify that the wrapper.config contains 
+      the necessary classpath entries on update.  If it has to update the
+      wrapper.config, it will stop the JVM and service completely, since the
+      java service wrapper doesn't reread the wrapper.config on JVM restart -
+      requiring the user to manually restart the service after an update.
+    * Increase the TCP connection timeout to 30s (which is obscenely long)
 
 2004-11-22  jrandom
     * Update to the SAM bridge to reduce some unnecessary memory allocation.
