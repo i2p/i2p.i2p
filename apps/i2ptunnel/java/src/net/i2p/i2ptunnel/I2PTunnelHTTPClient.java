@@ -119,6 +119,11 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("Line=[" + line + "]");
                 
+                if (line.startsWith("Connection: ") || 
+                    line.startsWith("Keep-Alive: ") || 
+                    line.startsWith("Proxy-Connection: "))
+                    continue;
+                
                 if (method == null) { // first line (GET /base64/realaddr)
                     if (_log.shouldLog(Log.DEBUG))
                         _log.debug("Method is null for [" + line + "]");
@@ -182,7 +187,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
                         _log.debug("HOST  :" + host + ":");
                         _log.debug("DEST  :" + destination + ":");
                     }
-
+                    
                 } else {
                     if (line.startsWith("Host: ") && !usingWWWProxy) {
                         line = "Host: " + host;
@@ -190,8 +195,13 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
                             _log.info("Setting host = " + host);
                     }
                 }
-                newRequest.append(line).append("\r\n"); // HTTP spec
-                if (line.length() == 0) break;
+                
+                if (line.length() == 0) {
+                    newRequest.append("Connection: close\r\n\r\n");
+                    break;
+                } else {
+                    newRequest.append(line).append("\r\n"); // HTTP spec
+                }
             }
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("NewRequest header: [" + newRequest.toString() + "]");
