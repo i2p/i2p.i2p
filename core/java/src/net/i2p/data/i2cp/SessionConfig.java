@@ -47,7 +47,10 @@ public class SessionConfig extends DataStructureImpl {
     private final static long OFFSET_VALIDITY = 30 * 1000;
 
     public SessionConfig() {
-        _destination = null;
+        this(null);
+    }
+    public SessionConfig(Destination dest) {
+        _destination = dest;
         _signature = null;
         _creationDate = new Date(Clock.getInstance().now());
         _options = null;
@@ -59,14 +62,6 @@ public class SessionConfig extends DataStructureImpl {
      */
     public Destination getDestination() {
         return _destination;
-    }
-
-    /**
-     * Specify the destination for which this session is supposed to connect
-     *
-     */
-    public void setDestination(Destination dest) {
-        _destination = dest;
     }
 
     /**
