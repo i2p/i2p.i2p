@@ -8,6 +8,9 @@ package net.i2p.router.peermanager;
  *
  */
 
+import java.io.IOException;
+import java.io.OutputStream;
+
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
@@ -124,5 +127,7 @@ class PeerManager {
         return rv;
     }
     
-    public String renderStatusHTML() { return _organizer.renderStatusHTML(); }
+    public void renderStatusHTML(OutputStream out) throws IOException { 
+        _organizer.renderStatusHTML(out); 
+    }
 }
