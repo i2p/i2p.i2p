@@ -227,12 +227,17 @@ class RestrictiveTCPConnection extends TCPConnection {
         sockCreator.setPriority(I2PThread.MIN_PRIORITY);
         sockCreator.start();
         
-        if (_log.shouldLog(Log.DEBUG)) _log.debug("Before joining socket creator via peer callback...");
+        if (_log.shouldLog(Log.DEBUG)) 
+            _log.debug("Before joining socket creator via peer callback...");
         try {
             synchronized (creator) {
                 creator.wait(TCPTransport.SOCKET_CREATE_TIMEOUT);
             }
-        } catch (InterruptedException ie) {}
+        } catch (InterruptedException ie) {
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Timed out waiting to connect to " + peer.getHost() 
+                           + ':' + peer.getPort());
+        }
         
         boolean established = creator.couldEstablish();
         // returns a socket if and only if the connection was established and the I2P handshake byte sent and received
@@ -289,7 +294,7 @@ class RestrictiveTCPConnection extends TCPConnection {
             
             if (_log.shouldLog(Log.INFO))
                 _log.info("TCP connection " + _id + " established with " + _remoteIdentity.getHash().toBase64());
-            _in = new AESInputStream(_context, new BandwidthLimitedInputStream(_context, new BufferedInputStream(_in, BUF_SIZE), _remoteIdentity), _key, _iv);
+            _in = new AESInputStream(_context, new BandwidthLimitedInputStream(_context, _in, _remoteIdentity), _key, _iv);
             _out = new AESOutputStream(_context, new BufferedOutputStream(new BandwidthLimitedOutputStream(_context, _out, _remoteIdentity), BUF_SIZE), _key, _iv);
             _socket.setSoTimeout(0);
             success = _context.clock().now();
