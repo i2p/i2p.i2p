@@ -198,7 +198,7 @@ class TestTunnelJob extends JobImpl {
                     _log.warn("Secondary test of tunnel " + _secondaryId.getTunnelId() 
                               + " failed while waiting for nonce " + _nonce + ": " 
                               + _pool.getTunnelInfo(_secondaryId), getAddedBy());
-                _pool.tunnelFailed(_secondaryId);
+                //_pool.tunnelFailed(_secondaryId);
             }
         }
     }
