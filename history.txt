@@ -1,4 +1,7 @@
-$Id: history.txt,v 1.157 2005/02/24 18:53:35 jrandom Exp $
+$Id: history.txt,v 1.158 2005/02/26 14:16:46 jrandom Exp $
+
+2005-02-26  jrandom
+    * Force 1.3-isms on the precompiled jsps too (thanks laberhost)
 
 2005-02-26  jrandom
     * Further streaming lib caching improvements
