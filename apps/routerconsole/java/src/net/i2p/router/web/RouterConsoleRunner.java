@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.List;
 
 import net.i2p.router.RouterContext;
+import net.i2p.apps.systray.SysTray;
 
 import org.mortbay.jetty.Server;
 import org.mortbay.jetty.servlet.WebApplicationContext;
@@ -50,6 +51,11 @@ public class RouterConsoleRunner {
             _server.start();
         } catch (MultiException me) {
             me.printStackTrace();
+        }
+        try {
+            SysTray tray = SysTray.getInstance();
+        } catch (Throwable t) {
+            t.printStackTrace();
         }
     }
     
