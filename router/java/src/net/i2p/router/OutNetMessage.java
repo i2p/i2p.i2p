@@ -139,37 +139,18 @@ public class OutNetMessage {
     
     public long getMessageSize() {
         if (_messageSize <= 0) {
-            try {
-                ByteArrayOutputStream baos = new ByteArrayOutputStream(2048); // large enough to hold most messages
-                _message.writeBytes(baos);
-                long sz = baos.size();
-                baos.reset();
-                _messageSize = sz;
-            } catch (DataFormatException dfe) {
-                _log.error("Error serializing the I2NPMessage for the OutNetMessage", dfe);
-            } catch (IOException ioe) {
-                _log.error("Error serializing the I2NPMessage for the OutNetMessage", ioe);
-            }
+            _messageSize = _message.getMessageSize();
         }
         return _messageSize;
     }
-    public byte[] getMessageData() {
+    
+    public int getMessageData(byte outBuffer[]) {
         if (_message == null) {
-            return null;
+            return -1;
         } else {
-            try {
-                ByteArrayOutputStream baos = new ByteArrayOutputStream(1024); // large enough to hold most messages
-                _message.writeBytes(baos);
-                byte data[] = baos.toByteArray();
-                _messageSize = data.length;
-                return data;
-            } catch (DataFormatException dfe) {
-                _log.error("Error serializing the I2NPMessage for the OutNetMessage", dfe);
-            } catch (IOException ioe) {
-                _log.error("Error serializing the I2NPMessage for the OutNetMessage", ioe);
-            }
-            
-            return null;
+            int len = _message.toByteArray(outBuffer);
+            _messageSize = len;
+            return len;
         }
     }
     

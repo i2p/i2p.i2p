@@ -185,23 +185,13 @@ public class HandleDatabaseLookupMessageJob extends JobImpl {
         long expiration = REPLY_TIMEOUT + getContext().clock().now();
 
         TunnelMessage msg = new TunnelMessage(getContext());
-        try {
-            ByteArrayOutputStream baos = new ByteArrayOutputStream(1024);
-            message.writeBytes(baos);
-            msg.setData(baos.toByteArray());
-            msg.setTunnelId(replyTunnel);
-            msg.setMessageExpiration(new Date(expiration));
-            getContext().jobQueue().addJob(new SendMessageDirectJob(getContext(), msg, toPeer, null, null, null, null, REPLY_TIMEOUT, MESSAGE_PRIORITY));
+        msg.setData(message.toByteArray());
+        msg.setTunnelId(replyTunnel);
+        msg.setMessageExpiration(new Date(expiration));
+        getContext().jobQueue().addJob(new SendMessageDirectJob(getContext(), msg, toPeer, null, null, null, null, REPLY_TIMEOUT, MESSAGE_PRIORITY));
 
-            String bodyType = message.getClass().getName();
-            getContext().messageHistory().wrap(bodyType, message.getUniqueId(), TunnelMessage.class.getName(), msg.getUniqueId());
-        } catch (IOException ioe) {
-            if (_log.shouldLog(Log.ERROR))
-                _log.error("Error writing out the tunnel message to send to the tunnel", ioe);
-        } catch (DataFormatException dfe) {
-            if (_log.shouldLog(Log.ERROR))
-                _log.error("Error writing out the tunnel message to send to the tunnel", dfe);
-        }
+        String bodyType = message.getClass().getName();
+        getContext().messageHistory().wrap(bodyType, message.getUniqueId(), TunnelMessage.class.getName(), msg.getUniqueId());
     }
     
     public String getName() { return "Handle Database Lookup Message"; }

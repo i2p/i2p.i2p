@@ -80,33 +80,30 @@ public class DatabaseSearchReplyMessage extends I2NPMessageImpl {
         }
     }
     
-    protected byte[] writeMessage() throws I2NPMessageException, IOException {
+    /** calculate the message body's length (not including the header and footer */
+    protected int calculateWrittenLength() { 
+        return Hash.HASH_LENGTH + 1 + getNumReplies()*Hash.HASH_LENGTH + Hash.HASH_LENGTH;
+    }
+    /** write the message body to the output array, starting at the given index */
+    protected int writeMessageBody(byte out[], int curIndex) throws I2NPMessageException {
         if (_key == null)
             throw new I2NPMessageException("Key in reply to not specified");
         if (_peerHashes == null)
             throw new I2NPMessageException("Peer replies are null");
         if (_from == null)
             throw new I2NPMessageException("No 'from' address specified!");
-        
-        byte rv[] = null;
-        ByteArrayOutputStream os = new ByteArrayOutputStream(32);
-        try {
-            _key.writeBytes(os);
-            
-            DataHelper.writeLong(os, 1, _peerHashes.size());
-            for (int i = 0; i < getNumReplies(); i++) {
-                Hash peer = getReply(i);
-                peer.writeBytes(os);
-            }
-            
-            _from.writeBytes(os);
 
-            rv = os.toByteArray();
-            _context.statManager().addRateData("netDb.searchReplyMessageSendSize", rv.length, 1);
-        } catch (DataFormatException dfe) {
-            throw new I2NPMessageException("Error writing out the message data", dfe);
+        System.arraycopy(_key.getData(), 0, out, curIndex, Hash.HASH_LENGTH);
+        curIndex += Hash.HASH_LENGTH;
+        byte len[] = DataHelper.toLong(1, _peerHashes.size());
+        out[curIndex++] = len[0];
+        for (int i = 0; i < getNumReplies(); i++) {
+            System.arraycopy(getReply(i).getData(), 0, out, curIndex, Hash.HASH_LENGTH);
+            curIndex += Hash.HASH_LENGTH;
         }
-        return rv;
+        System.arraycopy(_from.getData(), 0, out, curIndex, Hash.HASH_LENGTH);
+        curIndex += Hash.HASH_LENGTH;
+        return curIndex;
     }
     
     public int getType() { return MESSAGE_TYPE; }

@@ -151,10 +151,26 @@ public class TCPConnection {
      */
     public void addMessage(OutNetMessage msg) {
         msg.timestamp("TCPConnection.addMessage");
+        List expired = null;
+        int remaining = 0;
         synchronized (_pendingMessages) {
             _pendingMessages.add(msg);
+            expired = locked_expireOld();
             locked_throttle();
+            remaining = _pendingMessages.size();
             _pendingMessages.notifyAll();
+        }
+        if (expired != null) {
+            for (int i = 0; i < expired.size(); i++) {
+                OutNetMessage cur = (OutNetMessage)expired.get(i);
+                cur.timestamp("TCPConnection.addMessage expired");
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("Message " + cur.getMessageId() + " expired on the queue to " 
+                              + _ident.getHash().toBase64().substring(0,6)
+                              + " (queue size " + remaining + ") with lifetime " 
+                              + cur.getLifetime());
+                sent(cur, false, 0);
+            }
         }
     }
     
@@ -232,6 +248,22 @@ public class TCPConnection {
         if (msgSize > excessBytesQueued)
             return 100;
         return (int)(100.0*(msgSize/excessBytesQueued));
+    }
+    
+    private List locked_expireOld() {
+        long now = _context.clock().now();
+        List expired = null;
+        for (int i = 0; i < _pendingMessages.size(); i++) {
+            OutNetMessage cur = (OutNetMessage)_pendingMessages.get(i);
+            if (cur.getExpiration() < now) {
+                _pendingMessages.remove(i);
+                if (expired == null)
+                    expired = new ArrayList(1);
+                expired.add(cur);
+                i--;
+            }
+        }
+        return expired;
     }
     
     /** 

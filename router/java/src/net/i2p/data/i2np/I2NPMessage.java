@@ -52,5 +52,8 @@ public interface I2NPMessage extends DataStructure {
     public Date getMessageExpiration();
     
     /** How large the message is, including any checksums */
-    public int getSize();
+    public int getMessageSize();
+    
+    /** write the message to the buffer, returning the number of bytes written */
+    public int toByteArray(byte buffer[]);
 }

@@ -135,33 +135,19 @@ public class SendTunnelMessageJob extends JobImpl {
      */
     private void forwardToGateway() {
         TunnelMessage msg = new TunnelMessage(getContext());
-        try {
-            ByteArrayOutputStream baos = new ByteArrayOutputStream(1024);
-            _message.writeBytes(baos);
-            msg.setData(baos.toByteArray());
-            msg.setTunnelId(_tunnelId);
-            msg.setMessageExpiration(new Date(_expiration));
-            getContext().jobQueue().addJob(new SendMessageDirectJob(getContext(), msg, 
-                                                                _destRouter, _onSend, 
-                                                                _onReply, _onFailure, 
-                                                                _selector, 
-                                                                (int)(_expiration-getContext().clock().now()), 
-                                                                _priority));
+        msg.setData(_message.toByteArray());
+        msg.setTunnelId(_tunnelId);
+        msg.setMessageExpiration(new Date(_expiration));
+        getContext().jobQueue().addJob(new SendMessageDirectJob(getContext(), msg, 
+                                                            _destRouter, _onSend, 
+                                                            _onReply, _onFailure, 
+                                                            _selector, 
+                                                            (int)(_expiration-getContext().clock().now()), 
+                                                            _priority));
 
-            String bodyType = _message.getClass().getName();
-            getContext().messageHistory().wrap(bodyType, _message.getUniqueId(), 
-                                           TunnelMessage.class.getName(), msg.getUniqueId());
-        } catch (IOException ioe) {
-            if (_log.shouldLog(Log.ERROR))
-                _log.error("Error writing out the tunnel message to send to the tunnel", ioe);
-            if (_onFailure != null)
-                getContext().jobQueue().addJob(_onFailure);
-        } catch (DataFormatException dfe) {
-            if (_log.shouldLog(Log.ERROR))
-                _log.error("Error writing out the tunnel message to send to the tunnel", dfe);
-            if (_onFailure != null)
-                getContext().jobQueue().addJob(_onFailure);
-        }
+        String bodyType = _message.getClass().getName();
+        getContext().messageHistory().wrap(bodyType, _message.getUniqueId(), 
+                                       TunnelMessage.class.getName(), msg.getUniqueId());
         return;
     }
     
@@ -391,7 +377,8 @@ public class SendTunnelMessageJob extends JobImpl {
     private byte[] encrypt(DataStructure struct, SessionKey key, int paddedSize) {
         try {
             ByteArrayOutputStream baos = new ByteArrayOutputStream(paddedSize);
-            struct.writeBytes(baos);
+            byte data[] = struct.toByteArray();
+            baos.write(data);
             
             byte iv[] = new byte[16];
             Hash h = getContext().sha().calculateHash(key.getData());
@@ -400,9 +387,6 @@ public class SendTunnelMessageJob extends JobImpl {
         } catch (IOException ioe) {
             if (_log.shouldLog(Log.ERROR))
                 _log.error("Error writing out data to encrypt", ioe);
-        } catch (DataFormatException dfe) {
-            if (_log.shouldLog(Log.ERROR))
-                _log.error("Error formatting data to encrypt", dfe);
         }
         return null;
     }
@@ -451,17 +435,8 @@ public class SendTunnelMessageJob extends JobImpl {
             tmsg.setEncryptedDeliveryInstructions(null);
             tmsg.setTunnelId(_targetTunnelId);
             tmsg.setVerificationStructure(null);
-            ByteArrayOutputStream baos = new ByteArrayOutputStream(1024);
-            try {
-                _message.writeBytes(baos);
-            } catch (IOException ioe) {
-                if (_log.shouldLog(Log.ERROR))
-                    _log.error("Error writing out the message to be forwarded...??", ioe);
-            } catch (DataFormatException dfe) {
-                if (_log.shouldLog(Log.ERROR))
-                    _log.error("Error writing message to be forwarded...???", dfe);
-            }
-            tmsg.setData(baos.toByteArray());
+            byte data[] = _message.toByteArray();
+            tmsg.setData(data);
             msg = tmsg;
         } else {
             if (_log.shouldLog(Log.DEBUG))

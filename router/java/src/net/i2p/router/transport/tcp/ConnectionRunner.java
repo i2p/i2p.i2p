@@ -20,6 +20,7 @@ class ConnectionRunner implements Runnable {
     private RouterContext _context;
     private TCPConnection _con;
     private boolean _keepRunning;
+    private byte _writeBuffer[];
     
     public ConnectionRunner(RouterContext ctx, TCPConnection con) {
         _context = ctx;
@@ -30,6 +31,7 @@ class ConnectionRunner implements Runnable {
     
     public void startRunning() {
         _keepRunning = true;
+        _writeBuffer = new byte[38*1024]; // expansion factor 
         
         String name = "TCP " + _context.routerHash().toBase64().substring(0,6) 
                       + " to " 
@@ -56,8 +58,18 @@ class ConnectionRunner implements Runnable {
     }
     
     private void sendMessage(OutNetMessage msg) {
-        byte data[] = msg.getMessageData();
-        if (data == null) {            
+        byte buf[] = _writeBuffer;
+        int written = 0;
+        try {
+            written = msg.getMessageData(_writeBuffer);
+        } catch (ArrayIndexOutOfBoundsException aioobe) {
+            I2NPMessage m = msg.getMessage();
+            if (m != null) {
+                buf = m.toByteArray();
+                written = buf.length;
+            }
+        }
+        if (written <= 0) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("message " + msg.getMessageType() + "/" + msg.getMessageId() 
                           + " expired before it could be sent");
@@ -76,7 +88,7 @@ class ConnectionRunner implements Runnable {
         try {
             synchronized (out) {
                 before = _context.clock().now();
-                out.write(data);
+                out.write(buf, 0, written);
                 out.flush();
                 after = _context.clock().now();
             }

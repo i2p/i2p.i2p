@@ -154,33 +154,48 @@ public class DatabaseLookupMessage extends I2NPMessageImpl {
         }
     }
     
-    protected byte[] writeMessage() throws I2NPMessageException, IOException {
+    protected int calculateWrittenLength() {
+        int totalLength = 0;
+        totalLength += Hash.HASH_LENGTH*2; // key+fromHash
+        totalLength += 1; // hasTunnel?
+        if (_replyTunnel != null)
+            totalLength += 4;
+        totalLength += 2; // numPeers
+        if (_dontIncludePeers != null) 
+            totalLength += Hash.HASH_LENGTH * _dontIncludePeers.size();
+        return totalLength;
+    }
+    
+    protected int writeMessageBody(byte out[], int curIndex) throws I2NPMessageException {
         if (_key == null) throw new I2NPMessageException("Key being searched for not specified");
         if (_fromHash == null) throw new I2NPMessageException("From address not specified");
 
-        ByteArrayOutputStream os = new ByteArrayOutputStream(32);
-        try {
-            _key.writeBytes(os);
-            _fromHash.writeBytes(os);
-            if (_replyTunnel != null) {
-                DataHelper.writeBoolean(os, Boolean.TRUE);
-                _replyTunnel.writeBytes(os);
-            } else {
-                DataHelper.writeBoolean(os, Boolean.FALSE);
-            }
-            if ( (_dontIncludePeers == null) || (_dontIncludePeers.size() <= 0) ) {
-                DataHelper.writeLong(os, 2, 0);
-            } else {
-                DataHelper.writeLong(os, 2, _dontIncludePeers.size());
-                for (Iterator iter = _dontIncludePeers.iterator(); iter.hasNext(); ) {
-                    Hash peer = (Hash)iter.next();
-                    peer.writeBytes(os);
-                }
-            }
-        } catch (DataFormatException dfe) {
-            throw new I2NPMessageException("Error writing out the message data", dfe);
+        System.arraycopy(_key.getData(), 0, out, curIndex, Hash.HASH_LENGTH);
+        curIndex += Hash.HASH_LENGTH;
+        System.arraycopy(_fromHash.getData(), 0, out, curIndex, Hash.HASH_LENGTH);
+        curIndex += Hash.HASH_LENGTH;
+        if (_replyTunnel != null) {
+            out[curIndex++] = DataHelper.BOOLEAN_TRUE;
+            byte id[] = DataHelper.toLong(4, _replyTunnel.getTunnelId());
+            System.arraycopy(id, 0, out, curIndex, 4);
+            curIndex += 4;
+        } else {
+            out[curIndex++] = DataHelper.BOOLEAN_FALSE;
         }
-        return os.toByteArray();
+        if ( (_dontIncludePeers == null) || (_dontIncludePeers.size() <= 0) ) {
+            out[curIndex++] = 0x0;
+            out[curIndex++] = 0x0;
+        } else {
+            byte len[] = DataHelper.toLong(2, _dontIncludePeers.size());
+            out[curIndex++] = len[0];
+            out[curIndex++] = len[1];
+            for (Iterator iter = _dontIncludePeers.iterator(); iter.hasNext(); ) {
+                Hash peer = (Hash)iter.next();
+                System.arraycopy(peer.getData(), 0, out, curIndex, Hash.HASH_LENGTH);
+                curIndex += Hash.HASH_LENGTH;
+            }
+        }
+        return curIndex;
     }
     
     public int getType() { return MESSAGE_TYPE; }

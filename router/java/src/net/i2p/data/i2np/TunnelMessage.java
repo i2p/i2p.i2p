@@ -15,6 +15,8 @@ import java.io.InputStream;
 import net.i2p.I2PAppContext;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
+import net.i2p.data.Hash;
+import net.i2p.data.Signature;
 import net.i2p.data.TunnelId;
 import net.i2p.util.Log;
 
@@ -47,7 +49,11 @@ public class TunnelMessage extends I2NPMessageImpl {
     public void setTunnelId(TunnelId id) { _tunnelId = id; }
     
     public byte[] getData() { return _data; }
-    public void setData(byte data[]) { _data = data; }
+    public void setData(byte data[]) { 
+        _data = data; 
+        if ( (data != null) && (_data.length <= 0) )
+            throw new IllegalArgumentException("Empty tunnel payload?");
+    }
     
     public TunnelVerificationStructure getVerificationStructure() { return _verification; }
     public void setVerificationStructure(TunnelVerificationStructure verification) { _verification = verification; }
@@ -85,41 +91,54 @@ public class TunnelMessage extends I2NPMessageImpl {
         }
     }
     
-    protected byte[] writeMessage() throws I2NPMessageException, IOException {
-        if ( (_tunnelId == null) || (_data == null) || (_data.length <= 0) )
-            throw new I2NPMessageException("Not enough data to write out");
-        
-        ByteArrayOutputStream os = new ByteArrayOutputStream(64+_data.length);
-        try {
-            _tunnelId.writeBytes(os);
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Writing tunnel message for tunnel " + _tunnelId);
-            DataHelper.writeLong(os, 4, _data.length);
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Writing tunnel message length: " + _data.length);
-            os.write(_data);
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Writing tunnel message data");
-            if ( (_verification == null) || (_encryptedInstructions == null) ) {
-                DataHelper.writeLong(os, 1, FLAG_DONT_INCLUDESTRUCTURE);
-                if (_log.shouldLog(Log.DEBUG))
-                    _log.debug("Writing DontIncludeStructure flag");
-            } else {
-                DataHelper.writeLong(os, 1, FLAG_INCLUDESTRUCTURE);
-                if (_log.shouldLog(Log.DEBUG))
-                    _log.debug("Writing IncludeStructure flag, then the verification structure, then the " +
-                               "E(instr).length [" + _encryptedInstructions.length + "], then the E(instr)");
-                _verification.writeBytes(os);
-                DataHelper.writeLong(os, 2, _encryptedInstructions.length);
-                os.write(_encryptedInstructions);
-            }
-        } catch (DataFormatException dfe) {
-            throw new I2NPMessageException("Error writing out the message data", dfe);
+    /** calculate the message body's length (not including the header and footer */
+    protected int calculateWrittenLength() { 
+        int length = 0;
+        length += 4; // tunnelId
+        length += 4; // data length
+        length += _data.length;
+        if ( (_verification == null) || (_encryptedInstructions == null) ) {
+            length += 1; // include verification?
+        } else {
+            length += 1; // include verification?
+            length += Hash.HASH_LENGTH + Signature.SIGNATURE_BYTES;
+            length += 2; // instructions length
+            length += _encryptedInstructions.length;
         }
-        byte rv[] = os.toByteArray();
-        if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Overall data being written: " + rv.length);
-        return rv;
+        return length;
+    }
+    /** write the message body to the output array, starting at the given index */
+    protected int writeMessageBody(byte out[], int curIndex) throws I2NPMessageException {
+        if ( (_tunnelId == null) || (_data == null) )
+            throw new I2NPMessageException("Not enough data to write out (id=" + _tunnelId + " data=" + _data + ")");
+        if (_data.length <= 0) 
+            throw new I2NPMessageException("Not enough data to write out (data.length=" + _data.length + ")");
+        
+        byte id[] = DataHelper.toLong(4, _tunnelId.getTunnelId());
+        System.arraycopy(id, 0, out, curIndex, 4);
+        curIndex += 4;
+        byte len[] = DataHelper.toLong(4, _data.length);
+        System.arraycopy(len, 0, out, curIndex, 4);
+        curIndex += 4;
+        System.arraycopy(_data, 0, out, curIndex, _data.length);
+        curIndex += _data.length;
+        if ( (_verification == null) || (_encryptedInstructions == null) ) {
+            byte flag[] = DataHelper.toLong(1, FLAG_DONT_INCLUDESTRUCTURE);
+            out[curIndex++] = flag[0];
+        } else {
+            byte flag[] = DataHelper.toLong(1, FLAG_INCLUDESTRUCTURE);
+            out[curIndex++] = flag[0];
+            System.arraycopy(_verification.getMessageHash().getData(), 0, out, curIndex, Hash.HASH_LENGTH);
+            curIndex += Hash.HASH_LENGTH;
+            System.arraycopy(_verification.getAuthorizationSignature().getData(), 0, out, curIndex, Signature.SIGNATURE_BYTES);
+            curIndex += Signature.SIGNATURE_BYTES;
+            len = DataHelper.toLong(2, _encryptedInstructions.length);
+            System.arraycopy(len, 0, out, curIndex, 2);
+            curIndex += 2;
+            System.arraycopy(_encryptedInstructions, 0, out, curIndex, _encryptedInstructions.length);
+            curIndex += _encryptedInstructions.length;
+        }
+        return curIndex;
     }
     
     public int getType() { return MESSAGE_TYPE; }

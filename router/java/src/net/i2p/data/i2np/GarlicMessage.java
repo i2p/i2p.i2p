@@ -48,17 +48,18 @@ public class GarlicMessage extends I2NPMessageImpl {
         }
     }
     
-    protected byte[] writeMessage() throws I2NPMessageException, IOException {
-        if ( (_data == null) || (_data.length <= 0) ) throw new I2NPMessageException("Not enough data to write out");
-        
-        ByteArrayOutputStream os = new ByteArrayOutputStream(32);
-        try {
-            DataHelper.writeLong(os, 4, _data.length);
-            os.write(_data);
-        } catch (DataFormatException dfe) {
-            throw new I2NPMessageException("Error writing out the message data", dfe);
-        }
-        return os.toByteArray();
+    /** calculate the message body's length (not including the header and footer */
+    protected int calculateWrittenLength() { 
+        return 4 + _data.length;
+    }
+    /** write the message body to the output array, starting at the given index */
+    protected int writeMessageBody(byte out[], int curIndex) throws I2NPMessageException {
+        byte len[] = DataHelper.toLong(4, _data.length);
+        System.arraycopy(len, 0, out, curIndex, 4);
+        curIndex += 4;
+        System.arraycopy(_data, 0, out, curIndex, _data.length);
+        curIndex += _data.length;
+        return curIndex;
     }
     
     public int getType() { return MESSAGE_TYPE; }

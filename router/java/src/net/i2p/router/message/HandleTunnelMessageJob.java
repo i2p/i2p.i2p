@@ -335,21 +335,11 @@ public class HandleTunnelMessageJob extends JobImpl {
                        + router.toBase64());
         TunnelMessage msg = new TunnelMessage(getContext());
         msg.setTunnelId(id);
-        try {
-            ByteArrayOutputStream baos = new ByteArrayOutputStream(1024);
-            body.writeBytes(baos);
-            msg.setData(baos.toByteArray());
-            getContext().jobQueue().addJob(new SendMessageDirectJob(getContext(), msg, router, FORWARD_TIMEOUT, FORWARD_PRIORITY));
+        msg.setData(body.toByteArray());
+        getContext().jobQueue().addJob(new SendMessageDirectJob(getContext(), msg, router, FORWARD_TIMEOUT, FORWARD_PRIORITY));
 
-            String bodyType = body.getClass().getName();
-            getContext().messageHistory().wrap(bodyType, body.getUniqueId(), TunnelMessage.class.getName(), msg.getUniqueId());	
-        } catch (DataFormatException dfe) {
-            if (_log.shouldLog(Log.ERROR))
-                _log.error("Error writing out the message to forward to the tunnel", dfe);
-        } catch (IOException ioe) {
-            if (_log.shouldLog(Log.ERROR))
-                _log.error("Error writing out the message to forward to the tunnel", ioe);
-        }
+        String bodyType = body.getClass().getName();
+        getContext().messageHistory().wrap(bodyType, body.getUniqueId(), TunnelMessage.class.getName(), msg.getUniqueId());	
     }
     
     private void sendToRouter(Hash router, I2NPMessage body) {
@@ -419,6 +409,11 @@ public class HandleTunnelMessageJob extends JobImpl {
         if (decrypted == null) {
             if (_log.shouldLog(Log.ERROR))
                 _log.error("Error decrypting the message", getAddedBy());
+            return null;
+        }
+        if (decrypted.length <= 0) {
+            if (_log.shouldLog(Log.ERROR))
+                _log.error("Received an empty decrypted message?  encrypted length: " + encryptedMessage.length, getAddedBy());
             return null;
         }
         return getBody(decrypted);

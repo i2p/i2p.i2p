@@ -52,17 +52,21 @@ public class DeliveryStatusMessage extends I2NPMessageImpl {
         }
     }
     
-    protected byte[] writeMessage() throws I2NPMessageException, IOException {
+    /** calculate the message body's length (not including the header and footer */
+    protected int calculateWrittenLength() { 
+        return 4 + DataHelper.DATE_LENGTH; // id + arrival
+    }
+    /** write the message body to the output array, starting at the given index */
+    protected int writeMessageBody(byte out[], int curIndex) throws I2NPMessageException {
         if ( (_id < 0) || (_arrival == null) ) throw new I2NPMessageException("Not enough data to write out");
         
-        ByteArrayOutputStream os = new ByteArrayOutputStream(32);
-        try {
-            DataHelper.writeLong(os, 4, _id);
-            DataHelper.writeDate(os, _arrival);
-        } catch (DataFormatException dfe) {
-            throw new I2NPMessageException("Error writing out the message data", dfe);
-        }
-        return os.toByteArray();
+        byte id[] = DataHelper.toLong(4, _id);
+        System.arraycopy(id, 0, out, curIndex, 4);
+        curIndex += 4;
+        byte date[] = DataHelper.toDate(_arrival);
+        System.arraycopy(date, 0, out, curIndex, DataHelper.DATE_LENGTH);
+        curIndex += DataHelper.DATE_LENGTH;
+        return curIndex;
     }
     
     public int getType() { return MESSAGE_TYPE; }

@@ -35,6 +35,8 @@ public class DatabaseStoreMessage extends I2NPMessageImpl {
     private int _type;
     private LeaseSet _leaseSet;
     private RouterInfo _info;
+    private byte[] _leaseSetCache;
+    private byte[] _routerInfoCache;
     private long _replyToken;
     private TunnelId _replyTunnel;
     private Hash _replyGateway;
@@ -156,37 +158,57 @@ public class DatabaseStoreMessage extends I2NPMessageImpl {
         }
     }
     
-    protected byte[] writeMessage() throws I2NPMessageException, IOException {
+    /** calculate the message body's length (not including the header and footer */
+    protected int calculateWrittenLength() { 
+        int len = Hash.HASH_LENGTH + 1 + 4; // key+type+replyToken
+        if (_replyToken > 0) 
+            len += 4 + Hash.HASH_LENGTH; // replyTunnel+replyGateway
+        if (_type == KEY_TYPE_LEASESET) {
+            _leaseSetCache = _leaseSet.toByteArray();
+            len += _leaseSetCache.length;
+        } else if (_type == KEY_TYPE_ROUTERINFO) {
+            byte uncompressed[] = _info.toByteArray();
+            byte compressed[] = DataHelper.compress(uncompressed);
+            _routerInfoCache = compressed;
+            len += compressed.length + 2;
+        }
+        return len;
+    }
+    /** write the message body to the output array, starting at the given index */
+    protected int writeMessageBody(byte out[], int curIndex) throws I2NPMessageException {
         if (_key == null) throw new I2NPMessageException("Invalid key");
         if ( (_type != KEY_TYPE_LEASESET) && (_type != KEY_TYPE_ROUTERINFO) ) throw new I2NPMessageException("Invalid key type");
         if ( (_type == KEY_TYPE_LEASESET) && (_leaseSet == null) ) throw new I2NPMessageException("Missing lease set");
         if ( (_type == KEY_TYPE_ROUTERINFO) && (_info == null) ) throw new I2NPMessageException("Missing router info");
         
-        ByteArrayOutputStream os = new ByteArrayOutputStream(256);
-        try {
-            _key.writeBytes(os);
-            DataHelper.writeLong(os, 1, _type);
-            DataHelper.writeLong(os, 4, _replyToken);
-            if (_replyToken > 0) {
-                _replyTunnel.writeBytes(os);
-                _replyGateway.writeBytes(os);
-            } else {
-                // noop
-            }
-            if (_type == KEY_TYPE_LEASESET) {
-                _leaseSet.writeBytes(os);
-            } else if (_type == KEY_TYPE_ROUTERINFO) {
-                ByteArrayOutputStream baos = new ByteArrayOutputStream(4*1024);
-                _info.writeBytes(baos);
-                byte uncompressed[] = baos.toByteArray();
-                byte compressed[] = DataHelper.compress(uncompressed);
-                DataHelper.writeLong(os, 2, compressed.length);
-                os.write(compressed);
-            }
-        } catch (DataFormatException dfe) {
-            throw new I2NPMessageException("Error writing out the message data", dfe);
+        System.arraycopy(_key.getData(), 0, out, curIndex, Hash.HASH_LENGTH);
+        curIndex += Hash.HASH_LENGTH;
+        byte type[] = DataHelper.toLong(1, _type);
+        out[curIndex++] = type[0];
+        byte tok[] = DataHelper.toLong(4, _replyToken);
+        System.arraycopy(tok, 0, out, curIndex, 4);
+        curIndex += 4;
+        
+        if (_replyToken > 0) {
+            byte id[] = DataHelper.toLong(4, _replyTunnel.getTunnelId());
+            System.arraycopy(id, 0, out, curIndex, 4);
+            curIndex += 4;
+            System.arraycopy(_replyGateway.getData(), 0, out, curIndex, Hash.HASH_LENGTH);
+            curIndex += Hash.HASH_LENGTH;
         }
-        return os.toByteArray();
+        
+        if (_type == KEY_TYPE_LEASESET) {
+            // initialized in calculateWrittenLength
+            System.arraycopy(_leaseSetCache, 0, out, curIndex, _leaseSetCache.length);
+            curIndex += _leaseSetCache.length;
+        } else if (_type == KEY_TYPE_ROUTERINFO) {
+            byte len[] = DataHelper.toLong(2, _routerInfoCache.length);
+            out[curIndex++] = len[0];
+            out[curIndex++] = len[1];
+            System.arraycopy(_routerInfoCache, 0, out, curIndex, _routerInfoCache.length);
+            curIndex += _routerInfoCache.length;
+        }
+        return curIndex;
     }
     
     public int getType() { return MESSAGE_TYPE; }

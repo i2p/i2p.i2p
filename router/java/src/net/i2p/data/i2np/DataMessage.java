@@ -54,15 +54,28 @@ public class DataMessage extends I2NPMessageImpl {
         }
     }
     
-    protected byte[] writeMessage() throws I2NPMessageException, IOException {
-        ByteArrayOutputStream os = new ByteArrayOutputStream((_data != null ? _data.length + 4 : 4));
-        try {
-            DataHelper.writeLong(os, 4, (_data != null ? _data.length : 0));
-            os.write(_data);
-        } catch (DataFormatException dfe) {
-            throw new I2NPMessageException("Error writing out the message data", dfe);
+    /** calculate the message body's length (not including the header and footer */
+    protected int calculateWrittenLength() { 
+        if (_data == null) 
+            return 4;
+        else
+            return 4 + _data.length;
+    }
+    /** write the message body to the output array, starting at the given index */
+    protected int writeMessageBody(byte out[], int curIndex) {
+        if (_data == null) {
+            out[curIndex++] = 0x0;
+            out[curIndex++] = 0x0;
+            out[curIndex++] = 0x0;
+            out[curIndex++] = 0x0;
+        } else {
+            byte len[] = DataHelper.toLong(4, _data.length);
+            System.arraycopy(len, 0, out, curIndex, 4);
+            curIndex += 4;
+            System.arraycopy(_data, 0, out, curIndex, _data.length);
+            curIndex += _data.length;
         }
-        return os.toByteArray();
+        return curIndex;
     }
     
     public int getType() { return MESSAGE_TYPE; }

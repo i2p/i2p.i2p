@@ -1,4 +1,9 @@
-$Id: history.txt,v 1.36 2004/10/06 08:23:38 jrandom Exp $
+$Id: history.txt,v 1.37 2004/10/06 16:03:52 jrandom Exp $
+
+2004-10-07  jrandom
+    * Expire queued messages even when the writer is blocked.
+    * Reimplement most of the I2NP writing with less temporary memory 
+      allocations (I2NP reading still gobbles memory).
 
 2004-10-06  jrandom
     * Implement an active queue management scheme on the TCP transports,

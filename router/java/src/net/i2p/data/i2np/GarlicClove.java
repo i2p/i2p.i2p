@@ -98,7 +98,7 @@ public class GarlicClove extends DataStructureImpl {
 
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Wrote instructions: " + _instructions);
-        _msg.writeBytes(out);
+        out.write(_msg.toByteArray());
         DataHelper.writeLong(out, 4, _cloveId);
         DataHelper.writeDate(out, _expiration);
         if (_log.shouldLog(Log.DEBUG))

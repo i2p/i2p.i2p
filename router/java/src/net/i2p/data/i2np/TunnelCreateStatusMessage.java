@@ -70,18 +70,22 @@ public class TunnelCreateStatusMessage extends I2NPMessageImpl {
         }
     }
     
-    protected byte[] writeMessage() throws I2NPMessageException, IOException {
+    /** calculate the message body's length (not including the header and footer */
+    protected int calculateWrittenLength() { 
+        return 4 + 1 + Hash.HASH_LENGTH; // id + status + from
+    }
+    /** write the message body to the output array, starting at the given index */
+    protected int writeMessageBody(byte out[], int curIndex) throws I2NPMessageException {
         if ( (_tunnelId == null) || (_from == null) ) throw new I2NPMessageException("Not enough data to write out");
         
-        ByteArrayOutputStream os = new ByteArrayOutputStream(32);
-        try {
-            _tunnelId.writeBytes(os);
-            DataHelper.writeLong(os, 1, (_status < 0 ? 255 : _status));
-            _from.writeBytes(os);
-        } catch (DataFormatException dfe) {
-            throw new I2NPMessageException("Error writing out the message data", dfe);
-        }
-        return os.toByteArray();
+        byte id[] = DataHelper.toLong(4, _tunnelId.getTunnelId());
+        System.arraycopy(id, 0, out, curIndex, 4);
+        curIndex += 4;
+        byte status[] = DataHelper.toLong(1, _status);
+        out[curIndex++] = status[0];
+        System.arraycopy(_from.getData(), 0, out, curIndex, Hash.HASH_LENGTH);
+        curIndex += Hash.HASH_LENGTH;
+        return curIndex;
     }
     
     public int getType() { return MESSAGE_TYPE; }

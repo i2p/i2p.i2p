@@ -31,6 +31,7 @@ public abstract class I2NPMessageImpl extends DataStructureImpl implements I2NPM
     protected I2PAppContext _context;
     private Date _expiration;
     private long _uniqueId;
+    private byte _data[];
     
     public final static long DEFAULT_EXPIRATION_MS = 1*60*1000; // 1 minute by default
     
@@ -39,14 +40,9 @@ public abstract class I2NPMessageImpl extends DataStructureImpl implements I2NPM
         _log = context.logManager().getLog(I2NPMessageImpl.class);
         _expiration = new Date(_context.clock().now() + DEFAULT_EXPIRATION_MS);
         _uniqueId = _context.random().nextLong(MAX_ID_VALUE);
+        _context.statManager().createRateStat("i2np.writeTime", "How long it takes to write an I2NP message", "I2NP", new long[] { 10*60*1000, 60*60*1000 });
+        _context.statManager().createRateStat("i2np.readTime", "How long it takes to read an I2NP message", "I2NP", new long[] { 10*60*1000, 60*60*1000 });
     }
-    
-    /**
-     * Write out the payload part of the message (not including the initial
-     * 1 byte type)
-     *
-     */
-    protected abstract byte[] writeMessage() throws I2NPMessageException, IOException;
     
     /**
      * Read the body into the data structures, after the initial type byte and
@@ -70,6 +66,7 @@ public abstract class I2NPMessageImpl extends DataStructureImpl implements I2NPM
     }
     public void readBytes(InputStream in, int type) throws I2NPMessageException, IOException {
         try {
+            long start = _context.clock().now();
             if (type < 0)
                 type = (int)DataHelper.readLong(in, 1);
             _uniqueId = DataHelper.readLong(in, 4);
@@ -88,25 +85,20 @@ public abstract class I2NPMessageImpl extends DataStructureImpl implements I2NPM
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Reading bytes: type = " + type + " / uniqueId : " + _uniqueId + " / expiration : " + _expiration);
             readMessage(new ByteArrayInputStream(data), type);
+            long time = _context.clock().now() - start;
+            if (time > 50)
+                _context.statManager().addRateData("i2np.readTime", time, time);
         } catch (DataFormatException dfe) {
             throw new I2NPMessageException("Error reading the message header", dfe);
         }
     }
     public void writeBytes(OutputStream out) throws DataFormatException, IOException {
-        try {
-            DataHelper.writeLong(out, 1, getType());
-            DataHelper.writeLong(out, 4, _uniqueId);
-            DataHelper.writeDate(out, _expiration);
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Writing bytes: type = " + getType() + " / uniqueId : " + _uniqueId + " / expiration : " + _expiration);
-            byte[] data = writeMessage();
-            DataHelper.writeLong(out, 2, data.length);
-            Hash h = _context.sha().calculateHash(data);
-            h.writeBytes(out);
-            out.write(data);
-        } catch (I2NPMessageException ime) {
-            throw new DataFormatException("Error writing out the I2NP message data", ime);
-        }
+        int size = getMessageSize();
+        if (size < 47) throw new DataFormatException("Unable to build the message");
+        byte buf[] = new byte[size];
+        int read = toByteArray(buf);
+        if (read < 0)
+        out.write(buf, 0, read);
     }
     
     /**
@@ -122,14 +114,76 @@ public abstract class I2NPMessageImpl extends DataStructureImpl implements I2NPM
     public Date getMessageExpiration() { return _expiration; }
     public void setMessageExpiration(Date exp) { _expiration = exp; }
     
-    public int getSize() { 
-        try {
-            byte msg[] = writeMessage();
-            return msg.length + 43;
-        } catch (IOException ioe) {
-            return 0;
-        } catch (I2NPMessageException ime) {
-            return 0;
+    public synchronized int getMessageSize() { 
+        return calculateWrittenLength()+47; // 47 bytes in the header
+    }
+    
+    public byte[] toByteArray() {
+        byte data[] = new byte[getMessageSize()];
+        int written = toByteArray(data);
+        if (written != data.length) {
+            _log.error("Error writing out " + data.length + " for " + getClass().getName());
+            return null;
         }
+        return data;
+    }
+    
+    public int toByteArray(byte buffer[]) {
+        long start = _context.clock().now();
+
+        byte prefix[][] = new byte[][] { DataHelper.toLong(1, getType()), 
+                                         DataHelper.toLong(4, _uniqueId),
+                                         DataHelper.toDate(_expiration),
+                                         new byte[2], 
+                                         new byte[Hash.HASH_LENGTH]};
+        byte suffix[][] = new byte[][] { };
+        try {
+            int writtenLen = toByteArray(buffer, prefix, suffix);
+
+            int prefixLen = 1+4+8+2+Hash.HASH_LENGTH;
+            int suffixLen = 0;
+            int payloadLen = writtenLen  - prefixLen - suffixLen;
+            Hash h = _context.sha().calculateHash(buffer, prefixLen, payloadLen);
+
+            byte len[] = DataHelper.toLong(2, payloadLen);
+            buffer[1+4+8] = len[0];
+            buffer[1+4+8+1] = len[1];
+            for (int i = 0; i < Hash.HASH_LENGTH; i++)
+                System.arraycopy(h.getData(), 0, buffer, 1+4+8+2, Hash.HASH_LENGTH);
+
+            long time = _context.clock().now() - start;
+            if (time > 50)
+                _context.statManager().addRateData("i2np.writeTime", time, time);
+
+            return writtenLen;                     
+        } catch (I2NPMessageException ime) {
+            _context.logManager().getLog(getClass()).error("Error writing", ime);
+            throw new IllegalStateException("Unable to serialize the message: " + ime.getMessage());
+        }
+    }
+    
+    /** calculate the message body's length (not including the header and footer */
+    protected abstract int calculateWrittenLength();
+    /** 
+     * write the message body to the output array, starting at the given index.
+     * @return the index into the array after the last byte written
+     */
+    protected abstract int writeMessageBody(byte out[], int curIndex) throws I2NPMessageException;
+    
+    protected int toByteArray(byte out[], byte[][] prefix, byte[][] suffix) throws I2NPMessageException {
+        int curIndex = 0;
+        for (int i = 0; i < prefix.length; i++) {
+            System.arraycopy(prefix[i], 0, out, curIndex, prefix[i].length);
+            curIndex += prefix[i].length;
+        }
+        
+        curIndex = writeMessageBody(out, curIndex);
+        
+        for (int i = 0; i < suffix.length; i++) {
+            System.arraycopy(suffix[i], 0, out, curIndex, suffix[i].length);
+            curIndex += suffix[i].length;
+        }
+        
+        return curIndex;
     }
 }

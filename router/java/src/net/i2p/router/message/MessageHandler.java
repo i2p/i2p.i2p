@@ -135,22 +135,16 @@ class MessageHandler {
             _log.info("Handle " + message.getClass().getName() + " to send to remote tunnel " 
                       + tunnelId.getTunnelId() + " on router " + to.toBase64());
         TunnelMessage msg = new TunnelMessage(_context);
-        ByteArrayOutputStream baos = new ByteArrayOutputStream(1024);
-        try {
-            message.writeBytes(baos);
-            msg.setData(baos.toByteArray());
-            msg.setTunnelId(tunnelId);
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Placing message of type " + message.getClass().getName() 
-                           + " into the new tunnel message bound for " + tunnelId.getTunnelId() 
-                           + " on " + to.toBase64());
-            _context.jobQueue().addJob(new SendMessageDirectJob(_context, msg, to, (int)timeoutMs, priority));
+        msg.setData(message.toByteArray());
+        msg.setTunnelId(tunnelId);
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("Placing message of type " + message.getClass().getName() 
+                       + " into the new tunnel message bound for " + tunnelId.getTunnelId() 
+                       + " on " + to.toBase64());
+        _context.jobQueue().addJob(new SendMessageDirectJob(_context, msg, to, (int)timeoutMs, priority));
 
-            String bodyType = message.getClass().getName();
-            _context.messageHistory().wrap(bodyType, message.getUniqueId(), TunnelMessage.class.getName(), msg.getUniqueId());	
-        } catch (Exception e) {
-            _log.warn("Unable to forward on according to the instructions to the remote tunnel", e);
-        }
+        String bodyType = message.getClass().getName();
+        _context.messageHistory().wrap(bodyType, message.getUniqueId(), TunnelMessage.class.getName(), msg.getUniqueId());	
     }
     
     private void handleLocalDestination(DeliveryInstructions instructions, I2NPMessage message, Hash fromHash) {
