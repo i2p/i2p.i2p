@@ -1,4 +1,11 @@
-$Id: history.txt,v 1.182 2005/03/26 02:13:38 jrandom Exp $
+$Id: history.txt,v 1.183 2005/03/29 19:07:40 jrandom Exp $
+
+2005-04-01  jrandom
+    * Fix to check for missing news file (thanks smeghead!)
+    * Added destination display CLI:
+      java -cp lib/i2p.jar net.i2p.data.Destination privKeyFilename
+    * Added destination display to the web interface (thanks pnspns)
+    * Installed CIA backdoor
 
 * 2005-03-29  0.5.0.5 released
 

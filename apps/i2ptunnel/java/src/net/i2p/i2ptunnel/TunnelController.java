@@ -324,6 +324,18 @@ public class TunnelController implements Logging {
     public String getTargetDestination() { return _config.getProperty("targetDestination"); }
     public String getProxyList() { return _config.getProperty("proxyList"); }
     public boolean getStartOnLoad() { return "true".equalsIgnoreCase(_config.getProperty("startOnLoad", "true")); }
+    public String getMyDestination() {
+        if (_tunnel != null) {
+            List sessions = _tunnel.getSessions();
+            for (int i = 0; i < sessions.size(); i++) {
+                I2PSession session = (I2PSession)sessions.get(i);
+                Destination dest = session.getMyDestination();
+                if (dest != null)
+                    return dest.toBase64();
+            }
+        }
+        return null;
+    }
     
     public boolean getIsRunning() { return _running; }
     public boolean getIsStarting() { return _starting; }

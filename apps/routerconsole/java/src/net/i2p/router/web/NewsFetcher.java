@@ -33,6 +33,10 @@ public class NewsFetcher implements Runnable, EepGet.StatusListener {
         _context = ctx;
         _log = ctx.logManager().getLog(NewsFetcher.class);
         _instance = this;
+        updateLastFetched();
+    }
+    
+    private void updateLastFetched() {
         File news = new File(NEWS_FILE);
         if (news.exists())
             _lastFetch = news.lastModified();
@@ -58,6 +62,7 @@ public class NewsFetcher implements Runnable, EepGet.StatusListener {
     }
     
     private boolean shouldFetchNews() {
+        updateLastFetched();
         String freq = _context.getProperty(ConfigUpdateHandler.PROP_REFRESH_FREQUENCY);
         if (freq == null)
             freq = ConfigUpdateHandler.DEFAULT_REFRESH_FREQUENCY;

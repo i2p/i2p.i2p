@@ -12,6 +12,7 @@ package net.i2p.data;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.FileInputStream;
 
 import net.i2p.util.Log;
 
@@ -154,5 +155,23 @@ public class Destination extends DataStructureImpl {
     public Hash calculateHash() {
         if (__calculatedHash == null) __calculatedHash = super.calculateHash();
         return __calculatedHash;
+    }
+    
+    public static void main(String args[]) {
+        if (args.length == 0) {
+            System.err.println("Usage: Destination filename");
+        } else {
+            FileInputStream in = null;
+            try {
+                in = new FileInputStream(args[0]);
+                Destination d = new Destination();
+                d.readBytes(in);
+                System.out.println(d.toBase64());
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                if (in != null) try { in.close(); } catch (IOException ioe) {}
+            }
+        }
     }
 }

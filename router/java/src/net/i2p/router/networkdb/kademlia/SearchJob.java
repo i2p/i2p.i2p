@@ -204,8 +204,12 @@ class SearchJob extends JobImpl {
                                   + peer + " : " + (ds == null ? "null" : ds.getClass().getName()));
                     _state.replyTimeout(peer);
                 } else {
-                    sendSearch((RouterInfo)ds);
-                    sent++;
+                    if (getContext().shitlist().isShitlisted(peer)) {
+                        // dont bother
+                    } else {
+                        sendSearch((RouterInfo)ds);
+                        sent++;
+                    }
                 }
             }
             if (sent <= 0) {

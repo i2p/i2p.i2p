@@ -288,8 +288,10 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
                 getContext().statManager().addRateData("client.leaseSetFailedRemoteTime", lookupTime, lookupTime);
             }
             
-            if (_log.shouldLog(Log.ERROR))
-                _log.error("Unable to send to " + _toString + " because we couldn't find their leaseSet");
+            if (!_finished) {
+                if (_log.shouldLog(Log.ERROR))
+                    _log.error("Unable to send to " + _toString + " because we couldn't find their leaseSet");
+            }
 
             dieFatal();
         }

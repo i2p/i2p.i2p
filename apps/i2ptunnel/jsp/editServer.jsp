@@ -110,6 +110,10 @@ Port: <input type="text" size="4" maxlength="4" name="targetPort" value="<%=edit
 </td>
 </tr>
 <tr>
+<td valign="top" align="left"><b>Local destination:</b><br /><i>(if known)</i></td>
+<td valign="top" align="left"><input type="text" size="60" value="<%=editBean.getDestinationBase64(curTunnel)%>" /></td>
+</tr>
+<tr>
 <td colspan="2" align="center">
 <b><hr size="1">
 Advanced networking options<br />
