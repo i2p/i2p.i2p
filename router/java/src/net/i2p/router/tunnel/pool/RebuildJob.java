@@ -11,20 +11,18 @@ import net.i2p.router.tunnel.TunnelCreatorConfig;
  */
 class RebuildJob extends JobImpl {
     private TunnelPool _pool;
-    private Object _buildToken;
     private TunnelCreatorConfig _cfg;
     
-    public RebuildJob(RouterContext ctx, TunnelCreatorConfig cfg, TunnelPool pool, Object buildToken) {
+    public RebuildJob(RouterContext ctx, TunnelCreatorConfig cfg, TunnelPool pool) {
         super(ctx);
         _pool = pool;
         _cfg = cfg;
-        _buildToken = buildToken;
         long rebuildOn = cfg.getExpiration() - pool.getSettings().getRebuildPeriod();
         rebuildOn -= ctx.random().nextInt(pool.getSettings().getRebuildPeriod()*2);
         getTiming().setStartAfter(rebuildOn);
     }
     public String getName() { return "Rebuild tunnel"; }
     public void runJob() {
-        _pool.getBuilder().buildTunnel(getContext(), _pool, _buildToken);
+        _pool.getBuilder().buildTunnel(getContext(), _pool);
     }
 }

@@ -30,14 +30,6 @@ public class TunnelPool {
     private boolean _alive;
     private long _lifetimeProcessed;
     
-    /** 
-     * list of pool tokens (Object) passed around during building/rebuilding/etc.
-     * if/when the token is removed from this list, that sequence of building/rebuilding/etc
-     * should cease (though others may continue).
-     *
-     */
-    private List _tokens;
-    
     public TunnelPool(RouterContext ctx, TunnelPoolManager mgr, TunnelPoolSettings settings, TunnelPeerSelector sel, TunnelBuilder builder) {
         _context = ctx;
         _log = ctx.logManager().getLog(TunnelPool.class);
@@ -46,7 +38,6 @@ public class TunnelPool {
         _tunnels = new ArrayList(settings.getLength() + settings.getBackupQuantity());
         _peerSelector = sel;
         _builder = builder;
-        _tokens = new ArrayList(settings.getBackupQuantity() + settings.getQuantity());
         _alive = false;
         _lifetimeProcessed = 0;
         refreshSettings();
@@ -70,102 +61,39 @@ public class TunnelPool {
     }
     public void shutdown() {
         _alive = false;
-        synchronized (_tokens) { _tokens.clear(); }
+    }
+
+    private int countUsableTunnels() {
+        int valid = 0;
+        synchronized (_tunnels) {
+            for (int i = 0; i < _tunnels.size(); i++) {
+                TunnelInfo info = (TunnelInfo)_tunnels.get(i);
+                if (info.getExpiration() > _context.clock().now() + 3*_settings.getRebuildPeriod())
+                    valid++;
+            }
+        }
+        return valid;
     }
     
-    private int refreshBuilders() {
+    /**
+     * Fire up as many buildTunnel tasks as necessary, returning how many
+     * were added
+     *
+     */
+    int refreshBuilders() {
+        if (!_alive) return 0;
         // only start up new build tasks if we need more of 'em
         int target = _settings.getQuantity() + _settings.getBackupQuantity();
-        int oldTokenCount = 0;
-        List newTokens = null;
-        synchronized (_tokens) {
-            oldTokenCount = _tokens.size();
-            while (_tokens.size() > target)
-                _tokens.remove(0);
-            if (_tokens.size() < target) {
-                int wanted = target - _tokens.size();
-                newTokens = new ArrayList(wanted);
-                for (int i = 0; i < wanted; i++) {
-                    Object token = new Object();
-                    newTokens.add(token);
-                    _tokens.add(token);
-                }
-            }
-        }
+        int usableTunnels = countUsableTunnels();
         
-        if (newTokens != null) {
-            if (_log.shouldLog(Log.INFO))
-                _log.info(toString() + ": refreshing builders, previously had " + oldTokenCount 
+        if ( (target > usableTunnels) && (_log.shouldLog(Log.INFO)) )
+            _log.info(toString() + ": refreshing builders, previously had " + usableTunnels
                           + ", want a total of " + target + ", creating " 
-                          + newTokens.size() + " new ones.");
-            for (int i = 0; i < newTokens.size(); i++) {
-                Object token = newTokens.get(i);
-                if (_log.shouldLog(Log.DEBUG))
-                    _log.debug(toString() + ": Building a tunnel with the token " + token);
-                _builder.buildTunnel(_context, this, token);
-            }
-            return newTokens.size();
-        } else {
-            return 0;
-        }
-    }
-    
-    /** do we still need this sequence of build/rebuild/etc to continue? */
-    public boolean keepBuilding(Object token) {
-        boolean connected = true;
-        boolean rv = false;
-        int remaining = 0;
-        int wanted = _settings.getQuantity() + _settings.getBackupQuantity();
-        if ( (_settings.getDestination() != null) && (!_context.clientManager().isLocal(_settings.getDestination())) )
-            connected = false;
-        synchronized (_tokens) {
-            if (!connected) {
-                // client disconnected, so stop rebuilding this series
-                _tokens.remove(token);
-                rv = false;
-            } else {
-                rv = _tokens.contains(token); 
-            }
-            remaining = _tokens.size();
-        } 
+                          + (target-usableTunnels) + " new ones.");
+        for (int i = usableTunnels; i < target; i++)
+            _builder.buildTunnel(_context, this);
         
-        if (remaining <= 0) {
-            _manager.removeTunnels(_settings.getDestination());
-        }
-        
-        if (!rv) {
-            if (_log.shouldLog(Log.INFO))
-                _log.info(toString() + ": keepBuilding does NOT want building to continue (want " 
-                          + wanted + ", have " + remaining);
-        } else {
-            boolean needed = true;
-            int valid = 0;
-            synchronized (_tunnels) {
-                if (_tunnels.size() > wanted) {
-                    for (int i = 0; i < _tunnels.size(); i++) {
-                        TunnelInfo info = (TunnelInfo)_tunnels.get(i);
-                        if (info.getExpiration() > _context.clock().now() + 3*_settings.getRebuildPeriod()) {
-                            valid++;
-                            if (valid >= wanted*2)
-                                break;
-                        }
-                    }
-                    if (valid >= wanted*2)
-                        needed = false;
-                }
-            }
-
-            if (!needed) {
-                if (_log.shouldLog(Log.WARN))
-                    _log.warn(toString() + ": keepBuilding wants building to continue, but not "
-                              + " with the current object... # tunnels = " + valid + ", wanted = " + wanted);
-                synchronized (_tokens) {
-                    _tokens.remove(token);
-                }
-                return false;
-            }
-        }
-        return rv;
+        return (target > usableTunnels ? target-usableTunnels : 0);
     }
     
     void refreshSettings() {
@@ -210,7 +138,7 @@ public class TunnelPool {
         }
         
         if (_alive && _settings.getAllowZeroHop())
-            buildFake();
+            buildFallback();
         if (allowRecurseOnFail)
             return selectTunnel(false); 
         else
@@ -244,6 +172,8 @@ public class TunnelPool {
         }
     }
     
+    int getTunnelCount() { synchronized (_tunnels) { return _tunnels.size(); } }
+    
     public TunnelBuilder getBuilder() { return _builder; }
     public TunnelPoolSettings getSettings() { return _settings; }
     public void setSettings(TunnelPoolSettings settings) { 
@@ -274,6 +204,8 @@ public class TunnelPool {
         
         if (ls != null)
             _context.clientManager().requestLeaseSet(_settings.getDestination(), ls);
+        
+        refreshBuilders();
     }
     
     public void removeTunnel(TunnelInfo info) {
@@ -298,8 +230,16 @@ public class TunnelPool {
                     _log.warn(toString() + ": unable to build a new leaseSet on removal (" + remaining 
                               + " remaining), request a new tunnel");
                 if (_settings.getAllowZeroHop())
-                    buildFake();
+                    buildFallback();
             }
+        }
+
+        boolean connected = true;
+        if ( (_settings.getDestination() != null) && (!_context.clientManager().isLocal(_settings.getDestination())) )
+            connected = false;
+        if ( (getTunnelCount() <= 0) && (!connected) ) {
+            _manager.removeTunnels(_settings.getDestination());
+            return;
         }
         refreshBuilders();
     }
@@ -326,7 +266,7 @@ public class TunnelPool {
                     _log.warn(toString() + ": unable to build a new leaseSet on failure (" + remaining 
                               + " remaining), request a new tunnel");
                 if (remaining < _settings.getBackupQuantity() + _settings.getQuantity())
-                    buildFake(false);
+                    buildFallback();
             }
         }
         refreshBuilders();
@@ -350,43 +290,23 @@ public class TunnelPool {
                               + " remaining), request a new tunnel");
                 if ( (remaining < _settings.getBackupQuantity() + _settings.getQuantity()) 
                    && (_settings.getAllowZeroHop()) )
-                        buildFake();
+                        buildFallback();
             }
         }
     }
 
-    void buildFake() { buildFake(true); }
-    void buildFake(boolean zeroHop) {
+    void buildFallback() {
         int quantity = _settings.getBackupQuantity() + _settings.getQuantity();
-        boolean needed = true;
-        synchronized (_tunnels) {
-            if (_tunnels.size() > quantity) {
-                int valid = 0;
-                for (int i = 0; i < _tunnels.size(); i++) {
-                    TunnelInfo info = (TunnelInfo)_tunnels.get(i);
-                    if (info.getExpiration() > _context.clock().now() + 3*_settings.getRebuildPeriod()) {
-                        valid++;
-                        if (valid >= quantity)
-                            break;
-                    }
-                }
-                if (valid >= quantity)
-                    needed = false;
-            }
-        }
-        
-        if (!needed) return;
+        int usable = countUsableTunnels();
+        if (usable >= quantity) return;
 
         if (_log.shouldLog(Log.INFO))
-            _log.info(toString() + ": building a fake tunnel (allow zeroHop? " + zeroHop + ")");
-        Object tempToken = new Object();
-        synchronized (_tokens) {
-            _tokens.add(tempToken);
-        }
-        _builder.buildTunnel(_context, this, zeroHop, tempToken);
-        synchronized (_tokens) {
-            _tokens.remove(tempToken);
-        }
+            _log.info(toString() + ": building a fallback tunnel (usable: " + usable + " needed: " + quantity + ")");
+        if ( (usable == 0) && (_settings.getAllowZeroHop()) )
+            _builder.buildTunnel(_context, this, true);
+        else
+            _builder.buildTunnel(_context, this);
+        refreshBuilders();
     }
     
     /**

@@ -24,19 +24,17 @@ import net.i2p.util.Log;
 class TestJob extends JobImpl {
     private Log _log;
     private TunnelPool _pool;
-    private Object _buildToken;
     private PooledTunnelCreatorConfig _cfg;
     private boolean _found;
     
     /** base to randomize the test delay on */
     private static final int TEST_DELAY = 60*1000;
     
-    public TestJob(RouterContext ctx, PooledTunnelCreatorConfig cfg, TunnelPool pool, Object buildToken) {
+    public TestJob(RouterContext ctx, PooledTunnelCreatorConfig cfg, TunnelPool pool) {
         super(ctx);
         _log = ctx.logManager().getLog(TestJob.class);
         _pool = pool;
         _cfg = cfg;
-        _buildToken = buildToken;
         getTiming().setStartAfter(getDelay() + ctx.clock().now());
         ctx.statManager().createRateStat("tunnel.testFailedTime", "How long did the failure take (max of 60s for full timeout)?", "Tunnels", 
                                          new long[] { 10*60*1000l, 60*60*1000l, 3*60*60*1000l, 24*60*60*1000l });

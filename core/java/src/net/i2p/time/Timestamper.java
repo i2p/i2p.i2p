@@ -144,7 +144,7 @@ public class Timestamper implements Runnable {
      * True if the time was queried successfully, false if it couldn't be
      */
     private boolean queryTime(String serverList[]) throws IllegalArgumentException {
-        long found[] = new long[serverList.length];
+        long found[] = new long[_concurringServers];
         long localTime = -1;
         long now = -1;
         long expectedDelta = 0;

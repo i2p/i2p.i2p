@@ -132,6 +132,8 @@ public class SAMStreamSession {
         if (socketMgr == null) {
             throw new SAMException("Error creating I2PSocketManager");
         }
+        
+        socketMgr.addDisconnectListener(new DisconnectListener());
 
         forceFlush = Boolean.valueOf(allprops.getProperty(PROP_FORCE_FLUSH, DEFAULT_FORCE_FLUSH)).booleanValue();
         
@@ -154,6 +156,12 @@ public class SAMStreamSession {
             Thread t = new I2PThread(server, "SAMStreamSessionServer");
 
             t.start();
+        }
+    }
+    
+    private class DisconnectListener implements I2PSocketManager.DisconnectListener {
+        public void sessionDisconnected() {
+            close();
         }
     }
 

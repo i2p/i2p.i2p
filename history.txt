@@ -1,4 +1,12 @@
-$Id: history.txt,v 1.151 2005/02/22 02:07:34 jrandom Exp $
+$Id: history.txt,v 1.152 2005/02/22 18:13:00 jrandom Exp $
+
+2005-02-22  jrandom
+    * Reworked the tunnel (re)building process to remove the tokens and 
+      provide cleaner controls on the tunnels built.
+    * Fixed situations where the timestamper wanted to test more servers than
+      were provided (thanks Tracker!)
+    * Get rid of the dead SAM sessions by using the streaming lib's callbacks
+      (thanks Tracker!)
 
 2005-02-22  jrandom
     * Temporary workaround for the I2CP disconnect bug (have the streaminglib

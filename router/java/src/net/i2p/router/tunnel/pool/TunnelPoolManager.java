@@ -26,12 +26,14 @@ import net.i2p.router.TunnelInfo;
 import net.i2p.router.TunnelManagerFacade;
 import net.i2p.router.TunnelPoolSettings;
 import net.i2p.router.tunnel.HopConfig;
+import net.i2p.util.Log;
 
 /**
  * 
  */
 public class TunnelPoolManager implements TunnelManagerFacade {
     private RouterContext _context;
+    private Log _log;
     /** Hash (destination) to TunnelPool */
     private Map _clientInboundPools;
     /** Hash (destination) to TunnelPool */
@@ -41,6 +43,7 @@ public class TunnelPoolManager implements TunnelManagerFacade {
     
     public TunnelPoolManager(RouterContext ctx) {
         _context = ctx;
+        _log = ctx.logManager().getLog(TunnelPoolManager.class);
         
         HandlerJobBuilder builder = new HandleTunnelCreateMessageJob.Builder(ctx);
         ctx.inNetMessagePool().registerHandlerJobBuilder(TunnelCreateMessage.MESSAGE_TYPE, builder);
@@ -63,7 +66,7 @@ public class TunnelPoolManager implements TunnelManagerFacade {
     public TunnelInfo selectInboundTunnel() { 
         TunnelInfo info = _inboundExploratory.selectTunnel(); 
         if (info == null) {
-            _inboundExploratory.buildFake();
+            _inboundExploratory.buildFallback();
             // still can be null, but probably not
             info = _inboundExploratory.selectTunnel();
         }
@@ -80,6 +83,9 @@ public class TunnelPoolManager implements TunnelManagerFacade {
         if (pool != null) {
             return pool.selectTunnel();
         }
+        if (_log.shouldLog(Log.CRIT))
+            _log.log(Log.CRIT, "wtf, want the inbound tunnel for " + destination.calculateHash().toBase64() +
+                     " but there isn't a pool?");
         return null;
     }
     
@@ -87,7 +93,7 @@ public class TunnelPoolManager implements TunnelManagerFacade {
     public TunnelInfo selectOutboundTunnel() { 
         TunnelInfo info = _outboundExploratory.selectTunnel();
         if (info == null) {
-            _outboundExploratory.buildFake();
+            _outboundExploratory.buildFallback();
             // still can be null, but probably not
             info = _outboundExploratory.selectTunnel();
         }
@@ -224,6 +230,10 @@ public class TunnelPoolManager implements TunnelManagerFacade {
     
     public void removeTunnels(Hash destination) {
         if (destination == null) return;
+        if (_context.clientManager().isLocal(destination)) {
+            if (_log.shouldLog(Log.CRIT))
+                _log.log(Log.CRIT, "wtf, why are you removing the pool for " + destination.toBase64(), new Exception("i did it"));
+        }
         TunnelPool inbound = null;
         TunnelPool outbound = null;
         synchronized (_clientInboundPools) {
@@ -268,7 +278,7 @@ public class TunnelPoolManager implements TunnelManagerFacade {
         }
         public String getName() { return "Bootstrap tunnel pool"; }
         public void runJob() {
-            _pool.buildFake(false);
+            _pool.buildFallback();
         }
     }
     

@@ -27,50 +27,42 @@ public class TunnelBuilder {
      * jobs are built.  This call does not block.
      *
      */
-    public void buildTunnel(RouterContext ctx, TunnelPool pool, Object poolToken) {
-        buildTunnel(ctx, pool, false, poolToken);
+    public void buildTunnel(RouterContext ctx, TunnelPool pool) {
+        buildTunnel(ctx, pool, false);
     }
-    public void buildTunnel(RouterContext ctx, TunnelPool pool, boolean fake, Object poolToken) {
-        if (!pool.keepBuilding(poolToken))
-            return;
-        
+    public void buildTunnel(RouterContext ctx, TunnelPool pool, boolean zeroHop) {
         // this is probably overkill (ya think?)
         pool.refreshSettings();
         
-        PooledTunnelCreatorConfig cfg = configTunnel(ctx, pool, fake);
-        if ( (cfg == null) && (!fake) ) {
-            RetryJob j = new RetryJob(ctx, pool, poolToken);
+        PooledTunnelCreatorConfig cfg = configTunnel(ctx, pool, zeroHop);
+        if (cfg == null) {
+            RetryJob j = new RetryJob(ctx, pool);
             j.getTiming().setStartAfter(ctx.clock().now() + ctx.random().nextInt(30*1000));
             ctx.jobQueue().addJob(j);
             return;
         }
-        OnCreatedJob onCreated = new OnCreatedJob(ctx, pool, cfg, fake, poolToken);
-        RetryJob onFailed= (fake ? null : new RetryJob(ctx, pool, poolToken));
+        OnCreatedJob onCreated = new OnCreatedJob(ctx, pool, cfg);
+        RetryJob onFailed= (zeroHop ? null : new RetryJob(ctx, pool));
         // queue up a job to request the endpoint to join the tunnel, which then
         // requeues up another job for earlier hops, etc, until it reaches the 
         // gateway.  after the gateway is confirmed, onCreated is fired
-        RequestTunnelJob req = new RequestTunnelJob(ctx, cfg, onCreated, onFailed, cfg.getLength()-1, fake, pool.getSettings().isExploratory());
-        if (fake) // lets get it done inline, as we /need/ it asap
+        RequestTunnelJob req = new RequestTunnelJob(ctx, cfg, onCreated, onFailed, cfg.getLength()-1, zeroHop, pool.getSettings().isExploratory());
+        if (zeroHop || (cfg.getLength() <= 1) ) // lets get it done inline, as we /need/ it asap
             req.runJob();
         else
             ctx.jobQueue().addJob(req);
     }
     
-    private PooledTunnelCreatorConfig configTunnel(RouterContext ctx, TunnelPool pool, boolean fake) {
+    private PooledTunnelCreatorConfig configTunnel(RouterContext ctx, TunnelPool pool, boolean zeroHop) {
         Log log = ctx.logManager().getLog(TunnelBuilder.class);
         TunnelPoolSettings settings = pool.getSettings();
         long expiration = ctx.clock().now() + settings.getDuration();
         List peers = null;
         
-        long failures = countFailures(ctx);
-        boolean failing = (failures > 5) && (pool.getSettings().getAllowZeroHop());
-        boolean failsafe = false;
-        if (failing && (ctx.random().nextInt(100) < failures) )
-            failsafe = true;
-        if (fake || failsafe) {
+        if (zeroHop) {
             peers = new ArrayList(1);
             peers.add(ctx.routerHash());
-            if ( (failsafe) && (log.shouldLog(Log.WARN)) )
+            if (log.shouldLog(Log.WARN))
                 log.warn("Building failsafe tunnel for " + pool);
         } else {
             peers = pool.getSelector().selectPeers(ctx, settings);
@@ -80,10 +72,10 @@ public class TunnelBuilder {
             // the pool is refusing 0 hop tunnels
             if (peers == null) {
                 if (log.shouldLog(Log.ERROR))
-                    log.error("No peers to put in the new tunnel! selectPeers returned null!  boo, hiss!  fake=" + fake);
+                    log.error("No peers to put in the new tunnel! selectPeers returned null!  boo, hiss!  fake=" + zeroHop);
             } else {
                 if (log.shouldLog(Log.ERROR))
-                    log.error("No peers to put in the new tunnel! selectPeers returned an empty list?!  fake=" + fake);
+                    log.error("No peers to put in the new tunnel! selectPeers returned an empty list?!  fake=" + zeroHop);
             }
             return null;
         }
@@ -108,36 +100,20 @@ public class TunnelBuilder {
         return cfg;
     }
     
-    private long countFailures(RouterContext ctx) {
-        RateStat rs = ctx.statManager().getRate("tunnel.testFailedTime");
-        if (rs == null) 
-            return 0;
-        Rate r = rs.getRate(10*60*1000);
-        if (r == null) 
-            return 0;
-        else 
-            return r.getCurrentEventCount();
-    }
-    
     /** 
      * If the building fails, try, try again.
      *
      */
     private class RetryJob extends JobImpl {
         private TunnelPool _pool;
-        private Object _buildToken;
-        public RetryJob(RouterContext ctx, TunnelPool pool, Object buildToken) {
+        public RetryJob(RouterContext ctx, TunnelPool pool) {
             super(ctx);
             _pool = pool;
-            _buildToken = buildToken;
         }
-        public String getName() { return "tunnel create failed"; }
+        public String getName() { return "Tunnel create failed"; }
         public void runJob() {
             // yikes, nothing left, lets get some backup (if we're allowed)
-            if ( (_pool.selectTunnel() == null) && (_pool.getSettings().getAllowZeroHop()) )
-                _pool.buildFake();
-            
-            buildTunnel(getContext(), _pool, _buildToken);
+            _pool.refreshBuilders();
         }
     }
 }
