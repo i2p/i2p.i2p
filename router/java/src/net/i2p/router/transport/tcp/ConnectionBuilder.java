@@ -104,7 +104,8 @@ public class ConnectionBuilder {
         try {
             return doEstablishConnection();
         } catch (Exception e) { // catchall in case the timeout gets us flat footed
-            fail("Error connecting", e);
+            if (_socket != null)
+                fail("Error connecting", e);
             return null;
         }
     }
