@@ -7,6 +7,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+import net.i2p.util.Log;
+
 /**
  * Encodes and decodes to and from Base64 notation.
  *
@@ -37,6 +39,9 @@ import java.io.OutputStream;
  * @version 1.3.4
  */
 public class Base64 {
+
+    private final static Log _log = new Log(Base64.class);
+
     public static String encode(byte[] source) {
         return safeEncode(source);
     }
@@ -579,7 +584,7 @@ public class Base64 {
 
             } // end if: white space, equals sign or better
             else {
-                System.err.println("Bad Base64 input character at " + i + ": " + source[i] + "(decimal)");
+                _log.warn("Bad Base64 input character at " + i + ": " + source[i] + "(decimal)");
                 return null;
             } // end else: 
         } // each input character
