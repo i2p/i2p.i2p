@@ -153,6 +153,8 @@ public class I2NPMessageReader {
                 return 0;
             } else {
                 boolean shouldLag = _context.random().nextInt(1000) > size;
+                if (!shouldLag) return 0;
+                
                 long readLag = getReadLag();
                 if (readLag > 0) {
                     long lag = _context.random().nextLong(readLag);

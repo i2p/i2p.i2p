@@ -1,4 +1,10 @@
-$Id: history.txt,v 1.60 2004/11/01 08:31:31 jrandom Exp $
+$Id: history.txt,v 1.61 2004/11/02 03:27:56 jrandom Exp $
+
+2004-11-02  jrandom
+    * Fix for a long standing synchronization bug in the JobQueue (and added
+      some kooky flags to make sure it stays dead)
+    * Update the ministreaming lib to force mode=guaranteed if the default
+      lib is used, and mode=best_effort for all other libs.
 
 2004-11-02  jrandom
     * Fixed up the configuration overrides for the streaming socket lib 

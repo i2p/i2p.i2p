@@ -89,7 +89,8 @@ public class I2PSocketManagerFactory {
             if (!opts.containsKey(name))
                 opts.setProperty(name, System.getProperty(name));
         }
-        if (true) {
+        boolean oldLib = DEFAULT_MANAGER.equals(opts.getProperty(PROP_MANAGER, DEFAULT_MANAGER));
+        if (oldLib) {
             // for the old streaming lib
             opts.setProperty(I2PClient.PROP_RELIABILITY, I2PClient.PROP_RELIABILITY_GUARANTEED);
             //opts.setProperty("tunnels.depthInbound", "0");

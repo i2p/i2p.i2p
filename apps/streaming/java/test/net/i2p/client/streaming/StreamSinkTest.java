@@ -1,28 +1,51 @@
 package net.i2p.client.streaming;
 
 /**
- *
+ * Usage: StreamSinkTest [(old|new) [#hops [#kb]]]
  */
 public class StreamSinkTest {
 /*    private static String HOST1 = "dev.i2p.net";
     private static String HOST2 = "dev.i2p.net";
     private static String PORT1 = "4101";
     private static String PORT2 = "4501";
-*/ /* */
+ /* 
     private static String HOST1 = "localhost";
     private static String HOST2 = "localhost";
     private static String PORT1 = "7654";
     private static String PORT2 = "7654";
-  /*  */ /*
+   */
     private static String HOST1 = "localhost";
     private static String HOST2 = "localhost";
     private static String PORT1 = "10001";
     private static String PORT2 = "11001";
-  */
+  /* */
     
     public static void main(String args[]) {
-        System.setProperty(I2PSocketManagerFactory.PROP_MANAGER, I2PSocketManagerFull.class.getName());
-        //System.setProperty("tunnels.depthInbound", "0");
+        boolean old = false;
+        int hops = 0;
+        int kb = 32*1024;
+        if (args.length > 0) {
+            if ("old".equals(args[0]))
+                old = true;
+        } 
+        if (args.length > 1) {
+            try { 
+                hops = Integer.parseInt(args[1]); 
+            } catch (NumberFormatException nfe) {
+                hops = 0;
+            }
+        }
+        if (args.length > 2) {
+            try {
+                kb = Integer.parseInt(args[2]);
+            } catch (NumberFormatException nfe) {
+                kb = 32*1024;
+            }
+        }
+        
+        if (!old)
+            System.setProperty(I2PSocketManagerFactory.PROP_MANAGER, I2PSocketManagerFull.class.getName());
+        System.setProperty("tunnels.depthInbound", ""+hops);
         
         new Thread(new Runnable() { 
             public void run() { 
@@ -32,10 +55,10 @@ public class StreamSinkTest {
         
         try { Thread.sleep(60*1000); } catch (Exception e) {}
         
-        //run(256, 10000);
+        //run(256, 1);
         //run(256, 1000);
-        //run(1024, 10);
-        run(32*1024, 1);
+        //run(4*1024, 10);
+        run(kb, 1);
         //run(1*1024, 1);
         //run("/home/jrandom/streamSinkTestDir/clientSink36766.dat", 1);
         //run(512*1024, 1);

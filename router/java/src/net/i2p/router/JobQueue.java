@@ -132,7 +132,6 @@ public class JobQueue {
         if (job instanceof JobImpl)
             ((JobImpl)job).addedToQueue();
 
-        boolean isReady = false;
         long numReady = 0;
         boolean alreadyExists = false;
         synchronized (_readyJobs) {
@@ -154,7 +153,9 @@ public class JobQueue {
                           + numReady + ": job = " + job);
             job.dropped();
             _context.statManager().addRateData("jobQueue.droppedJobs", 1, 1);
-            awaken(1);
+            synchronized (_readyJobs) {
+                _readyJobs.notifyAll();
+            }
             return;
         }
 
@@ -166,7 +167,7 @@ public class JobQueue {
                     ((JobImpl)job).madeReady();
                 synchronized (_readyJobs) {
                     _readyJobs.add(job);
-                    isReady = true;
+                    _readyJobs.notifyAll();
                 }
             } else {
                 synchronized (_timedJobs) {
@@ -177,11 +178,6 @@ public class JobQueue {
         } else {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Not adding already enqueued job " + job.getName());
-        }
-
-        if (isReady) {
-            // wake up at most one runner
-            awaken(1);
         }
 
         return;
@@ -246,11 +242,15 @@ public class JobQueue {
         }
         synchronized (_readyJobs) {
             _readyJobs.clear();
+            _readyJobs.notifyAll();
         }
     }
     
     void shutdown() { 
         _alive = false; 
+        synchronized (_readyJobs) {
+            _readyJobs.notifyAll();
+        }
         if (_log.shouldLog(Log.WARN)) {
             StringBuffer buf = new StringBuffer(1024);
             buf.append("current jobs: \n");
@@ -339,31 +339,13 @@ public class JobQueue {
      */
     Job getNext() {
         while (_alive) {
-            Job rv = null;
-            int ready = 0;
             synchronized (_readyJobs) {
-                ready = _readyJobs.size();
-                if (ready > 0)
-                    rv = (Job)_readyJobs.remove(0);
-            }
-            if (rv != null) {
-                // we found one, but there may be more, so wake up enough
-                // other runners
-                
-                //if (_log.shouldLog(Log.DEBUG))
-                //    _log.debug("Waking up " + (ready-1) + " job runners (and running one)");
-                //awaken(ready-1);
-                return rv;
-            } else {
-                if (_log.shouldLog(Log.DEBUG))
-                    _log.debug("No jobs pending, waiting");
-            }
-            
-            try {
-                synchronized (_runnerLock) {
-                    _runnerLock.wait();
+                if (_readyJobs.size() > 0) {
+                    return (Job)_readyJobs.remove(0);
+                } else {
+                    try { _readyJobs.wait(); } catch (InterruptedException ie) {}
                 }
-            } catch (InterruptedException ie) {}
+            }
         }
         if (_log.shouldLog(Log.WARN))
             _log.warn("No longer alive, returning null");
@@ -414,23 +396,6 @@ public class JobQueue {
     }
         
     void removeRunner(int id) { _queueRunners.remove(new Integer(id)); }
-
-    /**
-     * Notify a sufficient number of waiting runners, and if necessary, increase
-     * the number of runners (up to maxRunners)
-     *
-     */
-    private void awaken(int numMadeReady) {
-        // notify a sufficient number of waiting runners
-        //for (int i = 0; i < numMadeReady; i++) {
-        //    synchronized (_runnerLock) {
-        //        _runnerLock.notify();
-        //    }
-        //}
-        synchronized (_runnerLock) {
-            _runnerLock.notify();
-        }
-    }
     
     /**
      * Responsible for moving jobs from the timed queue to the ready queue, 
@@ -480,9 +445,8 @@ public class JobQueue {
                             // on some profiling data ;)
                             for (int i = 0; i < toAdd.size(); i++)
                                 _readyJobs.add(toAdd.get(i));
+                            _readyJobs.notifyAll();
                         }
-                        
-                        awaken(toAdd.size());
                     } else {
                         if (timeToWait < 100)
                             timeToWait = 100;
@@ -609,16 +573,15 @@ public class JobQueue {
         ArrayList justFinishedJobs = new ArrayList(4);
         out.write("<!-- jobQueue rendering -->\n");
         out.flush();
-        synchronized (_readyJobs) { readyJobs = new ArrayList(_readyJobs); }
-        out.write("<!-- jobQueue rendering: after readyJobs sync -->\n");
-        out.flush();
-        synchronized (_timedJobs) { timedJobs = new ArrayList(_timedJobs); }
-        out.write("<!-- jobQueue rendering: after timedJobs sync -->\n");
-        out.flush();
+        
+        int states[] = null;
         int numRunners = 0;
         synchronized (_queueRunners) {
-            for (Iterator iter = _queueRunners.values().iterator(); iter.hasNext();) {
+            states = new int[_queueRunners.size()];
+            int i = 0;
+            for (Iterator iter = _queueRunners.values().iterator(); iter.hasNext(); i++) {
                 JobQueueRunner runner = (JobQueueRunner)iter.next();
+                states[i] = runner.getState();
                 Job job = runner.getCurrentJob();
                 if (job != null) {
                     activeJobs.add(job);
@@ -630,13 +593,28 @@ public class JobQueue {
             numRunners = _queueRunners.size();
         }
         
-        out.write("<!-- jobQueue rendering: after queueRunners sync -->\n");
+        StringBuffer str = new StringBuffer(128);
+        str.append("<!-- after queueRunner sync: states: ");
+        for (int i = 0; states != null && i < states.length; i++)
+            str.append(states[i]).append(" ");
+        str.append(" -->\n");
+        out.write(str.toString());
+        out.flush();
+        
+        synchronized (_readyJobs) { readyJobs = new ArrayList(_readyJobs); }
+        out.write("<!-- jobQueue rendering: after readyJobs sync -->\n");
+        out.flush();
+        synchronized (_timedJobs) { timedJobs = new ArrayList(_timedJobs); }
+        out.write("<!-- jobQueue rendering: after timedJobs sync -->\n");
         out.flush();
         
         StringBuffer buf = new StringBuffer(32*1024);
         buf.append("<h2>JobQueue</h2>");
-        buf.append("# runners: ").append(numRunners);
-        buf.append("<br />\n");
+        buf.append("# runners: ").append(numRunners).append(" [states=");
+        if (states != null) 
+            for (int i = 0; i < states.length; i++) 
+                buf.append(states[i]).append(" ");
+        buf.append("]<br />\n");
 
         long now = _context.clock().now();
 
