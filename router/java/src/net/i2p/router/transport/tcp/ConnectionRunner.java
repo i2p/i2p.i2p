@@ -168,7 +168,7 @@ class ConnectionRunner implements Runnable {
                                             + " due to " + DataHelper.formatDuration(timeSinceWrite)
                                             + " of inactivity after " 
                                             + DataHelper.formatDuration(_con.getLifetime()));
-                _con.closeConnection();
+                _con.closeConnection(false);
                 return;
             }
             if (_lastTimeSend < _context.clock().now() - 2*TIME_SEND_FREQUENCY) 

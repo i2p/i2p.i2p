@@ -111,7 +111,8 @@ public class TCPConnection {
      * be called multiple times safely.
      *
      */
-    public synchronized void closeConnection() {
+    public synchronized void closeConnection() { closeConnection(true); }
+    public synchronized void closeConnection(boolean wasError) {
         if (_log.shouldLog(Log.INFO)) {
             if (_ident != null)
                 _log.info("Connection between " + _ident.getHash().toBase64().substring(0,6) 
@@ -140,10 +141,12 @@ public class TCPConnection {
             msg.timestamp("closeConnection");
             _transport.afterSend(msg, false, true, -1);
         }
-        _context.profileManager().commErrorOccurred(_ident.getHash());
-        _transport.addConnectionErrorMessage("Connection closed with "
-                                             + _ident.getHash().toBase64().substring(0,6)
-                                             + " after " + DataHelper.formatDuration(getLifetime()));
+        if (wasError) {
+            _context.profileManager().commErrorOccurred(_ident.getHash());
+            _transport.addConnectionErrorMessage("Connection closed with "
+                                                 + _ident.getHash().toBase64().substring(0,6)
+                                                 + " after " + DataHelper.formatDuration(getLifetime()));
+        }
         _transport.connectionClosed(this);
     }
     

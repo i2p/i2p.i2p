@@ -26,6 +26,7 @@
         <ant dir="apps/netmonitor/java/" target="jar" />
         <ant dir="apps/systray/java/" target="jar" />
         <ant dir="apps/routerconsole/java/" target="jar" />
+        <ant dir="apps/addressbook/" target="war" />
     </target>
     <target name="buildWEB">
         <ant dir="apps/jetty" target="fetchJettylib" />
@@ -55,6 +56,7 @@
         <copy file="apps/netmonitor/java/build/netmonitor.jar" todir="build/" />
         <copy file="apps/systray/java/build/systray.jar" todir="build/" />
         <copy file="installer/lib/jbigi/jbigi.jar" todir="build" />
+        <copy file="apps/addressbook/dist/addressbook.war" todir="build/" />
     </target>
     <target name="javadoc">
         <mkdir dir="./build" />
@@ -102,6 +104,7 @@
         <ant dir="apps/heartbeat/java/" target="distclean" />
         <ant dir="apps/netmonitor/java/" target="distclean" />
         <ant dir="apps/routerconsole/java/" target="distclean" />
+        <ant dir="apps/addressbook/" target="distclean" />
         <ant dir="apps/systray/java/" target="distclean" />
         <ant dir="installer/java/" target="distclean" />
         <delete>
@@ -178,6 +181,15 @@
         <copy file="build/xml-apis.jar" todir="pkg-temp/lib/" />
         <copy file="build/i2ptunnel.war" todir="pkg-temp/webapps/" />
         <copy file="build/routerconsole.war" todir="pkg-temp/webapps/" />
+
+	<!--
+        <mkdir dir="pkg-temp/addressbook" />
+        <copy file="apps/addressbook/config.txt" todir="pkg-temp/addressbook/" />
+        <copy file="apps/addressbook/myhosts.txt" todir="pkg-temp/addressbook/" />
+        <copy file="apps/addressbook/subscriptions.txt" todir="pkg-temp/addressbook/" />
+        <copy file="build/addressbook.war" todir="pkg-temp/webapps/" />
+	-->
+
         <copy file="installer/resources/clients.config" todir="pkg-temp/" />
         <copy file="installer/resources/i2prouter" todir="pkg-temp/" />
         <copy file="installer/resources/i2prouter.bat" todir="pkg-temp/" />
@@ -239,6 +251,12 @@
         <copy file="build/routerconsole.jar" todir="pkg-temp/lib/" />
         <copy file="build/i2ptunnel.war" todir="pkg-temp/webapps/" />
         <copy file="build/routerconsole.war" todir="pkg-temp/webapps/" />
+        
+	<!-- 
+	<mkdir dir="pkg-temp/addressbook" />
+        <copy file="build/addressbook.war" todir="pkg-temp/webapps/" />
+	-->
+
         <copy file="history.txt" todir="pkg-temp/" />
         <copy file="hosts.txt" todir="pkg-temp/" />
         <mkdir dir="pkg-temp/eepsite" />

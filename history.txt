@@ -1,4 +1,9 @@
-$Id: history.txt,v 1.119 2004/12/29 10:53:30 jrandom Exp $
+$Id: history.txt,v 1.120 2004/12/29 15:06:43 jrandom Exp $
+
+2004-12-29  jrandom
+    * Imported Ragnarok's addressbook source (2.0.2) which is built but not
+      deployed in the i2pinstall.jar/i2pupdate.zip (yet).
+    * Don't treat connection inactivity closure as a connection error.
 
 2004-12-29  jrandom
     * Add in a new keepalive event on each TCP connection, proactively sending
