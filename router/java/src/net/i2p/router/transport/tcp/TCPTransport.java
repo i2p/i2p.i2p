@@ -119,7 +119,9 @@ public class TCPTransport extends TransportImpl {
      * and it should not block
      */
     protected void outboundMessageReady() {
-        _context.jobQueue().addJob(new NextJob());
+        //_context.jobQueue().addJob(new NextJob());
+        NextJob j = new NextJob();
+        j.runJob();
     }
     
     private class NextJob extends JobImpl {

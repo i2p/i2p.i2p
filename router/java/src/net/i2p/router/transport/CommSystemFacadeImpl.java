@@ -48,7 +48,8 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
     }
     
     public void processMessage(OutNetMessage msg) {	
-        _context.jobQueue().addJob(new GetBidsJob(_context, this, msg));
+        GetBidsJob j = new GetBidsJob(_context, this, msg);
+        j.runJob();
     }
     
     public String renderStatusHTML() { return _manager.renderStatusHTML(); }
