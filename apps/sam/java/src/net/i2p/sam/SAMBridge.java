@@ -220,6 +220,15 @@ public class SAMBridge implements Runnable {
         }
         SAMBridge bridge = new SAMBridge(host, port, opts, keyfile);
         I2PThread t = new I2PThread(bridge, "SAMListener");
+        if (Boolean.valueOf(System.getProperty("sam.shutdownOnOOM", "false")).booleanValue()) {
+            t.addOOMEventListener(new I2PThread.OOMEventListener() {
+                public void outOfMemory(OutOfMemoryError err) {
+                    err.printStackTrace();
+                    System.err.println("OOMed, die die die");
+                    System.exit(-1);
+                }
+            });
+        }
         t.start();
     }
 
