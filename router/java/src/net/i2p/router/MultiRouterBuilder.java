@@ -128,7 +128,7 @@ public class MultiRouterBuilder {
         buf.append("i2np.bandwidth.inboundBytesPerMinute=-60\n");
         buf.append("i2np.bandwidth.outboundBytesPerMinute=-60\n");
         buf.append("router.publishPeerRankings=true\n");
-        buf.append("router.keepHistory=true\n");
+        buf.append("router.keepHistory=false\n");
         buf.append("router.submitHistory=false\n");
         buf.append("router.maxJobRunners=1\n");
         buf.append("router.jobLagWarning=10000\n");
@@ -152,6 +152,7 @@ public class MultiRouterBuilder {
         buf.append("router.tunnelPoolFile=").append(baseDir.getPath()).append("/tunnelPool.dat\n");
         buf.append("router.keyBackupDir=").append(baseDir.getPath()).append("/keyBackup\n");
         buf.append("i2np.tcp.port=").append(basePort).append('\n');
+        buf.append("i2np.tcp.hostname=localhost\n");
         buf.append("i2cp.port=").append(basePort+1).append('\n');
         buf.append("router.adminPort=").append(basePort+2).append('\n');
         buf.append("#clientApp.0.main=net.i2p.sam.SAMBridge\n");
@@ -184,7 +185,7 @@ public class MultiRouterBuilder {
             fos = new FileOutputStream(envFile);
             fos.write(("loggerFilenameOverride="+baseDir+ "/logs/log-router-#.txt\n").getBytes());
             fos.write(("router.configLocation="+baseDir+"/router.config\n").getBytes());
-            fos.write(("i2p.vmCommSystem=true\n").getBytes());
+            //fos.write(("i2p.vmCommSystem=true\n").getBytes());
             fos.write(("i2p.encryption=off\n").getBytes());
             fos.close();
             
