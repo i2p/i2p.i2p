@@ -43,11 +43,16 @@ public class I2PThread extends Thread {
         try {
             super.run();
         } catch (Throwable t) {
+            try {
+                // we cant assume log is created
+                if (_log == null) _log = new Log(I2PThread.class);
+                _log.log(Log.CRIT, "Killing thread " + getName(), t);
+            } catch (Throwable woof) {
+                System.err.println("Died within the OOM itself");
+                t.printStackTrace();
+            }
             if (t instanceof OutOfMemoryError)
                 fireOOM((OutOfMemoryError)t);
-            // we cant assume log is created
-            if (_log == null) _log = new Log(I2PThread.class);
-            _log.log(Log.CRIT, "Killing thread " + getName(), t);
         }
     }
     
