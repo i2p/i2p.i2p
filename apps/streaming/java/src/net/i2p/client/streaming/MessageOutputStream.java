@@ -191,7 +191,7 @@ public class MessageOutputStream extends OutputStream {
          * which we throttle rather than accept arbitrary data and queue 
          */
         public void waitForAccept(int maxWaitMs);
-        /** was the write accepted?  aka did the socket not close? */
+        /** the write was accepted.  aka did the socket not close? */
         public boolean writeAccepted();
         /** did the write fail?  */
         public boolean writeFailed();

@@ -19,7 +19,7 @@ import net.i2p.util.Log;
  * </ul>
  *
  * <h2>Next states:</h2>
- * <li>{@link SchedulerConnected connected} - after receiving an ACK</li>
+ * <li>{@link SchedulerConnectedBulk connected} - after receiving an ACK</li>
  * <li>{@link SchedulerClosing closing} - after both sending and receiving a CLOSE</li>
  * <li>{@link SchedulerClosed closed} - after both sending and receiving ACKs on the CLOSE</li>
  * <li>{@link SchedulerDead dead} - after sending or receiving a RESET</li>

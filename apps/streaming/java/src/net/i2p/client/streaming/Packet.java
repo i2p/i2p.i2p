@@ -11,13 +11,13 @@ import net.i2p.data.SigningPrivateKey;
 /**
  * Contain a single packet transferred as part of a streaming connection.  
  * The data format is as follows:<ul>
- * <li>{@see #getSendStreamId sendStreamId} [4 byte value]</li>
- * <li>{@see #getReceiveStreamId receiveStreamId} [4 byte value]</li>
- * <li>{@see #getSequenceNum sequenceNum} [4 byte unsigned integer]</li>
- * <li>{@see #getAckThrough ackThrough} [4 byte unsigned integer]</li>
+ * <li>{@link #getSendStreamId sendStreamId} [4 byte value]</li>
+ * <li>{@link #getReceiveStreamId receiveStreamId} [4 byte value]</li>
+ * <li>{@link #getSequenceNum sequenceNum} [4 byte unsigned integer]</li>
+ * <li>{@link #getAckThrough ackThrough} [4 byte unsigned integer]</li>
  * <li>number of NACKs [1 byte unsigned integer]</li>
- * <li>that many {@see #getNacks NACKs}</li>
- * <li>{@see #getResendDelay resendDelay} [1 byte integer]</li>
+ * <li>that many {@link #getNacks NACKs}</li>
+ * <li>{@link #getResendDelay resendDelay} [1 byte integer]</li>
  * <li>flags [2 byte value]</li>
  * <li>option data size [2 byte integer]</li>
  * <li>option data specified by those flags [0 or more bytes]</li>
@@ -28,15 +28,15 @@ import net.i2p.data.SigningPrivateKey;
  * turn may require certain additional data to be included.  The flags are
  * as follows (with any data structures specified added to the options area
  * in the given order):</p><ol>
- * <li>{@see #FLAG_SYNCHRONIZE}: no option data</li>
- * <li>{@see #FLAG_CLOSE}: no option data</li>
- * <li>{@see #FLAG_RESET}: no option data</li>
- * <li>{@see #FLAG_SIGNATURE_INCLUDED}: {@see net.i2p.data.Signature}</li>
- * <li>{@see #FLAG_SIGNATURE_REQUESTED}: no option data</li>
- * <li>{@see #FLAG_FROM_INCLUDED}: {@see net.i2p.data.Destination}</li>
- * <li>{@see #FLAG_DELAY_REQUESTED}: 1 byte integer</li>
- * <li>{@see #FLAG_MAX_PACKET_SIZE_INCLUDED}: 2 byte integer</li>
- * <li>{@see #FLAG_PROFILE_INTERACTIVE}: no option data</li>
+ * <li>{@link #FLAG_SYNCHRONIZE}: no option data</li>
+ * <li>{@link #FLAG_CLOSE}: no option data</li>
+ * <li>{@link #FLAG_RESET}: no option data</li>
+ * <li>{@link #FLAG_SIGNATURE_INCLUDED}: {@link net.i2p.data.Signature}</li>
+ * <li>{@link #FLAG_SIGNATURE_REQUESTED}: no option data</li>
+ * <li>{@link #FLAG_FROM_INCLUDED}: {@link net.i2p.data.Destination}</li>
+ * <li>{@link #FLAG_DELAY_REQUESTED}: 1 byte integer</li>
+ * <li>{@link #FLAG_MAX_PACKET_SIZE_INCLUDED}: 2 byte integer</li>
+ * <li>{@link #FLAG_PROFILE_INTERACTIVE}: no option data</li>
  * </ol>
  *
  * <p>If the signature is included, it uses the Destination's DSA key 
@@ -149,7 +149,7 @@ public class Packet {
     }
     
     /** 
-     * what is the stream replies should be sent on?  if the 
+     * Stream that replies should be sent on.  if the 
      * connection is still being built, this should be 
      * null.
      *
@@ -171,8 +171,8 @@ public class Packet {
     public void setSequenceNum(long num) { _sequenceNum = num; }
     
     /** 
-     * what is the highest packet sequence number that received
-     * on the receiveStreamId?  This field is ignored on the initial
+     * The highest packet sequence number that received
+     * on the receiveStreamId.  This field is ignored on the initial
      * connection packet (where receiveStreamId is the unknown id).
      *
      */
@@ -180,8 +180,8 @@ public class Packet {
     public void setAckThrough(long id) { _ackThrough = id; }
     
     /**
-     * What packet sequence numbers below the getAckThrough() value
-     * have not been received?  this may be null.
+     * List of packet sequence numbers below the getAckThrough() value
+     * have not been received.  this may be null.
      *
      */
     public long[] getNacks() { return _nacks; }

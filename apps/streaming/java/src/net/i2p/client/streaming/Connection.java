@@ -318,7 +318,7 @@ public class Connection {
     public byte[] getSendStreamId() { return _sendStreamId; }
     public void setSendStreamId(byte[] id) { _sendStreamId = id; }
     
-    /** what stream does the peer send data to us on? (may be null) */
+    /** stream the peer sends data to us on. (may be null) */
     public byte[] getReceiveStreamId() { return _receiveStreamId; }
     public void setReceiveStreamId(byte[] id) { _receiveStreamId = id; }
     
@@ -343,9 +343,9 @@ public class Connection {
     public ConnectionPacketHandler getPacketHandler() { return _handler; }
     
     /** 
-     * when does the scheduler next want to send a packet?   -1 if never.
-     * This should be set when we want to send on timeout, for instance, or
-     * want to delay an ACK.
+     * Time when the scheduler next want to send a packet, or -1 if 
+     * never.  This should be set when we want to send on timeout, for 
+     * instance, or want to delay an ACK.
      */
     public long getNextSendTime() { return _nextSendTime; }
     public void setNextSendTime(long when) { 
