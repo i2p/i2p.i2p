@@ -137,7 +137,7 @@ class RouterThrottleImpl implements RouterThrottle {
                 if (avg < numTunnels) {
                     // we're accelerating, lets try not to take on too much too fast
                     double probAccept = avg / numTunnels;
-                    if (_context.random().nextDouble() >= probAccept) {
+                    if (_context.random().nextDouble() < probAccept) {
                         // ok
                     } else {
                         if (_log.shouldLog(Log.WARN))
@@ -156,7 +156,7 @@ class RouterThrottleImpl implements RouterThrottle {
                 double avg60m = tunnelTestTime60m.getAverageValue();
                 if (avg10m > avg60m) {
                     double probAccept = avg60m/avg10m;
-                    if (_context.random().nextDouble() >= probAccept) {
+                    if (_context.random().nextDouble() < probAccept) {
                         // ok
                     } else {
                         if (_log.shouldLog(Log.WARN))
