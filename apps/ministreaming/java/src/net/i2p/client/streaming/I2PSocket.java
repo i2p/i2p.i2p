@@ -50,4 +50,21 @@ public interface I2PSocket {
      * Closes the socket if not closed yet
      */
     public void close() throws IOException;
+    
+    public void setSocketErrorListener(SocketErrorListener lsnr);
+    /**
+     * Allow notification of underlying errors communicating across I2P without
+     * waiting for any sort of cleanup process.  For example, if some data could
+     * not be sent, this listener is notified immediately, and while the input/output
+     * streams are notified through IOExceptions, they are told only after the 
+     * TCP-like stream is closed (which may be a minute later, if the close message
+     * times out as well).  This is not fired on normal close() activity.
+     *
+     */
+    public interface SocketErrorListener {
+        /**
+         * An error occurred communicating with the peer.
+         */
+        void errorOccurred();
+    }
 }
