@@ -1,4 +1,5 @@
-v1.20
+v1.20	2004-07-11
+	* Ported to FreeBSD (Makefile.freebsd)
 	* Full winsock compatibility - all Windows functions now return appropriate
 		error strings
 

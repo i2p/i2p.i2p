@@ -189,7 +189,7 @@ samerr_t sam_dgram_send(const sam_pubkey_t dest, const void *data, size_t size)
 #ifdef NO_Z_FORMAT
 		SAMLOG("Invalid data send size (%u bytes)", size);
 #else
-		SAMLOG("Invalid data send size (%z bytes)", size);
+		SAMLOG("Invalid data send size (%dz bytes)", size);
 #endif
 		return SAM_TOO_BIG;
 	}
@@ -197,7 +197,7 @@ samerr_t sam_dgram_send(const sam_pubkey_t dest, const void *data, size_t size)
 	snprintf(cmd, sizeof cmd, "DATAGRAM SEND DESTINATION=%s SIZE=%u\n",
 		dest, size);
 #else
-	snprintf(cmd, sizeof cmd, "DATAGRAM SEND DESTINATION=%s SIZE=%z\n",
+	snprintf(cmd, sizeof cmd, "DATAGRAM SEND DESTINATION=%s SIZE=%dz\n",
 		dest, size);
 #endif
 	sam_write(cmd, strlen(cmd));
@@ -957,7 +957,7 @@ samerr_t sam_stream_send(sam_sid_t stream_id, const void *data, size_t size)
 		SAMLOG("Invalid data send size (%u bytes) for stream %d",
 			size, stream_id);
 #else
-		SAMLOG("Invalid data send size (%z bytes) for stream %d",
+		SAMLOG("Invalid data send size (%dz bytes) for stream %d",
 			size, stream_id);
 #endif
 		return SAM_TOO_BIG;
@@ -971,7 +971,7 @@ samerr_t sam_stream_send(sam_sid_t stream_id, const void *data, size_t size)
 			stream_id, size);
 	#endif
 #else
-	snprintf(cmd, sizeof cmd, "STREAM SEND ID=%d SIZE=%z\n",
+	snprintf(cmd, sizeof cmd, "STREAM SEND ID=%d SIZE=%dz\n",
 		stream_id, size);
 #endif
 	sam_write(cmd, strlen(cmd));

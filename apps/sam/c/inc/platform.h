@@ -34,7 +34,7 @@
 /*
  * Operating system
  */
-#define FREEBSD	0  // FreeBSD (untested)
+#define FREEBSD	0  // FreeBSD
 #define MINGW	1  // Windows native (Mingw)
 #define LINUX	2  // Linux
 #define CYGWIN	3  // Cygwin
@@ -83,9 +83,10 @@
 	#include <winsock.h>
 #else
 	#include <arpa/inet.h>
+	#include <netinet/in.h>
 	#include <sys/select.h>
-	#include <sys/types.h>
 	#include <sys/socket.h>
+	#include <sys/types.h>
 #endif
 #include <assert.h>
 #include <errno.h>
