@@ -113,6 +113,7 @@ public class StatisticsManager implements Service {
             includeRate("tunnel.outboundMessagesProcessed", stats, new long[] { 10*60*1000, 60*60*1000 });
             includeRate("tunnel.inboundMessagesProcessed", stats, new long[] { 10*60*1000, 60*60*1000 });
             includeRate("tunnel.participatingMessagesProcessed", stats, new long[] { 10*60*1000, 60*60*1000 });
+            includeRate("tunnel.expiredAfterAcceptTime", stats, new long[] { 10*60*1000l, 60*60*1000l, 24*60*60*1000l });
             includeRate("netDb.lookupsReceived", stats, new long[] { 5*60*1000, 60*60*1000 });
             includeRate("netDb.lookupsHandled", stats, new long[] { 5*60*1000, 60*60*1000 });
             includeRate("netDb.lookupsMatched", stats, new long[] { 5*60*1000, 60*60*1000 });
