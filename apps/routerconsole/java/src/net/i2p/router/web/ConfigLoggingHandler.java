@@ -41,16 +41,16 @@ public class ConfigLoggingHandler extends FormHandler {
     public void setDefaultloglevel(String level) {
         _defaultLevel = (level != null ? level.trim() : null);
     }
-    public void setFilename(String filename) {
+    public void setLogfilename(String filename) {
         _filename = (filename != null ? filename.trim() : null);
     }
-    public void setRecordformat(String format) {
+    public void setLogformat(String format) {
         _recordFormat = (format != null ? format.trim() : null);
     }
-    public void setDateformat(String format) {
+    public void setLogdateformat(String format) {
         _dateFormat = (format != null ? format.trim() : null);
     }
-    public void setFilesize(String size) {
+    public void setLogfilesize(String size) {
         _fileSize = (size != null ? size.trim() : null);
     }
     
