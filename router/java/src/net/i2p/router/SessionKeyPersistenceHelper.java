@@ -18,7 +18,8 @@ public class SessionKeyPersistenceHelper implements Service {
     private Log _log;
     private RouterContext _context;
     private final static long PERSIST_DELAY = 3*60*1000;
-    private final static String SESSION_KEY_FILE = "sessionKeys.dat";
+    private final static String PROP_SESSION_KEY_FILE = "router.sessionKeys.location";
+    private final static String DEFAULT_SESSION_KEY_FILE = "sessionKeys.dat";
     
     public SessionKeyPersistenceHelper(RouterContext context) {
         _context = context;
@@ -29,11 +30,18 @@ public class SessionKeyPersistenceHelper implements Service {
         writeState();
     }
     
+    private String getKeyFile() {
+        String val = _context.router().getConfigSetting(PROP_SESSION_KEY_FILE);
+        if (val == null)
+            val = DEFAULT_SESSION_KEY_FILE;
+        return val;
+    }
+            
     public void startup() {
         SessionKeyManager mgr = _context.sessionKeyManager();
         if (mgr instanceof PersistentSessionKeyManager) {
             PersistentSessionKeyManager manager = (PersistentSessionKeyManager)mgr;
-            File f = new File(SESSION_KEY_FILE);
+            File f = new File(getKeyFile());
             if (f.exists()) {
                 FileInputStream fin = null;
                 try {
@@ -69,7 +77,7 @@ public class SessionKeyPersistenceHelper implements Service {
                 if (expired > 0) {
                     _log.info("Agressive expired " + expired + " tag sets");
                 }
-                fos = new FileOutputStream(SESSION_KEY_FILE);
+                fos = new FileOutputStream(getKeyFile());
                 mgr.saveState(fos);
                 fos.flush();
                 _log.debug("Session keys written");
