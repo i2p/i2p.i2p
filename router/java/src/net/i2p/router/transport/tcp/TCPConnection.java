@@ -71,7 +71,7 @@ class TCPConnection implements I2NPMessageReader.I2NPMessageEventListener {
     protected RouterContext _context;
     
     public final static String PARAM_MAX_QUEUED_MESSAGES = "i2np.tcp.maxQueuedMessages";
-    private final static int DEFAULT_MAX_QUEUED_MESSAGES = 10;
+    private final static int DEFAULT_MAX_QUEUED_MESSAGES = 20;
 
     public TCPConnection(RouterContext context, Socket s, boolean locallyInitiated) {
         _context = context;
