@@ -118,7 +118,7 @@ public class I2PSocketManager implements I2PSessionListener {
                 return;
             }
             if (msg.length < 4) {
-                _log.error(getName() + ": ==== packet too short ====");
+                _log.warn(getName() + ": ==== packet too short ====");
                 return;
             }
             int type = msg[0] & 0xff;
@@ -155,7 +155,7 @@ public class I2PSocketManager implements I2PSessionListener {
                     return;
             }
         } catch (I2PException ise) {
-            _log.error(getName() + ": Error processing", ise);
+            _log.warn(getName() + ": Error processing", ise);
         } catch (IllegalStateException ise) {
             _log.debug(getName() + ": Error processing", ise);
         }
@@ -242,7 +242,7 @@ public class I2PSocketManager implements I2PSessionListener {
             }
             return;
         } catch (Exception t) {
-            _log.error(getName() + ": Ignoring error on disconnect for socket " + s, t);
+            _log.warn(getName() + ": Ignoring error on disconnect for socket " + s, t);
         }
     }
     
@@ -306,7 +306,7 @@ public class I2PSocketManager implements I2PSessionListener {
                 replySentOk = _session.sendMessage(d, packet);
             }
             if (!replySentOk) {
-                _log.error(getName() + ": Error sending close to " + d.calculateHash().toBase64()
+                _log.warn(getName() + ": Error sending close to " + d.calculateHash().toBase64()
                            + " in response to a new con message", 
                            new Exception("Failed creation"));
             }
@@ -363,13 +363,13 @@ public class I2PSocketManager implements I2PSessionListener {
                 return;
             } else {
                 if ( (payload.length > 0) && (_log.shouldLog(Log.ERROR)) )
-                    _log.error(getName() + ": Disconnect packet had " + payload.length + " bytes");
+                    _log.warn(getName() + ": Disconnect packet had " + payload.length + " bytes");
                 if (s != null) 
                     s.internalClose();
                 return;
             }
         } catch (Exception t) {
-            _log.error(getName() + ": Ignoring error on disconnect", t);
+            _log.warn(getName() + ": Ignoring error on disconnect", t);
             return;
         }
     }
@@ -507,8 +507,8 @@ public class I2PSocketManager implements I2PSessionListener {
             
             return s;
         } catch (InterruptedIOException ioe) {
-            if (_log.shouldLog(Log.ERROR))
-                _log.error(getName() + ": Timeout waiting for ack from syn for id " 
+            if (_log.shouldLog(Log.WARN))
+                _log.warn(getName() + ": Timeout waiting for ack from syn for id " 
                            + lcID + " to " + peer.calculateHash().toBase64().substring(0,6) 
                            + " for socket " + s, ioe);
             synchronized (lock) {
@@ -532,8 +532,8 @@ public class I2PSocketManager implements I2PSessionListener {
             s.internalClose();
             throw ex;
         } catch (IOException ex) {
-            if (_log.shouldLog(Log.ERROR))
-                _log.error(getName() + ": Error sending syn on id " 
+            if (_log.shouldLog(Log.WARN))
+                _log.warn(getName() + ": Error sending syn on id " 
                            + lcID + " to " + peer.calculateHash().toBase64().substring(0,6) 
                            + " for socket " + s, ex);
             synchronized (lock) {
@@ -553,7 +553,7 @@ public class I2PSocketManager implements I2PSessionListener {
             throw ex;
         } catch (Exception e) {
             s.internalClose();
-            _log.error(getName() + ": Unhandled error connecting on "
+            _log.warn(getName() + ": Unhandled error connecting on "
                        + lcID + " to " + peer.calculateHash().toBase64().substring(0,6) 
                        + " for socket " + s, e);
             throw new ConnectException("Unhandled error connecting: " + e.getMessage());
@@ -626,7 +626,7 @@ public class I2PSocketManager implements I2PSessionListener {
             _session.destroySession();
             _log.debug(getName() + ": I2P session destroyed");
         } catch (I2PSessionException e) {
-            _log.error(getName() + ": Error destroying I2P session", e);
+            _log.warn(getName() + ": Error destroying I2P session", e);
         }
     }
 
@@ -652,7 +652,7 @@ public class I2PSocketManager implements I2PSessionListener {
         try {
             return _session.sendMessage(peer, new byte[] { (byte) CHAFF});
         } catch (I2PException ex) {
-            _log.error(getName() + ": I2PException:", ex);
+            _log.warn(getName() + ": I2PException:", ex);
             return false;
         }
     }
