@@ -1,4 +1,4 @@
-<code>$Id: tunnel.html,v 1.10 2005/01/16 01:07:07 jrandom Exp $</code>
+<code>$Id: tunnel-alt.html,v 1.1 2005/01/18 10:55:17 jrandom Exp $</code>
 <pre>
 1) <a href="#tunnel.overview">Tunnel overview</a>
 2) <a href="#tunnel.operation">Tunnel operation</a>
@@ -102,7 +102,10 @@ fragments it across the necessary number of 1KB tunnel messages, and decides how
 each I2NP message should be handled by the tunnel endpoint, encoding that
 data into the raw tunnel payload:</p>
 <ul>
-<li>the first 4 bytes of the SHA256 of the remaining preprocessed data</li>
+<li>the first 4 bytes of the SHA256 of the remaining preprocessed data concatenated 
+    with the preIV, using the preIV as will be seen on the tunnel endpoint (for
+    outbound tunnels) or the preIV as was seen on the tunnel gateway (for inbound
+    tunnels) (see below for preIV processing).</li>
 <li>0 or more bytes containing random nonzero integers</li>
 <li>1 byte containing 0x00</li>
 <li>a series of zero or more { instructions, message } pairs</li>
