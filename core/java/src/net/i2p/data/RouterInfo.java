@@ -46,6 +46,8 @@ public class RouterInfo extends DataStructureImpl {
     private volatile boolean _isValid;
     private volatile String _stringified;
     private volatile byte _byteified[];
+    private volatile int _hashCode;
+    private volatile boolean _hashCodeInitialized;
 
     public RouterInfo() {
         setIdentity(null);
@@ -59,6 +61,7 @@ public class RouterInfo extends DataStructureImpl {
         _currentRoutingKey = null;
         _stringified = null;
         _byteified = null;
+        _hashCodeInitialized = false;
     }
 
     public RouterInfo(RouterInfo old) {
@@ -74,6 +77,7 @@ public class RouterInfo extends DataStructureImpl {
     private void resetCache() {
         _stringified = null;
         _byteified = null;
+        _hashCodeInitialized = false;
     }
 
     /**
@@ -111,6 +115,7 @@ public class RouterInfo extends DataStructureImpl {
      */
     public void setPublished(long published) {
         _published = published;
+        resetCache();
     }
 
     /**
@@ -221,16 +226,20 @@ public class RouterInfo extends DataStructureImpl {
         //_log.debug("verify ok? " + DSAEngine.getInstance().verifySignature(sig, bytes, getIdentity().getSigningPublicKey()));
         //_log.debug("Signed data: \n" + Base64.encode(bytes));
         //_log.debug("Signature: " + getSignature());
-
-        resetCache();
     }
 
+    /** 
+     * Write out the raw payload of the routerInfo, excluding the signature.  This
+     * caches the data in memory if possible.
+     *
+     * @throws DataFormatException if the data is somehow b0rked (missing props, etc)
+     */
     private byte[] getBytes() throws DataFormatException {
         if (_byteified != null) return _byteified;
-        if (_identity == null) throw new IllegalStateException("Router identity isn't set? wtf!");
-        if (_addresses == null) throw new IllegalStateException("Router addressess isn't set? wtf!");
-        if (_peers == null) throw new IllegalStateException("Router peers isn't set? wtf!");
-        if (_options == null) throw new IllegalStateException("Router options isn't set? wtf!");
+        if (_identity == null) throw new DataFormatException("Router identity isn't set? wtf!");
+        if (_addresses == null) throw new DataFormatException("Router addressess isn't set? wtf!");
+        if (_peers == null) throw new DataFormatException("Router peers isn't set? wtf!");
+        if (_options == null) throw new DataFormatException("Router options isn't set? wtf!");
 
         long before = Clock.getInstance().now();
         ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -339,10 +348,14 @@ public class RouterInfo extends DataStructureImpl {
         }
         _isValid = DSAEngine.getInstance().verifySignature(_signature, data, _identity.getSigningPublicKey());
         if (!_isValid) {
-            _log.error("Invalid [" + SHA256Generator.getInstance().calculateHash(data).toBase64()
-                       + "] w/ signing key: " + _identity.getSigningPublicKey(), new Exception("Signature failed"));
-            _log.debug("Failed data: \n" + Base64.encode(data));
-            _log.debug("Signature: " + getSignature());
+            if (_log.shouldLog(Log.ERROR))
+                _log.error("Invalid [" + SHA256Generator.getInstance().calculateHash(data).toBase64()
+                           + "] w/ signing key: " + _identity.getSigningPublicKey(), 
+                           new Exception("Signature failed"));
+            if (_log.shouldLog(Log.DEBUG)) {
+                _log.debug("Failed data: \n" + Base64.encode(data));
+                _log.debug("Signature: " + getSignature());
+            }
         }
     }
 
@@ -378,19 +391,7 @@ public class RouterInfo extends DataStructureImpl {
         //if (!isValid())
         //    throw new DataFormatException("Data is not valid");
         ByteArrayOutputStream baos = new ByteArrayOutputStream(512);
-        _identity.writeBytes(baos);
-        DataHelper.writeDate(baos, new Date(_published));
-        DataHelper.writeLong(baos, 1, _addresses.size());
-        for (Iterator iter = _addresses.iterator(); iter.hasNext();) {
-            RouterAddress addr = (RouterAddress) iter.next();
-            addr.writeBytes(baos);
-        }
-        DataHelper.writeLong(baos, 1, _peers.size());
-        for (Iterator iter = _peers.iterator(); iter.hasNext();) {
-            Hash peerHash = (Hash) iter.next();
-            peerHash.writeBytes(baos);
-        }
-        DataHelper.writeProperties(baos, _options);
+        baos.write(getBytes());
         _signature.writeBytes(baos);
 
         byte data[] = baos.toByteArray();
@@ -401,16 +402,22 @@ public class RouterInfo extends DataStructureImpl {
     public boolean equals(Object object) {
         if ((object == null) || !(object instanceof RouterInfo)) return false;
         RouterInfo info = (RouterInfo) object;
-        return DataHelper.eq(getAddresses(), info.getAddresses()) && DataHelper.eq(getIdentity(), info.getIdentity())
-               && DataHelper.eq(getOptions(), info.getOptions()) && DataHelper.eq(getPeers(), info.getPeers())
-               && DataHelper.eq(getSignature(), info.getSignature())
+        return DataHelper.eq(_addresses, info.getAddresses()) 
+               && DataHelper.eq(_identity, info.getIdentity())
+               && DataHelper.eq(_options, info.getOptions()) 
+               && DataHelper.eq(_peers, info.getPeers())
+               && DataHelper.eq(_signature, info.getSignature())
                && DataHelper.eq(getPublished(), info.getPublished());
     }
 
     public int hashCode() {
-        return DataHelper.hashCode(getAddresses()) + DataHelper.hashCode(getIdentity())
-               + DataHelper.hashCode(getOptions()) + DataHelper.hashCode(getPeers())
-               + DataHelper.hashCode(getSignature()) + (int) getPublished();
+        if (!_hashCodeInitialized) {
+            _hashCode = DataHelper.hashCode(_addresses) + DataHelper.hashCode(_identity)
+                        + DataHelper.hashCode(_options) + DataHelper.hashCode(_peers)
+                        + DataHelper.hashCode(_signature) + (int) getPublished();
+            _hashCodeInitialized = true;
+        }
+        return _hashCode;
     }
 
     public String toString() {
@@ -420,17 +427,19 @@ public class RouterInfo extends DataStructureImpl {
         buf.append("\n\tIdentity: ").append(getIdentity());
         buf.append("\n\tSignature: ").append(getSignature());
         buf.append("\n\tPublished on: ").append(new Date(getPublished()));
-        buf.append("\n\tAddresses: #: ").append(getAddresses().size());
-        for (Iterator iter = getAddresses().iterator(); iter.hasNext();) {
+        Set addresses = _addresses; // getAddresses()
+        buf.append("\n\tAddresses: #: ").append(addresses.size());
+        for (Iterator iter = addresses.iterator(); iter.hasNext();) {
             RouterAddress addr = (RouterAddress) iter.next();
             buf.append("\n\t\tAddress: ").append(addr);
         }
-        buf.append("\n\tPeers: #: ").append(getPeers().size());
-        for (Iterator iter = getPeers().iterator(); iter.hasNext();) {
+        Set peers = _peers; // getPeers()
+        buf.append("\n\tPeers: #: ").append(peers.size());
+        for (Iterator iter = peers.iterator(); iter.hasNext();) {
             Hash hash = (Hash) iter.next();
             buf.append("\n\t\tPeer hash: ").append(hash);
         }
-        Properties options = getOptions();
+        Properties options = _options; // getOptions();
         buf.append("\n\tOptions: #: ").append(options.size());
         for (Iterator iter = options.keySet().iterator(); iter.hasNext();) {
             String key = (String) iter.next();
