@@ -10,6 +10,7 @@
         <ant dir="../../apps/sam/java/" target="build" />
         <ant dir="../../apps/netmonitor/java/" target="build" />
         <ant dir="../../apps/heartbeat/java/" target="build" />
+        <ant dir="../../apps/time/java/" target="build" />
     </target>
     <target name="compile">
         <mkdir dir="./build" />
@@ -39,6 +40,7 @@
             <fileset file="../../apps/sam/java/build/sam.jar" />
             <fileset file="../../apps/heartbeat/java/build/heartbeat.jar" />
             <fileset file="../../apps/netmonitor/java/build/netmonitor.jar" />
+            <fileset file="../../apps/time/java/build/timestamper.jar" />
             <fileset file="../doc/COPYING" />
             <fileset file="../../readme.txt" />
             <fileset file="../../hosts.txt" />
@@ -62,6 +64,7 @@
             <fileset file="../../apps/sam/java/build/sam.jar" />
             <fileset file="../../apps/heartbeat/java/build/heartbeat.jar" />
             <fileset file="../../apps/netmonitor/java/build/netmonitor.jar" />
+            <fileset file="../../apps/time/java/build/timestamper.jar" />
             <fileset file="../doc/COPYING" />
             <fileset file="../../readme.txt" />
             <fileset file="../../hosts.txt" />
@@ -83,6 +86,7 @@
         <ant dir="../../apps/sam/java/" target="cleandep" />
         <ant dir="../../apps/heartbeat/java" target="cleandep" />
         <ant dir="../../apps/netmonitor/java" target="cleandep" />
+        <ant dir="../../apps/time/java" target="cleandep" />
     </target>
     <target name="distclean" depends="clean">
         <ant dir="../../core/java/" target="distclean" />
@@ -92,5 +96,6 @@
         <ant dir="../../apps/sam/java/" target="distclean" />
         <ant dir="../../apps/heartbeat/java" target="distclean" />
         <ant dir="../../apps/netmonitor/java" target="distclean" />
+        <ant dir="../../apps/time/java" target="distclean" />
     </target>
 </project>
