@@ -1,4 +1,14 @@
-$Id: history.txt,v 1.16 2004/09/08 21:26:43 jrandom Exp $
+$Id: history.txt,v 1.17 2004/09/12 22:08:17 jrandom Exp $
+
+2004-09-16  jrandom
+    * Refactor the TCP transport to deal with changing identities gracefully,
+      and to prevent some wasted effort by keeping track of what host+port
+      combinations we are connected to (rather than just the identities).  Also
+      catch a few configuration errors earlier.
+    * Removed no longer relevent methods from the Transport API that were 
+      exposing ideas that probably shouldn't be exposed.
+    * Removed the 0.4.0.1 specific files from i2pupdate.zip (relating to script
+      updates)
 
 2004-09-13  jrandom
     * Update for the SDK reconnection to deal with overflow.

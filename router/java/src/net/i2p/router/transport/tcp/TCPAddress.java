@@ -9,6 +9,7 @@ package net.i2p.router.transport.tcp;
  */
 
 import java.net.InetAddress;
+import java.net.UnknownHostException;
 
 import net.i2p.data.DataHelper;
 import net.i2p.data.RouterAddress;
@@ -28,9 +29,18 @@ public class TCPAddress {
     public final static String PROP_HOST = "host";
     
     public TCPAddress(String host, int port) {
-	_host = host;
-	_port = port;
-	_addr = null;
+        try {
+            if (host != null) {
+                InetAddress iaddr = InetAddress.getByName(host);
+                _host = iaddr.getHostAddress();
+                _addr = iaddr;
+            }
+            _port = port;
+        } catch (UnknownHostException uhe) {
+            _host = null;
+            _port = -1;
+            _addr = null;
+        }
     }
     
     public TCPAddress() {
@@ -40,24 +50,34 @@ public class TCPAddress {
     }
     
     public TCPAddress(InetAddress addr, int port) {
-	_host = addr.getHostName();
+        if (addr != null)
+            _host = addr.getHostAddress();
 	_addr = addr;
 	_port = port;
     }
     public TCPAddress(RouterAddress addr) {
 	if (addr == null) throw new IllegalArgumentException("Null router address");
-	_host = addr.getOptions().getProperty(PROP_HOST);
-	String port = addr.getOptions().getProperty(PROP_PORT);
-	if ( (port != null) && (port.trim().length() > 0) ) {
-	    try {
-		_port = Integer.parseInt(port);
-	    } catch (NumberFormatException nfe) {
-		_log.error("Invalid port [" + port + "]", nfe);
-		_port = -1;
-	    }
-	} else {
-	    _port = -1;
-	}
+        String host = addr.getOptions().getProperty(PROP_HOST);
+        try {
+            InetAddress iaddr = InetAddress.getByName(host);
+            _host = iaddr.getHostAddress();
+            _addr = iaddr;
+            
+            String port = addr.getOptions().getProperty(PROP_PORT);
+            if ( (port != null) && (port.trim().length() > 0) ) {
+                try {
+                    _port = Integer.parseInt(port);
+                } catch (NumberFormatException nfe) {
+                    _log.error("Invalid port [" + port + "]", nfe);
+                    _port = -1;
+                }
+            } else {
+                _port = -1;
+            }
+        } catch (UnknownHostException uhe) {
+            _host = null;
+            _port = -1;
+        }
     }
     
     public String getHost() { return _host; }
@@ -84,6 +104,8 @@ public class TCPAddress {
 	}
     }
     
+    public String toString() { return _host + ":" + _port; }
+    
     public int hashCode() {
 	int rv = 0;
 	rv += _port;
@@ -96,12 +118,13 @@ public class TCPAddress {
     public boolean equals(Object val) {
 	if ( (val != null) && (val instanceof TCPAddress) ) {
 	    TCPAddress addr = (TCPAddress)val;
-	    if (getAddress().getHostAddress() != null)
+	    if ( (_addr != null) && (_addr.getHostAddress() != null) ) {
 		return DataHelper.eq(getAddress().getHostAddress(), addr.getAddress().getHostAddress()) &&
  		       (getPort() == addr.getPort());
-	    else
+            } else {
 		return DataHelper.eq(getHost(), addr.getHost()) &&
 		       (getPort() == addr.getPort());
+            }
 	} 
 	return false;
     }

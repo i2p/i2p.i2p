@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.math.BigInteger;
+import java.net.InetAddress;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -26,6 +27,7 @@ import net.i2p.data.ByteArray;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
+import net.i2p.data.RouterAddress;
 import net.i2p.data.RouterIdentity;
 import net.i2p.data.RouterInfo;
 import net.i2p.data.SessionKey;
@@ -70,6 +72,7 @@ class TCPConnection implements I2NPMessageReader.I2NPMessageEventListener {
     private boolean _weInitiated;
     private long _created;
     protected RouterContext _context;
+    protected TCPAddress _remoteAddress;
     
     public TCPConnection(RouterContext context, Socket s, boolean locallyInitiated) throws IOException {
         _context = context;
@@ -101,14 +104,21 @@ class TCPConnection implements I2NPMessageReader.I2NPMessageEventListener {
         // doesn't, so we've got to check & cache it here if we want to log it later.  (kaffe et al are acting per
         // spec, btw)
         try {
-            _remoteHost = s.getInetAddress() + "";
+            InetAddress addr = s.getInetAddress();
+            if (addr != null) {
+                _remoteHost = addr.getHostAddress();
+            }
             _remotePort = s.getPort();
+            if (locallyInitiated)
+                _remoteAddress = new TCPAddress(_remoteHost, _remotePort);
         } catch (NullPointerException npe) {
             throw new IOException("kaffe is being picky since the socket closed too fast...");
         }
         if (_log.shouldLog(Log.INFO))
             _log.info("Connected with peer: " + _remoteHost + ":" + _remotePort);
     }
+    
+    public TCPAddress getRemoteAddress() { return _remoteAddress; }
     
     /** how long has this connection been around for, or -1 if it isn't established yet */
     public long getLifetime() { 
@@ -215,6 +225,18 @@ class TCPConnection implements I2NPMessageReader.I2NPMessageEventListener {
                 _in = new AESInputStream(_context, new BandwidthLimitedInputStream(_context, _in, _remoteIdentity), _key, _iv);
                 _out = new AESOutputStream(_context, new BandwidthLimitedOutputStream(_context, _out, _remoteIdentity), _key, _iv);
                 _socket.setSoTimeout(0);
+                
+                for (Iterator iter = _remoteInfo.getAddresses().iterator(); iter.hasNext(); ) {
+                    RouterAddress curAddr = (RouterAddress)iter.next();
+                    if (TCPTransport.STYLE.equals(curAddr.getTransportStyle())) {
+                        _remoteAddress = new TCPAddress(curAddr);
+                        break;
+                    }
+                }
+                if (_remoteAddress == null) {
+                    throw new DataFormatException("wtf, peer " + _remoteIdentity.calculateHash().toBase64() 
+                                                  + " unreachable?  we already verified!");
+                }
                 established();
                 return _remoteIdentity;
             }

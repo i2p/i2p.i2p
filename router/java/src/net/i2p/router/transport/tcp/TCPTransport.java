@@ -42,12 +42,17 @@ public class TCPTransport extends TransportImpl {
     private Log _log;
     public final static String STYLE = "TCP";
     private List _listeners;
-    private Map _connections; // routerIdentity --> List of TCPConnection
+    /** RouterIdentity to List of TCPConnections */
+    private Map _connections;
+    /** TCPAddress (w/ IP not hostname) to List of TCPConnections */
+    private Map _connectionAddresses;
     private String _listenHost;
     private int _listenPort;
     private RouterAddress _address;
+    private TCPAddress _tcpAddress;
     private boolean _listenAddressIsValid;
-    private Map _msgs; // H(ident) --> PendingMessages for unestablished connections
+    /** H(ident) to PendingMessages for unestablished connections */
+    private Map _msgs; 
     private boolean _running;
     
     private int _numConnectionEstablishers;
@@ -76,6 +81,7 @@ public class TCPTransport extends TransportImpl {
 
         _listeners = new ArrayList();
         _connections = new HashMap();
+        _connectionAddresses = new HashMap();
         _msgs = new HashMap();
         _address = address;
         if (address != null) {
@@ -86,6 +92,7 @@ public class TCPTransport extends TransportImpl {
             } catch (NumberFormatException nfe) {
                 _log.error("Invalid port: " + portStr + " Address: \n" + address, nfe);
             }
+            _tcpAddress = new TCPAddress(_listenHost, _listenPort);
         }
         _listenAddressIsValid = false;
         try {
@@ -189,6 +196,38 @@ public class TCPTransport extends TransportImpl {
                 RouterAddress addr = (RouterAddress)iter.next();
                 startEstablish = _context.clock().now();
                 if (getStyle().equals(addr.getTransportStyle())) {
+
+                    TCPAddress tcpAddr = new TCPAddress(addr);
+                    synchronized (_connectionAddresses) {
+                        if (_connectionAddresses.containsKey(tcpAddr)) {
+                            if (_log.shouldLog(Log.WARN))
+                                _log.warn("We already have a connection to another router at " + tcpAddr);
+                            _context.shitlist().shitlistRouter(target.getIdentity().getHash(), "Duplicate TCP address (changed identities?)");
+                            _context.netDb().fail(target.getIdentity().getHash());
+                            return false;
+                        }
+                    }
+                    
+                    if (tcpAddr.equals(_tcpAddress)) {
+                        if (_log.shouldLog(Log.WARN))
+                            _log.warn("Peer " + target.getIdentity().getHash().toBase64() 
+                                      + " has OUR address [" + tcpAddr + "]");
+                        _context.profileManager().commErrorOccurred(target.getIdentity().getHash());
+                        _context.shitlist().shitlistRouter(target.getIdentity().getHash(), "Points at us");
+                        _context.netDb().fail(target.getIdentity().getHash());
+                        return false;
+                    }
+
+                    if (!tcpAddr.isPubliclyRoutable() && false) {
+                        if (_log.shouldLog(Log.WARN))
+                            _log.warn("Peer " + target.getIdentity().getHash().toBase64() 
+                                      + " has an unroutable address [" + tcpAddr + "]");
+                        _context.profileManager().commErrorOccurred(target.getIdentity().getHash());
+                        _context.shitlist().shitlistRouter(target.getIdentity().getHash(), "Unroutable address");
+                        _context.netDb().fail(target.getIdentity().getHash());
+                        return false;
+                    }
+                    
                     if (_log.shouldLog(Log.DEBUG))
                         _log.debug("Establishing a connection with address " + addr);
                     Socket s = createSocket(addr);
@@ -384,6 +423,7 @@ public class TCPTransport extends TransportImpl {
                     allCons.add(con);
                 }
             }
+            _connectionAddresses.clear();
         }
         for (Iterator iter = allCons.iterator(); iter.hasNext(); ) {
             TCPConnection con = (TCPConnection)iter.next();
@@ -420,6 +460,13 @@ public class TCPTransport extends TransportImpl {
                 _connections.remove(iter.next());
             }
         }
+        
+        TCPAddress address = con.getRemoteAddress();
+        if (address != null) {
+            synchronized (_connectionAddresses) {
+                _connectionAddresses.remove(address);
+            }
+        }
         if (_log.shouldLog(Log.INFO))
             _log.info(buf.toString());
         //if (con.getRemoteRouterIdentity() != null)
@@ -429,6 +476,30 @@ public class TCPTransport extends TransportImpl {
         con.setTransport(this);
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Before establishing connection");
+        TCPAddress remAddr = con.getRemoteAddress();
+        if (remAddr != null) {
+            synchronized (_connectionAddresses) {
+                if (_connectionAddresses.containsKey(remAddr)) {
+                    if (_log.shouldLog(Log.WARN))
+                        _log.warn("refusing connection from " + remAddr + " as it is a dup");
+                    con.closeConnection();
+                    return false;
+                }
+            }
+        
+            if (_tcpAddress.equals(remAddr)) {
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("refusing connection to ourselves...");
+                _context.shitlist().shitlistRouter(target.getIdentity().getHash(), "Our old address");
+                _context.netDb().fail(target.getIdentity().getHash());
+                con.closeConnection();
+                return false;
+            }
+        } else {
+            //if (_log.shouldLog(Log.WARN))
+            //    _log.warn("Why do we not have a remoteAddress for " + con, new Exception("hrm"));
+        }
+        
         long start = _context.clock().now();
         RouterIdentity ident = con.establishConnection();
         long afterEstablish = _context.clock().now();
@@ -440,18 +511,26 @@ public class TCPTransport extends TransportImpl {
             return false;
         }
         
+        if (ident.equals(_context.router().getRouterInfo().getIdentity())) {
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Dropping established connection with *cough* ourselves: listenHost=[" 
+                          + _tcpAddress.getHost() + "] listenPort=[" +_tcpAddress.getPort()+ "] remoteHost=["
+                          + remAddr.getHost() + "] remPort=[" + remAddr.getPort() + "]");
+            con.closeConnection();
+            return false;
+        }
+        
         if (_log.shouldLog(Log.INFO))
             _log.info("Connection established with " + ident + " after " + (afterEstablish-start) + "ms");
         if (target != null) {
             if (!target.getIdentity().equals(ident)) {
-                _context.statManager().updateFrequency("tcp.acceptFailureFrequency");
-                if (_log.shouldLog(Log.ERROR))
-                    _log.error("Target changed identities!!!  was " + target.getIdentity().getHash().toBase64() + ", now is " + ident.getHash().toBase64() + "!  DROPPING CONNECTION");
-                con.closeConnection();
+                //_context.statManager().updateFrequency("tcp.acceptFailureFrequency");
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("Target changed identities!  was " + target.getIdentity().getHash().toBase64() + ", now is " + ident.getHash().toBase64() + "!");
                 // remove the old ref, since they likely just created a new identity
                 _context.netDb().fail(target.getIdentity().getHash());
                 _context.shitlist().shitlistRouter(target.getIdentity().getHash(), "Peer changed identities");
-                return false;
+                //return false;
             } else {
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("Target is the same as who we connected with");
@@ -459,14 +538,34 @@ public class TCPTransport extends TransportImpl {
         }
         if (ident != null) {
             Set toClose = new HashSet(4);
-            List toAdd = new LinkedList();
+            List toAdd = new ArrayList(1);
+            List cons = null;
             synchronized (_connections) {
                 if (!_connections.containsKey(ident))
                     _connections.put(ident, new ArrayList(2));
-                List cons = (List)_connections.get(ident);
+                cons = (List)_connections.get(ident);
                 if (cons.size() > 0) {
-                    if (_log.shouldLog(Log.WARN))
+                    if (_log.shouldLog(Log.WARN)) {
                         _log.warn("Attempted to open additional connections with " + ident.getHash() + ": closing older connections", new Exception("multiple cons"));
+
+                        StringBuffer buf = new StringBuffer(128);
+                        if (remAddr == null)
+                            remAddr = con.getRemoteAddress();
+                        buf.append("Connection address: [").append(remAddr.toString()).append(']');
+                        synchronized (_connectionAddresses) {
+                            if (_connectionAddresses.containsKey(remAddr)) {
+                                buf.append(" NOT KNOWN in: ");
+                            } else {
+                                buf.append(" KNOWN IN: ");
+                            }
+                            for (Iterator iter = _connectionAddresses.keySet().iterator(); iter.hasNext(); ) {
+                                TCPAddress curAddr = (TCPAddress)iter.next();
+                                buf.append('[').append(curAddr.toString()).append("] ");
+                            }
+                        }
+                        _log.warn(buf.toString());
+                    }
+            
                     while (cons.size() > 0) {
                         TCPConnection oldCon = (TCPConnection)cons.remove(0);
                         toAdd.addAll(oldCon.getPendingMessages());
@@ -485,6 +584,10 @@ public class TCPTransport extends TransportImpl {
                 for (Iterator iter = toRemove.iterator(); iter.hasNext(); ) {
                     _connections.remove(iter.next());
                 }
+            }
+            
+            synchronized (_connectionAddresses) {
+                _connectionAddresses.put(con.getRemoteAddress(), cons);
             }
             
             if (toAdd.size() > 0) {
@@ -616,7 +719,9 @@ public class TCPTransport extends TransportImpl {
                             refetchedCon = _context.clock().now();
                             if (con == null) {
                                 if (_log.shouldLog(Log.ERROR))
-                                    _log.error("Connection established but we can't find the connection? wtf!  peer = " + pending.getPeer());
+                                    _log.error("Connection established to " + pending.getPeer().toBase64() + " but they aren't who we wanted");
+                                _context.shitlist().shitlistRouter(pending.getPeer(), "Old address of a new peer");
+                                failPending(pending);
                             } else {
                                 _context.shitlist().unshitlistRouter(pending.getPeer());
                                 sendPending(con, pending);
@@ -690,7 +795,7 @@ public class TCPTransport extends TransportImpl {
                     _log.debug("Adding a pending to existing " + target.toBase64());
             }
             int level = Log.INFO;
-            if (msgs.getMessageCount() > 1)
+            if (msgs.getMessageCount() > 2)
                 level = Log.WARN;
             if (_log.shouldLog(level))
                 _log.log(level, "Add message to " + target.toBase64() + ", making a total of " + msgs.getMessageCount() + " for them, with another " + (_msgs.size() -1) + " peers pending establishment");
@@ -754,11 +859,19 @@ public class TCPTransport extends TransportImpl {
             _log.info("Connection established, now queueing up " + pending.getMessageCount() + " messages to be sent");
         synchronized (_msgs) {
             _msgs.remove(pending.getPeer());
-            
+        }
+        if (pending.getPeer().equals(con.getRemoteRouterIdentity().calculateHash())) {
             OutNetMessage msg = null;
             while ( (msg = pending.getNextMessage()) != null) {
                 msg.timestamp("TCPTransport.sendPending to con.addMessage");
                 con.addMessage(msg);
+            }
+        } else {
+            // we connected to someone we didn't try to connect to...
+            OutNetMessage msg = null;
+            while ( (msg = pending.getNextMessage()) != null) {
+                msg.timestamp("TCPTransport.sendPending connected to a different peer");
+                afterSend(msg, false, false);
             }
         }
     }
@@ -790,7 +903,7 @@ public class TCPTransport extends TransportImpl {
         private ConnEstablisher _establisher;
         
         public PendingMessages(RouterInfo peer) {
-            _messages = new LinkedList();
+            _messages = new ArrayList(2);
             _peerInfo = peer;
             _peer = peer.getIdentity().getHash();
             _establisher = null;

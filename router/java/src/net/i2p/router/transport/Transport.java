@@ -31,9 +31,7 @@ public interface Transport {
     public void send(OutNetMessage msg);
     public RouterAddress startListening();
     public void stopListening();
-    public void rotateAddresses();
     public Set getCurrentAddresses();
-    public void addAddressInfo(Properties infoForNewAddress);
     public void setListener(TransportEventListener listener);
     public String getStyle();
     

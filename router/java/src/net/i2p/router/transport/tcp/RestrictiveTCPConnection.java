@@ -15,11 +15,13 @@ import java.io.IOException;
 import java.math.BigInteger;
 import java.net.Socket;
 import java.util.Date;
+import java.util.Iterator;
 
 import net.i2p.crypto.AESInputStream;
 import net.i2p.crypto.AESOutputStream;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
+import net.i2p.data.RouterAddress;
 import net.i2p.data.RouterIdentity;
 import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
@@ -298,6 +300,18 @@ class RestrictiveTCPConnection extends TCPConnection {
             _out = new AESOutputStream(_context, new BufferedOutputStream(new BandwidthLimitedOutputStream(_context, _out, _remoteIdentity), BUF_SIZE), _key, _iv);
             _socket.setSoTimeout(0);
             success = _context.clock().now();
+            
+            for (Iterator iter = _remoteInfo.getAddresses().iterator(); iter.hasNext(); ) {
+                RouterAddress curAddr = (RouterAddress)iter.next();
+                if (TCPTransport.STYLE.equals(curAddr.getTransportStyle())) {
+                    _remoteAddress = new TCPAddress(curAddr);
+                    break;
+                }
+            }
+            if (_remoteAddress == null) {
+                throw new DataFormatException("wtf, no TCP addresses?  we already verified!");
+            }
+            
             established();
             return _remoteIdentity;
             

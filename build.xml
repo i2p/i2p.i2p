@@ -217,24 +217,15 @@
     </target>
     <target name="updater" depends="build">
         <delete dir="pkg-temp" />
-        <copy file="build/heartbeat.jar" todir="pkg-temp/lib/" />
         <copy file="build/i2p.jar" todir="pkg-temp/lib/" />
         <copy file="build/i2ptunnel.jar" todir="pkg-temp/lib/" />
         <copy file="build/mstreaming.jar" todir="pkg-temp/lib/" />
         <copy file="build/router.jar" todir="pkg-temp/lib/" />
         <copy file="build/routerconsole.jar" todir="pkg-temp/lib/" />
-        <copy file="build/sam.jar" todir="pkg-temp/lib/" />
-        <copy file="build/systray.jar" todir="pkg-temp/lib" />
         <copy file="build/i2ptunnel.war" todir="pkg-temp/webapps/" />
         <copy file="build/routerconsole.war" todir="pkg-temp/webapps/" />
         <copy file="history.txt" todir="pkg-temp/" />
         <copy file="hosts.txt" todir="pkg-temp/" />
-        <copy file="installer/resources/install_i2p_service_winnt.bat" todir="pkg-temp/" />
-        <copy file="installer/resources/uninstall_i2p_service_winnt.bat" todir="pkg-temp/" />
-        <copy file="installer/resources/i2prouter" todir="pkg-temp/" />
-        <copy file="installer/resources/i2prouter.bat" todir="pkg-temp/" />
-        <copy file="installer/resources/i2prouter_win9x.bat" todir="pkg-temp/" />
-        <copy file="installer/resources/wrapper.config" todir="pkg-temp/" />
         <zip destfile="i2pupdate.zip" basedir="pkg-temp" />
     </target>
     <taskdef name="izpack" classpath="${basedir}/installer/lib/izpack/standalone-compiler.jar" classname="com.izforge.izpack.ant.IzPackTask" />
