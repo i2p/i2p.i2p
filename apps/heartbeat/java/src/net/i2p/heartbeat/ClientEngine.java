@@ -84,8 +84,8 @@ class ClientEngine {
     /** fire off a new ping */
     private void doSend() {
         long now = Clock.getInstance().now();
-        _heartbeat.sendPing(_data.getConfig().getPeer(), _id, now, _data.getConfig().getSendSize());
         _data.addPing(now);
+        _heartbeat.sendPing(_data.getConfig().getPeer(), _id, now, _data.getConfig().getSendSize());
     }
 
     /** our actual heartbeat pumper - this drives the test */
