@@ -24,6 +24,7 @@ import net.i2p.data.PublicKey;
 import net.i2p.data.SessionKey;
 import net.i2p.data.SessionTag;
 import net.i2p.util.Log;
+import net.i2p.util.SimpleTimer;
 
 /**
  * Implement the session key management, but keep everything in memory (don't write 
@@ -67,8 +68,21 @@ class TransientSessionKeyManager extends SessionKeyManager {
         _context = context;
         _outboundSessions = new HashMap(1024);
         _inboundTagSets = new HashMap(64*1024);
+        context.statManager().createRateStat("crypto.sessionTagsExpired", "How many tags/sessions are expired?", "Encryption", new long[] { 10*60*1000, 60*60*1000, 3*60*60*1000 });
+        context.statManager().createRateStat("crypto.sessionTagsRemaining", "How many tags/sessions are remaining after a cleanup?", "Encryption", new long[] { 10*60*1000, 60*60*1000, 3*60*60*1000 });
+        SimpleTimer.getInstance().addEvent(new CleanupEvent(), 60*1000);
     }
     private TransientSessionKeyManager() { this(null); }
+    
+    private class CleanupEvent implements SimpleTimer.TimedEvent {
+        public void timeReached() {
+            long beforeExpire = _context.clock().now();
+            int expired = aggressiveExpire();
+            long expireTime = _context.clock().now() - beforeExpire;
+            _context.statManager().addRateData("crypto.sessionTagsExpired", expired, expireTime);
+            SimpleTimer.getInstance().addEvent(CleanupEvent.this, 60*1000);
+        }
+    }
 
     /** TagSet */
     protected Set getInboundTagSets() {
@@ -247,6 +261,7 @@ class TransientSessionKeyManager extends SessionKeyManager {
                 overage = _inboundTagSets.size() - MAX_INBOUND_SESSION_TAGS;
             }
         }
+        
         if (overage > 0)
             clearExcess(overage);
 
@@ -361,45 +376,32 @@ class TransientSessionKeyManager extends SessionKeyManager {
      */
     public int aggressiveExpire() {
         int removed = 0;
+        int remaining = 0;
         long now = _context.clock().now();
-        Set tagsToDrop = null; // new HashSet(64);
         synchronized (_inboundTagSets) {
             for (Iterator iter = _inboundTagSets.keySet().iterator(); iter.hasNext();) {
                 SessionTag tag = (SessionTag) iter.next();
                 TagSet ts = (TagSet) _inboundTagSets.get(tag);
                 if (ts.getDate() < now - SESSION_LIFETIME_MAX_MS) {
-                    if (tagsToDrop == null)
-                        tagsToDrop = new HashSet(4);
-                    tagsToDrop.add(tag);
+                    iter.remove();
+                    removed++;
                 }
             }
-            if (tagsToDrop != null) {
-                removed += tagsToDrop.size();
-                for (Iterator iter = tagsToDrop.iterator(); iter.hasNext();)
-                    _inboundTagSets.remove(iter.next());
-            }
+            remaining = _inboundTagSets.size();
         }
+        _context.statManager().addRateData("crypto.sessionTagsRemaining", remaining, 0);
+
+
         //_log.warn("Expiring tags: [" + tagsToDrop + "]");
 
         synchronized (_outboundSessions) {
-            Set sessionsToDrop = null;
             for (Iterator iter = _outboundSessions.keySet().iterator(); iter.hasNext();) {
                 PublicKey key = (PublicKey) iter.next();
                 OutboundSession sess = (OutboundSession) _outboundSessions.get(key);
                 removed += sess.expireTags();
-                if (sess.getTagSets().size() <= 0) {
-                    if (sessionsToDrop == null)
-                        sessionsToDrop = new HashSet(4);
-                    sessionsToDrop.add(key);
-                }
-            }
-            if (sessionsToDrop != null) {
-                for (Iterator iter = sessionsToDrop.iterator(); iter.hasNext();) {
-                    OutboundSession cur = (OutboundSession)_outboundSessions.remove(iter.next());
-                    if ( (cur != null) && (_log.shouldLog(Log.WARN)) )
-                        _log.warn("Removing session tags with " + cur.availableTags() + " available for "
-                                   + (cur.getLastExpirationDate()-_context.clock().now())
-                                   + "ms more", new Exception("Removed by"));
+                if (sess.availableTags() <= 0) {
+                    iter.remove();
+                    removed++;
                 }
             }
         }

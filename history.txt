@@ -1,4 +1,11 @@
-$Id: history.txt,v 1.160 2005/02/27 17:09:37 jrandom Exp $
+$Id: history.txt,v 1.161 2005/03/01 12:50:54 jrandom Exp $
+
+2005-03-02  jrandom
+    * Fix one substantial OOM cause (session tag manager was only dropping 
+      tags once the critical limit was met, rather than honoring their 
+      expiration) (duh)
+    * Lots of small memory fixes
+    * Double the allowable concurrent outstanding tunnel build tasks (20)
 
 2005-03-01  jrandom
     * Really disable the streaming lib packet caching

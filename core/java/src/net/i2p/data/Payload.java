@@ -73,14 +73,16 @@ public class Payload extends DataStructureImpl {
         _encryptedData = new byte[size];
         int read = read(in, _encryptedData);
         if (read != size) throw new DataFormatException("Incorrect number of bytes read in the payload structure");
-        _log.debug("read payload: " + read + " bytes");
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("read payload: " + read + " bytes");
     }
 
     public void writeBytes(OutputStream out) throws DataFormatException, IOException {
         if (_encryptedData == null) throw new DataFormatException("Not yet encrypted.  Please set the encrypted data");
         DataHelper.writeLong(out, 4, _encryptedData.length);
         out.write(_encryptedData);
-        _log.debug("wrote payload: " + _encryptedData.length);
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("wrote payload: " + _encryptedData.length);
     }
     public int writeBytes(byte target[], int offset) {
         if (_encryptedData == null) throw new IllegalStateException("Not yet encrypted.  Please set the encrypted data");

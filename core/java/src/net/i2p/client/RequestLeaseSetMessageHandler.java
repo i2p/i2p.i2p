@@ -41,7 +41,8 @@ class RequestLeaseSetMessageHandler extends HandlerImpl {
     }
 
     public void handleMessage(I2CPMessage message, I2PSessionImpl session) {
-        _log.debug("Handle message " + message);
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("Handle message " + message);
         RequestLeaseSetMessage msg = (RequestLeaseSetMessage) message;
         LeaseSet leaseSet = new LeaseSet();
         for (int i = 0; i < msg.getEndpoints(); i++) {

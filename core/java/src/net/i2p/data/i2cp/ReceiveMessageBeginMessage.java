@@ -64,14 +64,10 @@ public class ReceiveMessageBeginMessage extends I2CPMessageImpl {
     protected byte[] doWriteMessage() throws I2CPMessageException, IOException {
         if ((_sessionId == null) || (_messageId == null))
             throw new I2CPMessageException("Unable to write out the message as there is not enough data");
-        ByteArrayOutputStream os = new ByteArrayOutputStream(64);
-        try {
-            _sessionId.writeBytes(os);
-            _messageId.writeBytes(os);
-        } catch (DataFormatException dfe) {
-            throw new I2CPMessageException("Error writing out the message data", dfe);
-        }
-        return os.toByteArray();
+        byte rv[] = new byte[2+4];
+        DataHelper.toLong(rv, 0, 2, _sessionId.getSessionId());
+        DataHelper.toLong(rv, 2, 4, _messageId.getMessageId());
+        return rv;
     }
 
     public int getType() {

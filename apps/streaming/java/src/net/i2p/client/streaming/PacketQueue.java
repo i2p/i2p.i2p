@@ -48,7 +48,9 @@ class PacketQueue {
             tagsSent = new HashSet(0);
 
         // cache this from before sendMessage
-        String conStr = (packet.getConnection() != null ? packet.getConnection().toString() : "");
+        String conStr = null;
+        if (_log.shouldLog(Log.DEBUG))
+            conStr = (packet.getConnection() != null ? packet.getConnection().toString() : "");
         if (packet.getAckTime() > 0) {
             _log.debug("Not resending " + packet);
             return;

@@ -54,13 +54,13 @@ public class TunnelPoolManager implements TunnelManagerFacade {
         _clientInboundPools = new HashMap(4);
         _clientOutboundPools = new HashMap(4);
         _outstandingBuilds = 0;
-        _maxOutstandingBuilds = 10;
-        String max = ctx.getProperty("router.tunnel.maxConcurrentBuilds", "10");
+        _maxOutstandingBuilds = 20;
+        String max = ctx.getProperty("router.tunnel.maxConcurrentBuilds", "20");
         if (max != null) {
             try {
                 _maxOutstandingBuilds = Integer.parseInt(max);
             } catch (NumberFormatException nfe) {
-                _maxOutstandingBuilds = 10;
+                _maxOutstandingBuilds = 20;
             }
         }
         

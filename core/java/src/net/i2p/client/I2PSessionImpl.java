@@ -39,6 +39,7 @@ import net.i2p.data.i2cp.MessagePayloadMessage;
 import net.i2p.data.i2cp.SessionId;
 import net.i2p.util.I2PThread;
 import net.i2p.util.Log;
+import net.i2p.util.SimpleTimer;
 
 /**
  * Implementation of an I2P session running over TCP.  This class is NOT thread safe -
@@ -348,8 +349,8 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
         int id = msg.getMessageId().getMessageId();
         byte data[] = msg.getPayload().getUnencryptedData();
         if ((data == null) || (data.length <= 0)) {
-            if (_log.shouldLog(Log.ERROR))
-                _log.error(getPrefix() + "addNewMessage of a message with no unencrypted data",
+            if (_log.shouldLog(Log.CRIT))
+                _log.log(Log.CRIT, getPrefix() + "addNewMessage of a message with no unencrypted data",
                            new Exception("Empty message"));
         } else {
             int size = data.length;
@@ -357,6 +358,20 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
             if (_log.shouldLog(Log.INFO))
                 _log.info(getPrefix() + "Notified availability for session " + _sessionId + ", message " + id);
         }
+        SimpleTimer.getInstance().addEvent(new VerifyUsage(id), 30*1000);
+    }
+    private class VerifyUsage implements SimpleTimer.TimedEvent {
+        private int _msgId;
+        public VerifyUsage(int id) { _msgId = id; }
+        public void timeReached() {
+            MessagePayloadMessage removed = null;
+            synchronized (_availableMessages) {
+                removed = (MessagePayloadMessage)_availableMessages.remove(new Integer(_msgId));
+            }
+            if (removed != null)
+                _log.log(Log.CRIT, "Message NOT removed!  id=" + _msgId + ": " + removed);
+        }
+        
     }
 
     private class AvailabilityNotifier implements Runnable {
@@ -407,6 +422,8 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
                         } catch (Exception e) {
                             _log.log(Log.CRIT, "Error notifying app of message availability", e);
                         }
+                    } else {
+                        _log.log(Log.CRIT, "Unable to notify an app that " + msgId + " of size " + size + " is available!");
                     }
                 }
             }
