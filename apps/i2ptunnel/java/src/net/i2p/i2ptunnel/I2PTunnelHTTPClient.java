@@ -281,6 +281,15 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
                         line = "Host: " + host;
                         if (_log.shouldLog(Log.INFO)) 
                             _log.info(getPrefix(requestId) + "Setting host = " + host);
+                    } else if (line.startsWith("User-Agent: ")) {
+                        line = "User-Agent: MYOB/6.66 (AN/ON)";
+                    } else if (line.startsWith("Referer: ")) {
+                        // Shouldn't we be more specific, like accepting in-site referers ?
+                        line = "Referer: i2p";
+                    } else if (line.startsWith("Via: ")) {
+                        line = "Via: i2p";
+                    } else if (line.startsWith("From: ")) {
+                        line = "From: i2p";
                     }
                 }
                 

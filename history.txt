@@ -1,4 +1,12 @@
-$Id: history.txt,v 1.1 2004/09/02 15:00:28 jrandom Exp $
+$Id: history.txt,v 1.2 2004/09/02 16:26:03 jrandom Exp $
+
+2004-09-03  oOo
+    * Added some filters to the HTTP request, replacing the User-Agent,
+      Referrer, Via, and From headers, which helps until we have a more 
+      comprehensive filtering system.
+
+2004-09-03  jrandom
+    * Disabled the old listener on port 7655.
 
 2004-09-02  jrandom
     * Cleaned up the base build.xml, adding a new target ("updater") which 
