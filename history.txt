@@ -1,4 +1,10 @@
-$Id: history.txt,v 1.9 2004/09/07 02:17:03 jrandom Exp $
+$Id: history.txt,v 1.10 2004/09/07 02:23:49 jrandom Exp $
+
+2004-09-07  jrandom
+    * Disable the timestamper by default for all applications except the router
+      (enable via -Dtime.disabled=false)
+    * Simplify the retrieval of the full destination with text based browsers.
+    * Bundle the updated wrapper.config and hosts.txt in the i2pupdate.tar.bz2
 
 2004-09-07  jrandom
     * Write the native libraries to the current directory when they are loaded 

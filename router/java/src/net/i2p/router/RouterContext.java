@@ -65,10 +65,23 @@ public class RouterContext extends I2PAppContext {
     
     public RouterContext(Router router) { this(router, null); }
     public RouterContext(Router router, Properties envProps) { 
-        super(envProps);
+        super(filterProps(envProps));
         _router = router;
         initAll();
         _contexts.add(this);
+    }
+    /**
+     * Unless we are explicitly disabling the timestamper, we want to use it.
+     * We need this now as the new timestamper default is disabled (so we don't
+     * have each I2PAppContext creating their own SNTP queries all the time)
+     *
+     */
+    static final Properties filterProps(Properties envProps) {
+        if (envProps == null)
+            envProps = new Properties();
+        if (envProps.getProperty("time.disabled") == null)
+            envProps.setProperty("time.disabled", "false");
+        return envProps;
     }
     private void initAll() {
         _adminManager = new AdminManager(this);

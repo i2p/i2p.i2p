@@ -25,7 +25,7 @@ public class Timestamper implements Runnable {
     
     private static final int DEFAULT_QUERY_FREQUENCY = 5*60*1000;
     private static final String DEFAULT_SERVER_LIST = "pool.ntp.org, pool.ntp.org";
-    private static final boolean DEFAULT_DISABLED = false;
+    private static final boolean DEFAULT_DISABLED = true;
     
     public static final String PROP_QUERY_FREQUENCY = "time.queryFrequencyMs";
     public static final String PROP_SERVER_LIST = "time.sntpServerList";

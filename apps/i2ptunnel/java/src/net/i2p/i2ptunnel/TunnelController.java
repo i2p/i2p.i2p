@@ -371,14 +371,15 @@ public class TunnelController implements Logging {
                 Destination dest = session.getMyDestination();
                 if (dest != null) {
                     buf.append("Destination hash: ").append(dest.calculateHash().toBase64()).append("<br />\n");
-                    buf.append("Full destination: ");
-                    buf.append("<input type=\"text\" size=\"10\" onclick=\"this.select();\" ");
-                    buf.append("value=\"").append(dest.toBase64()).append("\" />\n");
                     if ("server".equals(getType())) {
-                        buf.append(" Give that out to people so they can view your service.");
-                        buf.append(" If you are going to share it on irc, be sure to split it on two lines");
+                        buf.append("Full destination: ");
+                        buf.append("<input type=\"text\" size=\"10\" onclick=\"this.select();\" ");
+                        buf.append("value=\"").append(dest.toBase64()).append("\" />\n");
+                        buf.append("<br />If you are going to share this on IRC, you need to split it up:<br />\n");
+                        String str = dest.toBase64();
+                        buf.append(str.substring(0, str.length()/2)).append("<br />\n");
+                        buf.append(str.substring(str.length()/2)).append("<br />\n");
                     }
-                    buf.append("<br />\n");
                 }
             }
         }

@@ -227,6 +227,8 @@
         <copy file="build/i2ptunnel.war" todir="pkg-temp/webapps/" />
         <copy file="build/routerconsole.war" todir="pkg-temp/webapps/" />
         <copy file="history.txt" todir="pkg-temp/" />
+        <copy file="hosts.txt" todir="pkg-temp/" />
+        <copy file="installer/resources/wrapper.config" todir="pkg-temp/" />        
         <tar compression="bzip2" destfile="i2pupdate.tar.bz2">
             <tarfileset dir="pkg-temp" includes="**/*" prefix="i2p" />
         </tar>
