@@ -38,9 +38,13 @@ public class BandwidthLimitedOutputStream extends FilterOutputStream {
     public void write(int val) throws IOException {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Writing a single byte!", new Exception("Single byte from..."));
+        long before = _context.clock().now();
         FIFOBandwidthLimiter.Request req = _context.bandwidthLimiter().requestOutbound(1, _peerTarget);
         // only a single byte, no need to loop
         req.waitForNextAllocation();
+        long waited = _context.clock().now() - before;
+        if ( (waited > 1000) && (_log.shouldLog(Log.WARN)) )
+            _log.warn("Waiting to write a byte took too long [" + waited + "ms");
         out.write(val);
     }
     public void write(byte src[]) throws IOException {
@@ -65,6 +69,7 @@ public class BandwidthLimitedOutputStream extends FilterOutputStream {
                     out.write(src, off + written, toWrite);
                 } catch (IOException ioe) {
                     _currentRequest.abort();
+                    _currentRequest = null;
                     throw ioe;
                 }
                 written += toWrite;

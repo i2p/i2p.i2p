@@ -27,13 +27,13 @@ class FIFOBandwidthRefiller implements Runnable {
     public static final String PROP_REPLENISH_FREQUENCY = "i2np.bandwidth.replenishFrequencyMs";
  
     /** For now, until there is some tuning and safe throttling, we set the floor at 6KBps inbound */
-    public static final int MIN_INBOUND_BANDWIDTH = 6;
+    public static final int MIN_INBOUND_BANDWIDTH = 1;
     /** For now, until there is some tuning and safe throttling, we set the floor at 6KBps outbound */
-    public static final int MIN_OUTBOUND_BANDWIDTH = 6;
+    public static final int MIN_OUTBOUND_BANDWIDTH = 1;
     /** For now, until there is some tuning and safe throttling, we set the floor at a 10 second burst */
-    public static final int MIN_INBOUND_BANDWIDTH_PEAK = 6;
+    public static final int MIN_INBOUND_BANDWIDTH_PEAK = 1;
     /** For now, until there is some tuning and safe throttling, we set the floor at a 10 second burst */
-    public static final int MIN_OUTBOUND_BANDWIDTH_PEAK = 6;
+    public static final int MIN_OUTBOUND_BANDWIDTH_PEAK = 1;
     /** Updating the bandwidth more than once a second is silly.  once every 2 or 5 seconds is less so. */
     public static final long MIN_REPLENISH_FREQUENCY = 1000;
     
@@ -107,6 +107,8 @@ class FIFOBandwidthRefiller implements Runnable {
             }
             return true;
         } else {
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Refresh delay too fast (" + numMs + ")");
             return false;
         }
     }

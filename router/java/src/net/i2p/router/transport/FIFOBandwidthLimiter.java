@@ -138,7 +138,9 @@ public class FIFOBandwidthLimiter {
                     if (_log.shouldLog(Log.WARN))
                         _log.warn("Still denying the " + _pendingInboundRequests.size() 
                                   + " pending inbound requests (available "
-                                  + _availableInboundBytes + "/" + _availableOutboundBytes + " in/out)");
+                                  + _availableInboundBytes + "/" + _availableOutboundBytes 
+                                  + " in/out, longest waited " + locked_getLongestInboundWait()
+                                  + "/" + locked_getLongestOutboundWait() + " in/out)");
                 }
             }
         }
@@ -149,6 +151,31 @@ public class FIFOBandwidthLimiter {
                 req.notifyAllocation();
             }
         }
+    }
+    
+    private long locked_getLongestInboundWait() {
+        long start = -1;
+        for (int i = 0; i < _pendingInboundRequests.size(); i++) {
+            SimpleRequest req = (SimpleRequest)_pendingInboundRequests.get(i);
+            if ( (start < 0) || (start > req.getRequestTime()) )
+                start = req.getRequestTime();
+        }
+        if (start == -1) 
+            return 0;
+        else
+            return _context.clock().now() - start;
+    }
+    private long locked_getLongestOutboundWait() {
+        long start = -1;
+        for (int i = 0; i < _pendingOutboundRequests.size(); i++) {
+            SimpleRequest req = (SimpleRequest)_pendingOutboundRequests.get(i);
+            if ( (start < 0) || (start > req.getRequestTime()) )
+                start = req.getRequestTime();
+        }
+        if (start == -1)
+            return 0;
+        else
+            return _context.clock().now() - start;
     }
     
     /**
@@ -229,14 +256,18 @@ public class FIFOBandwidthLimiter {
                                 + req.getRequestName() + " (wanted " 
                                 + req.getTotalInboundRequested() + " bytes, waited " 
                                 + waited
-                                + "ms) pending " + _pendingInboundRequests.size());
+                                + "ms) pending " + _pendingInboundRequests.size()
+                                + ", longest waited " + locked_getLongestInboundWait() 
+                                + "/" + locked_getLongestOutboundWait() + " in/out");
             } else {
                 if (_log.shouldLog(Log.INFO))
                      _log.info("Allocating " + allocated + " bytes inbound to finish the partial grant to " 
                                 + req.getRequestName() + " (total " 
                                 + req.getTotalInboundRequested() + " bytes, waited " 
                                 + waited
-                                + "ms) pending " + _pendingInboundRequests.size());
+                                + "ms) pending " + _pendingInboundRequests.size()
+                                + ", longest waited " + locked_getLongestInboundWait() 
+                                + "/" + locked_getLongestOutboundWait() + " in/out");
                 _pendingInboundRequests.remove(i);
                 i--;
                 if (waited > 10)
@@ -259,7 +290,9 @@ public class FIFOBandwidthLimiter {
                     if (_log.shouldLog(Log.WARN))
                         _log.warn("Still denying the " + _pendingOutboundRequests.size() 
                                   + " pending outbound requests (available "
-                                  + _availableInboundBytes + "/" + _availableOutboundBytes + " in/out)");
+                                  + _availableInboundBytes + "/" + _availableOutboundBytes + " in/out, "
+                                  + "longest waited " + locked_getLongestInboundWait() 
+                                  + "/" + locked_getLongestOutboundWait() + " in/out)");
                 }
             }
         }
@@ -292,7 +325,9 @@ public class FIFOBandwidthLimiter {
                  _log.info("Granting outbound request " + req.getRequestName() + " fully for " 
                             + req.getTotalOutboundRequested() + " bytes (waited " 
                             + waited
-                            + "ms) pending " + _pendingOutboundRequests.size());
+                            + "ms) pending " + _pendingOutboundRequests.size()
+                            + ", longest waited " + locked_getLongestInboundWait() 
+                             + "/" + locked_getLongestOutboundWait() + " in/out");
             if (waited > 10)
                 _context.statManager().addRateData("bwLimiter.outboundDelayedTime", waited, waited);
         }
@@ -350,14 +385,18 @@ public class FIFOBandwidthLimiter {
                                 + req.getRequestName() + " (wanted " 
                                 + req.getTotalOutboundRequested() + " bytes, waited " 
                                 + waited
-                                + "ms) pending " + _pendingOutboundRequests.size());
+                                + "ms) pending " + _pendingOutboundRequests.size()
+                                + ", longest waited " + locked_getLongestInboundWait() 
+                                + "/" + locked_getLongestOutboundWait() + " in/out");
             } else {
                 if (_log.shouldLog(Log.INFO))
                      _log.info("Allocating " + allocated + " bytes outbound to finish the partial grant to " 
                                 + req.getRequestName() + " (total " 
                                 + req.getTotalOutboundRequested() + " bytes, waited " 
                                 + waited
-                                + "ms) pending " + _pendingOutboundRequests.size());
+                                + "ms) pending " + _pendingOutboundRequests.size()
+                                + ", longest waited " + locked_getLongestInboundWait() 
+                                + "/" + locked_getLongestOutboundWait() + " in/out)");
                 _pendingOutboundRequests.remove(i);
                 i--;
                 if (waited > 10)
