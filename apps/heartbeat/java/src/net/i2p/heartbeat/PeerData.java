@@ -27,7 +27,7 @@ public class PeerData {
     /** date sent (Long) to EventDataPoint containing the datapoints sent in the current period */
     private Map _dataPoints;
     /** date sent (Long) to EventDataPoint containing pings that haven't yet timed out or been ponged */
-    private Map _pendingPings;
+    private TreeMap _pendingPings;
     private long _sessionStart;
     private long _lifetimeSent;
     private long _lifetimeReceived;
@@ -208,14 +208,32 @@ public class PeerData {
     public void pongReceived(long dateSent, long pongSent) {
         long now = Clock.getInstance().now();
         synchronized (_updateLock) {
-            EventDataPoint data = (EventDataPoint) _pendingPings.remove(new Long(dateSent));
+            if (_pendingPings.size() <= 0) {
+                _log.warn("Pong received (sent at " + dateSent + ", " + (now-dateSent) 
+                          + "ms ago, pong delay " + (pongSent-dateSent) + "ms, pong receive delay "
+                          + (now-pongSent) + "ms)");
+                return;
+            }
+            Long first = (Long)_pendingPings.firstKey();
+            EventDataPoint data = (EventDataPoint)_pendingPings.remove(new Long(dateSent));
+            
             if (data != null) {
                 data.setPongReceived(now);
                 data.setPongSent(pongSent);
                 data.setWasPonged(true);
                 locked_addDataPoint(data);
+                
+                if (dateSent != first.longValue()) {
+                    _log.error("Out of order delivery: received " + dateSent 
+                               + " but the first pending is " + first.longValue()
+                               + " (delta " + (dateSent - first.longValue()) + ")");
+                } else {
+                    _log.info("In order delivery for " + dateSent + " in ping " 
+                               + _peer.getComment());
+                }
             } else {
                 _log.warn("Pong received, but no matching ping?  ping sent at = " + dateSent);
+                return;
             }
         }
         _sendRate.addData(pongSent - dateSent, 0);
