@@ -37,7 +37,11 @@ class JobQueueRunner implements Runnable {
         while ( (_keepRunning) && (_context.jobQueue().isAlive()) ) { 
             try {
                 Job job = _context.jobQueue().getNext();
-                if (job == null) continue;
+                if (job == null) {
+                    if (_log.shouldLog(Log.ERROR))
+                        _log.error("getNext returned null - dead?");
+                    continue;
+                }
                 long now = _context.clock().now();
 
                 long enqueuedTime = 0;
@@ -52,7 +56,6 @@ class JobQueueRunner implements Runnable {
                 }
 
                 long betweenJobs = now - lastActive;
-                _context.statManager().addRateData("jobQueue.jobRunnerInactive", betweenJobs, betweenJobs);
                 _currentJob = job;
                 _lastJob = null;
                 if (_log.shouldLog(Log.DEBUG))
@@ -67,6 +70,7 @@ class JobQueueRunner implements Runnable {
                 _context.jobQueue().updateStats(job, doStart, origStartAfter, duration);
                 long diff = _context.clock().now() - beforeUpdate;
 
+                _context.statManager().addRateData("jobQueue.jobRunnerInactive", betweenJobs, betweenJobs);
                 _context.statManager().addRateData("jobQueue.jobRun", duration, duration);
                 _context.statManager().addRateData("jobQueue.jobLag", doStart - origStartAfter, 0);
                 _context.statManager().addRateData("jobQueue.jobWait", enqueuedTime, enqueuedTime);

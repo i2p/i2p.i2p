@@ -42,8 +42,6 @@ public class JobQueue {
     private ArrayList _readyJobs;
     /** list of jobs that are scheduled for running in the future */
     private ArrayList _timedJobs;
-    /** when true, don't run any new jobs or update any limits, etc */
-    private boolean _paused;
     /** job name to JobStat for that job */
     private SortedMap _jobStats;
     /** how many job queue runners can go concurrently */
@@ -117,7 +115,6 @@ public class JobQueue {
         _readyJobs = new ArrayList();
         _timedJobs = new ArrayList();
         _queueRunners = new HashMap();
-        _paused = false;
         _jobStats = Collections.synchronizedSortedMap(new TreeMap());
         _allowParallelOperation = false;
         _pumper = new QueuePumper();
@@ -241,9 +238,6 @@ public class JobQueue {
      */
     Job getNext() {
         while (_alive) {
-            while (_paused) {
-                try { Thread.sleep(30); } catch (InterruptedException ie) {}
-            }
             Job rv = null;
             int ready = 0;
             synchronized (_readyJobs) {
@@ -254,10 +248,13 @@ public class JobQueue {
             if (rv != null) {
                 // we found one, but there may be more, so wake up enough
                 // other runners
-                awaken(ready-1);
                 if (_log.shouldLog(Log.DEBUG))
-                    _log.debug("Using a ready job after waking up " + (ready-1) + " others");
+                    _log.debug("Waking up " + (ready-1) + " job runners (and running one)");
+                awaken(ready-1);
                 return rv;
+            } else {
+                if (_log.shouldLog(Log.DEBUG))
+                    _log.debug("No jobs pending, waiting a second");
             }
             
             try {
@@ -266,6 +263,8 @@ public class JobQueue {
                 }
             } catch (InterruptedException ie) {}
         }
+        if (_log.shouldLog(Log.WARN))
+            _log.warn("No longer alive, returning null");
         return null;
     }
     
@@ -341,8 +340,6 @@ public class JobQueue {
         }
     }
         
-    //public void pauseQueue() { _paused = true; }
-    //public void unpauseQueue() { _paused = false; }    
     void removeRunner(int id) { _queueRunners.remove(new Integer(id)); }
 
 
@@ -356,23 +353,6 @@ public class JobQueue {
         for (int i = 0; i < numMadeReady; i++) {
             synchronized (_runnerLock) {
                 _runnerLock.notify();
-            }
-        }
-
-        int numRunners = 0;
-        synchronized (_queueRunners) {
-            numRunners = _queueRunners.size();
-        }
-
-        if (numRunners > 1) {
-            if (numMadeReady > numRunners) {
-                if (numMadeReady  < _maxRunners) {
-                    _log.info("Too much job contention (" + numMadeReady + " ready and waiting, " + numRunners + " runners exist), adding " + numMadeReady + " new runners (with max " + _maxRunners + ")");
-                    runQueue(numMadeReady);
-                } else {
-                    _log.info("Too much job contention (" + numMadeReady + " ready and waiting, " + numRunners + " runners exist), increasing to our max of " + _maxRunners + " runners");
-                    runQueue(_maxRunners);
-                }
             }
         }
     }
@@ -392,10 +372,6 @@ public class JobQueue {
         public void run() {
             try {
                 while (_alive) {
-                    while (_paused) {
-                        try { Thread.sleep(1000); } catch (InterruptedException ie) {}
-                    }
-                    
                     // periodically update our max runners limit
                     long now = _context.clock().now();
                     if (now > _lastLimitUpdated + MAX_LIMIT_UPDATE_DELAY) { 
