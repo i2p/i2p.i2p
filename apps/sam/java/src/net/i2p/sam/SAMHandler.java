@@ -43,8 +43,8 @@ public abstract class SAMHandler implements Runnable {
      *
      */
     public void startHandling() {
-	thread = new I2PThread(this, "SAMHandler");
-	thread.start();
+        thread = new I2PThread(this, "SAMHandler");
+        thread.start();
     }
     
     /**
@@ -61,13 +61,13 @@ public abstract class SAMHandler implements Runnable {
      * @param data A byte array to be written
      */
     protected void writeBytes(byte[] data) throws IOException {
-	synchronized (socketWLock) {
-	    if (socketOS == null) {
-		socketOS = socket.getOutputStream();
-	    }
-	    socketOS.write(data);
-	    socketOS.flush();
-	}
+        synchronized (socketWLock) {
+            if (socketOS == null) {
+                socketOS = socket.getOutputStream();
+            }
+            socketOS.write(data);
+            socketOS.flush();
+        }
     }
 
     /**
@@ -80,14 +80,14 @@ public abstract class SAMHandler implements Runnable {
      * @return True is the string was successfully written, false otherwise
      */
     protected boolean writeString(String str) {
-	try {
-	    writeBytes(str.getBytes("ISO-8859-1"));
-	} catch (IOException e) {
-	    _log.debug("Caught IOException", e);
-	    return false;
-	}
+        try {
+            writeBytes(str.getBytes("ISO-8859-1"));
+        } catch (IOException e) {
+            _log.debug("Caught IOException", e);
+            return false;
+        }
 
-	return true;
+        return true;
     }
 
     /**
@@ -95,9 +95,9 @@ public abstract class SAMHandler implements Runnable {
      *
      */
     public void stopHandling() {
-	synchronized (stopLock) {
-	    stopHandler = true;
-	}
+        synchronized (stopLock) {
+            stopHandler = true;
+        }
     }
 
     /**
@@ -106,9 +106,9 @@ public abstract class SAMHandler implements Runnable {
      * @return True if the handler should be stopped, false otherwise
      */
     protected boolean shouldStop() {
-	synchronized (stopLock) {
-	    return stopHandler;
-	}
+        synchronized (stopLock) {
+            return stopHandler;
+        }
     }
 
     /**
@@ -119,6 +119,6 @@ public abstract class SAMHandler implements Runnable {
     public abstract String toString();
 
     public final void run() {
-	handle();
+        handle();
     }
 }
