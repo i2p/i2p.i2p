@@ -330,7 +330,7 @@ public class SAMv1Handler extends SAMHandler implements SAMRawReceiver, SAMDatag
             }
             
             if (dest == null) {
-                return writeString("NAMING REPLY RESULT=KEY_NOT_FOUND\n");
+                return writeString("NAMING REPLY RESULT=KEY_NOT_FOUND NAME=" + name + "\n");
             }
             
             return writeString("NAMING REPLY RESULT=OK NAME=" + name
