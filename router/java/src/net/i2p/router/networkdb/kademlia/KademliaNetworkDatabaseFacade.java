@@ -388,7 +388,10 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
     private final void writeMyInfo(RouterInfo info) {
         FileOutputStream fos = null;
         try {
-            fos = new FileOutputStream(new File(new File(_dbDir), "my.info"));
+            File dbDir = new File(_dbDir);
+            if (!dbDir.exists())
+                dbDir.mkdirs();
+            fos = new FileOutputStream(new File(dbDir, "my.info"));
             info.writeBytes(fos);
             fos.close();
         } catch (IOException ioe) {
