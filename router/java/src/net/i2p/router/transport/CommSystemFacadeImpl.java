@@ -76,7 +76,8 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
         if (addr != null)
             addresses.add(addr);
         
-        addresses.addAll(_manager.getAddresses());
+        if (_manager != null)
+            addresses.addAll(_manager.getAddresses());
         
         if (_log.shouldLog(Log.INFO))
             _log.info("Creating addresses: " + addresses);

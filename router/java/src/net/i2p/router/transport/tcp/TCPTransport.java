@@ -84,6 +84,8 @@ public class TCPTransport extends TransportImpl {
     
     /** Ordered list of supported I2NP protocols */
     public static final int[] SUPPORTED_PROTOCOLS = new int[] { 1 };
+    /** blah, people shouldnt use defaults... */
+    public static final int DEFAULT_LISTEN_PORT = 8887;
     
     /** Creates a new instance of TCPTransport */
     public TCPTransport(RouterContext context) {
@@ -300,8 +302,8 @@ public class TCPTransport extends TransportImpl {
     
     public RouterAddress startListening() { 
         configureLocalAddress();
+        _listener.startListening();
         if (_myAddress != null) {
-            _listener.startListening();
             return _myAddress.toRouterAddress();
         } else {
             return null;
@@ -341,7 +343,12 @@ public class TCPTransport extends TransportImpl {
         }
     }
     
-    TCPAddress getMyAddress() { return _myAddress; }
+    String getMyHost() { 
+        if (_myAddress != null) 
+            return _myAddress.getHost();
+        else
+            return null;
+    }
     public String getStyle() { return STYLE; }
     ConnectionTagManager getTagManager() { return _tagManager; }
     
@@ -352,6 +359,11 @@ public class TCPTransport extends TransportImpl {
     private void configureLocalAddress() {
         String addr = _context.getProperty(LISTEN_ADDRESS);
         int port = getPort();
+        if ( (addr == null) || (addr.trim().length() <= 0) ) {
+            if (_log.shouldLog(Log.ERROR))
+                _log.error("External address is not specified - autodetecting IP (be sure to forward port " + port + ")");
+            return;
+        }
         if (port != -1) {
             TCPAddress address = new TCPAddress(addr, port);
             boolean ok = allowAddress(address);
@@ -435,7 +447,7 @@ public class TCPTransport extends TransportImpl {
         if ( (_myAddress != null) && (_myAddress.getPort() > 0) )
             return _myAddress.getPort();
         
-        String port = _context.getProperty(LISTEN_PORT);
+        String port = _context.getProperty(LISTEN_PORT, DEFAULT_LISTEN_PORT+"");
         if (port != null) {
             try {
                 int portNum = Integer.parseInt(port);

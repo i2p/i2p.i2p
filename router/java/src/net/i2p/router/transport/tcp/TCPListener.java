@@ -63,10 +63,11 @@ class TCPListener {
         _handlers = new ArrayList(CONCURRENT_HANDLERS);
     }
         
-    /** Make sure we are listening on the transport's getMyAddress() */
+    /** Make sure we are listening per the transport's config */
     public void startListening() {
-        TCPAddress addr = _transport.getMyAddress();
-        if ( (addr != null) && (addr.getHost() != null) && (addr.getPort() > 0) ) {
+        TCPAddress addr = new TCPAddress(_transport.getMyHost(), _transport.getPort());
+            
+        if (addr.getPort() > 0) {
             if (_listener != null) {
                 if (_log.shouldLog(Log.WARN))
                     _log.warn("Not starting another listener on " + addr 
@@ -141,14 +142,15 @@ class TCPListener {
             int curDelay = 0;
             while (_isRunning) {
                 try {
-                    if (_transport.shouldListenToAllInterfaces()) {
+                    if ( (_transport.shouldListenToAllInterfaces()) || (_myAddress.getHost() == null) ) {
                         _socket = new ServerSocket(_myAddress.getPort());
                     } else {
                         InetAddress listenAddr = getInetAddress(_myAddress.getHost());
                         _socket = new ServerSocket(_myAddress.getPort(), 5, listenAddr);
                     }
+                    String host = (null == _myAddress.getHost() ? "0.0.0.0" : _myAddress.getHost());
                     if (_log.shouldLog(Log.INFO))
-                        _log.info("Begin looping for host " + _myAddress.getHost() + ":" + _myAddress.getPort());
+                        _log.info("Begin looping for host " + host + ":" + _myAddress.getPort());
                     curDelay = 0;
                     loop();
                 } catch (IOException ioe) {
