@@ -77,7 +77,8 @@ public abstract class I2NPMessageImpl extends DataStructureImpl implements I2NPM
         } catch (DataFormatException dfe) {
             throw new I2NPMessageException("Error reading the message header", dfe);
         }
-        _log.debug("Reading bytes: type = " + type + " / uniqueId : " + _uniqueId + " / expiration : " + _expiration);
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("Reading bytes: type = " + type + " / uniqueId : " + _uniqueId + " / expiration : " + _expiration);
         readMessage(in, type);
     }
     public void writeBytes(OutputStream out) throws DataFormatException, IOException {
@@ -85,7 +86,8 @@ public abstract class I2NPMessageImpl extends DataStructureImpl implements I2NPM
             DataHelper.writeLong(out, 1, getType());
             DataHelper.writeLong(out, 4, _uniqueId);
             DataHelper.writeDate(out, _expiration);
-            _log.debug("Writing bytes: type = " + getType() + " / uniqueId : " + _uniqueId + " / expiration : " + _expiration);
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Writing bytes: type = " + getType() + " / uniqueId : " + _uniqueId + " / expiration : " + _expiration);
             byte[] data = writeMessage();
             out.write(data);
         } catch (I2NPMessageException ime) {

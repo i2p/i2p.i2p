@@ -60,9 +60,11 @@ public class TunnelMessage extends I2NPMessageImpl {
         try {
             _tunnelId = new TunnelId();
             _tunnelId.readBytes(in);
-            _log.debug("Read tunnel message for tunnel " + _tunnelId);
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Read tunnel message for tunnel " + _tunnelId);
             _size = DataHelper.readLong(in, 4);
-            _log.debug("Read tunnel message size: " + _size);
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Read tunnel message size: " + _size);
             if (_size < 0) throw new I2NPMessageException("Invalid size in the structure: " + _size);
             _data = new byte[(int)_size];
             int read = read(in, _data);
@@ -90,17 +92,23 @@ public class TunnelMessage extends I2NPMessageImpl {
         ByteArrayOutputStream os = new ByteArrayOutputStream(32);
         try {
             _tunnelId.writeBytes(os);
-            _log.debug("Writing tunnel message for tunnel " + _tunnelId);
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Writing tunnel message for tunnel " + _tunnelId);
             DataHelper.writeLong(os, 4, _data.length);
-            _log.debug("Writing tunnel message length: " + _data.length);
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Writing tunnel message length: " + _data.length);
             os.write(_data);
-            _log.debug("Writing tunnel message data");
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Writing tunnel message data");
             if ( (_verification == null) || (_encryptedInstructions == null) ) {
                 DataHelper.writeLong(os, 1, FLAG_DONT_INCLUDESTRUCTURE);
-                _log.debug("Writing DontIncludeStructure flag");
+                if (_log.shouldLog(Log.DEBUG))
+                    _log.debug("Writing DontIncludeStructure flag");
             } else {
                 DataHelper.writeLong(os, 1, FLAG_INCLUDESTRUCTURE);
-                _log.debug("Writing IncludeStructure flag, then the verification structure, then the E(instr).length [" + _encryptedInstructions.length + "], then the E(instr)");
+                if (_log.shouldLog(Log.DEBUG))
+                    _log.debug("Writing IncludeStructure flag, then the verification structure, then the " +
+                               "E(instr).length [" + _encryptedInstructions.length + "], then the E(instr)");
                 _verification.writeBytes(os);
                 DataHelper.writeLong(os, 2, _encryptedInstructions.length);
                 os.write(_encryptedInstructions);
@@ -109,7 +117,8 @@ public class TunnelMessage extends I2NPMessageImpl {
             throw new I2NPMessageException("Error writing out the message data", dfe);
         }
         byte rv[] = os.toByteArray();
-        _log.debug("Overall data being written: " + rv.length);
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("Overall data being written: " + rv.length);
         return rv;
     }
     

@@ -88,7 +88,8 @@ public class DatabaseStoreMessage extends I2NPMessageImpl {
         try {
             _key = new Hash();
             _key.readBytes(in);
-            _log.debug("Hash read: " + _key.toBase64());
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Hash read: " + _key.toBase64());
             _type = (int)DataHelper.readLong(in, 1);
             if (_type == KEY_TYPE_LEASESET) {
                 _leaseSet = new LeaseSet();

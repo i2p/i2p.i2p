@@ -84,7 +84,8 @@ public class GarlicClove extends DataStructureImpl {
     public void readBytes(InputStream in) throws DataFormatException, IOException {
         _instructions = new DeliveryInstructions();
         _instructions.readBytes(in);
-        _log.debug("Read instructions: " + _instructions);
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("Read instructions: " + _instructions);
         try {
             _msg = _handler.readMessage(in);
         } catch (I2NPMessageException ime) {
@@ -92,10 +93,12 @@ public class GarlicClove extends DataStructureImpl {
         }
         _cloveId = DataHelper.readLong(in, 4);
         _expiration = DataHelper.readDate(in);
-        _log.debug("CloveID read: " + _cloveId + " expiration read: " + _expiration);
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("CloveID read: " + _cloveId + " expiration read: " + _expiration);
         _certificate = new Certificate();
         _certificate.readBytes(in);
-        _log.debug("Read cert: " + _certificate);
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("Read cert: " + _certificate);
         int replyStyle = (int)DataHelper.readLong(in, 1);
         setSourceRouteBlockAction(replyStyle);
         if (replyStyle != ACTION_NONE) {
@@ -124,13 +127,17 @@ public class GarlicClove extends DataStructureImpl {
                 throw new DataFormatException("Source route block must be specified for non-null action");
             _instructions.writeBytes(out);
             
-            _log.debug("Wrote instructions: " + _instructions);
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Wrote instructions: " + _instructions);
             _msg.writeBytes(out);
             DataHelper.writeLong(out, 4, _cloveId);
             DataHelper.writeDate(out, _expiration);
-            _log.debug("CloveID written: " + _cloveId + " expiration written: " + _expiration);
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("CloveID written: " + _cloveId + " expiration written: " 
+                           + _expiration);
             _certificate.writeBytes(out);
-            _log.debug("Written cert: " + _certificate);
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Written cert: " + _certificate);
             DataHelper.writeLong(out, 1, _replyAction);
             if ( (_replyAction != 0) && (_sourceRouteBlock != null) )
                 _sourceRouteBlock.writeBytes(out);
