@@ -11,14 +11,17 @@ package net.i2p.data;
 
 import java.io.BufferedReader;
 import java.io.BufferedInputStream;
+import java.io.BufferedWriter;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.PrintWriter;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -161,7 +164,22 @@ public class DataHelper {
             if (in != null) try { in.close(); } catch (IOException ioe) {}
         }
     }
-        
+    
+    public static void storeProps(Properties props, File file) throws IOException {
+        PrintWriter out = null;
+        try {
+            out = new PrintWriter(new BufferedWriter(new FileWriter(file)));
+            for (Iterator iter = props.keySet().iterator(); iter.hasNext(); ) {
+                String name = (String)iter.next();
+                String val = props.getProperty(name);
+                out.println(name + "=" + val);
+            }
+            out.flush();
+            out.close();
+        } finally {
+            if (out != null) out.close();
+        }
+    }
     
     /**
      * Pretty print the collection

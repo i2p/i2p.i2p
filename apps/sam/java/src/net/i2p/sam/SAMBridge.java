@@ -46,7 +46,7 @@ public class SAMBridge implements Runnable {
      * app designated destination name to the base64 of the I2P formatted 
      * destination keys (Destination+PrivateKey+SigningPrivateKey)
      */
-    private Map nameToPrivKeys = Collections.synchronizedMap(new HashMap(8));
+    private Map nameToPrivKeys;
 
     private boolean acceptConnections = true;
 
@@ -65,6 +65,7 @@ public class SAMBridge implements Runnable {
      */
     public SAMBridge(String listenHost, int listenPort, Properties i2cpProps, String persistFile) {
         persistFilename = persistFile;
+        nameToPrivKeys = new HashMap(8);
         loadKeys();
         try {
             if ( (listenHost != null) && !("0.0.0.0".equals(listenHost)) ) {
@@ -93,16 +94,18 @@ public class SAMBridge implements Runnable {
      * @return null if the name does not exist, or if it is improperly formatted
      */
     public Destination getDestination(String name) {
-        String val = (String)nameToPrivKeys.get(name);
-        if (val == null) return null;
-        try {
-            Destination d = new Destination();
-            d.fromBase64(val);
-            return d;
-        } catch (DataFormatException dfe) {
-            _log.error("Error retrieving the destination from " + name, dfe);
-            nameToPrivKeys.remove(name);
-            return null;
+        synchronized (nameToPrivKeys) {
+            String val = (String)nameToPrivKeys.get(name);
+            if (val == null) return null;
+            try {
+                Destination d = new Destination();
+                d.fromBase64(val);
+                return d;
+            } catch (DataFormatException dfe) {
+                _log.error("Error retrieving the destination from " + name, dfe);
+                nameToPrivKeys.remove(name);
+                return null;
+            }
         }
     }
     
@@ -114,9 +117,11 @@ public class SAMBridge implements Runnable {
      * @return null if the name does not exist, else the stream
      */
     public String getKeystream(String name) {
-        String val = (String)nameToPrivKeys.get(name);
-        if (val == null) return null;
-        return val;
+        synchronized (nameToPrivKeys) {
+            String val = (String)nameToPrivKeys.get(name);
+            if (val == null) return null;
+            return val;
+        }
     }
 
     /**
@@ -124,7 +129,9 @@ public class SAMBridge implements Runnable {
      *
      */
     public void addKeystream(String name, String stream) {
-        nameToPrivKeys.put(name, stream);
+        synchronized (nameToPrivKeys) {
+            nameToPrivKeys.put(name, stream);
+        }
         storeKeys();
     }
     
@@ -132,49 +139,52 @@ public class SAMBridge implements Runnable {
      * Load up the keys from the persistFilename
      *
      */
-    private synchronized void loadKeys() {
-        Map keys = new HashMap(16);
-        FileInputStream in = null;
-        try {
-            in = new FileInputStream(persistFilename);
-            BufferedReader reader = new BufferedReader(new InputStreamReader(in));
-            String line = null;
-            while ( (line = reader.readLine()) != null) {
-                int eq = line.indexOf('=');
-                String name = line.substring(0, eq);
-                String privKeys = line.substring(eq+1);
-                keys.put(name, privKeys);
+    private void loadKeys() {
+        synchronized (nameToPrivKeys) {
+            nameToPrivKeys.clear();
+            FileInputStream in = null;
+            try {
+                in = new FileInputStream(persistFilename);
+                BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+                String line = null;
+                while ( (line = reader.readLine()) != null) {
+                    int eq = line.indexOf('=');
+                    String name = line.substring(0, eq);
+                    String privKeys = line.substring(eq+1);
+                    nameToPrivKeys.put(name, privKeys);
+                }
+            } catch (FileNotFoundException fnfe) {
+                _log.warn("Key file does not exist at " + persistFilename);
+            } catch (IOException ioe) {
+                _log.error("Unable to read the keys from " + persistFilename, ioe);
+            } finally {
+                if (in != null) try { in.close(); } catch (IOException ioe) {}
             }
-        } catch (FileNotFoundException fnfe) {
-            _log.warn("Key file does not exist at " + persistFilename);
-        } catch (IOException ioe) {
-            _log.error("Unable to read the keys from " + persistFilename, ioe);
-        } finally {
-            if (in != null) try { in.close(); } catch (IOException ioe) {}
         }
-        nameToPrivKeys = Collections.synchronizedMap(keys);
     }
     
     /**
      * Store the current keys to disk in the location specified on creation
      *
      */
-    private synchronized void storeKeys() {
-        FileOutputStream out = null;
-        try {
-            out = new FileOutputStream(persistFilename);
-            for (Iterator iter = nameToPrivKeys.keySet().iterator(); iter.hasNext(); ) {
-                String name = (String)iter.next();
-                String privKeys = (String)nameToPrivKeys.get(name);
-                out.write(name.getBytes());
-                out.write('=');
-                out.write(privKeys.getBytes());
-                out.write('\n');
+    private void storeKeys() {
+        synchronized (nameToPrivKeys) {
+            FileOutputStream out = null;
+            try {
+                out = new FileOutputStream(persistFilename);
+                for (Iterator iter = nameToPrivKeys.keySet().iterator(); iter.hasNext(); ) {
+                    String name = (String)iter.next();
+                    String privKeys = (String)nameToPrivKeys.get(name);
+                    out.write(name.getBytes());
+                    out.write('=');
+                    out.write(privKeys.getBytes());
+                    out.write('\n');
+                }
+            } catch (IOException ioe) {
+                _log.error("Error writing out the SAM keys to " + persistFilename, ioe);
+            } finally {
+                if (out != null) try { out.close(); } catch (IOException ioe) {}
             }
-        } catch (IOException ioe) {
-            _log.error("Error writing out the SAM keys to " + persistFilename, ioe);
-        } finally {
-            if (out != null) try { out.close(); } catch (IOException ioe) {}
         }
     }
     

@@ -107,7 +107,7 @@ public class SAMv1Handler extends SAMHandler implements SAMRawReceiver, SAMDatag
 
                 msg = buf.toString("ISO-8859-1").trim();
                 if (_log.shouldLog(Log.DEBUG)) {
-                    _log.debug("New message received: " + msg);
+                    _log.debug("New message received: [" + msg + "]");
                 }
                 buf.reset();
 

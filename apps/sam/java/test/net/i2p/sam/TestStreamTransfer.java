@@ -33,7 +33,11 @@ public class TestStreamTransfer {
     
     private static void runTest(String samHost, int samPort, String conOptions) {
         startAlice(samHost, samPort, conOptions);
-        testBob(samHost, samPort, conOptions);
+        for (int i = 0; i < 20; i++) {
+            testBob("bob" + i, samHost, samPort, conOptions);
+            if (i % 2 == 1)
+                try { Thread.sleep(10*1000); } catch (InterruptedException ie) {}
+        }
     }
     
     private static void startAlice(String host, int port, String conOptions) {
@@ -95,11 +99,13 @@ public class TestStreamTransfer {
                     try { _out.close(); } catch (IOException ioe) {}
                     try { _s.close(); } catch (IOException ioe) {}
                     _streams.clear();
+                    _dead = true;
                 }
             }
         }
         private void doRun() throws IOException, SAMException {
             String line = _reader.readLine();
+            _log.debug("Read: " + line);
             StringTokenizer tok = new StringTokenizer(line);
             String maj = tok.nextToken();
             String min = tok.nextToken();
@@ -146,12 +152,15 @@ public class TestStreamTransfer {
                 }
                 _log.info("Received from the stream " + id + ": [" + new String(payload) + "]");
                 try { Thread.sleep(5*1000); } catch (InterruptedException ie) {}
+                /*
                 // now echo it back
                 String reply = "STREAM SEND ID=" + id + 
                                " SIZE=" + payloadSize + 
-                               "\n" + payload;
+                               "\n" + new String(payload);
                 _out.write(reply.getBytes());
                 _out.flush();
+                _log.info("Reply sent back [" + new String(reply.getBytes()) + "]");
+                 */
             } else {
                 _log.error("Received unsupported type [" + maj + "/"+ min + "]");
                 return;
@@ -159,8 +168,27 @@ public class TestStreamTransfer {
         }
     }
     
-    private static void testBob(String host, int port, String conOptions) {
-        _log.info("\n\nTesting Bob\n\n\n");
+    private static void testBob(String sessionName, String host, int port, String conOptions) {
+        I2PThread t = new I2PThread(new TestBob(sessionName, host, port, conOptions), sessionName);
+        t.start();
+    }
+    private static class TestBob implements Runnable {
+        private String _sessionName;
+        private String _host;
+        private int _port;
+        private String _opts;
+        public TestBob(String name, String host, int port, String opts) {
+            _sessionName = name;
+            _host = host;
+            _port = port;
+            _opts = opts;
+        }
+        public void run() {
+            doTestBob(_sessionName, _host, _port, _opts);
+        }
+    }
+    private static void doTestBob(String sessionName, String host, int port, String conOptions) {
+        _log.info("\n\nTesting " + sessionName + "\n\n\n");
         try {
             Socket s = new Socket(host, port);
             OutputStream out = s.getOutputStream();
@@ -168,32 +196,37 @@ public class TestStreamTransfer {
             BufferedReader reader = new BufferedReader(new InputStreamReader(s.getInputStream()));
             String line = reader.readLine();
             _log.debug("line read for valid version: " + line);
-            String req = "SESSION CREATE STYLE=STREAM DESTINATION=Bob " + conOptions + "\n";
+            String req = "SESSION CREATE STYLE=STREAM DESTINATION=" + sessionName + " " + conOptions + "\n";
             out.write(req.getBytes());
             line = reader.readLine();
-            _log.info("Response to creating the session with destination Bob: " + line);
+            _log.info("Response to creating the session with destination "+ sessionName+": " + line);
             req = "STREAM CONNECT ID=42 DESTINATION=" + _alice + "\n";
             out.write(req.getBytes());
             line = reader.readLine();
-            _log.info("Response to the stream connect from Bob to Alice: " + line);
+            _log.info("Response to the stream connect from "+sessionName+" to Alice: " + line);
             StringTokenizer tok = new StringTokenizer(line);
             String maj = tok.nextToken();
             String min = tok.nextToken();
             Properties props = SAMUtils.parseParams(tok);
+            _log.info("props = " + props);
             String result = props.getProperty("RESULT");
             if (!("OK".equals(result))) {
                 _log.error("Unable to connect!");
-                _dead = true;
+                //_dead = true;
                 return;
             }
             try { Thread.sleep(5*1000) ; } catch (InterruptedException ie) {}
             req = "STREAM SEND ID=42 SIZE=10\nBlahBlah!!";
+            _log.info("Sending data");
             out.write(req.getBytes());
+            out.flush();
             try { Thread.sleep(20*1000); } catch (InterruptedException ie) {}
+            _log.info("Sending close");
             req = "STREAM CLOSE ID=42\n";
             out.write(req.getBytes());
-            try { Thread.sleep(3*1000); } catch (InterruptedException ie) {}
-            _dead = true;
+            out.flush();
+            try { Thread.sleep(30*1000); } catch (InterruptedException ie) {}
+            //_dead = true;
             s.close();
         } catch (Exception e) {
             _log.error("Error testing for valid version", e);
@@ -203,7 +236,7 @@ public class TestStreamTransfer {
     public static void main(String args[]) {
         // "i2cp.tcp.host=www.i2p.net i2cp.tcp.port=7765 tunnels.inboundDepth=0";
         // "i2cp.tcp.host=localhost i2cp.tcp.port=7654 tunnels.inboundDepth=0"; 
-        String conOptions = "i2cp.tcp.host=www.i2p.net i2cp.tcp.port=7765 tunnels.inboundDepth=0";
+        String conOptions = "i2cp.tcp.host=localhost i2cp.tcp.port=10001 tunnels.inboundDepth=0";
         if (args.length > 0) {
             conOptions = "";
             for (int i = 0; i < args.length; i++)
@@ -215,8 +248,8 @@ public class TestStreamTransfer {
         } catch (Throwable t) {
             _log.error("Error running test", t);
         }
-        try { Thread.sleep(5*1000); } catch (InterruptedException ie) {}
-        System.exit(0);
+        //try { Thread.sleep(5*1000); } catch (InterruptedException ie) {}
+        //System.exit(0);
     }
 }
 

@@ -1,4 +1,11 @@
-$Id: history.txt,v 1.61 2004/11/02 03:27:56 jrandom Exp $
+$Id: history.txt,v 1.62 2004/11/02 06:57:08 jrandom Exp $
+
+2004-11-05  jrandom
+    * Bugfixes and unit tests for the SAM bridge to handle quoted message
+      parameters, verify proper operation after multiple session lifetimes,
+      as well as some synchronization problems.
+    * New properties method on the DataHelper class.
+    * Address a race on fast disconnecting clients
 
 2004-11-02  jrandom
     * Fix for a long standing synchronization bug in the JobQueue (and added

@@ -134,7 +134,7 @@ class ClientTunnelPoolManagerJob extends JobImpl {
                 // this aint good 'nuff...
                 continue;
             }
-            boolean ok = _tunnelPool.allocateTunnel(id, _clientPool.getDestination());
+            boolean ok = _tunnelPool.allocateTunnel(id, _clientPool);
             if (ok) {
                 allocated++;
             }

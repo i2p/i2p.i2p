@@ -111,9 +111,10 @@ public class SAMUtils {
      */
     public static Properties parseParams(StringTokenizer tok) throws SAMException {
         int pos, nprops = 0, ntoks = tok.countTokens();
-        String token, param, value;
+        String token, param;
         Properties props = new Properties();
         
+        StringBuffer value = new StringBuffer();
         for (int i = 0; i < ntoks; ++i) {
             token = tok.nextToken();
 
@@ -123,9 +124,16 @@ public class SAMUtils {
                 throw new SAMException("Bad formatting for param [" + token + "]");
             }
             param = token.substring(0, pos);
-            value = token.substring(pos + 1);
+            value.append(token.substring(pos+1));
+            if (value.charAt(0) == '"') {
+                while ( (i < ntoks) && (value.lastIndexOf("\"") <= 0) ) {
+                    value.append(' ').append(tok.nextToken());
+                    i++;
+                }
+            }
 
-            props.setProperty(param, value);
+            props.setProperty(param, value.toString());
+            value.setLength(0);
             nprops += 1;
         }
 
@@ -156,5 +164,20 @@ public class SAMUtils {
         }
         
         return msg;
+    }
+    
+    public static void main(String args[]) {
+        try {
+            test("a=b c=d e=\"f g h\"");
+            test("a=\"b c d\" e=\"f g h\" i=\"j\"");
+            test("a=\"b c d\" e=f i=\"j\"");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    private static void test(String props) throws Exception {
+        StringTokenizer tok = new StringTokenizer(props);
+        Properties p = parseParams(tok);
+        System.out.println(p);
     }
 }

@@ -598,6 +598,10 @@ public class JobQueue {
         for (int i = 0; states != null && i < states.length; i++)
             str.append(states[i]).append(" ");
         str.append(" -->\n");
+        str.append("<!-- jobs: ");
+        for (int i = 0; i < activeJobs.size(); i++)
+            str.append(activeJobs.get(i).toString()).append(" ");
+        str.append("-->\n");
         out.write(str.toString());
         out.flush();
         

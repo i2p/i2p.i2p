@@ -175,23 +175,25 @@ class TunnelPool {
      * @return true if the tunnel was allocated successfully, false if an error occurred
      */
     public boolean allocateTunnel(TunnelId id, Destination dest) {
+        return allocateTunnel(id, getClientPool(dest));
+    }
+    public boolean allocateTunnel(TunnelId id, ClientTunnelPool pool) {
         if (!_isLive) return false;
-        ClientTunnelPool pool = getClientPool(dest);
         if (pool == null) {
             if (_log.shouldLog(Log.ERROR))
-                _log.error("Error allocating tunnel " + id + " to " + dest + ": no pool for the client known");
+                _log.error("Error allocating tunnel " + id + " to " + pool.getDestination() + ": no pool for the client known");
             return false;
         }
         TunnelInfo tunnel = removeFreeTunnel(id);
         if (tunnel == null) {
             if (_log.shouldLog(Log.ERROR))
-                _log.error("Error allocating tunnel " + id + " to " + dest + ": tunnel is no longer free?");
+                _log.error("Error allocating tunnel " + id + " to " + pool.getDestination() + ": tunnel is no longer free?");
             return false;
         }
 
         TunnelInfo t = tunnel;
         while (t != null) {
-            t.setDestination(dest);
+            t.setDestination(pool.getDestination());
             t = t.getNextHopInfo();
         }
 
