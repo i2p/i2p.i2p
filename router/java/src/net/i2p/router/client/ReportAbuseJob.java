@@ -15,8 +15,8 @@ import net.i2p.data.i2cp.AbuseSeverity;
 import net.i2p.data.i2cp.I2CPMessageException;
 import net.i2p.data.i2cp.ReportAbuseMessage;
 import net.i2p.router.JobImpl;
-import net.i2p.util.Log;
 import net.i2p.router.RouterContext;
+import net.i2p.util.Log;
 
 /**
  * Async job to send an abuse message to the client

@@ -15,12 +15,9 @@ import java.util.Set;
 
 import net.i2p.data.TunnelId;
 import net.i2p.router.JobImpl;
-import net.i2p.router.JobQueue;
-import net.i2p.router.TunnelInfo;
-import net.i2p.util.Clock;
-import net.i2p.util.Log;
-import net.i2p.util.RandomSource;
 import net.i2p.router.RouterContext;
+import net.i2p.router.TunnelInfo;
+import net.i2p.util.Log;
 
 /**
  * Manage the testing for free, outbound, and active inbound client tunnels

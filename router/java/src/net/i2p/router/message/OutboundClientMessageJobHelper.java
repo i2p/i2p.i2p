@@ -15,24 +15,21 @@ import java.util.Set;
 import net.i2p.data.Certificate;
 import net.i2p.data.Destination;
 import net.i2p.data.Hash;
+import net.i2p.data.LeaseSet;
 import net.i2p.data.Payload;
 import net.i2p.data.PublicKey;
 import net.i2p.data.SessionKey;
 import net.i2p.data.TunnelId;
-import net.i2p.data.LeaseSet;
 import net.i2p.data.i2np.DataMessage;
+import net.i2p.data.i2np.DatabaseStoreMessage;
 import net.i2p.data.i2np.DeliveryInstructions;
 import net.i2p.data.i2np.DeliveryStatusMessage;
-import net.i2p.data.i2np.DatabaseStoreMessage;
 import net.i2p.data.i2np.GarlicMessage;
 import net.i2p.router.Router;
-import net.i2p.router.TunnelInfo;
-import net.i2p.router.TunnelManagerFacade;
-import net.i2p.router.TunnelSelectionCriteria;
-import net.i2p.util.Clock;
-import net.i2p.util.Log;
-import net.i2p.util.RandomSource;
 import net.i2p.router.RouterContext;
+import net.i2p.router.TunnelInfo;
+import net.i2p.router.TunnelSelectionCriteria;
+import net.i2p.util.Log;
 
 /**
  * Handle a particular client message that is destined for a remote destination.

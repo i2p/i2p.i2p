@@ -5,8 +5,8 @@ import java.util.Iterator;
 import java.util.Set;
 import java.util.TreeSet;
 
-import net.i2p.util.Log;
 import net.i2p.I2PAppContext;
+import net.i2p.util.Log;
 
 public class SimpleStatDumper {
     private final static Log _log = new Log(SimpleStatDumper.class);

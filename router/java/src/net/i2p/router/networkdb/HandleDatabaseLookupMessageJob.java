@@ -27,17 +27,11 @@ import net.i2p.data.i2np.I2NPMessage;
 import net.i2p.data.i2np.TunnelMessage;
 import net.i2p.router.Job;
 import net.i2p.router.JobImpl;
-import net.i2p.router.JobQueue;
-import net.i2p.router.MessageHistory;
-import net.i2p.router.NetworkDatabaseFacade;
-import net.i2p.router.Router;
+import net.i2p.router.RouterContext;
 import net.i2p.router.TunnelInfo;
-import net.i2p.router.TunnelManagerFacade;
 import net.i2p.router.message.SendMessageDirectJob;
 import net.i2p.router.message.SendTunnelMessageJob;
-import net.i2p.util.Clock;
 import net.i2p.util.Log;
-import net.i2p.router.RouterContext;
 
 /**
  * Handle a lookup for a key received from a remote peer.  Needs to be implemented

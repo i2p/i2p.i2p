@@ -24,18 +24,15 @@ import net.i2p.data.RouterInfo;
 import net.i2p.data.i2np.DatabaseLookupMessage;
 import net.i2p.data.i2np.DatabaseSearchReplyMessage;
 import net.i2p.data.i2np.DatabaseStoreMessage;
-import net.i2p.router.InNetMessagePool;
 import net.i2p.router.Job;
-import net.i2p.router.JobQueue;
 import net.i2p.router.NetworkDatabaseFacade;
 import net.i2p.router.Router;
+import net.i2p.router.RouterContext;
 import net.i2p.router.networkdb.DatabaseLookupMessageHandler;
 import net.i2p.router.networkdb.DatabaseSearchReplyMessageHandler;
 import net.i2p.router.networkdb.DatabaseStoreMessageHandler;
 import net.i2p.router.networkdb.PublishLocalRouterInfoJob;
-import net.i2p.util.Clock;
 import net.i2p.util.Log;
-import net.i2p.router.RouterContext;
 
 /**
  * Kademlia based version of the network database

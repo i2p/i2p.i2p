@@ -12,7 +12,6 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
-import net.i2p.crypto.SessionKeyManager;
 import net.i2p.data.Certificate;
 import net.i2p.data.Hash;
 import net.i2p.data.PublicKey;
@@ -23,14 +22,11 @@ import net.i2p.data.i2np.DeliveryStatusMessage;
 import net.i2p.data.i2np.I2NPMessage;
 import net.i2p.router.Job;
 import net.i2p.router.JobImpl;
-import net.i2p.router.JobQueue;
 import net.i2p.router.MessageSelector;
 import net.i2p.router.ReplyJob;
 import net.i2p.router.Router;
-import net.i2p.util.Clock;
-import net.i2p.util.Log;
-import net.i2p.util.RandomSource;
 import net.i2p.router.RouterContext;
+import net.i2p.util.Log;
 
 /**
  * Build a test message that will be sent to the target to make sure they're alive.

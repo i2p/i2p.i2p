@@ -9,8 +9,8 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
-import net.i2p.util.Log;
 import net.i2p.I2PAppContext;
+import net.i2p.util.Log;
 
 /** 
  * Coordinate the management of various frequencies and rates within I2P components,

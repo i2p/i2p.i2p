@@ -20,12 +20,9 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
-import net.i2p.crypto.AESEngine;
 import net.i2p.crypto.AESInputStream;
 import net.i2p.crypto.AESOutputStream;
 import net.i2p.crypto.DHSessionKeyBuilder;
-import net.i2p.crypto.DSAEngine;
-import net.i2p.crypto.SHA256Generator;
 import net.i2p.data.ByteArray;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
@@ -33,18 +30,14 @@ import net.i2p.data.Hash;
 import net.i2p.data.RouterIdentity;
 import net.i2p.data.SessionKey;
 import net.i2p.data.Signature;
-import net.i2p.data.SigningPrivateKey;
 import net.i2p.data.i2np.I2NPMessage;
 import net.i2p.data.i2np.I2NPMessageReader;
 import net.i2p.router.OutNetMessage;
-import net.i2p.router.Router;
+import net.i2p.router.RouterContext;
 import net.i2p.router.transport.BandwidthLimitedInputStream;
 import net.i2p.router.transport.BandwidthLimitedOutputStream;
-import net.i2p.stat.StatManager;
-import net.i2p.util.Clock;
 import net.i2p.util.I2PThread;
 import net.i2p.util.Log;
-import net.i2p.router.RouterContext;
 
 /**
  * Wraps a connection - this contains a reader thread (via I2NPMessageReader) and

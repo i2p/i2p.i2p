@@ -10,9 +10,9 @@ package net.i2p.util;
  */
 
 
-import java.util.Set;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Set;
 
 /**
  * In case its useful later...

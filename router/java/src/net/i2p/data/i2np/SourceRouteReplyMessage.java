@@ -13,13 +13,12 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-import net.i2p.crypto.ElGamalAESEngine;
+import net.i2p.I2PAppContext;
 import net.i2p.data.Certificate;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
 import net.i2p.data.PrivateKey;
 import net.i2p.util.Log;
-import net.i2p.I2PAppContext;
 
 /**
  * Defines a message directed by a source route block to deliver a message to an

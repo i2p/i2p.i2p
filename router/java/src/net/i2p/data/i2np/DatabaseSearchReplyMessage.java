@@ -16,12 +16,12 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import net.i2p.I2PAppContext;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
 import net.i2p.data.RouterInfo;
 import net.i2p.util.Log;
-import net.i2p.I2PAppContext;
 
 /**
  * Defines the message a router sends to another router in response to a

@@ -5,11 +5,10 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Properties;
 import java.util.Set;
 import java.util.TreeMap;
-import java.util.Properties;
 
-import net.i2p.crypto.SessionKeyManager;
 import net.i2p.data.Certificate;
 import net.i2p.data.Destination;
 import net.i2p.data.Hash;
@@ -25,22 +24,14 @@ import net.i2p.data.i2np.DeliveryInstructions;
 import net.i2p.data.i2np.DeliveryStatusMessage;
 import net.i2p.data.i2np.GarlicMessage;
 import net.i2p.data.i2np.I2NPMessage;
-import net.i2p.router.ClientManagerFacade;
 import net.i2p.router.ClientMessage;
 import net.i2p.router.JobImpl;
-import net.i2p.router.JobQueue;
-import net.i2p.router.MessageHistory;
 import net.i2p.router.MessageSelector;
-import net.i2p.router.NetworkDatabaseFacade;
 import net.i2p.router.ReplyJob;
 import net.i2p.router.Router;
-import net.i2p.router.TunnelManagerFacade;
-import net.i2p.router.TunnelSelectionCriteria;
-import net.i2p.stat.StatManager;
-import net.i2p.util.Clock;
-import net.i2p.util.Log;
-import net.i2p.util.RandomSource;
 import net.i2p.router.RouterContext;
+import net.i2p.router.TunnelSelectionCriteria;
+import net.i2p.util.Log;
 
 /**
  * Send a client message, taking into consideration the fact that there may be

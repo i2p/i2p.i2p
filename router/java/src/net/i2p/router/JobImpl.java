@@ -8,7 +8,6 @@ package net.i2p.router;
  *
  */
 
-import net.i2p.util.Clock;
 import net.i2p.util.Log;
 /**
  * Base implementation of a Job

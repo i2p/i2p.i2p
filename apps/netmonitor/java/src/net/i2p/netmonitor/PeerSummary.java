@@ -1,16 +1,16 @@
 package net.i2p.netmonitor;
 
-import net.i2p.util.Clock;
-import net.i2p.util.Log;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 import java.util.Set;
+import java.util.TreeMap;
+
+import net.i2p.util.Clock;
+import net.i2p.util.Log;
 
 /** 
  * coordinate the data points summarizing the performance of a particular peer 

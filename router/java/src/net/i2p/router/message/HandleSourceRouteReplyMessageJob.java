@@ -21,12 +21,9 @@ import net.i2p.data.RouterIdentity;
 import net.i2p.data.i2np.DeliveryInstructions;
 import net.i2p.data.i2np.SourceRouteReplyMessage;
 import net.i2p.router.JobImpl;
-import net.i2p.router.KeyManager;
-import net.i2p.router.MessageHistory;
 import net.i2p.router.Router;
-import net.i2p.util.Clock;
-import net.i2p.util.Log;
 import net.i2p.router.RouterContext;
+import net.i2p.util.Log;
 
 /**
  * Handle a source route reply - decrypt the instructions and forward the message 

@@ -20,10 +20,8 @@ import net.i2p.data.DataStructure;
 import net.i2p.data.Hash;
 import net.i2p.data.LeaseSet;
 import net.i2p.data.RouterInfo;
-import net.i2p.router.ProfileManager;
-import net.i2p.util.Clock;
-import net.i2p.util.Log;
 import net.i2p.router.RouterContext;
+import net.i2p.util.Log;
 
 class TransientDataStore implements DataStore {
     private Log _log;

@@ -16,8 +16,8 @@ import net.i2p.data.Hash;
 import net.i2p.data.LeaseSet;
 import net.i2p.router.JobImpl;
 import net.i2p.router.Router;
-import net.i2p.util.Log;
 import net.i2p.router.RouterContext;
+import net.i2p.util.Log;
 
 /**
  * Periodically search through all leases to find expired ones, failing those

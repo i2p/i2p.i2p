@@ -1,24 +1,25 @@
 package net.i2p.router;
 
+import java.util.Properties;
+
+import net.i2p.I2PAppContext;
 import net.i2p.data.Hash;
 import net.i2p.router.client.ClientManagerFacadeImpl;
-import net.i2p.router.transport.OutboundMessageRegistry;
 import net.i2p.router.networkdb.kademlia.KademliaNetworkDatabaseFacade;
-import net.i2p.router.transport.VMCommSystem;
-import net.i2p.router.transport.CommSystemFacadeImpl;
-import net.i2p.router.transport.BandwidthLimiter;
-import net.i2p.router.transport.TrivialBandwidthLimiter;
-import net.i2p.router.tunnelmanager.PoolingTunnelManagerFacade;
-import net.i2p.router.peermanager.ProfileOrganizer;
+import net.i2p.router.peermanager.Calculator;
+import net.i2p.router.peermanager.IntegrationCalculator;
+import net.i2p.router.peermanager.IsFailingCalculator;
 import net.i2p.router.peermanager.PeerManagerFacadeImpl;
 import net.i2p.router.peermanager.ProfileManagerImpl;
-import net.i2p.router.peermanager.Calculator;
-import net.i2p.router.peermanager.IsFailingCalculator;
+import net.i2p.router.peermanager.ProfileOrganizer;
 import net.i2p.router.peermanager.ReliabilityCalculator;
 import net.i2p.router.peermanager.SpeedCalculator;
-import net.i2p.router.peermanager.IntegrationCalculator;
-import net.i2p.I2PAppContext;
-import java.util.Properties;
+import net.i2p.router.transport.BandwidthLimiter;
+import net.i2p.router.transport.CommSystemFacadeImpl;
+import net.i2p.router.transport.OutboundMessageRegistry;
+import net.i2p.router.transport.TrivialBandwidthLimiter;
+import net.i2p.router.transport.VMCommSystem;
+import net.i2p.router.tunnelmanager.PoolingTunnelManagerFacade;
 
 /**
  * Build off the core I2P context to provide a root for a router instance to

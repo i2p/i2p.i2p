@@ -31,15 +31,13 @@ package net.i2p.crypto;
 
 import java.math.BigInteger;
 
+import net.i2p.I2PAppContext;
 import net.i2p.data.Hash;
 import net.i2p.data.Signature;
 import net.i2p.data.SigningPrivateKey;
 import net.i2p.data.SigningPublicKey;
-import net.i2p.util.Clock;
 import net.i2p.util.Log;
 import net.i2p.util.NativeBigInteger;
-import net.i2p.util.RandomSource;
-import net.i2p.I2PAppContext;
 
 public class DSAEngine {
     private Log _log;

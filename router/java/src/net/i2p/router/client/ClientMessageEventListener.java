@@ -26,13 +26,9 @@ import net.i2p.data.i2cp.SendMessageMessage;
 import net.i2p.data.i2cp.SessionId;
 import net.i2p.data.i2cp.SessionStatusMessage;
 import net.i2p.data.i2cp.SetDateMessage;
-import net.i2p.router.JobQueue;
-import net.i2p.router.KeyManager;
-import net.i2p.router.NetworkDatabaseFacade;
-import net.i2p.util.Clock;
+import net.i2p.router.RouterContext;
 import net.i2p.util.Log;
 import net.i2p.util.RandomSource;
-import net.i2p.router.RouterContext;
 
 /**
  * Receive events from the client and handle them accordingly (updating the runner when

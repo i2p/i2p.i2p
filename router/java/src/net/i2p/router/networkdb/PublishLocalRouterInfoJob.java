@@ -13,16 +13,9 @@ import java.util.Properties;
 
 import net.i2p.data.DataFormatException;
 import net.i2p.data.RouterInfo;
-import net.i2p.router.CommSystemFacade;
 import net.i2p.router.JobImpl;
-import net.i2p.router.KeyManager;
-import net.i2p.router.NetworkDatabaseFacade;
-import net.i2p.router.Router;
-import net.i2p.router.StatisticsManager;
-import net.i2p.util.Clock;
-import net.i2p.util.Log;
-import net.i2p.util.RandomSource;
 import net.i2p.router.RouterContext;
+import net.i2p.util.Log;
 
 /**
  * Publish the local router's RouterInfo every 5 to 10 minutes

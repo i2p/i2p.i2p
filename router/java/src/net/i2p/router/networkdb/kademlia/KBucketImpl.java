@@ -12,11 +12,11 @@ import java.math.BigInteger;
 import java.util.HashSet;
 import java.util.Set;
 
+import net.i2p.I2PAppContext;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
 import net.i2p.util.Log;
 import net.i2p.util.RandomSource;
-import net.i2p.I2PAppContext;
 
 class KBucketImpl implements KBucket {
     private Log _log;

@@ -1,20 +1,15 @@
 package net.i2p.netmonitor.gui;
 
 import java.awt.Color;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
-import java.util.TreeMap;
 import java.util.Map;
-import java.util.HashMap;
+import java.util.Set;
 
-import net.i2p.data.Destination;
-import net.i2p.util.Log;
 import net.i2p.netmonitor.PeerSummary;
+import net.i2p.util.Log;
 
 /**
  * Configure how we want to render a particular peerSummary in the GUI

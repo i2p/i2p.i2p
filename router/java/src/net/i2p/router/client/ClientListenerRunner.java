@@ -13,8 +13,8 @@ import java.net.ServerSocket;
 import java.net.Socket;
 
 import net.i2p.client.I2PClient;
-import net.i2p.util.Log;
 import net.i2p.router.RouterContext;
+import net.i2p.util.Log;
 
 /**
  * Listen for connections on the specified port, and toss them onto the client manager's

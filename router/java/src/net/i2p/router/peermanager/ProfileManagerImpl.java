@@ -18,9 +18,8 @@ import java.util.Set;
 
 import net.i2p.data.Hash;
 import net.i2p.router.ProfileManager;
-import net.i2p.util.Clock;
-import net.i2p.util.Log;
 import net.i2p.router.RouterContext;
+import net.i2p.util.Log;
 
 public class ProfileManagerImpl implements ProfileManager {
     private Log _log;

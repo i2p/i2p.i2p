@@ -24,14 +24,13 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Properties;
 
+import net.i2p.I2PAppContext;
 import net.i2p.I2PException;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.Destination;
 import net.i2p.util.Clock;
 import net.i2p.util.I2PThread;
 import net.i2p.util.Log;
-import net.i2p.util.LogManager;
-import net.i2p.I2PAppContext;
 
 /**
  * ATalk - anonymous talk, demonstrating a trivial I2P usage scenario.

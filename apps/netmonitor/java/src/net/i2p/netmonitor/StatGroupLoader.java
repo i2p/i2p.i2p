@@ -1,13 +1,14 @@
 package net.i2p.netmonitor;
 
 
-import net.i2p.util.Log;
-import java.io.IOException;
 import java.io.File;
 import java.io.FileInputStream;
-import java.util.List;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
+
+import net.i2p.util.Log;
 
 /**
  * Load up the StatGroups from the location specified to configure the data harvester.

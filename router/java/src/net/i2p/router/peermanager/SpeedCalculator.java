@@ -1,9 +1,9 @@
 package net.i2p.router.peermanager;
 
+import net.i2p.router.RouterContext;
 import net.i2p.stat.Rate;
 import net.i2p.stat.RateStat;
 import net.i2p.util.Log;
-import net.i2p.router.RouterContext;
 
 /**
  * Quantify how fast the peer is - how fast they respond to our requests, how fast

@@ -18,6 +18,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import net.i2p.I2PAppContext;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
@@ -25,11 +26,7 @@ import net.i2p.data.PrivateKey;
 import net.i2p.data.PublicKey;
 import net.i2p.data.SessionKey;
 import net.i2p.data.SessionTag;
-import net.i2p.stat.StatManager;
-import net.i2p.util.Clock;
 import net.i2p.util.Log;
-import net.i2p.util.RandomSource;
-import net.i2p.I2PAppContext;
 
 /**
  * Handles the actual ElGamal+AES encryption and decryption scenarios using the

@@ -14,15 +14,14 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
-import net.i2p.crypto.ElGamalAESEngine;
 import net.i2p.data.Certificate;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
 import net.i2p.data.PrivateKey;
 import net.i2p.data.i2np.GarlicClove;
 import net.i2p.data.i2np.GarlicMessage;
-import net.i2p.util.Log;
 import net.i2p.router.RouterContext;
+import net.i2p.util.Log;
 
 /**
  * Read a GarlicMessage, decrypt it, and return the resulting CloveSet

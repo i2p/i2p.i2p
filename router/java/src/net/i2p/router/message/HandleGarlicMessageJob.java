@@ -21,14 +21,10 @@ import net.i2p.data.RouterIdentity;
 import net.i2p.data.i2np.GarlicClove;
 import net.i2p.data.i2np.GarlicMessage;
 import net.i2p.router.JobImpl;
-import net.i2p.router.KeyManager;
 import net.i2p.router.LeaseSetKeys;
-import net.i2p.router.MessageHistory;
 import net.i2p.router.Router;
-import net.i2p.stat.StatManager;
-import net.i2p.util.Clock;
-import net.i2p.util.Log;
 import net.i2p.router.RouterContext;
+import net.i2p.util.Log;
 
 /**
  * Unencrypt a garlic message and handle each of the cloves - locally destined

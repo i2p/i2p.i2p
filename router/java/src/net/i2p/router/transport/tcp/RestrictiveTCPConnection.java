@@ -15,23 +15,17 @@ import java.math.BigInteger;
 import java.net.Socket;
 import java.util.Date;
 
-import net.i2p.crypto.AESEngine;
 import net.i2p.crypto.AESInputStream;
 import net.i2p.crypto.AESOutputStream;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
 import net.i2p.data.RouterIdentity;
-import net.i2p.data.SigningPrivateKey;
-import net.i2p.router.NetworkDatabaseFacade;
 import net.i2p.router.Router;
-import net.i2p.router.Shitlist;
+import net.i2p.router.RouterContext;
 import net.i2p.router.transport.BandwidthLimitedInputStream;
 import net.i2p.router.transport.BandwidthLimitedOutputStream;
-import net.i2p.stat.StatManager;
-import net.i2p.util.Clock;
 import net.i2p.util.I2PThread;
 import net.i2p.util.Log;
-import net.i2p.router.RouterContext;
 
 /**
  * TCPConnection that validates the time and protocol version, dropping connection if

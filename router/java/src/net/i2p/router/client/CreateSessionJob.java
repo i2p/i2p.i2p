@@ -13,9 +13,8 @@ import java.util.Properties;
 import net.i2p.data.i2cp.SessionConfig;
 import net.i2p.router.ClientTunnelSettings;
 import net.i2p.router.JobImpl;
-import net.i2p.router.TunnelManagerFacade;
-import net.i2p.util.Log;
 import net.i2p.router.RouterContext;
+import net.i2p.util.Log;
 
 /**
  * Given an established connection, walk through the process of establishing the

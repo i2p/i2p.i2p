@@ -5,25 +5,21 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.TreeMap;
-import java.util.List;
 import java.util.ArrayList;
-import java.util.Set;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Random;
+import java.util.Set;
+import java.util.TreeMap;
 
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
-import javax.swing.JColorChooser;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
-import net.i2p.util.Log;
 import net.i2p.netmonitor.PeerStat;
-import net.i2p.netmonitor.PeerSummary;
+import net.i2p.util.Log;
 
 class PeerPlotConfigPane extends JPanel implements PeerPlotConfig.UpdateListener {
     private final static Log _log = new Log(PeerPlotConfigPane.class);

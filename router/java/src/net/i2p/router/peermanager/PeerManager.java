@@ -13,12 +13,9 @@ import java.util.Iterator;
 import java.util.Set;
 
 import net.i2p.data.Hash;
-import net.i2p.router.JobQueue;
-import net.i2p.router.NetworkDatabaseFacade;
 import net.i2p.router.PeerSelectionCriteria;
-import net.i2p.router.Router;
-import net.i2p.util.Log;
 import net.i2p.router.RouterContext;
+import net.i2p.util.Log;
 
 /**
  * Manage the current state of the statistics

@@ -13,6 +13,7 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.i2p.I2PAppContext;
 import net.i2p.data.ByteArray;
 import net.i2p.data.SessionKey;
 import net.i2p.util.Clock;
@@ -20,7 +21,6 @@ import net.i2p.util.I2PThread;
 import net.i2p.util.Log;
 import net.i2p.util.NativeBigInteger;
 import net.i2p.util.RandomSource;
-import net.i2p.I2PAppContext;
 
 /**
  * Generate a new session key through a diffie hellman exchange.  This uses the

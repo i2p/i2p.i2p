@@ -21,11 +21,9 @@ import java.util.Iterator;
 
 import net.i2p.data.RouterAddress;
 import net.i2p.router.OutNetMessage;
-import net.i2p.router.transport.BandwidthLimiter;
-import net.i2p.util.Clock;
+import net.i2p.router.RouterContext;
 import net.i2p.util.I2PThread;
 import net.i2p.util.Log;
-import net.i2p.router.RouterContext;
 
 class PHTTPSender {
     private Log _log;

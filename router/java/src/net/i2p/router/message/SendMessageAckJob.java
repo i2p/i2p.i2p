@@ -14,8 +14,6 @@ import net.i2p.data.i2np.DeliveryStatusMessage;
 import net.i2p.data.i2np.I2NPMessage;
 import net.i2p.data.i2np.SourceRouteBlock;
 import net.i2p.router.JobImpl;
-import net.i2p.router.JobQueue;
-import net.i2p.util.Clock;
 import net.i2p.router.RouterContext;
 
 /**

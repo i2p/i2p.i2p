@@ -3,16 +3,15 @@ package net.i2p.router;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.TimeZone;
 
 import net.i2p.data.Hash;
 import net.i2p.data.TunnelId;
 import net.i2p.data.i2np.I2NPMessage;
-import net.i2p.util.Clock;
 import net.i2p.util.Log;
 
 /**

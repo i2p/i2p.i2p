@@ -15,15 +15,12 @@ import net.i2p.data.SessionKey;
 import net.i2p.data.i2np.GarlicMessage;
 import net.i2p.router.Job;
 import net.i2p.router.JobImpl;
-import net.i2p.router.JobQueue;
 import net.i2p.router.MessageSelector;
 import net.i2p.router.OutNetMessage;
-import net.i2p.router.OutNetMessagePool;
 import net.i2p.router.ReplyJob;
 import net.i2p.router.Router;
-import net.i2p.util.Clock;
-import net.i2p.util.Log;
 import net.i2p.router.RouterContext;
+import net.i2p.util.Log;
 
 /**
  * Build a garlic message from config, encrypt it, and enqueue it for delivery.

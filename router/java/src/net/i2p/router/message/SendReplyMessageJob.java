@@ -12,9 +12,8 @@ import net.i2p.data.i2np.I2NPMessage;
 import net.i2p.data.i2np.SourceRouteBlock;
 import net.i2p.data.i2np.SourceRouteReplyMessage;
 import net.i2p.router.JobImpl;
-import net.i2p.router.JobQueue;
-import net.i2p.util.Log;
 import net.i2p.router.RouterContext;
+import net.i2p.util.Log;
 
 /**
  * Send a SourceRouteReplyMessage to the location specified in the source route block.

@@ -15,13 +15,13 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
+import net.i2p.I2PAppContext;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
 import net.i2p.data.RouterInfo;
 import net.i2p.data.TunnelId;
 import net.i2p.util.Log;
-import net.i2p.I2PAppContext;
 
 /**
  * Defines the message a router sends to another router to search for a

@@ -1,7 +1,7 @@
 package net.i2p.router.peermanager;
 
-import net.i2p.util.Log;
 import net.i2p.router.RouterContext;
+import net.i2p.util.Log;
 
 /**
  * Determine how well integrated the peer is - how likely they will be useful

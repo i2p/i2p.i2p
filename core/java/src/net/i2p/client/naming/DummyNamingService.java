@@ -7,8 +7,8 @@
  */
 package net.i2p.client.naming;
 
-import net.i2p.data.Destination;
 import net.i2p.I2PAppContext;
+import net.i2p.data.Destination;
 
 /**
  * A Dummy naming service that can only handle base64 destinations.

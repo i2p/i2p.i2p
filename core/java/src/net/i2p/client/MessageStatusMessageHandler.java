@@ -9,10 +9,10 @@ package net.i2p.client;
  *
  */
 
+import net.i2p.I2PAppContext;
 import net.i2p.data.i2cp.I2CPMessage;
 import net.i2p.data.i2cp.MessageStatusMessage;
 import net.i2p.data.i2cp.ReceiveMessageBeginMessage;
-import net.i2p.I2PAppContext;
 
 /**
  * Handle I2CP MessageStatusMessages from the router.  This currently only takes

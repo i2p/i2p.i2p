@@ -24,7 +24,6 @@ import net.i2p.data.PrivateKey;
 import net.i2p.data.PublicKey;
 import net.i2p.data.SigningPrivateKey;
 import net.i2p.data.SigningPublicKey;
-import net.i2p.util.Clock;
 import net.i2p.util.Log;
 
 /**

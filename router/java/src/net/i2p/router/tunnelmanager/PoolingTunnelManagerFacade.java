@@ -10,14 +10,11 @@ import net.i2p.data.Hash;
 import net.i2p.data.TunnelId;
 import net.i2p.data.i2np.TunnelCreateMessage;
 import net.i2p.router.ClientTunnelSettings;
-import net.i2p.router.InNetMessagePool;
+import net.i2p.router.RouterContext;
 import net.i2p.router.TunnelInfo;
 import net.i2p.router.TunnelManagerFacade;
 import net.i2p.router.TunnelSelectionCriteria;
-import net.i2p.stat.StatManager;
-import net.i2p.util.Clock;
 import net.i2p.util.Log;
-import net.i2p.router.RouterContext;
 
 /**
  * Main interface to the pool

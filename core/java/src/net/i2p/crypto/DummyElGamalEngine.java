@@ -12,12 +12,12 @@ package net.i2p.crypto;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 
+import net.i2p.I2PAppContext;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
 import net.i2p.data.PrivateKey;
 import net.i2p.data.PublicKey;
 import net.i2p.util.Log;
-import net.i2p.I2PAppContext;
 
 /** 
  * Fake ElG E and D, useful for when performance isn't being tested

@@ -18,10 +18,8 @@ import net.i2p.data.LeaseSet;
 import net.i2p.data.RouterInfo;
 import net.i2p.router.JobImpl;
 import net.i2p.router.Router;
-import net.i2p.util.Clock;
-import net.i2p.util.Log;
-import net.i2p.util.RandomSource;
 import net.i2p.router.RouterContext;
+import net.i2p.util.Log;
 
 class DataRepublishingSelectorJob extends JobImpl {
     private Log _log;

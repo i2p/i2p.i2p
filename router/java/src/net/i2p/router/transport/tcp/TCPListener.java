@@ -15,9 +15,9 @@ import java.net.Socket;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 
+import net.i2p.router.RouterContext;
 import net.i2p.util.I2PThread;
 import net.i2p.util.Log;
-import net.i2p.router.RouterContext;
 
 /**
  * Listen for TCP connections with a listener thread

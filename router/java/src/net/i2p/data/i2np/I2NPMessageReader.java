@@ -11,9 +11,9 @@ package net.i2p.data.i2np;
 import java.io.IOException;
 import java.io.InputStream;
 
+import net.i2p.router.RouterContext;
 import net.i2p.util.I2PThread;
 import net.i2p.util.Log;
-import net.i2p.router.RouterContext;
 
 /**
  * The I2NPMessageReader reads an InputStream (using

@@ -1,9 +1,9 @@
 package net.i2p.crypto;
 
+import net.i2p.I2PAppContext;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
 import net.i2p.data.SessionKey;
-import net.i2p.I2PAppContext;
 
 /**
  * Calculate the HMAC-SHA256 of a key+message.  Currently FAKE - returns a stupid

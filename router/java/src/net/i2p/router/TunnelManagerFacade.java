@@ -13,7 +13,6 @@ import java.util.List;
 import net.i2p.data.Destination;
 import net.i2p.data.Hash;
 import net.i2p.data.TunnelId;
-import net.i2p.router.tunnelmanager.PoolingTunnelManagerFacade;
 
 /**
  * Build and maintain tunnels throughout the network.

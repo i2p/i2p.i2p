@@ -1,18 +1,15 @@
 package net.i2p.router.tunnelmanager;
 
-import java.util.Iterator;
-import java.util.TreeMap;
-import java.util.List;
 import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.TreeMap;
 
 import net.i2p.data.TunnelId;
-import net.i2p.router.ClientManagerFacade;
 import net.i2p.router.JobImpl;
-import net.i2p.router.JobQueue;
-import net.i2p.router.TunnelInfo;
-import net.i2p.util.Clock;
-import net.i2p.util.Log;
 import net.i2p.router.RouterContext;
+import net.i2p.router.TunnelInfo;
+import net.i2p.util.Log;
 
 /**
  * refill the client tunnel pool as necessary, either from the TunnelPool's free

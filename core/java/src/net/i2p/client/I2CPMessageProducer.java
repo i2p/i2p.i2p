@@ -12,7 +12,7 @@ package net.i2p.client;
 import java.util.HashSet;
 import java.util.Set;
 
-import net.i2p.crypto.ElGamalAESEngine;
+import net.i2p.I2PAppContext;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.Destination;
 import net.i2p.data.LeaseSet;
@@ -32,7 +32,6 @@ import net.i2p.data.i2cp.SendMessageMessage;
 import net.i2p.data.i2cp.SessionConfig;
 import net.i2p.util.Log;
 import net.i2p.util.RandomSource;
-import net.i2p.I2PAppContext;
 
 /**
  * Produce the various messages the session needs to send to the router.

@@ -11,12 +11,9 @@ package net.i2p.router;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import net.i2p.router.transport.OutboundMessageRegistry;
-import net.i2p.stat.StatManager;
 import net.i2p.util.Log;
 
 /**

@@ -17,9 +17,8 @@ import net.i2p.data.Hash;
 import net.i2p.data.RouterInfo;
 import net.i2p.data.TunnelId;
 import net.i2p.data.i2np.DatabaseLookupMessage;
-import net.i2p.router.Router;
-import net.i2p.util.Log;
 import net.i2p.router.RouterContext;
+import net.i2p.util.Log;
 
 /**
  * Search for a particular key iteratively until we either find a value, we run

@@ -16,25 +16,17 @@ import java.util.Set;
 import net.i2p.data.DataStructure;
 import net.i2p.data.Hash;
 import net.i2p.data.RouterInfo;
-import net.i2p.data.RoutingKeyGenerator;
 import net.i2p.data.TunnelId;
 import net.i2p.data.i2np.DatabaseLookupMessage;
 import net.i2p.data.i2np.DatabaseSearchReplyMessage;
 import net.i2p.router.Job;
 import net.i2p.router.JobImpl;
-import net.i2p.router.JobQueue;
-import net.i2p.router.NetworkDatabaseFacade;
-import net.i2p.router.ProfileManager;
-import net.i2p.router.Router;
+import net.i2p.router.RouterContext;
 import net.i2p.router.TunnelInfo;
-import net.i2p.router.TunnelManagerFacade;
 import net.i2p.router.TunnelSelectionCriteria;
 import net.i2p.router.message.SendMessageDirectJob;
 import net.i2p.router.message.SendTunnelMessageJob;
-import net.i2p.stat.StatManager;
-import net.i2p.util.Clock;
 import net.i2p.util.Log;
-import net.i2p.router.RouterContext;
 
 /**
  * Search for a particular key iteratively until we either find a value or we 

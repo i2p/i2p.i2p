@@ -14,6 +14,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Properties;
 
+import net.i2p.I2PAppContext;
 import net.i2p.I2PException;
 import net.i2p.crypto.KeyGenerator;
 import net.i2p.data.Certificate;
@@ -22,7 +23,6 @@ import net.i2p.data.PrivateKey;
 import net.i2p.data.PublicKey;
 import net.i2p.data.SigningPrivateKey;
 import net.i2p.data.SigningPublicKey;
-import net.i2p.I2PAppContext;
 
 /**
  * Base client implementation

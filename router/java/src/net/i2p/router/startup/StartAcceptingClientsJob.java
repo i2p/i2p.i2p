@@ -8,18 +8,9 @@ package net.i2p.router.startup;
  *
  */
 
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.List;
-
-import net.i2p.router.ClientManagerFacade;
 import net.i2p.router.JobImpl;
-import net.i2p.router.JobQueue;
-import net.i2p.router.Router;
-import net.i2p.util.Clock;
-import net.i2p.util.I2PThread;
-import net.i2p.util.Log;
 import net.i2p.router.RouterContext;
+import net.i2p.util.Log;
 
 public class StartAcceptingClientsJob extends JobImpl {
     private Log _log;

@@ -1,18 +1,18 @@
 package net.i2p.netmonitor;
 
-import net.i2p.util.Log;
-import net.i2p.util.I2PThread;
-
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Properties;
-import java.util.Map;
-import java.util.HashMap;
-import java.io.IOException;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FilenameFilter;
-import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+
+import net.i2p.util.I2PThread;
+import net.i2p.util.Log;
 
 /**
  * Main driver for the app that harvests data about the performance of the network,

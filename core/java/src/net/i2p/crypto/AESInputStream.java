@@ -17,6 +17,7 @@ import java.io.InputStream;
 import java.util.LinkedList;
 import java.util.List;
 
+import net.i2p.I2PAppContext;
 import net.i2p.data.Base64;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
@@ -24,7 +25,6 @@ import net.i2p.data.SessionKey;
 import net.i2p.util.Clock;
 import net.i2p.util.Log;
 import net.i2p.util.RandomSource;
-import net.i2p.I2PAppContext;
 
 /**
  * This reads an underlying stream as written by AESOutputStream - AES256 encrypted

@@ -12,9 +12,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Date;
 
-import net.i2p.crypto.AESEngine;
-import net.i2p.crypto.KeyGenerator;
-import net.i2p.crypto.SHA256Generator;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.DataStructure;
 import net.i2p.data.Hash;
@@ -28,25 +25,17 @@ import net.i2p.data.i2np.I2NPMessage;
 import net.i2p.data.i2np.TunnelMessage;
 import net.i2p.data.i2np.TunnelVerificationStructure;
 import net.i2p.router.ClientMessage;
-import net.i2p.router.ClientMessagePool;
 import net.i2p.router.InNetMessage;
-import net.i2p.router.InNetMessagePool;
 import net.i2p.router.Job;
 import net.i2p.router.JobImpl;
-import net.i2p.router.JobQueue;
-import net.i2p.router.MessageHistory;
 import net.i2p.router.MessageReceptionInfo;
 import net.i2p.router.MessageSelector;
-import net.i2p.router.MessageValidator;
 import net.i2p.router.OutNetMessage;
 import net.i2p.router.ReplyJob;
 import net.i2p.router.Router;
-import net.i2p.router.TunnelInfo;
-import net.i2p.router.TunnelManagerFacade;
-import net.i2p.router.transport.OutboundMessageRegistry;
-import net.i2p.util.Clock;
-import net.i2p.util.Log;
 import net.i2p.router.RouterContext;
+import net.i2p.router.TunnelInfo;
+import net.i2p.util.Log;
 
 /**
  * Send a message down a tunnel that we are the gateway for

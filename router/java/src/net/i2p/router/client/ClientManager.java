@@ -21,15 +21,11 @@ import net.i2p.data.Payload;
 import net.i2p.data.i2cp.MessageId;
 import net.i2p.data.i2cp.SessionConfig;
 import net.i2p.router.ClientMessage;
-import net.i2p.router.ClientMessagePool;
 import net.i2p.router.Job;
 import net.i2p.router.JobImpl;
-import net.i2p.router.JobQueue;
-import net.i2p.stat.StatManager;
-import net.i2p.util.Clock;
+import net.i2p.router.RouterContext;
 import net.i2p.util.I2PThread;
 import net.i2p.util.Log;
-import net.i2p.router.RouterContext;
 
 /**
  * Coordinate connections and various tasks

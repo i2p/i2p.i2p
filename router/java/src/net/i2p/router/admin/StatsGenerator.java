@@ -11,14 +11,12 @@ import java.util.Map;
 import java.util.Set;
 
 import net.i2p.data.DataHelper;
-import net.i2p.router.Router;
+import net.i2p.router.RouterContext;
 import net.i2p.stat.Frequency;
 import net.i2p.stat.FrequencyStat;
 import net.i2p.stat.Rate;
 import net.i2p.stat.RateStat;
-import net.i2p.stat.StatManager;
 import net.i2p.util.Log;
-import net.i2p.router.RouterContext;
 
 /**
  * Dump the stats to the web admin interface

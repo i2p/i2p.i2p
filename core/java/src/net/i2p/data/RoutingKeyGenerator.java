@@ -15,11 +15,10 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.TimeZone;
 
+import net.i2p.I2PAppContext;
 import net.i2p.crypto.SHA256Generator;
-import net.i2p.util.Clock;
 import net.i2p.util.Log;
 import net.i2p.util.RandomSource;
-import net.i2p.I2PAppContext;
 
 /**
  * Component to manage the munging of hashes into routing keys - given a hash, 

@@ -10,6 +10,7 @@ package net.i2p.util;
  */
 
 import java.security.SecureRandom;
+
 import net.i2p.I2PAppContext;
 
 /**

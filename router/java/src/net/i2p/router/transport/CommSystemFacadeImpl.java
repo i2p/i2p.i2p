@@ -15,14 +15,11 @@ import java.util.Set;
 
 import net.i2p.data.RouterAddress;
 import net.i2p.router.CommSystemFacade;
-import net.i2p.router.JobQueue;
-import net.i2p.router.KeyManager;
 import net.i2p.router.OutNetMessage;
-import net.i2p.router.Router;
+import net.i2p.router.RouterContext;
 import net.i2p.router.transport.phttp.PHTTPTransport;
 import net.i2p.router.transport.tcp.TCPTransport;
 import net.i2p.util.Log;
-import net.i2p.router.RouterContext;
 
 public class CommSystemFacadeImpl extends CommSystemFacade {
     private Log _log;

@@ -12,7 +12,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
-
 import java.util.Properties;
 
 import net.i2p.util.I2PThread;

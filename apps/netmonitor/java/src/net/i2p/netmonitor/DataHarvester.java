@@ -1,17 +1,18 @@
 package net.i2p.netmonitor;
 
-import net.i2p.data.RouterInfo;
-import net.i2p.util.Log;
-import net.i2p.util.Clock;
-import java.util.Properties;
-import java.util.Iterator;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.StringTokenizer;
-import java.util.Locale;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Locale;
+import java.util.Properties;
+import java.util.StringTokenizer;
+
+import net.i2p.data.RouterInfo;
+import net.i2p.util.Clock;
+import net.i2p.util.Log;
 
 /**
  * Pull out important data from the published routerInfo and stash it away

@@ -16,10 +16,8 @@ import java.util.Set;
 
 import net.i2p.data.DataFormatException;
 import net.i2p.data.Hash;
-import net.i2p.router.Router;
-import net.i2p.util.Clock;
-import net.i2p.util.Log;
 import net.i2p.router.RouterContext;
+import net.i2p.util.Log;
 
 class ProfilePersistenceHelper {
     private Log _log;

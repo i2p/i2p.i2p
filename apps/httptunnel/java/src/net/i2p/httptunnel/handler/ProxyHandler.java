@@ -3,7 +3,7 @@ package net.i2p.httptunnel.handler;
 import java.io.IOException;
 import java.io.OutputStream;
 
-import net.i2p.client.naming.NamingService;
+import net.i2p.I2PAppContext;
 import net.i2p.client.streaming.I2PSocketManager;
 import net.i2p.data.Destination;
 import net.i2p.httptunnel.HTTPListener;
@@ -12,7 +12,6 @@ import net.i2p.httptunnel.SocketManagerProducer;
 import net.i2p.httptunnel.filter.Filter;
 import net.i2p.httptunnel.filter.NullFilter;
 import net.i2p.util.Log;
-import net.i2p.I2PAppContext;
 
 /**
  * Handler for proxying "normal" HTTP requests.

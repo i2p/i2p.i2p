@@ -16,7 +16,6 @@ import net.i2p.data.i2cp.SessionConfig;
 import net.i2p.router.ClientManagerFacade;
 import net.i2p.router.ClientMessage;
 import net.i2p.router.Job;
-import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
 import net.i2p.util.Log;
 

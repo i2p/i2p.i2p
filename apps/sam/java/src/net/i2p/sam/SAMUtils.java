@@ -8,22 +8,20 @@ package net.i2p.sam;
  *
  */
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Enumeration;
 import java.util.Properties;
 import java.util.StringTokenizer;
 
+import net.i2p.I2PAppContext;
 import net.i2p.I2PException;
 import net.i2p.client.I2PClient;
 import net.i2p.client.I2PClientFactory;
 import net.i2p.client.naming.NamingService;
-import net.i2p.data.Base64;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.Destination;
 import net.i2p.util.Log;
-import net.i2p.I2PAppContext;
 
 /**
  * Miscellaneous utility methods used by SAM protocol handlers.

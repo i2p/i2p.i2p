@@ -1,15 +1,15 @@
 package net.i2p.netmonitor;
 
-import net.i2p.util.Log;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
-import java.util.TreeSet;
-import java.util.Set;
 import java.util.Locale;
-import java.util.Date;
-import java.text.SimpleDateFormat;
+import java.util.TreeSet;
+
+import net.i2p.util.Log;
 
 /**
  * Dump various peer summaries to disk (so external apps (or good ol' vi) can

@@ -1,19 +1,17 @@
 package net.i2p.netmonitor;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-
-import java.io.IOException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FilenameFilter;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
-import net.i2p.util.Clock;
-import net.i2p.util.Log;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.RouterInfo;
+import net.i2p.util.Clock;
+import net.i2p.util.Log;
 
 /**
  * Active process that drives the monitoring by periodically rading the 

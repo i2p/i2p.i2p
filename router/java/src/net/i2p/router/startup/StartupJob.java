@@ -10,11 +10,8 @@ package net.i2p.router.startup;
 
 
 import net.i2p.router.JobImpl;
-import net.i2p.router.JobQueue;
-import net.i2p.router.StatisticsManager;
-import net.i2p.router.admin.AdminManager;
-import net.i2p.util.Log;
 import net.i2p.router.RouterContext;
+import net.i2p.router.admin.AdminManager;
 
 /**
  * The StartupJob should be run once on router startup to initialize the system

@@ -18,18 +18,12 @@ import net.i2p.data.i2np.SourceRouteBlock;
 import net.i2p.data.i2np.TunnelCreateMessage;
 import net.i2p.data.i2np.TunnelCreateStatusMessage;
 import net.i2p.router.JobImpl;
-import net.i2p.router.JobQueue;
-import net.i2p.router.MessageHistory;
-import net.i2p.router.NetworkDatabaseFacade;
-import net.i2p.router.Router;
+import net.i2p.router.RouterContext;
 import net.i2p.router.TunnelInfo;
-import net.i2p.router.TunnelManagerFacade;
 import net.i2p.router.TunnelSettings;
 import net.i2p.router.message.BuildTestMessageJob;
 import net.i2p.router.message.SendReplyMessageJob;
-import net.i2p.util.Clock;
 import net.i2p.util.Log;
-import net.i2p.router.RouterContext;
 
 public class HandleTunnelCreateMessageJob extends JobImpl {
     private Log _log;

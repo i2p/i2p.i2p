@@ -17,7 +17,6 @@ import net.i2p.CoreVersion;
 import net.i2p.data.DataHelper;
 import net.i2p.stat.Rate;
 import net.i2p.stat.RateStat;
-import net.i2p.stat.StatManager;
 import net.i2p.util.Log;
 
 /**

@@ -1,15 +1,14 @@
 package net.i2p.client.streaming;
 
 import java.net.ConnectException;
-
-import net.i2p.I2PException;
-import net.i2p.util.Log;
-import net.i2p.util.Clock;
-import net.i2p.I2PAppContext;
-
-import java.util.List;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
+
+import net.i2p.I2PAppContext;
+import net.i2p.I2PException;
+import net.i2p.util.Clock;
+import net.i2p.util.Log;
 
 /**
  * Server socket implementation, allowing multiple threads to accept I2PSockets 

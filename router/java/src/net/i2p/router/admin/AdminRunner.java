@@ -6,17 +6,15 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.Socket;
-import java.util.Iterator;
-import java.util.Set;
-import java.util.Locale;
-import java.text.SimpleDateFormat;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Iterator;
+import java.util.Locale;
+import java.util.Set;
 
 import net.i2p.data.Hash;
-import net.i2p.router.Router;
-import net.i2p.router.peermanager.ProfileOrganizer;
-import net.i2p.util.Log;
 import net.i2p.router.RouterContext;
+import net.i2p.util.Log;
 
 class AdminRunner implements Runnable {
     private Log _log;

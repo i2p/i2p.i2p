@@ -20,21 +20,16 @@ import net.i2p.data.Hash;
 import net.i2p.data.RouterAddress;
 import net.i2p.data.RouterIdentity;
 import net.i2p.data.RouterInfo;
-import net.i2p.data.SigningPrivateKey;
 import net.i2p.data.i2np.DatabaseLookupMessage;
 import net.i2p.data.i2np.DatabaseSearchReplyMessage;
 import net.i2p.data.i2np.DatabaseStoreMessage;
 import net.i2p.data.i2np.I2NPMessage;
-import net.i2p.router.CommSystemFacade;
 import net.i2p.router.InNetMessage;
-import net.i2p.router.InNetMessagePool;
 import net.i2p.router.OutNetMessage;
-import net.i2p.router.Router;
+import net.i2p.router.RouterContext;
 import net.i2p.router.transport.phttp.PHTTPTransport;
 import net.i2p.router.transport.tcp.TCPTransport;
-import net.i2p.util.Clock;
 import net.i2p.util.Log;
-import net.i2p.router.RouterContext;
 
 public class TransportManager implements TransportEventListener {
     private Log _log;

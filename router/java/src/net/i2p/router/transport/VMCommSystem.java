@@ -1,21 +1,19 @@
 package net.i2p.router.transport;
 
+import java.io.ByteArrayInputStream;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+
 import net.i2p.data.Hash;
 import net.i2p.data.i2np.I2NPMessage;
 import net.i2p.data.i2np.I2NPMessageHandler;
-import net.i2p.router.RouterContext;
 import net.i2p.router.CommSystemFacade;
-import net.i2p.router.OutNetMessage;
 import net.i2p.router.InNetMessage;
-import net.i2p.router.InNetMessagePool;
 import net.i2p.router.JobImpl;
+import net.i2p.router.OutNetMessage;
+import net.i2p.router.RouterContext;
 import net.i2p.util.Log;
-
-import java.io.ByteArrayInputStream;
-
-import java.util.Map;
-import java.util.HashMap;
-import java.util.Collections;
 
 /**
  * Hacked up in-VM comm system for talking between contexts.  It doesn't even

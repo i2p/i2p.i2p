@@ -12,8 +12,6 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
-import net.i2p.crypto.AESEngine;
-import net.i2p.crypto.SHA256Generator;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
@@ -29,23 +27,13 @@ import net.i2p.data.i2np.I2NPMessageException;
 import net.i2p.data.i2np.I2NPMessageHandler;
 import net.i2p.data.i2np.TunnelMessage;
 import net.i2p.data.i2np.TunnelVerificationStructure;
-import net.i2p.router.ClientManagerFacade;
 import net.i2p.router.ClientMessage;
-import net.i2p.router.ClientMessagePool;
 import net.i2p.router.InNetMessage;
-import net.i2p.router.InNetMessagePool;
 import net.i2p.router.JobImpl;
-import net.i2p.router.JobQueue;
-import net.i2p.router.MessageHistory;
 import net.i2p.router.MessageReceptionInfo;
-import net.i2p.router.MessageValidator;
-import net.i2p.router.Router;
-import net.i2p.router.TunnelInfo;
-import net.i2p.router.TunnelManagerFacade;
-import net.i2p.stat.StatManager;
-import net.i2p.util.Clock;
-import net.i2p.util.Log;
 import net.i2p.router.RouterContext;
+import net.i2p.router.TunnelInfo;
+import net.i2p.util.Log;
 
 public class HandleTunnelMessageJob extends JobImpl {
     private Log _log;

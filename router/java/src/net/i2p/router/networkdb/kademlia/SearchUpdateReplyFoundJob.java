@@ -8,10 +8,9 @@ import net.i2p.data.i2np.DatabaseSearchReplyMessage;
 import net.i2p.data.i2np.DatabaseStoreMessage;
 import net.i2p.data.i2np.I2NPMessage;
 import net.i2p.router.JobImpl;
-import net.i2p.router.ProfileManager;
 import net.i2p.router.ReplyJob;
-import net.i2p.util.Log;
 import net.i2p.router.RouterContext;
+import net.i2p.util.Log;
 
 /**
  * Called after a match to a db search is found

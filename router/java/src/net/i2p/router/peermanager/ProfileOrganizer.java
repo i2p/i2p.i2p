@@ -20,9 +20,8 @@ import java.util.TreeSet;
 
 import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
-import net.i2p.util.Clock;
-import net.i2p.util.Log;
 import net.i2p.router.RouterContext;
+import net.i2p.util.Log;
 
 /**
  * Keep the peer profiles organized according to the tiered model.  This does not

@@ -15,10 +15,10 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Arrays;
 
-import net.i2p.data.SessionKey;
-import net.i2p.data.DataHelper;
-import net.i2p.util.Log;
 import net.i2p.I2PAppContext;
+import net.i2p.data.DataHelper;
+import net.i2p.data.SessionKey;
+import net.i2p.util.Log;
 
 /**
  * This writes everything as CBC with PKCS#5 padding, but each block is padded

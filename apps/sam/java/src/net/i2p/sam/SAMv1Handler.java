@@ -8,27 +8,24 @@ package net.i2p.sam;
  *
  */
 
-import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.EOFException;
-import java.io.InputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InterruptedIOException;
-import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
-import java.net.Socket;
 import java.net.ConnectException;
 import java.net.NoRouteToHostException;
-import java.util.Enumeration;
+import java.net.Socket;
 import java.util.Properties;
 import java.util.StringTokenizer;
 
+import net.i2p.I2PException;
 import net.i2p.client.I2PSessionException;
 import net.i2p.data.Base64;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.Destination;
-import net.i2p.I2PException;
 import net.i2p.util.Log;
 
 /**

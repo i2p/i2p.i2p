@@ -16,6 +16,7 @@ import java.util.HashSet;
 import java.util.Properties;
 import java.util.Set;
 
+import net.i2p.I2PAppContext;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
 import net.i2p.data.DataStructureImpl;
@@ -29,7 +30,6 @@ import net.i2p.data.i2np.TunnelConfigurationSessionKey;
 import net.i2p.data.i2np.TunnelSessionKey;
 import net.i2p.data.i2np.TunnelSigningPrivateKey;
 import net.i2p.data.i2np.TunnelSigningPublicKey;
-import net.i2p.I2PAppContext;
 
 /**
  * Defines the information associated with a tunnel

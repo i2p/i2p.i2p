@@ -9,10 +9,8 @@ package net.i2p.router.startup;
  */
 
 import net.i2p.router.JobImpl;
-import net.i2p.router.JobQueue;
-import net.i2p.router.NetworkDatabaseFacade;
-import net.i2p.util.Log;
 import net.i2p.router.RouterContext;
+import net.i2p.util.Log;
 
 public class BootNetworkDbJob extends JobImpl {
     private static Log _log = new Log(BootNetworkDbJob.class);

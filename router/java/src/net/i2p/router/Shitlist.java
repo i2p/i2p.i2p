@@ -14,7 +14,6 @@ import java.util.Iterator;
 import java.util.Map;
 
 import net.i2p.data.Hash;
-import net.i2p.util.Clock;
 import net.i2p.util.Log;
 
 /**

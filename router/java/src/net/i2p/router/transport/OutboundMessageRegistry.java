@@ -19,13 +19,10 @@ import java.util.TreeMap;
 import net.i2p.data.i2np.I2NPMessage;
 import net.i2p.router.Job;
 import net.i2p.router.JobImpl;
-import net.i2p.router.JobQueue;
-import net.i2p.router.MessageHistory;
 import net.i2p.router.MessageSelector;
 import net.i2p.router.OutNetMessage;
-import net.i2p.util.Clock;
-import net.i2p.util.Log;
 import net.i2p.router.RouterContext;
+import net.i2p.util.Log;
 
 public class OutboundMessageRegistry {
     private Log _log;

@@ -8,19 +8,18 @@ package net.i2p.router;
  *
  */
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.ArrayList;
-import java.util.TreeMap;
 import java.util.SortedMap;
-import java.util.Collections;
+import java.util.TreeMap;
 
 import net.i2p.router.message.HandleSourceRouteReplyMessageJob;
 import net.i2p.router.networkdb.HandleDatabaseLookupMessageJob;
 import net.i2p.router.tunnelmanager.HandleTunnelCreateMessageJob;
 import net.i2p.router.tunnelmanager.RequestTunnelJob;
-import net.i2p.stat.StatManager;
 import net.i2p.util.Clock;
 import net.i2p.util.I2PThread;
 import net.i2p.util.Log;

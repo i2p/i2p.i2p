@@ -1,15 +1,14 @@
 package net.i2p.time;
 
-import net.i2p.util.Log;
-import net.i2p.util.I2PThread;
-
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
-import java.net.URL;
-import java.net.MalformedURLException;
-import java.io.IOException;
+import net.i2p.util.I2PThread;
+import net.i2p.util.Log;
 
 /**
  * Periodically query a series of NTP servers and post the offset 

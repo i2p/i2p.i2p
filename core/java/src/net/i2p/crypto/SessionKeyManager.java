@@ -11,10 +11,10 @@ package net.i2p.crypto;
 
 import java.util.Set;
 
+import net.i2p.I2PAppContext;
 import net.i2p.data.PublicKey;
 import net.i2p.data.SessionKey;
 import net.i2p.data.SessionTag;
-import net.i2p.I2PAppContext;
 
 /**
  * Manage the session keys and session tags used for encryption and decryption.

@@ -5,7 +5,6 @@ package net.i2p.i2ptunnel;
 
 import java.net.Socket;
 
-import net.i2p.I2PException;
 import net.i2p.client.streaming.I2PSocket;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.Destination;

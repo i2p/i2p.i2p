@@ -7,12 +7,12 @@
  */
 package net.i2p.client.naming;
 
+import java.lang.reflect.Constructor;
+
+import net.i2p.I2PAppContext;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.Destination;
 import net.i2p.util.Log;
-import net.i2p.I2PAppContext;
-
-import java.lang.reflect.Constructor;
 
 /**
  * Naming services create a subclass of this class.

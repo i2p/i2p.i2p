@@ -29,8 +29,8 @@ package net.i2p.crypto;
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-import net.i2p.data.Hash;
 import net.i2p.I2PAppContext;
+import net.i2p.data.Hash;
 
 /** Defines a wrapper for SHA-256 operation
  *

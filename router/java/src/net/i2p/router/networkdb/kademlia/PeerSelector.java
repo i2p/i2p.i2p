@@ -20,10 +20,8 @@ import java.util.TreeMap;
 
 import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
-import net.i2p.router.ProfileManager;
-import net.i2p.router.Router;
-import net.i2p.util.Log;
 import net.i2p.router.RouterContext;
+import net.i2p.util.Log;
 
 class PeerSelector {
     private Log _log;

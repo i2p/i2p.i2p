@@ -14,8 +14,8 @@ import java.util.Set;
 
 import net.i2p.data.Hash;
 import net.i2p.router.JobImpl;
-import net.i2p.util.Log;
 import net.i2p.router.RouterContext;
+import net.i2p.util.Log;
 
 /**
  * Go through the kbuckets and generate random keys for routers in buckets not

@@ -5,8 +5,6 @@ import java.util.Set;
 
 import net.i2p.data.Hash;
 import net.i2p.router.JobImpl;
-import net.i2p.router.JobQueue;
-import net.i2p.util.Clock;
 import net.i2p.router.RouterContext;
 
 class PersistProfilesJob extends JobImpl {

@@ -13,9 +13,8 @@ import java.util.List;
 
 import net.i2p.router.PeerManagerFacade;
 import net.i2p.router.PeerSelectionCriteria;
-import net.i2p.router.Router;
-import net.i2p.util.Log;
 import net.i2p.router.RouterContext;
+import net.i2p.util.Log;
 
 /**
  * Base implementation that has simple algorithms and periodically saves state

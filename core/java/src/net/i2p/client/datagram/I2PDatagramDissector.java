@@ -9,7 +9,6 @@ package net.i2p.client.datagram;
  */
 
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
 import net.i2p.crypto.DSAEngine;
@@ -17,7 +16,6 @@ import net.i2p.crypto.SHA256Generator;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.Destination;
 import net.i2p.data.Signature;
-import net.i2p.util.HexDump;
 import net.i2p.util.Log;
 
 /**

@@ -1,13 +1,13 @@
 package net.i2p.router.startup;
 
-import net.i2p.util.I2PThread;
-import net.i2p.util.Log;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
+
 import net.i2p.router.JobImpl;
 import net.i2p.router.RouterContext;
-
-import java.lang.reflect.Method;
-import java.util.List;
-import java.util.ArrayList;
+import net.i2p.util.I2PThread;
+import net.i2p.util.Log;
 
 /**
  * Run any client applications specified in the router.config.  If any clientApp

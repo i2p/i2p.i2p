@@ -11,8 +11,8 @@ import java.util.Set;
 import java.util.TreeMap;
 
 import net.i2p.data.Destination;
-import net.i2p.util.Log;
 import net.i2p.heartbeat.ClientConfig;
+import net.i2p.util.Log;
 
 /**
  * Configure how we want to render a particular clientConfig in the GUI

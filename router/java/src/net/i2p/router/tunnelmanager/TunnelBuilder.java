@@ -14,7 +14,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import net.i2p.crypto.KeyGenerator;
 import net.i2p.data.Destination;
 import net.i2p.data.Hash;
 import net.i2p.data.SessionKey;
@@ -22,16 +21,11 @@ import net.i2p.data.SigningPrivateKey;
 import net.i2p.data.SigningPublicKey;
 import net.i2p.data.TunnelId;
 import net.i2p.router.ClientTunnelSettings;
-import net.i2p.router.NetworkDatabaseFacade;
-import net.i2p.router.PeerManagerFacade;
 import net.i2p.router.PeerSelectionCriteria;
-import net.i2p.router.Router;
+import net.i2p.router.RouterContext;
 import net.i2p.router.TunnelInfo;
 import net.i2p.router.TunnelSettings;
-import net.i2p.util.Clock;
 import net.i2p.util.Log;
-import net.i2p.util.RandomSource;
-import net.i2p.router.RouterContext;
 
 class TunnelBuilder {
     private Log _log;

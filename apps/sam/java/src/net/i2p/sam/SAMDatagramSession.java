@@ -8,16 +8,14 @@ package net.i2p.sam;
  *
  */
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.InputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Properties;
 
+import net.i2p.client.I2PSessionException;
 import net.i2p.client.datagram.I2PDatagramDissector;
 import net.i2p.client.datagram.I2PDatagramMaker;
 import net.i2p.client.datagram.I2PInvalidDatagramException;
-import net.i2p.client.I2PSessionException;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.Destination;
 import net.i2p.util.Log;

@@ -10,8 +10,6 @@ package net.i2p.router;
 
 import java.util.List;
 
-import net.i2p.router.peermanager.PeerManagerFacadeImpl;
-
 /**
  * Manage peer references and keep them up to date so that when asked for peers,
  * it can provide appropriate peers according to the criteria provided.  This 

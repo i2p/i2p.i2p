@@ -1,8 +1,7 @@
 package net.i2p.router.peermanager;
 
-import net.i2p.util.Clock;
-import net.i2p.util.Log;
 import net.i2p.router.RouterContext;
+import net.i2p.util.Log;
 
 /**
  * Simple boolean calculation to determine whether the given profile is "failing" -

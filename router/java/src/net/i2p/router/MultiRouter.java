@@ -1,9 +1,10 @@
 package net.i2p.router;
 
-import java.io.IOException;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Properties;
+
 import net.i2p.I2PAppContext;
 import net.i2p.util.Log;
 

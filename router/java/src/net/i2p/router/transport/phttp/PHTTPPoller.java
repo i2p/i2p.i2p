@@ -17,20 +17,15 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Date;
 
-import net.i2p.crypto.DSAEngine;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Signature;
 import net.i2p.data.i2np.I2NPMessage;
 import net.i2p.data.i2np.I2NPMessageException;
 import net.i2p.data.i2np.I2NPMessageHandler;
-import net.i2p.router.Router;
-import net.i2p.router.transport.BandwidthLimiter;
-import net.i2p.util.Clock;
+import net.i2p.router.RouterContext;
 import net.i2p.util.I2PThread;
 import net.i2p.util.Log;
-import net.i2p.util.RandomSource;
-import net.i2p.router.RouterContext;
 
 class PHTTPPoller {
     private Log _log;

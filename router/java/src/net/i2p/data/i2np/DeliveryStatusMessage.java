@@ -13,10 +13,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Date;
 
+import net.i2p.I2PAppContext;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
 import net.i2p.util.Log;
-import net.i2p.I2PAppContext;
 
 /**
  * Defines the message sent back in reply to a message when requested, containing

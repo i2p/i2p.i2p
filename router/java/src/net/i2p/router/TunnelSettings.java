@@ -13,10 +13,10 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Date;
 
+import net.i2p.I2PAppContext;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
 import net.i2p.data.DataStructureImpl;
-import net.i2p.I2PAppContext;
 
 /**
  * Wrap up the settings specified for a particular tunnel

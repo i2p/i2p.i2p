@@ -23,6 +23,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
+import net.i2p.I2PAppContext;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.Destination;
 import net.i2p.data.LeaseSet;
@@ -36,10 +37,8 @@ import net.i2p.data.i2cp.I2CPMessageException;
 import net.i2p.data.i2cp.I2CPMessageReader;
 import net.i2p.data.i2cp.MessagePayloadMessage;
 import net.i2p.data.i2cp.SessionId;
-import net.i2p.util.Clock;
 import net.i2p.util.I2PThread;
 import net.i2p.util.Log;
-import net.i2p.I2PAppContext;
 
 /**
  * Implementation of an I2P session running over TCP.  This class is NOT thread safe -

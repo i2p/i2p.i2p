@@ -14,9 +14,6 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
-import net.i2p.crypto.ElGamalAESEngine;
-import net.i2p.crypto.KeyGenerator;
-import net.i2p.crypto.SessionKeyManager;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
 import net.i2p.data.PublicKey;
@@ -26,9 +23,8 @@ import net.i2p.data.i2np.GarlicClove;
 import net.i2p.data.i2np.GarlicMessage;
 import net.i2p.data.i2np.I2NPMessage;
 import net.i2p.data.i2np.SourceRouteBlock;
-import net.i2p.router.MessageHistory;
-import net.i2p.util.Log;
 import net.i2p.router.RouterContext;
+import net.i2p.util.Log;
 
 /**
  * Build garlic messages based on a GarlicConfig

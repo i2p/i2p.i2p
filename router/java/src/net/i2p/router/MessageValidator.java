@@ -5,7 +5,6 @@ import java.util.Iterator;
 import java.util.Set;
 import java.util.TreeMap;
 
-import net.i2p.util.Clock;
 import net.i2p.util.Log;
 
 /**

@@ -13,10 +13,8 @@ import net.i2p.data.RouterIdentity;
 import net.i2p.data.RouterInfo;
 import net.i2p.data.i2np.DatabaseSearchReplyMessage;
 import net.i2p.router.JobImpl;
-import net.i2p.router.JobQueue;
-import net.i2p.router.NetworkDatabaseFacade;
-import net.i2p.util.Log;
 import net.i2p.router.RouterContext;
+import net.i2p.util.Log;
 
 /**
  * Receive DatabaseSearchReplyMessage data and store it in the local net db

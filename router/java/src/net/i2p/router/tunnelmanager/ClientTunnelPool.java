@@ -9,13 +9,10 @@ import java.util.Set;
 import net.i2p.data.Destination;
 import net.i2p.data.TunnelId;
 import net.i2p.router.ClientTunnelSettings;
-import net.i2p.router.JobQueue;
-import net.i2p.router.MessageHistory;
 import net.i2p.router.Router;
-import net.i2p.router.TunnelInfo;
-import net.i2p.util.Clock;
-import net.i2p.util.Log;
 import net.i2p.router.RouterContext;
+import net.i2p.router.TunnelInfo;
+import net.i2p.util.Log;
 
 class ClientTunnelPool {
     private Log _log;

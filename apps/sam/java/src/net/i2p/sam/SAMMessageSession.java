@@ -9,9 +9,8 @@ package net.i2p.sam;
  */
 
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.InputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Properties;
 
 import net.i2p.client.I2PClient;

@@ -26,7 +26,6 @@ import java.util.TreeMap;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
-import net.i2p.util.Log;
 import net.i2p.util.OrderedProperties;
 
 /**

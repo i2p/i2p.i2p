@@ -14,13 +14,11 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Properties;
-import java.util.ArrayList;
 import java.util.Map;
-import java.util.HashMap;
+import java.util.Properties;
 
 import net.i2p.I2PAppContext;
 

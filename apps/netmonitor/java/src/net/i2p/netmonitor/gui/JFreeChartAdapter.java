@@ -1,28 +1,24 @@
 package net.i2p.netmonitor.gui;
 
-import net.i2p.netmonitor.PeerSummary;
-import net.i2p.netmonitor.PeerStat;
-import net.i2p.util.Log;
-
-import org.jfree.data.XYSeries;
-import org.jfree.data.XYSeriesCollection;
-import org.jfree.data.MovingAverage;
-import org.jfree.chart.JFreeChart;
-import org.jfree.chart.ChartPanel;
-import org.jfree.chart.plot.Plot;
-import org.jfree.chart.plot.XYPlot;
-import org.jfree.chart.axis.DateAxis;
-import org.jfree.chart.axis.NumberAxis;
-import org.jfree.chart.renderer.XYLineAndShapeRenderer;
-import org.jfree.chart.renderer.XYItemRenderer;
-import org.jfree.chart.renderer.XYDotRenderer;
+import java.awt.Color;
+import java.awt.Font;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
-import java.util.Iterator;
 
-import javax.swing.JPanel;
-import java.awt.Font;
-import java.awt.Color;
+import org.jfree.chart.ChartPanel;
+import org.jfree.chart.JFreeChart;
+import org.jfree.chart.axis.DateAxis;
+import org.jfree.chart.axis.NumberAxis;
+import org.jfree.chart.plot.Plot;
+import org.jfree.chart.plot.XYPlot;
+import org.jfree.chart.renderer.XYItemRenderer;
+import org.jfree.chart.renderer.XYLineAndShapeRenderer;
+import org.jfree.data.XYSeries;
+import org.jfree.data.XYSeriesCollection;
+
+import net.i2p.netmonitor.PeerStat;
+import net.i2p.util.Log;
 
 class JFreeChartAdapter {
     private final static Log _log = new Log(JFreeChartAdapter.class);

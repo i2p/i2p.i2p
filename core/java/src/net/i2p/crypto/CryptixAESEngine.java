@@ -11,9 +11,9 @@ package net.i2p.crypto;
 
 import java.security.InvalidKeyException;
 
+import net.i2p.I2PAppContext;
 import net.i2p.data.SessionKey;
 import net.i2p.util.Log;
-import net.i2p.I2PAppContext;
 
 /** 
  * Wrapper for AES cypher operation using Cryptix's Rijndael implementation.  Implements

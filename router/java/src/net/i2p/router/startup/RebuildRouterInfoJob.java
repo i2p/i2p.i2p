@@ -21,15 +21,10 @@ import net.i2p.data.RouterIdentity;
 import net.i2p.data.RouterInfo;
 import net.i2p.data.SigningPrivateKey;
 import net.i2p.data.SigningPublicKey;
-import net.i2p.router.CommSystemFacade;
 import net.i2p.router.JobImpl;
-import net.i2p.router.JobQueue;
-import net.i2p.router.KeyManager;
 import net.i2p.router.Router;
-import net.i2p.router.StatisticsManager;
-import net.i2p.util.Clock;
-import net.i2p.util.Log;
 import net.i2p.router.RouterContext;
+import net.i2p.util.Log;
 
 /**
  * If the file router.info.rebuild exists, rebuild the router info and republish.

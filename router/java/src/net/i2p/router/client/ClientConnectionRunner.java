@@ -32,10 +32,7 @@ import net.i2p.data.i2cp.SessionConfig;
 import net.i2p.data.i2cp.SessionId;
 import net.i2p.router.Job;
 import net.i2p.router.JobImpl;
-import net.i2p.router.JobQueue;
-import net.i2p.router.NetworkDatabaseFacade;
 import net.i2p.router.RouterContext;
-import net.i2p.util.Clock;
 import net.i2p.util.Log;
 import net.i2p.util.RandomSource;
 

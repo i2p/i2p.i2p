@@ -12,10 +12,10 @@ import java.math.BigInteger;
 import java.util.HashSet;
 import java.util.Set;
 
+import net.i2p.I2PAppContext;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
 import net.i2p.util.Log;
-import net.i2p.I2PAppContext;
 
 /**
  * In memory storage of buckets sorted by the XOR metric from the local router's

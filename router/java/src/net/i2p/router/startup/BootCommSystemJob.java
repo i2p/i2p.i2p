@@ -8,15 +8,10 @@ package net.i2p.router.startup;
  *
  */
 
-import net.i2p.router.CommSystemFacade;
 import net.i2p.router.Job;
 import net.i2p.router.JobImpl;
-import net.i2p.router.JobQueue;
-import net.i2p.router.PeerManagerFacade;
-import net.i2p.router.Router;
-import net.i2p.router.TunnelManagerFacade;
-import net.i2p.util.Log;
 import net.i2p.router.RouterContext;
+import net.i2p.util.Log;
 
 public class BootCommSystemJob extends JobImpl {
     private Log _log;

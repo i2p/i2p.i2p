@@ -19,20 +19,12 @@ import net.i2p.data.i2np.DeliveryInstructions;
 import net.i2p.data.i2np.I2NPMessage;
 import net.i2p.data.i2np.SourceRouteBlock;
 import net.i2p.data.i2np.TunnelMessage;
-import net.i2p.router.ClientManagerFacade;
 import net.i2p.router.ClientMessage;
-import net.i2p.router.ClientMessagePool;
 import net.i2p.router.InNetMessage;
-import net.i2p.router.InNetMessagePool;
 import net.i2p.router.Job;
-import net.i2p.router.JobQueue;
-import net.i2p.router.MessageHistory;
 import net.i2p.router.MessageReceptionInfo;
-import net.i2p.router.MessageValidator;
-import net.i2p.router.Router;
-import net.i2p.util.Clock;
-import net.i2p.util.Log;
 import net.i2p.router.RouterContext;
+import net.i2p.util.Log;
 
 /**
  * Implement the inbound message processing logic to forward based on delivery instructions and

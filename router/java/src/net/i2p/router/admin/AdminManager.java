@@ -1,10 +1,9 @@
 package net.i2p.router.admin;
 
-import net.i2p.router.Router;
+import net.i2p.router.RouterContext;
 import net.i2p.router.Service;
 import net.i2p.util.I2PThread;
 import net.i2p.util.Log;
-import net.i2p.router.RouterContext;
 
 public class AdminManager implements Service {
     private Log _log;

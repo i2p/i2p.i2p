@@ -9,10 +9,6 @@ package net.i2p.router;
  */
 
 //import net.i2p.router.message.ProcessOutboundClientMessageJob;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-
 import net.i2p.router.message.OutboundClientMessageJob;
 import net.i2p.util.Log;
 

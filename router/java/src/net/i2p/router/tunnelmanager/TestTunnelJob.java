@@ -8,32 +8,21 @@ package net.i2p.router.tunnelmanager;
  *
  */
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 
-import net.i2p.data.DataFormatException;
 import net.i2p.data.Hash;
 import net.i2p.data.TunnelId;
 import net.i2p.data.i2np.DeliveryStatusMessage;
 import net.i2p.data.i2np.I2NPMessage;
-import net.i2p.data.i2np.TunnelMessage;
 import net.i2p.router.JobImpl;
-import net.i2p.router.JobQueue;
-import net.i2p.router.MessageHistory;
 import net.i2p.router.MessageSelector;
 import net.i2p.router.ReplyJob;
-import net.i2p.router.Router;
-import net.i2p.router.TunnelInfo;
-import net.i2p.router.TunnelManagerFacade;
-import net.i2p.router.TunnelSelectionCriteria;
-import net.i2p.router.message.SendMessageDirectJob;
-import net.i2p.router.message.SendTunnelMessageJob;
-import net.i2p.util.Clock;
-import net.i2p.util.Log;
-import net.i2p.util.RandomSource;
 import net.i2p.router.RouterContext;
+import net.i2p.router.TunnelInfo;
+import net.i2p.router.TunnelSelectionCriteria;
+import net.i2p.router.message.SendTunnelMessageJob;
+import net.i2p.util.Log;
 
 class TestTunnelJob extends JobImpl {
     private Log _log;

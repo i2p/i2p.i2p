@@ -14,9 +14,8 @@ import java.util.Set;
 
 import net.i2p.data.Hash;
 import net.i2p.router.JobImpl;
-import net.i2p.router.JobQueue;
-import net.i2p.util.Log;
 import net.i2p.router.RouterContext;
+import net.i2p.util.Log;
 
 /**
  * Fire off search jobs for random keys from the explore pool, up to MAX_PER_RUN

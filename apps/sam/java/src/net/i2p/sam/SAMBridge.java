@@ -8,29 +8,25 @@ package net.i2p.sam;
  *
  */
 
-import java.io.IOException;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.BufferedReader;
-import java.io.InputStreamReader;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.Properties;
-import java.util.Map;
-import java.util.HashMap;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
+import java.util.Properties;
 
-import net.i2p.data.Destination;
 import net.i2p.data.DataFormatException;
-import net.i2p.data.PrivateKey;
-import net.i2p.data.SigningPrivateKey;
-
+import net.i2p.data.Destination;
 import net.i2p.util.I2PThread;
 import net.i2p.util.Log;
-import net.i2p.I2PAppContext;
 
 /**
  * SAM bridge implementation.

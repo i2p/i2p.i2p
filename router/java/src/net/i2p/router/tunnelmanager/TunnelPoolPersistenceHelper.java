@@ -13,10 +13,9 @@ import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
 import net.i2p.data.TunnelId;
 import net.i2p.router.ClientTunnelSettings;
-import net.i2p.router.Router;
+import net.i2p.router.RouterContext;
 import net.i2p.router.TunnelInfo;
 import net.i2p.util.Log;
-import net.i2p.router.RouterContext;
 
 /**
  * Handle all of the load / store of the tunnel pool (including any contained 

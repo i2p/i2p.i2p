@@ -16,10 +16,8 @@ import net.i2p.data.i2cp.I2CPMessageException;
 import net.i2p.data.i2cp.RequestLeaseSetMessage;
 import net.i2p.router.Job;
 import net.i2p.router.JobImpl;
-import net.i2p.router.JobQueue;
-import net.i2p.util.Clock;
-import net.i2p.util.Log;
 import net.i2p.router.RouterContext;
+import net.i2p.util.Log;
 
 /**
  * Async job to walk the client through generating a lease set.  First sends it

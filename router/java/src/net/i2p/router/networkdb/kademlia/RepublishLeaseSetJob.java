@@ -8,19 +8,12 @@ package net.i2p.router.networkdb.kademlia;
  *
  */
 
-import java.util.HashSet;
-import java.util.Set;
-
 import net.i2p.data.Hash;
 import net.i2p.data.LeaseSet;
-import net.i2p.router.ClientManagerFacade;
 import net.i2p.router.JobImpl;
-import net.i2p.router.JobQueue;
 import net.i2p.router.Router;
-import net.i2p.util.Clock;
-import net.i2p.util.Log;
 import net.i2p.router.RouterContext;
-import net.i2p.I2PException;
+import net.i2p.util.Log;
 
 /**
  * Run periodically for each locally created leaseSet to cause it to be republished

@@ -1,14 +1,13 @@
 package net.i2p.netmonitor.gui;
 
-import net.i2p.netmonitor.NetMonitor;
-import net.i2p.netmonitor.PeerSummary;
-import net.i2p.netmonitor.PeerStat;
-import net.i2p.util.Log;
-import net.i2p.util.I2PThread;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.HashMap;
+
+import net.i2p.netmonitor.NetMonitor;
+import net.i2p.util.I2PThread;
+import net.i2p.util.Log;
 
 /**
  * Coordinate the visualization of the network monitor. <p />

@@ -14,9 +14,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Date;
 
-import net.i2p.crypto.ElGamalAESEngine;
-import net.i2p.crypto.KeyGenerator;
-import net.i2p.crypto.SessionKeyManager;
+import net.i2p.I2PAppContext;
 import net.i2p.data.Certificate;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
@@ -26,7 +24,6 @@ import net.i2p.data.PublicKey;
 import net.i2p.data.SessionKey;
 import net.i2p.data.SessionTag;
 import net.i2p.util.Log;
-import net.i2p.I2PAppContext;
 
 
 /**

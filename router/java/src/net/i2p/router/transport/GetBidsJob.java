@@ -12,14 +12,10 @@ import java.util.List;
 
 import net.i2p.data.Hash;
 import net.i2p.router.JobImpl;
-import net.i2p.router.JobQueue;
 import net.i2p.router.MessageSelector;
 import net.i2p.router.OutNetMessage;
-import net.i2p.router.ProfileManager;
-import net.i2p.router.Router;
-import net.i2p.router.Shitlist;
-import net.i2p.util.Log;
 import net.i2p.router.RouterContext;
+import net.i2p.util.Log;
 
 /**
  * Retrieve a set of bids for a particular outbound message, and if any are found

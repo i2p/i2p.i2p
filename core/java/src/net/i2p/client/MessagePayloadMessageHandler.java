@@ -9,14 +9,13 @@ package net.i2p.client;
  *
  */
 
-import net.i2p.crypto.ElGamalAESEngine;
+import net.i2p.I2PAppContext;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.Payload;
 import net.i2p.data.i2cp.I2CPMessage;
 import net.i2p.data.i2cp.MessageId;
 import net.i2p.data.i2cp.MessagePayloadMessage;
 import net.i2p.data.i2cp.ReceiveMessageEndMessage;
-import net.i2p.I2PAppContext;
 
 /**
  * Handle I2CP MessagePayloadMessages from the router delivering the contents

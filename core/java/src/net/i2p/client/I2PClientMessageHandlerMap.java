@@ -12,6 +12,7 @@ package net.i2p.client;
 import java.util.HashMap;
 import java.util.Map;
 
+import net.i2p.I2PAppContext;
 import net.i2p.data.i2cp.DisconnectMessage;
 import net.i2p.data.i2cp.MessagePayloadMessage;
 import net.i2p.data.i2cp.MessageStatusMessage;
@@ -19,7 +20,6 @@ import net.i2p.data.i2cp.RequestLeaseSetMessage;
 import net.i2p.data.i2cp.SessionStatusMessage;
 import net.i2p.data.i2cp.SetDateMessage;
 import net.i2p.util.Log;
-import net.i2p.I2PAppContext;
 
 /**
  * Contains a map of message handlers that a session will want to use

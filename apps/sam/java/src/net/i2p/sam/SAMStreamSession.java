@@ -9,29 +9,27 @@ package net.i2p.sam;
  */
 
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.InputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InterruptedIOException;
-import java.util.HashMap;
 import java.io.OutputStream;
 import java.net.ConnectException;
 import java.net.NoRouteToHostException;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Properties;
 import java.util.Set;
 
+import net.i2p.I2PException;
+import net.i2p.client.I2PClient;
 import net.i2p.client.streaming.I2PServerSocket;
 import net.i2p.client.streaming.I2PSocket;
 import net.i2p.client.streaming.I2PSocketManager;
 import net.i2p.client.streaming.I2PSocketManagerFactory;
 import net.i2p.client.streaming.I2PSocketOptions;
-import net.i2p.client.I2PClient;
 import net.i2p.data.Base64;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.Destination;
-import net.i2p.I2PException;
-import net.i2p.util.HexDump;
 import net.i2p.util.I2PThread;
 import net.i2p.util.Log;
 

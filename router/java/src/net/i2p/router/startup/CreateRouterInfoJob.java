@@ -12,7 +12,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.HashSet;
 
-import net.i2p.crypto.KeyGenerator;
 import net.i2p.data.Certificate;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.PrivateKey;
@@ -21,16 +20,11 @@ import net.i2p.data.RouterIdentity;
 import net.i2p.data.RouterInfo;
 import net.i2p.data.SigningPrivateKey;
 import net.i2p.data.SigningPublicKey;
-import net.i2p.router.CommSystemFacade;
 import net.i2p.router.Job;
 import net.i2p.router.JobImpl;
-import net.i2p.router.JobQueue;
-import net.i2p.router.KeyManager;
 import net.i2p.router.Router;
-import net.i2p.router.StatisticsManager;
-import net.i2p.util.Clock;
-import net.i2p.util.Log;
 import net.i2p.router.RouterContext;
+import net.i2p.util.Log;
 
 public class CreateRouterInfoJob extends JobImpl {
     private static Log _log = new Log(CreateRouterInfoJob.class);

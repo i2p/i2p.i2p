@@ -1,10 +1,11 @@
 package net.i2p.router.peermanager;
 
+import java.io.File;
+
 import net.i2p.data.Hash;
+import net.i2p.router.RouterContext;
 import net.i2p.stat.RateStat;
 import net.i2p.util.Log;
-import net.i2p.router.RouterContext;
-import java.io.File;
 
 public class PeerProfile {
     private Log _log;

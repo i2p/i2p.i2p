@@ -1,9 +1,8 @@
 package net.i2p.router.tunnelmanager;
 
 import net.i2p.router.JobImpl;
-import net.i2p.router.JobQueue;
-import net.i2p.router.TunnelInfo;
 import net.i2p.router.RouterContext;
+import net.i2p.router.TunnelInfo;
 
 class RequestOutboundTunnelJob extends JobImpl {
     private TunnelPool _pool;
