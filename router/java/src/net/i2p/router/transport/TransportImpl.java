@@ -117,31 +117,23 @@ public abstract class TransportImpl implements Transport {
                 _context.statManager().addRateData("transport.expiredOnQueueLifetime", lifetime, lifetime);
             
             if (allowRequeue) {
-                if (true) {
-                    if (_log.shouldLog(Log.ERROR))
-                        _log.error("wtf, requeueing message " + msg.getMessageId() + " of type " + msg.getMessageType(), 
-                                   new Exception("requeued by"));
+                if ( (msg.getExpiration() <= 0) || (msg.getExpiration() > _context.clock().now()) ) {
+                    // this may not be the last transport available - keep going
+                    _context.outNetMessagePool().add(msg);
+                    // don't discard the data yet!
+                } else {
+                    if (_log.shouldLog(Log.INFO))
+                        _log.info("No more time left (" + new Date(msg.getExpiration()) 
+                                  + ", expiring without sending successfully the " 
+                                  + msg.getMessageType());
+                    if (msg.getOnFailedSendJob() != null)
+                        _context.jobQueue().addJob(msg.getOnFailedSendJob());
+                    MessageSelector selector = msg.getReplySelector();
+                    if (selector != null) {
+                        _context.messageRegistry().unregisterPending(msg);
+                    }
                     log = true;
                     msg.discardData();
-                } else {
-                    if ( (msg.getExpiration() <= 0) || (msg.getExpiration() > _context.clock().now()) ) {
-                        // this may not be the last transport available - keep going
-                        _context.outNetMessagePool().add(msg);
-                        // don't discard the data yet!
-                    } else {
-                        if (_log.shouldLog(Log.INFO))
-                            _log.info("No more time left (" + new Date(msg.getExpiration()) 
-                                      + ", expiring without sending successfully the " 
-                                      + msg.getMessageType());
-                        if (msg.getOnFailedSendJob() != null)
-                            _context.jobQueue().addJob(msg.getOnFailedSendJob());
-                        MessageSelector selector = msg.getReplySelector();
-                        if (selector != null) {
-                            _context.messageRegistry().unregisterPending(msg);
-                        }
-                        log = true;
-                        msg.discardData();
-                    }
                 }
             } else {
                 if (_log.shouldLog(Log.INFO))
