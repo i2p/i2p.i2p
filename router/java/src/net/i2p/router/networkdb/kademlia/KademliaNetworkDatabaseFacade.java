@@ -36,7 +36,6 @@ import net.i2p.router.NetworkDatabaseFacade;
 import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
 import net.i2p.router.networkdb.DatabaseLookupMessageHandler;
-import net.i2p.router.networkdb.DatabaseSearchReplyMessageHandler;
 import net.i2p.router.networkdb.DatabaseStoreMessageHandler;
 import net.i2p.router.networkdb.PublishLocalRouterInfoJob;
 import net.i2p.util.Log;
