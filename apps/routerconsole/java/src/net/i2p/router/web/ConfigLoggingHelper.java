@@ -73,7 +73,7 @@ public class ConfigLoggingHelper {
         buf.append("<select name=\"defaultloglevel\">\n");
         
         buf.append("<option value=\"DEBUG\" ");
-        if ("DEFAULT".equals(cur)) buf.append(" selected=\"true\" ");
+        if ("DEBUG".equals(cur)) buf.append(" selected=\"true\" ");
         buf.append(">DEBUG</option>\n");
         
         buf.append("<option value=\"INFO\" ");
@@ -85,7 +85,7 @@ public class ConfigLoggingHelper {
         buf.append(">WARN</option>\n");
         
         buf.append("<option value=\"ERROR\" ");
-        if ("WARN".equals(cur)) buf.append(" selected=\"true\" ");
+        if ("ERROR".equals(cur)) buf.append(" selected=\"true\" ");
         buf.append(">ERROR</option>\n");
         
         buf.append("<option value=\"CRIT\" ");
