@@ -182,6 +182,7 @@ public class OutboundClientMessageJob extends JobImpl {
             if (_log.shouldLog(Log.WARN))
                 _log.warn(getJobId() + ": No more leases, and we still haven't heard back from the peer"
                           + ", refetching the leaseSet to try again");
+            LeaseSet ls = _status.getLeaseSet();
             _status.setLeaseSet(null);
             long remainingMs = _overallExpiration - getContext().clock().now();
             if (_status.getNumLookups() < MAX_LEASE_LOOKUPS) {
@@ -190,6 +191,8 @@ public class OutboundClientMessageJob extends JobImpl {
                 _status.clearAlreadySent(); // so we can send down old tunnels again
                 getContext().netDb().fail(to); // so we don't just fetch what we have
                 getContext().netDb().lookupLeaseSet(to, _nextStep, _lookupLeaseSetFailed, remainingMs);
+                if (ls != null)
+                    getContext().jobQueue().addJob(new ShortCircuitSearchJob(ls));
                 return;
             } else {
                 if (_log.shouldLog(Log.WARN))
@@ -201,6 +204,27 @@ public class OutboundClientMessageJob extends JobImpl {
         }
         
         getContext().jobQueue().addJob(new SendJob(nextLease));
+    }
+    
+    private static final long MAX_SEARCH_INTERVAL = 10*1000;
+    /** 
+     * If the netDb refetch isn't going well, lets fall back on the old leaseSet
+     * anyway
+     *
+     */
+    private class ShortCircuitSearchJob extends JobImpl {
+        private LeaseSet _ls;
+        public ShortCircuitSearchJob(LeaseSet ls) {
+            super(OutboundClientMessageJob.this.getContext());
+            _ls = ls;
+            ShortCircuitSearchJob.this.getTiming().setStartAfter(getContext().clock().now() + MAX_SEARCH_INTERVAL);
+        }
+        public String getName() { return "Short circuit search"; }
+        public void runJob() {
+            LeaseSet ls = getContext().netDb().lookupLeaseSetLocally(_ls.getDestination().calculateHash());
+            if (ls == null)
+                getContext().netDb().store(_ls.getDestination().calculateHash(), _ls);
+        }
     }
     
     /**
