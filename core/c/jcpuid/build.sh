@@ -32,7 +32,7 @@ MINGW*)
 FreeBSD*)
 	COMPILEFLAGS="-Wall"
 	INCLUDES="-I. -Iinclude -I$JAVA_HOME/include/ -I$JAVA_HOME/include/freebsd/"
-	LINKFLAGS="-shared -static -static-libgcc -Wl,-soname,libjcpuid-x86-freebsd.so"
+	LINKFLAGS="-shared -static -Wl,-soname,libjcpuid-x86-freebsd.so"
 	LIBFILE="lib/freenet/support/CPUInformation/libjcpuid-x86-freebsd.so";;
 Linux*)
 	COMPILEFLAGS="-fPIC -Wall"
