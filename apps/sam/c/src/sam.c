@@ -85,8 +85,12 @@ void (*sam_statusback)(sam_sess_t *session, sam_sid_t stream_id,
 bool sam_close(sam_sess_t *session)
 {
 	assert(session != NULL);
-	if (!session->connected)
+	if (!session->connected) {
+#if SAM_WIRETAP
+		SAMLOGS("Connection already closed - sam_close() skipped");
+#endif
 		return true;
+	}
 
 #ifdef WINSOCK
 	if (closesocket(session->sock) == SOCKET_ERROR) {
@@ -95,13 +99,19 @@ bool sam_close(sam_sess_t *session)
 		return false;
 	}
 	session->connected = false;
-	if (sam_winsock_cleanup() == SAM_OK)
+	if (sam_winsock_cleanup() == SAM_OK) {
+#if SAM_WIRETAP
+		SAMLOGS("Connection closed safely");
+#endif
 		return true;
-	else
+	} else
 		return false;
 #else
 	if (close(session->sock) == 0) {
 		session->connected = false;
+#if SAM_WIRETAP
+		SAMLOGS("Connection closed safely");
+#endif
 		return true;
 	} else {
 		SAMLOG("Failed closing the SAM connection (%s)", strerror(errno));
@@ -1119,7 +1129,7 @@ const char *sam_strerror(samerr_t code)
 		case SAM_BAD_STYLE:			/* Style must be stream, datagram, or raw */
 			return "Bad connection style";
 		case SAM_BAD_VERSION:		/* sam_hello() had an unexpected reply */
-			return "Bad SAM version";
+			return "Not a SAM port, or bad SAM version";
 		case SAM_CALLBACKS_UNSET:	/* Some callbacks are still set to NULL */
 			return "Callbacks unset";
 		case SAM_SOCKET_ERROR:		/* TCP/IP connection to the SAM host:port

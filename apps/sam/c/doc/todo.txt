@@ -2,6 +2,8 @@ I need to do these things:
 
 * SAM raw support
 * Write an instruction manual
+* Make dest a dynamic string
+* Change SAM parser to use a hashmap
 
 Anyone can help with these things:
 
