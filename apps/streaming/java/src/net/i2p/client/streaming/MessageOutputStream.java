@@ -108,7 +108,16 @@ public class MessageOutputStream extends OutputStream {
             _dataLock.notifyAll();
         }
         
-        ws.waitForCompletion(_writeTimeout);
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("before waiting " + _writeTimeout + "ms for completion of " + ws);
+        if (_closed && 
+            ( (_writeTimeout > Connection.DISCONNECT_TIMEOUT) ||
+              (_writeTimeout <= 0) ) )
+            ws.waitForCompletion(Connection.DISCONNECT_TIMEOUT);
+        else
+            ws.waitForCompletion(_writeTimeout);
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("after waiting " + _writeTimeout + "ms for completion of " + ws);
         if (ws.writeFailed() && (_writeTimeout > 0) )
             throw new InterruptedIOException("Timed out during write");
         else if (ws.writeFailed())
@@ -117,6 +126,7 @@ public class MessageOutputStream extends OutputStream {
     }
     
     public void close() throws IOException {
+        if (_closed) return;
         _closed = true;
         flush();
         _log.debug("Output stream closed after writing " + _written);

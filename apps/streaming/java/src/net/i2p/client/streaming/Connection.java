@@ -66,7 +66,7 @@ public class Connection {
     public static final long MIN_RESEND_DELAY = 20*1000;
 
     /** wait up to 5 minutes after disconnection so we can ack/close packets */
-    public static long DISCONNECT_TIMEOUT = 5*60*1000;
+    public static int DISCONNECT_TIMEOUT = 5*60*1000;
     
     /** lets be sane.. no more than 32 packets in the air in each dir */
     public static final int MAX_WINDOW_SIZE = 32;

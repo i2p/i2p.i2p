@@ -117,14 +117,20 @@ public class PacketLocal extends Packet implements MessageOutputStream.WriteStat
     
     public void waitForCompletion(int maxWaitMs) {
         long expiration = _context.clock().now()+maxWaitMs;
-        while ((maxWaitMs <= 0) || (expiration < _context.clock().now())) {
-            synchronized (this) {
-                if (_ackOn > 0)
-                    return;
-                if (_cancelledOn > 0)
-                    return;
-                try { wait(); } catch (InterruptedException ie) {}
-            }
+        while (true) {
+            long timeRemaining = expiration - _context.clock().now();
+            if ( (timeRemaining <= 0) && (maxWaitMs > 0) ) return;
+            try {
+                synchronized (this) {
+                    if (_ackOn > 0) return;
+                    if (_cancelledOn > 0) return;
+                    if (timeRemaining > 60*1000)
+                        timeRemaining = 60*1000;
+                    else if (timeRemaining <= 0)
+                        timeRemaining = 10*1000;
+                    wait(timeRemaining);
+                }
+            } catch (InterruptedException ie) {}
         }
     }
     
