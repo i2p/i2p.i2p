@@ -69,15 +69,21 @@ public class HandleDatabaseLookupMessageJob extends JobImpl {
             _log.debug("Handling database lookup message for " + _message.getSearchKey());
 
         Hash fromKey = _message.getFrom().getIdentity().getHash();
-	
-        if (_message.getReplyTunnel() != null) {
-            if (_log.shouldLog(Log.INFO))
-                _log.info("dbLookup received with replies going to " + fromKey 
+
+        if (_log.shouldLog(Log.DEBUG)) {
+            if (_message.getReplyTunnel() != null)
+                _log.debug("dbLookup received with replies going to " + fromKey 
                           + " (tunnel " + _message.getReplyTunnel() + ")");
         }
 
+        // might as well grab what they sent us
         NetworkDatabaseFacade.getInstance().store(fromKey, _message.getFrom());
-	
+
+        // whatdotheywant?
+        handleRequest(fromKey);
+    }
+    
+    private void handleRequest(Hash fromKey) {
         LeaseSet ls = NetworkDatabaseFacade.getInstance().lookupLeaseSetLocally(_message.getSearchKey());
         if (ls != null) {
             // send that lease set to the _message.getFromHash peer
@@ -109,7 +115,6 @@ public class HandleDatabaseLookupMessageJob extends JobImpl {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Sending data matching key key " + key.toBase64() + " to peer " + toPeer.toBase64() 
                        + " tunnel " + replyTunnel);
-        StatManager.getInstance().addRateData("netDb.lookupsMatched", 1, 0);
         DatabaseStoreMessage msg = new DatabaseStoreMessage();
         msg.setKey(key);
         if (data instanceof LeaseSet) {
@@ -119,6 +124,8 @@ public class HandleDatabaseLookupMessageJob extends JobImpl {
             msg.setRouterInfo((RouterInfo)data);
             msg.setValueType(DatabaseStoreMessage.KEY_TYPE_ROUTERINFO);
         }
+        StatManager.getInstance().addRateData("netDb.lookupsMatched", 1, 0);
+        StatManager.getInstance().addRateData("netDb.lookupsHandled", 1, 0);
         sendMessage(msg, toPeer, replyTunnel);
     }
     
@@ -134,11 +141,11 @@ public class HandleDatabaseLookupMessageJob extends JobImpl {
             routerInfoSet.add(Router.getInstance().getRouterInfo());
         }
         msg.addReplies(routerInfoSet);
+        StatManager.getInstance().addRateData("netDb.lookupsHandled", 1, 0);
         sendMessage(msg, toPeer, replyTunnel); // should this go via garlic messages instead?
     }
     
     private void sendMessage(I2NPMessage message, Hash toPeer, TunnelId replyTunnel) {
-        StatManager.getInstance().addRateData("netDb.lookupsHandled", 1, 0);
         Job send = null;
         if (replyTunnel != null) {
             sendThroughTunnel(message, toPeer, replyTunnel);
@@ -157,47 +164,52 @@ public class HandleDatabaseLookupMessageJob extends JobImpl {
         // the sendTunnelMessageJob can't handle injecting into the tunnel anywhere but the beginning
         // (and if we are the beginning, we have the signing key)
         if ( (info == null) || (info.getSigningKey() != null)) {
-            if (_log.shouldLog(Log.INFO))
-                _log.info("Sending reply through " + replyTunnel + " on " + toPeer);
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Sending reply through " + replyTunnel + " on " + toPeer);
             JobQueue.getInstance().addJob(new SendTunnelMessageJob(message, replyTunnel, toPeer, null, null, null, null, null, REPLY_TIMEOUT, MESSAGE_PRIORITY));
         } else {
             // its a tunnel we're participating in, but we're NOT the gateway, so 
-            if (_log.shouldLog(Log.INFO))
-                _log.info("Want to reply to a db request via a tunnel, but we're a participant in the reply!  so send it to the gateway");
-	    
-            if ( (toPeer == null) || (replyTunnel == null) ) {
-                if (_log.shouldLog(Log.ERROR))
-                    _log.error("Someone br0ke us.  where is this message supposed to go again?", getAddedBy());
-                return;
-            }
-	    
-            long expiration = REPLY_TIMEOUT + Clock.getInstance().now();
-	    
-            TunnelMessage msg = new TunnelMessage();
-            try {
-                ByteArrayOutputStream baos = new ByteArrayOutputStream(1024);
-                message.writeBytes(baos);
-                msg.setData(baos.toByteArray());
-                msg.setTunnelId(replyTunnel);
-                msg.setMessageExpiration(new Date(expiration));
-                JobQueue.getInstance().addJob(new SendMessageDirectJob(msg, toPeer, null, null, null, null, expiration, MESSAGE_PRIORITY));
+            sendToGateway(message, toPeer, replyTunnel, info);
+        }
+    }
+    
+    private void sendToGateway(I2NPMessage message, Hash toPeer, TunnelId replyTunnel, TunnelInfo info) {
+        if (_log.shouldLog(Log.INFO))
+            _log.info("Want to reply to a db request via a tunnel, but we're a participant in the reply!  so send it to the gateway");
 
-                String bodyType = message.getClass().getName();
-                MessageHistory.getInstance().wrap(bodyType, message.getUniqueId(), TunnelMessage.class.getName(), msg.getUniqueId());
-            } catch (IOException ioe) {
-                if (_log.shouldLog(Log.ERROR))
-                    _log.error("Error writing out the tunnel message to send to the tunnel", ioe);
-            } catch (DataFormatException dfe) {
-                if (_log.shouldLog(Log.ERROR))
-                    _log.error("Error writing out the tunnel message to send to the tunnel", dfe);
-            }
+        if ( (toPeer == null) || (replyTunnel == null) ) {
+            if (_log.shouldLog(Log.ERROR))
+                _log.error("Someone br0ke us.  where is this message supposed to go again?", getAddedBy());
             return;
+        }
+
+        long expiration = REPLY_TIMEOUT + Clock.getInstance().now();
+
+        TunnelMessage msg = new TunnelMessage();
+        try {
+            ByteArrayOutputStream baos = new ByteArrayOutputStream(1024);
+            message.writeBytes(baos);
+            msg.setData(baos.toByteArray());
+            msg.setTunnelId(replyTunnel);
+            msg.setMessageExpiration(new Date(expiration));
+            JobQueue.getInstance().addJob(new SendMessageDirectJob(msg, toPeer, null, null, null, null, expiration, MESSAGE_PRIORITY));
+
+            String bodyType = message.getClass().getName();
+            MessageHistory.getInstance().wrap(bodyType, message.getUniqueId(), TunnelMessage.class.getName(), msg.getUniqueId());
+        } catch (IOException ioe) {
+            if (_log.shouldLog(Log.ERROR))
+                _log.error("Error writing out the tunnel message to send to the tunnel", ioe);
+        } catch (DataFormatException dfe) {
+            if (_log.shouldLog(Log.ERROR))
+                _log.error("Error writing out the tunnel message to send to the tunnel", dfe);
         }
     }
     
     public String getName() { return "Handle Database Lookup Message"; }
 
     public void dropped() {
-        MessageHistory.getInstance().messageProcessingError(_message.getUniqueId(), _message.getClass().getName(), "Dropped due to overload");
+        MessageHistory.getInstance().messageProcessingError(_message.getUniqueId(), 
+                                                            _message.getClass().getName(), 
+                                                            "Dropped due to overload");
     }
 }
