@@ -1,4 +1,11 @@
-$Id: history.txt,v 1.94 2004/12/04 18:40:53 jrandom Exp $
+$Id: history.txt,v 1.95 2004/12/05 05:22:58 jrandom Exp $
+
+2004-12-05  jrandom
+    * Fix the recently broken SAM bridge (duh)
+    * Add a new pair of SAM apps - net.i2p.sam.client.SAMStreamSink and
+      net.i2p.sam.client.SAMStreamSend, mirroring the streaming lib's
+      StreamSink and StreamSend apps for transferring files.
+    * Make the passive flush timer fire more frequently.
 
 2004-12-05  jrandom
     * Fixed some links in the console (thanks ugha!) and the javadoc 

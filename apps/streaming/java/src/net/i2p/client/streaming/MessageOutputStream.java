@@ -47,7 +47,7 @@ public class MessageOutputStream extends OutputStream {
         _written = 0;
         _closed = false;
         _writeTimeout = -1;
-        _passiveFlushDelay = 2*1000;
+        _passiveFlushDelay = 500;
         _flusher = new Flusher();
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("MessageOutputStream created");

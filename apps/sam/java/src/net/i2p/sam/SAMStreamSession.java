@@ -471,14 +471,14 @@ public class SAMStreamSession {
             ByteCache cache = ByteCache.getInstance(1024, 4);
             ByteArray ba = cache.acquire();
             try {
-                int sent = 0;
+                int remaining = size;
                 byte buf[] = ba.getData(); 
-                while (sent < size) {
-                    int read = in.read(buf);
+                while (remaining > 0) {
+                    int read = in.read(buf, 0, remaining > buf.length ? buf.length : remaining);
                     if (read == -1)
-                        throw new IOException("Insufficient data from the SAM client (" + sent + "/" + size + ")");
+                        throw new IOException("Insufficient data from the SAM client (" + remaining + "/" + size + ")");
                     i2pSocketOS.write(buf, 0, read);
-                    sent += read;
+                    remaining -= read;
                 }
                 //i2pSocketOS.flush();
             } catch (IOException e) {
