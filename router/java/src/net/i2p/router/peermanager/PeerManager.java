@@ -91,10 +91,11 @@ class PeerManager {
                 case PeerSelectionCriteria.PURPOSE_TUNNEL:
                     // pull all of the fast ones, regardless of how many we 
                     // want - we'll whittle them down later (40 lines from now)
-                    int num = _organizer.countFastPeers();
-                    if (num <= 0) 
-                        num = criteria.getMaximumRequired();
-                    _organizer.selectFastPeers(num, exclude, curVals);
+                    // int num = _organizer.countFastPeers();
+                    // if (num <= 0) 
+                    //    num = criteria.getMaximumRequired();
+                    // _organizer.selectFastPeers(num, exclude, curVals);
+                    _organizer.selectFastPeers(criteria.getMaximumRequired(), exclude, curVals);
                     break;
                 case PeerSelectionCriteria.PURPOSE_SOURCE_ROUTE:
                     _organizer.selectHighCapacityPeers(criteria.getMinimumRequired(), exclude, curVals);
@@ -133,6 +134,7 @@ class PeerManager {
         if (_log.shouldLog(Log.INFO))
             _log.info("Peers selected after " + numPasses + ": " + rv);
         
+        /*
         if (criteria.getPurpose() == PeerSelectionCriteria.PURPOSE_TUNNEL) {
             // we selected extra peers above.  now lets strip that down to the 
             // minimum requested, ordering it by the least recently agreed to
@@ -155,6 +157,7 @@ class PeerManager {
             if (_log.shouldLog(Log.INFO))
                 _log.info("Peers selected after " + numPasses + ", sorted for a tunnel: " + rv);
         }
+         */
         return rv;
     }
     

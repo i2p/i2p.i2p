@@ -600,7 +600,8 @@ public class ProfileOrganizer {
             }
         } else {
             // our average isn't doing well (its recovering from failures)
-            if (numExceedingBaseline > minHighCapacityPeers) {
+            _thresholdCapacityValue = baseline + 0.0000001;
+            /*if (numExceedingBaseline > minHighCapacityPeers) {
                 if (_log.shouldLog(Log.INFO))
                     _log.info("Our average capacity isn't doing well [" + meanCapacity 
                               + "], but the baseline has " + numExceedingBaseline);
@@ -612,6 +613,7 @@ public class ProfileOrganizer {
                               + " so falling back on the median of " + thresholdAtMedian);
                 _thresholdCapacityValue = thresholdAtMedian;
             }
+             */
         }
     }
     
