@@ -85,7 +85,7 @@ class TunnelPool {
         }
         if (id == null) {
             if (_log.shouldLog(Log.ERROR))
-                _log.error(toString() + ": Id requested is null");
+                _log.error(toString() + ": Id requested is null", new Exception("wtf, why do you want a null?"));
             return null;
         }
         boolean typeKnown = id.getType() != TunnelId.TYPE_UNSPECIFIED;
