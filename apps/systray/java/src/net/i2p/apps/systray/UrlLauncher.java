@@ -17,6 +17,8 @@ package net.i2p.apps.systray;
  * Firefox, Netscape, Opera, and Safari.    
  * 
  * @author hypercubus
+ * 
+ * TODO Add a method to allow opening a URL with a specific browser.
  */
 public class UrlLauncher {
 

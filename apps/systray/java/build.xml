@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project basedir="." default="all" name="systray">
+    <target name="all" depends="clean, build" />
+    <target name="build" depends="jar" />
+    <target name="compile">
+        <mkdir dir="./build" />
+        <mkdir dir="./build/obj" />
+        <javac
+            srcdir="./src"
+            debug="true"
+            deprecation="on"
+            source="1.3"
+            target="1.3"
+            destdir="./build/obj"
+            includes="**/*.java"
+            classpath="./src/net/i2p/apps/systray/lib/systray4j.jar" />
+    </target>
+    <target name="jar" depends="compile">
+        <copy todir="./build/lib">
+            <fileset dir="./src/net/i2p/apps/systray/lib" includes="libsystray4j.so systray4j.dll systray4j.jar" />
+        </copy>
+        <copy todir="./build/icons">
+            <fileset dir="./src/net/i2p/apps/systray/icons" />
+        </copy>
+        <copy todir="./build/jar_temp/doc">
+            <fileset dir="../doc" />
+        </copy>
+        <mkdir dir="./build/jar_temp" />
+        <copy todir="./build/jar_temp">
+            <fileset dir="./build/obj" includes="**/*.class" />
+            <fileset dir="./src/net/i2p/apps/systray" includes="doc/*" />
+        </copy>
+        <jar destfile="./build/lib/systray.jar" basedir="./build/jar_temp" includes="**/*">
+            <manifest>
+                <attribute name="Main-Class" value="net.i2p.apps.systray.SysTray" />
+                <attribute name="Class-Path" value="systray4j.jar" />
+            </manifest>
+        </jar>
+        <delete dir="./build/jar_temp" />
+    </target>
+    <target name="javadoc">
+        <mkdir dir="./build" />
+        <mkdir dir="./build/javadoc" />
+        <javadoc
+            sourcepath="./src"
+            classpath="./src:./src/net/i2p/apps/systray/systray4j.jar"
+            destdir="./build/javadoc"
+            packagenames="*"
+            use="true"
+            access="package"
+            splitindex="true" />
+    </target>
+    <target name="clean">
+        <delete dir="./build" />
+    </target>
+</project>

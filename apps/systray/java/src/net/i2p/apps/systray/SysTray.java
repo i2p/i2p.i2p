@@ -18,19 +18,18 @@ import snoozesoft.systray4j.SysTrayMenuListener;
  * A system tray control for launching the I2P router console.
  *
  * @author hypercubus
+ * 
+ * TODO Add a menu entry and dialog to let the user specify the location of their preferred web browser.
  */
 public class SysTray implements SysTrayMenuListener {
 
-    private SysTrayMenuItem itemExit                = new SysTrayMenuItem("Exit", "exit");
-    private SysTrayMenuItem itemStartRouter         = new SysTrayMenuItem("Start router", "start");
-    private SysTrayMenuItem itemStopRouter          = new SysTrayMenuItem("Stop router", "stop");
-    private SysTrayMenuIcon sysTrayMenuIconDisabled = new SysTrayMenuIcon("icons/iggy_grey");
-    private SysTrayMenuIcon sysTrayMenuIconEnabled  = new SysTrayMenuIcon("icons/iggy");
-    private SysTrayMenu     sysTrayMenu             = new SysTrayMenu(sysTrayMenuIconEnabled, "I2P Console");
+    private SysTrayMenuItem itemExit        = new SysTrayMenuItem("Exit systray", "exit");
+    private SysTrayMenuItem itemSetBrowser  = new SysTrayMenuItem("Set preferred browser...", "setbrowser");
+    private SysTrayMenuIcon sysTrayMenuIcon = new SysTrayMenuIcon("../icons/iggy");
+    private SysTrayMenu     sysTrayMenu     = new SysTrayMenu(sysTrayMenuIcon, "I2P Console");
 
     public SysTray() {
-        sysTrayMenuIconDisabled.addSysTrayMenuListener(this);
-        sysTrayMenuIconEnabled.addSysTrayMenuListener(this);
+        sysTrayMenuIcon.addSysTrayMenuListener(this);
         createSysTrayMenu();
     }
 
@@ -38,7 +37,7 @@ public class SysTray implements SysTrayMenuListener {
         new SysTray();
         while(true)
             try {
-            Thread.sleep(2*1000);
+            Thread.sleep(2 * 1000);
             } catch (InterruptedException e) {
                 // blah
             }
@@ -47,34 +46,27 @@ public class SysTray implements SysTrayMenuListener {
     public void iconLeftClicked(SysTrayMenuEvent e) {}
 
     public void iconLeftDoubleClicked(SysTrayMenuEvent e) {
-        System.out.println("Double click!");
+        try {
+            new UrlLauncher().openUrl("http://localhost:7657");
+        } catch (Exception ex) {
+            // Pop up a dialog or something.
+        }
     }
 
     public void menuItemSelected(SysTrayMenuEvent e) {
         if (e.getActionCommand().equals("exit")) {
             // exit systray
             System.exit(0);
-        } else if (e.getActionCommand().equals("stop")) {
-            itemStartRouter.setEnabled(true);
-            itemStopRouter.setEnabled(false);
-            // stop router
-            sysTrayMenu.setIcon(sysTrayMenuIconDisabled);
         } else if (e.getActionCommand().equals("start")) {
-            itemStopRouter.setEnabled(true);
-            itemStartRouter.setEnabled(false);
-            // start router
-            sysTrayMenu.setIcon(sysTrayMenuIconEnabled);
+            // Popup browser dialog
         }
     }
 
     private void createSysTrayMenu() {
-        itemStartRouter.addSysTrayMenuListener(this);
-        itemStartRouter.setEnabled(false);
-        itemStopRouter.addSysTrayMenuListener(this);
+        itemSetBrowser.addSysTrayMenuListener(this);
         itemExit.addSysTrayMenuListener(this);
         sysTrayMenu.addItem(itemExit);
         sysTrayMenu.addSeparator();
-        sysTrayMenu.addItem(itemStopRouter);
-        sysTrayMenu.addItem(itemStartRouter);
+        sysTrayMenu.addItem(itemSetBrowser);
     }
 }
