@@ -70,7 +70,7 @@ public class MultiRouter {
         
         for (int i = 0; i < _routers.size(); i++) {
             ((Router)_routers.get(i)).runRouter();
-            //try { Thread.sleep(10*1000); } catch (InterruptedException ie) {}
+            try { Thread.sleep(10*1000); } catch (InterruptedException ie) {}
         }
         _log.info("All " + _routers.size() + " routers started up");
         waitForCompletion();
@@ -93,7 +93,8 @@ public class MultiRouter {
             for (int i = 0; i < _routers.size(); i++) {
                 Router r = (Router)_routers.get(i);
                 if (!r.isAlive()) {
-                    _log.info("Router " + i + " is dead");
+                    if (_log.shouldLog(Log.INFO))
+                        _log.info("Router " + i + " is dead");
                 } else {
                     alive++;
                 }
