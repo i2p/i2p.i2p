@@ -42,20 +42,26 @@ public class ReliabilityCalculator extends Calculator {
         //val -= profile.getTunnelHistory().getRejectionRate().getRate(60*60*1000).getLastEventCount() * 1;
         
         // penalize them heavily for dropping netDb requests
-        val -= profile.getDBHistory().getFailedLookupRate().getRate(60*1000).getCurrentEventCount() * 10;
-        val -= profile.getDBHistory().getFailedLookupRate().getRate(60*1000).getLastEventCount() * 5;
+        if (profile.getDBHistory().getFailedLookupRate().getRate(60*1000).getCurrentEventCount() > 0)
+            val -= 10;
+        if (profile.getDBHistory().getFailedLookupRate().getRate(60*1000).getLastEventCount() > 0)
+        val -= 5;
         //val -= profile.getDBHistory().getFailedLookupRate().getRate(60*60*1000).getCurrentEventCount();
         //val -= profile.getDBHistory().getFailedLookupRate().getRate(60*60*1000).getLastEventCount();
         //val -= profile.getDBHistory().getFailedLookupRate().getRate(24*60*60*1000).getCurrentEventCount() * 50;
         //val -= profile.getDBHistory().getFailedLookupRate().getRate(24*60*60*1000).getLastEventCount() * 20;
         
-        val -= profile.getCommError().getRate(60*1000).getCurrentEventCount() * 200;
-        val -= profile.getCommError().getRate(60*1000).getLastEventCount() * 200;
+        if (profile.getCommError().getRate(60*1000).getCurrentEventCount() > 0)
+            val -= 200;
+        if (profile.getCommError().getRate(60*1000).getLastEventCount() > 0)
+            val -= 200;
         
-        val -= profile.getCommError().getRate(60*60*1000).getCurrentEventCount() * 50;
-        val -= profile.getCommError().getRate(60*60*1000).getLastEventCount() * 50;
+        if (profile.getCommError().getRate(60*60*1000).getCurrentEventCount() > 0)
+            val -= 10;
+        if (profile.getCommError().getRate(60*60*1000).getLastEventCount() > 0)
+            val -= 10;
         
-        val -= profile.getCommError().getRate(24*60*60*1000).getCurrentEventCount() * 10;
+        val -= profile.getCommError().getRate(24*60*60*1000).getCurrentEventCount() * 1;
         
         long now = _context.clock().now();
         
@@ -70,10 +76,10 @@ public class ReliabilityCalculator extends Calculator {
             val -= 100; // we got a rejection within the last minute
         }
         
-        if ( (profile.getLastSendSuccessful() > 0) && (now - 24*60*60*1000 > profile.getLastSendSuccessful()) ) {
-            // we know they're real, but we havent sent them a message successfully in over a day.
-            val -= 1000;
-        }
+        //if ( (profile.getLastSendSuccessful() > 0) && (now - 24*60*60*1000 > profile.getLastSendSuccessful()) ) {
+        //    // we know they're real, but we havent sent them a message successfully in over a day.
+        //    val -= 1000;
+        //}
         
         val += profile.getReliabilityBonus();
         return val;
