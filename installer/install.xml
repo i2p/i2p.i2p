@@ -11,7 +11,7 @@
         <url>http://www.i2p.net</url>
     </info>
 
-    <guiprefs width="580" height="356" resizable="no">
+    <guiprefs width="580" height="356" resizable="yes">
         <laf name="liquid">
             <os family="unix"/>
         </laf>
