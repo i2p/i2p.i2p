@@ -197,13 +197,14 @@ public class MessageOutputStream extends OutputStream {
     void flushAvailable(DataReceiver target, boolean blocking) throws IOException {
         WriteStatus ws = null;
         synchronized (_dataLock) {
-            if (_buf == null) throw new IOException("closed (buffer went away)");
+            // _buf may be null, but the data receiver can handle that just fine,
+            // deciding whether or not to send a packet
             ws = target.writeData(_buf, 0, _valid);
             _written += _valid;
             _valid = 0;
             _dataLock.notifyAll();
         }
-        if (blocking) {
+        if (blocking && ws != null) {
             ws.waitForAccept(_writeTimeout);
             if (ws.writeFailed())
                 throw new IOException("Flush available failed");
