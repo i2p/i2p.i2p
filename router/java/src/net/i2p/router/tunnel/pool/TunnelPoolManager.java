@@ -40,6 +40,10 @@ public class TunnelPoolManager implements TunnelManagerFacade {
     private Map _clientOutboundPools;
     private TunnelPool _inboundExploratory;
     private TunnelPool _outboundExploratory;
+    /** how many build requests are in process */
+    private int _outstandingBuilds;
+    /** max # of concurrent build requests */
+    private int _maxOutstandingBuilds;
     
     public TunnelPoolManager(RouterContext ctx) {
         _context = ctx;
@@ -53,6 +57,16 @@ public class TunnelPoolManager implements TunnelManagerFacade {
 
         _clientInboundPools = new HashMap(4);
         _clientOutboundPools = new HashMap(4);
+        _outstandingBuilds = 0;
+        _maxOutstandingBuilds = 10;
+        String max = ctx.getProperty("router.tunnel.maxConcurrentBuilds", "10");
+        if (max != null) {
+            try {
+                _maxOutstandingBuilds = Integer.parseInt(max);
+            } catch (NumberFormatException nfe) {
+                _maxOutstandingBuilds = 10;
+            }
+        }
         
         ctx.statManager().createRateStat("tunnel.testSuccessTime", 
                                          "How long do successful tunnel tests take?", "Tunnels", 
@@ -246,6 +260,35 @@ public class TunnelPoolManager implements TunnelManagerFacade {
             inbound.shutdown();
         if (outbound != null)
             outbound.shutdown();
+    }
+    
+    /** 
+     * Check to make sure we can build this many new tunnels (throttled so
+     * we don't build too many at a time across all pools).
+     *
+     * @param wanted how many tunnels the pool wants to build
+     * @return how many are allowed to be built
+     */
+    int allocateBuilds(int wanted) {
+        synchronized (this) {
+            if (_outstandingBuilds >= _maxOutstandingBuilds)
+                return 0;
+            if (_outstandingBuilds + wanted < _maxOutstandingBuilds) {
+                _outstandingBuilds += wanted;
+                return wanted;
+            } else {
+                int allowed = _maxOutstandingBuilds - _outstandingBuilds;
+                _outstandingBuilds = _maxOutstandingBuilds;
+                return allowed;
+            }
+        }
+    }
+
+    void buildComplete() {
+        synchronized (this) {
+            if (_outstandingBuilds > 0)
+                _outstandingBuilds--;
+        }
     }
     
     public void startup() { 

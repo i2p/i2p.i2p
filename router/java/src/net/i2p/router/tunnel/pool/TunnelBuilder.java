@@ -31,12 +31,16 @@ public class TunnelBuilder {
         buildTunnel(ctx, pool, false);
     }
     public void buildTunnel(RouterContext ctx, TunnelPool pool, boolean zeroHop) {
-        if (!pool.isAlive()) return;
+        if (!pool.isAlive()) {
+            pool.getManager().buildComplete();
+            return;
+        }
         // this is probably overkill (ya think?)
         pool.refreshSettings();
         
         PooledTunnelCreatorConfig cfg = configTunnel(ctx, pool, zeroHop);
         if (cfg == null) {
+            pool.getManager().buildComplete();
             return;
         }
         OnCreatedJob onCreated = new OnCreatedJob(ctx, pool, cfg);
@@ -111,6 +115,7 @@ public class TunnelBuilder {
         public String getName() { return "Tunnel create failed"; }
         public void runJob() {
             // yikes, nothing left, lets get some backup (if we're allowed)
+            _pool.getManager().buildComplete();
             _pool.refreshBuilders();
         }
     }

@@ -120,6 +120,13 @@ public class TunnelPool {
             if (build > (MAX_BUILDS_PER_MINUTE - _buildsThisMinute))
                 build = (MAX_BUILDS_PER_MINUTE - _buildsThisMinute);
             
+            int wanted = build;
+            build = _manager.allocateBuilds(build);
+            
+            if ( (wanted != build) && (_log.shouldLog(Log.ERROR)) )
+                _log.error("Wanted to build " + wanted + " tunnels, but throttled down to " 
+                           + build + ", due to concurrent requests (cpu overload?)");
+            
             for (int i = 0; i < build; i++)
                 _builder.buildTunnel(_context, this);
             _buildsThisMinute += build;
@@ -129,6 +136,8 @@ public class TunnelPool {
             return 0;
         }
     }
+    
+    TunnelPoolManager getManager() { return _manager; }
     
     void refreshSettings() {
         if (_settings.getDestination() != null) {

@@ -361,7 +361,7 @@ public class DataHelper {
      */
     public static void writeLong(OutputStream rawStream, int numBytes, long value) 
         throws DataFormatException, IOException {
-            
+        if (value < 0) throw new DataFormatException("Value is negative (" + value + ")");
         for (int i = numBytes - 1; i >= 0; i--) {
             byte cur = (byte)( (value >>> (i*8) ) & 0xFF);
             rawStream.write(cur);
@@ -369,6 +369,7 @@ public class DataHelper {
     }
     
     public static byte[] toLong(int numBytes, long value) throws IllegalArgumentException {
+        if (value < 0) throw new IllegalArgumentException("Negative value not allowed");
         byte val[] = new byte[numBytes];
         toLong(val, 0, numBytes, value);
         return val;
@@ -395,43 +396,6 @@ public class DataHelper {
         if (rv < 0)
             throw new IllegalArgumentException("wtf, fromLong got a negative? " + rv + ": offset="+ offset +" numBytes="+numBytes);
         return rv;
-    }
-    
-    public static void main(String args[]) {
-        for (int i = 0; i <= 0xFF; i++)
-            testLong(1, i);
-        System.out.println("Test 1byte passed");
-        for (long i = 0; i <= 0xFFFF; i++)
-            testLong(2, i);
-        System.out.println("Test 2byte passed");
-        for (long i = 0; i <= 0xFFFFFF; i ++)
-            testLong(3, i);
-        System.out.println("Test 3byte passed");
-        for (long i = 0; i <= 0xFFFFFFFF; i++)
-            testLong(4, i);
-        System.out.println("Test 4byte passed");
-        for (long i = 0; i <= 0xFFFFFFFF; i++)
-            testLong(8, i);
-        System.out.println("Test 8byte passed");
-    }
-    private static void testLong(int numBytes, long value) {
-        try {
-            ByteArrayOutputStream baos = new ByteArrayOutputStream(numBytes);
-            writeLong(baos, numBytes, value);
-            byte written[] = baos.toByteArray();
-            byte extract[] = toLong(numBytes, value);
-            if (!eq(written, extract))
-                throw new RuntimeException("testLong("+numBytes+","+value+") FAILED");
-            
-            long read = fromLong(extract, 0, extract.length);
-            if (read != value)
-                throw new RuntimeException("testLong("+numBytes+","+value+") FAILED on read (" + read + ")");
-            read = readLong(new ByteArrayInputStream(written), numBytes);
-            if (read != value)
-                throw new RuntimeException("testLong("+numBytes+","+value+") FAILED on readLong (" + read + ")");
-        } catch (Exception e) {
-            throw new RuntimeException(e.getMessage());
-        }
     }
     
     /** Read in a date from the stream as specified by the I2P data structure spec.

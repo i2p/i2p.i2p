@@ -209,8 +209,8 @@ public class Packet {
     /** get the actual payload of the message.  may be null */
     public ByteArray getPayload() { return _payload; }
     public void setPayload(ByteArray payload) { 
-        if ( (_payload != null) && (_payload != payload) )
-            _cache.release(_payload);
+        //if ( (_payload != null) && (_payload != payload) )
+        //    _cache.release(_payload);
         _payload = payload; 
         if ( (payload != null) && (payload.getValid() > MAX_PAYLOAD_SIZE) )
             throw new IllegalArgumentException("Too large payload: " + payload.getValid());
@@ -466,7 +466,7 @@ public class Packet {
             throw new IllegalArgumentException("length: " + length + " offset: " + offset + " begin: " + payloadBegin);
         
         // skip ahead to the payload
-        _payload = _cache.acquire(); //new ByteArray(new byte[payloadSize]);
+        _payload = new ByteArray(new byte[payloadSize]); //_cache.acquire(); 
         System.arraycopy(buffer, payloadBegin, _payload.getData(), 0, payloadSize);
         _payload.setValid(payloadSize);
         _payload.setOffset(0);

@@ -1,4 +1,23 @@
-$Id: history.txt,v 1.159 2005/02/26 19:03:42 jrandom Exp $
+$Id: history.txt,v 1.160 2005/02/27 17:09:37 jrandom Exp $
+
+2005-03-01  jrandom
+    * Really disable the streaming lib packet caching
+    * Synchronized a message handling point in the SDK (even though its use is
+      already essentially single threaded, its better to play it safe)
+    * Don't add new RepublishLeaseSetJobs on failure, just requeue up the 
+      existing one (duh)
+    * Throttle the number of concurrent pending tunnel builds across all 
+      pools, in addition to simply throttling the number of new requests per 
+      minute for each pool individually.  This should avoid the cascading 
+      failure when tunnel builds take too long, as no new builds will be 
+      created until the previous ones are handled.
+    * Factored out and extended the DataHelper's unit tests for dealing with 
+      long and date formatting.
+    * Explicitly specify the HTTP auth realm as "i2prouter", though this 
+      alone doesn't address the bug where jetty asks for authentication too
+      much.  (thanks orion!)
+    * Updated the StreamSinkServer to ignore all read bytes, rather than write
+      them to the filesystem.
 
 2005-02-27  jrandom
     * Don't rerequest leaseSets if there are already pending requests

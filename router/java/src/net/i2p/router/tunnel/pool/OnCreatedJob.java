@@ -29,6 +29,8 @@ class OnCreatedJob extends JobImpl {
         } else {
             getContext().tunnelDispatcher().joinOutbound(_cfg);
         }
+        
+        _pool.getManager().buildComplete();
         _pool.addTunnel(_cfg);
         TestJob testJob = (_cfg.getLength() > 1 ? new TestJob(getContext(), _cfg, _pool) : null);
         RebuildJob rebuildJob = new RebuildJob(getContext(), _cfg, _pool);

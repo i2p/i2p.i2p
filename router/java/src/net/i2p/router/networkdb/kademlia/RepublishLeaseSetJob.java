@@ -76,9 +76,7 @@ public class RepublishLeaseSetJob extends JobImpl {
         public void runJob() { 
             if (_log.shouldLog(Log.WARN))
                 _log.warn("FAILED publishing of the leaseSet for " + _dest.toBase64());
-            LeaseSet ls = _facade.lookupLeaseSetLocally(_dest);
-            if ( (ls != null) && (ls.isCurrent(0)) )
-                getContext().jobQueue().addJob(new RepublishLeaseSetJob(getContext(), _facade, _dest));
+            RepublishLeaseSetJob.this.requeue(30*1000);
         }
     }
 }

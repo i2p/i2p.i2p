@@ -122,11 +122,12 @@ public class StreamSinkServer {
                 long written = 0;
                 int read = 0;
                 while ( (read = in.read(buf)) != -1) {
-                    _fos.write(buf, 0, read);
+                    //_fos.write(buf, 0, read);
                     written += read;
                     if (_log.shouldLog(Log.DEBUG))
                         _log.debug("read and wrote " + read);
                 }
+                _fos.write(("written: [" + written + "]\n").getBytes());
                 long lifetime = System.currentTimeMillis() - start;
                 _log.error("Got EOF from client socket [written=" + written + " lifetime=" + lifetime + "]");
             } catch (IOException ioe) {
@@ -150,7 +151,7 @@ public class StreamSinkServer {
         StreamSinkServer server = null;
         switch (args.length) {
             case 0:
-                server = new StreamSinkServer("dataDir", "server.key", "localhost", 10001);
+                server = new StreamSinkServer("dataDir", "server.key", "localhost", 7654);
                 break;
             case 2:
                 server = new StreamSinkServer(args[0], args[1]);

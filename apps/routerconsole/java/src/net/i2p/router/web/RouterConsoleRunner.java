@@ -78,7 +78,7 @@ public class RouterConsoleRunner {
     private void initialize(WebApplicationContext context) {
         String password = getPassword();
         if (password != null) {
-            HashUserRealm realm = new HashUserRealm();
+            HashUserRealm realm = new HashUserRealm("i2prouter");
             realm.put("admin", password);
             realm.addUserToRole("admin", "routerAdmin");
             context.setRealm(realm);

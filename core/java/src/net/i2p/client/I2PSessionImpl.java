@@ -78,7 +78,7 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
     /** class that generates new messages */
     protected I2CPMessageProducer _producer;
     /** map of integer --> MessagePayloadMessage */
-    Map _availableMessages;
+    private Map _availableMessages;
     
     protected I2PClientMessageHandlerMap _handlerMap;
     
@@ -290,7 +290,10 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
      *
      */
     public byte[] receiveMessage(int msgId) throws I2PSessionException {
-        MessagePayloadMessage msg = (MessagePayloadMessage) _availableMessages.remove(new Integer(msgId));
+        MessagePayloadMessage msg = null;
+        synchronized (_availableMessages) {
+            msg = (MessagePayloadMessage) _availableMessages.remove(new Integer(msgId));
+        }
         if (msg == null) return null;
         return msg.getPayload().getUnencryptedData();
     }
@@ -339,7 +342,9 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
      * Recieve a payload message and let the app know its available
      */
     public void addNewMessage(MessagePayloadMessage msg) {
-        _availableMessages.put(new Integer(msg.getMessageId().getMessageId()), msg);
+        synchronized (_availableMessages) {
+            _availableMessages.put(new Integer(msg.getMessageId().getMessageId()), msg);
+        }
         int id = msg.getMessageId().getMessageId();
         byte data[] = msg.getPayload().getUnencryptedData();
         if ((data == null) || (data.length <= 0)) {

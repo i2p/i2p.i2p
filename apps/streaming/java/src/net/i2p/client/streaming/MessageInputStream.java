@@ -344,8 +344,8 @@ public class MessageInputStream extends InputStream {
                                        + " readyBlocks=" + _readyDataBlocks.size()
                                        + " readTotal=" + _readTotal);
                     }
-                    if (removed) 
-                        _cache.release(cur);
+                    //if (removed) 
+                    //    _cache.release(cur);
                 }
             } // for (int i = 0; i < length; i++) {
         }  // synchronized (_dataLock)
@@ -416,15 +416,16 @@ public class MessageInputStream extends InputStream {
     
     public void close() {
         synchronized (_dataLock) {
-            while (_readyDataBlocks.size() > 0)
-                _cache.release((ByteArray)_readyDataBlocks.remove(0));
+            //while (_readyDataBlocks.size() > 0)
+            //    _cache.release((ByteArray)_readyDataBlocks.remove(0));
+            _readyDataBlocks.clear();
              
             // we don't need the data, but we do need to keep track of the messageIds
             // received, so we can ACK accordingly
             for (Iterator iter = _notYetReadyBlocks.values().iterator(); iter.hasNext(); ) {
                 ByteArray ba = (ByteArray)iter.next();
-                //ba.setData(null);
-                _cache.release(ba);
+                ba.setData(null);
+                //_cache.release(ba);
             }
             _locallyClosed = true;
             _dataLock.notifyAll();
