@@ -75,5 +75,7 @@ public class GetBidsJob extends JobImpl {
         }
         
         _context.profileManager().messageFailed(_msg.getTarget().getIdentity().getHash());
+        
+        _msg.discardData();
     }
 }

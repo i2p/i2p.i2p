@@ -60,8 +60,12 @@ public abstract class TransportImpl implements Transport {
     }
     
     public void afterSend(OutNetMessage msg, boolean sendSuccessful) {
+        afterSend(msg, sendSuccessful, true);
+    }
+    public void afterSend(OutNetMessage msg, boolean sendSuccessful, boolean allowRequeue) {
         boolean log = false;
         msg.timestamp("afterSend(" + sendSuccessful + ")");
+        
         if (!sendSuccessful)
             msg.transportFailed(getStyle());
 
@@ -76,40 +80,59 @@ public abstract class TransportImpl implements Transport {
 
         if (sendSuccessful) {
             if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Send message " + msg.getMessage().getClass().getName() + " to " 
+                _log.debug("Send message " + msg.getMessageType() + " to " 
                            + msg.getTarget().getIdentity().getHash().toBase64() + " with transport " 
                            + getStyle() + " successfully");
             Job j = msg.getOnSendJob();
             if (j != null) 
                 _context.jobQueue().addJob(j);
             log = true;
+            msg.discardData();
         } else {
             if (_log.shouldLog(Log.INFO))
-                _log.info("Failed to send message " + msg.getMessage().getClass().getName() 
+                _log.info("Failed to send message " + msg.getMessageType() 
                           + " to " + msg.getTarget().getIdentity().getHash().toBase64() 
                           + " with transport " + getStyle() + " (details: " + msg + ")");
-            if ( (msg.getExpiration() <= 0) || (msg.getExpiration() > _context.clock().now()) ) {
-                // this may not be the last transport available - keep going
-                _context.outNetMessagePool().add(msg);
+            if (allowRequeue) {
+                if ( (msg.getExpiration() <= 0) || (msg.getExpiration() > _context.clock().now()) ) {
+                    // this may not be the last transport available - keep going
+                    _context.outNetMessagePool().add(msg);
+                    // don't discard the data yet!
+                } else {
+                    if (_log.shouldLog(Log.INFO))
+                        _log.info("No more time left (" + new Date(msg.getExpiration()) 
+                                  + ", expiring without sending successfully the " 
+                                  + msg.getMessageType());
+                    if (msg.getOnFailedSendJob() != null)
+                        _context.jobQueue().addJob(msg.getOnFailedSendJob());
+                    MessageSelector selector = msg.getReplySelector();
+                    if (selector != null) {
+                        _context.messageRegistry().unregisterPending(msg);
+                    }
+                    log = true;
+                    msg.discardData();
+                }
             } else {
                 if (_log.shouldLog(Log.INFO))
-                    _log.info("No more time left (" + new Date(msg.getExpiration()) 
-                              + ", expiring without sending successfully the " 
-                              + msg.getMessage().getClass().getName());
+                    _log.info("Failed and no requeue allowed for a " 
+                              + msg.getMessageSize() + " byte " 
+                              + msg.getMessageType() + " message");
                 if (msg.getOnFailedSendJob() != null)
                     _context.jobQueue().addJob(msg.getOnFailedSendJob());
                 MessageSelector selector = msg.getReplySelector();
-                if (selector != null) {
+                if (selector != null)
                     _context.messageRegistry().unregisterPending(msg);
-                }
                 log = true;
+                msg.discardData();
             }
         }
 
         if (log) {
-            I2NPMessage dmsg = msg.getMessage();
-            String type = dmsg.getClass().getName();
-            _context.messageHistory().sendMessage(type, dmsg.getUniqueId(), dmsg.getMessageExpiration(), msg.getTarget().getIdentity().getHash(), sendSuccessful);
+            String type = msg.getMessageType();
+            _context.messageHistory().sendMessage(type, msg.getMessageId(), 
+                                                  new Date(msg.getExpiration()),
+                                                  msg.getTarget().getIdentity().getHash(), 
+                                                  sendSuccessful);
         }
 
         long now = _context.clock().now();
@@ -123,11 +146,13 @@ public abstract class TransportImpl implements Transport {
             if (allTime > 60*1000) {
                 // WTF!!@#
                 if (_log.shouldLog(Log.WARN))
-                    _log.warn("WTF, more than a minute slow? " + msg.getMessage().getClass().getName() 
-                              + " of id " + msg.getMessage().getUniqueId() + " (send begin on " 
+                    _log.warn("WTF, more than a minute slow? " + msg.getMessageType() 
+                              + " of id " + msg.getMessageId() + " (send begin on " 
                               + new Date(msg.getSendBegin()) + " / created on " 
                               + new Date(msg.getCreated()) + "): " + msg, msg.getCreatedBy());
-                _context.messageHistory().messageProcessingError(msg.getMessage().getUniqueId(), msg.getMessage().getClass().getName(), "Took too long to send [" + allTime + "ms]");
+                _context.messageHistory().messageProcessingError(msg.getMessageId(), 
+                                                                 msg.getMessageType(), 
+                                                                 "Took too long to send [" + allTime + "ms]");
             }
         }
 
