@@ -11,7 +11,6 @@ import net.i2p.util.Log;
 
 /**
  * Define the configuration for testing against one particular peer as a client
- *  
  */
 public class ClientConfig {
     private static final Log _log = new Log(ClientConfig.class);
@@ -88,24 +87,15 @@ public class ClientConfig {
     }
 
     /**
-     * @param peer
-     *            who we will test against
-     * @param us
-     *            who we are
-     * @param duration
-     *            how many minutes to keep events for
-     * @param statFreq
-     *            how often to write out stats
-     * @param sendFreq
-     *            how often to send pings
-     * @param sendSize
-     *            how large the pings should be
-     * @param numHops
-     *            how many hops is the current Heartbeat app using
-     * @param comment
-     *            describe this test
-     * @param averagePeriods
-     *            list of minutes to summarize over
+     * @param peer who we will test against
+     * @param us who we are
+     * @param duration how many minutes to keep events for
+     * @param statFreq how often to write out stats
+     * @param sendFreq how often to send pings
+     * @param sendSize how large the pings should be
+     * @param numHops how many hops is the current Heartbeat app using
+     * @param comment describe this test
+     * @param averagePeriods list of minutes to summarize over
      */
     public ClientConfig(Destination peer, Destination us, String statFile, int duration, int statFreq, int sendFreq,
             int sendSize, int numHops, String comment, int averagePeriods[]) {
@@ -133,8 +123,7 @@ public class ClientConfig {
     /**
      * Sets the peer to test against
      * 
-     * @param peer
-     *            the Destination (peer)
+     * @param peer the Destination (peer)
      */
     public void setPeer(Destination peer) {
         _peer = peer;
@@ -152,8 +141,7 @@ public class ClientConfig {
     /**
      * Sets who we are when we test
      * 
-     * @param us
-     *            the Destination (us)
+     * @param us the Destination (us)
      */
     public void setUs(Destination us) {
         _us = us;
@@ -171,8 +159,7 @@ public class ClientConfig {
     /**
      * Sets the name of the location we write the current stats to
      * 
-     * @param statFile
-     *            the name of the file
+     * @param statFile the name of the file
      */
     public void setStatFile(String statFile) {
         _statFile = statFile;
@@ -192,8 +179,7 @@ public class ClientConfig {
      * Sets how many minutes of statistics should be maintained within the
      * window for this client
      * 
-     * @param durationMinutes
-     *            the number of minutes
+     * @param durationMinutes the number of minutes
      */
     public void setStatDuration(int durationMinutes) {
         _statDuration = durationMinutes;
@@ -211,8 +197,7 @@ public class ClientConfig {
     /**
      * Sets how frequently the stats are written out (in seconds)
      * 
-     * @param freqSeconds
-     *            the frequency in seconds
+     * @param freqSeconds the frequency in seconds
      */
     public void setStatFrequency(int freqSeconds) {
         _statFrequency = freqSeconds;
@@ -230,8 +215,7 @@ public class ClientConfig {
     /**
      * Sets how frequenty we send messages to the peer (in seconds)
      * 
-     * @param freqSeconds
-     *            the frequency in seconds
+     * @param freqSeconds the frequency in seconds
      */
     public void setSendFrequency(int freqSeconds) {
         _sendFrequency = freqSeconds;
@@ -251,8 +235,7 @@ public class ClientConfig {
      * Sets how many bytes the ping messages should be (min values ~700, max
      * ~32KB)
      * 
-     * @param numBytes
-     *            the size in bytes
+     * @param numBytes the size in bytes
      */
     public void setSendSize(int numBytes) {
         _sendSize = numBytes;
@@ -272,8 +255,7 @@ public class ClientConfig {
     /**
      * Sets a brief, 1 line description (comment) of the test.
      * 
-     * @param comment
-     *            the brief comment
+     * @param comment the brief comment
      */
     public void setComment(String comment) {
         _comment = comment;
@@ -292,8 +274,7 @@ public class ClientConfig {
     /**
      * Sets the periods that the client's tests should be averaged over.
      * 
-     * @param periods
-     *            the list of periods (in minutes) that the data should be
+     * @param periods the list of periods (in minutes) that the data should be
      *            averaged over, or null
      */
     public void setAveragePeriods(int periods[]) {
@@ -314,8 +295,7 @@ public class ClientConfig {
      * Sets how many hops this test engine is configured to use for its outbound
      * and inbound tunnels
      * 
-     * @param numHops
-     *            the number of hops
+     * @param numHops the number of hops
      */
     public void setNumHops(int numHops) {
         _numHops = numHops;
@@ -325,10 +305,8 @@ public class ClientConfig {
      * Load the client config from the properties specified, deriving the
      * current config entry from the peer number.
      * 
-     * @param clientConfig
-     *            the properties to load from
-     * @param peerNum
-     *            the number associated with the peer
+     * @param clientConfig the properties to load from
+     * @param peerNum the number associated with the peer
      * @return true if it was loaded correctly, false if there were errors
      */
     public boolean load(Properties clientConfig, int peerNum) {
@@ -418,10 +396,8 @@ public class ClientConfig {
      * Store the client config to the properties specified, deriving the current
      * config entry from the peer number.
      * 
-     * @param clientConfig
-     *            the properties to store to
-     * @param peerNum
-     *            the number associated with the peer
+     * @param clientConfig the properties to store to
+     * @param peerNum the number associated with the peer
      * @return true if it was stored correctly, false if there were errors
      */
     public boolean store(Properties clientConfig, int peerNum) {
