@@ -19,6 +19,7 @@ import java.util.Properties;
 import net.i2p.I2PAppContext;
 import net.i2p.I2PException;
 import net.i2p.client.streaming.I2PSocket;
+import net.i2p.client.streaming.I2PSocketOptions;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.Destination;
 import net.i2p.util.Clock;
@@ -142,6 +143,33 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
             String proxy = (String)proxyList.get(index);
             return proxy;
         }
+    }
+
+    private static final int DEFAULT_READ_TIMEOUT = 60*1000;
+    
+    /** 
+     * create the default options (using the default timeout, etc)
+     *
+     */
+    protected I2PSocketOptions getDefaultOptions() {
+        I2PSocketOptions opts = super.getDefaultOptions();
+        Properties defaultOpts = getTunnel().getClientOptions();
+        if (!defaultOpts.contains(I2PSocketOptions.PROP_READ_TIMEOUT))
+            opts.setReadTimeout(DEFAULT_READ_TIMEOUT);
+        return opts;
+    }
+    
+    /** 
+     * create the default options (using the default timeout, etc)
+     *
+     */
+    protected I2PSocketOptions getDefaultOptions(Properties overrides) {
+        I2PSocketOptions opts = super.getDefaultOptions(overrides);
+        Properties defaultOpts = getTunnel().getClientOptions();
+        defaultOpts.putAll(overrides);
+        if (!defaultOpts.containsKey(I2PSocketOptions.PROP_READ_TIMEOUT))
+            opts.setConnectTimeout(DEFAULT_READ_TIMEOUT);
+        return opts;
     }
     
     private static long __requestId = 0;
@@ -295,7 +323,14 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
                         if (_log.shouldLog(Log.INFO)) 
                             _log.info(getPrefix(requestId) + "Setting host = " + host);
                     } else if (line.startsWith("User-Agent: ")) {
-                        line = "User-Agent: MYOB/6.66 (AN/ON)";
+                        // always stripped, added back at the end
+                        line = null;
+                        continue;
+                    } else if (line.startsWith("Accept")) {
+                        // strip the accept-blah headers, as they vary dramatically from
+                        // browser to browser
+                        line = null;
+                        continue;
                     } else if (line.startsWith("Referer: ")) {
                         // Shouldn't we be more specific, like accepting in-site referers ?
                         //line = "Referer: i2p";
@@ -313,6 +348,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
                 }
                 
                 if (line.length() == 0) {
+                    newRequest.append("User-Agent: MYOB/6.66 (AN/ON)");
                     newRequest.append("Connection: close\r\n\r\n");
                     break;
                 } else {

@@ -337,8 +337,12 @@ public class Connection {
     
     void resetReceived() {
         _resetReceived = true;
-        _outputStream.streamErrorOccurred(new IOException("Reset received"));
-        _inputStream.streamErrorOccurred(new IOException("Reset received"));
+        MessageOutputStream mos = _outputStream;
+        MessageInputStream mis = _inputStream;
+        if (mos != null)
+            mos.streamErrorOccurred(new IOException("Reset received"));
+        if (mis != null)
+            mis.streamErrorOccurred(new IOException("Reset received"));
         _connectionError = "Connection reset";
         synchronized (_connectLock) { _connectLock.notifyAll(); }
     }
