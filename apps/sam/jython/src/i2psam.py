@@ -79,7 +79,7 @@ i2cpPort = 7654
 # logging settings
 
 # 1=v.quiet, 2=normal, 3=verbose, 4=debug, 5=painful
-verbosity = 5
+verbosity = 2
 
 # change to a filename to log there instead
 logfile = sys.stdout
@@ -851,23 +851,28 @@ class I2PSocket:
         self.dest = dest
     
         if kw.has_key('sock') \
-                and kw.has_key('dest') \
                 and kw.has_key('remdest') \
                 and kw.has_key('instream') \
                 and kw.has_key('outstream'):
+    
             # wrapping an accept()'ed connection
+            log(4, "accept()'ed a connection, wrapping...")
+    
             self.sock = kw['sock']
-            self.dest = kw['dest']
+            self.dest = dest
             self.remdest = kw['remdest']
             self.instream = kw['instream']
             self.outstream = kw['outstream']
         else:
+            log(4, "creating new I2PSocket %s" % dest)
+    
             # process keywords
             self.host = kw.get('host', self.host)
             self.port = int(kw.get('port', self.port))
     
             # we need a factory, don't we?
             self.sockmgrFact = i2p.client.streaming.I2PSocketManagerFactory()
+    
     #@-node:__init__
     #@+node:bind
     def bind(self, dest=None):
@@ -882,7 +887,8 @@ class I2PSocket:
             self.dest = dest
         elif not self.dest:
             # create new dest, client should interrogate it at some time
-            self.dest = Destination()
+            log(4, "bind: socket has no dest, creating one")
+            self.dest = I2PDestination()
     #@-node:bind
     #@+node:listen
     def listen(self, *args, **kw):
@@ -894,6 +900,8 @@ class I2PSocket:
             raise I2PSocketError(".sockmgr already present - have you already called listen?")
         if not self.dest:
             raise I2PSocketError("socket is not bound to a destination")
+    
+        log(4, "listening on socket")
         
         # create the socket manager
         self._createSockmgr()
@@ -936,11 +944,12 @@ class I2PSocket:
         to different dests.
         """
         # sanity check
-        #if self.sockmgr:
-        #    raise I2PSocketError(".sockmgr already present - have you already called listen/connect?")
+        if self.sockmgr:
+            raise I2PSocketError(".sockmgr already present - have you already called listen/connect?")
     
         # create whole new dest if none was provided to constructor
         if self.dest is None:
+            log(4, "connect: creating whole new dest")
             self.dest = I2PDestination()
     
         # create the socket manager
@@ -951,6 +960,7 @@ class I2PSocket:
     
         opts = net.i2p.client.streaming.I2PSocketOptions()
         try:
+            log(4, "trying to connect to %s" % remdest.toBase64())
             sock = self.sock = self.sockmgr.connect(remdest._item, opts)
             self.remdest = remdest
         except:
@@ -962,8 +972,8 @@ class I2PSocket:
         sockobj = I2PSocket(dest=self.dest,
                             remdest=remdest,
                             sock=sock,
-                            instream=instream,
-                            outstream=outstream)
+                            instream=self.instream,
+                            outstream=self.outstream)
         self._connected = 1
         return sockobj
     #@-node:connect
@@ -1004,23 +1014,27 @@ class I2PSocket:
             raise I2PSocketError("Socket is not connected")
     
         # and write it out
-        #print "send: writing '%s' to outstream..." % repr(buf)
+        log(4, "send: writing '%s' to outstream..." % repr(buf))
         outstream = self.outstream
         for c in buf:
             outstream.write(ord(c))
     
         # flush just in case
-        #print "send: flushing..."
+        log(4, "send: flushing...")
         self.outstream.flush()
     
-        #print "send: done"
+        log(4, "send: done")
+    
     #@-node:send
     #@+node:available
     def available(self):
         """
         Returns the number of bytes available for recv()
         """
-        return self.sock.available()
+        #print "available: sock is %s" % repr(self.sock)
+    
+        return self.instream.available()
+    
     
     #@-node:available
     #@+node:close
@@ -1048,6 +1062,9 @@ class I2PSocket:
     #@-node:close
     #@+node:_createSockmgr
     def _createSockmgr(self):
+    
+        if getattr(self, 'sockmgr', None):
+            return
     
         #options = {jI2PClient.PROP_TCP_HOST: self.host,
         #           jI2PClient.PROP_TCP_PORT: self.port}
@@ -1606,6 +1623,26 @@ class I2PSamClientHandler(StreamRequestHandler):
     
             else: # STREAM
                 # no need to create session object, because we're using streaming api
+                log(4, "Creating STREAM session")
+                
+                # what kind of stream?
+                direction = args.get('DIRECTION', 'BOTH')
+                if direction not in ['BOTH', 'RECEIVE', 'CREATE']:
+                    self.samSend("SESSION", "STATUS",
+                        RESULT="I2P_ERROR",
+                        MESSAGE="Illegal_direction_keyword_%s" % direction.replace(" ","_"),
+                        )
+                    return
+    
+                if direction == 'BOTH':
+                    self.canConnect = 1
+                    self.canAccept = 1
+                elif direction == 'RECEIVE':
+                    self.canConnect = 0
+                    self.canAccept = 1
+                elif direction == 'CREATE':
+                    self.canConnect = 1
+                    self.canAccept = 0
     
                 # but we do need to mark it as being in use
                 localsessions[destb64] = globalsessions[destb64] = None
@@ -1613,8 +1650,9 @@ class I2PSamClientHandler(StreamRequestHandler):
                 # make a local socket
                 sock = self.samSock = I2PSocket(dest)
     
-                # and we also need to fire up a socket listener
-                thread.start_new_thread(self.threadSocketListener, (sock, dest))
+                # and we also need to fire up a socket listener, if not CREATE-only
+                if self.canAccept:
+                    thread.start_new_thread(self.threadSocketListener, (sock, dest))
     
             # finally, we can reply with the good news
             self.samSend("SESSION", "STATUS",
@@ -1663,21 +1701,38 @@ class I2PSamClientHandler(StreamRequestHandler):
     
         if subtopic == 'CONNECT':
             # who are we connecting to again?
-            remdest = I2PDestionation(b64=args['DESTINATION'])
-            id = args['ID']
+            remdest = I2PDestination(base64=args['DESTINATION'])
+            id = int(args['ID'])
         
             try:
+                log(4, "Trying to connect to remote peer %s..." % args['DESTINATION'])
                 sock = self.samSock.connect(remdest)
+                log(4, "Connected to remote peer %s..." % args['DESTINATION'])
                 self.localstreams[id] = sock
                 self.samSend("STREAM", "STATUS",
                              RESULT='OK',
                              ID=id,
                              )
+                thread.start_new_thread(self.threadSocketReceiver, (sock, id))
+    
             except:
+                log(4, "Failed to connect to remote peer %s..." % args['DESTINATION'])
                 self.samSend("STREAM", "STATUS",
                              RESULT='I2P_ERROR',
                              MESSAGE='exception_on_connect',
+                             ID=id,
                              )
+    
+        elif subtopic == 'SEND':
+            # send to someone
+            id = int(args['ID'])
+            try:
+                sock = self.localstreams[id]
+                sock.send(args['DATA'])
+            except:
+                logException(4, "send failed")
+    
+    
     
     
     #@-node:on_STREAM
@@ -1840,18 +1895,24 @@ class I2PSamClientHandler(StreamRequestHandler):
         """
         destb64 = dest.toBase64()
     
-        log(4, "Listening for connections to %s..." % destb64[:40])
+        log(4, "Listening for connections to %s..." % destb64)
     
+        sock.bind()
         sock.listen()
     
         while 1:
+            log(4, "Awaiting next connection to %s..." % destb64)
             newsock = sock.accept()
-            
+            log(4, "Got connection to %s..." % destb64)
+    
             # need an id, negative
             id = - self.server.samAllocId()
     
             # register it in local and global streams
             self.localstreams[id] = self.globalstreams[id] = newsock
+    
+            # fire up the receiver thread
+            thread.start_new_thread(self.threadSocketReceiver, (newsock, id))
             
             # who is connected to us?
             remdest = newsock.remdest
@@ -1861,7 +1922,55 @@ class I2PSamClientHandler(StreamRequestHandler):
             self.samSend("STREAM", "CONNECTED",
                          DESTINATION=remdest_b64,
                          ID=id)
+    
     #@-node:threadSocketListener
+    #@+node:threadSocketReceiver
+    def threadSocketReceiver(self, sock, id):
+        """
+        One of these gets launched each time a new stream connection
+        is created. Due to the lack of callback mechanism within the
+        ministreaming API, we have to actively poll for and send back
+        received data
+        """
+        while 1:
+            #avail = sock.available()
+            #if avail <= 0:
+            #    print "threadSocketReceiver: waiting for data on %s (%s avail)..." % (id, avail)
+            #    time.sleep(5)
+            #    continue
+            #log(4, "reading a byte")
+    
+            try:
+                buf = sock.recv(1)
+            except:
+                logException(4, "Exception reading first byte")
+            
+            if buf == '':
+                log(4, "stream closed")
+    
+                # notify a close
+                self.samSend("STREAM", "CLOSED",
+                             ID=id)
+                return
+    
+            # grab more if there's any available
+            navail = sock.available()
+            if navail > 0:
+                #log(4, "%d more bytes available, reading..." % navail)
+                rest = sock.recv(navail)
+                buf += rest
+            
+            # send if off
+            log(4, "got from peer: %s" % repr(buf))
+            
+            self.samSend("STREAM", "RECEIVED", buf,
+                         ID=id,
+                         )
+    
+    
+    
+    
+    #@-node:threadSocketReceiver
     #@+node:samParse
     def samParse(self, flds):
         """
@@ -1879,7 +1988,7 @@ class I2PSamClientHandler(StreamRequestHandler):
             try:
                 name, val = arg.split("=", 1)
             except:
-                logException(3, "failed to process %s" % repr(arg))
+                logException(3, "failed to process %s in %s" % (repr(arg), repr(flds)))
                 raise
             dargs[name] = val
     
@@ -2108,106 +2217,6 @@ def logException(level, msg=''):
     traceback.print_exc(file=s)
     log(level, "%s\n%s" % (s.getvalue(), msg), 1)
 #@-node:logException
-#@+node:usage
-def usage(detailed=0):
-    
-    print "Usage: %s <options> [<command>]" % sys.argv[0]
-    if not detailed:
-        print "Run with '-h' to get detailed help"
-        sys.exit(0)
-
-    print "I2PSAM is a bridge that allows I2P client programs to access the"
-    print "I2P network by talking over a plaintext socket connection."
-    print "References:"
-    print "   - http://www.freenet.org.nz/i2p - source, doco, downloadables"
-    print "   - http://drupal.i2p.net/node/view/144 - I2P SAM specification"
-    print
-    print "Options:"
-    print "  -h, -?, --help        - display this help"
-    print "  -v, --version         - print program version"
-    print "  -V, --verbosity=n     - set verbosity to n, default 2, 1==quiet, 4==noisy"
-    print "  -H, --listenhost=host - specify host to listen on for client connections"
-    print "  -P, --listenport=port - port to listen on for client connections"
-    print "      --i2cphost=host   - hostname of I2P router's I2CP interface"
-    print "      --i2cpport=port   - port of I2P router's I2CP interface"
-    print
-    print "Commands:"
-    print "     (run with no commands to launch SAM server)"
-    print "     samserver - runs as a SAM server"
-    print "     test - run a suite of self-tests"
-    print
-    
-    sys.exit(0)
-
-
-
-#@-node:usage
-#@+node:main
-def main():
-
-    argv = sys.argv
-    argc = len(argv)
-
-    try:
-        opts, args = getopt.getopt(sys.argv[1:],
-                                   "h?vV:H:P:",
-                                   ['help', 'version', 'verbosity=',
-                                    'listenhost=', 'listenport=',
-                                    'i2cphost=', 'i2cpport=',
-                                    ])
-    except:
-        traceback.print_exc(file=sys.stdout)
-        usage("You entered an invalid option")
-
-    cmd = 'samserver'
-
-    # we prolly should pass all these parms in constructor call, but
-    # what the heck!
-    #global verbosity, i2psamhost, i2psamport, i2cpHost, i2cpPort
-    
-    serveropts = {}
-
-    for opt, val in opts:
-        if opt in ['-h', '-?', '--help']:
-            usage(1)
-        elif opt in ['-v', '--version']:
-            print "I2P SAM version %s" % version
-            sys.exit(0)
-        elif opt in ['-V', '--verbosity']:
-            serveropts['verbosity'] = int(val)
-        elif opt in ['-H', '--listenhost']:
-            serveropts['host'] = val
-        elif opt in ['-P', '--listenport']:
-            serveropts['port'] = int(val)
-        elif opt in ['--i2cphost']:
-            serveropts['i2cphost'] = val
-        elif opt in ['--i2cpport']:
-            serveropts['i2cpport'] = int(val)
-        else:
-            usage(0)
-
-    if len(args) == 0:
-        cmd = 'samserver'
-    else:
-        cmd = args[0]
-
-    if cmd == 'samserver':
-
-        log(2, "Running I2P SAM Server...")
-        server = I2PSamServer(**serveropts)
-        server.run()
-
-    elif cmd == 'test':
-        
-        print "RUNNING I2P Jython TESTS"
-        testsigs()
-        testdests()
-        testsession()
-        testsocket()
-
-    else:
-        usage(0)
-#@-node:main
 #@+node:testdests
 def testdests():
     """
@@ -2356,7 +2365,7 @@ def testsession():
     print "session tests passed!"
 #@-node:testsession
 #@+node:testsocket
-def testsocket():
+def testsocket(bidirectional=0):
 
     global d1, d2, s1, s2
 
@@ -2416,6 +2425,19 @@ def testsocket():
     print "launching server thread..."
     thread.start_new_thread(servThread, (sServer,))
 
+    if bidirectional:
+        # dummy thread which accepts connections TO client socket
+        def threadDummy(s):
+            print "dummy: listening"
+            s.listen()
+            print "dummy: accepting"
+    
+            sock = s.accept()
+            print "dummy: got connection"
+    
+        print "test - launching dummy client accept thread"
+        thread.start_new_thread(threadDummy, (sClient,))
+
     print "client: trying to connect"
     sClient.connect(dServer)
 
@@ -2432,7 +2454,119 @@ def testsocket():
 
     print "I2PSocket test apparently succeeded"
 
+
 #@-node:testsocket
+#@+node:usage
+def usage(detailed=0):
+    
+    print "Usage: %s <options> [<command>]" % sys.argv[0]
+    if not detailed:
+        print "Run with '-h' to get detailed help"
+        sys.exit(0)
+
+    print "I2PSAM is a bridge that allows I2P client programs to access the"
+    print "I2P network by talking over a plaintext socket connection."
+    print "References:"
+    print "   - http://www.freenet.org.nz/i2p - source, doco, downloadables"
+    print "   - http://drupal.i2p.net/node/view/144 - I2P SAM specification"
+    print
+    print "Options:"
+    print "  -h, -?, --help        - display this help"
+    print "  -v, --version         - print program version"
+    print "  -V, --verbosity=n     - set verbosity to n, default 2, 1==quiet, 4==noisy"
+    print "  -H, --listenhost=host - specify host to listen on for client connections"
+    print "  -P, --listenport=port - port to listen on for client connections"
+    print "      --i2cphost=host   - hostname of I2P router's I2CP interface"
+    print "      --i2cpport=port   - port of I2P router's I2CP interface"
+    print
+    print "Commands:"
+    print "     (run with no commands to launch SAM server)"
+    print "     samserver - runs as a SAM server"
+    print "     test - run a suite of self-tests"
+    print "     testsocket - run only the socket test"
+    print "     testbidirsocket - run socket test in bidirectional mode"
+    print
+    
+    sys.exit(0)
+#@-node:usage
+#@+node:main
+def main():
+
+    argv = sys.argv
+    argc = len(argv)
+
+    # -------------------------------------------------
+    # do the getopt command line parsing
+
+    try:
+        opts, args = getopt.getopt(sys.argv[1:],
+                                   "h?vV:H:P:",
+                                   ['help', 'version', 'verbosity=',
+                                    'listenhost=', 'listenport=',
+                                    'i2cphost=', 'i2cpport=',
+                                    ])
+    except:
+        traceback.print_exc(file=sys.stdout)
+        usage("You entered an invalid option")
+
+    #print "args=%s" % args
+
+    serveropts = {}
+    for opt, val in opts:
+        if opt in ['-h', '-?', '--help']:
+            usage(1)
+        elif opt in ['-v', '--version']:
+            print "I2P SAM version %s" % version
+            sys.exit(0)
+        elif opt in ['-V', '--verbosity']:
+            serveropts['verbosity'] = int(val)
+        elif opt in ['-H', '--listenhost']:
+            serveropts['host'] = val
+        elif opt in ['-P', '--listenport']:
+            serveropts['port'] = int(val)
+        elif opt in ['--i2cphost']:
+            serveropts['i2cphost'] = val
+        elif opt in ['--i2cpport']:
+            serveropts['i2cpport'] = int(val)
+        else:
+            usage(0)
+
+    # --------------------------------------------------
+    # now run in required mode, default is 'samserver'
+
+    if len(args) == 0:
+        cmd = 'samserver'
+    else:
+        cmd = args[0]
+
+    if cmd == 'samserver':
+
+        log(2, "Running I2P SAM Server...")
+        server = I2PSamServer(**serveropts)
+        server.run()
+
+    elif cmd == 'test':
+        
+        print "RUNNING full I2PSAM Jython TEST SUITE"
+        testsigs()
+        testdests()
+        testsession()
+        testsocket()
+
+    elif cmd == 'testsocket':
+        
+        print "RUNNING SOCKET TEST"
+        testsocket(0)
+
+    elif cmd == 'testbidirsocket':
+        print "RUNNING BIDIRECTIONAL SOCKET TEST"
+        testsocket(1)
+
+    else:
+        # spit at unrecognised option
+        usage(0)
+
+#@-node:main
 #@+node:MAINLINE
 if __name__ == '__main__':
     main()

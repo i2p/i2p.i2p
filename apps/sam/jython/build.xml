@@ -11,17 +11,25 @@
     </target>
 
     <target name="jar">
-        <mkdir dir="./build" />
-        <exec executable="jythonc">
+
+        <condition property="jythonext" value=".bat">
+            <os family="windows" />
+        </condition>
+        <condition property="jythonext" value="">
+            <not>
+                <os family="windows" />
+            </not>
+        </condition>
+
+        <exec executable="jythonc${jythonext}" dir=".">
             <env key="CLASSPATH" path="../../../core/java/build/i2p.jar:../../ministreaming/java/build/mstreaming.jar"/>
-            <arg value="--jar"/>
-            <arg value="./build/i2psam.jar"/>
-            <arg value="./src/i2psam.py"/>
+            <arg value="--jar"/><arg path="./i2psam.jar"/>
+            <arg path="./src/i2psam.py"/>
         </exec>
     </target>
 
     <target name="clean">
-        <delete dir="./build" />
+        <delete file="i2psam.jar" />
         <delete dir="./jpywork" />
     </target>
 
