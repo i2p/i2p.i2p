@@ -15,7 +15,7 @@
 # Java Service Wrapper can be found at:
 # http://wrapper.tanukisoftware.org/doc/english/introduction.html
 
-if [ $UID -ne 0 ]; then
+if [ ! "X$USER" = "Xroot" ]; then
     echo "Sorry, you need root privileges to install services."
     exit 1
 fi
@@ -23,7 +23,7 @@ fi
 ERROR_MSG="Cannot determine operating system type. Please install the service manually."
 HOST_OS=`./osid`
 
-if [[ ! $HOST_OS || $HOST_OS = "unknown" ]]; then
+if [ "X$HOST_OS" = "X" -o "$HOST_OS" = "unknown" ]; then
     echo "$ERROR_MSG"
     exit 1
 fi
