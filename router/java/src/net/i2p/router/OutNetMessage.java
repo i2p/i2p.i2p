@@ -35,6 +35,10 @@ public class OutNetMessage {
     private RouterContext _context;
     private RouterInfo _target;
     private I2NPMessage _message;
+    /** cached message class name, for use after we discard the message */
+    private String _messageType;
+    /** cached message ID, for use after we discard the message */
+    private long _messageId;
     private long _messageSize;
     private int _priority;
     private long _expiration;
@@ -75,6 +79,10 @@ public class OutNetMessage {
         _createdBy = new Exception("Created by");
         _created = context.clock().now();
         timestamp("Created");
+        _context.messageStateMonitor().outboundMessageAdded();
+        _context.statManager().createRateStat("outNetMessage.timeToDiscard", 
+                                              "How long until we discard an outbound msg?",
+                                              "OutNetMessage", new long[] { 5*60*1000, 30*60*1000, 60*60*1000 });
     }
     
     public void timestamp(String eventName) {
@@ -109,7 +117,14 @@ public class OutNetMessage {
     public I2NPMessage getMessage() { return _message; }
     public void setMessage(I2NPMessage msg) {
         _message = msg;
+        if (msg != null) {
+            _messageType = msg.getClass().getName();
+            _messageId = msg.getUniqueId();
+        }
     }
+    
+    public String getMessageType() { return _messageType; }
+    public long getMessageId() { return _messageId; }
     
     public long getMessageSize() {
         if (_messageSize <= 0) {
@@ -132,7 +147,7 @@ public class OutNetMessage {
             return null;
         } else {
             try {
-                ByteArrayOutputStream baos = new ByteArrayOutputStream(4096); // large enough to hold most messages
+                ByteArrayOutputStream baos = new ByteArrayOutputStream(1024); // large enough to hold most messages
                 _message.writeBytes(baos);
                 byte data[] = baos.toByteArray();
                 _messageSize = data.length;
@@ -206,6 +221,36 @@ public class OutNetMessage {
     public long getCreated() { return _created; }
     public long getLifetime() { return _context.clock().now() - _created; }
     
+    /** 
+     * We've done what we need to do with the data from this message, though
+     * we may keep the object around for a while to use its ID, jobs, etc.
+     */
+    public void discardData() {
+        long timeToDiscard = _context.clock().now() - _created;
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("Discard " + _messageSize + "byte " + _messageType + " message after " 
+                       + timeToDiscard);
+        _message = null;
+        _context.statManager().addRateData("outNetMessage.timeToDiscard", timeToDiscard, timeToDiscard);
+        _context.messageStateMonitor().outboundMessageDiscarded();
+    }
+    
+    public void finalize() throws Throwable {
+        if (_message != null) {
+            StringBuffer buf = new StringBuffer(1024);
+            buf.append("Undiscarded ").append(_messageSize).append("byte ");
+            buf.append(_messageType).append(" message created ");
+            buf.append((_context.clock().now() - _created)).append("ms ago: ");
+            buf.append(_messageId).append(" to ").append(_target.calculateHash().toBase64());
+            buf.append(", timing - \n");
+            renderTimestamps(buf);
+            _log.error(buf.toString(), _createdBy);
+            _context.messageStateMonitor().outboundMessageDiscarded();
+        }
+        _context.messageStateMonitor().outboundMessageFinalized();
+        super.finalize();
+    }
+    
     public String toString() {
         StringBuffer buf = new StringBuffer(128);
         buf.append("[OutNetMessage contains ");
@@ -230,6 +275,13 @@ public class OutNetMessage {
         if (_onFailedSend != null)
             buf.append(" with onFailedSend job: ").append(_onFailedSend);
         buf.append(" {timestamps: \n");
+        renderTimestamps(buf);
+        buf.append("}");
+        buf.append("]");
+        return buf.toString();
+    }
+    
+    private void renderTimestamps(StringBuffer buf) {
         synchronized (_timestamps) {
             long lastWhen = -1;
             for (int i = 0; i < _timestampOrder.size(); i++) {
@@ -243,13 +295,12 @@ public class OutNetMessage {
                     buf.append(diff);
                 else
                     buf.append(0);
-                buf.append("ms: \t").append(name).append('=').append(formatDate(when.longValue())).append("]\n");
+                buf.append("ms: \t").append(name);
+                buf.append('=').append(formatDate(when.longValue()));
+                buf.append("]\n");
                 lastWhen = when.longValue();
             }
         }
-        buf.append("}");
-        buf.append("]");
-        return buf.toString();
     }
     
     private final static SimpleDateFormat _fmt = new SimpleDateFormat("HH:mm:ss.SSS");
