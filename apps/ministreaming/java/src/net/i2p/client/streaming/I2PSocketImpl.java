@@ -76,7 +76,7 @@ class I2PSocketImpl implements I2PSocket {
         _socketId = ++__socketId;
         local = mgr.getSession().getMyDestination();
         String us = mgr.getSession().getMyDestination().calculateHash().toBase64().substring(0,4);
-        String name = us + (outgoing ? "->" : "<-") + peer.calculateHash().toBase64().subSequence(0,4);
+        String name = us + (outgoing ? "->" : "<-") + peer.calculateHash().toBase64().substring(0,4);
         in = new I2PInputStream(name + " in");
         I2PInputStream pin = new I2PInputStream(name + " out");
         out = new I2POutputStream(pin);
