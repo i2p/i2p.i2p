@@ -503,7 +503,7 @@ public class FIFOBandwidthLimiter {
         public int getPendingInboundRequested();
         /** block until we are allocated some more bytes */
         public void waitForNextAllocation();
-        /** we no longer want the data requested (e.g. the connection closed */
+        /** we no longer want the data requested (the connection closed) */
         public void abort();
         /** was this request aborted?  */
         public boolean getAborted();
