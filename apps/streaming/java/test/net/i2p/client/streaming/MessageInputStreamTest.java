@@ -110,12 +110,52 @@ public class MessageInputStreamTest {
         }
     }
     
+    public void testStaggered() {
+        byte orig[] = new byte[256*1024];
+        byte read[] = new byte[orig.length];
+        _context.random().nextBytes(orig);
+        
+        MessageInputStream in = new MessageInputStream(_context);
+        ArrayList order = new ArrayList(32);
+        for (int i = 0; i < orig.length / 1024; i++)
+            order.add(new Integer(i));
+        Collections.shuffle(order);
+        
+        int offset = 0;
+        for (int i = 0; i < orig.length / 1024; i++) {
+            byte msg[] = new byte[1024];
+            Integer cur = (Integer)order.get(i);
+            System.arraycopy(orig, cur.intValue()*1024, msg, 0, 1024);
+            in.messageReceived(cur.intValue(), msg);
+            _log.debug("Injecting " + cur);
+            
+            try {
+                if (in.available() > 0) {
+                    int curRead = in.read(read, offset, read.length-offset);
+                    _log.debug("read " + curRead);
+                    if (curRead == -1)
+                        throw new RuntimeException("EOF with offset " + offset);
+                    else
+                        offset += curRead;
+                }
+            } catch (IOException ioe) {
+                throw new RuntimeException("IOE: " + ioe.getMessage());
+            }
+        }
+        
+        if (!DataHelper.eq(orig, read))
+            throw new RuntimeException("Failed test: data read is not equal");
+
+        _log.info("Passed test: staggered");
+    }
+    
     public static void main(String args[]) {
         MessageInputStreamTest t = new MessageInputStreamTest();
         try {
             t.testInOrder();
             t.testRandomOrder();
             t.testRandomDups();
+            t.testStaggered();
         } catch (Exception e) {
             e.printStackTrace();
         }
