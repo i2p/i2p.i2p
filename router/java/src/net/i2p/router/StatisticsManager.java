@@ -125,7 +125,10 @@ public class StatisticsManager implements Service {
             includeRate("netDb.storeSent", stats, new long[] { 5*60*1000, 60*60*1000 });
             includeRate("netDb.successPeers", stats, new long[] { 60*60*1000 });
             includeRate("netDb.failedPeers", stats, new long[] { 60*60*1000 });
-            includeRate("netDb.searchCount", stats, new long[] { 3*60*60*1000});
+            includeRate("router.throttleNetDbDoSSend", stats, new long[] { 10*60*1000, 60*60*1000, 24*60*60*1000 });
+            includeRate("router.throttleNetDbDoS", stats, new long[] { 10*60*1000, 60*60*1000 });
+            //includeRate("netDb.searchCount", stats, new long[] { 3*60*60*1000});
+            //includeRate("netDb.searchMessageCount", stats, new long[] { 5*60*1000, 10*60*1000, 60*60*1000 });
             //includeRate("inNetMessage.timeToDiscard", stats, new long[] { 5*60*1000, 10*60*1000, 60*60*1000 });
             //includeRate("outNetMessage.timeToDiscard", stats, new long[] { 5*60*1000, 10*60*1000, 60*60*1000 });
             includeRate("router.throttleNetworkCause", stats, new long[] { 10*60*1000, 60*60*1000 });

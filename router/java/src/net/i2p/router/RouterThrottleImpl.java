@@ -129,4 +129,6 @@ class RouterThrottleImpl implements RouterThrottle {
                        + " tunnels with lag of " + lag + " and " + throttleEvents + " throttle events)");
         return true;
     }
+    
+    protected RouterContext getContext() { return _context; }
 }
