@@ -33,9 +33,14 @@ public class StatisticsManager implements Service {
     public final static String DEFAULT_PROP_PUBLISH_RANKINGS = "false";
     public final static String PROP_MAX_PUBLISHED_PEERS = "router.publishPeerMax";
     public final static int DEFAULT_MAX_PUBLISHED_PEERS = 20;
-    
+
+    private final DecimalFormat _fmt;
+    private final DecimalFormat _pct;
+
     public StatisticsManager(RouterContext context) {
         _context = context;
+        _fmt = new DecimalFormat("###,##0.00", new DecimalFormatSymbols(Locale.UK));
+        _pct = new DecimalFormat("#0.00%", new DecimalFormatSymbols(Locale.UK));
         _log = context.logManager().getLog(StatisticsManager.class);
         _includePeerRankings = false;
     }
@@ -172,7 +177,7 @@ public class StatisticsManager implements Service {
         }
     }
     
-    private static String renderRate(Rate rate, boolean fudgeQuantity) {
+    private String renderRate(Rate rate, boolean fudgeQuantity) {
         StringBuffer buf = new StringBuffer(128);
         buf.append(num(rate.getAverageValue())).append(';');
         buf.append(num(rate.getExtremeAverageValue())).append(';');
@@ -246,14 +251,10 @@ public class StatisticsManager implements Service {
     }
 
     
-    private static String getPeriod(Rate rate) { return DataHelper.formatDuration(rate.getPeriod()); }
+    private String getPeriod(Rate rate) { return DataHelper.formatDuration(rate.getPeriod()); }
 
-    // TODO: get this to use some random locale, not the user's default (since its published)
-    private final static DecimalFormat _fmt = new DecimalFormat("###,##0.00", new DecimalFormatSymbols(Locale.UK));
-    private final static String num(double num) { synchronized (_fmt) { return _fmt.format(num); } }
-    
-    private final static DecimalFormat _pct = new DecimalFormat("#0.00%", new DecimalFormatSymbols(Locale.UK));
-    private final static String pct(double num) { synchronized (_pct) { return _pct.format(num); } }
+    private final String num(double num) { synchronized (_fmt) { return _fmt.format(num); } }
+    private final String pct(double num) { synchronized (_pct) { return _pct.format(num); } }
    
     public String renderStatusHTML() { return ""; }
 }
