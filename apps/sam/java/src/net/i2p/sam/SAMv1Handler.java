@@ -685,9 +685,12 @@ public class SAMv1Handler extends SAMHandler implements SAMRawReceiver, SAMDatag
 
         ByteArrayOutputStream msg = new ByteArrayOutputStream();
 
-        msg.write(("RAW RECEIVED SIZE=" + data.length
-                   + "\n").getBytes("ISO-8859-1"));
+        String msgText = "RAW RECEIVED SIZE=" + data.length + "\n";
+        msg.write(msgText.getBytes("ISO-8859-1"));
         msg.write(data);
+        
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("sending to client: " + msgText);
 
         writeBytes(msg.toByteArray());
     }
@@ -716,9 +719,12 @@ public class SAMv1Handler extends SAMHandler implements SAMRawReceiver, SAMDatag
 
         ByteArrayOutputStream msg = new ByteArrayOutputStream();
 
-        msg.write(("DATAGRAM RECEIVED DESTINATION=" + sender.toBase64()
-                   + " SIZE=" + data.length
-                   + "\n").getBytes("ISO-8859-1"));
+        String msgText = "DATAGRAM RECEIVED DESTINATION=" + sender.toBase64()
+                         + " SIZE=" + data.length + "\n";
+        msg.write(msgText.getBytes("ISO-8859-1"));
+        
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("sending to client: " + msgText);
         msg.write(data);
 
         writeBytes(msg.toByteArray());
@@ -761,8 +767,10 @@ public class SAMv1Handler extends SAMHandler implements SAMRawReceiver, SAMDatag
 
         ByteArrayOutputStream msg = new ByteArrayOutputStream();
 
-        msg.write(("STREAM RECEIVED ID=" + id 
-                   +" SIZE=" + len + "\n").getBytes("ISO-8859-1"));
+        String msgText = "STREAM RECEIVED ID=" + id +" SIZE=" + len + "\n";
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("sending to client: " + msgText);
+        msg.write(msgText.getBytes("ISO-8859-1"));
         msg.write(data, 0, len);
 
         writeBytes(msg.toByteArray());
