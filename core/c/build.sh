@@ -14,19 +14,20 @@ STATICLIBS=""
 LIBFILE="libjbigi.so"
 
 # jrandom's mingw setup:
+#COMPILEFLAGS="-Wall"
 #INCLUDES="-Iinclude -Ic:/software/j2sdk1.4.2/include/win32/ -Ic:/software/j2sdk1.4.2/include/ -Ic:/dev/gmp-4.1.2/"
 #LINKFLAGS="-shared -Wl,--kill-at"
 #LIBFILE="jbigi.dll"
 #INCLUDELIBS=""
-#STATICLIBS="c:/dev/libgmp.a"
+#STATICLIBS="libgmp.a"
 
 rm -f jbigi.o $LIBFILE
 $CC -c $COMPILEFLAGS $INCLUDES src/jbigi.c
 $CC $LINKFLAGS $INCLUDES $INCLUDELIBS -o $LIBFILE jbigi.o $STATICLIBS
 
 echo "built, now testing"
-(cd ../java/src/ ; $ANT )
-LD_LIBRARY_PATH=. $JAVA -cp ../java/src/i2p.jar -DloggerConfigLocation=../java/src/logger.config net.i2p.util.NativeBigInteger
+(cd ../java/ ; $ANT build)
+LD_LIBRARY_PATH=. $JAVA -cp ../java/build/i2p.jar -DloggerConfigLocation=../../installer/java/src/logger.config.template net.i2p.util.NativeBigInteger
 
 
 echo ""
