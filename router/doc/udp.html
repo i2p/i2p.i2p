@@ -1,4 +1,4 @@
-<code>$Id: udp.html,v 1.7 2005/03/29 19:20:07 jrandom Exp $</code>
+<code>$Id: udp.html,v 1.8 2005/04/04 12:21:30 jrandom Exp $</code>
 
 <h1>Secure Semireliable UDP (SSU)</h1>
 <b>DRAFT</b>
@@ -48,7 +48,8 @@ key.  The specific construct of the MAC is the first 16 bytes from:</p>
 
 <p>The payload itself is AES256/CBC encrypted with the IV and the 
 sessionKey, with replay prevention addressed within its body, 
-explained below.</p>
+explained below.  The payloadLength in the MAC is a 2 byte unsigned 
+integer in 2s complement.</p>
 
 <h2><a name="payload">Payload</a></h2>
 
@@ -136,14 +137,17 @@ around briefly, to address packet loss and reordering.</p>
 	<li>1 byte IP address size</li>
 	<li>that many byte representation of Alice's IP address</li>
 	<li>2 byte port number (unsigned, big endian 2s complement)</li>
-        <li>0-15 pad bytes to reach the 16 byte boundary</li>
         <li>4 byte relay tag which Alice can publish (else 0x0)</li>
-        <li>40 byte DSA signature of the critical exchanged data</li>
+        <li>40 byte DSA signature of the critical exchanged data, encrypted
+            with another layer of encryption using the negotiated sessionKey.
+            The IV is reused here (but with the sessionKey, not the introKey).</li>
+        <li>8 bytes padding, encrypted with an additional layer of encryption
+            using the negotiated session key as part of the DSA block</li>
         <li>N bytes, currently uninterpreted (later, for challenges)</li>
 	</ul></td></tr>
 <tr><td align="right" valign="top"><b>Key used:</b></td>
-    <td>introKey for the data through the pad bytes, and the 
-        sessionKey for the DSA signature</td></tr>
+    <td>introKey, with an additional layer of encryption over the 40 byte
+        signature and the following 8 bytes padding.</td></tr>
 </table>
 
 <pre>
@@ -155,18 +159,21 @@ around briefly, to address packet loss and reordering.</p>
  +----+----+----+----+----+----+----+----+
  |size| that many byte IP address (4-16) |
  +----+----+----+----+----+----+----+----+
- | Port (A)| (pad to 16 byte boundary)   |
+ | Port (A)| public relay tag  |         |
+ +----+----+----+----+----+----+         |
+ | DSA signature                         |
+ |                                       |
+ |                                       |
+ |                                       |
+ |                             +----+----+
+ |                             |         
  +----+----+----+----+----+----+----+----+
- |  public relay tag | DSA signature     |
- +----+----+----+----+                   |
+   (8 bytes of padding)        |         |
+ +----+----+----+----+----+----+         |
+ |           arbitrary amount            |
+ |        of uninterpreted data          |
+                 .   .   .               
  |                                       |
- |                                       |
- |                                       |
- |                                       |
- +                   +----+----+----+----+
- |                   | arbitrary amount  |
- +----+----+----+----+                   |
- |     of uninterpreted data             |
  +----+----+----+----+----+----+----+----+
 </pre>
 
