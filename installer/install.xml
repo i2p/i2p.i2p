@@ -31,7 +31,7 @@
         <panel classname="InfoPanel"/>
         <panel classname="TargetPanel"/>
         <panel classname="InstallPanel"/>
-        <panel classname="FinishPanel"/>
+        <panel classname="SimpleFinishPanel"/>
     </panels>
 
     <packs>

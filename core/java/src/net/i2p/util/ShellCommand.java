@@ -7,7 +7,7 @@
  * This code is public domain.
  */
 
-package net.i2p.apps.systray;
+package net.i2p.util;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;

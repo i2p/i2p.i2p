@@ -9,6 +9,8 @@
 
 package net.i2p.apps.systray;
 
+import net.i2p.util.ShellCommand;
+
 import java.net.MalformedURLException;
 import java.net.URL;
 
