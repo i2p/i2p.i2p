@@ -1,4 +1,13 @@
-$Id: history.txt,v 1.63 2004/11/05 05:53:41 jrandom Exp $
+$Id: history.txt,v 1.64 2004/11/06 02:59:54 jrandom Exp $
+
+2004-11-06  jrandom
+    * Expose a drop down on the /configclients.jsp to enter the outbound 
+      tunnel depth.
+    * Improved *hosts.txt loading
+    * Explicitly override the JVM's timezone settings to use GMT so that 
+      any client applications which use timezones won't leak sensitive
+      data (thanks gott!)
+    * Bundle sam.jar in the update (thanks duck!)
 
 2004-11-06  jrandom
     * Fix for a long standing synchronization bug in the SDK that in rare 

@@ -80,6 +80,9 @@ public class Router {
         System.setProperty("networkaddress.cache.ttl", "0");
         // (no need for keepalive)
         System.setProperty("http.keepAlive", "false");
+        System.setProperty("user.timezone", "GMT");
+        // just in case, lets make it explicit...
+        TimeZone.setDefault(TimeZone.getTimeZone("GMT"));
     }
     
     public Router() { this(null, null); }

@@ -114,4 +114,31 @@ public class ConfigClientsHelper {
         buf.append("</select>\n");
         return buf.toString();
     }
+    
+    public String getTunnelDepthOutboundSelectBox() {
+        int count = ClientTunnelSettings.DEFAULT_DEPTH_OUTBOUND;
+        String val = _context.router().getConfigSetting(ClientTunnelSettings.PROP_DEPTH_OUTBOUND);
+        if (val != null) {
+            try {
+                count = Integer.parseInt(val);
+            } catch (NumberFormatException nfe) {
+                // ignore, use default from above
+            }
+        }
+        StringBuffer buf = new StringBuffer(1024);
+        buf.append("<select name=\"tunneldepthoutbound\">\n");
+        for (int i = 0; i < 4; i++) {
+            buf.append("<option value=\"").append(i).append("\" ");
+            if (count == i)
+                buf.append("selected=\"true\" ");
+            buf.append(">").append(i).append("</option>\n");
+        }
+        if (count >= 4) {
+            buf.append("<option value=\"").append(count);
+            buf.append("\" selected>").append(count);
+            buf.append("</option>\n");
+        }
+        buf.append("</select>\n");
+        return buf.toString();
+    }
 }

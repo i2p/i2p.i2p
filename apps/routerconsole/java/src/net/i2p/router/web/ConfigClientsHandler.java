@@ -11,6 +11,7 @@ public class ConfigClientsHandler extends FormHandler {
     private String _numClients;
     private String _numTunnels;
     private String _numHops;
+    private String _numHopsOutbound;
     private boolean _shouldSave;
     
     public void ConfigNetHandler() {
@@ -36,6 +37,9 @@ public class ConfigClientsHandler extends FormHandler {
     public void setTunneldepth(String num) {
         _numHops = (num != null ? num.trim() : null);
     }
+    public void setTunneldepthoutbound(String num) {
+        _numHopsOutbound = (num != null ? num.trim() : null);
+    }
     
     /**
      * The user made changes to the network config and wants to save them, so
@@ -60,6 +64,12 @@ public class ConfigClientsHandler extends FormHandler {
         if ( (_numHops != null) && (_numHops.length() > 0) ) {
             _context.router().setConfigSetting(ClientTunnelSettings.PROP_DEPTH_INBOUND, _numHops);
             addFormNotice("Updating default tunnel length to " + _numHops);
+            saveRequired = true;
+        }
+        
+        if ( (_numHopsOutbound != null) && (_numHopsOutbound.length() > 0) ) {
+            _context.router().setConfigSetting(ClientTunnelSettings.PROP_DEPTH_OUTBOUND, _numHopsOutbound);
+            addFormNotice("Updating default outbound tunnel length to " + _numHopsOutbound);
             saveRequired = true;
         }
         

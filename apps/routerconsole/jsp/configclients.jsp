@@ -34,6 +34,8 @@
     <jsp:getProperty name="clientshelper" property="tunnelCountSelectBox" /><br />
  <b>Default number of hops per tunnel:</b>
     <jsp:getProperty name="clientshelper" property="tunnelDepthSelectBox" /><br />
+ <b>Hops per outbound tunnel:</b>
+    <jsp:getProperty name="clientshelper" property="tunnelDepthOutboundSelectBox" /><br />
  <hr />
  <input type="submit" name="shouldsave" value="Save changes" /> <input type="reset" value="Cancel" />
  </form>

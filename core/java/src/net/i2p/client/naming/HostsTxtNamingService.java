@@ -16,6 +16,7 @@ import java.util.Properties;
 import java.util.StringTokenizer;
 
 import net.i2p.I2PAppContext;
+import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
 import net.i2p.util.Log;
 
@@ -61,12 +62,10 @@ public class HostsTxtNamingService extends NamingService {
         for (int i = 0; i < filenames.size(); i++) { 
             String hostsfile = (String)filenames.get(i);
             Properties hosts = new Properties();
-            FileInputStream fis = null;
             try {
                 File f = new File(hostsfile);
                 if ( (f.exists()) && (f.canRead()) ) {
-                    fis = new FileInputStream(f);
-                    hosts.load(fis);
+                    DataHelper.loadProps(hosts, f);
                     
                     String key = hosts.getProperty(hostname);
                     if ( (key != null) && (key.trim().length() > 0) ) {
@@ -78,11 +77,6 @@ public class HostsTxtNamingService extends NamingService {
                 }
             } catch (Exception ioe) {
                 _log.error("Error loading hosts file " + hostsfile, ioe);
-            } finally {
-                if (fis != null) try {
-                    fis.close();
-                } catch (IOException ioe) { // nop
-                }
             }
             // not found, continue to the next file
         }
