@@ -38,7 +38,7 @@ public class I2PSocketOptions {
     
     /**
      * What is the longest we'll block on the input stream while waiting
-     * for more data?  If this value is exceeded, the read() throws 
+     * for more data.  If this value is exceeded, the read() throws 
      * InterruptedIOException
      */
     public long getReadTimeout() {
@@ -47,7 +47,7 @@ public class I2PSocketOptions {
 
     /**
      * What is the longest we'll block on the input stream while waiting
-     * for more data?  If this value is exceeded, the read() throws 
+     * for more data.  If this value is exceeded, the read() throws 
      * InterruptedIOException
      */
     public void setReadTimeout(long ms) {
@@ -79,7 +79,7 @@ public class I2PSocketOptions {
     
     /**
      * What is the longest we'll block on the output stream while waiting
-     * for the data to flush?  If this value is exceeded, the write() throws 
+     * for the data to flush.  If this value is exceeded, the write() throws 
      * InterruptedIOException.  If this is less than or equal to zero, there 
      * is no timeout.
      */
@@ -89,7 +89,7 @@ public class I2PSocketOptions {
 
     /**
      * What is the longest we'll block on the output stream while waiting
-     * for the data to flush?  If this value is exceeded, the write() throws 
+     * for the data to flush.  If this value is exceeded, the write() throws 
      * InterruptedIOException.  If this is less than or equal to zero, there 
      * is no timeout.
      */

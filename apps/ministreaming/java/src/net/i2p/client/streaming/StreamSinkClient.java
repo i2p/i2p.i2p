@@ -18,7 +18,7 @@ import net.i2p.util.Log;
 
 /**
  * Simple streaming lib test app that connects to a given destination and sends 
- * it a particular amount of random data, then disconnects.  See the {@link main}
+ * it a particular amount of random data, then disconnects.  See the {@link #main}
  *
  */
 public class StreamSinkClient {
