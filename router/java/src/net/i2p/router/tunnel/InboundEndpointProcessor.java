@@ -1,6 +1,7 @@
 package net.i2p.router.tunnel;
 
 import net.i2p.I2PAppContext;
+import net.i2p.data.Base64;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
 import net.i2p.util.Log;
@@ -17,7 +18,9 @@ public class InboundEndpointProcessor {
     private I2PAppContext _context;
     private Log _log;
     private TunnelCreatorConfig _config;
-    private IVValidator _validator;
+    private IVValidator _validator;    
+    
+    static final boolean USE_ENCRYPTION = HopProcessor.USE_ENCRYPTION;
     
     public InboundEndpointProcessor(I2PAppContext ctx, TunnelCreatorConfig cfg) {
         _context = ctx;
@@ -52,7 +55,9 @@ public class InboundEndpointProcessor {
         }
         
         // inbound endpoints and outbound gateways have to undo the crypto in the same way
-        OutboundGatewayProcessor.decrypt(_context, _config, iv, orig, offset, length);
+        if (USE_ENCRYPTION)
+            OutboundGatewayProcessor.decrypt(_context, _config, iv, orig, offset, length);
+        
         return true;
     }
 }

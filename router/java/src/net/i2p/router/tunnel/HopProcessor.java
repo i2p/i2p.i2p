@@ -20,7 +20,9 @@ public class HopProcessor {
     private Log _log;
     protected HopConfig _config;
     private IVValidator _validator;
-    
+        
+    /** helpful flag for debugging */
+    static final boolean USE_ENCRYPTION = true;
     static final int IV_LENGTH = 16;
     
     public HopProcessor(I2PAppContext ctx, HopConfig config) {
@@ -31,6 +33,7 @@ public class HopProcessor {
     }
     
     protected IVValidator createValidator() { 
+        // yeah, we'll use an O(1) validator later (e.g. bloom filter)
         return new HashSetIVValidator();
     }
     
@@ -71,8 +74,10 @@ public class HopProcessor {
             //_log.debug("IV received: " + Base64.encode(iv));
             //_log.debug("Before:" + Base64.encode(orig, IV_LENGTH, orig.length - IV_LENGTH));
         }
-        encrypt(orig, offset, length);
-        updateIV(orig, offset);
+        if (USE_ENCRYPTION) {
+            encrypt(orig, offset, length);
+            updateIV(orig, offset);
+        }
         if (_log.shouldLog(Log.DEBUG)) {
             //_log.debug("Data after processing: " + Base64.encode(orig, IV_LENGTH, orig.length - IV_LENGTH));
             //_log.debug("IV sent: " + Base64.encode(orig, 0, IV_LENGTH));

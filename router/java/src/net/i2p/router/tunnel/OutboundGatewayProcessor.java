@@ -16,7 +16,9 @@ public class OutboundGatewayProcessor {
     private I2PAppContext _context;
     private Log _log;
     private TunnelCreatorConfig _config;
-    
+        
+    static final boolean USE_ENCRYPTION = HopProcessor.USE_ENCRYPTION;
+
     public OutboundGatewayProcessor(I2PAppContext ctx, TunnelCreatorConfig cfg) {
         _context = ctx;
         _log = ctx.logManager().getLog(OutboundGatewayProcessor.class);
@@ -27,20 +29,22 @@ public class OutboundGatewayProcessor {
      * Since we are the outbound gateway, pick a random IV and wrap the preprocessed 
      * data so that it will be exposed at the endpoint.
      *
-     * @param orig original data with an extra 16 bytes prepended.
+     * @param orig original data with an extra 16 byte IV prepended.
      * @param offset index into the array where the extra 16 bytes (IV) begins
      * @param length how much of orig can we write to (must be a multiple of 16).
      */
     public void process(byte orig[], int offset, int length) {
         byte iv[] = new byte[HopProcessor.IV_LENGTH];
-        _context.random().nextBytes(iv);
-        System.arraycopy(iv, 0, orig, offset, HopProcessor.IV_LENGTH);
+        //_context.random().nextBytes(iv);
+        //System.arraycopy(iv, 0, orig, offset, HopProcessor.IV_LENGTH);
+        System.arraycopy(orig, offset, iv, 0, HopProcessor.IV_LENGTH);
         
         if (_log.shouldLog(Log.DEBUG)) {
-            _log.debug("Original random IV: " + Base64.encode(iv));
-            _log.debug("data:  " + Base64.encode(orig, iv.length, length - iv.length));
+            //_log.debug("Original random IV: " + Base64.encode(iv));
+            //_log.debug("data:  " + Base64.encode(orig, iv.length, length - iv.length));
         }
-        decrypt(_context, _config, iv, orig, offset, length);
+        if (USE_ENCRYPTION)
+            decrypt(_context, _config, iv, orig, offset, length);
     }
     
     /**
@@ -55,8 +59,8 @@ public class OutboundGatewayProcessor {
         for (int i = cfg.getLength()-1; i >= 0; i--) {
             decrypt(ctx, iv, orig, offset, length, cur, cfg.getConfig(i));
             if (log.shouldLog(Log.DEBUG)) {
-                //_log.debug("IV at hop " + i + ": " + Base64.encode(orig, offset, iv.length));
-                //log.debug("hop " + i + ": " + Base64.encode(orig, offset + iv.length, length - iv.length));
+                //log.debug("IV at hop " + i + ": " + Base64.encode(orig, offset, HopProcessor.IV_LENGTH));
+                //log.debug("hop " + i + ": " + Base64.encode(orig, offset + HopProcessor.IV_LENGTH, length - HopProcessor.IV_LENGTH));
             }
         }
     }

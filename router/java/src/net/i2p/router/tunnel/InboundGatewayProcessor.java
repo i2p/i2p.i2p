@@ -19,15 +19,14 @@ public class InboundGatewayProcessor extends HopProcessor {
     }
 
     /**
-     * Since we are the inbound gateway, pick a random IV, ignore the 'prev'
-     * hop, and encrypt the message like every other participant.
+     * Since we are the inbound gateway, use the IV given to us as the first 
+     * 16 bytes, ignore the 'prev' hop, and encrypt the message like every 
+     * other participant.
      *
      */
-    public boolean process(byte orig[], int offset, int length, Hash prev) {
-        byte iv[] = new byte[IV_LENGTH];
-        _context.random().nextBytes(iv);
-        System.arraycopy(iv, 0, orig, offset, IV_LENGTH);
-        
-        return super.process(orig, offset, length, null);
+    public void process(byte orig[], int offset, int length) {
+        boolean ok = super.process(orig, offset, length, null);
+        if (!ok) 
+            throw new RuntimeException("wtf, we are the gateway, how did it fail?");
     }
 }

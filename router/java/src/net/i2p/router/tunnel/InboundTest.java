@@ -24,18 +24,19 @@ public class InboundTest {
         int numHops = 8;
         TunnelCreatorConfig config = prepareConfig(numHops);
         long start = _context.clock().now();
-        for (int i = 0; i < 1000; i++) 
+        for (int i = 0; i < 1; i++) 
             runTest(numHops, config);
         long time = _context.clock().now() - start;
         _log.debug("Time for 1000 messages: " + time);
     }
     
     private void runTest(int numHops, TunnelCreatorConfig config) {
-        byte orig[] = new byte[1024];
-        byte message[] = new byte[1024];
+        byte orig[] = new byte[128];
+        byte message[] = new byte[128];
         _context.random().nextBytes(orig); // might as well fill the IV
         System.arraycopy(orig, 0, message, 0, message.length);
         
+        _log.debug("orig: \n" + Base64.encode(orig, 16, orig.length-16));
         InboundGatewayProcessor p = new InboundGatewayProcessor(_context, config.getConfig(0));
         p.process(message, 0, message.length, null);
         
@@ -51,8 +52,10 @@ public class InboundTest {
         
         InboundEndpointProcessor end = new InboundEndpointProcessor(_context, config);
         boolean ok = end.retrievePreprocessedData(message, 0, message.length, config.getPeer(numHops-1));
-        if (!ok)
+        if (!ok) {
             _log.error("Error retrieving cleartext at the endpoint");
+            try { Thread.sleep(5*1000); } catch (Exception e) {}
+        }
         
         //_log.debug("After: " + Base64.encode(message, 16, orig.length-16));
         boolean eq = DataHelper.eq(orig, 16, message, 16, orig.length - 16);

@@ -1,4 +1,4 @@
-<code>$Id: tunnel-alt.html,v 1.4 2005/01/19 01:24:25 jrandom Exp $</code>
+<code>$Id: tunnel-alt.html,v 1.5 2005/01/19 18:13:10 jrandom Exp $</code>
 <pre>
 1) <a href="#tunnel.overview">Tunnel overview</a>
 2) <a href="#tunnel.operation">Tunnel operation</a>
@@ -111,27 +111,42 @@ data into the raw tunnel payload:</p>
 <li>a series of zero or more { instructions, message } pairs</li>
 </ul>
 
-<p>The instructions are encoded as follows:</p>
+<p>The instructions are encoded with a single control byte, followed by any
+necessary additional information.  The first bit in that control byte determines
+how the remainder of the header is interpreted - if it is not set, the message 
+is eithernot fragmented or this is the first fragment in the message.  If it is
+set, this is a follow on fragment.</p>
+
+<p>With the first bit being 0, the instructions are:</p>
 <ul>
-<li>1 byte value:<pre>
-   bits 0-1: delivery type
+<li>1 byte control byte:<pre>
+      bit 0: is follow on fragment?  (1 = true, 0 = false, must be 0)
+   bits 1-2: delivery type
              (0x0 = LOCAL, 0x01 = TUNNEL, 0x02 = ROUTER)
-      bit 2: delay included?  (1 = true, 0 = false)
-      bit 3: fragmented?  (1 = true, 0 = false)
-      bit 4: extended options?  (1 = true, 0 = false)
-   bits 5-7: reserved</pre></li>
+      bit 3: delay included?  (1 = true, 0 = false)
+      bit 4: fragmented?  (1 = true, 0 = false)
+      bit 5: extended options?  (1 = true, 0 = false)
+   bits 6-7: reserved</pre></li>
 <li>if the delivery type was TUNNEL, a 4 byte tunnel ID</li>
 <li>if the delivery type was TUNNEL or ROUTER, a 32 byte router hash</li>
 <li>if the delay included flag is true, a 1 byte value:<pre>
       bit 0: type (0 = strict, 1 = randomized)
    bits 1-7: delay exponent (2^value minutes)</pre></li>
-<li>if the fragmented flag is true, a 4 byte message ID, and a 1 byte value:<pre>
-   bits 0-6: fragment number
-      bit 7: is last?  (1 = true, 0 = false)</pre></li>
+<li>if the fragmented flag is true, a 4 byte message ID</li>
 <li>if the extended options flag is true:<pre>
    = a 1 byte option size (in bytes)
    = that many bytes</pre></li>
-<li>2 byte size of the I2NP message</li>
+<li>2 byte size of the I2NP message or this fragment</li>
+</ul>
+
+<p>If the first bit being 1, the instructions are:</p>
+<ul>
+<li>1 byte control byte:<pre>
+      bit 0: is follow on fragment?  (1 = true, 0 = false, must be 1)
+   bits 1-6: fragment number
+      bit 7: is last? (1 = true, 0 = false)</pre></li>
+<li>4 byte message ID (same one defined in the first fragment)</li>
+<li>2 byte size of this fragment</li>
 </ul>
 
 <p>The I2NP message is encoded in its standard form, and the 
@@ -202,7 +217,8 @@ implement fragmentation.  Padding to the closest exponential size (ala freenet)
 seems promising.  Perhaps we should gather some stats on the net as to what size
 messages are, then see what costs and benefits would arise from different 
 strategies?  <b>See <a href="http://dev.i2p.net/~jrandom/messageSizes/">gathered
-stats</a></b></i></p>
+stats</a></b>.  The current plan is to pad to a fixed 1024 byte message size with
+fragmentation.</i></p>
 
 <h3>2.6) <a name="tunnel.fragmentation">Tunnel fragmentation</a></h3>
 
