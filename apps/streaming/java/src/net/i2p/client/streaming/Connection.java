@@ -584,7 +584,7 @@ public class Connection {
                 
                 // shrink the window
                 int newWindowSize = getOptions().getWindowSize();
-                _lastCongestionSeenAt = newWindowSize;
+                congestionOccurred();
                 newWindowSize /= 2;
                 if (newWindowSize <= 0)
                     newWindowSize = 1;
