@@ -2549,6 +2549,7 @@ class KNodeReqHandler(KBase, SocketServer.StreamRequestHandler):
             else:
                 write("ok\n%s\n%s" % (len(value), value))
             flush()
+            time.sleep(2)
             finish()
             return
         
