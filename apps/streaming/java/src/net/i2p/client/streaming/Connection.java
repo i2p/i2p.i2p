@@ -668,7 +668,7 @@ public class Connection {
         private boolean _currentIsActiveResend;
         public ResendPacketEvent(PacketLocal packet) {
             _packet = packet;
-            _currentIsActiveResend = true;
+            _currentIsActiveResend = false;
         }
         
         public void timeReached() {
