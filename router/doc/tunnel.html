@@ -1,4 +1,4 @@
-<code>$Id: tunnel.html,v 1.5 2005/01/14 17:43:44 jrandom Exp $</code>
+<code>$Id: tunnel.html,v 1.6 2005/01/14 19:06:40 jrandom Exp $</code>
 <pre>
 1) <a href="#tunnel.overview">Tunnel overview</a>
 2) <a href="#tunnel.operation">Tunnel operation</a>
@@ -264,9 +264,9 @@ peer who is the first hop (usually the peer1.recv row) and forward that entirely
 tunnel key using AES256 in CTR mode with the first 16 bytes as the IV.  They then
 calculate the hash of what they see as the payload (bytes 16 through $size-288) and
 search for that hash within the decrypted checksum block.  If no match is found, the
-message is discarded.  Otherwise, the IV is updated by decrypting it and replacing it
-with the first 16 bytes of its hash.  The resulting message is then forwarded on to 
-the next peer for processing.</p>
+message is discarded.  Otherwise, the IV is updated by decrypting it, XORing that value
+with the IV_WHITENER, and replacing it with the first 16 bytes of its hash.  The 
+resulting message is then forwarded on to the next peer for processing.</p>
 
 <h3>2.4) <a name="tunnel.endpoint">Endpoint processing</a></h3>
 
