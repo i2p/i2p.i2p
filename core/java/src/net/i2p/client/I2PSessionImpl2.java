@@ -73,10 +73,11 @@ class I2PSessionImpl2 extends I2PSessionImpl {
     }
     public boolean sendMessage(Destination dest, byte[] payload, int offset, int size, SessionKey keyUsed, Set tagsSent)
                    throws I2PSessionException {
+        if (_log.shouldLog(Log.DEBUG)) _log.debug("sending message");
         if (isClosed()) throw new I2PSessionException("Already closed");
         if (SHOULD_COMPRESS) payload = DataHelper.compress(payload, offset, size);
         else throw new IllegalStateException("we need to update sendGuaranteed to support partial send");
-        
+        if (_log.shouldLog(Log.DEBUG)) _log.debug("message compressed");
         // we always send as guaranteed (so we get the session keys/tags acked), 
         // but only block until the appropriate event has been reached (guaranteed
         // success or accepted).  we may want to break this out into a seperate
@@ -111,10 +112,12 @@ class I2PSessionImpl2 extends I2PSessionImpl {
     private boolean sendBestEffort(Destination dest, byte payload[], SessionKey keyUsed, Set tagsSent)
                     throws I2PSessionException {
         long begin = _context.clock().now();
-        
+        if (_log.shouldLog(Log.DEBUG)) _log.debug("begin sendBestEffort");
         SessionKey key = _context.sessionKeyManager().getCurrentKey(dest.getPublicKey());
+        if (_log.shouldLog(Log.DEBUG)) _log.debug("key fetched");
         if (key == null) key = _context.sessionKeyManager().createSession(dest.getPublicKey());
         SessionTag tag = _context.sessionKeyManager().consumeNextAvailableTag(dest.getPublicKey(), key);
+        if (_log.shouldLog(Log.DEBUG)) _log.debug("tag consumed");
         Set sentTags = null;
         int oldTags = _context.sessionKeyManager().getAvailableTags(dest.getPublicKey(), key);
         long availTimeLeft = _context.sessionKeyManager().getAvailableTimeLeft(dest.getPublicKey(), key);
@@ -151,7 +154,10 @@ class I2PSessionImpl2 extends I2PSessionImpl {
             sentTags.addAll(tagsSent);
         }
 
+        if (_log.shouldLog(Log.DEBUG)) _log.debug("before creating nonce");
+        
         long nonce = _context.random().nextInt(Integer.MAX_VALUE);
+        if (_log.shouldLog(Log.DEBUG)) _log.debug("before sync state");
         MessageState state = new MessageState(nonce, getPrefix());
         state.setKey(key);
         state.setTags(sentTags);
@@ -171,6 +177,7 @@ class I2PSessionImpl2 extends I2PSessionImpl {
             }
         }
 
+        if (_log.shouldLog(Log.DEBUG)) _log.debug("before sync state");
         long beforeSendingSync = _context.clock().now();
         long inSendingSync = 0;
         synchronized (_sendingStates) {

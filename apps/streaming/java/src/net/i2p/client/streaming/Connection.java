@@ -892,13 +892,15 @@ public class Connection {
                     _context.sessionKeyManager().failTags(_remotePeer.getPublicKey());
                 }
                 
-                if (_log.shouldLog(Log.WARN))
-                    _log.warn("Resend packet " + _packet + " time " + numSends + 
-                              " activeResends: " + _activeResends + 
-                              " (wsize "
-                              + newWindowSize + " lifetime " 
-                              + (_context.clock().now() - _packet.getCreatedOn()) + "ms)");
-                _outboundQueue.enqueue(_packet);
+                if (numSends - 1 <= _options.getMaxResends()) {
+                    if (_log.shouldLog(Log.WARN))
+                        _log.warn("Resend packet " + _packet + " time " + numSends + 
+                                  " activeResends: " + _activeResends + 
+                                  " (wsize "
+                                  + newWindowSize + " lifetime " 
+                                  + (_context.clock().now() - _packet.getCreatedOn()) + "ms)");
+                    _outboundQueue.enqueue(_packet);
+                }
                 
                 _lastSendTime = _context.clock().now();
                 
@@ -911,7 +913,7 @@ public class Connection {
                     return;
                 }
                 
-                if (numSends > _options.getMaxResends()) {
+                if (numSends - 1 > _options.getMaxResends()) {
                     if (_log.shouldLog(Log.DEBUG))
                         _log.debug("Too many resends");
                     _packet.cancelled();

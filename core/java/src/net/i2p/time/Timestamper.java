@@ -158,15 +158,12 @@ public class Timestamper implements Runnable {
      */
     private boolean queryTime(String serverList[]) throws IllegalArgumentException {
         long found[] = new long[_concurringServers];
-        long localTime = -1;
         long now = -1;
         long expectedDelta = 0;
         for (int i = 0; i < _concurringServers; i++) {
             try { Thread.sleep(10*1000); } catch (InterruptedException ie) {}
-            localTime = _context.clock().now();
             now = NtpClient.currentTime(serverList);
-            
-            long delta = now - localTime;
+            long delta = now - _context.clock().now();
             found[i] = delta;
             if (i == 0) {
                 if (Math.abs(delta) < MAX_VARIANCE) {

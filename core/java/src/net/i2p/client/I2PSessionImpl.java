@@ -504,12 +504,15 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
 
         long beforeSync = _context.clock().now();
         long inSync = 0;
-        
+        if (_log.shouldLog(Log.DEBUG)) _log.debug("before sync to write");
         try {
             synchronized (_out) {
                 inSync = _context.clock().now();
+                if (_log.shouldLog(Log.DEBUG)) _log.debug("before writeMessage");
                 message.writeMessage(_out);
+                if (_log.shouldLog(Log.DEBUG)) _log.debug("after writeMessage");
                 _out.flush();
+                if (_log.shouldLog(Log.DEBUG)) _log.debug("after flush");
             }
         } catch (I2CPMessageException ime) {
             throw new I2PSessionException(getPrefix() + "Error writing out the message", ime);

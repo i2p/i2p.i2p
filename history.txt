@@ -1,4 +1,16 @@
-$Id: history.txt,v 1.171 2005/03/17 17:14:31 jrandom Exp $
+$Id: history.txt,v 1.172 2005/03/18 03:48:00 jrandom Exp $
+
+* 2005-03-18  0.5.0.3 released
+
+2005-03-18  jrandom
+    * Minor tweak to the timestamper to help reduce small skews
+    * Adjust the stats published to include only the relevent ones
+    * Only show the currently used speed calculation on the profile page
+    * Allow the full max # resends to be sent, rather than piggybacking the
+      RESET packet along side the final resend (duh)
+    * Add irc.postman.i2p to the default list of IRC servers for new installs
+    * Drop support for routers running 0.5 or 0.5.0.1 while maintaining 
+      backwards compatability for users running 0.5.0.2.
 
 2005-03-18  jrandom
     * Eepproxy Fix for corrupted HTTP headers (thanks nickster!)

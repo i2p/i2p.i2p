@@ -102,24 +102,23 @@ public class StatisticsManager implements Service {
             stats.putAll(_context.profileManager().summarizePeers(_publishedStats));
 
             includeThroughput(stats);
-            includeRate("router.invalidMessageTime", stats, new long[] { 10*60*1000, 3*60*60*1000 });
+            includeRate("router.invalidMessageTime", stats, new long[] { 10*60*1000 });
             includeRate("router.duplicateMessageId", stats, new long[] { 24*60*60*1000 });
             includeRate("tunnel.duplicateIV", stats, new long[] { 24*60*60*1000 });
-            includeRate("tunnel.fragmentedComplete", stats, new long[] { 10*60*1000, 3*60*60*1000 });
             includeRate("tunnel.fragmentedDropped", stats, new long[] { 10*60*1000, 3*60*60*1000 });
             includeRate("tunnel.fullFragments", stats, new long[] { 10*60*1000, 3*60*60*1000 });
             includeRate("tunnel.smallFragments", stats, new long[] { 10*60*1000, 3*60*60*1000 });
-            includeRate("tunnel.testFailedTime", stats, new long[] { 60*60*1000, 3*60*60*1000 });
-            includeRate("tunnel.dispatchOutboundTime", stats, new long[] { 60*60*1000 });
-            includeRate("tunnel.dispatchGatewayTime", stats, new long[] { 60*60*1000 });
-            includeRate("tunnel.dispatchDataTime", stats, new long[] { 60*60*1000 });
-            includeRate("tunnel.buildFailure", stats, new long[] { 10*60*1000, 60*60*1000 });
-            includeRate("tunnel.buildSuccess", stats, new long[] { 10*60*1000, 60*60*1000 });
+            includeRate("tunnel.testFailedTime", stats, new long[] { 60*60*1000 });
+            
+            includeRate("tunnel.buildFailure", stats, new long[] { 60*60*1000 });
+            includeRate("tunnel.buildSuccess", stats, new long[] { 60*60*1000 });
             
             includeRate("router.throttleTunnelProbTestSlow", stats, new long[] { 60*60*1000 });
             includeRate("router.throttleTunnelProbTooFast", stats, new long[] { 60*60*1000 });
             includeRate("router.throttleTunnelProcessingTime1m", stats, new long[] { 60*60*1000 });
-            
+
+            includeRate("router.fastPeers", stats, new long[] { 60*60*1000 });
+
             includeRate("clock.skew", stats, new long[] { 10*60*1000, 3*60*60*1000, 24*60*60*1000 });
             
             includeRate("transport.sendProcessingTime", stats, new long[] { 60*60*1000 });

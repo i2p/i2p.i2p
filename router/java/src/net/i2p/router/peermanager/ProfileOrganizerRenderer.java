@@ -111,7 +111,8 @@ class ProfileOrganizerRenderer {
             if (isIntegrated) buf.append(", Integrated");
             
             buf.append("<td align=\"right\">").append(num(prof.getSpeedValue()));
-            buf.append('/').append(num(prof.getOldSpeedValue())).append("</td>");
+            //buf.append('/').append(num(prof.getOldSpeedValue()));
+            buf.append("</td>");
             buf.append("<td align=\"right\">").append(num(prof.getCapacityValue())).append("</td>");
             buf.append("<td align=\"right\">").append(num(prof.getIntegrationValue())).append("</td>");
             buf.append("<td align=\"right\">").append(prof.getIsFailing()).append("</td>");
