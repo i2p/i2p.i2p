@@ -87,6 +87,7 @@ public class OutboundClientMessageJob extends JobImpl {
         ctx.statManager().createFrequencyStat("client.sendMessageFailFrequency", "How often does a client fail to send a message?", "Client Messages", new long[] { 60*1000l, 60*60*1000l, 24*60*60*1000l });
         ctx.statManager().createRateStat("client.sendMessageSize", "How large are messages sent by the client?", "Client Messages", new long[] { 60*1000l, 60*60*1000l, 24*60*60*1000l });
         ctx.statManager().createRateStat("client.sendAttemptAverage", "How many different tunnels do we have to try when sending a client message?", "Client Messages", new long[] { 60*1000l, 60*60*1000l, 24*60*60*1000l });
+        ctx.statManager().createRateStat("client.sendAckTime", "How long does it take to get an ACK back from a message?", "Client Messages", new long[] { 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
         
         long timeoutMs = OVERALL_TIMEOUT_MS_DEFAULT;
         
@@ -606,6 +607,7 @@ public class OutboundClientMessageJob extends JobImpl {
             _context.clientManager().messageDeliveryStatusUpdate(_status.getFrom(), msgId, true);
             _lease.setNumSuccess(_lease.getNumSuccess()+1);
             
+            _context.statManager().addRateData("client.sendAckTime", sendTime, 0);
             _context.statManager().addRateData("client.sendMessageSize", _status.getMessage().getPayload().getSize(), sendTime);
             _context.statManager().addRateData("client.sendAttemptAverage", _status.getNumSent(), sendTime);
         }

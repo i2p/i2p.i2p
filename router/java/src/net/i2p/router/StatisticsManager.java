@@ -111,6 +111,7 @@ public class StatisticsManager implements Service {
             includeRate("netDb.successPeers", stats, new long[] { 60*60*1000 });
             includeRate("transport.receiveMessageSize", stats, new long[] { 5*60*1000, 60*60*1000 });
             includeRate("transport.sendMessageSize", stats, new long[] { 5*60*1000, 60*60*1000 });
+            includeRate("client.sendAckTime", stats, new long[] { 60*60*1000, 24*60*60*1000l }, true);
             stats.setProperty("stat_uptime", DataHelper.formatDuration(_context.router().getUptime()));
             stats.setProperty("stat__rateKey", "avg;maxAvg;pctLifetime;[sat;satLim;maxSat;maxSatLim;][num;lifetimeFreq;maxFreq]");
             _log.debug("Publishing peer rankings");
@@ -127,6 +128,15 @@ public class StatisticsManager implements Service {
         includeRate(rateName, stats, null);
     }
     private void includeRate(String rateName, Properties stats, long selectedPeriods[]) {
+        includeRate(rateName, stats, selectedPeriods, false);
+    }
+    /**
+     * @param fudgeQuantity the data being published in this stat is too sensitive to, uh
+     *                      publish, so we're kludge the quantity (allowing the fairly safe
+     *                      publication of the average values
+     */
+    private void includeRate(String rateName, Properties stats, long selectedPeriods[], 
+                             boolean fudgeQuantity) {
         RateStat rate = _context.statManager().getRate(rateName);
         if (rate == null) return;
         long periods[] = rate.getPeriods();
@@ -144,11 +154,11 @@ public class StatisticsManager implements Service {
 
             Rate curRate = rate.getRate(periods[i]);
             if (curRate == null) continue;
-            stats.setProperty("stat_" + rateName + '.' + getPeriod(curRate), renderRate(curRate));
+            stats.setProperty("stat_" + rateName + '.' + getPeriod(curRate), renderRate(curRate, fudgeQuantity));
         }
     }
     
-    private static String renderRate(Rate rate) {
+    private static String renderRate(Rate rate, boolean fudgeQuantity) {
         StringBuffer buf = new StringBuffer(255);
         buf.append(num(rate.getAverageValue())).append(';');
         buf.append(num(rate.getExtremeAverageValue())).append(';');
@@ -159,13 +169,21 @@ public class StatisticsManager implements Service {
             buf.append(pct(rate.getExtremeEventSaturation())).append(';');
             buf.append(num(rate.getExtremeSaturationLimit())).append(';');
         }
-        buf.append(num(rate.getLastEventCount())).append(';');
         long numPeriods = rate.getLifetimePeriods();
-        if (numPeriods > 0) {
-            double avgFrequency = rate.getLifetimeEventCount() / (double)numPeriods;
-            double peakFrequency = rate.getExtremeEventCount();
-            buf.append(num(avgFrequency)).append(';');
-            buf.append(num(rate.getExtremeEventCount())).append(';');
+        if (fudgeQuantity) {
+            buf.append("666").append(';');
+            if (numPeriods > 0) {
+                buf.append("666").append(';');
+                buf.append("666").append(';');
+            }
+        } else {
+            buf.append(num(rate.getLastEventCount())).append(';');
+            if (numPeriods > 0) {
+                double avgFrequency = rate.getLifetimeEventCount() / (double)numPeriods;
+                double peakFrequency = rate.getExtremeEventCount();
+                buf.append(num(avgFrequency)).append(';');
+                buf.append(num(rate.getExtremeEventCount())).append(';');
+            }
         }
         return buf.toString();
     }
