@@ -1,4 +1,4 @@
 #!/bin/sh
 cd ##_scripts_installdir##
-java -jar lib/fetchseeds.jar netDb
+java -jar lib/fetchseeds.jar netDb http://dev.i2p.net/i2pdb/
 echo Router network database reseeded

@@ -79,7 +79,7 @@ public class FetchSeeds {
     public static void main(String[] args) {
         switch (args.length) {
         case 1:
-            fetchSeeds(new File(args[0]), "http://i2p.dnsalias.net/i2pdb/");
+            fetchSeeds(new File(args[0]), "http://dev.i2p.net/i2pdb/");
             return;
         case 2:
             fetchSeeds(new File(args[0]), args[1]);
@@ -93,7 +93,7 @@ public class FetchSeeds {
             System.out.println("Usage: FetchSeeds <outDir>");
             System.out.println("    or FetchSeeds <outDir> <seedURL>");
             System.out.println("    or FetchSeeds <outDir> <seedURL> <secondsBetweenFetch>");
-            System.out.println("The default seedURL is http://i2p.dnsalias.net/i2pdb/");
+            System.out.println("The default seedURL is http://dev.i2p.net/i2pdb/");
             return;
         }
     }

@@ -325,6 +325,10 @@ public abstract class Install {
         _i2cpPort = ((Integer)_answers.get("i2cpPort")).intValue();
         _inBPS = ((Integer)_answers.get("inBPS")).intValue();
         _outBPS = ((Integer)_answers.get("outBPS")).intValue();
+        long num = new java.util.Random().nextLong();
+        if (num < 0)
+            num = 0 - num;
+        _answers.put("timestamperPassword", new Long(num));
     }
 
     private void useTemplate(String templateName, File destFile) {
