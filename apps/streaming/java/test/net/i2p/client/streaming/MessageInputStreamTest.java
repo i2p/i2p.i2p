@@ -25,7 +25,7 @@ public class MessageInputStreamTest {
         byte orig[] = new byte[32*1024];
         _context.random().nextBytes(orig);
         
-        MessageInputStream in = new MessageInputStream();
+        MessageInputStream in = new MessageInputStream(_context);
         for (int i = 0; i < 32; i++) {
             byte msg[] = new byte[1024];
             System.arraycopy(orig, i*1024, msg, 0, 1024);
@@ -50,7 +50,7 @@ public class MessageInputStreamTest {
         byte orig[] = new byte[32*1024];
         _context.random().nextBytes(orig);
         
-        MessageInputStream in = new MessageInputStream();
+        MessageInputStream in = new MessageInputStream(_context);
         ArrayList order = new ArrayList(32);
         for (int i = 0; i < 32; i++)
             order.add(new Integer(i));

@@ -2,6 +2,7 @@ package net.i2p.client.streaming;
 
 import java.util.Arrays;
 import net.i2p.I2PAppContext;
+import net.i2p.data.Base64;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
 import net.i2p.data.Signature;
@@ -42,6 +43,9 @@ import net.i2p.data.SigningPrivateKey;
  * to sign the entire header and payload with the space in the options 
  * for the signature being set to all zeroes.</p>
  *
+ * <p>If the sequenceNum is 0 and the SYN is not set, this is a plain ACK 
+ * packet that should not be ACKed</p>
+ *
  */
 public class Packet {
     private byte _sendStreamId[];
@@ -64,11 +68,11 @@ public class Packet {
      * synchronize packet)
      *
      */
-    public static final byte RECEIVE_STREAM_ID_UNKNOWN[] = new byte[] { 0x00, 0x00, 0x00, 0x00 };
+    public static final byte STREAM_ID_UNKNOWN[] = new byte[] { 0x00, 0x00, 0x00, 0x00 };
     
     /**
      * This packet is creating a new socket connection (if the receiveStreamId
-     * is RECEIVE_STREAM_ID_UNKNOWN) or it is acknowledging a request to 
+     * is STREAM_ID_UNKNOWN) or it is acknowledging a request to 
      * create a connection and in turn is accepting the socket.
      *
      */
@@ -122,19 +126,44 @@ public class Packet {
      *
      */
     public static final int FLAG_PROFILE_INTERACTIVE = (1 << 8);
+    /**
+     * If set, this packet is a ping (if sendStreamId is set) or a 
+     * ping reply (if receiveStreamId is set).
+     */
+    public static final int FLAG_ECHO = (1 << 9);
+    
+    public static final int DEFAULT_MAX_SIZE = 32*1024;
     
     /** what stream is this packet a part of? */
-    public byte[] getSendStreamId() { return _sendStreamId; }
-    public void setSendStreamId(byte[] id) { _sendStreamId = id; }
+    public byte[] getSendStreamId() { 
+        if ( (_sendStreamId == null) || (DataHelper.eq(_sendStreamId, STREAM_ID_UNKNOWN)) )
+            return null;
+        else
+            return _sendStreamId; 
+    }
+    public void setSendStreamId(byte[] id) { 
+        _sendStreamId = id; 
+        if ( (id != null) && (DataHelper.eq(id, STREAM_ID_UNKNOWN)) )
+            _sendStreamId = null;
+    }
     
     /** 
      * what is the stream replies should be sent on?  if the 
      * connection is still being built, this should be 
-     * {@see #RECEIVE_STREAM_ID_UNKNOWN}.
+     * null.
      *
      */
-    public byte[] getReceiveStreamId() { return _receiveStreamId; }
-    public void setReceiveStreamId(byte[] id) { _receiveStreamId = id; }
+    public byte[] getReceiveStreamId() { 
+        if ( (_receiveStreamId == null) || (DataHelper.eq(_receiveStreamId, STREAM_ID_UNKNOWN)) )
+            return null;
+        else
+            return _receiveStreamId; 
+    }
+    public void setReceiveStreamId(byte[] id) { 
+        _receiveStreamId = id; 
+        if ( (id != null) && (DataHelper.eq(id, STREAM_ID_UNKNOWN)) )
+            _receiveStreamId = null;
+    }
     
     /** 0-indexed sequence number for this Packet in the sendStream */
     public long getSequenceNum() { return _sequenceNum; }
@@ -173,14 +202,27 @@ public class Packet {
     /** is a particular flag set on this packet? */
     public boolean isFlagSet(int flag) { return 0 != (_flags & flag); }
     public void setFlag(int flag) { _flags |= flag; }
+    public void setFlag(int flag, boolean set) { 
+        if (set)
+            _flags |= flag; 
+        else
+            _flags &= ~flag;
+    }
 
     /** the signature on the packet (only included if the flag for it is set) */
     public Signature getOptionalSignature() { return _optionSignature; }
-    public void setOptionalSignature(Signature sig) { _optionSignature = sig; }
+    public void setOptionalSignature(Signature sig) { 
+        setFlag(FLAG_SIGNATURE_INCLUDED, sig != null);
+        _optionSignature = sig; 
+    }
 
     /** the sender of the packet (only included if the flag for it is set) */
     public Destination getOptionalFrom() { return _optionFrom; }
-    public void setOptionalFrom(Destination from) { _optionFrom = from; }
+    public void setOptionalFrom(Destination from) { 
+        setFlag(FLAG_FROM_INCLUDED, from != null);
+        if (from == null) throw new RuntimeException("from is null!?");
+        _optionFrom = from; 
+    }
     
     /** 
      * How many milliseconds the sender of this packet wants the recipient
@@ -188,14 +230,20 @@ public class Packet {
      * set) 
      */
     public int getOptionalDelay() { return _optionDelay; }
-    public void setOptionalDelay(int delayMs) { _optionDelay = delayMs; }
+    public void setOptionalDelay(int delayMs) { 
+        setFlag(FLAG_DELAY_REQUESTED, delayMs > 0);
+        _optionDelay = delayMs; 
+    }
     
-    /** 
+    /**
      * What is the largest payload the sender of this packet wants to receive?
      *
      */
     public int getOptionalMaxSize() { return _optionMaxSize; }
-    public void setOptionalMaxSize(int numBytes) { _optionMaxSize = numBytes; }
+    public void setOptionalMaxSize(int numBytes) { 
+        setFlag(FLAG_MAX_PACKET_SIZE_INCLUDED, numBytes > 0);
+        _optionMaxSize = numBytes; 
+    }
     
     /**
      * Write the packet to the buffer (starting at the offset) and return
@@ -212,13 +260,19 @@ public class Packet {
      */
     private int writePacket(byte buffer[], int offset, boolean includeSig) throws IllegalStateException {
         int cur = offset;
-        System.arraycopy(_sendStreamId, 0, buffer, cur, _sendStreamId.length);
-        cur += _sendStreamId.length;
-        System.arraycopy(_receiveStreamId, 0, buffer, cur, _receiveStreamId.length);
-        cur += _receiveStreamId.length;
-        DataHelper.toLong(buffer, cur, 4, _sequenceNum);
+        if (_sendStreamId != null)
+            System.arraycopy(_sendStreamId, 0, buffer, cur, _sendStreamId.length);
+        else
+            System.arraycopy(STREAM_ID_UNKNOWN, 0, buffer, cur, STREAM_ID_UNKNOWN.length);
         cur += 4;
-        DataHelper.toLong(buffer, cur, 4, _ackThrough);
+        if (_receiveStreamId != null)
+            System.arraycopy(_receiveStreamId, 0, buffer, cur, _receiveStreamId.length);
+        else
+            System.arraycopy(STREAM_ID_UNKNOWN, 0, buffer, cur, STREAM_ID_UNKNOWN.length);
+        cur += 4;
+        DataHelper.toLong(buffer, cur, 4, _sequenceNum > 0 ? _sequenceNum : 0);
+        cur += 4;
+        DataHelper.toLong(buffer, cur, 4, _ackThrough > 0 ? _ackThrough : 0);
         cur += 4;
         if (_nacks != null) {
             DataHelper.toLong(buffer, cur, 1, _nacks.length);
@@ -231,7 +285,7 @@ public class Packet {
             DataHelper.toLong(buffer, cur, 1, 0);
             cur++;
         }
-        DataHelper.toLong(buffer, cur, 1, _resendDelay);
+        DataHelper.toLong(buffer, cur, 1, _resendDelay > 0 ? _resendDelay : 0);
         cur++;
         DataHelper.toLong(buffer, cur, 2, _flags);
         cur += 2;
@@ -250,21 +304,21 @@ public class Packet {
         cur += 2;
         
         if (isFlagSet(FLAG_DELAY_REQUESTED)) {
-            DataHelper.toLong(buffer, cur, 1, _optionDelay);
+            DataHelper.toLong(buffer, cur, 1, _optionDelay > 0 ? _optionDelay : 0);
             cur++;
         }
         if (isFlagSet(FLAG_FROM_INCLUDED)) {
             cur += _optionFrom.writeBytes(buffer, cur);
         }
         if (isFlagSet(FLAG_MAX_PACKET_SIZE_INCLUDED)) {
-            DataHelper.toLong(buffer, cur, 2, _optionMaxSize);
+            DataHelper.toLong(buffer, cur, 2, _optionMaxSize > 0 ? _optionMaxSize : DEFAULT_MAX_SIZE);
             cur += 2;
         }
         if (isFlagSet(FLAG_SIGNATURE_INCLUDED)) {
             if (includeSig)
                 System.arraycopy(_optionSignature.getData(), 0, buffer, cur, Signature.SIGNATURE_BYTES);
             else // we're signing (or validating)
-                Arrays.fill(buffer, cur, Signature.SIGNATURE_BYTES, (byte)0x0);
+                Arrays.fill(buffer, cur, cur+Signature.SIGNATURE_BYTES, (byte)0x0);
             cur += Signature.SIGNATURE_BYTES;
         }
         
@@ -272,10 +326,46 @@ public class Packet {
             System.arraycopy(_payload, 0, buffer, cur, _payload.length);
             cur += _payload.length;
         }
-        
+                
         return cur - offset;
     }
     
+    
+    /**
+     * how large would this packet be if we wrote it
+     */
+    public int writtenSize() throws IllegalStateException {
+        int size = 0;
+        size += _sendStreamId.length;
+        size += _receiveStreamId.length;
+        size += 4; // sequenceNum
+        size += 4; // ackThrough
+        if (_nacks != null) {
+			size++; // nacks length
+            size += 4 * _nacks.length;
+        } else {
+            size++; // nacks length
+        }
+        size++; // resendDelay
+        size += 2; // flags
+
+        if (isFlagSet(FLAG_DELAY_REQUESTED))
+            size += 1;
+        if (isFlagSet(FLAG_FROM_INCLUDED))
+            size += _optionFrom.size();
+        if (isFlagSet(FLAG_MAX_PACKET_SIZE_INCLUDED))
+            size += 2;
+        if (isFlagSet(FLAG_SIGNATURE_INCLUDED))
+            size += Signature.SIGNATURE_BYTES;
+        
+        size += 2; // option size
+        
+        if (_payload != null) {
+            size += _payload.length;
+        }
+        
+        return size;
+    }
     /**
      * Read the packet from the buffer (starting at the offset) and return
      * the number of bytes read.
@@ -337,10 +427,10 @@ public class Packet {
             cur += 2;
         }
         if (isFlagSet(FLAG_SIGNATURE_INCLUDED)) {
-            Signature sig = new Signature();
+            _optionSignature = new Signature();
             byte buf[] = new byte[Signature.SIGNATURE_BYTES];
             System.arraycopy(buffer, cur, buf, 0, Signature.SIGNATURE_BYTES);
-            sig.setData(buf);
+            _optionSignature.setData(buf);
             cur += Signature.SIGNATURE_BYTES;
         }
     }
@@ -355,6 +445,8 @@ public class Packet {
         if (!isFlagSet(FLAG_SIGNATURE_INCLUDED)) return false;
         if (_optionSignature == null) return false;
         
+        if (buffer == null)
+            buffer = new byte[writtenSize()];
         int size = writePacket(buffer, 0, false);
         return ctx.dsa().verifySignature(_optionSignature, buffer, 0, size, from.getSigningPublicKey());
     }
@@ -385,5 +477,34 @@ public class Packet {
                               + (isFlagSet(FLAG_MAX_PACKET_SIZE_INCLUDED) ? 2 : 0);
         System.arraycopy(_optionSignature.getData(), 0, buffer, signatureOffset, Signature.SIGNATURE_BYTES);
         return size;
+    }
+    
+    public String toString() {
+        return "Packet " + _sequenceNum + " on " + toId(_sendStreamId) 
+               + "<-->" + toId(_receiveStreamId) + ": " + toFlagString() 
+               + " ACK through " + _ackThrough 
+               + " size: " + (_payload != null ? _payload.length : 0);
+    }
+    
+    private static final String toId(byte id[]) {
+        if (id == null)
+            return Base64.encode(STREAM_ID_UNKNOWN);
+        else
+            return Base64.encode(id);
+    }
+    
+    private final String toFlagString() {
+        StringBuffer buf = new StringBuffer(32);
+        if (isFlagSet(FLAG_CLOSE)) buf.append(" CLOSE");
+        if (isFlagSet(FLAG_DELAY_REQUESTED)) buf.append(" DELAY");
+        if (isFlagSet(FLAG_ECHO)) buf.append(" ECHO");
+        if (isFlagSet(FLAG_FROM_INCLUDED)) buf.append(" FROM");
+        if (isFlagSet(FLAG_MAX_PACKET_SIZE_INCLUDED)) buf.append(" MAXSIZE");
+        if (isFlagSet(FLAG_PROFILE_INTERACTIVE)) buf.append(" INTERACTIVE");
+        if (isFlagSet(FLAG_RESET)) buf.append(" RESET");
+        if (isFlagSet(FLAG_SIGNATURE_INCLUDED)) buf.append(" SIG");
+        if (isFlagSet(FLAG_SIGNATURE_REQUESTED)) buf.append(" SIGREQ");
+        if (isFlagSet(FLAG_SYNCHRONIZE)) buf.append(" SYN");
+        return buf.toString();
     }
 }
