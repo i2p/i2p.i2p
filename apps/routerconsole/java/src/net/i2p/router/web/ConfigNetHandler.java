@@ -145,11 +145,16 @@ public class ConfigNetHandler extends FormHandler {
             }
 
             int fetched = 0;
+            int errors = 0;
             for (Iterator iter = urls.iterator(); iter.hasNext(); ) {
-                fetchSeed(seedURL, (String)iter.next());
-                fetched++;
+                try {
+                    fetchSeed(seedURL, (String)iter.next());
+                    fetched++;
+                } catch (Exception e) {
+                    errors++;
+                }
             }
-            addFormNotice("Reseeded with " + fetched + " peers");
+            addFormNotice("Reseeded with " + fetched + " peers (and " + errors + " failures)");
         } catch (Throwable t) {
             _context.logManager().getLog(ConfigNetHandler.class).error("Error reseeding", t);
             addFormError("Error reseeding (RESEED_EXCEPTION)");
