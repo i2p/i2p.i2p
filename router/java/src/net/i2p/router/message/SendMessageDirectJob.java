@@ -19,6 +19,7 @@ import net.i2p.router.JobImpl;
 import net.i2p.router.MessageSelector;
 import net.i2p.router.OutNetMessage;
 import net.i2p.router.ReplyJob;
+import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
 import net.i2p.util.Log;
 
@@ -75,10 +76,12 @@ public class SendMessageDirectJob extends JobImpl {
                           + " [expiring in " + (_expiration-now) + "]", getAddedBy());
         }
 
-        if (_expiration < now) {
+        if (_expiration < now - Router.CLOCK_FUDGE_FACTOR) {
             if (_log.shouldLog(Log.ERROR))
                 _log.error("Timed out sending message " + _message + " directly (expiration = " 
                            + new Date(_expiration) + ") to " + _targetHash.toBase64(), getAddedBy());
+            if (_onFail != null)
+                getContext().jobQueue().addJob(_onFail);
             return;
         }
         if (_router != null) {
@@ -104,6 +107,8 @@ public class SendMessageDirectJob extends JobImpl {
                         _log.error("Unable to find the router to send to: " + _targetHash 
                                    + " after searching for " + (getContext().clock().now()-_searchOn) 
                                    + "ms, message: " + _message, getAddedBy());
+                    if (_onFail != null)
+                        getContext().jobQueue().addJob(_onFail);
                 }
             }
         }

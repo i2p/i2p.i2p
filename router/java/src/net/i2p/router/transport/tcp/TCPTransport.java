@@ -444,6 +444,7 @@ public class TCPTransport extends TransportImpl {
                 con.closeConnection();
                 // remove the old ref, since they likely just created a new identity
                 _context.netDb().fail(target.getIdentity().getHash());
+                _context.shitlist().shitlistRouter(target.getIdentity().getHash());
                 return false;
             } else {
                 if (_log.shouldLog(Log.DEBUG))

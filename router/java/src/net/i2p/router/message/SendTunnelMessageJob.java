@@ -32,6 +32,7 @@ import net.i2p.router.MessageReceptionInfo;
 import net.i2p.router.MessageSelector;
 import net.i2p.router.OutNetMessage;
 import net.i2p.router.ReplyJob;
+import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
 import net.i2p.router.TunnelInfo;
 import net.i2p.util.Log;
@@ -97,6 +98,8 @@ public class SendTunnelMessageJob extends JobImpl {
                 if (_log.shouldLog(Log.ERROR))
                     _log.error("Someone br0ke us.  where is this message supposed to go again?", 
                                getAddedBy());
+                if (_onFailure != null)
+                    getContext().jobQueue().addJob(_onFailure);
                 return;
             } else {
                 forwardToGateway();
@@ -145,9 +148,13 @@ public class SendTunnelMessageJob extends JobImpl {
         } catch (IOException ioe) {
             if (_log.shouldLog(Log.ERROR))
                 _log.error("Error writing out the tunnel message to send to the tunnel", ioe);
+            if (_onFailure != null)
+                getContext().jobQueue().addJob(_onFailure);
         } catch (DataFormatException dfe) {
             if (_log.shouldLog(Log.ERROR))
                 _log.error("Error writing out the tunnel message to send to the tunnel", dfe);
+            if (_onFailure != null)
+                getContext().jobQueue().addJob(_onFailure);
         }
         return;
     }
@@ -179,7 +186,7 @@ public class SendTunnelMessageJob extends JobImpl {
                 _log.debug("Tunnel message created: " + msg + " out of encrypted message: " 
                            + _message);
             long now = getContext().clock().now();
-            if (_expiration < now) {
+            if (_expiration < now - Router.CLOCK_FUDGE_FACTOR) {
                 if (_log.shouldLog(Log.ERROR))
                     _log.error("We are the gateway to " + info.getTunnelId().getTunnelId() 
                                + " and the message " + msg.getUniqueId() + " is valid, but it has timed out (" 
@@ -468,7 +475,7 @@ public class SendTunnelMessageJob extends JobImpl {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Why are we trying to send a " + _message.getClass().getName() 
                            + " message with " + (_expiration-now) + "ms left?", getAddedBy());
-            if (timeLeft < 0) {
+            if (timeLeft + Router.CLOCK_FUDGE_FACTOR < 0) {
                 _log.error("Timed out honoring request to send a " + _message.getClass().getName() 
                            + " message remotely [" + _message.getUniqueId() + "] expired "
                            + (0-timeLeft) + "ms ago");
