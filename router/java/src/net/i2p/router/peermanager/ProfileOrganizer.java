@@ -105,6 +105,7 @@ public class ProfileOrganizer {
                 throw new ClassCastException("Only profiles can be compared - lhs = " + lhs + " rhs = " + rhs);
             PeerProfile left = (PeerProfile)lhs;
             PeerProfile right= (PeerProfile)rhs;
+            
             // note below that yes, we are treating left and right backwards.  see: classname
             int diff = (int)(right.getReliabilityValue() - left.getReliabilityValue());
             // we can't just return that, since the set would b0rk on equal values (just because two profiles
@@ -317,6 +318,10 @@ public class ProfileOrganizer {
             _notFailingPeers.clear();
             _reliablePeers.clear();
             _fastAndReliablePeers.clear();
+    
+            Set reordered = new TreeSet(InverseReliabilityComparator._comparator);
+            reordered.addAll(_strictReliabilityOrder);
+            _strictReliabilityOrder = reordered;
             
             calculateThresholds(allPeers);
             
@@ -324,11 +329,6 @@ public class ProfileOrganizer {
                 PeerProfile profile = (PeerProfile)iter.next();
                 locked_placeProfile(profile);
             }
-            
-            Set reordered = new TreeSet(InverseReliabilityComparator._comparator);
-            reordered.addAll(_strictReliabilityOrder);
-            
-            _strictReliabilityOrder = reordered;
             
             locked_unfailAsNecessary();
             locked_promoteFastAsNecessary();
@@ -415,58 +415,57 @@ public class ProfileOrganizer {
     
     /**
      * Update the thresholds based on the profiles in this set.  currently
-     * implements the thresholds based on a simple average (ignoring failing values),
-     * with integration and speed being directly equal to the simple average as
-     * calculated over all reliable and active non-failing peers, while the reliability threshold
-     * is half the simple average of active non-failing peers.  Lots of room to tune this.
-     * should this instead be top 10%?  top 90%?  top 50?  etc
+     * implements the reliability threshold based on the median reliability (ignoring
+     * failing peers) with integration and speed thresholds being derived from the average
+     * of the active reliable peers.
      *
      */
     private void calculateThresholds(Set allPeers) {
-        double totalReliability = 0;
-        int numActive = 0;
-        
+        Set reordered = new TreeSet(InverseReliabilityComparator._comparator);
         for (Iterator iter = allPeers.iterator(); iter.hasNext(); ) {
             PeerProfile profile = (PeerProfile)iter.next();
             
             if (_us.equals(profile.getPeer())) continue;
             
-            // only take into account peers that we're talking to within the last
-            // few minutes
-            if ( (!profile.getIsActive()) || (profile.getIsFailing()) )
+            // only take into account peers that aren't failing
+            if (profile.getIsFailing())
                 continue;
-            
-            numActive++;
-            
-            if (profile.getReliabilityValue() > 0)
-                totalReliability += profile.getReliabilityValue();
-        }
-        _thresholdReliabilityValue = getReliabilityThresholdFactor() * avg(totalReliability, numActive);
         
-        // now derive the integration and speed thresholds based ONLY on the reliable
-        // and active peers
-        numActive = 0;
+            reordered.add(profile);
+        }
+        int numNotFailing = reordered.size();
+        // how many are in the "top half" of the reliability peers?
+        int topCount = 0;
+        if (numNotFailing != 0)
+            topCount = (int)(numNotFailing / 2);
+
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("top count is " + topCount + " out of " + numNotFailing);
+        
+        int numActive = 0;
         double totalIntegration = 0;
         double totalSpeed = 0;
-        
-        for (Iterator iter = allPeers.iterator(); iter.hasNext(); ) {
+        int i = 0;
+        for (Iterator iter = reordered.iterator(); iter.hasNext(); i++) {
             PeerProfile profile = (PeerProfile)iter.next();
-            
-            if (_us.equals(profile.getPeer())) continue;
-            
-            // only take into account peers that we're talking to within the last
-            // few minutes, who are reliable, AND who are not failing
-            if ( (!profile.getIsActive()) || (profile.getReliabilityValue() < _thresholdReliabilityValue) || (profile.getIsFailing()) )
-                continue;
-            
-            numActive++;
-            
-            if (profile.getIntegrationValue() > 0)
-                totalIntegration += profile.getIntegrationValue();
-            if (profile.getSpeedValue() > 0)
-                totalSpeed += profile.getSpeedValue();
+            if (i < topCount) {
+                if (profile.getIsActive()) {
+                    numActive++;
+                    if (profile.getIntegrationValue() > 0)
+                        totalIntegration += profile.getIntegrationValue();
+                    if (profile.getSpeedValue() > 0)
+                        totalSpeed += profile.getSpeedValue();
+                }
+            } else if (i == topCount) {
+                if (profile.getReliabilityValue() < 0)
+                    _thresholdReliabilityValue = 0;
+                else
+                    _thresholdReliabilityValue = profile.getReliabilityValue();
+                break;
+            } else {
+                break;
+            }
         }
-        
         
         _thresholdIntegrationValue = 1.0d * avg(totalIntegration, numActive);
         _thresholdSpeedValue       = 1.0d * avg(totalSpeed, numActive);
