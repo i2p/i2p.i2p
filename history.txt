@@ -1,4 +1,10 @@
-$Id: history.txt,v 1.17 2004/09/12 22:08:17 jrandom Exp $
+$Id: history.txt,v 1.18 2004/09/16 18:55:12 jrandom Exp $
+
+2004-09-21  jrandom
+    * Have two tiers of hosts.txt files - the standard "hosts.txt" and
+      the new "userhosts.txt".  Updates to I2P will only overwrite the former,
+      but values stored in the later take precedence.  Both are queried on
+      lookup.
 
 2004-09-16  jrandom
     * Refactor the TCP transport to deal with changing identities gracefully,

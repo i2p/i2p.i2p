@@ -10,7 +10,10 @@ package net.i2p.client.naming;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
+import java.util.StringTokenizer;
 
 import net.i2p.I2PAppContext;
 import net.i2p.data.Destination;
@@ -34,42 +37,58 @@ public class HostsTxtNamingService extends NamingService {
      * If this system property is specified, the tunnel will read the
      * given file for hostname=destKey values when resolving names
      */
-    public final static String PROP_HOSTS_FILE = "i2p.hostsfile";
+    public final static String PROP_HOSTS_FILE = "i2p.hostsfilelist";
 
     /** default hosts.txt filename */
-    public final static String DEFAULT_HOSTS_FILE = "hosts.txt";
+    public final static String DEFAULT_HOSTS_FILE = "userhosts.txt,hosts.txt";
 
     private final static Log _log = new Log(HostsTxtNamingService.class);
 
+    private List getFilenames() {
+        String list = _context.getProperty(PROP_HOSTS_FILE, DEFAULT_HOSTS_FILE);
+        StringTokenizer tok = new StringTokenizer(list, ",");
+        List rv = new ArrayList(tok.countTokens());
+        while (tok.hasMoreTokens())
+            rv.add(tok.nextToken());
+        return rv;
+    }
+        
     public Destination lookup(String hostname) {
-        // Try to look it up in hosts.txt 
-        // Reload file each time to catch changes.
-        // (and it's easier :P
-        String hostsfile = _context.getProperty(PROP_HOSTS_FILE, DEFAULT_HOSTS_FILE);
-        Properties hosts = new Properties();
-        FileInputStream fis = null;
-        try {
-            File f = new File(hostsfile);
-            if (f.canRead()) {
-                fis = new FileInputStream(f);
-                hosts.load(fis);
-            } else {
-                _log.error("Hosts file " + hostsfile + " does not exist.");
+        // check the list each time, reloading the file on each
+        // lookup
+        
+        List filenames = getFilenames();
+        for (int i = 0; i < filenames.size(); i++) { 
+            String hostsfile = (String)filenames.get(i);
+            Properties hosts = new Properties();
+            FileInputStream fis = null;
+            try {
+                File f = new File(hostsfile);
+                if ( (f.exists()) && (f.canRead()) ) {
+                    fis = new FileInputStream(f);
+                    hosts.load(fis);
+                    
+                    String key = hosts.getProperty(hostname);
+                    if ( (key != null) && (key.trim().length() > 0) ) {
+                        return lookupBase64(key);
+                    }
+                    
+                } else {
+                    _log.warn("Hosts file " + hostsfile + " does not exist.");
+                }
+            } catch (Exception ioe) {
+                _log.error("Error loading hosts file " + hostsfile, ioe);
+            } finally {
+                if (fis != null) try {
+                    fis.close();
+                } catch (IOException ioe) { // nop
+                }
             }
-        } catch (Exception ioe) {
-            _log.error("Error loading hosts file " + hostsfile, ioe);
-        } finally {
-            if (fis != null) try {
-                fis.close();
-            } catch (IOException ioe) { // nop
-            }
+            // not found, continue to the next file
         }
-        String res = hosts.getProperty(hostname);
-        // If we can't find name in hosts, assume it's a key.
-        if ((res == null) || (res.trim().length() == 0)) {
-            res = hostname;
-        }
-        return lookupBase64(res);
+        // If we can't find name in any of the hosts files, 
+        // assume it's a key.
+        return lookupBase64(hostname);
     }
 
     public String reverseLookup(Destination dest) {
