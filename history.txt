@@ -1,4 +1,8 @@
-$Id: history.txt,v 1.184 2005/04/01 06:28:07 jrandom Exp $
+$Id: history.txt,v 1.185 2005/04/01 08:29:27 jrandom Exp $
+
+2005-04-03  jrandom
+    * EepGet fix for open-ended HTTP fetches (such as the news.xml 
+      feeding the NewsFetcher)
 
 2005-04-01  jrandom
     * Allow editing I2PTunnel server instances with five digit ports 

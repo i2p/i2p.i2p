@@ -304,12 +304,16 @@ public class EepGet {
         readHeaders();
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Headers read completely, reading " + _bytesRemaining);
-
+        
+        boolean strictSize = (_bytesRemaining >= 0);
+            
         int remaining = (int)_bytesRemaining;
         byte buf[] = new byte[1024];
-        while (_keepFetching && remaining > 0) {
+        while (_keepFetching && ( (remaining > 0) || !strictSize )) {
             int toRead = buf.length;
-            int read = _proxyIn.read(buf, 0, (buf.length > remaining ? remaining : buf.length));
+            if (strictSize && toRead > remaining)
+                toRead = remaining;
+            int read = _proxyIn.read(buf, 0, toRead);
             if (read == -1)
                 break;
             _out.write(buf, 0, read);
