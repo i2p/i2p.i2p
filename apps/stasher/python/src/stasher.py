@@ -85,14 +85,25 @@ if sys.platform == 'win32':
 from StringIO import StringIO
 from pdb import set_trace
 
-import bencode
+try:
+    import bencode
+except:
+    print "The bencode module is missing from your python installation."
+    print "Are you sure you installed Stasher correctly?"
+    sys.exit(1)
 
-import i2p.socket
-import i2p.select
-
-import i2p.pylib
-SocketServer = i2p.pylib.SocketServer
-socket = i2p.pylib.socket
+try:
+    import i2p.socket
+    import i2p.select
+    import i2p.pylib
+    SocketServer = i2p.pylib.SocketServer
+    socket = i2p.pylib.socket
+except:
+    print "You don't appear to have the I2P Python modules installed."
+    print "Not good. Stasher totally needs them."
+    print "Please to to i2p/apps/sam/python in your I2P cvs tree, and"
+    print "install the core I2P python modules first"
+    sys.exit(1)
 
 #@-node:imports
 #@+node:constants
