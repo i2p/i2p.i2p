@@ -198,6 +198,14 @@ public class I2PSocketManagerFull implements I2PSocketManager {
         _connectionManager.disconnectAllHard();
         _connectionManager.setAllowIncomingConnections(false);
         // should we destroy the _session too?
+        // yes, since the old lib did (and SAM wants it to, and i dont know why not)
+        if ( (_session != null) && (!_session.isClosed()) ) {
+            try {
+                _session.destroySession();
+            } catch (I2PSessionException ise) {
+                _log.warn("Unable to destroy the session", ise);
+            }
+        }
     }
 
     /**

@@ -21,7 +21,9 @@ public class I2PSocketFull implements I2PSocket {
     public void close() throws IOException {
         if (_connection == null) return;
         if (_connection.getIsConnected()) {
-            _connection.getOutputStream().close();
+            OutputStream out = _connection.getOutputStream();
+            if (out != null)
+                out.close();
             _connection.disconnect(true);
         } else {
             //throw new IOException("Not connected");

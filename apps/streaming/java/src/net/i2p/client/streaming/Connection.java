@@ -178,6 +178,8 @@ public class Connection {
     }
     
     void sendPacket(PacketLocal packet) {
+        if (packet == null) return;
+        
         setNextSendTime(-1);
         _unackedPacketsReceived = 0;
         if (_options.getRequireFullySigned()) {
@@ -227,7 +229,7 @@ public class Connection {
             // however, if we are running low on sessionTags we want to send
             // something that will get a reply so that we can deliver some new tags -
             // ACKs don't get ACKed, but pings do.
-            if (packet.getTagsSent().size() > 0) {
+            if ( (packet.getTagsSent() != null) && (packet.getTagsSent().size() > 0) ) {
                 _log.warn("Sending a ping since the ACK we just sent has " + packet.getTagsSent().size() + " tags");
                 _connectionManager.ping(_remotePeer, _options.getRTT()*2, false, packet.getKeyUsed(), packet.getTagsSent(), new PingNotifier());
             }
