@@ -24,11 +24,11 @@ class RouterThrottleImpl implements RouterThrottle {
     private static int JOB_LAG_LIMIT = 2000;
     /**
      * Arbitrary hard limit - if we throttle our network connection this many
-     * times in the previous 10-20 minute period, don't accept requests to 
+     * times in the previous 2 minute period, don't accept requests to 
      * participate in tunnels.
      *
      */
-    private static int THROTTLE_EVENT_LIMIT = 300;
+    private static int THROTTLE_EVENT_LIMIT = 30;
     
     private static final String PROP_MAX_TUNNELS = "router.maxParticipatingTunnels";
     private static final String PROP_DEFAULT_KBPS_THROTTLE = "router.defaultKBpsThrottle";
@@ -81,7 +81,7 @@ class RouterThrottleImpl implements RouterThrottle {
         RateStat rs = _context.statManager().getRate("router.throttleNetworkCause");
         Rate r = null;
         if (rs != null)
-            r = rs.getRate(10*60*1000);
+            r = rs.getRate(60*1000);
         long throttleEvents = (r != null ? r.getCurrentEventCount() + r.getLastEventCount() : 0);
         if (throttleEvents > THROTTLE_EVENT_LIMIT) {
             if (_log.shouldLog(Log.DEBUG))

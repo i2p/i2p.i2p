@@ -49,9 +49,11 @@ public class ConfigTunnelsHelper {
             TunnelPoolSettings in = _context.tunnelManager().getInboundSettings(dest.calculateHash());
             TunnelPoolSettings out = _context.tunnelManager().getOutboundSettings(dest.calculateHash());
             
-            String name = (in != null ? in.getDestinationNickname() : null);
+            if ( (in == null) || (out == null) ) continue;
+            
+            String name = in.getDestinationNickname();
             if (name == null)
-                name = (out != null ? out.getDestinationNickname() : null);
+                name = out.getDestinationNickname();
             if (name == null)
                 name = dest.calculateHash().toBase64().substring(0,6);
         

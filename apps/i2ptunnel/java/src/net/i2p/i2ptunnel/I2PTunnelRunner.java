@@ -216,7 +216,7 @@ public class I2PTunnelRunner extends I2PThread implements I2PSocket.SocketErrorL
             this.out = out;
             _toI2P = toI2P;
             direction = (toI2P ? "toI2P" : "fromI2P");
-            _cache = ByteCache.getInstance(256, NETWORK_BUFFER_SIZE);
+            _cache = ByteCache.getInstance(16, NETWORK_BUFFER_SIZE);
             setName("StreamForwarder " + _runnerId + "." + (++__forwarderId));
             start();
         }

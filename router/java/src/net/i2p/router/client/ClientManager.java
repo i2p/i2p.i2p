@@ -223,7 +223,7 @@ public class ClientManager {
         }
     }
 
-    private static final int REQUEST_LEASESET_TIMEOUT = 20*1000;
+    private static final int REQUEST_LEASESET_TIMEOUT = 120*1000;
     public void requestLeaseSet(Hash dest, LeaseSet ls) {
         ClientConnectionRunner runner = getRunner(dest);
         if (runner != null)  {

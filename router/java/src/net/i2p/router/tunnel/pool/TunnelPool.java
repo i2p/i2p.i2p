@@ -137,6 +137,33 @@ public class TunnelPool {
             if (_log.shouldLog(Log.INFO))
                 _log.info(toString() + ": keepBuilding does NOT want building to continue (want " 
                           + wanted + ", have " + remaining);
+        } else {
+            boolean needed = true;
+            int valid = 0;
+            synchronized (_tunnels) {
+                if (_tunnels.size() > wanted) {
+                    for (int i = 0; i < _tunnels.size(); i++) {
+                        TunnelInfo info = (TunnelInfo)_tunnels.get(i);
+                        if (info.getExpiration() > _context.clock().now() + 3*_settings.getRebuildPeriod()) {
+                            valid++;
+                            if (valid >= wanted*2)
+                                break;
+                        }
+                    }
+                    if (valid >= wanted*2)
+                        needed = false;
+                }
+            }
+
+            if (!needed) {
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn(toString() + ": keepBuilding wants building to continue, but not "
+                              + " with the current object... # tunnels = " + valid + ", wanted = " + wanted);
+                synchronized (_tokens) {
+                    _tokens.remove(token);
+                }
+                return false;
+            }
         }
         return rv;
     }
@@ -279,7 +306,7 @@ public class TunnelPool {
 
     public void tunnelFailed(PooledTunnelCreatorConfig cfg) {
         if (_log.shouldLog(Log.WARN))
-            _log.warn(toString() + ": Tunnel failed: " + cfg, new Exception("failure cause"));
+            _log.warn(toString() + ": Tunnel failed: " + cfg);
         int remaining = 0;
         LeaseSet ls = null;
         synchronized (_tunnels) {
@@ -337,7 +364,7 @@ public class TunnelPool {
                 int valid = 0;
                 for (int i = 0; i < _tunnels.size(); i++) {
                     TunnelInfo info = (TunnelInfo)_tunnels.get(i);
-                    if (info.getExpiration() > _context.clock().now()) {
+                    if (info.getExpiration() > _context.clock().now() + 3*_settings.getRebuildPeriod()) {
                         valid++;
                         if (valid >= quantity)
                             break;

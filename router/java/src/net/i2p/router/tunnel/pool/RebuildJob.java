@@ -20,7 +20,7 @@ class RebuildJob extends JobImpl {
         _cfg = cfg;
         _buildToken = buildToken;
         long rebuildOn = cfg.getExpiration() - pool.getSettings().getRebuildPeriod();
-        rebuildOn -= ctx.random().nextInt(pool.getSettings().getRebuildPeriod());
+        rebuildOn -= ctx.random().nextInt(pool.getSettings().getRebuildPeriod()*2);
         getTiming().setStartAfter(rebuildOn);
     }
     public String getName() { return "Rebuild tunnel"; }

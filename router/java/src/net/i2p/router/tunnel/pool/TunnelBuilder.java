@@ -49,7 +49,7 @@ public class TunnelBuilder {
         // queue up a job to request the endpoint to join the tunnel, which then
         // requeues up another job for earlier hops, etc, until it reaches the 
         // gateway.  after the gateway is confirmed, onCreated is fired
-        RequestTunnelJob req = new RequestTunnelJob(ctx, cfg, onCreated, onFailed, cfg.getLength()-1, fake);
+        RequestTunnelJob req = new RequestTunnelJob(ctx, cfg, onCreated, onFailed, cfg.getLength()-1, fake, pool.getSettings().isExploratory());
         if (fake) // lets get it done inline, as we /need/ it asap
             req.runJob();
         else

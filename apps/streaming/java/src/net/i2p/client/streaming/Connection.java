@@ -76,7 +76,7 @@ public class Connection {
     private long _lifetimeDupMessageReceived;
     
     public static final long MAX_RESEND_DELAY = 60*1000;
-    public static final long MIN_RESEND_DELAY = 30*1000;
+    public static final long MIN_RESEND_DELAY = 20*1000;
 
     /** wait up to 5 minutes after disconnection so we can ack/close packets */
     public static int DISCONNECT_TIMEOUT = 5*60*1000;
@@ -179,6 +179,11 @@ public class Connection {
                     return true;
                 }
             }
+        }
+    }
+    void windowAdjusted() {
+        synchronized (_outboundPackets) {
+            _outboundPackets.notifyAll();
         }
     }
     
@@ -866,6 +871,7 @@ public class Connection {
                                       + ") for " + Connection.this.toString());
 
                         getOptions().setWindowSize(newWindowSize);
+                        windowAdjusted();
                     }
                 }
                 

@@ -39,7 +39,7 @@ class SchedulerConnecting extends SchedulerImpl {
         boolean notYetConnected = (con.getIsConnected()) &&
                                   //(con.getSendStreamId() == null) && // not null on recv
                                   (con.getLastSendId() >= 0) &&
-                                  (con.getAckedPackets() <= 0) && 
+                                  (con.getHighestAckedThrough() < 0) && 
                                   (!con.getResetReceived());
         return notYetConnected;
     }

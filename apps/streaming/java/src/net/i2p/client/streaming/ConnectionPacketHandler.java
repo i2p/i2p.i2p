@@ -224,6 +224,9 @@ public class ConnectionPacketHandler {
                     newWindowSize += 1;
                 }
             }
+            
+            if (newWindowSize <= 0)
+                newWindowSize = 1;
                     
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("New window size " + newWindowSize + "/" + oldWindow + " congestionSeenAt: "
@@ -233,6 +236,7 @@ public class ConnectionPacketHandler {
             con.setCongestionWindowEnd(newWindowSize + lowest);
         }
         
+        con.windowAdjusted();
         return congested;
     }
     

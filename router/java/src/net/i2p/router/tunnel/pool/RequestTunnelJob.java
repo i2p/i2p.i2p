@@ -43,11 +43,12 @@ public class RequestTunnelJob extends JobImpl {
     private TunnelCreatorConfig _config;
     private long _lastSendTime;
     private boolean _isFake;
+    private boolean _isExploratory;
     
     static final int HOP_REQUEST_TIMEOUT = 30*1000;
     private static final int LOOKUP_TIMEOUT = 10*1000;
     
-    public RequestTunnelJob(RouterContext ctx, TunnelCreatorConfig cfg, Job onCreated, Job onFailed, int hop, boolean isFake) {
+    public RequestTunnelJob(RouterContext ctx, TunnelCreatorConfig cfg, Job onCreated, Job onFailed, int hop, boolean isFake, boolean isExploratory) {
         super(ctx);
         _log = ctx.logManager().getLog(RequestTunnelJob.class);
         _config = cfg;
@@ -58,13 +59,16 @@ public class RequestTunnelJob extends JobImpl {
         _lookups = 0;
         _lastSendTime = 0;
         _isFake = isFake;
+        _isExploratory = isExploratory;
         
         ctx.statManager().createRateStat("tunnel.receiveRejectionProbabalistic", "How often we are rejected probabalistically?", "Tunnels", new long[] { 10*60*1000l, 60*60*1000l, 24*60*60*1000l });
         ctx.statManager().createRateStat("tunnel.receiveRejectionTransient", "How often we are rejected due to transient overload?", "Tunnels", new long[] { 10*60*1000l, 60*60*1000l, 24*60*60*1000l });
         ctx.statManager().createRateStat("tunnel.receiveRejectionBandwidth", "How often we are rejected due to bandwidth overload?", "Tunnels", new long[] { 10*60*1000l, 60*60*1000l, 24*60*60*1000l });
         ctx.statManager().createRateStat("tunnel.receiveRejectionCritical", "How often we are rejected due to critical failure?", "Tunnels", new long[] { 10*60*1000l, 60*60*1000l, 24*60*60*1000l });
-        ctx.statManager().createRateStat("tunnel.buildFailure", "How often we fail to build a tunnel?", "Tunnels", new long[] { 10*60*1000l, 60*60*1000l, 24*60*60*1000l });
-        ctx.statManager().createRateStat("tunnel.buildSuccess", "How often we succeed building a tunnel?", "Tunnels", new long[] { 10*60*1000l, 60*60*1000l, 24*60*60*1000l });
+        ctx.statManager().createRateStat("tunnel.buildFailure", "How often we fail to build a non-exploratory tunnel?", "Tunnels", new long[] { 10*60*1000l, 60*60*1000l, 24*60*60*1000l });
+        ctx.statManager().createRateStat("tunnel.buildExploratoryFailure", "How often we fail to build an exploratory tunnel?", "Tunnels", new long[] { 10*60*1000l, 60*60*1000l, 24*60*60*1000l });
+        ctx.statManager().createRateStat("tunnel.buildSuccess", "How often we succeed building a non-exploratory tunnel?", "Tunnels", new long[] { 10*60*1000l, 60*60*1000l, 24*60*60*1000l });
+        ctx.statManager().createRateStat("tunnel.buildExploratorySuccess", "How often we succeed building an exploratory tunnel?", "Tunnels", new long[] { 10*60*1000l, 60*60*1000l, 24*60*60*1000l });
 
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Requesting hop " + hop + " in " + cfg);
@@ -108,7 +112,7 @@ public class RequestTunnelJob extends JobImpl {
                                + _currentConfig.getReceiveTunnel() + ": " + _config);
                 // inbound tunnel with more than just ourselves
                 RequestTunnelJob req = new RequestTunnelJob(getContext(), _config, _onCreated, 
-                                                            _onFailed, _currentHop - 1, _isFake);
+                                                            _onFailed, _currentHop - 1, _isFake, _isExploratory);
                 if (_isFake)
                     req.runJob();
                 else
@@ -257,19 +261,25 @@ public class RequestTunnelJob extends JobImpl {
             _log.info("tunnel building failed: " + _config + " at hop " + _currentHop);
         if (_onFailed != null)
             getContext().jobQueue().addJob(_onFailed);
-        getContext().statManager().addRateData("tunnel.buildFailure", 1, 0);
+        if (_isExploratory)
+            getContext().statManager().addRateData("tunnel.buildExploratoryFailure", 1, 0);
+        else
+            getContext().statManager().addRateData("tunnel.buildFailure", 1, 0);
     }
     
     private void peerSuccess() {
         getContext().profileManager().tunnelJoined(_currentPeer.getIdentity().calculateHash(), 
                                                    getContext().clock().now() - _lastSendTime);
         if (_currentHop > 0) {
-            RequestTunnelJob j = new RequestTunnelJob(getContext(), _config, _onCreated, _onFailed, _currentHop - 1, _isFake);
+            RequestTunnelJob j = new RequestTunnelJob(getContext(), _config, _onCreated, _onFailed, _currentHop - 1, _isFake, _isExploratory);
             getContext().jobQueue().addJob(j);
         } else {
             if (_onCreated != null)
                 getContext().jobQueue().addJob(_onCreated);
-            getContext().statManager().addRateData("tunnel.buildSuccess", 1, 0);
+            if (_isExploratory)
+                getContext().statManager().addRateData("tunnel.buildExploratorySuccess", 1, 0);
+            else
+                getContext().statManager().addRateData("tunnel.buildSuccess", 1, 0);
         }
     }
     

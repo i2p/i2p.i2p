@@ -38,7 +38,7 @@ class SchedulerConnectedBulk extends SchedulerImpl {
     
     public boolean accept(Connection con) {
         boolean ok = (con != null) && 
-                     (con.getAckedPackets() > 0) &&
+                     (con.getHighestAckedThrough() >= 0) &&
                      (con.getOptions().getProfile() == ConnectionOptions.PROFILE_BULK) &&
                      (!con.getResetReceived()) &&
                      ( (con.getCloseSentOn() <= 0) || (con.getCloseReceivedOn() <= 0) );

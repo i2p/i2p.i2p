@@ -37,14 +37,15 @@ class SearchUpdateReplyFoundJob extends JobImpl implements ReplyJob {
     
     public String getName() { return "Update Reply Found for Kademlia Search"; }
     public void runJob() {
+        I2NPMessage message = _message;
         if (_log.shouldLog(Log.INFO))
             _log.info(getJobId() + ": Reply from " + _peer.toBase64() 
-                      + " with message " + _message.getClass().getName());
+                      + " with message " + message.getClass().getName());
         
-        if (_message instanceof DatabaseStoreMessage) {
+        if (message instanceof DatabaseStoreMessage) {
             long timeToReply = _state.dataFound(_peer);
             
-            DatabaseStoreMessage msg = (DatabaseStoreMessage)_message;
+            DatabaseStoreMessage msg = (DatabaseStoreMessage)message;
             if (msg.getValueType() == DatabaseStoreMessage.KEY_TYPE_LEASESET) {
                 try {
                     _facade.store(msg.getKey(), msg.getLeaseSet());
@@ -71,11 +72,11 @@ class SearchUpdateReplyFoundJob extends JobImpl implements ReplyJob {
                 if (_log.shouldLog(Log.ERROR))
                     _log.error(getJobId() + ": Unknown db store type?!@ " + msg.getValueType());
             }
-        } else if (_message instanceof DatabaseSearchReplyMessage) {
-            _job.replyFound((DatabaseSearchReplyMessage)_message, _peer);
+        } else if (message instanceof DatabaseSearchReplyMessage) {
+            _job.replyFound((DatabaseSearchReplyMessage)message, _peer);
         } else {
             if (_log.shouldLog(Log.ERROR))
-                _log.error(getJobId() + ": WTF, reply job matched a strange message: " + _message);
+                _log.error(getJobId() + ": WTF, reply job matched a strange message: " + message);
             return;
         }
         

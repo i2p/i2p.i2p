@@ -363,8 +363,8 @@ public class FragmentHandler {
             }
             if (removed && !_msg.getReleased()) {
                 noteFailure(_msg.getMessageId());
-                if (_log.shouldLog(Log.ERROR))
-                    _log.error("Dropped failed fragmented message: " + _msg);
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("Dropped failed fragmented message: " + _msg);
                 _context.statManager().addRateData("tunnel.fragmentedDropped", _msg.getFragmentCount(), _msg.getLifetime());
                 _msg.failed();
             } else {

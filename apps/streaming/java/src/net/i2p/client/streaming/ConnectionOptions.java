@@ -160,6 +160,8 @@ public class ConnectionOptions extends I2PSocketOptionsImpl {
     public void setWindowSize(int numMsgs) { 
         if (numMsgs > _maxWindowSize)
             numMsgs = _maxWindowSize;
+        else if (numMsgs <= 0)
+            numMsgs = 1;
         _windowSize = numMsgs; 
     }
     

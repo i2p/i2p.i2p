@@ -40,6 +40,8 @@ class TestJob extends JobImpl {
         getTiming().setStartAfter(getDelay() + ctx.clock().now());
         ctx.statManager().createRateStat("tunnel.testFailedTime", "How long did the failure take (max of 60s for full timeout)?", "Tunnels", 
                                          new long[] { 10*60*1000l, 60*60*1000l, 3*60*60*1000l, 24*60*60*1000l });
+        ctx.statManager().createRateStat("tunnel.testExploratoryFailedTime", "How long did the failure of an exploratory tunnel take (max of 60s for full timeout)?", "Tunnels", 
+                                         new long[] { 10*60*1000l, 60*60*1000l, 3*60*60*1000l, 24*60*60*1000l });
         ctx.statManager().createRateStat("tunnel.testSuccessLength", "How long were the tunnels that passed the test?", "Tunnels", 
                                          new long[] { 10*60*1000l, 60*60*1000l, 3*60*60*1000l, 24*60*60*1000l });
         ctx.statManager().createRateStat("tunnel.testSuccessTime", "How long did tunnel testing take?", "Tunnels", 
@@ -132,7 +134,10 @@ class TestJob extends JobImpl {
     }
     
     private void testFailed(long timeToFail) {
-        getContext().statManager().addRateData("tunnel.testFailedTime", timeToFail, timeToFail);
+        if (_pool.getSettings().isExploratory())
+            getContext().statManager().addRateData("tunnel.testExploratoryFailedTime", timeToFail, timeToFail);
+        else
+            getContext().statManager().addRateData("tunnel.testFailedTime", timeToFail, timeToFail);
         _cfg.tunnelFailed();
         if (_log.shouldLog(Log.WARN))
             _log.warn("Tunnel test failed in " + timeToFail + "ms: " + _cfg);
