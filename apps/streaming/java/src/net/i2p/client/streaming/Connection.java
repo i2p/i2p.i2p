@@ -32,6 +32,7 @@ public class Connection {
     private long _lastSendTime;
     private long _lastSendId;
     private boolean _resetReceived;
+    private boolean _resetSent;
     private boolean _connected;
     private boolean _hardDisconnected;
     private MessageInputStream _inputStream;
@@ -178,6 +179,7 @@ public class Connection {
      *
      */
     void sendReset() {
+        _resetSent = true;
         if ( (_remotePeer == null) || (_sendStreamId == null) ) return;
         PacketLocal reply = new PacketLocal(_context, _remotePeer);
         reply.setFlag(Packet.FLAG_RESET);
@@ -380,6 +382,7 @@ public class Connection {
     
     public boolean getIsConnected() { return _connected; }
     public boolean getHardDisconnected() { return _hardDisconnected; }
+    public boolean getResetSent() { return _resetSent; }
 
     void disconnect(boolean cleanDisconnect) {
         disconnect(cleanDisconnect, true);

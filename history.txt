@@ -1,4 +1,11 @@
-$Id: history.txt,v 1.108 2004/12/15 21:45:56 jrandom Exp $
+$Id: history.txt,v 1.109 2004/12/16 00:42:04 jrandom Exp $
+
+2004-12-16  jrandom
+    * Catch another oddball case for a reset connection in the streaming lib.
+    * Add a dumpprofile.jsp page, called with ?peer=base64OfPeerHash, which
+      dumps the current state of that peer's profile.  Instead of the full 
+      base64, you can pass in however many characters you have and it will
+      return the first match found.
 
 2004-12-16  jrandom
     * Remove the randomized factor in the tunnel rejection by bandwidth -

@@ -70,9 +70,9 @@ class ProfilePersistenceHelper {
             groups = "not failing";
         } else {
             if (_context.profileOrganizer().isFast(profile.getPeer()))
-                groups = "fast and reliable";
+                groups = "fast and high capacity";
             else
-                groups = "reliable";
+                groups = "high capacity";
             
             if (_context.profileOrganizer().isWellIntegrated(profile.getPeer()))
                 groups = groups + ", well integrated";
@@ -85,6 +85,7 @@ class ProfilePersistenceHelper {
             buf.append("# as calculated by ").append(_us.toBase64()).append(NL);
         buf.append("#").append(NL);
         buf.append("# reliability: ").append(profile.getReliabilityValue()).append(NL);
+        buf.append("# capacity: ").append(profile.getCapacityValue()).append(NL);
         buf.append("# integration: ").append(profile.getIntegrationValue()).append(NL);
         buf.append("# speedValue: ").append(profile.getSpeedValue()).append(NL);
         buf.append("#").append(NL);
