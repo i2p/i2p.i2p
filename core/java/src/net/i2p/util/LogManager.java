@@ -197,8 +197,10 @@ public class LogManager {
     private void loadConfig() {
         File cfgFile = new File(_location);
         if ((_configLastRead > 0) && (_configLastRead >= cfgFile.lastModified())) {
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Short circuiting config read");
+            if (_log.shouldLog(Log.INFO))
+                _log.info("Short circuiting config read (last read: " 
+                           + (_context.clock().now() - _configLastRead) + "ms ago, config file modified "
+                           + (_context.clock().now() - cfgFile.lastModified()) + "ms ago");
             return;
         } else {
             if (_log.shouldLog(Log.DEBUG))
@@ -209,7 +211,7 @@ public class LogManager {
         try {
             fis = new FileInputStream(cfgFile);
             p.load(fis);
-            _configLastRead = cfgFile.lastModified();
+            _configLastRead = _context.clock().now();
         } catch (IOException ioe) {
             System.err.println("Error loading logger config from " + new File(_location).getAbsolutePath());
         } finally {
