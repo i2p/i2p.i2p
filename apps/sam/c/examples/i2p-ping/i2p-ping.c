@@ -78,7 +78,7 @@ int main(int argc, char *argv[])
 	int count = INT_MAX;  /* number of times to ping */
 	int pongcount = -1;
 	char *samhost = "localhost";
-	uint16_t samport = 7656;
+	unsigned short samport = 7656;
 
 	while ((ch = getopt(argc, argv, "ac:h:mp:qv")) != -1) {
 		switch (ch) {
@@ -103,7 +103,7 @@ int main(int argc, char *argv[])
 				quiet = true;
 				break;
 			case 'v':  /* version */
-				puts("$Id: i2p-ping.c,v 1.4 2004/09/22 20:05:40 jrandom Exp $");
+				puts("$Id: i2p-ping.c,v 1.5 2004/09/24 16:08:00 mpc Exp $");
 				puts("Copyright (c) 2004, Matthew P. Cashdollar <mpc@innographx.com>");
 				break;
 			case '?':
@@ -140,7 +140,7 @@ int main(int argc, char *argv[])
 
 	pongcount = 0;
 	for (int j = 0; j < argc; j++) {
-		if (strlen(argv[j]) == 516) {
+		if (strlen(argv[j]) == SAM_PUBKEY_LEN - 1) {
 			memcpy(dest, argv[j], SAM_PUBKEY_LEN);
 			gotdest = true;
 		} else

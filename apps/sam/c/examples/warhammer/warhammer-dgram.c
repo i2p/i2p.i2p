@@ -88,12 +88,12 @@ int main(int argc, char *argv[])
 	}
 
 	/*
-	 * Check whether they've supplied a name or a base 64 destination
+	 * Check whether they've supplied a hostname or a base 64 destination
 	 *
 	 * Note that this is a hack.  Jrandom says that once certificates are added,
 	 * the length could be different depending on the certificate's size.
 	 */
-	if (strlen(argv[1]) == 516) {
+	if (strlen(argv[1]) == SAM_PUBKEY_LEN - 1) {
 		memcpy(dest, argv[1], SAM_PUBKEY_LEN);
 		gotdest = true;
 	} else {
@@ -155,7 +155,7 @@ static void dgramback(sam_sess_t *session, sam_pubkey_t dest, void *data,
 static void diedback(sam_sess_t *session)
 {
 	fprintf(stderr, "Lost SAM connection!\n");
-	/* high quality code would do a sam_session_free() here */
+	sam_session_free(&session);
 	exit(1);
 }
 
