@@ -1,5 +1,6 @@
 package net.i2p.router.peermanager;
 
+import net.i2p.data.DataHelper;
 import net.i2p.router.RouterContext;
 import net.i2p.stat.Rate;
 import net.i2p.stat.RateStat;
@@ -140,41 +141,73 @@ public class SpeedCalculator extends Calculator {
      *
      */
     private double getMeasuredRoundTripTime(PeerProfile profile, long period, boolean tunnelTestOnly) {
-        if (period < 0) {
+        double activityTime = 0;
+        double rtt = 0;
+        double dbResponseTime = 0;
+        double tunnelResponseTime = 0;
+        double tunnelTestTime = 0;
+
+        long dbResponses = 0;
+        long tunnelResponses = 0;
+        long tunnelTests = 0;
+
+        long events = 0;
+        
+        if (period < 0) { 
             Rate dbResponseRate = profile.getDbResponseTime().getRate(60*60*1000l);
             Rate tunnelResponseRate = profile.getTunnelCreateResponseTime().getRate(60*60*1000l);
             Rate tunnelTestRate = profile.getTunnelTestResponseTime().getRate(60*60*1000l);
 
-            long dbResponses = tunnelTestOnly ? 0 : dbResponseRate.getLifetimeEventCount();
-            long tunnelResponses = tunnelTestOnly ? 0 : tunnelResponseRate.getLifetimeEventCount();
-            long tunnelTests = tunnelTestRate.getLifetimeEventCount();
+            dbResponses = tunnelTestOnly ? 0 : dbResponseRate.getLifetimeEventCount();
+            tunnelResponses = tunnelTestOnly ? 0 : tunnelResponseRate.getLifetimeEventCount();
+            tunnelTests = tunnelTestRate.getLifetimeEventCount();
 
-            double dbResponseTime = tunnelTestOnly ? 0 : dbResponseRate.getLifetimeAverageValue();
-            double tunnelResponseTime = tunnelTestOnly ? 0 : tunnelResponseRate.getLifetimeAverageValue();
-            double tunnelTestTime = tunnelTestRate.getLifetimeAverageValue();
+            dbResponseTime = tunnelTestOnly ? 0 : dbResponseRate.getLifetimeAverageValue();
+            tunnelResponseTime = tunnelTestOnly ? 0 : tunnelResponseRate.getLifetimeAverageValue();
+            tunnelTestTime = tunnelTestRate.getLifetimeAverageValue();
 
-            long events = dbResponses + tunnelResponses + tunnelTests;
+            events = dbResponses + tunnelResponses + tunnelTests;
             if (events <= 0) return 0;
-            return (dbResponses*dbResponseTime + tunnelResponses*tunnelResponseTime + tunnelTests*tunnelTestTime)
-                   / events;
+            activityTime = (dbResponses*dbResponseTime + tunnelResponses*tunnelResponseTime + tunnelTests*tunnelTestTime);
+            rtt = activityTime / events;
         } else {
             Rate dbResponseRate = profile.getDbResponseTime().getRate(period);
             Rate tunnelResponseRate = profile.getTunnelCreateResponseTime().getRate(period);
             Rate tunnelTestRate = profile.getTunnelTestResponseTime().getRate(period);
 
-            long dbResponses = tunnelTestOnly ? 0 : dbResponseRate.getCurrentEventCount() + dbResponseRate.getLastEventCount();
-            long tunnelResponses = tunnelTestOnly ? 0 : tunnelResponseRate.getCurrentEventCount() + tunnelResponseRate.getLastEventCount();
-            long tunnelTests = tunnelTestRate.getCurrentEventCount() + tunnelTestRate.getLastEventCount();
+            dbResponses = tunnelTestOnly ? 0 : dbResponseRate.getCurrentEventCount() + dbResponseRate.getLastEventCount();
+            tunnelResponses = tunnelTestOnly ? 0 : tunnelResponseRate.getCurrentEventCount() + tunnelResponseRate.getLastEventCount();
+            tunnelTests = tunnelTestRate.getCurrentEventCount() + tunnelTestRate.getLastEventCount();
 
-            double dbResponseTime = tunnelTestOnly ? 0 : dbResponseRate.getAverageValue();
-            double tunnelResponseTime = tunnelTestOnly ? 0 : tunnelResponseRate.getAverageValue();
-            double tunnelTestTime = tunnelTestRate.getAverageValue();
+            if (!tunnelTestOnly) {
+                dbResponseTime = avg(dbResponseRate);
+                tunnelResponseTime = avg(tunnelResponseRate);
+            }
+            tunnelTestTime = avg(tunnelTestRate);
 
-            long events = dbResponses + tunnelResponses + tunnelTests;
+            events = dbResponses + tunnelResponses + tunnelTests;
             if (events <= 0) return 0;
-            return (dbResponses*dbResponseTime + tunnelResponses*tunnelResponseTime + tunnelTests*tunnelTestTime)
-                   / events;
+            activityTime = (dbResponses*dbResponseTime + tunnelResponses*tunnelResponseTime + tunnelTests*tunnelTestTime);
+            rtt = activityTime / events;
         }
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("\nMeasured response time for " + profile.getPeer().toBase64() + " over " 
+                       + DataHelper.formatDuration(period) + " with activityTime of " + activityTime
+                       + ": " + rtt + "\nover " + events + " events (" 
+                       + dbResponses + " dbResponses, " + tunnelResponses + " tunnelResponses, " 
+                       + tunnelTests + " tunnelTests)\ntimes (" 
+                       + dbResponseTime + "ms, " + tunnelResponseTime + "ms, " 
+                       + tunnelTestTime + "ms respectively)");
+        return rtt;
+    }
+    
+    private double avg(Rate rate) {
+        long events = rate.getCurrentEventCount() + rate.getLastEventCount();
+        long time = rate.getCurrentTotalEventTime() + rate.getLastTotalEventTime();
+        if ( (events > 0) && (time > 0) ) 
+            return time / events;
+        else
+            return 0.0d;
     }
     
     private double getEstimatedRoundTripTime(PeerProfile profile, long period) {
