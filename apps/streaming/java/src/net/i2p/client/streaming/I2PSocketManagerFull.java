@@ -80,8 +80,18 @@ public class I2PSocketManagerFull implements I2PSocketManager {
         _acceptTimeout = ACCEPT_TIMEOUT_DEFAULT;
         _defaultOptions = new ConnectionOptions(opts);
         _serverSocket = new I2PServerSocketFull(this);
+        
+        if (_log.shouldLog(Log.INFO)) {
+            _log.info("Socket manager created.  \ndefault options: " + _defaultOptions
+                      + "\noriginal properties: " + opts);
+        }
     }
 
+    public I2PSocketOptions buildOptions() { return buildOptions(null); }
+    public I2PSocketOptions buildOptions(Properties opts) {
+        return new ConnectionOptions(opts);
+    }
+    
     public I2PSession getSession() {
         return _session;
     }

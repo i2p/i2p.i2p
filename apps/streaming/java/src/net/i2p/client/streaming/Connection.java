@@ -61,6 +61,8 @@ public class Connection {
     private boolean _ackSinceCongestion;
     /** Notify this on connection (or connection failure) */
     private Object _connectLock;
+    /** how many messages have been resent and not yet ACKed? */
+    private int _activeResends;
     
     public static final long MAX_RESEND_DELAY = 60*1000;
     public static final long MIN_RESEND_DELAY = 20*1000;
@@ -103,6 +105,7 @@ public class Connection {
         _activityTimer = new ActivityTimer();
         _ackSinceCongestion = true;
         _connectLock = new Object();
+        _activeResends = 0;
     }
     
     public long getNextOutboundPacketNum() { 
@@ -283,7 +286,17 @@ public class Connection {
                     PacketLocal p = (PacketLocal)acked.get(i);
                     _outboundPackets.remove(new Long(p.getSequenceNum()));
                     _ackedPackets++;
+                    if (p.getNumSends() > 1) {
+                        _activeResends--;
+                        if (_log.shouldLog(Log.WARN))
+                            _log.warn("Active resend of " + p + " successful, # active left: " + _activeResends);
+                    }
                 }
+            }
+            if ( (_outboundPackets.size() <= 0) && (_activeResends != 0) ) {
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("All outbound packets acked, clearing " + _activeResends);
+                _activeResends = 0;
             }
             _outboundPackets.notifyAll();
         }
@@ -652,8 +665,10 @@ public class Connection {
      */
     private class ResendPacketEvent implements SimpleTimer.TimedEvent {
         private PacketLocal _packet;
+        private boolean _currentIsActiveResend;
         public ResendPacketEvent(PacketLocal packet) {
             _packet = packet;
+            _currentIsActiveResend = true;
         }
         
         public void timeReached() {
@@ -667,6 +682,16 @@ public class Connection {
                     resend = true;
             }
             if ( (resend) && (_packet.getAckTime() < 0) ) {
+                if ( (_activeResends > 0) && (!_currentIsActiveResend) ) {
+                    // we want to resend this packet, but there are already active
+                    // resends in the air and we dont want to make a bad situation 
+                    // worse.  wait another second
+                    if (_log.shouldLog(Log.WARN))
+                        _log.warn("Delaying resend of " + _packet + " as there are " 
+                                  + _activeResends + " active resends already in play");
+                    SimpleTimer.getInstance().addEvent(ResendPacketEvent.this, 1000);
+                    return;
+                }
                 // revamp various fields, in case we need to ack more, etc
                 _inputStream.updateAcks(_packet);
                 _packet.setOptionalDelay(getOptions().getChoke());
@@ -685,13 +710,21 @@ public class Connection {
                 
                 int numSends = _packet.getNumSends() + 1;
                 
+                if (numSends == 2) {
+                    // first resend for this packet
+                    _activeResends++;
+                    _currentIsActiveResend = true;
+                }
+                
                 // in case things really suck, the other side may have lost thier
                 // session tags (e.g. they restarted), so jump back to ElGamal.
                 if ( (newWindowSize == 1) && (numSends > 2) )
                     _context.sessionKeyManager().failTags(_remotePeer.getPublicKey());
                 
                 if (_log.shouldLog(Log.WARN))
-                    _log.warn("Resend packet " + _packet + " time " + numSends + " (wsize "
+                    _log.warn("Resend packet " + _packet + " time " + numSends + 
+                              " activeResends: " + _activeResends + 
+                              " (wsize "
                               + newWindowSize + " lifetime " 
                               + (_context.clock().now() - _packet.getCreatedOn()) + "ms)");
                 _outboundQueue.enqueue(_packet);

@@ -6,7 +6,7 @@ import java.util.Properties;
  * Define the current options for the con (and allow custom tweaking midstream)
  *
  */
-public class ConnectionOptions extends I2PSocketOptions {
+public class ConnectionOptions extends I2PSocketOptionsImpl {
     private int _connectDelay;
     private boolean _fullySigned;
     private int _windowSize;
@@ -203,4 +203,31 @@ public class ConnectionOptions extends I2PSocketOptions {
      */
     public int getInboundBufferSize() { return _inboundBufferSize; }
     public void setInboundBufferSize(int bytes) { _inboundBufferSize = bytes; }
+    
+    public String toString() {
+        StringBuffer buf = new StringBuffer(128);
+        buf.append("conDelay=").append(_connectDelay);
+        buf.append(" maxSize=").append(_maxMessageSize);
+        buf.append(" rtt=").append(_rtt);
+        buf.append(" rwin=").append(_receiveWindow);
+        buf.append(" resendDelay=").append(_resendDelay);
+        buf.append(" ackDelay=").append(_sendAckDelay);
+        buf.append(" cwin=").append(_windowSize);
+        buf.append(" maxResends=").append(_maxResends);
+        buf.append(" writeTimeout=").append(getWriteTimeout());
+        buf.append(" inactivityTimeout=").append(_inactivityTimeout);
+        buf.append(" inboundBuffer=").append(_inboundBufferSize);
+        return buf.toString();
+    }
+    
+    public static void main(String args[]) {
+        Properties p = new Properties();
+        
+        p.setProperty(PROP_CONNECT_DELAY, "1000");
+        ConnectionOptions c = new ConnectionOptions(p);
+        System.out.println("opts: " + c);
+        
+        c = new ConnectionOptions(new I2PSocketOptionsImpl(p));
+        System.out.println("opts: " + c);
+    }
 }
