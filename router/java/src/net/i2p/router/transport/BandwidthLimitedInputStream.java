@@ -62,6 +62,8 @@ public class BandwidthLimitedInputStream extends FilterInputStream {
     
     public int read(byte dest[], int off, int len) throws IOException {
         int read = in.read(dest, off, len);
+        if (read == -1) return -1;
+        
         if (_pullFromOutbound)
             _currentRequest = _context.bandwidthLimiter().requestOutbound(read, _peerSource);
         else
@@ -84,6 +86,7 @@ public class BandwidthLimitedInputStream extends FilterInputStream {
     }
     public long skip(long numBytes) throws IOException {
         long skip = in.skip(numBytes);
+        
         if (_pullFromOutbound)
             _currentRequest = _context.bandwidthLimiter().requestOutbound((int)skip, _peerSource);
         else
