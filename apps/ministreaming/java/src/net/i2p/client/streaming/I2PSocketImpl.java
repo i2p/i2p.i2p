@@ -33,6 +33,12 @@ class I2PSocketImpl implements I2PSocket {
     private Object flagLock = new Object();
     private boolean closed = false, sendClose = true, closed2 = false;
 
+    /**
+     * @param peer who this socket is (or should be) connected to 
+     * @param mgr how we talk to the network
+     * @param outgoing did we initiate the connection (true) or did we receive it (false)?
+     * @param localID what is our half of the socket ID?
+     */
     public I2PSocketImpl(Destination peer, I2PSocketManager mgr, boolean outgoing, String localID) {
         this.outgoing = outgoing;
         manager = mgr;
@@ -45,10 +51,17 @@ class I2PSocketImpl implements I2PSocket {
         this.localID = localID;
     }
 
+    /**
+     * Our half of the socket's unique ID
+     *
+     */
     public String getLocalID() {
         return localID;
     }
 
+    /**
+     * We've received the other side's half of the socket's unique ID 
+     */
     public void setRemoteID(String id) {
         synchronized (remoteIDWaiter) {
             remoteID = id;
@@ -56,10 +69,32 @@ class I2PSocketImpl implements I2PSocket {
         }
     }
 
-    public String getRemoteID(boolean wait) throws InterruptedIOException {
-        return getRemoteID(wait, -1);
+    /**
+     * Retrieve the other side's half of the socket's unique ID, or null if it
+     * isn't known yet
+     *
+     * @param wait if true, we should wait until we receive it from the peer, otherwise
+     *             return what we know immediately (which may be null)
+     */
+    public String getRemoteID(boolean wait) {
+        try {
+            return getRemoteID(wait, -1);
+        } catch (InterruptedIOException iie) {
+            _log.error("wtf, we said we didn't want it to time out!  you smell", iie);
+            return null;
+        }
     }
 
+    /**
+     * Retrieve the other side's half of the socket's unique ID, or null if it isn't
+     * known yet and we were instructed not to wait
+     *
+     * @param wait should we wait for the peer to send us their half of the ID, or 
+     *             just return immediately?
+     * @param maxWait if we're going to wait, after how long should we timeout and fail?
+     *                (if this value is < 0, we wait indefinitely)
+     * @throws InterruptedIOException when the max waiting period has been exceeded
+     */
     public String getRemoteID(boolean wait, long maxWait) throws InterruptedIOException {
         long dieAfter = System.currentTimeMillis() + maxWait;
         synchronized (remoteIDWaiter) {
@@ -84,10 +119,21 @@ class I2PSocketImpl implements I2PSocket {
         }
     }
 
-    public String getRemoteID() throws InterruptedIOException {
+    /**
+     * Retrieve the other side's half of the socket's unique ID, or null if it
+     * isn't known yet.  This does not wait
+     *
+     */
+    public String getRemoteID() {
         return getRemoteID(false);
     }
 
+    /**
+     * The other side has given us some data, so inject it into our socket's 
+     * inputStream
+     *
+     * @param data the data to inject into our local inputStream
+     */
     public void queueData(byte[] data) {
         in.queueData(data);
     }
@@ -151,6 +197,11 @@ class I2PSocketImpl implements I2PSocket {
             return (byte)(I2PSocketManager.DATA_OUT + (byte)add);
     }
 
+    /**
+     * What is the longest we'll block on the input stream while waiting
+     * for more data?  If this value is exceeded, the read() throws 
+     * InterruptedIOException
+     */
     public long getReadTimeout() {
         return in.getReadTimeout();
     }
@@ -160,7 +211,7 @@ class I2PSocketImpl implements I2PSocket {
     }
 
     //--------------------------------------------------
-    public class I2PInputStream extends InputStream {
+    private class I2PInputStream extends InputStream {
 
         private ByteCollector bc = new ByteCollector();
 
@@ -252,7 +303,7 @@ class I2PSocketImpl implements I2PSocket {
 
     }
 
-    public class I2POutputStream extends OutputStream {
+    private class I2POutputStream extends OutputStream {
 
         public I2PInputStream sendTo;
 
@@ -274,12 +325,13 @@ class I2PSocketImpl implements I2PSocket {
     }
 
     private static volatile long __runnerId = 0;
-    public class I2PSocketRunner extends I2PThread {
+    private class I2PSocketRunner extends I2PThread {
 
         public InputStream in;
 
         public I2PSocketRunner(InputStream in) {
-            _log.debug("Runner's input stream is: " + in.hashCode());
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Runner's input stream is: " + in.hashCode());
             this.in = in;
             String peer = I2PSocketImpl.this.remote.calculateHash().toBase64();
             setName("SocketRunner " + (++__runnerId) + " " + peer.substring(0, 4));

@@ -159,11 +159,7 @@ public class I2PSocketManager implements I2PSessionListener {
         }
 
         String remoteId = null;
-        try {
-            remoteId = s.getRemoteID(false); 
-        } catch (InterruptedIOException iie) {
-            throw new RuntimeException("ERROR!  getRemoteId(false) should never throw InterruptedIOException!");
-        }
+        remoteId = s.getRemoteID(false); 
 
         if ( (payload.length == 3) && (remoteId == null) ) {
             String newID = toString(payload);
