@@ -65,6 +65,7 @@ class I2PSessionImpl2 extends I2PSessionImpl {
     }
 
     public boolean sendMessage(Destination dest, byte[] payload) throws I2PSessionException {
+
         return sendMessage(dest, payload, new SessionKey(), new HashSet(64));
     }
 
@@ -225,12 +226,12 @@ class I2PSessionImpl2 extends I2PSessionImpl {
                 _log.error("State with nonce " + state.getNonce()
                            + " was not accepted?  (no messageId!! found=" + found 
                            + " msgId=" + state.getMessageId() + ")", 
-                           new Exception("Race on accept/success status messages?"));
+                           new Exception("Race on accept/success status messages, or reconnected?"));
             nackTags(state);
             //if (_log.shouldLog(Log.CRIT))
             //    _log.log(Log.CRIT, "Disconnecting/reconnecting because we never were accepted!");
             //disconnect();
-            //return false;
+            return false;
         }
 
         if (_log.shouldLog(Log.DEBUG))
