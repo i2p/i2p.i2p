@@ -1,0 +1,32 @@
+<html><body>
+<p>Implements the base I2P SDK for developing applications that communicate 
+through I2P.</p>
+
+<p>When a client application wants to communicate over I2P, the first thing it 
+needs to do is get a {@link net.i2p.client.I2PClient} from the 
+{@link net.i2p.client.I2PClientFactory}.  If it does not already have a {@link 
+net.i2p.data.Destination}, it must generate one with the {@link 
+net.i2p.client.I2PClient#createDestination} before proceeding.  Once it has
+one, it then creates an {@link net.i2p.client.I2PSession} which serves as the
+bridge to the I2P network, allowing it to send messages (via 
+{@link net.i2p.client.I2PSession#sendMessage}) and receive messages (via 
+{@link net.i2p.client.I2PSession#receiveMessage}).  In addition, the client 
+receives asynchronous notification of network activity by providing an implementation 
+of {@link net.i2p.client.I2PSessionListener}. </p>
+
+<p>A simple example of how these base client classes can be used is the 
+{@link net.i2p.client.ATalk} application.  It isn't really useful, but it is 
+heavily documented code.</p>
+
+<p>This client package provides the basic necessity for communicating over I2P,
+but there are three other subpackages that are helpful.  Specifically:<ul>
+<li>{@link net.i2p.client.datagram} - for applications that want their messages
+    to be both authenticated and repliable</li>
+<li>{@link net.i2p.client.naming} - for applications that want to resolve 
+    readable names into {@link net.i2p.data.Destination}s</li>
+<li>{@link net.i2p.client.streaming} - for applications that want to use 
+    a streaming API to provide reliable in order message delivery (<b>note</b>:
+    the streaming library is packaged seperate from the main SDK - in the 
+    ministreaming.jar)</li>
+</ul></p>
+</body></html>

@@ -1,0 +1,15 @@
+<html><body>
+<p>Provides a standard way for reading and writing messages transferred over I2P
+so that the recipient has an authenticated mechanism to reply to it.  This is
+necessary because the base I2P message sent through {@link net.i2p.client.I2PSession#sendMessage}
+has no "from" address, and simply providing a raw "from" address would be 
+insecure as it could be spoofed.  An application that needs to know for certain 
+who sent a message to them should use the {@link net.i2p.client.datagram.I2PDatagramDissector} 
+to parse the raw message received from the {@link net.i2p.client.I2PSession}, and 
+in turn, use the {@link net.i2p.client.datagram.I2PDatagramMaker} to build a 
+message that can be parsed. </p>
+
+<p>The datagram format implemented here includes
+the sender's {@link net.i2p.data.Destination}, the payload, and a hash of the 
+payload (signed by the sender's {@link net.i2p.data.SigningPrivateKey}).</p>
+</body></html>
