@@ -42,8 +42,11 @@ public class PoolingTunnelManagerFacade implements TunnelManagerFacade {
     }
     
     public void startup() {
-        if (_pool == null)
+        if (_pool == null) {
             _pool = new TunnelPool(_context);
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug(toString() + ": New tunnel pool created: " + _pool.toString());
+        }
         _pool.startup();
         _testManager = new TunnelTestManager(_context, _pool);
     }
@@ -88,9 +91,9 @@ public class PoolingTunnelManagerFacade implements TunnelManagerFacade {
             }
         }
 
-        if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Joining tunnel: " + info);
         boolean ok = _pool.addParticipatingTunnel(info);
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("Joining tunnel (" + ok + "): " + info);
         if (!ok)
             _context.statManager().updateFrequency("tunnel.rejectRequestFrequency");
         else

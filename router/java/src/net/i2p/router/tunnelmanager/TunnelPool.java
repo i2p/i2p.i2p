@@ -78,44 +78,71 @@ class TunnelPool {
      *
      */
     public TunnelInfo getTunnelInfo(TunnelId id) {
-        if (!_isLive) return null;
-        if (id == null) return null;
+        if (!_isLive) {
+            if (_log.shouldLog(Log.ERROR))
+                _log.error(toString() + ": Not live, unable to search for tunnel " + id);
+            return null;
+        }
+        if (id == null) {
+            if (_log.shouldLog(Log.ERROR))
+                _log.error(toString() + ": Id requested is null");
+            return null;
+        }
         boolean typeKnown = id.getType() != TunnelId.TYPE_UNSPECIFIED;
 
         if ( (!typeKnown) || (id.getType() == TunnelId.TYPE_PARTICIPANT) ) {
             synchronized (_participatingTunnels) {
-                if (_participatingTunnels.containsKey(id))
+                if (_participatingTunnels.containsKey(id)) {
+                    if (_log.shouldLog(Log.DEBUG))
+                        _log.debug(toString() + ": Found tunnel " + id + " as a participant");
                     return (TunnelInfo)_participatingTunnels.get(id);
+                }
             }
         }
         if ( (!typeKnown) || (id.getType() == TunnelId.TYPE_OUTBOUND) ) {
             synchronized (_outboundTunnels) {
-                if (_outboundTunnels.containsKey(id))
+                if (_outboundTunnels.containsKey(id)) {
+                    if (_log.shouldLog(Log.DEBUG))
+                        _log.debug(toString() + ": Found tunnel " + id + " as outbound");
                     return (TunnelInfo)_outboundTunnels.get(id);
+                }
             }
         }
         if ( (!typeKnown) || (id.getType() == TunnelId.TYPE_INBOUND) ) {
             synchronized (_freeInboundTunnels) {
-                if (_freeInboundTunnels.containsKey(id))
+                if (_freeInboundTunnels.containsKey(id)) {
+                    if (_log.shouldLog(Log.DEBUG))
+                        _log.debug(toString() + ": Found tunnel " + id + " as a free inbound");
                     return (TunnelInfo)_freeInboundTunnels.get(id);
+                }
             }
         }
         synchronized (_pendingTunnels) {
-            if (_pendingTunnels.containsKey(id))
+            if (_pendingTunnels.containsKey(id)) {
+                if (_log.shouldLog(Log.DEBUG))
+                    _log.debug(toString() + ": Found tunnel " + id + " as a pending tunnel");
                 return (TunnelInfo)_pendingTunnels.get(id);
+            }
         }
 
         if ( (!typeKnown) || (id.getType() == TunnelId.TYPE_INBOUND) ) {
             synchronized (_clientPools) {
                 for (Iterator iter = _clientPools.values().iterator(); iter.hasNext(); ) {
                     ClientTunnelPool pool = (ClientTunnelPool)iter.next();
-                    if (pool.isInboundTunnel(id))
+                    if (pool.isInboundTunnel(id)) {
+                        if (_log.shouldLog(Log.DEBUG))
+                            _log.debug(toString() + ": Found tunnel " + id + " as an inbound tunnel for the client " + pool.getDestination().calculateHash().toBase64());
                         return pool.getInboundTunnel(id);
-                    else if (pool.isInactiveInboundTunnel(id))
+                    } else if (pool.isInactiveInboundTunnel(id)) {
+                        if (_log.shouldLog(Log.DEBUG))
+                            _log.debug(toString() + ": Found tunnel " + id + " as an inactive inbound tunnel for the client " + pool.getDestination().calculateHash().toBase64());
                         return pool.getInactiveInboundTunnel(id);
+                    }
                 }
             }
         }
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug(toString() + ": Did NOT find the tunnel " + id);
         return null;
     }
     
@@ -195,7 +222,7 @@ class TunnelPool {
     }
     public void addOutboundTunnel(TunnelInfo tunnel) {
         if (!_isLive) return;
-        if (_log.shouldLog(Log.DEBUG)) _log.debug("Add outbound tunnel " + tunnel.getTunnelId());
+        if (_log.shouldLog(Log.DEBUG)) _log.debug(toString() + ": Add outbound tunnel " + tunnel.getTunnelId());
         _context.messageHistory().tunnelJoined("outbound", tunnel);
         synchronized (_outboundTunnels) {
             _outboundTunnels.put(tunnel.getTunnelId(), tunnel);
@@ -206,7 +233,7 @@ class TunnelPool {
     }
     public void removeOutboundTunnel(TunnelId id) {
         if (!_isLive) return;
-        if (_log.shouldLog(Log.DEBUG)) _log.debug("Removing outbound tunnel " + id);
+        if (_log.shouldLog(Log.DEBUG)) _log.debug(toString() + ": Removing outbound tunnel " + id);
         int remaining = 0;
         synchronized (_outboundTunnels) {
             _outboundTunnels.remove(id);
@@ -240,7 +267,7 @@ class TunnelPool {
     }
     public void addFreeTunnel(TunnelInfo tunnel) {
         if (!_isLive) return;
-        if (_log.shouldLog(Log.DEBUG)) _log.debug("Add free inbound tunnel " + tunnel.getTunnelId());
+        if (_log.shouldLog(Log.DEBUG)) _log.debug(toString() + ": Add free inbound tunnel " + tunnel.getTunnelId());
         _context.messageHistory().tunnelJoined("free inbound", tunnel);
         synchronized (_freeInboundTunnels) {
             _freeInboundTunnels.put(tunnel.getTunnelId(), tunnel);
@@ -255,7 +282,7 @@ class TunnelPool {
     }
     public TunnelInfo removeFreeTunnel(TunnelId id) {
         if (!_isLive) return null;
-        if (_log.shouldLog(Log.DEBUG)) _log.debug("Removing free inbound tunnel " + id);
+        if (_log.shouldLog(Log.DEBUG)) _log.debug(toString() + ": Removing free inbound tunnel " + id);
         int remaining = 0;
         TunnelInfo rv = null;
         synchronized (_freeInboundTunnels) {
@@ -291,7 +318,7 @@ class TunnelPool {
     
     public boolean addParticipatingTunnel(TunnelInfo tunnel) {
         if (!_isLive) return false;
-        if (_log.shouldLog(Log.DEBUG)) _log.debug("Add participating tunnel " + tunnel.getTunnelId());
+        if (_log.shouldLog(Log.DEBUG)) _log.debug(toString() + ": Add participating tunnel " + tunnel.getTunnelId());
         _context.messageHistory().tunnelJoined("participant", tunnel);
         synchronized (_participatingTunnels) {
             if (_participatingTunnels.containsKey(tunnel.getTunnelId())) {
@@ -306,7 +333,7 @@ class TunnelPool {
     
     public TunnelInfo removeParticipatingTunnel(TunnelId id) {
         if (!_isLive) return null;
-        if (_log.shouldLog(Log.DEBUG)) _log.debug("Removing participating tunnel " + id);
+        if (_log.shouldLog(Log.DEBUG)) _log.debug(toString() + ": Removing participating tunnel " + id);
         synchronized (_participatingTunnels) {
             return (TunnelInfo)_participatingTunnels.remove(id);
         }
@@ -396,7 +423,7 @@ class TunnelPool {
     }
     public void removePendingTunnel(TunnelId id) {
         if (!_isLive) return;
-        if (_log.shouldLog(Log.DEBUG)) _log.debug("Removing pending tunnel " + id);
+        if (_log.shouldLog(Log.DEBUG)) _log.debug(toString() + ": Removing pending tunnel " + id);
         synchronized (_pendingTunnels) {
             _pendingTunnels.remove(id);
         }
