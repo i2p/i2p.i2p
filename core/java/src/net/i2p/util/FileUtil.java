@@ -33,7 +33,7 @@ public class FileUtil {
     /**
      * Delete the path as well as any files or directories underneath it.
      * 
-     * @param path path to the directory being deleted
+     * @param target the file or directory being deleted
      * @param failIfNotEmpty if true, do not delete anything if the directory
      *                       is not empty (and return false)
      * @return true if the path no longer exists (aka was removed), 
