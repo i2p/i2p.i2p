@@ -47,9 +47,13 @@ public class WebStatusPageHelper {
     }
     
     public String getSummaryList() {
+        TunnelControllerGroup group = TunnelControllerGroup.getInstance();
+        if (group == null)
+            return "<b>I2PTunnel instances not yet started - please be patient</b>\n";
+            
         StringBuffer buf = new StringBuffer(4*1024);
         buf.append("<ul>");
-        List tunnels = TunnelControllerGroup.getInstance().getControllers();
+        List tunnels = group.getControllers();
         for (int i = 0; i < tunnels.size(); i++) {
             buf.append("<li>\n");
             getSummary(buf, i, (TunnelController)tunnels.get(i));
@@ -92,24 +96,45 @@ public class WebStatusPageHelper {
             return "Action <i>" + _action + "</i> unknown";
     }
     private String stopAll() {
-        List msgs = TunnelControllerGroup.getInstance().stopAllControllers();
+        TunnelControllerGroup group = TunnelControllerGroup.getInstance();
+        if (group == null)
+            return "<b>I2PTunnel instances not yet started - please be patient</b>\n";
+        
+        List msgs = group.stopAllControllers();
         return getMessages(msgs);
     }
     private String startAll() {
-        List msgs = TunnelControllerGroup.getInstance().startAllControllers();
+        TunnelControllerGroup group = TunnelControllerGroup.getInstance();
+        if (group == null)
+            return "<b>I2PTunnel instances not yet started - please be patient</b>\n";
+        
+        List msgs = group.startAllControllers();
         return getMessages(msgs);
     }
     private String restartAll() {
-        List msgs = TunnelControllerGroup.getInstance().restartAllControllers();
+        TunnelControllerGroup group = TunnelControllerGroup.getInstance();
+        if (group == null)
+            return "<b>I2PTunnel instances not yet started - please be patient</b>\n";
+        
+        List msgs = group.restartAllControllers();
         return getMessages(msgs);
     }
     private String reloadConfig() {
-        TunnelControllerGroup.getInstance().reloadControllers();
+        TunnelControllerGroup group = TunnelControllerGroup.getInstance();
+        if (group == null)
+            return "<b>I2PTunnel instances not yet started - please be patient</b>\n";
+        
+        group.reloadControllers();
         return "Config reloaded";
     }
     private String start() {
+        TunnelControllerGroup group = TunnelControllerGroup.getInstance();
+        if (group == null)
+            return "<b>I2PTunnel instances not yet started - please be patient</b>\n";
+        
         if (_controllerNum < 0) return "Invalid tunnel";
-        List controllers = TunnelControllerGroup.getInstance().getControllers();
+        
+        List controllers = group.getControllers();
         if (_controllerNum >= controllers.size()) return "Invalid tunnel";
         TunnelController controller = (TunnelController)controllers.get(_controllerNum);
         controller.startTunnel();
@@ -117,8 +142,13 @@ public class WebStatusPageHelper {
     }
     
     private String stop() {
+        TunnelControllerGroup group = TunnelControllerGroup.getInstance();
+        if (group == null)
+            return "<b>I2PTunnel instances not yet started - please be patient</b>\n";
+        
         if (_controllerNum < 0) return "Invalid tunnel";
-        List controllers = TunnelControllerGroup.getInstance().getControllers();
+        
+        List controllers = group.getControllers();
         if (_controllerNum >= controllers.size()) return "Invalid tunnel";
         TunnelController controller = (TunnelController)controllers.get(_controllerNum);
         controller.stopTunnel();
@@ -126,7 +156,11 @@ public class WebStatusPageHelper {
     }
     
     private String getMessages() {
-        return getMessages(TunnelControllerGroup.getInstance().clearAllMessages());
+        TunnelControllerGroup group = TunnelControllerGroup.getInstance();
+        if (group == null)
+            return "";
+        
+        return getMessages(group.clearAllMessages());
     }
     
     private String getMessages(List msgs) {

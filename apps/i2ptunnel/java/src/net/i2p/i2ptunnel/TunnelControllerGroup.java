@@ -30,27 +30,21 @@ public class TunnelControllerGroup {
     private List _controllers;
     private String _configFile = DEFAULT_CONFIG_FILE;
     
-    public static TunnelControllerGroup getInstance() { 
-        synchronized (TunnelControllerGroup.class) {
-            if (_instance == null)
-                _instance = new TunnelControllerGroup(DEFAULT_CONFIG_FILE);
-            return _instance; 
-        }
-    }
+    public static TunnelControllerGroup getInstance() { return _instance; }
 
-    private TunnelControllerGroup(String configFile) { 
+    private TunnelControllerGroup(String configFile) {
         _log = I2PAppContext.getGlobalContext().logManager().getLog(TunnelControllerGroup.class);
         _controllers = new ArrayList();
         _configFile = configFile;
         loadControllers(_configFile);
     }
-    
+
     public static void main(String args[]) {
         if ( (args == null) || (args.length <= 0) ) {
-            _instance = getInstance();
+            _instance = new TunnelControllerGroup(DEFAULT_CONFIG_FILE);
         } else if (args.length == 1) {
             if (DEFAULT_CONFIG_FILE.equals(args[0]))
-                _instance = getInstance();
+                _instance = new TunnelControllerGroup(DEFAULT_CONFIG_FILE);
             else
                 _instance = new TunnelControllerGroup(args[0]);
         } else {
