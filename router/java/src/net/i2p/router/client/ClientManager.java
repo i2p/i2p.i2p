@@ -17,16 +17,19 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
+import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
 import net.i2p.data.Hash;
 import net.i2p.data.LeaseSet;
 import net.i2p.data.Payload;
+import net.i2p.data.TunnelId;
 import net.i2p.data.i2cp.MessageId;
 import net.i2p.data.i2cp.SessionConfig;
 import net.i2p.router.ClientMessage;
 import net.i2p.router.Job;
 import net.i2p.router.JobImpl;
 import net.i2p.router.RouterContext;
+import net.i2p.router.TunnelInfo;
 import net.i2p.util.I2PThread;
 import net.i2p.util.Log;
 
@@ -310,7 +313,8 @@ public class ClientManager {
     
     public void renderStatusHTML(OutputStream out) throws IOException {
         StringBuffer buf = new StringBuffer(8*1024);
-        buf.append("<h2>Clients</h2><ul>");
+        buf.append("<u><b>Local destinations</b></u><br />");
+        
         Map runners = null;
         synchronized (_runners) {
             runners = (Map)_runners.clone();
@@ -318,16 +322,39 @@ public class ClientManager {
         for (Iterator iter = runners.keySet().iterator(); iter.hasNext(); ) {
             Destination dest = (Destination)iter.next();
             ClientConnectionRunner runner = (ClientConnectionRunner)runners.get(dest);
-            buf.append("<li>").append(dest.calculateHash().toBase64()).append("</li>\n");
-            // toss out some general warnings
-            if (runner.getLeaseSet() == null)
-                buf.append("<font color=\"red\"><b>No leases! If you didn't just start a client, please restart it (and perhaps check your router's logs for ERROR messages)</b></font><br />\n");
-            else if (runner.getLeaseSet().getEarliestLeaseDate() < _context.clock().now()) 
-                buf.append("<font color=\"red\"><b>wtf, lease has already expired!  please wait a minute, and if this message remains, restart your client</b></font><br />\n");
-            buf.append("<pre>\n");
-            buf.append(runner.getLeaseSet()).append("</pre>\n");
+            buf.append("<b>*</b> ").append(dest.calculateHash().toBase64().substring(0,6)).append("<br />\n");
+            LeaseSet ls = runner.getLeaseSet();
+            if (ls == null) {
+                buf.append("<font color=\"red\"><i>No lease</i></font><br />\n");
+            } else { 
+                long leaseAge = ls.getEarliestLeaseDate() - _context.clock().now();
+                if (leaseAge <= 0) { 
+                    buf.append("<font color=\"red\"><i>Lease expired ");
+                    buf.append(DataHelper.formatDuration(0-leaseAge)).append(" ago</i></font><br />\n");
+                } else {
+                    int count = ls.getLeaseCount();
+                    if (count <= 0) {
+                        buf.append("<font color=\"red\"><i>No tunnels</i></font><br />\n");
+                    } else {
+                        TunnelId id = ls.getLease(0).getTunnelId();
+                        TunnelInfo info = _context.tunnelManager().getTunnelInfo(id);
+                        if (info == null) {
+                            buf.append("<font color=\"red\"><i>Failed tunnels</i></font><br />\n");
+                        } else {
+                            buf.append(count).append(" x ");
+                            buf.append(info.getLength() - 1).append(" hop tunnel");
+                            if (count != 1)
+                                buf.append('s');
+                            buf.append("<br />\n");
+                            buf.append("Expiring in ").append(DataHelper.formatDuration(leaseAge));
+                            buf.append("<br />\n");
+                        }
+                    }
+                }
+            }
         }
-        buf.append("</ul>\n");
+        
+        buf.append("\n<hr />\n");
         out.write(buf.toString().getBytes());
     }
     
