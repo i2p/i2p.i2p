@@ -146,6 +146,10 @@ public class PoolingTunnelManagerFacade implements TunnelManagerFacade {
      *
      */
     public void peerFailed(Hash peer) {
+        if (true) {
+            _log.error("Peer " + peer.toBase64() + " failed, but we're not going to kill their tunnels", new Exception("wtf"));
+            return;
+        }
         int numFailed = 0;
         for (Iterator iter = _pool.getManagedTunnelIds().iterator(); iter.hasNext(); ) {
             TunnelId id = (TunnelId)iter.next();

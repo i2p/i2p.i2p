@@ -18,9 +18,6 @@ class TunnelPoolManagerJob extends JobImpl {
     private Log _log;
     private TunnelPool _pool;
     
-    /** whether we built tunnels on the last run */
-    private boolean _builtOnLastRun;
-    
     /**
      * How frequently to check the pool (and fire appropriate refill jobs)
      *
@@ -48,8 +45,8 @@ class TunnelPoolManagerJob extends JobImpl {
             boolean built = false;
     
             int targetClients = _pool.getTargetClients();
-            int targetInboundTunnels = targetClients*_pool.getPoolSettings().getNumInboundTunnels() + 3;
-            int targetOutboundTunnels = targetClients*_pool.getPoolSettings().getNumOutboundTunnels() + 3;
+            int targetInboundTunnels = targetClients*_pool.getPoolSettings().getNumInboundTunnels() + 1;
+            int targetOutboundTunnels = targetClients*_pool.getPoolSettings().getNumOutboundTunnels() + 1;
     
             int curFreeInboundTunnels = getFreeTunnelCount();
             if (curFreeInboundTunnels < targetInboundTunnels) {
@@ -60,7 +57,8 @@ class TunnelPoolManagerJob extends JobImpl {
                 //requestFakeInboundTunnels(1);
                 built = true;
             } else {
-                if (_builtOnLastRun) {
+                // 10% chance of building a new tunnel
+                if (getContext().random().nextInt(9) > 0) {
                     // all good, no need for more inbound tunnels
                     if (_log.shouldLog(Log.DEBUG))
                         _log.debug("Sufficient inbound tunnels (" + curFreeInboundTunnels + ")");
@@ -81,7 +79,8 @@ class TunnelPoolManagerJob extends JobImpl {
                 //requestFakeOutboundTunnels(1);
                 built = true;
             } else {
-                if (_builtOnLastRun) {
+                // 10% chance of building a new tunnel
+                if (getContext().random().nextInt(9) > 0) {
                     // all good, no need for more outbound tunnels
                     if (_log.shouldLog(Log.DEBUG))
                         _log.debug("Sufficient outbound tunnels (" + curOutboundTunnels + ")");
@@ -94,7 +93,6 @@ class TunnelPoolManagerJob extends JobImpl {
             }
 
             _pool.buildFakeTunnels();
-            _builtOnLastRun = built;
         } catch (Throwable t) {
             _log.log(Log.CRIT, "Unhandled exception managing the tunnel pool", t);
         }
@@ -109,6 +107,7 @@ class TunnelPoolManagerJob extends JobImpl {
     private int getFreeTunnelCount() {
         Set freeTunnels = _pool.getFreeTunnels();
         int free = 0;
+        int tooShort = 0;
         int minLength = _pool.getPoolSettings().getDepthInbound();
         long mustExpireAfter = getContext().clock().now() + EXPIRE_FUDGE_PERIOD;
         for (Iterator iter = freeTunnels.iterator(); iter.hasNext(); ) {
@@ -131,14 +130,20 @@ class TunnelPoolManagerJob extends JobImpl {
                         // for the moment we'll keep these around so that we can use them
                         // for tunnel management and db messages, rather than force all
                         // tunnels to be the 2+ hop length as required for clients
-                        free++;
+                        tooShort++; // free++;
                     }
                 } else {
                     _log.info("Inbound tunnel " + id + " is expiring in the upcoming period, consider it not-free");
                 }
             }
         }
-        return free;
+        if (free <= 0) {
+            if (_log.shouldLog(Log.WARN)) 
+                _log.warn("No free tunnels that are long enough, but there are " + tooShort + " shorter ones");
+            return tooShort;
+        } else {
+            return free;
+        }
     }
     
     /**
