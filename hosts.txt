@@ -1,6 +1,9 @@
 ; TC's hosts.txt guaranteed freshness
-; $Id: hosts.txt,v 1.39 2004/09/07 17:30:53 hypercubus Exp $
+; $Id: hosts.txt,v 1.43 2004/09/08 17:05:01 hypercubus Exp $
 ; changelog:
+; (1.67) added eepdot.i2p
+; (1.66) removed datagram_test.i2p
+; (1.65) added socks1.tor.i2p
 ; (1.64) added sugadude.i2p
 ; (1.63) added files.i2p
 ; (1.62) added beyond.i2p
