@@ -18,11 +18,19 @@ public class ConfigServiceHandler extends FormHandler {
         if (_action == null) return;
         
         if ("Shutdown gracefully".equals(_action)) {
-            WrapperManager.signalStopped(Router.EXIT_GRACEFUL);
+            try { 
+                WrapperManager.signalStopped(Router.EXIT_GRACEFUL);
+            } catch (Throwable t) {
+                addFormError("Warning: unable to contact the service manager - " + t.getMessage());
+            }
             _context.router().shutdownGracefully();
             addFormNotice("Graceful shutdown initiated");
         } else if ("Shutdown immediately".equals(_action)) {
-            WrapperManager.signalStopped(Router.EXIT_HARD);
+            try {
+                WrapperManager.signalStopped(Router.EXIT_HARD);
+            } catch (Throwable t) {
+                addFormError("Warning: unable to contact the service manager - " + t.getMessage());
+            }
             _context.router().shutdown(Router.EXIT_HARD);
             addFormNotice("Shutdown immediately!  boom bye bye bad bwoy");
         } else if ("Cancel graceful shutdown".equals(_action)) {
@@ -32,23 +40,35 @@ public class ConfigServiceHandler extends FormHandler {
             _context.router().shutdown(Router.EXIT_HARD_RESTART);
             addFormNotice("Hard restart requested");
         } else if ("Dump threads".equals(_action)) {
-            WrapperManager.requestThreadDump();
+            try {
+                WrapperManager.requestThreadDump();
+            } catch (Throwable t) {
+                addFormError("Warning: unable to contact the service manager - " + t.getMessage());
+            }
             addFormNotice("Threads dumped to logs/wrapper.log");
         } else if ("Show systray icon".equals(_action)) {
-            SysTray tray = SysTray.getInstance();
-            if (tray != null) {
-                tray.show();
-                addFormNotice("Systray enabled");
-            } else {
-                addFormNotice("Systray not supported on this platform");
+            try {
+                SysTray tray = SysTray.getInstance();
+                if (tray != null) {
+                    tray.show();
+                    addFormNotice("Systray enabled");
+                } else {
+                    addFormNotice("Systray not supported on this platform");
+                }
+            } catch (Throwable t) {
+                addFormError("Warning: unable to contact the systray manager - " + t.getMessage());
             }
         } else if ("Hide systray icon".equals(_action)) {
-            SysTray tray = SysTray.getInstance();
-            if (tray != null) {
-                tray.hide();
-                addFormNotice("Systray disabled");
-            } else {
-                addFormNotice("Systray not supported on this platform");
+            try {
+                SysTray tray = SysTray.getInstance();
+                if (tray != null) {
+                    tray.hide();
+                    addFormNotice("Systray disabled");
+                } else {
+                    addFormNotice("Systray not supported on this platform");
+                }
+            } catch (Throwable t) {
+                addFormError("Warning: unable to contact the systray manager - " + t.getMessage());
             }
         } else {
             addFormNotice("Blah blah blah.  whatever.  I'm not going to " + _action);
