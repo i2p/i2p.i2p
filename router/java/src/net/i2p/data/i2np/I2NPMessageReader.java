@@ -122,12 +122,14 @@ public class I2NPMessageReader {
                             _listener.messageReceived(I2NPMessageReader.this, msg, msToRead);
                         }
                     } catch (I2NPMessageException ime) {
-                        //_log.warn("Error handling message", ime);
+                        if (_log.shouldLog(Log.WARN))
+                            _log.warn("Error handling message", ime);
                         _listener.readError(I2NPMessageReader.this, ime);
                         _listener.disconnected(I2NPMessageReader.this);
                         cancelRunner();
                     } catch (IOException ioe) {
-                        _log.warn("IO Error handling message", ioe);
+                        if (_log.shouldLog(Log.WARN))
+                            _log.warn("IO Error handling message", ioe);
                         _listener.disconnected(I2NPMessageReader.this);
                         cancelRunner();
                     }
