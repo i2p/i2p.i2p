@@ -74,7 +74,7 @@ public class ConfigNetHelper {
         if (rate != null)
             return rate;
         else
-            return "Unlimited";
+            return "-1";
     }
     public String getInboundBurstFactorBox() {
         String rate = _context.getProperty(PROP_INBOUND_KBPS);
