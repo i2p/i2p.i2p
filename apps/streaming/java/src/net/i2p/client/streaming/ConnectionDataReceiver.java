@@ -26,6 +26,10 @@ class ConnectionDataReceiver implements MessageOutputStream.DataReceiver {
         _dummyStatus = new DummyStatus();
     }
     
+    public boolean writeInProcess() {
+        return _connection.getUnackedPacketsSent() > 0;
+    }
+    
     /**
      * Send some data through the connection, or if there is no new data, this
      * may generate a packet with a plain ACK/NACK or CLOSE, or nothing whatsoever

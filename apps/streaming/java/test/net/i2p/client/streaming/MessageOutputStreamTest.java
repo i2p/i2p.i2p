@@ -57,6 +57,7 @@ public class MessageOutputStreamTest {
             _data.write(buf, off, size);
 			return new DummyWriteStatus();
         }
+        public boolean writeInProcess() { return false; }
         public byte[] getData() { return _data.toByteArray(); }
     }
 
