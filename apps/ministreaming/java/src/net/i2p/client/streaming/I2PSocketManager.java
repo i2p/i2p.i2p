@@ -22,6 +22,7 @@ import net.i2p.client.I2PSessionException;
 import net.i2p.client.I2PSessionListener;
 import net.i2p.data.Base64;
 import net.i2p.data.Destination;
+import net.i2p.data.DataFormatException;
 import net.i2p.util.Log;
 
 /**
@@ -40,6 +41,14 @@ public class I2PSocketManager implements I2PSessionListener {
     private HashMap _outSockets;
     private HashMap _inSockets;
     private I2PSocketOptions _defaultOptions;
+    
+    public static final short ACK = 0x51;
+    public static final short CLOSE_OUT = 0x52;
+    public static final short DATA_OUT = 0x50;
+    public static final short SYN = 0xA1;
+    public static final short CLOSE_IN = 0xA2;
+    public static final short DATA_IN = 0xA0;
+    public static final short CHAFF = 0xFF;
 
     public I2PSocketManager() {
         _session = null;
@@ -63,7 +72,7 @@ public class I2PSocketManager implements I2PSessionListener {
     public void errorOccurred(I2PSession session, String message, Throwable error) {
         _log.error("Error occurred: [" + message + "]", error);
     }
-
+    
     public void messageAvailable(I2PSession session, int msgId, long size) {
         try {
             I2PSocketImpl s;
@@ -77,157 +86,274 @@ public class I2PSocketManager implements I2PSessionListener {
                 return;
             }
             int type = msg[0] & 0xff;
-            String id = new String(new byte[] { msg[1], msg[2], msg[3]}, "ISO-8859-1");
+            String id = toString(new byte[] { msg[1], msg[2], msg[3]});
             byte[] payload = new byte[msg.length - 4];
             System.arraycopy(msg, 4, payload, 0, payload.length);
             _log.debug("Message read: type = [" + Integer.toHexString(type) + "] id = [" + getReadableForm(id)
                        + "] payload length: " + payload.length + "]");
-            synchronized (lock) {
-                switch (type) {
-                case 0x51:
-                    // ACK outgoing
-                    s = (I2PSocketImpl) _outSockets.get(id);
-                    if (s == null) {
-                        _log.warn("No socket responsible for ACK packet");
-                        return;
-                    }
-                    if (payload.length == 3 && s.getRemoteID(false) == null) {
-                        String newID = new String(payload, "ISO-8859-1");
-                        s.setRemoteID(newID);
-                        return;
-                    } else {
-                        if (payload.length != 3)
-                            _log.warn("Ack packet had " + payload.length + " bytes");
-                        else
-                            _log.warn("Remote ID already exists? " + s.getRemoteID());
-                        return;
-                    }
-                case 0x52:
-                    // disconnect outgoing
-                    _log.debug("*Disconnect outgoing!");
-                    try {
-                        s = (I2PSocketImpl) _outSockets.get(id);
-                        if (s != null) {
-                            if (payload.length > 0) {
-                                _log.debug("Disconnect packet had "
-                                           + payload.length + " bytes");
-                            }
-                            if (s.getRemoteID(false) == null) {
-                                s.setRemoteID(null); // Just to wake up socket
-                                return;
-                            }
-                            s.internalClose();
-                            _outSockets.remove(id);
-                        }
-                        return;
-                    } catch (Exception t) {
-                        _log.error("Ignoring error on disconnect", t);
-                    }
-                case 0x50:
-                    // packet send outgoing
-                    _log.debug("*Packet send outgoing [" + payload.length + "]");
-                    s = (I2PSocketImpl) _outSockets.get(id);
-                    if (s != null) {
-                        s.queueData(payload);
-                        return;
-                    } else {
-                        _log.error("Null socket with data available");
-                        throw new IllegalStateException("Null socket with data available");
-                    }
-                case 0xA1:
-                    // SYN incoming
-                    _log.debug("*Syn!");
-                    String newLocalID = makeID(_inSockets);
-                    Destination d = new Destination();
-                    d.readBytes(new ByteArrayInputStream(payload));
-                    
-                    if (_serverSocket == null) {
-                        // The app did not instantiate an I2PServerSocket
-                        byte[] packet = makePacket((byte) 0x52, id, newLocalID.getBytes("ISO-8859-1"));
-                        boolean replySentOk = false;
-                        synchronized (_session) {
-                            replySentOk = _session.sendMessage(d, packet);
-                        }
-                        if (!replySentOk) {
-                            _log.error("Error sending close to " + d.calculateHash().toBase64()
-                                       + " in response to a new con message", new Exception("Failed creation"));
-                        }
-                        return;
-                    }
-                    
-                    s = new I2PSocketImpl(d, this, false, newLocalID);
-                    s.setRemoteID(id);
-                    if (_serverSocket.getNewSocket(s)) {
-                        _inSockets.put(newLocalID, s);
-                        byte[] packet = makePacket((byte) 0x51, id, newLocalID.getBytes("ISO-8859-1"));
-                        boolean replySentOk = false;
-                        synchronized (_session) {
-                            replySentOk = _session.sendMessage(d, packet);
-                        }
-                        if (!replySentOk) {
-                            _log.error("Error sending reply to " + d.calculateHash().toBase64()
-                                       + " in response to a new con message", new Exception("Failed creation"));
-                            s.internalClose();
-                        }
-                    } else {
-                        byte[] packet = (" " + id).getBytes("ISO-8859-1");
-                        packet[0] = 0x52;
-                        boolean nackSent = session.sendMessage(d, packet);
-                        if (!nackSent) {
-                            _log.error("Error sending NACK for session creation");
-                        }
-                        s.internalClose();
-                    }
+            switch (type) {
+                case ACK:
+                    ackAvailable(id, payload);
                     return;
-                case 0xA2:
-                    // disconnect incoming
-                    _log.debug("*Disconnect incoming!");
-                    try {
-                        s = (I2PSocketImpl) _inSockets.get(id);
-                        if (payload.length == 0 && s != null) {
-                            s.internalClose();
-                            _inSockets.remove(id);
-                            return;
-                        } else {
-                            if (payload.length > 0) _log.warn("Disconnect packet had " + payload.length + " bytes");
-                            return;
-                        }
-                    } catch (Exception t) {
-                        _log.error("Ignoring error on disconnect", t);
-                        return;
-                    }
-                case 0xA0:
-                    // packet send incoming
-                    _log.debug("*Packet send incoming [" + payload.length + "]");
-                    s = (I2PSocketImpl) _inSockets.get(id);
-                    if (s != null) {
-                        s.queueData(payload);
-                        return;
-                    } else {
-                        _log.error("Null socket with data available");
-                        throw new IllegalStateException("Null socket with data available");
-                    }
-                case 0xFF:
+                case CLOSE_OUT:
+                    disconnectAvailable(id, payload);
+                    return;
+                case DATA_OUT:
+                    sendOutgoingAvailable(id, payload);
+                    return;
+                case SYN:
+                    synIncomingAvailable(id, payload, session);
+                    return;
+                case CLOSE_IN:
+                    disconnectIncoming(id, payload);
+                    return;
+                case DATA_IN:
+                    sendIncoming(id, payload);
+                case CHAFF:
                     // ignore
                     return;
-                }
-                _log.error("\n\n=============== Unknown packet! " + "============" + "\nType: " + (int) type
-                           + "\nID:   " + getReadableForm(id) + "\nBase64'ed Data: " + Base64.encode(payload)
-                           + "\n\n\n");
-                if (id != null) {
-                    _inSockets.remove(id);
-                    _outSockets.remove(id);
-                }
+                default:
+                    handleUnknown(type, id, payload);
+                    return;
             }
         } catch (I2PException ise) {
             _log.error("Error processing", ise);
-        } catch (IOException ioe) {
-            _log.error("Error processing", ioe);
         } catch (IllegalStateException ise) {
             _log.debug("Error processing", ise);
         }
     }
+    
+    /**
+     * We've received an ACK packet (hopefully, in response to a SYN that we 
+     * recently sent out).  Notify the associated I2PSocket that we now have
+     * the remote stream ID (which should get things going, since the handshake
+     * is complete).
+     *
+     */
+    private void ackAvailable(String id, byte payload[]) {
+        I2PSocketImpl s = null;
+        synchronized (lock) {
+            s = (I2PSocketImpl) _outSockets.get(id);
+        }
 
+        if (s == null) {
+            _log.warn("No socket responsible for ACK packet");
+            return;
+        }
+
+        String remoteId = null;
+        try {
+            remoteId = s.getRemoteID(false); 
+        } catch (InterruptedIOException iie) {
+            throw new RuntimeException("ERROR!  getRemoteId(false) should never throw InterruptedIOException!");
+        }
+
+        if ( (payload.length == 3) && (remoteId == null) ) {
+            String newID = toString(payload);
+            s.setRemoteID(newID);
+            return;
+        } else {
+            // (payload.length != 3 || getRemoteId != null)
+            if (_log.shouldLog(Log.WARN)) {
+                if (payload.length != 3)
+                    _log.warn("Ack packet had " + payload.length + " bytes");
+                else
+                    _log.warn("Remote ID already exists? " + remoteId);
+            }
+            return;
+        }
+    }
+    
+    /**
+     * We received a disconnect packet, telling us to tear down the specified
+     * stream.
+     */
+    private void disconnectAvailable(String id, byte payload[]) {
+        I2PSocketImpl s = null;
+        synchronized (lock) {
+            s = (I2PSocketImpl) _outSockets.get(id);
+        }
+        
+        _log.debug("*Disconnect outgoing!");
+        try {
+            if (s != null) {
+                if (payload.length > 0) {
+                    _log.debug("Disconnect packet had "
+                               + payload.length + " bytes");
+                }
+                if (s.getRemoteID(false) == null) {
+                    s.setRemoteID(null); // Just to wake up socket
+                    return;
+                }
+                s.internalClose();
+                synchronized (lock) {
+                    _outSockets.remove(id);
+                }
+            }
+            return;
+        } catch (Exception t) {
+            _log.error("Ignoring error on disconnect", t);
+        }
+    }
+    
+    /**
+     * We've received data on a stream we created - toss the data onto
+     * the socket for handling.
+     *
+     * @throws IllegalStateException if the socket isn't open or isn't known
+     */
+    private void sendOutgoingAvailable(String id, byte payload[]) throws IllegalStateException {
+        I2PSocketImpl s = null;
+        synchronized (lock) {
+            s = (I2PSocketImpl) _outSockets.get(id);
+        }
+
+        // packet send outgoing
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("*Packet send outgoing [" + payload.length + "]");
+        if (s != null) {
+            s.queueData(payload);
+            return;
+        } else {
+            _log.error("Null socket with data available");
+            throw new IllegalStateException("Null socket with data available");
+        }
+    }
+    
+    /**
+     * We've received a SYN packet (a request for a new stream).  If the client has 
+     * said they want incoming sockets (by retrieving the serverSocket), the stream
+     * will be ACKed, but if they have not, they'll be NACKed)
+     *
+     * @throws DataFormatException if the destination in the SYN was invalid
+     * @throws I2PSessionException if there was an I2P error sending the ACK or NACK
+     */
+    private void synIncomingAvailable(String id, byte payload[], I2PSession session) 
+                                      throws DataFormatException, I2PSessionException {
+        _log.debug("*Syn!");
+        Destination d = new Destination();
+        d.fromByteArray(payload);
+
+        I2PSocketImpl s = null;
+        boolean acceptConnections = (_serverSocket != null);
+        String newLocalID = null;
+        synchronized (lock) {
+            newLocalID = makeID(_inSockets);
+            if (acceptConnections) {
+                s = new I2PSocketImpl(d, this, false, newLocalID);
+                s.setRemoteID(id);
+            }
+        }    
+        
+        if (!acceptConnections) {
+            // The app did not instantiate an I2PServerSocket
+            byte[] packet = makePacket((byte) CLOSE_OUT, id, toBytes(newLocalID));
+            boolean replySentOk = false;
+            synchronized (_session) {
+                replySentOk = _session.sendMessage(d, packet);
+            }
+            if (!replySentOk) {
+                _log.error("Error sending close to " + d.calculateHash().toBase64()
+                           + " in response to a new con message", 
+                           new Exception("Failed creation"));
+            }
+            return;
+        }
+
+        if (_serverSocket.getNewSocket(s)) {
+            _inSockets.put(newLocalID, s);
+            byte[] packet = makePacket((byte) ACK, id, toBytes(newLocalID));
+            boolean replySentOk = false;
+            replySentOk = _session.sendMessage(d, packet);
+            if (!replySentOk) {
+                _log.error("Error sending reply to " + d.calculateHash().toBase64()
+                           + " in response to a new con message",
+                           new Exception("Failed creation"));
+                s.internalClose();
+            }
+        } else {
+            byte[] packet = toBytes(" " + id);
+            packet[0] = CLOSE_OUT;
+            boolean nackSent = session.sendMessage(d, packet);
+            if (!nackSent) {
+                _log.error("Error sending NACK for session creation");
+            }
+            s.internalClose();
+        }
+        return;
+    }
+    
+    /**
+     * We've received a disconnect for a socket we didn't initiate, so kill
+     * the socket.
+     *
+     */
+    private void disconnectIncoming(String id, byte payload[]) {
+        _log.debug("*Disconnect incoming!");
+        I2PSocketImpl s = null;
+        synchronized (lock) {
+            s = (I2PSocketImpl) _inSockets.get(id);
+            if (payload.length == 0 && s != null) {
+                _inSockets.remove(id);
+            }
+        }
+        
+        try {
+            if (payload.length == 0 && s != null) {
+                s.internalClose();
+                return;
+            } else {
+                if ( (payload.length > 0) && (_log.shouldLog(Log.WARN)) )
+                    _log.warn("Disconnect packet had " + payload.length + " bytes");
+                return;
+            }
+        } catch (Exception t) {
+            _log.error("Ignoring error on disconnect", t);
+            return;
+        }
+    }
+    
+    /**
+     * We've received data on a stream we received - toss the data onto
+     * the socket for handling.
+     *
+     * @throws IllegalStateException if the socket isn't open or isn't known
+     */
+    private void sendIncoming(String id, byte payload[]) {
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("*Packet send incoming [" + payload.length + "]");
+        I2PSocketImpl s = null;
+        synchronized (lock) {
+            s = (I2PSocketImpl) _inSockets.get(id);
+        }
+        
+        if (s != null) {
+            s.queueData(payload);
+            return;
+        } else {
+            _log.error("Null socket with data available");
+            throw new IllegalStateException("Null socket with data available");
+        }
+    }
+    
+    /**
+     * Unknown packet.  moo.
+     *
+     */
+    private void handleUnknown(int type, String id, byte payload[]) {
+        _log.error("\n\n=============== Unknown packet! " + "============" 
+                   + "\nType: " + (int) type
+                   + "\nID:   " + getReadableForm(id) 
+                   + "\nBase64'ed Data: " + Base64.encode(payload)
+                   + "\n\n\n");
+        if (id != null) {
+            synchronized (lock) {
+                _inSockets.remove(id);
+                _outSockets.remove(id);
+            }
+        }
+    }
+    
     public void reportAbuse(I2PSession session, int severity) {
         _log.error("Abuse reported [" + severity + "]");
     }
@@ -258,25 +384,24 @@ public class I2PSocketManager implements I2PSessionListener {
      * @throws InterruptedIOException if the connection timeouts
      * @throws I2PException if there is some other I2P-related problem
      */
-    public I2PSocket connect(Destination peer, I2PSocketOptions options) throws I2PException, ConnectException, NoRouteToHostException, InterruptedIOException {
-
+    public I2PSocket connect(Destination peer, I2PSocketOptions options) 
+                             throws I2PException, ConnectException, 
+                             NoRouteToHostException, InterruptedIOException {
         String localID, lcID;
         I2PSocketImpl s;
         synchronized (lock) {
             localID = makeID(_outSockets);
             lcID = getReadableForm(localID);
             s = new I2PSocketImpl(peer, this, true, localID);
-            _outSockets.put(s.getLocalID(), s);
+            _outSockets.put(localID, s);
         }
         try {
             ByteArrayOutputStream pubkey = new ByteArrayOutputStream();
             _session.getMyDestination().writeBytes(pubkey);
             String remoteID;
-            byte[] packet = makePacket((byte) 0xA1, localID, pubkey.toByteArray());
+            byte[] packet = makePacket((byte) SYN, localID, pubkey.toByteArray());
             boolean sent = false;
-            synchronized (_session) {
-                sent = _session.sendMessage(peer, packet);
-            }
+            sent = _session.sendMessage(peer, packet);
             if (!sent) {
                 _log.info("Unable to send & receive ack for SYN packet");
                 synchronized (lock) {
@@ -285,9 +410,10 @@ public class I2PSocketManager implements I2PSessionListener {
                 throw new I2PException("Error sending through I2P network");
             }
             remoteID = s.getRemoteID(true, options.getConnectTimeout());
-            if (remoteID == null) { throw new ConnectException("Connection refused by peer"); }
-            if ("".equals(remoteID)) { throw new NoRouteToHostException("Unable to reach peer"); }
-            _log.debug("TIMING: s given out for remoteID " + getReadableForm(remoteID));
+            if (remoteID == null) throw new ConnectException("Connection refused by peer");
+            if ("".equals(remoteID)) throw new NoRouteToHostException("Unable to reach peer");
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("TIMING: s given out for remoteID " + getReadableForm(remoteID));
             return s;
         } catch (InterruptedIOException ioe) {
             _log.error("Timeout waiting for ack from syn for id " + getReadableForm(lcID), ioe);
@@ -324,7 +450,8 @@ public class I2PSocketManager implements I2PSessionListener {
      * @throws InterruptedIOException if the connection timeouts
      * @throws I2PException if there is some other I2P-related problem
      */
-    public I2PSocket connect(Destination peer) throws I2PException, ConnectException, NoRouteToHostException, InterruptedIOException {
+    public I2PSocket connect(Destination peer) throws I2PException, ConnectException, 
+                                               NoRouteToHostException, InterruptedIOException {
         return connect(peer, null);
     }
 
@@ -406,7 +533,7 @@ public class I2PSocketManager implements I2PSessionListener {
      */
     public boolean ping(Destination peer, long timeoutMs) {
         try {
-            return _session.sendMessage(peer, new byte[] { (byte) 0xFF});
+            return _session.sendMessage(peer, new byte[] { (byte) CHAFF});
         } catch (I2PException ex) {
             _log.error("I2PException:", ex);
             return false;
@@ -415,8 +542,7 @@ public class I2PSocketManager implements I2PSessionListener {
 
     public void removeSocket(I2PSocketImpl sock) {
         synchronized (lock) {
-            _log.debug("Removing socket \""
-                       + getReadableForm(sock.getLocalID()) + "\"");
+            _log.debug("Removing socket \"" + getReadableForm(sock.getLocalID()) + "\"");
             _inSockets.remove(sock.getLocalID());
             _outSockets.remove(sock.getLocalID());
             lock.notify();
@@ -424,14 +550,9 @@ public class I2PSocketManager implements I2PSessionListener {
     }
 
     public static String getReadableForm(String id) {
-        try {
-            if (id == null) return "(null)";
-            if (id.length() != 3) return "Bogus";
-            return Base64.encode(id.getBytes("ISO-8859-1"));
-        } catch (UnsupportedEncodingException ex) {
-            ex.printStackTrace();
-            return null;
-        }
+        if (id == null) return "(null)";
+        if (id.length() != 3) return "Bogus";
+        return Base64.encode(toBytes(id));
     }
 
     /**
@@ -439,22 +560,17 @@ public class I2PSocketManager implements I2PSessionListener {
      *
      * @param uniqueIn map of already known local IDs so we don't collide. WARNING - NOT THREADSAFE!
      */
-    public static String makeID(HashMap uniqueIn) {
+    private static String makeID(HashMap uniqueIn) {
         String newID;
-        try {
-            do {
-                int id = (int) (Math.random() * 16777215 + 1);
-                byte[] nid = new byte[3];
-                nid[0] = (byte) (id / 65536);
-                nid[1] = (byte) ((id / 256) % 256);
-                nid[2] = (byte) (id % 256);
-                newID = new String(nid, "ISO-8859-1");
-            } while (uniqueIn.get(newID) != null);
-            return newID;
-        } catch (UnsupportedEncodingException ex) {
-            ex.printStackTrace();
-            return null;
-        }
+        do {
+            int id = (int) (Math.random() * 16777215 + 1);
+            byte[] nid = new byte[3];
+            nid[0] = (byte) (id / 65536);
+            nid[1] = (byte) ((id / 256) % 256);
+            nid[2] = (byte) (id % 256);
+            newID = toString(nid);
+        } while (uniqueIn.get(newID) != null);
+        return newID;
     }
 
     /**
@@ -462,17 +578,28 @@ public class I2PSocketManager implements I2PSessionListener {
      * the given payload
      */
     public static byte[] makePacket(byte type, String id, byte[] payload) {
+        byte[] packet = new byte[payload.length + 4];
+        packet[0] = type;
+        byte[] temp = toBytes(id);
+        if (temp.length != 3) throw new RuntimeException("Incorrect ID length: " + temp.length);
+        System.arraycopy(temp, 0, packet, 1, 3);
+        System.arraycopy(payload, 0, packet, 4, payload.length);
+        return packet;
+    }
+    
+    private static final String toString(byte data[]) {
         try {
-            byte[] packet = new byte[payload.length + 4];
-            packet[0] = type;
-            byte[] temp = id.getBytes("ISO-8859-1");
-            if (temp.length != 3) throw new RuntimeException("Incorrect ID length: " + temp.length);
-            System.arraycopy(temp, 0, packet, 1, 3);
-            System.arraycopy(payload, 0, packet, 4, payload.length);
-            return packet;
-        } catch (UnsupportedEncodingException ex) {
-            if (_log.shouldLog(Log.ERROR)) _log.error("Error building the packet", ex);
-            return new byte[0];
+            return new String(data, "ISO-8859-1");
+        } catch (UnsupportedEncodingException uee) {
+            throw new RuntimeException("WTF!  iso-8859-1 isn't supported?");
+        }
+    }
+    
+    private static final byte[] toBytes(String str) {
+        try {
+            return str.getBytes("ISO-8859-1");
+        } catch (UnsupportedEncodingException uee) {
+            throw new RuntimeException("WTF!  iso-8859-1 isn't supported?");
         }
     }
 }

@@ -75,8 +75,10 @@ class I2PSocketImpl implements I2PSocket {
                 if ((maxWait >= 0) && (System.currentTimeMillis() >= dieAfter))
                     throw new InterruptedIOException("Timed out waiting for remote ID");
              
-                _log.debug("TIMING: RemoteID set to " + I2PSocketManager.getReadableForm(remoteID) + " for "
-                           + this.hashCode());
+                if (_log.shouldLog(Log.DEBUG))
+                    _log.debug("TIMING: RemoteID set to " 
+                               + I2PSocketManager.getReadableForm(remoteID) + " for "
+                               + this.hashCode());
             }
             return remoteID;
         }
@@ -143,7 +145,10 @@ class I2PSocketImpl implements I2PSocket {
     }
 
     private byte getMask(int add) {
-        return (byte) ((outgoing ? (byte) 0xA0 : (byte) 0x50) + (byte) add);
+        if (outgoing)
+            return (byte)(I2PSocketManager.DATA_IN + (byte)add);
+        else
+            return (byte)(I2PSocketManager.DATA_OUT + (byte)add);
     }
 
     public long getReadTimeout() {
@@ -187,7 +192,7 @@ class I2PSocketImpl implements I2PSocket {
             while (read.length == 0) {
                 synchronized (flagLock) {
                     if (closed) {
-                        _log.debug("Closed is set, so closing stream: " + this.hashCode());
+                        _log.debug("Closed is set, so closing stream: " + hashCode());
                         return -1;
                     }
                 }
@@ -210,12 +215,13 @@ class I2PSocketImpl implements I2PSocket {
             System.arraycopy(read, 0, b, off, read.length);
 
             if (_log.shouldLog(Log.DEBUG)) {
-                _log.debug("Read from I2PInputStream " + this.hashCode() + " returned " + read.length + " bytes");
+                _log.debug("Read from I2PInputStream " + hashCode() + " returned " 
+                           + read.length + " bytes");
             }
             //if (_log.shouldLog(Log.DEBUG)) {
             //  _log.debug("Read from I2PInputStream " + this.hashCode()
-            //	   + " returned "+read.length+" bytes:\n"
-            //	   + HexDump.dump(read));
+            //             + " returned "+read.length+" bytes:\n"
+            //             + HexDump.dump(read));
             //}
             return read.length;
         }
@@ -229,7 +235,8 @@ class I2PSocketImpl implements I2PSocket {
         }
 
         public synchronized void queueData(byte[] data, int off, int len) {
-            _log.debug("Insert " + len + " bytes into queue: " + this.hashCode());
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Insert " + len + " bytes into queue: " + hashCode());
             bc.append(data, off, len);
             notifyAll();
         }
@@ -268,67 +275,84 @@ class I2PSocketImpl implements I2PSocket {
         public I2PSocketRunner(InputStream in) {
             _log.debug("Runner's input stream is: " + in.hashCode());
             this.in = in;
-            setName("SocketRunner from " + I2PSocketImpl.this.remote.calculateHash().toBase64().substring(0, 4));
+            String peer = I2PSocketImpl.this.remote.calculateHash().toBase64();
+            setName("SocketRunner from " + peer.substring(0, 4));
             start();
+        }
+        
+        /**
+         * Pump some more data
+         *
+         * @return true if we should keep on handling, false otherwise
+         */
+        private boolean handleNextPacket(ByteCollector bc, byte buffer[]) 
+                                         throws IOException, I2PSessionException {
+            int len = in.read(buffer);
+            int bcsize = bc.getCurrentSize();
+            if (len != -1) {
+                bc.append(buffer, len);
+            } else if (bcsize == 0) {
+                // nothing left in the buffer, but the read(..) didn't EOF (-1)
+                // this used to be 'break' (aka return false), though that seems
+                // odd to me - shouldn't it keep reading packets until EOF?  
+                // but perhaps there's something funky in the stream's operation,
+                // or some other dependency within the rest of the ministreaming
+                // lib, so for the moment, return false.  --jr
+                return false;
+            }
+            if ((bcsize < MAX_PACKET_SIZE) && (in.available() == 0)) {
+                if (_log.shouldLog(Log.DEBUG))
+                    _log.debug("Runner Point d: " + hashCode());
+
+                try {
+                    Thread.sleep(PACKET_DELAY);
+                } catch (InterruptedException e) {
+                    _log.warn("wtf", e);
+                }
+            }
+            if ((bcsize >= MAX_PACKET_SIZE) || (in.available() == 0)) {
+                byte[] data = bc.startToByteArray(MAX_PACKET_SIZE);
+                if (data.length > 0) {
+                    if (_log.shouldLog(Log.DEBUG))
+                        _log.debug("Message size is: " + data.length);
+                    boolean sent = sendBlock(data);
+                    if (!sent) {
+                        _log.error("Error sending message to peer.  Killing socket runner");
+                        return false;
+                    }
+                }
+            }
+            return true;
         }
 
         public void run() {
             byte[] buffer = new byte[MAX_PACKET_SIZE];
             ByteCollector bc = new ByteCollector();
-            boolean sent = true;
+            boolean keepHandling = true;
+            int packetsHandled = 0;
             try {
-                int len, bcsize;
                 //		try {
-                while (true) {
-                    len = in.read(buffer);
-                    bcsize = bc.getCurrentSize();
-                    if (len != -1) {
-                        bc.append(buffer, len);
-                    } else if (bcsize == 0) {
-                        break;
-                    }
-                    if ((bcsize < MAX_PACKET_SIZE) && (in.available() == 0)) {
-                        _log.debug("Runner Point d: " + this.hashCode());
-
-                        try {
-                            Thread.sleep(PACKET_DELAY);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                    if ((bcsize >= MAX_PACKET_SIZE) || (in.available() == 0)) {
-                        byte[] data = bc.startToByteArray(MAX_PACKET_SIZE);
-                        if (data.length > 0) {
-                            _log.debug("Message size is: " + data.length);
-                            sent = sendBlock(data);
-                            if (!sent) {
-                                _log.error("Error sending message to peer.  Killing socket runner");
-                                break;
-                            }
-                        }
-                    }
+                while (keepHandling) {
+                    keepHandling = handleNextPacket(bc, buffer);
+                    packetsHandled++;
                 }
-                if ((bc.getCurrentSize() > 0) && sent) {
-                    _log.error("A SCARY MONSTER HAS EATEN SOME DATA! " + "(input stream: " + in.hashCode() + "; "
+                if ((bc.getCurrentSize() > 0) && (packetsHandled > 1)) {
+                    _log.error("A SCARY MONSTER HAS EATEN SOME DATA! " + "(input stream: " 
+                               + in.hashCode() + "; "
                                + "queue size: " + bc.getCurrentSize() + ")");
                 }
                 synchronized (flagLock) {
                     closed2 = true;
                 }
-                // 		} catch (IOException ex) {
-                // 		    if (_log.shouldLog(Log.INFO))
-                // 			_log.info("Error reading and writing", ex);
-                // 		}
                 boolean sc;
                 synchronized (flagLock) {
                     sc = sendClose;
                 } // FIXME: Race here?
                 if (sc) {
-                    _log.info("Sending close packet: " + outgoing);
-                    byte[] packet = I2PSocketManager.makePacket((byte) (getMask(0x02)), remoteID, new byte[0]);
-                    synchronized (manager.getSession()) {
-                        sent = manager.getSession().sendMessage(remote, packet);
-                    }
+                    if (_log.shouldLog(Log.INFO))
+                        _log.info("Sending close packet: " + outgoing);
+                    byte[] packet = I2PSocketManager.makePacket(getMask(0x02), remoteID, new byte[0]);
+                    boolean sent = manager.getSession().sendMessage(remote, packet);
                     if (!sent) {
                         _log.error("Error sending close packet to peer");
                     }
@@ -348,7 +372,8 @@ class I2PSocketImpl implements I2PSocket {
         }
 
         private boolean sendBlock(byte data[]) throws I2PSessionException {
-            _log.debug("TIMING: Block to send for " + I2PSocketImpl.this.hashCode());
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("TIMING: Block to send for " + I2PSocketImpl.this.hashCode());
             if (remoteID == null) {
                 _log.error("NULL REMOTEID");
                 return false;
@@ -358,9 +383,7 @@ class I2PSocketImpl implements I2PSocket {
             synchronized (flagLock) {
                 if (closed2) return false;
             }
-            synchronized (manager.getSession()) {
-                sent = manager.getSession().sendMessage(remote, packet);
-            }
+            sent = manager.getSession().sendMessage(remote, packet);
             return sent;
         }
     }
