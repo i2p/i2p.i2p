@@ -81,6 +81,8 @@ public class MessageHistory {
     public void initialize(boolean forceReinitialize) {
         if (!forceReinitialize) return;
 
+        if (_context.router() == null) return;
+        
         if (_context.router().getRouterInfo() == null) {
             _reinitializeJob.getTiming().setStartAfter(_context.clock().now()+5000);
             _context.jobQueue().addJob(_reinitializeJob);
