@@ -39,7 +39,7 @@ public class CapacityCalculator extends Calculator {
     }
     
     /** used to adjust each period so that we keep trying to expand the peer's capacity */
-    private static long GROWTH_FACTOR = 5;
+    static long GROWTH_FACTOR = 5;
     
     /** the calculator estimates over a 1 hour period */
     private static long ESTIMATE_PERIOD = 60*60*1000;

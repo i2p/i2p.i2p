@@ -29,6 +29,8 @@ class RouterThrottleImpl implements RouterThrottle {
      */
     private static int THROTTLE_EVENT_LIMIT = 300;
     
+    private static final String PROP_MAX_TUNNELS = "router.maxParticipatingTunnels";
+    
     public RouterThrottleImpl(RouterContext context) {
         _context = context;
         _log = context.logManager().getLog(RouterThrottleImpl.class);
@@ -38,6 +40,7 @@ class RouterThrottleImpl implements RouterThrottle {
         _context.statManager().createRateStat("tunnel.bytesAllocatedAtAccept", "How many bytes had been 'allocated' for participating tunnels when we accepted a request?", "Tunnels", new long[] { 10*60*1000, 60*60*1000, 24*60*60*1000 });
         _context.statManager().createRateStat("router.throttleTunnelProcessingTime1m", "How long it takes to process a message (1 minute average) when we throttle a tunnel?", "Throttle", new long[] { 60*1000, 10*60*1000, 60*60*1000, 24*60*60*1000 });
         _context.statManager().createRateStat("router.throttleTunnelProcessingTime10m", "How long it takes to process a message (10 minute average) when we throttle a tunnel?", "Throttle", new long[] { 60*1000, 10*60*1000, 60*60*1000, 24*60*60*1000 });
+        _context.statManager().createRateStat("router.throttleTunnelMaxExceeded", "How many tunnels we are participating in when we refuse one due to excees?", "Throttle", new long[] { 10*60*1000, 60*60*1000, 24*60*60*1000 });
     }
     
     public boolean acceptNetworkMessage() {
@@ -116,10 +119,28 @@ class RouterThrottleImpl implements RouterThrottle {
         double bytesPerMsg = (r != null ? r.getAverageValue() : 0);
         double bytesPerTunnel = msgsPerTunnel * bytesPerMsg;
 
-
         int numTunnels = _context.tunnelManager().getParticipatingCount();
         double bytesAllocated =  (numTunnels + 1) * bytesPerTunnel;
 
+        // the max # tunnels throttle is useful for shutting down the router - 
+        // set this to 0, wait a few minutes, and the router can be shut off 
+        // without killing anyone's tunnels
+        String maxTunnels = _context.getProperty(PROP_MAX_TUNNELS);
+        if (maxTunnels != null) {
+            try {
+                int max = Integer.parseInt(maxTunnels);
+                if (numTunnels >= max) {
+                    if (_log.shouldLog(Log.WARN))
+                        _log.warn("Refusing tunnel request since we are already participating in " 
+                                  + numTunnels + " (our max is " + max + ")");
+                    _context.statManager().addRateData("router.throttleTunnelMaxExceeded", numTunnels, 0);
+                    return false;
+                }
+            } catch (NumberFormatException nfe) {
+                // no default, ignore it
+            }
+        }
+        
         _context.statManager().addRateData("tunnel.bytesAllocatedAtAccept", (long)bytesAllocated, msg.getTunnelDurationSeconds()*1000);
         // todo: um, throttle (include bw usage of the netDb, our own tunnels, the clients,
         // and check to see that they are less than the bandwidth limits
