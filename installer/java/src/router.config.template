@@ -20,9 +20,13 @@ router.adminPort=7655
 # Bandwidth limits
 # These limits are for all i2np connections - tcp or whatever to all peers.
 # They are hard enforced with no smoothing.  If they are <= 0, no limits are enforced.
+# Do not set this lower than 6KBps
 i2np.bandwidth.inboundKBytesPerSecond=-1
 i2np.bandwidth.outboundKBytesPerSecond=-1
 # How many bytes will we let accumulate due to inactivity (allowing bursts)?
+# Do not set this lower than the rate above - doing so will not achieve what you want, really.
+# (the bandwidth limiter uses a token bucket algorithm and this burst defines the size of the
+# bucket)
 i2np.bandwidth.inboundBurstKBytes=-1
 i2np.bandwidth.outboundBurstKBytes=-1
 
@@ -144,11 +148,15 @@ clientApp.1.args=sam.keys 0.0.0.0 7656 i2cp.tcp.host=localhost i2cp.tcp.port=##_
 clientApp.2.main=net.i2p.i2ptunnel.I2PTunnel
 clientApp.2.name=Tunnels
 clientApp.2.args=-nocli -e "config localhost ##_router_i2cp_port##" -e "httpclient 4444" -e "client 6668 irc.duck.i2p"
+# note: if you want the proxies to be reachable from other machines, add:
+#       -e "listen_on 0.0.0.0"   
+# before the -e "httpclient 4444".  otherwise, both of these proxies will only listen for connections on 127.0.0.1
 
 # New router console webapp, driven by Jetty
 # to use, you must mkdir ./webapps/ and place the routerconsole.war file in there,
 # and add jetty-all.jar and routerconsole.jar in the router's classpath in the startRouter 
 # script
+# (don't bother trying to figure this out prior to the 0.4 release)
 #clientApp.3.main=net.i2p.router.web.RouterConsoleRunner
 #clientApp.3.name=webConsole
 #clientApp.3.args=7657 127.0.0.1 ./webapps/
