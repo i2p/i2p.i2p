@@ -17,7 +17,6 @@ import java.math.BigInteger;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 
 import net.i2p.crypto.AESInputStream;
@@ -256,13 +255,21 @@ class TCPConnection implements I2NPMessageReader.I2NPMessageEventListener {
         int totalPending = 0;
         boolean fail = false;
         long beforeAdd = _context.clock().now();
+        StringBuffer pending = new StringBuffer(64);
         synchronized (_toBeSent) {
             if ( (_maxQueuedMessages > 0) && (_toBeSent.size() >= _maxQueuedMessages) ) {
                 fail = true;
             } else { 
                 _toBeSent.add(msg);
-                totalPending = _toBeSent.size();
                 // the ConnectionRunner.processSlice does a wait() until we have messages
+            }
+            totalPending = _toBeSent.size();
+            if (fail) {
+                pending.append(totalPending).append(": ");
+                for (int i = 0; i < totalPending; i++) {
+                    OutNetMessage cur = (OutNetMessage)_toBeSent.get(i);
+                    pending.append(cur.getMessage().getClass().getName()).append(" ");
+                }
             }
             _toBeSent.notifyAll();
         }
@@ -272,8 +279,11 @@ class TCPConnection implements I2NPMessageReader.I2NPMessageEventListener {
 
         if (fail) {
             if (_log.shouldLog(Log.ERROR))
-                _log.error("too many queued messages to " + _remoteIdentity.getHash().toBase64() + ": " + totalPending);
+                _log.error("too many queued messages to " + _remoteIdentity.getHash().toBase64() + ": " + pending.toString());
 
+            // do we really want to give them a comm error because they're so.damn.slow reading their stream?
+            _context.profileManager().commErrorOccurred(_remoteIdentity.getHash());
+            
             msg.timestamp("TCPConnection.addMessage exceeded max queued");
             _transport.afterSend(msg, false);
             return;
@@ -281,8 +291,9 @@ class TCPConnection implements I2NPMessageReader.I2NPMessageEventListener {
 	
         long diff = afterAdd - beforeAdd;
         if (diff > 500) {
-            if (_log.shouldLog(Log.ERROR))
-                _log.error("Lock contention adding a message: " + diff + "ms");
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Lock contention adding a message: " + diff + "ms to " 
+                          + _remoteIdentity.getHash().toBase64() + ": " + totalPending);
         }
 
         msg.timestamp("TCPConnection.addMessage after toBeSent.add and notify");
@@ -437,7 +448,7 @@ class TCPConnection implements I2NPMessageReader.I2NPMessageEventListener {
 
             OutNetMessage msg = null;
             int remaining = 0;
-            List timedOut = new LinkedList();
+            List timedOut = null;
 
             synchronized (_toBeSent) {
                 // loop through, dropping expired messages, waiting until a non-expired
@@ -453,21 +464,24 @@ class TCPConnection implements I2NPMessageReader.I2NPMessageEventListener {
                     msg = (OutNetMessage)_toBeSent.remove(0);
                     remaining--;
                     if ( (msg.getExpiration() > 0) && (msg.getExpiration() < start) ) {
+                        if (timedOut == null) timedOut = new ArrayList(4);
                         timedOut.add(msg);
                         msg = null; // keep looking
                     }
                 }
             }
 
-            for (Iterator iter = timedOut.iterator(); iter.hasNext(); ) {
-                OutNetMessage failed = (OutNetMessage)iter.next();
-                if (_log.shouldLog(Log.WARN))
-                    _log.warn("Message timed out while sitting on the TCP Connection's queue!  was too slow by: " 
-                              + (start-msg.getExpiration()) + "ms to " 
-                              + _remoteIdentity.getHash().toBase64() + ": " + msg);
-                msg.timestamp("TCPConnection.runner.processSlice expired");
-                _transport.afterSend(msg, false);
-                return true;
+            if (timedOut != null) {
+                for (int i = 0; i < timedOut.size(); i++) {
+                    OutNetMessage failed = (OutNetMessage)timedOut.get(i);
+                    if (_log.shouldLog(Log.WARN))
+                        _log.warn("Message timed out while sitting on the TCP Connection's queue!  was too slow by: " 
+                                  + (start-msg.getExpiration()) + "ms to " 
+                                  + _remoteIdentity.getHash().toBase64() + ": " + msg);
+                    msg.timestamp("TCPConnection.runner.processSlice expired");
+                    _transport.afterSend(msg, false);
+                    return true;
+                }
             }
 
             if (remaining > 0) {
