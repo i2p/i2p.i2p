@@ -133,7 +133,7 @@ public class KeyManager {
             super(KeyManager.this._context);
         }
         public void runJob() {
-            String keyDir = KeyManager.this._context.router().getConfigSetting(PROP_KEYDIR);
+            String keyDir = KeyManager.this._context.getProperty(PROP_KEYDIR);
             if (keyDir == null) 
                 keyDir = DEFAULT_KEYDIR;
             File dir = new File(keyDir);
