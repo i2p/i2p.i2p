@@ -46,66 +46,81 @@ public class AESInputStream extends FilterInputStream {
     private long _cumulativePrepared; // how many bytes decrypted and added to _readyBuf
     private long _cumulativePaddingStripped; // how many bytes have been stripped
 
-    private ByteArrayOutputStream _encryptedBuf; // read from the stream but not yet decrypted
-    private List _readyBuf; // list of Bytes ready to be consumed, where index 0 is the first
+    /** read but not yet decrypted */
+    private byte _encryptedBuf[];
+    /** how many bytes have been added to the encryptedBuf since it was decrypted? */
+    private int _writesSinceDecrypt;
+    /** decrypted bytes ready for reading (first available == index of 0) */
+    private int _decryptedBuf[];
+    /** how many bytes are available for reading without decrypt? */
+    private int _decryptedSize;
 
     private final static int BLOCK_SIZE = CryptixRijndael_Algorithm._BLOCK_SIZE;
-    private final static int READ_SIZE = BLOCK_SIZE;
-    private final static int DECRYPT_SIZE = BLOCK_SIZE - 1;
 
-    public AESInputStream(I2PAppContext context, InputStream source, SessionKey key, byte iv[]) {
+    public AESInputStream(I2PAppContext context, InputStream source, SessionKey key, byte[] iv) {
         super(source);
         _context = context;
         _log = context.logManager().getLog(AESInputStream.class);
         _key = key;
         _lastBlock = new byte[BLOCK_SIZE];
         System.arraycopy(iv, 0, _lastBlock, 0, BLOCK_SIZE);
-        _encryptedBuf = new ByteArrayOutputStream(BLOCK_SIZE);
-        _readyBuf = new ArrayList(1024);
+        _encryptedBuf = new byte[BLOCK_SIZE];
+        _writesSinceDecrypt = 0;
+        _decryptedBuf = new int[BLOCK_SIZE-1];
+        _decryptedSize = 0;
         _cumulativePaddingStripped = 0;
         _eofFound = false;
     }
 
     public int read() throws IOException {
-        while ((!_eofFound) && (_readyBuf.size() <= 0)) {
-            refill(READ_SIZE);
+        while ((!_eofFound) && (_decryptedSize <= 0)) { 
+            refill();
         }
-        Integer nval = getNext();
-        if (nval != null) {
-            return nval.intValue();
-        }
-        if (_log.shouldLog(Log.DEBUG))
-            _log.debug("No byte available.  eof? " + _eofFound);
-
-        if (_eofFound)
+        if (_decryptedSize > 0) {
+            int c = _decryptedBuf[0];
+            System.arraycopy(_decryptedBuf, 1, _decryptedBuf, 0, _decryptedBuf.length-1);
+            _decryptedSize--;
+            return c;
+        } else if (_eofFound) {
             return -1;
-
-        throw new IOException("Not EOF, but none available?  " + _readyBuf.size() + "/" + _encryptedBuf.size()
-                              + "/" + _cumulativeRead + "... impossible");
+        } else {
+            throw new IOException("Not EOF, but none available?  " + _decryptedSize 
+                                  + "/" + _writesSinceDecrypt
+                                  + "/" + _cumulativeRead + "... impossible");
+        }
     }
 
     public int read(byte dest[]) throws IOException {
-        for (int i = 0; i < dest.length; i++) {
-            int val = read();
-            if (val == -1) {
-                // no more to read... can they expect more?
-                if (_eofFound && (i == 0)) return -1;
-
-                return i;
-            }
-            dest[i] = (byte) val;
-        }
-        if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Read the full buffer of size " + dest.length);
-        return dest.length;
+        return read(dest, 0, dest.length);
     }
 
     public int read(byte dest[], int off, int len) throws IOException {
-        byte buf[] = new byte[len];
-        int read = read(buf);
-        if (read == -1) return -1;
-        System.arraycopy(buf, 0, dest, off, read);
-        return read;
+        for (int i = 0; i < len; i++) {
+            int val = read();
+            if (val == -1) {
+                // no more to read... can they expect more?
+                if (_eofFound && (i == 0)) {
+                    if (_log.shouldLog(Log.DEBUG))
+                        _log.info("EOF? " + _eofFound 
+                                  + "\nread=" + i + " decryptedSize=" + _decryptedSize 
+                                  + " \nencryptedSize=" + _writesSinceDecrypt 
+                                  + " \ntotal=" + _cumulativeRead
+                                  + " \npadding=" + _cumulativePaddingStripped
+                                  + " \nprepared=" + _cumulativePrepared);
+                    return -1;
+                } else {
+                    if (i != len) 
+                        if (_log.shouldLog(Log.DEBUG))
+                            _log.info("non-terminal eof: " + _eofFound + " i=" + i + " len=" + len);
+                }
+                
+                return i;
+            }
+            dest[off+i] = (byte)val;
+        }
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("Read the full buffer of size " + len);
+        return len;
     }
 
     public long skip(long numBytes) throws IOException {
@@ -117,25 +132,15 @@ public class AESInputStream extends FilterInputStream {
     }
 
     public int available() throws IOException {
-        return _readyBuf.size();
+        return _decryptedSize;
     }
 
     public void close() throws IOException {
-        //_log.debug("We have " + _encryptedBuf.size() + " available to decrypt... doing so");
-        //decrypt();
-        //byte buf[] = new byte[_readyBuf.size()];
-        //for (int i = 0; i < buf.length; i++) 
-        //    buf[i] = ((Integer)_readyBuf.get(i)).byteValue();
-        //_log.debug("After decrypt: readyBuf.size: " + _readyBuf.size() + "\n val:\t" + Base64.encode(buf));
-        int ready = _readyBuf.size();
-        int encrypted = _readyBuf.size();
-        _readyBuf.clear();
-        _encryptedBuf.reset();
         in.close();
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Cumulative bytes read from source/decrypted/stripped: " + _cumulativeRead + "/"
-                       + _cumulativePrepared + "/" + _cumulativePaddingStripped + "] remaining [" + ready + " ready, "
-                       + encrypted + " still encrypted]");
+                       + _cumulativePrepared + "/" + _cumulativePaddingStripped + "] remaining [" + _decryptedSize + " ready, "
+                       + _writesSinceDecrypt + " still encrypted]");
     }
 
     public void mark(int readLimit) { // nop
@@ -150,115 +155,59 @@ public class AESInputStream extends FilterInputStream {
     }
 
     /**
-     * Retrieve the next ready byte, or null if no bytes are ready.  this does not refill or block
-     *
-     */
-    private Integer getNext() {
-        if (_readyBuf.size() > 0) {
-            return (Integer) _readyBuf.remove(0);
-        }
-        
-        return null;
-    }
-
-    /**
      * Read at least one new byte from the underlying stream, and up to max new bytes,
      * but not necessarily enough for a new decrypted block.  This blocks until at least
      * one new byte is read from the stream
      *
      */
-    private void refill(int max) throws IOException {
+    private void refill() throws IOException {
         if (!_eofFound) {
-            byte buf[] = new byte[max];
-            int read = in.read(buf);
+            int read = in.read(_encryptedBuf, _writesSinceDecrypt, _encryptedBuf.length - _writesSinceDecrypt);
             if (read == -1) {
                 _eofFound = true;
             } else if (read > 0) {
-                //_log.debug("Read from the source stream " + read + " bytes");
                 _cumulativeRead += read;
-                _encryptedBuf.write(buf, 0, read);
+                _writesSinceDecrypt += read;
             }
         }
-        if (false) return; // true to keep the data for decrypt/display on close
-        if (_encryptedBuf.size() > 0) {
-            if (_encryptedBuf.size() >= DECRYPT_SIZE) {
-                if (_log.shouldLog(Log.DEBUG))
-                    _log.debug("We have " + _encryptedBuf.size() + " available to decrypt... doing so");
-                decrypt();
-                if ( (_encryptedBuf.size() > 0) && (_log.shouldLog(Log.DEBUG)) )
-                    _log.debug("Bytes left in the encrypted buffer after decrypt: "  + _encryptedBuf.size());
-            } else {
-                if (_eofFound) {
-                    if (_log.shouldLog(Log.DEBUG))
-                        _log.debug("EOF and not enough bytes to decrypt [size = " + _encryptedBuf.size() 
-                                   + " totalCumulative: " + _cumulativeRead + "/"+_cumulativePrepared +"]!");
-                } else {
-                    if (_log.shouldLog(Log.DEBUG))
-                        _log.debug("Not enough bytes to decrypt [size = " + _encryptedBuf.size() 
-                                   + " totalCumulative: " + _cumulativeRead + "/"+_cumulativePrepared +"]");
-                }
-            }
+        if (_writesSinceDecrypt == BLOCK_SIZE) {
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("We have " + _writesSinceDecrypt + " available to decrypt... doing so");
+            decryptBlock();
+            if ( (_writesSinceDecrypt > 0) && (_log.shouldLog(Log.DEBUG)) )
+                _log.debug("Bytes left in the encrypted buffer after decrypt: "  
+                           + _writesSinceDecrypt);
         }
     }
 
     /**
-     * Take (n*BLOCK_SIZE) bytes off the _encryptedBuf, decrypt them, and place
-     * them on _readyBuf
-     *
+     * Decrypt the 
      */
-    private void decrypt() throws IOException {
-        byte encrypted[] = _encryptedBuf.toByteArray();
-        _encryptedBuf.reset();
-
-        if ((encrypted == null) || (encrypted.length <= 0))
+    private void decryptBlock() throws IOException {
+        if (_writesSinceDecrypt != BLOCK_SIZE)
             throw new IOException("Error decrypting - no data to decrypt");
+        
+        if (_decryptedSize != 0)
+            throw new IOException("wtf, decrypted size is not 0? " + _decryptedSize);
+        
+        _context.aes().decrypt(_encryptedBuf, 0, _encryptedBuf, 0, _key, _lastBlock, BLOCK_SIZE);
+        DataHelper.xor(_encryptedBuf, 0, _lastBlock, 0, _encryptedBuf, 0, BLOCK_SIZE);
+        int payloadBytes = countBlockPayload(_encryptedBuf, 0);
 
-        int numBlocks = encrypted.length / BLOCK_SIZE;
-        if ((encrypted.length % BLOCK_SIZE) != 0) {
-            // it was flushed / handled off the BLOCK_SIZE segments, so put the excess 
-            // back into the _encryptedBuf for later handling
-            int trailing = encrypted.length % BLOCK_SIZE;
-            _encryptedBuf.write(encrypted, encrypted.length - trailing, trailing);
-            byte nencrypted[] = new byte[encrypted.length - trailing];
-            System.arraycopy(encrypted, 0, nencrypted, 0, nencrypted.length);
-            encrypted = nencrypted;
-            if (_log.shouldLog(Log.WARN))
-                _log.warn("Decrypt got odd segment - " + trailing
-                          + " bytes pushed back for later decryption - corrupted or slow data stream perhaps?");
-        } else {
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug(encrypted.length + " bytes makes up " + numBlocks + " blocks to decrypt normally");
+        for (int i = 0; i < payloadBytes; i++) {
+            int c = _encryptedBuf[i];
+            if (c <= 0)
+                c += 256;
+            _decryptedBuf[i] = c;
         }
+        _decryptedSize = payloadBytes;
 
-        for (int i = 0; i < numBlocks; i++) {
-            _context.aes().decrypt(encrypted, i * BLOCK_SIZE, encrypted, i * BLOCK_SIZE, _key, _lastBlock, BLOCK_SIZE);
-            DataHelper.xor(encrypted, i * BLOCK_SIZE, _lastBlock, 0, encrypted, i * BLOCK_SIZE, BLOCK_SIZE);
-            int payloadBytes = countBlockPayload(encrypted, i * BLOCK_SIZE);
-            
-            for (int j = 0; j < payloadBytes; j++) {
-                int c = encrypted[j + i * BLOCK_SIZE];
-                if (c <= 0)
-                    c += 256;
-                _readyBuf.add(new Integer(c));
-            }
-            _cumulativePaddingStripped += BLOCK_SIZE - payloadBytes;
-            _cumulativePrepared += payloadBytes;
-            
-            System.arraycopy(encrypted, i * BLOCK_SIZE, _lastBlock, 0, BLOCK_SIZE);
-        }
+        _cumulativePaddingStripped += BLOCK_SIZE - payloadBytes;
+        _cumulativePrepared += payloadBytes;
 
-        int remaining = encrypted.length % BLOCK_SIZE;
-        if (remaining != 0) {
-            _encryptedBuf.write(encrypted, encrypted.length - remaining, remaining);
-            _log.debug("After pushing " + remaining
-                       + " bytes back onto the buffer, lets delay 1s our action so we don't fast busy until the net transfers data");
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException ie) { // nop
-            }
-        } else {
-            //_log.debug("No remaining encrypted bytes beyond the block size");
-        }
+        System.arraycopy(_encryptedBuf, 0, _lastBlock, 0, BLOCK_SIZE);
+        
+        _writesSinceDecrypt = 0;
     }
 
     /**
@@ -303,11 +252,11 @@ public class AESInputStream extends FilterInputStream {
     }
 
     int remainingBytes() {
-        return _encryptedBuf.size();
+        return _writesSinceDecrypt;
     }
 
     int readyBytes() {
-        return _readyBuf.size();
+        return _decryptedSize;
     }
 
     /**
@@ -446,7 +395,9 @@ public class AESInputStream extends FilterInputStream {
             if (eq) {
                 //log.info("Equal hashes.  hash: " + origHash);
             } else {
-                throw new RuntimeException("NOT EQUAL!  len=" + orig.length + "\norig: \t" + Base64.encode(orig) + "\nnew : \t" + Base64.encode(fin));
+                throw new RuntimeException("NOT EQUAL!  len=" + orig.length + " read=" + read 
+                                           + "\norig: \t" + Base64.encode(orig) + "\nnew : \t" 
+                                           + Base64.encode(fin));
             }
             boolean ok = DataHelper.eq(orig, fin);
             log.debug("EQ data? " + ok + " origLen: " + orig.length + " fin.length: " + fin.length);
