@@ -43,6 +43,7 @@ class HeartbeatControlPane extends JPanel {
         _configPane.addTab(config.getTitle(), null, new JScrollPane(new PeerPlotConfigPane(config, this)), config.getSummary());
         _configPane.setBackgroundAt(_configPane.getTabCount()-1, _background);
         _configPane.setForegroundAt(_configPane.getTabCount()-1, _foreground);
+        _gui.pack();
     }
     
     /**

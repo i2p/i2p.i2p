@@ -15,7 +15,7 @@ import net.i2p.util.Log;
  */
 class HeartbeatPlotPane extends JPanel {
     private final static Log _log = new Log(HeartbeatPlotPane.class);
-    private HeartbeatMonitorGUI _gui;
+    protected HeartbeatMonitorGUI _gui;
     private JTextArea _text;
     
     /**
@@ -48,9 +48,9 @@ class HeartbeatPlotPane extends JPanel {
         _text.setText(buf.toString());
     }
     
-    private void initializeComponents() {
-        setBackground(new Color(255, 255, 255));
-        // Dimension size = new Dimension(800, 600);
+    protected void initializeComponents() {
+        setBackground(_gui.getBackground());
+        //Dimension size = new Dimension(800, 600);
         _text = new JTextArea("",30,80); // 16, 60);
         _text.setAutoscrolls(true);
         _text.setEditable(false);

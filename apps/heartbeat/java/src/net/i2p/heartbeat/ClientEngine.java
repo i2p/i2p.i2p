@@ -4,6 +4,7 @@ import net.i2p.data.Destination;
 import net.i2p.util.Clock;
 import net.i2p.util.I2PThread;
 import net.i2p.util.Log;
+import net.i2p.util.Clock;
 
 /**
  * Responsible for actually conducting the tests, coordinating the storing of the 

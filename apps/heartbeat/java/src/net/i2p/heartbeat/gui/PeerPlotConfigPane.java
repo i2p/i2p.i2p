@@ -195,10 +195,10 @@ class PeerPlotConfigPane extends JPanel implements PeerPlotConfig.UpdateListener
                 _log.warn("Config for minutes " + _options[i]._durationMinutes + " was not found?");
                 continue;
             }
-            _log.debug("Refreshing view for minutes ["+ _options[i]._durationMinutes + "]: send [" + 
-                       _options[i]._send.isSelected() + "/" + cfg.getPlotSendTime() + "] recv [" + 
-                       _options[i]._recv.isSelected() + "/" + cfg.getPlotReceiveTime() + "] lost [" +
-                       _options[i]._lost.isSelected() + "/" + cfg.getPlotLostMessages() + "]");
+            //_log.debug("Refreshing view for minutes ["+ _options[i]._durationMinutes + "]: send [" + 
+            //           _options[i]._send.isSelected() + "/" + cfg.getPlotSendTime() + "] recv [" + 
+            //           _options[i]._recv.isSelected() + "/" + cfg.getPlotReceiveTime() + "] lost [" +
+            //           _options[i]._lost.isSelected() + "/" + cfg.getPlotLostMessages() + "]");
             _options[i]._send.setSelected(cfg.getPlotSendTime());
             _options[i]._recv.setSelected(cfg.getPlotReceiveTime());
             _options[i]._lost.setSelected(cfg.getPlotLostMessages());
@@ -289,13 +289,15 @@ class PeerPlotConfigPane extends JPanel implements PeerPlotConfig.UpdateListener
             if (g < 0) g = -g;
             int b = _rnd.nextInt(255);
             if (b < 0) b = -b;
-            _color.setBackground(new Color(r, g, b));
+            //_color.setBackground(new Color(r, g, b));
+            _color.setBackground(_background);
             
             _send.addActionListener(new UpdateListener(OptionLine.this, _durationMinutes));
             _recv.addActionListener(new UpdateListener(OptionLine.this, _durationMinutes));
             _lost.addActionListener(new UpdateListener(OptionLine.this, _durationMinutes));
             _all.addActionListener(new UpdateListener(OptionLine.this, _durationMinutes));
             _color.addActionListener(new ChooseColor(durationMinutes, _color));
+            _color.setEnabled(false);
         }
     }
     
@@ -318,22 +320,12 @@ class PeerPlotConfigPane extends JPanel implements PeerPlotConfig.UpdateListener
          */
         public void actionPerformed(ActionEvent evt) { 
             PeerPlotConfig.PlotSeriesConfig cfg = getConfig(_minutes);
-            if (cfg == null) {
-                _log.error("wtf, why is there no config for " + _minutes + "?");
-                
-                List configs = _config.getAverageSeriesConfigs();
-                for (int i = 0; i < configs.size(); i++) {
-                    PeerPlotConfig.PlotSeriesConfig conf = (PeerPlotConfig.PlotSeriesConfig)configs.get(i);
-                    _log.debug("We know about " + conf.getPeriod());
-                }
-                return;
-            }
             
             cfg.getPlotConfig().disableEvents();
             _log.debug("Updating data for minutes ["+ _line._durationMinutes + "]: send [" + 
                        _line._send.isSelected() + "/" + cfg.getPlotSendTime() + "] recv [" + 
                        _line._recv.isSelected() + "/" + cfg.getPlotReceiveTime() + "] lost [" +
-                       _line._lost.isSelected() + "/" + cfg.getPlotLostMessages() + "]");
+                       _line._lost.isSelected() + "/" + cfg.getPlotLostMessages() + "]: config = " + cfg);
             
             boolean force = _line._all.isSelected();
             cfg.setPlotSendTime(_line._send.isSelected() || force);

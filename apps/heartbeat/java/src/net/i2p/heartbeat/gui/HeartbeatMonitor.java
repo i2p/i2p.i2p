@@ -6,14 +6,16 @@ import net.i2p.util.Log;
 /**
  * The HeartbeatMonitor, complete with main()!  Act now, and it's only 5 easy
  * payments of $19.95 (plus shipping and handling)!  You heard me, only _5_
- * easy payments of $19.95 (plus shipping and handling)!
+ * easy payments of $19.95 (plus shipping and handling)! <p />
  * 
  * (fine print:  something about some states in the US requiring the addition
- * of sales tax... or something)
+ * of sales tax... or something) <p />
  * 
- * (finer print:  Satan owns you.  Deal with it.)
+ * (finer print:  Satan owns you.  Deal with it.) <p />
+ *
+ * (even finer print: usage: <code>HeartbeatMonitor [configFilename]</code>)
  */
-public class HeartbeatMonitor implements PeerPlotStateFetcher.FetchStateReceptor {
+public class HeartbeatMonitor implements PeerPlotStateFetcher.FetchStateReceptor, PeerPlotConfig.UpdateListener {
     private final static Log _log = new Log(HeartbeatMonitor.class);
     private HeartbeatMonitorState _state;
     private HeartbeatMonitorGUI _gui;
@@ -73,6 +75,7 @@ public class HeartbeatMonitor implements PeerPlotStateFetcher.FetchStateReceptor
      */
     public void load(String location) {
         PeerPlotConfig cfg = new PeerPlotConfig(location);
+        cfg.addListener(this);
         PeerPlotState state = new PeerPlotState(cfg);
         PeerPlotStateFetcher.fetchPeerPlotState(this, state);
     }
@@ -98,5 +101,10 @@ public class HeartbeatMonitor implements PeerPlotStateFetcher.FetchStateReceptor
             new HeartbeatMonitor(args[0]).runMonitor();
         else
             new HeartbeatMonitor().runMonitor();
+    }
+    
+    public void configUpdated(PeerPlotConfig config) { 
+        _log.debug("Config updated, revamping the gui");
+        _gui.stateUpdated(); 
     }
 }

@@ -11,12 +11,14 @@ import java.util.Set;
 import java.util.TreeMap;
 
 import net.i2p.data.Destination;
+import net.i2p.util.Log;
 import net.i2p.heartbeat.ClientConfig;
 
 /**
  * Configure how we want to render a particular clientConfig in the GUI
  */
 class PeerPlotConfig {
+    private final static Log _log = new Log(PeerPlotConfig.class);
     /** where can we find the current state/data (either as a filename or a URL)? */
     private String _location;
     /** what test are we defining the plot data for? */
@@ -90,7 +92,9 @@ class PeerPlotConfig {
             PlotSeriesConfig cfg = (PlotSeriesConfig)_averageSeriesConfigs.get(i);
             ordered.put(new Long(cfg.getPeriod()), cfg);
         }
-        ordered.put(new Long(minutes*60*1000), new PlotSeriesConfig(minutes*60*1000));
+        Long period = new Long(minutes*60*1000);
+        if (!ordered.containsKey(period))
+            ordered.put(period, new PlotSeriesConfig(minutes*60*1000));
         
         List cfgs = Collections.synchronizedList(new ArrayList(ordered.size()));
         for (Iterator iter = ordered.values().iterator(); iter.hasNext(); )
@@ -244,6 +248,11 @@ class PeerPlotConfig {
          */
         public PlotSeriesConfig(long period) {
             this(period, false, false, false, null);
+            if (period <= 0) {
+                _plotSendTime = true;
+                _plotReceiveTime = true;
+                _plotLostMessages = true;
+            }
         }
         
         

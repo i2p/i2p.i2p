@@ -10,6 +10,7 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JScrollPane;
+import javax.swing.JSplitPane;
 
 class HeartbeatMonitorGUI extends JFrame {
     private HeartbeatMonitor _monitor;
@@ -27,7 +28,7 @@ class HeartbeatMonitorGUI extends JFrame {
         _monitor = monitor;
         initializeComponents();
         pack();
-        setResizable(false);
+        //setResizable(false);
         setVisible(true);
     }
     
@@ -39,16 +40,18 @@ class HeartbeatMonitorGUI extends JFrame {
         
         setBackground(_background);
         
-        _plotPane = new HeartbeatPlotPane(this);
+        _plotPane = new JFreeChartHeartbeatPlotPane(this); // new HeartbeatPlotPane(this);
         _plotPane.setBackground(_background);
-        JScrollPane pane = new JScrollPane(_plotPane);
-        pane.setBackground(_background);
-        getContentPane().add(pane, BorderLayout.CENTER);
+        //JScrollPane pane = new JScrollPane(_plotPane);
+        //pane.setBackground(_background);
+        getContentPane().add(new JScrollPane(_plotPane), BorderLayout.CENTER);
         
         _controlPane = new HeartbeatControlPane(this);
         _controlPane.setBackground(_background);
         getContentPane().add(_controlPane, BorderLayout.SOUTH);
         
+        //JSplitPane pane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, new JScrollPane(_plotPane), new JScrollPane(_controlPane));
+        //getContentPane().add(pane, BorderLayout.CENTER);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         initializeMenus();
     }

@@ -30,6 +30,8 @@ import net.i2p.util.Log;
  *    # where our private destination keys are located - if this doesn't exist,
  *    # a new one will be created and saved there (by default, heartbeat.keys)
  *    privateDestinationFile=heartbeat_r2.keys
+ *    # where do we want to export the plain base64 of our destination?
+ *    publicDestinationFile=heartbeat_r2.txt
  *
  *    ## peer tests configured below:
  *    

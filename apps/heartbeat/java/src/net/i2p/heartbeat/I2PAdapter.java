@@ -37,6 +37,8 @@ class I2PAdapter {
     private int _numHops;
     /** filename containing the heartbeat engine's private destination info */
     private String _privateDestFile;
+    /** filename to store the heartbeat engine's public destination in base64*/
+    private String _publicDestFile;
     /** our destination */
     private Destination _localDest;
     /** who do we tell? */
@@ -53,6 +55,10 @@ class I2PAdapter {
     private static final String DEST_FILE_PROP = "privateDestinationFile";
     /** by default, the private destination data is in "heartbeat.keys" */
     private static final String DEST_FILE_DEFAULT = "heartbeat.keys";
+    /** where will we export the public destination in base 64? */
+    private static final String PUBLIC_DEST_FILE_PROP = "publicDestinationFile";
+    /** where will we export the public destination in base 64? */
+    private static final String PUBLIC_DEST_FILE_DEFAULT = "heartbeat.txt";
     /** This config property defines where the I2P router is */
     private static final String I2CP_HOST_PROP = "i2cpHost";
     /** by default, the I2P host is "localhost" */
@@ -72,6 +78,7 @@ class I2PAdapter {
      */
     public I2PAdapter() {
         _privateDestFile = null;
+        _publicDestFile = null;
         _i2cpHost = null;
         _i2cpPort = -1;
         _localDest = null;
@@ -126,6 +133,7 @@ class I2PAdapter {
      */
     void loadConfig(Properties props) {
         String privDestFile = props.getProperty(DEST_FILE_PROP, DEST_FILE_DEFAULT);
+        String pubDestFile = props.getProperty(PUBLIC_DEST_FILE_PROP, PUBLIC_DEST_FILE_DEFAULT);
         String host = props.getProperty(I2CP_HOST_PROP, I2CP_HOST_DEFAULT);
         String port = props.getProperty(I2CP_PORT_PROP, "" + I2CP_PORT_DEFAULT);
         String numHops = props.getProperty(NUMHOPS_PROP, "" + NUMHOPS_DEFAULT);
@@ -151,6 +159,7 @@ class I2PAdapter {
 
         _numHops = hops;
         _privateDestFile = privDestFile;
+        _publicDestFile = pubDestFile;
         _i2cpHost = host;
         _i2cpPort = portNum;
     }
@@ -164,6 +173,12 @@ class I2PAdapter {
             props.setProperty(DEST_FILE_PROP, _privateDestFile);
         } else {
             props.setProperty(DEST_FILE_PROP, DEST_FILE_DEFAULT);
+        }
+        
+        if (_publicDestFile != null) {
+            props.setProperty(PUBLIC_DEST_FILE_PROP, _publicDestFile);
+        } else {
+            props.setProperty(PUBLIC_DEST_FILE_PROP, PUBLIC_DEST_FILE_DEFAULT);
         }
 
         if (_i2cpHost != null) {
@@ -406,6 +421,18 @@ class I2PAdapter {
                 if (_log.shouldLog(Log.INFO)) {
                     _log.info("Existing destination loaded: [" + us.toBase64() + "]");
                 }
+                
+                FileOutputStream fos = null;
+                try {
+                    fos = new FileOutputStream(_publicDestFile);
+                    fos.write(us.toBase64().getBytes());
+                    fos.flush();
+                } catch (IOException fioe) {
+                    _log.error("Error writing out the plain destination to [" + _publicDestFile + "]", fioe);
+                } finally {
+                    if (fos != null) try { fos.close(); } catch (IOException fioe) {}
+                }
+                
             } catch (IOException ioe) {
                 if (fin != null) try {
                     fin.close();
@@ -466,7 +493,9 @@ class I2PAdapter {
      */
     private Properties getOptions() {
         Properties props = new Properties();
-        props.setProperty(I2PClient.PROP_RELIABILITY, I2PClient.PROP_RELIABILITY_BEST_EFFORT);
+        // this should be BEST_EFFORT, but i'm too lazy to update the code to handle tracking 
+        // sessionTags and sessionKeys, marking them as delivered on pong.
+        props.setProperty(I2PClient.PROP_RELIABILITY, I2PClient.PROP_RELIABILITY_GUARANTEED);
         props.setProperty(I2PClient.PROP_TCP_HOST, _i2cpHost);
         props.setProperty(I2PClient.PROP_TCP_PORT, _i2cpPort + "");
         props.setProperty("tunnels.depthInbound", "" + _numHops);

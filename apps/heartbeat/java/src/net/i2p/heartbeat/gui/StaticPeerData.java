@@ -91,7 +91,11 @@ class StaticPeerData extends PeerData {
      * @return milliseconds average, or -1 if we dont track that period
      */
     public double getAverageSendTime(int period) { 
-        return ((Integer)_averageSendTimes.get(new Integer(period))).doubleValue();
+        Integer i = (Integer)_averageSendTimes.get(new Integer(period));
+        if (i == null)
+            return -1;
+        else
+            return i.doubleValue();
     }
     
     
@@ -102,7 +106,11 @@ class StaticPeerData extends PeerData {
      * @return milliseconds average, or -1 if we dont track that period
      */
     public double getAverageReceiveTime(int period) {
-        return ((Integer)_averageReceiveTimes.get(new Integer(period))).doubleValue();
+        Integer i = (Integer)_averageReceiveTimes.get(new Integer(period));
+        if (i == null)
+            return -1;
+        else
+            return i.doubleValue();
     }
        
     /** 
@@ -112,7 +120,11 @@ class StaticPeerData extends PeerData {
      * @return number of lost messages in the period, or -1 if we dont track that period
      */
     public double getLostMessages(int period) {
-        return ((Integer)_lostMessages.get(new Integer(period))).doubleValue();
+        Integer i = (Integer)_lostMessages.get(new Integer(period));
+        if (i == null)
+            return -1;
+        else
+            return i.doubleValue();
     }
         
     /* (non-Javadoc)

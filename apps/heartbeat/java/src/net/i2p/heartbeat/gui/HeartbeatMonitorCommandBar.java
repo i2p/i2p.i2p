@@ -46,7 +46,7 @@ class HeartbeatMonitorCommandBar extends JPanel {
         _refreshRate.addItemListener(new ItemListener() { public void itemStateChanged(ItemEvent evt) { refreshChanged(evt); } });
         _refreshRate.setEnabled(false);
         _refreshRate.setBackground(_gui.getBackground());
-        add(_refreshRate);
+        //add(_refreshRate);
         JLabel loadLabel = new JLabel("Load from: ");
         loadLabel.setBackground(_gui.getBackground());
         add(loadLabel);
