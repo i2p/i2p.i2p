@@ -38,6 +38,7 @@ start /b /i /d"%INSTALL_PATH%" i2prouter.bat %INSTALL_PATH%
 
 ) else (
 
+del "%INSTALL_PATH%eepget"
 del "%INSTALL_PATH%i2prouter"
 :: del "%INSTALL_PATH%install_i2p_service_unix"
 del "%INSTALL_PATH%install_i2p_service_winnt.bat"
