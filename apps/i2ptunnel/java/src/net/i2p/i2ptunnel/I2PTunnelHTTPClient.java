@@ -211,7 +211,18 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
                     String request = line.substring(pos + 1);
                     if (request.startsWith("/") && getTunnel().getClientOptions().getProperty("i2ptunnel.noproxy") != null) {
                         request = "http://i2p" + request;
+                    } else if (request.startsWith("/eepproxy/")) {
+                        // /eepproxy/foo.i2p/bar/baz.html HTTP/1.0
+                        String subRequest = request.substring("/eepproxy/".length());
+                        int protopos = subRequest.indexOf(" ");
+                        String uri = subRequest.substring(0, protopos);
+                        if (uri.indexOf("/") == -1) {
+                                uri = uri + "/";
+                        }
+                        // "http://" + "foo.i2p/bar/baz.html" + " HTTP/1.0"
+                        request = "http://" + uri + subRequest.substring(protopos);
                     }
+
                     pos = request.indexOf("//");
                     if (pos == -1) {
                         method = null;
