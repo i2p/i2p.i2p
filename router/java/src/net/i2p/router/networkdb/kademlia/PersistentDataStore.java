@@ -97,6 +97,7 @@ class PersistentDataStore extends TransientDataStore {
         public void runJob() {
             _log.info("Writing key " + _key);
             FileOutputStream fos = null;
+            File dbFile = null;
             try {
                 String filename = null;
                 File dbDir = getDbDir();
@@ -108,18 +109,36 @@ class PersistentDataStore extends TransientDataStore {
                 else
                     throw new IOException("We don't know how to write objects of type " + _data.getClass().getName());
                 
-                fos = new FileOutputStream(new File(dbDir, filename));
-                try {
-                    _data.writeBytes(fos);
-                } catch (DataFormatException dfe) {
-                    _log.error("Error writing out malformed object as " + _key + ": " + _data, dfe);
-                    File f = new File(dbDir, filename);
-                    f.delete();
+                dbFile = new File(dbDir, filename);
+                long dataPublishDate = getPublishDate();
+                if (dbFile.lastModified() < dataPublishDate) {
+                    // our filesystem is out of date, lets replace it
+                    fos = new FileOutputStream(dbFile);
+                    try {
+                        _data.writeBytes(fos);
+                        fos.close();
+                        dbFile.setLastModified(dataPublishDate);
+                    } catch (DataFormatException dfe) {
+                        _log.error("Error writing out malformed object as " + _key + ": " 
+                                   + _data, dfe);
+                        dbFile.delete();
+                    }
+                } else {
+                    // we've already written the file, no need to waste our time
                 }
             } catch (IOException ioe) {
                 _log.error("Error writing out the object", ioe);
             } finally {
                 if (fos != null) try { fos.close(); } catch (IOException ioe) {}
+            }
+        }
+        private long getPublishDate() {
+            if (_data instanceof RouterInfo) {
+                return ((RouterInfo)_data).getPublished();
+            } else if (_data instanceof LeaseSet) {
+                return ((LeaseSet)_data).getEarliestLeaseDate();
+            } else {
+                return -1;
             }
         }
     }
@@ -143,7 +162,7 @@ class PersistentDataStore extends TransientDataStore {
                     for (int i = 0; i < leaseSetFiles.length; i++) {
                         Hash key = getLeaseSetHash(leaseSetFiles[i].getName());
                         if ( (key != null) && (!isKnown(key)) )
-                            PersistentDataStore.this._context.jobQueue().addJob(new ReadLeaseJob(leaseSetFiles[i]));
+                            PersistentDataStore.this._context.jobQueue().addJob(new ReadLeaseJob(leaseSetFiles[i], key));
                     }
                 }
                 File routerInfoFiles[] = dbDir.listFiles(RouterInfoFilter.getInstance());
@@ -151,24 +170,41 @@ class PersistentDataStore extends TransientDataStore {
                     for (int i = 0; i < routerInfoFiles.length; i++) {
                         Hash key = getRouterInfoHash(routerInfoFiles[i].getName());
                         if ( (key != null) && (!isKnown(key)) )
-                            PersistentDataStore.this._context.jobQueue().addJob(new ReadRouterJob(routerInfoFiles[i]));
+                            PersistentDataStore.this._context.jobQueue().addJob(new ReadRouterJob(routerInfoFiles[i], key));
                     }
                 }
             } catch (IOException ioe) {
                 _log.error("Error reading files in the db dir", ioe);
             }
         }
-        
     }
     
     private class ReadLeaseJob extends JobImpl {
         private File _leaseFile;
-        public ReadLeaseJob(File leaseFile) {
+        private Hash _key;
+        public ReadLeaseJob(File leaseFile, Hash key) {
             super(PersistentDataStore.this._context);
             _leaseFile = leaseFile;
+            _key = key;
         }
         public String getName() { return "Read LeaseSet"; }
+        private boolean shouldRead() {
+            DataStructure data = get(_key);
+            if (data == null) return true;
+            if (data instanceof LeaseSet) {
+                long knownDate = ((LeaseSet)data).getEarliestLeaseDate();
+                long fileDate = _leaseFile.lastModified();
+                if (fileDate > knownDate)
+                    return true;
+                else
+                    return false;
+            } else {
+                // wtf
+                return true;
+            }
+        }
         public void runJob() {
+            if (!shouldRead()) return;
             try {
                 FileInputStream fis = null;
                 boolean corrupt = false;
@@ -201,12 +237,31 @@ class PersistentDataStore extends TransientDataStore {
     
     private class ReadRouterJob extends JobImpl {
         private File _routerFile;
-        public ReadRouterJob(File routerFile) {
+        private Hash _key;
+        public ReadRouterJob(File routerFile, Hash key) {
             super(PersistentDataStore.this._context);
             _routerFile = routerFile;
+            _key = key;
         }
         public String getName() { return "Read RouterInfo"; }
+        
+        private boolean shouldRead() {
+            DataStructure data = get(_key);
+            if (data == null) return true;
+            if (data instanceof RouterInfo) {
+                long knownDate = ((RouterInfo)data).getPublished();
+                long fileDate = _routerFile.lastModified();
+                if (fileDate > knownDate)
+                    return true;
+                else
+                    return false;
+            } else {
+                // wtf
+                return true;
+            }
+        }
         public void runJob() {
+            if (!shouldRead()) return;
             try {
                 FileInputStream fis = null;
                 boolean corrupt = false;
