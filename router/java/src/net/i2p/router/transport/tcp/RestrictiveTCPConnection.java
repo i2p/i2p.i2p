@@ -260,9 +260,9 @@ class RestrictiveTCPConnection extends TCPConnection {
             boolean ok = identifyStationToStation();
             if (_log.shouldLog(Log.DEBUG)) _log.debug("After station to station [" + ok + "]...");
             
-            if (!ok)
+            if (!ok) {
                 throw new DataFormatException("Station to station identification failed!  MITM?");
-            
+            }
             
             if (_log.shouldLog(Log.DEBUG)) _log.debug("before validateVersion...");
             boolean versionOk = validateVersion();
@@ -282,6 +282,18 @@ class RestrictiveTCPConnection extends TCPConnection {
             if (!timeOk) {
                 _context.shitlist().shitlistRouter(_remoteIdentity.getHash(), "Time too far out of sync");
                 throw new DataFormatException("Peer is too far out of sync with the current router's clock!  dropping");
+            }
+            
+            try {
+                _context.netDb().store(_remoteIdentity.getHash(), _remoteInfo);
+            } catch (IllegalArgumentException iae) {
+                if (_log.shouldLog(Log.ERROR))
+                    _log.error("Peer gave us invalid router info", iae);
+                // not only do we remove the reference to the invalid peer
+                _context.netDb().fail(_remoteIdentity.getHash());
+                // but we make sure that we don't try to talk to them soon even if we get a new ref
+                _context.shitlist().shitlistRouter(_remoteIdentity.getHash(), "Invalid peer info");
+                throw new DataFormatException("Invalid peer info provided");
             }
             
             if (_log.shouldLog(Log.DEBUG)) _log.debug("before validate peer address...");
