@@ -84,7 +84,10 @@ public class DatabaseLookupMessage extends I2NPMessageImpl {
             _key.readBytes(in);
             _from = new RouterInfo();
             _from.readBytes(in);
-            boolean tunnelSpecified = DataHelper.readBoolean(in).booleanValue();
+            Boolean val = DataHelper.readBoolean(in);
+            if (val == null) 
+                throw new I2NPMessageException("Tunnel must be explicitly specified (or not)");
+            boolean tunnelSpecified = val.booleanValue();
             if (tunnelSpecified) {
                 _replyTunnel = new TunnelId();
                 _replyTunnel.readBytes(in);
