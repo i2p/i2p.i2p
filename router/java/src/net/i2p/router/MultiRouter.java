@@ -56,7 +56,8 @@ public class MultiRouter {
         
         Runtime.getRuntime().addShutdownHook(new Thread() {
             public void run() {
-                try { Thread.sleep(15*1000); } catch (InterruptedException ie) {}
+                Thread.currentThread().setName("Router* Shutdown");
+                try { Thread.sleep(120*1000); } catch (InterruptedException ie) {}
                 Runtime.getRuntime().halt(-1);
             }
         });
@@ -66,12 +67,13 @@ public class MultiRouter {
             router.setKillVMOnEnd(false);
             _routers.add(router);
             _log.info("Router " + i + " created from " + args[i]);
-            try { Thread.sleep(1*1000); } catch (InterruptedException ie) {}
+            try { Thread.sleep(5*1000 + new java.util.Random().nextInt(5)*1000); } catch (InterruptedException ie) {}
         }
         
         for (int i = 0; i < _routers.size(); i++) {
             ((Router)_routers.get(i)).runRouter();
-            try { Thread.sleep(10*1000); } catch (InterruptedException ie) {}
+            _log.info("Router " + i + " started");
+            try { Thread.sleep(4*1000 + new java.util.Random().nextInt(4)*1000); } catch (InterruptedException ie) {}
         }
         _log.info("All " + _routers.size() + " routers started up");
         waitForCompletion();
