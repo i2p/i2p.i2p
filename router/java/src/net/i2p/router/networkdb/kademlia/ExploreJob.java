@@ -71,19 +71,18 @@ class ExploreJob extends SearchJob {
         DatabaseLookupMessage msg = new DatabaseLookupMessage(getContext(), true);
         msg.setSearchKey(getState().getTarget());
         msg.setFrom(replyGateway.getIdentity().getHash());
-        msg.setDontIncludePeers(getState().getAttempted());
+        msg.setDontIncludePeers(getState().getClosestAttempted(MAX_CLOSEST));
         msg.setMessageExpiration(expiration);
         msg.setReplyTunnel(replyTunnelId);
         
-        Set attempted = getState().getAttempted();
-        List peers = _peerSelector.selectNearestExplicit(getState().getTarget(), NUM_CLOSEST_TO_IGNORE, attempted, getFacade().getKBuckets());
-        Set toSkip = new HashSet(64);
-        toSkip.addAll(attempted);
-        toSkip.addAll(peers);
-        msg.setDontIncludePeers(toSkip);
+        int available = MAX_CLOSEST - msg.getDontIncludePeers().size();
+        if (available > 0) {
+            List peers = _peerSelector.selectNearestExplicit(getState().getTarget(), available, msg.getDontIncludePeers(), getFacade().getKBuckets());
+            msg.getDontIncludePeers().addAll(peers);
+        }
         
         if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Peers we don't want to hear about: " + toSkip);
+            _log.debug("Peers we don't want to hear about: " + msg.getDontIncludePeers());
         
         return msg;
     }

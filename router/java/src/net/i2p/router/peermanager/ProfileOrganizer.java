@@ -44,6 +44,8 @@ public class ProfileOrganizer {
     private Map _wellIntegratedPeers;
     /** H(routerIdentity) to PeerProfile for all peers that are not failing horribly */
     private Map _notFailingPeers;
+    /** H(routerIdnetity), containing elements in _notFailingPeers */
+    private List _notFailingPeersList;
     /** H(routerIdentity) to PeerProfile for all peers that ARE failing horribly (but that we haven't dropped reference to yet) */
     private Map _failingPeers;
     /** who are we? */
@@ -91,7 +93,8 @@ public class ProfileOrganizer {
         _fastPeers = new HashMap(16);
         _highCapacityPeers = new HashMap(16);
         _wellIntegratedPeers = new HashMap(16);
-        _notFailingPeers = new HashMap(16);
+        _notFailingPeers = new HashMap(64);
+        _notFailingPeersList = new ArrayList(64);
         _failingPeers = new HashMap(16);
         _strictCapacityOrder = new TreeSet(_comp);
         _thresholdSpeedValue = 0.0d;
@@ -285,8 +288,20 @@ public class ProfileOrganizer {
      *
      */
     public void selectNotFailingPeers(int howMany, Set exclude, Set matches) {
+        selectNotFailingPeers(howMany, exclude, matches, false);
+    }
+    /**
+     * Return a set of Hashes for peers that are not failing, preferring ones that
+     * we are already talking with
+     *
+     * @param howMany how many peers to find
+     * @param exclude what peers to skip (may be null)
+     * @param matches set to store the matches in
+     * @param onlyNotFailing if true, don't include any high capacity peers
+     */
+    public void selectNotFailingPeers(int howMany, Set exclude, Set matches, boolean onlyNotFailing) {
         if (matches.size() < howMany)
-            selectActiveNotFailingPeers(howMany, exclude, matches);
+            selectAllNotFailingPeers(howMany, exclude, matches, onlyNotFailing);
         return;
     }
     /**
@@ -294,6 +309,7 @@ public class ProfileOrganizer {
      * talking with.
      *
      */
+    /*
     private void selectActiveNotFailingPeers(int howMany, Set exclude, Set matches) {
         if (true) {
             selectAllNotFailingPeers(howMany, exclude, matches);
@@ -319,30 +335,39 @@ public class ProfileOrganizer {
             selectAllNotFailingPeers(howMany, exclude, matches);
         return;
     }
+    */
     /**
      * Return a set of Hashes for peers that are not failing.
      *
      */
-    private void selectAllNotFailingPeers(int howMany, Set exclude, Set matches) {
+    private void selectAllNotFailingPeers(int howMany, Set exclude, Set matches, boolean onlyNotFailing) {
         if (matches.size() < howMany) {
             int orig = matches.size();
             int needed = howMany - orig;
+            int start = 0;
             List selected = new ArrayList(needed);
             synchronized (_reorganizeLock) {
-                for (Iterator iter = _strictCapacityOrder.iterator(); selected.size() < needed && iter.hasNext(); ) {
-                    PeerProfile prof = (PeerProfile)iter.next();
-                    if (matches.contains(prof.getPeer()) ||
-                        (exclude != null && exclude.contains(prof.getPeer())) ||
-                        _failingPeers.containsKey(prof.getPeer()) ) {
+                // we randomize the whole list when rebuilding it, but randomizing 
+                // the entire list on each peer selection is a bit crazy
+                start = _context.random().nextInt(_notFailingPeersList.size());
+                for (int i = 0; i < _notFailingPeersList.size() && selected.size() < needed; i++) {
+                    int curIndex = (i+start) % _notFailingPeersList.size();
+                    Hash cur = (Hash)_notFailingPeersList.get(curIndex);
+                    if (matches.contains(cur) ||
+                        (exclude != null && exclude.contains(cur))) {
+                        continue;
+                    } else if (onlyNotFailing && _highCapacityPeers.containsKey(cur)) {
+                        // we dont want the good peers, just random ones
                         continue;
                     } else {
-                        if (isOk(prof.getPeer()))
-                            selected.add(prof.getPeer());
+                        if (isOk(cur))
+                            selected.add(cur);
                     }
                 }
             }
             if (_log.shouldLog(Log.INFO))
-                _log.info("Selecting all not failing found " + (matches.size()-orig) + " new peers: " + selected);
+                _log.info("Selecting all not failing (strict? " + onlyNotFailing + " start=" + start 
+                          + ") found " + selected.size() + " new peers: " + selected);
             matches.addAll(selected);
         }
         if (matches.size() < howMany) {
@@ -408,6 +433,7 @@ public class ProfileOrganizer {
             _fastPeers.clear();
             _highCapacityPeers.clear();
             _notFailingPeers.clear();
+            _notFailingPeersList.clear();
             _wellIntegratedPeers.clear();
             
             for (Iterator iter = allPeers.iterator(); iter.hasNext(); ) {
@@ -417,7 +443,9 @@ public class ProfileOrganizer {
             
             locked_unfailAsNecessary();
             locked_promoteFastAsNecessary();
-            
+
+            Collections.shuffle(_notFailingPeersList, _context.random());
+
             if (_log.shouldLog(Log.DEBUG)) {
                 _log.debug("Profiles reorganized.  averages: [integration: " + _thresholdIntegrationValue 
                            + ", capacity: " + _thresholdCapacityValue + ", speed: " + _thresholdSpeedValue + "]");
@@ -654,12 +682,11 @@ public class ProfileOrganizer {
     
     /** called after locking the reorganizeLock */
     private PeerProfile locked_getProfile(Hash peer) {
-        if (_notFailingPeers.containsKey(peer))
-            return (PeerProfile)_notFailingPeers.get(peer);
-        else if (_failingPeers.containsKey(peer))
-            return (PeerProfile)_failingPeers.get(peer);
-        else
-            return null;
+        PeerProfile cur = (PeerProfile)_notFailingPeers.get(peer);
+        if (cur != null) 
+            return cur;
+        cur = (PeerProfile)_failingPeers.get(peer);
+        return cur;
     }
     
     /**
@@ -717,6 +744,7 @@ public class ProfileOrganizer {
             _highCapacityPeers.remove(profile.getPeer());
             _wellIntegratedPeers.remove(profile.getPeer());
             _notFailingPeers.remove(profile.getPeer());
+            _notFailingPeersList.remove(profile.getPeer());
         } else {
             _failingPeers.remove(profile.getPeer());
             _fastPeers.remove(profile.getPeer());
@@ -724,6 +752,7 @@ public class ProfileOrganizer {
             _wellIntegratedPeers.remove(profile.getPeer());
             
             _notFailingPeers.put(profile.getPeer(), profile);
+            _notFailingPeersList.add(profile.getPeer());
             if (_thresholdCapacityValue <= profile.getCapacityValue()) { 
                 _highCapacityPeers.put(profile.getPeer(), profile);
                 if (_log.shouldLog(Log.DEBUG))

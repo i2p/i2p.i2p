@@ -330,6 +330,26 @@ public class TunnelPool {
 
     void buildFake() { buildFake(true); }
     void buildFake(boolean zeroHop) {
+        int quantity = _settings.getBackupQuantity() + _settings.getQuantity();
+        boolean needed = true;
+        synchronized (_tunnels) {
+            if (_tunnels.size() > quantity) {
+                int valid = 0;
+                for (int i = 0; i < _tunnels.size(); i++) {
+                    TunnelInfo info = (TunnelInfo)_tunnels.get(i);
+                    if (info.getExpiration() > _context.clock().now()) {
+                        valid++;
+                        if (valid >= quantity)
+                            break;
+                    }
+                }
+                if (valid >= quantity)
+                    needed = false;
+            }
+        }
+        
+        if (!needed) return;
+
         if (_log.shouldLog(Log.INFO))
             _log.info(toString() + ": building a fake tunnel (allow zeroHop? " + zeroHop + ")");
         Object tempToken = new Object();

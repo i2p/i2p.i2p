@@ -1,4 +1,11 @@
-$Id: history.txt,v 1.147 2005/02/18 10:58:20 jrandom Exp $
+$Id: history.txt,v 1.148 2005/02/19 18:20:58 jrandom Exp $
+
+2005-02-20  jrandom
+    * Only build failsafe tunnels if we need them
+    * Properly implement the selectNotFailingPeers so that we get a random
+      selection of peers, rather than using the strictOrdering (thanks dm!)
+    * Don't include too many "don't tell me about" peer references in the 
+      lookup message - only send the 10 peer references closest to the target.
 
 2005-02-19  jrandom
     * Only build new extra tunnels on failure if we don't have enough

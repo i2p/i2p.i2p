@@ -6,7 +6,9 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.TreeSet;
 
+import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
 import net.i2p.router.RouterContext;
 
@@ -48,6 +50,25 @@ class SearchState {
             return (Set)_attemptedPeers.clone();
         }
     }
+    public Set getClosestAttempted(int max) {
+        synchronized (_attemptedPeers) {
+            return locked_getClosest(_attemptedPeers, max, _searchKey);
+        }
+    }
+    
+    private Set locked_getClosest(Set peers, int max, Hash target) {
+        if (_attemptedPeers.size() <= max)
+            return new HashSet(_attemptedPeers);
+        TreeSet closest = new TreeSet(new XORComparator(target));
+        closest.addAll(_attemptedPeers);
+        HashSet rv = new HashSet(max);
+        int i = 0;
+        for (Iterator iter = closest.iterator(); iter.hasNext() && i < max; i++) {
+            rv.add(iter.next());
+        }
+        return rv;
+    }
+    
     public boolean wasAttempted(Hash peer) {
         synchronized (_attemptedPeers) {
             return _attemptedPeers.contains(peer);

@@ -18,7 +18,7 @@ class ExploratoryPeerSelector extends TunnelPeerSelector {
         if (length < 0)
             return null;
         HashSet matches = new HashSet(length);
-        ctx.profileOrganizer().selectNotFailingPeers(length, null, matches);
+        ctx.profileOrganizer().selectNotFailingPeers(length, null, matches, true);
         
         matches.remove(ctx.routerHash());
         ArrayList rv = new ArrayList(matches);

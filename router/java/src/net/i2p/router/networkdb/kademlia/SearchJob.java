@@ -53,6 +53,8 @@ class SearchJob extends JobImpl {
     
     private static final int SEARCH_BREDTH = 3; // 3 peers at a time 
     private static final int SEARCH_PRIORITY = 400; // large because the search is probably for a real search
+    /** only send the 10 closest "dont tell me about" refs */
+    static final int MAX_CLOSEST = 10;
     
     /**
      * How long will we give each peer to reply to our search? 
@@ -371,7 +373,7 @@ class SearchJob extends JobImpl {
         DatabaseLookupMessage msg = new DatabaseLookupMessage(getContext(), true);
         msg.setSearchKey(_state.getTarget());
         msg.setFrom(replyGateway.getIdentity().getHash());
-        msg.setDontIncludePeers(_state.getAttempted());
+        msg.setDontIncludePeers(_state.getClosestAttempted(MAX_CLOSEST));
         msg.setMessageExpiration(expiration);
         msg.setReplyTunnel(replyTunnelId);
         return msg;
@@ -386,7 +388,7 @@ class SearchJob extends JobImpl {
         DatabaseLookupMessage msg = new DatabaseLookupMessage(getContext(), true);
         msg.setSearchKey(_state.getTarget());
         msg.setFrom(getContext().routerHash());
-        msg.setDontIncludePeers(_state.getAttempted());
+        msg.setDontIncludePeers(_state.getClosestAttempted(MAX_CLOSEST));
         msg.setMessageExpiration(expiration);
         msg.setReplyTunnel(null);
         return msg;
