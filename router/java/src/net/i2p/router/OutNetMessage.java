@@ -241,7 +241,7 @@ public class OutNetMessage {
             buf.append("Undiscarded ").append(_messageSize).append("byte ");
             buf.append(_messageType).append(" message created ");
             buf.append((_context.clock().now() - _created)).append("ms ago: ");
-            buf.append(_messageId).append(" to ").append(_target.calculateHash().toBase64());
+            buf.append(_messageId); // .append(" to ").append(_target.calculateHash().toBase64());
             buf.append(", timing - \n");
             renderTimestamps(buf);
             _log.error(buf.toString(), _createdBy);
