@@ -1,4 +1,16 @@
-$Id: history.txt,v 1.35 2004/10/05 20:12:04 jrandom Exp $
+$Id: history.txt,v 1.36 2004/10/06 08:23:38 jrandom Exp $
+
+2004-10-06  jrandom
+    * Implement an active queue management scheme on the TCP transports,
+      dropping messages probabalistically as the queue fills up.  The 
+      estimated queue capacity is determined by the rate at which messages 
+      have been sent to the peer (averaged at 1, 5, and 60m periods).  As 
+      we exceed 1/2 of the estimated capacity, we drop messages throughout
+      the queue probabalistically with regards to their size.  This is based
+      on RFC 2309's RED, with the minimum threshold set to 1/2 the 
+      estimated connection capacity.  We may want to consider using a send
+      rate and queue size measured across all connections, to deal with our
+      own local bandwidth saturation, but we'll try the per-con metrics first.
 
 2004-10-06  jrandom
     * Enable explicit disabling of the systray entirely for windows machines

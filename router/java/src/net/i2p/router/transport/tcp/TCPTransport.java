@@ -698,6 +698,12 @@ public class TCPTransport extends TransportImpl {
                 buf.append("<li>");
                 buf.append(con.getRemoteRouterIdentity().getHash().toBase64().substring(0,6));
                 buf.append(": up for ").append(DataHelper.formatDuration(con.getLifetime()));
+                buf.append(" transferring at ");
+                long bps = con.getSendRate();
+                if (bps < 1024)
+                    buf.append(bps).append("Bps");
+                else 
+                    buf.append((int)(bps/1024)).append("KBps");
                 buf.append("</li>\n");
             }
             buf.append("</ul>\n");
