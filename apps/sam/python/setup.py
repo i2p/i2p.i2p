@@ -1,5 +1,8 @@
 
 from distutils.core import setup
+import os
+
+os.chdir('./src')
 
 setup(name="Python I2P API",
       version="0.9",
