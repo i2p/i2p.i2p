@@ -5,6 +5,7 @@ import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.SocketException;
 
 import net.i2p.I2PException;
 import net.i2p.client.naming.NamingService;
@@ -94,7 +95,13 @@ public class EepHandler {
             written = true;
             out.write(filtered);
             out.flush();
+        } catch (SocketException ex) {
+            _log.error("Error while handling eepsite request");
+            return written;
         } catch (IOException ex) {
+            _log.error("Error while handling eepsite request");
+            return written;
+        } catch (InterruptedException ex) {
             _log.error("Error while handling eepsite request");
             return written;
         } catch (I2PException ex) {
