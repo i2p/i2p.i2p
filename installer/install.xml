@@ -4,9 +4,9 @@
 
     <info>
         <appname>I2P</appname>
-        <appversion>0.4.0</appversion>
+        <appversion>0.3.5</appversion>
         <authors>
-            <author name="The I2P Project" email="support@i2p.net"/>
+            <author name="I2P" email="support@i2p.net"/>
         </authors>
         <url>http://www.i2p.net</url>
     </info>
