@@ -30,7 +30,18 @@ public class I2PSocketManagerFactory {
      * @return the newly created socket manager, or null if there were errors
      */
     public static I2PSocketManager createManager() {
-        return createManager("localhost", 7654, new Properties());
+        String i2cpHost = System.getProperty(I2PClient.PROP_TCP_HOST, "localhost");
+        int i2cpPort = 7654;
+        String i2cpPortStr = System.getProperty(I2PClient.PROP_TCP_PORT);
+        if (i2cpPortStr != null) {
+            try {
+                i2cpPort = Integer.parseInt(i2cpPortStr);
+            } catch (NumberFormatException nfe) {
+                // gobble gobble
+            }
+        }
+
+        return createManager(i2cpHost, i2cpPort, System.getProperties());
     }
 
     /**
