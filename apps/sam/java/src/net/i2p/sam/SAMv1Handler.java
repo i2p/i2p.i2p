@@ -127,8 +127,6 @@ public class SAMv1Handler extends SAMHandler implements SAMRawReceiver, SAMDatag
                                + "\"; opcode: \"" + opcode + "\")");
                 }
                 props = SAMUtils.parseParams(tok);
-                if (i2cpProps != null)
-                    props.putAll(i2cpProps); // make sure we've got the i2cp settings
 
                 if (domain.equals("STREAM")) {
                     canContinue = execStreamMessage(opcode, props);
@@ -137,6 +135,8 @@ public class SAMv1Handler extends SAMHandler implements SAMRawReceiver, SAMDatag
                 } else if (domain.equals("RAW")) {
                     canContinue = execRawMessage(opcode, props);
                 } else if (domain.equals("SESSION")) {
+                    if (i2cpProps != null)
+                        props.putAll(i2cpProps); // make sure we've got the i2cp settings
                     canContinue = execSessionMessage(opcode, props);
                 } else if (domain.equals("DEST")) {
                     canContinue = execDestMessage(opcode, props);
