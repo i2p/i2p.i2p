@@ -432,6 +432,13 @@ class TCPConnection implements I2NPMessageReader.I2NPMessageEventListener {
             _log.warn("Error reading from stream to " + _remoteIdentity.getHash().toBase64(), error);
     }
     
+    /**
+     * If we are taking an absurdly long time to send out a message, drop it 
+     * since we're overloaded.
+     *
+     */
+    private static final long MAX_LIFETIME_BEFORE_OUTBOUND_EXPIRE = 15*1000;
+    
     class ConnectionRunner implements Runnable {
         private boolean _running;
         public void run() {
@@ -494,7 +501,7 @@ class TCPConnection implements I2NPMessageReader.I2NPMessageEventListener {
                     long lifetime = cur.timestamp("TCPConnection.runner.locked_expireOldMessages still ok with " 
                                                   + (i) + " ahead and " + (_toBeSent.size()-i-1) 
                                                   + " behind on the queue");
-                    if (lifetime > 5*1000) {
+                    if (lifetime > MAX_LIFETIME_BEFORE_OUTBOUND_EXPIRE) {
                         cur.timestamp("TCPConnection.runner.locked_expireOldMessages lifetime too long - " + lifetime);
                         if (timedOut == null)
                             timedOut = new ArrayList(2);
