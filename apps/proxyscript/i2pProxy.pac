@@ -5,11 +5,18 @@
 ** License: Public Domain
 ** Date:    11 May 2004
 **
+** Revised: 07 Sep 2004
+** Changes:
+**       Proxy recursion disabled by default (strict)
+**       Password Authentication for session commands
+**       Support for http://path?i2paddresshelper=BASE64
+**       Support for http://i2p/BASE64/path syntax
 ** Revised: 17 May 2004
-** Added:
+** Changes:
 **       Ability for the user to control the proxy
 **       status on a per browser-session basis.
 ********************************************************/
+
 
 /* C O N F I G U R A T I O N
 */ 
@@ -53,12 +60,13 @@ var proxyStatus = "auto";
 **   could change your status mode by linking to command keywords...
 **   eg. <img src="i2p.off" ...
 **   This is why the default setting for statusKeyword is "limited", which only
-**   allows you to set the proxy status to "on".
+**   allows you to set the proxy status to "on". See also keywordAuthPassword.
 **
 **   [1] "all"	=> All proxy status urls are available.
 **               '->  i2p.on, i2p.off, i2p.auto (respective to proxyStatus settings)
 **               '->  WARNING: Setting "all" is a big risk to your anonymity!
-**               
+**               '->  In this mode it is highly recommended you set an AuthPassword too!
+**
 **   [2] "limited"  => Only i2p.on is available..
 **                      '->  This setting lasts for the duration of the browser setting.
 **                      '->  You have to close your browser in order to revert to
@@ -70,7 +78,7 @@ var proxyStatus = "auto";
 **
 */
 
-var statusKeyword = "limited";
+var statusKeyword = "all";
 
 /*
 **   By default if proxyStatus is set to "auto" the config script
@@ -84,7 +92,24 @@ var statusKeyword = "limited";
 **   sites will be rejected if the i2p proxy is offline. (safest)
 */
 
-var strict = false;
+var strict = true;
+
+/*
+**   By setting an authentication password, all activated session keywords
+**   will require the addition of a password to prevent malicious sites from
+**   hijacking your proxy settings. ie. <img src="i2p.off" ...
+**   Users should append whatever they set here to any command keywords
+**   they use. 
+**   eg. i2p.on.passw0rd
+**   If left blank, authentication is ignored - it is recommended that
+**   you use "limited" statusKeyword mode if you choose not to require a password.
+**   If you do require this feature then you should replace the default "passw0rd" with
+**   one of your own (recommend at least 8 letters with a case-sensitive alpha-numeric
+**   mix of characters).
+**
+*/
+
+var keywordAuthPassword = "passw0rd";
 
 
 /* E N D   C O N F I G U R A T I O N
@@ -96,7 +121,13 @@ var strict = false;
 */
 
 if (strict == false) {
-	i2pProxy = i2pProxy + "; " + normal;
+     i2pProxy = i2pProxy + "; " + normal;
+}
+
+/*Check for User Authentication Password.
+*/
+if (keywordAuthPassword != "") {
+     keywordAuthPassword = "." + keywordAuthPassword;
 }
 
 /* This function gets called every time a url is submitted
@@ -108,16 +139,17 @@ function FindProxyForURL(url, host) {
     */
 
    if (statusKeyword != "off") {
-      if (host == "i2p.off" && statusKeyword == "all") {
+      if (host == "i2p.off" + keywordAuthPassword && statusKeyword == "all") {
          /*Proxy is bypassed - outweb available only
          */
          proxyStatus = "off";
-      } else if (host == "i2p.auto" && statusKeyword == "all") {
+      } else if (host == "i2p.auto" + keywordAuthPassword && statusKeyword == "all") {
           /* Proxy is used only for .i2p hosts otherwise
           ** '-> browse as normal.
           */
           proxyStatus = "auto";
-      } else if (host == "i2p.on" && statusKeyword == "limited") {
+      } else if (host == "i2p.on" + keywordAuthPassword && (statusKeyword == "limited" ||
+                                                            statusKeyword == "all"        )) {
           /* Only I2P traffic is accepted.
           */
           proxyStatus = "on";
@@ -135,13 +167,14 @@ function FindProxyForURL(url, host) {
    }
    
    host = host.toLowerCase();
-   /* check tld for "i2p" - if found then redirect
+   /* check tld for "i2p" or oOo's new "i2paddresshelper" syntax - if found then redirect
    ** '-> request to the i2p proxy
    */
    
-   if (shExpMatch(host, "*.i2p")) {    // seems more reliable than:
-       return i2pProxy;                     // dnsDomainIs(host, ".i2p") || 
-   } else {                                      // i2pRegex.test(host)
+   if (url.match(/^http:\/\/i2p\/[a-zA-Z0-9\-\~]{516}|i2paddresshelper=/i) ||
+       shExpMatch(host, "*.i2p")) {                       // seems more reliable than:
+       return i2pProxy;                                     // dnsDomainIs(host, ".i2p") || 
+   } else {                                                   // i2pRegex.test(host)
        return normal;
    }
 }
