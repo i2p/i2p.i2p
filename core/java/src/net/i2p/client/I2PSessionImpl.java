@@ -85,8 +85,6 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
     /** used to seperate things out so we can get rid of singletons */
     protected I2PAppContext _context;
 
-    private int _totalReconnectAttempts;
-
     /** monitor for waiting until a lease set has been granted */
     private Object _leaseSetWait = new Object();
 
@@ -137,7 +135,6 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
         loadConfig(options);
         _sessionId = null;
         _leaseSet = null;
-        _totalReconnectAttempts = 0;
     }
 
     /**
@@ -564,8 +561,8 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
         closeSocket();
     }
 
-    private final static int MAX_RECONNECT_ATTEMPTS = 1;
-    private final static int MAX_TOTAL_RECONNECT_ATTEMPTS = 3;
+    private final static int MAX_RECONNECT_DELAY = 320*1000;
+    private final static int BASE_RECONNECT_DELAY = 10*1000;
 
     protected boolean shouldReconnect() {
         return true;
@@ -573,24 +570,25 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
 
     protected boolean reconnect() {
         closeSocket();
-        if (_totalReconnectAttempts < MAX_TOTAL_RECONNECT_ATTEMPTS) {
-            _totalReconnectAttempts++;
-        } else {
-            if (_log.shouldLog(Log.CRIT))
-                _log.log(Log.CRIT, getPrefix() + "Max number of reconnects exceeded ["
-                                   + _totalReconnectAttempts + "], we give up!");
-            return false;
-        }
         if (_log.shouldLog(Log.INFO)) _log.info(getPrefix() + "Reconnecting...");
-        for (int i = 0; i < MAX_RECONNECT_ATTEMPTS; i++) {
+        int i = 0;
+        while (true) {
+            long delay = BASE_RECONNECT_DELAY << i;
+            i++;
+            if (delay > MAX_RECONNECT_DELAY)
+                delay = MAX_RECONNECT_DELAY;
+            try { Thread.sleep(delay); } catch (InterruptedException ie) {}
+            
             try {
                 connect();
+                if (_log.shouldLog(Log.INFO)) 
+                    _log.info(getPrefix() + "Reconnected on attempt " + i);
                 return true;
             } catch (I2PSessionException ise) {
-                if (_log.shouldLog(Log.ERROR)) _log.error(getPrefix() + "Error reconnecting on attempt " + i, ise);
+                if (_log.shouldLog(Log.ERROR)) 
+                    _log.error(getPrefix() + "Error reconnecting on attempt " + i, ise);
             }
         }
-        return false;
     }
     
     protected String getPrefix() { return "[" + (_sessionId == null ? -1 : _sessionId.getSessionId()) + "]: "; }

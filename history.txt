@@ -1,4 +1,8 @@
-$Id: history.txt,v 1.4 2004/09/03 11:52:27 hypercubus Exp $
+$Id: history.txt,v 1.5 2004/09/03 14:46:08 jrandom Exp $
+
+2004-09-04  jrandom
+    * Update the SDK to automatically reconnect indefinitely with an 
+      exponential delay on retries (capped at 5 minutes).
 
 * 2004-09-03  0.4 released
 
