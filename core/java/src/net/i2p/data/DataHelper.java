@@ -154,6 +154,9 @@ public class DataHelper {
             while ( (line = in.readLine()) != null) {
                 if (line.trim().length() <= 0) continue;
                 if (line.charAt(0) == '#') continue;
+                if (line.charAt(0) == ';') continue;
+                if (line.indexOf('#') > 0)  // trim off any end of line comment
+                    line = line.substring(0, line.indexOf('#')).trim();
                 int split = line.indexOf('=');
                 if (split <= 0) continue;
                 String key = line.substring(0, split);
@@ -311,7 +314,7 @@ public class DataHelper {
             throw new IllegalArgumentException("wtf, fromLong got a negative? " + rv + ": offset="+ offset +" numBytes="+numBytes);
         return rv;
     }
-
+    
     public static void main(String args[]) {
         for (int i = 0; i <= 0xFF; i++)
             testLong(1, i);

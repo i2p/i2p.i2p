@@ -4,7 +4,11 @@
 package net.i2p.i2ptunnel;
 
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.StringTokenizer;
 
+import net.i2p.I2PAppContext;
 import net.i2p.client.streaming.I2PSocket;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.Destination;
@@ -15,15 +19,17 @@ public class I2PTunnelClient extends I2PTunnelClientBase {
 
     private static final Log _log = new Log(I2PTunnelClient.class);
 
-    protected Destination dest;
+    /** list of Destination objects that we point at */
+    protected List dests;
     private static final long DEFAULT_READ_TIMEOUT = 5*60*1000; // -1
     protected long readTimeout = DEFAULT_READ_TIMEOUT;
 
     /**
+     * @param destinations comma delimited list of peers we target
      * @throws IllegalArgumentException if the I2PTunnel does not contain
      *                                  valid config to contact the router
      */
-    public I2PTunnelClient(int localPort, String destination, Logging l, 
+    public I2PTunnelClient(int localPort, String destinations, Logging l, 
                            boolean ownDest, EventDispatcher notifyThis, 
                            I2PTunnel tunnel) throws IllegalArgumentException {
         super(localPort, ownDest, l, notifyThis, "SynSender", tunnel);
@@ -33,19 +39,28 @@ public class I2PTunnelClient extends I2PTunnelClientBase {
             return;
         }
 
-        try {
-            dest = I2PTunnel.destFromName(destination);
-            if (dest == null) {
-                l.log("Could not resolve " + destination + ".");
-                return;
+        StringTokenizer tok = new StringTokenizer(destinations, ",");
+        dests = new ArrayList(1);
+        while (tok.hasMoreTokens()) {
+            String destination = tok.nextToken();
+            try {
+                Destination dest = I2PTunnel.destFromName(destination);
+                if (dest == null)
+                    l.log("Could not resolve " + destination);
+                else
+                    dests.add(dest);
+            } catch (DataFormatException dfe) {
+                l.log("Bad format parsing \"" + destination + "\"");
             }
-        } catch (DataFormatException e) {
-            l.log("Bad format in destination \"" + destination + "\".");
+        }
+
+        if (dests.size() <= 0) {
+            l.log("No target destinations found");
             notifyEvent("openClientResult", "error");
             return;
         }
 
-        setName(getLocalPort() + " -> " + destination);
+        setName(getLocalPort() + " -> " + destinations);
 
         startRunning();
 
@@ -56,6 +71,7 @@ public class I2PTunnelClient extends I2PTunnelClientBase {
     public long getReadTimeout() { return readTimeout; }
     
     protected void clientConnectionRun(Socket s) {
+        Destination dest = pickDestination();
         I2PSocket i2ps = null;
         try {
             i2ps = createI2PSocket(dest);
@@ -71,5 +87,18 @@ public class I2PTunnelClient extends I2PTunnelClientBase {
                 }
             }
         }
+    }
+    
+    private final Destination pickDestination() {
+        int size = dests.size();
+        if (size <= 0) {
+            if (_log.shouldLog(Log.ERROR))
+                _log.error("No client targets?!");
+            return null;
+        }
+        if (size == 1) // skip the rand in the most common case
+            return (Destination)dests.get(0);
+        int index = I2PAppContext.getGlobalContext().random().nextInt(size);
+        return (Destination)dests.get(index);
     }
 }

@@ -2,6 +2,9 @@
 <jsp:useBean class="net.i2p.router.web.SummaryHelper" id="helper" scope="request" />
 <jsp:setProperty name="helper" property="contextId" value="<%=(String)session.getAttribute("i2p.contextId")%>" />
 
+<jsp:useBean class="net.i2p.router.web.ReseedHandler" id="reseed" scope="request" />
+<jsp:setProperty name="reseed" property="*" />
+
 <div class="routersummary">
  <u><b>General</b></u><br />
  <b>Ident:</b> <jsp:getProperty name="helper" property="ident" /><br />
@@ -16,8 +19,27 @@
  <b>High capacity:</b> <jsp:getProperty name="helper" property="highCapacityPeers" /><br />
  <b>Well integrated:</b> <jsp:getProperty name="helper" property="wellIntegratedPeers" /><br />
  <b>Failing:</b> <jsp:getProperty name="helper" property="failingPeers" /><br />
- <b>Shitlisted:</b> <jsp:getProperty name="helper" property="shitlistedPeers" /><br />
- <hr />
+ <b>Shitlisted:</b> <jsp:getProperty name="helper" property="shitlistedPeers" /><br /><%
+     if (helper.getActivePeers() <= 0) {
+        %><b><a href="config.jsp">check your NAT/firewall</a></b><br /><%
+     }
+    if (helper.getActiveProfiles() <= 4) { // 4 is the min fallback
+        if ("true".equals(System.getProperty("net.i2p.router.web.ReseedHandler.reseedInProgress", "false"))) {
+            out.print(" <i>reseeding</i>");
+        } else {
+            long nonce = new java.util.Random().nextLong();
+            String prev = System.getProperty("net.i2p.router.web.ReseedHandler.nonce");
+            if (prev != null) System.setProperty("net.i2p.router.web.ReseedHandler.noncePrev", prev);
+            System.setProperty("net.i2p.router.web.ReseedHandler.nonce", nonce+"");
+            String uri = request.getRequestURI();
+            if (uri.indexOf('?') > 0)
+                uri = uri + "&reseedNonce=" + nonce;
+            else
+                uri = uri + "?reseedNonce=" + nonce;
+            out.print(" <a href=\"" + uri + "\">reseed</a>");
+        }
+    }
+ %><hr />
  
  <u><b>Bandwidth in/out</b></u><br />
  <b>1m:</b> <jsp:getProperty name="helper" property="inboundMinuteKBps" />/<jsp:getProperty name="helper" property="outboundMinuteKBps" />KBps<br />

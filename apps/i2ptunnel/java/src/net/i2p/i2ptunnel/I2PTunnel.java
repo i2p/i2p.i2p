@@ -284,7 +284,7 @@ public class I2PTunnel implements Logging, EventDispatcher {
         l.log("textserver <host> <port> <privkey>");
         l.log("genkeys <privkeyfile> [<pubkeyfile>]");
         l.log("gentextkeys");
-        l.log("client <port> <pubkey>|file:<pubkeyfile>");
+        l.log("client <port> <pubkey>[,<pubkey,...]|file:<pubkeyfile>");
         l.log("httpclient <port>");
         l.log("lookup <name>");
         l.log("quit");
@@ -449,9 +449,11 @@ public class I2PTunnel implements Logging, EventDispatcher {
                 notifyEvent("clientTaskId", new Integer(-1));
             }
         } else {
-            l.log("client <port> <pubkey>|file:<pubkeyfile>");
+            l.log("client <port> <pubkey>[,<pubkey>]|file:<pubkeyfile>");
             l.log("  creates a client that forwards port to the pubkey.\n"
-                  + "  use 0 as port to get a free port assigned.");
+                  + "  use 0 as port to get a free port assigned.  If you specify\n"
+                  + "  a comma delimited list of pubkeys, it will rotate among them\n"
+                  + "  randomlyl");
             notifyEvent("clientTaskId", new Integer(-1));
         }
     }

@@ -1,4 +1,13 @@
-$Id: history.txt,v 1.76 2004/11/19 18:04:27 jrandom Exp $
+$Id: history.txt,v 1.77 2004/11/20 23:08:14 jrandom Exp $
+
+2004-11-21  jrandom
+    * Allow end of line comments in the hosts.txt and other config files,
+      using '#' to begin the comments (thanks susi!)
+    * Add support to I2PTunnel's 'client' feature for picking between multiple
+      target destinations (e.g. 'client 6668 irc.duck.i2p,irc.baffled.i2p')
+    * Add a quick link on the left hand nav to reseed if there aren't enough
+      known peers, as well as link to the config page if there are no active 
+      peers.  Revised config page accordingly.
 
 2004-11-21  jrandom
     * Destroy ElGamal/AES+SessionTag keys after 15 minutes of inactivity 
