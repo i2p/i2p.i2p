@@ -18,7 +18,7 @@ import java.util.Map;
  * favorite plotting tool)
  */
 public class StatLogSplitter {
-    private static final String DATE_FORMAT = "yyyyMMdd hh:mm:ss.SSS";
+    private static final String DATE_FORMAT = "yyyyMMdd HH:mm:ss.SSS";
     private static SimpleDateFormat _fmt = new SimpleDateFormat(DATE_FORMAT);
     public static void main(String args[]) {
         if (args.length != 1) {
@@ -56,7 +56,8 @@ public class StatLogSplitter {
                     }
                     FileWriter out = (FileWriter)outputFiles.get(stat);
                     double s = (when.getTime()-first)/1000.0;
-                    out.write(s + " " + val + "\n");
+                    //long s = when.getTime();
+                    out.write(s + " " + val + " [" + line + "]\n");
                     out.flush();
                 } catch (ParseException pe) {
                     continue;
