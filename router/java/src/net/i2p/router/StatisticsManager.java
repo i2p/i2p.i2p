@@ -31,7 +31,7 @@ public class StatisticsManager implements Service {
     private int _publishedStats;
     
     public final static String PROP_PUBLISH_RANKINGS = "router.publishPeerRankings";
-    public final static String DEFAULT_PROP_PUBLISH_RANKINGS = "false";
+    public final static String DEFAULT_PROP_PUBLISH_RANKINGS = "true";
     public final static String PROP_MAX_PUBLISHED_PEERS = "router.publishPeerMax";
     public final static int DEFAULT_MAX_PUBLISHED_PEERS = 20;
 
