@@ -9,6 +9,7 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.i2p.data.DataHelper;
 import net.i2p.data.RouterIdentity;
 import net.i2p.data.RouterInfo;
 import net.i2p.data.i2np.I2NPMessageReader;
@@ -95,6 +96,11 @@ public class TCPConnection {
             OutNetMessage msg = (OutNetMessage)msgs.get(0);
             _transport.afterSend(msg, false, true, -1);
         }
+        _context.profileManager().commErrorOccurred(_ident.getHash());
+        _transport.addConnectionErrorMessage("Connection closed with "
+                                             + _ident.getHash().toBase64().substring(0,6)
+                                             + " after " + DataHelper.formatDuration(getLifetime()));
+        _transport.connectionClosed(this);
     }
     
     /**

@@ -1,5 +1,6 @@
 package net.i2p.router.transport.tcp;
 
+import java.io.BufferedOutputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -7,6 +8,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.InetAddress;
 import java.net.Socket;
+import java.net.SocketException;
 
 import java.text.SimpleDateFormat;
 
@@ -24,8 +26,10 @@ import net.i2p.data.Hash;
 import net.i2p.data.SessionKey;
 import net.i2p.data.Signature;
 import net.i2p.data.RouterInfo;
-import net.i2p.router.RouterContext;
 import net.i2p.router.Router;
+import net.i2p.router.RouterContext;
+import net.i2p.router.transport.BandwidthLimitedInputStream;
+import net.i2p.router.transport.BandwidthLimitedOutputStream;
 import net.i2p.util.Log;
 import net.i2p.util.NativeBigInteger;
 
@@ -85,6 +89,7 @@ public class ConnectionHandler {
         _error = null;
         _agreedProtocol = -1;
         InetAddress addr = _socket.getInetAddress();
+        try { _socket.setSoTimeout(TCPListener.HANDLE_TIMEOUT); } catch (SocketException se) {}
         if (addr != null) {
             _from = addr.getHostAddress();
         }
@@ -122,6 +127,8 @@ public class ConnectionHandler {
         
         if (ok && (_error == null) ) {
             establishComplete();
+            
+            try { _socket.setSoTimeout(0); } catch (SocketException se) {}
             
             if (_log.shouldLog(Log.INFO))
                 _log.info("Establishment ok... building the con");
@@ -166,7 +173,7 @@ public class ConnectionHandler {
             int numBytes = (int)DataHelper.readLong(_rawIn, 2);
             if (numBytes <= 0)
                 throw new IOException("Invalid number of bytes in connection");
-            // 0xFF is a reserved value identifying the connection as a reachability test
+            // 0xFFFF is a reserved value identifying the connection as a reachability test
             if (numBytes == 0xFFFF) {
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("ReadProtocol[Y]: test called, handle it");
@@ -635,6 +642,8 @@ public class ConnectionHandler {
             OutputStream out = s.getOutputStream();
             InputStream in = s.getInputStream();
             
+            try { s.setSoTimeout(TCPListener.HANDLE_TIMEOUT); } catch (SocketException se) {}
+            
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Beginning verification of reachability");
             
@@ -691,7 +700,7 @@ public class ConnectionHandler {
     /**
      * The peer contacting us is just testing us.  Verify that we are reachable
      * by following the protocol, then close the socket.  This is called only 
-     * after reading the initial 0xFF.
+     * after reading the initial 0xFFFF.
      *
      */
     private void handleTest() {
@@ -721,7 +730,7 @@ public class ConnectionHandler {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("HandleTest: version=" + version + " opts=" +opts);
             
-            // send: 0xFF + versionOk + #bytesIP + IP + currentTime + properties
+            // send: 0xFFFF + versionOk + #bytesIP + IP + currentTime + properties
             _rawOut.write(0xFF);
             _rawOut.write(0xFF);
             _rawOut.write(version);
@@ -755,7 +764,6 @@ public class ConnectionHandler {
             _actualPeer = null;
             _testComplete = true;
         }
-        // send: 0xFF + versionOk + #bytesIP + IP + currentTime + properties
     }
     
     /**
@@ -764,9 +772,9 @@ public class ConnectionHandler {
      *
      */
     private void establishComplete() {
-        // todo: add bw limiter
-        _connectionIn = _rawIn;
-        _connectionOut = _rawOut;
+        _connectionIn = new BandwidthLimitedInputStream(_context, _rawIn, _actualPeer.getIdentity());
+        OutputStream blos = new BandwidthLimitedOutputStream(_context, _rawOut, _actualPeer.getIdentity());
+        _connectionOut = new BufferedOutputStream(blos, ConnectionBuilder.WRITE_BUFFER_SIZE);
         
         Hash peer = _actualPeer.getIdentity().getHash();
         _context.netDb().store(peer, _actualPeer);

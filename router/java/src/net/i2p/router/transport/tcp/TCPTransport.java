@@ -126,6 +126,14 @@ public class TCPTransport extends TransportImpl {
     }
     
     public TransportBid bid(RouterInfo toAddress, long dataSize) {
+        RouterAddress addr = toAddress.getTargetAddress(STYLE);
+        if (addr == null) 
+            return null;
+        
+        TCPAddress tcpAddr = new TCPAddress(addr);
+        if ( (_myAddress != null) && (tcpAddr.equals(_myAddress)) )
+            return null; // dont talk to yourself
+        
         TransportBid bid = new TransportBid();
         bid.setBandwidthBytes((int)dataSize);
         bid.setExpiration(_context.clock().now() + 30*1000);
@@ -136,6 +144,7 @@ public class TCPTransport extends TransportImpl {
         if (!getIsConnected(toAddress.getIdentity()))
             latency += 5000;
         bid.setLatencyMs(latency);
+        
         return bid;
     }
     
@@ -245,6 +254,13 @@ public class TCPTransport extends TransportImpl {
         con.runConnection();
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Connection set to run");
+    }
+    
+    void connectionClosed(TCPConnection con) {
+        synchronized (_connectionLock) {
+            _connectionsByIdent.remove(con.getRemoteRouterIdentity().getHash());
+            _connectionsByAddress.remove(con.getRemoteAddress().toString());
+        }
     }
     
     /**
@@ -479,6 +495,11 @@ public class TCPTransport extends TransportImpl {
                         continue; // uh...
                     OutNetMessage msg = (OutNetMessage)msgs.get(0);
                     RouterAddress addr = msg.getTarget().getTargetAddress(STYLE);
+                    if (addr == null) {
+                        _log.error("Message target has no TCP addresses! "  + msg.getTarget());
+                        iter.remove();
+                        continue;
+                    }
                     TCPAddress tcpAddr = new TCPAddress(addr);
                     if (tcpAddr.getPort() <= 0)
                         continue; // invalid

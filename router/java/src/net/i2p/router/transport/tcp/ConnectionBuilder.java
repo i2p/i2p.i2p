@@ -1,5 +1,6 @@
 package net.i2p.router.transport.tcp;
 
+import java.io.BufferedOutputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -7,6 +8,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.math.BigInteger;
 import java.net.Socket;
+import java.net.SocketException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -25,6 +27,8 @@ import net.i2p.data.RouterInfo;
 import net.i2p.data.SessionKey;
 import net.i2p.data.Signature;
 import net.i2p.router.RouterContext;
+import net.i2p.router.transport.BandwidthLimitedInputStream;
+import net.i2p.router.transport.BandwidthLimitedOutputStream;
 import net.i2p.util.I2PThread;
 import net.i2p.util.Log;
 import net.i2p.util.NativeBigInteger;
@@ -78,6 +82,8 @@ public class ConnectionBuilder {
     /** If the connection hasn't been built in 10 seconds, give up */
     public static final int CONNECTION_TIMEOUT = 10*1000;
     
+    public static final int WRITE_BUFFER_SIZE = 2*1024;
+    
     public ConnectionBuilder(RouterContext context, TCPTransport transport, RouterInfo info) {
         _context = context;
         _log = context.logManager().getLog(ConnectionBuilder.class);
@@ -106,6 +112,8 @@ public class ConnectionBuilder {
         createSocket();        
         if ( (_socket == null) || (_error != null) )
             return null;
+
+        try { _socket.setSoTimeout(CONNECTION_TIMEOUT); } catch (SocketException se) {}
         
         negotiateProtocol();
         
@@ -123,7 +131,9 @@ public class ConnectionBuilder {
         
         if (ok && (_error == null) ) {
             establishComplete();
-            
+
+            try { _socket.setSoTimeout(0); } catch (SocketException se) {}
+        
             TCPConnection con = new TCPConnection(_context);
             con.setInputStream(_connectionIn);
             con.setOutputStream(_connectionOut);
@@ -209,8 +219,8 @@ public class ConnectionBuilder {
         try {
             // #bytesFollowing + versionOk + #bytesIP + IP + tagOk? + nonce + properties
             int numBytes = (int)DataHelper.readLong(_rawIn, 2);
-            // 0xFF is a reserved value
-            if ( (numBytes <= 0) || (numBytes >= 0xFF) )
+            // 0xFFFF is a reserved value
+            if ( (numBytes <= 0) || (numBytes >= 0xFFFF) )
                 throw new IOException("Invalid number of bytes in response");
             
             byte line[] = new byte[numBytes];
@@ -620,9 +630,9 @@ public class ConnectionBuilder {
      *
      */
     private void establishComplete() {
-        // todo: add bw limiter
-        _connectionIn = _rawIn;
-        _connectionOut = _rawOut;
+        _connectionIn = new BandwidthLimitedInputStream(_context, _rawIn, _actualPeer.getIdentity());
+        OutputStream blos = new BandwidthLimitedOutputStream(_context, _rawOut, _actualPeer.getIdentity());
+        _connectionOut = new BufferedOutputStream(blos, WRITE_BUFFER_SIZE);
         
         Hash peer = _actualPeer.getIdentity().getHash();
         _context.netDb().store(peer, _actualPeer);
@@ -658,8 +668,10 @@ public class ConnectionBuilder {
         fail(error, null);
     }
     private void fail(String error, Exception e) {
-        if (_error == null) // only grab the first error
+        if (_error == null) {
+            // only grab the first error
             _error = error;
+        }
         
         if (_rawIn != null) try { _rawIn.close(); } catch (IOException ioe) {}
         if (_rawOut != null) try { _rawOut.close(); } catch (IOException ioe) {}

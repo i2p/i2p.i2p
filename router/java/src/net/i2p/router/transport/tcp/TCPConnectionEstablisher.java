@@ -1,5 +1,6 @@
 package net.i2p.router.transport.tcp;
 
+import net.i2p.data.Hash;
 import net.i2p.data.RouterInfo;
 import net.i2p.router.RouterContext;
 import net.i2p.util.Log;
@@ -30,7 +31,10 @@ public class TCPConnectionEstablisher implements Runnable {
                 _transport.connectionEstablished(con);
             } else {
                 _transport.addConnectionErrorMessage(cb.getError());
-                _context.shitlist().shitlistRouter(info.getIdentity().getHash(), "Unable to contact");
+                Hash peer = info.getIdentity().getHash();
+                _context.profileManager().commErrorOccurred(peer);
+                _context.shitlist().shitlistRouter(peer, "Unable to contact");
+                _context.netDb().fail(peer);
             }
             
             // this removes the _pending block on the address and 

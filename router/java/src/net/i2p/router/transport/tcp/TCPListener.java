@@ -48,7 +48,7 @@ class TCPListener {
      */
     private final static int MAX_FAIL_DELAY = 5*60*1000;
     /** if we're not making progress in 10s, drop 'em */
-    private final static long HANDLE_TIMEOUT = 10*1000;
+    final static int HANDLE_TIMEOUT = 10*1000;
     /** id generator for the connections */
     private static volatile int __handlerId = 0;
     

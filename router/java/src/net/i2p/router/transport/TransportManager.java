@@ -260,14 +260,12 @@ public class TransportManager implements TransportEventListener {
             buf.append(addr.toString()).append("\n\n");
         }
         buf.append("</pre>\n");
-        buf.append("<ul>\n");
         for (Iterator iter = _transports.iterator(); iter.hasNext(); ) {
             Transport t = (Transport)iter.next();
             String str = t.renderStatusHTML();
             if (str != null)
-                buf.append("<li>").append(str).append("</li>\n");
+                buf.append(str);
         }
-        buf.append("</ul>\n");
         out.write(buf.toString().getBytes());
     }
 }

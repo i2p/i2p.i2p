@@ -58,7 +58,11 @@ public class TCPAddress {
     }
     
     public TCPAddress(RouterAddress addr) {
-	if (addr == null) throw new IllegalArgumentException("Null router address");
+        if (addr == null) {
+            _host = null;
+            _port = -1;
+            return;
+        }
         String host = addr.getOptions().getProperty(PROP_HOST);
         try {
             InetAddress iaddr = InetAddress.getByName(host);
