@@ -122,9 +122,12 @@ class RouterThrottleImpl implements RouterThrottle {
         int numTunnels = _context.tunnelManager().getParticipatingCount();
         double bytesAllocated =  (numTunnels + 1) * bytesPerTunnel;
 
-        // the max # tunnels throttle is useful for shutting down the router - 
-        // set this to 0, wait a few minutes, and the router can be shut off 
-        // without killing anyone's tunnels
+        if (_context.getProperty(Router.PROP_SHUTDOWN_IN_PROGRESS) != null) {
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Refusing tunnel request since we are shutting down ASAP");
+            return false;
+        }
+        
         String maxTunnels = _context.getProperty(PROP_MAX_TUNNELS);
         if (maxTunnels != null) {
             try {

@@ -57,6 +57,7 @@ public class Router {
     private boolean _isAlive;
     private I2PThread.OOMEventListener _oomListener;
     private ShutdownHook _shutdownHook;
+    private I2PThread _gracefulShutdownDetector;
     
     public final static String PROP_CONFIG_FILE = "router.configLocation";
     
@@ -67,6 +68,7 @@ public class Router {
     public final static String PROP_INFO_FILENAME_DEFAULT = "router.info";
     public final static String PROP_KEYS_FILENAME = "router.keys.location";
     public final static String PROP_KEYS_FILENAME_DEFAULT = "router.keys";
+    public final static String PROP_SHUTDOWN_IN_PROGRESS = "__shutdownInProgress";
         
     static {
         // grumble about sun's java caching DNS entries *forever*
@@ -108,6 +110,8 @@ public class Router {
             }
         };
         _shutdownHook = new ShutdownHook();
+        _gracefulShutdownDetector = new I2PThread(new GracefulShutdown());
+        _gracefulShutdownDetector.start();
     }
     
     /**
@@ -184,6 +188,8 @@ public class Router {
             File f = new File(filename);
             if (f.canRead()) {
                 DataHelper.loadProps(props, f);
+                // dont be a wanker
+                props.remove(PROP_SHUTDOWN_IN_PROGRESS);
             } else {
                 log.warn("Configuration file " + filename + " does not exist");
             }
@@ -549,6 +555,71 @@ public class Router {
         if (_killVMOnEnd) {
             try { Thread.sleep(1000); } catch (InterruptedException ie) {}
             Runtime.getRuntime().halt(-1);
+        }
+    }
+    
+    /**
+     * Call this if we want the router to kill itself as soon as we aren't 
+     * participating in any more tunnels (etc).  This will not block and doesn't
+     * guarantee any particular time frame for shutting down.  To shut the 
+     * router down immediately, use {@link #shutdown}.  If you want to cancel
+     * the graceful shutdown (prior to actual shutdown ;), call 
+     * {@link #cancelGracefulShutdown}.
+     *
+     */
+    public void shutdownGracefully() {
+        _config.setProperty(PROP_SHUTDOWN_IN_PROGRESS, "true");
+        synchronized (_gracefulShutdownDetector) {
+            _gracefulShutdownDetector.notifyAll();
+        }
+    }
+    
+    /**
+     * Cancel any prior request to shut the router down gracefully.
+     *
+     */
+    public void cancelGracefulShutdown() {
+        _config.remove(PROP_SHUTDOWN_IN_PROGRESS);
+        synchronized (_gracefulShutdownDetector) {
+            _gracefulShutdownDetector.notifyAll();
+        }        
+    }
+    
+    public boolean gracefulShutdownInProgress() {
+        return (null != _config.getProperty(PROP_SHUTDOWN_IN_PROGRESS));
+    }
+    
+    /**
+     * Simple thread that sits and waits forever, managing the
+     * graceful shutdown "process" (describing it would take more text
+     * than just reading the code...)
+     *
+     */
+    private class GracefulShutdown implements Runnable {
+        public void run() {
+            while (true) {
+                boolean shutdown = (null != _config.getProperty(PROP_SHUTDOWN_IN_PROGRESS));
+                if (shutdown) {
+                    if (_context.tunnelManager().getParticipatingCount() <= 0) {
+                        if (_log.shouldLog(Log.CRIT))
+                            _log.log(Log.CRIT, "Graceful shutdown progress - no more tunnels, safe to die");
+                        shutdown();
+                        return;
+                    } else {
+                        try {
+                            synchronized (Thread.currentThread()) {
+                                Thread.currentThread().wait(10*1000);
+                            }
+                        } catch (InterruptedException ie) {}
+                    }
+                } else {
+                    try {
+                        synchronized (Thread.currentThread()) {
+                            Thread.currentThread().wait();
+                        }
+                    } catch (InterruptedException ie) {}
+                }
+            }
         }
     }
     

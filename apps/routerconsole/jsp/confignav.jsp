@@ -1,5 +1,7 @@
 <h4><% if (request.getRequestURI().indexOf("config.jsp") != -1) { 
  %>Network | <% } else { %><a href="config.jsp">Network</a> | <% }
+ if (request.getRequestURI().indexOf("configservice.jsp") != -1) {
+ %>Service | <% } else { %><a href="configservice.jsp">Service</a> | <% }
  if (request.getRequestURI().indexOf("configclients.jsp") != -1) {
  %>Clients | <% } else { %><a href="configclients.jsp">Clients</a> | <% }
  if (request.getRequestURI().indexOf("configlogging.jsp") != -1) {
