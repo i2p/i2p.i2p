@@ -798,11 +798,15 @@ bool sam_socket_connect(const char *host, uint16_t port)
 
 	samd = socket(AF_INET, SOCK_STREAM, 0);
 #ifdef WINSOCK
-	if (samd == INVALID_SOCKET)
+	if (samd == INVALID_SOCKET) {
+		SAMLOG("socket() failed: %s", sam_winsock_strerror(WSAGetLastError()));
 		return false;
+	}
 #else
-	if (samd == -1)
+	if (samd == -1) {
+		SAMLOG("socket() failed: %s", strerror(errno));
 		return false;
+	}
 #endif
 	memset(&hostaddr, 0, sizeof hostaddr);
 	hostaddr.sin_family = AF_INET;
@@ -822,8 +826,15 @@ bool sam_socket_connect(const char *host, uint16_t port)
 	} else if (rc == -1)
 		return false;
 
-	if (connect(samd, (struct sockaddr *)&hostaddr, sizeof hostaddr) == -1)
+	rc = connect(samd, (struct sockaddr *)&hostaddr, sizeof hostaddr);
+	if (rc == -1) {
+#ifdef WINSOCK
+		SAMLOG("connect() failed: %s", sam_winsock_strerror(WSAGetLastError()));
+#else
+		SAMLOG("connect() failed: %s", strerror(errno));
+#endif
 		return false;
+	}
 
 	samd_connected = true;
 	return true;
@@ -1026,7 +1037,7 @@ const char *sam_strerror(samerr_t code)
 samerr_t sam_winsock_cleanup(void)
 {
 	if (WSACleanup() == SOCKET_ERROR) {
-		SAMLOG("WSACleanup() failed (%s)",
+		SAMLOG("WSACleanup() failed: %s",
 			sam_winsock_strerror(WSAGetLastError()));
     	return SAM_SOCKET_ERROR;		
 	}
@@ -1051,7 +1062,7 @@ samerr_t sam_winsock_startup(void)
 	wVersionRequested = MAKEWORD(2, 2);
 	rc = WSAStartup(wVersionRequested, &wsaData);
 	if (rc != 0) {
-		SAMLOG("WSAStartup() failed (%s)", sam_winsock_strerror(rc));
+		SAMLOG("WSAStartup() failed: %s", sam_winsock_strerror(rc));
     	return SAM_SOCKET_ERROR;
 	}
 	if (LOBYTE(wsaData.wVersion) != 2 || HIBYTE(wsaData.wVersion) != 2) {
