@@ -31,19 +31,20 @@
 #include "platform.h"
 #include "sam.h"
 
-static bool			sam_hello(void);
+static bool			sam_hello();
 static void			sam_log(const char *format, ...);
 static void			sam_parse(char *s);
 static ssize_t		sam_read1(char *buf, size_t n);
 static ssize_t		sam_read2(void *buf, size_t n);
-static bool			sam_readable(void);
+static bool			sam_readable();
+static sam_sendq_t	*sam_sendq_create();
 static samerr_t		sam_session_create(const char *destname, sam_conn_t style,
 						uint_t tunneldepth);
 static bool			sam_socket_connect(const char *host, uint16_t port);
 static bool			sam_socket_resolve(const char *hostname, char *ipaddr);
 #ifdef WINSOCK
-static samerr_t		sam_winsock_cleanup(void);
-static samerr_t		sam_winsock_startup(void);
+static samerr_t		sam_winsock_cleanup();
+static samerr_t		sam_winsock_startup();
 static const char	*sam_winsock_strerror(int code);
 #endif
 static ssize_t		sam_write(const void *buf, size_t n);
@@ -61,7 +62,7 @@ void (*sam_databack)(sam_sid_t stream_id, void *data, size_t size) = NULL;
 /* a peer sent some datagram data (`data' MUST be freed) */
 void (*sam_dgramback)(sam_pubkey_t dest, void *data, size_t size) = NULL;
 /* we lost the connection to the SAM host */
-void (*sam_diedback)(void) = NULL;
+void (*sam_diedback)() = NULL;
 /* logging callback */
 void (*sam_logback)(char *str) = NULL;
 /* naming lookup reply - `pubkey' will be NULL if `result' isn't SAM_OK */
@@ -79,7 +80,7 @@ static bool samd_connected = false;  /* Whether we're connected with SAM */
  *
  * Returns: true on success, false on failure
  */
-bool sam_close(void)
+bool sam_close()
 {
 	if (!samd_connected)
 		return true;
@@ -119,7 +120,7 @@ bool sam_close(void)
  * Returns: true on success, false on failure
  */
 samerr_t sam_connect(const char *samhost, uint16_t samport,
-	const char *destname, sam_conn_t style, uint_t tunneldepth)
+		const char *destname, sam_conn_t style, uint_t tunneldepth)
 {
 	samerr_t rc;
 
@@ -212,7 +213,7 @@ samerr_t sam_dgram_send(const sam_pubkey_t dest, const void *data, size_t size)
  *
  * Returns: true on success, false on reply failure
  */
-static bool sam_hello(void)
+static bool sam_hello()
 {
 #define SAM_HELLO_CMD	"HELLO VERSION MIN=1.0 MAX=1.0\n"
 #define SAM_HELLO_REPLY	"HELLO REPLY RESULT=OK VERSION=1.0"
@@ -491,7 +492,7 @@ static void sam_parse(char *s)
  *
  * Returns: true if we read anything, or false if nothing was there
  */
-bool sam_read_buffer(void)
+bool sam_read_buffer()
 {
 	bool read_something = false;
 	char reply[SAM_REPLY_LEN];
@@ -639,7 +640,7 @@ static ssize_t sam_read2(void *buf, size_t n)
  *
  * Returns: true if data is waiting, false otherwise
  */
-static bool sam_readable(void)
+static bool sam_readable()
 {
 	fd_set rset;  /* set of readable descriptors */
 	struct timeval tv;
@@ -679,36 +680,58 @@ static bool sam_readable(void)
  *
  * Returns: true on success, false on error
  */
-samerr_t sam_sendq_add(sam_sendq_t *sendq, const void *data, size_t dsize)
+void sam_sendq_add(sam_sid_t stream_id, sam_sendq_t **sendq, const void *data,
+		size_t dsize)
 {
 	assert(dsize >= 0);
 	if (dsize == 0) {
-		SAMLOGS("dsize is 0 - adding nothing");
-		return SAM_OK;
-	} else if (sendq->size + dsize > SAM_STREAM_PAYLOAD_MAX) {
-		SAMLOGS("The queue size would exceed the maximum SAM payload size -" \
-			" will not add to the queue");
-		return SAM_TOO_BIG;
+		SAMLOGS("dsize is 0 - doing nothing");
+		return;
 	}
 
-	sendq->data = realloc(sendq->data, sendq->size + dsize);
-	memcpy(sendq->data + sendq->size, data, dsize);
-	sendq->size += dsize;
+	/* if the sendq pointer is set to NULL, create a sendq */
+	if (*sendq == NULL)
+		*sendq = sam_sendq_create();
 
-	return SAM_OK;
+	/* the added data doesn't fill the queue - add but don't send */
+	if ((*sendq)->size + dsize < SAM_STREAM_PAYLOAD_MAX) {
+		memcpy((*sendq)->data + (*sendq)->size, data, dsize);
+		(*sendq)->size += dsize;
+		return;
+	}
+
+	/* what luck! - an exact fit - send the packet */
+	if ((*sendq)->size + dsize == SAM_STREAM_PAYLOAD_MAX) {
+		memcpy((*sendq)->data + (*sendq)->size, data, dsize);
+		(*sendq)->size = SAM_STREAM_PAYLOAD_MAX;
+		sam_sendq_flush(stream_id, sendq);
+		return;
+	}	
+
+	/* they have more data than the queue can hold, so we'll have to send some*/
+	size_t s = SAM_STREAM_PAYLOAD_MAX - (*sendq)->size;  // space free in packet
+	memcpy((*sendq)->data + (*sendq)->size, data, s); //append as much as we can
+	dsize -= s;  /* update dsize to the size of whatever data hasn't been sent*/
+	(*sendq)->size = SAM_STREAM_PAYLOAD_MAX;  /* it's a full packet */
+	sam_sendq_flush(stream_id, sendq);  /* send the queued data */
+	sam_sendq_add(stream_id, sendq, data + s, dsize);  /* recurse the rest */
+
+	return;
 }
 
 /*
- * Creates a data queue for use with sam_stream_send
+ * Creates a data queue for use with sam_sendq_add()
  *
  * Returns: pointer to the newly created send queue
  */
-sam_sendq_t *sam_sendq_create(void)
+static sam_sendq_t *sam_sendq_create()
 {
 	sam_sendq_t *sendq;
 
 	sendq = malloc(sizeof(sam_sendq_t));
-	sendq->data = NULL;
+	sendq->data = malloc(SAM_STREAM_PAYLOAD_MAX);
+	/* ^^ a waste of memory perhaps, but more efficient than realloc'ing every
+	 * time data is added the to queue */
 	sendq->size = 0;
 
 	return sendq;
@@ -720,10 +743,13 @@ sam_sendq_t *sam_sendq_create(void)
  * sendq - the send queue
  * stream_id - stream number to send to
  */
-void sam_sendq_send(sam_sendq_t *sendq, sam_sid_t stream_id)
+void sam_sendq_flush(sam_sid_t stream_id, sam_sendq_t **sendq)
 {
-	sam_stream_send(stream_id, sendq->data, sendq->size);
-	free(sendq);
+	sam_stream_send(stream_id, (*sendq)->data, (*sendq)->size);
+	/* we now free it in case they aren't going to use it anymore */
+	free((*sendq)->data);
+	free(*sendq);
+	*sendq = NULL;
 
 	return;
 }
@@ -738,7 +764,7 @@ void sam_sendq_send(sam_sendq_t *sendq, sam_sid_t stream_id)
  * Returns: SAM error code
  */
 static samerr_t sam_session_create(const char *destname, sam_conn_t style,
-	uint_t tunneldepth)
+		uint_t tunneldepth)
 {
 #define SAM_SESSTATUS_REPLY_OK "SESSION STATUS RESULT=OK"
 #define SAM_SESSTATUS_REPLY_DD "SESSION STATUS RESULT=DUPLICATED_DEST"
@@ -1034,7 +1060,7 @@ const char *sam_strerror(samerr_t code)
  *
  * Returns: SAM error code
  */
-samerr_t sam_winsock_cleanup(void)
+samerr_t sam_winsock_cleanup()
 {
 	if (WSACleanup() == SOCKET_ERROR) {
 		SAMLOG("WSACleanup() failed: %s",
@@ -1050,7 +1076,7 @@ samerr_t sam_winsock_cleanup(void)
  *
  * Returns: SAM error code
  */
-samerr_t sam_winsock_startup(void)
+samerr_t sam_winsock_startup()
 {
 	/*
 	 * Is Windows retarded or what?

@@ -34,18 +34,28 @@
 extern "C" {
 #endif
 
+#include <stdbool.h>
+#include <stdint.h>
+
 /*
  * Lengths
  */
-#define SAM_CMD_LEN 128  /* the maximum length a SAM command can be */
-#define SAM_DGRAM_PAYLOAD_MAX ((31 * 1024) - 30)  /* max size of a single datagram packet (-30 temporary bug fix for SAM) */
-#define SAM_ERRMSG_LEN 23  /* the longest message returned from sam_strerror */
-#define SAM_LOGMSG_LEN 256	/* the longest log message */
-#define SAM_NAME_LEN 256  /* the longest `name' arg for naming lookup callback*/
-#define SAM_STREAM_PAYLOAD_MAX 32768  /* max size of a single stream packet */
-#define SAM_PKCMD_LEN (SAM_PUBKEY_LEN + SAM_CMD_LEN)/*a public key SAM command*/
-#define SAM_PUBKEY_LEN 517  /* it's actually 516, but +1 for '\0' */
-#define SAM_REPLY_LEN 1024  /* the maximum length a SAM non-data reply can be */
+/* The maximum length a SAM command can be */
+#define SAM_CMD_LEN 128
+/*The maximum size of a single datagram packet (-30 temporary bug fix for SAM)*/
+#define SAM_DGRAM_PAYLOAD_MAX ((31 * 1024) - 30)
+/* The longest log message */
+#define SAM_LOGMSG_LEN 256
+/* The longest `name' arg for the naming lookup callback */
+#define SAM_NAME_LEN 256
+/* The max size of a single stream packet */
+#define SAM_STREAM_PAYLOAD_MAX (32 * 1024)
+/* The length of a base 64 public key - it's actually 516, but +1 for '\0' */
+#define SAM_PUBKEY_LEN 517
+/* A public key SAM command's length */
+#define SAM_PKCMD_LEN (SAM_PUBKEY_LEN + SAM_CMD_LEN)
+/* The maximum length a SAM non-data reply can be */
+#define SAM_REPLY_LEN 1024
 
 /*
  * Shorten some standard variable types
@@ -81,14 +91,14 @@ typedef enum {  /* see sam_strerror() for detailed descriptions of these */
  */
 
 /* SAM controls */
-extern bool		sam_close(void);
+extern bool		sam_close();
 extern samerr_t	sam_connect(const char *samhost, uint16_t samport,
 					const char *destname, sam_conn_t style, uint_t tunneldepth);
 extern void		sam_naming_lookup(const char *name);
-extern bool		sam_read_buffer(void);
+extern bool		sam_read_buffer();
 extern const char *sam_strerror(samerr_t code);
 /* SAM controls - callbacks */
-extern void		(*sam_diedback)(void);
+extern void		(*sam_diedback)();
 extern void		(*sam_logback)(char *str);
 extern void		(*sam_namingback)(char *name, sam_pubkey_t pubkey,
 					samerr_t result);
@@ -105,10 +115,9 @@ extern void		(*sam_databack)(sam_sid_t stream_id, void *data, size_t size);
 extern void		(*sam_statusback)(sam_sid_t stream_id, samerr_t result);
 
 /* Stream send queue */
-extern samerr_t	sam_sendq_add(sam_sendq_t *sendq, const void *data,
-					size_t dsize);
-extern sam_sendq_t *sam_sendq_create(void);
-extern void		sam_sendq_send(sam_sendq_t *sendq, sam_sid_t stream_id);
+extern void		sam_sendq_add(sam_sid_t stream_id, sam_sendq_t **sendq,
+					const void *data, size_t dsize);
+extern void		sam_sendq_flush(sam_sid_t stream_id, sam_sendq_t **sendq);
 
 /* Datagram commands */
 extern samerr_t	sam_dgram_send(const sam_pubkey_t dest, const void *data,
