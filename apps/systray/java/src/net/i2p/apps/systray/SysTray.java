@@ -82,8 +82,9 @@ public class SysTray implements SysTrayMenuListener {
     }
 
     private void createSysTrayMenu() {
-        _itemSelectBrowser.addSysTrayMenuListener(this);
         _itemShutdown.addSysTrayMenuListener(this);
+        _itemSelectBrowser.addSysTrayMenuListener(this);
+        _itemOpenConsole.addSysTrayMenuListener(this);
         _sysTrayMenu.addItem(_itemShutdown);
         _sysTrayMenu.addSeparator();
         _sysTrayMenu.addItem(_itemSelectBrowser);
