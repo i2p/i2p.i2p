@@ -36,6 +36,8 @@ class RouterThrottleImpl implements RouterThrottle {
         _context.statManager().createRateStat("router.throttleNetDbCause", "How lagged the jobQueue was when a networkDb request was throttled", "Throttle", new long[] { 60*1000, 10*60*1000, 60*60*1000, 24*60*60*1000 });
         _context.statManager().createRateStat("router.throttleTunnelCause", "How lagged the jobQueue was when a tunnel request was throttled", "Throttle", new long[] { 60*1000, 10*60*1000, 60*60*1000, 24*60*60*1000 });
         _context.statManager().createRateStat("tunnel.bytesAllocatedAtAccept", "How many bytes had been 'allocated' for participating tunnels when we accepted a request?", "Tunnels", new long[] { 10*60*1000, 60*60*1000, 24*60*60*1000 });
+        _context.statManager().createRateStat("router.throttleTunnelProcessingTime1m", "How long it takes to process a message (1 minute average) when we throttle a tunnel?", "Throttle", new long[] { 60*1000, 10*60*1000, 60*60*1000, 24*60*60*1000 });
+        _context.statManager().createRateStat("router.throttleTunnelProcessingTime10m", "How long it takes to process a message (10 minute average) when we throttle a tunnel?", "Throttle", new long[] { 60*1000, 10*60*1000, 60*60*1000, 24*60*60*1000 });
     }
     
     public boolean acceptNetworkMessage() {
@@ -77,7 +79,28 @@ class RouterThrottleImpl implements RouterThrottle {
             return false;
         }
         
-         
+        rs = _context.statManager().getRate("transport.sendProcessingTime");
+        r = null;
+        if (rs != null)
+            r = rs.getRate(10*60*1000);
+        double processTime = (r != null ? r.getAverageValue() : 0);
+        if (processTime > 1000) {
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Refusing tunnel request with the job lag of " + lag 
+                           + "since the 10 minute message processing time is too slow (" + processTime + ")");
+            _context.statManager().addRateData("router.throttleTunnelProcessingTime10m", (long)processTime, (long)processTime);
+            return false;
+        }
+        if (rs != null)
+            r = rs.getRate(60*1000);
+        processTime = (r != null ? r.getAverageValue() : 0);
+        if (processTime > 2000) {
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Refusing tunnel request with the job lag of " + lag 
+                           + "since the 1 minute message processing time is too slow (" + processTime + ")");
+            _context.statManager().addRateData("router.throttleTunnelProcessingTime1m", (long)processTime, (long)processTime);
+            return false;
+        }
         
         // ok, we're not hosed, but can we handle the bandwidth requirements 
         // of another tunnel?
