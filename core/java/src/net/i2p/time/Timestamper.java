@@ -21,6 +21,7 @@ public class Timestamper implements Runnable {
     private List _listeners;
     private int _queryFrequency;
     private boolean _disabled;
+    private boolean _daemon;
     
     private static final int DEFAULT_QUERY_FREQUENCY = 5*60*1000;
     private static final String DEFAULT_SERVER_LIST = "pool.ntp.org, pool.ntp.org";
@@ -31,11 +32,15 @@ public class Timestamper implements Runnable {
     public static final String PROP_DISABLED = "time.disabled";
     
     public Timestamper(I2PAppContext ctx) {
-        this(ctx, null);
+        this(ctx, null, true);
     }
     
     public Timestamper(I2PAppContext ctx, UpdateListener lsnr) {
+        this(ctx, lsnr, true);
+    }
+    public Timestamper(I2PAppContext ctx, UpdateListener lsnr, boolean daemon) {
         _context = ctx;
+        _daemon = daemon;
         _servers = new ArrayList(1);
         _listeners = new ArrayList(1);
         if (lsnr != null)
@@ -83,6 +88,7 @@ public class Timestamper implements Runnable {
     private void startTimestamper() {
         I2PThread t = new I2PThread(this, "Timestamper");
         t.setPriority(I2PThread.MIN_PRIORITY);
+        t.setDaemon(_daemon);
         t.start();
     }
     
