@@ -18,6 +18,7 @@ public class DBHistory {
     private long _successfulLookups;
     private long _failedLookups;
     private RateStat _failedLookupRate;
+    private RateStat _invalidReplyRate;
     private long _lookupReplyNew;
     private long _lookupReplyOld;
     private long _lookupReplyDuplicate;
@@ -34,6 +35,7 @@ public class DBHistory {
         _successfulLookups = 0;
         _failedLookups = 0;
         _failedLookupRate = null;
+        _invalidReplyRate = null;
         _lookupReplyNew = 0;
         _lookupReplyOld = 0;
         _lookupReplyDuplicate = 0;
@@ -74,6 +76,8 @@ public class DBHistory {
      */
     public RateStat getFailedLookupRate() { return _failedLookupRate; }
     
+    public RateStat getInvalidReplyRate() { return _invalidReplyRate; }
+    
     /**
      * Note that the peer was not only able to respond to the lookup, but sent us
      * the data we wanted!
@@ -103,6 +107,10 @@ public class DBHistory {
         _lookupReplyOld += oldPeers;
         _lookupReplyInvalid += invalid;
         _lookupReplyDuplicate += duplicate;
+        
+        if (invalid > 0) {
+            _invalidReplyRate.addData(invalid, 0);
+        }
     }
     /**
      * Note that the peer sent us a lookup
@@ -148,6 +156,7 @@ public class DBHistory {
     public void coallesceStats() {
         _log.debug("Coallescing stats");
         _failedLookupRate.coallesceStats();
+        _invalidReplyRate.coallesceStats();
     }
     
     private final static String NL = System.getProperty("line.separator");
@@ -171,7 +180,7 @@ public class DBHistory {
         add(buf, "avgDelayBetweenLookupsReceived", _avgDelayBetweenLookupsReceived, "How long is it typically between each db lookup they send us?  (in milliseconds)");
         out.write(buf.toString().getBytes());
         _failedLookupRate.store(out, "dbHistory.failedLookupRate");
-        _log.debug("Writing out dbHistory.failedLookupRate");
+        _invalidReplyRate.store(out, "dbHistory.invalidReplyRate");
     }
     
     private void add(StringBuffer buf, String name, long val, String description) {
@@ -197,12 +206,21 @@ public class DBHistory {
             _log.debug("Loading dbHistory.failedLookupRate");
         } catch (IllegalArgumentException iae) {
             _log.warn("DB History failed lookup rate is corrupt, resetting", iae);
+        }
+        
+        try { 
+            _invalidReplyRate.load(props, "dbHistory.invalidReplyRate", true);
+        } catch (IllegalArgumentException iae) {
+            _log.warn("DB History invalid reply rate is corrupt, resetting", iae);
             createRates();
         }
     }
     
     private void createRates() {
-        _failedLookupRate = new RateStat("dbHistory.failedLookupRate", "How often does this peer to respond to a lookup?", "dbHistory", new long[] { 60*1000l, 60*60*1000l, 24*60*60*1000l });
+        if (_failedLookupRate == null)
+            _failedLookupRate = new RateStat("dbHistory.failedLookupRate", "How often does this peer to respond to a lookup?", "dbHistory", new long[] { 60*1000l, 60*60*1000l, 24*60*60*1000l });
+        if (_invalidReplyRate == null)
+            _invalidReplyRate = new RateStat("dbHistory.invalidReplyRate", "How often does this peer give us a bad (nonexistant, forged, etc) peer?", "dbHistory", new long[] { 60*1000l, 60*60*1000l, 24*60*60*1000l });
     }
     
     private final static long getLong(Properties props, String key) {

@@ -26,6 +26,7 @@ import net.i2p.router.TunnelInfo;
 import net.i2p.router.TunnelSelectionCriteria;
 import net.i2p.router.message.SendMessageDirectJob;
 import net.i2p.router.message.SendTunnelMessageJob;
+import net.i2p.router.peermanager.PeerProfile;
 import net.i2p.util.Log;
 
 /**
@@ -87,6 +88,9 @@ class SearchJob extends JobImpl {
         getContext().statManager().createRateStat("netDb.failedPeers", "How many peers fail to respond to a lookup?", "Network Database", new long[] { 60*60*1000l, 24*60*60*1000l });
         getContext().statManager().createRateStat("netDb.searchCount", "Overall number of searches sent", "Network Database", new long[] { 5*60*1000l, 10*60*1000l, 60*60*1000l, 3*60*60*1000l, 24*60*60*1000l });
         getContext().statManager().createRateStat("netDb.searchMessageCount", "Overall number of mesages for all searches sent", "Network Database", new long[] { 5*60*1000l, 10*60*1000l, 60*60*1000l, 3*60*60*1000l, 24*60*60*1000l });
+        getContext().statManager().createRateStat("netDb.searchReplyValidated", "How many search replies we get that we are able to validate (fetch)", "Network Database", new long[] { 5*60*1000l, 10*60*1000l, 60*60*1000l, 3*60*60*1000l, 24*60*60*1000l });
+        getContext().statManager().createRateStat("netDb.searchReplyNotValidated", "How many search replies we get that we are NOT able to validate (fetch)", "Network Database", new long[] { 5*60*1000l, 10*60*1000l, 60*60*1000l, 3*60*60*1000l, 24*60*60*1000l });
+        getContext().statManager().createRateStat("netDb.searchReplyValidationSkipped", "How many search replies we get from unreliable peers that we skip?", "Network Database", new long[] { 5*60*1000l, 10*60*1000l, 60*60*1000l, 3*60*60*1000l, 24*60*60*1000l });
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Search (" + getClass().getName() + " for " + key.toBase64(), new Exception("Search enqueued by"));
     }
@@ -396,12 +400,22 @@ class SearchJob extends JobImpl {
     
     private final class SearchReplyJob extends JobImpl {
         private DatabaseSearchReplyMessage _msg;
+        /** 
+         * Peer who we think sent us the reply.  Note: could be spoofed!  If the
+         * attacker knew we were searching for a particular key from a 
+         * particular peer, they could send us some searchReply messages with
+         * shitty values, trying to get us to consider that peer unreliable.  
+         * Potential fixes include either authenticated 'from' address or use a
+         * nonce in the search + searchReply (and check for it in the selector).
+         *
+         */
         private Hash _peer;
         private int _curIndex;
         private int _invalidPeers;
         private int _seenPeers;
         private int _newPeers;
         private int _duplicatePeers;
+        private int _repliesPendingVerification;
         private long _duration;
         public SearchReplyJob(DatabaseSearchReplyMessage message, Hash peer, long duration) {
             super(SearchJob.this.getContext());
@@ -412,24 +426,40 @@ class SearchJob extends JobImpl {
             _seenPeers = 0;
             _newPeers = 0;
             _duplicatePeers = 0;
+            _repliesPendingVerification = 0;
         }
         public String getName() { return "Process Reply for Kademlia Search"; }
         public void runJob() {
             if (_curIndex >= _msg.getNumReplies()) {
-                getContext().profileManager().dbLookupReply(_peer, _newPeers, _seenPeers, 
-                                                        _invalidPeers, _duplicatePeers, _duration);
-                if (_newPeers > 0)
-                    newPeersFound(_newPeers);
+                if (_repliesPendingVerification > 0) {
+                    // we received new references from the peer, but still 
+                    // haven't verified all of them, so lets give it more time
+                    SearchReplyJob.this.requeue(_timeoutMs);
+                } else {
+                    // either they didn't tell us anything new or we have verified
+                    // (or failed to verify) all of them.  we're done
+                    getContext().profileManager().dbLookupReply(_peer, _newPeers, _seenPeers, 
+                                                               _invalidPeers, _duplicatePeers, _duration);
+                    if (_newPeers > 0)
+                        newPeersFound(_newPeers);
+                }
             } else {
                 Hash peer = _msg.getReply(_curIndex);
                 
                 RouterInfo info = getContext().netDb().lookupRouterInfoLocally(peer);
                 if (info == null) {
-                    // hmm, perhaps don't always send a lookup for this...
-                    // but for now, wtf, why not.  we may even want to adjust it so that 
-                    // we penalize or benefit peers who send us that which we can or
-                    // cannot lookup
-                    getContext().netDb().lookupRouterInfo(peer, null, null, _timeoutMs);
+                    // if the peer is giving us lots of bad peer references, 
+                    // dont try to fetch them.
+                    
+                    boolean sendsBadInfo = getContext().profileOrganizer().peerSendsBadReplies(_peer);
+                    if (!sendsBadInfo) {
+                        getContext().netDb().lookupRouterInfo(peer, new ReplyVerifiedJob(peer), new ReplyNotVerifiedJob(peer), _timeoutMs);
+                        _repliesPendingVerification++;
+                    } else {
+                        if (_log.shouldLog(Log.WARN))
+                            _log.warn("Peer " + _peer.toBase64() + " sends us bad replies, so not verifying " + peer.toBase64());
+                        getContext().statManager().addRateData("netDb.searchReplyValidationSkipped", 1, 0);
+                    }
                 }
             
                 if (_state.wasAttempted(peer)) {
@@ -445,6 +475,38 @@ class SearchJob extends JobImpl {
                 
                 _curIndex++;
                 requeue(0);
+            }
+        }
+        
+        /** the peer gave us a reference to a new router, and we were able to fetch it */
+        private final class ReplyVerifiedJob extends JobImpl {
+            private Hash _key;
+            public ReplyVerifiedJob(Hash key) {
+                super(SearchReplyJob.this.getContext());
+                _key = key;
+            }
+            public String getName() { return "Search reply value verified"; }
+            public void runJob() {
+                if (_log.shouldLog(Log.INFO))
+                    _log.info("Peer reply from " + _peer.toBase64() + " verified: " + _key.toBase64());
+                _repliesPendingVerification--;
+                getContext().statManager().addRateData("netDb.searchReplyValidated", 1, 0);
+            }
+        }
+        /** the peer gave us a reference to a new router, and we were NOT able to fetch it */
+        private final class ReplyNotVerifiedJob extends JobImpl {
+            private Hash _key;
+            public ReplyNotVerifiedJob(Hash key) {
+                super(SearchReplyJob.this.getContext());
+                _key = key;
+            }
+            public String getName() { return "Search reply value NOT verified"; }
+            public void runJob() {
+                if (_log.shouldLog(Log.INFO))
+                    _log.info("Peer reply from " + _peer.toBase64() + " failed verification: " + _key.toBase64());
+                _repliesPendingVerification--;
+                _invalidPeers++;
+                getContext().statManager().addRateData("netDb.searchReplyNotValidated", 1, 0);
             }
         }
     }
@@ -534,6 +596,7 @@ class SearchJob extends JobImpl {
         if (_keepStats) {
             long time = getContext().clock().now() - _state.getWhenStarted();
             getContext().statManager().addRateData("netDb.failedTime", time, 0);
+            _facade.fail(_state.getTarget());
         }
         if (_onFailure != null)
             getContext().jobQueue().addJob(_onFailure);

@@ -38,10 +38,18 @@ public abstract class NetworkDatabaseFacade implements Service {
     public abstract LeaseSet lookupLeaseSetLocally(Hash key);
     public abstract void lookupRouterInfo(Hash key, Job onFindJob, Job onFailedLookupJob, long timeoutMs);
     public abstract RouterInfo lookupRouterInfoLocally(Hash key);
-    /** return the leaseSet if another leaseSet already existed at that key */
-    public abstract LeaseSet store(Hash key, LeaseSet leaseSet);
-    /** return the routerInfo if another router already existed at that key */
-    public abstract RouterInfo store(Hash key, RouterInfo routerInfo);
+    /** 
+     * return the leaseSet if another leaseSet already existed at that key 
+     *
+     * @throws IllegalArgumentException if the data is not valid
+     */
+    public abstract LeaseSet store(Hash key, LeaseSet leaseSet) throws IllegalArgumentException;
+    /** 
+     * return the routerInfo if another router already existed at that key 
+     *
+     * @throws IllegalArgumentException if the data is not valid
+     */
+    public abstract RouterInfo store(Hash key, RouterInfo routerInfo) throws IllegalArgumentException;
     public abstract void publish(RouterInfo localRouterInfo);
     public abstract void publish(LeaseSet localLeaseSet);
     public abstract void unpublish(LeaseSet localLeaseSet);

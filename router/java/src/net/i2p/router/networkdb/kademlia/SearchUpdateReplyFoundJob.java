@@ -46,19 +46,27 @@ class SearchUpdateReplyFoundJob extends JobImpl implements ReplyJob {
             
             DatabaseStoreMessage msg = (DatabaseStoreMessage)_message;
             if (msg.getValueType() == DatabaseStoreMessage.KEY_TYPE_LEASESET) {
-                _facade.store(msg.getKey(), msg.getLeaseSet());
+                try {
+                    _facade.store(msg.getKey(), msg.getLeaseSet());
+                    getContext().profileManager().dbLookupSuccessful(_peer, timeToReply);
+                } catch (IllegalArgumentException iae) {
+                    getContext().profileManager().dbLookupReply(_peer, 0, 0, 1, 0, timeToReply);
+                }
             } else if (msg.getValueType() == DatabaseStoreMessage.KEY_TYPE_ROUTERINFO) {
                 if (_log.shouldLog(Log.INFO))
                     _log.info(getJobId() + ": dbStore received on search containing router " 
                               + msg.getKey() + " with publishDate of " 
                               + new Date(msg.getRouterInfo().getPublished()));
-                _facade.store(msg.getKey(), msg.getRouterInfo());
+                try {
+                    _facade.store(msg.getKey(), msg.getRouterInfo());
+                    getContext().profileManager().dbLookupSuccessful(_peer, timeToReply);
+                } catch (IllegalArgumentException iae) {
+                    getContext().profileManager().dbLookupReply(_peer, 0, 0, 1, 0, timeToReply);
+                }
             } else {
                 if (_log.shouldLog(Log.ERROR))
                     _log.error(getJobId() + ": Unknown db store type?!@ " + msg.getValueType());
             }
-            
-            getContext().profileManager().dbLookupSuccessful(_peer, timeToReply);
         } else if (_message instanceof DatabaseSearchReplyMessage) {
             _job.replyFound((DatabaseSearchReplyMessage)_message, _peer);
         } else {

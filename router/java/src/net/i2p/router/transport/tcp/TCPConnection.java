@@ -191,8 +191,15 @@ class TCPConnection implements I2NPMessageReader.I2NPMessageEventListener {
         byte signedData[] = new byte[decr.length - rsig.getData().length];
         System.arraycopy(decr, 0, signedData, 0, signedData.length);
         boolean valid = _context.dsa().verifySignature(rsig, signedData, _remoteIdentity.getSigningPublicKey());
-        if (valid) 
-            _context.netDb().store(_remoteIdentity.getHash(), peer);
+        if (valid) {
+            try {
+                _context.netDb().store(_remoteIdentity.getHash(), peer);
+            } catch (IllegalArgumentException iae) {
+                if (_log.shouldLog(Log.ERROR))
+                    _log.error("Peer gave us invalid router info", iae);
+                valid = false;
+            }
+        }
         return valid;
     }
     

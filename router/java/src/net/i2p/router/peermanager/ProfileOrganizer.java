@@ -21,6 +21,8 @@ import java.util.TreeSet;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
 import net.i2p.router.RouterContext;
+import net.i2p.stat.Rate;
+import net.i2p.stat.RateStat;
 import net.i2p.util.Log;
 
 /**
@@ -196,6 +198,35 @@ public class ProfileOrganizer {
     public boolean isHighCapacity(Hash peer) { synchronized (_reorganizeLock) { return _highCapacityPeers.containsKey(peer); } }
     public boolean isWellIntegrated(Hash peer) { synchronized (_reorganizeLock) { return _wellIntegratedPeers.containsKey(peer); } }
     public boolean isFailing(Hash peer) { synchronized (_reorganizeLock) { return _failingPeers.containsKey(peer); } }
+    
+        
+    /** 
+     * if a peer sends us more than 5 replies in a searchReply that we cannot
+     * fetch, stop listening to them.
+     *
+     */
+    private final static int MAX_BAD_REPLIES_PER_HOUR = 5;
+    
+    /**
+     * Does the given peer send us bad replies - either invalid store messages 
+     * (expired, corrupt, etc) or unreachable replies (pointing towards routers
+     * that don't exist).
+     *
+     */
+    public boolean peerSendsBadReplies(Hash peer) {
+        PeerProfile profile = getProfile(peer);
+        if (profile != null) {
+            RateStat invalidReplyRateStat = profile.getDBHistory().getInvalidReplyRate();
+            Rate invalidReplyRate = invalidReplyRateStat.getRate(60*60*1000l);
+            if ( (invalidReplyRate.getCurrentTotalValue() > MAX_BAD_REPLIES_PER_HOUR) ||
+                 (invalidReplyRate.getLastTotalValue() > MAX_BAD_REPLIES_PER_HOUR) ) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    
     
     /**
      * Return a set of Hashes for peers that are both fast and reliable.  If an insufficient

@@ -433,31 +433,47 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
     /** I don't think it'll ever make sense to have a lease last for a full day */
     private static final long MAX_LEASE_FUTURE = 24*60*60*1000;
     
-    public LeaseSet store(Hash key, LeaseSet leaseSet) {
-        long start = _context.clock().now();
-        if (!_initialized) return null;
+    /**
+     * Determine whether this leaseSet will be accepted as valid and current
+     * given what we know now.
+     *
+     */
+    boolean validate(Hash key, LeaseSet leaseSet) {
         if (!key.equals(leaseSet.getDestination().calculateHash())) {
             if (_log.shouldLog(Log.ERROR))
                 _log.error("Invalid store attempt! key does not match leaseSet.destination!  key = "
                 + key + ", leaseSet = " + leaseSet);
-            return null;
+            return false;
         } else if (!leaseSet.verifySignature()) {
             if (_log.shouldLog(Log.ERROR))
                 _log.error("Invalid leaseSet signature!  leaseSet = " + leaseSet);
-            return null;
+            return false;
         } else if (leaseSet.getEarliestLeaseDate() <= _context.clock().now()) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Old leaseSet!  not storing it: " 
                           + leaseSet.getDestination().calculateHash().toBase64() 
                           + " expires on " + new Date(leaseSet.getEarliestLeaseDate()), new Exception("Rejecting store"));
-            return null;
+            return false;
         } else if (leaseSet.getEarliestLeaseDate() > _context.clock().now() + MAX_LEASE_FUTURE) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("LeaseSet to expire too far in the future: " 
                           + leaseSet.getDestination().calculateHash().toBase64() 
                           + " expires on " + new Date(leaseSet.getEarliestLeaseDate()), new Exception("Rejecting store"));
-            return null;
+            return false;
         }
+        return true;
+    }
+    
+    /**
+     * Store the leaseSet
+     *
+     * @throws IllegalArgumentException if the leaseSet is not valid
+     */
+    public LeaseSet store(Hash key, LeaseSet leaseSet) throws IllegalArgumentException {
+        if (!_initialized) return null;
+        
+        boolean valid = validate(key, leaseSet);
+        if (!valid) throw new IllegalArgumentException("LeaseSet is not valid");
         
         LeaseSet rv = null;
         if (_ds.isKnown(key))
@@ -485,39 +501,54 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
             }
         }
         
-        long end = _context.clock().now();
-        if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Store leaseSet took [" + (end-start) + "ms]");
         return rv;
     }
     
-    public RouterInfo store(Hash key, RouterInfo routerInfo) {
-        long start = _context.clock().now();
-        if (!_initialized) return null;
+    /**
+     * Determine whether this routerInfo will be accepted as valid and current
+     * given what we know now.
+     *
+     */
+    boolean validate(Hash key, RouterInfo routerInfo) {
+        long now = _context.clock().now();
+        
         if (!key.equals(routerInfo.getIdentity().getHash())) {
             _log.error("Invalid store attempt! key does not match routerInfo.identity!  key = " + key + ", router = " + routerInfo);
-            return null;
+            return false;
         } else if (!routerInfo.isValid()) {
             _log.error("Invalid routerInfo signature!  forged router structure!  router = " + routerInfo);
-            return null;
+            return false;
         } else if (!routerInfo.isCurrent(ExpireRoutersJob.EXPIRE_DELAY)) {
             int existing = _kb.size();
             if (existing >= MIN_REMAINING_ROUTERS) {
                 if (_log.shouldLog(Log.INFO))
                     _log.info("Not storing expired router for " + key.toBase64(), new Exception("Rejecting store"));
-                return null;
+                return false;
             } else {
                 if (_log.shouldLog(Log.WARN))
                     _log.warn("Even though the peer is old, we have only " + existing
                     + " peers left (curPeer: " + key.toBase64() + " published on "
                     + new Date(routerInfo.getPublished()));
             }
-        } else if (routerInfo.getPublished() > start + Router.CLOCK_FUDGE_FACTOR) {
+        } else if (routerInfo.getPublished() > now + Router.CLOCK_FUDGE_FACTOR) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Peer " + key.toBase64() + " published their routerInfo in the future?! [" 
                           + new Date(routerInfo.getPublished()) + "]", new Exception("Rejecting store"));
-            return null;
+            return false;
         }
+        return true;
+    }
+    
+    /**
+     * store the routerInfo
+     *
+     * @throws IllegalArgumentException if the routerInfo is not valid
+     */
+    public RouterInfo store(Hash key, RouterInfo routerInfo) throws IllegalArgumentException {
+        if (!_initialized) return null;
+        
+        boolean valid = validate(key, routerInfo);
+        if (!valid) throw new IllegalArgumentException("LeaseSet is not valid");
         
         RouterInfo rv = null;
         if (_ds.isKnown(key))
@@ -534,9 +565,6 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
                 _lastSent.put(key, new Long(0));
         }
         _kb.add(key);
-        long end = _context.clock().now();
-        if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Store routerInfo took [" + (end-start) + "ms]");
         return rv;
     }
     
@@ -574,6 +602,11 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
             // are any updates
             if (_log.shouldLog(Log.INFO))
                 _log.info("Dropping a lease: " + dbEntry);
+        }
+        
+        if (o == null) {
+            boolean removed = _kb.remove(dbEntry);
+            // if we dont know the key, lets make sure it isn't a now-dead peer
         }
         
         _ds.remove(dbEntry);

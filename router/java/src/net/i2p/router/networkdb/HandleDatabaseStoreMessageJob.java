@@ -47,18 +47,31 @@ public class HandleDatabaseStoreMessageJob extends JobImpl {
     public void runJob() {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Handling database store message");
-	
+
+        boolean invalid = false;
         boolean wasNew = false;
         if (_message.getValueType() == DatabaseStoreMessage.KEY_TYPE_LEASESET) {
-            Object match = getContext().netDb().store(_message.getKey(), _message.getLeaseSet());
-            wasNew = (null == match);
+            try {
+                Object match = getContext().netDb().store(_message.getKey(), _message.getLeaseSet());
+                wasNew = (null == match);
+            } catch (IllegalArgumentException iae) {
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("Not storing a leaseSet", iae);
+                invalid = true;
+            }
         } else if (_message.getValueType() == DatabaseStoreMessage.KEY_TYPE_ROUTERINFO) {
             if (_log.shouldLog(Log.INFO))
                 _log.info("Handling dbStore of router " + _message.getKey() + " with publishDate of " 
                           + new Date(_message.getRouterInfo().getPublished()));
-            Object match = getContext().netDb().store(_message.getKey(), _message.getRouterInfo());
-            wasNew = (null == match);
-            getContext().profileManager().heardAbout(_message.getKey());
+            try {
+                Object match = getContext().netDb().store(_message.getKey(), _message.getRouterInfo());
+                wasNew = (null == match);
+                getContext().profileManager().heardAbout(_message.getKey());
+            } catch (IllegalArgumentException iae) {
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("Not storing a routerInfo", iae);
+                invalid = true;
+            }
         } else {
             if (_log.shouldLog(Log.ERROR))
                 _log.error("Invalid DatabaseStoreMessage data type - " + _message.getValueType() 
@@ -70,9 +83,12 @@ public class HandleDatabaseStoreMessageJob extends JobImpl {
         
         if (_from != null)
             _fromHash = _from.getHash();
-        if (_fromHash != null)
-            getContext().profileManager().dbStoreReceived(_fromHash, wasNew);
-        getContext().statManager().addRateData("netDb.storeHandled", 1, 0);
+        if (_fromHash != null) {
+            if (!invalid) {
+                getContext().profileManager().dbStoreReceived(_fromHash, wasNew);
+                getContext().statManager().addRateData("netDb.storeHandled", 1, 0);
+            }
+        }
     }
     
     private void sendAck() {
@@ -86,8 +102,8 @@ public class HandleDatabaseStoreMessageJob extends JobImpl {
             return;
         } else {
             getContext().jobQueue().addJob(new SendTunnelMessageJob(getContext(), msg, outTunnelId, 
-                                       _message.getReplyGateway(), _message.getReplyTunnel(), 
-                                       null, null, null, null, ACK_TIMEOUT, ACK_PRIORITY));
+                                           _message.getReplyGateway(), _message.getReplyTunnel(), 
+                                           null, null, null, null, ACK_TIMEOUT, ACK_PRIORITY));
         }
     }
 

@@ -21,6 +21,9 @@ import java.util.TreeMap;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
 import net.i2p.router.RouterContext;
+import net.i2p.router.peermanager.PeerProfile;
+import net.i2p.stat.Rate;
+import net.i2p.stat.RateStat;
 import net.i2p.util.Log;
 
 class PeerSelector {
@@ -82,16 +85,33 @@ class PeerSelector {
      *
      */
     private void removeFailingPeers(Set peerHashes) {
-        List failing = new ArrayList(16);
+        List failing = null;
         for (Iterator iter = peerHashes.iterator(); iter.hasNext(); ) {
             Hash cur = (Hash)iter.next();
             if (_context.profileOrganizer().isFailing(cur)) {
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("Peer " + cur.toBase64() + " is failing, don't include them in the peer selection");
+                if (failing == null)
+                    failing = new ArrayList(4);
                 failing.add(cur);
+            } else if (_context.profileOrganizer().peerSendsBadReplies(cur)) {
+                if (failing == null)
+                    failing = new ArrayList(4);
+                failing.add(cur);
+                if (_log.shouldLog(Log.WARN)) {
+                    PeerProfile profile = _context.profileOrganizer().getProfile(cur);
+                    if (profile != null) {
+                        RateStat invalidReplyRateStat = profile.getDBHistory().getInvalidReplyRate();
+                        Rate invalidReplyRate = invalidReplyRateStat.getRate(60*60*1000l);
+                        _log.warn("Peer " + cur.toBase64() + " sends us bad replies: current hour: " 
+                                  + invalidReplyRate.getCurrentEventCount() + " and last hour: " 
+                                  + invalidReplyRate.getLastEventCount() + ":\n" + invalidReplyRate.toString());
+                    }
+                }
             }
         }
-        peerHashes.removeAll(failing);
+        if (failing != null)
+            peerHashes.removeAll(failing);
     }
     
     protected BigInteger getDistance(Hash targetKey, Hash routerInQuestion) {
