@@ -689,7 +689,7 @@ static bool sam_readable(sam_sess_t *session)
 	FD_ZERO(&rset);
 	FD_SET(session->sock, &rset);
 	tv.tv_sec = 0;
-	tv.tv_usec = 10;
+	tv.tv_usec = 0;
 	rc = select(session->sock + 1, &rset, NULL, NULL, &tv);
 	if (rc == 0)
 		return false;
