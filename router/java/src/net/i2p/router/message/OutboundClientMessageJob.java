@@ -383,8 +383,8 @@ public class OutboundClientMessageJob extends JobImpl {
                            + ", no need to do it again", new Exception("Duplicate death?"));
             return;
         } else {
-            if (_log.shouldLog(Log.ERROR))
-                _log.error(getJobId() + ": Failed to send the message " + msg.getMessageId() + " after " 
+            if (_log.shouldLog(Log.WARN))
+                _log.warn(getJobId() + ": Failed to send the message " + msg.getMessageId() + " after " 
                            + _status.getNumSent() + " sends and " + _status.getNumLookups() 
                            + " lookups (and " + sendTime + "ms)", 
                            new Exception("Message send failure"));
