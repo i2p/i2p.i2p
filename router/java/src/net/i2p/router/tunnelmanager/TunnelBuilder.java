@@ -307,6 +307,7 @@ class TunnelBuilder {
             if (prev != null) {
                 prev.setNextHop(peer);
                 prev.setNextHopInfo(cur);
+                prev.setNextHopId(cur.getTunnelId());
             } else {
                 first = cur;
             }
@@ -331,6 +332,7 @@ class TunnelBuilder {
                 cur = cur.getNextHopInfo();
             cur.setNextHop(last.getThisHop());
             cur.setNextHopInfo(last);
+            cur.setNextHopId(last.getTunnelId());
         }
         
         return first;
@@ -393,6 +395,7 @@ class TunnelBuilder {
             
             prev.setNextHop(peer);
             prev.setNextHopInfo(cur);
+            prev.setNextHopId(cur.getTunnelId());
             prev = cur;
         }
         
