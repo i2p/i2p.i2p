@@ -11,7 +11,7 @@ package net.i2p.router.transport;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -41,11 +41,14 @@ public abstract class TransportImpl implements Transport {
         _context = context;
         _log = _context.logManager().getLog(TransportImpl.class);
         
-        _context.statManager().createFrequencyStat("transport.sendMessageFailureFrequency", "How often do we fail to send messages?", "Transport", new long[] { 60*1000l, 60*60*1000l, 24*60*60*1000l });
+        _context.statManager().createRateStat("transport.sendMessageFailureLifetime", "How long the lifetime of messages that fail are?", "Transport", new long[] { 60*1000l, 10*60*1000l, 60*60*1000l, 24*60*60*1000l });
         _context.statManager().createRateStat("transport.sendMessageSize", "How large are the messages sent?", "Transport", new long[] { 60*1000l, 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
         _context.statManager().createRateStat("transport.receiveMessageSize", "How large are the messages received?", "Transport", new long[] { 60*1000l, 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
-        _context.statManager().createRateStat("transport.sendProcessingTime", "How long does it take from noticing that we want to send the message to having it completely sent (successfully or failed)?", "Transport", new long[] { 60*1000l, 60*60*1000l, 24*60*60*1000l });
-        _sendPool = new LinkedList();
+        _context.statManager().createRateStat("transport.receiveMessageTime", "How long it takes to read a message?", "Transport", new long[] { 60*1000l, 5*60*1000l, 10*60*1000l, 60*60*1000l, 24*60*60*1000l });
+        _context.statManager().createRateStat("transport.receiveMessageTimeSlow", "How long it takes to read a message (when it takes more than a second)?", "Transport", new long[] { 60*1000l, 5*60*1000l, 10*60*1000l, 60*60*1000l, 24*60*60*1000l });
+        _context.statManager().createRateStat("transport.sendProcessingTime", "How long does it take from noticing that we want to send the message to having it completely sent (successfully or failed)?", "Transport", new long[] { 60*1000l, 10*60*1000l, 60*60*1000l, 24*60*60*1000l });
+        _context.statManager().createRateStat("transport.expiredOnQueueLifetime", "How long a message that expires on our outbound queue is processed", "Transport", new long[] { 60*1000l, 10*60*1000l, 60*60*1000l, 24*60*60*1000l } );
+        _sendPool = new ArrayList(16);
         _currentAddresses = new HashSet();
     }
     
@@ -93,6 +96,9 @@ public abstract class TransportImpl implements Transport {
                 _log.info("Failed to send message " + msg.getMessageType() 
                           + " to " + msg.getTarget().getIdentity().getHash().toBase64() 
                           + " with transport " + getStyle() + " (details: " + msg + ")");
+            if (msg.getExpiration() < _context.clock().now())
+                _context.statManager().addRateData("transport.expiredOnQueueLifetime", lifetime, lifetime);
+            
             if (allowRequeue) {
                 if ( (msg.getExpiration() <= 0) || (msg.getExpiration() > _context.clock().now()) ) {
                     // this may not be the last transport available - keep going
@@ -163,7 +169,7 @@ public abstract class TransportImpl implements Transport {
             _context.statManager().addRateData("transport.sendMessageSize", msg.getMessageSize(), sendTime);
         } else {
             _context.profileManager().messageFailed(msg.getTarget().getIdentity().getHash(), getStyle());
-            _context.statManager().updateFrequency("transport.sendMessageFailureFrequency");
+            _context.statManager().addRateData("transport.sendMessageFailureLifetime", lifetime, lifetime);
         }
     }
     
@@ -227,6 +233,10 @@ public abstract class TransportImpl implements Transport {
             _context.profileManager().messageReceived(remoteIdentHash, getStyle(), msToReceive, bytesReceived);
             _context.statManager().addRateData("transport.receiveMessageSize", bytesReceived, msToReceive);
         }
+        
+        _context.statManager().addRateData("transport.receiveMessageTime", msToReceive, msToReceive);
+        if (msToReceive > 1000)
+            _context.statManager().addRateData("transport.receiveMessageTimeSlow", msToReceive, msToReceive);
 
         //// this functionality is built into the InNetMessagePool
         //String type = inMsg.getClass().getName();

@@ -71,8 +71,14 @@ class TCPConnection implements I2NPMessageReader.I2NPMessageEventListener {
     public TCPConnection(RouterContext context, Socket s, boolean locallyInitiated) throws IOException {
         _context = context;
         _log = context.logManager().getLog(TCPConnection.class);
-        _context.statManager().createRateStat("tcp.queueSize", "How many messages were already in the queue when a new message was added?", 
+        _context.statManager().createRateStat("tcp.queueSize", "How many messages were already in the queue when a new message was added (only when it wasnt empty)?", 
                                               "TCP Transport", new long[] { 60*1000l, 60*60*1000l, 24*60*60*1000l });
+        _context.statManager().createRateStat("tcp.writeTimeLarge", "How long it takes to write a message that is over 2K?", 
+                                              "TCP Transport", new long[] { 60*1000l, 10*60*1000l, 60*60*1000l, 24*60*60*1000l });
+        _context.statManager().createRateStat("tcp.writeTimeSmall", "How long it takes to write a message that is under 2K?", 
+                                              "TCP Transport", new long[] { 60*1000l, 10*60*1000l, 60*60*1000l, 24*60*60*1000l });
+        _context.statManager().createRateStat("tcp.writeTimeSlow", "How long it takes to write a message (ignoring messages transferring in under a second)?", 
+                                              "TCP Transport", new long[] { 60*1000l, 10*60*1000l, 60*60*1000l, 24*60*60*1000l });
         _id = ++_idCounter;
         _weInitiated = locallyInitiated;
         _closed = false;
@@ -287,7 +293,8 @@ class TCPConnection implements I2NPMessageReader.I2NPMessageEventListener {
         }
         long afterAdd = _context.clock().now();
 
-        _context.statManager().addRateData("tcp.queueSize", totalPending-1, 0);
+        if (totalPending >= 2)
+            _context.statManager().addRateData("tcp.queueSize", totalPending-1, 0);
 
         if (removed != null) {
             if (_log.shouldLog(Log.WARN))
@@ -562,6 +569,12 @@ class TCPConnection implements I2NPMessageReader.I2NPMessageEventListener {
                               + "ms) sending " + data.length + " bytes to " 
                               + _remoteIdentity.getHash().toBase64());
             }
+            if (data.length > 2*1024)
+                _context.statManager().addRateData("tcp.writeTimeLarge", end - beforeWrite, end - beforeWrite);
+            else
+                _context.statManager().addRateData("tcp.writeTimeSmall", end - beforeWrite, end - beforeWrite);
+            if (end-beforeWrite > 1*1024)
+                _context.statManager().addRateData("tcp.writeTimeSlow", end - beforeWrite, end - beforeWrite);
             return true;
         }
         

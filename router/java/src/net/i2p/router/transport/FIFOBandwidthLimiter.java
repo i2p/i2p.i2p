@@ -30,6 +30,10 @@ public class FIFOBandwidthLimiter {
     public FIFOBandwidthLimiter(I2PAppContext context) {
         _context = context;
         _log = context.logManager().getLog(FIFOBandwidthLimiter.class);
+        _context.statManager().createRateStat("bwLimiter.pendingOutboundRequests", "How many outbound requests are ahead of the current one (ignoring ones with 0)?", "BandwidthLimiter", new long[] { 60*1000l, 5*60*1000l, 10*60*1000l, 60*60*1000l });
+        _context.statManager().createRateStat("bwLimiter.pendingInboundRequests", "How many inbound requests are ahead of the current one (ignoring ones with 0)?", "BandwidthLimiter", new long[] { 60*1000l, 5*60*1000l, 10*60*1000l, 60*60*1000l });
+        _context.statManager().createRateStat("bwLimiter.outboundDelayedTime", "How long it takes to honor an outbound request (ignoring ones with that go instantly)?", "BandwidthLimiter", new long[] { 60*1000l, 5*60*1000l, 10*60*1000l, 60*60*1000l });
+        _context.statManager().createRateStat("bwLimiter.inboundDelayedTime", "How long it takes to honor an inbound request (ignoring ones with that go instantly)?", "BandwidthLimiter", new long[] { 60*1000l, 5*60*1000l, 10*60*1000l, 60*60*1000l });
         _pendingInboundRequests = new ArrayList(16);
         _pendingOutboundRequests = new ArrayList(16);
         _refiller = new FIFOBandwidthRefiller(_context, this);
@@ -69,10 +73,14 @@ public class FIFOBandwidthLimiter {
      */
     public Request requestInbound(int bytesIn, String purpose) {
         SimpleRequest req = new SimpleRequest(bytesIn, 0, purpose);
+        int pending = 0;
         synchronized (_pendingInboundRequests) {
+            pending = _pendingInboundRequests.size();
             _pendingInboundRequests.add(req);
         }
         satisfyInboundRequests();
+        if (pending > 0)
+            _context.statManager().addRateData("bwLimiter.pendingInboundRequests", pending, pending);
         return req;
     }
     /**
@@ -81,10 +89,14 @@ public class FIFOBandwidthLimiter {
      */
     public Request requestOutbound(int bytesOut, String purpose) {
         SimpleRequest req = new SimpleRequest(0, bytesOut, purpose);
+        int pending = 0;
         synchronized (_pendingOutboundRequests) {
+            pending = _pendingOutboundRequests.size();
             _pendingOutboundRequests.add(req);
         }
         satisfyOutboundRequests();
+        if (pending > 0)
+            _context.statManager().addRateData("bwLimiter.pendingOutboundRequests", pending, pending);
         return req;
     }
     
@@ -125,13 +137,16 @@ public class FIFOBandwidthLimiter {
                     if (satisfied == null)
                         satisfied = new ArrayList(2);
                     satisfied.add(req);
+                    long waited = _context.clock().now() - req.getRequestTime();
                     if (_log.shouldLog(Log.INFO))
                          _log.info("Granting inbound request " + req.getRequestName() + " fully for " 
                                     + req.getTotalInboundRequested() + " bytes (waited " 
-                                    + (_context.clock().now() - req.getRequestTime()) 
+                                    + waited
                                     + "ms) pending " + _pendingInboundRequests.size());
                     // if we're unlimited, we always grant it fully, so there's no need to keep it around
                     _pendingInboundRequests.remove(0);
+                    if (waited > 10)
+                        _context.statManager().addRateData("bwLimiter.inboundDelayedTime", waited, waited);
                 } else if (_availableInboundBytes > 0) {
                     int requested = req.getPendingInboundRequested();
                     int allocated = 0;
@@ -140,25 +155,29 @@ public class FIFOBandwidthLimiter {
                     else
                         allocated = _availableInboundBytes;
                     _availableInboundBytes -= allocated;
+                    _totalAllocatedInboundBytes += allocated;
                     req.allocateBytes(allocated, 0);
                     if (satisfied == null)
                         satisfied = new ArrayList(2);
                     satisfied.add(req);
+                    long waited = _context.clock().now() - req.getRequestTime();
                     if (req.getPendingInboundRequested() > 0) {
                         if (_log.shouldLog(Log.INFO))
                              _log.info("Allocating " + allocated + " bytes inbound as a partial grant to " 
                                         + req.getRequestName() + " (wanted " 
                                         + req.getTotalInboundRequested() + " bytes, waited " 
-                                        + (_context.clock().now() - req.getRequestTime()) 
+                                        + waited
                                         + "ms) pending " + _pendingInboundRequests.size());
                     } else {
                         if (_log.shouldLog(Log.INFO))
                              _log.info("Allocating " + allocated + " bytes inbound to finish the partial grant to " 
                                         + req.getRequestName() + " (total " 
                                         + req.getTotalInboundRequested() + " bytes, waited " 
-                                        + (_context.clock().now() - req.getRequestTime()) 
+                                        + waited
                                         + "ms) pending " + _pendingInboundRequests.size());
                         _pendingInboundRequests.remove(0);
+                        if (waited > 10)
+                            _context.statManager().addRateData("bwLimiter.inboundDelayedTime", waited, waited);
                     }
                 } else {
                     // no bandwidth available
@@ -194,13 +213,16 @@ public class FIFOBandwidthLimiter {
                     if (satisfied == null)
                         satisfied = new ArrayList(2);
                     satisfied.add(req);
+                    long waited = _context.clock().now() - req.getRequestTime();
                     if (_log.shouldLog(Log.INFO))
                          _log.info("Granting outbound request " + req.getRequestName() + " fully for " 
                                     + req.getTotalOutboundRequested() + " bytes (waited " 
-                                    + (_context.clock().now() - req.getRequestTime()) 
+                                    + waited
                                     + "ms) pending " + _pendingOutboundRequests.size());
                     // if we're unlimited, we always grant it fully, so there's no need to keep it around
                     _pendingOutboundRequests.remove(0);
+                    if (waited > 10)
+                        _context.statManager().addRateData("bwLimiter.outboundDelayedTime", waited, waited);
                 } else if (_availableOutboundBytes > 0) {
                     int requested = req.getPendingOutboundRequested();
                     int allocated = 0;
@@ -209,25 +231,29 @@ public class FIFOBandwidthLimiter {
                     else
                         allocated = _availableOutboundBytes;
                     _availableOutboundBytes -= allocated;
+                    _totalAllocatedOutboundBytes += allocated;
                     req.allocateBytes(0, allocated);
                     if (satisfied == null)
                         satisfied = new ArrayList(2);
                     satisfied.add(req);
+                    long waited = _context.clock().now() - req.getRequestTime();
                     if (req.getPendingOutboundRequested() > 0) {
                         if (_log.shouldLog(Log.INFO))
                              _log.info("Allocating " + allocated + " bytes outbound as a partial grant to " 
                                         + req.getRequestName() + " (wanted " 
                                         + req.getTotalOutboundRequested() + " bytes, waited " 
-                                        + (_context.clock().now() - req.getRequestTime()) 
+                                        + waited
                                         + "ms) pending " + _pendingOutboundRequests.size());
                     } else {
                         if (_log.shouldLog(Log.INFO))
                              _log.info("Allocating " + allocated + " bytes outbound to finish the partial grant to " 
                                         + req.getRequestName() + " (total " 
                                         + req.getTotalOutboundRequested() + " bytes, waited " 
-                                        + (_context.clock().now() - req.getRequestTime()) 
+                                        + waited
                                         + "ms) pending " + _pendingOutboundRequests.size());
                         _pendingOutboundRequests.remove(0);
+                        if (waited > 10)
+                            _context.statManager().addRateData("bwLimiter.outboundDelayedTime", waited, waited);
                     }
                 } else {
                     // no bandwidth available

@@ -26,7 +26,10 @@ public class BandwidthLimitedOutputStream extends FilterOutputStream {
         super(source);
         _context = context;
         _peer = peer;
-        _peerTarget = peer.getHash().toBase64();
+        if (peer != null)
+            _peerTarget = peer.getHash().toBase64();
+        else
+            _peerTarget = "unknown";
         _log = context.logManager().getLog(BandwidthLimitedOutputStream.class);
     }
     
