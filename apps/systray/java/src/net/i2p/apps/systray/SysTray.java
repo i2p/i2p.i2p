@@ -37,12 +37,11 @@ public class SysTray implements SysTrayMenuListener {
     private SysTrayMenu     _sysTrayMenu       = new SysTrayMenu(_sysTrayMenuIcon, "I2P Control");
     private UrlLauncher     _urlLauncher       = new UrlLauncher();
 
-    public SysTray() {
+    private SysTray() {
         if (!_configFile.init("systray.config"))
             _configFile.setProperty("browser", "default");
 
         _browserString = _configFile.getProperty("browser", "default");
-
         _sysTrayMenuIcon.addSysTrayMenuListener(this);
         createSysTrayMenu();
     }
@@ -62,6 +61,7 @@ public class SysTray implements SysTrayMenuListener {
     }
 
     public void menuItemSelected(SysTrayMenuEvent e) {
+
         String browser = null;
 
         if (e.getActionCommand().equals("shutdown")) {
@@ -97,6 +97,7 @@ public class SysTray implements SysTrayMenuListener {
     }
 
     private void openRouterConsole() {
+
         String browser = null;
 
         if (_browserString == null || _browserString.equals("default")) {
@@ -120,7 +121,9 @@ public class SysTray implements SysTrayMenuListener {
     }
 
     private String promptForBrowser(String windowTitle) {
+
         String browser = null;
+
         _frame = new Frame();
         _browserChooser = new BrowserChooser(_frame, windowTitle);
         browser = _browserChooser.getDirectory() + _browserChooser.getFile();
