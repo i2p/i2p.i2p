@@ -109,13 +109,7 @@ tunnels.tunnelDuration=600000
 # http://localhost:7655/shutdown?password=thisIsASecret)
 #router.shutdownPassword=thisIsASecret
 
-#
-# the remaining lines describe how you can get your router to fire up client 
-# applications it is up and running, all within the router's JVM.  Uncomment the
-# ones you want (revising the numbers and ports accordingly)
-
-# Keep the router's clock in sync by querying one of the specified NTP servers once
-# a minute (uses UDP port 123)
+# Comma delimited list of SNTP servers to query.  pool.ntp.org is a DNS trick to
 # This defaults to the DNS round-robin ntp pool - see http://www.pool.ntp.org/
 # Please change the NTP server specified to include ones closer to you - see 
 # http://www.eecis.udel.edu/~mills/ntp/clock2a.html for a list (you can specify as
@@ -126,28 +120,30 @@ tunnels.tunnelDuration=600000
 #  BR: ntp1.pucpr.br
 #  BE: ntp2.belbone.be
 #  AU: ntp.saard.net
-clientApp.0.main=net.i2p.time.Timestamper
-clientApp.0.name=Timestamper
-clientApp.0.onBoot=true
-clientApp.0.args=http://localhost:7655/setTime?##timestamperPassword## pool.ntp.org pool.ntp.org pool.ntp.org
+time.sntpServerList=pool.ntp.org,pool.ntp.org,pool.ntp.org
 
-# The admin time passphrase, used to prevent unauthorized people from updating your
-# routers time.  The value should be included in the timestamper's args above, 
-# otherwise it wont honor timestamp updates.  You shouldnt include any spaces or funky 
-# characters - just pick some random numbers.
-adminTimePassphrase=##timestamperPassword##
+# Query an SNTP server every 5 minutes
+# time.queryFrequencyMs=300000
+
+# If you really really know that your computer's clock is ALWAYS correct, set this property
+# time.disabled=true
+
+#
+# the remaining lines describe how you can get your router to fire up client 
+# applications it is up and running, all within the router's JVM.  Uncomment the
+# ones you want (revising the numbers and ports accordingly)
 
 # SAM bridge (a simplified socket based protocol for using I2P - listens on port 7656.  see
 # the specs at http://www.i2p.net/node/view/144 for more info)
-clientApp.1.main=net.i2p.sam.SAMBridge
-clientApp.1.name=SAMBridge
-clientApp.1.args=sam.keys 0.0.0.0 7656 i2cp.tcp.host=localhost i2cp.tcp.port=##_router_i2cp_port##
+clientApp.0.main=net.i2p.sam.SAMBridge
+clientApp.0.name=SAMBridge
+clientApp.0.args=sam.keys 0.0.0.0 7656 i2cp.tcp.host=localhost i2cp.tcp.port=##_router_i2cp_port##
 
 # The eepProxy (HTTP proxy that lets you browse both eepsites and the normal web via squid.i2p) and
 # the ircProxy (which connects to the anonymously hosted ircd at irc.duck.i2p)
-clientApp.2.main=net.i2p.i2ptunnel.I2PTunnel
-clientApp.2.name=Tunnels
-clientApp.2.args=-nocli -e "config localhost ##_router_i2cp_port##" -e "httpclient 4444" -e "client 6668 irc.duck.i2p"
+clientApp.1.main=net.i2p.i2ptunnel.I2PTunnel
+clientApp.1.name=Tunnels
+clientApp.1.args=-nocli -e "config localhost ##_router_i2cp_port##" -e "httpclient 4444" -e "client 6668 irc.duck.i2p"
 # note: if you want the proxies to be reachable from other machines, add:
 #       -e "listen_on 0.0.0.0"   
 # before the -e "httpclient 4444".  otherwise, both of these proxies will only listen for connections on 127.0.0.1
@@ -157,10 +153,10 @@ clientApp.2.args=-nocli -e "config localhost ##_router_i2cp_port##" -e "httpclie
 # and add jetty-all.jar and routerconsole.jar in the router's classpath in the startRouter 
 # script
 # (don't bother trying to figure this out prior to the 0.4 release)
-#clientApp.3.main=net.i2p.router.web.RouterConsoleRunner
-#clientApp.3.name=webConsole
-#clientApp.3.args=7657 127.0.0.1 ./webapps/
-#clientApp.3.onBoot=true
+#clientApp.2.main=net.i2p.router.web.RouterConsoleRunner
+#clientApp.2.name=webConsole
+#clientApp.2.args=7657 127.0.0.1 ./webapps/
+#clientApp.2.onBoot=true
 
 # To require simple HTTP authentication for accessing any of the pages underneath the web console
 # (including any other webapps deployed), uncomment the following line and set the password
@@ -169,16 +165,3 @@ clientApp.2.args=-nocli -e "config localhost ##_router_i2cp_port##" -e "httpclie
 # settings, etc).  This is only used for the new jetty console (started in clientApp.3.* above)
 #
 #consolePassword=fooBarBaz
-
-# Network monitor (harvests data from the network database and stores it under 
-# monitorData/, and with the netviewer GUI you can browse through its results)
-#clientApp.4.main=net.i2p.netmonitor.NetMonitor
-#clientApp.4.name=NetMonitor
-#clientApp.4.args=
-
-# Heartbeat engine (ueber-simple ping/pong system, configured in heartbeat.config.  By itself
-# it just writes out stat data where its told to, but there's a seperate HeartbeatMonitor 
-# GUI to let you visualize things)
-#clientApp.5.main=net.i2p.heartbeat.Heartbeat
-#clientApp.5.name=Heartbeat
-#clientApp.5.args=heartbeat.config

@@ -27,7 +27,6 @@
         <ant dir="apps/sam/java/" target="jar" />
         <ant dir="apps/heartbeat/java/" target="jar" />
         <ant dir="apps/netmonitor/java/" target="jar" />
-        <ant dir="apps/time/java/" target="jar" />
         <ant dir="apps/routerconsole/java/" target="jar" />
         <ant dir="installer/java/" target="jar" />
     </target>
@@ -43,7 +42,6 @@
         <copy file="apps/sam/java/build/sam.jar" todir="build/" />
         <copy file="apps/heartbeat/java/build/heartbeat.jar" todir="build/" />
         <copy file="apps/netmonitor/java/build/netmonitor.jar" todir="build/" />
-        <copy file="apps/time/java/build/timestamper.jar" todir="build/" />
         <copy file="installer/java/build/install.jar" todir="build/" />
         <copy file="installer/java/build/guiinstall.jar" todir="build/" />
         <copy file="installer/java/build/fetchseeds.jar" todir="build/" />
@@ -74,7 +72,6 @@
         <ant dir="apps/heartbeat/java/" target="distclean" />
         <ant dir="apps/netmonitor/java/" target="distclean" />
         <ant dir="apps/routerconsole/java/" target="distclean" />
-        <ant dir="apps/time/java/" target="distclean" />
         <ant dir="installer/java/" target="distclean" />
         <delete>
             <fileset dir="." includes="**/*.class" />

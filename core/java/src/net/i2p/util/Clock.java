@@ -5,6 +5,7 @@ import java.util.Iterator;
 import java.util.Set;
 
 import net.i2p.I2PAppContext;
+import net.i2p.time.Timestamper;
 
 /**
  * Alternate location for determining the time which takes into account an offset.
@@ -13,17 +14,22 @@ import net.i2p.I2PAppContext;
  * (such as an NTP synchronized clock).
  *
  */
-public class Clock {
+public class Clock implements Timestamper.UpdateListener {
     private I2PAppContext _context;
+    private Timestamper _timestamper;
+    
     public Clock(I2PAppContext context) {
         _context = context;
         _offset = 0;
         _alreadyChanged = false;
         _listeners = new HashSet(64);
+        _timestamper = new Timestamper(context, this);
     }
     public static Clock getInstance() {
         return I2PAppContext.getGlobalContext().clock();
     }
+    
+    public Timestamper getTimestamper() { return _timestamper; }
     
     /** we fetch it on demand to avoid circular dependencies (logging uses the clock) */
     private Log getLog() { return _context.logManager().getLog(Clock.class); }

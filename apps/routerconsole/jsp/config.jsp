@@ -34,10 +34,8 @@
  to <a href="http://www.whatismyip.com/">www.whatismyip.com</a>.</i>
  <hr />
  <b>Enable internal time synchronization?</b> <input type="checkbox" <jsp:getProperty name="nethelper" property="enableTimeSyncChecked" /> name="enabletimesync" /><br />
- <i>If disabled, your machine <b>must</b> be NTP synchronized.  This option only 
-    takes effect for the current run - if your machine is always synchronized within
-    (a few seconds), you can update your configuration so that it doesn't start the
-    "Timestamper" app (which would make this option irrelevent)</i>
+ <i>If disabled, your machine <b>must</b> be NTP synchronized - your clock must always
+    be within a few seconds of "correct".</i>
  <hr />
  <b>Bandwidth limiter</b><br />
  <b>Inbound rate</b>: 

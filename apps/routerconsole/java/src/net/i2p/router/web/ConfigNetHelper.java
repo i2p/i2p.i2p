@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Iterator;
 import java.util.TreeMap;
 
+import net.i2p.time.Timestamper;
 import net.i2p.util.Log;
 
 import net.i2p.router.RouterContext;
@@ -50,8 +51,8 @@ public class ConfigNetHelper {
     }
     
     public String getEnableTimeSyncChecked() {
-        String enabled = System.getProperty("timestamper.enabled");
-        if ( (enabled == null) || (!"true".equals(enabled)) )
+        String enabled = _context.getProperty(Timestamper.PROP_DISABLED, "true");
+        if ( (enabled == null) || (!"true".equalsIgnoreCase(enabled)) )
             return "";
         else
             return " checked ";

@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Set;
 
 import net.i2p.util.Log;
+import net.i2p.time.Timestamper;
 
 import net.i2p.router.RouterContext;
 import net.i2p.router.ClientTunnelSettings;
@@ -221,9 +222,9 @@ public class ConfigNetHandler extends FormHandler {
         updateRates();
         
         if (_timeSyncEnabled) {
-            System.setProperty("timestamper.enabled", "true");
+            _context.router().setConfigSetting(Timestamper.PROP_DISABLED, "false");
         } else {
-            System.setProperty("timestamper.enabled", "false");
+            _context.router().setConfigSetting(Timestamper.PROP_DISABLED, "false");
         }
         
         boolean saved = _context.router().saveConfig();

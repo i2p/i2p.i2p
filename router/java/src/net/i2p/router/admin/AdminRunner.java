@@ -6,10 +6,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.Socket;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Iterator;
-import java.util.Locale;
 import java.util.Set;
 
 import net.i2p.data.Hash;
@@ -58,13 +55,6 @@ class AdminRunner implements Runnable {
             }
         } else if (command.indexOf("/profile/") >= 0) {
             replyText(out, getProfile(command));
-        } else if (command.indexOf("setTime") >= 0) {
-            if (allowTimeUpdate(command)) {
-                setTime(command);
-                reply(out, "<html><body>Time updated</body></html>");
-            } else {
-                reply(out, "<html><body>Time not updated</body></html>");
-            }
         } else if (command.indexOf("/shutdown") >= 0) {
             reply(out, shutdown(command));
         } else if (true || command.indexOf("routerConsole.html") > 0) {
@@ -77,25 +67,6 @@ class AdminRunner implements Runnable {
                     _log.warn("Error writing out the admin reply");
                 throw ioe;
             }
-        }
-    }
-    
-    private boolean allowTimeUpdate(String command) {
-        String pass = _context.getProperty("adminTimePassphrase");
-        if ( (pass == null) || (pass.trim().length() <= 0) ) {
-            if (_log.shouldLog(Log.ERROR))
-                _log.error("No passphrase for update time from " + _socket.getInetAddress() 
-                          + ":" + _socket.getPort());
-            return false;
-        }
-        
-        if (command.indexOf(pass) != -1) {
-            return true;
-        } else {
-            if (_log.shouldLog(Log.ERROR))
-                _log.error("Invalid passphrase for update time from " + _socket.getInetAddress() 
-                          + ":" + _socket.getPort());
-            return false;
         }
     }
     
@@ -151,33 +122,6 @@ class AdminRunner implements Runnable {
         
         return "No such peer is being profiled\n";
     }
-    
-    
-    private static final String FORMAT_STRING = "yyyyMMdd_HH:mm:ss.SSS";
-    private SimpleDateFormat _fmt = new SimpleDateFormat(FORMAT_STRING, Locale.UK);
-    
-    private long getTime(String now) throws ParseException { 
-        synchronized (_fmt) {
-            return _fmt.parse(now).getTime();
-        }
-    }
-    private void setTime(String cmd) {
-        int start = cmd.indexOf("now=");
-        String str = cmd.substring(start + 4, start+4+FORMAT_STRING.length());
-        try {
-            long now = getTime(str);
-            if (_log.shouldLog(Log.INFO))
-                _log.log(Log.INFO, "Admin time set to " + str);
-            setTime(now);
-        } catch (ParseException pe) {
-            _log.error("Invalid time specified [" + str + "]", pe);
-        }
-    }
-    
-    private void setTime(long now) {
-        _context.clock().setNow(now);
-    }
-    
     
     private static final String SHUTDOWN_PASSWORD_PROP = "router.shutdownPassword";
     private String shutdown(String cmd) {
