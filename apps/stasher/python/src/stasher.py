@@ -2586,6 +2586,8 @@ class KNodeReqHandler(KBase, SocketServer.StreamRequestHandler):
             res = node.dest
             write("ok\n")
             write("%s\n" % res)
+            flush()
+            time.sleep(1)
             finish()
             return
     
@@ -2752,7 +2754,7 @@ class KNodeClient(KBase):
             ref = self.readline().strip()
             return ref
         else:
-            return None
+            return "failed"
     
     #@-node:getref
     #@+node:pingall
