@@ -16,4 +16,4 @@ set INSTALL_PATH=%~dp0
 copy "%INSTALL_PATH%lib\wrapper\win32\I2Psvc.exe" "%INSTALL_PATH%"
 copy "%INSTALL_PATH%lib\wrapper\win32\wrapper.dll" "%INSTALL_PATH%lib"
 copy "%INSTALL_PATH%lib\wrapper\win32\wrapper.jar" "%INSTALL_PATH%lib"
-"%INSTALL_PATH%i2prouter.bat"
+start /b /i /d"%INSTALL_PATH%" i2prouter.bat
