@@ -103,7 +103,7 @@ public class ClientConnectionRunner {
             I2PThread t = new I2PThread(_writer);
             t.setName("Writer " + ++__id);
             t.setDaemon(true);
-            t.setPriority(I2PThread.MIN_PRIORITY);
+            t.setPriority(I2PThread.MAX_PRIORITY);
             t.start();
             _out = _socket.getOutputStream();
             _reader.startReading();
