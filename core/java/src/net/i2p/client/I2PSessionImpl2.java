@@ -105,6 +105,8 @@ class I2PSessionImpl2 extends I2PSessionImpl {
         }
         return compressed;
     }
+    
+    private static final int NUM_TAGS = 50;
 
     private boolean sendBestEffort(Destination dest, byte payload[], SessionKey keyUsed, Set tagsSent)
                     throws I2PSessionException {
@@ -119,14 +121,14 @@ class I2PSessionImpl2 extends I2PSessionImpl {
         
         if ( (tagsSent == null) || (tagsSent.size() <= 0) ) {
             if (oldTags < 10) {
-                sentTags = createNewTags(50);
+                sentTags = createNewTags(NUM_TAGS);
                 if (_log.shouldLog(Log.DEBUG))
-                    _log.debug("** sendBestEffort only had " + oldTags + " with " + availTimeLeft + ", adding 50");
+                    _log.debug("** sendBestEffort only had " + oldTags + " with " + availTimeLeft + ", adding " + NUM_TAGS);
             } else if (availTimeLeft < 2 * 60 * 1000) {
                 // if we have > 10 tags, but they expire in under 2 minutes, we want more
-                sentTags = createNewTags(50);
+                sentTags = createNewTags(NUM_TAGS);
                 if (_log.shouldLog(Log.DEBUG)) 
-                    _log.debug(getPrefix() + "Tags expiring in " + availTimeLeft + ", adding 50 new ones");
+                    _log.debug(getPrefix() + "Tags expiring in " + availTimeLeft + ", adding " + NUM_TAGS + " new ones");
                 //_log.error("** sendBestEffort available time left " + availTimeLeft);
             } else {
                 if (_log.shouldLog(Log.DEBUG))
@@ -240,11 +242,11 @@ class I2PSessionImpl2 extends I2PSessionImpl {
         SessionTag tag = _context.sessionKeyManager().consumeNextAvailableTag(dest.getPublicKey(), key);
         Set sentTags = null;
         if (_context.sessionKeyManager().getAvailableTags(dest.getPublicKey(), key) < 10) {
-            sentTags = createNewTags(50);
+            sentTags = createNewTags(NUM_TAGS);
         } else if (_context.sessionKeyManager().getAvailableTimeLeft(dest.getPublicKey(), key) < 2 * 60 * 1000) {
             // if we have > 10 tags, but they expire in under 30 seconds, we want more
-            sentTags = createNewTags(50);
-            if (_log.shouldLog(Log.DEBUG)) _log.debug(getPrefix() + "Tags are almost expired, adding 50 new ones");
+            sentTags = createNewTags(NUM_TAGS);
+            if (_log.shouldLog(Log.DEBUG)) _log.debug(getPrefix() + "Tags are almost expired, adding " + NUM_TAGS + " new ones");
         }
         SessionKey newKey = null;
         if (false) // rekey

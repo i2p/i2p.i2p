@@ -1,4 +1,11 @@
-$Id: history.txt,v 1.117 2004/12/21 11:32:50 jrandom Exp $
+$Id: history.txt,v 1.118 2004/12/21 13:23:03 jrandom Exp $
+
+2004-12-28  jrandom
+    * Cleaned up the resending and choking algorithm in the streaming lib.
+    * Removed the read timeout override for I2PTunnel's httpclient, allowing
+      it to use the default for the streaming lib.
+    * Revised ack triggers in the streaming lib.
+    * Logging.
 
 * 2004-12-21  0.4.2.5 released
 

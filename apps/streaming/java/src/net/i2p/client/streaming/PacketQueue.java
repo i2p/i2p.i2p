@@ -74,6 +74,9 @@ class PacketQueue {
             if ( (writeTime > 1000) && (_log.shouldLog(Log.WARN)) )
                 _log.warn("took " + writeTime + "ms to write the packet: " + packet);
 
+            // last chance to short circuit...
+            if (packet.getAckTime() > 0) return;
+            
             // this should not block!
             begin = _context.clock().now();
             sent = _session.sendMessage(packet.getTo(), buf, 0, size, keyUsed, tagsSent);

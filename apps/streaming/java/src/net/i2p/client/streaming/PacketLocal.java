@@ -69,6 +69,8 @@ public class PacketLocal extends Packet implements MessageOutputStream.WriteStat
     public void prepare() {
         if (_connection != null)
             _connection.getInputStream().updateAcks(this);
+        if (_numSends > 0) // so we can debug to differentiate resends
+            setOptionalDelay(_numSends * 1000);
     }
     
     public long getCreatedOn() { return _createdOn; }
@@ -110,10 +112,14 @@ public class PacketLocal extends Packet implements MessageOutputStream.WriteStat
     
     public String toString() {
         String str = super.toString();
+        
+        if ( (_tagsSent != null) && (_tagsSent.size() > 0) ) 
+            str = str + " with tags";
+
         if (_ackOn > 0)
-            return str + " ack after " + getAckTime();
+            return str + " ack after " + getAckTime() + (_numSends <= 1 ? "" : " sent " + _numSends + " times");
         else
-            return str;
+            return str + (_numSends <= 1 ? "" : " sent " + _numSends + " times");
     }
     
     public void waitForAccept(int maxWaitMs) {

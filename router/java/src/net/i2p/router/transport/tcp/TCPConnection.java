@@ -168,10 +168,16 @@ public class TCPConnection {
         msg.timestamp("TCPConnection.addMessage");
         List expired = null;
         int remaining = 0;
+        long remainingSize = 0;
         synchronized (_pendingMessages) {
             _pendingMessages.add(msg);
             expired = locked_expireOld();
             locked_throttle();
+            for (int i = 0; i < _pendingMessages.size(); i++) {
+                OutNetMessage cur = (OutNetMessage)_pendingMessages.get(i);
+                remaining++;
+                remainingSize += cur.getMessageSize();
+            }
             remaining = _pendingMessages.size();
             _pendingMessages.notifyAll();
         }
@@ -182,8 +188,8 @@ public class TCPConnection {
                 if (_log.shouldLog(Log.WARN))
                     _log.warn("Message " + cur.getMessageId() + " expired on the queue to " 
                               + _ident.getHash().toBase64().substring(0,6)
-                              + " (queue size " + remaining + ") with lifetime " 
-                              + cur.getLifetime());
+                              + " (queue size " + remaining + "/" + remainingSize + ") with lifetime " 
+                              + cur.getLifetime() + " and size " + cur.getMessageSize());
                 sent(cur, false, 0);
             }
         }

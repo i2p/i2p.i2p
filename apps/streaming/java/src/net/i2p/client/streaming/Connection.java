@@ -72,7 +72,7 @@ public class Connection {
     private long _lifetimeDupMessageReceived;
     
     public static final long MAX_RESEND_DELAY = 60*1000;
-    public static final long MIN_RESEND_DELAY = 40*1000;
+    public static final long MIN_RESEND_DELAY = 30*1000;
 
     /** wait up to 5 minutes after disconnection so we can ack/close packets */
     public static int DISCONNECT_TIMEOUT = 5*60*1000;
@@ -146,20 +146,25 @@ public class Connection {
             synchronized (_outboundPackets) {
                 if (!started)
                     _context.statManager().addRateData("stream.chokeSizeBegin", _outboundPackets.size(), timeoutMs);
+                if (!_connected) 
+                    return false;
                 started = true;
-                if (_outboundPackets.size() >= _options.getWindowSize()) {
+                if ( (_outboundPackets.size() >= _options.getWindowSize()) || (_activeResends > 0) ) {
                     if (writeExpire > 0) {
                         if (timeLeft <= 0) {
                             _log.error("Outbound window is full of " + _outboundPackets.size() 
+                                       + " with " + _activeResends + " active resends"
                                        + " and we've waited too long (" + writeExpire + "ms)");
                             return false;
                         }
                         if (_log.shouldLog(Log.DEBUG))
-                            _log.debug("Outbound window is full (" + _outboundPackets.size() + "/" + _options.getWindowSize() + "), waiting " + timeLeft);
+                            _log.debug("Outbound window is full (" + _outboundPackets.size() + "/" + _options.getWindowSize() + "/" 
+                                       + _activeResends + "), waiting " + timeLeft);
                         try { _outboundPackets.wait(timeLeft); } catch (InterruptedException ie) {}
                     } else {
                         if (_log.shouldLog(Log.DEBUG))
-                            _log.debug("Outbound window is full (" + _outboundPackets.size() + "), waiting indefinitely");
+                            _log.debug("Outbound window is full (" + _outboundPackets.size() + "/" + _activeResends 
+                                       + "), waiting indefinitely");
                         try { _outboundPackets.wait(); } catch (InterruptedException ie) {}
                     }
                 } else {
@@ -242,7 +247,7 @@ public class Connection {
             if (timeout > MAX_RESEND_DELAY)
                 timeout = MAX_RESEND_DELAY;
             if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Resend in " + timeout + " for " + packet);
+                _log.debug("Resend in " + timeout + " for " + packet, new Exception("Sent by"));
 
             SimpleTimer.getInstance().addEvent(new ResendPacketEvent(packet), timeout);
         }
@@ -688,6 +693,14 @@ public class Connection {
                 default:
                     if (_log.shouldLog(Log.WARN))
                         _log.warn("Closing connection due to inactivity");
+                    if (_log.shouldLog(Log.DEBUG)) {
+                        StringBuffer buf = new StringBuffer(128);
+                        buf.append("last sent was: ").append(_context.clock().now() - _lastSendTime);
+                        buf.append("ms ago, last received was: ").append(_context.clock().now()-_lastReceivedOn);
+                        buf.append("ms ago, inactivity timeout is: ").append(_options.getInactivityTimeout());
+                        _log.debug(buf.toString());
+                    }
+                    
                     disconnect(true);
                     break;
             }
@@ -752,10 +765,8 @@ public class Connection {
      */
     private class ResendPacketEvent implements SimpleTimer.TimedEvent {
         private PacketLocal _packet;
-        private boolean _currentIsActiveResend;
         public ResendPacketEvent(PacketLocal packet) {
             _packet = packet;
-            _currentIsActiveResend = false;
             packet.setResendPacketEvent(ResendPacketEvent.this);
         }
         
@@ -763,7 +774,7 @@ public class Connection {
             if (_packet.getAckTime() > 0) 
                 return;
             
-            if (!_connected) {
+            if (_resetSent || _resetReceived) {
                 _packet.cancelled();
                 return;
             }
@@ -771,12 +782,15 @@ public class Connection {
             //if (_log.shouldLog(Log.DEBUG))
             //    _log.debug("Resend period reached for " + _packet);
             boolean resend = false;
+            boolean isLowest = false;
             synchronized (_outboundPackets) {
+                if (_packet.getSequenceNum() == _highestAckedThrough + 1)
+                    isLowest = true;
                 if (_outboundPackets.containsKey(new Long(_packet.getSequenceNum())))
                     resend = true;
             }
             if ( (resend) && (_packet.getAckTime() < 0) ) {
-                if ( (_activeResends > 0) && (!_currentIsActiveResend) ) {
+                if (!isLowest) {
                     // we want to resend this packet, but there are already active
                     // resends in the air and we dont want to make a bad situation 
                     // worse.  wait another second
@@ -808,7 +822,6 @@ public class Connection {
                 if (numSends == 2) {
                     // first resend for this packet
                     _activeResends++;
-                    _currentIsActiveResend = true;
                 }
                 
                 // in case things really suck, the other side may have lost thier
@@ -827,6 +840,17 @@ public class Connection {
                               + newWindowSize + " lifetime " 
                               + (_context.clock().now() - _packet.getCreatedOn()) + "ms)");
                 _outboundQueue.enqueue(_packet);
+                
+                _lastSendTime = _context.clock().now();
+                
+                // acked during resending (... or somethin')
+                if ( (_packet.getAckTime() > 0) && (_packet.getNumSends() > 1) ) {
+                    _activeResends--;
+                    synchronized (_outboundPackets) {
+                        _outboundPackets.notifyAll();
+                    }
+                    return;
+                }
                 
                 if (numSends > _options.getMaxResends()) {
                     if (_log.shouldLog(Log.DEBUG))

@@ -147,7 +147,6 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
 
     private static final int DEFAULT_READ_TIMEOUT = 60*1000;
     
-    
     /** 
      * create the default options (using the default timeout, etc)
      *
@@ -156,8 +155,8 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
         Properties defaultOpts = getTunnel().getClientOptions();
         if (!defaultOpts.contains(I2PSocketOptions.PROP_READ_TIMEOUT))
             defaultOpts.setProperty(I2PSocketOptions.PROP_READ_TIMEOUT, ""+DEFAULT_READ_TIMEOUT);
-        if (!defaultOpts.contains("i2p.streaming.inactivityTimeout"))
-            defaultOpts.setProperty("i2p.streaming.inactivityTimeout", ""+DEFAULT_READ_TIMEOUT);
+        //if (!defaultOpts.contains("i2p.streaming.inactivityTimeout"))
+        //    defaultOpts.setProperty("i2p.streaming.inactivityTimeout", ""+DEFAULT_READ_TIMEOUT);
         I2PSocketOptions opts = sockMgr.buildOptions(defaultOpts);
         if (!defaultOpts.containsKey(I2PSocketOptions.PROP_CONNECT_TIMEOUT))
             opts.setConnectTimeout(DEFAULT_CONNECT_TIMEOUT);

@@ -559,7 +559,7 @@ class TunnelPool {
         }
         
         if (_log.shouldLog(Log.WARN)) 
-            _log.warn("Tunnel " + id + " marked as not ready, since it /failed/", new Exception("Failed tunnel"));
+            _log.warn("Tunnel " + id + " marked as not ready, since it /failed/: " + info.toString(), new Exception("Failed tunnel"));
         _context.messageHistory().tunnelFailed(info.getTunnelId());
         info.setIsReady(false);
         Hash us = _context.routerHash();

@@ -56,7 +56,7 @@ public class ConnectionPacketHandler {
         long ready = con.getInputStream().getHighestReadyBockId();
         int available = con.getOptions().getInboundBufferSize() - con.getInputStream().getTotalReadySize();
         int allowedBlocks = available/con.getOptions().getMaxMessageSize();
-        if (packet.getSequenceNum() > ready + allowedBlocks) {
+        if ( (packet.getPayloadSize() > 0) && (packet.getSequenceNum() > ready + allowedBlocks) ) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Inbound buffer exceeded on connection " + con + " (" 
                           + ready + "/"+ (ready+allowedBlocks) + "/" + available
@@ -106,14 +106,11 @@ public class ConnectionPacketHandler {
                 con.incrementDupMessagesReceived(1);
         
                 // take note of congestion
-                //con.getOptions().setResendDelay(con.getOptions().getResendDelay()*2);
-                //con.getOptions().setWindowSize(con.getOptions().getWindowSize()/2);
                 if (_log.shouldLog(Log.WARN))
                     _log.warn("congestion.. dup " + packet);
                 SimpleTimer.getInstance().addEvent(new AckDup(con), con.getOptions().getSendAckDelay());
-                //con.incrementUnackedPacketsReceived();
                 //con.setNextSendTime(_context.clock().now() + con.getOptions().getSendAckDelay());
-                fastAck = true;
+                //fastAck = true;
             } else {
                 if (packet.isFlagSet(Packet.FLAG_SYNCHRONIZE)) {
                     //con.incrementUnackedPacketsReceived();
@@ -128,7 +125,7 @@ public class ConnectionPacketHandler {
         fastAck = fastAck || ack(con, packet.getAckThrough(), packet.getNacks(), packet, isNew);
         con.eventOccurred();
         if (fastAck) {
-            if (con.getLastSendTime() + 1000 < _context.clock().now()) {
+            if (con.getLastSendTime() + 2000 < _context.clock().now()) {
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("Fast ack for dup " + packet);
                 con.ackImmediately();
