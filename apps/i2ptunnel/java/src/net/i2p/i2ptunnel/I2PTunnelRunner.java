@@ -170,7 +170,8 @@ public class I2PTunnelRunner extends I2PThread {
                     }
                 }
             } catch (InterruptedIOException ex) {
-                _log.debug("Socket read timed out - closing StreamForwarder");
+                _log.warn("Closing connection due to timeout (error: \""
+                          + ex.getMessage() + "\")");
             } catch (IOException ex) {
                 if (!finished)
                     _log.error("Error forwarding", ex);
