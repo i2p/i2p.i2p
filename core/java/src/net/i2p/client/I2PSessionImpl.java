@@ -580,7 +580,7 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
         while (true) {
             long delay = BASE_RECONNECT_DELAY << i;
             i++;
-            if (delay > MAX_RECONNECT_DELAY)
+            if ( (delay > MAX_RECONNECT_DELAY) || (delay <= 0) )
                 delay = MAX_RECONNECT_DELAY;
             try { Thread.sleep(delay); } catch (InterruptedException ie) {}
             

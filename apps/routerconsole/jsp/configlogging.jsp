@@ -29,7 +29,7 @@
  <input type="hidden" name="action" value="blah" />
  <b>Logging filename:</b> 
     <input type="text" name="logfilename" size="40" value="<jsp:getProperty name="logginghelper" property="logFilePattern" />" /><br />
-    <i>(the symbol '#' will be replaced during log rotation)</i><br />
+    <i>(the symbol '@' will be replaced during log rotation)</i><br />
  <b>Log record format:</b>
     <input type="text" name="logformat" size="20" value="<jsp:getProperty name="logginghelper" property="recordPattern" />" /><br />
     <i>(use 'd' = date, 'c' = class, 't' = thread, 'p' = priority, 'm' = message)</i><br />

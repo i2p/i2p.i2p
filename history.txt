@@ -1,4 +1,9 @@
-$Id: history.txt,v 1.15 2004/09/08 17:15:43 hypercubus Exp $
+$Id: history.txt,v 1.16 2004/09/08 21:26:43 jrandom Exp $
+
+2004-09-13  jrandom
+    * Update for the SDK reconnection to deal with overflow.
+    * Web improvements (@ not # on the /logs.jsp [thanks ugha!] and fixed the 
+      rounding on lifetime bandwidth used [thanks gott!]).
 
 * 2004-09-08  0.4.0.1 released
 

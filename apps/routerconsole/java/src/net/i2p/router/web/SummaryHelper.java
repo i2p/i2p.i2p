@@ -297,26 +297,27 @@ public class SummaryHelper {
     }
     
     private static String getTransferred(long bytes) {
+        double val = bytes;
         int scale = 0;
         if (bytes > 1024*1024*1024) {
             // gigs transferred
             scale = 3; 
-            bytes /= (1024*1024*1024);
+            val /= (double)(1024*1024*1024);
         } else if (bytes > 1024*1024) {
             // megs transferred
             scale = 2;
-            bytes /= (1024*1024);
+            val /= (double)(1024*1024);
         } else if (bytes > 1024) {
             // kbytes transferred
             scale = 1;
-            bytes /= 1024;
+            val /= (double)1024;
         } else {
             scale = 0;
         }
         
         DecimalFormat fmt = new DecimalFormat("##0.00");
 
-        String str = fmt.format(bytes);
+        String str = fmt.format(val);
         switch (scale) {
             case 1: return str + "KB";
             case 2: return str + "MB";
