@@ -25,7 +25,9 @@ class SearchUpdateReplyFoundJob extends JobImpl implements ReplyJob {
     private KademliaNetworkDatabaseFacade _facade;
     private SearchJob _job;
     
-    public SearchUpdateReplyFoundJob(RouterContext context, RouterInfo peer, SearchState state, KademliaNetworkDatabaseFacade facade, SearchJob job) {
+    public SearchUpdateReplyFoundJob(RouterContext context, RouterInfo peer, 
+                                     SearchState state, KademliaNetworkDatabaseFacade facade, 
+                                     SearchJob job) {
         super(context);
         _log = context.logManager().getLog(SearchUpdateReplyFoundJob.class);
         _peer = peer.getIdentity().getHash();
@@ -37,7 +39,8 @@ class SearchUpdateReplyFoundJob extends JobImpl implements ReplyJob {
     public String getName() { return "Update Reply Found for Kademlia Search"; }
     public void runJob() {
         if (_log.shouldLog(Log.INFO))
-            _log.info(getJobId() + ": Reply from " + _peer + " with message " + _message.getClass().getName());
+            _log.info(getJobId() + ": Reply from " + _peer.toBase64() 
+                      + " with message " + _message.getClass().getName());
         
         if (_message instanceof DatabaseStoreMessage) {
             long timeToReply = _state.dataFound(_peer);
@@ -47,7 +50,9 @@ class SearchUpdateReplyFoundJob extends JobImpl implements ReplyJob {
                 _facade.store(msg.getKey(), msg.getLeaseSet());
             } else if (msg.getValueType() == DatabaseStoreMessage.KEY_TYPE_ROUTERINFO) {
                 if (_log.shouldLog(Log.INFO))
-                    _log.info(getJobId() + ": dbStore received on search containing router " + msg.getKey() + " with publishDate of " + new Date(msg.getRouterInfo().getPublished()));
+                    _log.info(getJobId() + ": dbStore received on search containing router " 
+                              + msg.getKey() + " with publishDate of " 
+                              + new Date(msg.getRouterInfo().getPublished()));
                 _facade.store(msg.getKey(), msg.getRouterInfo());
             } else {
                 if (_log.shouldLog(Log.ERROR))

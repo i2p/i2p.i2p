@@ -640,11 +640,12 @@ public class OutboundClientMessageJob extends JobImpl {
             long sendTime = _context.clock().now() - _status.getStart();
             boolean alreadySuccessful = _status.success();
             MessageId msgId = _status.getMessage().getMessageId();
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug(OutboundClientMessageJob.this.getJobId() 
-                           + ": SUCCESS!  Message delivered completely for message " + msgId 
-                           + " after " + sendTime + "ms [for " 
-                           +  _status.getMessage().getMessageId() + "]");
+            if (_log.shouldLog(Log.INFO))
+                _log.info(OutboundClientMessageJob.this.getJobId() 
+                           + ": SUCCESS!  msg " + msgId 
+                           + " sent after " + sendTime + "ms after " 
+                           + _status.getNumLookups() + " lookups and " 
+                           + _status.getNumSent() + " sends");
             
             if ( (_key != null) && (_tags != null) && (_tags.size() > 0) ) {
                 _context.sessionKeyManager().tagsDelivered(_status.getLeaseSet().getEncryptionKey(),

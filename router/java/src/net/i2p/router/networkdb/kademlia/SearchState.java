@@ -129,29 +129,33 @@ class SearchState {
             buf.append(" completed? false ");
         else
             buf.append(" completed on ").append(new Date(_completed));
-        buf.append(" Attempted: ");
+        buf.append("\n\tAttempted: ");
         synchronized (_attemptedPeers) {
+            buf.append(_attemptedPeers.size()).append(' ');
             for (Iterator iter = _attemptedPeers.iterator(); iter.hasNext(); ) {
                 Hash peer = (Hash)iter.next();
                 buf.append(peer.toBase64()).append(" ");
             }
         }
-        buf.append(" Pending: ");
+        buf.append("\n\tPending: ");
         synchronized (_pendingPeers) {
+            buf.append(_pendingPeers.size()).append(' ');
             for (Iterator iter = _pendingPeers.iterator(); iter.hasNext(); ) {
                 Hash peer = (Hash)iter.next();
                 buf.append(peer.toBase64()).append(" ");
             }
         }
-        buf.append(" Failed: ");
+        buf.append("\n\tFailed: ");
         synchronized (_failedPeers) {
+            buf.append(_failedPeers.size()).append(' ');
             for (Iterator iter = _failedPeers.iterator(); iter.hasNext(); ) {
                 Hash peer = (Hash)iter.next();
                 buf.append(peer.toBase64()).append(" ");
             }
         }
-        buf.append(" Successful: ");
+        buf.append("\n\tSuccessful: ");
         synchronized (_successfulPeers) {
+            buf.append(_successfulPeers.size()).append(' ');
             for (Iterator iter = _successfulPeers.iterator(); iter.hasNext(); ) {
                 Hash peer = (Hash)iter.next();
                 buf.append(peer.toBase64()).append(" ");

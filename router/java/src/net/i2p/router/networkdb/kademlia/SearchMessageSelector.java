@@ -36,12 +36,16 @@ class SearchMessageSelector implements MessageSelector {
             _log.debug("[" + _id + "] Created: " + toString());
     }
     
-    public String toString() { return "Search selector [" + _id + "] looking for a reply from " + _peer + " with regards to " + _state.getTarget(); }
+    public String toString() { 
+        return "Search selector [" + _id + "] looking for a reply from " + _peer 
+               + " with regards to " + _state.getTarget(); 
+    }
     
     public boolean continueMatching() {
         if (_found) {
             if (_log.shouldLog(Log.DEBUG))
-                _log.debug("[" + _id + "] Dont continue matching! looking for a reply from " + _peer + " with regards to " + _state.getTarget());
+                _log.debug("[" + _id + "] Dont continue matching! looking for a reply from " 
+                           + _peer + " with regards to " + _state.getTarget());
             return false;
         }
         long now = _context.clock().now();
@@ -50,12 +54,16 @@ class SearchMessageSelector implements MessageSelector {
     public long getExpiration() { return _exp; }
     public boolean isMatch(I2NPMessage message) {
         if (_log.shouldLog(Log.DEBUG))
-            _log.debug("[" + _id + "] isMatch("+message.getClass().getName() + ") [want dbStore or dbSearchReply from " + _peer + " for " + _state.getTarget() + "]");
+            _log.debug("[" + _id + "] isMatch("+message.getClass().getName() 
+                       + ") [want dbStore or dbSearchReply from " + _peer 
+                       + " for " + _state.getTarget() + "]");
         if (message instanceof DatabaseStoreMessage) {
             DatabaseStoreMessage msg = (DatabaseStoreMessage)message;
             if (msg.getKey().equals(_state.getTarget())) {
                 if (_log.shouldLog(Log.DEBUG))
-                    _log.debug("[" + _id + "] Was a DBStore of the key we're looking for.  May not have been from who we're checking against though, but DBStore doesn't include that info");
+                    _log.debug("[" + _id + "] Was a DBStore of the key we're looking for.  " 
+                               + "May not have been from who we're checking against though, "
+                               + "but DBStore doesn't include that info");
                 _found = true;
                 return true;
             } else {
@@ -68,17 +76,20 @@ class SearchMessageSelector implements MessageSelector {
             if (_peer.equals(msg.getFromHash())) {
                 if (msg.getSearchKey().equals(_state.getTarget())) {
                     if (_log.shouldLog(Log.DEBUG))
-                        _log.debug("[" + _id + "] Was a DBSearchReply from who we're checking with for a key we're looking for");
+                        _log.debug("[" + _id + "] Was a DBSearchReply from who we're "
+                                   + "checking with for a key we're looking for");
                     _found = true;
                     return true;
                 } else {
                     if (_log.shouldLog(Log.DEBUG))
-                        _log.debug("[" + _id + "] Was a DBSearchReply from who we're checking with but NOT for the key we're looking for");
+                        _log.debug("[" + _id + "] Was a DBSearchReply from who we're checking "
+                                   + "with but NOT for the key we're looking for");
                     return false;
                 }
             } else {
                 if (_log.shouldLog(Log.DEBUG))
-                    _log.debug("[" + _id + "] DBSearchReply from someone we are not checking with [" + msg.getFromHash() + ", not " + _state.getTarget() + "]");
+                    _log.debug("[" + _id + "] DBSearchReply from someone we are not checking with [" 
+                               + msg.getFromHash() + ", not " + _state.getTarget() + "]");
                 return false;
             }
         } else {

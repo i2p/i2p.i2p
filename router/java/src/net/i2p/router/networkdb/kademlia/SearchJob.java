@@ -57,7 +57,19 @@ class SearchJob extends JobImpl {
     private static final int SEARCH_BREDTH = 3; // 3 peers at a time 
     private static final int SEARCH_PRIORITY = 400; // large because the search is probably for a real search
     
-    private static final long PER_PEER_TIMEOUT = 30*1000;
+    /**
+     * How long will we give each peer to reply to our search? 
+     *
+     */
+    private static final long PER_PEER_TIMEOUT = 10*1000;
+    
+    /** 
+     * give ourselves 30 seconds to send out the value found to the closest 
+     * peers /after/ we get a successful match.  If this fails, no biggie, but
+     * this'll help heal the network so subsequent searches will find the data.
+     *
+     */
+    private static final long RESEND_TIMEOUT = 30*1000;
     
     /**
      * Create a new search for the routingKey specified
@@ -103,8 +115,8 @@ class SearchJob extends JobImpl {
      */
     protected void searchNext() {
         if (_state.completed()) {
-            if (_log.shouldLog(Log.INFO))
-                _log.info(getJobId() + ": Already completed");
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug(getJobId() + ": Already completed");
             return;
         }
         if (_log.shouldLog(Log.INFO))
@@ -155,8 +167,7 @@ class SearchJob extends JobImpl {
             // too many already pending
             if (_log.shouldLog(Log.INFO))
                 _log.info(getJobId() + ": Too many searches already pending (pending: " 
-                          + _state.getPending().size() + " max: " + getBredth() + ")", 
-                          new Exception("too many pending"));
+                          + _state.getPending().size() + " max: " + getBredth() + ")");
             requeuePending();
             return;
         } 
@@ -166,16 +177,14 @@ class SearchJob extends JobImpl {
                 // we tried to find some peers, but there weren't any and no one else is going to answer
                 if (_log.shouldLog(Log.INFO))
                     _log.info(getJobId() + ": No peers left, and none pending!  Already searched: " 
-                              + _state.getAttempted().size() + " failed: " + _state.getFailed().size(), 
-                              new Exception("none left"));
+                              + _state.getAttempted().size() + " failed: " + _state.getFailed().size());
                 fail();
             } else {
                 // no more to try, but we might get data or close peers from some outstanding requests
                 if (_log.shouldLog(Log.INFO))
                     _log.info(getJobId() + ": No peers left, but some are pending!  Pending: " 
                               + _state.getPending().size() + " attempted: " + _state.getAttempted().size() 
-                              + " failed: " + _state.getFailed().size(), 
-                              new Exception("none left, but pending"));
+                              + " failed: " + _state.getFailed().size());
                 requeuePending();
                 return;
             }
@@ -187,7 +196,7 @@ class SearchJob extends JobImpl {
                 if ( (ds == null) || !(ds instanceof RouterInfo) ) {
                     if (_log.shouldLog(Log.WARN))
                         _log.warn(getJobId() + ": Error selecting closest hash that wasnt a router! " 
-                                  + peer + " : " + ds);
+                                  + peer + " : " + (ds == null ? "null" : ds.getClass().getName()));
                 } else {
                     sendSearch((RouterInfo)ds);
                 }
@@ -237,7 +246,7 @@ class SearchJob extends JobImpl {
             return;
         } else {
             if (_log.shouldLog(Log.DEBUG))
-                _log.debug(getJobId() + ": Send search to " + router);
+                _log.debug(getJobId() + ": Send search to " + router.getIdentity().getHash().toBase64());
         }
 
         if (_isLease || false) // moo
@@ -424,8 +433,8 @@ class SearchJob extends JobImpl {
                     if (_state.wasAttempted(ri.getIdentity().getHash())) {
                         _duplicatePeers++;
                     } 
-                    if (_log.shouldLog(Log.INFO))
-                        _log.info(getJobId() + ": dbSearchReply received on search containing router " 
+                    if (_log.shouldLog(Log.DEBUG))
+                        _log.debug(getJobId() + ": dbSearchReply received on search containing router " 
                                   + ri.getIdentity().getHash() + " with publishDate of " 
                                   + new Date(ri.getPublished()));
                     _facade.store(ri.getIdentity().getHash(), ri);
@@ -435,8 +444,7 @@ class SearchJob extends JobImpl {
                         _seenPeers++;
                 } else {
                     if (_log.shouldLog(Log.ERROR))
-                        _log.error(getJobId() + ": Received an invalid peer from " + _peer + ": " 
-                                   + ri, new Exception("Invalid peer"));
+                        _log.error(getJobId() + ": Received an invalid peer from " + _peer + ": " + ri);
                     _invalidPeers++;
                 }
                 _curIndex++;
@@ -485,9 +493,10 @@ class SearchJob extends JobImpl {
     /**
      * Search was totally successful
      */
-    protected void succeed() {
+    private void succeed() {
         if (_log.shouldLog(Log.INFO))
-            _log.info(getJobId() + ": Succeeded search for key " + _state.getTarget());
+            _log.info(getJobId() + ": Succeeded search for key " + _state.getTarget() 
+                      + " after querying " + _state.getAttempted().size());
         if (_log.shouldLog(Log.DEBUG))
             _log.debug(getJobId() + ": State of successful search: " + _state);
 	
@@ -498,6 +507,23 @@ class SearchJob extends JobImpl {
         }
         if (_onSuccess != null)
             _context.jobQueue().addJob(_onSuccess);
+        
+        resend();
+    }
+    
+    /**
+     * After we get the data we were searching for, rebroadcast it to the peers
+     * we would query first if we were to search for it again (healing the network).
+     *
+     */
+    private void resend() {
+        DataStructure ds = _facade.lookupLeaseSetLocally(_state.getTarget());
+        if (ds == null)
+            ds = _facade.lookupRouterInfoLocally(_state.getTarget());
+        if (ds != null)
+            _context.jobQueue().addJob(new StoreJob(_context, _facade, _state.getTarget(), 
+                                                    ds, null, null, RESEND_TIMEOUT,
+                                                    _state.getSuccessful()));
     }
 
     /**

@@ -81,11 +81,20 @@ class StoreJob extends JobImpl {
      */
     public StoreJob(RouterContext context, KademliaNetworkDatabaseFacade facade, Hash key, 
                     DataStructure data, Job onSuccess, Job onFailure, long timeoutMs) {
+        this(context, facade, key, data, onSuccess, onFailure, timeoutMs, null);
+    }
+    
+    /**
+     * @param toSkip set of peer hashes of people we dont want to send the data to (e.g. we
+     *               already know they have it).  This can be null.
+     */
+    public StoreJob(RouterContext context, KademliaNetworkDatabaseFacade facade, Hash key, 
+                    DataStructure data, Job onSuccess, Job onFailure, long timeoutMs, Set toSkip) {
         super(context);
         _log = context.logManager().getLog(StoreJob.class);
         _context.statManager().createRateStat("netDb.storeSent", "How many netDb store messages have we sent?", "Network Database", new long[] { 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
         _facade = facade;
-        _state = new StoreState(key, data);
+        _state = new StoreState(key, data, toSkip);
         _onSuccess = onSuccess;
         _onFailure = onFailure;
         _timeoutMs = timeoutMs;
@@ -385,11 +394,16 @@ class StoreJob extends JobImpl {
         private volatile long _started;
 
         public StoreState(Hash key, DataStructure data) {
+            this(key, data, null);
+        }
+        public StoreState(Hash key, DataStructure data, Set toSkip) {
             _key = key;
             _data = data;
             _pendingPeers = new HashSet(16);
             _pendingPeerTimes = new HashMap(16);
             _attemptedPeers = new HashSet(16);
+            if (toSkip != null)
+                _attemptedPeers.addAll(toSkip);
             _failedPeers = new HashSet(16);
             _successfulPeers = new HashSet(16);
             _successfulExploratoryPeers = new HashSet(16);
