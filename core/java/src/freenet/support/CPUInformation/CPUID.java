@@ -37,6 +37,8 @@ public class CPUID {
     //.matches() is a java 1.4+ addition, using a simplified version for 1.3+
     //private static final boolean isX86 = System.getProperty("os.arch").toLowerCase().matches("i?[x0-9]86(_64)?");
     private static final boolean isX86 = (-1 != System.getProperty("os.arch").indexOf("86"));
+    private static final String libPrefix = (System.getProperty("os.name").startsWith("Win") ? "" : "lib");
+    private static final String libSuffix = (System.getProperty("os.name").startsWith("Win") ? ".dll" : ".so");
     
     static
     {
@@ -483,7 +485,7 @@ public class CPUID {
         File outFile = null;
         try {
             InputStream libStream = resource.openStream();
-            outFile = File.createTempFile("jcpuid", "lib.tmp");
+            outFile = File.createTempFile(libPrefix + "jcpuid", "lib.tmp" + libSuffix);
             FileOutputStream fos = new FileOutputStream(outFile);
             byte buf[] = new byte[4096*1024];
             while (true) {

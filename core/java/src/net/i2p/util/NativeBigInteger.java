@@ -103,6 +103,10 @@ public class NativeBigInteger extends BigInteger {
     private final static String JBIGI_OPTIMIZATION_PENTIUM3   = "pentium3";
     private final static String JBIGI_OPTIMIZATION_PENTIUM4   = "pentium4";
 
+    /* libjbigi.so vs jbigi.dll */
+    private static final String _libPrefix = (System.getProperty("os.name").startsWith("Win") ? "" : "lib");
+    private static final String _libSuffix = (System.getProperty("os.name").startsWith("Win") ? ".dll" : ".so");
+
     private final static String sCPUType; //The CPU Type to optimize for (one of the above strings)
     
     static {
@@ -480,7 +484,7 @@ public class NativeBigInteger extends BigInteger {
         File outFile = null;
         try {
             InputStream libStream = resource.openStream();
-            outFile = File.createTempFile("jbigi", "lib.tmp");
+            outFile = File.createTempFile(_libPrefix + "jbigi", "lib.tmp" + _libSuffix);
             FileOutputStream fos = new FileOutputStream(outFile);
             byte buf[] = new byte[4096*1024];
             while (true) {
