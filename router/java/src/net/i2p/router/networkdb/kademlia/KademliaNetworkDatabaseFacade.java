@@ -124,7 +124,11 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
     boolean isShitlisted(Hash key) {
         synchronized (_badKeys) {
             locked_cleanupShitlist();
-            return !_badKeys.contains(key);
+            boolean isShitlisted = _badKeys.contains(key);
+            if (!isShitlisted) return false;
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Key " + key.toBase64() + " is shitlisted");
+            return true;
         }
     }
     /**
@@ -136,11 +140,16 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
     void shitlist(Hash key) {
         synchronized (_badKeys) {
             locked_cleanupShitlist();
-            _badKeys.add(key);
-            long when = _context.clock().now();
-            while (_badKeyDates.containsKey(new Long(when)))
-                when++;
-            _badKeyDates.put(new Long(when), key);
+            boolean wasNew = _badKeys.add(key);
+            if (wasNew) {
+                long when = _context.clock().now();
+                while (_badKeyDates.containsKey(new Long(when)))
+                    when++;
+                _badKeyDates.put(new Long(when), key);
+                _log.info("Shitlist " + key.toBase64() + " - new shitlist");
+            } else {
+                _log.info("Shitlist " + key.toBase64() + " - already shitlisted");
+            }
         }
     }
     private void locked_cleanupShitlist() {
@@ -166,11 +175,10 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
             }
         }
         
-        if (_badKeys.size() > 0) {
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Cleaning up shitlist: " + _badKeys.size() + " remain after removing " 
-                           + (old != null ? old.size() : 0));
-        }
+        
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("Cleaning up shitlist: " + _badKeys.size() + " remain after removing " 
+                       + (old != null ? old.size() : 0));
     }
     
     KBucketSet getKBuckets() { return _kb; }
