@@ -1,0 +1,496 @@
+<code>$Id$</code>
+
+<h1>Secure Semireliable UDP (SSU)</h1>
+<b>DRAFT</b>
+
+<p>
+The goal of this protocol is to provide secure and authenticated 
+semireliable, undordered message delivery, exposing only a minimal
+amount of data easily discernable to third parties.  It should 
+support high degree communication as well as TCP-friendly congestion
+control, and may include PMTU detection.   It should be capable of
+efficiently moving bulk data at rates sufficient for home users.
+In addition, it should support techniques for addressing network 
+obstacles, like most NATs or firewalls.</p>
+
+<h2><a name="addressing">Addressing and introduction</a></h2>
+
+<p>To contact an ESU peer, one of two sets of information is necessary:
+a direct address, for when the peer is publicly reachable, or an 
+indirect address, for using a third party to introduce the peer.  
+There is no restriction on the number of addresses a peer may have.</p>
+
+<pre>
+    Direct: udp://host:port/introKey
+  Indirect: udp://tag@relayhost:port/relayIntroKey/targetIntroKey
+</pre>
+
+<p>These introduction keys are delivered through an external channel 
+and must be used when establishing a session key.  For the indirect
+address, the peer must first contact the relayhost and ask them for
+an introduction to the peer known at that relayhost under the given
+tag.  If possible, the relayhost sends a message to the addressed
+peer telling them to contact the requesting peer, and also gives 
+the requesting peer the IP and port on which the addressed peer is
+located.  In addition, the peer establishing the connection must 
+already know the public keys of the peer they are connecting to (but
+not necessary to any intermediary relay peer).</p>
+
+<h2><a name="header">Header</a></h2>
+
+<p>All UDP datagrams begin with a MAC and an IV, followed by a variable
+size payload encrypted with the appropriate key.  The MAC used is 
+HMAC-SHA256, truncated to 16 bytes, while the key is a full AES256 
+key.  The specific construct of the MAC is the first 16 bytes from:</p>
+<pre>
+  HMAC-SHA256(payload, HMAC-SHA256(IV || payloadLength, key))
+</pre>
+
+<p>The payload itself is AES256/CBC encrypted with the IV and the key,
+with replay prevention addressed within its body, explained below.</p>
+
+<h2><a name="payload">Payload</a></h2>
+
+<p>Within the AES encrypted payload, there is a minimal common structure
+to the various messages - a one byte flag and a four byte sending 
+timestamp (*seconds* since the unix epoch).  The flag byte contains 
+the following bitfields:</p>
+<pre>
+  bits 0-3: payload type
+     bit 4: rekey?
+     bit 5: extended options included
+  bits 6-7: reserved
+</pre>
+
+<p>If the rekey flag is set, 32 bytes of keying material follow the 
+timestamp.  If the extended options flag is set, a one byte option 
+size value is appended to, followed by that many extended option 
+bytes, which are currently uninterpreted.</p>
+
+<p>When rekeying, the keying material is fed into a SHA256 to produce
+the new key, though that key is not immediately used.  The other 
+side should also reply with the rekey flag set and that same keying
+material.  Once both sides have sent and received those values, the
+new key should be used and the previous key discarded.  It may be
+useful to keep the old key around briefly, to address packet loss 
+and reordering.</p>
+
+<pre>
+ Header: 37+ bytes
+ +----+----+----+----+----+----+----+----+
+ |                  MAC                  |
+ |                                       |
+ +----+----+----+----+----+----+----+----+
+ |                   IV                  |
+ |                                       |
+ +----+----+----+----+----+----+----+----+
+ |flag|        time       | (optionally  |
+ +----+----+----+----+----+              |
+ | this may have 32 byte keying material |
+ | and/or a one+N byte extended options) |
+ +---------------------------------------|
+</pre>
+
+<h2><a name="messages">Messages</a></h2>
+
+<h3><a name="sessionRequest">SessionRequest (type 0)</a></h3>
+<table border="1">
+<tr><td align="right" valign="top"><b>Peer:</b></td>
+    <td>Alice to Bob</td></tr>
+<tr><td align="right" valign="top"><b>Data:</b></td>
+    <td><ul>
+        <li>256 byte X, to begin the DH agreement</li>
+        <li>1 byte IP address size</li>
+        <li>that many byte representation of Bob's IP address</li>
+        <li>N bytes, currently uninterpreted (later, for challenges)</li>
+	</ul></td></tr>
+<tr><td align="right" valign="top"><b>Key used:</b></td>
+    <td>introKey</td></tr>
+</table>
+
+<pre>
+ +----+----+----+----+----+----+----+----+
+ |         X, as calculated from DH      |
+ |                                       |
+                 .   .   .               
+ |                                       |
+ +----+----+----+----+----+----+----+----+
+ |size| that many byte IP address (4-16) |
+ +----+----+----+----+----+----+----+----+
+ |           arbitrary amount            |
+ |        of uninterpreted data          |
+                 .   .   .               
+ |                                       |
+ +----+----+----+----+----+----+----+----+
+</pre>
+
+<h3><a name="sessionCreated">SessionCreated (type 1)</a></h3>
+<table border="1">
+<tr><td align="right" valign="top"><b>Peer:</b></td>
+    <td>Bob to Alice</td></tr>
+<tr><td align="right" valign="top"><b>Data:</b></td>
+    <td><ul>
+        <li>256 byte Y, to complete the DH agreement</li>
+	<li>1 byte IP address size</li>
+	<li>that many byte representation of Alice's IP address</li>
+	<li>2 byte port number (unsigned, big endian 2s complement)</li>
+        <li>0-15 pad bytes to reach the 16 byte boundary</li>
+        <li>4 byte relay tag which Alice can publish (else 0x0)</li>
+        <li>40 byte DSA signature of the critical exchanged data</li>
+        <li>N bytes, currently uninterpreted (later, for challenges)</li>
+	</ul></td></tr>
+<tr><td align="right" valign="top"><b>Key used:</b></td>
+    <td>introKey for the data through the pad bytes, and the 
+        sessionKey for the DSA signature</td></tr>
+</table>
+
+<pre>
+ +----+----+----+----+----+----+----+----+
+ |         Y, as calculated from DH      |
+ |                                       |
+                 .   .   .               
+ |                                       |
+ +----+----+----+----+----+----+----+----+
+ |size| that many byte IP address (4-16) |
+ +----+----+----+----+----+----+----+----+
+ | Port (A)| (pad to 16 byte boundary)   |
+ +----+----+----+----+----+----+----+----+
+ |  public relay tag | DSA signature     |
+ +----+----+----+----+                   |
+ |                                       |
+ |                                       |
+ |                                       |
+ |                                       |
+ +                   +----+----+----+----+
+ |                   | arbitrary amount  |
+ +----+----+----+----+                   |
+ |     of uninterpreted data             |
+ +----+----+----+----+----+----+----+----+
+</pre>
+
+<h3><a name="sessionConfirmed">SessionConfirmed (type 2)</a></h3>
+<table border="1">
+<tr><td align="right" valign="top"><b>Peer:</b></td>
+    <td>Bob to Alice</td></tr>
+<tr><td align="right" valign="top"><b>Data:</b></td>
+    <td><ul>
+        <li>1 byte identity fragment info:<pre>
+bits 0-3: current identity fragment #
+bits 4-7: total identity fragments</pre></li>
+        <li>N byte fragment of Alice's identity, sent over a number
+            of messages.</li>
+        <li>on the last identity fragment, the last 40 bytes contain
+            the DSA signature of the critical exchanged data</li>
+        </ul></td></tr>
+<tr><td align="right" valign="top"><b>Key used:</b></td>
+    <td>sessionKey</td></tr>
+</table>
+
+<pre>
+ <b>Fragment 1 through N-1</b>
+ +----+----+----+----+----+----+----+----+
+ |info| fragment of Alice's full         |
+ +----+                                  |
+ |            identity keys              |
+                 .   .   .               
+ |                                       |
+ +----+----+----+----+----+----+----+----+
+ 
+ <b>Fragment N:</b>
+ +----+----+----+----+----+----+----+----+
+ |info| fragment of Alice's full         |
+ +----+                                  |
+ |            identity keys              |
+                 .   .   .               
+ |                                       |
+ +----+----+----+----+----+----+----+----+
+ |  arbitrary amount of uninterpreted    |
+ |        data, up from the end of the   |
+ |  identity key to 40 bytes prior to    |
+ |       end of the current packet       |
+ +----+----+----+----+----+----+----+----+
+ | DSA signature                         |
+ |                                       |
+ |                                       |
+ |                                       |
+ |                                       |
+ +----+----+----+----+----+----+----+----+
+</pre>
+ 
+<h3><a name="relayRequest">RelayRequest (type 3)</a></h3>
+<table border="1">
+<tr><td align="right" valign="top"><b>Peer:</b></td>
+    <td>Alice to Bob</td></tr>
+<tr><td align="right" valign="top"><b>Data:</b></td>
+    <td><ul>
+        <li>4 byte relay tag</li>
+        <li>1 byte IP address size</li>
+        <li>that many byte representation of Bob's IP address</li>
+        <li>1 byte IP address size</li>
+        <li>that many byte representation of Alice's IP address</li>
+        <li>2 byte port number (of Alice)</li>
+        <li>1 byte challenge size</li>
+        <li>that many bytes to be relayed to Charlie in the intro</li>
+        <li>N bytes, currently uninterpreted</li>
+	</ul></td></tr>
+<tr><td align="right" valign="top"><b>Key used:</b></td>
+    <td>introKey (or sessionKey, if Alice/Bob is established)</td></tr>
+</table>
+ 
+<pre>
+ +----+----+----+----+----+----+----+----+
+ |      relay tag    |size| that many    |
+ +----+----+----+----+----+         +----|
+ | bytes making up Bob's IP address |size|
+ +----+----+----+----+----+----+----+----+
+ | that many bytes making up Alice's IP  |
+ +----+----+----+----+----+----+----+----+
+ | Port (A)|size| that many challenge    |
+ +----+----+----+                        |
+ | bytes to be delivered to Charlie      |
+ +----+----+----+----+----+----+----+----+
+ | arbitrary amount of uninterpreted data|
+ +----+----+----+----+----+----+----+----+
+</pre>
+
+<h3><a name="relayResponse">RelayResponse (type 4)</a></h3>
+<table border="1">
+<tr><td align="right" valign="top"><b>Peer:</b></td>
+    <td>Bob to Alice</td></tr>
+<tr><td align="right" valign="top"><b>Data:</b></td>
+    <td><ul>
+        <li>1 byte IP address size</li>
+        <li>that many byte representation of Charlie's IP address</li>
+        <li>2 byte port number</li>
+        <li>1 byte IP address size</li>
+        <li>that many byte representation of Alice's IP address</li>
+        <li>2 byte port number</li>
+        <li>N bytes, currently uninterpreted</li>
+	</ul></td></tr>
+<tr><td align="right" valign="top"><b>Key used:</b></td>
+    <td>introKey (or sessionKey, if Alice/Bob is established)</td></tr>
+</table>
+
+<pre>
+ +----+----+----+----+----+----+----+----+
+ |size| that many bytes making up        |
+ +----+                        +----+----+
+ | Charlie's IP address        | Port (C)|
+ +----+----+----+----+----+----+----+----+
+ |size| that many bytes making up        |
+ +----+                        +----+----+
+ | Alice's IP address          | Port (A)|
+ +----+----+----+----+----+----+----+----+
+ | arbitrary amount of uninterpreted data|
+ +----+----+----+----+----+----+----+----+
+</pre>
+
+<h3><a name="relayIntro">RelayIntro (type 5)</a></h3>
+<table border="1">
+<tr><td align="right" valign="top"><b>Peer:</b></td>
+    <td>Bob to Charlie</td></tr>
+<tr><td align="right" valign="top"><b>Data:</b></td>
+    <td><ul>
+        <li>1 byte IP address size</li>
+        <li>that many byte representation of Alice's IP address</li>
+        <li>2 byte port number (of Alice)</li>
+        <li>1 byte challenge size</li>
+        <li>that many bytes relayed from Alice</li>
+        <li>N bytes, currently uninterpreted</li>
+	</ul></td></tr>
+<tr><td align="right" valign="top"><b>Key used:</b></td>
+    <td>sessionKey</td></tr>
+</table>
+
+<pre>
+ +----+----+----+----+----+----+----+----+
+ |size| that many bytes making up        |
+ +----+                        +----+----+
+ | Charlie's IP address        | Port (C)|
+ +----+----+----+----+----+----+----+----+
+ |size| that many bytes of challenge     |
+ +----+                                  |
+ | data relayed from Alice               |
+ +----+----+----+----+----+----+----+----+
+ | arbitrary amount of uninterpreted data|
+ +----+----+----+----+----+----+----+----+
+</pre>
+
+<h3><a name="data">Data (type 6)</a></h3>
+<table border="1">
+<tr><td align="right" valign="top"><b>Peer:</b></td>
+    <td>Any</td></tr>
+<tr><td align="right" valign="top"><b>Data:</b></td>
+    <td><ul>
+        <li>1 byte flags:<pre>
+   bit 0: explicit ACKs included
+   bit 1: explicit NACKs included
+   bit 2: numACKs included
+bits 3-4: reserved for congestion control
+   bit 5: want reply
+bits 6-7: reserved</pre></li>
+        <li>if explicit ACKs are included:<ul>
+	  <li>a 1 byte number of ACKs</li>
+          <li>that many 4 byte MessageIds being fully ACKed</li>
+	  </ul></li>
+        <li>if explicit NACKs are included:<ul>
+          <li>a 1 byte number of NACKs</li>
+          <li>that many 4 byte MessageIds + 1 byte fragmentNum NACKs</li>
+	  </ul></li>
+        <li>if numACKs included:<ul>
+          <li>a 1 byte number for how many messages were fully 
+              received in the last minute.</li></ul></li>
+        <li>1 byte number of fragments</li>
+        <li>that many message fragments:<ul>
+          <li>4 byte messageId</li>
+          <li>1 byte fragment info:<pre>
+bits 0-4: fragment #
+   bit 5: isLast (1 = true)
+bits 6-7: unused</pre></li>
+          <li>2 byte fragment size</li>
+          <li>that many bytes</li>
+          <li>1 byte fragment size</li></ul>
+        <li>N bytes padding, uninterpreted</li>
+	</ul></td></tr>
+<tr><td align="right" valign="top"><b>Key used:</b></td>
+    <td>sessionKey</td></tr>
+</table>
+
+<pre>
+ +----+----+----+----+----+----+----+----+
+ |flag| (additional headers, determined  |
+ +----+                                  |
+ | by the flags, such as ACKs, NACKs, or |
+ | simple rate of full ACKs)             |
+ +----+----+----+----+----+----+----+----+
+ |#frg|     messageId     |info|fragSize |
+ +----+----+----+----+----+----+----+----+
+ | that many bytes of fragment data      |
+                  .  .  .                                       
+ |                                       |
+ +----+----+----+----+----+----+----+----+
+ |     messageId     |info|fragSize |    |
+ +----+----+----+----+----+----+----+    |
+ | that many bytes of fragment data      |
+                  .  .  .                                       
+ |                                       |
+ +----+----+----+----+----+----+----+----+
+ |     messageId     |info|fragSize |    |
+ +----+----+----+----+----+----+----+    |
+ | that many bytes of fragment data      |
+                  .  .  .                                       
+ |                                       |
+ +----+----+----+----+----+----+----+----+
+ | arbitrary amount of uninterpreted data|
+ +----+----+----+----+----+----+----+----+
+</pre>
+
+<h2><a name="keys">Keys</a></h2>
+
+<p>All encryption used is AES256/CBC with 16 byte keys and 16 byte IVs.
+When using the introKey, both the initial message and any subsequent
+reply use the introKey of the responder (Bob) - the responder does 
+not need to know the introKey of the requestor (Alice).  The DSA 
+signing key used by Bob should already be known to Alice when she 
+contacts him, though Alice's DSA key may not already be known by 
+Bob.</p>
+
+<p>Upon receiving a message, the receiver checks the from IP address 
+with any established sessions - if there is one or more matches,
+those session keys are tested sequentially in the HMAC.  If none
+of those verify or if there are no matching IP addresses, the 
+receiver tries their introKey in the MAC.  If that does not verify,
+the packet is dropped.  If it does verify, it is interpreted 
+according to the message type, though if the receiver is overloaded,
+it may be dropped anyway.</p>
+
+<p>If Alice and Bob have an established session, but Alice loses the 
+key for some reason and she wants to contact Bob, she may at any 
+time simply establish a new session through the SessionRequest and
+related messages.  If Bob has lost the key but Alice does not know
+that, she will first attempt to prod him to reply, by sending a 
+DataMessage with the wantReply flag set, and if Bob continually 
+fails to reply, she will assume the key is lost and reestablish a 
+new one.</p>
+
+<p>For the DH key agreement,
+<a href="http://www.faqs.org/rfcs/rfc3526.html">RFC3526</a> 2048bit
+MODP group (#14) is used:</p>
+<pre>
+  p = 2^2048 - 2^1984 - 1 + 2^64 * { [2^1918 pi] + 124476 }
+  g = 2
+</pre>
+
+<p>The DSA p, q, and g are shared according to the scope of the 
+identity which created them.</p>
+
+<h2><a name="messageSequences">Message sequences</a></h2>
+
+<h3><a name="establishDirect">Connection establishment (direct)</a></h3>
+
+<pre>
+        Alice                         Bob
+    SessionRequest---------------------&gt;
+          &lt;---------------------SessionCreated
+    SessionConfirmed-------------------&gt;
+    SessionConfirmed-------------------&gt;
+    SessionConfirmed-------------------&gt;
+    SessionConfirmed-------------------&gt;
+          &lt;--------------------------Data
+</pre>
+
+<h3><a name="establishIndirect">Connection establishment (indirect)</a></h3>
+
+<pre>
+        Alice                         Bob                  Charlie
+    RelayRequest ----------------------&gt;
+         &lt;--------------RelayResponse    RelayIntro-----------&gt;
+         &lt;--------------------------------------------Data (ignored)
+    SessionRequest--------------------------------------------&gt;
+         &lt;--------------------------------------------SessionCreated
+    SessionConfirmed------------------------------------------&gt;
+    SessionConfirmed------------------------------------------&gt;
+    SessionConfirmed------------------------------------------&gt;
+    SessionConfirmed------------------------------------------&gt;
+         &lt;---------------------------------------------------Data
+</pre>
+
+<h2><a name="sampleDatagrams">Sample datagrams</a></h2>
+
+<b>Minimal data message (no fragments, no ACKs, no NACKs, etc)</b><br />
+<i>(Size: 39 bytes)</i>
+
+<pre>
+ +----+----+----+----+----+----+----+----+
+ |                  MAC                  |
+ |                                       |
+ +----+----+----+----+----+----+----+----+
+ |                   IV                  |
+ |                                       |
+ +----+----+----+----+----+----+----+----+
+ |flag|        time       |flag|#frg|    |
+ +----+----+----+----+----+----+----+    |
+ |  padding to fit a full AES256 block   |
+ +----+----+----+----+----+----+----+----+
+</pre>
+
+<b>Minimal data message with payload</b><br />
+<i>(Size: 46+fragmentSize bytes)</i>
+
+<pre>
+ +----+----+----+----+----+----+----+----+
+ |                  MAC                  |
+ |                                       |
+ +----+----+----+----+----+----+----+----+
+ |                   IV                  |
+ |                                       |
+ +----+----+----+----+----+----+----+----+
+ |flag|        time       |flag|#frg| 
+ +----+----+----+----+----+----+----+----+
+   messageId    |info| fragSize|         |
+ +----+----+----+----+----+----+         |
+ | that many bytes of fragment data      |
+                  .  .  .                                       
+ |                                       |
+ +----+----+----+----+----+----+----+----+
+</pre> 
