@@ -61,7 +61,7 @@ public class IsFailingCalculator extends Calculator {
                 return true;
             }
             
-            if (profile.getLastSendFailed() >= recently) {
+            if (false && profile.getLastSendFailed() >= recently) {
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("Peer " + profile.getPeer().toBase64() 
                                + " is failing because we couldnt send to it recently");
