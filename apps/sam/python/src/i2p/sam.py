@@ -238,7 +238,21 @@ class Socket:
       pass
     self.closed = True
 
-  def connect(self, address):
+  def connect(self, address, **kw):
+    """
+    Attempts to connect to a remote dest, identified in local
+    SAM bridge's hosts file as host 'address'.
+
+    For example:
+      s.connect("duck.i2p")
+
+    You can pass a keyword 'dontResolve', which if true,
+    allows you to pass the base64 destination as the address, and
+    override the hostname lookup.
+
+    For example:
+      s.connect("238797sdfh2k34kjh....AAAA")
+    """
     # Synchronized.  Lock prevents two connects from occurring at the
     # same time in different threads.
     self.lock.acquire()
@@ -249,7 +263,11 @@ class Socket:
         return
 
       self._verify_not_connected()
-      address = resolve(address, self.samaddr)
+
+      # patched by aum - allow caller to pass in raw base64 dest,
+      # and prevent the name lookup attempt
+      if not kw.get('dontResolve', 1):
+        address = resolve(address, self.samaddr)
 
       timeout = self.timeout
       unwrap = self.sessobj.connect(address, timeout=timeout)
