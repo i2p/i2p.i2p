@@ -21,6 +21,10 @@ public class I2PSocketOptions {
         return _connectTimeout;
     }
 
+    /**
+     * Define how long we will wait for the ACK from a SYN, in milliseconds.
+     *
+     */
     public void setConnectTimeout(long ms) {
         _connectTimeout = ms;
     }

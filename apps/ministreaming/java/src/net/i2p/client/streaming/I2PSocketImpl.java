@@ -65,14 +65,14 @@ class I2PSocketImpl implements I2PSocket {
         synchronized (remoteIDWaiter) {
             if (wait) {
                 try {
-                    if (maxWait > 0)
+                    if (maxWait >= 0)
                         remoteIDWaiter.wait(maxWait);
                     else
                         remoteIDWaiter.wait();
                 } catch (InterruptedException ex) {
                 }
 
-                if ((maxWait > 0) && (System.currentTimeMillis() > dieAfter))
+                if ((maxWait >= 0) && (System.currentTimeMillis() >= dieAfter))
                     throw new InterruptedIOException("Timed out waiting for remote ID");
              
                 _log.debug("TIMING: RemoteID set to " + I2PSocketManager.getReadableForm(remoteID) + " for "
@@ -146,11 +146,29 @@ class I2PSocketImpl implements I2PSocket {
         return (byte) ((outgoing ? (byte) 0xA0 : (byte) 0x50) + (byte) add);
     }
 
+    public long getReadTimeout() {
+        return in.getReadTimeout();
+    }
+
+    public void setReadTimeout(long ms) {
+        in.setReadTimeout(ms);
+    }
+
     //--------------------------------------------------
     public class I2PInputStream extends InputStream {
 
         private ByteCollector bc = new ByteCollector();
 
+        private long readTimeout = -1;
+
+        public long getReadTimeout() {
+            return readTimeout;
+        }
+        
+        public void setReadTimeout(long ms) {
+            readTimeout = ms;
+        }
+        
         public int read() throws IOException {
             byte[] b = new byte[1];
             int res = read(b);
@@ -162,7 +180,10 @@ class I2PSocketImpl implements I2PSocket {
         public synchronized int read(byte[] b, int off, int len) throws IOException {
             _log.debug("Read called: " + this.hashCode());
             if (len == 0) return 0;
+            long dieAfter = System.currentTimeMillis() + readTimeout;
             byte[] read = bc.startToByteArray(len);
+            boolean timedOut = false;
+
             while (read.length == 0) {
                 synchronized (flagLock) {
                     if (closed) {
@@ -171,9 +192,18 @@ class I2PSocketImpl implements I2PSocket {
                     }
                 }
                 try {
-                    wait();
-                } catch (InterruptedException ex) {
+                    if (readTimeout >= 0) {
+                        wait(readTimeout);
+                    } else {
+                        wait();
+                    }
+                } catch (InterruptedException ex) {}
+
+                if ((readTimeout >= 0)
+                    && (System.currentTimeMillis() >= dieAfter)) {
+                    throw new InterruptedIOException("Timeout reading from I2PSocket (" + readTimeout + " msecs)");
                 }
+
                 read = bc.startToByteArray(len);
             }
             if (read.length > len) throw new RuntimeException("BUG");
@@ -304,6 +334,8 @@ class I2PSocketImpl implements I2PSocket {
                     }
                 }
                 manager.removeSocket(I2PSocketImpl.this);
+            } catch (InterruptedIOException ex) {
+                _log.error("BUG! read() operations should not timeout!", ex);
             } catch (IOException ex) {
                 // WHOEVER removes this event on inconsistent
                 // state before fixing the inconsistent state (a

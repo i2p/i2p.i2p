@@ -33,6 +33,20 @@ public interface I2PSocket {
     public OutputStream getOutputStream() throws IOException;
 
     /**
+     * How long we will wait blocked on a read() operation.
+     *
+     * @return milliseconds to wait, or -1 if we will wait indefinitely
+     */
+    public long getReadTimeout();
+
+    /**
+     * Define how long we will wait blocked on a read() operation (-1 will make
+     * the socket wait forever).
+     *
+     */
+    public void setReadTimeout(long ms);
+
+    /**
      * Closes the socket if not closed yet
      */
     public void close() throws IOException;
