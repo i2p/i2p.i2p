@@ -701,6 +701,9 @@ public class TCPTransport extends TransportImpl {
         PendingMessages rv = null;
         while (true) {
             synchronized (_msgs) {
+                if (_msgs.size() <= 0) {
+                    try { _msgs.wait(); } catch (InterruptedException ie) {}
+                } 
                 if (_msgs.size() > 0) {
                     for (Iterator iter = _msgs.keySet().iterator(); iter.hasNext(); ) {
                         Object key = iter.next();
@@ -717,7 +720,6 @@ public class TCPTransport extends TransportImpl {
                         }
                     }
                 }
-                try { _msgs.wait(1000); } catch (InterruptedException ie) {}
             }
         }
         
