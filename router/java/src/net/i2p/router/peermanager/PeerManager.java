@@ -76,89 +76,44 @@ class PeerManager {
      *
      */
     List selectPeers(PeerSelectionCriteria criteria) {
-        int numPasses = 0;
-        List rv = new ArrayList(criteria.getMinimumRequired());
+        Set peers = new HashSet(criteria.getMinimumRequired());
         Set exclude = new HashSet(1);
         exclude.add(_context.routerHash());
-        while (rv.size() < criteria.getMinimumRequired()) {
-            Set curVals = new HashSet(criteria.getMinimumRequired());
-            switch (criteria.getPurpose()) {
-                case PeerSelectionCriteria.PURPOSE_TEST:
-                    // for now, the peers we test will be the reliable ones
-                    //_organizer.selectWellIntegratedPeers(criteria.getMinimumRequired(), exclude, curVals);
-                    _organizer.selectHighCapacityPeers(criteria.getMinimumRequired(), exclude, curVals);
-                    break;
-                case PeerSelectionCriteria.PURPOSE_TUNNEL:
-                    // pull all of the fast ones, regardless of how many we 
-                    // want - we'll whittle them down later (40 lines from now)
-                    // int num = _organizer.countFastPeers();
-                    // if (num <= 0) 
-                    //    num = criteria.getMaximumRequired();
-                    // _organizer.selectFastPeers(num, exclude, curVals);
-                    _organizer.selectFastPeers(criteria.getMaximumRequired(), exclude, curVals);
-                    break;
-                case PeerSelectionCriteria.PURPOSE_SOURCE_ROUTE:
-                    _organizer.selectHighCapacityPeers(criteria.getMinimumRequired(), exclude, curVals);
-                    break;
-                case PeerSelectionCriteria.PURPOSE_GARLIC:
-                    _organizer.selectHighCapacityPeers(criteria.getMinimumRequired(), exclude, curVals);
-                    break;
-                default:
-                    break;
-            }
-            if (curVals.size() <= 0) {
-                if (_log.shouldLog(Log.WARN))
-                    _log.warn("We ran out of peers when looking for reachable ones after finding " 
-                              + rv.size() + " with "
-                              + _organizer.countWellIntegratedPeers() + "/" 
-                              + _organizer.countHighCapacityPeers() + "/" 
-                              + _organizer.countFastPeers() + " integrated/high capacity/fast peers");
+        switch (criteria.getPurpose()) {
+            case PeerSelectionCriteria.PURPOSE_TEST:
+                // for now, the peers we test will be the reliable ones
+                //_organizer.selectWellIntegratedPeers(criteria.getMinimumRequired(), exclude, curVals);
+                _organizer.selectHighCapacityPeers(criteria.getMinimumRequired(), exclude, peers);
                 break;
-            } else {
-                for (Iterator iter = curVals.iterator(); iter.hasNext(); ) {
-                    Hash peer = (Hash)iter.next();
-                    if (null != _context.netDb().lookupRouterInfoLocally(peer)) {
-                        if (_log.shouldLog(Log.DEBUG))
-                            _log.debug("Peer " + peer.toBase64() + " is locally known, so we'll allow its selection");
-                        if (!rv.contains(peer))
-                            rv.add(peer);
-                    } else {
-                        if (_log.shouldLog(Log.DEBUG))
-                            _log.debug("Peer " + peer.toBase64() + " is NOT locally known, disallowing its selection");
-                    }
-                }
-                exclude.addAll(curVals);
-            }
-            numPasses++;
+            case PeerSelectionCriteria.PURPOSE_TUNNEL:
+                // pull all of the fast ones, regardless of how many we 
+                // want - we'll whittle them down later (40 lines from now)
+                // int num = _organizer.countFastPeers();
+                // if (num <= 0) 
+                //    num = criteria.getMaximumRequired();
+                // _organizer.selectFastPeers(num, exclude, curVals);
+                _organizer.selectFastPeers(criteria.getMaximumRequired(), exclude, peers);
+                break;
+            case PeerSelectionCriteria.PURPOSE_SOURCE_ROUTE:
+                _organizer.selectHighCapacityPeers(criteria.getMinimumRequired(), exclude, peers);
+                break;
+            case PeerSelectionCriteria.PURPOSE_GARLIC:
+                _organizer.selectHighCapacityPeers(criteria.getMinimumRequired(), exclude, peers);
+                break;
+            default:
+                break;
+        }
+        if (peers.size() <= 0) {
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("We ran out of peers when looking for reachable ones after finding " 
+                          + peers.size() + " with "
+                          + _organizer.countWellIntegratedPeers() + "/" 
+                          + _organizer.countHighCapacityPeers() + "/" 
+                          + _organizer.countFastPeers() + " integrated/high capacity/fast peers");
         }
         if (_log.shouldLog(Log.INFO))
-            _log.info("Peers selected after " + numPasses + ": " + rv);
-        
-        /*
-        if (criteria.getPurpose() == PeerSelectionCriteria.PURPOSE_TUNNEL) {
-            // we selected extra peers above.  now lets strip that down to the 
-            // minimum requested, ordering it by the least recently agreed to
-            // first
-            TreeMap ordered = new TreeMap();
-            for (Iterator iter = rv.iterator(); iter.hasNext(); ) {
-                Hash peer = (Hash)iter.next();
-                PeerProfile prof = _organizer.getProfile(peer);
-                long when = prof.getTunnelHistory().getLastAgreedTo();
-                while (ordered.containsKey(new Long(when)))
-                    when++;
-                ordered.put(new Long(when), peer);
-            }
-            rv.clear();
-            for (Iterator iter = ordered.values().iterator(); iter.hasNext(); ) {
-                if (rv.size() >= criteria.getMaximumRequired()) break;
-                Hash peer = (Hash)iter.next();
-                rv.add(peer);
-            }
-            if (_log.shouldLog(Log.INFO))
-                _log.info("Peers selected after " + numPasses + ", sorted for a tunnel: " + rv);
-        }
-         */
-        return rv;
+            _log.info("Peers selected: " + peers);
+        return new ArrayList(peers);
     }
     
     public void renderStatusHTML(OutputStream out) throws IOException { 

@@ -21,6 +21,7 @@ import java.util.TreeSet;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
 import net.i2p.router.RouterContext;
+import net.i2p.router.NetworkDatabaseFacade;
 import net.i2p.stat.Rate;
 import net.i2p.stat.RateStat;
 import net.i2p.util.Log;
@@ -251,8 +252,14 @@ public class ProfileOrganizer {
         synchronized (_reorganizeLock) {
             locked_selectPeers(_fastPeers, howMany, exclude, matches);
         }
-        if (matches.size() < howMany)
+        if (matches.size() < howMany) {
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("selectFastPeers("+howMany+"), not enough fast (" + matches.size() + ") going on to highCap");
             selectHighCapacityPeers(howMany, exclude, matches);
+        } else {
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("selectFastPeers("+howMany+"), found enough fast (" + matches.size() + ")");
+        }
         return;
     }
     
@@ -271,8 +278,14 @@ public class ProfileOrganizer {
                 exclude.addAll(_fastPeers.keySet());
             locked_selectPeers(_highCapacityPeers, howMany, exclude, matches);
         }
-        if (matches.size() < howMany)
+        if (matches.size() < howMany) {
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("selectHighCap("+howMany+"), not enough fast (" + matches.size() + ") going on to notFailing");
             selectNotFailingPeers(howMany, exclude, matches);
+        } else {
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("selectHighCap("+howMany+"), found enough highCap (" + matches.size() + ")");
+        }
         return;
     }
     /**
@@ -283,8 +296,15 @@ public class ProfileOrganizer {
         synchronized (_reorganizeLock) {
             locked_selectPeers(_wellIntegratedPeers, howMany, exclude, matches);
         }
-        if (matches.size() < howMany)
+        if (matches.size() < howMany) {
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("selectWellIntegrated("+howMany+"), not enough integrated (" + matches.size() + ") going on to notFailing");
             selectNotFailingPeers(howMany, exclude, matches);
+        } else {            
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("selectWellIntegrated("+howMany+"), found enough well integrated (" + matches.size() + ")");
+        }
+        
         return;
     }
     /**
@@ -340,19 +360,27 @@ public class ProfileOrganizer {
                 for (Iterator iter = _strictCapacityOrder.iterator(); selected.size() < needed && iter.hasNext(); ) {
                     PeerProfile prof = (PeerProfile)iter.next();
                     if (matches.contains(prof.getPeer()) ||
-                    (exclude != null && exclude.contains(prof.getPeer())) ||
-                    _failingPeers.containsKey(prof.getPeer()))
+                        (exclude != null && exclude.contains(prof.getPeer())) ||
+                        _failingPeers.containsKey(prof.getPeer()) ) {
                         continue;
-                    else
-                        selected.add(prof.getPeer());
+                    } else {
+                        if (isOk(prof.getPeer()))
+                            selected.add(prof.getPeer());
+                    }
                 }
             }
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Selecting all not failing found " + (matches.size()-orig) + " new peers: " + selected);
             matches.addAll(selected);
         }
-        if (matches.size() < howMany)
+        if (matches.size() < howMany) {
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("selectAllNotFailing("+howMany+"), not enough (" + matches.size() + ") going on to failing");
             selectFailingPeers(howMany, exclude, matches);
+        } else {
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("selectAllNotFailing("+howMany+"), enough (" + matches.size() + ")");
+        }
         return;
     }
     /**
@@ -554,70 +582,57 @@ public class ProfileOrganizer {
     /**
      * Update the _thresholdCapacityValue by using a few simple formulas run 
      * against the specified peers.  Ideally, we set the threshold capacity to
-     * the mean, as long as that gives us enough peers and the mean is a "growth"
-     * value.  We fall back on the capacity of the top K-th capacity, or the 
-     * mean, or the base growth value, depending on various circumstances.
+     * the mean, as long as that gives us enough peers and is greater than the
+     * median.
      *
      * @param reordered ordered set of PeerProfile objects, ordered by capacity
-     *                  (highest first) for active nonfailing peers
+     *                  (highest first) for active nonfailing peers whose 
+     *                  capacity is greater than the growth factor
      */
     private void locked_calculateCapacityThreshold(double totalCapacity, Set reordered) {
         int numNotFailing = reordered.size();
         
         double meanCapacity = avg(totalCapacity, numNotFailing);
         
-        long baseline = CapacityCalculator.GROWTH_FACTOR;
         int minHighCapacityPeers = getMinimumHighCapacityPeers();
         
         int numExceedingMean = 0;
-        int numExceedingBaseline = 0;
         double thresholdAtMedian = 0;
         double thresholdAtMinHighCap = 0;
+        double thresholdAtLowest = CapacityCalculator.GROWTH_FACTOR;
         int cur = 0;
         for (Iterator iter = reordered.iterator(); iter.hasNext(); ) {
             PeerProfile profile = (PeerProfile)iter.next();
             double val = profile.getCapacityValue();
             if (val > meanCapacity)
                 numExceedingMean++;
-            if (val > baseline)
-                numExceedingBaseline++;
             if (cur == reordered.size()/2)
                 thresholdAtMedian = val;
             if (cur == minHighCapacityPeers)
                 thresholdAtMinHighCap = val;
+            if (cur == reordered.size() -1)
+                thresholdAtLowest = val;
             cur++;
         }
         
-        if (meanCapacity > baseline) {
+        if (numExceedingMean >= minHighCapacityPeers) {
             // our average is doing well (growing, not recovering from failures)
-            if (numExceedingMean > minHighCapacityPeers) {
-                if (_log.shouldLog(Log.INFO))
-                    _log.info("Our average capacity is doing well [" + meanCapacity 
-                              + "], and includes " + numExceedingMean);
-                _thresholdCapacityValue = meanCapacity;
-            } else {
-                if (_log.shouldLog(Log.INFO))
-                    _log.info("Our average capacity is doing well [" + meanCapacity 
-                              + "], but it is skewed to only have " + numExceedingMean
-                              + " so falling back on the top few to " + thresholdAtMinHighCap);
-                _thresholdCapacityValue = thresholdAtMinHighCap;
-            }
+            if (_log.shouldLog(Log.INFO))
+                _log.info("Our average capacity is doing well [" + meanCapacity 
+                          + "], and includes " + numExceedingMean);
+            _thresholdCapacityValue = meanCapacity;
+        } else if (reordered.size()/2 >= minHighCapacityPeers) {
+            // ok mean is skewed low, but we still have enough to use the median
+            if (_log.shouldLog(Log.INFO))
+                _log.info("Our average capacity is skewed under the median [" + meanCapacity 
+                          + "], so use the median threshold " + thresholdAtMedian);
+            _thresholdCapacityValue = thresholdAtMedian;
         } else {
-            // our average isn't doing well (its recovering from failures)
-            _thresholdCapacityValue = baseline + 0.0000001;
-            /*if (numExceedingBaseline > minHighCapacityPeers) {
-                if (_log.shouldLog(Log.INFO))
-                    _log.info("Our average capacity isn't doing well [" + meanCapacity 
-                              + "], but the baseline has " + numExceedingBaseline);
-                _thresholdCapacityValue = baseline+.0001;
-            } else {
-                if (_log.shouldLog(Log.INFO))
-                    _log.info("Our average capacity isn't doing well [" + meanCapacity 
-                              + "], and the baseline has " + numExceedingBaseline 
-                              + " so falling back on the median of " + thresholdAtMedian);
-                _thresholdCapacityValue = thresholdAtMedian;
-            }
-             */
+            // our average is doing well, but not enough peers
+            if (_log.shouldLog(Log.INFO))
+                _log.info("Our average capacity is doing well [" + meanCapacity 
+                          + "], but there aren't enough of them " + numExceedingMean);
+            _thresholdCapacityValue = Math.max(thresholdAtMinHighCap, thresholdAtLowest);
         }
     }
     
@@ -681,12 +696,32 @@ public class ProfileOrganizer {
         List all = new ArrayList(peers.keySet());
         if (toExclude != null)
             all.removeAll(toExclude);
+        
         all.removeAll(matches);
         all.remove(_us);
-        howMany -= matches.size();
         Collections.shuffle(all, _random);
-        for (int i = 0; i < howMany && i < all.size(); i++) {
-            matches.add(all.get(i));
+        for (int i = 0; (matches.size() < howMany) && (i < all.size()); i++) {
+            Hash peer = (Hash)all.get(i);
+            boolean ok = isOk(peer);
+            if (ok)
+                matches.add(peer);
+            else
+                matches.remove(peer);
+        }
+    }
+    
+    private boolean isOk(Hash peer) {
+        NetworkDatabaseFacade netDb = _context.netDb();
+        // the CLI shouldn't depend upon the netDb
+        if (netDb == null) return true;
+        if (null != netDb.lookupRouterInfoLocally(peer)) {
+            if (_log.shouldLog(Log.INFO))
+                _log.info("Peer " + peer.toBase64() + " is locally known, selecting");
+            return true;
+        } else {
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Peer " + peer.toBase64() + " is NOT locally known, disallowing its selection");
+            return false;
         }
     }
     
