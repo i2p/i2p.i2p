@@ -285,7 +285,7 @@ public class Router {
         RateStat sendRate = _context.statManager().getRate("transport.sendMessageSize");
         for (int i = 0; i < sendRate.getPeriods().length; i++) {
             Rate rate = sendRate.getRate(sendRate.getPeriods()[i]);
-            double bytes = rate.getLastTotalValue() + rate.getCurrentTotalValue();
+            double bytes = rate.getLastTotalValue();
             long ms = rate.getLastTotalEventTime() + rate.getLastTotalEventTime();
             if (ms <= 0) {
                 bytes = 0;
@@ -303,9 +303,7 @@ public class Router {
             buf.append(" over ").append((long)bytes).append(" bytes");
             buf.append("</li><li>");
             buf.append(DataHelper.formatDuration(rate.getPeriod())).append(" period send avg: ");
-            // we include lastPeriod + current *partial* period, and jrandom is too lazy to calculate how
-            // much of that partial is contained here, so 2*period it is.
-            bps = bytes*1000.0d/(2*rate.getPeriod()); 
+            bps = bytes*1000.0d/(rate.getPeriod()); 
             if (bps > 2048) {
                 bps /= 1024.0d;
                 buf.append(fmt.format(bps)).append(" KBps");
@@ -337,8 +335,6 @@ public class Router {
             buf.append(" over ").append((long)bytes).append(" bytes");
             buf.append("</li><li>");
             buf.append(DataHelper.formatDuration(rate.getPeriod())).append(" period receive avg: ");
-            // we include lastPeriod + current *partial* period, and jrandom is too lazy to calculate how
-            // much of that partial is contained here, so 2*period it is.
             bps = bytes*1000.0d/(rate.getPeriod());
             if (bps > 2048) {
                 bps /= 1024.0d;
