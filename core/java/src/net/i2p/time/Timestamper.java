@@ -143,6 +143,7 @@ public class Timestamper implements Runnable {
         if ( (serverList == null) || (serverList.trim().length() <= 0) )
             serverList = DEFAULT_SERVER_LIST;
         synchronized (_servers) {
+            _servers.clear();
             StringTokenizer tok = new StringTokenizer(serverList, ",");
             while (tok.hasMoreTokens()) {
                 String val = (String)tok.nextToken();
