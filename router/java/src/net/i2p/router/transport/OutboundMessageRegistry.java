@@ -101,7 +101,7 @@ public class OutboundMessageRegistry {
                     } else {
                         if (_log.shouldLog(Log.DEBUG))
                             _log.debug("Stop matching selector " + selector + " for message " 
-                                       + msg.getMessage().getClass().getName());
+                                       + msg.getMessageType());
                         matchedRemove.add(exp);
                     }
                 } else {
@@ -230,7 +230,7 @@ public class OutboundMessageRegistry {
             String warn = delay + "ms";
             if ( (delay > 1000) && (_log.shouldLog(Log.WARN)) ) {
                 _log.warn("Synchronizing in the registry.unRegister took too long!  " + warn);
-                _context.messageHistory().messageProcessingError(msg.getMessage().getUniqueId(), msg.getMessage().getClass().getName(), "Unregister took too long: " + warn);
+                _context.messageHistory().messageProcessingError(msg.getMessageId(), msg.getMessageType(), "Unregister took too long: " + warn);
             } else {
                 if (_log.shouldLog(Log.DEBUG)) 
                     _log.debug("Synchronizing in the registry.unRegister was quick:  " + warn);
@@ -249,7 +249,7 @@ public class OutboundMessageRegistry {
         for (Iterator iter = msgs.keySet().iterator(); iter.hasNext();) {
             Long exp = (Long)iter.next();
             OutNetMessage msg = (OutNetMessage)msgs.get(exp);
-            buf.append("<li>").append(msg.getMessage().getClass().getName());
+            buf.append("<li>").append(msg.getMessageType());
             buf.append(": expiring on ").append(new Date(exp.longValue()));
             if (msg.getReplySelector() != null)
                 buf.append(" with reply selector ").append(msg.getReplySelector().toString());
@@ -286,7 +286,7 @@ public class OutboundMessageRegistry {
                     if (fail != null) {
                         if (_log.shouldLog(Log.DEBUG))
                             _log.debug("Removing message with selector " + msg.getReplySelector() 
-                                       + ": " + msg.getMessage().getClass().getName() 
+                                       + ": " + msg.getMessageType() 
                                        + " and firing fail job: " + fail.getClass().getName());
                         ctx.jobQueue().addJob(fail);
                     } else {
