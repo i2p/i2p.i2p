@@ -26,6 +26,7 @@ class TestJob extends JobImpl {
     private TunnelPool _pool;
     private Object _buildToken;
     private PooledTunnelCreatorConfig _cfg;
+    private boolean _found;
     
     /** base to randomize the test delay on */
     private static final int TEST_DELAY = 60*1000;
@@ -48,6 +49,7 @@ class TestJob extends JobImpl {
     }
     public String getName() { return "Test tunnel"; }
     public void runJob() {
+        _found = false;
         // note: testing with exploratory tunnels always, even if the tested tunnel
         // is a client tunnel (per _cfg.getDestination())
         TunnelInfo replyTunnel = null;
@@ -150,7 +152,6 @@ class TestJob extends JobImpl {
         private RouterContext _context;
         private long _id;
         private long _expiration;
-        private boolean _found;
         public ReplySelector(RouterContext ctx, long id, long expiration) {
             _context = ctx;
             _id = id;
@@ -158,7 +159,7 @@ class TestJob extends JobImpl {
             _found = false;
         }
         
-        public boolean continueMatching() { return _found && _context.clock().now() < _expiration; }
+        public boolean continueMatching() { return !_found && _context.clock().now() < _expiration; }
         public long getExpiration() { return _expiration; }
         public boolean isMatch(I2NPMessage message) {
             if (message instanceof DeliveryStatusMessage) {
@@ -167,6 +168,12 @@ class TestJob extends JobImpl {
             return false;
         }
         
+        public String toString() {
+            StringBuffer rv = new StringBuffer(64);
+            rv.append("Testing tunnel ").append(_cfg.toString()).append(" waiting for ");
+            rv.append(_id).append(" found? ").append(_found);
+            return rv.toString();
+        }
     }
     
     /**
@@ -181,11 +188,18 @@ class TestJob extends JobImpl {
                 testSuccessful((int)_successTime);
             else
                 testFailed(_successTime);
-                
+            _found = true;
         }
         // who cares about the details...
         public void setMessage(I2NPMessage message) {
             _successTime = getContext().clock().now() - ((DeliveryStatusMessage)message).getArrival();
+        }
+        
+        public String toString() {
+            StringBuffer rv = new StringBuffer(64);
+            rv.append("Testing tunnel ").append(_cfg.toString());
+            rv.append(" successful after ").append(_successTime);
+            return rv.toString();
         }
     }
     
@@ -200,7 +214,15 @@ class TestJob extends JobImpl {
         }
         public String getName() { return "Tunnel test timeout"; }
         public void runJob() {
-            testFailed(getContext().clock().now() - _started);
+            if (!_found)
+                testFailed(getContext().clock().now() - _started);
+        }
+        
+        public String toString() {
+            StringBuffer rv = new StringBuffer(64);
+            rv.append("Testing tunnel ").append(_cfg.toString());
+            rv.append(" timed out");
+            return rv.toString();
         }
     }
 }

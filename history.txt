@@ -1,4 +1,11 @@
-$Id: history.txt,v 1.142 2005/02/16 17:23:47 jrandom Exp $
+$Id: history.txt,v 1.143 2005/02/16 23:08:34 jrandom Exp $
+
+2005-02-17  jrandom
+    * Fixed the braindead tunnel testing logic
+    * If a large number of tunnels are failing (within the last 5-10 minutes)
+      and the current tunnel pool's configuration allows it, randomly build a 
+      zero hop tunnel to replace failed tunnels.
+    * Enable postman's POP3 and SMTP tunnels by default
 
 2005-02-16  jrandom
     * Added some error handling when the number of session tags exceeds the

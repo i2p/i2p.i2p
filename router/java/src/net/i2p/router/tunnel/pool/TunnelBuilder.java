@@ -6,6 +6,8 @@ import java.util.List;
 import net.i2p.data.Hash;
 import net.i2p.data.SessionKey;
 import net.i2p.data.SessionTag;
+import net.i2p.stat.Rate;
+import net.i2p.stat.RateStat;
 import net.i2p.router.RouterContext;
 import net.i2p.router.JobImpl;
 import net.i2p.router.tunnel.HopConfig;
@@ -59,9 +61,17 @@ public class TunnelBuilder {
         TunnelPoolSettings settings = pool.getSettings();
         long expiration = ctx.clock().now() + settings.getDuration();
         List peers = null;
-        if (fake) {
+        
+        long failures = countFailures(ctx);
+        boolean failing = (failures > 5) && (pool.getSettings().getAllowZeroHop());
+        boolean failsafe = false;
+        if (failing && (ctx.random().nextInt(100) < failures) )
+            failsafe = true;
+        if (fake || failsafe) {
             peers = new ArrayList(1);
             peers.add(ctx.routerHash());
+            if ( (failsafe) && (log.shouldLog(Log.WARN)) )
+                log.warn("Building failsafe tunnel for " + pool);
         } else {
             peers = pool.getSelector().selectPeers(ctx, settings);
         }
@@ -97,7 +107,18 @@ public class TunnelBuilder {
             l.debug("Config contains " + peers + ": " + cfg);
         return cfg;
     }
-
+    
+    private long countFailures(RouterContext ctx) {
+        RateStat rs = ctx.statManager().getRate("tunnel.testFailedTime");
+        if (rs == null) 
+            return 0;
+        Rate r = rs.getRate(10*60*1000);
+        if (r == null) 
+            return 0;
+        else 
+            return r.getCurrentEventCount();
+    }
+    
     /** 
      * If the building fails, try, try again.
      *
