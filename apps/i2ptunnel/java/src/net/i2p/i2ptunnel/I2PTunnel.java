@@ -64,9 +64,9 @@ import net.i2p.util.EventDispatcherImpl;
 import net.i2p.util.Log;
 
 public class I2PTunnel implements Logging, EventDispatcher {
-    private final static Log _log = new Log(I2PTunnel.class);
-    private final EventDispatcherImpl _event = new EventDispatcherImpl();
-    private static I2PAppContext _context = new I2PAppContext();
+    private Log _log;
+    private EventDispatcherImpl _event;
+    private I2PAppContext _context;
 
     public static final int PACKET_DELAY = 100;
 
@@ -98,6 +98,9 @@ public class I2PTunnel implements Logging, EventDispatcher {
     }
 
     public I2PTunnel(String[] args, ConnectionEventListener lsnr) {
+        _context = new I2PAppContext();
+        _log = _context.logManager().getLog(I2PTunnel.class);
+        _event = new EventDispatcherImpl();
         addConnectionEventListener(lsnr);
         boolean gui = true;
         boolean checkRunByE = true;
@@ -921,6 +924,9 @@ public class I2PTunnel implements Logging, EventDispatcher {
 
         if ((name == null) || (name.trim().length() <= 0)) throw new DataFormatException("Empty destination provided");
 
+        I2PAppContext ctx = I2PAppContext.getGlobalContext();
+        Log log = ctx.logManager().getLog(I2PTunnel.class);
+        
         if (name.startsWith("file:")) {
             Destination result = new Destination();
             byte content[] = null;
@@ -944,19 +950,21 @@ public class I2PTunnel implements Logging, EventDispatcher {
                 result.fromByteArray(content);
                 return result;
             } catch (Exception ex) {
-                if (_log.shouldLog(Log.INFO)) _log.info("File is not a binary destination - trying base64");
+                if (log.shouldLog(Log.INFO)) 
+                    log.info("File is not a binary destination - trying base64");
                 try {
                     byte decoded[] = Base64.decode(new String(content));
                     result.fromByteArray(decoded);
                     return result;
                 } catch (DataFormatException dfe) {
-                    if (_log.shouldLog(Log.WARN)) _log.warn("File is not a base64 destination either - failing!");
+                    if (log.shouldLog(Log.WARN)) 
+                        log.warn("File is not a base64 destination either - failing!");
                     return null;
                 }
             }
         } else {
             // ask naming service
-            NamingService inst = _context.namingService();
+            NamingService inst = ctx.namingService();
             return inst.lookup(name);
         }
     }
