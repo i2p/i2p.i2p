@@ -31,5 +31,11 @@ public interface Service {
      */
     public void shutdown();
     
+    /**
+     * Perform a soft restart.
+     *
+     */
+    public void restart();
+    
     public void renderStatusHTML(OutputStream out) throws IOException;
 }

@@ -37,6 +37,19 @@ public class AdminListener implements Runnable {
         _running = false;
     }
     
+    public void restart() {
+        // this works by taking advantage of the auto-retry mechanism in the 
+        // startup() loop (which we reset to wait 1s).  by failing the socket
+        // (through close()) and nulling it, we will have to try to build a new
+        // serverSocket (using the *new* _port)
+        _nextFailDelay = 1000;
+        ServerSocket s = _socket;
+        try {
+            _socket = null;
+            s.close();
+        } catch (IOException ioe) {}
+    }
+    
     public void setPort(int port) { _port = port; }
     public int getPort() { return _port; }
     
@@ -58,7 +71,7 @@ public class AdminListener implements Runnable {
                 _log.info("Starting up listening for connections on port " + _port);
                 _socket = new ServerSocket(_port);
                 curDelay = 0;
-                while (_running) {
+                while (_running && (_socket != null) )  {
                     try {
                         Socket socket = _socket.accept();
                         _log.debug("Connection received");

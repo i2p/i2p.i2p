@@ -148,5 +148,10 @@ public class VMCommSystem extends CommSystemFacade {
         _commSystemFacades.put(_context.routerHash(), this);
     }
     
+    public void restart() {
+        _commSystemFacades.remove(_context.routerHash());
+        _commSystemFacades.put(_context.routerHash(), this);
+    }
+    
     public void renderStatusHTML(OutputStream out) {}
 }

@@ -45,6 +45,10 @@ class PersistentDataStore extends TransientDataStore {
         _context.jobQueue().addJob(new ReadJob());
     }
     
+    public void restart() {
+        _dbDir = _facade.getDbDir();
+    }
+    
     public DataStructure remove(Hash key) {
         _context.jobQueue().addJob(new RemoveJob(key));
         return super.remove(key);

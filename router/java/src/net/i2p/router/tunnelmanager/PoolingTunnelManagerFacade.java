@@ -56,6 +56,10 @@ public class PoolingTunnelManagerFacade implements TunnelManagerFacade {
         _testManager = null;
     }
     
+    public void restart() {
+        _pool.restart();
+    }
+    
     /** 
      * React to a request to join the specified tunnel.
      *
@@ -230,4 +234,5 @@ public class PoolingTunnelManagerFacade implements TunnelManagerFacade {
         if (_pool != null)
             _pool.renderStatusHTML(out);
     }
+    
 }

@@ -63,6 +63,28 @@ public class ClientManager {
         t.start();
     }
     
+    public void restart() {
+        shutdown();
+        
+        // to let the old listener die
+        try { Thread.sleep(2*1000); } catch (InterruptedException ie) {}
+        
+        int port = ClientManagerFacadeImpl.DEFAULT_PORT;
+        String portStr = _context.router().getConfigSetting(ClientManagerFacadeImpl.PROP_CLIENT_PORT);
+        if (portStr != null) {
+            try {
+                port = Integer.parseInt(portStr);
+            } catch (NumberFormatException nfe) {
+                _log.error("Error setting the port: " + portStr + " is not valid", nfe);
+            }
+        } 
+        _listener = new ClientListenerRunner(_context, this, port);
+        Thread t = new I2PThread(_listener);
+        t.setName("ClientListener:" + port);
+        t.setDaemon(true);
+        t.start();
+    }
+    
     public void shutdown() {
         _log.info("Shutting down the ClientManager");
         _listener.stopListening();

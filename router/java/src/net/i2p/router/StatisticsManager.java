@@ -47,6 +47,9 @@ public class StatisticsManager implements Service {
     }
         
     public void shutdown() {}
+    public void restart() { 
+        startup();
+    }
     public void startup() {
         String val = _context.router().getConfigSetting(PROP_PUBLISH_RANKINGS);
         try {

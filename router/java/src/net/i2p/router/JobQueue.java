@@ -239,6 +239,16 @@ public class JobQueue {
     }
     
     public void allowParallelOperation() { _allowParallelOperation = true; }
+    
+    public void restart() {
+        synchronized (_timedJobs) {
+            _timedJobs.clear();
+        }
+        synchronized (_readyJobs) {
+            _readyJobs.clear();
+        }
+    }
+    
     void shutdown() { 
         _alive = false; 
         StringBuffer buf = new StringBuffer(1024);
@@ -344,7 +354,10 @@ public class JobQueue {
                     t.start();
                 }
             } else if (_queueRunners.size() == numThreads) {
-                // noop
+                for (Iterator iter = _queueRunners.values().iterator(); iter.hasNext(); ) {
+                    JobQueueRunner runner = (JobQueueRunner)iter.next();
+                    runner.startRunning();
+                }
             } else { // numThreads < # runners, so shrink
                 //for (int i = _queueRunners.size(); i > numThreads; i++) {
                 //     QueueRunner runner = (QueueRunner)_queueRunners.get(new Integer(i));

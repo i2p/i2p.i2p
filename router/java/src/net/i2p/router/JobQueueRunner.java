@@ -30,6 +30,7 @@ class JobQueueRunner implements Runnable {
     public Job getLastJob() { return _lastJob; }
     public int getRunnerId() { return _id; }
     public void stopRunning() { _keepRunning = false; }
+    public void startRunning() { _keepRunning = true; }
     public void run() {
         long lastActive = _context.clock().now();
         long jobNum = 0;

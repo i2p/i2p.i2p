@@ -30,6 +30,10 @@ public class AdminManager implements Service {
         }
     }
     
+    public void restart() {
+        startup();
+    }
+    
     public void startup() {
         int port = DEFAULT_ADMIN_PORT;
         String str = _context.router().getConfigSetting(PARAM_ADMIN_PORT);
@@ -46,11 +50,16 @@ public class AdminManager implements Service {
     }
     
     private void startup(int port) {
-        _listener = new AdminListener(_context, port);
-        I2PThread t = new I2PThread(_listener);
-        t.setName("Admin Listener:" + port);
-        t.setDaemon(true);
-        //t.setPriority(Thread.MIN_PRIORITY);
-        t.start();
+        if (_listener == null) {
+            _listener = new AdminListener(_context, port);
+            I2PThread t = new I2PThread(_listener);
+            t.setName("Admin Listener:" + port);
+            t.setDaemon(true);
+            //t.setPriority(Thread.MIN_PRIORITY);
+            t.start();
+        } else {
+            _listener.setPort(port);
+            _listener.restart();
+        }
     }
 }

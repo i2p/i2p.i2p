@@ -576,6 +576,22 @@ class TunnelPool {
         _context.jobQueue().addJob(new TunnelPoolExpirationJob(_context, this));
     }
     
+    public void restart() {
+        try {
+            String str = _context.router().getConfigSetting(TUNNEL_CREATION_TIMEOUT_PARAM);
+            _tunnelCreationTimeout = Long.parseLong(str);
+        } catch (Throwable t) {
+            _tunnelCreationTimeout = TUNNEL_CREATION_TIMEOUT_DEFAULT;
+        }
+        _targetClients = TARGET_CLIENTS_DEFAULT;
+        try {
+            String str = _context.router().getConfigSetting(TARGET_CLIENTS_PARAM);
+            _targetClients = Integer.parseInt(str);
+        } catch (Throwable t) {
+            _targetClients = TARGET_CLIENTS_DEFAULT;
+        }
+    }
+    
     public void shutdown() {
         if (_log.shouldLog(Log.INFO)) _log.info("Shutting down tunnel pool");
         if (_persistenceHelper != null)

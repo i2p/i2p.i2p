@@ -18,6 +18,7 @@ import net.i2p.util.Log;
 public class SessionKeyPersistenceHelper implements Service {
     private Log _log;
     private RouterContext _context;
+    private SessionKeyWriterJob _writerJob;
     private final static long PERSIST_DELAY = 3*60*1000;
     private final static String PROP_SESSION_KEY_FILE = "router.sessionKeys.location";
     private final static String DEFAULT_SESSION_KEY_FILE = "sessionKeys.dat";
@@ -25,10 +26,16 @@ public class SessionKeyPersistenceHelper implements Service {
     public SessionKeyPersistenceHelper(RouterContext context) {
         _context = context;
         _log = _context.logManager().getLog(SessionKeyPersistenceHelper.class);
+        _writerJob = new SessionKeyWriterJob();
     }
     
     public void shutdown() {
         writeState();
+    }
+    
+    public void restart() {
+        writeState();
+        startup();
     }
     
     private String getKeyFile() {
@@ -58,7 +65,7 @@ public class SessionKeyPersistenceHelper implements Service {
                     if (fin != null) try { fin.close(); } catch (IOException ioe) {}
                 }
             }
-            _context.jobQueue().addJob(new SessionKeyWriterJob());
+            _context.jobQueue().addJob(_writerJob);
         }
     }
     

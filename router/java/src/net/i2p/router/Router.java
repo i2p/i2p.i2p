@@ -512,6 +512,49 @@ public class Router {
         }
     }
     
+    /**
+     * Save the current config options (returning true if save was 
+     * successful, false otherwise)
+     *
+     */
+    public boolean saveConfig() {
+        FileOutputStream fos = null;
+        try {
+            fos = new FileOutputStream(_configFilename);
+            _config.store(fos, "I2P Router config");
+        } catch (IOException ioe) {
+            if (_log.shouldLog(Log.ERROR))
+                _log.error("Error saving the config to " + _configFilename, ioe);
+            return false;
+        } finally {
+            if (fos != null) try { fos.close(); } catch (IOException ioe) {}
+        }
+        
+        return true;
+    }
+    
+    public void restart() {
+        _isAlive = false;
+        
+        try { _context.commSystem().restart(); } catch (Throwable t) { _log.log(Log.CRIT, "Error restarting the comm system", t); }
+        try { _context.clientManager().restart(); } catch (Throwable t) { _log.log(Log.CRIT, "Error restarting the client manager", t); }
+        try { _context.tunnelManager().restart(); } catch (Throwable t) { _log.log(Log.CRIT, "Error restarting the tunnel manager", t); }
+        try { _context.peerManager().restart(); } catch (Throwable t) { _log.log(Log.CRIT, "Error restarting the peer manager", t); }
+        try { _context.netDb().restart(); } catch (Throwable t) { _log.log(Log.CRIT, "Error restarting the networkDb", t); }
+        
+        //try { _context.jobQueue().restart(); } catch (Throwable t) { _log.log(Log.CRIT, "Error restarting the job queue", t); }
+        
+        _log.log(Log.CRIT, "Restart teardown complete... ");
+        try { Thread.sleep(10*1000); } catch (InterruptedException ie) {}
+        
+        _log.log(Log.CRIT, "Restarting...");
+        
+        _isAlive = true;
+        _started = _context.clock().now();
+        
+        _log.log(Log.CRIT, "Restart complete");
+    }
+    
     private void dumpStats() {
         //_log.log(Log.CRIT, "Lifetime stats:\n\n" + StatsGenerator.generateStatsPage());
     }

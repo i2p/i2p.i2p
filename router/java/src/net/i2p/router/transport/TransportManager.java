@@ -101,6 +101,12 @@ public class TransportManager implements TransportEventListener {
         _log.debug("Done start listening on transports");
     }
     
+    public void restart() {
+        stopListening();
+        try { Thread.sleep(1*1000); } catch (InterruptedException ie) {}
+        startListening();
+    }
+    
     public void stopListening() {
         for (int i = 0; i < _transports.size(); i++) {
             ((Transport)_transports.get(i)).stopListening();

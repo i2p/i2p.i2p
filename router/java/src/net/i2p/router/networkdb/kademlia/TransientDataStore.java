@@ -36,6 +36,12 @@ class TransientDataStore implements DataStore {
             _log.info("Data Store initialized");
     }
     
+    public void restart() {
+        synchronized (_data) {
+            _data.clear();
+        }
+    }
+    
     public Set getKeys() {
         synchronized (_data) {
             return new HashSet(_data.keySet());

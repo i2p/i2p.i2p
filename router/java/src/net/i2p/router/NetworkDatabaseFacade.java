@@ -57,7 +57,8 @@ class DummyNetworkDatabaseFacade extends NetworkDatabaseFacade {
         _routers = new HashMap();
         _context = ctx;
     }
-    
+
+    public void restart() {}
     public void shutdown() {}
     public void startup() {
         RouterInfo info = _context.router().getRouterInfo();

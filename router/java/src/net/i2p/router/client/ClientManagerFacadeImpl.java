@@ -61,6 +61,13 @@ public class ClientManagerFacadeImpl extends ClientManagerFacade {
             _manager.shutdown();
     }
     
+    public void restart() {
+        if (_manager != null)
+            _manager.restart();
+        else
+            startup();
+    }
+    
     /**
      * Request that a particular client authorize the Leases contained in the 
      * LeaseSet, after which the onCreateJob is queued up.  If that doesn't occur

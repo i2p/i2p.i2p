@@ -30,6 +30,7 @@ public interface PeerManagerFacade extends Service {
 class DummyPeerManagerFacade implements PeerManagerFacade {
     public void shutdown() {}    
     public void startup() {}
+    public void restart() {}
     public void renderStatusHTML(OutputStream out) { }    
     public List selectPeers(PeerSelectionCriteria criteria) { return null; }
 }

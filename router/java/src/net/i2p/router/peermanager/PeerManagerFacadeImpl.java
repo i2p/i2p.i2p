@@ -49,6 +49,12 @@ public class PeerManagerFacadeImpl implements PeerManagerFacade {
         _manager.storeProfiles();
     }
     
+    public void restart() {
+        _manager.storeProfiles();
+        _persistenceHelper.setUs(_context.routerHash());
+        _manager.loadProfiles();
+    }
+    
     public List selectPeers(PeerSelectionCriteria criteria) {
         return new ArrayList(_manager.selectPeers(criteria));
     }

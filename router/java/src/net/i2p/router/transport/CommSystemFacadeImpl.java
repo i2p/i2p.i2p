@@ -45,6 +45,13 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
             _manager.stopListening();
     }
     
+    public void restart() {
+        if (_manager == null)
+            startup();
+        else
+            _manager.restart();
+    }
+    
     public List getBids(OutNetMessage msg) {
         return _manager.getBids(msg);
     }

@@ -180,6 +180,26 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         _exploreKeys = null;
         _lastSent = null;
     }
+    
+    public void restart() {
+        _dbDir = _context.router().getConfigSetting(PROP_DB_DIR);
+        if (_dbDir == null) {
+            _log.info("No DB dir specified [" + PROP_DB_DIR + "], using [" + DEFAULT_DB_DIR + "]");
+            _dbDir = DEFAULT_DB_DIR;
+        }
+        _ds.restart();
+        synchronized (_explicitSendKeys) { _explicitSendKeys.clear(); }
+        synchronized (_exploreKeys) { _exploreKeys.clear(); }
+        synchronized (_passiveSendKeys) { _passiveSendKeys.clear(); }
+
+        _initialized = true;
+        
+        RouterInfo ri = _context.router().getRouterInfo();
+        publish(ri);
+    }
+    
+    String getDbDir() { return _dbDir; }
+    
     public void startup() {
         _log.info("Starting up the kademlia network database");
         RouterInfo ri = _context.router().getRouterInfo();

@@ -19,4 +19,5 @@ public interface DataStore {
     public void put(Hash key, DataStructure data);
     public DataStructure remove(Hash key);
     public Set getKeys();
+    public void restart();
 }
