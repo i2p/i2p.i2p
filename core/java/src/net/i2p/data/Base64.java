@@ -568,7 +568,7 @@ public class Base64 {
      * @return The data as a string
      * @since 1.4
      */
-    private static String decodeToString(String s) {
+    public static String decodeToString(String s) {
         return new String(decode(s));
     } // end decodeToString
 
