@@ -128,7 +128,7 @@ public class MultiRouterBuilder {
         buf.append("i2np.bandwidth.inboundBytesPerMinute=-60\n");
         buf.append("i2np.bandwidth.outboundBytesPerMinute=-60\n");
         buf.append("router.publishPeerRankings=true\n");
-        buf.append("router.keepHistory=false\n");
+        buf.append("router.keepHistory=true\n");
         buf.append("router.submitHistory=false\n");
         buf.append("router.maxJobRunners=1\n");
         buf.append("router.jobLagWarning=10000\n");
