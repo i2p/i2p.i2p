@@ -27,6 +27,7 @@ public class ProfileManagerImpl implements ProfileManager {
     
     public ProfileManagerImpl(RouterContext context) {
         _context = context;
+        _log = _context.logManager().getLog(ProfileManagerImpl.class);
     }
     
     /**
@@ -73,8 +74,8 @@ public class ProfileManagerImpl implements ProfileManager {
         PeerProfile data = getProfile(peer);
         if (data == null) return;
         data.setLastSendFailed(_context.clock().now());
-        data.getSendFailureSize().addData(0, 0); // yeah, should be a frequency...
-        data.getCommError().addData(0, 0); // see above
+        data.getSendFailureSize().addData(1, 0); // yeah, should be a frequency...
+        data.getCommError().addData(1, 0); // see above
     }
     
     /**
