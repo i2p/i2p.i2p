@@ -4,6 +4,12 @@
 #
 
 #
+# Your operating environment
+#
+
+OS = CYGWIN
+
+#
 # Directories
 #
 
@@ -27,6 +33,7 @@ CC = g++
 #
 
 CFLAGS = -g -march=i486 -pipe -Wall
+CFLAGS += -DOS=$(OS)
 
 #
 # Libraries
