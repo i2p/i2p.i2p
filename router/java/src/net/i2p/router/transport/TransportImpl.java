@@ -226,9 +226,9 @@ public abstract class TransportImpl implements Transport {
             }
         }
 
-        _context.statManager().addRateData("transport.sendProcessingTime", msg.getLifetime(), msg.getLifetime());
-
+        
         if (sendSuccessful) {
+            _context.statManager().addRateData("transport.sendProcessingTime", lifetime, lifetime);
             _context.profileManager().messageSent(msg.getTarget().getIdentity().getHash(), getStyle(), sendTime, msg.getMessageSize());
             _context.statManager().addRateData("transport.sendMessageSize", msg.getMessageSize(), sendTime);
         } else {

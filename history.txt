@@ -1,4 +1,9 @@
-$Id: history.txt,v 1.30 2004/10/02 14:05:24 jrandom Exp $
+$Id: history.txt,v 1.31 2004/10/03 15:48:43 jrandom Exp $
+
+2004-10-04  jrandom
+    * Update the shitlist to reject a peer for an exponentially increasing 
+      period of time (with an upper bounds of an hour).  
+    * Various minor stat and debugging fixes
 
 2004-10-03  jrandom
     * Add a new stat logging component to optionally dump the raw stats to 

@@ -171,6 +171,8 @@ public class TCPTransport extends TransportImpl {
             if (msg.getTarget() == null) 
                 throw new IllegalStateException("Null target for a ready message?");
             
+            msg.timestamp("TCPTransport.outboundMessageReady");
+            
             TCPConnection con = null;
             boolean newPeer = false;
             synchronized (_connectionLock) {

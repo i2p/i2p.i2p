@@ -68,7 +68,7 @@ public class BufferedStatLog implements StatLog {
 
     private boolean shouldLog(String stat) {
         synchronized (_statFilters) {
-            return _statFilters.contains(stat);
+            return _statFilters.contains(stat) || _statFilters.contains("*");
         }
     }
 

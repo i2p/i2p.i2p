@@ -139,6 +139,7 @@ public class TCPConnection {
      *
      */
     public void addMessage(OutNetMessage msg) {
+        msg.timestamp("TCPConnection.addMessage");
         synchronized (_pendingMessages) {
             _pendingMessages.add(msg);
             _pendingMessages.notifyAll();
@@ -157,7 +158,9 @@ public class TCPConnection {
         while ( (msg == null) && (!_closed) ) {
             List expired = null;
             long now = _context.clock().now();
+            int queueSize = 0;
             synchronized (_pendingMessages) {
+                queueSize = _pendingMessages.size();
                 for (int i = 0; i < _pendingMessages.size(); i++) {
                     OutNetMessage cur = (OutNetMessage)_pendingMessages.get(i);
                     if (cur.getExpiration() < now) {
@@ -182,10 +185,19 @@ public class TCPConnection {
             if (expired != null) {
                 for (int i = 0; i < expired.size(); i++) {
                     OutNetMessage cur = (OutNetMessage)expired.get(i);
+                    cur.timestamp("TCPConnection.getNextMessage expired");
+                    if (_log.shouldLog(Log.WARN))
+                        _log.warn("Message " + cur.getMessageId() + " expired on the queue to " 
+                                  + _ident.getHash().toBase64().substring(0,6)
+                                  + " (queue size " + queueSize + ") with lifetime " 
+                                  + cur.getLifetime());
                     sent(cur, false, 0);
                 }
             }
         }
+        
+        if (msg != null)
+            msg.timestamp("TCPConnection.getNextMessage retrieved");
         return msg;
     }
     

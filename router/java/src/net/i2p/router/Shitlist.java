@@ -16,6 +16,7 @@ import java.util.Iterator;
 import java.util.Map;
 
 import net.i2p.data.Hash;
+import net.i2p.router.peermanager.PeerProfile;
 import net.i2p.util.Log;
 
 /**
@@ -62,8 +63,16 @@ public class Shitlist {
         if (_log.shouldLog(Log.INFO))
             _log.info("Shitlisting router " + peer.toBase64(), new Exception("Shitlist cause"));
         
+        long period = SHITLIST_DURATION_MS;
+        PeerProfile prof = _context.profileOrganizer().getProfile(peer);
+        if (prof != null)
+            period = SHITLIST_DURATION_MS << prof.incrementShitlists();
+        
+        if (period > 60*60*1000)
+            period = 60*60*1000;
+        
         synchronized (_shitlist) {
-            Date oldDate = (Date)_shitlist.put(peer, new Date(_context.clock().now()));
+            Date oldDate = (Date)_shitlist.put(peer, new Date(_context.clock().now() + period));
             wasAlready = (null == oldDate);
             if (reason != null) {
                 _shitlistCause.put(peer, reason);
@@ -85,6 +94,9 @@ public class Shitlist {
             _shitlist.remove(peer);
             _shitlistCause.remove(peer);
         }
+        PeerProfile prof = _context.profileOrganizer().getProfile(peer);
+        if (prof != null)
+            prof.unshitlist();
     }
     
     public boolean isShitlisted(Hash peer) {
@@ -95,7 +107,7 @@ public class Shitlist {
         if (shitlistDate == null) return false;
         
         // check validity
-        if (shitlistDate.getTime() > _context.clock().now() - SHITLIST_DURATION_MS) {
+        if (shitlistDate.getTime() > _context.clock().now()) {
             return true;
         } else {
             unshitlistRouter(peer);
@@ -115,7 +127,7 @@ public class Shitlist {
             shitlist = new HashMap(_shitlist);
         }
         
-        long limit = _context.clock().now() - SHITLIST_DURATION_MS;
+        long limit = _context.clock().now();
         
         for (Iterator iter = shitlist.keySet().iterator(); iter.hasNext(); ) {
             Hash key = (Hash)iter.next();
@@ -146,7 +158,7 @@ public class Shitlist {
             Date shitDate = (Date)shitlist.get(key);
             buf.append("<li><b>").append(key.toBase64()).append("</b>");
             buf.append(" <a href=\"netdb.jsp#").append(key.toBase64().substring(0, 6)).append("\">(?)</a>");
-            buf.append(" was shitlisted on ");
+            buf.append(" expiring on ");
             buf.append(shitDate);
             String cause = (String)causes.get(key);
             if (cause != null) {

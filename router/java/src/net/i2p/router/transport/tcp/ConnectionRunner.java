@@ -59,9 +59,13 @@ class ConnectionRunner implements Runnable {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("message " + msg.getMessageType() + "/" + msg.getMessageId() 
                           + " expired before it could be sent");
+            
+            msg.timestamp("ConnectionRunner.sendMessage noData");
             _con.sent(msg, false, 0);
             return;
         }
+        
+        msg.timestamp("ConnectionRunner.sendMessage data");
 
         OutputStream out = _con.getOutputStream();
         boolean ok = false;

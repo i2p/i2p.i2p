@@ -44,6 +44,7 @@ public class PeerProfile {
     private DBHistory _dbHistory;
     // does this peer profile contain expanded data, or just the basics?
     private boolean _expanded;
+    private int _consecutiveShitlists;
     
     public PeerProfile(RouterContext context, Hash peer) {
         this(context, peer, true);
@@ -57,6 +58,7 @@ public class PeerProfile {
         _capacityValue = 0;
         _integrationValue = 0;
         _isFailing = false;
+        _consecutiveShitlists = 0;
         _peer = peer;
         if (expand)
             expandProfile();
@@ -73,6 +75,9 @@ public class PeerProfile {
      *
      */
     public boolean getIsExpanded() { return _expanded; }
+    
+    public int incrementShitlists() { return _consecutiveShitlists++; }
+    public void unshitlist() { _consecutiveShitlists = 0; }
     
     /**
      * Is this peer active at the moment (sending/receiving messages within the last
