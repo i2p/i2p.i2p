@@ -133,6 +133,7 @@ public class Packet {
     public static final int FLAG_ECHO = (1 << 9);
 
     public static final int DEFAULT_MAX_SIZE = 32*1024;
+    private static final int MAX_DELAY_REQUEST = 65535;
     
     /** what stream is this packet a part of? */
     public byte[] getSendStreamId() { 
@@ -236,9 +237,14 @@ public class Packet {
      * set) 
      */
     public int getOptionalDelay() { return _optionDelay; }
-    public void setOptionalDelay(int delayMs) { 
-        setFlag(FLAG_DELAY_REQUESTED, delayMs > 0);
-        _optionDelay = delayMs; 
+    public void setOptionalDelay(int delayMs) {
+        setFlag(FLAG_DELAY_REQUESTED, delayMs > 0); 
+        if (delayMs > MAX_DELAY_REQUEST)
+            _optionDelay = MAX_DELAY_REQUEST;
+        else if (delayMs < 0)
+            _optionDelay = 0;
+        else
+            _optionDelay = delayMs; 
     }
     
     /**
@@ -298,7 +304,7 @@ public class Packet {
 
         int optionSize = 0;
         if (isFlagSet(FLAG_DELAY_REQUESTED))
-            optionSize += 1;
+            optionSize += 2;
         if (isFlagSet(FLAG_FROM_INCLUDED))
             optionSize += _optionFrom.size();
         if (isFlagSet(FLAG_MAX_PACKET_SIZE_INCLUDED))
@@ -310,8 +316,8 @@ public class Packet {
         cur += 2;
         
         if (isFlagSet(FLAG_DELAY_REQUESTED)) {
-            DataHelper.toLong(buffer, cur, 1, _optionDelay > 0 ? _optionDelay : 0);
-            cur++;
+            DataHelper.toLong(buffer, cur, 2, _optionDelay > 0 ? _optionDelay : 0);
+            cur += 2;
         }
         if (isFlagSet(FLAG_FROM_INCLUDED)) {
             cur += _optionFrom.writeBytes(buffer, cur);
@@ -361,7 +367,7 @@ public class Packet {
         size += 2; // flags
 
         if (isFlagSet(FLAG_DELAY_REQUESTED))
-            size += 1;
+            size += 2;
         if (isFlagSet(FLAG_FROM_INCLUDED))
             size += _optionFrom.size();
         if (isFlagSet(FLAG_MAX_PACKET_SIZE_INCLUDED))
@@ -428,8 +434,8 @@ public class Packet {
         
         // ok now lets go back and deal with the options
         if (isFlagSet(FLAG_DELAY_REQUESTED)) {
-            _optionDelay = (int)DataHelper.fromLong(buffer, cur, 1);
-            cur++;
+            _optionDelay = (int)DataHelper.fromLong(buffer, cur, 2);
+            cur += 2;
         }
         if (isFlagSet(FLAG_FROM_INCLUDED)) {
             _optionFrom = new Destination();
@@ -458,10 +464,20 @@ public class Packet {
         if (!isFlagSet(FLAG_SIGNATURE_INCLUDED)) return false;
         if (_optionSignature == null) return false;
         
+        int size = writtenSize();
+        
         if (buffer == null)
-            buffer = new byte[writtenSize()];
-        int size = writePacket(buffer, 0, false);
-        return ctx.dsa().verifySignature(_optionSignature, buffer, 0, size, from.getSigningPublicKey());
+            buffer = new byte[size];
+        int written = writePacket(buffer, 0, false);
+        if (written != size) {
+            ctx.logManager().getLog(Packet.class).error("Written " + written + " size " + size + " for " + toString(), new Exception("moo"));
+            return false;
+        }
+        boolean ok = ctx.dsa().verifySignature(_optionSignature, buffer, 0, size, from.getSigningPublicKey());
+        if (!ok) {
+            ctx.logManager().getLog(Packet.class).error("Signature failed with sig " + Base64.encode(_optionSignature.getData()), new Exception("moo"));
+        }
+        return ok;
     }
 
     /**
@@ -485,7 +501,7 @@ public class Packet {
                               + 1 // resendDelay
                               + 2 // flags
                               + 2 // optionSize
-                              + (isFlagSet(FLAG_DELAY_REQUESTED) ? 1 : 0)
+                              + (isFlagSet(FLAG_DELAY_REQUESTED) ? 2 : 0)
                               + (isFlagSet(FLAG_FROM_INCLUDED) ? _optionFrom.size() : 0)
                               + (isFlagSet(FLAG_MAX_PACKET_SIZE_INCLUDED) ? 2 : 0);
         System.arraycopy(_optionSignature.getData(), 0, buffer, signatureOffset, Signature.SIGNATURE_BYTES);
@@ -497,7 +513,11 @@ public class Packet {
         buf.append(toId(_sendStreamId));
         //buf.append("<-->");
         buf.append(toId(_receiveStreamId)).append(": #").append(_sequenceNum);
-        buf.append(" ").append(toFlagString());
+        if (_sequenceNum < 10) 
+            buf.append(" \t"); // so the tab lines up right
+        else
+            buf.append('\t');
+        buf.append(toFlagString());
         buf.append(" ACK ").append(_ackThrough);
         if (_nacks != null) {
             buf.append(" NACK");
@@ -520,7 +540,7 @@ public class Packet {
     private final String toFlagString() {
         StringBuffer buf = new StringBuffer(32);
         if (isFlagSet(FLAG_CLOSE)) buf.append(" CLOSE");
-        if (isFlagSet(FLAG_DELAY_REQUESTED)) buf.append(" DELAY");
+        if (isFlagSet(FLAG_DELAY_REQUESTED)) buf.append(" DELAY ").append(_optionDelay);
         if (isFlagSet(FLAG_ECHO)) buf.append(" ECHO");
         if (isFlagSet(FLAG_FROM_INCLUDED)) buf.append(" FROM");
         if (isFlagSet(FLAG_MAX_PACKET_SIZE_INCLUDED)) buf.append(" MS");

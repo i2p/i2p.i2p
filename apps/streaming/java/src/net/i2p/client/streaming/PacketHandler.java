@@ -6,9 +6,11 @@ import java.util.Set;
 import java.text.SimpleDateFormat;
 
 import net.i2p.I2PAppContext;
+import net.i2p.I2PException;
 import net.i2p.data.Base64;
 import net.i2p.data.DataHelper;
 import net.i2p.util.Log;
+import net.i2p.util.SimpleTimer;
 
 /**
  * receive a packet and dispatch it correctly to the connection specified,
@@ -19,35 +21,71 @@ public class PacketHandler {
     private ConnectionManager _manager;
     private I2PAppContext _context;
     private Log _log;
+    private int _lastDelay;
     
     public PacketHandler(I2PAppContext ctx, ConnectionManager mgr) {
         _manager = mgr;
         _context = ctx;
         _log = ctx.logManager().getLog(PacketHandler.class);
+        _lastDelay = _context.random().nextInt(30*1000);
     }
     
     private boolean choke(Packet packet) {
         if (false) {
-            // artificial choke: 2% random drop and a 1s
-            // random delay
+            // artificial choke: 2% random drop and a 0-30s
+            // random tiered delay from 0-30s
             if (_context.random().nextInt(100) >= 98) {
-                _log.error("DROP: " + packet);
+                displayPacket(packet, "DROP");
                 return false;
             } else {
-                int delay = _context.random().nextInt(1000);
-                try { Thread.sleep(delay); } catch (InterruptedException ie) {}
-                _log.debug("OK  : " + packet + " delay = " + delay);
-                return true;
+                /*
+                int delay = _context.random().nextInt(5*1000);
+                */
+                int delay = _context.random().nextInt(6*1000);
+                int delayFactor = _context.random().nextInt(100);
+                if (delayFactor > 80) {
+                    if (delayFactor > 98)
+                        delay *= 5;
+                    else if (delayFactor > 95)
+                        delay *= 4;
+                    else if (delayFactor > 90)
+                        delay *= 3;
+                    else
+                        delay *= 2;
+                }
+                 
+                if (_context.random().nextInt(100) >= 20)
+                    delay = _lastDelay;
+                
+                _lastDelay = delay;
+                SimpleTimer.getInstance().addEvent(new Reinject(packet, delay), delay);
+                return false;
             }
         } else {
             return true;
         }
     }
     
+    private class Reinject implements SimpleTimer.TimedEvent {
+        private Packet _packet;
+        private int _delay;
+        public Reinject(Packet packet, int delay) {
+            _packet = packet;
+            _delay = delay;
+        }
+        public void timeReached() {
+            _log.debug("Reinjecting after " + _delay + ": " + _packet);
+            receivePacketDirect(_packet);
+        }
+    }
+    
     void receivePacket(Packet packet) {
         boolean ok = choke(packet);
-        if (!ok) return;
-        
+        if (ok)
+            receivePacketDirect(packet);
+    }
+    
+    private void receivePacketDirect(Packet packet) {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("packet received: " + packet);
         
@@ -58,21 +96,20 @@ public class PacketHandler {
         Connection con = (sendId != null ? _manager.getConnectionByInboundId(sendId) : null); 
         if (con != null) {
             receiveKnownCon(con, packet);
-            displayPacket(packet, con);
+            displayPacket(packet, "RECV");
         } else {
             receiveUnknownCon(packet, sendId);
-            displayPacket(packet, null);
+            displayPacket(packet, "UNKN");
         }
     }
     
-    private void displayPacket(Packet packet, Connection con) {
-        if (_log.shouldLog(Log.DEBUG)) {
-            SimpleDateFormat fmt = new SimpleDateFormat("hh:mm:ss.SSS");
-            String now = fmt.format(new Date());
-            String msg = packet + (con != null ? " on " + con : " on unknown con");
-            //_log.debug(msg);
-            System.out.println(now + ": " + msg);
+    private static final SimpleDateFormat _fmt = new SimpleDateFormat("hh:mm:ss.SSS");
+    static void displayPacket(Packet packet, String prefix) {
+        String msg = null;
+        synchronized (_fmt) {
+            msg = _fmt.format(new Date()) + ": " + prefix + " " + packet.toString();
         }
+        System.out.println(msg);
     }
     
     private void receiveKnownCon(Connection con, Packet packet) {
@@ -81,19 +118,36 @@ public class PacketHandler {
             // the packet's receive stream ID also matches what we expect
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("receive valid: " + packet);
-            con.getPacketHandler().receivePacket(packet, con);
+            try {
+                con.getPacketHandler().receivePacket(packet, con);
+            } catch (I2PException ie) {
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("Received forged packet for " + con, ie);
+            }
         } else {
             if (packet.isFlagSet(Packet.FLAG_RESET)) {
                 // refused
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("receive reset: " + packet);
-                con.getPacketHandler().receivePacket(packet, con);
+                try {
+                    con.getPacketHandler().receivePacket(packet, con);
+                } catch (I2PException ie) {
+                    if (_log.shouldLog(Log.WARN))
+                        _log.warn("Received forged reset for " + con, ie);
+                }
             } else if (packet.isFlagSet(Packet.FLAG_SYNCHRONIZE)) {
                 if ( (con.getSendStreamId() == null) || 
                      (DataHelper.eq(con.getSendStreamId(), packet.getReceiveStreamId())) ) {
+                    byte oldId[] =con.getSendStreamId();
                     // con fully established, w00t
                     con.setSendStreamId(packet.getReceiveStreamId());
-                    con.getPacketHandler().receivePacket(packet, con);
+                    try {
+                        con.getPacketHandler().receivePacket(packet, con);
+                    } catch (I2PException ie) {
+                        if (_log.shouldLog(Log.WARN))
+                            _log.warn("Received forged syn for " + con, ie);
+                        con.setSendStreamId(oldId);
+                    }
                 } else {
                     if (_log.shouldLog(Log.WARN))
                         _log.warn("Receive a syn packet with the wrong IDs: " + packet);
@@ -146,7 +200,7 @@ public class PacketHandler {
                     Set cons = _manager.listConnections();
                     for (Iterator iter = cons.iterator(); iter.hasNext(); ) {
                         Connection con = (Connection)iter.next();
-                        buf.append(Base64.encode(con.getReceiveStreamId())).append(" ");
+                        buf.append(con.toString()).append(" ");
                     }
                     _log.warn("Packet belongs to no other cons: " + packet + " connections: " 
                               + buf.toString() + " sendId: " 

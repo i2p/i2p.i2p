@@ -90,17 +90,20 @@ public class MessageInputStream extends InputStream {
      *
      */
     public long[] getNacks() {
-        List ids = null;
         synchronized (_dataLock) {
-            for (long i = _highestReadyBlockId + 1; i < _highestBlockId; i++) {
-                Long l = new Long(i);
-                if (_notYetReadyBlocks.containsKey(l)) {
-                    // ACK
-                } else {
-                    if (ids == null)
-                        ids = new ArrayList(4);
-                    ids.add(l);
-                }
+            return locked_getNacks();
+        }
+    }
+    private long[] locked_getNacks() {
+        List ids = null;
+        for (long i = _highestReadyBlockId + 1; i < _highestBlockId; i++) {
+            Long l = new Long(i);
+            if (_notYetReadyBlocks.containsKey(l)) {
+                // ACK
+            } else {
+                if (ids == null)
+                    ids = new ArrayList(4);
+                ids.add(l);
             }
         }
         if (ids != null) {
@@ -110,6 +113,13 @@ public class MessageInputStream extends InputStream {
             return rv;
         } else {
             return null;
+        }
+    }
+    
+    public void updateAcks(PacketLocal packet) {
+        synchronized (_dataLock) {
+            packet.setAckThrough(_highestBlockId);
+            packet.setNacks(locked_getNacks());
         }
     }
     

@@ -1,6 +1,7 @@
 package net.i2p.client.streaming;
 
 import java.io.InterruptedIOException;
+import java.io.IOException;
 import net.i2p.I2PAppContext;
 import net.i2p.util.Log;
 
@@ -11,16 +12,16 @@ class ConnectionDataReceiver implements MessageOutputStream.DataReceiver {
     private I2PAppContext _context;
     private Log _log;
     private Connection _connection;
+    private MessageOutputStream.WriteStatus _dummyStatus;
     
     public ConnectionDataReceiver(I2PAppContext ctx, Connection con) {
         _context = ctx;
         _log = ctx.logManager().getLog(ConnectionDataReceiver.class);
         _connection = con;
+        _dummyStatus = new DummyStatus();
     }
     
-    public void writeData(byte[] buf, int off, int size) throws InterruptedIOException {
-        if (!_connection.packetSendChoke())
-            throw new InterruptedIOException("Timeout expired waiting to write");
+    public MessageOutputStream.WriteStatus writeData(byte[] buf, int off, int size) {
         boolean doSend = true;
         if ( (size <= 0) && (_connection.getLastSendId() >= 0) ) {
             if (_connection.getOutputStream().getClosed()) {
@@ -45,15 +46,18 @@ class ConnectionDataReceiver implements MessageOutputStream.DataReceiver {
                        + " con: " + _connection, new Exception("write called by"));
 
         if (doSend) {
-            send(buf, off, size);
+            PacketLocal packet = send(buf, off, size);
+            return packet;
         } else {
-            //_connection.flushPackets();
+            return _dummyStatus;
         }
     }
     
-    public void send(byte buf[], int off, int size) {
+    
+    public PacketLocal send(byte buf[], int off, int size) {
         PacketLocal packet = buildPacket(buf, off, size);
         _connection.sendPacket(packet);
+        return packet;
     }
     
     private boolean isAckOnly(int size) {
@@ -67,7 +71,7 @@ class ConnectionDataReceiver implements MessageOutputStream.DataReceiver {
     
     private PacketLocal buildPacket(byte buf[], int off, int size) {
         boolean ackOnly = isAckOnly(size);
-        PacketLocal packet = new PacketLocal(_context, _connection.getRemotePeer());
+        PacketLocal packet = new PacketLocal(_context, _connection.getRemotePeer(), _connection);
         byte data[] = new byte[size];
         if (size > 0)
             System.arraycopy(buf, off, data, 0, size);
@@ -79,8 +83,7 @@ class ConnectionDataReceiver implements MessageOutputStream.DataReceiver {
         packet.setSendStreamId(_connection.getSendStreamId());
         packet.setReceiveStreamId(_connection.getReceiveStreamId());
         
-        packet.setAckThrough(_connection.getInputStream().getHighestBlockId());
-        packet.setNacks(_connection.getInputStream().getNacks());
+        _connection.getInputStream().updateAcks(packet);
         packet.setOptionalDelay(_connection.getOptions().getChoke());
         packet.setOptionalMaxSize(_connection.getOptions().getMaxMessageSize());
         packet.setResendDelay(_connection.getOptions().getResendDelay());
@@ -103,10 +106,18 @@ class ConnectionDataReceiver implements MessageOutputStream.DataReceiver {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Closed is set for a new packet on " + _connection + ": " + packet);
         } else {
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Closed is not set for a new packet on " + _connection + ": " + packet);
+            //if (_log.shouldLog(Log.DEBUG))
+            //    _log.debug("Closed is not set for a new packet on " + _connection + ": " + packet);
         }
         return packet;
     }
+
     
+    private static final class DummyStatus implements MessageOutputStream.WriteStatus {
+        public final void waitForAccept(int maxWaitMs) { return; }
+        public final void waitForCompletion(int maxWaitMs) { return; }
+        public final boolean writeAccepted() { return true; }
+        public final boolean writeFailed() { return false; }
+        public final boolean writeSuccessful() { return true; }
+    }    
 }

@@ -77,7 +77,20 @@ class ConnectionHandler {
         }
         
         if (syn != null) {
-			return _manager.receiveConnection(syn);
+            // deal with forged / invalid syn packets
+            Connection con = _manager.receiveConnection(syn);
+            if (con != null) {
+                return con;
+            } else if (timeoutMs > 0) {
+                long remaining = expiration - _context.clock().now();
+                if (remaining <= 0) {
+                    return null;
+                } else {
+                    return accept(remaining);
+                }
+            } else {
+                return accept(timeoutMs);
+            }
         } else {
             return null;
         }

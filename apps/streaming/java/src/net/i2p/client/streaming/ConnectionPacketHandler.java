@@ -3,6 +3,7 @@ package net.i2p.client.streaming;
 import java.util.List;
 
 import net.i2p.I2PAppContext;
+import net.i2p.I2PException;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
 import net.i2p.util.Log;
@@ -25,7 +26,7 @@ public class ConnectionPacketHandler {
     }
     
     /** distribute a packet to the connection specified */
-    void receivePacket(Packet packet, Connection con) {
+    void receivePacket(Packet packet, Connection con) throws I2PException {
         boolean ok = verifyPacket(packet, con);
         if (!ok) return;
         boolean isNew = con.getInputStream().messageReceived(packet.getSequenceNum(), packet.getPayload());
@@ -36,15 +37,17 @@ public class ConnectionPacketHandler {
         
         if (isNew) {
             con.incrementUnackedPacketsReceived();
-            long nextTime = con.getNextSendTime();
-            if (nextTime <= 0) {
-                con.setNextSendTime(con.getOptions().getSendAckDelay() + _context.clock().now());
+            if (packet.isFlagSet(Packet.FLAG_DELAY_REQUESTED) && (packet.getOptionalDelay() <= 0) ) {
                 if (_log.shouldLog(Log.DEBUG))
-                    _log.debug("Scheduling ack in " + con.getOptions().getSendAckDelay() + "ms for received packet " + packet);
+                    _log.debug("Scheduling immediate ack for " + packet);
+                con.setNextSendTime(_context.clock().now() + con.getOptions().getSendAckDelay());
             } else {
+                int delay = con.getOptions().getSendAckDelay();
+                if (packet.isFlagSet(Packet.FLAG_DELAY_REQUESTED)) // delayed ACK requested
+                    delay += packet.getOptionalDelay();
+                con.setNextSendTime(delay + _context.clock().now());
                 if (_log.shouldLog(Log.DEBUG))
-                    _log.debug("Ack is already scheduled in " + (nextTime-_context.clock().now()) 
-                               + "ms, though we just received " + packet);
+                    _log.debug("Scheduling ack in " + delay + "ms for received packet " + packet);
             }
         } else {
             if (packet.getSequenceNum() > 0) {
@@ -54,9 +57,15 @@ public class ConnectionPacketHandler {
                 if (_log.shouldLog(Log.WARN))
                     _log.warn("congestion.. dup " + packet);   
                 con.incrementUnackedPacketsReceived();
+                con.setNextSendTime(_context.clock().now() + con.getOptions().getSendAckDelay());
             } else {
-                if (_log.shouldLog(Log.DEBUG))
-                    _log.debug("ACK only packet received: " + packet);
+                if (packet.isFlagSet(Packet.FLAG_SYNCHRONIZE)) {
+                    con.incrementUnackedPacketsReceived();
+                    con.setNextSendTime(_context.clock().now() + con.getOptions().getSendAckDelay());
+                } else {
+                    if (_log.shouldLog(Log.DEBUG))
+                        _log.debug("ACK only packet received: " + packet);
+                }
             }
         }
         
@@ -65,14 +74,14 @@ public class ConnectionPacketHandler {
         if ( (acked != null) && (acked.size() > 0) ) {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug(acked.size() + " of our packets acked with " + packet);
-            // use the lowest RTT, since these would likely be bunched together,
-            // waiting for the most recent packet received before sending the ACK
-            int lowestRtt = -1;
+            // use the highest RTT, since these would likely be bunched together,
+            // and the highest rtt lets us set our resend delay properly
+            int highestRTT = -1;
             for (int i = 0; i < acked.size(); i++) {
                 PacketLocal p = (PacketLocal)acked.get(i);
-                if ( (lowestRtt < 0) || (p.getAckTime() < lowestRtt) ) {
+                if (p.getAckTime() > highestRTT) {
                     //if (p.getNumSends() <= 1)
-                    lowestRtt = p.getAckTime();
+                    highestRTT = p.getAckTime();
                 }
                 
                 if (p.getNumSends() > 1)
@@ -88,24 +97,25 @@ public class ConnectionPacketHandler {
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("Packet acked after " + p.getAckTime() + "ms: " + p);
             }
-            if (lowestRtt > 0) {
+            if (highestRTT > 0) {
                 int oldRTT = con.getOptions().getRTT();
-                int newRTT = (int)(RTT_DAMPENING*oldRTT + (1-RTT_DAMPENING)*lowestRtt);
+                int newRTT = (int)(RTT_DAMPENING*oldRTT + (1-RTT_DAMPENING)*highestRTT);
                 con.getOptions().setRTT(newRTT);
             }
         }
 
-        boolean fastAck = adjustWindow(con, isNew, packet.getSequenceNum(), numResends);
+        boolean fastAck = adjustWindow(con, isNew, packet.getSequenceNum(), numResends, (acked != null ? acked.size() : 0));
         con.eventOccurred();
         if (fastAck) {
             if (con.getLastSendTime() + con.getOptions().getRTT() < _context.clock().now()) {
-                _log.error("Fast ack for dup " + packet);
+                if (_log.shouldLog(Log.DEBUG))
+                    _log.debug("Fast ack for dup " + packet);
                 con.ackImmediately();
             }
         }
     }
     
-    private boolean adjustWindow(Connection con, boolean isNew, long sequenceNum, int numResends) {
+    private boolean adjustWindow(Connection con, boolean isNew, long sequenceNum, int numResends, int acked) {
         if ( (!isNew) && (sequenceNum > 0) ) {
             // dup real packet
             int oldSize = con.getOptions().getWindowSize();
@@ -115,22 +125,17 @@ public class ConnectionPacketHandler {
             con.getOptions().setWindowSize(oldSize);
             return true;
         } else if (numResends > 0) {
-            int newWindowSize = con.getOptions().getWindowSize();
-            newWindowSize /= 2; // >>>= numResends;
-            if (newWindowSize <= 0)
-                newWindowSize = 1;
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Shrink the window to " + newWindowSize + " (#resends: " + numResends 
-                           + ") for " + con);
-            con.getOptions().setWindowSize(newWindowSize);
+            // window sizes are shrunk on resend, not on ack
         } else {
-            // new packet that ack'ed uncongested data, or an empty ack
-            int newWindowSize = con.getOptions().getWindowSize();
-            newWindowSize += 1; //acked.size();
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("New window size " + newWindowSize + " (#resends: " + numResends 
-                           + ") for " + con);
-            con.getOptions().setWindowSize(newWindowSize);
+            if (acked > 0) { 
+                // new packet that ack'ed uncongested data, or an empty ack
+                int newWindowSize = con.getOptions().getWindowSize();
+                newWindowSize += 1; // acked; // 1
+                if (_log.shouldLog(Log.DEBUG))
+                    _log.debug("New window size " + newWindowSize + " (#resends: " + numResends 
+                               + ") for " + con);
+                con.getOptions().setWindowSize(newWindowSize);
+            }
         }
         return false;
     }
@@ -141,12 +146,12 @@ public class ConnectionPacketHandler {
      * @return true if the packet is ok for this connection, false if we shouldn't
      *         continue processing.
      */
-    private boolean verifyPacket(Packet packet, Connection con) {
+    private boolean verifyPacket(Packet packet, Connection con) throws I2PException {
         if (packet.isFlagSet(Packet.FLAG_RESET)) {
             verifyReset(packet, con);
             return false;
         } else {
-            boolean sigOk = verifySignature(packet, con);
+            verifySignature(packet, con);
             
             if (con.getSendStreamId() == null) {
                 if (packet.isFlagSet(Packet.FLAG_SYNCHRONIZE)) {
@@ -204,9 +209,9 @@ public class ConnectionPacketHandler {
     /**
      * Verify the signature if necessary.  
      *
-     * @return false only if the signature was required and it was invalid
+     * @throws I2PException if the signature was necessary and it was invalid
      */
-    private boolean verifySignature(Packet packet, Connection con) {
+    private void verifySignature(Packet packet, Connection con) throws I2PException {
         // verify the signature if necessary
         if (con.getOptions().getRequireFullySigned() || 
             packet.isFlagSet(Packet.FLAG_SYNCHRONIZE) ||
@@ -217,11 +222,8 @@ public class ConnectionPacketHandler {
                 from = packet.getOptionalFrom();
             boolean sigOk = packet.verifySignature(_context, from, null);
             if (!sigOk) {
-                if (_log.shouldLog(Log.WARN))
-                    _log.warn("Received unsigned / forged packet: " + packet);
-                return false;
+                throw new I2PException("Received unsigned / forged packet: " + packet);
             }
         }
-        return true;
     }    
 }

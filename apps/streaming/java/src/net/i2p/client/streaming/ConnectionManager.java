@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Set;
 
 import net.i2p.I2PAppContext;
+import net.i2p.I2PException;
 import net.i2p.client.I2PSession;
 import net.i2p.data.ByteArray;
 import net.i2p.data.Destination;
@@ -90,7 +91,14 @@ public class ConnectionManager {
         }
         
         con.setReceiveStreamId(receiveId);
-        con.getPacketHandler().receivePacket(synPacket, con);
+        try {
+            con.getPacketHandler().receivePacket(synPacket, con);
+        } catch (I2PException ie) {
+            synchronized (_connectionLock) {
+                _connectionByInboundId.remove(new ByteArray(receiveId));
+            }
+            return null;
+        }
         return con;
     }
     

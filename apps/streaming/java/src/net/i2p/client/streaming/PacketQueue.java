@@ -29,6 +29,7 @@ class PacketQueue {
      * Add a new packet to be sent out ASAP
      */
     public void enqueue(PacketLocal packet) {
+        packet.prepare();
         int size = 0;
         if (packet.shouldSign())
             size = packet.writeSignedPacket(_buf, 0, _context, _session.getPrivateKey());
@@ -42,8 +43,12 @@ class PacketQueue {
         if (tagsSent == null)
             tagsSent = new HashSet();
         try {
+            // cache this from before sendMessage
+            String conStr = packet.getConnection() + "";
             // this should not block!
+            long begin = _context.clock().now();
             boolean sent = _session.sendMessage(packet.getTo(), _buf, 0, size, keyUsed, tagsSent);
+            long end = _context.clock().now();
             if (!sent) {
                 if (_log.shouldLog(Log.WARN))
                     _log.warn("Send failed for " + packet);
@@ -55,13 +60,17 @@ class PacketQueue {
                     String msg = "SEND " + packet + (tagsSent.size() > 0 
                                                      ? " with " + tagsSent.size() + " tags"
                                                      : "")
-                                                     + " send # " + packet.getNumSends();
+                                                     + " send # " + packet.getNumSends()
+                                                     + " sendTime: " + (end-begin)
+                                                     + " con: " + conStr;
                     _log.debug(msg);
                 }
+                PacketHandler.displayPacket(packet, "SEND");
             }
         } catch (I2PSessionException ise) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Unable to send the packet " + packet, ise);
         }
     }
+    
 }

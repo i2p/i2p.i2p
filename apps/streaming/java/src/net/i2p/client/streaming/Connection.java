@@ -92,9 +92,9 @@ public class Connection {
      *
      * @return true if the packet should be sent
      */
-    boolean packetSendChoke() {
+    boolean packetSendChoke(long timeoutMs) {
         if (false) return true;
-        long writeExpire = _options.getWriteTimeout();
+        long writeExpire = timeoutMs;
         while (true) {
             long timeLeft = writeExpire - _context.clock().now();
             synchronized (_outboundPackets) {
@@ -130,7 +130,7 @@ public class Connection {
     void sendAvailable() {
         // this grabs the data, builds a packet, and queues it up via sendPacket
         try {
-            _outputStream.flushAvailable(_receiver);
+            _outputStream.flushAvailable(_receiver, false);
         } catch (IOException ioe) {
             if (_log.shouldLog(Log.ERROR))
                 _log.error("Error flushing available", ioe);
@@ -149,12 +149,28 @@ public class Connection {
                 
         if ( (packet.getSequenceNum() == 0) && (!packet.isFlagSet(Packet.FLAG_SYNCHRONIZE)) ) {
             ackOnly = true;
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("No resend for " + packet);
         } else {
+            int remaining = 0;
             synchronized (_outboundPackets) {
                 _outboundPackets.put(new Long(packet.getSequenceNum()), packet);
+                remaining = _options.getWindowSize() - _outboundPackets.size() ;
                 _outboundPackets.notifyAll();
             }
-            SimpleTimer.getInstance().addEvent(new ResendPacketEvent(packet), _options.getRTT()*2);
+            if (remaining < 0) 
+                remaining = 0;
+            if (packet.isFlagSet(Packet.FLAG_CLOSE) || (remaining < 2)) {
+                packet.setOptionalDelay(0);
+            } else {
+                int delay = _options.getRTT() / 2;
+                packet.setOptionalDelay(delay);
+                _log.debug("Requesting ack delay of " + delay + "ms for packet " + packet);
+            }
+            packet.setFlag(Packet.FLAG_DELAY_REQUESTED);
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Resend in " + (_options.getRTT()*2) + " for " + packet);
+            SimpleTimer.getInstance().addEvent(new ResendPacketEvent(packet), (_options.getRTT()*2 < 5000 ? 5000 : _options.getRTT()*2));
         }
 
         _lastSendTime = _context.clock().now();
@@ -167,7 +183,7 @@ public class Connection {
             // ACKs don't get ACKed, but pings do.
             if (packet.getTagsSent().size() > 0) {
                 _log.warn("Sending a ping since the ACK we just sent has " + packet.getTagsSent().size() + " tags");
-                _connectionManager.ping(_remotePeer, _options.getRTT()*2, false, packet.getKeyUsed(), packet.getTagsSent());
+                _connectionManager.ping(_remotePeer, 30*1000, false, packet.getKeyUsed(), packet.getTagsSent());
             }
         }
     }
@@ -178,13 +194,17 @@ public class Connection {
             for (Iterator iter = _outboundPackets.keySet().iterator(); iter.hasNext(); ) {
                 Long id = (Long)iter.next();
                 if (id.longValue() <= ackThrough) {
+                    boolean nacked = false;
                     if (nacks != null) {
                         // linear search since its probably really tiny
-                        for (int i = 0; i < nacks.length; i++)
-                            if (nacks[i] == id.longValue())
-                                continue; // NACKed
-                    } else {
-                        // ACKed
+                        for (int i = 0; i < nacks.length; i++) {
+                            if (nacks[i] == id.longValue()) {
+                                nacked = true;
+                                break; // NACKed
+                            }
+                        }
+                    }
+                    if (!nacked) { // aka ACKed
                         if (acked == null) 
                             acked = new ArrayList(1);
                         PacketLocal ackedPacket = (PacketLocal)_outboundPackets.get(id);
@@ -231,16 +251,15 @@ public class Connection {
         
         if (cleanDisconnect) {
             // send close packets and schedule stuff...
-            try { 
-                _outputStream.close();
-                _inputStream.close();
-            } catch (IOException ioe) {
-                if (_log.shouldLog(Log.WARN))
-                    _log.warn("Error on clean disconnect", ioe);
-            }
+            _outputStream.closeInternal();
+            _inputStream.close();
         } else {
             doClose();
             synchronized (_outboundPackets) {
+                for (Iterator iter = _outboundPackets.values().iterator(); iter.hasNext(); ) {
+                    PacketLocal pl = (PacketLocal)iter.next();
+                    pl.cancelled();
+                }
                 _outboundPackets.clear();
                 _outboundPackets.notifyAll();
             }
@@ -297,10 +316,25 @@ public class Connection {
      */
     public long getNextSendTime() { return _nextSendTime; }
     public void setNextSendTime(long when) { 
-        if (_nextSendTime > 0)
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("set next send time to " + (when-_nextSendTime) + "ms after it was before ("+when+")");
-        _nextSendTime = when; 
+        if (_nextSendTime >= 0) {
+            if (when < _nextSendTime)
+                _nextSendTime = when;
+        } else {
+            _nextSendTime = when; 
+        }
+
+        if (_nextSendTime >= 0) {
+            long max = _context.clock().now() + _options.getSendAckDelay();
+            if (max < _nextSendTime)
+                _nextSendTime = max;
+        }
+        
+        if (_log.shouldLog(Log.DEBUG) && false) {
+            if (_nextSendTime <= 0) 
+                _log.debug("set next send time to an unknown time", new Exception(toString()));
+            else
+                _log.debug("set next send time to " + (_nextSendTime-_context.clock().now()) + "ms from now", new Exception(toString()));
+        }
     }
     
     public long getAckedPackets() { return _ackedPackets; }
@@ -346,6 +380,12 @@ public class Connection {
             buf.append("] ");
         }
         buf.append("unacked inbound? ").append(getUnackedPacketsReceived());
+        buf.append(" [high ").append(_inputStream.getHighestBlockId());
+        long nacks[] = _inputStream.getNacks();
+        if (nacks != null)
+            for (int i = 0; i < nacks.length; i++)
+                buf.append(" ").append(nacks[i]);
+        buf.append("]");
         buf.append("]");
         return buf.toString();
     }
@@ -360,6 +400,8 @@ public class Connection {
         }
         
         public void timeReached() {
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Resend period reached for " + _packet);
             boolean resend = false;
             synchronized (_outboundPackets) {
                 if (_outboundPackets.containsKey(new Long(_packet.getSequenceNum())))
@@ -367,18 +409,26 @@ public class Connection {
             }
             if ( (resend) && (_packet.getAckTime() < 0) ) {
                 // revamp various fields, in case we need to ack more, etc
-                _packet.setAckThrough(getInputStream().getHighestBlockId());
-                _packet.setNacks(getInputStream().getNacks());
+                _inputStream.updateAcks(_packet);
                 _packet.setOptionalDelay(getOptions().getChoke());
                 _packet.setOptionalMaxSize(getOptions().getMaxMessageSize());
                 _packet.setResendDelay(getOptions().getResendDelay());
                 _packet.setReceiveStreamId(_receiveStreamId);
                 _packet.setSendStreamId(_sendStreamId);
 
+                // shrink the window
+                int newWindowSize = getOptions().getWindowSize();
+                newWindowSize /= 2;
+                if (newWindowSize <= 0)
+                    newWindowSize = 1;
+                getOptions().setWindowSize(newWindowSize);
+                
                 int numSends = _packet.getNumSends() + 1;
                 
                 if (_log.shouldLog(Log.WARN))
-                    _log.warn("Resend packet " + _packet + " time " + numSends + " on " + Connection.this);
+                    _log.warn("Resend packet " + _packet + " time " + numSends + " (wsize "
+                              + newWindowSize + " lifetime " 
+                              + (_context.clock().now() - _packet.getCreatedOn()) + "ms)");
                 _outboundQueue.enqueue(_packet);
                 
                 if (numSends > _options.getMaxResends()) {
@@ -387,14 +437,15 @@ public class Connection {
                     disconnect(false);
                 } else {
                     //long timeout = _options.getResendDelay() << numSends;
-                    long timeout = _options.getRTT() << numSends;
+                    long timeout = _options.getRTT() << (numSends-1);
                     if (_log.shouldLog(Log.DEBUG))
-                        _log.debug("Scheduling resend in " + timeout + "ms");
+                        _log.debug("Scheduling resend in " + timeout + "ms for " + _packet);
                     SimpleTimer.getInstance().addEvent(ResendPacketEvent.this, timeout);
                 }
             } else {
                 if (_log.shouldLog(Log.DEBUG))
-                    _log.debug("Packet acked before resend: " + _packet + " on " + Connection.this);
+                    _log.debug("Packet acked before resend (resend="+ resend + "): " 
+                               + _packet + " on " + Connection.this);
             }
         }
     }

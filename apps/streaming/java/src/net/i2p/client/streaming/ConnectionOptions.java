@@ -52,10 +52,10 @@ public class ConnectionOptions extends I2PSocketOptions {
             setConnectDelay(2*1000);
             setProfile(PROFILE_BULK);
             setMaxMessageSize(Packet.MAX_PAYLOAD_SIZE);
-            setRTT(5*1000);
+            setRTT(30*1000);
             setReceiveWindow(1);
             setResendDelay(5*1000);
-            setSendAckDelay(1*1000);
+            setSendAckDelay(2*1000);
             setWindowSize(1);
             setMaxResends(10);
             setWriteTimeout(-1);
@@ -102,7 +102,11 @@ public class ConnectionOptions extends I2PSocketOptions {
      * What to set the round trip time estimate to (in milliseconds)
      */
     public int getRTT() { return _rtt; }
-    public void setRTT(int ms) { _rtt = ms; }
+    public void setRTT(int ms) { 
+        _rtt = ms; 
+        if (_rtt > 60*1000)
+            _rtt = 60*1000;
+    }
     
     /** How long after sending a packet will we wait before resending? */
     public int getResendDelay() { return _resendDelay; }
