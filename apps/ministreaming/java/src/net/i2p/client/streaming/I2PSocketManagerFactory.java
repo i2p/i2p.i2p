@@ -81,6 +81,7 @@ public class I2PSocketManagerFactory {
     private static I2PSocketManager createManager(I2PSession session) {
         I2PSocketManager mgr = new I2PSocketManager();
         mgr.setSession(session);
+        mgr.setDefaultOptions(new I2PSocketOptions());
         return mgr;
     }
 }

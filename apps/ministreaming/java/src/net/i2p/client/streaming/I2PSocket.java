@@ -32,8 +32,18 @@ public interface I2PSocket {
      */
     public OutputStream getOutputStream() throws IOException;
 
+    /** 
+     * Retrieve this socket's configuration
+     */
+    public I2PSocketOptions getOptions();
+    /** 
+     * Configure the socket
+     */
+    public void setOptions(I2PSocketOptions options);
+    
     /**
-     * How long we will wait blocked on a read() operation.
+     * How long we will wait blocked on a read() operation.  This is simply a
+     * helper to query the I2PSocketOptions
      *
      * @return milliseconds to wait, or -1 if we will wait indefinitely
      */
@@ -41,7 +51,8 @@ public interface I2PSocket {
 
     /**
      * Define how long we will wait blocked on a read() operation (-1 will make
-     * the socket wait forever).
+     * the socket wait forever).  This is simply a helper to adjust the 
+     * I2PSocketOptions
      *
      */
     public void setReadTimeout(long ms);

@@ -40,6 +40,7 @@ class I2PSocketImpl implements I2PSocket {
     private long _createdOn;
     private long _closedOn;
     private long _remoteIdSetTime;
+    private I2PSocketOptions _options;
     private Object flagLock = new Object();
 
     /**
@@ -81,6 +82,7 @@ class I2PSocketImpl implements I2PSocket {
         _createdOn = I2PAppContext.getGlobalContext().clock().now();
         _remoteIdSetTime = -1;
         _closedOn = -1;
+        _options = mgr.getDefaultOptions();
     }
 
     /**
@@ -176,7 +178,21 @@ class I2PSocketImpl implements I2PSocket {
      */
     public void queueData(byte[] data) {
         _bytesRead += data.length;
-        in.queueData(data);
+        try {
+            in.queueData(data);
+        } catch (InterruptedIOException iie) {
+            if (_log.shouldLog(Log.ERROR))
+                _log.error("Queue overflow, closing the stream", iie);
+            try {
+                close();
+            } catch (IOException ioe) {
+                if (_log.shouldLog(Log.ERROR))
+                    _log.error("Error closing the stream due to overflow", ioe);
+            }
+        } catch (IOException ioe) {
+            if (_log.shouldLog(Log.ERROR))
+                _log.error("Connection closed while writing to the socket", ioe);
+        }
     }
 
     /**
@@ -245,19 +261,36 @@ class I2PSocketImpl implements I2PSocket {
             return (byte)(I2PSocketManager.DATA_OUT + (byte)add);
     }
 
+    public void setOptions(I2PSocketOptions options) {
+        _options = options;
+        in.setReadTimeout(options.getReadTimeout());
+    }
+    
+    public I2PSocketOptions getOptions() { 
+        return _options;
+    }
+    
     /**
-     * What is the longest we'll block on the input stream while waiting
-     * for more data?  If this value is exceeded, the read() throws 
-     * InterruptedIOException
+     * How long we will wait blocked on a read() operation.  This is simply a
+     * helper to query the I2PSocketOptions
+     *
+     * @return milliseconds to wait, or -1 if we will wait indefinitely
      */
     public long getReadTimeout() {
-        return in.getReadTimeout();
+        return _options.getReadTimeout();
     }
 
+    /**
+     * Define how long we will wait blocked on a read() operation (-1 will make
+     * the socket wait forever).  This is simply a helper to adjust the 
+     * I2PSocketOptions
+     *
+     */
     public void setReadTimeout(long ms) {
+        _options.setReadTimeout(ms);
         in.setReadTimeout(ms);
     }
-
+    
     public void setSocketErrorListener(SocketErrorListener lsnr) {
         _socketErrorListener = lsnr;
     }
@@ -279,6 +312,7 @@ class I2PSocketImpl implements I2PSocket {
     private class I2PInputStream extends InputStream {
 
         private ByteCollector bc = new ByteCollector();
+        private boolean inStreamClosed = false;
 
         private long readTimeout = -1;
 
@@ -306,6 +340,7 @@ class I2PSocketImpl implements I2PSocket {
             byte[] read = null;
             synchronized (bc) {
                 read = bc.startToByteArray(len);
+                bc.notifyAll();
             }
             boolean timedOut = false;
 
@@ -334,6 +369,7 @@ class I2PSocketImpl implements I2PSocket {
 
                 synchronized (bc) {
                     read = bc.startToByteArray(len);
+                    bc.notifyAll();
                 }
             }
             if (read.length > len) throw new RuntimeException("BUG");
@@ -357,14 +393,44 @@ class I2PSocketImpl implements I2PSocket {
             }
         }
 
-        public void queueData(byte[] data) {
+        /**
+         * Add the data to the queue
+         *
+         * @throws InterruptedIOException if the queue's buffer is full, the socket has
+         *                                a write timeout, and that timeout is exceeded
+         * @throws IOException if the connection was closed while queueing up the data
+         */
+        public void queueData(byte[] data) throws InterruptedIOException, IOException {
             queueData(data, 0, data.length);
         }
 
-        public void queueData(byte[] data, int off, int len) {
+        /**
+         * Add the data to the queue
+         *
+         * @throws InterruptedIOException if the queue's buffer is full, the socket has
+         *                                a write timeout, and that timeout is exceeded
+         * @throws IOException if the connection was closed while queueing up the data
+         */
+        public void queueData(byte[] data, int off, int len) throws InterruptedIOException, IOException {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug(getPrefix() + "Insert " + len + " bytes into queue: " + hashCode());
             synchronized (bc) {
+                if (_options.getMaxBufferSize() > 0) {
+                    int waited = 0;
+                    while (bc.getCurrentSize() + len > _options.getMaxBufferSize()) {
+                        if (_log.shouldLog(Log.DEBUG))
+                            _log.debug("Buffer size exceeded: pending " + bc.getCurrentSize() + " limit " + _options.getMaxBufferSize());
+                        if ( (_options.getWriteTimeout() > 0) && (waited > _options.getWriteTimeout()) ) {
+                            throw new InterruptedIOException("Waited " + waited + "ms to write " + len + " with a buffer at " + bc.getCurrentSize());
+                        }
+                        if (inStreamClosed)
+                            throw new IOException("Stream closed while writing");
+                        try {
+                            bc.wait(1000);
+                            waited += 1000;
+                        } catch (InterruptedException ie) {}
+                    }
+                }
                 bc.append(data, off, len);
             }
             synchronized (I2PInputStream.this) {
@@ -381,6 +447,10 @@ class I2PSocketImpl implements I2PSocket {
         public void close() throws IOException {
             super.close();
             notifyClosed();
+            synchronized (bc) {
+                inStreamClosed = true;
+                bc.notifyAll();
+            }
         }
 
     }

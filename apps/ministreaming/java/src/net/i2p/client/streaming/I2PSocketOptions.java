@@ -6,9 +6,17 @@ package net.i2p.client.streaming;
  */
 public class I2PSocketOptions {
     private long _connectTimeout;
+    private long _readTimeout;
+    private long _writeTimeout;
+    private int _maxBufferSize;
 
+    public static final int DEFAULT_BUFFER_SIZE = 1024*128;
+    
     public I2PSocketOptions() {
         _connectTimeout = -1;
+        _readTimeout = -1;
+        _writeTimeout = -1;
+        _maxBufferSize = DEFAULT_BUFFER_SIZE;
     }
 
     /**
@@ -26,5 +34,66 @@ public class I2PSocketOptions {
      */
     public void setConnectTimeout(long ms) {
         _connectTimeout = ms;
+    }
+    
+    /**
+     * What is the longest we'll block on the input stream while waiting
+     * for more data?  If this value is exceeded, the read() throws 
+     * InterruptedIOException
+     */
+    public long getReadTimeout() {
+        return _readTimeout;
+    }
+
+    /**
+     * What is the longest we'll block on the input stream while waiting
+     * for more data?  If this value is exceeded, the read() throws 
+     * InterruptedIOException
+     */
+    public void setReadTimeout(long ms) {
+        _readTimeout = ms;
+    }
+    
+    /**
+     * How much data will we accept that hasn't been written out yet.  After 
+     * this amount has been exceeded, subsequent .write calls will block until
+     * either some data is removed or the connection is closed.  If this is 
+     * less than or equal to zero, there is no limit (warning: can eat ram)
+     *
+     * @return buffer size limit, in bytes
+     */
+    public int getMaxBufferSize() {
+        return _maxBufferSize; 
+    }
+    
+    /**
+     * How much data will we accept that hasn't been written out yet.  After 
+     * this amount has been exceeded, subsequent .write calls will block until
+     * either some data is removed or the connection is closed.  If this is 
+     * less than or equal to zero, there is no limit (warning: can eat ram)
+     *
+     */
+    public void setMaxBufferSize(int numBytes) {
+        _maxBufferSize = numBytes; 
+    }
+    
+    /**
+     * What is the longest we'll block on the output stream while waiting
+     * for the data to flush?  If this value is exceeded, the write() throws 
+     * InterruptedIOException.  If this is less than or equal to zero, there 
+     * is no timeout.
+     */
+    public long getWriteTimeout() {
+        return _writeTimeout;
+    }
+
+    /**
+     * What is the longest we'll block on the output stream while waiting
+     * for the data to flush?  If this value is exceeded, the write() throws 
+     * InterruptedIOException.  If this is less than or equal to zero, there 
+     * is no timeout.
+     */
+    public void setWriteTimeout(long ms) {
+        _writeTimeout = ms;
     }
 }

@@ -377,7 +377,7 @@ public class I2PSocketManager implements I2PSessionListener {
      *
      * @throws IllegalStateException if the socket isn't open or isn't known
      */
-    private void sendIncoming(String id, byte payload[]) {
+    private void sendIncoming(String id, byte payload[]) throws IllegalStateException {
         I2PSocketImpl s = null;
         synchronized (lock) {
             s = (I2PSocketImpl) _inSockets.get(id);
@@ -469,7 +469,10 @@ public class I2PSocketManager implements I2PSessionListener {
                 _context.statManager().addRateData("streaming.synNoAck", 1, 1);
                 throw new I2PException("Error sending through I2P network");
             }
-            remoteID = s.getRemoteID(true, options.getConnectTimeout());
+            if (options != null)
+                remoteID = s.getRemoteID(true, options.getConnectTimeout());
+            else
+                remoteID = s.getRemoteID(true, getDefaultOptions().getConnectTimeout());
             
             if (remoteID == null) {
                 _context.statManager().addRateData("streaming.nackReceived", 1, 1);
