@@ -118,9 +118,8 @@ public class ClientConfig {
      * @param averagePeriods
      *            list of minutes to summarize over
      */
-    public ClientConfig(Destination peer, Destination us, String statFile,
-            int duration, int statFreq, int sendFreq, int sendSize,
-            int numHops, String comment, int averagePeriods[]) {
+    public ClientConfig(Destination peer, Destination us, String statFile, int duration, int statFreq, int sendFreq,
+            int sendSize, int numHops, String comment, int averagePeriods[]) {
         _peer = peer;
         _us = us;
         _statFile = statFile;
@@ -345,25 +344,16 @@ public class ClientConfig {
      */
     public boolean load(Properties clientConfig, int peerNum) {
         if ((clientConfig == null) || (peerNum < 0)) return false;
-        String peerVal = clientConfig.getProperty(PROP_PREFIX + peerNum
-                + PROP_PEER);
-        String statFileVal = clientConfig.getProperty(PROP_PREFIX + peerNum
-                + PROP_STATFILE);
-        String statDurationVal = clientConfig.getProperty(PROP_PREFIX + peerNum
-                + PROP_STATDURATION);
-        String statFrequencyVal = clientConfig.getProperty(PROP_PREFIX
-                + peerNum + PROP_STATFREQUENCY);
-        String sendFrequencyVal = clientConfig.getProperty(PROP_PREFIX
-                + peerNum + PROP_SENDFREQUENCY);
-        String sendSizeVal = clientConfig.getProperty(PROP_PREFIX + peerNum
-                + PROP_SENDSIZE);
-        String commentVal = clientConfig.getProperty(PROP_PREFIX + peerNum
-                + PROP_COMMENT);
-        String periodsVal = clientConfig.getProperty(PROP_PREFIX + peerNum
-                + PROP_AVERAGEPERIODS);
+        String peerVal = clientConfig.getProperty(PROP_PREFIX + peerNum + PROP_PEER);
+        String statFileVal = clientConfig.getProperty(PROP_PREFIX + peerNum + PROP_STATFILE);
+        String statDurationVal = clientConfig.getProperty(PROP_PREFIX + peerNum + PROP_STATDURATION);
+        String statFrequencyVal = clientConfig.getProperty(PROP_PREFIX + peerNum + PROP_STATFREQUENCY);
+        String sendFrequencyVal = clientConfig.getProperty(PROP_PREFIX + peerNum + PROP_SENDFREQUENCY);
+        String sendSizeVal = clientConfig.getProperty(PROP_PREFIX + peerNum + PROP_SENDSIZE);
+        String commentVal = clientConfig.getProperty(PROP_PREFIX + peerNum + PROP_COMMENT);
+        String periodsVal = clientConfig.getProperty(PROP_PREFIX + peerNum + PROP_AVERAGEPERIODS);
 
-        if ((peerVal == null) || (statFileVal == null)
-                || (statDurationVal == null) || (statFrequencyVal == null)
+        if ((peerVal == null) || (statFileVal == null) || (statDurationVal == null) || (statFrequencyVal == null)
                 || (sendFrequencyVal == null) || (sendSizeVal == null)) {
             if (_log.shouldLog(Log.DEBUG)) {
                 _log.debug("Peer number " + peerNum + " does not exist");
@@ -377,13 +367,10 @@ public class ClientConfig {
             int sendFreq = getInt(sendFrequencyVal);
             int sendSize = getInt(sendSizeVal);
 
-            if ((duration <= 0) || (statFreq <= 0) || (sendFreq <= 0)
-                    || (sendSize <= 0)) {
+            if ((duration <= 0) || (statFreq <= 0) || (sendFreq <= 0) || (sendSize <= 0)) {
                 if (_log.shouldLog(Log.WARN)) {
-                    _log.warn("Invalid client config: duration ["
-                            + statDurationVal + "] stat frequency ["
-                            + statFrequencyVal + "] send frequency ["
-                            + sendFrequencyVal + "] send size [" + sendSizeVal
+                    _log.warn("Invalid client config: duration [" + statDurationVal + "] stat frequency ["
+                            + statFrequencyVal + "] send frequency [" + sendFrequencyVal + "] send size [" + sendSizeVal
                             + "]");
                 }
                 return false;
@@ -433,8 +420,7 @@ public class ClientConfig {
             _averagePeriods = avgPeriods;
             return true;
         } catch (DataFormatException dfe) {
-            _log.error("Peer destination for " + peerNum + " was invalid: "
-                    + peerVal);
+            _log.error("Peer destination for " + peerNum + " was invalid: " + peerVal);
             return false;
         }
     }
@@ -450,8 +436,7 @@ public class ClientConfig {
      * @return true if it was stored correctly, false if there were errors
      */
     public boolean store(Properties clientConfig, int peerNum) {
-        if ((_peer == null) || (_sendFrequency <= 0) || (_sendSize <= 0)
-                || (_statDuration <= 0) || (_statFrequency <= 0)
+        if ((_peer == null) || (_sendFrequency <= 0) || (_sendSize <= 0) || (_statDuration <= 0) || (_statFrequency <= 0)
                 || (_statFile == null)) { return false; }
 
         String comment = _comment;
@@ -469,21 +454,14 @@ public class ClientConfig {
             }
         }
 
-        clientConfig.setProperty(PROP_PREFIX + peerNum + PROP_PEER, _peer
-                .toBase64());
-        clientConfig.setProperty(PROP_PREFIX + peerNum + PROP_STATFILE,
-                _statFile);
-        clientConfig.setProperty(PROP_PREFIX + peerNum + PROP_STATDURATION,
-                _statDuration + "");
-        clientConfig.setProperty(PROP_PREFIX + peerNum + PROP_STATFREQUENCY,
-                _statFrequency + "");
-        clientConfig.setProperty(PROP_PREFIX + peerNum + PROP_SENDFREQUENCY,
-                _sendFrequency + "");
-        clientConfig.setProperty(PROP_PREFIX + peerNum + PROP_SENDSIZE,
-                _sendSize + "");
+        clientConfig.setProperty(PROP_PREFIX + peerNum + PROP_PEER, _peer.toBase64());
+        clientConfig.setProperty(PROP_PREFIX + peerNum + PROP_STATFILE, _statFile);
+        clientConfig.setProperty(PROP_PREFIX + peerNum + PROP_STATDURATION, _statDuration + "");
+        clientConfig.setProperty(PROP_PREFIX + peerNum + PROP_STATFREQUENCY, _statFrequency + "");
+        clientConfig.setProperty(PROP_PREFIX + peerNum + PROP_SENDFREQUENCY, _sendFrequency + "");
+        clientConfig.setProperty(PROP_PREFIX + peerNum + PROP_SENDSIZE, _sendSize + "");
         clientConfig.setProperty(PROP_PREFIX + peerNum + PROP_COMMENT, comment);
-        clientConfig.setProperty(PROP_PREFIX + peerNum + PROP_AVERAGEPERIODS,
-                buf.toString());
+        clientConfig.setProperty(PROP_PREFIX + peerNum + PROP_AVERAGEPERIODS, buf.toString());
         return true;
     }
 
