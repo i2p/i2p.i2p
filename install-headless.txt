@@ -1,0 +1,35 @@
+$Id$
+Headless I2P installation instructions
+
+1) tar xjf i2p.tar.bz2                     (you've already done this)
+2) cd i2p ; vi install.txt                 (you're doing this now)
+3) sh postinstall.sh                       (this launches the router)
+4) lynx http://localhost:7657/index.jsp    (configure the router)
+
+If you're having trouble, swing by http://forum.i2p.net/, check the
+website at http://www.i2p.net/, or get on irc://irc.freenode.net/#i2p
+
+To have I2P run on startup as a daemon, after the above, run:
+   sh install_i2p_service_unix
+
+To run I2P explicitly:
+   sh i2prouter start
+
+To stop the router (gracefully):
+   lynx http://localhost:7657/configservice.jsp ("Shutdown gracefully")
+
+To stop the router (immediately):
+   sh i2prouter stop
+
+To uninstall I2P:
+   rm -rf $i2pInstallDir
+
+To remove the daemon setup, run:
+   sh uninstall_i2p_service_unix
+
+Supported JVMs:
+  Windows: Latest available from http://java.sun.com/ (1.3+ supported)
+  Linux:   Latest available from http://java.sun.com/ (1.3+ supported)
+  FreeBSD: /usr/ports/java/linux-sun-jdk1.4
+  various: http://www.kaffe.org/ using CVS HEAD as of Sept 1, 2004
+           (or any subsequent releases)
