@@ -63,7 +63,7 @@ public class OutboundClientMessageJob extends JobImpl {
     private final static long OVERALL_TIMEOUT_MS_DEFAULT = 60*1000;
     
     /** how long for each send do we allow before going on to the next? */
-    private final static long DEFAULT_SEND_PARTIAL_TIMEOUT = 10*1000;
+    private final static long DEFAULT_SEND_PARTIAL_TIMEOUT = 50*1000;
     private static final String PROP_SEND_PARTIAL_TIMEOUT = "router.clientPartialSendTimeout";
     
     /** priority of messages, that might get honored some day... */

@@ -14,8 +14,8 @@ package net.i2p;
  *
  */
 public class CoreVersion {
-    public final static String ID = "$Revision: 1.24 $ $Date: 2004/10/18 14:08:00 $";
-    public final static String VERSION = "0.4.1.4";
+    public final static String ID = "$Revision: 1.25 $ $Date: 2004/11/06 22:00:57 $";
+    public final static String VERSION = "0.4.2";
 
     public static void main(String args[]) {
         System.out.println("I2P Core version: " + VERSION);

@@ -26,8 +26,8 @@ public class I2PSocketManagerFactory {
     private final static Log _log = new Log(I2PSocketManagerFactory.class);
 
     public static final String PROP_MANAGER = "i2p.streaming.manager";
-    public static final String DEFAULT_MANAGER = "net.i2p.client.streaming.I2PSocketManagerImpl";
-    //public static final String DEFAULT_MANAGER = "net.i2p.client.streaming.I2PSocketManagerFull";
+    //public static final String DEFAULT_MANAGER = "net.i2p.client.streaming.I2PSocketManagerImpl";
+    public static final String DEFAULT_MANAGER = "net.i2p.client.streaming.I2PSocketManagerFull";
     
     /**
      * Create a socket manager using a brand new destination connected to the
@@ -90,7 +90,7 @@ public class I2PSocketManagerFactory {
                 opts.setProperty(name, System.getProperty(name));
         }
         boolean oldLib = DEFAULT_MANAGER.equals(opts.getProperty(PROP_MANAGER, DEFAULT_MANAGER));
-        if (oldLib) {
+        if (oldLib && false) {
             // for the old streaming lib
             opts.setProperty(I2PClient.PROP_RELIABILITY, I2PClient.PROP_RELIABILITY_GUARANTEED);
             //opts.setProperty("tunnels.depthInbound", "0");
