@@ -52,10 +52,12 @@ class PacketQueue {
         if (_log.shouldLog(Log.DEBUG))
             conStr = (packet.getConnection() != null ? packet.getConnection().toString() : "");
         if (packet.getAckTime() > 0) {
-            _log.debug("Not resending " + packet);
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Not resending " + packet);
             return;
         } else {
-            _log.debug("Sending... " + packet);
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Sending... " + packet);
         }
     
         ByteArray ba = _cache.acquire();

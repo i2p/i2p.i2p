@@ -31,11 +31,12 @@ import java.util.List;
 import java.util.Properties;
 import java.util.TreeMap;
 import java.util.zip.GZIPInputStream;
-import java.util.zip.GZIPOutputStream;
 
 import net.i2p.util.ByteCache;
 import net.i2p.util.CachingByteArrayOutputStream;
 import net.i2p.util.OrderedProperties;
+import net.i2p.util.ReusableGZIPInputStream;
+import net.i2p.util.ReusableGZIPOutputStream;
 
 /**
  * Defines some simple IO routines for dealing with marshalling data structures
@@ -826,20 +827,21 @@ public class DataHelper {
         return rv;
     }
 
+    private static final int MAX_UNCOMPRESSED = 40*1024;
     /** compress the data and return a new GZIP compressed array */
     public static byte[] compress(byte orig[]) {
         return compress(orig, 0, orig.length);
     }
     public static byte[] compress(byte orig[], int offset, int size) {
         if ((orig == null) || (orig.length <= 0)) return orig;
+        if (size >= MAX_UNCOMPRESSED) 
+            throw new IllegalArgumentException("tell jrandom size=" + size);
+        ReusableGZIPOutputStream out = ReusableGZIPOutputStream.acquire();
         try {
-            CachingByteArrayOutputStream baos = new CachingByteArrayOutputStream(16, 40*1024);
-            GZIPOutputStream out = new GZIPOutputStream(baos, size);
             out.write(orig, offset, size);
             out.finish();
             out.flush();
-            byte rv[] = baos.toByteArray();
-            baos.releaseBuffer();
+            byte rv[] = out.getData();
             //if (_log.shouldLog(Log.DEBUG))
             //    _log.debug("Compression of " + orig.length + " into " + rv.length + " (or " + 100.0d
             //               * (((double) orig.length) / ((double) rv.length)) + "% savings)");
@@ -847,31 +849,34 @@ public class DataHelper {
         } catch (IOException ioe) {
             //_log.error("Error compressing?!", ioe);
             return null;
+        } finally {
+            ReusableGZIPOutputStream.release(out);
         }
+        
     }
-
+    
     /** decompress the GZIP compressed data (returning null on error) */
     public static byte[] decompress(byte orig[]) throws IOException {
         return (orig != null ? decompress(orig, 0, orig.length) : null);
     }
     public static byte[] decompress(byte orig[], int offset, int length) throws IOException {
         if ((orig == null) || (orig.length <= 0)) return orig;
-        GZIPInputStream in = new GZIPInputStream(new ByteArrayInputStream(orig, offset, length), length);
-        CachingByteArrayOutputStream baos = new CachingByteArrayOutputStream(16, 40*1024);
-        ByteCache cache = ByteCache.getInstance(10, 4*1024);
-        ByteArray ba = cache.acquire();
-        byte buf[] = ba.getData(); // new byte[4 * 1024];
+        
+        ReusableGZIPInputStream in = ReusableGZIPInputStream.acquire();
+        in.initialize(new ByteArrayInputStream(orig, offset, length));
+        
+        ByteCache cache = ByteCache.getInstance(16, MAX_UNCOMPRESSED);
+        ByteArray outBuf = cache.acquire();
+        int written = 0;
         while (true) {
-            int read = in.read(buf);
-            if (read == -1) break;
-            baos.write(buf, 0, read);
+            int read = in.read(outBuf.getData(), written, MAX_UNCOMPRESSED-written);
+            if (read == -1)
+                break;
+            written += read;
         }
-        byte rv[] = baos.toByteArray();
-        cache.release(ba);
-        baos.releaseBuffer();
-        //if (_log.shouldLog(Log.DEBUG))
-        //    _log.debug("Decompression of " + orig.length + " into " + rv.length + " (or " + 100.0d
-        //               * (((double) rv.length) / ((double) orig.length)) + "% savings)");
+        byte rv[] = new byte[written];
+        System.arraycopy(outBuf.getData(), 0, rv, 0, written);
+        cache.release(outBuf);
         return rv;
     }
     

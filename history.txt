@@ -1,4 +1,15 @@
-$Id: history.txt,v 1.161 2005/03/01 12:50:54 jrandom Exp $
+$Id: history.txt,v 1.162 2005/03/02 22:36:52 jrandom Exp $
+
+2005-03-03  jrandom
+    * Loop while starting up the I2PTunnel instances, in case the I2CP 
+      listener isn't up yet (thanks detonate!)
+    * Implement custom reusable GZIP streams to both reduce memory churn
+      and prevent the exposure of data in the standard GZIP header (creation
+      time, OS, etc).  This is RFC1952 compliant, and backwards compatible, 
+      though has only been tested within the confines of I2P's compression use
+      (DataHelper.[de]compress).
+    * Preemptively support the next protocol version, so that after the 0.5.0.2
+      release, we'll be able to drop protocol=2 to get rid of 0.5 users.
 
 2005-03-02  jrandom
     * Fix one substantial OOM cause (session tag manager was only dropping 

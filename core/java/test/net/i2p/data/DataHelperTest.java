@@ -23,6 +23,8 @@ public class DataHelperTest {
     }
     
     public void runTests() {
+        // compress
+        testCompress();
         // long (read/write/to/from)
         testLong();
         // date (read/write/to/from)
@@ -31,7 +33,6 @@ public class DataHelperTest {
         // properties
         // boolean
         // readline
-        // compress
     }
     
     /**
@@ -150,6 +151,28 @@ public class DataHelperTest {
             System.out.println("eq: " + time);
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage());
+        }
+    }
+    
+    private void testCompress() {
+        for (int i = 0; i < 32*1024; i++)
+            testCompress(i);
+    }
+    
+    private void testCompress(int size) {
+        byte data[] = new byte[size];
+        _context.random().nextBytes(data);
+        byte compressed[] = DataHelper.compress(data);
+        try {
+            byte decompressed[] = DataHelper.decompress(compressed);
+            boolean ok = DataHelper.eq(data, decompressed);
+            if (!ok) 
+                throw new RuntimeException("failed match at size=" + size);
+            else
+                System.out.println("Match at size=" + size);
+        } catch (java.io.IOException ioe) {
+            ioe.printStackTrace();
+            throw new RuntimeException("Error at size=" + size +":" + ioe.getMessage());
         }
     }
     

@@ -75,10 +75,16 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
         I2PClient client = I2PClientFactory.createClient();
         Properties props = new Properties();
         props.putAll(getTunnel().getClientOptions());
-        synchronized (slock) {
-            sockMgr = I2PSocketManagerFactory.createManager(privData, getTunnel().host, Integer.parseInt(getTunnel().port),
-                                                            props);
+        while (sockMgr == null) {
+            synchronized (slock) {
+                sockMgr = I2PSocketManagerFactory.createManager(privData, getTunnel().host, Integer.parseInt(getTunnel().port),
+                                                                props);
 
+            }
+            if (sockMgr == null) {
+                _log.log(Log.CRIT, "Unable to create socket manager");
+                try { Thread.sleep(10*1000); } catch (InterruptedException ie) {}
+            }
         }
         sockMgr.setName("Server");
         getTunnel().addSession(sockMgr.getSession());

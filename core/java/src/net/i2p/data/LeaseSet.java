@@ -298,6 +298,16 @@ public class LeaseSet extends DataStructureImpl {
         }
         _signature.writeBytes(out);
     }
+    
+    public int size() {
+        return PublicKey.KEYSIZE_BYTES //destination.pubKey
+             + SigningPublicKey.KEYSIZE_BYTES // destination.signPubKey
+             + 2 // destination.certificate
+             + PublicKey.KEYSIZE_BYTES // encryptionKey
+             + SigningPublicKey.KEYSIZE_BYTES // signingKey
+             + 1
+             + _leases.size() * (Hash.HASH_LENGTH + 4 + 8);
+    }
 
     public boolean equals(Object object) {
         if ((object == null) || !(object instanceof LeaseSet)) return false;

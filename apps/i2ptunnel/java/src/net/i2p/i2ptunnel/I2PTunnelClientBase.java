@@ -101,11 +101,17 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
         this.l = l;
         this.handlerName = handlerName + _clientId;
 
-        synchronized (sockLock) {
-            if (ownDest) {
-                sockMgr = buildSocketManager();
-            } else {
-                sockMgr = getSocketManager();
+        while (sockMgr == null) {
+            synchronized (sockLock) {
+                if (ownDest) {
+                    sockMgr = buildSocketManager();
+                } else {
+                    sockMgr = getSocketManager();
+                }
+            }
+            if (sockMgr == null) {
+                _log.log(Log.CRIT, "Unable to create socket manager");
+                try { Thread.sleep(10*1000); } catch (InterruptedException ie) {}
             }
         }
         if (sockMgr == null) {

@@ -91,7 +91,11 @@ public class CreateLeaseSetMessage extends I2CPMessageImpl {
     protected byte[] doWriteMessage() throws I2CPMessageException, IOException {
         if ((_sessionId == null) || (_signingPrivateKey == null) || (_privateKey == null) || (_leaseSet == null))
             throw new I2CPMessageException("Unable to write out the message as there is not enough data");
-        ByteArrayOutputStream os = new ByteArrayOutputStream(512);
+        int size = 4 // sessionId
+                 + SigningPrivateKey.KEYSIZE_BYTES
+                 + PrivateKey.KEYSIZE_BYTES
+                 + _leaseSet.size();
+        ByteArrayOutputStream os = new ByteArrayOutputStream(size);
         try {
             _sessionId.writeBytes(os);
             _signingPrivateKey.writeBytes(os);
