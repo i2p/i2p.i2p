@@ -435,6 +435,10 @@ public class JobQueue {
                         
                         awaken(toAdd.size());
                     } else {
+                        if (timeToWait < 100)
+                            timeToWait = 100;
+                        if (timeToWait > 10*1000)
+                            timeToWait = 10*1000;
                         if (_log.shouldLog(Log.DEBUG))
                             _log.debug("Waiting " + timeToWait + " before rechecking the timed queue");
                         try {
