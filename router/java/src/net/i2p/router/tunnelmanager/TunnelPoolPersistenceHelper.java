@@ -1,23 +1,21 @@
 package net.i2p.router.tunnelmanager;
 
-import net.i2p.util.Log;
-
-import net.i2p.router.Router;
-import net.i2p.router.TunnelInfo;
-import net.i2p.router.ClientTunnelSettings;
-import net.i2p.data.TunnelId;
-import net.i2p.data.Destination;
-import net.i2p.data.DataHelper;
-import net.i2p.data.DataFormatException;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-
-import java.util.Iterator;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Properties;
+
+import net.i2p.data.DataFormatException;
+import net.i2p.data.DataHelper;
+import net.i2p.data.Destination;
+import net.i2p.data.TunnelId;
+import net.i2p.router.ClientTunnelSettings;
+import net.i2p.router.Router;
+import net.i2p.router.TunnelInfo;
+import net.i2p.util.Log;
 
 /**
  * Handle all of the load / store of the tunnel pool (including any contained 

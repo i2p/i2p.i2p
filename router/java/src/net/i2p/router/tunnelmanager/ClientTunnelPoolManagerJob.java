@@ -8,8 +8,8 @@ import net.i2p.router.ClientManagerFacade;
 import net.i2p.router.JobImpl;
 import net.i2p.router.JobQueue;
 import net.i2p.router.TunnelInfo;
-import net.i2p.util.Log;
 import net.i2p.util.Clock;
+import net.i2p.util.Log;
 
 /**
  * refill the client tunnel pool as necessary, either from the TunnelPool's free

@@ -14,8 +14,8 @@ import net.i2p.router.ClientManagerFacade;
 import net.i2p.router.JobImpl;
 import net.i2p.router.NetworkDatabaseFacade;
 import net.i2p.router.TunnelInfo;
-import net.i2p.util.Log;
 import net.i2p.util.Clock;
+import net.i2p.util.Log;
 
 /**
  * Manage the process of requesting a lease set as necessary for a client based

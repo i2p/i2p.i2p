@@ -13,8 +13,8 @@ import net.i2p.router.JobQueue;
 import net.i2p.router.MessageHistory;
 import net.i2p.router.Router;
 import net.i2p.router.TunnelInfo;
-import net.i2p.util.Log;
 import net.i2p.util.Clock;
+import net.i2p.util.Log;
 
 class ClientTunnelPool {
     private final static Log _log = new Log(ClientTunnelPool.class);

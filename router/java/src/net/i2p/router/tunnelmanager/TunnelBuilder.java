@@ -28,8 +28,8 @@ import net.i2p.router.PeerSelectionCriteria;
 import net.i2p.router.Router;
 import net.i2p.router.TunnelInfo;
 import net.i2p.router.TunnelSettings;
-import net.i2p.util.Log;
 import net.i2p.util.Clock;
+import net.i2p.util.Log;
 import net.i2p.util.RandomSource;
 
 class TunnelBuilder {

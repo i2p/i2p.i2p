@@ -13,14 +13,13 @@ import net.i2p.data.TunnelId;
 import net.i2p.router.ClientTunnelSettings;
 import net.i2p.router.JobImpl;
 import net.i2p.router.JobQueue;
+import net.i2p.router.MessageHistory;
 import net.i2p.router.ProfileManager;
 import net.i2p.router.Router;
 import net.i2p.router.TunnelInfo;
-import net.i2p.router.MessageHistory;
-import net.i2p.util.Log;
-import net.i2p.util.Clock;
-
 import net.i2p.stat.StatManager;
+import net.i2p.util.Clock;
+import net.i2p.util.Log;
 
 /**
  * Store the data for free inbound, outbound, and client pooled tunnels, and serve

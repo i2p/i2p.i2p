@@ -8,8 +8,8 @@ package net.i2p.router.tunnelmanager;
  *
  */
 
-import net.i2p.data.TunnelId;
 import net.i2p.data.Hash;
+import net.i2p.data.TunnelId;
 
 class TunnelGateway {
     private TunnelId _tunnel;

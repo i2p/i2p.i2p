@@ -7,8 +7,8 @@ import net.i2p.data.TunnelId;
 import net.i2p.router.JobImpl;
 import net.i2p.router.Router;
 import net.i2p.router.TunnelInfo;
-import net.i2p.util.Log;
 import net.i2p.util.Clock;
+import net.i2p.util.Log;
 
 /**
  * Periodically go through all of the tunnels not assigned to a client and mark 

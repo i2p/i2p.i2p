@@ -36,6 +36,7 @@ import net.i2p.data.i2np.TunnelCreateStatusMessage;
 import net.i2p.router.Job;
 import net.i2p.router.JobImpl;
 import net.i2p.router.JobQueue;
+import net.i2p.router.MessageHistory;
 import net.i2p.router.MessageSelector;
 import net.i2p.router.NetworkDatabaseFacade;
 import net.i2p.router.PeerManagerFacade;
@@ -46,16 +47,14 @@ import net.i2p.router.Router;
 import net.i2p.router.TunnelInfo;
 import net.i2p.router.TunnelManagerFacade;
 import net.i2p.router.TunnelSelectionCriteria;
-import net.i2p.router.MessageHistory;
 import net.i2p.router.message.GarlicConfig;
 import net.i2p.router.message.GarlicMessageBuilder;
 import net.i2p.router.message.PayloadGarlicConfig;
 import net.i2p.router.message.SendTunnelMessageJob;
-import net.i2p.util.Log;
-import net.i2p.util.Clock;
-import net.i2p.util.RandomSource;
-
 import net.i2p.stat.StatManager;
+import net.i2p.util.Clock;
+import net.i2p.util.Log;
+import net.i2p.util.RandomSource;
 
 /**
  * Request the creation of a new tunnel
