@@ -1,9 +1,10 @@
 /* vi:set ts=4: */
 
 v1.30
-	* Added SAM_BAD_STYLE error
+	* Improved WIRETAP to do more logging
 	* Added "pinger.sh" shell script example for using i2p-ping
-	* Various minor enhancements and bug fixes
+	* Added SAM_BAD_STYLE error
+	* Added exit values for i2p-ping from xolo
 
 v1.25	2004-07-31
 	* Created I2P-Ping, a new example program (it's a clone of I2Ping).  Works

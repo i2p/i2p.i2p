@@ -598,7 +598,7 @@ static ssize_t sam_read1(sam_sess_t *session, char *buf, size_t n)
 		if (*p == '\n') {  /* end of SAM response */
 			*p = '\0';
 #if SAM_WIRETAP
-			printf("<<<< %s\n", buf);
+			printf("*RR* %s\n", buf);
 #endif
 			return n - nleft;
 		}
@@ -663,7 +663,16 @@ static ssize_t sam_read2(sam_sess_t *session, void *buf, size_t n)
 		p += nread;
 	}
 #if SAM_WIRETAP
-	printf("<<<< (read2() %d bytes)\n", n);
+	p = buf;
+	printf("*RR* ");
+	for (size_t x = 0; x < n; x++) {
+		if (isprint(((uchar_t*)p)[x]))
+			printf("%c,", ((uchar_t*)p)[x]);
+		else
+			printf("%03d,", ((uint8_t*)p)[x]);
+	}
+	printf("\n");
+	printf("*RR* (read2() read %d bytes)\n", n);
 #endif
 	assert(nleft == 0);/*  <---\                       */
 	return n - nleft;  /* should be equal to initial n */
@@ -1334,6 +1343,7 @@ static ssize_t sam_write(sam_sess_t *session, const void *buf, size_t n)
 	}
 #if SAM_WIRETAP
 	const uchar_t *cp = buf;
+	printf("*WW* ");
 	for (size_t x = 0; x < n; x++) {
 		if (isprint(cp[x]))
 			printf("%c,", cp[x]);
@@ -1365,7 +1375,7 @@ static ssize_t sam_write(sam_sess_t *session, const void *buf, size_t n)
 		p += nwritten;
 	}
 #if SAM_WIRETAP
-	printf(">>>> (write() %d bytes)\n", n);
+	printf("*WW* (write() wrote %d bytes)\n", n);
 #endif
 
 	return n;
