@@ -2613,7 +2613,6 @@ class KNodeReqHandler(KBase, SocketServer.StreamRequestHandler):
     def finish(self):
     
         SocketServer.StreamRequestHandler.finish(self)
-        self.connection.close()
     
     #@-node:finish
     #@-others
