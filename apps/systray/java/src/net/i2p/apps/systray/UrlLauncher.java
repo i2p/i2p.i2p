@@ -17,10 +17,10 @@ package net.i2p.apps.systray;
  * Firefox, Netscape, Opera, and Safari.    
  * 
  * @author hypercubus
- * 
- * TODO Add a method to allow opening a URL with a specific browser.
  */
 public class UrlLauncher {
+
+    ShellCommand _shellCommand = new ShellCommand();
 
     /**
      * Discovers the operating system the installer is running under and tries
@@ -30,52 +30,59 @@ public class UrlLauncher {
      */ 
     public boolean openUrl(String url) throws Exception {
 
-        String       osName       = System.getProperty("os.name");
-        ShellCommand shellCommand = new ShellCommand();
+        String osName = System.getProperty("os.name");
 
         if (osName.toLowerCase().indexOf("mac") > -1) {
             if (osName.toLowerCase().startsWith("mac os x")) {
 
-                if (shellCommand.executeSilentAndWaitTimed("safari " + url, 5))
+                if (_shellCommand.executeSilentAndWaitTimed("safari " + url, 5))
                     return true;
 
             } else {
                 return false;
             }
 
-            if (shellCommand.executeSilentAndWaitTimed("iexplore " + url, 5))
+            if (_shellCommand.executeSilentAndWaitTimed("iexplore " + url, 5))
                 return true;
 
         } else if (osName.startsWith("Windows")) {
 
-            if (shellCommand.executeSilentAndWaitTimed("\"C:\\Program Files\\Internet Explorer\\iexplore.exe\" " + url, 5))
+            if (_shellCommand.executeSilentAndWaitTimed("\"C:\\Program Files\\Internet Explorer\\iexplore.exe\" " + url, 5))
                 return true;
 
         } else {
 
-            if (shellCommand.executeSilentAndWaitTimed("konqueror " + url, 5))
+            if (_shellCommand.executeSilentAndWaitTimed("konqueror " + url, 5))
                 return true;
 
-            if (shellCommand.executeSilentAndWaitTimed("galeon " + url, 5))
+            if (_shellCommand.executeSilentAndWaitTimed("galeon " + url, 5))
                 return true;
         }
 
-        if (shellCommand.executeSilentAndWaitTimed("firefox " + url, 5))
+        if (_shellCommand.executeSilentAndWaitTimed("firefox " + url, 5))
             return true;
 
-        if (shellCommand.executeSilentAndWaitTimed("opera -newpage " + url, 5))
+        if (_shellCommand.executeSilentAndWaitTimed("opera -newpage " + url, 5))
             return true;
 
-        if (shellCommand.executeSilentAndWaitTimed("mozilla " + url, 5))
+        if (_shellCommand.executeSilentAndWaitTimed("mozilla " + url, 5))
             return true;
 
-        if (shellCommand.executeSilentAndWaitTimed("netscape " + url, 5))
+        if (_shellCommand.executeSilentAndWaitTimed("netscape " + url, 5))
             return true;
 
-        if (shellCommand.executeSilentAndWaitTimed("links " + url, 5))
+        if (_shellCommand.executeSilentAndWaitTimed("links " + url, 5))
             return true;
 
-        if (shellCommand.executeSilentAndWaitTimed("lynx " + url, 5))
+        if (_shellCommand.executeSilentAndWaitTimed("lynx " + url, 5))
+            return true;
+
+        return false;
+    }
+
+    public boolean openUrl(String url, String browser) throws Exception {
+        // System.out.println("Launching: '" + browser + " " + url + "'");
+        if (_shellCommand.executeSilentAndWaitTimed(browser + " " + url, 5))
             return true;
 
         return false;

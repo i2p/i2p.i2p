@@ -8,6 +8,8 @@
 
 package net.i2p.apps.systray;
 
+import java.awt.Frame;
+
 import snoozesoft.systray4j.SysTrayMenu;
 import snoozesoft.systray4j.SysTrayMenuEvent;
 import snoozesoft.systray4j.SysTrayMenuIcon;
@@ -23,18 +25,26 @@ import snoozesoft.systray4j.SysTrayMenuListener;
  */
 public class SysTray implements SysTrayMenuListener {
 
-    private SysTrayMenuItem itemExit        = new SysTrayMenuItem("Exit systray", "exit");
-    private SysTrayMenuItem itemSetBrowser  = new SysTrayMenuItem("Set preferred browser...", "setbrowser");
-    private SysTrayMenuIcon sysTrayMenuIcon = new SysTrayMenuIcon("../icons/iggy");
-    private SysTrayMenu     sysTrayMenu     = new SysTrayMenu(sysTrayMenuIcon, "I2P Console");
+    private static String _browserString;
+
+    private BrowserChooser  _browserChooser;
+    private Frame           _frame;
+    private SysTrayMenuItem _itemExit          = new SysTrayMenuItem("Exit systray", "exit");
+    private SysTrayMenuItem _itemSelectBrowser = new SysTrayMenuItem("Select preferred browser...", "selectbrowser");
+    private SysTrayMenuIcon _sysTrayMenuIcon   = new SysTrayMenuIcon("../icons/iggy");
+    private SysTrayMenu     _sysTrayMenu       = new SysTrayMenu(_sysTrayMenuIcon, "I2P Console");
 
     public SysTray() {
-        sysTrayMenuIcon.addSysTrayMenuListener(this);
+        _sysTrayMenuIcon.addSysTrayMenuListener(this);
         createSysTrayMenu();
     }
 
     public static void main(String[] args) {
         new SysTray();
+
+        if (args.length == 1) 
+            _browserString = args[0];
+
         while(true)
             try {
             Thread.sleep(2 * 1000);
@@ -46,27 +56,52 @@ public class SysTray implements SysTrayMenuListener {
     public void iconLeftClicked(SysTrayMenuEvent e) {}
 
     public void iconLeftDoubleClicked(SysTrayMenuEvent e) {
-        try {
-            new UrlLauncher().openUrl("http://localhost:7657");
-        } catch (Exception ex) {
-            // Pop up a dialog or something.
+        if (_browserString == null || _browserString.equals("browser default")) {
+            try {
+                new UrlLauncher().openUrl("http://localhost:7657");
+            } catch (Exception ex) {
+                setBrowser(promptForBrowser("Please select another browser"));
+            }
+        } else {
+            try {
+                new UrlLauncher().openUrl("http://localhost:7657", _browserString);
+            } catch (Exception ex) {
+                setBrowser(promptForBrowser("Please select another browser"));
+            }
         }
     }
 
     public void menuItemSelected(SysTrayMenuEvent e) {
         if (e.getActionCommand().equals("exit")) {
-            // exit systray
+            _browserChooser = null;
+            _frame = null;
+            _itemExit = null;
+            _itemSelectBrowser = null;
+            _sysTrayMenuIcon = null;
+            _sysTrayMenu = null;       
             System.exit(0);
-        } else if (e.getActionCommand().equals("start")) {
-            // Popup browser dialog
+        } else if (e.getActionCommand().equals("selectbrowser")) {
+            setBrowser(promptForBrowser("Select preferred browser"));
         }
     }
 
     private void createSysTrayMenu() {
-        itemSetBrowser.addSysTrayMenuListener(this);
-        itemExit.addSysTrayMenuListener(this);
-        sysTrayMenu.addItem(itemExit);
-        sysTrayMenu.addSeparator();
-        sysTrayMenu.addItem(itemSetBrowser);
+        _itemSelectBrowser.addSysTrayMenuListener(this);
+        _itemExit.addSysTrayMenuListener(this);
+        _sysTrayMenu.addItem(_itemExit);
+        _sysTrayMenu.addSeparator();
+        _sysTrayMenu.addItem(_itemSelectBrowser);
+    }
+
+    private String promptForBrowser(String windowTitle) {
+        _frame = new Frame();
+        _browserChooser = new BrowserChooser(_frame, windowTitle);
+        return _browserChooser.getDirectory() + _browserChooser.getFile();
+    }
+
+    private void setBrowser(String browser) {
+        _browserString = browser;
+        // change "clientApp.3.args=browser" property in clients.config here.
+        // System.out.println("User chose browser: " + browser);
     }
 }

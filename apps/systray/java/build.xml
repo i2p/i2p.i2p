@@ -22,13 +22,9 @@
         <copy todir="./build/icons">
             <fileset dir="./src/net/i2p/apps/systray/icons" />
         </copy>
-        <copy todir="./build/jar_temp/doc">
-            <fileset dir="../doc" />
-        </copy>
         <mkdir dir="./build/jar_temp" />
         <copy todir="./build/jar_temp">
             <fileset dir="./build/obj" includes="**/*.class" />
-            <fileset dir="./src/net/i2p/apps/systray" includes="doc/*" />
         </copy>
         <jar destfile="./build/lib/systray.jar" basedir="./build/jar_temp" includes="**/*">
             <manifest>
