@@ -59,20 +59,20 @@ public final class I2PDatagramDissector {
      */
     public void loadI2PDatagram(byte[] dgram) throws DataFormatException {
         ByteArrayInputStream dgStream = new ByteArrayInputStream(dgram);
-        byte[] hashedData;
-
+        byte[] rxTrimmedPayload;
 
         try {
+            rxDest.readBytes(dgStream);
+
             rxSign.readBytes(dgStream);
 
-            rxDest.readBytes(dgStream);
             rxPayloadLen = dgStream.read(rxPayload);
+
+            // FIXME: hashGen.calculateHash(source, offset, len) would rock...
+            rxTrimmedPayload = new byte[rxPayloadLen];
+            System.arraycopy(rxPayload, 0, rxTrimmedPayload, 0, rxPayloadLen);
             
-            hashedData = new byte[dgram.length - Signature.SIGNATURE_BYTES];
-            System.arraycopy(dgram, Signature.SIGNATURE_BYTES,
-                             hashedData, 0,
-                             hashedData.length);
-            rxHashBytes = hashGen.calculateHash(hashedData).toByteArray();
+            rxHashBytes =hashGen.calculateHash(rxTrimmedPayload).toByteArray();
         } catch (IOException e) {
             _log.error("Caught IOException - INCONSISTENT STATE!", e);
         }

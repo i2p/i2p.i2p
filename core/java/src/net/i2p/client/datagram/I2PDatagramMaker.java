@@ -36,7 +36,6 @@ public final class I2PDatagramMaker {
     private SigningPrivateKey sxPrivKey = null;
     private byte[] sxDestBytes = null;
 
-    private ByteArrayOutputStream sxBuf = new ByteArrayOutputStream(DGRAM_BUFSIZE);
     private ByteArrayOutputStream sxDGram = new ByteArrayOutputStream(DGRAM_BUFSIZE);
 
     /**
@@ -56,22 +55,16 @@ public final class I2PDatagramMaker {
      * @param payload Bytes to be contained in the I2P datagram.
      */
     public byte[] makeI2PDatagram(byte[] payload) {
-        byte[] hashedData;
-
-        sxBuf.reset();
         sxDGram.reset();
         
         try {
-            sxBuf.write(sxDestBytes);
-            sxBuf.write(payload);
-            
-            hashedData = sxBuf.toByteArray();
-            
-            dsaEng.sign(hashGen.calculateHash(hashedData).toByteArray(),
+            sxDGram.write(sxDestBytes);
+        
+            dsaEng.sign(hashGen.calculateHash(payload).toByteArray(),
                         sxPrivKey).writeBytes(sxDGram);
 
-            sxDGram.write(hashedData);
-        
+            sxDGram.write(payload);
+
             return sxDGram.toByteArray();
         } catch (IOException e) {
             _log.error("Caught IOException", e);
