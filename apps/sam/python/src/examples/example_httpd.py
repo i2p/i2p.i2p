@@ -2,12 +2,12 @@
 
 myServerAddress = "mytestxxx.i2p"
 
-from i2p import BaseHTTPServer, CGIHTTPServer
+from i2p import I2PBaseHTTPServer, I2PCGIHTTPServer
 
-class MyServer(BaseHTTPServer.HTTPServer):
+class MyServer(I2PBaseHTTPServer.HTTPServer):
     pass
 
-class MyRequestHandler(CGIHTTPServer.CGIHTTPRequestHandler):
+class MyRequestHandler(I2PCGIHTTPServer.CGIHTTPRequestHandler):
     pass
 
 def runServer():
