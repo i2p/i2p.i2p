@@ -24,19 +24,44 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
 
     private String wwwProxy;
 
-    private final static byte[] ERR_REQUEST_DENIED = "HTTP/1.1 404 Not Found\r\nContent-Type: text/html; charset=iso-8859-1\r\nCache-control: no-cache\r\n\r\n<html><body><H1>I2P ERROR: REQUEST DENIED</H1>You attempted to connect to a non-I2P website or location.<BR>"
-                                                                                                                                                                                                                                                                           .getBytes();
-    private final static byte[] ERR_DESTINATION_UNKNOWN = "HTTP/1.1 404 Not Found\r\nContent-Type: text/html; charset=iso-8859-1\r\nCache-control: no-cache\r\n\r\n<html><body><H1>I2P ERROR: NOT FOUND</H1>That Desitination was not found. Perhaps you pasted in the wrong BASE64 I2P Destination or the link you are following is bad. The host (or the WWW proxy, if you're using one) could also be temporarily offline. Could not find the following Destination:<BR><BR>"
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                .getBytes();
-    private final static byte[] ERR_TIMEOUT = "HTTP/1.1 404 Not Found\r\nContent-Type: text/html; charset=iso-8859-1\r\nCache-control: no-cache\r\n\r\n<html><body><H1>I2P ERROR: TIMEOUT</H1>That Desitination was reachable, but timed out getting a response.  This may be a temporary error, so you should simply try to refresh, though if the problem persists, the remote destination may have issues.  Could not get a response from the following Destination:<BR><BR>"
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                .getBytes();
+    private final static byte[] ERR_REQUEST_DENIED =
+        ("HTTP/1.1 404 Not Found\r\n"+
+         "Content-Type: text/html; charset=iso-8859-1\r\n"+
+         "Cache-control: no-cache\r\n"+
+         "\r\n"+
+         "<html><body><H1>I2P ERROR: REQUEST DENIED</H1>"+
+         "You attempted to connect to a non-I2P website or location.<BR>")
+        .getBytes();
+    
+    private final static byte[] ERR_DESTINATION_UNKNOWN =
+        ("HTTP/1.1 404 Not Found\r\n"+
+         "Content-Type: text/html; charset=iso-8859-1\r\n"+
+         "Cache-control: no-cache\r\n"+
+         "\r\n"+
+         "<html><body><H1>I2P ERROR: NOT FOUND</H1>"+
+         "That Desitination was not found. Perhaps you pasted in the wrong "+
+         "BASE64 I2P Destination or the link you are following is bad.  "+
+         "The host (or the WWW proxy, if you're using one) could also be "+
+         "temporarily offline. "+
+         "Could not find the following Destination:<BR><BR>")
+        .getBytes();
+    
+    private final static byte[] ERR_TIMEOUT =
+        ("HTTP/1.1 404 Not Found\r\n"+
+         "Content-Type: text/html; charset=iso-8859-1\r\n"+
+         "Cache-control: no-cache\r\n\r\n"+
+         "<html><body><H1>I2P ERROR: TIMEOUT</H1>"+
+         "That Desitination was reachable, but timed out getting a "+
+         "response.  This may be a temporary error, so you should simply "+
+         "try to refresh, though if the problem persists, the remote "+
+         "destination may have issues.  Could not get a response from "+
+         "the following Destination:<BR><BR>")
+        .getBytes();
 
-    //public I2PTunnelHTTPClient(int localPort, Logging l,
-    //			       boolean ownDest,
-    //			       String wwwProxy) {
-    //	I2PTunnelHTTPClient(localPort, l, ownDest, wwwProxy,
-    //			    (EventDispatcher)null);
-    //}
+// public I2PTunnelHTTPClient(int localPort, Logging l,
+//                            boolean ownDest, String wwwProxy) {
+//     this(localPort, l, ownDest, wwwProxy, (EventDispatcher)null);
+// }
 
     public I2PTunnelHTTPClient(int localPort, Logging l, boolean ownDest, String wwwProxy, EventDispatcher notifyThis) {
         super(localPort, ownDest, l, notifyThis, "HTTPHandler");
