@@ -6,12 +6,12 @@ Instructions for building i2psam.jar
 
 You will need:
 
- - a decent java sdk, eg Sun J2SDK 1.4.2 or later
  - jython - www.jython.org
 
 Note that you don't need python to build the SAM server
 
-IMPORTANT - when installing jython, and run java on jython_n.n.class,
+IMPORTANT - when you're installing jython, and running
+ 'java on jython_n.n.class',
 make sure you run the java.exe that's in your SDK, not the one in your
 JRE.
 
@@ -19,17 +19,14 @@ JRE.
 
 2) Preparation
 
-Edit the Makefile, and set JYTHONJAR to where your jython.jar lives
-
-Don't worry about this if your're on windows
+ - add the main jython directory to your PATH. Test this by typing
+   'jythonc' from a shell prompt.
 
 ----------------------------------------------------------
 
 3) Building
 
-To build i2psam.jar on regular *nix OSs, simply type 'make'.
-
-To build i2psam.jar on Windows, type 'build.bat'
+ - type 'ant build'
 
 ----------------------------------------------------------
 
