@@ -29,183 +29,180 @@ public class StatsGenerator {
         _log = context.logManager().getLog(StatsGenerator.class);
     }
     
-    public String generateStatsPage() {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream(32*1024);
-        try {
-            generateStatsPage(baos);
-        } catch (IOException ioe) {
-            _log.error("Error generating stats", ioe);
-        }
-        return new String(baos.toByteArray());
-    }
-    
     public void generateStatsPage(OutputStream out) throws IOException {
-        PrintWriter pw = new PrintWriter(out);
-        pw.println("<html><head><title>I2P Router Stats</title></head><body>");
-        pw.println("<h1>Router statistics</h1>");
-        pw.println("<i><a href=\"/routerConsole.html\">console</a> | <a href=\"/routerStats.html\">stats</a></i><hr />");
+        StringBuffer buf = new StringBuffer(16*1024);
+        buf.append("<html><head><title>I2P Router Stats</title></head><body>");
+        buf.append("<h1>Router statistics</h1>");
+        buf.append("<i><a href=\"/routerConsole.html\">console</a> | <a href=\"/routerStats.html\">stats</a></i><hr />");
+        buf.append("<form action=\"/routerStats.html\">");
+        buf.append("<select name=\"go\" onChange='location.href=this.value'>");
+        out.write(buf.toString().getBytes());
+        buf.setLength(0);
+        
         Map groups = _context.statManager().getStatsByGroup();
-        
-        pw.println("<form action=\"/routerStats.html\">");
-        pw.println("<select name=\"go\" onChange='location.href=this.value'>");
         for (Iterator iter = groups.keySet().iterator(); iter.hasNext(); ) {
             String group = (String)iter.next();
             Set stats = (Set)groups.get(group);
-            pw.print("<option value=\"/routerStats.html#");
-            pw.print(group);
-            pw.print("\">");
-            pw.print(group);
-            pw.println("</option>\n");
+            buf.append("<option value=\"/routerStats.html#").append(group).append("\">");
+            buf.append(group).append("</option>\n");
             for (Iterator statIter = stats.iterator(); statIter.hasNext(); ) {
                 String stat = (String)statIter.next();
-                pw.print("<option value=\"/routerStats.html#");
-                pw.print(stat);
-                pw.print("\">...");
-                pw.print(stat);
-                pw.println("</option>\n");
+                buf.append("<option value=\"/routerStats.html#");
+                buf.append(stat);
+                buf.append("\">...");
+                buf.append(stat);
+                buf.append("</option>\n");
             }
+            out.write(buf.toString().getBytes());
+            buf.setLength(0);
         }
-        pw.println("</select>");
-        pw.println("</form>");
+        buf.append("</select>");
+        buf.append("</form>");
         
-        pw.print("Statistics gathered during this router's uptime (");
+        buf.append("Statistics gathered during this router's uptime (");
         long uptime = _context.router().getUptime();
-        pw.print(DataHelper.formatDuration(uptime));
-        pw.println(").  The data gathered is quantized over a 1 minute period, so should just be used as an estimate<p />");
+        buf.append(DataHelper.formatDuration(uptime));
+        buf.append(").  The data gathered is quantized over a 1 minute period, so should just be used as an estimate<p />");
+
+        out.write(buf.toString().getBytes());
+        buf.setLength(0);
         
         for (Iterator iter = groups.keySet().iterator(); iter.hasNext(); ) {
             String group = (String)iter.next();
             Set stats = (Set)groups.get(group);
-            pw.print("<h2><a name=\"");
-            pw.print(group);
-            pw.print("\">");
-            pw.print(group);
-            pw.println("</a></h2>");
-            pw.println("<ul>");
+            buf.append("<h2><a name=\"");
+            buf.append(group);
+            buf.append("\">");
+            buf.append(group);
+            buf.append("</a></h2>");
+            buf.append("<ul>");
+            out.write(buf.toString().getBytes());
+            buf.setLength(0);
             for (Iterator statIter = stats.iterator(); statIter.hasNext(); ) {
                 String stat = (String)statIter.next();
-                pw.print("<li><b><a name=\"");
-                pw.print(stat);
-                pw.print("\">");
-                pw.print(stat);
-                pw.println("</a></b><br />");
+                buf.append("<li><b><a name=\"");
+                buf.append(stat);
+                buf.append("\">");
+                buf.append(stat);
+                buf.append("</a></b><br />");
                 if (_context.statManager().isFrequency(stat))
-                    renderFrequency(stat, pw);
+                    renderFrequency(stat, buf);
                 else
-                    renderRate(stat, pw);
+                    renderRate(stat, buf);
+                out.write(buf.toString().getBytes());
+                buf.setLength(0);
             }
-            pw.println("</ul><hr />");
+            out.write("</ul><hr />".getBytes());
         }
-        pw.println("</body></html>");
-        pw.flush();
+        out.write("</body></html>".getBytes());
     }
     
-    private void renderFrequency(String name, PrintWriter pw) throws IOException {
+    private void renderFrequency(String name, StringBuffer buf) {
         FrequencyStat freq = _context.statManager().getFrequency(name);
-        pw.print("<i>");
-        pw.print(freq.getDescription());
-        pw.println("</i><br />");
+        buf.append("<i>");
+        buf.append(freq.getDescription());
+        buf.append("</i><br />");
         long periods[] = freq.getPeriods();
         Arrays.sort(periods);
         for (int i = 0; i < periods.length; i++) {
-            renderPeriod(pw, periods[i], "frequency");
+            renderPeriod(buf, periods[i], "frequency");
             Frequency curFreq = freq.getFrequency(periods[i]);
-            pw.print(" <i>avg per period:</i> (");
-            pw.print(num(curFreq.getAverageEventsPerPeriod()));
-            pw.print(", max ");
-            pw.print(num(curFreq.getMaxAverageEventsPerPeriod()));
+            buf.append(" <i>avg per period:</i> (");
+            buf.append(num(curFreq.getAverageEventsPerPeriod()));
+            buf.append(", max ");
+            buf.append(num(curFreq.getMaxAverageEventsPerPeriod()));
             if ( (curFreq.getMaxAverageEventsPerPeriod() > 0) && (curFreq.getAverageEventsPerPeriod() > 0) ) {
-                pw.print(", current is ");
-                pw.print(pct(curFreq.getAverageEventsPerPeriod()/curFreq.getMaxAverageEventsPerPeriod()));
-                pw.print(" of max");
+                buf.append(", current is ");
+                buf.append(pct(curFreq.getAverageEventsPerPeriod()/curFreq.getMaxAverageEventsPerPeriod()));
+                buf.append(" of max");
             }
-            pw.print(")");
+            buf.append(")");
             //buf.append(" <i>avg interval between updates:</i> (").append(num(curFreq.getAverageInterval())).append("ms, min ");
             //buf.append(num(curFreq.getMinAverageInterval())).append("ms)");
-            pw.print(" <i>strict average per period:</i> ");
-            pw.print(num(curFreq.getStrictAverageEventsPerPeriod()));
-            pw.print(" events (averaged ");
-            pw.print(" using the lifetime of ");
-            pw.print(num(curFreq.getEventCount()));
-            pw.print(" events)");
-            pw.println("<br />");
+            buf.append(" <i>strict average per period:</i> ");
+            buf.append(num(curFreq.getStrictAverageEventsPerPeriod()));
+            buf.append(" events (averaged ");
+            buf.append(" using the lifetime of ");
+            buf.append(num(curFreq.getEventCount()));
+            buf.append(" events)");
+            buf.append("<br />");
         }
-        pw.println("<br />");
+        buf.append("<br />");
     }
     
-    private void renderRate(String name, PrintWriter pw) throws IOException {
+    private void renderRate(String name, StringBuffer buf) {
         RateStat rate = _context.statManager().getRate(name);
-        pw.print("<i>");
-        pw.print(rate.getDescription());
-        pw.println("</i><br />");
+        buf.append("<i>");
+        buf.append(rate.getDescription());
+        buf.append("</i><br />");
         long periods[] = rate.getPeriods();
         Arrays.sort(periods);
-        pw.println("<ul>");
+        buf.append("<ul>");
         for (int i = 0; i < periods.length; i++) {
-            pw.println("<li>");
-            renderPeriod(pw, periods[i], "rate");
+            buf.append("<li>");
+            renderPeriod(buf, periods[i], "rate");
             Rate curRate = rate.getRate(periods[i]);
-            pw.print( "<i>avg value:</i> (");
-            pw.print(num(curRate.getAverageValue()));
-            pw.print(" peak ");
-            pw.print(num(curRate.getExtremeAverageValue()));
-            pw.print(", [");
-            pw.print(pct(curRate.getPercentageOfExtremeValue()));
-            pw.print(" of max");
-            pw.print(", and ");
-            pw.print(pct(curRate.getPercentageOfLifetimeValue()));
-            pw.print(" of lifetime average]");
+            buf.append( "<i>avg value:</i> (");
+            buf.append(num(curRate.getAverageValue()));
+            buf.append(" peak ");
+            buf.append(num(curRate.getExtremeAverageValue()));
+            buf.append(", [");
+            buf.append(pct(curRate.getPercentageOfExtremeValue()));
+            buf.append(" of max");
+            buf.append(", and ");
+            buf.append(pct(curRate.getPercentageOfLifetimeValue()));
+            buf.append(" of lifetime average]");
             
-            pw.print(")");
-            pw.print(" <i>highest total period value:</i> (");
-            pw.print(num(curRate.getExtremeTotalValue()));
-            pw.print(")");
+            buf.append(")");
+            buf.append(" <i>highest total period value:</i> (");
+            buf.append(num(curRate.getExtremeTotalValue()));
+            buf.append(")");
             if (curRate.getLifetimeTotalEventTime() > 0) {
-                pw.print(" <i>saturation:</i> (");
-                pw.print(pct(curRate.getLastEventSaturation()));
-                pw.print(")");
-                pw.print(" <i>saturated limit:</i> (");
-                pw.print(num(curRate.getLastSaturationLimit()));
-                pw.print(")");
-                pw.print(" <i>peak saturation:</i> (");
-                pw.print(pct(curRate.getExtremeEventSaturation()));
-                pw.print(")");
-                pw.print(" <i>peak saturated limit:</i> (");
-                pw.print(num(curRate.getExtremeSaturationLimit()));
-                pw.print(")");
+                buf.append(" <i>saturation:</i> (");
+                buf.append(pct(curRate.getLastEventSaturation()));
+                buf.append(")");
+                buf.append(" <i>saturated limit:</i> (");
+                buf.append(num(curRate.getLastSaturationLimit()));
+                buf.append(")");
+                buf.append(" <i>peak saturation:</i> (");
+                buf.append(pct(curRate.getExtremeEventSaturation()));
+                buf.append(")");
+                buf.append(" <i>peak saturated limit:</i> (");
+                buf.append(num(curRate.getExtremeSaturationLimit()));
+                buf.append(")");
             }
-            pw.print(" <i>events per period:</i> ");
-            pw.print(num(curRate.getLastEventCount()));
+            buf.append(" <i>events per period:</i> ");
+            buf.append(num(curRate.getLastEventCount()));
             long numPeriods = curRate.getLifetimePeriods();
             if (numPeriods > 0) {
                 double avgFrequency = curRate.getLifetimeEventCount() / (double)numPeriods;
                 double peakFrequency = curRate.getExtremeEventCount();
-                pw.print(" (lifetime average: ");
-                pw.print(num(avgFrequency));
-                pw.print(", peak average: ");
-                pw.print(num(curRate.getExtremeEventCount()));
-                pw.println(")");
+                buf.append(" (lifetime average: ");
+                buf.append(num(avgFrequency));
+                buf.append(", peak average: ");
+                buf.append(num(curRate.getExtremeEventCount()));
+                buf.append(")");
             }
-            pw.print("</li>");
+            buf.append("</li>");
             if (i + 1 == periods.length) {
                 // last one, so lets display the strict average
-                pw.print("<li><b>lifetime average value:</b> ");
-                pw.print(num(curRate.getLifetimeAverageValue()));
-                pw.print(" over ");
-                pw.print(num(curRate.getLifetimeEventCount()));
-                pw.println(" events<br /></li>");
+                buf.append("<li><b>lifetime average value:</b> ");
+                buf.append(num(curRate.getLifetimeAverageValue()));
+                buf.append(" over ");
+                buf.append(num(curRate.getLifetimeEventCount()));
+                buf.append(" events<br /></li>");
             }
         }
-        pw.print("</ul>");
-        pw.println("<br />");
+        buf.append("</ul>");
+        buf.append("<br />");
     }
     
-    private static void renderPeriod(PrintWriter pw, long period, String name) throws IOException {
-        pw.print("<b>");
-        pw.print(DataHelper.formatDuration(period));
-        pw.print(" ");
-        pw.print(name);
-        pw.print(":</b> ");
+    private static void renderPeriod(StringBuffer buf, long period, String name) {
+        buf.append("<b>");
+        buf.append(DataHelper.formatDuration(period));
+        buf.append(" ");
+        buf.append(name);
+        buf.append(":</b> ");
     }
     
     private final static DecimalFormat _fmt = new DecimalFormat("###,##0.00");
