@@ -90,7 +90,12 @@ class KBucketSet {
             if (_buckets[i].shouldContain(key))
                 return i;
         }
-        _log.error("Key does not fit in any bucket?! WTF!\nKey  : [" + toString(key.getData()) + "]\nDelta: ["+ toString(DataHelper.xor(_us.getData(), key.getData())) + "]\nUs   : [" + toString(_us.getData()) + "]", new Exception("WTF"));
+        _log.error("Key does not fit in any bucket?! WTF!\nKey  : [" 
+                   + DataHelper.toHexString(key.getData()) + "]" 
+                   + "\nUs   : [" + toString(_us.getData()) + "]"
+                   + "\nDelta: ["
+                   + DataHelper.toHexString(DataHelper.xor(_us.getData(), key.getData()))
+                   + "]", new Exception("WTF"));
         displayBuckets();
         return -1;
     }
@@ -150,5 +155,31 @@ class KBucketSet {
         }
         //    buf.append(Integer.toBinaryString(val[i]));
         return buf.toString();
+    }
+    
+    public static void main(String args[]) {
+        I2PAppContext context = I2PAppContext.getGlobalContext();
+        Log log = context.logManager().getLog(KBucketSet.class);
+        KBucketSet set = new KBucketSet(context, Hash.FAKE_HASH);
+        testSelf(set, log);
+        testRandom(set, 1000, context, log);
+    }
+    private static void testSelf(KBucketSet set, Log log) {
+        boolean added = set.add(Hash.FAKE_HASH);
+        if (!added) 
+            log.error("Unable to add self...");
+        else
+            log.debug("Added self");
+    }
+    private static void testRandom(KBucketSet set, int count, I2PAppContext context, Log log) {
+        for (int i = 0; i < count; i++) {
+            byte val[] = new byte[Hash.HASH_LENGTH];
+            context.random().nextBytes(val);
+            boolean added = set.add(new Hash(val));
+            if (!added)
+                log.error("Unable to add random key [" + DataHelper.toHexString(val) + "]");
+            else
+                log.debug("Added random key");
+        }
     }
 }
