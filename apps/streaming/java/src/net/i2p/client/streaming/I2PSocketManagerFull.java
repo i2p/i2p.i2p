@@ -77,10 +77,10 @@ public class I2PSocketManagerFull implements I2PSocketManager {
                 _log.warn("Invalid max # of concurrent streams, defaulting to unlimited", nfe);
             _maxStreams = -1;
         }
-        _connectionManager = new ConnectionManager(_context, _session, _maxStreams);
         _name = name + " " + (++__managerId);
         _acceptTimeout = ACCEPT_TIMEOUT_DEFAULT;
         _defaultOptions = new ConnectionOptions(opts);
+        _connectionManager = new ConnectionManager(_context, _session, _maxStreams, _defaultOptions);
         _serverSocket = new I2PServerSocketFull(this);
         
         if (_log.shouldLog(Log.INFO)) {
@@ -91,7 +91,9 @@ public class I2PSocketManagerFull implements I2PSocketManager {
 
     public I2PSocketOptions buildOptions() { return buildOptions(null); }
     public I2PSocketOptions buildOptions(Properties opts) {
-        return new ConnectionOptions(opts);
+        ConnectionOptions curOpts = new ConnectionOptions(_defaultOptions);
+        curOpts.setProperties(opts);
+        return curOpts;
     }
     
     public I2PSession getSession() {
@@ -164,9 +166,13 @@ public class I2PSocketManagerFull implements I2PSocketManager {
             options = _defaultOptions;
         ConnectionOptions opts = null;
         if (options instanceof ConnectionOptions)
-            opts = (ConnectionOptions)options;
+            opts = new ConnectionOptions((ConnectionOptions)options);
         else
             opts = new ConnectionOptions(options);
+        
+        if (_log.shouldLog(Log.INFO))
+            _log.info("Connecting to " + peer.calculateHash().toBase64().substring(0,6) 
+                      + " with options: " + opts);
         Connection con = _connectionManager.connect(peer, opts);
         if (con == null)
             throw new TooManyStreamsException("Too many streams (max " + _maxStreams + ")");

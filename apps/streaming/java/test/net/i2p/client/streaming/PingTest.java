@@ -19,7 +19,7 @@ public class PingTest {
         try {
             I2PAppContext context = I2PAppContext.getGlobalContext();
             I2PSession session = createSession();
-            ConnectionManager mgr = new ConnectionManager(context, session, -1);
+            ConnectionManager mgr = new ConnectionManager(context, session, -1, null);
             Log log = context.logManager().getLog(PingTest.class);
             for (int i = 0; i < 10; i++) {
                 log.debug("ping " + i);

@@ -343,7 +343,12 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         // periodically update and resign the router's 'published date', which basically
         // serves as a version
         _context.jobQueue().addJob(new PublishLocalRouterInfoJob(_context));
-        publish(ri);
+        try {
+            publish(ri);
+        } catch (IllegalArgumentException iae) {
+            _log.log(Log.CRIT, "Our local router info is b0rked, clearing from scratch", iae);
+            _context.router().rebuildNewIdentity();
+        }
     }
     
     /**

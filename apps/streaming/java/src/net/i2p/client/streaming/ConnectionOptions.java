@@ -9,7 +9,7 @@ import java.util.Properties;
 public class ConnectionOptions extends I2PSocketOptionsImpl {
     private int _connectDelay;
     private boolean _fullySigned;
-    private int _windowSize;
+    private volatile int _windowSize;
     private int _receiveWindow;
     private int _profile;
     private int _rtt;
@@ -81,8 +81,8 @@ public class ConnectionOptions extends I2PSocketOptionsImpl {
         setMaxMessageSize(getInt(opts, PROP_MAX_MESSAGE_SIZE, Packet.MAX_PAYLOAD_SIZE));
         setRTT(getInt(opts, PROP_INITIAL_RTT, 30*1000));
         setReceiveWindow(getInt(opts, PROP_INITIAL_RECEIVE_WINDOW, 1));
-        setResendDelay(getInt(opts, PROP_INITIAL_RESEND_DELAY, 5*1000));
-        setSendAckDelay(getInt(opts, PROP_INITIAL_ACK_DELAY, 2*1000));
+        setResendDelay(getInt(opts, PROP_INITIAL_RESEND_DELAY, 500));
+        setSendAckDelay(getInt(opts, PROP_INITIAL_ACK_DELAY, 500));
         setWindowSize(getInt(opts, PROP_INITIAL_WINDOW_SIZE, 1));
         setMaxResends(getInt(opts, PROP_MAX_RESENDS, 5));
         setWriteTimeout(getInt(opts, PROP_WRITE_TIMEOUT, -1));
@@ -91,6 +91,39 @@ public class ConnectionOptions extends I2PSocketOptionsImpl {
         setInboundBufferSize((getMaxMessageSize() + 2) * Connection.MAX_WINDOW_SIZE);
         
         setConnectTimeout(getInt(opts, PROP_CONNECT_TIMEOUT, Connection.DISCONNECT_TIMEOUT));
+    }
+    
+    public void setProperties(Properties opts) {
+        super.setProperties(opts);
+        if (opts == null) return;
+        if (opts.containsKey(PROP_CONNECT_DELAY))
+            setConnectDelay(getInt(opts, PROP_CONNECT_DELAY, -1));
+        if (opts.containsKey(PROP_PROFILE))
+            setProfile(getInt(opts, PROP_PROFILE, PROFILE_BULK));
+        if (opts.containsKey(PROP_MAX_MESSAGE_SIZE))
+            setMaxMessageSize(getInt(opts, PROP_MAX_MESSAGE_SIZE, Packet.MAX_PAYLOAD_SIZE));
+        if (opts.containsKey(PROP_INITIAL_RTT))
+            setRTT(getInt(opts, PROP_INITIAL_RTT, 30*1000));
+        if (opts.containsKey(PROP_INITIAL_RECEIVE_WINDOW))
+            setReceiveWindow(getInt(opts, PROP_INITIAL_RECEIVE_WINDOW, 1));
+        if (opts.containsKey(PROP_INITIAL_RESEND_DELAY))
+            setResendDelay(getInt(opts, PROP_INITIAL_RESEND_DELAY, 500));
+        if (opts.containsKey(PROP_INITIAL_ACK_DELAY))
+            setSendAckDelay(getInt(opts, PROP_INITIAL_ACK_DELAY, 500));
+        if (opts.containsKey(PROP_INITIAL_WINDOW_SIZE))
+            setWindowSize(getInt(opts, PROP_INITIAL_WINDOW_SIZE, 1));
+        if (opts.containsKey(PROP_MAX_RESENDS))
+            setMaxResends(getInt(opts, PROP_MAX_RESENDS, 5));
+        if (opts.containsKey(PROP_WRITE_TIMEOUT))
+            setWriteTimeout(getInt(opts, PROP_WRITE_TIMEOUT, -1));
+        if (opts.containsKey(PROP_INACTIVITY_TIMEOUT))
+            setInactivityTimeout(getInt(opts, PROP_INACTIVITY_TIMEOUT, 5*60*1000));
+        if (opts.containsKey(PROP_INACTIVITY_ACTION))
+            setInactivityAction(getInt(opts, PROP_INACTIVITY_ACTION, INACTIVITY_ACTION_DISCONNECT));
+        setInboundBufferSize((getMaxMessageSize() + 2) * Connection.MAX_WINDOW_SIZE);
+        
+        if (opts.containsKey(PROP_CONNECT_TIMEOUT))
+            setConnectTimeout(getInt(opts, PROP_CONNECT_TIMEOUT, Connection.DISCONNECT_TIMEOUT));
     }
     
     /** 

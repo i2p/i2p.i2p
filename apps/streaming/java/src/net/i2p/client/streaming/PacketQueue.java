@@ -121,7 +121,9 @@ class PacketQueue {
                              + " con: " + conStr;
                 _log.debug(msg);
             }
-            _connectionManager.getPacketHandler().displayPacket(packet, "SEND");
+            Connection c = packet.getConnection();
+            String suffix = (c != null ? "wsize " + c.getOptions().getWindowSize() : null);
+            _connectionManager.getPacketHandler().displayPacket(packet, "SEND", suffix);
         }
     }
     

@@ -563,7 +563,7 @@ public class Packet {
         if (isFlagSet(FLAG_DELAY_REQUESTED)) buf.append(" DELAY ").append(_optionDelay);
         if (isFlagSet(FLAG_ECHO)) buf.append(" ECHO");
         if (isFlagSet(FLAG_FROM_INCLUDED)) buf.append(" FROM");
-        if (isFlagSet(FLAG_MAX_PACKET_SIZE_INCLUDED)) buf.append(" MS");
+        if (isFlagSet(FLAG_MAX_PACKET_SIZE_INCLUDED)) buf.append(" MS ").append(_optionMaxSize);
         if (isFlagSet(FLAG_PROFILE_INTERACTIVE)) buf.append(" INTERACTIVE");
         if (isFlagSet(FLAG_RESET)) buf.append(" RESET");
         if (isFlagSet(FLAG_SIGNATURE_INCLUDED)) buf.append(" SIG");

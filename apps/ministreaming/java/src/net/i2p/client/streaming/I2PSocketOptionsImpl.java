@@ -35,6 +35,18 @@ class I2PSocketOptionsImpl implements I2PSocketOptions {
         init(opts);
     }
     
+    public void setProperties(Properties opts) {
+        if (opts == null) return;
+        if (opts.containsKey(PROP_BUFFER_SIZE))
+            _maxBufferSize = getInt(opts, PROP_BUFFER_SIZE, DEFAULT_BUFFER_SIZE);
+        if (opts.containsKey(PROP_CONNECT_TIMEOUT))
+            _connectTimeout = getInt(opts, PROP_CONNECT_TIMEOUT, DEFAULT_CONNECT_TIMEOUT);
+        if (opts.containsKey(PROP_READ_TIMEOUT))
+            _readTimeout = getInt(opts, PROP_READ_TIMEOUT, -1);
+        if (opts.containsKey(PROP_WRITE_TIMEOUT))
+            _writeTimeout = getInt(opts, PROP_WRITE_TIMEOUT, DEFAULT_WRITE_TIMEOUT);
+    }
+    
     protected void init(Properties opts) {
         _maxBufferSize = getInt(opts, PROP_BUFFER_SIZE, DEFAULT_BUFFER_SIZE);
         _connectTimeout = getInt(opts, PROP_CONNECT_TIMEOUT, DEFAULT_CONNECT_TIMEOUT);

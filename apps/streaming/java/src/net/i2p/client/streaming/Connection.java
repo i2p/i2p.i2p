@@ -61,6 +61,8 @@ public class Connection {
     private ActivityTimer _activityTimer;
     /** window size when we last saw congestion */
     private int _lastCongestionSeenAt;
+    private long _lastCongestionTime;
+    private long _lastCongestionHighestUnacked;
     private boolean _ackSinceCongestion;
     /** Notify this on connection (or connection failure) */
     private Object _connectLock;
@@ -89,7 +91,7 @@ public class Connection {
         _log = ctx.logManager().getLog(Connection.class);
         _receiver = new ConnectionDataReceiver(ctx, this);
         _inputStream = new MessageInputStream(ctx);
-        _outputStream = new MessageOutputStream(ctx, _receiver);
+        _outputStream = new MessageOutputStream(ctx, _receiver, (opts == null ? Packet.MAX_PAYLOAD_SIZE : opts.getMaxMessageSize()));
         _chooser = chooser;
         _outboundPackets = new TreeMap();
         _outboundQueue = queue;
@@ -105,6 +107,8 @@ public class Connection {
         _congestionWindowEnd = 0;
         _highestAckedThrough = -1;
         _lastCongestionSeenAt = MAX_WINDOW_SIZE;
+        _lastCongestionTime = -1;
+        _lastCongestionHighestUnacked = -1;
         _connectionManager = manager;
         _resetReceived = false;
         _connected = true;
@@ -599,6 +603,8 @@ public class Connection {
         // dont set the size to (winSize >> 4).  only set the
         if (_ackSinceCongestion) {
             _lastCongestionSeenAt = _options.getWindowSize();
+            _lastCongestionTime = _context.clock().now();
+            _lastCongestionHighestUnacked = _lastSendId;
             _ackSinceCongestion = false;
         }
     }
@@ -813,14 +819,24 @@ public class Connection {
                 _packet.setReceiveStreamId(_receiveStreamId);
                 _packet.setSendStreamId(_sendStreamId);
                 
-                // shrink the window
                 int newWindowSize = getOptions().getWindowSize();
-                congestionOccurred();
-                _context.statManager().addRateData("stream.con.windowSizeAtCongestion", newWindowSize, _packet.getLifetime());
-                newWindowSize /= 2;
-                if (newWindowSize <= 0)
-                    newWindowSize = 1;
-                getOptions().setWindowSize(newWindowSize);
+
+                if (_ackSinceCongestion) {
+                    // only shrink the window once per window
+                    if (_packet.getSequenceNum() > _lastCongestionHighestUnacked) {
+                        congestionOccurred();
+                        _context.statManager().addRateData("stream.con.windowSizeAtCongestion", newWindowSize, _packet.getLifetime());
+                        newWindowSize /= 2;
+                        if (newWindowSize <= 0)
+                            newWindowSize = 1;
+
+                        if (_log.shouldLog(Log.WARN))
+                            _log.warn("Congestion resending packet " + _packet.getSequenceNum() + ": new windowSize " + newWindowSize 
+                                      + ") for " + Connection.this.toString());
+
+                        getOptions().setWindowSize(newWindowSize);
+                    }
+                }
                 
                 int numSends = _packet.getNumSends() + 1;
                 

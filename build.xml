@@ -248,7 +248,6 @@
         <copy file="hosts.txt" todir="pkg-temp/" />
         <mkdir dir="pkg-temp/eepsite" />
         <mkdir dir="pkg-temp/eepsite/webapps" />
-        <copy file="installer/resources/jetty.xml" tofile="pkg-temp/eepsite/jetty.xml" />
         <zip destfile="i2pupdate.zip" basedir="pkg-temp" />
     </target>
     <taskdef name="izpack" classpath="${basedir}/installer/lib/izpack/standalone-compiler.jar" classname="com.izforge.izpack.ant.IzPackTask" />

@@ -32,6 +32,12 @@ public class MessageOutputStream extends OutputStream {
     private long _lastBuffered;
     /** if we enqueue data but don't flush it in this period, flush it passively */
     private int _passiveFlushDelay;
+    /** 
+     * if we are changing the buffer size during operation, set this to the new 
+     * buffer size, and next time we are flushing, update the _buf array to the new 
+     * size
+     */
+    private volatile int _nextBufferSize;
     
     public MessageOutputStream(I2PAppContext ctx, DataReceiver receiver) {
         this(ctx, receiver, Packet.MAX_PAYLOAD_SIZE);
@@ -48,6 +54,7 @@ public class MessageOutputStream extends OutputStream {
         _closed = false;
         _writeTimeout = -1;
         _passiveFlushDelay = 500;
+        _nextBufferSize = -1;
         _flusher = new Flusher();
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("MessageOutputStream created");
@@ -55,6 +62,7 @@ public class MessageOutputStream extends OutputStream {
     
     public void setWriteTimeout(int ms) { _writeTimeout = ms; }
     public int getWriteTimeout() { return _writeTimeout; }
+    public void setBufferSize(int size) { _nextBufferSize = size; }
     
     public void write(byte b[]) throws IOException {
         write(b, 0, b.length);
@@ -103,6 +111,8 @@ public class MessageOutputStream extends OutputStream {
                     _valid = 0;                       
                     throwAnyError();
                     _lastFlushed = _context.clock().now();
+                    
+                    locked_updateBufferSize();
                 }
             }
             if (ws != null) {
@@ -132,6 +142,22 @@ public class MessageOutputStream extends OutputStream {
     public void write(int b) throws IOException {
         write(new byte[] { (byte)b }, 0, 1);
         throwAnyError();
+    }
+    
+    /**
+     * If the other side requested we shrink our buffer, do so.
+     *
+     */
+    private final void locked_updateBufferSize() {
+        int size = _nextBufferSize;
+        if (size > 0) {
+            // update the buffer size to the requested amount
+            _dataCache.release(new ByteArray(_buf));
+            _dataCache = ByteCache.getInstance(128, size);
+            ByteArray ba = _dataCache.acquire();
+            _buf = ba.getData();
+            _nextBufferSize = -1;
+        }
     }
     
     /**
@@ -180,6 +206,7 @@ public class MessageOutputStream extends OutputStream {
                         _written += _valid;
                         _valid = 0;
                         _lastFlushed = _context.clock().now();
+                        locked_updateBufferSize();
                         _dataLock.notifyAll();
                         sent = true;
                     }
@@ -213,6 +240,7 @@ public class MessageOutputStream extends OutputStream {
             ws = _dataReceiver.writeData(_buf, 0, _valid);
             _written += _valid;
             _valid = 0;
+            locked_updateBufferSize();
             _lastFlushed = _context.clock().now();
             _dataLock.notifyAll();
         }
@@ -251,6 +279,7 @@ public class MessageOutputStream extends OutputStream {
                 ba = new ByteArray(_buf);
                 _buf = null;
                 _valid = 0;
+                locked_updateBufferSize();
             }
         }
         if (ba != null) {
@@ -314,6 +343,7 @@ public class MessageOutputStream extends OutputStream {
             ws = target.writeData(_buf, 0, _valid);
             _written += _valid;
             _valid = 0;
+            locked_updateBufferSize();
             _dataLock.notifyAll();
             _lastFlushed = _context.clock().now();
         }

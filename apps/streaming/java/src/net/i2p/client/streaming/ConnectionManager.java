@@ -37,10 +37,11 @@ public class ConnectionManager {
     private Map _pendingPings;
     private boolean _allowIncoming;
     private int _maxConcurrentStreams;
+    private ConnectionOptions _defaultOptions;
     private volatile int _numWaiting;
     private Object _connectionLock;
     
-    public ConnectionManager(I2PAppContext context, I2PSession session, int maxConcurrent) {
+    public ConnectionManager(I2PAppContext context, I2PSession session, int maxConcurrent, ConnectionOptions defaultOptions) {
         _context = context;
         _log = context.logManager().getLog(ConnectionManager.class);
         _connectionByInboundId = new HashMap(32);
@@ -56,6 +57,7 @@ public class ConnectionManager {
         _outboundQueue = new PacketQueue(context, session, this);
         _allowIncoming = false;
         _maxConcurrentStreams = maxConcurrent;
+        _defaultOptions = defaultOptions;
         _numWaiting = 0;
         _context.statManager().createRateStat("stream.con.lifetimeMessagesSent", "How many messages do we send on a stream?", "Stream", new long[] { 60*60*1000, 24*60*60*1000 });
         _context.statManager().createRateStat("stream.con.lifetimeMessagesReceived", "How many messages do we receive on a stream?", "Stream", new long[] { 60*60*1000, 24*60*60*1000 });
@@ -103,7 +105,7 @@ public class ConnectionManager {
      *         it, or null if the syn's streamId was already taken
      */
     public Connection receiveConnection(Packet synPacket) {
-        Connection con = new Connection(_context, this, _schedulerChooser, _outboundQueue, _conPacketHandler);
+        Connection con = new Connection(_context, this, _schedulerChooser, _outboundQueue, _conPacketHandler, new ConnectionOptions(_defaultOptions));
         byte receiveId[] = new byte[4];
         _context.random().nextBytes(receiveId);
         boolean reject = false;

@@ -35,7 +35,7 @@ public class PacketHandler {
             // artificial choke: 2% random drop and a 0-30s
             // random tiered delay from 0-30s
             if (_context.random().nextInt(100) >= 95) {
-                displayPacket(packet, "DROP");
+                displayPacket(packet, "DROP", null);
                 return false;
             } else {
                 // if (true) return true; // no lag, just drop
@@ -97,18 +97,18 @@ public class PacketHandler {
         Connection con = (sendId != null ? _manager.getConnectionByInboundId(sendId) : null); 
         if (con != null) {
             receiveKnownCon(con, packet);
-            displayPacket(packet, "RECV");
+            displayPacket(packet, "RECV", "wsize " + con.getOptions().getWindowSize());
         } else {
             receiveUnknownCon(packet, sendId);
-            displayPacket(packet, "UNKN");
+            displayPacket(packet, "UNKN", null);
         }
     }
     
     private static final SimpleDateFormat _fmt = new SimpleDateFormat("HH:mm:ss.SSS");
-    void displayPacket(Packet packet, String prefix) {
+    void displayPacket(Packet packet, String prefix, String suffix) {
         String msg = null;
         synchronized (_fmt) {
-            msg = _fmt.format(new Date()) + ": " + prefix + " " + packet.toString();
+            msg = _fmt.format(new Date()) + ": " + prefix + " " + packet.toString() + (suffix != null ? " " + suffix : "");
         }
         if (_log.shouldLog(Log.DEBUG))
             System.out.println(msg);

@@ -146,7 +146,6 @@ class ConnectionDataReceiver implements MessageOutputStream.DataReceiver {
         
         con.getInputStream().updateAcks(packet);
         packet.setOptionalDelay(con.getOptions().getChoke());
-        packet.setOptionalMaxSize(con.getOptions().getMaxMessageSize());
         packet.setResendDelay(con.getOptions().getResendDelay());
         
         if (con.getOptions().getProfile() == ConnectionOptions.PROFILE_INTERACTIVE)
@@ -159,6 +158,7 @@ class ConnectionDataReceiver implements MessageOutputStream.DataReceiver {
         if ( (!ackOnly) && (packet.getSequenceNum() <= 0) ) {
             packet.setFlag(Packet.FLAG_SYNCHRONIZE);
             packet.setOptionalFrom(con.getSession().getMyDestination());
+            packet.setOptionalMaxSize(con.getOptions().getMaxMessageSize());
         }
         
         // don't set the closed flag if this is a plain ACK and there are outstanding

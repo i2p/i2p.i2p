@@ -49,7 +49,16 @@ public class ConnectionPacketHandler {
             }
             return;
         }
-        
+
+        if (packet.isFlagSet(Packet.FLAG_MAX_PACKET_SIZE_INCLUDED)) {
+            if (packet.getOptionalMaxSize() < con.getOptions().getMaxMessageSize()) {
+                if (_log.shouldLog(Log.INFO))
+                    _log.info("Reducing our max message size to " + packet.getOptionalMaxSize() 
+                              + " from " + con.getOptions().getMaxMessageSize());
+                con.getOptions().setMaxMessageSize(packet.getOptionalMaxSize());
+                con.getOutputStream().setBufferSize(packet.getOptionalMaxSize());
+            }
+        }
 
         con.packetReceived();
         
@@ -185,20 +194,21 @@ public class ConnectionPacketHandler {
             oldSize >>>= 1;
             if (oldSize <= 0)
                 oldSize = 1;
-            con.getOptions().setWindowSize(oldSize);
-            
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Congestion occurred - new windowSize " + oldSize + " congestionSeenAt: "
                            + con.getLastCongestionSeenAt() + " (#resends: " + numResends 
                            + ") for " + con);
 
+            con.getOptions().setWindowSize(oldSize);
+            
             congested = true;
         } 
         
         long lowest = con.getHighestAckedThrough();
         if (lowest >= con.getCongestionWindowEnd()) {
             // new packet that ack'ed uncongested data, or an empty ack
-            int newWindowSize = con.getOptions().getWindowSize();
+            int oldWindow = con.getOptions().getWindowSize();
+            int newWindowSize = oldWindow;
 
             if ( (!congested) && (acked > 0) && (numResends <= 0) ) {
                 if (newWindowSize > con.getLastCongestionSeenAt() / 2) {
@@ -216,7 +226,7 @@ public class ConnectionPacketHandler {
             }
                     
             if (_log.shouldLog(Log.DEBUG))
-                _log.debug("New window size " + newWindowSize + " congestionSeenAt: "
+                _log.debug("New window size " + newWindowSize + "/" + oldWindow + " congestionSeenAt: "
                            + con.getLastCongestionSeenAt() + " (#resends: " + numResends 
                            + ") for " + con);
             con.getOptions().setWindowSize(newWindowSize);
