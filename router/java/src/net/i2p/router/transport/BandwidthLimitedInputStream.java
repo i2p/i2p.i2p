@@ -14,12 +14,15 @@ import java.io.InputStream;
 
 import net.i2p.data.RouterIdentity;
 import net.i2p.router.RouterContext;
+import net.i2p.util.Log;
 
 public class BandwidthLimitedInputStream extends FilterInputStream {
+    private Log _log;
     private RouterIdentity _peer;
     private String _peerSource;
     private RouterContext _context;
     private boolean _pullFromOutbound;
+    private FIFOBandwidthLimiter.Request _currentRequest;
     
     public BandwidthLimitedInputStream(RouterContext context, InputStream source, RouterIdentity peer) {
         this(context, source, peer, false);
@@ -35,18 +38,21 @@ public class BandwidthLimitedInputStream extends FilterInputStream {
         if (peer != null)
             _peerSource = peer.getHash().toBase64();
         _pullFromOutbound = pullFromOutbound;
+        _log = context.logManager().getLog(BandwidthLimitedInputStream.class);
     }
     
     public int read() throws IOException {
-        FIFOBandwidthLimiter.Request req = null;
         if (_pullFromOutbound)
-            req = _context.bandwidthLimiter().requestOutbound(1, _peerSource);
+            _currentRequest = _context.bandwidthLimiter().requestOutbound(1, _peerSource);
         else
-            req = _context.bandwidthLimiter().requestInbound(1, _peerSource);
+            _currentRequest = _context.bandwidthLimiter().requestInbound(1, _peerSource);
         
         // since its only a single byte, we dont need to loop
         // or check how much was allocated
-        req.waitForNextAllocation();
+        _currentRequest.waitForNextAllocation();
+        synchronized (this) {
+            _currentRequest = null;
+        }
         return in.read();
     }
     
@@ -56,32 +62,51 @@ public class BandwidthLimitedInputStream extends FilterInputStream {
     
     public int read(byte dest[], int off, int len) throws IOException {
         int read = in.read(dest, off, len);
-        FIFOBandwidthLimiter.Request req = null;
         if (_pullFromOutbound)
-            req = _context.bandwidthLimiter().requestOutbound(read, _peerSource);
+            _currentRequest = _context.bandwidthLimiter().requestOutbound(read, _peerSource);
         else
-            req = _context.bandwidthLimiter().requestInbound(read, _peerSource);
+            _currentRequest = _context.bandwidthLimiter().requestInbound(read, _peerSource);
         
-        while ( (req.getPendingInboundRequested() > 0) ||
-                (req.getPendingOutboundRequested() > 0) ) {
+        while ( (_currentRequest.getPendingInboundRequested() > 0) ||
+                (_currentRequest.getPendingOutboundRequested() > 0) ) {
             // we still haven't been authorized for everything, keep on waiting
-            req.waitForNextAllocation();
+            _currentRequest.waitForNextAllocation();
+            if (_currentRequest.getAborted()) {
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("Request aborted while trying to read " + len + " (actually read " + read + ")");
+                break;
+            }
+        }
+        synchronized (this) {
+            _currentRequest = null;
         }
         return read;
     }
     public long skip(long numBytes) throws IOException {
         long skip = in.skip(numBytes);
-        FIFOBandwidthLimiter.Request req = null;
         if (_pullFromOutbound)
-            req = _context.bandwidthLimiter().requestOutbound((int)skip, _peerSource);
+            _currentRequest = _context.bandwidthLimiter().requestOutbound((int)skip, _peerSource);
         else
-            req = _context.bandwidthLimiter().requestInbound((int)skip, _peerSource);
+            _currentRequest = _context.bandwidthLimiter().requestInbound((int)skip, _peerSource);
         
-        while ( (req.getPendingInboundRequested() > 0) ||
-                (req.getPendingOutboundRequested() > 0) ) {
+        while ( (_currentRequest.getPendingInboundRequested() > 0) ||
+                (_currentRequest.getPendingOutboundRequested() > 0) ) {
             // we still haven't been authorized for everything, keep on waiting
-            req.waitForNextAllocation();
+            _currentRequest.waitForNextAllocation();
+            if (_currentRequest.getAborted()) {
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("Request aborted while trying to skip " + numBytes);
+                break;
+            }
         }
         return skip;
+    }
+    
+    public void close() throws IOException {
+        synchronized (this) {
+            if (_currentRequest != null)
+                _currentRequest.abort();
+        }
+        super.close();
     }
 }

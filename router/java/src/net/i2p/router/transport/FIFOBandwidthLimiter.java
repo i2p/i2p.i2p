@@ -191,6 +191,19 @@ public class FIFOBandwidthLimiter {
         for (int i = 0; i < _pendingInboundRequests.size(); i++) {
             if (_availableInboundBytes <= 0) break;
             SimpleRequest req = (SimpleRequest)_pendingInboundRequests.get(i);
+            long waited = _context.clock().now() - req.getRequestTime();
+            if (req.getAborted()) {
+                // connection decided they dont want the data anymore
+                if (_log.shouldLog(Log.INFO))
+                     _log.info("Aborting inbound request to " 
+                                + req.getRequestName() + " (total " 
+                                + req.getTotalInboundRequested() + " bytes, waited " 
+                                + waited
+                                + "ms) pending " + _pendingInboundRequests.size());
+                _pendingInboundRequests.remove(i);
+                i--;
+                continue;
+            }
             if (req.getAllocationsSinceWait() > 0) {
                 // we have already allocated some values to this request, but
                 // they haven't taken advantage of it yet (most likely they're
@@ -210,7 +223,6 @@ public class FIFOBandwidthLimiter {
             if (satisfied == null)
                 satisfied = new ArrayList(2);
             satisfied.add(req);
-            long waited = _context.clock().now() - req.getRequestTime();
             if (req.getPendingInboundRequested() > 0) {
                 if (_log.shouldLog(Log.INFO))
                      _log.info("Allocating " + allocated + " bytes inbound as a partial grant to " 
@@ -300,6 +312,19 @@ public class FIFOBandwidthLimiter {
         for (int i = 0; i < _pendingOutboundRequests.size(); i++) {
             if (_availableOutboundBytes <= 0) break;
             SimpleRequest req = (SimpleRequest)_pendingOutboundRequests.get(i);
+            long waited = _context.clock().now() - req.getRequestTime();
+            if (req.getAborted()) {
+                // connection decided they dont want the data anymore
+                if (_log.shouldLog(Log.INFO))
+                     _log.info("Aborting outbound request to " 
+                                + req.getRequestName() + " (total " 
+                                + req.getTotalOutboundRequested() + " bytes, waited " 
+                                + waited
+                                + "ms) pending " + _pendingOutboundRequests.size());
+                _pendingOutboundRequests.remove(i);
+                i--;
+                continue;
+            }
             if (req.getAllocationsSinceWait() > 0) {
                 // we have already allocated some values to this request, but
                 // they haven't taken advantage of it yet (most likely they're
@@ -319,7 +344,6 @@ public class FIFOBandwidthLimiter {
             if (satisfied == null)
                 satisfied = new ArrayList(2);
             satisfied.add(req);
-            long waited = _context.clock().now() - req.getRequestTime();
             if (req.getPendingOutboundRequested() > 0) {
                 if (_log.shouldLog(Log.INFO))
                      _log.info("Allocating " + allocated + " bytes outbound as a partial grant to " 
@@ -385,12 +409,14 @@ public class FIFOBandwidthLimiter {
         private long _requestTime;
         private String _target;
         private int _allocationsSinceWait;
+        private boolean _aborted;
         
         public SimpleRequest(int in, int out, String target) {
             _inTotal = in;
             _outTotal = out;
             _inAllocated = 0;
             _outAllocated = 0;
+            _aborted = false;
             _target = target;
             _requestId = ++__requestId;
             _requestTime = _context.clock().now();
@@ -402,6 +428,9 @@ public class FIFOBandwidthLimiter {
         public int getPendingOutboundRequested() { return _outTotal - _outAllocated; }
         public int getTotalInboundRequested() { return _inTotal; }
         public int getPendingInboundRequested() { return _inTotal - _inAllocated; }
+        public boolean getAborted() { return _aborted; }
+        public void abort() { _aborted = true; }
+        
         public void waitForNextAllocation() {
             _allocationsSinceWait = 0;
             if ( (_outAllocated >= _outTotal) && 
@@ -441,5 +470,10 @@ public class FIFOBandwidthLimiter {
         public int getPendingInboundRequested();
         /** block until we are allocated some more bytes */
         public void waitForNextAllocation();
+        /** we no longer want the data requested (e.g. the connection closed */
+        public void abort();
+        /** was this request aborted?  */
+        public boolean getAborted();
+        
     }
 }

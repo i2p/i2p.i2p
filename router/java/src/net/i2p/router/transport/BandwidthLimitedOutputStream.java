@@ -21,6 +21,7 @@ public class BandwidthLimitedOutputStream extends FilterOutputStream {
     private String _peerTarget;
     private RouterContext _context;
     private Log _log;
+    private FIFOBandwidthLimiter.Request _currentRequest;
     
     public BandwidthLimitedOutputStream(RouterContext context, OutputStream source, RouterIdentity peer) {
         super(source);
@@ -31,6 +32,7 @@ public class BandwidthLimitedOutputStream extends FilterOutputStream {
         else
             _peerTarget = "unknown";
         _log = context.logManager().getLog(BandwidthLimitedOutputStream.class);
+        _currentRequest = null;
     }
     
     public void write(int val) throws IOException {
@@ -52,17 +54,33 @@ public class BandwidthLimitedOutputStream extends FilterOutputStream {
         if (len + off > src.length)
             throw new IllegalArgumentException("wtf are you thinking?  len=" + len 
                                                + ", off=" + off + ", data=" + src.length);
-        FIFOBandwidthLimiter.Request req = _context.bandwidthLimiter().requestOutbound(len, _peerTarget);
+        _currentRequest = _context.bandwidthLimiter().requestOutbound(len, _peerTarget);
         
         int written = 0;
         while (written < len) {
-            int allocated = len - req.getPendingOutboundRequested();
+            int allocated = len - _currentRequest.getPendingOutboundRequested();
             int toWrite = allocated - written;
             if (toWrite > 0) {
-                out.write(src, off + written, toWrite);
+                try {
+                    out.write(src, off + written, toWrite);
+                } catch (IOException ioe) {
+                    _currentRequest.abort();
+                    throw ioe;
+                }
                 written += toWrite;
             }
-            req.waitForNextAllocation();
+            _currentRequest.waitForNextAllocation();
         }
+        synchronized (this) {
+            _currentRequest = null;
+        }
+    }
+    
+    public void close() throws IOException {
+        synchronized (this) {
+            if (_currentRequest != null)
+                _currentRequest.abort();
+        }
+        super.close();
     }
 }
