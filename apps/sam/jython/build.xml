@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project basedir="." default="all" name="sam">
+
+    <target name="all" depends="build" />
+
+    <target name="build" depends="builddep, jar" />
+
+    <target name="builddep">
+        <ant dir="../../../core/java/" target="build" />
+        <ant dir="../../ministreaming/java/" target="build" />
+    </target>
+
+    <target name="jar">
+        <exec executable="jythonc">
+            <env key="CLASSPATH" path="../../../core/java/build/i2p.jar:../../ministreaming/java/build/mstreaming.jar"/>
+            <arg value="--jar"/>
+            <arg value="./build/i2psam.jar"/>
+            <arg value="./src/i2psam.py"/>
+        </exec>
+    </target>
+
+    <target name="clean">
+        <delete dir="./build" />
+        <delete dir="./jpywork" />
+    </target>
+
+</project>

@@ -1,0 +1,57 @@
+-----------------------------------
+Instructions for building i2psam.jar
+------------------------------------
+
+1) Requirements
+
+You will need:
+
+ - a decent java sdk, eg Sun J2SDK 1.4.2 or later
+ - jython - www.jython.org
+
+Note that you don't need python to build the SAM server
+
+IMPORTANT - when installing jython, and run java on jython_n.n.class,
+make sure you run the java.exe that's in your SDK, not the one in your
+JRE.
+
+---------------------------------------------------------
+
+2) Preparation
+
+Edit the Makefile, and set JYTHONJAR to where your jython.jar lives
+
+Don't worry about this if your're on windows
+
+----------------------------------------------------------
+
+3) Building
+
+To build i2psam.jar on regular *nix OSs, simply type 'make'.
+
+To build i2psam.jar on Windows, type 'build.bat'
+
+----------------------------------------------------------
+
+4) Installing
+
+Copy i2psam.jar to wherever the jar files live on your i2p installation,
+usually <i2pbasedir>/lib
+
+Find jython.jar, and copy it there too
+
+----------------------------------------------------------
+
+5) Running
+
+(assuming that you're putting the start script into your main i2p
+runtime directory, where the I2P jars live in a 'lib' subdirectory)
+
+You will need to launch i2psam.jar with a command like:
+
+ java -cp lib/jython.jar:lib/i2p.jar:lib/mstreaming.jar:lib/i2psam.jar i2psam
+
+or on windows,
+
+ java -cp lib\jython.jar;lib\i2p.jar;lib\mstreaming.jar;lib\i2psam.jar i2psam
+
