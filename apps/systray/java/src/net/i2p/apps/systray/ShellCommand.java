@@ -346,12 +346,6 @@ public class ShellCommand {
                 processStdoutConsumer = new StreamConsumer(_process.getInputStream());
                 processStdoutConsumer.start();
             } else {
-                /*
-                 * Will the following stream readers allow _process to return 
-                 * just as if _process's streams had been consumed as above? If
-                 * so, get rid of the stream consumers and just use the
-                 * following for all cases.
-                 */
                 _errorStream = _process.getErrorStream();
                 _inputStream = _process.getInputStream();
                 _outputStream = _process.getOutputStream();
@@ -367,24 +361,15 @@ public class ShellCommand {
                 try {
                     _process.waitFor();
                 } catch (Exception e) {
-                    if (!consumeOutput) {
-                        _errorStream.close();
-                        _errorStream = null;
-                        _inputStream.close();
-                        _inputStream = null;
-                        _outputStream.close();
-                        _outputStream = null;
-                    }
+
+                    if (!consumeOutput)
+                        killStreams();
+
                     return false;
                 }
-                if (!consumeOutput) {
-                    _errorStream.close();
-                    _errorStream = null;
-                    _inputStream.close();
-                    _inputStream = null;
-                    _outputStream.close();
-                    _outputStream = null;
-                }
+
+                if (!consumeOutput)
+                    killStreams();
 
                 if (_process.exitValue() > 0)
                     return false;
@@ -394,5 +379,26 @@ public class ShellCommand {
             return false;
         }
         return true;
+    }
+
+    private void killStreams() {
+        try {
+            _errorStream.close();
+        } catch (IOException e) {
+            // Fall through.
+        }
+        try {
+            _inputStream.close();
+        } catch (IOException e1) {
+            // Fall through.
+        }
+        try {
+            _outputStream.close();
+        } catch (IOException e2) {
+            // Fall through.
+        }
+        _errorStream = null;
+        _inputStream = null;
+        _outputStream = null;
     }
 }

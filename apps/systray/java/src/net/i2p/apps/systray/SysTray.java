@@ -20,55 +20,52 @@ import snoozesoft.systray4j.SysTrayMenuListener;
  * A system tray control for launching the I2P router console.
  *
  * @author hypercubus
- * 
- * TODO Add a menu entry and dialog to let the user specify the location of their preferred web browser.
  */
 public class SysTray implements SysTrayMenuListener {
 
-    private static String _browserString;
-
     private BrowserChooser  _browserChooser;
+    private String          _browserString;
+    private ConfigFile      _configFile        = new ConfigFile("../systray.config");
     private Frame           _frame;
-    private SysTrayMenuItem _itemExit          = new SysTrayMenuItem("Exit systray", "exit");
+    private SysTrayMenuItem _itemExit          = new SysTrayMenuItem("Exit I2P systray", "exit");
     private SysTrayMenuItem _itemSelectBrowser = new SysTrayMenuItem("Select preferred browser...", "selectbrowser");
     private SysTrayMenuIcon _sysTrayMenuIcon   = new SysTrayMenuIcon("../icons/iggy");
     private SysTrayMenu     _sysTrayMenu       = new SysTrayMenu(_sysTrayMenuIcon, "I2P Router Console");
+    private UrlLauncher     _urlLauncher       = new UrlLauncher();
 
     public SysTray() {
+        _browserString = _configFile.getProperty("browser", "default");
         _sysTrayMenuIcon.addSysTrayMenuListener(this);
         createSysTrayMenu();
     }
 
     public static void main(String[] args) {
         new SysTray();
-
-        if (args.length == 1) 
-            _browserString = args[0];
-
-        while(true)
-            try {
-            Thread.sleep(2 * 1000);
-            } catch (InterruptedException e) {
-                // blah
-            }
     }
 
     public void iconLeftClicked(SysTrayMenuEvent e) {}
 
     public void iconLeftDoubleClicked(SysTrayMenuEvent e) {
-        if (_browserString == null || _browserString.equals("browser default")) {
+        if (_browserString == null || _browserString.equals("default")) {
             try {
-                new UrlLauncher().openUrl("http://localhost:7657");
+
+                if (_urlLauncher.openUrl("http://localhost:7657"))
+                    return;
+
             } catch (Exception ex) {
-                setBrowser(promptForBrowser("Please select another browser"));
+                // Fall through.
             }
         } else {
             try {
-                new UrlLauncher().openUrl("http://localhost:7657", _browserString);
+
+                if (_urlLauncher.openUrl("http://localhost:7657", _browserString))
+                    return;
+
             } catch (Exception ex) {
-                setBrowser(promptForBrowser("Please select another browser"));
+                // Fall through.
             }
         }
+        setBrowser(promptForBrowser("Please select another browser"));
     }
 
     public void menuItemSelected(SysTrayMenuEvent e) {
@@ -103,7 +100,6 @@ public class SysTray implements SysTrayMenuListener {
 
     private void setBrowser(String browser) {
         _browserString = browser;
-        // change "clientApp.3.args=browser" property in clients.config here.
-        // System.out.println("User chose browser: " + browser);
+        _configFile.setProperty("browser", browser);
     }
 }
