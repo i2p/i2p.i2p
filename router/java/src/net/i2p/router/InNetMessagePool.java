@@ -131,8 +131,8 @@ public class InNetMessagePool {
                         _log.info("Dropping unhandled delivery status message created " + timeSinceSent + "ms ago: " + msg);
                     _context.statManager().addRateData("inNetPool.droppedDeliveryStatusDelay", timeSinceSent, timeSinceSent);
                 } else {
-                    if (_log.shouldLog(Log.ERROR))
-                        _log.error("Message " + messageBody + " expiring on " 
+                    if (_log.shouldLog(Log.WARN))
+                        _log.warn("Message " + messageBody + " expiring on " 
                                    + (messageBody != null ? (messageBody.getMessageExpiration()+"") : " [unknown]")
                                    + " was not handled by a HandlerJobBuilder - DROPPING: " 
                                    + msg, new Exception("DROPPED MESSAGE"));
