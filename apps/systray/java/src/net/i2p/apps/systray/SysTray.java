@@ -27,10 +27,11 @@ public class SysTray implements SysTrayMenuListener {
     private String          _browserString;
     private ConfigFile      _configFile        = new ConfigFile();
     private Frame           _frame;
+    private SysTrayMenuItem _itemOpenConsole   = new SysTrayMenuItem("Open router console", "openconsole");
     private SysTrayMenuItem _itemSelectBrowser = new SysTrayMenuItem("Select browser...", "selectbrowser");
     private SysTrayMenuItem _itemShutdown      = new SysTrayMenuItem("Shut down I2P router", "shutdown");
     private SysTrayMenuIcon _sysTrayMenuIcon   = new SysTrayMenuIcon("icons/iggy");
-    private SysTrayMenu     _sysTrayMenu       = new SysTrayMenu(_sysTrayMenuIcon, "I2P Router Console");
+    private SysTrayMenu     _sysTrayMenu       = new SysTrayMenu(_sysTrayMenuIcon, "I2P Control");
     private UrlLauncher     _urlLauncher       = new UrlLauncher();
 
     public SysTray() {
@@ -45,12 +46,51 @@ public class SysTray implements SysTrayMenuListener {
     }
 
     public static void main(String[] args) {
-        new SysTray();
+
+        if (System.getProperty("os.name").startsWith("Windows"))
+            new SysTray();
     }
 
     public void iconLeftClicked(SysTrayMenuEvent e) {}
 
     public void iconLeftDoubleClicked(SysTrayMenuEvent e) {
+        openRouterConsole();
+    }
+
+    public void menuItemSelected(SysTrayMenuEvent e) {
+
+        String browser = null;
+
+        if (e.getActionCommand().equals("shutdown")) {
+            _browserChooser = null;
+            _frame = null;
+            _itemShutdown = null;
+            _itemSelectBrowser = null;
+            _sysTrayMenuIcon = null;
+            _sysTrayMenu = null;
+            _browserChooser = null;
+            _frame = null;
+            System.exit(0);
+        } else if (e.getActionCommand().equals("selectbrowser")) {
+
+            if (!(browser = promptForBrowser("Select browser")).equals("nullnull"))
+                setBrowser(browser);
+
+        } else if (e.getActionCommand().equals("openconsole")) {
+            openRouterConsole();
+        }
+    }
+
+    private void createSysTrayMenu() {
+        _itemSelectBrowser.addSysTrayMenuListener(this);
+        _itemShutdown.addSysTrayMenuListener(this);
+        _sysTrayMenu.addItem(_itemShutdown);
+        _sysTrayMenu.addSeparator();
+        _sysTrayMenu.addItem(_itemSelectBrowser);
+        _sysTrayMenu.addItem(_itemOpenConsole);
+    }
+
+    private void openRouterConsole() {
 
         String browser = null;
 
@@ -76,35 +116,6 @@ public class SysTray implements SysTrayMenuListener {
 
         if (!(browser = promptForBrowser("Please select another browser")).equals("nullnull"))
             setBrowser(browser);
-    }
-
-    public void menuItemSelected(SysTrayMenuEvent e) {
-
-        String browser = null;
-
-        if (e.getActionCommand().equals("shutdown")) {
-            _browserChooser = null;
-            _frame = null;
-            _itemShutdown = null;
-            _itemSelectBrowser = null;
-            _sysTrayMenuIcon = null;
-            _sysTrayMenu = null;
-            _browserChooser = null;
-            _frame = null;
-            System.exit(0);
-        } else if (e.getActionCommand().equals("selectbrowser")) {
-
-            if (!(browser = promptForBrowser("Select browser")).equals("nullnull"))
-                setBrowser(browser);
-        }
-    }
-
-    private void createSysTrayMenu() {
-        _itemSelectBrowser.addSysTrayMenuListener(this);
-        _itemShutdown.addSysTrayMenuListener(this);
-        _sysTrayMenu.addItem(_itemShutdown);
-        _sysTrayMenu.addSeparator();
-        _sysTrayMenu.addItem(_itemSelectBrowser);
     }
 
     private String promptForBrowser(String windowTitle) {
