@@ -53,8 +53,7 @@ class I2CPMessageProducer {
      */
     public void connect(I2PSessionImpl session) throws I2PSessionException {
         CreateSessionMessage msg = new CreateSessionMessage();
-        SessionConfig cfg = new SessionConfig();
-        cfg.setDestination(session.getMyDestination());
+        SessionConfig cfg = new SessionConfig(session.getMyDestination());
         cfg.setOptions(session.getOptions());
         try {
             cfg.signSessionConfig(session.getPrivateKey());
