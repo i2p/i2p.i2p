@@ -1,6 +1,7 @@
 package net.i2p.time;
 
 import java.io.IOException;
+import java.io.InterruptedIOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
@@ -79,7 +80,13 @@ public class NtpClient {
 
             // Get response
             packet = new DatagramPacket(buf, buf.length);
-            socket.receive(packet);
+            socket.setSoTimeout(10*1000);
+            try {
+                socket.receive(packet);
+            } catch (InterruptedIOException iie) {
+                socket.close();
+                return -1;
+            }
 
             // Immediately record the incoming timestamp
             double destinationTimestamp = (System.currentTimeMillis()/1000.0) + SECONDS_1900_TO_EPOCH;
