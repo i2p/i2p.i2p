@@ -133,8 +133,14 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
         msg.setSessionId(sessionId);
         msg.setStatus(SessionStatusMessage.STATUS_CREATED);
         try {
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("before sending sessionStatusMessage for " + message.getSessionConfig().getDestination().calculateHash().toBase64());
             _runner.doSend(msg);
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("after sending sessionStatusMessage for " + message.getSessionConfig().getDestination().calculateHash().toBase64());
             _runner.sessionEstablished(message.getSessionConfig());
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("after sessionEstablished for " + message.getSessionConfig().getDestination().calculateHash().toBase64());
         } catch (I2CPMessageException ime) {
             _log.error("Error writing out the session status message", ime);
         } catch (IOException ioe) {
