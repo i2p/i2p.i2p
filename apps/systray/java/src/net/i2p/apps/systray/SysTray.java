@@ -10,6 +10,7 @@
 package net.i2p.apps.systray;
 
 import java.awt.Frame;
+import java.io.File;
 
 import snoozesoft.systray4j.SysTrayMenu;
 import snoozesoft.systray4j.SysTrayMenuEvent;
@@ -24,7 +25,7 @@ import snoozesoft.systray4j.SysTrayMenuListener;
  */
 public class SysTray implements SysTrayMenuListener {
 
-    private static final SysTray INSTANCE = System.getProperty("os.name").startsWith("Windows") ? new SysTray() : null;
+    private static SysTray _instance = new SysTray();
 
     private BrowserChooser  _browserChooser;
     private String          _browserString;
@@ -42,12 +43,20 @@ public class SysTray implements SysTrayMenuListener {
             _configFile.setProperty("browser", "default");
 
         _browserString = _configFile.getProperty("browser", "default");
+
+        if (! (new File("router.config")).exists())
+            openRouterConsole();
+
+        if (!System.getProperty("os.name").startsWith("Windows")) {
+            _instance = null;
+            return;
+        }
         _sysTrayMenuIcon.addSysTrayMenuListener(this);
         createSysTrayMenu();
     }
 
     public static synchronized SysTray getInstance() {
-        return INSTANCE;
+        return _instance;
     }
 
     public void hide() {
