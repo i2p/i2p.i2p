@@ -105,7 +105,7 @@ public class I2PSocketManagerFull implements I2PSocketManager {
     }
 
     public I2PSocket receiveSocket() throws I2PException {
-        if (_session.isClosed()) throw new I2PException("Session closed");
+        verifySession();
         Connection con = _connectionManager.getConnectionHandler().accept(-1);
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("receiveSocket() called: " + con);
@@ -149,6 +149,12 @@ public class I2PSocketManagerFull implements I2PSocketManager {
         return _serverSocket;
     }
 
+    private void verifySession() throws I2PException {
+        if (!_connectionManager.getSession().isClosed())
+            return;
+        _connectionManager.getSession().connect();
+    }
+    
     /**
      * Create a new connected socket (block until the socket is created)
      *
@@ -160,8 +166,7 @@ public class I2PSocketManagerFull implements I2PSocketManager {
      */
     public I2PSocket connect(Destination peer, I2PSocketOptions options) 
                              throws I2PException, NoRouteToHostException {
-        if (_connectionManager.getSession().isClosed()) 
-            throw new I2PException("Session is closed");
+        verifySession();
         if (options == null)
             options = _defaultOptions;
         ConnectionOptions opts = null;

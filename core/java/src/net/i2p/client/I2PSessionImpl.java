@@ -225,6 +225,7 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
      */
     public void connect() throws I2PSessionException {
         _closed = false;
+        _availabilityNotifier.stopNotifying();
         I2PThread notifier = new I2PThread(_availabilityNotifier);
         notifier.setName("Notifier " + _myDestination.calculateHash().toBase64().substring(0,4));
         notifier.setDaemon(true);

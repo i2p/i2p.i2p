@@ -74,9 +74,11 @@ public class RepublishLeaseSetJob extends JobImpl {
         public OnFailure(RouterContext ctx) { super(ctx); }
         public String getName() { return "Publish leaseSet failed"; }
         public void runJob() { 
-            if (_log.shouldLog(Log.ERROR))
-                _log.error("FAILED publishing of the leaseSet for " + _dest.toBase64());
-            getContext().jobQueue().addJob(new RepublishLeaseSetJob(getContext(), _facade, _dest));
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("FAILED publishing of the leaseSet for " + _dest.toBase64());
+            LeaseSet ls = _facade.lookupLeaseSetLocally(_dest);
+            if ( (ls != null) && (ls.isCurrent(0)) )
+                getContext().jobQueue().addJob(new RepublishLeaseSetJob(getContext(), _facade, _dest));
         }
     }
 }
