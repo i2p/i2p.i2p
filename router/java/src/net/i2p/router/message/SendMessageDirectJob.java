@@ -73,12 +73,6 @@ public class SendMessageDirectJob extends JobImpl {
     public void runJob() { 
         long now = getContext().clock().now();
 
-        if (_expiration - 30*1000 < now) {
-            if (_log.shouldLog(Log.INFO))
-                _log.info("Soon to expire sendDirect of " + _message.getClass().getName() 
-                          + " [expiring in " + (_expiration-now) + "]", getAddedBy());
-        }
-
         if (_expiration < now - Router.CLOCK_FUDGE_FACTOR) {
             if (_log.shouldLog(Log.ERROR))
                 _log.error("Timed out sending message " + _message + " directly (expiration = " 
@@ -87,6 +81,17 @@ public class SendMessageDirectJob extends JobImpl {
                 getContext().jobQueue().addJob(_onFail);
             return;
         }
+
+        if (_expiration - 30*1000 < now) {
+            if (_log.shouldLog(Log.INFO))
+                _log.info("Soon to expire sendDirect of " + _message.getClass().getName() 
+                          + " [expiring in " + (_expiration-now) + "]", getAddedBy());
+            
+            // if its made it this far, we want to honor it, so make sure we give it
+            // enough time to be sent out
+            _expiration += 30*1000;
+        }
+        
         if (_router != null) {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Router specified, sending");
