@@ -92,6 +92,7 @@ public class StatisticsManager implements Service {
         if (_includePeerRankings) {
             stats.putAll(_context.profileManager().summarizePeers(_publishedStats));
 
+            includeThroughput(stats);
             includeRate("transport.sendProcessingTime", stats, new long[] { 60*1000, 60*60*1000 });
             //includeRate("tcp.queueSize", stats);
             includeRate("jobQueue.jobLag", stats, new long[] { 60*1000, 60*60*1000 });
@@ -104,6 +105,9 @@ public class StatisticsManager implements Service {
             includeRate("inNetPool.dropped", stats, new long[] { 60*60*1000, 24*60*60*1000 });
             includeRate("tunnel.participatingTunnels", stats, new long[] { 5*60*1000, 60*60*1000 });
             includeRate("tunnel.testSuccessTime", stats, new long[] { 60*60*1000l, 24*60*60*1000l });
+            includeRate("tunnel.outboundMessagesProcessed", stats, new long[] { 10*60*1000, 60*60*1000 });
+            includeRate("tunnel.inboundMessagesProcessed", stats, new long[] { 10*60*1000, 60*60*1000 });
+            includeRate("tunnel.participatingMessagesProcessed", stats, new long[] { 10*60*1000, 60*60*1000 });
             includeRate("netDb.lookupsReceived", stats, new long[] { 5*60*1000, 60*60*1000 });
             includeRate("netDb.lookupsHandled", stats, new long[] { 5*60*1000, 60*60*1000 });
             includeRate("netDb.lookupsMatched", stats, new long[] { 5*60*1000, 60*60*1000 });
@@ -111,8 +115,16 @@ public class StatisticsManager implements Service {
             includeRate("netDb.successPeers", stats, new long[] { 60*60*1000 });
             includeRate("netDb.failedPeers", stats, new long[] { 60*60*1000 });
             includeRate("netDb.searchCount", stats, new long[] { 3*60*60*1000});
+            includeRate("inNetMessage.timeToDiscard", stats, new long[] { 5*60*1000, 10*60*1000, 60*60*1000 });
+            includeRate("outNetMessage.timeToDiscard", stats, new long[] { 5*60*1000, 10*60*1000, 60*60*1000 });
             includeRate("transport.receiveMessageSize", stats, new long[] { 5*60*1000, 60*60*1000 });
             includeRate("transport.sendMessageSize", stats, new long[] { 5*60*1000, 60*60*1000 });
+            includeRate("transport.sendMessageSmall", stats, new long[] { 5*60*1000, 60*60*1000 });
+            includeRate("transport.sendMessageMedium", stats, new long[] { 5*60*1000, 60*60*1000 });
+            includeRate("transport.sendMessageLarge", stats, new long[] { 5*60*1000, 60*60*1000 });
+            includeRate("transport.receiveMessageSmall", stats, new long[] { 5*60*1000, 60*60*1000 });
+            includeRate("transport.receiveMessageMedium", stats, new long[] { 5*60*1000, 60*60*1000 });
+            includeRate("transport.receiveMessageLarge", stats, new long[] { 5*60*1000, 60*60*1000 });
             includeRate("client.sendAckTime", stats, new long[] { 60*60*1000, 24*60*60*1000l }, true);
             stats.setProperty("stat_uptime", DataHelper.formatDuration(_context.router().getUptime()));
             stats.setProperty("stat__rateKey", "avg;maxAvg;pctLifetime;[sat;satLim;maxSat;maxSatLim;][num;lifetimeFreq;maxFreq]");
@@ -189,6 +201,46 @@ public class StatisticsManager implements Service {
         }
         return buf.toString();
     }
+
+    private String renderThroughput(double bytes, long ms) {
+        if (bytes <= 0) 
+            return "0;0;0;0;";
+        else
+            return num(bytes/(ms/1000)) + ";0;0;0;";
+    }
+    
+    private void includeThroughput(Properties stats) {
+        double sendBytes5m = 0;
+        double sendBytes60m = 0;
+        double recvBytes5m = 0;
+        double recvBytes60m = 0;
+        
+        RateStat sendRate = _context.statManager().getRate("transport.sendMessageSize");
+        Rate r = sendRate.getRate(5*60*1000);
+        if (r != null)
+            sendBytes5m = r.getLastTotalValue();
+        r = sendRate.getRate(60*60*1000);
+        if (r != null)
+            sendBytes60m = r.getLastTotalValue();
+        
+        RateStat recvRate = _context.statManager().getRate("transport.receiveMessageSize");
+        r = recvRate.getRate(5*60*1000);
+        if (r != null)
+            recvBytes5m = r.getLastTotalValue();
+        r = recvRate.getRate(60*60*1000);
+        if (r != null)
+            recvBytes60m = r.getLastTotalValue();
+        
+        String throughputRate = renderThroughput(sendBytes5m, 5*60*1000);
+        stats.setProperty("stat_bandwidthSendBps.5m", throughputRate);
+        throughputRate = renderThroughput(sendBytes60m, 60*60*1000);
+        stats.setProperty("stat_bandwidthSendBps.60m", throughputRate);
+        throughputRate = renderThroughput(recvBytes5m, 5*60*1000);
+        stats.setProperty("stat_bandwidthReceiveBps.5m", throughputRate);
+        throughputRate = renderThroughput(recvBytes60m, 60*60*1000);
+        stats.setProperty("stat_bandwidthReceiveBps.60m", throughputRate);
+    }
+
     
     private static String getPeriod(Rate rate) { return DataHelper.formatDuration(rate.getPeriod()); }
 
