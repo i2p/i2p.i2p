@@ -7,7 +7,7 @@
     </target>
     <target name="fetchJfreechart">
         <mkdir dir="./lib" />
-        <get src="http://www.jfree.org/jfreechart/jfreechart-0.9.17.zip" dest="lib/jfreechart-0.9.17.zip" />
+        <get src="http://www.jfree.org/jfreechart/jfreechart-0.9.17.zip" verbose="true" dest="lib/jfreechart-0.9.17.zip" />
         <unzip src="lib/jfreechart-0.9.17.zip" dest="lib/" />
     </target>
     <target name="buildGUI" depends="build, jfreechart, jarGUI" />
