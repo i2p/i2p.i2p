@@ -34,8 +34,10 @@ import net.i2p.util.Log;
  */
 class TransientSessionKeyManager extends SessionKeyManager {
     private Log _log;
-    private Map _outboundSessions; // PublicKey --> OutboundSession
-    private Map _inboundTagSets; // SessionTag --> TagSet
+    /** Map allowing us to go from the targeted PublicKey to the OutboundSession used */
+    private Map _outboundSessions;
+    /** Map allowing us to go from a SessionTag to the containing TagSet */
+    private Map _inboundTagSets;
     protected I2PAppContext _context;
 
     /** 
@@ -46,7 +48,7 @@ class TransientSessionKeyManager extends SessionKeyManager {
      */
     public final static long SESSION_TAG_DURATION_MS = 10 * 60 * 1000;
     /**
-     * Keep unused inbound session tags around for up to 15 minutes (5 minutes longer than
+     * Keep unused inbound session tags around for up to 12 minutes (2 minutes longer than
      * session tags are used on the outbound side so that no reasonable network lag 
      * can cause failed decrypts)
      *
@@ -213,10 +215,11 @@ class TransientSessionKeyManager extends SessionKeyManager {
         sess.setCurrentKey(key);
         TagSet set = new TagSet(sessionTags, key, _context.clock().now());
         sess.addTags(set);
-        if (_log.shouldLog(Log.DEBUG))
+        if (_log.shouldLog(Log.DEBUG)) {
             _log.debug("Tags delivered to set " + set + " on session " + sess);
-        if (sessionTags.size() > 0)
-            _log.debug("Tags delivered: " + sessionTags.size() + " total = " + sess.availableTags());
+            if (sessionTags.size() > 0)
+                _log.debug("Tags delivered: " + sessionTags.size() + " total = " + sess.availableTags());
+        }
     }
 
     /**
@@ -234,6 +237,7 @@ class TransientSessionKeyManager extends SessionKeyManager {
      *
      */
     public void tagsReceived(SessionKey key, Set sessionTags) {
+        int overage = 0;
         TagSet tagSet = new TagSet(sessionTags, key, _context.clock().now());
         for (Iterator iter = sessionTags.iterator(); iter.hasNext();) {
             SessionTag tag = (SessionTag) iter.next();
@@ -241,18 +245,66 @@ class TransientSessionKeyManager extends SessionKeyManager {
                 _log.debug("Receiving tag " + tag + " for key " + key);
             synchronized (_inboundTagSets) {
                 _inboundTagSets.put(tag, tagSet);
+                overage = _inboundTagSets.size() - MAX_INBOUND_SESSION_TAGS;
             }
         }
-        synchronized (_inboundTagSets) {
-            // todo: make this limit the tags by sessionKey and actually enforce the limit!
-            int overage = _inboundTagSets.size() - MAX_INBOUND_SESSION_TAGS;
-            if (overage > 0) {
-                if (_log.shouldLog(Log.ERROR))
-                    _log.error("TOO MANY SESSION TAGS! " + (_inboundTagSets.size()));
-            }
-        }
+        if (overage > 0)
+            clearExcess(overage);
 
-        if (sessionTags.size() <= 0) _log.debug("Received 0 tags for key " + key);
+        if ( (sessionTags.size() <= 0) && (_log.shouldLog(Log.DEBUG)) )
+            _log.debug("Received 0 tags for key " + key);
+    }
+    
+    /**
+     * remove a bunch of arbitrarily selected tags, then drop all of
+     * the associated tag sets.  this is very time consuming - iterating
+     * across the entire _inboundTagSets map, but it should be very rare,
+     * and the stats we can gather can hopefully reduce the frequency of
+     * using too many session tags in the future
+     *
+     */
+    private void clearExcess(int overage) {
+        long now = _context.clock().now();
+        int old = 0;
+        int large = 0;
+        int absurd = 0;
+        int recent = 0;
+        int tags = 0;
+        int toRemove = overage * 2;
+        List removed = new ArrayList(toRemove);
+        synchronized (_inboundTagSets) {
+            for (Iterator iter = _inboundTagSets.values().iterator(); iter.hasNext(); ) {
+                TagSet set = (TagSet)iter.next();
+                int size = set.getTags().size();
+                if (size > 1000)
+                    absurd++;
+                if (size > 100)
+                    large++;
+                if (now - set.getDate() > SESSION_LIFETIME_MAX_MS)
+                    old++;
+                else if (now - set.getDate() < 1*60*1000)
+                    recent++;
+
+                if ((removed.size() < (toRemove)) || (now - set.getDate() > SESSION_LIFETIME_MAX_MS))
+                    removed.add(set);
+            }
+            for (int i = 0; i < removed.size(); i++) {
+                TagSet cur = (TagSet)removed.get(i);
+                for (Iterator iter = cur.getTags().iterator(); iter.hasNext(); ) {
+                    SessionTag tag = (SessionTag)iter.next();
+                    _inboundTagSets.remove(tag);
+                    tags++;
+                }
+            }
+        }
+        if (_log.shouldLog(Log.CRIT))
+            _log.log(Log.CRIT, "TOO MANY SESSION TAGS!  removing " + removed 
+                     + " tag sets arbitrarily, with " + tags + " tags,"
+                     + "where there are " + old + " long lasting sessions, "
+                     + recent + " ones created in the last minute, and "
+                     + large + " sessions with more than 100 tags (and "
+                     + absurd + " with more than 1000!), leaving a total of "
+                     + _inboundTagSets.size() + " tags behind");
     }
 
     /**
@@ -562,6 +614,7 @@ class TransientSessionKeyManager extends SessionKeyManager {
             _date = date;
         }
 
+        /** when the tag set was created */
         public long getDate() {
             return _date;
         }
@@ -570,6 +623,7 @@ class TransientSessionKeyManager extends SessionKeyManager {
             _date = when;
         }
 
+        /** tags still available */
         public Set getTags() {
             return _sessionTags;
         }

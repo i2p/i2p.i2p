@@ -65,7 +65,8 @@ public class Daemon {
             master.merge((AddressBook) iter.next(), log);
         }
         master.write(new File(routerLocation));
-        master.write(published);
+        if (published != null)
+            master.write(published);
         subscriptions.write();
     }
 
@@ -82,7 +83,9 @@ public class Daemon {
                 .get("master_addressbook"));
         File routerFile = new File(home, (String) settings
                 .get("router_addressbook"));
-        File published = new File(home, (String) settings
+        File published = null;
+        if ("true".equals(settings.get("should_publish"))) 
+            published = new File(home, (String) settings
                 .get("published_addressbook"));
         File subscriptionFile = new File(home, (String) settings
                 .get("subscriptions"));
@@ -131,6 +134,7 @@ public class Daemon {
         defaultSettings.put("master_addressbook", "../userhosts.txt");
         defaultSettings.put("router_addressbook", "../hosts.txt");
         defaultSettings.put("published_addressbook", "../eepsite/docroot/hosts.txt");
+        defaultSettings.put("should_publish", "false");
         defaultSettings.put("log", "log.txt");
         defaultSettings.put("subscriptions", "subscriptions.txt");
         defaultSettings.put("etags", "etags");

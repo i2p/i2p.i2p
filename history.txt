@@ -1,4 +1,15 @@
-$Id: history.txt,v 1.141 2005/02/10 21:44:49 smeghead Exp $
+$Id: history.txt,v 1.142 2005/02/16 17:23:47 jrandom Exp $
+
+2005-02-16  jrandom
+    * Added some error handling when the number of session tags exceeds the
+      realistic capacity, dropping a random chunk of received tag sets and
+      conducting some minor analysis of the remaining ones.  This is a part
+      of a pretty serious error condition, and logs as CRIT (if/when people 
+      see "TOO MANY SESSION TAGS!", please let me know the full log line it
+      puts in the wrapper.log or /logs.jsp)
+    * Update the addressbook to only write to the published hosts location
+      if the addressbook's config contains "should_publish=true" (by default,
+      it contains "should_publish=false")
 
 2005-02-16  jrandom
     * (Merged the 0.5-pre branch back into CVS HEAD)
@@ -47,7 +58,7 @@ $Id: history.txt,v 1.141 2005/02/10 21:44:49 smeghead Exp $
     * Substantial memory optimizations within the router and the SDK to reduce
       GC churn.  Client apps and the streaming libs have not been tuned, 
       however.
-    * More bugfixes thank you can shake a stick at.
+    * More bugfixes than you can shake a stick at.
 
 2005-02-13  jrandom
     * Updated jbigi source to handle 64bit CPUs.  The bundled jbigi.jar still 

@@ -758,7 +758,7 @@ public class DataHelper {
         int rv = 0;
         if (b != null) {
             for (int i = 0; i < b.length && i < 8; i++)
-                rv += b[i];
+                rv += (b[i] << i);
         }
         return rv;
     }
