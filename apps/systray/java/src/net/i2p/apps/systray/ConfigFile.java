@@ -3,6 +3,7 @@
  *
  * ConfigFile.java
  * 2004 The I2P Project
+ * http://www.i2p.net
  * This code is public domain.
  */
 
