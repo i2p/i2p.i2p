@@ -50,7 +50,7 @@ public class ConfigServiceHandler extends FormHandler {
             } catch (Throwable t) {
                 addFormError("Warning: unable to contact the service manager - " + t.getMessage());
             }
-            addFormNotice("Threads dumped to logs/wrapper.log");
+            addFormNotice("Threads dumped to wrapper.log");
         } else if ("Show systray icon".equals(_action)) {
             try {
                 SysTray tray = SysTray.getInstance();

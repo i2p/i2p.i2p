@@ -54,7 +54,7 @@
  <h4>Debugging</h4>
  At times, it may be helpful to debug I2P by getting a thread dump.  To do so, 
  please select the following option and review the thread dumped to 
-<a href="logs.jsp#servicelogs">logs/wrapper.log</a>.<br />
+<a href="logs.jsp#servicelogs">wrapper.log</a>.<br />
  <input type="submit" name="action" value="Dump threads" />
  </form>
 </div>

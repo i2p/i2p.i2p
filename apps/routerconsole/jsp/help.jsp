@@ -42,6 +42,12 @@ details on other applications available, as well as their licenses, please see t
 <a href="http://www.i2p.net/licenses">license policy</a>.  Source for the I2P code and most bundled
 client applications can be found on our <a href="http://www.i2p.net/download">download page</a>, and is
 in <a href="http://www.i2p.net/cvs">cvs</a>.</p>
+
+<h2>Release history</h2>
+ <jsp:useBean class="net.i2p.router.web.ContentHelper" id="contenthelper" scope="request" />
+ <jsp:setProperty name="contenthelper" property="page" value="history.txt" />
+ <jsp:setProperty name="contenthelper" property="maxLines" value="500" />
+ <jsp:getProperty name="contenthelper" property="textContent" />
 </div>
 
 </body>
