@@ -541,7 +541,7 @@ public class I2PTunnel implements Logging, EventDispatcher {
             } catch (NumberFormatException e) {
                 notifyEvent("read_timeoutResult", "error");
             }
-            notifyEvent("listen_onResult", "ok");
+            notifyEvent("read_timeoutResult", "ok");
         } else {
             l.log("read_timeout <msecs>");
             l.log("  sets the read timeout (in milliseconds) for I2P connections\n"
