@@ -125,7 +125,8 @@ const char *sam_strerror(samerr_t code);
 /* SAM controls - callbacks */
 void		(*sam_diedback)(sam_sess_t *session);
 void		(*sam_logback)(char *str);
-void		(*sam_namingback)(char *name, sam_pubkey_t pubkey, samerr_t result);
+void		(*sam_namingback)(sam_sess_t *session, char *name,
+				sam_pubkey_t pubkey, samerr_t result);
 
 /* Stream commands */
 void		sam_stream_close(sam_sess_t *session, sam_sid_t stream_id);

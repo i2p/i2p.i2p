@@ -47,7 +47,8 @@ static void dgramback(sam_sess_t *session, sam_pubkey_t dest, void *data,
 	size_t size);
 static void diedback(sam_sess_t *session);
 static void logback(char *s);
-static void namingback(char *name, sam_pubkey_t pubkey, samerr_t result);
+static void namingback(sam_sess_t *session, char *name, sam_pubkey_t pubkey,
+	samerr_t result);
 
 /*
  * Just some ugly global variables.  Don't do this in your program.
@@ -155,7 +156,6 @@ static void dgramback(sam_sess_t *session, sam_pubkey_t dest, void *data,
 static void diedback(sam_sess_t *session)
 {
 	fprintf(stderr, "Lost SAM connection!\n");
-	sam_session_free(&session);
 	exit(1);
 }
 
@@ -172,11 +172,11 @@ static void logback(char *s)
  * This is really hackish, but we know that we are only doing one lookup, so
  * what the hell
  */
-static void namingback(char *name, sam_pubkey_t pubkey, samerr_t result)
+static void namingback(sam_sess_t *session, char *name, sam_pubkey_t pubkey,
+	samerr_t result)
 {
 	if (result != SAM_OK) {
 		fprintf(stderr, "Naming lookup failed: %s\n", sam_strerror(result));
-		/* high quality code would do a sam_session_free() here */
 		exit(1);
 	}
 	memcpy(dest, pubkey, SAM_PUBKEY_LEN);

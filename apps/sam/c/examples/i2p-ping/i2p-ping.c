@@ -60,7 +60,8 @@ static void databack(sam_sess_t *session, sam_sid_t stream_id, void *data,
 	size_t size);
 static void diedback(sam_sess_t *session);
 static void logback(char *s);
-static void namingback(char *name, sam_pubkey_t pubkey, samerr_t result);
+static void namingback(sam_sess_t *session, char *name, sam_pubkey_t pubkey,
+	samerr_t result);
 static void statusback(sam_sess_t *session, sam_sid_t stream_id,
 	samerr_t result);
 
@@ -103,7 +104,7 @@ int main(int argc, char *argv[])
 				quiet = true;
 				break;
 			case 'v':  /* version */
-				puts("$Id: i2p-ping.c,v 1.5 2004/09/24 16:08:00 mpc Exp $");
+				puts("$Id: i2p-ping.c,v 1.6 2004/12/02 17:54:23 mpc Exp $");
 				puts("Copyright (c) 2004, Matthew P. Cashdollar <mpc@innographx.com>");
 				break;
 			case '?':
@@ -242,7 +243,8 @@ static void logback(char *s)
  * This is really hackish, but we know that we are only doing one lookup, so
  * what the hell
  */
-static void namingback(char *name, sam_pubkey_t pubkey, samerr_t result)
+static void namingback(sam_sess_t *session, char *name, sam_pubkey_t pubkey,
+	samerr_t result)
 {
 	if (result != SAM_OK) {
 		fprintf(stderr, "Naming lookup failed: %s\n", sam_strerror(result));

@@ -1,6 +1,7 @@
 /* vi:set ts=4: */
 
 v1.30
+	* Added session to sam_namingback()
 	* Removed stdint.h dependency
 	* Improved WIRETAP to do more logging
 	* Added "pinger.sh" shell script example for using i2p-ping

@@ -79,7 +79,8 @@ void (*sam_diedback)(sam_sess_t *session) = NULL;
 void (*sam_logback)(char *str) = NULL;
 
 /* naming lookup reply - `pubkey' will be NULL if `result' isn't SAM_OK */
-void (*sam_namingback)(char *name, sam_pubkey_t pubkey, samerr_t result) = NULL;
+void (*sam_namingback)(sam_sess_t *session, char *name, sam_pubkey_t pubkey,
+	samerr_t result) = NULL;
 
 /* our connection to a peer has completed */
 void (*sam_statusback)(sam_sess_t *session, sam_sid_t stream_id,
@@ -386,7 +387,7 @@ static void sam_parse(sam_sess_t *session, char *s)
 			q++;
 			strlcpy(name, p, sizeof name);
 			strlcpy(pubkey, q, sizeof pubkey);
-			sam_namingback(name, pubkey, SAM_OK);
+			sam_namingback(session, name, pubkey, SAM_OK);
 
 		} else if (strncmp(s, SAM_NAMING_REPLY_IK,
 				strlen(SAM_NAMING_REPLY_IK)) == 0) {
@@ -394,7 +395,7 @@ static void sam_parse(sam_sess_t *session, char *s)
 			if (q != NULL)
 				*q = '\0';
 			strlcpy(name, p, sizeof name);
-			sam_namingback(name, NULL, SAM_INVALID_KEY);
+			sam_namingback(session, name, NULL, SAM_INVALID_KEY);
 
 		} else if (strncmp(s, SAM_NAMING_REPLY_KNF,
 				strlen(SAM_NAMING_REPLY_KNF)) == 0) {
@@ -402,14 +403,14 @@ static void sam_parse(sam_sess_t *session, char *s)
 			if (q != NULL)
 				*q = '\0';
 			strlcpy(name, p, sizeof name);
-			sam_namingback(name, NULL, SAM_KEY_NOT_FOUND);
+			sam_namingback(session, name, NULL, SAM_KEY_NOT_FOUND);
 
 		} else {
 			q = strchr(p, ' ');  /* ' 'MES.. (optional) */
 			if (q != NULL)
 				*q = '\0';
 			strlcpy(name, p, sizeof name);
-			sam_namingback(name, NULL, SAM_UNKNOWN);
+			sam_namingback(session, name, NULL, SAM_UNKNOWN);
 		}
 
 		return;
