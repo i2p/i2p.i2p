@@ -1,8 +1,9 @@
 package net.i2p.router.web;
 
+import java.io.IOException;
+
 import net.i2p.router.ClientTunnelSettings;
 import net.i2p.router.Router;
-
 import net.i2p.apps.systray.SysTray;
 import org.tanukisoftware.wrapper.WrapperManager;
 
@@ -39,6 +40,10 @@ public class ConfigServiceHandler extends FormHandler {
         } else if ("Hard restart".equals(_action)) {
             _context.router().shutdown(Router.EXIT_HARD_RESTART);
             addFormNotice("Hard restart requested");
+        } else if ("Run I2P on startup".equals(_action)) {
+            installService();
+        } else if ("Don't run I2P on startup".equals(_action)) {
+            uninstallService();
         } else if ("Dump threads".equals(_action)) {
             try {
                 WrapperManager.requestThreadDump();
@@ -72,6 +77,23 @@ public class ConfigServiceHandler extends FormHandler {
             }
         } else {
             addFormNotice("Blah blah blah.  whatever.  I'm not going to " + _action);
+        }
+    }
+    
+    private void installService() {
+        try { 
+            Runtime.getRuntime().exec("install_i2p_service_winnt.bat");
+            addFormNotice("Service installed");
+        } catch (IOException ioe) {
+            addFormError("Warning: unable to install the service - " + ioe.getMessage());
+        }
+    }
+    private void uninstallService() {
+        try { 
+            Runtime.getRuntime().exec("uninstall_i2p_service_winnt.bat");
+            addFormNotice("Service removed");
+        } catch (IOException ioe) {
+            addFormError("Warning: unable to remove the service - " + ioe.getMessage());
         }
     }
 }

@@ -39,18 +39,15 @@
  If you are on windows, you can either enable or disable that icon here. <br />
  <input type="submit" name="action" value="Show systray icon" />
  <input type="submit" name="action" value="Hide systray icon" />
- <!--
+ <% if ( (System.getProperty("os.name") != null) && (System.getProperty("os.name").startsWith("Win")) ) { %>
  <h4>Run on startup</h4>
- On the windows platform, you can control whether I2P is run on startup or not by
- selecting one of the following options - I2P will install (or remove) a service 
- accordingly.  On *nix machines, you need root permissions to add a script
- to be run on startup (we hope you know better than to run I2P as root ;).  To 
- have I2P run (or not run) at startup on *nix machines, please run 
- <code>install_i2p_service_unix</code> or <code>install_i2p_service_unix</code>
- as root.<br />
+ You can control whether I2P is run on startup or not by selecting one of the 
+ following options - I2P will install (or remove) a service accordingly.  You can
+ also run the <code>install_i2p_service_winnt.bat</code> (or 
+ <code>uninstall_i2p_service_winnt.bat</code>) from the command line, if you prefer.<br />
  <input type="submit" name="action" value="Run I2P on startup" />
  <input type="submit" name="action" value="Don't run I2P on startup" />
- -->
+ <% } %>
  <h4>Debugging</h4>
  At times, it may be helpful to debug I2P by getting a thread dump.  To do so, 
  please select the following option and review the thread dumped to 
