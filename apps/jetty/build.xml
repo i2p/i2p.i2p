@@ -1,9 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project basedir="." default="all" name="jetty">
-    <available property="jetty.available" file="jettylib" />
         
     <target name="all" depends="build" />
-    <target name="fetchJettylib" unless="jetty.available" >
+    <target name="fetchJettylib" >
+        <available property="jetty.available" file="jettylib" />
+        <ant target="doFetchJettylib" />
+    </target>
+    <target name="doFetchJettylib" unless="jetty.available" >
         <echo message="The libraries contained within the fetched file are from Jetty's 4.2.21 " />
         <echo message="distribution (http://jetty.mortbay.org/) which we have copied to our website since" />
         <echo message="theirs doesn't have direct HTTP access to the libs.  These are not " />

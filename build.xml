@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project basedir="." default="all" name="i2p">
-    <available property="jettylib.available" file="apps/jetty/jettylib" />
     
     <target name="all" >
         <echo message="Useful targets: " />
@@ -118,7 +117,11 @@
     <target name="prepWEB">
         <ant dir="apps/jetty" target="fetchJettylib" />
     </target>
-    <target name="buildWEB" if="jettylib.available">
+    <target name="buildWEB" >
+        <available property="jettylib.available" file="apps/jetty/jettylib" />
+        <ant target="doBuildWEB" />
+    </target>
+    <target name="doBuildWEB" if="jettylib.available">
         <ant dir="apps/routerconsole/java" target="build" />
         <copy file="apps/routerconsole/java/build/routerconsole.jar" todir="build/" />
         <copy file="apps/routerconsole/java/build/routerconsole.war" todir="build/" />
