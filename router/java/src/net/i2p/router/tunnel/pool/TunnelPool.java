@@ -11,6 +11,7 @@ import net.i2p.data.Lease;
 import net.i2p.data.LeaseSet;
 import net.i2p.data.TunnelId;
 
+import net.i2p.router.JobImpl;
 import net.i2p.router.RouterContext;
 import net.i2p.router.TunnelPoolSettings;
 import net.i2p.router.TunnelInfo;
@@ -29,6 +30,16 @@ public class TunnelPool {
     private TunnelPoolManager _manager;
     private boolean _alive;
     private long _lifetimeProcessed;
+    private int _buildsThisMinute;
+    private long _currentMinute;
+    private RefreshJob _refreshJob;
+    
+    /**
+     * Only 3 builds per minute per pool, even if we have failing tunnels,
+     * etc.  On overflow, the necessary additional tunnels are built by the
+     * RefreshJob
+     */
+    private static final int MAX_BUILDS_PER_MINUTE = 3;
     
     public TunnelPool(RouterContext ctx, TunnelPoolManager mgr, TunnelPoolSettings settings, TunnelPeerSelector sel, TunnelBuilder builder) {
         _context = ctx;
@@ -40,11 +51,16 @@ public class TunnelPool {
         _builder = builder;
         _alive = false;
         _lifetimeProcessed = 0;
+        _buildsThisMinute = 0;
+        _currentMinute = ctx.clock().now();
+        _refreshJob = new RefreshJob(ctx);
         refreshSettings();
     }
     
     public void startup() {
         _alive = true;
+        _refreshJob.getTiming().setStartAfter(_context.clock().now() + 60*1000);
+        _context.jobQueue().addJob(_refreshJob);
         int added = refreshBuilders();
         if (added <= 0) {
             // we just reconnected and didn't require any new tunnel builders.
@@ -92,10 +108,26 @@ public class TunnelPool {
             _log.info(toString() + ": refreshing builders, previously had " + usableTunnels
                           + ", want a total of " + target + ", creating " 
                           + (target-usableTunnels) + " new ones.");
-        for (int i = usableTunnels; i < target; i++)
-            _builder.buildTunnel(_context, this);
-        
-        return (target > usableTunnels ? target-usableTunnels : 0);
+
+        if (target > usableTunnels) {
+            long minute = _context.clock().now();
+            minute = minute - (minute % 60*1000);
+            if (_currentMinute < minute) {
+                _currentMinute = minute;
+                _buildsThisMinute = 0;
+            }
+            int build = (target - usableTunnels);
+            if (build > (MAX_BUILDS_PER_MINUTE - _buildsThisMinute))
+                build = (MAX_BUILDS_PER_MINUTE - _buildsThisMinute);
+            
+            for (int i = 0; i < build; i++)
+                _builder.buildTunnel(_context, this);
+            _buildsThisMinute += build;
+
+            return build;
+        } else {
+            return 0;
+        }
     }
     
     void refreshSettings() {
@@ -385,5 +417,24 @@ public class TunnelPool {
             return rv.toString();
         }
             
+    }
+
+    /**
+     * We choke the # of rebuilds per pool per minute, so we need this to
+     * make sure to build enough tunnels.
+     *
+     */
+    private class RefreshJob extends JobImpl {
+        public RefreshJob(RouterContext ctx) {
+            super(ctx);
+        }
+        public String getName() { return "Refresh pool"; }
+        public void runJob() {
+            if (!_alive) return;
+            int added = refreshBuilders();
+            if ( (added > 0) && (_log.shouldLog(Log.WARN)) )
+                _log.warn("Passive rebuilding a tunnel");
+            requeue(60*1000);
+        }
     }
 }

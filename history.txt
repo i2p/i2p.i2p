@@ -1,4 +1,9 @@
-$Id: history.txt,v 1.155 2005/02/23 16:44:32 jrandom Exp $
+$Id: history.txt,v 1.156 2005/02/24 13:05:26 jrandom Exp $
+
+2005-02-24  jrandom
+    * Throttle the number of tunnel rebuilds per minute, preventing CPU 
+      overload under catastrophic failures (thanks Tracker and cervantes!)
+    * Block the router startup process until we've initialized the clock
 
 2005-02-24  jrandom
     * Cache temporary memory allocation in the DSA's SHA1 impl, and the packet

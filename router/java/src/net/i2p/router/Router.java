@@ -225,6 +225,14 @@ public class Router {
         warmupCrypto();
         _sessionKeyPersistenceHelper.startup();
         //_context.adminManager().startup();
+        
+        // let the timestamper get us sync'ed
+        long before = System.currentTimeMillis();
+        _context.clock().getTimestamper().waitForInitialization();
+        long waited = System.currentTimeMillis() - before;
+        if (_log.shouldLog(Log.INFO))
+            _log.info("Waited " + waited + "ms to initialize");
+        
         _context.jobQueue().addJob(new StartupJob(_context));
     }
     

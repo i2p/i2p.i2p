@@ -101,6 +101,15 @@ public class Timestamper implements Runnable {
         t.start();
     }
     
+    public void waitForInitialization() {
+        try { 
+            synchronized (this) {
+                if (!_initialized)
+                    wait();
+            }
+        } catch (InterruptedException ie) {}
+    }
+    
     public void run() {
         try { Thread.sleep(1000); } catch (InterruptedException ie) {}
         _log = _context.logManager().getLog(Timestamper.class);
@@ -130,6 +139,9 @@ public class Timestamper implements Runnable {
                         lastFailed = true;
                     }
                 }
+                
+                _initialized = true;
+                synchronized (this) { notifyAll(); }
                 long sleepTime = _context.random().nextInt(_queryFrequency) + _queryFrequency;
                 if (lastFailed)
                     sleepTime = 30*1000;
@@ -137,6 +149,7 @@ public class Timestamper implements Runnable {
             }
         } catch (Throwable t) {
             _log.log(Log.CRIT, "Timestamper died!", t);
+            synchronized (this) { notifyAll(); }
         }
     }
     
