@@ -240,7 +240,7 @@
         <copy file="build/i2ptunnel.war" todir="pkg-temp/webapps/" />
         <copy file="build/routerconsole.war" todir="pkg-temp/webapps/" />
         <copy file="installer/resources/wrapper.config" todir="pkg-temp/" />
-        <copy file="installer/resources/wrapper.config.updated" todir="pkg-temp/" />
+        <copy file="installer/resources/wrapper.config" tofile="pkg-temp/wrapper.config.updated" />
         <copy file="history.txt" todir="pkg-temp/" />
         <copy file="hosts.txt" todir="pkg-temp/" />
         <mkdir dir="pkg-temp/eepsite" />
