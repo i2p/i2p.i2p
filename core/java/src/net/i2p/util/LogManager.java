@@ -102,7 +102,11 @@ public class LogManager {
         t.setName("LogWriter");
         t.setDaemon(true);
         t.start();
-        Runtime.getRuntime().addShutdownHook(new ShutdownHook());
+        try {
+            Runtime.getRuntime().addShutdownHook(new ShutdownHook());
+        } catch (IllegalStateException ise) {
+            // shutdown in progress, fsck it
+        }
         //System.out.println("Created logManager " + this + " with context: " + context);
     }
     private LogManager() {}
