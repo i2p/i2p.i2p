@@ -20,7 +20,7 @@
     </target>
     <target name="jar" depends="compile">
         <copy todir="./build/lib">
-            <fileset dir="./lib" includes="libsystray4j.so systray4j.dll systray4j.jar" />
+            <fileset dir="./lib" includes="systray4j.dll systray4j.jar" />
         </copy>
         <copy todir="./build/icons">
             <fileset dir="./resources/" />
@@ -51,5 +51,12 @@
     </target>
     <target name="clean">
         <delete dir="./build" />
+    </target>
+    <target name="cleandep" depends="clean">
+	<!-- router will clean core -->
+        <ant dir="../../../core/java/" target="cleandep" />
+    </target>
+    <target name="distclean" depends="clean">
+        <ant dir="../../../core/java/" target="distclean" />
     </target>
 </project>
