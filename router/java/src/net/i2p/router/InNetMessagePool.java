@@ -132,7 +132,9 @@ public class InNetMessagePool {
                     _context.statManager().addRateData("inNetPool.droppedDeliveryStatusDelay", timeSinceSent, timeSinceSent);
                 } else {
                     if (_log.shouldLog(Log.ERROR))
-                        _log.error("Message " + messageBody + " was not handled by a HandlerJobBuilder - DROPPING: " 
+                        _log.error("Message " + messageBody + " expiring on " 
+                                   + (messageBody != null ? (messageBody.getMessageExpiration()+"") : " [unknown]")
+                                   + " was not handled by a HandlerJobBuilder - DROPPING: " 
                                    + msg, new Exception("DROPPED MESSAGE"));
                     _context.statManager().addRateData("inNetPool.dropped", 1, 0);
                 }
