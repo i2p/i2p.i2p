@@ -8,8 +8,12 @@ package net.i2p.router;
  *
  */
 
-//import net.i2p.router.message.ProcessOutboundClientMessageJob;
+import java.util.Properties;
+
+import net.i2p.client.I2PClient;
+
 import net.i2p.router.message.OutboundClientMessageJob;
+import net.i2p.router.message.OutboundClientMessageOneShotJob;
 import net.i2p.util.Log;
 
 /**
@@ -55,7 +59,22 @@ public class ClientMessagePool {
         } else {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Adding message for remote delivery");
-            _context.jobQueue().addJob(new OutboundClientMessageJob(_context, msg));
+            if (isGuaranteed(msg))
+                _context.jobQueue().addJob(new OutboundClientMessageJob(_context, msg));
+            else
+                _context.jobQueue().addJob(new OutboundClientMessageOneShotJob(_context, msg));
+        }
+    }
+    
+    private boolean isGuaranteed(ClientMessage msg) {
+        Properties opts = null;
+        if (msg.getSenderConfig() != null)
+            opts = msg.getSenderConfig().getOptions();
+        if (opts != null) {
+            String val = opts.getProperty(I2PClient.PROP_RELIABILITY, I2PClient.PROP_RELIABILITY_BEST_EFFORT);
+            return val.equals(I2PClient.PROP_RELIABILITY_GUARANTEED);
+        } else {
+            return false;
         }
     }
 }

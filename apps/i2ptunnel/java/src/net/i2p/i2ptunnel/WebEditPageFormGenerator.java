@@ -103,7 +103,7 @@ class WebEditPageFormGenerator {
         if ( (controller != null) && (controller.getTargetHost() != null) )
             buf.append("value=\"").append(controller.getTargetHost()).append("\" ");
         else
-            buf.append("value=\"localhost\" ");
+            buf.append("value=\"127.0.0.1\" ");
         buf.append(" /><br />\n");
         
         buf.append("<b>Target port:</b> <input type=\"text\" size=\"4\" name=\"targetPort\" ");
@@ -285,7 +285,7 @@ class WebEditPageFormGenerator {
         if ( (controller != null) && (controller.getI2CPHost() != null) )
             buf.append(controller.getI2CPHost());
         else
-            buf.append("localhost");
+            buf.append("127.0.0.1");
         buf.append("\" /><br />\n");
         buf.append("<b>I2CP port:</b> ");
         buf.append("<input type=\"text\" name=\"clientPort\" size=\"20\" value=\"");

@@ -1,4 +1,15 @@
-$Id: history.txt,v 1.101 2004/12/08 12:16:17 jrandom Exp $
+$Id: history.txt,v 1.102 2004/12/08 16:08:11 jrandom Exp $
+
+2004-12-11  jrandom
+    * Use a simpler and less memory intensive job for processing outbound 
+      client messages when the session is in mode=bestEffort.  We can 
+      immediately discard the data as soon as its sent the first time, 
+      rather than wait for an ack, since we will never internally resend.
+    * Reduce some synchronization to avoid a rare deadlock
+    * Replaced 'localhost' with 127.0.0.1 in the i2ptunnel config, and special
+      case it within the tunnel controller.
+    * Script cleanup for building jbigi/jcpuid
+    * Logging
 
 * 2004-12-08  0.4.2.3 released
 

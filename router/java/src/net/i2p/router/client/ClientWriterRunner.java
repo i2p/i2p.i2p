@@ -83,6 +83,9 @@ class ClientWriterRunner implements Runnable {
                 for (int i = 0; i < messages.size(); i++) {
                     I2CPMessage msg = (I2CPMessage)messages.get(i);
                     Long when = (Long)messageTimes.get(i);
+                    if (_log.shouldLog(Log.DEBUG))
+                        _log.debug("["+_id+"] writeMessage before writing " 
+                                   + msg.getClass().getName());
                     _runner.writeMessage(msg);
                     if (_log.shouldLog(Log.DEBUG))
                         _log.debug("["+_id+"] writeMessage time since addMessage(): " 

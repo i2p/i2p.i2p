@@ -693,6 +693,9 @@ public class Connection {
         buf.append(" wsize: ").append(_options.getWindowSize());
         buf.append(" cwin: ").append(_congestionWindowEnd - _highestAckedThrough);
         buf.append(" rtt: ").append(_options.getRTT());
+        // not synchronized to avoid some kooky races
+        buf.append(" unacked outbound: ").append(_outboundPackets.size()).append(" ");
+        /*
         buf.append(" unacked outbound: ");
         synchronized (_outboundPackets) {
             buf.append(_outboundPackets.size()).append(" [");
@@ -701,6 +704,7 @@ public class Connection {
             }
             buf.append("] ");
         }
+         */
         buf.append("unacked inbound? ").append(getUnackedPacketsReceived());
         if (_inputStream != null) {
             buf.append(" [high ");
