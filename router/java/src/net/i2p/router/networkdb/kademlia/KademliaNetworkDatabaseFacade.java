@@ -615,7 +615,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
             if (existing >= MIN_REMAINING_ROUTERS) {
                 if (_log.shouldLog(Log.INFO))
                     _log.info("Not storing expired router for " + key.toBase64(), new Exception("Rejecting store"));
-                return "Peer " + key.toBase64() + " expired " + DataHelper.formatDuration(age) + "ms ago";
+                return "Peer " + key.toBase64() + " expired " + DataHelper.formatDuration(age) + " ago";
             } else {
                 if (_log.shouldLog(Log.WARN))
                     _log.warn("Even though the peer is old, we have only " + existing
