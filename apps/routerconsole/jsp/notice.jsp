@@ -1,0 +1,1 @@
+<%=(null != request.getParameter("i2p.console.notice") ? request.getParameter("i2p.console.notice") : "")%>

@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project basedir="." default="all" name="routerconsole">
+    <target name="all" depends="clean, build" />
+    <target name="build" depends="builddep, jar" />
+    <target name="builddep" depends="jetty" >
+        <ant dir="../../../router/java/" target="build" />
+	<!-- router will build core -->
+    </target>
+    <target name="jetty">
+        <untar src="jetty-4.2.21-min.tar.bz2" compression="bzip2" dest="." />
+        <ant dir="jetty-4.2.21-min/extra/jdk1.2/" target="all" />
+    </target>
+    <target name="compile">
+        <mkdir dir="./build" />
+        <mkdir dir="./build/obj" />
+        <javac 
+            srcdir="./src" 
+            debug="true" deprecation="on" source="1.3" target="1.3" 
+            destdir="./build/obj" 
+            classpath="../../../core/java/build/i2p.jar:../../../router/java/build/router.jar:jetty-4.2.21-min/extra/lib/org.mortbay.jetty-jdk1.2.jar" />
+    </target>
+    <target name="jar" depends="compile">
+        <jar destfile="./build/routerconsole.jar" basedir="./build/obj" includes="**/*.class">
+            <manifest>
+                <attribute name="Class-Path" value="i2p.jar router.jar" />
+            </manifest>
+        </jar>
+        <ant target="war" />
+    </target>
+    <target name="war"> 
+        <war destfile="build/routerconsole.war" webxml="../jsp/web.xml"
+             basedir="../jsp/" excludes="web.xml">
+        </war>
+    </target>
+    <target name="javadoc">
+        <mkdir dir="./build" />
+        <mkdir dir="./build/javadoc" />
+        <javadoc 
+            sourcepath="./src:../../../core/java/src:../../router/java/src" destdir="./build/javadoc" 
+            packagenames="*" 
+            use="true" 
+            splitindex="true" 
+            windowtitle="Router Console" />
+    </target>
+    <target name="clean">
+        <delete dir="./build" />
+    </target>
+    <target name="cleandep" depends="clean">
+	<!-- router will clean core -->
+        <ant dir="../../../router/java/" target="distclean" />
+    </target>
+    <target name="distclean" depends="clean">
+	<!-- router will clean core -->
+        <ant dir="../../../router/java/" target="distclean" />
+        <delete dir="./jetty-4.2.21-min" />
+    </target>
+</project>

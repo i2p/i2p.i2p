@@ -1,0 +1,60 @@
+body {
+	font-family: Verdana, Tahoma, Helvetica, sans-serif;
+	margin: 1em 0em;
+	padding: 0em;
+	text-align: center;
+	background-color: white;
+	color: black;
+}
+
+.hide {
+	display: none;
+}
+
+img {
+	border: none;
+}
+
+div.logo {
+	float: left;
+	left: 1em;
+	top: 1em;
+	margin: 0em;
+	padding: .5em;
+	text-align: left;
+}
+
+div.routersummary {
+	/* width: 8em; */
+	/* height: 5em; */
+	/* position: fixed; */
+	float: left;
+	/* left: 1em; */
+	/* top: 1em; */
+	margin: 0em;
+	padding: .5em;
+	text-align: left;
+	border: medium solid #efefff;
+	background-color: #fafaff;
+	color: inherit;
+	font-size: small;
+	clear: left; /* fixes a bug in Opera */
+}
+
+div.warning {
+	margin: 0em 1em 1em 12em;
+	padding: .5em 1em;
+	background-color: #ffefef;
+	border: medium solid #ffafaf;
+	text-align: left;
+	color: inherit;
+}
+
+div.main {
+	margin: 0em 1em 1em 12em;
+	padding: .5em 1em;
+	background-color: #ffffef;
+	border: medium solid #ffffd0;
+	text-align: left;
+	color: inherit;
+}
