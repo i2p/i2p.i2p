@@ -31,6 +31,7 @@ public class TunnelBuilder {
         buildTunnel(ctx, pool, false);
     }
     public void buildTunnel(RouterContext ctx, TunnelPool pool, boolean zeroHop) {
+        if (!pool.isAlive()) return;
         // this is probably overkill (ya think?)
         pool.refreshSettings();
         

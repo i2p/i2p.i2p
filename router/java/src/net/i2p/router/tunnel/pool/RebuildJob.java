@@ -23,6 +23,6 @@ class RebuildJob extends JobImpl {
     }
     public String getName() { return "Rebuild tunnel"; }
     public void runJob() {
-        _pool.getBuilder().buildTunnel(getContext(), _pool);
+        _pool.refreshBuilders();
     }
 }

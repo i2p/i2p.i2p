@@ -1,4 +1,8 @@
-$Id: history.txt,v 1.153 2005/02/22 23:20:29 jrandom Exp $
+$Id: history.txt,v 1.154 2005/02/23 00:00:53 jrandom Exp $
+
+2005-02-23  jrandom 
+    * Now that we don't get stale SAM sessions, it'd be nice if we didn't
+      get stale tunnel pools, don't you think?
 
 * 2005-02-23  0.5.0.1 released
 

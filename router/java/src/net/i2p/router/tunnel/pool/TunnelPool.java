@@ -81,6 +81,8 @@ public class TunnelPool {
      *
      */
     int refreshBuilders() {
+        if ( (_settings.getDestination() != null) && (!_context.clientManager().isLocal(_settings.getDestination())) )
+            _alive = false;
         if (!_alive) return 0;
         // only start up new build tasks if we need more of 'em
         int target = _settings.getQuantity() + _settings.getBackupQuantity();
