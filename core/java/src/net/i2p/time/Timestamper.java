@@ -20,7 +20,7 @@ public class Timestamper implements Runnable {
     private List _servers;
     private List _listeners;
     private int _queryFrequency;
-    private boolean _disabled;
+    private volatile boolean _disabled;
     private boolean _daemon;
     
     private static final int DEFAULT_QUERY_FREQUENCY = 5*60*1000;
@@ -102,6 +102,7 @@ public class Timestamper implements Runnable {
             _log.info("Starting up timestamper");
         try {
             while (true) {
+                updateConfig();
                 if (!_disabled) {
                     String serverList[] = null;
                     synchronized (_servers) {
@@ -120,7 +121,6 @@ public class Timestamper implements Runnable {
                         _log.log(Log.CRIT, "Unable to reach any of the NTP servers - network disconnected?");
                     }
                 }
-                updateConfig();
                 try { Thread.sleep(_queryFrequency); } catch (InterruptedException ie) {}
             }
         } catch (Throwable t) {
