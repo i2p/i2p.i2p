@@ -199,7 +199,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
                     if (host.toLowerCase().endsWith(".i2p")) {
                         destination = host;
                         host = getHostName(destination);
-                        if (host == "i2p") {
+                        if ( (host != null) && ("i2p".equals(host)) ) {
                             int pos2;
                             if ((pos2 = line.indexOf("?")) != -1) {
                                 // Try to find an address helper in the fragments
