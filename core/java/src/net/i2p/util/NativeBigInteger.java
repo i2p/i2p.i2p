@@ -24,7 +24,8 @@ public class NativeBigInteger extends BigInteger {
             _log.info("Native BigInteger library jbigi loaded");
         } catch (UnsatisfiedLinkError ule) {
             _nativeOk = false;
-            _log.warn("Native BigInteger library jbigi not loaded - using pure java", ule);
+            _log.log(Log.CRIT, "Native BigInteger library jbigi not loaded - using pure java");
+            _log.warn("jbigi not loaded", ule);
         }
     }
 
