@@ -620,13 +620,6 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
      */
     private void search(Hash key, Job onFindJob, Job onFailedLookupJob, long timeoutMs, boolean isLease) {
         if (!_initialized) return;
-        if (isShitlisted(key)) {
-            if (_log.shouldLog(Log.WARN))
-                _log.warn("Not searching for a shitlisted key [" + key.toBase64() + "]");
-            if (onFailedLookupJob != null)
-                _context.jobQueue().addJob(onFailedLookupJob);
-            return;
-        }
         // all searching is indirect (through tunnels) now
         _context.jobQueue().addJob(new SearchJob(_context, this, key, onFindJob, onFailedLookupJob, timeoutMs, true, isLease));
     }
