@@ -64,6 +64,13 @@ class DataPublisherJob extends JobImpl {
     private Set selectKeysToSend() {
         Set explicit = _facade.getExplicitSendKeys();
         Set toSend = new HashSet(MAX_SEND_PER_RUN);
+        
+        // if there's nothing we *need* to send, only send 10% of the time
+        if (explicit.size() <= 0) {
+            if (getContext().random().nextInt(9) <= 8)
+                return toSend;
+        }
+        
         if (explicit.size() < MAX_SEND_PER_RUN) {
             toSend.addAll(explicit);
             _facade.removeFromExplicitSend(explicit);
