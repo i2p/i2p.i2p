@@ -63,6 +63,10 @@
                 <pathelement location="build/routerconsole.jar" />
             </classpath>
         </javac>
+        <delete>
+            <fileset dir="../jsp/WEB-INF/" includes="**/*.java" />
+            <fileset dir="../jsp/WEB-INF/" includes="**/*.jsp" />
+        </delete>
         <copy file="../jsp/web.xml" tofile="../jsp/web-out.xml" />
         <loadfile property="jspc.web.fragment" srcfile="../jsp/web-fragment.xml" />
         <replace file="../jsp/web-out.xml">
