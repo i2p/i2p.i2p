@@ -1,5 +1,8 @@
 /* vi:set ts=4: */
 
+v1.30
+	* Added SAM_BAD_STYLE error
+
 v1.25	2004-07-31
 	* Created I2P-Ping, a new example program (it's a clone of I2Ping).  Works
 		on Posix only, because it uses getopt().
