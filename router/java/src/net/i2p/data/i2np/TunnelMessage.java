@@ -89,7 +89,7 @@ public class TunnelMessage extends I2NPMessageImpl {
         if ( (_tunnelId == null) || (_data == null) || (_data.length <= 0) )
             throw new I2NPMessageException("Not enough data to write out");
         
-        ByteArrayOutputStream os = new ByteArrayOutputStream(4096);
+        ByteArrayOutputStream os = new ByteArrayOutputStream(64+_data.length);
         try {
             _tunnelId.writeBytes(os);
             if (_log.shouldLog(Log.DEBUG))

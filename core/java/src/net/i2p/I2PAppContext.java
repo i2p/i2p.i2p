@@ -284,7 +284,7 @@ public class I2PAppContext {
      * matter.  Though for the crazy people out there, we do expose a way to 
      * disable it.
      */
-    public AESEngine AESEngine() {
+    public AESEngine aes() {
         if (!_AESEngineInitialized) initializeAESEngine();
         return _AESEngine;
     }

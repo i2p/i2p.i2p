@@ -467,10 +467,36 @@ public class DataHelper {
 
     public final static byte[] xor(byte lhs[], byte rhs[]) {
         if ((lhs == null) || (rhs == null) || (lhs.length != rhs.length)) return null;
+        byte rv[] = new byte[lhs.length];
+        
         byte diff[] = new byte[lhs.length];
-        for (int i = 0; i < lhs.length; i++)
-            diff[i] = (byte) (lhs[i] ^ rhs[i]);
+        xor(lhs, 0, rhs, 0, diff, 0, lhs.length);
         return diff;
+    }
+
+    /**
+     * xor the lhs with the rhs, storing the result in out.  
+     *
+     * @param lhs one of the source arrays
+     * @param startLeft starting index in the lhs array to begin the xor
+     * @param rhs the other source array
+     * @param startRight starting index in the rhs array to begin the xor
+     * @param out output array
+     * @param startOut starting index in the out array to store the result
+     * @param len how many bytes into the various arrays to xor
+     */
+    public final static void xor(byte lhs[], int startLeft, byte rhs[], int startRight, byte out[], int startOut, int len) {
+        if ( (lhs == null) || (rhs == null) || (out == null) )
+            throw new NullPointerException("Invalid params to xor (" + lhs + ", " + rhs + ", " + out + ")");
+        if (lhs.length < startLeft + len)
+            throw new IllegalArgumentException("Left hand side is too short");
+        if (rhs.length < startRight + len)
+            throw new IllegalArgumentException("Right hand side is too short");
+        if (out.length < startOut + len)
+            throw new IllegalArgumentException("Result is too short");
+        
+        for (int i = 0; i < len; i++)
+            out[startOut + i] = (byte) (lhs[startLeft + i] ^ rhs[startRight + i]);
     }
 
     //

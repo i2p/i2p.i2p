@@ -74,6 +74,11 @@ class ConnectionRunner implements Runnable {
                 out.flush();
                 after = _context.clock().now();
             }
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Just sent message " + msg.getMessageId() + " to " 
+                         + msg.getTarget().getIdentity().getHash().toBase64().substring(0,6)
+                         + " writeTime = " + (after-before) +"ms"
+                         + " lifetime = " + msg.getLifetime() + "ms");
             
             ok = true;
         } catch (IOException ioe) {

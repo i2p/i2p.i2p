@@ -106,18 +106,16 @@ public class AESOutputStream extends FilterOutputStream {
         int numBlocks = src.length / (BLOCK_SIZE - 1);
 
         byte block[] = new byte[BLOCK_SIZE];
-        block[BLOCK_SIZE - 1] = 0x01; // the padding byte for "full" blocks
         for (int i = 0; i < numBlocks; i++) {
-            System.arraycopy(src, i * 15, block, 0, 15);
-            byte data[] = DataHelper.xor(block, _lastBlock);
-            byte encrypted[] = _context.AESEngine().encrypt(data, _key, _lastBlock);
-            _cumulativeWritten += encrypted.length;
+            DataHelper.xor(src, i * 15, _lastBlock, 0, block, 0, 15);
+            // the padding byte for "full" blocks
+            block[BLOCK_SIZE - 1] = (byte)(_lastBlock[BLOCK_SIZE - 1] ^ 0x01); 
+            _context.aes().encrypt(block, 0, block, 0, _key, _lastBlock, BLOCK_SIZE);
             if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Padding block " + i + " of " + numBlocks + " with 1 byte.  orig= " 
-                           + DataHelper.toHexString(data) + " (size=" + data.length + ") encrypted= " 
-                           + DataHelper.toHexString(encrypted) + " (size=" + encrypted.length + ")");
-            out.write(encrypted);
-            System.arraycopy(encrypted, encrypted.length - BLOCK_SIZE, _lastBlock, 0, BLOCK_SIZE);
+                _log.debug("Padding block " + i + " of " + numBlocks + " with 1 byte");
+            out.write(block);
+            System.arraycopy(block, 0, _lastBlock, 0, BLOCK_SIZE);
+            _cumulativeWritten += BLOCK_SIZE;
             _cumulativePadding++;
         }
 
@@ -129,12 +127,12 @@ public class AESOutputStream extends FilterOutputStream {
                 _log.debug("Padding " + src.length + " with " + paddingBytes + " bytes in " + numBlocks + " blocks");
             System.arraycopy(src, numBlocks * 15, block, 0, remainingBytes);
             Arrays.fill(block, remainingBytes, BLOCK_SIZE, (byte) paddingBytes);
-            byte data[] = DataHelper.xor(block, _lastBlock);
-            byte encrypted[] = _context.AESEngine().encrypt(data, _key, _lastBlock);
-            out.write(encrypted);
-            System.arraycopy(encrypted, encrypted.length - BLOCK_SIZE, _lastBlock, 0, BLOCK_SIZE);
+            DataHelper.xor(block, 0, _lastBlock, 0, block, 0, BLOCK_SIZE);
+            _context.aes().encrypt(block, 0, block, 0, _key, _lastBlock, BLOCK_SIZE);
+            out.write(block);
+            System.arraycopy(block, 0, _lastBlock, 0, BLOCK_SIZE);
             _cumulativePadding += paddingBytes;
-            _cumulativeWritten += encrypted.length;
+            _cumulativeWritten += BLOCK_SIZE;
         }
     }
 

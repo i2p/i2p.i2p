@@ -37,21 +37,16 @@ public class AESEngine {
     
     /** Encrypt the payload with the session key
      * @param payload data to be encrypted
+     * @param payloadIndex index into the payload to start encrypting
+     * @param out where to store the result
+     * @param outIndex where in out to start writing
      * @param sessionKey private esession key to encrypt to
-     * @param initializationVector IV for CBC
-     * @return encrypted data
+     * @param iv IV for CBC
+     * @param length how much data to encrypt
      */
-    public byte[] encrypt(byte payload[], SessionKey sessionKey, byte initializationVector[]) {
-        if ((initializationVector == null) || (payload == null) || (sessionKey == null)
-            || (initializationVector.length != 16)) return null;
-
-        byte cyphertext[] = null;
-        if ((payload.length % 16) == 0) 
-            cyphertext = new byte[payload.length];
-        else
-            cyphertext = new byte[payload.length + (16 - (payload.length % 16))];
-        System.arraycopy(payload, 0, cyphertext, 0, payload.length);
-        return cyphertext;
+    public void encrypt(byte payload[], int payloadIndex, byte out[], int outIndex, SessionKey sessionKey, byte iv[], int length) {
+        System.arraycopy(payload, payloadIndex, out, outIndex, length);
+        _log.warn("Warning: AES is disabled");
     }
 
     public byte[] safeEncrypt(byte payload[], SessionKey sessionKey, byte iv[], int paddedSize) {
@@ -72,13 +67,17 @@ public class AESEngine {
             _log.error("Error writing data", dfe);
             return null;
         }
-        return encrypt(baos.toByteArray(), sessionKey, iv);
+        byte orig[] = baos.toByteArray();
+        byte rv[] = new byte[orig.length];
+        encrypt(orig, 0, rv, 0, sessionKey, iv, rv.length);
+        return rv;
     }
 
     public byte[] safeDecrypt(byte payload[], SessionKey sessionKey, byte iv[]) {
         if ((iv == null) || (payload == null) || (sessionKey == null) || (iv.length != 16)) return null;
 
-        byte decr[] = decrypt(payload, sessionKey, iv);
+        byte decr[] = new byte[payload.length];
+        decrypt(payload, 0, decr, 0, sessionKey, iv, payload.length);
         if (decr == null) {
             _log.error("Error decrypting the data - payload " + payload.length + " decrypted to null");
             return null;
@@ -110,19 +109,19 @@ public class AESEngine {
         }
     }
 
-    /** decrypt the data with the session key provided
-     * @param cyphertext encrypted data
-     * @param sessionKey private session key
-     * @param initializationVector IV for CBC
-     * @return unencrypted data
-     */
-    public byte[] decrypt(byte cyphertext[], SessionKey sessionKey, byte initializationVector[]) {
-        if ((initializationVector == null) || (cyphertext == null) || (sessionKey == null)
-            || (initializationVector.length != 16)) return null;
 
-        byte payload[] = new byte[cyphertext.length];
+    /** Decrypt the data with the session key
+     * @param payload data to be decrypted
+     * @param payloadIndex index into the payload to start decrypting
+     * @param out where to store the cleartext
+     * @param outIndex where in out to start writing
+     * @param sessionKey private session key to decrypt to
+     * @param iv IV for CBC
+     * @param length how much data to decrypt
+     */
+    public void decrypt(byte payload[], int payloadIndex, byte out[], int outIndex, SessionKey sessionKey, byte iv[], int length) {
+        System.arraycopy(payload, payloadIndex, out, outIndex, length);
         _log.warn("Warning: AES is disabled");
-        return cyphertext;
     }
 
     public static void main(String args[]) {
@@ -133,14 +132,16 @@ public class AESEngine {
 
         byte sbuf[] = new byte[16];
         RandomSource.getInstance().nextBytes(sbuf);
-        byte se[] = ctx.AESEngine().encrypt(sbuf, key, iv);
-        byte sd[] = ctx.AESEngine().decrypt(se, key, iv);
+        byte se[] = new byte[16];
+        ctx.aes().encrypt(sbuf, 0, se, 0, key, iv, sbuf.length);
+        byte sd[] = new byte[16];
+        ctx.aes().decrypt(se, 0, sd, 0, key, iv, se.length);
         ctx.logManager().getLog(AESEngine.class).debug("Short test: " + DataHelper.eq(sd, sbuf));
 
         byte lbuf[] = new byte[1024];
         RandomSource.getInstance().nextBytes(sbuf);
-        byte le[] = ctx.AESEngine().safeEncrypt(lbuf, key, iv, 2048);
-        byte ld[] = ctx.AESEngine().safeDecrypt(le, key, iv);
+        byte le[] = ctx.aes().safeEncrypt(lbuf, key, iv, 2048);
+        byte ld[] = ctx.aes().safeDecrypt(le, key, iv);
         ctx.logManager().getLog(AESEngine.class).debug("Long test: " + DataHelper.eq(ld, lbuf));
     }
 }

@@ -396,7 +396,7 @@ public class SendTunnelMessageJob extends JobImpl {
             byte iv[] = new byte[16];
             Hash h = getContext().sha().calculateHash(key.getData());
             System.arraycopy(h.getData(), 0, iv, 0, iv.length);
-            return getContext().AESEngine().safeEncrypt(baos.toByteArray(), key, iv, paddedSize);
+            return getContext().aes().safeEncrypt(baos.toByteArray(), key, iv, paddedSize);
         } catch (IOException ioe) {
             if (_log.shouldLog(Log.ERROR))
                 _log.error("Error writing out data to encrypt", ioe);

@@ -60,6 +60,13 @@ public class InNetMessagePool {
         I2NPMessage messageBody = msg.getMessage();
         msg.processingComplete();
         Date exp = messageBody.getMessageExpiration();
+        
+        if (_log.shouldLog(Log.INFO))
+                _log.info("Received inbound " 
+                          + " with id " + messageBody.getUniqueId()
+                          + " expiring on " + exp
+                          + " of type " + messageBody.getClass().getName());
+        
         boolean valid = _context.messageValidator().validateMessage(messageBody.getUniqueId(), exp.getTime());
         if (!valid) {
             if (_log.shouldLog(Log.WARN))

@@ -328,8 +328,8 @@ public class ConnectionHandler {
         byte pre[] = new byte[48];
         System.arraycopy(_nonce.getData(), 0, pre, 0, 4);
         System.arraycopy(_connectionTag.getData(), 0, pre, 4, 32);
-        byte encr[] = _context.AESEngine().encrypt(pre, _key, _iv);
-        Hash h = _context.sha().calculateHash(encr);
+        _context.aes().encrypt(pre, 0, pre, 0, _key, _iv, pre.length);
+        Hash h = _context.sha().calculateHash(pre);
         _nextConnectionTag = new ByteArray(h.getData());
     }
     
@@ -804,6 +804,8 @@ public class ConnectionHandler {
         _connectionIn = new BandwidthLimitedInputStream(_context, _rawIn, _actualPeer.getIdentity());
         OutputStream blos = new BandwidthLimitedOutputStream(_context, _rawOut, _actualPeer.getIdentity());
         _connectionOut = blos;
+        //_connectionIn = _rawIn;
+        //_connectionOut = _rawOut;
         
         Hash peer = _actualPeer.getIdentity().getHash();
         _context.netDb().store(peer, _actualPeer);

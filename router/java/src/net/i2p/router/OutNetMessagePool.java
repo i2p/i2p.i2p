@@ -41,6 +41,13 @@ public class OutNetMessagePool {
      *
      */
     public void add(OutNetMessage msg) {
+        if (_log.shouldLog(Log.INFO))
+                _log.info("Adding outbound message to " 
+                          + msg.getTarget().getIdentity().getHash().toBase64().substring(0,6)
+                          + " with id " + msg.getMessage().getUniqueId()
+                          + " expiring on " + msg.getMessage().getMessageExpiration()
+                          + " of type " + msg.getMessageType());
+        
         boolean valid = validate(msg);
         if (!valid) return;
         MessageSelector selector = msg.getReplySelector();

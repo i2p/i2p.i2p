@@ -248,7 +248,8 @@ public class ElGamalAESEngine {
                                   SessionKey foundKey) throws DataFormatException {
         //_log.debug("iv for decryption: " + DataHelper.toString(iv, 16));	
         //_log.debug("decrypting AES block.  encr.length = " + (encrypted == null? -1 : encrypted.length) + " sentTag: " + DataHelper.toString(sentTag, 32));
-        byte decrypted[] = _context.AESEngine().decrypt(encrypted, key, iv);
+        byte decrypted[] = new byte[encrypted.length];
+        _context.aes().decrypt(encrypted, 0, decrypted, 0, key, iv, encrypted.length);
         //Hash h = _context.sha().calculateHash(decrypted);
         //_log.debug("Hash of entire aes block after decryption: \n" + DataHelper.toString(h.getData(), 32));
         try {
@@ -503,7 +504,8 @@ public class ElGamalAESEngine {
             byte aesUnencr[] = aesSrc.toByteArray();
             //Hash h = _context.sha().calculateHash(aesUnencr);
             //_log.debug("Hash of entire aes block before encryption: (len=" + aesUnencr.length + ")\n" + DataHelper.toString(h.getData(), 32));
-            byte aesEncr[] = _context.AESEngine().encrypt(aesUnencr, key, iv);
+            byte aesEncr[] = new byte[aesUnencr.length];
+            _context.aes().encrypt(aesUnencr, 0, aesEncr, 0, key, iv, aesEncr.length);
             //_log.debug("Encrypted length: " + aesEncr.length);
             return aesEncr;
         } catch (IOException ioe) {

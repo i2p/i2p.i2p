@@ -352,8 +352,10 @@ public class DHSessionKeyBuilder {
             byte iv[] = new byte[16];
             RandomSource.getInstance().nextBytes(iv);
             String origVal = "1234567890123456"; // 16 bytes max using AESEngine
-            byte enc[] = ctx.AESEngine().encrypt(origVal.getBytes(), key1, iv);
-            byte dec[] = ctx.AESEngine().decrypt(enc, key2, iv);
+            byte enc[] = new byte[16];
+            byte dec[] = new byte[16];
+            ctx.aes().encrypt(origVal.getBytes(), 0, enc, 0, key1, iv, 16);
+            ctx.aes().decrypt(enc, 0, dec, 0, key2, iv, 16);
             String tranVal = new String(dec);
             if (origVal.equals(tranVal))
                 _log.debug("**Success: D(E(val)) == val");

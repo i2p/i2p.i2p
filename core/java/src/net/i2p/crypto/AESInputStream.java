@@ -230,22 +230,21 @@ public class AESInputStream extends FilterInputStream {
                 _log.info(encrypted.length + " bytes makes up " + numBlocks + " blocks to decrypt normally");
         }
 
-        byte block[] = new byte[BLOCK_SIZE];
         for (int i = 0; i < numBlocks; i++) {
-            System.arraycopy(encrypted, i * BLOCK_SIZE, block, 0, BLOCK_SIZE);
-            byte decrypted[] = _context.AESEngine().decrypt(block, _key, _lastBlock);
-            byte data[] = DataHelper.xor(decrypted, _lastBlock);
-            int cleaned[] = stripPadding(data);
-            for (int j = 0; j < cleaned.length; j++) {
-                if (cleaned[j] <= 0) {
-                    cleaned[j] += 256;
-                    //_log.error("(modified: " + cleaned[j] + ")");
-                }
-                _readyBuf.add(new Integer(cleaned[j]));
+            _context.aes().decrypt(encrypted, i * BLOCK_SIZE, encrypted, i * BLOCK_SIZE, _key, _lastBlock, BLOCK_SIZE);
+            DataHelper.xor(encrypted, i * BLOCK_SIZE, _lastBlock, 0, encrypted, i * BLOCK_SIZE, BLOCK_SIZE);
+            int payloadBytes = countBlockPayload(encrypted, i * BLOCK_SIZE);
+            
+            for (int j = 0; j < payloadBytes; j++) {
+                int c = encrypted[j + i * BLOCK_SIZE];
+                if (c <= 0)
+                    c += 256;
+                _readyBuf.add(new Integer(c));
             }
-            _cumulativePrepared += cleaned.length;
-            //_log.debug("Updating last block for inputStream");
-            System.arraycopy(decrypted, 0, _lastBlock, 0, BLOCK_SIZE);
+            _cumulativePaddingStripped += BLOCK_SIZE - payloadBytes;
+            _cumulativePrepared += payloadBytes;
+            
+            System.arraycopy(encrypted, i * BLOCK_SIZE, _lastBlock, 0, BLOCK_SIZE);
         }
 
         int remaining = encrypted.length % BLOCK_SIZE;
@@ -263,6 +262,9 @@ public class AESInputStream extends FilterInputStream {
     }
 
     /**
+     * How many non-padded bytes are there in the block starting at the given
+     * location.
+     *
      * PKCS#5 specifies the padding for the block has the # of padding bytes
      * located in the last byte of the block, and each of the padding bytes are
      * equal to that value.  
@@ -275,31 +277,29 @@ public class AESInputStream extends FilterInputStream {
      *
      * We use 16 byte blocks in this AES implementation
      *
+     * @throws IOException if the padding is invalid
      */
-    private int[] stripPadding(byte data[]) throws IOException {
-        int numPadBytes = data[data.length - 1];
-        if ((numPadBytes >= data.length) || (numPadBytes <= 0)) {
+    private int countBlockPayload(byte data[], int startIndex) throws IOException {
+        int numPadBytes = data[startIndex + BLOCK_SIZE - 1];
+        if ((numPadBytes >= BLOCK_SIZE) || (numPadBytes <= 0)) {
             if (_log.shouldLog(Log.DEBUG))
-                _log.debug("stripPadding from block " + DataHelper.toHexString(data) + " (" + data.length + "bytes): "
+                _log.debug("countBlockPayload on block index " + startIndex 
                            + numPadBytes + " is an invalid # of pad bytes");
             throw new IOException("Invalid number of pad bytes (" + numPadBytes 
-                                  + ") for " + data.length + " bytes");
+                                  + ") for " + startIndex + " index");
         }
         
-        int rv[] = new int[data.length - numPadBytes];
         // optional, but a really good idea: verify the padding
         if (true) {
-            for (int i = data.length - numPadBytes; i < data.length; i++) {
-                if (data[i] != (byte) numPadBytes) { 
+            for (int i = BLOCK_SIZE - numPadBytes; i < BLOCK_SIZE; i++) {
+                if (data[startIndex + i] != (byte) numPadBytes) { 
                     throw new IOException("Incorrect padding on decryption: data[" + i
-                                          + "] = " + data[i] + " not " + numPadBytes); 
+                                          + "] = " + data[startIndex + i] + " not " + numPadBytes); 
                 }
             }
         }
-        for (int i = 0; i < rv.length; i++)
-            rv[i] = data[i];
-        _cumulativePaddingStripped += numPadBytes;
-        return rv;
+        
+        return BLOCK_SIZE - numPadBytes;
     }
 
     int remainingBytes() {

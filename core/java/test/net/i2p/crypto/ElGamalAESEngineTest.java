@@ -145,8 +145,10 @@ class ElGamalAESEngineTest {
             String msg = "Hello world01234012345678901234501234567890123450123456789012345";
             h = SHA256Generator.getInstance().calculateHash(msg.getBytes());
             _log.debug("Hash of entire aes block before encryption: \n" + DataHelper.toString(h.getData(), 32));
-            byte aesEncr[] = _context.AESEngine().encrypt(msg.getBytes(), sessionKey, iv);
-            byte aesDecr[] = _context.AESEngine().decrypt(aesEncr, sessionKey, iv);
+            byte aesEncr[] = new byte[msg.getBytes().length];
+            byte aesDecr[] = new byte[aesEncr.length];
+            _context.aes().encrypt(msg.getBytes(), 0, aesEncr, 0, sessionKey, iv, aesEncr.length);
+            _context.aes().decrypt(aesEncr, 0, aesDecr, 0, sessionKey, iv, aesEncr.length);
             h = SHA256Generator.getInstance().calculateHash(aesDecr);
             _log.debug("Hash of entire aes block after decryption: \n" + DataHelper.toString(h.getData(), 32));
             if (msg.equals(new String(aesDecr))) {

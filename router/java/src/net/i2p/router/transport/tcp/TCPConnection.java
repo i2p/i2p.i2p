@@ -202,6 +202,7 @@ public class TCPConnection {
 
     /** Have we been closed already? */
     boolean getIsClosed() { return _closed; }
+    RouterContext getRouterContext() { return _context; }
     
     /** 
      * The message was sent.

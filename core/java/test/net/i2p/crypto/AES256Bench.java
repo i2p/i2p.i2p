@@ -72,22 +72,28 @@ public class AES256Bench {
             iv[x] = (byte)civ[x];
         }
         
-        byte[] e = _context.AESEngine().encrypt(plain, key, iv);
-        byte[] d = _context.AESEngine().decrypt(e, key, iv);
+        byte[] e = new byte[plain.length];
+        _context.aes().encrypt(plain, 0, e, 0, key, iv, plain.length);
+        byte[] d = new byte[e.length];
+        _context.aes().decrypt(e, 0, d, 0, key, iv, d.length);
         boolean same = true;
         for (int x = 0; x < d.length; x++) {
             if (plain[x] != d[x]) {
-                same = false;
+                throw new RuntimeException("Failed decrypt at " + x);
             }
         }
         
         System.out.println("Standard test D(E(value)) == value? " + same);
+        if (!same) throw new RuntimeException("moo");
         
         plain = "1234567890123456".getBytes();
-        e = _context.AESEngine().encrypt(plain, key, iv);
-        d = _context.AESEngine().decrypt(e, key, iv);
+        e = new byte[plain.length];
+        _context.aes().encrypt(plain, 0, e, 0, key, iv, plain.length);
+        d = new byte[e.length];
+        _context.aes().decrypt(e, 0, d, 0, key, iv, d.length);
         same = DataHelper.eq(plain, d);
         System.out.println("Different value test D(E(value)) == value? " + same);
+        if (!same) throw new RuntimeException("moo");
         
         System.out.println();
         System.out.println();
@@ -104,9 +110,11 @@ public class AES256Bench {
             message[i] = (byte)((i%26)+'a');
         for (int x = 0; x < times; x++) {
             long startencrypt = System.currentTimeMillis();
-            e = _context.AESEngine().encrypt(message, key, iv);
+            e = new byte[message.length];
+            d = new byte[e.length];
+            _context.aes().encrypt(message, 0, e, 0, key, iv, message.length);
             long endencryptstartdecrypt = System.currentTimeMillis();
-            d = _context.AESEngine().decrypt(e, key, iv);
+            _context.aes().decrypt(e, 0, d, 0, key, iv, d.length);
             long enddecrypt = System.currentTimeMillis();
             System.out.print(".");
             encrypttime += endencryptstartdecrypt - startencrypt;

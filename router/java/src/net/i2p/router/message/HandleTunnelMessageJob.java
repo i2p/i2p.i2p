@@ -415,7 +415,7 @@ public class HandleTunnelMessageJob extends JobImpl {
         byte iv[] = new byte[16];
         Hash h = getContext().sha().calculateHash(key.getData());
         System.arraycopy(h.getData(), 0, iv, 0, iv.length);
-        byte decrypted[] = getContext().AESEngine().safeDecrypt(encryptedMessage, key, iv);
+        byte decrypted[] = getContext().aes().safeDecrypt(encryptedMessage, key, iv);
         if (decrypted == null) {
             if (_log.shouldLog(Log.ERROR))
                 _log.error("Error decrypting the message", getAddedBy());
@@ -429,7 +429,7 @@ public class HandleTunnelMessageJob extends JobImpl {
             byte iv[] = new byte[16];
             Hash h = getContext().sha().calculateHash(key.getData());
             System.arraycopy(h.getData(), 0, iv, 0, iv.length);
-            byte decrypted[] = getContext().AESEngine().safeDecrypt(encryptedInstructions, key, iv);
+            byte decrypted[] = getContext().aes().safeDecrypt(encryptedInstructions, key, iv);
             if (decrypted == null) {
                 if (_log.shouldLog(Log.ERROR))
                     _log.error("Error decrypting the instructions", getAddedBy());
