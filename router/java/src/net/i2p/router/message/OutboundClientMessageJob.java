@@ -639,8 +639,10 @@ public class OutboundClientMessageJob extends JobImpl {
                            + _status.getNumSent() + " sends");
             
             if ( (_key != null) && (_tags != null) && (_tags.size() > 0) ) {
-                _context.sessionKeyManager().tagsDelivered(_status.getLeaseSet().getEncryptionKey(),
-                                                           _key, _tags);
+                LeaseSet ls = _status.getLeaseSet();
+                if (ls != null)
+                    _context.sessionKeyManager().tagsDelivered(ls.getEncryptionKey(),
+                                                              _key, _tags);
             }
             
             if (alreadySuccessful) {
