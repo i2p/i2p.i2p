@@ -35,6 +35,15 @@ public class Destination extends DataStructureImpl {
         __calculatedHash = null;
     }
 
+    /**
+     * alternative constructor which takes a base64 string representation
+     * @param s a Base64 representation of the destination, as (eg) is used in hosts.txt
+     */
+    public Destination(String s) {
+        this();
+        fromBase64(s);
+    }
+
     public Certificate getCertificate() {
         return _certificate;
     }
