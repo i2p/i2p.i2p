@@ -111,7 +111,7 @@ class ConnectionRunner implements I2CPMessageReader.I2CPMessageEventListener {
     /**
      * Actually run the connection - listen for I2CP messages and respond.  This
      * is the main driver for this class, though it gets all its meat from the
-     * {@link net.invisiblenet.i2p.data.i2cp.I2CPMessageReader I2CPMessageReader}
+     * {@link net.i2p.data.i2cp.I2CPMessageReader I2CPMessageReader}
      *
      */
     public void doYourThing() throws IOException {
