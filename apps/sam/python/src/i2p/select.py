@@ -144,13 +144,13 @@ def select(readlist, writelist, errlist, timeout=None):
      sockets.  See select.select() in the Python library for more
      information."""
 
-  if timeout != None: end = time.clock() + timeout
+  if timeout != None: end = time.time() + timeout
   while True:
     # FIXME: Check performance.
     # Use pyselect.poll for Python sockets, if needed for speed.
     (Rans, Wans, Eans) = _noblock_select(readlist,writelist,errlist)
 
-    if timeout != None and time.clock() >= end: break
+    if timeout != None and time.time() >= end: break
     if len(Rans) != 0 or len(Wans) != 0 or len(Eans) != 0:
       # One or more sockets are ready.
       if timeout != 0.0:

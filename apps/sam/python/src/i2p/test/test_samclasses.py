@@ -240,8 +240,8 @@ def multithread_packet_test(raw=True):
     while __done_count < n: time.sleep(0.01)
 
     # Read any left-over received packets.
-    end_time = time.clock() + multithread_wait_time
-    while time.clock() < end_time:
+    end_time = time.time() + multithread_wait_time
+    while time.time() < end_time:
       # Read any available packets.
       try: (p, fromaddr) = C.recv(timeout=0.0)
       except socket.BlockError: p = None
@@ -257,7 +257,7 @@ def multithread_packet_test(raw=True):
       if len(C_got) == len(C_recv) and len(D_got) == len(D_recv):
         break
 
-    if time.clock() >= end_time:
+    if time.time() >= end_time:
       may_need_increase = True
 
     C_got.sort()
@@ -367,8 +367,8 @@ def multithread_stream_test():
     while __done_count < n: time.sleep(0.01)
 
     # Read any left-over received string data.
-    end_time = time.clock() + multithread_wait_time
-    while time.clock() < end_time:
+    end_time = time.time() + multithread_wait_time
+    while time.time() < end_time:
       # Read any available string data, non-blocking.
       try: p = Cin.recv(100000, timeout=0.0)
       except socket.BlockError: p = None
@@ -382,7 +382,7 @@ def multithread_stream_test():
          len(''.join(D_got)) == len(''.join(D_recv)):
         break
 
-    if time.clock() >= end_time:
+    if time.time() >= end_time:
       may_need_increase = True
 
     C_got = ''.join(C_got)
