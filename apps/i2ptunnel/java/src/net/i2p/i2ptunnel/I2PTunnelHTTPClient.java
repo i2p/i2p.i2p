@@ -64,8 +64,10 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
 //     this(localPort, l, ownDest, wwwProxy, (EventDispatcher)null);
 // }
 
+    private static volatile long __clientId = 0;
+    
     public I2PTunnelHTTPClient(int localPort, Logging l, boolean ownDest, String wwwProxy, EventDispatcher notifyThis) {
-        super(localPort, ownDest, l, notifyThis, "HTTPHandler");
+        super(localPort, ownDest, l, notifyThis, "HTTPHandler " + (++__clientId));
 
         if (waitEventValue("openBaseClientResult").equals("error")) {
             notifyEvent("openHTTPClientResult", "error");
@@ -211,6 +213,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
     }
 
     private static final long INACTIVITY_TIMEOUT = 120 * 1000;
+    private static volatile long __timeoutId = 0;
 
     private class InactivityTimeoutThread extends I2PThread {
 
@@ -230,7 +233,8 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
             _targetRequest = targetRequest;
             _useWWWProxy = useWWWProxy;
             _disabled = false;
-            setName("InactivityThread");
+            long timeoutId = ++__timeoutId;
+            setName("InactivityThread " + timeoutId);
         }
 
         public void disable() {
