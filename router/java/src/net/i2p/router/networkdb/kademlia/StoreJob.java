@@ -213,6 +213,10 @@ class StoreJob extends JobImpl {
         long token = getContext().random().nextLong(I2NPMessage.MAX_ID_VALUE);
         
         TunnelId replyTunnelId = selectInboundTunnel();
+        if (replyTunnelId == null) {
+            _log.error("No reply inbound tunnels available!");
+            return;
+        }
         TunnelInfo replyTunnel = getContext().tunnelManager().getTunnelInfo(replyTunnelId);
         if (replyTunnel == null) {
             _log.error("No reply inbound tunnels available!");
