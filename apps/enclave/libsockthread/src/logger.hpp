@@ -28,26 +28,38 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-// Modelled after JThread by Jori Liesenborgs
-
-#ifndef LIBSOCKTHREAD_MUTEX_HPP
-#define LIBSOCKTHREAD_MUTEX_HPP
+#ifndef LIBSOCKTHREAD_LOGGER_HPP
+#define LIBSOCKTHREAD_LOGGER_HPP
 
 namespace Libsockthread {
-	class Mutex {
+	class Logger {
 		public:
-			Mutex(void);
-			~Mutex(void);
+			typedef enum {DEBUG = 0, MINOR = 1, INFO = 2, WARN = 3, ERROR = 4}
+				priority_t;
 
-			void lock(void);
-			void unlock(void);
+			Logger(void)
+				: logf(0), loglevel(Logger::DEBUG) { }
+			~Logger(void) { close(); }
+
+			void close(void);
+			void log(priority_t priority, const char* format, ...);
+			priority_t get_loglevel(void) const
+				{ mutex.lock(); priority_t ll = loglevel; mutex.unlock(); return ll; }
+			void open(const string& file);  // throws Logger_error
+			void set_loglevel(priority_t priority)
+				{ mutex.lock(); loglevel = priority; mutex.unlock(); }
 		private:
-#ifdef WINTHREAD
-			HANDLE mutex;
-#else
-			pthread_mutex_t mutex;
-#endif
+			Mutex cerr_m;
+			FILE* logf;
+			priority_t loglevel;
+			Mutex logger_m;
+	};
+
+	class Logger_error : public runtime_error {
+		public:
+			Logger_error(const string& s)
+				: runtime_error(s) { }
 	};
 }
 
-#endif  // LIBSOCKTHREAD_MUTEX_HPP
+#endif  // LIBSOCKTHREAD_LOGGER_HPP

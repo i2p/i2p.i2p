@@ -28,26 +28,66 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-// Modelled after JThread by Jori Liesenborgs
+#include <ctime>
+#include <string>
+using namespace std;
+#include "time.hpp"
+using namespace Libsockthread;
 
-#ifndef LIBSOCKTHREAD_MUTEX_HPP
-#define LIBSOCKTHREAD_MUTEX_HPP
+/*
+ * Converts the time to an ISO 8601 standard time and date and puts it in a string
+ * Example: 2004-07-01 19:03:47Z
+ */
+string& Time::utc(string &s) const
+{
+	struct tm* tm;
 
-namespace Libsockthread {
-	class Mutex {
-		public:
-			Mutex(void);
-			~Mutex(void);
-
-			void lock(void);
-			void unlock(void);
-		private:
-#ifdef WINTHREAD
-			HANDLE mutex;
-#else
-			pthread_mutex_t mutex;
-#endif
-	};
+	tm = gmtime(&unixtime);
+	char t[21];
+	strftime(t, sizeof t, "%Y-%m-%d %H:%M:%SZ", tm);
+	return s = t;
 }
 
-#endif  // LIBSOCKTHREAD_MUTEX_HPP
+/*
+ * Converts the time to an ISO 8601 standard date and puts it in a string
+ * Example: 2004-07-01Z
+ */
+string& Time::utc_date(string &s) const
+{
+	struct tm* tm;
+
+	tm = gmtime(&unixtime);
+	char t[12];
+	strftime(t, sizeof t, "%Y-%m-%dZ", tm);
+	return s = t;
+}
+
+/*
+ * Converts the time to an ISO 8601 standard time and puts it in a string
+ * Example: 19:03:47Z
+ */
+string& Time::utc_time(string &s) const
+{
+	struct tm* tm;
+
+	tm = gmtime(&unixtime);
+	char t[10];
+	strftime(t, sizeof t, "%H:%M:%SZ", tm);
+	return s = t;
+}
+
+#ifdef UNIT_TEST
+// g++ -Wall -DUNIT_TEST time.cpp -o time
+#include <iostream>
+
+int main(void)
+{
+	Time t;
+	string s;
+	cout << "Current date and time is " << t.utc(s) << '\n';
+	cout << "Current date is " << t.utc_date(s) << '\n';
+	cout << "Current time is " << t.utc_time(s) << '\n';
+
+	return 0;
+}
+#endif  // UNIT_TEST

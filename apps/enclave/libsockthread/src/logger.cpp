@@ -28,107 +28,103 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-// Modelled after JThread by Jori Liesenborgs
-
 #include <cassert>
-#include "platform.hpp"
-#ifdef WINTHREAD
-	#include <windows.h>
-#else
-	#include <pthread.h>
-#endif
+#include <cstdarg>
+#include <cstdio>
+#include <iostream>
+#include <string>
 using namespace std;
-#include "mutex.hpp"
+#include "time.hpp"
+#include "logger.hpp"
 using namespace Libsockthread;
 
 /*
- * Creates a mutex
+ * Closes the log file
  */
-Mutex::Mutex(void)
+void Logger::close(void)
 {
-#ifdef WINTHREAD
-	mutex = CreateMutex(0, false, 0);
-	assert(mutex != 0);
-#else
-	int rc = pthread_mutex_init(&mutex, 0);
-	assert(rc == 0);
-#endif
+	logger_m.lock();
+	if (logf == 0) {
+		logger_m.unlock();
+		return;
+	}
+	if (fclose(logf) == EOF) {
+		cerr_m.lock();
+		cerr << "fclose() failed: " << strerror(errno) << '\n';
+		cerr_m.unlock();
+	}
+	logf = 0;
+	logger_m.unlock();
 }
 
 /*
- * Destroys a mutex
+ * Sends a line to the log file.  Uses variable arguments just like printf().
  */
-Mutex::~Mutex(void)
+void Logger::log(priority_t priority, const char* format, ...)
 {
-#ifdef WINTHREAD
-	BOOL rc = CloseHandle(mutex);
-	assert(rc);
-#else
-	int rc = pthread_mutex_destroy(&mutex);
-	assert(rc == 0);
-#endif
+	if (priority < get_loglevel())
+		return;
+
+	char ll;
+	switch (priority) {
+		case Logger::DEBUG:
+			ll = 'D';
+			break;
+		case Logger::MINOR:
+			ll = 'M';
+			break;
+		case Logger::INFO:
+			ll = 'I';
+			break;
+		case Logger::WARN:
+			ll = 'W';
+			break;
+		case Logger::ERROR:
+			ll = 'E';
+			break;
+		default:
+			ll = '?';
+	}
+
+	va_list ap;
+	va_start(ap, format);
+	string s;
+	Time t;
+	logger_m.lock();
+	assert(logf != 0);
+
+	fprintf(logf, "%c@%s: ", ll, t.utc(s).c_str());
+	vfprintf(logf, format, ap);
+	fputc('\n', logf);
+
+	va_end(ap);
+
+	if (fflush(logf) == EOF) {
+		cerr_m.lock();
+		cerr << "fflush() failed: " << strerror(errno) << '\n';
+		cerr_m.unlock();
+	}
+	logger_m.unlock();
+
+	return;
 }
 
 /*
- * Locks the mutex
+ * Opens a log file for appending.  If there already is an open log file, then
+ * it is closed and the new one is opened.
+ *
+ * file - file location to open
  */
-void Mutex::lock(void)
+void Logger::open(const string& file)
 {
-#ifdef WINTHREAD
-	DWORD rc = WaitForSingleObject(mutex, INFINITE);
-	assert(rc != WAIT_FAILED);
-#else
-	int rc = pthread_mutex_lock(&mutex);
-	assert(rc == 0);  // if it stops here, it is probably from a deadlock
-#endif
+	close();
+	logger_m.lock();
+	logf = fopen(file.c_str(), "a");
+	logger_m.unlock();
+	if (logf == NULL) {
+		cerr_m.lock();
+		cerr << "fopen() failed (" << file << "): " << strerror(errno) << '\n';
+		cerr_m.unlock();
+		throw Logger_error("Error opening log file");
+	}
 }
-
-/*
- * Unlocks the mutex
- */
-void Mutex::unlock(void)
-{
-#ifdef WINTHREAD
-	BOOL rc = ReleaseMutex(mutex);
-	assert(rc);
-#else
-	int rc = pthread_mutex_unlock(&mutex);
-	assert(rc == 0);
-#endif
-}
-
-#ifdef UNIT_TEST
-// g++ -Wall -c thread.cpp -o thread.o
-// g++ -Wall -DUNIT_TEST -c mutex.cpp -o mutex.o
-// g++ -Wall -DUNIT_TEST mutex.o thread.o -o mutex -lpthread
-#include <iostream>
-#include <ctime>
-#include "thread.hpp"
-
-Mutex widget;
-
-int main(void)
-{
-	class Mutex_test : public Thread
-	{
-		public:
-			Mutex_test(int n)
-				: testval(n) {}
-
-			void* thread(void)
-			{
-				widget.lock();
-				cout << "I got it!  thread #" << testval << '\n';
-				widget.unlock();
-				return 0;
-			}
-		private:
-			int testval;
-	};
-	Mutex_test t1(1);
-	Mutex_test t2(2);
-	Mutex_test t3(3);
-
-	return 0;
-}
-#endif  // UNIT_TEST

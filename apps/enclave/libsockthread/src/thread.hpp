@@ -30,8 +30,8 @@
 
 // Modelled after JThread by Jori Liesenborgs
 
-#ifndef THREAD_HPP
-#define THREAD_HPP
+#ifndef LIBSOCKTHREAD_THREAD_HPP
+#define LIBSOCKTHREAD_THREAD_HPP
 
 namespace Libsockthread {
 	class Thread {
@@ -41,12 +41,11 @@ namespace Libsockthread {
 			virtual ~Thread(void)
 				{ kill(); }
 
-			virtual void *execute(void) = 0;
 			void* get_retval(void);
 			bool is_running(void);
 			void kill(void);
 			void start(void);
-
+			virtual void *thread(void) = 0;
 		private:
 #ifdef WINTHREAD
 			static DWORD WINAPI the_thread(void* param);
@@ -56,11 +55,11 @@ namespace Libsockthread {
 			static void* the_thread(void* param);
 			pthread_t id;
 #endif
+			Mutex continue_m;
 			void *retval;
 			bool running;
 			Mutex running_m;
-			Mutex continue_m;
 	};
 }
 
-#endif  // THREAD_HPP
+#endif  // LIBSOCKTHREAD_THREAD_HPP

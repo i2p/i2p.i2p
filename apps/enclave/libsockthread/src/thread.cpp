@@ -30,8 +30,17 @@
 
 // Modelled after JThread by Jori Liesenborgs
 
+#include <cassert>
 #include "platform.hpp"
+#ifdef WINTHREAD
+	#include <windows.h>
+#else
+	#include <pthread.h>
+#endif
+using namespace std;
+#include "mutex.hpp"
 #include "thread.hpp"
+using namespace Libsockthread;
 
 /*
  * Gets the return value of a finished thread
@@ -97,10 +106,10 @@ void Thread::start(void)
 #endif
 	continue_m.lock();
 #ifdef WINTHREAD
-	handle = CreateThread(NULL, 0, &the_thread, this, 0, &id);
-	assert(handle != NULL);
+	handle = CreateThread(0, 0, &the_thread, this, 0, &id);
+	assert(handle != 0);
 #else
-	int rc = pthread_create(&id, NULL, &the_thread, this);
+	int rc = pthread_create(&id, 0, &the_thread, this);
 	assert(rc == 0);
 #endif
 	// Wait until `running' is set
@@ -118,17 +127,73 @@ void Thread::start(void)
  */
 void* Thread::the_thread(void *param)
 {
-	Thread* t = dynamic_cast<Thread*>(param);
+	Thread* t = static_cast<Thread*>(param);
 	t->running_m.lock();
 	t->running = true;
 	t->running_m.unlock();
 	// wait until we can continue
 	t->continue_m.lock();
 	t->continue_m.unlock();
-	void* ret = t->execute();
+	void* ret = t->thread();
 	t->running_m.lock();
 	t->running = false;
 	t->retval = ret;
 	t->running_m.unlock();
 	return 0;
 }
+
+#ifdef UNIT_TEST
+// g++ -Wall -c mutex.cpp -o mutex.o
+// g++ -Wall -DUNIT_TEST -c thread.cpp -o thread.o
+// g++ -Wall -DUNIT_TEST mutex.o thread.o -o thread -lpthread
+#include <iostream>
+
+int main(void)
+{
+	class Thread_test : public Thread
+	{
+		public:
+			Thread_test(int testval)
+				: testval(testval) { }
+
+			int get_testval(void)
+			{
+				testval_m.lock();
+				int rc = testval;
+				testval_m.unlock();
+				return rc;
+			}
+
+			void *thread(void)
+			{
+				// just do something
+				while (true) {
+					testval_m.lock();
+					++testval;
+					testval_m.unlock();
+				}
+				return 0;
+			}
+		private:
+			int testval;
+			Mutex testval_m;
+	};
+
+	Thread_test t1(1);
+	t1.start();
+	Thread_test t2(1000000);
+	t2.start();
+	Thread_test t3(-1000000);
+	t3.start();
+	while (true) {
+		if (t1.is_running())
+			cout << "t1 is running..." << t1.get_testval() << '\n';
+		if (t2.is_running())
+			cout << "t2 is running..." << t2.get_testval() << '\n';
+		if (t3.is_running())
+			cout << "t3 is running..." << t3.get_testval() << '\n';
+	}
+
+	return 0;
+}
+#endif  // UNIT_TEST

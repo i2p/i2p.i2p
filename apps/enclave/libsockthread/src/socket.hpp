@@ -28,13 +28,15 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef SOCKET_HPP
-#define SOCKET_HPP
+#ifndef LIBSOCKTHREAD_SOCKET_HPP
+#define LIBSOCKTHREAD_SOCKET_HPP
 
 namespace Libsockthread {
 	class Socket {
 		public:
-			Socket(int type);  // throws Socket error
+			Socket(void);  // throws socket error
+			Socket(int domain, int type);  // throws Socket_error
+			~Socket(void);
 
 			void func(void);
 		private:
@@ -47,7 +49,10 @@ namespace Libsockthread {
 #else
 			typedef int socket_t;
 #endif
+			void create_socket(int domain, int type);  // throws Socket_error
+
 			socket_t sock;
+			static size_t total;
 	};
 
 	class Socket_error : public runtime_error {
@@ -57,4 +62,4 @@ namespace Libsockthread {
 	};
 }
 
-#endif  // MUTEX_HPP
+#endif  // LIBSOCKTHREAD_SOCKET_HPP

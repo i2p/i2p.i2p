@@ -31,17 +31,57 @@
 #include "platform.hpp"
 #include "socket.hpp"
 
+size_t Socket::total = 0;  // the total number of sockets in use
+
+/*
+ * Constructs an IPv4 TCP socket
+ */
+Socket::Socket(void)
+{
+	++total;
+#ifdef WINSOCK
+	if (total == 1)
+		winsock_startup();
+#endif
+	socket(PF_INET, SOCK_STREAM);
+}
+
+/*
+ * Constructs a socket
+ *
+ * domain - either PF_INET or PF_INET6
+ * type - either SOCK_STREAM or SOCK_DGRAM
+ */
+Socket::Socket(int domain, int type)
+{
+	++total;
+#ifdef WINSOCK
+	if (total == 1)
+		winsock_startup();
+#endif
+	socket(domain, type);
+}
+
+/*
+ * Destroys a socket
+ */
+Socket::~Socket(void)
+{
+	total--;
+	// TODO: finish me
+}
+
 /*
  * Creates a socket
  *
+ * domain - either PF_INET or PF_INET6
  * type - either SOCK_STREAM or SOCK_DGRAM
  */
-Socket::Socket(int type)
+void Socket::create_socket(int domain, int type)
 {
-#ifdef WINSOCK
-	winsock_startup();
-#endif
-	sock = socket(PF_INET, type, 0);
+	assert((domain == PF_INET || domain == PF_INET6) &&
+		(type == SOCK_STREAM || type == SOCK_DGRAM));
+	sock = socket(domain, type, 0);
 #ifdef WINSOCK
 	if (sock == INVALID_SOCKET)
 		throw Socket_error(sam_winsock_strerror(WSAGetLastError()));

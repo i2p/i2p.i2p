@@ -28,26 +28,21 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-// Modelled after JThread by Jori Liesenborgs
-
-#ifndef LIBSOCKTHREAD_MUTEX_HPP
-#define LIBSOCKTHREAD_MUTEX_HPP
+#ifndef LIBSOCKTHREAD_TIME_HPP
+#define LIBSOCKTHREAD_TIME_HPP
 
 namespace Libsockthread {
-	class Mutex {
+	class Time {
 		public:
-			Mutex(void);
-			~Mutex(void);
+			Time(void) { now(); }
 
-			void lock(void);
-			void unlock(void);
+			void now(void) { unixtime = time(0); }
+			string& utc(string &s) const;
+			string& utc_date(string &s) const;
+			string& utc_time(string &s) const;
 		private:
-#ifdef WINTHREAD
-			HANDLE mutex;
-#else
-			pthread_mutex_t mutex;
-#endif
+			time_t unixtime;
 	};
 }
 
-#endif  // LIBSOCKTHREAD_MUTEX_HPP
+#endif  // LIBSOCKTHREAD_TIME_HPP
