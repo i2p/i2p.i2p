@@ -43,7 +43,7 @@ import java.io.IOException;
  */
 public class MultiRouterBuilder {
     public static void main(String args[]) {
-        if (args.length <= 2) {
+        if (args.length < 2) {
             usage();
             return;
         }
@@ -128,7 +128,7 @@ public class MultiRouterBuilder {
         buf.append("i2np.bandwidth.inboundBytesPerMinute=-60\n");
         buf.append("i2np.bandwidth.outboundBytesPerMinute=-60\n");
         buf.append("router.publishPeerRankings=true\n");
-        buf.append("router.keepHistory=true\n");
+        buf.append("router.keepHistory=false\n");
         buf.append("router.submitHistory=false\n");
         buf.append("router.maxJobRunners=1\n");
         buf.append("router.jobLagWarning=10000\n");
@@ -136,9 +136,9 @@ public class MultiRouterBuilder {
         buf.append("router.jobRunWarning=10000\n");
         buf.append("router.jobRunFatal=30000\n");
         buf.append("router.jobWarmupTime=600000\n");
-        buf.append("router.targetClients=2\n");
-        buf.append("tunnels.numInbound=2\n");
-        buf.append("tunnels.numOutbound=2\n");
+        buf.append("router.targetClients=1\n");
+        buf.append("tunnels.numInbound=6\n");
+        buf.append("tunnels.numOutbound=6\n");
         buf.append("tunnels.depthInbound=2\n");
         buf.append("tunnels.depthOutbound=2\n");
         buf.append("tunnels.tunnelDuration=600000\n");
