@@ -6,8 +6,8 @@
 # Programs
 #
 
-CC = C:\Dev-Cpp\bin\gcc
-RM = C:\Dev-Cpp\bin\rm
+CC = C:\MinGW\bin\gcc
+RM = C:\MinGW\bin\rm
 
 #
 # Flags

@@ -21,9 +21,9 @@ SRCDIR = src
 # Programs
 #
 
-AR = C:\Dev-Cpp\bin\ar
-CC = C:\Dev-Cpp\bin\gcc
-RM = C:\Dev-Cpp\bin\rm
+AR = C:\MinGW\bin\ar
+CC = C:\MinGW\bin\gcc
+RM = C:\MinGW\bin\rm
 
 #
 # Flags

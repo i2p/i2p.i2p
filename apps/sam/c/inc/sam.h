@@ -87,6 +87,7 @@ typedef struct {
 	int sock;  /* the socket used for communications with SAM */
 	bool connected;  /* whether the socket is connected */
 	sam_sid_t prev_id;  /* the last stream id number we used */
+	void *child;  /* whatever you want it to be */
 } sam_sess_t;  /* a SAM session */
 
 typedef enum {  /* see sam_strerror() for detailed descriptions of these */

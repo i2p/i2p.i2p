@@ -937,6 +937,7 @@ sam_sess_t *sam_session_init(sam_sess_t *session)
 			SAMLOGS("Out of memory");
 			abort();
 		}
+		session->child = NULL;
 	}
 	session->connected = false;
 	session->prev_id = 0;
