@@ -62,7 +62,7 @@ Server->Client
 Sample conversations:
 =====================
 
-a) Service not available (e.g. the server on the TCP port is not running)
+a) Service not available (e.g. the server is not accepting connections)
 
 C->S  A1 12 34 56 key... (SYN, client ID = 12 34 56)
 S->C  52 12 34 56  (Close)
