@@ -2,6 +2,8 @@ package net.i2p.router.peermanager;
 
 import java.io.File;
 
+import java.text.DecimalFormat;
+
 import net.i2p.data.Hash;
 import net.i2p.router.RouterContext;
 import net.i2p.stat.RateStat;
@@ -297,6 +299,8 @@ public class PeerProfile {
      */
     public static void main(String args[]) {
         RouterContext ctx = new RouterContext(new net.i2p.router.Router());
+        DecimalFormat fmt = new DecimalFormat("0,000.0");
+        fmt.setPositivePrefix("+");
         ProfilePersistenceHelper helper = new ProfilePersistenceHelper(ctx);
         try { Thread.sleep(5*1000); } catch (InterruptedException e) {}
         StringBuffer buf = new StringBuffer(1024);
@@ -308,9 +312,9 @@ public class PeerProfile {
             }
             //profile.coallesceStats();
             buf.append("Peer " + profile.getPeer().toBase64() 
-                       + ":\t Speed:\t" + profile.calculateSpeed()
-                       + " Reliability:\t" + profile.calculateReliability()
-                       + " Integration:\t" + profile.calculateIntegration()
+                       + ":\t Speed:\t" + fmt.format(profile.calculateSpeed())
+                       + " Reliability:\t" + fmt.format(profile.calculateReliability())
+                       + " Integration:\t" + fmt.format(profile.calculateIntegration())
                        + " Active?\t" + profile.getIsActive() 
                        + " Failing?\t" + profile.calculateIsFailing()
                        + '\n');

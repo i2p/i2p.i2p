@@ -23,10 +23,10 @@ public class ReliabilityCalculator extends Calculator {
             return profile.getReliabilityBonus();
         
         long val = 0;
-        val += profile.getSendSuccessSize().getRate(60*1000).getCurrentEventCount() * 5;
-        val += profile.getSendSuccessSize().getRate(60*1000).getLastEventCount() * 2;
-        val += profile.getSendSuccessSize().getRate(60*60*1000).getLastEventCount();
-        val += profile.getSendSuccessSize().getRate(60*60*1000).getCurrentEventCount();
+        val += profile.getSendSuccessSize().getRate(60*1000).getCurrentEventCount() * 20;
+        val += profile.getSendSuccessSize().getRate(60*1000).getLastEventCount() * 10;
+        val += profile.getSendSuccessSize().getRate(60*60*1000).getLastEventCount() * 1;
+        val += profile.getSendSuccessSize().getRate(60*60*1000).getCurrentEventCount() * 5;
         
         val += profile.getTunnelCreateResponseTime().getRate(10*60*1000).getLastEventCount() * 5;
         val += profile.getTunnelCreateResponseTime().getRate(60*60*1000).getCurrentEventCount();
@@ -36,10 +36,10 @@ public class ReliabilityCalculator extends Calculator {
         //val -= profile.getSendFailureSize().getRate(60*60*1000).getCurrentEventCount()*2;
         //val -= profile.getSendFailureSize().getRate(60*60*1000).getLastEventCount()*2;
         
-        val -= profile.getTunnelHistory().getRejectionRate().getRate(60*1000).getCurrentEventCount() * 50;
-        val -= profile.getTunnelHistory().getRejectionRate().getRate(60*1000).getLastEventCount() * 25;
-        val -= profile.getTunnelHistory().getRejectionRate().getRate(60*60*1000).getCurrentEventCount() * 5;
-        val -= profile.getTunnelHistory().getRejectionRate().getRate(60*60*1000).getLastEventCount() * 1;
+        val -= profile.getTunnelHistory().getRejectionRate().getRate(60*1000).getCurrentEventCount() * 10;
+        val -= profile.getTunnelHistory().getRejectionRate().getRate(60*1000).getLastEventCount() * 5;
+        val -= profile.getTunnelHistory().getRejectionRate().getRate(60*60*1000).getCurrentEventCount() * 1;
+        //val -= profile.getTunnelHistory().getRejectionRate().getRate(60*60*1000).getLastEventCount() * 1;
         
         // penalize them heavily for dropping netDb requests
         val -= profile.getDBHistory().getFailedLookupRate().getRate(60*1000).getCurrentEventCount() * 10;
