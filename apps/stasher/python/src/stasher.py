@@ -163,10 +163,10 @@ runCore = True
 
 # timeouts - calibrate as needed
 timeout = {
-    'ping' : 120,
-    'findNode' : 120,
-    'findData' : 120,
-    'store' : 120,
+    'ping' : 60,
+    'findNode' : 60,
+    'findData' : 60,
+    'store' : 60,
     }
 
 logToSocket = None
