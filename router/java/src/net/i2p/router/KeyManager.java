@@ -39,6 +39,8 @@ public class KeyManager {
     private SigningPrivateKey _signingPrivateKey;
     private SigningPublicKey _signingPublicKey;
     private Map _leaseSetKeys; // Destination --> LeaseSetKeys
+    private boolean _alreadyReadFromDisk;
+    private boolean _pendingWrite;
     
     public final static String PROP_KEYDIR = "router.keyBackupDir";
     public final static String DEFAULT_KEYDIR = "keyBackup";
@@ -56,20 +58,34 @@ public class KeyManager {
         setSigningPrivateKey(null);
         setSigningPublicKey(null);
         _leaseSetKeys = new HashMap();
+        _alreadyReadFromDisk = false;
+        _pendingWrite = false;
         _context.jobQueue().addJob(new SynchronizeKeysJob());
     }
     
     /** Configure the router's private key */
-    public void setPrivateKey(PrivateKey key) { _privateKey = key; }
+    public void setPrivateKey(PrivateKey key) { 
+        _privateKey = key; 
+        _pendingWrite = true;
+    }
     public PrivateKey getPrivateKey() { return _privateKey; }
     /** Configure the router's public key */
-    public void setPublicKey(PublicKey key) { _publicKey = key; }
+    public void setPublicKey(PublicKey key) { 
+        _publicKey = key; 
+        _pendingWrite = true;
+    }
     public PublicKey getPublicKey() { return _publicKey; }
     /** Configure the router's signing private key */
-    public void setSigningPrivateKey(SigningPrivateKey key) { _signingPrivateKey = key; }
+    public void setSigningPrivateKey(SigningPrivateKey key) { 
+        _signingPrivateKey = key; 
+        _pendingWrite = true;
+    }
     public SigningPrivateKey getSigningPrivateKey() { return _signingPrivateKey; }
     /** Configure the router's signing public key */
-    public void setSigningPublicKey(SigningPublicKey key) { _signingPublicKey = key; }
+    public void setSigningPublicKey(SigningPublicKey key) { 
+        _signingPublicKey = key; 
+        _pendingWrite = true;
+    }
     public SigningPublicKey getSigningPublicKey() { return _signingPublicKey; }
     
     public void registerKeys(Destination dest, SigningPrivateKey leaseRevocationPrivateKey, PrivateKey endpointDecryptionKey) {
@@ -78,13 +94,25 @@ public class KeyManager {
         synchronized (_leaseSetKeys) {
             _leaseSetKeys.put(dest, keys);
         }
+        _pendingWrite = true;
+    }
+   
+    /**
+     * True if we've never read the data from disk or if we've 
+     * updated data in memory.  
+     */
+    private boolean needsSync() {
+        return !(_alreadyReadFromDisk && !_pendingWrite);
     }
     
     public LeaseSetKeys unregisterKeys(Destination dest) {
         _log.info("Unregistering keys for destination " + dest.calculateHash().toBase64());
+        LeaseSetKeys rv = null;
         synchronized (_leaseSetKeys) {
-            return (LeaseSetKeys)_leaseSetKeys.remove(dest);
+            rv = (LeaseSetKeys)_leaseSetKeys.remove(dest);
         }
+        _pendingWrite = true;
+        return rv;
     }
     
     public LeaseSetKeys getKeys(Destination dest) {
@@ -118,12 +146,14 @@ public class KeyManager {
             getTiming().setStartAfter(KeyManager.this._context.clock().now()+DELAY);
             KeyManager.this._context.jobQueue().addJob(this);
         }
-
+        
         private void syncKeys(File keyDir) {
+            if (!needsSync()) return;
             syncPrivateKey(keyDir);
             syncPublicKey(keyDir);
             syncSigningKey(keyDir);
             syncVerificationKey(keyDir);
+            _alreadyReadFromDisk = true;
         }
 
         private void syncPrivateKey(File keyDir) {
