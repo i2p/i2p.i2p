@@ -447,7 +447,6 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
         if (_closed) return;
         
         if (_log.shouldLog(Log.DEBUG)) _log.debug("Destroy the session", new Exception("DestroySession()"));
-        _closed = true;
         if (sendDisconnect) {
             try {
                 _producer.disconnect(this);
@@ -455,6 +454,7 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
                 propogateError("Error destroying the session", ipe);
             }
         }
+        _closed = true;
         closeSocket();
         if (_sessionListener != null) _sessionListener.disconnected(this);
     }
