@@ -12,6 +12,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.io.IOException;
+import java.io.InterruptedIOException;
 import java.util.HashMap;
 import java.io.OutputStream;
 import java.net.ConnectException;
@@ -151,10 +152,10 @@ public class SAMStreamSession {
      *                                      receive-only session
      * @throws ConnectException if the destination refuses connections
      * @throws NoRouteToHostException if the destination can't be reached
-     * @throws InterruptedException if the connection timeouts
+     * @throws InterruptedIOException if the connection timeouts
      * @throws I2PException if there's another I2P-related error
      */
-    public boolean connect(int id, String dest, Properties props) throws I2PException, ConnectException, NoRouteToHostException, DataFormatException, InterruptedException, SAMInvalidDirectionException {
+    public boolean connect(int id, String dest, Properties props) throws I2PException, ConnectException, NoRouteToHostException, DataFormatException, InterruptedIOException, SAMInvalidDirectionException {
         if (!canCreate) {
             _log.debug("Trying to create an outgoing connection using a receive-only session");
             throw new SAMInvalidDirectionException("Trying to create connections through a receive-only session");

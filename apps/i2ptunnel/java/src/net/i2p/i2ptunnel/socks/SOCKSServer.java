@@ -96,9 +96,6 @@ public abstract class SOCKSServer {
         } catch (IOException e) {
             throw new SOCKSException("Error connecting ("
                                      + e.getMessage() + ")");
-        } catch (InterruptedException e) {
-            throw new SOCKSException("Error connecting ("
-                                     + e.getMessage() + ")");
         } catch (I2PException e) {
             throw new SOCKSException("Error connecting ("
                                      + e.getMessage() + ")");

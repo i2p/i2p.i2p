@@ -52,7 +52,6 @@ public class I2PTunnelClient extends I2PTunnelClientBase {
         } catch (Exception ex) {
             _log.info("Error connecting", ex);
             l.log(ex.getMessage());
-            // s has been initialized before the try block...
             closeSocket(s);
         }
     }

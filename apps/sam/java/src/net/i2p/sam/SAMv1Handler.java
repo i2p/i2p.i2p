@@ -14,6 +14,7 @@ import java.io.DataInputStream;
 import java.io.EOFException;
 import java.io.InputStream;
 import java.io.IOException;
+import java.io.InterruptedIOException;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.Socket;
@@ -598,7 +599,7 @@ public class SAMv1Handler extends SAMHandler implements SAMRawReceiver, SAMDatag
                 _log.debug("STREAM CONNECT failed: " + e.getMessage());
                 return writeString("STREAM STATUS RESULT=CANT_REACH_PEER ID="
                                    + id + "\n");
-            } catch (InterruptedException e) {
+            } catch (InterruptedIOException e) {
                 _log.debug("STREAM CONNECT failed: " + e.getMessage());
                 return writeString("STREAM STATUS RESULT=TIMEOUT ID="
                                    + id + "\n");

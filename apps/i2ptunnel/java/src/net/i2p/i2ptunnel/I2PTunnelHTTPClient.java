@@ -201,12 +201,6 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
             l.log(ex.getMessage());
             handleHTTPClientException(ex, out, targetRequest, usingWWWProxy, wwwProxy);
             closeSocket(s);
-        } catch (InterruptedException ex) {
-            if (timeoutThread != null) timeoutThread.disable();
-            _log.info("Error trying to connect", ex);
-            l.log(ex.getMessage());
-            handleHTTPClientException(ex, out, targetRequest, usingWWWProxy, wwwProxy);
-            closeSocket(s);
         } catch (I2PException ex) {
             if (timeoutThread != null) timeoutThread.disable();
             _log.info("Error trying to connect", ex);

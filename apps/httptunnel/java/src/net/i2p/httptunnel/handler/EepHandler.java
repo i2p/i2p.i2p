@@ -101,9 +101,6 @@ public class EepHandler {
         } catch (IOException ex) {
             _log.error("Error while handling eepsite request");
             return written;
-        } catch (InterruptedException ex) {
-            _log.error("Error while handling eepsite request");
-            return written;
         } catch (I2PException ex) {
             _log.error("Error while handling eepsite request");
             return written;
