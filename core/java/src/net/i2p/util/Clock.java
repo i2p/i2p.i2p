@@ -35,7 +35,7 @@ public class Clock {
     /** if the clock is skewed by 3+ days, fuck 'em */
     public final static long MAX_OFFSET = 3 * 24 * 60 * 60 * 1000;
     /** if the clock skewed changes by less than 1s, ignore the update (so we don't slide all over the place) */
-    public final static long MIN_OFFSET_CHANGE = 30 * 1000;
+    public final static long MIN_OFFSET_CHANGE = 10 * 1000;
 
     /**
      * Specify how far away from the "correct" time the computer is - a positive
