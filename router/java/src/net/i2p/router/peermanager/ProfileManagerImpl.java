@@ -1,9 +1,9 @@
 package net.i2p.router.peermanager;
 /*
  * free (adj.): unencumbered; not under the control of others
- * Written by jrandom in 2003 and released into the public domain 
- * with no warranty of any kind, either expressed or implied.  
- * It probably won't make your computer catch on fire, or eat 
+ * Written by jrandom in 2003 and released into the public domain
+ * with no warranty of any kind, either expressed or implied.
+ * It probably won't make your computer catch on fire, or eat
  * your children, but it might.  Use at your own risk.
  *
  */
@@ -20,19 +20,14 @@ import net.i2p.data.Hash;
 import net.i2p.router.ProfileManager;
 import net.i2p.util.Clock;
 import net.i2p.util.Log;
+import net.i2p.router.RouterContext;
 
-public class ProfileManagerImpl extends ProfileManager {
-    private final static Log _log = new Log(ProfileManagerImpl.class);
-    public ProfileManagerImpl() {}
+public class ProfileManagerImpl implements ProfileManager {
+    private Log _log;
+    private RouterContext _context;
     
-    
-    /** is this peer failing or already dropped? */
-    public boolean isFailing(Hash peer) {
-	PeerProfile prof = getProfile(peer);
-	if (prof == null) 
-	    return true;
-	else
-	    return prof.getIsFailing();
+    public ProfileManagerImpl(RouterContext context) {
+        _context = context;
     }
     
     /**
@@ -41,10 +36,10 @@ public class ProfileManagerImpl extends ProfileManager {
      *
      */
     public void messageSent(Hash peer, String transport, long msToSend, long bytesSent) {
-	PeerProfile data = getProfile(peer);
-	if (data == null) return;
-	data.setLastSendSuccessful(Clock.getInstance().now());
-	data.getSendSuccessSize().addData(bytesSent, msToSend);
+        PeerProfile data = getProfile(peer);
+        if (data == null) return;
+        data.setLastSendSuccessful(_context.clock().now());
+        data.getSendSuccessSize().addData(bytesSent, msToSend);
     }
     
     /**
@@ -52,10 +47,10 @@ public class ProfileManagerImpl extends ProfileManager {
      *
      */
     public void messageFailed(Hash peer, String transport) {
-	PeerProfile data = getProfile(peer);
-	if (data == null) return;
-	data.setLastSendFailed(Clock.getInstance().now());
-	data.getSendFailureSize().addData(0, 0); // yeah, should be a frequency...
+        PeerProfile data = getProfile(peer);
+        if (data == null) return;
+        data.setLastSendFailed(_context.clock().now());
+        data.getSendFailureSize().addData(0, 0); // yeah, should be a frequency...
     }
     
     /**
@@ -63,10 +58,10 @@ public class ProfileManagerImpl extends ProfileManager {
      *
      */
     public void messageFailed(Hash peer) {
-	PeerProfile data = getProfile(peer);
-	if (data == null) return;
-	data.setLastSendFailed(Clock.getInstance().now());
-	data.getSendFailureSize().addData(0, 0); // yeah, should be a frequency...
+        PeerProfile data = getProfile(peer);
+        if (data == null) return;
+        data.setLastSendFailed(_context.clock().now());
+        data.getSendFailureSize().addData(0, 0); // yeah, should be a frequency...
     }
     
     /**
@@ -74,13 +69,13 @@ public class ProfileManagerImpl extends ProfileManager {
      *
      */
     public void commErrorOccurred(Hash peer) {
-	if (_log.shouldLog(Log.INFO))
-	    _log.info("Comm error occurred for peer " + peer.toBase64(), new Exception("Comm error"));
-	PeerProfile data = getProfile(peer);
-	if (data == null) return;
-	data.setLastSendFailed(Clock.getInstance().now());
-	data.getSendFailureSize().addData(0, 0); // yeah, should be a frequency...
-	data.getCommError().addData(0, 0); // see above
+        if (_log.shouldLog(Log.INFO))
+            _log.info("Comm error occurred for peer " + peer.toBase64(), new Exception("Comm error"));
+        PeerProfile data = getProfile(peer);
+        if (data == null) return;
+        data.setLastSendFailed(_context.clock().now());
+        data.getSendFailureSize().addData(0, 0); // yeah, should be a frequency...
+        data.getCommError().addData(0, 0); // see above
     }
     
     /**
@@ -88,11 +83,11 @@ public class ProfileManagerImpl extends ProfileManager {
      *
      */
     public void tunnelJoined(Hash peer, long responseTimeMs) {
-	PeerProfile data = getProfile(peer);
-	if (data == null) return;
-	data.getTunnelCreateResponseTime().addData(responseTimeMs, responseTimeMs);
-	data.setLastHeardFrom(Clock.getInstance().now());
-	data.getTunnelHistory().incrementAgreedTo();
+        PeerProfile data = getProfile(peer);
+        if (data == null) return;
+        data.getTunnelCreateResponseTime().addData(responseTimeMs, responseTimeMs);
+        data.setLastHeardFrom(_context.clock().now());
+        data.getTunnelHistory().incrementAgreedTo();
     }
     
     /**
@@ -100,10 +95,10 @@ public class ProfileManagerImpl extends ProfileManager {
      *
      */
     public void tunnelRejected(Hash peer, long responseTimeMs) {
-	PeerProfile data = getProfile(peer);
-	if (data == null) return;
-	data.setLastHeardFrom(Clock.getInstance().now());
-	data.getTunnelHistory().incrementRejected();
+        PeerProfile data = getProfile(peer);
+        if (data == null) return;
+        data.setLastHeardFrom(_context.clock().now());
+        data.getTunnelHistory().incrementRejected();
     }
     
     /**
@@ -112,10 +107,10 @@ public class ProfileManagerImpl extends ProfileManager {
      *
      */
     public void tunnelFailed(Hash peer) {
-	PeerProfile data = getProfile(peer);
-	if (data == null) return;
-	data.setLastHeardFrom(Clock.getInstance().now());
-	data.getTunnelHistory().incrementFailed();
+        PeerProfile data = getProfile(peer);
+        if (data == null) return;
+        data.setLastHeardFrom(_context.clock().now());
+        data.getTunnelHistory().incrementFailed();
     }
     
     /**
@@ -123,12 +118,12 @@ public class ProfileManagerImpl extends ProfileManager {
      *
      */
     public void dbLookupSuccessful(Hash peer, long responseTimeMs) {
-	PeerProfile data = getProfile(peer);
-	if (data == null) return;
-	data.setLastHeardFrom(Clock.getInstance().now());
-	data.getDbResponseTime().addData(responseTimeMs, responseTimeMs);
-	DBHistory hist = data.getDBHistory();
-	hist.lookupSuccessful();
+        PeerProfile data = getProfile(peer);
+        if (data == null) return;
+        data.setLastHeardFrom(_context.clock().now());
+        data.getDbResponseTime().addData(responseTimeMs, responseTimeMs);
+        DBHistory hist = data.getDBHistory();
+        hist.lookupSuccessful();
     }
     
     /**
@@ -137,10 +132,10 @@ public class ProfileManagerImpl extends ProfileManager {
      *
      */
     public void dbLookupFailed(Hash peer) {
-	PeerProfile data = getProfile(peer);
-	if (data == null) return;
-	DBHistory hist = data.getDBHistory();
-	hist.lookupFailed();
+        PeerProfile data = getProfile(peer);
+        if (data == null) return;
+        DBHistory hist = data.getDBHistory();
+        hist.lookupFailed();
     }
     
     /**
@@ -152,13 +147,13 @@ public class ProfileManagerImpl extends ProfileManager {
      *
      */
     public void dbLookupReply(Hash peer, int newPeers, int oldPeers, int invalid, int duplicate, long responseTimeMs) {
-	PeerProfile data = getProfile(peer);
-	if (data == null) return;
-	data.setLastHeardFrom(Clock.getInstance().now());
-	data.getDbResponseTime().addData(responseTimeMs, responseTimeMs);
-	data.getDbIntroduction().addData(newPeers, responseTimeMs);
-	DBHistory hist = data.getDBHistory();
-	hist.lookupReply(newPeers, oldPeers, invalid, duplicate);
+        PeerProfile data = getProfile(peer);
+        if (data == null) return;
+        data.setLastHeardFrom(_context.clock().now());
+        data.getDbResponseTime().addData(responseTimeMs, responseTimeMs);
+        data.getDbIntroduction().addData(newPeers, responseTimeMs);
+        DBHistory hist = data.getDBHistory();
+        hist.lookupReply(newPeers, oldPeers, invalid, duplicate);
     }
     
     /**
@@ -166,11 +161,11 @@ public class ProfileManagerImpl extends ProfileManager {
      *
      */
     public void dbLookupReceived(Hash peer) {
-	PeerProfile data = getProfile(peer);
-	if (data == null) return;
-	data.setLastHeardFrom(Clock.getInstance().now());
-	DBHistory hist = data.getDBHistory();
-	hist.lookupReceived();
+        PeerProfile data = getProfile(peer);
+        if (data == null) return;
+        data.setLastHeardFrom(_context.clock().now());
+        DBHistory hist = data.getDBHistory();
+        hist.lookupReceived();
     }
     
     /**
@@ -178,11 +173,11 @@ public class ProfileManagerImpl extends ProfileManager {
      *
      */
     public void dbStoreReceived(Hash peer, boolean wasNewKey) {
-	PeerProfile data = getProfile(peer);
-	if (data == null) return;
-	data.setLastHeardFrom(Clock.getInstance().now());
-	DBHistory hist = data.getDBHistory();
-	hist.unpromptedStoreReceived(wasNewKey);
+        PeerProfile data = getProfile(peer);
+        if (data == null) return;
+        data.setLastHeardFrom(_context.clock().now());
+        DBHistory hist = data.getDBHistory();
+        hist.unpromptedStoreReceived(wasNewKey);
     }
     
     /**
@@ -191,23 +186,23 @@ public class ProfileManagerImpl extends ProfileManager {
      *
      */
     public void dbStoreSent(Hash peer, long responseTimeMs) {
-	PeerProfile data = getProfile(peer);
-	if (data == null) return;
-	long now = Clock.getInstance().now();
-	data.setLastSendSuccessful(now);
-	data.setLastHeardFrom(now);
-	// we could do things like update some sort of "how many successful stores we've sent them"...
-	// naah.. dont really care now
+        PeerProfile data = getProfile(peer);
+        if (data == null) return;
+        long now = _context.clock().now();
+        data.setLastSendSuccessful(now);
+        data.setLastHeardFrom(now);
+        // we could do things like update some sort of "how many successful stores we've sent them"...
+        // naah.. dont really care now
     }
     
     /**
-     * Note that we were unable to confirm a successful send of db data to 
+     * Note that we were unable to confirm a successful send of db data to
      * the peer, at least not within our timeout period
      *
      */
     public void dbStoreFailed(Hash peer) {
-	// we could do things like update some sort of "how many successful stores we've 
-	// failed to send them"...
+        // we could do things like update some sort of "how many successful stores we've
+        // failed to send them"...
     }
     
     /**
@@ -215,9 +210,9 @@ public class ProfileManagerImpl extends ProfileManager {
      * through an explicit dbStore or in a dbLookupReply
      */
     public void heardAbout(Hash peer) {
-	PeerProfile data = getProfile(peer);
-	if (data == null) return;
-	data.setLastHeardAbout(Clock.getInstance().now());
+        PeerProfile data = getProfile(peer);
+        if (data == null) return;
+        data.setLastHeardAbout(_context.clock().now());
     }
     
     /**
@@ -228,63 +223,63 @@ public class ProfileManagerImpl extends ProfileManager {
      *
      */
     public void messageReceived(Hash peer, String style, long msToReceive, int bytesRead) {
-	PeerProfile data = getProfile(peer);
-	if (data == null) return;
-	data.setLastHeardFrom(Clock.getInstance().now());
-	data.getReceiveSize().addData(bytesRead, msToReceive);
+        PeerProfile data = getProfile(peer);
+        if (data == null) return;
+        data.setLastHeardFrom(_context.clock().now());
+        data.getReceiveSize().addData(bytesRead, msToReceive);
     }
-
-    private PeerProfile getProfile(Hash peer) { 
-	PeerProfile prof = ProfileOrganizer.getInstance().getProfile(peer);
-	if (prof == null) {
-	    prof = new PeerProfile(peer);
-	    ProfileOrganizer.getInstance().addProfile(prof);
-	}
-	return prof;
+    
+    private PeerProfile getProfile(Hash peer) {
+        PeerProfile prof = _context.profileOrganizer().getProfile(peer);
+        if (prof == null) {
+            prof = new PeerProfile(_context, peer);
+            _context.profileOrganizer().addProfile(prof);
+        }
+        return prof;
     }
     
     
     /** provide a simple summary of a number of peers, suitable for publication in the netDb */
     public Properties summarizePeers(int numPeers) {
-	Set peers = new HashSet(numPeers);
-	// lets get the fastest ones we've got (this fails over to include just plain reliable,
-	// or even notFailing peers if there aren't enough fast ones)
-	ProfileOrganizer.getInstance().selectFastAndReliablePeers(numPeers, null, peers);
-	Properties props = new Properties();
-	for (Iterator iter  = peers.iterator(); iter.hasNext(); ) {
-	    Hash peer = (Hash)iter.next();
-	    PeerProfile prof = getProfile(peer);
-	    if (prof == null) continue;
-	    
-	    StringBuffer buf = new StringBuffer(64);
-	    
-	    buf.append("status: ");
-	    if (ProfileOrganizer.getInstance().isFastAndReliable(peer)) {
-		buf.append("fastReliable");
-	    } else if (ProfileOrganizer.getInstance().isReliable(peer)) {
-		buf.append("reliable");
-	    } else if (ProfileOrganizer.getInstance().isFailing(peer)) {
-		buf.append("failing");
-	    } else {
-		buf.append("notFailing");
-	    }
-	    
-	    if (ProfileOrganizer.getInstance().isWellIntegrated(peer))
-		buf.append("Integrated ");
-	    else
-		buf.append(" ");
-	    
-	    buf.append("reliability: ").append(num(prof.getReliabilityValue())).append(" ");
-	    buf.append("speed: ").append(num(prof.getSpeedValue())).append(" ");
-	    buf.append("integration: ").append(num(prof.getIntegrationValue()));
-	    
-	    props.setProperty("profile." + peer.toBase64().replace('=', '_'), buf.toString());
-	}
-	return props;
+        Set peers = new HashSet(numPeers);
+        // lets get the fastest ones we've got (this fails over to include just plain reliable,
+        // or even notFailing peers if there aren't enough fast ones)
+        _context.profileOrganizer().selectFastAndReliablePeers(numPeers, null, peers);
+        Properties props = new Properties();
+        for (Iterator iter  = peers.iterator(); iter.hasNext(); ) {
+            Hash peer = (Hash)iter.next();
+            PeerProfile prof = getProfile(peer);
+            if (prof == null) continue;
+            
+            StringBuffer buf = new StringBuffer(64);
+            
+            buf.append("status: ");
+            if (_context.profileOrganizer().isFastAndReliable(peer)) {
+                buf.append("fastReliable");
+            } else if (_context.profileOrganizer().isReliable(peer)) {
+                buf.append("reliable");
+            } else if (_context.profileOrganizer().isFailing(peer)) {
+                buf.append("failing");
+            } else {
+                buf.append("notFailing");
+            }
+            
+            if (_context.profileOrganizer().isWellIntegrated(peer))
+                buf.append("Integrated ");
+            else
+                buf.append(" ");
+            
+            buf.append("reliability: ").append(num(prof.getReliabilityValue())).append(" ");
+            buf.append("speed: ").append(num(prof.getSpeedValue())).append(" ");
+            buf.append("integration: ").append(num(prof.getIntegrationValue()));
+            
+            props.setProperty("profile." + peer.toBase64().replace('=', '_'), buf.toString());
+        }
+        return props;
     }
     
     private final static DecimalFormat _fmt = new DecimalFormat("##0.00", new DecimalFormatSymbols(Locale.UK));
     private final static String num(double val) {
-	synchronized (_fmt) { return _fmt.format(val); }
+        synchronized (_fmt) { return _fmt.format(val); }
     }
 }

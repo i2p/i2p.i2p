@@ -27,6 +27,7 @@ import net.i2p.data.PublicKey;
 import net.i2p.data.SessionKey;
 import net.i2p.data.SessionTag;
 import net.i2p.util.Log;
+import net.i2p.I2PAppContext;
 
 /**
  * Expose the functionality to allow people to write out and read in the 
@@ -39,6 +40,19 @@ public class PersistentSessionKeyManager extends TransientSessionKeyManager {
 
     private Object _yk = YKGenerator.class;
 
+    
+    /** 
+     * The session key manager should only be constructed and accessed through the 
+     * application context.  This constructor should only be used by the 
+     * appropriate application context itself.
+     *
+     */
+    public PersistentSessionKeyManager(I2PAppContext context) {
+        super(context);
+    }
+    private PersistentSessionKeyManager() {
+        super(null);
+    }
     /**
      * Write the session key data to the given stream
      *
@@ -146,7 +160,8 @@ public class PersistentSessionKeyManager extends TransientSessionKeyManager {
     }
 
     public static void main(String args[]) {
-        PersistentSessionKeyManager mgr = new PersistentSessionKeyManager();
+        I2PAppContext ctx = new I2PAppContext();
+        PersistentSessionKeyManager mgr = (PersistentSessionKeyManager)ctx.sessionKeyManager();
         try {
             mgr.loadState(new FileInputStream("sessionKeys.dat"));
             String state = mgr.renderStatusHTML();

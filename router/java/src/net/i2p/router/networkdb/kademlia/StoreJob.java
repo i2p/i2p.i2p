@@ -49,15 +49,17 @@ import net.i2p.util.Clock;
 import net.i2p.util.Log;
 import net.i2p.util.RandomSource;
 import net.i2p.stat.StatManager;
+import net.i2p.router.RouterContext;
 
 class StoreJob extends JobImpl {
-    private final Log _log = new Log(StoreJob.class);
+    private Log _log;
     private KademliaNetworkDatabaseFacade _facade;
     private StoreState _state;
     private Job _onSuccess;
     private Job _onFailure;
     private long _timeoutMs;
     private long _expiration;
+    private PeerSelector _peerSelector;
 
     private final static int PARALLELIZATION = 1; // how many sent at a time
     private final static int REDUNDANCY = 2; // we want the data sent to 2 peers
@@ -72,22 +74,23 @@ class StoreJob extends JobImpl {
      */
     private final static int EXPLORATORY_REDUNDANCY = 1; 
     private final static int STORE_PRIORITY = 100;
-            
-    static {
-        StatManager.getInstance().createRateStat("netDb.storeSent", "How many netDb store messages have we sent?", "Network Database", new long[] { 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
-    }
-    
+
     /**
      * Create a new search for the routingKey specified
      * 
      */
-    public StoreJob(KademliaNetworkDatabaseFacade facade, Hash key, DataStructure data, Job onSuccess, Job onFailure, long timeoutMs) {
+    public StoreJob(RouterContext context, KademliaNetworkDatabaseFacade facade, Hash key, 
+                    DataStructure data, Job onSuccess, Job onFailure, long timeoutMs) {
+        super(context);
+        _log = context.logManager().getLog(StoreJob.class);
+        _context.statManager().createRateStat("netDb.storeSent", "How many netDb store messages have we sent?", "Network Database", new long[] { 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
         _facade = facade;
         _state = new StoreState(key, data);
         _onSuccess = onSuccess;
         _onFailure = onFailure;
         _timeoutMs = timeoutMs;
-        _expiration = Clock.getInstance().now() + timeoutMs;
+        _expiration = context.clock().now() + timeoutMs;
+        _peerSelector = new PeerSelector(context);
     }
 
     public String getName() { return "Kademlia NetDb Store";}
@@ -96,7 +99,7 @@ class StoreJob extends JobImpl {
     }
 
     protected boolean isExpired() { 
-        return Clock.getInstance().now() >= _expiration;
+        return _context.clock().now() >= _expiration;
     }
 
     /**
@@ -169,10 +172,11 @@ class StoreJob extends JobImpl {
      * @return ordered list of Hash objects
      */
     protected List getClosestRouters(Hash key, int numClosest, Set alreadyChecked) {
-        Hash rkey = RoutingKeyGenerator.getInstance().getRoutingKey(key);
+        Hash rkey = _context.routingKeyGenerator().getRoutingKey(key);
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Current routing key for " + key + ": " + rkey);
-        return PeerSelector.getInstance().selectNearestExplicit(rkey, numClosest, alreadyChecked, _facade.getKBuckets());
+
+        return _peerSelector.selectNearestExplicit(rkey, numClosest, alreadyChecked, _facade.getKBuckets());
     }
 
     /**
@@ -181,7 +185,7 @@ class StoreJob extends JobImpl {
      *
      */
     protected void sendStore(RouterInfo router) {
-        DatabaseStoreMessage msg = new DatabaseStoreMessage();
+        DatabaseStoreMessage msg = new DatabaseStoreMessage(_context);
         msg.setKey(_state.getTarget());
         if (_state.getData() instanceof RouterInfo) 
             msg.setRouterInfo((RouterInfo)_state.getData());
@@ -189,9 +193,9 @@ class StoreJob extends JobImpl {
             msg.setLeaseSet((LeaseSet)_state.getData());
         else
             throw new IllegalArgumentException("Storing an unknown data type! " + _state.getData());
-        msg.setMessageExpiration(new Date(Clock.getInstance().now() + _timeoutMs));
+        msg.setMessageExpiration(new Date(_context.clock().now() + _timeoutMs));
 
-        if (router.getIdentity().equals(Router.getInstance().getRouterInfo().getIdentity())) {
+        if (router.getIdentity().equals(_context.router().getRouterInfo().getIdentity())) {
             // don't send it to ourselves
             if (_log.shouldLog(Log.ERROR))
                 _log.error("Dont send store to ourselves - why did we try?");
@@ -214,7 +218,7 @@ class StoreJob extends JobImpl {
         TunnelInfo info = null;
         TunnelId outboundTunnelId = selectOutboundTunnel();
         if (outboundTunnelId != null)
-            info = TunnelManagerFacade.getInstance().getTunnelInfo(outboundTunnelId);
+            info = _context.tunnelManager().getTunnelInfo(outboundTunnelId);
         if (info == null) {
             if (_log.shouldLog(Log.ERROR))
                 _log.error("selectOutboundTunnel didn't find a valid tunnel!  outboundTunnelId = " 
@@ -226,11 +230,11 @@ class StoreJob extends JobImpl {
                       + " is going to " + peer.getIdentity().getHash() + " via outbound tunnel: " + info);
         // send it out our outboundTunnelId with instructions for our endpoint to forward it
         // to the router specified (though no particular tunnelId on the target)
-        Job j = new SendTunnelMessageJob(msg, outboundTunnelId, peer.getIdentity().getHash(), 
-                                         null, sent, null, fail, null, _expiration-Clock.getInstance().now(), 
+        Job j = new SendTunnelMessageJob(_context, msg, outboundTunnelId, peer.getIdentity().getHash(), 
+                                         null, sent, null, fail, null, _expiration-_context.clock().now(), 
                                          STORE_PRIORITY);
-        JobQueue.getInstance().addJob(j);
-        StatManager.getInstance().addRateData("netDb.storeSent", 1, 0);
+        _context.jobQueue().addJob(j);
+        _context.statManager().addRateData("netDb.storeSent", 1, 0);
     }
     
     private TunnelId selectOutboundTunnel() {
@@ -240,7 +244,7 @@ class StoreJob extends JobImpl {
         criteria.setReliabilityPriority(20);
         criteria.setMaximumTunnelsRequired(1);
         criteria.setMinimumTunnelsRequired(1);
-        List tunnelIds = TunnelManagerFacade.getInstance().selectOutboundTunnelIds(criteria);
+        List tunnelIds = _context.tunnelManager().selectOutboundTunnelIds(criteria);
         if (tunnelIds.size() <= 0) {
             _log.error("No outbound tunnels?!");
             return null;
@@ -263,7 +267,7 @@ class StoreJob extends JobImpl {
         private Hash _peer;
 
         public OptimisticSendSuccess(RouterInfo peer) {
-            super();
+            super(StoreJob.this._context);
             _peer = peer.getIdentity().getHash();
         }
 
@@ -291,12 +295,12 @@ class StoreJob extends JobImpl {
     protected class FailedJob extends JobImpl {
         private Hash _peer;
         public FailedJob(RouterInfo peer) {
-            super();
+            super(StoreJob.this._context);
             _peer = peer.getIdentity().getHash();
         }
         public void runJob() {
             _state.replyTimeout(_peer);
-            ProfileManager.getInstance().dbStoreFailed(_peer);
+            _context.profileManager().dbStoreFailed(_peer);
             sendNext();
         }
         public String getName() { return "Kademlia Store Failed"; }
@@ -352,7 +356,7 @@ class StoreJob extends JobImpl {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("State of successful send: " + _state);
         if (_onSuccess != null)
-            JobQueue.getInstance().addJob(_onSuccess);
+            _context.jobQueue().addJob(_onSuccess);
         _facade.noteKeySent(_state.getTarget());
     }
 
@@ -365,10 +369,10 @@ class StoreJob extends JobImpl {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("State of failed send: " + _state, new Exception("Who failed me?"));
         if (_onFailure != null)
-            JobQueue.getInstance().addJob(_onFailure);
+            _context.jobQueue().addJob(_onFailure);
     }
 
-    protected static class StoreState {
+    protected class StoreState {
         private Hash _key;
         private DataStructure _data;
         private HashSet _pendingPeers;
@@ -390,7 +394,7 @@ class StoreJob extends JobImpl {
             _successfulPeers = new HashSet(16);
             _successfulExploratoryPeers = new HashSet(16);
             _completed = -1;
-            _started = Clock.getInstance().now();
+            _started = _context.clock().now();
         }
 
         public Hash getTarget() { return _key; }
@@ -423,7 +427,7 @@ class StoreJob extends JobImpl {
         public boolean completed() { return _completed != -1; }
         public void complete(boolean completed) { 
             if (completed)
-                _completed = Clock.getInstance().now();
+                _completed = _context.clock().now();
         }
 
         public long getWhenStarted() { return _started; }
@@ -433,7 +437,7 @@ class StoreJob extends JobImpl {
             synchronized (_pendingPeers) {
                 _pendingPeers.addAll(pending);
                 for (Iterator iter = pending.iterator(); iter.hasNext(); ) 
-                    _pendingPeerTimes.put(iter.next(), new Long(Clock.getInstance().now()));
+                    _pendingPeerTimes.put(iter.next(), new Long(_context.clock().now()));
             }
             synchronized (_attemptedPeers) {
                 _attemptedPeers.addAll(pending);
@@ -446,7 +450,7 @@ class StoreJob extends JobImpl {
                 _pendingPeers.remove(peer);
                 Long when = (Long)_pendingPeerTimes.remove(peer);
                 if (when != null)
-                    rv = Clock.getInstance().now() - when.longValue();
+                    rv = _context.clock().now() - when.longValue();
             }
             synchronized (_successfulPeers) {
                 _successfulPeers.add(peer);
@@ -460,7 +464,7 @@ class StoreJob extends JobImpl {
                 _pendingPeers.remove(peer);
                 Long when = (Long)_pendingPeerTimes.remove(peer);
                 if (when != null)
-                    rv = Clock.getInstance().now() - when.longValue();
+                    rv = _context.clock().now() - when.longValue();
             }
             synchronized (_successfulExploratoryPeers) {
                 _successfulExploratoryPeers.add(peer);

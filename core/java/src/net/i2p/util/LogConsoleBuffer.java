@@ -1,26 +1,24 @@
 package net.i2p.util;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
+import net.i2p.I2PAppContext;
 
 /**
  * Offer a glimpse into the last few console messages generated
  *
  */
 public class LogConsoleBuffer {
-    private final static LogConsoleBuffer _instance = new LogConsoleBuffer();
-
-    public final static LogConsoleBuffer getInstance() {
-        return _instance;
-    }
+    private I2PAppContext _context;
     private List _buffer;
 
-    private LogConsoleBuffer() {
-        _buffer = new LinkedList();
+    public LogConsoleBuffer(I2PAppContext context) {
+        _context = context;
+        _buffer = new ArrayList();
     }
 
     void add(String msg) {
-        int lim = LogManager.getInstance().getConsoleBufferSize();
+        int lim = _context.logManager().getConsoleBufferSize();
         synchronized (_buffer) {
             while (_buffer.size() >= lim)
                 _buffer.remove(0);
@@ -36,7 +34,7 @@ public class LogConsoleBuffer {
      */
     public List getMostRecentMessages() {
         synchronized (_buffer) {
-            return new LinkedList(_buffer);
+            return new ArrayList(_buffer);
         }
     }
 }

@@ -1,9 +1,9 @@
 package net.i2p.data.i2np;
 /*
  * free (adj.): unencumbered; not under the control of others
- * Written by jrandom in 2003 and released into the public domain 
- * with no warranty of any kind, either expressed or implied.  
- * It probably won't make your computer catch on fire, or eat 
+ * Written by jrandom in 2003 and released into the public domain
+ * with no warranty of any kind, either expressed or implied.
+ * It probably won't make your computer catch on fire, or eat
  * your children, but it might.  Use at your own risk.
  *
  */
@@ -17,9 +17,10 @@ import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
 import net.i2p.data.TunnelId;
 import net.i2p.util.Log;
+import net.i2p.I2PAppContext;
 
 /**
- * Defines the message a router sends to another router in reply to a 
+ * Defines the message a router sends to another router in reply to a
  * TunnelCreateMessage
  *
  * @author jrandom
@@ -37,10 +38,11 @@ public class TunnelCreateStatusMessage extends I2NPMessageImpl {
     public final static int STATUS_FAILED_CERTIFICATE = 3;
     public final static int STATUS_FAILED_DELETED = 100;
     
-    public TunnelCreateStatusMessage() { 
-	setTunnelId(null);
-	setStatus(-1);
-	setFromHash(null);
+    public TunnelCreateStatusMessage(I2PAppContext context) {
+        super(context);
+        setTunnelId(null);
+        setStatus(-1);
+        setFromHash(null);
     }
     
     public TunnelId getTunnelId() { return _tunnelId; }
@@ -56,26 +58,26 @@ public class TunnelCreateStatusMessage extends I2NPMessageImpl {
     public void setFromHash(Hash from) { _from = from; }
     
     public void readMessage(InputStream in, int type) throws I2NPMessageException, IOException {
-	if (type != MESSAGE_TYPE) throw new I2NPMessageException("Message type is incorrect for this message");
+        if (type != MESSAGE_TYPE) throw new I2NPMessageException("Message type is incorrect for this message");
         try {
-	    _tunnelId = new TunnelId();
-	    _tunnelId.readBytes(in);
-	    _status = (int)DataHelper.readLong(in, 1);
-	    _from = new Hash();
-	    _from.readBytes(in);
+            _tunnelId = new TunnelId();
+            _tunnelId.readBytes(in);
+            _status = (int)DataHelper.readLong(in, 1);
+            _from = new Hash();
+            _from.readBytes(in);
         } catch (DataFormatException dfe) {
             throw new I2NPMessageException("Unable to load the message data", dfe);
         }
     }
     
     protected byte[] writeMessage() throws I2NPMessageException, IOException {
-	if ( (_tunnelId == null) || (_from == null) ) throw new I2NPMessageException("Not enough data to write out");
-	
+        if ( (_tunnelId == null) || (_from == null) ) throw new I2NPMessageException("Not enough data to write out");
+        
         ByteArrayOutputStream os = new ByteArrayOutputStream(32);
         try {
-	    _tunnelId.writeBytes(os);
-	    DataHelper.writeLong(os, 1, (_status < 0 ? 255 : _status));
-	    _from.writeBytes(os);
+            _tunnelId.writeBytes(os);
+            DataHelper.writeLong(os, 1, (_status < 0 ? 255 : _status));
+            _from.writeBytes(os);
         } catch (DataFormatException dfe) {
             throw new I2NPMessageException("Error writing out the message data", dfe);
         }
@@ -85,23 +87,23 @@ public class TunnelCreateStatusMessage extends I2NPMessageImpl {
     public int getType() { return MESSAGE_TYPE; }
     
     public int hashCode() {
-	return DataHelper.hashCode(getTunnelId()) +
-	       getStatus() +
-	       DataHelper.hashCode(getFromHash());
+        return DataHelper.hashCode(getTunnelId()) +
+               getStatus() +
+               DataHelper.hashCode(getFromHash());
     }
     
     public boolean equals(Object object) {
         if ( (object != null) && (object instanceof TunnelCreateStatusMessage) ) {
             TunnelCreateStatusMessage msg = (TunnelCreateStatusMessage)object;
             return DataHelper.eq(getTunnelId(),msg.getTunnelId()) &&
-		   DataHelper.eq(getFromHash(),msg.getFromHash()) &&
-		   (getStatus() == msg.getStatus());
+                   DataHelper.eq(getFromHash(),msg.getFromHash()) &&
+                   (getStatus() == msg.getStatus());
         } else {
             return false;
         }
     }
     
-    public String toString() { 
+    public String toString() {
         StringBuffer buf = new StringBuffer();
         buf.append("[TunnelCreateStatusMessage: ");
         buf.append("\n\tTunnel ID: ").append(getTunnelId());

@@ -1,14 +1,15 @@
 package net.i2p.router;
 /*
  * free (adj.): unencumbered; not under the control of others
- * Written by jrandom in 2003 and released into the public domain 
- * with no warranty of any kind, either expressed or implied.  
- * It probably won't make your computer catch on fire, or eat 
+ * Written by jrandom in 2003 and released into the public domain
+ * with no warranty of any kind, either expressed or implied.
+ * It probably won't make your computer catch on fire, or eat
  * your children, but it might.  Use at your own risk.
  *
  */
 
 import net.i2p.util.Clock;
+
 /**
  * Define the timing requirements and statistics for a particular job
  *
@@ -17,12 +18,14 @@ public class JobTiming implements Clock.ClockUpdateListener {
     private long _start;
     private long _actualStart;
     private long _actualEnd;
+    private RouterContext _context;
     
-    public JobTiming() {
-	_start = Clock.getInstance().now();
-	_actualStart = 0;
-	_actualEnd = 0;
-	Clock.getInstance().addUpdateListener(this);
+    public JobTiming(RouterContext context) {
+        _context = context;
+        _start = context.clock().now();
+        _actualStart = 0;
+        _actualEnd = 0;
+        context.clock().addUpdateListener(this);
     }
     
     /**
@@ -42,7 +45,7 @@ public class JobTiming implements Clock.ClockUpdateListener {
      * Notify the timing that the job began
      *
      */
-    public void start() { _actualStart = Clock.getInstance().now(); }
+    public void start() { _actualStart = _context.clock().now(); }
     /**
      * # of milliseconds after the epoch the job actually ended
      *
@@ -53,17 +56,17 @@ public class JobTiming implements Clock.ClockUpdateListener {
      * Notify the timing that the job finished
      *
      */
-    public void end() { 
-	_actualEnd = Clock.getInstance().now(); 
-	Clock.getInstance().removeUpdateListener(this);
+    public void end() {
+        _actualEnd = _context.clock().now();
+        _context.clock().removeUpdateListener(this);
     }
     
     public void offsetChanged(long delta) {
-	if (_start != 0)
-	    _start += delta;
-	if (_actualStart != 0)
-	    _actualStart += delta;
-	if (_actualEnd != 0)
-	    _actualEnd += delta;
+        if (_start != 0)
+            _start += delta;
+        if (_actualStart != 0)
+            _actualStart += delta;
+        if (_actualEnd != 0)
+            _actualEnd += delta;
     }
 }

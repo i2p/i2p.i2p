@@ -10,6 +10,7 @@ package net.i2p.client;
  */
 
 import net.i2p.util.Log;
+import net.i2p.I2PAppContext;
 
 /**
  * Base class for handling I2CP messages
@@ -19,8 +20,10 @@ import net.i2p.util.Log;
 abstract class HandlerImpl implements I2CPMessageHandler {
     protected Log _log;
     private int _type;
+    protected I2PAppContext _context;
 
-    public HandlerImpl(int type) {
+    public HandlerImpl(I2PAppContext context, int type) {
+        _context = context;
         _type = type;
         _log = new Log(getClass());
     }

@@ -23,11 +23,16 @@ import net.i2p.data.Hash;
 import net.i2p.router.ProfileManager;
 import net.i2p.router.Router;
 import net.i2p.util.Log;
+import net.i2p.router.RouterContext;
 
 class PeerSelector {
-    private final static Log _log = new Log(PeerSelector.class);
-    private static final PeerSelector _instance = new PeerSelector();
-    public static final PeerSelector getInstance() { return _instance; }
+    private Log _log;
+    private RouterContext _context;
+    
+    public PeerSelector(RouterContext ctx) {
+        _context = ctx;
+        _log = _context.logManager().getLog(PeerSelector.class);
+    }
     
     /**
      * Search through the kbucket set to find the most reliable peers close to the
@@ -36,9 +41,9 @@ class PeerSelector {
      * @return ordered list of Hash objects
      */
     public List selectMostReliablePeers(Hash key, int numClosest, Set alreadyChecked, KBucketSet kbuckets) {
-	// get the peers closest to the key
-	List nearest = selectNearestExplicit(key, numClosest, alreadyChecked, kbuckets);
-	return nearest;
+        // get the peers closest to the key
+        List nearest = selectNearestExplicit(key, numClosest, alreadyChecked, kbuckets);
+        return nearest;
     }
     
     /**
@@ -49,26 +54,29 @@ class PeerSelector {
      * @return List of Hash for the peers selected, ordered by bucket (but intra bucket order is not defined)
      */
     public List selectNearestExplicit(Hash key, int maxNumRouters, Set peersToIgnore, KBucketSet kbuckets) { 
-	if (peersToIgnore == null)
-	    peersToIgnore = new HashSet(1);
-	peersToIgnore.add(Router.getInstance().getRouterInfo().getIdentity().getHash());
-	Set allHashes = kbuckets.getAll(peersToIgnore);
-	removeFailingPeers(allHashes);
-	Map diffMap = new HashMap(allHashes.size());
-	for (Iterator iter = allHashes.iterator(); iter.hasNext(); ) {
-	    Hash cur = (Hash)iter.next();
-	    BigInteger diff = getDistance(key, cur);
-	    diffMap.put(diff, cur);
-	}
-	// n*log(n)
-	Map sortedMap = new TreeMap(diffMap);
-	List peerHashes = new ArrayList(maxNumRouters);
-	for (Iterator iter = sortedMap.values().iterator(); iter.hasNext(); ) {
-	    if (peerHashes.size() >= maxNumRouters) break;
-	    peerHashes.add(iter.next());
-	}
-	_log.debug("Searching for " + maxNumRouters + " peers close to " + key + ": " + peerHashes + " (not including " + peersToIgnore + ") [allHashes.size = " + allHashes.size() + "]");
-	return peerHashes;
+        if (peersToIgnore == null)
+            peersToIgnore = new HashSet(1);
+        peersToIgnore.add(_context.router().getRouterInfo().getIdentity().getHash());
+        Set allHashes = kbuckets.getAll(peersToIgnore);
+        removeFailingPeers(allHashes);
+        Map diffMap = new HashMap(allHashes.size());
+        for (Iterator iter = allHashes.iterator(); iter.hasNext(); ) {
+            Hash cur = (Hash)iter.next();
+            BigInteger diff = getDistance(key, cur);
+            diffMap.put(diff, cur);
+        }
+        // n*log(n)
+        Map sortedMap = new TreeMap(diffMap);
+        List peerHashes = new ArrayList(maxNumRouters);
+        for (Iterator iter = sortedMap.values().iterator(); iter.hasNext(); ) {
+            if (peerHashes.size() >= maxNumRouters) break;
+            peerHashes.add(iter.next());
+        }
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("Searching for " + maxNumRouters + " peers close to " + key + ": " 
+                       + peerHashes + " (not including " + peersToIgnore + ") [allHashes.size = " 
+                       + allHashes.size() + "]");
+        return peerHashes;
     }
     
     /** 
@@ -76,22 +84,22 @@ class PeerSelector {
      *
      */
     private void removeFailingPeers(Set peerHashes) {
-	List failing = new ArrayList(16);
-	for (Iterator iter = peerHashes.iterator(); iter.hasNext(); ) {
-	    Hash cur = (Hash)iter.next();
-	    if (ProfileManager.getInstance().isFailing(cur)) {
-		if (_log.shouldLog(Log.DEBUG))
-		    _log.debug("Peer " + cur.toBase64() + " is failing, don't include them in the peer selection");
-		failing.add(cur);
-	    }
-	}
-	peerHashes.removeAll(failing);
+        List failing = new ArrayList(16);
+        for (Iterator iter = peerHashes.iterator(); iter.hasNext(); ) {
+            Hash cur = (Hash)iter.next();
+            if (_context.profileOrganizer().isFailing(cur)) {
+                if (_log.shouldLog(Log.DEBUG))
+                    _log.debug("Peer " + cur.toBase64() + " is failing, don't include them in the peer selection");
+                failing.add(cur);
+            }
+        }
+        peerHashes.removeAll(failing);
     }
     
     protected BigInteger getDistance(Hash targetKey, Hash routerInQuestion) {
-	// plain XOR of the key and router
-	byte diff[] = DataHelper.xor(routerInQuestion.getData(), targetKey.getData());
-	return new BigInteger(1, diff);
+        // plain XOR of the key and router
+        byte diff[] = DataHelper.xor(routerInQuestion.getData(), targetKey.getData());
+        return new BigInteger(1, diff);
     }
     
     /**
@@ -102,10 +110,10 @@ class PeerSelector {
      * @return List of Hash for the peers selected, ordered by bucket (but intra bucket order is not defined)
      */
     public List selectNearest(Hash key, int maxNumRouters, Set peersToIgnore, KBucketSet kbuckets) { 
-	// sure, this may not be exactly correct per kademlia (peers on the border of a kbucket in strict kademlia
-	// would behave differently) but I can see no reason to keep around an /additional/ more complicated algorithm.
-	// later if/when selectNearestExplicit gets costly, we may revisit this (since kbuckets let us cache the distance()
-	// into a simple bucket selection algo + random select rather than an n*log(n) op)
-	return selectNearestExplicit(key, maxNumRouters, peersToIgnore, kbuckets);
+        // sure, this may not be exactly correct per kademlia (peers on the border of a kbucket in strict kademlia
+        // would behave differently) but I can see no reason to keep around an /additional/ more complicated algorithm.
+        // later if/when selectNearestExplicit gets costly, we may revisit this (since kbuckets let us cache the distance()
+        // into a simple bucket selection algo + random select rather than an n*log(n) op)
+        return selectNearestExplicit(key, maxNumRouters, peersToIgnore, kbuckets);
     }
 }

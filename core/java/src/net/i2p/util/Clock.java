@@ -4,6 +4,8 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
+import net.i2p.I2PAppContext;
+
 /**
  * Alternate location for determining the time which takes into account an offset.
  * This offset will ideally be periodically updated so as to serve as the difference
@@ -12,12 +14,20 @@ import java.util.Set;
  *
  */
 public class Clock {
-    private final static Log _log = new Log(Clock.class);
-    private final static Clock _instance = new Clock();
-
-    public final static Clock getInstance() {
-        return _instance;
+    private I2PAppContext _context;
+    public Clock(I2PAppContext context) {
+        _context = context;
+        _offset = 0;
+        _alreadyChanged = false;
+        _listeners = new HashSet(64);
     }
+    public static Clock getInstance() {
+        return I2PAppContext.getGlobalContext().clock();
+    }
+    
+    /** we fetch it on demand to avoid circular dependencies (logging uses the clock) */
+    private Log getLog() { return _context.logManager().getLog(Clock.class); }
+    
     private volatile long _offset;
     private boolean _alreadyChanged;
     private Set _listeners;
@@ -27,12 +37,6 @@ public class Clock {
     /** if the clock skewed changes by less than 1s, ignore the update (so we don't slide all over the place) */
     public final static long MIN_OFFSET_CHANGE = 30 * 1000;
 
-    private Clock() {
-        _offset = 0;
-        _alreadyChanged = false;
-        _listeners = new HashSet(64);
-    }
-
     /**
      * Specify how far away from the "correct" time the computer is - a positive
      * value means that we are slow, while a negative value means we are fast.
@@ -40,18 +44,18 @@ public class Clock {
      */
     public void setOffset(long offsetMs) {
         if ((offsetMs > MAX_OFFSET) || (offsetMs < 0 - MAX_OFFSET)) {
-            _log.error("Maximum offset shift exceeded [" + offsetMs + "], NOT HONORING IT");
+            getLog().error("Maximum offset shift exceeded [" + offsetMs + "], NOT HONORING IT");
             return;
         }
         long delta = offsetMs - _offset;
         if ((delta < MIN_OFFSET_CHANGE) && (delta > 0 - MIN_OFFSET_CHANGE)) {
-            _log.debug("Not changing offset since it is only " + delta + "ms");
+            getLog().debug("Not changing offset since it is only " + delta + "ms");
             return;
         }
         if (_alreadyChanged)
-            _log.log(Log.CRIT, "Updating clock offset to " + offsetMs + "ms from " + _offset + "ms");
+            getLog().log(Log.CRIT, "Updating clock offset to " + offsetMs + "ms from " + _offset + "ms");
         else
-            _log.log(Log.INFO, "Initializing clock offset to " + offsetMs + "ms from " + _offset + "ms");
+            getLog().log(Log.INFO, "Initializing clock offset to " + offsetMs + "ms from " + _offset + "ms");
         _alreadyChanged = true;
         _offset = offsetMs;
         fireOffsetChanged(delta);

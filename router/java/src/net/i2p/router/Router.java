@@ -54,14 +54,14 @@ import net.i2p.util.RandomSource;
  *
  */
 public class Router {
-    private final static Log _log = new Log(Router.class);
-    private final static Router _instance = new Router();
-    public static Router getInstance() { return _instance; }
+    private Log _log;
+    private RouterContext _context;
     private Properties _config;
     private String _configFilename;
     private RouterInfo _routerInfo;
     private long _started;
     private boolean _higherVersionSeen;
+    private SessionKeyPersistenceHelper _sessionKeyPersistenceHelper;
     
     public final static String PROP_CONFIG_FILE = "router.configLocation";
     
@@ -73,16 +73,19 @@ public class Router {
     public final static String PROP_KEYS_FILENAME = "router.keys.location";
     public final static String PROP_KEYS_FILENAME_DEFAULT = "router.keys";
         
-    private Router() { 
-        _config = new Properties();
-        _configFilename = System.getProperty(PROP_CONFIG_FILE, "router.config");
-        _routerInfo = null;
-        _higherVersionSeen = false;
+    public Router() {
         // grumble about sun's java caching DNS entries *forever*
         System.setProperty("sun.net.inetaddr.ttl", "0");
         System.setProperty("networkaddress.cache.ttl", "0");
         // (no need for keepalive)
         System.setProperty("http.keepAlive", "false");
+        _config = new Properties();
+        _context = new RouterContext(this);
+        _configFilename = _context.getProperty(PROP_CONFIG_FILE, "router.config");
+        _routerInfo = null;
+        _higherVersionSeen = false;
+        _log = _context.logManager().getLog(Router.class);
+        _sessionKeyPersistenceHelper = new SessionKeyPersistenceHelper(_context);
     }
     
     public String getConfigFilename() { return _configFilename; }
@@ -97,7 +100,7 @@ public class Router {
     public void setRouterInfo(RouterInfo info) { 
         _routerInfo = info; 
         if (info != null)
-            JobQueue.getInstance().addJob(new PersistRouterInfoJob());
+            _context.jobQueue().addJob(new PersistRouterInfoJob());
     }
     
     /**
@@ -110,10 +113,10 @@ public class Router {
     
     public long getWhenStarted() { return _started; }
     /** wall clock uptime */
-    public long getUptime() { return Clock.getInstance().now() - Clock.getInstance().getOffset() - _started; }
+    public long getUptime() { return _context.clock().now() - _context.clock().getOffset() - _started; }
     
     private void runRouter() {
-        _started = Clock.getInstance().now();
+        _started = _context.clock().now();
         Runtime.getRuntime().addShutdownHook(new ShutdownHook());
         I2PThread.setOOMEventListener(new I2PThread.OOMEventListener() { 
             public void outOfMemory(OutOfMemoryError oom) { 
@@ -123,21 +126,22 @@ public class Router {
         });
         setupHandlers();
         startupQueue();
-        JobQueue.getInstance().addJob(new CoallesceStatsJob());
-        JobQueue.getInstance().addJob(new UpdateRoutingKeyModifierJob());
+        _context.jobQueue().addJob(new CoallesceStatsJob());
+        _context.jobQueue().addJob(new UpdateRoutingKeyModifierJob());
         warmupCrypto();
-        SessionKeyPersistenceHelper.getInstance().startup();
-        JobQueue.getInstance().addJob(new StartupJob());
+        _sessionKeyPersistenceHelper.startup();
+        _context.jobQueue().addJob(new StartupJob(_context));
     }
     
     /**
      * coallesce the stats framework every minute
      *
      */
-    private final static class CoallesceStatsJob extends JobImpl {
+    private final class CoallesceStatsJob extends JobImpl {
+        public CoallesceStatsJob() { super(Router.this._context); }
         public String getName() { return "Coallesce stats"; }
         public void runJob() {
-            StatManager.getInstance().coallesceStats();
+            Router.this._context.statManager().coallesceStats();
             requeue(60*1000);
         }
     }
@@ -147,15 +151,16 @@ public class Router {
      * This is done here because we want to make sure the key is updated before anyone
      * uses it.
      */
-    private final static class UpdateRoutingKeyModifierJob extends JobImpl {
+    private final class UpdateRoutingKeyModifierJob extends JobImpl {
         private Calendar _cal = new GregorianCalendar(TimeZone.getTimeZone("GMT"));
+        public UpdateRoutingKeyModifierJob() { super(Router.this._context); }
         public String getName() { return "Update Routing Key Modifier"; }
         public void runJob() {
-            RoutingKeyGenerator.getInstance().generateDateBasedModData();
+            Router.this._context.routingKeyGenerator().generateDateBasedModData();
             requeue(getTimeTillMidnight());
         }
         private long getTimeTillMidnight() {
-            long now = Clock.getInstance().now();
+            long now = Router.this._context.clock().now();
             _cal.setTime(new Date(now));
             _cal.add(Calendar.DATE, 1);
             _cal.set(Calendar.HOUR_OF_DAY, 0);
@@ -175,18 +180,18 @@ public class Router {
     }
     
     private void warmupCrypto() {
-        RandomSource.getInstance().nextBoolean();
+        _context.random().nextBoolean();
         new DHSessionKeyBuilder(); // load the class so it starts the precalc process
     }
     
     private void startupQueue() {
-        JobQueue.getInstance().runQueue(1);
+        _context.jobQueue().runQueue(1);
     }
     
     private void setupHandlers() {
-        InNetMessagePool.getInstance().registerHandlerJobBuilder(GarlicMessage.MESSAGE_TYPE, new GarlicMessageHandler());
-        InNetMessagePool.getInstance().registerHandlerJobBuilder(TunnelMessage.MESSAGE_TYPE, new TunnelMessageHandler());
-        InNetMessagePool.getInstance().registerHandlerJobBuilder(SourceRouteReplyMessage.MESSAGE_TYPE, new SourceRouteReplyMessageHandler());
+        _context.inNetMessagePool().registerHandlerJobBuilder(GarlicMessage.MESSAGE_TYPE, new GarlicMessageHandler(_context));
+        _context.inNetMessagePool().registerHandlerJobBuilder(TunnelMessage.MESSAGE_TYPE, new TunnelMessageHandler(_context));
+        _context.inNetMessagePool().registerHandlerJobBuilder(SourceRouteReplyMessage.MESSAGE_TYPE, new SourceRouteReplyMessageHandler(_context));
     }
     
     public String renderStatusHTML() {
@@ -214,9 +219,9 @@ public class Router {
 
         if ( (_routerInfo != null) && (_routerInfo.getIdentity() != null) )
             buf.append("<b>Router: </b> ").append(_routerInfo.getIdentity().getHash().toBase64()).append("<br />\n");
-        buf.append("<b>As of: </b> ").append(new Date(Clock.getInstance().now())).append(" (uptime: ").append(DataHelper.formatDuration(getUptime())).append(") <br />\n");
+        buf.append("<b>As of: </b> ").append(new Date(_context.clock().now())).append(" (uptime: ").append(DataHelper.formatDuration(getUptime())).append(") <br />\n");
         buf.append("<b>Started on: </b> ").append(new Date(getWhenStarted())).append("<br />\n");
-        buf.append("<b>Clock offset: </b> ").append(Clock.getInstance().getOffset()).append("ms (OS time: ").append(new Date(Clock.getInstance().now() - Clock.getInstance().getOffset())).append(")<br />\n");
+        buf.append("<b>Clock offset: </b> ").append(_context.clock().getOffset()).append("ms (OS time: ").append(new Date(_context.clock().now() - _context.clock().getOffset())).append(")<br />\n");
         long tot = Runtime.getRuntime().totalMemory()/1024;
         long free = Runtime.getRuntime().freeMemory()/1024;
         buf.append("<b>Memory:</b> In use: ").append((tot-free)).append("KB Free: ").append(free).append("KB <br />\n"); 
@@ -225,8 +230,8 @@ public class Router {
             buf.append("<b><font color=\"red\">HIGHER VERSION SEEN</font><b> - please <a href=\"http://i2p.dnsalias.net/\">check</a> to see if there is a new release out<br />\n");
 
         buf.append("<hr /><a name=\"bandwidth\"> </a><h2>Bandwidth</h2>\n");
-        long sent = BandwidthLimiter.getInstance().getTotalSendBytes();
-        long received = BandwidthLimiter.getInstance().getTotalReceiveBytes();
+        long sent = _context.bandwidthLimiter().getTotalSendBytes();
+        long received = _context.bandwidthLimiter().getTotalReceiveBytes();
         buf.append("<ul>");
 
         buf.append("<li> ").append(sent).append(" bytes sent, ");
@@ -235,7 +240,7 @@ public class Router {
         DecimalFormat fmt = new DecimalFormat("##0.00");
 
         // we use the unadjusted time, since thats what getWhenStarted is based off
-        long lifetime = Clock.getInstance().now()-Clock.getInstance().getOffset() - getWhenStarted();
+        long lifetime = _context.clock().now()-_context.clock().getOffset() - getWhenStarted();
         lifetime /= 1000;
         if ( (sent > 0) && (received > 0) ) {
             double sendKBps = sent / (lifetime*1024.0);
@@ -246,7 +251,7 @@ public class Router {
             buf.append("</li>");
             } 
         
-        RateStat sendRate = StatManager.getInstance().getRate("transport.sendMessageSize");
+        RateStat sendRate = _context.statManager().getRate("transport.sendMessageSize");
         for (int i = 0; i < sendRate.getPeriods().length; i++) {
             Rate rate = sendRate.getRate(sendRate.getPeriods()[i]);
             double bytes = rate.getLastTotalValue() + rate.getCurrentTotalValue();
@@ -280,7 +285,7 @@ public class Router {
             buf.append("</li>");
         }
 
-        RateStat receiveRate = StatManager.getInstance().getRate("transport.receiveMessageSize");
+        RateStat receiveRate = _context.statManager().getRate("transport.receiveMessageSize");
         for (int i = 0; i < receiveRate.getPeriods().length; i++) {
             Rate rate = receiveRate.getRate(receiveRate.getPeriods()[i]);
             double bytes = rate.getLastTotalValue() + rate.getCurrentTotalValue();
@@ -321,23 +326,23 @@ public class Router {
         buf.append("\n");
 
         buf.append("<hr /><a name=\"clients\"> </a>\n");
-        buf.append(ClientManagerFacade.getInstance().renderStatusHTML());
+        buf.append(_context.clientManager().renderStatusHTML());
         buf.append("\n<hr /><a name=\"transports\"> </a>\n");
-        buf.append(CommSystemFacade.getInstance().renderStatusHTML());
+        buf.append(_context.commSystem().renderStatusHTML());
         buf.append("\n<hr /><a name=\"profiles\"> </a>\n");
-        buf.append(PeerManagerFacade.getInstance().renderStatusHTML());
+        buf.append(_context.peerManager().renderStatusHTML());
         buf.append("\n<hr /><a name=\"tunnels\"> </a>\n");
-        buf.append(TunnelManagerFacade.getInstance().renderStatusHTML());
+        buf.append(_context.tunnelManager().renderStatusHTML());
         buf.append("\n<hr /><a name=\"jobs\"> </a>\n");
-        buf.append(JobQueue.getInstance().renderStatusHTML());
+        buf.append(_context.jobQueue().renderStatusHTML());
         buf.append("\n<hr /><a name=\"shitlist\"> </a>\n");
-        buf.append(Shitlist.getInstance().renderStatusHTML());
+        buf.append(_context.shitlist().renderStatusHTML());
         buf.append("\n<hr /><a name=\"pending\"> </a>\n");
-        buf.append(OutboundMessageRegistry.getInstance().renderStatusHTML());
+        buf.append(_context.messageRegistry().renderStatusHTML());
         buf.append("\n<hr /><a name=\"netdb\"> </a>\n");
-        buf.append(NetworkDatabaseFacade.getInstance().renderStatusHTML());
+        buf.append(_context.netDb().renderStatusHTML());
         buf.append("\n<hr /><a name=\"logs\"> </a>\n");	
-        List msgs = LogConsoleBuffer.getInstance().getMostRecentMessages();
+        List msgs = _context.logManager().getBuffer().getMostRecentMessages();
         buf.append("\n<h2>Most recent console messages:</h2><table border=\"1\">\n");
         for (Iterator iter = msgs.iterator(); iter.hasNext(); ) {
             String msg = (String)iter.next();
@@ -350,27 +355,28 @@ public class Router {
     }
     
     public void shutdown() {
-        try { JobQueue.getInstance().shutdown(); } catch (Throwable t) { _log.log(Log.CRIT, "Error shutting down the job queue", t); }
-        try { StatisticsManager.getInstance().shutdown(); } catch (Throwable t) { _log.log(Log.CRIT, "Error shutting down the stats manager", t); }
-        try { ClientManagerFacade.getInstance().shutdown(); } catch (Throwable t) { _log.log(Log.CRIT, "Error shutting down the client manager", t); }
-        try { TunnelManagerFacade.getInstance().shutdown(); } catch (Throwable t) { _log.log(Log.CRIT, "Error shutting down the tunnel manager", t); }
-        try { NetworkDatabaseFacade.getInstance().shutdown(); } catch (Throwable t) { _log.log(Log.CRIT, "Error shutting down the networkDb", t); }
-        try { CommSystemFacade.getInstance().shutdown(); } catch (Throwable t) { _log.log(Log.CRIT, "Error shutting down the comm system", t); }
-        try { PeerManagerFacade.getInstance().shutdown(); } catch (Throwable t) { _log.log(Log.CRIT, "Error shutting down the peer manager", t); }
-        try { SessionKeyPersistenceHelper.getInstance().shutdown(); } catch (Throwable t) { _log.log(Log.CRIT, "Error shutting down the session key manager", t); }
+        try { _context.jobQueue().shutdown(); } catch (Throwable t) { _log.log(Log.CRIT, "Error shutting down the job queue", t); }
+        try { _context.statPublisher().shutdown(); } catch (Throwable t) { _log.log(Log.CRIT, "Error shutting down the stats manager", t); }
+        try { _context.clientManager().shutdown(); } catch (Throwable t) { _log.log(Log.CRIT, "Error shutting down the client manager", t); }
+        try { _context.tunnelManager().shutdown(); } catch (Throwable t) { _log.log(Log.CRIT, "Error shutting down the tunnel manager", t); }
+        try { _context.netDb().shutdown(); } catch (Throwable t) { _log.log(Log.CRIT, "Error shutting down the networkDb", t); }
+        try { _context.commSystem().shutdown(); } catch (Throwable t) { _log.log(Log.CRIT, "Error shutting down the comm system", t); }
+        try { _context.peerManager().shutdown(); } catch (Throwable t) { _log.log(Log.CRIT, "Error shutting down the peer manager", t); }
+        try { _sessionKeyPersistenceHelper.shutdown(); } catch (Throwable t) { _log.log(Log.CRIT, "Error shutting down the session key manager", t); }
         dumpStats();
         _log.log(Log.CRIT, "Shutdown complete", new Exception("Shutdown"));
-        try { LogManager.getInstance().shutdown(); } catch (Throwable t) { }
+        try { _context.logManager().shutdown(); } catch (Throwable t) { }
         try { Thread.sleep(1000); } catch (InterruptedException ie) {}
         Runtime.getRuntime().halt(-1);
     }
     
     private void dumpStats() {
-        _log.log(Log.CRIT, "Lifetime stats:\n\n" + StatsGenerator.generateStatsPage());
+        //_log.log(Log.CRIT, "Lifetime stats:\n\n" + StatsGenerator.generateStatsPage());
     }
     
     public static void main(String args[]) {
-        Router.getInstance().runRouter();
+        Router r = new Router();
+        r.runRouter();
     }
     
     private class ShutdownHook extends Thread {
@@ -381,17 +387,18 @@ public class Router {
     }
     
     /** update the router.info file whenever its, er, updated */
-    private static class PersistRouterInfoJob extends JobImpl {
+    private class PersistRouterInfoJob extends JobImpl {
+        public PersistRouterInfoJob() { super(Router.this._context); }
         public String getName() { return "Persist Updated Router Information"; }
         public void runJob() {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Persisting updated router info");
 
-            String infoFilename = Router.getInstance().getConfigSetting(PROP_INFO_FILENAME);
+            String infoFilename = getConfigSetting(PROP_INFO_FILENAME);
             if (infoFilename == null)
                 infoFilename = PROP_INFO_FILENAME_DEFAULT;
 
-            RouterInfo info = Router.getInstance().getRouterInfo();
+            RouterInfo info = getRouterInfo();
 
             FileOutputStream fos = null;
             try {

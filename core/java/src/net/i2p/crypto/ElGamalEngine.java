@@ -43,6 +43,7 @@ import net.i2p.util.Clock;
 import net.i2p.util.Log;
 import net.i2p.util.NativeBigInteger;
 import net.i2p.util.RandomSource;
+import net.i2p.I2PAppContext;
 
 /** 
  * Wrapper for ElGamal encryption/signature schemes.
@@ -56,25 +57,28 @@ import net.i2p.util.RandomSource;
  */
 
 public class ElGamalEngine {
-    private final static Log _log = new Log(ElGamalEngine.class);
-    private static ElGamalEngine _engine;
-    static {
-        if ("off".equals(System.getProperty("i2p.encryption", "on")))
-            _engine = new DummyElGamalEngine();
-        else
-            _engine = new ElGamalEngine();
-
-        StatManager.getInstance().createRateStat("crypto.elGamal.encrypt",
-                                                 "how long does it take to do a full ElGamal encryption", "Encryption",
-                                                 new long[] { 60 * 1000, 60 * 60 * 1000, 24 * 60 * 60 * 1000});
-        StatManager.getInstance().createRateStat("crypto.elGamal.decrypt",
-                                                 "how long does it take to do a full ElGamal decryption", "Encryption",
-                                                 new long[] { 60 * 1000, 60 * 60 * 1000, 24 * 60 * 60 * 1000});
+    private Log _log;
+    private I2PAppContext _context;
+    
+    /** 
+     * The ElGamal engine should only be constructed and accessed through the 
+     * application context.  This constructor should only be used by the 
+     * appropriate application context itself.
+     *
+     */
+    public ElGamalEngine(I2PAppContext context) {
+        context.statManager().createRateStat("crypto.elGamal.encrypt",
+                                             "how long does it take to do a full ElGamal encryption", "Encryption",
+                                             new long[] { 60 * 1000, 60 * 60 * 1000, 24 * 60 * 60 * 1000});
+        context.statManager().createRateStat("crypto.elGamal.decrypt",
+                                             "how long does it take to do a full ElGamal decryption", "Encryption",
+                                             new long[] { 60 * 1000, 60 * 60 * 1000, 24 * 60 * 60 * 1000});
+        _context = context;
+        _log = context.logManager().getLog(ElGamalEngine.class);
     }
+    private ElGamalEngine() {}
 
-    public static ElGamalEngine getInstance() {
-        return _engine;
-    }
+    
     private final static BigInteger _two = new NativeBigInteger(1, new byte[] { 0x02});
 
     private BigInteger[] getNextYK() {
@@ -91,12 +95,12 @@ public class ElGamalEngine {
             throw new IllegalArgumentException("Data to encrypt must be < 223 bytes at the moment");
         if (publicKey == null) throw new IllegalArgumentException("Null public key specified");
 
-        long start = Clock.getInstance().now();
+        long start = _context.clock().now();
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream(256);
         try {
             baos.write(0xFF);
-            Hash hash = SHA256Generator.getInstance().calculateHash(data);
+            Hash hash = _context.sha().calculateHash(data);
             hash.writeBytes(baos);
             baos.write(data);
             baos.flush();
@@ -106,25 +110,25 @@ public class ElGamalEngine {
         }
 
         byte d2[] = baos.toByteArray();
-        long t0 = Clock.getInstance().now();
+        long t0 = _context.clock().now();
         BigInteger m = new NativeBigInteger(1, d2);
-        long t1 = Clock.getInstance().now();
+        long t1 = _context.clock().now();
         if (m.compareTo(CryptoConstants.elgp) >= 0)
             throw new IllegalArgumentException("ARGH.  Data cannot be larger than the ElGamal prime.  FIXME");
-        long t2 = Clock.getInstance().now();
+        long t2 = _context.clock().now();
         BigInteger aalpha = new NativeBigInteger(1, publicKey.getData());
-        long t3 = Clock.getInstance().now();
+        long t3 = _context.clock().now();
         BigInteger yk[] = getNextYK();
         BigInteger k = yk[1];
         BigInteger y = yk[0];
 
-        long t7 = Clock.getInstance().now();
+        long t7 = _context.clock().now();
         BigInteger d = aalpha.modPow(k, CryptoConstants.elgp);
-        long t8 = Clock.getInstance().now();
+        long t8 = _context.clock().now();
         d = d.multiply(m);
-        long t9 = Clock.getInstance().now();
+        long t9 = _context.clock().now();
         d = d.mod(CryptoConstants.elgp);
-        long t10 = Clock.getInstance().now();
+        long t10 = _context.clock().now();
 
         byte[] ybytes = y.toByteArray();
         byte[] dbytes = d.toByteArray();
@@ -146,14 +150,14 @@ public class ElGamalEngine {
         buf.append("8-9: ").append(t9 - t8).append('\n');
         buf.append("9-10: ").append(t10 - t9).append('\n');
         //_log.debug(buf.toString());
-        long end = Clock.getInstance().now();
+        long end = _context.clock().now();
 
         long diff = end - start;
         if (diff > 1000) {
             if (_log.shouldLog(Log.WARN)) _log.warn("Took too long to encrypt ElGamal block (" + diff + "ms)");
         }
 
-        StatManager.getInstance().addRateData("crypto.elGamal.encrypt", diff, diff);
+        _context.statManager().addRateData("crypto.elGamal.encrypt", diff, diff);
         return out;
     }
 
@@ -165,7 +169,7 @@ public class ElGamalEngine {
     public byte[] decrypt(byte encrypted[], PrivateKey privateKey) {
         if ((encrypted == null) || (encrypted.length > 514))
             throw new IllegalArgumentException("Data to decrypt must be <= 514 bytes at the moment");
-        long start = Clock.getInstance().now();
+        long start = _context.clock().now();
 
         byte[] ybytes = new byte[257];
         byte[] dbytes = new byte[257];
@@ -196,10 +200,10 @@ public class ElGamalEngine {
             return null;
         }
 
-        Hash calcHash = SHA256Generator.getInstance().calculateHash(rv);
+        Hash calcHash = _context.sha().calculateHash(rv);
         boolean ok = calcHash.equals(hash);
 
-        long end = Clock.getInstance().now();
+        long end = _context.clock().now();
 
         long diff = end - start;
         if (diff > 1000) {
@@ -207,7 +211,7 @@ public class ElGamalEngine {
                 _log.warn("Took too long to decrypt and verify ElGamal block (" + diff + "ms)");
         }
 
-        StatManager.getInstance().addRateData("crypto.elGamal.decrypt", diff, diff);
+        _context.statManager().addRateData("crypto.elGamal.decrypt", diff, diff);
 
         if (ok) {
             //_log.debug("Hash matches: " + DataHelper.toString(hash.getData(), hash.getData().length));
@@ -236,6 +240,7 @@ public class ElGamalEngine {
         }
 
         RandomSource.getInstance().nextBoolean();
+        I2PAppContext context = new I2PAppContext();
 
         System.out.println("Running " + numRuns + " times");
 
@@ -249,9 +254,9 @@ public class ElGamalEngine {
             byte buf[] = new byte[128];
             RandomSource.getInstance().nextBytes(buf);
             long startE = Clock.getInstance().now();
-            byte encr[] = ElGamalEngine.getInstance().encrypt(buf, pubkey);
+            byte encr[] = context.elGamalEngine().encrypt(buf, pubkey);
             long endE = Clock.getInstance().now();
-            byte decr[] = ElGamalEngine.getInstance().decrypt(encr, privkey);
+            byte decr[] = context.elGamalEngine().decrypt(encr, privkey);
             long endD = Clock.getInstance().now();
             eTime += endE - startE;
             dTime += endD - endE;
@@ -259,8 +264,7 @@ public class ElGamalEngine {
 
             if (!DataHelper.eq(decr, buf)) {
                 System.out.println("PublicKey     : " + DataHelper.toString(pubkey.getData(), pubkey.getData().length));
-                System.out.println("PrivateKey    : "
-                                   + DataHelper.toString(privkey.getData(), privkey.getData().length));
+                System.out.println("PrivateKey    : " + DataHelper.toString(privkey.getData(), privkey.getData().length));
                 System.out.println("orig          : " + DataHelper.toString(buf, buf.length));
                 System.out.println("d(e(orig)     : " + DataHelper.toString(decr, decr.length));
                 System.out.println("orig.len      : " + buf.length);

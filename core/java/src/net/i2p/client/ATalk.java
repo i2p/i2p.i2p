@@ -31,6 +31,7 @@ import net.i2p.util.Clock;
 import net.i2p.util.I2PThread;
 import net.i2p.util.Log;
 import net.i2p.util.LogManager;
+import net.i2p.I2PAppContext;
 
 /**
  * ATalk - anonymous talk, demonstrating a trivial I2P usage scenario.
@@ -290,6 +291,7 @@ public class ATalk implements I2PSessionListener, Runnable {
 
     /** driver */
     public static void main(String args[]) {
+        I2PAppContext context = new I2PAppContext();
         if (args.length == 2) {
             String myKeyFile = args[0];
             String myDestinationFile = args[1];
@@ -309,9 +311,9 @@ public class ATalk implements I2PSessionListener, Runnable {
             String peerDestFile = args[1];
             String shouldLog = args[2];
             if (Boolean.TRUE.toString().equalsIgnoreCase(shouldLog))
-                LogManager.getInstance().setDisplayOnScreen(true);
+                context.logManager().setDisplayOnScreen(true);
             else
-                LogManager.getInstance().setDisplayOnScreen(false);
+                context.logManager().setDisplayOnScreen(false);
             String logFile = args[2];
             Thread talkThread = new I2PThread(new ATalk(myKeyfile, peerDestFile));
             talkThread.start();

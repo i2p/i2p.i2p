@@ -39,30 +39,31 @@ import net.i2p.stat.StatManager;
 import net.i2p.util.Clock;
 import net.i2p.util.Log;
 import net.i2p.util.RandomSource;
+import net.i2p.router.RouterContext;
 
 /**
  * Send a client message, taking into consideration the fact that there may be
  * multiple inbound tunnels that the target provides.  This job sends it to one
  * of them and if it doesnt get a confirmation within 15 seconds (SEND_TIMEOUT_MS),
- * it tries the next, continuing on until a confirmation is received, the full 
+ * it tries the next, continuing on until a confirmation is received, the full
  * timeout has been reached (60 seconds, or the ms defined in the client's or
- * router's "clientMessageTimeout" option).  
+ * router's "clientMessageTimeout" option).
  *
- * After sending through all of the leases without success, if there's still 
- * time left it fails the leaseSet itself, does a new search for that leaseSet, 
- * and continues sending down any newly found leases.  
+ * After sending through all of the leases without success, if there's still
+ * time left it fails the leaseSet itself, does a new search for that leaseSet,
+ * and continues sending down any newly found leases.
  *
  */
 public class OutboundClientMessageJob extends JobImpl {
-    private final static Log _log = new Log(OutboundClientMessageJob.class);
+    private Log _log;
     private OutboundClientMessageStatus _status;
     private NextStepJob _nextStep;
     private LookupLeaseSetFailedJob _lookupLeaseSetFailed;
     private long _overallExpiration;
-
-    /** 
+    
+    /**
      * final timeout (in milliseconds) that the outbound message will fail in.
-     * This can be overridden in the router.config or the client's session config 
+     * This can be overridden in the router.config or the client's session config
      * (the client's session config takes precedence)
      */
     public final static String OVERALL_TIMEOUT_MS_PARAM = "clientMessageTimeout";
@@ -76,286 +77,285 @@ public class OutboundClientMessageJob extends JobImpl {
     /** dont search for the lease more than 3 times */
     private final static int MAX_LEASE_LOOKUPS = 3;
     
-    static {
-    	StatManager.getInstance().createFrequencyStat("client.sendMessageFailFrequency", "How often does a client fail to send a message?", "Client Messages", new long[] { 60*1000l, 60*60*1000l, 24*60*60*1000l });
-    	StatManager.getInstance().createRateStat("client.sendMessageSize", "How large are messages sent by the client?", "Client Messages", new long[] { 60*1000l, 60*60*1000l, 24*60*60*1000l });
-    	StatManager.getInstance().createRateStat("client.sendAttemptAverage", "How many different tunnels do we have to try when sending a client message?", "Client Messages", new long[] { 60*1000l, 60*60*1000l, 24*60*60*1000l });
-    }
-    
     /**
      * Send the sucker
      */
-    public OutboundClientMessageJob(ClientMessage msg) {
-	super();
-	
-	long timeoutMs = OVERALL_TIMEOUT_MS_DEFAULT;
-	
-	String param = msg.getSenderConfig().getOptions().getProperty(OVERALL_TIMEOUT_MS_PARAM);
-	if (param == null)
-	    param = Router.getInstance().getConfigSetting(OVERALL_TIMEOUT_MS_PARAM);
-	if (param != null) {
-	    try {
-		timeoutMs = Long.parseLong(param);
-	    } catch (NumberFormatException nfe) {
-		if (_log.shouldLog(Log.WARN))
-		    _log.warn("Invalid client message timeout specified [" + param + "], defaulting to " + OVERALL_TIMEOUT_MS_DEFAULT, nfe);
-		timeoutMs = OVERALL_TIMEOUT_MS_DEFAULT;
-	    }
-	}
-	
-	_overallExpiration = timeoutMs + Clock.getInstance().now();
-	_status = new OutboundClientMessageStatus(msg);
-	_nextStep = new NextStepJob();
-	_lookupLeaseSetFailed = new LookupLeaseSetFailedJob();
+    public OutboundClientMessageJob(RouterContext ctx, ClientMessage msg) {
+        super(ctx);
+        _log = ctx.logManager().getLog(OutboundClientMessageJob.class);
+        
+        ctx.statManager().createFrequencyStat("client.sendMessageFailFrequency", "How often does a client fail to send a message?", "Client Messages", new long[] { 60*1000l, 60*60*1000l, 24*60*60*1000l });
+        ctx.statManager().createRateStat("client.sendMessageSize", "How large are messages sent by the client?", "Client Messages", new long[] { 60*1000l, 60*60*1000l, 24*60*60*1000l });
+        ctx.statManager().createRateStat("client.sendAttemptAverage", "How many different tunnels do we have to try when sending a client message?", "Client Messages", new long[] { 60*1000l, 60*60*1000l, 24*60*60*1000l });
+        
+        long timeoutMs = OVERALL_TIMEOUT_MS_DEFAULT;
+        
+        String param = msg.getSenderConfig().getOptions().getProperty(OVERALL_TIMEOUT_MS_PARAM);
+        if (param == null)
+            param = ctx.router().getConfigSetting(OVERALL_TIMEOUT_MS_PARAM);
+        if (param != null) {
+            try {
+                timeoutMs = Long.parseLong(param);
+            } catch (NumberFormatException nfe) {
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("Invalid client message timeout specified [" + param + "], defaulting to " + OVERALL_TIMEOUT_MS_DEFAULT, nfe);
+                timeoutMs = OVERALL_TIMEOUT_MS_DEFAULT;
+            }
+        }
+        
+        _overallExpiration = timeoutMs + _context.clock().now();
+        _status = new OutboundClientMessageStatus(msg);
+        _nextStep = new NextStepJob();
+        _lookupLeaseSetFailed = new LookupLeaseSetFailedJob();
     }
     
     public String getName() { return "Outbound client message"; }
     
     public void runJob() {
-	if (_log.shouldLog(Log.DEBUG))
-	    _log.debug("Send outbound client message job beginning");
-	buildClove();
-	if (_log.shouldLog(Log.DEBUG))
-	    _log.debug("Clove built");
-	Hash to = _status.getTo().calculateHash();
-	long timeoutMs = _overallExpiration - Clock.getInstance().now();
-	if (_log.shouldLog(Log.DEBUG))
-	    _log.debug("Send outbound client message - sending off leaseSet lookup job");
-	_status.incrementLookups();
-	NetworkDatabaseFacade.getInstance().lookupLeaseSet(to, _nextStep, _lookupLeaseSetFailed, timeoutMs);
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("Send outbound client message job beginning");
+        buildClove();
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("Clove built");
+        Hash to = _status.getTo().calculateHash();
+        long timeoutMs = _overallExpiration - _context.clock().now();
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("Send outbound client message - sending off leaseSet lookup job");
+        _status.incrementLookups();
+        _context.netDb().lookupLeaseSet(to, _nextStep, _lookupLeaseSetFailed, timeoutMs);
     }
     
     /**
      * Continue on sending through the next tunnel
      */
     private void sendNext() {
-	if (_log.shouldLog(Log.DEBUG)) {
-	    _log.debug("sendNext() called with " + _status.getNumSent() + " already sent");
-	}
-	
-	if (_status.getSuccess()) {
-	    if (_log.shouldLog(Log.DEBUG))
-		_log.debug("sendNext() - already successful!");
-	    return;
-	}
-	if (_status.getFailure()) {
-	    if (_log.shouldLog(Log.DEBUG))
-		_log.debug("sendNext() - already failed!");
-	    return;
-	}
-	
-	long now = Clock.getInstance().now();
-	if (now >= _overallExpiration) {
-	    if (_log.shouldLog(Log.WARN))
-		_log.warn("sendNext() - Expired");
-	    dieFatal();
-	    return;
-	}
-	
-	Lease nextLease = getNextLease();
-	
-	if (_log.shouldLog(Log.DEBUG))
-	    _log.debug("Send outbound client message - next lease found for [" + _status.getTo().calculateHash().toBase64() + "] - " + nextLease);
-	
-	if (nextLease == null) {
-	    if (_log.shouldLog(Log.WARN)) 
-		_log.warn("No more leases, and we still haven't heard back from the peer, refetching the leaseSet to try again");
-	    _status.setLeaseSet(null);
-	    long remainingMs = _overallExpiration - Clock.getInstance().now();
-	    if (_status.getNumLookups() < MAX_LEASE_LOOKUPS) {
-		_status.incrementLookups();
-		Hash to = _status.getMessage().getDestination().calculateHash();
-		_status.clearAlreadySent();
-		NetworkDatabaseFacade.getInstance().fail(to);
-		NetworkDatabaseFacade.getInstance().lookupLeaseSet(to, _nextStep, _lookupLeaseSetFailed, remainingMs);
-		return;
-	    } else {
-		if (_log.shouldLog(Log.WARN)) 
-		    _log.warn("sendNext() - max # lease lookups exceeded! " + _status.getNumLookups());
-		dieFatal();
-		return;
-	    }
-	}
-	
-	JobQueue.getInstance().addJob(new SendJob(nextLease));
+        if (_log.shouldLog(Log.DEBUG)) {
+            _log.debug("sendNext() called with " + _status.getNumSent() + " already sent");
+        }
+        
+        if (_status.getSuccess()) {
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("sendNext() - already successful!");
+            return;
+        }
+        if (_status.getFailure()) {
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("sendNext() - already failed!");
+            return;
+        }
+        
+        long now = _context.clock().now();
+        if (now >= _overallExpiration) {
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("sendNext() - Expired");
+            dieFatal();
+            return;
+        }
+        
+        Lease nextLease = getNextLease();
+        
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("Send outbound client message - next lease found for [" + _status.getTo().calculateHash().toBase64() + "] - " + nextLease);
+        
+        if (nextLease == null) {
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("No more leases, and we still haven't heard back from the peer, refetching the leaseSet to try again");
+            _status.setLeaseSet(null);
+            long remainingMs = _overallExpiration - _context.clock().now();
+            if (_status.getNumLookups() < MAX_LEASE_LOOKUPS) {
+                _status.incrementLookups();
+                Hash to = _status.getMessage().getDestination().calculateHash();
+                _status.clearAlreadySent();
+                _context.netDb().fail(to);
+                _context.netDb().lookupLeaseSet(to, _nextStep, _lookupLeaseSetFailed, remainingMs);
+                return;
+            } else {
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("sendNext() - max # lease lookups exceeded! " + _status.getNumLookups());
+                dieFatal();
+                return;
+            }
+        }
+        
+        _context.jobQueue().addJob(new SendJob(nextLease));
     }
     
-    /** 
-     * fetch the next lease that we should try sending through, or null if there 
-     * are no remaining leases available (or there weren't any in the first place...).  
-     * This implements the logic to determine which lease should be next by picking a 
+    /**
+     * fetch the next lease that we should try sending through, or null if there
+     * are no remaining leases available (or there weren't any in the first place...).
+     * This implements the logic to determine which lease should be next by picking a
      * random one that has been failing the least (e.g. if there are 3 leases in the leaseSet
      * and one has failed, the other two are randomly chosen as the 'next')
      *
      */
-    private Lease getNextLease() { 
-	LeaseSet ls = _status.getLeaseSet();
-	if (ls == null) {
-	    ls = NetworkDatabaseFacade.getInstance().lookupLeaseSetLocally(_status.getTo().calculateHash());
-	    if (ls == null) {
-		if (_log.shouldLog(Log.WARN))
-		    _log.warn("Lookup locally didn't find the leaseSet");
-		return null;
-	    } else {
-		if (_log.shouldLog(Log.DEBUG))
-		    _log.debug("Lookup locally DID find the leaseSet");
-	    }
-	    _status.setLeaseSet(ls);
-	}
-	long now = Clock.getInstance().now();
-	
-	// get the possible leases
-	List leases = new ArrayList(4);
-	for (int i = 0; i < ls.getLeaseCount(); i++) {
-	    Lease lease = ls.getLease(i);
-	    if (lease.isExpired(Router.CLOCK_FUDGE_FACTOR)) {
-		if (_log.shouldLog(Log.WARN))
-		    _log.warn("getNextLease() - expired lease! - " + lease);
-		continue;
-	    }
-	    
-	    if (!_status.alreadySent(lease.getRouterIdentity().getHash(), lease.getTunnelId())) {
-		leases.add(lease);
-	    } else {
-		if (_log.shouldLog(Log.DEBUG))
-		    _log.debug("getNextLease() - skipping lease we've already sent it down - " + lease);
-	    }
-	}
-	
-	// randomize the ordering (so leases with equal # of failures per next sort are randomly ordered)
-	Collections.shuffle(leases);
-	
-	// ordered by lease number of failures
-	TreeMap orderedLeases = new TreeMap();
-	for (Iterator iter = leases.iterator(); iter.hasNext(); ) {
-	    Lease lease = (Lease)iter.next();
-	    long id = lease.getNumFailure();
-	    while (orderedLeases.containsKey(new Long(id)))
-		id++;
-	    orderedLeases.put(new Long(id), lease);
-	    if (_log.shouldLog(Log.DEBUG))
-		_log.debug("getNextLease() - ranking lease we havent sent it down as " + id);
-	}
-	
-	if (orderedLeases.size() <= 0) {
-	    if (_log.shouldLog(Log.WARN))
-		_log.warn("No leases in the ordered set found! all = " + leases.size());
-	    return null;
-	} else {
-	    return (Lease)orderedLeases.get(orderedLeases.firstKey());
-	}
+    private Lease getNextLease() {
+        LeaseSet ls = _status.getLeaseSet();
+        if (ls == null) {
+            ls = _context.netDb().lookupLeaseSetLocally(_status.getTo().calculateHash());
+            if (ls == null) {
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("Lookup locally didn't find the leaseSet");
+                return null;
+            } else {
+                if (_log.shouldLog(Log.DEBUG))
+                    _log.debug("Lookup locally DID find the leaseSet");
+            }
+            _status.setLeaseSet(ls);
+        }
+        long now = _context.clock().now();
+        
+        // get the possible leases
+        List leases = new ArrayList(4);
+        for (int i = 0; i < ls.getLeaseCount(); i++) {
+            Lease lease = ls.getLease(i);
+            if (lease.isExpired(Router.CLOCK_FUDGE_FACTOR)) {
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("getNextLease() - expired lease! - " + lease);
+                continue;
+            }
+            
+            if (!_status.alreadySent(lease.getRouterIdentity().getHash(), lease.getTunnelId())) {
+                leases.add(lease);
+            } else {
+                if (_log.shouldLog(Log.DEBUG))
+                    _log.debug("getNextLease() - skipping lease we've already sent it down - " + lease);
+            }
+        }
+        
+        // randomize the ordering (so leases with equal # of failures per next sort are randomly ordered)
+        Collections.shuffle(leases);
+        
+        // ordered by lease number of failures
+        TreeMap orderedLeases = new TreeMap();
+        for (Iterator iter = leases.iterator(); iter.hasNext(); ) {
+            Lease lease = (Lease)iter.next();
+            long id = lease.getNumFailure();
+            while (orderedLeases.containsKey(new Long(id)))
+                id++;
+            orderedLeases.put(new Long(id), lease);
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("getNextLease() - ranking lease we havent sent it down as " + id);
+        }
+        
+        if (orderedLeases.size() <= 0) {
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("No leases in the ordered set found! all = " + leases.size());
+            return null;
+        } else {
+            return (Lease)orderedLeases.get(orderedLeases.firstKey());
+        }
     }
     
     /**
      * Send the message to the specified tunnel by creating a new garlic message containing
-     * the (already created) payload clove as well as a new delivery status message.  This garlic 
+     * the (already created) payload clove as well as a new delivery status message.  This garlic
      * message is sent out one of our tunnels, destined for the lease (tunnel+router) specified, and the delivery
-     * status message is targetting one of our free inbound tunnels as well.  We use a new 
+     * status message is targetting one of our free inbound tunnels as well.  We use a new
      * reply selector to keep an eye out for that delivery status message's token
      *
      */
     private void send(Lease lease) {
-	// send it as a garlic with a DeliveryStatusMessage clove and a message selector w/ successJob on reply
-	long token = RandomSource.getInstance().nextInt(Integer.MAX_VALUE);
-	PublicKey key = _status.getLeaseSet().getEncryptionKey();
-	SessionKey sessKey = new SessionKey();
-	Set tags = new HashSet();
-	GarlicMessage msg = OutboundClientMessageJobHelper.createGarlicMessage(token, _overallExpiration, key, _status.getClove(), _status.getTo(), sessKey, tags, true);
-	
-	if (_log.shouldLog(Log.DEBUG))
-	    _log.debug("send(lease) - token expected " + token);
-	
-	_status.sent(lease.getRouterIdentity().getHash(), lease.getTunnelId());
-	
-	SendSuccessJob onReply = new SendSuccessJob(lease, sessKey, tags);
-	SendTimeoutJob onFail = new SendTimeoutJob(lease);
-	ReplySelector selector = new ReplySelector(token);
-	
-	if (_log.shouldLog(Log.DEBUG))
-	    _log.debug("Placing GarlicMessage into the new tunnel message bound for " + lease.getTunnelId() + " on " + lease.getRouterIdentity().getHash().toBase64());
-	
-	TunnelId outTunnelId = selectOutboundTunnel();
-	if (outTunnelId != null) {
-	    if (_log.shouldLog(Log.DEBUG))
-		_log.debug("Sending tunnel message out " + outTunnelId + " to " + lease.getTunnelId() + " on " + lease.getRouterIdentity().getHash().toBase64());
-	    SendTunnelMessageJob j = new SendTunnelMessageJob(msg, outTunnelId, lease.getRouterIdentity().getHash(), lease.getTunnelId(), null, onReply, onFail, selector, SEND_TIMEOUT_MS, SEND_PRIORITY);
-	    JobQueue.getInstance().addJob(j);
-	} else {
-	    if (_log.shouldLog(Log.ERROR))
-		_log.error("Could not find any outbound tunnels to send the payload through... wtf?");
-	    JobQueue.getInstance().addJob(onFail);
-	}
+        // send it as a garlic with a DeliveryStatusMessage clove and a message selector w/ successJob on reply
+        long token = _context.random().nextInt(Integer.MAX_VALUE);
+        PublicKey key = _status.getLeaseSet().getEncryptionKey();
+        SessionKey sessKey = new SessionKey();
+        Set tags = new HashSet();
+        GarlicMessage msg = OutboundClientMessageJobHelper.createGarlicMessage(_context, token, _overallExpiration, key, _status.getClove(), _status.getTo(), sessKey, tags, true);
+        
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("send(lease) - token expected " + token);
+        
+        _status.sent(lease.getRouterIdentity().getHash(), lease.getTunnelId());
+        
+        SendSuccessJob onReply = new SendSuccessJob(lease, sessKey, tags);
+        SendTimeoutJob onFail = new SendTimeoutJob(lease);
+        ReplySelector selector = new ReplySelector(token);
+        
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("Placing GarlicMessage into the new tunnel message bound for " + lease.getTunnelId() + " on " + lease.getRouterIdentity().getHash().toBase64());
+        
+        TunnelId outTunnelId = selectOutboundTunnel();
+        if (outTunnelId != null) {
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Sending tunnel message out " + outTunnelId + " to " + lease.getTunnelId() + " on " + lease.getRouterIdentity().getHash().toBase64());
+            SendTunnelMessageJob j = new SendTunnelMessageJob(_context, msg, outTunnelId, lease.getRouterIdentity().getHash(), lease.getTunnelId(), null, onReply, onFail, selector, SEND_TIMEOUT_MS, SEND_PRIORITY);
+            _context.jobQueue().addJob(j);
+        } else {
+            if (_log.shouldLog(Log.ERROR))
+                _log.error("Could not find any outbound tunnels to send the payload through... wtf?");
+            _context.jobQueue().addJob(onFail);
+        }
     }
     
     /**
-     * Pick an arbitrary outbound tunnel to send the message through, or null if 
+     * Pick an arbitrary outbound tunnel to send the message through, or null if
      * there aren't any around
      *
      */
     private TunnelId selectOutboundTunnel() {
-	TunnelSelectionCriteria crit = new TunnelSelectionCriteria();
-	crit.setMaximumTunnelsRequired(1);
-	crit.setMinimumTunnelsRequired(1);
-	List tunnelIds = TunnelManagerFacade.getInstance().selectOutboundTunnelIds(crit);
-	if (tunnelIds.size() <= 0) 
-	    return null;
-	else
-	    return (TunnelId)tunnelIds.get(0);
+        TunnelSelectionCriteria crit = new TunnelSelectionCriteria();
+        crit.setMaximumTunnelsRequired(1);
+        crit.setMinimumTunnelsRequired(1);
+        List tunnelIds = _context.tunnelManager().selectOutboundTunnelIds(crit);
+        if (tunnelIds.size() <= 0)
+            return null;
+        else
+            return (TunnelId)tunnelIds.get(0);
     }
     
-    /** 
+    /**
      * give up the ghost, this message just aint going through.  tell the client to fuck off.
      *
      * this is safe to call multiple times (only tells the client once)
      */
     private void dieFatal() {
-	if (_status.getSuccess()) return;
-	boolean alreadyFailed = _status.failed();
-	long sendTime = Clock.getInstance().now() - _status.getStart();
-	ClientMessage msg = _status.getMessage();
-	if (alreadyFailed) {
-	    if (_log.shouldLog(Log.DEBUG))
-		_log.debug("dieFatal() - already failed sending " + msg.getMessageId()+ ", no need to do it again", new Exception("Duplicate death?"));
-	    return;
-	} else {
-	    if (_log.shouldLog(Log.ERROR))
-		_log.error("Failed to send the message " + msg.getMessageId() + " after " + _status.getNumSent() + " sends and " + _status.getNumLookups() + " lookups (and " + sendTime + "ms)", new Exception("Message send failure"));
-	}
-	
-	MessageHistory.getInstance().sendPayloadMessage(msg.getMessageId().getMessageId(), false, sendTime);
-	ClientManagerFacade.getInstance().messageDeliveryStatusUpdate(msg.getFromDestination(), msg.getMessageId(), false);
-	StatManager.getInstance().updateFrequency("client.sendMessageFailFrequency");
-	StatManager.getInstance().addRateData("client.sendAttemptAverage", _status.getNumSent(), sendTime);
+        if (_status.getSuccess()) return;
+        boolean alreadyFailed = _status.failed();
+        long sendTime = _context.clock().now() - _status.getStart();
+        ClientMessage msg = _status.getMessage();
+        if (alreadyFailed) {
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("dieFatal() - already failed sending " + msg.getMessageId()+ ", no need to do it again", new Exception("Duplicate death?"));
+            return;
+        } else {
+            if (_log.shouldLog(Log.ERROR))
+                _log.error("Failed to send the message " + msg.getMessageId() + " after " + _status.getNumSent() + " sends and " + _status.getNumLookups() + " lookups (and " + sendTime + "ms)", new Exception("Message send failure"));
+        }
+        
+        _context.messageHistory().sendPayloadMessage(msg.getMessageId().getMessageId(), false, sendTime);
+        _context.clientManager().messageDeliveryStatusUpdate(msg.getFromDestination(), msg.getMessageId(), false);
+        _context.statManager().updateFrequency("client.sendMessageFailFrequency");
+        _context.statManager().addRateData("client.sendAttemptAverage", _status.getNumSent(), sendTime);
     }
     
     /** build the payload clove that will be used for all of the messages, placing the clove in the status structure */
     private void buildClove() {
-	PayloadGarlicConfig clove = new PayloadGarlicConfig();
-	
-	DeliveryInstructions instructions = new DeliveryInstructions();
-	instructions.setDeliveryMode(DeliveryInstructions.DELIVERY_MODE_DESTINATION);
-	instructions.setDestination(_status.getTo().calculateHash());
-	
-	instructions.setDelayRequested(false);
-	instructions.setDelaySeconds(0);
-	instructions.setEncrypted(false);
-
-	clove.setCertificate(new Certificate(Certificate.CERTIFICATE_TYPE_NULL, null));
-	clove.setDeliveryInstructions(instructions);
-	clove.setExpiration(_overallExpiration);
-	clove.setId(RandomSource.getInstance().nextInt(Integer.MAX_VALUE));
-	
-	DataMessage msg = new DataMessage();
-	msg.setData(_status.getMessage().getPayload().getEncryptedData());
-	
-	clove.setPayload(msg);
-	clove.setRecipientPublicKey(null);
-	clove.setRequestAck(false);
-	
-	_status.setClove(clove);
-	
-	if (_log.shouldLog(Log.DEBUG))
-	    _log.debug("Built payload clove with id " + clove.getId());
+        PayloadGarlicConfig clove = new PayloadGarlicConfig();
+        
+        DeliveryInstructions instructions = new DeliveryInstructions();
+        instructions.setDeliveryMode(DeliveryInstructions.DELIVERY_MODE_DESTINATION);
+        instructions.setDestination(_status.getTo().calculateHash());
+        
+        instructions.setDelayRequested(false);
+        instructions.setDelaySeconds(0);
+        instructions.setEncrypted(false);
+        
+        clove.setCertificate(new Certificate(Certificate.CERTIFICATE_TYPE_NULL, null));
+        clove.setDeliveryInstructions(instructions);
+        clove.setExpiration(_overallExpiration);
+        clove.setId(_context.random().nextInt(Integer.MAX_VALUE));
+        
+        DataMessage msg = new DataMessage(_context);
+        msg.setData(_status.getMessage().getPayload().getEncryptedData());
+        
+        clove.setPayload(msg);
+        clove.setRecipientPublicKey(null);
+        clove.setRequestAck(false);
+        
+        _status.setClove(clove);
+        
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("Built payload clove with id " + clove.getId());
     }
     
     /**
@@ -363,162 +363,171 @@ public class OutboundClientMessageJob extends JobImpl {
      *
      */
     private class OutboundClientMessageStatus {
-	private ClientMessage _msg;
-	private PayloadGarlicConfig _clove;
-	private LeaseSet _leaseSet;
-	private Set _sent;
-	private int _numLookups;
-	private boolean _success;
-	private boolean _failure;
-	private long _start;
-	private int _previousSent;
-	
-	public OutboundClientMessageStatus(ClientMessage msg) {
-	    _msg = msg;
-	    _clove = null;
-	    _leaseSet = null;
-	    _sent = new HashSet(4);
-	    _success = false;
-	    _failure = false;
-	    _numLookups = 0;
-	    _previousSent = 0;
-	    _start = Clock.getInstance().now();
-	}
-	
-	/** raw payload */
-	public Payload getPayload() { return _msg.getPayload(); }
-	/** clove, if we've built it */
-	public PayloadGarlicConfig getClove() { return _clove; }
-	public void setClove(PayloadGarlicConfig clove) { _clove = clove; }
-	public ClientMessage getMessage() { return _msg; }
-	/** date we started the process on */
-	public long getStart() { return _start; }
-	
-	public int getNumLookups() { return _numLookups; }
-	public void incrementLookups() { _numLookups++; }
-	public void clearAlreadySent() {
-	    synchronized (_sent) {
-		_previousSent += _sent.size();
-		_sent.clear(); 
-	    }
-	}
-	
-	/** who sent the message? */
-	public Destination getFrom() { return _msg.getFromDestination(); }
-	/** who is the message going to? */
-	public Destination getTo() { return _msg.getDestination(); }
-	/** what is the target's current leaseSet (or null if we don't know yet) */
-	public LeaseSet getLeaseSet() { return _leaseSet; }
-	public void setLeaseSet(LeaseSet ls) { _leaseSet = ls; }
-	/** have we already sent the message down this tunnel? */
-	public boolean alreadySent(Hash gateway, TunnelId tunnelId) {
-	    Tunnel t = new Tunnel(gateway, tunnelId);
-	    synchronized (_sent) {
-		return _sent.contains(t);
-	    }
-	}
-	public void sent(Hash gateway, TunnelId tunnelId) { 
-	    Tunnel t = new Tunnel(gateway, tunnelId);
-	    synchronized (_sent) {
-		_sent.add(t);
-	    }
-	}
-	/** how many messages have we sent through various leases? */
-	public int getNumSent() { 
-	    synchronized (_sent) {
-		return _sent.size() + _previousSent;
-	    }
-	}
-	/** did we totally fail? */
-	public boolean getFailure() { return _failure; }
-	/** we failed.  returns true if we had already failed before */
-	public boolean failed() { 
-	    boolean already = _failure;
-	    _failure = true; 
-	    return already;
-	}
-	/** have we totally succeeded? */
-	public boolean getSuccess() { return _success; }
-	/** we succeeded.  returns true if we had already succeeded before */
-	public boolean success() { 
-	    boolean already = _success;
-	    _success = true;
-	    return already;
-	}
-	
-	/** represent a unique tunnel at any given time */
-	private class Tunnel {
-	    private Hash _gateway;
-	    private TunnelId _tunnel;
-
-	    public Tunnel(Hash tunnelGateway, TunnelId tunnel) {
-		_gateway = tunnelGateway;
-		_tunnel = tunnel;
-	    }
-
-	    public Hash getGateway() { return _gateway; }
-	    public TunnelId getTunnel() { return _tunnel; }
-
-	    public int hashCode() {
-		int rv = 0;
-		if (_gateway != null)
-		    rv += _gateway.hashCode();
-		if (_tunnel != null) 
-		    rv += 7*_tunnel.getTunnelId();
-		return rv;
-	    }
-
-	    public boolean equals(Object o) {
-		if (o == null) return false;
-		if (o.getClass() != Tunnel.class) return false;
-		Tunnel t = (Tunnel)o;
-		return (getTunnel() == t.getTunnel()) && 
-		       getGateway().equals(t.getGateway());
-	    }
-	}   
+        private ClientMessage _msg;
+        private PayloadGarlicConfig _clove;
+        private LeaseSet _leaseSet;
+        private Set _sent;
+        private int _numLookups;
+        private boolean _success;
+        private boolean _failure;
+        private long _start;
+        private int _previousSent;
+        
+        public OutboundClientMessageStatus(ClientMessage msg) {
+            _msg = msg;
+            _clove = null;
+            _leaseSet = null;
+            _sent = new HashSet(4);
+            _success = false;
+            _failure = false;
+            _numLookups = 0;
+            _previousSent = 0;
+            _start = _context.clock().now();
+        }
+        
+        /** raw payload */
+        public Payload getPayload() { return _msg.getPayload(); }
+        /** clove, if we've built it */
+        public PayloadGarlicConfig getClove() { return _clove; }
+        public void setClove(PayloadGarlicConfig clove) { _clove = clove; }
+        public ClientMessage getMessage() { return _msg; }
+        /** date we started the process on */
+        public long getStart() { return _start; }
+        
+        public int getNumLookups() { return _numLookups; }
+        public void incrementLookups() { _numLookups++; }
+        public void clearAlreadySent() {
+            synchronized (_sent) {
+                _previousSent += _sent.size();
+                _sent.clear();
+            }
+        }
+        
+        /** who sent the message? */
+        public Destination getFrom() { return _msg.getFromDestination(); }
+        /** who is the message going to? */
+        public Destination getTo() { return _msg.getDestination(); }
+        /** what is the target's current leaseSet (or null if we don't know yet) */
+        public LeaseSet getLeaseSet() { return _leaseSet; }
+        public void setLeaseSet(LeaseSet ls) { _leaseSet = ls; }
+        /** have we already sent the message down this tunnel? */
+        public boolean alreadySent(Hash gateway, TunnelId tunnelId) {
+            Tunnel t = new Tunnel(gateway, tunnelId);
+            synchronized (_sent) {
+                return _sent.contains(t);
+            }
+        }
+        public void sent(Hash gateway, TunnelId tunnelId) {
+            Tunnel t = new Tunnel(gateway, tunnelId);
+            synchronized (_sent) {
+                _sent.add(t);
+            }
+        }
+        /** how many messages have we sent through various leases? */
+        public int getNumSent() {
+            synchronized (_sent) {
+                return _sent.size() + _previousSent;
+            }
+        }
+        /** did we totally fail? */
+        public boolean getFailure() { return _failure; }
+        /** we failed.  returns true if we had already failed before */
+        public boolean failed() {
+            boolean already = _failure;
+            _failure = true;
+            return already;
+        }
+        /** have we totally succeeded? */
+        public boolean getSuccess() { return _success; }
+        /** we succeeded.  returns true if we had already succeeded before */
+        public boolean success() {
+            boolean already = _success;
+            _success = true;
+            return already;
+        }
+        
+        /** represent a unique tunnel at any given time */
+        private class Tunnel {
+            private Hash _gateway;
+            private TunnelId _tunnel;
+            
+            public Tunnel(Hash tunnelGateway, TunnelId tunnel) {
+                _gateway = tunnelGateway;
+                _tunnel = tunnel;
+            }
+            
+            public Hash getGateway() { return _gateway; }
+            public TunnelId getTunnel() { return _tunnel; }
+            
+            public int hashCode() {
+                int rv = 0;
+                if (_gateway != null)
+                    rv += _gateway.hashCode();
+                if (_tunnel != null)
+                    rv += 7*_tunnel.getTunnelId();
+                return rv;
+            }
+            
+            public boolean equals(Object o) {
+                if (o == null) return false;
+                if (o.getClass() != Tunnel.class) return false;
+                Tunnel t = (Tunnel)o;
+                return (getTunnel() == t.getTunnel()) &&
+                getGateway().equals(t.getGateway());
+            }
+        }
     }
-
+    
     /**
      * Keep an eye out for any of the delivery status message tokens that have been
      * sent down the various tunnels to deliver this message
      *
      */
     private class ReplySelector implements MessageSelector {
-	private long _pendingToken;
-	public ReplySelector(long token) {
-	    _pendingToken = token;
-	}
-	
-	public boolean continueMatching() { return false; }
-	public long getExpiration() { return _overallExpiration; }
-	
-	public boolean isMatch(I2NPMessage inMsg) {
-	    if (inMsg.getType() == DeliveryStatusMessage.MESSAGE_TYPE) {
-		return _pendingToken == ((DeliveryStatusMessage)inMsg).getMessageId();
-	    } else {
-		return false;
-	    }
-	}
+        private long _pendingToken;
+        public ReplySelector(long token) {
+            _pendingToken = token;
+        }
+        
+        public boolean continueMatching() { return false; }
+        public long getExpiration() { return _overallExpiration; }
+        
+        public boolean isMatch(I2NPMessage inMsg) {
+            if (inMsg.getType() == DeliveryStatusMessage.MESSAGE_TYPE) {
+                return _pendingToken == ((DeliveryStatusMessage)inMsg).getMessageId();
+            } else {
+                return false;
+            }
+        }
     }
     
     /** queued by the db lookup success and the send timeout to get us to try the next lease */
     private class NextStepJob extends JobImpl {
-	public String getName() { return "Process next step for outbound client message"; }
-	public void runJob() { sendNext(); }
+        public NextStepJob() {
+            super(OutboundClientMessageJob.this._context);
+        }
+        public String getName() { return "Process next step for outbound client message"; }
+        public void runJob() { sendNext(); }
     }
     
     /** we couldn't even find the leaseSet, fuck off */
     private class LookupLeaseSetFailedJob extends JobImpl {
-	public String getName() { return "Lookup for outbound client message failed"; }
-	public void runJob() { dieFatal(); }
+        public LookupLeaseSetFailedJob()  {
+            super(OutboundClientMessageJob.this._context);
+        }
+        public String getName() { return "Lookup for outbound client message failed"; }
+        public void runJob() { dieFatal(); }
     }
     
     /** send a message to a lease */
     private class SendJob extends JobImpl {
-	private Lease _lease;
-	public SendJob(Lease lease) { _lease = lease; }
-	public String getName() { return "Send outbound client message through the lease"; }
-	public void runJob() { send(_lease); }
+        private Lease _lease;
+        public SendJob(Lease lease) { 
+            super(OutboundClientMessageJob.this._context);
+            _lease = lease;
+        }
+        public String getName() { return "Send outbound client message through the lease"; }
+        public void runJob() { send(_lease); }
     }
     
     /**
@@ -527,48 +536,49 @@ public class OutboundClientMessageJob extends JobImpl {
      *
      */
     private class SendSuccessJob extends JobImpl implements ReplyJob {
-	private Lease _lease;
-	private SessionKey _key;
-	private Set _tags;
-	
-	/**
-	 * Create a new success job that will be fired when the message encrypted with
-	 * the given session key and bearing the specified tags are confirmed delivered.
-	 *
-	 */
-	public SendSuccessJob(Lease lease, SessionKey key, Set tags) {
-	    _lease = lease;
-	    _key = key;
-	    _tags = tags;
-	}
-	
-	public String getName() { return "Send client message successful to a lease"; }
-	public void runJob() {
-	    long sendTime = Clock.getInstance().now() - _status.getStart();
-	    boolean alreadySuccessful = _status.success();
-	    MessageId msgId = _status.getMessage().getMessageId();
-	    if (_log.shouldLog(Log.DEBUG))
-		_log.debug("SUCCESS!  Message delivered completely for message " + msgId + " after " + sendTime + "ms [for " +  _status.getMessage().getMessageId() + "]");
-	    
-	    if ( (_key != null) && (_tags != null) && (_tags.size() > 0) ) {
-		SessionKeyManager.getInstance().tagsDelivered(_status.getLeaseSet().getEncryptionKey(), _key, _tags);
-	    }
-	    
-	    if (alreadySuccessful) {
-		if (_log.shouldLog(Log.DEBUG))
-		    _log.debug("Success is a duplicate for " +  _status.getMessage().getMessageId() + ", dont notify again...");
-		return;
-	    }
-	    long dataMsgId = _status.getClove().getId();
-	    MessageHistory.getInstance().sendPayloadMessage(dataMsgId, true, sendTime);
-	    ClientManagerFacade.getInstance().messageDeliveryStatusUpdate(_status.getFrom(), msgId, true);
-	    _lease.setNumSuccess(_lease.getNumSuccess()+1);
-	    
-	    StatManager.getInstance().addRateData("client.sendMessageSize", _status.getMessage().getPayload().getSize(), sendTime);
-	    StatManager.getInstance().addRateData("client.sendAttemptAverage", _status.getNumSent(), sendTime);
-	}
-	
-	public void setMessage(I2NPMessage msg) {}
+        private Lease _lease;
+        private SessionKey _key;
+        private Set _tags;
+        
+        /**
+         * Create a new success job that will be fired when the message encrypted with
+         * the given session key and bearing the specified tags are confirmed delivered.
+         *
+         */
+        public SendSuccessJob(Lease lease, SessionKey key, Set tags) {
+            super(OutboundClientMessageJob.this._context);
+            _lease = lease;
+            _key = key;
+            _tags = tags;
+        }
+        
+        public String getName() { return "Send client message successful to a lease"; }
+        public void runJob() {
+            long sendTime = _context.clock().now() - _status.getStart();
+            boolean alreadySuccessful = _status.success();
+            MessageId msgId = _status.getMessage().getMessageId();
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("SUCCESS!  Message delivered completely for message " + msgId + " after " + sendTime + "ms [for " +  _status.getMessage().getMessageId() + "]");
+            
+            if ( (_key != null) && (_tags != null) && (_tags.size() > 0) ) {
+                SendSuccessJob.this._context.sessionKeyManager().tagsDelivered(_status.getLeaseSet().getEncryptionKey(), _key, _tags);
+            }
+            
+            if (alreadySuccessful) {
+                if (_log.shouldLog(Log.DEBUG))
+                    _log.debug("Success is a duplicate for " +  _status.getMessage().getMessageId() + ", dont notify again...");
+                return;
+            }
+            long dataMsgId = _status.getClove().getId();
+            SendSuccessJob.this._context.messageHistory().sendPayloadMessage(dataMsgId, true, sendTime);
+            SendSuccessJob.this._context.clientManager().messageDeliveryStatusUpdate(_status.getFrom(), msgId, true);
+            _lease.setNumSuccess(_lease.getNumSuccess()+1);
+            
+            SendSuccessJob.this._context.statManager().addRateData("client.sendMessageSize", _status.getMessage().getPayload().getSize(), sendTime);
+            SendSuccessJob.this._context.statManager().addRateData("client.sendAttemptAverage", _status.getNumSent(), sendTime);
+        }
+        
+        public void setMessage(I2NPMessage msg) {}
     }
     
     /**
@@ -577,18 +587,19 @@ public class OutboundClientMessageJob extends JobImpl {
      *
      */
     private class SendTimeoutJob extends JobImpl {
-	private Lease _lease;
-	
-	public SendTimeoutJob(Lease lease) {
-	    _lease = lease;
-	}
-	
-	public String getName() { return "Send client message timed out through a lease"; }
-	public void runJob() {
-	    if (_log.shouldLog(Log.DEBUG))
-		_log.debug("Soft timeout through the lease " + _lease);
-	    _lease.setNumFailure(_lease.getNumFailure()+1);
-	    sendNext();
-	}
+        private Lease _lease;
+        
+        public SendTimeoutJob(Lease lease) {
+            super(OutboundClientMessageJob.this._context);
+            _lease = lease;
+        }
+        
+        public String getName() { return "Send client message timed out through a lease"; }
+        public void runJob() {
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Soft timeout through the lease " + _lease);
+            _lease.setNumFailure(_lease.getNumFailure()+1);
+            sendNext();
+        }
     }
 }

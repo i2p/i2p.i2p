@@ -11,20 +11,12 @@ package net.i2p.router;
 import java.util.HashSet;
 import java.util.Set;
 
-import net.i2p.router.transport.CommSystemFacadeImpl;
-
 /**
  * Manages the communication subsystem between peers, including connections, 
  * listeners, transports, connection keys, etc.
  *
  */ 
 public abstract class CommSystemFacade implements Service {
-    private static CommSystemFacade _instance = new CommSystemFacadeImpl();
-    public static CommSystemFacade getInstance() { return _instance; }
-    
-    // getAddresses
-    // rotateAddress(address)
-    
     public abstract void processMessage(OutNetMessage msg);
     
     public String renderStatusHTML() { return ""; }

@@ -20,6 +20,7 @@ import net.i2p.router.TunnelInfo;
 import net.i2p.stat.StatManager;
 import net.i2p.util.Clock;
 import net.i2p.util.Log;
+import net.i2p.router.RouterContext;
 
 /**
  * Store the data for free inbound, outbound, and client pooled tunnels, and serve
@@ -27,7 +28,8 @@ import net.i2p.util.Log;
  *
  */
 class TunnelPool {
-    private final static Log _log = new Log(TunnelPool.class);
+    private Log _log;
+    private RouterContext _context;
     /** TunnelId --> TunnelInfo of outbound tunnels */
     private Map _outboundTunnels;
     /** TunnelId --> TunnelInfo of free inbound tunnels */
@@ -47,6 +49,7 @@ class TunnelPool {
     private int _targetClients;
     /** active or has it been shutdown? */
     private boolean _isLive;
+    private TunnelBuilder _tunnelBuilder;
     
     /** write out the current state every 60 seconds */
     private final static long WRITE_POOL_DELAY = 60*1000; 
@@ -57,15 +60,17 @@ class TunnelPool {
     
     public final static String TARGET_CLIENTS_PARAM = "router.targetClients";
     public final static int TARGET_CLIENTS_DEFAULT = 3;
-    
-    static {
-        StatManager.getInstance().createFrequencyStat("tunnel.failFrequency", "How often do tunnels prematurely fail (after being successfully built)?", "Tunnels", new long[] { 60*1000l, 60*60*1000l, 24*60*60*1000l });
-        StatManager.getInstance().createRateStat("tunnel.failAfterTime", "How long do tunnels that fail prematurely last before failing?", "Tunnels", new long[] { 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
-    }
 
-    public TunnelPool() {
+    public TunnelPool(RouterContext ctx) {
+        _context = ctx;
+        _log = ctx.logManager().getLog(TunnelPool.class);
+
+        _context.statManager().createFrequencyStat("tunnel.failFrequency", "How often do tunnels prematurely fail (after being successfully built)?", "Tunnels", new long[] { 60*1000l, 60*60*1000l, 24*60*60*1000l });
+        _context.statManager().createRateStat("tunnel.failAfterTime", "How long do tunnels that fail prematurely last before failing?", "Tunnels", new long[] { 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
+
         _isLive = true;
-        _persistenceHelper = new TunnelPoolPersistenceHelper();
+        _persistenceHelper = new TunnelPoolPersistenceHelper(_context);
+        _tunnelBuilder = new TunnelBuilder(_context);
     }
     
     /**
@@ -191,7 +196,7 @@ class TunnelPool {
     public void addOutboundTunnel(TunnelInfo tunnel) {
         if (!_isLive) return;
         if (_log.shouldLog(Log.DEBUG)) _log.debug("Add outbound tunnel " + tunnel.getTunnelId());
-        MessageHistory.getInstance().tunnelJoined("outbound", tunnel);
+        _context.messageHistory().tunnelJoined("outbound", tunnel);
         synchronized (_outboundTunnels) {
             _outboundTunnels.put(tunnel.getTunnelId(), tunnel);
         }
@@ -236,7 +241,7 @@ class TunnelPool {
     public void addFreeTunnel(TunnelInfo tunnel) {
         if (!_isLive) return;
         if (_log.shouldLog(Log.DEBUG)) _log.debug("Add free inbound tunnel " + tunnel.getTunnelId());
-        MessageHistory.getInstance().tunnelJoined("free inbound", tunnel);
+        _context.messageHistory().tunnelJoined("free inbound", tunnel);
         synchronized (_freeInboundTunnels) {
             _freeInboundTunnels.put(tunnel.getTunnelId(), tunnel);
         }
@@ -287,7 +292,7 @@ class TunnelPool {
     public boolean addParticipatingTunnel(TunnelInfo tunnel) {
         if (!_isLive) return false;
         if (_log.shouldLog(Log.DEBUG)) _log.debug("Add participating tunnel " + tunnel.getTunnelId());
-        MessageHistory.getInstance().tunnelJoined("participant", tunnel);
+        _context.messageHistory().tunnelJoined("participant", tunnel);
         synchronized (_participatingTunnels) {
             if (_participatingTunnels.containsKey(tunnel.getTunnelId())) {
                 return false;
@@ -331,7 +336,7 @@ class TunnelPool {
                 if (_log.shouldLog(Log.INFO))
                     _log.info("Reusing an existing client tunnel pool for " + dest.calculateHash());
             } else {
-                pool = new ClientTunnelPool(dest, settings, this);
+                pool = new ClientTunnelPool(_context, dest, settings, this);
                 if (_log.shouldLog(Log.INFO))
                     _log.info("New client tunnel pool created for " + dest.calculateHash());
                 _clientPools.put(dest, pool);
@@ -384,7 +389,7 @@ class TunnelPool {
     }    
     public void addPendingTunnel(TunnelInfo info) {
         if (!_isLive) return;
-        MessageHistory.getInstance().tunnelJoined("pending", info);
+        _context.messageHistory().tunnelJoined("pending", info);
         synchronized (_pendingTunnels) {
             _pendingTunnels.put(info.getTunnelId(), info);
         }
@@ -433,15 +438,15 @@ class TunnelPool {
         if (getFreeValidTunnelCount() < 3) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Running low on valid inbound tunnels, building another");
-            TunnelInfo inTunnelGateway = TunnelBuilder.getInstance().configureInboundTunnel(null, getPoolSettings(), true);
-            RequestTunnelJob inReqJob = new RequestTunnelJob(this, inTunnelGateway, true, getTunnelCreationTimeout());
+            TunnelInfo inTunnelGateway = _tunnelBuilder.configureInboundTunnel(null, getPoolSettings(), true);
+            RequestTunnelJob inReqJob = new RequestTunnelJob(_context, this, inTunnelGateway, true, getTunnelCreationTimeout());
             inReqJob.runJob();
         }
         if (getOutboundValidTunnelCount() < 3) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Running low on valid outbound tunnels, building another");
-            TunnelInfo outTunnelGateway = TunnelBuilder.getInstance().configureOutboundTunnel(getPoolSettings(), true);
-            RequestTunnelJob outReqJob = new RequestTunnelJob(this, outTunnelGateway, false, getTunnelCreationTimeout());
+            TunnelInfo outTunnelGateway = _tunnelBuilder.configureOutboundTunnel(getPoolSettings(), true);
+            RequestTunnelJob outReqJob = new RequestTunnelJob(_context, this, outTunnelGateway, false, getTunnelCreationTimeout());
             outReqJob.runJob();
         }
     }
@@ -449,7 +454,7 @@ class TunnelPool {
     private int getFreeValidTunnelCount() {
         int found = 0;
         Set ids = getFreeTunnels();
-        long mustExpireAfter = Clock.getInstance().now();
+        long mustExpireAfter = _context.clock().now();
 
         for (Iterator iter = ids.iterator(); iter.hasNext(); ) {
             TunnelId id = (TunnelId)iter.next();
@@ -468,7 +473,7 @@ class TunnelPool {
     private int getOutboundValidTunnelCount() {
         int found = 0;
         Set ids = getOutboundTunnels();
-        long mustExpireAfter = Clock.getInstance().now();
+        long mustExpireAfter = _context.clock().now();
 
         for (Iterator iter = ids.iterator(); iter.hasNext(); ) {
             TunnelId id = (TunnelId)iter.next();
@@ -489,18 +494,18 @@ class TunnelPool {
         TunnelInfo info = getTunnelInfo(id);
         if (info == null)
             return;
-        MessageHistory.getInstance().tunnelFailed(info.getTunnelId());
+        _context.messageHistory().tunnelFailed(info.getTunnelId());
         info.setIsReady(false);
-        Hash us = Router.getInstance().getRouterInfo().getIdentity().getHash();
-        long lifetime = Clock.getInstance().now() - info.getCreated();
+        Hash us = _context.routerHash();
+        long lifetime = _context.clock().now() - info.getCreated();
         while (info != null) {
             if (!info.getThisHop().equals(us)) {
-                ProfileManager.getInstance().tunnelFailed(info.getThisHop());
+                _context.profileManager().tunnelFailed(info.getThisHop());
             }
             info = info.getNextHopInfo();
         }
-        StatManager.getInstance().addRateData("tunnel.failAfterTime", lifetime, lifetime);
-        StatManager.getInstance().updateFrequency("tunnel.failFrequency");
+        _context.statManager().addRateData("tunnel.failAfterTime", lifetime, lifetime);
+        _context.statManager().updateFrequency("tunnel.failFrequency");
         buildFakeTunnels();
     }
     
@@ -516,22 +521,22 @@ class TunnelPool {
         _persistenceHelper.loadPool(this);
         _tunnelCreationTimeout = -1;
         try {
-            String str = Router.getInstance().getConfigSetting(TUNNEL_CREATION_TIMEOUT_PARAM);
+            String str = _context.router().getConfigSetting(TUNNEL_CREATION_TIMEOUT_PARAM);
             _tunnelCreationTimeout = Long.parseLong(str);
         } catch (Throwable t) {
             _tunnelCreationTimeout = TUNNEL_CREATION_TIMEOUT_DEFAULT;
         }
         _targetClients = TARGET_CLIENTS_DEFAULT;
         try {
-            String str = Router.getInstance().getConfigSetting(TARGET_CLIENTS_PARAM);
+            String str = _context.router().getConfigSetting(TARGET_CLIENTS_PARAM);
             _targetClients = Integer.parseInt(str);
         } catch (Throwable t) {
             _targetClients = TARGET_CLIENTS_DEFAULT;
         }
         buildFakeTunnels();
-        JobQueue.getInstance().addJob(new WritePoolJob());
-        JobQueue.getInstance().addJob(new TunnelPoolManagerJob(this));
-        JobQueue.getInstance().addJob(new TunnelPoolExpirationJob(this));
+        _context.jobQueue().addJob(new WritePoolJob());
+        _context.jobQueue().addJob(new TunnelPoolManagerJob(_context, this));
+        _context.jobQueue().addJob(new TunnelPoolExpirationJob(_context, this));
     }
     
     public void shutdown() {
@@ -551,7 +556,7 @@ class TunnelPool {
     
     private ClientTunnelSettings createPoolSettings() {
         ClientTunnelSettings settings = new ClientTunnelSettings();
-        settings.readFromProperties(Router.getInstance().getConfigMap());
+        settings.readFromProperties(_context.router().getConfigMap());
         return settings;
     }
  
@@ -641,7 +646,8 @@ class TunnelPool {
      */
     private class WritePoolJob extends JobImpl {
         public WritePoolJob() {
-            getTiming().setStartAfter(Clock.getInstance().now() + WRITE_POOL_DELAY);
+            super(TunnelPool.this._context);
+            getTiming().setStartAfter(TunnelPool.this._context.clock().now() + WRITE_POOL_DELAY);
         }
         public String getName() { return "Write Out Tunnel Pool"; }
         public void runJob() {

@@ -17,6 +17,7 @@ import net.i2p.data.Hash;
 import net.i2p.data.PrivateKey;
 import net.i2p.data.PublicKey;
 import net.i2p.util.Log;
+import net.i2p.I2PAppContext;
 
 /** 
  * Fake ElG E and D, useful for when performance isn't being tested
@@ -26,11 +27,19 @@ import net.i2p.util.Log;
 public class DummyElGamalEngine extends ElGamalEngine {
     private final static Log _log = new Log(DummyElGamalEngine.class);
 
-    public DummyElGamalEngine() {
+    /** 
+     * The ElGamal engine should only be constructed and accessed through the 
+     * application context.  This constructor should only be used by the 
+     * appropriate application context itself.
+     *
+     */
+    public DummyElGamalEngine(I2PAppContext context) {
+        super(context);
         _log.log(Log.CRIT, "Dummy ElGamal engine in use!  NO DATA SECURITY.  Danger Will Robinson, Danger!",
                  new Exception("I really hope you know what you're doing"));
     }
-
+    private DummyElGamalEngine() { super(null); }
+    
     /** encrypt the data to the public key
      * @return encrypted data
      * @param publicKey public key encrypt to

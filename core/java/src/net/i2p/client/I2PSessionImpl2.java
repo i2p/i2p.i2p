@@ -26,6 +26,7 @@ import net.i2p.data.i2cp.MessageStatusMessage;
 import net.i2p.util.Clock;
 import net.i2p.util.Log;
 import net.i2p.util.RandomSource;
+import net.i2p.I2PAppContext;
 
 /**
  * Thread safe implementation of an I2P session running over TCP.  
@@ -33,7 +34,7 @@ import net.i2p.util.RandomSource;
  * @author jrandom
  */
 class I2PSessionImpl2 extends I2PSessionImpl {
-    private final static Log _log = new Log(I2PSessionImpl2.class);
+    private Log _log;
 
     /** set of MessageState objects, representing all of the messages in the process of being sent */
     private Set _sendingStates;
@@ -48,8 +49,9 @@ class I2PSessionImpl2 extends I2PSessionImpl {
      *
      * @throws I2PSessionException if there is a problem loading the private keys or 
      */
-    public I2PSessionImpl2(InputStream destKeyStream, Properties options) throws I2PSessionException {
-        super(destKeyStream, options);
+    public I2PSessionImpl2(I2PAppContext ctx, InputStream destKeyStream, Properties options) throws I2PSessionException {
+        super(ctx, destKeyStream, options);
+        _log = ctx.logManager().getLog(I2PSessionImpl2.class);
         _sendingStates = new HashSet(32);
     }
 
@@ -95,22 +97,22 @@ class I2PSessionImpl2 extends I2PSessionImpl {
 
     private boolean sendBestEffort(Destination dest, byte payload[], SessionKey keyUsed, Set tagsSent)
                     throws I2PSessionException {
-        SessionKey key = SessionKeyManager.getInstance().getCurrentKey(dest.getPublicKey());
-        if (key == null) key = SessionKeyManager.getInstance().createSession(dest.getPublicKey());
-        SessionTag tag = SessionKeyManager.getInstance().consumeNextAvailableTag(dest.getPublicKey(), key);
+        SessionKey key = _context.sessionKeyManager().getCurrentKey(dest.getPublicKey());
+        if (key == null) key = _context.sessionKeyManager().createSession(dest.getPublicKey());
+        SessionTag tag = _context.sessionKeyManager().consumeNextAvailableTag(dest.getPublicKey(), key);
         Set sentTags = null;
-        if (SessionKeyManager.getInstance().getAvailableTags(dest.getPublicKey(), key) < 10) {
+        if (_context.sessionKeyManager().getAvailableTags(dest.getPublicKey(), key) < 10) {
             sentTags = createNewTags(50);
-        } else if (SessionKeyManager.getInstance().getAvailableTimeLeft(dest.getPublicKey(), key) < 30 * 1000) {
+        } else if (_context.sessionKeyManager().getAvailableTimeLeft(dest.getPublicKey(), key) < 30 * 1000) {
             // if we have > 10 tags, but they expire in under 30 seconds, we want more
             sentTags = createNewTags(50);
             if (_log.shouldLog(Log.DEBUG)) _log.debug("Tags are almost expired, adding 50 new ones");
         }
         SessionKey newKey = null;
         if (false) // rekey
-                  newKey = KeyGenerator.getInstance().generateSessionKey();
+            newKey = _context.keyGenerator().generateSessionKey();
 
-        long nonce = (long) RandomSource.getInstance().nextInt(Integer.MAX_VALUE);
+        long nonce = (long)_context.random().nextInt(Integer.MAX_VALUE);
         MessageState state = new MessageState(nonce);
         state.setKey(key);
         state.setTags(sentTags);
@@ -137,7 +139,8 @@ class I2PSessionImpl2 extends I2PSessionImpl {
             _log.debug("Adding sending state " + state.getMessageId() + " / "
                        + state.getNonce());
         _producer.sendMessage(this, dest, nonce, payload, tag, key, sentTags, newKey);
-        state.waitFor(MessageStatusMessage.STATUS_SEND_ACCEPTED, Clock.getInstance().now() + getTimeout());
+        state.waitFor(MessageStatusMessage.STATUS_SEND_ACCEPTED, 
+                      _context.clock().now() + getTimeout());
         synchronized (_sendingStates) {
             _sendingStates.remove(state);
         }
@@ -163,22 +166,22 @@ class I2PSessionImpl2 extends I2PSessionImpl {
 
     private boolean sendGuaranteed(Destination dest, byte payload[], SessionKey keyUsed, Set tagsSent)
                     throws I2PSessionException {
-        SessionKey key = SessionKeyManager.getInstance().getCurrentKey(dest.getPublicKey());
-        if (key == null) key = SessionKeyManager.getInstance().createSession(dest.getPublicKey());
-        SessionTag tag = SessionKeyManager.getInstance().consumeNextAvailableTag(dest.getPublicKey(), key);
+        SessionKey key = _context.sessionKeyManager().getCurrentKey(dest.getPublicKey());
+        if (key == null) key = _context.sessionKeyManager().createSession(dest.getPublicKey());
+        SessionTag tag = _context.sessionKeyManager().consumeNextAvailableTag(dest.getPublicKey(), key);
         Set sentTags = null;
-        if (SessionKeyManager.getInstance().getAvailableTags(dest.getPublicKey(), key) < 10) {
+        if (_context.sessionKeyManager().getAvailableTags(dest.getPublicKey(), key) < 10) {
             sentTags = createNewTags(50);
-        } else if (SessionKeyManager.getInstance().getAvailableTimeLeft(dest.getPublicKey(), key) < 30 * 1000) {
+        } else if (_context.sessionKeyManager().getAvailableTimeLeft(dest.getPublicKey(), key) < 30 * 1000) {
             // if we have > 10 tags, but they expire in under 30 seconds, we want more
             sentTags = createNewTags(50);
             if (_log.shouldLog(Log.DEBUG)) _log.debug("Tags are almost expired, adding 50 new ones");
         }
         SessionKey newKey = null;
         if (false) // rekey
-                  newKey = KeyGenerator.getInstance().generateSessionKey();
+            newKey = _context.keyGenerator().generateSessionKey();
 
-        long nonce = (long) RandomSource.getInstance().nextInt(Integer.MAX_VALUE);
+        long nonce = (long)_context.random().nextInt(Integer.MAX_VALUE);
         MessageState state = new MessageState(nonce);
         state.setKey(key);
         state.setTags(sentTags);
@@ -206,9 +209,11 @@ class I2PSessionImpl2 extends I2PSessionImpl {
                        + state.getNonce());
         _producer.sendMessage(this, dest, nonce, payload, tag, key, sentTags, newKey);
         if (isGuaranteed())
-            state.waitFor(MessageStatusMessage.STATUS_SEND_GUARANTEED_SUCCESS, Clock.getInstance().now() + SEND_TIMEOUT);
+            state.waitFor(MessageStatusMessage.STATUS_SEND_GUARANTEED_SUCCESS, 
+                          _context.clock().now() + SEND_TIMEOUT);
         else
-            state.waitFor(MessageStatusMessage.STATUS_SEND_ACCEPTED, Clock.getInstance().now() + SEND_TIMEOUT);
+            state.waitFor(MessageStatusMessage.STATUS_SEND_ACCEPTED, 
+                          _context.clock().now() + SEND_TIMEOUT);
         synchronized (_sendingStates) {
             _sendingStates.remove(state);
         }
@@ -250,9 +255,9 @@ class I2PSessionImpl2 extends I2PSessionImpl {
                        + state.getTags());
         if ((state.getTags() != null) && (state.getTags().size() > 0)) {
             if (state.getNewKey() == null)
-                SessionKeyManager.getInstance().tagsDelivered(state.getTo().getPublicKey(), state.getKey(), state.getTags());
+                _context.sessionKeyManager().tagsDelivered(state.getTo().getPublicKey(), state.getKey(), state.getTags());
             else
-                SessionKeyManager.getInstance().tagsDelivered(state.getTo().getPublicKey(), state.getNewKey(), state.getTags());
+                _context.sessionKeyManager().tagsDelivered(state.getTo().getPublicKey(), state.getNewKey(), state.getTags());
         }
     }
 
@@ -260,7 +265,7 @@ class I2PSessionImpl2 extends I2PSessionImpl {
         if (_log.shouldLog(Log.INFO))
             _log.info("nack tags for msgId " + state.getMessageId() + " / " + state.getNonce()
                       + " key = " + state.getKey());
-        SessionKeyManager.getInstance().failTags(state.getTo().getPublicKey());
+        _context.sessionKeyManager().failTags(state.getTo().getPublicKey());
     }
 
     public void receiveStatus(int msgId, long nonce, int status) {

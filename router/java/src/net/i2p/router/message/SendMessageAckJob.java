@@ -1,9 +1,9 @@
 package net.i2p.router.message;
 /*
  * free (adj.): unencumbered; not under the control of others
- * Written by jrandom in 2003 and released into the public domain 
- * with no warranty of any kind, either expressed or implied.  
- * It probably won't make your computer catch on fire, or eat 
+ * Written by jrandom in 2003 and released into the public domain
+ * with no warranty of any kind, either expressed or implied.
+ * It probably won't make your computer catch on fire, or eat
  * your children, but it might.  Use at your own risk.
  *
  */
@@ -16,6 +16,7 @@ import net.i2p.data.i2np.SourceRouteBlock;
 import net.i2p.router.JobImpl;
 import net.i2p.router.JobQueue;
 import net.i2p.util.Clock;
+import net.i2p.router.RouterContext;
 
 /**
  * Send a DeliveryStatusMessage to the location specified in the source route block
@@ -30,29 +31,29 @@ public class SendMessageAckJob extends JobImpl {
     
     public final static int ACK_PRIORITY = 100;
     
-    public SendMessageAckJob(SourceRouteBlock block, long ackId) {
-	super();
-	_block = block;
-	_ackId = ackId;
+    public SendMessageAckJob(RouterContext ctx, SourceRouteBlock block, long ackId) {
+        super(ctx);
+        _block = block;
+        _ackId = ackId;
     }
     
     public void runJob() {
-	JobQueue.getInstance().addJob(new SendReplyMessageJob(_block, createAckMessage(), ACK_PRIORITY));
+        _context.jobQueue().addJob(new SendReplyMessageJob(_context, _block, createAckMessage(), ACK_PRIORITY));
     }
     
     /**
-     * Create whatever should be delivered to the intermediary hop so that 
-     * a DeliveryStatusMessage gets to the intended recipient.  
+     * Create whatever should be delivered to the intermediary hop so that
+     * a DeliveryStatusMessage gets to the intended recipient.
      *
      * Currently this doesn't garlic encrypt the DeliveryStatusMessage with
      * the block's tag and sessionKey, but it could.
      *
      */
     protected I2NPMessage createAckMessage() {
-	DeliveryStatusMessage statusMessage = new DeliveryStatusMessage();
-	statusMessage.setArrival(new Date(Clock.getInstance().now()));
-	statusMessage.setMessageId(_ackId);
-	return statusMessage;
+        DeliveryStatusMessage statusMessage = new DeliveryStatusMessage(_context);
+        statusMessage.setArrival(new Date(_context.clock().now()));
+        statusMessage.setMessageId(_ackId);
+        return statusMessage;
     }
     
     public String getName() { return "Send Message Ack"; }

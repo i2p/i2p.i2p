@@ -25,9 +25,8 @@ import net.i2p.util.Log;
  *
  */
 public class StatisticsManager implements Service {
-    private final static Log _log = new Log(StatisticsManager.class);
-    private static StatisticsManager _instance = new StatisticsManager();
-    public static StatisticsManager getInstance() { return _instance; }
+    private Log _log;
+    private RouterContext _context;
     private boolean _includePeerRankings;
     private int _publishedStats;
     
@@ -36,13 +35,15 @@ public class StatisticsManager implements Service {
     public final static String PROP_MAX_PUBLISHED_PEERS = "router.publishPeerMax";
     public final static int DEFAULT_MAX_PUBLISHED_PEERS = 20;
     
-    public StatisticsManager() {
+    public StatisticsManager(RouterContext context) {
+        _context = context;
+        _log = context.logManager().getLog(StatisticsManager.class);
         _includePeerRankings = false;
     }
         
     public void shutdown() {}
     public void startup() {
-        String val = Router.getInstance().getConfigSetting(PROP_PUBLISH_RANKINGS);
+        String val = _context.router().getConfigSetting(PROP_PUBLISH_RANKINGS);
         try {
             if (val == null) {
                 if (_log.shouldLog(Log.INFO))
@@ -65,7 +66,7 @@ public class StatisticsManager implements Service {
                            + "], so we're defaulting to FALSE"); 
             _includePeerRankings = false;
         }
-        val = Router.getInstance().getConfigSetting(PROP_MAX_PUBLISHED_PEERS);
+        val = _context.router().getConfigSetting(PROP_MAX_PUBLISHED_PEERS);
         if (val == null) {
             _publishedStats = DEFAULT_MAX_PUBLISHED_PEERS;
         } else {
@@ -90,7 +91,7 @@ public class StatisticsManager implements Service {
         stats.setProperty("core.id", CoreVersion.ID);
 	
         if (_includePeerRankings) {
-            stats.putAll(ProfileManager.getInstance().summarizePeers(_publishedStats));
+            stats.putAll(_context.profileManager().summarizePeers(_publishedStats));
 
             includeRate("transport.sendProcessingTime", stats, new long[] { 60*1000, 60*60*1000 });
             //includeRate("tcp.queueSize", stats);
@@ -110,7 +111,7 @@ public class StatisticsManager implements Service {
             includeRate("netDb.successPeers", stats, new long[] { 60*60*1000 });
             includeRate("transport.receiveMessageSize", stats, new long[] { 5*60*1000, 60*60*1000 });
             includeRate("transport.sendMessageSize", stats, new long[] { 5*60*1000, 60*60*1000 });
-            stats.setProperty("stat_uptime", DataHelper.formatDuration(Router.getInstance().getUptime()));
+            stats.setProperty("stat_uptime", DataHelper.formatDuration(_context.router().getUptime()));
             stats.setProperty("stat__rateKey", "avg;maxAvg;pctLifetime;[sat;satLim;maxSat;maxSatLim;][num;lifetimeFreq;maxFreq]");
             _log.debug("Publishing peer rankings");
         } else {
@@ -126,7 +127,7 @@ public class StatisticsManager implements Service {
         includeRate(rateName, stats, null);
     }
     private void includeRate(String rateName, Properties stats, long selectedPeriods[]) {
-        RateStat rate = StatManager.getInstance().getRate(rateName);
+        RateStat rate = _context.statManager().getRate(rateName);
         if (rate == null) return;
         long periods[] = rate.getPeriods();
         for (int i = 0; i < periods.length; i++) {

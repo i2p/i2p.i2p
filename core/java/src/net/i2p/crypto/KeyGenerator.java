@@ -22,18 +22,24 @@ import net.i2p.util.Clock;
 import net.i2p.util.Log;
 import net.i2p.util.NativeBigInteger;
 import net.i2p.util.RandomSource;
+import net.i2p.I2PAppContext;
 
 /** Define a way of generating asymetrical key pairs as well as symetrical keys
  * @author jrandom
  */
 public class KeyGenerator {
-    private final static Log _log = new Log(KeyGenerator.class);
-    private static final RandomSource _random = RandomSource.getInstance();
-    private static KeyGenerator _generator = new KeyGenerator();
+    private Log _log;
+    private I2PAppContext _context;
 
-    public static KeyGenerator getInstance() {
-        return _generator;
+    public KeyGenerator(I2PAppContext context) {
+        _log = context.logManager().getLog(KeyGenerator.class);
+        _context = context;
     }
+    public static KeyGenerator getInstance() {
+        return I2PAppContext.getGlobalContext().keyGenerator();
+    }
+    
+
 
     /** Generate a private 256 bit session key
      * @return session key
@@ -42,7 +48,7 @@ public class KeyGenerator {
         // 256bit random # as a session key
         SessionKey key = new SessionKey();
         byte data[] = new byte[SessionKey.KEYSIZE_BYTES];
-        _random.nextBytes(data);
+        _context.random().nextBytes(data);
         key.setData(data);
         return key;
     }
@@ -52,7 +58,7 @@ public class KeyGenerator {
      * @return pair of keys
      */
     public Object[] generatePKIKeypair() {
-        BigInteger a = new NativeBigInteger(2048, _random);
+        BigInteger a = new NativeBigInteger(2048, _context.random());
         BigInteger aalpha = CryptoConstants.elgg.modPow(a, CryptoConstants.elgp);
 
         Object[] keys = new Object[2];
@@ -80,7 +86,7 @@ public class KeyGenerator {
 
         // make sure the random key is less than the DSA q
         do {
-            x = new NativeBigInteger(160, _random);
+            x = new NativeBigInteger(160, _context.random());
         } while (x.compareTo(CryptoConstants.dsaq) >= 0);
 
         BigInteger y = CryptoConstants.dsag.modPow(x, CryptoConstants.dsap);
@@ -118,13 +124,14 @@ public class KeyGenerator {
         byte src[] = new byte[200];
         RandomSource.getInstance().nextBytes(src);
 
+        I2PAppContext ctx = new I2PAppContext();
         long time = 0;
         for (int i = 0; i < 10; i++) {
             long start = Clock.getInstance().now();
             Object keys[] = KeyGenerator.getInstance().generatePKIKeypair();
             long end = Clock.getInstance().now();
-            byte ctext[] = ElGamalEngine.getInstance().encrypt(src, (PublicKey) keys[0]);
-            byte ptext[] = ElGamalEngine.getInstance().decrypt(ctext, (PrivateKey) keys[1]);
+            byte ctext[] = ctx.elGamalEngine().encrypt(src, (PublicKey) keys[0]);
+            byte ptext[] = ctx.elGamalEngine().decrypt(ctext, (PrivateKey) keys[1]);
             time += end - start;
             if (DataHelper.eq(ptext, src))
                 log.debug("D(E(data)) == data");

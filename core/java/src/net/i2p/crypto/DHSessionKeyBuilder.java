@@ -20,6 +20,7 @@ import net.i2p.util.I2PThread;
 import net.i2p.util.Log;
 import net.i2p.util.NativeBigInteger;
 import net.i2p.util.RandomSource;
+import net.i2p.I2PAppContext;
 
 /**
  * Generate a new session key through a diffie hellman exchange.  This uses the
@@ -62,22 +63,23 @@ public class DHSessionKeyBuilder {
     public final static String DEFAULT_DH_PRECALC_DELAY = "1000";
 
     static {
+        I2PAppContext ctx = I2PAppContext.getGlobalContext();
         try {
-            int val = Integer.parseInt(System.getProperty(PROP_DH_PRECALC_MIN, DEFAULT_DH_PRECALC_MIN));
+            int val = Integer.parseInt(ctx.getProperty(PROP_DH_PRECALC_MIN, DEFAULT_DH_PRECALC_MIN));
             MIN_NUM_BUILDERS = val;
         } catch (Throwable t) {
             int val = Integer.parseInt(DEFAULT_DH_PRECALC_MIN);
             MIN_NUM_BUILDERS = val;
         }
         try {
-            int val = Integer.parseInt(System.getProperty(PROP_DH_PRECALC_MAX, DEFAULT_DH_PRECALC_MAX));
+            int val = Integer.parseInt(ctx.getProperty(PROP_DH_PRECALC_MAX, DEFAULT_DH_PRECALC_MAX));
             MAX_NUM_BUILDERS = val;
         } catch (Throwable t) {
             int val = Integer.parseInt(DEFAULT_DH_PRECALC_MAX);
             MAX_NUM_BUILDERS = val;
         }
         try {
-            int val = Integer.parseInt(System.getProperty(PROP_DH_PRECALC_DELAY, DEFAULT_DH_PRECALC_DELAY));
+            int val = Integer.parseInt(ctx.getProperty(PROP_DH_PRECALC_DELAY, DEFAULT_DH_PRECALC_DELAY));
             CALC_DELAY = val;
         } catch (Throwable t) {
             int val = Integer.parseInt(DEFAULT_DH_PRECALC_DELAY);
@@ -266,6 +268,7 @@ public class DHSessionKeyBuilder {
             Thread.sleep(20 * 1000);
         } catch (InterruptedException ie) {
         }
+        I2PAppContext ctx = new I2PAppContext();
         _log.debug("\n\n\n\nBegin test\n");
         long negTime = 0;
         for (int i = 0; i < 5; i++) {
@@ -289,8 +292,8 @@ public class DHSessionKeyBuilder {
             byte iv[] = new byte[16];
             RandomSource.getInstance().nextBytes(iv);
             String origVal = "1234567890123456"; // 16 bytes max using AESEngine
-            byte enc[] = AESEngine.getInstance().encrypt(origVal.getBytes(), key1, iv);
-            byte dec[] = AESEngine.getInstance().decrypt(enc, key2, iv);
+            byte enc[] = ctx.AESEngine().encrypt(origVal.getBytes(), key1, iv);
+            byte dec[] = ctx.AESEngine().decrypt(enc, key2, iv);
             String tranVal = new String(dec);
             if (origVal.equals(tranVal))
                 _log.debug("**Success: D(E(val)) == val");

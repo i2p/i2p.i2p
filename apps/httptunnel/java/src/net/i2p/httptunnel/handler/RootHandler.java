@@ -29,7 +29,7 @@ public class RootHandler {
     private static RootHandler instance;
 
     /**
-     * Singleton stuff . . .
+     * Singleton stuff
      * @return the one and only instance, yay!
      */
     public static synchronized RootHandler getInstance() {

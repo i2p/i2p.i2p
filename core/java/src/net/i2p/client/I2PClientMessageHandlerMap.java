@@ -19,6 +19,7 @@ import net.i2p.data.i2cp.RequestLeaseSetMessage;
 import net.i2p.data.i2cp.SessionStatusMessage;
 import net.i2p.data.i2cp.SetDateMessage;
 import net.i2p.util.Log;
+import net.i2p.I2PAppContext;
 
 /**
  * Contains a map of message handlers that a session will want to use
@@ -28,19 +29,19 @@ import net.i2p.util.Log;
 class I2PClientMessageHandlerMap {
     private final static Log _log = new Log(I2PClientMessageHandlerMap.class);
     /** map of message type id --> I2CPMessageHandler */
-    private static Map _handlers;
+    private Map _handlers;
 
-    static {
+    public I2PClientMessageHandlerMap(I2PAppContext context) {
         _handlers = new HashMap();
-        _handlers.put(new Integer(DisconnectMessage.MESSAGE_TYPE), new DisconnectMessageHandler());
-        _handlers.put(new Integer(SessionStatusMessage.MESSAGE_TYPE), new SessionStatusMessageHandler());
-        _handlers.put(new Integer(RequestLeaseSetMessage.MESSAGE_TYPE), new RequestLeaseSetMessageHandler());
-        _handlers.put(new Integer(MessagePayloadMessage.MESSAGE_TYPE), new MessagePayloadMessageHandler());
-        _handlers.put(new Integer(MessageStatusMessage.MESSAGE_TYPE), new MessageStatusMessageHandler());
-        _handlers.put(new Integer(SetDateMessage.MESSAGE_TYPE), new SetDateMessageHandler());
+        _handlers.put(new Integer(DisconnectMessage.MESSAGE_TYPE), new DisconnectMessageHandler(context));
+        _handlers.put(new Integer(SessionStatusMessage.MESSAGE_TYPE), new SessionStatusMessageHandler(context));
+        _handlers.put(new Integer(RequestLeaseSetMessage.MESSAGE_TYPE), new RequestLeaseSetMessageHandler(context));
+        _handlers.put(new Integer(MessagePayloadMessage.MESSAGE_TYPE), new MessagePayloadMessageHandler(context));
+        _handlers.put(new Integer(MessageStatusMessage.MESSAGE_TYPE), new MessageStatusMessageHandler(context));
+        _handlers.put(new Integer(SetDateMessage.MESSAGE_TYPE), new SetDateMessageHandler(context));
     }
 
-    public static I2CPMessageHandler getHandler(int messageTypeId) {
+    public I2CPMessageHandler getHandler(int messageTypeId) {
         I2CPMessageHandler handler = (I2CPMessageHandler) _handlers.get(new Integer(messageTypeId));
         return handler;
     }

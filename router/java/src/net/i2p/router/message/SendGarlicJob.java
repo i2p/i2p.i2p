@@ -1,9 +1,9 @@
 package net.i2p.router.message;
 /*
  * free (adj.): unencumbered; not under the control of others
- * Written by jrandom in 2003 and released into the public domain 
- * with no warranty of any kind, either expressed or implied.  
- * It probably won't make your computer catch on fire, or eat 
+ * Written by jrandom in 2003 and released into the public domain
+ * with no warranty of any kind, either expressed or implied.
+ * It probably won't make your computer catch on fire, or eat
  * your children, but it might.  Use at your own risk.
  *
  */
@@ -23,13 +23,14 @@ import net.i2p.router.ReplyJob;
 import net.i2p.router.Router;
 import net.i2p.util.Clock;
 import net.i2p.util.Log;
+import net.i2p.router.RouterContext;
 
 /**
  * Build a garlic message from config, encrypt it, and enqueue it for delivery.
  *
  */
 public class SendGarlicJob extends JobImpl {
-    private final static Log _log = new Log(SendGarlicJob.class);
+    private Log _log;
     //private RouterInfo _target;
     private GarlicConfig _config;
     private Job _onSend;
@@ -42,7 +43,7 @@ public class SendGarlicJob extends JobImpl {
     private GarlicMessage _message;
     private SessionKey _wrappedKey;
     private Set _wrappedTags;
-
+    
     /**
      *
      * @param config ???
@@ -54,69 +55,73 @@ public class SendGarlicJob extends JobImpl {
      * @param priority how high priority to send this test
      * @param replySelector ???
      */
-    public SendGarlicJob(GarlicConfig config, Job onSend, Job onSendFailed, ReplyJob onReply, Job onReplyFailed, long timeoutMs, int priority, MessageSelector replySelector) {
-	this(config, onSend, onSendFailed, onReply, onReplyFailed, timeoutMs, priority, replySelector, new SessionKey(), new HashSet());
+    public SendGarlicJob(RouterContext ctx, GarlicConfig config, Job onSend, Job onSendFailed, ReplyJob onReply, Job onReplyFailed, long timeoutMs, int priority, MessageSelector replySelector) {
+        this(ctx, config, onSend, onSendFailed, onReply, onReplyFailed, timeoutMs, priority, replySelector, new SessionKey(), new HashSet());
     }
-    public SendGarlicJob(GarlicConfig config, Job onSend, Job onSendFailed, ReplyJob onReply, Job onReplyFailed, long timeoutMs, int priority, MessageSelector replySelector, SessionKey wrappedKey, Set wrappedTags) {
-	super();
-	if (config == null) throw new IllegalArgumentException("No config specified");
-	if (config.getRecipient() == null) throw new IllegalArgumentException("No recipient in the config");
-	//_target = target;
-	_config = config;
-	_onSend = onSend;
-	_onSendFailed = onSendFailed;
-	_onReply = onReply;
-	_onReplyFailed = onReplyFailed;
-	_timeoutMs = timeoutMs;
-	_priority = priority;
-	_replySelector = replySelector;
-	_message = null;
-	_wrappedKey = wrappedKey;
-	_wrappedTags = wrappedTags;
+    public SendGarlicJob(RouterContext ctx, GarlicConfig config, Job onSend, Job onSendFailed, ReplyJob onReply, Job onReplyFailed, long timeoutMs, int priority, MessageSelector replySelector, SessionKey wrappedKey, Set wrappedTags) {
+        super(ctx);
+        _log = ctx.logManager().getLog(SendGarlicJob.class);
+        if (config == null) throw new IllegalArgumentException("No config specified");
+        if (config.getRecipient() == null) throw new IllegalArgumentException("No recipient in the config");
+        //_target = target;
+        _config = config;
+        _onSend = onSend;
+        _onSendFailed = onSendFailed;
+        _onReply = onReply;
+        _onReplyFailed = onReplyFailed;
+        _timeoutMs = timeoutMs;
+        _priority = priority;
+        _replySelector = replySelector;
+        _message = null;
+        _wrappedKey = wrappedKey;
+        _wrappedTags = wrappedTags;
     }
     
     public String getName() { return "Build Garlic Message"; }
     
     public void runJob() {
-	long before = Clock.getInstance().now();
-	_message = GarlicMessageBuilder.buildMessage(_config, _wrappedKey, _wrappedTags);
-	long after = Clock.getInstance().now();
-	if ( (after - before) > 1000) {
-	    _log.warn("Building the garlic took too long [" + (after-before)+" ms]", getAddedBy());
-	} else {
-	    _log.debug("Building the garlic was fast! " + (after - before) + " ms");
-	}
-	JobQueue.getInstance().addJob(new SendJob());
+        long before = _context.clock().now();
+        _message = GarlicMessageBuilder.buildMessage(_context, _config, _wrappedKey, _wrappedTags);
+        long after = _context.clock().now();
+        if ( (after - before) > 1000) {
+            _log.warn("Building the garlic took too long [" + (after-before)+" ms]", getAddedBy());
+        } else {
+            _log.debug("Building the garlic was fast! " + (after - before) + " ms");
+        }
+        _context.jobQueue().addJob(new SendJob());
     }
     
     private class SendJob extends JobImpl {
-	public String getName() { return "Send Built Garlic Message"; }
-	public void runJob() {
-	    if (_config.getRecipient() != null)
-		_log.info("sending garlic to recipient " + _config.getRecipient().getIdentity().getHash().toBase64());
-	    else
-		_log.info("sending garlic to public key " + _config.getRecipientPublicKey());
-	    sendGarlic();
-	}
+        public SendJob() {
+            super(SendGarlicJob.this._context);
+        }
+        public String getName() { return "Send Built Garlic Message"; }
+        public void runJob() {
+            if (_config.getRecipient() != null)
+                _log.info("sending garlic to recipient " + _config.getRecipient().getIdentity().getHash().toBase64());
+            else
+                _log.info("sending garlic to public key " + _config.getRecipientPublicKey());
+            sendGarlic();
+        }
     }
     
     private void sendGarlic() {
-	OutNetMessage msg = new OutNetMessage();
-	long when = _message.getMessageExpiration().getTime() + Router.CLOCK_FUDGE_FACTOR;
-	msg.setExpiration(when);
-	msg.setMessage(_message);
-	msg.setOnFailedReplyJob(_onReplyFailed);
-	msg.setOnFailedSendJob(_onSendFailed);
-	msg.setOnReplyJob(_onReply);
-	msg.setOnSendJob(_onSend);
-	msg.setPriority(_priority);
-	msg.setReplySelector(_replySelector);
-	msg.setTarget(_config.getRecipient());
-	//_log.info("Sending garlic message to [" + _config.getRecipient() + "] encrypted with " + _config.getRecipientPublicKey() + " or " + _config.getRecipient().getIdentity().getPublicKey());
-	//_log.debug("Garlic config data:\n" + _config);
-	//msg.setTarget(_target);
-	OutNetMessagePool.getInstance().add(msg);
-	_log.debug("Garlic message added to outbound network message pool");
+        OutNetMessage msg = new OutNetMessage(_context);
+        long when = _message.getMessageExpiration().getTime() + Router.CLOCK_FUDGE_FACTOR;
+        msg.setExpiration(when);
+        msg.setMessage(_message);
+        msg.setOnFailedReplyJob(_onReplyFailed);
+        msg.setOnFailedSendJob(_onSendFailed);
+        msg.setOnReplyJob(_onReply);
+        msg.setOnSendJob(_onSend);
+        msg.setPriority(_priority);
+        msg.setReplySelector(_replySelector);
+        msg.setTarget(_config.getRecipient());
+        //_log.info("Sending garlic message to [" + _config.getRecipient() + "] encrypted with " + _config.getRecipientPublicKey() + " or " + _config.getRecipient().getIdentity().getPublicKey());
+        //_log.debug("Garlic config data:\n" + _config);
+        //msg.setTarget(_target);
+        _context.outNetMessagePool().add(msg);
+        _log.debug("Garlic message added to outbound network message pool");
     }
 }
 

@@ -14,6 +14,7 @@ import java.util.Set;
 import net.i2p.data.PublicKey;
 import net.i2p.data.SessionKey;
 import net.i2p.data.SessionTag;
+import net.i2p.I2PAppContext;
 
 /**
  * Manage the session keys and session tags used for encryption and decryption.
@@ -23,12 +24,11 @@ import net.i2p.data.SessionTag;
  *
  */
 public class SessionKeyManager {
-    private final static SessionKeyManager _instance = new PersistentSessionKeyManager(); // new TransientSessionKeyManager(); // SessionKeyManager();
-
-    public final static SessionKeyManager getInstance() {
-        return _instance;
-    }
-
+    /** session key managers must be created through an app context */
+    protected SessionKeyManager(I2PAppContext context) {}
+    /** see above */
+    private SessionKeyManager() {}
+    
     /**
      * Retrieve the session key currently associated with encryption to the target,
      * or null if a new session key should be generated.

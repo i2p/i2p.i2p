@@ -16,6 +16,7 @@ import net.i2p.data.i2cp.I2CPMessage;
 import net.i2p.data.i2cp.MessageId;
 import net.i2p.data.i2cp.MessagePayloadMessage;
 import net.i2p.data.i2cp.ReceiveMessageEndMessage;
+import net.i2p.I2PAppContext;
 
 /**
  * Handle I2CP MessagePayloadMessages from the router delivering the contents
@@ -25,8 +26,8 @@ import net.i2p.data.i2cp.ReceiveMessageEndMessage;
  * @author jrandom
  */
 class MessagePayloadMessageHandler extends HandlerImpl {
-    public MessagePayloadMessageHandler() {
-        super(MessagePayloadMessage.MESSAGE_TYPE);
+    public MessagePayloadMessageHandler(I2PAppContext context) {
+        super(context, MessagePayloadMessage.MESSAGE_TYPE);
     }
 
     public void handleMessage(I2CPMessage message, I2PSessionImpl session) {
@@ -53,7 +54,7 @@ class MessagePayloadMessageHandler extends HandlerImpl {
      */
     private Payload decryptPayload(MessagePayloadMessage msg, I2PSessionImpl session) throws DataFormatException {
         Payload payload = msg.getPayload();
-        byte[] data = ElGamalAESEngine.decrypt(payload.getEncryptedData(), session.getDecryptionKey());
+        byte[] data = _context.elGamalAESEngine().decrypt(payload.getEncryptedData(), session.getDecryptionKey());
         if (data == null) {
             _log
                 .error("Error decrypting the payload to public key "

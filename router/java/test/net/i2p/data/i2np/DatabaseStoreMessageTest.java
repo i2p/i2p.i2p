@@ -1,9 +1,9 @@
 package net.i2p.data.i2np;
 /*
  * free (adj.): unencumbered; not under the control of others
- * Written by jrandom in 2003 and released into the public domain 
- * with no warranty of any kind, either expressed or implied.  
- * It probably won't make your computer catch on fire, or eat 
+ * Written by jrandom in 2003 and released into the public domain
+ * with no warranty of any kind, either expressed or implied.
+ * It probably won't make your computer catch on fire, or eat
  * your children, but it might.  Use at your own risk.
  *
  */
@@ -29,13 +29,13 @@ class DatabaseStoreMessageTest extends StructureTest {
         TestData.registerTest(new DatabaseStoreMessageTest(), "DatabaseStoreMessage");
     }
     public DataStructure createDataStructure() throws DataFormatException {
-        DatabaseStoreMessage msg = new DatabaseStoreMessage();
-	RouterInfo info = (RouterInfo)new RouterInfoTest().createDataStructure();
-	msg.setKey(info.getIdentity().getHash());
-	msg.setMessageExpiration(new Date(Clock.getInstance().now()));
-	msg.setUniqueId(42);
-	msg.setRouterInfo(info);
-	return msg; 
+        DatabaseStoreMessage msg = new DatabaseStoreMessage(_context);
+        RouterInfo info = (RouterInfo)new RouterInfoTest().createDataStructure();
+        msg.setKey(info.getIdentity().getHash());
+        msg.setMessageExpiration(new Date(Clock.getInstance().now()));
+        msg.setUniqueId(42);
+        msg.setRouterInfo(info);
+        return msg;
     }
-    public DataStructure createStructureToRead() { return new DatabaseStoreMessage(); }
+    public DataStructure createStructureToRead() { return new DatabaseStoreMessage(_context); }
 }

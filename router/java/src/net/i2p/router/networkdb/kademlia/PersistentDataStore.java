@@ -1,9 +1,9 @@
 package net.i2p.router.networkdb.kademlia;
 /*
  * free (adj.): unencumbered; not under the control of others
- * Written by jrandom in 2003 and released into the public domain 
- * with no warranty of any kind, either expressed or implied.  
- * It probably won't make your computer catch on fire, or eat 
+ * Written by jrandom in 2003 and released into the public domain
+ * with no warranty of any kind, either expressed or implied.
+ * It probably won't make your computer catch on fire, or eat
  * your children, but it might.  Use at your own risk.
  *
  */
@@ -24,226 +24,231 @@ import net.i2p.router.JobImpl;
 import net.i2p.router.JobQueue;
 import net.i2p.router.Router;
 import net.i2p.util.Log;
+import net.i2p.router.RouterContext;
 
 /**
  * Write out keys to disk when we get them and periodically read ones we don't know
  * about into memory, with newly read routers are also added to the routing table.
- * 
+ *
  */
 class PersistentDataStore extends TransientDataStore {
-    private final static Log _log = new Log(PersistentDataStore.class);
+    private Log _log;
     private String _dbDir;
     private KademliaNetworkDatabaseFacade _facade;
     
     private final static int READ_DELAY = 60*1000;
     
-    public PersistentDataStore(String dbDir, KademliaNetworkDatabaseFacade facade) {
-	super();
-	_dbDir = dbDir;
-	_facade = facade;
-	JobQueue.getInstance().addJob(new ReadJob());
+    public PersistentDataStore(RouterContext ctx, String dbDir, KademliaNetworkDatabaseFacade facade) {
+        super(ctx);
+        _log = ctx.logManager().getLog(PersistentDataStore.class);
+        _dbDir = dbDir;
+        _facade = facade;
+        _context.jobQueue().addJob(new ReadJob());
     }
     
     public DataStructure remove(Hash key) {
-	JobQueue.getInstance().addJob(new RemoveJob(key));
-	return super.remove(key);
+        _context.jobQueue().addJob(new RemoveJob(key));
+        return super.remove(key);
     }
-
+    
     public void put(Hash key, DataStructure data) {
-	if ( (data == null) || (key == null) ) return;
-	super.put(key, data);
-	JobQueue.getInstance().addJob(new WriteJob(key, data));
+        if ( (data == null) || (key == null) ) return;
+        super.put(key, data);
+        _context.jobQueue().addJob(new WriteJob(key, data));
     }
     
     private void accept(LeaseSet ls) {
-	super.put(ls.getDestination().calculateHash(), ls);
+        super.put(ls.getDestination().calculateHash(), ls);
     }
     private void accept(RouterInfo ri) {
-	Hash key = ri.getIdentity().getHash();
-	super.put(key, ri);
-	// add recently loaded routers to the routing table
-	_facade.getKBuckets().add(key);
+        Hash key = ri.getIdentity().getHash();
+        super.put(key, ri);
+        // add recently loaded routers to the routing table
+        _facade.getKBuckets().add(key);
     }
     
     private class RemoveJob extends JobImpl {
-	private Hash _key;
-	public RemoveJob(Hash key) {
-	    _key = key; 
-	}
-	public String getName() { return "Remove Key"; }
-	public void runJob() {
-	    _log.info("Removing key " + _key, getAddedBy());
-	    try {
-		File dbDir = getDbDir();
-		removeFile(_key, dbDir);
-	    } catch (IOException ioe) {
-		_log.error("Error removing key " + _key, ioe);
-	    }
-	}
+        private Hash _key;
+        public RemoveJob(Hash key) {
+            super(PersistentDataStore.this._context);
+            _key = key;
+        }
+        public String getName() { return "Remove Key"; }
+        public void runJob() {
+            _log.info("Removing key " + _key, getAddedBy());
+            try {
+                File dbDir = getDbDir();
+                removeFile(_key, dbDir);
+            } catch (IOException ioe) {
+                _log.error("Error removing key " + _key, ioe);
+            }
+        }
     }
-
+    
     private class WriteJob extends JobImpl {
-	private Hash _key;
-	private DataStructure _data;
-	public WriteJob(Hash key, DataStructure data) {
-	    super();
-	    _key = key;
-	    _data = data;
-	}
-	public String getName() { return "DB Writer Job"; }
-	public void runJob() {
-	    _log.info("Writing key " + _key);
-	    FileOutputStream fos = null;
-	    try {
-		String filename = null;
-		File dbDir = getDbDir();
-		
-		if (_data instanceof LeaseSet)
-		    filename = getLeaseSetName(_key);
-		else if (_data instanceof RouterInfo) 
-		    filename = getRouterInfoName(_key);
-		else 
-		    throw new IOException("We don't know how to write objects of type " + _data.getClass().getName());
-		
-		fos = new FileOutputStream(new File(dbDir, filename));
-		try {
-		    _data.writeBytes(fos);
-		} catch (DataFormatException dfe) {
-		    _log.error("Error writing out malformed object as " + _key + ": " + _data, dfe);
-		    File f = new File(dbDir, filename);
-		    f.delete();
-		}
-	    } catch (IOException ioe) {
-		_log.error("Error writing out the object", ioe);
-	    } finally {
-		if (fos != null) try { fos.close(); } catch (IOException ioe) {}
-	    }
-	}
+        private Hash _key;
+        private DataStructure _data;
+        public WriteJob(Hash key, DataStructure data) {
+            super(PersistentDataStore.this._context);
+            _key = key;
+            _data = data;
+        }
+        public String getName() { return "DB Writer Job"; }
+        public void runJob() {
+            _log.info("Writing key " + _key);
+            FileOutputStream fos = null;
+            try {
+                String filename = null;
+                File dbDir = getDbDir();
+                
+                if (_data instanceof LeaseSet)
+                    filename = getLeaseSetName(_key);
+                else if (_data instanceof RouterInfo)
+                    filename = getRouterInfoName(_key);
+                else
+                    throw new IOException("We don't know how to write objects of type " + _data.getClass().getName());
+                
+                fos = new FileOutputStream(new File(dbDir, filename));
+                try {
+                    _data.writeBytes(fos);
+                } catch (DataFormatException dfe) {
+                    _log.error("Error writing out malformed object as " + _key + ": " + _data, dfe);
+                    File f = new File(dbDir, filename);
+                    f.delete();
+                }
+            } catch (IOException ioe) {
+                _log.error("Error writing out the object", ioe);
+            } finally {
+                if (fos != null) try { fos.close(); } catch (IOException ioe) {}
+            }
+        }
     }
     
     private class ReadJob extends JobImpl {
-	public ReadJob() {
-	    super();
-	}
-	public String getName() { return "DB Read Job"; }
-	public void runJob() {
-	    _log.info("Rereading new files");
-	    readFiles();
-	    requeue(READ_DELAY);
-	}
-	
-	private void readFiles() {
-	    try {
-		File dbDir = getDbDir();
-		File leaseSetFiles[] = dbDir.listFiles(LeaseSetFilter.getInstance());
-		if (leaseSetFiles != null) {
-		    for (int i = 0; i < leaseSetFiles.length; i++) {
-			Hash key = getLeaseSetHash(leaseSetFiles[i].getName());
-			if ( (key != null) && (!isKnown(key)) )
-			    JobQueue.getInstance().addJob(new ReadLeaseJob(leaseSetFiles[i]));
-		    }
-		}
-		File routerInfoFiles[] = dbDir.listFiles(RouterInfoFilter.getInstance());
-		if (routerInfoFiles != null) {
-		    for (int i = 0; i < routerInfoFiles.length; i++) {
-			Hash key = getRouterInfoHash(routerInfoFiles[i].getName());
-			if ( (key != null) && (!isKnown(key)) )
-			    JobQueue.getInstance().addJob(new ReadRouterJob(routerInfoFiles[i]));
-		    }
-		}
-	    } catch (IOException ioe) {
-		_log.error("Error reading files in the db dir", ioe);
-	    }
-	}
-	
+        public ReadJob() {
+            super(PersistentDataStore.this._context);
+        }
+        public String getName() { return "DB Read Job"; }
+        public void runJob() {
+            _log.info("Rereading new files");
+            readFiles();
+            requeue(READ_DELAY);
+        }
+        
+        private void readFiles() {
+            try {
+                File dbDir = getDbDir();
+                File leaseSetFiles[] = dbDir.listFiles(LeaseSetFilter.getInstance());
+                if (leaseSetFiles != null) {
+                    for (int i = 0; i < leaseSetFiles.length; i++) {
+                        Hash key = getLeaseSetHash(leaseSetFiles[i].getName());
+                        if ( (key != null) && (!isKnown(key)) )
+                            PersistentDataStore.this._context.jobQueue().addJob(new ReadLeaseJob(leaseSetFiles[i]));
+                    }
+                }
+                File routerInfoFiles[] = dbDir.listFiles(RouterInfoFilter.getInstance());
+                if (routerInfoFiles != null) {
+                    for (int i = 0; i < routerInfoFiles.length; i++) {
+                        Hash key = getRouterInfoHash(routerInfoFiles[i].getName());
+                        if ( (key != null) && (!isKnown(key)) )
+                            PersistentDataStore.this._context.jobQueue().addJob(new ReadRouterJob(routerInfoFiles[i]));
+                    }
+                }
+            } catch (IOException ioe) {
+                _log.error("Error reading files in the db dir", ioe);
+            }
+        }
+        
     }
     
     private class ReadLeaseJob extends JobImpl {
-	private File _leaseFile;
-	public ReadLeaseJob(File leaseFile) {
-	    _leaseFile = leaseFile;
-	}
-	public String getName() { return "Read LeaseSet"; }
-	public void runJob() {
-	    try {
-		FileInputStream fis = null;
-		boolean corrupt = false;
-		try { 
-		    fis = new FileInputStream(_leaseFile);
-		    LeaseSet ls = new LeaseSet();
-		    ls.readBytes(fis);
-		    if (ls.isCurrent(Router.CLOCK_FUDGE_FACTOR)) {
-			_log.info("Reading in new LeaseSet: " + ls.getDestination().calculateHash());
-			accept(ls);
-		    } else {
-			_log.warn("Expired LeaseSet found for " + ls.getDestination().calculateHash() + ": Deleting");
-			corrupt = true;
-		    }
-		} catch (DataFormatException dfe) {
-		    _log.warn("Error reading the leaseSet from " + _leaseFile.getAbsolutePath(), dfe);
-		    corrupt = true;
-		} catch (FileNotFoundException fnfe) {
-		    _log.debug("Deleted prior to read.. a race during expiration / load");
-		    corrupt = false;
-		} finally {
-		    if (fis != null) try { fis.close(); } catch (IOException ioe) {}
-		}
-		if (corrupt) _leaseFile.delete();
-	    } catch (IOException ioe) {
-		_log.warn("Error reading the leaseSet from " + _leaseFile.getAbsolutePath(), ioe);
-	    }
-	}
+        private File _leaseFile;
+        public ReadLeaseJob(File leaseFile) {
+            super(PersistentDataStore.this._context);
+            _leaseFile = leaseFile;
+        }
+        public String getName() { return "Read LeaseSet"; }
+        public void runJob() {
+            try {
+                FileInputStream fis = null;
+                boolean corrupt = false;
+                try {
+                    fis = new FileInputStream(_leaseFile);
+                    LeaseSet ls = new LeaseSet();
+                    ls.readBytes(fis);
+                    if (ls.isCurrent(Router.CLOCK_FUDGE_FACTOR)) {
+                        _log.info("Reading in new LeaseSet: " + ls.getDestination().calculateHash());
+                        accept(ls);
+                    } else {
+                        _log.warn("Expired LeaseSet found for " + ls.getDestination().calculateHash() + ": Deleting");
+                        corrupt = true;
+                    }
+                } catch (DataFormatException dfe) {
+                    _log.warn("Error reading the leaseSet from " + _leaseFile.getAbsolutePath(), dfe);
+                    corrupt = true;
+                } catch (FileNotFoundException fnfe) {
+                    _log.debug("Deleted prior to read.. a race during expiration / load");
+                    corrupt = false;
+                } finally {
+                    if (fis != null) try { fis.close(); } catch (IOException ioe) {}
+                }
+                if (corrupt) _leaseFile.delete();
+            } catch (IOException ioe) {
+                _log.warn("Error reading the leaseSet from " + _leaseFile.getAbsolutePath(), ioe);
+            }
+        }
     }
     
     private class ReadRouterJob extends JobImpl {
-	private File _routerFile;
-	public ReadRouterJob(File routerFile) {
-	    _routerFile = routerFile;
-	}
-	public String getName() { return "Read RouterInfo"; }
-	public void runJob() {
-	    try {
-		FileInputStream fis = null;
-		boolean corrupt = false;
-		try { 
-		    fis = new FileInputStream(_routerFile);
-		    RouterInfo ri = new RouterInfo();
-		    ri.readBytes(fis);
-		    if (ri.isValid()) {
-			_log.info("Reading in new RouterInfo: " + ri.getIdentity().getHash());
-			accept(ri);
-		    } else {
-			_log.warn("Invalid routerInfo found for " + ri.getIdentity().getHash() + ": " + ri);
-			corrupt = true;
-		    }
-		} catch (DataFormatException dfe) {
-		    _log.warn("Error reading the routerInfo from " + _routerFile.getAbsolutePath(), dfe);
-		    corrupt = true;
-		} finally {
-		    if (fis != null) try { fis.close(); } catch (IOException ioe) {}
-		}
-		if (corrupt) _routerFile.delete();
-	    } catch (IOException ioe) {
-		_log.warn("Error reading the RouterInfo from " + _routerFile.getAbsolutePath(), ioe);
-	    }
-	}
+        private File _routerFile;
+        public ReadRouterJob(File routerFile) {
+            super(PersistentDataStore.this._context);
+            _routerFile = routerFile;
+        }
+        public String getName() { return "Read RouterInfo"; }
+        public void runJob() {
+            try {
+                FileInputStream fis = null;
+                boolean corrupt = false;
+                try {
+                    fis = new FileInputStream(_routerFile);
+                    RouterInfo ri = new RouterInfo();
+                    ri.readBytes(fis);
+                    if (ri.isValid()) {
+                        _log.info("Reading in new RouterInfo: " + ri.getIdentity().getHash());
+                        accept(ri);
+                    } else {
+                        _log.warn("Invalid routerInfo found for " + ri.getIdentity().getHash() + ": " + ri);
+                        corrupt = true;
+                    }
+                } catch (DataFormatException dfe) {
+                    _log.warn("Error reading the routerInfo from " + _routerFile.getAbsolutePath(), dfe);
+                    corrupt = true;
+                } finally {
+                    if (fis != null) try { fis.close(); } catch (IOException ioe) {}
+                }
+                if (corrupt) _routerFile.delete();
+            } catch (IOException ioe) {
+                _log.warn("Error reading the RouterInfo from " + _routerFile.getAbsolutePath(), ioe);
+            }
+        }
     }
     
     
     private File getDbDir() throws IOException {
-	File f = new File(_dbDir);
-	if (!f.exists()) {
-	    boolean created = f.mkdirs();
-	    if (!created)
-		throw new IOException("Unable to create the DB directory [" + f.getAbsolutePath() + "]");
-	}
-	if (!f.isDirectory())
-	    throw new IOException("DB directory [" + f.getAbsolutePath() + "] is not a directory!");
-	if (!f.canRead())
-	    throw new IOException("DB directory [" + f.getAbsolutePath() + "] is not readable!");
-	if (!f.canWrite())
-	    throw new IOException("DB directory [" + f.getAbsolutePath() + "] is not writable!");
-	return f;
+        File f = new File(_dbDir);
+        if (!f.exists()) {
+            boolean created = f.mkdirs();
+            if (!created)
+                throw new IOException("Unable to create the DB directory [" + f.getAbsolutePath() + "]");
+        }
+        if (!f.isDirectory())
+            throw new IOException("DB directory [" + f.getAbsolutePath() + "] is not a directory!");
+        if (!f.canRead())
+            throw new IOException("DB directory [" + f.getAbsolutePath() + "] is not readable!");
+        if (!f.canWrite())
+            throw new IOException("DB directory [" + f.getAbsolutePath() + "] is not writable!");
+        return f;
     }
     
     private final static String LEASESET_PREFIX = "leaseSet-";
@@ -252,72 +257,72 @@ class PersistentDataStore extends TransientDataStore {
     private final static String ROUTERINFO_SUFFIX = ".dat";
     
     private String getLeaseSetName(Hash hash) {
-	return LEASESET_PREFIX + hash.toBase64() + LEASESET_SUFFIX;
+        return LEASESET_PREFIX + hash.toBase64() + LEASESET_SUFFIX;
     }
     private String getRouterInfoName(Hash hash) {
-	return ROUTERINFO_PREFIX + hash.toBase64() + ROUTERINFO_SUFFIX;
+        return ROUTERINFO_PREFIX + hash.toBase64() + ROUTERINFO_SUFFIX;
     }
     
     private Hash getLeaseSetHash(String filename) {
-	return getHash(filename, LEASESET_PREFIX, LEASESET_SUFFIX);
+        return getHash(filename, LEASESET_PREFIX, LEASESET_SUFFIX);
     }
-
+    
     private Hash getRouterInfoHash(String filename) {
-	return getHash(filename, ROUTERINFO_PREFIX, ROUTERINFO_SUFFIX);
+        return getHash(filename, ROUTERINFO_PREFIX, ROUTERINFO_SUFFIX);
     }
-
+    
     private Hash getHash(String filename, String prefix, String suffix) {
-	try {
-	    String key = filename.substring(prefix.length());
-	    key = key.substring(0, key.length() - suffix.length());
-	    Hash h = new Hash();
-	    h.fromBase64(key);
-	    return h;
-	} catch (Exception e) {
-	    _log.warn("Unable to fetch the key from [" + filename + "]", e);
-	    return null;
-	}
+        try {
+            String key = filename.substring(prefix.length());
+            key = key.substring(0, key.length() - suffix.length());
+            Hash h = new Hash();
+            h.fromBase64(key);
+            return h;
+        } catch (Exception e) {
+            _log.warn("Unable to fetch the key from [" + filename + "]", e);
+            return null;
+        }
     }
-
+    
     private void removeFile(Hash key, File dir) throws IOException {
-	String lsName = getLeaseSetName(key);
-	String riName = getRouterInfoName(key);
-	File f = new File(dir, lsName);
-	if (f.exists()) {
-	    boolean removed = f.delete(); 
-	    if (!removed)
-		_log.warn("Unable to remove lease set at " + f.getAbsolutePath());
-	    else
-		_log.info("Removed lease set at " + f.getAbsolutePath());
-	    return;
-	}
-	f = new File(dir, riName);
-	if (f.exists()) {
-	    boolean removed = f.delete(); 
-	    if (!removed)
-		_log.warn("Unable to remove router info at " + f.getAbsolutePath());
-	    else
-		_log.info("Removed router info at " + f.getAbsolutePath());
-	    return;
-	}
+        String lsName = getLeaseSetName(key);
+        String riName = getRouterInfoName(key);
+        File f = new File(dir, lsName);
+        if (f.exists()) {
+            boolean removed = f.delete();
+            if (!removed)
+                _log.warn("Unable to remove lease set at " + f.getAbsolutePath());
+            else
+                _log.info("Removed lease set at " + f.getAbsolutePath());
+            return;
+        }
+        f = new File(dir, riName);
+        if (f.exists()) {
+            boolean removed = f.delete();
+            if (!removed)
+                _log.warn("Unable to remove router info at " + f.getAbsolutePath());
+            else
+                _log.info("Removed router info at " + f.getAbsolutePath());
+            return;
+        }
     }
     
     private final static class LeaseSetFilter implements FilenameFilter {
-	private static final FilenameFilter _instance = new LeaseSetFilter();
-	public static final FilenameFilter getInstance() { return _instance; }
-	public boolean accept(File dir, String name) { 
-	    if (name == null) return false;
-	    name = name.toUpperCase();
-	    return (name.startsWith(LEASESET_PREFIX.toUpperCase()) && name.endsWith(LEASESET_SUFFIX.toUpperCase()));
-	}
+        private static final FilenameFilter _instance = new LeaseSetFilter();
+        public static final FilenameFilter getInstance() { return _instance; }
+        public boolean accept(File dir, String name) {
+            if (name == null) return false;
+            name = name.toUpperCase();
+            return (name.startsWith(LEASESET_PREFIX.toUpperCase()) && name.endsWith(LEASESET_SUFFIX.toUpperCase()));
+        }
     }
     private final static class RouterInfoFilter implements FilenameFilter {
-	private static final FilenameFilter _instance = new RouterInfoFilter();
-	public static final FilenameFilter getInstance() { return _instance; }
-	public boolean accept(File dir, String name) { 
-	    if (name == null) return false;
-	    name = name.toUpperCase();
-	    return (name.startsWith(ROUTERINFO_PREFIX.toUpperCase()) && name.endsWith(ROUTERINFO_SUFFIX.toUpperCase()));
-	}
+        private static final FilenameFilter _instance = new RouterInfoFilter();
+        public static final FilenameFilter getInstance() { return _instance; }
+        public boolean accept(File dir, String name) {
+            if (name == null) return false;
+            name = name.toUpperCase();
+            return (name.startsWith(ROUTERINFO_PREFIX.toUpperCase()) && name.endsWith(ROUTERINFO_SUFFIX.toUpperCase()));
+        }
     }
 }

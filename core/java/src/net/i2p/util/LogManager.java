@@ -19,6 +19,10 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
 import java.util.Set;
+import java.util.Map;
+import java.util.HashMap;
+
+import net.i2p.I2PAppContext;
 
 /**
  * Manages the logging system, loading (and reloading) the configuration file,
@@ -31,14 +35,6 @@ public class LogManager {
     public final static String CONFIG_LOCATION_PROP = "loggerConfigLocation";
     public final static String FILENAME_OVERRIDE_PROP = "loggerFilenameOverride";
     public final static String CONFIG_LOCATION_DEFAULT = "logger.config";
-
-    public static final LogManager getInstance() {
-        return _instance;
-    }
-    private static final LogManager _instance = new LogManager(System.getProperty(CONFIG_LOCATION_PROP,
-                                                                                  CONFIG_LOCATION_DEFAULT));
-    private static final Log _log = new Log(LogManager.class);
-
     /**
      * These define the characters in the format line of the config file 
      */
@@ -65,12 +61,15 @@ public class LogManager {
     public final static String DEFAULT_DEFALTLEVEL = Log.STR_DEBUG;
     public final static String DEFAULT_ONSCREENLEVEL = Log.STR_DEBUG;
 
+    private I2PAppContext _context;
+    private Log _log;
+    
     private long _configLastRead;
 
     private String _location;
     private List _records;
     private Set _limits;
-    private Set _logs;
+    private Map _logs;
     private LogWriter _writer;
 
     private int _defaultLimit;
@@ -83,7 +82,59 @@ public class LogManager {
 
     private boolean _displayOnScreen;
     private int _consoleBufferSize;
+    
+    private LogConsoleBuffer _consoleBuffer;
 
+    public LogManager(I2PAppContext context) {
+        _displayOnScreen = true;
+        _records = new ArrayList();
+        _limits = new HashSet();
+        _logs = new HashMap(128);
+        _defaultLimit = Log.DEBUG;
+        _configLastRead = 0;
+        _location = context.getProperty(CONFIG_LOCATION_PROP, CONFIG_LOCATION_DEFAULT);
+        _context = context;
+        _log = getLog(LogManager.class);
+        _consoleBuffer = new LogConsoleBuffer(context);
+        loadConfig();
+        _writer = new LogWriter(this);
+        Thread t = new I2PThread(_writer);
+        t.setName("LogWriter");
+        t.setDaemon(true);
+        t.start();
+        Runtime.getRuntime().addShutdownHook(new ShutdownHook());
+        System.out.println("Created logManager " + this + " with context: " + context);
+    }
+    private LogManager() {}
+    
+    public Log getLog(Class cls) { return getLog(cls, null); }
+    public Log getLog(String name) { return getLog(null, name); }
+    public Log getLog(Class cls, String name) {
+        Log rv = null;
+        synchronized (_logs) {
+            Log newLog = new Log(this, cls, name);
+            if (_logs.containsKey(newLog.getScope())) {
+                Log oldLog = (Log)_logs.get(newLog.getScope());
+                rv = oldLog;
+                //_log.error("Duplicate log creation for " + cls);
+            } else {
+                _logs.put(newLog.getScope(), newLog);
+                rv = newLog;
+            }
+        }
+        updateLimit(rv);
+        return rv;
+    }
+    void addLog(Log log) {
+        synchronized (_logs) {
+            if (!_logs.containsKey(log.getScope()))
+                _logs.put(log.getScope(), log);
+        }
+        updateLimit(log);
+    }
+    
+    public LogConsoleBuffer getBuffer() { return _consoleBuffer; }
+        
     public void setDisplayOnScreen(boolean yes) {
         _displayOnScreen = yes;
     }
@@ -123,18 +174,7 @@ public class LogManager {
             _records.add(record);
         }
     }
-
-    /**
-     * Called during Log construction
-     *
-     */
-    void registerLog(Log log) {
-        synchronized (_logs) {
-            _logs.add(log);
-        }
-        updateLimit(log);
-    }
-
+    
     /**
      * Called periodically by the log writer's thread
      *
@@ -148,23 +188,6 @@ public class LogManager {
     ///
     ///
 
-    private LogManager(String location) {
-        _displayOnScreen = true;
-        _location = location;
-        _records = new ArrayList();
-        _limits = new HashSet();
-        _logs = new HashSet();
-        _defaultLimit = Log.DEBUG;
-        _configLastRead = 0;
-        loadConfig();
-        _writer = new LogWriter();
-        Thread t = new I2PThread(_writer);
-        t.setName("LogWriter");
-        t.setDaemon(true);
-        t.start();
-        Runtime.getRuntime().addShutdownHook(new ShutdownHook());
-    }
-
     //
     //
     //
@@ -175,6 +198,8 @@ public class LogManager {
         if ((_configLastRead > 0) && (_configLastRead > cfgFile.lastModified())) {
             _log.debug("Short circuiting config read");
             return;
+        } else {
+            _log.debug("Loading config from " + _location);
         }
         FileInputStream fis = null;
         try {
@@ -212,7 +237,7 @@ public class LogManager {
                 _displayOnScreen = false;
         }
 
-        String filenameOverride = System.getProperty(FILENAME_OVERRIDE_PROP);
+        String filenameOverride = _context.getProperty(FILENAME_OVERRIDE_PROP);
         if (filenameOverride != null)
             _baseLogfilename = filenameOverride;
         else
@@ -297,11 +322,11 @@ public class LogManager {
     }
 
     private void updateLimits() {
-        Set logs = new HashSet();
+        Map logs = null;
         synchronized (_logs) {
-            logs.addAll(_logs);
+            logs = new HashMap(_logs);
         }
-        for (Iterator iter = logs.iterator(); iter.hasNext();) {
+        for (Iterator iter = logs.values().iterator(); iter.hasNext();) {
             Log log = (Log) iter.next();
             updateLimit(log);
         }
@@ -322,10 +347,13 @@ public class LogManager {
                 }
             }
         }
-        if (max != null)
+        if (max != null) {
             log.setMinimumPriority(max.getLimit());
-        else
+        } else {
+            //if (_log != null)
+            //    _log.debug("The log for " + log.getClass() + " has no matching limits");
             log.setMinimumPriority(_defaultLimit);
+        }
     }
 
     private List getLimits(Log log) {
@@ -373,10 +401,11 @@ public class LogManager {
     }
 
     public static void main(String args[]) {
-        Log l1 = new Log("test.1");
-        Log l2 = new Log("test.2");
-        Log l21 = new Log("test.2.1");
-        Log l = new Log("test");
+        I2PAppContext ctx = new I2PAppContext();
+        Log l1 = ctx.logManager().getLog("test.1");
+        Log l2 = ctx.logManager().getLog("test.2");
+        Log l21 = ctx.logManager().getLog("test.2.1");
+        Log l = ctx.logManager().getLog("test");
         l.debug("this should fail");
         l.info("this should pass");
         l1.warn("this should pass");

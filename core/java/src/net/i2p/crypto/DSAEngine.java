@@ -39,17 +39,22 @@ import net.i2p.util.Clock;
 import net.i2p.util.Log;
 import net.i2p.util.NativeBigInteger;
 import net.i2p.util.RandomSource;
+import net.i2p.I2PAppContext;
 
 public class DSAEngine {
-    private final static Log _log = new Log(DSAEngine.class);
-    private static DSAEngine _instance = new DSAEngine();
+    private Log _log;
+    private I2PAppContext _context;
 
-    public static DSAEngine getInstance() {
-        return _instance;
+    public DSAEngine(I2PAppContext context) {
+        _log = context.logManager().getLog(DSAEngine.class);
+        _context = context;
     }
-
+    public static DSAEngine getInstance() {
+        return I2PAppContext.getGlobalContext().dsa();
+    }
+    
     public boolean verifySignature(Signature signature, byte signedData[], SigningPublicKey verifyingKey) {
-        long start = Clock.getInstance().now();
+        long start = _context.clock().now();
 
         byte[] sigbytes = signature.getData();
         byte rbytes[] = new byte[20];
@@ -65,22 +70,20 @@ public class DSAEngine {
         BigInteger r = new NativeBigInteger(1, rbytes);
         BigInteger y = new NativeBigInteger(1, verifyingKey.getData());
         BigInteger w = s.modInverse(CryptoConstants.dsaq);
-        BigInteger u1 = ((new NativeBigInteger(1, calculateHash(signedData).getData())).multiply(w))
-                                                                                                    .mod(CryptoConstants.dsaq);
+        byte data[] = calculateHash(signedData).getData();
+        NativeBigInteger bi = new NativeBigInteger(1, data);
+        BigInteger u1 = bi.multiply(w).mod(CryptoConstants.dsaq);
         BigInteger u2 = r.multiply(w).mod(CryptoConstants.dsaq);
-        BigInteger v = ((CryptoConstants.dsag.modPow(u1, CryptoConstants.dsap))
-                                                                               .multiply(y.modPow(u2,
-                                                                                                  CryptoConstants.dsap)))
-                                                                                                                         .mod(
-                                                                                                                              CryptoConstants.dsap)
-                                                                                                                         .mod(
-                                                                                                                              CryptoConstants.dsaq);
+        BigInteger modval = CryptoConstants.dsag.modPow(u1, CryptoConstants.dsap);
+        BigInteger modmulval = modval.multiply(y.modPow(u2,CryptoConstants.dsap));
+        BigInteger v = (modmulval).mod(CryptoConstants.dsap).mod(CryptoConstants.dsaq);
 
         boolean ok = v.compareTo(r) == 0;
 
-        long diff = Clock.getInstance().now() - start;
+        long diff = _context.clock().now() - start;
         if (diff > 1000) {
-            if (_log.shouldLog(Log.WARN)) _log.warn("Took too long to verify the signature (" + diff + "ms)");
+            if (_log.shouldLog(Log.WARN)) 
+                _log.warn("Took too long to verify the signature (" + diff + "ms)");
         }
 
         return ok;
@@ -88,13 +91,13 @@ public class DSAEngine {
 
     public Signature sign(byte data[], SigningPrivateKey signingKey) {
         if ((signingKey == null) || (data == null) || (data.length <= 0)) return null;
-        long start = Clock.getInstance().now();
+        long start = _context.clock().now();
 
         Signature sig = new Signature();
         BigInteger k;
 
         do {
-            k = new BigInteger(160, RandomSource.getInstance());
+            k = new BigInteger(160, _context.random());
         } while (k.compareTo(CryptoConstants.dsaq) != 1);
 
         BigInteger r = CryptoConstants.dsag.modPow(k, CryptoConstants.dsap).mod(CryptoConstants.dsaq);
@@ -139,7 +142,7 @@ public class DSAEngine {
         }
         sig.setData(out);
 
-        long diff = Clock.getInstance().now() - start;
+        long diff = _context.clock().now() - start;
         if (diff > 1000) {
             if (_log.shouldLog(Log.WARN)) _log.warn("Took too long to sign (" + diff + "ms)");
         }

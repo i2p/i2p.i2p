@@ -19,51 +19,54 @@ import net.i2p.router.JobQueue;
 import net.i2p.router.Router;
 import net.i2p.util.Clock;
 import net.i2p.util.Log;
+import net.i2p.router.RouterContext;
 
 /**
  * Simply read the router config
  */
 public class ReadConfigJob extends JobImpl {
-    private static Log _log = new Log(ReadConfigJob.class);
-    
     private final static long DELAY = 30*1000; // reread every 30 seconds
+
+    public ReadConfigJob(RouterContext ctx) {
+        super(ctx);
+    }
     
     public String getName() { return "Read Router Configuration"; }
     public void runJob() {
-	doRead();
-	getTiming().setStartAfter(Clock.getInstance().now() + DELAY);
-	JobQueue.getInstance().addJob(this);
+        doRead(_context);
+        getTiming().setStartAfter(_context.clock().now() + DELAY);
+        _context.jobQueue().addJob(this);
     }
     
-    public static void doRead() { 
-	Router r = Router.getInstance();
-	String f = r.getConfigFilename();
-	Properties config = getConfig(f);
-	for (Iterator iter = config.keySet().iterator(); iter.hasNext(); ) {
-	    String name = (String)iter.next();
-	    String val = config.getProperty(name);
-	    _log.debug("Setting config prop [" + name + "] = [" + val + "]");
-	    Router.getInstance().setConfigSetting(name, val);
-	}
+    public static void doRead(RouterContext ctx) { 
+        Router r = ctx.router();
+        String f = r.getConfigFilename();
+        Properties config = getConfig(ctx, f);
+        for (Iterator iter = config.keySet().iterator(); iter.hasNext(); ) {
+            String name = (String)iter.next();
+            String val = config.getProperty(name);
+            r.setConfigSetting(name, val);
+        }
     }
     
-    private static Properties getConfig(String filename) {
-	_log.debug("Config file: " + filename);
-	Properties props = new Properties();
-	FileInputStream fis = null;
-	try {
-	    File f = new File(filename);
-	    if (f.canRead()) {
-		fis = new FileInputStream(f);
-		props.load(fis);
-	    } else {
-		_log.error("Configuration file " + filename + " does not exist");
-	    }
-	} catch (Exception ioe) {
-	    _log.error("Error loading the router configuration from " + filename, ioe);
-	} finally {
-	    if (fis != null) try { fis.close(); } catch (IOException ioe) {}
-	}
-	return props;
+    private static Properties getConfig(RouterContext ctx, String filename) {
+        Log log = ctx.logManager().getLog(ReadConfigJob.class);
+        log.debug("Config file: " + filename);
+        Properties props = new Properties();
+        FileInputStream fis = null;
+        try {
+            File f = new File(filename);
+            if (f.canRead()) {
+                fis = new FileInputStream(f);
+                props.load(fis);
+            } else {
+                log.error("Configuration file " + filename + " does not exist");
+            }
+        } catch (Exception ioe) {
+            log.error("Error loading the router configuration from " + filename, ioe);
+        } finally {
+            if (fis != null) try { fis.close(); } catch (IOException ioe) {}
+        }
+        return props;
     }
 }

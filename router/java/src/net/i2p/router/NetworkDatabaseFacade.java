@@ -23,9 +23,6 @@ import net.i2p.router.networkdb.kademlia.KademliaNetworkDatabaseFacade;
  *
  */ 
 public abstract class NetworkDatabaseFacade implements Service {
-    private static NetworkDatabaseFacade _instance = new KademliaNetworkDatabaseFacade(); // NetworkDatabaseFacadeImpl();
-    public static NetworkDatabaseFacade getInstance() { return _instance; }
-    
     /**
      * Return the RouterInfo structures for the routers closest to the given key.
      * At most maxNumRouters will be returned
@@ -54,33 +51,35 @@ public abstract class NetworkDatabaseFacade implements Service {
 
 class DummyNetworkDatabaseFacade extends NetworkDatabaseFacade {
     private Map _routers;
+    private RouterContext _context;
     
-    public DummyNetworkDatabaseFacade() {
-	_routers = new HashMap();
+    public DummyNetworkDatabaseFacade(RouterContext ctx) {
+        _routers = new HashMap();
+        _context = ctx;
     }
     
     public void shutdown() {}
     public void startup() {
-	RouterInfo info = Router.getInstance().getRouterInfo();
-	_routers.put(info.getIdentity().getHash(), info);
+        RouterInfo info = _context.router().getRouterInfo();
+        _routers.put(info.getIdentity().getHash(), info);
     }
     
     public void lookupLeaseSet(Hash key, Job onFindJob, Job onFailedLookupJob, long timeoutMs) {}
     public LeaseSet lookupLeaseSetLocally(Hash key) { return null; }
     public void lookupRouterInfo(Hash key, Job onFindJob, Job onFailedLookupJob, long timeoutMs) {
-	RouterInfo info = lookupRouterInfoLocally(key);
-	if (info == null) 
-	    JobQueue.getInstance().addJob(onFailedLookupJob);
-	else
-	    JobQueue.getInstance().addJob(onFindJob);
+        RouterInfo info = lookupRouterInfoLocally(key);
+        if (info == null) 
+            _context.jobQueue().addJob(onFailedLookupJob);
+        else
+            _context.jobQueue().addJob(onFindJob);
     }
     public RouterInfo lookupRouterInfoLocally(Hash key) { return (RouterInfo)_routers.get(key); }
     public void publish(LeaseSet localLeaseSet) {}
     public void publish(RouterInfo localRouterInfo) {}
     public LeaseSet store(Hash key, LeaseSet leaseSet) { return leaseSet; }
     public RouterInfo store(Hash key, RouterInfo routerInfo) {
-	_routers.put(key, routerInfo);
-	return routerInfo;
+        _routers.put(key, routerInfo);
+        return routerInfo;
     }
     public void unpublish(LeaseSet localLeaseSet) {}
     public void fail(Hash dbEntry) {}    

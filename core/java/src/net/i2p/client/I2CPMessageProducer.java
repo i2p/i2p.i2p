@@ -32,6 +32,7 @@ import net.i2p.data.i2cp.SendMessageMessage;
 import net.i2p.data.i2cp.SessionConfig;
 import net.i2p.util.Log;
 import net.i2p.util.RandomSource;
+import net.i2p.I2PAppContext;
 
 /**
  * Produce the various messages the session needs to send to the router.
@@ -41,7 +42,12 @@ import net.i2p.util.RandomSource;
 class I2CPMessageProducer {
     private final static Log _log = new Log(I2CPMessageProducer.class);
     private final static RandomSource _rand = RandomSource.getInstance();
+    private I2PAppContext _context;
 
+    public I2CPMessageProducer(I2PAppContext context) {
+        _context = context;
+    }
+    
     /** 
      * Send all the messages that a client needs to send to a router to establish
      * a new session.  
@@ -102,7 +108,7 @@ class I2CPMessageProducer {
         Payload data = new Payload();
         // randomize padding
         int size = payload.length + RandomSource.getInstance().nextInt(1024);
-        byte encr[] = ElGamalAESEngine.encrypt(payload, dest.getPublicKey(), key, tags, tag, newKey, size);
+        byte encr[] = _context.elGamalAESEngine().encrypt(payload, dest.getPublicKey(), key, tags, tag, newKey, size);
         // yes, in an intelligent component, newTags would be queued for confirmation along with key, and
         // generateNewTags would only generate tags if necessary
 

@@ -10,6 +10,9 @@ package net.i2p.client.naming;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.Destination;
 import net.i2p.util.Log;
+import net.i2p.I2PAppContext;
+
+import java.lang.reflect.Constructor;
 
 /**
  * Naming services create a subclass of this class.
@@ -17,10 +20,23 @@ import net.i2p.util.Log;
 public abstract class NamingService {
 
     private final static Log _log = new Log(NamingService.class);
+    protected I2PAppContext _context;
 
     private static final String PROP_IMPL = "i2p.naming.impl";
     private static final String DEFAULT_IMPL = "net.i2p.client.naming.HostsTxtNamingService";
 
+    
+    /** 
+     * The naming service should only be constructed and accessed through the 
+     * application context.  This constructor should only be used by the 
+     * appropriate application context itself.
+     *
+     */
+    protected NamingService(I2PAppContext context) {
+        _context = context;
+    }
+    private NamingService() {}
+    
     /**
      * Look up a host name.
      * @return the Destination for this host name, or
@@ -52,23 +68,22 @@ public abstract class NamingService {
         }
     }
 
-    private static NamingService instance = null;
-
     /**
      * Get a naming service instance. This method ensures that there
      * will be only one naming service instance (singleton) as well as
      * choose the implementation from the "i2p.naming.impl" system
      * property.
      */
-    public static synchronized NamingService getInstance() {
-        if (instance == null) {
-            String impl = System.getProperty(PROP_IMPL, DEFAULT_IMPL);
-            try {
-                instance = (NamingService) Class.forName(impl).newInstance();
-            } catch (Exception ex) {
-                _log.error("Cannot loadNaming service implementation", ex);
-                instance = new DummyNamingService(); // fallback
-            }
+    public static final synchronized NamingService createInstance(I2PAppContext context) {
+        NamingService instance = null;
+        String impl = context.getProperty(PROP_IMPL, DEFAULT_IMPL);
+        try {
+            Class cls = Class.forName(impl);
+            Constructor con = cls.getConstructor(new Class[] { I2PAppContext.class });
+            instance = (NamingService)con.newInstance(new Object[] { context });
+        } catch (Exception ex) {
+            _log.error("Cannot loadNaming service implementation", ex);
+            instance = new DummyNamingService(context); // fallback
         }
         return instance;
     }

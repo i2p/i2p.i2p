@@ -49,6 +49,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.StringTokenizer;
 
+import net.i2p.I2PAppContext;
 import net.i2p.I2PException;
 import net.i2p.client.I2PClient;
 import net.i2p.client.I2PClientFactory;
@@ -65,6 +66,7 @@ import net.i2p.util.Log;
 public class I2PTunnel implements Logging, EventDispatcher {
     private final static Log _log = new Log(I2PTunnel.class);
     private final EventDispatcherImpl _event = new EventDispatcherImpl();
+    private static I2PAppContext _context = new I2PAppContext();
 
     public static final int PACKET_DELAY = 100;
 
@@ -954,7 +956,7 @@ public class I2PTunnel implements Logging, EventDispatcher {
             }
         } else {
             // ask naming service
-            NamingService inst = NamingService.getInstance();
+            NamingService inst = _context.namingService();
             return inst.lookup(name);
         }
     }

@@ -19,26 +19,20 @@ import net.i2p.data.Hash;
 import net.i2p.data.SessionKey;
 import net.i2p.util.Log;
 import net.i2p.util.RandomSource;
+import net.i2p.I2PAppContext;
 
 /** 
- * Wrapper singleton for AES cypher operation.
+ * Dummy wrapper for AES cipher operation.
  *
- * @author jrandom
  */
 public class AESEngine {
-    private final static Log _log = new Log(AESEngine.class);
-    private static AESEngine _engine;
-    static {
-        if ("off".equals(System.getProperty("i2p.encryption", "on")))
-            _engine = new AESEngine();
-        else
-            _engine = new CryptixAESEngine();
+    private Log _log;
+    private I2PAppContext _context;
+    public AESEngine(I2PAppContext ctx) {
+        _context = ctx;
+        _log = _context.logManager().getLog(AESEngine.class);
     }
-
-    public static AESEngine getInstance() {
-        return _engine;
-    }
-
+    
     /** Encrypt the payload with the session key
      * @param payload data to be encrypted
      * @param sessionKey private esession key to encrypt to
@@ -59,13 +53,13 @@ public class AESEngine {
         if ((iv == null) || (payload == null) || (sessionKey == null) || (iv.length != 16)) return null;
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream(paddedSize + 64);
-        Hash h = SHA256Generator.getInstance().calculateHash(sessionKey.getData());
+        Hash h = _context.sha().calculateHash(sessionKey.getData());
         try {
             h.writeBytes(baos);
             DataHelper.writeLong(baos, 4, payload.length);
             baos.write(payload);
             byte tv[] = baos.toByteArray();
-            baos.write(ElGamalAESEngine.getPadding(tv.length, paddedSize));
+            baos.write(ElGamalAESEngine.getPadding(_context, tv.length, paddedSize));
         } catch (IOException ioe) {
             _log.error("Error writing data", ioe);
             return null;
@@ -85,7 +79,7 @@ public class AESEngine {
             return null;
         }
         ByteArrayInputStream bais = new ByteArrayInputStream(decr);
-        Hash h = SHA256Generator.getInstance().calculateHash(sessionKey.getData());
+        Hash h = _context.sha().calculateHash(sessionKey.getData());
         try {
             Hash rh = new Hash();
             rh.readBytes(bais);
@@ -127,20 +121,21 @@ public class AESEngine {
     }
 
     public static void main(String args[]) {
-        SessionKey key = KeyGenerator.getInstance().generateSessionKey();
+        I2PAppContext ctx = new I2PAppContext();
+        SessionKey key = ctx.keyGenerator().generateSessionKey();
         byte iv[] = new byte[16];
         RandomSource.getInstance().nextBytes(iv);
 
         byte sbuf[] = new byte[16];
         RandomSource.getInstance().nextBytes(sbuf);
-        byte se[] = AESEngine.getInstance().encrypt(sbuf, key, iv);
-        byte sd[] = AESEngine.getInstance().decrypt(se, key, iv);
-        _log.debug("Short test: " + DataHelper.eq(sd, sbuf));
+        byte se[] = ctx.AESEngine().encrypt(sbuf, key, iv);
+        byte sd[] = ctx.AESEngine().decrypt(se, key, iv);
+        ctx.logManager().getLog(AESEngine.class).debug("Short test: " + DataHelper.eq(sd, sbuf));
 
         byte lbuf[] = new byte[1024];
         RandomSource.getInstance().nextBytes(sbuf);
-        byte le[] = AESEngine.getInstance().safeEncrypt(lbuf, key, iv, 2048);
-        byte ld[] = AESEngine.getInstance().safeDecrypt(le, key, iv);
-        _log.debug("Long test: " + DataHelper.eq(ld, lbuf));
+        byte le[] = ctx.AESEngine().safeEncrypt(lbuf, key, iv, 2048);
+        byte ld[] = ctx.AESEngine().safeDecrypt(le, key, iv);
+        ctx.logManager().getLog(AESEngine.class).debug("Long test: " + DataHelper.eq(ld, lbuf));
     }
 }

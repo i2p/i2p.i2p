@@ -3,28 +3,23 @@ package net.i2p.crypto;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
 import net.i2p.data.SessionKey;
+import net.i2p.I2PAppContext;
 
 /**
  * Calculate the HMAC-SHA256 of a key+message.  Currently FAKE - returns a stupid
  * kludgy hash: H(H(key) XOR H(data)).  Fix me!
  *
  */
-public abstract class HMACSHA256Generator {
-    private static HMACSHA256Generator _generator = new DummyHMACSHA256Generator();
-
+public class HMACSHA256Generator {
+    public HMACSHA256Generator(I2PAppContext context) {};
     public static HMACSHA256Generator getInstance() {
-        return _generator;
+        return I2PAppContext.getGlobalContext().hmac();
     }
-
-    public abstract Hash calculate(SessionKey key, byte data[]);
-}
-
-/**
- * jrandom smells.  
- *
- */
-
-class DummyHMACSHA256Generator extends HMACSHA256Generator {
+    
+    /**
+     * This should calculate the HMAC/SHA256, but it DOESNT.  Its just a kludge.
+     * Fix me.
+     */
     public Hash calculate(SessionKey key, byte data[]) {
         if ((key == null) || (key.getData() == null) || (data == null))
             throw new NullPointerException("Null arguments for HMAC");

@@ -24,6 +24,7 @@ import net.i2p.data.SessionKey;
 import net.i2p.util.Clock;
 import net.i2p.util.Log;
 import net.i2p.util.RandomSource;
+import net.i2p.I2PAppContext;
 
 /**
  * This reads an underlying stream as written by AESOutputStream - AES256 encrypted
@@ -36,8 +37,8 @@ import net.i2p.util.RandomSource;
  *
  */
 public class AESInputStream extends FilterInputStream {
-    private final static Log _log = new Log(AESInputStream.class);
-    private final static CryptixAESEngine _engine = new CryptixAESEngine();
+    private Log _log;
+    private I2PAppContext _context;
     private SessionKey _key;
     private byte[] _lastBlock;
     private boolean _eofFound;
@@ -52,8 +53,10 @@ public class AESInputStream extends FilterInputStream {
     private final static int READ_SIZE = BLOCK_SIZE;
     private final static int DECRYPT_SIZE = BLOCK_SIZE - 1;
 
-    public AESInputStream(InputStream source, SessionKey key, byte iv[]) {
+    public AESInputStream(I2PAppContext context, InputStream source, SessionKey key, byte iv[]) {
         super(source);
+        _context = context;
+        _log = context.logManager().getLog(AESInputStream.class);
         _key = key;
         _lastBlock = new byte[BLOCK_SIZE];
         System.arraycopy(iv, 0, _lastBlock, 0, BLOCK_SIZE);
@@ -223,8 +226,8 @@ public class AESInputStream extends FilterInputStream {
         byte block[] = new byte[BLOCK_SIZE];
         for (int i = 0; i < numBlocks; i++) {
             System.arraycopy(encrypted, i * BLOCK_SIZE, block, 0, BLOCK_SIZE);
-            byte decrypted[] = _engine.decrypt(block, _key, _lastBlock);
-            byte data[] = CryptixAESEngine.xor(decrypted, _lastBlock);
+            byte decrypted[] = _context.AESEngine().decrypt(block, _key, _lastBlock);
+            byte data[] = DataHelper.xor(decrypted, _lastBlock);
             int cleaned[] = stripPadding(data);
             for (int j = 0; j < cleaned.length; j++) {
                 if (((int) cleaned[j]) <= 0) {
@@ -297,6 +300,8 @@ public class AESInputStream extends FilterInputStream {
      * Test AESOutputStream/AESInputStream
      */
     public static void main(String args[]) {
+        I2PAppContext ctx = new I2PAppContext();
+        Log log = ctx.logManager().getLog(AESInputStream.class);
         byte orig[] = new byte[1024 * 32];
         RandomSource.getInstance().nextBytes(orig);
         //byte orig[] = "you are my sunshine, my only sunshine".getBytes();
@@ -304,40 +309,40 @@ public class AESInputStream extends FilterInputStream {
         byte iv[] = "there once was a".getBytes();
 
         for (int i = 0; i < 20; i++) {
-            runTest(orig, key, iv);
+            runTest(ctx, orig, key, iv);
         }
 
-        _log.info("Done testing 32KB data");
+        log.info("Done testing 32KB data");
 
         orig = new byte[20];
         RandomSource.getInstance().nextBytes(orig);
         for (int i = 0; i < 20; i++) {
-            runTest(orig, key, iv);
+            runTest(ctx, orig, key, iv);
         }
 
-        _log.info("Done testing 20 byte data");
+        log.info("Done testing 20 byte data");
 
         orig = new byte[3];
         RandomSource.getInstance().nextBytes(orig);
         for (int i = 0; i < 20; i++) {
-            runTest(orig, key, iv);
+            runTest(ctx, orig, key, iv);
         }
 
-        _log.info("Done testing 3 byte data");
+        log.info("Done testing 3 byte data");
 
         orig = new byte[0];
         RandomSource.getInstance().nextBytes(orig);
         for (int i = 0; i < 20; i++) {
-            runTest(orig, key, iv);
+            runTest(ctx, orig, key, iv);
         }
 
-        _log.info("Done testing 0 byte data");
+        log.info("Done testing 0 byte data");
 
         orig = new byte[32];
         RandomSource.getInstance().nextBytes(orig);
-        runOffsetTest(orig, key, iv);
+        runOffsetTest(ctx, orig, key, iv);
 
-        _log.info("Done testing offset test (it should have come back with a statement NOT EQUAL!)");
+        log.info("Done testing offset test (it should have come back with a statement NOT EQUAL!)");
 
         try {
             Thread.sleep(30 * 1000);
@@ -345,11 +350,12 @@ public class AESInputStream extends FilterInputStream {
         }
     }
 
-    private static void runTest(byte orig[], SessionKey key, byte[] iv) {
+    private static void runTest(I2PAppContext ctx, byte orig[], SessionKey key, byte[] iv) {
+        Log log = ctx.logManager().getLog(AESInputStream.class);
         try {
             long start = Clock.getInstance().now();
             ByteArrayOutputStream origStream = new ByteArrayOutputStream(512);
-            AESOutputStream out = new AESOutputStream(origStream, key, iv);
+            AESOutputStream out = new AESOutputStream(ctx, origStream, key, iv);
             out.write(orig);
             out.close();
 
@@ -357,7 +363,7 @@ public class AESInputStream extends FilterInputStream {
             long endE = Clock.getInstance().now();
 
             ByteArrayInputStream encryptedStream = new ByteArrayInputStream(encrypted);
-            AESInputStream in = new AESInputStream(encryptedStream, key, iv);
+            AESInputStream in = new AESInputStream(ctx, encryptedStream, key, iv);
             ByteArrayOutputStream baos = new ByteArrayOutputStream(512);
             byte buf[] = new byte[1024 * 32];
             int read = DataHelper.read(in, buf);
@@ -370,65 +376,66 @@ public class AESInputStream extends FilterInputStream {
             Hash newHash = SHA256Generator.getInstance().calculateHash(fin);
             boolean eq = origHash.equals(newHash);
             if (eq)
-                _log.info("Equal hashes.  hash: " + origHash);
+                log.info("Equal hashes.  hash: " + origHash);
             else
-                _log.error("NOT EQUAL!  \norig: \t" + Base64.encode(orig) + "\nnew : \t" + Base64.encode(fin));
+                log.error("NOT EQUAL!  \norig: \t" + Base64.encode(orig) + "\nnew : \t" + Base64.encode(fin));
             boolean ok = DataHelper.eq(orig, fin);
-            _log.debug("EQ data? " + ok + " origLen: " + orig.length + " fin.length: " + fin.length);
-            _log.debug("Time to D(E(" + orig.length + ")): " + (end - start) + "ms");
-            _log.debug("Time to E(" + orig.length + "): " + (endE - start) + "ms");
-            _log.debug("Time to D(" + orig.length + "): " + (end - endE) + "ms");
+            log.debug("EQ data? " + ok + " origLen: " + orig.length + " fin.length: " + fin.length);
+            log.debug("Time to D(E(" + orig.length + ")): " + (end - start) + "ms");
+            log.debug("Time to E(" + orig.length + "): " + (endE - start) + "ms");
+            log.debug("Time to D(" + orig.length + "): " + (end - endE) + "ms");
 
         } catch (Throwable t) {
-            _log.error("ERROR transferring", t);
+            log.error("ERROR transferring", t);
         }
         //try { Thread.sleep(5000); } catch (Throwable t) {}
     }
 
-    private static void runOffsetTest(byte orig[], SessionKey key, byte[] iv) {
+    private static void runOffsetTest(I2PAppContext ctx, byte orig[], SessionKey key, byte[] iv) {
+        Log log = ctx.logManager().getLog(AESInputStream.class);
         try {
             long start = Clock.getInstance().now();
             ByteArrayOutputStream origStream = new ByteArrayOutputStream(512);
-            AESOutputStream out = new AESOutputStream(origStream, key, iv);
+            AESOutputStream out = new AESOutputStream(ctx, origStream, key, iv);
             out.write(orig);
             out.close();
 
             byte encrypted[] = origStream.toByteArray();
             long endE = Clock.getInstance().now();
 
-            _log.info("Encrypted segment length: " + encrypted.length);
+            log.info("Encrypted segment length: " + encrypted.length);
             byte encryptedSegment[] = new byte[40];
             System.arraycopy(encrypted, 0, encryptedSegment, 0, 40);
 
             ByteArrayInputStream encryptedStream = new ByteArrayInputStream(encryptedSegment);
-            AESInputStream in = new AESInputStream(encryptedStream, key, iv);
+            AESInputStream in = new AESInputStream(ctx, encryptedStream, key, iv);
             ByteArrayOutputStream baos = new ByteArrayOutputStream(512);
             byte buf[] = new byte[1024 * 32];
             int read = DataHelper.read(in, buf);
             int remaining = in.remainingBytes();
             int readyBytes = in.readyBytes();
-            _log.info("Read: " + read);
+            log.info("Read: " + read);
             if (read > 0) baos.write(buf, 0, read);
             in.close();
             byte fin[] = baos.toByteArray();
-            _log.info("fin.length: " + fin.length + " remaining: " + remaining + " ready: " + readyBytes);
+            log.info("fin.length: " + fin.length + " remaining: " + remaining + " ready: " + readyBytes);
             long end = Clock.getInstance().now();
             Hash origHash = SHA256Generator.getInstance().calculateHash(orig);
 
             Hash newHash = SHA256Generator.getInstance().calculateHash(fin);
             boolean eq = origHash.equals(newHash);
             if (eq)
-                _log.info("Equal hashes.  hash: " + origHash);
+                log.info("Equal hashes.  hash: " + origHash);
             else
-                _log.error("NOT EQUAL!  \norig: \t" + Base64.encode(orig) + "\nnew : \t" + Base64.encode(fin));
+                log.error("NOT EQUAL!  \norig: \t" + Base64.encode(orig) + "\nnew : \t" + Base64.encode(fin));
             boolean ok = DataHelper.eq(orig, fin);
-            _log.debug("EQ data? " + ok + " origLen: " + orig.length + " fin.length: " + fin.length);
-            _log.debug("Time to D(E(" + orig.length + ")): " + (end - start) + "ms");
-            _log.debug("Time to E(" + orig.length + "): " + (endE - start) + "ms");
-            _log.debug("Time to D(" + orig.length + "): " + (end - endE) + "ms");
+            log.debug("EQ data? " + ok + " origLen: " + orig.length + " fin.length: " + fin.length);
+            log.debug("Time to D(E(" + orig.length + ")): " + (end - start) + "ms");
+            log.debug("Time to E(" + orig.length + "): " + (endE - start) + "ms");
+            log.debug("Time to D(" + orig.length + "): " + (end - endE) + "ms");
 
         } catch (Throwable t) {
-            _log.error("ERROR transferring", t);
+            log.error("ERROR transferring", t);
         }
         //try { Thread.sleep(5000); } catch (Throwable t) {}
     }

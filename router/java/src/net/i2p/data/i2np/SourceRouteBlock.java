@@ -26,6 +26,7 @@ import net.i2p.data.PublicKey;
 import net.i2p.data.SessionKey;
 import net.i2p.data.SessionTag;
 import net.i2p.util.Log;
+import net.i2p.I2PAppContext;
 
 
 /**
@@ -46,14 +47,14 @@ public class SourceRouteBlock extends DataStructureImpl {
     private long _decryptedExpiration;
     
     public SourceRouteBlock() { 
-	setRouter(null);
-	setData(null);
-	setKey(null);
-	setTag((byte[])null);
-	_decryptedInstructions = null;
-	_decryptedMessageId = -1;
-	_decryptedCertificate = null;
-	_decryptedExpiration = -1;
+        setRouter(null);
+        setData(null);
+        setKey(null);
+        setTag((byte[])null);
+        _decryptedInstructions = null;
+        _decryptedMessageId = -1;
+        _decryptedCertificate = null;
+        _decryptedExpiration = -1;
     }
     
     /**
@@ -92,9 +93,9 @@ public class SourceRouteBlock extends DataStructureImpl {
     public byte[] getTag() { return _tag; }
     public void setTag(SessionTag tag) { setTag(tag.getData()); }
     public void setTag(byte tag[]) {
-	if ( (tag != null) && (tag.length != SessionTag.BYTE_LENGTH) )
-	    throw new IllegalArgumentException("Tag must be either null or 32 bytes");
-	_tag = tag;
+        if ( (tag != null) && (tag.length != SessionTag.BYTE_LENGTH) )
+            throw new IllegalArgumentException("Tag must be either null or 32 bytes");
+        _tag = tag;
     }
 
     /**
@@ -126,100 +127,105 @@ public class SourceRouteBlock extends DataStructureImpl {
      * 
      * @throws DataFormatException if the data is invalid or could not be encrypted
      */
-    public void setData(DeliveryInstructions instructions, long messageId, Certificate cert, long expiration, PublicKey replyThrough) throws DataFormatException {
-	try {
-	    ByteArrayOutputStream baos = new ByteArrayOutputStream(64);
+    public void setData(I2PAppContext ctx, DeliveryInstructions instructions, 
+                        long messageId, Certificate cert, long expiration, 
+                        PublicKey replyThrough) throws DataFormatException {
+        try {
+            ByteArrayOutputStream baos = new ByteArrayOutputStream(64);
 
-	    _decryptedInstructions = instructions;
-	    _decryptedMessageId = messageId;
-	    _decryptedCertificate = cert;
-	    _decryptedExpiration = expiration;
-	    
-	    instructions.writeBytes(baos);
-	    DataHelper.writeLong(baos, 4, messageId);
-	    cert.writeBytes(baos);
-	    DataHelper.writeDate(baos, new Date(expiration));
+            _decryptedInstructions = instructions;
+            _decryptedMessageId = messageId;
+            _decryptedCertificate = cert;
+            _decryptedExpiration = expiration;
 
-	    int paddedSize = 256;
-	    SessionKey sessKey = null;
-	    SessionTag tag = null;
-	    if (instructions.getDelayRequested()) {
-		// always use a new key if we're delaying, since the reply block may not be used within the 
-		// window of a session
-		sessKey = KeyGenerator.getInstance().generateSessionKey();
-		tag = null;
-		_log.debug("Delay requested - creating a new session key");
-	    } else {
-		sessKey = SessionKeyManager.getInstance().getCurrentKey(replyThrough);
-		if (sessKey == null) { 
-		    sessKey = KeyGenerator.getInstance().generateSessionKey();
-		    tag = null;
-		    _log.debug("No delay requested, but no session key is known");
-		} else {
-		    tag = SessionKeyManager.getInstance().consumeNextAvailableTag(replyThrough, sessKey);
-		}
-	    }
-	    byte encData[] = ElGamalAESEngine.encrypt(baos.toByteArray(), replyThrough, sessKey, null, tag, paddedSize);
-	    setData(encData);
-	} catch (IOException ioe) {
-	    throw new DataFormatException("Error writing out the source route block data", ioe);
-	} catch (DataFormatException dfe) {
-	    throw new DataFormatException("Error writing out the source route block data", dfe);
-	}
+            instructions.writeBytes(baos);
+            DataHelper.writeLong(baos, 4, messageId);
+            cert.writeBytes(baos);
+            DataHelper.writeDate(baos, new Date(expiration));
+
+            int paddedSize = 256;
+            SessionKey sessKey = null;
+            SessionTag tag = null;
+            if (instructions.getDelayRequested()) {
+                // always use a new key if we're delaying, since the reply block may not be used within the 
+                // window of a session
+                sessKey = ctx.keyGenerator().generateSessionKey();
+                tag = null;
+                if (_log.shouldLog(Log.DEBUG))
+                    _log.debug("Delay requested - creating a new session key");
+            } else {
+                sessKey = ctx.sessionKeyManager().getCurrentKey(replyThrough);
+                if (sessKey == null) { 
+                    sessKey = ctx.keyGenerator().generateSessionKey();
+                    tag = null;
+                    if (_log.shouldLog(Log.DEBUG))
+                        _log.debug("No delay requested, but no session key is known");
+                } else {
+                    tag = ctx.sessionKeyManager().consumeNextAvailableTag(replyThrough, sessKey);
+                }
+            }
+            byte encData[] = ctx.elGamalAESEngine().encrypt(baos.toByteArray(), replyThrough, 
+                                                            sessKey, null, tag, paddedSize);
+            setData(encData);
+        } catch (IOException ioe) {
+            throw new DataFormatException("Error writing out the source route block data", ioe);
+        } catch (DataFormatException dfe) {
+            throw new DataFormatException("Error writing out the source route block data", dfe);
+        }
     }
     
     
     public void readBytes(InputStream in) throws DataFormatException, IOException {
-	_router = new Hash();
-	_router.readBytes(in);
-	int size = (int)DataHelper.readLong(in, 2);
-	_data = new byte[size];
-	int read = read(in, _data);
-	if (read != _data.length)
-	    throw new DataFormatException("Incorrect # of bytes read for source route block: " + read);
-	_key = new SessionKey();
-	_key.readBytes(in);
-	_tag = new byte[32];
-	read = read(in, _tag);
-	if (read != _tag.length)
-	    throw new DataFormatException("Incorrect # of bytes read for session tag: " + read);
+        _router = new Hash();
+        _router.readBytes(in);
+        int size = (int)DataHelper.readLong(in, 2);
+        _data = new byte[size];
+        int read = read(in, _data);
+        if (read != _data.length)
+            throw new DataFormatException("Incorrect # of bytes read for source route block: " + read);
+        _key = new SessionKey();
+        _key.readBytes(in);
+        _tag = new byte[32];
+        read = read(in, _tag);
+        if (read != _tag.length)
+            throw new DataFormatException("Incorrect # of bytes read for session tag: " + read);
     }
     
     public void writeBytes(OutputStream out) throws DataFormatException, IOException {
         if ( (_router == null) || (_data == null) || (_key == null) || (_tag == null) || (_tag.length != 32) ) 
-	    throw new DataFormatException("Insufficient data to write");
-	_router.writeBytes(out);
-	DataHelper.writeLong(out, 2, _data.length);
-	out.write(_data);
-	_key.writeBytes(out);
-	out.write(_tag);
+            throw new DataFormatException("Insufficient data to write");
+        _router.writeBytes(out);
+        DataHelper.writeLong(out, 2, _data.length);
+        out.write(_data);
+        _key.writeBytes(out);
+        out.write(_tag);
     }
     
     public boolean equals(Object obj) {
         if ( (obj == null) || !(obj instanceof SourceRouteBlock))
             return false;
-	SourceRouteBlock block = (SourceRouteBlock)obj;
-	return DataHelper.eq(getRouter(), block.getRouter()) &&
-	       DataHelper.eq(getData(), block.getData()) &&
-	       DataHelper.eq(getKey(), block.getKey()) &&
-	       DataHelper.eq(getTag(), block.getTag());
+        SourceRouteBlock block = (SourceRouteBlock)obj;
+        return DataHelper.eq(getRouter(), block.getRouter()) &&
+               DataHelper.eq(getData(), block.getData()) &&
+               DataHelper.eq(getKey(), block.getKey()) &&
+               DataHelper.eq(getTag(), block.getTag());
     }
     
     public int hashCode() {
         return DataHelper.hashCode(getRouter()) + 
-	       DataHelper.hashCode(getData()) +
-	       DataHelper.hashCode(getKey()) +
-	       DataHelper.hashCode(getTag());
+               DataHelper.hashCode(getData()) +
+               DataHelper.hashCode(getKey()) +
+               DataHelper.hashCode(getTag());
     }
     
     public String toString() {
-	StringBuffer buf = new StringBuffer(128);
+        StringBuffer buf = new StringBuffer(128);
         buf.append("[SourceRouteBlock: ");
-	buf.append("\n\tRouter: ").append(getRouter());
-	buf.append("\n\tData: ").append(DataHelper.toString(getData(), getData().length));
-	buf.append("\n\tTag: ").append(DataHelper.toString(getTag(), (getTag() != null ? getTag().length : 0)));
-	buf.append("\n\tKey: ").append(getKey());
-	buf.append("]");
-	return buf.toString();
+        buf.append("\n\tRouter: ").append(getRouter());
+        buf.append("\n\tData: ").append(DataHelper.toString(getData(), getData().length));
+        buf.append("\n\tTag: ").append(DataHelper.toString(getTag(), (getTag() != null ? getTag().length : 0)));
+        buf.append("\n\tKey: ").append(getKey());
+        buf.append("]");
+        return buf.toString();
     }
 }

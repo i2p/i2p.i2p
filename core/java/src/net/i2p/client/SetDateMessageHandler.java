@@ -12,6 +12,7 @@ package net.i2p.client;
 import net.i2p.data.i2cp.I2CPMessage;
 import net.i2p.data.i2cp.SetDateMessage;
 import net.i2p.util.Clock;
+import net.i2p.I2PAppContext;
 
 /**
  * Handle I2CP time messages from the router
@@ -19,8 +20,8 @@ import net.i2p.util.Clock;
  * @author jrandom
  */
 class SetDateMessageHandler extends HandlerImpl {
-    public SetDateMessageHandler() {
-        super(SetDateMessage.MESSAGE_TYPE);
+    public SetDateMessageHandler(I2PAppContext ctx) {
+        super(ctx, SetDateMessage.MESSAGE_TYPE);
     }
 
     public void handleMessage(I2CPMessage message, I2PSessionImpl session) {

@@ -25,15 +25,12 @@ import net.i2p.util.Log;
  *
  */
 public class ClientMessagePool {
-    private final static Log _log = new Log(ClientMessagePool.class);
-    private static ClientMessagePool _instance = new ClientMessagePool();
-    public static final ClientMessagePool getInstance() { return _instance; }
-    private List _inMessages;
-    private List _outMessages;
+    private Log _log;
+    private RouterContext _context;
     
-    private ClientMessagePool() {
-	_inMessages = new ArrayList();
-	_outMessages = new ArrayList();
+    public ClientMessagePool(RouterContext context) {
+        _context = context;
+        _log = _context.logManager().getLog(ClientMessagePool.class);
     }
   
     /**
@@ -42,84 +39,13 @@ public class ClientMessagePool {
      *
      */
     public void add(ClientMessage msg) {
-	if ( (ClientManagerFacade.getInstance().isLocal(msg.getDestination())) ||
-	     (ClientManagerFacade.getInstance().isLocal(msg.getDestinationHash())) ) {
-	    _log.debug("Adding message for local delivery");
-	    ClientManagerFacade.getInstance().messageReceived(msg);
-	    //synchronized (_inMessages) {
-	    //	_inMessages.add(msg);
-	    //}
-	} else {
-	    _log.debug("Adding message for remote delivery");
-	    //JobQueue.getInstance().addJob(new ProcessOutboundClientMessageJob(msg));
-	    JobQueue.getInstance().addJob(new OutboundClientMessageJob(msg));
-	    //synchronized (_outMessages) {
-	    //	_outMessages.add(msg);
-	    //}
-	}
-    }
-    
-    /**
-     * Retrieve the next locally destined message, or null if none are available.
-     *
-     */
-    public ClientMessage getNextLocal() {
-	synchronized (_inMessages) {
-	    if (_inMessages.size() <= 0) return null;
-	    return (ClientMessage)_inMessages.remove(0);
-	}
-    }
-    
-    /**
-     * Retrieve the next remotely destined message, or null if none are available.
-     *
-     */
-    public ClientMessage getNextRemote() {
-	synchronized (_outMessages) {
-	    if (_outMessages.size() <= 0) return null;
-	    return (ClientMessage)_outMessages.remove(0);
-	}
-    }
-    
-    /**
-     * Determine how many locally bound messages are in the pool
-     *
-     */
-    public int getLocalCount() {
-	synchronized (_inMessages) {
-	    return _inMessages.size(); 
-	}
-    }
-    
-    /**
-     * Determine how many remotely bound messages are in the pool.
-     *
-     */
-    public int getRemoteCount() {
-	synchronized (_outMessages) {
-	    return _outMessages.size();
-	}
-    }
-    
-    public void dumpPoolInfo() {
-	StringBuffer buf = new StringBuffer();
-	buf.append("\nDumping Client Message Pool.  Local messages: ").append(getLocalCount()).append(" Remote messages: ").append(getRemoteCount()).append("\n");
-	buf.append("Inbound messages\n");
-	buf.append("----------------------------\n");
-	synchronized (_inMessages) {
-	    for (Iterator iter = _inMessages.iterator(); iter.hasNext();) {
-		ClientMessage msg = (ClientMessage)iter.next();
-		buf.append(msg).append("\n\n");
-	    }
-	}
-	buf.append("Outbound messages\n");
-	buf.append("----------------------------\n");
-	synchronized (_outMessages) {
-	    for (Iterator iter = _outMessages.iterator(); iter.hasNext();) {
-		ClientMessage msg = (ClientMessage)iter.next();
-		buf.append(msg).append("\n\n");
-	    }
-	}
-	_log.debug(buf.toString());
+        if ( (_context.clientManager().isLocal(msg.getDestination())) ||
+             (_context.clientManager().isLocal(msg.getDestinationHash())) ) {
+            _log.debug("Adding message for local delivery");
+            _context.clientManager().messageReceived(msg);
+        } else {
+            _log.debug("Adding message for remote delivery");
+            _context.jobQueue().addJob(new OutboundClientMessageJob(_context, msg));
+        }
     }
 }

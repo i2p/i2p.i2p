@@ -19,6 +19,7 @@ import net.i2p.crypto.SHA256Generator;
 import net.i2p.util.Clock;
 import net.i2p.util.Log;
 import net.i2p.util.RandomSource;
+import net.i2p.I2PAppContext;
 
 /**
  * Component to manage the munging of hashes into routing keys - given a hash, 
@@ -40,12 +41,17 @@ import net.i2p.util.RandomSource;
  *
  */
 public class RoutingKeyGenerator {
-    private final static RoutingKeyGenerator _instance = new RoutingKeyGenerator();
+    private Log _log;
+    private I2PAppContext _context;
 
-    public static RoutingKeyGenerator getInstance() {
-        return _instance;
+    public RoutingKeyGenerator(I2PAppContext context) {
+        _log = context.logManager().getLog(RoutingKeyGenerator.class);
+        _context = context;
     }
-    private final static Log _log = new Log(RoutingKeyGenerator.class);
+    public static RoutingKeyGenerator getInstance() {
+        return I2PAppContext.getGlobalContext().routingKeyGenerator();
+    }
+    
     private byte _currentModData[];
 
     private final static Calendar _cal = GregorianCalendar.getInstance(TimeZone.getTimeZone("GMT"));
@@ -67,7 +73,7 @@ public class RoutingKeyGenerator {
     public void generateDateBasedModData() {
         Date today = null;
         synchronized (_cal) {
-            _cal.setTime(new Date(Clock.getInstance().now()));
+            _cal.setTime(new Date(_context.clock().now()));
             _cal.set(Calendar.HOUR_OF_DAY, 0);
             _cal.set(Calendar.MINUTE, 0);
             _cal.set(Calendar.SECOND, 0);

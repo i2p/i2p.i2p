@@ -23,6 +23,7 @@ import net.i2p.data.Base64;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.Destination;
 import net.i2p.util.Log;
+import net.i2p.I2PAppContext;
 
 /**
  * Miscellaneous utility methods used by SAM protocol handlers.
@@ -32,6 +33,7 @@ import net.i2p.util.Log;
 public class SAMUtils {
 
     private final static Log _log = new Log(SAMUtils.class);
+    private static I2PAppContext _context = new I2PAppContext();
 
     /**
      * Generate a random destination key
@@ -84,7 +86,7 @@ public class SAMUtils {
      * @return the Destination for the specified hostname, or null if not found
      */
     public static Destination lookupHost(String name, OutputStream pubKey) {
-        NamingService ns = NamingService.getInstance();
+        NamingService ns = _context.namingService();
         Destination dest = ns.lookup(name);
 
         if ((pubKey != null) && (dest != null)) {

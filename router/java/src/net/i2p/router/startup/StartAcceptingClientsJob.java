@@ -20,24 +20,28 @@ import net.i2p.router.admin.AdminManager;
 import net.i2p.util.Clock;
 import net.i2p.util.I2PThread;
 import net.i2p.util.Log;
+import net.i2p.router.RouterContext;
 
 public class StartAcceptingClientsJob extends JobImpl {
-    private static Log _log = new Log(StartAcceptingClientsJob.class);
+    private Log _log;
     
-    public StartAcceptingClientsJob() { }
+    public StartAcceptingClientsJob(RouterContext context) {
+        super(context);
+        _log = context.logManager().getLog(StartAcceptingClientsJob.class);
+    }
     
     public String getName() { return "Start Accepting Clients"; }
     
     public void runJob() {
         // start up the network database
 
-        ClientManagerFacade.getInstance().startup();
+        _context.clientManager().startup();
 
-        JobQueue.getInstance().addJob(new ReadConfigJob());
-        JobQueue.getInstance().addJob(new RebuildRouterInfoJob());
-        AdminManager.getInstance().startup();
-        JobQueue.getInstance().allowParallelOperation();
-        JobQueue.getInstance().addJob(new LoadClientAppsJob());
+        _context.jobQueue().addJob(new ReadConfigJob(_context));
+        _context.jobQueue().addJob(new RebuildRouterInfoJob(_context));
+        new AdminManager(_context).startup();
+        _context.jobQueue().allowParallelOperation();
+        _context.jobQueue().addJob(new LoadClientAppsJob(_context));
     }
     
     public static void main(String args[]) {
@@ -59,19 +63,20 @@ public class StartAcceptingClientsJob extends JobImpl {
 }
 
 class LoadClientAppsJob extends JobImpl {
-    private final static Log _log = new Log(LoadClientAppsJob.class);
+    private Log _log;
     /** wait 2 minutes before starting up client apps */
     private final static long STARTUP_DELAY = 2*60*1000;
-    public LoadClientAppsJob() {
-        super();
-        getTiming().setStartAfter(STARTUP_DELAY + Clock.getInstance().now());
+    public LoadClientAppsJob(RouterContext ctx) {
+        super(ctx);
+        _log = ctx.logManager().getLog(LoadClientAppsJob.class);
+        getTiming().setStartAfter(STARTUP_DELAY + _context.clock().now());
     }
     public void runJob() {
         int i = 0;
         while (true) {
-            String className = Router.getInstance().getConfigSetting("clientApp."+i+".main");
-            String clientName = Router.getInstance().getConfigSetting("clientApp."+i+".name");
-            String args = Router.getInstance().getConfigSetting("clientApp."+i+".args");
+            String className = _context.router().getConfigSetting("clientApp."+i+".main");
+            String clientName = _context.router().getConfigSetting("clientApp."+i+".name");
+            String args = _context.router().getConfigSetting("clientApp."+i+".args");
             if (className == null) break;
 
             String argVal[] = parseArgs(args);
@@ -137,7 +142,7 @@ class LoadClientAppsJob extends JobImpl {
         t.start();
     }
     
-    private final static class RunApp implements Runnable {
+    private final class RunApp implements Runnable {
         private String _className;
         private String _appName;
         private String _args[];

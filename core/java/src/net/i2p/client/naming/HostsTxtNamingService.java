@@ -14,12 +14,22 @@ import java.util.Properties;
 
 import net.i2p.data.Destination;
 import net.i2p.util.Log;
+import net.i2p.I2PAppContext;
 
 /**
  * A naming service based on the "hosts.txt" file.
  */
 public class HostsTxtNamingService extends NamingService {
 
+    /** 
+     * The naming service should only be constructed and accessed through the 
+     * application context.  This constructor should only be used by the 
+     * appropriate application context itself.
+     *
+     */
+    protected HostsTxtNamingService(I2PAppContext context) { super(context); }
+    private HostsTxtNamingService() { super(null); }
+    
     /**
      * If this system property is specified, the tunnel will read the
      * given file for hostname=destKey values when resolving names
@@ -35,7 +45,7 @@ public class HostsTxtNamingService extends NamingService {
         // Try to look it up in hosts.txt 
         // Reload file each time to catch changes.
         // (and it's easier :P
-        String hostsfile = System.getProperty(PROP_HOSTS_FILE, DEFAULT_HOSTS_FILE);
+        String hostsfile = _context.getProperty(PROP_HOSTS_FILE, DEFAULT_HOSTS_FILE);
         Properties hosts = new Properties();
         FileInputStream fis = null;
         try {

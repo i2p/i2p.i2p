@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import net.i2p.I2PAppContext;
 import net.i2p.data.DataHelper;
 import net.i2p.data.PublicKey;
 import net.i2p.data.SessionKey;
@@ -52,11 +53,18 @@ class TransientSessionKeyManager extends SessionKeyManager {
     public final static long SESSION_LIFETIME_MAX_MS = SESSION_TAG_DURATION_MS + 5 * 60 * 1000;
     public final static int MAX_INBOUND_SESSION_TAGS = 100 * 1000; // this will consume at most 3.2M
 
-    public TransientSessionKeyManager() {
-        super();
+    /** 
+     * The session key manager should only be constructed and accessed through the 
+     * application context.  This constructor should only be used by the 
+     * appropriate application context itself.
+     *
+     */
+    public TransientSessionKeyManager(I2PAppContext context) {
+        super(context);
         _outboundSessions = new HashMap(64);
         _inboundTagSets = new HashMap(1024);
     }
+    private TransientSessionKeyManager() { super(null); }
 
     /** TagSet */
     protected Set getInboundTagSets() {

@@ -1,9 +1,9 @@
 package net.i2p.data.i2np;
 /*
  * free (adj.): unencumbered; not under the control of others
- * Written by jrandom in 2003 and released into the public domain 
- * with no warranty of any kind, either expressed or implied.  
- * It probably won't make your computer catch on fire, or eat 
+ * Written by jrandom in 2003 and released into the public domain
+ * with no warranty of any kind, either expressed or implied.
+ * It probably won't make your computer catch on fire, or eat
  * your children, but it might.  Use at your own risk.
  *
  */
@@ -13,9 +13,10 @@ import java.io.InputStream;
 
 import net.i2p.util.I2PThread;
 import net.i2p.util.Log;
+import net.i2p.router.RouterContext;
 
 /**
- * The I2NPMessageReader reads an InputStream (using 
+ * The I2NPMessageReader reads an InputStream (using
  * {@link I2NPMessageHandler I2NPMessageHandler}) and passes out events to a registered
  * listener, where events are either messages being received, exceptions being
  * thrown, or the connection being closed.  Routers should use this rather
@@ -24,23 +25,26 @@ import net.i2p.util.Log;
  * @author jrandom
  */
 public class I2NPMessageReader {
-    private final static Log _log = new Log(I2NPMessageReader.class);
+    private Log _log;
+    private RouterContext _context;
     private InputStream _stream;
     private I2NPMessageEventListener _listener;
     private I2NPMessageReaderRunner _reader;
     private Thread _readerThread;
     
-    public I2NPMessageReader(InputStream stream, I2NPMessageEventListener lsnr) {
-	this(stream, lsnr, "I2NP Reader");
+    public I2NPMessageReader(RouterContext context, InputStream stream, I2NPMessageEventListener lsnr) {
+        this(context, stream, lsnr, "I2NP Reader");
     }
     
-    public I2NPMessageReader(InputStream stream, I2NPMessageEventListener lsnr, String name) {
-	_stream = stream;
+    public I2NPMessageReader(RouterContext context, InputStream stream, I2NPMessageEventListener lsnr, String name) {
+        _context = context;
+        _log = context.logManager().getLog(I2NPMessageReader.class);
+        _stream = stream;
         setListener(lsnr);
         _reader = new I2NPMessageReaderRunner();
         _readerThread = new I2PThread(_reader);
-	_readerThread.setName(name);
-	_readerThread.setDaemon(true);
+        _readerThread.setName(name);
+        _readerThread.setDaemon(true);
     }
     
     public void setListener(I2NPMessageEventListener lsnr) { _listener = lsnr; }
@@ -50,7 +54,7 @@ public class I2NPMessageReader {
      * Instruct the reader to begin reading messages off the stream
      *
      */
-    public void startReading() { _readerThread.start(); }    
+    public void startReading() { _readerThread.start(); }
     /**
      * Have the already started reader pause its reading indefinitely
      *
@@ -62,7 +66,7 @@ public class I2NPMessageReader {
      */
     public void resumeReading() { _reader.resumeRunner(); }
     /**
-     * Cancel reading.  
+     * Cancel reading.
      *
      */
     public void stopReading() { _reader.cancelRunner(); }
@@ -90,22 +94,22 @@ public class I2NPMessageReader {
          *
          */
         public void disconnected(I2NPMessageReader reader);
-    }   
+    }
     
     private class I2NPMessageReaderRunner implements Runnable {
-        private boolean _doRun; 
+        private boolean _doRun;
         private boolean _stayAlive;
-	private I2NPMessageHandler _handler;
+        private I2NPMessageHandler _handler;
         public I2NPMessageReaderRunner() {
             _doRun = true;
             _stayAlive = true;
-	    _handler = new I2NPMessageHandler();
+            _handler = new I2NPMessageHandler(_context);
         }
         public void pauseRunner() { _doRun = false; }
         public void resumeRunner() { _doRun = true; }
-        public void cancelRunner() { 
+        public void cancelRunner() {
             _doRun = false;
-            _stayAlive = false; 
+            _stayAlive = false;
         }
         public void run() {
             while (_stayAlive) {
@@ -114,16 +118,16 @@ public class I2NPMessageReader {
                     try {
                         I2NPMessage msg = _handler.readMessage(_stream);
                         if (msg != null) {
-			    long msToRead = _handler.getLastReadTime();
+                            long msToRead = _handler.getLastReadTime();
                             _listener.messageReceived(I2NPMessageReader.this, msg, msToRead);
-			}
+                        }
                     } catch (I2NPMessageException ime) {
-			//_log.warn("Error handling message", ime);
+                        //_log.warn("Error handling message", ime);
                         _listener.readError(I2NPMessageReader.this, ime);
-			_listener.disconnected(I2NPMessageReader.this);
-			cancelRunner();
+                        _listener.disconnected(I2NPMessageReader.this);
+                        cancelRunner();
                     } catch (IOException ioe) {
-			_log.warn("IO Error handling message", ioe);
+                        _log.warn("IO Error handling message", ioe);
                         _listener.disconnected(I2NPMessageReader.this);
                         cancelRunner();
                     }

@@ -16,7 +16,9 @@ import java.io.OutputStream;
 import java.util.Arrays;
 
 import net.i2p.data.SessionKey;
+import net.i2p.data.DataHelper;
 import net.i2p.util.Log;
+import net.i2p.I2PAppContext;
 
 /**
  * This writes everything as CBC with PKCS#5 padding, but each block is padded
@@ -28,8 +30,8 @@ import net.i2p.util.Log;
  *
  */
 public class AESOutputStream extends FilterOutputStream {
-    private final static CryptixAESEngine _engine = new CryptixAESEngine();
-    private final static Log _log = new Log(AESOutputStream.class);
+    private Log _log;
+    private I2PAppContext _context;
     private SessionKey _key;
     private byte[] _lastBlock;
     private ByteArrayOutputStream _inBuf;
@@ -42,8 +44,10 @@ public class AESOutputStream extends FilterOutputStream {
     private final static int BLOCK_SIZE = CryptixRijndael_Algorithm._BLOCK_SIZE;
     private final static int MAX_BUF = 256;
 
-    public AESOutputStream(OutputStream source, SessionKey key, byte[] iv) {
+    public AESOutputStream(I2PAppContext context, OutputStream source, SessionKey key, byte[] iv) {
         super(source);
+        _context = context;
+        _log = context.logManager().getLog(AESOutputStream.class);
         _key = key;
         _lastBlock = new byte[BLOCK_SIZE];
         System.arraycopy(iv, 0, _lastBlock, 0, BLOCK_SIZE);
@@ -104,8 +108,8 @@ public class AESOutputStream extends FilterOutputStream {
         block[BLOCK_SIZE - 1] = 0x01; // the padding byte for "full" blocks
         for (int i = 0; i < numBlocks; i++) {
             System.arraycopy(src, i * 15, block, 0, 15);
-            byte data[] = _engine.xor(block, _lastBlock);
-            byte encrypted[] = _engine.encrypt(data, _key, _lastBlock);
+            byte data[] = DataHelper.xor(block, _lastBlock);
+            byte encrypted[] = _context.AESEngine().encrypt(data, _key, _lastBlock);
             _cumulativeWritten += encrypted.length;
             out.write(encrypted);
             System.arraycopy(encrypted, encrypted.length - BLOCK_SIZE, _lastBlock, 0, BLOCK_SIZE);
@@ -118,8 +122,8 @@ public class AESOutputStream extends FilterOutputStream {
             int paddingBytes = BLOCK_SIZE - remainingBytes;
             System.arraycopy(src, numBlocks * 15, block, 0, remainingBytes);
             Arrays.fill(block, remainingBytes, BLOCK_SIZE, (byte) paddingBytes);
-            byte data[] = _engine.xor(block, _lastBlock);
-            byte encrypted[] = _engine.encrypt(data, _key, _lastBlock);
+            byte data[] = DataHelper.xor(block, _lastBlock);
+            byte encrypted[] = _context.AESEngine().encrypt(data, _key, _lastBlock);
             out.write(encrypted);
             System.arraycopy(encrypted, encrypted.length - BLOCK_SIZE, _lastBlock, 0, BLOCK_SIZE);
             _cumulativePadding += paddingBytes;

@@ -19,6 +19,7 @@ import net.i2p.httptunnel.SocketManagerProducer;
 import net.i2p.httptunnel.filter.Filter;
 import net.i2p.httptunnel.filter.NullFilter;
 import net.i2p.util.Log;
+import net.i2p.I2PAppContext;
 
 /**
  * Handler for browsing Eepsites.
@@ -26,6 +27,7 @@ import net.i2p.util.Log;
 public class EepHandler {
 
     private static final Log _log = new Log(EepHandler.class);
+    private static I2PAppContext _context = new I2PAppContext();
 
     protected ErrorHandler errorHandler;
 
@@ -44,7 +46,7 @@ public class EepHandler {
     public void handle(Request req, HTTPListener httpl, OutputStream out,
     /* boolean fromProxy, */String destination) throws IOException {
         SocketManagerProducer smp = httpl.getSMP();
-        Destination dest = NamingService.getInstance().lookup(destination);
+        Destination dest = _context.namingService().lookup(destination);
         if (dest == null) {
             errorHandler.handle(req, httpl, out, "Could not lookup host: " + destination);
             return;
@@ -66,8 +68,8 @@ public class EepHandler {
      * @return boolean, true if something was written, false otherwise.
      * @throws IOException
      */
-    public boolean handle(Request req, Filter f, OutputStream out, Destination dest, I2PSocketManager sm)
-                                                                                                         throws IOException {
+    public boolean handle(Request req, Filter f, OutputStream out, Destination dest, 
+                          I2PSocketManager sm) throws IOException {
         I2PSocket s = null;
         boolean written = false;
         try {

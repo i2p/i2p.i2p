@@ -1,9 +1,9 @@
 package net.i2p.data.i2np;
 /*
  * free (adj.): unencumbered; not under the control of others
- * Written by jrandom in 2003 and released into the public domain 
- * with no warranty of any kind, either expressed or implied.  
- * It probably won't make your computer catch on fire, or eat 
+ * Written by jrandom in 2003 and released into the public domain
+ * with no warranty of any kind, either expressed or implied.
+ * It probably won't make your computer catch on fire, or eat
  * your children, but it might.  Use at your own risk.
  *
  */
@@ -21,19 +21,19 @@ import net.i2p.data.Signature;
 import net.i2p.data.SigningPrivateKey;
 import net.i2p.data.SigningPublicKey;
 import net.i2p.util.Log;
+import net.i2p.router.RouterContext;
 
 /**
  *
  * @author jrandom
  */
 public class TunnelVerificationStructure extends DataStructureImpl {
-    private final static Log _log = new Log(TunnelVerificationStructure.class);
     private Hash _msgHash;
     private Signature _authSignature;
     
-    public TunnelVerificationStructure() { 
-	setMessageHash(null); 
-	setAuthorizationSignature(null);
+    public TunnelVerificationStructure() {
+        setMessageHash(null);
+        setAuthorizationSignature(null);
     }
     
     public Hash getMessageHash() { return _msgHash; }
@@ -42,45 +42,45 @@ public class TunnelVerificationStructure extends DataStructureImpl {
     public Signature getAuthorizationSignature() { return _authSignature; }
     public void setAuthorizationSignature(Signature sig) { _authSignature = sig; }
     
-    public void sign(SigningPrivateKey key) {
-	if (_msgHash != null) {
-	    Signature sig = DSAEngine.getInstance().sign(_msgHash.getData(), key);
-	    setAuthorizationSignature(sig);
-	}
+    public void sign(RouterContext context, SigningPrivateKey key) {
+        if (_msgHash != null) {
+            Signature sig = context.dsa().sign(_msgHash.getData(), key);
+            setAuthorizationSignature(sig);
+        }
     }
-    public boolean verifySignature(SigningPublicKey key) {
-	if (_msgHash == null) return false;
-	return DSAEngine.getInstance().verifySignature(_authSignature, _msgHash.getData(), key);
+    public boolean verifySignature(RouterContext context, SigningPublicKey key) {
+        if (_msgHash == null) return false;
+        return context.dsa().verifySignature(_authSignature, _msgHash.getData(), key);
     }
     
     public void readBytes(InputStream in) throws DataFormatException, IOException {
-	_msgHash = new Hash();
-	_msgHash.readBytes(in);
-	_authSignature = new Signature();
-	_authSignature.readBytes(in);
+        _msgHash = new Hash();
+        _msgHash.readBytes(in);
+        _authSignature = new Signature();
+        _authSignature.readBytes(in);
     }
     
     public void writeBytes(OutputStream out) throws DataFormatException, IOException {
-	if (_authSignature == null) { 
-	    _authSignature = new Signature();
-	    _authSignature.setData(Signature.FAKE_SIGNATURE);
-	}
+        if (_authSignature == null) {
+            _authSignature = new Signature();
+            _authSignature.setData(Signature.FAKE_SIGNATURE);
+        }
         if ( (_msgHash == null) || (_authSignature == null) ) throw new DataFormatException("Invalid data");
-	_msgHash.writeBytes(out);
-	_authSignature.writeBytes(out);
+        _msgHash.writeBytes(out);
+        _authSignature.writeBytes(out);
     }
     
     public boolean equals(Object obj) {
         if ( (obj == null) || !(obj instanceof TunnelVerificationStructure))
             return false;
-	TunnelVerificationStructure str = (TunnelVerificationStructure)obj;
-	return DataHelper.eq(getMessageHash(), str.getMessageHash()) &&
-	       DataHelper.eq(getAuthorizationSignature(), str.getAuthorizationSignature());
+        TunnelVerificationStructure str = (TunnelVerificationStructure)obj;
+        return DataHelper.eq(getMessageHash(), str.getMessageHash()) &&
+        DataHelper.eq(getAuthorizationSignature(), str.getAuthorizationSignature());
     }
     
     public int hashCode() {
-	if ( (_msgHash == null) || (_authSignature == null) ) return 0;
-	return getMessageHash().hashCode() + getAuthorizationSignature().hashCode();
+        if ( (_msgHash == null) || (_authSignature == null) ) return 0;
+        return getMessageHash().hashCode() + getAuthorizationSignature().hashCode();
     }
     
     public String toString() {

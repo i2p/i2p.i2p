@@ -21,8 +21,6 @@ import net.i2p.router.client.ClientManagerFacadeImpl;
  * @author jrandom
  */
 public abstract class ClientManagerFacade implements Service {
-    private static ClientManagerFacade _instance = new ClientManagerFacadeImpl();
-    public static ClientManagerFacade getInstance() { return _instance; }
     
     /**
      * Request that a particular client authorize the Leases contained in the 
@@ -74,16 +72,19 @@ public abstract class ClientManagerFacade implements Service {
 }
 
 class DummyClientManagerFacade extends ClientManagerFacade {
+    private RouterContext _context;
+    public DummyClientManagerFacade(RouterContext ctx) {
+        _context = ctx;
+    }
     public boolean isLocal(Hash destHash) { return true; }
     public boolean isLocal(Destination dest) { return true; }
     public void reportAbuse(Destination dest, String reason, int severity) { }
     public void messageReceived(ClientMessage msg) {}
-    public void requestLeaseSet(Destination dest, LeaseSet set, long timeout, Job onCreateJob, Job onFailedJob) { 
-	JobQueue.getInstance().addJob(onFailedJob);
+    public void requestLeaseSet(Destination dest, LeaseSet set, long timeout, 
+                                Job onCreateJob, Job onFailedJob) { 
+        _context.jobQueue().addJob(onFailedJob);
     }
-    public void startup() {
-	//JobQueue.getInstance().addJob(new PollOutboundClientMessagesJob());
-    }    
+    public void startup() {}    
     public void stopAcceptingClients() { }
     public void shutdown() {}
     

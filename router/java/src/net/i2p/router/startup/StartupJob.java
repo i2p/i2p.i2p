@@ -13,6 +13,7 @@ import net.i2p.router.JobImpl;
 import net.i2p.router.JobQueue;
 import net.i2p.router.StatisticsManager;
 import net.i2p.util.Log;
+import net.i2p.router.RouterContext;
 
 /**
  * The StartupJob should be run once on router startup to initialize the system
@@ -28,13 +29,15 @@ import net.i2p.util.Log;
  *
  */
 public class StartupJob extends JobImpl {
-    private static Log _log = new Log(StartupJob.class);
+    
+    public StartupJob(RouterContext context) {
+        super(context);
+    }
 
     public String getName() { return "Startup Router"; }
     public void runJob() {
-	ReadConfigJob.doRead();
-	StatisticsManager.getInstance().startup();
-
-	JobQueue.getInstance().addJob(new LoadRouterInfoJob());
+        ReadConfigJob.doRead(_context);
+        _context.statPublisher().startup();
+        _context.jobQueue().addJob(new LoadRouterInfoJob(_context));
     }
 }

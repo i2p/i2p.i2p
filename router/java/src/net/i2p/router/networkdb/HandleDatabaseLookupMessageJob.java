@@ -37,7 +37,7 @@ import net.i2p.router.message.SendMessageDirectJob;
 import net.i2p.router.message.SendTunnelMessageJob;
 import net.i2p.util.Clock;
 import net.i2p.util.Log;
-import net.i2p.stat.StatManager;
+import net.i2p.router.RouterContext;
 
 /**
  * Handle a lookup for a key received from a remote peer.  Needs to be implemented
@@ -45,20 +45,19 @@ import net.i2p.stat.StatManager;
  *
  */
 public class HandleDatabaseLookupMessageJob extends JobImpl {
-    private final static Log _log = new Log(HandleDatabaseLookupMessageJob.class);
+    private Log _log;
     private DatabaseLookupMessage _message;
     private RouterIdentity _from;
     private Hash _fromHash;
     private final static int MAX_ROUTERS_RETURNED = 3;
     private final static int REPLY_TIMEOUT = 60*1000;
     private final static int MESSAGE_PRIORITY = 300;
-
-    static {
-        StatManager.getInstance().createRateStat("netDb.lookupsHandled", "How many netDb lookups have we handled?", "Network Database", new long[] { 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
-        StatManager.getInstance().createRateStat("netDb.lookupsMatched", "How many netDb lookups did we have the data for?", "Network Database", new long[] { 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
-    }
     
-    public HandleDatabaseLookupMessageJob(DatabaseLookupMessage receivedMessage, RouterIdentity from, Hash fromHash) {
+    public HandleDatabaseLookupMessageJob(RouterContext ctx, DatabaseLookupMessage receivedMessage, RouterIdentity from, Hash fromHash) {
+        super(ctx);
+        _log = _context.logManager().getLog(HandleDatabaseLookupMessageJob.class);
+        _context.statManager().createRateStat("netDb.lookupsHandled", "How many netDb lookups have we handled?", "Network Database", new long[] { 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
+        _context.statManager().createRateStat("netDb.lookupsMatched", "How many netDb lookups did we have the data for?", "Network Database", new long[] { 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
         _message = receivedMessage;
         _from = from;
         _fromHash = fromHash;
@@ -77,14 +76,14 @@ public class HandleDatabaseLookupMessageJob extends JobImpl {
         }
 
         // might as well grab what they sent us
-        NetworkDatabaseFacade.getInstance().store(fromKey, _message.getFrom());
+        _context.netDb().store(fromKey, _message.getFrom());
 
         // whatdotheywant?
         handleRequest(fromKey);
     }
     
     private void handleRequest(Hash fromKey) {
-        LeaseSet ls = NetworkDatabaseFacade.getInstance().lookupLeaseSetLocally(_message.getSearchKey());
+        LeaseSet ls = _context.netDb().lookupLeaseSetLocally(_message.getSearchKey());
         if (ls != null) {
             // send that lease set to the _message.getFromHash peer
             if (_log.shouldLog(Log.DEBUG))
@@ -92,7 +91,7 @@ public class HandleDatabaseLookupMessageJob extends JobImpl {
                            + " locally as a lease set.  sending to " + fromKey.toBase64());
             sendData(_message.getSearchKey(), ls, fromKey, _message.getReplyTunnel());
         } else {
-            RouterInfo info = NetworkDatabaseFacade.getInstance().lookupRouterInfoLocally(_message.getSearchKey());
+            RouterInfo info = _context.netDb().lookupRouterInfoLocally(_message.getSearchKey());
             if (info != null) {
                 // send that routerInfo to the _message.getFromHash peer
                 if (_log.shouldLog(Log.DEBUG))
@@ -101,8 +100,9 @@ public class HandleDatabaseLookupMessageJob extends JobImpl {
                 sendData(_message.getSearchKey(), info, fromKey, _message.getReplyTunnel());
             } else {
                 // not found locally - return closest peer routerInfo structs
-                Set routerInfoSet = NetworkDatabaseFacade.getInstance().findNearestRouters(_message.getSearchKey(), 
-                                                             MAX_ROUTERS_RETURNED, _message.getDontIncludePeers());
+                Set routerInfoSet = _context.netDb().findNearestRouters(_message.getSearchKey(), 
+                                                                        MAX_ROUTERS_RETURNED, 
+                                                                        _message.getDontIncludePeers());
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("We do not have key " + _message.getSearchKey().toBase64() + 
                                " locally.  sending back " + routerInfoSet.size() + " peers to " + fromKey.toBase64());
@@ -115,7 +115,7 @@ public class HandleDatabaseLookupMessageJob extends JobImpl {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Sending data matching key key " + key.toBase64() + " to peer " + toPeer.toBase64() 
                        + " tunnel " + replyTunnel);
-        DatabaseStoreMessage msg = new DatabaseStoreMessage();
+        DatabaseStoreMessage msg = new DatabaseStoreMessage(_context);
         msg.setKey(key);
         if (data instanceof LeaseSet) {
             msg.setLeaseSet((LeaseSet)data);
@@ -124,8 +124,8 @@ public class HandleDatabaseLookupMessageJob extends JobImpl {
             msg.setRouterInfo((RouterInfo)data);
             msg.setValueType(DatabaseStoreMessage.KEY_TYPE_ROUTERINFO);
         }
-        StatManager.getInstance().addRateData("netDb.lookupsMatched", 1, 0);
-        StatManager.getInstance().addRateData("netDb.lookupsHandled", 1, 0);
+        _context.statManager().addRateData("netDb.lookupsMatched", 1, 0);
+        _context.statManager().addRateData("netDb.lookupsHandled", 1, 0);
         sendMessage(msg, toPeer, replyTunnel);
     }
     
@@ -133,15 +133,15 @@ public class HandleDatabaseLookupMessageJob extends JobImpl {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Sending closest routers to key " + key.toBase64() + ": # peers = " 
                        + routerInfoSet.size() + " tunnel " + replyTunnel);
-        DatabaseSearchReplyMessage msg = new DatabaseSearchReplyMessage();
-        msg.setFromHash(Router.getInstance().getRouterInfo().getIdentity().getHash());
+        DatabaseSearchReplyMessage msg = new DatabaseSearchReplyMessage(_context);
+        msg.setFromHash(_context.router().getRouterInfo().getIdentity().getHash());
         msg.setSearchKey(key);
         if (routerInfoSet.size() <= 0) {
             // always include something, so lets toss ourselves in there
-            routerInfoSet.add(Router.getInstance().getRouterInfo());
+            routerInfoSet.add(_context.router().getRouterInfo());
         }
         msg.addReplies(routerInfoSet);
-        StatManager.getInstance().addRateData("netDb.lookupsHandled", 1, 0);
+        _context.statManager().addRateData("netDb.lookupsHandled", 1, 0);
         sendMessage(msg, toPeer, replyTunnel); // should this go via garlic messages instead?
     }
     
@@ -152,21 +152,21 @@ public class HandleDatabaseLookupMessageJob extends JobImpl {
         } else {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Sending reply directly to " + toPeer);
-            send = new SendMessageDirectJob(message, toPeer, REPLY_TIMEOUT+Clock.getInstance().now(), MESSAGE_PRIORITY);
+            send = new SendMessageDirectJob(_context, message, toPeer, REPLY_TIMEOUT+_context.clock().now(), MESSAGE_PRIORITY);
         }
 
-        NetworkDatabaseFacade.getInstance().lookupRouterInfo(toPeer, send, null, REPLY_TIMEOUT);
+        _context.netDb().lookupRouterInfo(toPeer, send, null, REPLY_TIMEOUT);
     }
     
     private void sendThroughTunnel(I2NPMessage message, Hash toPeer, TunnelId replyTunnel) {
-        TunnelInfo info = TunnelManagerFacade.getInstance().getTunnelInfo(replyTunnel);
+        TunnelInfo info = _context.tunnelManager().getTunnelInfo(replyTunnel);
 	
         // the sendTunnelMessageJob can't handle injecting into the tunnel anywhere but the beginning
         // (and if we are the beginning, we have the signing key)
         if ( (info == null) || (info.getSigningKey() != null)) {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Sending reply through " + replyTunnel + " on " + toPeer);
-            JobQueue.getInstance().addJob(new SendTunnelMessageJob(message, replyTunnel, toPeer, null, null, null, null, null, REPLY_TIMEOUT, MESSAGE_PRIORITY));
+            _context.jobQueue().addJob(new SendTunnelMessageJob(_context, message, replyTunnel, toPeer, null, null, null, null, null, REPLY_TIMEOUT, MESSAGE_PRIORITY));
         } else {
             // its a tunnel we're participating in, but we're NOT the gateway, so 
             sendToGateway(message, toPeer, replyTunnel, info);
@@ -183,19 +183,19 @@ public class HandleDatabaseLookupMessageJob extends JobImpl {
             return;
         }
 
-        long expiration = REPLY_TIMEOUT + Clock.getInstance().now();
+        long expiration = REPLY_TIMEOUT + _context.clock().now();
 
-        TunnelMessage msg = new TunnelMessage();
+        TunnelMessage msg = new TunnelMessage(_context);
         try {
             ByteArrayOutputStream baos = new ByteArrayOutputStream(1024);
             message.writeBytes(baos);
             msg.setData(baos.toByteArray());
             msg.setTunnelId(replyTunnel);
             msg.setMessageExpiration(new Date(expiration));
-            JobQueue.getInstance().addJob(new SendMessageDirectJob(msg, toPeer, null, null, null, null, expiration, MESSAGE_PRIORITY));
+            _context.jobQueue().addJob(new SendMessageDirectJob(_context, msg, toPeer, null, null, null, null, expiration, MESSAGE_PRIORITY));
 
             String bodyType = message.getClass().getName();
-            MessageHistory.getInstance().wrap(bodyType, message.getUniqueId(), TunnelMessage.class.getName(), msg.getUniqueId());
+            _context.messageHistory().wrap(bodyType, message.getUniqueId(), TunnelMessage.class.getName(), msg.getUniqueId());
         } catch (IOException ioe) {
             if (_log.shouldLog(Log.ERROR))
                 _log.error("Error writing out the tunnel message to send to the tunnel", ioe);
@@ -208,8 +208,8 @@ public class HandleDatabaseLookupMessageJob extends JobImpl {
     public String getName() { return "Handle Database Lookup Message"; }
 
     public void dropped() {
-        MessageHistory.getInstance().messageProcessingError(_message.getUniqueId(), 
-                                                            _message.getClass().getName(), 
-                                                            "Dropped due to overload");
+        _context.messageHistory().messageProcessingError(_message.getUniqueId(), 
+                                                         _message.getClass().getName(), 
+                                                         "Dropped due to overload");
     }
 }

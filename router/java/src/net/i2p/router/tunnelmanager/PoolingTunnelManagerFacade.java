@@ -17,32 +17,35 @@ import net.i2p.router.TunnelSelectionCriteria;
 import net.i2p.stat.StatManager;
 import net.i2p.util.Clock;
 import net.i2p.util.Log;
+import net.i2p.router.RouterContext;
 
 /**
  * Main interface to the pool
  *
  */
-public class PoolingTunnelManagerFacade extends TunnelManagerFacade {
-    private final static Log _log = new Log(PoolingTunnelManagerFacade.class);
+public class PoolingTunnelManagerFacade implements TunnelManagerFacade {
+    private Log _log;
     private TunnelPool _pool;
     private TunnelTestManager _testManager;
+    private RouterContext _context;
+    private PoolingTunnelSelector _selector;
     
-    static {
-        StatManager.getInstance().createFrequencyStat("tunnel.acceptRequestFrequency", "How often do we accept requests to join a tunnel?", "Tunnels", new long[] { 60*1000l, 60*60*1000l, 24*60*60*1000l });
-        StatManager.getInstance().createFrequencyStat("tunnel.rejectRequestFrequency", "How often do we reject requests to join a tunnel?", "Tunnels", new long[] { 60*1000l, 60*60*1000l, 24*60*60*1000l });
-        StatManager.getInstance().createRateStat("tunnel.participatingTunnels", "How many tunnels are we participating in?", "Tunnels", new long[] { 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
-    }
-    
-    public PoolingTunnelManagerFacade() {
-        super();
-        InNetMessagePool.getInstance().registerHandlerJobBuilder(TunnelCreateMessage.MESSAGE_TYPE, new TunnelCreateMessageHandler());
+    public PoolingTunnelManagerFacade(RouterContext context) {
+        if (context == null) throw new IllegalArgumentException("Null routerContext is not supported");
+        _context = context;
+        _log = context.logManager().getLog(PoolingTunnelManagerFacade.class);
+        _context.statManager().createFrequencyStat("tunnel.acceptRequestFrequency", "How often do we accept requests to join a tunnel?", "Tunnels", new long[] { 60*1000l, 60*60*1000l, 24*60*60*1000l });
+        _context.statManager().createFrequencyStat("tunnel.rejectRequestFrequency", "How often do we reject requests to join a tunnel?", "Tunnels", new long[] { 60*1000l, 60*60*1000l, 24*60*60*1000l });
+        _context.statManager().createRateStat("tunnel.participatingTunnels", "How many tunnels are we participating in?", "Tunnels", new long[] { 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
+        _context.inNetMessagePool().registerHandlerJobBuilder(TunnelCreateMessage.MESSAGE_TYPE, new TunnelCreateMessageHandler(_context));
+        _selector = new PoolingTunnelSelector(context);
     }
     
     public void startup() {
         if (_pool == null)
-            _pool = new TunnelPool();
+            _pool = new TunnelPool(_context);
         _pool.startup();
-        _testManager = new TunnelTestManager(_pool);
+        _testManager = new TunnelTestManager(_context, _pool);
     }
     
     public void shutdown() {
@@ -60,27 +63,27 @@ public class PoolingTunnelManagerFacade extends TunnelManagerFacade {
         if (info == null) {
             if (_log.shouldLog(Log.ERROR))
                 _log.error("Null tunnel", new Exception("Null tunnel"));
-            StatManager.getInstance().updateFrequency("tunnel.rejectRequestFrequency");
+            _context.statManager().updateFrequency("tunnel.rejectRequestFrequency");
             return false;
         }
         if (info.getSettings() == null) {
             if (_log.shouldLog(Log.ERROR))
                 _log.error("Null settings!", new Exception("settings are null"));
-            StatManager.getInstance().updateFrequency("tunnel.rejectRequestFrequency");
+            _context.statManager().updateFrequency("tunnel.rejectRequestFrequency");
             return false;
         }
         if (info.getSettings().getExpiration() == 0) {
             if (_log.shouldLog(Log.INFO))
                 _log.info("No expiration for tunnel " + info.getTunnelId().getTunnelId(), 
                           new Exception("No expiration"));
-            StatManager.getInstance().updateFrequency("tunnel.rejectRequestFrequency");
+            _context.statManager().updateFrequency("tunnel.rejectRequestFrequency");
             return false;
         } else {
-            if (info.getSettings().getExpiration() < Clock.getInstance().now()) {
+            if (info.getSettings().getExpiration() < _context.clock().now()) {
                 if (_log.shouldLog(Log.WARN))
                     _log.warn("Already expired - " + new Date(info.getSettings().getExpiration()), 
                               new Exception("Already expired"));
-                StatManager.getInstance().updateFrequency("tunnel.rejectRequestFrequency");
+                _context.statManager().updateFrequency("tunnel.rejectRequestFrequency");
                 return false;
             }
         }
@@ -89,10 +92,10 @@ public class PoolingTunnelManagerFacade extends TunnelManagerFacade {
             _log.debug("Joining tunnel: " + info);
         boolean ok = _pool.addParticipatingTunnel(info);
         if (!ok)
-            StatManager.getInstance().updateFrequency("tunnel.rejectRequestFrequency");
+            _context.statManager().updateFrequency("tunnel.rejectRequestFrequency");
         else
-            StatManager.getInstance().updateFrequency("tunnel.acceptRequestFrequency");
-        StatManager.getInstance().addRateData("tunnel.participatingTunnels", _pool.getParticipatingTunnelCount(), 0);
+            _context.statManager().updateFrequency("tunnel.acceptRequestFrequency");
+        _context.statManager().addRateData("tunnel.participatingTunnels", _pool.getParticipatingTunnelCount(), 0);
         return ok;
     }
     /**
@@ -106,13 +109,13 @@ public class PoolingTunnelManagerFacade extends TunnelManagerFacade {
      * Retrieve a set of tunnels from the existing ones for various purposes
      */
     public List selectOutboundTunnelIds(TunnelSelectionCriteria criteria) {
-        return PoolingTunnelSelector.selectOutboundTunnelIds(_pool, criteria);
+        return _selector.selectOutboundTunnelIds(_pool, criteria);
     }
     /**
      * Retrieve a set of tunnels from the existing ones for various purposes
      */
     public List selectInboundTunnelIds(TunnelSelectionCriteria criteria) {
-        return PoolingTunnelSelector.selectInboundTunnelIds(_pool, criteria);
+        return _selector.selectInboundTunnelIds(_pool, criteria);
     }
     
     /**
@@ -146,8 +149,8 @@ public class PoolingTunnelManagerFacade extends TunnelManagerFacade {
                 info.setIsReady(false);
                 numFailed++;
 		
-                long lifetime = Clock.getInstance().now() - info.getCreated();
-                StatManager.getInstance().addRateData("tunnel.failAfterTime", lifetime, lifetime);
+                long lifetime = _context.clock().now() - info.getCreated();
+                _context.statManager().addRateData("tunnel.failAfterTime", lifetime, lifetime);
             }
         }
 

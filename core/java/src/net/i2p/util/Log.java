@@ -9,6 +9,9 @@ package net.i2p.util;
  *
  */
 
+import net.i2p.data.DataHelper;
+import net.i2p.I2PAppContext;
+
 /**
  * Wrapper class for whatever logging system I2P uses.  This class should be 
  * instantiated and kept as a variable for each class it is used by, ala:
@@ -24,6 +27,8 @@ public class Log {
     private Class _class;
     private String _name;
     private int _minPriority;
+    private LogScope _scope;
+    private LogManager _manager;
 
     public final static int DEBUG = 10;
     public final static int INFO = 20;
@@ -65,33 +70,46 @@ public class Log {
     }
 
     public Log(Class cls) {
-        this(cls, null);
+        this(I2PAppContext.getGlobalContext().logManager(), cls, null);
+        _manager.addLog(this);
     }
 
     public Log(String name) {
-        this(null, name);
+        this(I2PAppContext.getGlobalContext().logManager(), null, name);
+        _manager.addLog(this);
     }
 
-    public Log(Class cls, String name) {
+    Log(LogManager manager, Class cls) {
+        this(manager, cls, null);
+    }
+
+    Log(LogManager manager, String name) {
+        this(manager, null, name);
+    }
+
+    Log(LogManager manager, Class cls, String name) {
+        _manager = manager;
         _class = cls;
         _name = name;
         _minPriority = DEBUG;
-        LogManager.getInstance().registerLog(this);
+        _scope = new LogScope(name, cls);
+        //_manager.addRecord(new LogRecord(Log.class, null, Thread.currentThread().getName(), Log.DEBUG, 
+        //                                 "Log created with manager " + manager + " for class " + cls, null));
     }
 
     public void log(int priority, String msg) {
         if (priority >= _minPriority) {
-            LogManager.getInstance().addRecord(
-                                               new LogRecord(_class, _name, Thread.currentThread().getName(), priority,
-                                                             msg, null));
+            _manager.addRecord(new LogRecord(_class, _name, 
+                                             Thread.currentThread().getName(), priority,
+                                             msg, null));
         }
     }
 
     public void log(int priority, String msg, Throwable t) {
         if (priority >= _minPriority) {
-            LogManager.getInstance().addRecord(
-                                               new LogRecord(_class, _name, Thread.currentThread().getName(), priority,
-                                                             msg, t));
+            _manager.addRecord(new LogRecord(_class, _name, 
+                                             Thread.currentThread().getName(), priority,
+                                             msg, t));
         }
     }
 
@@ -133,6 +151,9 @@ public class Log {
 
     public void setMinimumPriority(int priority) {
         _minPriority = priority;
+        //_manager.addRecord(new LogRecord(Log.class, null, Thread.currentThread().getName(), Log.DEBUG, 
+        //                                 "Log with manager " + _manager + " for class " + _class 
+        //                                 + " new priority " + toLevelString(priority), null));
     }
 
     public boolean shouldLog(int priority) {
@@ -145,5 +166,32 @@ public class Log {
         else
             return _name;
     }
-
+    
+    public Object getScope() { return _scope; }
+    private static final class LogScope {
+        private String _scopeName;
+        private Class _scopeClass;
+        public LogScope(String name, Class cls) {
+            _scopeName = name;
+            _scopeClass = cls;
+        }
+        public int hashCode() {
+            if (_scopeClass != null) 
+                return _scopeClass.hashCode();
+            else if (_scopeName != null)
+                return _scopeName.hashCode();
+            else
+                return 42;
+        }
+        public boolean equals(Object obj) {
+            if (obj == null) throw new NullPointerException("Null object scope?");
+            if (obj instanceof LogScope) {
+                LogScope s = (LogScope)obj;
+                return DataHelper.eq(s._scopeName, _scopeName) &&
+                       DataHelper.eq(s._scopeClass, _scopeClass);
+            } else {
+                return false;
+            }
+        }
+    }
 }

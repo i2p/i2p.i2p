@@ -6,24 +6,25 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import net.i2p.util.Log;
+import net.i2p.I2PAppContext;
 
 public class SimpleStatDumper {
     private final static Log _log = new Log(SimpleStatDumper.class);
 
-    public static void dumpStats(int logLevel) {
+    public static void dumpStats(I2PAppContext context, int logLevel) {
         if (!_log.shouldLog(logLevel)) return;
 
         StringBuffer buf = new StringBuffer(4 * 1024);
-        dumpFrequencies(buf);
-        dumpRates(buf);
+        dumpFrequencies(context, buf);
+        dumpRates(context, buf);
         _log.log(logLevel, buf.toString());
     }
 
-    private static void dumpFrequencies(StringBuffer buf) {
-        Set frequencies = new TreeSet(StatManager.getInstance().getFrequencyNames());
+    private static void dumpFrequencies(I2PAppContext ctx, StringBuffer buf) {
+        Set frequencies = new TreeSet(ctx.statManager().getFrequencyNames());
         for (Iterator iter = frequencies.iterator(); iter.hasNext();) {
             String name = (String) iter.next();
-            FrequencyStat freq = StatManager.getInstance().getFrequency(name);
+            FrequencyStat freq = ctx.statManager().getFrequency(name);
             buf.append('\n');
             buf.append(freq.getGroupName()).append('.').append(freq.getName()).append(": ")
                .append(freq.getDescription()).append('\n');
@@ -39,11 +40,11 @@ public class SimpleStatDumper {
         }
     }
 
-    private static void dumpRates(StringBuffer buf) {
-        Set rates = new TreeSet(StatManager.getInstance().getRateNames());
+    private static void dumpRates(I2PAppContext ctx, StringBuffer buf) {
+        Set rates = new TreeSet(ctx.statManager().getRateNames());
         for (Iterator iter = rates.iterator(); iter.hasNext();) {
             String name = (String) iter.next();
-            RateStat rate = StatManager.getInstance().getRate(name);
+            RateStat rate = ctx.statManager().getRate(name);
             buf.append('\n');
             buf.append(rate.getGroupName()).append('.').append(rate.getName()).append(": ")
                .append(rate.getDescription()).append('\n');

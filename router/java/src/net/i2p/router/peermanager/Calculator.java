@@ -6,17 +6,7 @@ package net.i2p.router.peermanager;
  * as to coordinate via statics the four known aspects.
  *
  */
-class Calculator {
-    private static Calculator _isFailingCalc = new IsFailingCalculator();
-    private static Calculator _integrationCalc = new IntegrationCalculator();
-    private static Calculator _speedCalc = new SpeedCalculator();
-    private static Calculator _reliabilityCalc = new ReliabilityCalculator();
-    
-    public static Calculator getIsFailingCalculator() { return _isFailingCalc; }
-    public static Calculator getIntegrationCalculator() { return _integrationCalc; }
-    public static Calculator getSpeedCalculator() { return _speedCalc; } 
-    public static Calculator getReliabilityCalculator() { return _reliabilityCalc; }
-    
+public class Calculator {
     /**
      * Evaluate the profile according to the current metric
      */
@@ -24,5 +14,5 @@ class Calculator {
     /**
      * Evaluate the profile according to the current metric
      */
-    public boolean calcBoolean(PeerProfile profile) { return true; }
+    public boolean calcBoolean(PeerProfile profile) { return false; }
 }

@@ -10,6 +10,7 @@ package net.i2p.util;
  */
 
 import java.security.SecureRandom;
+import net.i2p.I2PAppContext;
 
 /**
  * Singleton for whatever PRNG i2p uses.  
@@ -17,14 +18,14 @@ import java.security.SecureRandom;
  * @author jrandom
  */
 public class RandomSource extends SecureRandom {
-    private final static RandomSource _random = new RandomSource();
+    private Log _log;
 
-    private RandomSource() {
+    public RandomSource(I2PAppContext context) {
         super();
+        _log = context.logManager().getLog(RandomSource.class);
     }
-
     public static RandomSource getInstance() {
-        return _random;
+        return I2PAppContext.getGlobalContext().random();
     }
 
     /**

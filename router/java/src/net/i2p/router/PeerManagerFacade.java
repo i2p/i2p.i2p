@@ -18,23 +18,19 @@ import net.i2p.router.peermanager.PeerManagerFacadeImpl;
  * includes periodically queueing up outbound messages to the peers to test them.
  *
  */
-public abstract class PeerManagerFacade implements Service {
-    private static PeerManagerFacade _instance = new PeerManagerFacadeImpl();
-    public static PeerManagerFacade getInstance() { return _instance; }
-
+public interface PeerManagerFacade extends Service {
     /**
      * Select peers from the manager's existing routing tables according to 
      * the specified criteria.  This call DOES block.
      *
      * @return List of Hash objects of the RouterIdentity for matching peers
      */
-    public abstract List selectPeers(PeerSelectionCriteria criteria);
-    public String renderStatusHTML() { return ""; }
+    public List selectPeers(PeerSelectionCriteria criteria);
 }
 
-class DummyPeerManagerFacade extends PeerManagerFacade {
+class DummyPeerManagerFacade implements PeerManagerFacade {
     public void shutdown() {}    
     public void startup() {}
-    
+    public String renderStatusHTML() { return ""; }    
     public List selectPeers(PeerSelectionCriteria criteria) { return null; }
 }

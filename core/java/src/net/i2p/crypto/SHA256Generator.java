@@ -30,6 +30,7 @@ package net.i2p.crypto;
  */
 
 import net.i2p.data.Hash;
+import net.i2p.I2PAppContext;
 
 /** Defines a wrapper for SHA-256 operation
  *
@@ -38,10 +39,9 @@ import net.i2p.data.Hash;
  * @author thecrypto,jrandom
  */
 public class SHA256Generator {
-    private static SHA256Generator _generator = new SHA256Generator();
-
+    public SHA256Generator(I2PAppContext context) {};
     public static SHA256Generator getInstance() {
-        return _generator;
+        return I2PAppContext.getGlobalContext().sha();
     }
 
     static int[] K = { 0x428a2f98, 0x71374491, 0xb5c0fbcf, 0xe9b5dba5, 0x3956c25b, 0x59f111f1, 0x923f82a4, 0xab1c5ed5,

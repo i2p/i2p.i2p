@@ -8,11 +8,21 @@
 package net.i2p.client.naming;
 
 import net.i2p.data.Destination;
+import net.i2p.I2PAppContext;
 
 /**
  * A Dummy naming service that can only handle base64 destinations.
  */
 class DummyNamingService extends NamingService {
+    /** 
+     * The naming service should only be constructed and accessed through the 
+     * application context.  This constructor should only be used by the 
+     * appropriate application context itself.
+     *
+     */
+    protected DummyNamingService(I2PAppContext context) { super(context); }
+    private DummyNamingService() { super(null); }
+    
     public Destination lookup(String hostname) {
         return lookupBase64(hostname);
     }

@@ -12,6 +12,7 @@ import net.i2p.router.JobQueue;
 import net.i2p.router.TunnelInfo;
 import net.i2p.util.Clock;
 import net.i2p.util.Log;
+import net.i2p.router.RouterContext;
 
 /**
  * refill the client tunnel pool as necessary, either from the TunnelPool's free
@@ -19,17 +20,20 @@ import net.i2p.util.Log;
  *
  */
 class ClientTunnelPoolManagerJob extends JobImpl {
-    private final static Log _log = new Log(ClientTunnelPoolManagerJob.class);
+    private Log _log;
     private ClientTunnelPool _clientPool;
     private TunnelPool _tunnelPool;
+    private TunnelBuilder _tunnelBuilder;
     
     /** check the pool every 30 seconds to make sure it has enough tunnels */
     private final static long POOL_CHECK_DELAY = 30*1000;
     
-    public ClientTunnelPoolManagerJob(TunnelPool pool, ClientTunnelPool clientPool) {
-        super();
+    public ClientTunnelPoolManagerJob(RouterContext ctx, TunnelPool pool, ClientTunnelPool clientPool) {
+        super(ctx);
+        _log = ctx.logManager().getLog(ClientTunnelPoolManagerJob.class);
         _clientPool = clientPool;
         _tunnelPool = pool;
+        _tunnelBuilder = new TunnelBuilder(ctx);
     }
     public String getName() { return "Manage Client Tunnel Pool"; }
     public void runJob() {
@@ -39,7 +43,7 @@ class ClientTunnelPoolManagerJob extends JobImpl {
                 return;
             }
 
-            if (!ClientManagerFacade.getInstance().isLocal(_clientPool.getDestination())) {
+            if (!_context.clientManager().isLocal(_clientPool.getDestination())) {
                 if (_log.shouldLog(Log.INFO))
                     _log.info("Client " + _clientPool.getDestination().calculateHash() 
                               + " is no longer connected, stop the pool");
@@ -62,7 +66,7 @@ class ClientTunnelPoolManagerJob extends JobImpl {
      * The pool is stopped, so lets see if we should keep doing anything
      */
     private void handleStopped() {
-        if (ClientManagerFacade.getInstance().isLocal(_clientPool.getDestination())) {
+        if (_context.clientManager().isLocal(_clientPool.getDestination())) {
             // it was stopped, but they've reconnected, so boot 'er up again
             if (_log.shouldLog(Log.INFO))
                 _log.info("Client " + _clientPool.getDestination().calculateHash().toBase64() 
@@ -168,7 +172,7 @@ class ClientTunnelPoolManagerJob extends JobImpl {
             return false;
         }
 
-        long expireAfter = Clock.getInstance().now() + POOL_CHECK_DELAY + _tunnelPool.getTunnelCreationTimeout()*2;
+        long expireAfter = _context.clock().now() + POOL_CHECK_DELAY + _tunnelPool.getTunnelCreationTimeout()*2;
         if (info.getSettings().getExpiration() <= expireAfter) {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Refusing tunnel " + info.getTunnelId() + " because it is going to expire soon");
@@ -229,7 +233,7 @@ class ClientTunnelPoolManagerJob extends JobImpl {
      */
     private void requestCustomTunnels(int numTunnels) {
         for (int i = 0; i < numTunnels; i++) {
-            JobQueue.getInstance().addJob(new RequestCustomTunnelJob());
+            _context.jobQueue().addJob(new RequestCustomTunnelJob());
         }
     }
     
@@ -239,11 +243,14 @@ class ClientTunnelPoolManagerJob extends JobImpl {
      *
      */
     private class RequestCustomTunnelJob extends JobImpl {
+        public RequestCustomTunnelJob() {
+            super(ClientTunnelPoolManagerJob.this._context);
+        }
         public String getName() { return "Request Custom Client Tunnel"; }
         public void runJob() {
-            TunnelInfo tunnelGateway = TunnelBuilder.getInstance().configureInboundTunnel(_clientPool.getDestination(), _clientPool.getClientSettings());
-            RequestTunnelJob reqJob = new RequestTunnelJob(_tunnelPool, tunnelGateway, true, _tunnelPool.getTunnelCreationTimeout());
-            JobQueue.getInstance().addJob(reqJob);
+            TunnelInfo tunnelGateway = _tunnelBuilder.configureInboundTunnel(_clientPool.getDestination(), _clientPool.getClientSettings());
+            RequestTunnelJob reqJob = new RequestTunnelJob(RequestCustomTunnelJob.this._context, _tunnelPool, tunnelGateway, true, _tunnelPool.getTunnelCreationTimeout());
+            RequestCustomTunnelJob.this._context.jobQueue().addJob(reqJob);
         }
     }
 }

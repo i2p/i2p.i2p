@@ -26,13 +26,13 @@ class LogRecordFormatter {
     private final static int MAX_THREAD_LENGTH = 12;
     private final static int MAX_PRIORITY_LENGTH = 5;
 
-    public static String formatRecord(LogRecord rec) {
+    public static String formatRecord(LogManager manager, LogRecord rec) {
         StringBuffer buf = new StringBuffer();
-        char format[] = LogManager.getInstance()._getFormat();
+        char format[] = manager._getFormat();
         for (int i = 0; i < format.length; ++i) {
             switch ((int) format[i]) {
             case (int) LogManager.DATE:
-                buf.append(getWhen(rec));
+                buf.append(getWhen(manager, rec));
                 break;
             case (int) LogManager.CLASS:
                 buf.append(getWhere(rec));
@@ -71,8 +71,8 @@ class LogRecordFormatter {
         return toString(logRecord.getThreadName(), MAX_THREAD_LENGTH);
     }
 
-    private static String getWhen(LogRecord logRecord) {
-        return LogManager.getInstance()._getDateFormat().format(new Date(logRecord.getDate()));
+    private static String getWhen(LogManager manager, LogRecord logRecord) {
+        return manager._getDateFormat().format(new Date(logRecord.getDate()));
     }
 
     private static String getPriority(LogRecord rec) {

@@ -19,22 +19,22 @@ import net.i2p.router.NetworkDatabaseFacade;
 import net.i2p.router.ProfileManager;
 import net.i2p.util.Log;
 import net.i2p.stat.StatManager;
+import net.i2p.router.RouterContext;
 
 /**
  * Receive DatabaseStoreMessage data and store it in the local net db
  *
  */
 public class HandleDatabaseStoreMessageJob extends JobImpl {
-    private final static Log _log = new Log(HandleDatabaseStoreMessageJob.class);
+    private Log _log;
     private DatabaseStoreMessage _message;
     private RouterIdentity _from;
     private Hash _fromHash;
-        
-    static {
-        StatManager.getInstance().createRateStat("netDb.storeHandled", "How many netDb store messages have we handled?", "Network Database", new long[] { 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
-    }
 
-    public HandleDatabaseStoreMessageJob(DatabaseStoreMessage receivedMessage, RouterIdentity from, Hash fromHash) {
+    public HandleDatabaseStoreMessageJob(RouterContext ctx, DatabaseStoreMessage receivedMessage, RouterIdentity from, Hash fromHash) {
+        super(ctx);
+        _log = ctx.logManager().getLog(HandleDatabaseStoreMessageJob.class);
+        ctx.statManager().createRateStat("netDb.storeHandled", "How many netDb store messages have we handled?", "Network Database", new long[] { 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
         _message = receivedMessage;
         _from = from;
         _fromHash = fromHash;
@@ -46,15 +46,15 @@ public class HandleDatabaseStoreMessageJob extends JobImpl {
 	
         boolean wasNew = false;
         if (_message.getValueType() == DatabaseStoreMessage.KEY_TYPE_LEASESET) {
-            Object match = NetworkDatabaseFacade.getInstance().store(_message.getKey(), _message.getLeaseSet());
+            Object match = _context.netDb().store(_message.getKey(), _message.getLeaseSet());
             wasNew = (null == match);
         } else if (_message.getValueType() == DatabaseStoreMessage.KEY_TYPE_ROUTERINFO) {
             if (_log.shouldLog(Log.INFO))
                 _log.info("Handling dbStore of router " + _message.getKey() + " with publishDate of " 
                           + new Date(_message.getRouterInfo().getPublished()));
-            Object match = NetworkDatabaseFacade.getInstance().store(_message.getKey(), _message.getRouterInfo());
+            Object match = _context.netDb().store(_message.getKey(), _message.getRouterInfo());
             wasNew = (null == match);
-            ProfileManager.getInstance().heardAbout(_message.getKey());
+            _context.profileManager().heardAbout(_message.getKey());
         } else {
             if (_log.shouldLog(Log.ERROR))
                 _log.error("Invalid DatabaseStoreMessage data type - " + _message.getValueType() 
@@ -63,13 +63,13 @@ public class HandleDatabaseStoreMessageJob extends JobImpl {
         if (_from != null)
             _fromHash = _from.getHash();
         if (_fromHash != null)
-            ProfileManager.getInstance().dbStoreReceived(_fromHash, wasNew);
-        StatManager.getInstance().addRateData("netDb.storeHandled", 1, 0);
+            _context.profileManager().dbStoreReceived(_fromHash, wasNew);
+        _context.statManager().addRateData("netDb.storeHandled", 1, 0);
     }
 
     public String getName() { return "Handle Database Store Message"; }
     
     public void dropped() {
-        MessageHistory.getInstance().messageProcessingError(_message.getUniqueId(), _message.getClass().getName(), "Dropped due to overload");
+        _context.messageHistory().messageProcessingError(_message.getUniqueId(), _message.getClass().getName(), "Dropped due to overload");
     }
 }

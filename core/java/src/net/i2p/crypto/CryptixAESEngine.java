@@ -13,6 +13,7 @@ import java.security.InvalidKeyException;
 
 import net.i2p.data.SessionKey;
 import net.i2p.util.Log;
+import net.i2p.I2PAppContext;
 
 /** 
  * Wrapper for AES cypher operation using Cryptix's Rijndael implementation.  Implements
@@ -23,10 +24,15 @@ import net.i2p.util.Log;
  * @author jrandom, thecrypto
  */
 public class CryptixAESEngine extends AESEngine {
-    private final static Log _log = new Log(CryptixAESEngine.class);
+    private Log _log;
     private final static CryptixRijndael_Algorithm _algo = new CryptixRijndael_Algorithm();
     private final static boolean USE_FAKE_CRYPTO = false;
     private final static byte FAKE_KEY = 0x2A;
+    
+    public CryptixAESEngine(I2PAppContext context) {
+        super(context);
+        _log = context.logManager().getLog(CryptixAESEngine.class);
+    }
 
     public byte[] encrypt(byte payload[], SessionKey sessionKey, byte initializationVector[]) {
         if ((initializationVector == null) || (payload == null) || (payload.length <= 0) || (sessionKey == null)
@@ -116,7 +122,7 @@ public class CryptixAESEngine extends AESEngine {
      * @param sessionKey private esession key to encrypt to
      * @return encrypted data
      */
-    final static byte[] encrypt(byte payload[], SessionKey sessionKey) {
+    final byte[] encrypt(byte payload[], SessionKey sessionKey) {
         try {
             Object key = CryptixRijndael_Algorithm.makeKey(sessionKey.getData(), 16);
             byte rv[] = new byte[payload.length];
@@ -133,7 +139,7 @@ public class CryptixAESEngine extends AESEngine {
      * @param sessionKey private session key
      * @return unencrypted data
      */
-    final static byte[] decrypt(byte payload[], SessionKey sessionKey) {
+    final byte[] decrypt(byte payload[], SessionKey sessionKey) {
         try {
             Object key = CryptixRijndael_Algorithm.makeKey(sessionKey.getData(), 16);
             byte rv[] = new byte[payload.length];

@@ -15,6 +15,7 @@ import java.io.InputStream;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.DataStructure;
 import net.i2p.util.Log;
+import net.i2p.I2PAppContext;
 
 /**
  * Utility class for wrapping data structure tests
@@ -23,6 +24,7 @@ import net.i2p.util.Log;
  */
 public abstract class StructureTest implements TestDataGenerator, TestDataPrinter {
     private static final Log _log = new Log(StructureTest.class);
+    protected static I2PAppContext _context = I2PAppContext.getGlobalContext();
     
     public abstract DataStructure createDataStructure() throws DataFormatException;
     public abstract DataStructure createStructureToRead();

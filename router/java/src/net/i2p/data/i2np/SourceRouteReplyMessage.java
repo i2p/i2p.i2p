@@ -19,6 +19,7 @@ import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
 import net.i2p.data.PrivateKey;
 import net.i2p.util.Log;
+import net.i2p.I2PAppContext;
 
 /**
  * Defines a message directed by a source route block to deliver a message to an
@@ -35,14 +36,17 @@ public class SourceRouteReplyMessage extends I2NPMessageImpl {
     private long _decryptedMessageId;
     private Certificate _decryptedCertificate;
     private long _decryptedExpiration;
+    private I2NPMessageHandler _handler;
     
-    public SourceRouteReplyMessage() { 
-	_encryptedHeader = null;
-	_message = null;
-	_decryptedInstructions = null;
-	_decryptedMessageId = -1;
-	_decryptedCertificate = null;
-	_decryptedExpiration = -1;
+    public SourceRouteReplyMessage(I2PAppContext context) { 
+        super(context);
+        _handler = new I2NPMessageHandler(context);
+        _encryptedHeader = null;
+        _message = null;
+        _decryptedInstructions = null;
+        _decryptedMessageId = -1;
+        _decryptedCertificate = null;
+        _decryptedExpiration = -1;
     }
     
     /**
@@ -77,54 +81,56 @@ public class SourceRouteReplyMessage extends I2NPMessageImpl {
      * @throws DataFormatException if the decryption fails or if the data is somehow malformed
      */
     public void decryptHeader(PrivateKey key) throws DataFormatException {
-	if ( (_encryptedHeader == null) || (_encryptedHeader.length <= 0) )
-	    throw new DataFormatException("No header to decrypt");
-	
-	byte decr[] = ElGamalAESEngine.decrypt(_encryptedHeader, key);
-	
-	if (decr == null)
-	    throw new DataFormatException("Decrypted data is null");
-	
-	try {
-	    ByteArrayInputStream bais = new ByteArrayInputStream(decr);
-    
-	    _decryptedInstructions = new DeliveryInstructions();
-	    _decryptedInstructions.readBytes(bais);
-	    _decryptedMessageId = DataHelper.readLong(bais, 4);
-	    _decryptedCertificate = new Certificate();
-	    _decryptedCertificate.readBytes(bais);
-	    _decryptedExpiration = DataHelper.readDate(bais).getTime();
+        if ( (_encryptedHeader == null) || (_encryptedHeader.length <= 0) )
+            throw new DataFormatException("No header to decrypt");
 
-	} catch (IOException ioe) {
-	    throw new DataFormatException("Error reading the source route reply header", ioe);
-	} catch (DataFormatException dfe) {
-	    throw new DataFormatException("Error reading the source route reply header", dfe);
-	}
+        byte decr[] = _context.elGamalAESEngine().decrypt(_encryptedHeader, key);
+
+        if (decr == null)
+            throw new DataFormatException("Decrypted data is null");
+
+        try {
+            ByteArrayInputStream bais = new ByteArrayInputStream(decr);
+    
+            _decryptedInstructions = new DeliveryInstructions();
+            _decryptedInstructions.readBytes(bais);
+            _decryptedMessageId = DataHelper.readLong(bais, 4);
+            _decryptedCertificate = new Certificate();
+            _decryptedCertificate.readBytes(bais);
+            _decryptedExpiration = DataHelper.readDate(bais).getTime();
+
+        } catch (IOException ioe) {
+            throw new DataFormatException("Error reading the source route reply header", ioe);
+        } catch (DataFormatException dfe) {
+            throw new DataFormatException("Error reading the source route reply header", dfe);
+        }
     }
         
     public void readMessage(InputStream in, int type) throws I2NPMessageException, IOException {
-	if (type != MESSAGE_TYPE) throw new I2NPMessageException("Message type is incorrect for this message");
+        if (type != MESSAGE_TYPE) 
+            throw new I2NPMessageException("Message type is incorrect for this message");
         try {
-	    int headerSize = (int)DataHelper.readLong(in, 2);
-	    _encryptedHeader = new byte[headerSize];
-	    int read = read(in, _encryptedHeader);
-	    if (read != headerSize)
-		throw new DataFormatException("Not enough bytes to read the header (read = " + read + ", required = " + headerSize + ")");
-	    _message = new I2NPMessageHandler().readMessage(in);
+            int headerSize = (int)DataHelper.readLong(in, 2);
+            _encryptedHeader = new byte[headerSize];
+            int read = read(in, _encryptedHeader);
+            if (read != headerSize)
+                throw new DataFormatException("Not enough bytes to read the header (read = " + read 
+                                              + ", required = " + headerSize + ")");
+            _message = _handler.readMessage(in);
         } catch (DataFormatException dfe) {
             throw new I2NPMessageException("Unable to load the message data", dfe);
         }
     }
     
     protected byte[] writeMessage() throws I2NPMessageException, IOException {
-	if ( (_encryptedHeader == null) || (_message == null) )
-	    throw new I2NPMessageException("Not enough data to write out");
-	
-	ByteArrayOutputStream os = new ByteArrayOutputStream(1024);
+        if ( (_encryptedHeader == null) || (_message == null) )
+            throw new I2NPMessageException("Not enough data to write out");
+
+        ByteArrayOutputStream os = new ByteArrayOutputStream(1024);
         try {
-	    DataHelper.writeLong(os, 2, _encryptedHeader.length);
-	    os.write(_encryptedHeader);
-	    _message.writeBytes(os);
+            DataHelper.writeLong(os, 2, _encryptedHeader.length);
+            os.write(_encryptedHeader);
+            _message.writeBytes(os);
         } catch (DataFormatException dfe) {
             throw new I2NPMessageException("Error writing out the message data", dfe);
         }
@@ -134,15 +140,15 @@ public class SourceRouteReplyMessage extends I2NPMessageImpl {
     public int getType() { return MESSAGE_TYPE; }
     
     public int hashCode() {
-	return DataHelper.hashCode(_encryptedHeader) +
-	       DataHelper.hashCode(_message);
+        return DataHelper.hashCode(_encryptedHeader) +
+               DataHelper.hashCode(_message);
     }
     
     public boolean equals(Object object) {
         if ( (object != null) && (object instanceof SourceRouteReplyMessage) ) {
             SourceRouteReplyMessage msg = (SourceRouteReplyMessage)object;
             return DataHelper.eq(_message,msg._message) && 
-	           DataHelper.eq(_encryptedHeader,msg._encryptedHeader);
+                   DataHelper.eq(_encryptedHeader,msg._encryptedHeader);
         } else {
             return false;
         }

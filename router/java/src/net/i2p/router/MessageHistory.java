@@ -23,13 +23,16 @@ import net.i2p.util.Log;
  *
  */
 public class MessageHistory {
-    private final static Log _log = new Log(MessageHistory.class);
-    private static MessageHistory _instance;
+    private Log _log;
+    private RouterContext _context;
     private List _unwrittenEntries; // list of raw entries (strings) yet to be written
     private String _historyFile; // where to write 
     private String _localIdent; // placed in each entry to uniquely identify the local router
     private boolean _doLog; // true == we want to log
     private boolean _doPause; // true == briefly stop writing data to the log (used while submitting it)
+    private ReinitializeJob _reinitializeJob;
+    private WriteJob _writeJob;
+    private SubmitMessageHistoryJob _submitMessageHistoryJob;
     
     private final static byte[] NL = System.getProperty("line.separator").getBytes();
     private final static int FLUSH_SIZE = 1000; // write out at least once every 1000 entries
@@ -41,21 +44,12 @@ public class MessageHistory {
     public final static String PROP_MESSAGE_HISTORY_FILENAME = "router.historyFilename";
     public final static String DEFAULT_MESSAGE_HISTORY_FILENAME = "messageHistory.txt";
     
-    public final static MessageHistory getInstance() { 
-	if (_instance == null)
-	    initialize();
-	return _instance; 
-    }
-    private final static void setInstance(MessageHistory hist) { 
-	if (_instance != null) {
-	    synchronized (_instance._unwrittenEntries) {
-		for (Iterator iter = _instance._unwrittenEntries.iterator(); iter.hasNext(); ) {
-		    hist.addEntry((String)iter.next());
-		}
-		_instance._unwrittenEntries.clear();
-	    }
-	} 
-	_instance = hist; 
+    public MessageHistory(RouterContext context) {
+        _context = context;
+        _reinitializeJob = new ReinitializeJob();
+        _writeJob = new WriteJob();
+        _submitMessageHistoryJob = new SubmitMessageHistoryJob(_context);
+        initialize(true);
     }
     
     void setDoLog(boolean log) { _doLog = log; }
@@ -65,19 +59,19 @@ public class MessageHistory {
     String getFilename() { return _historyFile; }
     
     private void updateSettings() {
-	String keepHistory = Router.getInstance().getConfigSetting(PROP_KEEP_MESSAGE_HISTORY);
-	if (keepHistory != null) {
-	    _doLog = Boolean.TRUE.toString().equalsIgnoreCase(keepHistory);
-	} else {
-	    _doLog = DEFAULT_KEEP_MESSAGE_HISTORY;
-	}
-	
-	String filename = null;
-	if (_doLog) {
-	    filename = Router.getInstance().getConfigSetting(PROP_MESSAGE_HISTORY_FILENAME);
-	    if ( (filename == null) || (filename.trim().length() <= 0) )
-		filename = DEFAULT_MESSAGE_HISTORY_FILENAME;
-	}
+        String keepHistory = _context.router().getConfigSetting(PROP_KEEP_MESSAGE_HISTORY);
+        if (keepHistory != null) {
+            _doLog = Boolean.TRUE.toString().equalsIgnoreCase(keepHistory);
+        } else {
+            _doLog = DEFAULT_KEEP_MESSAGE_HISTORY;
+        }
+
+        String filename = null;
+        if (_doLog) {
+            filename = _context.router().getConfigSetting(PROP_MESSAGE_HISTORY_FILENAME);
+            if ( (filename == null) || (filename.trim().length() <= 0) )
+                filename = DEFAULT_MESSAGE_HISTORY_FILENAME;
+        }
     }
     
     /**
@@ -85,55 +79,38 @@ public class MessageHistory {
      * Call this whenever the router identity changes.
      *
      */
-    public static void initialize() {
-	initialize(false);
+    public void initialize(boolean forceReinitialize) {
+        if (!forceReinitialize) return;
+
+        if (_context.router().getRouterInfo() == null) {
+            _reinitializeJob.getTiming().setStartAfter(_context.clock().now()+5000);
+            _context.jobQueue().addJob(_reinitializeJob);
+        } else {
+            String filename = null;
+            filename = _context.router().getConfigSetting(PROP_MESSAGE_HISTORY_FILENAME);
+            if ( (filename == null) || (filename.trim().length() <= 0) )
+                filename = DEFAULT_MESSAGE_HISTORY_FILENAME;
+
+            _doLog = DEFAULT_KEEP_MESSAGE_HISTORY;
+            _historyFile = filename;
+            _localIdent = getName(_context.routerHash());
+            _unwrittenEntries = new LinkedList();
+            updateSettings();
+            addEntry(getPrefix() + "** Router initialized (started up or changed identities)");
+            _context.jobQueue().addJob(_writeJob);
+            _submitMessageHistoryJob.getTiming().setStartAfter(_context.clock().now() + 2*60*1000);
+            _context.jobQueue().addJob(_submitMessageHistoryJob);
+        }
     }
-    public static void initialize(boolean forceReinitialize) {
-	if ( (!forceReinitialize) && (_instance != null) ) return;
-	
-	if (Router.getInstance().getRouterInfo() == null) {
-	    ReinitializeJob j = ReinitializeJob.getInstance();
-	    j.getTiming().setStartAfter(Clock.getInstance().now()+5000);
-	    JobQueue.getInstance().addJob(j);
-	} else {
-	    String filename = null;
-	    filename = Router.getInstance().getConfigSetting(PROP_MESSAGE_HISTORY_FILENAME);
-	    if ( (filename == null) || (filename.trim().length() <= 0) )
-		filename = DEFAULT_MESSAGE_HISTORY_FILENAME;
-	    MessageHistory hist = new MessageHistory(Router.getInstance().getRouterInfo().getIdentity().getHash(), filename);
-	    setInstance(hist);
-	    hist.updateSettings();
-	    getInstance().addEntry(getInstance().getPrefix() + "** Router initialized (started up or changed identities)");
-	    JobQueue.getInstance().addJob(new WriteJob());
-	    SubmitMessageHistoryJob histJob = new SubmitMessageHistoryJob();
-	    histJob.getTiming().setStartAfter(Clock.getInstance().now() + 2*60*1000);
-	    JobQueue.getInstance().addJob(histJob);
-	}
-    }
-    
-    private static final class ReinitializeJob extends JobImpl {
-	private final static ReinitializeJob _jobInstance = new ReinitializeJob();
-	public final static ReinitializeJob getInstance() { return _jobInstance; } 
-	private ReinitializeJob() {
-	    super();
-	}
-	public void runJob() {
-	    MessageHistory.initialize();
-	}
-	public String getName() { return "Reinitialize message history"; }
-    }
-    
-    /**
-     * Create a component to monitor the message history of the router.
-     *
-     * @param localIdent Hash of local identity
-     * @param filename file to log trace info to
-     */
-    private MessageHistory(Hash localIdent, String filename) {
-	_doLog = DEFAULT_KEEP_MESSAGE_HISTORY;
-	_historyFile = filename;
-	_localIdent = getName(localIdent);
-	_unwrittenEntries = new LinkedList();
+
+    private final class ReinitializeJob extends JobImpl {
+        private ReinitializeJob() {
+            super(MessageHistory.this._context);
+        }
+        public void runJob() {
+            initialize(true);
+        }
+        public String getName() { return "Reinitialize message history"; }
     }
     
     /**
@@ -151,20 +128,20 @@ public class MessageHistory {
      * @param replyThrough the gateway of the tunnel that the sourceRoutePeer will be sending to
      */
     public void requestTunnelCreate(TunnelId createTunnel, TunnelId outTunnel, Hash peerRequested, Hash nextPeer, Hash sourceRoutePeer, TunnelId replyTunnel, Hash replyThrough) {
-	if (!_doLog) return;
-	StringBuffer buf = new StringBuffer(128);
-	buf.append(getPrefix());
-	buf.append("request [").append(getName(peerRequested)).append("] to create tunnel [");
-	buf.append(createTunnel.getTunnelId()).append("] ");
-	if (nextPeer != null)
-	    buf.append("(next [").append(getName(nextPeer)).append("]) ");
-	if (outTunnel != null)
-	    buf.append("via [").append(outTunnel.getTunnelId()).append("] ");
-	if (sourceRoutePeer != null)
-	    buf.append("with replies routed through [").append(getName(sourceRoutePeer)).append("] ");
-	if ( (replyTunnel != null) && (replyThrough != null) ) 
-	    buf.append("who forwards it through [").append(replyTunnel.getTunnelId()).append("] on [").append(getName(replyThrough)).append("]");
-	addEntry(buf.toString());
+        if (!_doLog) return;
+        StringBuffer buf = new StringBuffer(128);
+        buf.append(getPrefix());
+        buf.append("request [").append(getName(peerRequested)).append("] to create tunnel [");
+        buf.append(createTunnel.getTunnelId()).append("] ");
+        if (nextPeer != null)
+            buf.append("(next [").append(getName(nextPeer)).append("]) ");
+        if (outTunnel != null)
+            buf.append("via [").append(outTunnel.getTunnelId()).append("] ");
+        if (sourceRoutePeer != null)
+            buf.append("with replies routed through [").append(getName(sourceRoutePeer)).append("] ");
+        if ( (replyTunnel != null) && (replyThrough != null) ) 
+            buf.append("who forwards it through [").append(replyTunnel.getTunnelId()).append("] on [").append(getName(replyThrough)).append("]");
+        addEntry(buf.toString());
     }
     
     /**
@@ -178,14 +155,14 @@ public class MessageHistory {
      * @param sourceRoutePeer peer through whom we should send our garlic routed ok through
      */
     public void receiveTunnelCreate(TunnelId createTunnel, Hash nextPeer, Date expire, boolean ok, Hash sourceRoutePeer) {
-	if (!_doLog) return;
-	StringBuffer buf = new StringBuffer(128);
-	buf.append(getPrefix());
-	buf.append("receive tunnel create [").append(createTunnel.getTunnelId()).append("] ");
-	if (nextPeer != null)
-	    buf.append("(next [").append(getName(nextPeer)).append("]) ");
-	buf.append("ok? ").append(ok).append(" expiring on [").append(getTime(expire)).append("]");
-	addEntry(buf.toString());
+        if (!_doLog) return;
+        StringBuffer buf = new StringBuffer(128);
+        buf.append(getPrefix());
+        buf.append("receive tunnel create [").append(createTunnel.getTunnelId()).append("] ");
+        if (nextPeer != null)
+            buf.append("(next [").append(getName(nextPeer)).append("]) ");
+        buf.append("ok? ").append(ok).append(" expiring on [").append(getTime(expire)).append("]");
+        addEntry(buf.toString());
     }
     
     /**
@@ -195,22 +172,22 @@ public class MessageHistory {
      * @param tunnel tunnel joined
      */
     public void tunnelJoined(String state, TunnelInfo tunnel) {
-	if (!_doLog) return;
-	if (tunnel == null) return;
-	StringBuffer buf = new StringBuffer(128);
-	buf.append(getPrefix());
-	buf.append("joining tunnel [").append(tunnel.getTunnelId().getTunnelId()).append("] as [").append(state).append("] ");
-	buf.append(" (next: ");
-	TunnelInfo cur = tunnel;
-	while (cur.getNextHopInfo() != null) {
-	    buf.append('[').append(getName(cur.getNextHopInfo().getThisHop()));
-	    buf.append("], ");
-	    cur = cur.getNextHopInfo();
-	}
-	if (cur.getNextHop() != null)
-	    buf.append('[').append(getName(cur.getNextHop())).append(']');
-	buf.append(") expiring on [").append(getTime(new Date(tunnel.getSettings().getExpiration()))).append("]");
-	addEntry(buf.toString());
+        if (!_doLog) return;
+        if (tunnel == null) return;
+        StringBuffer buf = new StringBuffer(128);
+        buf.append(getPrefix());
+        buf.append("joining tunnel [").append(tunnel.getTunnelId().getTunnelId()).append("] as [").append(state).append("] ");
+        buf.append(" (next: ");
+        TunnelInfo cur = tunnel;
+        while (cur.getNextHopInfo() != null) {
+            buf.append('[').append(getName(cur.getNextHopInfo().getThisHop()));
+            buf.append("], ");
+            cur = cur.getNextHopInfo();
+        }
+        if (cur.getNextHop() != null)
+            buf.append('[').append(getName(cur.getNextHop())).append(']');
+        buf.append(") expiring on [").append(getTime(new Date(tunnel.getSettings().getExpiration()))).append("]");
+        addEntry(buf.toString());
     }
     
     /**
@@ -219,12 +196,12 @@ public class MessageHistory {
      * @param tunnel tunnel failed
      */
     public void tunnelFailed(TunnelId tunnel) {
-	if (!_doLog) return;
-	if (tunnel == null) return;
-	StringBuffer buf = new StringBuffer(128);
-	buf.append(getPrefix());
-	buf.append("failing tunnel [").append(tunnel.getTunnelId()).append("]");
-	addEntry(buf.toString());
+        if (!_doLog) return;
+        if (tunnel == null) return;
+        StringBuffer buf = new StringBuffer(128);
+        buf.append(getPrefix());
+        buf.append("failing tunnel [").append(tunnel.getTunnelId()).append("]");
+        addEntry(buf.toString());
     }
     
     /**
@@ -235,24 +212,24 @@ public class MessageHistory {
      * @param timeToTest milliseconds to verify the tunnel
      */
     public void tunnelValid(TunnelInfo tunnel, long timeToTest) {
-	if (!_doLog) return;
-	if (tunnel == null) return;
-	StringBuffer buf = new StringBuffer(128);
-	buf.append(getPrefix());
-	buf.append("tunnel ").append(tunnel.getTunnelId().getTunnelId()).append(" tested ok after ").append(timeToTest).append("ms (containing ");
-	TunnelInfo cur = tunnel;
-	while (cur != null) {
-	    buf.append('[').append(getName(cur.getThisHop())).append("], ");
-	    if (cur.getNextHopInfo() != null) {
-		cur = cur.getNextHopInfo();
-	    } else {
-		if (cur.getNextHop() != null)
-		    buf.append('[').append(getName(cur.getNextHop())).append(']');
-		cur = null;		
-	    }
-	}
-	buf.append(')');
-	addEntry(buf.toString());
+        if (!_doLog) return;
+        if (tunnel == null) return;
+        StringBuffer buf = new StringBuffer(128);
+        buf.append(getPrefix());
+        buf.append("tunnel ").append(tunnel.getTunnelId().getTunnelId()).append(" tested ok after ").append(timeToTest).append("ms (containing ");
+        TunnelInfo cur = tunnel;
+        while (cur != null) {
+            buf.append('[').append(getName(cur.getThisHop())).append("], ");
+            if (cur.getNextHopInfo() != null) {
+                cur = cur.getNextHopInfo();
+            } else {
+                if (cur.getNextHop() != null)
+                    buf.append('[').append(getName(cur.getNextHop())).append(']');
+                cur = null;		
+            }
+        }
+        buf.append(')');
+        addEntry(buf.toString());
     }
     
     /**
@@ -260,15 +237,15 @@ public class MessageHistory {
      *
      */
     public void tunnelRejected(Hash peer, TunnelId tunnel, Hash replyThrough, String reason) {
-	if (!_doLog) return;
-	if ( (tunnel == null) || (peer == null) ) return;
-	StringBuffer buf = new StringBuffer(128);
-	buf.append(getPrefix());
-	buf.append("tunnel [").append(tunnel.getTunnelId()).append("] was rejected by [");
-	buf.append(getName(peer)).append("] for [").append(reason).append("]");
-	if (replyThrough != null)
-	    buf.append(" with their reply intended to come through [").append(getName(replyThrough)).append("]");
-	addEntry(buf.toString());
+        if (!_doLog) return;
+        if ( (tunnel == null) || (peer == null) ) return;
+        StringBuffer buf = new StringBuffer(128);
+        buf.append(getPrefix());
+        buf.append("tunnel [").append(tunnel.getTunnelId()).append("] was rejected by [");
+        buf.append(getName(peer)).append("] for [").append(reason).append("]");
+        if (replyThrough != null)
+            buf.append(" with their reply intended to come through [").append(getName(replyThrough)).append("]");
+        addEntry(buf.toString());
     }
     
     /**
@@ -277,15 +254,15 @@ public class MessageHistory {
      *
      */
     public void tunnelRequestTimedOut(Hash peer, TunnelId tunnel, Hash replyThrough) {
-	if (!_doLog) return;
-	if ( (tunnel == null) || (peer == null) ) return;
-	StringBuffer buf = new StringBuffer(128);
-	buf.append(getPrefix());
-	buf.append("tunnel [").append(tunnel.getTunnelId()).append("] timed out on [");
-	buf.append(getName(peer)).append("]");
-	if (replyThrough != null)
-	    buf.append(" with their reply intended to come through [").append(getName(replyThrough)).append("]");
-	addEntry(buf.toString());
+        if (!_doLog) return;
+        if ( (tunnel == null) || (peer == null) ) return;
+        StringBuffer buf = new StringBuffer(128);
+        buf.append(getPrefix());
+        buf.append("tunnel [").append(tunnel.getTunnelId()).append("] timed out on [");
+        buf.append(getName(peer)).append("]");
+        if (replyThrough != null)
+            buf.append(" with their reply intended to come through [").append(getName(replyThrough)).append("]");
+        addEntry(buf.toString());
     }
     
     /**
@@ -296,24 +273,24 @@ public class MessageHistory {
      * @param from peer that sent us this message (if known)
      */
     public void droppedTunnelMessage(TunnelId id, Hash from) {
-	if (!_doLog) return;
-	StringBuffer buf = new StringBuffer(128);
-	buf.append(getPrefix());
-	buf.append("dropped message for unknown tunnel [").append(id.getTunnelId()).append("] from [").append(getName(from)).append("]");
-	addEntry(buf.toString());
+        if (!_doLog) return;
+        StringBuffer buf = new StringBuffer(128);
+        buf.append(getPrefix());
+        buf.append("dropped message for unknown tunnel [").append(id.getTunnelId()).append("] from [").append(getName(from)).append("]");
+        addEntry(buf.toString());
     }
     
     /**
      * We received another message we weren't waiting for and don't know how to handle
      */
     public void droppedOtherMessage(I2NPMessage message) {
-	if (!_doLog) return;
-	if (message == null) return;
-	StringBuffer buf = new StringBuffer(512);
-	buf.append(getPrefix());
-	buf.append("dropped [").append(message.getClass().getName()).append("] ").append(message.getUniqueId());
-	buf.append(" [").append(message.toString()).append("]");
-	addEntry(buf.toString());
+        if (!_doLog) return;
+        if (message == null) return;
+        StringBuffer buf = new StringBuffer(512);
+        buf.append(getPrefix());
+        buf.append("dropped [").append(message.getClass().getName()).append("] ").append(message.getUniqueId());
+        buf.append(" [").append(message.toString()).append("]");
+        addEntry(buf.toString());
     }
     
     /**
@@ -322,16 +299,16 @@ public class MessageHistory {
      * @param sentMessage message sent that didn't receive a reply
      */
     public void replyTimedOut(OutNetMessage sentMessage) {
-	if (!_doLog) return;
-	if (sentMessage == null) return;
-	StringBuffer buf = new StringBuffer(512);
-	buf.append(getPrefix());
-	buf.append("timed out waiting for a reply to [").append(sentMessage.getMessage().getClass().getName());
-	buf.append("] [").append(sentMessage.getMessage().getUniqueId()).append("] expiring on [");
-	if (sentMessage != null)
-	    buf.append(getTime(new Date(sentMessage.getReplySelector().getExpiration())));
-	buf.append("] ").append(sentMessage.getReplySelector().toString());
-	addEntry(buf.toString());
+        if (!_doLog) return;
+        if (sentMessage == null) return;
+        StringBuffer buf = new StringBuffer(512);
+        buf.append(getPrefix());
+        buf.append("timed out waiting for a reply to [").append(sentMessage.getMessage().getClass().getName());
+        buf.append("] [").append(sentMessage.getMessage().getUniqueId()).append("] expiring on [");
+        if (sentMessage != null)
+            buf.append(getTime(new Date(sentMessage.getReplySelector().getExpiration())));
+        buf.append("] ").append(sentMessage.getReplySelector().toString());
+        addEntry(buf.toString());
     }
     
     /**
@@ -342,11 +319,11 @@ public class MessageHistory {
      * @param error error message related to the processing of the message
      */
     public void messageProcessingError(long messageId, String messageType, String error) {
-	if (!_doLog) return;
-	StringBuffer buf = new StringBuffer(128);
-	buf.append(getPrefix());
-	buf.append("Error processing [").append(messageType).append("] [").append(messageId).append("] failed with [").append(error).append("]");
-	addEntry(buf.toString());
+        if (!_doLog) return;
+        StringBuffer buf = new StringBuffer(128);
+        buf.append(getPrefix());
+        buf.append("Error processing [").append(messageType).append("] [").append(messageId).append("] failed with [").append(error).append("]");
+        addEntry(buf.toString());
     }
     
     /**
@@ -360,17 +337,17 @@ public class MessageHistory {
      * @param sentOk whether the message was sent successfully
      */
     public void sendMessage(String messageType, long messageId, Date expiration, Hash peer, boolean sentOk) {
-	if (!_doLog) return;
-	StringBuffer buf = new StringBuffer(128);
-	buf.append(getPrefix());
-	buf.append("send [").append(messageType).append("] message [").append(messageId).append("] ");
-	buf.append("to [").append(getName(peer)).append("] ");
-	buf.append("expiring on [").append(getTime(expiration)).append("] ");
-	if (sentOk)
-	    buf.append("successfully");
-	else
-	    buf.append("failed");
-	addEntry(buf.toString());
+        if (!_doLog) return;
+        StringBuffer buf = new StringBuffer(128);
+        buf.append(getPrefix());
+        buf.append("send [").append(messageType).append("] message [").append(messageId).append("] ");
+        buf.append("to [").append(getName(peer)).append("] ");
+        buf.append("expiring on [").append(getTime(expiration)).append("] ");
+        if (sentOk)
+            buf.append("successfully");
+        else
+            buf.append("failed");
+        addEntry(buf.toString());
     }
 
     /**
@@ -385,20 +362,20 @@ public class MessageHistory {
      *
      */
     public void receiveMessage(String messageType, long messageId, Date expiration, Hash from, boolean isValid) {
-	if (!_doLog) return;
-	StringBuffer buf = new StringBuffer(128);
-	buf.append(getPrefix());
-	buf.append("receive [").append(messageType).append("] with id [").append(messageId).append("] ");
-	if (from != null)
-	    buf.append("from [").append(getName(from)).append("] ");
-	buf.append("expiring on [").append(getTime(expiration)).append("] valid? ").append(isValid);
-	addEntry(buf.toString());
-	if (messageType.equals("net.i2p.data.i2np.TunnelMessage")) {
-	    //_log.warn("ReceiveMessage tunnel message ["+messageId+"]", new Exception("Receive tunnel"));
+        if (!_doLog) return;
+        StringBuffer buf = new StringBuffer(128);
+        buf.append(getPrefix());
+        buf.append("receive [").append(messageType).append("] with id [").append(messageId).append("] ");
+        if (from != null)
+            buf.append("from [").append(getName(from)).append("] ");
+        buf.append("expiring on [").append(getTime(expiration)).append("] valid? ").append(isValid);
+        addEntry(buf.toString());
+        if (messageType.equals("net.i2p.data.i2np.TunnelMessage")) {
+        //_log.warn("ReceiveMessage tunnel message ["+messageId+"]", new Exception("Receive tunnel"));
 	}
     }
     public void receiveMessage(String messageType, long messageId, Date expiration, boolean isValid) {
-	receiveMessage(messageType, messageId, expiration, null, isValid);
+        receiveMessage(messageType, messageId, expiration, null, isValid);
     }
     
     /**
@@ -410,12 +387,12 @@ public class MessageHistory {
      * @param containerMessageId the unique message id of the message 
      */
     public void wrap(String bodyMessageType, long bodyMessageId, String containerMessageType, long containerMessageId) {
-	if (!_doLog) return;
-	StringBuffer buf = new StringBuffer(128);
-	buf.append(getPrefix());
-	buf.append("Wrap message [").append(bodyMessageType).append("] id [").append(bodyMessageId).append("] ");
-	buf.append("in [").append(containerMessageType).append("] id [").append(containerMessageId).append("]");
-	addEntry(buf.toString());
+        if (!_doLog) return;
+        StringBuffer buf = new StringBuffer(128);
+        buf.append(getPrefix());
+        buf.append("Wrap message [").append(bodyMessageType).append("] id [").append(bodyMessageId).append("] ");
+        buf.append("in [").append(containerMessageType).append("] id [").append(containerMessageId).append("]");
+        addEntry(buf.toString());
     }
     
     /**
@@ -423,11 +400,11 @@ public class MessageHistory {
      *
      */
     public void receivePayloadMessage(long messageId) {
-	if (!_doLog) return;
-	StringBuffer buf = new StringBuffer(64);
-	buf.append(getPrefix());
-	buf.append("Receive payload message [").append(messageId).append("]");
-	addEntry(buf.toString());
+        if (!_doLog) return;
+        StringBuffer buf = new StringBuffer(64);
+        buf.append(getPrefix());
+        buf.append("Receive payload message [").append(messageId).append("]");
+        addEntry(buf.toString());
     }
     
     /**
@@ -438,11 +415,11 @@ public class MessageHistory {
      * @param timeToSend how long it took to send the message
      */
     public void sendPayloadMessage(long messageId, boolean successfullySent, long timeToSend) {
-	if (!_doLog) return;
-	StringBuffer buf = new StringBuffer(128);
-	buf.append(getPrefix());
-	buf.append("Send payload message in [").append(messageId).append("] in [").append(timeToSend).append("] successfully? ").append(successfullySent);
-	addEntry(buf.toString());
+        if (!_doLog) return;
+        StringBuffer buf = new StringBuffer(128);
+        buf.append(getPrefix());
+        buf.append("Send payload message in [").append(messageId).append("] in [").append(timeToSend).append("] successfully? ").append(successfullySent);
+        addEntry(buf.toString());
     }
     
     /**
@@ -450,27 +427,27 @@ public class MessageHistory {
      *
      */
     private final static String getName(Hash router) {
-	if (router == null) return "unknown";
-	String str = router.toBase64();
-	if ( (str == null) || (str.length() < 6) ) return "invalid";
-	return str.substring(0, 6);
+        if (router == null) return "unknown";
+        String str = router.toBase64();
+        if ( (str == null) || (str.length() < 6) ) return "invalid";
+        return str.substring(0, 6);
     }
     
     private final String getPrefix() {
-	StringBuffer buf = new StringBuffer(48);
-	buf.append(getTime(new Date(Clock.getInstance().now())));
-	buf.append(' ').append(_localIdent).append(": ");
-	return buf.toString();
+        StringBuffer buf = new StringBuffer(48);
+        buf.append(getTime(new Date(_context.clock().now())));
+        buf.append(' ').append(_localIdent).append(": ");
+        return buf.toString();
     }
     
     private final static SimpleDateFormat _fmt = new SimpleDateFormat("yy/MM/dd.HH:mm:ss.SSS");
     static {
-	_fmt.setTimeZone(TimeZone.getTimeZone("GMT"));
+        _fmt.setTimeZone(TimeZone.getTimeZone("GMT"));
     }
     private final static String getTime(Date when) {
-	synchronized (_fmt) {
-	    return _fmt.format(when);
-	}
+        synchronized (_fmt) {
+            return _fmt.format(when);
+        }
     }
     
     /**
@@ -479,27 +456,27 @@ public class MessageHistory {
      *
      */
     private void addEntry(String entry) {
-	if (entry == null) return;
-	int sz = 0;
-	synchronized (_unwrittenEntries) {
-	    _unwrittenEntries.add(entry);
-	    sz = _unwrittenEntries.size();
-	}
-	if (sz > FLUSH_SIZE)
-	    flushEntries();
+        if (entry == null) return;
+        int sz = 0;
+        synchronized (_unwrittenEntries) {
+            _unwrittenEntries.add(entry);
+            sz = _unwrittenEntries.size();
+        }
+        if (sz > FLUSH_SIZE)
+            flushEntries();
     }
     
     /**
      * Write out any unwritten entries, and clear the pending list
      */
     private void flushEntries() {
-	if (_doPause) return;
-	List entries = null;
-	synchronized (_unwrittenEntries) {
-	    entries = new LinkedList(_unwrittenEntries);
-	    _unwrittenEntries.clear();
-	}
-	writeEntries(entries);
+        if (_doPause) return;
+        List entries = null;
+        synchronized (_unwrittenEntries) {
+            entries = new LinkedList(_unwrittenEntries);
+            _unwrittenEntries.clear();
+        }
+        writeEntries(entries);
     }
     
     /**
@@ -507,41 +484,46 @@ public class MessageHistory {
      *
      */
     private void writeEntries(List entries) {
-	if (!_doLog) return;
-	FileOutputStream fos = null;
-	try {
-	    fos = new FileOutputStream(_historyFile, true);
-	    for (Iterator iter = entries.iterator(); iter.hasNext(); ) {
-		String entry = (String)iter.next();
-		fos.write(entry.getBytes());
-		fos.write(NL);
-	    }
-	} catch (IOException ioe) {
-	    _log.error("Error writing trace entries", ioe);
-	} finally {
-	    if (fos != null) try { fos.close(); } catch (IOException ioe) {}
-	}
+        if (!_doLog) return;
+        FileOutputStream fos = null;
+        try {
+            fos = new FileOutputStream(_historyFile, true);
+            for (Iterator iter = entries.iterator(); iter.hasNext(); ) {
+                String entry = (String)iter.next();
+                fos.write(entry.getBytes());
+                fos.write(NL);
+            }
+        } catch (IOException ioe) {
+            _log.error("Error writing trace entries", ioe);
+        } finally {
+            if (fos != null) try { fos.close(); } catch (IOException ioe) {}
+        }
     }
     
     /** write out the message history once per minute, if not sooner */
     private final static long WRITE_DELAY = 60*1000;
-    private static class WriteJob extends JobImpl {
-	public String getName() { return "Write History Entries"; }
-	public void runJob() {
-	    MessageHistory.getInstance().flushEntries();
-	    MessageHistory.getInstance().updateSettings();
-	    requeue(WRITE_DELAY);
-	}
+    private class WriteJob extends JobImpl {
+        public WriteJob() {
+            super(MessageHistory.this._context);
+        }
+        public String getName() { return "Write History Entries"; }
+        public void runJob() {
+            flushEntries();
+            updateSettings();
+            requeue(WRITE_DELAY);
+        }
     }
     
     public static void main(String args[]) {
-	MessageHistory hist = new MessageHistory(new Hash(new byte[32]), "messageHistory.txt");
-	MessageHistory.getInstance().setDoLog(false);
-	hist.addEntry("you smell before");
-	hist.getInstance().setDoLog(true);
-	hist.addEntry("you smell after");
-	hist.getInstance().setDoLog(false);
-	hist.addEntry("you smell finished");
-	hist.flushEntries();
+        RouterContext ctx = new RouterContext(null);
+        MessageHistory hist = new MessageHistory(ctx);
+        //, new Hash(new byte[32]), "messageHistory.txt");
+        hist.setDoLog(false);
+        hist.addEntry("you smell before");
+        hist.setDoLog(true);
+        hist.addEntry("you smell after");
+        hist.setDoLog(false);
+        hist.addEntry("you smell finished");
+        hist.flushEntries();
     }
 }

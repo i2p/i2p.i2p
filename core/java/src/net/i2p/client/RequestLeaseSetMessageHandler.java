@@ -25,6 +25,7 @@ import net.i2p.data.SigningPublicKey;
 import net.i2p.data.i2cp.I2CPMessage;
 import net.i2p.data.i2cp.RequestLeaseSetMessage;
 import net.i2p.util.Log;
+import net.i2p.I2PAppContext;
 
 /**
  * Handle I2CP RequestLeaseSetMessage from the router by granting all leases
@@ -35,8 +36,8 @@ class RequestLeaseSetMessageHandler extends HandlerImpl {
     private final static Log _log = new Log(RequestLeaseSetMessageHandler.class);
     private Map _existingLeaseSets;
 
-    public RequestLeaseSetMessageHandler() {
-        super(RequestLeaseSetMessage.MESSAGE_TYPE);
+    public RequestLeaseSetMessageHandler(I2PAppContext context) {
+        super(context, RequestLeaseSetMessage.MESSAGE_TYPE);
         _existingLeaseSets = new HashMap(32);
     }
 

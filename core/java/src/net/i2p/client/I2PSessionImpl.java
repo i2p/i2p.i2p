@@ -39,6 +39,7 @@ import net.i2p.data.i2cp.SessionId;
 import net.i2p.util.Clock;
 import net.i2p.util.I2PThread;
 import net.i2p.util.Log;
+import net.i2p.I2PAppContext;
 
 /**
  * Implementation of an I2P session running over TCP.  This class is NOT thread safe -
@@ -47,7 +48,7 @@ import net.i2p.util.Log;
  * @author jrandom
  */
 abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessageEventListener {
-    private final static Log _log = new Log(I2PSessionImpl.class);
+    private Log _log;
     /** who we are */
     private Destination _myDestination;
     /** private key for decryption */
@@ -79,6 +80,11 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
     protected I2CPMessageProducer _producer;
     /** map of integer --> MessagePayloadMessage */
     Map _availableMessages;
+    
+    protected I2PClientMessageHandlerMap _handlerMap;
+    
+    /** used to seperate things out so we can get rid of singletons */
+    protected I2PAppContext _context;
 
     /** MessageStatusMessage status from the most recent send that hasn't been consumed */
     private List _receivedStatus;
@@ -108,9 +114,12 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
      *
      * @throws I2PSessionException if there is a problem loading the private keys or 
      */
-    public I2PSessionImpl(InputStream destKeyStream, Properties options) throws I2PSessionException {
+    public I2PSessionImpl(I2PAppContext context, InputStream destKeyStream, Properties options) throws I2PSessionException {
+        _context = context;
+        _log = context.logManager().getLog(I2PSessionImpl.class);
+        _handlerMap = new I2PClientMessageHandlerMap(context);
         _closed = true;
-        _producer = new I2CPMessageProducer();
+        _producer = new I2CPMessageProducer(context);
         _availableMessages = new HashMap();
         try {
             readDestination(destKeyStream);
@@ -139,13 +148,13 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
             _portNum = Integer.parseInt(portNum);
         } catch (NumberFormatException nfe) {
             if (_log.shouldLog(Log.WARN))
-                                         _log.warn("Invalid port number specified, defaulting to "
-                                                   + TestServer.LISTEN_PORT, nfe);
+                _log.warn("Invalid port number specified, defaulting to "
+                          + TestServer.LISTEN_PORT, nfe);
             _portNum = TestServer.LISTEN_PORT;
         }
     }
 
-    private static Properties filter(Properties options) {
+    private Properties filter(Properties options) {
         Properties rv = new Properties();
         for (Iterator iter = options.keySet().iterator(); iter.hasNext();) {
             String key = (String) iter.next();
@@ -212,7 +221,7 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
      */
     public void connect() throws I2PSessionException {
         _closed = false;
-        long startConnect = Clock.getInstance().now();
+        long startConnect = _context.clock().now();
         try {
             if (_log.shouldLog(Log.DEBUG)) _log.debug("connect begin to " + _hostname + ":" + _portNum);
             _socket = new Socket(_hostname, _portNum);
@@ -251,7 +260,7 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
                     }
                 }
             }
-            long connected = Clock.getInstance().now();
+            long connected = _context.clock().now();
             if (_log.shouldLog(Log.INFO))
                                          _log.info("Lease set created with inbound tunnels after "
                                                    + (connected - startConnect)
@@ -339,7 +348,7 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
      *
      */
     public void messageReceived(I2CPMessageReader reader, I2CPMessage message) {
-        I2CPMessageHandler handler = I2PClientMessageHandlerMap.getHandler(message.getType());
+        I2CPMessageHandler handler = _handlerMap.getHandler(message.getType());
         if (handler == null) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Unknown message or unhandleable message received: type = "

@@ -18,6 +18,7 @@ import net.i2p.util.I2PThread;
 import net.i2p.util.Log;
 import net.i2p.util.NativeBigInteger;
 import net.i2p.util.RandomSource;
+import net.i2p.I2PAppContext;
 
 /**
  * Precalculate the Y and K for ElGamal encryption operations.
@@ -56,22 +57,23 @@ class YKGenerator {
     private final static long CHECK_DELAY = 30 * 1000;
 
     static {
+        I2PAppContext ctx = I2PAppContext.getGlobalContext();
         try {
-            int val = Integer.parseInt(System.getProperty(PROP_YK_PRECALC_MIN, DEFAULT_YK_PRECALC_MIN));
+            int val = Integer.parseInt(ctx.getProperty(PROP_YK_PRECALC_MIN, DEFAULT_YK_PRECALC_MIN));
             MIN_NUM_BUILDERS = val;
         } catch (Throwable t) {
             int val = Integer.parseInt(DEFAULT_YK_PRECALC_MIN);
             MIN_NUM_BUILDERS = val;
         }
         try {
-            int val = Integer.parseInt(System.getProperty(PROP_YK_PRECALC_MAX, DEFAULT_YK_PRECALC_MAX));
+            int val = Integer.parseInt(ctx.getProperty(PROP_YK_PRECALC_MAX, DEFAULT_YK_PRECALC_MAX));
             MAX_NUM_BUILDERS = val;
         } catch (Throwable t) {
             int val = Integer.parseInt(DEFAULT_YK_PRECALC_MAX);
             MAX_NUM_BUILDERS = val;
         }
         try {
-            int val = Integer.parseInt(System.getProperty(PROP_YK_PRECALC_DELAY, DEFAULT_YK_PRECALC_DELAY));
+            int val = Integer.parseInt(ctx.getProperty(PROP_YK_PRECALC_DELAY, DEFAULT_YK_PRECALC_DELAY));
             CALC_DELAY = val;
         } catch (Throwable t) {
             int val = Integer.parseInt(DEFAULT_YK_PRECALC_DELAY);

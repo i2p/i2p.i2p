@@ -26,17 +26,18 @@ import net.i2p.util.Log;
  *
  */
 public class InNetMessagePool {
-    private final static Log _log = new Log(InNetMessagePool.class);
-    private static InNetMessagePool _instance = new InNetMessagePool();
-    public final static InNetMessagePool getInstance() { return _instance; }
+    private Log _log;
+    private RouterContext _context;
     private List _messages;
     private Map _handlerJobBuilders;
     
-    private InNetMessagePool() {
+    public InNetMessagePool(RouterContext context) {
+        _context = context;
         _messages = new ArrayList();
         _handlerJobBuilders = new HashMap();
-        StatManager.getInstance().createRateStat("inNetPool.dropped", "How often do we drop a message", "InNetPool", new long[] { 60*1000l, 60*60*1000l, 24*60*60*1000l });
-        StatManager.getInstance().createRateStat("inNetPool.duplicate", "How often do we receive a duplicate message", "InNetPool", new long[] { 60*1000l, 60*60*1000l, 24*60*60*1000l });
+        _log = _context.logManager().getLog(InNetMessagePool.class);
+        _context.statManager().createRateStat("inNetPool.dropped", "How often do we drop a message", "InNetPool", new long[] { 60*1000l, 60*60*1000l, 24*60*60*1000l });
+        _context.statManager().createRateStat("inNetPool.duplicate", "How often do we receive a duplicate message", "InNetPool", new long[] { 60*1000l, 60*60*1000l, 24*60*60*1000l });
     }
   
     public HandlerJobBuilder registerHandlerJobBuilder(int i2npMessageType, HandlerJobBuilder builder) {
@@ -57,15 +58,15 @@ public class InNetMessagePool {
      */
     public int add(InNetMessage msg) {
         Date exp = msg.getMessage().getMessageExpiration();
-        boolean valid = MessageValidator.getInstance().validateMessage(msg.getMessage().getUniqueId(), exp.getTime());
+        boolean valid = _context.messageValidator().validateMessage(msg.getMessage().getUniqueId(), exp.getTime());
         if (!valid) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Duplicate message received [" + msg.getMessage().getUniqueId() 
                           + " expiring on " + exp + "]: " + msg.getMessage().getClass().getName());
-            StatManager.getInstance().addRateData("inNetPool.dropped", 1, 0);
-            StatManager.getInstance().addRateData("inNetPool.duplicate", 1, 0);
-            MessageHistory.getInstance().droppedOtherMessage(msg.getMessage());
-            MessageHistory.getInstance().messageProcessingError(msg.getMessage().getUniqueId(), 
+            _context.statManager().addRateData("inNetPool.dropped", 1, 0);
+            _context.statManager().addRateData("inNetPool.duplicate", 1, 0);
+            _context.messageHistory().droppedOtherMessage(msg.getMessage());
+            _context.messageHistory().messageProcessingError(msg.getMessage().getUniqueId(), 
                                                                 msg.getMessage().getClass().getName(), 
                                                                 "Duplicate/expired");
             return -1;
@@ -87,14 +88,14 @@ public class InNetMessagePool {
             Job job = builder.createJob(msg.getMessage(), msg.getFromRouter(), 
                                         msg.getFromRouterHash(), msg.getReplyBlock());
             if (job != null) {
-                JobQueue.getInstance().addJob(job);
+                _context.jobQueue().addJob(job);
                 synchronized (_messages) { 
                     size = _messages.size();
                 }
             }
         }
 
-        List origMessages = OutboundMessageRegistry.getInstance().getOriginalMessages(msg.getMessage());
+        List origMessages = _context.messageRegistry().getOriginalMessages(msg.getMessage());
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Original messages for inbound message: " + origMessages.size());
         if (origMessages.size() > 1) {
@@ -112,7 +113,7 @@ public class InNetMessagePool {
 
             if (job != null) {
                 job.setMessage(msg.getMessage());
-                JobQueue.getInstance().addJob(job);
+                _context.jobQueue().addJob(job);
             }
         }
 
@@ -120,24 +121,24 @@ public class InNetMessagePool {
             // not handled as a reply
             if (size == -1) { 
                 // was not handled via HandlerJobBuilder
-                MessageHistory.getInstance().droppedOtherMessage(msg.getMessage());
+                _context.messageHistory().droppedOtherMessage(msg.getMessage());
                 if (_log.shouldLog(Log.ERROR))
                     _log.error("Message " + msg.getMessage() + " was not handled by a HandlerJobBuilder - DROPPING: " 
                                + msg, new Exception("DROPPED MESSAGE"));
-                StatManager.getInstance().addRateData("inNetPool.dropped", 1, 0);
+                _context.statManager().addRateData("inNetPool.dropped", 1, 0);
             } else {
                 String mtype = msg.getMessage().getClass().getName();
-                MessageHistory.getInstance().receiveMessage(mtype, msg.getMessage().getUniqueId(), 
-                                                            msg.getMessage().getMessageExpiration(), 
-                                                            msg.getFromRouterHash(), true);	
+                _context.messageHistory().receiveMessage(mtype, msg.getMessage().getUniqueId(), 
+                                                         msg.getMessage().getMessageExpiration(), 
+                                                         msg.getFromRouterHash(), true);	
                 return size;
             }
         }
 
         String mtype = msg.getMessage().getClass().getName();
-        MessageHistory.getInstance().receiveMessage(mtype, msg.getMessage().getUniqueId(), 
-                                                    msg.getMessage().getMessageExpiration(), 
-                                                    msg.getFromRouterHash(), true);	
+        _context.messageHistory().receiveMessage(mtype, msg.getMessage().getUniqueId(), 
+                                                 msg.getMessage().getMessageExpiration(), 
+                                                 msg.getFromRouterHash(), true);	
         return size;
     }
     
@@ -174,19 +175,4 @@ public class InNetMessagePool {
             return _messages.size(); 
         }
     }
-    
-    public void dumpPoolInfo() {
-        if (!_log.shouldLog(Log.DEBUG)) return;
-
-        StringBuffer buf = new StringBuffer();
-        buf.append("\nDumping Inbound Network Message Pool.  Total # message: ").append(getCount()).append("\n");
-        synchronized (_messages) {
-            for (Iterator iter = _messages.iterator(); iter.hasNext();) {
-                InNetMessage msg = (InNetMessage)iter.next();
-                buf.append("Message ").append(msg.getMessage()).append("\n\n");
-            }
-        }
-        _log.debug(buf.toString());
-    }
-
 }

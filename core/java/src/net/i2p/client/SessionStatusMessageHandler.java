@@ -11,6 +11,7 @@ package net.i2p.client;
 
 import net.i2p.data.i2cp.I2CPMessage;
 import net.i2p.data.i2cp.SessionStatusMessage;
+import net.i2p.I2PAppContext;
 
 /**
  * Handle I2CP SessionStatusMessagese from the router, updating the session as
@@ -19,8 +20,8 @@ import net.i2p.data.i2cp.SessionStatusMessage;
  * @author jrandom
  */
 class SessionStatusMessageHandler extends HandlerImpl {
-    public SessionStatusMessageHandler() {
-        super(SessionStatusMessage.MESSAGE_TYPE);
+    public SessionStatusMessageHandler(I2PAppContext context) {
+        super(context, SessionStatusMessage.MESSAGE_TYPE);
     }
 
     public void handleMessage(I2CPMessage message, I2PSessionImpl session) {

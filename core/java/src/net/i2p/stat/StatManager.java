@@ -10,6 +10,7 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 
 import net.i2p.util.Log;
+import net.i2p.I2PAppContext;
 
 /** 
  * Coordinate the management of various frequencies and rates within I2P components,
@@ -19,18 +20,23 @@ import net.i2p.util.Log;
  * 
  */
 public class StatManager {
-    private final static Log _log = new Log(StatManager.class);
-    private final static StatManager _instance = new StatManager();
+    private Log _log;
+    private I2PAppContext _context;
 
-    public final static StatManager getInstance() {
-        return _instance;
-    }
     /** stat name to FrequencyStat */
     private Map _frequencyStats;
     /** stat name to RateStat */
     private Map _rateStats;
 
-    private StatManager() {
+    /**
+     * The stat manager should only be constructed and accessed through the 
+     * application context.  This constructor should only be used by the 
+     * appropriate application context itself.
+     *
+     */
+    public StatManager(I2PAppContext context) {
+        _log = context.logManager().getLog(StatManager.class);
+        _context = context;
         _frequencyStats = Collections.synchronizedMap(new HashMap(128));
         _rateStats = Collections.synchronizedMap(new HashMap(128));
     }
@@ -44,6 +50,7 @@ public class StatManager {
      * @param periods array of period lengths (in milliseconds)
      */
     public void createFrequencyStat(String name, String description, String group, long periods[]) {
+        if (_frequencyStats.containsKey(name)) return;
         _frequencyStats.put(name, new FrequencyStat(name, description, group, periods));
     }
 
@@ -56,6 +63,7 @@ public class StatManager {
      * @param periods array of period lengths (in milliseconds)
      */
     public void createRateStat(String name, String description, String group, long periods[]) {
+        if (_rateStats.containsKey(name)) return;
         _rateStats.put(name, new RateStat(name, description, group, periods));
     }
 

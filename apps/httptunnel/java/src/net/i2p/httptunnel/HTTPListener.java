@@ -53,7 +53,7 @@ public class HTTPListener extends Thread {
     private boolean proxyUsed = false;
 
     /**
-     * Query whether this is the first use of the proxy or not . . .
+     * Query whether this is the first use of the proxy or not
      * @return Whether this is the first proxy use, no doubt.
      */
     public boolean firstProxyUse() {

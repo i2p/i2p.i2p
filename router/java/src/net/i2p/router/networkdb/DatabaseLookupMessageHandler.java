@@ -15,20 +15,22 @@ import net.i2p.data.i2np.I2NPMessage;
 import net.i2p.data.i2np.SourceRouteBlock;
 import net.i2p.router.HandlerJobBuilder;
 import net.i2p.router.Job;
-import net.i2p.stat.StatManager;
+import net.i2p.router.RouterContext;
 
 /**
  * Build a HandleDatabaseLookupMessageJob whenever a DatabaseLookupMessage arrives
  *
  */
 public class DatabaseLookupMessageHandler implements HandlerJobBuilder {
-    static {
-        StatManager.getInstance().createRateStat("netDb.lookupsReceived", "How many netDb lookups have we received?", "Network Database", new long[] { 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
+    private RouterContext _context;
+    public DatabaseLookupMessageHandler(RouterContext context) {
+        _context = context;
+        _context.statManager().createRateStat("netDb.lookupsReceived", "How many netDb lookups have we received?", "Network Database", new long[] { 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
     }
 
     public Job createJob(I2NPMessage receivedMessage, RouterIdentity from, Hash fromHash, SourceRouteBlock replyBlock) {
-        StatManager.getInstance().addRateData("netDb.lookupsReceived", 1, 0);
+        _context.statManager().addRateData("netDb.lookupsReceived", 1, 0);
         // ignore the reply block for the moment
-        return new HandleDatabaseLookupMessageJob((DatabaseLookupMessage)receivedMessage, from, fromHash);
+        return new HandleDatabaseLookupMessageJob(_context, (DatabaseLookupMessage)receivedMessage, from, fromHash);
     }
 }

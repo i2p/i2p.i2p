@@ -13,40 +13,42 @@ import net.i2p.util.Clock;
  * Base implementation of a Job
  */
 public abstract class JobImpl implements Job {
+    protected RouterContext _context;
     private JobTiming _timing;
     private static int _idSrc = 0;
     private int _id;
     private Exception _addedBy;
     private long _madeReadyOn;
     
-    public JobImpl() {
-	_timing = new JobTiming();
-	_id = ++_idSrc;
-	_addedBy = null;
-	_madeReadyOn = 0;
+    public JobImpl(RouterContext context) {
+        _context = context;
+        _timing = new JobTiming(context);
+        _id = ++_idSrc;
+        _addedBy = null;
+        _madeReadyOn = 0;
     }
     
     public int getJobId() { return _id; }
     public JobTiming getTiming() { return _timing; }
     
     public String toString() { 
-	StringBuffer buf = new StringBuffer(128);
-	buf.append(super.toString());
-	buf.append(": Job ").append(_id).append(": ").append(getName());
-	return buf.toString();
+        StringBuffer buf = new StringBuffer(128);
+        buf.append(super.toString());
+        buf.append(": Job ").append(_id).append(": ").append(getName());
+        return buf.toString();
     }
     
     void addedToQueue() {
-	_addedBy = new Exception();
+        _addedBy = new Exception();
     }
     
     public Exception getAddedBy() { return _addedBy; }
     public long getMadeReadyOn() { return _madeReadyOn; }
-    public void madeReady() { _madeReadyOn = Clock.getInstance().now(); }
+    public void madeReady() { _madeReadyOn = _context.clock().now(); }
     public void dropped() {}
     
     protected void requeue(long delayMs) { 
-	getTiming().setStartAfter(Clock.getInstance().now() + delayMs);
-	JobQueue.getInstance().addJob(this);
+        getTiming().setStartAfter(_context.clock().now() + delayMs);
+        _context.jobQueue().addJob(this);
     }
 }

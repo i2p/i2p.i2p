@@ -35,7 +35,6 @@ import net.i2p.util.OrderedProperties;
  * @author jrandom
  */
 public class DataHelper {
-    private final static Log _log = new Log(DataHelper.class);
     private final static String _equal = "="; // in UTF-8
     private final static String _semicolon = ";"; // in UTF-8
 
@@ -56,7 +55,8 @@ public class DataHelper {
      * @throws IOException if there is a problem reading the data
      * @return mapping
      */
-    public static Properties readProperties(InputStream rawStream) throws DataFormatException, IOException {
+    public static Properties readProperties(InputStream rawStream) 
+        throws DataFormatException, IOException {
         Properties props = new OrderedProperties();
         long size = readLong(rawStream, 2);
         byte data[] = new byte[(int) size];
@@ -65,24 +65,18 @@ public class DataHelper {
         ByteArrayInputStream in = new ByteArrayInputStream(data);
         byte eqBuf[] = _equal.getBytes();
         byte semiBuf[] = _semicolon.getBytes();
-        try {
-            while (in.available() > 0) {
-                String key = readString(in);
-                read = read(in, eqBuf);
-                if ((read != eqBuf.length) || (!eq(new String(eqBuf), _equal))) {
-                    _log.debug("Failed eqtest [" + new String(eqBuf) + "]");
-                    break;
-                }
-                String val = readString(in);
-                read = read(in, semiBuf);
-                if ((read != semiBuf.length) || (!eq(new String(semiBuf), _semicolon))) {
-                    _log.debug("Failed semitest [" + new String(semiBuf) + "]");
-                    break;
-                }
-                props.put(key, val);
+        while (in.available() > 0) {
+            String key = readString(in);
+            read = read(in, eqBuf);
+            if ((read != eqBuf.length) || (!eq(new String(eqBuf), _equal))) {
+                break;
             }
-        } catch (IOException ioe) {
-            _log.warn("Error reading properties", ioe);
+            String val = readString(in);
+            read = read(in, semiBuf);
+            if ((read != semiBuf.length) || (!eq(new String(semiBuf), _semicolon))) {
+                break;
+            }
+            props.put(key, val);
         }
         return props;
     }
@@ -96,8 +90,8 @@ public class DataHelper {
      * @throws DataFormatException if there is not enough valid data to write out
      * @throws IOException if there is an IO error writing out the data
      */
-    public static void writeProperties(OutputStream rawStream, Properties props) throws DataFormatException,
-                                                                                IOException {
+    public static void writeProperties(OutputStream rawStream, Properties props) 
+            throws DataFormatException, IOException {
         OrderedProperties p = new OrderedProperties();
         if (props != null) p.putAll(props);
         ByteArrayOutputStream baos = new ByteArrayOutputStream(32);
@@ -204,10 +198,10 @@ public class DataHelper {
      * @throws IOException if there is an IO error reading the number
      * @return number
      */
-    public static long readLong(InputStream rawStream, int numBytes) throws DataFormatException, IOException {
+    public static long readLong(InputStream rawStream, int numBytes) 
+        throws DataFormatException, IOException {
         if (numBytes > 8)
-            throw new DataFormatException(
-                                          "readLong doesn't currently support reading numbers > 8 bytes [as thats bigger than java's long]");
+            throw new DataFormatException("readLong doesn't currently support reading numbers > 8 bytes [as thats bigger than java's long]");
         byte data[] = new byte[numBytes];
         int num = read(rawStream, data);
         if (num != numBytes)
@@ -225,8 +219,8 @@ public class DataHelper {
      * @throws DataFormatException if the stream doesn't contain a validly formatted number of that many bytes
      * @throws IOException if there is an IO error writing to the stream
      */
-    public static void writeLong(OutputStream rawStream, int numBytes, long value) throws DataFormatException,
-                                                                                  IOException {
+    public static void writeLong(OutputStream rawStream, int numBytes, long value) 
+        throws DataFormatException, IOException {
         UnsignedInteger i = new UnsignedInteger(value);
         rawStream.write(i.getBytes(numBytes));
     }
@@ -254,7 +248,8 @@ public class DataHelper {
      * @throws DataFormatException if the date is not valid
      * @throws IOException if there is an IO error writing the date
      */
-    public static void writeDate(OutputStream out, Date date) throws DataFormatException, IOException {
+    public static void writeDate(OutputStream out, Date date) 
+        throws DataFormatException, IOException {
         if (date == null)
             writeLong(out, 8, 0L);
         else
@@ -286,7 +281,8 @@ public class DataHelper {
      * @throws DataFormatException if the string is not valid
      * @throws IOException if there is an IO error writing the string
      */
-    public static void writeString(OutputStream out, String string) throws DataFormatException, IOException {
+    public static void writeString(OutputStream out, String string) 
+        throws DataFormatException, IOException {
         if (string == null) {
             writeLong(out, 1, 0);
         } else {
@@ -328,7 +324,8 @@ public class DataHelper {
      * @throws DataFormatException if the boolean is not valid
      * @throws IOException if there is an IO error writing the boolean
      */
-    public static void writeBoolean(OutputStream out, Boolean bool) throws DataFormatException, IOException {
+    public static void writeBoolean(OutputStream out, Boolean bool) 
+        throws DataFormatException, IOException {
         if (bool == null)
             writeLong(out, 1, 2);
         else if (Boolean.TRUE.equals(bool))
@@ -353,7 +350,6 @@ public class DataHelper {
             boolean eq = (((lhs == null) && (rhs == null)) || ((lhs != null) && (lhs.equals(rhs))));
             return eq;
         } catch (ClassCastException cce) {
-            _log.warn("Error comparing [" + lhs + "] with [" + rhs + "]", cce);
             return false;
         }
     }
@@ -542,12 +538,12 @@ public class DataHelper {
             out.finish();
             out.flush();
             byte rv[] = baos.toByteArray();
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Compression of " + orig.length + " into " + rv.length + " (or " + 100.0d
-                           * (((double) orig.length) / ((double) rv.length)) + "% savings)");
+            //if (_log.shouldLog(Log.DEBUG))
+            //    _log.debug("Compression of " + orig.length + " into " + rv.length + " (or " + 100.0d
+            //               * (((double) orig.length) / ((double) rv.length)) + "% savings)");
             return rv;
         } catch (IOException ioe) {
-            _log.error("Error compressing?!", ioe);
+            //_log.error("Error compressing?!", ioe);
             return null;
         }
     }
@@ -565,12 +561,12 @@ public class DataHelper {
                 baos.write(buf, 0, read);
             }
             byte rv[] = baos.toByteArray();
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Decompression of " + orig.length + " into " + rv.length + " (or " + 100.0d
-                           * (((double) rv.length) / ((double) orig.length)) + "% savings)");
+            //if (_log.shouldLog(Log.DEBUG))
+            //    _log.debug("Decompression of " + orig.length + " into " + rv.length + " (or " + 100.0d
+            //               * (((double) rv.length) / ((double) orig.length)) + "% savings)");
             return rv;
         } catch (IOException ioe) {
-            _log.error("Error decompressing?", ioe);
+            //_log.error("Error decompressing?", ioe);
             return null;
         }
     }

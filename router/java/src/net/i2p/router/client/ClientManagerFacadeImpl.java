@@ -17,6 +17,7 @@ import net.i2p.router.ClientManagerFacade;
 import net.i2p.router.ClientMessage;
 import net.i2p.router.Job;
 import net.i2p.router.Router;
+import net.i2p.router.RouterContext;
 import net.i2p.util.Log;
 
 /**
@@ -27,33 +28,35 @@ import net.i2p.util.Log;
 public class ClientManagerFacadeImpl extends ClientManagerFacade {
     private final static Log _log = new Log(ClientManagerFacadeImpl.class);
     private ClientManager _manager; 
+    private RouterContext _context;
     public final static String PROP_CLIENT_PORT = "i2cp.port";
     public final static int DEFAULT_PORT = 7654;
     
-    public ClientManagerFacadeImpl() {
-	_manager = null;
-	_log.debug("Client manager facade created");
+    public ClientManagerFacadeImpl(RouterContext context) {
+        _context = context;
+        _manager = null;
+        _log.debug("Client manager facade created");
     }
     
     public void startup() {
-	_log.info("Starting up the client subsystem");
-	String portStr = Router.getInstance().getConfigSetting(PROP_CLIENT_PORT);
-	if (portStr != null) {
-	    try {
-		int port = Integer.parseInt(portStr);
-		_manager = new ClientManager(port);
-	    } catch (NumberFormatException nfe) {
-		_log.error("Error setting the port: " + portStr + " is not valid", nfe);
-		_manager = new ClientManager(DEFAULT_PORT);
-	    }
-	} else {
-	    _manager = new ClientManager(DEFAULT_PORT);
-	}
+        _log.info("Starting up the client subsystem");
+        String portStr = _context.router().getConfigSetting(PROP_CLIENT_PORT);
+        if (portStr != null) {
+            try {
+                int port = Integer.parseInt(portStr);
+                _manager = new ClientManager(_context, port);
+            } catch (NumberFormatException nfe) {
+                _log.error("Error setting the port: " + portStr + " is not valid", nfe);
+                _manager = new ClientManager(_context, DEFAULT_PORT);
+            }
+        } else {
+            _manager = new ClientManager(_context, DEFAULT_PORT);
+        }
     }    
     
     public void shutdown() {
-	if (_manager != null)
-	    _manager.shutdown();
+        if (_manager != null)
+            _manager.shutdown();
     }
     
     /**
@@ -70,10 +73,10 @@ public class ClientManagerFacadeImpl extends ClientManagerFacade {
      * @param onFailedJob Job to run after the timeout passes without receiving authorization
      */
     public void requestLeaseSet(Destination dest, LeaseSet set, long timeout, Job onCreateJob, Job onFailedJob) {
-	if (_manager != null)
-	    _manager.requestLeaseSet(dest, set, timeout, onCreateJob, onFailedJob);
-	else
-	    _log.error("Null manager on requestLeaseSet!");
+        if (_manager != null)
+            _manager.requestLeaseSet(dest, set, timeout, onCreateJob, onFailedJob);
+        else
+            _log.error("Null manager on requestLeaseSet!");
     }
     
     /**
@@ -85,10 +88,10 @@ public class ClientManagerFacadeImpl extends ClientManagerFacade {
      * @param severity How severe the abuse is, with 0 being not severe and 255 is the max
      */
     public void reportAbuse(Destination dest, String reason, int severity) {
-	if (_manager != null)
-	    _manager.reportAbuse(dest, reason, severity);
-	else
-	    _log.error("Null manager on reportAbuse!");
+        if (_manager != null)
+            _manager.reportAbuse(dest, reason, severity);
+        else
+            _log.error("Null manager on reportAbuse!");
     }
     /**
      * Determine if the destination specified is managed locally.  This call
@@ -97,12 +100,12 @@ public class ClientManagerFacadeImpl extends ClientManagerFacade {
      * @param dest Destination to be checked
      */
     public boolean isLocal(Destination dest) {
-	if (_manager != null)
-	    return _manager.isLocal(dest);
-	else {
-	    _log.debug("Null manager on isLocal(dest)!");
-	    return false;
-	}
+        if (_manager != null)
+            return _manager.isLocal(dest);
+        else {
+            _log.debug("Null manager on isLocal(dest)!");
+            return false;
+        }
     }
     /**
      * Determine if the destination specified is managed locally.  This call
@@ -111,26 +114,26 @@ public class ClientManagerFacadeImpl extends ClientManagerFacade {
      * @param destHash Hash of Destination to be checked
      */
     public boolean isLocal(Hash destHash) {
-	if (_manager != null)
-	    return _manager.isLocal(destHash);
-	else {
-	    _log.debug("Null manager on isLocal(hash)!");
-	    return false;
-	}
+        if (_manager != null)
+            return _manager.isLocal(destHash);
+        else {
+            _log.debug("Null manager on isLocal(hash)!");
+            return false;
+        }
     }
     
     public void messageDeliveryStatusUpdate(Destination fromDest, MessageId id, boolean delivered) {
-	if (_manager != null)
-	    _manager.messageDeliveryStatusUpdate(fromDest, id, delivered);
-	else
-	    _log.error("Null manager on messageDeliveryStatusUpdate!");
+        if (_manager != null)
+            _manager.messageDeliveryStatusUpdate(fromDest, id, delivered);
+        else
+            _log.error("Null manager on messageDeliveryStatusUpdate!");
     }
     
     public void messageReceived(ClientMessage msg) { 
-	if (_manager != null)
-	    _manager.messageReceived(msg); 
-	else
-	    _log.error("Null manager on messageReceived!");
+        if (_manager != null)
+            _manager.messageReceived(msg); 
+        else
+            _log.error("Null manager on messageReceived!");
     }
     
     /**
@@ -138,20 +141,20 @@ public class ClientManagerFacadeImpl extends ClientManagerFacade {
      *
      */
     public SessionConfig getClientSessionConfig(Destination dest) {
-	if (_manager != null)
-	    return _manager.getClientSessionConfig(dest);
-	else {
-	    _log.error("Null manager on getClientSessionConfig!");
-	    return null;
-	}
+        if (_manager != null)
+            return _manager.getClientSessionConfig(dest);
+        else {
+            _log.error("Null manager on getClientSessionConfig!");
+            return null;
+        }
     }
     
     public String renderStatusHTML() { 
-	if (_manager != null)
-	    return _manager.renderStatusHTML(); 
-	else {
-	    _log.error("Null manager on renderStatusHTML!");
-	    return null;
-	}
+        if (_manager != null)
+            return _manager.renderStatusHTML(); 
+        else {
+            _log.error("Null manager on renderStatusHTML!");
+            return null;
+        }
     }
 }

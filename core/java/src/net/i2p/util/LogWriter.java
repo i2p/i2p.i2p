@@ -29,8 +29,14 @@ class LogWriter implements Runnable {
     private int _rotationNum = -1;
     private String _logFilenamePattern;
     private File _currentFile;
+    private LogManager _manager;
 
     private boolean _write;
+    
+    private LogWriter() {}
+    public LogWriter(LogManager manager) {
+        _manager = manager;
+    }
 
     public void stopWriting() {
         _write = false;
@@ -46,7 +52,7 @@ class LogWriter implements Runnable {
 
     public void flushRecords() {
         try {
-            List records = LogManager.getInstance()._removeAll();
+            List records = _manager._removeAll();
             for (int i = 0; i < records.size(); i++) {
                 LogRecord rec = (LogRecord) records.get(i);
                 writeRecord(rec);
@@ -68,19 +74,19 @@ class LogWriter implements Runnable {
         }
         long now = Clock.getInstance().now();
         if (now - _lastReadConfig > CONFIG_READ_ITERVAL) {
-            LogManager.getInstance().rereadConfig();
+            _manager.rereadConfig();
             _lastReadConfig = now;
         }
     }
 
     private void writeRecord(LogRecord rec) {
-        String val = LogRecordFormatter.formatRecord(rec);
+        String val = LogRecordFormatter.formatRecord(_manager, rec);
         writeRecord(val);
 
-        if (LogManager.getInstance().getDisplayOnScreenLevel() <= rec.getPriority()) {
+        if (_manager.getDisplayOnScreenLevel() <= rec.getPriority()) {
             // we always add to the console buffer, but only sometimes write to stdout
-            LogConsoleBuffer.getInstance().add(val);
-            if (LogManager.getInstance().displayOnScreen()) {
+            _manager.getBuffer().add(val);
+            if (_manager.displayOnScreen()) {
                 System.out.print(val);
             }
         }
@@ -98,7 +104,7 @@ class LogWriter implements Runnable {
             System.err.println("Error writing record, disk full?");
             t.printStackTrace();
         }
-        if (_numBytesInCurrentFile >= LogManager.getInstance()._getFileSize()) {
+        if (_numBytesInCurrentFile >= _manager._getFileSize()) {
             rotateFile();
         }
     }
@@ -108,7 +114,7 @@ class LogWriter implements Runnable {
      *
      */
     private void rotateFile() {
-        String pattern = LogManager.getInstance()._getBaseLogfilename();
+        String pattern = _manager._getBaseLogfilename();
         File f = getNextFile(pattern);
         _currentFile = f;
         _numBytesInCurrentFile = 0;
@@ -129,7 +135,7 @@ class LogWriter implements Runnable {
         if (pattern.indexOf('#') < 0) {
             return new File(pattern);
         } else {
-            int max = LogManager.getInstance()._getRotationLimit();
+            int max = _manager._getRotationLimit();
             if (_rotationNum == -1) {
                 return getFirstFile(pattern, max);
             } else {

@@ -12,6 +12,7 @@ import net.i2p.httptunnel.SocketManagerProducer;
 import net.i2p.httptunnel.filter.Filter;
 import net.i2p.httptunnel.filter.NullFilter;
 import net.i2p.util.Log;
+import net.i2p.I2PAppContext;
 
 /**
  * Handler for proxying "normal" HTTP requests.
@@ -19,6 +20,7 @@ import net.i2p.util.Log;
 public class ProxyHandler extends EepHandler {
 
     private static final Log _log = new Log(ErrorHandler.class);
+    private static I2PAppContext _context = new I2PAppContext();
 
     /* package private */ProxyHandler(ErrorHandler eh) {
         super(eh);
@@ -31,7 +33,7 @@ public class ProxyHandler extends EepHandler {
      * @throws IOException
      */
     public void handle(Request req, HTTPListener httpl, OutputStream out
-    /*, boolean fromProxy */) throws IOException {
+                       /*, boolean fromProxy */) throws IOException {
         SocketManagerProducer smp = httpl.getSMP();
         Destination dest = findProxy();
         if (dest == null) {
@@ -48,6 +50,6 @@ public class ProxyHandler extends EepHandler {
 
     private Destination findProxy() {
         //FIXME!
-        return NamingService.getInstance().lookup("squid.i2p");
+        return _context.namingService().lookup("squid.i2p");
     }
 }

@@ -44,6 +44,7 @@ import net.i2p.stat.StatManager;
 import net.i2p.util.Clock;
 import net.i2p.util.I2PThread;
 import net.i2p.util.Log;
+import net.i2p.router.RouterContext;
 
 /**
  * Wraps a connection - this contains a reader thread (via I2NPMessageReader) and
@@ -52,7 +53,7 @@ import net.i2p.util.Log;
  *
  */
 class TCPConnection implements I2NPMessageReader.I2NPMessageEventListener {
-    private final static Log _log = new Log(TCPConnection.class);
+    private Log _log;
     protected static int _idCounter = 0;
     protected int _id;
     protected DHSessionKeyBuilder _builder;
@@ -60,7 +61,6 @@ class TCPConnection implements I2NPMessageReader.I2NPMessageEventListener {
     protected I2NPMessageReader _reader;
     protected InputStream _in;
     protected OutputStream _out;
-    protected RouterIdentity _myIdentity;
     protected RouterIdentity _remoteIdentity;
     protected TCPTransport _transport;
     protected ConnectionRunner _runner;
@@ -68,28 +68,25 @@ class TCPConnection implements I2NPMessageReader.I2NPMessageEventListener {
     protected SessionKey _key;
     protected ByteArray _extraBytes;
     protected byte[] _iv;
-    protected SigningPrivateKey _signingKey;
     protected int _maxQueuedMessages;
     private long _lastSliceRun;
     private boolean _closed;
     private boolean _weInitiated;
     private long _created;
+    protected RouterContext _context;
     
     public final static String PARAM_MAX_QUEUED_MESSAGES = "i2np.tcp.maxQueuedMessages";
     private final static int DEFAULT_MAX_QUEUED_MESSAGES = 20;
-    
-    static {
-        StatManager.getInstance().createRateStat("tcp.queueSize", "How many messages were already in the queue when a new message was added?", 
-                                                 "TCP Transport", new long[] { 60*1000l, 60*60*1000l, 24*60*60*1000l });
-    }
 
-    public TCPConnection(Socket s, RouterIdentity myIdent, SigningPrivateKey signingKey, boolean locallyInitiated) {
+    public TCPConnection(RouterContext context, Socket s, boolean locallyInitiated) {
+        _context = context;
+        _log = context.logManager().getLog(TCPConnection.class);
+        _context.statManager().createRateStat("tcp.queueSize", "How many messages were already in the queue when a new message was added?", 
+                                              "TCP Transport", new long[] { 60*1000l, 60*60*1000l, 24*60*60*1000l });
         _id = ++_idCounter;
         _weInitiated = locallyInitiated;
         _closed = false;
         _socket = s;
-        _myIdentity = myIdent;
-        _signingKey = signingKey;
         _created = -1;
         _toBeSent = new ArrayList();
         try {
@@ -110,7 +107,7 @@ class TCPConnection implements I2NPMessageReader.I2NPMessageEventListener {
     /** how long has this connection been around for, or -1 if it isn't established yet */
     public long getLifetime() { 
         if (_created > 0) 
-            return Clock.getInstance().now() - _created; 
+            return _context.clock().now() - _created; 
         else
             return -1;
     }
@@ -118,7 +115,7 @@ class TCPConnection implements I2NPMessageReader.I2NPMessageEventListener {
     protected boolean weInitiatedConnection() { return _weInitiated; }
     
     private void updateMaxQueuedMessages() {
-        String str = Router.getInstance().getConfigSetting(PARAM_MAX_QUEUED_MESSAGES);
+        String str = _context.router().getConfigSetting(PARAM_MAX_QUEUED_MESSAGES);
         if ( (str != null) && (str.trim().length() > 0) ) {
             try {
                 int max = Integer.parseInt(str);
@@ -166,13 +163,13 @@ class TCPConnection implements I2NPMessageReader.I2NPMessageEventListener {
     
     protected boolean identifyStationToStation() throws IOException, DataFormatException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream(512);
-        _myIdentity.writeBytes(baos);
-        Hash keyHash = SHA256Generator.getInstance().calculateHash(_key.getData());
+        _context.router().getRouterInfo().getIdentity().writeBytes(baos);
+        Hash keyHash = _context.sha().calculateHash(_key.getData());
         keyHash.writeBytes(baos);
-        Signature sig = DSAEngine.getInstance().sign(baos.toByteArray(), _signingKey);
+        Signature sig = _context.dsa().sign(baos.toByteArray(), _context.keyManager().getSigningPrivateKey());
         sig.writeBytes(baos);
     
-        byte encr[] = AESEngine.getInstance().safeEncrypt(baos.toByteArray(),  _key, _iv, 1024);
+        byte encr[] = _context.AESEngine().safeEncrypt(baos.toByteArray(),  _key, _iv, 1024);
         DataHelper.writeLong(_out, 2, encr.length);
         _out.write(encr);
 
@@ -182,7 +179,7 @@ class TCPConnection implements I2NPMessageReader.I2NPMessageEventListener {
         int read = DataHelper.read(_in, pencr);
         if (read != rlen) 
             throw new DataFormatException("Not enough data in peer ident");
-        byte decr[] = AESEngine.getInstance().safeDecrypt(pencr, _key, _iv);
+        byte decr[] = _context.AESEngine().safeDecrypt(pencr, _key, _iv);
         if (decr == null)
             throw new DataFormatException("Unable to decrypt - failed exchange?");
 
@@ -202,7 +199,7 @@ class TCPConnection implements I2NPMessageReader.I2NPMessageEventListener {
         rsig.readBytes(bais);
         byte signedData[] = new byte[decr.length - rsig.getData().length];
         System.arraycopy(decr, 0, signedData, 0, signedData.length);
-        return DSAEngine.getInstance().verifySignature(rsig, signedData, _remoteIdentity.getSigningPublicKey());
+        return _context.dsa().verifySignature(rsig, signedData, _remoteIdentity.getSigningPublicKey());
     }
     
     protected final static int ESTABLISHMENT_TIMEOUT = 10*1000; // 10 second lag (not necessarily for the entire establish)
@@ -221,8 +218,8 @@ class TCPConnection implements I2NPMessageReader.I2NPMessageEventListener {
                 if (_log.shouldLog(Log.INFO))
                     _log.info("TCP connection " + _id + " established with " 
                               + _remoteIdentity.getHash().toBase64());
-                _in = new AESInputStream(new BandwidthLimitedInputStream(_in, _remoteIdentity), _key, _iv);
-                _out = new AESOutputStream(new BandwidthLimitedOutputStream(_out, _remoteIdentity), _key, _iv);
+                _in = new AESInputStream(_context, new BandwidthLimitedInputStream(_context, _in, _remoteIdentity), _key, _iv);
+                _out = new AESOutputStream(_context, new BandwidthLimitedOutputStream(_context, _out, _remoteIdentity), _key, _iv);
                 _socket.setSoTimeout(0);
                 established();
                 return _remoteIdentity;
@@ -245,7 +242,7 @@ class TCPConnection implements I2NPMessageReader.I2NPMessageEventListener {
         } 
     }
     
-    protected void established() { _created = Clock.getInstance().now(); }
+    protected void established() { _created = _context.clock().now(); }
     
     public void runConnection() {
         if (_log.shouldLog(Log.DEBUG))
@@ -255,7 +252,7 @@ class TCPConnection implements I2NPMessageReader.I2NPMessageEventListener {
         t.setName("Run Conn [" + _id + "]");
         t.setDaemon(true);
         t.start();
-        _reader = new I2NPMessageReader(_in, this, "TCP Read [" + _id + "]");
+        _reader = new I2NPMessageReader(_context, _in, this, "TCP Read [" + _id + "]");
         _reader.startReading();
     }
     
@@ -265,7 +262,7 @@ class TCPConnection implements I2NPMessageReader.I2NPMessageEventListener {
         msg.timestamp("TCPConnection.addMessage");
         int totalPending = 0;
         boolean fail = false;
-        long beforeAdd = Clock.getInstance().now();
+        long beforeAdd = _context.clock().now();
         synchronized (_toBeSent) {
             if ( (_maxQueuedMessages > 0) && (_toBeSent.size() >= _maxQueuedMessages) ) {
                 fail = true;
@@ -276,9 +273,9 @@ class TCPConnection implements I2NPMessageReader.I2NPMessageEventListener {
             }
             _toBeSent.notifyAll();
         }
-        long afterAdd = Clock.getInstance().now();
+        long afterAdd = _context.clock().now();
 
-        StatManager.getInstance().addRateData("tcp.queueSize", totalPending-1, 0);
+        _context.statManager().addRateData("tcp.queueSize", totalPending-1, 0);
 
         if (fail) {
             if (_log.shouldLog(Log.ERROR))
@@ -306,7 +303,7 @@ class TCPConnection implements I2NPMessageReader.I2NPMessageEventListener {
 
         if (slicesTooLong()) {
             if (_log.shouldLog(Log.ERROR)) {
-                long sliceTime = Clock.getInstance().now()-_lastSliceRun;
+                long sliceTime = _context.clock().now()-_lastSliceRun;
                 _log.error("onAdd: Slices are taking too long (" + sliceTime 
                            + "ms) - perhaps the remote side is disconnected or hung? remote=" 
                            + _remoteIdentity.getHash().toBase64());
@@ -339,7 +336,7 @@ class TCPConnection implements I2NPMessageReader.I2NPMessageEventListener {
         if (_out != null) try { _out.close(); } catch (IOException ioe) {}
         if (_socket != null) try { _socket.close(); } catch (IOException ioe) {}
         if (_toBeSent != null) {
-            long now = Clock.getInstance().now();
+            long now = _context.clock().now();
             synchronized (_toBeSent) {
                 for (Iterator iter = _toBeSent.iterator(); iter.hasNext(); ) {
                     OutNetMessage msg = (OutNetMessage)iter.next();
@@ -384,7 +381,7 @@ class TCPConnection implements I2NPMessageReader.I2NPMessageEventListener {
 
         if (slicesTooLong()) {
             if (_log.shouldLog(Log.ERROR)) {
-                long sliceTime = Clock.getInstance().now()-_lastSliceRun;
+                long sliceTime = _context.clock().now()-_lastSliceRun;
                 _log.error("onReceive: Slices are taking too long (" + sliceTime 
                            + "ms) - perhaps the remote side is disconnected or hung?  peer = " 
                            + _remoteIdentity.getHash().toBase64());
@@ -417,7 +414,7 @@ class TCPConnection implements I2NPMessageReader.I2NPMessageEventListener {
      */
     private boolean slicesTooLong() {
         if (_lastSliceRun <= 0) return false;
-        long diff = Clock.getInstance().now() - _lastSliceRun;
+        long diff = _context.clock().now() - _lastSliceRun;
         return (diff > MAX_SLICE_DURATION);
     }
     
@@ -427,10 +424,10 @@ class TCPConnection implements I2NPMessageReader.I2NPMessageEventListener {
             _running = true;
             try {
                 while (_running) {
-                    long startSlice = Clock.getInstance().now();
+                    long startSlice = _context.clock().now();
                     _lastSliceRun = startSlice;
                     processSlice();
-                    long endSlice = Clock.getInstance().now();
+                    long endSlice = _context.clock().now();
                 }
             } catch (IOException ioe) {
                 if (_log.shouldLog(Log.ERROR))
@@ -445,7 +442,7 @@ class TCPConnection implements I2NPMessageReader.I2NPMessageEventListener {
         }
 
         private void processSlice() throws IOException {
-            long start = Clock.getInstance().now();
+            long start = _context.clock().now();
 
             OutNetMessage msg = null;
             int remaining = 0;
@@ -488,7 +485,7 @@ class TCPConnection implements I2NPMessageReader.I2NPMessageEventListener {
                               " messages queued up for sending to " + _remoteIdentity.getHash().toBase64());
             }
 
-            long afterExpire = Clock.getInstance().now();
+            long afterExpire = _context.clock().now();
 
             if (msg != null) {
                 msg.timestamp("TCPConnection.runner.processSlice fetched");
@@ -508,13 +505,13 @@ class TCPConnection implements I2NPMessageReader.I2NPMessageEventListener {
                     }
 
                     msg.timestamp("TCPConnection.runner.processSlice sent and flushed");
-                    long end = Clock.getInstance().now();
+                    long end = _context.clock().now();
                     long timeLeft = msg.getMessage().getMessageExpiration().getTime() - end;
                     if (_log.shouldLog(Log.INFO))
                         _log.info("Message " + msg.getMessage().getClass().getName() 
                                   + " (expiring in " + timeLeft + "ms) sent to " 
                                   + _remoteIdentity.getHash().toBase64() + " from " 
-                                  + _myIdentity.getHash().toBase64()
+                                  + _context.routerHash().toBase64()
                                   + " over connection " + _id + " with " + data.length 
                                   + " bytes in " + (end - start) + "ms");
                     if (timeLeft < 10*1000) {
