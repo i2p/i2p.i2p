@@ -97,6 +97,8 @@ public class StatisticsManager implements Service {
             includeRate("jobQueue.jobLag", stats, new long[] { 60*1000, 60*60*1000 });
             includeRate("jobQueue.jobRun", stats, new long[] { 60*1000, 60*60*1000 });
             includeRate("crypto.elGamal.encrypt", stats, new long[] { 60*1000, 60*60*1000 });
+            includeRate("crypto.garlic.decryptFail", stats, new long[] { 60*60*1000, 24*60*60*1000 });
+            includeRate("tunnel.unknownTunnelTimeLeft", stats, new long[] { 60*60*1000, 24*60*60*1000 });
             includeRate("jobQueue.readyJobs", stats, new long[] { 60*1000, 60*60*1000 });
             includeRate("jobQueue.droppedJobs", stats, new long[] { 60*60*1000, 24*60*60*1000 });
             includeRate("inNetPool.dropped", stats, new long[] { 60*60*1000, 24*60*60*1000 });
