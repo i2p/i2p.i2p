@@ -264,7 +264,8 @@ public class I2PSocketManager implements I2PSessionListener {
             s.queueData(payload);
             return;
         } else {
-            _log.error(getName() + ": Null socket with data available");
+            if (_log.shouldLog(Log.WARN))
+                _log.warn(getName() + ": Null socket with data available");
             throw new IllegalStateException("Null socket with data available");
         }
     }

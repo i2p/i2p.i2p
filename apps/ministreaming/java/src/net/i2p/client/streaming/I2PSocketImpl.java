@@ -454,7 +454,8 @@ class I2PSocketImpl implements I2PSocket {
                         _log.debug(getPrefix() + "Message size is: " + data.length);
                     boolean sent = sendBlock(data);
                     if (!sent) {
-                        _log.error(getPrefix() + "Error sending message to peer.  Killing socket runner");
+                        if (_log.shouldLog(Log.WARN))
+                            _log.warn(getPrefix() + "Error sending message to peer.  Killing socket runner");
                         errorOccurred();
                         return false;
                     }
@@ -475,9 +476,10 @@ class I2PSocketImpl implements I2PSocket {
                     packetsHandled++;
                 }
                 if ((bc.getCurrentSize() > 0) && (packetsHandled > 1)) {
-                    _log.error(getPrefix() + "A SCARY MONSTER HAS EATEN SOME DATA! " + "(input stream: " 
-                               + in.hashCode() + "; "
-                               + "queue size: " + bc.getCurrentSize() + ")");
+                    if (_log.shouldLog(Log.WARN))
+                        _log.warn(getPrefix() + "We lost some data queued up due to a network send error (input stream: " 
+                                  + in.hashCode() + "; "
+                                  + "queue size: " + bc.getCurrentSize() + ")");
                 }
                 synchronized (flagLock) {
                     closed2 = true;
@@ -492,7 +494,8 @@ class I2PSocketImpl implements I2PSocket {
                     byte[] packet = I2PSocketManager.makePacket(getMask(0x02), remoteID, new byte[0]);
                     boolean sent = manager.getSession().sendMessage(remote, packet);
                     if (!sent) {
-                        _log.error(getPrefix() + "Error sending close packet to peer");
+                        if (_log.shouldLog(Log.WARN))
+                            _log.warn(getPrefix() + "Error sending close packet to peer");
                         errorOccurred();
                     }
                 }
