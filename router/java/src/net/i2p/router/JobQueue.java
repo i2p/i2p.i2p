@@ -13,6 +13,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.ArrayList;
 import java.util.TreeMap;
+import java.util.SortedMap;
+import java.util.Collections;
 
 import net.i2p.router.message.HandleSourceRouteReplyMessageJob;
 import net.i2p.router.networkdb.HandleDatabaseLookupMessageJob;
@@ -43,7 +45,7 @@ public class JobQueue {
     /** when true, don't run any new jobs or update any limits, etc */
     private boolean _paused;
     /** job name to JobStat for that job */
-    private TreeMap _jobStats;
+    private SortedMap _jobStats;
     /** how many job queue runners can go concurrently */
     private int _maxRunners; 
     private QueuePumper _pumper;
@@ -116,7 +118,7 @@ public class JobQueue {
         _timedJobs = new ArrayList();
         _queueRunners = new HashMap();
         _paused = false;
-        _jobStats = new TreeMap();
+        _jobStats = Collections.synchronizedSortedMap(new TreeMap());
         _allowParallelOperation = false;
         _pumper = new QueuePumper();
         I2PThread pumperThread = new I2PThread(_pumper);
@@ -436,13 +438,15 @@ public class JobQueue {
         MessageHistory hist = _context.messageHistory();
         long uptime = _context.router().getUptime();
 
-        synchronized (_jobStats) {
-            if (!_jobStats.containsKey(key))
-                _jobStats.put(key, new JobStats(key));
-            JobStats stats = (JobStats)_jobStats.get(key);
-    
-            stats.jobRan(duration, lag);
+        JobStats stats = null;
+        if (!_jobStats.containsKey(key)) {
+            _jobStats.put(key, new JobStats(key));
+            // yes, if two runners finish the same job at the same time, this could
+            // create an extra object.  but, who cares, its pushed out of the map
+            // immediately anyway.
         }
+        stats = (JobStats)_jobStats.get(key);
+        stats.jobRan(duration, lag);
 
         String dieMsg = null;
 
@@ -599,15 +603,20 @@ public class JobQueue {
         ArrayList readyJobs = null;
         ArrayList timedJobs = null;
         ArrayList activeJobs = new ArrayList(4);
+        ArrayList justFinishedJobs = new ArrayList(4);
         synchronized (_readyJobs) { readyJobs = new ArrayList(_readyJobs); }
         synchronized (_timedJobs) { timedJobs = new ArrayList(_timedJobs); }
         synchronized (_queueRunners) {
             for (Iterator iter = _queueRunners.values().iterator(); iter.hasNext();) {
                 JobQueueRunner runner = (JobQueueRunner)iter.next();
                 Job job = runner.getCurrentJob();
-                if (job != null)
+                if (job != null) {
                     activeJobs.add(job.getName());
+                } else {
+                    job = runner.getLastJob();
+                    justFinishedJobs.add(job.getName());
                 }
+            }
         }
         StringBuffer buf = new StringBuffer(20*1024);
         buf.append("<h2>JobQueue</h2>");
@@ -619,6 +628,11 @@ public class JobQueue {
         buf.append("# active jobs: ").append(activeJobs.size()).append("<ol>\n");
         for (int i = 0; i < activeJobs.size(); i++) {
             buf.append("<li>").append(activeJobs.get(i)).append("</li>\n");
+        }
+        buf.append("</ol>\n");
+        buf.append("# just finished jobs: ").append(justFinishedJobs.size()).append("<ol>\n");
+        for (int i = 0; i < justFinishedJobs.size(); i++) {
+            buf.append("<li>").append(justFinishedJobs.get(i)).append("</li>\n");
         }
         buf.append("</ol>\n");
         buf.append("# ready/waiting jobs: ").append(readyJobs.size()).append(" <i>(lots of these mean there's likely a big problem)</i><ol>\n");
@@ -662,7 +676,7 @@ public class JobQueue {
 
         TreeMap tstats = null;
         synchronized (_jobStats) {
-            tstats = (TreeMap)_jobStats.clone();
+            tstats = new TreeMap(_jobStats);
         }
 
         for (Iterator iter = tstats.values().iterator(); iter.hasNext(); ) {

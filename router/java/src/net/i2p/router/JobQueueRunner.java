@@ -12,6 +12,7 @@ class JobQueueRunner implements Runnable {
     private int _id;
     private long _numJobs;
     private Job _currentJob;
+    private Job _lastJob;
     
     public JobQueueRunner(RouterContext context, int id) {
         _context = context;
@@ -19,6 +20,7 @@ class JobQueueRunner implements Runnable {
         _keepRunning = true;
         _numJobs = 0;
         _currentJob = null;
+        _lastJob = null;
         _log = _context.logManager().getLog(JobQueueRunner.class);
         _context.statManager().createRateStat("jobQueue.jobRun", "How long jobs take", "JobQueue", new long[] { 60*1000l, 60*60*1000l, 24*60*60*1000l });
         _context.statManager().createRateStat("jobQueue.jobLag", "How long jobs have to wait before running", "JobQueue", new long[] { 60*1000l, 60*60*1000l, 24*60*60*1000l });
@@ -27,6 +29,7 @@ class JobQueueRunner implements Runnable {
     }
     
     public Job getCurrentJob() { return _currentJob; }
+    public Job getLastJob() { return _lastJob; }
     public int getRunnerId() { return _id; }
     public void stopRunning() { _keepRunning = false; }
     public void run() {
@@ -51,6 +54,7 @@ class JobQueueRunner implements Runnable {
                 long betweenJobs = now - lastActive;
                 _context.statManager().addRateData("jobQueue.jobRunnerInactive", betweenJobs, betweenJobs);
                 _currentJob = job;
+                _lastJob = null;
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("Runner " + _id + " running job " + job.getJobId() + ": " + job.getName());
                 long origStartAfter = job.getTiming().getStartAfter();
@@ -75,6 +79,7 @@ class JobQueueRunner implements Runnable {
                     _log.debug("Job duration " + duration + "ms for " + job.getName() 
                                + " with lag of " + (doStart-origStartAfter) + "ms");
                 lastActive = _context.clock().now();
+                _lastJob = _currentJob;
                 _currentJob = null;
             } catch (Throwable t) {
                 if (_log.shouldLog(Log.CRIT))
