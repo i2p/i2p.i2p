@@ -1,4 +1,7 @@
-$Id: history.txt,v 1.136 2005/01/26 23:48:41 smeghead Exp $
+$Id: history.txt,v 1.137 2005/02/03 08:39:47 smeghead Exp $
+
+2005-02-06  Sugadude
+    * Added a filter to the addressbook to remove entries that dont end in ".i2p"
 
 2005-02-03  smeghead
     * Added Ant buildfile in apps/fortuna for creating a custom Fortuna PRNG jar

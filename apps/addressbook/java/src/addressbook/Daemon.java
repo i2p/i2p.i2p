@@ -64,6 +64,7 @@ public class Daemon {
         while (iter.hasNext()) {
             master.merge((AddressBook) iter.next(), log);
         }
+	master.filter(log); /** @author Sugadude */
         master.write(new File(routerLocation));
         master.write(published);
         subscriptions.write();
