@@ -1,4 +1,6 @@
-$Id: history.txt,v 1.26 2004/10/01 06:49:03 jrandom Exp $
+$Id: history.txt,v 1.27 2004/10/01 09:35:49 jrandom Exp $
+
+* 2004-10-01  0.4.1.1 released
 
 2004-10-01  jrandom
     * Handle partial reseeds, caused by seeds going away before the download
