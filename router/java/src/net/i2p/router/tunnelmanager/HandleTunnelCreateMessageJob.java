@@ -47,6 +47,10 @@ public class HandleTunnelCreateMessageJob extends JobImpl {
     
     public void runJob() {
         if (_log.shouldLog(Log.DEBUG)) _log.debug("Handling tunnel create");
+        if (isOverloaded()) {
+            sendReply(false);
+            return;
+        } 
         TunnelInfo info = new TunnelInfo(_context);
         info.setConfigurationKey(_message.getConfigurationKey());
         info.setEncryptionKey(_message.getTunnelKey());
@@ -76,6 +80,11 @@ public class HandleTunnelCreateMessageJob extends JobImpl {
         } else {
             _context.netDb().lookupRouterInfo(info.getNextHop(), new TestJob(info), new JoinJob(info, false), TIMEOUT);
         }
+    }
+    
+    private boolean isOverloaded() {
+        // hmmm....
+        return false;
     }
     
     private class TestJob extends JobImpl {
