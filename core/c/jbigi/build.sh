@@ -29,13 +29,13 @@ make
 sh ../../build_jbigi.sh static
 case `uname -sr` in
 MINGW*)
-	cp jbigi.dll ../../lib/net/i2p/util/jbigi-windows-x86.dll;;
+	cp jbigi.dll ../../lib/jbigi;;
 CYGWIN*)
-	cp jbigi.dll ../../lib/net/i2p/util/jbigi-windows-x86.dll;;
+	cp jbigi.dll ../../lib/jbigi;;
 Linux*)
-	cp libjbigi.so ../../lib/net/i2p/util/libjbigi-linux-x86.so;;
+	cp libjbigi.so ../../lib/jbigi;;
 FreeBSD*)
-	cp libjbigi.so ../../lib/net/i2p/util/libjbigi-freebsd-x86.so;;
+	cp libjbigi.so ../../lib/jbigi;;
 esac
 cd ..
 cd ..
