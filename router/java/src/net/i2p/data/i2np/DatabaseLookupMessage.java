@@ -243,7 +243,9 @@ public class DatabaseLookupMessage extends I2NPMessageImpl {
         buf.append("\n\tSearch Key: ").append(getSearchKey());
         buf.append("\n\tFrom: ").append(getFrom());
         buf.append("\n\tReply Tunnel: ").append(getReplyTunnel());
-        buf.append("\n\tDont Include Peers: ").append(_dontIncludePeers.size());
+        buf.append("\n\tDont Include Peers: ");
+        if (_dontIncludePeers != null)
+            buf.append(_dontIncludePeers.size());
         buf.append("]");
         return buf.toString();
     }
