@@ -54,13 +54,19 @@ public class IsFailingCalculator extends Calculator {
                 return true;
             }
             
-            Rate failedRate = profile.getTunnelHistory().getFailedRate().getRate(60*1000);
-            if (failedRate.getCurrentEventCount() >= 2) {
-                if (_log.shouldLog(Log.DEBUG))
-                    _log.debug("Peer " + profile.getPeer().toBase64() 
-                               + " is failing because too many of their tunnels failed recently");
-                return true;
-            }
+            ////
+            // the right way to behave would be to use some statistical 
+            // analysis on the failure rate, and only mark the peer as failing
+            // if their rate exceeded the expected rate (mean, median, stddev, etc)
+            ////
+            
+            //Rate failedRate = profile.getTunnelHistory().getFailedRate().getRate(60*1000);
+            //if (failedRate.getCurrentEventCount() >= 2) {
+            //    if (_log.shouldLog(Log.DEBUG))
+            //        _log.debug("Peer " + profile.getPeer().toBase64() 
+            //                   + " is failing because too many of their tunnels failed recently");
+            //    return true;
+            //}
             
             return false;
         }

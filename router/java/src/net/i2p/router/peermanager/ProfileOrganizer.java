@@ -146,8 +146,8 @@ public class ProfileOrganizer {
      * Add the new profile, returning the old value (or null if no profile existed)
      *
      */
-    public PeerProfile addProfile(PeerProfile profile) {
-        if ( (profile == null) || (profile.getPeer() == null) || (_us.equals(profile.getPeer())) ) return null;
+    public PeerProfile addProfile(PeerProfile profile) throws IllegalStateException {
+        if ( (profile == null) || (profile.getPeer() == null) ) return null;
         
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("New profile created for " + profile.getPeer().toBase64());
