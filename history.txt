@@ -1,4 +1,8 @@
-$Id: history.txt,v 1.33 2004/10/05 10:38:37 jrandom Exp $
+$Id: history.txt,v 1.34 2004/10/05 14:21:47 jrandom Exp $
+
+2004-10-05  jrandom
+    * Allow peers on the same LAN to communicate with each other safely even
+      when they cannot talk to each other through the external address.
 
 2004-10-05  jrandom
     * Display how much time is left before the graceful shutdown is complete.

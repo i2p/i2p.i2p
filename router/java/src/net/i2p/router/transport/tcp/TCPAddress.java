@@ -112,13 +112,16 @@ public class TCPAddress {
     public void setPort(int port) { _port = port; }
     
     public boolean isPubliclyRoutable() {
-        if (_host == null) return false;
+        return isPubliclyRoutable(_host);
+    }
+    public static boolean isPubliclyRoutable(String host) {
+        if (host == null) return false;
         try {
-            InetAddress addr = InetAddress.getByName(_host);
+            InetAddress addr = InetAddress.getByName(host);
             byte quad[] = addr.getAddress();
             if (quad.length != 4) {
                 if (_log.shouldLog(Log.ERROR))
-                    _log.error("Refusing IPv6 address (" + _host + " / " + addr.getHostAddress() + ") "
+                    _log.error("Refusing IPv6 address (" + host + " / " + addr.getHostAddress() + ") "
                                + " since not all peers support it, and we don't support restricted routes");
                 return false;
             }

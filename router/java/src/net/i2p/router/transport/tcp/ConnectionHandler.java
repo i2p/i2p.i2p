@@ -675,22 +675,29 @@ public class ConnectionHandler {
     private boolean verifyReachability() { 
         if (_actualPeer == null) return false;
         _remoteAddress = new TCPAddress(_actualPeer.getTargetAddress(TCPTransport.STYLE));
-        if (!_transport.allowAddress(_remoteAddress))
+        if ( (_remoteAddress.getPort() <= 0) || (_remoteAddress.getPort() > 65535) )
             return false;
         
+        TCPAddress testAddress = _remoteAddress;
+        
+        // if it is a LAN address, test with that address and not the public one
+        if (!TCPAddress.isPubliclyRoutable(_from)) {
+            testAddress = new TCPAddress(_from, _remoteAddress.getPort());
+        }
+        
         try {
-            return verifyReachability(_remoteAddress);
+            return verifyReachability(testAddress);
         } catch (IOException ioe) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Error verifying " 
                           + _actualPeer.getIdentity().calculateHash().toBase64().substring(0,6)
-                          + "at " + _remoteAddress, ioe);
+                          + "at " + testAddress, ioe);
             return false;
         } catch (DataFormatException dfe) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Error verifying " 
                           + _actualPeer.getIdentity().calculateHash().toBase64().substring(0,6)
-                          + "at " + _remoteAddress, dfe);
+                          + "at " + testAddress, dfe);
             return false;
         }
     }
