@@ -36,18 +36,23 @@ public class SAMHandlerFactory {
      */
     public static SAMHandler createSAMHandler(Socket s) throws SAMException {
         BufferedReader br;
+        String line;
         StringTokenizer tok;
 
         try {
             br = new BufferedReader(new InputStreamReader(s.getInputStream(),
                                                           "ISO-8859-1"));
-            tok = new StringTokenizer(br.readLine(), " ");
+            line = br.readLine();
+            if (line == null) {
+                _log.debug("Connection closed by client");
+                return null;
+            }
+            tok = new StringTokenizer(line, " ");
         } catch (IOException e) {
             throw new SAMException("Error reading from socket: "
                                    + e.getMessage());
         } catch (Exception e) {
-            throw new SAMException("Unexpected error: "
-                                   + e.getMessage());
+            throw new SAMException("Unexpected error: " + e.getMessage());
         }
 
         // Message format: HELLO VERSION MIN=v1 MAX=v2
@@ -118,15 +123,20 @@ public class SAMHandlerFactory {
         int verMajor = getMajor(ver);
         int verMinor = getMinor(ver);
         SAMHandler handler;
-        switch (verMajor) {
-        case 1:
-            handler = new SAMv1Handler(s, verMajor, verMinor);
-            break;
-        default:
-            _log.error("BUG! Trying to initialize the wrong SAM version!");
-            throw new SAMException("BUG triggered! (handler instantiation)");
-        }
 
+        try {
+            switch (verMajor) {
+            case 1:
+                handler = new SAMv1Handler(s, verMajor, verMinor);
+                break;
+            default:
+                _log.error("BUG! Trying to initialize the wrong SAM version!");
+                throw new SAMException("BUG! (in handler instantiation)");
+            }
+        } catch (IOException e) {
+            _log.error("IOException caught during SAM handler instantiation");
+            return null;
+        }
         return handler;
     }
 

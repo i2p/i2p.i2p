@@ -33,14 +33,14 @@ import net.i2p.util.Log;
  *
  * @author human
  */
-public class SAMv1Handler extends SAMHandler implements SAMRawReceiver, SAMStreamReceiver {
+public class SAMv1Handler extends SAMHandler implements SAMRawReceiver, SAMDatagramReceiver, SAMStreamReceiver {
     
     private final static Log _log = new Log(SAMv1Handler.class);
 
     private final static int IN_BUFSIZE = 2048;
 
     private SAMRawSession rawSession = null;
-    private SAMRawSession datagramSession = null;
+    private SAMDatagramSession datagramSession = null;
     private SAMStreamSession streamSession = null;
 
     /**
@@ -49,20 +49,16 @@ public class SAMv1Handler extends SAMHandler implements SAMRawReceiver, SAMStrea
      * stripped) from the socket input stream.
      *
      * @param s Socket attached to a SAM client
+     * @param verMajor SAM major version to manage (should be 1)
+     * @param verMinor SAM minor version to manage
      */
-    public SAMv1Handler(Socket s, int verMajor, int verMinor) throws SAMException{
+    public SAMv1Handler(Socket s, int verMajor, int verMinor) throws SAMException, IOException {
+        super(s, verMajor, verMinor);
         _log.debug("SAM version 1 handler instantiated");
-
-        this.verMajor = verMajor;
-        this.verMinor = verMinor;
 
         if ((this.verMajor != 1) || (this.verMinor != 0)) {
             throw new SAMException("BUG! Wrong protocol version!");
         }
-
-        this.socket = s;
-        this.verMajor = verMajor;
-        this.verMinor = verMinor;
     }
 
     public void handle() {
@@ -76,7 +72,7 @@ public class SAMv1Handler extends SAMHandler implements SAMRawReceiver, SAMStrea
         _log.debug("SAM handling started");
 
         try {
-            InputStream in = socket.getInputStream();
+            InputStream in = getClientSocketInputStream();
             int b = -1;
 
             while (true) {
@@ -118,6 +114,8 @@ public class SAMv1Handler extends SAMHandler implements SAMRawReceiver, SAMStrea
 
                 if (domain.equals("STREAM")) {
                     canContinue = execStreamMessage(opcode, props);
+                } else if (domain.equals("DATAGRAM")) {
+                    canContinue = execDatagramMessage(opcode, props);
                 } else if (domain.equals("RAW")) {
                     canContinue = execRawMessage(opcode, props);
                 } else if (domain.equals("SESSION")) {
@@ -147,7 +145,7 @@ public class SAMv1Handler extends SAMHandler implements SAMRawReceiver, SAMStrea
         } finally {
             _log.debug("Stopping handler");
             try {
-                this.socket.close();
+                closeClientSocket();
             } catch (IOException e) {
                 _log.error("Error closing socket: " + e.getMessage());
             }
@@ -204,6 +202,8 @@ public class SAMv1Handler extends SAMHandler implements SAMRawReceiver, SAMStrea
                 
                 if (style.equals("RAW")) {
                     rawSession = new SAMRawSession(dest, props, this);
+                } else if (style.equals("DATAGRAM")) {
+                    datagramSession = new SAMDatagramSession(dest, props,this);
                 } else if (style.equals("STREAM")) {
                     String dir = props.getProperty("DIRECTION");
                     if (dir == null) {
@@ -305,7 +305,7 @@ public class SAMv1Handler extends SAMHandler implements SAMRawReceiver, SAMStrea
             
             return writeString("NAMING REPLY RESULT=OK NAME=" + name
                                + " VALUE="
-                               + SAMUtils.getBase64DestinationPubKey(dest)
+                               + dest.toBase64()
                                + "\n");
         } else {
             _log.debug("Unrecognized NAMING message opcode: \""
@@ -314,10 +314,82 @@ public class SAMv1Handler extends SAMHandler implements SAMRawReceiver, SAMStrea
         }
     }
 
+
+    /* Parse and execute a DATAGRAM message */
+    private boolean execDatagramMessage(String opcode, Properties props) {
+        if (datagramSession == null) {
+            _log.error("DATAGRAM message received, but no DATAGRAM session exists");
+            return false;
+        }
+
+        if (opcode.equals("SEND")) {
+            if (props == null) {
+                _log.debug("No parameters specified in DATAGRAM SEND message");
+                return false;
+            }
+            
+            String dest = props.getProperty("DESTINATION");
+            if (dest == null) {
+                _log.debug("Destination not specified in DATAGRAM SEND message");
+                return false;
+            }
+
+            int size;
+            {
+                String strsize = props.getProperty("SIZE");
+                if (strsize == null) {
+                    _log.debug("Size not specified in DATAGRAM SEND message");
+                    return false;
+                }
+                try {
+                    size = Integer.parseInt(strsize);
+                } catch (NumberFormatException e) {
+                    _log.debug("Invalid DATAGRAM SEND size specified: " + strsize);
+                    return false;
+                }
+                if (!checkDatagramSize(size)) {
+                    _log.debug("Specified size (" + size
+                               + ") is out of protocol limits");
+                    return false;
+                }
+            }
+
+            try {
+                DataInputStream in = new DataInputStream(getClientSocketInputStream());
+                byte[] data = new byte[size];
+
+                in.readFully(data);
+
+                if (!datagramSession.sendBytes(dest, data)) {
+                    _log.error("DATAGRAM SEND failed");
+                    return false;
+                }
+
+                return true;
+            } catch (EOFException e) {
+                _log.debug("Too few bytes with DATAGRAM SEND message (expected: "
+                           + size);
+                return false;
+            } catch (IOException e) {
+                _log.debug("Caught IOException while parsing DATAGRAM SEND message",
+                           e);
+                return false;
+            } catch (DataFormatException e) {
+                _log.debug("Invalid key specified with DATAGRAM SEND message",
+                           e);
+                return false;
+            }
+        } else {
+            _log.debug("Unrecognized DATAGRAM message opcode: \""
+                       + opcode + "\"");
+            return false;
+        }
+    }
+
     /* Parse and execute a RAW message */
     private boolean execRawMessage(String opcode, Properties props) {
         if (rawSession == null) {
-            _log.debug("RAW message received, but no RAW session exists");
+            _log.error("RAW message received, but no RAW session exists");
             return false;
         }
 
@@ -354,7 +426,7 @@ public class SAMv1Handler extends SAMHandler implements SAMRawReceiver, SAMStrea
             }
 
             try {
-                DataInputStream in = new DataInputStream(socket.getInputStream());
+                DataInputStream in = new DataInputStream(getClientSocketInputStream());
                 byte[] data = new byte[size];
 
                 in.readFully(data);
@@ -388,7 +460,7 @@ public class SAMv1Handler extends SAMHandler implements SAMRawReceiver, SAMStrea
     /* Parse and execute a STREAM message */
     private boolean execStreamMessage(String opcode, Properties props) {
         if (streamSession == null) {
-            _log.debug("STREAM message received, but no STREAM session exists");
+            _log.error("STREAM message received, but no STREAM session exists");
             return false;
         }
 
@@ -434,7 +506,7 @@ public class SAMv1Handler extends SAMHandler implements SAMRawReceiver, SAMStrea
             }
 
             try {
-                DataInputStream in = new DataInputStream(socket.getInputStream());
+                DataInputStream in = new DataInputStream(getClientSocketInputStream());
                 byte[] data = new byte[size];
 
                 in.readFully(data);
@@ -535,15 +607,14 @@ public class SAMv1Handler extends SAMHandler implements SAMRawReceiver, SAMStrea
         }
     }
 
-    public String toString() {
-        return "SAM v1 handler (client: "
-            + this.socket.getInetAddress().toString() + ":"
-            + this.socket.getPort() + ")";
-    }
-
     /* Check whether a size is inside the limits allowed by this protocol */
     private boolean checkSize(int size) {
         return ((size >= 1) && (size <= 32768));
+    }
+
+    /* Check whether a size is inside the limits allowed by this protocol */
+    private boolean checkDatagramSize(int size) {
+        return ((size >= 1) && (size <= 31744));
     }
     
     // SAMRawReceiver implementation
@@ -571,7 +642,39 @@ public class SAMv1Handler extends SAMHandler implements SAMRawReceiver, SAMStrea
         }
 
         try {
-            this.socket.close();
+            closeClientSocket();
+        } catch (IOException e) {
+            _log.error("Error closing socket: " + e.getMessage());
+        }
+    }
+
+    // SAMDatagramReceiver implementation
+    public void receiveDatagramBytes(Destination sender, byte data[]) throws IOException {
+        if (datagramSession == null) {
+            _log.error("BUG! Received datagram bytes, but session is null!");
+            throw new NullPointerException("BUG! DATAGRAM session is null!");
+        }
+
+        ByteArrayOutputStream msg = new ByteArrayOutputStream();
+
+        msg.write(("DATAGRAM RECEIVED DESTINATION=" + sender.toBase64()
+                   + " SIZE=" + data.length
+                   + "\n").getBytes("ISO-8859-1"));
+        msg.write(data);
+
+        writeBytes(msg.toByteArray());
+    }
+
+    public void stopDatagramReceiving() {
+        _log.debug("stopDatagramReceiving() invoked");
+
+        if (datagramSession == null) {
+            _log.error("BUG! Got datagram receiving stop, but session is null!");
+            throw new NullPointerException("BUG! DATAGRAM session is null!");
+        }
+
+        try {
+            closeClientSocket();
         } catch (IOException e) {
             _log.error("Error closing socket: " + e.getMessage());
         }
@@ -585,7 +688,7 @@ public class SAMv1Handler extends SAMHandler implements SAMRawReceiver, SAMStrea
         }
 
         if (!writeString("STREAM CONNECTED DESTINATION="
-                         + SAMUtils.getBase64DestinationPubKey(d)
+                         + d.toBase64()
                          + " ID=" + id + "\n")) {
             throw new IOException("Error notifying connection to SAM client");
         }
@@ -629,7 +732,7 @@ public class SAMv1Handler extends SAMHandler implements SAMRawReceiver, SAMStrea
         }
 
         try {
-            this.socket.close();
+            closeClientSocket();
         } catch (IOException e) {
             _log.error("Error closing socket: " + e.getMessage());
         }

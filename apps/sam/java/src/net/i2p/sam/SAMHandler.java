@@ -9,6 +9,7 @@ package net.i2p.sam;
  */
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
 
@@ -29,20 +30,36 @@ public abstract class SAMHandler implements Runnable {
     protected I2PThread thread = null;
 
     private Object socketWLock = new Object(); // Guards writings on socket
+    private Socket socket = null;
     private OutputStream socketOS = null; // Stream associated to socket
-    protected Socket socket = null;
 
     protected int verMajor = 0;
     protected int verMinor = 0;
 
-    private boolean stopHandler = false;
     private Object  stopLock = new Object();
+    private boolean stopHandler = false;
+
+    /**
+     * SAMHandler constructor (to be called by subclasses)
+     *
+     * @param s Socket attached to a SAM client
+     * @param verMajor SAM major version to manage
+     * @param verMinor SAM minor version to manage
+     */
+    protected SAMHandler(Socket s,
+                         int verMajor, int verMinor) throws IOException {
+        socket = s;
+        socketOS = socket.getOutputStream();
+
+        this.verMajor = verMajor;
+        this.verMinor = verMinor;
+    }
 
     /**
      * Start handling the SAM connection, detaching an handling thread.
      *
      */
-    public void startHandling() {
+    public final void startHandling() {
         thread = new I2PThread(this, "SAMHandler");
         thread.start();
     }
@@ -54,17 +71,22 @@ public abstract class SAMHandler implements Runnable {
     protected abstract void handle();
 
     /**
+     * Get the input stream of the socket connected to the SAM client
+     *
+     */
+    protected final InputStream getClientSocketInputStream() throws IOException {
+        return socket.getInputStream();
+    }
+
+    /**
      * Write a byte array on the handler's socket.  This method must
      * always be used when writing data, unless you really know what
      * you're doing.
      *
      * @param data A byte array to be written
      */
-    protected void writeBytes(byte[] data) throws IOException {
+    protected final void writeBytes(byte[] data) throws IOException {
         synchronized (socketWLock) {
-            if (socketOS == null) {
-                socketOS = socket.getOutputStream();
-            }
             socketOS.write(data);
             socketOS.flush();
         }
@@ -79,7 +101,7 @@ public abstract class SAMHandler implements Runnable {
      *
      * @return True is the string was successfully written, false otherwise
      */
-    protected boolean writeString(String str) {
+    protected final boolean writeString(String str) {
         try {
             writeBytes(str.getBytes("ISO-8859-1"));
         } catch (IOException e) {
@@ -91,10 +113,18 @@ public abstract class SAMHandler implements Runnable {
     }
 
     /**
+     * Close the socket connected to the SAM client.
+     *
+     */
+    protected final void closeClientSocket() throws IOException {
+        socket.close();
+    }
+
+    /**
      * Stop the SAM handler
      *
      */
-    public void stopHandling() {
+    public final void stopHandling() {
         synchronized (stopLock) {
             stopHandler = true;
         }
@@ -105,7 +135,7 @@ public abstract class SAMHandler implements Runnable {
      *
      * @return True if the handler should be stopped, false otherwise
      */
-    protected boolean shouldStop() {
+    protected final boolean shouldStop() {
         synchronized (stopLock) {
             return stopHandler;
         }
@@ -116,7 +146,13 @@ public abstract class SAMHandler implements Runnable {
      *
      * @return A String describing the handler;
      */
-    public abstract String toString();
+    public final String toString() {
+        return ("SAM handler (class: " + this.getClass().getName()
+                + "; SAM version: " + verMajor + "." + verMinor
+                + "; client: "
+                + this.socket.getInetAddress().toString() + ":"
+                + this.socket.getPort() + ")");
+    }
 
     public final void run() {
         handle();

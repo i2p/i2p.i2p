@@ -40,43 +40,21 @@ public class SAMUtils {
      * @param pub Stream used to write the public key (may be null)
      */
     public static void genRandomKey(OutputStream priv, OutputStream pub) {
-	_log.debug("Generating random keys...");
-	try {
-	    I2PClient c = I2PClientFactory.createClient();
-	    Destination d = c.createDestination(priv);
-	    priv.flush();
+        _log.debug("Generating random keys...");
+        try {
+            I2PClient c = I2PClientFactory.createClient();
+            Destination d = c.createDestination(priv);
+            priv.flush();
 
-	    if (pub != null) {
-		d.writeBytes(pub);
-		pub.flush();
-	    }
+            if (pub != null) {
+                d.writeBytes(pub);
+                pub.flush();
+            }
         } catch (I2PException e) {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
-
-    /**
-     * Get the Base64 representation of a Destination public key
-     *
-     * @param d A Destination
-     *
-     * @return A String representing the Destination public key
-     */
-    public static String getBase64DestinationPubKey(Destination d) {
-	ByteArrayOutputStream baos = new ByteArrayOutputStream();
-
-	try {
-	    d.writeBytes(baos);
-	    return Base64.encode(baos.toByteArray());
-	} catch (IOException e) {
-	    _log.error("getDestinationPubKey(): caught IOException", e);
-	    return null;
-	} catch (DataFormatException e) {
-	    _log.error("getDestinationPubKey(): caught DataFormatException",e);
-	    return null;
-	}
     }
 
     /**
@@ -87,13 +65,13 @@ public class SAMUtils {
      * @return True if the destination is valid, false otherwise
      */
     public static boolean checkDestination(String dest) {
-	try {
-	    Destination d = new Destination();
-	    d.fromBase64(dest);
+        try {
+            Destination d = new Destination();
+            d.fromBase64(dest);
 
-	    return true;
+            return true;
         } catch (DataFormatException e) {
-	    return false;
+            return false;
         }
     }
 
@@ -106,22 +84,22 @@ public class SAMUtils {
      * @return the Destination for the specified hostname, or null if not found
      */
     public static Destination lookupHost(String name, OutputStream pubKey) {
-	NamingService ns = NamingService.getInstance();
-	Destination dest = ns.lookup(name);
+        NamingService ns = NamingService.getInstance();
+        Destination dest = ns.lookup(name);
 
-	if ((pubKey != null) && (dest != null)) {
-	    try {
-		dest.writeBytes(pubKey);
-	    } catch (IOException e) {
-		e.printStackTrace();
-		return null;
-	    } catch (DataFormatException e) {
-		e.printStackTrace();
-		return null;
-	    }
-	}
+        if ((pubKey != null) && (dest != null)) {
+            try {
+                dest.writeBytes(pubKey);
+            } catch (IOException e) {
+                e.printStackTrace();
+                return null;
+            } catch (DataFormatException e) {
+                e.printStackTrace();
+                return null;
+            }
+        }
 
-	return dest;
+        return dest;
     }
     
     /**
@@ -132,55 +110,55 @@ public class SAMUtils {
      * @return Properties with the parsed SAM params, or null if none is found
      */
     public static Properties parseParams(StringTokenizer tok) {
-	int pos, nprops = 0, ntoks = tok.countTokens();
-	String token, param, value;
-	Properties props = new Properties();
-	
-	for (int i = 0; i < ntoks; ++i) {
-	    token = tok.nextToken();
+        int pos, nprops = 0, ntoks = tok.countTokens();
+        String token, param, value;
+        Properties props = new Properties();
+        
+        for (int i = 0; i < ntoks; ++i) {
+            token = tok.nextToken();
 
-	    pos = token.indexOf("=");
-	    if (pos == -1) {
-		_log.debug("Error in params format");
-		return null;
-	    }
-	    param = token.substring(0, pos);
-	    value = token.substring(pos + 1);
+            pos = token.indexOf("=");
+            if (pos == -1) {
+                _log.debug("Error in params format");
+                return null;
+            }
+            param = token.substring(0, pos);
+            value = token.substring(pos + 1);
 
-	    props.setProperty(param, value);
-	    nprops += 1;
-	}
+            props.setProperty(param, value);
+            nprops += 1;
+        }
 
-	if (_log.shouldLog(Log.DEBUG)) {
-	    _log.debug("Parsed properties: " + dumpProperties(props));
-	}
+        if (_log.shouldLog(Log.DEBUG)) {
+            _log.debug("Parsed properties: " + dumpProperties(props));
+        }
 
-	if (nprops != 0) {
-	    return props;
-	} else {
-	    return null;
-	}
+        if (nprops != 0) {
+            return props;
+        } else {
+            return null;
+        }
     }
 
     /* Dump a Properties object in an human-readable form */
     private static String dumpProperties(Properties props) {
-	Enumeration enum = props.propertyNames();
-	String msg = "";
-	String key, val;
-	boolean firstIter = true;
-	
-	while (enum.hasMoreElements()) {
-	    key = (String)enum.nextElement();
-	    val = props.getProperty(key);
-	    
-	    if (!firstIter) {
-		msg += ";";
-	    } else {
-		firstIter = false;
-	    }
-	    msg += " \"" + key + "\" -> \"" + val + "\"";
-	}
-	
-	return msg;
+        Enumeration enum = props.propertyNames();
+        String msg = "";
+        String key, val;
+        boolean firstIter = true;
+        
+        while (enum.hasMoreElements()) {
+            key = (String)enum.nextElement();
+            val = props.getProperty(key);
+            
+            if (!firstIter) {
+                msg += ";";
+            } else {
+                firstIter = false;
+            }
+            msg += " \"" + key + "\" -> \"" + val + "\"";
+        }
+        
+        return msg;
     }
 }
