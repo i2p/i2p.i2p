@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project basedir="." default="all" name="fortuna">
+
+	<property name="cvs.base.dir" value="java/gnu-crypto" />
+	<property name="cvs.etc.dir" value="${cvs.base.dir}/etc" />
+	<property name="cvs.lib.dir" value="${cvs.base.dir}/lib" />
+	<property name="cvs.object.dir" value="${cvs.base.dir}/classes" />
+	<property name="cvs.base.crypto.object.dir" value="${cvs.object.dir}/gnu/crypto" />
+	<property name="cvs.cipher.object.dir" value="${cvs.base.crypto.object.dir}/cipher" />
+	<property name="cvs.hash.object.dir" value="${cvs.base.crypto.object.dir}/hash" />
+	<property name="cvs.prng.object.dir" value="${cvs.base.crypto.object.dir}/prng" />
+
+	<patternset id="fortuna.files">
+		<include name="${cvs.base.crypto.object.dir}/Registry.class"/>
+		<include name="${cvs.prng.object.dir}/Fortuna*.class"/>
+		<include name="${cvs.prng.object.dir}/BasePRNG.class"/>
+		<include name="${cvs.prng.object.dir}/RandomEventListener.class"/>
+		<include name="${cvs.prng.object.dir}/IRandom.class"/>
+		<include name="${cvs.cipher.object.dir}/CipherFactory.class"/>
+		<include name="${cvs.cipher.object.dir}/IBlockCipher.class"/>
+		<include name="${cvs.hash.object.dir}/HashFactory.class"/>
+		<include name="${cvs.hash.object.dir}/IMessageDigest.class"/>
+	</patternset>
+
+	<target name="all" depends="build,jar" 
+		description="Create and test the custom Fortuna library" />
+
+	<target name="build" depends="-init,checkout"
+		description="Build the source and tests">
+		<ant dir="${cvs.base.dir}" target="jar" />
+	</target>
+
+	<target name="builddep" />
+
+	<target name="checkout" depends="-init" unless="cvs.source.available"
+		description="Check out GNU Crypto sources from CVS HEAD">
+		<cvs cvsRoot=":ext:anoncvs@savannah.gnu.org:/cvsroot/gnu-crypto"
+			cvsRsh="ssh"
+			dest="java"
+			package="gnu-crypto" />
+	</target>
+
+	<target name="clean"
+		description="Remove generated tests and object files">
+		<ant dir="${cvs.base.dir}" target="clean" />
+	</target>
+
+	<target name="cleandep" />
+
+	<target name="compile" />
+
+	<target name="distclean" depends="clean"
+		description="Remove all generated files">
+		<delete dir="build" />
+		<delete dir="jartemp" />
+		<!--
+			Annoyingly the GNU Crypto distclean task called here doesn't clean
+			*all* derived files from java/gnu-crypto/lib like it should.....
+		-->
+		<ant dir="${cvs.base.dir}" target="distclean" />
+		<!--
+			.....and so we mop up the rest ourselves.
+		-->
+		<delete dir="${cvs.lib.dir}" />
+	</target>
+
+	<target name="-init">
+		<available property="cvs.source.available" file="${cvs.base.dir}" />
+	</target>
+
+	<target name="jar" depends="build"
+		description="Create the custom Fortuna jar library">
+		<delete dir="build" />
+		<delete dir="jartemp" />
+		<mkdir dir="build" />
+		<mkdir dir="jartemp/${cvs.object.dir}" />
+		<copy todir="jartemp">
+			<fileset dir=".">
+				<patternset refid="fortuna.files" />
+			</fileset>
+		</copy>
+		<jar basedir="jartemp/${cvs.object.dir}" jarfile="build/fortuna.jar">
+			<manifest>
+				<section name="fortuna">
+					<attribute name="Implementation-Title" value="I2P Custom GNU Crypto Fortuna Library" />
+					<attribute name="Implementation-Version" value="CVS HEAD" /> 
+					<attribute name="Implementation-Vendor" value="Free Software Foundation" />
+					<attribute name="Implementation-Vendor-Id" value="FSF" />
+					<attribute name="Implementation-URL" value="http://www.gnu.org/software/gnu-crypto" />
+				</section>
+			</manifest>
+		</jar>
+		<delete dir="jartemp" />
+	</target>
+
+	<target name="test" depends="jar"
+		description="Perform crypto tests on custom Fortuna jar library" />
+		<!--
+			Add this when Fortuna tests are added to GNU Crypto, else write some
+		-->
+
+	<target name="update" depends="checkout"
+		description="Update GNU Crypto sources to latest CVS HEAD">
+		<cvs command="update -d" cvsRsh="ssh" dest="java/gnu-crypto" />
+	</target>
+</project>

@@ -1,4 +1,8 @@
-$Id: history.txt,v 1.135 2005/01/26 19:21:10 smeghead Exp $
+$Id: history.txt,v 1.136 2005/01/26 23:48:41 smeghead Exp $
+
+2005-02-03  smeghead
+    * Added Ant buildfile in apps/fortuna for creating a custom Fortuna PRNG jar
+      library from GNU Crypto's CVS HEAD sources.
 
 2005-01-26  smeghead
     * i2pProxy.pac, i2pbench.sh, and i2ptest.sh are now shipped with the dist

@@ -3,8 +3,6 @@
 # Use the "--sourcedir" parameter if running this from the source tree.
 # Yeah yeah, a lot of repetitive code here, but it works for now.
 
-#i2p/apps/proxyscript/i2pProxy.pac
-
 $runtime = "java";
 $classpath = "../lib/i2p.jar:../lib/jbigi.jar";
 
