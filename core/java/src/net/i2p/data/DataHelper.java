@@ -34,8 +34,8 @@ import net.i2p.util.OrderedProperties;
  * @author jrandom
  */
 public class DataHelper {
-    private final static String _equal = "="; // in UTF-8
-    private final static String _semicolon = ";"; // in UTF-8
+    private final static byte _equalBytes[] = "=".getBytes(); // in UTF-8
+    private final static byte _semicolonBytes[] = ";".getBytes(); // in UTF-8
 
     /** Read a mapping from the stream, as defined by the I2P data structure spec,
      * and store it into a Properties object.
@@ -62,17 +62,17 @@ public class DataHelper {
         int read = read(rawStream, data);
         if (read != size) throw new DataFormatException("Not enough data to read the properties");
         ByteArrayInputStream in = new ByteArrayInputStream(data);
-        byte eqBuf[] = _equal.getBytes();
-        byte semiBuf[] = _semicolon.getBytes();
+        byte eqBuf[] = new byte[_equalBytes.length];
+        byte semiBuf[] = new byte[_semicolonBytes.length];
         while (in.available() > 0) {
             String key = readString(in);
             read = read(in, eqBuf);
-            if ((read != eqBuf.length) || (!eq(new String(eqBuf), _equal))) {
+            if ((read != eqBuf.length) || (!eq(eqBuf, _equalBytes))) {
                 break;
             }
             String val = readString(in);
             read = read(in, semiBuf);
-            if ((read != semiBuf.length) || (!eq(new String(semiBuf), _semicolon))) {
+            if ((read != semiBuf.length) || (!eq(semiBuf, _semicolonBytes))) {
                 break;
             }
             props.put(key, val);
@@ -98,12 +98,12 @@ public class DataHelper {
             String key = (String) iter.next();
             String val = p.getProperty(key);
             // now make sure they're in UTF-8
-            key = new String(key.getBytes(), "UTF-8");
-            val = new String(val.getBytes(), "UTF-8");
+            //key = new String(key.getBytes(), "UTF-8");
+            //val = new String(val.getBytes(), "UTF-8");
             writeString(baos, key);
-            baos.write(_equal.getBytes());
+            baos.write(_equalBytes);
             writeString(baos, val);
-            baos.write(_semicolon.getBytes());
+            baos.write(_semicolonBytes);
         }
         baos.close();
         byte propBytes[] = baos.toByteArray();
@@ -154,8 +154,10 @@ public class DataHelper {
             return toString(buf, buf.length);
     }
 
+    private static final byte[] EMPTY_BUFFER = "".getBytes();
+    
     public static String toString(byte buf[], int len) {
-        if (buf == null) buf = "".getBytes();
+        if (buf == null) buf = EMPTY_BUFFER;
         StringBuffer out = new StringBuffer();
         if (len > buf.length) {
             for (int i = 0; i < len - buf.length; i++)
@@ -173,7 +175,7 @@ public class DataHelper {
     }
 
     public static String toDecimalString(byte buf[], int len) {
-        if (buf == null) buf = "".getBytes();
+        if (buf == null) buf = EMPTY_BUFFER;
         BigInteger val = new BigInteger(1, buf);
         return val.toString(10);
     }
@@ -289,12 +291,13 @@ public class DataHelper {
         if (string == null) {
             writeLong(out, 1, 0);
         } else {
-            if (string.length() > 255)
+            int len = string.length();
+            if (len > 255)
                 throw new DataFormatException("The I2P data spec limits strings to 255 bytes or less, but this is "
                                               + string.length() + " [" + string + "]");
-            byte raw[] = string.getBytes();
-            writeLong(out, 1, raw.length);
-            out.write(raw);
+            writeLong(out, 1, len);
+            for (int i = 0; i < len; i++)
+                out.write((byte)(string.charAt(i) & 0xFF));
         }
     }
 
