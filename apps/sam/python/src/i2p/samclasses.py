@@ -1,6 +1,6 @@
 
 # -------------------------------------------------------------
-# samclasses.py: Lower-level SAM API, interfaces with SAM Bridge.
+# samclasses.py: Lower-level SAM classes, for internal use.
 # -------------------------------------------------------------
 
 """
@@ -8,46 +8,45 @@ Lower-level SAM API, interfaces with SAM Bridge.
 
 For internal use only.
 
-Use the higher level i2p.sam module for your own programs.
+Use the higher level i2p.socket module for your own programs.
 
 For details on SAM, see "Simple Anonymous Messaging (SAM) v1.0,"
 as published by jrandom.
 
 Class Overview:
 
-  SAMTerminal:     Message sender/reader, talks to SAM Bridge
-                   through a single socket.
-  StringBuffer:    Queue for character data.
-  BaseSession:     SAM session classes are derived from this.
-  StreamSession:   Manipulate a SAM stream session through a
-                   threadsafe, high-level interface.
-  DatagramSession: SAM datagram session, threadsafe, high level.
-  RawSession:      SAM raw session, threadsafe, high level.
+ - SAMTerminal:     Message sender/reader, talks to SAM Bridge.
+ - StringBuffer:    Queue for character data.
+ - BaseSession:     SAM session classes are derived from this.
+ - StreamSession:   SAM stream session class, threadsafe, high level.
+ - DatagramSession: SAM datagram session, threadsafe, high level.
+ - RawSession:      SAM raw session, threadsafe, high level.
 
 Note that a 'None' timeout is an infinite timeout: it
 blocks forever if necessary.
 
 Todo:
-  * Error handling is a huge mess.  Neaten it up.
+  - Error handling is a huge mess.  Neaten it up.
     Subclass a ErrorMixin class, then use set_error(e),
     check_error(), get_error().
-  * Streams are a huge mess.  Neaten them up.
-  * This whole interface is a tad confusing.  Neaten it up.
+  - Streams are a huge mess.  Neaten them up.
+  - This whole interface is a tad confusing.  Neaten it up.
 """
 
 # ---------------------------------------------------------
 # Imports
 # ---------------------------------------------------------
 
-import socket, thread, threading, time, string
 import Queue, traceback, random, sys, shlex
+import thread, threading, time, string
 
 # ---------------------------------------------------------
-# Import i2p and i2p.sam (for defaults and errors)
+# Import i2p and i2p.socket (for defaults and errors)
 # ---------------------------------------------------------
 
 import i2p
-import i2p.sam
+import i2p.socket
+from i2p.pylib import socket as pysocket   # Import Python socket
 
 # ---------------------------------------------------------
 # Functions
@@ -55,7 +54,7 @@ import i2p.sam
 
 def sleep(): time.sleep(0.01)   # Sleep between thread polls
 
-sam_log = False                 # Logging flag.  Logs to ./log.txt.
+log = False                     # Logging flag.  Logs to ./log.txt.
 
 # -----------------------------------------------------
 # SAMTerminal
@@ -63,13 +62,13 @@ sam_log = False                 # Logging flag.  Logs to ./log.txt.
 
 class SAMTerminal:
   """Message-by-message communication with SAM through a single
-     socket.  _on_* messages are dispatched to msgobj."""
+     pysocket.  _on_* messages are dispatched to msgobj."""
 
   def __init__(self, addr, msgobj):
     try: self.host, self.port = addr.split(':')
     except: raise ValueError('sam port required')
     self.port = int(self.port)
-    self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    self.sock=pysocket.socket(pysocket.AF_INET,pysocket.SOCK_STREAM)
     self.msgobj = msgobj
     try:
       self.sock.connect((self.host, self.port))
@@ -88,13 +87,13 @@ class SAMTerminal:
         line = []
         while True:
           try: c = self.sock.recv(1)
-          except socket.error, ex: self.error = self.lost_error
+          except pysocket.error, ex: self.error = self.lost_error
           if c == '': self.error = self.lost_error
           if self.error != None: return
           if c == '\n': break
           if c != '': line += [c]
         line = ''.join(line)
-        if sam_log:
+        if log:
           logf = open('log.txt', 'a')
           logf.write('\n' + line + '\n')
           logf.close()
@@ -105,7 +104,7 @@ class SAMTerminal:
           remain = int(kwargs['SIZE'])
           while True:
             try: s = self.sock.recv(remain)
-            except socket.error, ex: self.error = self.lost_error
+            except pysocket.error, ex: self.error = self.lost_error
             if s == '': self.error = self.lost_error
             if self.error != None: return
             if s != '': data += [s]
@@ -142,7 +141,7 @@ class SAMTerminal:
   def check_message(self, kwargs):
     """Raises an error if kwargs['RESULT'] != 'OK'."""
     if not kwargs.get('RESULT', '') in ['OK', '']:
-      raise i2p.sam.NetworkError((kwargs['RESULT'],
+      raise i2p.socket.NetworkError((kwargs['RESULT'],
                                   kwargs.get('MESSAGE', '')))
 
   def on_message(self, msg, kwargs):
@@ -156,12 +155,12 @@ class SAMTerminal:
        automatically added if none is present."""
     self.check()
     if not '\n' in msg: msg = msg + '\n'
-    if sam_log:
+    if log:
       logf = open('log.txt', 'a')
       logf.write('\n' + msg)
       logf.close()
     try: self.sock.sendall(msg)
-    except socket.error: self.error = self.lost_error
+    except pysocket.error: self.error = self.lost_error
     self.check()
 
   def check(self):
@@ -175,7 +174,7 @@ class SAMTerminal:
     # immediately, the data will be lost.  Delay 0.01 s to fix this
     # bug (tested Windows, Linux).
     time.sleep(0.01)
-    self.error = i2p.sam.ClosedError()
+    self.error = i2p.socket.ClosedError()
     self.sock.close()
 
   def queue_get(self, q):
@@ -230,10 +229,12 @@ class StringBuffer(Deque):
      appended to the end, and read from the beginning.
 
      Example:
-       B = StringBuffer('Hello W')
-       B.append('orld!')
-       print B.read(5)        # 'Hello'
-       print B.read()         # 'World!'
+       >>> B = StringBuffer('Hello W')
+       >>> B.append('orld!')
+       >>> B.read(5)
+       'Hello'
+       >>> B.read()
+       'World!'
   """
   def __init__(self, s=''):
     Deque.__init__(self)
@@ -285,7 +286,7 @@ class BaseSession:
      and RawSession are derived."""
 
   def __init__(self, addr=''):
-    if addr == '': addr = i2p.sam.samaddr
+    if addr == '': addr = i2p.socket.samaddr
     self.term = SAMTerminal(addr=addr, msgobj=self)
     self.lock = threading.Lock()  # Data lock.
     self.closed = False
@@ -297,7 +298,7 @@ class BaseSession:
   def _hello(self):
     """Internal command, handshake with SAM terminal."""
     self.term.send_message('HELLO VERSION MIN=' +
-                 str(i2p.sam.samver) + ' MAX=' + str(i2p.sam.samver))
+         str(i2p.socket.samver) + ' MAX=' + str(i2p.socket.samver))
     self.term.check_message(self.term.queue_get(self.qhello))
 
   def _on_HELLO_REPLY(self, **kwargs):
@@ -358,7 +359,7 @@ class StreamSession(BaseSession):
   """Stream session.  All methods are blocking and threadsafe."""
 
   def __init__(self, name, addr='', **kwargs):
-    if addr == '': addr = i2p.sam.samaddr
+    if addr == '': addr = i2p.socket.samaddr
     BaseSession.__init__(self, addr)
     self.idmap = {}                # Maps id to Stream object.
     self.qaccept = Queue.Queue()   # Thread messaging, accept.
@@ -443,9 +444,9 @@ class StreamSession(BaseSession):
 
     # Handle timeout and blocking errors
     if timeout == 0.0:
-      raise i2p.sam.BlockError('command would have blocked')
+      raise i2p.socket.BlockError('command would have blocked')
     else:
-      raise i2p.sam.Timeout('timed out')
+      raise i2p.socket.Timeout('timed out')
 
   def listen(self, backlog):
     """Set maximum number of queued connections."""
@@ -541,7 +542,7 @@ class Stream:
     id = self.id
     if self.closed or id == None:
       if self.err != None: raise self.err
-      raise i2p.sam.ClosedError('stream closed')
+      raise i2p.socket.ClosedError('stream closed')
     if len(s) == 0: return
     nmax = 32768
     for block in [s[i:i+nmax] for i in range(0,len(s),nmax)]:
@@ -584,9 +585,9 @@ class Stream:
 
     # Handle timeout and blocking error
     if timeout == 0.0:
-      raise i2p.sam.BlockError('command would have blocked')
+      raise i2p.socket.BlockError('command would have blocked')
     else:
-      raise i2p.sam.Timeout('timed out')
+      raise i2p.socket.Timeout('timed out')
 
   def __len__(self):
     """Current length of read buffer."""
@@ -632,7 +633,7 @@ class DatagramSession(BaseSession):
   """Datagram session.  All methods are blocking and threadsafe."""
 
   def __init__(self, name, addr='', **kwargs):
-    if addr == '': addr = i2p.sam.samaddr
+    if addr == '': addr = i2p.socket.samaddr
     BaseSession.__init__(self, addr)
     self.buf = Deque()                    # FIFO of incoming packets.
     self.name = name
@@ -656,9 +657,9 @@ class DatagramSession(BaseSession):
   def send(self, s, dest):
     """Send packet with contents s to given destination."""
     # Raise error if packet is too large.
-    if len(s) > i2p.sam.MAX_DGRAM:
+    if len(s) > i2p.socket.MAX_DGRAM:
       raise ValueError('packets must have length <= ' +
-                       str(i2p.sam.MAX_DGRAM) + ' bytes')
+                       str(i2p.socket.MAX_DGRAM) + ' bytes')
     self.term.send_message('DATAGRAM SEND DESTINATION=' + dest +
                            ' SIZE=' + str(len(s)) + '\n' + s)
 
@@ -687,9 +688,9 @@ class DatagramSession(BaseSession):
 
     # Handle timeout and blocking error
     if timeout == 0.0:
-      raise i2p.sam.BlockError('command would have blocked')
+      raise i2p.socket.BlockError('command would have blocked')
     else:
-      raise i2p.sam.Timeout('timed out')
+      raise i2p.socket.Timeout('timed out')
 
   def __len__(self):
     """Number of packets in read buffer."""
@@ -703,7 +704,7 @@ class RawSession(BaseSession):
   """Raw session.  All methods are blocking and threadsafe."""
 
   def __init__(self, name, addr='', **kwargs):
-    if addr == '': addr = i2p.sam.samaddr
+    if addr == '': addr = i2p.socket.samaddr
     BaseSession.__init__(self, addr)
     self.buf = Deque()                    # FIFO of incoming packets.
     self.name = name
@@ -727,9 +728,9 @@ class RawSession(BaseSession):
   def send(self, s, dest):
     """Send packet with contents s to given destination."""
     # Raise error if packet is too big
-    if len(s) > i2p.sam.MAX_RAW:
+    if len(s) > i2p.socket.MAX_RAW:
       raise ValueError('packets must have length <= ' +
-                       str(i2p.sam.MAX_RAW) + ' bytes')
+                       str(i2p.socket.MAX_RAW) + ' bytes')
     self.term.send_message('RAW SEND DESTINATION=' + dest +
                            ' SIZE=' + str(len(s)) + '\n' + s)
 
@@ -755,9 +756,9 @@ class RawSession(BaseSession):
 
     # Handle timeout and blocking error
     if timeout == 0.0:
-      raise i2p.sam.BlockError('command would have blocked')
+      raise i2p.socket.BlockError('command would have blocked')
     else:
-      raise i2p.sam.Timeout('timed out')
+      raise i2p.socket.Timeout('timed out')
 
   def __len__(self):
     """Number of packets in read buffer."""

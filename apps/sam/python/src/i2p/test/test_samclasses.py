@@ -7,7 +7,7 @@
 import sys; sys.path += ['../../']
 
 import traceback, time, thread, threading, random
-from i2p import eep, sam, samclasses
+from i2p import eep, socket, samclasses
 
 def test_passed(s, msg='OK'):
   """Notify user that the given unit test passed."""
@@ -16,18 +16,6 @@ def test_passed(s, msg='OK'):
 def verify_html(s):
   """Raise an error if s does not end with </html>"""
   assert s.strip().lower()[-7:] == '</html>'
-
-def resolve_test(name='duck.i2p'):
-  """Unit test for resolve."""
-  try:
-    rname = sam.resolve(name)
-  except:
-    print 'Unit test failed for sam.resolve'
-    traceback.print_exc(); sys.exit()
-
-  test_passed('sam.resolve', 'See below')
-  print '  Use hosts.txt to verify that ' + name + '=' +   \
-        rname[:15] + '...'
 
 def raw_test1():
   """Unit test for samclasses.RawSession."""
@@ -103,7 +91,7 @@ def stream_test1():
   """Unit test for samclasses.StreamSession.connect."""
 
   try:
-    dest = sam.resolve('duck.i2p')
+    dest = socket.resolve('duck.i2p')
     S = samclasses.StreamSession('Bob')
     verify_html(stream_http_get(S, dest))
     verify_html(stream_http_get(S, dest))
@@ -225,7 +213,7 @@ def multithread_packet_test(raw=True):
         time.sleep(0.01*random.uniform(0.0,1.0))
         # Read any available packets.
         try: (p, fromaddr) = C.recv(timeout=0.0)
-        except sam.BlockError: p = None
+        except socket.BlockError: p = None
         if p != None and not raw: assert fromaddr == D.dest 
 
         __lock.acquire()
@@ -233,7 +221,7 @@ def multithread_packet_test(raw=True):
         __lock.release()
 
         try: (p, fromaddr) = D.recv(timeout=0.0)
-        except sam.BlockError: p = None
+        except socket.BlockError: p = None
         if p != None and not raw: assert fromaddr == C.dest 
 
         __lock.acquire()
@@ -256,13 +244,13 @@ def multithread_packet_test(raw=True):
     while time.clock() < end_time:
       # Read any available packets.
       try: (p, fromaddr) = C.recv(timeout=0.0)
-      except sam.BlockError: p = None
+      except socket.BlockError: p = None
       if p != None and not raw: assert fromaddr == D.dest 
 
       if p != None: C_got += [p]
 
       try: (p, fromaddr) = D.recv(timeout=0.0)
-      except sam.BlockError: p = None
+      except socket.BlockError: p = None
       if p != None and not raw: assert fromaddr == C.dest 
 
       if p != None: D_got += [p]
@@ -357,13 +345,13 @@ def multithread_stream_test():
 
         __lock.acquire()
         try: p = Cin.recv(100000, timeout=0.0)
-        except sam.BlockError: p = None
+        except socket.BlockError: p = None
         if p != None: C_got += [p]
         __lock.release()
 
         __lock.acquire()
         try: p = Din.recv(100000, timeout=0.0)
-        except sam.BlockError: p = None
+        except socket.BlockError: p = None
         if p != None: D_got += [p]
         __lock.release()
 
@@ -383,11 +371,11 @@ def multithread_stream_test():
     while time.clock() < end_time:
       # Read any available string data, non-blocking.
       try: p = Cin.recv(100000, timeout=0.0)
-      except sam.BlockError: p = None
+      except socket.BlockError: p = None
       if p != None: C_got += [p]
 
       try: p = Din.recv(100000, timeout=0.0)
-      except sam.BlockError: p = None
+      except socket.BlockError: p = None
       if p != None: D_got += [p]
 
       if len(''.join(C_got)) == len(''.join(C_recv)) and \
@@ -428,7 +416,6 @@ def test():
   print
   print 'Testing:'
 
-  resolve_test()
   raw_test1()
   datagram_test1()
   stream_test1()
@@ -437,7 +424,7 @@ def test():
   multithread_stream_test()
 
  # Note: The datagram unit test fails, but it's apparently I2P's
- # fault (the code is the same as for raw packets, and the sam
+ # fault (the code is the same as for raw packets, and the SAM
  # bridge is sent all the relevant data).
  # Code: multithread_packet_test(raw=False)
 

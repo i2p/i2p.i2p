@@ -1,10 +1,10 @@
 
 # -------------------------------------------------------------
-# eep.py: I2P Project -- Eeproxy Python API
+# eep.py: Eeproxy access module
 # -------------------------------------------------------------
 
 """
-Eeproxy Python API
+Eeproxy access module
 """
 
 import urllib2

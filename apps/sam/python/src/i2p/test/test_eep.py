@@ -7,7 +7,7 @@
 import sys; sys.path += ['../../']
 
 import traceback, sys
-from i2p import eep, sam, samclasses
+from i2p import eep
 
 def verify_html(s):
   """Raise an error if s does not end with </html>"""

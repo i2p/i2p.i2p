@@ -1,24 +1,24 @@
 
 # -------------------------------------------------------------
-# router.py: I2P Project -- Router Control API for Python
+# router.py: Router control module
 # -------------------------------------------------------------
 
 """
-Router Control API for Python
+Router control module
 """
 
 import i2p
-import i2p.sam
+import i2p.socket
 import i2p.eep
+from i2p.pylib import socket as pysocket   # Import Python socket
 
-import socket as pysocket
 import os, sys
 import os.path
 import time
 import threading
 import urllib2
 
-check_addrlist = [i2p.sam.samaddr, i2p.eep.eepaddr]
+check_addrlist = [i2p.socket.samaddr, i2p.eep.eepaddr]
 
 router_config = 'router.config'     # Router config filename
 
@@ -31,19 +31,16 @@ def find(dir=None):
   """Find the absolute path to a locally installed I2P router.
 
      An I2P installation is located by looking in the
-     environment I2P, then in PATH, then in the dir argument
-     given to the function.  It looks for startRouter.sh or
-     startRouter.bat.  Raises ValueError if an I2P installation
+     the dir argument given to the function, then in the
+     environment I2P, then in PATH.  It looks for startRouter.sh
+     or startRouter.bat.  Raises ValueError if an I2P installation
      could not be located.
   """
-  if sys.platform[:3] == 'win':
-    sep = ';'
-  else:
-    sep = ':'
+  sep = os.pathsep        # Path separator
   L = []
-  if 'PATH' in os.environ: L += os.environ['PATH'].split(sep)
-  if 'I2P' in os.environ: L += os.environ['I2P'].split(sep)
   if dir != None and dir != '': L += dir.split(sep)
+  if 'I2P' in os.environ: L += os.environ['I2P'].split(sep)
+  if 'PATH' in os.environ: L += os.environ['PATH'].split(sep)
   for dirname in L:
     filename = os.path.join(dirname, 'startRouter.bat')
     if os.path.exists(filename):
