@@ -122,8 +122,7 @@ bool sam_close(sam_sess_t *session)
  * tunneldepth - length of the I2P tunnels created by this program (longer is
  *		more anonymous, but slower)
  *
- * Returns: True on success, false on failure.  If true, `session' will be ready
- *		for use.
+ * Returns: SAM error code.  If SAM_OK, `session' will be ready for use.
  */
 samerr_t sam_connect(sam_sess_t *session, const char *samhost, uint16_t samport,
 	const char *destname, sam_conn_t style, uint_t tunneldepth)
@@ -792,39 +791,6 @@ void sam_sendq_flush(sam_sess_t *session, sam_sid_t stream_id,
 }
 
 /*
- * Allocates memory for the session and sets its default values
- *
- * session - pointer to a previously allocated sam_sess_t to initalise, or NULL
- *		if you want memory to be allocated by this function
- */
-sam_sess_t *sam_session_init(sam_sess_t *session)
-{
-	if (session == NULL) {
-		session = malloc(sizeof(sam_sess_t));
-		if (session == NULL) {
-			SAMLOGS("Out of memory");
-			abort();
-		}
-	}
-	session->connected = false;
-	session->prev_id = 0;
-
-	return session;
-}
-
-/*
- * Frees memory used by the session and sets the pointer to NULL
- *
- * session - pointer to a pointer to a sam_sess_t
- */
-void sam_session_free(sam_sess_t **session)
-{
-	assert(*session != NULL);
-	free(*session);
-	*session = NULL;
-}
-
-/*
  * Sends the second SAM handshake command and checks the reply
  *
  * destname - destination name for this program, or "TRANSIENT" to create a
@@ -878,6 +844,39 @@ static samerr_t sam_session_create(sam_sess_t *session, const char *destname,
 		return SAM_INVALID_KEY;
 	else
 		return SAM_UNKNOWN;
+}
+
+/*
+ * Allocates memory for the session and sets its default values
+ *
+ * session - pointer to a previously allocated sam_sess_t to initalise, or NULL
+ *		if you want memory to be allocated by this function
+ */
+sam_sess_t *sam_session_init(sam_sess_t *session)
+{
+	if (session == NULL) {
+		session = malloc(sizeof(sam_sess_t));
+		if (session == NULL) {
+			SAMLOGS("Out of memory");
+			abort();
+		}
+	}
+	session->connected = false;
+	session->prev_id = 0;
+
+	return session;
+}
+
+/*
+ * Frees memory used by the session and sets the pointer to NULL
+ *
+ * session - pointer to a pointer to a sam_sess_t
+ */
+void sam_session_free(sam_sess_t **session)
+{
+	assert(*session != NULL);
+	free(*session);
+	*session = NULL;
 }
 
 /*
