@@ -1,13 +1,14 @@
+#! /usr/bin/env python
 
 # -----------------------------------------------
 # stream_noblock.py: Non-blocking stream server
 # -----------------------------------------------
 
 import i2p
-from i2p import sam
+from i2p import socket
 import thread, time
 
-S = sam.socket('Dave', sam.SOCK_STREAM)
+S = socket.socket('Dave', socket.SOCK_STREAM)
 S.listen(10)                      # Queue up to 10 connections
 S.setblocking(False)              # Non-blocking
 print 'Serving at:', S.dest
@@ -25,15 +26,15 @@ def handle_connection(C):
 
     f.close()                     # Close file
     C.close()                     # Close connection
-  except sam.Error, e:
-    # Recover from SAM errors
+  except socket.Error, e:
+    # Recover from socket errors
     print 'Warning:', str(e)
 
 while True:
   try:
     (C, remotedest) = S.accept()  # Get a connection
     thread.start_new_thread(handle_connection, (C,))
-  except sam.BlockError:
+  except socket.BlockError:
     # Ignore 'command would have blocked' errors
     pass
   time.sleep(0.01)                # Reduce CPU usage

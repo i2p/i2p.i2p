@@ -1,11 +1,12 @@
+#! /usr/bin/env python
 
 # -----------------------------------------------
 # datagram_server.py: Datagram server
 # -----------------------------------------------
 
-from i2p import sam
+from i2p import socket
 
-S = sam.socket('Eve', sam.SOCK_DGRAM)
+S = socket.socket('Eve', socket.SOCK_DGRAM)
 print 'Serving at:', S.dest
 
 while True:

@@ -1,11 +1,12 @@
+#! /usr/bin/env python
 
 # -----------------------------------------------
 # stream_eepget.py: Get an eepsite using sockets
 # -----------------------------------------------
 
-from i2p import sam
+from i2p import socket
 
-S = sam.socket('Alice', sam.SOCK_STREAM)  
+S = socket.socket('Alice', socket.SOCK_STREAM)  
 S.connect('duck.i2p')
 S.send('GET / HTTP/1.0\r\n\r\n')          # Send request
 f = S.makefile()                          # File object

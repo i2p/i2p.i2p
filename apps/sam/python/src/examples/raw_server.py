@@ -1,11 +1,12 @@
+#! /usr/bin/env python
 
 # -----------------------------------------------
 # raw_server.py: Raw server
 # -----------------------------------------------
 
-from i2p import sam
+from i2p import socket
 
-S = sam.socket('Eve', sam.SOCK_RAW)
+S = socket.socket('Eve', socket.SOCK_RAW)
 print 'Serving at:', S.dest
 
 while True:

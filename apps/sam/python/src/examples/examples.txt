@@ -1,6 +1,7 @@
 
 Examples:
 
+cgi_server.py       - Example of CGIHTTPServer
 datagram.py         - Datagram client
 datagram_noblock.py - Non-blocking datagram server
 datagram_server.py  - Blocking datagram server

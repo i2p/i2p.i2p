@@ -1,10 +1,11 @@
+#! /usr/bin/env python
 
 # -----------------------------------------------
 # raw.py: Raw client
 # -----------------------------------------------
 
-from i2p import sam
+from i2p import socket
 
-dest = sam.resolve('yourserver.i2p')      # Send to dest
-S = sam.socket('Carol', sam.SOCK_RAW)
+dest = socket.resolve('yourserver.i2p')      # Send to dest
+S = socket.socket('Carol', socket.SOCK_RAW)
 S.sendto('Hello packet', 0, dest)

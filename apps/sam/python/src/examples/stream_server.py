@@ -1,12 +1,13 @@
+#! /usr/bin/env python
 
 # -----------------------------------------------
 # stream_server.py: Simple stream server
 # -----------------------------------------------
 
 import i2p
-from i2p import sam
+from i2p import socket
 
-S = sam.socket('Dave', sam.SOCK_STREAM)
+S = socket.socket('Dave', socket.SOCK_STREAM)
 S.listen(10)                      # Queue up to 10 connections
 print 'Serving at:', S.dest
 
@@ -23,6 +24,6 @@ while True:
 
     f.close()                     # Close file
     C.close()                     # Close connection
-  except sam.Error, e:
-    # Recover from SAM errors
+  except socket.Error, e:
+    # Recover from socket errors
     print 'Warning:', str(e)

