@@ -1,0 +1,115 @@
+#!/bin/sh
+
+# I2P Installer - Installs and pre-configures I2P.
+#
+# uninstall_i2p_service_unix
+# 2004 The I2P Project
+# This code is public domain.
+#
+# author: hypercubus
+#
+# Uninstalls the Wrapper-based I2P service on various *nix systems. This script
+# must be run as root.
+#
+# Wrapper can be found at:
+# http://wrapper.tanukisoftware.org/doc/english/introduction.html
+
+if [ $UID -ne 0 ]; then
+    echo 'Sorry, you need root privileges to uninstall services.'
+    exit 1
+fi
+
+HOST_OS=`uname -a`
+if [ ! '$HOST_OS' ]; then
+    echo 'Cannot determine operating system type. Please uninstall the service manually.'
+    exit 1
+fi
+
+# The following are several different service installation methods covering some
+# of the major *nix operating systems. Most *nix OSes should be able to use one
+# of these styles. TODO: AIX, HP-UX, HP-UX/64, IRIX, OSF/1.
+
+uninstall_bsd()
+{
+    rm /usr/local/etc/rc.d/i2psvc.sh
+}
+
+uninstall_debian()
+{
+    rm /etc/init.d/i2psvc
+    update-rc.d -f i2psvc remove
+}
+
+uninstall_gentoo()
+{
+    rm /etc/init.d/i2psvc
+    rc-update del i2psvc default
+}
+
+uninstall_redhat()
+{
+    rm /etc/rc.d/init.d/i2psvc
+    chkconfig --level 345 i2psvc off
+}
+
+uninstall_sysv()
+{
+    rm /etc/init.d/i2psvc
+    rm /etc/rc0.d/K20i2psvc
+    rm /etc/rc1.d/K20i2psvc
+    rm /etc/rc2.d/S20i2psvc
+    rm /etc/rc3.d/S20i2psvc
+}
+
+if [[ `echo "$HOST_OS" | grep Darwin` || `echo "$HOST_OS" | grep Macintosh` ]]; then
+    uninstall_bsd
+    exit 0
+fi
+
+if [[ `echo "$HOST_OS" | grep FreeBSD` ]]; then
+    uninstall_bsd
+    exit 0
+fi
+
+if [[ `echo "$HOST_OS" | grep Linux` ]]; then
+
+    LINUX_DISTRO=`cat /proc/version`
+
+    if [[ `echo "$LINUX_DISTRO" | grep Debian` ]]; then
+        uninstall_debian
+        exit 0
+    fi
+
+    if [[ `echo "$LINUX_DISTRO" | grep Fedora` ]]; then
+        uninstall_redhat
+        exit 0
+    fi
+
+    if [[ `echo "$LINUX_DISTRO" | grep Gentoo` ]]; then
+        uninstall_gentoo
+        exit 0
+    fi
+
+    if [[ `echo "$LINUX_DISTRO" | grep Mandrake` ]]; then
+        uninstall_redhat
+        exit 0
+    fi
+
+    if [[ `echo "$LINUX_DISTRO" | grep "Red Hat"` ]]; then
+        uninstall_redhat
+        exit 0
+    fi
+
+    if [[ `echo "$LINUX_DISTRO" | grep Suse` ]]; then
+        uninstall_redhat
+        exit 0
+    fi
+fi
+
+if [[ `echo "$HOST_OS" | grep Solaris` ]]; then
+    uninstall_sysv()
+    exit 0
+fi
+
+echo 'Cannot determine operating system type. Please uninstall the service manually.'
+exit 1
