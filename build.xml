@@ -91,6 +91,7 @@
         <copy file="installer/java/build/install.jar" todir="build/" />
         <copy file="installer/java/build/guiinstall.jar" todir="build/" />
         <copy file="installer/java/build/fetchseeds.jar" todir="build/" />
+        <copy file="installer/lib/jbigi/jbigi.jar" todir="build" />
     </target>
     <target name="javadoc">
         <mkdir dir="./build" />
@@ -206,6 +207,7 @@
         <copy file="build/sam.jar" todir="pkg-temp/lib/" />
         <copy file="build/xercesImpl.jar" todir="pkg-temp/lib/" />
         <copy file="build/xml-apis.jar" todir="pkg-temp/lib/" />
+        <copy file="build/jbigi.jar" todir="pkg-temp/lib" />
         <copy file="build/i2ptunnel.war" todir="pkg-temp/webapps/" />
         <copy file="build/routerconsole.war" todir="pkg-temp/webapps/" />
         <copy file="hosts.txt" todir="pkg-temp/" />
