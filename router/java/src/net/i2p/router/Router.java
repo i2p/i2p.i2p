@@ -62,6 +62,10 @@ public class Router {
     private long _started;
     private boolean _higherVersionSeen;
     private SessionKeyPersistenceHelper _sessionKeyPersistenceHelper;
+    private boolean _killVMOnEnd;
+    private boolean _isAlive;
+    private I2PThread.OOMEventListener _oomListener;
+    private ShutdownHook _shutdownHook;
     
     public final static String PROP_CONFIG_FILE = "router.configLocation";
     
@@ -73,20 +77,46 @@ public class Router {
     public final static String PROP_KEYS_FILENAME = "router.keys.location";
     public final static String PROP_KEYS_FILENAME_DEFAULT = "router.keys";
         
-    public Router() {
+    static {
         // grumble about sun's java caching DNS entries *forever*
         System.setProperty("sun.net.inetaddr.ttl", "0");
         System.setProperty("networkaddress.cache.ttl", "0");
         // (no need for keepalive)
         System.setProperty("http.keepAlive", "false");
+    }
+    
+    public Router() { this(null, null); }
+    public Router(Properties envProps) { this(null, envProps); }
+    public Router(String configFilename) { this(configFilename, null); }
+    public Router(String configFilename, Properties envProps) {
         _config = new Properties();
-        _context = new RouterContext(this);
-        _configFilename = _context.getProperty(PROP_CONFIG_FILE, "router.config");
+        _context = new RouterContext(this, envProps);
+        if (configFilename == null)
+            _configFilename = _context.getProperty(PROP_CONFIG_FILE, "router.config");
+        else
+            _configFilename = configFilename;
         _routerInfo = null;
         _higherVersionSeen = false;
         _log = _context.logManager().getLog(Router.class);
+        _log.info("New router created with config file " + _configFilename);
         _sessionKeyPersistenceHelper = new SessionKeyPersistenceHelper(_context);
+        _killVMOnEnd = true;
+        _oomListener = new I2PThread.OOMEventListener() { 
+            public void outOfMemory(OutOfMemoryError oom) { 
+                _log.log(Log.CRIT, "Thread ran out of memory", oom);
+                shutdown(); 
+            }
+        };
+        _shutdownHook = new ShutdownHook();
     }
+    
+    /**
+     * Configure the router to kill the JVM when the router shuts down, as well
+     * as whether to explicitly halt the JVM during the hard fail process.
+     *
+     */
+    public void setKillVMOnEnd(boolean shouldDie) { _killVMOnEnd = shouldDie; }
+    public boolean getKillVMOnEnd() { return _killVMOnEnd; }
     
     public String getConfigFilename() { return _configFilename; }
     public void setConfigFilename(String filename) { _configFilename = filename; }
@@ -115,15 +145,11 @@ public class Router {
     /** wall clock uptime */
     public long getUptime() { return _context.clock().now() - _context.clock().getOffset() - _started; }
     
-    private void runRouter() {
+    void runRouter() {
+        _isAlive = true;
         _started = _context.clock().now();
-        Runtime.getRuntime().addShutdownHook(new ShutdownHook());
-        I2PThread.setOOMEventListener(new I2PThread.OOMEventListener() { 
-            public void outOfMemory(OutOfMemoryError oom) { 
-                _log.log(Log.CRIT, "Thread ran out of memory", oom);
-                shutdown(); 
-            }
-        });
+        Runtime.getRuntime().addShutdownHook(_shutdownHook);
+        I2PThread.addOOMEventListener(_oomListener);
         setupHandlers();
         startupQueue();
         _context.jobQueue().addJob(new CoallesceStatsJob());
@@ -132,6 +158,8 @@ public class Router {
         _sessionKeyPersistenceHelper.startup();
         _context.jobQueue().addJob(new StartupJob(_context));
     }
+    
+    public boolean isAlive() { return _isAlive; }
     
     /**
      * coallesce the stats framework every minute
@@ -355,6 +383,8 @@ public class Router {
     }
     
     public void shutdown() {
+        _isAlive = false;
+        I2PThread.removeOOMEventListener(_oomListener);
         try { _context.jobQueue().shutdown(); } catch (Throwable t) { _log.log(Log.CRIT, "Error shutting down the job queue", t); }
         try { _context.statPublisher().shutdown(); } catch (Throwable t) { _log.log(Log.CRIT, "Error shutting down the stats manager", t); }
         try { _context.clientManager().shutdown(); } catch (Throwable t) { _log.log(Log.CRIT, "Error shutting down the client manager", t); }
@@ -366,8 +396,10 @@ public class Router {
         dumpStats();
         _log.log(Log.CRIT, "Shutdown complete", new Exception("Shutdown"));
         try { _context.logManager().shutdown(); } catch (Throwable t) { }
-        try { Thread.sleep(1000); } catch (InterruptedException ie) {}
-        Runtime.getRuntime().halt(-1);
+        if (_killVMOnEnd) {
+            try { Thread.sleep(1000); } catch (InterruptedException ie) {}
+            Runtime.getRuntime().halt(-1);
+        }
     }
     
     private void dumpStats() {

@@ -4,6 +4,7 @@ import net.i2p.data.Hash;
 import net.i2p.router.client.ClientManagerFacadeImpl;
 import net.i2p.router.transport.OutboundMessageRegistry;
 import net.i2p.router.networkdb.kademlia.KademliaNetworkDatabaseFacade;
+import net.i2p.router.transport.VMCommSystem;
 import net.i2p.router.transport.CommSystemFacadeImpl;
 import net.i2p.router.transport.BandwidthLimiter;
 import net.i2p.router.transport.TrivialBandwidthLimiter;
@@ -68,7 +69,10 @@ public class RouterContext extends I2PAppContext {
         _messageRegistry = new OutboundMessageRegistry(this);
         _netDb = new KademliaNetworkDatabaseFacade(this);
         _keyManager = new KeyManager(this);
-        _commSystem = new CommSystemFacadeImpl(this);
+        if ("false".equals(getProperty("i2p.vmCommSystem", "false")))
+            _commSystem = new CommSystemFacadeImpl(this);
+        else
+            _commSystem = new VMCommSystem(this);
         _profileOrganizer = new ProfileOrganizer(this);
         _peerManagerFacade = new PeerManagerFacadeImpl(this);
         _profileManager = new ProfileManagerImpl(this);
@@ -184,4 +188,33 @@ public class RouterContext extends I2PAppContext {
     public Calculator speedCalculator() { return _speedCalc; } 
     /** how do we rank the reliability of profiles? */
     public Calculator reliabilityCalculator() { return _reliabilityCalc; }
+    
+    public String toString() {
+        StringBuffer buf = new StringBuffer(512);
+        buf.append("RouterContext: ").append(super.toString()).append('\n');
+        buf.append(_router).append('\n');
+        buf.append(_clientManagerFacade).append('\n');
+        buf.append(_clientMessagePool).append('\n');
+        buf.append(_jobQueue).append('\n');
+        buf.append(_inNetMessagePool).append('\n');
+        buf.append(_outNetMessagePool).append('\n');
+        buf.append(_messageHistory).append('\n');
+        buf.append(_messageRegistry).append('\n');
+        buf.append(_netDb).append('\n');
+        buf.append(_keyManager).append('\n');
+        buf.append(_commSystem).append('\n');
+        buf.append(_profileOrganizer).append('\n');
+        buf.append(_peerManagerFacade).append('\n');
+        buf.append(_profileManager).append('\n');
+        buf.append(_bandwidthLimiter).append('\n');
+        buf.append(_tunnelManager).append('\n');
+        buf.append(_statPublisher).append('\n');
+        buf.append(_shitlist).append('\n');
+        buf.append(_messageValidator).append('\n');
+        buf.append(_isFailingCalc).append('\n');
+        buf.append(_integrationCalc).append('\n');
+        buf.append(_speedCalc).append('\n');
+        buf.append(_reliabilityCalc).append('\n');
+        return buf.toString();
+    }
 }
