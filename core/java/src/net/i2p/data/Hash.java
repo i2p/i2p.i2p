@@ -25,6 +25,7 @@ public class Hash extends DataStructureImpl {
     private final static Log _log = new Log(Hash.class);
     private byte[] _data;
     private volatile String _stringified;
+    private volatile String _base64ed;
 
     public final static int HASH_LENGTH = 32;
     public final static Hash FAKE_HASH = new Hash(new byte[HASH_LENGTH]);
@@ -44,11 +45,13 @@ public class Hash extends DataStructureImpl {
     public void setData(byte[] data) {
         _data = data;
         _stringified = null;
+        _base64ed = null;
     }
 
     public void readBytes(InputStream in) throws DataFormatException, IOException {
         _data = new byte[HASH_LENGTH];
         _stringified = null;
+        _base64ed = null;
         int read = read(in, _data);
         if (read != HASH_LENGTH) throw new DataFormatException("Not enough bytes to read the hash");
     }
@@ -81,5 +84,12 @@ public class Hash extends DataStructureImpl {
             _stringified = buf.toString();
         }
         return _stringified;
+    }
+    
+    public String toBase64() {
+        if (_base64ed == null) {
+            _base64ed = super.toBase64();
+        }
+        return _base64ed;
     }
 }

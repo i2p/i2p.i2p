@@ -9,6 +9,11 @@ package net.i2p.util;
  *
  */
 
+
+import java.util.Set;
+import java.util.HashSet;
+import java.util.Iterator;
+
 /**
  * In case its useful later...
  * (e.g. w/ native programatic thread dumping, etc)
@@ -16,7 +21,7 @@ package net.i2p.util;
  */
 public class I2PThread extends Thread {
     private static Log _log;
-    private static OOMEventListener _lsnr;
+    private static Set _listeners = new HashSet(4);
 
     public I2PThread() {
         super();
@@ -38,19 +43,29 @@ public class I2PThread extends Thread {
         try {
             super.run();
         } catch (Throwable t) {
-            if ((t instanceof OutOfMemoryError) && (_lsnr != null)) _lsnr.outOfMemory((OutOfMemoryError) t);
+            if (t instanceof OutOfMemoryError)
+                fireOOM((OutOfMemoryError)t);
             // we cant assume log is created
             if (_log == null) _log = new Log(I2PThread.class);
             _log.log(Log.CRIT, "Killing thread " + getName(), t);
         }
     }
-
-    public static void setOOMEventListener(OOMEventListener lsnr) {
-        _lsnr = lsnr;
+    
+    private void fireOOM(OutOfMemoryError oom) {
+        for (Iterator iter = _listeners.iterator(); iter.hasNext(); ) {
+            OOMEventListener listener = (OOMEventListener)iter.next();
+            listener.outOfMemory(oom);
+        }
     }
 
-    public static OOMEventListener getOOMEventListener() {
-        return _lsnr;
+    /** register a new component that wants notification of OOM events */
+    public static void addOOMEventListener(OOMEventListener lsnr) {
+        _listeners.add(lsnr);
+    }
+
+    /** unregister a component that wants notification of OOM events */    
+    public static void removeOOMEventListener(OOMEventListener lsnr) {
+        _listeners.remove(lsnr);
     }
 
     public interface OOMEventListener {

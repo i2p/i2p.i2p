@@ -25,7 +25,7 @@ import net.i2p.I2PAppContext;
  * @author jrandom
  */
 public class DummyElGamalEngine extends ElGamalEngine {
-    private final static Log _log = new Log(DummyElGamalEngine.class);
+    private Log _log;
 
     /** 
      * The ElGamal engine should only be constructed and accessed through the 
@@ -35,6 +35,7 @@ public class DummyElGamalEngine extends ElGamalEngine {
      */
     public DummyElGamalEngine(I2PAppContext context) {
         super(context);
+        _log = context.logManager().getLog(DummyElGamalEngine.class);
         _log.log(Log.CRIT, "Dummy ElGamal engine in use!  NO DATA SECURITY.  Danger Will Robinson, Danger!",
                  new Exception("I really hope you know what you're doing"));
     }
@@ -93,11 +94,13 @@ public class DummyElGamalEngine extends ElGamalEngine {
         }
         Hash calcHash = SHA256Generator.getInstance().calculateHash(rv);
         if (calcHash.equals(hash)) {
-            _log.debug("Hash matches: " + DataHelper.toString(hash.getData(), hash.getData().length));
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Hash matches: " + DataHelper.toString(hash.getData(), hash.getData().length));
             return rv;
         } else {
-            _log.debug("Doesn't match hash [calc=" + calcHash + " sent hash=" + hash + "]\ndata = " + new String(rv),
-                       new Exception("Doesn't match"));
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Doesn't match hash [calc=" + calcHash + " sent hash=" + hash + "]\ndata = " + new String(rv),
+                           new Exception("Doesn't match"));
             return null;
         }
     }

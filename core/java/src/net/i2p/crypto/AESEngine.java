@@ -31,6 +31,8 @@ public class AESEngine {
     public AESEngine(I2PAppContext ctx) {
         _context = ctx;
         _log = _context.logManager().getLog(AESEngine.class);
+        if (getClass() == AESEngine.class)
+            _log.warn("Warning: AES is disabled");
     }
     
     /** Encrypt the payload with the session key
@@ -44,7 +46,6 @@ public class AESEngine {
             || (initializationVector.length != 16)) return null;
 
         byte cyphertext[] = new byte[payload.length + (16 - (payload.length % 16))];
-        _log.warn("Warning: AES is disabled");
         System.arraycopy(payload, 0, cyphertext, 0, payload.length);
         return cyphertext;
     }

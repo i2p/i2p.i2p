@@ -269,6 +269,9 @@ public class LogManager {
             _consoleBufferSize = DEFAULT_CONSOLEBUFFERSIZE;
         }
 
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("Log set to use the base log file as " + _baseLogfilename);
+        
         parseLimits(config);
     }
 
