@@ -23,21 +23,25 @@ import net.i2p.util.Log;
  */
 public class Timestamper implements Runnable {
     private static Log _log = new Log(Timestamper.class);
-    private String _targetURL;
-    private String _serverList[];
+    private static String _targetURL;
+    private static String _serverList[];
     
     private int DELAY_MS = 5*60*1000;
     
-    public Timestamper(String url, String serverNames[]) {
-        if (_log.shouldLog(Log.INFO))
-            _log.info("Creating new timestamper pointing at " + url);
-        _targetURL = url;
-        _serverList = serverNames;
-    }
+    public Timestamper() {}
     
     public void startTimestamper() {
         if (_log.shouldLog(Log.INFO))
             _log.info("Starting timestamper pointing at " + _targetURL);
+        synchronized (Timestamper.class) {
+            String enabled = System.getProperty("timestamper.enabled");
+            if (enabled != null) {
+                _log.warn("Timestamper already running");
+                return;
+            } else {
+                System.setProperty("timestamper.enabled", "true");
+            }
+        }
         I2PThread t = new I2PThread(this, "Timestamper");
         t.setPriority(I2PThread.MIN_PRIORITY);
         t.start();
@@ -48,15 +52,21 @@ public class Timestamper implements Runnable {
             _log.info("Starting up timestamper");
         try {
             while (true) {
-                if (_log.shouldLog(Log.DEBUG))
-                    _log.debug("Querying servers " + _serverList);
-                try {
-                    long now = NtpClient.currentTime(_serverList);
+                String enabled = System.getProperty("timestamper.enabled");
+                if ( (enabled == null) || (!"true".equals(enabled)) ) {
                     if (_log.shouldLog(Log.DEBUG))
-                        _log.debug("Stamp time");
-                    stampTime(now);
-                } catch (IllegalArgumentException iae) {
-                    _log.log(Log.CRIT, "Unable to reach any of the NTP servers - network disconnected?");
+                        _log.debug("Not stamping the time");
+                } else {
+                    if (_log.shouldLog(Log.DEBUG))
+                        _log.debug("Querying servers " + _serverList);
+                    try {
+                        long now = NtpClient.currentTime(_serverList);
+                        if (_log.shouldLog(Log.DEBUG))
+                            _log.debug("Stamp time");
+                        stampTime(now);
+                    } catch (IllegalArgumentException iae) {
+                        _log.log(Log.CRIT, "Unable to reach any of the NTP servers - network disconnected?");
+                    }
                 }
                 try { Thread.sleep(DELAY_MS); } catch (InterruptedException ie) {}
             }
@@ -98,7 +108,9 @@ public class Timestamper implements Runnable {
         } 
         String servers[] = new String[args.length-1];
         System.arraycopy(args, 1, servers, 0, servers.length);
-        Timestamper ts = new Timestamper(args[0], servers);
+        _targetURL = args[0];
+        _serverList = servers;
+        Timestamper ts = new Timestamper();
         ts.startTimestamper();
     }
     
