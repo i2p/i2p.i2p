@@ -51,7 +51,7 @@ class JFreeChartHeartbeatPlotPane extends NetViewerPlotPane {
         //dummy.setBackground(_gui.getBackground());
         //dummy.setPreferredSize(new Dimension(800,600));
         //add(dummy);
-
+        setPreferredSize(new Dimension(800,600));
         //add(_panel);
 
     }

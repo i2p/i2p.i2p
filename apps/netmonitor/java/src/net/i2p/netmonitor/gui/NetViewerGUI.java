@@ -50,7 +50,8 @@ class NetViewerGUI extends JFrame {
         _controlPane.setBackground(_background);
         //getContentPane().add(_controlPane, BorderLayout.SOUTH);
         
-        JSplitPane split = new JSplitPane(JSplitPane.VERTICAL_SPLIT, pane, new JScrollPane(_controlPane));
+        JSplitPane split = new JSplitPane(JSplitPane.VERTICAL_SPLIT, _plotPane, _controlPane);
+        //split.setDividerLocation(0.3d);
         getContentPane().add(split, BorderLayout.CENTER);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         initializeMenus();
@@ -62,7 +63,7 @@ class NetViewerGUI extends JFrame {
     public void stateUpdated() {
         _controlPane.stateUpdated();
         _plotPane.stateUpdated();
-        pack();
+        //pack();
     }
     
     public void refreshView() {
