@@ -207,6 +207,8 @@ class TransientSessionKeyManager extends SessionKeyManager {
         sess.addTags(set);
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Tags delivered to set " + set + " on session " + sess);
+        if (sessionTags.size() > 0)
+            _log.debug("Tags delivered: " + sessionTags.size() + " total = " + sess.availableTags());
     }
 
     /**

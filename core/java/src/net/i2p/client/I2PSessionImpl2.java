@@ -82,7 +82,8 @@ class I2PSessionImpl2 extends I2PSessionImpl {
         // success or accepted).  we may want to break this out into a seperate
         // attribute, allowing both nonblocking sends and transparently managed keys,
         // as well as the nonblocking sends with application managed keys.  Later.
-        if (isGuaranteed() || true) {
+        if (isGuaranteed() || false) {
+            //_log.error("sendGuaranteed");
             return sendGuaranteed(dest, payload, keyUsed, tagsSent);
         }
         return sendBestEffort(dest, payload, keyUsed, tagsSent);
@@ -111,16 +112,28 @@ class I2PSessionImpl2 extends I2PSessionImpl {
         if (key == null) key = _context.sessionKeyManager().createSession(dest.getPublicKey());
         SessionTag tag = _context.sessionKeyManager().consumeNextAvailableTag(dest.getPublicKey(), key);
         Set sentTags = null;
-        if (_context.sessionKeyManager().getAvailableTags(dest.getPublicKey(), key) < 10) {
+        int oldTags = _context.sessionKeyManager().getAvailableTags(dest.getPublicKey(), key);
+        long availTimeLeft = _context.sessionKeyManager().getAvailableTimeLeft(dest.getPublicKey(), key);
+        if (oldTags < 10) {
             sentTags = createNewTags(50);
-        } else if (_context.sessionKeyManager().getAvailableTimeLeft(dest.getPublicKey(), key) < 30 * 1000) {
+            //_log.error("** sendBestEffort only had " + oldTags + " adding 50");
+        } else if (availTimeLeft < 30 * 1000) {
             // if we have > 10 tags, but they expire in under 30 seconds, we want more
             sentTags = createNewTags(50);
             if (_log.shouldLog(Log.DEBUG)) _log.debug(getPrefix() + "Tags are almost expired, adding 50 new ones");
+            //_log.error("** sendBestEffort available time left " + availTimeLeft);
+        } else {
+            //_log.error("sendBestEffort old tags: " + oldTags + " available time left: " + availTimeLeft);
         }
         SessionKey newKey = null;
         if (false) // rekey
             newKey = _context.keyGenerator().generateSessionKey();
+        
+        if ( (tagsSent != null) && (tagsSent.size() > 0) ) {
+            if (sentTags == null)
+                sentTags = new HashSet();
+            sentTags.addAll(tagsSent);
+        }
 
         long nonce = _context.random().nextInt(Integer.MAX_VALUE);
         MessageState state = new MessageState(nonce, getPrefix());

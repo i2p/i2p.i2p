@@ -13,6 +13,7 @@ import java.net.NoRouteToHostException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Properties;
 import java.util.Set;
 
 import net.i2p.I2PAppContext;
@@ -65,13 +66,18 @@ public class I2PSocketManagerImpl implements I2PSocketManager, I2PSessionListene
         this("SocketManager " + (++__managerId));
     }
     public I2PSocketManagerImpl(String name) {
+        init(I2PAppContext.getGlobalContext(), null, null, name);
+    }
+    
+    public void init(I2PAppContext context, I2PSession session, Properties opts, String name) {
         _name = name;
-        _session = null;
+        _context = context;
+        _log = _context.logManager().getLog(I2PSocketManager.class);
         _inSockets = new HashMap(16);
         _outSockets = new HashMap(16);
         _acceptTimeout = ACCEPT_TIMEOUT_DEFAULT;
-        _context = I2PAppContext.getGlobalContext();
-        _log = _context.logManager().getLog(I2PSocketManager.class);
+        setSession(session);
+        setDefaultOptions(new I2PSocketOptions());
         _context.statManager().createRateStat("streaming.lifetime", "How long before the socket is closed?", "streaming", new long[] { 10*60*1000, 60*60*1000, 24*60*60*1000 });
         _context.statManager().createRateStat("streaming.sent", "How many bytes are sent in the stream?", "streaming", new long[] { 10*60*1000, 60*60*1000, 24*60*60*1000 });
         _context.statManager().createRateStat("streaming.received", "How many bytes are received in the stream?", "streaming", new long[] { 10*60*1000, 60*60*1000, 24*60*60*1000 });

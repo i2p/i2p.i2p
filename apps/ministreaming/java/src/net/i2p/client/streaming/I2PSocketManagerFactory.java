@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
+import net.i2p.I2PAppContext;
 import net.i2p.I2PException;
 import net.i2p.client.I2PClient;
 import net.i2p.client.I2PClientFactory;
@@ -23,6 +24,9 @@ import net.i2p.util.Log;
 public class I2PSocketManagerFactory {
     private final static Log _log = new Log(I2PSocketManagerFactory.class);
 
+    public static final String PROP_MANAGER = "i2p.streaming.manager";
+    public static final String DEFAULT_MANAGER = "net.i2p.client.streaming.I2PSocketManagerImpl";
+    
     /**
      * Create a socket manager using a brand new destination connected to the
      * I2CP router on the local machine on the default port (7654).
@@ -76,23 +80,60 @@ public class I2PSocketManagerFactory {
     public static I2PSocketManager createManager(InputStream myPrivateKeyStream, String i2cpHost, int i2cpPort,
                                                  Properties opts) {
         I2PClient client = I2PClientFactory.createClient();
-        opts.setProperty(I2PClient.PROP_RELIABILITY, I2PClient.PROP_RELIABILITY_GUARANTEED);
+        if (true) {
+            // for the old streaming lib
+            opts.setProperty(I2PClient.PROP_RELIABILITY, I2PClient.PROP_RELIABILITY_GUARANTEED);
+        } else {
+            // for new streaming lib:
+            opts.setProperty(I2PClient.PROP_RELIABILITY, I2PClient.PROP_RELIABILITY_BEST_EFFORT);
+        }
+
         opts.setProperty(I2PClient.PROP_TCP_HOST, i2cpHost);
         opts.setProperty(I2PClient.PROP_TCP_PORT, "" + i2cpPort);
         try {
             I2PSession session = client.createSession(myPrivateKeyStream, opts);
             session.connect();
-            return createManager(session);
+            return createManager(session, opts, "manager");
         } catch (I2PSessionException ise) {
             _log.error("Error creating session for socket manager", ise);
             return null;
         }
     }
 
-    private static I2PSocketManager createManager(I2PSession session) {
-        I2PSocketManagerImpl mgr = new I2PSocketManagerImpl();
-        mgr.setSession(session);
-        mgr.setDefaultOptions(new I2PSocketOptions());
-        return mgr;
+    private static I2PSocketManager createManager(I2PSession session, Properties opts, String name) {
+        if (false) {
+            I2PSocketManagerImpl mgr = new I2PSocketManagerImpl();
+            mgr.setSession(session);
+            mgr.setDefaultOptions(new I2PSocketOptions());
+            return mgr;
+        } else {
+            String classname = opts.getProperty(PROP_MANAGER, DEFAULT_MANAGER);
+            if (classname != null) {
+                try {
+                    Class cls = Class.forName(classname);
+                    Object obj = cls.newInstance();
+                    if (obj instanceof I2PSocketManager) {
+                        I2PSocketManager mgr = (I2PSocketManager)obj;
+                        I2PAppContext context = I2PAppContext.getGlobalContext();
+                        mgr.init(context, session, opts, name);
+                        return mgr;
+                    } else {
+                        throw new IllegalStateException("Invalid manager class [" + classname + "]");
+                    }
+                } catch (ClassNotFoundException cnfe) {
+                    _log.error("Error loading " + classname, cnfe);
+                    throw new IllegalStateException("Invalid manager class [" + classname + "] - not found");
+                } catch (InstantiationException ie) {
+                    _log.error("Error loading " + classname, ie);
+                    throw new IllegalStateException("Invalid manager class [" + classname + "] - unable to instantiate");
+                } catch (IllegalAccessException iae) {
+                    _log.error("Error loading " + classname, iae);
+                    throw new IllegalStateException("Invalid manager class [" + classname + "] - illegal access");
+                }
+            } else {
+                throw new IllegalStateException("No manager class specified");
+            }
+        }
+        
     }
 }

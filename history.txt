@@ -1,4 +1,17 @@
-$Id: history.txt,v 1.54 2004/10/18 14:08:01 jrandom Exp $
+$Id: history.txt,v 1.55 2004/10/23 20:42:35 jrandom Exp $
+
+2004-10-24  jrandom
+    * Allow explicit inclusion of session tags in the SDK, enabling the
+      resending of tags bundled with messages that would not otherwise
+      be ACKed.
+    * Don't force mode=guaranteed for end to end delivery - if mode=bestEffort
+      no DeliveryStatusMessage will be bundled (and as such, client apps using
+      it will need to do their own session tag ack/nack).
+    * Handle client errors when notifying them of message availability.
+    * New StreamSinkSend which sends a file to a destination and disconnects.
+    * Update the I2PSocketManagerFactory to build the specific 
+      I2PSocketManager instance based on the "i2p.streaming.manager" property,
+      containing the class name of the I2PSocketManager to instantiate.
 
 2004-10-23  jrandom
     * Minor ministreaming lib refactoring to simplify integration of the full

@@ -386,8 +386,13 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
                     }
                 }
                 if ( (msgId != null) && (size != null) ) {
-                    if (_sessionListener != null) 
-                        _sessionListener.messageAvailable(I2PSessionImpl.this, msgId.intValue(), size.intValue());
+                    if (_sessionListener != null) {
+                        try {
+                            _sessionListener.messageAvailable(I2PSessionImpl.this, msgId.intValue(), size.intValue());
+                        } catch (Exception e) {
+                            _log.log(Log.CRIT, "Error notifying app of message availability", e);
+                        }
+                    }
                 }
             }
         }

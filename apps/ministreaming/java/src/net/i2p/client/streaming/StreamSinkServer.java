@@ -109,10 +109,13 @@ public class StreamSinkServer {
                 while ( (read = in.read(buf)) != -1) {
                     _fos.write(buf, 0, read);
                 }
+                _log.error("Got EOF from client socket");
             } catch (IOException ioe) {
                 _log.error("Error writing the sink", ioe);
             } finally {
                 if (_fos != null) try { _fos.close(); } catch (IOException ioe) {}
+                if (_sock != null) try { _sock.close(); } catch (IOException ioe) {}
+                _log.error("Client socket closed");
             }
         }
     }

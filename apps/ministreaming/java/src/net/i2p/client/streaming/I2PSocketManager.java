@@ -13,6 +13,7 @@ import java.net.NoRouteToHostException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Properties;
 import java.util.Set;
 
 import net.i2p.I2PAppContext;
@@ -99,4 +100,6 @@ public interface I2PSocketManager {
 
     public String getName();
     public void setName(String name);
+
+    public void init(I2PAppContext context, I2PSession session, Properties opts, String name);
 }
