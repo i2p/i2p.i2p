@@ -33,6 +33,16 @@ public class PrivateKey extends DataStructureImpl {
         setData(null);
     }
 
+    /** constructs from base64
+     * @param a string of base64 data (the output of .toBase64() called
+     * on a prior instance of PrivateKey
+     * @author aum
+     */
+    public PrivateKey(String base64Data) throws DataFormatException {
+        this();
+        fromBase64(base64Data);
+    }
+
     public byte[] getData() {
         return _data;
     }
