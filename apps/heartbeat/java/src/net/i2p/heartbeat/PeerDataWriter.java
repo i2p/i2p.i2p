@@ -2,6 +2,7 @@ package net.i2p.heartbeat;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.OutputStream;
 import java.io.IOException;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
@@ -17,7 +18,7 @@ import net.i2p.util.Log;
  * Actually write out the stats for peer test
  *
  */
-class PeerDataWriter {
+public class PeerDataWriter {
     private final static Log _log = new Log(PeerDataWriter.class);
 
     /** 
@@ -28,18 +29,11 @@ class PeerDataWriter {
      */
     public boolean persist(PeerData data) {
         String filename = data.getConfig().getStatFile();
-        String header = getHeader(data);
         File statFile = new File(filename);
         FileOutputStream fos = null;
         try {
             fos = new FileOutputStream(statFile);
-            fos.write(header.getBytes());
-            fos.write("#action\tstatus\tdate and time sent   \tsendMs\treplyMs\n".getBytes());
-            for (Iterator iter = data.getDataPoints().iterator(); iter.hasNext();) {
-                PeerData.EventDataPoint point = (PeerData.EventDataPoint) iter.next();
-                String line = getEvent(point);
-                fos.write(line.getBytes());
-            }
+            persist(data, fos);
         } catch (IOException ioe) {
             if (_log.shouldLog(Log.ERROR))
                 _log.error("Error persisting the peer data for "
@@ -50,6 +44,19 @@ class PeerDataWriter {
                 fos.close();
             } catch (IOException ioe) {
             }
+        }
+        return true;
+    }
+    
+    public boolean persist(PeerData data, OutputStream out) throws IOException {
+        String header = getHeader(data);
+
+        out.write(header.getBytes());
+        out.write("#action\tstatus\tdate and time sent   \tsendMs\treplyMs\n".getBytes());
+        for (Iterator iter = data.getDataPoints().iterator(); iter.hasNext();) {
+            PeerData.EventDataPoint point = (PeerData.EventDataPoint) iter.next();
+            String line = getEvent(point);
+            out.write(line.getBytes());
         }
         return true;
     }

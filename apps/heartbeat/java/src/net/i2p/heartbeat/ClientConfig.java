@@ -1,6 +1,7 @@
 package net.i2p.heartbeat;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 import java.util.StringTokenizer;
@@ -85,10 +86,19 @@ public class ClientConfig {
     public ClientConfig() {
         this(null, null, null, -1, -1, -1, -1, 0, null, null);
     }
+    
+    /**
+     * Create a dummy client config to be fetched from the specified location
+     *
+     */
+    public ClientConfig(String location) {
+        this(null, null, location, -1, -1, -1, -1, 0, null, null);
+    }
 
     /**
      * @param peer who we will test against
      * @param us who we are
+     * @param statLocation where the stat data should be stored/fetched
      * @param duration how many minutes to keep events for
      * @param statFreq how often to write out stats
      * @param sendFreq how often to send pings
@@ -97,11 +107,11 @@ public class ClientConfig {
      * @param comment describe this test
      * @param averagePeriods list of minutes to summarize over
      */
-    public ClientConfig(Destination peer, Destination us, String statFile, int duration, int statFreq, int sendFreq,
+    public ClientConfig(Destination peer, Destination us, String statLocation, int duration, int statFreq, int sendFreq,
                         int sendSize, int numHops, String comment, int averagePeriods[]) {
         _peer = peer;
         _us = us;
-        _statFile = statFile;
+        _statFile = statLocation;
         _statDuration = duration;
         _statFrequency = statFreq;
         _sendFrequency = sendFreq;
@@ -271,6 +281,30 @@ public class ClientConfig {
      * @param periods the list of periods (in minutes) that the data should be averaged over, or null
      */
     public void setAveragePeriods(int periods[]) {
+        _averagePeriods = periods;
+    }
+    
+    /**
+     * Make sure we're keeping track of the average over the given time period.
+     *
+     * @param minutes how many minutes to monitor
+     */
+    public void addAveragePeriod(int minutes) {
+        if (_averagePeriods != null) {
+            for (int i = 0; i < _averagePeriods.length; i++) {
+                if (_averagePeriods[i] == minutes)
+                    return;
+            }
+        }
+        
+        int numPeriods = 1;
+        if (_averagePeriods != null)
+            numPeriods += _averagePeriods.length;
+        int periods[] = new int[numPeriods];
+        if (_averagePeriods != null)
+            System.arraycopy(_averagePeriods, 0, periods, 0, _averagePeriods.length);
+        periods[periods.length-1] = minutes;
+        Arrays.sort(periods);
         _averagePeriods = periods;
     }
 

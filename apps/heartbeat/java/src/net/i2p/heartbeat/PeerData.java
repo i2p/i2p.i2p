@@ -103,6 +103,7 @@ public class PeerData {
     public long getSessionStart() {
         return _sessionStart;
     }
+    public void setSessionStart(long when) { _sessionStart = when; }
 
     /**
      * how many pings have we sent for this test?
@@ -211,12 +212,16 @@ public class PeerData {
                 data.setPongReceived(now);
                 data.setPongSent(pongSent);
                 data.setWasPonged(true);
-                _dataPoints.put(new Long(dateSent), data);
+                addDataPoint(data);
             }
         }
         _sendRate.addData(pongSent - dateSent, 0);
         _receiveRate.addData(now - pongSent, 0);
         _lifetimeReceived++;
+    }
+    
+    protected void addDataPoint(EventDataPoint data) {
+        _dataPoints.put(new Long(data.getPingSent()), data);
     }
 
     /** 
