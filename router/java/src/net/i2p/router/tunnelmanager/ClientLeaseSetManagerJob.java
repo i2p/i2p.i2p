@@ -216,7 +216,8 @@ class ClientLeaseSetManagerJob extends JobImpl {
                 _lastCreated = ctx.clock().now();
                 _currentLeaseSet = ls;
             } else {
-                _log.error("New lease set created, but not found locally?  wtf?!");
+                _log.error("New lease set created, but not found locally?  wtf?! client=" 
+                           + _pool.getDestination().calculateHash().toBase64());
             }
         }
     }

@@ -51,8 +51,11 @@ public class MultiRouter {
             return;
         }
         _defaultContext = new I2PAppContext(getEnv(args[0]));
+        
         _log = _defaultContext.logManager().getLog(MultiRouter.class);
         try { Thread.sleep(5*1000); } catch (InterruptedException ie) {}
+        
+        _defaultContext.clock().setOffset(0);
         
         Runtime.getRuntime().addShutdownHook(new Thread() {
             public void run() {
@@ -71,8 +74,13 @@ public class MultiRouter {
         }
         
         for (int i = 0; i < _routers.size(); i++) {
-            ((Router)_routers.get(i)).runRouter();
-            _log.info("Router " + i + " started");
+            Router r = (Router)_routers.get(i);
+            long offset = r.getContext().random().nextLong(Router.CLOCK_FUDGE_FACTOR/2);
+            if (r.getContext().random().nextBoolean())
+                offset = 0 - offset;
+            r.getContext().clock().setOffset(offset, true);
+            r.runRouter();
+            _log.info("Router " + i + " started with clock offset " + offset);
             try { Thread.sleep(2*1000 + new java.util.Random().nextInt(2)*1000); } catch (InterruptedException ie) {}
         }
         _log.info("All " + _routers.size() + " routers started up");
@@ -83,6 +91,7 @@ public class MultiRouter {
         Properties props = new Properties();
         try {
             props.load(new FileInputStream(filename));
+            props.setProperty("time.disabled", "true");
             return props;
         } catch (IOException ioe) {
             ioe.printStackTrace();

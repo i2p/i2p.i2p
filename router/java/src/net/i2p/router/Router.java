@@ -152,6 +152,8 @@ public class Router {
     /** wall clock uptime */
     public long getUptime() { return _context.clock().now() - _context.clock().getOffset() - _started; }
     
+    public RouterContext getContext() { return _context; }
+    
     void runRouter() {
         _isAlive = true;
         _started = _context.clock().now();

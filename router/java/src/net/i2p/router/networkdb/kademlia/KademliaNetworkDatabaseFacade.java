@@ -462,7 +462,12 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
     public void publish(LeaseSet localLeaseSet) {
         if (!_initialized) return;
         Hash h = localLeaseSet.getDestination().calculateHash();
-        store(h, localLeaseSet);
+        try {
+            store(h, localLeaseSet);
+        } catch (IllegalArgumentException iae) {
+            _log.error("wtf, locally published leaseSet is not valid?", iae);
+            return;
+        }
         synchronized (_explicitSendKeys) {
             _explicitSendKeys.add(h);
         }

@@ -117,7 +117,10 @@ class RestrictiveTCPConnection extends TCPConnection {
         long diff = now.getTime() - theirNow.getTime();
         if ( (diff > Router.CLOCK_FUDGE_FACTOR) || (diff < (0-Router.CLOCK_FUDGE_FACTOR)) ) {
             if (_log.shouldLog(Log.ERROR))
-                _log.error("Peer is out of time sync!  They think it is " + theirNow + ": " + _remoteIdentity.getHash(), new Exception("Time sync error - please make sure your clock is correct!"));
+                _log.error("Peer is out of time sync by " + DataHelper.formatDuration(diff) 
+                           + "!  They think it is " + theirNow + ", we think it is " 
+                           + new Date(_context.clock().now()) + ": " + _remoteIdentity.getHash(), 
+                           new Exception("Time sync error - please make sure your clock is correct!"));
             return false;
         } else {
             if (_log.shouldLog(Log.DEBUG))
