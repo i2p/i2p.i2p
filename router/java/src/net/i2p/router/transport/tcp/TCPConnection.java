@@ -68,7 +68,7 @@ class TCPConnection implements I2NPMessageReader.I2NPMessageEventListener {
     protected RouterContext _context;
     
     public final static String PARAM_MAX_QUEUED_MESSAGES = "i2np.tcp.maxQueuedMessages";
-    private final static int DEFAULT_MAX_QUEUED_MESSAGES = 10;
+    private final static int DEFAULT_MAX_QUEUED_MESSAGES = 20;
 
     public TCPConnection(RouterContext context, Socket s, boolean locallyInitiated) {
         _context = context;
@@ -264,12 +264,11 @@ class TCPConnection implements I2NPMessageReader.I2NPMessageEventListener {
                 // the ConnectionRunner.processSlice does a wait() until we have messages
             }
             totalPending = _toBeSent.size();
-            if (fail) {
-                pending.append(totalPending).append(": ");
-                for (int i = 0; i < totalPending; i++) {
-                    OutNetMessage cur = (OutNetMessage)_toBeSent.get(i);
-                    pending.append(cur.getMessage().getClass().getName()).append(" ");
-                }
+            pending.append(totalPending).append(": ");
+            for (int i = 0; i < totalPending; i++) {
+                OutNetMessage cur = (OutNetMessage)_toBeSent.get(i);
+                pending.append(cur.getMessage().getClass().getName());
+                pending.append(" added ").append(cur.getLifetime()).append(" ms ago, ");
             }
             _toBeSent.notifyAll();
         }
@@ -310,7 +309,7 @@ class TCPConnection implements I2NPMessageReader.I2NPMessageEventListener {
                 long sliceTime = _context.clock().now()-_lastSliceRun;
                 _log.error("onAdd: Slices are taking too long (" + sliceTime 
                            + "ms) - perhaps the remote side is disconnected or hung? remote=" 
-                           + _remoteIdentity.getHash().toBase64());
+                           + _remoteIdentity.getHash().toBase64() + " pending: " + pending.toString());
             }
             closeConnection();
         }
