@@ -113,7 +113,7 @@ class ClientLeaseSetManagerJob extends JobImpl {
      * Determine if the tunnels in the current leaseSet are the same as the 
      * currently available free tunnels
      * 
-     * @return true if the tunnels are /not/ the same, else true if they are
+     * @return true if the tunnels are /not/ the same, else false if they are the same
      */
     private boolean tunnelsChanged() {
         long furthestInFuture = 0;
