@@ -18,8 +18,10 @@ import net.i2p.util.I2PThread;
  * treats everything as open (aka doesn't limit)
  *
  */
-public class TrivialBandwidthLimiter extends BandwidthLimiter {
+public class TrivialBandwidthLimiter implements BandwidthLimiter {
     private Log _log;
+    private RouterContext _context;
+    
     /** how many bytes can we read from the network without blocking? */
     private volatile long _inboundAvailable;
     /** how many bytes can we write to the network without blocking? */
@@ -54,19 +56,24 @@ public class TrivialBandwidthLimiter extends BandwidthLimiter {
      */
     private Object _updateBwLock = new Object();
     
-    final static String PROP_INBOUND_BANDWIDTH = "i2np.bandwidth.inboundKBytesPerSecond";
-    final static String PROP_OUTBOUND_BANDWIDTH = "i2np.bandwidth.outboundKBytesPerSecond";
-    final static String PROP_INBOUND_BANDWIDTH_PEAK = "i2np.bandwidth.inboundBurstKBytes";
-    final static String PROP_OUTBOUND_BANDWIDTH_PEAK = "i2np.bandwidth.outboundBurstKBytes";
-    final static String PROP_REPLENISH_FREQUENCY = "i2np.bandwidth.replenishFrequency";
-    final static String PROP_MIN_NON_ZERO_DELAY = "i2np.bandwidth.minimumNonZeroDelay";
-    final static long DEFAULT_REPLENISH_FREQUENCY = 1*1000;
-    final static long DEFAULT_MIN_NON_ZERO_DELAY = 1*1000;
+    /** 
+     * wait on this when we want outbound bytes, and notify 
+     * it when more bytes are available 
+     */
+    private Object _outboundWaitLock = new Object();
+    /** 
+     * wait on this when we want inbound bytes, and notify 
+     * it when more bytes are available 
+     */
+    private Object _inboundWaitLock = new Object();
     
-    final static long UPDATE_LIMIT_FREQUENCY = 60*1000;
+    private static final long DEFAULT_REPLENISH_FREQUENCY = 1*1000;
+    private static final long DEFAULT_MIN_NON_ZERO_DELAY = 1*1000;
+    
+    private static final long UPDATE_LIMIT_FREQUENCY = 60*1000;
     
     public TrivialBandwidthLimiter(RouterContext ctx) {
-        super(ctx);
+        _context = ctx;
         _log = ctx.logManager().getLog(TrivialBandwidthLimiter.class);
         _inboundAvailable = 0;
         _outboundAvailable = 0;
@@ -87,13 +94,49 @@ public class TrivialBandwidthLimiter extends BandwidthLimiter {
         bwThread.start();
     }
     
+    
+    /**
+     * Delay the required amount of time before returning so that receiving numBytes
+     * from the peer will not violate the bandwidth limits
+     */
+    public void delayInbound(RouterIdentity peer, int numBytes) {
+        long delay = 0;
+        while ( (delay = calculateDelayInbound(peer, numBytes)) > 0) {
+            try {
+                synchronized (_inboundWaitLock) {
+                    _inboundWaitLock.wait(delay);
+                }
+            } catch (InterruptedException ie) {}
+        }
+        synchronized (_inboundWaitLock) { _inboundWaitLock.notify(); }
+        consumeInbound(peer, numBytes);
+    }
+    
+    
+    /**
+     * Delay the required amount of time before returning so that sending numBytes
+     * to the peer will not violate the bandwidth limits
+     */
+    public void delayOutbound(RouterIdentity peer, int numBytes) {
+        long delay = 0;
+        while ( (delay = calculateDelayOutbound(peer, numBytes)) > 0) {
+            try {
+                synchronized (_outboundWaitLock) {
+                    _outboundWaitLock.wait(delay);
+                }
+            } catch (InterruptedException ie) {}
+        }
+        synchronized (_outboundWaitLock) { _outboundWaitLock.notify(); }
+        consumeOutbound(peer, numBytes);
+    }
+    
     public long getTotalSendBytes() { return _totalOutboundBytes; }
     public long getTotalReceiveBytes() { return _totalInboundBytes; }
     
     /**
      * Return how many milliseconds to wait before receiving/processing numBytes from the peer
      */
-    public long calculateDelayInbound(RouterIdentity peer, int numBytes) {
+    private long calculateDelayInbound(RouterIdentity peer, int numBytes) {
         if (_inboundKBytesPerSecond <= 0) return 0;
         if (_inboundAvailable - numBytes > 0) {
             // we have bytes available
@@ -118,7 +161,7 @@ public class TrivialBandwidthLimiter extends BandwidthLimiter {
     /**
      * Return how many milliseconds to wait before sending numBytes to the peer
      */
-    public long calculateDelayOutbound(RouterIdentity peer, int numBytes) {
+    private long calculateDelayOutbound(RouterIdentity peer, int numBytes) {
         if (_outboundKBytesPerSecond <= 0) return 0;
         if (_outboundAvailable - numBytes > 0) {
             // we have bytes available
@@ -145,7 +188,7 @@ public class TrivialBandwidthLimiter extends BandwidthLimiter {
     /**
      * Note that numBytes have been read from the peer
      */
-    public void consumeInbound(RouterIdentity peer, int numBytes) {
+    private void consumeInbound(RouterIdentity peer, int numBytes) {
         if (numBytes > 0)
             _totalInboundBytes += numBytes;
         if (_inboundKBytesPerSecond > 0)
@@ -155,7 +198,7 @@ public class TrivialBandwidthLimiter extends BandwidthLimiter {
     /**
      * Note that numBytes have been sent to the peer
      */
-    public void consumeOutbound(RouterIdentity peer, int numBytes) {
+    private void consumeOutbound(RouterIdentity peer, int numBytes) {
         if (numBytes > 0)
             _totalOutboundBytes += numBytes;
         if (_outboundKBytesPerSecond > 0)

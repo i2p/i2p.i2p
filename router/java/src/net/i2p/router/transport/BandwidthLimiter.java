@@ -13,76 +13,30 @@ import net.i2p.router.RouterContext;
 import net.i2p.util.Log;
 
 /**
- * Coordinate the bandwidth limiting across all classes of peers.  Currently
- * treats everything as open (aka doesn't limit)
+ * Coordinate the bandwidth limiting across all classes of peers.  
  *
  */
-public class BandwidthLimiter {
-    private Log _log;
-    protected RouterContext _context;
-    
-    protected Object _outboundWaitLock = new Object();
-    protected Object _inboundWaitLock = new Object();
-    
-    protected BandwidthLimiter(RouterContext context) {
-        _context = context;
-        _log = context.logManager().getLog(BandwidthLimiter.class);
-    }
-    
-    public long getTotalSendBytes() { return 0; }
-    public long getTotalReceiveBytes() { return 0; }
-    
-    /**
-     * Return how many milliseconds to wait before receiving/processing numBytes from the peer
-     */
-    public long calculateDelayInbound(RouterIdentity peer, int numBytes) {
-        return 0;
-    }
-    
-    /**
-     * Return how many milliseconds to wait before sending numBytes to the peer
-     */
-    public long calculateDelayOutbound(RouterIdentity peer, int numBytes) {
-        return 0;
-    }
-    
-    /**
-     * Note that numBytes have been read from the peer
-     */
-    public void consumeInbound(RouterIdentity peer, int numBytes) {}
-    /**
-     * Note that numBytes have been sent to the peer
-     */
-    public void consumeOutbound(RouterIdentity peer, int numBytes) {}
-    
+public interface BandwidthLimiter {
     /**
      * Delay the required amount of time before returning so that receiving numBytes
      * from the peer will not violate the bandwidth limits
      */
-    public void delayInbound(RouterIdentity peer, int numBytes) {
-        while (calculateDelayInbound(peer, numBytes) > 0) {
-            try {
-                synchronized (_inboundWaitLock) {
-                    _inboundWaitLock.wait(10*1000);
-                }
-            } catch (InterruptedException ie) {}
-        }
-        synchronized (_inboundWaitLock) { _inboundWaitLock.notify(); }
-        consumeInbound(peer, numBytes);
-    }
+    public void delayInbound(RouterIdentity peer, int numBytes);
+    
     /**
      * Delay the required amount of time before returning so that sending numBytes
      * to the peer will not violate the bandwidth limits
      */
-    public void delayOutbound(RouterIdentity peer, int numBytes) {
-        while (calculateDelayOutbound(peer, numBytes) > 0) {
-            try {
-                synchronized (_outboundWaitLock) {
-                    _outboundWaitLock.wait(10*1000);
-                }
-            } catch (InterruptedException ie) {}
-        }
-        synchronized (_outboundWaitLock) { _outboundWaitLock.notify(); }
-        consumeOutbound(peer, numBytes);
-    }
+    public void delayOutbound(RouterIdentity peer, int numBytes);
+    
+    public long getTotalSendBytes();
+    public long getTotalReceiveBytes();
+    
+    
+    static final String PROP_INBOUND_BANDWIDTH = "i2np.bandwidth.inboundKBytesPerSecond";
+    static final String PROP_OUTBOUND_BANDWIDTH = "i2np.bandwidth.outboundKBytesPerSecond";
+    static final String PROP_INBOUND_BANDWIDTH_PEAK = "i2np.bandwidth.inboundBurstKBytes";
+    static final String PROP_OUTBOUND_BANDWIDTH_PEAK = "i2np.bandwidth.outboundBurstKBytes";
+    static final String PROP_REPLENISH_FREQUENCY = "i2np.bandwidth.replenishFrequency";
+    static final String PROP_MIN_NON_ZERO_DELAY = "i2np.bandwidth.minimumNonZeroDelay";
 }
