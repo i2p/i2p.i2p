@@ -134,6 +134,29 @@ public class ConnectionPacketHandler {
                     con.getOptions().setWindowSize(newWindowSize);
                     con.setCongestionWindowEnd(newWindowSize + lowest);
                 }
+            } else {
+                // received a message that doesn't contain a new ack
+                
+                // ehh. cant do this, as we SACK and the acks may be 
+                // received out of order: 
+                // Alice: RECEIVE 2
+                // Alice: SEND    ack 2 nack 1
+                // Alice: RECEIVE 1
+                // Alice: SEND    ack 2
+                // Bob:   RECEIVE ack 2
+                // Bob:   RECEIVE ack 2 nack 1 <-- NOT bad
+                
+                /*
+                if (con.getUnackedPacketsSent() > 0) {
+                    // peer got a dup
+                    int oldSize = con.getOptions().getWindowSize();
+                    oldSize >>>= 1;
+                    if (oldSize <= 0)
+                        oldSize = 1;
+                    con.getOptions().setWindowSize(oldSize);
+                    return false;
+                }
+                */
             }
         }
         return false;

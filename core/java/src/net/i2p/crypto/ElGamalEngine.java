@@ -99,8 +99,10 @@ public class ElGamalEngine {
 
         byte d2[] = new byte[1+Hash.HASH_LENGTH+data.length];
         d2[0] = (byte)0xFF;
-        Hash hash = _context.sha().calculateHash(data);
+        SHA256EntryCache.CacheEntry cache = _context.sha().cache().acquire(data.length);
+        Hash hash = _context.sha().calculateHash(data, cache);
         System.arraycopy(hash.getData(), 0, d2, 1, Hash.HASH_LENGTH);
+        _context.sha().cache().release(cache);
         System.arraycopy(data, 0, d2, 1+Hash.HASH_LENGTH, data.length);
         
         long t0 = _context.clock().now();
@@ -180,21 +182,23 @@ public class ElGamalEngine {
         for (i = 0; i < val.length; i++)
             if (val[i] != (byte) 0x00) break;
 
-        ByteArrayInputStream bais = new ByteArrayInputStream(val, i, val.length - i);
-        Hash hash = new Hash();
-        byte rv[] = null;
-        try {
-            bais.read(); // skip first byte
-            hash.readBytes(bais);
-            rv = new byte[val.length - i - 1 - 32];
-            bais.read(rv);
-        } catch (Exception e) {
-            if (_log.shouldLog(Log.ERROR)) _log.error("Internal error reading value", e);
+        //ByteArrayInputStream bais = new ByteArrayInputStream(val, i, val.length - i);
+        byte hashData[] = new byte[Hash.HASH_LENGTH];
+        System.arraycopy(val, i + 1, hashData, 0, Hash.HASH_LENGTH);
+        Hash hash = new Hash(hashData);
+        int payloadLen = val.length - i - 1 - Hash.HASH_LENGTH;
+        if (payloadLen < 0) {
+            if (_log.shouldLog(Log.ERROR)) 
+                _log.error("Decrypted data is too small (" + (val.length - i)+ ")");
             return null;
         }
+        byte rv[] = new byte[payloadLen];
+        System.arraycopy(val, i + 1 + Hash.HASH_LENGTH, rv, 0, rv.length);
 
-        Hash calcHash = _context.sha().calculateHash(rv);
+        SHA256EntryCache.CacheEntry cache = _context.sha().cache().acquire(payloadLen);
+        Hash calcHash = _context.sha().calculateHash(rv, cache);
         boolean ok = calcHash.equals(hash);
+        _context.sha().cache().release(cache);
 
         long end = _context.clock().now();
 
@@ -211,7 +215,7 @@ public class ElGamalEngine {
             return rv;
         }
         if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Doesn't match hash [calc=" + calcHash + " sent hash=" + hash + "]\ndata = "
+            _log.debug("Doesn't match hash [sent hash=" + hash + "]\ndata = "
                        + Base64.encode(rv), new Exception("Doesn't match"));
         return null;
     }

@@ -117,12 +117,14 @@ public class I2NPMessageReader {
                     while (!_context.throttle().acceptNetworkMessage()) {
                         try { Thread.sleep(500 + _context.random().nextInt(512)); } catch (InterruptedException ie) {}
                     }
+                    
                     // do read
                     try {
                         I2NPMessage msg = _handler.readMessage(_stream);
                         if (msg != null) {
                             long msToRead = _handler.getLastReadTime();
                             int bytesRead = _handler.getLastSize();
+                            msToRead += injectLag(bytesRead);
                             _listener.messageReceived(I2NPMessageReader.this, msg, msToRead, bytesRead);
                         }
                     } catch (I2NPMessageException ime) {
@@ -144,6 +146,34 @@ public class I2NPMessageReader {
                 }
             }
             // boom bye bye bad bwoy
+        }
+        
+        private final long injectLag(int size) {
+            if (true) { 
+                return 0;
+            } else {
+                boolean shouldLag = _context.random().nextInt(1000) > size;
+                long readLag = getReadLag();
+                if (readLag > 0) {
+                    long lag = _context.random().nextLong(readLag);
+                    if (lag > 0) {
+                        try { Thread.sleep(lag); } catch (InterruptedException ie) {}
+                        return lag;
+                    } else {
+                        return 0;
+                    }
+                } else {
+                    return 0;
+                }
+            }
+        }
+        
+        private final long getReadLag() {
+            try { 
+                return Long.parseLong(_context.getProperty("router.injectLagMs", "0")); 
+            } catch (NumberFormatException nfe) {
+                return 0;
+            }
         }
     }
 }

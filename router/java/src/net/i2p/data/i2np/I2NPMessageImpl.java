@@ -15,6 +15,7 @@ import java.io.OutputStream;
 import java.util.Date;
 
 import net.i2p.I2PAppContext;
+import net.i2p.crypto.SHA256EntryCache;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
 import net.i2p.data.DataStructureImpl;
@@ -74,8 +75,11 @@ public abstract class I2NPMessageImpl extends DataStructureImpl implements I2NPM
                 cur += numRead;
             }
             
-            Hash calc = _context.sha().calculateHash(buffer, 0, size);
-            if (!calc.equals(h))
+            SHA256EntryCache.CacheEntry cache = _context.sha().cache().acquire(size);
+            Hash calc = _context.sha().calculateHash(buffer, 0, size, cache);
+            boolean eq = calc.equals(h);
+            _context.sha().cache().release(cache);
+            if (!eq)
                 throw new I2NPMessageException("Hash does not match");
 
             long start = _context.clock().now();
@@ -90,6 +94,46 @@ public abstract class I2NPMessageImpl extends DataStructureImpl implements I2NPM
             throw new I2NPMessageException("Error reading the message header", dfe);
         }
     }
+    public int readBytes(byte data[], int type, int offset) throws I2NPMessageException, IOException {
+        if (type < 0) {
+            type = (int)DataHelper.fromLong(data, offset, 1);
+            offset++;
+        }
+        _uniqueId = DataHelper.fromLong(data, offset, 4);
+        offset += 4;
+        _expiration = DataHelper.fromDate(data, offset);
+        offset += DataHelper.DATE_LENGTH;
+        int size = (int)DataHelper.fromLong(data, offset, 2);
+        offset += 2;
+        Hash h = new Hash();
+        byte hdata[] = new byte[Hash.HASH_LENGTH];
+        System.arraycopy(data, offset, hdata, 0, Hash.HASH_LENGTH);
+        offset += Hash.HASH_LENGTH;
+        h.setData(hdata);
+
+        if (offset + size > data.length)
+            throw new I2NPMessageException("Payload is too short [" 
+                                           + "data.len=" + data.length
+                                           + " offset=" + offset 
+                                           + " wanted=" + size + "]");
+
+        SHA256EntryCache.CacheEntry cache = _context.sha().cache().acquire(size);
+        Hash calc = _context.sha().calculateHash(data, offset, size, cache);
+        boolean eq = calc.equals(h);
+        _context.sha().cache().release(cache);
+        if (!eq)
+            throw new I2NPMessageException("Hash does not match");
+
+        long start = _context.clock().now();
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("Reading bytes: type = " + type + " / uniqueId : " + _uniqueId + " / expiration : " + _expiration);
+        readMessage(data, offset, size, type);
+        long time = _context.clock().now() - start;
+        if (time > 50)
+            _context.statManager().addRateData("i2np.readTime", time, time);
+        return size + Hash.HASH_LENGTH + 1 + 4 + DataHelper.DATE_LENGTH;
+    }
+    
     public void writeBytes(OutputStream out) throws DataFormatException, IOException {
         int size = getMessageSize();
         if (size < 47) throw new DataFormatException("Unable to build the message");

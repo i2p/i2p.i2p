@@ -11,6 +11,7 @@ package net.i2p.router.message;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.List;
 
 import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
@@ -37,6 +38,7 @@ import net.i2p.router.ReplyJob;
 import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
 import net.i2p.router.TunnelInfo;
+import net.i2p.router.TunnelSelectionCriteria;
 import net.i2p.util.Log;
 
 public class HandleTunnelMessageJob extends JobImpl {
@@ -333,20 +335,57 @@ public class HandleTunnelMessageJob extends JobImpl {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Sending on to requested tunnel " + id.getTunnelId() + " on router " 
                        + router.toBase64());
-        TunnelMessage msg = new TunnelMessage(getContext());
-        msg.setTunnelId(id);
-        msg.setData(body.toByteArray());
-        getContext().jobQueue().addJob(new SendMessageDirectJob(getContext(), msg, router, FORWARD_TIMEOUT, FORWARD_PRIORITY));
 
-        String bodyType = body.getClass().getName();
-        getContext().messageHistory().wrap(bodyType, body.getUniqueId(), TunnelMessage.class.getName(), msg.getUniqueId());	
+        int timeoutMs = (int)(body.getMessageExpiration().getTime() - getContext().clock().now());
+        if (timeoutMs < 5000)
+            timeoutMs = FORWARD_TIMEOUT;
+
+        TunnelInfo curInfo = getContext().tunnelManager().getTunnelInfo(_message.getTunnelId());
+        if (curInfo.getTunnelId().getType() != TunnelId.TYPE_INBOUND) {
+            // we are not processing a request at the end of an inbound tunnel, so
+            // there's no reason to hide our location.  honor the request directly
+            
+            TunnelMessage msg = new TunnelMessage(getContext());
+            msg.setTunnelId(id);
+            msg.setData(body.toByteArray());
+            
+            getContext().jobQueue().addJob(new SendMessageDirectJob(getContext(), msg, router, timeoutMs, FORWARD_PRIORITY));
+
+            String bodyType = body.getClass().getName();
+            getContext().messageHistory().wrap(bodyType, body.getUniqueId(), TunnelMessage.class.getName(), msg.getUniqueId());	
+        } else {
+            // the instructions request that we forward a message remotely from
+            // the hidden location.  honor it by sending it out a tunnel
+            TunnelId outTunnelId = selectOutboundTunnelId();
+            if (outTunnelId == null) {
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("No outbound tunnels available to forward the message, dropping it");
+                return;
+            }
+            getContext().jobQueue().addJob(new SendTunnelMessageJob(getContext(), body, outTunnelId, router, id, 
+                                                                    null, null, null, null, timeoutMs, FORWARD_PRIORITY));
+        }
+    }
+    
+    private TunnelId selectOutboundTunnelId() {
+        TunnelSelectionCriteria criteria = new TunnelSelectionCriteria();
+        criteria.setMinimumTunnelsRequired(1);
+        criteria.setMaximumTunnelsRequired(1);
+        List ids = getContext().tunnelManager().selectOutboundTunnelIds(criteria);
+        if ( (ids == null) || (ids.size() <= 0) )
+            return null;
+        else
+            return (TunnelId)ids.get(0);
     }
     
     private void sendToRouter(Hash router, I2NPMessage body) {
         // TODO: we may want to send it via a tunnel later on, but for now, direct will do.
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Sending on to requested router " + router.toBase64());
-        getContext().jobQueue().addJob(new SendMessageDirectJob(getContext(), body, router, FORWARD_TIMEOUT, FORWARD_PRIORITY));
+        int timeoutMs = (int)(body.getMessageExpiration().getTime() - getContext().clock().now());
+        if (timeoutMs < 5000)
+            timeoutMs = FORWARD_TIMEOUT;
+        getContext().jobQueue().addJob(new SendMessageDirectJob(getContext(), body, router, timeoutMs, FORWARD_PRIORITY));
     }
     
     private void sendToLocal(I2NPMessage body) {
@@ -390,7 +429,7 @@ public class HandleTunnelMessageJob extends JobImpl {
     
     private I2NPMessage getBody(byte body[]) {
         try {
-            return _handler.readMessage(new ByteArrayInputStream(body));
+            return _handler.readMessage(body); // new ByteArrayInputStream(body));
         } catch (I2NPMessageException ime) {
             if (_log.shouldLog(Log.ERROR))
                 _log.error("Error parsing the message body", ime);

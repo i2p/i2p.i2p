@@ -19,11 +19,10 @@ final class CryptixAESKeyCache {
     private static final int BC = BLOCKSIZE / 4;
     private static final int KC = KEYSIZE / 4; 
     
+    private static final int MAX_KEYS = 64;
+    
     public CryptixAESKeyCache() {
-        _availableKeys = new ArrayList(64);
-        for (int i = 0; i < 64; i++) {
-            _availableKeys.add(createNew());
-        }
+        _availableKeys = new ArrayList(MAX_KEYS);
     }
     
     /**
@@ -44,7 +43,8 @@ final class CryptixAESKeyCache {
      */
     public final void releaseKey(KeyCacheEntry key) {
         synchronized (_availableKeys) {
-            _availableKeys.add(key);
+            if (_availableKeys.size() < MAX_KEYS)
+                _availableKeys.add(key);
         }
     }
     

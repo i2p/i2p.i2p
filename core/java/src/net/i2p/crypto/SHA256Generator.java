@@ -29,6 +29,7 @@ package net.i2p.crypto;
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+import java.util.Arrays;
 import net.i2p.I2PAppContext;
 import net.i2p.data.Hash;
 
@@ -38,15 +39,18 @@ import net.i2p.data.Hash;
  * 
  * @author thecrypto,jrandom
  */
-public class SHA256Generator {
+public final class SHA256Generator {
+    private final SHA256EntryCache _cache = new SHA256EntryCache();
     public SHA256Generator(I2PAppContext context) {  // nop
     }
     
-    public static SHA256Generator getInstance() {
+    public static final SHA256Generator getInstance() {
         return I2PAppContext.getGlobalContext().sha();
     }
+    
+    public final SHA256EntryCache cache() { return _cache; }
 
-    static int[] K = { 0x428a2f98, 0x71374491, 0xb5c0fbcf, 0xe9b5dba5, 0x3956c25b, 0x59f111f1, 0x923f82a4, 0xab1c5ed5,
+    static final int[] K = { 0x428a2f98, 0x71374491, 0xb5c0fbcf, 0xe9b5dba5, 0x3956c25b, 0x59f111f1, 0x923f82a4, 0xab1c5ed5,
                       0xd807aa98, 0x12835b01, 0x243185be, 0x550c7dc3, 0x72be5d74, 0x80deb1fe, 0x9bdc06a7, 0xc19bf174,
                       0xe49b69c1, 0xefbe4786, 0x0fc19dc6, 0x240ca1cc, 0x2de92c6f, 0x4a7484aa, 0x5cb0a9dc, 0x76f988da,
                       0x983e5152, 0xa831c66d, 0xb00327c8, 0xbf597fc7, 0xc6e00bf3, 0xd5a79147, 0x06ca6351, 0x14292967,
@@ -55,16 +59,49 @@ public class SHA256Generator {
                       0x19a4c116, 0x1e376c08, 0x2748774c, 0x34b0bcb5, 0x391c0cb3, 0x4ed8aa4a, 0x5b9cca4f, 0x682e6ff3,
                       0x748f82ee, 0x78a5636f, 0x84c87814, 0x8cc70208, 0x90befffa, 0xa4506ceb, 0xbef9a3f7, 0xc67178f2};
 
-    static int[] H0 = { 0x6a09e667, 0xbb67ae85, 0x3c6ef372, 0xa54ff53a, 0x510e527f, 0x9b05688c, 0x1f83d9ab, 0x5be0cd19};
+    static final int[] H0 = { 0x6a09e667, 0xbb67ae85, 0x3c6ef372, 0xa54ff53a, 0x510e527f, 0x9b05688c, 0x1f83d9ab, 0x5be0cd19};
 
+    public static final int getWordlength(int sourceLength) {
+        long length = sourceLength * 8;
+        int k = 448 - (int) ((length + 1) % 512);
+        if (k < 0) {
+            k += 512;
+        }
+        int padbytes = k / 8;
+        int rv = sourceLength / 4 + padbytes / 4 + 3;
+        return rv;
+    }
+    
+    private final SHA256EntryCache.CacheEntry getNewEntry(int payloadSize) {
+        return new SHA256EntryCache.CacheEntry(payloadSize);
+    }
+    
     /** Calculate the SHA-256 has of the source
      * @param source what to hash
      * @return hash of the source
      */
-    public Hash calculateHash(byte[] source) {
-        return calculateHash(source, 0, source.length);
+    public final Hash calculateHash(byte[] source) {
+        byte rv[] = new byte[Hash.HASH_LENGTH];
+        SHA256EntryCache.CacheEntry cache = _cache.acquire(source.length);
+        Hash hash = calculateHash(source, 0, source.length, cache);
+        System.arraycopy(hash.getData(), 0, rv, 0, Hash.HASH_LENGTH);
+        _cache.release(cache);
+        return new Hash(rv);
     }
-    public Hash calculateHash(byte[] source, int start, int len) {
+    public final Hash calculateHash(byte[] source, SHA256EntryCache.CacheEntry cache) {
+        return calculateHash(source, 0, source.length, cache);
+    }
+    public final Hash calculateHash(byte[] source, int start, int len) {
+        byte rv[] = new byte[Hash.HASH_LENGTH];
+        SHA256EntryCache.CacheEntry cache = _cache.acquire(len);
+        Hash hash = calculateHash(source, start, len, cache);
+        System.arraycopy(hash.getData(), 0, rv, 0, Hash.HASH_LENGTH);
+        _cache.release(cache);
+        return new Hash(rv);
+    }
+    public final Hash calculateHash(byte[] source, int start, int len, SHA256EntryCache.CacheEntry cache) {
+        if (cache == null)
+            return calculateHash(source, start, len);
         long length = len * 8;
         int k = 448 - (int) ((length + 1) % 512);
         if (k < 0) {
@@ -72,7 +109,10 @@ public class SHA256Generator {
         }
         int padbytes = k / 8;
         int wordlength = len / 4 + padbytes / 4 + 3;
-        int[] M0 = new int[wordlength];
+        if (wordlength != getWordlength(len))
+            throw new RuntimeException("len = " + len + " wordlength = " + wordlength 
+                                       + " getWordlength = " + getWordlength(len));
+        int[] M0 = cache.M0;
         int wordcount = 0;
         int x = 0;
         for (x = 0; x < (len / 4) * 4; x += 4) {
@@ -104,11 +144,12 @@ public class SHA256Generator {
         }
         M0[wordlength - 2] = (int) (length >>> 32);
         M0[wordlength - 1] = (int) (length);
-        int[] H = new int[8];
+        int[] H = cache.H;
         for (x = 0; x < 8; x++) {
             H[x] = H0[x];
         }
-        int blocks = M0.length / 16;
+        int blocks = wordlength / 16;
+        int[] W = cache.W;
         for (int bl = 0; bl < blocks; bl++) {
             int a = H[0];
             int b = H[1];
@@ -118,7 +159,7 @@ public class SHA256Generator {
             int f = H[5];
             int g = H[6];
             int h = H[7];
-            int[] W = new int[64];
+            Arrays.fill(W, 0);
             for (x = 0; x < 64; x++) {
                 if (x < 16) {
                     W[x] = M0[bl * 16 + x];
@@ -147,51 +188,49 @@ public class SHA256Generator {
             H[6] = add(g, H[6]);
             H[7] = add(h, H[7]);
         }
-        byte[] hashbytes = new byte[32];
+        byte[] hashbytes = cache.hashbytes;
         for (x = 0; x < 8; x++) {
             hashbytes[x * 4] = (byte) (H[x] << 0 >>> 24);
             hashbytes[x * 4 + 1] = (byte) (H[x] << 8 >>> 24);
             hashbytes[x * 4 + 2] = (byte) (H[x] << 16 >>> 24);
             hashbytes[x * 4 + 3] = (byte) (H[x] << 24 >>> 24);
         }
-        Hash hash = new Hash();
-        hash.setData(hashbytes);
-        return hash;
+        return cache.hash;
     }
 
-    private static int Ch(int x, int y, int z) {
+    private static final int Ch(int x, int y, int z) {
         return (x & y) ^ (~x & z);
     }
 
-    private static int Maj(int x, int y, int z) {
+    private static final int Maj(int x, int y, int z) {
         return (x & y) ^ (x & z) ^ (y & z);
     }
 
-    private static int ROTR(int x, int n) {
+    private static final int ROTR(int x, int n) {
         return (x >>> n) | (x << 32 - n);
     }
 
-    private static int e0(int x) {
+    private static final int e0(int x) {
         return ROTR(x, 2) ^ ROTR(x, 13) ^ ROTR(x, 22);
     }
 
-    private static int e1(int x) {
+    private static final int e1(int x) {
         return ROTR(x, 6) ^ ROTR(x, 11) ^ ROTR(x, 25);
     }
 
-    private static int SHR(int x, int n) {
+    private static final int SHR(int x, int n) {
         return x >>> n;
     }
 
-    private static int o0(int x) {
+    private static final int o0(int x) {
         return ROTR(x, 7) ^ ROTR(x, 18) ^ SHR(x, 3);
     }
 
-    private static int o1(int x) {
+    private static final int o1(int x) {
         return ROTR(x, 17) ^ ROTR(x, 19) ^ SHR(x, 10);
     }
 
-    private static int add(int x, int y) {
+    private static final int add(int x, int y) {
         return x + y;
     }
 }

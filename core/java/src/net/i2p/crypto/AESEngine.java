@@ -56,11 +56,14 @@ public class AESEngine {
         int padding = ElGamalAESEngine.getPaddingSize(size, paddedSize);
         
         byte data[] = new byte[size + padding];
-        Hash h = _context.sha().calculateHash(iv);
+        SHA256EntryCache.CacheEntry cache = _context.sha().cache().acquire(iv.length);
+        Hash h = _context.sha().calculateHash(iv, cache);
         
         int cur = 0;
         System.arraycopy(h.getData(), 0, data, cur, Hash.HASH_LENGTH);
         cur += Hash.HASH_LENGTH;
+        _context.sha().cache().release(cache);
+        
         DataHelper.toLong(data, cur, 4, payload.length);
         cur += 4;
         System.arraycopy(payload, 0, data, cur, payload.length);
@@ -83,15 +86,18 @@ public class AESEngine {
         }
 
         int cur = 0;
-        byte h[] = _context.sha().calculateHash(iv).getData();
+        SHA256EntryCache.CacheEntry cache = _context.sha().cache().acquire(iv.length);
+        byte h[] = _context.sha().calculateHash(iv, cache).getData();
         for (int i = 0; i < Hash.HASH_LENGTH; i++) {
             if (decr[i] != h[i]) {
                 _log.error("Hash does not match [key=" + sessionKey + " / iv =" + DataHelper.toString(iv, iv.length)
                            + "]", new Exception("Hash error"));
+                _context.sha().cache().release(cache);
                 return null;
             }
         }
         cur += Hash.HASH_LENGTH;
+        _context.sha().cache().release(cache);
         
         long len = DataHelper.fromLong(decr, cur, 4);
         cur += 4;

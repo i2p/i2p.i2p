@@ -12,6 +12,7 @@ package net.i2p.data.i2cp;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 
 import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
@@ -75,6 +76,15 @@ public class MessagePayloadMessage extends I2CPMessageImpl {
     }
 
     protected byte[] doWriteMessage() throws I2CPMessageException, IOException {
+        throw new RuntimeException("go away, we dont want any");
+    }
+    
+    /**
+     * Write out the full message to the stream, including the 4 byte size and 1 
+     * byte type header.
+     *
+     */
+    public void writeMessage(OutputStream out) throws I2CPMessageException, IOException {
         if (_sessionId == null)
             throw new I2CPMessageException("Unable to write out the message, as the session ID has not been defined");
         if (_messageId == null)
@@ -82,15 +92,17 @@ public class MessagePayloadMessage extends I2CPMessageImpl {
         if (_payload == null)
             throw new I2CPMessageException("Unable to write out the message, as the payload has not been defined");
 
-        ByteArrayOutputStream os = new ByteArrayOutputStream(512);
+        int size = 2 + 4 + 4 + _payload.getSize();
         try {
-            _sessionId.writeBytes(os);
-            _messageId.writeBytes(os);
-            _payload.writeBytes(os);
+            DataHelper.writeLong(out, 4, size);
+            DataHelper.writeLong(out, 1, getType());
+            DataHelper.writeLong(out, 2, _sessionId.getSessionId());
+            DataHelper.writeLong(out, 4, _messageId.getMessageId());
+            DataHelper.writeLong(out, 4, _payload.getSize());
+            out.write(_payload.getEncryptedData());
         } catch (DataFormatException dfe) {
-            throw new I2CPMessageException("Error writing out the message data", dfe);
+            throw new I2CPMessageException("Unable to write the message length or type", dfe);
         }
-        return os.toByteArray();
     }
 
     public int getType() {

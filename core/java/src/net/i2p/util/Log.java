@@ -25,6 +25,7 @@ import net.i2p.data.DataHelper;
  */
 public class Log {
     private Class _class;
+    private String _className;
     private String _name;
     private int _minPriority;
     private LogScope _scope;
@@ -90,6 +91,7 @@ public class Log {
     Log(LogManager manager, Class cls, String name) {
         _manager = manager;
         _class = cls;
+        _className = cls != null ? cls.getName() : null;
         _name = name;
         _minPriority = DEBUG;
         _scope = new LogScope(name, cls);
@@ -161,33 +163,37 @@ public class Log {
     }
 
     public String getName() {
-        if (_class != null) return _class.getName();
+        if (_className != null) return _className;
     
         return _name;
     }
     
     public Object getScope() { return _scope; }
+    static String getScope(String name, Class cls) { 
+        if ( (name == null) && (cls == null) ) return "f00";
+        if (cls == null) return name;
+        if (name == null) return cls.getName();
+        return name + "" + cls.getName();
+    }
     private static final class LogScope {
         private String _scopeName;
         private Class _scopeClass;
+        private String _scopeCache;
         public LogScope(String name, Class cls) {
             _scopeName = name;
             _scopeClass = cls;
+            _scopeCache = getScope(name, cls);
         }
         public int hashCode() {
-            if (_scopeClass != null) 
-                return _scopeClass.hashCode();
-            else if (_scopeName != null)
-                return _scopeName.hashCode();
-            else
-                return 42;
+            return _scopeCache.hashCode();
         }
         public boolean equals(Object obj) {
             if (obj == null) throw new NullPointerException("Null object scope?");
             if (obj instanceof LogScope) {
                 LogScope s = (LogScope)obj;
-                return DataHelper.eq(s._scopeName, _scopeName) &&
-                       DataHelper.eq(s._scopeClass, _scopeClass);
+                return s._scopeCache.equals(_scopeCache);
+            } else if (obj instanceof String) {
+                return obj.equals(_scopeCache);
             }
             
             return false;

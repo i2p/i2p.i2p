@@ -35,7 +35,8 @@ public interface I2NPMessage extends DataStructure {
      * @throws IOException if there is a problem reading from the stream
      */
     public int readBytes(InputStream in, int type, byte buffer[]) throws I2NPMessageException, IOException;
-    
+    public int readBytes(byte data[], int type, int offset) throws I2NPMessageException, IOException;
+
     /**
      * Read the body into the data structures, after the initial type byte and
      * the uniqueId / expiration, using the current class's format as defined by

@@ -71,6 +71,11 @@ public class TunnelId extends DataStructureImpl {
         if (_tunnelId < 0) throw new DataFormatException("Invalid tunnel ID: " + _tunnelId);
         DataHelper.writeLong(out, 4, _tunnelId);
     }
+    public int writeBytes(byte target[], int offset) throws DataFormatException {
+        if (_tunnelId < 0) throw new DataFormatException("Invalid tunnel ID: " + _tunnelId);
+        DataHelper.toLong(target, offset, 4, _tunnelId);
+        return 4;
+    }
     
     public boolean equals(Object obj) {
         if ( (obj == null) || !(obj instanceof TunnelId))

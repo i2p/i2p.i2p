@@ -34,7 +34,7 @@ public class MessageValidator {
     public MessageValidator(RouterContext context) {
         _log = context.logManager().getLog(MessageValidator.class);
         _receivedIdExpirations = new TreeMap();
-        _receivedIds = new HashSet(32*1024);
+        _receivedIds = new HashSet(256);
         _receivedIdLock = new Object();
         _context = context;
     }
@@ -108,12 +108,16 @@ public class MessageValidator {
      *
      */
     private void locked_cleanReceivedIds(long now) {
-        Set toRemoveIds = new HashSet(4);
-        Set toRemoveDates = new HashSet(4);
+        Set toRemoveIds = null;
+        Set toRemoveDates = null; 
         for (Iterator iter = _receivedIdExpirations.keySet().iterator(); iter.hasNext(); ) {
             Long date = (Long)iter.next();
             if (date.longValue() <= now) {
                 // no need to keep track of things in the past
+                if (toRemoveIds == null) {
+                    toRemoveIds = new HashSet(2);
+                    toRemoveDates = new HashSet(2);
+                }
                 toRemoveDates.add(date);
                 toRemoveIds.add(_receivedIdExpirations.get(date));
             } else {
@@ -122,12 +126,16 @@ public class MessageValidator {
                 break;
             }
         }
-        for (Iterator iter = toRemoveDates.iterator(); iter.hasNext(); )
-            _receivedIdExpirations.remove(iter.next());
-        for (Iterator iter = toRemoveIds.iterator(); iter.hasNext(); )
-            _receivedIds.remove(iter.next());
-        if (_log.shouldLog(Log.INFO))
-            _log.info("Cleaned out " + toRemoveDates.size() + " expired messageIds, leaving " + _receivedIds.size() + " remaining");
+        if (toRemoveIds != null) {
+            for (Iterator iter = toRemoveDates.iterator(); iter.hasNext(); )
+                _receivedIdExpirations.remove(iter.next());
+            for (Iterator iter = toRemoveIds.iterator(); iter.hasNext(); )
+                _receivedIds.remove(iter.next());
+            if (_log.shouldLog(Log.INFO))
+                _log.info("Cleaned out " + toRemoveDates.size() 
+                          + " expired messageIds, leaving " 
+                          + _receivedIds.size() + " remaining");
+        }
     }
     
     void shutdown() {

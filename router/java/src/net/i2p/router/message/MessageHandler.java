@@ -10,6 +10,8 @@ package net.i2p.router.message;
 
 import java.io.ByteArrayOutputStream;
 
+import java.util.List;
+
 import net.i2p.data.Hash;
 import net.i2p.data.Payload;
 import net.i2p.data.RouterIdentity;
@@ -22,6 +24,7 @@ import net.i2p.router.ClientMessage;
 import net.i2p.router.InNetMessage;
 import net.i2p.router.MessageReceptionInfo;
 import net.i2p.router.RouterContext;
+import net.i2p.router.TunnelSelectionCriteria;
 import net.i2p.util.Log;
 
 /**
@@ -40,7 +43,7 @@ class MessageHandler {
 
     public void handleMessage(DeliveryInstructions instructions, I2NPMessage message, 
                               long replyId, RouterIdentity from, Hash fromHash, 
-                              long expiration, int priority) {
+                              long expiration, int priority, boolean sendDirect) {
         switch (instructions.getDeliveryMode()) {
             case DeliveryInstructions.DELIVERY_MODE_LOCAL:
                 _log.debug("Instructions for LOCAL DELIVERY");
@@ -75,7 +78,7 @@ class MessageHandler {
                     _log.debug("Instructions for TUNNEL DELIVERY to" 
                                + instructions.getTunnelId().getTunnelId() + " on " 
                                + instructions.getRouter().toBase64());
-                handleTunnel(instructions, expiration, message, priority);
+                handleTunnel(instructions, expiration, message, priority, sendDirect);
                 break;
             default:
                 _log.error("Message has instructions that are not yet implemented: mode = " + instructions.getDeliveryMode());
@@ -111,7 +114,7 @@ class MessageHandler {
         _context.jobQueue().addJob(j);
     }
     
-    private void handleTunnel(DeliveryInstructions instructions, long expiration, I2NPMessage message, int priority) {
+    private void handleTunnel(DeliveryInstructions instructions, long expiration, I2NPMessage message, int priority, boolean direct) {
         Hash to = instructions.getRouter();
         long timeoutMs = expiration - _context.clock().now();
         TunnelId tunnelId = instructions.getTunnelId();
@@ -131,20 +134,44 @@ class MessageHandler {
             }
         }
 
-        if (_log.shouldLog(Log.INFO))
-            _log.info("Handle " + message.getClass().getName() + " to send to remote tunnel " 
-                      + tunnelId.getTunnelId() + " on router " + to.toBase64());
-        TunnelMessage msg = new TunnelMessage(_context);
-        msg.setData(message.toByteArray());
-        msg.setTunnelId(tunnelId);
-        if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Placing message of type " + message.getClass().getName() 
-                       + " into the new tunnel message bound for " + tunnelId.getTunnelId() 
-                       + " on " + to.toBase64());
-        _context.jobQueue().addJob(new SendMessageDirectJob(_context, msg, to, (int)timeoutMs, priority));
-
-        String bodyType = message.getClass().getName();
-        _context.messageHistory().wrap(bodyType, message.getUniqueId(), TunnelMessage.class.getName(), msg.getUniqueId());	
+        if (direct) {
+            if (_log.shouldLog(Log.INFO))
+                _log.info("Handle " + message.getClass().getName() + " to send to remote tunnel " 
+                          + tunnelId.getTunnelId() + " on router " + to.toBase64());
+            TunnelMessage msg = new TunnelMessage(_context);
+            msg.setData(message.toByteArray());
+            msg.setTunnelId(tunnelId);
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Placing message of type " + message.getClass().getName() 
+                           + " into the new tunnel message bound for " + tunnelId.getTunnelId() 
+                           + " on " + to.toBase64());
+            _context.jobQueue().addJob(new SendMessageDirectJob(_context, msg, to, (int)timeoutMs, priority));
+        
+            String bodyType = message.getClass().getName();
+            _context.messageHistory().wrap(bodyType, message.getUniqueId(), TunnelMessage.class.getName(), msg.getUniqueId());	
+        } else {
+            // we received a message with instructions to send it somewhere, but we shouldn't
+            // expose where we are in the process of honoring it.  so, send it out a tunnel
+            TunnelId outTunnelId = selectOutboundTunnelId();
+            if (outTunnelId == null) {
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("No outbound tunnels available to forward the message, dropping it");
+                return;
+            }
+            _context.jobQueue().addJob(new SendTunnelMessageJob(_context, message, outTunnelId, to, tunnelId, 
+                                                                null, null, null, null, timeoutMs, priority));
+        }
+    }
+    
+    private TunnelId selectOutboundTunnelId() {
+        TunnelSelectionCriteria criteria = new TunnelSelectionCriteria();
+        criteria.setMinimumTunnelsRequired(1);
+        criteria.setMaximumTunnelsRequired(1);
+        List ids = _context.tunnelManager().selectOutboundTunnelIds(criteria);
+        if ( (ids == null) || (ids.size() <= 0) )
+            return null;
+        else
+            return (TunnelId)ids.get(0);
     }
     
     private void handleLocalDestination(DeliveryInstructions instructions, I2NPMessage message, Hash fromHash) {

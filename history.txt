@@ -1,4 +1,16 @@
-$Id: history.txt,v 1.58 2004/10/29 21:40:52 jrandom Exp $
+$Id: history.txt,v 1.59 2004/10/30 18:44:01 jrandom Exp $
+
+2004-11-01  jrandom
+    * Increase the tunnel test timeout rapidly if our tunnels are failing.
+    * Honor message expirations for some tunnel jobs that were prematurely
+      expired.
+    * Streamline memory usage with temporary object caches and more efficient
+      serialization for SHA256 calculation, logging, and both I2CP and I2NP
+      message handling.
+    * Fix some situations where we forward messages too eagerly.  For a 
+      request at the tunnel endpoint, if the tunnel is inbound and the target 
+      is remote, honor the message by tunnel routing the data rather than
+      sending it directly to the requested location.
 
 2004-10-30  jrandom
     * Cache the temporary objects used in the AES encryption/decryption

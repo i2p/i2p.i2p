@@ -30,6 +30,7 @@ package net.i2p.crypto;
  */
 
 import java.math.BigInteger;
+import java.util.Arrays;
 
 import net.i2p.I2PAppContext;
 import net.i2p.data.Hash;
@@ -201,6 +202,8 @@ public class DSAEngine {
             H[x] = H0[x];
         }
         int blocks = M0.length / 16;
+        
+        int[] W = new int[80];
         for (int bl = 0; bl < blocks; bl++) {
             int a = H[0];
             int b = H[1];
@@ -208,8 +211,8 @@ public class DSAEngine {
             int d = H[3];
             int e = H[4];
 
-            int[] W = new int[80];
-
+            Arrays.fill(W, 0);
+            
             for (x = 0; x < 80; x++) {
                 if (x < 16) {
                     W[x] = M0[bl * 16 + x];

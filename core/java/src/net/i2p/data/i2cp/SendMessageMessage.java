@@ -75,6 +75,19 @@ public class SendMessageMessage extends I2CPMessageImpl {
     }
 
     protected void doReadMessage(InputStream in, int size) throws I2CPMessageException, IOException {
+        if (true) throw new IllegalStateException("wtf, do not run me");
+    }
+
+    /**
+     * Read the body into the data structures
+     *
+     */
+    public void readMessage(InputStream in, int length, int type) throws I2CPMessageException, IOException {
+        if (type != getType())
+            throw new I2CPMessageException("Invalid message type (found: " + type + " supported: " + getType()
+                                           + " class: " + getClass().getName() + ")");
+        if (length < 0) throw new IOException("Negative payload size");
+
         try {
             _sessionId = new SessionId();
             _sessionId.readBytes(in);

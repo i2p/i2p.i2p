@@ -141,14 +141,11 @@ public class LogManager {
     public Log getLog(Class cls, String name) {
         Log rv = null;
         synchronized (_logs) {
-            Log newLog = new Log(this, cls, name);
-            if (_logs.containsKey(newLog.getScope())) {
-                Log oldLog = (Log)_logs.get(newLog.getScope());
-                rv = oldLog;
-                //_log.error("Duplicate log creation for " + cls);
-            } else {
-                _logs.put(newLog.getScope(), newLog);
-                rv = newLog;
+            String scope = Log.getScope(name, cls);
+            rv = (Log)_logs.get(scope);
+            if (rv == null) {
+                rv = new Log(this, cls, name);
+                _logs.put(scope, rv);
             }
         }
         updateLimit(rv);
@@ -483,14 +480,16 @@ public class LogManager {
         List limits = getLimits(log);
         LogLimit max = null;
         LogLimit notMax = null;
-        for (int i = 0; i < limits.size(); i++) {
-            LogLimit cur = (LogLimit) limits.get(i);
-            if (max == null)
-                max = cur;
-            else {
-                if (cur.getRootName().length() > max.getRootName().length()) {
-                    notMax = max;
+        if (limits != null) {
+            for (int i = 0; i < limits.size(); i++) {
+                LogLimit cur = (LogLimit) limits.get(i);
+                if (max == null)
                     max = cur;
+                else {
+                    if (cur.getRootName().length() > max.getRootName().length()) {
+                        notMax = max;
+                        max = cur;
+                    }
                 }
             }
         }
@@ -504,11 +503,15 @@ public class LogManager {
     }
 
     private List getLimits(Log log) {
-        ArrayList limits = new ArrayList(4);
+        ArrayList limits = null; // new ArrayList(4);
         synchronized (_limits) {
             for (int i = 0; i < _limits.size(); i++) {
                 LogLimit limit = (LogLimit)_limits.get(i);
-                if (limit.matches(log)) limits.add(limit);
+                if (limit.matches(log)) { 
+                    if (limits == null)
+                        limits = new ArrayList(4);
+                    limits.add(limit);
+                }
             }
         }
         return limits;

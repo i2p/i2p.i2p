@@ -126,6 +126,61 @@ public class DeliveryInstructions extends DataStructureImpl {
         }
     }
     
+    public int readBytes(byte data[], int offset) throws DataFormatException {
+        int cur = offset;
+        long flags = DataHelper.fromLong(data, cur, 1);
+        cur++;
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("Read flags: " + flags + " mode: " +  flagMode(flags));
+        
+        if (flagEncrypted(flags)) {
+            byte kd[] = new byte[SessionKey.KEYSIZE_BYTES];
+            System.arraycopy(data, cur, kd, 0, SessionKey.KEYSIZE_BYTES);
+            cur += SessionKey.KEYSIZE_BYTES;
+            setEncryptionKey(new SessionKey(kd));
+            setEncrypted(true);
+        } else {
+            setEncrypted(false);
+        }
+        
+        setDeliveryMode(flagMode(flags));
+        switch (flagMode(flags)) {
+            case FLAG_MODE_LOCAL:
+                break;
+            case FLAG_MODE_DESTINATION:
+                byte destHash[] = new byte[Hash.HASH_LENGTH];
+                System.arraycopy(data, cur, destHash, 0, Hash.HASH_LENGTH);
+                cur += Hash.HASH_LENGTH;
+                setDestination(new Hash(destHash));
+                break;
+            case FLAG_MODE_ROUTER:
+                byte routerHash[] = new byte[Hash.HASH_LENGTH];
+                System.arraycopy(data, cur, routerHash, 0, Hash.HASH_LENGTH);
+                cur += Hash.HASH_LENGTH;
+                setRouter(new Hash(routerHash));
+                break;
+            case FLAG_MODE_TUNNEL:
+                byte tunnelRouterHash[] = new byte[Hash.HASH_LENGTH];
+                System.arraycopy(data, cur, tunnelRouterHash, 0, Hash.HASH_LENGTH);
+                cur += Hash.HASH_LENGTH;
+                setRouter(new Hash(tunnelRouterHash));
+                setTunnelId(new TunnelId(DataHelper.fromLong(data, cur, 4)));
+                cur += 4;
+                break;
+        }
+        
+        if (flagDelay(flags)) {
+            long delay = DataHelper.fromLong(data, cur, 4);
+            cur += 4;
+            setDelayRequested(true);
+            setDelaySeconds(delay);
+        } else {
+            setDelayRequested(false);
+        }
+        return cur - offset;
+    }
+    
+    
     private boolean flagEncrypted(long flags) {
         return (0 != (flags & FLAG_ENCRYPTED));
     }

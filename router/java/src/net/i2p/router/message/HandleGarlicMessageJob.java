@@ -166,9 +166,11 @@ public class HandleGarlicMessageJob extends JobImpl {
             return;
         } 
         long sendExpiration = clove.getExpiration().getTime();
+        // if the clove targets something remote, tunnel route it
+        boolean sendDirect = false; 
         _handler.handleMessage(clove.getInstructions(), clove.getData(), 
                                clove.getCloveId(), _from, _fromHash, 
-                               sendExpiration, FORWARD_PRIORITY);
+                               sendExpiration, FORWARD_PRIORITY, sendDirect);
     }
     
     public void dropped() {
