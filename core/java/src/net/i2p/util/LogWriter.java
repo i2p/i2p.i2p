@@ -47,6 +47,7 @@ class LogWriter implements Runnable {
         rotateFile();
         while (_write) {
             flushRecords();
+            rereadConfig();
         }
     }
 
@@ -70,6 +71,9 @@ class LogWriter implements Runnable {
         } finally {
             try { Thread.sleep(100); } catch (InterruptedException ie) {}
         }
+    }
+    
+    private void rereadConfig() {
         long now = Clock.getInstance().now();
         if (now - _lastReadConfig > CONFIG_READ_ITERVAL) {
             _manager.rereadConfig();
@@ -94,7 +98,9 @@ class LogWriter implements Runnable {
         if (val == null) return;
         if (_currentOut == null) rotateFile();
 
-        byte b[] = val.getBytes();
+        byte b[] = new byte[val.length()];
+        for (int i = 0; i < b.length; i++)
+            b[i] = (byte)(val.charAt(i) & 0xFF);
         try {
             _currentOut.write(b);
             _numBytesInCurrentFile += b.length;
