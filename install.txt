@@ -1,0 +1,26 @@
+$Id$
+I2P source installation instructions
+
+To build and install I2P from source, you must first build
+and package up the appropriate installer by running:
+
+  ant dist
+
+This will produce a few key files:
+* i2p.tar.bz2:   the headless installation
+* install.jar:   the GUI installer
+* i2pupdate.zip: the update package
+
+From there, you can follow the headless installation instructions
+with the headless installer, run the GUI installer, or deploy
+the update into an existing installation.
+
+You will need to have ant installed from http://ant.apache.org/
+(1.5 or newer)
+
+Supported JVMs:
+  Windows: Latest available from http://java.sun.com/ (1.3+ supported)
+  Linux:   Latest available from http://java.sun.com/ (1.3+ supported)
+  FreeBSD: /usr/ports/java/linux-sun-jdk1.4
+  various: http://www.kaffe.org/ using CVS HEAD as of Sept 1, 2004
+           (or any subsequent releases) 
