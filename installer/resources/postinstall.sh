@@ -56,6 +56,8 @@ esac
 cp $wrapperpath/wrapper.jar ./lib/
 cp $wrapperpath/i2psvc .
 chmod 744 ./i2psvc
+chmod 744 ./scripts/i2pbench.sh
+chmod 744 ./scripts/i2ptest.sh
 rm -rf ./icons
 rm -rf ./lib/wrapper
 rm -f ./lib/*.dll

@@ -108,32 +108,39 @@ class KBucketImpl implements KBucket {
             return false;
         
         for (int i = 0; i < distance.length; i++) {
-            if ( (i < upperLimitByte) && (distance[i] != 0x00) ) {
-                // outright too large
-                return true;
-            } else {
-                int upperVal = 1 << (upperLimitBit % 8);
-                if (distance[i] > upperVal) {
-                    // still too large, but close
+            if (i < upperLimitByte) {
+                if (distance[i] != 0x00) {
+                    // outright too large
                     return true;
-                } else if (distance[i] == upperVal) {
-                    // ok, it *may* equal the upper limit, 
-                    // if the rest of the bytes are 0
-                    for (int j = i+1; j < distance.length; i++) {
-                        if (distance[j] != 0x00) {
-                            // nope
-                            return true;
-                        }
-                    }
-                    // w00t, the rest is made of 0x00 bytes, so it
-                    // exactly matches the upper limit.  kooky, very improbable,
-                    // but possible
+                }
+            } else if (i == upperLimitByte) {
+                if (distance[i] == 0x00) {
+                    // no bits set through the high bit
                     return false;
                 } else {
-                    // no bits set before or at the upper limit, so its
-                    // definitely not too large
-                    return false;
+                    int upperVal = 1 << (upperLimitBit % 8);
+                    if (distance[i] > upperVal) {
+                        // still too large, but close
+                        return true;
+                    } else if (distance[i] == upperVal) {
+                        // ok, it *may* equal the upper limit,
+                        // if the rest of the bytes are 0
+                        for (int j = i+1; j < distance.length; j++) {
+                            if (distance[j] != 0x00) {
+                                // nope
+                                return true;
+                            }
+                        }
+                        // w00t, the rest is made of 0x00 bytes, so it
+                        // exactly matches the upper limit.  kooky, very improbable,
+                        // but possible
+                        return false;
+                    }
                 }
+            } else if (i > upperLimitByte) {
+                // no bits set before or at the upper limit, so its
+                // definitely not too large
+                return false;
             }
         }
         _log.log(Log.CRIT, "wtf, gravity broke: distance=" + DataHelper.toHexString(distance) 

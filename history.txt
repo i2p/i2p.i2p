@@ -1,4 +1,13 @@
-$Id: history.txt,v 1.134 2005/01/26 01:29:19 smeghead Exp $
+$Id: history.txt,v 1.135 2005/01/26 19:21:10 smeghead Exp $
+
+2005-01-26  smeghead
+    * i2pProxy.pac, i2pbench.sh, and i2ptest.sh are now shipped with the dist
+      packages and installed to $i2pinstalldir/scripts.
+    * Added command line params to i2ptest.sh and i2pbench.sh: --gij to run them
+      using gij + libgcj, and --sourcedir to run them from the source tree
+      instead of the installation directory.
+    * Fixed unreachable for() statement clause in the KBucketImpl class that was
+      causing gcj to toss a compilation warning (jrandom++).
 
 2005-01-26  smeghead
     * Added a couple of scripts, i2ptest.sh and i2pbench.sh, to manage the core

@@ -1,5 +1,24 @@
 #!/usr/bin/perl
+# Use the "--gij" parameter to run the tests against libgcj.
+# Use the "--sourcedir" parameter if running this from the source tree.
 # Yeah yeah, a lot of repetitive code here, but it works for now.
+
+#i2p/apps/proxyscript/i2pProxy.pac
+
+$runtime = "java";
+$classpath = "../lib/i2p.jar:../lib/jbigi.jar";
+
+foreach $argv (@ARGV) {
+	if ($argv eq "--gij") {
+		$runtime = "gij";
+		print "\n*** Using gij + libgcj ***\n\n";
+	}
+	if ($argv eq "--sourcedir") {
+		$classpath = "../../build/i2p.jar:../../build/jbigi.jar";
+	}
+}
+
+$javacommand = "$runtime -cp $classpath -Dlogger.shutdownDelay=0";
 
 $failed = 0;
 $passed = 0;
@@ -21,7 +40,7 @@ print "\nTest Suite #1: i2p/core/java/test/net/i2p/data/*Test\n\n";
 
 foreach $testclass (@testclasses) {
 	print "[TEST] $testclass: ";
-	if(! system("java -cp lib/i2p.jar:lib/jbigi.jar net.i2p.data.TestData test $testclass $testclass.dat > /dev/null 2>test.tmp")) {
+	if(! system("$javacommand net.i2p.data.TestData test $testclass $testclass.dat > /dev/null 2>test.tmp")) {
 		print "OK\n";
 		$passed++;
 	} else {
@@ -51,7 +70,7 @@ print "\nTest Suite #2: i2p/core/java/test/net/i2p/crypto/*\n\n";
 foreach $testclass (@testclasses) {
 	if ($testclass eq "SessionEncryptionTest") {
 		print "[TEST] $testclass: ";
-		if(! system("java -cp lib/i2p.jar:lib/jbigi.jar net.i2p.crypto.SessionEncryptionTest > /dev/null 2>test.tmp")) {
+		if(! system("$javacommand net.i2p.crypto.SessionEncryptionTest > /dev/null 2>test.tmp")) {
 			print "OK\n";
 			$passed++;
 		} else {
@@ -65,7 +84,7 @@ foreach $testclass (@testclasses) {
 		}
 	} else {
 		print "[TEST] $testclass:\n\n";
-		if(! system("java -cp lib/i2p.jar:lib/jbigi.jar net.i2p.crypto.$testclass")) {
+		if(! system("$javacommand net.i2p.crypto.$testclass")) {
 			$passed++;
 		} else {
 			$failed++;
@@ -90,7 +109,7 @@ print "\nTest Suite #3: Miscellaneous\n\n";
 foreach $testclass (@testclasses) {
 	if ($testclass eq "net.i2p.data.UnsignedInteger") {
 		print "[TEST] $testclass:\n\n";
-		if(! system("java -cp lib/i2p.jar:lib/jbigi.jar net.i2p.data.UnsignedInteger")) {
+		if(! system("$javacommand net.i2p.data.UnsignedInteger")) {
 			$passed++;
 		} else {
 			$failed++;
@@ -98,7 +117,7 @@ foreach $testclass (@testclasses) {
 		print "\n";
 	} else {
 		print "[TEST] $testclass: ";
-		if(! system("java -cp lib/i2p.jar:lib/jbigi.jar $testclass > /dev/null 2>test.tmp")) {
+		if(! system("$javacommand $testclass > /dev/null 2>test.tmp")) {
 			print "OK\n";
 			$passed++;
 		} else {
