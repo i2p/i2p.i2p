@@ -1,4 +1,12 @@
-$Id: history.txt,v 1.129 2005/01/17 03:15:00 jrandom Exp $
+$Id: history.txt,v 1.130 2005/01/18 19:08:13 jrandom Exp $
+
+2005-01-21  Jhor
+    * Updated jbigi build scripts for OSX.
+
+2005-01-21  jrandom
+    * Added support for OSX to the NativeBigInteger code so that it will look
+      in the classpath for libjbigi-osx-none.jnilib.  At the moment, that file
+      is not bundled with the shipped jbigi.jar yet though.
 
 2005-01-18  jrandom
     * Increased the max # session tags maintained and decreased slightly the

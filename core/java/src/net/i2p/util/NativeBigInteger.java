@@ -103,14 +103,22 @@ public class NativeBigInteger extends BigInteger {
     private final static String JBIGI_OPTIMIZATION_PENTIUM3   = "pentium3";
     private final static String JBIGI_OPTIMIZATION_PENTIUM4   = "pentium4";
 
+    private static final boolean _isWin = System.getProperty("os.name").startsWith("Win");
+    private static final boolean _isMac = System.getProperty("os.name").startsWith("Mac");
+    private static final boolean _isLinux = System.getProperty("os.name").toLowerCase().indexOf("linux") != -1;
+    private static final boolean _isFreebsd = System.getProperty("os.name").toLowerCase().indexOf("freebsd") != -1;
+    private static final boolean _isNix = !(_isWin || _isMac);
     /* libjbigi.so vs jbigi.dll */
-    private static final String _libPrefix = (System.getProperty("os.name").startsWith("Win") ? "" : "lib");
-    private static final String _libSuffix = (System.getProperty("os.name").startsWith("Win") ? ".dll" : ".so");
+    private static final String _libPrefix = (_isWin ? "" : "lib");
+    private static final String _libSuffix = (_isWin ? ".dll" : _isMac ? ".jnilib" : ".so");
 
     private final static String sCPUType; //The CPU Type to optimize for (one of the above strings)
     
     static {
-        sCPUType = resolveCPUType();
+        if (_isMac) // replace with osx/mac friendly jni cpu type detection when we have one
+            sCPUType = null;
+        else
+            sCPUType = resolveCPUType();
         loadNative();
     }
     
@@ -518,12 +526,12 @@ public class NativeBigInteger extends BigInteger {
     }
     
     private static final String getResourceName(boolean optimized) {
-        String pref = getLibraryPrefix();
+        String pref = _libPrefix;
         String middle = getMiddleName(optimized);
-        String suff = getLibrarySuffix();
+        String suff = _libSuffix;
         if(pref == null || middle == null || suff == null)
             return null;
-        return pref+middle+"."+suff;
+        return pref+middle+suff;
     }
     
     private static final String getMiddleName(boolean optimized){
@@ -538,31 +546,14 @@ public class NativeBigInteger extends BigInteger {
         }else
                sAppend = "-none";
 
-        boolean isWindows =(System.getProperty("os.name").toLowerCase().indexOf("windows") != -1);
-        boolean isLinux =(System.getProperty("os.name").toLowerCase().indexOf("linux") != -1);
-        boolean isFreebsd =(System.getProperty("os.name").toLowerCase().indexOf("freebsd") != -1);
-        if(isWindows)
+        if(_isWin)
              return "jbigi-windows"+sAppend; // The convention on Windows
-        if(isLinux)
+        if(_isLinux)
             return "jbigi-linux"+sAppend; // The convention on linux...
-        if(isFreebsd)
+        if(_isFreebsd)
             return "jbigi-freebsd"+sAppend; // The convention on freebsd...
+        if(_isMac)
+            return "jbigi-osx"+sAppend;
         throw new RuntimeException("Dont know jbigi library name for os type '"+System.getProperty("os.name")+"'");
-    }
-    private static final String getLibrarySuffix()
-    {
-        boolean isWindows =System.getProperty("os.name").toLowerCase().indexOf("windows") != -1;
-        if(isWindows)
-            return "dll";
-        else
-            return "so";
-    }
-    private static final String getLibraryPrefix()
-    {
-        boolean isWindows =System.getProperty("os.name").toLowerCase().indexOf("windows") != -1;
-        if(isWindows)
-            return "";
-        else
-            return "lib";
     }
 }

@@ -8,7 +8,13 @@ echo "Building..."
 mkdir -p lib/
 mkdir -p bin/local
 cd bin/local
-../../gmp-4.1.4/configure
+case `uname -sr` in
+Darwin*)
+# --with-pic is required for static linking
+../../gmp-4.1.4/configure --with-pic;;
+*)
+../../gmp-4.1.4/configure;;
+esac
 make
 sh ../../build_jbigi.sh static
 cp *jbigi???* ../../lib/
