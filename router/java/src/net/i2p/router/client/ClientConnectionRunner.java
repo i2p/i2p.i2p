@@ -148,6 +148,8 @@ public class ClientConnectionRunner {
     void removePayload(MessageId id) { synchronized (_messages) { _messages.remove(id); } }
     
     void sessionEstablished(SessionConfig config) {
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("SessionEstablished called for destination " + config.getDestination().calculateHash().toBase64());
         _config = config;
         _manager.destinationEstablished(this);
     }
@@ -286,12 +288,24 @@ public class ClientConnectionRunner {
      */
     void doSend(I2CPMessage msg) throws I2CPMessageException, IOException {
         if (_out == null) throw new I2CPMessageException("Output stream is not initialized");
+        if (msg == null) throw new I2CPMessageException("Null message?!");
+        if (_log.shouldLog(Log.DEBUG)) {
+            if ( (_config == null) || (_config.getDestination() == null) ) 
+                _log.debug("before doSend of a "+ msg.getClass().getName() 
+                           + " message on for establishing i2cp con");
+            else
+                _log.debug("before doSend of a "+ msg.getClass().getName() 
+                           + " message on for " 
+                           + _config.getDestination().calculateHash().toBase64());
+        }
         long before = _context.clock().now();
         try {
             synchronized (_out) {
                 msg.writeMessage(_out);
                 _out.flush();
             }
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("after doSend of a "+ msg.getClass().getName() + " message");
         } catch (I2CPMessageException ime) {
             _log.error("Message exception sending I2CP message", ime);
             throw ime;
