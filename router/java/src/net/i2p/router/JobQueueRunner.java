@@ -98,6 +98,11 @@ class JobQueueRunner implements Runnable {
 
                 _state = 14;
                 
+                
+                if ( (duration > 1000) && (_log.shouldLog(Log.WARN)) )
+                    _log.warn("Duration of " + duration + " (lag "+ (doStart-origStartAfter) 
+                              + ") on job " + _currentJob);
+                
                 if (diff > 100) {
                     if (_log.shouldLog(Log.WARN))
                         _log.warn("Updating statistics for the job took too long [" + diff + "ms]");

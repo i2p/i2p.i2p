@@ -1,4 +1,7 @@
-$Id: history.txt,v 1.70 2004/11/13 04:43:35 jrandom Exp $
+$Id: history.txt,v 1.71 2004/11/15 09:35:18 jrandom Exp $
+
+2004-11-16  jrandom
+    * Minor logging update
 
 2004-11-14  jrandom
     * Fix a long standing leak in I2PTunnel (hanging on to i2psocket objects)

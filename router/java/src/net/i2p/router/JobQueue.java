@@ -436,8 +436,8 @@ public class JobQueue {
                                 _readyJobs.add(toAdd.get(i));
                             _jobLock.notifyAll();
                         } else {
-                            if (timeToWait < 100)
-                                timeToWait = 100;
+                            if (timeToWait < 10)
+                                timeToWait = 10;
                             if (timeToWait > 10*1000)
                                 timeToWait = 10*1000;
                             if (_log.shouldLog(Log.DEBUG))
