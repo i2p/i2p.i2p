@@ -100,11 +100,12 @@ public class ReseedHandler {
         URL url = new URL(seedURL + (seedURL.endsWith("/") ? "" : "/") + "routerInfo-" + peer + ".dat");
 
         byte data[] = readURL(url);
+        System.out.println("read: " + (data != null ? data.length : -1));
         writeSeed(peer, data);
     }
     
     private static byte[] readURL(URL url) throws Exception {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream(1024);
+        ByteArrayOutputStream baos = new ByteArrayOutputStream(4*1024);
         String hostname = url.getHost();
         int port = url.getPort();
         if (port < 0)
@@ -113,9 +114,28 @@ public class ReseedHandler {
         OutputStream out = s.getOutputStream();
         InputStream in = s.getInputStream();
         String request = getRequest(url);
-        System.out.println("Sending to " + hostname +":"+ port + ": " + request);
+        //System.out.println("Sending to " + hostname +":"+ port + ": " + request);
         out.write(request.getBytes());
         out.flush();
+        // skip the HTTP response headers
+        // (if we were smart, we'd check for HTTP 200, content-length, etc)
+        int consecutiveNL = 0;
+        while (true) {
+            int cur = in.read();
+            switch (cur) {
+                case -1: 
+                    return null;
+                case '\n':
+                case '\r':
+                    consecutiveNL++;
+                    break;
+                default:
+                    consecutiveNL = 0;
+            }
+            if (consecutiveNL == 4)
+                break;
+        }
+        // ok, past the headers, grab the goods
         byte buf[] = new byte[1024];
         while (true) {
             int read = in.read(buf);
@@ -155,6 +175,6 @@ public class ReseedHandler {
     
     public static void main(String args[]) {
         reseed();
-        System.out.println("Done reseeding");
+        //System.out.println("Done reseeding");
     }
 }

@@ -265,7 +265,8 @@
         <copy file="build/addressbook.war" todir="pkg-temp/webapps/" />
         <copy file="build/susimail.war" todir="pkg-temp/webapps/" />
         <copy file="history.txt" todir="pkg-temp/" />
-        <copy file="hosts.txt" todir="pkg-temp/" />
+        <!-- the addressbook handles this for updates -->
+        <!-- <copy file="hosts.txt" todir="pkg-temp/" /> -->
         <mkdir dir="pkg-temp/eepsite" />
         <mkdir dir="pkg-temp/eepsite/webapps" />
         <mkdir dir="pkg-temp/eepsite/cgi-bin" />
