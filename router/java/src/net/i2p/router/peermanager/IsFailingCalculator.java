@@ -45,7 +45,7 @@ public class IsFailingCalculator extends Calculator {
             
             long recently = _context.clock().now() - GRACE_PERIOD;
             
-            if (profile.getTunnelHistory().getLastRejected() >= recently) {
+            if (false && (profile.getTunnelHistory().getLastRejected() >= recently) ) {
                 // have they refused to participate in a tunnel in the last 5 minutes?
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("Peer " + profile.getPeer().toBase64() 
@@ -53,7 +53,7 @@ public class IsFailingCalculator extends Calculator {
                 return true;
             }
             
-            if (profile.getTunnelHistory().getLastFailed() >= recently) {
+            if (false && (profile.getTunnelHistory().getLastFailed() >= recently) ) {
                 // has a tunnel they participate in failed in the last 5 minutes?
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("Peer " + profile.getPeer().toBase64() 
