@@ -467,6 +467,19 @@ class I2PAdapter {
                 if (_log.shouldLog(Log.INFO)) {
                     _log.info("New destination created: [" + us.toBase64() + "]");
                 }
+                fos.close();
+                
+                try {
+                    fos = new FileOutputStream(_publicDestFile);
+                    fos.write(us.toBase64().getBytes());
+                    fos.flush();
+                } catch (IOException fioe) {
+                    _log.error("Error writing out the plain destination to [" + _publicDestFile + "]", fioe);
+                } finally {
+                    if (fos != null) try { fos.close(); } catch (IOException fioe) {}
+                    fos = null;
+                }
+                
             } catch (IOException ioe) {
                 if (_log.shouldLog(Log.ERROR)) {
                     _log.error("Error writing out the destination keys being created", ioe);
