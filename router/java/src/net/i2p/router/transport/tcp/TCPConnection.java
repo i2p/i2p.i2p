@@ -37,6 +37,7 @@ import net.i2p.router.transport.BandwidthLimitedInputStream;
 import net.i2p.router.transport.BandwidthLimitedOutputStream;
 import net.i2p.util.I2PThread;
 import net.i2p.util.Log;
+import net.i2p.util.NativeBigInteger;
 
 /**
  * Wraps a connection - this contains a reader thread (via I2NPMessageReader) and
@@ -50,6 +51,8 @@ class TCPConnection implements I2NPMessageReader.I2NPMessageEventListener {
     protected int _id;
     protected DHSessionKeyBuilder _builder;
     protected Socket _socket;
+    protected String _remoteHost;
+    protected int _remotePort;
     protected I2NPMessageReader _reader;
     protected InputStream _in;
     protected OutputStream _out;
@@ -91,8 +94,13 @@ class TCPConnection implements I2NPMessageReader.I2NPMessageEventListener {
         _extraBytes = null;
         _lastSliceRun = -1;
 
+        // sun keeps the socket's InetAddress around after its been closed, but kaffe (and the rest of classpath)
+        // doesn't, so we've got to check & cache it here if we want to log it later.  (kaffe et al are acting per
+        // spec, btw)
+        _remoteHost = s.getInetAddress() + "";
+        _remotePort = s.getPort();
         if (_log.shouldLog(Log.INFO))
-            _log.info("Connected with peer: " + s.getInetAddress() + ":" + s.getPort());
+            _log.info("Connected with peer: " + _remoteHost + ":" + _remotePort);
         updateMaxQueuedMessages();
     }
     
@@ -142,7 +150,7 @@ class TCPConnection implements I2NPMessageReader.I2NPMessageEventListener {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("rlen: " + rlen + " peerBytes: " + DataHelper.toString(peerPubBytes) + " read: " + read);
 
-        BigInteger peerPub = new BigInteger(1, peerPubBytes);
+        BigInteger peerPub = new NativeBigInteger(1, peerPubBytes);
         _builder.setPeerPublicValue(peerPub);
 
         _key = _builder.getSessionKey();
@@ -330,10 +338,11 @@ class TCPConnection implements I2NPMessageReader.I2NPMessageEventListener {
                           new Exception("Closed by"));
         } else {
             if (_socket != null) {
-                if (_log.shouldLog(Log.WARN))
+                if (_log.shouldLog(Log.WARN)) {
                     _log.warn("Closing the unestablished connection with " 
-                              + _socket.getInetAddress().toString() + ":" 
-                              + _socket.getPort(), new Exception("Closed by"));
+                              + _remoteHost  + ":" 
+                              + _remotePort, new Exception("Closed by"));
+                }
             } else {
                 if (_log.shouldLog(Log.WARN))
                     _log.warn("Closing the unestablished connection", new Exception("Closed by"));
@@ -403,8 +412,8 @@ class TCPConnection implements I2NPMessageReader.I2NPMessageEventListener {
     public void readError(I2NPMessageReader reader, Exception error) {
         if (_log.shouldLog(Log.ERROR))
             _log.error("Error reading from stream to " + _remoteIdentity.getHash().toBase64() + ": " + error.getMessage());
-        if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Error reading from stream to " + _remoteIdentity.getHash().toBase64(), error);
+        if (_log.shouldLog(Log.WARN))
+            _log.warn("Error reading from stream to " + _remoteIdentity.getHash().toBase64(), error);
     }
     
     /** 
