@@ -34,11 +34,12 @@ public class Timestamper implements Runnable {
         if (_log.shouldLog(Log.INFO))
             _log.info("Starting timestamper pointing at " + _targetURL);
         synchronized (Timestamper.class) {
-            String enabled = System.getProperty("timestamper.enabled");
+            String enabled = System.getProperty("timestamper.started");
             if (enabled != null) {
                 _log.warn("Timestamper already running");
                 return;
             } else {
+                System.setProperty("timestamper.started", "true");
                 System.setProperty("timestamper.enabled", "true");
             }
         }
