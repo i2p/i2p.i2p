@@ -97,6 +97,8 @@ public class TunnelGateway {
             for (int i = 0; i < _queue.size(); i++) {
                 Pending m = (Pending)_queue.get(i);
                 if (m.getExpiration() < _lastFlush) {
+                    if (_log.shouldLog(Log.ERROR))
+                        _log.error("Expire on the queue: " + m);
                     _queue.remove(i);
                     i--;
                 }
@@ -175,13 +177,16 @@ public class TunnelGateway {
     
     private class DelayedFlush implements SimpleTimer.TimedEvent {
         public void timeReached() {
-            long now = _context.clock().now();
+            boolean wantRequeue = false;
             synchronized (_queue) {
-                if ( (_queue.size() > 0) && (_lastFlush + _flushFrequency < now) ) {
-                    _preprocessor.preprocessQueue(_queue, _sender, _receiver);
-                    _lastFlush = _context.clock().now();
-                }
+                if (_queue.size() > 0)
+                    wantRequeue = _preprocessor.preprocessQueue(_queue, _sender, _receiver);
             }
+            
+            if (wantRequeue)
+                SimpleTimer.getInstance().addEvent(_delayedFlush, _flushFrequency);
+            else
+                _lastFlush = _context.clock().now();
         }
     }
 }

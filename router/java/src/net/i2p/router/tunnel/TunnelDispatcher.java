@@ -106,6 +106,16 @@ public class TunnelDispatcher implements Service {
                                          "How many messages are sent through a participating tunnel?", "Tunnels", 
                                          new long[] { 60*10*1000l, 60*60*1000l, 24*60*60*1000l });
     }
+
+    private TunnelGateway.QueuePreprocessor createPreprocessor() {
+        return createPreprocessor(null);
+    }
+    private TunnelGateway.QueuePreprocessor createPreprocessor(TunnelCreatorConfig cfg) {
+        if (true)
+            return new BatchedRouterPreprocessor(_context, cfg); 
+        else
+            return new TrivialRouterPreprocessor(_context); 
+    }
     
     /**
      * We are the outbound gateway - we created this tunnel 
@@ -114,7 +124,7 @@ public class TunnelDispatcher implements Service {
         if (_log.shouldLog(Log.INFO))
             _log.info("Outbound built successfully: " + cfg);
         if (cfg.getLength() > 1) {
-            TunnelGateway.QueuePreprocessor preproc = new TrivialRouterPreprocessor(_context);
+            TunnelGateway.QueuePreprocessor preproc = createPreprocessor(cfg);
             TunnelGateway.Sender sender = new OutboundSender(_context, cfg);
             TunnelGateway.Receiver receiver = new OutboundReceiver(_context, cfg);
             TunnelGateway gw = new TunnelGateway(_context, preproc, sender, receiver);
@@ -211,7 +221,7 @@ public class TunnelDispatcher implements Service {
     public void joinInboundGateway(HopConfig cfg) {
         if (_log.shouldLog(Log.INFO))
             _log.info("Joining as inbound gateway: " + cfg);
-        TunnelGateway.QueuePreprocessor preproc = new TrivialRouterPreprocessor(_context);
+        TunnelGateway.QueuePreprocessor preproc = createPreprocessor();
         TunnelGateway.Sender sender = new InboundSender(_context, cfg);
         TunnelGateway.Receiver receiver = new InboundGatewayReceiver(_context, cfg);
         TunnelGateway gw = new TunnelGateway(_context, preproc, sender, receiver);

@@ -1,5 +1,6 @@
 package net.i2p.router.tunnel.pool;
 
+import java.util.Properties;
 import net.i2p.data.Hash;
 import net.i2p.router.RouterContext;
 import net.i2p.router.tunnel.TunnelCreatorConfig;
@@ -32,6 +33,11 @@ public class PooledTunnelCreatorConfig extends TunnelCreatorConfig {
         if (_testJob != null) {
             _testJob.testSuccessful(ms);
         }
+    }
+    
+    public Properties getOptions() {
+        if (_pool == null) return null;
+        return _pool.getSettings().getUnknownOptions();
     }
     
     /**

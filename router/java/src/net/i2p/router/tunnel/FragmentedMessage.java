@@ -74,7 +74,10 @@ public class FragmentedMessage {
             _log.debug("Receive message " + messageId + " fragment " + fragmentNum + " with " + length + " bytes (last? " + isLast + ") offset = " + offset);
         _messageId = messageId;
         // we should just use payload[] and use an offset/length on it
-        ByteArray ba = new ByteArray(payload, offset, length); //new byte[length]);
+        ByteArray ba = _cache.acquire(); //new ByteArray(payload, offset, length); //new byte[length]);
+        System.arraycopy(payload, offset, ba.getData(), 0, length);
+        ba.setValid(length);
+        ba.setOffset(0);
         //System.arraycopy(payload, offset, ba.getData(), 0, length);
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("fragment[" + fragmentNum + "/" + offset + "/" + length + "]: " 
@@ -107,7 +110,10 @@ public class FragmentedMessage {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Receive message " + messageId + " with " + length + " bytes (last? " + isLast + ") targetting " + toRouter + " / " + toTunnel + " offset=" + offset);
         _messageId = messageId;
-        ByteArray ba = new ByteArray(payload, offset, length); // new byte[length]);
+        ByteArray ba = _cache.acquire(); // new ByteArray(payload, offset, length); // new byte[length]);
+        System.arraycopy(payload, offset, ba.getData(), 0, length);
+        ba.setValid(length);
+        ba.setOffset(0);
         //System.arraycopy(payload, offset, ba.getData(), 0, length);
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("fragment[0/" + offset + "/" + length + "]: " 

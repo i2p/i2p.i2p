@@ -1,4 +1,17 @@
-$Id: history.txt,v 1.172 2005/03/18 03:48:00 jrandom Exp $
+$Id: history.txt,v 1.173 2005/03/18 17:34:54 jrandom Exp $
+
+2005-03-21  jrandom
+    * Fixed the tunnel fragmentation handler to deal with multiple fragments 
+      in a single message properly (rather than release the buffer into the 
+      cache after processing the first one) (duh!)
+    * Added the batching preprocessor which will bundle together multiple 
+      small messages inside a single tunnel message by delaying their delivery 
+      up to .5s, or whenever the pending data will fill a full message, 
+      whichever comes first.  This is disabled at the moment, since without the
+      above bugfix widely deployed, lots and lots of messages would fail.
+    * Within each tunnel pool, stick with a randomly selected peer for up to
+      .5s before randomizing and selecting again, instead of randomizing the
+      pool each time a tunnel is needed.  
 
 * 2005-03-18  0.5.0.3 released
 

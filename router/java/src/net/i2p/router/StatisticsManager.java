@@ -112,6 +112,9 @@ public class StatisticsManager implements Service {
             
             includeRate("tunnel.buildFailure", stats, new long[] { 60*60*1000 });
             includeRate("tunnel.buildSuccess", stats, new long[] { 60*60*1000 });
+
+            includeRate("tunnel.batchDelaySent", stats, new long[] { 10*60*1000, 60*60*1000 });
+            includeRate("tunnel.batchMultipleCount", stats, new long[] { 10*60*1000, 60*60*1000 });
             
             includeRate("router.throttleTunnelProbTestSlow", stats, new long[] { 60*60*1000 });
             includeRate("router.throttleTunnelProbTooFast", stats, new long[] { 60*60*1000 });

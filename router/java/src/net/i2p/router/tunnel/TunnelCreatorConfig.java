@@ -2,6 +2,7 @@ package net.i2p.router.tunnel;
 
 import java.util.Date;
 import java.util.Locale;
+import java.util.Properties;
 import java.text.SimpleDateFormat;
 
 import net.i2p.data.Base64;
@@ -43,6 +44,8 @@ public class TunnelCreatorConfig implements TunnelInfo {
     
     /** how many hops are there in the tunnel? */
     public int getLength() { return _config.length; }
+    
+    public Properties getOptions() { return null; }
     
     /** 
      * retrieve the config for the given hop.  the gateway is

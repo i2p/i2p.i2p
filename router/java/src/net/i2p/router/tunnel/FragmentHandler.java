@@ -33,8 +33,9 @@ public class FragmentHandler {
     private int _failed;
     
     /** don't wait more than 60s to defragment the partial message */
-    private static final long MAX_DEFRAGMENT_TIME = 60*1000;
-    
+    static long MAX_DEFRAGMENT_TIME = 60*1000;
+    private static final ByteCache _cache = ByteCache.getInstance(512, TrivialPreprocessor.PREPROCESSED_SIZE);
+
     public FragmentHandler(I2PAppContext context, DefragmentedReceiver receiver) {
         _context = context;
         _log = context.logManager().getLog(FragmentHandler.class);
@@ -62,6 +63,7 @@ public class FragmentHandler {
         if (!ok) {
             _log.error("Unable to verify preprocessed data (pre.length=" + preprocessed.length 
                        + " off=" +offset + " len=" + length, new Exception("failed"));
+            _cache.release(new ByteArray(preprocessed));
             return;
         }
         offset += HopProcessor.IV_LENGTH; // skip the IV
@@ -83,6 +85,11 @@ public class FragmentHandler {
             if (_log.shouldLog(Log.ERROR))
                 _log.error("Corrupt fragment received: offset = " + offset, e);
             throw e;
+        } finally {
+            // each of the FragmentedMessages populated make a copy out of the
+            // payload, which they release separately, so we can release 
+            // immediately
+            _cache.release(new ByteArray(preprocessed));
         }
     }
     
@@ -254,6 +261,9 @@ public class FragmentHandler {
         }
         
         offset += size;
+        
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("Handling finished message " + msg.getMessageId() + " at offset " + offset);
         return offset;
     }
     
