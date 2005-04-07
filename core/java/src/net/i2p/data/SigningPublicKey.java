@@ -33,7 +33,7 @@ public class SigningPublicKey extends DataStructureImpl {
     public SigningPublicKey(byte data[]) { setData(data); }
 
     /** constructs from base64
-     * @param a string of base64 data (the output of .toBase64() called
+     * @param base64Data a string of base64 data (the output of .toBase64() called
      * on a prior instance of SigningPublicKey
      */
     public SigningPublicKey(String base64Data)  throws DataFormatException {

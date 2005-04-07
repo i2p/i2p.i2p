@@ -77,7 +77,7 @@ public class KeyGenerator {
     }
 
     /** Convert a PrivateKey to its corresponding PublicKey
-     * @param a PrivateKey object
+     * @param priv PrivateKey object
      * @return the corresponding PublicKey object
      */
     public static PublicKey getPublicKey(PrivateKey priv) {
@@ -114,7 +114,7 @@ public class KeyGenerator {
     }
 
     /** Convert a SigningPrivateKey to a SigningPublicKey
-     * @param a SigningPrivateKey object
+     * @param priv a SigningPrivateKey object
      * @return a SigningPublicKey object
      */
     public static SigningPublicKey getSigningPublicKey(SigningPrivateKey priv) {
