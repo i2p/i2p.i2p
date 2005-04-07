@@ -36,7 +36,6 @@ public class SigningPrivateKey extends DataStructureImpl {
     /** constructs from base64
      * @param a string of base64 data (the output of .toBase64() called
      * on a prior instance of SigningPrivateKey
-     * @author aum
      */
     public SigningPrivateKey(String base64Data)  throws DataFormatException {
         this();
@@ -90,7 +89,6 @@ public class SigningPrivateKey extends DataStructureImpl {
 
     /** converts this signing private key to its public equivalent
      * @return a SigningPublicKey object derived from this private key
-     * @author aum
      */
     public SigningPublicKey toPublic() {
         return KeyGenerator.getSigningPublicKey(this);

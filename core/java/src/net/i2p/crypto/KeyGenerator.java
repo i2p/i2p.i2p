@@ -79,7 +79,6 @@ public class KeyGenerator {
     /** Convert a PrivateKey to its corresponding PublicKey
      * @param a PrivateKey object
      * @return the corresponding PublicKey object
-     * @author aum
      */
     public static PublicKey getPublicKey(PrivateKey priv) {
         BigInteger a = new NativeBigInteger(priv.toByteArray());
@@ -117,7 +116,6 @@ public class KeyGenerator {
     /** Convert a SigningPrivateKey to a SigningPublicKey
      * @param a SigningPrivateKey object
      * @return a SigningPublicKey object
-     * @author aum
      */
     public static SigningPublicKey getSigningPublicKey(SigningPrivateKey priv) {
         BigInteger x = new NativeBigInteger(priv.toByteArray());

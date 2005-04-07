@@ -35,7 +35,6 @@ public class PublicKey extends DataStructureImpl {
     /** constructs from base64
      * @param a string of base64 data (the output of .toBase64() called
      * on a prior instance of PublicKey
-     * @author aum
      */
     public PublicKey(String base64Data)  throws DataFormatException {
         this();
