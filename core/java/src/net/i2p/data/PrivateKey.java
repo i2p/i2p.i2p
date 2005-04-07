@@ -91,7 +91,6 @@ public class PrivateKey extends DataStructureImpl {
     /** derives a new PublicKey object derived from the secret contents
      * of this PrivateKey
      * @return a PublicKey object
-     * @author aum
      */
     public PublicKey toPublic() {
         return KeyGenerator.getPublicKey(this);
