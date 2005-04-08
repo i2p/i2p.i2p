@@ -1,4 +1,4 @@
-<code>$Id: udp.html,v 1.9 2005/04/05 10:28:54 jrandom Exp $</code>
+<code>$Id: udp.html,v 1.10 2005/04/08 09:21:26 jrandom Exp $</code>
 
 <h1>Secure Semireliable UDP (SSU)</h1>
 <b>DRAFT</b>
@@ -192,8 +192,8 @@ around briefly, to address packet loss and reordering.</p>
         <li>1 byte identity fragment info:<pre>
 bits 0-3: current identity fragment #
 bits 4-7: total identity fragments</pre></li>
-        <li>N byte fragment of Alice's identity, sent over a number
-            of messages.</li>
+        <li>2 byte size of the current identity fragment</li>
+        <li>that many byte fragment of Alice's identity.</li>
         <li>on the last identity fragment, the signed on time is
             included after the identity fragment, and the last 40 
             bytes contain the DSA signature of the critical exchanged 
@@ -207,8 +207,9 @@ bits 4-7: total identity fragments</pre></li>
 <pre>
  <b>Fragment 1 through N-1</b>
  +----+----+----+----+----+----+----+----+
- |info| fragment of Alice's full         |
- +----+                                  |
+ |info| cursize |                        |
+ +----+----+----+                        |
+ |      fragment of Alice's full         |
  |            identity keys              |
                  .   .   .               
  |                                       |
@@ -216,8 +217,9 @@ bits 4-7: total identity fragments</pre></li>
  
  <b>Fragment N:</b>
  +----+----+----+----+----+----+----+----+
- |info| fragment of Alice's full         |
- +----+                                  |
+ |info| cursize |                        |
+ +----+----+----+                        |
+ |      fragment of Alice's full         |
  |            identity keys              |
                  .   .   .               
  |                                       |
