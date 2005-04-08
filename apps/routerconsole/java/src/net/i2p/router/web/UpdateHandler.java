@@ -2,19 +2,25 @@ package net.i2p.router.web;
 
 import java.io.File;
 import java.text.DecimalFormat;
+
 import net.i2p.crypto.TrustedUpdate;
 import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
-import net.i2p.util.I2PThread;
+import net.i2p.router.RouterVersion;
 import net.i2p.util.EepGet;
+import net.i2p.util.I2PThread;
 import net.i2p.util.Log;
 
 /**
- * Handle the request to update the router by firing off an EepGet call and
- * displaying its status to anyone who asks.  After the download completes,
- * it is verified with the TrustedUpdate, and if it is authentic, the router
- * is restarted.
- *
+ * <p>Handles the request to update the router by firing off an
+ * {@link net.i2p.util.EepGet} call to download the latest signed update file
+ * and displaying the status to anyone who asks.
+ * </p>
+ * <p>After the download completes the signed update file is verified with
+ * {@link net.i2p.crypto.TrustedUpdate}, and if it's authentic the payload
+ * of the signed update file is unpacked and the router is restarted to complete
+ * the update process.
+ * </p>
  */
 public class UpdateHandler {
     private static UpdateRunner _updateRunner;
@@ -140,7 +146,7 @@ public class UpdateHandler {
         public void transferComplete(long alreadyTransferred, long bytesTransferred, long bytesRemaining, String url, String outputFile) {
             _status = "<b>Update downloaded</b><br />";
             TrustedUpdate up = new TrustedUpdate(_context);
-            boolean ok = up.migrateVerified(SIGNED_UPDATE_FILE, "i2pupdate.zip");
+            boolean ok = up.migrateVerified(RouterVersion.VERSION, SIGNED_UPDATE_FILE, "i2pupdate.zip");
             File f = new File(SIGNED_UPDATE_FILE);
             f.delete();
             if (ok) {

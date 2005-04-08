@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.StringTokenizer;
 
 import net.i2p.I2PAppContext;
+import net.i2p.crypto.TrustedUpdate;
 import net.i2p.data.DataHelper;
 import net.i2p.router.RouterContext;
 import net.i2p.router.RouterVersion;
@@ -136,7 +137,7 @@ public class NewsFetcher implements Runnable, EepGet.StatusListener {
                         String ver = buf.substring(index+VERSION_PREFIX.length(), end);
                         if (_log.shouldLog(Log.DEBUG))
                             _log.debug("Found version: [" + ver + "]");
-                        if (needsUpdate(ver)) {
+                        if (TrustedUpdate.needsUpdate(RouterVersion.VERSION, ver)) {
                             if (_log.shouldLog(Log.DEBUG))
                                 _log.debug("Our version is out of date, update!");
                             break;
@@ -188,54 +189,6 @@ public class NewsFetcher implements Runnable, EepGet.StatusListener {
         } else {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Policy requests manual update, so we do nothing");
-        }
-    }
-    
-    private boolean needsUpdate(String version) {
-        StringTokenizer newTok = new StringTokenizer(sanitize(version), ".");
-        StringTokenizer ourTok = new StringTokenizer(sanitize(RouterVersion.VERSION), ".");
-        
-        while (newTok.hasMoreTokens() && ourTok.hasMoreTokens()) {
-            String newVer = newTok.nextToken();
-            String oldVer = ourTok.nextToken();
-            switch (compare(newVer, oldVer)) {
-                case -1: // newVer is smaller
-                    return false;
-                case 0: // eq
-                    break;
-                case 1: // newVer is larger
-                    return true;
-            }
-        }
-        if (newTok.hasMoreTokens() && !ourTok.hasMoreTokens())
-            return true;
-        return false;
-    }
-    
-    private static final String VALID = "0123456789.";
-    private static final String sanitize(String str) {
-        StringBuffer buf = new StringBuffer(str);
-        for (int i = 0; i < buf.length(); i++) {
-            if (VALID.indexOf(buf.charAt(i)) == -1) {
-                buf.deleteCharAt(i);
-                i--;
-            }
-        }
-        return buf.toString();
-    }
-    
-    private static final int compare(String lhs, String rhs) {
-        try {
-            int left = Integer.parseInt(lhs);
-            int right = Integer.parseInt(rhs);
-            if (left < right) 
-                return -1;
-            else if (left == right)
-                return 0;
-            else
-                return 1;
-        } catch (NumberFormatException nfe) {
-            return 0;
         }
     }
     

@@ -1,4 +1,14 @@
-$Id: history.txt,v 1.188 2005/04/05 17:24:32 jrandom Exp $
+$Id: history.txt,v 1.189 2005/04/06 10:43:25 jrandom Exp $
+
+2005-04-08  smeghead
+    * Security improvements to TrustedUpdate: signing and verification of the
+      version string along with the data payload for signed update files
+      (consequently the positions of the DSA signature and version string fields
+      have been swapped in the spec for the update file's header); router will
+      no longer perform a trusted update if the signed update's version is lower
+      than or equal to the currently running router's version.
+    * Added two new CLI commands to TrustedUpdate: showversion, verifyupdate.
+    * Extended TrustedUpdate public API for use by third party applications.
 
 * 2005-04-06  0.5.0.6 released
 
