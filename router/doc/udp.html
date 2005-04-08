@@ -1,4 +1,4 @@
-<code>$Id: udp.html,v 1.8 2005/04/04 12:21:30 jrandom Exp $</code>
+<code>$Id: udp.html,v 1.9 2005/04/05 10:28:54 jrandom Exp $</code>
 
 <h1>Secure Semireliable UDP (SSU)</h1>
 <b>DRAFT</b>
@@ -138,9 +138,13 @@ around briefly, to address packet loss and reordering.</p>
 	<li>that many byte representation of Alice's IP address</li>
 	<li>2 byte port number (unsigned, big endian 2s complement)</li>
         <li>4 byte relay tag which Alice can publish (else 0x0)</li>
-        <li>40 byte DSA signature of the critical exchanged data, encrypted
-            with another layer of encryption using the negotiated sessionKey.
-            The IV is reused here (but with the sessionKey, not the introKey).</li>
+        <li>4 byte timestamp (seconds from the epoch) for use in the DSA 
+            signature</li>
+        <li>40 byte DSA signature of the critical exchanged data 
+            (Alice's IP + Alice's port + Bob's IP + Bob's port + Alice's
+            new relay tag + Bob's signed on time), encrypted with another 
+            layer of encryption using the negotiated sessionKey.  The IV 
+            is reused here.</li>
         <li>8 bytes padding, encrypted with an additional layer of encryption
             using the negotiated session key as part of the DSA block</li>
         <li>N bytes, currently uninterpreted (later, for challenges)</li>
@@ -159,17 +163,19 @@ around briefly, to address packet loss and reordering.</p>
  +----+----+----+----+----+----+----+----+
  |size| that many byte IP address (4-16) |
  +----+----+----+----+----+----+----+----+
- | Port (A)| public relay tag  |         |
- +----+----+----+----+----+----+         |
- | DSA signature                         |
- |                                       |
- |                                       |
- |                                       |
- |                             +----+----+
- |                             |         
+ | Port (A)| public relay tag  |  signed
  +----+----+----+----+----+----+----+----+
-   (8 bytes of padding)        |         |
- +----+----+----+----+----+----+         |
+   on time |                             |
+ +----+----+                             |
+ |              DSA signature            |
+ |                                       |
+ |                                       |
+ |                                       |
+ |         +----+----+----+----+----+----+
+ |         |     (8 bytes of padding) 
+ +----+----+----+----+----+----+----+----+
+           |                             |
+ +----+----+                             |
  |           arbitrary amount            |
  |        of uninterpreted data          |
                  .   .   .               
@@ -180,7 +186,7 @@ around briefly, to address packet loss and reordering.</p>
 <h3><a name="sessionConfirmed">SessionConfirmed (type 2)</a></h3>
 <table border="1">
 <tr><td align="right" valign="top"><b>Peer:</b></td>
-    <td>Bob to Alice</td></tr>
+    <td>Alice to Bob</td></tr>
 <tr><td align="right" valign="top"><b>Data:</b></td>
     <td><ul>
         <li>1 byte identity fragment info:<pre>
@@ -188,8 +194,11 @@ bits 0-3: current identity fragment #
 bits 4-7: total identity fragments</pre></li>
         <li>N byte fragment of Alice's identity, sent over a number
             of messages.</li>
-        <li>on the last identity fragment, the last 40 bytes contain
-            the DSA signature of the critical exchanged data</li>
+        <li>on the last identity fragment, the signed on time is
+            included after the identity fragment, and the last 40 
+            bytes contain the DSA signature of the critical exchanged 
+            data (Alice's IP + Alice's port + Bob's IP + Bob's port
+            + Alice's new relay key + Alice's signed on time)</li>
         </ul></td></tr>
 <tr><td align="right" valign="top"><b>Key used:</b></td>
     <td>sessionKey</td></tr>
@@ -213,6 +222,8 @@ bits 4-7: total identity fragments</pre></li>
                  .   .   .               
  |                                       |
  +----+----+----+----+----+----+----+----+
+ |  signed on time   |                   |
+ +----+----+----+----+                   |
  |  arbitrary amount of uninterpreted    |
  |        data, up from the end of the   |
  |  identity key to 40 bytes prior to    |
