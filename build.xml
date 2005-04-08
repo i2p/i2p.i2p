@@ -185,6 +185,7 @@
         <copy file="build/addressbook.war" todir="pkg-temp/webapps/" />
         <copy file="build/susimail.war" todir="pkg-temp/webapps/" />
         <copy file="installer/resources/clients.config" todir="pkg-temp/" />
+        <copy file="installer/resources/eepget" todir="pkg-temp/" />
         <copy file="installer/resources/i2prouter" todir="pkg-temp/" />
         <copy file="installer/resources/i2prouter.bat" todir="pkg-temp/" />
         <copy file="installer/resources/i2ptunnel.config" todir="pkg-temp/" />
