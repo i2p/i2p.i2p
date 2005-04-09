@@ -1,4 +1,7 @@
-$Id: history.txt,v 1.189 2005/04/06 10:43:25 jrandom Exp $
+$Id: history.txt,v 1.190 2005/04/08 07:39:20 smeghead Exp $
+
+2005-04-08  smeghead
+    * Added NativeBigInteger benchmark to scripts/i2pbench.sh.
 
 2005-04-08  smeghead
     * Security improvements to TrustedUpdate: signing and verification of the

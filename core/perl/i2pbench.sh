@@ -27,4 +27,10 @@ foreach $testclass (@testclasses) {
 	print "\n";
 }
 
-print "\n*** ALL BENCHMARKS COMPLETE ***\n\n";
+print "\nBenchmark Suite #2: i2p/core/java/src/net/i2p/util/NativeBigInteger\n\n";
+
+$javacommand = "$runtime -cp $classpath -Djava.library.path=.";
+
+system("$javacommand net.i2p.util.NativeBigInteger");
+
+print "\n\n*** ALL BENCHMARKS COMPLETE ***\n\n";
