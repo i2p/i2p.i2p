@@ -1,4 +1,9 @@
-$Id: history.txt,v 1.190 2005/04/08 07:39:20 smeghead Exp $
+$Id: history.txt,v 1.191 2005/04/08 22:16:05 smeghead Exp $
+
+2005-04-12  jrandom
+    * Make sure we don't get cached updates (thanks smeghead!)
+    * Clear out the callback for the TestJob after it passes (only affects the
+      job timing accounting)
 
 2005-04-08  smeghead
     * Added NativeBigInteger benchmark to scripts/i2pbench.sh.

@@ -35,6 +35,7 @@ public class EepGet {
     private int _numRetries;
     private String _outputFile;
     private String _url;
+    private boolean _allowCaching;
     private List _listeners;
     
     private boolean _keepFetching;
@@ -52,10 +53,19 @@ public class EepGet {
     public EepGet(I2PAppContext ctx, String proxyHost, int proxyPort, int numRetries, String outputFile, String url) {
         this(ctx, true, proxyHost, proxyPort, numRetries, outputFile, url);
     }
+    public EepGet(I2PAppContext ctx, String proxyHost, int proxyPort, int numRetries, String outputFile, String url, boolean allowCaching) {
+        this(ctx, true, proxyHost, proxyPort, numRetries, outputFile, url, allowCaching);
+    }
     public EepGet(I2PAppContext ctx, int numRetries, String outputFile, String url) {
         this(ctx, false, null, -1, numRetries, outputFile, url);
     }
+    public EepGet(I2PAppContext ctx, int numRetries, String outputFile, String url, boolean allowCaching) {
+        this(ctx, false, null, -1, numRetries, outputFile, url, allowCaching);
+    }
     public EepGet(I2PAppContext ctx, boolean shouldProxy, String proxyHost, int proxyPort, int numRetries, String outputFile, String url) {
+        this(ctx, shouldProxy, proxyHost, proxyPort, numRetries, outputFile, url, true);
+    }
+    public EepGet(I2PAppContext ctx, boolean shouldProxy, String proxyHost, int proxyPort, int numRetries, String outputFile, String url, boolean allowCaching) {
         _context = ctx;
         _log = ctx.logManager().getLog(EepGet.class);
         _shouldProxy = shouldProxy;
@@ -550,6 +560,10 @@ public class EepGet {
             buf.append("-\n");
         }
         buf.append("Accept-Encoding: identity;q=1, *;q=0\n");
+        if (!_allowCaching) {
+            buf.append("Cache-control: no-cache\n");
+            buf.append("Pragma: no-cache\n");
+        }
         buf.append("Connection: close\n\n");
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Request: [" + buf.toString() + "]");

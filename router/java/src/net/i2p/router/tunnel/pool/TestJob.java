@@ -12,6 +12,7 @@ import net.i2p.data.i2np.GarlicMessage;
 import net.i2p.data.i2np.I2NPMessage;
 import net.i2p.router.JobImpl;
 import net.i2p.router.MessageSelector;
+import net.i2p.router.OutNetMessage;
 import net.i2p.router.ReplyJob;
 import net.i2p.router.RouterContext;
 import net.i2p.router.TunnelInfo;
@@ -78,7 +79,8 @@ class TestJob extends JobImpl {
             ReplySelector sel = new ReplySelector(getContext(), m.getMessageId(), testExpiration + 2*testPeriod);
             OnTestReply onReply = new OnTestReply(getContext());
             OnTestTimeout onTimeout = new OnTestTimeout(getContext());
-            getContext().messageRegistry().registerPending(sel, onReply, onTimeout, 3*testPeriod);
+            OutNetMessage msg = getContext().messageRegistry().registerPending(sel, onReply, onTimeout, 3*testPeriod);
+            onReply.setSentMessage(msg);
             sendTest(m);
         }
     }
@@ -201,9 +203,13 @@ class TestJob extends JobImpl {
      */
     private class OnTestReply extends JobImpl implements ReplyJob {
         private long _successTime;
+        private OutNetMessage _sentMessage;
         public OnTestReply(RouterContext ctx) { super(ctx); }
         public String getName() { return "Tunnel test success"; }
+        public void setSentMessage(OutNetMessage m) { _sentMessage = m; }
         public void runJob() { 
+            if (_sentMessage != null)
+                getContext().messageRegistry().unregisterPending(_sentMessage);
             if (_successTime < getTestPeriod())
                 testSuccessful((int)_successTime);
             else
@@ -234,6 +240,7 @@ class TestJob extends JobImpl {
         }
         public String getName() { return "Tunnel test timeout"; }
         public void runJob() {
+            _log.error("Timeout: found? " + _found, getAddedBy());
             if (!_found)
                 testFailed(getContext().clock().now() - _started);
         }
