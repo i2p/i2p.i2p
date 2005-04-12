@@ -8,6 +8,8 @@ package net.i2p.router.transport;
  *
  */
 
+import java.io.IOException;
+import java.io.Writer;
 import java.util.List;
 import java.util.Set;
 
@@ -38,5 +40,5 @@ public interface Transport {
     public int countActivePeers();    
     public List getMostRecentErrorMessages();
     
-    public String renderStatusHTML();
+    public void renderStatusHTML(Writer out) throws IOException;
 }

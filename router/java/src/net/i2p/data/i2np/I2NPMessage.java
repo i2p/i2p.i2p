@@ -61,6 +61,7 @@ public interface I2NPMessage extends DataStructure {
      * Replay resistent message Id
      */
     public long getUniqueId(); 
+    public void setUniqueId(long id);
     
     /**
      * Date after which the message should be dropped (and the associated uniqueId forgotten)
@@ -72,7 +73,20 @@ public interface I2NPMessage extends DataStructure {
     
     /** How large the message is, including any checksums */
     public int getMessageSize();
+    /** How large the raw message is */
+    public int getRawMessageSize();
+
     
-    /** write the message to the buffer, returning the number of bytes written */
+    /** 
+     * write the message to the buffer, returning the number of bytes written.
+     * the data is formatted so as to be self contained, with the type, size,
+     * expiration, unique id, as well as a checksum bundled along.  
+     */
     public int toByteArray(byte buffer[]);
+    /**
+     * write the message to the buffer, returning the number of bytes written.
+     * the data is is not self contained - it does not include the size,
+     * unique id, or any checksum, but does include the type and expiration.
+     */
+    public int toRawByteArray(byte buffer[]);
 }

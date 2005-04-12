@@ -247,6 +247,23 @@ public class DHSessionKeyBuilder {
         if (_myPublicValue == null) _myPublicValue = generateMyValue();
         return _myPublicValue;
     }
+    /**
+     * Return a 256 byte representation of our public key, with leading 0s 
+     * if necessary.
+     *
+     */
+    public byte[] getMyPublicValueBytes() {
+        BigInteger bi = getMyPublicValue();
+        byte data[] = bi.toByteArray();
+        byte rv[] = new byte[256];
+        if (data.length == 257) // high byte has the sign bit
+            System.arraycopy(data, 1, rv, 0, rv.length);
+        else if (data.length == 256)
+            System.arraycopy(data, 0, rv, 0, rv.length);
+        else
+            System.arraycopy(data, 0, rv, rv.length-data.length, data.length);
+        return rv;
+    }
 
     /**
      * Specify the value given by the peer for use in the session key negotiation
@@ -254,6 +271,20 @@ public class DHSessionKeyBuilder {
      */
     public void setPeerPublicValue(BigInteger peerVal) {
         _peerValue = peerVal;
+    }
+    public void setPeerPublicValue(byte val[]) {
+        if (val.length != 256)
+            throw new IllegalArgumentException("Peer public value must be exactly 256 bytes");
+
+        if (1 == (val[0] & 0x80)) {
+            // high bit set, need to inject an additional byte to keep 2s complement
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("High bit set");
+            byte val2[] = new byte[257];
+            System.arraycopy(val, 0, val2, 1, 256);
+            val = val2;
+        }
+        _peerValue = new NativeBigInteger(val);
     }
 
     public BigInteger getPeerPublicValue() {

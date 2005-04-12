@@ -35,6 +35,8 @@ public abstract class I2NPMessageImpl extends DataStructureImpl implements I2NPM
     public final static long DEFAULT_EXPIRATION_MS = 1*60*1000; // 1 minute by default
     public final static int CHECKSUM_LENGTH = 1; //Hash.HASH_LENGTH;
     
+    private static final boolean RAW_FULL_SIZE = true;
+    
     public I2NPMessageImpl(I2PAppContext context) {
         _context = context;
         _log = context.logManager().getLog(I2NPMessageImpl.class);
@@ -165,7 +167,13 @@ public abstract class I2NPMessageImpl extends DataStructureImpl implements I2NPM
     public void setMessageExpiration(long exp) { _expiration = exp; }
     
     public synchronized int getMessageSize() { 
-        return calculateWrittenLength()+15 + CHECKSUM_LENGTH; // 47 bytes in the header
+        return calculateWrittenLength()+15 + CHECKSUM_LENGTH; // 16 bytes in the header
+    }
+    public synchronized int getRawMessageSize() { 
+        if (RAW_FULL_SIZE) 
+            return getMessageSize();
+        else
+            return calculateWrittenLength()+5;
     }
     
     public byte[] toByteArray() {
@@ -248,4 +256,83 @@ public abstract class I2NPMessageImpl extends DataStructureImpl implements I2NPM
         return curIndex;
     }
      */
+
+    
+    public int toRawByteArray(byte buffer[]) {
+        if (RAW_FULL_SIZE)
+            return toByteArray(buffer);
+        try {
+            int off = 0;
+            DataHelper.toLong(buffer, off, 1, getType());
+            off += 1;
+            DataHelper.toLong(buffer, off, 4, _expiration/1000); // seconds
+            off += 4;
+            return writeMessageBody(buffer, off);
+        } catch (I2NPMessageException ime) {
+            _context.logManager().getLog(getClass()).log(Log.CRIT, "Error writing", ime);
+            throw new IllegalStateException("Unable to serialize the message (" + getClass().getName() 
+                                            + "): " + ime.getMessage());
+        }
+    }
+
+    public static I2NPMessage fromRawByteArray(I2PAppContext ctx, byte buffer[], int offset, int len) throws I2NPMessageException {
+        int type = (int)DataHelper.fromLong(buffer, offset, 1);
+        offset++;
+        I2NPMessage msg = createMessage(ctx, type);
+        if (msg == null) 
+            throw new I2NPMessageException("Unknown message type: " + type);
+        if (RAW_FULL_SIZE) {
+            try {
+                msg.readBytes(buffer, type, offset);
+            } catch (IOException ioe) {
+                throw new I2NPMessageException("Error reading the " + msg, ioe);
+            }
+            return msg;
+        }
+
+        long expiration = DataHelper.fromLong(buffer, offset, 4) * 1000; // seconds
+        offset += 4;
+        int dataSize = len - 1 - 4;
+        try {
+            msg.readMessage(buffer, offset, dataSize, type);
+            msg.setMessageExpiration(expiration);
+            return msg;
+        } catch (IOException ioe) {
+            throw new I2NPMessageException("IO error reading raw message", ioe);
+        }
+    }
+
+    
+    /**
+     * Yes, this is fairly ugly, but its the only place it ever happens.
+     *
+     */
+    public static I2NPMessage createMessage(I2PAppContext context, int type) throws I2NPMessageException {
+        switch (type) {
+            case DatabaseStoreMessage.MESSAGE_TYPE:
+                return new DatabaseStoreMessage(context);
+            case DatabaseLookupMessage.MESSAGE_TYPE:
+                return new DatabaseLookupMessage(context);
+            case DatabaseSearchReplyMessage.MESSAGE_TYPE:
+                return new DatabaseSearchReplyMessage(context);
+            case DeliveryStatusMessage.MESSAGE_TYPE:
+                return new DeliveryStatusMessage(context);
+            case DateMessage.MESSAGE_TYPE:
+                return new DateMessage(context);
+            case GarlicMessage.MESSAGE_TYPE:
+                return new GarlicMessage(context);
+            case TunnelDataMessage.MESSAGE_TYPE:
+                return new TunnelDataMessage(context);
+            case TunnelGatewayMessage.MESSAGE_TYPE:
+                return new TunnelGatewayMessage(context);
+            case DataMessage.MESSAGE_TYPE:
+                return new DataMessage(context);
+            case TunnelCreateMessage.MESSAGE_TYPE:
+                return new TunnelCreateMessage(context);
+            case TunnelCreateStatusMessage.MESSAGE_TYPE:
+                return new TunnelCreateStatusMessage(context);
+            default:
+                return null;
+        }
+    }
 }

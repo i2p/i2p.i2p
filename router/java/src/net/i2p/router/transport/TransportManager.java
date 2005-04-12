@@ -21,6 +21,7 @@ import net.i2p.data.i2np.I2NPMessage;
 import net.i2p.router.OutNetMessage;
 import net.i2p.router.RouterContext;
 import net.i2p.router.transport.tcp.TCPTransport;
+import net.i2p.router.transport.udp.UDPTransport;
 import net.i2p.util.Log;
 
 public class TransportManager implements TransportEventListener {
@@ -29,6 +30,7 @@ public class TransportManager implements TransportEventListener {
     private RouterContext _context;
 
     private final static String PROP_DISABLE_TCP = "i2np.tcp.disable";
+    private static final boolean ENABLE_UDP = false;
     
     public TransportManager(RouterContext context) {
         _context = context;
@@ -56,6 +58,11 @@ public class TransportManager implements TransportEventListener {
             Transport t = new TCPTransport(_context);
             t.setListener(this);
             _transports.add(t);
+        }
+        if (ENABLE_UDP) {
+            UDPTransport udp = new UDPTransport(_context);
+            udp.setListener(this);
+            _transports.add(udp);
         }
     }
     
@@ -172,13 +179,15 @@ public class TransportManager implements TransportEventListener {
             }   
         }
         buf.append("</pre>\n");
+        out.write(buf.toString());
         for (Iterator iter = _transports.iterator(); iter.hasNext(); ) {
             Transport t = (Transport)iter.next();
-            String str = t.renderStatusHTML();
-            if (str != null)
-                buf.append(str);
+            //String str = t.renderStatusHTML();
+            //if (str != null)
+            //    buf.append(str);
+            t.renderStatusHTML(out);
         }
-        out.write(buf.toString());
+        //out.write(buf.toString());
         out.flush();
     }
 }

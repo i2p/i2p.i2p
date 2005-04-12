@@ -49,7 +49,7 @@ public class I2NPMessageHandler {
         try {
             int type = (int)DataHelper.readLong(in, 1);
             _lastReadBegin = System.currentTimeMillis();
-            I2NPMessage msg = createMessage(type);
+            I2NPMessage msg = I2NPMessageImpl.createMessage(_context, type);
             if (msg == null)
                 throw new I2NPMessageException("The type "+ type + " is an unknown I2NP message");
             try {
@@ -94,7 +94,7 @@ public class I2NPMessageHandler {
         int type = (int)DataHelper.fromLong(data, cur, 1);
         cur++;
         _lastReadBegin = System.currentTimeMillis();
-        I2NPMessage msg = createMessage(type);
+        I2NPMessage msg = I2NPMessageImpl.createMessage(_context, type);
         if (msg == null)
             throw new I2NPMessageException("The type "+ type + " is an unknown I2NP message");
         try {
@@ -117,39 +117,6 @@ public class I2NPMessageHandler {
     
     public long getLastReadTime() { return _lastReadEnd - _lastReadBegin; }
     public int getLastSize() { return _lastSize; }
-    
-    /**
-     * Yes, this is fairly ugly, but its the only place it ever happens.
-     *
-     */
-    private I2NPMessage createMessage(int type) throws I2NPMessageException {
-        switch (type) {
-            case DatabaseStoreMessage.MESSAGE_TYPE:
-                return new DatabaseStoreMessage(_context);
-            case DatabaseLookupMessage.MESSAGE_TYPE:
-                return new DatabaseLookupMessage(_context);
-            case DatabaseSearchReplyMessage.MESSAGE_TYPE:
-                return new DatabaseSearchReplyMessage(_context);
-            case DeliveryStatusMessage.MESSAGE_TYPE:
-                return new DeliveryStatusMessage(_context);
-            case DateMessage.MESSAGE_TYPE:
-                return new DateMessage(_context);
-            case GarlicMessage.MESSAGE_TYPE:
-                return new GarlicMessage(_context);
-            case TunnelDataMessage.MESSAGE_TYPE:
-                return new TunnelDataMessage(_context);
-            case TunnelGatewayMessage.MESSAGE_TYPE:
-                return new TunnelGatewayMessage(_context);
-            case DataMessage.MESSAGE_TYPE:
-                return new DataMessage(_context);
-            case TunnelCreateMessage.MESSAGE_TYPE:
-                return new TunnelCreateMessage(_context);
-            case TunnelCreateStatusMessage.MESSAGE_TYPE:
-                return new TunnelCreateStatusMessage(_context);
-            default:
-                return null;
-        }
-    }
     
     public static void main(String args[]) {
         try {

@@ -8,6 +8,8 @@ package net.i2p.router.transport;
  *
  */
 
+import java.io.IOException;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -365,7 +367,7 @@ public abstract class TransportImpl implements Transport {
     /** Who to notify on message availability */
     public void setListener(TransportEventListener listener) { _listener = listener; }
     /** Make this stuff pretty (only used in the old console) */
-    public String renderStatusHTML() { return null; }
+    public void renderStatusHTML(Writer out) throws IOException {}
     
     public RouterContext getContext() { return _context; }
 }

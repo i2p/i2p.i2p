@@ -1,5 +1,7 @@
 package net.i2p.router.transport.tcp;
 
+import java.io.IOException;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -766,7 +768,7 @@ public class TCPTransport extends TransportImpl {
     }
     
     /** Make this stuff pretty (only used in the old console) */
-    public String renderStatusHTML() { 
+    public void renderStatusHTML(Writer out) throws IOException {
         StringBuffer buf = new StringBuffer(1024);
         synchronized (_connectionLock) {
             long offsetTotal = 0;
@@ -813,7 +815,7 @@ public class TCPTransport extends TransportImpl {
         }
         buf.append("</ul>");
         
-        return buf.toString();
+        out.write(buf.toString());
     }
 
     /**
