@@ -35,7 +35,7 @@ public abstract class I2NPMessageImpl extends DataStructureImpl implements I2NPM
     public final static long DEFAULT_EXPIRATION_MS = 1*60*1000; // 1 minute by default
     public final static int CHECKSUM_LENGTH = 1; //Hash.HASH_LENGTH;
     
-    private static final boolean RAW_FULL_SIZE = true;
+    private static final boolean RAW_FULL_SIZE = false;
     
     public I2NPMessageImpl(I2PAppContext context) {
         _context = context;
@@ -123,7 +123,7 @@ public abstract class I2NPMessageImpl extends DataStructureImpl implements I2NPM
                                            + "data.len=" + data.length
                                            + " offset=" + offset
                                            + " cur=" + cur 
-                                           + " wanted=" + size + "]");
+                                           + " wanted=" + size + "]: " + getClass().getName());
 
         SHA256EntryCache.CacheEntry cache = _context.sha().cache().acquire(size);
         Hash calc = _context.sha().calculateHash(data, cur, size, cache);

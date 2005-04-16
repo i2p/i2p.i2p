@@ -52,7 +52,7 @@ public class UDPPacketReader {
     /** what type of payload is in here? */
     public int readPayloadType() {
         // 3 highest order bits == payload type
-        return _message[_payloadBeginOffset] >>> 4;
+        return (_message[_payloadBeginOffset] & 0xFF) >>> 4;
     }
     
     /** does this packet include rekeying data? */
@@ -104,6 +104,11 @@ public class UDPPacketReader {
             default:
                 return "Other packet type...";
         }
+    }
+    
+    public void toRawString(StringBuffer buf) {
+        if (_message != null)
+            buf.append(Base64.encode(_message, _payloadBeginOffset, _payloadLength));
     }
     
     /** Help read the SessionRequest payload */
@@ -187,7 +192,7 @@ public class UDPPacketReader {
         /** which fragment is this? */
         public int readCurrentFragmentNum() {
             int readOffset = readBodyOffset();
-            return _message[readOffset] >>> 4;
+            return (_message[readOffset] & 0xFF) >>> 4;
         }
         /** how many fragments will there be? */
         public int readTotalFragmentNum() {
@@ -323,7 +328,7 @@ public class UDPPacketReader {
         public int readMessageFragmentNum(int fragmentNum) {
             int off = getFragmentBegin(fragmentNum);
             off += 4; // messageId
-            return _message[off] >>> 3;
+            return (_message[off] & 0xFF) >>> 3;
         }
         public boolean readMessageIsLast(int fragmentNum) {
             int off = getFragmentBegin(fragmentNum);
@@ -434,7 +439,13 @@ public class UDPPacketReader {
             for (int i = 0; i < numFragments; i++) {
                 buf.append("containing messageId ");
                 buf.append(DataHelper.fromLong(_message, off, 4));
-                off += 5; // messageId+info
+                off += 4;
+                int fragNum = (_message[off] & 0XFF) >>> 3;
+                boolean isLast = (_message[off] & (1 << 2)) != 0;
+                off++;
+                buf.append(" frag# ").append(fragNum);
+                buf.append(" isLast? ").append(isLast);
+                buf.append(" info ").append((int)_message[off-1]);
                 int size = (int)DataHelper.fromLong(_message, off, 2);
                 buf.append(" with ").append(size).append(" bytes");
                 buf.append(' ');
@@ -443,6 +454,18 @@ public class UDPPacketReader {
             }
             
             return buf.toString();
+        }
+        
+        public void toRawString(StringBuffer buf) { 
+            UDPPacketReader.this.toRawString(buf); 
+            buf.append(" payload: ");
+                  
+            int off = getFragmentBegin(0); // first fragment
+            off += 4; // messageId
+            off++; // fragment info
+            int size = (int)DataHelper.fromLong(_message, off, 2);
+            off += 2;
+            buf.append(Base64.encode(_message, off, size));
         }
     }
 }

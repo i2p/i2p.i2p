@@ -240,7 +240,8 @@ class TestJob extends JobImpl {
         }
         public String getName() { return "Tunnel test timeout"; }
         public void runJob() {
-            _log.error("Timeout: found? " + _found, getAddedBy());
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Timeout: found? " + _found, getAddedBy());
             if (!_found)
                 testFailed(getContext().clock().now() - _started);
         }

@@ -38,7 +38,7 @@ public class InboundMessageFragments {
     
     private static final int RECENTLY_COMPLETED_SIZE = 100;
     /** how frequently do we want to send ACKs to a peer? */
-    private static final int ACK_FREQUENCY = 100;
+    private static final int ACK_FREQUENCY = 200;
         
     public InboundMessageFragments(RouterContext ctx, OutboundMessageFragments outbound, UDPTransport transport) {
         _context = ctx;
@@ -132,7 +132,7 @@ public class InboundMessageFragments {
                     messageComplete = true;
                     messages.remove(messageId);
                     
-                   while (_recentlyCompletedMessages.size() >= RECENTLY_COMPLETED_SIZE)
+                    while (_recentlyCompletedMessages.size() >= RECENTLY_COMPLETED_SIZE)
                         _recentlyCompletedMessages.remove(0);
                     _recentlyCompletedMessages.add(messageId);
 
@@ -147,8 +147,6 @@ public class InboundMessageFragments {
 
                     _context.statManager().addRateData("udp.receivedCompleteTime", state.getLifetime(), state.getLifetime());
                     _context.statManager().addRateData("udp.receivedCompleteFragments", state.getFragmentCount(), state.getLifetime());
-
-                    _stateLock.notifyAll();
                 } else if (state.isExpired()) {
                     messageExpired = true;
                     messages.remove(messageId);
@@ -160,6 +158,8 @@ public class InboundMessageFragments {
                 if (!fragmentOK)
                     break;
             }
+            
+            _stateLock.notifyAll();
         }
     }
     
@@ -167,13 +167,15 @@ public class InboundMessageFragments {
         if (data.readACKsIncluded()) {
             int fragments = 0;
             long acks[] = data.readACKs();
-            _context.statManager().addRateData("udp.receivedACKs", acks.length, 0);
-            for (int i = 0; i < acks.length; i++) {
-                if (_log.shouldLog(Log.INFO))
-                    _log.info("Full ACK of message " + acks[i] + " received!");
-                fragments += _outbound.acked(acks[i], from.getRemotePeer());
+            if (acks != null) {
+                _context.statManager().addRateData("udp.receivedACKs", acks.length, 0);
+                for (int i = 0; i < acks.length; i++) {
+                    if (_log.shouldLog(Log.INFO))
+                        _log.info("Full ACK of message " + acks[i] + " received!");
+                    fragments += _outbound.acked(acks[i], from.getRemotePeer());
+                }
+                from.messageACKed(fragments * from.getMTU()); // estimated size
             }
-            from.messageACKed(fragments * from.getMTU()); // estimated size
         }
         if (data.readECN())
             from.ECNReceived();

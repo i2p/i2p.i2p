@@ -23,7 +23,7 @@ public class ACKSender implements Runnable {
         _log = ctx.logManager().getLog(ACKSender.class);
         _fragments = fragments;
         _transport = transport;
-        _builder = new PacketBuilder(_context, _transport);
+        _builder = new PacketBuilder(_context);
     }
     
     public void run() {

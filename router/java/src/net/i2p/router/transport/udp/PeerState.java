@@ -79,6 +79,14 @@ public class PeerState {
     private int _sendWindowBytes;
     /** how many bytes can we send to the peer in the current second */
     private int _sendWindowBytesRemaining;
+    private long _lastSendRefill;
+    private long _lastCongestionOccurred;
+    /** 
+     * when sendWindowBytes is below this, grow the window size quickly,
+     * but after we reach it, grow it slowly
+     *
+     */
+    private int _slowStartThreshold;
     /** what IP is the peer sending and receiving packets on? */
     private byte[] _remoteIP;
     /** what port is the peer sending and receiving packets on? */
@@ -108,7 +116,8 @@ public class PeerState {
     
     private static final int DEFAULT_SEND_WINDOW_BYTES = 16*1024;
     private static final int MINIMUM_WINDOW_BYTES = DEFAULT_SEND_WINDOW_BYTES;
-    private static final int DEFAULT_MTU = 512;
+    private static final int MAX_SEND_WINDOW_BYTES = 1024*1024;
+    private static final int DEFAULT_MTU = 1024;
     
     public PeerState(I2PAppContext ctx) {
         _context = ctx;
@@ -130,6 +139,9 @@ public class PeerState {
         _remoteWantsPreviousACKs = false;
         _sendWindowBytes = DEFAULT_SEND_WINDOW_BYTES;
         _sendWindowBytesRemaining = DEFAULT_SEND_WINDOW_BYTES;
+        _slowStartThreshold = MAX_SEND_WINDOW_BYTES/2;
+        _lastSendRefill = _context.clock().now();
+        _lastCongestionOccurred = -1;
         _remoteIP = null;
         _remotePort = -1;
         _remoteRequiresIntroduction = false;
@@ -298,9 +310,9 @@ public class PeerState {
      */
     public boolean allocateSendingBytes(int size) { 
         long now = _context.clock().now();
-        if (_lastSendTime > 0) {
-            if (_lastSendTime + 1000 <= now)
-                _sendWindowBytesRemaining = _sendWindowBytes;
+        if (_lastSendRefill + 1000 <= now) {
+            _sendWindowBytesRemaining = _sendWindowBytes;
+            _lastSendRefill = now;
         }
         if (size <= _sendWindowBytesRemaining) {
             _sendWindowBytesRemaining -= size; 
@@ -334,6 +346,7 @@ public class PeerState {
         _mtu = mtu; 
         _mtuLastChecked = _context.clock().now();
     }
+    public int getSlowStartThreshold() { return _slowStartThreshold; }
     
     /** we received the message specified completely */
     public void messageFullyReceived(Long messageId) {
@@ -350,9 +363,16 @@ public class PeerState {
      *
      */
     public void congestionOccurred() {
+        long now = _context.clock().now();
+        if (_lastCongestionOccurred + 2000 > now)
+            return; // only shrink once every other second
+        _lastCongestionOccurred = now;
+        
         _sendWindowBytes /= 2;
         if (_sendWindowBytes < MINIMUM_WINDOW_BYTES)
             _sendWindowBytes = MINIMUM_WINDOW_BYTES;
+        if (_sendWindowBytes < _slowStartThreshold)
+            _slowStartThreshold = _sendWindowBytes;
     }
     
     /** pull off the ACKs (Long) to send to the peer */
@@ -368,7 +388,15 @@ public class PeerState {
     /** we sent a message which was ACKed containing the given # of bytes */
     public void messageACKed(int bytesACKed) {
         _consecutiveSendingSecondsWithoutACKs = 0;
-        _sendWindowBytes += bytesACKed;
+        if (_sendWindowBytes <= _slowStartThreshold) {
+            _sendWindowBytes += bytesACKed;
+        } else {
+            double prob = bytesACKed / _sendWindowBytes;
+            if (_context.random().nextDouble() <= prob)
+                _sendWindowBytes += bytesACKed;
+        }
+        if (_sendWindowBytes > MAX_SEND_WINDOW_BYTES)
+            _sendWindowBytes = MAX_SEND_WINDOW_BYTES;
         _lastReceiveTime = _context.clock().now();
         _messagesSent++;
     }

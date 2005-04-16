@@ -61,8 +61,8 @@ public class MessageReceiver implements Runnable {
             m.setUniqueId(state.getMessageId());
             return m;
         } catch (I2NPMessageException ime) {
-            if (_log.shouldLog(Log.WARN))
-                _log.warn("Message invalid: " + state, ime);
+            if (_log.shouldLog(Log.ERROR))
+                _log.error("Message invalid: " + state, ime);
             return null;
         } catch (Exception e) {
             _log.log(Log.CRIT, "Error dealing with a message: " + state, e);

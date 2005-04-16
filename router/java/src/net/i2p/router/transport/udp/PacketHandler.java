@@ -20,17 +20,16 @@ import net.i2p.util.Log;
  * receiver's queue and pushing them as necessary.
  *
  */
-public class PacketHandler implements Runnable {
+public class PacketHandler {
     private RouterContext _context;
     private Log _log;
     private UDPTransport _transport;
     private UDPEndpoint _endpoint;
-    private UDPPacketReader _reader;
     private EstablishmentManager _establisher;
     private InboundMessageFragments _inbound;
     private boolean _keepReading;
     
-    private static final int NUM_HANDLERS = 3;
+    private static final int NUM_HANDLERS = 4;
     
     public PacketHandler(RouterContext ctx, UDPTransport transport, UDPEndpoint endpoint, EstablishmentManager establisher, InboundMessageFragments inbound) {
         _context = ctx;
@@ -39,7 +38,6 @@ public class PacketHandler implements Runnable {
         _endpoint = endpoint;
         _establisher = establisher;
         _inbound = inbound;
-        _reader = new UDPPacketReader(ctx);
         _context.statManager().createRateStat("udp.handleTime", "How long it takes to handle a received packet after its been pulled off the queue", "udp", new long[] { 10*60*1000, 60*60*1000 });
         _context.statManager().createRateStat("udp.queueTime", "How long after a packet is received can we begin handling it", "udp", new long[] { 10*60*1000, 60*60*1000 });
         _context.statManager().createRateStat("udp.receivePacketSkew", "How long ago after the packet was sent did we receive it", "udp", new long[] { 10*60*1000, 60*60*1000 });
@@ -48,7 +46,7 @@ public class PacketHandler implements Runnable {
     public void startup() { 
         _keepReading = true;
         for (int i = 0; i < NUM_HANDLERS; i++) {
-            I2PThread t = new I2PThread(this, "Packet handler " + i + ": " + _endpoint.getListenPort());
+            I2PThread t = new I2PThread(new Handler(), "Packet handler " + i + ": " + _endpoint.getListenPort());
             t.setDaemon(true);
             t.start();
         }
@@ -58,30 +56,37 @@ public class PacketHandler implements Runnable {
         _keepReading = false; 
     }
     
-    public void run() {
-        while (_keepReading) {
-            UDPPacket packet = _endpoint.receive();
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Received the packet " + packet);
-            long queueTime = packet.getLifetime();
-            long handleStart = _context.clock().now();
-            handlePacket(packet);
-            long handleTime = _context.clock().now() - handleStart;
-            _context.statManager().addRateData("udp.handleTime", handleTime, packet.getLifetime());
-            _context.statManager().addRateData("udp.queueTime", queueTime, packet.getLifetime());
-            
-            if (handleTime > 1000) {
-                if (_log.shouldLog(Log.WARN))
-                    _log.warn("Took " + handleTime + " to process the packet " 
-                              + packet + ": " + _reader);
+    private class Handler implements Runnable { 
+        private UDPPacketReader _reader;
+        public Handler() {
+            _reader = new UDPPacketReader(_context);
+        }
+        
+        public void run() {
+            while (_keepReading) {
+                UDPPacket packet = _endpoint.receive();
+                if (_log.shouldLog(Log.DEBUG))
+                    _log.debug("Received the packet " + packet);
+                long queueTime = packet.getLifetime();
+                long handleStart = _context.clock().now();
+                handlePacket(_reader, packet);
+                long handleTime = _context.clock().now() - handleStart;
+                _context.statManager().addRateData("udp.handleTime", handleTime, packet.getLifetime());
+                _context.statManager().addRateData("udp.queueTime", queueTime, packet.getLifetime());
+
+                if (handleTime > 1000) {
+                    if (_log.shouldLog(Log.WARN))
+                        _log.warn("Took " + handleTime + " to process the packet " 
+                                  + packet + ": " + _reader);
+                }
+
+                // back to the cache with thee!
+                packet.release();
             }
-            
-            // back to the cache with thee!
-            packet.release();
         }
     }
     
-    private void handlePacket(UDPPacket packet) {
+    private void handlePacket(UDPPacketReader reader, UDPPacket packet) {
         if (packet == null) return;
         
         InetAddress remAddr = packet.getPacket().getAddress();
@@ -94,7 +99,7 @@ public class PacketHandler implements Runnable {
             if (est != null) {
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("Packet received IS for an inbound establishment");
-                receivePacket(packet, est);
+                receivePacket(reader, packet, est);
             } else {
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("Packet received is not for an inbound establishment");
@@ -102,22 +107,22 @@ public class PacketHandler implements Runnable {
                 if (oest != null) {
                     if (_log.shouldLog(Log.DEBUG))
                         _log.debug("Packet received IS for an outbound establishment");
-                    receivePacket(packet, oest);
+                    receivePacket(reader, packet, oest);
                 } else {
                     if (_log.shouldLog(Log.DEBUG))
                         _log.debug("Packet received is not for an inbound or outbound establishment");
                     // ok, not already known establishment, try as a new one
-                    receivePacket(packet);
+                    receivePacket(reader, packet);
                 }
             }
         } else {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Packet received IS for an existing peer");
-            receivePacket(packet, state);
+            receivePacket(reader, packet, state);
         }
     }
     
-    private void receivePacket(UDPPacket packet, PeerState state) {
+    private void receivePacket(UDPPacketReader reader, UDPPacket packet, PeerState state) {
         boolean isValid = packet.validate(state.getCurrentMACKey());
         if (!isValid) {
             if (state.getNextMACKey() != null)
@@ -147,10 +152,10 @@ public class PacketHandler implements Runnable {
             packet.decrypt(state.getCurrentCipherKey());
         }
         
-        handlePacket(packet, state, null, null);
+        handlePacket(reader, packet, state, null, null);
     }
     
-    private void receivePacket(UDPPacket packet) {
+    private void receivePacket(UDPPacketReader reader, UDPPacket packet) {
         boolean isValid = packet.validate(_transport.getIntroKey());
         if (!isValid) {
             if (_log.shouldLog(Log.WARN))
@@ -162,10 +167,10 @@ public class PacketHandler implements Runnable {
         }
         
         packet.decrypt(_transport.getIntroKey());
-        handlePacket(packet, null, null, null);
+        handlePacket(reader, packet, null, null, null);
     }
 
-    private void receivePacket(UDPPacket packet, InboundEstablishState state) {
+    private void receivePacket(UDPPacketReader reader, UDPPacket packet, InboundEstablishState state) {
         if ( (state != null) && (_log.shouldLog(Log.DEBUG)) ) {
             StringBuffer buf = new StringBuffer(128);
             buf.append("Attempting to receive a packet on a known inbound state: ");
@@ -182,7 +187,7 @@ public class PacketHandler implements Runnable {
                     _log.warn("Valid introduction packet received for inbound con: " + packet);
 
                 packet.decrypt(state.getCipherKey());
-                handlePacket(packet, null, null, null);
+                handlePacket(reader, packet, null, null, null);
                 return;
             } else {
                 if (_log.shouldLog(Log.WARN))
@@ -192,10 +197,10 @@ public class PacketHandler implements Runnable {
         }
         // ok, we couldn't handle it with the established stuff, so fall back
         // on earlier state packets
-        receivePacket(packet);
+        receivePacket(reader, packet);
     }
 
-    private void receivePacket(UDPPacket packet, OutboundEstablishState state) {
+    private void receivePacket(UDPPacketReader reader, UDPPacket packet, OutboundEstablishState state) {
         if ( (state != null) && (_log.shouldLog(Log.DEBUG)) ) {
             StringBuffer buf = new StringBuffer(128);
             buf.append("Attempting to receive a packet on a known outbound state: ");
@@ -213,7 +218,7 @@ public class PacketHandler implements Runnable {
                     _log.warn("Valid introduction packet received for outbound established con: " + packet);
                 
                 packet.decrypt(state.getCipherKey());
-                handlePacket(packet, null, state, null);
+                handlePacket(reader, packet, null, state, null);
                 return;
             }
         }
@@ -224,7 +229,7 @@ public class PacketHandler implements Runnable {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Valid introduction packet received for outbound established con with old intro key: " + packet);
             packet.decrypt(state.getIntroKey());
-            handlePacket(packet, null, state, null);
+            handlePacket(reader, packet, null, state, null);
             return;
         } else {
             if (_log.shouldLog(Log.WARN))
@@ -233,7 +238,7 @@ public class PacketHandler implements Runnable {
         
         // ok, we couldn't handle it with the established stuff, so fall back
         // on earlier state packets
-        receivePacket(packet);
+        receivePacket(reader, packet);
     }
 
     /** let packets be up to 30s slow */
@@ -242,10 +247,10 @@ public class PacketHandler implements Runnable {
     /**
      * Parse out the interesting bits and honor what it says
      */
-    private void handlePacket(UDPPacket packet, PeerState state, OutboundEstablishState outState, InboundEstablishState inState) {
-        _reader.initialize(packet);
+    private void handlePacket(UDPPacketReader reader, UDPPacket packet, PeerState state, OutboundEstablishState outState, InboundEstablishState inState) {
+        reader.initialize(packet);
         long now = _context.clock().now();
-        long when = _reader.readTimestamp() * 1000;
+        long when = reader.readTimestamp() * 1000;
         long skew = now - when;
         if (skew > GRACE_PERIOD) {
             if (_log.shouldLog(Log.WARN))
@@ -263,31 +268,27 @@ public class PacketHandler implements Runnable {
         int fromPort = packet.getPacket().getPort();
         String from = PeerState.calculateRemoteHostString(fromHost.getAddress(), fromPort);
         
-        switch (_reader.readPayloadType()) {
+        switch (reader.readPayloadType()) {
             case UDPPacket.PAYLOAD_TYPE_SESSION_REQUEST:
-                _establisher.receiveSessionRequest(from, fromHost, fromPort, _reader);
+                _establisher.receiveSessionRequest(from, fromHost, fromPort, reader);
                 break;
             case UDPPacket.PAYLOAD_TYPE_SESSION_CONFIRMED:
-                _establisher.receiveSessionConfirmed(from, _reader);
+                _establisher.receiveSessionConfirmed(from, reader);
                 break;
             case UDPPacket.PAYLOAD_TYPE_SESSION_CREATED:
-                _establisher.receiveSessionCreated(from, _reader);
+                _establisher.receiveSessionCreated(from, reader);
                 break;
             case UDPPacket.PAYLOAD_TYPE_DATA:
                 if (outState != null)
                     state = _establisher.receiveData(outState);
-                handleData(packet, state);
+                if (_log.shouldLog(Log.INFO))
+                    _log.info("Received new DATA packet from " + state + ": " + packet);
+                _inbound.receiveData(state, reader.getDataReader());
                 break;
             default:
                 if (_log.shouldLog(Log.WARN))
-                    _log.warn("Unknown payload type: " + _reader.readPayloadType());
+                    _log.warn("Unknown payload type: " + reader.readPayloadType());
                 return;
         }
-    }
-    
-    private void handleData(UDPPacket packet, PeerState peer) {
-        if (_log.shouldLog(Log.INFO))
-            _log.info("Received new DATA packet from " + peer + ": " + packet);
-        _inbound.receiveData(peer, _reader.getDataReader());
     }
 }

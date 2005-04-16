@@ -38,7 +38,7 @@ public class EstablishmentManager {
         _context = ctx;
         _log = ctx.logManager().getLog(EstablishmentManager.class);
         _transport = transport;
-        _builder = new PacketBuilder(ctx, _transport);
+        _builder = new PacketBuilder(ctx);
         _inboundStates = new HashMap(32);
         _outboundStates = new HashMap(32);
         _activityLock = new Object();
@@ -281,7 +281,7 @@ public class EstablishmentManager {
             _log.debug("Send created to: " + state.getRemoteHostInfo());
         
         state.generateSessionKey();
-        _transport.send(_builder.buildSessionCreatedPacket(state));
+        _transport.send(_builder.buildSessionCreatedPacket(state, _transport.getExternalPort(), _transport.getIntroKey()));
         // if they haven't advanced to sending us confirmed packets in 5s,
         // repeat
         state.setNextSendTime(now + 5*1000);
@@ -308,7 +308,7 @@ public class EstablishmentManager {
         // signs if we havent signed yet
         state.prepareSessionConfirmed();
         
-        UDPPacket packets[] = _builder.buildSessionConfirmedPackets(state);
+        UDPPacket packets[] = _builder.buildSessionConfirmedPackets(state, _context.router().getRouterInfo().getIdentity());
         
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Send confirm to: " + state.getRemoteHostInfo());

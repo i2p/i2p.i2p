@@ -49,6 +49,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     private OutboundRefiller _refiller;
     private PacketPusher _pusher;
     private InboundMessageFragments _inboundFragments;
+    private UDPFlooder _flooder;
     
     /** list of RelayPeer objects for people who will relay to us */
     private List _relayPeers;
@@ -83,6 +84,9 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     private static final int PRIORITY_LIMITS[] = new int[] { 100, 200, 300, 400, 500, 1000 };
     /** configure the priority queue with the given weighting per priority group */
     private static final int PRIORITY_WEIGHT[] = new int[] { 1, 1, 1, 1, 1, 2 };
+
+    /** should we flood all UDP peers with the configured rate? */
+    private static final boolean SHOULD_FLOOD_PEERS = false;
     
     public UDPTransport(RouterContext ctx) {
         super(ctx);
@@ -101,6 +105,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         
         _fragments = new OutboundMessageFragments(_context, this);
         _inboundFragments = new InboundMessageFragments(_context, _fragments, this);
+        _flooder = new UDPFlooder(_context, this);
     }
     
     public void startup() {
@@ -118,6 +123,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             _refiller.shutdown();
         if (_inboundFragments != null)
             _inboundFragments.shutdown();
+        if (_flooder != null)
+            _flooder.shutdown();
         
         _introKey = new SessionKey(new byte[SessionKey.KEYSIZE_BYTES]);
         System.arraycopy(_context.routerHash().getData(), 0, _introKey.getData(), 0, SessionKey.KEYSIZE_BYTES);
@@ -165,6 +172,9 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         if (_refiller == null)
             _refiller = new OutboundRefiller(_context, _fragments, _outboundMessages);
         
+        if (_flooder == null)
+            _flooder = new UDPFlooder(_context, this);
+        
         _endpoint.startup();
         _establisher.startup();
         _handler.startup();
@@ -173,9 +183,12 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         _pusher = new PacketPusher(_context, _fragments, _endpoint.getSender());
         _pusher.startup();
         _refiller.startup();
+        _flooder.startup();
     }
     
     public void shutdown() {
+        if (_flooder != null)
+            _flooder.shutdown();
         if (_refiller != null)
             _refiller.shutdown();
         if (_handler != null)
@@ -296,6 +309,9 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         
         _context.shitlist().unshitlistRouter(peer.getRemotePeer());
 
+        if (SHOULD_FLOOD_PEERS)
+            _flooder.addPeer(peer);
+        
         return true;
     }
     
@@ -321,6 +337,10 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     
     public String getStyle() { return STYLE; }
     public void send(OutNetMessage msg) { 
+        if (msg == null) return;
+        if (msg.getTarget() == null) return;
+        if (msg.getTarget().getIdentity() == null) return;
+        
         Hash to = msg.getTarget().getIdentity().calculateHash();
         if (getPeerState(to) != null) {
             if (_log.shouldLog(Log.DEBUG))
@@ -471,7 +491,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         buf.append("<table border=\"1\">\n");
         buf.append(" <tr><td><b>Peer</b></td><td><b>Location</b></td>\n");
         buf.append("     <td><b>Last send</b></td><td><b>Last recv</b></td>\n");
-        buf.append("     <td><b>Lifetime</b></td><td><b>Window size</b></td>\n");
+        buf.append("     <td><b>Lifetime</b></td><td><b>cwnd</b></td><td><b>ssthresh</b></td>\n");
         buf.append("     <td><b>Sent</b></td><td><b>Received</b></td>\n");
         buf.append(" </tr>\n");
         out.write(buf.toString());
@@ -518,6 +538,10 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             buf.append("</td>");
 
             buf.append("<td>");
+            buf.append(peer.getSlowStartThreshold());
+            buf.append("</td>");
+
+            buf.append("<td>");
             buf.append(peer.getMessagesSent());
             buf.append("</td>");
             
@@ -533,7 +557,6 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         out.write("</table>\n");
     }
 
-    
     /**
      * Cache the bid to reduce object churn
      */

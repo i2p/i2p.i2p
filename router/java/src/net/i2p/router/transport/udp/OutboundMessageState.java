@@ -4,7 +4,7 @@ import java.util.Arrays;
 import net.i2p.data.Base64;
 import net.i2p.data.ByteArray;
 import net.i2p.data.i2np.I2NPMessage;
-import net.i2p.router.RouterContext;
+import net.i2p.I2PAppContext;
 import net.i2p.router.OutNetMessage;
 import net.i2p.util.ByteCache;
 import net.i2p.util.Log;
@@ -14,7 +14,7 @@ import net.i2p.util.Log;
  *
  */
 public class OutboundMessageState {
-    private RouterContext _context;
+    private I2PAppContext _context;
     private Log _log;
     /** may be null if we are part of the establishment */
     private OutNetMessage _message;
@@ -35,19 +35,35 @@ public class OutboundMessageState {
     public static final int MAX_FRAGMENTS = 32;
     private static final ByteCache _cache = ByteCache.getInstance(64, MAX_FRAGMENTS*1024);
     
-    public OutboundMessageState(RouterContext context) {
+    public OutboundMessageState(I2PAppContext context) {
         _context = context;
         _log = _context.logManager().getLog(OutboundMessageState.class);
         _pushCount = 0;
         _maxSends = 0;
     }
     
-    public synchronized void initialize(OutNetMessage msg) {
-        initialize(msg, msg.getMessage(), null);
+    public synchronized boolean initialize(OutNetMessage msg) {
+        try {
+            initialize(msg, msg.getMessage(), null);
+            return true;
+        } catch (OutOfMemoryError oom) {
+            throw oom;
+        } catch (Exception e) {
+            _log.log(Log.CRIT, "Error initializing " + msg, e);
+            return false;
+        }
     }
     
-    public void initialize(I2NPMessage msg, PeerState peer) {
-        initialize(null, msg, peer);
+    public boolean initialize(I2NPMessage msg, PeerState peer) {
+        try {
+            initialize(null, msg, peer);
+            return true;
+        } catch (OutOfMemoryError oom) {
+            throw oom;
+        } catch (Exception e) {
+            _log.log(Log.CRIT, "Error initializing " + msg, e);
+            return false;
+        }
     }
     
     private void initialize(OutNetMessage m, I2NPMessage msg, PeerState peer) {
@@ -227,6 +243,10 @@ public class OutboundMessageState {
         buf.append("Message ").append(_messageId);
         if (_fragmentSends != null)
             buf.append(" with ").append(_fragmentSends.length).append(" fragments");
+        if (_messageBuf != null)
+            buf.append(" of size ").append(_messageBuf.getValid());
+        buf.append(" volleys: ").append(_maxSends);
+        buf.append(" lifetime: ").append(getLifetime());
         return buf.toString();
     }
 }

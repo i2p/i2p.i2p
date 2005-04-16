@@ -6,13 +6,14 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
+import net.i2p.I2PAppContext;
 import net.i2p.data.Base64;
 import net.i2p.data.ByteArray;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
+import net.i2p.data.RouterIdentity;
 import net.i2p.data.SessionKey;
 import net.i2p.data.Signature;
-import net.i2p.router.RouterContext;
 import net.i2p.util.ByteCache;
 import net.i2p.util.Log;
 
@@ -22,16 +23,14 @@ import net.i2p.util.Log;
  *
  */
 public class PacketBuilder {
-    private RouterContext _context;
+    private I2PAppContext _context;
     private Log _log;
-    private UDPTransport _transport;
     
     private static final ByteCache _ivCache = ByteCache.getInstance(64, UDPPacket.IV_SIZE);
     
-    public PacketBuilder(RouterContext ctx, UDPTransport transport) {
+    public PacketBuilder(I2PAppContext ctx) {
         _context = ctx;
         _log = ctx.logManager().getLog(PacketBuilder.class);
-        _transport = transport;
     }
     
     public UDPPacket buildPacket(OutboundMessageState state, int fragment, PeerState peer) {
@@ -136,7 +135,7 @@ public class PacketBuilder {
      * 
      * @return ready to send packet, or null if there was a problem
      */
-    public UDPPacket buildSessionCreatedPacket(InboundEstablishState state) {
+    public UDPPacket buildSessionCreatedPacket(InboundEstablishState state, int externalPort, SessionKey ourIntroKey) {
         UDPPacket packet = UDPPacket.acquire(_context);
         try {
             packet.getPacket().setAddress(InetAddress.getByAddress(state.getSentIP()));
@@ -187,7 +186,7 @@ public class PacketBuilder {
             buf.append(" AliceIP: ").append(Base64.encode(state.getSentIP()));
             buf.append(" AlicePort: ").append(state.getSentPort());
             buf.append(" BobIP: ").append(Base64.encode(state.getReceivedOurIP()));
-            buf.append(" BobPort: ").append(_transport.getExternalPort());
+            buf.append(" BobPort: ").append(externalPort);
             buf.append(" RelayTag: ").append(state.getSentRelayTag());
             buf.append(" SignedOn: ").append(state.getSentSignedOnTime());
             buf.append(" signature: ").append(Base64.encode(state.getSentSignature().getData()));
@@ -209,7 +208,7 @@ public class PacketBuilder {
         if ( (off % 16) != 0)
             off += 16 - (off % 16);
         packet.getPacket().setLength(off);
-        authenticate(packet, _transport.getIntroKey(), _transport.getIntroKey(), iv);
+        authenticate(packet, ourIntroKey, ourIntroKey, iv);
         setTo(packet, state.getSentIP(), state.getSentPort());
         _ivCache.release(iv);
         return packet;
@@ -279,8 +278,8 @@ public class PacketBuilder {
      * 
      * @return ready to send packets, or null if there was a problem
      */
-    public UDPPacket[] buildSessionConfirmedPackets(OutboundEstablishState state) {
-        byte identity[] = _context.router().getRouterInfo().getIdentity().toByteArray();
+    public UDPPacket[] buildSessionConfirmedPackets(OutboundEstablishState state, RouterIdentity ourIdentity) {
+        byte identity[] = ourIdentity.toByteArray();
         int numFragments = identity.length / MAX_IDENTITY_FRAGMENT_SIZE;
         if (numFragments * MAX_IDENTITY_FRAGMENT_SIZE != identity.length)
             numFragments++;

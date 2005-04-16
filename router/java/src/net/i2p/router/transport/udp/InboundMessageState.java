@@ -50,7 +50,11 @@ public class InboundMessageState {
     public synchronized boolean receiveFragment(UDPPacketReader.DataReader data, int dataFragment) {
         int fragmentNum = data.readMessageFragmentNum(dataFragment);
         if ( (fragmentNum < 0) || (fragmentNum > _fragments.length)) {
-            _log.log(Log.CRIT, "Invalid fragment " + fragmentNum + ": " + data, new Exception("source"));
+            StringBuffer buf = new StringBuffer(1024);
+            buf.append("Invalid fragment ").append(fragmentNum);
+            buf.append(": ").append(data);
+            data.toRawString(buf);
+            _log.log(Log.CRIT, buf.toString(), new Exception("source"));
             return false;
         }
         if (_fragments[fragmentNum] == null) {

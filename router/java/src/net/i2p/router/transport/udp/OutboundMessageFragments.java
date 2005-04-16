@@ -42,7 +42,7 @@ public class OutboundMessageFragments {
         _transport = transport;
         _activeMessages = new ArrayList(MAX_ACTIVE);
         _nextPacketMessage = 0;
-        _builder = new PacketBuilder(ctx, _transport);
+        _builder = new PacketBuilder(ctx);
         _alive = true;
         _context.statManager().createRateStat("udp.sendVolleyTime", "Long it takes to send a full volley", "udp", new long[] { 60*1000, 10*60*1000, 60*60*1000, 24*60*60*1000 });
         _context.statManager().createRateStat("udp.sendConfirmTime", "How long it takes to send a message and get the ACK", "udp", new long[] { 60*1000, 10*60*1000, 60*60*1000, 24*60*60*1000 });
@@ -89,10 +89,11 @@ public class OutboundMessageFragments {
      */
     public void add(OutNetMessage msg) {
         OutboundMessageState state = new OutboundMessageState(_context);
-        state.initialize(msg);
+        boolean ok = state.initialize(msg);
         finishMessages();
         synchronized (_activeMessages) {
-            _activeMessages.add(state);
+            if (ok)
+                _activeMessages.add(state);
             _activeMessages.notifyAll();
         }
     }
@@ -129,14 +130,14 @@ public class OutboundMessageFragments {
                         // it can not have an OutNetMessage if the source is the
                         // final after establishment message
                         if (_log.shouldLog(Log.WARN))
-                            _log.warn("Unable to send a direct message: " + state);
+                            _log.warn("Unable to send an expired direct message: " + state);
                     }
                     i--;
                 } else if (state.getPushCount() > MAX_VOLLEYS) {
                     _activeMessages.remove(i);
                     _context.statManager().addRateData("udp.sendAggressiveFailed", state.getPushCount(), state.getLifetime());
-                    if (state.getPeer() != null)
-                        state.getPeer().congestionOccurred();
+                    //if (state.getPeer() != null)
+                    //    state.getPeer().congestionOccurred();
 
                     if (state.getMessage() != null) {
                         _transport.failed(state.getMessage());
@@ -144,7 +145,7 @@ public class OutboundMessageFragments {
                         // it can not have an OutNetMessage if the source is the
                         // final after establishment message
                         if (_log.shouldLog(Log.WARN))
-                            _log.warn("Unable to send a direct message: " + state);
+                            _log.warn("Unable to send a direct message after too many volleys: " + state);
                     }
                     i--;
                     
@@ -198,25 +199,31 @@ public class OutboundMessageFragments {
                             int fragmentSize = state.fragmentSize(currentFragment);
                             if (peer.allocateSendingBytes(fragmentSize)) {
                                 if (_log.shouldLog(Log.INFO))
-                                    _log.info("Allocation of " + fragmentSize + " allowed");
+                                    _log.info("Allocation of " + fragmentSize + " allowed with " 
+                                              + peer.getSendWindowBytesRemaining() 
+                                              + "/" + peer.getSendWindowBytes() 
+                                              + " remaining"
+                                              + " for message " + state.getMessageId() + ": " + state);
                                 
                                 // for fairness, we move on in a round robin
                                 _nextPacketMessage = i + 1;
                                 
                                 if (state.getPushCount() != oldVolley) {
                                     _context.statManager().addRateData("udp.sendVolleyTime", state.getLifetime(), state.getFragmentCount());
-                                    state.setNextSendTime(now + 500);
+                                    state.setNextSendTime(now + (1000-(now%1000)) + _context.random().nextInt(2000));
                                 } else {
                                     if (peer.getSendWindowBytesRemaining() > 0)
                                         state.setNextSendTime(now);
                                     else
-                                        state.setNextSendTime(now + 50 );
+                                        state.setNextSendTime(now + (1000-(now%1000)));
                                 }
                                 break;
                             } else {
                                 if (_log.shouldLog(Log.WARN))
-                                    _log.warn("Allocation of " + fragmentSize + " rejected");
-                                state.setNextSendTime(now + _context.random().nextInt(500));
+                                    _log.warn("Allocation of " + fragmentSize + " rejected w/ wsize=" + peer.getSendWindowBytes()
+                                              + " available=" + peer.getSendWindowBytesRemaining()
+                                              + " for message " + state.getMessageId() + ": " + state);
+                                state.setNextSendTime(now + (1000-(now%1000)));
                                 currentFragment = -1;
                             }
                         }
@@ -229,15 +236,15 @@ public class OutboundMessageFragments {
                 if (currentFragment < 0) {
                     if (nextSend <= 0) {
                         try {
-                            _activeMessages.wait(100);
+                            _activeMessages.wait();
                         } catch (InterruptedException ie) {}
                     } else {
                         // none of the packets were eligible for sending
                         long delay = nextSend - now;
                         if (delay <= 0)
                             delay = 10;
-                        if (delay > 500) 
-                            delay = 500;
+                        if (delay > 1000) 
+                            delay = 1000;
                         try {
                             _activeMessages.wait(delay);
                         } catch (InterruptedException ie) {}
