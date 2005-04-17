@@ -29,7 +29,7 @@ public class PacketHandler {
     private InboundMessageFragments _inbound;
     private boolean _keepReading;
     
-    private static final int NUM_HANDLERS = 4;
+    private static final int NUM_HANDLERS = 1;
     
     public PacketHandler(RouterContext ctx, UDPTransport transport, UDPEndpoint endpoint, EstablishmentManager establisher, InboundMessageFragments inbound) {
         _context = ctx;

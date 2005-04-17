@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import java.net.InetAddress;
+import java.net.UnknownHostException;
 
 import net.i2p.I2PAppContext;
 import net.i2p.data.Hash;
@@ -89,6 +90,8 @@ public class PeerState {
     private int _slowStartThreshold;
     /** what IP is the peer sending and receiving packets on? */
     private byte[] _remoteIP;
+    /** cached IP address */
+    private transient InetAddress _remoteIPAddress;
     /** what port is the peer sending and receiving packets on? */
     private int _remotePort;
     /** cached remoteIP + port, used to find the peerState by remote info */
@@ -214,6 +217,17 @@ public class PeerState {
     public int getSendWindowBytesRemaining() { return _sendWindowBytesRemaining; }
     /** what IP is the peer sending and receiving packets on? */
     public byte[] getRemoteIP() { return _remoteIP; }
+    public InetAddress getRemoteIPAddress() {
+        if (_remoteIPAddress == null) {
+            try {
+                _remoteIPAddress = InetAddress.getByAddress(_remoteIP);
+            } catch (UnknownHostException uhe) {
+                if (_log.shouldLog(Log.ERROR))
+                    _log.error("Invalid IP? ", uhe);
+            }
+        }
+        return _remoteIPAddress;
+    }
     /** what port is the peer sending and receiving packets on? */
     public int getRemotePort() { return _remotePort; }
     /** if we need to contact them, do we need to talk to an introducer? */
@@ -325,6 +339,7 @@ public class PeerState {
     /** what IP+port is the peer sending and receiving packets on? */
     public void setRemoteAddress(byte ip[], int port) { 
         _remoteIP = ip;
+        _remoteIPAddress = null;
         _remotePort = port; 
         _remoteHostString = calculateRemoteHostString(ip, port);
     }
@@ -391,7 +406,7 @@ public class PeerState {
         if (_sendWindowBytes <= _slowStartThreshold) {
             _sendWindowBytes += bytesACKed;
         } else {
-            double prob = bytesACKed / _sendWindowBytes;
+            double prob = ((double)bytesACKed) / ((double)_sendWindowBytes);
             if (_context.random().nextDouble() <= prob)
                 _sendWindowBytes += bytesACKed;
         }

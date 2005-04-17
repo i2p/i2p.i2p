@@ -77,7 +77,7 @@ public class PacketBuilder {
             off += 16 - (off % 16);
         packet.getPacket().setLength(off);
         authenticate(packet, peer.getCurrentCipherKey(), peer.getCurrentMACKey());
-        setTo(packet, peer.getRemoteIP(), peer.getRemotePort());
+        setTo(packet, peer.getRemoteIPAddress(), peer.getRemotePort());
         return packet;
     }
     
@@ -119,7 +119,7 @@ public class PacketBuilder {
             off += 16 - (off % 16);
         packet.getPacket().setLength(off);
         authenticate(packet, peer.getCurrentCipherKey(), peer.getCurrentMACKey());
-        setTo(packet, peer.getRemoteIP(), peer.getRemotePort());
+        setTo(packet, peer.getRemoteIPAddress(), peer.getRemotePort());
         return packet;
     }
     
@@ -137,8 +137,9 @@ public class PacketBuilder {
      */
     public UDPPacket buildSessionCreatedPacket(InboundEstablishState state, int externalPort, SessionKey ourIntroKey) {
         UDPPacket packet = UDPPacket.acquire(_context);
+        InetAddress to = null;
         try {
-            packet.getPacket().setAddress(InetAddress.getByAddress(state.getSentIP()));
+            to = InetAddress.getByAddress(state.getSentIP());
         } catch (UnknownHostException uhe) {
             if (_log.shouldLog(Log.ERROR))
                 _log.error("How did we think this was a valid IP?  " + state.getRemoteHostInfo());
@@ -209,7 +210,7 @@ public class PacketBuilder {
             off += 16 - (off % 16);
         packet.getPacket().setLength(off);
         authenticate(packet, ourIntroKey, ourIntroKey, iv);
-        setTo(packet, state.getSentIP(), state.getSentPort());
+        setTo(packet, to, state.getSentPort());
         _ivCache.release(iv);
         return packet;
     }
@@ -228,8 +229,9 @@ public class PacketBuilder {
      */
     public UDPPacket buildSessionRequestPacket(OutboundEstablishState state) {
         UDPPacket packet = UDPPacket.acquire(_context);
+        InetAddress to = null;
         try {
-            packet.getPacket().setAddress(InetAddress.getByAddress(state.getSentIP()));
+            to = InetAddress.getByAddress(state.getSentIP());
         } catch (UnknownHostException uhe) {
             if (_log.shouldLog(Log.ERROR))
                 _log.error("How did we think this was a valid IP?  " + state.getRemoteHostInfo());
@@ -266,7 +268,7 @@ public class PacketBuilder {
             off += 16 - (off % 16);
         packet.getPacket().setLength(off);
         authenticate(packet, state.getIntroKey(), state.getIntroKey());
-        setTo(packet, state.getSentIP(), state.getSentPort());
+        setTo(packet, to, state.getSentPort());
         return packet;
     }
 
@@ -303,8 +305,9 @@ public class PacketBuilder {
      */
     public UDPPacket buildSessionConfirmedPacket(OutboundEstablishState state, int fragmentNum, int numFragments, byte identity[]) {
         UDPPacket packet = UDPPacket.acquire(_context);
+        InetAddress to = null;
         try {
-            packet.getPacket().setAddress(InetAddress.getByAddress(state.getSentIP()));
+            to = InetAddress.getByAddress(state.getSentIP());
         } catch (UnknownHostException uhe) {
             if (_log.shouldLog(Log.ERROR))
                 _log.error("How did we think this was a valid IP?  " + state.getRemoteHostInfo());
@@ -370,19 +373,13 @@ public class PacketBuilder {
             authenticate(packet, state.getIntroKey(), state.getIntroKey());
         } 
         
-        setTo(packet, state.getSentIP(), state.getSentPort());
+        setTo(packet, to, state.getSentPort());
         return packet;
     }
 
-    private void setTo(UDPPacket packet, byte ip[], int port) {
-        try {
-            InetAddress to = InetAddress.getByAddress(ip);
-            packet.getPacket().setAddress(to);
-            packet.getPacket().setPort(port);
-        } catch (UnknownHostException uhe) {
-            if (_log.shouldLog(Log.ERROR))
-                _log.error("Invalid IP? ", uhe);
-        }
+    private void setTo(UDPPacket packet, InetAddress ip, int port) {
+        packet.getPacket().setAddress(ip);
+        packet.getPacket().setPort(port);
     }
     
     /**

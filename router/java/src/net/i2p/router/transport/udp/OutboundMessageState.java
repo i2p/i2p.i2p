@@ -91,6 +91,11 @@ public class OutboundMessageState {
             _log.debug("Raw byte array for " + _messageId + ": " + Base64.encode(_messageBuf.getData(), 0, len));
     }
     
+    public void releaseResources() { 
+        _cache.release(_messageBuf);
+        _messageBuf = null;
+    }
+    
     public OutNetMessage getMessage() { return _message; }
     public long getMessageId() { return _messageId; }
     public PeerState getPeer() { return _peer; }

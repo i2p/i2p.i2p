@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import net.i2p.I2PAppContext;
-import net.i2p.crypto.SHA256EntryCache;
 import net.i2p.data.Base64;
 import net.i2p.data.ByteArray;
 import net.i2p.data.DataHelper;
@@ -138,8 +137,7 @@ public class FragmentHandler {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("endpoint IV: " + Base64.encode(preV, validLength - HopProcessor.IV_LENGTH, HopProcessor.IV_LENGTH));
         
-        SHA256EntryCache.CacheEntry cache = _context.sha().cache().acquire(TrivialPreprocessor.PREPROCESSED_SIZE);
-		Hash v = _context.sha().calculateHash(preV, 0, validLength, cache);
+        Hash v = _context.sha().calculateHash(preV, 0, validLength);
         
         //Hash v = _context.sha().calculateHash(preV, 0, validLength);
         boolean eq = DataHelper.eq(v.getData(), 0, preprocessed, offset + HopProcessor.IV_LENGTH, 4);
@@ -152,7 +150,6 @@ public class FragmentHandler {
                            + Base64.encode(preprocessed, offset, length));
         }
         
-        _context.sha().cache().release(cache);
         _validateCache.release(ba);
         
         if (eq) {

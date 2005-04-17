@@ -27,7 +27,7 @@ public class InboundMessageState {
     private long _receiveBegin;
     
     /** expire after 30s */
-    private static final long MAX_RECEIVE_TIME = 30*1000;
+    private static final long MAX_RECEIVE_TIME = 10*1000;
     private static final int MAX_FRAGMENTS = 32;
     
     private static final ByteCache _fragmentCache = ByteCache.getInstance(64, 2048);

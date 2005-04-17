@@ -19,12 +19,14 @@ class UDPFlooder implements Runnable {
     private UDPTransport _transport;
     private List _peers;
     private boolean _alive;
+    private static final byte _floodData[] = new byte[4096];
     
     public UDPFlooder(RouterContext ctx, UDPTransport transport) {
         _context = ctx;
         _log = ctx.logManager().getLog(UDPFlooder.class);
         _transport = transport;
         _peers = new ArrayList(4);
+        ctx.random().nextBytes(_floodData);
     }
     
     public void addPeer(PeerState peer) {
@@ -61,8 +63,8 @@ class UDPFlooder implements Runnable {
             for (int i = 0; i < _peers.size(); i++) {
                 PeerState peer = (PeerState)_peers.get(i);
                 DataMessage m = new DataMessage(_context);
-                byte data[] = new byte[4096];
-                _context.random().nextBytes(data);
+                byte data[] = _floodData; // new byte[4096];
+                //_context.random().nextBytes(data);
                 m.setData(data);
                 m.setMessageExpiration(_context.clock().now() + 10*1000);
                 m.setUniqueId(_context.random().nextLong(I2NPMessage.MAX_ID_VALUE));

@@ -13,6 +13,7 @@ The base I2P router and SDK make use of the
 following non-public domain code:
 
 * TheCrypto's cryptographic routines (BSD)
+* Bouncycastle's hash routines (MIT license)
 * Cryptix's AES routines (Cryptix license)
 * Adam Buckley's SNTP routines (BSD)
 

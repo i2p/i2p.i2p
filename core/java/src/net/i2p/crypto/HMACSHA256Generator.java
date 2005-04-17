@@ -1,62 +1,32 @@
 package net.i2p.crypto;
 
 import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.List;
 import net.i2p.I2PAppContext;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
 import net.i2p.data.SessionKey;
 
+import org.bouncycastle.crypto.digests.SHA256Digest;
+import org.bouncycastle.crypto.macs.HMac;
+
 /**
- * Calculate the HMAC-SHA256 of a key+message.
+ * Calculate the HMAC-SHA256 of a key+message.  All the good stuff occurs
+ * in {@link org.bouncycastle.crypto.macs.HMac} and 
+ * {@link org.bouncycastle.crypto.digests.SHA256Digest}.
  *
  */
 public class HMACSHA256Generator {
     private I2PAppContext _context;
+    private List _available;
     public HMACSHA256Generator(I2PAppContext context) {
         _context = context;
+        _available = new ArrayList(32);
     }
     
     public static HMACSHA256Generator getInstance() {
         return I2PAppContext.getGlobalContext().hmac();
-    }
-    
-    private static final int PAD_LENGTH = 64;
-    
-    private static final byte[] _IPAD = new byte[PAD_LENGTH];
-    private static final byte[] _OPAD = new byte[PAD_LENGTH];
-    static {
-        for (int i = 0; i < _IPAD.length; i++) {
-            _IPAD[i] = 0x36;
-            _OPAD[i] = 0x5C;
-        }
-    }
-    
-
-    public Buffer createBuffer(int dataLen) { return new Buffer(dataLen); }
-    
-    public class Buffer {
-        private byte padded[];
-        private byte innerBuf[];
-        private SHA256EntryCache.CacheEntry innerEntry;
-        private byte rv[];
-        private byte outerBuf[];
-        private SHA256EntryCache.CacheEntry outerEntry;
-
-        public Buffer(int dataLength) {
-            padded = new byte[PAD_LENGTH];
-            innerBuf = new byte[dataLength + PAD_LENGTH];
-            innerEntry = _context.sha().cache().acquire(innerBuf.length);
-            rv = new byte[Hash.HASH_LENGTH];
-            outerBuf = new byte[Hash.HASH_LENGTH + PAD_LENGTH];
-            outerEntry = _context.sha().cache().acquire(outerBuf.length);
-        }
-        
-        public void releaseCached() {
-            _context.sha().cache().release(innerEntry);
-            _context.sha().cache().release(outerEntry);
-        }
-        
-        public byte[] getHash() { return rv; }
     }
     
     /**
@@ -75,43 +45,26 @@ public class HMACSHA256Generator {
         if ((key == null) || (key.getData() == null) || (data == null))
             throw new NullPointerException("Null arguments for HMAC");
         
-        Buffer buf = new Buffer(length);
-        calculate(key, data, offset, length, buf);
-        Hash rv = new Hash(buf.rv);
-        buf.releaseCached();
-        return rv;
+        HMac mac = acquire();
+        mac.init(key.getData());
+        mac.update(data, offset, length);
+        byte rv[] = new byte[Hash.HASH_LENGTH];
+        mac.doFinal(rv, 0);
+        release(mac);
+        return new Hash(rv);
     }
     
-    /**
-     * Calculate the HMAC of the data with the given key
-     */
-    public void calculate(SessionKey key, byte data[], Buffer buf) {
-        calculate(key, data, 0, data.length, buf);
+    private HMac acquire() {
+        synchronized (_available) {
+            if (_available.size() > 0)
+                return (HMac)_available.remove(0);
+        }
+        return new HMac(new SHA256Digest());
     }
-    
-    /**
-     * Calculate the HMAC of the data with the given key
-     */
-    public void calculate(SessionKey key, byte data[], int offset, int length, Buffer buf) {
-        // inner hash
-        padKey(key.getData(), _IPAD, buf.padded);
-        System.arraycopy(buf.padded, 0, buf.innerBuf, 0, PAD_LENGTH);
-        System.arraycopy(data, offset, buf.innerBuf, PAD_LENGTH, length);
-        
-        Hash h = _context.sha().calculateHash(buf.innerBuf, buf.innerEntry);
-        
-        // outer hash
-        padKey(key.getData(), _OPAD, buf.padded);
-        System.arraycopy(buf.padded, 0, buf.outerBuf, 0, PAD_LENGTH);
-        System.arraycopy(h.getData(), 0, buf.outerBuf, PAD_LENGTH, Hash.HASH_LENGTH);
-        
-        h = _context.sha().calculateHash(buf.outerBuf, buf.outerEntry);
-        System.arraycopy(h.getData(), 0, buf.rv, 0, Hash.HASH_LENGTH);
-    }
-    
-    private static final void padKey(byte key[], byte pad[], byte out[]) {
-        for (int i = 0; i < SessionKey.KEYSIZE_BYTES; i++)
-            out[i] = (byte) (key[i] ^ pad[i]);
-        Arrays.fill(out, SessionKey.KEYSIZE_BYTES, PAD_LENGTH, pad[0]);
+    private void release(HMac mac) {
+        synchronized (_available) {
+            if (_available.size() < 64)
+                _available.add(mac);
+        }
     }
 }

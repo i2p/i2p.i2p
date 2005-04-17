@@ -1,4 +1,7 @@
-$Id: history.txt,v 1.191 2005/04/08 22:16:05 smeghead Exp $
+$Id: history.txt,v 1.192 2005/04/12 10:22:11 jrandom Exp $
+
+2005-04-16  jrandom
+    * Migrated to Bouncycastle's SHA256 and HMAC implementations for efficiency
 
 2005-04-12  jrandom
     * Make sure we don't get cached updates (thanks smeghead!)

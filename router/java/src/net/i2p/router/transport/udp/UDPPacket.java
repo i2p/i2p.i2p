@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.i2p.I2PAppContext;
+import net.i2p.crypto.HMACSHA256Generator;
 import net.i2p.data.Base64;
 import net.i2p.data.ByteArray;
 import net.i2p.data.DataHelper;
@@ -29,6 +30,7 @@ public class UDPPacket {
     private long _initializeTime;
     private long _expiration;
     private byte[] _data;
+    private ByteArray _dataBuf;
   
     private static final List _packetCache;
     static {
@@ -61,11 +63,13 @@ public class UDPPacket {
     private static final int MAX_VALIDATE_SIZE = MAX_PACKET_SIZE;
     private static final ByteCache _validateCache = ByteCache.getInstance(16, MAX_VALIDATE_SIZE);
     private static final ByteCache _ivCache = ByteCache.getInstance(16, IV_SIZE);
-    
+    private static final ByteCache _dataCache = ByteCache.getInstance(64, MAX_PACKET_SIZE);
+
     private UDPPacket(I2PAppContext ctx) {
         _context = ctx;
         _log = ctx.logManager().getLog(UDPPacket.class);
-        _data = new byte[MAX_PACKET_SIZE];
+        _dataBuf = _dataCache.acquire();
+        _data = _dataBuf.getData(); 
         _packet = new DatagramPacket(_data, MAX_PACKET_SIZE);
         _initializeTime = _context.clock().now();
     }
@@ -113,7 +117,7 @@ public class UDPPacket {
             DataHelper.toLong(buf.getData(), off, 2, payloadLength);
             off += 2;
 
-            Hash calculated = _context.hmac().calculate(macKey, buf.getData(), 0, off);
+            Hash hmac = _context.hmac().calculate(macKey, buf.getData(), 0, off);
 
             if (_log.shouldLog(Log.DEBUG)) {
                 StringBuffer str = new StringBuffer(128);
@@ -123,12 +127,12 @@ public class UDPPacket {
                 str.append("\nIV2: ").append(Base64.encode(_data, MAC_SIZE, IV_SIZE));
                 str.append("\nlen: ").append(DataHelper.fromLong(buf.getData(), payloadLength + IV_SIZE, 2));
                 str.append("\nMAC key: ").append(macKey.toBase64());
-                str.append("\ncalc HMAC: ").append(calculated.toBase64());
+                str.append("\ncalc HMAC: ").append(Base64.encode(hmac.getData()));
                 str.append("\nread HMAC: ").append(Base64.encode(_data, _packet.getOffset(), MAC_SIZE));
                 str.append("\nraw: ").append(Base64.encode(_data, _packet.getOffset(), _packet.getLength()));
                 _log.debug(str.toString());
             }
-            eq = DataHelper.eq(calculated.getData(), 0, _data, _packet.getOffset(), MAC_SIZE);
+            eq = DataHelper.eq(hmac.getData(), 0, _data, _packet.getOffset(), MAC_SIZE);
         } else {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Payload length is " + payloadLength);
@@ -177,6 +181,7 @@ public class UDPPacket {
     }
     
     public void release() {
+        _dataCache.release(_dataBuf);
         if (!CACHE) return;
         synchronized (_packetCache) {
             _packet.setLength(0);

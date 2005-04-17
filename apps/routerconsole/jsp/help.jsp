@@ -16,10 +16,12 @@ hmm.  we should probably have some help text here.<br />
 <h2>Legal stuff</h2>
 The I2P router (router.jar) and SDK (i2p.jar) are almost entirely public domain, with 
 a few notable exceptions:<ul>
-<li>ElGamal, DSA, and SHA256 code, under the BSD license, written by TheCrypto</li>
+<li>ElGamal and DSA code, under the BSD license, written by TheCrypto</li>
+<li>SHA256 and HMAC-SHA256, under the MIT license, written by the Legion of the Bouncycastle</li>
 <li>AES code, under the Cryptix (MIT) license, written by the Cryptix team</li>
 <li>SNTP code, under the BSD license, written by Adam Buckley</li>
-<li>The rest is outright public domain, written by jrandom, mihi, hypercubus, oOo, ugha, duck, and shendaras</li>
+<li>The rest is outright public domain, written by jrandom, mihi, hypercubus, oOo, 
+    ugha, duck, shendaras, and others.</li>
 </ul>
 
 <p>On top of the I2P router are a series of client applications, each with their own set of

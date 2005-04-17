@@ -119,6 +119,7 @@ public class OutboundMessageFragments {
                 if (state.isComplete()) {
                     _activeMessages.remove(i);
                     _transport.succeeded(state.getMessage());
+                    state.releaseResources();
                     i--;
                 } else if (state.isExpired()) {
                     _activeMessages.remove(i);
@@ -132,6 +133,7 @@ public class OutboundMessageFragments {
                         if (_log.shouldLog(Log.WARN))
                             _log.warn("Unable to send an expired direct message: " + state);
                     }
+                    state.releaseResources();
                     i--;
                 } else if (state.getPushCount() > MAX_VOLLEYS) {
                     _activeMessages.remove(i);
@@ -147,8 +149,8 @@ public class OutboundMessageFragments {
                         if (_log.shouldLog(Log.WARN))
                             _log.warn("Unable to send a direct message after too many volleys: " + state);
                     }
+                    state.releaseResources();
                     i--;
-                    
                 }
             }
         }
@@ -182,6 +184,7 @@ public class OutboundMessageFragments {
                             _transport.failed(state.getMessage());
                             if (_log.shouldLog(Log.WARN))
                                 _log.warn("Peer disconnected for " + state);
+                            state.releaseResources();
                             i--;
                         } else {
                             if (!state.isFragmented()) {
@@ -210,7 +213,7 @@ public class OutboundMessageFragments {
                                 
                                 if (state.getPushCount() != oldVolley) {
                                     _context.statManager().addRateData("udp.sendVolleyTime", state.getLifetime(), state.getFragmentCount());
-                                    state.setNextSendTime(now + (1000-(now%1000)) + _context.random().nextInt(2000));
+                                    state.setNextSendTime(now + (1000-(now%1000)) + _context.random().nextInt(4000));
                                 } else {
                                     if (peer.getSendWindowBytesRemaining() > 0)
                                         state.setNextSendTime(now);
@@ -316,7 +319,9 @@ public class OutboundMessageFragments {
             if ( (numSends > 1) && (state.getPeer() != null) )
                 state.getPeer().congestionOccurred();
             _transport.succeeded(state.getMessage());
-            return state.getFragmentCount();
+            int numFragments = state.getFragmentCount();
+            state.releaseResources();
+            return numFragments;
         } else {
             if (_log.shouldLog(Log.ERROR))
                 _log.error("Received an ACK for a message not pending: " + messageId);
@@ -360,6 +365,7 @@ public class OutboundMessageFragments {
             _context.statManager().addRateData("udp.sendConfirmTime", state.getLifetime(), state.getLifetime());
             _context.statManager().addRateData("udp.sendConfirmFragments", state.getFragmentCount(), state.getLifetime());
             _transport.succeeded(state.getMessage());
+            state.releaseResources();
         }
     }
 }

@@ -163,11 +163,9 @@ public class ElGamalAESEngine {
 
         //_log.debug("Pre IV for decryptNewSession: " + DataHelper.toString(preIV, 32));
         //_log.debug("SessionKey for decryptNewSession: " + DataHelper.toString(key.getData(), 32));
-        SHA256EntryCache.CacheEntry cache = _context.sha().cache().acquire(preIV.length);
-        Hash ivHash = _context.sha().calculateHash(preIV, cache);
+        Hash ivHash = _context.sha().calculateHash(preIV);
         byte iv[] = new byte[16];
         System.arraycopy(ivHash.getData(), 0, iv, 0, 16);
-        _context.sha().cache().release(cache);
 
         // feed the extra bytes into the PRNG
         _context.random().harvester().feedEntropy("ElG/AES", elgDecr, offset, elgDecr.length - offset); 
@@ -202,12 +200,10 @@ public class ElGamalAESEngine {
                                          SessionKey usedKey, SessionKey foundKey) throws DataFormatException {
         byte preIV[] = new byte[32];
         System.arraycopy(data, 0, preIV, 0, preIV.length);
-        SHA256EntryCache.CacheEntry cache = _context.sha().cache().acquire(32);
-        Hash ivHash = _context.sha().calculateHash(preIV, cache);
+        Hash ivHash = _context.sha().calculateHash(preIV);
         byte iv[] = new byte[16];
         System.arraycopy(ivHash.getData(), 0, iv, 0, 16);
-        _context.sha().cache().release(cache);
-
+        
         usedKey.setData(key.getData());
 
         //_log.debug("Pre IV for decryptExistingSession: " + DataHelper.toString(preIV, 32));
@@ -296,11 +292,9 @@ public class ElGamalAESEngine {
             byte unencrData[] = new byte[(int) len];
             System.arraycopy(decrypted, cur, unencrData, 0, (int)len);
             cur += len;
-            SHA256EntryCache.CacheEntry cache = _context.sha().cache().acquire(unencrData.length);
-            Hash calcHash = _context.sha().calculateHash(unencrData, cache);
+            Hash calcHash = _context.sha().calculateHash(unencrData);
             boolean eq = calcHash.equals(readHash);
-            _context.sha().cache().release(cache);
-
+            
             if (eq) {
                 // everything matches.  w00t.
                 foundTags.addAll(tags);
@@ -410,11 +404,9 @@ public class ElGamalAESEngine {
         
         // should we also feed the encrypted elG block into the harvester?
 
-        SHA256EntryCache.CacheEntry cache = _context.sha().cache().acquire(preIV.length);
-        Hash ivHash = _context.sha().calculateHash(preIV, cache);
+        Hash ivHash = _context.sha().calculateHash(preIV);
         byte iv[] = new byte[16];
         System.arraycopy(ivHash.getData(), 0, iv, 0, 16);
-        _context.sha().cache().release(cache);
         byte aesEncr[] = encryptAESBlock(data, key, iv, tagsForDelivery, newKey, paddedSize);
         //_log.debug("AES encrypted length: " + aesEncr.length);
 
@@ -448,12 +440,10 @@ public class ElGamalAESEngine {
 
         //_log.debug("Pre IV for encryptExistingSession (aka tag): " + currentTag.toString());
         //_log.debug("SessionKey for encryptNewSession: " + DataHelper.toString(key.getData(), 32));
-        SHA256EntryCache.CacheEntry cache = _context.sha().cache().acquire(rawTag.length);
-        Hash ivHash = _context.sha().calculateHash(rawTag, cache);
+        Hash ivHash = _context.sha().calculateHash(rawTag);
         byte iv[] = new byte[16];
         System.arraycopy(ivHash.getData(), 0, iv, 0, 16);
-        _context.sha().cache().release(cache);
-
+        
         byte aesEncr[] = encryptAESBlock(data, key, iv, tagsForDelivery, newKey, paddedSize, SessionTag.BYTE_LENGTH);
         // that prepended SessionTag.BYTE_LENGTH bytes at the beginning of the buffer
         System.arraycopy(rawTag, 0, aesEncr, 0, rawTag.length);
@@ -507,12 +497,10 @@ public class ElGamalAESEngine {
         DataHelper.toLong(aesData, cur, 4, data.length);
         cur += 4;
         //_log.debug("data length: " + data.length);
-        SHA256EntryCache.CacheEntry cache = _context.sha().cache().acquire(data.length);
-        Hash hash = _context.sha().calculateHash(data, cache);
+        Hash hash = _context.sha().calculateHash(data);
         System.arraycopy(hash.getData(), 0, aesData, cur, Hash.HASH_LENGTH);
         cur += Hash.HASH_LENGTH;
-        _context.sha().cache().release(cache);
-
+        
         //_log.debug("hash of data: " + DataHelper.toString(hash.getData(), 32));
         if (newKey == null) {
             aesData[cur++] = 0x00; // don't rekey

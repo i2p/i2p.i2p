@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.i2p.I2PAppContext;
-import net.i2p.crypto.SHA256EntryCache;
 import net.i2p.data.Base64;
 import net.i2p.data.ByteArray;
 import net.i2p.data.DataHelper;
@@ -103,11 +102,9 @@ public class TrivialPreprocessor implements TunnelGateway.QueuePreprocessor {
         byte iv[] = ivBuf.getData(); // new byte[IV_SIZE];
         _context.random().nextBytes(iv);
         
-        SHA256EntryCache.CacheEntry cache = _context.sha().cache().acquire(PREPROCESSED_SIZE);
-        
         // payload ready, now H(instructions+payload+IV)
         System.arraycopy(iv, 0, fragments, fragmentLength, IV_SIZE);
-		Hash h = _context.sha().calculateHash(fragments, 0, fragmentLength + IV_SIZE, cache);
+		Hash h = _context.sha().calculateHash(fragments, 0, fragmentLength + IV_SIZE);
         //Hash h = _context.sha().calculateHash(target, 0, offset + IV_SIZE);
         //_log.debug("before shift: " + Base64.encode(target));
         // now shiiiiiift
@@ -128,7 +125,6 @@ public class TrivialPreprocessor implements TunnelGateway.QueuePreprocessor {
         offset += 4;
         //_log.debug("before pad  : " + Base64.encode(target));
         
-        _context.sha().cache().release(cache);
         _ivCache.release(ivBuf);
         
         // fits in a single message, so may be smaller than the full size

@@ -98,10 +98,8 @@ public class ElGamalEngine {
 
         byte d2[] = new byte[1+Hash.HASH_LENGTH+data.length];
         d2[0] = (byte)0xFF;
-        SHA256EntryCache.CacheEntry cache = _context.sha().cache().acquire(data.length);
-        Hash hash = _context.sha().calculateHash(data, cache);
+        Hash hash = _context.sha().calculateHash(data);
         System.arraycopy(hash.getData(), 0, d2, 1, Hash.HASH_LENGTH);
-        _context.sha().cache().release(cache);
         System.arraycopy(data, 0, d2, 1+Hash.HASH_LENGTH, data.length);
         
         long t0 = _context.clock().now();
@@ -194,11 +192,9 @@ public class ElGamalEngine {
         byte rv[] = new byte[payloadLen];
         System.arraycopy(val, i + 1 + Hash.HASH_LENGTH, rv, 0, rv.length);
 
-        SHA256EntryCache.CacheEntry cache = _context.sha().cache().acquire(payloadLen);
-        Hash calcHash = _context.sha().calculateHash(rv, cache);
+        Hash calcHash = _context.sha().calculateHash(rv);
         boolean ok = calcHash.equals(hash);
-        _context.sha().cache().release(cache);
-
+        
         long end = _context.clock().now();
 
         long diff = end - start;

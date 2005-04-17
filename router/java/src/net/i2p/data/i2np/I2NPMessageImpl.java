@@ -13,7 +13,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 import net.i2p.I2PAppContext;
-import net.i2p.crypto.SHA256EntryCache;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
 import net.i2p.data.DataStructureImpl;
@@ -80,11 +79,9 @@ public abstract class I2NPMessageImpl extends DataStructureImpl implements I2NPM
                 cur += numRead;
             }
             
-            SHA256EntryCache.CacheEntry cache = _context.sha().cache().acquire(size);
-            Hash calc = _context.sha().calculateHash(buffer, 0, size, cache);
+            Hash calc = _context.sha().calculateHash(buffer, 0, size);
             //boolean eq = calc.equals(h);
             boolean eq = DataHelper.eq(checksum, 0, calc.getData(), 0, CHECKSUM_LENGTH);
-            _context.sha().cache().release(cache);
             if (!eq)
                 throw new I2NPMessageException("Hash does not match for " + getClass().getName());
 
@@ -125,11 +122,9 @@ public abstract class I2NPMessageImpl extends DataStructureImpl implements I2NPM
                                            + " cur=" + cur 
                                            + " wanted=" + size + "]: " + getClass().getName());
 
-        SHA256EntryCache.CacheEntry cache = _context.sha().cache().acquire(size);
-        Hash calc = _context.sha().calculateHash(data, cur, size, cache);
+        Hash calc = _context.sha().calculateHash(data, cur, size);
         //boolean eq = calc.equals(h);
         boolean eq = DataHelper.eq(hdata, 0, calc.getData(), 0, CHECKSUM_LENGTH);
-        _context.sha().cache().release(cache);
         if (!eq)
             throw new I2NPMessageException("Hash does not match for " + getClass().getName());
 
@@ -204,8 +199,7 @@ public abstract class I2NPMessageImpl extends DataStructureImpl implements I2NPM
         try {
             int writtenLen = writeMessageBody(buffer, prefixLen);
             int payloadLen = writtenLen - prefixLen;
-            SHA256EntryCache.CacheEntry cache = _context.sha().cache().acquire(payloadLen);
-            Hash h = _context.sha().calculateHash(buffer, prefixLen, payloadLen, cache);
+            Hash h = _context.sha().calculateHash(buffer, prefixLen, payloadLen);
 
             int off = 0;
             DataHelper.toLong(buffer, off, 1, getType());
@@ -217,7 +211,6 @@ public abstract class I2NPMessageImpl extends DataStructureImpl implements I2NPM
             DataHelper.toLong(buffer, off, 2, payloadLen);
             off += 2;
             System.arraycopy(h.getData(), 0, buffer, off, CHECKSUM_LENGTH);
-            _context.sha().cache().release(cache);
 
             long time = _context.clock().now() - start;
             //if (time > 50)

@@ -139,7 +139,7 @@ public class UDPSender {
                     }
                     
                     // back to the cache
-                    //packet.release();
+                    packet.release();
                 }
             }
         }
