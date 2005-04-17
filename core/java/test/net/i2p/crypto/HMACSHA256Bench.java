@@ -71,33 +71,29 @@ public class HMACSHA256Bench {
 			buf.append("a");
 		}
 		byte[] lmess = buf.toString().getBytes();
-        
-        HMACSHA256Generator.Buffer sbuf = ctx.hmac().createBuffer(smess.length);
-        HMACSHA256Generator.Buffer mbuf = ctx.hmac().createBuffer(mmess.length);
-        HMACSHA256Generator.Buffer lbuf = ctx.hmac().createBuffer(lmess.length);
-        
+
 		// warm up the engines
-        ctx.hmac().calculate(key, smess, sbuf);
-        ctx.hmac().calculate(key, mmess, mbuf);
-        ctx.hmac().calculate(key, lmess, lbuf);
+        ctx.hmac().calculate(key, smess);
+        ctx.hmac().calculate(key, mmess);
+        ctx.hmac().calculate(key, lmess);
         
         long before = System.currentTimeMillis();
         for (int x = 0; x < times; x++)
-            ctx.hmac().calculate(key, smess, sbuf);
+            ctx.hmac().calculate(key, smess);
         long after = System.currentTimeMillis();
         
         display(times, before, after, smess.length, "3 byte");
         
         before = System.currentTimeMillis();
         for (int x = 0; x < times; x++)
-            ctx.hmac().calculate(key, mmess, mbuf);
+            ctx.hmac().calculate(key, mmess);
         after = System.currentTimeMillis();
 
         display(times, before, after, mmess.length, "2KB");
         
         before = System.currentTimeMillis();
         for (int x = 0; x < times; x++)
-            ctx.hmac().calculate(key, lmess, lbuf);
+            ctx.hmac().calculate(key, lmess);
         after = System.currentTimeMillis();
 
         display(times, before, after, lmess.length, "10KB");
