@@ -38,7 +38,7 @@ public class TunnelBuilder {
             return;
         }
         OnCreatedJob onCreated = new OnCreatedJob(ctx, pool, cfg);
-        RetryJob onFailed= (zeroHop ? null : new RetryJob(ctx, pool));
+        RetryJob onFailed= new RetryJob(ctx, pool);
         // queue up a job to request the endpoint to join the tunnel, which then
         // requeues up another job for earlier hops, etc, until it reaches the 
         // gateway.  after the gateway is confirmed, onCreated is fired

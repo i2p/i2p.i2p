@@ -41,7 +41,7 @@ public class TunnelPool {
      * etc.  On overflow, the necessary additional tunnels are built by the
      * RefreshJob
      */
-    private static final int MAX_BUILDS_PER_MINUTE = 5;
+    private static final int MAX_BUILDS_PER_MINUTE = 10;
     
     public TunnelPool(RouterContext ctx, TunnelPoolManager mgr, TunnelPoolSettings settings, TunnelPeerSelector sel, TunnelBuilder builder) {
         _context = ctx;

@@ -1,0 +1,41 @@
+HTTP/1.1 504 Gateway Timeout
+Content-Type: text/html; charset=iso-8859-1
+Cache-control: no-cache
+
+<html><head>
+<title>Eepsite not reachable</title>
+<style type='text/css'>
+div.warning {
+	margin: 0em 1em 1em 224px;
+	padding: .5em 1em;
+	background-color: #ffefef;
+	border: medium solid #ffafaf;
+	text-align: left;
+	color: inherit;
+}
+div.logo {
+	float: left;
+	width: 200px;
+	left: 1em;
+	top: 1em;
+	margin: 0em;
+	padding: .5em;
+	text-align: left;
+	border: medium solid #efefff;
+	background-color: #fafaff;
+	color: inherit;
+}
+</style>
+</head>
+<body>
+<div class=logo>
+ <a href="http://localhost:7657/index.jsp">Router Console</a><br />
+ [<a href="http://localhost:7657/config.jsp">configuration</a> | <a href="http://localhost:7657/help.jsp">help</a>]
+</div>
+<div class=warning id=warning>
+The eepsite was not reachable. Perhaps 
+the link you are following is 
+bad. The eepsite could also 
+be temporarily offline.  You may want to 
+<a href="javascript: window.location.reload()">retry</a>. 
+<BR><BR>Could not find the following destination:<BR><BR>

@@ -1,0 +1,42 @@
+HTTP/1.1 400 Destination Not Found
+Content-Type: text/html; charset=iso-8859-1
+Cache-control: no-cache
+
+<html><head>
+<title>Invalid eepsite destination</title>
+<style type='text/css'>
+	div.warning {
+	margin: 0em 1em 1em 224px;
+	padding: .5em 1em;
+	background-color: #ffefef;
+	border: medium solid #ffafaf;
+	text-align: left;
+	color: inherit;
+}
+div.logo {
+	float: left;
+	width: 200px;
+	left: 1em;
+	top: 1em;
+	margin: 0em;
+	padding: .5em;
+	text-align: left;
+	border: medium solid #efefff;
+	background-color: #fafaff;
+	color: inherit;
+}
+</style>
+</head>
+<body>
+<div class=logo>
+ <a href="http://localhost:7657/index.jsp">Router Console</a><br />
+ [<a href="http://localhost:7657/config.jsp">configuration</a> | <a href="http://localhost:7657/help.jsp">help</a>]
+</div>
+<div class=warning id=warning>
+The eepsite destination specified was not valid, or was
+otherwise unreachable.  Perhaps you pasted in the 
+wrong BASE64 string or the link you are following is 
+bad. The I2P host could also 
+be temporarily offline.  You may want to 
+<a href="javascript: window.location.reload()">retry</a>. 
+<BR><BR>Could not find the following destination:<BR><BR>

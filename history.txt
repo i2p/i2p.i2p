@@ -1,4 +1,13 @@
-$Id: history.txt,v 1.192 2005/04/12 10:22:11 jrandom Exp $
+$Id: history.txt,v 1.193 2005/04/16 19:59:51 jrandom Exp $
+
+2005-04-17  zzz
+    * Added new user-editable eepproxy error page templates.
+
+2005-04-17  jrandom
+    * Revamp the tunnel building throttles, fixing a situation where the 
+      rebuild may not recover, and defaulting it to unthrottled (users with
+      slow CPUs may want to set "router.tunnel.shouldThrottle=true" in their
+      advanced router config)
 
 2005-04-16  jrandom
     * Migrated to Bouncycastle's SHA256 and HMAC implementations for efficiency

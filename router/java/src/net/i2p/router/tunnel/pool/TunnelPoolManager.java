@@ -41,6 +41,12 @@ public class TunnelPoolManager implements TunnelManagerFacade {
     /** max # of concurrent build requests */
     private int _maxOutstandingBuilds;
     
+    private static final String PROP_MAX_OUTSTANDING_BUILDS = "router.tunnel.maxConcurrentBuilds";
+    private static final int DEFAULT_MAX_OUTSTANDING_BUILDS = 20;
+
+    private static final String PROP_THROTTLE_CONCURRENT_TUNNELS = "router.tunnel.shouldThrottle";
+    private static final boolean DEFAULT_THROTTLE_CONCURRENT_TUNNELS = false;
+    
     public TunnelPoolManager(RouterContext ctx) {
         _context = ctx;
         _log = ctx.logManager().getLog(TunnelPoolManager.class);
@@ -54,13 +60,13 @@ public class TunnelPoolManager implements TunnelManagerFacade {
         _clientInboundPools = new HashMap(4);
         _clientOutboundPools = new HashMap(4);
         _outstandingBuilds = 0;
-        _maxOutstandingBuilds = 20;
-        String max = ctx.getProperty("router.tunnel.maxConcurrentBuilds", "20");
+        _maxOutstandingBuilds = DEFAULT_MAX_OUTSTANDING_BUILDS;
+        String max = ctx.getProperty(PROP_MAX_OUTSTANDING_BUILDS, String.valueOf(DEFAULT_MAX_OUTSTANDING_BUILDS));
         if (max != null) {
             try {
                 _maxOutstandingBuilds = Integer.parseInt(max);
             } catch (NumberFormatException nfe) {
-                _maxOutstandingBuilds = 20;
+                _maxOutstandingBuilds = DEFAULT_MAX_OUTSTANDING_BUILDS;
             }
         }
         
@@ -266,6 +272,9 @@ public class TunnelPoolManager implements TunnelManagerFacade {
      * @return how many are allowed to be built
      */
     int allocateBuilds(int wanted) {
+        boolean shouldThrottle = shouldThrottleTunnels();
+        if (!shouldThrottle) return wanted;
+        
         synchronized (this) {
             if (_outstandingBuilds >= _maxOutstandingBuilds) {
                 // ok, as a failsafe, always let one through
@@ -283,6 +292,11 @@ public class TunnelPoolManager implements TunnelManagerFacade {
                 return allowed;
             }
         }
+    }
+    
+    private boolean shouldThrottleTunnels() {
+        Boolean rv = Boolean.valueOf(_context.getProperty(PROP_THROTTLE_CONCURRENT_TUNNELS, ""+DEFAULT_THROTTLE_CONCURRENT_TUNNELS));
+        return rv.booleanValue();
     }
 
     void buildComplete() {

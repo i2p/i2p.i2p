@@ -23,6 +23,7 @@ import net.i2p.client.streaming.I2PSocketOptions;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.Destination;
 import net.i2p.util.EventDispatcher;
+import net.i2p.util.FileUtil;
 import net.i2p.util.Log;
 
 /**
@@ -70,7 +71,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
          "wrong BASE64 I2P Destination or the link you are following is "+
          "bad. The host (or the WWW proxy, if you're using one) could also "+
 	 "be temporarily offline.  You may want to <b>retry</b>.  "+
-         "Could not find the following Destination:<BR><BR>")
+         "Could not find the following Destination:<BR><BR><div>")
         .getBytes();
     
     private final static byte[] ERR_TIMEOUT =
@@ -190,6 +191,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
             BufferedReader br = new BufferedReader(new InputStreamReader(s.getInputStream(), "ISO-8859-1"));
             String line, method = null, protocol = null, host = null, destination = null;
             StringBuffer newRequest = new StringBuffer();
+            int ahelper = 0;
             while ((line = br.readLine()) != null) {
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug(getPrefix(requestId) + "Line=[" + line + "]");
@@ -282,6 +284,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
                             if (addressHelper != null) {
                                 destination = addressHelper;
                                 host = getHostName(destination);
+                                ahelper = 1;
                             }
                         }
                         line = method + " " + request.substring(pos);
@@ -403,7 +406,19 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
                 l.log("Could not resolve " + destination + ".");
                 if (_log.shouldLog(Log.WARN))
                     _log.warn("Unable to resolve " + destination + " (proxy? " + usingWWWProxy + ", request: " + targetRequest);
-                writeErrorMessage(ERR_DESTINATION_UNKNOWN, out, targetRequest, usingWWWProxy, destination);
+                String str;
+                byte[] header;
+                if (usingWWWProxy)
+                    str = FileUtil.readTextFile("docs/dnfp-header.ht", 100, true);
+                else if(ahelper != 0)
+                    str = FileUtil.readTextFile("docs/dnfb-header.ht", 100, true);
+                else
+                    str = FileUtil.readTextFile("docs/dnf-header.ht", 100, true);
+                if (str != null)
+                    header = str.getBytes();
+                else
+                    header = ERR_DESTINATION_UNKNOWN;
+                writeErrorMessage(header, out, targetRequest, usingWWWProxy, destination);
                 s.close();
                 return;
             }
@@ -476,10 +491,16 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
         if (out != null) {
             out.write(errMessage);
             if (targetRequest != null) {
-                out.write(targetRequest.getBytes());
+                int protopos = targetRequest.indexOf(" ");
+                String uri = targetRequest.substring(0, protopos);
+                out.write("<a href=\"http://".getBytes());
+                out.write(uri.getBytes());
+                out.write("\">http://".getBytes());
+                out.write(uri.getBytes());
+                out.write("</a>".getBytes());
                 if (usingWWWProxy) out.write(("<br>WWW proxy: " + wwwProxy).getBytes());
             }
-            out.write("<p /><i>Generated on: ".getBytes());
+            out.write("</div><p><i>I2P HTTP Proxy Server<br>Generated on: ".getBytes());
             out.write(new Date().toString().getBytes());
             out.write("</i></body></html>\n".getBytes());
             out.flush();
@@ -493,7 +514,17 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
             _log.warn(getPrefix(requestId) + "Error sending to " + wwwProxy + " (proxy? " + usingWWWProxy + ", request: " + targetRequest, ex);
         if (out != null) {
             try {
-                writeErrorMessage(ERR_DESTINATION_UNKNOWN, out, targetRequest, usingWWWProxy, wwwProxy);
+                String str;
+                byte[] header;
+                if (usingWWWProxy)
+                    str = FileUtil.readTextFile("docs/dnfp-header.ht", 100, true);
+                else
+                    str = FileUtil.readTextFile("docs/dnf-header.ht", 100, true);
+                if (str != null)
+                    header = str.getBytes();
+                else
+                    header = ERR_DESTINATION_UNKNOWN;
+                writeErrorMessage(header, out, targetRequest, usingWWWProxy, wwwProxy);
             } catch (IOException ioe) {
                 _log.warn(getPrefix(requestId) + "Error writing out the 'destination was unknown' " + "message", ioe);
             }
