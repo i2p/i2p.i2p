@@ -1,0 +1,139 @@
+<TABLE align="center" class="mainpaneitem" width=90% >
+  <TR>
+    <TD class="formHeading" colspan="2">Insert Content</TD>
+  </tr>
+
+  <TR>
+    <TD colspan="2" align=center><a href="/insert?mode=site">Insert A QSite Instead</a></TD>
+  </tr>
+
+  <tr><td colspan=2><hr></td></tr>
+
+  <form method="POST" ENCTYPE="multipart/form-data" action="/insert" class="formBody">
+<!--  <form method="POST" action="/insert" class="formBody"> -->
+
+    <input type=hidden name="cmd" value="put">
+
+    <tr>
+      <td valign=top>Type: </td>
+      <td style="font-size:smaller">
+        <input type="radio" name="type" value="text">Text 
+        <input type="radio" name="type" value="html">HTML
+        <input type="radio" name="type" value="image">Image
+        <input type="radio" name="type" value="audio">Audio
+        <input type="radio" name="type" value="video">Video
+        <input type="radio" name="type" value="archive">Archive
+        <input type="radio" name="type" value="other" checked>Other
+      </td>
+    </tr>
+    
+    <tr><td colspan=2><hr></td></tr>
+
+    <tr>
+      <TD valign=top>Title: </TD>
+      <td>
+        <input type="text" name="title" size="60" maxlength="58">
+        <div style="font-style: italic; font-size: smaller">
+          (A short descriptive title for this item)
+        </div>
+      </td>
+    </TR>
+
+    <tr><td colspan=2><hr></td></tr>
+
+    <tr>
+      <TD valign=top>Path: </TD>
+      <td>
+        <input type="text" name="path" size="60" maxlength="128">
+        <div style="font-style: italic; font-size: smaller">
+          (If you're inserting in plain-hash mode, this should be a suggested
+           filename for people to save the item as when downloading it; If you're
+           inserting in signed-space mode, this can be a longer pathname)
+        </div>
+      </td>
+    </TR>
+
+    <tr><td colspan=2><hr></td></tr>
+
+    <tr>
+      <TD valign=top>Mimetype: </TD>
+      <td>
+        <input type="text" name="mimetype" size="40" maxlength="40">
+        <div style="font-style: italic; font-size: smaller">
+          (Leave blank unless you know exactly what this means)
+        </div>
+      </td>
+    </TR>
+
+    <tr><td colspan=2><hr></td></tr>
+
+    <tr>
+      <TD valign=top>Keywords: </TD>
+      <td>
+        <input type="text" name="keywords" size="60" maxlength="80">
+        <div style="font-style: italic; font-size: smaller">
+          (Comma-separated list of short descriptive keywords)
+        </div>
+      </td>
+    </TR>
+
+    <tr><td colspan=2><hr></td></tr>
+
+    <tr>
+      <TD valign=top>Abstract: </TD>
+      <td>
+        <textarea name="abstract" cols="50" rows="2"></textarea>
+        <div style="font-style: italic; font-size: smaller">
+          (A short descriptive summary for the item, preferably no
+           longer than 256 characters)
+        </div>
+      </td>
+    </TR>
+
+    <tr><td colspan=2><hr></td></tr>
+
+    <tr>
+      <TD valign=top>File: </TD>
+      <td>
+        <INPUT type="file" name="data" size="40" maxlength="128">
+        <div style="font-style: italic; font-size: smaller">
+          (Leave this blank if you are entering the raw data in the text box below)
+        </div>
+      </td>
+    </TR>
+
+    <tr><td colspan=2><hr></td></tr>
+
+    <tr>
+      <TD valign=top>Private Key: </TD>
+      <td>
+        <INPUT type="text" name="privkey" size="30" maxlength="60">
+        <div style="font-size: smaller; font-style: italic">
+          (Only if inserting in signed space mode)
+        </div>
+      </td>
+    </TR>
+
+    <tr><td colspan=2><hr></td></tr>
+
+    <tr>
+      <TD colspan=2 align=center>
+        <INPUT class="btn" type="submit" name="submit" value="Insert it">
+      </TD>
+    </tr>
+
+    <tr><td colspan=2><hr></td></tr>
+
+    <tr>
+      <td valign=top>Raw Data:</td>
+      <td>
+        <div style="font-size: smaller; font-style:italic">
+          (You may enter the raw data here as text instead of selecting a
+           file above)
+        </div>
+        <textarea name="rawdata" cols=60 rows=16></textarea>
+      </td>
+    </tr>
+  </form>
+
+</TABLE>

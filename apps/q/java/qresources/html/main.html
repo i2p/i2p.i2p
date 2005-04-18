@@ -1,0 +1,122 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<TITLE>Q Web Interface</TITLE>
+<style type="text/css">
+<!--
+body { font-family: helvetica, arial, sans-serif; background-color: #000080 }
+td {  }
+code { font-family: courier, monospace; font-weight: bolder; font-size:smaller }
+.logocell {
+            border-color: #ffe000;
+            border-width: 1px;
+            border-top-style:none;
+            border-bottom-style:solid;
+            border-left-style:none;
+            border-right-style:none;
+            text-align: right;
+            font-weight: bold;
+            color: #f0f0ff;
+            }
+.tabcell {
+            font-weight: bold;
+            background-color: #fffff0;
+            padding:5px;
+            border-color:#ffe000;
+            border-width: 1px;
+            border-top-style:solid;
+            border-bottom-style:none;
+            border-left-style:solid;
+            border-right-style:solid;
+            }
+.tabcell_inactive {
+            background-color: #f0f0ff;
+            padding:5px;
+            border-color:#ffe000;
+            border-width: 1px;
+            border-top-style:solid;
+            border-bottom-style:solid;
+            border-left-style:solid;
+            border-right-style:solid;
+            }
+.tablink {
+            font-size: smaller;
+            text-decoration: none;
+            }
+.mainpane { border-color:#ffe000;
+            border-width: 1px;
+            border-top-style:none;
+            border-bottom-style:solid;
+            border-left-style:solid;
+            border-right-style:solid;
+            }
+
+.mainpaneitem1 { border-style:solid; border-color:#0000ff; border-width: thin; }
+
+.mainpaneitem { border-style:solid;
+            border-color:#0000ff;
+            border-width: thin;
+            background-color: #f0f0ff;
+            }
+
+.formHeading { font-size:larger; font-weight: bolder; text-align:center; }
+
+.btn1 {      font-weight: bold;
+            }
+
+input1 {     background-color: #fffff0;
+            color: #000080;
+            
+            }
+
+-->
+</style>
+</head>
+<body bgcolor="#ffffff">
+<TABLE width="99%" height=99% align="center" cellspacing="0" cellpadding="0" border=0>
+  <TR>
+    <TD>
+      <table width="100%" cellspacing=0 cellpadding=0>
+        <tr>
+          <td>
+            <table align=right cellspacing=0 cellpadding=0 border=0>
+              <tr>
+                <tmpl_loop tabs>
+                  <td class=<tmpl_if active>"tabcell"<tmpl_else>"tabcell_inactive"</tmpl_if>>
+                    <a class="tablink" href="/<tmpl_var name>"><tmpl_var label></a>
+                  </td>
+                </tmpl_loop>
+                
+                <tmpl_if _ignore>
+                <TD class="tabcell_inactive">
+                  <a class="tablink" href="/status">Status</a>
+                </TD>
+                <TD class="tabcell">
+                  <a class="tablink" href="/settings">Settings</a>
+                </TD>
+                </tmpl_if>
+                
+              </tr>
+            </table>
+          </td>
+          <TD width=100%  class="logocell">
+            Q <tmpl_var nodeType> Node
+          </TD>
+        </TR>
+      </table>
+    </TD>  </TR>
+  <tr height=99% bgcolor="#fffff0">
+    <TD class="mainpane">
+      <br>
+      <center>
+      <tmpl_loop items>
+        <br>
+        <tmpl_var item>
+        <br>
+      </tmpl_loop>
+      </center>
+    </TD>
+  </tr>
+</TABLE>
+</body>
+</html>

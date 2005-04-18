@@ -1,0 +1,27 @@
+<table align="center" class="mainpaneitem" <tmpl_if results>width="95%"</tmpl_if>>
+  <tr>
+    <td class="formHeading" colspan=2>Search Results</td>
+  </tr>
+  <tr>
+    <td style="font-style: italic" align="center"><tmpl_var numresults> items found</td>
+  </tr>
+  <tr>
+    <td width="90%">
+      <table cellspacing=0 cellpadding=5 align=center border=0 width=95%>
+        <tmpl_loop results>
+          <tr>
+            <td>
+              <div style="font-size: larger"><a href="/<tmpl_var uri>"><tmpl_var title></a></div>
+              <tmpl_if abstract>
+                <div style="font-style: italic"><tmpl_var abstract></div>
+              </tmpl_if>
+              <div style="font-size: smaller; color: #008000;"><tmpl_var uri></div>
+              <div style="font-size:smaller;"><tmpl_var type> (<tmpl_var mimetype>) <tmpl_var size> bytes</div>
+              <div/>
+            </td>
+          </tr>
+        </tmpl_loop>
+      </table>
+    </td>
+  </tr>
+</table>

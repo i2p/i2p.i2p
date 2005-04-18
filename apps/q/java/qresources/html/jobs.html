@@ -1,0 +1,34 @@
+<table align="center" class="mainpaneitem">
+  <tr>
+    <td class="formHeading" colspan=2>Current Background Jobs</td>
+  </tr>
+  <tr>
+    <td>
+      
+      <tmpl_if items>
+      
+        <table cellspacing=0 cellpadding=5 align=center border=1>
+
+          <tr>
+            <td><b>Secs From Now</b></td>
+            <td><b>Description</b></td>
+          </tr>
+
+          <tmpl_loop items>
+            <tr>
+              <td><tmpl_var future></td>
+              <td><tmpl_var description></td>
+            </tr>
+          </tmpl_loop>
+
+        </table>
+      
+      <tmpl_else>
+      
+        <tr><td colspan=2 align=center><i>(No current jobs)</i></td></tr>
+      
+      </tmpl_if>
+
+    </td>
+  </tr>
+</table>

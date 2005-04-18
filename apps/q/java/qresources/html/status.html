@@ -1,0 +1,24 @@
+<table align="center" class="mainpaneitem">
+  <tr>
+    <td class="formHeading" colspan=2>Q Node Status</td>
+  </tr>
+  <tr>
+    <td>
+      <table cellspacing=0 cellpadding=5 align=center border=1>
+
+        <tr>
+          <td><b>Item</b></td>
+          <td><b>Value</b></td>
+        </tr>
+
+        <tmpl_loop items>
+          <tr>
+            <td><tmpl_var key></td>
+            <td><tmpl_var value></td>
+          </tr>
+        </tmpl_loop>
+
+      </table>
+    </td>
+  </tr>
+</table>

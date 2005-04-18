@@ -1,0 +1,101 @@
+<table align="center" class="mainpaneitem" width=90% >
+  <TR>
+    <TD class="formHeading" colspan="2">Insert A QSite</TD>
+  </tr>
+
+  <TR>
+    <TD colspan="2" align=center><a href="/insert?mode=file">Insert A Single File Instead</a></TD>
+  </tr>
+
+  <tr><td colspan=2><hr></td></tr>
+
+  <form method="POST" action="/insert" class="formBody">
+<!--  <form method="POST" action="/insert" class="formBody"> -->
+
+    <input type=hidden name="cmd" value="putsite">
+    <input type=hidden name="type" value="qsite">
+
+    <tr>
+      <TD valign=top>Name: </TD>
+      <td>
+        <input type="text" name="name" size="32" maxlength="50">
+        <div style="font-style: italic; font-size: smaller">
+          (A short name for the QSite - should contain only alphanumerics, '-', and '_';
+          should definitely <i>not</i> contain '/', ':', '\', ' ' etc)
+        </div>
+      </td>
+    </TR>
+
+    <tr><td colspan=2><hr></td></tr>
+
+    <tr>
+      <TD valign=top>Private Key: </TD>
+      <td>
+        <INPUT type="text" name="privkey" size="30" maxlength="60">
+        <div style="font-size: smaller; font-style: italic">
+          (Mandatory - if you don't have a signed-space keypair, get one by
+           clicking on <b>Tools</b>)
+        </div>
+      </td>
+    </TR>
+
+    <tr><td colspan=2><hr></td></tr>
+
+    <tr>
+      <TD valign=top>Directory: </TD>
+      <td>
+        <INPUT type="text" name="dir" size="60" maxlength="128">
+        <div style="font-size: smaller; font-style: italic">
+          (Absolute directory path where the QSite's files reside)
+        </div>
+      </td>
+    </TR>
+
+    <tr><td colspan=2><hr></td></tr>
+
+    <tr>
+      <TD valign=top>Title: </TD>
+      <td>
+        <input type="text" name="title" size="60" maxlength="58">
+        <div style="font-style: italic; font-size: smaller">
+          (A short descriptive title for this QSite)
+        </div>
+      </td>
+    </TR>
+
+    <tr><td colspan=2><hr></td></tr>
+
+    <tr>
+      <TD valign=top>Keywords: </TD>
+      <td>
+        <input type="text" name="keywords" size="60" maxlength="80">
+        <div style="font-style: italic; font-size: smaller">
+          (Comma-separated list of short descriptive keywords)
+        </div>
+      </td>
+    </TR>
+
+    <tr><td colspan=2><hr></td></tr>
+
+    <tr>
+      <TD valign=top>Abstract: </TD>
+      <td>
+        <textarea name="abstract" cols="50" rows="2"></textarea>
+        <div style="font-style: italic; font-size: smaller">
+          (A short descriptive summary for the QSite, preferably no
+           longer than 256 characters)
+        </div>
+      </td>
+    </TR>
+
+    <tr><td colspan=2><hr></td></tr>
+
+    <tr>
+      <TD colspan=2 align=center>
+        <INPUT class="btn" type="submit" name="submit" value="Insert it">
+      </TD>
+    </tr>
+
+  </form>
+
+</table>

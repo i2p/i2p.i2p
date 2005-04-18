@@ -1,0 +1,52 @@
+<table align="center" class="mainpaneitem"  width=80%>
+  <tr>
+    <td class="formHeading" colspan=2>Critical Anonymity Alert!</td>
+  </tr>
+  <tr>
+    <td>
+      <table cellspacing=0 cellpadding=5 align=center border=1>
+
+        <tr>
+          <td>
+            <p>You are attempting to view a QSite via an unprotected link.
+              </p>
+            <p>We have blocked the connection to protect your anonymity. If we don't
+              do this, then a malicious QSite author can insert content into the QSite
+              which triggers oubound hits to arbitrary servers on the mainstream web,
+              which in turn can easily reveal a lot of personal information about you
+              and the QSite you are accessing.
+              </p>
+            <p>If you want to browse QSites with your web browser with greater safety,
+              you'll have to follow these simple steps:
+              </p>
+              <ol>
+                <li>Edit your I2P <code>hosts.txt</code> file and add the following entry
+                  (all on one line):
+                  <blockquote><code><textarea rows=5 cols=50>q.i2p=<tmpl_var dest></textarea></code><blockquote>
+                  (and make sure you do NOT reveal this entry to anyone else)
+                  </li>
+                <li>Configure one of your web browsers to use the proxy server:
+                  <blockquote><code>localhost:4444</code></blockquote>
+                  (or whatever address you have configured your I2P EEProxy to listen on,
+                  if you've changed it)<br><br>
+                  </li>
+                <li>Start up the browser you have just configured, and enter the web address:
+                  <blockquote><code>http://q.i2p</code></blockquote>
+                  </li>
+              </ol>
+            <p>Even if you do this, you still won't have a 100% guarantee of anonymity, since
+               a malicious QSite author can send code to your browser which exploits a vulnerability
+               in the browser to compromise your anonymity (eg, accessing third party cookies, executing
+               arbitrary code, accessing your local filesystem, uploading compromising information
+               about you to hostile I2P EEPsites etc). But you can relax (somewhat) in the knowledge
+               that such attacks are much more difficult, particularly if you use a decent web browser.
+               </p>
+            <p>Thank you for your co-operation. We wish you happy and safe browsing.
+               </p>
+          </td>
+        </tr>
+
+      </table>
+    </td>
+  </tr>
+</table>
