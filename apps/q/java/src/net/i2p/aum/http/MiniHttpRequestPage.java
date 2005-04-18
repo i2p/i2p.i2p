@@ -21,6 +21,13 @@ public class MiniHttpRequestPage extends MiniHttpRequestHandler {
     /** the 'body' portion of our response page */
     protected Tag body;
 
+    public MiniHttpRequestPage(MiniHttpServer server, Object socket) throws Exception {
+        super(server, socket, null);
+        this.page = new HtmlPage();
+        head = page.head;
+        body = page.body;
+    }
+
     /** Creates a new instance of MiniHttpRequestPage */
     public MiniHttpRequestPage(MiniHttpServer server, Object socket, Object arg) throws Exception {
         super(server, socket, arg);

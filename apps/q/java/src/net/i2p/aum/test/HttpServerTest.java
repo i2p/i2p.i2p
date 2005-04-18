@@ -7,10 +7,10 @@ package net.i2p.aum.test;
 import java.util.*;
 import net.i2p.aum.http.*;
 
-public class HttpServerTest extends MiniHttpRequestHandler {
+public class HttpServerTest extends MiniHttpRequestPage {
     
-    public HttpServerTest(Object socket) throws Exception {
-        super(socket);
+    public HttpServerTest(MiniHttpServer serv, Object socket) throws Exception {
+        super(serv, socket);
     }
 
     public void on_GET() throws Exception {
