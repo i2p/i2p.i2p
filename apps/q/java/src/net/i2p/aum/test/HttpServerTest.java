@@ -7,7 +7,7 @@ package net.i2p.aum.test;
 import java.util.*;
 import net.i2p.aum.http.*;
 
-public class HttpServerTest extends MiniHttpRequestHandlerBase {
+public class HttpServerTest extends MiniHttpRequestHandler {
     
     public HttpServerTest(Object socket) throws Exception {
         super(socket);
