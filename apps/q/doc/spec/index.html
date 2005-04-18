@@ -1,0 +1,1460 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+    <title>Q Protocol Specification</title>
+
+    <style type="text/css">
+<!--
+td { vertical-align: top; }
+-->
+    </style>
+  </head>
+
+
+
+  <body style="font-family: arial, helvetica, sans-serif">
+    <center>
+      <h1>Q Protocol Specification</h1>
+
+      (first draft by aum)<br>
+      <br>
+      Return to <a href="../index.html">Q Homepage</a><br>
+      <br>
+    <small>
+        <a href="#intro">Introduction</a> |
+        <a href="#xmlrpc">XML-RPC</a> |
+        <a href="#arch">Architecture</a> |
+        <a href="#commands">Commands</a> |
+        <a href="#examples">Example&nbsp;Code</a> |
+        <a href="#metadata">Metadata</a> |
+        <a href="#security">Security</a> |
+        <a href="#contact">Contact us</a>
+      </small>
+
+    </center>
+
+    <a name="intro"></a>
+
+    <hr>
+
+    <h2>1. Introduction</h2>
+
+    This document describes details of the interfaces between the various entities
+    in the Q network - <i>server nodes</i>, <i>client nodes</i> and <i>client applications</i>.<br>
+    <br>
+    Purpose is to:
+    <ul>
+      <li>Assist with people writing user client applications, such as GUI apps, command-line
+        apps, or integrate Q in to existing apps.
+      </li>
+
+      <li>Permit alternative implementations of any of these entities, in any
+        programming language.
+      </li>
+
+      <li>Help interested parties to gain a quick understanding of Q's architecture,
+        perhaps with a view to contributing ideas for improvement.</li>
+    </ul>
+
+        <a name="xmlrpc"></a>
+
+    <hr>
+
+    <h2>2. XML-RPC Interface</h2>
+
+    <h3>2.1. WTF? All those ugly complicated angle-brackets?!?</h3>
+
+    If you haven't come across XML-RPC before, the whole concept might seem frightening, like
+    you've gotta write thousands of lines of code for parsing and encoding XML, and
+    negotiate some mind-numbingly complex multi-layered protocol.<br>
+    <br>
+    This is most certainly not the case. XML-RPC libraries are <i>way simple</i> to use.<br>
+    <br>
+    XML-RPC client and server libraries are available for all major (and most minor)
+    programming languages, and are structured in a way that hides all the intricate
+    details and presents an extremely simple and quickly learnable API over the top.
+
+    <hr>
+
+    <h3>2.2. Why XML-RPC??</h3>
+
+    I've chosen XML-RPC as the node interface framework because:
+    <ul>
+      <li>It's easy and quick to learn, regardless of programming language</li>
+      <li>It's supported by free libraries in all major programming languages</li>
+      <li>It avoids the maintenance problems of home-brew interfaces (people writing
+        implementations in several languages, some falling into disuse then breaking)</li>
+      <li>It reduces the opportunity for writing vulnerable client code (compare to writing
+        raw socket handlers in C, and inadvertently opening oneself up to buffer
+        overruns etc)</li>
+      <li>It allows for rapid client development</li>
+    </ul>
+
+      <a name="arch"></a>
+
+    <hr>
+
+    <h2>3. Architectural Overview</h2>
+
+    The Q network is structured as a two-level hierarchy of <i>server nodes</i> and
+    <i>client nodes</i>. Additionally, <i>client applications</i> are run by users, and
+    form the human interface to Q.<br>
+    <br>
+    Let's quickly overview the difference between these three entities:
+    <ul>
+      <li>Server nodes:
+        <ul>
+          <li>Are exptected to stay up all or most of the time</li>
+          <li>Are suited for running on permanently-up I2P routers</li>
+          <li>Run an XML-RPC server, listening exclusively within the I2P network for
+            commands from other peer <i>server nodes</i> as well as from <i>client
+              nodes</i></li>
+          <li>Run XML-RPC clients, for sending commands via I2P to other <i>server nodes</i></li>
+          <li>When joining the network, announce themselves as peers to
+            other <i>server nodes</i></li>
+          <li>Usually have no direct contact with <i>client applications</i></li>
+          <li>Receive and execute commands from <i>client nodes</i>, as well as
+            from other peer <i>server nodes</i>.</li>
+          <li>Will never send commands to <i>client nodes</i>.</li>
+          <li>Store content, which is served up by request to <i>client nodes</i></li>
+          <li>Send catalogues of their stored content on request to <i>client nodes</i></li>
+          <li>Store lists of their known peer <i>server nodes</i>, and send these lists
+            on request to <i>client nodes</i>
+          <li>Manage load by advising <i>client nodes</i>, and peer <i>server nodes</i>,
+            in command replies, of the next advisable time for contact</li>
+          <li>Should preferably be implemented in platform-independent code</li>
+        </ul>
+      </li>
+    <br>
+
+    <li>Client nodes:
+      <ul>
+        <li>May run as continuously or as intermittently as desired without causing
+          disruption to the network</li>
+        <li>Run an XML-RPC server, listening exclusively within the user's local
+          TCP/IP network (usually a localhost port), as opposed to <i>server nodes</i>
+          which run their XML-RPC server listening within I2P</li>
+        <li>Run XML-RPC clients, for sending commands via I2P to <i>server nodes</i></li>
+        <li>Never announce themselves as peers to <i>server nodes</i></li>
+        <li>Never have contact with other <i>client nodes</i>
+        <li>Are suited for use over permanent <i>or</i> transient I2P routers</li>
+        <li>Periodically contact servers requesting differential updates to
+          content catalogues, as well as peer lists. From this info, they maintain
+          a local mirror of what's available globally</li>
+        <li>When receiving any command reply from a given server, are expected to
+          honour the <i>next advised contact time</i> specified by that server</li>
+        <li>Form the official point of access to the Q network for <i>client
+            applications</i></li>
+        <li>Should preferably be implemented in platform-independent code</li>
+      </ul>
+    </li>
+    <br>
+
+    <li>Client applications:
+      <ul>
+        <li>Form the point of human (or third-party program) access to the Q network</li>
+        <li>Offer the user a means of searching for content, inserting content and
+          retrieving content</li>
+        <li>Include GUI apps, CLI apps, web apps, and apps with other user or program
+          interfaces.</li>
+        <li>Usually never run an XML-RPC server at all</li>
+        <li>Run a single XML-RPC client, for sending commands via TCP to a
+          local <i>client node</i></li>
+        <li>Are implemented and maintained separately to the core Q framework, though
+          at any time might be included in official Q distributions</li>
+        <li>Can be freely implemented in platform-independent or platform-dependent
+          code. For instance, Macintosh-only, or Windows-only implementations are
+          perfectly acceptable (but not <i>quite</i> as welcome as platform-independent
+          implementations)</li>
+      </ul>
+    </li>
+
+  </ul>
+
+      <a name="commands"></a>
+
+    <hr>
+
+    <h2>4. Q Command Interface Description</h2>
+
+    <h3>4.1. Overview</h3>
+
+    As mentioned earlier, communication between all Q entities takes place via an
+    XML-RPC mechanism.<br>
+    <br>
+    This chapter describes the actual primitives which are supported by both <i>server
+      nodes</i> and <i>client nodes</i>.<br>
+    <br>
+    Although the primitives are the same for both server and client, the way they are actioned
+    internally may vary.<br>
+    <blockquote>
+      <small>
+        <i>For example, with the <b>getItem</b> primitive, server nodes will only look in
+          their local content store for the item, returning either that item's data and
+          metadata, or a failure reply. On the other hand, client nodes will try their
+          local content store first, and if the item is not found, will look in their
+          peer catalogues. If the item is found in a peer catalogue, the client node will
+          then on-send <b>getItem</b> calls to all server nodes believed to hold that item,
+          until or unless it retrieves a verifiable copy of that item</i>
+      </small>
+    </blockquote>
+
+    <hr>
+
+    <h3>4.2. XML-RPC Data Types</h3>
+
+    <blockquote>
+      <blockquote>
+        <small><i>
+        It's possibly a good idea here to get a hold of the XML-RPC library for
+        your favourite programming language, as well as the manual, and look up
+        the description of data types. Also, if you're especially keen,
+        you might like to read up on XML-RPC in general:
+        <ul>
+          <li><a href="http://ontosys.com/xml-rpc/">XML-RPC Information</li>
+          <li><a href="http://xmlrpc-c.sourceforge.net/xmlrpc-howto/xmlrpc-howto.html">XML-RPC
+              Howto</a></li>
+        </ul>
+        </i></small>
+      </blockquote>
+    </blockquote>
+
+    XML-RPC supports a canonical set of data types, which are seamlessly integrated into
+    all its high level language implementations. A quick overview of the XML-RPC data types
+    used in Q appears below.<br>
+    <br>
+
+    <table width=70% cellspacing=0 cellpadding=4 align=center border=1>
+        <tr>
+          <td><b>XML-RPC Data Type</b></td>
+          <td><b>Description</b></td>
+        </tr>
+
+        <tr>
+          <td>int</td>
+          <td>Plain 32-bit integer</td>
+        </tr>
+
+        <tr>
+          <td>string</td>
+          <td>Sequence of ASCII bytes, viewed as <b>java.lang.String</b> objects in java, and <b>str</b>
+            objects (strings) in Python.
+            Note that ASCII control chars, and high-bit-set chars, are highly illegal and will
+            cause failure.</td>
+        </tr>
+
+        <tr>
+          <td>binary data</td>
+          <td>Raw binary data, viewed as <b>byte []</b> in java, and <b>xmlrpclib.Binary</b> objects
+            in Python. This is the format used for raw content data.</td>
+        <tr>
+          <td>list</td>
+          <td>Sequence of objects, viewed as <b>java.util.Vector</b> in java, and <b>list</b> objects in Python.
+          </td>
+        </tr>
+
+        <tr>
+          <td>struct</td>
+          <td>An unordered set of (key, value) pairs.
+            Represented as <b>java.util.Hashtable</b> objects in java, and
+            <b>dict</b> objects in Python, (<b>associative array</b> in perl, ...)</td>
+        </tr>
+
+    </table>
+
+    <hr>
+
+    <h3>4.3. General Command/Response Format</h3>
+
+    With Q's XML-RPC usage, all commands are a sequence of zero or more arguments. All
+    responses are a <b>struct</b> with at least the key <b>status</b>, whose value, a
+    string, is one of:
+    <ul>
+      <li><b>"ok"</b> - the command was successful; any additional data is included
+        under other keys, depending on the command</li>
+      <li><b>"error"</b> - the command failed, and an additional key <b>error</b>
+        contains a terse description of the error</li>
+    </ul>
+    Note that all commands are also implemented with an alternative entry point, one which
+    takes a single Hashtable (struct/dict/assoc-array) argument. Refer to the javadocs for
+    further info: 
+
+    <hr>
+
+    <h4>4.4. Exceptions - XML-RPC and Otherwise</h4>
+    <blockquote>
+      In certain cases, XML-RPC calls to Q nodes may return an exception.<br>
+      <br>
+      For instance, any attempt to invoke any primitive other than those listed below
+      will most definitely cause an exception, because in the Q XML-RPC implementation,
+      no provision is made for default handlers.<br>
+      <br>
+      Apart from this, it's possible that calls to known legal methods may trigger an
+      exception. This is not supposed to happen, and the author will be working over
+      time to intercept all such exceptions and wrap them in appropriate response
+      structures. But in the meantime, client app developers should catch any exceptions
+      resulting from their XML-RPC calls and recover appropriately.
+    </blockquote>
+
+    <hr>
+
+    <h3>4.5. Overview of Q XML-RPC Primitives</h3>
+
+    The XML-RPC primitives supported by Q server and client nodes include:
+    <ul>
+      <li><b>i2p.q.ping</b> - test if a server node is alive</li>
+      <li><b>i2p.q.hello</b> - one new server node introduces itself to another server node</li>
+      <li><b>i2p.q.getItem</b> - retrieve an item of content</li>
+      <li><b>i2p.q.putItem</b> - insert an item of content</li>
+      <li><b>i2p.q.getUpdate</b> - retrieve a differential update of peers list (and optionally, catalog update)</li>
+      <li><b>i2.q.search</b> - search a client node for data items matching certain patterns</li>
+    </ul>
+
+    <hr>
+
+    <h3>4.6. i2p.q.ping</h3>
+
+    <blockquote>
+
+      <h4>Overview</h4>
+
+      <blockquote>
+
+        The <b>i2p.q.ping</b> primitive is used to test if a given server or client node
+        is presently online. It can be sent by server nodes, client nodes and client apps.
+
+      </blockquote>
+
+      <h4>Arguments</h4>
+
+      <blockquote>
+        This primitive accepts no arguments, and will fail if any arguments are given.
+      </blockquote>
+
+      <h4>Server Behaviour</h4>
+
+      <blockquote>
+        No action on the part of the receiving server is required, apart from sending back:
+      </blockquote>
+      <table cellspacing=0 cellpadding=4 border=1 width=70% align=center>
+          <tr><td><b>Key</b></td><td><b>Type</b></td><td><b>Description</b></td></tr>
+          <tr>
+            <td>status</td>
+            <td>string</td>
+            <td>"ok"</td>
+          </tr>
+          <tr>
+            <td>id</td>
+            <td>string</td>
+            <td>The node's nodeId, as a base64 string</td>
+          </tr>
+          <tr>
+            <td>dest</td>
+            <td>string</td>
+            <td>Node's destination, represented as base64 string</td>
+          </tr>
+          <tr>
+            <td>uptime</td>
+            <td>int</td>
+            <td>The number of seconds that this node has been running for</td>
+          </tr>
+          <tr>
+            <td>load</td>
+            <td>float</td>
+            <td>Current load this node is experiencing, as a float between
+              0.0 (no load) to 1.0 (impossibly flatlined)</td>
+          </tr>
+      </table>
+
+      <h4>Client Behaviour</h4>
+
+      <blockquote>
+        Same as server.
+      </blockquote>
+
+    </blockquote>
+
+    <hr>
+
+    <h3>4.7. i2p.q.hello</h3>
+
+    <blockquote>
+
+      <h4>Overview</h4>
+
+      <blockquote>
+
+        The <b>i2p.q.hello</b> primitive is sent by new server nodes to advise other existing
+        server nodes of their existence. It is only sent by server nodes to other server
+        nodes. It is considered an abuse for a client node to send this command.
+
+      </blockquote>
+
+      <h4>Arguments</h4>
+
+      <ul>
+        <li><b>destination</b> (string) - the base64 representation of the calling node's
+          I2P destination (on which the calling node's in-I2P XML-RPC server may be
+          subsequently reached). Same format as the I2P hosts.txt listing.
+      </ul>
+
+      <h4>Server Behaviour</h4>
+
+      <blockquote>
+        If the destination is valid, the receiving server will reply with:
+      </blockquote>
+
+      <table cellspacing=0 cellpadding=4 border=1 width=70% align=center>
+          <tr><td><b>Key</b></td><td><b>Type</b></td><td><b>Description</b></td></tr>
+          <tr>
+            <td>status</td>
+            <td>string</td>
+            <td>"ok"</td>
+          </tr>
+      </table>
+
+      <blockquote>
+        If the destination is invalid, the receiving server will send back:
+      </blockquote>
+
+      <table cellspacing=0 cellpadding=4 border=1 width=70% align=center>
+          <tr><td><b>Key</b></td><td><b>Type</b></td><td><b>Description</b></td></tr>
+          <tr>
+            <td>status</td>
+            <td>string</td>
+            <td>"error"</td>
+          </tr>
+          <tr>
+            <td>error</td>
+            <td>string</td>
+            <td>"baddest"</td>
+          </tr>
+      </table>
+
+      <h4>Client Behaviour</h4>
+      
+      <blockquote>
+        <b>i2p.q.hello</b> calls to clients are illegal. Client nodes receiving such
+        calls will respond with:
+      </blockquote>
+
+      <table cellspacing=0 cellpadding=4 border=1 width=70% align=center>
+          <tr><td><b>Key</b></td><td><b>Type</b></td><td><b>Description</b></td></tr>
+          <tr>
+            <td>status</td>
+            <td>string</td>
+            <td>"error"</td>
+          </tr>
+          <tr>
+            <td>error</td>
+            <td>string</td>
+            <td>"unimplemented"</td>
+          </tr>
+      </table>
+
+    </blockquote>
+
+    <hr>
+
+    <h3>4.8. i2p.q.getItem</h3>
+
+    <blockquote>
+
+      <h4>Overview</h4>
+
+      <blockquote>
+
+        The <b>i2p.q.getItem</b> primitive is used to attempt retrieval of an item of content
+        from a client or server node.
+        
+      </blockquote>
+      
+      <h4>Arguments</h4>
+      
+      <ul>
+        <li><b>key</b> (string) - the base64 key under which the item in question is
+          stored</li>
+      </ul>
+
+      <h4>Server Behaviour</h4>
+
+      <blockquote>
+        Servers receiving this command will only search their own datastore for the item.
+        They will never attempt to on-request this item from other servers.<br>
+        <br>
+        If the server possesses the requested item in its datastore, it will respond with:
+      </blockquote>
+
+      <table cellspacing=0 cellpadding=4 border=1 width=70% align=center>
+          <tr><td><b>Key</b></td><td><b>Type</b></td><td><b>Description</b></td></tr>
+          <tr>
+            <td>status</td>
+            <td>string</td>
+            <td>"ok"</td>
+          </tr>
+          <tr>
+            <td>metadata</td>
+            <td>struct</td>
+            <td>A nested struct, containing the metadata for the key. (Refer section on
+              metadata).</td>
+          </tr>
+          <tr>
+            <td>data</td>
+            <td>binary data</td>
+            <td>The raw data.</td>
+          </tr>
+      </table>
+
+      <blockquote>
+        If the server doesn't possess the data, it will respond with:
+      </blockquote>
+
+      <table cellspacing=0 cellpadding=4 border=1 width=70% align=center>
+          <tr><td><b>Key</b></td><td><b>Type</b></td><td><b>Description</b></td></tr>
+          <tr>
+            <td>status</td>
+            <td>string</td>
+            <td>"error"</td>
+          </tr>
+          <tr>
+            <td>error</td>
+            <td>string</td>
+            <td>"notfound"</td>
+          </tr>
+      </table>
+
+
+      <h4>Client Behaviour</h4>
+
+      <blockquote>
+        If the client possesses the key in its own local datastore, it will send back
+        the full data immediately:
+      </blockquote>
+
+      <table cellspacing=0 cellpadding=4 border=1 width=70% align=center>
+          <tr><td><b>Key</b></td><td><b>Type</b></td><td><b>Description</b></td></tr>
+          <tr>
+            <td>status</td>
+            <td>string</td>
+            <td>"ok"</td>
+          </tr>
+          <tr>
+            <td>metadata</td>
+            <td>struct</td>
+            <td>A nested struct, containing the metadata for the key. (Refer section on
+              metadata).</td>
+          </tr>
+          <tr>
+            <td>data</td>
+            <td>binary data</td>
+            <td>The raw data.</td>
+          </tr>
+      </table>
+
+      <blockquote>
+        If the client doesn't possess the key, it will search its internal catalogues
+        for a server which does have the key.<br>
+        <br>
+        If one or more servers possessing the key are found, the client will on-send
+        an <b>i2p.q.getItem</b> command to each of those servers in turn, until it
+        either successfully retrieves the data, or fails.<br>
+        <br>
+        If the client successfully retrieves the data from one or more of its servers,
+        it will add the data to its internal cache, and reply with the above success
+        response.<br>
+        <br>
+        If the client was unable to source the complete data from any of its servers,
+        it will reply with:
+      </blockquote>
+
+      <table cellspacing=0 cellpadding=4 border=1 width=70% align=center>
+          <tr><td><b>Key</b></td><td><b>Type</b></td><td><b>Description</b></td></tr>
+          <tr>
+            <td>status</td>
+            <td>string</td>
+            <td>"error"</td>
+          </tr>
+          <tr>
+            <td>error</td>
+            <td>string</td>
+            <td>"notfound"</td>
+          </tr>
+      </table>
+
+    </blockquote>
+
+    <hr>
+
+    <h3>4.9. i2p.q.putItem</h3>
+
+    <blockquote>
+
+      <h4>Overview</h4>
+
+      <blockquote>
+
+        The <b>i2p.q.putItem</b> primitive is used by client nodes to insert a new item
+        of content onto a server node.<br>
+        <br>
+        It is also used by <i>client apps</i> to insert a new item onto their
+        <i>client node</i>.<br>
+        <br>
+        Also, if a server node is receiving a high traffic of requests for a given item,
+        it may at its discretion send <b>i2p.q.putItem</b> commands to peer servers
+        to mirror the item on those servers, and spread the load.
+      </blockquote>
+
+      <h4>Arguments</h4>
+
+      <ul>
+        <li><b>data</b> - (binary) - the raw data to insert. Refer earlier - the compatible
+        Java datatype is <b>byte[]</b>, and Python datatype is <b>xmlrpclib.Binary</b>.</li>
+        <li><b>metadata</b> - (struct) - <b><i>optional</i></b> - a struct of metadata to
+          insert alongside the data. If this is not given, a minimal metadata set will
+          be automatically created by the recipient. See the section on
+          <a href="#metadata">metadata</a>.
+      </ul>
+
+      <h4>Server Behaviour</h4>
+
+      <blockquote>
+        If the server successfully received and stored the data (and optionally provided
+        metadata), it will reply with:
+      </blockquote>
+
+      <table cellspacing=0 cellpadding=4 border=1 width=70% align=center>
+          <tr><td><b>Key</b></td><td><b>Type</b></td><td><b>Description</b></td></tr>
+          <tr>
+            <td>status</td>
+            <td>string</td>
+            <td>"ok"</td>
+          </tr>
+          <tr>
+            <td>key</td>
+            <td>string</td>
+            <td>The base64 key under which this item has been stored, and which should
+              be used for any subsequent <b>i2p.q.getItem</b> requests for that item
+              within the Q network.</td>
+          </tr>
+      </table>
+
+      <blockquote>
+        However, if the server's datastore is full, the server will not be able to store
+        this item, in which case it will respond with:
+      </blockquote>
+
+      <table cellspacing=0 cellpadding=4 border=1 width=70% align=center>
+          <tr><td><b>Key</b></td><td><b>Type</b></td><td><b>Description</b></td></tr>
+          <tr>
+            <td>status</td>
+            <td>string</td>
+            <td>"error"</td>
+          </tr>
+          <tr>
+            <td>error</td>
+            <td>string</td>
+            <td>"storefull"</td>
+          </tr>
+      </table>
+
+      <h4>Client Behaviour</h4>
+
+      <blockquote>
+        Client nodes receiving this command will attempt to store the item in their own
+        datastore, and respond immediately with one of the above server responses.<br>
+        <br>
+        In addition, client nodes will enqueue a background job to upload this item to
+        one or more selected server nodes.
+      </blockquote>
+
+    </blockquote>
+
+    <hr>
+
+    <h3>4.10. i2p.q.getUpdate</h3>
+
+    <blockquote>
+
+      <h4>Overview</h4>
+
+      <blockquote>
+
+        The <b>i2p.q.getUpdate</b> primitive is used to request a differential peers list
+        update (which optionally can include a catalog update as well).<br>
+        <br>
+        <i>Client apps</i> invoke this primitive on <i>client nodes</i> to get up-to-date
+        listings of items available in the network. Note that client apps will not
+        hand over any peers list.<br>
+        <br>
+        <i>Client nodes</i> periodically schedule a background job to invoke this primitive
+        on their known servers, such that they keep the most recent possible view of
+        available data and other servers.<br>
+      </blockquote>
+
+      <h4>Arguments</h4>
+
+      <ul>
+        <li><b>since</b> - (int) - unix time in seconds to update from. The recipient
+          will send back a list of all content it has become aware of since this
+          time.</li>
+        <li><b>includePeers</b> - (int) - set to 1 to include peer list update in the return
+          data, 0 to omit.</li>
+        <li><b>includeCatalog</b> - (int) - set to 1 to include catalog update in the return
+          data, 0 to omit.</li>
+      </ul>
+
+      <h4>Server Behaviour</h4>
+
+      <blockquote>
+        On receiving this command, a server node will send back lists of metadata records
+        for all new content (and/or all new peers) it has become aware of since the given
+        date. The full response is formatted as follows:
+      </blockquote>
+
+      <table cellspacing=0 cellpadding=4 border=1 width=70% align=center>
+          <tr><td><b>Key</b></td><td><b>Type</b></td><td><b>Description</b></td></tr>
+          <tr>
+            <td>status</td>
+            <td>string</td>
+            <td>"ok"</td>
+          </tr>
+          <tr>
+            <td>items</td>
+            <td>list</td>
+            <td>A list of metadata records for new items. Refer to the section on
+              <a href="#metadata">metadata</a> for more information. If the server
+              has not become aware of any new data since the given date (or if the
+              <b>includeCatalog</b> argument was 0), this list will be empty.</td>
+          </tr>
+          <tr>
+            <td>peers</td>
+            <td>list</td>
+            <td>A list of destinations of new peers. If the server has not discovered
+              any new peers since the given date (or if the <b>includePeers</b> argument
+              was 0), this list will be empty.
+          <tr>
+            <td>timeUpdateEnds</td>
+            <td>int</td>
+            <td>unixtime in secs that this update ends. The peer receiving this
+              response should note this time, and quote it as the <b>since</b> argument
+              in the next <b>getUpdate</b> request</td>
+          </tr>
+          <tr>
+            <td>timeNextContact</td>
+            <td>int</td>
+            <td>Advised time (unixtime in sec) for sending the next <b>getUpdate</b> command. The sending
+              peer should not issue any getCatalog commands before this time, but is
+              welcome to issue them after this time. The actual time value is guesstimated
+              by the server node, depending on its current load.</td>
+          </tr>
+      </table>
+
+    <h3>4.11. i2p.q.search</h3>
+
+    <blockquote>
+
+      <h4>Overview</h4>
+
+      <blockquote>
+
+        The <b>i2p.q.search</b> primitive is invoked by client apps to search a client node
+          for data items matching a set of criteria.
+        <br>
+          Only client nodes support this primitive. Server nodes will return an empty
+          result set and an error response.
+      </blockquote>
+
+      <h4>Arguments</h4>
+
+      <ul>
+        <li><b>criteria</b> - (hashtable) - a set of metadata criteria to match. Each key in
+            this hashtable is a metadata key (eg <b>title</b>, <b>type</b> etc), and the
+            corresponding value is a regular expression string to match. Regular expression
+            syntax is documented in the java API in the 
+            <a href="http://java.sun.com/j2se/1.4.2/docs/api/java/util/regex/Pattern.html">section
+              on class 'Pattern'</a>.<br>
+            <br>
+            The search criteria work 'AND-style', in that if more than one metadata key
+            match pattern is given, then only items matching all of the given criteria
+            will be returned.<br>
+            <br>
+            Python example (using XML-RPC proxy - see code samples below):
+            <blockquote><code><pre>
+result = mynode.i2p.q.search({"type":"text", "summary":"^War.*"})
+metaRecs = result['items']
+</pre></code></blockquote>
+            Java Example (using XML-RPC proxy - see code examples below):
+            <blockquote><code><pre>
+Hashtable criteria = new Hashtable();
+criteria.put("type", "text");
+criteria.put("summary", "^War.*");
+Vector args = new Vector();
+args.addElement(criteria);
+Hashtable result = (Hashtable)mynode.execute("i2p.q.search", args);
+Vector metaRecs = (Vector)result.get("items");
+</pre></code></blockquote>
+            Note that if the <b>criteria</b> argument is empty (no keys/values), then the
+            client node will send back metadata for every item of content it knows of, which
+            (depending on the size of the Q network), could be quite a resource-hungry operation.
+          </li>
+      </ul>
+
+      <h4>Server Behaviour</h4>
+
+        <blockquote>
+          Servers receiving this command will send back an error response:
+        </blockquote>
+        
+        <table cellspacing=0 cellpadding=4 border=1 width=70% align=center>
+            <tr><td><b>Key</b></td><td><b>Type</b></td><td><b>Description</b></td></tr>
+            <tr>
+              <td>status</td>
+              <td>string</td>
+              <td>"error"</td>
+            </tr>
+            <tr>
+              <td>error</td>
+              <td>string</td>
+              <td>"unimplemented"</td>
+            </tr>
+        </table>
+        
+      <h4>Client Behaviour</h4>
+
+      <blockquote>
+          Client nodes receiving this command will send back the following response:
+      </blockquote>
+
+        <table cellspacing=0 cellpadding=4 border=1 width=70% align=center>
+            <tr><td><b>Key</b></td><td><b>Type</b></td><td><b>Description</b></td></tr>
+            <tr>
+              <td>status</td>
+              <td>string</td>
+              <td>"ok"</td>
+            </tr>
+            <tr>
+              <td>items</td>
+              <td>vector</td>
+              <td>A list of metadata records (Hashtables) for items which match the given
+                search criteria, and are retrievable through this client
+                node (ie, the client node either possesses the item, or knows one or more
+                servers which possess the item).<br>
+            </tr>
+        </table>
+
+    </blockquote>
+
+
+    <hr>
+
+    <h2>5. Client Program Examples</h2>
+
+    <h3>5.1. Overview</h3>
+
+    This section provides a couple of simple examples of client app programming.<br>
+    <br>
+    At present, only Python and Java examples are given.<br>
+    <br>
+    (If you don't know either of these languages, you should be
+    able to get the general drift by studying the examples, sufficient to map the concepts to the
+    XML-RPC API available to your preferred language.)<br>
+    <br>
+    The examples below communicate with a <i>client node</i> XML-RPC server (running on the
+    local machine and listening on its default port of 7651), and perform simple
+    operations of data insertion, catalog fetching and data retrieval.
+
+    <hr>
+
+    <h3>5.2. Java Example</h3>
+
+    To run this example, you'll need:
+    <ul>
+      <li>A running I2P installation, with an instance of a Q client node.
+      <li>The I2P standard jarfiles declared in your java <b>CLASSPATH</b></li>
+      <li>The standard Apache XML-RPC library jarfile in your <b>CLASSPATH</b> (which you will
+        already have on your CLASSPATH, because this is part of installing Q). Recall that you
+        can get a copy of Apache java XML-RPC lib jarfile from
+        <a href="http://ws.apache.org/xmlrpc">http://ws.apache.org/xmlrpc</a>).</li>
+    </ul>
+    Now for the code (heavily annotated, so you don't necessarily need to know or understand Java), which
+    should be written to a source file called <b>QDemo.java</b>. Note that this client would be a
+    significantly shorter if it instantiated a <b>QClientNode</b> class directly and invoked its methods,
+    but that is not what we're showing here - we're demonstrating the use of the client node's XML-RPC
+    interface.
+    <blockquote>
+      <code><pre>
+// QDemo.java
+//
+// A simple demo example of a Q client application, which 
+// communicates with a running Q client node on the local
+// machine via its TCP XML-RPC interface
+//
+// If your client node is not running on localhost, or
+// if it's listening on a port other than the default
+// 7651, you'll need to change the code below.
+//
+// Note that this demo is bloated by the fact we're using
+// raw XML-RPC.
+// 
+// The following exercises are left to the reader:
+//  1. Modify this app so that instead of using the XML-RPC
+//     interface, it instantiates a QClientNode, and
+//     invokes its methods directly.
+//  2. Write a thin wrapper class which instantiates an XML-RPC
+//     client, and offers simpler access methods (thus avoiding
+//     the need to create and populate Vectors of args before
+//     calling, and pick through a reply Hashtable after the call),
+//     and create a version of this demo which uses the wrapper.
+
+// pull in some standard java stuff
+import java.*;
+import java.lang.*;
+import java.util.*;
+import java.net.*;
+import java.io.*;
+
+// pull in some xml-rpc stuff
+import org.apache.xmlrpc.*;
+
+// since we're talking to the node via xmlrpc, and talking to
+// it in a separate VM, we don't need to import any Q packages
+
+// Define a minimal demo class, which kust defines a
+// main method enabling us to run the demo from a shell.
+//
+// For the purposes of this demo, we're assuming that your Q client node is
+// running on your local machine, and that you haven't altered the
+// listening port (default 7651) for the client's XML-RPC interface.
+
+public class QDemo {
+
+    // just define a main so we can run this from a shell
+    static public void main(String [] args)
+        throws MalformedURLException, XmlRpcException, IOException
+    {
+        // for getting and analysing replies from node
+        Hashtable result;
+        String status;
+
+        // Create a new client app object
+        XmlRpcClient myClient = new XmlRpcClient("http://127.0.0.1:7651");
+
+        // -------------------------------------
+        // First action - execute a 'ping' on this peer
+        // -------------------------------------
+
+        Vector noArgs = new Vector();
+        result = (Hashtable)myClient.execute("i2p.q.ping", noArgs);
+        print("ping: result=" + result);
+
+        // -------------------------------------
+        // Second action - insert an item of data
+        // -------------------------------------
+
+        // mark the current time, we'll use this later
+        Integer then = new Integer((int)(new Date().getTime() / 1000));
+
+        // create metadata
+        // (note from previous chapter that metadata is optional)
+        Hashtable meta = new Hashtable();
+        meta.put("type", "text");
+        meta.put("abstract", "a simple piece of demo data");
+        meta.put("mimetype", "text/plain");
+
+        // create some data
+        String data = "Hello, world";
+
+        // set up the arguments list
+        Vector insertArgs = new Vector();
+        insertArgs.addElement(meta);
+        insertArgs.addElement(data.getBytes()); // must insert data as byte[]
+            
+        // and do the insert
+        result = (Hashtable)myClient.execute("i2p.q.putItem", insertArgs);
+        print("putItem: result=" + result);
+
+        // check what happened
+        status = (String)result.get("status");
+        String key;
+        if (status.equals("ok")) {
+            // insert succeeded
+            key = (String)result.get("key");
+            print("Insert successful");
+        } else {
+            // insert failed, bail
+            print("Insert failed: error=" + (String)result.get("error"));
+            return;
+        }
+
+        // -------------------------------------
+        // Third action - check for catalog updates
+        // (which should include what we've just inserted)
+        // -------------------------------------
+
+        // create an args list, with just the date we noted before the insert
+        Vector updateArgs = new Vector();
+        updateArgs.addElement(then);
+        // add the flags
+        updateArgs.addElement(new Integer(0));   // 'includePeers'
+        updateArgs.addElement(new Integer(1));   // 'includeCatalog'
+
+        // execute the 'getCatalog'
+        result = (Hashtable)myClient.execute("i2p.q.getUpdate", updateArgs);
+        print("getUpdate: result="+result);
+
+        // pick out the results, and search for what we just inserted
+        int i;
+        Vector items = (Vector)result.get("items");
+        int nitems = items.size();
+        boolean foundit = false;
+        for (i = 0; i < nitems; i++) {
+            // get the nth item
+            Hashtable metaRec = (Hashtable)items.get(i);
+            String thisKey = (String)metaRec.get("key");
+            if (thisKey.equals(key)) {
+                // yay, got it!
+                foundit = true;
+                break;
+            }
+        }
+
+        // did we get it?
+        if (!foundit) {
+            print("wtf? we inserted it but it's not in the catalog!");
+            return;
+        }
+
+        // yep, we got it, so try to retrieve it back
+        Vector getArgs = new Vector();
+        getArgs.addElement(key);
+        result = (Hashtable)myClient.execute("i2p.q.getItem", getArgs);
+        print("getItem: result=" + result);
+
+        // did we get it?
+        status = (String)result.get("status");
+        if (!status.equals("ok")) {
+            print("getItem failed: " + (String)result.get("error"));
+            return;
+        }
+
+        // yep, got it
+        byte [] binData = (byte [])result.get("data");
+        String strData = new String(binData);
+        print("getItem: success, data='"+strData+"'");
+
+        print("--- END OF Q CLIENT DEMO ---");
+    }
+
+    // a convenient shorthand method for printing stuff to stdout
+    static void print(String msg) {
+        System.out.println(msg);
+    }
+}
+        </pre></code>
+      </blockquote>
+
+    <hr>
+
+    <h3>5.3. Python Example</h3>
+
+    To run this example, you will need a running I2P installation, including a running instance
+    of a Q client node.<br>
+    <br>
+    Note that, in contrast to Java, Python 2.3 and later have all the necessary XML-RPC libraries built in.
+    <br>
+    Now for some code (again, heavily annotated). This, together with the previous example, present an
+    interesting comparison between some of Java and Python's ways of doing things.
+    <blockquote>
+      <code><pre>
+#!/usr/bin/env python
+"""
+QDemo.py
+
+A simple demo example of a Q client application, which 
+communicates with a running Q client node on the local
+machine via its TCP XML-RPC interface
+
+If your client node is not running on localhost, or
+if it's listening on a port other than the default
+7651, you'll need to change the code below.
+
+Note that this demo is bloated by the fact we're using
+raw XML-RPC.
+
+The following exercise is left to the reader:
+ * Write a thin wrapper class which instantiates an XML-RPC
+   client, and offers simpler access methods (thus avoiding
+   the need to pick through a reply dict after the call),
+   and create a version of this demo which uses the wrapper.
+"""
+
+# a coupla needed imports
+from time import time
+from xmlrpclib import ServerProxy, Binary
+
+# For the purposes of this demo, we're assuming that your Q client node is
+# running on your local machine, and that you haven't altered the
+# listening port (default 7651) for the client's XML-RPC interface.
+
+def qdemo():
+    # Create a new client app object
+    myClient = ServerProxy("http://127.0.0.1:7651")
+
+    # -------------------------------------
+    # First action - execute a 'ping' on this peer
+    # -------------------------------------
+
+    result = myClient.i2p.q.ping()
+    print "ping: result=%s" % result
+
+    # -------------------------------------
+    # Second action - insert an item of data
+    # -------------------------------------
+
+    # mark the current time, we'll use this later
+    then = int(time())
+
+    # create metadata
+    # (note from previous chapter that metadata is optional)
+    meta = {
+        "type" : "text",
+        "abstract" : "a simple piece of demo data",
+        "mimetype" : "text/plain",
+        }
+
+    # create some data, and binary-wrap it
+    data = "Hello, world"
+    binData = Binary(data)
+
+    # and do the insert
+    result = myClient.i2p.q.putItem(meta, binData)
+    print "putItem: result=%s" % result
+
+    # check what happened
+    if result["status"] == "ok":
+        # insert succeeded
+        key = result["key"]
+        print "Insert successful"
+    else:
+        # insert failed, bail
+        print "Insert failed: error=%s" % result['error']
+        return;
+
+    # -------------------------------------
+    # Third action - check for catalog updates
+    # (which should include what we've just inserted)
+    # -------------------------------------
+
+    # execute the 'getUpdate'
+    result = myClient.i2p.q.getUpdate(then, 0, 1)
+    print "getUpdate: result=%s" % result
+
+    # pick out the results, and search for what we just inserted
+    foundit = False
+    for metaRec in result['items']:
+        if metaRec['key'] == key:
+            # yay, got it!
+            foundit = True
+            break
+
+    # did we get it?
+    if not foundit:
+        print "wtf? we inserted it but it's not in the catalog!"
+        return;
+
+    # yep, we got it, so try to retrieve it back
+    print "getCatalog: found the item we just inserted"
+    result = myClient.i2p.q.getItem(key)
+    print "getItem: result=%s" % result
+
+    # did we get it?
+    if result["status"] != "ok":
+        print "getItem failed: %s" + result["error"]
+        return;
+
+    # yep, got it (note that data is an xmlrpclib.Binary object,
+    # and the raw data we want is in its .data attribute)
+    print "getItem: success, data='%s'" % result['data'].data
+
+    print "--- END OF Q CLIENT DEMO ---"
+
+# run the demo func if this script is executed directly
+if __name__ == '__main__':
+    qdemo()
+        </pre></code>
+      </blockquote>
+
+    <a name="metadata"></a>
+
+    <hr>
+
+    <h2>6. Keys and Metadata</h2>
+
+    <h3>6.1. Overview</h3>
+    Like Freenet, content is stored in Q as (data, metadata) pairs.<br>
+    <br>
+    However, there's a difference. On Freenet, metadata is stored as a string of up to
+    32k length, and must be parsed (and sometimes executed) by client code. On the other
+    hand, metadata is exposed in Q as an XML-RPC <b>struct</b> (Java <b>Hashtable</b> or
+    <b>Properties</b> object, or Python <b>dict</b>, or Perl <b>associative array</b> etc).<br>
+    <br>
+    If a content item gets inserted to the Q network without metadata, a minimal metadata set
+    will be transparently generated, and is guaranteed to contain at least the following
+    elements:<br>
+    <br>
+    <table cellspacing=0 cellpadding=4 border=1 width=70% align=center>
+        <tr><td><b>Key</b></td><td><b>Type</b></td><td><b>Description</b></td></tr>
+        <tr>
+          <td>size</td>
+          <td>int</td>
+          <td>Size of the stored data item, in bytes</td>
+        </tr>
+        <tr>
+          <td>dataHash</td>
+          <td>string</td>
+          <td>a base64 representation of the SHA256 hash of the full raw data, using the I2P
+            base64 alphabet</td>
+        </tr> 
+    </table>
+    <br>
+
+    <hr>
+
+    <h3>6.2. Node IDs</h3>
+    
+    When Q nodes are first created, they generate themselves a random
+    I2P privKey/dest keypair using the in-I2P services.<br>
+    <br>
+    The I2P destination gets converted to what we call a <b>Q Node ID</b>, as follows:
+    <ul>
+      <li>Start with binary destination (not base64)</li>
+      <li>Determine the SHA256 binary digest of this dest</li>
+      <li>Encode the resulting binary string via I2P's base64 alphabet</li>
+    </ul>
+
+    <hr>
+
+    <h3>6.3. Keys</h3>
+
+    Here, 'key' means the unique short string, by which items of content can be
+    retrieved, and which is returned from an i2p.q.putItem command.<br>
+    <br>
+    Like Freenet's <b>CHK@</b> keytype, Q keys are hashes of the key's content and
+    metadata.<br>
+    <br>
+    The recipe for calculating the 'key' of a particular item of metadata+data is:
+    <ol>
+      <li>If no metadata is submitted with the data, create a minimal metadata as per above</li>
+      <li>Serialise out the metadata into a string representation, with the fieldnames in
+        alphanumeric order. The format of such string is one line per metadata field/value
+        pair per line, in the format:
+        <blockquote><code>
+            metadatakeyname=metadatakeyvalue\n
+          </code></blockquote>
+      </li>
+      <li>Calculate the binary SHA1 digest of this serialised metadata string</li>
+      <li>Base64-encode this binary digest via the I2P Base64 alphabet</li>
+    </ol>
+
+    <hr>
+
+    <h3>6.4. Q Metadata Conventions</h3>
+
+    Additional to the core metadata defined above, there is a convention in Q that the
+    following optional extra metadata
+    keys be provided on insert, and recognised and honoured on retrieve.<br>
+    <br>
+    It is highly recommended that these keys be included
+    in metadata when content is inserted:<br>
+    <br>
+    <table cellspacing=0 cellpadding=4 border=1 width=70% align=center>
+        <tr><td><b>Key</b></td><td><b>Type</b></td><td><b>Description</b></td></tr>
+        <tr>
+          <td>title</td>
+          <td>string</td>
+          <td>A short and descriptive title for the item, preferably formatted as
+            a filename which is legal and convenient on all main operating systems, ie,
+            containing only alphanumerics, '-', '_' and '.'.<br>
+            <br>
+            It is highly advisable that an appropriate file extension appear at the
+            end of the title. Refer to the <a href="#security">Security Considerations</a>
+            section below.
+            <br>
+            It is expected that client applications will use this title field when
+            displaying available content lists to users.
+          </td>
+        </tr> 
+        <tr>
+          <td>type</td>
+          <td>string</td>
+          <td>Generic type of material, using the following superset of the  eMule/Donkey
+            classifications:
+            <ul>
+              <li>text</li>
+              <li>html</li>
+              <li>image</li>
+              <li>audio</li>
+              <li>video</li>
+              <li>software</li>
+              <li>archive</li>
+              <li>misc</li>
+            </ul>
+          </td>
+        </tr>
+        <tr>
+          <td>mimetype</td>
+          <td>string</td>
+          <td>A recognised mime-type, as per RFC1341, RFC1521, RFC1522, such as
+            <b>audio/mpeg</b>, <b>text/plain</b> etc.<br>
+            <br>
+            This will help client app developers devise ways of disposing with data items
+            they request from client nodes.<br>
+            <br>
+            For instance, client apps with http front ends
+            may send back this mimetype as the value of the <b>Content-type:</b> header,
+            (and possibly take preventative action with potentially hazardous mimetypes, such
+            as those which some browsers such as IE might trust and execute blindly as
+            binary code).<br>
+            <br>
+            Alternatively, gui-based or cli-based client apps may convert this mimetype to
+            an appropriate benign file extension (such as <b>.txt</b>,
+            <b>.ogg</b>, <b>.jpg</b> etc). See <a href="#security">Security
+              Considerations</a> below.
+          </td>
+        </tr> 
+        <tr>
+          <td>keywords</td>
+          <td>string</td>
+          <td>A set of space-separated keywords describing this item, intended for
+            human reading, as well as automatic parsing by client apps.</td>
+        </tr>
+        <tr>
+          <td>abstract</td>
+          <td>string</td>
+          <td>A short descriptive summary of the nature of the data, intended for
+            human reading, as well as automatic pattern matching searches by client
+            apps.</td>
+        </tr>
+    </table>
+        <br>
+        <br>
+
+    <hr>
+
+    <h3>6.5. One Data Item, Many Metadata Sets?</h3>
+
+    It is perfectly possible, and legal, for one item of data to be referenced by two
+    completely different items of metadata.<br>
+    <br>
+    Since content <b>keys</b> are a hash of metadata, which in turn contains a hash of the data,
+    then two pieces of metadata referencing the same data item, but containing different
+    metadata values, will end up with different keys.<br>
+    <br>
+    So as far as key addresses go, there will be a many-to-1 relationship between raw
+    content keys, and the data returned under these keys.<br>
+    <br>
+   
+    <a name="security">
+
+    <hr>
+
+    <h2>7. Security Considerations</h2>
+
+    All Peer2Peer software (as with all networked software in general) carries with it a set of
+    devastating security risks which should be respected to the utmost.<br>
+    <br>
+    This applies in no small part to Q.<br>
+    <br>
+    So this brief sermon is addressed to anyone writing any client applications or
+    APIs talking to the Q network.<br>
+    <br>
+    <b>Any</b> material which involves the execution of code on a client machine is risky.
+    However, much of the risk can be managed if the code is open source and peer-reviewed.<br>
+    <br>
+    Perhaps the biggest issue as far as Q is concerned is this:
+
+    <blockquote><b>
+        Client app developers should never, <b><i>NEVER</i></b> implicitly
+        trust incoming content, and should always assume that malicious remote users
+        <b>will</b> insert content which attempts to compromise other users' systems.
+      </b></blockquote>
+
+    If a Q client app wants to offer filetype-specific support, then perhaps a good
+    strategy is for the client app to use a <b>whitelist</b> of
+    known low-risk file extensions, such as <b>.txt</b>, or (possibly)
+    <b>.ogg</b>, <b>.png</b> etc. Recall that in some Windows configurations, even
+    <b>.jpg</b> can carry an arbitrary code execution attack!<br>
+    <br>
+    Note that <b>.html</b> (<b>text/html</b>) is especially dangerous, and
+    should be respected accordingly.<br>
+    <br>
+    Support for <b>.html</b> could be a real boon. For instance, it could allow
+    I2P users to publish an I2P equivalent of freenet's <i>freesites</i> - static
+    HTML websites which are accessible even when the author goes offline.<br>
+    <br>
+    However, if a client app chooses to recognise <b>.html</b>, it should either
+    use a code-screening mechanism like freenet's <b>fproxy</b> and keep it
+    up to date with all the latest advisories, or use a mandatory-proxy
+    mechanism like I2P's <b>eepProxy</b>.<br>
+    <br>
+    One possiblility is to serve up such content via a totally in-I2P http interface,
+    such that Joe can view the content via his regular eeproxy-configured browser.<br>
+    <br>
+    This is a typical case where security and ease/convenience can end up in
+    direct conflict. Automatic handling of content according to data type
+    is great from a Joe Sixpack Windows User point of view, but it is a snake-pit
+    of risks that can potentially result in any of the following (or worse):
+    <ul>
+      <li>Set up Joe's computer as a spambot</li>
+      <li>Get Joe's personal credit card and other info, and use this criminally</li>
+      <li>Download child pornography or terrorist information onto Joe's PC, use an
+        exploit to get Joe's IP address and/or identity details, and report this to
+        authorities, thus framing Joe and sending him off undeservedly to Club Fed or 
+        Her Majesty's</li>
+      <li>Mount a DDoS, anonymity or other attack on the I2P network</li>
+      <li>Further spread additional content for achieving more of the above on 
+        other unsuspecting users.</li>
+    </ul>
+
+    The crux of this lecture is that client app writers have a huge responsibility to
+    ensure their apps are safe against malicious content.<br>
+    <br>
+    Perhaps the best and most
+    practical solution is to just store downloaded material into a directory
+    known to and owned by the user, and make it the user's task and responsibility to
+    manually copy materials out of this directory and take responsibility for how s/he uses
+    this content thereafter.<br>
+    <br>
+
+      <a name="contact"></a>
+
+    <hr>
+
+    <h2>8. Contacting the Author</h2>
+
+    I am <b>aum</b>, and can be reached as <b>aum</b> on in-I2P IRC networks, and also
+    at the in-I2P email address of <b>aum@mail.i2p</b>.<br>
+    <br>
+
+    <hr>
+    <center>
+      <small>
+        <a href="#intro">Introduction</a> |
+        <a href="#xmlrpc">XML-RPC</a> |
+        <a href="#arch">Architecture</a> |
+        <a href="#commands">Commands</a> |
+        <a href="#examples">Example&nbsp;Code</a> |
+        <a href="#metadata">Metadata</a> |
+        <a href="#security">Security</a> |
+        <a href="#contact">Contact us</a>
+      </small>
+    </center>
+    <hr>
+    <br>
+
+    <!-- Created: Sat Mar 26 11:22:24 NZST 2005 -->
+    <!-- hhmts start -->
+Last modified: Sat Apr  2 13:31:08 NZST 2005
+<!-- hhmts end -->
+  </body>
+</html>

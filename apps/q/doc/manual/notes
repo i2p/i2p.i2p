@@ -1,0 +1,23 @@
+
+ rise on each hit:
+
+   dy = (1 - y) / kRise
+
+ fall after each time unit:
+
+   dy = y / kFall
+
+ fall after time dt:
+
+   dy = - y ** - (dt / kFall)
+
+ after the next hit:
+
+   y = y - y ** (- dt / kFall) + (1 - y) / kRise
+
+first attempt at a load measurement algorithm:
+  - kFall is an arbitrary constant which dictates decay rate of load
+    in the absence of hits
+  - kRise is another constant which dictates rise of load with each hit
+  - dt is the time between each hit
+
