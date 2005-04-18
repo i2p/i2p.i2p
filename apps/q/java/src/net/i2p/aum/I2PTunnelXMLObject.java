@@ -10,8 +10,7 @@ import net.i2p.client.*;
 import net.i2p.client.streaming.*;
 import net.i2p.util.*;
 import net.i2p.data.*;
-import net.i2p.i2ptunnel.*;
-
+import net.i2p.i2ptunnel.I2PTunnelXMLWrapper;
 
 /**
  * Defines the I2P tunnel management methods which will be

@@ -14,7 +14,6 @@ import net.i2p.client.streaming.*;
 import net.i2p.data.Base64;
 import net.i2p.util.*;
 import net.i2p.data.*;
-import net.i2p.i2ptunnel.*;
 
 
 /**

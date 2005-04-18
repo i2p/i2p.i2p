@@ -11,7 +11,6 @@ import net.i2p.client.*;
 import net.i2p.client.streaming.*;
 import net.i2p.util.*;
 import net.i2p.data.*;
-import net.i2p.i2ptunnel.*;
 
 /**
  * Class which wraps an I2PSocket object with convenient methods.

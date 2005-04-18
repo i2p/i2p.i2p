@@ -10,7 +10,6 @@ import net.i2p.client.*;
 import net.i2p.client.streaming.*;
 import net.i2p.util.*;
 import net.i2p.data.*;
-import net.i2p.i2ptunnel.*;
 
 /**
  * Provides a means for programs in any language to dynamically manage

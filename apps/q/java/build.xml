@@ -19,10 +19,19 @@
     <property location="${project.name}.jar" name="jar"/>
   </target>
 
-  <target depends="init" name="compile">
+  <target name="builddep">
+    <ant dir="../../i2ptunnel/java/" target="build" />
+    <!-- i2ptunnel builds ministreaming and core -->
+  </target>
+  
+  <target depends="init,builddep" name="compile">
     <!-- Both srcdir and destdir should be package roots. -->
     <mkdir dir="${classes.dir}"/>
-    <javac debug="true" deprecation="true" destdir="${classes.dir}" srcdir="${src.dir}">
+    <javac debug="true" 
+           deprecation="true" 
+           destdir="${classes.dir}" 
+           srcdir="${src.dir}"
+           classpath="xmlrpc.jar:../../../core/java/build/i2p.jar:../../ministreaming/java/build/mstreaming.jar:../../i2ptunnel/java/build/i2ptunnel.jar" >
       <!-- To add something to the classpath: -->
       <!-- <classpath><pathelement location="${mylib}"/></classpath> -->
       <!-- To exclude some files: -->
