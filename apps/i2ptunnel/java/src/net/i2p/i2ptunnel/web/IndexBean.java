@@ -52,6 +52,7 @@ public class IndexBean {
     private String _privKeyFile;
     private String _profile;
     private boolean _startOnLoad;
+    private boolean _sharedClient;
     private boolean _privKeyGenerate;
     private boolean _removeConfirmed;
     
@@ -204,7 +205,8 @@ public class IndexBean {
             for (int i = 0; i < controllers.size(); i++) {
                 TunnelController c = (TunnelController)controllers.get(i);
                 if (c == cur) continue;
-                if ("httpclient".equals(c.getType()) || "client".equals(c.getType())) {
+                //only change when they really are declared of beeing a sharedClient
+                if (("httpclient".equals(c.getType()) || "client".equals(c.getType())) && "true".equalsIgnoreCase(c.getSharedClient())) {
                     Properties cOpt = c.getConfig("");
                     if (_tunnelCount != null) {
                         cOpt.setProperty("option.inbound.quantity", _tunnelCount);
@@ -343,6 +345,14 @@ public class IndexBean {
             return "";
     }
     
+    public String getSharedClient(int tunnel) {
+    	TunnelController tun = getController(tunnel);
+    	if (tun != null)
+    		return tun.getSharedClient();
+    	else
+    		return "";
+    }
+    
     public String getClientDestination(int tunnel) {
         TunnelController tun = getController(tunnel);
         if (tun == null) return "";
@@ -469,6 +479,9 @@ public class IndexBean {
     public void setStartOnLoad(String moo) {
         _startOnLoad = true;
     }
+    public void setSharedClient(String moo) {
+    	_sharedClient=true;
+    }
     public void setConnectDelay(String moo) {
         _connectDelay = true;
     }
@@ -496,8 +509,14 @@ public class IndexBean {
             if (_proxyList != null)
                 config.setProperty("proxyList", _proxyList);
 
-            config.setProperty("option.inbound.nickname", CLIENT_NICKNAME);
-            config.setProperty("option.outbound.nickname", CLIENT_NICKNAME);
+        	config.setProperty("option.inbound.nickname", CLIENT_NICKNAME);
+        	config.setProperty("option.outbound.nickname", CLIENT_NICKNAME);
+            if (_name != null && !_sharedClient) {
+                 config.setProperty("option.inbound.nickname", _name);
+                 config.setProperty("option.outbound.nickname", _name);
+            }
+
+            config.setProperty("sharedClient", _sharedClient + "");
         } else if ("client".equals(_type)) {
             if (_port != null)
                 config.setProperty("listenPort", _port);
@@ -510,6 +529,11 @@ public class IndexBean {
             
             config.setProperty("option.inbound.nickname", CLIENT_NICKNAME);
             config.setProperty("option.outbound.nickname", CLIENT_NICKNAME);
+            if (_name != null && !_sharedClient) {
+                config.setProperty("option.inbound.nickname", _name);
+                config.setProperty("option.outbound.nickname", _name);
+           }
+            config.setProperty("sharedClient", _sharedClient + "");
         } else if ("server".equals(_type)) {
             if (_targetHost != null)
                 config.setProperty("targetHost", _targetHost);
@@ -567,7 +591,7 @@ public class IndexBean {
         }
 
         config.setProperty("startOnLoad", _startOnLoad + "");
-        
+
         if (_tunnelCount != null) {
             config.setProperty("option.inbound.quantity", _tunnelCount);
             config.setProperty("option.outbound.quantity", _tunnelCount);
@@ -581,7 +605,7 @@ public class IndexBean {
         else
             config.setProperty("option.i2p.streaming.connectDelay", "0");
         if (_name != null) {
-            if ( (!"client".equals(_type)) && (!"httpclient".equals(_type)) ) {
+            if ( ((!"client".equals(_type)) && (!"httpclient".equals(_type))) || (!_sharedClient) ) {
                 config.setProperty("option.inbound.nickname", _name);
                 config.setProperty("option.outbound.nickname", _name);
             } else {

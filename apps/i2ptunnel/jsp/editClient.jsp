@@ -161,10 +161,23 @@ if (curTunnel >= 0) {
 </td>
 </tr>
 <tr>
+<td>
+<b>Shared Client</b>
+</td>
+<td>
+<% if (editBean.isSharedClient(curTunnel)) { %>
+<input type="checkbox" value="true" name="sharedClient" checked="true" />
+<% } else { %>
+<input type="checkbox" value="true" name="sharedClient" />
+<% } %>
+<i>(Share tunnels with other clients and httpclients? Change requires restart of client proxy)</i>
+</td>
+</tr>
+<tr>
 <td colspan="2" align="center">
 <b><hr size="1">
 Advanced networking options<br />
-<span style="color:#dd0000;">(Those are shared between ALL your Client proxies!)</span></b>
+<span style="color:#dd0000;">(NOTE: when this client proxy is configured to share tunnels, then these options are for all the shared proxy clients!)</span></b>
 </td>
 </tr>
 <tr>

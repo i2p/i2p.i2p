@@ -73,6 +73,14 @@ public class EditBean extends IndexBean {
             return false;
     }
     
+    public boolean isSharedClient(int tunnel) {
+        TunnelController tun = getController(tunnel);
+        if (tun != null)
+            return "true".equalsIgnoreCase(tun.getSharedClient());
+        else
+            return true;
+    }
+    
     public boolean shouldDelay(int tunnel) {
         TunnelController tun = getController(tunnel);
         if (tun != null) {

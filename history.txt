@@ -1,4 +1,15 @@
-$Id: history.txt,v 1.193 2005/04/16 19:59:51 jrandom Exp $
+$Id: history.txt,v 1.194 2005/04/17 18:23:21 jrandom Exp $
+
+2005-04-17  sirup
+    * Added the possibility for i2ptunnel client and httpclient instances to 
+      have their own i2p session (and hence, destination and tunnels).  By 
+      default, tunnels are shared, but that can be changed on the web 
+      interface or with the sharedClient config option in i2ptunnel.config.
+
+2005-04-17  jrandom
+    * Marked the net.i2p.i2ptunnel.TunnelManager as deprecated.  Anyone use
+      this?  If not, I want to drop it (lots of tiny details with lots of 
+      duplicated semantics).
 
 2005-04-17  zzz
     * Added new user-editable eepproxy error page templates.

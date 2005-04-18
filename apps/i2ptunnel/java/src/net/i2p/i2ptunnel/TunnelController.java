@@ -153,10 +153,11 @@ public class TunnelController implements Logging {
         setListenOn();
         String listenPort = getListenPort();
         String proxyList = getProxyList();
+        String sharedClient = getSharedClient();
         if (proxyList == null)
-            _tunnel.runHttpClient(new String[] { listenPort }, this);
+            _tunnel.runHttpClient(new String[] { listenPort, sharedClient }, this);
         else
-            _tunnel.runHttpClient(new String[] { listenPort, proxyList }, this);
+            _tunnel.runHttpClient(new String[] { listenPort, sharedClient, proxyList }, this);
         acquire();
         _running = true;
     }
@@ -199,7 +200,8 @@ public class TunnelController implements Logging {
         setListenOn();
         String listenPort = getListenPort(); 
         String dest = getTargetDestination();
-        _tunnel.runClient(new String[] { listenPort, dest }, this);
+        String sharedClient = getSharedClient();
+        _tunnel.runClient(new String[] { listenPort, dest, sharedClient }, this);
         acquire();
         _running = true;
     }
@@ -331,6 +333,7 @@ public class TunnelController implements Logging {
     public String getListenPort() { return _config.getProperty("listenPort"); }
     public String getTargetDestination() { return _config.getProperty("targetDestination"); }
     public String getProxyList() { return _config.getProperty("proxyList"); }
+    public String getSharedClient() { return _config.getProperty("sharedClient", "true"); }
     public boolean getStartOnLoad() { return "true".equalsIgnoreCase(_config.getProperty("startOnLoad", "true")); }
     public String getMyDestination() {
         if (_tunnel != null) {

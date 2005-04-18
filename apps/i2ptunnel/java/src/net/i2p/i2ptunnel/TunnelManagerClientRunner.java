@@ -1,6 +1,7 @@
 /* I2PTunnel is GPL'ed (with the exception mentioned in I2PTunnel.java)
  * (c) 2003 - 2004 mihi
  */
+
 package net.i2p.i2ptunnel;
 
 import java.io.BufferedReader;
@@ -102,45 +103,53 @@ class TunnelManagerClientRunner implements Runnable {
             } else if ("openclient".equalsIgnoreCase(cmd)) {
                 int listenPort = 0;
                 String peer = null;
-                if (!tok.hasMoreTokens()) {
-                    _mgr.error("Usage: openclient <listenPort> <peer>", out);
+                String sharedClient = null;
+                int numTokens = tok.countTokens();
+                if (numTokens < 2 || numTokens > 3) {
+                    _mgr.error("Usage: openclient <listenPort> <peer> <sharedClient>", out);
                     return;
                 }
                 try {
-                    String portStr = tok.nextToken();
-                    listenPort = Integer.parseInt(portStr);
+                    listenPort = Integer.parseInt(tok.nextToken());
+                    peer = tok.nextToken();
+                    if (tok.hasMoreTokens())
+                        sharedClient = tok.nextToken();
+                    else
+                        sharedClient = "true";
+                    _mgr.processOpenClient(listenPort, peer, sharedClient, out);
                 } catch (NumberFormatException nfe) {
                     _mgr.error("Bad listen port", out);
                     return;
                 }
-                if (!tok.hasMoreTokens()) {
-                    _mgr.error("Usage: openclient <listenport> <peer>", out);
-                    return;
-                }
-                peer = tok.nextToken();
-                _mgr.processOpenClient(listenPort, peer, out);
             } else if ("openhttpclient".equalsIgnoreCase(cmd)) {
                 int listenPort = 0;
                 String proxy = "squid.i2p";
-                if (!tok.hasMoreTokens()) {
-                    _mgr.error("Usage: openhttpclient <listenPort> [<proxy>]", out);
+                String sharedClient = "true";
+                int numTokens = tok.countTokens();
+                if (numTokens < 1 || numTokens > 3) {
+                    _mgr.error("Usage: openhttpclient <listenPort> [<sharedClient>] [<proxy>]", out);
                     return;
                 }
                 try {
-                    String portStr = tok.nextToken();
-                    listenPort = Integer.parseInt(portStr);
+                    listenPort = Integer.parseInt(tok.nextToken());
+                    if (tok.hasMoreTokens()) {
+                        String val = tok.nextToken();
+                        if (tok.hasMoreTokens()) {
+                            sharedClient = val;
+                            proxy = tok.nextToken();
+                        } else {
+                            if ( ("true".equals(val)) || ("false".equals(val)) ) {
+                                sharedClient = val;
+                            } else {
+                                proxy = val;
+                            }
+                        }
+                    }
+                    _mgr.processOpenHTTPClient(listenPort, sharedClient, proxy, out);
                 } catch (NumberFormatException nfe) {
                     _mgr.error("Bad listen port", out);
                     return;
                 }
-                if (tok.hasMoreTokens()) {
-                    proxy = tok.nextToken();
-                }
-                if (tok.hasMoreTokens()) {
-                    _mgr.error("Usage: openclient <listenport> [<proxy>]", out);
-                    return;
-                }
-                _mgr.processOpenHTTPClient(listenPort, proxy, out);
             } else if ("opensockstunnel".equalsIgnoreCase(cmd)) {
                 int listenPort = 0;
                 if (!tok.hasMoreTokens()) {

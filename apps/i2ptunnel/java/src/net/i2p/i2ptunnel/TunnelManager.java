@@ -1,6 +1,7 @@
 /* I2PTunnel is GPL'ed (with the exception mentioned in I2PTunnel.java)
  * (c) 2003 - 2004 mihi
  */
+
 package net.i2p.i2ptunnel;
 
 import java.io.IOException;
@@ -55,7 +56,7 @@ import net.i2p.util.Log;
  *  Sets the ip address clients will listen on. By default this is the
  *  localhost (127.0.0.1)
  * -------------------------------------------------
- * openclient &lt;listenPort&gt; &lt;peer&gt;\n
+ * openclient &lt;listenPort&gt; &lt;peer&gt;[ &lt;sharedClient&gt;]\n
  * --
  * ok [&lt;jobId&gt;]\n
  *  or
@@ -70,8 +71,10 @@ import net.i2p.util.Log;
  *  specified as 'file:&lt;filename&gt;' or the name of a destination listed in
  *  hosts.txt. The &lt;jobId&gt; returned together with "ok" and &lt;listenport&gt; can
  *  later be used as argument for the "close" command.
+ *  &lt;sharedClient&gt; indicates if this httpclient shares tunnels with other
+ *  clients or not (just use 'true' and 'false'
  * -------------------------------------------------
- * openhttpclient &lt;listenPort&gt; [&lt;proxy&gt;]\n
+ * openhttpclient &lt;listenPort&gt; [&lt;sharedClient&gt;] [&lt;proxy&gt;]\n
  * --
  * ok [&lt;jobId&gt;]\n
  *  or
@@ -90,6 +93,8 @@ import net.i2p.util.Log;
  *  hosts.txt. The &lt;jobId&gt; returned together with "ok" and
  *  &lt;listenport&gt; can later be used as argument for the "close"
  *  command.
+ *  &lt;sharedClient&gt; indicates if this httpclient shares tunnels with other
+ *  clients or not (just use 'true' and 'false'
  * -------------------------------------------------
  * opensockstunnel &lt;listenPort&gt;\n
  * --
@@ -145,6 +150,11 @@ import net.i2p.util.Log;
  *  description depends on the type of job.
  * -------------------------------------------------
  * </pre>
+ *
+ *
+ * @deprecated this isn't run by default, and no one seems to use it, and has
+ *             lots of things to maintain.  so, at some point this may dissapear
+ *             unless someone pipes up ;)
  */
 public class TunnelManager implements Runnable {
     private final static Log _log = new Log(TunnelManager.class);
@@ -322,9 +332,9 @@ public class TunnelManager implements Runnable {
         buf.ignoreFurtherActions();
     }
 
-    public void processOpenClient(int listenPort, String peer, OutputStream out) throws IOException {
+    public void processOpenClient(int listenPort, String peer, String sharedClient, OutputStream out) throws IOException {
         BufferLogger buf = new BufferLogger();
-        _tunnel.runCommand("client " + listenPort + " " + peer, buf);
+        _tunnel.runCommand("client " + listenPort + " " + peer + " " + sharedClient, buf);
         Integer taskId = (Integer) _tunnel.waitEventValue("clientTaskId");
         if (taskId.intValue() < 0) {
             out.write("error\n".getBytes());
@@ -348,9 +358,9 @@ public class TunnelManager implements Runnable {
         buf.ignoreFurtherActions();
     }
 
-    public void processOpenHTTPClient(int listenPort, String proxy, OutputStream out) throws IOException {
+    public void processOpenHTTPClient(int listenPort, String sharedClient, String proxy, OutputStream out) throws IOException {
         BufferLogger buf = new BufferLogger();
-        _tunnel.runCommand("httpclient " + listenPort + " " + proxy, buf);
+        _tunnel.runCommand("httpclient " + listenPort + " " + sharedClient + " " + proxy, buf);
         Integer taskId = (Integer) _tunnel.waitEventValue("httpclientTaskId");
         if (taskId.intValue() < 0) {
             out.write("error\n".getBytes());

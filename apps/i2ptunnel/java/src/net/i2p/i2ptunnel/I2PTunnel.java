@@ -27,6 +27,7 @@
  * not obligated to do so. If you do not wish to do so, delete this
  * exception statement from your version.
  */
+
 package net.i2p.i2ptunnel;
 
 import java.io.BufferedReader;
@@ -288,8 +289,8 @@ public class I2PTunnel implements Logging, EventDispatcher {
         l.log("textserver <host> <port> <privkey>");
         l.log("genkeys <privkeyfile> [<pubkeyfile>]");
         l.log("gentextkeys");
-        l.log("client <port> <pubkey>[,<pubkey,...]|file:<pubkeyfile>");
-        l.log("httpclient <port>");
+        l.log("client <port> <pubkey>[,<pubkey,...]|file:<pubkeyfile> [<sharedClient>]");
+        l.log("httpclient <port> [<sharedClient>] [<proxy>]");
         l.log("lookup <name>");
         l.log("quit");
         l.log("close [forced] <jobnumber>|all");
@@ -486,12 +487,16 @@ public class I2PTunnel implements Logging, EventDispatcher {
      * Also sets the event "openClientResult" = "error" or "ok" (before setting the value to "ok" it also
      * adds "Ready! Port #" to the logger as well).  In addition, it will also set "clientLocalPort" =
      * Integer port number if the client is listening
+     * sharedClient parameter is a String "true" or "false"
      *
-     * @param args {portNumber, destinationBase64 or "file:filename"}
+     * @param args {portNumber, destinationBase64 or "file:filename"[, sharedClient]}
      * @param l logger to receive events and output
      */
     public void runClient(String args[], Logging l) {
-        if (args.length == 2) {
+        boolean isShared = true;
+        if (args.length == 3)
+            isShared = Boolean.valueOf(args[2].trim()).booleanValue();
+        if ( (args.length == 2) || (args.length == 3) ) {
             int portNum = -1;
             try {
                 portNum = Integer.parseInt(args[0]);
@@ -502,6 +507,7 @@ public class I2PTunnel implements Logging, EventDispatcher {
                 return;
             }
             I2PTunnelTask task;
+            ownDest = !isShared;
             try {
                 task = new I2PTunnelClient(portNum, args[1], l, ownDest, (EventDispatcher) this, this);
                 addtask(task);
@@ -512,11 +518,12 @@ public class I2PTunnel implements Logging, EventDispatcher {
                 notifyEvent("clientTaskId", new Integer(-1));
             }
         } else {
-            l.log("client <port> <pubkey>[,<pubkey>]|file:<pubkeyfile>");
+            l.log("client <port> <pubkey>[,<pubkey>]|file:<pubkeyfile>[ <sharedClient>]");
             l.log("  creates a client that forwards port to the pubkey.\n"
                   + "  use 0 as port to get a free port assigned.  If you specify\n"
                   + "  a comma delimited list of pubkeys, it will rotate among them\n"
-                  + "  randomlyl");
+                  + "  randomlyl. sharedClient indicates if this client shares \n"
+                  + "   with other clients (true of false)");
             notifyEvent("clientTaskId", new Integer(-1));
         }
     }
@@ -526,12 +533,13 @@ public class I2PTunnel implements Logging, EventDispatcher {
      *
      * Sets the event "httpclientTaskId" = Integer(taskId) after the tunnel has been started (or -1 on error).
      * Also sets "httpclientStatus" = "ok" or "error" after the client tunnel has started.
+     * parameter sharedClient is a String, either "true" or "false"
      *
-     * @param args {portNumber and (optionally) proxy to be used for the WWW}
+     * @param args {portNumber[, sharedClient][, proxy to be used for the WWW]}
      * @param l logger to receive events and output
      */
     public void runHttpClient(String args[], Logging l) {
-        if (args.length >= 1 && args.length <= 2) {
+        if (args.length >= 1 && args.length <= 3) {
             int port = -1;
             try {
                 port = Integer.parseInt(args[0]);
@@ -541,12 +549,32 @@ public class I2PTunnel implements Logging, EventDispatcher {
                 notifyEvent("httpclientTaskId", new Integer(-1));
                 return;
             }
-
+            
             String proxy = "squid.i2p";
-            if (args.length == 2) {
-                proxy = args[1];
+            boolean isShared = true;
+            if (args.length > 1) {
+                if ("true".equalsIgnoreCase(args[1].trim())) {
+                    isShared = true;
+                    if (args.length == 3)
+                        proxy = args[2];
+                } else if ("false".equalsIgnoreCase(args[1].trim())) {
+                    _log.warn("args[1] == [" + args[1] + "] and rejected explicitly");
+                    isShared = false;
+                    if (args.length == 3)
+                        proxy = args[2];
+                } else if (args.length == 3) {
+                    isShared = false; // not "true"
+                    proxy = args[2];
+                    _log.warn("args[1] == [" + args[1] + "] but rejected");
+                } else {
+                    // isShared not specified, default to true
+                    isShared = true;
+                    proxy = args[1];
+                }
             }
+
             I2PTunnelTask task;
+            ownDest = !isShared;
             try {
                 task = new I2PTunnelHTTPClient(port, l, ownDest, proxy, (EventDispatcher) this, this);
                 addtask(task);
@@ -557,8 +585,9 @@ public class I2PTunnel implements Logging, EventDispatcher {
                 notifyEvent("httpclientTaskId", new Integer(-1));
             }
         } else {
-            l.log("httpclient <port> [<proxy>]");
+            l.log("httpclient <port> [<sharedClient>] [<proxy>]");
             l.log("  creates a client that distributes HTTP requests.");
+            l.log("  <sharedClient> (optional) indicates if this client shares tunnels with other clients (true of false)");
             l.log("  <proxy> (optional) indicates a proxy server to be used");
             l.log("  when trying to access an address out of the .i2p domain");
             l.log("  (the default proxy is squid.i2p).");
