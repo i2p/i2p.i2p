@@ -17,6 +17,7 @@
     <property location="doc/q/api" name="javadoc.dir"/>
     <property name="project.name" value="${ant.project.name}"/>
     <property location="${project.name}.jar" name="jar"/>
+    <property location="${project.name}.war" name="war"/>
   </target>
 
   <target name="builddep">
@@ -54,7 +55,19 @@
     </jar>
   </target>
 
-  <target depends="init,jar" description="Build everything." name="all"/>
+    <target depends="init,compile" name="war">
+        <!-- To make a standalone app, insert into <jar>: -->
+        <!-- <manifest><attribute name="Main-Class" value="com.foo.Main"/></manifest> -->
+        <war compress="true" jarfile="${war}" webxml="web.xml">
+          <!-- <fileset dir="${classes.dir}" includes="**/QConsole.class"/> -->
+          <classes file="build/net/i2p/aum/q/QConsole.class"/>
+          <classes file="build/HTML/**"/>
+          <!-- <fileset includes="**/HTML/*.class"/> -->
+          <lib file="xmlrpc.jar"/>
+        </war>
+    </target>
+
+  <target depends="init,jar,war" description="Build everything." name="all"/>
 
   <target depends="init" description="Javadoc for my API." name="javadoc">
     <mkdir dir="${javadoc.dir}"/>
