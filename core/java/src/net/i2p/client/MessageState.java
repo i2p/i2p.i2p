@@ -4,6 +4,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
+import net.i2p.I2PAppContext;
 import net.i2p.data.Destination;
 import net.i2p.data.SessionKey;
 import net.i2p.data.i2cp.MessageId;
@@ -16,6 +17,7 @@ import net.i2p.util.Log;
  *
  */
 class MessageState {
+    private I2PAppContext _context;
     private final static Log _log = new Log(MessageState.class);
     private long _nonce;
     private String _prefix;
@@ -31,8 +33,9 @@ class MessageState {
     private static long __stateId = 0;
     private long _stateId;
     
-    public MessageState(long nonce, String prefix) {
+    public MessageState(I2PAppContext ctx, long nonce, String prefix) {
         _stateId = ++__stateId;
+        _context = ctx;
         _nonce = nonce;
         _prefix = prefix + "[" + _stateId + "]: ";
         _id = null;
@@ -42,7 +45,8 @@ class MessageState {
         _newKey = null;
         _tags = null;
         _to = null;
-        _created = Clock.getInstance().now();
+        _created = ctx.clock().now();
+        //ctx.statManager().createRateStat("i2cp.checkStatusTime", "how long it takes to go through the states", "i2cp", new long[] { 60*1000 });
     }
 
     public void receive(int status) {
@@ -99,32 +103,41 @@ class MessageState {
     }
 
     public long getElapsed() {
-        return Clock.getInstance().now() - _created;
+        return _context.clock().now() - _created;
     }
 
     public void waitFor(int status, long expiration) {
-        while (true) {
+        long checkTime = -1;
+        boolean found = false;
+        while (!found) {
             if (_cancelled) return;
-            long timeToWait = expiration - Clock.getInstance().now();
+            long timeToWait = expiration - _context.clock().now();
             if (timeToWait <= 0) {
                 if (_log.shouldLog(Log.WARN)) 
                     _log.warn(_prefix + "Expired waiting for the status [" + status + "]");
                 return;
             }
+            found = false;
             synchronized (_receivedStatus) {
+                long beforeCheck = _context.clock().now();
                 if (locked_isSuccess(status) || locked_isFailure(status)) {
                     if (_log.shouldLog(Log.DEBUG)) 
                         _log.debug(_prefix + "Received a confirm (one way or the other)");
-                    return;
+                    found = true;
                 }
-                if (timeToWait > 5000) {
-                    timeToWait = 5000;
-                }
-                try {
-                    _receivedStatus.wait(timeToWait);
-                } catch (InterruptedException ie) { // nop
+                checkTime = _context.clock().now() - beforeCheck;
+                if (!found) {
+                    if (timeToWait > 5000) {
+                        timeToWait = 5000;
+                    }
+                    try {
+                        _receivedStatus.wait(timeToWait);
+                    } catch (InterruptedException ie) { // nop
+                    }
                 }
             }
+            //if (found) 
+            //    _context.statManager().addRateData("i2cp.checkStatusTime", checkTime, 0);
         }
     }
 

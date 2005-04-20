@@ -66,7 +66,7 @@ public class OutboundMessageState {
         }
     }
     
-    private void initialize(OutNetMessage m, I2NPMessage msg, PeerState peer) {
+    private synchronized void initialize(OutNetMessage m, I2NPMessage msg, PeerState peer) {
         _message = m;
         _peer = peer;
         if (_messageBuf != null) {
@@ -91,8 +91,9 @@ public class OutboundMessageState {
             _log.debug("Raw byte array for " + _messageId + ": " + Base64.encode(_messageBuf.getData(), 0, len));
     }
     
-    public void releaseResources() { 
-        _cache.release(_messageBuf);
+    public synchronized void releaseResources() { 
+        if (_messageBuf != null)
+            _cache.release(_messageBuf);
         _messageBuf = null;
     }
     
@@ -136,7 +137,7 @@ public class OutboundMessageState {
      * fragmentSize bytes per fragment.
      *
      */
-    public void fragment(int fragmentSize) {
+    public synchronized void fragment(int fragmentSize) {
         int totalSize = _messageBuf.getValid();
         int numFragments = totalSize / fragmentSize;
         if (numFragments * fragmentSize != totalSize)
@@ -161,7 +162,8 @@ public class OutboundMessageState {
     }
     /** should we continue sending this fragment? */
     public boolean shouldSend(int fragmentNum) { return _fragmentSends[fragmentNum] >= (short)0; }
-    public int fragmentSize(int fragmentNum) {
+    public synchronized int fragmentSize(int fragmentNum) {
+        if (_messageBuf == null) return -1;
         if (fragmentNum + 1 == _fragmentSends.length)
             return _messageBuf.getValid() % _fragmentSize;
         else
@@ -233,6 +235,7 @@ public class OutboundMessageState {
     public synchronized int writeFragment(byte out[], int outOffset, int fragmentNum) {
         int start = _fragmentSize * fragmentNum;
         int end = start + _fragmentSize;
+        if (_messageBuf == null) return -1;
         if (end > _messageBuf.getValid())
             end = _messageBuf.getValid();
         int toSend = end - start;
@@ -243,7 +246,7 @@ public class OutboundMessageState {
         return toSend;
     }
     
-    public String toString() {
+    public synchronized String toString() {
         StringBuffer buf = new StringBuffer(64);
         buf.append("Message ").append(_messageId);
         if (_fragmentSends != null)

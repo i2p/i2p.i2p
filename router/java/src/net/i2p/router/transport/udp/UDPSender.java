@@ -150,6 +150,7 @@ public class UDPSender {
                 try {
                     synchronized (_outboundQueue) {
                         if (_outboundQueue.size() <= 0) {
+                            _outboundQueue.notifyAll();
                             _outboundQueue.wait();
                         } else {
                             packet = (UDPPacket)_outboundQueue.remove(0);

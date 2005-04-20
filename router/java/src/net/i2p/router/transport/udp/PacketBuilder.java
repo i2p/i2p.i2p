@@ -65,10 +65,15 @@ public class PacketBuilder {
             data[off] |= 1 << 2; // isLast
         off++;
         
-        DataHelper.toLong(data, off, 2, state.fragmentSize(fragment));
+        int size = state.fragmentSize(fragment);
+        if (size < 0)
+            return null;
+        DataHelper.toLong(data, off, 2, size);
         off += 2;
         
-        off += state.writeFragment(data, off, fragment);
+        size = state.writeFragment(data, off, fragment);
+        if (size < 0) return null;
+        off += size;
 
         // we can pad here if we want, maybe randomized?
         

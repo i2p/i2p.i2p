@@ -61,6 +61,18 @@ public class DecayingBloomFilter {
         SimpleTimer.getInstance().addEvent(_decayEvent, _durationMs);
     }
     
+    public long getCurrentDuplicateCount() { return _currentDuplicates; }
+    public int getInsertedCount() { 
+        synchronized (this) {
+            return _current.size() + _previous.size(); 
+        }
+    }
+    public double getFalsePositiveRate() { 
+        synchronized (this) {
+            return _current.falsePositives(); 
+        }
+    }
+    
     /** 
      * return true if the entry added is a duplicate
      *

@@ -1,4 +1,21 @@
-$Id: history.txt,v 1.194 2005/04/17 18:23:21 jrandom Exp $
+$Id: history.txt,v 1.195 2005/04/17 21:07:58 jrandom Exp $
+
+2005-04-20  jrandom
+    * In the SDK, we don't actually need to block when we're sending a message
+      as BestEffort (and these days, we're always sending BestEffort).
+    * Pass out client messages in fewer (larger) steps.
+    * Have the InNetMessagePool short circuit dispatch requests.
+    * Have the message validator take into account expiration to cut down on
+      false positives at high transfer rates.
+    * Allow configuration of the probabalistic window size growth rate in the 
+      streaming lib's slow start and congestion avoidance phases, and default 
+      them to a more conservative value (2), rather than the previous value 
+      (1).
+    * Reduce the ack delay in the streaming lib to 500ms
+    * Honor choke requests in the streaming lib (only affects those getting
+      insanely high transfer rates)
+    * Let the user specify an interface besides 127.0.0.1 or 0.0.0.0 on the
+      I2PTunnel client page (thanks maestro^!)
 
 2005-04-17  sirup
     * Added the possibility for i2ptunnel client and httpclient instances to 

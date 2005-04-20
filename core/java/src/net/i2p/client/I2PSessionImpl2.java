@@ -50,6 +50,14 @@ class I2PSessionImpl2 extends I2PSessionImpl {
         super(ctx, destKeyStream, options);
         _log = ctx.logManager().getLog(I2PSessionImpl2.class);
         _sendingStates = new HashSet(32);
+
+        ctx.statManager().createRateStat("i2cp.sendBestEffortTotalTime", "how long to do the full sendBestEffort call?", "i2cp", new long[] { 10*60*1000 } );
+        //ctx.statManager().createRateStat("i2cp.sendBestEffortStage0", "first part of sendBestEffort?", "i2cp", new long[] { 10*60*1000 } );
+        //ctx.statManager().createRateStat("i2cp.sendBestEffortStage1", "second part of sendBestEffort?", "i2cp", new long[] { 10*60*1000 } );
+        //ctx.statManager().createRateStat("i2cp.sendBestEffortStage2", "third part of sendBestEffort?", "i2cp", new long[] { 10*60*1000 } );
+        //ctx.statManager().createRateStat("i2cp.sendBestEffortStage3", "fourth part of sendBestEffort?", "i2cp", new long[] { 10*60*1000 } );
+        //ctx.statManager().createRateStat("i2cp.sendBestEffortStage4", "fifth part of sendBestEffort?", "i2cp", new long[] { 10*60*1000 } );
+        
     }
 
     protected long getTimeout() {
@@ -158,7 +166,7 @@ class I2PSessionImpl2 extends I2PSessionImpl {
         
         long nonce = _context.random().nextInt(Integer.MAX_VALUE);
         if (_log.shouldLog(Log.DEBUG)) _log.debug("before sync state");
-        MessageState state = new MessageState(nonce, getPrefix());
+        MessageState state = new MessageState(_context, nonce, getPrefix());
         state.setKey(key);
         state.setTags(sentTags);
         state.setNewKey(newKey);
@@ -196,7 +204,7 @@ class I2PSessionImpl2 extends I2PSessionImpl {
         // saying that the router received it - in theory, that should come back
         // immediately, but in practice can take up to a second (though usually
         // much quicker).  setting this to false will short-circuit that delay
-        boolean actuallyWait = true;
+        boolean actuallyWait = false; // true;
         
         long beforeWaitFor = _context.clock().now();
         if (actuallyWait)
@@ -225,6 +233,13 @@ class I2PSessionImpl2 extends I2PSessionImpl {
                       + (beforeWaitFor-afterSendingSync) + "ms to send, "
                       + (afterRemovingSync-beforeWaitFor) + "ms waiting for reply");
         }
+        
+        _context.statManager().addRateData("i2cp.sendBestEffortTotalTime", afterRemovingSync - begin, 0);
+        //_context.statManager().addRateData("i2cp.sendBestEffortStage0", beforeSendingSync- begin, 0);
+        //_context.statManager().addRateData("i2cp.sendBestEffortStage1", afterSendingSync- beforeSendingSync, 0);
+        //_context.statManager().addRateData("i2cp.sendBestEffortStage2", beforeWaitFor- afterSendingSync, 0);
+        //_context.statManager().addRateData("i2cp.sendBestEffortStage3", afterWaitFor- beforeWaitFor, 0);
+        //_context.statManager().addRateData("i2cp.sendBestEffortStage4", afterRemovingSync- afterWaitFor, 0);
         
         if (found) {
             if (_log.shouldLog(Log.INFO))
@@ -260,7 +275,7 @@ class I2PSessionImpl2 extends I2PSessionImpl {
             newKey = _context.keyGenerator().generateSessionKey();
 
         long nonce = _context.random().nextInt(Integer.MAX_VALUE);
-        MessageState state = new MessageState(nonce, getPrefix());
+        MessageState state = new MessageState(_context, nonce, getPrefix());
         state.setKey(key);
         state.setTags(sentTags);
         state.setNewKey(newKey);
@@ -418,6 +433,7 @@ class I2PSessionImpl2 extends I2PSessionImpl {
                 _log.info(getPrefix() + "No matching state for messageId " + msgId + " / " + nonce
                           + " w/ status = " + status);
         }
+        _context.statManager().addRateData("i2cp.receiveStatusTime", _context.clock().now() - beforeSync, 0);
     }
 
     /**

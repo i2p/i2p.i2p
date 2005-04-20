@@ -31,9 +31,10 @@ public class OutboundMessageDistributor {
     public void distribute(I2NPMessage msg, Hash target, TunnelId tunnel) {
         RouterInfo info = _context.netDb().lookupRouterInfoLocally(target);
         if (info == null) {
-            _log.debug("outbound distributor to " + target.toBase64().substring(0,4)
-                       + "." + (tunnel != null ? tunnel.getTunnelId() + "" : "")
-                       + ": no info locally, searching...");
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("outbound distributor to " + target.toBase64().substring(0,4)
+                           + "." + (tunnel != null ? tunnel.getTunnelId() + "" : "")
+                           + ": no info locally, searching...");
             _context.netDb().lookupRouterInfo(target, new DistributeJob(_context, msg, target, tunnel), null, MAX_DISTRIBUTE_TIME);
             return;
         } else {

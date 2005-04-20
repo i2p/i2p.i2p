@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 import net.i2p.data.Hash;
 import net.i2p.data.RouterIdentity;
+import net.i2p.data.i2np.DataMessage;
 import net.i2p.data.i2np.DeliveryStatusMessage;
 import net.i2p.data.i2np.I2NPMessage;
 import net.i2p.data.i2np.DatabaseSearchReplyMessage;
@@ -52,6 +53,13 @@ public class InNetMessagePool implements Service {
      */
     public static final String PROP_DISPATCH_THREADED = "router.dispatchThreaded";
     public static final boolean DEFAULT_DISPATCH_THREADED = false;
+    /**
+     * If we aren't doing threaded dispatch for tunnel messages, should we
+     * call the actual dispatch() method inline (on the same thread which
+     * called add())?  If false, we queue it up in a shared short circuit
+     * job.
+     */
+    private static final boolean DISPATCH_DIRECT = true;
     
     public InNetMessagePool(RouterContext context) {
         _context = context;
@@ -101,6 +109,10 @@ public class InNetMessagePool implements Service {
                           + " expiring on " + exp
                           + " of type " + messageBody.getClass().getName());
         
+        //if (messageBody instanceof DataMessage) {
+        //    _context.statManager().getStatLog().addData(fromRouterHash.toBase64().substring(0,6), "udp.floodDataReceived", 1, 0);
+        //    return 0;
+        //}
         if (messageBody instanceof TunnelDataMessage) {
             // do not validate the message with the validator - the IV validator is sufficient
         } else { 
@@ -228,7 +240,7 @@ public class InNetMessagePool implements Service {
     // others and/or on other threads (e.g. transport threads).  lets try 'em both.
     
     private void shortCircuitTunnelGateway(I2NPMessage messageBody) {
-        if (false) {
+        if (DISPATCH_DIRECT) {
             doShortCircuitTunnelGateway(messageBody);
         } else {
             synchronized (_pendingGatewayMessages) { 
@@ -249,7 +261,7 @@ public class InNetMessagePool implements Service {
     }
     
     private void shortCircuitTunnelData(I2NPMessage messageBody, Hash from) {
-        if (false) {
+        if (DISPATCH_DIRECT) {
             doShortCircuitTunnelData(messageBody, from);
         } else {
             synchronized (_pendingDataMessages) { 

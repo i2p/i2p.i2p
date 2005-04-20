@@ -149,7 +149,8 @@ public class TestSwarm {
         public void run() {
             _started = _context.clock().now();
             _context.statManager().addRateData("swarm." + _connectionId + ".started", 1, 0);
-            byte data[] = new byte[32*1024];
+            byte data[] = new byte[4*1024];
+            _context.random().nextBytes(data);
             long value = 0;
             long lastSend = _context.clock().now();
             if (_socket == null) {
@@ -167,15 +168,19 @@ public class TestSwarm {
             try {
                 OutputStream out = _socket.getOutputStream();
                 while (!_closed) {
-                    out.write(data);
-                    // out.flush();
-                    _totalSent += data.length;
-                    _context.statManager().addRateData("swarm." + _connectionId + ".totalSent", _totalSent, 0);
-                    //try { Thread.sleep(100); } catch (InterruptedException ie) {}
-                    long now = _context.clock().now();
-                    _log.debug("Sending " + _connectionId + " after " + (now-lastSend));
-                    lastSend = now;
-                    try { Thread.sleep(20); } catch (InterruptedException ie) {}
+                    if (shouldSend()) {
+                        out.write(data);
+                        // out.flush();
+                        _totalSent += data.length;
+                        _context.statManager().addRateData("swarm." + _connectionId + ".totalSent", _totalSent, 0);
+                        //try { Thread.sleep(100); } catch (InterruptedException ie) {}
+                        long now = _context.clock().now();
+                        //_log.debug("Sending " + _connectionId + " after " + (now-lastSend));
+                        lastSend = now;
+                        //try { Thread.sleep(20); } catch (InterruptedException ie) {}
+                    } else {
+                        try { Thread.sleep(5000); } catch (InterruptedException ie) {}
+                    }
                 }
             } catch (Exception e) {
                 _log.error("Error sending", e);
@@ -188,13 +193,13 @@ public class TestSwarm {
                 long now = lastRead;
                 try {
                     InputStream in = _socket.getInputStream();
-                    byte buf[] = new byte[32*1024];
+                    byte buf[] = new byte[8*1024];
                     int read = 0;
                     while ( (read = in.read(buf)) != -1) {
                         now = System.currentTimeMillis();
                         _totalReceived += read;
                         _context.statManager().addRateData("swarm." + getConnectionId() + ".totalReceived", _totalReceived, 0);
-                        _log.debug("Receiving " + _connectionId + " with " + read + " after " + (now-lastRead));
+                        //_log.debug("Receiving " + _connectionId + " with " + read + " after " + (now-lastRead));
                         lastRead = now;
                     }
                 } catch (Exception e) {
@@ -202,5 +207,9 @@ public class TestSwarm {
                 }
             }
         }
+    }
+    
+    private boolean shouldSend() {
+        return Boolean.valueOf(_context.getProperty("shouldSend", "false")).booleanValue();
     }
 }

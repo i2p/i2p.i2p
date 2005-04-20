@@ -60,6 +60,8 @@ public class MessageValidator {
         }
     }
     
+    private static final long TIME_MASK = 0xFFFFFC00;
+    
     /**
      * Note that we've received the message (which has the expiration given).
      * This functionality will need to be reworked for I2P 3.0 when we take into
@@ -69,7 +71,16 @@ public class MessageValidator {
      * @return true if we HAVE already seen this message, false if not
      */
     private boolean noteReception(long messageId, long messageExpiration) {
-        boolean dup = _filter.add(messageId);
+        long val = messageId;
+        // tweak the high order bits with the message expiration /seconds/
+        val ^= (messageExpiration & TIME_MASK) << 16;
+        boolean dup = _filter.add(val);
+        if (dup && _log.shouldLog(Log.WARN)) {
+            _log.warn("Duplicate with " + _filter.getCurrentDuplicateCount() 
+                      + " other dups, " + _filter.getInsertedCount() 
+                      + " other entries, and a false positive rate of "
+                      + _filter.getFalsePositiveRate());
+        }
         return dup;
     }
     

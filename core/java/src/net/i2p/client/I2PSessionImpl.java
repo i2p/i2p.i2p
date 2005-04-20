@@ -135,6 +135,8 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
         } catch (IOException ioe) {
             throw new I2PSessionException("Error reading the destination key stream", ioe);
         }
+        if (options == null)
+            options = System.getProperties();
         loadConfig(options);
         _sessionId = null;
         _leaseSet = null;

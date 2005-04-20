@@ -64,6 +64,15 @@ public class ConnectionPacketHandler {
 
         con.packetReceived();
         
+        boolean choke = false;
+        if (packet.isFlagSet(Packet.FLAG_DELAY_REQUESTED)) {
+            if (packet.getOptionalDelay() > 60000) {
+                // requested choke 
+                choke = true;
+                con.getOptions().setRTT(con.getOptions().getRTT() + 10*1000);
+            }
+        }
+        
         long ready = con.getInputStream().getHighestReadyBockId();
         int available = con.getOptions().getInboundBufferSize() - con.getInputStream().getTotalReadySize();
         int allowedBlocks = available/con.getOptions().getMaxMessageSize();
@@ -72,9 +81,10 @@ public class ConnectionPacketHandler {
                 _log.warn("Inbound buffer exceeded on connection " + con + " (" 
                           + ready + "/"+ (ready+allowedBlocks) + "/" + available
                           + ": dropping " + packet);
-            ack(con, packet.getAckThrough(), packet.getNacks(), null, false);
-            con.getOptions().setChoke(5*1000);
+            ack(con, packet.getAckThrough(), packet.getNacks(), null, false, choke);
+            con.getOptions().setChoke(61*1000);
             packet.releasePayload();
+            con.ackImmediately();
             return;
         }
         con.getOptions().setChoke(0);
@@ -107,7 +117,7 @@ public class ConnectionPacketHandler {
             } else {
                 int delay = con.getOptions().getSendAckDelay();
                 if (packet.isFlagSet(Packet.FLAG_DELAY_REQUESTED)) // delayed ACK requested
-                    delay += packet.getOptionalDelay();
+                    delay = packet.getOptionalDelay();
                 con.setNextSendTime(delay + _context.clock().now());
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("Scheduling ack in " + delay + "ms for received packet " + packet);
@@ -142,7 +152,7 @@ public class ConnectionPacketHandler {
             // don't honor the ACK 0 in SYN packets received when the other side
             // has obviously not seen our messages
         } else {
-            fastAck = fastAck || ack(con, packet.getAckThrough(), packet.getNacks(), packet, isNew);
+            fastAck = ack(con, packet.getAckThrough(), packet.getNacks(), packet, isNew, choke);
         }
         con.eventOccurred();
         if (fastAck) {
@@ -159,7 +169,10 @@ public class ConnectionPacketHandler {
         }
     }
     
-    private boolean ack(Connection con, long ackThrough, long nacks[], Packet packet, boolean isNew) {
+    private boolean ack(Connection con, long ackThrough, long nacks[], Packet packet, boolean isNew, boolean choke) {
+        if ( (nacks != null) && (nacks.length > 0) )
+            con.getOptions().setRTT(con.getOptions().getRTT() + nacks.length*1000);
+
         int numResends = 0;
         List acked = con.ackPackets(ackThrough, nacks);
         if ( (acked != null) && (acked.size() > 0) ) {
@@ -196,16 +209,16 @@ public class ConnectionPacketHandler {
         }
 
         if (packet != null)
-            return adjustWindow(con, isNew, packet.getSequenceNum(), numResends, (acked != null ? acked.size() : 0));
+            return adjustWindow(con, isNew, packet.getSequenceNum(), numResends, (acked != null ? acked.size() : 0), choke);
         else
-            return adjustWindow(con, false, -1, numResends, (acked != null ? acked.size() : 0));
+            return adjustWindow(con, false, -1, numResends, (acked != null ? acked.size() : 0), choke);
     }
     
     
-    private boolean adjustWindow(Connection con, boolean isNew, long sequenceNum, int numResends, int acked) {
+    private boolean adjustWindow(Connection con, boolean isNew, long sequenceNum, int numResends, int acked, boolean choke) {
         boolean congested = false;
         if ( (!isNew) && (sequenceNum > 0) ) {
-            // dup real packet
+            // dup real packet, or they told us to back off
             int oldSize = con.getOptions().getWindowSize();
             con.congestionOccurred();
             oldSize >>>= 1;
@@ -235,12 +248,16 @@ public class ConnectionPacketHandler {
 
                     // we can't use newWindowSize += 1/newWindowSize, since we're
                     // integers, so lets use a random distribution instead
-                    int shouldIncrement = _context.random().nextInt(newWindowSize);
+                    int shouldIncrement = _context.random().nextInt(con.getOptions().getCongestionAvoidanceGrowthRateFactor()*newWindowSize);
                     if (shouldIncrement <= 0)
                         newWindowSize += 1;
                 } else {
-                    // slow start
-                    newWindowSize += 1;
+                    // slow start, but modified to take into account the fact
+					// that windows in the streaming lib are messages, not bytes,
+                    // so we only grow 1 every N times (where N = the slow start factor)
+                    int shouldIncrement = _context.random().nextInt(con.getOptions().getSlowStartGrowthRateFactor());
+                    if (shouldIncrement <= 0)
+                        newWindowSize += 1;
                 }
             }
             

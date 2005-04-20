@@ -22,6 +22,8 @@ public class ConnectionOptions extends I2PSocketOptionsImpl {
     private int _inactivityAction;
     private int _inboundBufferSize;
     private int _maxWindowSize;
+    private int _congestionAvoidanceGrowthRateFactor;
+    private int _slowStartGrowthRateFactor;
 
     public static final int PROFILE_BULK = 1;
     public static final int PROFILE_INTERACTIVE = 2;
@@ -45,6 +47,8 @@ public class ConnectionOptions extends I2PSocketOptionsImpl {
     public static final String PROP_INACTIVITY_TIMEOUT = "i2p.streaming.inactivityTimeout";
     public static final String PROP_INACTIVITY_ACTION = "i2p.streaming.inactivityAction";
     public static final String PROP_MAX_WINDOW_SIZE = "i2p.streaming.maxWindowSize";
+    public static final String PROP_CONGESTION_AVOIDANCE_GROWTH_RATE_FACTOR = "i2p.streaming.congestionAvoidanceGrowthRateFactor";
+    public static final String PROP_SLOW_START_GROWTH_RATE_FACTOR = "i2p.streaming.slowStartGrowthRateFactor";
     
     public ConnectionOptions() {
         super();
@@ -74,6 +78,8 @@ public class ConnectionOptions extends I2PSocketOptionsImpl {
             setInactivityAction(opts.getInactivityAction());
             setInboundBufferSize(opts.getInboundBufferSize());
             setMaxWindowSize(opts.getMaxWindowSize());
+            setCongestionAvoidanceGrowthRateFactor(opts.getCongestionAvoidanceGrowthRateFactor());
+            setSlowStartGrowthRateFactor(opts.getSlowStartGrowthRateFactor());
         }
     }
     
@@ -85,13 +91,15 @@ public class ConnectionOptions extends I2PSocketOptionsImpl {
         setRTT(getInt(opts, PROP_INITIAL_RTT, 10*1000));
         setReceiveWindow(getInt(opts, PROP_INITIAL_RECEIVE_WINDOW, 1));
         setResendDelay(getInt(opts, PROP_INITIAL_RESEND_DELAY, 1000));
-        setSendAckDelay(getInt(opts, PROP_INITIAL_ACK_DELAY, 1000));
+        setSendAckDelay(getInt(opts, PROP_INITIAL_ACK_DELAY, 500));
         setWindowSize(getInt(opts, PROP_INITIAL_WINDOW_SIZE, 1));
         setMaxResends(getInt(opts, PROP_MAX_RESENDS, 5));
         setWriteTimeout(getInt(opts, PROP_WRITE_TIMEOUT, -1));
         setInactivityTimeout(getInt(opts, PROP_INACTIVITY_TIMEOUT, 5*60*1000));
         setInactivityAction(getInt(opts, PROP_INACTIVITY_ACTION, INACTIVITY_ACTION_DISCONNECT));
-        setInboundBufferSize((getMaxMessageSize() + 2) * Connection.MAX_WINDOW_SIZE);
+        setInboundBufferSize(getMaxMessageSize() * (Connection.MAX_WINDOW_SIZE + 2));
+        setCongestionAvoidanceGrowthRateFactor(getInt(opts, PROP_CONGESTION_AVOIDANCE_GROWTH_RATE_FACTOR, 2));
+        setSlowStartGrowthRateFactor(getInt(opts, PROP_SLOW_START_GROWTH_RATE_FACTOR, 2));
         
         setConnectTimeout(getInt(opts, PROP_CONNECT_TIMEOUT, Connection.DISCONNECT_TIMEOUT));
         setMaxWindowSize(getInt(opts, PROP_MAX_WINDOW_SIZE, Connection.MAX_WINDOW_SIZE));
@@ -124,7 +132,11 @@ public class ConnectionOptions extends I2PSocketOptionsImpl {
             setInactivityTimeout(getInt(opts, PROP_INACTIVITY_TIMEOUT, 5*60*1000));
         if (opts.containsKey(PROP_INACTIVITY_ACTION))
             setInactivityAction(getInt(opts, PROP_INACTIVITY_ACTION, INACTIVITY_ACTION_DISCONNECT));
-        setInboundBufferSize((getMaxMessageSize() + 2) * Connection.MAX_WINDOW_SIZE);
+        setInboundBufferSize(getMaxMessageSize() * (Connection.MAX_WINDOW_SIZE + 2));
+        if (opts.contains(PROP_CONGESTION_AVOIDANCE_GROWTH_RATE_FACTOR))
+            setCongestionAvoidanceGrowthRateFactor(getInt(opts, PROP_CONGESTION_AVOIDANCE_GROWTH_RATE_FACTOR, 2));
+        if (opts.contains(PROP_SLOW_START_GROWTH_RATE_FACTOR))
+            setSlowStartGrowthRateFactor(getInt(opts, PROP_SLOW_START_GROWTH_RATE_FACTOR, 2));
         
         if (opts.containsKey(PROP_CONNECT_TIMEOUT))
             setConnectTimeout(getInt(opts, PROP_CONNECT_TIMEOUT, Connection.DISCONNECT_TIMEOUT));
@@ -256,6 +268,24 @@ public class ConnectionOptions extends I2PSocketOptionsImpl {
      */
     public int getInboundBufferSize() { return _inboundBufferSize; }
     public void setInboundBufferSize(int bytes) { _inboundBufferSize = bytes; }
+    
+    /**
+     * When we're in congestion avoidance, we grow the window size at the rate
+     * of 1/(windowSize*factor).  In standard TCP, window sizes are in bytes,
+     * while in I2P, window sizes are in messages, so setting factor=maxMessageSize
+     * mimics TCP, but using a smaller factor helps grow a little more rapidly.
+     */
+    public int getCongestionAvoidanceGrowthRateFactor() { return _congestionAvoidanceGrowthRateFactor; }
+    public void setCongestionAvoidanceGrowthRateFactor(int factor) { _congestionAvoidanceGrowthRateFactor = factor; }
+    
+    /**
+     * When we're in slow start, we grow the window size at the rate
+     * of 1/(factor).  In standard TCP, window sizes are in bytes,
+     * while in I2P, window sizes are in messages, so setting factor=maxMessageSize
+     * mimics TCP, but using a smaller factor helps grow a little more rapidly.
+     */
+    public int getSlowStartGrowthRateFactor() { return _slowStartGrowthRateFactor; }
+    public void setSlowStartGrowthRateFactor(int factor) { _slowStartGrowthRateFactor = factor; }
     
     public String toString() {
         StringBuffer buf = new StringBuffer(128);

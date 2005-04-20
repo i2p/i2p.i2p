@@ -114,6 +114,9 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
         ctx.statManager().createRateStat("client.leaseSetFoundLocally", "How often we tried to look for a leaseSet and found it locally?", "ClientMessages", new long[] { 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
         ctx.statManager().createRateStat("client.leaseSetFoundRemoteTime", "How long we tried to look fora remote leaseSet (when we succeeded)?", "ClientMessages", new long[] { 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
         ctx.statManager().createRateStat("client.leaseSetFailedRemoteTime", "How long we tried to look for a remote leaseSet (when we failed)?", "ClientMessages", new long[] { 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
+        ctx.statManager().createRateStat("client.dispatchPrepareTime", "How long until we've queued up the dispatch job (since we started)?", "ClientMessages", new long[] { 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
+        ctx.statManager().createRateStat("client.dispatchTime", "How long until we've dispatched the message (since we started)?", "ClientMessages", new long[] { 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
+        ctx.statManager().createRateStat("client.dispatchSendTime", "How long the actual dispatching takes?", "ClientMessages", new long[] { 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
         long timeoutMs = OVERALL_TIMEOUT_MS_DEFAULT;
         _clientMessage = msg;
         _clientMessageId = msg.getMessageId();
@@ -355,8 +358,11 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
                            + _lease.getTunnelId() + " on " 
                            + _lease.getGateway().toBase64());
 
-            // dispatch may take 100+ms, so toss it in its own job
-            getContext().jobQueue().addJob(new DispatchJob(getContext(), msg, selector, onReply, onFail, (int)(_overallExpiration-getContext().clock().now())));
+            DispatchJob dispatchJob = new DispatchJob(getContext(), msg, selector, onReply, onFail, (int)(_overallExpiration-getContext().clock().now()));
+            if (false) // dispatch may take 100+ms, so toss it in its own job
+                getContext().jobQueue().addJob(dispatchJob);
+            else
+                dispatchJob.runJob();
         } else {
             if (_log.shouldLog(Log.ERROR))
                 _log.error(getJobId() + ": Could not find any outbound tunnels to send the payload through... wtf?");
@@ -364,6 +370,7 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
         }
         _clientMessage = null;
         _clove = null;
+        getContext().statManager().addRateData("client.dispatchPrepareTime", getContext().clock().now() - _start, 0);
     }
 
     private class DispatchJob extends JobImpl {
@@ -385,10 +392,13 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
             getContext().messageRegistry().registerPending(_selector, _replyFound, _replyTimeout, _timeoutMs);
             if (_log.shouldLog(Log.INFO))
                 _log.info("Dispatching message to " + _toString + ": " + _msg);
+            long before = getContext().clock().now();
             getContext().tunnelDispatcher().dispatchOutbound(_msg, _outTunnel.getSendTunnelId(0), _lease.getTunnelId(), _lease.getGateway());
+            long dispatchSendTime = getContext().clock().now() - before; 
             if (_log.shouldLog(Log.INFO))
                 _log.info("Dispatching message to " + _toString + " complete");
-
+            getContext().statManager().addRateData("client.dispatchTime", getContext().clock().now() - _start, 0);
+            getContext().statManager().addRateData("client.dispatchSendTime", dispatchSendTime, 0);
         }
     }
     

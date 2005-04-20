@@ -111,7 +111,7 @@ if (curTunnel >= 0) {
 </select>
 &nbsp;&nbsp;
 <b>others:</b>
-<input type="text" name="reachablyByOther" size="20" value="<%=clientInterface%>" />
+<input type="text" name="reachableByOther" size="20" value="<%=clientInterface%>" />
 <% } %>
 
 </td>
