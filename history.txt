@@ -1,4 +1,6 @@
-$Id: history.txt,v 1.195 2005/04/17 21:07:58 jrandom Exp $
+$Id: history.txt,v 1.196 2005/04/20 14:15:28 jrandom Exp $
+
+* 2005-04-20  0.5.0.7 released
 
 2005-04-20  jrandom
     * In the SDK, we don't actually need to block when we're sending a message
