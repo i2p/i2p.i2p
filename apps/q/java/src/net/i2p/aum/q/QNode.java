@@ -157,6 +157,8 @@ public abstract class QNode extends Thread
      */
 
     public String nodeType = "(base)";
+    
+    public boolean isRunning;
 
     // ----------------------------------------------------------
     // CONSTRUCTORS
@@ -580,6 +582,13 @@ public abstract class QNode extends Thread
         System.out.println("scheduleStartupJobs: c<p="+updateCatalogFromPeers+", isClient="+isClient);
     }
 
+    public void scheduleShutdown()
+    {
+        Hashtable job = new Hashtable();
+        job.put("cmd", "shutdown");
+        runAfter(1000, job, "shutdown");
+    }
+
     public void schedulePeerUploadJob(QDataItem item)
     {
         String uri = (String)item.get("uri");
@@ -790,6 +799,8 @@ public abstract class QNode extends Thread
     {
         log.info("Starting background tasks");
         
+        isRunning = true;
+        
         // mark our start time
         nodeStartTime = new Date();
         
@@ -833,7 +844,7 @@ public abstract class QNode extends Thread
 
         // fetch items from the job queue, and launch
         // threads to execute them
-        while (true)
+        while (isRunning)
         {
             // get a thread slot from the thread pool
             try {

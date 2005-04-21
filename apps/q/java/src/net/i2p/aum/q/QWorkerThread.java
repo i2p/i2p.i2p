@@ -62,6 +62,9 @@ class QWorkerThread extends Thread {
             else if (cmd.equals("test")) {
                 doTest();
             }
+            else if (cmd.equals("shutdown")) {
+                doShutdown();
+            }
             else {
                 node.log.error("workerthread.run: unrecognised command '"+cmd+"'");
                 System.out.println("workerthread.run: unrecognised command '"+cmd+"'");
@@ -88,6 +91,21 @@ class QWorkerThread extends Thread {
         
         String msg = (String)job.get("msg");
         System.out.println("TESTJOB: msg='"+msg+"'");
+    }
+    
+    public void doShutdown() throws Exception {
+        
+        try {
+            new File(node.jobsDir + node.sep + jobTime).delete();
+            new File(node.jobsDir + node.sep + jobTime + ".desc").delete();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        SimpleFile f = new SimpleFile("/tmp/eeee", "rws");
+        f.write("xxx");
+        node.isRunning = false;
+        Runtime.getRuntime().halt(0);
     }
     
     public void doLocalPutItem() throws Exception {

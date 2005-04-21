@@ -341,13 +341,15 @@ public class QServerMethods {
         //System.out.println("shutdown: our privkey="+node.privKeyStr);
         //System.out.println("shutdown: nodePrivKey="+nodePrivKey);
         if (nodePrivKey.equals(node.privKeyStr)) {
+
+            res.put("status", "ok");
+            //node.scheduleShutdown();
             // get a runtime
-            System.out.println("Node at "+node.dataDir+" shutting down");
+            //System.out.println("Node at "+node.dataDir+" shutting down");
             Runtime r = Runtime.getRuntime();
-            
             // and terminate the vm
-            r.exit(0);
-            //r.halt(0);
+            //r.exit(0);
+            r.halt(0);
         }
         else {
             res.put("status", "error");
