@@ -55,12 +55,11 @@ Hash: SHA1
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v1.2.4 (GNU/Linux)
 
-iD8DBQFCQXoJGnFL2th344YRAtsIAKCUy/sOIsxahUnT2hKLXFL9lXsAmACfUHa5
-CPah6TDXYJCWmR0n3oPtrvo=
-=mD0t
+iD8DBQFCZ38IWYfZ3rPnHH0RAgOHAJ4wNgmfO2AkL8IXiGnPtWrTlXcVogCfQ79z
+jP69nPbh4KLGhF+SD0+0bW4=
+=npPe
 -----END PGP SIGNATURE-----
 */
-
     private static final String VALID_VERSION_CHARS = "0123456789.";
     private static final int    VERSION_BYTES       = 16;
     private static final int    HEADER_BYTES        = Signature.SIGNATURE_BYTES + VERSION_BYTES;
