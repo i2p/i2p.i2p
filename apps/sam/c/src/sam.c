@@ -30,6 +30,10 @@
 
 #include "sam.h"
 #include "platform.h"
+#include "parse.h"
+#include "tinystring.h"
+
+#include <assert.h>
 
 static bool			sam_hello(sam_sess_t *session);
 static void			sam_log(const char *format, ...);
@@ -57,7 +61,7 @@ static ssize_t		sam_write(sam_sess_t *session, const void *buf, size_t n);
  */
 
 /* a peer closed the connection */
-void (*sam_closeback)(sam_sess_t *session, sam_sid_t stream_id, samerr_t reason)
+void (*sam_closeback)(sam_sess_t *session, sam_sid_t stream_id, samerr_t reason, const char* message)
 	= NULL;
 
 /* a peer connected to us */
@@ -76,15 +80,14 @@ void (*sam_dgramback)(sam_sess_t *session, sam_pubkey_t dest, void *data,
 void (*sam_diedback)(sam_sess_t *session) = NULL;
 
 /* logging callback */
-void (*sam_logback)(char *str) = NULL;
+void (*sam_logback)(const char *str) = NULL;
 
 /* naming lookup reply - `pubkey' will be NULL if `result' isn't SAM_OK */
-void (*sam_namingback)(sam_sess_t *session, char *name, sam_pubkey_t pubkey,
-	samerr_t result) = NULL;
+void (*sam_namingback)(sam_sess_t *session, const char *name, sam_pubkey_t pubkey, samerr_t result, const char* message) = NULL;
 
 /* our connection to a peer has completed */
 void (*sam_statusback)(sam_sess_t *session, sam_sid_t stream_id,
-	samerr_t result) = NULL;
+	samerr_t result, const char* message) = NULL;
 
 /* a peer sent some raw data (`data' MUST be freed) */
 void (*sam_rawback)(sam_sess_t *session, void *data, size_t size) = NULL;
@@ -290,13 +293,13 @@ static void sam_log(const char *format, ...)
  */
 void sam_naming_lookup(sam_sess_t *session, const char *name)
 {
-	assert(session != NULL);
-	char cmd[SAM_CMD_LEN];
+    assert(session != NULL);
+    char cmd[SAM_CMD_LEN];
 
-	snprintf(cmd, sizeof cmd, "NAMING LOOKUP NAME=%s\n", name);
-	sam_write(session, cmd, strlen(cmd));
+    snprintf(cmd, sizeof cmd, "NAMING LOOKUP NAME=%s\n", name);
+    sam_write(session, cmd, strlen(cmd));
 
-	return;
+    return;
 }
 
 /*
@@ -304,241 +307,192 @@ void sam_naming_lookup(sam_sess_t *session, const char *name)
  *
  * s - string of data that we read (read past tense)
  */
+bool sam_parse_args(sam_sess_t *session, args_t args);
 static void sam_parse(sam_sess_t *session, char *s)
 {
-	assert(session != NULL);
-#define SAM_DGRAM_RECEIVED_REPLY "DATAGRAM RECEIVED"
-#define SAM_NAMING_REPLY "NAMING REPLY"
-#define SAM_NAMING_REPLY_OK "NAMING REPLY RESULT=OK"
-#define SAM_NAMING_REPLY_IK "NAMING REPLY RESULT=INVALID_KEY"
-#define SAM_NAMING_REPLY_KNF "NAMING REPLY RESULT=KEY_NOT_FOUND"
-#define SAM_RAW_RECEIVED_REPLY "RAW RECEIVED"
-#define SAM_STREAM_CLOSED_REPLY "STREAM CLOSED"
-#define SAM_STREAM_CONNECTED_REPLY "STREAM CONNECTED"
-#define SAM_STREAM_RECEIVED_REPLY "STREAM RECEIVED"
-#define SAM_STREAM_STATUS_REPLY "STREAM STATUS"
-#define SAM_STREAM_STATUS_REPLY_OK "STREAM STATUS RESULT=OK"
-#define SAM_STREAM_STATUS_REPLY_CRP "STREAM STATUS RESULT=CANT_REACH_PEER"
-#define SAM_STREAM_STATUS_REPLY_I2E "STREAM STATUS RESULT=I2P_ERROR"
-#define SAM_STREAM_STATUS_REPLY_IK "STREAM STATUS RESULT=INVALID_KEY"
-#define SAM_STREAM_STATUS_REPLY_TO "STREAM STATUS RESULT=TIMEOUT"
+    //Wrapper for ease of memory management
+    args_t args;
+    assert(session != NULL);
+    args = arg_parse(s);
+    if(!sam_parse_args(session, args)) {
+        SAMLOG("Unknown SAM command received: %s", s);
+    }
+    arg_done(args);
+}
 
-	/*
-	 * TODO: add raw parsing
-	 */
+long int strtol_checked(const char* str) {
+    static char* end = NULL;
+    long int ret = strtol(str,&end,10);
+    assert(str != end || "No number found at all!");    
+    return ret;
+}
 
-	if (strncmp(s, SAM_DGRAM_RECEIVED_REPLY,
-			strlen(SAM_DGRAM_RECEIVED_REPLY)) == 0) {
-		char *p;
-		sam_pubkey_t dest;
-		size_t size;
-		void *data;
-
-		p = strchr(s, '=');  /* DESTINATION= */
-		assert(p != NULL);
-		p++;
-		strlcpy(dest, p, sizeof dest);
-		p = strchr(p, '=');  /* SIZE= */
-		assert(p != NULL);
-		p++;
-		size = strtol(p, NULL, 10);
-		assert(size != 0);
-		data = malloc(size + 1);  /* +1 for NUL termination, so when we are
-									receiving a string it will just work and it
-									won't be necessary to send NUL.  When binary
-									data is sent, the extra NUL character will
-									just be ignored by the client program,
-									because it is not added to the size */
-		if (data == NULL) {
-			SAMLOGS("Out of memory");
-			abort();
-		}
-		if (sam_read2(session, data, size) != -1) {
-			p = data + size;
-			*p = '\0';  /* see above NUL note */
-			sam_dgramback(session, dest, data, size); /* `data' must be freed */
-		} else
-			free(data);
-
-		return;
-
-	} else if (strncmp(s, SAM_NAMING_REPLY, strlen(SAM_NAMING_REPLY)) == 0) {
-		char *p;
-		char *q;
-		char name[SAM_NAME_LEN];
-
-		p = strchr(s, '=');  /* can't use strrchar because of option
-								MESSAGE= */
-		assert(p != NULL);  /* RESULT= */
-		p++;
-		p = strchr(p, '=');  /* NAME= */
-		assert(p != NULL);
-		p++;
-
-		if (strncmp(s, SAM_NAMING_REPLY_OK, strlen(SAM_NAMING_REPLY_OK)) == 0) {
-			sam_pubkey_t pubkey;
-
-			q = strchr(p, ' ');  /* ' 'VAL.. */
-			assert(q != NULL);
-			*q = '\0';
-			q++;
-			q = strchr(q, '=');  /* VALUE= */
-			assert(q != NULL);
-			q++;
-			strlcpy(name, p, sizeof name);
-			strlcpy(pubkey, q, sizeof pubkey);
-			sam_namingback(session, name, pubkey, SAM_OK);
-
-		} else if (strncmp(s, SAM_NAMING_REPLY_IK,
-				strlen(SAM_NAMING_REPLY_IK)) == 0) {
-			q = strchr(p, ' ');  /* ' 'MES.. (optional) */
-			if (q != NULL)
-				*q = '\0';
-			strlcpy(name, p, sizeof name);
-			sam_namingback(session, name, NULL, SAM_INVALID_KEY);
-
-		} else if (strncmp(s, SAM_NAMING_REPLY_KNF,
-				strlen(SAM_NAMING_REPLY_KNF)) == 0) {
-			q = strchr(p, ' ');  /* ' 'MES.. (optional) */
-			if (q != NULL)
-				*q = '\0';
-			strlcpy(name, p, sizeof name);
-			sam_namingback(session, name, NULL, SAM_KEY_NOT_FOUND);
-
-		} else {
-			q = strchr(p, ' ');  /* ' 'MES.. (optional) */
-			if (q != NULL)
-				*q = '\0';
-			strlcpy(name, p, sizeof name);
-			sam_namingback(session, name, NULL, SAM_UNKNOWN);
-		}
-
-		return;
-
-	} else if (strncmp(s, SAM_STREAM_CLOSED_REPLY,
-			strlen(SAM_STREAM_CLOSED_REPLY)) == 0) {
-		char *p;
-		sam_sid_t stream_id;
-
-		p = strchr(s, '=');  /* can't use strrchar because of option MESSAGE= */
-		assert(p != NULL);  /* ID= */
-		p++;
-		stream_id = strtol(p, NULL, 10);
-		assert(stream_id != 0);
-		p = strchr(p, '=');  /* RESULT= */
-		assert(p != NULL);
-		p++;
-		if (strncmp(p, "OK", strlen("OK")) == 0)
-			sam_closeback(session, stream_id, SAM_OK);
-		else if (strncmp(p, "CANT_REACH_PEER", strlen("CANT_REACH_PEER")) == 0)
-			sam_closeback(session, stream_id, SAM_CANT_REACH_PEER);
-		else if (strncmp(p, "I2P_ERROR", strlen("I2P_ERROR")) == 0)
-			sam_closeback(session, stream_id, SAM_I2P_ERROR);
-		else if (strncmp(p, "PEER_NOT_FOUND", strlen("PEER_NOT_FOUND")) == 0)
-			sam_closeback(session, stream_id, SAM_PEER_NOT_FOUND);
-		else if (strncmp(p, "TIMEOUT", strlen("TIMEOUT")) == 0)
-			sam_closeback(session, stream_id, SAM_TIMEOUT);
-		else
-			sam_closeback(session, stream_id, SAM_UNKNOWN);
-
-		return;
-
-	} else if (strncmp(s, SAM_STREAM_CONNECTED_REPLY,
-			strlen(SAM_STREAM_CONNECTED_REPLY)) == 0) {
-		char *p;
-		sam_sid_t stream_id;
-		sam_pubkey_t dest;
-
-		p = strrchr(s, '=');  /* ID= */
-		assert(p != NULL);
-		*p = '\0';
-		p++;
-		stream_id = strtol(p, NULL, 10);
-		assert(stream_id != 0);
-		p = strstr(s, "N=");  /* DESTINATION= */
-		p += 2;
-		strlcpy(dest, p, sizeof dest);
-		sam_connectback(session, stream_id, dest);
+bool sam_parse_args(sam_sess_t *session, args_t args)
+{
+    arg_t* arg; // The current argument being examined...
+    const char* message = NULL; // Almost EVERYTHING can have a message...
 	
-		return;
+    if(args.num <= 0) return 0;
 
-	} else if (strncmp(s, SAM_STREAM_RECEIVED_REPLY,
-			strlen(SAM_STREAM_RECEIVED_REPLY)) == 0) {
-		char *p;
-		sam_sid_t stream_id;
+#define ARG_IS(a,b) string_equal(AG(args,a)->name,string_wrap(b))
+#define ARG_FIND(a) arg_find(args,_sw(a))
+
+    // Almost EVERYTHING can have a message...
+    arg = ARG_FIND("MESSAGE");
+    if(arg) {
+        message = string_data(arg->value);
+    }
+
+    if(ARG_IS(0,"DATAGRAM") &&
+       ARG_IS(1,"RECEIVED")) {
+        sam_pubkey_t dest;
+        size_t size;
+        void *data;
+
+        arg = ARG_FIND("DESTINATION");
+        assert(arg != NULL);
+        _scr(arg->value, dest, sizeof dest);
+
+        arg = ARG_FIND("SIZE");
+        assert(arg != NULL);
+        size = strtol_checked(string_data(arg->value));
+
+        data = malloc(size + 1);  
+        /* +1 for NUL termination, so when we are
+           receiving a string it will just work and it
+           won't be necessary to send NUL.  When binary
+           data is sent, the extra NUL character will
+           just be ignored by the client program,
+           because it is not added to the size */
+        if (data == NULL) {
+	    SAMLOGS("Out of memory");
+	    abort();
+        }
+        if (sam_read2(session, data, size) != -1) {
+	    char* p = data + size;
+	    *p = '\0';  /* see above NUL note */
+	    sam_dgramback(session, dest, data, size); /* `data' must be freed */
+        } else
+	    free(data);
+	  
+    } else if (ARG_IS(0,"NAMING") &&
+               ARG_IS(1, "REPLY")) {
+        if(NULL == (arg = ARG_FIND("RESULT"))) {
+            SAMLOGS("Naming reply with no result");
+            return 0;
+        }
+
+        if (string_is(arg->value,"OK")) {
+            sam_pubkey_t pubkey;
+            arg = ARG_FIND("VALUE");
+            assert(arg != NULL);
+            _scr(arg->value, pubkey, sizeof pubkey);
+            arg = ARG_FIND("NAME");
+            assert(arg != NULL);
+
+            sam_namingback(session, string_data(arg->value), pubkey, SAM_OK, message);
+        } else if(string_is(arg->value,"INVALID_KEY")) {
+            arg_t* namearg = ARG_FIND("NAME");
+            assert(namearg != NULL);
+            sam_namingback(session, string_data(namearg->value), NULL,
+                           SAM_INVALID_KEY, message);
+        } else if(string_is(arg->value,"KEY_NOT_FOUND")) {
+            arg_t* namearg = ARG_FIND("NAME");
+            assert(namearg != NULL);
+            sam_namingback(session, string_data(namearg->value), NULL,
+                           SAM_KEY_NOT_FOUND, message);
+        } else {
+            arg_t* namearg = ARG_FIND("NAME");
+            assert(namearg != NULL);
+            sam_namingback(session, string_data(namearg->value), NULL,
+                           SAM_UNKNOWN, message);
+        }
+        
+    } else if (ARG_IS(0,"STREAM")) {
+        sam_sid_t stream_id;
+        arg = ARG_FIND("ID");
+        assert(arg != 0);
+        stream_id = strtol_checked(string_data(arg->value));
+
+        if(ARG_IS(1,"CLOSED")) {
+            arg = ARG_FIND("RESULT");
+            assert(arg != NULL);
+            if (string_is(arg->value,"OK")) {
+                sam_closeback(session, stream_id, SAM_OK, message);
+            } else if (string_is(arg->value,"CANT_REACH_PEER")) {
+                sam_closeback(session, stream_id, SAM_CANT_REACH_PEER, message);
+            } else if (string_is(arg->value,"I2P_ERROR")) {
+                sam_closeback(session, stream_id, SAM_I2P_ERROR, message);
+            } else if (string_is(arg->value,"PEER_NOT_FOUND")) {
+                sam_closeback(session, stream_id, SAM_PEER_NOT_FOUND, message);
+            } else if (string_is(arg->value,"TIMEOUT")) {
+                sam_closeback(session, stream_id, SAM_TIMEOUT, message);
+            } else {
+                sam_closeback(session, stream_id, SAM_UNKNOWN, message);
+            }
+
+	} else if(ARG_IS(1,"CONNECTED")) {
+		sam_pubkey_t dest;
+
+                arg = ARG_FIND("DESTINATION");
+                assert(arg != NULL);
+                _scr(arg->value, dest, sizeof dest);
+
+		sam_connectback(session, stream_id, dest);
+
+	} else if(ARG_IS(1,"RECEIVED")) {
 		size_t size;
 		void *data;
 
-		p = strrchr(s, '=');  /* SIZE= */
-		assert(p != NULL);
-		p++;
-		size = strtol(p, NULL, 10);
-		assert(size != 0);
-		p -= 6;
-		*p = '\0';
-		p = strrchr(s, '=');  /* ID= */
-		assert(p != NULL);
-		p++;
-		stream_id = strtol(p, NULL, 10);
-		assert(stream_id != 0);
-		data = malloc(size + 1);  /* +1 for NUL termination, so when we are
-									receiving a string it will just work and it
-									won't be necessary to send NUL.  When binary
-									data is sent, the extra NUL character will
-									just be ignored by the client program,
-									because it is not added to the size */
+                arg = ARG_FIND("SIZE");
+                assert(arg != NULL);
+                size = strtol_checked(string_data(arg->value));
+
+		data = malloc(size + 1);  
+                /* +1 for NUL termination, so when we are
+                   receiving a string it will just work and it
+                   won't be necessary to send NUL.  When binary
+                   data is sent, the extra NUL character will
+                   just be ignored by the client program,
+                   because it is not added to the size */
 		if (data == NULL) {
 			SAMLOGS("Out of memory");
 			abort();
 		}
 		if (sam_read2(session, data, size) != -1) {
-			p = data + size;
+			char* p = data + size;
 			*p = '\0';  /* see above NUL note */
 			sam_databack(session, stream_id, data, size);
 			/* ^^^ `data' must be freed ^^^*/
 		} else
 			free(data);
 
-		return;
-
-	} else if (strncmp(s, SAM_STREAM_STATUS_REPLY,
-			strlen(SAM_STREAM_STATUS_REPLY)) == 0) {
-		char *p;
-		sam_sid_t stream_id;
-
-		p = strchr(s, '=');  /* can't use strrchar because of option MESSAGE= */
-		assert(p != NULL);  /* RESULT= */
-		p++;
-		p = strchr(p, '=');  /* ID= */
-		assert(p != NULL);
-		p++;
-		stream_id = strtol(p, NULL, 10);
-		assert(stream_id != 0);
-		if (strncmp(s, SAM_STREAM_STATUS_REPLY_OK,
-				strlen(SAM_STREAM_STATUS_REPLY_OK)) == 0)
-			sam_statusback(session, stream_id, SAM_OK);
-		else if (strncmp(s, SAM_STREAM_STATUS_REPLY_CRP,
-				strlen(SAM_STREAM_STATUS_REPLY_CRP)) == 0)
-			sam_statusback(session, stream_id, SAM_CANT_REACH_PEER);
-		else if (strncmp(s, SAM_STREAM_STATUS_REPLY_I2E,
-				strlen(SAM_STREAM_STATUS_REPLY_I2E)) == 0)
-			sam_statusback(session, stream_id, SAM_I2P_ERROR);
-		else if (strncmp(s, SAM_STREAM_STATUS_REPLY_IK,
-				strlen(SAM_STREAM_STATUS_REPLY_IK)) == 0)
-			sam_statusback(session, stream_id, SAM_INVALID_KEY);
-		else if (strncmp(s, SAM_STREAM_STATUS_REPLY_TO,
-				strlen(SAM_STREAM_STATUS_REPLY_TO)) == 0)
-			sam_statusback(session, stream_id, SAM_TIMEOUT);
-		else
-			sam_statusback(session, stream_id, SAM_UNKNOWN);
-
-		return;
-
-	} else
-		SAMLOG("Unknown SAM command received: %s", s);
-
-	return;
+	} else if(ARG_IS(1,"STATUS")) {
+            arg = ARG_FIND("RESULT");
+            assert(arg != NULL);
+            if (string_is(arg->value,"OK")) {
+                sam_statusback(session, stream_id, SAM_OK, message);
+            } else if (string_is(arg->value,"CANT_REACH_PEER")) {
+                sam_statusback(session, stream_id, 
+                               SAM_CANT_REACH_PEER, message);
+            } else if (string_is(arg->value,"I2P_ERROR")) {
+                sam_statusback(session, stream_id, SAM_I2P_ERROR, message);
+            } else if (string_is(arg->value,"INVALID_KEY")) {
+                sam_statusback(session, stream_id, SAM_INVALID_KEY, message);
+            } else if (string_is(arg->value,"TIMEOUT")) {
+                sam_statusback(session, stream_id, SAM_TIMEOUT, message);
+            } else {
+                sam_statusback(session, stream_id, SAM_UNKNOWN, message);
+            }
+	}
+    } else
+        return 0;
+    return -1;
 }
+
+#undef ARG_IS
+#undef ARG_FIND
+
 
 /*
  * Sends data to a destination in a raw packet

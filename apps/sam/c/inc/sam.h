@@ -121,9 +121,9 @@ bool		sam_read_buffer(sam_sess_t *session);
 const char *sam_strerror(samerr_t code);
 /* SAM controls - callbacks */
 void		(*sam_diedback)(sam_sess_t *session);
-void		(*sam_logback)(char *str);
-void		(*sam_namingback)(sam_sess_t *session, char *name,
-				sam_pubkey_t pubkey, samerr_t result);
+void		(*sam_logback)(const char *str);
+void            (*sam_namingback)(sam_sess_t *session, const char *name, 
+                                  sam_pubkey_t pubkey, samerr_t result, const char* message);
 
 /* Stream commands */
 void		sam_stream_close(sam_sess_t *session, sam_sid_t stream_id);
@@ -131,14 +131,15 @@ sam_sid_t	sam_stream_connect(sam_sess_t *session, const sam_pubkey_t dest);
 samerr_t	sam_stream_send(sam_sess_t *session, sam_sid_t stream_id,
 				const void *data, size_t size);
 /* Stream commands - callbacks */
-void		(*sam_closeback)(sam_sess_t *session, sam_sid_t stream_id,
-				samerr_t reason);
+void            (*sam_closeback)(sam_sess_t *session, sam_sid_t stream_id, 
+                                 samerr_t reason, const char* message);
+
 void		(*sam_connectback)(sam_sess_t *session, sam_sid_t stream_id,
-				sam_pubkey_t dest);
-void		(*sam_databack)(sam_sess_t *session, sam_sid_t stream_id,
+                                   sam_pubkey_t dest);
+    void		(*sam_databack)(sam_sess_t *session, sam_sid_t stream_id,
 				void *data, size_t size);
-void		(*sam_statusback)(sam_sess_t *session, sam_sid_t stream_id,
-				samerr_t result);
+void            (*sam_statusback)(sam_sess_t *session, sam_sid_t stream_id,
+                                  samerr_t result, const char* message);
 
 /* Stream send queue (experimental) */
 void		sam_sendq_add(sam_sess_t *session, sam_sid_t stream_id,

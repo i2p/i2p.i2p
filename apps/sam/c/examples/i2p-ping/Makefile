@@ -1,39 +1,54 @@
-#
-# This Makefile is compatible with GNU Make and should work on POSIX systems
-#
+FLAGS+=-g
 
-#
-# Programs
-#
+CFLAGS = $(FLAGS) -pipe -std=c99 -Wall
+CFLAGS += -I../../inc
+LDFLAGS = $(FLAGS) -L../../lib -lsam
 
-CC = gcc
-INSTALL = install
-RM = rm
+OBJS:=i2p-ping.lo
+DEPS:=$(patsubst obj/%.lo, .deps/%.d, $(OBJS))
+DESTDIR:=$(if $(DESTDIR),$(DESTDIR)/lib,/usr/lib)
 
-#
-# Flags
-#
+MAKEFLAGS=-s -r
+PERL=$(shell which perl 2>/dev/null)
+ifneq ($(PERL),)
+STATUS=$(PERL) ../../status
+else
+STATUS=echo
+endif
 
-CFLAGS = -g -O2 -pipe -std=c99 -Wall
-CFLAGS += -I../../inc -L../../lib
-LIBS = -lsam
+LIBTOOL_LOG=libtool.log
 
-#
-# Build rules
-#
+all:: cleanlog i2p-ping
 
-all: clean i2p-ping
+cleanlog:
+	>$(LIBTOOL_LOG)
 
-i2p-ping: i2p-ping.c
-	$(CC) $(CFLAGS) -o i2p-ping.o -c i2p-ping.c
-	$(CC) $(CFLAGS) -o i2p-ping i2p-ping.o $(LIBS)
+i2p-ping: $(OBJS)
+	$(STATUS) link
+	libtool --mode=link gcc $(LDFLAGS) -o $@ $^ >>$(LIBTOOL_LOG)
 
-install: i2p-ping
-	$(INSTALL) i2p-ping $(HOME)/bin
-
-#
-# Cleanup rules
-#
+%.lo: %.c
+	$(STATUS) compile $*
+	libtool --mode=compile gcc $(CFLAGS) -Iinc/ -c -o $@ $< >>$(LIBTOOL_LOG)
+.deps/%.d: src/%.c
+	$(STATUS) deps $*
+	gcc -Iinc/ -MM -MT obj/$*.o $^ -o $@
 
 clean:
-	-$(RM) -f i2p-ping *.o
+	$(STATUS) clean
+	rm -Rf .deps obj libtool.log
+	libtool --mode=clean rm -f i2p-ping i2p-ping.lo >>$(LIBTOOL_LOG)
+
+$(OBJS):|obj
+obj:
+	$(STATUS) MKDIR $@
+	mkdir -p $@
+
+-include $(DEPS)
+$(DEPS):|.deps
+.deps:
+	$(STATUS) MKDIR $@
+	mkdir -p $@
+
+
+.PHONY: all cleanlog clean

@@ -1,0 +1,4 @@
+#!/usr/bin/env perl
+
+printf "%-8s ",uc(shift @ARGV);
+print join(' ', @ARGV),"\n";
