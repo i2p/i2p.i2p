@@ -113,6 +113,12 @@ public class PeerState {
     private int _mtu;
     /** when did we last check the MTU? */
     private long _mtuLastChecked;
+    /** current round trip time estimate */
+    private int _rtt;
+    /** smoothed mean deviation in the rtt */
+    private int _rttDeviation;
+    /** current retransmission timeout */
+    private int _rto;
     
     private long _messagesReceived;
     private long _messagesSent;
@@ -120,7 +126,7 @@ public class PeerState {
     private static final int DEFAULT_SEND_WINDOW_BYTES = 16*1024;
     private static final int MINIMUM_WINDOW_BYTES = DEFAULT_SEND_WINDOW_BYTES;
     private static final int MAX_SEND_WINDOW_BYTES = 1024*1024;
-    private static final int DEFAULT_MTU = 1024;
+    private static final int DEFAULT_MTU = 1492;
     
     public PeerState(I2PAppContext ctx) {
         _context = ctx;
@@ -153,6 +159,9 @@ public class PeerState {
         _mtu = DEFAULT_MTU;
         _mtuLastChecked = -1;
         _lastACKSend = -1;
+        _rtt = 1000;
+        _rttDeviation = _rtt;
+        _rto = 6000;
         _messagesReceived = 0;
         _messagesSent = 0;
     }
@@ -328,6 +337,7 @@ public class PeerState {
             _sendWindowBytesRemaining = _sendWindowBytes;
             _lastSendRefill = now;
         }
+        //if (true) return true;
         if (size <= _sendWindowBytesRemaining) {
             _sendWindowBytesRemaining -= size; 
             _lastSendTime = now;
@@ -393,15 +403,22 @@ public class PeerState {
     /** pull off the ACKs (Long) to send to the peer */
     public List retrieveACKs() {
         List rv = null;
+        int threshold = countMaxACKs();
         synchronized (_currentACKs) {
-            rv = new ArrayList(_currentACKs);
-            _currentACKs.clear();
+            if (_currentACKs.size() < threshold) {
+                rv = new ArrayList(_currentACKs);
+                _currentACKs.clear();
+            } else {
+                rv = new ArrayList(threshold);
+                for (int i = 0; i < threshold; i++)
+                    rv.add(_currentACKs.remove(0));
+            }
         }
         return rv;
     }
     
     /** we sent a message which was ACKed containing the given # of bytes */
-    public void messageACKed(int bytesACKed) {
+    public void messageACKed(int bytesACKed, long lifetime, int numSends) {
         _consecutiveSendingSecondsWithoutACKs = 0;
         if (_sendWindowBytes <= _slowStartThreshold) {
             _sendWindowBytes += bytesACKed;
@@ -414,7 +431,35 @@ public class PeerState {
             _sendWindowBytes = MAX_SEND_WINDOW_BYTES;
         _lastReceiveTime = _context.clock().now();
         _messagesSent++;
+        if (numSends <= 2)
+            recalculateTimeouts(lifetime);
+        else
+            _log.warn("acked after numSends=" + numSends + " w/ lifetime=" + lifetime + " and size=" + bytesACKed);
     }
+
+    /** adjust the tcp-esque timeouts */
+    private void recalculateTimeouts(long lifetime) {
+        _rttDeviation = _rttDeviation + (int)(0.25d*(Math.abs(lifetime-_rtt)-_rttDeviation));
+        _rtt = (int)((float)_rtt*(0.9f) + (0.1f)*(float)lifetime);
+        _rto = _rtt + (_rttDeviation<<2);
+        if (_log.shouldLog(Log.WARN))
+            _log.warn("Recalculating timeouts w/ lifetime=" + lifetime + ": rtt=" + _rtt
+                      + " rttDev=" + _rttDeviation + " rto=" + _rto);
+        if (_rto < 1000)
+            _rto = 1000;
+        if (_rto > 5000)
+            _rto = 5000;
+    }
+    /** we are resending a packet, so lets jack up the rto */
+    public void messageRetransmitted() { 
+        //_rto *= 2; 
+    }
+    /** how long does it usually take to get a message ACKed? */
+    public int getRTT() { return _rtt; }
+    /** how soon should we retransmit an unacked packet? */
+    public int getRTO() { return _rto; }
+    /** how skewed are the measured RTTs? */
+    public long getRTTDeviation() { return _rttDeviation; }
     
     public long getMessagesSent() { return _messagesSent; }
     public long getMessagesReceived() { return _messagesReceived; }
@@ -435,6 +480,25 @@ public class PeerState {
     /** when did we last send an ACK to the peer? */
     public long getLastACKSend() { return _lastACKSend; }
     public void setLastACKSend(long when) { _lastACKSend = when; }
+    public boolean unsentACKThresholdReached() {
+        int threshold = countMaxACKs();
+        synchronized (_currentACKs) {
+            return _currentACKs.size() >= threshold;
+        }
+    }
+    private int countMaxACKs() {
+        return (_mtu 
+                - OutboundMessageFragments.IP_HEADER_SIZE
+                - OutboundMessageFragments.UDP_HEADER_SIZE
+                - UDPPacket.IV_SIZE 
+                - UDPPacket.MAC_SIZE
+                - 1 // type flag
+                - 4 // timestamp
+                - 1 // data flag
+                - 1 // # ACKs
+                - 16 // padding safety
+               ) / 4;
+    }
     
     public String getRemoteHostString() { return _remoteHostString; }
 

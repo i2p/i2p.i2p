@@ -22,6 +22,7 @@ import net.i2p.stat.StatManager;
 import net.i2p.util.Clock;
 import net.i2p.util.LogManager;
 import net.i2p.util.RandomSource;
+import net.i2p.util.PooledRandomSource;
 
 /**
  * <p>Provide a base scope for accessing singletons that I2P exposes.  Rather than
@@ -432,7 +433,7 @@ public class I2PAppContext {
     private void initializeRandom() {
         synchronized (this) {
             if (_random == null)
-                _random = new RandomSource(this);
+                _random = new PooledRandomSource(this);
             _randomInitialized = true;
         }
     }

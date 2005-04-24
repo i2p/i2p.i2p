@@ -225,7 +225,8 @@ public class TrivialPreprocessor implements TunnelGateway.QueuePreprocessor {
         offset += payloadLength;
 
         msg.setOffset(msg.getOffset() + payloadLength);
-        msg.incrementFragmentNumber();
+        if (fragmented)
+            msg.incrementFragmentNumber();
         return offset;
     }
     
@@ -264,7 +265,8 @@ public class TrivialPreprocessor implements TunnelGateway.QueuePreprocessor {
 
         offset += payloadLength;
         
-        msg.incrementFragmentNumber();
+        if (!isLast)
+            msg.incrementFragmentNumber();
         msg.setOffset(msg.getOffset() + payloadLength);
         return offset;
     }

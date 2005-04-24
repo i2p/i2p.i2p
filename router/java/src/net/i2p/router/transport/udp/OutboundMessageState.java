@@ -31,6 +31,7 @@ public class OutboundMessageState {
     private long _nextSendTime;
     private int _pushCount;
     private short _maxSends;
+    private int _nextSendFragment;
     
     public static final int MAX_FRAGMENTS = 32;
     private static final ByteCache _cache = ByteCache.getInstance(64, MAX_FRAGMENTS*1024);
@@ -40,6 +41,7 @@ public class OutboundMessageState {
         _log = _context.logManager().getLog(OutboundMessageState.class);
         _pushCount = 0;
         _maxSends = 0;
+        _nextSendFragment = 0;
     }
     
     public synchronized boolean initialize(OutNetMessage msg) {
@@ -100,6 +102,7 @@ public class OutboundMessageState {
     public OutNetMessage getMessage() { return _message; }
     public long getMessageId() { return _messageId; }
     public PeerState getPeer() { return _peer; }
+    public void setPeer(PeerState peer) { _peer = peer; }
     public boolean isExpired() {
         return _expiration < _context.clock().now(); 
     }
@@ -160,6 +163,7 @@ public class OutboundMessageState {
         else
             return _fragmentSends.length; 
     }
+    public int getFragmentSize() { return _fragmentSize; }
     /** should we continue sending this fragment? */
     public boolean shouldSend(int fragmentNum) { return _fragmentSends[fragmentNum] >= (short)0; }
     public synchronized int fragmentSize(int fragmentNum) {
@@ -178,6 +182,17 @@ public class OutboundMessageState {
      * @return fragment index, or -1 if all of the fragments were acked
      */
     public int pickNextFragment() {
+        if (true) {
+            int rv = _nextSendFragment;
+            _fragmentSends[rv]++;
+            _maxSends = _fragmentSends[rv];
+            _nextSendFragment++;
+            if (_nextSendFragment >= _fragmentSends.length) {
+                _nextSendFragment = 0;
+                _pushCount++;
+            } 
+            return rv;
+        }
         short minValue = -1;
         int minIndex = -1;
         int startOffset = _context.random().nextInt(_fragmentSends.length);
@@ -207,9 +222,9 @@ public class OutboundMessageState {
                 break;
             }
         }
-        if (endOfVolley)
+        if (endOfVolley) {
             _pushCount++;
-        
+        }
         
         if (_log.shouldLog(Log.DEBUG)) {
             StringBuffer buf = new StringBuffer(64);
@@ -222,6 +237,13 @@ public class OutboundMessageState {
             _log.debug(buf.toString());
         }
         return minIndex;
+    }
+
+    public boolean justBeganVolley() {
+        if (_fragmentSends.length == 1)
+            return true;
+        else
+            return _nextSendFragment == 1;
     }
     
     /**

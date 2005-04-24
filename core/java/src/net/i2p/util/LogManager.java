@@ -140,8 +140,8 @@ public class LogManager {
     public Log getLog(String name) { return getLog(null, name); }
     public Log getLog(Class cls, String name) {
         Log rv = null;
+        String scope = Log.getScope(name, cls);
         synchronized (_logs) {
-            String scope = Log.getScope(name, cls);
             rv = (Log)_logs.get(scope);
             if (rv == null) {
                 rv = new Log(this, cls, name);
@@ -154,10 +154,7 @@ public class LogManager {
     public List getLogs() {
         List rv = null;
         synchronized (_logs) {
-            rv = new ArrayList(_logs.size());
-            for (Iterator iter = _logs.values().iterator(); iter.hasNext(); ) {
-                rv.add(iter.next());
-            }
+            rv = new ArrayList(_logs.values());
         }
         return rv;
     }

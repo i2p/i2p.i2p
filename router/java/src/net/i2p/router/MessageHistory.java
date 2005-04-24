@@ -12,6 +12,7 @@ import java.util.TimeZone;
 import net.i2p.data.Hash;
 import net.i2p.data.TunnelId;
 import net.i2p.data.i2np.I2NPMessage;
+import net.i2p.router.tunnel.HopConfig;
 import net.i2p.util.Log;
 
 /**
@@ -178,8 +179,31 @@ public class MessageHistory {
         if (tunnel == null) return;
         StringBuffer buf = new StringBuffer(128);
         buf.append(getPrefix());
-        buf.append("joining tunnel [").append(tunnel.getReceiveTunnelId(0).getTunnelId()).append("] as [").append(state).append("] ");
+        buf.append("joining as [").append(state);
+        buf.append("] to tunnel: ").append(tunnel.toString());
         addEntry(buf.toString());
+    }
+    
+    /**
+     * The local router has joined the given tunnel operating in the given state.
+     *
+     * @param state {"free inbound", "allocated inbound", "inactive inbound", "outbound", "participant", "pending"}
+     * @param tunnel tunnel joined
+     */
+    public void tunnelJoined(String state, HopConfig tunnel) {
+        if (!_doLog) return;
+        if (tunnel == null) return;
+        StringBuffer buf = new StringBuffer(128);
+        buf.append(getPrefix());
+        buf.append("joining as [").append(state);
+        buf.append("] to tunnel: ").append(tunnel.toString());
+        addEntry(buf.toString());
+    }
+    
+    public void tunnelDispatched(String info) {
+        if (!_doLog) return;
+        if (info == null) return;
+        addEntry(getPrefix() + "tunnel dispatched: " + info);
     }
     
     /**
@@ -352,9 +376,6 @@ public class MessageHistory {
             buf.append("from [").append(getName(from)).append("] ");
         buf.append("expiring on [").append(getTime(expiration)).append("] valid? ").append(isValid);
         addEntry(buf.toString());
-        if (messageType.equals("net.i2p.data.i2np.TunnelMessage")) {
-        //_log.warn("ReceiveMessage tunnel message ["+messageId+"]", new Exception("Receive tunnel"));
-	}
     }
     public void receiveMessage(String messageType, long messageId, long expiration, boolean isValid) {
         receiveMessage(messageType, messageId, expiration, null, isValid);
@@ -404,12 +425,13 @@ public class MessageHistory {
         addEntry(buf.toString());
     }
     
-    public void receiveTunnelFragment(long messageId, int fragmentId) {
+    public void receiveTunnelFragment(long messageId, int fragmentId, String status) {
         if (!_doLog) return;
         if (messageId == -1) throw new IllegalArgumentException("why are you -1?");
         StringBuffer buf = new StringBuffer(48);
         buf.append(getPrefix());
         buf.append("Receive fragment ").append(fragmentId).append(" in ").append(messageId);
+        buf.append(" status: ").append(status);
         addEntry(buf.toString());
     }
     public void receiveTunnelFragmentComplete(long messageId) {
@@ -420,12 +442,13 @@ public class MessageHistory {
         buf.append("Receive fragmented message completely: ").append(messageId);
         addEntry(buf.toString());
     }
-    public void droppedFragmentedMessage(long messageId) {
+    public void droppedFragmentedMessage(long messageId, String status) {
         if (!_doLog) return;
         if (messageId == -1) throw new IllegalArgumentException("why are you -1?");
         StringBuffer buf = new StringBuffer(48);
         buf.append(getPrefix());
         buf.append("Fragmented message dropped: ").append(messageId);
+        buf.append(" ").append(status);
         addEntry(buf.toString());
     }
     public void fragmentMessage(long messageId, int numFragments) {
@@ -434,6 +457,15 @@ public class MessageHistory {
         StringBuffer buf = new StringBuffer(48);
         buf.append(getPrefix());
         buf.append("Break message ").append(messageId).append(" into fragments: ").append(numFragments);
+        addEntry(buf.toString());
+    }
+    public void fragmentMessage(long messageId, int numFragments, String tunnel) {
+        if (!_doLog) return;
+        if (messageId == -1) throw new IllegalArgumentException("why are you -1?");
+        StringBuffer buf = new StringBuffer(48);
+        buf.append(getPrefix());
+        buf.append("Break message ").append(messageId).append(" into fragments: ").append(numFragments);
+        buf.append(" on ").append(tunnel);
         addEntry(buf.toString());
     }
     public void droppedTunnelDataMessageUnknown(long msgId, long tunnelId) {

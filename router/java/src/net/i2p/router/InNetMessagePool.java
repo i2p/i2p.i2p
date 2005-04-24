@@ -150,18 +150,20 @@ public class InNetMessagePool implements Service {
             shortCircuitTunnelData(messageBody, fromRouterHash);
             allowMatches = false;
         } else {
-            HandlerJobBuilder builder = _handlerJobBuilders[type];
+            if ( (type > 0) && (type < _handlerJobBuilders.length) ) {
+                HandlerJobBuilder builder = _handlerJobBuilders[type];
 
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Add message to the inNetMessage pool - builder: " + builder 
-                           + " message class: " + messageBody.getClass().getName());
+                if (_log.shouldLog(Log.DEBUG))
+                    _log.debug("Add message to the inNetMessage pool - builder: " + builder 
+                               + " message class: " + messageBody.getClass().getName());
 
-            if (builder != null) {
-                Job job = builder.createJob(messageBody, fromRouter, 
-                                            fromRouterHash);
-                if (job != null) {
-                    _context.jobQueue().addJob(job);
-                    jobFound = true;
+                if (builder != null) {
+                    Job job = builder.createJob(messageBody, fromRouter, 
+                                                fromRouterHash);
+                    if (job != null) {
+                        _context.jobQueue().addJob(job);
+                        jobFound = true;
+                    }
                 }
             }
         }

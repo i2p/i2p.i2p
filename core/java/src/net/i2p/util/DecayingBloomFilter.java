@@ -108,7 +108,29 @@ public class DecayingBloomFilter {
         }
     }
     
+    /** 
+     * return true if the entry is already known.  this does NOT add the
+     * entry however.
+     *
+     */
+    public boolean isKnown(long entry) {
+        synchronized (this) {
+            if (_entryBytes <= 7)
+                entry &= _longToEntryMask; 
+            if (entry < 0) {
+                DataHelper.toLong(_longToEntry, 0, _entryBytes, 0-entry);
+                _longToEntry[0] |= (1 << 7);
+            } else {
+                DataHelper.toLong(_longToEntry, 0, _entryBytes, entry);
+            }
+            return locked_add(_longToEntry, false);
+        }
+    }
+    
     private boolean locked_add(byte entry[]) {
+        return locked_add(entry, true);
+    }
+    private boolean locked_add(byte entry[], boolean addIfNew) {
         if (_extended != null) {
             // extend the entry to 32 bytes
             System.arraycopy(entry, 0, _extended, 0, entry.length);
@@ -121,8 +143,10 @@ public class DecayingBloomFilter {
                 _currentDuplicates++;
                 return true;
             } else {
-                _current.insert(_extended);
-                _previous.insert(_extended);
+                if (addIfNew) {
+                    _current.insert(_extended);
+                    _previous.insert(_extended);
+                }
                 return false;
             }
         } else {
@@ -132,8 +156,10 @@ public class DecayingBloomFilter {
                 _currentDuplicates++;
                 return true;
             } else {
-                _current.locked_insert(entry);
-                _previous.locked_insert(entry);
+                if (addIfNew) {
+                    _current.locked_insert(entry);
+                    _previous.locked_insert(entry);
+                }
                 return false;
             }
         }

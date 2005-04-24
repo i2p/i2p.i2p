@@ -167,11 +167,14 @@ public class ConnectionPacketHandler {
             // non-ack message payloads are queued in the MessageInputStream
             packet.releasePayload();
         }
+        
+        //if (choke)
+        //    con.fastRetransmit();
     }
     
     private boolean ack(Connection con, long ackThrough, long nacks[], Packet packet, boolean isNew, boolean choke) {
-        if ( (nacks != null) && (nacks.length > 0) )
-            con.getOptions().setRTT(con.getOptions().getRTT() + nacks.length*1000);
+        //if ( (nacks != null) && (nacks.length > 0) )
+        //    con.getOptions().setRTT(con.getOptions().getRTT() + nacks.length*1000);
 
         int numResends = 0;
         List acked = con.ackPackets(ackThrough, nacks);

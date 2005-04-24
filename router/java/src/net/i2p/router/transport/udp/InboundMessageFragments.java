@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import net.i2p.router.RouterContext;
+import net.i2p.util.DecayingBloomFilter;
 import net.i2p.util.I2PThread;
 import net.i2p.util.Log;
 
@@ -28,8 +29,8 @@ public class InboundMessageFragments {
     private List _unsentACKs;
     /** list of messages (InboundMessageState) fully received but not interpreted yet */
     private List _completeMessages;
-    /** list of message IDs (Long) recently received, so we can ignore in flight dups */
-    private List _recentlyCompletedMessages;
+    /** list of message IDs recently received, so we can ignore in flight dups */
+    private DecayingBloomFilter _recentlyCompletedMessages;
     private OutboundMessageFragments _outbound;
     private UDPTransport _transport;
     /** this can be broken down further, but to start, OneBigLock does the trick */
@@ -39,6 +40,8 @@ public class InboundMessageFragments {
     private static final int RECENTLY_COMPLETED_SIZE = 100;
     /** how frequently do we want to send ACKs to a peer? */
     private static final int ACK_FREQUENCY = 200;
+    /** decay the recently completed every 2 minutes */
+    private static final int DECAY_PERIOD = 120*1000;
         
     public InboundMessageFragments(RouterContext ctx, OutboundMessageFragments outbound, UDPTransport transport) {
         _context = ctx;
@@ -46,7 +49,6 @@ public class InboundMessageFragments {
         _inboundMessages = new HashMap(64);
         _unsentACKs = new ArrayList(64);
         _completeMessages = new ArrayList(64);
-        _recentlyCompletedMessages = new ArrayList(RECENTLY_COMPLETED_SIZE);
         _outbound = outbound;
         _transport = transport;
         _context.statManager().createRateStat("udp.receivedCompleteTime", "How long it takes to receive a full message", "udp", new long[] { 60*1000, 10*60*1000, 60*60*1000, 24*60*60*1000 });
@@ -60,6 +62,11 @@ public class InboundMessageFragments {
     
     public void startup() { 
         _alive = true; 
+        // may want to extend the DecayingBloomFilter so we can use a smaller 
+        // array size (currently its tuned for 10 minute rates for the 
+        // messageValidator)
+        _recentlyCompletedMessages = new DecayingBloomFilter(_context, DECAY_PERIOD, 8);
+        
         I2PThread t = new I2PThread(new ACKSender(_context, this, _transport), "UDP ACK sender");
         t.setDaemon(true);
         t.start();
@@ -70,6 +77,9 @@ public class InboundMessageFragments {
     }
     public void shutdown() {
         _alive = false;
+        if (_recentlyCompletedMessages != null)
+            _recentlyCompletedMessages.stopDecaying();
+        _recentlyCompletedMessages = null;
         synchronized (_stateLock) {
             _completeMessages.clear();
             _unsentACKs.clear();
@@ -112,8 +122,15 @@ public class InboundMessageFragments {
             for (int i = 0; i < fragments; i++) {
                 Long messageId = new Long(data.readMessageId(i));
             
-                if (_recentlyCompletedMessages.contains(messageId)) {
+                if (_recentlyCompletedMessages.isKnown(messageId.longValue())) {
                     _context.statManager().addRateData("udp.ignoreRecentDuplicate", 1, 0);
+                    from.messageFullyReceived(messageId);
+                    if (!_unsentACKs.contains(from))
+                        _unsentACKs.add(from);
+                    if (_log.shouldLog(Log.WARN))
+                        _log.warn("Message received is a dup: " + messageId + " dups: " 
+                                  + _recentlyCompletedMessages.getCurrentDuplicateCount() + " out of " 
+                                  + _recentlyCompletedMessages.getInsertedCount());
                     continue;
                 }
             
@@ -132,9 +149,7 @@ public class InboundMessageFragments {
                     messageComplete = true;
                     messages.remove(messageId);
                     
-                    while (_recentlyCompletedMessages.size() >= RECENTLY_COMPLETED_SIZE)
-                        _recentlyCompletedMessages.remove(0);
-                    _recentlyCompletedMessages.add(messageId);
+                    _recentlyCompletedMessages.add(messageId.longValue());
 
                     _completeMessages.add(state);
                     
@@ -169,12 +184,15 @@ public class InboundMessageFragments {
             long acks[] = data.readACKs();
             if (acks != null) {
                 _context.statManager().addRateData("udp.receivedACKs", acks.length, 0);
+                _context.statManager().getStatLog().addData(from.getRemoteHostString(), "udp.peer.receiveACKCount", acks.length, 0);
+
                 for (int i = 0; i < acks.length; i++) {
                     if (_log.shouldLog(Log.INFO))
                         _log.info("Full ACK of message " + acks[i] + " received!");
                     fragments += _outbound.acked(acks[i], from.getRemotePeer());
                 }
-                from.messageACKed(fragments * from.getMTU()); // estimated size
+            } else {
+                _log.error("Received ACKs with no acks?! " + data);
             }
         }
         if (data.readECN())
@@ -212,7 +230,8 @@ public class InboundMessageFragments {
                 synchronized (_stateLock) {
                     for (int i = 0; i < _unsentACKs.size(); i++) {
                         PeerState peer = (PeerState)_unsentACKs.get(i);
-                        if (peer.getLastACKSend() + ACK_FREQUENCY <= now) {
+                        if ( (peer.getLastACKSend() + ACK_FREQUENCY <= now) ||
+                             (peer.unsentACKThresholdReached()) ) {
                             _unsentACKs.remove(i);
                             peer.setLastACKSend(now);
                             return peer;

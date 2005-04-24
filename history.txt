@@ -1,4 +1,15 @@
-$Id: history.txt,v 1.196 2005/04/20 14:15:28 jrandom Exp $
+$Id: history.txt,v 1.197 2005/04/20 15:14:17 jrandom Exp $
+
+2005-04-24  jrandom
+    * Added a pool of PRNGs using a different synchronization technique, 
+      hopefully sufficient to work around IBM's PRNG bugs until we get our
+      own Fortuna.
+    * In the streaming lib, don't jack up the RTT on NACK, and have the window
+      size bound the not-yet-ready messages to the peer, not the unacked 
+      message count (not sure yet whether this is worthwile).
+    * Many additions to the messageHistory log.
+    * Handle out of order tunnel fragment delivery (not an issue on the live 
+      net with TCP, but critical with UDP).
 
 * 2005-04-20  0.5.0.7 released
 

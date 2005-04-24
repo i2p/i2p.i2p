@@ -24,7 +24,7 @@ import net.i2p.util.Log;
  */
 public class UDPPacket {
     private I2PAppContext _context;
-    private Log _log;
+    private static Log _log;
     private DatagramPacket _packet;
     private short _priority;
     private long _initializeTime;
@@ -35,6 +35,7 @@ public class UDPPacket {
     private static final List _packetCache;
     static {
         _packetCache = new ArrayList(256);
+        _log = I2PAppContext.getGlobalContext().logManager().getLog(UDPPacket.class);
     }
     
     private static final boolean CACHE = false;
@@ -67,7 +68,6 @@ public class UDPPacket {
 
     private UDPPacket(I2PAppContext ctx) {
         _context = ctx;
-        _log = ctx.logManager().getLog(UDPPacket.class);
         _dataBuf = _dataCache.acquire();
         _data = _dataBuf.getData(); 
         _packet = new DatagramPacket(_data, MAX_PACKET_SIZE);

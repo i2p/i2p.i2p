@@ -263,7 +263,7 @@ public class FragmentHandler {
                 SimpleTimer.getInstance().removeEvent(msg.getExpireEvent());
             receiveComplete(msg);
         } else {
-            noteReception(msg.getMessageId(), 0);
+            noteReception(msg.getMessageId(), 0, msg.toString());
         }
         
         if (isNew && fragmented && !msg.isComplete()) {
@@ -325,7 +325,7 @@ public class FragmentHandler {
             _context.statManager().addRateData("tunnel.fragmentedComplete", msg.getFragmentCount(), msg.getLifetime());
             receiveComplete(msg);
         } else {
-            noteReception(msg.getMessageId(), fragmentNum);
+            noteReception(msg.getMessageId(), fragmentNum, msg.toString());
         }
         
         if (isNew && !msg.isComplete()) {
@@ -359,9 +359,9 @@ public class FragmentHandler {
         }
     }
 
-    protected void noteReception(long messageId, int fragmentId) {}
+    protected void noteReception(long messageId, int fragmentId, String status) {}
     protected void noteCompletion(long messageId) {}
-    protected void noteFailure(long messageId) {}
+    protected void noteFailure(long messageId, String status) {}
     
     /**
      * Receive messages out of the tunnel endpoint.  There should be a single 
@@ -393,7 +393,7 @@ public class FragmentHandler {
             }
             if (removed && !_msg.getReleased()) {
                 _failed++;
-                noteFailure(_msg.getMessageId());
+                noteFailure(_msg.getMessageId(), _msg.toString());
                 if (_log.shouldLog(Log.WARN))
                     _log.warn("Dropped failed fragmented message: " + _msg);
                 _context.statManager().addRateData("tunnel.fragmentedDropped", _msg.getFragmentCount(), _msg.getLifetime());

@@ -152,7 +152,8 @@ public class Connection {
                 if (!_connected) 
                     return false;
                 started = true;
-                if ( (_outboundPackets.size() >= _options.getWindowSize()) || (_activeResends > 0) ) {
+                if ( (_outboundPackets.size() >= _options.getWindowSize()) || (_activeResends > 0) ||
+                     (_lastSendId - _highestAckedThrough > _options.getWindowSize()) ) {
                     if (writeExpire > 0) {
                         if (timeLeft <= 0) {
                             _log.error("Outbound window is full of " + _outboundPackets.size() 

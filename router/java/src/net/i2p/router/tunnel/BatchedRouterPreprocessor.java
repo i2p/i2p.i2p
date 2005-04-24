@@ -11,6 +11,7 @@ import net.i2p.router.RouterContext;
 public class BatchedRouterPreprocessor extends BatchedPreprocessor {
     private RouterContext _routerContext;
     private TunnelCreatorConfig _config;
+    private HopConfig _hopConfig;
     
     /** 
      * How frequently should we flush non-full messages, in milliseconds
@@ -20,12 +21,17 @@ public class BatchedRouterPreprocessor extends BatchedPreprocessor {
     public static final int DEFAULT_BATCH_FREQUENCY = 500;
     
     public BatchedRouterPreprocessor(RouterContext ctx) {
-        this(ctx, null);
+        this(ctx, (HopConfig)null);
     }
     public BatchedRouterPreprocessor(RouterContext ctx, TunnelCreatorConfig cfg) {
         super(ctx);
         _routerContext = ctx;
         _config = cfg;
+    }
+    public BatchedRouterPreprocessor(RouterContext ctx, HopConfig cfg) {
+        super(ctx);
+        _routerContext = ctx;
+        _hopConfig = cfg;
     }
 
     /** how long should we wait before flushing */
@@ -50,6 +56,9 @@ public class BatchedRouterPreprocessor extends BatchedPreprocessor {
     }
     
     protected void notePreprocessing(long messageId, int numFragments) {
-        _routerContext.messageHistory().fragmentMessage(messageId, numFragments);
+        if (_config != null)
+            _routerContext.messageHistory().fragmentMessage(messageId, numFragments, _config.toString());
+        else
+            _routerContext.messageHistory().fragmentMessage(messageId, numFragments, _hopConfig.toString());
     }
 }

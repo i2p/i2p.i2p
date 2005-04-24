@@ -84,7 +84,7 @@ public class FragmentedMessage {
                        + Base64.encode(ba.getData(), ba.getOffset(), ba.getValid()));
 
         _fragments[fragmentNum] = ba;
-        _lastReceived = isLast;
+        _lastReceived = _lastReceived || isLast;
         if (fragmentNum > _highFragmentNum)
             _highFragmentNum = fragmentNum;
         if (isLast && fragmentNum <= 0)
@@ -119,7 +119,7 @@ public class FragmentedMessage {
             _log.debug("fragment[0/" + offset + "/" + length + "]: " 
                        + Base64.encode(ba.getData(), ba.getOffset(), ba.getValid()));
         _fragments[0] = ba;
-        _lastReceived = isLast;
+        _lastReceived = _lastReceived || isLast;
         _toRouter = toRouter;
         _toTunnel = toTunnel;
         if (_highFragmentNum < 0)

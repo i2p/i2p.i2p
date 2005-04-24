@@ -86,7 +86,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     private static final int PRIORITY_WEIGHT[] = new int[] { 1, 1, 1, 1, 1, 2 };
 
     /** should we flood all UDP peers with the configured rate? */
-    private static final boolean SHOULD_FLOOD_PEERS = false;
+    private static final boolean SHOULD_FLOOD_PEERS = true;
     
     public UDPTransport(RouterContext ctx) {
         super(ctx);
@@ -492,6 +492,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         buf.append(" <tr><td><b>Peer</b></td><td><b>Location</b></td>\n");
         buf.append("     <td><b>Last send</b></td><td><b>Last recv</b></td>\n");
         buf.append("     <td><b>Lifetime</b></td><td><b>cwnd</b></td><td><b>ssthresh</b></td>\n");
+        buf.append("     <td><b>rtt</b></td><td><b>dev</b></td><td><b>rto</b></td>\n");
         buf.append("     <td><b>Sent</b></td><td><b>Received</b></td>\n");
         buf.append(" </tr>\n");
         out.write(buf.toString());
@@ -534,13 +535,25 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             buf.append("</td>");
 
             buf.append("<td>");
-            buf.append(peer.getSendWindowBytes());
+            buf.append(peer.getSendWindowBytes()/1024);
+            buf.append("K</td>");
+
+            buf.append("<td>");
+            buf.append(peer.getSlowStartThreshold()/1024);
+            buf.append("K</td>");
+
+            buf.append("<td>");
+            buf.append(peer.getRTT());
+            buf.append("</td>");
+            
+            buf.append("<td>");
+            buf.append(peer.getRTTDeviation());
             buf.append("</td>");
 
             buf.append("<td>");
-            buf.append(peer.getSlowStartThreshold());
+            buf.append(peer.getRTO());
             buf.append("</td>");
-
+            
             buf.append("<td>");
             buf.append(peer.getMessagesSent());
             buf.append("</td>");

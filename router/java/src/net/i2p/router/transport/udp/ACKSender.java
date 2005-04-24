@@ -24,6 +24,7 @@ public class ACKSender implements Runnable {
         _fragments = fragments;
         _transport = transport;
         _builder = new PacketBuilder(_context);
+        _context.statManager().createRateStat("udp.sendACKCount", "how many ack messages were sent to a peer", "udp", new long[] { 60*1000, 60*60*1000 });
     }
     
     public void run() {
@@ -32,6 +33,8 @@ public class ACKSender implements Runnable {
             if (peer != null) {
                 List acks = peer.retrieveACKs();
                 if ( (acks != null) && (acks.size() > 0) ) {
+                    _context.statManager().addRateData("udp.sendACKCount", acks.size(), 0);
+                    _context.statManager().getStatLog().addData(peer.getRemoteHostString(), "udp.peer.sendACKCount", acks.size(), 0);
                     UDPPacket ack = _builder.buildACK(peer, acks);
                     if (_log.shouldLog(Log.INFO))
                         _log.info("Sending ACK for " + acks);

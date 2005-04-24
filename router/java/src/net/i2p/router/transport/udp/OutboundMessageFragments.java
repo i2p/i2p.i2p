@@ -31,6 +31,8 @@ public class OutboundMessageFragments {
     /** which message should we build the next packet out of? */
     private int _nextPacketMessage;
     private PacketBuilder _builder;
+    /** if we can handle more messages explicitly, set this to true */
+    private boolean _allowExcess;
     
     private static final int MAX_ACTIVE = 64;
     // don't send a packet more than 10 times
@@ -44,12 +46,14 @@ public class OutboundMessageFragments {
         _nextPacketMessage = 0;
         _builder = new PacketBuilder(ctx);
         _alive = true;
+        _allowExcess = false;
         _context.statManager().createRateStat("udp.sendVolleyTime", "Long it takes to send a full volley", "udp", new long[] { 60*1000, 10*60*1000, 60*60*1000, 24*60*60*1000 });
         _context.statManager().createRateStat("udp.sendConfirmTime", "How long it takes to send a message and get the ACK", "udp", new long[] { 60*1000, 10*60*1000, 60*60*1000, 24*60*60*1000 });
         _context.statManager().createRateStat("udp.sendConfirmFragments", "How many fragments are included in a fully ACKed message", "udp", new long[] { 60*1000, 10*60*1000, 60*60*1000, 24*60*60*1000 });
         _context.statManager().createRateStat("udp.sendConfirmVolley", "How many times did fragments need to be sent before ACK", "udp", new long[] { 60*1000, 10*60*1000, 60*60*1000, 24*60*60*1000 });
         _context.statManager().createRateStat("udp.sendFailed", "How many fragments were in a message that couldn't be delivered", "udp", new long[] { 60*1000, 10*60*1000, 60*60*1000, 24*60*60*1000 });
         _context.statManager().createRateStat("udp.sendAggressiveFailed", "How many volleys was a packet sent before we gave up", "udp", new long[] { 60*1000, 10*60*1000, 60*60*1000, 24*60*60*1000 });
+        _context.statManager().createRateStat("udp.outboundActiveCount", "How many messages are in the active pool when a new one is added", "udp", new long[] { 60*1000, 10*60*1000, 60*60*1000, 24*60*60*1000 });
     }
     
     public void startup() { _alive = true; }
@@ -75,7 +79,9 @@ public class OutboundMessageFragments {
                         return false;
                     else if (_activeMessages.size() < MAX_ACTIVE)
                         return true;
-                    else 
+                    else if (_allowExcess)
+                        return true;
+                    else
                         _activeMessages.wait();
                 }
             } catch (InterruptedException ie) {}
@@ -90,12 +96,16 @@ public class OutboundMessageFragments {
     public void add(OutNetMessage msg) {
         OutboundMessageState state = new OutboundMessageState(_context);
         boolean ok = state.initialize(msg);
+        state.setPeer(_transport.getPeerState(msg.getTarget().getIdentity().calculateHash()));
         finishMessages();
+        int active = 0;
         synchronized (_activeMessages) {
             if (ok)
                 _activeMessages.add(state);
+            active = _activeMessages.size();
             _activeMessages.notifyAll();
         }
+        _context.statManager().addRateData("udp.outboundActiveCount", active, 0);
     }
     
     /** 
@@ -156,6 +166,9 @@ public class OutboundMessageFragments {
         }
     }
     
+    private static final long SECOND_MASK = 1023l;
+
+    
     /**
      * Grab the next packet that we want to send, blocking until one is ready.
      * This is the main driver for the packet scheduler
@@ -208,17 +221,31 @@ public class OutboundMessageFragments {
                                               + " remaining"
                                               + " for message " + state.getMessageId() + ": " + state);
                                 
+                                if (state.justBeganVolley() && (state.getPushCount() > 0) && (state.getFragmentCount() > 1)) {
+                                    peer.messageRetransmitted();
+                                    if (_log.shouldLog(Log.ERROR))
+                                        _log.error("Retransmitting " + state + " to " + peer);
+                                }
+                                
                                 // for fairness, we move on in a round robin
                                 _nextPacketMessage = i + 1;
                                 
-                                if (state.getPushCount() != oldVolley) {
+                                if (currentFragment >= state.getFragmentCount() - 1) {
+                                    // this is the last fragment
                                     _context.statManager().addRateData("udp.sendVolleyTime", state.getLifetime(), state.getFragmentCount());
-                                    state.setNextSendTime(now + (1000-(now%1000)) + _context.random().nextInt(4000));
+                                    if (state.getPeer() != null) {
+                                        int rto = state.getPeer().getRTO() * state.getPushCount();
+                                        //_log.error("changed volley, rto=" + rto + " volley="+ state.getPushCount());
+                                        state.setNextSendTime(now + rto);
+                                    } else {
+                                        _log.error("changed volley, unknown peer");
+                                        state.setNextSendTime(now + 1000 + _context.random().nextInt(2000));
+                                    }
                                 } else {
                                     if (peer.getSendWindowBytesRemaining() > 0)
                                         state.setNextSendTime(now);
                                     else
-                                        state.setNextSendTime(now + (1000-(now%1000)));
+                                        state.setNextSendTime((now + 1024) & ~SECOND_MASK);
                                 }
                                 break;
                             } else {
@@ -226,7 +253,7 @@ public class OutboundMessageFragments {
                                     _log.warn("Allocation of " + fragmentSize + " rejected w/ wsize=" + peer.getSendWindowBytes()
                                               + " available=" + peer.getSendWindowBytesRemaining()
                                               + " for message " + state.getMessageId() + ": " + state);
-                                state.setNextSendTime(now + (1000-(now%1000)));
+                                state.setNextSendTime((now + 1024) & ~SECOND_MASK);
                                 currentFragment = -1;
                             }
                         }
@@ -234,7 +261,7 @@ public class OutboundMessageFragments {
                     long time = state.getNextSendTime();
                     if ( (nextSend < 0) || (time < nextSend) )
                         nextSend = time;
-                }
+                } // end of the for(activeMessages)
             
                 if (currentFragment < 0) {
                     if (nextSend <= 0) {
@@ -248,13 +275,16 @@ public class OutboundMessageFragments {
                             delay = 10;
                         if (delay > 1000) 
                             delay = 1000;
+                        _allowExcess = true;
+                        _activeMessages.notifyAll();
                         try {
                             _activeMessages.wait(delay);
                         } catch (InterruptedException ie) {}
                     }
                 }
-            }
-        }
+                _allowExcess = false;
+            } // end of the synchronized block
+        } // end of the while (alive && !found)
         
         if (currentFragment >= 0) {
             if (_log.shouldLog(Log.INFO))
@@ -269,8 +299,8 @@ public class OutboundMessageFragments {
     }
     
     private static final int SSU_HEADER_SIZE = 46;
-    private static final int UDP_HEADER_SIZE = 8;
-    private static final int IP_HEADER_SIZE = 20;
+    static final int UDP_HEADER_SIZE = 8;
+    static final int IP_HEADER_SIZE = 20;
     /** how much payload data can we shove in there? */
     private static final int fragmentSize(int mtu) {
         return mtu - SSU_HEADER_SIZE - UDP_HEADER_SIZE - IP_HEADER_SIZE;
@@ -309,17 +339,23 @@ public class OutboundMessageFragments {
         }
         
         if (state != null) {
+            int numSends = state.getMaxSends();
             if (_log.shouldLog(Log.INFO))
                 _log.info("Received ack of " + messageId + " by " + ackedBy.toBase64() 
-                          + " after " + state.getLifetime());
+                          + " after " + state.getLifetime() + " and " + numSends + " sends");
             _context.statManager().addRateData("udp.sendConfirmTime", state.getLifetime(), state.getLifetime());
             _context.statManager().addRateData("udp.sendConfirmFragments", state.getFragmentCount(), state.getLifetime());
-            int numSends = state.getMaxSends();
             _context.statManager().addRateData("udp.sendConfirmVolley", numSends, state.getFragmentCount());
             if ( (numSends > 1) && (state.getPeer() != null) )
                 state.getPeer().congestionOccurred();
             _transport.succeeded(state.getMessage());
             int numFragments = state.getFragmentCount();
+            if (state.getPeer() != null) {
+                // this adjusts the rtt/rto/window/etc
+                state.getPeer().messageACKed(numFragments*state.getFragmentSize(), state.getLifetime(), state.getMaxSends());
+            } else {
+                _log.warn("message acked, but no peer attacked: " + state);
+            }
             state.releaseResources();
             return numFragments;
         } else {

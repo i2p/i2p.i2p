@@ -52,8 +52,10 @@ public class BatchedPreprocessor extends TrivialPreprocessor {
                 // loops because sends may be partial
                 TunnelGateway.Pending msg = (TunnelGateway.Pending)pending.get(0);
                 send(pending, 0, 0, sender, rec);
-                if (msg.getOffset() >= msg.getData().length)
+                if (msg.getOffset() >= msg.getData().length) {
+                    notePreprocessing(msg.getMessageId(), msg.getFragmentNumber());
                     pending.remove(0);
+                }
             }
             return false;
         }
@@ -84,11 +86,14 @@ public class BatchedPreprocessor extends TrivialPreprocessor {
                         _log.info("Allocated=" + allocated + " so we sent " + (i+1) 
                                   + " (last complete? " + (msg.getOffset() >= msg.getData().length) + ")");
 
-                    for (int j = 0; j < i; j++)
-                        pending.remove(0);
+                    for (int j = 0; j < i; j++) {
+                        TunnelGateway.Pending cur = (TunnelGateway.Pending)pending.remove(0);
+                        notePreprocessing(cur.getMessageId(), cur.getFragmentNumber());
+                    }
                     if (msg.getOffset() >= msg.getData().length) {
                         // ok, this last message fit perfectly, remove it too
-                        pending.remove(0);
+                        TunnelGateway.Pending cur = (TunnelGateway.Pending)pending.remove(0);
+                        notePreprocessing(cur.getMessageId(), cur.getFragmentNumber());
                     }
                     if (i > 0)
                         _context.statManager().addRateData("tunnel.batchMultipleCount", i+1, 0);
@@ -113,7 +118,11 @@ public class BatchedPreprocessor extends TrivialPreprocessor {
                     _context.statManager().addRateData("tunnel.batchDelaySent", pending.size(), 0);
 
                     send(pending, 0, pending.size()-1, sender, rec);
-                    pending.clear();
+                    
+                    while (pending.size() > 0) {
+                        TunnelGateway.Pending cur = (TunnelGateway.Pending)pending.remove(0);
+                        notePreprocessing(cur.getMessageId(), cur.getFragmentNumber());
+                    }
                     _pendingSince = 0;
                     return false;
                 } else {

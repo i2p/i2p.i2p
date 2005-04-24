@@ -107,8 +107,11 @@ public class TunnelDispatcher implements Service {
                                          new long[] { 60*10*1000l, 60*60*1000l, 24*60*60*1000l });
     }
 
-    private TunnelGateway.QueuePreprocessor createPreprocessor() {
-        return createPreprocessor(null);
+    private TunnelGateway.QueuePreprocessor createPreprocessor(HopConfig cfg) {
+        if (true)
+            return new BatchedRouterPreprocessor(_context, cfg); 
+        else
+            return new TrivialRouterPreprocessor(_context); 
     }
     private TunnelGateway.QueuePreprocessor createPreprocessor(TunnelCreatorConfig cfg) {
         if (true)
@@ -133,6 +136,7 @@ public class TunnelDispatcher implements Service {
                 _outboundGateways.put(outId, gw);
             }
             _context.statManager().addRateData("tunnel.joinOutboundGateway", 1, 0);
+            _context.messageHistory().tunnelJoined("outbound", cfg);
         } else {
             TunnelGatewayZeroHop gw = new TunnelGatewayZeroHop(_context, cfg);
             TunnelId outId = cfg.getConfig(0).getSendTunnel();
@@ -140,6 +144,7 @@ public class TunnelDispatcher implements Service {
                 _outboundGateways.put(outId, gw);
             }
             _context.statManager().addRateData("tunnel.joinOutboundGatewayZeroHop", 1, 0);
+            _context.messageHistory().tunnelJoined("outboundZeroHop", cfg);
         }
     }
     /** 
@@ -156,6 +161,7 @@ public class TunnelDispatcher implements Service {
                 _participants.put(recvId, participant);
             }
             _context.statManager().addRateData("tunnel.joinInboundEndpoint", 1, 0);
+            _context.messageHistory().tunnelJoined("inboundEndpoint", cfg);
         } else {
             TunnelGatewayZeroHop gw = new TunnelGatewayZeroHop(_context, cfg);
             TunnelId recvId = cfg.getConfig(0).getReceiveTunnel();
@@ -163,6 +169,7 @@ public class TunnelDispatcher implements Service {
                 _inboundGateways.put(recvId, gw);
             }
             _context.statManager().addRateData("tunnel.joinInboundEndpointZeroHop", 1, 0);
+            _context.messageHistory().tunnelJoined("inboundEndpointZeroHop", cfg);
         }
     }
     
@@ -183,6 +190,7 @@ public class TunnelDispatcher implements Service {
             _participatingConfig.put(recvId, cfg);
             numParticipants = _participatingConfig.size();
         }
+        _context.messageHistory().tunnelJoined("participant", cfg);
         _context.statManager().addRateData("tunnel.participatingTunnels", numParticipants, 0);
         _context.statManager().addRateData("tunnel.joinParticipant", 1, 0);
         if (cfg.getExpiration() > _lastParticipatingExpiration)
@@ -206,6 +214,7 @@ public class TunnelDispatcher implements Service {
             _participatingConfig.put(recvId, cfg);
             numParticipants = _participatingConfig.size();
         }
+        _context.messageHistory().tunnelJoined("outboundEndpoint", cfg);
         _context.statManager().addRateData("tunnel.participatingTunnels", numParticipants, 0);
         _context.statManager().addRateData("tunnel.joinOutboundEndpoint", 1, 0);
 
@@ -221,7 +230,7 @@ public class TunnelDispatcher implements Service {
     public void joinInboundGateway(HopConfig cfg) {
         if (_log.shouldLog(Log.INFO))
             _log.info("Joining as inbound gateway: " + cfg);
-        TunnelGateway.QueuePreprocessor preproc = createPreprocessor();
+        TunnelGateway.QueuePreprocessor preproc = createPreprocessor(cfg);
         TunnelGateway.Sender sender = new InboundSender(_context, cfg);
         TunnelGateway.Receiver receiver = new InboundGatewayReceiver(_context, cfg);
         TunnelGateway gw = new TunnelGateway(_context, preproc, sender, receiver);
@@ -234,6 +243,7 @@ public class TunnelDispatcher implements Service {
             _participatingConfig.put(recvId, cfg);
             numParticipants = _participatingConfig.size();
         }
+        _context.messageHistory().tunnelJoined("inboundGateway", cfg);
         _context.statManager().addRateData("tunnel.participatingTunnels", numParticipants, 0);
         _context.statManager().addRateData("tunnel.joinInboundGateway", 1, 0);
 
@@ -346,6 +356,8 @@ public class TunnelDispatcher implements Service {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("dispatch to participant " + participant + ": " + msg.getUniqueId() + " from " 
                            + recvFrom.toBase64().substring(0,4));
+            _context.messageHistory().tunnelDispatched("message " + msg.getUniqueId() + " on tunnel " 
+                                                       + msg.getTunnelId().getTunnelId() + " as participant");
             participant.dispatch(msg, recvFrom);
             _context.statManager().addRateData("tunnel.dispatchParticipant", 1, 0);
         } else {
@@ -358,7 +370,10 @@ public class TunnelDispatcher implements Service {
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("dispatch where we are the outbound endpoint: " + endpoint + ": " 
                                + msg + " from " + recvFrom.toBase64().substring(0,4));
+                _context.messageHistory().tunnelDispatched("message " + msg.getUniqueId() + " on tunnel " 
+                                                           + msg.getTunnelId().getTunnelId() + " as outbound endpoint");
                 endpoint.dispatch(msg, recvFrom);
+                
                 _context.statManager().addRateData("tunnel.dispatchEndpoint", 1, 0);
             } else {
                 _context.messageHistory().droppedTunnelDataMessageUnknown(msg.getUniqueId(), msg.getTunnelId().getTunnelId());
@@ -397,6 +412,8 @@ public class TunnelDispatcher implements Service {
                                + msg.getMessage().getClass().getName());
                 return;
             }
+            _context.messageHistory().tunnelDispatched("message " + msg.getUniqueId() + "/" + msg.getMessage().getUniqueId() + " on tunnel " 
+                                                           + msg.getTunnelId().getTunnelId() + " as inbound gateway");
             gw.add(msg);
             _context.statManager().addRateData("tunnel.dispatchInbound", 1, 0);
         } else {
@@ -464,6 +481,9 @@ public class TunnelDispatcher implements Service {
                                + (before-msg.getMessageExpiration()) + "ms ago? " 
                                + msg, new Exception("cause"));
             }
+            _context.messageHistory().tunnelDispatched("message " + msg.getUniqueId() + " on tunnel " 
+                                                           + outboundTunnel + "/" + targetTunnel + " to "
+                                                           + targetPeer + " as outbound gateway");
             gw.add(msg, targetPeer, targetTunnel);
             if (targetTunnel == null)
                 _context.statManager().addRateData("tunnel.dispatchOutboundPeer", 1, 0);
