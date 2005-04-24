@@ -229,7 +229,7 @@ public class ClientConnectionRunner {
     void disconnectClient(String reason) {
         if (_log.shouldLog(Log.CRIT))
             _log.log(Log.CRIT, "Disconnecting the client (" 
-                     + _config.getDestination().calculateHash().toBase64().substring(0,4) 
+                     + _config
                      + ": " + reason);
         DisconnectMessage msg = new DisconnectMessage();
         msg.setReason(reason);
