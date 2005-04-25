@@ -63,8 +63,10 @@ public class PeerState {
     private long _lastSendTime;
     /** when did we last receive a packet from them? */
     private long _lastReceiveTime;
-    /** how many seconds have we sent packets without any ACKs received? */
-    private int _consecutiveSendingSecondsWithoutACKs;
+    /** how many consecutive messages have we sent and not received an ACK to */
+    private int _consecutiveFailedSends;
+    /** when did we last have a failed send */
+    private long _lastFailedSendMinute;
     /** list of messageIds (Long) that we have received but not yet sent */
     private List _currentACKs;
     /** when did we last send ACKs to the peer? */
@@ -212,7 +214,7 @@ public class PeerState {
     /** when did we last receive a packet from them? */
     public long getLastReceiveTime() { return _lastReceiveTime; }
     /** how many seconds have we sent packets without any ACKs received? */
-    public int getConsecutiveSendingSecondsWithoutACKS() { return _consecutiveSendingSecondsWithoutACKs; }
+    public int getConsecutiveFailedSends() { return _consecutiveFailedSends; }
     /** have we received a packet with the ECN bit set in the current second? */
     public boolean getCurrentSecondECNReceived() { return _currentSecondECNReceived; }
     /** 
@@ -303,22 +305,16 @@ public class PeerState {
     public void setLastSendTime(long when) { _lastSendTime = when; }
     /** when did we last receive a packet from them? */
     public void setLastReceiveTime(long when) { _lastReceiveTime = when; }
-    public void incrementConsecutiveSendingSecondsWithoutACKS() { _consecutiveSendingSecondsWithoutACKs++; }
-    public void resetConsecutiveSendingSecondsWithoutACKS() { _consecutiveSendingSecondsWithoutACKs = 0; }
-    
-    /*
-    public void migrateACKs(List NACKs, long newSecond) {
-        _previousSecondACKs = _currentSecondACKs;
-        if (_currentSecondECNReceived)
-            _sendWindowBytes /= 2;
-        if (_sendWindowBytes < MINIMUM_WINDOW_BYTES)
-            _sendWindowBytes = MINIMUM_WINDOW_BYTES;
-        _sendWindowBytesRemaining = _sendWindowBytes;
-        _currentSecondECNReceived = false;
-        _remoteWantsPreviousACKs = true;
-        _currentReceiveSecond = newSecond;
+    public int incrementConsecutiveFailedSends() { 
+        long now = _context.clock().now()/60*1000;
+        if (_lastFailedSendMinute == now) {
+            // ignore... too fast
+        } else {
+            _lastFailedSendMinute = now;
+            _consecutiveFailedSends++; 
+        }
+        return _consecutiveFailedSends;
     }
-     */
     
     /** 
      * have all of the packets received in the current second requested that
@@ -419,7 +415,8 @@ public class PeerState {
     
     /** we sent a message which was ACKed containing the given # of bytes */
     public void messageACKed(int bytesACKed, long lifetime, int numSends) {
-        _consecutiveSendingSecondsWithoutACKs = 0;
+        _consecutiveFailedSends = 0;
+        _lastFailedSendMinute = -1;
         if (_sendWindowBytes <= _slowStartThreshold) {
             _sendWindowBytes += bytesACKed;
         } else {
@@ -442,9 +439,9 @@ public class PeerState {
         _rttDeviation = _rttDeviation + (int)(0.25d*(Math.abs(lifetime-_rtt)-_rttDeviation));
         _rtt = (int)((float)_rtt*(0.9f) + (0.1f)*(float)lifetime);
         _rto = _rtt + (_rttDeviation<<2);
-        if (_log.shouldLog(Log.WARN))
-            _log.warn("Recalculating timeouts w/ lifetime=" + lifetime + ": rtt=" + _rtt
-                      + " rttDev=" + _rttDeviation + " rto=" + _rto);
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("Recalculating timeouts w/ lifetime=" + lifetime + ": rtt=" + _rtt
+                       + " rttDev=" + _rttDeviation + " rto=" + _rto);
         if (_rto < 1000)
             _rto = 1000;
         if (_rto > 5000)

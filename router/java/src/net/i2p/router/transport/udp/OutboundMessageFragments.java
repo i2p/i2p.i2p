@@ -136,7 +136,7 @@ public class OutboundMessageFragments {
                     _context.statManager().addRateData("udp.sendFailed", state.getFragmentCount(), state.getLifetime());
 
                     if (state.getMessage() != null) {
-                        _transport.failed(state.getMessage());
+                        _transport.failed(state);
                     } else {
                         // it can not have an OutNetMessage if the source is the
                         // final after establishment message
@@ -152,7 +152,7 @@ public class OutboundMessageFragments {
                     //    state.getPeer().congestionOccurred();
 
                     if (state.getMessage() != null) {
-                        _transport.failed(state.getMessage());
+                        _transport.failed(state);
                     } else {
                         // it can not have an OutNetMessage if the source is the
                         // final after establishment message
@@ -192,9 +192,9 @@ public class OutboundMessageFragments {
                             peer = _transport.getPeerState(state.getMessage().getTarget().getIdentity().calculateHash());
                         
                         if (peer == null) {
-                            // peer disconnected (whatever that means)
+                            // peer disconnected
                             _activeMessages.remove(cur);
-                            _transport.failed(state.getMessage());
+                            _transport.failed(state);
                             if (_log.shouldLog(Log.WARN))
                                 _log.warn("Peer disconnected for " + state);
                             state.releaseResources();

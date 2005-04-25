@@ -35,6 +35,12 @@ class UDPFlooder implements Runnable {
             _peers.notifyAll();
         }
     }
+    public void removePeer(PeerState peer) {
+        synchronized (_peers) {
+            _peers.remove(peer);
+            _peers.notifyAll();
+        }
+    }
     
     public void startup() {
         _alive = true;

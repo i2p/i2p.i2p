@@ -63,7 +63,7 @@ public class Shitlist {
         if (_log.shouldLog(Log.INFO))
             _log.info("Shitlisting router " + peer.toBase64(), new Exception("Shitlist cause"));
         
-        long period = SHITLIST_DURATION_MS;
+        long period = SHITLIST_DURATION_MS + _context.random().nextLong(SHITLIST_DURATION_MS);
         PeerProfile prof = _context.profileOrganizer().getProfile(peer);
         if (prof != null)
             period = SHITLIST_DURATION_MS << prof.incrementShitlists();

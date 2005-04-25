@@ -88,6 +88,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     /** should we flood all UDP peers with the configured rate? */
     private static final boolean SHOULD_FLOOD_PEERS = true;
     
+    private static final int MAX_CONSECUTIVE_FAILED = 2;
+    
     public UDPTransport(RouterContext ctx) {
         super(ctx);
         _context = ctx;
@@ -290,8 +292,9 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             synchronized (_peersByIdent) {
                 PeerState oldPeer = (PeerState)_peersByIdent.put(peer.getRemotePeer(), peer);
                 if ( (oldPeer != null) && (oldPeer != peer) ) {
-                    _peersByIdent.put(oldPeer.getRemotePeer(), oldPeer);
-                    return false;
+                    // should we transfer the oldPeer's RTT/RTO/etc? nah
+                    // or perhaps reject the new session?  nah, 
+                    // using the new one allow easier reconnect
                 }
             }
         }
@@ -302,8 +305,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         synchronized (_peersByRemoteHost) {
             PeerState oldPeer = (PeerState)_peersByRemoteHost.put(remoteString, peer);
             if ( (oldPeer != null) && (oldPeer != peer) ) {
-                _peersByRemoteHost.put(remoteString, oldPeer);
-                return false;
+                //_peersByRemoteHost.put(remoteString, oldPeer);
+                //return false;
             }
         }
         
@@ -313,6 +316,27 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             _flooder.addPeer(peer);
         
         return true;
+    }
+    
+    private void dropPeer(PeerState peer) {
+        if (_log.shouldLog(Log.WARN))
+            _log.debug("Dropping remote peer: " + peer);
+        if (peer.getRemotePeer() != null) {
+            _context.shitlist().shitlistRouter(peer.getRemotePeer(), "dropped after too many retries");
+            synchronized (_peersByIdent) {
+                _peersByIdent.remove(peer.getRemotePeer());
+            }
+        }
+        
+        String remoteString = peer.getRemoteHostString();
+        if (remoteString != null) {
+            synchronized (_peersByRemoteHost) {
+                _peersByRemoteHost.remove(remoteString);
+            }
+        }
+        
+        if (SHOULD_FLOOD_PEERS)
+            _flooder.removePeer(peer);
     }
     
     int send(UDPPacket packet) { 
@@ -449,6 +473,18 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         
         _externalAddress = addr;
         replaceAddress(addr);
+    }
+    
+    public void failed(OutboundMessageState msg) {
+        if (msg == null) return;
+        int consecutive = 0;
+        if (msg.getPeer() != null)
+            consecutive = msg.getPeer().incrementConsecutiveFailedSends();
+        if (_log.shouldLog(Log.WARN))
+            _log.warn("Consecutive failure #" + consecutive + " sending to " + msg.getPeer());
+        if (consecutive > MAX_CONSECUTIVE_FAILED)
+            dropPeer(msg.getPeer());
+        failed(msg.getMessage());
     }
     
     public void failed(OutNetMessage msg) {
