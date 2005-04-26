@@ -1,6 +1,10 @@
 package net.i2p.router.web;
 
+import net.i2p.I2PAppContext;
 import net.i2p.data.DataHelper;
+import net.i2p.router.Router;
+import net.i2p.router.web.ConfigServiceHandler.UpdateWrapperManagerTask;
+import net.i2p.util.Log;
 
 /**
  *
@@ -31,6 +35,15 @@ public class ConfigUpdateHandler extends FormHandler {
     public static final String DEFAULT_PROXY_PORT = "4444";
     
     protected void processForm() {
+        if ("Check for update now".equals(_action)) {
+            NewsFetcher fetcher = NewsFetcher.getInstance(I2PAppContext.getGlobalContext());
+            fetcher.fetchNews();
+            if (fetcher.updateAvailable())
+                addFormNotice("Update available, click link on left");
+            else
+                addFormNotice("No update available");
+        }
+
         if ( (_newsURL != null) && (_newsURL.length() > 0) ) {
             String oldURL = _context.router().getConfigSetting(PROP_NEWS_URL);
             if ( (oldURL == null) || (!_newsURL.equals(oldURL)) ) {
@@ -38,6 +51,7 @@ public class ConfigUpdateHandler extends FormHandler {
                 addFormNotice("Updating news URL to " + _newsURL);
             }
         }
+        
         if ( (_updateURL != null) && (_updateURL.length() > 0) ) {
             String oldURL = _context.router().getConfigSetting(PROP_UPDATE_URL);
             if ( (oldURL == null) || (!_updateURL.equals(oldURL)) ) {
@@ -56,7 +70,7 @@ public class ConfigUpdateHandler extends FormHandler {
         
         if ( (_proxyPort != null) && (_proxyPort.length() > 0) ) {
             String oldPort = _context.router().getConfigSetting(PROP_PROXY_PORT);
-            if ( (oldPort == null) || (!_proxyHost.equals(oldPort)) ) {
+            if ( (oldPort == null) || (!_proxyPort.equals(oldPort)) ) {
                 _context.router().setConfigSetting(PROP_PROXY_PORT, _proxyPort);
                 addFormNotice("Updating proxy port to " + _proxyPort);
             }

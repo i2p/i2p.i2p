@@ -27,7 +27,7 @@
     if (prev != null) System.setProperty("net.i2p.router.web.ConfigUpdateHandler.noncePrev", prev);
     System.setProperty("net.i2p.router.web.ConfigUpdateHandler.nonce", new java.util.Random().nextLong()+""); %>
  <input type="hidden" name="nonce" value="<%=System.getProperty("net.i2p.router.web.ConfigUpdateHandler.nonce")%>" />
- <input type="hidden" name="action" value="update" />
+ <input type="submit" name="action" value="Check for update now" /><br /><br />
  News URL:
  <input type="text" size="60" name="newsURL" value="<jsp:getProperty name="updatehelper" property="newsURL" />"><br />
  Refresh frequency:
@@ -36,10 +36,10 @@
  <input type="text" size="60" name="updateURL" value="<jsp:getProperty name="updatehelper" property="updateURL" />"><br />
  Update policy:
  <jsp:getProperty name="updatehelper" property="updatePolicySelectBox" /><br />
- Update anonymously?
+Update through the eepProxy?
  <jsp:getProperty name="updatehelper" property="updateThroughProxy" /><br />
- Proxy host: <input type="text" size="10" name="proxyHost" value="<jsp:getProperty name="updatehelper" property="proxyHost" />" /><br />
- Proxy port: <input type="text" size="4" name="proxyPort" value="<jsp:getProperty name="updatehelper" property="proxyPort" />" /><br />
+ eepProxy host: <input type="text" size="10" name="proxyHost" value="<jsp:getProperty name="updatehelper" property="proxyHost" />" /><br />
+ eepProxy port: <input type="text" size="4" name="proxyPort" value="<jsp:getProperty name="updatehelper" property="proxyPort" />" /><br />
  <!-- prompt for the eepproxy -->
  Trusted keys:
  <textarea name="trustedKeys" disabled="true" cols="60" rows="2"><jsp:getProperty name="updatehelper" property="trustedKeys" /></textarea>

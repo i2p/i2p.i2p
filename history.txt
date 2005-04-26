@@ -1,4 +1,9 @@
-$Id: history.txt,v 1.197 2005/04/20 15:14:17 jrandom Exp $
+$Id: history.txt,v 1.198 2005/04/24 13:42:05 jrandom Exp $
+
+2005-04-25  smeghead
+    * Added button to router console for manual update checks.
+    * Fixed bug in configupdate.jsp that caused the proxy port to be updated
+      every time the form was submitted even if it hadn't changed.
 
 2005-04-24  jrandom
     * Added a pool of PRNGs using a different synchronization technique, 
