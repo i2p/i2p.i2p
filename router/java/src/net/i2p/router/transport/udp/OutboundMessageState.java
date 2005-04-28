@@ -174,6 +174,17 @@ public class OutboundMessageState {
             return _fragmentSize;
     }
 
+    public void incrementCurrentFragment() {
+        int cur = _nextSendFragment;
+        _fragmentSends[cur]++;
+        _maxSends = _fragmentSends[cur];
+        _nextSendFragment++;
+        if (_nextSendFragment >= _fragmentSends.length) {
+            _nextSendFragment = 0;
+            _pushCount++;
+        }
+    }
+    
     /**
      * Pick a fragment that we still need to send.  Current implementation 
      * picks the fragment which has been sent the least (randomly choosing 
@@ -183,15 +194,7 @@ public class OutboundMessageState {
      */
     public int pickNextFragment() {
         if (true) {
-            int rv = _nextSendFragment;
-            _fragmentSends[rv]++;
-            _maxSends = _fragmentSends[rv];
-            _nextSendFragment++;
-            if (_nextSendFragment >= _fragmentSends.length) {
-                _nextSendFragment = 0;
-                _pushCount++;
-            } 
-            return rv;
+            return _nextSendFragment;
         }
         short minValue = -1;
         int minIndex = -1;

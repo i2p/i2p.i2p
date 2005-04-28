@@ -25,7 +25,7 @@ public class UDPSender {
     private boolean _keepRunning;
     private Runner _runner;
     
-    private static final int MAX_QUEUED = 64;
+    private static final int MAX_QUEUED = 4;
     
     public UDPSender(RouterContext ctx, DatagramSocket socket, String name) {
         _context = ctx;
@@ -35,7 +35,11 @@ public class UDPSender {
         _runner = new Runner();
         _name = name;
         _context.statManager().createRateStat("udp.pushTime", "How long a UDP packet takes to get pushed out", "udp", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
+        _context.statManager().createRateStat("udp.sendQueueSize", "How many packets are queued on the UDP sender", "udp", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
         _context.statManager().createRateStat("udp.sendPacketSize", "How large packets sent are", "udp", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
+        _context.statManager().createRateStat("udp.socketSendTime", "How long the actual socket.send took", "udp", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
+        _context.statManager().createRateStat("udp.sendBWThrottleTime", "How long the send is blocked by the bandwidth throttle", "udp", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
+        _context.statManager().createRateStat("udp.sendACKTime", "How long an ACK packet is blocked for (duration == lifetime)", "udp", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
     }
     
     public void startup() {
@@ -83,6 +87,7 @@ public class UDPSender {
                 }
             } catch (InterruptedException ie) {}
         }
+        _context.statManager().addRateData("udp.sendQueueSize", remaining, packet.getLifetime());
         return remaining;
     }
     
@@ -97,6 +102,7 @@ public class UDPSender {
             size = _outboundQueue.size();
             _outboundQueue.notifyAll();
         }
+        _context.statManager().addRateData("udp.sendQueueSize", size, packet.getLifetime());
         return size;
     }
     
@@ -112,12 +118,15 @@ public class UDPSender {
                 
                 UDPPacket packet = getNextPacket();
                 if (packet != null) {
+                    long acquireTime = _context.clock().now();
                     int size = packet.getPacket().getLength();
                     if (size > 0) {
                         FIFOBandwidthLimiter.Request req = _context.bandwidthLimiter().requestOutbound(size, "UDP sender");
                         while (req.getPendingOutboundRequested() > 0)
                             req.waitForNextAllocation();
                     }
+                    
+                    long afterBW = _context.clock().now();
                     
                     if (_log.shouldLog(Log.DEBUG)) {
                         int len = packet.getPacket().getLength();
@@ -127,10 +136,16 @@ public class UDPSender {
                     }
                     
                     try {
+                        long before = _context.clock().now();
                         synchronized (Runner.this) {
                             // synchronization lets us update safely
                             _socket.send(packet.getPacket());
                         }
+                        long sendTime = _context.clock().now() - before;
+                        _context.statManager().addRateData("udp.socketSendTime", sendTime, packet.getLifetime());
+                        _context.statManager().addRateData("udp.sendBWThrottleTime", afterBW - acquireTime, acquireTime - packet.getBegin());
+                        if (packet.getMarkedType() == 1)
+                            _context.statManager().addRateData("udp.sendACKTime", afterBW - acquireTime, packet.getLifetime());
                         _context.statManager().addRateData("udp.pushTime", packet.getLifetime(), packet.getLifetime());
                         _context.statManager().addRateData("udp.sendPacketSize", packet.getPacket().getLength(), packet.getLifetime());
                     } catch (IOException ioe) {

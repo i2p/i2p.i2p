@@ -96,7 +96,7 @@ public class InboundMessageState {
         if (_fragments != null)
             for (int i = 0; i < _fragments.length; i++)
                 _fragmentCache.release(_fragments[i]);
-        _fragments = null;
+        //_fragments = null;
     }
     
     public ByteArray[] getFragments() {
@@ -107,10 +107,11 @@ public class InboundMessageState {
     public String toString() {
         StringBuffer buf = new StringBuffer(32);
         buf.append("Message: ").append(_messageId);
-        if (isComplete()) {
-            buf.append(" completely received with ");
-            buf.append(getCompleteSize()).append(" bytes");
-        }
+        //if (isComplete()) {
+        //    buf.append(" completely received with ");
+        //    buf.append(getCompleteSize()).append(" bytes");
+        //}
+        buf.append(" lifetime: ").append(getLifetime());
         return buf.toString();
     }
 }

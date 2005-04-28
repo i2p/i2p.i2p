@@ -58,7 +58,11 @@ public class ClientMessagePool {
         } else {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Adding message for remote delivery");
-            _context.jobQueue().addJob(new OutboundClientMessageOneShotJob(_context, msg));
+            OutboundClientMessageOneShotJob j = new OutboundClientMessageOneShotJob(_context, msg);
+            if (true) // blocks the I2CP reader for a nontrivial period of time
+                j.runJob();
+            else
+                _context.jobQueue().addJob(j);
         }
     }
     

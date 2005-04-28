@@ -42,6 +42,7 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
         _context = context;
         _log = _context.logManager().getLog(ClientMessageEventListener.class);
         _runner = runner;
+        _context.statManager().createRateStat("client.distributeTime", "How long it took to inject the client message into the router", "ClientMessages", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
     }
     
     /**
@@ -162,6 +163,7 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
         MessageId id = _runner.distributeMessage(message);
         long timeToDistribute = _context.clock().now() - beforeDistribute;
         _runner.ackSendMessage(id, message.getNonce());
+        _context.statManager().addRateData("client.distributeTime", timeToDistribute, timeToDistribute);
         if ( (timeToDistribute > 50) && (_log.shouldLog(Log.WARN)) )
             _log.warn("Took too long to distribute the message (which holds up the ack): " + timeToDistribute);
     }

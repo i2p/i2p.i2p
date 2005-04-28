@@ -96,7 +96,7 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
                     _log.error("Error while closing the received i2p con", ex);
                 }
             } catch (IOException ex) {
-                _log.error("Error while waiting for I2PConnections", ex);
+                _log.error("Error while handling for I2PConnections", ex);
             }
             
             long afterHandle = I2PAppContext.getGlobalContext().clock().now();

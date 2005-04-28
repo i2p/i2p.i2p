@@ -93,7 +93,7 @@ if (curTunnel >= 0) {
 </select>
 &nbsp;&nbsp;
 <b>others:</b>
-<input type="text" name="reachablyByOther" size="20" />
+<input type="text" name="reachableByOther" size="20" />
 <% } else if ("0.0.0.0".equals(clientInterface)) { %>
 <option value="127.0.0.1">Locally (127.0.0.1)</option>
 <option value="0.0.0.0" selected="true">Everyone (0.0.0.0)</option>
@@ -102,7 +102,7 @@ if (curTunnel >= 0) {
 </select>
 &nbsp;&nbsp;
 <b>others:</b>
-<input type="text" name="reachablyByOther" size="20" />
+<input type="text" name="reachableByOther" size="20" />
 <% } else { %>
 <option value="127.0.0.1">Locally (127.0.0.1)</option>
 <option value="0.0.0.0">Everyone (0.0.0.0)</option>

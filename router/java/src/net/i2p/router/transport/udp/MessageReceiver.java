@@ -1,5 +1,8 @@
 package net.i2p.router.transport.udp;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import net.i2p.data.Base64;
 import net.i2p.data.ByteArray;
 import net.i2p.data.DataFormatException;
@@ -7,6 +10,7 @@ import net.i2p.data.i2np.I2NPMessage;
 import net.i2p.data.i2np.I2NPMessageImpl;
 import net.i2p.data.i2np.I2NPMessageException;
 import net.i2p.router.RouterContext;
+import net.i2p.util.I2PThread;
 import net.i2p.util.Log;
 
 /**
@@ -17,28 +21,62 @@ import net.i2p.util.Log;
 public class MessageReceiver implements Runnable {
     private RouterContext _context;
     private Log _log;
-    private InboundMessageFragments _fragments;
     private UDPTransport _transport;
+    /** list of messages (InboundMessageState) fully received but not interpreted yet */
+    private List _completeMessages;
+    private boolean _alive;
     
-    public MessageReceiver(RouterContext ctx, InboundMessageFragments frag, UDPTransport transport) {
+    public MessageReceiver(RouterContext ctx, UDPTransport transport) {
         _context = ctx;
         _log = ctx.logManager().getLog(MessageReceiver.class);
-        _fragments = frag;
         _transport = transport;
+        _completeMessages = new ArrayList(16);
+        _alive = true;
     }
 
+    public void startup() {
+        _alive = true;
+        I2PThread t = new I2PThread(this, "UDP message receiver");
+        t.setDaemon(true);
+        t.start();
+    }
+    public void shutdown() {
+        _alive = false;
+        synchronized (_completeMessages) {
+            _completeMessages.clear();
+            _completeMessages.notifyAll();
+        }
+    }
+    
+    public void receiveMessage(InboundMessageState state) {
+        synchronized (_completeMessages) {
+            _completeMessages.add(state);
+            _completeMessages.notifyAll();
+        }
+    }
+    
     public void run() {
-        while (_fragments.isAlive()) {
-            InboundMessageState message = _fragments.receiveNextMessage();
-            if (message == null) continue;
+        InboundMessageState message = null;
+        while (_alive) {
+            try {
+                synchronized (_completeMessages) {
+                    if (_completeMessages.size() > 0)
+                        message = (InboundMessageState)_completeMessages.remove(0);
+                    else
+                        _completeMessages.wait();
+                }
+            } catch (InterruptedException ie) {}
             
-            int size = message.getCompleteSize();
-            if (_log.shouldLog(Log.INFO))
-                _log.info("Full message received (" + message.getMessageId() + ") after " + message.getLifetime() 
-                          + "... todo: parse and plop it onto InNetMessagePool");
-            I2NPMessage msg = readMessage(message);
-            if (msg != null)
-                _transport.messageReceived(msg, null, message.getFrom(), message.getLifetime(), size);
+            if (message != null) {
+                int size = message.getCompleteSize();
+                if (_log.shouldLog(Log.INFO))
+                    _log.info("Full message received (" + message.getMessageId() + ") after " + message.getLifetime() 
+                              + "... todo: parse and plop it onto InNetMessagePool");
+                I2NPMessage msg = readMessage(message);
+                if (msg != null)
+                    _transport.messageReceived(msg, null, message.getFrom(), message.getLifetime(), size);
+                message = null;
+            }
         }
     }
     

@@ -30,7 +30,7 @@ public class TransportManager implements TransportEventListener {
     private RouterContext _context;
 
     private final static String PROP_DISABLE_TCP = "i2np.tcp.disable";
-    private static final boolean ENABLE_UDP = false;
+    private final static String PROP_ENABLE_UDP = "i2np.udp.enable";
     
     public TransportManager(RouterContext context) {
         _context = context;
@@ -59,7 +59,8 @@ public class TransportManager implements TransportEventListener {
             t.setListener(this);
             _transports.add(t);
         }
-        if (ENABLE_UDP) {
+        String enableUDP = _context.router().getConfigSetting(PROP_ENABLE_UDP);
+        if ( (enableUDP != null) && (Boolean.valueOf(enableUDP).booleanValue())) {
             UDPTransport udp = new UDPTransport(_context);
             udp.setListener(this);
             _transports.add(udp);
@@ -75,6 +76,7 @@ public class TransportManager implements TransportEventListener {
             _log.debug("Transport " + i + " (" + t.getStyle() + ") started");
         }
         _log.debug("Done start listening on transports");
+        _context.router().rebuildRouterInfo();
     }
     
     public void restart() {
@@ -116,17 +118,20 @@ public class TransportManager implements TransportEventListener {
         return rv;
     }
     
-    public List getBids(OutNetMessage msg) {
-        List rv = new ArrayList(1);
-        rv.add(getBid(msg));
-        return rv;
-    }
     public TransportBid getBid(OutNetMessage msg) {
+        List bids = getBids(msg);
+        if ( (bids == null) || (bids.size() <= 0) )
+            return null;
+        else
+            return (TransportBid)bids.get(0);
+    }
+    public List getBids(OutNetMessage msg) {
         if (msg == null)
             throw new IllegalArgumentException("Null message?  no bidding on a null outNetMessage!");
         if (_context.router().getRouterInfo().equals(msg.getTarget()))
             throw new IllegalArgumentException("WTF, bids for a message bound to ourselves?");
 
+        List rv = new ArrayList(_transports.size());
         Set failedTransports = msg.getFailedTransports();
         for (int i = 0; i < _transports.size(); i++) {
             Transport t = (Transport)_transports.get(i);
@@ -141,13 +146,13 @@ public class TransportManager implements TransportEventListener {
             if (bid != null) {
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("Transport " + t.getStyle() + " bid: " + bid);
-                return bid;
+                rv.add(bid);
             } else {
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("Transport " + t.getStyle() + " did not produce a bid");
             }
         }
-        return null;
+        return rv;
     }
     
     public void messageReceived(I2NPMessage message, RouterIdentity fromRouter, Hash fromRouterHash) {

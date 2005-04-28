@@ -65,12 +65,14 @@ public class PeerState {
     private long _lastReceiveTime;
     /** how many consecutive messages have we sent and not received an ACK to */
     private int _consecutiveFailedSends;
-    /** when did we last have a failed send */
-    private long _lastFailedSendMinute;
+    /** when did we last have a failed send (beginning of period) */
+    private long _lastFailedSendPeriod;
     /** list of messageIds (Long) that we have received but not yet sent */
     private List _currentACKs;
     /** when did we last send ACKs to the peer? */
-    private long _lastACKSend;
+    private volatile long _lastACKSend;
+    /** when did we decide we need to ACK to this peer? */
+    private volatile long _wantACKSendSince;
     /** have we received a packet with the ECN bit set in the current second? */
     private boolean _currentSecondECNReceived;
     /** 
@@ -79,17 +81,17 @@ public class PeerState {
      */
     private boolean _remoteWantsPreviousACKs;
     /** how many bytes should we send to the peer in a second */
-    private int _sendWindowBytes;
+    private volatile int _sendWindowBytes;
     /** how many bytes can we send to the peer in the current second */
-    private int _sendWindowBytesRemaining;
+    private volatile int _sendWindowBytesRemaining;
     private long _lastSendRefill;
-    private long _lastCongestionOccurred;
+    private volatile long _lastCongestionOccurred;
     /** 
      * when sendWindowBytes is below this, grow the window size quickly,
      * but after we reach it, grow it slowly
      *
      */
-    private int _slowStartThreshold;
+    private volatile int _slowStartThreshold;
     /** what IP is the peer sending and receiving packets on? */
     private byte[] _remoteIP;
     /** cached IP address */
@@ -116,19 +118,19 @@ public class PeerState {
     /** when did we last check the MTU? */
     private long _mtuLastChecked;
     /** current round trip time estimate */
-    private int _rtt;
+    private volatile int _rtt;
     /** smoothed mean deviation in the rtt */
-    private int _rttDeviation;
+    private volatile int _rttDeviation;
     /** current retransmission timeout */
-    private int _rto;
+    private volatile int _rto;
     
     private long _messagesReceived;
     private long _messagesSent;
     
-    private static final int DEFAULT_SEND_WINDOW_BYTES = 16*1024;
+    private static final int DEFAULT_SEND_WINDOW_BYTES = 8*1024;
     private static final int MINIMUM_WINDOW_BYTES = DEFAULT_SEND_WINDOW_BYTES;
     private static final int MAX_SEND_WINDOW_BYTES = 1024*1024;
-    private static final int DEFAULT_MTU = 1492;
+    private static final int DEFAULT_MTU = 1472;
     
     public PeerState(I2PAppContext ctx) {
         _context = ctx;
@@ -306,11 +308,11 @@ public class PeerState {
     /** when did we last receive a packet from them? */
     public void setLastReceiveTime(long when) { _lastReceiveTime = when; }
     public int incrementConsecutiveFailedSends() { 
-        long now = _context.clock().now()/60*1000;
-        if (_lastFailedSendMinute == now) {
+        long now = _context.clock().now()/(10*1000);
+        if (_lastFailedSendPeriod >= now) {
             // ignore... too fast
         } else {
-            _lastFailedSendMinute = now;
+            _lastFailedSendPeriod = now;
             _consecutiveFailedSends++; 
         }
         return _consecutiveFailedSends;
@@ -372,6 +374,8 @@ public class PeerState {
     /** we received the message specified completely */
     public void messageFullyReceived(Long messageId) {
         synchronized (_currentACKs) {
+            if (_wantACKSendSince <= 0)
+                _wantACKSendSince = _context.clock().now();
             if (!_currentACKs.contains(messageId))
                 _currentACKs.add(messageId);
         }
@@ -383,17 +387,21 @@ public class PeerState {
      * the data through.  
      *
      */
-    public void congestionOccurred() {
+    private boolean congestionOccurred() {
         long now = _context.clock().now();
-        if (_lastCongestionOccurred + 2000 > now)
-            return; // only shrink once every other second
+        if (_lastCongestionOccurred + 10*1000 > now)
+            return false; // only shrink once every 10 seconds
         _lastCongestionOccurred = now;
         
-        _sendWindowBytes /= 2;
+        //if (true)
+        //    _sendWindowBytes -= 10000;
+        //else
+            _sendWindowBytes = (_sendWindowBytes*2) / 3;
         if (_sendWindowBytes < MINIMUM_WINDOW_BYTES)
             _sendWindowBytes = MINIMUM_WINDOW_BYTES;
         if (_sendWindowBytes < _slowStartThreshold)
             _slowStartThreshold = _sendWindowBytes;
+        return true;
     }
     
     /** pull off the ACKs (Long) to send to the peer */
@@ -404,19 +412,21 @@ public class PeerState {
             if (_currentACKs.size() < threshold) {
                 rv = new ArrayList(_currentACKs);
                 _currentACKs.clear();
+                _wantACKSendSince = -1;
             } else {
                 rv = new ArrayList(threshold);
                 for (int i = 0; i < threshold; i++)
                     rv.add(_currentACKs.remove(0));
             }
         }
+        _lastACKSend = _context.clock().now();
         return rv;
     }
     
     /** we sent a message which was ACKed containing the given # of bytes */
     public void messageACKed(int bytesACKed, long lifetime, int numSends) {
         _consecutiveFailedSends = 0;
-        _lastFailedSendMinute = -1;
+        _lastFailedSendPeriod = -1;
         if (_sendWindowBytes <= _slowStartThreshold) {
             _sendWindowBytes += bytesACKed;
         } else {
@@ -449,6 +459,7 @@ public class PeerState {
     }
     /** we are resending a packet, so lets jack up the rto */
     public void messageRetransmitted() { 
+        congestionOccurred();
         //_rto *= 2; 
     }
     /** how long does it usually take to get a message ACKed? */
@@ -477,6 +488,7 @@ public class PeerState {
     /** when did we last send an ACK to the peer? */
     public long getLastACKSend() { return _lastACKSend; }
     public void setLastACKSend(long when) { _lastACKSend = when; }
+    public long getWantedACKSendSince() { return _wantACKSendSince; }
     public boolean unsentACKThresholdReached() {
         int threshold = countMaxACKs();
         synchronized (_currentACKs) {

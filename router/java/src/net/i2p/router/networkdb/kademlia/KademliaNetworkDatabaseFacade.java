@@ -545,13 +545,17 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
     public LeaseSet store(Hash key, LeaseSet leaseSet) throws IllegalArgumentException {
         if (!_initialized) return null;
         
+        LeaseSet rv = (LeaseSet)_ds.get(key);
+        
+        if ( (rv != null) && (rv.equals(leaseSet)) ) {
+            // if it hasn't changed, no need to do anything
+            return rv;
+        }
+        
         String err = validate(key, leaseSet);
         if (err != null)
             throw new IllegalArgumentException("Invalid store attempt - " + err);
         
-        LeaseSet rv = null;
-        if (_ds.isKnown(key))
-            rv = (LeaseSet)_ds.get(key);
         _ds.put(key, leaseSet);
         synchronized (_lastSent) {
             if (!_lastSent.containsKey(key))
@@ -629,13 +633,16 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
     public RouterInfo store(Hash key, RouterInfo routerInfo) throws IllegalArgumentException {
         if (!_initialized) return null;
         
+        RouterInfo rv = (RouterInfo)_ds.get(key);
+        
+        if ( (rv != null) && (rv.equals(routerInfo)) ) {
+            // no need to validate
+            return rv;
+        }
+        
         String err = validate(key, routerInfo);
         if (err != null)
             throw new IllegalArgumentException("Invalid store attempt - " + err);
-        
-        RouterInfo rv = null;
-        if (_ds.isKnown(key))
-            rv = (RouterInfo)_ds.get(key);
         
         if (_log.shouldLog(Log.INFO))
             _log.info("RouterInfo " + key.toBase64() + " is stored with "
@@ -648,7 +655,8 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
             if (!_lastSent.containsKey(key))
                 _lastSent.put(key, new Long(0));
         }
-        _kb.add(key);
+        if (rv == null)
+            _kb.add(key);
         return rv;
     }
     

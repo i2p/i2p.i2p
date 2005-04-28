@@ -86,9 +86,9 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     private static final int PRIORITY_WEIGHT[] = new int[] { 1, 1, 1, 1, 1, 2 };
 
     /** should we flood all UDP peers with the configured rate? */
-    private static final boolean SHOULD_FLOOD_PEERS = true;
+    private static final boolean SHOULD_FLOOD_PEERS = false;
     
-    private static final int MAX_CONSECUTIVE_FAILED = 2;
+    private static final int MAX_CONSECUTIVE_FAILED = 5;
     
     public UDPTransport(RouterContext ctx) {
         super(ctx);
@@ -103,7 +103,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         _relayPeers = new ArrayList(1);
 
         _fastBid = new SharedBid(50);
-        _slowBid = new SharedBid(100);
+        _slowBid = new SharedBid(1000);
         
         _fragments = new OutboundMessageFragments(_context, this);
         _inboundFragments = new InboundMessageFragments(_context, _fragments, this);
@@ -353,6 +353,9 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                 _log.debug("bidding on a message to an established peer: " + peer);
             return _fastBid;
         } else {
+            if (null == toAddress.getTargetAddress(STYLE))
+                return null;
+
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("bidding on a message to an unestablished peer: " + to.toBase64());
             return _slowBid;
@@ -478,12 +481,15 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     public void failed(OutboundMessageState msg) {
         if (msg == null) return;
         int consecutive = 0;
-        if (msg.getPeer() != null)
+        if ( (msg.getPeer() != null) && 
+             ( (msg.getMaxSends() >= OutboundMessageFragments.MAX_VOLLEYS) ||
+               (msg.isExpired())) ) {
             consecutive = msg.getPeer().incrementConsecutiveFailedSends();
-        if (_log.shouldLog(Log.WARN))
-            _log.warn("Consecutive failure #" + consecutive + " sending to " + msg.getPeer());
-        if (consecutive > MAX_CONSECUTIVE_FAILED)
-            dropPeer(msg.getPeer());
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Consecutive failure #" + consecutive + " sending to " + msg.getPeer());
+            if (consecutive > MAX_CONSECUTIVE_FAILED)
+                dropPeer(msg.getPeer());
+        }
         failed(msg.getMessage());
     }
     
@@ -614,5 +620,6 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         public SharedBid(int ms) { _ms = ms; }
         public int getLatency() { return _ms; }
         public Transport getTransport() { return UDPTransport.this; }
+        public String toString() { return "UDP bid @ " + _ms; }
     }
 }

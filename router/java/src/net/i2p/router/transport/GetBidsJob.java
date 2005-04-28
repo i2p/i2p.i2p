@@ -8,6 +8,7 @@ package net.i2p.router.transport;
  *
  */
 
+import java.util.List;
 import net.i2p.data.Hash;
 import net.i2p.router.JobImpl;
 import net.i2p.router.MessageSelector;
@@ -58,18 +59,28 @@ public class GetBidsJob extends JobImpl {
             return;
         }
         
-        TransportBid bid = facade.getBid(msg);
-        if (bid == null) {
-            // only shitlist them if we couldnt even try a single transport
-            if (msg.getFailedTransports().size() <= 0) {
-                if (log.shouldLog(Log.WARN))
-                    log.warn("No bids available for the message " + msg);
-                context.shitlist().shitlistRouter(to, "No bids");
-                context.netDb().fail(to);
-            }
+        List bids = facade.getBids(msg);
+        
+        if ( (bids == null) || (bids.size() <= 0) ) {
+            context.shitlist().shitlistRouter(to, "No bids after " + (bids != null ? bids.size() + " tries" : "0 tries"));
+            context.netDb().fail(to);
             fail(context, msg);
         } else {
-            bid.getTransport().send(msg);
+            int lowestCost = -1;
+            TransportBid winner = null;
+            for (int i = 0; i < bids.size(); i++) {
+                TransportBid bid = (TransportBid)bids.get(i);
+                if ( (lowestCost < 0) || (bid.getLatencyMs() < lowestCost) ) {
+                    winner = bid;
+                    lowestCost = bid.getLatencyMs();
+                }
+            }
+            if (winner != null) {
+                if (log.shouldLog(Log.INFO))
+                    log.info("Winning bid: " + winner + " out of " + bids);
+                
+                winner.getTransport().send(msg);
+            }
         }
     }
     

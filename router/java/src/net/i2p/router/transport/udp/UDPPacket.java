@@ -31,6 +31,7 @@ public class UDPPacket {
     private long _expiration;
     private byte[] _data;
     private ByteArray _dataBuf;
+    private int _markedType;
   
     private static final List _packetCache;
     static {
@@ -72,6 +73,7 @@ public class UDPPacket {
         _data = _dataBuf.getData(); 
         _packet = new DatagramPacket(_data, MAX_PACKET_SIZE);
         _initializeTime = _context.clock().now();
+        _markedType = -1;
     }
     
     public void initialize(short priority, long expiration, InetAddress host, int port) {
@@ -92,8 +94,12 @@ public class UDPPacket {
     public DatagramPacket getPacket() { return _packet; }
     public short getPriority() { return _priority; }
     public long getExpiration() { return _expiration; }
+    public long getBegin() { return _initializeTime; }
     public long getLifetime() { return _context.clock().now() - _initializeTime; }
     public void resetBegin() { _initializeTime = _context.clock().now(); }
+    /** flag this packet as a particular type for accounting purposes */
+    public void markType(int type) { _markedType = type; }
+    public int getMarkedType() { return _markedType; }
     
     /**
      * Validate the packet against the MAC specified, returning true if the
@@ -173,6 +179,7 @@ public class UDPPacket {
                     rv._log = ctx.logManager().getLog(UDPPacket.class);
                     rv.resetBegin();
                     Arrays.fill(rv._data, (byte)0x00);
+                    rv._markedType = -1;
                     return rv;
                 }
             }

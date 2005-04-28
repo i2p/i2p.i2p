@@ -137,16 +137,18 @@ public class TCPTransport extends TransportImpl {
     
     public TransportBid bid(RouterInfo toAddress, long dataSize) {
         RouterAddress addr = toAddress.getTargetAddress(STYLE);
-        if (addr == null) 
-            return null;
         
         if ( (_myAddress != null) && (_myAddress.equals(addr)) ) 
             return null; // dont talk to yourself
     
-        if (getIsConnected(toAddress.getIdentity()))
+        if (getIsConnected(toAddress.getIdentity())) {
             return _fastBid;
-        else
+        } else {
+            if (addr == null) 
+                return null;
+    
             return _slowBid;
+        }
     }
     
     private boolean getIsConnected(RouterIdentity ident) {
@@ -381,7 +383,10 @@ public class TCPTransport extends TransportImpl {
         configureLocalAddress();
         _listener.startListening();
         if (_myAddress != null) {
-            return _myAddress.toRouterAddress();
+            RouterAddress rv = _myAddress.toRouterAddress();
+            if (rv != null)
+                replaceAddress(rv);
+            return rv;
         } else {
             return null;
         }
@@ -826,5 +831,6 @@ public class TCPTransport extends TransportImpl {
         public SharedBid(int ms) { _ms = ms; }
         public int getLatency() { return _ms; }
         public Transport getTransport() { return TCPTransport.this; }
+        public String toString() { return "TCP bid @ " + _ms; }
     }    
 }
