@@ -35,7 +35,7 @@ import net.i2p.util.Log;
 public abstract class TransportImpl implements Transport {
     private Log _log;
     private TransportEventListener _listener;
-    private Set _currentAddresses;
+    private RouterAddress _currentAddress;
     private List _sendPool;
     protected RouterContext _context;
 
@@ -55,7 +55,7 @@ public abstract class TransportImpl implements Transport {
         _context.statManager().createRateStat("transport.sendProcessingTime", "How long does it take from noticing that we want to send the message to having it completely sent (successfully or failed)?", "Transport", new long[] { 60*1000l, 10*60*1000l, 60*60*1000l, 24*60*60*1000l });
         _context.statManager().createRateStat("transport.expiredOnQueueLifetime", "How long a message that expires on our outbound queue is processed", "Transport", new long[] { 60*1000l, 10*60*1000l, 60*60*1000l, 24*60*60*1000l } );
         _sendPool = new ArrayList(16);
-        _currentAddresses = new HashSet();
+        _currentAddress = null;
     }
     
     /**
@@ -334,34 +334,15 @@ public abstract class TransportImpl implements Transport {
     }
  	
     /** What addresses are we currently listening to? */
-    public Set getCurrentAddresses() { 
-        synchronized (_currentAddresses) { 
-            return new HashSet(_currentAddresses); 
-        }
+    public RouterAddress getCurrentAddress() { 
+        return _currentAddress;
     }
     /**
      * Replace any existing addresses for the current transport with the given
      * one.
      */
     protected void replaceAddress(RouterAddress address) {
-        synchronized (_currentAddresses) {
-            Set addresses = _currentAddresses;
-            List toRemove = null;
-            for (Iterator iter = addresses.iterator(); iter.hasNext(); ) {
-                RouterAddress cur = (RouterAddress)iter.next();
-                if (getStyle().equals(cur.getTransportStyle())) {
-                    if (toRemove == null)
-                        toRemove = new ArrayList(1);
-                    toRemove.add(cur);
-                }
-            }
-            if (toRemove != null) {
-                for (int i = 0; i < toRemove.size(); i++) {
-                    addresses.remove(toRemove.get(i));
-                }
-            }
-            _currentAddresses.add(address);
-        }
+        _currentAddress = address;
     }
     
     /** Who to notify on message availability */

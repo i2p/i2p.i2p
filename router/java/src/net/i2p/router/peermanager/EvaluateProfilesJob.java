@@ -27,21 +27,7 @@ class EvaluateProfilesJob extends JobImpl {
     public String getName() { return "Evaluate peer profiles"; }
     public void runJob() {
         try {
-            long start = getContext().clock().now();
-            Set allPeers = getContext().profileOrganizer().selectAllPeers();
-            long afterSelect = getContext().clock().now();
-            for (Iterator iter = allPeers.iterator(); iter.hasNext(); ) {
-                Hash peer = (Hash)iter.next();
-                PeerProfile profile = getContext().profileOrganizer().getProfile(peer);
-                if (profile != null)
-                    profile.coalesceStats();
-            }
-            long afterCoalesce = getContext().clock().now();
-            getContext().profileOrganizer().reorganize();
-            long afterReorganize = getContext().clock().now();
-            
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Profiles coalesced and reorganized.  total: " + allPeers.size() + ", selectAll: " + (afterSelect-start) + "ms, coalesce: " + (afterCoalesce-afterSelect) + "ms, reorganize: " + (afterReorganize-afterSelect));
+            getContext().profileOrganizer().reorganize(true);
         } catch (Throwable t) {
             _log.log(Log.CRIT, "Error evaluating profiles", t);
         } finally {

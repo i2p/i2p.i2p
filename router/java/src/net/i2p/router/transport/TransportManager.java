@@ -12,7 +12,9 @@ import java.io.IOException;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import net.i2p.data.Hash;
 import net.i2p.data.RouterAddress;
@@ -109,11 +111,12 @@ public class TransportManager implements TransportEventListener {
         return peers;
     }
     
-    List getAddresses() {
-        List rv = new ArrayList(_transports.size());
+    Map getAddresses() {
+        Map rv = new HashMap(_transports.size());
         for (int i = 0; i < _transports.size(); i++) {
             Transport t = (Transport)_transports.get(i);
-            rv.addAll(t.getCurrentAddresses());
+            if (t.getCurrentAddress() != null)
+                rv.put(t.getStyle(), t.getCurrentAddress());
         }
         return rv;
     }
@@ -178,10 +181,8 @@ public class TransportManager implements TransportEventListener {
         buf.append("Listening on: <br /><pre>\n");
         for (int i = 0; i < _transports.size(); i++) {
             Transport t = (Transport)_transports.get(i);
-            for (Iterator iter = t.getCurrentAddresses().iterator(); iter.hasNext(); ) {
-                RouterAddress addr = (RouterAddress)iter.next();
-                buf.append(addr.toString()).append("\n\n");
-            }   
+            if (t.getCurrentAddress() != null)
+                buf.append(t.getCurrentAddress()).append("\n\n");
         }
         buf.append("</pre>\n");
         out.write(buf.toString());

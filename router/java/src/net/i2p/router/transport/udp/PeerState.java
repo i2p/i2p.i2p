@@ -300,7 +300,9 @@ public class PeerState {
     /** when were the current cipher and MAC keys established/rekeyed? */
     public void setKeyEstablishedTime(long when) { _keyEstablishedTime = when; }
     /** how far off is the remote peer from our clock, in seconds? */
-    public void setClockSkew(short skew) { _clockSkew = skew; }
+    public void adjustClockSkew(short skew) { 
+        _clockSkew = (short)(0.9*(float)_clockSkew + 0.1*(float)skew); 
+    }
     /** what is the current receive second, for congestion control? */
     public void setCurrentReceiveSecond(long sec) { _currentReceiveSecond = sec; }
     /** when did we last send them a packet? */

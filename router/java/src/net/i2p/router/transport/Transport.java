@@ -33,7 +33,7 @@ public interface Transport {
     public void send(OutNetMessage msg);
     public RouterAddress startListening();
     public void stopListening();
-    public Set getCurrentAddresses();
+    public RouterAddress getCurrentAddress();
     public void setListener(TransportEventListener listener);
     public String getStyle();
     

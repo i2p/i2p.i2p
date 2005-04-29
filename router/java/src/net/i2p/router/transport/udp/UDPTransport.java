@@ -68,7 +68,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     /** shared slow bid for unconnected peers */
     private TransportBid _slowBid;
 
-    public static final String STYLE = "udp";
+    public static final String STYLE = "SSUv1";
     public static final String PROP_INTERNAL_PORT = "i2np.udp.internalPort";
 
     /** define this to explicitly set an external IP address */
@@ -531,11 +531,11 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         StringBuffer buf = new StringBuffer(512);
         buf.append("<b>UDP connections: ").append(peers.size()).append("</b><br />\n");
         buf.append("<table border=\"1\">\n");
-        buf.append(" <tr><td><b>Peer</b></td><td><b>Location</b></td>\n");
-        buf.append("     <td><b>Last send</b></td><td><b>Last recv</b></td>\n");
-        buf.append("     <td><b>Lifetime</b></td><td><b>cwnd</b></td><td><b>ssthresh</b></td>\n");
+        buf.append(" <tr><td><b>peer</b></td><td><b>activity (in/out)</b></td>\n");
+        buf.append("     <td><b>uptime</b></td><td><b>skew</b></td>\n");
+        buf.append("     <td><b>cwnd</b></td><td><b>ssthresh</b></td>\n");
         buf.append("     <td><b>rtt</b></td><td><b>dev</b></td><td><b>rto</b></td>\n");
-        buf.append("     <td><b>Sent</b></td><td><b>Received</b></td>\n");
+        buf.append("     <td><b>send</b></td><td><b>recv</b></td>\n");
         buf.append(" </tr>\n");
         out.write(buf.toString());
         buf.setLength(0);
@@ -547,11 +547,10 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             
             buf.append("<tr>");
             
-            buf.append("<td>");
+            buf.append("<td nowrap>");
+            buf.append("<a href=\"#");
             buf.append(peer.getRemotePeer().toBase64().substring(0,6));
-            buf.append("</td>");
-            
-            buf.append("<td>");
+            buf.append("\">");
             byte ip[] = peer.getRemoteIP();
             for (int j = 0; j < ip.length; j++) {
                 if (ip[j] < 0)
@@ -562,19 +561,24 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                     buf.append('.');
             }
             buf.append(':').append(peer.getRemotePort());
+            buf.append("</a>");
+            if (peer.getConsecutiveFailedSends() > 0)
+                buf.append(" [").append(peer.getConsecutiveFailedSends()).append(" failures]");
             buf.append("</td>");
             
             buf.append("<td>");
-            buf.append(DataHelper.formatDuration(now-peer.getLastSendTime()));
-            buf.append("</td>");
-
-            buf.append("<td>");
             buf.append(DataHelper.formatDuration(now-peer.getLastReceiveTime()));
+            buf.append("/");
+            buf.append(DataHelper.formatDuration(now-peer.getLastSendTime()));
             buf.append("</td>");
 
             buf.append("<td>");
             buf.append(DataHelper.formatDuration(now-peer.getKeyEstablishedTime()));
             buf.append("</td>");
+            
+            buf.append("<td>");
+            buf.append(peer.getClockSkew()/1000);
+            buf.append("s</td>");
 
             buf.append("<td>");
             buf.append(peer.getSendWindowBytes()/1024);

@@ -1,4 +1,10 @@
-$Id: history.txt,v 1.199 2005/04/25 21:59:23 smeghead Exp $
+$Id: history.txt,v 1.200 2005/04/28 16:54:27 jrandom Exp $
+
+2005-04-29  jrandom
+    * Reduce the peer profile stat coallesce overhead by inlining it with the 
+      reorganize.
+    * Limit each transport to at most one address (any transport that requires
+      multiple entry points can include those alternatives in the address).
 
 2005-04-28  jrandom
     * More fixes for the I2PTunnel "other" interface handling (thanks nelgin!)

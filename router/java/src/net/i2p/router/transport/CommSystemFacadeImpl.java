@@ -10,8 +10,10 @@ package net.i2p.router.transport;
 
 import java.io.IOException;
 import java.io.Writer;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
@@ -75,17 +77,22 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
     }
     
     public Set createAddresses() {
-        Set addresses = new HashSet();
-        RouterAddress addr = createTCPAddress();
-        if (addr != null)
-            addresses.add(addr);
+        Map addresses = null;
         
-        if (_manager != null)
-            addresses.addAll(_manager.getAddresses());
+        if (_manager != null) 
+            addresses = _manager.getAddresses();
+        else
+            addresses = new HashMap(1);
+        
+        if (!addresses.containsKey(TCPTransport.STYLE)) {
+            RouterAddress addr = createTCPAddress();
+            if (addr != null)
+                addresses.put(TCPTransport.STYLE, addr);
+        }
         
         if (_log.shouldLog(Log.INFO))
             _log.info("Creating addresses: " + addresses);
-        return addresses;
+        return new HashSet(addresses.values());
     }
     
     private final static String PROP_I2NP_TCP_HOSTNAME = "i2np.tcp.hostname";

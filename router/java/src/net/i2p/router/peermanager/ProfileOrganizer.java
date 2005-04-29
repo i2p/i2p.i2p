@@ -409,17 +409,20 @@ public class ProfileOrganizer {
      * this method, but the averages are recalculated.
      *
      */
-    public void reorganize() {
+    public void reorganize() { reorganize(false); }
+    public void reorganize(boolean shouldCoalesce) {
         synchronized (_reorganizeLock) {
-            Set allPeers = new HashSet(_failingPeers.size() + _notFailingPeers.size() + _highCapacityPeers.size() + _fastPeers.size());
-            allPeers.addAll(_failingPeers.values());
-            allPeers.addAll(_notFailingPeers.values());
-            allPeers.addAll(_highCapacityPeers.values());
-            allPeers.addAll(_fastPeers.values());
+            Set allPeers = _strictCapacityOrder; //new HashSet(_failingPeers.size() + _notFailingPeers.size() + _highCapacityPeers.size() + _fastPeers.size());
+            //allPeers.addAll(_failingPeers.values());
+            //allPeers.addAll(_notFailingPeers.values());
+            //allPeers.addAll(_highCapacityPeers.values());
+            //allPeers.addAll(_fastPeers.values());
 
             Set reordered = new TreeSet(_comp);
             for (Iterator iter = _strictCapacityOrder.iterator(); iter.hasNext(); ) {
                 PeerProfile prof = (PeerProfile)iter.next();
+                if (shouldCoalesce)
+                    prof.coalesceStats();
                 reordered.add(prof);
             }
             _strictCapacityOrder = reordered;

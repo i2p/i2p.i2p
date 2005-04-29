@@ -141,8 +141,17 @@ public class PacketHandler {
                         _log.info("Validation with existing con failed, but validation as reestablish/stray passed");
                     packet.decrypt(_transport.getIntroKey());
                 } else {
-                    if (_log.shouldLog(Log.WARN))
-                        _log.warn("Validation with existing con failed, and validation as reestablish failed too.  DROP");
+                    InetAddress remAddr = packet.getPacket().getAddress();
+                    int remPort = packet.getPacket().getPort();
+                    InboundEstablishState est = _establisher.getInboundState(remAddr, remPort);
+                    if (est != null) {
+                        if (_log.shouldLog(Log.DEBUG))
+                            _log.debug("Packet from an existing peer IS for an inbound establishment");
+                        receivePacket(reader, packet, est, false);
+                    } else {
+                        if (_log.shouldLog(Log.WARN))
+                            _log.warn("Validation with existing con failed, and validation as reestablish failed too.  DROP");
+                    }
                     return;
                 }
             } else {
@@ -171,6 +180,12 @@ public class PacketHandler {
     }
 
     private void receivePacket(UDPPacketReader reader, UDPPacket packet, InboundEstablishState state) {
+        receivePacket(reader, packet, state, true);
+    }
+    /**
+     * @param allowFallback if it isn't valid for this establishment state, try as a non-establishment packet
+     */
+    private void receivePacket(UDPPacketReader reader, UDPPacket packet, InboundEstablishState state, boolean allowFallback) {
         if ( (state != null) && (_log.shouldLog(Log.DEBUG)) ) {
             StringBuffer buf = new StringBuffer(128);
             buf.append("Attempting to receive a packet on a known inbound state: ");
@@ -195,9 +210,11 @@ public class PacketHandler {
 
             }
         }
-        // ok, we couldn't handle it with the established stuff, so fall back
-        // on earlier state packets
-        receivePacket(reader, packet);
+        if (allowFallback) { 
+            // ok, we couldn't handle it with the established stuff, so fall back
+            // on earlier state packets
+            receivePacket(reader, packet);
+        }
     }
 
     private void receivePacket(UDPPacketReader reader, UDPPacket packet, OutboundEstablishState state) {
@@ -241,26 +258,29 @@ public class PacketHandler {
         receivePacket(reader, packet);
     }
 
-    /** let packets be up to 30s slow */
-    private static final long GRACE_PERIOD = Router.CLOCK_FUDGE_FACTOR + 30*1000;
+    /** let packets be up to 5s slow */
+    private static final long GRACE_PERIOD = Router.CLOCK_FUDGE_FACTOR + 5*1000;
     
     /**
      * Parse out the interesting bits and honor what it says
      */
     private void handlePacket(UDPPacketReader reader, UDPPacket packet, PeerState state, OutboundEstablishState outState, InboundEstablishState inState) {
         reader.initialize(packet);
-        long now = _context.clock().now();
-        long when = reader.readTimestamp() * 1000;
-        long skew = now - when;
+        long recvOn = packet.getBegin();
+        long sendOn = reader.readTimestamp() * 1000;
+        long skew = recvOn - sendOn;
         if (skew > GRACE_PERIOD) {
             if (_log.shouldLog(Log.WARN))
-                _log.warn("Packet too far in the future: " + new Date(when) + ": " + packet);
+                _log.warn("Packet too far in the future: " + new Date(sendOn/1000) + ": " + packet);
             return;
         } else if (skew < 0 - GRACE_PERIOD) {
             if (_log.shouldLog(Log.WARN))
-                _log.warn("Packet too far in the past: " + new Date(when) + ": " + packet);
+                _log.warn("Packet too far in the past: " + new Date(sendOn/1000) + ": " + packet);
             return;
         }
+        
+        if (state != null)
+            state.adjustClockSkew((short)skew);
         
         _context.statManager().addRateData("udp.receivePacketSkew", skew, packet.getLifetime());
         
