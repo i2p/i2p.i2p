@@ -36,7 +36,6 @@ public class InboundMessageFragments {
     private MessageReceiver _messageReceiver;
     private boolean _alive;
     
-    private static final int RECENTLY_COMPLETED_SIZE = 100;
     /** decay the recently completed every 2 minutes */
     private static final int DECAY_PERIOD = 120*1000;
         
@@ -113,7 +112,7 @@ public class InboundMessageFragments {
             
                 if (_recentlyCompletedMessages.isKnown(messageId.longValue())) {
                     _context.statManager().addRateData("udp.ignoreRecentDuplicate", 1, 0);
-                    from.messageFullyReceived(messageId);
+                    from.messageFullyReceived(messageId, -1);
                     _ackSender.ackPeer(from);
                     if (_log.shouldLog(Log.WARN))
                         _log.warn("Message received is a dup: " + messageId + " dups: " 
@@ -143,7 +142,7 @@ public class InboundMessageFragments {
 
                     _messageReceiver.receiveMessage(state);
                     
-                    from.messageFullyReceived(messageId);
+                    from.messageFullyReceived(messageId, state.getCompleteSize());
                     _ackSender.ackPeer(from);
                     
                     if (_log.shouldLog(Log.INFO))

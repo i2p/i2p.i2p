@@ -37,7 +37,7 @@ public class PacketPusher implements Runnable {
         while (_alive) {
             UDPPacket packet = _fragments.getNextPacket();
             if (packet != null)
-                _sender.add(packet, true); // blocks
+                _sender.add(packet, 1000); // blocks for up to a second
         }
     }
 }

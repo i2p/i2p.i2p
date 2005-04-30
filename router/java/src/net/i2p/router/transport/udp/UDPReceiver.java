@@ -66,7 +66,16 @@ public class UDPReceiver {
     /** if a packet been sitting in the queue for 2 seconds, drop subsequent packets */
     private static final long MAX_QUEUE_PERIOD = 2*1000;
     
+    private static final float ARTIFICIAL_DROP_PROBABILITY = 0f; //0.02f;
+    
     private void receive(UDPPacket packet) {
+        if (ARTIFICIAL_DROP_PROBABILITY > 0) { 
+            // the first check is to let the compiler optimize away this 
+            // random block on the live system when the probability is == 0
+            if (_context.random().nextFloat() <= ARTIFICIAL_DROP_PROBABILITY)
+                return;
+        }
+        
         synchronized (_inboundQueue) {
             int queueSize = _inboundQueue.size();
             if (queueSize > 0) {

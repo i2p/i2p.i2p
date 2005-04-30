@@ -83,7 +83,7 @@ public class OutboundMessageFragments {
                     else if (_allowExcess)
                         return true;
                     else
-                        _activeMessages.wait();
+                        _activeMessages.wait(1000);
                 }
             } catch (InterruptedException ie) {}
         }
@@ -177,9 +177,10 @@ public class OutboundMessageFragments {
                             _nextPacketMessage = 0;
                     }
                     i--;
-                }
-            }
-        }
+                } // end (pushCount > maxVolleys)
+            } // end iterating over active
+            _activeMessages.notifyAll();
+        } // end synchronized
     }
     
     private static final long SECOND_MASK = 1023l;
@@ -286,6 +287,7 @@ public class OutboundMessageFragments {
                 if (currentFragment < 0) {
                     if (nextSend <= 0) {
                         try {
+                            _activeMessages.notifyAll();
                             _activeMessages.wait();
                         } catch (InterruptedException ie) {}
                     } else {
@@ -301,6 +303,8 @@ public class OutboundMessageFragments {
                             _activeMessages.wait(delay);
                         } catch (InterruptedException ie) {}
                     }
+                } else {
+                    _activeMessages.notifyAll();
                 }
                 _allowExcess = false;
             } // end of the synchronized block
@@ -344,6 +348,7 @@ public class OutboundMessageFragments {
                         Hash expectedBy = msg.getTarget().getIdentity().getHash();
                         if (!expectedBy.equals(ackedBy)) {
                             state = null;
+                            _activeMessages.notifyAll();
                             return 0;
                         }
                     }
@@ -355,12 +360,12 @@ public class OutboundMessageFragments {
                         if (_nextPacketMessage < 0)
                             _nextPacketMessage = 0;
                     }
-                    _activeMessages.notifyAll();
                     break;
                 } else {
                     state = null;
                 }
             }
+            _activeMessages.notifyAll();
         }
         
         if (state != null) {

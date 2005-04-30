@@ -7,6 +7,8 @@ import java.net.UnknownHostException;
 import java.io.IOException;
 import java.io.Writer;
 
+import java.text.DecimalFormat;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -108,6 +110,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         _fragments = new OutboundMessageFragments(_context, this);
         _inboundFragments = new InboundMessageFragments(_context, _fragments, this);
         _flooder = new UDPFlooder(_context, this);
+        
+        _context.statManager().createRateStat("udp.droppedPeer", "How long ago did we receive from a dropped peer (duration == session lifetime", "udp", new long[] { 60*60*1000, 24*60*60*1000 });
     }
     
     public void startup() {
@@ -322,6 +326,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         if (_log.shouldLog(Log.WARN))
             _log.debug("Dropping remote peer: " + peer);
         if (peer.getRemotePeer() != null) {
+            long now = _context.clock().now();
+            _context.statManager().addRateData("udp.droppedPeer", now - peer.getLastReceiveTime(), now - peer.getKeyEstablishedTime());
             _context.shitlist().shitlistRouter(peer.getRemotePeer(), "dropped after too many retries");
             synchronized (_peersByIdent) {
                 _peersByIdent.remove(peer.getRemotePeer());
@@ -531,7 +537,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         StringBuffer buf = new StringBuffer(512);
         buf.append("<b>UDP connections: ").append(peers.size()).append("</b><br />\n");
         buf.append("<table border=\"1\">\n");
-        buf.append(" <tr><td><b>peer</b></td><td><b>activity (in/out)</b></td>\n");
+        buf.append(" <tr><td><b>peer</b></td><td><b>activity (in/out)</b></td>");
+        buf.append("     <td><b>transfer (in/out)</b></td>\n");
         buf.append("     <td><b>uptime</b></td><td><b>skew</b></td>\n");
         buf.append("     <td><b>cwnd</b></td><td><b>ssthresh</b></td>\n");
         buf.append("     <td><b>rtt</b></td><td><b>dev</b></td><td><b>rto</b></td>\n");
@@ -567,10 +574,16 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             buf.append("</td>");
             
             buf.append("<td>");
-            buf.append(DataHelper.formatDuration(now-peer.getLastReceiveTime()));
-            buf.append("/");
-            buf.append(DataHelper.formatDuration(now-peer.getLastSendTime()));
-            buf.append("</td>");
+            buf.append((now-peer.getLastReceiveTime())/1000);
+            buf.append("s/");
+            buf.append((now-peer.getLastSendTime())/1000);
+            buf.append("s</td>");
+    
+            buf.append("<td>");
+            buf.append(formatKBps(peer.getReceiveBps()));
+            buf.append("KBps/");
+            buf.append(formatKBps(peer.getSendBps()));
+            buf.append("KBps</td>");
 
             buf.append("<td>");
             buf.append(DataHelper.formatDuration(now-peer.getKeyEstablishedTime()));
@@ -616,6 +629,13 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         out.write("</table>\n");
     }
 
+    private static final DecimalFormat _fmt = new DecimalFormat("#,##0.00");
+    private static final String formatKBps(int bps) {
+        synchronized (_fmt) {
+            return _fmt.format((float)bps/1024);
+        }
+    }
+    
     /**
      * Cache the bid to reduce object churn
      */

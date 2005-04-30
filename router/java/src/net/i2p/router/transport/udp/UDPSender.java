@@ -66,9 +66,11 @@ public class UDPSender {
      * Add the packet to the queue.  This may block until there is space
      * available, if requested, otherwise it returns immediately
      *
+     * @param blockTime how long to block
      * @return number of packets queued
      */
-    public int add(UDPPacket packet, boolean blocking) {
+    public int add(UDPPacket packet, int blockTime) {
+        long expiration = _context.clock().now() + blockTime;
         int remaining = -1;
         while ( (_keepRunning) && (remaining < 0) ) {
             try {
@@ -78,10 +80,12 @@ public class UDPSender {
                         remaining = _outboundQueue.size();
                         _outboundQueue.notifyAll();
                     } else {
-                        if (blocking) {
-                            _outboundQueue.wait();
+                        long remainingTime = expiration - _context.clock().now();
+                        if (remainingTime > 0) {
+                            _outboundQueue.wait(remainingTime);
                         } else {
                             remaining = _outboundQueue.size();
+                            _outboundQueue.notifyAll();
                         }
                     }
                 }

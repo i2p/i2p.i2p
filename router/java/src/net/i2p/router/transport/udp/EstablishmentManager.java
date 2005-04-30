@@ -42,6 +42,10 @@ public class EstablishmentManager {
         _inboundStates = new HashMap(32);
         _outboundStates = new HashMap(32);
         _activityLock = new Object();
+        _context.statManager().createRateStat("udp.inboundEstablishTime", "How long it takes for a new inbound session to be established", "udp", new long[] { 60*60*1000, 24*60*60*1000 });
+        _context.statManager().createRateStat("udp.outboundEstablishTime", "How long it takes for a new outbound session to be established", "udp", new long[] { 60*60*1000, 24*60*60*1000 });
+        _context.statManager().createRateStat("udp.inboundEstablishFailedState", "What state a failed inbound establishment request fails in", "udp", new long[] { 60*60*1000, 24*60*60*1000 });
+        _context.statManager().createRateStat("udp.outboundEstablishFailedState", "What state a failed outbound establishment request fails in", "udp", new long[] { 60*60*1000, 24*60*60*1000 });
     }
     
     public void startup() {
@@ -221,6 +225,7 @@ public class EstablishmentManager {
         
         _transport.addRemotePeerState(peer);
         
+        _context.statManager().addRateData("udp.inboundEstablishTime", state.getLifetime(), 0);
         sendOurInfo(peer);
     }
     
@@ -250,6 +255,7 @@ public class EstablishmentManager {
         
         _transport.addRemotePeerState(peer);
         
+        _context.statManager().addRateData("udp.outboundEstablishTime", state.getLifetime(), 0);
         sendOurInfo(peer);
         
         while (true) {
@@ -343,6 +349,7 @@ public class EstablishmentManager {
                 } else if (cur.getLifetime() > MAX_ESTABLISH_TIME) {
                     // took too long, fuck 'em
                     iter.remove();
+                    _context.statManager().addRateData("udp.inboundEstablishFailedState", cur.getState(), cur.getLifetime());
                     if (_log.shouldLog(Log.DEBUG))
                         _log.debug("Removing expired inbound state");
                 } else {
@@ -430,6 +437,7 @@ public class EstablishmentManager {
                     // took too long, fuck 'em
                     iter.remove();
                     outboundState = cur;
+                    _context.statManager().addRateData("udp.outboundEstablishFailedState", cur.getState(), cur.getLifetime());
                     if (_log.shouldLog(Log.DEBUG))
                         _log.debug("Removing expired outbound: " + cur);
                     break;

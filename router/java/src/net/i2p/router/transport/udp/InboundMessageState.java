@@ -25,6 +25,7 @@ public class InboundMessageState {
      */
     private int _lastFragment;
     private long _receiveBegin;
+    private int _completeSize;
     
     /** expire after 30s */
     private static final long MAX_RECEIVE_TIME = 10*1000;
@@ -39,6 +40,7 @@ public class InboundMessageState {
         _from = from;
         _fragments = new ByteArray[MAX_FRAGMENTS];
         _lastFragment = -1;
+        _completeSize = -1;
         _receiveBegin = ctx.clock().now();
     }
     
@@ -86,10 +88,13 @@ public class InboundMessageState {
     public Hash getFrom() { return _from; }
     public long getMessageId() { return _messageId; }
     public synchronized int getCompleteSize() {
-        int size = 0;
-        for (int i = 0; i <= _lastFragment; i++)
-            size += _fragments[i].getValid();
-        return size;
+        if (_completeSize < 0) {
+            int size = 0;
+            for (int i = 0; i <= _lastFragment; i++)
+                size += _fragments[i].getValid();
+            _completeSize = size;
+        }
+        return _completeSize;
     }
     
     public void releaseResources() {

@@ -85,6 +85,11 @@ public class PeerState {
     /** how many bytes can we send to the peer in the current second */
     private volatile int _sendWindowBytesRemaining;
     private long _lastSendRefill;
+    private int _sendBps;
+    private int _sendBytes;
+    private int _receiveBps;
+    private int _receiveBytes;
+    private long _receivePeriodBegin;
     private volatile long _lastCongestionOccurred;
     /** 
      * when sendWindowBytes is below this, grow the window size quickly,
@@ -131,6 +136,8 @@ public class PeerState {
     private static final int MINIMUM_WINDOW_BYTES = DEFAULT_SEND_WINDOW_BYTES;
     private static final int MAX_SEND_WINDOW_BYTES = 1024*1024;
     private static final int DEFAULT_MTU = 1472;
+    private static final int MIN_RTO = ACKSender.ACK_FREQUENCY + 100;
+    private static final int MAX_RTO = 5000;
     
     public PeerState(I2PAppContext ctx) {
         _context = ctx;
@@ -154,6 +161,10 @@ public class PeerState {
         _sendWindowBytesRemaining = DEFAULT_SEND_WINDOW_BYTES;
         _slowStartThreshold = MAX_SEND_WINDOW_BYTES/2;
         _lastSendRefill = _context.clock().now();
+        _receivePeriodBegin = _lastSendRefill;
+        _sendBps = 0;
+        _sendBytes = 0;
+        _receiveBps = 0;
         _lastCongestionOccurred = -1;
         _remoteIP = null;
         _remotePort = -1;
@@ -309,6 +320,9 @@ public class PeerState {
     public void setLastSendTime(long when) { _lastSendTime = when; }
     /** when did we last receive a packet from them? */
     public void setLastReceiveTime(long when) { _lastReceiveTime = when; }
+    /** return the smoothed send transfer rate */
+    public int getSendBps() { return _sendBps; }
+    public int getReceiveBps() { return _receiveBps; }
     public int incrementConsecutiveFailedSends() { 
         long now = _context.clock().now()/(10*1000);
         if (_lastFailedSendPeriod >= now) {
@@ -333,13 +347,18 @@ public class PeerState {
      */
     public boolean allocateSendingBytes(int size) { 
         long now = _context.clock().now();
-        if (_lastSendRefill + 1000 <= now) {
+        long duration = now - _lastSendRefill;
+        if (duration >= 1000) {
             _sendWindowBytesRemaining = _sendWindowBytes;
+            _sendBytes += size;
+            _sendBps = (int)(0.9f*(float)_sendBps + 0.1f*((float)_sendBytes * (1000f/(float)duration)));
+            _sendBytes = 0;
             _lastSendRefill = now;
         }
         //if (true) return true;
         if (size <= _sendWindowBytesRemaining) {
             _sendWindowBytesRemaining -= size; 
+            _sendBytes += size;
             _lastSendTime = now;
             return true;
         } else {
@@ -374,10 +393,21 @@ public class PeerState {
     public int getSlowStartThreshold() { return _slowStartThreshold; }
     
     /** we received the message specified completely */
-    public void messageFullyReceived(Long messageId) {
+    public void messageFullyReceived(Long messageId, int bytes) {
+        if (bytes > 0)
+            _receiveBytes += bytes;
+        
+        long now = _context.clock().now();
+        long duration = now - _receivePeriodBegin;
+        if (duration >= 1000) {
+            _receiveBps = (int)(0.9f*(float)_receiveBps + 0.1f*((float)_receiveBytes * (1000f/(float)duration)));
+            _receiveBytes = 0;
+            _receivePeriodBegin = now;
+        }
+        
         synchronized (_currentACKs) {
             if (_wantACKSendSince <= 0)
-                _wantACKSendSince = _context.clock().now();
+                _wantACKSendSince = now;
             if (!_currentACKs.contains(messageId))
                 _currentACKs.add(messageId);
         }
@@ -454,10 +484,10 @@ public class PeerState {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Recalculating timeouts w/ lifetime=" + lifetime + ": rtt=" + _rtt
                        + " rttDev=" + _rttDeviation + " rto=" + _rto);
-        if (_rto < 1000)
-            _rto = 1000;
-        if (_rto > 5000)
-            _rto = 5000;
+        if (_rto < MIN_RTO)
+            _rto = MIN_RTO;
+        if (_rto > MAX_RTO)
+            _rto = MAX_RTO;
     }
     /** we are resending a packet, so lets jack up the rto */
     public void messageRetransmitted() { 
