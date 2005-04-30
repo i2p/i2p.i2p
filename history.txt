@@ -1,4 +1,7 @@
-$Id: history.txt,v 1.200 2005/04/28 16:54:27 jrandom Exp $
+$Id: history.txt,v 1.201 2005/04/29 01:24:15 jrandom Exp $
+
+2005-04-30  jrandom
+    * Reduced some SimpleTimer churn
 
 2005-04-29  jrandom
     * Reduce the peer profile stat coallesce overhead by inlining it with the 

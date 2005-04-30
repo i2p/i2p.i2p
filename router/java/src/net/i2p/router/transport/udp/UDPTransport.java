@@ -48,6 +48,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     private EstablishmentManager _establisher;
     private MessageQueue _outboundMessages;
     private OutboundMessageFragments _fragments;
+    private OutboundMessageFragments.ActiveThrottle _activeThrottle;
     private OutboundRefiller _refiller;
     private PacketPusher _pusher;
     private InboundMessageFragments _inboundFragments;
@@ -101,13 +102,15 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         _peersByRelayTag = new HashMap(128);
         _endpoint = null;
         
-        _outboundMessages = new TimedWeightedPriorityMessageQueue(ctx, PRIORITY_LIMITS, PRIORITY_WEIGHT, this);
+        TimedWeightedPriorityMessageQueue mq = new TimedWeightedPriorityMessageQueue(ctx, PRIORITY_LIMITS, PRIORITY_WEIGHT, this);
+        _outboundMessages = mq;
+        _activeThrottle = mq;
         _relayPeers = new ArrayList(1);
 
         _fastBid = new SharedBid(50);
         _slowBid = new SharedBid(1000);
         
-        _fragments = new OutboundMessageFragments(_context, this);
+        _fragments = new OutboundMessageFragments(_context, this, _activeThrottle);
         _inboundFragments = new InboundMessageFragments(_context, _fragments, this);
         _flooder = new UDPFlooder(_context, this);
         
@@ -314,6 +317,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             }
         }
         
+        _activeThrottle.unchoke(peer.getRemotePeer());
         _context.shitlist().unshitlistRouter(peer.getRemotePeer());
 
         if (SHOULD_FLOOD_PEERS)
@@ -340,6 +344,9 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                 _peersByRemoteHost.remove(remoteString);
             }
         }
+        
+        // unchoke 'em, but just because we'll never talk again...
+        _activeThrottle.unchoke(peer.getRemotePeer());
         
         if (SHOULD_FLOOD_PEERS)
             _flooder.removePeer(peer);
@@ -569,6 +576,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             }
             buf.append(':').append(peer.getRemotePort());
             buf.append("</a>");
+            if (_activeThrottle.isChoked(peer.getRemotePeer()))
+                buf.append(" [choked]");
             if (peer.getConsecutiveFailedSends() > 0)
                 buf.append(" [").append(peer.getConsecutiveFailedSends()).append(" failures]");
             buf.append("</td>");

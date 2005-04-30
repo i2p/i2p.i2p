@@ -17,21 +17,6 @@ abstract class SchedulerImpl implements TaskScheduler {
     }
     
     protected void reschedule(long msToWait, Connection con) {
-        SimpleTimer.getInstance().addEvent(new ConEvent(con), msToWait);
-    }
-    
-    private class ConEvent implements SimpleTimer.TimedEvent {
-        private Connection _connection;
-        private Exception _addedBy;
-        public ConEvent(Connection con) { 
-            _connection = con; 
-            //_addedBy = new Exception("added by");
-        }
-        public void timeReached() {
-            //if (_log.shouldLog(Log.DEBUG))
-            //    _log.debug("firing event on " + _connection, _addedBy);
-            _connection.eventOccurred(); 
-        }
-        public String toString() { return "event on " + _connection; }
+        SimpleTimer.getInstance().addEvent(con.getConnectionEvent(), msToWait);
     }
 }

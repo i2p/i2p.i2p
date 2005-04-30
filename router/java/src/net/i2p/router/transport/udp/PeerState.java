@@ -136,7 +136,7 @@ public class PeerState {
     private static final int MINIMUM_WINDOW_BYTES = DEFAULT_SEND_WINDOW_BYTES;
     private static final int MAX_SEND_WINDOW_BYTES = 1024*1024;
     private static final int DEFAULT_MTU = 1472;
-    private static final int MIN_RTO = ACKSender.ACK_FREQUENCY + 100;
+    private static final int MIN_RTO = 600;
     private static final int MAX_RTO = 5000;
     
     public PeerState(I2PAppContext ctx) {
@@ -179,6 +179,8 @@ public class PeerState {
         _rto = 6000;
         _messagesReceived = 0;
         _messagesSent = 0;
+        _context.statManager().createRateStat("udp.congestionOccurred", "How large the cwin was when congestion occurred (duration == sendBps)", "udp", new long[] { 60*60*1000, 24*60*60*1000 });
+        _context.statManager().createRateStat("udp.congestedRTO", "retransmission timeout after congestion (duration == rtt dev)", "udp", new long[] { 60*60*1000, 24*60*60*1000 });
     }
     
     /**
@@ -425,6 +427,8 @@ public class PeerState {
             return false; // only shrink once every 10 seconds
         _lastCongestionOccurred = now;
         
+        _context.statManager().addRateData("udp.congestionOccurred", _sendWindowBytes, _sendBps);
+        
         //if (true)
         //    _sendWindowBytes -= 10000;
         //else
@@ -469,6 +473,12 @@ public class PeerState {
         if (_sendWindowBytes > MAX_SEND_WINDOW_BYTES)
             _sendWindowBytes = MAX_SEND_WINDOW_BYTES;
         _lastReceiveTime = _context.clock().now();
+        
+        if (_sendWindowBytesRemaining + bytesACKed <= _sendWindowBytes)
+            _sendWindowBytesRemaining += bytesACKed;
+        else
+            _sendWindowBytesRemaining = _sendWindowBytes;
+        
         _messagesSent++;
         if (numSends <= 2)
             recalculateTimeouts(lifetime);
@@ -492,6 +502,7 @@ public class PeerState {
     /** we are resending a packet, so lets jack up the rto */
     public void messageRetransmitted() { 
         congestionOccurred();
+        _context.statManager().addRateData("udp.congestedRTO", _rto, _rttDeviation);
         //_rto *= 2; 
     }
     /** how long does it usually take to get a message ACKed? */

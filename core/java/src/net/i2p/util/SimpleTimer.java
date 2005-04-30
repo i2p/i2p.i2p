@@ -45,7 +45,10 @@ public class SimpleTimer {
     }
     
     /**
-     * Queue up the given event to be fired no sooner than timeoutMs from now
+     * Queue up the given event to be fired no sooner than timeoutMs from now.
+     * However, if this event is already scheduled, the event will be scheduled
+     * for the earlier of the two timeouts, which may be before this stated 
+     * timeout.  If this is not the desired behavior, call removeEvent first.
      *
      */
     public void addEvent(TimedEvent event, long timeoutMs) {
@@ -55,8 +58,15 @@ public class SimpleTimer {
         Long time = new Long(eventTime);
         synchronized (_events) {
             // remove the old scheduled position, then reinsert it
-            if (_eventTimes.containsKey(event))
-                _events.remove(_eventTimes.get(event));
+            Long oldTime = (Long)_eventTimes.get(event);
+            if (oldTime != null) {
+                if (oldTime.longValue() < eventTime) {
+                    _events.notifyAll();
+                    return; // already scheduled for sooner than requested
+                } else {
+                    _events.remove(oldTime);
+                }
+            }
             while (_events.containsKey(time))
                 time = new Long(time.longValue() + 1);
             _events.put(time, event);

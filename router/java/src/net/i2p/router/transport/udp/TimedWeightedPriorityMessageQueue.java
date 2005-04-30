@@ -2,8 +2,11 @@ package net.i2p.router.transport.udp;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
+import net.i2p.data.Hash;
 import net.i2p.router.OutNetMessage;
 import net.i2p.router.RouterContext;
 import net.i2p.util.I2PThread;
@@ -14,7 +17,7 @@ import net.i2p.util.Log;
  * with code to fail messages that expire.  
  *
  */
-public class TimedWeightedPriorityMessageQueue implements MessageQueue {
+public class TimedWeightedPriorityMessageQueue implements MessageQueue, OutboundMessageFragments.ActiveThrottle {
     private RouterContext _context;
     private Log _log;
     /** FIFO queue of messages in a particular priority */
@@ -39,6 +42,8 @@ public class TimedWeightedPriorityMessageQueue implements MessageQueue {
     private volatile boolean _addedSincePassBegan;
     private Expirer _expirer;
     private FailedListener _listener;
+    /** set of peers (Hash) whose congestion window is exceeded in the active queue */
+    private Set _chokedPeers;
     
     /**
      * Build up a new queue
@@ -69,6 +74,7 @@ public class TimedWeightedPriorityMessageQueue implements MessageQueue {
         _alive = true;
         _nextLock = this;
         _nextQueue = 0;
+        _chokedPeers = new HashSet(16);
         _listener = lsnr;
         _context.statManager().createRateStat("udp.timeToEntrance", "Message lifetime until it reaches the UDP system", "udp", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
         _context.statManager().createRateStat("udp.messageQueueSize", "How many messages are on the current class queue at removal", "udp", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
@@ -114,8 +120,16 @@ public class TimedWeightedPriorityMessageQueue implements MessageQueue {
             for (int i = 0; i < _queue.length; i++) {
                 int currentQueue = (_nextQueue + i) % _queue.length;
                 synchronized (_queue[currentQueue]) {
-                    if (_queue[currentQueue].size() > 0) {
-                        OutNetMessage msg = (OutNetMessage)_queue[currentQueue].remove(0);
+                    for (int j = 0; j < _queue[currentQueue].size(); j++) {
+                        OutNetMessage msg = (OutNetMessage)_queue[currentQueue].get(j);
+                        Hash to = msg.getTarget().getIdentity().getHash();
+                        synchronized (_nextLock) { // yikes!
+                            if (_chokedPeers.contains(to))
+                                continue;
+                        }
+                        // not choked, lets push it to active
+                        _queue[currentQueue].remove(j);
+                        
                         long size = msg.getMessageSize();
                         _bytesQueued[currentQueue] -= size;
                         _bytesTransferred[currentQueue] += size;
@@ -129,12 +143,12 @@ public class TimedWeightedPriorityMessageQueue implements MessageQueue {
                             _log.debug("Pulling a message off queue " + currentQueue + " with " 
                                        + _queue[currentQueue].size() + " remaining");
                         return msg;
-                    } else {
-                        // nothing waiting
-                        _messagesFlushed[currentQueue] = 0;
-                        if (_log.shouldLog(Log.DEBUG))
-                            _log.debug("Nothing on queue " + currentQueue);
                     }
+                    
+                    // nothing waiting, or only choked peers
+                    _messagesFlushed[currentQueue] = 0;
+                    if (_log.shouldLog(Log.DEBUG))
+                        _log.debug("Nothing available on queue " + currentQueue);
                 }
             }
             
@@ -170,6 +184,26 @@ public class TimedWeightedPriorityMessageQueue implements MessageQueue {
         _alive = false;
         synchronized (_nextLock) {
             _nextLock.notifyAll();
+        }
+    }
+    
+    public void choke(Hash peer) {
+        if (true) return;
+        synchronized (_nextLock) {
+            _chokedPeers.add(peer);
+            _nextLock.notifyAll();
+        }
+    }
+    public void unchoke(Hash peer) {
+        if (true) return;
+        synchronized (_nextLock) {
+            _chokedPeers.remove(peer);
+            _nextLock.notifyAll();
+        }
+    }
+    public boolean isChoked(Hash peer) {
+        synchronized (_nextLock) {
+            return _chokedPeers.contains(peer);
         }
     }
     

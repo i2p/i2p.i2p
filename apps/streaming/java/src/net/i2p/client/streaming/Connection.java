@@ -65,6 +65,7 @@ public class Connection {
     private Object _connectLock;
     /** how many messages have been resent and not yet ACKed? */
     private int _activeResends;
+    private ConEvent _connectionEvent;
     
     private long _lifetimeBytesSent;
     private long _lifetimeBytesReceived;
@@ -116,6 +117,7 @@ public class Connection {
         _connectLock = new Object();
         _activeResends = 0;
         _resetSentOn = -1;
+        _connectionEvent = new ConEvent();
         _context.statManager().createRateStat("stream.con.windowSizeAtCongestion", "How large was our send window when we send a dup?", "Stream", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
         _context.statManager().createRateStat("stream.chokeSizeBegin", "How many messages were outstanding when we started to choke?", "Stream", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
         _context.statManager().createRateStat("stream.chokeSizeEnd", "How many messages were outstanding when we stopped being choked?", "Stream", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
@@ -805,6 +807,24 @@ public class Connection {
         
         buf.append("]");
         return buf.toString();
+    }
+
+    public SimpleTimer.TimedEvent getConnectionEvent() { return _connectionEvent; }
+    
+    /**
+     * fired to reschedule event notification
+     */
+    class ConEvent implements SimpleTimer.TimedEvent {
+        private Exception _addedBy;
+        public ConEvent() { 
+            //_addedBy = new Exception("added by");
+        }
+        public void timeReached() {
+            //if (_log.shouldLog(Log.DEBUG))
+            //    _log.debug("firing event on " + _connection, _addedBy);
+            eventOccurred(); 
+        }
+        public String toString() { return "event on " + Connection.this.toString(); }
     }
     
     /**

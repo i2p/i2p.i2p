@@ -114,6 +114,29 @@ public class OutboundMessageState {
         // nothing else pending ack
         return true;
     }
+    public synchronized int getUnackedSize() {
+        int rv = 0;
+        if ( (_messageBuf != null) && (_fragmentSends != null) ) {
+            int totalSize = _messageBuf.getValid();
+            int lastSize = totalSize % _fragmentSize;
+            if (lastSize == 0)
+                lastSize = _fragmentSize;
+            for (int i = 0; i < _fragmentSends.length; i++) {
+                if (_fragmentSends[i] >= (short)0) {
+                    if (i + 1 == _fragmentSends.length)
+                        rv += lastSize;
+                    else
+                        rv += _fragmentSize;
+                }
+            }
+        }
+        return rv;
+    }
+    public synchronized boolean needsSending(int fragment) {
+        if ( (_fragmentSends == null) || (fragment >= _fragmentSends.length) || (fragment < 0) )
+            return false;
+        return (_fragmentSends[fragment] >= (short)0);
+    }
     public long getLifetime() { return _context.clock().now() - _startedOn; }
     
     /**
@@ -133,7 +156,16 @@ public class OutboundMessageState {
     public int getMaxSends() { return _maxSends; }
     public int getPushCount() { return _pushCount; }
     /** note that we have pushed the message fragments */
-    public void push() { _pushCount++; }
+    public synchronized void push() { 
+        _pushCount++; 
+        if (_pushCount > _maxSends)
+            _maxSends = (short)_pushCount;
+        if (_fragmentSends != null)
+            for (int i = 0; i < _fragmentSends.length; i++)
+                if (_fragmentSends[i] >= (short)0)
+                    _fragmentSends[i] = (short)(1 + _fragmentSends[i]);
+        
+    }
     public boolean isFragmented() { return _fragmentSends != null; }
     /**
      * Prepare the message for fragmented delivery, using no more than
