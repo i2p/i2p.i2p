@@ -70,6 +70,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     private TransportBid _fastBid;
     /** shared slow bid for unconnected peers */
     private TransportBid _slowBid;
+    /** shared slow bid for unconnected peers when we want to prefer UDP */
+    private TransportBid _slowPreferredBid;
 
     public static final String STYLE = "SSUv1";
     public static final String PROP_INTERNAL_PORT = "i2np.udp.internalPort";
@@ -78,6 +80,13 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     public static final String PROP_EXTERNAL_HOST = "i2np.udp.host";
     /** define this to explicitly set an external port */
     public static final String PROP_EXTERNAL_PORT = "i2np.udp.port";
+    /** 
+     * If i2np.udp.alwaysPreferred is set, the UDP bids will always be under 
+     * the bid from the TCP transport - even if a TCP connection already 
+     * exists.  The default is to prefer UDP unless no UDP session exists and 
+     * a TCP connection already exists.
+     */
+    public static final String PROP_ALWAYS_PREFER_UDP = "i2np.udp.alwaysPreferred";
     
     
     /** how many relays offered to us will we use at a time? */
@@ -109,6 +118,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
 
         _fastBid = new SharedBid(50);
         _slowBid = new SharedBid(1000);
+        _slowPreferredBid = new SharedBid(75);
         
         _fragments = new OutboundMessageFragments(_context, this, _activeThrottle);
         _inboundFragments = new InboundMessageFragments(_context, _fragments, this);
@@ -371,8 +381,16 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
 
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("bidding on a message to an unestablished peer: " + to.toBase64());
-            return _slowBid;
+            if (alwaysPreferUDP())
+                return _slowPreferredBid;
+            else
+                return _slowBid;
         }
+    }
+
+    private boolean alwaysPreferUDP() {
+        String pref = _context.getProperty(PROP_ALWAYS_PREFER_UDP);
+        return (pref != null) && "true".equals(pref);
     }
     
     public String getStyle() { return STYLE; }
@@ -561,10 +579,12 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             
             buf.append("<tr>");
             
+            String name = peer.getRemotePeer().toBase64().substring(0,6);
             buf.append("<td nowrap>");
-            buf.append("<a href=\"#");
-            buf.append(peer.getRemotePeer().toBase64().substring(0,6));
+            buf.append("<a href=\"netdb.jsp#");
+            buf.append(name);
             buf.append("\">");
+            buf.append(name).append("@");
             byte ip[] = peer.getRemoteIP();
             for (int j = 0; j < ip.length; j++) {
                 buf.append(ip[j] & 0xFF);

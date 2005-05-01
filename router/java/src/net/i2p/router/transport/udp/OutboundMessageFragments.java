@@ -129,11 +129,12 @@ public class OutboundMessageFragments {
         synchronized (_activeMessages) {
             for (int i = 0; i < _activeMessages.size(); i++) {
                 OutboundMessageState state = (OutboundMessageState)_activeMessages.get(i);
+                PeerState peer = state.getPeer();
                 if (state.isComplete()) {
                     _activeMessages.remove(i);
                     _transport.succeeded(state.getMessage());
-                    if (state.getPeer().getSendWindowBytesRemaining() > 0)
-                        _throttle.unchoke(state.getPeer().getRemotePeer());
+                    if ( (peer != null) && (peer.getSendWindowBytesRemaining() > 0) )
+                        _throttle.unchoke(peer.getRemotePeer());
                     state.releaseResources();
                     if (i < _nextPacketMessage) {
                         _nextPacketMessage--; 
@@ -153,8 +154,8 @@ public class OutboundMessageFragments {
                         if (_log.shouldLog(Log.WARN))
                             _log.warn("Unable to send an expired direct message: " + state);
                     }
-                    if (state.getPeer().getSendWindowBytesRemaining() > 0)
-                        _throttle.unchoke(state.getPeer().getRemotePeer());
+                    if ( (peer != null) && (peer.getSendWindowBytesRemaining() > 0) )
+                        _throttle.unchoke(peer.getRemotePeer());
                     state.releaseResources();
                     if (i < _nextPacketMessage) {
                         _nextPacketMessage--; 
@@ -176,8 +177,8 @@ public class OutboundMessageFragments {
                         if (_log.shouldLog(Log.WARN))
                             _log.warn("Unable to send a direct message after too many volleys: " + state);
                     }
-                    if (state.getPeer().getSendWindowBytesRemaining() > 0)
-                        _throttle.unchoke(state.getPeer().getRemotePeer());
+                    if ( (peer != null) && (peer.getSendWindowBytesRemaining() > 0) )
+                        _throttle.unchoke(peer.getRemotePeer());
                     state.releaseResources();
                     if (i < _nextPacketMessage) {
                         _nextPacketMessage--; 
@@ -226,8 +227,8 @@ public class OutboundMessageFragments {
                             _transport.failed(state);
                             if (_log.shouldLog(Log.WARN))
                                 _log.warn("Peer disconnected for " + state);
-                            if (state.getPeer().getSendWindowBytesRemaining() > 0)
-                                _throttle.unchoke(state.getPeer().getRemotePeer());
+                            if ( (peer != null) && (peer.getSendWindowBytesRemaining() > 0) )
+                                _throttle.unchoke(peer.getRemotePeer());
                             state.releaseResources();
                             i--;
                         }

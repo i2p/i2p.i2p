@@ -102,6 +102,13 @@ public class ACKSender implements Runnable {
                     if (_log.shouldLog(Log.INFO))
                         _log.info("Sending ACK for " + acks);
                     _transport.send(ack);
+                    
+                    if (wanted == peer.getWantedACKSendSince()) {
+                        // still packets left to be ACKed, since wanted time
+                        // is reset by retrieveACKs when all of the IDs are
+                        // removed
+                        ackPeer(peer);
+                    }
                 }
             }
         }

@@ -135,7 +135,12 @@ public class PeerState {
     private static final int DEFAULT_SEND_WINDOW_BYTES = 8*1024;
     private static final int MINIMUM_WINDOW_BYTES = DEFAULT_SEND_WINDOW_BYTES;
     private static final int MAX_SEND_WINDOW_BYTES = 1024*1024;
-    private static final int DEFAULT_MTU = 1472;
+    /*
+     * 576 gives us 568 IP byes, 548 UDP bytes, and with an SSU data message, 
+     * 502 fragment bytes, which is enough to send a tunnel data message in 2 
+     * packets.
+     */
+    private static final int DEFAULT_MTU = 576;
     private static final int MIN_RTO = 600;
     private static final int MAX_RTO = 5000;
     
@@ -150,7 +155,7 @@ public class PeerState {
         _nextKeyingMaterial = null;
         _rekeyBeganLocally = false;
         _keyEstablishedTime = -1;
-        _clockSkew = Short.MIN_VALUE;
+        _clockSkew = 0;
         _currentReceiveSecond = -1;
         _lastSendTime = -1;
         _lastReceiveTime = -1;

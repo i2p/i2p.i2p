@@ -258,8 +258,8 @@ public class PacketHandler {
         receivePacket(reader, packet);
     }
 
-    /** let packets be up to 5s slow */
-    private static final long GRACE_PERIOD = Router.CLOCK_FUDGE_FACTOR + 5*1000;
+    /** let packets be up to 30s slow */
+    private static final long GRACE_PERIOD = Router.CLOCK_FUDGE_FACTOR + 30*1000;
     
     /**
      * Parse out the interesting bits and honor what it says
@@ -279,8 +279,11 @@ public class PacketHandler {
             return;
         }
         
-        if (state != null)
+        if (state != null) {
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Received packet from " + state.getRemoteHostString() + " with skew " + skew);
             state.adjustClockSkew((short)skew);
+        }
         
         _context.statManager().addRateData("udp.receivePacketSkew", skew, packet.getLifetime());
         

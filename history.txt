@@ -1,4 +1,7 @@
-$Id: history.txt,v 1.202 2005/04/30 18:26:19 jrandom Exp $
+$Id: history.txt,v 1.203 2005/04/30 19:48:15 jrandom Exp $
+
+2005-05-01  jrandom
+    * Cleaned up the peers page a bit more.
 
 2005-04-30  jrandom
     * Added a small new page to the web console (/peers.jsp) which contains 
