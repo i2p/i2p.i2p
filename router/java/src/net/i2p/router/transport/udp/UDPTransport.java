@@ -567,10 +567,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             buf.append("\">");
             byte ip[] = peer.getRemoteIP();
             for (int j = 0; j < ip.length; j++) {
-                if (ip[j] < 0)
-                    buf.append(ip[j] + 255);
-                else
-                    buf.append(ip[j]);
+                buf.append(ip[j] & 0xFF);
                 if (j + 1 < ip.length)
                     buf.append('.');
             }

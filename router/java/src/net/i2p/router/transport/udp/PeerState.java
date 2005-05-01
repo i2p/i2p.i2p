@@ -557,7 +557,7 @@ public class PeerState {
     public static String calculateRemoteHostString(byte ip[], int port) {
         StringBuffer buf = new StringBuffer(ip.length * 4 + 5);
         for (int i = 0; i < ip.length; i++)
-            buf.append((int)ip[i]).append('.');
+            buf.append(ip[i]&0xFF).append('.');
         buf.append(port);
         return buf.toString();
     }
