@@ -1,4 +1,9 @@
-$Id: history.txt,v 1.201 2005/04/29 01:24:15 jrandom Exp $
+$Id: history.txt,v 1.202 2005/04/30 18:26:19 jrandom Exp $
+
+2005-04-30  jrandom
+    * Added a small new page to the web console (/peers.jsp) which contains 
+      the peer connection information.  This will be cleaned up a lot more 
+      before 0.6 is out, but its a start.
 
 2005-04-30  jrandom
     * Reduced some SimpleTimer churn

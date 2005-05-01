@@ -16,6 +16,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 import net.i2p.data.Hash;
 import net.i2p.data.RouterAddress;
 import net.i2p.data.RouterIdentity;
@@ -176,8 +177,16 @@ public class TransportManager implements TransportEventListener {
     }
     
     public void renderStatusHTML(Writer out) throws IOException {
-        StringBuffer buf = new StringBuffer(8*1024);
-        buf.append("<h2>Transport Manager</h2>\n");
+        TreeMap transports = new TreeMap();
+        for (int i = 0; i < _transports.size(); i++) {
+            Transport t = (Transport)_transports.get(i);
+            transports.put(t.getStyle(), t);
+        }
+        for (Iterator iter = transports.values().iterator(); iter.hasNext(); ) {
+            Transport t= (Transport)iter.next();
+            t.renderStatusHTML(out);
+        }
+        StringBuffer buf = new StringBuffer(4*1024);
         buf.append("Listening on: <br /><pre>\n");
         for (int i = 0; i < _transports.size(); i++) {
             Transport t = (Transport)_transports.get(i);
@@ -186,14 +195,6 @@ public class TransportManager implements TransportEventListener {
         }
         buf.append("</pre>\n");
         out.write(buf.toString());
-        for (Iterator iter = _transports.iterator(); iter.hasNext(); ) {
-            Transport t = (Transport)iter.next();
-            //String str = t.renderStatusHTML();
-            //if (str != null)
-            //    buf.append(str);
-            t.renderStatusHTML(out);
-        }
-        //out.write(buf.toString());
         out.flush();
     }
 }
