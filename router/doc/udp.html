@@ -1,4 +1,4 @@
-<code>$Id: udp.html,v 1.11 2005/04/08 18:20:45 jrandom Exp $</code>
+<code>$Id: udp.html,v 1.12 2005/04/09 18:15:53 jrandom Exp $</code>
 
 <h1>Secure Semireliable UDP (SSU)</h1>
 <b>DRAFT</b>
@@ -346,8 +346,8 @@ bits 4-7: total identity fragments</pre></li>
     <td><ul>
         <li>1 byte flags:<pre>
    bit 0: explicit ACKs included
-   bit 1: explicit NACKs included
-   bit 2: numACKs included
+   bit 1: ACK bitfields included
+   bit 2: reserved
    bit 3: explicit congestion notification
    bit 4: request previous ACKs
    bit 5: want reply
@@ -357,24 +357,46 @@ bits 4-7: total identity fragments</pre></li>
 	  <li>a 1 byte number of ACKs</li>
           <li>that many 4 byte MessageIds being fully ACKed</li>
 	  </ul></li>
-        <li>if explicit NACKs are included:<ul>
-          <li>a 1 byte number of NACKs</li>
-          <li>that many 4 byte MessageIds + 1 byte fragmentNum NACKs</li>
+        <li>if ACK bitfields are included:<ul>
+          <li>a 1 byte number of ACK bitfields</li>
+          <li>that many 4 byte MessageIds + a 1 or more byte ACK bitfield.
+              The bitfield uses the 7 low bits of each byte, with the high
+              bit specifying whether an additional bitfield byte follows it
+              (1 = true, 0 = the current bitfield byte is the last).  These
+              sequence of 7 bit arrays represent whether a fragment has been
+              received - if a bit is 1, the fragment has been received.  To 
+              clarify, assuming fragments 0, 2, 5, and 9 have been received,
+              the bitfield bytes would be as follows:<pre>
+byte 0
+   bit 0: 1 (further bitfield bytes follow)
+   bit 1: 1 (fragment 0 received)
+   bit 2: 0 (fragment 1 not received)
+   bit 3: 1 (fragment 2 received)
+   bit 4: 0 (fragment 3 not received)
+   bit 5: 0 (fragment 4 not received)
+   bit 6: 1 (fragment 5 received)
+   bit 7: 0 (fragment 6 not received)
+byte 1
+   bit 0: 0 (no further bitfield bytes)
+   bit 1: 0 (fragment 7 not received)
+   bit 1: 0 (fragment 8 not received)
+   bit 1: 1 (fragment 9 received)
+   bit 1: 0 (fragment 10 not received)
+   bit 1: 0 (fragment 11 not received)
+   bit 1: 0 (fragment 12 not received)
+   bit 1: 0 (fragment 13 not received)</pre></li>
 	  </ul></li>
-        <li>if numACKs included:<ul>
-          <li>a 2 byte number for how many messages were fully 
-              received in the last minute.</li></ul></li>
         <li>If extended data included:<ul>
           <li>1 byte data size</li>
           <li>that many bytes of extended data (currently uninterpreted)</li</ul></li>
         <li>1 byte number of fragments</li>
         <li>that many message fragments:<ul>
           <li>4 byte messageId</li>
-          <li>1 byte fragment info:<pre>
-bits 0-4: fragment #
-   bit 5: isLast (1 = true)
-bits 6-7: unused</pre></li>
-          <li>2 byte fragment size</li>
+          <li>3 byte fragment info:<pre>
+  bits 0-6: fragment #
+     bit 7: isLast (1 = true)
+  bits 8-9: unused
+bits 10-23: fragment size</pre></li>
           <li>that many bytes</li></ul>
         <li>N bytes padding, uninterpreted</li>
 	</ul></td></tr>
@@ -386,22 +408,22 @@ bits 6-7: unused</pre></li>
  +----+----+----+----+----+----+----+----+
  |flag| (additional headers, determined  |
  +----+                                  |
- | by the flags, such as ACKs, NACKs, or |
- | simple rate of full ACKs)             |
+ | by the flags, such as ACKs or         |
+ | bitfields                             |
  +----+----+----+----+----+----+----+----+
- |#frg|     messageId     |info|fragSize |
+ |#frg|     messageId     |   frag info  |
  +----+----+----+----+----+----+----+----+
  | that many bytes of fragment data      |
                   .  .  .                                       
  |                                       |
  +----+----+----+----+----+----+----+----+
- |     messageId     |info|fragSize |    |
+ |     messageId     |   frag info  |    |
  +----+----+----+----+----+----+----+    |
  | that many bytes of fragment data      |
                   .  .  .                                       
  |                                       |
  +----+----+----+----+----+----+----+----+
- |     messageId     |info|fragSize |    |
+ |     messageId     |   frag info  |    |
  +----+----+----+----+----+----+----+    |
  | that many bytes of fragment data      |
                   .  .  .                                       
@@ -418,36 +440,24 @@ and the capacity for high throughput allows a great deal of latitude in
 congestion control.  The congestion control algorithm outlined below is
 meant to be both efficient in bandwidth as well as simple to implement.</p>
 
-<p>Data is transmitted in volleys of up to 1 second, sending N bytes within
-P packets.  The volley a packet is a part of is defined by the second field
-in the encrypted <a href="#payload">payload</a>.  The receiver of a volley
-should send back a full set of ACKs and NACKs for message IDs received in
-the previous volley - these ACKs and NACKs should be included in all messages
-sent until either the volley changes again or the the receiver gets a message
-in the current volley stating that the previous ACKs are no longer required.
-Subsequent responses from the receiver in the current volley should not 
-contain the ACKs.</p>
-
-<p>After receiving a volley with at least one data message fragment, the 
-receiver should send back at least one message with the ACKs.  Each time
-subsequent messages arrive on the current volley with the "request previous
-ACKs" flag set, if no messages in the current volley have arrived without
-that being set the receiver should send back a data message with the ACKs,
-if the receiver has the bandwidth to do so.</p>
-
-<p>The number of bytes sent in each volley (N) should be initialized as
-8192 bytes (an arbitrarily high value).  At the beginning of a volley, if
-the ACKs/NACKs received for the volley two periods back contain any NACKs,
-N should be set to the minimum of N and the number of bytes fully ACKed,
-though no less than 1/2 of N.  If there were no NACKs and all of the 
-messages sent were ACKed, N is increased by the average packet size.  If 
-a message is received in a volley with the explicit congestion 
-notification bit set, at the beginning of the next volley N is set to 
-1/2 N.</p>
-
-<p>Messages which are partially sent or NACKed have the unsent fragments
-transmitted in the next volley, unless the message expiration occurs, in
-which case it is dropped entirely.</p>
+<p>Packets are scheduled according to the the router's policy, taking care
+not to exceed the router's outbound capacity or to exceed the measured 
+capacity of the remote peer.  The measured capacity should operate along the
+lines of TCP's slow start and congestion avoidance, with additive increases
+to the sending capacity and multiplicative decreases in face of congestion.
+Veering away from TCP, however, routers may give up on some messages after
+a given period or number of retransmissions while continuing to transmit 
+other messages.</p>
+  
+<p>The congestion detection techniques vary from TCP as well, since each 
+message has its own unique and nonsequential identifier, and each message
+has a limited size - at most, 32KB.  To efficiently transmit this feedback
+to the sender, the receiver periodically includes a list of fully ACKed 
+message identifiers and may also include bitfields for partially received
+messages, where each bit represents the reception of a fragment.  If 
+duplicate fragments arrive, the message should be ACKed again, or if the
+message has still not been fully received, the bitfield should be 
+retransmitted with any new updates.</p>
 
 <p>The simplest possible implementation does not need to pad the packets to
 any particular size, but instead just places a single message fragment into
@@ -457,52 +467,6 @@ so long as it doesn't exceed the MTU, but this is not necessary.  Eventually,
 a set of fixed packet sizes may be appropriate to further hide the data 
 fragmentation to external adversaries, but the tunnel, garlic, and end to 
 end padding should be sufficient for most needs until then.</p>
-
-<h3><a name="congestionscenarios">Congestion scenarios</a></h3>
-
-<b>Unidirectional transfer</b><br />
-<pre>
-        Alice                         Bob
-    Data 1, volley 1, no ACKs---------&gt;
-    Data 2, volley 1, no ACKs---------&gt;
-    Data 3, volley 1, no ACKs---------&gt;
-    Data 4, volley 1, no ACKs---------&gt;
-    Data 5, volley 2, want ACKs-------&gt;
-    Data 6, volley 2, want ACKs-------&gt;         // want ACK since ACKs not received
-          &lt;------------------ACK 1, 2, 3, 4     // automatically sent
-          &lt;------------------ACK 1, 2, 3, 4     // sent due to Data 6
-    Data 7, volley 2, no ACKs---------&gt;         // no further ACKs required
-    Data 8, volley 2, no ACKs---------&gt;
-    Data 9, volley 3, want ACKs-------&gt;         // new volley, we want ACKs!
-          &lt;------------------ACK 5, 6, 7, 8     // automatically sent
-    Data 10, volley 3, no ACKs---------&gt;
-    Data 11, volley 3, no ACKs---------&gt;
-    Data 12, volley 3, no ACKs---------&gt;
-          &lt;------------------ACK 9, 10, 11, 12  // automatically sent
-</pre>
-
-<b>Bidirectional transfer</b><br />
-<pre>
-        Alice                                        Bob
-    Data 1, volley 1, no ACKs-------------------------&gt;
-          &lt;-----------------------------Data 1, volley 1, no ACKs
-    Data 2, volley 1, no ACKs-------------------------&gt;
-          &lt;-----------------------------Data 2, volley 1, no ACKs
-    Data 3, volley 1, no ACKs-------------------------&gt;
-          &lt;-----------------------------Data 3, volley 1, no ACKs
-    Data 4, volley 1, no ACKs-------------------------&gt;
-          &lt;-----------------------------Data 4, volley 1, no ACKs
-    Data 5, volley 2, want ACKs, ACK 1, 2, 3, 4-------&gt;              // new volley, send ACKs
-          &lt;---------------Data 5, volley 2, no ACKs, ACK 1, 2, 3, 4  // received ACKs, no need to ask for them
-    Data 6, volley 2, no ACKs-------------------------&gt;
-          &lt;-----------------------------Data 6, volley 2, no ACKs
-    Data 7, volley 2, no ACKs-------------------------&gt;
-          &lt;-----------------------------Data 8, volley 2, no ACKs
-    Data 8, volley 2, no ACKs-------------------------&gt;
-          &lt;-----------------------------Data 9, volley 2, no ACKs
-    ACK 5, 6, 7, 8, 9---------------------------------&gt;
-          &lt;-----------------------------------ACK 5, 6, 7, 8
-</pre>
 
 <h2><a name="keys">Keys</a></h2>
 
@@ -623,7 +587,7 @@ replay prevention - higher layers should take that into account.</p>
  +----+----+----+----+----+----+----+----+
  |flag|        time       |flag|#frg| 
  +----+----+----+----+----+----+----+----+
-   messageId    |info| fragSize|         |
+   messageId    |   frag info  |         |
  +----+----+----+----+----+----+         |
  | that many bytes of fragment data      |
                   .  .  .                                       
