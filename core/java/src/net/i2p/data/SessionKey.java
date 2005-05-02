@@ -24,6 +24,7 @@ import net.i2p.util.Log;
 public class SessionKey extends DataStructureImpl {
     private final static Log _log = new Log(SessionKey.class);
     private byte[] _data;
+    private Object _preparedKey;
 
     public final static int KEYSIZE_BYTES = 32;
 
@@ -38,9 +39,23 @@ public class SessionKey extends DataStructureImpl {
         return _data;
     }
 
+    /**
+     * caveat: this method isn't synchronized with the preparedKey, so don't
+     * try to *change* the key data after already doing some 
+     * encryption/decryption (or if you do change it, be sure this object isn't
+     * mid decrypt)
+     */
     public void setData(byte[] data) {
         _data = data;
+        _preparedKey = null;
     }
+    
+    /** 
+     * retrieve an internal representation of the session key, as known
+     * by the AES engine used.  this can be reused safely
+     */
+    public Object getPreparedKey() { return _preparedKey; }
+    public void setPreparedKey(Object obj) { _preparedKey = obj; }
 
     public void readBytes(InputStream in) throws DataFormatException, IOException {
         _data = new byte[KEYSIZE_BYTES];

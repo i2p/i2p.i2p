@@ -1,4 +1,8 @@
-$Id: history.txt,v 1.203 2005/04/30 19:48:15 jrandom Exp $
+$Id: history.txt,v 1.204 2005/05/01 12:21:50 jrandom Exp $
+
+2005-05-01  jrandom
+    * Added a substantial optimization to the AES engine by caching the
+      prepared session keys (duh).
 
 2005-05-01  jrandom
     * Cleaned up the peers page a bit more.
