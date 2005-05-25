@@ -1,4 +1,7 @@
-$Id: history.txt,v 1.204 2005/05/01 12:21:50 jrandom Exp $
+$Id: history.txt,v 1.205 2005/05/01 21:35:16 jrandom Exp $
+
+2005-05-25  duck
+    * Fixed PRNG bug (bugzilla #107)
 
 2005-05-01  jrandom
     * Added a substantial optimization to the AES engine by caching the

@@ -34,7 +34,9 @@ public class PooledRandomSource extends RandomSource {
     }
 
     private final RandomSource pickPRNG() {
-        return _pool[(_nextPool++) % POOL_SIZE];
+        int i = _nextPool;
+        _nextPool = (_nextPool++) % POOL_SIZE;
+        return _pool[i];
     }
     
     /**
