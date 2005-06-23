@@ -20,10 +20,7 @@ import net.i2p.data.SigningPublicKey;
  *
  * @author jrandom
  */
-class DestinationTest extends StructureTest {
-    static {
-        TestData.registerTest(new DestinationTest(), "Destination");
-    }
+public class DestinationTest extends StructureTest {
     public DataStructure createDataStructure() throws DataFormatException {
         Destination dest = new Destination();
         StructureTest tst = new CertificateTest();

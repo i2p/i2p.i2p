@@ -8,6 +8,8 @@ package net.i2p.data;
  *
  */
 
+import java.io.ByteArrayOutputStream;
+
 import net.i2p.data.Certificate;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.DataStructure;
@@ -20,10 +22,7 @@ import net.i2p.data.SigningPublicKey;
  *
  * @author jrandom
  */
-class RouterIdentityTest extends StructureTest {
-    static {
-        TestData.registerTest(new RouterIdentityTest(), "RouterIdentity");
-    }
+public class RouterIdentityTest extends StructureTest {
     public DataStructure createDataStructure() throws DataFormatException {
         RouterIdentity ident = new RouterIdentity();
         Certificate cert = (Certificate)(new CertificateTest()).createDataStructure();
@@ -35,4 +34,84 @@ class RouterIdentityTest extends StructureTest {
         return ident;
     }
     public DataStructure createStructureToRead() { return new RouterIdentity(); }
+    
+    public void testNullCert() throws Exception{
+        RouterIdentity ident = new RouterIdentity();
+        ident.setCertificate(null);
+        PublicKey pk = (PublicKey)(new PublicKeyTest()).createDataStructure();
+        ident.setPublicKey(pk);
+        SigningPublicKey k = (SigningPublicKey)(new SigningPublicKeyTest()).createDataStructure();
+        ident.setSigningPublicKey(k);
+        
+        boolean error = false;
+        try{
+            ident.writeBytes(new ByteArrayOutputStream());
+        }catch(DataFormatException dfe){
+            error = true;
+        }
+        assertTrue(error);
+    }
+    
+    public void testNullPublicKey() throws Exception{
+        RouterIdentity ident = new RouterIdentity();
+        Certificate cert = (Certificate)(new CertificateTest()).createDataStructure();
+        ident.setCertificate(cert);
+        ident.setPublicKey(null);
+        SigningPublicKey k = (SigningPublicKey)(new SigningPublicKeyTest()).createDataStructure();
+        ident.setSigningPublicKey(k);
+        
+        boolean error = false;
+        try{
+            ident.writeBytes(new ByteArrayOutputStream());
+        }catch(DataFormatException dfe){
+            error = true;
+        }
+        assertTrue(error);
+        
+    }
+    
+    public void testNullSigningKey() throws Exception{
+        RouterIdentity ident = new RouterIdentity();
+        Certificate cert = (Certificate)(new CertificateTest()).createDataStructure();
+        ident.setCertificate(cert);
+        PublicKey pk = (PublicKey)(new PublicKeyTest()).createDataStructure();
+        ident.setPublicKey(pk);
+        ident.setSigningPublicKey(null);
+        
+        boolean error = false;
+        try{
+            ident.writeBytes(new ByteArrayOutputStream());
+        }catch(DataFormatException dfe){
+            error = true;
+        }
+        assertTrue(error);
+    }
+    
+    public void testNullEquals() throws Exception{
+        RouterIdentity ident = new RouterIdentity();
+        assertFalse(ident.equals(null));
+    }
+    
+    public void testCalculatedHash() throws Exception{
+        RouterIdentity ident = new RouterIdentity();
+        Certificate cert = (Certificate)(new CertificateTest()).createDataStructure();
+        ident.setCertificate(cert);
+        PublicKey pk = (PublicKey)(new PublicKeyTest()).createDataStructure();
+        ident.setPublicKey(pk);
+        SigningPublicKey k = (SigningPublicKey)(new SigningPublicKeyTest()).createDataStructure();
+        ident.setSigningPublicKey(k);
+        
+        ident.calculateHash();
+        ident.calculateHash();
+        ident.calculateHash();
+        ident.calculateHash();
+        ident.calculateHash();
+    }
+    
+    public void testBadHash() throws Exception{
+        RouterIdentity ident = new RouterIdentity();
+        ident.getHash();
+    }
+    
+    
 }

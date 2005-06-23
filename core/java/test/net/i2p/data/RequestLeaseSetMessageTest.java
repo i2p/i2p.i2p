@@ -22,10 +22,7 @@ import net.i2p.data.i2cp.SessionId;
  *
  * @author jrandom
  */
-class RequestLeaseSetMessageTest extends StructureTest {
-    static {
-        TestData.registerTest(new RequestLeaseSetMessageTest(), "RequestLeaseSetMessage");
-    }
+public class RequestLeaseSetMessageTest extends StructureTest {
     public DataStructure createDataStructure() throws DataFormatException {
         RequestLeaseSetMessage msg = new RequestLeaseSetMessage();
         msg.setSessionId((SessionId)(new SessionIdTest()).createDataStructure());

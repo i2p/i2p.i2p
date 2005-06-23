@@ -17,10 +17,7 @@ import net.i2p.data.i2cp.AbuseSeverity;
  *
  * @author jrandom
  */
-class AbuseSeverityTest extends StructureTest {
-    static {
-        TestData.registerTest(new AbuseSeverityTest(), "AbuseSeverity");
-    }
+public class AbuseSeverityTest extends StructureTest {
     public DataStructure createDataStructure() throws DataFormatException {
         AbuseSeverity sev = new AbuseSeverity();
         sev.setSeverity(64);

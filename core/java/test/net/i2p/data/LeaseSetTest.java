@@ -21,10 +21,7 @@ import net.i2p.data.SigningPublicKey;
  *
  * @author jrandom
  */
-class LeaseSetTest extends StructureTest {
-    static {
-        TestData.registerTest(new LeaseSetTest(), "LeaseSet");
-    }
+public class LeaseSetTest extends StructureTest {
     public DataStructure createDataStructure() throws DataFormatException {
         LeaseSet leaseSet = new LeaseSet();
         leaseSet.setDestination((Destination)(new DestinationTest()).createDataStructure());

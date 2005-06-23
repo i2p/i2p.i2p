@@ -7,7 +7,11 @@ package net.i2p.data;
  * your children, but it might.  Use at your own risk.
  *
  */
+ 
+import java.io.ByteArrayOutputStream;
+import java.io.ByteArrayInputStream;
 
+import net.i2p.I2PAppContext;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.DataStructure;
 import net.i2p.data.SigningPrivateKey;
@@ -17,17 +21,78 @@ import net.i2p.data.SigningPrivateKey;
  *
  * @author jrandom
  */
-class SigningPrivateKeyTest extends StructureTest {
-    static {
-        TestData.registerTest(new SigningPrivateKeyTest(), "SigningPrivateKey");
-    }
+public class SigningPrivateKeyTest extends StructureTest {
     public DataStructure createDataStructure() throws DataFormatException {
-        SigningPrivateKey privateKey = new SigningPrivateKey();
+        SigningPrivateKey signingPrivateKey = new SigningPrivateKey();
         byte data[] = new byte[SigningPrivateKey.KEYSIZE_BYTES];
         for (int i = 0; i < data.length; i++)
             data[i] = (byte)(i%16);
-        privateKey.setData(data);
-        return privateKey; 
+        signingPrivateKey.setData(data);
+        return signingPrivateKey; 
     }
     public DataStructure createStructureToRead() { return new SigningPrivateKey(); }
+    
+    public void testBase64Constructor() throws Exception{
+        SigningPrivateKey signingPrivateKey = new SigningPrivateKey();
+        byte data[] = new byte[SigningPrivateKey.KEYSIZE_BYTES];
+        for (int i = 0; i < data.length; i++)
+            data[i] = (byte)(i%56);
+        signingPrivateKey.setData(data);
+        
+        SigningPrivateKey key2 = new SigningPrivateKey(signingPrivateKey.toBase64());
+        assertEquals(signingPrivateKey, key2);
+    }
+    
+    public void testNullEquals(){
+        SigningPrivateKey signingPrivateKey = new SigningPrivateKey();
+        byte data[] = new byte[SigningPrivateKey.KEYSIZE_BYTES];
+        for (int i = 0; i < data.length; i++)
+            data[i] = (byte)(i%56);
+        signingPrivateKey.setData(data);
+        
+        assertFalse(signingPrivateKey.equals(null));
+    }
+    
+    public void testNullData() throws Exception{
+        SigningPrivateKey signingPrivateKey = new SigningPrivateKey();
+        signingPrivateKey.toString();
+        
+        boolean error = false;
+        try{
+            signingPrivateKey.writeBytes(new ByteArrayOutputStream());
+        }catch(DataFormatException dfe){
+            error = true;
+        }
+        assertTrue(error);
+    }
+    
+    public void testShortData() throws Exception{
+        SigningPrivateKey signingPrivateKey = new SigningPrivateKey();
+        byte data[] = new byte[56];
+        for (int i = 0; i < data.length; i++)
+            data[i] = (byte)(i);
+        signingPrivateKey.setData(data);
+        
+        boolean error = false;
+        try{
+            signingPrivateKey.writeBytes(new ByteArrayOutputStream());
+        }catch(DataFormatException dfe){
+            error = true;
+        }
+        assertTrue(error);
+    }
+    
+    public void testShortRead() throws Exception{
+        SigningPrivateKey signingPrivateKey = new SigningPrivateKey();
+        ByteArrayInputStream in = new ByteArrayInputStream("short".getBytes());
+        boolean error = false;
+        try{
+            signingPrivateKey.readBytes(in);
+        }catch(DataFormatException dfe){
+            error = true;
+        }
+        assertTrue(error);
+    }
+    
+    
 }

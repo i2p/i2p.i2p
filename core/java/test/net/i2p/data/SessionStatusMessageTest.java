@@ -18,10 +18,7 @@ import net.i2p.data.i2cp.SessionStatusMessage;
  *
  * @author jrandom
  */
-class SessionStatusMessageTest extends StructureTest {
-    static {
-        TestData.registerTest(new SessionStatusMessageTest(), "SessionStatusMessage");
-    }
+public class SessionStatusMessageTest extends StructureTest {
     public DataStructure createDataStructure() throws DataFormatException {
         SessionStatusMessage msg = new SessionStatusMessage();
         msg.setSessionId((SessionId)(new SessionIdTest()).createDataStructure());

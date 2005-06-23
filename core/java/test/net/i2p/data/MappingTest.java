@@ -9,56 +9,42 @@ package net.i2p.data;
  */
 
 import java.io.ByteArrayOutputStream;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
 import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
-import net.i2p.util.Log;
+
+import junit.framework.TestCase;
 
 /**
- * Test harness for the mapping structure (in java, a Properties map)
+ * Test harness for the date structure
  *
  * @author jrandom
  */
-class MappingTest implements TestDataGenerator, TestDataPrinter {
-    static {
-        TestData.registerGenerator(new MappingTest(), "Mapping");
-        TestData.registerPrinter(new MappingTest(), "Mapping");
-    }
-    private static final Log _log = new Log(MappingTest.class);
+public class MappingTest extends TestCase{
     
-    public byte[] getData() {
+    public void testProperties() throws Exception{
+        byte[] temp = null;
+        
+        Properties orig = new Properties();
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        Properties options = new Properties();
-        options.setProperty("key1", "val1");
-        options.setProperty("key2", "val2");
-        options.setProperty("key3", "val3");
-        try {
-            DataHelper.writeProperties(baos, options);
-            return baos.toByteArray();
-        } catch (DataFormatException dfe) {
-            _log.error("Error writing the mapping", dfe);
-            return null;
-        } catch (IOException ioe) {
-            _log.error("Error writing the mapping", ioe);
-            return null;
-        }
+        orig.setProperty("key1", "val1");
+        orig.setProperty("key2", "val2");
+        orig.setProperty("key3", "val3");
+        
+        DataHelper.writeProperties(baos, orig);
+        temp = baos.toByteArray();
+        
+        
+        Properties p = null;
+        ByteArrayInputStream bais = new ByteArrayInputStream(temp);
+        
+        p = DataHelper.readProperties(bais);
+        
+        assertEquals(orig, p);
     }
-    
-    public String testData(InputStream inputStream) {
-        try {
-            Properties options = DataHelper.readProperties(inputStream);
-            return DataHelper.toString(options);
-        } catch (DataFormatException dfe) {
-            _log.error("Error reading the mapping", dfe);
-            return null;
-        } catch (IOException ioe) {
-            _log.error("Error reading the mapping", ioe);
-            return null;
-        }
-    }
-    
     
 }

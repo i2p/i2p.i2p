@@ -9,6 +9,7 @@ package net.i2p.data;
  */
 
 import java.io.ByteArrayOutputStream;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -17,46 +18,38 @@ import net.i2p.data.DataStructure;
 import net.i2p.util.Log;
 import net.i2p.I2PAppContext;
 
+import junit.framework.TestCase;
+
 /**
  * Utility class for wrapping data structure tests
  *
  * @author jrandom
  */
-public abstract class StructureTest implements TestDataGenerator, TestDataPrinter {
-    private static final Log _log = new Log(StructureTest.class);
-    protected static I2PAppContext _context = I2PAppContext.getGlobalContext();
+
+public abstract class StructureTest extends TestCase{
     
     public abstract DataStructure createDataStructure() throws DataFormatException;
     public abstract DataStructure createStructureToRead();
-
-    public byte[] getData() {
+    
+    public void testStructure() throws Exception{
+        byte[] temp = null;
+        
+        DataStructure orig;
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        try {
-            DataStructure structure = createDataStructure();
-            structure.writeBytes(baos);
-        } catch (DataFormatException dfe) {
-            _log.error("Error writing the data structure", dfe);
-            return null;
-        } catch (IOException ioe) {
-            _log.error("Error writing the data structure", ioe);
-            return null;
-        }
-        return baos.toByteArray();
+        
+        orig = createDataStructure();
+        orig.writeBytes(baos);
+        
+        
+        temp = baos.toByteArray();
+        
+        DataStructure ds;
+        ByteArrayInputStream bais = new ByteArrayInputStream(temp);
+        
+        ds = createStructureToRead();
+        ds.readBytes(bais);
+        
+        assertEquals(orig, ds);
     }
-    
-    public String testData(InputStream inputStream) {
-        try {
-            DataStructure structure = createStructureToRead();
-            structure.readBytes(inputStream);
-	    return structure.toString() + "\n\nIn base 64: " + structure.toBase64();
-        } catch (DataFormatException dfe) {
-            _log.error("Error reading the data structure", dfe);
-            return null;
-        } catch (IOException ioe) {
-            _log.error("Error reading the data structure", ioe);
-            return null;
-        }
-    }
-    
     
 }

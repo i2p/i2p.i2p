@@ -19,10 +19,7 @@ import net.i2p.data.i2cp.SessionId;
  *
  * @author jrandom
  */
-class ReceiveMessageBeginMessageTest extends StructureTest {
-    static {
-        TestData.registerTest(new ReceiveMessageBeginMessageTest(), "ReceiveMessageBeginMessage");
-    }
+public class ReceiveMessageBeginMessageTest extends StructureTest {
     public DataStructure createDataStructure() throws DataFormatException {
         ReceiveMessageBeginMessage msg = new ReceiveMessageBeginMessage();
         msg.setSessionId((SessionId)(new SessionIdTest()).createDataStructure());

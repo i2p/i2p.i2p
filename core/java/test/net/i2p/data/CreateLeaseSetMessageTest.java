@@ -21,15 +21,12 @@ import net.i2p.data.i2cp.SessionId;
  *
  * @author jrandom
  */
-class CreateLeaseSetMessageTest extends StructureTest {
-    static {
-        TestData.registerTest(new CreateLeaseSetMessageTest(), "CreateLeaseSetMessage");
-    }
+public class CreateLeaseSetMessageTest extends StructureTest {
     public DataStructure createDataStructure() throws DataFormatException {
         CreateLeaseSetMessage msg = new CreateLeaseSetMessage();
-	msg.setPrivateKey((PrivateKey)(new PrivateKeyTest()).createDataStructure());
-	msg.setSigningPrivateKey((SigningPrivateKey)(new SigningPrivateKeyTest()).createDataStructure());
-	msg.setLeaseSet((LeaseSet)(new LeaseSetTest()).createDataStructure());
+    	msg.setPrivateKey((PrivateKey)(new PrivateKeyTest()).createDataStructure());
+    	msg.setSigningPrivateKey((SigningPrivateKey)(new SigningPrivateKeyTest()).createDataStructure());
+    	msg.setLeaseSet((LeaseSet)(new LeaseSetTest()).createDataStructure());
         msg.setSessionId((SessionId)(new SessionIdTest()).createDataStructure());
         return msg; 
     }

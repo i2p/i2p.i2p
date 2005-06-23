@@ -17,10 +17,7 @@ import net.i2p.data.i2cp.MessageId;
  *
  * @author jrandom
  */
-class MessageIdTest extends StructureTest {
-    static {
-        TestData.registerTest(new MessageIdTest(), "MessageId");
-    }
+public class MessageIdTest extends StructureTest {
     public DataStructure createDataStructure() throws DataFormatException {
         MessageId id = new MessageId();
         id.setMessageId(101);

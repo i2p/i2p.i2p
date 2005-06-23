@@ -10,6 +10,8 @@ package net.i2p.data;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.ByteArrayInputStream;
 
 import net.i2p.data.DataFormatException;
 import net.i2p.data.DataStructure;
@@ -24,42 +26,45 @@ import net.i2p.util.Log;
  *
  * @author jrandom
  */
-class PayloadTest extends StructureTest {
-    private final static Log _log = new Log(PayloadTest.class);
-
-    static {
-        TestData.registerTest(new PayloadTest(), "Payload");
-    }
+ 
+ public class PayloadTest extends StructureTest{
+    
     public DataStructure createDataStructure() throws DataFormatException {
         Payload payload = new Payload();
         SessionKey key = (SessionKey)(new SessionKeyTest()).createDataStructure();
-        //payload.setEncryptionKey(key);
+        
         byte data[] = "Hello, I2P".getBytes();
         payload.setUnencryptedData(data);
         Hash hash = (Hash)(new HashTest()).createDataStructure();
-        //payload.setHash(hash);
+        
         Destination target = (Destination)(new DestinationTest()).createDataStructure();
-	payload.setEncryptedData(data);
-        //payload.encryptPayload(target, 128);
+    payload.setEncryptedData(data);
+    
         return payload; 
     }
     public DataStructure createStructureToRead() { return new Payload(); }
     
-    public String testData(InputStream inputStream) {
-        try {
-            DataStructure structure = createStructureToRead();
-            structure.readBytes(inputStream);
-	    Payload payload = (Payload)structure;
-	    payload.setUnencryptedData(payload.getEncryptedData());
-            //((Payload)structure).decryptPayload((PrivateKey)(new PrivateKeyTest()).createDataStructure());
-            return structure.toString();
-        } catch (DataFormatException dfe) {
-            _log.error("Error reading the data structure", dfe);
-            return null;
-        } catch (IOException ioe) {
-            _log.error("Error reading the data structure", ioe);
-            return null;
-        }
+    public void testStructure() throws Exception{
+        byte[] temp = null;
+        
+        DataStructure orig;
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        
+        orig = createDataStructure();
+        orig.writeBytes(baos);
+        
+        
+        temp = baos.toByteArray();
+        
+        DataStructure ds;
+        ByteArrayInputStream bais = new ByteArrayInputStream(temp);
+        
+        ds = createStructureToRead();
+        ds.readBytes(bais);
+        Payload payload = (Payload)ds;
+        payload.setUnencryptedData(payload.getEncryptedData());
+        
+        assertEquals(orig, ds);
     }
     
 }

@@ -18,10 +18,7 @@ import net.i2p.data.i2cp.SessionConfig;
  *
  * @author jrandom
  */
-class CreateSessionMessageTest extends StructureTest {
-    static {
-        TestData.registerTest(new CreateSessionMessageTest(), "CreateSessionMessage");
-    }
+public class CreateSessionMessageTest extends StructureTest {
     public DataStructure createDataStructure() throws DataFormatException {
         CreateSessionMessage msg = new CreateSessionMessage();
         msg.setSessionConfig((SessionConfig)(new SessionConfigTest()).createDataStructure());

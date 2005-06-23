@@ -17,10 +17,7 @@ import net.i2p.data.SessionKey;
  *
  * @author jrandom
  */
-class SessionKeyTest extends StructureTest {
-    static {
-        TestData.registerTest(new SessionKeyTest(), "SessionKey");
-    }
+public class SessionKeyTest extends StructureTest {
     public DataStructure createDataStructure() throws DataFormatException {
         SessionKey key = new SessionKey();
         byte data[] = new byte[SessionKey.KEYSIZE_BYTES];

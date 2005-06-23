@@ -8,7 +8,7 @@
     <target name="compile">
         <mkdir dir="./build" />
         <mkdir dir="./build/obj" />
-        <javac srcdir="./src:./test" debug="true" source="1.3" target="1.3" deprecation="on" destdir="./build/obj" />
+        <javac srcdir="./src:./test" debug="true" source="1.3" target="1.3" deprecation="on" destdir="./build/obj" classpath="lib/junit.jar" />
     </target>
     <target name="jar" depends="compile">
         <jar destfile="./build/i2p.jar" basedir="./build/obj" includes="**/*.class" />
@@ -18,6 +18,71 @@
         <mkdir dir="./build/javadoc" />
         <javadoc sourcepath="./src:./test" destdir="./build/javadoc" packagenames="*" use="true" splitindex="true" windowtitle="I2P SDK" />
     </target>
+    <target name="test" depends="clean, jar">
+        <junit printsummary="on" fork="yes">
+            <classpath>
+                <pathelement path="${classpath}" />
+                <pathelement location="./build/i2p.jar" />
+                <pathelement location="./lib/junit.jar" />
+                <pathelement path="${ant.home}/lib/clover.jar"/>
+            </classpath>
+            <batchtest>
+                <fileset dir="./test/">
+                    <include name="**/*Test.java" />
+                    <exclude name="**/ElGamalAESEngineTest.java" />
+                    <exclude name="**/StructureTest.java" />
+                </fileset>
+            </batchtest>
+            <formatter type="xml"/>
+        </junit>
+        <mkdir dir="../../reports/" />
+        <mkdir dir="../../reports/core/" />
+        <mkdir dir="../../reports/core/junit/" />
+        <delete>
+            <fileset dir="../../reports/core/junit">
+                <include name="TEST-*.xml"/>
+            </fileset>
+        </delete>
+        <copy todir="../../reports/core/junit">
+            <fileset dir=".">
+                <include name="TEST-*.xml"/>
+            </fileset>
+        </copy>
+        <delete>
+            <fileset dir=".">
+                <include name="TEST-*.xml"/>
+            </fileset>
+        </delete>
+    </target>
+    <target name="junit.report">
+        <junitreport todir="../../reports/core/junit">
+            <fileset dir="../../reports/core/junit">
+                <include name="TEST-*.xml"/>
+            </fileset>
+            <report format="frames" todir="../../reports/core/html/junit"/>
+        </junitreport>
+    </target>
+    <target name="clover.report">
+        <taskdef resource="clovertasks"/>
+        <mkdir dir="../../reports/" />
+        <mkdir dir="../../reports/core" />
+        <mkdir dir="../../reports/core/clover" />
+        <clover-setup initString="../../reports/core/clover/coverage.db"/>
+        <clover-report>
+            <current outfile="../../reports/core/html/clover">
+                <format type="html"/>
+            </current>
+        </clover-report>
+    </target>
+    <target name="test.report" depends="junit.report, clover.report"/>
+    <target name="useclover">
+        <taskdef resource="clovertasks"/>
+        <mkdir dir="../../reports/" />
+        <mkdir dir="../../reports/core/" />
+        <mkdir dir="../../reports/core/clover" />
+        <clover-setup initString="../../reports/core/clover/coverage.db"/>
+    </target>
+    <target name="fulltest" depends="useclover, test, test.report" />
     <target name="clean">
         <delete dir="./build" />
     </target>

@@ -17,10 +17,7 @@ import net.i2p.data.Signature;
  *
  * @author jrandom
  */
-class SignatureTest extends StructureTest {
-    static {
-        TestData.registerTest(new SignatureTest(), "Signature");
-    }
+public class SignatureTest extends StructureTest {
     public DataStructure createDataStructure() throws DataFormatException {
         Signature sig = new Signature();
         byte data[] = new byte[Signature.SIGNATURE_BYTES];

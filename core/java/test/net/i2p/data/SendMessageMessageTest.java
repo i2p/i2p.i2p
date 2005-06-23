@@ -10,6 +10,8 @@ package net.i2p.data;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.ByteArrayInputStream;
 
 import net.i2p.data.DataFormatException;
 import net.i2p.data.DataStructure;
@@ -24,33 +26,39 @@ import net.i2p.util.Log;
  *
  * @author jrandom
  */
-class SendMessageMessageTest extends StructureTest {
-    private final static Log _log = new Log(SendMessageMessageTest.class);
-
-    static {
-        TestData.registerTest(new SendMessageMessageTest(), "SendMessageMessage");
-    }
+ 
+ public class SendMessageMessageTest extends StructureTest {
+    
     public DataStructure createDataStructure() throws DataFormatException {
         SendMessageMessage msg = new SendMessageMessage();
         msg.setDestination((Destination)(new DestinationTest()).createDataStructure());
         msg.setPayload((Payload)(new PayloadTest()).createDataStructure());
         msg.setSessionId((SessionId)(new SessionIdTest()).createDataStructure());
+        msg.setNonce(1);
         return msg; 
     }
-    public DataStructure createStructureToRead() { return new SendMessageMessage(); }   
-    public String testData(InputStream inputStream) {
-        try {
-            DataStructure structure = createStructureToRead();
-            structure.readBytes(inputStream);
-            ((SendMessageMessage)structure).getPayload().setUnencryptedData(((SendMessageMessage)structure).getPayload().getEncryptedData());
-            return structure.toString();
-        } catch (DataFormatException dfe) {
-            _log.error("Error reading the data structure", dfe);
-            return null;
-        } catch (IOException ioe) {
-            _log.error("Error reading the data structure", ioe);
-            return null;
-        }
+    public DataStructure createStructureToRead() { return new SendMessageMessage(); }  
+    
+    public void testStructure() throws Exception{
+        byte[] temp = null;
+        
+        DataStructure orig;
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        
+        orig = createDataStructure();
+        orig.writeBytes(baos);
+        
+        
+        temp = baos.toByteArray();
+        
+        DataStructure ds;
+        ByteArrayInputStream bais = new ByteArrayInputStream(temp);
+        
+        ds = createStructureToRead();
+        ds.readBytes(bais);
+        ((SendMessageMessage)ds).getPayload().setUnencryptedData(((SendMessageMessage)ds).getPayload().getEncryptedData());
+        
+        assertEquals(orig, ds);
     }
- 
+    
 }

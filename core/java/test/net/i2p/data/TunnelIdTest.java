@@ -17,10 +17,7 @@ import net.i2p.data.TunnelId;
  *
  * @author jrandom
  */
-class TunnelIdTest extends StructureTest {
-    static {
-        TestData.registerTest(new TunnelIdTest(), "TunnelId");
-    }
+public class TunnelIdTest extends StructureTest {
     public DataStructure createDataStructure() throws DataFormatException {
         TunnelId id = new TunnelId();
         id.setTunnelId(42);

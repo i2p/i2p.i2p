@@ -9,6 +9,7 @@ package net.i2p.data;
  */
 
 import java.io.ByteArrayOutputStream;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Date;
@@ -17,44 +18,31 @@ import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
 import net.i2p.util.Log;
 
+import junit.framework.TestCase;
+
 /**
- * Test harness for the boolean structure
+ * Test harness for the date structure
  *
  * @author jrandom
  */
-class DateTest implements TestDataGenerator, TestDataPrinter {
-    static {
-        TestData.registerGenerator(new DateTest(), "Date");
-        TestData.registerPrinter(new DateTest(), "Date");
-    }
-    private static final Log _log = new Log(DateTest.class);
+public class DateTest extends TestCase{
     
-    public byte[] getData() {
+    public void testDate() throws Exception{
+        byte[] temp = null;
+        
+        Date orig = new Date();
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        try {
-            DataHelper.writeDate(baos, new Date());
-            return baos.toByteArray();
-        } catch (DataFormatException dfe) {
-            _log.error("Error writing the date", dfe);
-            return null;
-        } catch (IOException ioe) {
-            _log.error("Error writing the date", ioe);
-            return null;
-        }
+        
+        DataHelper.writeDate(baos, orig);
+        temp = baos.toByteArray();
+        
+        
+        Date d = null;
+        ByteArrayInputStream bais = new ByteArrayInputStream(temp);
+        
+        d = DataHelper.readDate(bais);
+        
+        assertEquals(orig, d);
     }
-    
-    public String testData(InputStream inputStream) {
-        try {
-            Date d = DataHelper.readDate(inputStream);
-            return ""+d;
-        } catch (DataFormatException dfe) {
-            _log.error("Error reading the date", dfe);
-            return null;
-        } catch (IOException ioe) {
-            _log.error("Error reading the date", ioe);
-            return null;
-        }
-    }
-    
     
 }

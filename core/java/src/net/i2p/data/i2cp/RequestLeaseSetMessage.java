@@ -129,7 +129,7 @@ public class RequestLeaseSetMessage extends I2CPMessageImpl {
             RequestLeaseSetMessage msg = (RequestLeaseSetMessage) object;
             if (getEndpoints() != msg.getEndpoints()) return false;
             for (int i = 0; i < getEndpoints(); i++) {
-                if (!DataHelper.eq(getRouter(i), msg.getRouter(i)) || DataHelper.eq(getTunnelId(i), msg.getTunnelId(i)))
+                if (!DataHelper.eq(getRouter(i), msg.getRouter(i)) || !DataHelper.eq(getTunnelId(i), msg.getTunnelId(i)))
                     return false;
             }
             return DataHelper.eq(getSessionId(), msg.getSessionId()) && DataHelper.eq(getEndDate(), msg.getEndDate());

@@ -17,10 +17,7 @@ import net.i2p.data.Hash;
  *
  * @author jrandom
  */
-class HashTest extends StructureTest {
-    static {
-        TestData.registerTest(new HashTest(), "Hash");
-    }
+public class HashTest extends StructureTest {
     public DataStructure createDataStructure() throws DataFormatException {
         Hash hash = new Hash();
         byte data[] = new byte[32];

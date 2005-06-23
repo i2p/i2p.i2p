@@ -17,10 +17,7 @@ import net.i2p.data.i2cp.SessionId;
  *
  * @author jrandom
  */
-class SessionIdTest extends StructureTest {
-    static {
-        TestData.registerTest(new SessionIdTest(), "SessionId");
-    }
+public class SessionIdTest extends StructureTest {
     public DataStructure createDataStructure() throws DataFormatException {
         SessionId id = new SessionId();
         id.setSessionId(7);

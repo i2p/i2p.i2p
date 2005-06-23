@@ -21,10 +21,7 @@ import net.i2p.data.i2cp.SessionId;
  *
  * @author jrandom
  */
-class ReportAbuseMessageTest extends StructureTest {
-    static {
-        TestData.registerTest(new ReportAbuseMessageTest(), "ReportAbuseMessage");
-    }
+public class ReportAbuseMessageTest extends StructureTest {
     public DataStructure createDataStructure() throws DataFormatException {
         ReportAbuseMessage msg = new ReportAbuseMessage();
         msg.setMessageId((MessageId)(new MessageIdTest()).createDataStructure());

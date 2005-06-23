@@ -30,9 +30,6 @@ import net.i2p.util.Log;
  */
 public class RouterInfoTest extends StructureTest {
     private final static Log _log = new Log(RouterInfoTest.class);
-    static {
-        TestData.registerTest(new RouterInfoTest(), "RouterInfo");
-    }
     public DataStructure createDataStructure() throws DataFormatException {
         RouterInfo info = new RouterInfo();
         HashSet addresses = new HashSet();
@@ -40,32 +37,32 @@ public class RouterInfoTest extends StructureTest {
         addresses.add(structure);
         info.setAddresses(addresses);
         
-	PublicKey pubKey = null;
-	SigningPublicKey signingPubKey = null;
-	PrivateKey privKey = null;
-	SigningPrivateKey signingPrivKey = null;
-	
-	Object obj[] = KeyGenerator.getInstance().generatePKIKeypair();
-	pubKey = (PublicKey)obj[0];
-	privKey = (PrivateKey)obj[1];
-	obj = KeyGenerator.getInstance().generateSigningKeypair();
-	signingPubKey = (SigningPublicKey)obj[0];
-	signingPrivKey = (SigningPrivateKey)obj[1];
-	
-	_log.debug("SigningPublicKey: " + signingPubKey);
-	_log.debug("SigningPrivateKey: " + signingPrivKey);
-	
-	RouterIdentity ident = new RouterIdentity();
-	ident.setCertificate(new Certificate(Certificate.CERTIFICATE_TYPE_NULL, null));
-	ident.setPublicKey(pubKey);
-	ident.setSigningPublicKey(signingPubKey);
-	
+    	PublicKey pubKey = null;
+    	SigningPublicKey signingPubKey = null;
+    	PrivateKey privKey = null;
+    	SigningPrivateKey signingPrivKey = null;
+    	
+    	Object obj[] = KeyGenerator.getInstance().generatePKIKeypair();
+    	pubKey = (PublicKey)obj[0];
+    	privKey = (PrivateKey)obj[1];
+    	obj = KeyGenerator.getInstance().generateSigningKeypair();
+    	signingPubKey = (SigningPublicKey)obj[0];
+    	signingPrivKey = (SigningPrivateKey)obj[1];
+    	
+    	_log.debug("SigningPublicKey: " + signingPubKey);
+    	_log.debug("SigningPrivateKey: " + signingPrivKey);
+    	
+    	RouterIdentity ident = new RouterIdentity();
+    	ident.setCertificate(new Certificate(Certificate.CERTIFICATE_TYPE_NULL, null));
+    	ident.setPublicKey(pubKey);
+    	ident.setSigningPublicKey(signingPubKey);
+    	
         info.setIdentity(ident);
         
         Properties options = new Properties();
-	for (int i = 0; i < 16; i++) {
-	    options.setProperty("option." + i, "12345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890$:." + i);
-	}
+    	for (int i = 0; i < 16; i++) {
+    	    options.setProperty("option." + i, "12345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890$:." + i);
+    	}
         options.setProperty("netConnectionSpeed", "OC12");
         info.setOptions(options);
 	
@@ -73,12 +70,12 @@ public class RouterInfoTest extends StructureTest {
         structure = (new HashTest()).createDataStructure();
         peers.add(structure);
         info.setPeers(peers);
-	info.setPublished(System.currentTimeMillis());
-        
-        //info.setVersion(69);
-        
-	info.sign(signingPrivKey);
-        
+    	info.setPublished(System.currentTimeMillis());
+            
+            //info.setVersion(69);
+            
+    	info.sign(signingPrivKey);
+            
         return info;
     }
     public DataStructure createStructureToRead() { return new RouterInfo(); }

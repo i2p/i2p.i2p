@@ -7,7 +7,8 @@ package net.i2p.data;
  * your children, but it might.  Use at your own risk.
  *
  */
-
+ 
+import java.io.ByteArrayOutputStream;
 import java.util.Date;
 import java.util.Properties;
 
@@ -20,10 +21,7 @@ import net.i2p.data.RouterAddress;
  *
  * @author jrandom
  */
-class RouterAddressTest extends StructureTest {
-    static {
-        TestData.registerTest(new RouterAddressTest(), "RouterAddress");
-    }
+public class RouterAddressTest extends StructureTest {
     public DataStructure createDataStructure() throws DataFormatException {
         RouterAddress addr = new RouterAddress();
         byte data[] = new byte[32];
@@ -39,4 +37,45 @@ class RouterAddressTest extends StructureTest {
         return addr; 
     }
     public DataStructure createStructureToRead() { return new RouterAddress(); }
+    
+    public void testBadWrite() throws Exception{
+        RouterAddress addr = new RouterAddress();
+        boolean error = true;
+        try{
+            addr.writeBytes(new ByteArrayOutputStream());
+        }catch(DataFormatException dfe){
+            error = true;
+        }
+        assertTrue(error);
+    }
+    
+    public void testNullEquals(){
+        RouterAddress addr = new RouterAddress();
+        byte data[] = new byte[32];
+        for (int i = 0; i < data.length; i++)
+            data[i] = (byte)(i%16);
+        addr.setCost(42);
+        addr.setExpiration(new Date(1000*60*60*24)); // jan 2 1970
+        Properties options = new Properties();
+        options.setProperty("hostname", "localhost");
+        options.setProperty("portnum", "1234");
+        addr.setOptions(options);
+        addr.setTransportStyle("Blah");
+        assertFalse(addr.equals(null));
+    }
+    
+    public void testToString(){
+        RouterAddress addr = new RouterAddress();
+        byte data[] = new byte[32];
+        for (int i = 0; i < data.length; i++)
+            data[i] = (byte)(i%16);
+        addr.setCost(42);
+        addr.setExpiration(new Date(1000*60*60*24)); // jan 2 1970
+        Properties options = new Properties();
+        options.setProperty("hostname", "localhost");
+        options.setProperty("portnum", "1234");
+        addr.setOptions(options);
+        addr.setTransportStyle("Blah");
+        addr.toString();
+    }
 }

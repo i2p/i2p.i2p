@@ -9,6 +9,7 @@ package net.i2p.data;
  */
 
 import java.io.ByteArrayOutputStream;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -16,44 +17,30 @@ import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
 import net.i2p.util.Log;
 
+import junit.framework.TestCase;
+
 /**
  * Test harness for the boolean structure
  *
  * @author jrandom
  */
-class BooleanTest implements TestDataGenerator, TestDataPrinter {
-    static {
-        TestData.registerGenerator(new BooleanTest(), "Boolean");
-        TestData.registerPrinter(new BooleanTest(), "Boolean");
-    }
-    private static final Log _log = new Log(BooleanTest.class);
+public class BooleanTest extends TestCase{
     
-    public byte[] getData() {
+    public void testBoolean() throws Exception{
+        byte[] temp = null;
+        
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        try {
-            DataHelper.writeBoolean(baos, Boolean.TRUE);
-            return baos.toByteArray();
-        } catch (DataFormatException dfe) {
-            _log.error("Error writing the boolean", dfe);
-            return null;
-        } catch (IOException ioe) {
-            _log.error("Error writing the boolean", ioe);
-            return null;
-        }
+        
+        DataHelper.writeBoolean(baos, Boolean.TRUE);
+        temp = baos.toByteArray();
+        
+        
+        Boolean b = null;
+        ByteArrayInputStream bais = new ByteArrayInputStream(temp);
+        
+        b = DataHelper.readBoolean(bais);
+        
+        assertEquals(Boolean.TRUE, b);
     }
-    
-    public String testData(InputStream inputStream) {
-        try {
-            Boolean b = DataHelper.readBoolean(inputStream);
-            return ""+b;
-        } catch (DataFormatException dfe) {
-            _log.error("Error reading the boolean", dfe);
-            return null;
-        } catch (IOException ioe) {
-            _log.error("Error reading the boolean", ioe);
-            return null;
-        }
-    }
-    
     
 }

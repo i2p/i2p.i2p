@@ -8,6 +8,9 @@ package net.i2p.data;
  *
  */
 
+import java.io.ByteArrayOutputStream;
+import java.io.ByteArrayInputStream;
+
 import net.i2p.data.DataFormatException;
 import net.i2p.data.DataStructure;
 import net.i2p.data.PublicKey;
@@ -17,10 +20,7 @@ import net.i2p.data.PublicKey;
  *
  * @author jrandom
  */
-class PublicKeyTest extends StructureTest {
-    static {
-        TestData.registerTest(new PublicKeyTest(), "PublicKey");
-    }
+public class PublicKeyTest extends StructureTest {
     public DataStructure createDataStructure() throws DataFormatException {
         PublicKey publicKey = new PublicKey();
         byte data[] = new byte[PublicKey.KEYSIZE_BYTES];
@@ -30,4 +30,66 @@ class PublicKeyTest extends StructureTest {
         return publicKey; 
     }
     public DataStructure createStructureToRead() { return new PublicKey(); }
+    
+    public void testBase64Constructor() throws Exception{
+        PublicKey publicKey = new PublicKey();
+        byte data[] = new byte[PublicKey.KEYSIZE_BYTES];
+        for (int i = 0; i < data.length; i++)
+            data[i] = (byte)(i%56);
+        publicKey.setData(data);
+        
+        PublicKey key2 = new PublicKey(publicKey.toBase64());
+        assertEquals(publicKey, key2);
+    }
+    
+    public void testNullEquals(){
+        PublicKey publicKey = new PublicKey();
+        byte data[] = new byte[PublicKey.KEYSIZE_BYTES];
+        for (int i = 0; i < data.length; i++)
+            data[i] = (byte)(i%56);
+        publicKey.setData(data);
+        
+        assertFalse(publicKey.equals(null));
+    }
+    
+    public void testNullData() throws Exception{
+        PublicKey publicKey = new PublicKey();
+        publicKey.toString();
+        
+        boolean error = false;
+        try{
+            publicKey.writeBytes(new ByteArrayOutputStream());
+        }catch(DataFormatException dfe){
+            error = true;
+        }
+        assertTrue(error);
+    }
+    
+    public void testShortData() throws Exception{
+        PublicKey publicKey = new PublicKey();
+        byte data[] = new byte[56];
+        for (int i = 0; i < data.length; i++)
+            data[i] = (byte)(i);
+        publicKey.setData(data);
+        
+        boolean error = false;
+        try{
+            publicKey.writeBytes(new ByteArrayOutputStream());
+        }catch(DataFormatException dfe){
+            error = true;
+        }
+        assertTrue(error);
+    }
+    
+    public void testShortRead() throws Exception{
+        PublicKey publicKey = new PublicKey();
+        ByteArrayInputStream in = new ByteArrayInputStream("six times nine equals forty-two".getBytes());
+        boolean error = false;
+        try{
+            publicKey.readBytes(in);
+        }catch(DataFormatException dfe){
+            error = true;
+        }
+        assertTrue(error);
+    }
 }

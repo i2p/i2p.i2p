@@ -17,10 +17,7 @@ import net.i2p.data.i2cp.DisconnectMessage;
  *
  * @author jrandom
  */
-class DisconnectMessageTest extends StructureTest {
-    static {
-        TestData.registerTest(new DisconnectMessageTest(), "DisconnectMessage");
-    }
+public class DisconnectMessageTest extends StructureTest {
     public DataStructure createDataStructure() throws DataFormatException {
         DisconnectMessage msg = new DisconnectMessage();
         msg.setReason("Because I say so");

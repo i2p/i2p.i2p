@@ -18,10 +18,7 @@ import net.i2p.data.i2cp.SessionId;
  *
  * @author jrandom
  */
-class DestroySessionMessageTest extends StructureTest {
-    static {
-        TestData.registerTest(new DestroySessionMessageTest(), "DestroySessionMessage");
-    }
+public class DestroySessionMessageTest extends StructureTest {
     public DataStructure createDataStructure() throws DataFormatException {
         DestroySessionMessage msg = new DestroySessionMessage();
         msg.setSessionId((SessionId)(new SessionIdTest()).createDataStructure());

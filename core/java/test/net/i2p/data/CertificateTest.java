@@ -17,10 +17,7 @@ import net.i2p.data.DataStructure;
  *
  * @author jrandom
  */
-class CertificateTest extends StructureTest {
-    static {
-        TestData.registerTest(new CertificateTest(), "Certificate");
-    }
+public class CertificateTest extends StructureTest {
     public DataStructure createDataStructure() throws DataFormatException {
         Certificate cert = new Certificate();
         byte data[] = new byte[32];

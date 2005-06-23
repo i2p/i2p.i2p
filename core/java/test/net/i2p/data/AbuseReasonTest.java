@@ -17,10 +17,7 @@ import net.i2p.data.i2cp.AbuseReason;
  *
  * @author jrandom
  */
-class AbuseReasonTest extends StructureTest {
-    static {
-        TestData.registerTest(new AbuseReasonTest(), "AbuseReason");
-    }
+public class AbuseReasonTest extends StructureTest {
     public DataStructure createDataStructure() throws DataFormatException {
         AbuseReason res = new AbuseReason();
         res.setReason("Because they're mean");

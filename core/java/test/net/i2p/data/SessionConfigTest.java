@@ -22,10 +22,7 @@ import net.i2p.data.i2cp.SessionConfig;
  *
  * @author jrandom
  */
-class SessionConfigTest extends StructureTest {
-    static {
-        TestData.registerTest(new SessionConfigTest(), "SessionConfig");
-    }
+public class SessionConfigTest extends StructureTest {
     public DataStructure createDataStructure() throws DataFormatException {
         SessionConfig cfg = new SessionConfig((Destination)(new DestinationTest()).createDataStructure());
         cfg.setSignature((Signature)(new SignatureTest()).createDataStructure());
