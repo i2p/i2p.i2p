@@ -87,6 +87,7 @@ public class AddressBook {
         this.location = subscription.getLocation();
 
         try {
+//            EepGet get = new EepGet(I2PAppContext.getGlobalContext(), true, )
             URL url = new URL(subscription.getLocation());
             HttpURLConnection connection = (HttpURLConnection) url
                     .openConnection();

@@ -51,7 +51,7 @@ public class OutboundEstablishState {
     private long _lastReceive;
     private long _lastSend;
     private long _nextSend;
-    private String _remoteHostInfo;
+    private RemoteHostId _remoteHostId;
     private RouterIdentity _remotePeer;
     private SessionKey _introKey;
     private List _queuedMessages;
@@ -74,7 +74,7 @@ public class OutboundEstablishState {
         _log = ctx.logManager().getLog(OutboundEstablishState.class);
         _bobIP = remoteHost.getAddress();
         _bobPort = remotePort;
-        _remoteHostInfo = PeerState.calculateRemoteHostString(_bobIP, _bobPort);
+        _remoteHostId = new RemoteHostId(_bobIP, _bobPort);
         _remotePeer = remotePeer;
         _introKey = introKey;
         _keyBuilder = null;
@@ -172,7 +172,7 @@ public class OutboundEstablishState {
             return true;
         } else {
             if (_log.shouldLog(Log.WARN))
-                _log.warn("Session created failed validation, clearing state");
+                _log.warn("Session created failed validation, clearing state for " + _remoteHostId.toString());
             _receivedY = null;
             _aliceIP = null;
             _receivedRelayTag = 0;
@@ -244,7 +244,8 @@ public class OutboundEstablishState {
         DataHelper.toLong(signed, off, 4, _receivedRelayTag);
         off += 4;
         DataHelper.toLong(signed, off, 4, _receivedSignedOnTime);
-        if (_log.shouldLog(Log.DEBUG)) {
+        boolean valid = _context.dsa().verifySignature(_receivedSignature, signed, _remotePeer.getSigningPublicKey());
+        if (!valid || _log.shouldLog(Log.DEBUG)) {
             StringBuffer buf = new StringBuffer(128);
             buf.append("Signed sessionCreated:");
             buf.append(" AliceIP: ").append(Base64.encode(_aliceIP));
@@ -254,9 +255,12 @@ public class OutboundEstablishState {
             buf.append(" RelayTag: ").append(_receivedRelayTag);
             buf.append(" SignedOn: ").append(_receivedSignedOnTime);
             buf.append(" signature: ").append(Base64.encode(_receivedSignature.getData()));
-            _log.debug(buf.toString());
+            if (valid)
+                _log.debug(buf.toString());
+            else if (_log.shouldLog(Log.WARN))
+                _log.warn("INVALID: " + buf.toString());
         }
-        return _context.dsa().verifySignature(_receivedSignature, signed, _remotePeer.getSigningPublicKey());
+        return valid;
     }
     
     public synchronized SessionKey getCipherKey() { return _sessionKey; }
@@ -331,8 +335,8 @@ public class OutboundEstablishState {
             _log.debug("Explicit nextSend=" + (_nextSend-_context.clock().now()), new Exception("Set by"));
     }
 
-    /** host+port, uniquely identifies an attempt */
-    public String getRemoteHostInfo() { return _remoteHostInfo; }
+    /** uniquely identifies an attempt */
+    public RemoteHostId getRemoteHostId() { return _remoteHostId; }
 
     /** we have received a real data packet, so we're done establishing */
     public synchronized void dataReceived() {

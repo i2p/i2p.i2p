@@ -43,6 +43,8 @@ public class UDPSender {
     }
     
     public void startup() {
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("Starting the runner: " + _name);
         _keepRunning = true;
         I2PThread t = new I2PThread(_runner, _name);
         t.setDaemon(true);
@@ -72,10 +74,12 @@ public class UDPSender {
     public int add(UDPPacket packet, int blockTime) {
         long expiration = _context.clock().now() + blockTime;
         int remaining = -1;
+        long lifetime = -1;
         while ( (_keepRunning) && (remaining < 0) ) {
             try {
                 synchronized (_outboundQueue) {
                     if (_outboundQueue.size() < MAX_QUEUED) {
+                        lifetime = packet.getLifetime();
                         _outboundQueue.add(packet);
                         remaining = _outboundQueue.size();
                         _outboundQueue.notifyAll();
@@ -91,7 +95,9 @@ public class UDPSender {
                 }
             } catch (InterruptedException ie) {}
         }
-        _context.statManager().addRateData("udp.sendQueueSize", remaining, packet.getLifetime());
+        _context.statManager().addRateData("udp.sendQueueSize", remaining, lifetime);
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("Added the packet onto the queue with " + remaining + " remaining and a lifetime of " + lifetime);
         return remaining;
     }
     
@@ -101,18 +107,24 @@ public class UDPSender {
      */
     public int add(UDPPacket packet) {
         int size = 0;
+        long lifetime = -1;
         synchronized (_outboundQueue) {
+            lifetime = packet.getLifetime();
             _outboundQueue.add(packet);
             size = _outboundQueue.size();
             _outboundQueue.notifyAll();
         }
-        _context.statManager().addRateData("udp.sendQueueSize", size, packet.getLifetime());
+        _context.statManager().addRateData("udp.sendQueueSize", size, lifetime);
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("Added the packet onto the queue with " + size + " remaining and a lifetime of " + lifetime);
         return size;
     }
     
     private class Runner implements Runnable {
         private boolean _socketChanged;
         public void run() {
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Running the UDP sender");
             _socketChanged = false;
             while (_keepRunning) {
                 if (_socketChanged) {
@@ -122,8 +134,11 @@ public class UDPSender {
                 
                 UDPPacket packet = getNextPacket();
                 if (packet != null) {
+                    if (_log.shouldLog(Log.DEBUG))
+                        _log.debug("Packet to send known: " + packet);
                     long acquireTime = _context.clock().now();
-                    int size = packet.getPacket().getLength();
+                    int size = packet.getPacketDataLength(); // packet.getPacket().getLength();
+                    int size2 = packet.getPacket().getLength();
                     if (size > 0) {
                         FIFOBandwidthLimiter.Request req = _context.bandwidthLimiter().requestOutbound(size, "UDP sender");
                         while (req.getPendingOutboundRequested() > 0)
@@ -133,17 +148,23 @@ public class UDPSender {
                     long afterBW = _context.clock().now();
                     
                     if (_log.shouldLog(Log.DEBUG)) {
-                        int len = packet.getPacket().getLength();
                         //if (len > 128)
                         //    len = 128;
-                        _log.debug("Sending packet: \nraw: " + Base64.encode(packet.getPacket().getData(), 0, len));
+                        //_log.debug("Sending packet: (size="+size + "/"+size2 +")\nraw: " + Base64.encode(packet.getPacket().getData(), 0, size));
                     }
                     
+                    //packet.getPacket().setLength(size);
                     try {
                         long before = _context.clock().now();
                         synchronized (Runner.this) {
                             // synchronization lets us update safely
-                            _socket.send(packet.getPacket());
+                            //_log.debug("Break out datagram for " + packet);
+                            DatagramPacket dp = packet.getPacket();
+                            if (_log.shouldLog(Log.DEBUG))
+                                _log.debug("Just before socket.send of " + packet);
+                            _socket.send(dp);
+                            if (_log.shouldLog(Log.DEBUG))
+                                _log.debug("Just after socket.send of " + packet);
                         }
                         long sendTime = _context.clock().now() - before;
                         _context.statManager().addRateData("udp.socketSendTime", sendTime, packet.getLifetime());
@@ -151,7 +172,7 @@ public class UDPSender {
                         if (packet.getMarkedType() == 1)
                             _context.statManager().addRateData("udp.sendACKTime", afterBW - acquireTime, packet.getLifetime());
                         _context.statManager().addRateData("udp.pushTime", packet.getLifetime(), packet.getLifetime());
-                        _context.statManager().addRateData("udp.sendPacketSize", packet.getPacket().getLength(), packet.getLifetime());
+                        _context.statManager().addRateData("udp.sendPacketSize", size, packet.getLifetime());
                     } catch (IOException ioe) {
                         if (_log.shouldLog(Log.ERROR))
                             _log.error("Error sending", ioe);
@@ -161,6 +182,8 @@ public class UDPSender {
                     packet.release();
                 }
             }
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Stop sending...");
         }
         
         private UDPPacket getNextPacket() {

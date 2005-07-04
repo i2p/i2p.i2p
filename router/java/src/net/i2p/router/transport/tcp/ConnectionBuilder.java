@@ -756,8 +756,14 @@ public class ConnectionBuilder {
                 _remoteAddress = tcpAddr;
                 _created = true;
             } catch (IOException ioe) {
+                Hash peer = _target.getIdentity().calculateHash();
+                String peerName = null;
+                if (peer == null)
+                    peerName = "unknown";
+                else
+                    peerName = peer.toBase64().substring(0,6);
                 fail("Error contacting " 
-                     + _target.getIdentity().calculateHash().toBase64().substring(0,6) 
+                     + peerName
                      + " on " + tcpAddr.toString() + ": " + ioe.getMessage());
                 return;
             }

@@ -206,6 +206,19 @@ public class MessageHistory {
         addEntry(getPrefix() + "tunnel dispatched: " + info);
     }
     
+    public void tunnelDispatched(long messageId, long tunnelId, String type) {
+        if (!_doLog) return;
+        addEntry(getPrefix() + "message " + messageId + " on tunnel " + tunnelId + " as " + type);
+    }
+    
+    public void tunnelDispatched(long messageId, long tunnelId, long toTunnel, Hash toPeer, String type) {
+        if (!_doLog) return;
+        if (toPeer != null)
+            addEntry(getPrefix() + "message " + messageId + " on tunnel " + tunnelId + " / " + toTunnel + " to " + toPeer.toBase64() + " as " + type);
+        else
+            addEntry(getPrefix() + "message " + messageId + " on tunnel " + tunnelId + " / " + toTunnel + " as " + type);
+    }
+    
     /**
      * The local router has detected a failure in the given tunnel
      *

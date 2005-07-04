@@ -37,6 +37,8 @@ public class ClientManagerFacadeImpl extends ClientManagerFacade {
     private RouterContext _context;
     public final static String PROP_CLIENT_PORT = "i2cp.port";
     public final static int DEFAULT_PORT = 7654;
+    public final static String PROP_CLIENT_HOST = "i2cp.hostname";
+    public final static String DEFAULT_HOST = "127.0.0.1";
     
     public ClientManagerFacadeImpl(RouterContext context) {
         _context = context;

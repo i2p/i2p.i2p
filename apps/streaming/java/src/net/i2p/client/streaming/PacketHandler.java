@@ -119,6 +119,19 @@ public class PacketHandler {
     }
     
     private void receiveKnownCon(Connection con, Packet packet) {
+        if (packet.isFlagSet(Packet.FLAG_ECHO)) {
+            if (packet.getSendStreamId() != null) {
+                receivePing(packet);
+            } else if (packet.getReceiveStreamId() != null) {
+                receivePong(packet);
+            } else {
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("Echo packet received with no stream IDs: " + packet);
+            }
+            packet.releasePayload();
+            return;
+        } 
+        
         // the packet is pointed at a stream ID we're receiving on
         if (isValidMatch(con.getSendStreamId(), packet.getReceiveStreamId())) {
             // the packet's receive stream ID also matches what we expect
@@ -163,8 +176,19 @@ public class PacketHandler {
                 } else {
                     if (!con.getResetSent()) {
                         // someone is sending us a packet on the wrong stream 
-                        if (_log.shouldLog(Log.WARN))
-                            _log.warn("Received a packet on the wrong stream: " + packet + " connection: " + con);
+                        if (_log.shouldLog(Log.ERROR)) {
+                            Set cons = _manager.listConnections();
+                            StringBuffer buf = new StringBuffer(512);
+                            buf.append("Received a packet on the wrong stream: ");
+                            buf.append(packet);
+                            buf.append(" connection: ");
+                            buf.append(con);
+                            for (Iterator iter = cons.iterator(); iter.hasNext();) {
+                                Connection cur = (Connection)iter.next();
+                                buf.append(" ").append(cur);
+                            }
+                            _log.error(buf.toString(), new Exception("Wrong stream"));
+                        }
                     }
                     packet.releasePayload();
                 }

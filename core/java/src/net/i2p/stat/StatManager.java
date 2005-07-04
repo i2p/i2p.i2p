@@ -29,6 +29,10 @@ public class StatManager {
     private Map _rateStats;
     private StatLog _statLog;
 
+    public static final String PROP_STAT_FILTER = "stat.logFilters";
+    public static final String PROP_STAT_FILE = "stat.logFile";
+    public static final String DEFAULT_STAT_FILE = "stats.log";
+    
     /**
      * The stat manager should only be constructed and accessed through the 
      * application context.  This constructor should only be used by the 
@@ -139,7 +143,7 @@ public class StatManager {
         return _frequencyStats.containsKey(statName);
     }
 
-    /** Group name (String) to a Set of stat names */
+    /** Group name (String) to a Set of stat names, ordered alphabetically */
     public Map getStatsByGroup() {
         Map groups = new TreeMap();
         for (Iterator iter = _frequencyStats.values().iterator(); iter.hasNext();) {
@@ -156,4 +160,7 @@ public class StatManager {
         }
         return groups;
     }
+
+    public String getStatFilter() { return _context.getProperty(PROP_STAT_FILTER); }
+    public String getStatFile() { return _context.getProperty(PROP_STAT_FILE, DEFAULT_STAT_FILE); }
 }

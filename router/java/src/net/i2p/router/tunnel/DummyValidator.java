@@ -8,5 +8,6 @@ class DummyValidator implements IVValidator {
     public static DummyValidator getInstance() { return _instance; }
     private DummyValidator() {}
     
-    public boolean receiveIV(byte[] iv) { return true; }
+    public boolean receiveIV(byte ivData[], int ivOffset, byte payload[], int payloadOffset) { return true; }
+
 }

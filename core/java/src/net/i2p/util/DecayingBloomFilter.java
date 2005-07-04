@@ -28,6 +28,8 @@ public class DecayingBloomFilter {
     private long _currentDuplicates;
     private boolean _keepDecaying;
     private DecayEvent _decayEvent;
+    
+    private static final boolean ALWAYS_MISS = false;
    
     /**
      * Create a bloom filter that will decay its entries over time.  
@@ -41,8 +43,8 @@ public class DecayingBloomFilter {
         _context = context;
         _log = context.logManager().getLog(DecayingBloomFilter.class);
         _entryBytes = entryBytes;
-        _current = new BloomSHA1(23, 11);
-        _previous = new BloomSHA1(23, 11);
+        _current = new BloomSHA1(23, 11); //new BloomSHA1(23, 11);
+        _previous = new BloomSHA1(23, 11); //new BloomSHA1(23, 11);
         _durationMs = durationMs;
         int numExtenders = (32+ (entryBytes-1))/entryBytes - 1;
         if (numExtenders < 0)
@@ -78,6 +80,7 @@ public class DecayingBloomFilter {
      *
      */
     public boolean add(byte entry[]) {
+        if (ALWAYS_MISS) return false;
         if (entry == null) 
             throw new IllegalArgumentException("Null entry");
         if (entry.length != _entryBytes) 
@@ -95,6 +98,7 @@ public class DecayingBloomFilter {
      *
      */
     public boolean add(long entry) {
+        if (ALWAYS_MISS) return false;
         synchronized (this) {
             if (_entryBytes <= 7)
                 entry &= _longToEntryMask; 
@@ -114,6 +118,7 @@ public class DecayingBloomFilter {
      *
      */
     public boolean isKnown(long entry) {
+        if (ALWAYS_MISS) return false;
         synchronized (this) {
             if (_entryBytes <= 7)
                 entry &= _longToEntryMask; 

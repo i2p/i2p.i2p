@@ -52,7 +52,7 @@ public class InboundEstablishState {
     private long _lastReceive;
     private long _lastSend;
     private long _nextSend;
-    private String _remoteHostInfo;
+    private RemoteHostId _remoteHostId;
     private int _currentState;
     
     /** nothin known yet */
@@ -71,7 +71,7 @@ public class InboundEstablishState {
         _log = ctx.logManager().getLog(InboundEstablishState.class);
         _aliceIP = remoteHost.getAddress();
         _alicePort = remotePort;
-        _remoteHostInfo = PeerState.calculateRemoteHostString(_aliceIP, _alicePort);
+        _remoteHostId = new RemoteHostId(_aliceIP, _alicePort);
         _bobPort = localPort;
         _keyBuilder = null;
         _verificationAttempted = false;
@@ -190,8 +190,8 @@ public class InboundEstablishState {
     public synchronized long getNextSendTime() { return _nextSend; }
     public synchronized void setNextSendTime(long when) { _nextSend = when; }
 
-    /** host+port, uniquely identifies an attempt */
-    public String getRemoteHostInfo() { return _remoteHostInfo; }
+    /** RemoteHostId, uniquely identifies an attempt */
+    public RemoteHostId getRemoteHostId() { return _remoteHostId; }
 
     public synchronized void receiveSessionConfirmed(UDPPacketReader.SessionConfirmedReader conf) {
         if (_receivedIdentity == null)

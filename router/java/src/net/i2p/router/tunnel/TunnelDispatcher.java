@@ -356,8 +356,7 @@ public class TunnelDispatcher implements Service {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("dispatch to participant " + participant + ": " + msg.getUniqueId() + " from " 
                            + recvFrom.toBase64().substring(0,4));
-            _context.messageHistory().tunnelDispatched("message " + msg.getUniqueId() + " on tunnel " 
-                                                       + msg.getTunnelId().getTunnelId() + " as participant");
+            _context.messageHistory().tunnelDispatched(msg.getUniqueId(), msg.getTunnelId().getTunnelId(), "participant");
             participant.dispatch(msg, recvFrom);
             _context.statManager().addRateData("tunnel.dispatchParticipant", 1, 0);
         } else {
@@ -370,8 +369,7 @@ public class TunnelDispatcher implements Service {
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("dispatch where we are the outbound endpoint: " + endpoint + ": " 
                                + msg + " from " + recvFrom.toBase64().substring(0,4));
-                _context.messageHistory().tunnelDispatched("message " + msg.getUniqueId() + " on tunnel " 
-                                                           + msg.getTunnelId().getTunnelId() + " as outbound endpoint");
+                _context.messageHistory().tunnelDispatched(msg.getUniqueId(), msg.getTunnelId().getTunnelId(), "outbound endpoint");
                 endpoint.dispatch(msg, recvFrom);
                 
                 _context.statManager().addRateData("tunnel.dispatchEndpoint", 1, 0);
@@ -481,9 +479,9 @@ public class TunnelDispatcher implements Service {
                                + (before-msg.getMessageExpiration()) + "ms ago? " 
                                + msg, new Exception("cause"));
             }
-            _context.messageHistory().tunnelDispatched("message " + msg.getUniqueId() + " on tunnel " 
-                                                           + outboundTunnel + "/" + targetTunnel + " to "
-                                                           + targetPeer + " as outbound gateway");
+            long tid1 = (outboundTunnel != null ? outboundTunnel.getTunnelId() : -1);
+            long tid2 = (targetTunnel != null ? targetTunnel.getTunnelId() : -1);
+            _context.messageHistory().tunnelDispatched(msg.getUniqueId(), tid1, tid2, targetPeer, "outbound gateway");
             gw.add(msg, targetPeer, targetTunnel);
             if (targetTunnel == null)
                 _context.statManager().addRateData("tunnel.dispatchOutboundPeer", 1, 0);

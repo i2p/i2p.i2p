@@ -38,6 +38,10 @@ public class MessageOutputStream extends OutputStream {
      * size
      */
     private volatile int _nextBufferSize;
+    // rate calc helpers
+    private long _sendPeriodBeginTime;
+    private long _sendPeriodBytes;
+    private int _sendBps;
     
     public MessageOutputStream(I2PAppContext ctx, DataReceiver receiver) {
         this(ctx, receiver, Packet.MAX_PAYLOAD_SIZE);
@@ -55,6 +59,10 @@ public class MessageOutputStream extends OutputStream {
         _writeTimeout = -1;
         _passiveFlushDelay = 500;
         _nextBufferSize = -1;
+        _sendPeriodBeginTime = ctx.clock().now();
+        _sendPeriodBytes = 0;
+        _sendBps = 0;
+        _context.statManager().createRateStat("stream.sendBps", "How fast we pump data through the stream", "Stream", new long[] { 60*1000, 5*60*1000, 60*60*1000 });
         _flusher = new Flusher();
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("MessageOutputStream created");
@@ -137,6 +145,21 @@ public class MessageOutputStream extends OutputStream {
         if ( (elapsed > 10*1000) && (_log.shouldLog(Log.DEBUG)) )
             _log.debug("wtf, took " + elapsed + "ms to write to the stream?", new Exception("foo"));
         throwAnyError();
+        updateBps(len);
+    }
+    
+    private void updateBps(int len) {
+        long now = _context.clock().now();
+        int periods = (int)Math.floor((now - _sendPeriodBeginTime) / 1000d);
+        if (periods > 0) {
+            // first term decays on slow transmission
+            _sendBps = (int)(((float)0.9f*((float)_sendBps/(float)periods)) + ((float)0.1f*((float)_sendPeriodBytes/(float)periods)));
+            _sendPeriodBytes = len;
+            _sendPeriodBeginTime = now;
+            _context.statManager().addRateData("stream.sendBps", _sendBps, 0);
+        } else {
+            _sendPeriodBytes += len;
+        }
     }
     
     public void write(int b) throws IOException {

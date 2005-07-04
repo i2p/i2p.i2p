@@ -30,11 +30,13 @@ public class BufferedStatLog implements StatLog {
     private BufferedWriter _out;
     private String _outFile;
     
+    private static final int BUFFER_SIZE = 1024;
+    
     public BufferedStatLog(I2PAppContext ctx) {
         _context = ctx;
         _log = ctx.logManager().getLog(BufferedStatLog.class);
-        _events = new StatEvent[1000];
-        for (int i = 0; i < 1000; i++)
+        _events = new StatEvent[BUFFER_SIZE];
+        for (int i = 0; i < BUFFER_SIZE; i++)
             _events[i] = new StatEvent();
         _eventNext = 0;
         _lastWrite = _events.length-1;
@@ -71,9 +73,9 @@ public class BufferedStatLog implements StatLog {
             return _statFilters.contains(stat) || _statFilters.contains("*");
         }
     }
-
+    
     private void updateFilters() {
-        String val = _context.getProperty("stat.logFilters");
+        String val = _context.getProperty(StatManager.PROP_STAT_FILTER);
         if (val != null) {
             if ( (_lastFilters != null) && (_lastFilters.equals(val)) ) {
                 // noop
@@ -90,9 +92,9 @@ public class BufferedStatLog implements StatLog {
             synchronized (_statFilters) { _statFilters.clear(); }
         }
         
-        String filename = _context.getProperty("stat.logFile");
+        String filename = _context.getProperty(StatManager.PROP_STAT_FILE);
         if (filename == null)
-            filename = "stats.log";
+            filename = StatManager.DEFAULT_STAT_FILE;
         if ( (_outFile != null) && (_outFile.equals(filename)) ) {
             // noop
         } else {

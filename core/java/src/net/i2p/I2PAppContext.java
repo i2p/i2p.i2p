@@ -10,6 +10,8 @@ import net.i2p.crypto.CryptixAESEngine;
 import net.i2p.crypto.DSAEngine;
 import net.i2p.crypto.DummyDSAEngine;
 import net.i2p.crypto.DummyElGamalEngine;
+import net.i2p.crypto.DummyHMACSHA256Generator;
+import net.i2p.crypto.DummyPooledRandomSource;
 import net.i2p.crypto.ElGamalAESEngine;
 import net.i2p.crypto.ElGamalEngine;
 import net.i2p.crypto.HMACSHA256Generator;
@@ -328,8 +330,12 @@ public class I2PAppContext {
     }
     private void initializeHMAC() {
         synchronized (this) {
-            if (_hmac == null)
-                _hmac= new HMACSHA256Generator(this);
+            if (_hmac == null) {
+                if ("true".equals(getProperty("i2p.fakeHMAC", "false")))
+                    _hmac = new DummyHMACSHA256Generator(this);
+                else
+                    _hmac= new HMACSHA256Generator(this);
+            }
             _hmacInitialized = true;
         }
     }
@@ -432,8 +438,12 @@ public class I2PAppContext {
     }
     private void initializeRandom() {
         synchronized (this) {
-            if (_random == null)
-                _random = new PooledRandomSource(this);
+            if (_random == null) {
+                if ("true".equals(getProperty("i2p.weakPRNG", "false")))
+                    _random = new DummyPooledRandomSource(this);
+                else
+                    _random = new PooledRandomSource(this);
+            }
             _randomInitialized = true;
         }
     }

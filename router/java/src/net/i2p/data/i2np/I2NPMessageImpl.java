@@ -66,7 +66,7 @@ public abstract class I2NPMessageImpl extends DataStructureImpl implements I2NPM
             //Hash h = new Hash();
             //h.readBytes(in);
             if (buffer.length < size) {
-                if (size > 64*1024) throw new I2NPMessageException("size=" + size);
+                if (size > MAX_SIZE) throw new I2NPMessageException("size=" + size);
                 buffer = new byte[size];
             }
             

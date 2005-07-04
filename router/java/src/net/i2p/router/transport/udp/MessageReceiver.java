@@ -10,6 +10,7 @@ import net.i2p.data.i2np.I2NPMessage;
 import net.i2p.data.i2np.I2NPMessageImpl;
 import net.i2p.data.i2np.I2NPMessageException;
 import net.i2p.router.RouterContext;
+import net.i2p.util.ByteCache;
 import net.i2p.util.I2PThread;
 import net.i2p.util.Log;
 
@@ -25,12 +26,14 @@ public class MessageReceiver implements Runnable {
     /** list of messages (InboundMessageState) fully received but not interpreted yet */
     private List _completeMessages;
     private boolean _alive;
+    private ByteCache _cache;
     
     public MessageReceiver(RouterContext ctx, UDPTransport transport) {
         _context = ctx;
         _log = ctx.logManager().getLog(MessageReceiver.class);
         _transport = transport;
         _completeMessages = new ArrayList(16);
+        _cache = ByteCache.getInstance(64, I2NPMessage.MAX_SIZE);
         _alive = true;
     }
 
@@ -70,8 +73,7 @@ public class MessageReceiver implements Runnable {
             if (message != null) {
                 int size = message.getCompleteSize();
                 if (_log.shouldLog(Log.INFO))
-                    _log.info("Full message received (" + message.getMessageId() + ") after " + message.getLifetime() 
-                              + "... todo: parse and plop it onto InNetMessagePool");
+                    _log.info("Full message received (" + message.getMessageId() + ") after " + message.getLifetime());
                 I2NPMessage msg = readMessage(message);
                 if (msg != null)
                     _transport.messageReceived(msg, null, message.getFrom(), message.getLifetime(), size);
@@ -81,21 +83,24 @@ public class MessageReceiver implements Runnable {
     }
     
     private I2NPMessage readMessage(InboundMessageState state) {
+        ByteArray buf = _cache.acquire();
         try {
-            byte buf[] = new byte[state.getCompleteSize()];
+            //byte buf[] = new byte[state.getCompleteSize()];
             ByteArray fragments[] = state.getFragments();
             int numFragments = state.getFragmentCount();
             int off = 0;
             for (int i = 0; i < numFragments; i++) {
-                System.arraycopy(fragments[i].getData(), 0, buf, off, fragments[i].getValid());
+                System.arraycopy(fragments[i].getData(), 0, buf.getData(), off, fragments[i].getValid());
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("Raw fragment[" + i + "] for " + state.getMessageId() + ": " 
                                + Base64.encode(fragments[i].getData(), 0, fragments[i].getValid()));
                 off += fragments[i].getValid();
             }
+            if (off != state.getCompleteSize())
+                _log.error("Hmm, offset of the fragments = " + off + " while the state says " + state.getCompleteSize());
             if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Raw byte array for " + state.getMessageId() + ": " + Base64.encode(buf));
-            I2NPMessage m = I2NPMessageImpl.fromRawByteArray(_context, buf, 0, buf.length);
+                _log.debug("Raw byte array for " + state.getMessageId() + ": " + Base64.encode(buf.getData(), 0, state.getCompleteSize()));
+            I2NPMessage m = I2NPMessageImpl.fromRawByteArray(_context, buf.getData(), 0, state.getCompleteSize());
             m.setUniqueId(state.getMessageId());
             return m;
         } catch (I2NPMessageException ime) {
@@ -107,6 +112,7 @@ public class MessageReceiver implements Runnable {
             return null;
         } finally {
             state.releaseResources();
+            _cache.release(buf);
         }
     }
 }

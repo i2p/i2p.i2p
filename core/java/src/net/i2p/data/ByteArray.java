@@ -56,19 +56,20 @@ public class ByteArray implements Serializable, Comparable {
     public final boolean equals(Object o) {
         if (o == null) return false;
         if (o instanceof ByteArray) {
-            return compare(getData(), ((ByteArray) o).getData());
+            ByteArray ba = (ByteArray)o;
+            return compare(getData(), _offset, _valid, ba.getData(), ba.getOffset(), ba.getValid());
         }
 
         try {
             byte val[] = (byte[]) o;
-            return compare(getData(), val);
+            return compare(getData(), _offset, _valid, val, 0, val.length);
         } catch (Throwable t) {
             return false;
         }
     }
 
-    private static final boolean compare(byte[] lhs, byte[] rhs) {
-        return DataHelper.eq(lhs, rhs);
+    private static final boolean compare(byte[] lhs, int loff, int llen, byte[] rhs, int roff, int rlen) {
+        return (llen == rlen) && DataHelper.eq(lhs, loff, rhs, roff, llen);
     }
     
     public final int compareTo(Object obj) {

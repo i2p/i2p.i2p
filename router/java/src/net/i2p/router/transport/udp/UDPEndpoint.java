@@ -26,6 +26,8 @@ public class UDPEndpoint {
     }
     
     public void startup() {
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("Starting up the UDP endpoint");
         shutdown();
         try {
             DatagramSocket socket = new DatagramSocket(_listenPort);

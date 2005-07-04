@@ -136,6 +136,8 @@ public class TCPTransport extends TransportImpl {
     }
     
     public TransportBid bid(RouterInfo toAddress, long dataSize) {
+        if (false) return null;
+        
         RouterAddress addr = toAddress.getTargetAddress(STYLE);
         
         if ( (_myAddress != null) && (_myAddress.equals(addr)) ) 
@@ -306,8 +308,13 @@ public class TCPTransport extends TransportImpl {
     }
     
     void connectionClosed(TCPConnection con) {
+        Hash remotePeer = null;
+        if (con == null) return;
+        RouterIdentity peer = con.getRemoteRouterIdentity();
+        if (peer == null) return;
+        remotePeer = peer.getHash();
         synchronized (_connectionLock) {
-            TCPConnection cur = (TCPConnection)_connectionsByIdent.remove(con.getRemoteRouterIdentity().getHash());
+            TCPConnection cur = (TCPConnection)_connectionsByIdent.remove(remotePeer);
             if ( (cur != null) && (cur != con) )
                 _connectionsByIdent.put(cur.getRemoteRouterIdentity().getHash(), cur);
             cur = (TCPConnection)_connectionsByAddress.remove(con.getRemoteAddress().toString());

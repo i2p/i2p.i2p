@@ -60,15 +60,16 @@ public class PacketBuilder {
         DataHelper.toLong(data, off, 4, state.getMessageId());
         off += 4;
         
-        data[off] |= fragment << 3;
+        data[off] |= fragment << 1;
         if (fragment == state.getFragmentCount() - 1)
-            data[off] |= 1 << 2; // isLast
+            data[off] |= 1; // isLast
         off++;
         
         int size = state.fragmentSize(fragment);
         if (size < 0)
             return null;
         DataHelper.toLong(data, off, 2, size);
+        data[off] &= (byte)3F; // 2 highest bits are reserved
         off += 2;
         
         size = state.writeFragment(data, off, fragment);
@@ -81,12 +82,18 @@ public class PacketBuilder {
         if ( (off % 16) != 0)
             off += 16 - (off % 16);
         packet.getPacket().setLength(off);
+        packet.setPacketDataLength(off);
         authenticate(packet, peer.getCurrentCipherKey(), peer.getCurrentMACKey());
         setTo(packet, peer.getRemoteIPAddress(), peer.getRemotePort());
         return packet;
     }
     
-    public UDPPacket buildACK(PeerState peer, List ackedMessageIds) {
+    private static final int ACK_PRIORITY = 1;
+    
+    /**
+     * @param ackBitfields list of ACKBitfield instances to either fully or partially ACK
+     */
+    public UDPPacket buildACK(PeerState peer, List ackBitfields) {
         UDPPacket packet = UDPPacket.acquire(_context);
         
         byte data[] = packet.getPacket().getData();
@@ -101,17 +108,55 @@ public class PacketBuilder {
         DataHelper.toLong(data, off, 4, now);
         off += 4;
         
+        int fullACKCount = 0;
+        int partialACKCount = 0;
+        for (int i = 0; i < ackBitfields.size(); i++) {
+            if (((ACKBitfield)ackBitfields.get(i)).receivedComplete())
+                fullACKCount++;
+            else
+                partialACKCount++;
+        }
         // ok, now for the body...
-        data[off] |= UDPPacket.DATA_FLAG_EXPLICIT_ACK;
+        if (fullACKCount > 0)
+            data[off] |= UDPPacket.DATA_FLAG_EXPLICIT_ACK;
+        if (partialACKCount > 0)
+            data[off] |= UDPPacket.DATA_FLAG_ACK_BITFIELDS;
         // add ECN if (peer.getSomethingOrOther())
         off++;
         
-        DataHelper.toLong(data, off, 1, ackedMessageIds.size());
-        off++;
-        for (int i = 0; i < ackedMessageIds.size(); i++) {
-            Long id = (Long)ackedMessageIds.get(i);
-            DataHelper.toLong(data, off, 4, id.longValue());
-            off += 4;
+        if (fullACKCount > 0) {
+            DataHelper.toLong(data, off, 1, fullACKCount);
+            off++;
+            for (int i = 0; i < ackBitfields.size(); i++) {
+                ACKBitfield bf = (ACKBitfield)ackBitfields.get(i);
+                if (bf.receivedComplete()) {
+                    DataHelper.toLong(data, off, 4, bf.getMessageId());
+                    off += 4;
+                }
+            }
+        }
+        
+        if (partialACKCount > 0) {
+            DataHelper.toLong(data, off, 1, partialACKCount);
+            off++;
+            for (int i = 0; i < ackBitfields.size(); i++) {
+                ACKBitfield bitfield = (ACKBitfield)ackBitfields.get(i);
+                if (bitfield.receivedComplete()) continue;
+                DataHelper.toLong(data, off, 4, bitfield.getMessageId());
+                off += 4;
+                int bits = bitfield.fragmentCount();
+                int size = (bits / 7) + 1;
+                for (int curByte = 0; curByte < size; curByte++) {
+                    if (curByte + 1 < size)
+                        data[off] |= (byte)(1 << 7);
+                    
+                    for (int curBit = 0; curBit < 7; curBit++) {
+                        if (bitfield.received(curBit + 7*curByte))
+                            data[off] |= (byte)(1 << curBit);
+                    }
+                    off++;
+                }
+            }
         }
         
         DataHelper.toLong(data, off, 1, 0); // no fragments in this message
@@ -123,6 +168,7 @@ public class PacketBuilder {
         if ( (off % 16) != 0)
             off += 16 - (off % 16);
         packet.getPacket().setLength(off);
+        packet.setPacketDataLength(off);
         authenticate(packet, peer.getCurrentCipherKey(), peer.getCurrentMACKey());
         setTo(packet, peer.getRemoteIPAddress(), peer.getRemotePort());
         return packet;
@@ -142,15 +188,16 @@ public class PacketBuilder {
      */
     public UDPPacket buildSessionCreatedPacket(InboundEstablishState state, int externalPort, SessionKey ourIntroKey) {
         UDPPacket packet = UDPPacket.acquire(_context);
+        
         InetAddress to = null;
         try {
             to = InetAddress.getByAddress(state.getSentIP());
         } catch (UnknownHostException uhe) {
             if (_log.shouldLog(Log.ERROR))
-                _log.error("How did we think this was a valid IP?  " + state.getRemoteHostInfo());
+                _log.error("How did we think this was a valid IP?  " + state.getRemoteHostId().toString());
             return null;
         }
-        
+
         state.prepareSessionCreated();
         
         byte data[] = packet.getPacket().getData();
@@ -214,6 +261,7 @@ public class PacketBuilder {
         if ( (off % 16) != 0)
             off += 16 - (off % 16);
         packet.getPacket().setLength(off);
+        packet.setPacketDataLength(off);
         authenticate(packet, ourIntroKey, ourIntroKey, iv);
         setTo(packet, to, state.getSentPort());
         _ivCache.release(iv);
@@ -239,7 +287,7 @@ public class PacketBuilder {
             to = InetAddress.getByAddress(state.getSentIP());
         } catch (UnknownHostException uhe) {
             if (_log.shouldLog(Log.ERROR))
-                _log.error("How did we think this was a valid IP?  " + state.getRemoteHostInfo());
+                _log.error("How did we think this was a valid IP?  " + state.getRemoteHostId().toString());
             return null;
         }
         
@@ -272,6 +320,7 @@ public class PacketBuilder {
         if ( (off % 16) != 0)
             off += 16 - (off % 16);
         packet.getPacket().setLength(off);
+        packet.setPacketDataLength(off);
         authenticate(packet, state.getIntroKey(), state.getIntroKey());
         setTo(packet, to, state.getSentPort());
         return packet;
@@ -315,7 +364,7 @@ public class PacketBuilder {
             to = InetAddress.getByAddress(state.getSentIP());
         } catch (UnknownHostException uhe) {
             if (_log.shouldLog(Log.ERROR))
-                _log.error("How did we think this was a valid IP?  " + state.getRemoteHostInfo());
+                _log.error("How did we think this was a valid IP?  " + state.getRemoteHostId().toString());
             return null;
         }
         
@@ -366,6 +415,7 @@ public class PacketBuilder {
             
             System.arraycopy(state.getSentSignature().getData(), 0, data, off, Signature.SIGNATURE_BYTES);
             packet.getPacket().setLength(off + Signature.SIGNATURE_BYTES);
+            packet.setPacketDataLength(off + Signature.SIGNATURE_BYTES);
             authenticate(packet, state.getCipherKey(), state.getMACKey());
         } else {
             // nothing more to add beyond the identity fragment, though we can
@@ -375,6 +425,7 @@ public class PacketBuilder {
             if ( (off % 16) != 0)
                 off += 16 - (off % 16);
             packet.getPacket().setLength(off);
+            packet.setPacketDataLength(off);
             authenticate(packet, state.getIntroKey(), state.getIntroKey());
         } 
         
@@ -417,7 +468,7 @@ public class PacketBuilder {
      */
     private void authenticate(UDPPacket packet, SessionKey cipherKey, SessionKey macKey, ByteArray iv) {
         int encryptOffset = packet.getPacket().getOffset() + UDPPacket.IV_SIZE + UDPPacket.MAC_SIZE;
-        int encryptSize = packet.getPacket().getLength() - UDPPacket.IV_SIZE - UDPPacket.MAC_SIZE - packet.getPacket().getOffset();
+        int encryptSize = packet.getPacketDataLength()/*packet.getPacket().getLength()*/ - UDPPacket.IV_SIZE - UDPPacket.MAC_SIZE - packet.getPacket().getOffset();
         byte data[] = packet.getPacket().getData();
         _context.aes().encrypt(data, encryptOffset, data, encryptOffset, cipherKey, iv.getData(), encryptSize);
         
@@ -434,7 +485,7 @@ public class PacketBuilder {
         Hash hmac = _context.hmac().calculate(macKey, data, hmacOff, hmacLen);
         
         if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Authenticating " + packet.getPacket().getLength() +
+            _log.debug("Authenticating " + packet.getPacketDataLength() + // packet.getPacket().getLength() +
                        "\nIV: " + Base64.encode(iv.getData()) +
                        "\nraw mac: " + hmac.toBase64() +
                        "\nMAC key: " + macKey.toBase64());

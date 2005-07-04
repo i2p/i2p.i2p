@@ -44,7 +44,7 @@ public class OutboundMessageState {
         _nextSendFragment = 0;
     }
     
-    public synchronized boolean initialize(OutNetMessage msg) {
+    public boolean initialize(OutNetMessage msg) {
         try {
             initialize(msg, msg.getMessage(), null);
             return true;
@@ -68,7 +68,7 @@ public class OutboundMessageState {
         }
     }
     
-    private synchronized void initialize(OutNetMessage m, I2NPMessage msg, PeerState peer) {
+    private void initialize(OutNetMessage m, I2NPMessage msg, PeerState peer) {
         _message = m;
         _peer = peer;
         if (_messageBuf != null) {
@@ -93,10 +93,10 @@ public class OutboundMessageState {
             _log.debug("Raw byte array for " + _messageId + ": " + Base64.encode(_messageBuf.getData(), 0, len));
     }
     
-    public synchronized void releaseResources() { 
+    public void releaseResources() { 
         if (_messageBuf != null)
             _cache.release(_messageBuf);
-        _messageBuf = null;
+        //_messageBuf = null;
     }
     
     public OutNetMessage getMessage() { return _message; }
@@ -107,23 +107,26 @@ public class OutboundMessageState {
         return _expiration < _context.clock().now(); 
     }
     public boolean isComplete() {
-        if (_fragmentSends == null) return false;
-        for (int i = 0; i < _fragmentSends.length; i++)
-            if (_fragmentSends[i] >= 0)
+        short sends[] = _fragmentSends;
+        if (sends == null) return false;
+        for (int i = 0; i < sends.length; i++)
+            if (sends[i] >= 0)
                 return false;
         // nothing else pending ack
         return true;
     }
-    public synchronized int getUnackedSize() {
+    public int getUnackedSize() {
+        short fragmentSends[] = _fragmentSends;
+        ByteArray messageBuf = _messageBuf;
         int rv = 0;
-        if ( (_messageBuf != null) && (_fragmentSends != null) ) {
-            int totalSize = _messageBuf.getValid();
+        if ( (messageBuf != null) && (fragmentSends != null) ) {
+            int totalSize = messageBuf.getValid();
             int lastSize = totalSize % _fragmentSize;
             if (lastSize == 0)
                 lastSize = _fragmentSize;
-            for (int i = 0; i < _fragmentSends.length; i++) {
-                if (_fragmentSends[i] >= (short)0) {
-                    if (i + 1 == _fragmentSends.length)
+            for (int i = 0; i < fragmentSends.length; i++) {
+                if (fragmentSends[i] >= (short)0) {
+                    if (i + 1 == fragmentSends.length)
                         rv += lastSize;
                     else
                         rv += _fragmentSize;
@@ -132,23 +135,45 @@ public class OutboundMessageState {
         }
         return rv;
     }
-    public synchronized boolean needsSending(int fragment) {
-        if ( (_fragmentSends == null) || (fragment >= _fragmentSends.length) || (fragment < 0) )
+    public boolean needsSending(int fragment) {
+        
+        short sends[] = _fragmentSends;
+        if ( (sends == null) || (fragment >= sends.length) || (fragment < 0) )
             return false;
-        return (_fragmentSends[fragment] >= (short)0);
+        return (sends[fragment] >= (short)0);
     }
     public long getLifetime() { return _context.clock().now() - _startedOn; }
     
     /**
-     * Ack all the fragments in the ack list
+     * Ack all the fragments in the ack list.  As a side effect, if there are
+     * still unacked fragments, the 'next send' time will be updated under the
+     * assumption that that all of the packets within a volley would reach the
+     * peer within that ack frequency (2-400ms).
+     *
+     * @return true if the message was completely ACKed
      */
-    public void acked(int ackedFragments[]) {
+    public boolean acked(ACKBitfield bitfield) {
         // stupid brute force, but the cardinality should be trivial
-        for (int i = 0; i < ackedFragments.length; i++) {
-            if ( (ackedFragments[i] < 0) || (ackedFragments[i] >= _fragmentSends.length) )
-                continue;
-            _fragmentSends[ackedFragments[i]] = -1;
+        short sends[] = _fragmentSends;
+        if (sends != null)
+            for (int i = 0; i < bitfield.fragmentCount(); i++)
+                if (bitfield.received(i))
+                    sends[i] = (short)-1;
+        
+        boolean rv = isComplete();
+        if (!rv && false) { // don't do the fast retransmit... lets give it time to get ACKed
+            long nextTime = _context.clock().now() + Math.max(_peer.getRTT(), ACKSender.ACK_FREQUENCY);
+            //_nextSendTime = Math.max(now, _startedOn+PeerState.MIN_RTO);
+            if (_nextSendTime <= 0)
+                _nextSendTime = nextTime;
+            else
+                _nextSendTime = Math.min(_nextSendTime, nextTime);
+            
+            //if (now + 100 > _nextSendTime)
+            //    _nextSendTime = now + 100;
+            //_nextSendTime = now;
         }
+        return rv;
     }
     
     public long getNextSendTime() { return _nextSendTime; }
@@ -156,7 +181,7 @@ public class OutboundMessageState {
     public int getMaxSends() { return _maxSends; }
     public int getPushCount() { return _pushCount; }
     /** note that we have pushed the message fragments */
-    public synchronized void push() { 
+    public void push() { 
         _pushCount++; 
         if (_pushCount > _maxSends)
             _maxSends = (short)_pushCount;
@@ -172,7 +197,7 @@ public class OutboundMessageState {
      * fragmentSize bytes per fragment.
      *
      */
-    public synchronized void fragment(int fragmentSize) {
+    public void fragment(int fragmentSize) {
         int totalSize = _messageBuf.getValid();
         int numFragments = totalSize / fragmentSize;
         if (numFragments * fragmentSize != totalSize)
@@ -198,7 +223,7 @@ public class OutboundMessageState {
     public int getFragmentSize() { return _fragmentSize; }
     /** should we continue sending this fragment? */
     public boolean shouldSend(int fragmentNum) { return _fragmentSends[fragmentNum] >= (short)0; }
-    public synchronized int fragmentSize(int fragmentNum) {
+    public int fragmentSize(int fragmentNum) {
         if (_messageBuf == null) return -1;
         if (fragmentNum + 1 == _fragmentSends.length)
             return _messageBuf.getValid() % _fragmentSize;
@@ -206,81 +231,6 @@ public class OutboundMessageState {
             return _fragmentSize;
     }
 
-    public void incrementCurrentFragment() {
-        int cur = _nextSendFragment;
-        _fragmentSends[cur]++;
-        _maxSends = _fragmentSends[cur];
-        _nextSendFragment++;
-        if (_nextSendFragment >= _fragmentSends.length) {
-            _nextSendFragment = 0;
-            _pushCount++;
-        }
-    }
-    
-    /**
-     * Pick a fragment that we still need to send.  Current implementation 
-     * picks the fragment which has been sent the least (randomly choosing 
-     * among equals), incrementing the # sends of the winner in the process.
-     *
-     * @return fragment index, or -1 if all of the fragments were acked
-     */
-    public int pickNextFragment() {
-        if (true) {
-            return _nextSendFragment;
-        }
-        short minValue = -1;
-        int minIndex = -1;
-        int startOffset = _context.random().nextInt(_fragmentSends.length);
-        for (int i = 0; i < _fragmentSends.length; i++) {
-            int cur = (i + startOffset) % _fragmentSends.length;
-            if (_fragmentSends[cur] < (short)0)
-                continue;
-            else if ( (minValue < (short)0) || (_fragmentSends[cur] < minValue) ) {
-                minValue = _fragmentSends[cur];
-                minIndex = cur;
-            }
-        }
-        if (minIndex >= 0) {
-            _fragmentSends[minIndex]++;
-            if (_fragmentSends[minIndex] > _maxSends)
-                _maxSends = _fragmentSends[minIndex];
-        }
-        
-        // if all fragments have now been sent an equal number of times,
-        // lets give pause for an ACK
-        boolean endOfVolley = true;
-        for (int i = 0; i < _fragmentSends.length; i++) {
-            if (_fragmentSends[i] < (short)0)
-                continue;
-            if (_fragmentSends[i] != (short)_pushCount+1) {
-                endOfVolley = false;
-                break;
-            }
-        }
-        if (endOfVolley) {
-            _pushCount++;
-        }
-        
-        if (_log.shouldLog(Log.DEBUG)) {
-            StringBuffer buf = new StringBuffer(64);
-            buf.append("Next fragment is ").append(minIndex);
-            if (minIndex >= 0) {
-                buf.append(" (#sends: ").append(_fragmentSends[minIndex]-1);
-                buf.append(" #fragments: ").append(_fragmentSends.length);
-                buf.append(")");
-            }
-            _log.debug(buf.toString());
-        }
-        return minIndex;
-    }
-
-    public boolean justBeganVolley() {
-        if (_fragmentSends.length == 1)
-            return true;
-        else
-            return _nextSendFragment == 1;
-    }
-    
     /**
      * Write a part of the the message onto the specified buffer.
      *
@@ -289,7 +239,7 @@ public class OutboundMessageState {
      * @param fragmentNum fragment to write (0 indexed)
      * @return bytesWritten
      */
-    public synchronized int writeFragment(byte out[], int outOffset, int fragmentNum) {
+    public int writeFragment(byte out[], int outOffset, int fragmentNum) {
         int start = _fragmentSize * fragmentNum;
         int end = start + _fragmentSize;
         if (_messageBuf == null) return -1;
@@ -303,15 +253,23 @@ public class OutboundMessageState {
         return toSend;
     }
     
-    public synchronized String toString() {
+    public String toString() {
+        short sends[] = _fragmentSends;
+        ByteArray messageBuf = _messageBuf;
         StringBuffer buf = new StringBuffer(64);
         buf.append("Message ").append(_messageId);
-        if (_fragmentSends != null)
-            buf.append(" with ").append(_fragmentSends.length).append(" fragments");
-        if (_messageBuf != null)
-            buf.append(" of size ").append(_messageBuf.getValid());
+        if (sends != null)
+            buf.append(" with ").append(sends.length).append(" fragments");
+        if (messageBuf != null)
+            buf.append(" of size ").append(messageBuf.getValid());
         buf.append(" volleys: ").append(_maxSends);
         buf.append(" lifetime: ").append(getLifetime());
+        if (sends != null) {
+            buf.append(" pending fragments: ");
+            for (int i = 0; i < sends.length; i++)
+                if (sends[i] >= 0)
+                    buf.append(i).append(' ');
+        }
         return buf.toString();
     }
 }

@@ -84,7 +84,7 @@ public class StreamSinkClient {
             Random rand = new Random();
             OutputStream out = sock.getOutputStream();
             long beforeSending = System.currentTimeMillis();
-            for (int i = 0; i < _sendSize; i+= 32) {
+            for (int i = 0; (_sendSize < 0) || (i < _sendSize); i+= 32) {
                 rand.nextBytes(buf);
                 out.write(buf);
                 if (_log.shouldLog(Log.DEBUG))
@@ -117,7 +117,7 @@ public class StreamSinkClient {
     /**
      * Fire up the client.  <code>Usage: StreamSinkClient [i2cpHost i2cpPort] sendSizeKB writeDelayMs serverDestFile</code> <br />
      * <ul>
-     *  <li><b>sendSizeKB</b>: how many KB to send</li>
+     *  <li><b>sendSizeKB</b>: how many KB to send, or -1 for unlimited</li>
      *  <li><b>writeDelayMs</b>: how long to wait between each .write (0 for no delay)</li>
      *  <li><b>serverDestFile</b>: file containing the StreamSinkServer's binary Destination</li>
      * </ul>

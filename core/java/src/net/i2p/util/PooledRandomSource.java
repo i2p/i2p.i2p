@@ -17,10 +17,10 @@ import net.i2p.crypto.EntropyHarvester;
  */
 public class PooledRandomSource extends RandomSource {
     private Log _log;
-    private RandomSource _pool[];
-    private volatile int _nextPool;
+    protected RandomSource _pool[];
+    protected volatile int _nextPool;
 
-    private static final int POOL_SIZE = 16;
+    public static final int POOL_SIZE = 16;
     
     public PooledRandomSource(I2PAppContext context) {
         super(context);
@@ -34,7 +34,7 @@ public class PooledRandomSource extends RandomSource {
     }
 
     private final RandomSource pickPRNG() {
-        int i = _nextPool;
+        int i = _nextPool % POOL_SIZE;
         _nextPool = (++_nextPool) % POOL_SIZE;
         return _pool[i];
     }
@@ -140,4 +140,17 @@ public class PooledRandomSource extends RandomSource {
         RandomSource prng = pickPRNG();
         return prng.harvester();
     }
+    
+    public static void main(String args[]) {
+        PooledRandomSource prng = new PooledRandomSource(I2PAppContext.getGlobalContext());
+        int size = 8*1024*1024;
+        try {
+            java.io.FileOutputStream out = new java.io.FileOutputStream("random.file");
+            for (int i = 0; i < size; i++) {
+                out.write(prng.nextInt());
+            }
+            out.close();
+        } catch (Exception e) { e.printStackTrace(); }
+        System.out.println("Written to random.file");
+    }    
 }

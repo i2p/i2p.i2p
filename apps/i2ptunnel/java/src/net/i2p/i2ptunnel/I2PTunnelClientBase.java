@@ -110,7 +110,7 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
                 }
             }
             if (sockMgr == null) {
-                _log.log(Log.CRIT, "Unable to create socket manager");
+                _log.log(Log.CRIT, "Unable to create socket manager (our own? " + ownDest + ")");
                 try { Thread.sleep(10*1000); } catch (InterruptedException ie) {}
             }
         }

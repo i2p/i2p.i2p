@@ -68,8 +68,9 @@ public class ACKSender implements Runnable {
                 synchronized (_peersToACK) {
                     for (int i = 0; i < _peersToACK.size(); i++) {
                         PeerState cur = (PeerState)_peersToACK.get(i);
-                        long delta = cur.getWantedACKSendSince() + ACK_FREQUENCY - now;
-                        if ( (delta < 0) || (cur.unsentACKThresholdReached()) ) {
+                        long wanted = cur.getWantedACKSendSince();
+                        long delta = wanted + ACK_FREQUENCY - now;
+                        if ( ( (wanted > 0) && (delta < 0) ) || (cur.unsentACKThresholdReached()) ) {
                             _peersToACK.remove(i);
                             peer = cur;
                             break;
@@ -90,28 +91,33 @@ public class ACKSender implements Runnable {
             if (peer != null) {
                 long lastSend = peer.getLastACKSend();
                 long wanted = peer.getWantedACKSendSince();
-                List acks = peer.retrieveACKs();
-                if ( (acks != null) && (acks.size() > 0) ) {
-                    _context.statManager().addRateData("udp.sendACKCount", acks.size(), 0);
+                List ackBitfields = peer.retrieveACKBitfields(_transport.getPartialACKSource());
+                
+                if (wanted < 0)
+                    _log.error("wtf, why are we acking something they dont want?  remaining=" + remaining + ", peer=" + peer + ", bitfields=" + ackBitfields);
+                
+                if ( (ackBitfields != null) && (ackBitfields.size() > 0) ) {
+                    _context.statManager().addRateData("udp.sendACKCount", ackBitfields.size(), 0);
                     _context.statManager().addRateData("udp.sendACKRemaining", remaining, 0);
                     now = _context.clock().now();
                     _context.statManager().addRateData("udp.ackFrequency", now-lastSend, now-wanted);
-                    _context.statManager().getStatLog().addData(peer.getRemoteHostString(), "udp.peer.sendACKCount", acks.size(), 0);
-                    UDPPacket ack = _builder.buildACK(peer, acks);
+                    _context.statManager().getStatLog().addData(peer.getRemoteHostId().toString(), "udp.peer.sendACKCount", ackBitfields.size(), 0);
+                    UDPPacket ack = _builder.buildACK(peer, ackBitfields);
                     ack.markType(1);
                     if (_log.shouldLog(Log.INFO))
-                        _log.info("Sending ACK for " + acks);
+                        _log.info("Sending ACK for " + ackBitfields);
                     _transport.send(ack);
                     
-                    if (wanted == peer.getWantedACKSendSince()) {
-                        // still packets left to be ACKed, since wanted time
-                        // is reset by retrieveACKs when all of the IDs are
+                    if ( (wanted > 0) && (wanted <= peer.getWantedACKSendSince()) ) {
+                        // still full packets left to be ACKed, since wanted time
+                        // is reset by retrieveACKBitfields when all of the IDs are
                         // removed
+                        if (_log.shouldLog(Log.WARN))
+                            _log.warn("Rerequesting ACK for peer " + peer);
                         ackPeer(peer);
                     }
                 }
             }
         }
     }
-    
 }

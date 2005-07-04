@@ -27,9 +27,9 @@ public class InboundMessageState {
     private long _receiveBegin;
     private int _completeSize;
     
-    /** expire after 30s */
+    /** expire after 10s */
     private static final long MAX_RECEIVE_TIME = 10*1000;
-    private static final int MAX_FRAGMENTS = 32;
+    private static final int MAX_FRAGMENTS = 64;
     
     private static final ByteCache _fragmentCache = ByteCache.getInstance(64, 2048);
     
@@ -49,7 +49,7 @@ public class InboundMessageState {
      *
      * @return true if the data was ok, false if it was corrupt
      */
-    public synchronized boolean receiveFragment(UDPPacketReader.DataReader data, int dataFragment) {
+    public boolean receiveFragment(UDPPacketReader.DataReader data, int dataFragment) {
         int fragmentNum = data.readMessageFragmentNum(dataFragment);
         if ( (fragmentNum < 0) || (fragmentNum > _fragments.length)) {
             StringBuffer buf = new StringBuffer(1024);
@@ -72,14 +72,14 @@ public class InboundMessageState {
         return true;
     }
     
-    public synchronized boolean isComplete() {
+    public boolean isComplete() {
         if (_lastFragment < 0) return false;
         for (int i = 0; i <= _lastFragment; i++)
             if (_fragments[i] == null)
                 return false;
         return true;
     }
-    public synchronized boolean isExpired() { 
+    public boolean isExpired() { 
         return _context.clock().now() > _receiveBegin + MAX_RECEIVE_TIME;
     }
     public long getLifetime() {
@@ -87,7 +87,7 @@ public class InboundMessageState {
     }
     public Hash getFrom() { return _from; }
     public long getMessageId() { return _messageId; }
-    public synchronized int getCompleteSize() {
+    public int getCompleteSize() {
         if (_completeSize < 0) {
             int size = 0;
             for (int i = 0; i <= _lastFragment; i++)
@@ -95,6 +95,46 @@ public class InboundMessageState {
             _completeSize = size;
         }
         return _completeSize;
+    }
+    public ACKBitfield createACKBitfield() {
+        return new PartialBitfield(_messageId, _fragments);
+    }
+    
+    private static final class PartialBitfield implements ACKBitfield {
+        private long _bitfieldMessageId;
+        private boolean _fragmentsReceived[];
+        
+        public PartialBitfield(long messageId, Object data[]) {
+            _bitfieldMessageId = messageId;
+            for (int i = data.length - 1; i >= 0; i--) {
+                if (data[i] != null) {
+                    if (_fragmentsReceived == null)
+                        _fragmentsReceived = new boolean[i+1];
+                    _fragmentsReceived[i] = true;
+                }
+            }
+            if (_fragmentsReceived == null)
+                _fragmentsReceived = new boolean[0];
+        }
+        public int fragmentCount() { return _fragmentsReceived.length; }
+        public long getMessageId() { return _bitfieldMessageId; }
+        public boolean received(int fragmentNum) { 
+            if ( (fragmentNum < 0) || (fragmentNum >= _fragmentsReceived.length) )
+                return false;
+            return _fragmentsReceived[fragmentNum];
+        }
+        public boolean receivedComplete() { return false; }
+        
+        public String toString() { 
+            StringBuffer buf = new StringBuffer(64);
+            buf.append("Partial ACK of ");
+            buf.append(_bitfieldMessageId);
+            buf.append(" with ACKs for: ");
+            for (int i = 0; i < _fragmentsReceived.length; i++)
+                if (_fragmentsReceived[i])
+                    buf.append(i).append(" ");
+            return buf.toString();
+        }
     }
     
     public void releaseResources() {

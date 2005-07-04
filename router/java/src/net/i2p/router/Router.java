@@ -414,14 +414,12 @@ public class Router {
             _cal.set(Calendar.SECOND, 0);
             _cal.set(Calendar.MILLISECOND, 0);
             long then = _cal.getTime().getTime();
-            _log.debug("Time till midnight: " + (then-now) + "ms");
-            if (then - now <= 60*1000) {
-                // everyone wave at kaffe.
-                // "Hi Kaffe"
-                return 60*1000;
-            } else {
-                return then - now;
-            }
+            long howLong = then - now;
+            if (howLong < 0) // hi kaffe
+                howLong = 24*60*60*1000 + howLong;
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Time till midnight: " + howLong + "ms");
+            return howLong;
         }
     }
     
@@ -838,12 +836,14 @@ public class Router {
         FileOutputStream fos = null;
         try {
             fos = new FileOutputStream(_configFilename);
-            TreeSet ordered = new TreeSet(_config.keySet());
             StringBuffer buf = new StringBuffer(8*1024);
-            for (Iterator iter = ordered.iterator() ; iter.hasNext(); ) {
-                String key = (String)iter.next();
-                String val = _config.getProperty(key);
-                buf.append(key).append('=').append(val).append('\n');
+            synchronized (_config) {
+                TreeSet ordered = new TreeSet(_config.keySet());
+                for (Iterator iter = ordered.iterator() ; iter.hasNext(); ) {
+                    String key = (String)iter.next();
+                    String val = _config.getProperty(key);
+                    buf.append(key).append('=').append(val).append('\n');
+                }
             }
             fos.write(buf.toString().getBytes());
         } catch (IOException ioe) {

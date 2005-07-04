@@ -41,6 +41,7 @@ public class PacketHandler {
         _context.statManager().createRateStat("udp.handleTime", "How long it takes to handle a received packet after its been pulled off the queue", "udp", new long[] { 10*60*1000, 60*60*1000 });
         _context.statManager().createRateStat("udp.queueTime", "How long after a packet is received can we begin handling it", "udp", new long[] { 10*60*1000, 60*60*1000 });
         _context.statManager().createRateStat("udp.receivePacketSkew", "How long ago after the packet was sent did we receive it", "udp", new long[] { 10*60*1000, 60*60*1000 });
+        _context.statManager().createRateStat("udp.droppedInvalid", "How old the packet we dropped due to invalidity was", "udp", new long[] { 10*60*1000, 60*60*1000 });
     }
     
     public void startup() { 
@@ -65,11 +66,17 @@ public class PacketHandler {
         public void run() {
             while (_keepReading) {
                 UDPPacket packet = _endpoint.receive();
+                if (packet == null) continue; // keepReading is probably false...
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("Received the packet " + packet);
                 long queueTime = packet.getLifetime();
                 long handleStart = _context.clock().now();
-                handlePacket(_reader, packet);
+                try {
+                    handlePacket(_reader, packet);
+                } catch (Exception e) {
+                    if (_log.shouldLog(Log.ERROR))
+                        _log.error("Crazy error handling a packet: " + packet, e);
+                }
                 long handleTime = _context.clock().now() - handleStart;
                 _context.statManager().addRateData("udp.handleTime", handleTime, packet.getLifetime());
                 _context.statManager().addRateData("udp.queueTime", queueTime, packet.getLifetime());
@@ -151,6 +158,7 @@ public class PacketHandler {
                     } else {
                         if (_log.shouldLog(Log.WARN))
                             _log.warn("Validation with existing con failed, and validation as reestablish failed too.  DROP");
+                        _context.statManager().addRateData("udp.droppedInvalid", packet.getLifetime(), packet.getExpiration());
                     }
                     return;
                 }
@@ -169,6 +177,7 @@ public class PacketHandler {
         if (!isValid) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Invalid introduction packet received: " + packet, new Exception("path"));
+            _context.statManager().addRateData("udp.droppedInvalid", packet.getLifetime(), packet.getExpiration());
             return;
         } else {
             if (_log.shouldLog(Log.INFO))
@@ -214,6 +223,8 @@ public class PacketHandler {
             // ok, we couldn't handle it with the established stuff, so fall back
             // on earlier state packets
             receivePacket(reader, packet);
+        } else {
+            _context.statManager().addRateData("udp.droppedInvalid", packet.getLifetime(), packet.getExpiration());
         }
     }
 
@@ -272,16 +283,18 @@ public class PacketHandler {
         if (skew > GRACE_PERIOD) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Packet too far in the future: " + new Date(sendOn/1000) + ": " + packet);
+            _context.statManager().addRateData("udp.droppedInvalid", packet.getLifetime(), packet.getExpiration());
             return;
         } else if (skew < 0 - GRACE_PERIOD) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Packet too far in the past: " + new Date(sendOn/1000) + ": " + packet);
+            _context.statManager().addRateData("udp.droppedInvalid", packet.getLifetime(), packet.getExpiration());
             return;
         }
         
         if (state != null) {
             if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Received packet from " + state.getRemoteHostString() + " with skew " + skew);
+                _log.debug("Received packet from " + state.getRemoteHostId().toString() + " with skew " + skew);
             state.adjustClockSkew((short)skew);
         }
         
@@ -289,7 +302,7 @@ public class PacketHandler {
         
         InetAddress fromHost = packet.getPacket().getAddress();
         int fromPort = packet.getPacket().getPort();
-        String from = PeerState.calculateRemoteHostString(fromHost.getAddress(), fromPort);
+        RemoteHostId from = new RemoteHostId(fromHost.getAddress(), fromPort);
         
         switch (reader.readPayloadType()) {
             case UDPPacket.PAYLOAD_TYPE_SESSION_REQUEST:
@@ -311,6 +324,7 @@ public class PacketHandler {
             default:
                 if (_log.shouldLog(Log.WARN))
                     _log.warn("Unknown payload type: " + reader.readPayloadType());
+                _context.statManager().addRateData("udp.droppedInvalid", packet.getLifetime(), packet.getExpiration());
                 return;
         }
     }

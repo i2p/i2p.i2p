@@ -39,9 +39,14 @@ import net.i2p.util.Log;
 class I2CPMessageProducer {
     private final static Log _log = new Log(I2CPMessageProducer.class);
     private I2PAppContext _context;
+    private int _sendBps;
+    private long _sendPeriodBytes;
+    private long _sendPeriodBeginTime;
 
     public I2CPMessageProducer(I2PAppContext context) {
         _context = context;
+        _sendBps = 0;
+        context.statManager().createRateStat("client.sendBpsRaw", "How fast we pump out I2CP data messages", "ClientMessages", new long[] { 60*1000, 5*60*1000, 10*60*1000, 60*60*1000 });
     }
     
     /** 
@@ -94,8 +99,30 @@ class I2CPMessageProducer {
         Payload data = createPayload(dest, payload, tag, key, tags, newKey);
         msg.setPayload(data);
         session.sendMessage(msg);
+        updateBps(payload.length);
     }
 
+    private void updateBps(int len) {
+        long now = _context.clock().now();
+        float period = ((float)now-_sendPeriodBeginTime)/1000f;
+        if (period >= 1f) {
+            // first term decays on slow transmission
+            _sendBps = (int)(((float)0.9f * (float)_sendBps) + ((float)0.1f*((float)_sendPeriodBytes)/period));
+            _sendPeriodBytes = len;
+            _sendPeriodBeginTime = now;
+            _context.statManager().addRateData("client.sendBpsRaw", _sendBps, 0);
+        } else {
+            _sendPeriodBytes += len;
+        }
+    }
+    
+    /** 
+     * Should we include the I2CP end to end crypto (which is in addition to any
+     * garlic crypto added by the router)
+     *
+     */
+    static final boolean END_TO_END_CRYPTO = true;
+    
     /**
      * Create a new signed payload and send it off to the destination
      *
@@ -106,6 +133,10 @@ class I2CPMessageProducer {
         if (payload == null) throw new I2PSessionException("No payload specified");
 
         Payload data = new Payload();
+        if (!END_TO_END_CRYPTO) {
+            data.setEncryptedData(payload);
+            return data;
+        }
         // no padding at this level
         // the garlic may pad, and the tunnels may pad, and the transports may pad
         int size = payload.length;

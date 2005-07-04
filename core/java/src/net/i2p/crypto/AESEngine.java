@@ -159,7 +159,6 @@ public class AESEngine {
         System.arraycopy(payload, inIndex, rv, outIndex, rv.length - outIndex);
     }
     
-    
     public static void main(String args[]) {
         I2PAppContext ctx = new I2PAppContext();
         SessionKey key = ctx.keyGenerator().generateSessionKey();

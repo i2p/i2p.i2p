@@ -92,11 +92,7 @@ public class UrlLauncher {
 
             } else {
 
-                if (_shellCommand.executeSilentAndWaitTimed("konqueror " + url, 5))
-                    return true;
-
-                if (_shellCommand.executeSilentAndWaitTimed("galeon " + url, 5))
-                    return true;
+                // fall through
             }
 
             if (_shellCommand.executeSilentAndWaitTimed("opera -newpage " + url, 5))
@@ -111,11 +107,18 @@ public class UrlLauncher {
             if (_shellCommand.executeSilentAndWaitTimed("netscape " + url, 5))
                 return true;
 
+            if (_shellCommand.executeSilentAndWaitTimed("konqueror " + url, 5))
+                return true;
+
+            if (_shellCommand.executeSilentAndWaitTimed("galeon " + url, 5))
+                return true;
+            
             if (_shellCommand.executeSilentAndWaitTimed("links " + url, 5))
                 return true;
 
             if (_shellCommand.executeSilentAndWaitTimed("lynx " + url, 5))
                 return true;
+            
         }
         return false;
     }

@@ -103,8 +103,8 @@ public class PeerState {
     private transient InetAddress _remoteIPAddress;
     /** what port is the peer sending and receiving packets on? */
     private int _remotePort;
-    /** cached remoteIP + port, used to find the peerState by remote info */
-    private String _remoteHostString;
+    /** cached RemoteHostId, used to find the peerState by remote info */
+    private RemoteHostId _remoteHostId;
     /** if we need to contact them, do we need to talk to an introducer? */
     private boolean _remoteRequiresIntroduction;
     /** 
@@ -129,8 +129,20 @@ public class PeerState {
     /** current retransmission timeout */
     private volatile int _rto;
     
+    /** how many packets will be considered within the retransmission rate calculation */
+    static final long RETRANSMISSION_PERIOD_WIDTH = 100;
+    
     private long _messagesReceived;
     private long _messagesSent;
+    private long _packetsTransmitted;
+    /** how many packets were retransmitted within the last RETRANSMISSION_PERIOD_WIDTH packets */
+    private long _packetsRetransmitted;
+    private int _packetRetransmissionRate;
+    /** what was the $packetsTransmitted when the current RETRANSMISSION_PERIOD_WIDTH began */
+    private long _retransmissionPeriodStart;
+    /** how many dup packets were received within the last RETRANSMISSION_PERIOD_WIDTH packets */
+    private long _packetsReceivedDuplicate;
+    private long _packetsReceived;
     
     private static final int DEFAULT_SEND_WINDOW_BYTES = 8*1024;
     private static final int MINIMUM_WINDOW_BYTES = DEFAULT_SEND_WINDOW_BYTES;
@@ -141,8 +153,8 @@ public class PeerState {
      * packets.
      */
     private static final int DEFAULT_MTU = 576;
-    private static final int MIN_RTO = 600;
-    private static final int MAX_RTO = 5000;
+    private static final int MIN_RTO = 500 + ACKSender.ACK_FREQUENCY;
+    private static final int MAX_RTO = 2000; // 5000;
     
     public PeerState(I2PAppContext ctx) {
         _context = ctx;
@@ -181,11 +193,20 @@ public class PeerState {
         _lastACKSend = -1;
         _rtt = 1000;
         _rttDeviation = _rtt;
-        _rto = 6000;
+        _rto = MAX_RTO;
         _messagesReceived = 0;
         _messagesSent = 0;
+        _packetsTransmitted = 0;
+        _packetsRetransmitted = 0;
+        _packetRetransmissionRate = 0;
+        _retransmissionPeriodStart = 0;
+        _packetsReceived = 0;
+        _packetsReceivedDuplicate = 0;
         _context.statManager().createRateStat("udp.congestionOccurred", "How large the cwin was when congestion occurred (duration == sendBps)", "udp", new long[] { 60*60*1000, 24*60*60*1000 });
         _context.statManager().createRateStat("udp.congestedRTO", "retransmission timeout after congestion (duration == rtt dev)", "udp", new long[] { 60*60*1000, 24*60*60*1000 });
+        _context.statManager().createRateStat("udp.sendACKPartial", "Number of partial ACKs sent (duration == number of full ACKs in that ack packet)", "udp", new long[] { 60*60*1000, 24*60*60*1000 });
+        _context.statManager().createRateStat("udp.sendBps", "How fast we are transmitting when a packet is acked", "udp", new long[] { 10*60*1000, 60*60*1000, 24*60*60*1000 });
+        _context.statManager().createRateStat("udp.receiveBps", "How fast we are receiving when a packet is fully received (at most one per second)", "udp", new long[] { 10*60*1000, 60*60*1000, 24*60*60*1000 });
     }
     
     /**
@@ -377,7 +398,7 @@ public class PeerState {
         _remoteIP = ip;
         _remoteIPAddress = null;
         _remotePort = port; 
-        _remoteHostString = calculateRemoteHostString(ip, port);
+        _remoteHostId = new RemoteHostId(ip, port);
     }
     /** if we need to contact them, do we need to talk to an introducer? */
     public void setRemoteRequiresIntroduction(boolean required) { _remoteRequiresIntroduction = required; }
@@ -403,6 +424,14 @@ public class PeerState {
     public void messageFullyReceived(Long messageId, int bytes) {
         if (bytes > 0)
             _receiveBytes += bytes;
+        else {
+            if (_retransmissionPeriodStart + RETRANSMISSION_PERIOD_WIDTH < _packetsReceived) {
+                _packetsReceivedDuplicate++;
+            } else {
+                _retransmissionPeriodStart = _packetsReceived;
+                _packetsReceivedDuplicate = 1;
+            }
+        }
         
         long now = _context.clock().now();
         long duration = now - _receivePeriodBegin;
@@ -410,6 +439,7 @@ public class PeerState {
             _receiveBps = (int)(0.9f*(float)_receiveBps + 0.1f*((float)_receiveBytes * (1000f/(float)duration)));
             _receiveBytes = 0;
             _receivePeriodBegin = now;
+           _context.statManager().addRateData("udp.receiveBps", _receiveBps, 0);
         }
         
         synchronized (_currentACKs) {
@@ -419,6 +449,11 @@ public class PeerState {
                 _currentACKs.add(messageId);
         }
         _messagesReceived++;
+    }
+    
+    public void messagePartiallyReceived() {
+        if (_wantACKSendSince <= 0)
+            _wantACKSendSince = _context.clock().now();
     }
     
     /** 
@@ -445,25 +480,65 @@ public class PeerState {
         return true;
     }
     
-    /** pull off the ACKs (Long) to send to the peer */
-    public List retrieveACKs() {
-        List rv = null;
-        int threshold = countMaxACKs();
+    /** 
+     * grab a list of ACKBitfield instances, some of which may fully 
+     * ACK a message while others may only partially ACK a message.  
+     * the values returned are limited in size so that they will fit within
+     * the peer's current MTU as an ACK - as such, not all messages may be
+     * ACKed with this call.  Be sure to check getWantedACKSendSince() which
+     * will be unchanged if there are ACKs remaining.
+     *
+     */
+    public List retrieveACKBitfields(UDPTransport.PartialACKSource partialACKSource) {
+        List rv = new ArrayList(16);
+        int bytesRemaining = countMaxACKData();
         synchronized (_currentACKs) {
-            if (_currentACKs.size() < threshold) {
-                rv = new ArrayList(_currentACKs);
-                _currentACKs.clear();
+            while ( (bytesRemaining >= 4) && (_currentACKs.size() > 0) ) {
+                rv.add(new FullACKBitfield((Long)_currentACKs.remove(0)));
+                bytesRemaining -= 4;
+            }
+            if (_currentACKs.size() <= 0)
                 _wantACKSendSince = -1;
-            } else {
-                rv = new ArrayList(threshold);
-                for (int i = 0; i < threshold; i++)
-                    rv.add(_currentACKs.remove(0));
+        }
+            
+        int partialIncluded = 0;
+        if ( (bytesRemaining > 4) && (partialACKSource != null) ) {
+            // ok, there's room to *try* to fit in some partial ACKs, so
+            // we should try to find some packets to partially ACK 
+            // (preferably the ones which have the most received fragments)
+            List partial = new ArrayList();
+            partialACKSource.fetchPartialACKs(_remotePeer, partial);
+            // we may not be able to use them all, but lets try...
+            for (int i = 0; (bytesRemaining > 4) && (i < partial.size()); i++) {
+                ACKBitfield bitfield = (ACKBitfield)partial.get(i);
+                int bytes = (bitfield.fragmentCount() / 7) + 1;
+                if (bytesRemaining > bytes + 4) { // msgId + bitfields
+                    rv.add(bitfield);
+                    bytesRemaining -= bytes + 4;
+                    partialIncluded++;
+                } else {
+                    // continue on to another partial, in case there's a 
+                    // smaller one that will fit
+                }
             }
         }
+
+        _context.statManager().addRateData("udp.sendACKPartial", partialIncluded, rv.size() - partialIncluded);
         _lastACKSend = _context.clock().now();
         return rv;
     }
     
+    /** represent a full ACK of a message */
+    private class FullACKBitfield implements ACKBitfield {
+        private long _msgId;
+        public FullACKBitfield(Long id) { _msgId = id.longValue(); }
+        public int fragmentCount() { return 0; }
+        public long getMessageId() { return _msgId; }
+        public boolean received(int fragmentNum) { return true; }
+        public boolean receivedComplete() { return true; }
+        public String toString() { return "Full ACK of " + _msgId; }
+    }
+        
     /** we sent a message which was ACKed containing the given # of bytes */
     public void messageACKed(int bytesACKed, long lifetime, int numSends) {
         _consecutiveFailedSends = 0;
@@ -489,26 +564,51 @@ public class PeerState {
             recalculateTimeouts(lifetime);
         else
             _log.warn("acked after numSends=" + numSends + " w/ lifetime=" + lifetime + " and size=" + bytesACKed);
+        
+        _context.statManager().addRateData("udp.sendBps", _sendBps, lifetime);
     }
 
     /** adjust the tcp-esque timeouts */
     private void recalculateTimeouts(long lifetime) {
         _rttDeviation = _rttDeviation + (int)(0.25d*(Math.abs(lifetime-_rtt)-_rttDeviation));
-        _rtt = (int)((float)_rtt*(0.9f) + (0.1f)*(float)lifetime);
+        
+        // the faster we are going, the slower we want to reduce the rtt
+        float scale = 0.1f;
+        if (_sendBps > 0)
+            scale = ((float)lifetime) / (float)((float)lifetime + (float)_sendBps);
+        if (scale < 0.001f) scale = 0.001f;
+        
+        _rtt = (int)(((float)_rtt)*(1.0f-scale) + (scale)*(float)lifetime);
         _rto = _rtt + (_rttDeviation<<2);
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Recalculating timeouts w/ lifetime=" + lifetime + ": rtt=" + _rtt
                        + " rttDev=" + _rttDeviation + " rto=" + _rto);
-        if (_rto < MIN_RTO)
-            _rto = MIN_RTO;
+        if (_rto < minRTO())
+            _rto = minRTO();
         if (_rto > MAX_RTO)
             _rto = MAX_RTO;
     }
+    
     /** we are resending a packet, so lets jack up the rto */
-    public void messageRetransmitted() { 
+    public void messageRetransmitted(int packets) { 
+        if (_retransmissionPeriodStart + RETRANSMISSION_PERIOD_WIDTH < _packetsTransmitted) {
+            _packetsRetransmitted += packets;
+        } else {
+            _packetRetransmissionRate = (int)((float)(0.9f*_packetRetransmissionRate) + (float)(0.1f*_packetsRetransmitted));
+            _retransmissionPeriodStart = _packetsTransmitted;
+            _packetsRetransmitted = packets;
+        }
         congestionOccurred();
         _context.statManager().addRateData("udp.congestedRTO", _rto, _rttDeviation);
         //_rto *= 2; 
+    }
+    public void packetsTransmitted(int packets) { 
+        _packetsTransmitted += packets; 
+        if (_retransmissionPeriodStart + RETRANSMISSION_PERIOD_WIDTH > _packetsTransmitted) {
+            _packetRetransmissionRate = (int)((float)(0.9f*_packetRetransmissionRate) + (float)(0.1f*_packetsRetransmitted));
+            _retransmissionPeriodStart = _packetsTransmitted;
+            _packetsRetransmitted = 0;
+        }
     }
     /** how long does it usually take to get a message ACKed? */
     public int getRTT() { return _rtt; }
@@ -519,6 +619,13 @@ public class PeerState {
     
     public long getMessagesSent() { return _messagesSent; }
     public long getMessagesReceived() { return _messagesReceived; }
+    public long getPacketsTransmitted() { return _packetsTransmitted; }
+    public long getPacketsRetransmitted() { return _packetsRetransmitted; }
+    /** avg number of packets retransmitted for every 100 packets */
+    public long getPacketRetransmissionRate() { return _packetRetransmissionRate; }
+    public long getPacketsReceived() { return _packetsReceived; }
+    public long getPacketsReceivedDuplicate() { return _packetsReceivedDuplicate; }
+    public void packetReceived() { _packetsReceived++; }
     
     /** 
      * we received a backoff request, so cut our send window
@@ -538,13 +645,13 @@ public class PeerState {
     public void setLastACKSend(long when) { _lastACKSend = when; }
     public long getWantedACKSendSince() { return _wantACKSendSince; }
     public boolean unsentACKThresholdReached() {
-        int threshold = countMaxACKs();
+        int threshold = countMaxACKData() / 4;
         synchronized (_currentACKs) {
             return _currentACKs.size() >= threshold;
         }
     }
-    private int countMaxACKs() {
-        return (_mtu 
+    private int countMaxACKData() {
+        return _mtu 
                 - OutboundMessageFragments.IP_HEADER_SIZE
                 - OutboundMessageFragments.UDP_HEADER_SIZE
                 - UDPPacket.IV_SIZE 
@@ -553,25 +660,19 @@ public class PeerState {
                 - 4 // timestamp
                 - 1 // data flag
                 - 1 // # ACKs
-                - 16 // padding safety
-               ) / 4;
+                - 16; // padding safety
     }
-    
-    public String getRemoteHostString() { return _remoteHostString; }
 
-    public static String calculateRemoteHostString(byte ip[], int port) {
-        StringBuffer buf = new StringBuffer(ip.length * 4 + 5);
-        for (int i = 0; i < ip.length; i++)
-            buf.append(ip[i]&0xFF).append('.');
-        buf.append(port);
-        return buf.toString();
+    private int minRTO() {
+        if (_packetRetransmissionRate < 10)
+            return MIN_RTO;
+        else if (_packetRetransmissionRate < 50)
+            return 2*MIN_RTO;
+        else
+            return MAX_RTO;
     }
     
-    public static String calculateRemoteHostString(UDPPacket packet) {
-        InetAddress remAddr = packet.getPacket().getAddress();
-        int remPort = packet.getPacket().getPort();
-        return calculateRemoteHostString(remAddr.getAddress(), remPort);
-    }
+    public RemoteHostId getRemoteHostId() { return _remoteHostId; }
     
     public int hashCode() {
         if (_remotePeer != null) 
@@ -594,7 +695,7 @@ public class PeerState {
     
     public String toString() {
         StringBuffer buf = new StringBuffer(64);
-        buf.append(_remoteHostString);
+        buf.append(_remoteHostId.toString());
         if (_remotePeer != null)
             buf.append(" ").append(_remotePeer.toBase64().substring(0,6));
         return buf.toString();

@@ -31,13 +31,15 @@ class UDPFlooder implements Runnable {
     
     public void addPeer(PeerState peer) {
         synchronized (_peers) {
-            _peers.add(peer);
+            if (!_peers.contains(peer))
+                _peers.add(peer);
             _peers.notifyAll();
         }
     }
     public void removePeer(PeerState peer) {
         synchronized (_peers) {
-            _peers.remove(peer);
+            while (_peers.remove(peer))
+                ;// loops until its empty
             _peers.notifyAll();
         }
     }

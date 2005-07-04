@@ -8,5 +8,7 @@
  %>Tunnels | <% } else { %><a href="configtunnels.jsp">Tunnels</a> | <% }
  if (request.getRequestURI().indexOf("configlogging.jsp") != -1) {
  %>Logging | <% } else { %><a href="configlogging.jsp">Logging</a> | <% }
+ if (request.getRequestURI().indexOf("configstats.jsp") != -1) {
+ %>Stats | <% } else { %><a href="configstats.jsp">Stats</a> | <% }
  if (request.getRequestURI().indexOf("configadvanced.jsp") != -1) {
  %>Advanced<% } else { %><a href="configadvanced.jsp">Advanced</a><% } %></h4>

@@ -58,7 +58,7 @@ public class InboundEndpointProcessor {
         //if (_config.getLength() > 1)
         //    _log.debug("IV at inbound endpoint before decrypt: " + Base64.encode(iv));
 
-        boolean ok = _validator.receiveIV(iv);
+        boolean ok = _validator.receiveIV(iv, 0, orig, offset + HopProcessor.IV_LENGTH);
         if (!ok) {
             if (_log.shouldLog(Log.WARN)) 
                 _log.warn("Invalid IV received");

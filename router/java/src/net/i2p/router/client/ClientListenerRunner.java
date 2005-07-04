@@ -61,11 +61,21 @@ public class ClientListenerRunner implements Runnable {
         int curDelay = 0;
         while (_running) {
             try {
-                _log.info("Starting up listening for connections on port " + _port);
-                if (_bindAllInterfaces)
+                if (_bindAllInterfaces) {
+                    if (_log.shouldLog(Log.INFO))
+                        _log.info("Listening on port " + _port + " on all interfaces");
                     _socket = new ServerSocket(_port);
-                else
-                    _socket = new ServerSocket(_port, 0, InetAddress.getByName("127.0.0.1"));
+                } else {
+                    String listenInterface = _context.getProperty(ClientManagerFacadeImpl.PROP_CLIENT_HOST, 
+                                                                  ClientManagerFacadeImpl.DEFAULT_HOST);
+                    if (_log.shouldLog(Log.INFO))
+                        _log.info("Listening on port " + _port + " of the specific interface: " + listenInterface);
+                    _socket = new ServerSocket(_port, 0, InetAddress.getByName(listenInterface));
+                }
+                
+                
+                if (_log.shouldLog(Log.DEBUG))
+                    _log.debug("ServerSocket created, before accept: " + _socket);
                 
                 curDelay = 0;
                 while (_running) {

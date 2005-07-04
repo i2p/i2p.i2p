@@ -47,6 +47,16 @@ public class BloomSHA1 {
     protected final int filterBits;
     protected final int filterWords;
     
+    public static void main(String args[]) {
+        BloomSHA1 b = new BloomSHA1(24, 11);
+        for (int i = 0; i < 100; i++) {
+            byte v[] = new byte[32];
+            v[0] = (byte)i;
+            b.insert(v);
+        }
+    }
+    
+    
     /**
      * Creates a filter with 2^m bits and k 'hash functions', where
      * each hash function is portion of the 160-bit SHA1 hash.   

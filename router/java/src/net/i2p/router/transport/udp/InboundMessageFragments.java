@@ -2,9 +2,11 @@ package net.i2p.router.transport.udp;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import net.i2p.data.Hash;
 import net.i2p.router.RouterContext;
 import net.i2p.util.DecayingBloomFilter;
 import net.i2p.util.I2PThread;
@@ -23,7 +25,7 @@ import net.i2p.util.Log;
  * a scheduled event)
  *
  */
-public class InboundMessageFragments {
+public class InboundMessageFragments implements UDPTransport.PartialACKSource {
     private RouterContext _context;
     private Log _log;
     /** Map of peer (Hash) to a Map of messageId (Long) to InboundMessageState objects */
@@ -87,6 +89,7 @@ public class InboundMessageFragments {
         receiveACKs(from, data);
         long afterACKs = _context.clock().now();
         
+        from.packetReceived();
         _context.statManager().addRateData("udp.receiveMessagePeriod", afterMsgs-beforeMsgs, afterACKs-beforeMsgs);
         _context.statManager().addRateData("udp.receiveACKPeriod", afterACKs-afterMsgs, afterACKs-beforeMsgs);
     }
@@ -100,7 +103,7 @@ public class InboundMessageFragments {
     private void receiveMessages(PeerState from, UDPPacketReader.DataReader data) {
         int fragments = data.readFragmentCount();
         if (fragments <= 0) return;
-        synchronized (_inboundMessages) {
+        synchronized (_inboundMessages) { // XXX: CHOKE POINT (to what extent?)
             Map messages = (Map)_inboundMessages.get(from.getRemotePeer());
             if (messages == null) {
                 messages = new HashMap(fragments);
@@ -158,6 +161,12 @@ public class InboundMessageFragments {
                     if (_log.shouldLog(Log.WARN))
                         _log.warn("Message expired while only being partially read: " + state);
                     state.releaseResources();
+                } else {
+                    // not expired but not yet complete... lets queue up a partial ACK
+                    if (_log.shouldLog(Log.DEBUG))
+                        _log.debug("Queueing up a partial ACK for peer: " + from + " for " + state);
+                    from.messagePartiallyReceived();
+                    _ackSender.ackPeer(from);
                 }
                 
                 if (!fragmentOK)
@@ -172,7 +181,7 @@ public class InboundMessageFragments {
             long acks[] = data.readACKs();
             if (acks != null) {
                 _context.statManager().addRateData("udp.receivedACKs", acks.length, 0);
-                _context.statManager().getStatLog().addData(from.getRemoteHostString(), "udp.peer.receiveACKCount", acks.length, 0);
+                //_context.statManager().getStatLog().addData(from.getRemoteHostId().toString(), "udp.peer.receiveACKCount", acks.length, 0);
 
                 for (int i = 0; i < acks.length; i++) {
                     if (_log.shouldLog(Log.INFO))
@@ -183,9 +192,40 @@ public class InboundMessageFragments {
                 _log.error("Received ACKs with no acks?! " + data);
             }
         }
+        if (data.readACKBitfieldsIncluded()) {
+            ACKBitfield bitfields[] = data.readACKBitfields();
+            if (bitfields != null) {
+                //_context.statManager().getStatLog().addData(from.getRemoteHostId().toString(), "udp.peer.receivePartialACKCount", bitfields.length, 0);
+
+                for (int i = 0; i < bitfields.length; i++) {
+                    if (_log.shouldLog(Log.INFO))
+                        _log.info("Partial ACK received: " + bitfields[i]);
+                    _outbound.acked(bitfields[i], from.getRemotePeer());
+                }
+            }
+        }
         if (data.readECN())
             from.ECNReceived();
         else
             from.dataReceived();
+    }
+    
+    public void fetchPartialACKs(Hash fromPeer, List ackBitfields) {
+        synchronized (_inboundMessages) {
+            Map messages = (Map)_inboundMessages.get(fromPeer);
+            if (messages == null)
+                return;
+            for (Iterator iter = messages.values().iterator(); iter.hasNext(); ) {
+                InboundMessageState state = (InboundMessageState)iter.next();
+                if (state.isExpired()) {
+                    iter.remove();
+                } else {
+                    if (!state.isComplete())
+                        ackBitfields.add(state.createACKBitfield());
+                }
+            }
+            if (messages.size() <= 0)
+                _inboundMessages.remove(fromPeer);
+        }
     }
 }

@@ -84,6 +84,17 @@ public class Base64 {
                                             (byte) 'w', (byte) 'x', (byte) 'y', (byte) 'z', (byte) '0', (byte) '1',
                                             (byte) '2', (byte) '3', (byte) '4', (byte) '5', (byte) '6', (byte) '7',
                                             (byte) '8', (byte) '9', (byte) '+', (byte) '/'};
+    private final static byte[] ALPHABET_ALT = { (byte) 'A', (byte) 'B', (byte) 'C', (byte) 'D', (byte) 'E', (byte) 'F',
+                                            (byte) 'G', (byte) 'H', (byte) 'I', (byte) 'J', (byte) 'K', (byte) 'L',
+                                            (byte) 'M', (byte) 'N', (byte) 'O', (byte) 'P', (byte) 'Q', (byte) 'R',
+                                            (byte) 'S', (byte) 'T', (byte) 'U', (byte) 'V', (byte) 'W', (byte) 'X',
+                                            (byte) 'Y', (byte) 'Z', (byte) 'a', (byte) 'b', (byte) 'c', (byte) 'd',
+                                            (byte) 'e', (byte) 'f', (byte) 'g', (byte) 'h', (byte) 'i', (byte) 'j',
+                                            (byte) 'k', (byte) 'l', (byte) 'm', (byte) 'n', (byte) 'o', (byte) 'p',
+                                            (byte) 'q', (byte) 'r', (byte) 's', (byte) 't', (byte) 'u', (byte) 'v',
+                                            (byte) 'w', (byte) 'x', (byte) 'y', (byte) 'z', (byte) '0', (byte) '1',
+                                            (byte) '2', (byte) '3', (byte) '4', (byte) '5', (byte) '6', (byte) '7',
+                                            (byte) '8', (byte) '9', (byte) '-', (byte) '~'};
 
     /** 
      * Translates a Base64 value to either its 6-bit reconstruction value
@@ -131,6 +142,7 @@ public class Base64 {
     }
 
     public static void main(String[] args) {
+        test();
         if (args.length == 0) {
             help();
             return;
@@ -312,6 +324,49 @@ public class Base64 {
         } // end switch
     } // end encode3to4
 
+    private static void encode3to4(byte[] source, int srcOffset, int numSigBytes, StringBuffer buf, byte alpha[]) {
+        //           1         2         3  
+        // 01234567890123456789012345678901 Bit position
+        // --------000000001111111122222222 Array position from threeBytes
+        // --------|    ||    ||    ||    | Six bit groups to index ALPHABET
+        //          >>18  >>12  >> 6  >> 0  Right shift necessary
+        //                0x3f  0x3f  0x3f  Additional AND
+
+        // Create buffer with zero-padding if there are only one or two
+        // significant bytes passed in the array.
+        // We have to shift left 24 in order to flush out the 1's that appear
+        // when Java treats a value as negative that is cast from a byte to an int.
+        int inBuff = (numSigBytes > 0 ? ((source[srcOffset] << 24) >>> 8) : 0)
+                     | (numSigBytes > 1 ? ((source[srcOffset + 1] << 24) >>> 16) : 0)
+                     | (numSigBytes > 2 ? ((source[srcOffset + 2] << 24) >>> 24) : 0);
+
+        switch (numSigBytes) {
+        case 3:
+            buf.append((char)alpha[(inBuff >>> 18)]);
+            buf.append((char)alpha[(inBuff >>> 12) & 0x3f]);
+            buf.append((char)alpha[(inBuff >>> 6) & 0x3f]);
+            buf.append((char)alpha[(inBuff) & 0x3f]);
+            return;
+
+        case 2:
+            buf.append((char)alpha[(inBuff >>> 18)]);
+            buf.append((char)alpha[(inBuff >>> 12) & 0x3f]);
+            buf.append((char)alpha[(inBuff >>> 6) & 0x3f]);
+            buf.append((char)EQUALS_SIGN);
+            return;
+
+        case 1:
+            buf.append((char)alpha[(inBuff >>> 18)]);
+            buf.append((char)alpha[(inBuff >>> 12) & 0x3f]);
+            buf.append((char)EQUALS_SIGN);
+            buf.append((char)EQUALS_SIGN);
+            return;
+
+        default:
+            return;
+        } // end switch
+    } // end encode3to4
+
     /**
      * Encodes a byte array into Base64 notation.
      * Equivalen to calling
@@ -331,14 +386,12 @@ public class Base64 {
     private static String safeEncode(byte[] source, int off, int len, boolean useStandardAlphabet) {
         if (len + off > source.length)
             throw new ArrayIndexOutOfBoundsException("Trying to encode too much!  source.len=" + source.length + " off=" + off + " len=" + len);
-        String encoded = encodeBytes(source, off, len, false);
-        if (useStandardAlphabet) {
-            // noop
-        } else {
-            encoded = encoded.replace('/', '~');
-            encoded = encoded.replace('+', '-');
-        }
-        return encoded;
+        StringBuffer buf = new StringBuffer(len * 4 / 3);
+        if (useStandardAlphabet)
+            encodeBytes(source, off, len, false, buf, ALPHABET);
+        else
+            encodeBytes(source, off, len, false, buf, ALPHABET_ALT);
+        return buf.toString();
     }
 
     /**
@@ -381,6 +434,12 @@ public class Base64 {
         return encodeBytes(source, off, len, true);
     } // end encodeBytes
 
+    private static String encodeBytes(byte[] source, int off, int len, boolean breakLines) {
+        StringBuffer buf = new StringBuffer( (len*4)/3 );
+        encodeBytes(source, off, len, breakLines, buf, ALPHABET);
+        return buf.toString();
+    }
+        
     /**
      * Encodes a byte array into Base64 notation.
      *
@@ -390,32 +449,36 @@ public class Base64 {
      * @param breakLines Break lines at 80 characters or less.
      * @since 1.4
      */
-    private static String encodeBytes(byte[] source, int off, int len, boolean breakLines) {
+    private static void encodeBytes(byte[] source, int off, int len, boolean breakLines, StringBuffer out, byte alpha[]) {
         int len43 = len * 4 / 3;
-        byte[] outBuff = new byte[(len43) // Main 4:3
-                                  + ((len % 3) > 0 ? 4 : 0) // Account for padding
-                                  + (breakLines ? (len43 / MAX_LINE_LENGTH) : 0)]; // New lines      
+        //byte[] outBuff = new byte[(len43) // Main 4:3
+        //                          + ((len % 3) > 0 ? 4 : 0) // Account for padding
+        //                          + (breakLines ? (len43 / MAX_LINE_LENGTH) : 0)]; // New lines      
         int d = 0;
         int e = 0;
         int len2 = len - 2;
         int lineLength = 0;
         for (; d < len2; d += 3, e += 4) {
-            encode3to4(source, d + off, 3, outBuff, e);
+            //encode3to4(source, d + off, 3, outBuff, e);
+            encode3to4(source, d + off, 3, out, alpha);
 
             lineLength += 4;
             if (breakLines && lineLength == MAX_LINE_LENGTH) {
-                outBuff[e + 4] = NEW_LINE;
+                //outBuff[e + 4] = NEW_LINE;
+                out.append('\n');
                 e++;
                 lineLength = 0;
             } // end if: end of line
         } // en dfor: each piece of array
 
         if (d < len) {
-            encode3to4(source, d + off, len - d, outBuff, e);
+            //encode3to4(source, d + off, len - d, outBuff, e);
+            encode3to4(source, d + off, len - d, out, alpha);
             e += 4;
         } // end if: some padding needed
 
-        return new String(outBuff, 0, e);
+        //out.append(new String(outBuff, 0, e));
+        //return new String(outBuff, 0, e);
     } // end encodeBytes
 
     /**

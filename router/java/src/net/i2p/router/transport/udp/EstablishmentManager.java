@@ -26,9 +26,9 @@ public class EstablishmentManager {
     private Log _log;
     private UDPTransport _transport;
     private PacketBuilder _builder;
-    /** map of host+port (String) to InboundEstablishState */
+    /** map of RemoteHostId to InboundEstablishState */
     private Map _inboundStates;
-    /** map of host+port (String) to OutboundEstablishState */
+    /** map of RemoteHostId to OutboundEstablishState */
     private Map _outboundStates;
     private boolean _alive;
     private Object _activityLock;
@@ -63,7 +63,7 @@ public class EstablishmentManager {
      * Grab the active establishing state
      */
     InboundEstablishState getInboundState(InetAddress fromHost, int fromPort) {
-        String from = PeerState.calculateRemoteHostString(fromHost.getAddress(), fromPort);
+        RemoteHostId from = new RemoteHostId(fromHost.getAddress(), fromPort);
         synchronized (_inboundStates) {
             InboundEstablishState state = (InboundEstablishState)_inboundStates.get(from);
             if ( (state == null) && (_log.shouldLog(Log.DEBUG)) )
@@ -73,7 +73,7 @@ public class EstablishmentManager {
     }
     
     OutboundEstablishState getOutboundState(InetAddress fromHost, int fromPort) {
-        String from = PeerState.calculateRemoteHostString(fromHost.getAddress(), fromPort);
+        RemoteHostId from = new RemoteHostId(fromHost.getAddress(), fromPort);
         synchronized (_outboundStates) {
             OutboundEstablishState state = (OutboundEstablishState)_outboundStates.get(from);
             if ( (state == null) && (_log.shouldLog(Log.DEBUG)) )
@@ -97,7 +97,7 @@ public class EstablishmentManager {
         UDPAddress addr = new UDPAddress(ra);
         InetAddress remAddr = addr.getHostAddress();
         int port = addr.getPort();
-        String to = PeerState.calculateRemoteHostString(remAddr.getAddress(), port);
+        RemoteHostId to = new RemoteHostId(remAddr.getAddress(), port);
         
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Add outobund establish state to: " + to);
@@ -120,7 +120,7 @@ public class EstablishmentManager {
      * Got a SessionRequest (initiates an inbound establishment)
      *
      */
-    void receiveSessionRequest(String from, InetAddress host, int port, UDPPacketReader reader) {
+    void receiveSessionRequest(RemoteHostId from, InetAddress host, int port, UDPPacketReader reader) {
         InboundEstablishState state = null;
         synchronized (_inboundStates) {
             state = (InboundEstablishState)_inboundStates.get(from);
@@ -132,7 +132,7 @@ public class EstablishmentManager {
         state.receiveSessionRequest(reader.getSessionRequestReader());
         
         if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Receive session request from: " + state.getRemoteHostInfo());
+            _log.debug("Receive session request from: " + state.getRemoteHostId().toString());
         
         notifyActivity();
     }
@@ -141,7 +141,7 @@ public class EstablishmentManager {
      * got a SessionConfirmed (should only happen as part of an inbound 
      * establishment) 
      */
-    void receiveSessionConfirmed(String from, UDPPacketReader reader) {
+    void receiveSessionConfirmed(RemoteHostId from, UDPPacketReader reader) {
         InboundEstablishState state = null;
         synchronized (_inboundStates) {
             state = (InboundEstablishState)_inboundStates.get(from);
@@ -150,7 +150,7 @@ public class EstablishmentManager {
             state.receiveSessionConfirmed(reader.getSessionConfirmedReader());
             notifyActivity();
             if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Receive session confirmed from: " + state.getRemoteHostInfo());
+                _log.debug("Receive session confirmed from: " + state.getRemoteHostId().toString());
         }
     }
     
@@ -158,7 +158,7 @@ public class EstablishmentManager {
      * Got a SessionCreated (in response to our outbound SessionRequest)
      *
      */
-    void receiveSessionCreated(String from, UDPPacketReader reader) {
+    void receiveSessionCreated(RemoteHostId from, UDPPacketReader reader) {
         OutboundEstablishState state = null;
         synchronized (_outboundStates) {
             state = (OutboundEstablishState)_outboundStates.get(from);
@@ -167,7 +167,7 @@ public class EstablishmentManager {
             state.receiveSessionCreated(reader.getSessionCreatedReader());
             notifyActivity();
             if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Receive session created from: " + state.getRemoteHostInfo());
+                _log.debug("Receive session created from: " + state.getRemoteHostId().toString());
         }
     }
 
@@ -179,7 +179,7 @@ public class EstablishmentManager {
     PeerState receiveData(OutboundEstablishState state) {
         state.dataReceived();
         synchronized (_outboundStates) {
-            _outboundStates.remove(state.getRemoteHostInfo());
+            _outboundStates.remove(state.getRemoteHostId());
         }
         if (_log.shouldLog(Log.INFO))
             _log.info("Outbound established completely!  yay");
@@ -206,7 +206,7 @@ public class EstablishmentManager {
      */
     private void handleCompletelyEstablished(InboundEstablishState state) {
         if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Handle completely established (inbound): " + state.getRemoteHostInfo());
+            _log.debug("Handle completely established (inbound): " + state.getRemoteHostId().toString());
         long now = _context.clock().now();
         RouterIdentity remote = state.getConfirmedIdentity();
         PeerState peer = new PeerState(_context);
@@ -236,7 +236,7 @@ public class EstablishmentManager {
      */
     private PeerState handleCompletelyEstablished(OutboundEstablishState state) {
         if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Handle completely established (outbound): " + state.getRemoteHostInfo());
+            _log.debug("Handle completely established (outbound): " + state.getRemoteHostId().toString());
         long now = _context.clock().now();
         RouterIdentity remote = state.getRemoteIdentity();
         PeerState peer = new PeerState(_context);
@@ -284,7 +284,7 @@ public class EstablishmentManager {
             state.setSentRelayTag(0);
         
         if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Send created to: " + state.getRemoteHostInfo());
+            _log.debug("Send created to: " + state.getRemoteHostId().toString());
         
         state.generateSessionKey();
         _transport.send(_builder.buildSessionCreatedPacket(state, _transport.getExternalPort(), _transport.getIntroKey()));
@@ -297,7 +297,7 @@ public class EstablishmentManager {
         long now = _context.clock().now();
         state.prepareSessionRequest();
         if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Send request to: " + state.getRemoteHostInfo());
+            _log.debug("Send request to: " + state.getRemoteHostId().toString());
         _transport.send(_builder.buildSessionRequestPacket(state));
         state.requestSent();
     }
@@ -317,7 +317,7 @@ public class EstablishmentManager {
         UDPPacket packets[] = _builder.buildSessionConfirmedPackets(state, _context.router().getRouterInfo().getIdentity());
         
         if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Send confirm to: " + state.getRemoteHostInfo());
+            _log.debug("Send confirm to: " + state.getRemoteHostId().toString());
         
         for (int i = 0; i < packets.length; i++)
             _transport.send(packets[i]);

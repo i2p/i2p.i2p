@@ -66,10 +66,7 @@ public class HopProcessor {
             }
         }
         
-        ByteArray ba = _cache.acquire();
-        byte iv[] = ba.getData(); // new byte[IV_LENGTH];
-        System.arraycopy(orig, offset, iv, 0, IV_LENGTH);
-        boolean okIV = _validator.receiveIV(iv);
+        boolean okIV = _validator.receiveIV(orig, offset, orig, offset + IV_LENGTH);
         if (!okIV) {
             if (_log.shouldLog(Log.WARN)) 
                 _log.warn("Invalid IV received on tunnel " + _config.getReceiveTunnelId());
@@ -88,7 +85,6 @@ public class HopProcessor {
             //_log.debug("Data after processing: " + Base64.encode(orig, IV_LENGTH, orig.length - IV_LENGTH));
             //_log.debug("IV sent: " + Base64.encode(orig, 0, IV_LENGTH));
         }
-        _cache.release(ba);
         return true;
     }
     

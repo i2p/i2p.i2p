@@ -174,7 +174,7 @@ class TransientSessionKeyManager extends SessionKeyManager {
         if (sess.getCurrentKey().equals(key)) {
             SessionTag nxt = sess.consumeNext();
             if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Tag consumed: " + nxt);
+                _log.debug("Tag consumed: " + nxt + " with key: " + key.toBase64());
             return nxt;
         }
         if (_log.shouldLog(Log.DEBUG))
@@ -228,10 +228,10 @@ class TransientSessionKeyManager extends SessionKeyManager {
         sess.setCurrentKey(key);
         TagSet set = new TagSet(sessionTags, key, _context.clock().now());
         sess.addTags(set);
-        if (_log.shouldLog(Log.DEBUG)) {
-            _log.debug("Tags delivered to set " + set + " on session " + sess);
+        if (_log.shouldLog(Log.WARN)) {
+            //_log.debug("Tags delivered to set " + set + " on session " + sess);
             if (sessionTags.size() > 0)
-                _log.debug("Tags delivered: " + sessionTags.size() + " total = " + sess.availableTags());
+                _log.warn("Tags delivered: " + sessionTags.size() + " for key: " + key.toBase64() + ": " + sessionTags);
         }
     }
 
@@ -255,10 +255,27 @@ class TransientSessionKeyManager extends SessionKeyManager {
         for (Iterator iter = sessionTags.iterator(); iter.hasNext();) {
             SessionTag tag = (SessionTag) iter.next();
             if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Receiving tag " + tag + " for key " + key);
+                _log.debug("Receiving tag " + tag + " for key " + key.toBase64() + " / " + key.toString() + ": tagSet: " + tagSet);
             synchronized (_inboundTagSets) {
-                _inboundTagSets.put(tag, tagSet);
+                Object old = _inboundTagSets.put(tag, tagSet);
                 overage = _inboundTagSets.size() - MAX_INBOUND_SESSION_TAGS;
+                if (old != null) {
+                    TagSet oldTS = (TagSet)old;
+                    if (!oldTS.getAssociatedKey().equals(tagSet.getAssociatedKey())) {
+                        if (_log.shouldLog(Log.ERROR)) {
+                            _log.error("Multiple tags matching!  tag: " + tag.toString() + " matches for new tagSet: " + tagSet + " and old tagSet: " + old);
+                            _log.error("Earlier tag set creation: " + old + ": key=" + oldTS.getAssociatedKey().toBase64(), oldTS.getCreatedBy());
+                            _log.error("Current tag set creation: " + tagSet + ": key=" + tagSet.getAssociatedKey().toBase64(), tagSet.getCreatedBy());
+                        }
+                    } else {
+                        if (_log.shouldLog(Log.DEBUG)) {
+                            //tagSet.getTags().addAll(oldTS.getTags());
+                            _log.debug("Multiple tags matching, but equal keys (probably just a retransmission). tag: " + tag.toString() + " matches for new tagSet: " + tagSet + " and old tagSet: " + old);
+                            _log.debug("Earlier tag set creation: " + old + ": key=" + oldTS.getAssociatedKey().toBase64(), oldTS.getCreatedBy());
+                            _log.debug("Current tag set creation: " + tagSet + ": key=" + tagSet.getAssociatedKey().toBase64(), tagSet.getCreatedBy());
+                        }
+                    }
+                }
             }
         }
         
@@ -267,6 +284,7 @@ class TransientSessionKeyManager extends SessionKeyManager {
 
         if ( (sessionTags.size() <= 0) && (_log.shouldLog(Log.DEBUG)) )
             _log.debug("Received 0 tags for key " + key);
+        if (false) aggressiveExpire();
     }
     
     /**
@@ -329,6 +347,7 @@ class TransientSessionKeyManager extends SessionKeyManager {
      *
      */
     public SessionKey consumeTag(SessionTag tag) {
+        if (false) aggressiveExpire();
         synchronized (_inboundTagSets) {
             TagSet tagSet = (TagSet) _inboundTagSets.remove(tag);
             if (tagSet == null) {
@@ -340,7 +359,7 @@ class TransientSessionKeyManager extends SessionKeyManager {
 
             SessionKey key = tagSet.getAssociatedKey();
             if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Consuming tag " + tag + " for sessionKey " + key);
+                _log.debug("Consuming tag " + tag.toString() + " for sessionKey " + key.toBase64() + " / " + key.toString() + " on tagSet: " + tagSet);
             return key;
         }
     }
@@ -378,19 +397,36 @@ class TransientSessionKeyManager extends SessionKeyManager {
         int removed = 0;
         int remaining = 0;
         long now = _context.clock().now();
+        StringBuffer buf = null;
+        StringBuffer bufSummary = null;
+        if (_log.shouldLog(Log.WARN)) {
+            buf = new StringBuffer(128);
+            buf.append("Expiring inbound: ");
+            bufSummary = new StringBuffer(1024);
+        }
         synchronized (_inboundTagSets) {
             for (Iterator iter = _inboundTagSets.keySet().iterator(); iter.hasNext();) {
                 SessionTag tag = (SessionTag) iter.next();
                 TagSet ts = (TagSet) _inboundTagSets.get(tag);
-                if (ts.getDate() < now - SESSION_LIFETIME_MAX_MS) {
+                long age = now - ts.getDate();
+                if (age > SESSION_LIFETIME_MAX_MS) {
+                //if (ts.getDate() < now - SESSION_LIFETIME_MAX_MS) {
                     iter.remove();
                     removed++;
+                    if (buf != null)
+                        buf.append(tag.toString()).append(" @ age ").append(DataHelper.formatDuration(age));
+                } else if (false && (bufSummary != null) ) {
+                    bufSummary.append("\nTagSet: " + ts.toString() + ", key: " + ts.getAssociatedKey().toBase64()+"/" + ts.getAssociatedKey().toString() 
+                                      + ": tag: " + tag.toString());
                 }
             }
             remaining = _inboundTagSets.size();
         }
         _context.statManager().addRateData("crypto.sessionTagsRemaining", remaining, 0);
-
+        if ( (buf != null) && (removed > 0) )
+            _log.warn(buf.toString());
+        if (bufSummary != null)
+            _log.warn("Cleaning up with remaining: " + bufSummary.toString());
 
         //_log.warn("Expiring tags: [" + tagsToDrop + "]");
 
@@ -606,6 +642,7 @@ class TransientSessionKeyManager extends SessionKeyManager {
         private Set _sessionTags;
         private SessionKey _key;
         private long _date;
+        private Exception _createdBy;
 
         public TagSet(Set tags, SessionKey key, long date) {
             if (key == null) throw new IllegalArgumentException("Missing key");
@@ -613,6 +650,10 @@ class TransientSessionKeyManager extends SessionKeyManager {
             _sessionTags = tags;
             _key = key;
             _date = date;
+            if (true) 
+                _createdBy = new Exception("Created by: key=" + _key.toBase64() + " on " 
+                                           + new Date(I2PAppContext.getGlobalContext().clock().now()) 
+                                           + " via " + Thread.currentThread().getName());
         }
 
         /** when the tag set was created */
@@ -652,6 +693,8 @@ class TransientSessionKeyManager extends SessionKeyManager {
             _sessionTags.remove(first);
             return first;
         }
+        
+        public Exception getCreatedBy() { return _createdBy; }
 
         public int hashCode() {
             long rv = 0;

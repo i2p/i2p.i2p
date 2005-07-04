@@ -40,7 +40,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     private UDPEndpoint _endpoint;
     /** Peer (Hash) to PeerState */
     private Map _peersByIdent;
-    /** Remote host (ip+port as a string) to PeerState */
+    /** RemoteHostId to PeerState */
     private Map _peersByRemoteHost;
     /** Relay tag (base64 String) to PeerState */
     private Map _peersByRelayTag;
@@ -98,7 +98,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     private static final int PRIORITY_WEIGHT[] = new int[] { 1, 1, 1, 1, 1, 2 };
 
     /** should we flood all UDP peers with the configured rate? */
-    private static final boolean SHOULD_FLOOD_PEERS = false;
+    private static final boolean SHOULD_FLOOD_PEERS = true;
     
     private static final int MAX_CONSECUTIVE_FAILED = 5;
     
@@ -270,7 +270,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
      * if no state exists
      */
     public PeerState getPeerState(InetAddress remoteHost, int remotePort) {
-        String hostInfo = PeerState.calculateRemoteHostString(remoteHost.getAddress(), remotePort);
+        RemoteHostId hostInfo = new RemoteHostId(remoteHost.getAddress(), remotePort);
         synchronized (_peersByRemoteHost) {
             return (PeerState)_peersByRemoteHost.get(hostInfo);
         }
@@ -316,11 +316,11 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             }
         }
         
-        String remoteString = peer.getRemoteHostString();
-        if (remoteString == null) return false;
+        RemoteHostId remoteId = peer.getRemoteHostId();
+        if (remoteId == null) return false;
         
         synchronized (_peersByRemoteHost) {
-            PeerState oldPeer = (PeerState)_peersByRemoteHost.put(remoteString, peer);
+            PeerState oldPeer = (PeerState)_peersByRemoteHost.put(remoteId, peer);
             if ( (oldPeer != null) && (oldPeer != peer) ) {
                 //_peersByRemoteHost.put(remoteString, oldPeer);
                 //return false;
@@ -348,10 +348,10 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             }
         }
         
-        String remoteString = peer.getRemoteHostString();
-        if (remoteString != null) {
+        RemoteHostId remoteId = peer.getRemoteHostId();
+        if (remoteId != null) {
             synchronized (_peersByRemoteHost) {
-                _peersByRemoteHost.remove(remoteString);
+                _peersByRemoteHost.remove(remoteId);
             }
         }
         
@@ -568,6 +568,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         buf.append("     <td><b>cwnd</b></td><td><b>ssthresh</b></td>\n");
         buf.append("     <td><b>rtt</b></td><td><b>dev</b></td><td><b>rto</b></td>\n");
         buf.append("     <td><b>send</b></td><td><b>recv</b></td>\n");
+        buf.append("     <td><b>resent</b></td><td><b>dupRecv</b></td>\n");
         buf.append(" </tr>\n");
         out.write(buf.toString());
         buf.setLength(0);
@@ -640,11 +641,22 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             buf.append("</td>");
             
             buf.append("<td>");
-            buf.append(peer.getMessagesSent());
+            buf.append(peer.getPacketsTransmitted());
             buf.append("</td>");
             
             buf.append("<td>");
-            buf.append(peer.getMessagesReceived());
+            buf.append(peer.getPacketsReceived());
+            buf.append("</td>");
+            
+            double sendLostPct = (double)peer.getPacketsRetransmitted()/(double)PeerState.RETRANSMISSION_PERIOD_WIDTH;
+            buf.append("<td>");
+            //buf.append(formatPct(sendLostPct));
+            buf.append(peer.getPacketRetransmissionRate());
+            buf.append("</td>");
+            
+            double recvDupPct = (double)peer.getPacketsReceivedDuplicate()/(double)peer.getPacketsReceived();
+            buf.append("<td>");
+            buf.append(formatPct(recvDupPct));
             buf.append("</td>");
 
             buf.append("</tr>");
@@ -655,10 +667,27 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         out.write("</table>\n");
     }
 
+    public PartialACKSource getPartialACKSource() { return _inboundFragments; }
+    
+    /** help us grab partial ACKs */
+    public interface PartialACKSource {
+        /** 
+         * build partial ACKs of messages received from the peer and store
+         * them in the ackBitfields
+         */
+        public void fetchPartialACKs(Hash fromPeer, List ackBitfields);
+    }
+    
     private static final DecimalFormat _fmt = new DecimalFormat("#,##0.00");
     private static final String formatKBps(int bps) {
         synchronized (_fmt) {
             return _fmt.format((float)bps/1024);
+        }
+    }
+    private static final DecimalFormat _pctFmt = new DecimalFormat("#0.0%");
+    private static final String formatPct(double pct) {
+        synchronized (_pctFmt) {
+            return _pctFmt.format(pct);
         }
     }
     

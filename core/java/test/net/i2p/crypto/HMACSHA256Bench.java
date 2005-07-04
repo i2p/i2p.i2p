@@ -32,12 +32,19 @@ package net.i2p.crypto;
 import net.i2p.I2PAppContext;
 import net.i2p.data.Hash;
 import net.i2p.data.SessionKey;
+import java.util.Properties;
 
 public class HMACSHA256Bench {
-	public static void main(String args[]) {
-        I2PAppContext ctx = I2PAppContext.getGlobalContext();
+        public static void main(String args[]) {
+            runTest(new I2PAppContext());
+            Properties props = new Properties();
+            props.setProperty("i2p.fakeHMAC", "true");
+            runTest(new I2PAppContext(props));
+
+        }
+        private static void runTest(I2PAppContext ctx) {
         SessionKey key = ctx.keyGenerator().generateSessionKey();
-		Hash asdfs = HMACSHA256Generator.getInstance().calculate(key, "qwerty".getBytes());
+		Hash asdfs = ctx.hmac().calculate(key, "qwerty".getBytes());
 			
 		int times = 100000;
 		long shorttime = 0;

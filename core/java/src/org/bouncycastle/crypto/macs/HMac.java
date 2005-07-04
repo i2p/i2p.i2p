@@ -31,13 +31,17 @@ import org.bouncycastle.crypto.Digest;
 import org.bouncycastle.crypto.Mac;
 //import org.bouncycastle.crypto.params.KeyParameter;
 import java.util.Arrays;
+import java.util.ArrayList;
 
 /**
  * HMAC implementation based on RFC2104
  *
  * H(K XOR opad, H(K XOR ipad, text))
  *
- * modified by jrandom to use the session key byte array directly
+ * modified by jrandom to use the session key byte array directly and to cache
+ * a frequently used buffer (called on doFinal).  changes released into the public
+ * domain in 2005.
+ *
  */
 public class HMac
 implements Mac
@@ -137,17 +141,39 @@ implements Mac
         byte[] out,
         int outOff)
     {
-        byte[] tmp = new byte[digestSize];
+        byte[] tmp = acquireTmp();
+        //byte[] tmp = new byte[digestSize];
         digest.doFinal(tmp, 0);
 
         digest.update(outputPad, 0, outputPad.length);
         digest.update(tmp, 0, tmp.length);
+        releaseTmp(tmp);
 
         int     len = digest.doFinal(out, outOff);
 
         reset();
 
         return len;
+    }
+    
+    private static ArrayList _tmpBuf = new ArrayList();
+    private static byte[] acquireTmp() {
+        byte rv[] = null;
+        synchronized (_tmpBuf) {
+            if (_tmpBuf.size() > 0)
+                rv = (byte[])_tmpBuf.remove(0);
+        }
+        if (rv != null)
+            Arrays.fill(rv, (byte)0x0);
+        else
+            rv = new byte[32]; // hard coded against SHA256 (should be digestSize)
+        return rv;
+    }
+    private static void releaseTmp(byte buf[]) {
+        synchronized (_tmpBuf) {
+            if (_tmpBuf.size() < 100) 
+                _tmpBuf.add((Object)buf);
+        }
     }
 
     /**

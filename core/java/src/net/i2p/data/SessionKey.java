@@ -78,7 +78,8 @@ public class SessionKey extends DataStructureImpl {
         return DataHelper.hashCode(_data);
     }
 
-    public String toString() {
+    public String toString() { 
+        if (true) return super.toString(); 
         StringBuffer buf = new StringBuffer(64);
         buf.append("[SessionKey: ");
         if (_data == null) {

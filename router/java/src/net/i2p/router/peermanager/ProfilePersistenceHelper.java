@@ -28,6 +28,14 @@ class ProfilePersistenceHelper {
     public final static String DEFAULT_PEER_PROFILE_DIR = "peerProfiles";
     private final static String NL = System.getProperty("line.separator");
     
+    /**
+     * If we haven't been able to get a message through to the peer in 3 days,
+     * drop the profile.  They may reappear, but if they do, their config may
+     * have changed (etc).
+     *
+     */
+    public static final long EXPIRE_AGE = 3*24*60*60*1000;
+    
     private File _profileDir = null;
     private Hash _us;
     
@@ -46,6 +54,9 @@ class ProfilePersistenceHelper {
     
     /** write out the data from the profile to the stream */
     public void writeProfile(PeerProfile profile) {
+        if (isExpired(profile.getLastSendSuccessful()))
+            return;
+        
         File f = pickFile(profile);
         long before = _context.clock().now();
         OutputStream fos = null;
@@ -159,6 +170,12 @@ class ProfilePersistenceHelper {
             rv.add(files[i]);
         return rv;
     }
+    
+    private boolean isExpired(long lastSentToSuccessfully) {
+        long timeSince = _context.clock().now() - lastSentToSuccessfully;
+        return (timeSince > EXPIRE_AGE);
+    }
+    
     public PeerProfile readProfile(File file) {
         Hash peer = getHash(file.getName());
         try {
@@ -170,6 +187,15 @@ class ProfilePersistenceHelper {
             Properties props = new Properties();
             
             loadProps(props, file);
+            
+            long lastSentToSuccessfully = getLong(props, "lastSentToSuccessfully");
+            if (isExpired(lastSentToSuccessfully)) {
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("Dropping old profile for " + file.getName() + 
+                              ", since we haven't heard from them in a long time");
+                file.delete();
+                return null;
+            }
             
             profile.setReliabilityBonus(getLong(props, "reliabilityBonus"));
             profile.setIntegrationBonus(getLong(props, "integrationBonus"));

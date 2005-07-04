@@ -59,6 +59,7 @@ public class Clock implements Timestamper.UpdateListener {
      *
      */
     public void setOffset(long offsetMs, boolean force) {
+        if (false) return;
         long delta = offsetMs - _offset;
         if (!force) {
             if ((offsetMs > MAX_OFFSET) || (offsetMs < 0 - MAX_OFFSET)) {

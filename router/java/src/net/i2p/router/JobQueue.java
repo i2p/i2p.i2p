@@ -401,7 +401,7 @@ public class JobQueue {
             try {
                 while (_alive) {
                     long now = _context.clock().now();
-                    long timeToWait = 0;
+                    long timeToWait = -1;
                     ArrayList toAdd = null;
                     synchronized (_jobLock) {
                         for (int i = 0; i < _timedJobs.size(); i++) {
@@ -434,9 +434,11 @@ public class JobQueue {
                                 _readyJobs.add(toAdd.get(i));
                             _jobLock.notifyAll();
                         } else {
-                            if (timeToWait < 10)
+                            if (timeToWait < 0)
+                                timeToWait = 30*1000;
+                            else if (timeToWait < 10)
                                 timeToWait = 10;
-                            if (timeToWait > 10*1000)
+                            else if (timeToWait > 10*1000)
                                 timeToWait = 10*1000;
                             if (_log.shouldLog(Log.DEBUG))
                                 _log.debug("Waiting " + timeToWait + " before rechecking the timed queue");

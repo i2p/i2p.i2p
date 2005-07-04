@@ -721,7 +721,7 @@ public class DataHelper {
     public static int hashCode(byte b[]) {
         int rv = 0;
         if (b != null) {
-            for (int i = 0; i < b.length && i < 8; i++)
+            for (int i = 0; i < b.length && i < 32; i++)
                 rv += (b[i] << i);
         }
         return rv;

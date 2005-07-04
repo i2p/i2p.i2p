@@ -131,15 +131,15 @@ class I2PSessionImpl2 extends I2PSessionImpl {
         long availTimeLeft = _context.sessionKeyManager().getAvailableTimeLeft(dest.getPublicKey(), key);
         
         if ( (tagsSent == null) || (tagsSent.size() <= 0) ) {
-            if (oldTags < 10) {
+            if (oldTags < NUM_TAGS) {
                 sentTags = createNewTags(NUM_TAGS);
                 if (_log.shouldLog(Log.DEBUG))
-                    _log.debug("** sendBestEffort only had " + oldTags + " with " + availTimeLeft + ", adding " + NUM_TAGS);
+                    _log.debug("** sendBestEffort only had " + oldTags + " with " + availTimeLeft + ", adding " + NUM_TAGS + ": " + sentTags);
             } else if (availTimeLeft < 2 * 60 * 1000) {
-                // if we have > 10 tags, but they expire in under 2 minutes, we want more
+                // if we have > 50 tags, but they expire in under 2 minutes, we want more
                 sentTags = createNewTags(NUM_TAGS);
                 if (_log.shouldLog(Log.DEBUG)) 
-                    _log.debug(getPrefix() + "Tags expiring in " + availTimeLeft + ", adding " + NUM_TAGS + " new ones");
+                    _log.debug(getPrefix() + "Tags expiring in " + availTimeLeft + ", adding " + NUM_TAGS + " new ones: " + sentTags);
                 //_log.error("** sendBestEffort available time left " + availTimeLeft);
             } else {
                 if (_log.shouldLog(Log.DEBUG))
