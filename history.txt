@@ -1,4 +1,10 @@
-$Id: history.txt,v 1.206 2005/05/25 16:32:38 duck Exp $
+$Id: history.txt,v 1.207 2005/07/04 15:44:17 jrandom Exp $
+
+2005-07-05
+    * Use a buffered PRNG, pulling the PRNG data off a larger precalculated 
+      buffer, rather than the underlying PRNG's (likely small) one, which in
+      turn reduces the frequency of recalcing.
+    * More tuning to reduce temporary allocation churn
 
 2005-07-04  jrandom
     * Within the tunnel, use xor(IV, msg[0:16]) as the flag to detect dups, 

@@ -159,6 +159,33 @@ public class TransportManager implements TransportEventListener {
         return rv;
     }
     
+    public TransportBid getNextBid(OutNetMessage msg) {
+        Set failedTransports = msg.getFailedTransports();
+        TransportBid rv = null;
+        for (int i = 0; i < _transports.size(); i++) {
+            Transport t = (Transport)_transports.get(i);
+            if (failedTransports.contains(t.getStyle())) {
+                if (_log.shouldLog(Log.DEBUG))
+                    _log.debug("Skipping transport " + t.getStyle() + " as it already failed");
+                continue;
+            }
+            // we always want to try all transports, in case there is a faster bidirectional one
+            // already connected (e.g. peer only has a public PHTTP address, but they've connected
+            // to us via TCP, send via TCP)
+            TransportBid bid = t.bid(msg.getTarget(), msg.getMessageSize());
+            if (bid != null) {
+                if (_log.shouldLog(Log.DEBUG))
+                    _log.debug("Transport " + t.getStyle() + " bid: " + bid);
+                if ( (rv == null) || (rv.getLatencyMs() > bid.getLatencyMs()) )
+                    rv = bid;
+            } else {
+                if (_log.shouldLog(Log.DEBUG))
+                    _log.debug("Transport " + t.getStyle() + " did not produce a bid");
+            }
+        }
+        return rv;
+    }
+    
     public void messageReceived(I2NPMessage message, RouterIdentity fromRouter, Hash fromRouterHash) {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("I2NPMessage received: " + message.getClass().getName(), new Exception("Where did I come from again?"));

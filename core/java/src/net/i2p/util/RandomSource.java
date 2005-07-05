@@ -22,9 +22,11 @@ import net.i2p.crypto.EntropyHarvester;
 public class RandomSource extends SecureRandom {
     private Log _log;
     private EntropyHarvester _entropyHarvester;
+    protected I2PAppContext _context;
 
     public RandomSource(I2PAppContext context) {
         super();
+        _context = context;
         _log = context.logManager().getLog(RandomSource.class);
         // when we replace to have hooks for fortuna (etc), replace with
         // a factory (or just a factory method)

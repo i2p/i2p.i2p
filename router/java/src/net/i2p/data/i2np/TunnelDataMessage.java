@@ -22,7 +22,8 @@ import net.i2p.util.Log;
  */
 public class TunnelDataMessage extends I2NPMessageImpl {
     private Log _log;
-    private TunnelId _tunnelId;
+    private long _tunnelId;
+    private TunnelId _tunnelIdObj;
     private byte[] _data;
     
     public final static int MESSAGE_TYPE = 18;
@@ -48,8 +49,17 @@ public class TunnelDataMessage extends I2NPMessageImpl {
         setMessageExpiration(context.clock().now() + EXPIRATION_PERIOD);
     }
     
-    public TunnelId getTunnelId() { return _tunnelId; }
-    public void setTunnelId(TunnelId id) { _tunnelId = id; }
+    public long getTunnelId() { return _tunnelId; }
+    public void setTunnelId(long id) { _tunnelId = id; }
+    public TunnelId getTunnelIdObj() { 
+        if (_tunnelIdObj == null)
+            _tunnelIdObj = new TunnelId(_tunnelId); // not thread safe, but immutable, so who cares
+        return _tunnelIdObj;
+    }
+    public void setTunnelId(TunnelId id) {
+        _tunnelIdObj = id;
+        _tunnelId = id.getTunnelId();
+    }
     
     public byte[] getData() { return _data; }
     public void setData(byte data[]) { 
@@ -62,10 +72,10 @@ public class TunnelDataMessage extends I2NPMessageImpl {
         if (type != MESSAGE_TYPE) throw new I2NPMessageException("Message type is incorrect for this message");
         int curIndex = offset;
         
-        _tunnelId = new TunnelId(DataHelper.fromLong(data, curIndex, 4));
+        _tunnelId = DataHelper.fromLong(data, curIndex, 4);
         curIndex += 4;
         
-        if (_tunnelId.getTunnelId() <= 0) 
+        if (_tunnelId <= 0) 
             throw new I2NPMessageException("Invalid tunnel Id " + _tunnelId);
         
         // we cant cache it in trivial form, as other components (e.g. HopProcessor)
@@ -82,12 +92,12 @@ public class TunnelDataMessage extends I2NPMessageImpl {
     protected int calculateWrittenLength() { return 4 + DATA_SIZE; }
     /** write the message body to the output array, starting at the given index */
     protected int writeMessageBody(byte out[], int curIndex) throws I2NPMessageException {
-        if ( (_tunnelId == null) || (_data == null) )
+        if ( (_tunnelId <= 0) || (_data == null) )
             throw new I2NPMessageException("Not enough data to write out (id=" + _tunnelId + " data=" + _data + ")");
         if (_data.length <= 0) 
             throw new I2NPMessageException("Not enough data to write out (data.length=" + _data.length + ")");
 
-        DataHelper.toLong(out, curIndex, 4, _tunnelId.getTunnelId());
+        DataHelper.toLong(out, curIndex, 4, _tunnelId);
         curIndex += 4;
         System.arraycopy(_data, 0, out, curIndex, DATA_SIZE);
         curIndex += _data.length;
@@ -99,7 +109,7 @@ public class TunnelDataMessage extends I2NPMessageImpl {
     public int getType() { return MESSAGE_TYPE; }
     
     public int hashCode() {
-        return DataHelper.hashCode(getTunnelId()) +
+        return (int)_tunnelId +
                DataHelper.hashCode(_data);
     }
     

@@ -57,8 +57,8 @@ public class BatchedRouterPreprocessor extends BatchedPreprocessor {
     
     protected void notePreprocessing(long messageId, int numFragments) {
         if (_config != null)
-            _routerContext.messageHistory().fragmentMessage(messageId, numFragments, _config.toString());
+            _routerContext.messageHistory().fragmentMessage(messageId, numFragments, _config);
         else
-            _routerContext.messageHistory().fragmentMessage(messageId, numFragments, _hopConfig.toString());
+            _routerContext.messageHistory().fragmentMessage(messageId, numFragments, _hopConfig);
     }
 }

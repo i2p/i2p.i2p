@@ -349,35 +349,35 @@ public class TunnelDispatcher implements Service {
         long before = _context.clock().now();
         TunnelParticipant participant = null;
         synchronized (_participants) {
-            participant = (TunnelParticipant)_participants.get(msg.getTunnelId());
+            participant = (TunnelParticipant)_participants.get(msg.getTunnelIdObj());
         }
         if (participant != null) {
             // we are either just a random participant or the inbound endpoint 
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("dispatch to participant " + participant + ": " + msg.getUniqueId() + " from " 
                            + recvFrom.toBase64().substring(0,4));
-            _context.messageHistory().tunnelDispatched(msg.getUniqueId(), msg.getTunnelId().getTunnelId(), "participant");
+            _context.messageHistory().tunnelDispatched(msg.getUniqueId(), msg.getTunnelId(), "participant");
             participant.dispatch(msg, recvFrom);
             _context.statManager().addRateData("tunnel.dispatchParticipant", 1, 0);
         } else {
             OutboundTunnelEndpoint endpoint = null;
             synchronized (_outboundEndpoints) {
-                endpoint = (OutboundTunnelEndpoint)_outboundEndpoints.get(msg.getTunnelId());
+                endpoint = (OutboundTunnelEndpoint)_outboundEndpoints.get(msg.getTunnelIdObj());
             }
             if (endpoint != null) {
                 // we are the outobund endpoint
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("dispatch where we are the outbound endpoint: " + endpoint + ": " 
                                + msg + " from " + recvFrom.toBase64().substring(0,4));
-                _context.messageHistory().tunnelDispatched(msg.getUniqueId(), msg.getTunnelId().getTunnelId(), "outbound endpoint");
+                _context.messageHistory().tunnelDispatched(msg.getUniqueId(), msg.getTunnelId(), "outbound endpoint");
                 endpoint.dispatch(msg, recvFrom);
                 
                 _context.statManager().addRateData("tunnel.dispatchEndpoint", 1, 0);
             } else {
-                _context.messageHistory().droppedTunnelDataMessageUnknown(msg.getUniqueId(), msg.getTunnelId().getTunnelId());
+                _context.messageHistory().droppedTunnelDataMessageUnknown(msg.getUniqueId(), msg.getTunnelId());
                 int level = (_context.router().getUptime() > 10*60*1000 ? Log.ERROR : Log.WARN);
                 if (_log.shouldLog(level))
-                    _log.log(level, "no matching participant/endpoint for id=" + msg.getTunnelId().getTunnelId() 
+                    _log.log(level, "no matching participant/endpoint for id=" + msg.getTunnelId() 
                              + " expiring in " + DataHelper.formatDuration(msg.getMessageExpiration()-_context.clock().now())
                              + ": existing = " + _participants.size() + " / " + _outboundEndpoints.size());
             }
@@ -410,8 +410,9 @@ public class TunnelDispatcher implements Service {
                                + msg.getMessage().getClass().getName());
                 return;
             }
-            _context.messageHistory().tunnelDispatched("message " + msg.getUniqueId() + "/" + msg.getMessage().getUniqueId() + " on tunnel " 
-                                                           + msg.getTunnelId().getTunnelId() + " as inbound gateway");
+            //_context.messageHistory().tunnelDispatched("message " + msg.getUniqueId() + "/" + msg.getMessage().getUniqueId() + " on tunnel " 
+            //                                               + msg.getTunnelId().getTunnelId() + " as inbound gateway");
+            _context.messageHistory().tunnelDispatched(msg.getUniqueId(), msg.getMessage().getUniqueId(), msg.getTunnelId().getTunnelId(), "inbound gateway");
             gw.add(msg);
             _context.statManager().addRateData("tunnel.dispatchInbound", 1, 0);
         } else {

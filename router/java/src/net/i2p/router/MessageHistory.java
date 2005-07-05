@@ -219,6 +219,11 @@ public class MessageHistory {
             addEntry(getPrefix() + "message " + messageId + " on tunnel " + tunnelId + " / " + toTunnel + " as " + type);
     }
     
+    public void tunnelDispatched(long messageId, long innerMessageId, long tunnelId, String type) {
+        if (!_doLog) return;
+        addEntry(getPrefix() + "message " + messageId + "/" + innerMessageId + " on " + tunnelId + " as " + type);
+    }
+    
     /**
      * The local router has detected a failure in the given tunnel
      *
@@ -472,13 +477,14 @@ public class MessageHistory {
         buf.append("Break message ").append(messageId).append(" into fragments: ").append(numFragments);
         addEntry(buf.toString());
     }
-    public void fragmentMessage(long messageId, int numFragments, String tunnel) {
+    public void fragmentMessage(long messageId, int numFragments, Object tunnel) {
         if (!_doLog) return;
         if (messageId == -1) throw new IllegalArgumentException("why are you -1?");
         StringBuffer buf = new StringBuffer(48);
         buf.append(getPrefix());
         buf.append("Break message ").append(messageId).append(" into fragments: ").append(numFragments);
-        buf.append(" on ").append(tunnel);
+        if (tunnel != null)
+            buf.append(" on ").append(tunnel.toString());
         addEntry(buf.toString());
     }
     public void droppedTunnelDataMessageUnknown(long msgId, long tunnelId) {

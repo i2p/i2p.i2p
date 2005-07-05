@@ -27,6 +27,7 @@ public class PacketBuilder {
     private Log _log;
     
     private static final ByteCache _ivCache = ByteCache.getInstance(64, UDPPacket.IV_SIZE);
+    private static final ByteCache _hmacCache = ByteCache.getInstance(64, Hash.HASH_LENGTH);
     
     public PacketBuilder(I2PAppContext ctx) {
         _context = ctx;
@@ -482,16 +483,20 @@ public class PacketBuilder {
         
         int hmacOff = packet.getPacket().getOffset();
         int hmacLen = encryptSize + UDPPacket.IV_SIZE + 2;
-        Hash hmac = _context.hmac().calculate(macKey, data, hmacOff, hmacLen);
+        //Hash hmac = _context.hmac().calculate(macKey, data, hmacOff, hmacLen);
+        ByteArray ba = _hmacCache.acquire();
+        _context.hmac().calculate(macKey, data, hmacOff, hmacLen, ba.getData(), 0);
         
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Authenticating " + packet.getPacketDataLength() + // packet.getPacket().getLength() +
                        "\nIV: " + Base64.encode(iv.getData()) +
-                       "\nraw mac: " + hmac.toBase64() +
+                       "\nraw mac: " + Base64.encode(ba.getData()) +
                        "\nMAC key: " + macKey.toBase64());
         // ok, now lets put it back where it belongs...
         System.arraycopy(data, hmacOff, data, encryptOffset, encryptSize);
-        System.arraycopy(hmac.getData(), 0, data, hmacOff, UDPPacket.MAC_SIZE);
+        //System.arraycopy(hmac.getData(), 0, data, hmacOff, UDPPacket.MAC_SIZE);
+        System.arraycopy(ba.getData(), 0, data, hmacOff, UDPPacket.MAC_SIZE);
         System.arraycopy(iv.getData(), 0, data, hmacOff + UDPPacket.MAC_SIZE, UDPPacket.IV_SIZE);
+        _hmacCache.release(ba);
     }
 }

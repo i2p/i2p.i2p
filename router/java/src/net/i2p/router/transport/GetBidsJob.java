@@ -59,28 +59,13 @@ public class GetBidsJob extends JobImpl {
             return;
         }
         
-        List bids = facade.getBids(msg);
-        
-        if ( (bids == null) || (bids.size() <= 0) ) {
-            context.shitlist().shitlistRouter(to, "No bids after " + (bids != null ? bids.size() + " tries" : "0 tries"));
+        TransportBid bid = facade.getNextBid(msg);
+        if (bid == null) {
+            context.shitlist().shitlistRouter(to, "No more bids available");
             context.netDb().fail(to);
             fail(context, msg);
         } else {
-            int lowestCost = -1;
-            TransportBid winner = null;
-            for (int i = 0; i < bids.size(); i++) {
-                TransportBid bid = (TransportBid)bids.get(i);
-                if ( (lowestCost < 0) || (bid.getLatencyMs() < lowestCost) ) {
-                    winner = bid;
-                    lowestCost = bid.getLatencyMs();
-                }
-            }
-            if (winner != null) {
-                if (log.shouldLog(Log.INFO))
-                    log.info("Winning bid: " + winner + " out of " + bids);
-                
-                winner.getTransport().send(msg);
-            }
+            bid.getTransport().send(msg);
         }
     }
     

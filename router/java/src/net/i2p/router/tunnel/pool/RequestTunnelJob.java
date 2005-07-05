@@ -104,7 +104,7 @@ public class RequestTunnelJob extends JobImpl {
             // inbound tunnel, which means we are the first person asked, and if
             // it is a zero hop tunnel, then we are also the last person asked
             
-            long id = getContext().random().nextLong(TunnelId.MAX_ID_VALUE);
+            long id = getContext().random().nextLong(TunnelId.MAX_ID_VALUE-1) + 1;
             _currentConfig.setReceiveTunnelId(DataHelper.toLong(4, id));
             if (_config.getLength() > 1) {
                 if (_log.shouldLog(Log.DEBUG))

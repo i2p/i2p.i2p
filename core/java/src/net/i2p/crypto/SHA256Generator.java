@@ -1,6 +1,8 @@
 package net.i2p.crypto;
 
 import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.List;
 import net.i2p.I2PAppContext;
 import net.i2p.data.Hash;
 
@@ -12,7 +14,10 @@ import org.bouncycastle.crypto.digests.SHA256Digest;
  * 
  */
 public final class SHA256Generator {
-    public SHA256Generator(I2PAppContext context) {}
+    private List _digests;
+    public SHA256Generator(I2PAppContext context) {
+        _digests = new ArrayList(32);
+    }
     
     public static final SHA256Generator getInstance() {
         return I2PAppContext.getGlobalContext().sha();
@@ -27,10 +32,34 @@ public final class SHA256Generator {
     }
     public final Hash calculateHash(byte[] source, int start, int len) {
         byte rv[] = new byte[Hash.HASH_LENGTH];
-        SHA256Digest digest = new SHA256Digest();
-        digest.update(source, start, len);
-        digest.doFinal(rv, 0);
+        calculateHash(source, start, len, rv, 0);
         return new Hash(rv);
+    }
+    public final void calculateHash(byte[] source, int start, int len, byte out[], int outOffset) {
+        SHA256Digest digest = acquire();
+        digest.update(source, start, len);
+        digest.doFinal(out, outOffset);
+        release(digest);
+    }
+    
+    private SHA256Digest acquire() {
+        SHA256Digest rv = null;
+        synchronized (_digests) {
+            if (_digests.size() > 0)
+                rv = (SHA256Digest)_digests.remove(0);
+        }
+        if (rv != null)
+            rv.reset();
+        else
+            rv = new SHA256Digest();
+        return rv;
+    }
+    private void release(SHA256Digest digest) {
+        synchronized (_digests) {
+            if (_digests.size() < 32) {
+                _digests.add(digest);
+            }
+        }
     }
     
     public static void main(String args[]) {

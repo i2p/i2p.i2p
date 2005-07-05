@@ -27,7 +27,8 @@ public class PooledRandomSource extends RandomSource {
         _log = context.logManager().getLog(PooledRandomSource.class);
         _pool = new RandomSource[POOL_SIZE];
         for (int i = 0; i < POOL_SIZE; i++) {
-            _pool[i] = new RandomSource(context);
+            //_pool[i] = new RandomSource(context);
+            _pool[i] = new BufferedRandomSource(context);
             _pool[i].nextBoolean();
         }
         _nextPool = 0;

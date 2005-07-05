@@ -68,9 +68,9 @@ public class UDPPacket {
     public static final byte BITFIELD_CONTINUATION = (byte)(1 << 7);
     
     private static final int MAX_VALIDATE_SIZE = MAX_PACKET_SIZE;
-    private static final ByteCache _validateCache = ByteCache.getInstance(16, MAX_VALIDATE_SIZE);
-    private static final ByteCache _ivCache = ByteCache.getInstance(16, IV_SIZE);
-    private static final ByteCache _dataCache = ByteCache.getInstance(64, MAX_PACKET_SIZE);
+    private static final ByteCache _validateCache = ByteCache.getInstance(64, MAX_VALIDATE_SIZE);
+    private static final ByteCache _ivCache = ByteCache.getInstance(64, IV_SIZE);
+    private static final ByteCache _dataCache = ByteCache.getInstance(128, MAX_PACKET_SIZE);
 
     private UDPPacket(I2PAppContext ctx) {
         _context = ctx;
@@ -237,8 +237,11 @@ public class UDPPacket {
         _released = true;
         //_releasedBy = new Exception("released by");
         //_acquiredBy = null;
-        //_dataCache.release(_dataBuf);
-        if (!CACHE) return;
+        //
+        if (!CACHE) {
+            _dataCache.release(_dataBuf);
+            return;
+        }
         synchronized (_packetCache) {
             if (_packetCache.size() <= 64) {
                 _packetCache.add(this);

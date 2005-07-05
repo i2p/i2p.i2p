@@ -37,10 +37,11 @@ import java.util.Properties;
 public class HMACSHA256Bench {
         public static void main(String args[]) {
             runTest(new I2PAppContext());
+            System.out.println("Running as MD5");
             Properties props = new Properties();
-            props.setProperty("i2p.fakeHMAC", "true");
+            //props.setProperty("i2p.fakeHMAC", "true");
+            props.setProperty("i2p.HMACMD5", "true");
             runTest(new I2PAppContext(props));
-
         }
         private static void runTest(I2PAppContext ctx) {
         SessionKey key = ctx.keyGenerator().generateSessionKey();
@@ -109,7 +110,7 @@ public class HMACSHA256Bench {
     private static void display(int times, long before, long after, int len, String name) {
         double rate = ((double)times)/(((double)after-(double)before)/1000.0d);
         double kbps = ((double)len/1024.0d)*((double)times)/(((double)after-(double)before)/1000.0d);
-        System.out.println(name + " HMAC-SHA256 pulled " + kbps + "KBps or " + rate + " calcs per second");
+        System.out.println(name + " HMAC pulled " + kbps + "KBps or " + rate + " calcs per second");
     }
 }
 	

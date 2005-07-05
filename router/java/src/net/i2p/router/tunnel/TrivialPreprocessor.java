@@ -26,6 +26,7 @@ public class TrivialPreprocessor implements TunnelGateway.QueuePreprocessor {
     protected static final int IV_SIZE = HopProcessor.IV_LENGTH;
     protected static final ByteCache _dataCache = ByteCache.getInstance(512, PREPROCESSED_SIZE);
     protected static final ByteCache _ivCache = ByteCache.getInstance(128, IV_SIZE);
+    protected static final ByteCache _hashCache = ByteCache.getInstance(128, Hash.HASH_LENGTH);
     
     public TrivialPreprocessor(I2PAppContext ctx) {
         _context = ctx;
@@ -104,7 +105,11 @@ public class TrivialPreprocessor implements TunnelGateway.QueuePreprocessor {
         
         // payload ready, now H(instructions+payload+IV)
         System.arraycopy(iv, 0, fragments, fragmentLength, IV_SIZE);
-		Hash h = _context.sha().calculateHash(fragments, 0, fragmentLength + IV_SIZE);
+        
+        ByteArray hashBuf = _hashCache.acquire();
+        //Hash h = _context.sha().calculateHash(fragments, 0, fragmentLength + IV_SIZE);
+        _context.sha().calculateHash(fragments, 0, fragmentLength + IV_SIZE, hashBuf.getData(), 0);
+        
         //Hash h = _context.sha().calculateHash(target, 0, offset + IV_SIZE);
         //_log.debug("before shift: " + Base64.encode(target));
         // now shiiiiiift
@@ -121,10 +126,12 @@ public class TrivialPreprocessor implements TunnelGateway.QueuePreprocessor {
         int offset = 0;
         System.arraycopy(iv, 0, fragments, offset, IV_SIZE);
         offset += IV_SIZE;
-        System.arraycopy(h.getData(), 0, fragments, offset, 4);
+        //System.arraycopy(h.getData(), 0, fragments, offset, 4);
+        System.arraycopy(hashBuf.getData(), 0, fragments, offset, 4);
         offset += 4;
         //_log.debug("before pad  : " + Base64.encode(target));
         
+        _hashCache.release(hashBuf);
         _ivCache.release(ivBuf);
         
         // fits in a single message, so may be smaller than the full size
