@@ -1,4 +1,4 @@
-<code>$Id: tunnel-alt.html,v 1.6 2005/01/25 00:46:22 jrandom Exp $</code>
+<code>$Id: tunnel-alt.html,v 1.7 2005/02/16 19:48:18 jrandom Exp $</code>
 <pre>
 1) <a href="#tunnel.overview">Tunnel overview</a>
 2) <a href="#tunnel.operation">Tunnel operation</a>
@@ -178,11 +178,14 @@ updates the IV by encrypting it with AES256/ECB using the participant's IV key,
 then forwards the tuple {nextTunnelId, nextIV, encryptedData} to the next hop.</p>
 
 <p>Duplicate message detection is handled by a decaying Bloom filter on message
-IVs.  Each router maintains a single Bloom filter to contain all of the IVs for
-all of the tunnels it is participating in, modified to drop seen entries after 
-10-20 minutes (when the tunnels will have expired).  The size of the bloom 
-filter and the parameters used are sufficient to more than saturate the router's
-network connection with a negligible chance of false positive.</p>
+IVs.  Each router maintains a single Bloom filter to contain the XOR of the IV and
+the first block of the message received for all of the tunnels it is participating
+in, modified to drop seen entries after 10-20 minutes (when the tunnels will have
+expired).  The size of the bloom filter and the parameters used are sufficient to
+more than saturate the router's network connection with a negligible chance of 
+false positive.  The unique value fed into the Bloom filter is the XOR of the IV 
+and the first block so as to prevent nonsequential colluding peers in the tunnel 
+from tagging a message by resending it with the IV and first block switched.</p>
 
 <h3>2.4) <a name="tunnel.endpoint">Endpoint processing</a></h3>
 
