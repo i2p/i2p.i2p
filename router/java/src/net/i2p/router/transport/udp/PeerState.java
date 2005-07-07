@@ -1,7 +1,10 @@
 package net.i2p.router.transport.udp;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -144,6 +147,9 @@ public class PeerState {
     private long _packetsReceivedDuplicate;
     private long _packetsReceived;
     
+    /** Message (Long) to InboundMessageState for active message */
+    private Map _inboundMessages;
+    
     private static final int DEFAULT_SEND_WINDOW_BYTES = 8*1024;
     private static final int MINIMUM_WINDOW_BYTES = DEFAULT_SEND_WINDOW_BYTES;
     private static final int MAX_SEND_WINDOW_BYTES = 1024*1024;
@@ -202,6 +208,7 @@ public class PeerState {
         _retransmissionPeriodStart = 0;
         _packetsReceived = 0;
         _packetsReceivedDuplicate = 0;
+        _inboundMessages = new HashMap(8);
         _context.statManager().createRateStat("udp.congestionOccurred", "How large the cwin was when congestion occurred (duration == sendBps)", "udp", new long[] { 60*60*1000, 24*60*60*1000 });
         _context.statManager().createRateStat("udp.congestedRTO", "retransmission timeout after congestion (duration == rtt dev)", "udp", new long[] { 60*60*1000, 24*60*60*1000 });
         _context.statManager().createRateStat("udp.sendACKPartial", "Number of partial ACKs sent (duration == number of full ACKs in that ack packet)", "udp", new long[] { 60*60*1000, 24*60*60*1000 });
@@ -457,6 +464,12 @@ public class PeerState {
     }
     
     /** 
+     * Fetch the internal id (Long) to InboundMessageState for incomplete inbound messages.
+     * Access to this map must be synchronized explicitly!
+     */
+    public Map getInboundMessages() { return _inboundMessages; }
+    
+    /** 
      * either they told us to back off, or we had to resend to get 
      * the data through.  
      *
@@ -489,7 +502,7 @@ public class PeerState {
      * will be unchanged if there are ACKs remaining.
      *
      */
-    public List retrieveACKBitfields(UDPTransport.PartialACKSource partialACKSource) {
+    public List retrieveACKBitfields() {
         List rv = new ArrayList(16);
         int bytesRemaining = countMaxACKData();
         synchronized (_currentACKs) {
@@ -502,12 +515,12 @@ public class PeerState {
         }
             
         int partialIncluded = 0;
-        if ( (bytesRemaining > 4) && (partialACKSource != null) ) {
+        if (bytesRemaining > 4) {
             // ok, there's room to *try* to fit in some partial ACKs, so
             // we should try to find some packets to partially ACK 
             // (preferably the ones which have the most received fragments)
             List partial = new ArrayList();
-            partialACKSource.fetchPartialACKs(_remotePeer, partial);
+            fetchPartialACKs(partial);
             // we may not be able to use them all, but lets try...
             for (int i = 0; (bytesRemaining > 4) && (i < partial.size()); i++) {
                 ACKBitfield bitfield = (ACKBitfield)partial.get(i);
@@ -526,6 +539,34 @@ public class PeerState {
         _context.statManager().addRateData("udp.sendACKPartial", partialIncluded, rv.size() - partialIncluded);
         _lastACKSend = _context.clock().now();
         return rv;
+    }
+    
+    private void fetchPartialACKs(List rv) {
+        InboundMessageState states[] = null;
+        int curState = 0;
+        synchronized (_inboundMessages) {
+            int numMessages = _inboundMessages.size();
+            if (numMessages <= 0) 
+                return;
+            for (Iterator iter = _inboundMessages.values().iterator(); iter.hasNext(); ) {
+                InboundMessageState state = (InboundMessageState)iter.next();
+                if (state.isExpired()) {
+                    iter.remove();
+                } else {
+                    if (!state.isComplete()) {
+                        if (states == null)
+                            states = new InboundMessageState[numMessages];
+                        states[curState++] = state;
+                    }
+                }
+            }
+        }
+        if (states != null) {
+            for (int i = curState-1; i >= 0; i--) {
+                if (states[i] != null)
+                    rv.add(states[i].createACKBitfield());
+            }
+        }
     }
     
     /** represent a full ACK of a message */

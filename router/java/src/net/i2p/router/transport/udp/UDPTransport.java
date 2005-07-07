@@ -666,17 +666,6 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         
         out.write("</table>\n");
     }
-
-    public PartialACKSource getPartialACKSource() { return _inboundFragments; }
-    
-    /** help us grab partial ACKs */
-    public interface PartialACKSource {
-        /** 
-         * build partial ACKs of messages received from the peer and store
-         * them in the ackBitfields
-         */
-        public void fetchPartialACKs(Hash fromPeer, List ackBitfields);
-    }
     
     private static final DecimalFormat _fmt = new DecimalFormat("#,##0.00");
     private static final String formatKBps(int bps) {

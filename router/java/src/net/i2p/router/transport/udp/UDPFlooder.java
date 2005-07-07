@@ -59,6 +59,7 @@ class UDPFlooder implements Runnable {
     }
     
     public void run() {
+        long nextSend = _context.clock().now();
         while (_alive) {
             try {
                 synchronized (_peers) {
@@ -67,33 +68,47 @@ class UDPFlooder implements Runnable {
                 }
             } catch (InterruptedException ie) {}
             
-            // peers always grows, so this is fairly safe
-            for (int i = 0; i < _peers.size(); i++) {
-                PeerState peer = (PeerState)_peers.get(i);
-                DataMessage m = new DataMessage(_context);
-                byte data[] = _floodData; // new byte[4096];
-                //_context.random().nextBytes(data);
-                m.setData(data);
-                m.setMessageExpiration(_context.clock().now() + 10*1000);
-                m.setUniqueId(_context.random().nextLong(I2NPMessage.MAX_ID_VALUE));
-                if (true) {
-                    OutNetMessage msg = new OutNetMessage(_context);
-                    msg.setMessage(m);
-                    msg.setExpiration(m.getMessageExpiration());
-                    msg.setPriority(500);
-                    RouterInfo to = _context.netDb().lookupRouterInfoLocally(peer.getRemotePeer());
-                    if (to == null)
-                        continue;
-                    msg.setTarget(to);
-                    _context.statManager().getStatLog().addData(peer.getRemotePeer().toBase64().substring(0,6), "udp.floodDataSent", 1, 0);
+            long now = _context.clock().now();
+            if (now >= nextSend) {
+                // peers always grows, so this is fairly safe
+                for (int i = 0; i < _peers.size(); i++) {
+                    PeerState peer = (PeerState)_peers.get(i);
+                    DataMessage m = new DataMessage(_context);
+                    byte data[] = _floodData; // new byte[4096];
+                    //_context.random().nextBytes(data);
+                    m.setData(data);
+                    m.setMessageExpiration(_context.clock().now() + 10*1000);
+                    m.setUniqueId(_context.random().nextLong(I2NPMessage.MAX_ID_VALUE));
+                    if (true) {
+                        OutNetMessage msg = new OutNetMessage(_context);
+                        msg.setMessage(m);
+                        msg.setExpiration(m.getMessageExpiration());
+                        msg.setPriority(500);
+                        RouterInfo to = _context.netDb().lookupRouterInfoLocally(peer.getRemotePeer());
+                        if (to == null)
+                            continue;
+                        msg.setTarget(to);
+                        _context.statManager().getStatLog().addData(peer.getRemotePeer().toBase64().substring(0,6), "udp.floodDataSent", 1, 0);
 
-                    _transport.send(msg);
-                } else {
-                    _transport.send(m, peer);
+                        _transport.send(msg);
+                    } else {
+                        _transport.send(m, peer);
+                    }
                 }
+                nextSend = now + calcFloodDelay();
             }
-            long floodDelay = calcFloodDelay();
-            try { Thread.sleep(floodDelay); } catch (InterruptedException ie) {}
+            
+            long delay = nextSend - now;
+            if (delay > 0) {
+                if (delay > 10*1000) {
+                    long fd = calcFloodDelay();
+                    if (delay > fd) {
+                        nextSend = now + fd;
+                        delay = fd;
+                    }
+                }
+                try { Thread.sleep(delay); } catch (InterruptedException ie) {}
+            }
         }
     }
     

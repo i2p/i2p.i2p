@@ -20,16 +20,10 @@ import net.i2p.util.Log;
  * up in the router we have full blown replay detection, its nice to have a
  * basic line of defense here).
  *
- * TODO: add in some sensible code to drop expired fragments from peers we 
- * don't hear from again (either a periodic culling for expired peers, or
- * a scheduled event)
- *
  */
-public class InboundMessageFragments implements UDPTransport.PartialACKSource {
+public class InboundMessageFragments /*implements UDPTransport.PartialACKSource */{
     private RouterContext _context;
     private Log _log;
-    /** Map of peer (Hash) to a Map of messageId (Long) to InboundMessageState objects */
-    private Map _inboundMessages;
     /** list of message IDs recently received, so we can ignore in flight dups */
     private DecayingBloomFilter _recentlyCompletedMessages;
     private OutboundMessageFragments _outbound;
@@ -44,7 +38,7 @@ public class InboundMessageFragments implements UDPTransport.PartialACKSource {
     public InboundMessageFragments(RouterContext ctx, OutboundMessageFragments outbound, UDPTransport transport) {
         _context = ctx;
         _log = ctx.logManager().getLog(InboundMessageFragments.class);
-        _inboundMessages = new HashMap(64);
+        //_inboundMessages = new HashMap(64);
         _outbound = outbound;
         _transport = transport;
         _ackSender = new ACKSender(_context, _transport);
@@ -73,9 +67,6 @@ public class InboundMessageFragments implements UDPTransport.PartialACKSource {
         _recentlyCompletedMessages = null;
         _ackSender.shutdown();
         _messageReceiver.shutdown();
-        synchronized (_inboundMessages) {
-            _inboundMessages.clear();
-        }
     }
     public boolean isAlive() { return _alive; }
 
@@ -103,72 +94,76 @@ public class InboundMessageFragments implements UDPTransport.PartialACKSource {
     private void receiveMessages(PeerState from, UDPPacketReader.DataReader data) {
         int fragments = data.readFragmentCount();
         if (fragments <= 0) return;
-        synchronized (_inboundMessages) { // XXX: CHOKE POINT (to what extent?)
-            Map messages = (Map)_inboundMessages.get(from.getRemotePeer());
-            if (messages == null) {
-                messages = new HashMap(fragments);
-                _inboundMessages.put(from.getRemotePeer(), messages);
+        Hash fromPeer = from.getRemotePeer();
+            
+        Map messages = from.getInboundMessages();
+            
+        for (int i = 0; i < fragments; i++) {
+            Long messageId = new Long(data.readMessageId(i));
+
+            if (_recentlyCompletedMessages.isKnown(messageId.longValue())) {
+                _context.statManager().addRateData("udp.ignoreRecentDuplicate", 1, 0);
+                from.messageFullyReceived(messageId, -1);
+                _ackSender.ackPeer(from);
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("Message received is a dup: " + messageId + " dups: " 
+                              + _recentlyCompletedMessages.getCurrentDuplicateCount() + " out of " 
+                              + _recentlyCompletedMessages.getInsertedCount());
+                continue;
             }
-        
-            for (int i = 0; i < fragments; i++) {
-                Long messageId = new Long(data.readMessageId(i));
             
-                if (_recentlyCompletedMessages.isKnown(messageId.longValue())) {
-                    _context.statManager().addRateData("udp.ignoreRecentDuplicate", 1, 0);
-                    from.messageFullyReceived(messageId, -1);
-                    _ackSender.ackPeer(from);
-                    if (_log.shouldLog(Log.WARN))
-                        _log.warn("Message received is a dup: " + messageId + " dups: " 
-                                  + _recentlyCompletedMessages.getCurrentDuplicateCount() + " out of " 
-                                  + _recentlyCompletedMessages.getInsertedCount());
-                    continue;
-                }
-            
-                int size = data.readMessageFragmentSize(i);
-                InboundMessageState state = null;
-                boolean messageComplete = false;
-                boolean messageExpired = false;
-                boolean fragmentOK = false;
+            int size = data.readMessageFragmentSize(i);
+            InboundMessageState state = null;
+            boolean messageComplete = false;
+            boolean messageExpired = false;
+            boolean fragmentOK = false;
+            boolean partialACK = false;
+         
+            // perhaps compact the synchronized block further by synchronizing on the
+            // particular state once its found?
+            synchronized (messages) {
                 state = (InboundMessageState)messages.get(messageId);
                 if (state == null) {
-                    state = new InboundMessageState(_context, messageId.longValue(), from.getRemotePeer());
+                    state = new InboundMessageState(_context, messageId.longValue(), fromPeer);
                     messages.put(messageId, state);
                 }
+                
                 fragmentOK = state.receiveFragment(data, i);
+             
                 if (state.isComplete()) {
                     messageComplete = true;
                     messages.remove(messageId);
-                    if (messages.size() <= 0)
-                        _inboundMessages.remove(from.getRemotePeer());
-                    
-                    _recentlyCompletedMessages.add(messageId.longValue());
+                } else if (state.isExpired()) {
+                    messageExpired = true;
+                    messages.remove(messageId);
+                } else {
+                    partialACK = true;
+                }
 
+                if (messageComplete) {
+                    _recentlyCompletedMessages.add(messageId.longValue());
                     _messageReceiver.receiveMessage(state);
-                    
+
                     from.messageFullyReceived(messageId, state.getCompleteSize());
                     _ackSender.ackPeer(from);
-                    
+
                     if (_log.shouldLog(Log.INFO))
                         _log.info("Message received completely!  " + state);
 
                     _context.statManager().addRateData("udp.receivedCompleteTime", state.getLifetime(), state.getLifetime());
                     _context.statManager().addRateData("udp.receivedCompleteFragments", state.getFragmentCount(), state.getLifetime());
-                } else if (state.isExpired()) {
-                    messageExpired = true;
-                    messages.remove(messageId);
-                    if (messages.size() <= 0)
-                        _inboundMessages.remove(from.getRemotePeer());
+                } else if (messageExpired) {
+                    state.releaseResources();
                     if (_log.shouldLog(Log.WARN))
                         _log.warn("Message expired while only being partially read: " + state);
-                    state.releaseResources();
-                } else {
+                } else if (partialACK) {
                     // not expired but not yet complete... lets queue up a partial ACK
                     if (_log.shouldLog(Log.DEBUG))
                         _log.debug("Queueing up a partial ACK for peer: " + from + " for " + state);
                     from.messagePartiallyReceived();
                     _ackSender.ackPeer(from);
                 }
-                
+
                 if (!fragmentOK)
                     break;
             }
@@ -208,24 +203,5 @@ public class InboundMessageFragments implements UDPTransport.PartialACKSource {
             from.ECNReceived();
         else
             from.dataReceived();
-    }
-    
-    public void fetchPartialACKs(Hash fromPeer, List ackBitfields) {
-        synchronized (_inboundMessages) {
-            Map messages = (Map)_inboundMessages.get(fromPeer);
-            if (messages == null)
-                return;
-            for (Iterator iter = messages.values().iterator(); iter.hasNext(); ) {
-                InboundMessageState state = (InboundMessageState)iter.next();
-                if (state.isExpired()) {
-                    iter.remove();
-                } else {
-                    if (!state.isComplete())
-                        ackBitfields.add(state.createACKBitfield());
-                }
-            }
-            if (messages.size() <= 0)
-                _inboundMessages.remove(fromPeer);
-        }
     }
 }
