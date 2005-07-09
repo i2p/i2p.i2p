@@ -507,20 +507,4 @@ public class PacketBuilder {
         System.arraycopy(iv.getData(), 0, data, hmacOff + UDPPacket.MAC_SIZE, UDPPacket.IV_SIZE);
         _hmacCache.release(ba);
     }
-    
-    public static void main(String args[]) {
-        byte data[] = new byte[32];
-        int off = 0;
-        int size = 1216;
-        System.out.println("Binary: " + Integer.toBinaryString(size));
-        System.out.println("Binary: " + Integer.toBinaryString(0x3F));
-        DataHelper.toLong(data, off, 2, size);
-        
-        System.out.println(DataHelper.toHexString(data));
-        data[off] &= (byte)0x3F; // 2 highest bits are reserved
-        System.out.println(DataHelper.toHexString(data));
-        System.out.println(DataHelper.toHexString(data));
-        long val = DataHelper.fromLong(data, off, 2);
-        System.out.println("Val: " + val + " size: " + size + " raw: " +Base64.encode(data));
-    }
 }
