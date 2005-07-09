@@ -37,7 +37,7 @@ public class UDPPacketReader {
     
     public void initialize(UDPPacket packet) {
         int off = packet.getPacket().getOffset();
-        int len = packet.getPacketDataLength(); //packet.getPacket().getLength();
+        int len = packet.getPacket().getLength();
         off += UDPPacket.MAC_SIZE + UDPPacket.IV_SIZE;
         len -= UDPPacket.MAC_SIZE + UDPPacket.IV_SIZE;
         initialize(packet.getPacket().getData(), off, len);

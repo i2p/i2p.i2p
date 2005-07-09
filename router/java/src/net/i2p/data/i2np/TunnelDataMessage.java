@@ -25,6 +25,7 @@ public class TunnelDataMessage extends I2NPMessageImpl {
     private long _tunnelId;
     private TunnelId _tunnelIdObj;
     private byte[] _data;
+    private ByteArray _dataBuf;
     
     public final static int MESSAGE_TYPE = 18;
     private static final int DATA_SIZE = 1024;
@@ -81,10 +82,12 @@ public class TunnelDataMessage extends I2NPMessageImpl {
         // we cant cache it in trivial form, as other components (e.g. HopProcessor)
         // call getData() and use it as the buffer to write with.  it is then used
         // again to pass to the 'receiver', which may even cache it in a FragmentMessage.
-        if (PIPELINED_CACHE)
-            _data = _cache.acquire().getData();
-        else
+        if (PIPELINED_CACHE) {
+            _dataBuf = _cache.acquire();
+            _data = _dataBuf.getData();
+        } else {
             _data = new byte[DATA_SIZE];
+        }
         System.arraycopy(data, curIndex, _data, 0, DATA_SIZE);
     }
     
@@ -102,7 +105,7 @@ public class TunnelDataMessage extends I2NPMessageImpl {
         System.arraycopy(_data, 0, out, curIndex, DATA_SIZE);
         curIndex += _data.length;
         if (PIPELINED_CACHE)
-            _cache.release(new ByteArray(_data));
+            _cache.release(_dataBuf);
         return curIndex;
     }
     

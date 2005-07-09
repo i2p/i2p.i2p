@@ -93,7 +93,9 @@ public class MessageReceiver implements Runnable {
                 System.arraycopy(fragments[i].getData(), 0, buf.getData(), off, fragments[i].getValid());
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("Raw fragment[" + i + "] for " + state.getMessageId() + ": " 
-                               + Base64.encode(fragments[i].getData(), 0, fragments[i].getValid()));
+                               + Base64.encode(fragments[i].getData(), 0, fragments[i].getValid())
+                               + " (valid: " + fragments[i].getValid() 
+                               + " raw: " + Base64.encode(fragments[i].getData()) + ")");
                 off += fragments[i].getValid();
             }
             if (off != state.getCompleteSize())

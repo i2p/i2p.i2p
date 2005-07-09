@@ -28,6 +28,7 @@ public class PacketBuilder {
     
     private static final ByteCache _ivCache = ByteCache.getInstance(64, UDPPacket.IV_SIZE);
     private static final ByteCache _hmacCache = ByteCache.getInstance(64, Hash.HASH_LENGTH);
+    private static final ByteCache _blockCache = ByteCache.getInstance(64, 16);
     
     public PacketBuilder(I2PAppContext ctx) {
         _context = ctx;
@@ -70,20 +71,32 @@ public class PacketBuilder {
         if (size < 0)
             return null;
         DataHelper.toLong(data, off, 2, size);
-        data[off] &= (byte)3F; // 2 highest bits are reserved
+        data[off] &= (byte)0x3F; // 2 highest bits are reserved
         off += 2;
         
-        size = state.writeFragment(data, off, fragment);
+        int sizeWritten = state.writeFragment(data, off, fragment);
+        if (sizeWritten != size)
+            _log.error("Size written: " + sizeWritten + " but size: " + size 
+                       + " for fragment " + fragment + " of " + state.getMessageId());
+        else if (_log.shouldLog(Log.DEBUG))
+            _log.debug("Size written: " + sizeWritten + " for fragment " + fragment 
+                       + " of " + state.getMessageId());
+        size = sizeWritten;
         if (size < 0) return null;
         off += size;
 
         // we can pad here if we want, maybe randomized?
         
         // pad up so we're on the encryption boundary
-        if ( (off % 16) != 0)
-            off += 16 - (off % 16);
+        int padSize = 16 - (off % 16);
+        if (padSize > 0) {
+            ByteArray block = _blockCache.acquire();
+            _context.random().nextBytes(block.getData());
+            System.arraycopy(block.getData(), 0, data, off, padSize);
+            _blockCache.release(block);
+            off += padSize;
+        }
         packet.getPacket().setLength(off);
-        packet.setPacketDataLength(off);
         authenticate(packet, peer.getCurrentCipherKey(), peer.getCurrentMACKey());
         setTo(packet, peer.getRemoteIPAddress(), peer.getRemotePort());
         return packet;
@@ -169,7 +182,6 @@ public class PacketBuilder {
         if ( (off % 16) != 0)
             off += 16 - (off % 16);
         packet.getPacket().setLength(off);
-        packet.setPacketDataLength(off);
         authenticate(packet, peer.getCurrentCipherKey(), peer.getCurrentMACKey());
         setTo(packet, peer.getRemoteIPAddress(), peer.getRemotePort());
         return packet;
@@ -262,7 +274,6 @@ public class PacketBuilder {
         if ( (off % 16) != 0)
             off += 16 - (off % 16);
         packet.getPacket().setLength(off);
-        packet.setPacketDataLength(off);
         authenticate(packet, ourIntroKey, ourIntroKey, iv);
         setTo(packet, to, state.getSentPort());
         _ivCache.release(iv);
@@ -321,7 +332,6 @@ public class PacketBuilder {
         if ( (off % 16) != 0)
             off += 16 - (off % 16);
         packet.getPacket().setLength(off);
-        packet.setPacketDataLength(off);
         authenticate(packet, state.getIntroKey(), state.getIntroKey());
         setTo(packet, to, state.getSentPort());
         return packet;
@@ -416,7 +426,6 @@ public class PacketBuilder {
             
             System.arraycopy(state.getSentSignature().getData(), 0, data, off, Signature.SIGNATURE_BYTES);
             packet.getPacket().setLength(off + Signature.SIGNATURE_BYTES);
-            packet.setPacketDataLength(off + Signature.SIGNATURE_BYTES);
             authenticate(packet, state.getCipherKey(), state.getMACKey());
         } else {
             // nothing more to add beyond the identity fragment, though we can
@@ -426,7 +435,6 @@ public class PacketBuilder {
             if ( (off % 16) != 0)
                 off += 16 - (off % 16);
             packet.getPacket().setLength(off);
-            packet.setPacketDataLength(off);
             authenticate(packet, state.getIntroKey(), state.getIntroKey());
         } 
         
@@ -469,7 +477,7 @@ public class PacketBuilder {
      */
     private void authenticate(UDPPacket packet, SessionKey cipherKey, SessionKey macKey, ByteArray iv) {
         int encryptOffset = packet.getPacket().getOffset() + UDPPacket.IV_SIZE + UDPPacket.MAC_SIZE;
-        int encryptSize = packet.getPacketDataLength()/*packet.getPacket().getLength()*/ - UDPPacket.IV_SIZE - UDPPacket.MAC_SIZE - packet.getPacket().getOffset();
+        int encryptSize = packet.getPacket().getLength() - UDPPacket.IV_SIZE - UDPPacket.MAC_SIZE - packet.getPacket().getOffset();
         byte data[] = packet.getPacket().getData();
         _context.aes().encrypt(data, encryptOffset, data, encryptOffset, cipherKey, iv.getData(), encryptSize);
         
@@ -488,7 +496,7 @@ public class PacketBuilder {
         _context.hmac().calculate(macKey, data, hmacOff, hmacLen, ba.getData(), 0);
         
         if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Authenticating " + packet.getPacketDataLength() + // packet.getPacket().getLength() +
+            _log.debug("Authenticating " + packet.getPacket().getLength() +
                        "\nIV: " + Base64.encode(iv.getData()) +
                        "\nraw mac: " + Base64.encode(ba.getData()) +
                        "\nMAC key: " + macKey.toBase64());
@@ -498,5 +506,21 @@ public class PacketBuilder {
         System.arraycopy(ba.getData(), 0, data, hmacOff, UDPPacket.MAC_SIZE);
         System.arraycopy(iv.getData(), 0, data, hmacOff + UDPPacket.MAC_SIZE, UDPPacket.IV_SIZE);
         _hmacCache.release(ba);
+    }
+    
+    public static void main(String args[]) {
+        byte data[] = new byte[32];
+        int off = 0;
+        int size = 1216;
+        System.out.println("Binary: " + Integer.toBinaryString(size));
+        System.out.println("Binary: " + Integer.toBinaryString(0x3F));
+        DataHelper.toLong(data, off, 2, size);
+        
+        System.out.println(DataHelper.toHexString(data));
+        data[off] &= (byte)0x3F; // 2 highest bits are reserved
+        System.out.println(DataHelper.toHexString(data));
+        System.out.println(DataHelper.toHexString(data));
+        long val = DataHelper.fromLong(data, off, 2);
+        System.out.println("Val: " + val + " size: " + size + " raw: " +Base64.encode(data));
     }
 }

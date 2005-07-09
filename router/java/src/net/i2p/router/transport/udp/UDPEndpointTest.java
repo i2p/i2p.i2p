@@ -112,7 +112,7 @@ public class UDPEndpointTest {
                 try {
                     packet.initialize(priority, expiration, InetAddress.getLocalHost(), _endpoints[curPeer].getListenPort());
                     packet.writeData(data, 0, 1024);
-                    packet.setPacketDataLength(1024);
+                    packet.getPacket().setLength(1024);
                     int outstanding = _sentNotReceived.size() + 1;
                     _sentNotReceived.add(new ByteArray(data, 0, 1024));
                     _log.debug("Sending packet " + curPacket + " with outstanding " + outstanding);

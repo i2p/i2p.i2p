@@ -30,6 +30,7 @@ import net.i2p.router.transport.Transport;
 import net.i2p.router.transport.TransportImpl;
 import net.i2p.router.transport.TransportBid;
 import net.i2p.util.Log;
+import net.i2p.util.SimpleTimer;
 
 /**
  *
@@ -53,6 +54,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     private PacketPusher _pusher;
     private InboundMessageFragments _inboundFragments;
     private UDPFlooder _flooder;
+    private ExpirePeerEvent _expireEvent;
     
     /** list of RelayPeer objects for people who will relay to us */
     private List _relayPeers;
@@ -123,6 +125,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         _fragments = new OutboundMessageFragments(_context, this, _activeThrottle);
         _inboundFragments = new InboundMessageFragments(_context, _fragments, this);
         _flooder = new UDPFlooder(_context, this);
+        _expireEvent = new ExpirePeerEvent();
         
         _context.statManager().createRateStat("udp.droppedPeer", "How long ago did we receive from a dropped peer (duration == session lifetime", "udp", new long[] { 60*60*1000, 24*60*60*1000 });
     }
@@ -203,6 +206,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         _pusher.startup();
         _refiller.startup();
         _flooder.startup();
+        _expireEvent.setIsAlive(true);
     }
     
     public void shutdown() {
@@ -222,6 +226,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             _establisher.shutdown();
         if (_inboundFragments != null)
             _inboundFragments.shutdown();
+        _expireEvent.setIsAlive(false);
     }
     
     /**
@@ -333,16 +338,23 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         if (SHOULD_FLOOD_PEERS)
             _flooder.addPeer(peer);
         
+        _expireEvent.add(peer);
+        
         return true;
     }
     
     private void dropPeer(PeerState peer) {
+        dropPeer(peer, true);
+    }
+    private void dropPeer(PeerState peer, boolean shouldShitlist) {
         if (_log.shouldLog(Log.WARN))
             _log.debug("Dropping remote peer: " + peer);
         if (peer.getRemotePeer() != null) {
-            long now = _context.clock().now();
-            _context.statManager().addRateData("udp.droppedPeer", now - peer.getLastReceiveTime(), now - peer.getKeyEstablishedTime());
-            _context.shitlist().shitlistRouter(peer.getRemotePeer(), "dropped after too many retries");
+            if (shouldShitlist) {
+                long now = _context.clock().now();
+                _context.statManager().addRateData("udp.droppedPeer", now - peer.getLastReceiveTime(), now - peer.getKeyEstablishedTime());
+                _context.shitlist().shitlistRouter(peer.getRemotePeer(), "dropped after too many retries");
+            }
             synchronized (_peersByIdent) {
                 _peersByIdent.remove(peer.getRemotePeer());
             }
@@ -360,6 +372,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         
         if (SHOULD_FLOOD_PEERS)
             _flooder.removePeer(peer);
+        _expireEvent.remove(peer);
     }
     
     int send(UDPPacket packet) { 
@@ -689,5 +702,72 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         public int getLatency() { return _ms; }
         public Transport getTransport() { return UDPTransport.this; }
         public String toString() { return "UDP bid @ " + _ms; }
+    }
+    
+    private class ExpirePeerEvent implements SimpleTimer.TimedEvent {
+        private List _peers;
+        // toAdd and toRemove are kept separate from _peers so that add and
+        // remove calls won't block packet handling while the big iteration is
+        // in process
+        private List _toAdd;
+        private List _toRemove;
+        private boolean _alive;
+        public ExpirePeerEvent() {
+            _peers = new ArrayList(128);
+            _toAdd = new ArrayList(4);
+            _toRemove = new ArrayList(4);
+        }
+        public void timeReached() {
+            long inactivityCutoff = _context.clock().now() - 10*60*1000;
+            for (int i = 0; i < _peers.size(); i++) {
+                PeerState peer = (PeerState)_peers.get(i);
+                if (peer.getLastReceiveTime() < inactivityCutoff) {
+                    dropPeer(peer, false);
+                    _peers.remove(i);
+                    i--;
+                }
+            }
+            synchronized (_toAdd) {
+                for (int i = 0; i < _toAdd.size(); i++) {
+                    PeerState peer = (PeerState)_toAdd.get(i);
+                    if (!_peers.contains(peer))
+                        _peers.add(peer);
+                }
+                _toAdd.clear();
+            }
+            synchronized (_toRemove) {
+                for (int i = 0; i < _toRemove.size(); i++) {
+                    PeerState peer = (PeerState)_toRemove.get(i);
+                    _peers.remove(peer);
+                }
+                _toRemove.clear();
+            }
+            if (_alive)
+                SimpleTimer.getInstance().addEvent(ExpirePeerEvent.this, 5*60*1000);
+        }
+        public void add(PeerState peer) {
+            synchronized (_toAdd) {
+                _toAdd.add(peer);
+            }
+        }
+        public void remove(PeerState peer) {
+            synchronized (_toRemove) {
+                _toRemove.add(peer);
+            }
+        }
+        public void setIsAlive(boolean isAlive) {
+            _alive = isAlive;
+            if (isAlive) {
+                SimpleTimer.getInstance().addEvent(ExpirePeerEvent.this, 5*60*1000);
+            } else {
+                SimpleTimer.getInstance().removeEvent(ExpirePeerEvent.this);
+                synchronized (_toAdd) {
+                    _toAdd.clear();
+                }
+                synchronized (_peers) {
+                    _peers.clear();
+                }
+            }
+        }
     }
 }

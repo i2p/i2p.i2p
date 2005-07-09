@@ -248,8 +248,9 @@ public class OutboundMessageState {
         int toSend = end - start;
         System.arraycopy(_messageBuf.getData(), start, out, outOffset, toSend);
         if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Raw fragment[" + fragmentNum + "] for " + _messageId + ": " 
-                       + Base64.encode(_messageBuf.getData(), start, toSend));
+            _log.debug("Raw fragment[" + fragmentNum + "] for " + _messageId 
+                       + "[" + start + "-" + (start+toSend) + "/" + _messageBuf.getValid() + "/" + _fragmentSize + "]: " 
+                       + Base64.encode(out, outOffset, toSend));
         return toSend;
     }
     

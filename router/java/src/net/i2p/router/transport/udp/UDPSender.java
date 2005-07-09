@@ -137,7 +137,7 @@ public class UDPSender {
                     if (_log.shouldLog(Log.DEBUG))
                         _log.debug("Packet to send known: " + packet);
                     long acquireTime = _context.clock().now();
-                    int size = packet.getPacketDataLength(); // packet.getPacket().getLength();
+                    int size = packet.getPacket().getLength();
                     int size2 = packet.getPacket().getLength();
                     if (size > 0) {
                         FIFOBandwidthLimiter.Request req = _context.bandwidthLimiter().requestOutbound(size, "UDP sender");

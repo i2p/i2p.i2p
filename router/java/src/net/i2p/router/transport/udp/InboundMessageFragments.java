@@ -99,14 +99,15 @@ public class InboundMessageFragments /*implements UDPTransport.PartialACKSource 
         Map messages = from.getInboundMessages();
             
         for (int i = 0; i < fragments; i++) {
-            Long messageId = new Long(data.readMessageId(i));
+            long mid = data.readMessageId(i);
+            Long messageId = new Long(mid);
 
-            if (_recentlyCompletedMessages.isKnown(messageId.longValue())) {
+            if (_recentlyCompletedMessages.isKnown(mid)) {
                 _context.statManager().addRateData("udp.ignoreRecentDuplicate", 1, 0);
                 from.messageFullyReceived(messageId, -1);
                 _ackSender.ackPeer(from);
                 if (_log.shouldLog(Log.WARN))
-                    _log.warn("Message received is a dup: " + messageId + " dups: " 
+                    _log.warn("Message received is a dup: " + mid + " dups: " 
                               + _recentlyCompletedMessages.getCurrentDuplicateCount() + " out of " 
                               + _recentlyCompletedMessages.getInsertedCount());
                 continue;
@@ -124,7 +125,7 @@ public class InboundMessageFragments /*implements UDPTransport.PartialACKSource 
             synchronized (messages) {
                 state = (InboundMessageState)messages.get(messageId);
                 if (state == null) {
-                    state = new InboundMessageState(_context, messageId.longValue(), fromPeer);
+                    state = new InboundMessageState(_context, mid, fromPeer);
                     messages.put(messageId, state);
                 }
                 
@@ -141,7 +142,7 @@ public class InboundMessageFragments /*implements UDPTransport.PartialACKSource 
                 }
 
                 if (messageComplete) {
-                    _recentlyCompletedMessages.add(messageId.longValue());
+                    _recentlyCompletedMessages.add(mid);
                     _messageReceiver.receiveMessage(state);
 
                     from.messageFullyReceived(messageId, state.getCompleteSize());

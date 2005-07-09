@@ -87,6 +87,9 @@ public class UDPReceiver {
         return doReceive(packet);
     }
     private final int doReceive(UDPPacket packet) {
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("Received: " + packet);
+
         synchronized (_inboundQueue) {
             int queueSize = _inboundQueue.size();
             if (queueSize > 0) {
@@ -159,7 +162,6 @@ public class UDPReceiver {
                     int size = packet.getPacket().getLength();
                     if (_log.shouldLog(Log.DEBUG))
                         _log.debug("After blocking socket.receive: packet is " + size + " bytes!");
-                    packet.setPacketDataLength(size);
                     packet.resetBegin();
             
                     // and block after we know how much we read but before

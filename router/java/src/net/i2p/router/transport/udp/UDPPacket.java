@@ -26,7 +26,6 @@ public class UDPPacket {
     private I2PAppContext _context;
     private static Log _log;
     private volatile DatagramPacket _packet;
-    private volatile int _packetDataLength;
     private volatile short _priority;
     private volatile long _initializeTime;
     private volatile long _expiration;
@@ -77,7 +76,6 @@ public class UDPPacket {
         _dataBuf = _dataCache.acquire();
         _data = _dataBuf.getData(); 
         _packet = new DatagramPacket(_data, MAX_PACKET_SIZE);
-        _packetDataLength = 0;
         _initializeTime = _context.clock().now();
         _markedType = -1;
     }
@@ -98,7 +96,6 @@ public class UDPPacket {
         verifyNotReleased();
         System.arraycopy(src, offset, _data, 0, len);
         _packet.setLength(len);
-        setPacketDataLength(len);
         resetBegin();
     }
     public DatagramPacket getPacket() { verifyNotReleased(); return _packet; }
@@ -106,8 +103,6 @@ public class UDPPacket {
     public long getExpiration() { verifyNotReleased(); return _expiration; }
     public long getBegin() { verifyNotReleased(); return _initializeTime; }
     public long getLifetime() { verifyNotReleased(); return _context.clock().now() - _initializeTime; }
-    public int getPacketDataLength() { return _packetDataLength; }
-    public void setPacketDataLength(int bytes) { _packetDataLength = bytes; }
     public void resetBegin() { _initializeTime = _context.clock().now(); }
     /** flag this packet as a particular type for accounting purposes */
     public void markType(int type) { verifyNotReleased(); _markedType = type; }
@@ -131,7 +126,7 @@ public class UDPPacket {
         // validate by comparing _data[0:15] and
         // HMAC(payload + IV + payloadLength, macKey)
         
-        int payloadLength = _packetDataLength /*_packet.getLength()*/ - MAC_SIZE - IV_SIZE;
+        int payloadLength = _packet.getLength() - MAC_SIZE - IV_SIZE;
         if (payloadLength > 0) {
             int off = 0;
             System.arraycopy(_data, _packet.getOffset() + MAC_SIZE + IV_SIZE, buf.getData(), off, payloadLength);
@@ -178,7 +173,7 @@ public class UDPPacket {
         verifyNotReleased(); 
         ByteArray iv = _ivCache.acquire();
         System.arraycopy(_data, MAC_SIZE, iv.getData(), 0, IV_SIZE);
-        int len = _packetDataLength; // _packet.getLength()
+        int len = _packet.getLength();
         _context.aes().decrypt(_data, _packet.getOffset() + MAC_SIZE + IV_SIZE, _data, _packet.getOffset() + MAC_SIZE + IV_SIZE, cipherKey, iv.getData(), len - MAC_SIZE - IV_SIZE);
         _ivCache.release(iv);
     }
@@ -186,12 +181,12 @@ public class UDPPacket {
     public String toString() {
         verifyNotReleased(); 
         StringBuffer buf = new StringBuffer(64);
-        buf.append(_packetDataLength);
+        buf.append(_packet.getLength());
         buf.append(" byte packet with ");
         buf.append(_packet.getAddress().getHostAddress()).append(":");
         buf.append(_packet.getPort());
         buf.append(" id=").append(System.identityHashCode(this));
-            buf.append(" data=").append(Base64.encode(_packet.getData(), _packet.getOffset(), _packet.getLength()));
+        buf.append("\ndata=").append(Base64.encode(_packet.getData(), _packet.getOffset(), _packet.getLength()));
         return buf.toString();
     }
     
@@ -245,6 +240,8 @@ public class UDPPacket {
         synchronized (_packetCache) {
             if (_packetCache.size() <= 64) {
                 _packetCache.add(this);
+            } else {
+                _dataCache.release(_dataBuf);
             }
         }
     }

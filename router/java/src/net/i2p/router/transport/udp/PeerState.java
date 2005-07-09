@@ -1,6 +1,7 @@
 package net.i2p.router.transport.udp;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -15,7 +16,7 @@ import net.i2p.data.SessionKey;
 import net.i2p.util.Log;
 
 /**
- * Contain all of the state about a UDP connection to a peer
+ * Contain all of the state about a UDP connection to a peer.
  *
  */
 public class PeerState {
@@ -158,7 +159,7 @@ public class PeerState {
      * 502 fragment bytes, which is enough to send a tunnel data message in 2 
      * packets.
      */
-    private static final int DEFAULT_MTU = 576;
+    private static final int DEFAULT_MTU = 1500;
     private static final int MIN_RTO = 500 + ACKSender.ACK_FREQUENCY;
     private static final int MAX_RTO = 2000; // 5000;
     
@@ -503,9 +504,10 @@ public class PeerState {
      *
      */
     public List retrieveACKBitfields() {
-        List rv = new ArrayList(16);
+        List rv = null;
         int bytesRemaining = countMaxACKData();
         synchronized (_currentACKs) {
+            rv = new ArrayList(_currentACKs.size());
             while ( (bytesRemaining >= 4) && (_currentACKs.size() > 0) ) {
                 rv.add(new FullACKBitfield((Long)_currentACKs.remove(0)));
                 bytesRemaining -= 4;
@@ -526,6 +528,8 @@ public class PeerState {
                 ACKBitfield bitfield = (ACKBitfield)partial.get(i);
                 int bytes = (bitfield.fragmentCount() / 7) + 1;
                 if (bytesRemaining > bytes + 4) { // msgId + bitfields
+                    if (rv == null)
+                        rv = new ArrayList(partial.size());
                     rv.add(bitfield);
                     bytesRemaining -= bytes + 4;
                     partialIncluded++;
@@ -538,6 +542,8 @@ public class PeerState {
 
         _context.statManager().addRateData("udp.sendACKPartial", partialIncluded, rv.size() - partialIncluded);
         _lastACKSend = _context.clock().now();
+        if (rv == null)
+            rv = Collections.EMPTY_LIST;
         return rv;
     }
     

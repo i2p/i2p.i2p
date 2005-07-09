@@ -1,5 +1,6 @@
 package net.i2p.router.transport.udp;
 
+import net.i2p.data.Base64;
 import net.i2p.data.ByteArray;
 import net.i2p.data.Hash;
 import net.i2p.router.RouterContext;
@@ -66,8 +67,19 @@ public class InboundMessageState {
             int size = data.readMessageFragmentSize(dataFragment);
             message.setValid(size);
             _fragments[fragmentNum] = message;
-            if (data.readMessageIsLast(dataFragment))
+            boolean isLast = data.readMessageIsLast(dataFragment);
+            if (isLast)
                 _lastFragment = fragmentNum;
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("New fragment " + fragmentNum + " for message " + _messageId 
+                           + ", size=" + size
+                           + ", isLast=" + isLast
+                           + ", data=" + Base64.encode(message.getData(), 0, size));
+        } else {
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Received fragment " + fragmentNum + " for message " + _messageId 
+                           + " again, old size=" + _fragments[fragmentNum].getValid() 
+                           + " and new size=" + data.readMessageFragmentSize(dataFragment));
         }
         return true;
     }
