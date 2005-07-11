@@ -4,6 +4,7 @@ import java.util.Random;
 import net.i2p.I2PAppContext;
 import net.i2p.util.PooledRandomSource;
 import net.i2p.util.RandomSource;
+import net.i2p.util.Log;
 
 /**
  *
@@ -11,6 +12,9 @@ import net.i2p.util.RandomSource;
 public class DummyPooledRandomSource extends PooledRandomSource {
     public DummyPooledRandomSource(I2PAppContext context) {
         super(context);
+    }
+    
+    protected void initializePool(I2PAppContext context) {
         _pool = new RandomSource[POOL_SIZE];
         for (int i = 0; i < POOL_SIZE; i++) {
             _pool[i] = new DummyRandomSource(context);

@@ -28,12 +28,15 @@ public class BufferedRandomSource extends RandomSource {
     private int _nextBit;
     private static volatile long _reseeds;
     
-    private static final int BUFFER_SIZE = 256*1024;
+    private static final int DEFAULT_BUFFER_SIZE = 256*1024;
     
     public BufferedRandomSource(I2PAppContext context) {
+        this(context, DEFAULT_BUFFER_SIZE);
+    }
+    public BufferedRandomSource(I2PAppContext context, int bufferSize) {
         super(context);
         context.statManager().createRateStat("prng.reseedCount", "How many times the prng has been reseeded", "Encryption", new long[] { 60*1000, 10*60*1000, 60*60*1000 } );
-        _buffer = new byte[BUFFER_SIZE];
+        _buffer = new byte[bufferSize];
         refillBuffer();
         // stagger reseeding
         _nextByte = ((int)_reseeds-1) * 16 * 1024;
@@ -73,7 +76,7 @@ public class BufferedRandomSource extends RandomSource {
                     _nextBit = 0;
                     _nextByte++;
                 }
-                if (_nextByte >= BUFFER_SIZE)
+                if (_nextByte >= _buffer.length)
                     refillBuffer();
                 rv += (_buffer[_nextByte] << curBit);
                 _nextBit++;
@@ -98,7 +101,7 @@ public class BufferedRandomSource extends RandomSource {
                     _nextBit = 0;
                     _nextByte++;
                 }
-                if (_nextByte >= BUFFER_SIZE)
+                if (_nextByte >= _buffer.length)
                     refillBuffer();
                 int gobbleBits = 8 - _nextBit;
                 int want = numBits - curBit;
@@ -117,10 +120,10 @@ public class BufferedRandomSource extends RandomSource {
     public synchronized final void nextBytes(byte buf[]) { 
         int outOffset = 0;
         while (outOffset < buf.length) {
-            int availableBytes = BUFFER_SIZE - _nextByte - (_nextBit != 0 ? 1 : 0);
+            int availableBytes = _buffer.length - _nextByte - (_nextBit != 0 ? 1 : 0);
             if (availableBytes <= 0)
                 refillBuffer();
-            int start = BUFFER_SIZE - availableBytes;
+            int start = _buffer.length - availableBytes;
             int writeSize = Math.min(buf.length - outOffset, availableBytes);
             System.arraycopy(_buffer, start, buf, outOffset, writeSize);
             outOffset += writeSize;
@@ -195,6 +198,10 @@ public class BufferedRandomSource extends RandomSource {
     }
     
     public static void main(String args[]) {
+        for (int i = 0; i < 16; i++)
+            test();
+    }
+    private static void test() {
         I2PAppContext ctx = I2PAppContext.getGlobalContext();
         byte data[] = new byte[16*1024];
         for (int i = 0; i < data.length; i += 4) {
@@ -203,8 +210,7 @@ public class BufferedRandomSource extends RandomSource {
             DataHelper.toLong(data, i, 4, l);
         }
         byte compressed[] = DataHelper.compress(data);
-        System.out.println("Compressed: " + compressed.length);
-        System.out.println("Orig: " + data.length + ": " + toString(data));
+        System.out.println("Data: " + data.length + "/" + compressed.length + ": " + toString(data));
     }
     private static final String toString(byte data[]) {
         StringBuffer buf = new StringBuffer(data.length * 9);

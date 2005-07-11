@@ -58,6 +58,8 @@ public class PersistentSessionKeyManager extends TransientSessionKeyManager {
      *
      */
     public void saveState(OutputStream out) throws IOException, DataFormatException {
+        if (true) return;
+        
         Set tagSets = getInboundTagSets();
         Set sessions = getOutboundSessions();
         if (_log.shouldLog(Log.INFO))

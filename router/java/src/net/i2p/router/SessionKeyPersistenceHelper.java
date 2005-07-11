@@ -70,6 +70,8 @@ public class SessionKeyPersistenceHelper implements Service {
     }
     
     private void writeState() {
+        if (true) return;
+        
         Object o = _context.sessionKeyManager();
         if (!(o instanceof PersistentSessionKeyManager)) {
             _log.error("Unable to persist the session key state - manager is " + o.getClass().getName());

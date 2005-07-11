@@ -18,6 +18,9 @@
     <target name="jar" depends="compile">
         <jar destfile="./build/i2p.jar" basedir="./build/obj" includes="**/*.class" />
     </target>
+    <target name="jarTest" depends="compileTest">
+        <jar destfile="./build/i2ptest.jar" basedir="./build/obj" includes="**/*.class" />
+    </target>
     <target name="javadoc">
         <mkdir dir="./build" />
         <mkdir dir="./build/javadoc" />

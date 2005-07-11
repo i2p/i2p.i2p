@@ -135,7 +135,7 @@ public class ClientConnectionRunner {
             _alreadyProcessed.clear();
         }
         _config = null;
-        _manager = null;
+        //_manager = null;
     }
     
     /** current client's config */
@@ -271,11 +271,13 @@ public class ClientConnectionRunner {
                        + "]");
         long beforeDistribute = _context.clock().now();
         // the following blocks as described above
-        _manager.distributeMessage(_config.getDestination(), message.getDestination(), message.getPayload(), id);
+        SessionConfig cfg = _config;
+        if (cfg != null)
+            _manager.distributeMessage(cfg.getDestination(), dest, payload, id);
         long timeToDistribute = _context.clock().now() - beforeDistribute;
         if (_log.shouldLog(Log.DEBUG))
             _log.warn("Time to distribute in the manager to " 
-                      + message.getDestination().calculateHash().toBase64() + ": " 
+                      + dest.calculateHash().toBase64() + ": " 
                       + timeToDistribute);
         return id;
     }

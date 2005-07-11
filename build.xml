@@ -76,9 +76,9 @@
             windowtitle="I2P">
             <sourcepath>
                 <pathelement location="core/java/src" />
-                <pathelement location="core/java/test" />
+                <!--<pathelement location="core/java/test" />-->
                 <pathelement location="router/java/src" />
-                <pathelement location="router/java/test" />
+                <!--<pathelement location="router/java/test" />-->
                 <pathelement location="apps/ministreaming/java/src" />
                 <pathelement location="apps/streaming/java/src" />
                 <pathelement location="apps/i2ptunnel/java/src" />
@@ -246,7 +246,15 @@
             <tarfileset dir="pkg-temp" includes="**/*" prefix="i2p" />
         </tar>
     </target>
-    <target name="updater" depends="distclean, build">
+    <target name="updater" depends="prepupdate">
+        <zip destfile="i2pupdate.zip" basedir="pkg-temp" />
+    </target>
+    <target name="updateTest" depends="prepupdate">
+        <ant dir="core/java/" target="jarTest" />    
+        <copy file="core/java/build/i2ptest.jar" todir="pkg-temp/lib" />
+        <zip destfile="i2pupdate.zip" basedir="pkg-temp" />
+    </target>
+    <target name="prepupdate" depends="distclean, build">
         <delete dir="pkg-temp" />
         <copy file="build/i2p.jar" todir="pkg-temp/lib/" />
         <copy file="build/i2ptunnel.jar" todir="pkg-temp/lib/" />
@@ -286,7 +294,6 @@
         <mkdir dir="pkg-temp/eepsite" />
         <mkdir dir="pkg-temp/eepsite/webapps" />
         <mkdir dir="pkg-temp/eepsite/cgi-bin" />
-        <zip destfile="i2pupdate.zip" basedir="pkg-temp" />
     </target>
     <taskdef name="izpack" classpath="${basedir}/installer/lib/izpack/standalone-compiler.jar" classname="com.izforge.izpack.ant.IzPackTask" />
     <target name="installer" depends="preppkg">

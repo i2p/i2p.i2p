@@ -140,7 +140,8 @@ public class TransportManager implements TransportEventListener {
         for (int i = 0; i < _transports.size(); i++) {
             Transport t = (Transport)_transports.get(i);
             if (failedTransports.contains(t.getStyle())) {
-                _log.debug("Skipping transport " + t.getStyle() + " as it already failed");
+                if (_log.shouldLog(Log.DEBUG))
+                    _log.debug("Skipping transport " + t.getStyle() + " as it already failed");
                 continue;
             }
             // we always want to try all transports, in case there is a faster bidirectional one

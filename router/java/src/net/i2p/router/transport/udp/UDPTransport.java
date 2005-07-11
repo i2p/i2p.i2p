@@ -100,7 +100,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     private static final int PRIORITY_WEIGHT[] = new int[] { 1, 1, 1, 1, 1, 2 };
 
     /** should we flood all UDP peers with the configured rate? */
-    private static final boolean SHOULD_FLOOD_PEERS = true;
+    private static final boolean SHOULD_FLOOD_PEERS = false;
     
     private static final int MAX_CONSECUTIVE_FAILED = 5;
     

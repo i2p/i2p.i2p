@@ -10,6 +10,7 @@ package net.i2p.crypto;
  */
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -262,11 +263,23 @@ class TransientSessionKeyManager extends SessionKeyManager {
                 if (old != null) {
                     TagSet oldTS = (TagSet)old;
                     if (!oldTS.getAssociatedKey().equals(tagSet.getAssociatedKey())) {
-                        if (_log.shouldLog(Log.ERROR)) {
-                            _log.error("Multiple tags matching!  tag: " + tag.toString() + " matches for new tagSet: " + tagSet + " and old tagSet: " + old);
-                            _log.error("Earlier tag set creation: " + old + ": key=" + oldTS.getAssociatedKey().toBase64(), oldTS.getCreatedBy());
-                            _log.error("Current tag set creation: " + tagSet + ": key=" + tagSet.getAssociatedKey().toBase64(), tagSet.getCreatedBy());
+                        if (_log.shouldLog(Log.WARN)) {
+                            _log.warn("Multiple tags matching!  tag: " + tag.toString() + " matches for new tagSet: " + tagSet + " and old tagSet: " + old);
+                            _log.warn("Earlier tag set creation: " + old + ": key=" + oldTS.getAssociatedKey().toBase64(), oldTS.getCreatedBy());
+                            _log.warn("Current tag set creation: " + tagSet + ": key=" + tagSet.getAssociatedKey().toBase64(), tagSet.getCreatedBy());
                         }
+                        // drop both, rather than sit around confused
+                        _inboundTagSets.remove(tag);
+                        
+                        for (Iterator tsIter = oldTS.dropTags().iterator(); iter.hasNext(); ) {
+                            SessionTag curTag = (SessionTag)tsIter.next();
+                            _inboundTagSets.remove(curTag);
+                        }
+                        for (Iterator tsIter = tagSet.dropTags().iterator(); iter.hasNext(); ) {
+                            SessionTag curTag = (SessionTag)tsIter.next();
+                            _inboundTagSets.remove(curTag);
+                        }
+                    
                     } else {
                         if (_log.shouldLog(Log.DEBUG)) {
                             //tagSet.getTags().addAll(oldTS.getTags());
@@ -307,7 +320,7 @@ class TransientSessionKeyManager extends SessionKeyManager {
         synchronized (_inboundTagSets) {
             for (Iterator iter = _inboundTagSets.values().iterator(); iter.hasNext(); ) {
                 TagSet set = (TagSet)iter.next();
-                int size = set.getTags().size();
+                int size = set.getTagCount();
                 if (size > 1000)
                     absurd++;
                 if (size > 100)
@@ -322,7 +335,7 @@ class TransientSessionKeyManager extends SessionKeyManager {
             }
             for (int i = 0; i < removed.size(); i++) {
                 TagSet cur = (TagSet)removed.get(i);
-                for (Iterator iter = cur.getTags().iterator(); iter.hasNext(); ) {
+                for (Iterator iter = cur.dropTags().iterator(); iter.hasNext(); ) {
                     SessionTag tag = (SessionTag)iter.next();
                     _inboundTagSets.remove(tag);
                     tags++;
@@ -465,7 +478,7 @@ class TransientSessionKeyManager extends SessionKeyManager {
             for (Iterator siter = sets.iterator(); siter.hasNext();) {
                 TagSet ts = (TagSet) siter.next();
                 buf.append("<li><b>Received on:</b> ").append(new Date(ts.getDate())).append(" with ")
-                   .append(ts.getTags().size()).append(" tags remaining</li>");
+                   .append(ts.getTagCount()).append(" tags remaining</li>");
             }
             buf.append("</ul></td></tr>");
         }
@@ -485,9 +498,7 @@ class TransientSessionKeyManager extends SessionKeyManager {
             buf.append("<tr><td><ul>");
             for (Iterator siter = sess.getTagSets().iterator(); siter.hasNext();) {
                 TagSet ts = (TagSet) siter.next();
-                buf.append("<li><b>Sent on:</b> ").append(new Date(ts.getDate())).append(" with ").append(
-                                                                                                          ts.getTags()
-                                                                                                            .size())
+                buf.append("<li><b>Sent on:</b> ").append(new Date(ts.getDate())).append(" with ").append(ts.getTagCount())
                    .append(" tags remaining</li>");
             }
             buf.append("</ul></td></tr>");
@@ -540,7 +551,7 @@ class TransientSessionKeyManager extends SessionKeyManager {
                     _tagSets = new ArrayList();
                     for (int i = 0; i < sets.size(); i++) {
                         TagSet set = (TagSet) sets.get(i);
-                        dropped += set.getTags().size();
+                        dropped += set.getTagCount();
                     }
                     if (_log.shouldLog(Log.INFO))
                         _log.info("Rekeyed from " + _currentKey + " to " + key 
@@ -604,7 +615,7 @@ class TransientSessionKeyManager extends SessionKeyManager {
                 for (int i = 0; i < _tagSets.size(); i++) {
                     TagSet set = (TagSet) _tagSets.get(i);
                     if (set.getDate() + SESSION_TAG_DURATION_MS > now)
-                        tags += set.getTags().size();
+                        tags += set.getTagCount();
                 }
             }
             return tags;
@@ -620,7 +631,7 @@ class TransientSessionKeyManager extends SessionKeyManager {
             synchronized (_tagSets) {
                 for (Iterator iter = _tagSets.iterator(); iter.hasNext();) {
                     TagSet set = (TagSet) iter.next();
-                    if ( (set.getDate() > last) && (set.getTags().size() > 0) ) 
+                    if ( (set.getDate() > last) && (set.getTagCount() > 0) ) 
                         last = set.getDate();
                 }
             }
@@ -665,9 +676,30 @@ class TransientSessionKeyManager extends SessionKeyManager {
             _date = when;
         }
 
-        /** tags still available */
-        public Set getTags() {
+        /** 
+         * raw tags still available - you MUST synchronize against the TagSet instance
+         * if you need to use this set
+         */
+        Set getTags() {
             return _sessionTags;
+        }
+        
+        public int getTagCount() {
+            synchronized (TagSet.this) {
+                if (_sessionTags == null)
+                    return 0;
+                else
+                    return _sessionTags.size();
+            }
+        }
+        
+        public Set dropTags() {
+            Set rv = null;
+            synchronized (TagSet.this) {
+                rv = _sessionTags;
+                _sessionTags = Collections.EMPTY_SET;
+            }
+            return rv;
         }
 
         public SessionKey getAssociatedKey() {

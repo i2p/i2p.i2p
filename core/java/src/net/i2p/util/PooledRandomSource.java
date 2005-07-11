@@ -21,14 +21,40 @@ public class PooledRandomSource extends RandomSource {
     protected volatile int _nextPool;
 
     public static final int POOL_SIZE = 16;
+    /**
+     * How much random data will we precalculate and feed from (as opposed to on demand
+     * reseeding, etc).  If this is not set, a default will be used (4MB), or if it is 
+     * set to 0, no buffer will be used, otherwise the amount specified will be allocated
+     * across the pooled PRNGs.
+     *
+     */
+    public static final String PROP_BUFFER_SIZE = "i2p.prng.totalBufferSizeKB";
     
     public PooledRandomSource(I2PAppContext context) {
         super(context);
         _log = context.logManager().getLog(PooledRandomSource.class);
+        initializePool(context);
+    }
+    
+    protected void initializePool(I2PAppContext context) {
         _pool = new RandomSource[POOL_SIZE];
+        
+        String totalSizeProp = context.getProperty(PROP_BUFFER_SIZE);
+        int totalSize = -1;
+        if (totalSizeProp != null) {
+            try {
+                totalSize = Integer.parseInt(totalSizeProp);
+            } catch (NumberFormatException nfe) {
+                totalSize = -1;
+            }
+        }
         for (int i = 0; i < POOL_SIZE; i++) {
-            //_pool[i] = new RandomSource(context);
-            _pool[i] = new BufferedRandomSource(context);
+            if (totalSize < 0)
+                _pool[i] = new BufferedRandomSource(context);
+            else if (totalSize > 0)
+                _pool[i] = new BufferedRandomSource(context, (totalSize*1024) / POOL_SIZE);
+            else
+                _pool[i] = new RandomSource(context);
             _pool[i].nextBoolean();
         }
         _nextPool = 0;

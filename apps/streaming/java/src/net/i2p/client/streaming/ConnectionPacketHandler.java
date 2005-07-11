@@ -256,7 +256,7 @@ public class ConnectionPacketHandler {
                         newWindowSize += 1;
                 } else {
                     // slow start, but modified to take into account the fact
-					// that windows in the streaming lib are messages, not bytes,
+                    // that windows in the streaming lib are messages, not bytes,
                     // so we only grow 1 every N times (where N = the slow start factor)
                     int shouldIncrement = _context.random().nextInt(con.getOptions().getSlowStartGrowthRateFactor());
                     if (shouldIncrement <= 0)

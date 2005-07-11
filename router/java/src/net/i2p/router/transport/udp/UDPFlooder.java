@@ -114,9 +114,9 @@ class UDPFlooder implements Runnable {
     
     private long calcFloodDelay() {
         try {
-            return Long.parseLong(_context.getProperty("udp.floodDelay", "30000"));
+            return Long.parseLong(_context.getProperty("udp.floodDelay", "300000"));
         } catch (Exception e) {
-            return 30*1000;
+            return 5*60*1000;
         }
     }
 }

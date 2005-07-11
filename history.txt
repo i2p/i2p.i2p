@@ -1,6 +1,20 @@
-$Id: history.txt,v 1.207 2005/07/04 15:44:17 jrandom Exp $
+$Id: history.txt,v 1.208 2005/07/05 17:08:56 jrandom Exp $
 
-2005-07-05
+2005-07-11  jrandom
+    * Reduced the growth factor on the slow start and congestion avoidance for
+      the streaming lib.
+    * Adjusted some of the I2PTunnelServer threading to use a small pool of
+      handlers, rather than launching off new threads which then immediately
+      launch off an I2PTunnelRunner instance (which launches 3 more threads..)
+    * Don't persist session keys / session tags (not worth it, for now)
+    * Added some detection and handling code for duplicate session tags being
+      delivered (root cause still not addressed)
+    * Make the PRNG's buffer size configurable (via the config property
+      "i2p.prng.totalBufferSizeKB=4096")
+    * Disable SSU flooding by default (duh)
+    * Updates to the StreamSink apps for better throttling tests.
+
+2005-07-05  jrandom
     * Use a buffered PRNG, pulling the PRNG data off a larger precalculated 
       buffer, rather than the underlying PRNG's (likely small) one, which in
       turn reduces the frequency of recalcing.

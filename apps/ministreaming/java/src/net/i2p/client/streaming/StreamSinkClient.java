@@ -15,6 +15,7 @@ import net.i2p.I2PAppContext;
 import net.i2p.I2PException;
 import net.i2p.data.Destination;
 import net.i2p.data.DataFormatException;
+import net.i2p.util.I2PThread;
 import net.i2p.util.Log;
 
 /**
@@ -74,61 +75,67 @@ public class StreamSinkClient {
         } finally {
             if (fis == null) try { fis.close(); } catch (IOException ioe) {}
         }
-        
-        
-        System.out.println("Send " + _sendSize + "KB to " + peer.calculateHash().toBase64());
-        
-        try {
-            I2PSocket sock = mgr.connect(peer);
-            byte buf[] = new byte[32*1024];
-            Random rand = new Random();
-            OutputStream out = sock.getOutputStream();
-            long beforeSending = System.currentTimeMillis();
-            for (int i = 0; (_sendSize < 0) || (i < _sendSize); i+= 32) {
-                rand.nextBytes(buf);
-                out.write(buf);
+
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("Send " + _sendSize + "KB to " + peer.calculateHash().toBase64());
+
+        while (true) {
+            try {
+                I2PSocket sock = mgr.connect(peer);
+                byte buf[] = new byte[Math.min(32*1024, _sendSize*1024)];
+                Random rand = new Random();
+                OutputStream out = sock.getOutputStream();
+                long beforeSending = System.currentTimeMillis();
+                for (int i = 0; (_sendSize < 0) || (i < _sendSize); i+= buf.length/1024) {
+                    rand.nextBytes(buf);
+                    out.write(buf);
+                    if (_log.shouldLog(Log.DEBUG))
+                        _log.debug("Wrote " + ((1+i*buf.length)/1024) + "/" + _sendSize + "KB");
+                    if (_writeDelay > 0) {
+                        try { Thread.sleep(_writeDelay); } catch (InterruptedException ie) {}
+                    }   
+                }
+                sock.close();
+                long afterSending = System.currentTimeMillis();
                 if (_log.shouldLog(Log.DEBUG))
-                    _log.debug("Wrote " + (i+32) + "/" + _sendSize + "KB");
-                if (_writeDelay > 0) {
-                    try { Thread.sleep(_writeDelay); } catch (InterruptedException ie) {}
-                }   
-            }
-            sock.close();
-            long afterSending = System.currentTimeMillis();
-            System.out.println("Sent " + _sendSize + "KB in " + (afterSending-beforeSending) + "ms");
-        } catch (InterruptedIOException iie) {
-            _log.error("Timeout connecting to the peer", iie);
-            return;
-        } catch (NoRouteToHostException nrthe) {
-            _log.error("Unable to connect to the peer", nrthe);
-            return;
-        } catch (ConnectException ce) {
-            _log.error("Connection already dropped", ce);
-            return;
-        } catch (I2PException ie) {
-            _log.error("Error connecting to the peer", ie);
-            return;
-        } catch (IOException ioe) {
-            _log.error("IO error sending", ioe);
-            return;
+                    _log.debug("Sent " + _sendSize + "KB in " + (afterSending-beforeSending) + "ms");
+            } catch (InterruptedIOException iie) {
+                _log.error("Timeout connecting to the peer", iie);
+                //return;
+            } catch (NoRouteToHostException nrthe) {
+                _log.error("Unable to connect to the peer", nrthe);
+                //return;
+            } catch (ConnectException ce) {
+                _log.error("Connection already dropped", ce);
+                //return;
+            } catch (I2PException ie) {
+                _log.error("Error connecting to the peer", ie);
+                return;
+            } catch (IOException ioe) {
+                _log.error("IO error sending", ioe);
+                return;
+            }   
         }
     }
 
     /**
-     * Fire up the client.  <code>Usage: StreamSinkClient [i2cpHost i2cpPort] sendSizeKB writeDelayMs serverDestFile</code> <br />
+     * Fire up the client.  <code>Usage: StreamSinkClient [i2cpHost i2cpPort] sendSizeKB writeDelayMs serverDestFile [concurrentSends]</code> <br />
      * <ul>
      *  <li><b>sendSizeKB</b>: how many KB to send, or -1 for unlimited</li>
      *  <li><b>writeDelayMs</b>: how long to wait between each .write (0 for no delay)</li>
      *  <li><b>serverDestFile</b>: file containing the StreamSinkServer's binary Destination</li>
+     *  <li><b>concurrentSends</b>: how many concurrent threads should send to the server at once</li>
      * </ul>
      */
     public static void main(String args[]) {
         StreamSinkClient client = null;
         int sendSizeKB = -1;
         int writeDelayMs = -1;
+        int concurrent = 1;
         
         switch (args.length) {
-            case 3:
+            case 3: // fall through
+            case 4:
                 try {
                     sendSizeKB = Integer.parseInt(args[0]);
                 } catch (NumberFormatException nfe) {
@@ -141,9 +148,13 @@ public class StreamSinkClient {
                     System.err.println("Write delay ms invalid [" + args[1] + "]");
                     return;
                 }
+                if (args.length == 4) {
+                    try { concurrent = Integer.parseInt(args[3]); } catch (NumberFormatException nfe) {}
+                }
                 client = new StreamSinkClient(sendSizeKB, writeDelayMs, args[2]);
                 break;
-            case 5:
+            case 5: // fall through
+            case 6:
                 try { 
                     int port = Integer.parseInt(args[1]);
                     sendSizeKB = Integer.parseInt(args[2]);
@@ -152,11 +163,26 @@ public class StreamSinkClient {
                 } catch (NumberFormatException nfe) {
                     System.err.println("arg error");
                 }
+                if (args.length == 6) {
+                    try { concurrent = Integer.parseInt(args[5]); } catch (NumberFormatException nfe) {}
+                }
                 break;
             default: 
-                System.out.println("Usage: StreamSinkClient [i2cpHost i2cpPort] sendSizeKB writeDelayMs serverDestFile");
+                System.out.println("Usage: StreamSinkClient [i2cpHost i2cpPort] sendSizeKB writeDelayMs serverDestFile [concurrentSends]");
         }
-        if (client != null)
-            client.runClient();
+        if (client != null) {
+            for (int i = 0; i < concurrent; i++)
+                new I2PThread(new Runner(client), "Client " + i).start();
+        }   
+    }
+    
+    private static class Runner implements Runnable {
+        private StreamSinkClient _client;
+        public Runner(StreamSinkClient client) {
+            _client = client;
+        }
+        public void run() {
+            _client.runClient();
+        }
     }
 }

@@ -6,6 +6,8 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import java.net.ConnectException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 
 import net.i2p.I2PAppContext;
@@ -26,6 +28,7 @@ public class StreamSinkServer {
     private String _destFile;
     private String _i2cpHost;
     private int _i2cpPort;
+    private int _handlers;
     
     /**
      * Create but do not start the streaming server.  
@@ -34,13 +37,14 @@ public class StreamSinkServer {
      * @param ourDestFile filename to write our binary destination to
      */
     public StreamSinkServer(String sinkDir, String ourDestFile) {
-        this(sinkDir, ourDestFile, null, -1);
+        this(sinkDir, ourDestFile, null, -1, 3);
     }
-    public StreamSinkServer(String sinkDir, String ourDestFile, String i2cpHost, int i2cpPort) {
+    public StreamSinkServer(String sinkDir, String ourDestFile, String i2cpHost, int i2cpPort, int handlers) {
         _sinkDir = sinkDir;
         _destFile = ourDestFile;
         _i2cpHost = i2cpHost;
         _i2cpPort = i2cpPort;
+        _handlers = handlers;
         _log = I2PAppContext.getGlobalContext().logManager().getLog(StreamSinkServer.class);
     }
     
@@ -56,7 +60,8 @@ public class StreamSinkServer {
         else 
             mgr = I2PSocketManagerFactory.createManager();
         Destination dest = mgr.getSession().getMyDestination();
-        System.out.println("Listening for connections on: " + dest.calculateHash().toBase64());
+        if (_log.shouldLog(Log.INFO))
+            _log.info("Listening for connections on: " + dest.calculateHash().toBase64());
         FileOutputStream fos = null;
         try {
             fos = new FileOutputStream(_destFile);
@@ -72,24 +77,16 @@ public class StreamSinkServer {
         }
         
         I2PServerSocket sock = mgr.getServerSocket();
-        while (true) {
-            try {
-                I2PSocket curSock = sock.accept();
-                handle(curSock);
-            } catch (I2PException ie) {
-                _log.error("Error accepting connection", ie);
-                return;
-            } catch (ConnectException ce) {
-                _log.error("Connection already dropped", ce);
-                return;
-            }
-        }
+        startup(sock);
     }
     
-    private void handle(I2PSocket socket) {
-        I2PThread t = new I2PThread(new ClientRunner(socket));
-        t.setName("Handle " + socket.getPeerDestination().calculateHash().toBase64().substring(0,4));
-        t.start();
+    public void startup(I2PServerSocket sock) {
+        for (int i = 0; i < _handlers; i++) {
+            I2PThread t = new I2PThread(new ClientRunner(sock));
+            t.setName("Handler " + i);
+            t.setDaemon(false);
+            t.start();
+        }
     }
     
     /**
@@ -97,27 +94,44 @@ public class StreamSinkServer {
      *
      */
     private class ClientRunner implements Runnable {
-        private I2PSocket _sock;
-        private FileOutputStream _fos;
-        public ClientRunner(I2PSocket socket) {
-            _sock = socket;
+        private I2PServerSocket _socket;
+        public ClientRunner(I2PServerSocket socket) {
+            _socket = socket;
+        }
+        public void run() {
+            while (true) {
+                try {
+                    I2PSocket socket = _socket.accept();
+                    if (socket != null)
+                        handle(socket);
+                } catch (I2PException ie) {
+                    _log.error("Error accepting connection", ie);
+                    return;
+                } catch (ConnectException ce) {
+                    _log.error("Connection already dropped", ce);
+                    return;
+                }       
+            }
+        }
+        
+        private void handle(I2PSocket sock) {
+            FileOutputStream fos = null;
             try {
                 File sink = new File(_sinkDir);
                 if (!sink.exists())
                     sink.mkdirs();
                 File cur = File.createTempFile("clientSink", ".dat", sink);
-                _fos = new FileOutputStream(cur);
-                System.out.println("Writing to " + cur.getAbsolutePath());
+                fos = new FileOutputStream(cur);
+                if (_log.shouldLog(Log.DEBUG))
+                    _log.debug("Writing to " + cur.getAbsolutePath());
             } catch (IOException ioe) {
                 _log.error("Error creating sink", ioe);
-                _fos = null;
+                return;
             }
-        }
-        public void run() {
-            if (_fos == null) return;
+            
             long start = System.currentTimeMillis();
             try {
-                InputStream in = _sock.getInputStream();
+                InputStream in = sock.getInputStream();
                 byte buf[] = new byte[4096];
                 long written = 0;
                 int read = 0;
@@ -125,47 +139,55 @@ public class StreamSinkServer {
                     //_fos.write(buf, 0, read);
                     written += read;
                     if (_log.shouldLog(Log.DEBUG))
-                        _log.debug("read and wrote " + read);
+                        _log.debug("read and wrote " + read + " (" + written + ")");
                 }
-                _fos.write(("written: [" + written + "]\n").getBytes());
+                fos.write(("written: [" + written + "]\n").getBytes());
                 long lifetime = System.currentTimeMillis() - start;
-                _log.error("Got EOF from client socket [written=" + written + " lifetime=" + lifetime + "]");
+                _log.info("Got EOF from client socket [written=" + written + " lifetime=" + lifetime + "]");
             } catch (IOException ioe) {
                 _log.error("Error writing the sink", ioe);
             } finally {
-                if (_fos != null) try { _fos.close(); } catch (IOException ioe) {}
-                if (_sock != null) try { _sock.close(); } catch (IOException ioe) {}
-                _log.error("Client socket closed");
+                if (fos != null) try { fos.close(); } catch (IOException ioe) {}
+                if (sock != null) try { sock.close(); } catch (IOException ioe) {}
+                _log.debug("Client socket closed");
             }
         }
     }
     
     /**
-     * Fire up the streaming server.  <code>Usage: StreamSinkServer [i2cpHost i2cpPort] sinkDir ourDestFile</code><br />
+     * Fire up the streaming server.  <code>Usage: StreamSinkServer [i2cpHost i2cpPort] sinkDir ourDestFile [numHandlers]</code><br />
      * <ul>
      *  <li><b>sinkDir</b>: Directory to store received files in</li>
      *  <li><b>ourDestFile</b>: filename to write our binary destination to</li>
+     *  <li><b>numHandlers</b>: how many concurrent connections to handle</li>
      * </ul>
      */
     public static void main(String args[]) {
         StreamSinkServer server = null;
         switch (args.length) {
             case 0:
-                server = new StreamSinkServer("dataDir", "server.key", "localhost", 7654);
+                server = new StreamSinkServer("dataDir", "server.key", "localhost", 7654, 3);
                 break;
             case 2:
                 server = new StreamSinkServer(args[0], args[1]);
                 break;
             case 4:
+            case 5:
+                int handlers = 3;
+                if (args.length == 5) {
+                    try {
+                        handlers = Integer.parseInt(args[4]);
+                    } catch (NumberFormatException nfe) {}
+                }
                 try { 
                     int port = Integer.parseInt(args[1]);
-                    server = new StreamSinkServer(args[2], args[3], args[0], port);
+                    server = new StreamSinkServer(args[2], args[3], args[0], port, handlers);
                 } catch (NumberFormatException nfe) {
-                    System.out.println("Usage: StreamSinkServer [i2cpHost i2cpPort] sinkDir ourDestFile");
+                    System.out.println("Usage: StreamSinkServer [i2cpHost i2cpPort] sinkDir ourDestFile [handlers]");
                 }
                 break;
             default:
-                System.out.println("Usage: StreamSinkServer [i2cpHost i2cpPort] sinkDir ourDestFile");
+                System.out.println("Usage: StreamSinkServer [i2cpHost i2cpPort] sinkDir ourDestFile [handlers]");
         }
         if (server != null)
             server.runServer();

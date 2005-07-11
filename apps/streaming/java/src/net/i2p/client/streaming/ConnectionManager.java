@@ -68,6 +68,7 @@ public class ConnectionManager {
         _context.statManager().createRateStat("stream.con.lifetimeRTT", "What is the final RTT when a stream closes?", "Stream", new long[] { 60*60*1000, 24*60*60*1000 });
         _context.statManager().createRateStat("stream.con.lifetimeCongestionSeenAt", "When was the last congestion seen at when a stream closes?", "Stream", new long[] { 60*60*1000, 24*60*60*1000 });
         _context.statManager().createRateStat("stream.con.lifetimeSendWindowSize", "What is the final send window size when a stream closes?", "Stream", new long[] { 60*60*1000, 24*60*60*1000 });
+        _context.statManager().createRateStat("stream.receiveActive", "How many streams are active when a new one is received (period being not yet dropped)", "Stream", new long[] { 60*60*1000, 24*60*60*1000 });
     }
     
     Connection getConnectionByInboundId(byte[] id) {
@@ -109,7 +110,14 @@ public class ConnectionManager {
         byte receiveId[] = new byte[4];
         _context.random().nextBytes(receiveId);
         boolean reject = false;
+        int active = 0;
+        int total = 0;
         synchronized (_connectionLock) {
+            total = _connectionByInboundId.size();
+            for (Iterator iter = _connectionByInboundId.values().iterator(); iter.hasNext(); ) {
+                if ( ((Connection)iter.next()).getIsConnected() )
+                    active++;
+            }
             if (locked_tooManyStreams()) {
                 reject = true;
             } else { 
@@ -126,6 +134,8 @@ public class ConnectionManager {
                 }
             }
         }
+        
+        _context.statManager().addRateData("stream.receiveActive", active, total);
         
         if (reject) {
             if (_log.shouldLog(Log.WARN))
@@ -227,6 +237,8 @@ public class ConnectionManager {
     }
 
     private boolean locked_tooManyStreams() {
+        if (_maxConcurrentStreams <= 0) return false;
+        if (_connectionByInboundId.size() < _maxConcurrentStreams) return false;
         int active = 0;
         for (Iterator iter = _connectionByInboundId.values().iterator(); iter.hasNext(); ) {
             Connection con = (Connection)iter.next();
@@ -238,8 +250,6 @@ public class ConnectionManager {
             _log.info("More than 100 connections!  " + active
                       + " total: " + _connectionByInboundId.size());
 
-        if (_maxConcurrentStreams <= 0) return false;
-        if (_connectionByInboundId.size() < _maxConcurrentStreams) return false;
         return (active >= _maxConcurrentStreams);
     }
     
