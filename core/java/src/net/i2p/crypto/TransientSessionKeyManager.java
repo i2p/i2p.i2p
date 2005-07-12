@@ -221,6 +221,11 @@ class TransientSessionKeyManager extends SessionKeyManager {
      *
      */
     public void tagsDelivered(PublicKey target, SessionKey key, Set sessionTags) {
+        if (_log.shouldLog(Log.DEBUG)) {
+            //_log.debug("Tags delivered to set " + set + " on session " + sess);
+            if (sessionTags.size() > 0)
+                _log.debug("Tags delivered: " + sessionTags.size() + " for key: " + key.toBase64() + ": " + sessionTags);
+        }
         OutboundSession sess = getSession(target);
         if (sess == null) {
             createSession(target, key);
@@ -229,11 +234,6 @@ class TransientSessionKeyManager extends SessionKeyManager {
         sess.setCurrentKey(key);
         TagSet set = new TagSet(sessionTags, key, _context.clock().now());
         sess.addTags(set);
-        if (_log.shouldLog(Log.WARN)) {
-            //_log.debug("Tags delivered to set " + set + " on session " + sess);
-            if (sessionTags.size() > 0)
-                _log.warn("Tags delivered: " + sessionTags.size() + " for key: " + key.toBase64() + ": " + sessionTags);
-        }
     }
 
     /**
@@ -696,7 +696,7 @@ class TransientSessionKeyManager extends SessionKeyManager {
         public Set dropTags() {
             Set rv = null;
             synchronized (TagSet.this) {
-                rv = _sessionTags;
+                rv = new HashSet(_sessionTags);
                 _sessionTags = Collections.EMPTY_SET;
             }
             return rv;
@@ -707,12 +707,16 @@ class TransientSessionKeyManager extends SessionKeyManager {
         }
 
         public boolean contains(SessionTag tag) {
-            return _sessionTags.contains(tag);
+            synchronized (TagSet.this) {
+                return _sessionTags.contains(tag);
+            }
         }
 
         public void consume(SessionTag tag) {
             if (contains(tag)) {
-                _sessionTags.remove(tag);
+                synchronized (TagSet.this) {
+                    _sessionTags.remove(tag);
+                }
             }
         }
 
@@ -721,9 +725,11 @@ class TransientSessionKeyManager extends SessionKeyManager {
                 return null;
             }
 
-            SessionTag first = (SessionTag) _sessionTags.iterator().next();
-            _sessionTags.remove(first);
-            return first;
+            synchronized (TagSet.this) {
+                SessionTag first = (SessionTag) _sessionTags.iterator().next();
+                _sessionTags.remove(first);
+                return first;
+            }
         }
         
         public Exception getCreatedBy() { return _createdBy; }
