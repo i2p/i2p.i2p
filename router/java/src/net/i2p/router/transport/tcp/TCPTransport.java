@@ -834,10 +834,8 @@ public class TCPTransport extends TransportImpl {
      * Cache the bid to reduce object churn
      */
     private class SharedBid extends TransportBid {
-        private int _ms;
-        public SharedBid(int ms) { _ms = ms; }
-        public int getLatency() { return _ms; }
+        public SharedBid(int ms) { super(); setLatencyMs(ms); }
         public Transport getTransport() { return TCPTransport.this; }
-        public String toString() { return "TCP bid @ " + _ms; }
+        public String toString() { return "TCP bid @ " + getLatencyMs(); }
     }    
 }

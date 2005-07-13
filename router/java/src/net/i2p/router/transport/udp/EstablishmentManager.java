@@ -476,7 +476,7 @@ public class EstablishmentManager {
                             break;
                         _transport.failed(msg);
                     }
-                    _context.shitlist().shitlistRouter(outboundState.getRemoteIdentity().calculateHash(), "Unable to establish");
+                    _context.shitlist().shitlistRouter(outboundState.getRemoteIdentity().calculateHash(), "Unable to establish with SSU");
                 } else {
                     while (true) {
                         OutNetMessage msg = outboundState.getNextQueuedMessage();

@@ -1,4 +1,9 @@
-$Id: history.txt,v 1.210 2005/07/12 16:26:07 jrandom Exp $
+$Id: history.txt,v 1.211 2005/07/13 13:20:43 jrandom Exp $
+
+2005-07-13  jrandom
+    * Fixed a recently injected bug in the multitransport bidding which had 
+      allowed an essentially arbitrary choice of transports, rather than the
+      properly ordered choice.
 
 2005-07-13  jrandom
     * Fixed a long standing bug where we weren't properly comparing session 

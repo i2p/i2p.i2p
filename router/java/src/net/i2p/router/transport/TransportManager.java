@@ -175,10 +175,11 @@ public class TransportManager implements TransportEventListener {
             // to us via TCP, send via TCP)
             TransportBid bid = t.bid(msg.getTarget(), msg.getMessageSize());
             if (bid != null) {
-                if (_log.shouldLog(Log.DEBUG))
-                    _log.debug("Transport " + t.getStyle() + " bid: " + bid);
                 if ( (rv == null) || (rv.getLatencyMs() > bid.getLatencyMs()) )
-                    rv = bid;
+                    rv = bid;    
+                if (_log.shouldLog(Log.DEBUG))
+                    _log.debug("Transport " + t.getStyle() + " bid: " + bid + " currently winning? " + (rv == bid) 
+                               + " (winning latency: " + rv.getLatencyMs() + " / " + rv + ")");
             } else {
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("Transport " + t.getStyle() + " did not produce a bid");

@@ -245,7 +245,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
      *
      */
     void externalAddressReceived(byte ourIP[], int ourPort) {
-        if (_log.shouldLog(Log.WARN))
+        if (_log.shouldLog(Log.DEBUG))
             _log.debug("External address received: " + Base64.encode(ourIP) + ":" + ourPort);
         
         if (explicitAddressSpecified()) 
@@ -308,8 +308,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
      *
      */
     boolean addRemotePeerState(PeerState peer) {
-        if (_log.shouldLog(Log.WARN))
-            _log.debug("Add remote peer state: " + peer);
+        if (_log.shouldLog(Log.INFO))
+            _log.info("Add remote peer state: " + peer);
         if (peer.getRemotePeer() != null) {
             synchronized (_peersByIdent) {
                 PeerState oldPeer = (PeerState)_peersByIdent.put(peer.getRemotePeer(), peer);
@@ -347,8 +347,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         dropPeer(peer, true);
     }
     private void dropPeer(PeerState peer, boolean shouldShitlist) {
-        if (_log.shouldLog(Log.WARN))
-            _log.debug("Dropping remote peer: " + peer);
+        if (_log.shouldLog(Log.INFO))
+            _log.info("Dropping remote peer: " + peer);
         if (peer.getRemotePeer() != null) {
             if (shouldShitlist) {
                 long now = _context.clock().now();
@@ -519,6 +519,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         addr.setOptions(options);
         
         _externalAddress = addr;
+        if (_log.shouldLog(Log.INFO))
+            _log.info("Address rebuilt: " + addr);
         replaceAddress(addr);
     }
     
@@ -697,11 +699,9 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
      * Cache the bid to reduce object churn
      */
     private class SharedBid extends TransportBid {
-        private int _ms;
-        public SharedBid(int ms) { _ms = ms; }
-        public int getLatency() { return _ms; }
+        public SharedBid(int ms) { super(); setLatencyMs(ms); }
         public Transport getTransport() { return UDPTransport.this; }
-        public String toString() { return "UDP bid @ " + _ms; }
+        public String toString() { return "UDP bid @ " + getLatencyMs(); }
     }
     
     private class ExpirePeerEvent implements SimpleTimer.TimedEvent {

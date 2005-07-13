@@ -65,6 +65,8 @@ public class GetBidsJob extends JobImpl {
             context.netDb().fail(to);
             fail(context, msg);
         } else {
+            if (log.shouldLog(Log.INFO))
+                log.info("Attempting to send on transport " + bid.getTransport().getStyle() + ": " + bid);
             bid.getTransport().send(msg);
         }
     }
