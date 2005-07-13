@@ -1,4 +1,4 @@
-<i2p.news date="$Date: 2005/07/11 18:16:41 $">
+<i2p.news date="$Date: 2005/07/11 22:56:42 $">
  <i2p.release version="0.5.0.7" date="2005/04/20" minVersion="0.5.0.4"
               anonurl="http://i2p/NF2RLVUxVulR3IqK0sGJR0dHQcGXAzwa6rEO4WAWYXOHw-DoZhKnlbf1nzHXwMEJoex5nFTyiNMqxJMWlY54cvU~UenZdkyQQeUSBZXyuSweflUXFqKN-y8xIoK2w9Ylq1k8IcrAFDsITyOzjUKoOPfVq34rKNDo7fYyis4kT5bAHy~2N1EVMs34pi2RFabATIOBk38Qhab57Umpa6yEoE~rbyR~suDRvD7gjBvBiIKFqhFueXsR2uSrPB-yzwAGofTXuklofK3DdKspciclTVzqbDjsk5UXfu2nTrC1agkhLyqlOfjhyqC~t1IXm-Vs2o7911k7KKLGjB4lmH508YJ7G9fLAUyjuB-wwwhejoWqvg7oWvqo4oIok8LG6ECR71C3dzCvIjY2QcrhoaazA9G4zcGMm6NKND-H4XY6tUWhpB~5GefB3YczOqMbHq4wi0O9MzBFrOJEOs3X4hwboKWANf7DT5PZKJZ5KorQPsYRSq0E3wSOsFCSsdVCKUGsAAAA/i2p/i2pupdate.sud"
               publicurl="http://dev.i2p.net/i2p/i2pupdate.sud"
@@ -9,14 +9,12 @@
             publicurl="http://dev.i2p.net/pipermail/i2p/2005-April/000723.html"
             anonlogs="http://i2p/Nf3ab-ZFkmI-LyMt7GjgT-jfvZ3zKDl0L96pmGQXF1B82W2Bfjf0n7~288vafocjFLnQnVcmZd~-p0-Oolfo9aW2Rm-AhyqxnxyLlPBqGxsJBXjPhm1JBT4Ia8FB-VXt0BuY0fMKdAfWwN61-tj4zIcQWRxv3DFquwEf035K~Ra4SWOqiuJgTRJu7~o~DzHVljVgWIzwf8Z84cz0X33pv-mdG~~y0Bsc2qJVnYwjjR178YMcRSmNE0FVMcs6f17c6zqhMw-11qjKpY~EJfHYCx4lBWF37CD0obbWqTNUIbL~78vxqZRT3dgAgnLixog9nqTO-0Rh~NpVUZnoUi7fNR~awW5U3Cf7rU7nNEKKobLue78hjvRcWn7upHUF45QqTDuaM3yZa7OsjbcH-I909DOub2Q0Dno6vIwuA7yrysccN1sbnkwZbKlf4T6~iDdhaSLJd97QCyPOlbyUfYy9QLNExlRqKgNVJcMJRrIual~Lb1CLbnzt0uvobM57UpqSAAAA/meeting139"
             publiclogs="http://www.i2p.net/meeting138" />
-Hi all, while its still very much experimental, those who would like
-to participate in the next round of SSU tests can do so - check out
-the <a href="http://dev.i2p.net/~jrandom/ssu_test.txt">details</a> 
-online.  If you're interested, please, please read through those 
-instructions carefully, and if you can help, great, but if you don't
-feel comfortable with the things listed, hang tight for the full 
-release when we have things simpler to use.  As before, for those who
-have no idea what the above means, you can ignore this note :)
+Thanks to those helping out with the SSU test - there have been lots
+of updates lately, so upgrading to the latest CVS HEAD (currently
+0.5.0.7-14 as of 2005/07/13) would be worthwhile, and the archived 
+i2pupdate.zip mentioned 
+<a href="http://dev.i2p.net/~jrandom/ssu_test.txt">before</a> 
+may not always be up to date.
 <br />
 </i2p.news>
 
