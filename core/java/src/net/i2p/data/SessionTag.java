@@ -41,6 +41,7 @@ public class SessionTag extends ByteArray {
         if (val.length != BYTE_LENGTH)
             throw new IllegalArgumentException("SessionTags must be " + BYTE_LENGTH + " bytes");
         super.setData(val);
+        setValid(BYTE_LENGTH);
     }
 
     public void readBytes(InputStream in) throws DataFormatException, IOException {

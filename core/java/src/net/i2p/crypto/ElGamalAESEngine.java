@@ -82,6 +82,7 @@ public class ElGamalAESEngine {
         SessionKey usedKey = new SessionKey();
         Set foundTags = new HashSet();
         byte decrypted[] = null;
+        boolean wasExisting = false;
         if (key != null) {
             //if (_log.shouldLog(Log.DEBUG)) _log.debug("Key is known for tag " + st);
             usedKey.setData(key.getData());
@@ -94,10 +95,11 @@ public class ElGamalAESEngine {
                 _context.statManager().updateFrequency("crypto.elGamalAES.decryptExistingSession");
                 if ( (foundTags.size() > 0) && (_log.shouldLog(Log.WARN)) )
                     _log.warn(id + ": ElG/AES decrypt success with " + st + ": found tags: " + foundTags);
+                wasExisting = true;
             } else {
                 _context.statManager().updateFrequency("crypto.elGamalAES.decryptFailed");
-                if (_log.shouldLog(Log.ERROR)) {
-                    _log.error(id + ": ElG decrypt fail: known tag [" + st + "], failed decrypt");
+                if (_log.shouldLog(Log.WARN)) {
+                    _log.warn(id + ": ElG decrypt fail: known tag [" + st + "], failed decrypt");
                 }
             }
         } else {
@@ -109,8 +111,8 @@ public class ElGamalAESEngine {
                     _log.warn("ElG decrypt success: found tags: " + foundTags);
             } else {
                 _context.statManager().updateFrequency("crypto.elGamalAES.decryptFailed");
-                if (_log.shouldLog(Log.ERROR))
-                    _log.error("ElG decrypt fail: unknown tag: " + st);
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("ElG decrypt fail: unknown tag: " + st);
             }
         }
 
@@ -121,11 +123,11 @@ public class ElGamalAESEngine {
         if (foundTags.size() > 0) {
             if (foundKey.getData() != null) {
                 if (_log.shouldLog(Log.DEBUG)) 
-                    _log.debug("Found key: " + foundKey.toBase64() + " tags: " + foundTags);
+                    _log.debug("Found key: " + foundKey.toBase64() + " tags: " + foundTags + " wasExisting? " + wasExisting);
                 _context.sessionKeyManager().tagsReceived(foundKey, foundTags);
             } else {
                 if (_log.shouldLog(Log.DEBUG)) 
-                    _log.debug("Used key: " + usedKey.toBase64() + " tags: " + foundTags);
+                    _log.debug("Used key: " + usedKey.toBase64() + " tags: " + foundTags + " wasExisting? " + wasExisting);
                 _context.sessionKeyManager().tagsReceived(usedKey, foundTags);
             }
         }

@@ -253,6 +253,7 @@ class TransientSessionKeyManager extends SessionKeyManager {
         int overage = 0;
         TagSet tagSet = new TagSet(sessionTags, key, _context.clock().now());
         TagSet old = null;
+        SessionTag dupTag = null;
         for (Iterator iter = sessionTags.iterator(); iter.hasNext();) {
             SessionTag tag = (SessionTag) iter.next();
             if (_log.shouldLog(Log.DEBUG))
@@ -263,6 +264,7 @@ class TransientSessionKeyManager extends SessionKeyManager {
                 if (old != null) {
                     if (!old.getAssociatedKey().equals(tagSet.getAssociatedKey())) {
                         _inboundTagSets.remove(tag);
+                        dupTag = tag;
                         break;
                     } else {
                         old = null; // ignore the dup
@@ -284,10 +286,10 @@ class TransientSessionKeyManager extends SessionKeyManager {
                 }
             }
 
-            if (_log.shouldLog(Log.WARN)) {
-                _log.warn("Multiple tags matching!  tagSet: " + tagSet + " and old tagSet: " + old);
-                _log.warn("Earlier tag set creation: " + old + ": key=" + old.getAssociatedKey().toBase64(), old.getCreatedBy());
-                _log.warn("Current tag set creation: " + tagSet + ": key=" + tagSet.getAssociatedKey().toBase64(), tagSet.getCreatedBy());
+            if (_log.shouldLog(Log.ERROR)) {
+                _log.error("Multiple tags matching!  tagSet: " + tagSet + " and old tagSet: " + old + " tag: " + dupTag);
+                _log.error("Earlier tag set creation: " + old + ": key=" + old.getAssociatedKey().toBase64(), old.getCreatedBy());
+                _log.error("Current tag set creation: " + tagSet + ": key=" + tagSet.getAssociatedKey().toBase64(), tagSet.getCreatedBy());
             }
         }
         
@@ -662,10 +664,12 @@ class TransientSessionKeyManager extends SessionKeyManager {
             _sessionTags = tags;
             _key = key;
             _date = date;
-            if (true) 
+            if (true) {
+                long now = I2PAppContext.getGlobalContext().clock().now();
                 _createdBy = new Exception("Created by: key=" + _key.toBase64() + " on " 
-                                           + new Date(I2PAppContext.getGlobalContext().clock().now()) 
+                                           + new Date(now) + "/" + now 
                                            + " via " + Thread.currentThread().getName());
+            }
         }
 
         /** when the tag set was created */

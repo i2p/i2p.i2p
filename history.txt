@@ -1,8 +1,13 @@
-$Id: history.txt,v 1.209 2005/07/11 18:06:23 jrandom Exp $
+$Id: history.txt,v 1.210 2005/07/12 16:26:07 jrandom Exp $
+
+2005-07-13  jrandom
+    * Fixed a long standing bug where we weren't properly comparing session 
+      tags but instead largely depending upon comparing their hashCode, 
+      causing intermittent decryption errors.
 
 2005-07-12  jrandom
-    * Add some data duplication to avoid a recently injected concurrency problem 
-      in the session tag manager (thanks redzara and romster).
+    * Add some data duplication to avoid a recently injected concurrency 
+      problem in the session tag manager (thanks redzara and romster).
 
 2005-07-11  jrandom
     * Reduced the growth factor on the slow start and congestion avoidance for
