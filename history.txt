@@ -1,4 +1,12 @@
-$Id: history.txt,v 1.211 2005/07/13 13:20:43 jrandom Exp $
+$Id: history.txt,v 1.212 2005/07/13 15:07:32 jrandom Exp $
+
+2005-07-15  cervantes
+	* Added workaround for an odd win32 bug in the stats configuration 
+	  console page which meant only the first checkbox selection was saved.
+
+2005-07-15  Romster
+	* Added per group selection toggles in the stats configuration console
+	  page.
 
 2005-07-13  jrandom
     * Fixed a recently injected bug in the multitransport bidding which had 

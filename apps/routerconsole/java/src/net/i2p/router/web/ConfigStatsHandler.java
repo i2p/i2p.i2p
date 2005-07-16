@@ -31,7 +31,17 @@ public class ConfigStatsHandler extends FormHandler {
     public void setFilename(String filename) {
         _filename = (filename != null ? filename.trim() : null);
     }
-    
+
+    public void setStatList(String stats[]) {
+        if (stats != null) {
+            for (int i = 0; i < stats.length; i++) {
+                String cur = stats[i].trim();
+                if ( (cur.length() > 0) && (!_stats.contains(cur)) )
+                    _stats.add(cur);
+            }
+        }
+    }
+
     public void setStatList(String stat) { 
         if (stat != null) {
             if (stat.indexOf(',') != -1) {
@@ -45,15 +55,6 @@ public class ConfigStatsHandler extends FormHandler {
                 stat = stat.trim();
                 if ( (stat.length() > 0) && (!_stats.contains(stat)) )
                     _stats.add(stat);
-            }
-        }
-    }
-    public void setStatList(String stats[]) {
-        if (stats != null) {
-            for (int i = 0; i < stats.length; i++) {
-                String cur = stats[i].trim();
-                if ( (cur.length() > 0) && (!_stats.contains(cur)) )
-                    _stats.add(cur);
             }
         }
     }

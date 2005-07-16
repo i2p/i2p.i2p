@@ -5,32 +5,53 @@
 <html><head>
 <title>I2P Router Console - config stats</title>
 <link rel="stylesheet" href="default.css" type="text/css" />
-<script language="JavaScript">
-function toggleAll(category) {
-  //alert("toggle all for " + category);
-  var shouldCheck = false;
-  var shouldCheckDetermined = false;
-  var elements = document.statsForm.elements;
-  for (var i = 0; i < elements.length; i++) {
-    //alert("cur element: " + i);
-    var curElement = elements.item(i);
-    //alert("cur elem: " + curElement);
-    var curName = curElement.name;
-    //alert("cur name: " + curName);
-    if (curName == 'statList') {
-      if (shouldCheckDetermined == false) {
-        shouldCheckDetermined = true;
-        shouldCheck = !curElement.checked;
-      }
-      if (shouldCheck)
-        curElement.checked = true;
-      else
-        curElement.checked = false;
-    }
-  }
+<script type="text/javascript">
+function init()
+{
+	checkAll = false;
+}
+function toggleAll(category)
+{
+	var inputs = document.getElementsByTagName("input");
+	for(index = 0; index < inputs.length; index++)
+	{
+		if(inputs[index].id == category)
+		{
+			if(inputs[index].checked == 0)
+			{
+				inputs[index].checked = 1;
+			}
+			else if(inputs[index].checked == 1)
+			{
+				inputs[index].checked = 0;
+			}
+		}
+		if(category == '*')
+		{
+			if (checkAll == false)
+			{
+				inputs[index].checked = 1;
+			}
+			else if (checkAll == true)
+			{
+				inputs[index].checked = 0;
+			}
+		}
+	}
+	if(category == '*')
+	{
+		if (checkAll == false)
+		{
+			checkAll = true;
+		}
+		else if (checkAll == true)
+		{
+			checkAll = false;
+		}
+	}
 }
 </script>
-</head><body>
+</head><body onLoad="init();">
 <%@include file="nav.jsp" %>
 <%@include file="summary.jsp" %>
 
@@ -53,17 +74,17 @@ function toggleAll(category) {
  <input type="hidden" name="action" value="foo" />
  <input type="hidden" name="nonce" value="<%=System.getProperty("net.i2p.router.web.ConfigStatsHandler.nonce")%>" />
  Stat file: <input type="text" name="filename" value="<%=statshelper.getFilename()%>" /><br />
- Filter: (<a href="javascript:toggleAll('*')">toggle all</a>)<br />
+ Filter: (<a href="javascript: void(null);" onclick="toggleAll('*')">toggle all</a>)<br />
  <table>
  <% while (statshelper.hasMoreStats()) {
       while (statshelper.groupRequired()) { %>
  <tr><td valign="top" align="left" colspan="2">
      <b><%=statshelper.getCurrentGroupName()%></b>
-     <!--(<a href="javascript:toggleAll('<%=statshelper.getCurrentGroupName()%>')">toggle all</a>)-->
+     (<a href="javascript: void(null);" onclick="toggleAll('<%=statshelper.getCurrentGroupName()%>')">toggle all</a>)
      </td></tr><%
      } // end iterating over required groups for the current stat %>
  <tr><td valign="top" align="left">
-     <input type="checkbox" name="statList" value="<%=statshelper.getCurrentStatName()%>" <% 
+     <input id="<%=statshelper.getCurrentGroupName()%>" type="checkbox" name="statList" value="<%=statshelper.getCurrentStatName()%>" <% 
      if (statshelper.getCurrentIsLogged()) { %>checked="true" <% } %>/></td>
      <td valign="top" align="left"><b><%=statshelper.getCurrentStatName()%>:</b><br />
      <%=statshelper.getCurrentStatDescription()%></td></tr><%
