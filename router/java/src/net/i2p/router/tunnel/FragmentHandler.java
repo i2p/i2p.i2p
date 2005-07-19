@@ -264,7 +264,7 @@ public class FragmentHandler {
                 SimpleTimer.getInstance().removeEvent(msg.getExpireEvent());
             receiveComplete(msg);
         } else {
-            noteReception(msg.getMessageId(), 0, msg.toString());
+            noteReception(msg.getMessageId(), 0, msg);
         }
         
         if (isNew && fragmented && !msg.isComplete()) {
@@ -326,7 +326,7 @@ public class FragmentHandler {
             _context.statManager().addRateData("tunnel.fragmentedComplete", msg.getFragmentCount(), msg.getLifetime());
             receiveComplete(msg);
         } else {
-            noteReception(msg.getMessageId(), fragmentNum, msg.toString());
+            noteReception(msg.getMessageId(), fragmentNum, msg);
         }
         
         if (isNew && !msg.isComplete()) {
@@ -360,7 +360,7 @@ public class FragmentHandler {
         }
     }
 
-    protected void noteReception(long messageId, int fragmentId, String status) {}
+    protected void noteReception(long messageId, int fragmentId, Object status) {}
     protected void noteCompletion(long messageId) {}
     protected void noteFailure(long messageId, String status) {}
     

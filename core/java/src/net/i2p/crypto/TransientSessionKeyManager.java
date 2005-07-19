@@ -220,10 +220,10 @@ class TransientSessionKeyManager extends SessionKeyManager {
      *
      */
     public void tagsDelivered(PublicKey target, SessionKey key, Set sessionTags) {
-        if (_log.shouldLog(Log.WARN)) {
+        if (_log.shouldLog(Log.DEBUG)) {
             //_log.debug("Tags delivered to set " + set + " on session " + sess);
             if (sessionTags.size() > 0)
-                _log.warn("Tags delivered: " + sessionTags.size() + " for key: " + key.toBase64() + ": " + sessionTags);
+                _log.debug("Tags delivered: " + sessionTags.size() + " for key: " + key.toBase64() + ": " + sessionTags);
         }
         OutboundSession sess = getSession(target);
         if (sess == null) {
@@ -286,10 +286,10 @@ class TransientSessionKeyManager extends SessionKeyManager {
                 }
             }
 
-            if (_log.shouldLog(Log.ERROR)) {
-                _log.error("Multiple tags matching!  tagSet: " + tagSet + " and old tagSet: " + old + " tag: " + dupTag);
-                _log.error("Earlier tag set creation: " + old + ": key=" + old.getAssociatedKey().toBase64(), old.getCreatedBy());
-                _log.error("Current tag set creation: " + tagSet + ": key=" + tagSet.getAssociatedKey().toBase64(), tagSet.getCreatedBy());
+            if (_log.shouldLog(Log.WARN)) {
+                _log.warn("Multiple tags matching!  tagSet: " + tagSet + " and old tagSet: " + old + " tag: " + dupTag + "/" + dupTag.toBase64());
+                _log.warn("Earlier tag set creation: " + old + ": key=" + old.getAssociatedKey().toBase64(), old.getCreatedBy());
+                _log.warn("Current tag set creation: " + tagSet + ": key=" + tagSet.getAssociatedKey().toBase64(), tagSet.getCreatedBy());
             }
         }
         
@@ -413,7 +413,7 @@ class TransientSessionKeyManager extends SessionKeyManager {
         long now = _context.clock().now();
         StringBuffer buf = null;
         StringBuffer bufSummary = null;
-        if (_log.shouldLog(Log.WARN)) {
+        if (_log.shouldLog(Log.DEBUG)) {
             buf = new StringBuffer(128);
             buf.append("Expiring inbound: ");
             bufSummary = new StringBuffer(1024);
@@ -438,9 +438,9 @@ class TransientSessionKeyManager extends SessionKeyManager {
         }
         _context.statManager().addRateData("crypto.sessionTagsRemaining", remaining, 0);
         if ( (buf != null) && (removed > 0) )
-            _log.warn(buf.toString());
+            _log.debug(buf.toString());
         if (bufSummary != null)
-            _log.warn("Cleaning up with remaining: " + bufSummary.toString());
+            _log.debug("Cleaning up with remaining: " + bufSummary.toString());
 
         //_log.warn("Expiring tags: [" + tagsToDrop + "]");
 

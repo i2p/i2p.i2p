@@ -119,49 +119,57 @@ class I2PSessionImpl2 extends I2PSessionImpl {
 
     private boolean sendBestEffort(Destination dest, byte payload[], SessionKey keyUsed, Set tagsSent)
                     throws I2PSessionException {
-        long begin = _context.clock().now();
-        if (_log.shouldLog(Log.DEBUG)) _log.debug("begin sendBestEffort");
-        SessionKey key = _context.sessionKeyManager().getCurrentKey(dest.getPublicKey());
-        if (_log.shouldLog(Log.DEBUG)) _log.debug("key fetched");
-        if (key == null) key = _context.sessionKeyManager().createSession(dest.getPublicKey());
-        SessionTag tag = _context.sessionKeyManager().consumeNextAvailableTag(dest.getPublicKey(), key);
-        if (_log.shouldLog(Log.DEBUG)) _log.debug("tag consumed");
+        SessionKey key = null;
+        SessionKey newKey = null;
+        SessionTag tag = null;
         Set sentTags = null;
-        int oldTags = _context.sessionKeyManager().getAvailableTags(dest.getPublicKey(), key);
-        long availTimeLeft = _context.sessionKeyManager().getAvailableTimeLeft(dest.getPublicKey(), key);
+        int oldTags = 0;
+        long begin = _context.clock().now();
+        if (I2CPMessageProducer.END_TO_END_CRYPTO) {
+            if (_log.shouldLog(Log.DEBUG)) _log.debug("begin sendBestEffort");
+            key = _context.sessionKeyManager().getCurrentKey(dest.getPublicKey());
+            if (_log.shouldLog(Log.DEBUG)) _log.debug("key fetched");
+            if (key == null) key = _context.sessionKeyManager().createSession(dest.getPublicKey());
+            tag = _context.sessionKeyManager().consumeNextAvailableTag(dest.getPublicKey(), key);
+            if (_log.shouldLog(Log.DEBUG)) _log.debug("tag consumed");
+            sentTags = null;
+            oldTags = _context.sessionKeyManager().getAvailableTags(dest.getPublicKey(), key);
+            long availTimeLeft = _context.sessionKeyManager().getAvailableTimeLeft(dest.getPublicKey(), key);
         
-        if ( (tagsSent == null) || (tagsSent.size() <= 0) ) {
-            if (oldTags < NUM_TAGS) {
-                sentTags = createNewTags(NUM_TAGS);
-                if (_log.shouldLog(Log.DEBUG))
-                    _log.debug("** sendBestEffort only had " + oldTags + " with " + availTimeLeft + ", adding " + NUM_TAGS + ": " + sentTags);
-            } else if (availTimeLeft < 2 * 60 * 1000) {
-                // if we have > 50 tags, but they expire in under 2 minutes, we want more
-                sentTags = createNewTags(NUM_TAGS);
-                if (_log.shouldLog(Log.DEBUG)) 
-                    _log.debug(getPrefix() + "Tags expiring in " + availTimeLeft + ", adding " + NUM_TAGS + " new ones: " + sentTags);
-                //_log.error("** sendBestEffort available time left " + availTimeLeft);
+            if ( (tagsSent == null) || (tagsSent.size() <= 0) ) {
+                if (oldTags < NUM_TAGS) {
+                    sentTags = createNewTags(NUM_TAGS);
+                    if (_log.shouldLog(Log.DEBUG))
+                        _log.debug("** sendBestEffort only had " + oldTags + " with " + availTimeLeft + ", adding " + NUM_TAGS + ": " + sentTags);
+                } else if (availTimeLeft < 2 * 60 * 1000) {
+                    // if we have > 50 tags, but they expire in under 2 minutes, we want more
+                    sentTags = createNewTags(NUM_TAGS);
+                    if (_log.shouldLog(Log.DEBUG)) 
+                        _log.debug(getPrefix() + "Tags expiring in " + availTimeLeft + ", adding " + NUM_TAGS + " new ones: " + sentTags);
+                    //_log.error("** sendBestEffort available time left " + availTimeLeft);
+                } else {
+                    if (_log.shouldLog(Log.DEBUG))
+                        _log.debug("sendBestEffort old tags: " + oldTags + " available time left: " + availTimeLeft);
+                }
             } else {
                 if (_log.shouldLog(Log.DEBUG))
-                    _log.debug("sendBestEffort old tags: " + oldTags + " available time left: " + availTimeLeft);
+                    _log.debug("sendBestEffort is sending " + tagsSent.size() + " with " + availTimeLeft 
+                               + "ms left, " + oldTags + " tags known and " 
+                               + (tag == null ? "no tag" : " a valid tag"));
+            }
+        
+            if (false) // rekey
+                newKey = _context.keyGenerator().generateSessionKey();
+        
+            if ( (tagsSent != null) && (tagsSent.size() > 0) ) {
+                if (sentTags == null)
+                    sentTags = new HashSet();
+                sentTags.addAll(tagsSent);
             }
         } else {
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("sendBestEffort is sending " + tagsSent.size() + " with " + availTimeLeft 
-                           + "ms left, " + oldTags + " tags known and " 
-                           + (tag == null ? "no tag" : " a valid tag"));
+            // not using end to end crypto, so don't ever bundle any tags
         }
         
-        SessionKey newKey = null;
-        if (false) // rekey
-            newKey = _context.keyGenerator().generateSessionKey();
-        
-        if ( (tagsSent != null) && (tagsSent.size() > 0) ) {
-            if (sentTags == null)
-                sentTags = new HashSet();
-            sentTags.addAll(tagsSent);
-        }
-
         if (_log.shouldLog(Log.DEBUG)) _log.debug("before creating nonce");
         
         long nonce = _context.random().nextInt(Integer.MAX_VALUE);
@@ -174,10 +182,14 @@ class I2PSessionImpl2 extends I2PSessionImpl {
         if (_log.shouldLog(Log.DEBUG)) _log.debug(getPrefix() + "Setting key = " + key);
 
         if (keyUsed != null) {
-            if (newKey != null)
-                keyUsed.setData(newKey.getData());
-            else
-                keyUsed.setData(key.getData());
+            if (I2CPMessageProducer.END_TO_END_CRYPTO) {
+                if (newKey != null)
+                    keyUsed.setData(newKey.getData());
+                else
+                    keyUsed.setData(key.getData());
+            } else {
+                keyUsed.setData(SessionKey.INVALID_KEY.getData());
+            }
         }
         if (tagsSent != null) {
             if (sentTags != null) {

@@ -51,6 +51,7 @@ public interface I2NPMessage extends DataStructure {
      * @throws IOException if there is a problem reading from the stream
      */
     public void readMessage(byte data[], int offset, int dataSize, int type) throws I2NPMessageException, IOException;
+    public void readMessage(byte data[], int offset, int dataSize, int type, I2NPMessageHandler handler) throws I2NPMessageException, IOException;
     
     /**
      * Return the unique identifier for this type of I2NP message, as defined in

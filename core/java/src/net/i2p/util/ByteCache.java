@@ -85,11 +85,15 @@ public final class ByteCache {
      *
      */
     public final void release(ByteArray entry) {
+        release(entry, true);
+    }
+    public final void release(ByteArray entry, boolean shouldZero) {
         if (_cache) {
             if ( (entry == null) || (entry.getData() == null) )
                 return;
             
-            Arrays.fill(entry.getData(), (byte)0x0);
+            if (shouldZero)
+                Arrays.fill(entry.getData(), (byte)0x0);
             synchronized (_available) {
                 if (_available.size() < _maxCached)
                     _available.add(entry);

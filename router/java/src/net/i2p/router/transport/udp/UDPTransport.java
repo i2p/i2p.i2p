@@ -310,9 +310,10 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     boolean addRemotePeerState(PeerState peer) {
         if (_log.shouldLog(Log.INFO))
             _log.info("Add remote peer state: " + peer);
+        PeerState oldPeer = null;
         if (peer.getRemotePeer() != null) {
             synchronized (_peersByIdent) {
-                PeerState oldPeer = (PeerState)_peersByIdent.put(peer.getRemotePeer(), peer);
+                oldPeer = (PeerState)_peersByIdent.put(peer.getRemotePeer(), peer);
                 if ( (oldPeer != null) && (oldPeer != peer) ) {
                     // should we transfer the oldPeer's RTT/RTO/etc? nah
                     // or perhaps reject the new session?  nah, 
@@ -321,16 +322,23 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             }
         }
         
+        if ( (oldPeer != null) && (_log.shouldLog(Log.WARN)) )
+            _log.warn("Peer already connected: old=" + oldPeer + " new=" + peer, new Exception("dup"));
+        oldPeer = null;
+        
         RemoteHostId remoteId = peer.getRemoteHostId();
         if (remoteId == null) return false;
         
         synchronized (_peersByRemoteHost) {
-            PeerState oldPeer = (PeerState)_peersByRemoteHost.put(remoteId, peer);
+            oldPeer = (PeerState)_peersByRemoteHost.put(remoteId, peer);
             if ( (oldPeer != null) && (oldPeer != peer) ) {
                 //_peersByRemoteHost.put(remoteString, oldPeer);
                 //return false;
             }
         }
+        
+        if ( (oldPeer != null) && (_log.shouldLog(Log.WARN)) )
+            _log.warn("Peer already connected: old=" + oldPeer + " new=" + peer, new Exception("dup"));
         
         _activeThrottle.unchoke(peer.getRemotePeer());
         _context.shitlist().unshitlistRouter(peer.getRemotePeer());
@@ -348,7 +356,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     }
     private void dropPeer(PeerState peer, boolean shouldShitlist) {
         if (_log.shouldLog(Log.INFO))
-            _log.info("Dropping remote peer: " + peer);
+            _log.info("Dropping remote peer: " + peer + " shitlist? " + shouldShitlist, new Exception("Dropped by"));
         if (peer.getRemotePeer() != null) {
             if (shouldShitlist) {
                 long now = _context.clock().now();

@@ -227,15 +227,17 @@ public class ConnectionPacketHandler {
             oldSize >>>= 1;
             if (oldSize <= 0)
                 oldSize = 1;
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Congestion occurred - new windowSize " + oldSize + " congestionSeenAt: "
-                           + con.getLastCongestionSeenAt() + " (#resends: " + numResends 
-                           + ") for " + con);
 
             // setRTT has its own ceiling
             con.getOptions().setRTT(con.getOptions().getRTT() + 10*1000);
             con.getOptions().setWindowSize(oldSize);
-            
+
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Congestion occurred - new windowSize " + oldSize + " / " + con.getOptions().getWindowSize() + " congestionSeenAt: "
+                           + con.getLastCongestionSeenAt() + " (#resends: " + numResends 
+                           + ") for " + con);
+
+
             congested = true;
         } 
         
@@ -266,13 +268,14 @@ public class ConnectionPacketHandler {
             
             if (newWindowSize <= 0)
                 newWindowSize = 1;
-                    
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("New window size " + newWindowSize + "/" + oldWindow + " congestionSeenAt: "
-                           + con.getLastCongestionSeenAt() + " (#resends: " + numResends 
-                           + ") for " + con);
+
             con.getOptions().setWindowSize(newWindowSize);
             con.setCongestionWindowEnd(newWindowSize + lowest);
+                                
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("New window size " + newWindowSize + "/" + oldWindow + "/" + con.getOptions().getWindowSize() + " congestionSeenAt: "
+                           + con.getLastCongestionSeenAt() + " (#resends: " + numResends 
+                           + ") for " + con);
         }
         
         con.windowAdjusted();

@@ -31,11 +31,13 @@ public class BufferedStatLog implements StatLog {
     private String _outFile;
     
     private static final int BUFFER_SIZE = 1024;
+    private static final boolean DISABLE_LOGGING = false;
     
     public BufferedStatLog(I2PAppContext ctx) {
         _context = ctx;
         _log = ctx.logManager().getLog(BufferedStatLog.class);
         _events = new StatEvent[BUFFER_SIZE];
+        if (DISABLE_LOGGING) return;
         for (int i = 0; i < BUFFER_SIZE; i++)
             _events[i] = new StatEvent();
         _eventNext = 0;
@@ -48,6 +50,7 @@ public class BufferedStatLog implements StatLog {
     }
     
     public void addData(String scope, String stat, long value, long duration) {
+        if (DISABLE_LOGGING) return;
         synchronized (_events) {
             _events[_eventNext].init(scope, stat, value, duration);
             _eventNext = (_eventNext + 1) % _events.length;

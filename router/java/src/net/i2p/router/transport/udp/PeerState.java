@@ -509,7 +509,8 @@ public class PeerState {
         synchronized (_currentACKs) {
             rv = new ArrayList(_currentACKs.size());
             while ( (bytesRemaining >= 4) && (_currentACKs.size() > 0) ) {
-                rv.add(new FullACKBitfield((Long)_currentACKs.remove(0)));
+                long id = ((Long)_currentACKs.remove(0)).longValue();
+                rv.add(new FullACKBitfield(id));
                 bytesRemaining -= 4;
             }
             if (_currentACKs.size() <= 0)
@@ -576,9 +577,9 @@ public class PeerState {
     }
     
     /** represent a full ACK of a message */
-    private class FullACKBitfield implements ACKBitfield {
+    private static class FullACKBitfield implements ACKBitfield {
         private long _msgId;
-        public FullACKBitfield(Long id) { _msgId = id.longValue(); }
+        public FullACKBitfield(long id) { _msgId = id; }
         public int fragmentCount() { return 0; }
         public long getMessageId() { return _msgId; }
         public boolean received(int fragmentNum) { return true; }

@@ -81,6 +81,10 @@ public class TunnelGatewayMessage extends I2NPMessageImpl {
     
 
     public void readMessage(byte data[], int offset, int dataSize, int type) throws I2NPMessageException, IOException {
+        I2NPMessageHandler h = new I2NPMessageHandler(_context);
+        readMessage(data, offset, dataSize, type, h);
+    }
+    public void readMessage(byte data[], int offset, int dataSize, int type, I2NPMessageHandler handler) throws I2NPMessageException, IOException {
         if (type != MESSAGE_TYPE) throw new I2NPMessageException("Message type is incorrect for this message");
         int curIndex = offset;
         
@@ -92,9 +96,8 @@ public class TunnelGatewayMessage extends I2NPMessageImpl {
         
         int size = (int)DataHelper.fromLong(data, curIndex, 2);
         curIndex += 2;
-        I2NPMessageHandler h = new I2NPMessageHandler(_context);
-        curIndex = h.readMessage(data, curIndex);
-        _msg = h.lastRead();
+        curIndex = handler.readMessage(data, curIndex);
+        _msg = handler.lastRead();
         if (_msg == null)
             throw new I2NPMessageException("wtf, message read has no payload?");
     }

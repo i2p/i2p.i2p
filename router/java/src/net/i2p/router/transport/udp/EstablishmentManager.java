@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import net.i2p.crypto.DHSessionKeyBuilder;
 import net.i2p.data.RouterAddress;
 import net.i2p.data.RouterIdentity;
 import net.i2p.data.SessionKey;
@@ -286,7 +287,16 @@ public class EstablishmentManager {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Send created to: " + state.getRemoteHostId().toString());
         
-        state.generateSessionKey();
+        try {
+            state.generateSessionKey();
+        } catch (DHSessionKeyBuilder.InvalidPublicParameterException ippe) {
+            if (_log.shouldLog(Log.ERROR))
+                _log.error("Peer " + state.getRemoteHostId() + " sent us an invalid DH parameter (or were spoofed)", ippe);
+            synchronized (_inboundStates) {
+                _inboundStates.remove(state.getRemoteHostId());
+            }
+            return;
+        }
         _transport.send(_builder.buildSessionCreatedPacket(state, _transport.getExternalPort(), _transport.getIntroKey()));
         // if they haven't advanced to sending us confirmed packets in 5s,
         // repeat

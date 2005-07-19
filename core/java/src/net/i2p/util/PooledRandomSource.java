@@ -61,9 +61,14 @@ public class PooledRandomSource extends RandomSource {
     }
 
     private final RandomSource pickPRNG() {
-        int i = _nextPool % POOL_SIZE;
-        _nextPool = (++_nextPool) % POOL_SIZE;
-        return _pool[i];
+        // how much more explicit can we get?
+        int cur = _nextPool;
+        cur = cur % POOL_SIZE;
+        RandomSource rv = _pool[cur];
+        cur++;
+        cur = cur % POOL_SIZE;
+        _nextPool = cur;
+        return rv;
     }
     
     /**

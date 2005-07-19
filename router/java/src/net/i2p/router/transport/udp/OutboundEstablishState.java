@@ -163,10 +163,18 @@ public class OutboundEstablishState {
             return true;
         }
         
-        generateSessionKey();
-        decryptSignature();
+        boolean valid = true;
+        try {
+            generateSessionKey();
+        } catch (DHSessionKeyBuilder.InvalidPublicParameterException ippe) {
+            if (_log.shouldLog(Log.ERROR))
+                _log.error("Peer " + getRemoteHostId() + " sent us an invalid DH parameter (or were spoofed)", ippe);
+            valid = false;
+        }
+        if (valid)
+            decryptSignature();
         
-        if (verifySessionCreated()) {
+        if (valid && verifySessionCreated()) {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Session created passed validation");
             return true;
@@ -191,7 +199,7 @@ public class OutboundEstablishState {
         }
     }
     
-    private void generateSessionKey() {
+    private void generateSessionKey() throws DHSessionKeyBuilder.InvalidPublicParameterException {
         if (_sessionKey != null) return;
         _keyBuilder.setPeerPublicValue(_receivedY);
         _sessionKey = _keyBuilder.getSessionKey();

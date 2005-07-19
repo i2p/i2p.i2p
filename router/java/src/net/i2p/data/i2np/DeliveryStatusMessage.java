@@ -54,8 +54,7 @@ public class DeliveryStatusMessage extends I2NPMessageImpl {
     protected int writeMessageBody(byte out[], int curIndex) throws I2NPMessageException {
         if ( (_id < 0) || (_arrival <= 0) ) throw new I2NPMessageException("Not enough data to write out");
         
-        byte id[] = DataHelper.toLong(4, _id);
-        System.arraycopy(id, 0, out, curIndex, 4);
+        DataHelper.toLong(out, curIndex, 4, _id);
         curIndex += 4;
         DataHelper.toLong(out, curIndex, DataHelper.DATE_LENGTH, _arrival);
         curIndex += DataHelper.DATE_LENGTH;

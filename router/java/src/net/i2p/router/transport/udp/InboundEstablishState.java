@@ -99,7 +99,7 @@ public class InboundEstablishState {
     public synchronized byte[] getReceivedX() { return _receivedX; }
     public synchronized byte[] getReceivedOurIP() { return _bobIP; }
     
-    public synchronized void generateSessionKey() {
+    public synchronized void generateSessionKey() throws DHSessionKeyBuilder.InvalidPublicParameterException {
         if (_sessionKey != null) return;
         _keyBuilder = new DHSessionKeyBuilder();
         _keyBuilder.setPeerPublicValue(_receivedX);

@@ -268,7 +268,16 @@ public abstract class I2NPMessageImpl extends DataStructureImpl implements I2NPM
         }
     }
 
+    public void readMessage(byte data[], int offset, int dataSize, int type, I2NPMessageHandler handler) throws I2NPMessageException, IOException {
+        // ignore the handler (overridden in subclasses if necessary
+        readMessage(data, offset, dataSize, type);
+    }
+
+    
     public static I2NPMessage fromRawByteArray(I2PAppContext ctx, byte buffer[], int offset, int len) throws I2NPMessageException {
+        return fromRawByteArray(ctx, buffer, offset, len, new I2NPMessageHandler(ctx));
+    }
+    public static I2NPMessage fromRawByteArray(I2PAppContext ctx, byte buffer[], int offset, int len, I2NPMessageHandler handler) throws I2NPMessageException {
         int type = (int)DataHelper.fromLong(buffer, offset, 1);
         offset++;
         I2NPMessage msg = createMessage(ctx, type);
@@ -287,7 +296,7 @@ public abstract class I2NPMessageImpl extends DataStructureImpl implements I2NPM
         offset += 4;
         int dataSize = len - 1 - 4;
         try {
-            msg.readMessage(buffer, offset, dataSize, type);
+            msg.readMessage(buffer, offset, dataSize, type, handler);
             msg.setMessageExpiration(expiration);
             return msg;
         } catch (IOException ioe) {

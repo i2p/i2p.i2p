@@ -100,6 +100,7 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
     
     private final static String PROP_I2NP_TCP_HOSTNAME = "i2np.tcp.hostname";
     private final static String PROP_I2NP_TCP_PORT = "i2np.tcp.port";
+    private final static String PROP_I2NP_TCP_DISABLED = "i2np.tcp.disable";
     
     private RouterAddress createTCPAddress() {
         RouterAddress addr = new RouterAddress();
@@ -108,6 +109,10 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
         Properties props = new Properties();
         String name = _context.router().getConfigSetting(PROP_I2NP_TCP_HOSTNAME);
         String port = _context.router().getConfigSetting(PROP_I2NP_TCP_PORT);
+        String disabledStr = _context.router().getConfigSetting(PROP_I2NP_TCP_DISABLED);
+        boolean disabled = false;
+        if ( (disabledStr != null) && ("true".equalsIgnoreCase(disabledStr)) )
+            return null;
         if ( (name == null) || (port == null) ) {
             //_log.info("TCP Host/Port not specified in config file - skipping TCP transport");
             return null;

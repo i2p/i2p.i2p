@@ -16,7 +16,7 @@ public class RouterFragmentHandler extends FragmentHandler {
         _log = context.logManager().getLog(RouterFragmentHandler.class);
     }
     
-    protected void noteReception(long messageId, int fragmentId, String status) {
+    protected void noteReception(long messageId, int fragmentId, Object status) {
         if (_log.shouldLog(Log.INFO))
             _log.info("Received fragment " + fragmentId + " for message " + messageId + ": " + status);
         _routerContext.messageHistory().receiveTunnelFragment(messageId, fragmentId, status);

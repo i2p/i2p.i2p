@@ -18,6 +18,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 import net.i2p.I2PAppContext;
+import net.i2p.I2PException;
 import net.i2p.data.ByteArray;
 import net.i2p.data.DataHelper;
 import net.i2p.data.SessionKey;
@@ -157,8 +158,14 @@ public class DHSessionKeyBuilder {
         // read: Y
         BigInteger Y = readBigI(in);
         if (Y == null) return null;
-        builder.setPeerPublicValue(Y);
-        return builder;
+        try {
+            builder.setPeerPublicValue(Y);
+            return builder;
+        } catch (InvalidPublicParameterException ippe) {
+            if (_log.shouldLog(Log.ERROR))
+                _log.error("Key exchange failed (hostile peer?)", ippe);
+            return null;
+        }
     }
     
     static BigInteger readBigI(InputStream in) throws IOException {
@@ -175,7 +182,7 @@ public class DHSessionKeyBuilder {
             System.arraycopy(Y, 0, Y2, 1, 256);
             Y = Y2;
         }
-        return new NativeBigInteger(Y);
+        return new NativeBigInteger(1, Y);
     }
     
     /**
@@ -269,10 +276,11 @@ public class DHSessionKeyBuilder {
      * Specify the value given by the peer for use in the session key negotiation
      *
      */
-    public void setPeerPublicValue(BigInteger peerVal) {
+    public void setPeerPublicValue(BigInteger peerVal) throws InvalidPublicParameterException {
+        validatePublic(peerVal);
         _peerValue = peerVal;
     }
-    public void setPeerPublicValue(byte val[]) {
+    public void setPeerPublicValue(byte val[]) throws InvalidPublicParameterException {
         if (val.length != 256)
             throw new IllegalArgumentException("Peer public value must be exactly 256 bytes");
 
@@ -284,7 +292,8 @@ public class DHSessionKeyBuilder {
             System.arraycopy(val, 0, val2, 1, 256);
             val = val2;
         }
-        _peerValue = new NativeBigInteger(val);
+        setPeerPublicValue(new NativeBigInteger(1, val));
+        //_peerValue = new NativeBigInteger(val);
     }
 
     public BigInteger getPeerPublicValue() {
@@ -355,8 +364,58 @@ public class DHSessionKeyBuilder {
         }
         return key;
     }
+    
+    /**
+     * rfc2631:
+     *  The following algorithm MAY be used to validate a received public key y.
+     *
+     *  1. Verify that y lies within the interval [2,p-1]. If it does not,
+     *     the key is invalid.
+     *  2. Compute y^q mod p. If the result == 1, the key is valid.
+     *     Otherwise the key is invalid.
+     */
+    private static final void validatePublic(BigInteger publicValue) throws InvalidPublicParameterException {
+        int cmp = publicValue.compareTo(NativeBigInteger.ONE);
+        if (cmp <= 0) 
+            throw new InvalidPublicParameterException("Public value is below two: " + publicValue.toString());
+        
+        cmp = publicValue.compareTo(CryptoConstants.elgp);
+        if (cmp >= 0) 
+            throw new InvalidPublicParameterException("Public value is above p-1: " + publicValue.toString());
+        
+        // todo: 
+        // whatever validation needs to be done to mirror the rfc's part 2 (we don't have a q, so can't do
+        // if (NativeBigInteger.ONE.compareTo(publicValue.modPow(q, CryptoConstants.elgp)) != 0)
+        //   throw new InvalidPublicParameterException("Invalid public value with y^q mod p != 1");
+        // 
+    }
 
+    /*
+    private static void testValidation() {
+        NativeBigInteger bi = new NativeBigInteger("-3416069082912684797963255430346582466254460710249795973742848334283491150671563023437888953432878859472362439146158925287289114133666004165938814597775594104058593692562989626922979416277152479694258099203456493995467386903611666213773085025718340335205240293383622352894862685806192183268523899615405287022135356656720938278415659792084974076416864813957028335830794117802560169423133816961503981757298122040391506600117301607823659479051969827845787626261515313227076880722069706394405554113103165334903531980102626092646197079218895216346725765704256096661045699444128316078549709132753443706200863682650825635513");
+        try { 
+            validatePublic(bi);
+            System.err.println("valid?!");
+        } catch (InvalidPublicParameterException ippe) {
+            System.err.println("Ok, invalid.  cool");
+        }
+        
+        byte val[] = bi.toByteArray();
+        System.out.println("Len: " + val.length + " first is ok? " + ( (val[0] & 0x80) == 1) 
+                           + "\n" + DataHelper.toString(val, 64));
+        NativeBigInteger bi2 = new NativeBigInteger(1, val);
+        try {
+            validatePublic(bi2);
+            System.out.println("valid");
+        } catch (InvalidPublicParameterException ippe) {
+            System.out.println("invalid");
+        }
+    }
+    */
+    
     public static void main(String args[]) {
+        //if (true) { testValidation(); return; }
+        
         RandomSource.getInstance().nextBoolean(); // warm it up
         try {
             Thread.sleep(20 * 1000);
@@ -365,36 +424,40 @@ public class DHSessionKeyBuilder {
         I2PAppContext ctx = new I2PAppContext();
         _log.debug("\n\n\n\nBegin test\n");
         long negTime = 0;
-        for (int i = 0; i < 5; i++) {
-            long startNeg = Clock.getInstance().now();
-            DHSessionKeyBuilder builder1 = new DHSessionKeyBuilder();
-            DHSessionKeyBuilder builder2 = new DHSessionKeyBuilder();
-            BigInteger pub1 = builder1.getMyPublicValue();
-            builder2.setPeerPublicValue(pub1);
-            BigInteger pub2 = builder2.getMyPublicValue();
-            builder1.setPeerPublicValue(pub2);
-            SessionKey key1 = builder1.getSessionKey();
-            SessionKey key2 = builder2.getSessionKey();
-            long endNeg = Clock.getInstance().now();
-            negTime += endNeg - startNeg;
+        try {
+            for (int i = 0; i < 5; i++) {
+                long startNeg = Clock.getInstance().now();
+                DHSessionKeyBuilder builder1 = new DHSessionKeyBuilder();
+                DHSessionKeyBuilder builder2 = new DHSessionKeyBuilder();
+                BigInteger pub1 = builder1.getMyPublicValue();
+                builder2.setPeerPublicValue(pub1);
+                BigInteger pub2 = builder2.getMyPublicValue();
+                builder1.setPeerPublicValue(pub2);
+                SessionKey key1 = builder1.getSessionKey();
+                SessionKey key2 = builder2.getSessionKey();
+                long endNeg = Clock.getInstance().now();
+                negTime += endNeg - startNeg;
 
-            if (!key1.equals(key2))
-                _log.error("**ERROR: Keys do not match");
-            else
-                _log.debug("**Success: Keys match");
+                if (!key1.equals(key2))
+                    _log.error("**ERROR: Keys do not match");
+                else
+                    _log.debug("**Success: Keys match");
 
-            byte iv[] = new byte[16];
-            RandomSource.getInstance().nextBytes(iv);
-            String origVal = "1234567890123456"; // 16 bytes max using AESEngine
-            byte enc[] = new byte[16];
-            byte dec[] = new byte[16];
-            ctx.aes().encrypt(origVal.getBytes(), 0, enc, 0, key1, iv, 16);
-            ctx.aes().decrypt(enc, 0, dec, 0, key2, iv, 16);
-            String tranVal = new String(dec);
-            if (origVal.equals(tranVal))
-                _log.debug("**Success: D(E(val)) == val");
-            else
-                _log.error("**ERROR: D(E(val)) != val [val=(" + tranVal + "), origVal=(" + origVal + ")");
+                byte iv[] = new byte[16];
+                RandomSource.getInstance().nextBytes(iv);
+                String origVal = "1234567890123456"; // 16 bytes max using AESEngine
+                byte enc[] = new byte[16];
+                byte dec[] = new byte[16];
+                ctx.aes().encrypt(origVal.getBytes(), 0, enc, 0, key1, iv, 16);
+                ctx.aes().decrypt(enc, 0, dec, 0, key2, iv, 16);
+                String tranVal = new String(dec);
+                if (origVal.equals(tranVal))
+                    _log.debug("**Success: D(E(val)) == val");
+                else
+                    _log.error("**ERROR: D(E(val)) != val [val=(" + tranVal + "), origVal=(" + origVal + ")");
+            }
+        } catch (InvalidPublicParameterException ippe) {
+            _log.error("Invalid dh", ippe);
         }
         _log.debug("Negotiation time for 5 runs: " + negTime + " @ " + negTime / 5l + "ms each");
         try {
@@ -449,6 +512,15 @@ public class DHSessionKeyBuilder {
             builder.getMyPublicValue();
             //_log.debug("Precalc " + i + " complete");
             return builder;
+        }
+    }
+    
+    public static class InvalidPublicParameterException extends I2PException {
+        public InvalidPublicParameterException() {
+            super();
+        }
+        public InvalidPublicParameterException(String msg) {
+            super(msg);
         }
     }
 }

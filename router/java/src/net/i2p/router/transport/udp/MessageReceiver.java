@@ -9,6 +9,7 @@ import net.i2p.data.DataFormatException;
 import net.i2p.data.i2np.I2NPMessage;
 import net.i2p.data.i2np.I2NPMessageImpl;
 import net.i2p.data.i2np.I2NPMessageException;
+import net.i2p.data.i2np.I2NPMessageHandler;
 import net.i2p.router.RouterContext;
 import net.i2p.util.ByteCache;
 import net.i2p.util.I2PThread;
@@ -27,6 +28,7 @@ public class MessageReceiver implements Runnable {
     private List _completeMessages;
     private boolean _alive;
     private ByteCache _cache;
+    private I2NPMessageHandler _handler;
     
     public MessageReceiver(RouterContext ctx, UDPTransport transport) {
         _context = ctx;
@@ -34,6 +36,7 @@ public class MessageReceiver implements Runnable {
         _transport = transport;
         _completeMessages = new ArrayList(16);
         _cache = ByteCache.getInstance(64, I2NPMessage.MAX_SIZE);
+        _handler = new I2NPMessageHandler(ctx);
         _alive = true;
     }
 
@@ -60,6 +63,8 @@ public class MessageReceiver implements Runnable {
     
     public void run() {
         InboundMessageState message = null;
+        ByteArray buf = _cache.acquire();
+        
         while (_alive) {
             try {
                 synchronized (_completeMessages) {
@@ -74,16 +79,18 @@ public class MessageReceiver implements Runnable {
                 int size = message.getCompleteSize();
                 if (_log.shouldLog(Log.INFO))
                     _log.info("Full message received (" + message.getMessageId() + ") after " + message.getLifetime());
-                I2NPMessage msg = readMessage(message);
+                I2NPMessage msg = readMessage(buf, message);
                 if (msg != null)
                     _transport.messageReceived(msg, null, message.getFrom(), message.getLifetime(), size);
                 message = null;
             }
         }
+        
+        // no need to zero it out, as these buffers are only used with an explicit getCompleteSize
+        _cache.release(buf, false); 
     }
     
-    private I2NPMessage readMessage(InboundMessageState state) {
-        ByteArray buf = _cache.acquire();
+    private I2NPMessage readMessage(ByteArray buf, InboundMessageState state) {
         try {
             //byte buf[] = new byte[state.getCompleteSize()];
             ByteArray fragments[] = state.getFragments();
@@ -102,7 +109,7 @@ public class MessageReceiver implements Runnable {
                 _log.error("Hmm, offset of the fragments = " + off + " while the state says " + state.getCompleteSize());
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Raw byte array for " + state.getMessageId() + ": " + Base64.encode(buf.getData(), 0, state.getCompleteSize()));
-            I2NPMessage m = I2NPMessageImpl.fromRawByteArray(_context, buf.getData(), 0, state.getCompleteSize());
+            I2NPMessage m = I2NPMessageImpl.fromRawByteArray(_context, buf.getData(), 0, state.getCompleteSize(), _handler);
             m.setUniqueId(state.getMessageId());
             return m;
         } catch (I2NPMessageException ime) {
@@ -114,7 +121,6 @@ public class MessageReceiver implements Runnable {
             return null;
         } finally {
             state.releaseResources();
-            _cache.release(buf);
         }
     }
 }

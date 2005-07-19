@@ -121,6 +121,8 @@ public class Connection {
         _context.statManager().createRateStat("stream.con.windowSizeAtCongestion", "How large was our send window when we send a dup?", "Stream", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
         _context.statManager().createRateStat("stream.chokeSizeBegin", "How many messages were outstanding when we started to choke?", "Stream", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
         _context.statManager().createRateStat("stream.chokeSizeEnd", "How many messages were outstanding when we stopped being choked?", "Stream", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("New connection created with options: " + _options);
     }
     
     public long getNextOutboundPacketNum() { 
@@ -805,6 +807,8 @@ public class Connection {
             buf.append(" close received");
         buf.append(" acked packets ").append(getAckedPackets());
         
+        buf.append(" maxWin ").append(getOptions().getMaxWindowSize());
+        
         buf.append("]");
         return buf.toString();
     }
@@ -885,14 +889,15 @@ public class Connection {
                         newWindowSize /= 2;
                         if (newWindowSize <= 0)
                             newWindowSize = 1;
-
-                        if (_log.shouldLog(Log.WARN))
-                            _log.warn("Congestion resending packet " + _packet.getSequenceNum() + ": new windowSize " + newWindowSize 
-                                      + ") for " + Connection.this.toString());
-
+                        
                         // setRTT has its own ceiling
                         getOptions().setRTT(getOptions().getRTT() + 10*1000);
                         getOptions().setWindowSize(newWindowSize);
+
+                        if (_log.shouldLog(Log.WARN))
+                            _log.warn("Congestion resending packet " + _packet.getSequenceNum() + ": new windowSize " + newWindowSize 
+                                      + "/" + getOptions().getWindowSize() + ") for " + Connection.this.toString());
+
                         windowAdjusted();
                     }
                 }

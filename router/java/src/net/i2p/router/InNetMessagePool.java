@@ -113,30 +113,35 @@ public class InNetMessagePool implements Service {
         //    _context.statManager().getStatLog().addData(fromRouterHash.toBase64().substring(0,6), "udp.floodDataReceived", 1, 0);
         //    return 0;
         //}
+        
+        String invalidReason = null;
         if (messageBody instanceof TunnelDataMessage) {
-            // do not validate the message with the validator - the IV validator is sufficient
-        } else { 
-            String invalidReason = _context.messageValidator().validateMessage(messageBody.getUniqueId(), exp);
-            if (invalidReason != null) {
-                int level = Log.WARN;
-                if (messageBody instanceof TunnelCreateMessage)
-                    level = Log.INFO;
-                if (_log.shouldLog(level))
-                    _log.log(level, "Duplicate message received [" + messageBody.getUniqueId() 
-                              + " expiring on " + exp + "]: " + messageBody.getClass().getName() + ": " + invalidReason 
-                              + ": " + messageBody);
-                _context.statManager().addRateData("inNetPool.dropped", 1, 0);
-                _context.statManager().addRateData("inNetPool.duplicate", 1, 0);
-                _context.messageHistory().droppedOtherMessage(messageBody);
-                _context.messageHistory().messageProcessingError(messageBody.getUniqueId(), 
-                                                                    messageBody.getClass().getName(), 
-                                                                    "Duplicate/expired");
-                return -1;
-            } else {
-                if (_log.shouldLog(Log.DEBUG))
-                    _log.debug("Message received [" + messageBody.getUniqueId() 
-                               + " expiring on " + exp + "] is NOT a duplicate or exipired");
-            }
+            // the IV validator is sufficient for dup detection on tunnel messages, so
+            // just validate the expiration
+            invalidReason = _context.messageValidator().validateMessage(exp);
+        } else {
+            invalidReason = _context.messageValidator().validateMessage(messageBody.getUniqueId(), exp);
+        }
+        
+        if (invalidReason != null) {
+            int level = Log.WARN;
+            if (messageBody instanceof TunnelCreateMessage)
+                level = Log.INFO;
+            if (_log.shouldLog(level))
+                _log.log(level, "Duplicate message received [" + messageBody.getUniqueId() 
+                          + " expiring on " + exp + "]: " + messageBody.getClass().getName() + ": " + invalidReason 
+                          + ": " + messageBody);
+            _context.statManager().addRateData("inNetPool.dropped", 1, 0);
+            _context.statManager().addRateData("inNetPool.duplicate", 1, 0);
+            _context.messageHistory().droppedOtherMessage(messageBody);
+            _context.messageHistory().messageProcessingError(messageBody.getUniqueId(), 
+                                                                messageBody.getClass().getName(), 
+                                                                "Duplicate/expired");
+            return -1;
+        } else {
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Message received [" + messageBody.getUniqueId() 
+                           + " expiring on " + exp + "] is NOT a duplicate or exipired");
         }
 
         boolean jobFound = false;

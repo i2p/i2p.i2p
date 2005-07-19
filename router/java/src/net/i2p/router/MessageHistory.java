@@ -443,13 +443,13 @@ public class MessageHistory {
         addEntry(buf.toString());
     }
     
-    public void receiveTunnelFragment(long messageId, int fragmentId, String status) {
+    public void receiveTunnelFragment(long messageId, int fragmentId, Object status) {
         if (!_doLog) return;
         if (messageId == -1) throw new IllegalArgumentException("why are you -1?");
         StringBuffer buf = new StringBuffer(48);
         buf.append(getPrefix());
         buf.append("Receive fragment ").append(fragmentId).append(" in ").append(messageId);
-        buf.append(" status: ").append(status);
+        buf.append(" status: ").append(status.toString());
         addEntry(buf.toString());
     }
     public void receiveTunnelFragmentComplete(long messageId) {

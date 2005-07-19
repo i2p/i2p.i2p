@@ -10,6 +10,7 @@ package net.i2p.data;
  */
 
 import java.io.Serializable;
+import net.i2p.data.Base64;
 
 /**
  * Wrap up an array of bytes so that they can be compared and placed in hashes,
@@ -82,6 +83,10 @@ public class ByteArray implements Serializable, Comparable {
     }
 
     public final String toString() {
-        return DataHelper.toString(getData(), 32);
+        return super.toString() + "/" + DataHelper.toString(getData(), 32) + "." + _valid;
+    }
+    
+    public final String toBase64() {
+        return Base64.encode(_data, _offset, _valid);
     }
 }
