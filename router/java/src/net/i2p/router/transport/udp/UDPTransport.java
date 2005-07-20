@@ -483,16 +483,23 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     }
     
     void rebuildExternalAddress() {
+        // if the external port is specified, we want to use that to bind to even
+        // if we don't know the external host.
+        String port = _context.getProperty(PROP_EXTERNAL_PORT);
+        if (port != null) { 
+            try {
+                _externalListenPort = Integer.parseInt(port);    
+            } catch (NumberFormatException nfe) {
+                _externalListenPort = -1;
+            }
+        }
+        
         if (explicitAddressSpecified()) {
             try {
                 String host = _context.getProperty(PROP_EXTERNAL_HOST);
-                String port = _context.getProperty(PROP_EXTERNAL_PORT);
                 _externalListenHost = InetAddress.getByName(host);
-                _externalListenPort = Integer.parseInt(port);
             } catch (UnknownHostException uhe) {
                 _externalListenHost = null;
-            } catch (NumberFormatException nfe) {
-                _externalListenPort = -1;
             }
         }
             

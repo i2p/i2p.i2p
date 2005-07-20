@@ -1,4 +1,8 @@
-$Id: history.txt,v 1.213 2005/07/16 07:52:36 cervantes Exp $
+$Id: history.txt,v 1.214 2005/07/19 16:00:25 jrandom Exp $
+
+2005-07-20  jrandom
+    * Allow the user to specify an external port # for SSU even if the external
+      host isn't specified (thanks duck!)
 
 2005-07-19  jrandom
     * Further preparation for removing I2CP crypto
