@@ -95,5 +95,8 @@ public class OutboundGatewayProcessor {
             prev = cur;
             cur = xf;
         }
+        
+        if (HopProcessor.USE_DOUBLE_IV_ENCRYPTION)
+            ctx.aes().decryptBlock(orig, offset, config.getIVKey(), orig, offset);
     }
 }

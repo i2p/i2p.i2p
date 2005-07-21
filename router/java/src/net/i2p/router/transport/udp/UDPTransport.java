@@ -251,6 +251,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         if (explicitAddressSpecified()) 
             return;
             
+        boolean updated = false;
         synchronized (this) {
             if ( (_externalListenHost == null) ||
                  (!eq(_externalListenHost.getAddress(), _externalListenPort, ourIP, ourPort)) ) {
@@ -259,11 +260,15 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                     _externalListenPort = ourPort;
                     rebuildExternalAddress();
                     replaceAddress(_externalAddress);
+                    updated = true;
                 } catch (UnknownHostException uhe) {
                     _externalListenHost = null;
                 }
             }
         }
+        
+        if (updated) 
+            _context.router().rebuildRouterInfo();
     }
     
     private static final boolean eq(byte laddr[], int lport, byte raddr[], int rport) {

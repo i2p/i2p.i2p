@@ -37,7 +37,8 @@ public class SessionTag extends ByteArray {
     }
 
     public void setData(byte val[]) throws IllegalArgumentException {
-        if (val == null) super.setData(null);
+        if (val == null) 
+            throw new NullPointerException("SessionTags cannot be null");
         if (val.length != BYTE_LENGTH)
             throw new IllegalArgumentException("SessionTags must be " + BYTE_LENGTH + " bytes");
         super.setData(val);

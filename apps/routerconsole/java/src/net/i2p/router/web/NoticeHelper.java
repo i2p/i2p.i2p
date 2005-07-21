@@ -25,8 +25,11 @@ public class NoticeHelper {
     
     public String getSystemNotice() {
         if (_context.router().gracefulShutdownInProgress()) {
-            return "Graceful shutdown in " 
-                   + DataHelper.formatDuration(_context.router().getShutdownTimeRemaining());
+            long remaining = _context.router().getShutdownTimeRemaining();
+            if (remaining > 0)
+                return "Graceful shutdown in " + DataHelper.formatDuration(remaining);
+            else
+                return "Graceful shutdown imminent, please be patient as state is written to disk";
         } else {
             return "";
         }

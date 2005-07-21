@@ -24,6 +24,12 @@ public class HopProcessor {
         
     /** helpful flag for debugging */
     static final boolean USE_ENCRYPTION = true;
+    /**
+     * as of i2p 0.6, the tunnel crypto will change by encrypting the IV both before 
+     * and after using it at each hop so as to prevent a certain type of replay/confirmation 
+     * attack.
+     */
+    static final boolean USE_DOUBLE_IV_ENCRYPTION = false;
     static final int IV_LENGTH = 16;
     private static final ByteCache _cache = ByteCache.getInstance(128, IV_LENGTH);
     
@@ -78,6 +84,8 @@ public class HopProcessor {
             //_log.debug("Before:" + Base64.encode(orig, IV_LENGTH, orig.length - IV_LENGTH));
         }
         if (USE_ENCRYPTION) {
+            if (USE_DOUBLE_IV_ENCRYPTION) 
+                updateIV(orig, offset);
             encrypt(orig, offset, length);
             updateIV(orig, offset);
         }

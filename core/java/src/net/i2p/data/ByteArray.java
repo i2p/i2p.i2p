@@ -27,8 +27,9 @@ public class ByteArray implements Serializable, Comparable {
     }
 
     public ByteArray(byte[] data) {
+        _offset = 0;
         _data = data;
-        _valid = 0;
+        _valid = (data != null ? data.length : 0);
     }
     public ByteArray(byte[] data, int offset, int length) {
         _data = data;

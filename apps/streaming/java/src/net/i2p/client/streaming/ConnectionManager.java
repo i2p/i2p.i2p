@@ -129,6 +129,8 @@ public class ConnectionManager {
                     } else { 
                         _connectionByInboundId.put(ba, oldCon);
                         // receiveId already taken, try another
+                        // (need to realloc receiveId, as ba.getData() points to the old value)
+                        receiveId = new byte[4];
                         _context.random().nextBytes(receiveId);
                     }
                 }

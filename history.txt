@@ -1,4 +1,10 @@
-$Id: history.txt,v 1.214 2005/07/19 16:00:25 jrandom Exp $
+$Id: history.txt,v 1.215 2005/07/20 14:24:47 jrandom Exp $
+
+2005-07-21  jrandom
+    * Fix in the SDK for a bug which would manifest itself as misrouted
+      streaming packets when a destination has many concurrent streaming
+      connections (thanks duck!)
+    * No more "Graceful shutdown in -18140121441141s"
 
 2005-07-20  jrandom
     * Allow the user to specify an external port # for SSU even if the external
