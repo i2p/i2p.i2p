@@ -179,8 +179,8 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
             _log.debug("Handling recieve begin: id = " + message.getMessageId());
         MessagePayloadMessage msg = new MessagePayloadMessage();
         msg.setMessageId(message.getMessageId());
-        msg.setSessionId(_runner.getSessionId());
-        Payload payload = _runner.getPayload(message.getMessageId());
+        msg.setSessionId(_runner.getSessionId().getSessionId());
+        Payload payload = _runner.getPayload(new MessageId(message.getMessageId()));
         if (payload == null) {
             if (_log.shouldLog(Log.ERROR))
                 _log.error("Payload for message id [" + message.getMessageId() 
@@ -202,7 +202,7 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
      *
      */
     private void handleReceiveEnd(I2CPMessageReader reader, ReceiveMessageEndMessage message) {
-        _runner.removePayload(message.getMessageId());
+        _runner.removePayload(new MessageId(message.getMessageId()));
     }
     
     private void handleDestroySession(I2CPMessageReader reader, DestroySessionMessage message) {

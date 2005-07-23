@@ -41,7 +41,11 @@ public class PacketHandler {
         _context.statManager().createRateStat("udp.handleTime", "How long it takes to handle a received packet after its been pulled off the queue", "udp", new long[] { 10*60*1000, 60*60*1000 });
         _context.statManager().createRateStat("udp.queueTime", "How long after a packet is received can we begin handling it", "udp", new long[] { 10*60*1000, 60*60*1000 });
         _context.statManager().createRateStat("udp.receivePacketSkew", "How long ago after the packet was sent did we receive it", "udp", new long[] { 10*60*1000, 60*60*1000 });
-        _context.statManager().createRateStat("udp.droppedInvalid", "How old the packet we dropped due to invalidity was", "udp", new long[] { 10*60*1000, 60*60*1000 });
+        _context.statManager().createRateStat("udp.droppedInvalidUnkown", "How old the packet we dropped due to invalidity (unkown type) was", "udp", new long[] { 10*60*1000, 60*60*1000 });
+        _context.statManager().createRateStat("udp.droppedInvalidReestablish", "How old the packet we dropped due to invalidity (doesn't use existing key, not an establishment) was", "udp", new long[] { 10*60*1000, 60*60*1000 });
+        _context.statManager().createRateStat("udp.droppedInvalidEstablish", "How old the packet we dropped due to invalidity (establishment, bad key) was", "udp", new long[] { 10*60*1000, 60*60*1000 });
+        _context.statManager().createRateStat("udp.droppedInvalidInboundEstablish", "How old the packet we dropped due to invalidity (inbound establishment, bad key) was", "udp", new long[] { 10*60*1000, 60*60*1000 });
+        _context.statManager().createRateStat("udp.droppedInvalidSkew", "How skewed the packet we dropped due to invalidity (valid except bad skew) was", "udp", new long[] { 10*60*1000, 60*60*1000 });
     }
     
     public void startup() { 
@@ -158,7 +162,7 @@ public class PacketHandler {
                     } else {
                         if (_log.shouldLog(Log.WARN))
                             _log.warn("Validation with existing con failed, and validation as reestablish failed too.  DROP");
-                        _context.statManager().addRateData("udp.droppedInvalid", packet.getLifetime(), packet.getExpiration());
+                        _context.statManager().addRateData("udp.droppedInvalidReestablish", packet.getLifetime(), packet.getExpiration());
                     }
                     return;
                 }
@@ -177,7 +181,7 @@ public class PacketHandler {
         if (!isValid) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Invalid introduction packet received: " + packet, new Exception("path"));
-            _context.statManager().addRateData("udp.droppedInvalid", packet.getLifetime(), packet.getExpiration());
+            _context.statManager().addRateData("udp.droppedInvalidEstablish", packet.getLifetime(), packet.getExpiration());
             return;
         } else {
             if (_log.shouldLog(Log.INFO))
@@ -224,7 +228,7 @@ public class PacketHandler {
             // on earlier state packets
             receivePacket(reader, packet);
         } else {
-            _context.statManager().addRateData("udp.droppedInvalid", packet.getLifetime(), packet.getExpiration());
+            _context.statManager().addRateData("udp.droppedInvalidInboundEstablish", packet.getLifetime(), packet.getExpiration());
         }
     }
 
@@ -283,12 +287,12 @@ public class PacketHandler {
         if (skew > GRACE_PERIOD) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Packet too far in the future: " + new Date(sendOn/1000) + ": " + packet);
-            _context.statManager().addRateData("udp.droppedInvalid", packet.getLifetime(), packet.getExpiration());
+            _context.statManager().addRateData("udp.droppedInvalidSkew", skew, packet.getExpiration());
             return;
         } else if (skew < 0 - GRACE_PERIOD) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Packet too far in the past: " + new Date(sendOn/1000) + ": " + packet);
-            _context.statManager().addRateData("udp.droppedInvalid", packet.getLifetime(), packet.getExpiration());
+            _context.statManager().addRateData("udp.droppedInvalidSkew", 0-skew, packet.getExpiration());
             return;
         }
         
@@ -324,7 +328,7 @@ public class PacketHandler {
             default:
                 if (_log.shouldLog(Log.WARN))
                     _log.warn("Unknown payload type: " + reader.readPayloadType());
-                _context.statManager().addRateData("udp.droppedInvalid", packet.getLifetime(), packet.getExpiration());
+                _context.statManager().addRateData("udp.droppedInvalidUnknown", packet.getLifetime(), packet.getExpiration());
                 return;
         }
     }

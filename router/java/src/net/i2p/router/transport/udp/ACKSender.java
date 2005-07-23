@@ -100,6 +100,8 @@ public class ACKSender implements Runnable {
                     _context.statManager().addRateData("udp.sendACKCount", ackBitfields.size(), 0);
                     _context.statManager().addRateData("udp.sendACKRemaining", remaining, 0);
                     now = _context.clock().now();
+                    if (lastSend < 0)
+                        lastSend = now - 1;
                     _context.statManager().addRateData("udp.ackFrequency", now-lastSend, now-wanted);
                     //_context.statManager().getStatLog().addData(peer.getRemoteHostId().toString(), "udp.peer.sendACKCount", ackBitfields.size(), 0);
                     UDPPacket ack = _builder.buildACK(peer, ackBitfields);

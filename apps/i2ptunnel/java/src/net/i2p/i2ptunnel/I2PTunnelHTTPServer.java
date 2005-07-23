@@ -35,85 +35,66 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
     public I2PTunnelHTTPServer(InetAddress host, int port, String privData, String spoofHost, Logging l, EventDispatcher notifyThis, I2PTunnel tunnel) {
         super(host, port, privData, l, notifyThis, tunnel);
         _spoofHost = spoofHost;
+        getTunnel().getContext().statManager().createRateStat("i2ptunnel.httpserver.blockingHandleTime", "how long the blocking handle takes to complete", "I2PTunnel.HTTPServer", new long[] { 60*1000, 10*60*1000, 3*60*60*1000 });
     }
 
     public I2PTunnelHTTPServer(InetAddress host, int port, File privkey, String privkeyname, String spoofHost, Logging l, EventDispatcher notifyThis, I2PTunnel tunnel) {
         super(host, port, privkey, privkeyname, l, notifyThis, tunnel);
         _spoofHost = spoofHost;
+        getTunnel().getContext().statManager().createRateStat("i2ptunnel.httpserver.blockingHandleTime", "how long the blocking handle takes to complete", "I2PTunnel.HTTPServer", new long[] { 60*1000, 10*60*1000, 3*60*60*1000 });
     }
 
     public I2PTunnelHTTPServer(InetAddress host, int port, InputStream privData, String privkeyname, String spoofHost, Logging l, EventDispatcher notifyThis, I2PTunnel tunnel) {
         super(host, port, privData, privkeyname, l, notifyThis, tunnel);
-        _spoofHost = spoofHost;
+        _spoofHost = spoofHost;        
+        getTunnel().getContext().statManager().createRateStat("i2ptunnel.httpserver.blockingHandleTime", "how long the blocking handle takes to complete", "I2PTunnel.HTTPServer", new long[] { 60*1000, 10*60*1000, 3*60*60*1000 });
     }
 
-    public void run() {
-        try {
-            I2PServerSocket i2pss = sockMgr.getServerSocket();
-            while (true) {
-                I2PSocket i2ps = i2pss.accept();
-                if (i2ps == null) throw new I2PException("I2PServerSocket closed");
-                I2PThread t = new I2PThread(new Handler(i2ps));
-                t.start();
-            }
-        } catch (I2PException ex) {
-            _log.error("Error while waiting for I2PConnections", ex);
-        } catch (IOException ex) {
-            _log.error("Error while waiting for I2PConnections", ex);
-        }
-    }
-    
     /**
-     * Async handler to keep .accept() from blocking too long.  
-     * todo: replace with a thread pool so we dont get overrun by threads if/when
-     * receiving a lot of connection requests concurrently.
+     * Called by the thread pool of I2PSocket handlers
      *
      */
-    private class Handler implements Runnable { 
-        private I2PSocket _handleSocket;
-        public Handler(I2PSocket socket) {
-            _handleSocket = socket;
-        }
-        public void run() {
-            long afterAccept = I2PAppContext.getGlobalContext().clock().now();
-            long afterSocket = -1;
-            
-            //local is fast, so synchronously. Does not need that many
-            //threads.
+    protected void blockingHandle(I2PSocket socket) {
+        long afterAccept = getTunnel().getContext().clock().now();
+        long afterSocket = -1;
+        //local is fast, so synchronously. Does not need that many
+        //threads.
+        try {
+            socket.setReadTimeout(readTimeout);
+            String modifiedHeader = getModifiedHeader(socket);
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Modified header: [" + modifiedHeader + "]");
+
+            Socket s = new Socket(remoteHost, remotePort);
+            afterSocket = getTunnel().getContext().clock().now();
+            new I2PTunnelRunner(s, socket, slock, null, modifiedHeader.getBytes(), null);
+        } catch (SocketException ex) {
             try {
-                _handleSocket.setReadTimeout(readTimeout);
-                String modifiedHeader = getModifiedHeader();
-                if (_log.shouldLog(Log.DEBUG))
-                    _log.debug("Modified header: [" + modifiedHeader + "]");
-            
-                Socket s = new Socket(remoteHost, remotePort);
-                afterSocket = I2PAppContext.getGlobalContext().clock().now();
-                new I2PTunnelRunner(s, _handleSocket, slock, null, modifiedHeader.getBytes(), null);
-            } catch (SocketException ex) {
-                try {
-                    _handleSocket.close();
-                } catch (IOException ioe) {
+                socket.close();
+            } catch (IOException ioe) {
+                if (_log.shouldLog(Log.ERROR))
                     _log.error("Error while closing the received i2p con", ex);
-                }
-            } catch (IOException ex) {
-                _log.error("Error while handling for I2PConnections", ex);
             }
-            
-            long afterHandle = I2PAppContext.getGlobalContext().clock().now();
-            long timeToHandle = afterHandle - afterAccept;
-            if (timeToHandle > 1000)
-                _log.warn("Took a while to handle the request [" + timeToHandle + ", socket create: " 
-                          + (afterSocket-afterAccept) + "]");
+        } catch (IOException ex) {
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Error while receiving the new HTTP request", ex);
         }
-        private String getModifiedHeader() throws IOException {
-            InputStream in = _handleSocket.getInputStream();
-            
-            StringBuffer command = new StringBuffer(128);
-            Properties headers = readHeaders(in, command);
-            headers.setProperty("Host", _spoofHost);
-            headers.setProperty("Connection", "close");
-            return formatHeaders(headers, command);
-        }
+
+        long afterHandle = getTunnel().getContext().clock().now();
+        long timeToHandle = afterHandle - afterAccept;
+        getTunnel().getContext().statManager().addRateData("i2ptunnel.httpserver.blockingHandleTime", timeToHandle, 0);
+        if ( (timeToHandle > 1000) && (_log.shouldLog(Log.WARN)) )
+            _log.warn("Took a while to handle the request [" + timeToHandle + ", socket create: " + (afterSocket-afterAccept) + "]");
+    }
+
+    private String getModifiedHeader(I2PSocket handleSocket) throws IOException {
+        InputStream in = handleSocket.getInputStream();
+
+        StringBuffer command = new StringBuffer(128);
+        Properties headers = readHeaders(in, command);
+        headers.setProperty("Host", _spoofHost);
+        headers.setProperty("Connection", "close");
+        return formatHeaders(headers, command);
     }
     
     private String formatHeaders(Properties headers, StringBuffer command) {

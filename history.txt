@@ -1,4 +1,10 @@
-$Id: history.txt,v 1.215 2005/07/20 14:24:47 jrandom Exp $
+$Id: history.txt,v 1.216 2005/07/21 17:37:16 jrandom Exp $
+
+2005-07-22  jrandom
+    * Use the small thread pool for I2PTunnelHTTPServer (already used for 
+      I2PTunnelServer)
+    * Minor memory churn reduction in I2CP
+    * Small stats update
 
 2005-07-21  jrandom
     * Fix in the SDK for a bug which would manifest itself as misrouted

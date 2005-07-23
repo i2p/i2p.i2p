@@ -26,22 +26,25 @@ import net.i2p.util.Log;
  */
 public class MessageId extends DataStructureImpl {
     private final static Log _log = new Log(MessageId.class);
-    private int _messageId;
+    private long _messageId;
 
     public MessageId() {
         setMessageId(-1);
     }
+    public MessageId(long id) {
+        setMessageId(id);
+    }
 
-    public int getMessageId() {
+    public long getMessageId() {
         return _messageId;
     }
 
-    public void setMessageId(int id) {
+    public void setMessageId(long id) {
         _messageId = id;
     }
 
     public void readBytes(InputStream in) throws DataFormatException, IOException {
-        _messageId = (int) DataHelper.readLong(in, 4);
+        _messageId = DataHelper.readLong(in, 4);
     }
 
     public void writeBytes(OutputStream out) throws DataFormatException, IOException {
@@ -55,7 +58,7 @@ public class MessageId extends DataStructureImpl {
     }
 
     public int hashCode() {
-        return getMessageId();
+        return (int)getMessageId();
     }
 
     public String toString() {

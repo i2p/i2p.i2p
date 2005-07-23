@@ -56,8 +56,8 @@ class MessageReceivedJob extends JobImpl {
             _log.debug("Sending message available: " + id + " to sessionId " + _runner.getSessionId() 
                        + " (with nonce=1)", new Exception("available"));
         MessageStatusMessage msg = new MessageStatusMessage();
-        msg.setMessageId(id);
-        msg.setSessionId(_runner.getSessionId());
+        msg.setMessageId(id.getMessageId());
+        msg.setSessionId(_runner.getSessionId().getSessionId());
         msg.setSize(size);
         msg.setNonce(1);
         msg.setStatus(MessageStatusMessage.STATUS_AVAILABLE);

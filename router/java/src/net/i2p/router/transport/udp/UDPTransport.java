@@ -128,6 +128,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         _expireEvent = new ExpirePeerEvent();
         
         _context.statManager().createRateStat("udp.droppedPeer", "How long ago did we receive from a dropped peer (duration == session lifetime", "udp", new long[] { 60*60*1000, 24*60*60*1000 });
+        _context.statManager().createRateStat("udp.droppedPeerInactive", "How long ago did we receive from a dropped peer (duration == session lifetime)", "udp", new long[] { 60*60*1000, 24*60*60*1000 });
     }
     
     public void startup() {
@@ -315,6 +316,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     boolean addRemotePeerState(PeerState peer) {
         if (_log.shouldLog(Log.INFO))
             _log.info("Add remote peer state: " + peer);
+        long oldEstablishedOn = -1;
         PeerState oldPeer = null;
         if (peer.getRemotePeer() != null) {
             synchronized (_peersByIdent) {
@@ -323,6 +325,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                     // should we transfer the oldPeer's RTT/RTO/etc? nah
                     // or perhaps reject the new session?  nah, 
                     // using the new one allow easier reconnect
+                    oldEstablishedOn = oldPeer.getKeyEstablishedTime();
                 }
             }
         }
@@ -339,6 +342,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             if ( (oldPeer != null) && (oldPeer != peer) ) {
                 //_peersByRemoteHost.put(remoteString, oldPeer);
                 //return false;
+                oldEstablishedOn = oldPeer.getKeyEstablishedTime();
             }
         }
         
@@ -353,6 +357,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         
         _expireEvent.add(peer);
         
+        if (oldEstablishedOn > 0)
+            _context.statManager().addRateData("udp.alreadyConnected", oldEstablishedOn, 0);
         return true;
     }
     
@@ -367,6 +373,9 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                 long now = _context.clock().now();
                 _context.statManager().addRateData("udp.droppedPeer", now - peer.getLastReceiveTime(), now - peer.getKeyEstablishedTime());
                 _context.shitlist().shitlistRouter(peer.getRemotePeer(), "dropped after too many retries");
+            } else {
+                long now = _context.clock().now();
+                _context.statManager().addRateData("udp.droppedPeerInactive", now - peer.getLastReceiveTime(), now - peer.getKeyEstablishedTime());
             }
             synchronized (_peersByIdent) {
                 _peersByIdent.remove(peer.getRemotePeer());

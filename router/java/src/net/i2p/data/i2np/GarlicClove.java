@@ -107,19 +107,29 @@ public class GarlicClove extends DataStructureImpl {
 
     
     public void writeBytes(OutputStream out) throws DataFormatException, IOException {
-        StringBuffer error = new StringBuffer();
-        if (_instructions == null)
+        StringBuffer error = null; 
+        if (_instructions == null) {
+            if (error == null) error = new StringBuffer();
             error.append("No instructions ");
-        if (_msg == null)
+        }
+        if (_msg == null) {
+            if (error == null) error = new StringBuffer();
             error.append("No message ");
-        if (_cloveId < 0)
+        }
+        if (_cloveId < 0) {
+            if (error == null) error = new StringBuffer();
             error.append("CloveID < 0 [").append(_cloveId).append("] ");
-        if (_expiration == null)
+        }
+        if (_expiration == null) {
+            if (error == null) error = new StringBuffer();
             error.append("Expiration is null ");
-        if (_certificate == null)
+        }
+        if (_certificate == null) {
+            if (error == null) error = new StringBuffer();
             error.append("Certificate is null ");
+        }
         
-        if (error.length() > 0)
+        if ( (error != null) && (error.length() > 0) )
             throw new DataFormatException(error.toString());
 
         _instructions.writeBytes(out);

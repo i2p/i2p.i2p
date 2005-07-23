@@ -26,47 +26,45 @@ import net.i2p.util.Log;
 public class ReceiveMessageEndMessage extends I2CPMessageImpl {
     private final static Log _log = new Log(ReceiveMessageEndMessage.class);
     public final static int MESSAGE_TYPE = 7;
-    private SessionId _sessionId;
-    private MessageId _messageId;
+    private long _sessionId;
+    private long _messageId;
 
     public ReceiveMessageEndMessage() {
-        setSessionId(null);
-        setMessageId(null);
+        setSessionId(-1);
+        setMessageId(-1);
     }
 
-    public SessionId getSessionId() {
+    public long getSessionId() {
         return _sessionId;
     }
 
-    public void setSessionId(SessionId id) {
+    public void setSessionId(long id) {
         _sessionId = id;
     }
 
-    public MessageId getMessageId() {
+    public long getMessageId() {
         return _messageId;
     }
 
-    public void setMessageId(MessageId id) {
+    public void setMessageId(long id) {
         _messageId = id;
     }
 
     protected void doReadMessage(InputStream in, int size) throws I2CPMessageException, IOException {
         try {
-            _sessionId = new SessionId();
-            _sessionId.readBytes(in);
-            _messageId = new MessageId();
-            _messageId.readBytes(in);
+            _sessionId = DataHelper.readLong(in, 2);
+            _messageId = DataHelper.readLong(in, 4);
         } catch (DataFormatException dfe) {
             throw new I2CPMessageException("Unable to load the message data", dfe);
         }
     }
 
     protected byte[] doWriteMessage() throws I2CPMessageException, IOException {
-        if ((_sessionId == null) || (_messageId == null))
+        if ((_sessionId < 0) || (_messageId < 0))
             throw new I2CPMessageException("Unable to write out the message as there is not enough data");
         byte rv[] = new byte[2+4];
-        DataHelper.toLong(rv, 0, 2, _sessionId.getSessionId());
-        DataHelper.toLong(rv, 2, 4, _messageId.getMessageId());
+        DataHelper.toLong(rv, 0, 2, _sessionId);
+        DataHelper.toLong(rv, 2, 4, _messageId);
         return rv;
     }
 

@@ -78,7 +78,7 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
 
     /** class that generates new messages */
     protected I2CPMessageProducer _producer;
-    /** map of integer --> MessagePayloadMessage */
+    /** map of Long --> MessagePayloadMessage */
     private Map _availableMessages;
     
     protected I2PClientMessageHandlerMap _handlerMap;
@@ -295,7 +295,7 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
     public byte[] receiveMessage(int msgId) throws I2PSessionException {
         MessagePayloadMessage msg = null;
         synchronized (_availableMessages) {
-            msg = (MessagePayloadMessage) _availableMessages.remove(new Integer(msgId));
+            msg = (MessagePayloadMessage) _availableMessages.remove(new Long(msgId));
         }
         if (msg == null) return null;
         return msg.getPayload().getUnencryptedData();
@@ -346,9 +346,9 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
      */
     public void addNewMessage(MessagePayloadMessage msg) {
         synchronized (_availableMessages) {
-            _availableMessages.put(new Integer(msg.getMessageId().getMessageId()), msg);
+            _availableMessages.put(new Long(msg.getMessageId()), msg);
         }
-        int id = msg.getMessageId().getMessageId();
+        long id = msg.getMessageId();
         byte data[] = msg.getPayload().getUnencryptedData();
         if ((data == null) || (data.length <= 0)) {
             if (_log.shouldLog(Log.CRIT))
@@ -363,12 +363,12 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
         SimpleTimer.getInstance().addEvent(new VerifyUsage(id), 30*1000);
     }
     private class VerifyUsage implements SimpleTimer.TimedEvent {
-        private int _msgId;
-        public VerifyUsage(int id) { _msgId = id; }
+        private long _msgId;
+        public VerifyUsage(long id) { _msgId = id; }
         public void timeReached() {
             MessagePayloadMessage removed = null;
             synchronized (_availableMessages) {
-                removed = (MessagePayloadMessage)_availableMessages.remove(new Integer(_msgId));
+                removed = (MessagePayloadMessage)_availableMessages.remove(new Long(_msgId));
             }
             if (removed != null)
                 _log.log(Log.CRIT, "Message NOT removed!  id=" + _msgId + ": " + removed);
@@ -393,9 +393,9 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
             }
         }
         
-        public void available(int msgId, int size) {
+        public void available(long msgId, int size) {
             synchronized (AvailabilityNotifier.this) {
-                _pendingIds.add(new Integer(msgId));
+                _pendingIds.add(new Long(msgId));
                 _pendingSizes.add(new Integer(size));
                 AvailabilityNotifier.this.notifyAll();
             }
@@ -403,7 +403,7 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
         public void run() {
             _alive = true;
             while (_alive) {
-                Integer msgId = null;
+                Long msgId = null;
                 Integer size = null;
                 synchronized (AvailabilityNotifier.this) {
                     if (_pendingIds.size() <= 0) {
@@ -413,7 +413,7 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
                         }
                     }
                     if (_pendingIds.size() > 0) {
-                        msgId = (Integer)_pendingIds.remove(0);
+                        msgId = (Long)_pendingIds.remove(0);
                         size = (Integer)_pendingSizes.remove(0);
                     }
                 }
@@ -532,8 +532,8 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
      * Pass off the error to the listener
      */
     void propogateError(String msg, Throwable error) {
-        if (_log.shouldLog(Log.ERROR)) 
-            _log.error(getPrefix() + "Error occurred: " + msg + " - " + error.getMessage());
+        if (_log.shouldLog(Log.WARN)) 
+            _log.warn(getPrefix() + "Error occurred: " + msg + " - " + error.getMessage());
         if (_log.shouldLog(Log.WARN))
             _log.warn(getPrefix() + " cause", error);
         

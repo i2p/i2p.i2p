@@ -35,7 +35,7 @@ class MessagePayloadMessageHandler extends HandlerImpl {
             _log.debug("Handle message " + message);
         try {
             MessagePayloadMessage msg = (MessagePayloadMessage) message;
-            MessageId id = msg.getMessageId();
+            long id = msg.getMessageId();
             Payload payload = decryptPayload(msg, session);
             session.addNewMessage(msg);
 

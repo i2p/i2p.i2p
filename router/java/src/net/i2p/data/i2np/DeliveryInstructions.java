@@ -216,60 +216,94 @@ public class DeliveryInstructions extends DataStructureImpl {
         val = val | fmode;
         if (getDelayRequested())
             val = val | FLAG_DELAY;
-        _log.debug("getFlags() = " + val);
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("getFlags() = " + val);
         return val;
     }
     
     private byte[] getAdditionalInfo() throws DataFormatException {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream(64);
-        try {
-            if (getEncrypted()) {
-                if (_encryptionKey == null) throw new DataFormatException("Encryption key is not set");
-                _encryptionKey.writeBytes(baos);
-                if (_log.shouldLog(Log.DEBUG))
-                    _log.debug("IsEncrypted");
-            } else {
-                if (_log.shouldLog(Log.DEBUG))
-                    _log.debug("Is NOT Encrypted");
-            }
-            switch (getDeliveryMode()) {
-                case FLAG_MODE_LOCAL:
-                    if (_log.shouldLog(Log.DEBUG))
-                        _log.debug("mode = local");
-                    break;
-                case FLAG_MODE_DESTINATION:
-                    if (_destinationHash == null) throw new DataFormatException("Destination hash is not set");
-                    _destinationHash.writeBytes(baos);
-                    if (_log.shouldLog(Log.DEBUG))
-                        _log.debug("mode = destination, hash = " + _destinationHash);
-                    break;
-                case FLAG_MODE_ROUTER:
-                    if (_routerHash == null) throw new DataFormatException("Router hash is not set");
-                    _routerHash.writeBytes(baos);
-                    if (_log.shouldLog(Log.DEBUG))
-                        _log.debug("mode = router, routerHash = " + _routerHash);
-                    break;
-                case FLAG_MODE_TUNNEL:
-                    if ( (_routerHash == null) || (_tunnelId == null) ) throw new DataFormatException("Router hash or tunnel ID is not set");
-                    _routerHash.writeBytes(baos);
-                    _tunnelId.writeBytes(baos);
-                    if (_log.shouldLog(Log.DEBUG))
-                        _log.debug("mode = tunnel, tunnelId = " + _tunnelId.getTunnelId() 
-                                   + ", routerHash = " + _routerHash);
-                    break;
-            }
-            if (getDelayRequested()) {
-                if (_log.shouldLog(Log.DEBUG))
-                    _log.debug("delay requested: " + getDelaySeconds());
-                DataHelper.writeLong(baos, 4, getDelaySeconds());
-            } else {
-                if (_log.shouldLog(Log.DEBUG))
-                    _log.debug("delay NOT requested");
-            }
-        } catch (IOException ioe) {
-            throw new DataFormatException("Unable to write out additional info", ioe);
+        int additionalSize = 0;
+        if (getEncrypted()) {
+            if (_encryptionKey == null) throw new DataFormatException("Encryption key is not set");
+            additionalSize += SessionKey.KEYSIZE_BYTES;
         }
-        return baos.toByteArray();
+        switch (getDeliveryMode()) {
+            case FLAG_MODE_LOCAL:
+                if (_log.shouldLog(Log.DEBUG))
+                    _log.debug("mode = local");
+                break;
+            case FLAG_MODE_DESTINATION:
+                if (_destinationHash == null) throw new DataFormatException("Destination hash is not set");
+                additionalSize += Hash.HASH_LENGTH;
+                break;
+            case FLAG_MODE_ROUTER:
+                if (_routerHash == null) throw new DataFormatException("Router hash is not set");
+                additionalSize += Hash.HASH_LENGTH;
+                break;
+            case FLAG_MODE_TUNNEL:
+                if ( (_routerHash == null) || (_tunnelId == null) ) throw new DataFormatException("Router hash or tunnel ID is not set");
+                additionalSize += Hash.HASH_LENGTH;
+                additionalSize += 4; // tunnelId
+                break;
+        }
+        
+        if (getDelayRequested()) {
+            additionalSize += 4;
+        } 
+        
+        byte rv[] = new byte[additionalSize];
+        int offset = 0;
+        
+        if (getEncrypted()) {
+            if (_encryptionKey == null) throw new DataFormatException("Encryption key is not set");
+            System.arraycopy(_encryptionKey.getData(), 0, rv, offset, SessionKey.KEYSIZE_BYTES);
+            offset += SessionKey.KEYSIZE_BYTES;
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("IsEncrypted");
+        } else {
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Is NOT Encrypted");
+        }
+        switch (getDeliveryMode()) {
+            case FLAG_MODE_LOCAL:
+                if (_log.shouldLog(Log.DEBUG))
+                    _log.debug("mode = local");
+                break;
+            case FLAG_MODE_DESTINATION:
+                if (_destinationHash == null) throw new DataFormatException("Destination hash is not set");
+                System.arraycopy(_destinationHash.getData(), 0, rv, offset, Hash.HASH_LENGTH);
+                offset += Hash.HASH_LENGTH;
+                if (_log.shouldLog(Log.DEBUG))
+                    _log.debug("mode = destination, hash = " + _destinationHash);
+                break;
+            case FLAG_MODE_ROUTER:
+                if (_routerHash == null) throw new DataFormatException("Router hash is not set");
+                System.arraycopy(_routerHash.getData(), 0, rv, offset, Hash.HASH_LENGTH);
+                offset += Hash.HASH_LENGTH;
+                if (_log.shouldLog(Log.DEBUG))
+                    _log.debug("mode = router, routerHash = " + _routerHash);
+                break;
+            case FLAG_MODE_TUNNEL:
+                if ( (_routerHash == null) || (_tunnelId == null) ) throw new DataFormatException("Router hash or tunnel ID is not set");
+                System.arraycopy(_routerHash.getData(), 0, rv, offset, Hash.HASH_LENGTH);
+                offset += Hash.HASH_LENGTH;
+                DataHelper.toLong(rv, offset, 4, _tunnelId.getTunnelId());
+                offset += 4;
+                if (_log.shouldLog(Log.DEBUG))
+                    _log.debug("mode = tunnel, tunnelId = " + _tunnelId.getTunnelId() 
+                               + ", routerHash = " + _routerHash);
+                break;
+        }
+        if (getDelayRequested()) {
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("delay requested: " + getDelaySeconds());
+            DataHelper.toLong(rv, offset, 4, getDelaySeconds());
+            offset += 4;
+        } else {
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("delay NOT requested");
+        }
+        return rv;
     }
     
     public void writeBytes(OutputStream out) throws DataFormatException, IOException {

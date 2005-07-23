@@ -61,25 +61,27 @@ class ClientWriterRunner implements Runnable {
         }
     }
     public void run() {
+        List messages = new ArrayList(64); 
+        List messageTimes = new ArrayList(64);
+        List switchList = null;
+        
         while (!_runner.getIsDead()) {
-            List messages = null; 
-            List messageTimes = null;
-            
             synchronized (_dataLock) {
                 if (_messagesToWrite.size() <= 0) 
                     try { _dataLock.wait(); } catch (InterruptedException ie) {}
                 
                 if (_messagesToWrite.size() > 0) {
-                    messages = new ArrayList(_messagesToWrite.size());
-                    messageTimes = new ArrayList(_messagesToWriteTimes.size());
-                    messages.addAll(_messagesToWrite);
-                    messageTimes.addAll(_messagesToWriteTimes);
-                    _messagesToWrite.clear();
-                    _messagesToWriteTimes.clear();
+                    switchList = _messagesToWrite;
+                    _messagesToWrite = messages;
+                    messages = switchList;
+                    
+                    switchList = _messagesToWriteTimes;
+                    _messagesToWriteTimes = messageTimes;
+                    messageTimes = switchList;
                 } 
             }
             
-            if (messages != null) {
+            if (messages.size() > 0) {
                 for (int i = 0; i < messages.size(); i++) {
                     I2CPMessage msg = (I2CPMessage)messages.get(i);
                     Long when = (Long)messageTimes.get(i);
@@ -92,7 +94,9 @@ class ClientWriterRunner implements Runnable {
                                    + (_context.clock().now()-when.longValue()) + " for " 
                                    + msg.getClass().getName());
                 }
-            } 
+            }
+            messages.clear();
+            messageTimes.clear();
         }
     }
 }

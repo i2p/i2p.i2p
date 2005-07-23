@@ -46,7 +46,7 @@ class MessageStatusMessageHandler extends HandlerImpl {
                 }
                 return;
             case MessageStatusMessage.STATUS_SEND_ACCEPTED:
-                session.receiveStatus(msg.getMessageId().getMessageId(), msg.getNonce(), msg.getStatus());
+                session.receiveStatus((int)msg.getMessageId(), msg.getNonce(), msg.getStatus());
                 // noop
                 return;
             case MessageStatusMessage.STATUS_SEND_BEST_EFFORT_SUCCESS:
@@ -54,14 +54,14 @@ class MessageStatusMessageHandler extends HandlerImpl {
                 if (_log.shouldLog(Log.INFO))
                     _log.info("Message delivery succeeded for message " + msg.getMessageId());
                 //if (!skipStatus)
-                session.receiveStatus(msg.getMessageId().getMessageId(), msg.getNonce(), msg.getStatus());
+                session.receiveStatus((int)msg.getMessageId(), msg.getNonce(), msg.getStatus());
                 return;
             case MessageStatusMessage.STATUS_SEND_BEST_EFFORT_FAILURE:
             case MessageStatusMessage.STATUS_SEND_GUARANTEED_FAILURE:
                 if (_log.shouldLog(Log.INFO))
                     _log.info("Message delivery FAILED for message " + msg.getMessageId());
                 //if (!skipStatus)
-                session.receiveStatus(msg.getMessageId().getMessageId(), msg.getNonce(), msg.getStatus());
+                session.receiveStatus((int)msg.getMessageId(), msg.getNonce(), msg.getStatus());
                 return;
             default:
                 if (_log.shouldLog(Log.ERROR))

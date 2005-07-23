@@ -168,9 +168,11 @@ public class UDPSender {
                         }
                         long sendTime = _context.clock().now() - before;
                         _context.statManager().addRateData("udp.socketSendTime", sendTime, packet.getLifetime());
-                        _context.statManager().addRateData("udp.sendBWThrottleTime", afterBW - acquireTime, acquireTime - packet.getBegin());
+                        long throttleTime = afterBW - acquireTime;
+                        if (throttleTime > 10)
+                            _context.statManager().addRateData("udp.sendBWThrottleTime", throttleTime, acquireTime - packet.getBegin());
                         if (packet.getMarkedType() == 1)
-                            _context.statManager().addRateData("udp.sendACKTime", afterBW - acquireTime, packet.getLifetime());
+                            _context.statManager().addRateData("udp.sendACKTime", throttleTime, packet.getLifetime());
                         _context.statManager().addRateData("udp.pushTime", packet.getLifetime(), packet.getLifetime());
                         _context.statManager().addRateData("udp.sendPacketSize", size, packet.getLifetime());
                     } catch (IOException ioe) {

@@ -12,6 +12,7 @@ package net.i2p.data.i2cp;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 
 import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
@@ -26,8 +27,8 @@ import net.i2p.util.Log;
 public class MessageStatusMessage extends I2CPMessageImpl {
     private final static Log _log = new Log(SessionStatusMessage.class);
     public final static int MESSAGE_TYPE = 22;
-    private SessionId _sessionId;
-    private MessageId _messageId;
+    private long _sessionId;
+    private long _messageId;
     private long _nonce;
     private long _size;
     private int _status;
@@ -40,18 +41,18 @@ public class MessageStatusMessage extends I2CPMessageImpl {
     public final static int STATUS_SEND_GUARANTEED_FAILURE = 5;
 
     public MessageStatusMessage() {
-        setSessionId(null);
+        setSessionId(-1);
         setStatus(-1);
-        setMessageId(null);
+        setMessageId(-1);
         setSize(-1);
         setNonce(-1);
     }
 
-    public SessionId getSessionId() {
+    public long getSessionId() {
         return _sessionId;
     }
 
-    public void setSessionId(SessionId id) {
+    public void setSessionId(long id) {
         _sessionId = id;
     }
 
@@ -63,11 +64,11 @@ public class MessageStatusMessage extends I2CPMessageImpl {
         _status = status;
     }
 
-    public MessageId getMessageId() {
+    public long getMessageId() {
         return _messageId;
     }
 
-    public void setMessageId(MessageId id) {
+    public void setMessageId(long id) {
         _messageId = id;
     }
 
@@ -108,10 +109,8 @@ public class MessageStatusMessage extends I2CPMessageImpl {
 
     protected void doReadMessage(InputStream in, int size) throws I2CPMessageException, IOException {
         try {
-            _sessionId = new SessionId();
-            _sessionId.readBytes(in);
-            _messageId = new MessageId();
-            _messageId.readBytes(in);
+            _sessionId = DataHelper.readLong(in, 2);
+            _messageId = DataHelper.readLong(in, 4);
             _status = (int) DataHelper.readLong(in, 1);
             _size = DataHelper.readLong(in, 4);
             _nonce = DataHelper.readLong(in, 4);
@@ -120,20 +119,32 @@ public class MessageStatusMessage extends I2CPMessageImpl {
         }
     }
 
-    protected byte[] doWriteMessage() throws I2CPMessageException, IOException {
-        if ((_sessionId == null) || (_messageId == null) || (_status < 0) || (_nonce <= 0))
-            throw new I2CPMessageException("Unable to write out the message as there is not enough data");
-        ByteArrayOutputStream os = new ByteArrayOutputStream(64);
+    
+    /** 
+     * Override to reduce mem churn
+     */
+    public void writeMessage(OutputStream out) throws I2CPMessageException, IOException {
+        int len = 2 + // sessionId
+                  4 + // messageId
+                  1 + // status
+                  4 + // size
+                  4; // nonce
+        
         try {
-            _sessionId.writeBytes(os);
-            _messageId.writeBytes(os);
-            DataHelper.writeLong(os, 1, _status);
-            DataHelper.writeLong(os, 4, _size);
-            DataHelper.writeLong(os, 4, _nonce);
+            DataHelper.writeLong(out, 4, len);
+            DataHelper.writeLong(out, 1, getType());
+            DataHelper.writeLong(out, 2, _sessionId);
+            DataHelper.writeLong(out, 4, _messageId);
+            DataHelper.writeLong(out, 1, _status);
+            DataHelper.writeLong(out, 4, _size);
+            DataHelper.writeLong(out, 4, _nonce);
         } catch (DataFormatException dfe) {
-            throw new I2CPMessageException("Error writing out the message data", dfe);
+            throw new I2CPMessageException("Unable to write the message length or type", dfe);
         }
-        return os.toByteArray();
+    }
+    
+    protected byte[] doWriteMessage() throws I2CPMessageException, IOException {
+        throw new UnsupportedOperationException("This shouldn't be called... use writeMessage(out)");
     }
 
     public int getType() {

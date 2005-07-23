@@ -1146,6 +1146,8 @@ public class I2PTunnel implements Logging, EventDispatcher {
     }
     
     private String getPrefix() { return '[' + _tunnelId + "]: "; }
+    
+    public I2PAppContext getContext() { return _context; }
 
     /**
      * Call this whenever we lose touch with the router involuntarily (aka the router

@@ -12,6 +12,7 @@ package net.i2p.data.i2cp;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 
 import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
@@ -26,50 +27,62 @@ import net.i2p.util.Log;
 public class ReceiveMessageBeginMessage extends I2CPMessageImpl {
     private final static Log _log = new Log(ReceiveMessageBeginMessage.class);
     public final static int MESSAGE_TYPE = 6;
-    private SessionId _sessionId;
-    private MessageId _messageId;
+    private long _sessionId;
+    private long _messageId;
 
     public ReceiveMessageBeginMessage() {
-        setSessionId(null);
-        setMessageId(null);
+        setSessionId(-1);
+        setMessageId(-1);
     }
 
-    public SessionId getSessionId() {
+    public long getSessionId() {
         return _sessionId;
     }
 
-    public void setSessionId(SessionId id) {
+    public void setSessionId(long id) {
         _sessionId = id;
     }
 
-    public MessageId getMessageId() {
+    public long getMessageId() {
         return _messageId;
     }
 
-    public void setMessageId(MessageId id) {
+    public void setMessageId(long id) {
         _messageId = id;
     }
 
     protected void doReadMessage(InputStream in, int size) throws I2CPMessageException, IOException {
         try {
-            _sessionId = new SessionId();
-            _sessionId.readBytes(in);
-            _messageId = new MessageId();
-            _messageId.readBytes(in);
+            _sessionId = DataHelper.readLong(in, 2);
+            _messageId = DataHelper.readLong(in, 4);
         } catch (DataFormatException dfe) {
             throw new I2CPMessageException("Unable to load the message data", dfe);
         }
     }
 
     protected byte[] doWriteMessage() throws I2CPMessageException, IOException {
-        if ((_sessionId == null) || (_messageId == null))
-            throw new I2CPMessageException("Unable to write out the message as there is not enough data");
-        byte rv[] = new byte[2+4];
-        DataHelper.toLong(rv, 0, 2, _sessionId.getSessionId());
-        DataHelper.toLong(rv, 2, 4, _messageId.getMessageId());
-        return rv;
+        throw new UnsupportedOperationException("This shouldn't be called... use writeMessage(out)");
     }
 
+    
+    /** 
+     * Override to reduce mem churn
+     */
+    public void writeMessage(OutputStream out) throws I2CPMessageException, IOException {
+        int len = 2 + // sessionId
+                  4; // messageId
+        
+        try {
+            DataHelper.writeLong(out, 4, len);
+            DataHelper.writeLong(out, 1, getType());
+            DataHelper.writeLong(out, 2, _sessionId);
+            DataHelper.writeLong(out, 4, _messageId);
+        } catch (DataFormatException dfe) {
+            throw new I2CPMessageException("Unable to write the message length or type", dfe);
+        }
+    }
+    
+    
     public int getType() {
         return MESSAGE_TYPE;
     }

@@ -27,29 +27,29 @@ import net.i2p.util.Log;
 public class MessagePayloadMessage extends I2CPMessageImpl {
     private final static Log _log = new Log(MessagePayloadMessage.class);
     public final static int MESSAGE_TYPE = 31;
-    private SessionId _sessionId;
-    private MessageId _messageId;
+    private long _sessionId;
+    private long _messageId;
     private Payload _payload;
 
     public MessagePayloadMessage() {
-        setSessionId(null);
-        setMessageId(null);
+        setSessionId(-1);
+        setMessageId(-1);
         setPayload(null);
     }
 
-    public SessionId getSessionId() {
+    public long getSessionId() {
         return _sessionId;
     }
 
-    public void setSessionId(SessionId id) {
+    public void setSessionId(long id) {
         _sessionId = id;
     }
 
-    public MessageId getMessageId() {
+    public long getMessageId() {
         return _messageId;
     }
 
-    public void setMessageId(MessageId id) {
+    public void setMessageId(long id) {
         _messageId = id;
     }
 
@@ -63,10 +63,8 @@ public class MessagePayloadMessage extends I2CPMessageImpl {
 
     protected void doReadMessage(InputStream in, int size) throws I2CPMessageException, IOException {
         try {
-            _sessionId = new SessionId();
-            _sessionId.readBytes(in);
-            _messageId = new MessageId();
-            _messageId.readBytes(in);
+            _sessionId = DataHelper.readLong(in, 2);
+            _messageId = DataHelper.readLong(in, 4);
             _payload = new Payload();
             _payload.readBytes(in);
         } catch (DataFormatException dfe) {
@@ -84,9 +82,9 @@ public class MessagePayloadMessage extends I2CPMessageImpl {
      *
      */
     public void writeMessage(OutputStream out) throws I2CPMessageException, IOException {
-        if (_sessionId == null)
+        if (_sessionId <= 0)
             throw new I2CPMessageException("Unable to write out the message, as the session ID has not been defined");
-        if (_messageId == null)
+        if (_messageId < 0)
             throw new I2CPMessageException("Unable to write out the message, as the message ID has not been defined");
         if (_payload == null)
             throw new I2CPMessageException("Unable to write out the message, as the payload has not been defined");
@@ -95,8 +93,8 @@ public class MessagePayloadMessage extends I2CPMessageImpl {
         try {
             DataHelper.writeLong(out, 4, size);
             DataHelper.writeLong(out, 1, getType());
-            DataHelper.writeLong(out, 2, _sessionId.getSessionId());
-            DataHelper.writeLong(out, 4, _messageId.getMessageId());
+            DataHelper.writeLong(out, 2, _sessionId);
+            DataHelper.writeLong(out, 4, _messageId);
             DataHelper.writeLong(out, 4, _payload.getSize());
             out.write(_payload.getEncryptedData());
         } catch (DataFormatException dfe) {

@@ -292,8 +292,8 @@ public class ClientConnectionRunner {
             _log.debug("Acking message send [accepted]" + id + " / " + nonce + " for sessionId " 
                        + _sessionId, new Exception("sendAccepted"));
         MessageStatusMessage status = new MessageStatusMessage();
-        status.setMessageId(id); 
-        status.setSessionId(_sessionId);
+        status.setMessageId(id.getMessageId()); 
+        status.setSessionId(_sessionId.getSessionId());
         status.setSize(0L);
         status.setNonce(nonce);
         status.setStatus(MessageStatusMessage.STATUS_SEND_ACCEPTED);
@@ -491,8 +491,8 @@ public class ClientConnectionRunner {
             if (_dead) return;
 
             MessageStatusMessage msg = new MessageStatusMessage();
-            msg.setMessageId(_messageId);
-            msg.setSessionId(_sessionId);
+            msg.setMessageId(_messageId.getMessageId());
+            msg.setSessionId(_sessionId.getSessionId());
             msg.setNonce(2);
             msg.setSize(0);
             if (_success) 

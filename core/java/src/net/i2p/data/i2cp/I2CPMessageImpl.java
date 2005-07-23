@@ -61,6 +61,7 @@ public abstract class I2CPMessageImpl extends DataStructureImpl implements I2CPM
                                            + " class: " + getClass().getName() + ")");
         if (length < 0) throw new IOException("Negative payload size");
 
+        /*
         byte buf[] = new byte[length];
         int read = DataHelper.read(in, buf);
         if (read != length)
@@ -69,6 +70,8 @@ public abstract class I2CPMessageImpl extends DataStructureImpl implements I2CPM
         ByteArrayInputStream bis = new ByteArrayInputStream(buf);
 
         doReadMessage(bis, length);
+         */
+        doReadMessage(in, length);
     }
 
     /**
