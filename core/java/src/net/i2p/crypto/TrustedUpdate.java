@@ -287,15 +287,20 @@ jP69nPbh4KLGhF+SD0+0bW4=
 
         try {
             fileInputStream = new FileInputStream(signedFile);
-            byte[] data = new byte[VERSION_BYTES];
-            int bytesRead = DataHelper.read(fileInputStream, data, Signature.SIGNATURE_BYTES, VERSION_BYTES);
-
-            if (bytesRead != VERSION_BYTES)
+            long skipped = fileInputStream.skip(Signature.SIGNATURE_BYTES);
+            if (skipped != Signature.SIGNATURE_BYTES)
                 return "";
+            byte[] data = new byte[VERSION_BYTES];
+            int bytesRead = DataHelper.read(fileInputStream, data);
+
+            if (bytesRead != VERSION_BYTES) {
+                return "";
+            }
 
             for (int i = 0; i < VERSION_BYTES; i++) 
-                if (data[i] == 0x00)
+                if (data[i] == 0x00) {
                     return new String(data, 0, i, "UTF-8");
+                }
 
             return new String(data, "UTF-8");
         } catch (UnsupportedEncodingException uee) {
