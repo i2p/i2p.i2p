@@ -30,9 +30,9 @@ import net.i2p.util.Log;
  public class MessagePayloadMessageTest extends StructureTest {
     public DataStructure createDataStructure() throws DataFormatException {
         MessagePayloadMessage msg = new MessagePayloadMessage();
-        msg.setMessageId((MessageId)(new MessageIdTest()).createDataStructure());
+        msg.setMessageId(123);
         msg.setPayload((Payload)(new PayloadTest()).createDataStructure());
-        msg.setSessionId((SessionId)(new SessionIdTest()).createDataStructure());
+        msg.setSessionId(321);
         return msg; 
     }
     public DataStructure createStructureToRead() { return new MessagePayloadMessage(); }

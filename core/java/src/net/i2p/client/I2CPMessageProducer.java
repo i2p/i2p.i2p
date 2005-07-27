@@ -121,7 +121,7 @@ class I2CPMessageProducer {
      * garlic crypto added by the router)
      *
      */
-    static final boolean END_TO_END_CRYPTO = true;
+    static final boolean END_TO_END_CRYPTO = false;
     
     /**
      * Create a new signed payload and send it off to the destination

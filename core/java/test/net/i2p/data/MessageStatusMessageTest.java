@@ -22,8 +22,8 @@ import net.i2p.data.i2cp.SessionId;
 public class MessageStatusMessageTest extends StructureTest {
     public DataStructure createDataStructure() throws DataFormatException {
         MessageStatusMessage msg = new MessageStatusMessage();
-        msg.setSessionId((SessionId)(new SessionIdTest()).createDataStructure());
-        msg.setMessageId((MessageId)(new MessageIdTest()).createDataStructure());
+        msg.setSessionId(42);
+        msg.setMessageId(41);
         msg.setSize(1024*1024*42L);
         msg.setStatus(MessageStatusMessage.STATUS_AVAILABLE);
         msg.setNonce(1);

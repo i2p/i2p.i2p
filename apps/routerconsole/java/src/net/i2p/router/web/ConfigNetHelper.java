@@ -24,13 +24,30 @@ public class ConfigNetHelper {
     /** copied from various private TCP components */
     public final static String PROP_I2NP_TCP_HOSTNAME = "i2np.tcp.hostname";
     public final static String PROP_I2NP_TCP_PORT = "i2np.tcp.port";
+    public final static String PROP_I2NP_UDP_PORT = "i2np.udp.port";
+    public final static String PROP_I2NP_INTERNAL_UDP_PORT = "i2np.udp.internalPort";
     
     public String getHostname() {
         return _context.getProperty(PROP_I2NP_TCP_HOSTNAME);
     }
-    public String getPort() {
+    public String getTcpPort() {
         int port = 8887;
         String val = _context.getProperty(PROP_I2NP_TCP_PORT);
+        if (val != null) {
+            try {
+                port = Integer.parseInt(val);
+            } catch (NumberFormatException nfe) {
+                // ignore, use default from above
+            }
+        }
+        return "" + port;
+    }
+    
+    public String getUdpPort() {
+        int port = 8887;
+        String val = _context.getProperty(PROP_I2NP_UDP_PORT);
+        if (val == null)
+            val = _context.getProperty(PROP_I2NP_INTERNAL_UDP_PORT);
         if (val != null) {
             try {
                 port = Integer.parseInt(val);

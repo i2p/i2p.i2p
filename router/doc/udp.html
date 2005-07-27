@@ -1,4 +1,4 @@
-<code>$Id: udp.html,v 1.12 2005/04/09 18:15:53 jrandom Exp $</code>
+<code>$Id: udp.html,v 1.13 2005/05/01 15:08:08 jrandom Exp $</code>
 
 <h1>Secure Semireliable UDP (SSU)</h1>
 <b>DRAFT</b>
@@ -141,7 +141,7 @@ around briefly, to address packet loss and reordering.</p>
         <li>4 byte timestamp (seconds from the epoch) for use in the DSA 
             signature</li>
         <li>40 byte DSA signature of the critical exchanged data 
-            (Alice's IP + Alice's port + Bob's IP + Bob's port + Alice's
+            (X + Y + Alice's IP + Alice's port + Bob's IP + Bob's port + Alice's
             new relay tag + Bob's signed on time), encrypted with another 
             layer of encryption using the negotiated sessionKey.  The IV 
             is reused here.</li>
@@ -197,7 +197,7 @@ bits 4-7: total identity fragments</pre></li>
         <li>on the last identity fragment, the signed on time is
             included after the identity fragment, and the last 40 
             bytes contain the DSA signature of the critical exchanged 
-            data (Alice's IP + Alice's port + Bob's IP + Bob's port
+            data (X + Y + Alice's IP + Alice's port + Bob's IP + Bob's port
             + Alice's new relay key + Alice's signed on time)</li>
         </ul></td></tr>
 <tr><td align="right" valign="top"><b>Key used:</b></td>

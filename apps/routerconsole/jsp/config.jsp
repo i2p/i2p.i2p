@@ -28,13 +28,13 @@
  <input type="hidden" name="nonce" value="<%=System.getProperty("net.i2p.router.web.ConfigNetHandler.nonce")%>" />
  <input type="hidden" name="action" value="blah" />
 
- TCP port:
-     <input name="port" type="text" size="4" value="<jsp:getProperty name="nethelper" property="port" />" /> <br />
+ UDP port: <i><jsp:getProperty name="nethelper" property="udpPort" /></i><br />
+<!-- <input name="udpPort" type="text" size="5" value="<jsp:getProperty name="nethelper" property="udpPort" />" /><br /> -->
+<b>You must poke a hole in your firewall or NAT (if applicable) to receive new inbound UDP packets on 
+this port from arbitrary peers (this requirement will be removed in i2p 0.6.1, but is necessary now)</b><br />
+ TCP port: <input name="tcpPort" type="text" size="5" value="<jsp:getProperty name="nethelper" property="tcpPort" />" /> <br />
  <b>You must poke a hole in your firewall or NAT (if applicable) so that you can receive inbound TCP
- connections on it.</b>  Nothing will work if you don't.  Sorry.  We know how to make it so
- this restriction won't be necessary, but its later on in the 
- <a href="http://www.i2p.net/roadmap">roadmap</a> and we only have so many coder-hours (but if you want
- to help, please <a href="http://www.i2p.net/getinvolved">get involved!</a>)
+ connections on it (this requirement will be removed in i2p 0.6.1, but is necessary now)</b>
  <hr />
  
  <b>Bandwidth limiter</b><br />
@@ -57,7 +57,7 @@
     packets on port 123 to one of the pool.ntp.org machines (or some other SNTP server).</i>
  <hr />
  <input type="submit" name="save" value="Save changes" /> <input type="reset" value="Cancel" /><br />
- <i>Changing the TCP port will force a 'soft restart' - dropping your connections and clients as 
+ <i>Changing the TCP or UDP port will force a 'soft restart' - dropping your connections and clients as 
     if the router was stopped and restarted.  <b>Please be patient</b> - it may take
     a few seconds to complete.</i>
  </form>
@@ -73,6 +73,13 @@
  "i2p.reseedURL=someURL" (e.g. java -Di2p.reseedURL=http://dev.i2p.net/i2pdb/ ...).  You can
  also do it manually by getting routerInfo-*.dat files from someone (a friend, someone on IRC,
  whatever) and saving them to your netDb/ directory.</p>
+<p>
+ With the SSU transport, the internal UDP port may be different from the external 
+ UDP port (in case of a firewall/NAT) - the UDP port field above specifies the 
+ external one and assumes they are the same, but if you want to set the internal 
+ port to something else, you can add "i2np.udp.internalPort=1234" to the
+ <a href="configadvanced.jsp">advanced</a> config and restart the router.
+</p>
 </div>
 
 </body>

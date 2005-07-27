@@ -555,8 +555,12 @@ public class ConnectionHandler {
         long clockSkew = 0;
         boolean sigOk = false;
         
+        // our public == Y, since we are receiving the connection
+        byte X[] = builder.getPeerPublicValueBytes();
+        byte Y[] = builder.getMyPublicValueBytes();
+        
         // read: routerInfo + currentTime 
-        //       + S(routerInfo + currentTime + nonce + nextTag, routerIdent.signingKey)
+        //       + S(routerInfo + currentTime + nonce + nextTag + X + Y, routerIdent.signingKey)
         try {
             RouterInfo info = new RouterInfo();
             info.readBytes(_rawIn);
@@ -569,6 +573,8 @@ public class ConnectionHandler {
             DataHelper.writeDate(baos, now);
             baos.write(_nonce.getData());
             baos.write(_nextConnectionTag.getData());
+            baos.write(X);
+            baos.write(Y);
             
             sigOk = _context.dsa().verifySignature(sig, baos.toByteArray(), 
                                                         info.getIdentity().getSigningPublicKey());
@@ -589,7 +595,7 @@ public class ConnectionHandler {
         boolean reachable = verifyReachability();
         
         // send: routerInfo + status + properties 
-        //       + S(routerInfo + status + properties + nonce + nextTag, routerIdent.signingKey)
+        //       + S(routerInfo + status + properties + nonce + nextTag + X + Y, routerIdent.signingKey)
         try {
             ByteArrayOutputStream baos = new ByteArrayOutputStream(512);
             _context.router().getRouterInfo().writeBytes(baos);
@@ -629,6 +635,8 @@ public class ConnectionHandler {
             
             baos.write(_nonce.getData());
             baos.write(_nextConnectionTag.getData());
+            baos.write(X);
+            baos.write(Y);
             
             Signature sig = _context.dsa().sign(baos.toByteArray(), 
                                                 _context.keyManager().getSigningPrivateKey());

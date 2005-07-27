@@ -63,8 +63,7 @@ public class EstablishmentManager {
     /**
      * Grab the active establishing state
      */
-    InboundEstablishState getInboundState(InetAddress fromHost, int fromPort) {
-        RemoteHostId from = new RemoteHostId(fromHost.getAddress(), fromPort);
+    InboundEstablishState getInboundState(RemoteHostId from) {
         synchronized (_inboundStates) {
             InboundEstablishState state = (InboundEstablishState)_inboundStates.get(from);
             if ( (state == null) && (_log.shouldLog(Log.DEBUG)) )
@@ -73,8 +72,7 @@ public class EstablishmentManager {
         }
     }
     
-    OutboundEstablishState getOutboundState(InetAddress fromHost, int fromPort) {
-        RemoteHostId from = new RemoteHostId(fromHost.getAddress(), fromPort);
+    OutboundEstablishState getOutboundState(RemoteHostId from) {
         synchronized (_outboundStates) {
             OutboundEstablishState state = (OutboundEstablishState)_outboundStates.get(from);
             if ( (state == null) && (_log.shouldLog(Log.DEBUG)) )
@@ -121,12 +119,12 @@ public class EstablishmentManager {
      * Got a SessionRequest (initiates an inbound establishment)
      *
      */
-    void receiveSessionRequest(RemoteHostId from, InetAddress host, int port, UDPPacketReader reader) {
+    void receiveSessionRequest(RemoteHostId from, UDPPacketReader reader) {
         InboundEstablishState state = null;
         synchronized (_inboundStates) {
             state = (InboundEstablishState)_inboundStates.get(from);
             if (state == null) {
-                state = new InboundEstablishState(_context, host, port, _transport.getLocalPort());
+                state = new InboundEstablishState(_context, from.getIP(), from.getPort(), _transport.getLocalPort());
                 _inboundStates.put(from, state);
             }
         }

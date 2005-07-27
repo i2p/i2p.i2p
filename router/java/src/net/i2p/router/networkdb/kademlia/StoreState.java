@@ -21,6 +21,7 @@ class StoreState {
     private HashSet _successfulExploratoryPeers;
     private HashSet _failedPeers;
     private HashSet _attemptedPeers;
+    private int _completeCount;
     private volatile long _completed;
     private volatile long _started;
 
@@ -34,8 +35,10 @@ class StoreState {
         _pendingPeers = new HashSet(16);
         _pendingPeerTimes = new HashMap(16);
         _attemptedPeers = new HashSet(16);
-        if (toSkip != null)
+        if (toSkip != null) {
             _attemptedPeers.addAll(toSkip);
+            _completeCount = toSkip.size();
+        }
         _failedPeers = new HashSet(16);
         _successfulPeers = new HashSet(16);
         _successfulExploratoryPeers = new HashSet(16);
@@ -75,6 +78,7 @@ class StoreState {
         if (completed)
             _completed = _context.clock().now();
     }
+    public int getCompleteCount() { return _completeCount; }
 
     public long getWhenStarted() { return _started; }
     public long getWhenCompleted() { return _completed; }
@@ -110,6 +114,7 @@ class StoreState {
         synchronized (_successfulPeers) {
             _successfulPeers.add(peer);
         }
+        _completeCount++;
         return rv;
     }
 

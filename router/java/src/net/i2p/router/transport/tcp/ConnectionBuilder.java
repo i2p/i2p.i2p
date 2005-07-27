@@ -529,8 +529,12 @@ public class ConnectionBuilder {
             return false;
         }
         
+        // our public == X, since we are establishing the connection
+        byte X[] = builder.getMyPublicValueBytes();
+        byte Y[] = builder.getPeerPublicValueBytes();
+        
         // send: routerInfo + currentTime 
-        //       + S(routerInfo + currentTime + nonce + nextTag, routerIdent.signingKey)
+        //       + S(routerInfo + currentTime + nonce + nextTag + X + Y, routerIdent.signingKey)
         try {
             ByteArrayOutputStream baos = new ByteArrayOutputStream(512);
             _context.router().getRouterInfo().writeBytes(baos);
@@ -540,6 +544,8 @@ public class ConnectionBuilder {
             
             baos.write(_nonce.getData());
             baos.write(_nextConnectionTag.getData());
+            baos.write(X);
+            baos.write(Y);
             Signature sig = _context.dsa().sign(baos.toByteArray(), 
                                                 _context.keyManager().getSigningPrivateKey());
             
@@ -556,7 +562,7 @@ public class ConnectionBuilder {
         }
         
         // read: routerInfo + status + properties 
-        //       + S(routerInfo + status + properties + nonce + nextTag, routerIdent.signingKey)
+        //       + S(routerInfo + status + properties + nonce + nextTag + X + Y, routerIdent.signingKey)
         try {
             RouterInfo peer = new RouterInfo();
             peer.readBytes(_rawIn);
@@ -578,6 +584,8 @@ public class ConnectionBuilder {
             DataHelper.writeProperties(baos, props);
             baos.write(_nonce.getData());
             baos.write(_nextConnectionTag.getData());
+            baos.write(X);
+            baos.write(Y);
             ok = _context.dsa().verifySignature(sig, baos.toByteArray(), 
                                                 peer.getIdentity().getSigningPublicKey());
             

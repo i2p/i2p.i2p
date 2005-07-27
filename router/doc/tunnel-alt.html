@@ -1,4 +1,4 @@
-<code>$Id: tunnel-alt.html,v 1.7 2005/02/16 19:48:18 jrandom Exp $</code>
+<code>$Id: tunnel-alt.html,v 1.8 2005/07/07 16:16:57 jrandom Exp $</code>
 <pre>
 1) <a href="#tunnel.overview">Tunnel overview</a>
 2) <a href="#tunnel.operation">Tunnel operation</a>
@@ -173,9 +173,12 @@ the initial preprocessed data.</p>
 the same previous hop as before (initialized when the first message comes through
 the tunnel).  If the previous peer is a different router, or if the message has
 already been seen, the message is dropped.  The participant then encrypts the 
-data with AES256/CBC using the participant's layer key and the received IV, 
-updates the IV by encrypting it with AES256/ECB using the participant's IV key,
-then forwards the tuple {nextTunnelId, nextIV, encryptedData} to the next hop.</p>
+received IV with AES256/ECB using their IV key to determine the current IV, uses 
+that IV with the participant's layer key to encrypt the data, encrypts the 
+current IV with AES256/ECB using their IV key again, then forwards the tuple 
+{nextTunnelId, nextIV, encryptedData} to the next hop.  This double encryption
+of the IV (both before and after use) help address a certain class of
+confirmation attacks.</p>
 
 <p>Duplicate message detection is handled by a decaying Bloom filter on message
 IVs.  Each router maintains a single Bloom filter to contain the XOR of the IV and

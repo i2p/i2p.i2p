@@ -541,10 +541,11 @@ public class PeerState {
             }
         }
 
-        _context.statManager().addRateData("udp.sendACKPartial", partialIncluded, rv.size() - partialIncluded);
         _lastACKSend = _context.clock().now();
         if (rv == null)
             rv = Collections.EMPTY_LIST;
+        if (partialIncluded > 0)
+            _context.statManager().addRateData("udp.sendACKPartial", partialIncluded, rv.size() - partialIncluded);
         return rv;
     }
     

@@ -25,9 +25,13 @@ public class DHSessionKeyBuilderTest extends TestCase {
             DHSessionKeyBuilder builder1 = new DHSessionKeyBuilder();
             DHSessionKeyBuilder builder2 = new DHSessionKeyBuilder();
             BigInteger pub1 = builder1.getMyPublicValue();
-            builder2.setPeerPublicValue(pub1);
             BigInteger pub2 = builder2.getMyPublicValue();
-            builder1.setPeerPublicValue(pub2);
+            try {
+                builder2.setPeerPublicValue(pub1);
+                builder1.setPeerPublicValue(pub2);
+            } catch (DHSessionKeyBuilder.InvalidPublicParameterException ippe) {
+                assertTrue(ippe.getMessage(), true);
+            }
             SessionKey key1 = builder1.getSessionKey();
             SessionKey key2 = builder2.getSessionKey();
 

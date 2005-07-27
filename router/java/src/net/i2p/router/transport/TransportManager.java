@@ -34,6 +34,7 @@ public class TransportManager implements TransportEventListener {
 
     private final static String PROP_DISABLE_TCP = "i2np.tcp.disable";
     private final static String PROP_ENABLE_UDP = "i2np.udp.enable";
+    private static final String DEFAULT_ENABLE_UDP = "true";
     
     public TransportManager(RouterContext context) {
         _context = context;
@@ -63,7 +64,9 @@ public class TransportManager implements TransportEventListener {
             _transports.add(t);
         }
         String enableUDP = _context.router().getConfigSetting(PROP_ENABLE_UDP);
-        if ( (enableUDP != null) && (Boolean.valueOf(enableUDP).booleanValue())) {
+        if (enableUDP == null)
+            enableUDP = DEFAULT_ENABLE_UDP;
+        if ("true".equalsIgnoreCase(enableUDP)) {
             UDPTransport udp = new UDPTransport(_context);
             udp.setListener(this);
             _transports.add(udp);

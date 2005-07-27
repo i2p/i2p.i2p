@@ -100,13 +100,12 @@ public class PacketHandler {
     private void handlePacket(UDPPacketReader reader, UDPPacket packet) {
         if (packet == null) return;
         
-        InetAddress remAddr = packet.getPacket().getAddress();
-        int remPort = packet.getPacket().getPort();
-        PeerState state = _transport.getPeerState(remAddr, remPort);
+        RemoteHostId rem = packet.getRemoteHost();
+        PeerState state = _transport.getPeerState(rem);
         if (state == null) {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Packet received is not for a connected peer");
-            InboundEstablishState est = _establisher.getInboundState(remAddr, remPort);
+            InboundEstablishState est = _establisher.getInboundState(rem);
             if (est != null) {
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("Packet received IS for an inbound establishment");
@@ -114,7 +113,7 @@ public class PacketHandler {
             } else {
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("Packet received is not for an inbound establishment");
-                OutboundEstablishState oest = _establisher.getOutboundState(remAddr, remPort);
+                OutboundEstablishState oest = _establisher.getOutboundState(rem);
                 if (oest != null) {
                     if (_log.shouldLog(Log.DEBUG))
                         _log.debug("Packet received IS for an outbound establishment");
@@ -152,9 +151,7 @@ public class PacketHandler {
                         _log.info("Validation with existing con failed, but validation as reestablish/stray passed");
                     packet.decrypt(_transport.getIntroKey());
                 } else {
-                    InetAddress remAddr = packet.getPacket().getAddress();
-                    int remPort = packet.getPacket().getPort();
-                    InboundEstablishState est = _establisher.getInboundState(remAddr, remPort);
+                    InboundEstablishState est = _establisher.getInboundState(packet.getRemoteHost());
                     if (est != null) {
                         if (_log.shouldLog(Log.DEBUG))
                             _log.debug("Packet from an existing peer IS for an inbound establishment");
@@ -304,13 +301,14 @@ public class PacketHandler {
         
         _context.statManager().addRateData("udp.receivePacketSkew", skew, packet.getLifetime());
         
-        InetAddress fromHost = packet.getPacket().getAddress();
-        int fromPort = packet.getPacket().getPort();
-        RemoteHostId from = new RemoteHostId(fromHost.getAddress(), fromPort);
+        //InetAddress fromHost = packet.getPacket().getAddress();
+        //int fromPort = packet.getPacket().getPort();
+        //RemoteHostId from = new RemoteHostId(fromHost.getAddress(), fromPort);
+        RemoteHostId from = packet.getRemoteHost();
         
         switch (reader.readPayloadType()) {
             case UDPPacket.PAYLOAD_TYPE_SESSION_REQUEST:
-                _establisher.receiveSessionRequest(from, fromHost, fromPort, reader);
+                _establisher.receiveSessionRequest(from, reader);
                 break;
             case UDPPacket.PAYLOAD_TYPE_SESSION_CONFIRMED:
                 _establisher.receiveSessionConfirmed(from, reader);

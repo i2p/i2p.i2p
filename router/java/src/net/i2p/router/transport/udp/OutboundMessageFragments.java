@@ -35,7 +35,7 @@ public class OutboundMessageFragments {
     /** if we can handle more messages explicitly, set this to true */
     private boolean _allowExcess;
     
-    private static final int MAX_ACTIVE = 16;
+    private static final int MAX_ACTIVE = 32;
     // don't send a packet more than 10 times
     static final int MAX_VOLLEYS = 10;
     
@@ -414,8 +414,10 @@ public class OutboundMessageFragments {
                 _log.info("Received ack of " + messageId + " by " + ackedBy.toBase64() 
                           + " after " + state.getLifetime() + " and " + numSends + " sends");
             _context.statManager().addRateData("udp.sendConfirmTime", state.getLifetime(), state.getLifetime());
-            _context.statManager().addRateData("udp.sendConfirmFragments", state.getFragmentCount(), state.getLifetime());
-            _context.statManager().addRateData("udp.sendConfirmVolley", numSends, state.getFragmentCount());
+            if (state.getFragmentCount() > 1)
+                _context.statManager().addRateData("udp.sendConfirmFragments", state.getFragmentCount(), state.getLifetime());
+            if (numSends > 1)
+                _context.statManager().addRateData("udp.sendConfirmVolley", numSends, state.getFragmentCount());
             _transport.succeeded(state.getMessage());
             int numFragments = state.getFragmentCount();
             if (state.getPeer() != null) {
@@ -494,8 +496,10 @@ public class OutboundMessageFragments {
             
             if (isComplete) {
                 _context.statManager().addRateData("udp.sendConfirmTime", state.getLifetime(), state.getLifetime());
-                _context.statManager().addRateData("udp.sendConfirmFragments", state.getFragmentCount(), state.getLifetime());
-                _context.statManager().addRateData("udp.sendConfirmVolley", numSends, state.getFragmentCount());
+                if (state.getFragmentCount() > 1)
+                    _context.statManager().addRateData("udp.sendConfirmFragments", state.getFragmentCount(), state.getLifetime());
+                if (numSends > 1)
+                    _context.statManager().addRateData("udp.sendConfirmVolley", numSends, state.getFragmentCount());
                 _transport.succeeded(state.getMessage());
                 
                 if (state.getPeer() != null) {

@@ -28,7 +28,8 @@ public class ConfigNetHandler extends FormHandler {
     private boolean _reseedRequested;
     private boolean _saveRequested;
     private boolean _timeSyncEnabled;
-    private String _port;
+    private String _tcpPort;
+    private String _udpPort;
     private String _inboundRate;
     private String _inboundBurst;
     private String _outboundRate;
@@ -56,8 +57,11 @@ public class ConfigNetHandler extends FormHandler {
     public void setHostname(String hostname) { 
         _hostname = (hostname != null ? hostname.trim() : null); 
     }
-    public void setPort(String port) { 
-        _port = (port != null ? port.trim() : null); 
+    public void setTcpPort(String port) { 
+        _tcpPort = (port != null ? port.trim() : null); 
+    }
+    public void setUdpPort(String port) { 
+        _udpPort = (port != null ? port.trim() : null); 
     }
     public void setInboundrate(String rate) { 
         _inboundRate = (rate != null ? rate.trim() : null); 
@@ -207,14 +211,25 @@ public class ConfigNetHandler extends FormHandler {
                 restartRequired = true;
             }
         }
-        if ( (_port != null) && (_port.length() > 0) ) {
+        if ( (_tcpPort != null) && (_tcpPort.length() > 0) ) {
             String oldPort = _context.router().getConfigSetting(ConfigNetHelper.PROP_I2NP_TCP_PORT);
-            if ( (oldPort == null) && (_port.equals("8887")) ) {
+            if ( (oldPort == null) && (_tcpPort.equals("8887")) ) {
                 // still on default.. noop
-            } else if ( (oldPort == null) || (!oldPort.equalsIgnoreCase(_port)) ) {
+            } else if ( (oldPort == null) || (!oldPort.equalsIgnoreCase(_tcpPort)) ) {
                 // its not the default OR it has changed
-                _context.router().setConfigSetting(ConfigNetHelper.PROP_I2NP_TCP_PORT, _port);
-                addFormNotice("Updating TCP port from " + oldPort + " to " + _port);
+                _context.router().setConfigSetting(ConfigNetHelper.PROP_I2NP_TCP_PORT, _tcpPort);
+                addFormNotice("Updating TCP port from " + oldPort + " to " + _tcpPort);
+                restartRequired = true;
+            }
+        }
+        if ( (_udpPort != null) && (_udpPort.length() > 0) ) {
+            String oldPort = _context.router().getConfigSetting(ConfigNetHelper.PROP_I2NP_UDP_PORT);
+            if ( (oldPort == null) && (_udpPort.equals("8887")) ) {
+                // still on default.. noop
+            } else if ( (oldPort == null) || (!oldPort.equalsIgnoreCase(_udpPort)) ) {
+                // its not the default OR it has changed
+                _context.router().setConfigSetting(ConfigNetHelper.PROP_I2NP_TCP_PORT, _udpPort);
+                addFormNotice("Updating UDP port from " + oldPort + " to " + _udpPort);
                 restartRequired = true;
             }
         }

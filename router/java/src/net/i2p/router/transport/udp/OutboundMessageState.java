@@ -225,10 +225,15 @@ public class OutboundMessageState {
     public boolean shouldSend(int fragmentNum) { return _fragmentSends[fragmentNum] >= (short)0; }
     public int fragmentSize(int fragmentNum) {
         if (_messageBuf == null) return -1;
-        if (fragmentNum + 1 == _fragmentSends.length)
-            return _messageBuf.getValid() % _fragmentSize;
-        else
+        if (fragmentNum + 1 == _fragmentSends.length) {
+            int valid = _messageBuf.getValid();
+            if (valid <= _fragmentSize)
+                return valid;
+            else
+                return valid % _fragmentSize;
+        } else {
             return _fragmentSize;
+        }
     }
 
     /**
@@ -241,10 +246,8 @@ public class OutboundMessageState {
      */
     public int writeFragment(byte out[], int outOffset, int fragmentNum) {
         int start = _fragmentSize * fragmentNum;
-        int end = start + _fragmentSize;
+        int end = start + fragmentSize(fragmentNum);
         if (_messageBuf == null) return -1;
-        if (end > _messageBuf.getValid())
-            end = _messageBuf.getValid();
         int toSend = end - start;
         System.arraycopy(_messageBuf.getData(), start, out, outOffset, toSend);
         if (_log.shouldLog(Log.DEBUG))

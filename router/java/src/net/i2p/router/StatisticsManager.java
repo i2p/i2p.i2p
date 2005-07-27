@@ -102,12 +102,12 @@ public class StatisticsManager implements Service {
             stats.putAll(_context.profileManager().summarizePeers(_publishedStats));
 
             includeThroughput(stats);
-            includeRate("router.invalidMessageTime", stats, new long[] { 10*60*1000 });
+            //includeRate("router.invalidMessageTime", stats, new long[] { 10*60*1000 });
             includeRate("router.duplicateMessageId", stats, new long[] { 24*60*60*1000 });
-            includeRate("tunnel.duplicateIV", stats, new long[] { 24*60*60*1000 });
+            //includeRate("tunnel.duplicateIV", stats, new long[] { 24*60*60*1000 });
             includeRate("tunnel.fragmentedDropped", stats, new long[] { 10*60*1000, 3*60*60*1000 });
-            includeRate("tunnel.fullFragments", stats, new long[] { 10*60*1000, 3*60*60*1000 });
-            includeRate("tunnel.smallFragments", stats, new long[] { 10*60*1000, 3*60*60*1000 });
+            //includeRate("tunnel.fullFragments", stats, new long[] { 10*60*1000, 3*60*60*1000 });
+            //includeRate("tunnel.smallFragments", stats, new long[] { 10*60*1000, 3*60*60*1000 });
             includeRate("tunnel.testFailedTime", stats, new long[] { 60*60*1000 });
             
             includeRate("tunnel.buildFailure", stats, new long[] { 60*60*1000 });
@@ -117,22 +117,26 @@ public class StatisticsManager implements Service {
             includeRate("tunnel.batchMultipleCount", stats, new long[] { 10*60*1000, 60*60*1000 });
             includeRate("tunnel.corruptMessage", stats, new long[] { 60*60*1000l, 3*60*60*1000l });
             
-            includeRate("router.throttleTunnelProbTestSlow", stats, new long[] { 60*60*1000 });
-            includeRate("router.throttleTunnelProbTooFast", stats, new long[] { 60*60*1000 });
-            includeRate("router.throttleTunnelProcessingTime1m", stats, new long[] { 60*60*1000 });
+            //includeRate("router.throttleTunnelProbTestSlow", stats, new long[] { 60*60*1000 });
+            //includeRate("router.throttleTunnelProbTooFast", stats, new long[] { 60*60*1000 });
+            //includeRate("router.throttleTunnelProcessingTime1m", stats, new long[] { 60*60*1000 });
 
             includeRate("router.fastPeers", stats, new long[] { 60*60*1000 });
 
             includeRate("clock.skew", stats, new long[] { 10*60*1000, 3*60*60*1000, 24*60*60*1000 });
             
-            includeRate("transport.sendProcessingTime", stats, new long[] { 60*60*1000 });
-            includeRate("jobQueue.jobRunSlow", stats, new long[] { 10*60*1000l, 60*60*1000l });
+            //includeRate("transport.sendProcessingTime", stats, new long[] { 60*60*1000 });
+            //includeRate("jobQueue.jobRunSlow", stats, new long[] { 10*60*1000l, 60*60*1000l });
             includeRate("crypto.elGamal.encrypt", stats, new long[] { 60*60*1000 });
             includeRate("tunnel.participatingTunnels", stats, new long[] { 5*60*1000, 60*60*1000 });
             includeRate("tunnel.testSuccessTime", stats, new long[] { 60*60*1000l, 24*60*60*1000l });
             includeRate("client.sendAckTime", stats, new long[] { 60*60*1000 }, true);
-            includeRate("stream.con.sendDuplicateSize", stats, new long[] { 60*60*1000 });
-            includeRate("stream.con.receiveDuplicateSize", stats, new long[] { 60*60*1000 });
+            includeRate("udp.sendConfirmTime", stats, new long[] { 10*60*1000 });
+            includeRate("udp.sendVolleyTime", stats, new long[] { 10*60*1000 });
+            includeRate("udp.ignoreRecentDuplicate", stats, new long[] { 10*60*1000 });
+            includeRate("udp.congestionOccurred", stats, new long[] { 10*60*1000 });
+            //includeRate("stream.con.sendDuplicateSize", stats, new long[] { 60*60*1000 });
+            //includeRate("stream.con.receiveDuplicateSize", stats, new long[] { 60*60*1000 });
             stats.setProperty("stat_uptime", DataHelper.formatDuration(_context.router().getUptime()));
             stats.setProperty("stat__rateKey", "avg;maxAvg;pctLifetime;[sat;satLim;maxSat;maxSatLim;][num;lifetimeFreq;maxFreq]");
             _log.debug("Publishing peer rankings");

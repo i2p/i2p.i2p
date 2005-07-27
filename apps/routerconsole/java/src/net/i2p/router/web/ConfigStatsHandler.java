@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
 
+import net.i2p.util.Log;
 import net.i2p.stat.StatManager;
 
 /**
@@ -22,6 +23,7 @@ public class ConfigStatsHandler extends FormHandler {
     public ConfigStatsHandler() {
         super();
         _stats = new ArrayList();
+        _explicitFilter = false;
     }
     
     protected void processForm() {
@@ -36,29 +38,16 @@ public class ConfigStatsHandler extends FormHandler {
         if (stats != null) {
             for (int i = 0; i < stats.length; i++) {
                 String cur = stats[i].trim();
+                if (_log.shouldLog(Log.DEBUG))
+                    _log.debug("Stat: [" + cur + "]");
                 if ( (cur.length() > 0) && (!_stats.contains(cur)) )
                     _stats.add(cur);
             }
         }
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("Updated stats: " + _stats);
     }
 
-    public void setStatList(String stat) { 
-        if (stat != null) {
-            if (stat.indexOf(',') != -1) {
-                StringTokenizer tok = new StringTokenizer(stat, ",");
-                while (tok.hasMoreTokens()) {
-                    String cur = tok.nextToken().trim();
-                    if ( (cur.length() > 0) && (!_stats.contains(cur)) )
-                        _stats.add(cur);
-                }
-            } else {
-                stat = stat.trim();
-                if ( (stat.length() > 0) && (!_stats.contains(stat)) )
-                    _stats.add(stat);
-            }
-        }
-    }
-    
     public void setExplicitFilter(String foo) { _explicitFilter = true; }
     public void setExplicitFilterValue(String filter) { _explicitFilterValue = filter; }
     
@@ -74,7 +63,19 @@ public class ConfigStatsHandler extends FormHandler {
         
         if (_explicitFilter) {
             _stats.clear();
-            setStatList(_explicitFilterValue);
+            
+            if (_explicitFilterValue.indexOf(',') != -1) {
+                StringTokenizer tok = new StringTokenizer(_explicitFilterValue, ",");
+                while (tok.hasMoreTokens()) {
+                    String cur = tok.nextToken().trim();
+                    if ( (cur.length() > 0) && (!_stats.contains(cur)) )
+                        _stats.add(cur);
+                }
+            } else {
+                String stat = _explicitFilterValue.trim();
+                if ( (stat.length() > 0) && (!_stats.contains(stat)) )
+                    _stats.add(stat);
+            }
         }
         
         StringBuffer stats = new StringBuffer();

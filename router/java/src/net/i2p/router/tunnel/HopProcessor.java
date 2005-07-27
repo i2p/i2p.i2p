@@ -29,7 +29,7 @@ public class HopProcessor {
      * and after using it at each hop so as to prevent a certain type of replay/confirmation 
      * attack.
      */
-    static final boolean USE_DOUBLE_IV_ENCRYPTION = false;
+    static final boolean USE_DOUBLE_IV_ENCRYPTION = true;
     static final int IV_LENGTH = 16;
     private static final ByteCache _cache = ByteCache.getInstance(128, IV_LENGTH);
     

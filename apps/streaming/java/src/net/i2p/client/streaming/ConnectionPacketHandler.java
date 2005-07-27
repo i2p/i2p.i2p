@@ -33,7 +33,7 @@ public class ConnectionPacketHandler {
         boolean ok = verifyPacket(packet, con);
         if (!ok) {
             if ( (!packet.isFlagSet(Packet.FLAG_RESET)) && (_log.shouldLog(Log.ERROR)) )
-                _log.error("Packet does NOT verify: " + packet);
+                _log.error("Packet does NOT verify: " + packet + " on " + con);
             packet.releasePayload();
             return;
         }
@@ -305,16 +305,16 @@ public class ConnectionPacketHandler {
                     if (packet.getSequenceNum() <= 2) {
                         return true;
                     } else {
-                        if (_log.shouldLog(Log.WARN))
-                            _log.warn("Packet without RST or SYN where we dont know stream ID: " 
+                        if (_log.shouldLog(Log.ERROR))
+                            _log.error("Packet without RST or SYN where we dont know stream ID: " 
                                       + packet);
                         return false;
                     }
                 }
             } else {
                 if (!DataHelper.eq(con.getSendStreamId(), packet.getReceiveStreamId())) {
-                    if (_log.shouldLog(Log.WARN))
-                        _log.warn("Packet received with the wrong reply stream id: " 
+                    if (_log.shouldLog(Log.ERROR))
+                        _log.error("Packet received with the wrong reply stream id: " 
                                   + con + " / " + packet);
                     return false;
                 } else {
@@ -331,8 +331,8 @@ public class ConnectionPacketHandler {
         if (DataHelper.eq(con.getReceiveStreamId(), packet.getSendStreamId())) {
             boolean ok = packet.verifySignature(_context, packet.getOptionalFrom(), null);
             if (!ok) {
-                if (_log.shouldLog(Log.WARN))
-                    _log.warn("Received unsigned / forged RST on " + con);
+                if (_log.shouldLog(Log.ERROR))
+                    _log.error("Received unsigned / forged RST on " + con);
                 return;
             } else {
                 if (_log.shouldLog(Log.DEBUG))

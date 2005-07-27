@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.ArrayList;
 
 import net.i2p.router.RouterContext;
+import net.i2p.util.Log;
 
 /**
  * Simple form handler base class - does not depend on servlets or jsp,
@@ -16,6 +17,7 @@ import net.i2p.router.RouterContext;
  */
 public class FormHandler {
     protected RouterContext _context;
+    protected Log _log;
     private String _nonce;
     protected String _action;
     private List _errors;
@@ -41,6 +43,7 @@ public class FormHandler {
     public void setContextId(String contextId) {
         try {
             _context = ContextHelper.getContext(contextId);
+            _log = _context.logManager().getLog(getClass());
         } catch (Throwable t) {
             t.printStackTrace();
         }

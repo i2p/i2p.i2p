@@ -281,7 +281,7 @@ class StoreJob extends JobImpl {
             getContext().profileManager().dbStoreSent(_peer.getIdentity().getHash(), howLong);
             getContext().statManager().addRateData("netDb.ackTime", howLong, howLong);
 
-            if (_state.getSuccessful().size() >= REDUNDANCY) {
+            if (_state.getCompleteCount() >= REDUNDANCY) {
                 succeed();
             } else {
                 sendNext();

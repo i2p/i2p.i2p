@@ -32,6 +32,7 @@ public class UDPPacket {
     private volatile byte[] _data;
     private volatile ByteArray _dataBuf;
     private volatile int _markedType;
+    private volatile RemoteHostId _remoteHost;
     private volatile boolean _released;
     private volatile Exception _releasedBy;
     private volatile Exception _acquiredBy;
@@ -78,6 +79,7 @@ public class UDPPacket {
         _packet = new DatagramPacket(_data, MAX_PACKET_SIZE);
         _initializeTime = _context.clock().now();
         _markedType = -1;
+        _remoteHost = null;
     }
     
     public void initialize(int priority, long expiration, InetAddress host, int port) {
@@ -88,6 +90,7 @@ public class UDPPacket {
         //_packet.setLength(0);
         _packet.setAddress(host);
         _packet.setPort(port);
+        _remoteHost = null;
         _released = false;
         _releasedBy = null;
     }
@@ -112,6 +115,12 @@ public class UDPPacket {
      *
      */
     public int getMarkedType() { verifyNotReleased(); return _markedType; }
+    
+    public RemoteHostId getRemoteHost() {
+        if (_remoteHost == null)
+            _remoteHost = new RemoteHostId(_packet.getAddress().getAddress(), _packet.getPort());
+        return _remoteHost;
+    }
     
     /**
      * Validate the packet against the MAC specified, returning true if the

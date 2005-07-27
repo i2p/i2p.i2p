@@ -37,7 +37,7 @@ public class UDPEndpoint {
             _receiver.startup();
         } catch (SocketException se) {
             if (_log.shouldLog(Log.ERROR))
-                _log.error("Unable to bind on " + _listenPort);
+                _log.error("Unable to bind on " + _listenPort, se);
         }
     }
     
@@ -45,11 +45,10 @@ public class UDPEndpoint {
         if (_sender != null) {
             _sender.shutdown();
             _receiver.shutdown();
-            _sender = null;
-            _receiver = null;
         }
     }
     
+    public void setListenPort(int newPort) { _listenPort = newPort; }
     public void updateListenPort(int newPort) {
         if (newPort == _listenPort) return;
         try {

@@ -89,7 +89,7 @@ public class TCPTransport extends TransportImpl {
     public static final int DEFAULT_ESTABLISHERS = 3;
     
     /** Ordered list of supported I2NP protocols */
-    public static final int[] SUPPORTED_PROTOCOLS = new int[] { 4 }; // drop <= 0.5.0.3
+    public static final int[] SUPPORTED_PROTOCOLS = new int[] { 5 }; // drop < 0.6
     /** blah, people shouldnt use defaults... */
     public static final int DEFAULT_LISTEN_PORT = 8887;
     

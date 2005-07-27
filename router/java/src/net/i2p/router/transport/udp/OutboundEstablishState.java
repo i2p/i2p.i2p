@@ -234,13 +234,18 @@ public class OutboundEstablishState {
      *         new relay tag + Bob's signed on time
      */
     private boolean verifySessionCreated() {
-        byte signed[] = new byte[_aliceIP.length + 2
+        byte signed[] = new byte[256+256 // X + Y
+                                 + _aliceIP.length + 2
                                  + _bobIP.length + 2
                                  + 4 // sent relay tag
                                  + 4 // signed on time
                                  ];
         
         int off = 0;
+        System.arraycopy(_sentX, 0, signed, off, _sentX.length);
+        off += _sentX.length;
+        System.arraycopy(_receivedY, 0, signed, off, _receivedY.length);
+        off += _receivedY.length;
         System.arraycopy(_aliceIP, 0, signed, off, _aliceIP.length);
         off += _aliceIP.length;
         DataHelper.toLong(signed, off, 2, _alicePort);
@@ -287,7 +292,8 @@ public class OutboundEstablishState {
     public synchronized void prepareSessionConfirmed() {
         if (_sentSignedOnTime > 0)
             return;
-        byte signed[] = new byte[_aliceIP.length + 2
+        byte signed[] = new byte[256+256 // X + Y
+                             + _aliceIP.length + 2
                              + _bobIP.length + 2
                              + 4 // Alice's relay key
                              + 4 // signed on time
@@ -296,6 +302,10 @@ public class OutboundEstablishState {
         _sentSignedOnTime = _context.clock().now() / 1000;
         
         int off = 0;
+        System.arraycopy(_sentX, 0, signed, off, _sentX.length);
+        off += _sentX.length;
+        System.arraycopy(_receivedY, 0, signed, off, _receivedY.length);
+        off += _receivedY.length;
         System.arraycopy(_aliceIP, 0, signed, off, _aliceIP.length);
         off += _aliceIP.length;
         DataHelper.toLong(signed, off, 2, _alicePort);

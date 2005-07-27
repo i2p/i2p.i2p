@@ -260,7 +260,10 @@ public class DHSessionKeyBuilder {
      *
      */
     public byte[] getMyPublicValueBytes() {
-        BigInteger bi = getMyPublicValue();
+        return toByteArray(getMyPublicValue());
+    }
+    
+    private static final byte[] toByteArray(BigInteger bi) {
         byte data[] = bi.toByteArray();
         byte rv[] = new byte[256];
         if (data.length == 257) // high byte has the sign bit
@@ -298,6 +301,9 @@ public class DHSessionKeyBuilder {
 
     public BigInteger getPeerPublicValue() {
         return _peerValue;
+    }
+    public byte[] getPeerPublicValueBytes() {
+        return toByteArray(getPeerPublicValue());
     }
 
     /**

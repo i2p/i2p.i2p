@@ -75,7 +75,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     /** shared slow bid for unconnected peers when we want to prefer UDP */
     private TransportBid _slowPreferredBid;
 
-    public static final String STYLE = "SSUv1";
+    public static final String STYLE = "SSU";
     public static final String PROP_INTERNAL_PORT = "i2np.udp.internalPort";
 
     /** define this to explicitly set an external IP address */
@@ -85,11 +85,12 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     /** 
      * If i2np.udp.alwaysPreferred is set, the UDP bids will always be under 
      * the bid from the TCP transport - even if a TCP connection already 
-     * exists.  The default is to prefer UDP unless no UDP session exists and 
-     * a TCP connection already exists.
+     * exists.  If this is true (the default), it will always prefer UDP, otherwise
+     * it will prefer UDP unless no UDP session exists and a TCP connection 
+     * already exists.
      */
     public static final String PROP_ALWAYS_PREFER_UDP = "i2np.udp.alwaysPreferred";
-    
+    private static final String DEFAULT_ALWAYS_PREFER_UDP = "true";
     
     /** how many relays offered to us will we use at a time? */
     public static final int PUBLIC_RELAY_COUNT = 3;
@@ -154,29 +155,35 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         
         rebuildExternalAddress();
         
-        if (_endpoint == null) {
-            int port = -1;
-            if (_externalListenPort <= 0) {
-                // no explicit external port, so lets try an internal one
-                String portStr = _context.getProperty(PROP_INTERNAL_PORT);
-                if (portStr != null) {
-                    try {
-                        port = Integer.parseInt(portStr);
-                    } catch (NumberFormatException nfe) {
-                        if (_log.shouldLog(Log.ERROR))
-                            _log.error("Invalid port specified [" + portStr + "]");
-                    }
+        int port = -1;
+        if (_externalListenPort <= 0) {
+            // no explicit external port, so lets try an internal one
+            String portStr = _context.getProperty(PROP_INTERNAL_PORT);
+            if (portStr != null) {
+                try {
+                    port = Integer.parseInt(portStr);
+                } catch (NumberFormatException nfe) {
+                    if (_log.shouldLog(Log.ERROR))
+                        _log.error("Invalid port specified [" + portStr + "]");
                 }
-                if (port <= 0) {
-                    port = 1024 + _context.random().nextInt(31*1024);
-                    if (_log.shouldLog(Log.INFO))
-                        _log.info("Selecting a random port to bind to: " + port);
-                }
-            } else {
-                port = _externalListenPort;
-                if (_log.shouldLog(Log.INFO))
-                    _log.info("Binding to the explicitly specified external port: " + port);
             }
+            if (port <= 0) {
+                port = 8887;
+                //port = 1024 + _context.random().nextInt(31*1024);
+                if (_log.shouldLog(Log.INFO))
+                    _log.info("Selecting an arbitrary port to bind to: " + port);
+                _context.router().setConfigSetting(PROP_INTERNAL_PORT, port+"");
+                // attempt to use it as our external port - this will be overridden by
+                // externalAddressReceived(...)
+                _context.router().setConfigSetting(PROP_EXTERNAL_PORT, port+"");
+                _context.router().saveConfig();
+            }
+        } else {
+            port = _externalListenPort;
+            if (_log.shouldLog(Log.INFO))
+                _log.info("Binding to the explicitly specified external port: " + port);
+        }
+        if (_endpoint == null) {
             try {
                 _endpoint = new UDPEndpoint(_context, port);
             } catch (SocketException se) {
@@ -184,6 +191,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                     _log.log(Log.CRIT, "Unable to listen on the UDP port (" + port + ")", se);
                 return;
             }
+        } else {
+            _endpoint.setListenPort(port);
         }
         
         if (_establisher == null)
@@ -211,14 +220,14 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     }
     
     public void shutdown() {
+        if (_endpoint != null)
+            _endpoint.shutdown();
         if (_flooder != null)
             _flooder.shutdown();
         if (_refiller != null)
             _refiller.shutdown();
         if (_handler != null)
             _handler.shutdown();
-        if (_endpoint != null)
-            _endpoint.shutdown();
         if (_fragments != null)
             _fragments.shutdown();
         if (_pusher != null)
@@ -268,6 +277,9 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             }
         }
         
+        _context.router().setConfigSetting(PROP_EXTERNAL_PORT, ourPort+"");
+        _context.router().saveConfig();
+        
         if (updated) 
             _context.router().rebuildRouterInfo();
     }
@@ -280,8 +292,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
      * get the state for the peer at the given remote host/port, or null 
      * if no state exists
      */
-    public PeerState getPeerState(InetAddress remoteHost, int remotePort) {
-        RemoteHostId hostInfo = new RemoteHostId(remoteHost.getAddress(), remotePort);
+    public PeerState getPeerState(RemoteHostId hostInfo) {
         synchronized (_peersByRemoteHost) {
             return (PeerState)_peersByRemoteHost.get(hostInfo);
         }
@@ -424,7 +435,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     }
 
     private boolean alwaysPreferUDP() {
-        String pref = _context.getProperty(PROP_ALWAYS_PREFER_UDP);
+        String pref = _context.getProperty(PROP_ALWAYS_PREFER_UDP, DEFAULT_ALWAYS_PREFER_UDP);
         return (pref != null) && "true".equals(pref);
     }
     

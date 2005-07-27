@@ -66,10 +66,10 @@ public class InboundEstablishState {
     /** we have completely received all of the confirmation packets */
     public static final int STATE_CONFIRMED_COMPLETELY = 4;
     
-    public InboundEstablishState(RouterContext ctx, InetAddress remoteHost, int remotePort, int localPort) {
+    public InboundEstablishState(RouterContext ctx, byte remoteIP[], int remotePort, int localPort) {
         _context = ctx;
         _log = ctx.logManager().getLog(InboundEstablishState.class);
-        _aliceIP = remoteHost.getAddress();
+        _aliceIP = remoteIP;
         _alicePort = remotePort;
         _remoteHostId = new RemoteHostId(_aliceIP, _alicePort);
         _bobPort = localPort;
@@ -141,7 +141,8 @@ public class InboundEstablishState {
      *       new relay tag + Bob's signed on time
      */
     private void signSessionCreated() {
-        byte signed[] = new byte[_aliceIP.length + 2
+        byte signed[] = new byte[256 + 256 // X + Y
+                                 + _aliceIP.length + 2
                                  + _bobIP.length + 2
                                  + 4 // sent relay tag
                                  + 4 // signed on time
@@ -149,6 +150,12 @@ public class InboundEstablishState {
         _sentSignedOnTime = _context.clock().now() / 1000;
         
         int off = 0;
+        System.arraycopy(_receivedX, 0, signed, off, _receivedX.length);
+        off += _receivedX.length;
+        if (_sentY == null)
+            _sentY = getSentY();
+        System.arraycopy(_sentY, 0, signed, off, _sentY.length);
+        off += _sentY.length;
         System.arraycopy(_aliceIP, 0, signed, off, _aliceIP.length);
         off += _aliceIP.length;
         DataHelper.toLong(signed, off, 2, _alicePort);
@@ -166,6 +173,8 @@ public class InboundEstablishState {
         if (_log.shouldLog(Log.DEBUG)) {
             StringBuffer buf = new StringBuffer(128);
             buf.append("Signing sessionCreated:");
+            buf.append(" ReceivedX: ").append(Base64.encode(_receivedX));
+            buf.append(" SentY: ").append(Base64.encode(_sentY));
             buf.append(" AliceIP: ").append(Base64.encode(_aliceIP));
             buf.append(" AlicePort: ").append(_alicePort);
             buf.append(" BobIP: ").append(Base64.encode(_bobIP));
@@ -266,13 +275,18 @@ public class InboundEstablishState {
         try {
             peer.readBytes(in);
             
-            byte signed[] = new byte[_aliceIP.length + 2
+            byte signed[] = new byte[256+256 // X + Y
+                                     + _aliceIP.length + 2
                                      + _bobIP.length + 2
                                      + 4 // Alice's relay key
                                      + 4 // signed on time
                                      ];
 
             off = 0;
+            System.arraycopy(_receivedX, 0, signed, off, _receivedX.length);
+            off += _receivedX.length;
+            System.arraycopy(_sentY, 0, signed, off, _sentY.length);
+            off += _sentY.length;
             System.arraycopy(_aliceIP, 0, signed, off, _aliceIP.length);
             off += _aliceIP.length;
             DataHelper.toLong(signed, off, 2, _alicePort);

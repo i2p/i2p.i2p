@@ -22,8 +22,8 @@ import net.i2p.data.i2cp.SessionId;
 public class ReceiveMessageEndMessageTest extends StructureTest {
     public DataStructure createDataStructure() throws DataFormatException {
         ReceiveMessageEndMessage msg = new ReceiveMessageEndMessage();
-        msg.setSessionId((SessionId)(new SessionIdTest()).createDataStructure());
-        msg.setMessageId((MessageId)(new MessageIdTest()).createDataStructure());
+        msg.setSessionId(321);
+        msg.setMessageId(123);
         return msg; 
     }
     public DataStructure createStructureToRead() { return new ReceiveMessageEndMessage(); }

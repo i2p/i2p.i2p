@@ -1,4 +1,23 @@
-$Id: history.txt,v 1.216 2005/07/21 17:37:16 jrandom Exp $
+$Id: history.txt,v 1.217 2005/07/22 19:15:59 jrandom Exp $
+
+* 2005-07-27  0.6 released
+
+2005-07-27  jrandom
+    * Enabled SSU as the default top priority transport, adjusting the 
+      config.jsp page accordingly.
+    * Add verification fields to the SSU and TCP connection negotiation (not
+      compatible with previous builds)
+    * Enable the backwards incompatible tunnel crypto change as documented in
+      tunnel-alt.html (have each hop encrypt the received IV before using it,
+      then encrypt it again before sending it on)
+    * Disable the I2CP encryption, leaving in place the end to end garlic 
+      encryption (another backwards incompatible change)
+    * Adjust the protocol versions on the TCP and SSU transports so that they
+      won't talk to older routers.
+    * Fix up the config stats handling again
+    * Fix a rare off-by-one in the SSU fragmentation
+    * Reduce some unnecessary netDb resending by inluding the peers queried
+      successfully in the store redundancy count.
 
 2005-07-22  jrandom
     * Use the small thread pool for I2PTunnelHTTPServer (already used for 

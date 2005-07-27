@@ -152,7 +152,8 @@ public class InboundMessageFragments /*implements UDPTransport.PartialACKSource 
                         _log.info("Message received completely!  " + state);
 
                     _context.statManager().addRateData("udp.receivedCompleteTime", state.getLifetime(), state.getLifetime());
-                    _context.statManager().addRateData("udp.receivedCompleteFragments", state.getFragmentCount(), state.getLifetime());
+                    if (state.getFragmentCount() > 0)
+                        _context.statManager().addRateData("udp.receivedCompleteFragments", state.getFragmentCount(), state.getLifetime());
                 } else if (messageExpired) {
                     state.releaseResources();
                     if (_log.shouldLog(Log.WARN))
