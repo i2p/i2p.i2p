@@ -54,18 +54,18 @@ public class EepGet {
         this(ctx, true, proxyHost, proxyPort, numRetries, outputFile, url);
     }
     public EepGet(I2PAppContext ctx, String proxyHost, int proxyPort, int numRetries, String outputFile, String url, boolean allowCaching) {
-        this(ctx, true, proxyHost, proxyPort, numRetries, outputFile, url, allowCaching);
+        this(ctx, true, proxyHost, proxyPort, numRetries, outputFile, url, allowCaching, null);
     }
     public EepGet(I2PAppContext ctx, int numRetries, String outputFile, String url) {
         this(ctx, false, null, -1, numRetries, outputFile, url);
     }
     public EepGet(I2PAppContext ctx, int numRetries, String outputFile, String url, boolean allowCaching) {
-        this(ctx, false, null, -1, numRetries, outputFile, url, allowCaching);
+        this(ctx, false, null, -1, numRetries, outputFile, url, allowCaching, null);
     }
     public EepGet(I2PAppContext ctx, boolean shouldProxy, String proxyHost, int proxyPort, int numRetries, String outputFile, String url) {
-        this(ctx, shouldProxy, proxyHost, proxyPort, numRetries, outputFile, url, true);
+        this(ctx, shouldProxy, proxyHost, proxyPort, numRetries, outputFile, url, true, null);
     }
-    public EepGet(I2PAppContext ctx, boolean shouldProxy, String proxyHost, int proxyPort, int numRetries, String outputFile, String url, boolean allowCaching) {
+    public EepGet(I2PAppContext ctx, boolean shouldProxy, String proxyHost, int proxyPort, int numRetries, String outputFile, String url, boolean allowCaching, String etag) {
         _context = ctx;
         _log = ctx.logManager().getLog(EepGet.class);
         _shouldProxy = shouldProxy;
@@ -79,10 +79,11 @@ public class EepGet {
         _bytesRemaining = -1;
         _currentAttempt = 0;
         _listeners = new ArrayList(1);
+        _etag = etag;
     }
    
     /**
-     * EepGet [-p localhost:4444] [-n #retries] [-o outputFile] [-m markSize lineLen] url
+     * EepGet [-p localhost:4444] [-n #retries] [-e etag] [-o outputFile] [-m markSize lineLen] url
      *
      */ 
     public static void main(String args[]) {
@@ -91,6 +92,7 @@ public class EepGet {
         int numRetries = 5;
         int markSize = 1024;
         int lineLen = 40;
+        String etag = null;
         String saveAs = null;
         String url = null;
         try {
@@ -102,6 +104,9 @@ public class EepGet {
                     i++;
                 } else if (args[i].equals("-n")) {
                     numRetries = Integer.parseInt(args[i+1]);
+                    i++;
+                } else if (args[i].equals("-e")) {
+                    etag = "\"" + args[i+1] + "\"";
                     i++;
                 } else if (args[i].equals("-o")) {
                     saveAs = args[i+1];
@@ -127,7 +132,7 @@ public class EepGet {
         if (saveAs == null)
             saveAs = suggestName(url);
 
-        EepGet get = new EepGet(I2PAppContext.getGlobalContext(), proxyHost, proxyPort, numRetries, saveAs, url);
+        EepGet get = new EepGet(I2PAppContext.getGlobalContext(), true, proxyHost, proxyPort, numRetries, saveAs, url, true, etag);
         get.addStatusListener(get.new CLIStatusListener(markSize, lineLen));
         get.fetch();
     }
@@ -230,6 +235,7 @@ public class EepGet {
             System.out.println("== Output saved to " + outputFile);
             long timeToSend = _context.clock().now() - _startedOn;
             System.out.println("== Transfer time: " + DataHelper.formatDuration(timeToSend));
+            System.out.println("== ETag: " + _etag);            
             StringBuffer buf = new StringBuffer(50);
             buf.append("== Transfer rate: ");
             double kbps = (1000.0d*(double)(_written)/((double)timeToSend*1024.0d));
@@ -367,6 +373,10 @@ public class EepGet {
                 _out = new FileOutputStream(_outputFile, true);
                 rcOk = true;
                 break;
+            case 304: // not modified
+                _bytesRemaining = 0;
+                _keepFetching = false;
+                return;              
             case 416: // completed (or range out of reach)
                 _bytesRemaining = 0;
                 _keepFetching = false;
@@ -564,9 +574,19 @@ public class EepGet {
             buf.append("Cache-control: no-cache\n");
             buf.append("Pragma: no-cache\n");
         }
+        if (_etag != null) {
+            buf.append("If-None-Match: ");
+            buf.append(_etag);
+            buf.append("\n");
+        }
         buf.append("Connection: close\n\n");
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Request: [" + buf.toString() + "]");
         return buf.toString();
     }
+
+    public String getETag() {
+        return _etag;
+    }
+
 }
