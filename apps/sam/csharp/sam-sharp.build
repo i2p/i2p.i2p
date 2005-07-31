@@ -3,7 +3,7 @@
 
 	<target name="bin" description="Builds assemblies from source">
 		<mkdir dir="bin" />
-		<csc target="dll" output="bin/sam-sharp.dll">
+		<csc target="library" output="bin/sam-sharp.dll">
 			<sources>
 				<include name="src/**/*.cs" />
 			</sources>
