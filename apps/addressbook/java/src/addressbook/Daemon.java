@@ -101,7 +101,8 @@ public class Daemon {
         defaultSubs.add("http://i2p/NF2RLVUxVulR3IqK0sGJR0dHQcGXAzwa6rEO4WAWYXOHw-DoZhKnlbf1nzHXwMEJoex5nFTyiNMqxJMWlY54cvU~UenZdkyQQeUSBZXyuSweflUXFqKN-y8xIoK2w9Ylq1k8IcrAFDsITyOzjUKoOPfVq34rKNDo7fYyis4kT5bAHy~2N1EVMs34pi2RFabATIOBk38Qhab57Umpa6yEoE~rbyR~suDRvD7gjBvBiIKFqhFueXsR2uSrPB-yzwAGofTXuklofK3DdKspciclTVzqbDjsk5UXfu2nTrC1agkhLyqlOfjhyqC~t1IXm-Vs2o7911k7KKLGjB4lmH508YJ7G9fLAUyjuB-wwwhejoWqvg7oWvqo4oIok8LG6ECR71C3dzCvIjY2QcrhoaazA9G4zcGMm6NKND-H4XY6tUWhpB~5GefB3YczOqMbHq4wi0O9MzBFrOJEOs3X4hwboKWANf7DT5PZKJZ5KorQPsYRSq0E3wSOsFCSsdVCKUGsAAAA/i2p/hosts.txt");
         
         SubscriptionList subscriptions = new SubscriptionList(subscriptionFile,
-                etagsFile, lastModifiedFile, defaultSubs);
+                etagsFile, lastModifiedFile, defaultSubs, (String) settings
+                .get("proxy_host"), Integer.parseInt((String) settings.get("proxy_port")));
         Log log = new Log(logFile);
 
         Daemon.update(master, router, published, subscriptions, log);
@@ -154,11 +155,6 @@ public class Daemon {
         while (true) {
             settings = ConfigParser.parse(settingsFile, defaultSettings);
 
-            System.setProperty("proxySet", "true");
-            System.setProperty("http.proxyHost", (String) settings
-                    .get("proxy_host"));
-            System.setProperty("http.proxyPort", (String) settings
-                    .get("proxy_port"));
             long delay = Long.parseLong((String) settings.get("update_delay"));
             if (delay < 1) {
                 delay = 1;

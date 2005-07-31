@@ -33,6 +33,8 @@ import java.util.List;
 public class SubscriptionIterator implements Iterator {
 
     private Iterator subIterator;
+    private String proxyHost;
+    private int proxyPort;
 
     /**
      * Construct a SubscriptionIterator using the Subscriprions in List subscriptions.
@@ -40,8 +42,10 @@ public class SubscriptionIterator implements Iterator {
      * @param subscriptions
      *            List of Subscription objects that represent address books.
      */
-    public SubscriptionIterator(List subscriptions) {
+    public SubscriptionIterator(List subscriptions, String proxyHost, int proxyPort) {
         this.subIterator = subscriptions.iterator();
+        this.proxyHost = proxyHost;
+        this.proxyPort = proxyPort;
     }
 
     
@@ -49,15 +53,15 @@ public class SubscriptionIterator implements Iterator {
      * @see java.util.Iterator#hasNext()
      */
     public boolean hasNext() {
-        return subIterator.hasNext();
+        return this.subIterator.hasNext();
     }
 
     /* (non-Javadoc)
      * @see java.util.Iterator#next()
      */
     public Object next() {
-        Subscription sub = (Subscription) subIterator.next();
-        return new AddressBook(sub);
+        Subscription sub = (Subscription) this.subIterator.next();
+        return new AddressBook(sub, this.proxyHost, this.proxyPort);
     }
 
     /* (non-Javadoc)

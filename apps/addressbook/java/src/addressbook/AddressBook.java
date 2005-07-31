@@ -24,10 +24,11 @@ package addressbook;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.net.URL;
-import java.net.HttpURLConnection;
 import java.io.File;
 import java.io.IOException;
+
+import net.i2p.I2PAppContext;
+import net.i2p.util.EepGet;
 
 /**
  * An address book for storing human readable names mapped to base64 i2p
@@ -65,11 +66,16 @@ public class AddressBook {
      *            where key is a human readable name, and value is a base64 i2p
      *            destination.
      */
-    public AddressBook(URL url) {
-        this.location = url.getHost();
+    public AddressBook(String url, String proxyHost, int proxyPort) {
+        this.location = url;
 
         try {
-            this.addresses = ConfigParser.parse(url);
+            EepGet get = new EepGet(I2PAppContext.getGlobalContext(), true,
+                    proxyHost, proxyPort, 2, "addressbook.tmp", url, true, 
+                    null);
+            get.fetch();
+            this.addresses = ConfigParser.parse("addressbook.tmp");
+            new File("addressbook.tmp").delete();
         } catch (IOException exp) {
             this.addresses = new HashMap();
         }
@@ -83,41 +89,17 @@ public class AddressBook {
      * @param subscription
      *            A Subscription instance pointing at a remote address book.
      */
-    public AddressBook(Subscription subscription) {
+    public AddressBook(Subscription subscription, String proxyHost, int proxyPort) {
         this.location = subscription.getLocation();
 
-        try {
-//            EepGet get = new EepGet(I2PAppContext.getGlobalContext(), true, )
-            URL url = new URL(subscription.getLocation());
-            HttpURLConnection connection = (HttpURLConnection) url
-                    .openConnection();
-            if (subscription.getEtag() != null) {
-                connection.addRequestProperty("If-None-Match", subscription
-                        .getEtag());
-            }
-            if (subscription.getLastModified() != null) {
-                connection.addRequestProperty("If-Modified-Since", subscription
-                        .getLastModified());
-            }
-            connection.connect();
-            if (connection.getResponseCode() == HttpURLConnection.HTTP_NOT_MODIFIED) {
-                connection.disconnect();
-                this.addresses = new HashMap();
-                return;
-            }
-            if (connection.getHeaderField("ETag") != null) {
-                subscription.setEtag(connection.getHeaderField("ETag"));
-            }
-            if (connection.getHeaderField("Last-Modified") != null) {
-                subscription.setLastModified(connection
-                        .getHeaderField("Last-Modified"));
-            }
-        } catch (IOException exp) {
-        }
-
-        try {
-            this.addresses = ConfigParser.parse(new URL(subscription
-                    .getLocation()));
+        try {            
+            EepGet get = new EepGet(I2PAppContext.getGlobalContext(), true,
+                    proxyHost, proxyPort, 2, "addressbook.tmp", 
+                    subscription.getLocation(), true, subscription.getEtag());
+            get.fetch();
+            this.addresses = ConfigParser.parse("addressbook.tmp");
+            subscription.setEtag(get.getETag());
+            new File("addressbook.tmp").delete();
         } catch (IOException exp) {
             this.addresses = new HashMap();
         }

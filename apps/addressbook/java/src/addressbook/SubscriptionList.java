@@ -42,6 +42,10 @@ public class SubscriptionList {
     private File etagsFile;
 
     private File lastModifiedFile;
+    
+    private String proxyHost;
+    
+    private int proxyPort;
 
     /**
      * Construct a SubscriptionList using the urls from locationsFile and, if
@@ -58,10 +62,13 @@ public class SubscriptionList {
      *            GET. The file is in the format "url=leastmodified".
      */
     public SubscriptionList(File locationsFile, File etagsFile,
-            File lastModifiedFile, List defaultSubs) {
+            File lastModifiedFile, List defaultSubs, String proxyHost, 
+            int proxyPort) {
         this.subscriptions = new LinkedList();
         this.etagsFile = etagsFile;
         this.lastModifiedFile = lastModifiedFile;
+        this.proxyHost = proxyHost;
+        this.proxyPort = proxyPort;
         List locations;
         Map etags;
         Map lastModified;
@@ -80,7 +87,7 @@ public class SubscriptionList {
         Iterator iter = locations.iterator();
         while (iter.hasNext()) {
             location = (String) iter.next();
-            subscriptions.add(new Subscription(location, (String) etags
+            this.subscriptions.add(new Subscription(location, (String) etags
                     .get(location), (String) lastModified.get(location)));
         }
 
@@ -94,7 +101,8 @@ public class SubscriptionList {
      * @return A SubscriptionIterator.
      */
     public SubscriptionIterator iterator() {
-        return new SubscriptionIterator(this.subscriptions);
+        return new SubscriptionIterator(this.subscriptions, this.proxyHost, 
+                this.proxyPort);
     }
 
     /**

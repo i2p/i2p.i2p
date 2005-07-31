@@ -27,7 +27,6 @@ import java.util.List;
 import java.util.LinkedList;
 import java.util.Iterator;
 import java.io.*;
-import java.net.URL;
 
 /**
  * Utility class providing methods to parse and write files in config file
@@ -84,24 +83,6 @@ public class ConfigParser {
         }
         input.close();
         return result;
-    }
-
-    /**
-     * Return a Map using the contents of the file at url. See
-     * parseBufferedReader for details of the input format.
-     * 
-     * @param url
-     *            A url pointing to a file to parse.
-     * @return A Map containing the key, value pairs from url.
-     * @throws IOException
-     *             if url cannot be read.
-     */
-    public static Map parse(URL url) throws IOException {
-        InputStream urlStream;
-        urlStream = url.openConnection().getInputStream();
-        BufferedReader input = new BufferedReader(new InputStreamReader(
-                urlStream));
-        return ConfigParser.parse(input);
     }
 
     /**
