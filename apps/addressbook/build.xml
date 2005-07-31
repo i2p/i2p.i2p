@@ -6,8 +6,7 @@
 	<property name="dist"  location="dist"/>
 	<property name="jar" value="addressbook.jar"/>
 	<property name="war" value="addressbook.war"/>
-	<property name="servlet" value="../jetty/jettylib/javax.servlet.jar"/>
-
+	
 	<target name="init">
 		<mkdir dir="${build}"/>
 		<mkdir dir="${dist}"/>
@@ -22,7 +21,12 @@
 
 	<target name="compile" depends="init">
 		<javac debug="true" deprecation="on" source="1.3" target="1.3" 
-                       srcdir="${src}" destdir="${build}" classpath="${servlet}"/>
+                       srcdir="${src}" destdir="${build}">
+            <classpath>
+                <pathelement location="../../core/java/build/i2p.jar" />
+                <pathelement location="../jetty/jettylib/javax.servlet.jar" />
+            </classpath>
+		</javac>
 	</target>
 
 	<target name="jar" depends="compile">
