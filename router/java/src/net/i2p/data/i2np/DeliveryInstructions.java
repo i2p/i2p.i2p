@@ -221,10 +221,10 @@ public class DeliveryInstructions extends DataStructureImpl {
         return val;
     }
     
-    private byte[] getAdditionalInfo() throws DataFormatException {
+    private int getAdditionalInfoSize() {
         int additionalSize = 0;
         if (getEncrypted()) {
-            if (_encryptionKey == null) throw new DataFormatException("Encryption key is not set");
+            if (_encryptionKey == null) throw new IllegalStateException("Encryption key is not set");
             additionalSize += SessionKey.KEYSIZE_BYTES;
         }
         switch (getDeliveryMode()) {
@@ -233,15 +233,15 @@ public class DeliveryInstructions extends DataStructureImpl {
                     _log.debug("mode = local");
                 break;
             case FLAG_MODE_DESTINATION:
-                if (_destinationHash == null) throw new DataFormatException("Destination hash is not set");
+                if (_destinationHash == null) throw new IllegalStateException("Destination hash is not set");
                 additionalSize += Hash.HASH_LENGTH;
                 break;
             case FLAG_MODE_ROUTER:
-                if (_routerHash == null) throw new DataFormatException("Router hash is not set");
+                if (_routerHash == null) throw new IllegalStateException("Router hash is not set");
                 additionalSize += Hash.HASH_LENGTH;
                 break;
             case FLAG_MODE_TUNNEL:
-                if ( (_routerHash == null) || (_tunnelId == null) ) throw new DataFormatException("Router hash or tunnel ID is not set");
+                if ( (_routerHash == null) || (_tunnelId == null) ) throw new IllegalStateException("Router hash or tunnel ID is not set");
                 additionalSize += Hash.HASH_LENGTH;
                 additionalSize += 4; // tunnelId
                 break;
@@ -249,13 +249,23 @@ public class DeliveryInstructions extends DataStructureImpl {
         
         if (getDelayRequested()) {
             additionalSize += 4;
-        } 
-        
+        }
+        return additionalSize;
+    }
+    
+    private byte[] getAdditionalInfo() {
+        int additionalSize = getAdditionalInfoSize();
         byte rv[] = new byte[additionalSize];
         int offset = 0;
-        
+        offset += getAdditionalInfo(rv, offset);
+        if (offset != additionalSize)
+            _log.log(Log.CRIT, "wtf, additionalSize = " + additionalSize + ", offset = " + offset);
+        return rv;
+    }
+    private int getAdditionalInfo(byte rv[], int offset) {
+        int origOffset = offset;
         if (getEncrypted()) {
-            if (_encryptionKey == null) throw new DataFormatException("Encryption key is not set");
+            if (_encryptionKey == null) throw new IllegalStateException("Encryption key is not set");
             System.arraycopy(_encryptionKey.getData(), 0, rv, offset, SessionKey.KEYSIZE_BYTES);
             offset += SessionKey.KEYSIZE_BYTES;
             if (_log.shouldLog(Log.DEBUG))
@@ -270,21 +280,21 @@ public class DeliveryInstructions extends DataStructureImpl {
                     _log.debug("mode = local");
                 break;
             case FLAG_MODE_DESTINATION:
-                if (_destinationHash == null) throw new DataFormatException("Destination hash is not set");
+                if (_destinationHash == null) throw new IllegalStateException("Destination hash is not set");
                 System.arraycopy(_destinationHash.getData(), 0, rv, offset, Hash.HASH_LENGTH);
                 offset += Hash.HASH_LENGTH;
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("mode = destination, hash = " + _destinationHash);
                 break;
             case FLAG_MODE_ROUTER:
-                if (_routerHash == null) throw new DataFormatException("Router hash is not set");
+                if (_routerHash == null) throw new IllegalStateException("Router hash is not set");
                 System.arraycopy(_routerHash.getData(), 0, rv, offset, Hash.HASH_LENGTH);
                 offset += Hash.HASH_LENGTH;
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("mode = router, routerHash = " + _routerHash);
                 break;
             case FLAG_MODE_TUNNEL:
-                if ( (_routerHash == null) || (_tunnelId == null) ) throw new DataFormatException("Router hash or tunnel ID is not set");
+                if ( (_routerHash == null) || (_tunnelId == null) ) throw new IllegalStateException("Router hash or tunnel ID is not set");
                 System.arraycopy(_routerHash.getData(), 0, rv, offset, Hash.HASH_LENGTH);
                 offset += Hash.HASH_LENGTH;
                 DataHelper.toLong(rv, offset, 4, _tunnelId.getTunnelId());
@@ -303,7 +313,7 @@ public class DeliveryInstructions extends DataStructureImpl {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("delay NOT requested");
         }
-        return rv;
+        return offset - origOffset;
     }
     
     public void writeBytes(OutputStream out) throws DataFormatException, IOException {
@@ -318,6 +328,27 @@ public class DeliveryInstructions extends DataStructureImpl {
             out.write(additionalInfo);
             out.flush();
         }
+    }
+    
+    /**
+     * return the number of bytes written to the target
+     */
+    public int writeBytes(byte target[], int offset) {
+        if ( (_deliveryMode < 0) || (_deliveryMode > FLAG_MODE_TUNNEL) ) throw new IllegalStateException("Invalid data: mode = " + _deliveryMode);
+        long flags = getFlags();
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("Write flags: " + flags + " mode: " + getDeliveryMode() 
+                       + " =?= " + flagMode(flags));
+        int origOffset = offset;
+        DataHelper.toLong(target, offset, 1, flags);
+        offset++;
+        offset += getAdditionalInfo(target, offset);
+        return offset - origOffset;
+    }
+    
+    public int getSize() {
+        return 1 // flags
+               + getAdditionalInfoSize();
     }
     
     public boolean equals(Object obj) {

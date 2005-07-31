@@ -201,9 +201,12 @@ public class GarlicMessageBuilder {
         clove.setCloveId(config.getId());
         clove.setExpiration(new Date(config.getExpiration()));
         clove.setInstructions(config.getDeliveryInstructions());
+        return clove.toByteArray();
+        /*
         int size = clove.estimateSize();
         ByteArrayOutputStream baos = new ByteArrayOutputStream(size);
         clove.writeBytes(baos);
         return baos.toByteArray();
+         */
     }
 }

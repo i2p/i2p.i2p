@@ -10,6 +10,7 @@ package net.i2p.router.networkdb.kademlia;
 
 import java.math.BigInteger;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 
 import net.i2p.I2PAppContext;
@@ -203,6 +204,14 @@ class KBucketImpl implements KBucket {
             entries.removeAll(toIgnoreHashes);
         }
         return entries;
+    }
+    
+    public void getEntries(SelectionCollector collector) {
+        synchronized (_entries) {
+            for (Iterator iter = _entries.iterator(); iter.hasNext(); ) {
+                collector.add((Hash)iter.next());
+            }
+        }
     }
     
     public void setEntries(Set entries) {

@@ -36,6 +36,8 @@ public class HandleDatabaseStoreMessageJob extends JobImpl {
         super(ctx);
         _log = ctx.logManager().getLog(HandleDatabaseStoreMessageJob.class);
         ctx.statManager().createRateStat("netDb.storeHandled", "How many netDb store messages have we handled?", "NetworkDatabase", new long[] { 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
+        ctx.statManager().createRateStat("netDb.storeLeaseSetHandled", "How many leaseSet store messages have we handled?", "NetworkDatabase", new long[] { 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
+        ctx.statManager().createRateStat("netDb.storeRouterInfoHandled", "How many routerInfo store messages have we handled?", "NetworkDatabase", new long[] { 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
         _message = receivedMessage;
         _from = from;
         _fromHash = fromHash;
@@ -48,6 +50,8 @@ public class HandleDatabaseStoreMessageJob extends JobImpl {
         String invalidMessage = null;
         boolean wasNew = false;
         if (_message.getValueType() == DatabaseStoreMessage.KEY_TYPE_LEASESET) {
+            getContext().statManager().addRateData("netDb.storeLeaseSetHandled", 1, 0);
+   
             try {
                 LeaseSet ls = _message.getLeaseSet();
                 // mark it as something we received, so we'll answer queries 
@@ -65,6 +69,7 @@ public class HandleDatabaseStoreMessageJob extends JobImpl {
                 invalidMessage = iae.getMessage();
             }
         } else if (_message.getValueType() == DatabaseStoreMessage.KEY_TYPE_ROUTERINFO) {
+            getContext().statManager().addRateData("netDb.storeRouterInfoHandled", 1, 0);
             if (_log.shouldLog(Log.INFO))
                 _log.info("Handling dbStore of router " + _message.getKey() + " with publishDate of " 
                           + new Date(_message.getRouterInfo().getPublished()));

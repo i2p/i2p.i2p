@@ -56,6 +56,7 @@ public class UDPPacket {
     public static final int PAYLOAD_TYPE_RELAY_RESPONSE = 4;
     public static final int PAYLOAD_TYPE_RELAY_INTRO = 5;
     public static final int PAYLOAD_TYPE_DATA = 6;
+    public static final int PAYLOAD_TYPE_TEST = 7;
     
     // various flag fields for use in the data packets
     public static final byte DATA_FLAG_EXPLICIT_ACK = (byte)(1 << 7);

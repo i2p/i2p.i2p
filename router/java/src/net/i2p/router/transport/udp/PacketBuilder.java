@@ -442,6 +442,145 @@ public class PacketBuilder {
         return packet;
     }
 
+    
+    /** 
+     * full flag info for a peerTest message.  this can be fixed, 
+     * since we never rekey on test, and don't need any extended options
+     */
+    private static final byte PEER_TEST_FLAG_BYTE = (UDPPacket.PAYLOAD_TYPE_TEST << 4);
+
+    /**
+     * Build a packet as if we are Alice and we either want Bob to begin a 
+     * peer test or Charlie to finish a peer test.
+     * 
+     * @return ready to send packet, or null if there was a problem
+     */
+    public UDPPacket buildPeerTestFromAlice(InetAddress toIP, int toPort, SessionKey toIntroKey, long nonce, SessionKey aliceIntroKey) {
+        UDPPacket packet = UDPPacket.acquire(_context);
+        byte data[] = packet.getPacket().getData();
+        Arrays.fill(data, 0, data.length, (byte)0x0);
+        int off = UDPPacket.MAC_SIZE + UDPPacket.IV_SIZE;
+        
+        // header
+        data[off] = PEER_TEST_FLAG_BYTE;
+        off++;
+        long now = _context.clock().now() / 1000;
+        DataHelper.toLong(data, off, 4, now);
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("Sending peer test " + nonce + " to Bob with time = " + new Date(now*1000));
+        off += 4;
+        
+        // now for the body
+        DataHelper.toLong(data, off, 4, nonce);
+        off += 4;
+        DataHelper.toLong(data, off, 1, 0); // neither Bob nor Charlie need Alice's IP from her
+        off++;
+        DataHelper.toLong(data, off, 2, 0); // neither Bob nor Charlie need Alice's port from her
+        off += 2;
+        System.arraycopy(aliceIntroKey.getData(), 0, data, off, SessionKey.KEYSIZE_BYTES);
+        off += SessionKey.KEYSIZE_BYTES;
+        
+        // we can pad here if we want, maybe randomized?
+        
+        // pad up so we're on the encryption boundary
+        if ( (off % 16) != 0)
+            off += 16 - (off % 16);
+        packet.getPacket().setLength(off);
+        authenticate(packet, toIntroKey, toIntroKey);
+        setTo(packet, toIP, toPort);
+        return packet;
+    }
+
+    /**
+     * Build a packet as if we are either Bob or Charlie and we are helping test Alice.
+     * 
+     * @return ready to send packet, or null if there was a problem
+     */
+    public UDPPacket buildPeerTestToAlice(InetAddress aliceIP, int alicePort, SessionKey aliceIntroKey, SessionKey charlieIntroKey, long nonce) {
+        UDPPacket packet = UDPPacket.acquire(_context);
+        byte data[] = packet.getPacket().getData();
+        Arrays.fill(data, 0, data.length, (byte)0x0);
+        int off = UDPPacket.MAC_SIZE + UDPPacket.IV_SIZE;
+        
+        // header
+        data[off] = PEER_TEST_FLAG_BYTE;
+        off++;
+        long now = _context.clock().now() / 1000;
+        DataHelper.toLong(data, off, 4, now);
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("Sending peer test " + nonce + " to Alice with time = " + new Date(now*1000));
+        off += 4;
+        
+        // now for the body
+        DataHelper.toLong(data, off, 4, nonce);
+        off += 4;
+        byte ip[] = aliceIP.getAddress();
+        DataHelper.toLong(data, off, 1, ip.length);
+        off++;
+        System.arraycopy(ip, 0, data, off, ip.length);
+        off += ip.length;
+        DataHelper.toLong(data, off, 2, alicePort);
+        off += 2;
+        System.arraycopy(charlieIntroKey.getData(), 0, data, off, SessionKey.KEYSIZE_BYTES);
+        off += SessionKey.KEYSIZE_BYTES;
+        
+        // we can pad here if we want, maybe randomized?
+        
+        // pad up so we're on the encryption boundary
+        if ( (off % 16) != 0)
+            off += 16 - (off % 16);
+        packet.getPacket().setLength(off);
+        authenticate(packet, aliceIntroKey, aliceIntroKey);
+        setTo(packet, aliceIP, alicePort);
+        return packet;
+    }
+
+    /**
+     * Build a packet as if we are Bob sending Charlie a packet to help test Alice.
+     * 
+     * @return ready to send packet, or null if there was a problem
+     */
+    public UDPPacket buildPeerTestToCharlie(InetAddress aliceIP, int alicePort, SessionKey aliceIntroKey, long nonce, 
+                                            InetAddress charlieIP, int charliePort, 
+                                            SessionKey charlieCipherKey, SessionKey charlieMACKey) {
+        UDPPacket packet = UDPPacket.acquire(_context);
+        byte data[] = packet.getPacket().getData();
+        Arrays.fill(data, 0, data.length, (byte)0x0);
+        int off = UDPPacket.MAC_SIZE + UDPPacket.IV_SIZE;
+        
+        // header
+        data[off] = PEER_TEST_FLAG_BYTE;
+        off++;
+        long now = _context.clock().now() / 1000;
+        DataHelper.toLong(data, off, 4, now);
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("Sending peer test " + nonce + " to Charlie with time = " + new Date(now*1000));
+        off += 4;
+        
+        // now for the body
+        DataHelper.toLong(data, off, 4, nonce);
+        off += 4;
+        byte ip[] = aliceIP.getAddress();
+        DataHelper.toLong(data, off, 1, ip.length);
+        off++;
+        System.arraycopy(ip, 0, data, off, ip.length);
+        off += ip.length;
+        DataHelper.toLong(data, off, 2, alicePort);
+        off += 2;
+        System.arraycopy(aliceIntroKey.getData(), 0, data, off, SessionKey.KEYSIZE_BYTES);
+        off += SessionKey.KEYSIZE_BYTES;
+        
+        // we can pad here if we want, maybe randomized?
+        
+        // pad up so we're on the encryption boundary
+        if ( (off % 16) != 0)
+            off += 16 - (off % 16);
+        packet.getPacket().setLength(off);
+        authenticate(packet, charlieCipherKey, charlieMACKey);
+        setTo(packet, charlieIP, charliePort);
+        return packet;
+    }
+
     private void setTo(UDPPacket packet, InetAddress ip, int port) {
         packet.getPacket().setAddress(ip);
         packet.getPacket().setPort(port);

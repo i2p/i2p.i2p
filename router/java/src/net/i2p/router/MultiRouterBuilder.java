@@ -51,7 +51,7 @@ public class MultiRouterBuilder {
             String dir = args[i];
             try {
                 int basePortNum = Integer.parseInt(args[i+1]);
-                buildConfig(dir, basePortNum);
+                buildConfig(dir, basePortNum, i == 0);
             } catch (NumberFormatException nfe) {
                 nfe.printStackTrace();
             }
@@ -74,42 +74,24 @@ public class MultiRouterBuilder {
     }
     
     private static void buildStartupScript(String args[]) {
-        buildStartupScriptWin(args);
         buildStartupScriptNix(args);
     }
-    private static void buildStartupScriptWin(String args[]) {
-        StringBuffer buf = new StringBuffer(4096);
-        buf.append("@echo off\ntitle I2P Router Sim\n");
-        buf.append("echo After all of the routers have started up, you should cross seed them\n");
-        buf.append("echo Simply copy */netDb/routerInfo-* to all of the various */netDb/ directories\n");
-        buf.append("java -cp lib\\i2p.jar;lib\\router.jar;lib\\mstreaming.jar;");
-        buf.append("lib\\heartbeat.jar;lib\\i2ptunnel.jar;lib\\netmonitor.jar;");
-        buf.append("lib\\sam.jar ");
-        buf.append("-Djava.library.path=. ");
-        buf.append("-DloggerFilenameOverride=logs\\log-sim-#.txt ");
-        buf.append("net.i2p.router.MultiRouter baseEnv.txt ");
-        for (int i = 0; i < args.length; i += 2) 
-            buf.append(args[i]).append("\\routerEnv.txt ");
-        buf.append("\npause\n");
-        try {
-            FileOutputStream fos = new FileOutputStream("runNetSim.bat");
-            fos.write(buf.toString().getBytes());
-            fos.close();
-        } catch (IOException ioe) { ioe.printStackTrace(); }
-    }
-    
     private static void buildStartupScriptNix(String args[]) {
         StringBuffer buf = new StringBuffer(4096);
         buf.append("#!/bin/sh\n");
-        buf.append("nohup java -cp lib/i2p.jar:lib/router.jar:lib/mstreaming.jar:");
-        buf.append("lib/heartbeat.jar:lib/i2ptunnel.jar:lib/netmonitor.jar:");
-        buf.append("lib/sam.jar ");
-        buf.append("-Djava.library.path=. ");
-        buf.append("-DloggerFilenameOverride=logs/log-sim-#.txt ");
-        buf.append("net.i2p.router.MultiRouter baseEnv.txt ");
-        for (int i = 1; i < args.length; i += 2) 
+        buf.append("export CP=.; for LIB in lib/* ; do export CP=$CP:$LIB ; done\n"); 
+        buf.append("nohup java -cp $CP ");
+        buf.append(" -Xmx1024m");
+        buf.append(" -Djava.library.path=.");
+        buf.append(" -DloggerFilenameOverride=logs/log-sim-#.txt");
+        buf.append(" -Dorg.mortbay.http.Version.paranoid=true");
+        buf.append(" -Dorg.mortbay.util.FileResource.checkAliases=false");
+        buf.append(" -verbose:gc");
+        
+        buf.append(" net.i2p.router.MultiRouter baseEnv.txt ");
+        for (int i = 0; i < args.length; i += 2) 
             buf.append(args[i]).append("/routerEnv.txt ");
-        buf.append(" > sim.txt &\n");
+        buf.append(" > sim.out 2>&1 &\n");
         buf.append("echo $! > sim.pid\n");
         buf.append("echo \"After all of the routers have started up, you should cross seed them\"\n");
         buf.append("echo \"Simply copy */netDb/routerInfo-* to all of the various */netDb/ directories\"\n");
@@ -120,32 +102,11 @@ public class MultiRouterBuilder {
         } catch (IOException ioe) { ioe.printStackTrace(); }
     }
     
-    private static void buildConfig(String dir, int basePort) {
+    private static void buildConfig(String dir, int basePort, boolean isFirst) {
         File baseDir = new File(dir);
         baseDir.mkdirs();
         File cfgFile = new File(baseDir, "router.config");
         StringBuffer buf = new StringBuffer(8*1024);
-        buf.append("i2np.bandwidth.inboundKBytesPerSecond=8\n");
-        buf.append("i2np.bandwidth.outboundKBytesPerSecond=8\n");
-        buf.append("i2np.bandwidth.inboundBurstKBytes=80\n");
-        buf.append("i2np.bandwidth.outboundBurstKBytes=80\n");
-        buf.append("i2np.bandwidth.replenishFrequencyMs=1000\n");
-        buf.append("router.publishPeerRankings=true\n");
-        buf.append("router.keepHistory=false\n");
-        buf.append("router.submitHistory=false\n");
-        buf.append("router.maxJobRunners=1\n");
-        buf.append("router.jobLagWarning=10000\n");
-        buf.append("router.jobLagFatal=30000\n");
-        buf.append("router.jobRunWarning=10000\n");
-        buf.append("router.jobRunFatal=30000\n");
-        buf.append("router.jobWarmupTime=600000\n");
-        buf.append("router.targetClients=1\n");
-        buf.append("tunnels.numInbound=6\n");
-        buf.append("tunnels.numOutbound=6\n");
-        buf.append("tunnels.depthInbound=2\n");
-        buf.append("tunnels.depthOutbound=2\n");
-        buf.append("tunnels.tunnelDuration=600000\n");
-        buf.append("router.maxWaitingJobs=30\n");
         buf.append("router.profileDir=").append(baseDir.getPath()).append("/peerProfiles\n");
         buf.append("router.historyFilename=").append(baseDir.getPath()).append("/messageHistory.txt\n");
         buf.append("router.sessionKeys.location=").append(baseDir.getPath()).append("/sessionKeys.dat\n");
@@ -154,46 +115,53 @@ public class MultiRouterBuilder {
         buf.append("router.networkDatabase.dbDir=").append(baseDir.getPath()).append("/netDb\n");
         buf.append("router.tunnelPoolFile=").append(baseDir.getPath()).append("/tunnelPool.dat\n");
         buf.append("router.keyBackupDir=").append(baseDir.getPath()).append("/keyBackup\n");
+        buf.append("router.clientConfigFile=").append(baseDir.getPath()).append("/clients.config\n");
         buf.append("i2np.tcp.port=").append(basePort).append('\n');
         buf.append("i2np.tcp.hostname=localhost\n");
+        buf.append("i2np.tcp.allowLocal=true\n");
+        buf.append("i2np.tcp.disable=true\n");
+        buf.append("i2np.tcp.enable=false\n");
+        buf.append("i2np.udp.host=127.0.0.1\n");
+        buf.append("i2np.udp.port=").append(basePort).append('\n');
+        buf.append("i2np.udp.internalPort=").append(basePort).append('\n');
         buf.append("i2cp.port=").append(basePort+1).append('\n');
-        buf.append("router.adminPort=").append(basePort+2).append('\n');
-        buf.append("#clientApp.0.main=net.i2p.sam.SAMBridge\n");
-        buf.append("#clientApp.0.name=SAM\n");
-        buf.append("#clientApp.0.args=localhost ").append(basePort+3).append(" i2cp.tcp.host=localhost i2cp.tcp.port=").append(basePort+1).append("\n");
-        buf.append("#clientApp.1.main=net.i2p.i2ptunnel.I2PTunnel\n");
-        buf.append("#clientApp.1.name=EepProxy\n");
-        buf.append("#clientApp.1.args=-nogui -e \"config localhost ").append(basePort+1).append("\" -e \"httpclient ").append(basePort+4).append("\"\n");
-        buf.append("#clientApp.2.main=net.i2p.heartbeat.Heartbeat\n");
-        buf.append("#clientApp.2.name=Heartbeat\n");
-        buf.append("#clientApp.2.args=").append(baseDir.getPath()).append("/heartbeat.config\n");
+        buf.append("stat.logFile=").append(baseDir.getPath()).append("/stats.log\n");
+        buf.append("stat.logFilters=*\n");
         
         try {
             FileOutputStream fos = new FileOutputStream(cfgFile);
             fos.write(buf.toString().getBytes());
             fos.close();
             
-            fos = new FileOutputStream(new File(baseDir, "heartbeat.config"));
-            StringBuffer tbuf = new StringBuffer(1024);
-            tbuf.append("i2cpHost=localhost\n");
-            tbuf.append("i2cpPort=").append(basePort+1).append('\n');
-            tbuf.append("numHops=2\n");
-            tbuf.append("privateDestinationFile=").append(baseDir.getPath()).append("/heartbeat.keys\n");
-            tbuf.append("publicDestinationFile=").append(baseDir.getPath()).append("/heartbeat.txt\n");
-            fos.write(tbuf.toString().getBytes());
-            fos.close();
-            
-            
             File envFile = new File(baseDir, "routerEnv.txt");
             fos = new FileOutputStream(envFile);
             fos.write(("loggerFilenameOverride="+baseDir+ "/logs/log-router-#.txt\n").getBytes());
             fos.write(("router.configLocation="+baseDir+"/router.config\n").getBytes());
+            fos.write(("router.pingFile="+baseDir+"/router.ping\n").getBytes());
             //fos.write(("i2p.vmCommSystem=true\n").getBytes());
-            fos.write(("i2p.encryption=off\n").getBytes());
+            //fos.write(("i2p.encryption=off\n").getBytes());
             fos.close();
             
             File f = new File(baseDir, "logs");
             f.mkdirs();
+            
+            if (isFirst) {
+                fos = new FileOutputStream(baseDir.getPath() + "/clients.config");
+                fos.write(("clientApp.0.args=" + (basePort-1) + " 127.0.0.1 ./webapps\n").getBytes());
+                fos.write(("clientApp.0.main=net.i2p.router.web.RouterConsoleRunner\n").getBytes());
+                fos.write(("clientApp.0.name=webconsole\n").getBytes());
+                fos.write(("clientApp.0.onBoot=true\n").getBytes());
+                fos.write(("clientApp.1.args=\n").getBytes());
+                fos.write(("clientApp.1.main=net.i2p.router.Counter\n").getBytes());
+                fos.write(("clientApp.1.name=counter\n").getBytes());
+                fos.write(("clientApp.1.onBoot=true\n").getBytes());
+                fos.write(("clientApp.2.args=i2ptunnel.config\n").getBytes());
+                fos.write(("clientApp.2.main=net.i2p.i2ptunnel.TunnelControllerGroup\n").getBytes());
+                fos.write(("clientApp.2.name=tunnels\n").getBytes());
+                fos.write(("clientApp.2.delay=60\n").getBytes());
+                fos.close();
+            }
+        
         } catch (IOException ioe) {
             ioe.printStackTrace();
         }

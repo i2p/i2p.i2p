@@ -40,6 +40,7 @@ public class UDPSender {
         _context.statManager().createRateStat("udp.socketSendTime", "How long the actual socket.send took", "udp", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
         _context.statManager().createRateStat("udp.sendBWThrottleTime", "How long the send is blocked by the bandwidth throttle", "udp", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
         _context.statManager().createRateStat("udp.sendACKTime", "How long an ACK packet is blocked for (duration == lifetime)", "udp", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
+        _context.statManager().createRateStat("udp.sendException", "How frequently we fail to send a packet (likely due to a windows exception)", "udp", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
     }
     
     public void startup() {
@@ -176,8 +177,9 @@ public class UDPSender {
                         _context.statManager().addRateData("udp.pushTime", packet.getLifetime(), packet.getLifetime());
                         _context.statManager().addRateData("udp.sendPacketSize", size, packet.getLifetime());
                     } catch (IOException ioe) {
-                        if (_log.shouldLog(Log.ERROR))
-                            _log.error("Error sending", ioe);
+                        if (_log.shouldLog(Log.WARN))
+                            _log.warn("Error sending", ioe);
+                        _context.statManager().addRateData("udp.sendException", 1, packet.getLifetime());
                     }
                     
                     // back to the cache

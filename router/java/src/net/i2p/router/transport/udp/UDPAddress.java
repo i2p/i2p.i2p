@@ -19,6 +19,10 @@ public class UDPAddress {
     public static final String PROP_PORT = "port";
     public static final String PROP_HOST = "host";
     public static final String PROP_INTRO_KEY = "key";
+    
+    public static final String PROP_CAPACITY = "opts";
+    public static final char CAPACITY_TESTING = 'A';
+    public static final char CAPACITY_INTRODUCER = 'B';
 
     public UDPAddress(RouterAddress addr) {
         parse(addr);

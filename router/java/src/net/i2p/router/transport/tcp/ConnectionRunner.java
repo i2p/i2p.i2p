@@ -25,8 +25,11 @@ class ConnectionRunner implements Runnable {
     private long _lastTimeSend;
     private long _lastWriteEnd;
     private long _lastWriteBegin;
+    private long _lastRealActivity;
     
     private static final long TIME_SEND_FREQUENCY = 60*1000;
+    /** if we don't send them any real data in a 10 minute period, drop 'em */
+    static final int DISCONNECT_INACTIVITY_PERIOD = 10*60*1000;
     
     public ConnectionRunner(RouterContext ctx, TCPConnection con) {
         _context = ctx;
@@ -35,6 +38,7 @@ class ConnectionRunner implements Runnable {
         _keepRunning = false;
         _lastWriteBegin = ctx.clock().now();
         _lastWriteEnd = _lastWriteBegin;
+        _lastRealActivity = _lastWriteBegin;
     }
     
     public void startRunning() {
@@ -104,6 +108,9 @@ class ConnectionRunner implements Runnable {
         
         OutputStream out = _con.getOutputStream();
         boolean ok = false;
+        
+        if (!DateMessage.class.getName().equals(msg.getMessageType()))
+            _lastRealActivity = _context.clock().now();
         try {
             synchronized (out) {
                 _lastWriteBegin = _context.clock().now();
@@ -154,6 +161,7 @@ class ConnectionRunner implements Runnable {
             long now = _context.clock().now();
             long timeSinceWrite = now - _lastWriteEnd;
             long timeSinceWriteBegin = now - _lastWriteBegin;
+            long timeSinceWriteReal = now - _lastRealActivity;
             if (timeSinceWrite > 5*TIME_SEND_FREQUENCY) {
                 TCPTransport t = _con.getTransport();
                 String msg = "Connection closed with "
@@ -170,6 +178,23 @@ class ConnectionRunner implements Runnable {
                 _con.closeConnection(false);
                 return;
             }
+            if (timeSinceWriteReal > DISCONNECT_INACTIVITY_PERIOD) {
+                TCPTransport t = _con.getTransport();
+                String msg = "Connection closed with "
+                             + _con.getRemoteRouterIdentity().getHash().toBase64().substring(0,6)
+                             + " due to " + DataHelper.formatDuration(timeSinceWriteReal)
+                             + " of inactivity after " 
+                             + DataHelper.formatDuration(_con.getLifetime());
+                if (_lastWriteBegin > _lastWriteEnd)
+                    msg = msg + " with a message being written for " + 
+                          DataHelper.formatDuration(timeSinceWriteBegin);
+                t.addConnectionErrorMessage(msg);
+                if (_log.shouldLog(Log.INFO))
+                    _log.info(msg);
+                _con.closeConnection(false);
+                return;
+            }
+            
             if (_lastTimeSend < _context.clock().now() - 2*TIME_SEND_FREQUENCY) 
                 enqueueTimeMessage();
             long delay = 2*TIME_SEND_FREQUENCY + _context.random().nextInt((int)TIME_SEND_FREQUENCY);

@@ -75,7 +75,7 @@ class StoreState {
     }
     public boolean completed() { return _completed != -1; }
     public void complete(boolean completed) { 
-        if (completed)
+        if (completed && _completed <= 0)
             _completed = _context.clock().now();
     }
     public int getCompleteCount() { return _completeCount; }

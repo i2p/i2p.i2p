@@ -85,6 +85,11 @@ class KBucketSet {
         return all;
     }
     
+    public void getAll(SelectionCollector collector) {
+        for (int i = 0; i < _buckets.length; i++)
+            _buckets[i].getEntries(collector);
+    }
+    
     public int pickBucket(Hash key) {
         for (int i = 0; i < NUM_BUCKETS; i++) {
             if (_buckets[i].shouldContain(key))
@@ -134,8 +139,7 @@ class KBucketSet {
         
         return buf.toString();
     }
-    
-    
+
     final static String toString(byte b[]) {
         byte val[] = new byte[Hash.HASH_LENGTH];
         if (b.length < 32)

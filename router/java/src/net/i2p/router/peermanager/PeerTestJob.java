@@ -38,6 +38,9 @@ public class PeerTestJob extends JobImpl {
         super(context);
         _log = context.logManager().getLog(PeerTestJob.class);
         _keepTesting = false;
+        getContext().statManager().createRateStat("peer.testOK", "How long a successful test takes", "Peers", new long[] { 60*1000, 10*60*1000 });
+        getContext().statManager().createRateStat("peer.testTooSlow", "How long a too-slow (yet successful) test takes", "Peers", new long[] { 60*1000, 10*60*1000 });
+        getContext().statManager().createRateStat("peer.testTimeout", "How often a test times out without a reply", "Peers", new long[] { 60*1000, 10*60*1000 });
     }
     
     /** how long should we wait before firing off new tests?  */
@@ -202,9 +205,14 @@ public class PeerTestJob extends JobImpl {
                 DeliveryStatusMessage msg = (DeliveryStatusMessage)message;
                 if (_nonce == msg.getMessageId()) {
                     long timeLeft = _expiration - getContext().clock().now();
-                    if (timeLeft < 0)
-                        _log.warn("Took too long to get a reply from peer " + _peer.toBase64() 
-                                  + ": " + (0-timeLeft) + "ms too slow");
+                    if (timeLeft < 0) {
+                        if (_log.shouldLog(Log.WARN))
+                            _log.warn("Took too long to get a reply from peer " + _peer.toBase64() 
+                                      + ": " + (0-timeLeft) + "ms too slow");
+                        getContext().statManager().addRateData("peer.testTooSlow", 0-timeLeft, 0);
+                    } else {
+                        getContext().statManager().addRateData("peer.testOK", getTestTimeout() - timeLeft, 0);
+                    }
                     return true;
                 }
             }
@@ -280,6 +288,7 @@ public class PeerTestJob extends JobImpl {
             
             // don't fail the tunnels, as the peer might just plain be down, or
             // otherwise overloaded
+            getContext().statManager().addRateData("peer.testTimeout", 1, 0);
         }
     }
 }

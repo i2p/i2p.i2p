@@ -55,6 +55,9 @@ class PeerSelector {
      * @return List of Hash for the peers selected, ordered by bucket (but intra bucket order is not defined)
      */
     public List selectNearestExplicit(Hash key, int maxNumRouters, Set peersToIgnore, KBucketSet kbuckets) { 
+        if (true)
+            return selectNearestExplicitThin(key, maxNumRouters, peersToIgnore, kbuckets);
+        
         if (peersToIgnore == null)
             peersToIgnore = new HashSet(1);
         peersToIgnore.add(_context.router().getRouterInfo().getIdentity().getHash());
@@ -80,6 +83,63 @@ class PeerSelector {
         return peerHashes;
     }
     
+    /**
+     * Ignore KBucket ordering and do the XOR explicitly per key.  Runs in O(n*log(n))
+     * time (n=routing table size with c ~ 32 xor ops).  This gets strict ordering 
+     * on closest
+     *
+     * @return List of Hash for the peers selected, ordered by bucket (but intra bucket order is not defined)
+     */
+    public List selectNearestExplicitThin(Hash key, int maxNumRouters, Set peersToIgnore, KBucketSet kbuckets) { 
+        if (peersToIgnore == null)
+            peersToIgnore = new HashSet(1);
+        peersToIgnore.add(_context.router().getRouterInfo().getIdentity().getHash());
+        MatchSelectionCollector matches = new MatchSelectionCollector(key, peersToIgnore);
+        kbuckets.getAll(matches);
+        List rv = matches.get(maxNumRouters);
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("Searching for " + maxNumRouters + " peers close to " + key + ": " 
+                       + rv + " (not including " + peersToIgnore + ") [allHashes.size = " 
+                       + matches.size() + "]");
+        return rv;
+    }
+    
+    private class MatchSelectionCollector implements SelectionCollector {
+        private TreeMap _sorted;
+        private Hash _key;
+        private Set _toIgnore;
+        private int _matches;
+        public MatchSelectionCollector(Hash key, Set toIgnore) {
+            _key = key;
+            _sorted = new TreeMap();
+            _toIgnore = toIgnore;
+            _matches = 0;
+        }
+        public void add(Hash entry) {
+            if (_context.profileOrganizer().isFailing(entry))
+                return;
+            if (_toIgnore.contains(entry))
+                return;
+            if (_context.netDb().lookupRouterInfoLocally(entry) == null)
+                return;
+            
+            BigInteger diff = getDistance(_key, entry);
+            _sorted.put(diff, entry);
+            _matches++;
+        }
+        /** get the first $howMany entries matching */
+        public List get(int howMany) {
+            List rv = new ArrayList(howMany);
+            for (int i = 0; i < howMany; i++) {
+                if (_sorted.size() <= 0)
+                    break;
+                rv.add(_sorted.remove(_sorted.firstKey()));
+            }
+            return rv;
+        }
+        public int size() { return _matches; }
+    }
+        
     /** 
      * strip out all of the peers that are failing
      *

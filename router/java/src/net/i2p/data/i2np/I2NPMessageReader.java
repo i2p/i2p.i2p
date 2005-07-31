@@ -10,6 +10,7 @@ package net.i2p.data.i2np;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InterruptedIOException;
 
 import net.i2p.router.RouterContext;
 import net.i2p.util.I2PThread;
@@ -131,6 +132,13 @@ public class I2NPMessageReader {
                         if (_log.shouldLog(Log.WARN))
                             _log.warn("Error handling message", ime);
                         _listener.readError(I2NPMessageReader.this, ime);
+                        _listener.disconnected(I2NPMessageReader.this);
+                        cancelRunner();
+                    } catch (InterruptedIOException iioe) { 
+                        // not all I2NPMessageReaders support this, but some run off sockets which throw
+                        // SocketTimeoutExceptions or InterruptedIOExceptions
+                        if (_log.shouldLog(Log.INFO))
+                            _log.info("Disconnecting due to inactivity", iioe);
                         _listener.disconnected(I2NPMessageReader.this);
                         cancelRunner();
                     } catch (IOException ioe) {

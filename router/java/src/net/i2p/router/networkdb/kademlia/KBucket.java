@@ -62,6 +62,8 @@ interface KBucket {
      * @return set of Hash structures
      */
     public Set getEntries(Set toIgnoreHashes);
+    public void getEntries(SelectionCollector collector);
+    
     /**
      * Fill the bucket with entries
      * @param entries set of Hash structures

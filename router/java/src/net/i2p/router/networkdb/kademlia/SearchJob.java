@@ -27,6 +27,8 @@ import net.i2p.router.JobImpl;
 import net.i2p.router.RouterContext;
 import net.i2p.router.TunnelInfo;
 import net.i2p.router.message.SendMessageDirectJob;
+import net.i2p.stat.Rate;
+import net.i2p.stat.RateStat;
 import net.i2p.util.Log;
 
 /**
@@ -59,7 +61,7 @@ class SearchJob extends JobImpl {
      * How long will we give each peer to reply to our search? 
      *
      */
-    private static final int PER_PEER_TIMEOUT = 10*1000;
+    private static final int PER_PEER_TIMEOUT = 2*1000;
     
     /** 
      * give ourselves 30 seconds to send out the value found to the closest 
@@ -68,6 +70,13 @@ class SearchJob extends JobImpl {
      *
      */
     private static final long RESEND_TIMEOUT = 30*1000;
+    
+    /** 
+     * When we're just waiting for something to change, requeue the search status test
+     * every second.
+     *
+     */
+    private static final long REQUEUE_DELAY = 1000;
     
     /**
      * Create a new search for the routingKey specified
@@ -100,15 +109,17 @@ class SearchJob extends JobImpl {
         getContext().statManager().createRateStat("netDb.searchReplyNotValidated", "How many search replies we get that we are NOT able to validate (fetch)", "NetworkDatabase", new long[] { 5*60*1000l, 10*60*1000l, 60*60*1000l, 3*60*60*1000l, 24*60*60*1000l });
         getContext().statManager().createRateStat("netDb.searchReplyValidationSkipped", "How many search replies we get from unreliable peers that we skip?", "NetworkDatabase", new long[] { 5*60*1000l, 10*60*1000l, 60*60*1000l, 3*60*60*1000l, 24*60*60*1000l });
         getContext().statManager().createRateStat("netDb.republishQuantity", "How many peers do we need to send a found leaseSet to?", "NetworkDatabase", new long[] { 10*60*1000l, 60*60*1000l, 3*60*60*1000l, 24*60*60*1000l });
+
+        getContext().statManager().addRateData("netDb.searchCount", 1, 0);
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Search (" + getClass().getName() + " for " + key.toBase64(), new Exception("Search enqueued by"));
     }
 
     public void runJob() {
-        _startedOn = getContext().clock().now();
+        if (_startedOn <= 0) 
+            _startedOn = getContext().clock().now();
         if (_log.shouldLog(Log.INFO))
             _log.info(getJobId() + ": Searching for " + _state.getTarget()); // , getAddedBy());
-        getContext().statManager().addRateData("netDb.searchCount", 1, 0);
         searchNext();
     }
     
@@ -116,6 +127,25 @@ class SearchJob extends JobImpl {
     protected KademliaNetworkDatabaseFacade getFacade() { return _facade; }
     protected long getExpiration() { return _expiration; }
     protected long getTimeoutMs() { return _timeoutMs; }
+    
+    /**
+     * Let each peer take up to the average successful search RTT
+     *
+     */
+    protected int getPerPeerTimeoutMs() {
+        int rv = -1;
+        RateStat rs = getContext().statManager().getRate("netDb.successTime");
+        if (rs != null) {
+            Rate r = rs.getRate(rs.getPeriods()[0]);
+            rv = (int)r.getLifetimeAverageValue();
+        } 
+        
+        rv <<= 1; // double it to give some leeway.  (bah, too lazy to record stdev)
+        if ( (rv <= 0) || (rv > PER_PEER_TIMEOUT) )
+            return PER_PEER_TIMEOUT;
+        else
+            return rv + 1025; // tunnel delay
+    }
     
     /**
      * Send the next search, or stop if its completed
@@ -228,7 +258,12 @@ class SearchJob extends JobImpl {
     }
     
     private void requeuePending() {
-        requeuePending(5*1000);
+        // timeout/2 to average things out (midway through)
+        long perPeerTimeout = getPerPeerTimeoutMs()/2;
+        if (perPeerTimeout < REQUEUE_DELAY)
+            requeuePending(perPeerTimeout);
+        else
+            requeuePending(REQUEUE_DELAY);
     }
     private void requeuePending(long ms) {
         if (_pendingRequeueJob == null)
@@ -306,7 +341,7 @@ class SearchJob extends JobImpl {
             return;
         }
 	
-        long expiration = getContext().clock().now() + PER_PEER_TIMEOUT; // getTimeoutMs();
+        long expiration = getContext().clock().now() + getPerPeerTimeoutMs();
 
         DatabaseLookupMessage msg = buildMessage(inTunnelId, inGateway, expiration);	
 	
@@ -328,13 +363,13 @@ class SearchJob extends JobImpl {
         SearchMessageSelector sel = new SearchMessageSelector(getContext(), router, _expiration, _state);
         SearchUpdateReplyFoundJob reply = new SearchUpdateReplyFoundJob(getContext(), router, _state, _facade, this);
         
-        getContext().messageRegistry().registerPending(sel, reply, new FailedJob(getContext(), router), PER_PEER_TIMEOUT);
+        getContext().messageRegistry().registerPending(sel, reply, new FailedJob(getContext(), router), getPerPeerTimeoutMs());
         getContext().tunnelDispatcher().dispatchOutbound(msg, outTunnelId, router.getIdentity().getHash());
     }
     
     /** we're searching for a router, so we can just send direct */
     protected void sendRouterSearch(RouterInfo router) {
-        long expiration = getContext().clock().now() + PER_PEER_TIMEOUT; // getTimeoutMs();
+        long expiration = getContext().clock().now() + getPerPeerTimeoutMs();
 
         DatabaseLookupMessage msg = buildMessage(expiration);
 
@@ -345,7 +380,7 @@ class SearchJob extends JobImpl {
         SearchMessageSelector sel = new SearchMessageSelector(getContext(), router, _expiration, _state);
         SearchUpdateReplyFoundJob reply = new SearchUpdateReplyFoundJob(getContext(), router, _state, _facade, this);
         SendMessageDirectJob j = new SendMessageDirectJob(getContext(), msg, router.getIdentity().getHash(), 
-                                                          reply, new FailedJob(getContext(), router), sel, PER_PEER_TIMEOUT, SEARCH_PRIORITY);
+                                                          reply, new FailedJob(getContext(), router), sel, getPerPeerTimeoutMs(), SEARCH_PRIORITY);
         getContext().jobQueue().addJob(j);
     }
     
@@ -599,6 +634,13 @@ class SearchJob extends JobImpl {
     private static final int MAX_LEASE_RESEND = 10;
     
     /**
+     * Should we republish a routerInfo received?  Probably not worthwhile, since
+     * routerInfo entries should be very easy to find.
+     *
+     */
+    private static final boolean SHOULD_RESEND_ROUTERINFO = false;
+    
+    /**
      * After we get the data we were searching for, rebroadcast it to the peers
      * we would query first if we were to search for it again (healing the network).
      *
@@ -606,11 +648,13 @@ class SearchJob extends JobImpl {
     private void resend() {
         DataStructure ds = _facade.lookupLeaseSetLocally(_state.getTarget());
         if (ds == null) {
-            ds = _facade.lookupRouterInfoLocally(_state.getTarget());
-            if (ds != null)
-                getContext().jobQueue().addJob(new StoreJob(getContext(), _facade, _state.getTarget(), 
-                                                            ds, null, null, RESEND_TIMEOUT,
-                                                            _state.getSuccessful()));
+            if (SHOULD_RESEND_ROUTERINFO) {
+                ds = _facade.lookupRouterInfoLocally(_state.getTarget());
+                if (ds != null)
+                    getContext().jobQueue().addJob(new StoreJob(getContext(), _facade, _state.getTarget(), 
+                                                                ds, null, null, RESEND_TIMEOUT,
+                                                                _state.getSuccessful()));
+            }
         } else {
             Set sendTo = _state.getFailed();
             sendTo.addAll(_state.getPending());

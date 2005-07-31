@@ -116,10 +116,10 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
     private final static int MIN_REMAINING_ROUTERS = 20;
     
     /** 
-     * dont accept any dbDtore of a router over 6 hours old (unless we dont 
+     * dont accept any dbDtore of a router over 24 hours old (unless we dont 
      * know anyone or just started up) 
      */
-    private final static long ROUTER_INFO_EXPIRATION = 6*60*60*1000l;
+    private final static long ROUTER_INFO_EXPIRATION = 24*60*60*1000l;
     
     public KademliaNetworkDatabaseFacade(RouterContext context) {
         _context = context;
@@ -274,7 +274,8 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         _started = System.currentTimeMillis();
         
         // read the queues and publish appropriately
-        _context.jobQueue().addJob(new DataPublisherJob(_context, this));
+        if (false)
+            _context.jobQueue().addJob(new DataPublisherJob(_context, this));
         // expire old leases
         _context.jobQueue().addJob(new ExpireLeasesJob(_context, this));
         // expire some routers in overly full kbuckets

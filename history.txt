@@ -1,4 +1,13 @@
-$Id: history.txt,v 1.217 2005/07/22 19:15:59 jrandom Exp $
+$Id: history.txt,v 1.218 2005/07/27 14:06:11 jrandom Exp $
+
+2005-07-31  jrandom
+    * Adjust the netDb search and store per peer timeouts to match the average
+      measured per peer success times, rather than huge fixed values.
+    * Optimized and reverified the netDb peer selection / retrieval process 
+      within the kbuckets.
+    * Drop TCP connections that don't have any useful activity in 10 minutes.
+    * If i2np.udp.fixedPort=true, never change the externally published port,
+      even if we are autodetecting the IP address.
 
 * 2005-07-27  0.6 released
 

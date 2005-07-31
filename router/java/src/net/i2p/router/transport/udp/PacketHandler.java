@@ -27,17 +27,19 @@ public class PacketHandler {
     private UDPEndpoint _endpoint;
     private EstablishmentManager _establisher;
     private InboundMessageFragments _inbound;
+    private PeerTestManager _testManager;
     private boolean _keepReading;
     
     private static final int NUM_HANDLERS = 3;
     
-    public PacketHandler(RouterContext ctx, UDPTransport transport, UDPEndpoint endpoint, EstablishmentManager establisher, InboundMessageFragments inbound) {
+    public PacketHandler(RouterContext ctx, UDPTransport transport, UDPEndpoint endpoint, EstablishmentManager establisher, InboundMessageFragments inbound, PeerTestManager testManager) {
         _context = ctx;
         _log = ctx.logManager().getLog(PacketHandler.class);
         _transport = transport;
         _endpoint = endpoint;
         _establisher = establisher;
         _inbound = inbound;
+        _testManager = testManager;
         _context.statManager().createRateStat("udp.handleTime", "How long it takes to handle a received packet after its been pulled off the queue", "udp", new long[] { 10*60*1000, 60*60*1000 });
         _context.statManager().createRateStat("udp.queueTime", "How long after a packet is received can we begin handling it", "udp", new long[] { 10*60*1000, 60*60*1000 });
         _context.statManager().createRateStat("udp.receivePacketSkew", "How long ago after the packet was sent did we receive it", "udp", new long[] { 10*60*1000, 60*60*1000 });
@@ -322,6 +324,9 @@ public class PacketHandler {
                 if (_log.shouldLog(Log.INFO))
                     _log.info("Received new DATA packet from " + state + ": " + packet);
                 _inbound.receiveData(state, reader.getDataReader());
+                break;
+            case UDPPacket.PAYLOAD_TYPE_TEST:
+                _testManager.receiveTest(from, reader);
                 break;
             default:
                 if (_log.shouldLog(Log.WARN))

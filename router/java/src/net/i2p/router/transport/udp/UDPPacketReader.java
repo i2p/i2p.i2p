@@ -23,6 +23,7 @@ public class UDPPacketReader {
     private SessionCreatedReader _sessionCreatedReader;
     private SessionConfirmedReader _sessionConfirmedReader;
     private DataReader _dataReader;
+    private PeerTestReader _peerTestReader;
     
     private static final int KEYING_MATERIAL_LENGTH = 64;
     
@@ -33,6 +34,7 @@ public class UDPPacketReader {
         _sessionCreatedReader = new SessionCreatedReader();
         _sessionConfirmedReader = new SessionConfirmedReader();
         _dataReader = new DataReader();
+        _peerTestReader = new PeerTestReader();
     }
     
     public void initialize(UDPPacket packet) {
@@ -51,7 +53,7 @@ public class UDPPacketReader {
     
     /** what type of payload is in here? */
     public int readPayloadType() {
-        // 3 highest order bits == payload type
+        // 4 highest order bits == payload type
         return (_message[_payloadBeginOffset] & 0xFF) >>> 4;
     }
     
@@ -90,6 +92,7 @@ public class UDPPacketReader {
     public SessionCreatedReader getSessionCreatedReader() { return _sessionCreatedReader; }
     public SessionConfirmedReader getSessionConfirmedReader() { return _sessionConfirmedReader; }
     public DataReader getDataReader() { return _dataReader; }
+    public PeerTestReader getPeerTestReader() { return _peerTestReader; }
     
     public String toString() {
         switch (readPayloadType()) {
@@ -489,6 +492,48 @@ public class UDPPacketReader {
                 if (received(i))
                     buf.append(i).append(" ");
             return buf.toString();
+        }
+    }
+    
+    /** Help read the PeerTest payload */
+    public class PeerTestReader {
+        private static final int NONCE_LENGTH = 4;
+        
+        public long readNonce() {
+            int readOffset = readBodyOffset();
+            return DataHelper.fromLong(_message, readOffset, NONCE_LENGTH);
+        }
+        
+        public int readIPSize() {
+            int offset = readBodyOffset() + NONCE_LENGTH;
+            return (int)DataHelper.fromLong(_message, offset, 1);
+        }
+        
+        /** what IP Alice is reachable on */
+        public void readIP(byte target[], int targetOffset) {
+            int offset = readBodyOffset() + NONCE_LENGTH;
+            int size = (int)DataHelper.fromLong(_message, offset, 1);
+            offset++;
+            System.arraycopy(_message, offset, target, targetOffset, size);
+        }
+        
+        /** what IP Alice is reachable on */
+        public int readPort() {
+            int offset = readBodyOffset() + NONCE_LENGTH;
+            int size = (int)DataHelper.fromLong(_message, offset, 1);
+            offset++;
+            offset += size; // skip the IP
+            return (int)DataHelper.fromLong(_message, offset, 2);
+        }
+        
+        /** what Alice's intro key is (if known - if unknown, the key is INVALID_KEY) */
+        public void readIntroKey(byte target[], int targetOffset) {
+            int offset = readBodyOffset() + NONCE_LENGTH;
+            int size = (int)DataHelper.fromLong(_message, offset, 1);
+            offset++;
+            offset += size; // skip the IP
+            offset += 2; // skip the port
+            System.arraycopy(_message, offset, target, targetOffset, SessionKey.KEYSIZE_BYTES);
         }
     }
 }

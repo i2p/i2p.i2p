@@ -22,8 +22,10 @@ import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
 import net.i2p.data.RouterAddress;
 import net.i2p.data.RouterInfo;
+import net.i2p.data.RouterIdentity;
 import net.i2p.data.SessionKey;
 import net.i2p.data.i2np.I2NPMessage;
+import net.i2p.data.i2np.DatabaseStoreMessage;
 import net.i2p.router.OutNetMessage;
 import net.i2p.router.RouterContext;
 import net.i2p.router.transport.Transport;
@@ -45,6 +47,11 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     private Map _peersByRemoteHost;
     /** Relay tag (base64 String) to PeerState */
     private Map _peersByRelayTag;
+    /**
+     * Array of list of PeerState instances, where each list contains peers with one 
+     * of the given capacities (from 0-25, referencing 'A'-'Z'). 
+     */
+    private List _peersByCapacity[];
     private PacketHandler _handler;
     private EstablishmentManager _establisher;
     private MessageQueue _outboundMessages;
@@ -54,6 +61,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     private PacketPusher _pusher;
     private InboundMessageFragments _inboundFragments;
     private UDPFlooder _flooder;
+    private PeerTestManager _testManager;
     private ExpirePeerEvent _expireEvent;
     
     /** list of RelayPeer objects for people who will relay to us */
@@ -92,6 +100,9 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     public static final String PROP_ALWAYS_PREFER_UDP = "i2np.udp.alwaysPreferred";
     private static final String DEFAULT_ALWAYS_PREFER_UDP = "true";
     
+    public static final String PROP_FIXED_PORT = "i2np.udp.fixedPort";
+    private static final String DEFAULT_FIXED_PORT = "true";
+    
     /** how many relays offered to us will we use at a time? */
     public static final int PUBLIC_RELAY_COUNT = 3;
     
@@ -112,6 +123,9 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         _peersByIdent = new HashMap(128);
         _peersByRemoteHost = new HashMap(128);
         _peersByRelayTag = new HashMap(128);
+        _peersByCapacity = new ArrayList['Z'-'A'+1];
+        for (int i = 0; i < _peersByCapacity.length; i++)
+            _peersByCapacity[i] = new ArrayList(16);
         _endpoint = null;
         
         TimedWeightedPriorityMessageQueue mq = new TimedWeightedPriorityMessageQueue(ctx, PRIORITY_LIMITS, PRIORITY_WEIGHT, this);
@@ -198,8 +212,11 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         if (_establisher == null)
             _establisher = new EstablishmentManager(_context, this);
         
+        if (_testManager == null)
+            _testManager = new PeerTestManager(_context, this);
+        
         if (_handler == null)
-            _handler = new PacketHandler(_context, this, _endpoint, _establisher, _inboundFragments);
+            _handler = new PacketHandler(_context, this, _endpoint, _establisher, _inboundFragments, _testManager);
         
         if (_refiller == null)
             _refiller = new OutboundRefiller(_context, _fragments, _outboundMessages);
@@ -261,13 +278,15 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         if (explicitAddressSpecified()) 
             return;
             
+        boolean fixedPort = getIsPortFixed();
         boolean updated = false;
         synchronized (this) {
             if ( (_externalListenHost == null) ||
                  (!eq(_externalListenHost.getAddress(), _externalListenPort, ourIP, ourPort)) ) {
                 try {
                     _externalListenHost = InetAddress.getByAddress(ourIP);
-                    _externalListenPort = ourPort;
+                    if (!fixedPort)
+                        _externalListenPort = ourPort;
                     rebuildExternalAddress();
                     replaceAddress(_externalAddress);
                     updated = true;
@@ -277,7 +296,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             }
         }
         
-        _context.router().setConfigSetting(PROP_EXTERNAL_PORT, ourPort+"");
+        if (!fixedPort)
+            _context.router().setConfigSetting(PROP_EXTERNAL_PORT, ourPort+"");
         _context.router().saveConfig();
         
         if (updated) 
@@ -288,6 +308,9 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         return (rport == lport) && DataHelper.eq(laddr, raddr);
     }
     
+    private boolean getIsPortFixed() {
+        return DEFAULT_FIXED_PORT.equals(_context.getProperty(PROP_FIXED_PORT, DEFAULT_FIXED_PORT));
+    }
     /** 
      * get the state for the peer at the given remote host/port, or null 
      * if no state exists
@@ -316,6 +339,56 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         synchronized (_peersByRelayTag) {
             return (PeerState)_peersByRelayTag.get(relayTag);
         }
+    }
+    
+    /** pick a random peer with the given capacity */
+    public PeerState getPeerState(char capacity) {
+        int index = _context.random().nextInt(1024);
+        List peers = _peersByCapacity[capacity-'A'];
+        synchronized (peers) {
+            int size = peers.size();
+            if (size <= 0) return null;
+            index = index % size;
+            return (PeerState)peers.get(index);
+        }
+    }
+
+    private static final int MAX_PEERS_PER_CAPACITY = 16;
+    
+    /**
+     * Intercept RouterInfo entries received directly from a peer to inject them into
+     * the PeersByCapacity listing.
+     *
+     */
+    public void messageReceived(I2NPMessage inMsg, RouterIdentity remoteIdent, Hash remoteIdentHash, long msToReceive, int bytesReceived) {
+        if (inMsg instanceof DatabaseStoreMessage) {
+            DatabaseStoreMessage dsm = (DatabaseStoreMessage)inMsg;
+            if (dsm.getType() == DatabaseStoreMessage.KEY_TYPE_ROUTERINFO) {
+                Hash from = remoteIdentHash;
+                if (from == null)
+                    from = remoteIdent.getHash();
+                if (from.equals(dsm.getKey())) {
+                    // db info received directly from the peer - inject it into the peersByCapacity
+                    RouterInfo info = dsm.getRouterInfo();
+                    Properties opts = info.getOptions();
+                    if ( (opts != null) && (info.isValid()) ) {
+                        String capacities = opts.getProperty(UDPAddress.PROP_CAPACITY);
+                        if (capacities != null) {
+                            PeerState peer = getPeerState(from);
+                            for (int i = 0; i < capacities.length(); i++) {
+                                char capacity = capacities.charAt(i);
+                                List peers = _peersByCapacity[capacity];
+                                synchronized (peers) {
+                                    if ( (peers.size() < MAX_PEERS_PER_CAPACITY) && (!peers.contains(peer)) )
+                                        peers.add(peer);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        super.messageReceived(inMsg, remoteIdent, remoteIdentHash, msToReceive, bytesReceived);
     }
     
     /** 
@@ -380,6 +453,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         if (_log.shouldLog(Log.INFO))
             _log.info("Dropping remote peer: " + peer + " shitlist? " + shouldShitlist, new Exception("Dropped by"));
         if (peer.getRemotePeer() != null) {
+            dropPeerCapacities(peer);
+            
             if (shouldShitlist) {
                 long now = _context.clock().now();
                 _context.statManager().addRateData("udp.droppedPeer", now - peer.getLastReceiveTime(), now - peer.getKeyEstablishedTime());
@@ -406,6 +481,26 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         if (SHOULD_FLOOD_PEERS)
             _flooder.removePeer(peer);
         _expireEvent.remove(peer);
+    }
+    
+    /**
+     * Make sure we don't think this dropped peer is capable of doing anything anymore...
+     *
+     */
+    private void dropPeerCapacities(PeerState peer) {
+        RouterInfo info = _context.netDb().lookupRouterInfoLocally(peer.getRemotePeer());
+        if (info != null) {
+            String capacities = info.getOptions().getProperty(UDPAddress.PROP_CAPACITY);
+            if (capacities != null) {
+                for (int i = 0; i < capacities.length(); i++) {
+                    char capacity = capacities.charAt(i);
+                    List peers = _peersByCapacity[capacity];
+                    synchronized (peers) {
+                        peers.remove(peer);
+                    }
+                }
+            }
+        }
     }
     
     int send(UDPPacket packet) { 

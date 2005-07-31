@@ -155,13 +155,35 @@ public class GarlicClove extends DataStructureImpl {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Written cert: " + _certificate);
     }
+
+    public byte[] toByteArray() {
+        byte rv[] = new byte[estimateSize()];
+        int offset = 0;
+        offset += _instructions.writeBytes(rv, offset);
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("Wrote instructions: " + _instructions);
+        //offset += _msg.toByteArray(rv);
+        try {
+            byte m[] = _msg.toByteArray();
+            System.arraycopy(m, 0, rv, offset, m.length);
+            offset += m.length;
+        } catch (Exception e) { throw new RuntimeException("Unable to write: " + _msg + ": " + e.getMessage()); }
+        DataHelper.toLong(rv, offset, 4, _cloveId);
+        offset += 4;
+        DataHelper.toDate(rv, offset, _expiration.getTime());
+        offset += DataHelper.DATE_LENGTH;
+        offset += _certificate.writeBytes(rv, offset);
+        if (offset != rv.length)
+            _log.log(Log.CRIT, "Clove offset: " + offset + " but estimated length: " + rv.length);
+        return rv;
+    }
     
     public int estimateSize() {
-        return 64 // instructions (high estimate)
+        return _instructions.getSize()
                + _msg.getMessageSize() 
                + 4 // cloveId
                + DataHelper.DATE_LENGTH
-               + 4; // certificate
+               + _certificate.size(); // certificate
     }
     
     public boolean equals(Object obj) {

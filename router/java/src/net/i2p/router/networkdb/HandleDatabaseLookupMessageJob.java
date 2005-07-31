@@ -53,6 +53,7 @@ public class HandleDatabaseLookupMessageJob extends JobImpl {
         getContext().statManager().createRateStat("netDb.lookupsMatchedReceivedPublished", "How many netDb lookups did we have the data for that were published to us?", "NetworkDatabase", new long[] { 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
         getContext().statManager().createRateStat("netDb.lookupsMatchedLocalClosest", "How many netDb lookups for local data were received where we are the closest peers?", "NetworkDatabase", new long[] { 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
         getContext().statManager().createRateStat("netDb.lookupsMatchedLocalNotClosest", "How many netDb lookups for local data were received where we are NOT the closest peers?", "NetworkDatabase", new long[] { 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
+        getContext().statManager().createRateStat("netDb.lookupsMatchedRemoteNotClosest", "How many netDb lookups for remote data were received where we are NOT the closest peers?", "NetworkDatabase", new long[] { 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
         _message = receivedMessage;
         _from = from;
         _fromHash = fromHash;
@@ -81,12 +82,16 @@ public class HandleDatabaseLookupMessageJob extends JobImpl {
                 Set routerInfoSet = getContext().netDb().findNearestRouters(_message.getSearchKey(), 
                                                                             CLOSENESS_THRESHOLD,
                                                                             _message.getDontIncludePeers());
-                if (getContext().clientManager().isLocal(ls.getDestination()) && 
-                    weAreClosest(routerInfoSet)) {
-                    getContext().statManager().addRateData("netDb.lookupsMatchedLocalClosest", 1, 0);
-                    sendData(_message.getSearchKey(), ls, fromKey, _message.getReplyTunnel());
+                if (getContext().clientManager().isLocal(ls.getDestination())) {
+                    if (weAreClosest(routerInfoSet)) {
+                        getContext().statManager().addRateData("netDb.lookupsMatchedLocalClosest", 1, 0);
+                        sendData(_message.getSearchKey(), ls, fromKey, _message.getReplyTunnel());
+                    } else {
+                        getContext().statManager().addRateData("netDb.lookupsMatchedLocalNotClosest", 1, 0);
+                        sendClosest(_message.getSearchKey(), routerInfoSet, fromKey, _message.getReplyTunnel());
+                    }
                 } else {
-                    getContext().statManager().addRateData("netDb.lookupsMatchedLocalNotClosest", 1, 0);
+                    getContext().statManager().addRateData("netDb.lookupsMatchedRemoteNotClosest", 1, 0);
                     sendClosest(_message.getSearchKey(), routerInfoSet, fromKey, _message.getReplyTunnel());
                 }
             }

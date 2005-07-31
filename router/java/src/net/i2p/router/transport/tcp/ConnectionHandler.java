@@ -152,7 +152,10 @@ public class ConnectionHandler {
         if (ok && (_error == null) ) {
             establishComplete();
             
-            try { _socket.setSoTimeout(0); } catch (SocketException se) {}
+            if (true)
+                try { _socket.setSoTimeout(ConnectionRunner.DISCONNECT_INACTIVITY_PERIOD); } catch (SocketException se) {}
+            else
+                try { _socket.setSoTimeout(0); } catch (SocketException se) {}
             
             if (_log.shouldLog(Log.INFO))
                 _log.info("Establishment ok... building the con");

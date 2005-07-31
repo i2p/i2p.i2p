@@ -33,6 +33,7 @@ public class RepublishLeaseSetJob extends JobImpl {
         _facade = facade;
         _dest = destHash;
         //getTiming().setStartAfter(ctx.clock().now()+REPUBLISH_LEASESET_DELAY);
+        getContext().statManager().createRateStat("netDb.republishLeaseSetCount", "How often we republish a leaseSet?", "NetworkDatabase", new long[] { 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
     }
     public String getName() { return "Republish a local leaseSet"; }
     public void runJob() {
@@ -46,6 +47,7 @@ public class RepublishLeaseSetJob extends JobImpl {
                         if (_log.shouldLog(Log.WARN))
                             _log.warn("Not publishing a LOCAL lease that isn't current - " + _dest, new Exception("Publish expired LOCAL lease?"));
                     } else {
+                        getContext().statManager().addRateData("netDb.republishLeaseSetCount", 1, 0);
                         getContext().jobQueue().addJob(new StoreJob(getContext(), _facade, _dest, ls, new OnSuccess(getContext()), new OnFailure(getContext()), REPUBLISH_LEASESET_TIMEOUT));
                     }
                 } else {
@@ -82,7 +84,7 @@ public class RepublishLeaseSetJob extends JobImpl {
         public void runJob() { 
             if (_log.shouldLog(Log.WARN))
                 _log.warn("FAILED publishing of the leaseSet for " + _dest.toBase64());
-            RepublishLeaseSetJob.this.requeue(30*1000);
+            RepublishLeaseSetJob.this.requeue(5*1000);
         }
     }
 }
