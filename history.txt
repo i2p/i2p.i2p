@@ -1,4 +1,10 @@
-$Id: history.txt,v 1.218 2005/07/27 14:06:11 jrandom Exp $
+$Id: history.txt,v 1.219 2005/07/31 16:35:26 jrandom Exp $
+
+2005-08-01  duck
+    * Fix an addressbook NPE when a new hostname from the master addressbook
+      didn't exist in the router addressbook.
+    * Fix an addressbook bug which caused subscriptions not to be parsed at
+      all. (Oops!)
 
 2005-07-31  jrandom
     * Adjust the netDb search and store per peer timeouts to match the average
