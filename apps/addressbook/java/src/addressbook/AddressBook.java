@@ -71,7 +71,7 @@ public class AddressBook {
 
         try {
             EepGet get = new EepGet(I2PAppContext.getGlobalContext(), true,
-                    proxyHost, proxyPort, 2, "addressbook.tmp", url, true, 
+                    proxyHost, proxyPort, 0, "addressbook.tmp", url, true, 
                     null);
             get.fetch();
             this.addresses = ConfigParser.parse("addressbook.tmp");
@@ -94,7 +94,7 @@ public class AddressBook {
 
         try {            
             EepGet get = new EepGet(I2PAppContext.getGlobalContext(), true,
-                    proxyHost, proxyPort, 2, "addressbook.tmp", 
+                    proxyHost, proxyPort, 0, "addressbook.tmp", 
                     subscription.getLocation(), true, subscription.getEtag());
             get.fetch();
             this.addresses = ConfigParser.parse("addressbook.tmp");
