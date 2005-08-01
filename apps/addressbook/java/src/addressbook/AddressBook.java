@@ -73,7 +73,7 @@ public class AddressBook {
                 null);
         get.fetch();
         try {
-            this.addresses = ConfigParser.parse("addressbook.tmp");
+            this.addresses = ConfigParser.parse(new File("addressbook.tmp"));
         } catch (IOException exp) {
             this.addresses = new HashMap();
         }
@@ -96,7 +96,7 @@ public class AddressBook {
         get.fetch();
         subscription.setEtag(get.getETag());
         try {            
-            this.addresses = ConfigParser.parse("addressbook.tmp");
+            this.addresses = ConfigParser.parse(new File("addressbook.tmp"));
         } catch (IOException exp) {
             this.addresses = new HashMap();
         }
@@ -178,14 +178,13 @@ public class AddressBook {
                                 + ". Destination in remote address book is "
                                 + otherValue);
                     }
-                } else {
-                    if (!this.addresses.get(otherKey).equals(otherValue)) {
-                        this.addresses.put(otherKey, otherValue);
-                        this.modified = true;
-                        if (log != null) {
-                            log.append("New address " + otherKey
-                                + " added to address book.");
-                        }
+                } else if (!this.addresses.containsKey(otherKey)
+                            || !this.addresses.get(otherKey).equals(otherValue)) {
+                    this.addresses.put(otherKey, otherValue);
+                    this.modified = true;
+                    if (log != null) {
+                        log.append("New address " + otherKey
+                            + " added to address book.");
                     }
                 }
             }
