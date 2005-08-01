@@ -58,15 +58,14 @@ public class Daemon {
      */
     public static void update(AddressBook master, AddressBook router,
             File published, SubscriptionList subscriptions, Log log) {
-        String routerLocation = router.getLocation();
-        master.merge(router);
+        router.merge(master, true, null);
         Iterator iter = subscriptions.iterator();
         while (iter.hasNext()) {
-            master.merge((AddressBook) iter.next(), log);
+            router.merge((AddressBook) iter.next(), false, log);
         }
-        master.write(new File(routerLocation));
+        router.write();
         if (published != null)
-            master.write(published);
+            router.write(published);
         subscriptions.write();
     }
 

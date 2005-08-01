@@ -68,17 +68,16 @@ public class AddressBook {
      */
     public AddressBook(String url, String proxyHost, int proxyPort) {
         this.location = url;
-
+        EepGet get = new EepGet(I2PAppContext.getGlobalContext(), true,
+                proxyHost, proxyPort, 0, "addressbook.tmp", url, true, 
+                null);
+        get.fetch();
         try {
-            EepGet get = new EepGet(I2PAppContext.getGlobalContext(), true,
-                    proxyHost, proxyPort, 0, "addressbook.tmp", url, true, 
-                    null);
-            get.fetch();
             this.addresses = ConfigParser.parse("addressbook.tmp");
-            new File("addressbook.tmp").delete();
         } catch (IOException exp) {
             this.addresses = new HashMap();
         }
+        new File("addressbook.tmp").delete();
     }
 
     /**
@@ -91,18 +90,17 @@ public class AddressBook {
      */
     public AddressBook(Subscription subscription, String proxyHost, int proxyPort) {
         this.location = subscription.getLocation();
-
+        EepGet get = new EepGet(I2PAppContext.getGlobalContext(), true,
+                proxyHost, proxyPort, 0, "addressbook.tmp", 
+                subscription.getLocation(), true, subscription.getEtag());
+        get.fetch();
+        subscription.setEtag(get.getETag());
         try {            
-            EepGet get = new EepGet(I2PAppContext.getGlobalContext(), true,
-                    proxyHost, proxyPort, 0, "addressbook.tmp", 
-                    subscription.getLocation(), true, subscription.getEtag());
-            get.fetch();
             this.addresses = ConfigParser.parse("addressbook.tmp");
-            subscription.setEtag(get.getETag());
-            new File("addressbook.tmp").delete();
         } catch (IOException exp) {
             this.addresses = new HashMap();
         }
+        new File("addressbook.tmp").delete();
     }
 
     /**
@@ -164,7 +162,7 @@ public class AddressBook {
      * @param log
      *            The log to write messages about new addresses or conflicts to.
      */
-    public void merge(AddressBook other, Log log) {
+    public void merge(AddressBook other, boolean overwrite, Log log) {
         Iterator otherIter = other.addresses.keySet().iterator();
 
         while (otherIter.hasNext()) {
@@ -172,7 +170,7 @@ public class AddressBook {
             String otherValue = (String) other.addresses.get(otherKey);
 
             if (otherKey.endsWith(".i2p") && otherValue.length() >= 516) {
-                if (this.addresses.containsKey(otherKey)) {
+                if (this.addresses.containsKey(otherKey) && !overwrite) {
                     if (!this.addresses.get(otherKey).equals(otherValue)
                             && log != null) {
                         log.append("Conflict for " + otherKey + " from "
@@ -181,25 +179,17 @@ public class AddressBook {
                                 + otherValue);
                     }
                 } else {
-                    this.addresses.put(otherKey, otherValue);
-                    this.modified = true;
-                    if (log != null) {
-                        log.append("New address " + otherKey
+                    if (!this.addresses.get(otherKey).equals(otherValue)) {
+                        this.addresses.put(otherKey, otherValue);
+                        this.modified = true;
+                        if (log != null) {
+                            log.append("New address " + otherKey
                                 + " added to address book.");
+                        }
                     }
                 }
             }
         }
-    }
-
-    /**
-     * Merge this AddressBook with other, without logging.
-     * 
-     * @param other
-     *            An AddressBook to merge with.
-     */
-    public void merge(AddressBook other) {
-        this.merge(other, null);
     }
 
     /**

@@ -69,11 +69,11 @@ public class SubscriptionList {
         this.lastModifiedFile = lastModifiedFile;
         this.proxyHost = proxyHost;
         this.proxyPort = proxyPort;
-        List locations;
         Map etags;
         Map lastModified;
         String location;
-        locations = ConfigParser.parseSubscriptions(locationsFile, defaultSubs);
+        List locations = ConfigParser.parseSubscriptions(locationsFile, 
+                defaultSubs);
         try {
             etags = ConfigParser.parse(etagsFile);
         } catch (IOException exp) {
@@ -90,8 +90,6 @@ public class SubscriptionList {
             this.subscriptions.add(new Subscription(location, (String) etags
                     .get(location), (String) lastModified.get(location)));
         }
-
-        iter = this.iterator();
     }
     
     /**
