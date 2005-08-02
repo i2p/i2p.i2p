@@ -1,4 +1,7 @@
-$Id: history.txt,v 1.219 2005/07/31 16:35:26 jrandom Exp $
+$Id: history.txt,v 1.220 2005/08/01 08:35:11 duck Exp $
+
+2005-08-01  duck
+    * Update IzPack to 3.7.2 (build 2005.04.22). This fixes bug #82.
 
 2005-08-01  duck
     * Fix an addressbook NPE when a new hostname from the master addressbook
