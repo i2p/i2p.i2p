@@ -159,9 +159,28 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
         }
     }
 
+    private static final String PROP_HANDLER_COUNT = "i2ptunnel.blockingHandlerCount";
+    private static final int DEFAULT_HANDLER_COUNT = 10;
+    
+    protected int getHandlerCount() { 
+        int rv = DEFAULT_HANDLER_COUNT;
+        String cnt = getTunnel().getClientOptions().getProperty(PROP_HANDLER_COUNT);
+        if (cnt != null) {
+            try {
+                rv = Integer.parseInt(cnt);
+                if (rv <= 0)
+                    rv = DEFAULT_HANDLER_COUNT;
+            } catch (NumberFormatException nfe) {
+                rv = DEFAULT_HANDLER_COUNT;
+            }
+        }
+        return rv;
+    }
+    
     public void run() {
             I2PServerSocket i2pss = sockMgr.getServerSocket();
-            for (int i = 0; i < 5; i++) {
+            int handlers = getHandlerCount();
+            for (int i = 0; i < handlers; i++) {
                 I2PThread handler = new I2PThread(new Handler(i2pss), "Handle Server " + i);
                 handler.start();
             }

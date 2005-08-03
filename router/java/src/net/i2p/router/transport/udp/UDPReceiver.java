@@ -179,8 +179,8 @@ public class UDPReceiver {
                         if (_log.shouldLog(Log.INFO))
                             _log.info("Changing ports...");
                     } else {
-                        if (_log.shouldLog(Log.ERROR))
-                            _log.error("Error receiving", ioe);
+                        if (_log.shouldLog(Log.WARN))
+                            _log.warn("Error receiving", ioe);
                     }
                     packet.release();
                 }

@@ -1,4 +1,11 @@
-$Id: history.txt,v 1.220 2005/08/01 08:35:11 duck Exp $
+$Id: history.txt,v 1.221 2005/08/01 22:26:51 duck Exp $
+
+* 2005-08-03  0.6.0.1 released
+
+2005-08-03  jrandom
+    * Backed out an inadvertant change to the netDb store redundancy factor.
+    * Verify tunnel participant caching.
+    * Logging cleanup
 
 2005-08-01  duck
     * Update IzPack to 3.7.2 (build 2005.04.22). This fixes bug #82.

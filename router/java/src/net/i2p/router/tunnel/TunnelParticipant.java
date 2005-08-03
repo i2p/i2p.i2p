@@ -142,14 +142,18 @@ public class TunnelParticipant {
         }
         public String getName() { return "forward a tunnel message"; }
         public void runJob() {
-            RouterInfo ri = _context.netDb().lookupRouterInfoLocally(_config.getSendTo());
-            if (ri != null) {
-                _nextHopCache = ri;
-                send(_config, _msg, ri);
+            if (_nextHopCache != null) {
+                send(_config, _msg, _nextHopCache);
             } else {
-                if (_log.shouldLog(Log.ERROR))
-                    _log.error("Lookup the nextHop (" + _config.getSendTo().toBase64().substring(0,4) 
-                              + " failed!  where do we go for " + _config + "?  msg dropped: " + _msg);
+                RouterInfo ri = _context.netDb().lookupRouterInfoLocally(_config.getSendTo());
+                if (ri != null) {
+                    _nextHopCache = ri;
+                    send(_config, _msg, ri);
+                } else {
+                    if (_log.shouldLog(Log.ERROR))
+                        _log.error("Lookup the nextHop (" + _config.getSendTo().toBase64().substring(0,4) 
+                                  + " failed!  where do we go for " + _config + "?  msg dropped: " + _msg);
+                }
             }
         }
     }
@@ -162,6 +166,9 @@ public class TunnelParticipant {
         }
         public String getName() { return "timeout looking for next hop info"; }
         public void runJob() {
+            if (_nextHopCache != null)
+                return;
+            
             RouterInfo ri = _context.netDb().lookupRouterInfoLocally(_config.getSendTo());
             if (ri != null) {
                 _nextHopCache = ri;

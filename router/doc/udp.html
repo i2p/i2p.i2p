@@ -1,4 +1,4 @@
-<code>$Id: udp.html,v 1.13 2005/05/01 15:08:08 jrandom Exp $</code>
+<code>$Id: udp.html,v 1.14 2005/07/27 14:04:07 jrandom Exp $</code>
 
 <h1>Secure Semireliable UDP (SSU)</h1>
 <b>DRAFT</b>
@@ -21,8 +21,8 @@ indirect address, for using a third party to introduce the peer.
 There is no restriction on the number of addresses a peer may have.</p>
 
 <pre>
-    Direct: udp://host:port/introKey
-  Indirect: udp://tag@relayhost:port/relayIntroKey/targetIntroKey
+    Direct: ssu://host:port/introKey[?opts=[A-Z]*]
+  Indirect: ssu://tag@relayhost:port/relayIntroKey/targetIntroKey[?opts=[A-Z]*]
 </pre>
 
 <p>These introduction keys are delivered through an external channel 
@@ -35,6 +35,10 @@ the requesting peer the IP and port on which the addressed peer is
 located.  In addition, the peer establishing the connection must 
 already know the public keys of the peer they are connecting to (but
 not necessary to any intermediary relay peer).</p>
+
+<p>Each of the addresses may also expose a series of options - special
+capabilities of that particular peer.  For a list of available
+capabilities, see <a href="#capabilities">below</a>.</p>
 
 <h2><a name="header">Header</a></h2>
 
@@ -433,6 +437,41 @@ bits 10-23: fragment size</pre></li>
  +----+----+----+----+----+----+----+----+
 </pre>
 
+<h3><a name="peerTest">PeerTest (type 7)</a></h3>
+<table border="1">
+<tr><td align="right" valign="top"><b>Peer:</b></td>
+    <td><a href="#peerTesting">Any</a></td></tr>
+<tr><td align="right" valign="top"><b>Data:</b></td>
+    <td><ul>
+        <li>4 byte nonce</li>
+        <li>1 byte IP address size</li>
+        <li>that many byte representation of Alice's IP address</li>
+        <li>2 byte port number</li>
+        <li>Alice's introduction key</li>
+        <li>N bytes, currently uninterpreted</li>
+	</ul></td></tr>
+<tr><td align="right" valign="top"><b>Key used:</b></td>
+    <td>introKey (or sessionKey if the connection has already been established)</td></tr>
+</table>
+
+<pre>
+ +----+----+----+----+----+----+----+----+
+ |    test nonce     |size| that many    |
+ +----+----+----+----+----+              |
+ |bytes making up Alice's IP address     |
+ |----+----+----+----+----+----+----+----+
+ | Port (A)| Alice or Charlie's          |
+ +----+----+                             |
+ | introduction key (Alice's is sent to  |
+ | Bob and Charlie, while Charlie's is   |                                      |
+ | sent to Alice)                        |
+ |         +----+----+----+----+----+----+
+ |         | arbitrary amount of         |
+ |----+----+                             |
+ | uninterpreted data                    |
+ +----+----+----+----+----+----+----+----+
+</pre>
+
 <h2><a name="congestioncontrol">Congestion control</a></h2>
 
 <p>SSU's need for only semireliable delivery, TCP-friendly operation,
@@ -524,6 +563,74 @@ are not in any particular order - in fact, they are likely to be
 entirely random.  The SSU layer makes no attempt at messageId 
 replay prevention - higher layers should take that into account.</p>
 
+<h2><a name="peerTesting">Peer testing</a></h2>
+
+<p>The automation of collaborative reachability testing for peers is
+enabled by a sequence of PeerTest messages.  With its proper 
+execution, a peer will be able to determine their own reachability
+and may update its behavior accordingly.  The testing process is 
+quite simple:</p>
+
+<pre>
+        Alice                  Bob                  Charlie
+    PeerTest ------------------&gt;
+         &lt;-------------PeerTest  PeerTest-------------&gt;
+         &lt;------------------------------------------PeerTest
+    PeerTest------------------------------------------&gt;
+         &lt;------------------------------------------PeerTest
+</pre>
+
+<p>Each of the PeerTest messages carry a nonce identifying the
+test series itself, as initialized by Alice.  If Alice doesn't 
+get a particular message that she expects, she will retransmit
+accordingly, and based upon the data received or the messages
+missing, she will know her reachability.  The various end states
+that may be reached are as follows:</p>
+
+<ul>
+<li>If she doesn't receive a response from Bob, she will retransmit
+up to a certain number of times, but if no response ever arrives,
+she will know that her firewall or NAT is somehow misconfigured, 
+rejecting all inbound UDP packets even in direct response to an
+outbound packet.  Alternately, Bob may be down.</li>
+
+<li>If Alice doesn't receive a PeerTest message with the 
+expected nonce from a third party (Charlie), she will retransmit
+her initial request to Bob up to a certain number of times, even
+if she has received Bob's reply already.  If Charlie's first message 
+still doesn't get through but Bob's does, she knows that she is
+behind a NAT or firewall that is rejecting unsolicited connection
+attempts and that port forwarding is not operating properly (the
+IP and port that Bob offered up should be forwarded).</li>
+
+<li>If Alice receives Bob's PeerTest message and both of Charlie's
+PeerTest messages but the enclosed IP and port numbers in Bob's 
+and Charlie's second messages don't match, she knows that she is 
+behind a symmetric NAT, rewriting all of her outbound packets with
+different 'from' ports for each peer contacted.  She will need to
+explicitly forward a port and always have that port exposed for 
+remote connectivity, ignoring further port discovery.</li>
+
+<li>If Alice receives Charlie's first message but not his second,
+she will retransmit her PeerTest message to Charlie up to a 
+certain number of times, but if no response is received she knows
+that Charlie is either confused or no longer online.</li>
+</ul>
+
+<p>Alice should choose Bob arbitrarily from known peers who seem
+to be capable of participating in peer tests.  Bob in turn should
+choose Charlie arbitrarily from peers that he knows who seem to be
+capable of participating in peer tests and who are on a different
+IP from both Bob and Alice.  If the first error condition occurs
+(Alice doesn't get PeerTest messages from Bob), Alice may decide
+to designate a new peer as Bob and try again with a different nonce.</p>
+
+<p>Alice's introduction key is included in all of the PeerTest 
+messages so that she doesn't need to already have an established
+session with Bob and so that Charlie can contact her without knowing
+any additional information.  Alice may go on to establish a session
+with either Bob or Charlie, but it is not required.</p>
+
 <h2><a name="messageSequences">Message sequences</a></h2>
 
 <h3><a name="establishDirect">Connection establishment (direct)</a></h3>
@@ -594,3 +701,16 @@ replay prevention - higher layers should take that into account.</p>
  |                                       |
  +----+----+----+----+----+----+----+----+
 </pre> 
+
+<h2><a name="capabilities">Peer capabilities</a></h2>
+
+<dl>
+ <dt>A</dt>
+ <dd>If the peer address contains the 'A' capability, that means 
+     they are willing and able to participate in peer tests as
+     a 'Bob' or 'Charlie'.</dd>
+ <dt>B</dt>
+ <dd>If the peer address contains the 'B' capability, that means
+     they are willing and able to serve as an introducer - serving
+     as a Bob for an otherwise unreachable Alice.</dd>
+</dl>

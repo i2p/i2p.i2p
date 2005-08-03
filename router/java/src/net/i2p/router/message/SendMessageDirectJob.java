@@ -74,8 +74,8 @@ public class SendMessageDirectJob extends JobImpl {
         long now = getContext().clock().now();
 
         if (_expiration < now) {
-            if (_log.shouldLog(Log.ERROR))
-                _log.error("Timed out sending message " + _message + " directly (expiration = " 
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Timed out sending message " + _message + " directly (expiration = " 
                            + new Date(_expiration) + ") to " + _targetHash.toBase64(), getAddedBy());
             if (_onFail != null)
                 getContext().jobQueue().addJob(_onFail);
