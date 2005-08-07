@@ -75,7 +75,6 @@ public class TunnelParticipant {
         }
         
         if ( (_config != null) && (_config.getSendTo() != null) ) {
-            _config.incrementProcessedMessages();
             RouterInfo ri = _nextHopCache;
             if (ri == null)
                 ri = _context.netDb().lookupRouterInfoLocally(_config.getSendTo());
@@ -83,6 +82,7 @@ public class TunnelParticipant {
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("Send off to nextHop directly (" + _config.getSendTo().toBase64().substring(0,4) 
                               + " for " + msg);
+                _config.incrementProcessedMessages();
                 send(_config, msg, ri);
             } else {
                 if (_log.shouldLog(Log.WARN))

@@ -3,6 +3,7 @@ package net.i2p.router.tunnel.pool;
 import net.i2p.data.Certificate;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
+import net.i2p.data.RouterInfo;
 import net.i2p.data.RouterIdentity;
 import net.i2p.data.TunnelId;
 import net.i2p.data.i2np.DeliveryInstructions;
@@ -19,6 +20,7 @@ import net.i2p.router.message.GarlicMessageBuilder;
 import net.i2p.router.message.PayloadGarlicConfig;
 import net.i2p.router.message.SendMessageDirectJob;
 import net.i2p.router.tunnel.HopConfig;
+import net.i2p.router.peermanager.TunnelHistory;
 import net.i2p.util.Log;
 
 /**
@@ -31,6 +33,7 @@ import net.i2p.util.Log;
 public class HandleTunnelCreateMessageJob extends JobImpl {
     private Log _log;
     private TunnelCreateMessage _request;
+    private boolean _alreadySearched;
     
     /** job builder to redirect all tunnelCreateMessages through this job type */
     static class Builder implements HandlerJobBuilder {
@@ -46,14 +49,19 @@ public class HandleTunnelCreateMessageJob extends JobImpl {
         super(ctx);
         _log = ctx.logManager().getLog(HandleTunnelCreateMessageJob.class);
         _request = msg;
+        _alreadySearched = false;
     }
+    
+    private static final int STATUS_DEFERRED = 10000;
     
     public String getName() { return "Handle tunnel join request"; }
     public void runJob() {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("handle join request: " + _request);
         int status = shouldAccept();
-        if (status > 0) {
+        if (status == STATUS_DEFERRED) {
+            return;
+        } else if (status > 0) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("reject(" + status + ") join request: " + _request);
             sendRejection(status);
@@ -64,7 +72,34 @@ public class HandleTunnelCreateMessageJob extends JobImpl {
         }
     }
     
-    private int shouldAccept() { return getContext().throttle().acceptTunnelRequest(_request); }
+    private int shouldAccept() {
+        Hash nextRouter = _request.getNextRouter();
+        if (nextRouter != null) {
+            RouterInfo ri = getContext().netDb().lookupRouterInfoLocally(nextRouter);
+            if (ri == null) {
+                if (_alreadySearched) // only search once
+                    return TunnelHistory.TUNNEL_REJECT_TRANSIENT_OVERLOAD;
+                getContext().netDb().lookupRouterInfo(nextRouter, new DeferredAccept(getContext(), true), new DeferredAccept(getContext(), false), 5*1000);
+                _alreadySearched = true;
+                return STATUS_DEFERRED;
+            }
+        }
+        return getContext().throttle().acceptTunnelRequest(_request); 
+    }
+    
+    private class DeferredAccept extends JobImpl {
+        private boolean _shouldAccept;
+        public DeferredAccept(RouterContext ctx, boolean shouldAccept) {
+            super(ctx);
+            _shouldAccept = shouldAccept;
+        }
+        public void runJob() {
+            HandleTunnelCreateMessageJob.this.runJob();
+        }
+        private static final String NAME_OK = "Deferred netDb accept";
+        private static final String NAME_REJECT = "Deferred netDb reject";
+        public String getName() { return _shouldAccept ? NAME_OK : NAME_REJECT; }
+    }
     
     private void accept() {
         byte recvId[] = new byte[4];

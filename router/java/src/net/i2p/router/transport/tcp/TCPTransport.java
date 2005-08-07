@@ -802,7 +802,7 @@ public class TCPTransport extends TransportImpl {
             }
             buf.append("</ul>\n");
             
-            buf.append("<b>Average clock skew: ");
+            buf.append("<b>Average clock skew, TCP peers: ");
             if (_connectionsByIdent.size() > 0)
                 buf.append(offsetTotal / _connectionsByIdent.size()).append("ms</b><br />\n");
             else

@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.i2p.data.Hash;
+import net.i2p.data.RouterInfo;
+import net.i2p.data.i2np.I2NPMessage;
 import net.i2p.router.OutNetMessage;
 import net.i2p.router.RouterContext;
 import net.i2p.util.I2PThread;
@@ -35,7 +37,7 @@ public class OutboundMessageFragments {
     /** if we can handle more messages explicitly, set this to true */
     private boolean _allowExcess;
     
-    private static final int MAX_ACTIVE = 32;
+    private static final int MAX_ACTIVE = 64;
     // don't send a packet more than 10 times
     static final int MAX_VOLLEYS = 10;
     
@@ -83,6 +85,7 @@ public class OutboundMessageFragments {
         
         long start = _context.clock().now();
         int numActive = 0;
+        int maxActive = Math.max(_transport.countActivePeers(), MAX_ACTIVE);
         while (_alive) {
             finishMessages();
             try {
@@ -90,7 +93,7 @@ public class OutboundMessageFragments {
                     numActive = _activeMessages.size();
                     if (!_alive)
                         return false;
-                    else if (numActive < MAX_ACTIVE)
+                    else if (numActive < maxActive)
                         return true;
                     else if (_allowExcess)
                         return true;
@@ -108,9 +111,18 @@ public class OutboundMessageFragments {
      *
      */
     public void add(OutNetMessage msg) {
+        I2NPMessage msgBody = msg.getMessage();
+        RouterInfo target = msg.getTarget();
+        if ( (msgBody == null) || (target == null) ) {
+            synchronized (_activeMessages) {
+                _activeMessages.notifyAll();
+            }
+            return;
+        }
+        
         OutboundMessageState state = new OutboundMessageState(_context);
-        boolean ok = state.initialize(msg);
-        state.setPeer(_transport.getPeerState(msg.getTarget().getIdentity().calculateHash()));
+        boolean ok = state.initialize(msg, msgBody);
+        state.setPeer(_transport.getPeerState(target.getIdentity().calculateHash()));
         finishMessages();
         int active = 0;
         synchronized (_activeMessages) {
@@ -337,7 +349,7 @@ public class OutboundMessageFragments {
     }
     
     private UDPPacket[] preparePackets(OutboundMessageState state, PeerState peer) {
-        if (state != null) {
+        if ( (state != null) && (peer != null) ) {
             int fragments = state.getFragmentCount();
             if (fragments < 0)
                 return null;
@@ -420,14 +432,16 @@ public class OutboundMessageFragments {
                 _context.statManager().addRateData("udp.sendConfirmVolley", numSends, state.getFragmentCount());
             _transport.succeeded(state.getMessage());
             int numFragments = state.getFragmentCount();
-            if (state.getPeer() != null) {
+            PeerState peer = state.getPeer();
+            if (peer != null) {
                 // this adjusts the rtt/rto/window/etc
-                state.getPeer().messageACKed(numFragments*state.getFragmentSize(), state.getLifetime(), state.getMaxSends());
+                peer.messageACKed(numFragments*state.getFragmentSize(), state.getLifetime(), state.getMaxSends());
+                if (peer.getSendWindowBytesRemaining() > 0)
+                    _throttle.unchoke(peer.getRemotePeer());
             } else {
-                _log.warn("message acked, but no peer attacked: " + state);
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("message acked, but no peer attacked: " + state);
             }
-            if (state.getPeer().getSendWindowBytesRemaining() > 0)
-                _throttle.unchoke(state.getPeer().getRemotePeer());
             state.releaseResources();
             return numFragments;
         } else {

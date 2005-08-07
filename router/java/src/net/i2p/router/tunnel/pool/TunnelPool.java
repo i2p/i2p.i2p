@@ -163,7 +163,15 @@ public class TunnelPool {
      * when selecting tunnels, stick with the same one for a brief 
      * period to allow batching if we can.
      */
-    private static final long SELECTION_PERIOD = 500;
+    private long curPeriod() {
+        long period = _context.clock().now();
+        long ms = period % 1000;
+        if (ms > 500)
+            period = period - ms + 500;
+        else
+            period = period - ms;
+        return period;
+    }
     
     /**
      * Pull a random tunnel out of the pool.  If there are none available but
@@ -173,8 +181,7 @@ public class TunnelPool {
      */
     public TunnelInfo selectTunnel() { return selectTunnel(true); }
     private TunnelInfo selectTunnel(boolean allowRecurseOnFail) {
-        long period = _context.clock().now();
-        period -= period % SELECTION_PERIOD;
+        long period = curPeriod();
         synchronized (_tunnels) {
             if (_lastSelectionPeriod == period) {
                 if ( (_lastSelected != null) && 

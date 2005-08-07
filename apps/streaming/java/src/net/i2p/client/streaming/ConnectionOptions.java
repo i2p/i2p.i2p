@@ -13,6 +13,7 @@ public class ConnectionOptions extends I2PSocketOptionsImpl {
     private int _receiveWindow;
     private int _profile;
     private int _rtt;
+    private int _trend[];
     private int _resendDelay;
     private int _sendAckDelay;
     private int _maxMessageSize;
@@ -50,6 +51,8 @@ public class ConnectionOptions extends I2PSocketOptionsImpl {
     public static final String PROP_CONGESTION_AVOIDANCE_GROWTH_RATE_FACTOR = "i2p.streaming.congestionAvoidanceGrowthRateFactor";
     public static final String PROP_SLOW_START_GROWTH_RATE_FACTOR = "i2p.streaming.slowStartGrowthRateFactor";
     
+    private static final int TREND_COUNT = 3;
+    
     public ConnectionOptions() {
         super();
     }
@@ -85,6 +88,8 @@ public class ConnectionOptions extends I2PSocketOptionsImpl {
     
     protected void init(Properties opts) {
         super.init(opts);
+        _trend = new int[TREND_COUNT];
+        
         setConnectDelay(getInt(opts, PROP_CONNECT_DELAY, -1));
         setProfile(getInt(opts, PROP_PROFILE, PROFILE_BULK));
         setMaxMessageSize(getInt(opts, PROP_MAX_MESSAGE_SIZE, 4*1024));
@@ -186,9 +191,34 @@ public class ConnectionOptions extends I2PSocketOptionsImpl {
      */
     public int getRTT() { return _rtt; }
     public void setRTT(int ms) { 
+        synchronized (_trend) {
+            _trend[0] = _trend[1];
+            _trend[1] = _trend[2];
+            if (ms > _rtt)
+                _trend[2] = 1;
+            else if (ms < _rtt)
+                _trend[2] = -1;
+            else
+                _trend[2] = 0;
+        }
         _rtt = ms; 
         if (_rtt > 60*1000)
             _rtt = 60*1000;
+    }
+    
+    /**
+     * If we have 3 consecutive rtt increases, we are trending upwards (1), or if we have
+     * 3 consecutive rtt decreases, we are trending downwards (-1), else we're stable.
+     *
+     */
+    public int getRTTTrend() {
+        synchronized (_trend) {
+            for (int i = 0; i < TREND_COUNT - 1; i++) {
+                if (_trend[i] != _trend[i+1])
+                    return 0;
+            }
+            return _trend[0];
+        }
     }
     
     /** rtt = rtt*RTT_DAMPENING + (1-RTT_DAMPENING)*currentPacketRTT */

@@ -155,12 +155,15 @@ public class PeerState {
     private static final int MINIMUM_WINDOW_BYTES = DEFAULT_SEND_WINDOW_BYTES;
     private static final int MAX_SEND_WINDOW_BYTES = 1024*1024;
     /*
-     * 576 gives us 568 IP byes, 548 UDP bytes, and with an SSU data message, 
-     * 502 fragment bytes, which is enough to send a tunnel data message in 2 
-     * packets.
+     * 596 gives us 588 IP byes, 568 UDP bytes, and with an SSU data message, 
+     * 522 fragment bytes, which is enough to send a tunnel data message in 2 
+     * packets. A tunnel data message sent over the wire is 1044 bytes, meaning 
+     * we need 522 fragment bytes to fit it in 2 packets - add 46 for SSU, 20 
+     * for UDP, and 8 for IP, giving us 596.  round up to mod 16, giving a total
+     * of 608
      */
-    private static final int DEFAULT_MTU = 1500;
-    private static final int MIN_RTO = 500 + ACKSender.ACK_FREQUENCY;
+    private static final int DEFAULT_MTU = 608;//600; //1500;
+    private static final int MIN_RTO = 1000 + ACKSender.ACK_FREQUENCY;
     private static final int MAX_RTO = 2000; // 5000;
     
     public PeerState(I2PAppContext ctx) {

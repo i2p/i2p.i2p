@@ -578,7 +578,7 @@ public class Packet {
         return buf;
     }
     
-    private static final String toId(byte id[]) {
+    static final String toId(byte id[]) {
         if (id == null)
             return Base64.encode(STREAM_ID_UNKNOWN);
         else

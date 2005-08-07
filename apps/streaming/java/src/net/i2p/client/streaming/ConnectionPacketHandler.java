@@ -26,6 +26,7 @@ public class ConnectionPacketHandler {
         _context.statManager().createRateStat("stream.con.packetsAckedPerMessageReceived", "Size of a duplicate message received on a connection", "Stream", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
         _context.statManager().createRateStat("stream.sendsBeforeAck", "How many times a message was sent before it was ACKed?", "Stream", new long[] { 10*60*1000, 60*60*1000 });
         _context.statManager().createRateStat("stream.resetReceived", "How many messages had we sent successfully before receiving a RESET?", "Stream", new long[] { 60*60*1000, 24*60*60*1000 });
+        _context.statManager().createRateStat("stream.trend", "What direction the RTT is trending in (with period = windowsize)", "Stream", new long[] { 60*1000, 60*60*1000 });
     }
     
     /** distribute a packet to the connection specified */
@@ -177,7 +178,19 @@ public class ConnectionPacketHandler {
         //    con.getOptions().setRTT(con.getOptions().getRTT() + nacks.length*1000);
 
         int numResends = 0;
-        List acked = con.ackPackets(ackThrough, nacks);
+        List acked = null;
+        // if we don't know the streamIds for both sides of the connection, there's no way we
+        // could actually be acking data (this fixes the buggered up ack of packet 0 problem).
+        // this is called after packet verification, which places the stream IDs as necessary if
+        // the SYN verifies (so if we're acking w/out stream IDs, no SYN has been received yet)
+        if ( (packet.getSendStreamId() != null) && (packet.getReceiveStreamId() != null) &&
+             (con.getSendStreamId() != null) && (con.getReceiveStreamId() != null) &&
+             (!DataHelper.eq(packet.getSendStreamId(), Packet.STREAM_ID_UNKNOWN)) &&
+             (!DataHelper.eq(packet.getReceiveStreamId(), Packet.STREAM_ID_UNKNOWN)) &&
+             (!DataHelper.eq(con.getSendStreamId(), Packet.STREAM_ID_UNKNOWN)) &&
+             (!DataHelper.eq(con.getReceiveStreamId(), Packet.STREAM_ID_UNKNOWN)) )
+            acked = con.ackPackets(ackThrough, nacks);
+        
         if ( (acked != null) && (acked.size() > 0) ) {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug(acked.size() + " of our packets acked with " + packet);
@@ -247,8 +260,13 @@ public class ConnectionPacketHandler {
             int oldWindow = con.getOptions().getWindowSize();
             int newWindowSize = oldWindow;
 
+            int trend = con.getOptions().getRTTTrend();
+
+            _context.statManager().addRateData("stream.trend", trend, newWindowSize);
+            
             if ( (!congested) && (acked > 0) && (numResends <= 0) ) {
-                if (newWindowSize > con.getLastCongestionSeenAt() / 2) {
+                if ( (newWindowSize > con.getLastCongestionSeenAt() / 2) ||
+                     (trend > 0) ) { // tcp vegas: avoidance if rtt is increasing, even if we arent at ssthresh/2 yet
                     // congestion avoidance
 
                     // we can't use newWindowSize += 1/newWindowSize, since we're

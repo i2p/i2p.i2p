@@ -15,12 +15,14 @@ public class UDPEndpoint {
     private RouterContext _context;
     private Log _log;
     private int _listenPort;
+    private UDPTransport _transport;
     private UDPSender _sender;
     private UDPReceiver _receiver;
     
-    public UDPEndpoint(RouterContext ctx, int listenPort) throws SocketException {
+    public UDPEndpoint(RouterContext ctx, UDPTransport transport, int listenPort) throws SocketException {
         _context = ctx;
         _log = ctx.logManager().getLog(UDPEndpoint.class);
+        _transport = transport;
         
         _listenPort = listenPort;
     }
@@ -32,7 +34,7 @@ public class UDPEndpoint {
         try {
             DatagramSocket socket = new DatagramSocket(_listenPort);
             _sender = new UDPSender(_context, socket, "UDPSend on " + _listenPort);
-            _receiver = new UDPReceiver(_context, socket, "UDPReceive on " + _listenPort);
+            _receiver = new UDPReceiver(_context, _transport, socket, "UDPReceive on " + _listenPort);
             _sender.startup();
             _receiver.startup();
         } catch (SocketException se) {

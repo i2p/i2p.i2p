@@ -189,6 +189,7 @@ public class SummaryHelper {
             return "0.0";
         
         RateStat receiveRate = _context.statManager().getRate("transport.receiveMessageSize");
+        if (receiveRate == null) return "0.0";
         Rate rate = receiveRate.getRate(60*1000);
         double bytes = rate.getLastTotalValue();
         double bps = (bytes*1000.0d)/(rate.getPeriod()*1024.0d); 
@@ -206,6 +207,7 @@ public class SummaryHelper {
             return "0.0";
         
         RateStat receiveRate = _context.statManager().getRate("transport.sendMessageSize");
+        if (receiveRate == null) return "0.0";
         Rate rate = receiveRate.getRate(60*1000);
         double bytes = rate.getLastTotalValue();
         double bps = (bytes*1000.0d)/(rate.getPeriod()*1024.0d); 
@@ -224,6 +226,7 @@ public class SummaryHelper {
             return "0.0";
         
         RateStat receiveRate = _context.statManager().getRate("transport.receiveMessageSize");
+        if (receiveRate == null) return "0.0";
         Rate rate = receiveRate.getRate(5*60*1000);
         double bytes = rate.getLastTotalValue();
         double bps = (bytes*1000.0d)/(rate.getPeriod()*1024.0d); 
@@ -242,6 +245,7 @@ public class SummaryHelper {
             return "0.0";
         
         RateStat receiveRate = _context.statManager().getRate("transport.sendMessageSize");
+        if (receiveRate == null) return "0.0";
         Rate rate = receiveRate.getRate(5*60*1000);
         double bytes = rate.getLastTotalValue();
         double bps = (bytes*1000.0d)/(rate.getPeriod()*1024.0d); 

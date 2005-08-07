@@ -45,6 +45,7 @@ public class OutboundMessageState {
     }
     
     public boolean initialize(OutNetMessage msg) {
+        if (msg == null) return false;
         try {
             initialize(msg, msg.getMessage(), null);
             return true;
@@ -57,8 +58,26 @@ public class OutboundMessageState {
     }
     
     public boolean initialize(I2NPMessage msg, PeerState peer) {
+        if (msg == null) 
+            return false;
+        
         try {
             initialize(null, msg, peer);
+            return true;
+        } catch (OutOfMemoryError oom) {
+            throw oom;
+        } catch (Exception e) {
+            _log.log(Log.CRIT, "Error initializing " + msg, e);
+            return false;
+        }
+    }
+    
+    public boolean initialize(OutNetMessage m, I2NPMessage msg) {
+        if ( (m == null) || (msg == null) ) 
+            return false;
+        
+        try {
+            initialize(m, msg, null);
             return true;
         } catch (OutOfMemoryError oom) {
             throw oom;
@@ -200,7 +219,7 @@ public class OutboundMessageState {
     public void fragment(int fragmentSize) {
         int totalSize = _messageBuf.getValid();
         int numFragments = totalSize / fragmentSize;
-        if (numFragments * fragmentSize != totalSize)
+        if (numFragments * fragmentSize < totalSize)
             numFragments++;
         
         if (_log.shouldLog(Log.DEBUG))

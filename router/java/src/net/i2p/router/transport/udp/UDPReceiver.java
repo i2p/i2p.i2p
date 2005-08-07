@@ -28,13 +28,15 @@ public class UDPReceiver {
     private List _inboundQueue;
     private boolean _keepRunning;
     private Runner _runner;
+    private UDPTransport _transport;
     
-    public UDPReceiver(RouterContext ctx, DatagramSocket socket, String name) {
+    public UDPReceiver(RouterContext ctx, UDPTransport transport, DatagramSocket socket, String name) {
         _context = ctx;
         _log = ctx.logManager().getLog(UDPReceiver.class);
         _name = name;
         _inboundQueue = new ArrayList(128);
         _socket = socket;
+        _transport = transport;
         _runner = new Runner();
         _context.statManager().createRateStat("udp.receivePacketSize", "How large packets received are", "udp", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
         _context.statManager().createRateStat("udp.droppedInbound", "How many packet are queued up but not yet received when we drop", "udp", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
@@ -64,8 +66,8 @@ public class UDPReceiver {
         return _runner.updateListeningPort(socket, newPort);
     }
 
-    /** if a packet been sitting in the queue for 2 seconds, drop subsequent packets */
-    private static final long MAX_QUEUE_PERIOD = 2*1000;
+    /** if a packet been sitting in the queue for a full second (meaning the handlers are overwhelmed), drop subsequent packets */
+    private static final long MAX_QUEUE_PERIOD = 1*1000;
     
     private static final float ARTIFICIAL_DROP_PROBABILITY = 0.0f; // 0.02f; // 0.0f;
     
@@ -90,22 +92,38 @@ public class UDPReceiver {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Received: " + packet);
 
+        boolean rejected = false;
+        int queueSize = 0;
+        long headPeriod = 0;
         synchronized (_inboundQueue) {
-            int queueSize = _inboundQueue.size();
+            queueSize = _inboundQueue.size();
             if (queueSize > 0) {
-                long headPeriod = ((UDPPacket)_inboundQueue.get(0)).getLifetime();
+                headPeriod = ((UDPPacket)_inboundQueue.get(0)).getLifetime();
                 if (headPeriod > MAX_QUEUE_PERIOD) {
-                    _context.statManager().addRateData("udp.droppedInbound", queueSize, headPeriod);
-                    if (_log.shouldLog(Log.ERROR))
-                        _log.error("Dropping inbound packet with " + queueSize + " queued for " + headPeriod);
+                    rejected = true;
                     _inboundQueue.notifyAll();
-                    return queueSize;
                 }
             }
-            _inboundQueue.add(packet);
-            _inboundQueue.notifyAll();
-            return queueSize + 1;
+            if (!rejected) {
+                _inboundQueue.add(packet);
+                _inboundQueue.notifyAll();
+                return queueSize + 1;
+            }
         }
+        
+        // rejected
+        _context.statManager().addRateData("udp.droppedInbound", queueSize, headPeriod);
+        if (_log.shouldLog(Log.ERROR)) {
+            StringBuffer msg = new StringBuffer();
+            msg.append("Dropping inbound packet with ");
+            msg.append(queueSize);
+            msg.append(" queued for ");
+            msg.append(headPeriod);
+            if (_transport != null)
+                msg.append(" packet handlers: ").append(_transport.getPacketHandlerStatus());
+            _log.error(msg.toString());
+        }
+        return queueSize;
     }
     
     private class ArtificiallyDelayedReceive implements SimpleTimer.TimedEvent {

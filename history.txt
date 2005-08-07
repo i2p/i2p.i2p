@@ -1,4 +1,20 @@
-$Id: history.txt,v 1.221 2005/08/01 22:26:51 duck Exp $
+$Id: history.txt,v 1.222 2005/08/03 13:58:13 jrandom Exp $
+
+2005-08-07  Complication
+    * Display the average clock skew for both SSU and TCP connections
+
+2005-08-07  jrandom
+    * Fixed the long standing streaming lib bug where we could lose the first
+      packet on retransmission.
+    * Avoid an NPE when a message expires on the SSU queue.
+    * Adjust the streaming lib's window growth factor with an additional
+      Vegas-esque congestion detection algorithm.
+    * Removed an unnecessary SSU session drop
+    * Reduced the MTU (until we get a working PMTU lib)
+    * Deferr tunnel acceptance until we know how to reach the next hop, 
+      rejecting it if we can't find them in time.
+    * If our netDb store of our leaseSet fails, give it a few seconds before
+      republishing.
 
 * 2005-08-03  0.6.0.1 released
 

@@ -272,10 +272,13 @@ public class Connection {
             SimpleTimer.getInstance().addEvent(new ResendPacketEvent(packet), timeout);
         }
 
+        _context.statManager().getStatLog().addData(Packet.toId(_sendStreamId), "stream.rtt", _options.getRTT(), _options.getWindowSize());
+        
         _lastSendTime = _context.clock().now();
         _outboundQueue.enqueue(packet);        
         resetActivityTimer();
         
+        /*
         if (ackOnly) {
             // ACK only, don't schedule this packet for retries
             // however, if we are running low on sessionTags we want to send
@@ -286,6 +289,7 @@ public class Connection {
                 _connectionManager.ping(_remotePeer, _options.getRTT()*2, false, packet.getKeyUsed(), packet.getTagsSent(), new PingNotifier());
             }
         }
+         */
     }
     
     private class PingNotifier implements ConnectionManager.PingNotifier {

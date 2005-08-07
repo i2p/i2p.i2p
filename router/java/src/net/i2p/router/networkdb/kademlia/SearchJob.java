@@ -334,16 +334,19 @@ class SearchJob extends JobImpl {
         }
         TunnelId inTunnelId = inTunnel.getReceiveTunnelId(0);
 
-        RouterInfo inGateway = getContext().netDb().lookupRouterInfoLocally(inTunnel.getPeer(0));
-        if (inGateway == null) {
-            _log.error("We can't find the gateway to our inbound tunnel?! wtf");
-            getContext().jobQueue().addJob(new FailedJob(getContext(), router));
-            return;
-        }
+        // this will fail if we've shitlisted our inbound gateway, but the gw may not necessarily
+        // be shitlisted by whomever needs to contact them, so we don't need to check this
+        
+        //RouterInfo inGateway = getContext().netDb().lookupRouterInfoLocally(inTunnel.getPeer(0));
+        //if (inGateway == null) {
+        //    _log.error("We can't find the gateway to our inbound tunnel?! wtf");
+        //    getContext().jobQueue().addJob(new FailedJob(getContext(), router));
+        //    return;
+        //}
 	
         long expiration = getContext().clock().now() + getPerPeerTimeoutMs();
 
-        DatabaseLookupMessage msg = buildMessage(inTunnelId, inGateway, expiration);	
+        DatabaseLookupMessage msg = buildMessage(inTunnelId, inTunnel.getPeer(0), expiration);	
 	
         TunnelInfo outTunnel = getOutboundTunnelId();
         if (outTunnel == null) {
@@ -409,10 +412,11 @@ class SearchJob extends JobImpl {
      * @param replyGateway gateway for the reply tunnel
      * @param expiration when the search should stop 
      */
-    protected DatabaseLookupMessage buildMessage(TunnelId replyTunnelId, RouterInfo replyGateway, long expiration) {
+    protected DatabaseLookupMessage buildMessage(TunnelId replyTunnelId, Hash replyGateway, long expiration) {
         DatabaseLookupMessage msg = new DatabaseLookupMessage(getContext(), true);
         msg.setSearchKey(_state.getTarget());
-        msg.setFrom(replyGateway.getIdentity().getHash());
+        //msg.setFrom(replyGateway.getIdentity().getHash());
+        msg.setFrom(replyGateway);
         msg.setDontIncludePeers(_state.getClosestAttempted(MAX_CLOSEST));
         msg.setMessageExpiration(expiration);
         msg.setReplyTunnel(replyTunnelId);
@@ -504,6 +508,8 @@ class SearchJob extends JobImpl {
                     
                     boolean sendsBadInfo = getContext().profileOrganizer().peerSendsBadReplies(_peer);
                     if (!sendsBadInfo) {
+                        // we don't need to search for everthing we're given here - only ones that
+                        // are next in our search path...
                         getContext().netDb().lookupRouterInfo(peer, new ReplyVerifiedJob(getContext(), peer), new ReplyNotVerifiedJob(getContext(), peer), _timeoutMs);
                         _repliesPendingVerification++;
                     } else {
