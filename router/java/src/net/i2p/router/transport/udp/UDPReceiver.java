@@ -113,7 +113,7 @@ public class UDPReceiver {
         
         // rejected
         _context.statManager().addRateData("udp.droppedInbound", queueSize, headPeriod);
-        if (_log.shouldLog(Log.ERROR)) {
+        if (_log.shouldLog(Log.WARN)) {
             StringBuffer msg = new StringBuffer();
             msg.append("Dropping inbound packet with ");
             msg.append(queueSize);
@@ -121,7 +121,7 @@ public class UDPReceiver {
             msg.append(headPeriod);
             if (_transport != null)
                 msg.append(" packet handlers: ").append(_transport.getPacketHandlerStatus());
-            _log.error(msg.toString());
+            _log.warn(msg.toString());
         }
         return queueSize;
     }
@@ -146,7 +146,7 @@ public class UDPReceiver {
                         _inboundQueue.notifyAll();
                         return rv;
                     } else {
-                        _inboundQueue.wait();
+                        _inboundQueue.wait(500);
                     }
                 }
             } catch (InterruptedException ie) {}
