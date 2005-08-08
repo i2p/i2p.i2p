@@ -196,8 +196,8 @@ public class ConnectionPacketHandler {
         // could actually be acking data (this fixes the buggered up ack of packet 0 problem).
         // this is called after packet verification, which places the stream IDs as necessary if
         // the SYN verifies (so if we're acking w/out stream IDs, no SYN has been received yet)
-        if ( (packet.getSendStreamId() != null) && (packet.getReceiveStreamId() != null) &&
-             (con.getSendStreamId() != null) && (con.getReceiveStreamId() != null) &&
+        if ( (packet != null) && (packet.getSendStreamId() != null) && (packet.getReceiveStreamId() != null) &&
+             (con != null) && (con.getSendStreamId() != null) && (con.getReceiveStreamId() != null) &&
              (!DataHelper.eq(packet.getSendStreamId(), Packet.STREAM_ID_UNKNOWN)) &&
              (!DataHelper.eq(packet.getReceiveStreamId(), Packet.STREAM_ID_UNKNOWN)) &&
              (!DataHelper.eq(con.getSendStreamId(), Packet.STREAM_ID_UNKNOWN)) &&
