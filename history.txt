@@ -1,4 +1,12 @@
-$Id: history.txt,v 1.222 2005/08/03 13:58:13 jrandom Exp $
+$Id: history.txt,v 1.223 2005/08/07 14:31:58 jrandom Exp $
+
+* 2005-08-08  0.6.0.2 released
+
+2005-08-08  jrandom
+    * Add a configurable throttle to the number of concurrent outbound SSU
+      connection negotiations (via i2np.udp.maxConcurrentEstablish=4).  This
+      may help those with slow connections to get integrated at the start.
+    * Further fixlets to the streaming lib
 
 2005-08-07  Complication
     * Display the average clock skew for both SSU and TCP connections

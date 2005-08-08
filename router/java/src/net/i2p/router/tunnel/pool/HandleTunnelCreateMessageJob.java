@@ -96,8 +96,8 @@ public class HandleTunnelCreateMessageJob extends JobImpl {
         public void runJob() {
             HandleTunnelCreateMessageJob.this.runJob();
         }
-        private static final String NAME_OK = "Deferred netDb accept";
-        private static final String NAME_REJECT = "Deferred netDb reject";
+        private static final String NAME_OK = "Deferred tunnel accept";
+        private static final String NAME_REJECT = "Deferred tunnel reject";
         public String getName() { return _shouldAccept ? NAME_OK : NAME_REJECT; }
     }
     

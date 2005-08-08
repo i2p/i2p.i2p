@@ -1,7 +1,9 @@
 package net.i2p.router.transport.udp;
 
 import java.net.InetAddress;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -31,9 +33,14 @@ public class EstablishmentManager {
     private Map _inboundStates;
     /** map of RemoteHostId to OutboundEstablishState */
     private Map _outboundStates;
+    /** map of RemoteHostId to List of OutNetMessage for messages exceeding capacity */
+    private Map _queuedOutbound;
     private boolean _alive;
     private Object _activityLock;
     private int _activity;
+    
+    private static final int DEFAULT_MAX_CONCURRENT_ESTABLISH = 16;
+    public static final String PROP_MAX_CONCURRENT_ESTABLISH = "i2np.udp.maxConcurrentEstablish";
     
     public EstablishmentManager(RouterContext ctx, UDPTransport transport) {
         _context = ctx;
@@ -42,6 +49,7 @@ public class EstablishmentManager {
         _builder = new PacketBuilder(ctx);
         _inboundStates = new HashMap(32);
         _outboundStates = new HashMap(32);
+        _queuedOutbound = new HashMap(32);
         _activityLock = new Object();
         _context.statManager().createRateStat("udp.inboundEstablishTime", "How long it takes for a new inbound session to be established", "udp", new long[] { 60*60*1000, 24*60*60*1000 });
         _context.statManager().createRateStat("udp.outboundEstablishTime", "How long it takes for a new outbound session to be established", "udp", new long[] { 60*60*1000, 24*60*60*1000 });
@@ -80,6 +88,18 @@ public class EstablishmentManager {
             return state;
         }
     }
+    
+    private int getMaxConcurrentEstablish() {
+        String val = _context.getProperty(PROP_MAX_CONCURRENT_ESTABLISH);
+        if (val != null) {
+            try {
+                return Integer.parseInt(val);
+            } catch (NumberFormatException nfe) {
+                return DEFAULT_MAX_CONCURRENT_ESTABLISH;
+            }
+        }
+        return DEFAULT_MAX_CONCURRENT_ESTABLISH;
+    }
   
     /**
      * Send the message to its specified recipient by establishing a connection
@@ -104,12 +124,27 @@ public class EstablishmentManager {
         synchronized (_outboundStates) {
             OutboundEstablishState state = (OutboundEstablishState)_outboundStates.get(to);
             if (state == null) {
-                state = new OutboundEstablishState(_context, remAddr, port, 
-                                                   msg.getTarget().getIdentity(), 
-                                                   new SessionKey(addr.getIntroKey()));
-                _outboundStates.put(to, state);
+                if (_outboundStates.size() >= getMaxConcurrentEstablish()) {
+                    List queued = (List)_queuedOutbound.get(to);
+                    if (queued == null) {
+                        queued = new ArrayList(1);
+                        _queuedOutbound.put(to, queued);
+                    }
+                    queued.add(msg);
+                } else {
+                    state = new OutboundEstablishState(_context, remAddr, port, 
+                                                       msg.getTarget().getIdentity(), 
+                                                       new SessionKey(addr.getIntroKey()));
+                    _outboundStates.put(to, state);
+                }
             }
-            state.addMessage(msg);
+            if (state != null) {
+                state.addMessage(msg);
+                List queued = (List)_queuedOutbound.remove(to);
+                if (queued != null)
+                    for (int i = 0; i < queued.size(); i++)
+                        state.addMessage((OutNetMessage)queued.get(i));
+            }
         }
         
         notifyActivity();
@@ -177,9 +212,27 @@ public class EstablishmentManager {
      */
     PeerState receiveData(OutboundEstablishState state) {
         state.dataReceived();
+        int active = 0;
+        int admitted = 0;
+        int remaining = 0;
         synchronized (_outboundStates) {
+            active = _outboundStates.size();
             _outboundStates.remove(state.getRemoteHostId());
+            if (_queuedOutbound.size() > 0) {
+                // there shouldn't have been queued messages for this active state, but just in case...
+                List queued = (List)_queuedOutbound.remove(state.getRemoteHostId());
+                if (queued != null) {
+                    for (int i = 0; i < queued.size(); i++) 
+                        state.addMessage((OutNetMessage)queued.get(i));
+                }
+                
+                admitted = locked_admitQueued();
+            }
+            remaining = _queuedOutbound.size();
         }
+        //if (admitted > 0)
+        //    _log.log(Log.CRIT, "Admitted " + admitted + " with " + remaining + " remaining queued and " + active + " active");
+        
         if (_log.shouldLog(Log.INFO))
             _log.info("Outbound established completely!  yay");
         PeerState peer = handleCompletelyEstablished(state);
@@ -187,6 +240,40 @@ public class EstablishmentManager {
         return peer;
     }
 
+    private int locked_admitQueued() {
+        int admitted = 0;
+        while ( (_queuedOutbound.size() > 0) && (_outboundStates.size() < getMaxConcurrentEstablish()) ) {
+            // ok, active shrunk, lets let some queued in.  duplicate the synchronized 
+            // section from the add(
+
+            RemoteHostId to = (RemoteHostId)_queuedOutbound.keySet().iterator().next();
+            List queued = (List)_queuedOutbound.remove(to);
+
+            if (queued.size() <= 0)
+                continue;
+            
+            OutNetMessage msg = (OutNetMessage)queued.get(0);
+            RouterAddress ra = msg.getTarget().getTargetAddress(_transport.getStyle());
+            if (ra == null) {
+                for (int i = 0; i < queued.size(); i++) 
+                    _transport.failed((OutNetMessage)queued.get(i));
+                continue;
+            }
+            UDPAddress addr = new UDPAddress(ra);
+            InetAddress remAddr = addr.getHostAddress();
+            int port = addr.getPort();
+
+            OutboundEstablishState qstate = new OutboundEstablishState(_context, remAddr, port, 
+                                               msg.getTarget().getIdentity(), 
+                                               new SessionKey(addr.getIntroKey()));
+            _outboundStates.put(to, qstate);
+
+            for (int i = 0; i < queued.size(); i++)
+                qstate.addMessage((OutNetMessage)queued.get(i));
+            admitted++;
+        }
+        return admitted;
+    }
     
     private void notifyActivity() {
         synchronized (_activityLock) { 
@@ -429,7 +516,11 @@ public class EstablishmentManager {
         long now = _context.clock().now();
         long nextSendTime = -1;
         OutboundEstablishState outboundState = null;
+        int admitted = 0;
+        int remaining = 0;
+        int active = 0;
         synchronized (_outboundStates) {
+            active = _outboundStates.size();
             //if (_log.shouldLog(Log.DEBUG))
             //    _log.debug("# outbound states: " + _outboundStates.size());
             for (Iterator iter = _outboundStates.values().iterator(); iter.hasNext(); ) {
@@ -473,8 +564,14 @@ public class EstablishmentManager {
                     }
                 }
             }
+            
+            admitted = locked_admitQueued();    
+            remaining = _queuedOutbound.size();
         }
 
+        //if (admitted > 0)
+        //    _log.log(Log.CRIT, "Admitted " + admitted + " in push with " + remaining + " remaining queued and " + active + " active");
+        
         if (outboundState != null) {
             if (outboundState.getLifetime() > MAX_ESTABLISH_TIME) {
                 if (outboundState.getState() != OutboundEstablishState.STATE_CONFIRMED_COMPLETELY) {
@@ -484,7 +581,23 @@ public class EstablishmentManager {
                             break;
                         _transport.failed(msg);
                     }
-                    _context.shitlist().shitlistRouter(outboundState.getRemoteIdentity().calculateHash(), "Unable to establish with SSU");
+                    String err = null;
+                    switch (outboundState.getState()) {
+                        case OutboundEstablishState.STATE_CONFIRMED_PARTIALLY:
+                            err = "Took too long to establish remote connection (confirmed partially)";
+                            break;
+                        case OutboundEstablishState.STATE_CREATED_RECEIVED:
+                            err = "Took too long to establish remote connection (created received)";
+                            break;
+                        case OutboundEstablishState.STATE_REQUEST_SENT:
+                            err = "Took too long to establish remote connection (request sent)";
+                            break;
+                        case OutboundEstablishState.STATE_UNKNOWN: // fallthrough
+                        default:
+                            err = "Took too long to establish remote connection (unknown state)";
+                    }
+                    
+                    _context.shitlist().shitlistRouter(outboundState.getRemoteIdentity().calculateHash(), err);
                 } else {
                     while (true) {
                         OutNetMessage msg = outboundState.getNextQueuedMessage();

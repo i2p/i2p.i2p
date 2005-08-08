@@ -202,7 +202,7 @@ public class MessageInputStream extends InputStream {
     public boolean messageReceived(long messageId, ByteArray payload) {
         synchronized (_dataLock) {
             if (_log.shouldLog(Log.DEBUG))
-                _log.debug("received " + messageId + " with " + payload.getValid());
+                _log.debug("received " + messageId + " with " + (payload != null ? payload.getValid()+"" : "no payload"));
             if (messageId <= _highestReadyBlockId) {
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("ignoring dup message " + messageId);

@@ -110,7 +110,7 @@ public class GarlicMessageBuilder {
         msg.setMessageExpiration(config.getExpiration());
         
         long timeFromNow = config.getExpiration() - ctx.clock().now();
-        if (timeFromNow < 10*1000)
+        if (timeFromNow < 15*1000)
             log.error("Building a message expiring in " + timeFromNow + "ms: " + config, new Exception("created by"));
         
         if (log.shouldLog(Log.WARN))

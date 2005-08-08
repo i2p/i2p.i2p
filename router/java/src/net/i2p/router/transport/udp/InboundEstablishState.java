@@ -319,4 +319,23 @@ public class InboundEstablishState {
         _lastReceive = _context.clock().now();
         _nextSend = _lastReceive;
     }
+    
+    public String toString() {            
+        StringBuffer buf = new StringBuffer(128);
+        buf.append(super.toString());
+        if (_receivedX != null)
+            buf.append(" ReceivedX: ").append(Base64.encode(_receivedX, 0, 4));
+        if (_sentY != null)
+            buf.append(" SentY: ").append(Base64.encode(_sentY, 0, 4));
+        if (_aliceIP != null)
+            buf.append(" AliceIP: ").append(Base64.encode(_aliceIP));
+        buf.append(" AlicePort: ").append(_alicePort);
+        if (_bobIP != null)
+            buf.append(" BobIP: ").append(Base64.encode(_bobIP));
+        buf.append(" BobPort: ").append(_bobPort);
+        buf.append(" RelayTag: ").append(_sentRelayTag);
+        buf.append(" SignedOn: ").append(_sentSignedOnTime);
+        buf.append(" state: ").append(_currentState);
+        return buf.toString();
+    }
 }

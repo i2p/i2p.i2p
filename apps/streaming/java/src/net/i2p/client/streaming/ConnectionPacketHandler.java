@@ -62,7 +62,7 @@ public class ConnectionPacketHandler {
                 con.getOutputStream().setBufferSize(packet.getOptionalMaxSize());
             }
         }
-
+        
         con.packetReceived();
         
         boolean choke = false;
@@ -92,7 +92,20 @@ public class ConnectionPacketHandler {
 
         _context.statManager().addRateData("stream.con.receiveMessageSize", packet.getPayloadSize(), 0);
         
-        boolean isNew = con.getInputStream().messageReceived(packet.getSequenceNum(), packet.getPayload());
+        boolean isNew = false;
+        boolean allowAck = true;
+        
+        if ( (!packet.isFlagSet(Packet.FLAG_SYNCHRONIZE)) && 
+             ( (packet.getSendStreamId() == null) ||  
+               (packet.getReceiveStreamId() == null) || 
+               (DataHelper.eq(packet.getSendStreamId(), Packet.STREAM_ID_UNKNOWN)) ||
+               (DataHelper.eq(packet.getReceiveStreamId(), Packet.STREAM_ID_UNKNOWN)) ) )
+            allowAck = false;
+
+        if (allowAck)
+            isNew = con.getInputStream().messageReceived(packet.getSequenceNum(), packet.getPayload());
+        else
+            isNew = con.getInputStream().messageReceived(con.getInputStream().getHighestReadyBockId(), null);
         
         if ( (packet.getSequenceNum() == 0) && (packet.getPayloadSize() > 0) ) {
             if (_log.shouldLog(Log.DEBUG))
@@ -190,6 +203,8 @@ public class ConnectionPacketHandler {
              (!DataHelper.eq(con.getSendStreamId(), Packet.STREAM_ID_UNKNOWN)) &&
              (!DataHelper.eq(con.getReceiveStreamId(), Packet.STREAM_ID_UNKNOWN)) )
             acked = con.ackPackets(ackThrough, nacks);
+        else
+            return false;
         
         if ( (acked != null) && (acked.size() > 0) ) {
             if (_log.shouldLog(Log.DEBUG))
