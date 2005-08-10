@@ -22,6 +22,7 @@ import net.i2p.data.Hash;
 import net.i2p.data.RouterAddress;
 import net.i2p.data.RouterIdentity;
 import net.i2p.data.i2np.I2NPMessage;
+import net.i2p.router.CommSystemFacade;
 import net.i2p.router.Job;
 import net.i2p.router.MessageSelector;
 import net.i2p.router.OutNetMessage;
@@ -351,4 +352,7 @@ public abstract class TransportImpl implements Transport {
     public void renderStatusHTML(Writer out) throws IOException {}
     
     public RouterContext getContext() { return _context; }
+    public short getReachabilityStatus() { return CommSystemFacade.STATUS_UNKNOWN; }
+    public void recheckReachability() {}
+
 }

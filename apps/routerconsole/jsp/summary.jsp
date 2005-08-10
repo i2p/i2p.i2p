@@ -14,7 +14,8 @@
  <b>Version:</b> <jsp:getProperty name="helper" property="version" /><br />
  <b>Uptime:</b> <jsp:getProperty name="helper" property="uptime" /><br />
  <b>Now:</b> <jsp:getProperty name="helper" property="time" /><br />
- <b>Memory:</b> <jsp:getProperty name="helper" property="memory" /><br /><%
+ <b>Memory:</b> <jsp:getProperty name="helper" property="memory" /><br />
+ <b>Status:</b> <a href="config.jsp"><jsp:getProperty name="helper" property="reachability" /></a><br /><%
     if (helper.updateAvailable()) {
         if ("true".equals(System.getProperty("net.i2p.router.web.UpdateHandler.updateInProgress", "false"))) {
             out.print(update.getStatus());
@@ -39,7 +40,8 @@
  <b>High capacity:</b> <jsp:getProperty name="helper" property="highCapacityPeers" /><br />
  <b>Well integrated:</b> <jsp:getProperty name="helper" property="wellIntegratedPeers" /><br />
  <b>Failing:</b> <jsp:getProperty name="helper" property="failingPeers" /><br />
- <b>Shitlisted:</b> <jsp:getProperty name="helper" property="shitlistedPeers" /><br /><%
+ <b>Shitlisted:</b> <jsp:getProperty name="helper" property="shitlistedPeers" /><br />
+ <b>Known:</b> <jsp:getProperty name="helper" property="allPeers" /><br /><%
      if (helper.getActivePeers() <= 0) {
         %><b><a href="config.jsp">check your NAT/firewall</a></b><br /><%
      }

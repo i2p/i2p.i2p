@@ -456,6 +456,9 @@ public class PacketBuilder {
      * @return ready to send packet, or null if there was a problem
      */
     public UDPPacket buildPeerTestFromAlice(InetAddress toIP, int toPort, SessionKey toIntroKey, long nonce, SessionKey aliceIntroKey) {
+        return buildPeerTestFromAlice(toIP, toPort, toIntroKey, toIntroKey, nonce, aliceIntroKey);
+    }
+    public UDPPacket buildPeerTestFromAlice(InetAddress toIP, int toPort, SessionKey toCipherKey, SessionKey toMACKey, long nonce, SessionKey aliceIntroKey) {
         UDPPacket packet = UDPPacket.acquire(_context);
         byte data[] = packet.getPacket().getData();
         Arrays.fill(data, 0, data.length, (byte)0x0);
@@ -486,7 +489,7 @@ public class PacketBuilder {
         if ( (off % 16) != 0)
             off += 16 - (off % 16);
         packet.getPacket().setLength(off);
-        authenticate(packet, toIntroKey, toIntroKey);
+        authenticate(packet, toCipherKey, toMACKey);
         setTo(packet, toIP, toPort);
         return packet;
     }

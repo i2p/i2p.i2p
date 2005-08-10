@@ -398,6 +398,8 @@ public class PacketHandler {
                     break;
                 case UDPPacket.PAYLOAD_TYPE_TEST:
                     _state = 51;
+                    if (_log.shouldLog(Log.INFO))
+                        _log.info("Received test packet: " + reader + " from " + from);
                     _testManager.receiveTest(from, reader);
                     break;
                 default:

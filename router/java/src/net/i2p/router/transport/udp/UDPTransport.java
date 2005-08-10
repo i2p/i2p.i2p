@@ -16,6 +16,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 
 import net.i2p.data.Base64;
 import net.i2p.data.DataHelper;
@@ -26,6 +27,7 @@ import net.i2p.data.RouterIdentity;
 import net.i2p.data.SessionKey;
 import net.i2p.data.i2np.I2NPMessage;
 import net.i2p.data.i2np.DatabaseStoreMessage;
+import net.i2p.router.CommSystemFacade;
 import net.i2p.router.OutNetMessage;
 import net.i2p.router.RouterContext;
 import net.i2p.router.transport.Transport;
@@ -63,6 +65,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     private UDPFlooder _flooder;
     private PeerTestManager _testManager;
     private ExpirePeerEvent _expireEvent;
+    private PeerTestEvent _testEvent;
+    private short _reachabilityStatus;
     
     /** list of RelayPeer objects for people who will relay to us */
     private List _relayPeers;
@@ -82,7 +86,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     private TransportBid _slowBid;
     /** shared slow bid for unconnected peers when we want to prefer UDP */
     private TransportBid _slowPreferredBid;
-
+    
     public static final String STYLE = "SSU";
     public static final String PROP_INTERNAL_PORT = "i2np.udp.internalPort";
 
@@ -116,6 +120,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     
     private static final int MAX_CONSECUTIVE_FAILED = 5;
     
+    private static final int TEST_FREQUENCY = 3*60*1000;
+    
     public UDPTransport(RouterContext ctx) {
         super(ctx);
         _context = ctx;
@@ -141,6 +147,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         _inboundFragments = new InboundMessageFragments(_context, _fragments, this);
         _flooder = new UDPFlooder(_context, this);
         _expireEvent = new ExpirePeerEvent();
+        _testEvent = new PeerTestEvent();
+        _reachabilityStatus = CommSystemFacade.STATUS_UNKNOWN;
         
         _context.statManager().createRateStat("udp.droppedPeer", "How long ago did we receive from a dropped peer (duration == session lifetime", "udp", new long[] { 60*60*1000, 24*60*60*1000 });
         _context.statManager().createRateStat("udp.droppedPeerInactive", "How long ago did we receive from a dropped peer (duration == session lifetime)", "udp", new long[] { 60*60*1000, 24*60*60*1000 });
@@ -234,6 +242,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         _refiller.startup();
         _flooder.startup();
         _expireEvent.setIsAlive(true);
+        _testEvent.setIsAlive(true);
     }
     
     public void shutdown() {
@@ -254,6 +263,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         if (_inboundFragments != null)
             _inboundFragments.shutdown();
         _expireEvent.setIsAlive(false);
+        _testEvent.setIsAlive(false);
     }
     
     /**
@@ -361,29 +371,41 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
      *
      */
     public void messageReceived(I2NPMessage inMsg, RouterIdentity remoteIdent, Hash remoteIdentHash, long msToReceive, int bytesReceived) {
+        
         if (inMsg instanceof DatabaseStoreMessage) {
             DatabaseStoreMessage dsm = (DatabaseStoreMessage)inMsg;
-            if (dsm.getType() == DatabaseStoreMessage.KEY_TYPE_ROUTERINFO) {
+            if (dsm.getValueType() == DatabaseStoreMessage.KEY_TYPE_ROUTERINFO) {
                 Hash from = remoteIdentHash;
                 if (from == null)
                     from = remoteIdent.getHash();
+
                 if (from.equals(dsm.getKey())) {
                     // db info received directly from the peer - inject it into the peersByCapacity
                     RouterInfo info = dsm.getRouterInfo();
-                    Properties opts = info.getOptions();
-                    if ( (opts != null) && (info.isValid()) ) {
-                        String capacities = opts.getProperty(UDPAddress.PROP_CAPACITY);
-                        if (capacities != null) {
-                            PeerState peer = getPeerState(from);
-                            for (int i = 0; i < capacities.length(); i++) {
-                                char capacity = capacities.charAt(i);
-                                List peers = _peersByCapacity[capacity];
-                                synchronized (peers) {
-                                    if ( (peers.size() < MAX_PEERS_PER_CAPACITY) && (!peers.contains(peer)) )
-                                        peers.add(peer);
+                    Set addresses = info.getAddresses();
+                    for (Iterator iter = addresses.iterator(); iter.hasNext(); ) {
+                        RouterAddress addr = (RouterAddress)iter.next();
+                        if (!STYLE.equals(addr.getTransportStyle()))
+                            continue;
+                        Properties opts = addr.getOptions();
+                        if ( (opts != null) && (info.isValid()) ) {
+                            String capacities = opts.getProperty(UDPAddress.PROP_CAPACITY);
+                            if (capacities != null) {
+                                if (_log.shouldLog(Log.INFO))
+                                    _log.info("Intercepting and storing the capacities for " + from.toBase64() + ": " + capacities);
+                                PeerState peer = getPeerState(from);
+                                for (int i = 0; i < capacities.length(); i++) {
+                                    char capacity = capacities.charAt(i);
+                                    List peers = _peersByCapacity[capacity-'A'];
+                                    synchronized (peers) {
+                                        if ( (peers.size() < MAX_PEERS_PER_CAPACITY) && (!peers.contains(peer)) )
+                                            peers.add(peer);
+                                    }
                                 }
                             }
                         }
+                        // this was an SSU address so we're done now
+                        break;
                     }
                 }
             }
@@ -532,7 +554,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             if (capacities != null) {
                 for (int i = 0; i < capacities.length(); i++) {
                     char capacity = capacities.charAt(i);
-                    List peers = _peersByCapacity[capacity];
+                    List peers = _peersByCapacity[capacity-'A'];
                     synchronized (peers) {
                         peers.remove(peer);
                     }
@@ -665,6 +687,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         if ( (_externalListenPort > 0) && (_externalListenHost != null) ) {
             options.setProperty(UDPAddress.PROP_PORT, String.valueOf(_externalListenPort));
             options.setProperty(UDPAddress.PROP_HOST, _externalListenHost.getHostAddress());
+            // if we have explicit external addresses, they had better be reachable
+            options.setProperty(UDPAddress.PROP_CAPACITY, ""+UDPAddress.CAPACITY_TESTING);
         } else {
             // grab 3 relays randomly
             synchronized (_relayPeers) {
@@ -728,8 +752,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     }
     public void succeeded(OutNetMessage msg) {
         if (msg == null) return;
-        if (_log.shouldLog(Log.INFO))
-            _log.info("Sending message succeeded: " + msg);
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("Sending message succeeded: " + msg);
         super.afterSend(msg, true);
     }
 
@@ -963,6 +987,62 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                 synchronized (_peers) {
                     _peers.clear();
                 }
+            }
+        }
+    }
+    
+    void setReachabilityStatus(short status) { _reachabilityStatus = status; }
+    public short getReachabilityStatus() { return _reachabilityStatus; }
+    public void recheckReachability() {
+        _testEvent.runTest();
+    }
+    
+    private static final String PROP_SHOULD_TEST = "i2np.udp.shouldTest";
+    
+    private boolean shouldTest() {
+        if (true) return true;
+        String val = _context.getProperty(PROP_SHOULD_TEST);
+        return ( (val != null) && ("true".equals(val)) );
+    }
+    
+    private class PeerTestEvent implements SimpleTimer.TimedEvent {
+        private boolean _alive;
+        /** when did we last test our reachability */
+        private long _lastTested;
+
+        public void timeReached() {
+            if (shouldTest()) {
+                long now = _context.clock().now();
+                if (now - _lastTested >= TEST_FREQUENCY) {
+                    runTest();
+                }
+            }
+            if (_alive) {
+                long delay = _context.random().nextInt(2*TEST_FREQUENCY);
+                SimpleTimer.getInstance().addEvent(PeerTestEvent.this, delay);
+            }
+        }
+        
+        private void runTest() {
+            PeerState bob = getPeerState(UDPAddress.CAPACITY_TESTING);
+            if (bob != null) {
+                if (_log.shouldLog(Log.INFO))
+                    _log.info("Running periodic test with bob = " + bob);
+                _testManager.runTest(bob.getRemoteIPAddress(), bob.getRemotePort(), bob.getCurrentCipherKey(), bob.getCurrentMACKey());
+            } else {
+                if (_log.shouldLog(Log.ERROR))
+                    _log.error("Unable to run a periodic test, as there are no peers with the capacity required");
+            }
+            _lastTested = _context.clock().now();
+        }
+        
+        public void setIsAlive(boolean isAlive) {
+            _alive = isAlive;
+            if (isAlive) {
+                long delay = _context.random().nextInt(2*TEST_FREQUENCY);
+                SimpleTimer.getInstance().addEvent(PeerTestEvent.this, delay);
+            } else {
+                SimpleTimer.getInstance().removeEvent(PeerTestEvent.this);
             }
         }
     }

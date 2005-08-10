@@ -1,4 +1,16 @@
-$Id: history.txt,v 1.223 2005/08/07 14:31:58 jrandom Exp $
+$Id: history.txt,v 1.224 2005/08/08 15:35:51 jrandom Exp $
+
+2005-08-10  jrandom
+    * Deployed the peer testing implementation to be run every few minutes on
+      each router, as well as any time the user requests a test manually.  The
+      tests do not reconfigure the ports at the moment, merely determine under
+      what conditions the local router is reachable.  The status shown in the 
+      top left will be "ERR-SymmetricNAT" if the user's IP and port show up 
+      differently for different peers, "ERR-Reject" if the router cannot 
+      receive unsolicited packets or the peer helping test could not find a  
+      collaborator, "Unknown" if the test has not been run or the test 
+      participants were unreachable, or "OK" if the router can receive 
+      unsolicited connections and those connections use the same IP and port.
 
 * 2005-08-08  0.6.0.2 released
 

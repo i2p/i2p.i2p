@@ -10,6 +10,7 @@ package net.i2p.router.transport;
 
 import java.io.IOException;
 import java.io.Writer;
+import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.HashMap;
@@ -22,6 +23,7 @@ import net.i2p.data.RouterAddress;
 import net.i2p.data.RouterIdentity;
 import net.i2p.data.i2np.I2NPMessage;
 import net.i2p.router.OutNetMessage;
+import net.i2p.router.CommSystemFacade;
 import net.i2p.router.RouterContext;
 import net.i2p.router.transport.tcp.TCPTransport;
 import net.i2p.router.transport.udp.UDPTransport;
@@ -114,6 +116,24 @@ public class TransportManager implements TransportEventListener {
         }
         return peers;
     }
+    
+    public short getReachabilityStatus() { 
+        if (_transports.size() <= 0) return CommSystemFacade.STATUS_UNKNOWN;
+        short status[] = new short[_transports.size()];
+        for (int i = 0; i < _transports.size(); i++) {
+            status[i] = ((Transport)_transports.get(i)).getReachabilityStatus();
+        }
+        // the values for the statuses are increasing for their 'badness'
+        Arrays.sort(status);
+        return status[0];
+    }
+
+    public void recheckReachability() { 
+        for (int i = 0; i < _transports.size(); i++)
+            ((Transport)_transports.get(i)).recheckReachability();
+    }
+
+    
     
     Map getAddresses() {
         Map rv = new HashMap(_transports.size());

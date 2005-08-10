@@ -30,6 +30,34 @@ public abstract class CommSystemFacade implements Service {
     
     public int countActivePeers() { return 0; }
     public List getMostRecentErrorMessages() { return Collections.EMPTY_LIST; }
+    
+    /**
+     * Determine under what conditions we are remotely reachable.
+     *
+     */
+    public short getReachabilityStatus() { return STATUS_OK; }
+    public void recheckReachability() {}
+    
+    /** 
+     * We are able to receive unsolicited connections
+     */
+    public static final short STATUS_OK = 0;
+    /**
+     * We are behind a symmetric NAT which will make our 'from' address look 
+     * differently when we talk to multiple people
+     *
+     */
+    public static final short STATUS_DIFFERENT = 1;
+    /**
+     * We are able to talk to peers that we initiate communication with, but
+     * cannot receive unsolicited connections
+     */
+    public static final short STATUS_REJECT_UNSOLICITED = 2;
+    /**
+     * Our reachability is unknown
+     */
+    public static final short STATUS_UNKNOWN = 3;
+    
 }
 
 class DummyCommSystemFacade extends CommSystemFacade {

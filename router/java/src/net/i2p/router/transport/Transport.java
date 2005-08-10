@@ -41,4 +41,6 @@ public interface Transport {
     public List getMostRecentErrorMessages();
     
     public void renderStatusHTML(Writer out) throws IOException;
+    public short getReachabilityStatus();
+    public void recheckReachability();
 }

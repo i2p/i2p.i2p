@@ -104,6 +104,8 @@ public class UDPPacketReader {
                 return "Session created packet";
             case UDPPacket.PAYLOAD_TYPE_SESSION_REQUEST:
                 return "Session request packet";
+            case UDPPacket.PAYLOAD_TYPE_TEST:
+                return "Peer test packet";
             default:
                 return "Other packet type...";
         }

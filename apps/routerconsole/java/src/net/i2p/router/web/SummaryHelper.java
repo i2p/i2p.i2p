@@ -12,6 +12,7 @@ import net.i2p.data.Destination;
 import net.i2p.data.LeaseSet;
 import net.i2p.stat.Rate;
 import net.i2p.stat.RateStat;
+import net.i2p.router.CommSystemFacade;
 import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
 import net.i2p.router.RouterVersion;
@@ -95,6 +96,23 @@ public class SummaryHelper {
     
     public boolean allowReseed() {
         return (_context.netDb().getKnownRouters() < 10);
+    }
+    
+    public int getAllPeers() { return _context.netDb().getKnownRouters(); }
+    
+    public String getReachability() {
+        int status = _context.commSystem().getReachabilityStatus();
+        switch (status) {
+            case CommSystemFacade.STATUS_OK:
+                return "OK";
+            case CommSystemFacade.STATUS_DIFFERENT:
+                return "ERR-SymmetricNAT";
+            case CommSystemFacade.STATUS_REJECT_UNSOLICITED:
+                return "ERR-Reject";
+            case CommSystemFacade.STATUS_UNKNOWN: // fallthrough
+            default:
+                return "Unknown";
+        }
     }
     
     /**

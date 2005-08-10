@@ -35,6 +35,8 @@ this port from arbitrary peers (this requirement will be removed in i2p 0.6.1, b
  TCP port: <input name="tcpPort" type="text" size="5" value="<jsp:getProperty name="nethelper" property="tcpPort" />" /> <br />
  <b>You must poke a hole in your firewall or NAT (if applicable) so that you can receive inbound TCP
  connections on it (this requirement will be removed in i2p 0.6.1, but is necessary now)</b>
+<br />
+<input type="submit" name="recheckReachability" value="Check network reachability..." />
  <hr />
  
  <b>Bandwidth limiter</b><br />

@@ -27,6 +27,7 @@ public class ConfigNetHandler extends FormHandler {
     private boolean _guessRequested;
     private boolean _reseedRequested;
     private boolean _saveRequested;
+    private boolean _recheckReachabilityRequested;
     private boolean _timeSyncEnabled;
     private String _tcpPort;
     private String _udpPort;
@@ -44,6 +45,8 @@ public class ConfigNetHandler extends FormHandler {
             reseed();
         } else if (_saveRequested) {
             saveChanges();
+        } else if (_recheckReachabilityRequested) {
+            recheckReachability();
         } else {
             // noop
         }
@@ -53,6 +56,7 @@ public class ConfigNetHandler extends FormHandler {
     public void setReseed(String moo) { _reseedRequested = true; }
     public void setSave(String moo) { _saveRequested = true; }
     public void setEnabletimesync(String moo) { _timeSyncEnabled = true; }
+    public void setRecheckReachability(String moo) { _recheckReachabilityRequested = true; }
     
     public void setHostname(String hostname) { 
         _hostname = (hostname != null ? hostname.trim() : null); 
@@ -193,6 +197,11 @@ public class ConfigNetHandler extends FormHandler {
         FileOutputStream fos = new FileOutputStream(new File(netDbDir, "routerInfo-" + name + ".dat"));
         fos.write(data);
         fos.close();
+    }
+    
+    private void recheckReachability() {
+        _context.commSystem().recheckReachability();
+        addFormNotice("Rechecking router reachability...");
     }
     
     /**
