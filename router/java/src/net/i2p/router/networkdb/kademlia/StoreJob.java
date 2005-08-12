@@ -38,7 +38,7 @@ class StoreJob extends JobImpl {
     private long _expiration;
     private PeerSelector _peerSelector;
 
-    private final static int PARALLELIZATION = 3; // how many sent at a time
+    private final static int PARALLELIZATION = 6; // how many sent at a time
     private final static int REDUNDANCY = 6; // we want the data sent to 6 peers
     /**
      * additionally send to 1 outlier(s), in case all of the routers chosen in our
@@ -146,7 +146,7 @@ class StoreJob extends JobImpl {
                 return;
             }
         } else {
-            _state.addPending(closestHashes);
+            //_state.addPending(closestHashes);
             if (_log.shouldLog(Log.INFO))
                 _log.info(getJobId() + ": Continue sending key " + _state.getTarget() + " after " + _state.getAttempted().size() + " tries to " + closestHashes);
             for (Iterator iter = closestHashes.iterator(); iter.hasNext(); ) {
@@ -155,8 +155,14 @@ class StoreJob extends JobImpl {
                 if ( (ds == null) || !(ds instanceof RouterInfo) ) {
                     if (_log.shouldLog(Log.WARN))
                         _log.warn(getJobId() + ": Error selecting closest hash that wasnt a router! " + peer + " : " + ds);
+                    _state.addSkipped(peer);
                 } else {
-                    sendStore((RouterInfo)ds);
+                    if (getContext().shitlist().isShitlisted(((RouterInfo)ds).getIdentity().calculateHash())) {
+                        _state.addSkipped(peer);
+                    } else {
+                        _state.addPending(peer);
+                        sendStore((RouterInfo)ds);
+                    }
                 }
             }
         }

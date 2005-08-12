@@ -67,6 +67,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     private ExpirePeerEvent _expireEvent;
     private PeerTestEvent _testEvent;
     private short _reachabilityStatus;
+    private long _reachabilityStatusLastUpdated;
     
     /** list of RelayPeer objects for people who will relay to us */
     private List _relayPeers;
@@ -152,6 +153,13 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         
         _context.statManager().createRateStat("udp.droppedPeer", "How long ago did we receive from a dropped peer (duration == session lifetime", "udp", new long[] { 60*60*1000, 24*60*60*1000 });
         _context.statManager().createRateStat("udp.droppedPeerInactive", "How long ago did we receive from a dropped peer (duration == session lifetime)", "udp", new long[] { 60*60*1000, 24*60*60*1000 });
+        _context.statManager().createRateStat("udp.peersByCapacity", "How many peers of the given capacity were available to pick between? (duration == (int)capacity)", "udp", new long[] { 1*60*1000, 5*60*1000, 60*60*1000 });
+        _context.statManager().createRateStat("udp.statusOK", "How many times the peer test returned OK", "udp", new long[] { 5*60*1000, 20*60*1000, 60*60*1000, 24*60*60*1000 });
+        _context.statManager().createRateStat("udp.statusDifferent", "How many times the peer test returned different IP/ports", "udp", new long[] { 5*60*1000, 20*60*1000, 60*60*1000, 24*60*60*1000 });
+        _context.statManager().createRateStat("udp.statusReject", "How many times the peer test returned reject unsolicited", "udp", new long[] { 5*60*1000, 20*60*1000, 60*60*1000, 24*60*60*1000 });
+        _context.statManager().createRateStat("udp.statusUnknown", "How many times the peer test returned an unknown result", "udp", new long[] { 5*60*1000, 20*60*1000, 60*60*1000, 24*60*60*1000 });
+        _context.statManager().createRateStat("udp.addressTestInsteadOfUpdate", "How many times we fire off a peer test of ourselves instead of adjusting our own reachable address?", "udp", new long[] { 1*60*1000, 20*60*1000, 60*60*1000, 24*60*60*1000 });
+        _context.statManager().createRateStat("udp.addressUpdated", "How many times we adjust our own reachable IP address", "udp", new long[] { 1*60*1000, 20*60*1000, 60*60*1000, 24*60*60*1000 });
     }
     
     public void startup() {
@@ -290,28 +298,46 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             
         boolean fixedPort = getIsPortFixed();
         boolean updated = false;
+        boolean fireTest = false;
         synchronized (this) {
             if ( (_externalListenHost == null) ||
                  (!eq(_externalListenHost.getAddress(), _externalListenPort, ourIP, ourPort)) ) {
-                try {
-                    _externalListenHost = InetAddress.getByAddress(ourIP);
-                    if (!fixedPort)
-                        _externalListenPort = ourPort;
-                    rebuildExternalAddress();
-                    replaceAddress(_externalAddress);
-                    updated = true;
-                } catch (UnknownHostException uhe) {
-                    _externalListenHost = null;
+                if ( (_reachabilityStatus != CommSystemFacade.STATUS_OK) ||
+                     (_context.clock().now() - _reachabilityStatusLastUpdated > 2*TEST_FREQUENCY) ) {
+                    // they told us something different and our tests are either old or failing
+                    try {
+                        _externalListenHost = InetAddress.getByAddress(ourIP);
+                        if (!fixedPort)
+                            _externalListenPort = ourPort;
+                        rebuildExternalAddress();
+                        replaceAddress(_externalAddress);
+                        updated = true;
+                    } catch (UnknownHostException uhe) {
+                        _externalListenHost = null;
+                    }
+                } else {
+                    // they told us something different, but our tests are recent and positive,
+                    // so lets test again
+                    fireTest = true;
                 }
+            } else {
+                // matched what we expect
             }
         }
         
-        if (!fixedPort)
-            _context.router().setConfigSetting(PROP_EXTERNAL_PORT, ourPort+"");
-        _context.router().saveConfig();
-        
-        if (updated) 
+        if (fireTest) {
+            _context.statManager().addRateData("udp.addressTestInsteadOfUpdate", 1, 0);
+            _testEvent.forceRun();
+            SimpleTimer.getInstance().addEvent(_testEvent, 5*1000);
+        } else if (updated) {
+            _context.statManager().addRateData("udp.addressUpdated", 1, 0);
+            if (!fixedPort)
+                _context.router().setConfigSetting(PROP_EXTERNAL_PORT, ourPort+"");
+            _context.router().saveConfig();
             _context.router().rebuildRouterInfo();
+            _testEvent.forceRun();
+            SimpleTimer.getInstance().addEvent(_testEvent, 5*1000);
+        }
     }
     
     private static final boolean eq(byte laddr[], int lport, byte raddr[], int rport) {
@@ -355,12 +381,25 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     public PeerState getPeerState(char capacity) {
         int index = _context.random().nextInt(1024);
         List peers = _peersByCapacity[capacity-'A'];
-        synchronized (peers) {
-            int size = peers.size();
-            if (size <= 0) return null;
-            index = index % size;
-            return (PeerState)peers.get(index);
+        int size = 0;
+        PeerState rv = null;
+        for (int i = 0; i < 5; i++) {
+            synchronized (peers) {
+                size = peers.size();
+                if (size > 0) { 
+                    index = (index + i) % size;
+                    rv = (PeerState)peers.get(index);
+                }
+            }
+            if (rv == null) 
+                break;
+            if (_context.shitlist().isShitlisted(rv.getRemotePeer()))
+                rv = null;
+            else
+                break;
         }
+        _context.statManager().addRateData("udp.peersByCapacity", size, capacity);
+        return rv;
     }
 
     private static final int MAX_PEERS_PER_CAPACITY = 16;
@@ -991,7 +1030,44 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         }
     }
     
-    void setReachabilityStatus(short status) { _reachabilityStatus = status; }
+    /**
+     * If we haven't had a non-unknown test result in 5 minutes, we really dont know.  Otherwise,
+     * when we receive an unknown we should ignore that value and try again (with different peers)
+     *
+     */
+    private static final long STATUS_GRACE_PERIOD = 5*60*1000;
+    
+    void setReachabilityStatus(short status) { 
+        long now = _context.clock().now();
+        switch (status) {
+            case CommSystemFacade.STATUS_OK:
+                _context.statManager().addRateData("udp.statusOK", 1, 0);
+                _reachabilityStatus = status; 
+                _reachabilityStatusLastUpdated = now;
+                break;
+            case CommSystemFacade.STATUS_DIFFERENT:
+                _context.statManager().addRateData("udp.statusDifferent", 1, 0);
+                _reachabilityStatus = status; 
+                _reachabilityStatusLastUpdated = now;
+                break;
+            case CommSystemFacade.STATUS_REJECT_UNSOLICITED:
+                _context.statManager().addRateData("udp.statusReject", 1, 0);
+                _reachabilityStatus = status; 
+                _reachabilityStatusLastUpdated = now;
+                break;
+            case CommSystemFacade.STATUS_UNKNOWN:
+            default:
+                _context.statManager().addRateData("udp.statusUnknown", 1, 0);
+                if (now - _reachabilityStatusLastUpdated < STATUS_GRACE_PERIOD) {
+                    _testEvent.forceRun();
+                    SimpleTimer.getInstance().addEvent(_testEvent, 5*1000);
+                } else {
+                    _reachabilityStatus = status;
+                    _reachabilityStatusLastUpdated = now;
+                }
+                break;
+        }
+    }
     public short getReachabilityStatus() { return _reachabilityStatus; }
     public void recheckReachability() {
         _testEvent.runTest();
@@ -1009,11 +1085,12 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         private boolean _alive;
         /** when did we last test our reachability */
         private long _lastTested;
+        private boolean _forceRun;
 
         public void timeReached() {
             if (shouldTest()) {
                 long now = _context.clock().now();
-                if (now - _lastTested >= TEST_FREQUENCY) {
+                if ( (_forceRun) || (now - _lastTested >= TEST_FREQUENCY) ) {
                     runTest();
                 }
             }
@@ -1035,6 +1112,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             }
             _lastTested = _context.clock().now();
         }
+        
+        private void forceRun() { _forceRun = true; }
         
         public void setIsAlive(boolean isAlive) {
             _alive = isAlive;

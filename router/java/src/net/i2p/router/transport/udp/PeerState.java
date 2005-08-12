@@ -164,7 +164,7 @@ public class PeerState {
      */
     private static final int DEFAULT_MTU = 608;//600; //1500;
     private static final int MIN_RTO = 1000 + ACKSender.ACK_FREQUENCY;
-    private static final int MAX_RTO = 2000; // 5000;
+    private static final int MAX_RTO = 3000; // 5000;
     
     public PeerState(I2PAppContext ctx) {
         _context = ctx;

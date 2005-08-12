@@ -147,7 +147,7 @@ public class PeerTestJob extends JobImpl {
 
         ReplySelector sel = new ReplySelector(peer.getIdentity().getHash(), nonce, expiration);
         PeerReplyFoundJob reply = new PeerReplyFoundJob(getContext(), peer, inTunnel, outTunnel);
-        PeerReplyTimeoutJob timeoutJob = new PeerReplyTimeoutJob(getContext(), peer, inTunnel, outTunnel);
+        PeerReplyTimeoutJob timeoutJob = new PeerReplyTimeoutJob(getContext(), peer, inTunnel, outTunnel, sel);
         
         getContext().messageRegistry().registerPending(sel, reply, timeoutJob, timeoutMs);
         getContext().tunnelDispatcher().dispatchOutbound(msg, outTunnelId, null, peer.getIdentity().getHash());
@@ -193,10 +193,12 @@ public class PeerTestJob extends JobImpl {
         private long _expiration;
         private long _nonce;
         private Hash _peer;
+        private boolean _matchFound;
         public ReplySelector(Hash peer, long nonce, long expiration) {
             _nonce = nonce;
             _expiration = expiration;
             _peer = peer;
+            _matchFound = false;
         }
         public boolean continueMatching() { return false; }
         public long getExpiration() { return _expiration; }
@@ -213,11 +215,13 @@ public class PeerTestJob extends JobImpl {
                     } else {
                         getContext().statManager().addRateData("peer.testOK", getTestTimeout() - timeLeft, 0);
                     }
+                    _matchFound = true;
                     return true;
                 }
             }
             return false;
         }
+        public boolean matchFound() { return _matchFound; }
         public String toString() {
             StringBuffer buf = new StringBuffer(64);
             buf.append("Test peer ").append(_peer.toBase64().substring(0,4));
@@ -268,15 +272,20 @@ public class PeerTestJob extends JobImpl {
         private RouterInfo _peer;
         private TunnelInfo _replyTunnel;
         private TunnelInfo _sendTunnel;
-        public PeerReplyTimeoutJob(RouterContext context, RouterInfo peer, TunnelInfo replyTunnel, TunnelInfo sendTunnel) {
+        private ReplySelector _selector;
+        public PeerReplyTimeoutJob(RouterContext context, RouterInfo peer, TunnelInfo replyTunnel, TunnelInfo sendTunnel, ReplySelector sel) {
             super(context);
             _peer = peer;
             _replyTunnel = replyTunnel;
             _sendTunnel = sendTunnel;
+            _selector = sel;
         }
         public String getName() { return "Peer test failed"; }
         private boolean getShouldFailPeer() { return true; }
         public void runJob() {
+            if (_selector.matchFound())
+                return;
+            
             if (getShouldFailPeer())
                 getContext().profileManager().dbLookupFailed(_peer.getIdentity().getHash());
                         

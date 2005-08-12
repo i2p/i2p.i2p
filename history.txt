@@ -1,4 +1,20 @@
-$Id: history.txt,v 1.224 2005/08/08 15:35:51 jrandom Exp $
+$Id: history.txt,v 1.225 2005/08/10 18:55:41 jrandom Exp $
+
+2005-08-12  jrandom
+    * Keep detailed stats on the peer testing, publishing the results in the 
+      netDb.
+    * Don't overwrite the status with 'unknown' unless we haven't had a valid
+      status in a while.
+    * Make sure to avoid shitlisted peers for peer testing.
+    * When we get an unknown result to a peer test, try again soon afterwards.
+    * When a peer tells us that our address is different from what we expect,
+      if we've done a recent peer test with a result of OK, fire off a peer
+      test to make sure our IP/port is still valid.  If our test is old or the
+      result was not OK, accept their suggestion, but queue up a peer test for
+      later.
+    * Don't try to do a netDb store to a shitlisted peer, and adjust the way 
+      we monitor netDb store progress (to clear up the high netDb.storePeers
+      stat)
 
 2005-08-10  jrandom
     * Deployed the peer testing implementation to be run every few minutes on

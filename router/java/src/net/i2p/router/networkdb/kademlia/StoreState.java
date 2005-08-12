@@ -102,6 +102,12 @@ class StoreState {
             _attemptedPeers.addAll(pending);
         }
     }
+    /** we aren't even going to try to contact this peer */
+    public void addSkipped(Hash peer) {
+        synchronized (_attemptedPeers) {
+            _attemptedPeers.add(peer);
+        }
+    }
 
     public long confirmed(Hash peer) {
         long rv = -1;

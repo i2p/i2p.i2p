@@ -122,6 +122,13 @@ public class StatisticsManager implements Service {
             //includeRate("router.throttleTunnelProcessingTime1m", stats, new long[] { 60*60*1000 });
 
             includeRate("router.fastPeers", stats, new long[] { 60*60*1000 });
+            
+            includeRate("udp.statusOK", stats, new long[] { 20*60*1000 });
+            includeRate("udp.statusDifferent", stats, new long[] { 20*60*1000 });
+            includeRate("udp.statusReject", stats, new long[] { 20*60*1000 });
+            includeRate("udp.statusUnknown", stats, new long[] { 20*60*1000 });
+            includeRate("udp.addressUpdated", stats, new long[] { 1*60*1000 });
+            includeRate("udp.addressTestInsteadOfUpdate", stats, new long[] { 1*60*1000 });
 
             includeRate("clock.skew", stats, new long[] { 10*60*1000, 3*60*60*1000, 24*60*60*1000 });
             
