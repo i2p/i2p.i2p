@@ -111,12 +111,12 @@ public class Bogobot extends PircBot {
         _botShutdownPassword = config.getProperty("botShutdownPassword", "take off eh");
 
         _ircChannel = config.getProperty("ircChannel", "#i2p-chat");
-        _ircServer = config.getProperty("ircServer", "irc.duck.i2p");
+        _ircServer = config.getProperty("ircServer", "irc.postman.i2p");
         _ircServerPort = Integer.parseInt(config.getProperty("ircServerPort", "6668"));
 
         _isLoggerEnabled = Boolean.valueOf(config.getProperty("isLoggerEnabled", "true")).booleanValue();
         _loggedHostnamePattern = config.getProperty("loggedHostnamePattern", "");
-        _logFilePrefix = config.getProperty("logFilePrefix", "irc.duck.i2p.i2p-chat");
+        _logFilePrefix = config.getProperty("logFilePrefix", "irc.postman.i2p.i2p-chat");
         _logFileRotationInterval = config.getProperty("logFileRotationInterval", INTERVAL_DAILY);
 
         _isRoundTripDelayEnabled = Boolean.valueOf(config.getProperty("isRoundTripDelayEnabled", "false")).booleanValue();
