@@ -377,17 +377,24 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         }
     }
     
+    /** 
+     * if we haven't received anything in the last 5 minutes from a peer, don't 
+     * trust its known capacities
+     */
+    private static final int MAX_INACTIVITY_FOR_CAPACITY = 5*60*1000;
     /** pick a random peer with the given capacity */
     public PeerState getPeerState(char capacity) {
+        long now = _context.clock().now();
         int index = _context.random().nextInt(1024);
         List peers = _peersByCapacity[capacity-'A'];
         int size = 0;
+        int off = 0;
         PeerState rv = null;
-        for (int i = 0; i < 5; i++) {
+        while (rv == null) {
             synchronized (peers) {
                 size = peers.size();
                 if (size > 0) { 
-                    index = (index + i) % size;
+                    index = (index + off) % size;
                     rv = (PeerState)peers.get(index);
                 }
             }
@@ -395,14 +402,19 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                 break;
             if (_context.shitlist().isShitlisted(rv.getRemotePeer()))
                 rv = null;
+            else if (now - rv.getLastReceiveTime() > MAX_INACTIVITY_FOR_CAPACITY)
+                rv = null;
             else
+                break;
+            off++;
+            if (off >= size)
                 break;
         }
         _context.statManager().addRateData("udp.peersByCapacity", size, capacity);
         return rv;
     }
 
-    private static final int MAX_PEERS_PER_CAPACITY = 16;
+    private static final int MAX_PEERS_PER_CAPACITY = 64;
     
     /**
      * Intercept RouterInfo entries received directly from a peer to inject them into

@@ -1,4 +1,4 @@
-<code>$Id: udp.html,v 1.14 2005/07/27 14:04:07 jrandom Exp $</code>
+<code>$Id: udp.html,v 1.15 2005/08/03 13:58:13 jrandom Exp $</code>
 
 <h1>Secure Semireliable UDP (SSU)</h1>
 <b>DRAFT</b>
@@ -573,8 +573,10 @@ quite simple:</p>
 
 <pre>
         Alice                  Bob                  Charlie
-    PeerTest ------------------&gt;
-         &lt;-------------PeerTest  PeerTest-------------&gt;
+    PeerTest -------------------&gt;
+                             PeerTest--------------------&gt;
+                                &lt;-------------------PeerTest
+         &lt;-------------------PeerTest
          &lt;------------------------------------------PeerTest
     PeerTest------------------------------------------&gt;
          &lt;------------------------------------------PeerTest
@@ -592,7 +594,8 @@ that may be reached are as follows:</p>
 up to a certain number of times, but if no response ever arrives,
 she will know that her firewall or NAT is somehow misconfigured, 
 rejecting all inbound UDP packets even in direct response to an
-outbound packet.  Alternately, Bob may be down.</li>
+outbound packet.  Alternately, Bob may be down or unable to get 
+Charlie to reply.</li>
 
 <li>If Alice doesn't receive a PeerTest message with the 
 expected nonce from a third party (Charlie), she will retransmit

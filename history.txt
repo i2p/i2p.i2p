@@ -1,4 +1,11 @@
-$Id: history.txt,v 1.225 2005/08/10 18:55:41 jrandom Exp $
+$Id: history.txt,v 1.226 2005/08/12 18:54:47 jrandom Exp $
+
+2005-08-17  jrandom
+    * Revise the SSU peer testing protocol so that Bob verifies Charlie's 
+      viability before agreeing to Alice's request.  This doesn't work with
+      older SSU peer test builds, but is backwards compatible (older nodes
+      won't ask newer nodes to participate in tests, and newer nodes won't 
+      ask older nodes to either).
 
 2005-08-12  jrandom
     * Keep detailed stats on the peer testing, publishing the results in the 

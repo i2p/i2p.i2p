@@ -59,7 +59,8 @@ class LogWriter implements Runnable {
         }
     }
 
-    public void flushRecords() {
+    public void flushRecords() { flushRecords(true); }
+    public void flushRecords(boolean shouldWait) {
         try {
             List records = _manager._removeAll();
             if (records == null) return;
@@ -77,11 +78,13 @@ class LogWriter implements Runnable {
         } catch (Throwable t) {
             t.printStackTrace();
         } finally {
-            try { 
-                synchronized (this) {
-                    this.wait(10*1000); 
+            if (shouldWait) {
+                try { 
+                    synchronized (this) {
+                        this.wait(10*1000); 
+                    }
+                } catch (InterruptedException ie) { // nop
                 }
-            } catch (InterruptedException ie) { // nop
             }
         }
     }

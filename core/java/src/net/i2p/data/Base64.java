@@ -44,19 +44,19 @@ public class Base64 {
 
     /** added by aum */
     public static String encode(String source) {
-        return encode(source.getBytes());
+        return (source != null ? encode(source.getBytes()) : "");
     }
     public static String encode(byte[] source) {
-        return encode(source, 0, (source != null ? source.length : 0));
+        return (source != null ? encode(source, 0, (source != null ? source.length : 0)) : "");
     }
     public static String encode(byte[] source, int off, int len) {
-        return encode(source, off, len, false);
+        return (source != null ? encode(source, off, len, false) : "");
     }
     public static String encode(byte[] source, boolean useStandardAlphabet) {
-        return encode(source, 0, (source != null ? source.length : 0), useStandardAlphabet);
+        return (source != null ? encode(source, 0, (source != null ? source.length : 0), useStandardAlphabet) : "");
     }
     public static String encode(byte[] source, int off, int len, boolean useStandardAlphabet) {
-        return safeEncode(source, off, len, useStandardAlphabet);
+        return (source != null ? safeEncode(source, off, len, useStandardAlphabet) : "");
     }
 
     public static byte[] decode(String s) {

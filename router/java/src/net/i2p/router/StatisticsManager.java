@@ -102,7 +102,7 @@ public class StatisticsManager implements Service {
             stats.putAll(_context.profileManager().summarizePeers(_publishedStats));
 
             includeThroughput(stats);
-            //includeRate("router.invalidMessageTime", stats, new long[] { 10*60*1000 });
+            includeRate("router.invalidMessageTime", stats, new long[] { 10*60*1000 });
             includeRate("router.duplicateMessageId", stats, new long[] { 24*60*60*1000 });
             //includeRate("tunnel.duplicateIV", stats, new long[] { 24*60*60*1000 });
             includeRate("tunnel.fragmentedDropped", stats, new long[] { 10*60*1000, 3*60*60*1000 });
