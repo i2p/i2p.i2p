@@ -583,7 +583,51 @@ public class PacketBuilder {
         setTo(packet, charlieIP, charliePort);
         return packet;
     }
-
+    
+    /**
+     * Build a packet as if we are Charlie sending Bob a packet verifying that we will help test Alice.
+     * 
+     * @return ready to send packet, or null if there was a problem
+     */
+    public UDPPacket buildPeerTestToBob(InetAddress bobIP, int bobPort, InetAddress aliceIP, int alicePort, SessionKey aliceIntroKey, long nonce, SessionKey bobCipherKey, SessionKey bobMACKey) {
+        UDPPacket packet = UDPPacket.acquire(_context);
+        byte data[] = packet.getPacket().getData();
+        Arrays.fill(data, 0, data.length, (byte)0x0);
+        int off = UDPPacket.MAC_SIZE + UDPPacket.IV_SIZE;
+        
+        // header
+        data[off] = PEER_TEST_FLAG_BYTE;
+        off++;
+        long now = _context.clock().now() / 1000;
+        DataHelper.toLong(data, off, 4, now);
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("Sending peer test " + nonce + " to Bob with time = " + new Date(now*1000));
+        off += 4;
+        
+        // now for the body
+        DataHelper.toLong(data, off, 4, nonce);
+        off += 4;
+        byte ip[] = aliceIP.getAddress();
+        DataHelper.toLong(data, off, 1, ip.length);
+        off++;
+        System.arraycopy(ip, 0, data, off, ip.length);
+        off += ip.length;
+        DataHelper.toLong(data, off, 2, alicePort);
+        off += 2;
+        System.arraycopy(aliceIntroKey.getData(), 0, data, off, SessionKey.KEYSIZE_BYTES);
+        off += SessionKey.KEYSIZE_BYTES;
+        
+        // we can pad here if we want, maybe randomized?
+        
+        // pad up so we're on the encryption boundary
+        if ( (off % 16) != 0)
+            off += 16 - (off % 16);
+        packet.getPacket().setLength(off);
+        authenticate(packet, bobCipherKey, bobMACKey);
+        setTo(packet, bobIP, bobPort);
+        return packet;
+    }
+    
     private void setTo(UDPPacket packet, InetAddress ip, int port) {
         packet.getPacket().setAddress(ip);
         packet.getPacket().setPort(port);
