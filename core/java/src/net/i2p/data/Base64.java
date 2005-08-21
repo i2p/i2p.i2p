@@ -142,7 +142,7 @@ public class Base64 {
     }
 
     public static void main(String[] args) {
-        test();
+        //test();
         if (args.length == 0) {
             help();
             return;
@@ -399,6 +399,7 @@ public class Base64 {
      * replacing / with ~, and + with -
      */
     private static byte[] safeDecode(String source, boolean useStandardAlphabet) {
+        if (source == null) return null;
         String toDecode = null;
         if (useStandardAlphabet) {
             toDecode = source;
