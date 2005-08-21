@@ -43,6 +43,7 @@ class PeerTestManager {
         _recentTests = Collections.synchronizedList(new ArrayList(16));
         _packetBuilder = new PacketBuilder(context);
         _currentTest = null;
+        _context.statManager().createRateStat("udp.statusKnownCharlie", "How often the bob we pick passes us to a charlie we already have a session with?", "udp", new long[] { 60*1000, 20*60*1000, 60*60*1000 });
     }
     
     private static final int RESEND_TIMEOUT = 5*1000;
@@ -149,6 +150,17 @@ class PeerTestManager {
                     _log.error("Unable to get our IP from bob's reply: " + from + ", " + testInfo, uhe);
             }
         } else {
+            PeerState charlieSession = _transport.getPeerState(from);
+            if (charlieSession != null) {
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("Bob chose a charlie we already have a session to, cancelling the test and rerunning (bob: " 
+                              + _currentTest + ", charlie: " + from + ")");
+                _currentTest = null;
+                _context.statManager().addRateData("udp.statusKnownCharlie", 1, 0);
+                honorStatus(CommSystemFacade.STATUS_UNKNOWN);
+                return;
+            }
+            
             if (test.getReceiveCharlieTime() > 0) {
                 // this is our second charlie, yay!
                 test.setAlicePortFromCharlie(testInfo.readPort());

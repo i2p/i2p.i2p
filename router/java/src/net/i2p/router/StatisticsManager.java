@@ -127,6 +127,7 @@ public class StatisticsManager implements Service {
             includeRate("udp.statusDifferent", stats, new long[] { 20*60*1000 });
             includeRate("udp.statusReject", stats, new long[] { 20*60*1000 });
             includeRate("udp.statusUnknown", stats, new long[] { 20*60*1000 });
+            includeRate("udp.statusKnownharlie", stats, new long[] { 1*60*1000, 10*60*1000 });
             includeRate("udp.addressUpdated", stats, new long[] { 1*60*1000 });
             includeRate("udp.addressTestInsteadOfUpdate", stats, new long[] { 1*60*1000 });
 

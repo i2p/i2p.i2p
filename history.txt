@@ -1,4 +1,10 @@
-$Id: history.txt,v 1.226 2005/08/12 18:54:47 jrandom Exp $
+$Id: history.txt,v 1.227 2005/08/17 15:05:03 jrandom Exp $
+
+* 2005-08-21  0.6.0.3 released
+
+2005-08-21  jrandom
+    * If we already have an established SSU session with the Charlie helping 
+      test us, cancel the test with the status of "unknown".
 
 2005-08-17  jrandom
     * Revise the SSU peer testing protocol so that Bob verifies Charlie's 

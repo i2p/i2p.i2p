@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project basedir="." default="all" name="i2p">
-    
+   
     <target name="all" >
         <echo message="Useful targets: " />
         <echo message="  dist:      distclean then package everything up (installer, clean tarball, update tarball)" />
@@ -28,6 +28,7 @@
         <ant dir="apps/routerconsole/java/" target="jar" />
         <ant dir="apps/addressbook/" target="war" />
         <ant dir="apps/susimail/" target="war" />
+        <ant dir="apps/syndie/java/" target="jar" /> <!-- not pushed in the update... yet -->
     </target>
     <target name="buildWEB">
         <ant dir="apps/jetty" target="fetchJettylib" />
@@ -58,6 +59,8 @@
         <copy file="installer/lib/jbigi/jbigi.jar" todir="build" />
         <copy file="apps/addressbook/dist/addressbook.war" todir="build/" />
         <copy file="apps/susimail/susimail.war" todir="build/" />
+        <copy file="apps/syndie/java/build/syndie.jar" todir="build/" />
+        <copy file="apps/syndie/syndie.war" todir="build/" />
     </target>
     <target name="javadoc">
         <mkdir dir="./build" />
