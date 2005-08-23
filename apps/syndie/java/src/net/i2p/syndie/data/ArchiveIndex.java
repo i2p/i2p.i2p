@@ -77,6 +77,44 @@ public class ArchiveIndex {
     /** get the raw entry size (including attachments) from the given blog/tag pair */
     public long getBlogEntrySizeKB(int index, int entryIndex) { return ((EntrySummary)((BlogSummary)_blogs.get(index)).entries.get(entryIndex)).size; }
     
+    public boolean getEntryIsKnown(BlogURI uri) { return getEntry(uri) != null; }
+    public long getBlogEntrySizeKB(BlogURI uri) {
+        EntrySummary entry = getEntry(uri);
+        if (entry == null) return -1;
+        return entry.size;
+    }
+    private EntrySummary getEntry(BlogURI uri) {
+        if ( (uri == null) || (uri.getKeyHash() == null) || (uri.getEntryId() < 0) ) return null;
+        for (int i = 0; i < _blogs.size(); i++) {
+            BlogSummary summary = (BlogSummary)_blogs.get(i);
+            if (summary.blog.equals(uri.getKeyHash())) {
+                for (int j = 0; j < summary.entries.size(); j++) {
+                    EntrySummary entry = (EntrySummary)summary.entries.get(j);
+                    if (entry.entry.equals(uri))
+                        return entry;
+                }
+            }
+        }
+        return null;
+    }
+    public Set getBlogEntryTags(BlogURI uri) {
+        Set tags = new HashSet();
+        if ( (uri == null) || (uri.getKeyHash() == null) || (uri.getEntryId() < 0) ) return tags;
+        for (int i = 0; i < _blogs.size(); i++) {
+            BlogSummary summary = (BlogSummary)_blogs.get(i);
+            if (summary.blog.equals(uri.getKeyHash())) {
+                for (int j = 0; j < summary.entries.size(); j++) {
+                    EntrySummary entry = (EntrySummary)summary.entries.get(j);
+                    if (entry.entry.equals(uri)) {
+                        tags.add(summary.tag);
+                        break;
+                    }
+                }
+            }
+        }
+        return tags;
+    }
+    
     /** how many 'new' blogs are listed */
     public int getNewestBlogCount() { return _newestBlogs.size(); }
     public Hash getNewestBlog(int index) { return (Hash)_newestBlogs.get(index); }

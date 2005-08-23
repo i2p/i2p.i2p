@@ -152,6 +152,10 @@ public class Base64 {
 
     private static void runApp(String args[]) {
         try {
+            if ("encodestring".equalsIgnoreCase(args[0])) {
+                System.out.println(encode(args[1].getBytes()));
+                return;
+            }
             InputStream in = System.in;
             OutputStream out = System.out;
             if (args.length >= 3) {

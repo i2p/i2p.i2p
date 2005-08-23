@@ -575,6 +575,8 @@ public class EstablishmentManager {
         if (outboundState != null) {
             if (outboundState.getLifetime() > MAX_ESTABLISH_TIME) {
                 if (outboundState.getState() != OutboundEstablishState.STATE_CONFIRMED_COMPLETELY) {
+                    if (_log.shouldLog(Log.WARN))
+                        _log.warn("Lifetime of expired outbound establish: " + outboundState.getLifetime());
                     while (true) {
                         OutNetMessage msg = outboundState.getNextQueuedMessage();
                         if (msg == null)

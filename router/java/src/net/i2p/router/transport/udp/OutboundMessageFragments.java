@@ -326,7 +326,7 @@ public class OutboundMessageFragments {
 
                 state.push();
             
-                int rto = peer.getRTO() * state.getPushCount();
+                int rto = peer.getRTO();// * state.getPushCount();
                 state.setNextSendTime(now + rto);
 
                 if (peer.getSendWindowBytesRemaining() > 0)
@@ -338,7 +338,7 @@ public class OutboundMessageFragments {
                     _log.warn("Allocation of " + size + " rejected w/ wsize=" + peer.getSendWindowBytes()
                               + " available=" + peer.getSendWindowBytesRemaining()
                               + " for message " + state.getMessageId() + ": " + state);
-                state.setNextSendTime((now + 1024) & ~SECOND_MASK);
+                state.setNextSendTime(now+(_context.random().nextInt(2*ACKSender.ACK_FREQUENCY))); //(now + 1024) & ~SECOND_MASK);
                 if (_log.shouldLog(Log.WARN))
                     _log.warn("Retransmit after choke for next send time in " + (state.getNextSendTime()-now) + "ms");
                 _throttle.choke(peer.getRemotePeer());
@@ -435,7 +435,7 @@ public class OutboundMessageFragments {
             PeerState peer = state.getPeer();
             if (peer != null) {
                 // this adjusts the rtt/rto/window/etc
-                peer.messageACKed(numFragments*state.getFragmentSize(), state.getLifetime(), state.getMaxSends());
+                peer.messageACKed(numFragments*state.getFragmentSize(), state.getLifetime(), numSends);
                 if (peer.getSendWindowBytesRemaining() > 0)
                     _throttle.unchoke(peer.getRemotePeer());
             } else {

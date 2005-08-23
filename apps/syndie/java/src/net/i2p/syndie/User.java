@@ -24,9 +24,17 @@ public class User {
     private String _addressbookLocation;
     private boolean _showImagesByDefault;
     private boolean _showExpandedByDefault;
+    private String _defaultSelector;
     private long _lastLogin;
     private long _lastMetaEntry;
+    private boolean _allowAccessRemote;
     private boolean _authenticated;
+    private String _eepProxyHost;
+    private int _eepProxyPort;
+    private String _webProxyHost;
+    private int _webProxyPort;
+    private String _torProxyHost;
+    private int _torProxyPort;
     
     public User() {
         _context = I2PAppContext.getGlobalContext();
@@ -40,9 +48,17 @@ public class User {
         _mostRecentEntry = -1;
         _blogGroups = new HashMap();
         _shitlistedBlogs = new ArrayList();
+        _defaultSelector = null;
         _addressbookLocation = "userhosts.txt";
         _showImagesByDefault = false;
         _showExpandedByDefault = false;
+        _allowAccessRemote = false;
+        _eepProxyHost = null;
+        _webProxyHost = null;
+        _torProxyHost = null;
+        _eepProxyPort = -1;
+        _webProxyPort = -1;
+        _torProxyPort = -1;
         _lastLogin = -1;
         _lastMetaEntry = 0;
     }
@@ -60,10 +76,21 @@ public class User {
     public long getLastLogin() { return _lastLogin; }
     public String getHashedPassword() { return _hashedPassword; }
     public long getLastMetaEntry() { return _lastMetaEntry; }
+    public String getDefaultSelector() { return _defaultSelector; }
+    public void setDefaultSelector(String sel) { _defaultSelector = sel; }
+    public boolean getAllowAccessRemote() { return _allowAccessRemote; }
+    public void setAllowAccessRemote(boolean allow) { _allowAccessRemote = true; }
     
     public void setMostRecentEntry(long id) { _mostRecentEntry = id; }
     public void setLastMetaEntry(long id) { _lastMetaEntry = id; }
 
+    public String getEepProxyHost() { return _eepProxyHost; }
+    public int getEepProxyPort() { return _eepProxyPort; }
+    public String getWebProxyHost() { return _webProxyHost; }
+    public int getWebProxyPort() { return _webProxyPort; }
+    public String getTorProxyHost() { return _torProxyHost; }
+    public int getTorProxyPort() { return _torProxyPort; }
+    
     public void invalidate() { 
         BlogManager.instance().saveUser(this);
         init(); 
@@ -135,11 +162,75 @@ public class User {
         _showImagesByDefault = (show != null) && (show.equals("true"));
         show = props.getProperty("showexpanded", "false");
         _showExpandedByDefault = (show != null) && (show.equals("true"));
-        
+        _defaultSelector = props.getProperty("defaultselector");
+        String allow = props.getProperty("allowaccessremote", "false");
+        _allowAccessRemote = (allow != null) && (allow.equals("true"));
+        _eepProxyPort = getInt(props.getProperty("eepproxyport"));
+        _webProxyPort = getInt(props.getProperty("webproxyport"));
+        _torProxyPort = getInt(props.getProperty("torproxyport"));
+        _eepProxyHost = props.getProperty("eepproxyhost");
+        _webProxyHost = props.getProperty("webproxyhost");
+        _torProxyHost = props.getProperty("torproxyhost");
         _lastLogin = _context.clock().now();
         _authenticated = true;
         return LOGIN_OK;
     }
     
+    private int getInt(String val) {
+        if (val == null) return -1;
+        try { return Integer.parseInt(val); } catch (NumberFormatException nfe) { return -1; }
+    }
+    
     public static final String LOGIN_OK = "Logged in";
+    
+    public String export() {
+        StringBuffer buf = new StringBuffer(512);
+        buf.append("password=" + getHashedPassword() + "\n");
+        buf.append("blog=" + getBlog().toBase64() + "\n");
+        buf.append("lastid=" + getMostRecentEntry() + "\n");
+        buf.append("lastmetaedition=" + getLastMetaEntry() + "\n");
+        buf.append("lastlogin=" + getLastLogin() + "\n");
+        buf.append("addressbook=" + getAddressbookLocation() + "\n");
+        buf.append("showimages=" + getShowImages() + "\n");
+        buf.append("showexpanded=" + getShowExpanded() + "\n");
+        buf.append("defaultselector=" + getDefaultSelector() + "\n");
+        buf.append("allowaccessremote=" + _allowAccessRemote + "\n");
+        buf.append("eepproxyhost="+_eepProxyHost+"\n");
+        buf.append("eepproxyport="+_eepProxyPort+"\n");
+        buf.append("webproxyhost="+_webProxyHost+"\n");
+        buf.append("webproxyport="+_webProxyPort+"\n");
+        buf.append("torproxyhost="+_torProxyHost+"\n");
+        buf.append("torproxyport="+_torProxyPort+"\n");
+        
+        buf.append("groups=");
+        Map groups = getBlogGroups();
+        for (Iterator iter = groups.keySet().iterator(); iter.hasNext(); ) {
+            String name = (String)iter.next();
+            List selectors = (List)groups.get(name);
+            buf.append(name).append(':');
+            for (int i = 0; i < selectors.size(); i++) {
+                buf.append(selectors.get(i));
+                if (i + 1 < selectors.size())
+                    buf.append(",");
+            }
+            if (iter.hasNext())
+                buf.append(' ');
+        }
+        buf.append('\n');
+        // shitlist=hash,hash,hash
+        List shitlistedBlogs = getShitlistedBlogs();
+        if (shitlistedBlogs.size() > 0) {
+            buf.setLength(0);
+            buf.append("shitlistedblogs=");
+            for (int i = 0; i < shitlistedBlogs.size(); i++) {
+                Hash blog = (Hash)shitlistedBlogs.get(i);
+                buf.append(blog.toBase64());
+                if (i + 1 < shitlistedBlogs.size())
+                    buf.append(',');
+            }
+            buf.append('\n');
+        }
+
+        return buf.toString();
+    }
 }

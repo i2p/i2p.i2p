@@ -79,10 +79,24 @@ public class ArchiveViewerBean {
     public static final String SEL_BLOGTAG = "blogtag://";
     public static final String SEL_ENTRY = "entry://";
     public static final String SEL_GROUP = "group://";
+    /** submit field for the selector form */
+    public static final String PARAM_SELECTOR_ACTION = "action";
+    public static final String SEL_ACTION_SET_AS_DEFAULT = "Set as default";
     
     public static void renderBlogSelector(User user, Map parameters, Writer out) throws IOException {
+        String sel = getString(parameters, PARAM_SELECTOR);
+        String action = getString(parameters, PARAM_SELECTOR_ACTION);
+        if ( (sel != null) && (action != null) && (SEL_ACTION_SET_AS_DEFAULT.equals(action)) ) {
+            user.setDefaultSelector(HTMLRenderer.sanitizeString(sel, false));
+            BlogManager.instance().saveUser(user);
+        }
+        
         out.write("<select name=\"");
         out.write(PARAM_SELECTOR);
+        out.write("\">");
+        out.write("<option value=\"");
+        out.write(getDefaultSelector(user, parameters));
+        out.write("\">Default blog filter</option>\n");
         out.write("\">");
         out.write("<option value=\"");
         out.write(SEL_ALL);
@@ -157,6 +171,13 @@ public class ArchiveViewerBean {
         
     }
     
+    private static String getDefaultSelector(User user, Map parameters) {
+        if ( (user == null) || (user.getDefaultSelector() == null) )
+            return BlogManager.instance().getArchive().getDefaultSelector();
+        else
+            return user.getDefaultSelector();
+    }
+    
     public static void renderBlogs(User user, Map parameters, Writer out) throws IOException {
         String blogStr = getString(parameters, PARAM_BLOG);
         Hash blog = null;
@@ -174,6 +195,8 @@ public class ArchiveViewerBean {
         if (group != null) group = new String(Base64.decode(group));
         
         String sel = getString(parameters, PARAM_SELECTOR);
+        if ( (sel == null) && (blog == null) && (group == null) && (tag == null) )
+            sel = getDefaultSelector(user, parameters);
         if (sel != null) {
             Selector s = new Selector(sel);
             blog = s.blog;
@@ -349,7 +372,7 @@ public class ArchiveViewerBean {
         return rv;
     }
     
-    private static final String getString(Map parameters, String param) {
+    public static final String getString(Map parameters, String param) {
         if ( (parameters == null) || (parameters.get(param) == null) )
             return null;
         Object vals = parameters.get(param);
@@ -365,6 +388,24 @@ public class ArchiveViewerBean {
                 return (String)c.iterator().next();
             else
                 return null;
+        } else {
+            return null;
+        }
+    }
+    public static final String[] getStrings(Map parameters, String param) {
+        if ( (parameters == null) || (parameters.get(param) == null) )
+            return null;
+        Object vals = parameters.get(param);
+        if (vals.getClass().isArray()) {
+            return (String[])vals;
+        } else if (vals instanceof Collection) {
+            Collection c = (Collection)vals;
+            if (c.size() <= 0) return null;
+            String rv[] = new String[c.size()];
+            int i = 0;
+            for (Iterator iter = c.iterator(); iter.hasNext(); i++) 
+                rv[i] = (String)iter.next();
+            return rv;
         } else {
             return null;
         }

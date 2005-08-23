@@ -13,6 +13,7 @@ import net.i2p.I2PAppContext;
  * Required keys:
  *  Owner: base64 of their signing public key
  *  Signature: base64 of the DSA signature of the rest of the ordered metadata
+ *  Edition: base10 unique identifier for this metadata (higher clobbers lower)
  *
  * Optional keys:
  *  Posters: comma delimited list of base64 signing public keys that
@@ -53,6 +54,7 @@ public class BlogInfo {
     public static final String SIGNATURE = "Signature";
     public static final String NAME = "Name";
     public static final String DESCRIPTION = "Description";
+    public static final String EDITION = "Edition";
     
     public void load(InputStream in) throws IOException {
         BufferedReader reader = new BufferedReader(new InputStreamReader(in));
@@ -63,8 +65,13 @@ public class BlogInfo {
             line = line.trim();
             int len = line.length();
             int split = line.indexOf(':');
-            if ( (len <= 0) || (split <= 0) || (split >= len - 2) )
+            if ( (len <= 0) || (split <= 0) ) {
                 continue;
+            } else if (split >= len - 1) {
+                names.add(line.substring(0, split).trim());
+                vals.add("");
+                continue;
+            }
             
             String key = line.substring(0, split).trim();
             String val = line.substring(split+1).trim();
@@ -102,7 +109,8 @@ public class BlogInfo {
             if ( (includeRealSignature) || (!SIGNATURE.equals(_optionNames[i])) )
                 buf.append(_optionNames[i]).append(':').append(_optionValues[i]).append('\n');
         }
-        out.write(buf.toString().getBytes());
+        String s = buf.toString();
+        out.write(s.getBytes());
     }
     
     public String getProperty(String name) {
@@ -133,6 +141,18 @@ public class BlogInfo {
         _optionValues = values;
     }
     
+    public int getEdition() { 
+        String e = getProperty(EDITION);
+        if (e != null) {
+            try {
+                return Integer.parseInt(e);
+            } catch (NumberFormatException nfe) {
+                return 0;
+            }
+        }
+        return 0;
+    }
+    
     public String[] getProperties() { return _optionNames; }
     
     public SigningPublicKey[] getPosters() { return _posters; }
@@ -151,7 +171,9 @@ public class BlogInfo {
         try {
             ByteArrayOutputStream out = new ByteArrayOutputStream(512);
             write(out, false);
-            return ctx.dsa().verifySignature(_signature, out.toByteArray(), _key);
+            out.close();
+            byte data[] = out.toByteArray();
+            return ctx.dsa().verifySignature(_signature, data, _key);
         } catch (IOException ioe) {
             return false;
         }
@@ -191,5 +213,53 @@ public class BlogInfo {
             }
         }
         return buf.toString();
+    }
+    
+    public static void main(String args[]) {
+        I2PAppContext ctx = I2PAppContext.getGlobalContext();
+        /*
+        try {
+            Object keys[] = ctx.keyGenerator().generateSigningKeypair();
+            SigningPublicKey pub = (SigningPublicKey)keys[0];
+            SigningPrivateKey priv = (SigningPrivateKey)keys[1];
+
+            Properties opts = new Properties();
+            opts.setProperty("Name", "n4m3");
+            opts.setProperty("Description", "foo");
+            opts.setProperty("Edition", "0");
+            opts.setProperty("ContactURL", "u@h.org");
+
+            BlogInfo info = new BlogInfo(pub, null, opts);
+            System.err.println("\n");
+            System.err.println("\n");
+            info.sign(ctx, priv);
+            System.err.println("\n");
+            boolean ok = info.verify(ctx);
+            System.err.println("\n");
+            System.err.println("sign&verify: " + ok);
+            System.err.println("\n");
+            System.err.println("\n");
+            
+            FileOutputStream o = new FileOutputStream("bloginfo-test.dat");
+            info.write(o, true);
+            o.close();
+            FileInputStream i = new FileInputStream("bloginfo-test.dat");
+            byte buf[] = new byte[4096];
+            int sz = DataHelper.read(i, buf);
+            BlogInfo read = new BlogInfo();
+            read.load(new ByteArrayInputStream(buf, 0, sz));
+            ok = read.verify(ctx);
+            System.err.println("write to disk, verify read: " + ok);
+            System.err.println("Data: " + Base64.encode(buf, 0, sz));
+            System.err.println("Str : " + new String(buf, 0, sz));
+        } catch (Exception e) { e.printStackTrace(); }
+        */
+        try {
+            FileInputStream in = new FileInputStream(args[0]);
+            BlogInfo info = new BlogInfo();
+            info.load(in);
+            boolean ok = info.verify(I2PAppContext.getGlobalContext());
+            System.out.println("OK? " + ok + " :" + info);
+        } catch (Exception e) { e.printStackTrace(); }
     }
 }

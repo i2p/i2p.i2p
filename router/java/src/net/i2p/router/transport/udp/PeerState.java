@@ -93,6 +93,10 @@ public class PeerState {
     private int _sendBytes;
     private int _receiveBps;
     private int _receiveBytes;
+    private int _sendACKBps;
+    private int _sendACKBytes;
+    private int _receiveACKBps;
+    private int _receiveACKBytes;
     private long _receivePeriodBegin;
     private volatile long _lastCongestionOccurred;
     /** 
@@ -141,8 +145,11 @@ public class PeerState {
     private long _packetsTransmitted;
     /** how many packets were retransmitted within the last RETRANSMISSION_PERIOD_WIDTH packets */
     private long _packetsRetransmitted;
+    /** how many packets were transmitted within the last RETRANSMISSION_PERIOD_WIDTH packets */
+    private long _packetsPeriodTransmitted;
+    private int _packetsPeriodRetransmitted;
     private int _packetRetransmissionRate;
-    /** what was the $packetsTransmitted when the current RETRANSMISSION_PERIOD_WIDTH began */
+    /** at what time did we last break off the retransmission counter period */
     private long _retransmissionPeriodStart;
     /** how many dup packets were received within the last RETRANSMISSION_PERIOD_WIDTH packets */
     private long _packetsReceivedDuplicate;
@@ -163,7 +170,7 @@ public class PeerState {
      * of 608
      */
     private static final int DEFAULT_MTU = 608;//600; //1500;
-    private static final int MIN_RTO = 1000 + ACKSender.ACK_FREQUENCY;
+    private static final int MIN_RTO = 500 + ACKSender.ACK_FREQUENCY;
     private static final int MAX_RTO = 3000; // 5000;
     
     public PeerState(I2PAppContext ctx) {
@@ -373,6 +380,10 @@ public class PeerState {
         return _consecutiveFailedSends;
     }
     
+    /** how fast we are sending *ack* packets */
+    public int getSendACKBps() { return _sendACKBps; }
+    public int getReceiveACKBps() { return _receiveACKBps; }
+    
     /** 
      * have all of the packets received in the current second requested that
      * the previous second's ACKs be sent?
@@ -384,14 +395,20 @@ public class PeerState {
      * cannot.  If it is not decremented, the window size remaining is 
      * not adjusted at all.
      */
-    public boolean allocateSendingBytes(int size) { 
+    public boolean allocateSendingBytes(int size) { return allocateSendingBytes(size, false); }
+    public boolean allocateSendingBytes(int size, boolean isForACK) { 
         long now = _context.clock().now();
         long duration = now - _lastSendRefill;
         if (duration >= 1000) {
             _sendWindowBytesRemaining = _sendWindowBytes;
             _sendBytes += size;
             _sendBps = (int)(0.9f*(float)_sendBps + 0.1f*((float)_sendBytes * (1000f/(float)duration)));
+            if (isForACK) {
+                _sendACKBytes += size;
+                _sendACKBps = (int)(0.9f*(float)_sendACKBps + 0.1f*((float)_sendACKBytes * (1000f/(float)duration)));
+            }
             _sendBytes = 0;
+            _sendACKBytes = 0;
             _lastSendRefill = now;
         }
         //if (true) return true;
@@ -399,6 +416,8 @@ public class PeerState {
             _sendWindowBytesRemaining -= size; 
             _sendBytes += size;
             _lastSendTime = now;
+            if (isForACK) 
+                _sendACKBytes += size;
             return true;
         } else {
             return false;
@@ -432,14 +451,17 @@ public class PeerState {
     public int getSlowStartThreshold() { return _slowStartThreshold; }
     
     /** we received the message specified completely */
-    public void messageFullyReceived(Long messageId, int bytes) {
-        if (bytes > 0)
+    public void messageFullyReceived(Long messageId, int bytes) { messageFullyReceived(messageId, bytes, false); }
+    public void messageFullyReceived(Long messageId, int bytes, boolean isForACK) {
+        if (bytes > 0) {
             _receiveBytes += bytes;
-        else {
-            if (_retransmissionPeriodStart + RETRANSMISSION_PERIOD_WIDTH < _packetsReceived) {
+            if (isForACK)
+                _receiveACKBytes += bytes;
+        } else {
+            if (_retransmissionPeriodStart + 1000 < _context.clock().now()) {
                 _packetsReceivedDuplicate++;
             } else {
-                _retransmissionPeriodStart = _packetsReceived;
+                _retransmissionPeriodStart = _context.clock().now();
                 _packetsReceivedDuplicate = 1;
             }
         }
@@ -448,6 +470,9 @@ public class PeerState {
         long duration = now - _receivePeriodBegin;
         if (duration >= 1000) {
             _receiveBps = (int)(0.9f*(float)_receiveBps + 0.1f*((float)_receiveBytes * (1000f/(float)duration)));
+            if (isForACK)
+                _receiveACKBps = (int)(0.9f*(float)_receiveACKBps + 0.1f*((float)_receiveACKBytes * (1000f/(float)duration)));
+            _receiveACKBytes = 0;
             _receiveBytes = 0;
             _receivePeriodBegin = now;
            _context.statManager().addRateData("udp.receiveBps", _receiveBps, 0);
@@ -480,20 +505,21 @@ public class PeerState {
      */
     private boolean congestionOccurred() {
         long now = _context.clock().now();
-        if (_lastCongestionOccurred + 10*1000 > now)
-            return false; // only shrink once every 10 seconds
+        if (_lastCongestionOccurred + 5*1000 > now)
+            return false; // only shrink once every 5 seconds
         _lastCongestionOccurred = now;
         
         _context.statManager().addRateData("udp.congestionOccurred", _sendWindowBytes, _sendBps);
         
+        int congestionAt = _sendWindowBytes;
         //if (true)
         //    _sendWindowBytes -= 10000;
         //else
-            _sendWindowBytes = (_sendWindowBytes*2) / 3;
+            _sendWindowBytes = _sendWindowBytes/4; //(_sendWindowBytes*2) / 3;
         if (_sendWindowBytes < MINIMUM_WINDOW_BYTES)
             _sendWindowBytes = MINIMUM_WINDOW_BYTES;
-        if (_sendWindowBytes < _slowStartThreshold)
-            _slowStartThreshold = _sendWindowBytes;
+        //if (congestionAt/2 < _slowStartThreshold)
+            _slowStartThreshold = congestionAt/2;
         return true;
     }
     
@@ -595,24 +621,34 @@ public class PeerState {
     public void messageACKed(int bytesACKed, long lifetime, int numSends) {
         _consecutiveFailedSends = 0;
         _lastFailedSendPeriod = -1;
-        if (_sendWindowBytes <= _slowStartThreshold) {
-            _sendWindowBytes += bytesACKed;
-        } else {
-            double prob = ((double)bytesACKed) / ((double)_sendWindowBytes);
-            if (_context.random().nextDouble() <= prob)
+        if (numSends < 2) {
+            if (_sendWindowBytes <= _slowStartThreshold) {
                 _sendWindowBytes += bytesACKed;
+            } else {
+                if (false) {
+                    _sendWindowBytes += 16; // why 16?
+                } else {
+                    float prob = ((float)bytesACKed) / ((float)_sendWindowBytes);
+                    float v = _context.random().nextFloat();
+                    if (v < 0) v = 0-v;
+                    if (v <= prob)
+                        _sendWindowBytes += bytesACKed;
+                }
+            }
         }
         if (_sendWindowBytes > MAX_SEND_WINDOW_BYTES)
             _sendWindowBytes = MAX_SEND_WINDOW_BYTES;
         _lastReceiveTime = _context.clock().now();
         
-        if (_sendWindowBytesRemaining + bytesACKed <= _sendWindowBytes)
-            _sendWindowBytesRemaining += bytesACKed;
-        else
-            _sendWindowBytesRemaining = _sendWindowBytes;
+        if (false) {
+            if (_sendWindowBytesRemaining + bytesACKed <= _sendWindowBytes)
+                _sendWindowBytesRemaining += bytesACKed;
+            else
+                _sendWindowBytesRemaining = _sendWindowBytes;
+        }
         
         _messagesSent++;
-        if (numSends <= 2)
+        if (numSends < 2)
             recalculateTimeouts(lifetime);
         else
             _log.warn("acked after numSends=" + numSends + " w/ lifetime=" + lifetime + " and size=" + bytesACKed);
@@ -643,11 +679,14 @@ public class PeerState {
     
     /** we are resending a packet, so lets jack up the rto */
     public void messageRetransmitted(int packets) { 
-        if (_retransmissionPeriodStart + RETRANSMISSION_PERIOD_WIDTH < _packetsTransmitted) {
+        long now = _context.clock().now();
+        if (_retransmissionPeriodStart + 1000 <= now) {
             _packetsRetransmitted += packets;
         } else {
             _packetRetransmissionRate = (int)((float)(0.9f*_packetRetransmissionRate) + (float)(0.1f*_packetsRetransmitted));
-            _retransmissionPeriodStart = _packetsTransmitted;
+            //_packetsPeriodTransmitted = _packetsTransmitted - _retransmissionPeriodStart;
+            _packetsPeriodRetransmitted = (int)_packetsRetransmitted;
+            _retransmissionPeriodStart = now;
             _packetsRetransmitted = packets;
         }
         congestionOccurred();
@@ -655,10 +694,13 @@ public class PeerState {
         //_rto *= 2; 
     }
     public void packetsTransmitted(int packets) { 
+        long now = _context.clock().now();
         _packetsTransmitted += packets; 
-        if (_retransmissionPeriodStart + RETRANSMISSION_PERIOD_WIDTH > _packetsTransmitted) {
+        //_packetsPeriodTransmitted += packets;
+        if (_retransmissionPeriodStart + 1000 <= now) {
             _packetRetransmissionRate = (int)((float)(0.9f*_packetRetransmissionRate) + (float)(0.1f*_packetsRetransmitted));
-            _retransmissionPeriodStart = _packetsTransmitted;
+            _retransmissionPeriodStart = 0;
+            _packetsPeriodRetransmitted = (int)_packetsRetransmitted;
             _packetsRetransmitted = 0;
         }
     }
@@ -673,6 +715,8 @@ public class PeerState {
     public long getMessagesReceived() { return _messagesReceived; }
     public long getPacketsTransmitted() { return _packetsTransmitted; }
     public long getPacketsRetransmitted() { return _packetsRetransmitted; }
+    public long getPacketsPeriodTransmitted() { return _packetsPeriodTransmitted; }
+    public int getPacketsPeriodRetransmitted() { return _packetsPeriodRetransmitted; }
     /** avg number of packets retransmitted for every 100 packets */
     public long getPacketRetransmissionRate() { return _packetRetransmissionRate; }
     public long getPacketsReceived() { return _packetsReceived; }

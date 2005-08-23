@@ -1,8 +1,10 @@
 <%@page import="net.i2p.data.Base64, net.i2p.syndie.web.*, net.i2p.syndie.sml.*, net.i2p.syndie.data.*, net.i2p.syndie.*, org.mortbay.servlet.MultiPartRequest, java.util.*" %>
 <jsp:useBean scope="session" class="net.i2p.syndie.User" id="user" />
+<jsp:useBean scope="session" class="net.i2p.syndie.web.PostBean" id="post" />
 <html>
 <head>
 <title>SyndieMedia</title>
+<link href="style.jsp" rel="stylesheet" type="text/css" />
 </head>
 <body>
 <table border="1" cellpadding="0" cellspacing="0" width="100%">
@@ -12,62 +14,76 @@
     <td valign="top" align="left" rowspan="2"><jsp:include page="_rightnav.jsp" /></td></tr>
 <tr><td valign="top" align="left" colspan="3"><%
 
-String contentType = request.getContentType();
-if ((contentType != null) && (contentType.indexOf("boundary=") != -1) ) {
-  if (!user.getAuthenticated()) { %>You must be logged in to post<%
-  } else {
-    MultiPartRequest req = new MultiPartRequest(request);
-    String entrySubject = req.getString("entrysubject");
-    String entryTags = req.getString("entrytags");
-    String entryText = req.getString("entrytext");
-    String entryHeaders = req.getString("entryheaders");
-    String replyTo = req.getString(ArchiveViewerBean.PARAM_IN_REPLY_TO);
-    if ( (replyTo != null) && (replyTo.trim().length() > 0) ) {
-      byte r[] = Base64.decode(replyTo);
-      if (r != null) {
-        if (entryHeaders == null) entryHeaders = HTMLRenderer.HEADER_IN_REPLY_TO + ": " + new String(r);
-        else entryHeaders = entryHeaders + '\n' + HTMLRenderer.HEADER_IN_REPLY_TO + ": " + new String(r);
-      } else {
-        replyTo = null;
-      }
+if (!user.getAuthenticated()) { 
+  %>You must be logged in to post<%
+} else {
+  String confirm = request.getParameter("confirm");
+  if ( (confirm != null) && (confirm.equalsIgnoreCase("true")) ) {
+    BlogURI uri = post.postEntry(); 
+    if (uri != null) {
+      %>Blog entry <a href="<%=HTMLRenderer.getPageURL(user.getBlog(), null, uri.getEntryId(), -1, -1, 
+                                                        user.getShowExpanded(), user.getShowImages())%>">posted</a>!<%
+    } else {
+      %>There was an unknown error posting the entry...<%
     }
-    
-    List fileStreams = new ArrayList();
-    List fileNames = new ArrayList();
-    List fileTypes = new ArrayList();
-    for (int i = 0; i < 32; i++) {
-      String filename = req.getFilename("entryfile" + i);
-      if ( (filename != null) && (filename.trim().length() > 0) ) {
-        fileNames.add(filename.trim());
-        fileStreams.add(req.getInputStream("entryfile" + i));
-        Hashtable params = req.getParams("entryfile" + i);
-        String type = "application/octet-stream";
-        for (Iterator iter = params.keySet().iterator(); iter.hasNext(); ) {
-          String cur = (String)iter.next();
-          if ("content-type".equalsIgnoreCase(cur)) {
-            type = (String)params.get(cur);
-            break;
+    post.reinitialize();
+    post.setUser(user);
+  } else {
+    // logged in but not confirmed...
+    String contentType = request.getContentType();
+    if ((contentType != null) && (contentType.indexOf("boundary=") != -1) ) {
+        // not confirmed but they posted stuff... gobble up what they give
+        // and display it as a preview (then we show the confirm form)
+        post.reinitialize();
+        post.setUser(user);
+        
+        MultiPartRequest req = new MultiPartRequest(request);
+        String entrySubject = req.getString("entrysubject");
+        String entryTags = req.getString("entrytags");
+        String entryText = req.getString("entrytext");
+        String entryHeaders = req.getString("entryheaders");
+        String replyTo = req.getString(ArchiveViewerBean.PARAM_IN_REPLY_TO);
+        if ( (replyTo != null) && (replyTo.trim().length() > 0) ) {
+          byte r[] = Base64.decode(replyTo);
+          if (r != null) {
+            if (entryHeaders == null) entryHeaders = HTMLRenderer.HEADER_IN_REPLY_TO + ": " + new String(r);
+            else entryHeaders = entryHeaders + '\n' + HTMLRenderer.HEADER_IN_REPLY_TO + ": " + new String(r);
+          } else {
+            replyTo = null;
           }
         }
-        fileTypes.add(type);
-      }
-    }
-    
-    BlogURI entry = BlogManager.instance().createBlogEntry(user, entrySubject, entryTags, entryHeaders, entryText, fileNames, fileStreams, fileTypes);
-    if (entry != null) {
-      // it has been rebuilt...
-      request.setAttribute("index", BlogManager.instance().getArchive().getIndex());
-%>
-Blog entry <a href="<%=HTMLRenderer.getPageURL(user.getBlog(), null, entry.getEntryId(), -1, -1, user.getShowExpanded(), user.getShowImages())%>">posted</a>!
-<%   } else { %>
-There was an error posting... dunno what it was...
-<%   }  
-  }
-} else { %><form action="post.jsp" method="POST" enctype="multipart/form-data"> 
-Post subject: <input type="text" size="80" name="entrysubject" /><br />
-Post tags: <input type="text" size="20" name="entrytags" /><br />
+
+        post.setSubject(entrySubject);
+        post.setTags(entryTags);
+        post.setText(entryText);
+        post.setHeaders(entryHeaders);
+
+        for (int i = 0; i < 32; i++) {
+          String filename = req.getFilename("entryfile" + i);
+          if ( (filename != null) && (filename.trim().length() > 0) ) {
+            Hashtable params = req.getParams("entryfile" + i);
+            String type = "application/octet-stream";
+            for (Iterator iter = params.keySet().iterator(); iter.hasNext(); ) {
+              String cur = (String)iter.next();
+              if ("content-type".equalsIgnoreCase(cur)) {
+                type = (String)params.get(cur);
+                break;
+              }
+            }
+            post.addAttachment(filename.trim(), req.getInputStream("entryfile" + i), type);
+          }
+        }
+
+        post.renderPreview(out);
+        %><hr />Please <a href="post.jsp?confirm=true">confirm</a> that this is ok.  Otherwise, just go back and make changes.<%
+    } else {
+      // logged in and not confirmed because they didn't send us anything!  
+      // give 'em a new form
+%><form action="post.jsp" method="POST" enctype="multipart/form-data"> 
+Post subject: <input type="text" size="80" name="entrysubject" value="<%=post.getSubject()%>" /><br />
+Post tags: <input type="text" size="20" name="entrytags" value="<%=post.getTags()%>" /><br />
 Post content (in raw SML, no headers):<br />
-<textarea rows="6" cols="80" name="entrytext"></textarea><br />
+<textarea rows="6" cols="80" name="entrytext"><%=post.getText()%></textarea><br />
 <b>SML cheatsheet:</b><br /><textarea rows="6" cols="80" readonly="true">
 * newlines are newlines are newlines. 
 * all &lt; and &gt; are replaced with their &amp;symbol;
@@ -88,7 +104,7 @@ SML headers are newline delimited key=value pairs.  Example keys are:
 * textfont = font to put most text into
 </textarea><br />
 SML post headers:<br />
-<textarea rows="3" cols="80" name="entryheaders"></textarea><br /><%
+<textarea rows="3" cols="80" name="entryheaders"><%=post.getHeaders()%></textarea><br /><%
 String s = request.getParameter(ArchiveViewerBean.PARAM_IN_REPLY_TO);
 if ( (s != null) && (s.trim().length() > 0) ) {%>
 <input type="hidden" name="<%=ArchiveViewerBean.PARAM_IN_REPLY_TO%>" value="<%=request.getParameter(ArchiveViewerBean.PARAM_IN_REPLY_TO)%>" />
@@ -105,8 +121,11 @@ Attachment 7: <input type="file" name="entryfile7" /><br />
 Attachment 8: <input type="file" name="entryfile8" /><br />
 Attachment 9: <input type="file" name="entryfile9" /><br />
 <hr />
-<input type="submit" name="Post" value="Post entry" /> <input type="reset" value="Cancel" />
-<% } %>
-</td></tr>
+<input type="submit" name="Post" value="Preview..." /> <input type="reset" value="Cancel" />
+<%
+    } // end of the 'logged in, not confirmed, nothing posted' section
+  } // end of the 'logged in, not confirmed' section
+} // end of the 'logged in' section
+%></td></tr>
 </table>
 </body>

@@ -1,4 +1,14 @@
-$Id: history.txt,v 1.227 2005/08/17 15:05:03 jrandom Exp $
+$Id: history.txt,v 1.228 2005/08/21 13:39:06 jrandom Exp $
+
+2005-08-23  jrandom
+    * Removed the concept of "no bandwidth limit" - if none is specified, its
+      16KBps in/out.
+    * Include ack packets in the per-peer cwin throttle (they were part of the
+      bandwidth limit though).
+    * Tweak the SSU cwin operation to get more accurrate estimates under 
+      congestions.
+    * SSU improvements to resend more efficiently.
+    * Added a basic scheduler to eepget to fetch multiple files sequentially.
 
 * 2005-08-21  0.6.0.3 released
 

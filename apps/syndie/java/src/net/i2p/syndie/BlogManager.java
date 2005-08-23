@@ -18,6 +18,7 @@ public class BlogManager {
     private File _archiveDir;
     private File _userDir;
     private File _cacheDir;
+    private File _tempDir;
     private Archive _archive;
     
     static {
@@ -42,11 +43,13 @@ public class BlogManager {
             _archiveDir = new File(root, "archive");
         _userDir = new File(root, "users");
         _cacheDir = new File(root, "cache");
+        _tempDir = new File(root, "temp");
         _blogKeyDir.mkdirs();
         _privKeyDir.mkdirs();
         _archiveDir.mkdirs();
         _cacheDir.mkdirs();
         _userDir.mkdirs();
+        _tempDir.mkdirs();
         _archive = new Archive(ctx, _archiveDir.getAbsolutePath(), _cacheDir.getAbsolutePath());
         _archive.regenerateIndex();
     }
@@ -93,6 +96,7 @@ public class BlogManager {
     }
     
     public Archive getArchive() { return _archive; }
+    public File getTempDir() { return _tempDir; }
     
     public List listMyBlogs() {
         File files[] = _privKeyDir.listFiles();
@@ -175,45 +179,7 @@ public class BlogManager {
         FileWriter out = null;
         try {
             out = new FileWriter(userFile);
-            out.write("password=" + user.getHashedPassword() + "\n");
-            out.write("blog=" + user.getBlog().toBase64() + "\n");
-            out.write("lastid=" + user.getMostRecentEntry() + "\n");
-            out.write("lastmetaedition=" + user.getLastMetaEntry() + "\n");
-            out.write("lastlogin=" + user.getLastLogin() + "\n");
-            out.write("addressbook=" + user.getAddressbookLocation() + "\n");
-            out.write("showimages=" + user.getShowImages() + "\n");
-            out.write("showexpanded=" + user.getShowExpanded() + "\n");
-            StringBuffer buf = new StringBuffer();
-            buf.append("groups=");
-            Map groups = user.getBlogGroups();
-            for (Iterator iter = groups.keySet().iterator(); iter.hasNext(); ) {
-                String name = (String)iter.next();
-                List selectors = (List)groups.get(name);
-                buf.append(name).append(':');
-                for (int i = 0; i < selectors.size(); i++) {
-                    buf.append(selectors.get(i));
-                    if (i + 1 < selectors.size())
-                        buf.append(",");
-                }
-                if (iter.hasNext())
-                    buf.append(' ');
-            }
-            buf.append('\n');
-            out.write(buf.toString());
-            // shitlist=hash,hash,hash
-            List shitlistedBlogs = user.getShitlistedBlogs();
-            if (shitlistedBlogs.size() > 0) {
-                buf.setLength(0);
-                buf.append("shitlistedblogs=");
-                for (int i = 0; i < shitlistedBlogs.size(); i++) {
-                    Hash blog = (Hash)shitlistedBlogs.get(i);
-                    buf.append(blog.toBase64());
-                    if (i + 1 < shitlistedBlogs.size())
-                        buf.append(',');
-                }
-                buf.append('\n');
-                out.write(buf.toString());
-            }
+            out.write(user.export());
         } catch (IOException ioe) {
             ioe.printStackTrace();
         } finally {
@@ -346,6 +312,39 @@ public class BlogManager {
             return null;
         }
     }
+    
+    /** 
+     * read in the syndie blog metadata file from the stream, verifying it and adding it to 
+     * the archive if necessary
+     *
+     */
+    public boolean importBlogMetadata(InputStream metadataStream) throws IOException {
+        try {
+            BlogInfo info = new BlogInfo();
+            info.load(metadataStream);
+            return _archive.storeBlogInfo(info);
+        } catch (IOException ioe) {
+            ioe.printStackTrace();
+            return false;
+        }
+    }
+    
+    /** 
+     * read in the syndie entry file from the stream, verifying it and adding it to 
+     * the archive if necessary
+     *
+     */
+    public boolean importBlogEntry(InputStream entryStream) throws IOException {
+        try {
+            EntryContainer c = new EntryContainer();
+            c.load(entryStream);
+            return _archive.storeEntry(c);
+        } catch (IOException ioe) {
+            ioe.printStackTrace();
+            return false;
+        }
+    }
+    
     
     public String addAddress(User user, String name, String location, String schema) {
         if (!user.getAuthenticated()) return "Not logged in";

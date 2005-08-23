@@ -25,15 +25,21 @@ class FIFOBandwidthRefiller implements Runnable {
     public static final String PROP_INBOUND_BANDWIDTH_PEAK = "i2np.bandwidth.inboundBurstKBytes";
     public static final String PROP_OUTBOUND_BANDWIDTH_PEAK = "i2np.bandwidth.outboundBurstKBytes";
     //public static final String PROP_REPLENISH_FREQUENCY = "i2np.bandwidth.replenishFrequencyMs";
- 
+
+    // no longer allow unlimited bandwidth - the user must specify a value, and if they do not, it is 16KBps
+    public static final int DEFAULT_INBOUND_BANDWIDTH = 16;
+    public static final int DEFAULT_OUTBOUND_BANDWIDTH = 16;
+
+    public static final int DEFAULT_BURST_SECONDS = 60;
+    
     /** For now, until there is some tuning and safe throttling, we set the floor at 6KBps inbound */
-    public static final int MIN_INBOUND_BANDWIDTH = 1;
+    public static final int MIN_INBOUND_BANDWIDTH = 5;
     /** For now, until there is some tuning and safe throttling, we set the floor at 6KBps outbound */
-    public static final int MIN_OUTBOUND_BANDWIDTH = 1;
+    public static final int MIN_OUTBOUND_BANDWIDTH = 5;
     /** For now, until there is some tuning and safe throttling, we set the floor at a 10 second burst */
-    public static final int MIN_INBOUND_BANDWIDTH_PEAK = 1;
+    public static final int MIN_INBOUND_BANDWIDTH_PEAK = 10;
     /** For now, until there is some tuning and safe throttling, we set the floor at a 10 second burst */
-    public static final int MIN_OUTBOUND_BANDWIDTH_PEAK = 1;
+    public static final int MIN_OUTBOUND_BANDWIDTH_PEAK = 10;
     /** Updating the bandwidth more than once a second is silly.  once every 2 or 5 seconds is less so. */
     public static final long MIN_REPLENISH_FREQUENCY = 100;
     
@@ -146,6 +152,8 @@ class FIFOBandwidthRefiller implements Runnable {
                     _inboundKBytesPerSecond = in;
                 else
                     _inboundKBytesPerSecond = MIN_INBOUND_BANDWIDTH;
+                if (_log.shouldLog(Log.DEBUG))
+                    _log.debug("Updating inbound rate to " + _inboundKBytesPerSecond);
             } catch (NumberFormatException nfe) {
                 if (_log.shouldLog(Log.WARN))
                     _log.warn("Invalid inbound bandwidth limit [" + inBwStr 
@@ -155,6 +163,9 @@ class FIFOBandwidthRefiller implements Runnable {
             if ( (inBwStr == null) && (_log.shouldLog(Log.DEBUG)) )
                 _log.debug("Inbound bandwidth limits not specified in the config via " + PROP_INBOUND_BANDWIDTH);
         }
+        
+        if (_inboundKBytesPerSecond <= 0)
+            _inboundKBytesPerSecond = DEFAULT_INBOUND_BANDWIDTH;
     }
     private void updateOutboundRate() {
         String outBwStr = _context.getProperty(PROP_OUTBOUND_BANDWIDTH);
@@ -169,6 +180,8 @@ class FIFOBandwidthRefiller implements Runnable {
                     _outboundKBytesPerSecond = out;
                 else
                     _outboundKBytesPerSecond = MIN_OUTBOUND_BANDWIDTH;
+                if (_log.shouldLog(Log.DEBUG))
+                    _log.debug("Updating outbound rate to " + _outboundKBytesPerSecond);
             } catch (NumberFormatException nfe) {
                 if (_log.shouldLog(Log.WARN))
                     _log.warn("Invalid outbound bandwidth limit [" + outBwStr 
@@ -178,6 +191,9 @@ class FIFOBandwidthRefiller implements Runnable {
             if ( (outBwStr == null) && (_log.shouldLog(Log.DEBUG)) )
                 _log.debug("Outbound bandwidth limits not specified in the config via " + PROP_OUTBOUND_BANDWIDTH);
         }
+        
+        if (_outboundKBytesPerSecond <= 0)
+            _outboundKBytesPerSecond = DEFAULT_OUTBOUND_BANDWIDTH;
     }
     
     private void updateInboundPeak() {
@@ -203,11 +219,13 @@ class FIFOBandwidthRefiller implements Runnable {
                 if (_log.shouldLog(Log.WARN))
                     _log.warn("Invalid inbound bandwidth burst limit [" + inBwStr 
                               + "]");
+                _limiter.setMaxInboundBytes(DEFAULT_BURST_SECONDS * _inboundKBytesPerSecond * 1024);
             }
         } else {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Inbound bandwidth burst limits not specified in the config via " 
                            + PROP_INBOUND_BANDWIDTH_PEAK);
+            _limiter.setMaxInboundBytes(DEFAULT_BURST_SECONDS * _inboundKBytesPerSecond * 1024);
         }
     }
     private void updateOutboundPeak() {
@@ -233,11 +251,13 @@ class FIFOBandwidthRefiller implements Runnable {
                 if (_log.shouldLog(Log.WARN))
                     _log.warn("Invalid outbound bandwidth burst limit [" + outBwStr 
                               + "]");
+                _limiter.setMaxOutboundBytes(DEFAULT_BURST_SECONDS * _outboundKBytesPerSecond * 1024);
             }
         } else {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Outbound bandwidth burst limits not specified in the config via " 
                            + PROP_OUTBOUND_BANDWIDTH_PEAK);
+            _limiter.setMaxOutboundBytes(DEFAULT_BURST_SECONDS * _outboundKBytesPerSecond * 1024);
         }
     }
     

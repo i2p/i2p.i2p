@@ -30,6 +30,7 @@ public class Archive {
     private Map _blogInfo;
     private ArchiveIndex _index;
     private EntryExtractor _extractor;
+    private String _defaultSelector;
     
     public static final String METADATA_FILE = "meta.snm";
     public static final String INDEX_FILE = "archive.txt";
@@ -50,6 +51,8 @@ public class Archive {
         _blogInfo = new HashMap();
         _index = null;
         _extractor = new EntryExtractor(ctx);
+        _defaultSelector = ctx.getProperty("syndie.defaultSelector");
+        if (_defaultSelector == null) _defaultSelector = "";
         reloadInfo();
     }
     
@@ -63,7 +66,12 @@ public class Archive {
                     BlogInfo bi = new BlogInfo();
                     try {
                         bi.load(new FileInputStream(meta));
-                        info.add(bi);
+                        if (bi.verify(_context)) {
+                            info.add(bi);
+                        } else {
+                            System.err.println("Invalid blog (but we're storing it anyway): " + bi);
+                            info.add(bi);
+                        }
                     } catch (IOException ioe) {
                         ioe.printStackTrace();
                     }
@@ -79,8 +87,11 @@ public class Archive {
             }
         }
     }
+    
+    public String getDefaultSelector() { return _defaultSelector; }
         
     public BlogInfo getBlogInfo(BlogURI uri) {
+        if (uri == null) return null;
         synchronized (_blogInfo) {
             return (BlogInfo)_blogInfo.get(uri.getKeyHash());
         }
@@ -90,14 +101,20 @@ public class Archive {
             return (BlogInfo)_blogInfo.get(key); 
         }
     }
-    public void storeBlogInfo(BlogInfo info) { 
+    public boolean storeBlogInfo(BlogInfo info) { 
         if (!info.verify(_context)) {
             System.err.println("Not storing the invalid blog " + info);
-            return;
+            return false;
         }
+        boolean isNew = true;
         synchronized (_blogInfo) {
-            _blogInfo.put(info.getKey().calculateHash(), info); 
+            BlogInfo old = (BlogInfo)_blogInfo.get(info.getKey().calculateHash());
+            if ( (old == null) || (old.getEdition() < info.getEdition()) )
+                _blogInfo.put(info.getKey().calculateHash(), info); 
+            else
+                isNew = false;
         }
+        if (!isNew) return true; // valid entry, but not stored, since its old
         try {
             File blogDir = new File(_rootDir, info.getKey().calculateHash().toBase64());
             blogDir.mkdirs();
@@ -106,8 +123,10 @@ public class Archive {
             info.write(out);
             out.close();
             System.out.println("Blog info written to " + blogFile.getPath());
+            return true;
         } catch (IOException ioe) {
             ioe.printStackTrace();
+            return false;
         }
     }
     
@@ -262,7 +281,16 @@ public class Archive {
     }
     
     public boolean storeEntry(EntryContainer container) {
+        if (container == null) return false;
         BlogURI uri = container.getURI();
+        if (uri == null) return false;
+
+        File blogDir = new File(_rootDir, uri.getKeyHash().toBase64());
+        blogDir.mkdirs();
+        File entryFile = new File(blogDir, getEntryFilename(uri.getEntryId()));
+        if (entryFile.exists()) return true;
+
+
         BlogInfo info = getBlogInfo(uri);
         if (info == null) {
             System.out.println("no blog metadata for the uri " + uri);
@@ -274,13 +302,10 @@ public class Archive {
         } else {
             //System.out.println("Signature is valid: " + container.getSignature() + " for info " + info);
         }
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
         try {
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();   
             container.write(baos, true);
-            File blogDir = new File(_rootDir, uri.getKeyHash().toBase64());
-            blogDir.mkdirs();
             byte data[] = baos.toByteArray();
-            File entryFile = new File(blogDir, getEntryFilename(uri.getEntryId()));
             FileOutputStream out = new FileOutputStream(entryFile);
             out.write(data);
             out.close();

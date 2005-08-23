@@ -72,7 +72,9 @@ public class EntryContainer {
     public int getFormat() { return _format; }
     
     public void load(InputStream source) throws IOException {
-        String fmt = DataHelper.readLine(source).trim();
+        String line = DataHelper.readLine(source);
+        if (line == null) throw new IOException("No format line in the entry");
+        String fmt = line.trim();
         if (FORMAT_ZIP_UNENCRYPTED_STR.equals(fmt)) {
             _format = FORMAT_ZIP_UNENCRYPTED;
         } else if (FORMAT_ZIP_ENCRYPTED_STR.equals(fmt)) {
@@ -81,7 +83,6 @@ public class EntryContainer {
             throw new IOException("Unsupported entry format: " + fmt);
         }
         
-        String line = null;
         while ( (line = DataHelper.readLine(source)) != null) {
             line = line.trim();
             int len = line.length();
@@ -99,17 +100,24 @@ public class EntryContainer {
         parseHeaders();
         
         String sigStr = DataHelper.readLine(source);
+        if ( (sigStr == null) || (sigStr.indexOf("Signature:") == -1) )
+            throw new IOException("No signature line");
         sigStr = sigStr.substring("Signature:".length()+1).trim();
         
         _signature = new Signature(Base64.decode(sigStr));
         //System.out.println("Sig: " + _signature.toBase64());
         
-        line = DataHelper.readLine(source).trim();
+        line = DataHelper.readLine(source);
+        if (line == null)
+            throw new IOException("No size line");
+        line = line.trim();
         int dataSize = -1;
         try {
             int index = line.indexOf("Size:");
             if (index == 0)
                 dataSize = Integer.parseInt(line.substring("Size:".length()+1).trim());
+            else
+                throw new IOException("Invalid size line");
         } catch (NumberFormatException nfe) {
             throw new IOException("Invalid entry size: " + line);
         }

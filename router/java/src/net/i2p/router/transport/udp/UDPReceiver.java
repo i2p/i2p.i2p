@@ -40,9 +40,12 @@ public class UDPReceiver {
         _runner = new Runner();
         _context.statManager().createRateStat("udp.receivePacketSize", "How large packets received are", "udp", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
         _context.statManager().createRateStat("udp.droppedInbound", "How many packet are queued up but not yet received when we drop", "udp", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
+        _context.statManager().createRateStat("udp.droppedInboundProbabalistically", "How many packet we drop probabalistically (to simulate failures)", "udp", new long[] { 60*1000, 5*60*1000, 10*60*1000, 60*60*1000 });
+        _context.statManager().createRateStat("udp.acceptedInboundProbabalistically", "How many packet we accept probabalistically (to simulate failures)", "udp", new long[] { 60*1000, 5*60*1000, 10*60*1000, 60*60*1000 });
     }
     
     public void startup() {
+        adjustDropProbability();
         _keepRunning = true;
         I2PThread t = new I2PThread(_runner, _name);
         t.setDaemon(true);
@@ -54,6 +57,18 @@ public class UDPReceiver {
         synchronized (_inboundQueue) {
             _inboundQueue.clear();
             _inboundQueue.notifyAll();
+        }
+    }
+    
+    private void adjustDropProbability() {
+        String p = _context.getProperty("i2np.udp.dropProbability");
+        if (p != null) {
+            try { 
+                ARTIFICIAL_DROP_PROBABILITY = Float.parseFloat(p);
+            } catch (NumberFormatException nfe) {}
+            if (ARTIFICIAL_DROP_PROBABILITY < 0) ARTIFICIAL_DROP_PROBABILITY = 0;
+        } else {
+            ARTIFICIAL_DROP_PROBABILITY = 0;
         }
     }
     
@@ -69,17 +84,26 @@ public class UDPReceiver {
     /** if a packet been sitting in the queue for a full second (meaning the handlers are overwhelmed), drop subsequent packets */
     private static final long MAX_QUEUE_PERIOD = 1*1000;
     
-    private static final float ARTIFICIAL_DROP_PROBABILITY = 0.0f; // 0.02f; // 0.0f;
+    private static float ARTIFICIAL_DROP_PROBABILITY = 0.0f; // 0.02f; // 0.0f;
     
     private static final int ARTIFICIAL_DELAY = 0; // 100;
     private static final int ARTIFICIAL_DELAY_BASE = 0; //100;
     
     private int receive(UDPPacket packet) {
+        //adjustDropProbability();
+        
         if (ARTIFICIAL_DROP_PROBABILITY > 0) { 
             // the first check is to let the compiler optimize away this 
             // random block on the live system when the probability is == 0
-            if (_context.random().nextFloat() <= ARTIFICIAL_DROP_PROBABILITY)
+            int v = _context.random().nextInt(1000);
+            if (v < ARTIFICIAL_DROP_PROBABILITY*1000) {
+                if (_log.shouldLog(Log.ERROR))
+                    _log.error("Drop with v=" + v + " p=" + ARTIFICIAL_DROP_PROBABILITY + " packet size: " + packet.getPacket().getLength());
+                _context.statManager().addRateData("udp.droppedInboundProbabalistically", 1, 0);
                 return -1;
+            } else {
+                _context.statManager().addRateData("udp.acceptedInboundProbabalistically", 1, 0);
+            }
         }
         
         if ( (ARTIFICIAL_DELAY > 0) || (ARTIFICIAL_DELAY_BASE > 0) ) {

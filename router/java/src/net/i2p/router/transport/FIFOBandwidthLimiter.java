@@ -119,7 +119,9 @@ public class FIFOBandwidthLimiter {
      */
     final void refillBandwidthQueues(long bytesInbound, long bytesOutbound) {
         if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Refilling the queues with " + bytesInbound + "/" + bytesOutbound);
+            _log.debug("Refilling the queues with " + bytesInbound + "/" + bytesOutbound + ", available " + 
+                       _availableInboundBytes + '/' + _availableOutboundBytes + ", max " + 
+                       _maxInboundBytes + '/' + _maxOutboundBytes);
         _availableInboundBytes += bytesInbound;
         _availableOutboundBytes += bytesOutbound;
         if (_availableInboundBytes > _maxInboundBytes) {

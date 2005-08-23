@@ -132,6 +132,7 @@ class PeerTestManager {
      */
     private void receiveTestReply(RemoteHostId from, UDPPacketReader.PeerTestReader testInfo) {
         PeerTestState test = _currentTest;
+        if (test == null) return;
         if ( (DataHelper.eq(from.getIP(), test.getBobIP().getAddress())) && (from.getPort() == test.getBobPort()) ) {
             byte ip[] = new byte[testInfo.readIPSize()];
             testInfo.readIP(ip, 0);
