@@ -109,6 +109,8 @@ public class ACKSender implements Runnable {
                     ack.markType(1);
                     if (_log.shouldLog(Log.INFO))
                         _log.info("Sending ACK for " + ackBitfields);
+                    boolean ok = peer.allocateSendingBytes(ack.getPacket().getLength(), true);
+                    // ignore whether its ok or not, its a bloody ack.  this should be fixed, probably.
                     _transport.send(ack);
                     
                     if ( (wanted > 0) && (wanted <= peer.getWantedACKSendSince()) ) {

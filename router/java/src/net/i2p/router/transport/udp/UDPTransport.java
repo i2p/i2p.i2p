@@ -884,7 +884,12 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             buf.append(formatKBps(peer.getReceiveBps()));
             buf.append("KBps/");
             buf.append(formatKBps(peer.getSendBps()));
-            buf.append("KBps</td>");
+            buf.append("KBps ");
+            //buf.append(formatKBps(peer.getReceiveACKBps()));
+            //buf.append("KBps/");
+            //buf.append(formatKBps(peer.getSendACKBps()));
+            //buf.append("KBps ");
+            buf.append("</td>");
 
             buf.append("<td>");
             buf.append(DataHelper.formatDuration(now-peer.getKeyEstablishedTime()));
@@ -923,10 +928,15 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             buf.append(peer.getPacketsReceived());
             buf.append("</td>");
             
-            double sendLostPct = (double)peer.getPacketsRetransmitted()/(double)PeerState.RETRANSMISSION_PERIOD_WIDTH;
+            double sent = (double)peer.getPacketsPeriodTransmitted();
+            double sendLostPct = 0;
+            if (sent > 0)
+                sendLostPct = (double)peer.getPacketsRetransmitted()/(sent);
+            
             buf.append("<td>");
             //buf.append(formatPct(sendLostPct));
-            buf.append(peer.getPacketRetransmissionRate());
+            buf.append(peer.getPacketsRetransmitted()); // + "/" + peer.getPacketsPeriodRetransmitted() + "/" + sent);
+            //buf.append(peer.getPacketRetransmissionRate());
             buf.append("</td>");
             
             double recvDupPct = (double)peer.getPacketsReceivedDuplicate()/(double)peer.getPacketsReceived();
