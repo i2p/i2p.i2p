@@ -50,6 +50,7 @@ public class RouterInfo extends DataStructureImpl {
     private volatile boolean _hashCodeInitialized;
 
     public static final String PROP_NETWORK_ID = "netId";
+    public static final String PROP_CAPABILITIES = "caps";
     
     public RouterInfo() {
         setIdentity(null);
@@ -297,6 +298,22 @@ public class RouterInfo extends DataStructureImpl {
             } catch (NumberFormatException nfe) {}
         }
         return -1;
+    }
+
+    /**
+     * what special capabilities this router offers
+     *
+     */
+    public String getCapabilities() {
+        if (_options == null) return "";
+        String capabilities = null;
+        synchronized (_options) {
+            capabilities = _options.getProperty(PROP_CAPABILITIES);
+        }
+        if (capabilities != null)
+            return capabilities;
+        else
+            return "";
     }
         
     /**

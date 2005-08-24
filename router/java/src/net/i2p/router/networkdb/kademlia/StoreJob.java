@@ -24,6 +24,7 @@ import net.i2p.router.JobImpl;
 import net.i2p.router.ReplyJob;
 import net.i2p.router.RouterContext;
 import net.i2p.router.TunnelInfo;
+import net.i2p.router.peermanager.PeerProfile;
 import net.i2p.stat.Rate;
 import net.i2p.stat.RateStat;
 import net.i2p.util.Log;
@@ -38,7 +39,7 @@ class StoreJob extends JobImpl {
     private long _expiration;
     private PeerSelector _peerSelector;
 
-    private final static int PARALLELIZATION = 6; // how many sent at a time
+    private final static int PARALLELIZATION = 3; // how many sent at a time
     private final static int REDUNDANCY = 6; // we want the data sent to 6 peers
     /**
      * additionally send to 1 outlier(s), in case all of the routers chosen in our
@@ -52,11 +53,6 @@ class StoreJob extends JobImpl {
     private final static int EXPLORATORY_REDUNDANCY = 1; 
     private final static int STORE_PRIORITY = 100;
     
-    /** default period we allow for an ACK to take after a store */
-    private final static int PER_PEER_TIMEOUT = 5*1000;
-    /** smallest allowed period */
-    private static final int MIN_PER_PEER_TIMEOUT = 1*1000;
-
     /**
      * Create a new search for the routingKey specified
      * 
@@ -157,12 +153,22 @@ class StoreJob extends JobImpl {
                         _log.warn(getJobId() + ": Error selecting closest hash that wasnt a router! " + peer + " : " + ds);
                     _state.addSkipped(peer);
                 } else {
-                    if (getContext().shitlist().isShitlisted(((RouterInfo)ds).getIdentity().calculateHash())) {
-                        _state.addSkipped(peer);
-                    } else {
+                    int peerTimeout = _facade.getPeerTimeout(peer);
+                    //RateStat failing = prof.getDBHistory().getFailedLookupRate();
+                    //Rate failed = failing.getRate(60*60*1000);
+                    //if (failed.getCurrentEventCount() + failed.getLastEventCount() > avg) {
+                    //    _state.addSkipped(peer);
+                    //}
+                    
+                    // we don't want to filter out peers based on our local shitlist, as that opens an avenue for
+                    // manipulation (since a peer can get us to shitlist them by, well, being shitty, and that
+                    // in turn would let them assume that a netDb store received didn't come from us)
+                    //if (getContext().shitlist().isShitlisted(((RouterInfo)ds).getIdentity().calculateHash())) {
+                    //    _state.addSkipped(peer);
+                    //} else {
                         _state.addPending(peer);
-                        sendStore((RouterInfo)ds);
-                    }
+                        sendStore((RouterInfo)ds, peerTimeout);
+                    //}
                 }
             }
         }
@@ -189,7 +195,7 @@ class StoreJob extends JobImpl {
      * DeliveryStatusMessage so we know it got there
      *
      */
-    private void sendStore(RouterInfo router) {
+    private void sendStore(RouterInfo router, int responseTime) {
         DatabaseStoreMessage msg = new DatabaseStoreMessage(getContext());
         msg.setKey(_state.getTarget());
         if (_state.getData() instanceof RouterInfo) 
@@ -210,7 +216,7 @@ class StoreJob extends JobImpl {
             //    _log.debug(getJobId() + ": Send store to " + router.getIdentity().getHash().toBase64());
         }
 
-        sendStore(msg, router, getContext().clock().now() + getPerPeerTimeoutMs());
+        sendStore(msg, router, getContext().clock().now() + responseTime);
     }
     
     private void sendStore(DatabaseStoreMessage msg, RouterInfo peer, long expiration) {
@@ -257,7 +263,7 @@ class StoreJob extends JobImpl {
             
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("sending store to " + peer.getIdentity().getHash() + " through " + outTunnel + ": " + msg);
-            getContext().messageRegistry().registerPending(selector, onReply, onFail, getPerPeerTimeoutMs());
+            getContext().messageRegistry().registerPending(selector, onReply, onFail, (int)(expiration - getContext().clock().now()));
             getContext().tunnelDispatcher().dispatchOutbound(msg, outTunnel.getSendTunnelId(0), null, peer.getIdentity().getHash());
         } else {
             if (_log.shouldLog(Log.ERROR))
@@ -359,28 +365,5 @@ class StoreJob extends JobImpl {
             getContext().jobQueue().addJob(_onFailure);
         _state.complete(true);
         getContext().statManager().addRateData("netDb.storeFailedPeers", _state.getAttempted().size(), _state.getWhenCompleted()-_state.getWhenStarted());
-    }
-    
-    /**
-     * Let each peer take up to the average successful search RTT
-     *
-     */
-    private int getPerPeerTimeoutMs() {
-        int rv = -1;
-        RateStat rs = getContext().statManager().getRate("netDb.ackTime");
-        if (rs != null) {
-            Rate r = rs.getRate(rs.getPeriods()[0]);
-            rv = (int)r.getLifetimeAverageValue();
-        } 
-        
-        rv <<= 1; // double it to give some leeway.  (bah, too lazy to record stdev)
-        if (rv <= 0)
-            return PER_PEER_TIMEOUT;
-        else if (rv < MIN_PER_PEER_TIMEOUT)
-            return MIN_PER_PEER_TIMEOUT;
-        else if (rv > PER_PEER_TIMEOUT)
-            return PER_PEER_TIMEOUT;
-        else
-            return rv;
     }
 }

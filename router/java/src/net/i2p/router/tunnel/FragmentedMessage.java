@@ -65,11 +65,27 @@ public class FragmentedMessage {
      * @param length how much past the offset should we snag?
      * @param isLast is this the last fragment in the message?
      */
-    public void receive(long messageId, int fragmentNum, byte payload[], int offset, int length, boolean isLast) {
-        if (fragmentNum < 0) throw new RuntimeException("Fragment # == " + fragmentNum + " for messageId " + messageId);
-        if (payload == null) throw new RuntimeException("Payload is null for messageId " + messageId);
-        if (length <= 0) throw new RuntimeException("Length is impossible (" + length + ") for messageId " + messageId);
-        if (offset + length > payload.length) throw new RuntimeException("Length is impossible (" + length + "/" + offset + " out of " + payload.length + ") for messageId " + messageId);
+    public boolean receive(long messageId, int fragmentNum, byte payload[], int offset, int length, boolean isLast) {
+        if (fragmentNum < 0) {
+            if (_log.shouldLog(Log.ERROR))
+                _log.error("Fragment # == " + fragmentNum + " for messageId " + messageId);
+            return false;
+        }
+        if (payload == null) {
+            if (_log.shouldLog(Log.ERROR))
+                _log.error("Payload is null for messageId " + messageId);
+            return false;
+        }
+        if (length <= 0) {
+            if (_log.shouldLog(Log.ERROR))
+                _log.error("Length is impossible (" + length + ") for messageId " + messageId);
+            return false;
+        }
+        if (offset + length > payload.length) {
+            if (_log.shouldLog(Log.ERROR))
+                _log.error("Length is impossible (" + length + "/" + offset + " out of " + payload.length + ") for messageId " + messageId);
+            return false;
+        }
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Receive message " + messageId + " fragment " + fragmentNum + " with " + length + " bytes (last? " + isLast + ") offset = " + offset);
         _messageId = messageId;
@@ -87,8 +103,12 @@ public class FragmentedMessage {
         _lastReceived = _lastReceived || isLast;
         if (fragmentNum > _highFragmentNum)
             _highFragmentNum = fragmentNum;
-        if (isLast && fragmentNum <= 0)
-            throw new RuntimeException("hmm, isLast and fragmentNum=" + fragmentNum + " for message " + messageId);
+        if (isLast && fragmentNum <= 0) {
+            if (_log.shouldLog(Log.ERROR))
+                _log.error("hmm, isLast and fragmentNum=" + fragmentNum + " for message " + messageId);
+            return false;
+        }
+        return true;
     }
     
     /**
@@ -103,10 +123,22 @@ public class FragmentedMessage {
      * @param toRouter what router is this destined for (may be null)
      * @param toTunnel what tunnel is this destined for (may be null)
      */
-    public void receive(long messageId, byte payload[], int offset, int length, boolean isLast, Hash toRouter, TunnelId toTunnel) {
-        if (payload == null) throw new RuntimeException("Payload is null for messageId " + messageId);
-        if (length <= 0) throw new RuntimeException("Length is impossible (" + length + ") for messageId " + messageId);
-        if (offset + length > payload.length) throw new RuntimeException("Length is impossible (" + length + "/" + offset + " out of " + payload.length + ") for messageId " + messageId);
+    public boolean receive(long messageId, byte payload[], int offset, int length, boolean isLast, Hash toRouter, TunnelId toTunnel) {
+        if (payload == null) {
+            if (_log.shouldLog(Log.ERROR))
+                _log.error("Payload is null for messageId " + messageId);
+            return false;
+        }
+        if (length <= 0) {
+            if (_log.shouldLog(Log.ERROR))
+                _log.error("Length is impossible (" + length + ") for messageId " + messageId);
+            return false;
+        }
+        if (offset + length > payload.length) {
+            if (_log.shouldLog(Log.ERROR))
+                _log.error("Length is impossible (" + length + "/" + offset + " out of " + payload.length + ") for messageId " + messageId);
+            return false;
+        }
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Receive message " + messageId + " with " + length + " bytes (last? " + isLast + ") targetting " + toRouter + " / " + toTunnel + " offset=" + offset);
         _messageId = messageId;
@@ -124,6 +156,7 @@ public class FragmentedMessage {
         _toTunnel = toTunnel;
         if (_highFragmentNum < 0)
             _highFragmentNum = 0;
+        return true;
     }
     
     public long getMessageId() { return _messageId; }

@@ -38,6 +38,7 @@ import net.i2p.router.RouterContext;
 import net.i2p.router.networkdb.DatabaseLookupMessageHandler;
 import net.i2p.router.networkdb.DatabaseStoreMessageHandler;
 import net.i2p.router.networkdb.PublishLocalRouterInfoJob;
+import net.i2p.router.peermanager.PeerProfile;
 import net.i2p.util.Log;
 
 /**
@@ -803,6 +804,20 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
                 routers.add(o);
         }
         return routers;
+    }
+
+    /** smallest allowed period */
+    private static final int MIN_PER_PEER_TIMEOUT = 1*1000;
+    private static final int MAX_PER_PEER_TIMEOUT = 5*1000;
+    
+    public int getPeerTimeout(Hash peer) {
+        PeerProfile prof = _context.profileOrganizer().getProfile(peer);
+        double responseTime = prof.getDbResponseTime().getLifetimeAverageValue();
+        if (responseTime < MIN_PER_PEER_TIMEOUT)
+            responseTime = MIN_PER_PEER_TIMEOUT;
+        else if (responseTime > MAX_PER_PEER_TIMEOUT)
+            responseTime = MAX_PER_PEER_TIMEOUT;
+        return 4 * (int)responseTime;  // give it up to 4x the average response time
     }
     
     public void renderStatusHTML(Writer out) throws IOException {

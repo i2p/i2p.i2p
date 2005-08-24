@@ -66,6 +66,15 @@ public class RateStat {
         return rv;
     }
 
+    public double getLifetimeAverageValue() {
+        if ( (_rates == null) || (_rates.length <= 0) ) return 0;
+        return _rates[0].getLifetimeAverageValue();
+    }
+    public double getLifetimeEventCount() {
+        if ( (_rates == null) || (_rates.length <= 0) ) return 0;
+        return _rates[0].getLifetimeEventCount();
+    }
+
     public Rate getRate(long period) {
         for (int i = 0; i < _rates.length; i++) {
             if (_rates[i].getPeriod() == period) return _rates[i];

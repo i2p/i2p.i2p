@@ -82,8 +82,14 @@ public class FragmentHandler {
             //_log.debug("fragments: " + Base64.encode(preprocessed, offset, preprocessed.length-offset));
         }
         try {
-            while (offset < length)
-                offset = receiveFragment(preprocessed, offset, length);
+            while (offset < length) {
+                int off = receiveFragment(preprocessed, offset, length);
+                if (off < 0) {
+                    _context.statManager().addRateData("tunnel.corruptMessage", 1, 1);
+                    return;
+                }
+                offset = off;
+            }
         } catch (RuntimeException e) {
             if (_log.shouldLog(Log.ERROR))
                 _log.error("Corrupt fragment received: offset = " + offset, e);
@@ -253,7 +259,8 @@ public class FragmentHandler {
             msg = new FragmentedMessage(_context);
         }
         
-        msg.receive(messageId, preprocessed, offset, size, !fragmented, router, tunnelId);
+        boolean ok = msg.receive(messageId, preprocessed, offset, size, !fragmented, router, tunnelId);
+        if (!ok) return -1;
         if (msg.isComplete()) {
             if (fragmented) {
                 synchronized (_fragmentedMessages) {
@@ -315,7 +322,8 @@ public class FragmentHandler {
             }
         }
         
-        msg.receive(messageId, fragmentNum, preprocessed, offset, size, isLast);
+        boolean ok = msg.receive(messageId, fragmentNum, preprocessed, offset, size, isLast);
+        if (!ok) return -1;
         
         if (msg.isComplete()) {
             synchronized (_fragmentedMessages) {

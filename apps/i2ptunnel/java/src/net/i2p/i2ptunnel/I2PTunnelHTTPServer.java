@@ -60,11 +60,13 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
         //local is fast, so synchronously. Does not need that many
         //threads.
         try {
-            socket.setReadTimeout(readTimeout);
+            // give them 5 seconds to send in the HTTP request
+            socket.setReadTimeout(5*1000);
             String modifiedHeader = getModifiedHeader(socket);
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Modified header: [" + modifiedHeader + "]");
 
+            socket.setReadTimeout(readTimeout);
             Socket s = new Socket(remoteHost, remotePort);
             afterSocket = getTunnel().getContext().clock().now();
             new I2PTunnelRunner(s, socket, slock, null, modifiedHeader.getBytes(), null);

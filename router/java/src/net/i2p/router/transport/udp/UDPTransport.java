@@ -1080,13 +1080,13 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             case CommSystemFacade.STATUS_UNKNOWN:
             default:
                 _context.statManager().addRateData("udp.statusUnknown", 1, 0);
-                if (now - _reachabilityStatusLastUpdated < STATUS_GRACE_PERIOD) {
-                    _testEvent.forceRun();
-                    SimpleTimer.getInstance().addEvent(_testEvent, 5*1000);
-                } else {
-                    _reachabilityStatus = status;
-                    _reachabilityStatusLastUpdated = now;
-                }
+                //if (now - _reachabilityStatusLastUpdated < STATUS_GRACE_PERIOD) {
+                //    _testEvent.forceRun();
+                //    SimpleTimer.getInstance().addEvent(_testEvent, 5*1000);
+                //} else {
+                //    _reachabilityStatus = status;
+                //    _reachabilityStatusLastUpdated = now;
+                //}
                 break;
         }
     }

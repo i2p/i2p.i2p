@@ -135,10 +135,8 @@ class SearchJob extends JobImpl {
     protected int getPerPeerTimeoutMs() {
         int rv = -1;
         RateStat rs = getContext().statManager().getRate("netDb.successTime");
-        if (rs != null) {
-            Rate r = rs.getRate(rs.getPeriods()[0]);
-            rv = (int)r.getLifetimeAverageValue();
-        } 
+        if (rs != null)
+            rv = (int)rs.getLifetimeAverageValue();
         
         rv <<= 1; // double it to give some leeway.  (bah, too lazy to record stdev)
         if ( (rv <= 0) || (rv > PER_PEER_TIMEOUT) )
@@ -344,7 +342,8 @@ class SearchJob extends JobImpl {
         //    return;
         //}
 	
-        long expiration = getContext().clock().now() + getPerPeerTimeoutMs();
+        int timeout = _facade.getPeerTimeout(router.getIdentity().getHash());
+        long expiration = getContext().clock().now() + timeout;
 
         DatabaseLookupMessage msg = buildMessage(inTunnelId, inTunnel.getPeer(0), expiration);	
 	
@@ -366,13 +365,14 @@ class SearchJob extends JobImpl {
         SearchMessageSelector sel = new SearchMessageSelector(getContext(), router, _expiration, _state);
         SearchUpdateReplyFoundJob reply = new SearchUpdateReplyFoundJob(getContext(), router, _state, _facade, this);
         
-        getContext().messageRegistry().registerPending(sel, reply, new FailedJob(getContext(), router), getPerPeerTimeoutMs());
+        getContext().messageRegistry().registerPending(sel, reply, new FailedJob(getContext(), router), timeout);
         getContext().tunnelDispatcher().dispatchOutbound(msg, outTunnelId, router.getIdentity().getHash());
     }
     
     /** we're searching for a router, so we can just send direct */
     protected void sendRouterSearch(RouterInfo router) {
-        long expiration = getContext().clock().now() + getPerPeerTimeoutMs();
+        int timeout = _facade.getPeerTimeout(router.getIdentity().getHash());
+        long expiration = getContext().clock().now() + timeout;
 
         DatabaseLookupMessage msg = buildMessage(expiration);
 
@@ -383,7 +383,7 @@ class SearchJob extends JobImpl {
         SearchMessageSelector sel = new SearchMessageSelector(getContext(), router, _expiration, _state);
         SearchUpdateReplyFoundJob reply = new SearchUpdateReplyFoundJob(getContext(), router, _state, _facade, this);
         SendMessageDirectJob j = new SendMessageDirectJob(getContext(), msg, router.getIdentity().getHash(), 
-                                                          reply, new FailedJob(getContext(), router), sel, getPerPeerTimeoutMs(), SEARCH_PRIORITY);
+                                                          reply, new FailedJob(getContext(), router), sel, timeout, SEARCH_PRIORITY);
         getContext().jobQueue().addJob(j);
     }
     
@@ -662,7 +662,7 @@ class SearchJob extends JobImpl {
                                                                 _state.getSuccessful()));
             }
         } else {
-            Set sendTo = _state.getFailed();
+            Set sendTo = _state.getRepliedPeers(); // _state.getFailed();
             sendTo.addAll(_state.getPending());
             int numSent = 0;
             for (Iterator iter = sendTo.iterator(); iter.hasNext(); ) {

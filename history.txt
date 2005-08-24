@@ -1,4 +1,23 @@
-$Id: history.txt,v 1.228 2005/08/21 13:39:06 jrandom Exp $
+$Id: history.txt,v 1.229 2005/08/23 16:25:49 jrandom Exp $
+
+2005-08-24  jrandom
+    * Catch errors with corrupt tunnel messages more gracefully (no need to 
+      kill the thread and cause an OOM...)
+    * Don't skip shitlisted peers for netDb store messages, as they aren't 
+      necessarily shitlisted by other people (though they probably are). 
+    * Adjust the netDb store per-peer timeout based on each particular peer's
+      profile (timeout = 4x their average netDb store response time)   
+    * Don't republish leaseSets to *failed* peers - send them to peers who
+      replied but just didn't know the value.
+    * Set a 5 second timeout on the I2PTunnelHTTPServer reading the client's
+      HTTP headers, rather than blocking indefinitely.  HTTP headers should be
+      sent entirely within the first streaming packet anyway, so this won't be
+      a problem.
+    * Don't use the I2PTunnel*Server handler thread pool by default, as it may
+      prevent any clients from accessing the server if the handlers get
+      blocked by the streaming lib or other issues.
+    * Don't overwrite a known status (OK/ERR-Reject/ERR-SymmetricNAT) with
+      Unknown.
 
 2005-08-23  jrandom
     * Removed the concept of "no bandwidth limit" - if none is specified, its

@@ -22,6 +22,7 @@ class SearchState {
     private HashSet _attemptedPeers;
     private HashSet _failedPeers;
     private HashSet _successfulPeers;
+    private HashSet _repliedPeers;
     private Hash _searchKey;
     private volatile long _completed;
     private volatile long _started;
@@ -34,6 +35,7 @@ class SearchState {
         _failedPeers = new HashSet(16);
         _successfulPeers = new HashSet(16);
         _pendingPeerTimes = new HashMap(16);
+        _repliedPeers = new HashSet(16);
         _completed = -1;
         _started = _context.clock().now();
     }
@@ -120,6 +122,9 @@ class SearchState {
     
     /** how long did it take to get the reply, or -1 if we dont know */
     public long replyFound(Hash peer) {
+        synchronized (_repliedPeers) {
+            _repliedPeers.add(peer);
+        }
         synchronized (_pendingPeers) {
             _pendingPeers.remove(peer);
             Long when = (Long)_pendingPeerTimes.remove(peer);
@@ -129,6 +134,8 @@ class SearchState {
                 return -1;
         }
     }
+    
+    public Set getRepliedPeers() { synchronized (_repliedPeers) { return (Set)_repliedPeers.clone(); } }
     
     public void replyTimeout(Hash peer) {
         synchronized (_pendingPeers) {

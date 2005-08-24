@@ -352,8 +352,8 @@ class PeerTestManager {
             
             PeerState bob = _transport.getPeerState(from);
             if (bob == null) {
-                if (_log.shouldLog(Log.ERROR))
-                    _log.error("Received from bob (" + from + ") who hasn't established a session with us, refusing to help him test " + aliceIP +":" + alicePort);
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("Received from bob (" + from + ") who hasn't established a session with us, refusing to help him test " + aliceIP +":" + alicePort);
                 return;
             } else {
                 state.setBobCipherKey(bob.getCurrentCipherKey());
