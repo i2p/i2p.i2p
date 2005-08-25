@@ -4,10 +4,20 @@
     "http://java.sun.com/j2ee/dtds/web-app_2.2.dtd">
 
 <web-app>
+    <servlet>
+     <servlet-name>net.i2p.syndie.web.ArchiveServlet</servlet-name>
+     <servlet-class>net.i2p.syndie.web.ArchiveServlet</servlet-class>
+    </servlet>
+     
     <!-- precompiled servlets -->
+    
     <servlet-mapping> 
       <servlet-name>net.i2p.syndie.jsp.index_jsp</servlet-name>
       <url-pattern>/</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping> 
+      <servlet-name>net.i2p.syndie.web.ArchiveServlet</servlet-name>
+      <url-pattern>/archive/*</url-pattern>
     </servlet-mapping>
     
     <session-config>

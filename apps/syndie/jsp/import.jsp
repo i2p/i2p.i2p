@@ -1,5 +1,5 @@
 <%@page import="net.i2p.data.Base64, net.i2p.syndie.web.*, net.i2p.syndie.sml.*, net.i2p.syndie.data.*, net.i2p.syndie.*, org.mortbay.servlet.MultiPartRequest, java.util.*, java.io.*" %>
-<jsp:useBean scope="session" class="net.i2p.syndie.data.ArchiveIndex" id="archive" />
+<jsp:useBean scope="session" class="net.i2p.syndie.data.TransparentArchiveIndex" id="archive" />
 <html>
 <head>
 <title>SyndieMedia import</title>

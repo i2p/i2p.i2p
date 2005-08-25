@@ -26,6 +26,8 @@ public class ArchiveIndex {
     protected List _newestBlogs;
     /** list of BlogURI objects */
     protected List _newestEntries;
+    /** parent message to a set of replies, ordered with the oldest first */
+    protected Map _replies;
     protected Properties _headers;
     
     public ArchiveIndex() {
@@ -36,6 +38,7 @@ public class ArchiveIndex {
         _newestBlogs = new ArrayList();
         _newestEntries = new ArrayList();
         _headers = new Properties();
+        _replies = Collections.synchronizedMap(new HashMap());
         _generatedOn = -1;
         if (shouldLoad)
             setIsLocal("true");
@@ -138,7 +141,13 @@ public class ArchiveIndex {
             rv.add(getBlog(i));
         return rv;
     }
-    
+    public List getReplies(BlogURI uri) {
+        Set replies = (Set)_replies.get(uri);
+        if (replies == null) return Collections.EMPTY_LIST;
+        synchronized (replies) {
+            return new ArrayList(replies);
+        }
+    }
     public void setLocation(String location) {
         try {
             File l = new File(location);
@@ -255,14 +264,16 @@ public class ArchiveIndex {
             }
             if (tag != null) {
                 if (!tag.equals(summary.tag)) {
-                    System.out.println("Tag [" + summary.tag + "] does not match the requested [" + tag + "]");
+                    System.out.println("Tag [" + summary.tag + "] does not match the requested [" + tag + "] in " + summary.blog.toBase64());
                     continue;
                 }
             }
             
             for (int j = 0; j < summary.entries.size(); j++) {
                 EntrySummary entry = (EntrySummary)summary.entries.get(j);
-                ordered.put(new Long(0-entry.entry.getEntryId()), entry.entry);
+                String k = (Long.MAX_VALUE-entry.entry.getEntryId()) + "-" + entry.entry.getKeyHash().toBase64();
+                ordered.put(k, entry.entry);
+                System.err.println("Including match: " + k);
             }
         }
         for (Iterator iter = ordered.values().iterator(); iter.hasNext(); ) {
@@ -319,7 +330,7 @@ public class ArchiveIndex {
         _blogs.add(summary);
     }
     
-    private SimpleDateFormat _dateFmt = new SimpleDateFormat("yyyyMMdd");
+    private SimpleDateFormat _dateFmt = new SimpleDateFormat("yyyyMMdd", Locale.UK);
     private long getIndexDate(String yyyymmdd) {
         synchronized (_dateFmt) {
             try {

@@ -7,6 +7,7 @@ import net.i2p.I2PAppContext;
 import net.i2p.data.*;
 import net.i2p.util.EepGet;
 import net.i2p.util.EepGetScheduler;
+import net.i2p.util.EepPost;
 import net.i2p.syndie.data.*;
 import net.i2p.syndie.sml.*;
 import net.i2p.syndie.*;
@@ -39,6 +40,8 @@ public class RemoteArchiveBean {
     public String getRemoteSchema() { return _remoteSchema; }
     public String getRemoteLocation() { return _remoteLocation; }
     public ArchiveIndex getRemoteIndex() { return _remoteIndex; }
+    public String getProxyHost() { return _proxyHost; }
+    public int getProxyPort() { return _proxyPort; }
     public boolean getFetchIndexInProgress() { return _fetchIndexInProgress; }
     public String getStatus() {
         StringBuffer buf = new StringBuffer();
@@ -46,7 +49,7 @@ public class RemoteArchiveBean {
             buf.append(_statusMessages.remove(0)).append("\n");
         return buf.toString();
     }
-
+    
     public void fetchMetadata(User user, Map parameters) {
         String meta = ArchiveViewerBean.getString(parameters, "blog");
         if (meta == null) return;
@@ -146,33 +149,45 @@ public class RemoteArchiveBean {
         scheduler.fetch();
     }
     
-    public void fetchIndex(User user, String schema, String location) {
+    public void fetchIndex(User user, String schema, String location, String proxyHost, String proxyPort) {
         _fetchIndexInProgress = true;
         _remoteIndex = null;
         _remoteLocation = location;
         _remoteSchema = schema;
         _proxyHost = null;
         _proxyPort = -1;
-        if ("eep".equals(_remoteSchema)) {
-            _proxyHost = user.getEepProxyHost();
-            _proxyPort = user.getEepProxyPort();
-        } else if ("web".equals(_remoteSchema)) {
-            _proxyHost = user.getWebProxyHost();
-            _proxyPort = user.getWebProxyPort();
-        } else if ("tor".equals(_remoteSchema)) {
-            _proxyHost = user.getTorProxyHost();
-            _proxyPort = user.getTorProxyPort();
+        
+        if ( (schema == null) || (schema.trim().length() <= 0) ||
+        (location == null) || (location.trim().length() <= 0) ) {
+            _statusMessages.add("Location must be specified");
+            _fetchIndexInProgress = false;
+            return;
+        }
+        
+        if ("web".equals(schema)) {
+            if ( (proxyHost != null) && (proxyHost.trim().length() > 0) &&
+            (proxyPort != null) && (proxyPort.trim().length() > 0) ) {
+                _proxyHost = proxyHost;
+                try {
+                    _proxyPort = Integer.parseInt(proxyPort);
+                } catch (NumberFormatException nfe) {
+                    _statusMessages.add("Proxy port " + HTMLRenderer.sanitizeString(proxyPort) + " is invalid");
+                    _fetchIndexInProgress = false;
+                    return;
+                }
+            }
         } else {
             _statusMessages.add(new String("Remote schema " + HTMLRenderer.sanitizeString(schema) + " currently not supported"));
             _fetchIndexInProgress = false;
             return;
         }
-
-        _statusMessages.add("Fetching index from " + HTMLRenderer.sanitizeString(_remoteLocation));
+        
+        _statusMessages.add("Fetching index from " + HTMLRenderer.sanitizeString(_remoteLocation) +
+        (_proxyHost != null ? " via " + HTMLRenderer.sanitizeString(_proxyHost) + ":" + _proxyPort : ""));
         File archiveFile = new File(BlogManager.instance().getTempDir(), user.getBlog().toBase64() + "_remoteArchive.txt");
         archiveFile.delete();
-        EepGet eep = new EepGet(I2PAppContext.getGlobalContext(), ((_proxyHost != null) && (_proxyPort > 0)), 
-                                _proxyHost, _proxyPort, 0, archiveFile.getAbsolutePath(), location);
+        EepGet eep = new EepGet(I2PAppContext.getGlobalContext(), ((_proxyHost != null) && (_proxyPort > 0)),
+        _proxyHost, _proxyPort, 0, archiveFile.getAbsolutePath(), location);
         eep.addStatusListener(new IndexFetcherStatusListener(archiveFile));
         eep.fetch();
     }
@@ -185,7 +200,7 @@ public class RemoteArchiveBean {
         public void attemptFailed(String url, long bytesTransferred, long bytesRemaining, int currentAttempt, int numRetries, Exception cause) {
             _statusMessages.add("Attempt " + currentAttempt + " failed after " + bytesTransferred + (cause != null ? cause.getMessage() : ""));
         }
-
+        
         public void bytesTransferred(long alreadyTransferred, int currentWrite, long bytesTransferred, long bytesRemaining, String url) {}
         public void transferComplete(long alreadyTransferred, long bytesTransferred, long bytesRemaining, String url, String outputFile) {
             _statusMessages.add("Fetch of " + HTMLRenderer.sanitizeString(url) + " successful");
@@ -210,7 +225,7 @@ public class RemoteArchiveBean {
         public void attemptFailed(String url, long bytesTransferred, long bytesRemaining, int currentAttempt, int numRetries, Exception cause) {
             _statusMessages.add("Attempt " + currentAttempt + " failed after " + bytesTransferred + (cause != null ? cause.getMessage() : ""));
         }
-
+        
         public void bytesTransferred(long alreadyTransferred, int currentWrite, long bytesTransferred, long bytesRemaining, String url) {}
         public void transferComplete(long alreadyTransferred, long bytesTransferred, long bytesRemaining, String url, String outputFile) {
             _statusMessages.add("Fetch of " + HTMLRenderer.sanitizeString(url) + " successful");
@@ -244,7 +259,7 @@ public class RemoteArchiveBean {
         public void attemptFailed(String url, long bytesTransferred, long bytesRemaining, int currentAttempt, int numRetries, Exception cause) {
             _statusMessages.add("Attempt " + currentAttempt + " failed after " + bytesTransferred + (cause != null ? cause.getMessage() : ""));
         }
-
+        
         public void bytesTransferred(long alreadyTransferred, int currentWrite, long bytesTransferred, long bytesRemaining, String url) {}
         public void transferComplete(long alreadyTransferred, long bytesTransferred, long bytesRemaining, String url, String outputFile) {
             _statusMessages.add("Fetch of " + HTMLRenderer.sanitizeString(url) + " successful");
@@ -285,6 +300,47 @@ public class RemoteArchiveBean {
         }
     }
     
+    
+    public void postSelectedEntries(User user, Map parameters) {
+        String entries[] = ArchiveViewerBean.getStrings(parameters, "localentry");
+        if ( (entries == null) || (entries.length <= 0) ) return;
+        List uris = new ArrayList(entries.length);
+        for (int i = 0; i < entries.length; i++)
+            uris.add(new BlogURI(entries[i]));
+        
+        post(uris, user);
+    }
+    
+    private void post(List blogURIs, User user) {
+        List files = new ArrayList(blogURIs.size()+1);
+        Set meta = new HashSet(4);
+        Map uploads = new HashMap(files.size());
+        String importURL = getImportURL();
+        _statusMessages.add("Uploading through " + HTMLRenderer.sanitizeString(importURL));
+        for (int i = 0; i < blogURIs.size(); i++) {
+            BlogURI uri = (BlogURI)blogURIs.get(i);
+            File blogDir = new File(BlogManager.instance().getArchive().getArchiveDir(), uri.getKeyHash().toBase64());
+            BlogInfo info = BlogManager.instance().getArchive().getBlogInfo(uri);
+            if (!meta.contains(uri.getKeyHash())) {
+                uploads.put("blogmeta" + meta.size(), new File(blogDir, Archive.METADATA_FILE));
+                meta.add(uri.getKeyHash());
+                _statusMessages.add("Scheduling upload of the blog metadata for " + HTMLRenderer.sanitizeString(info.getProperty(BlogInfo.NAME)));
+            }
+            uploads.put("blogpost" + i, new File(blogDir, uri.getEntryId() + ".snd"));
+            _statusMessages.add("Scheduling upload of " + HTMLRenderer.sanitizeString(info.getProperty(BlogInfo.NAME)) 
+                                + ": " + getEntryDate(uri.getEntryId()));
+        }
+        EepPost post = new EepPost();
+        post.postFiles(importURL, _proxyHost, _proxyPort, uploads, new Runnable() { public void run() { _statusMessages.add("Upload complete"); } });
+    }
+    
+    private String getImportURL() {
+        String loc = _remoteLocation.trim();
+        int archiveRoot = loc.lastIndexOf('/');
+        int syndieRoot = loc.lastIndexOf('/', archiveRoot-1);
+        return loc.substring(0, syndieRoot + 1) + "import.jsp";
+    }
+    
     public void renderDeltaForm(User user, ArchiveIndex localIndex, Writer out) throws IOException {
         Archive archive = BlogManager.instance().getArchive();
         StringBuffer buf = new StringBuffer(512);
@@ -305,7 +361,9 @@ public class RemoteArchiveBean {
         }
         
         int newEntries = 0;
+        int localNew = 0;
         out.write("<table border=\"1\" width=\"100%\">\n");
+        List entries = new ArrayList();
         for (Iterator iter = remoteBlogs.iterator(); iter.hasNext(); ) {
             Hash blog = (Hash)iter.next();
             buf = new StringBuffer(1024);
@@ -314,13 +372,13 @@ public class RemoteArchiveBean {
             BlogInfo info = archive.getBlogInfo(blog);
             if (info != null) {
                 buf.append("<a href=\"" + HTMLRenderer.getPageURL(blog, null, -1, -1, -1, user.getShowExpanded(), user.getShowImages()) + "\"><b>" + HTMLRenderer.sanitizeString(info.getProperty(BlogInfo.NAME)) + "</b></a>: " +
-                          HTMLRenderer.sanitizeString(info.getProperty(BlogInfo.DESCRIPTION)) + "\n");
+                HTMLRenderer.sanitizeString(info.getProperty(BlogInfo.DESCRIPTION)) + "\n");
             } else {
                 buf.append("<b>" + blog.toBase64() + "</b>\n");
             }
             buf.append("</td></tr>\n");
             buf.append("<tr><td>&nbsp;</td><td nowrap=\"true\"><b>Posted on</b></td><td nowrap=\"true\"><b>#</b></td><td nowrap=\"true\"><b>Size</b></td><td width=\"90%\" nowrap=\"true\"><b>Tags</b></td></tr>\n");
-            List entries = new ArrayList();
+            entries.clear();
             _remoteIndex.selectMatchesOrderByEntryId(entries, blog, null);
             for (int i = 0; i < entries.size(); i++) {
                 BlogURI uri = (BlogURI)entries.get(i);
@@ -330,8 +388,8 @@ public class RemoteArchiveBean {
                     newEntries++;
                     shownEntries++;
                 } else {
-                    String page = HTMLRenderer.getPageURL(blog, null, uri.getEntryId(), -1, -1, 
-                                                          user.getShowExpanded(), user.getShowImages());
+                    String page = HTMLRenderer.getPageURL(blog, null, uri.getEntryId(), -1, -1,
+                    user.getShowExpanded(), user.getShowImages());
                     buf.append("<td><a href=\"" + page + "\">(local)</a></td>\n");
                 }
                 buf.append("<td>" + getDate(uri.getEntryId()) + "</td>\n");
@@ -345,9 +403,70 @@ public class RemoteArchiveBean {
                 buf.append("</td>\n");
                 buf.append("</tr>\n");
             }
+            
+            // now for posts in known blogs that we have and they don't
+            entries.clear();
+            localIndex.selectMatchesOrderByEntryId(entries, blog, null);
+            buf.append("<tr><td colspan=\"5\">Entries we have, but the remote Syndie doesn't:</td></tr>\n");
+            for (int i = 0; i < entries.size(); i++) {
+                BlogURI uri = (BlogURI)entries.get(i);
+                if (!_remoteIndex.getEntryIsKnown(uri)) {
+                    buf.append("<tr>\n");
+                    buf.append("<td><input type=\"checkbox\" name=\"localentry\" value=\"" + uri.toString() + "\" /></td>\n");
+                    shownEntries++;
+                    newEntries++;
+                    localNew++;
+                    buf.append("<td>" + getDate(uri.getEntryId()) + "</td>\n");
+                    buf.append("<td>" + getId(uri.getEntryId()) + "</td>\n");
+                    buf.append("<td>" + localIndex.getBlogEntrySizeKB(uri) + "KB</td>\n");
+                    buf.append("<td>");
+                    for (Iterator titer = new TreeSet(localIndex.getBlogEntryTags(uri)).iterator(); titer.hasNext(); ) {
+                        String tag = (String)titer.next();
+                        buf.append("<a href=\"" + HTMLRenderer.getPageURL(blog, tag, -1, -1, -1, user.getShowExpanded(), user.getShowImages()) + "\">" + tag + "</a> \n");
+                    }
+                    buf.append("</td>\n");
+                    buf.append("</tr>\n");
+                }
+            }
+            
             if (shownEntries > 0) // skip blogs we have already syndicated
                 out.write(buf.toString());
         }
+
+        // now for posts in blogs we have and they don't
+        int newBefore = localNew;
+        buf.setLength(0);
+        buf.append("<tr><td colspan=\"5\">Blogs the remote Syndie doesn't have</td></tr>\n");
+        for (Iterator iter = localBlogs.iterator(); iter.hasNext(); ) {
+            Hash blog = (Hash)iter.next();
+            if (remoteBlogs.contains(blog)) {
+                System.err.println("Remote index has " + blog.toBase64());
+                continue;
+            }
+            
+            entries.clear();
+            localIndex.selectMatchesOrderByEntryId(entries, blog, null);
+            
+            for (int i = 0; i < entries.size(); i++) {
+                BlogURI uri = (BlogURI)entries.get(i);
+                buf.append("<tr>\n");
+                buf.append("<td><input type=\"checkbox\" name=\"localentry\" value=\"" + uri.toString() + "\" /></td>\n");
+                buf.append("<td>" + getDate(uri.getEntryId()) + "</td>\n");
+                buf.append("<td>" + getId(uri.getEntryId()) + "</td>\n");
+                buf.append("<td>" + localIndex.getBlogEntrySizeKB(uri) + "KB</td>\n");
+                buf.append("<td>");
+                for (Iterator titer = new TreeSet(localIndex.getBlogEntryTags(uri)).iterator(); titer.hasNext(); ) {
+                    String tag = (String)titer.next();
+                    buf.append("<a href=\"" + HTMLRenderer.getPageURL(blog, tag, -1, -1, -1, user.getShowExpanded(), user.getShowImages()) + "\">" + tag + "</a> \n");
+                }
+                buf.append("</td>\n");
+                buf.append("</tr>\n");
+                localNew++;
+            }
+        }
+        if (localNew > newBefore)
+            out.write(buf.toString());
+        
         out.write("</table>\n");
         if (newEntries > 0) {
             out.write("<input type=\"submit\" name=\"action\" value=\"Fetch selected entries\" /> \n");
@@ -355,14 +474,30 @@ public class RemoteArchiveBean {
         } else {
             out.write(HTMLRenderer.sanitizeString(_remoteLocation) + " has no new posts to offer us\n");
         }
+        if (localNew > 0) {
+            out.write("<input type=\"submit\" name=\"action\" value=\"Post selected entries\" /> \n");
+        }
     }
-    private final SimpleDateFormat _dateFormat = new SimpleDateFormat("yyyy/MM/dd");
+    private final SimpleDateFormat _dateFormat = new SimpleDateFormat("yyyy/MM/dd", Locale.UK);
     private String getDate(long when) {
         synchronized (_dateFormat) {
             return _dateFormat.format(new Date(when));
         }
     }
-
+    private final String getEntryDate(long when) {
+        synchronized (_dateFormat) {
+            try {
+                String str = _dateFormat.format(new Date(when));
+                long dayBegin = _dateFormat.parse(str).getTime();
+                return str + "." + (when - dayBegin);
+            } catch (ParseException pe) {
+                pe.printStackTrace();
+                // wtf
+                return "unknown";
+            }
+        }
+    }
+    
     private long getId(long id) {
         synchronized (_dateFormat) {
             try {

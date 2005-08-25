@@ -412,6 +412,20 @@ public class HTMLRenderer extends EventReceiverImpl {
             else if (addrs > 1)
                 _postBodyBuffer.append(addrs).append(" addresses ");
             
+            if (_entry != null) {
+                List replies = _archive.getIndex().getReplies(_entry.getURI());
+                if ( (replies != null) && (replies.size() > 0) ) {
+                    if (replies.size() == 1)
+                        _postBodyBuffer.append("1 reply ");
+                    else
+                        _postBodyBuffer.append(replies.size()).append(" replies ");
+                }
+            }
+        
+            String inReplyTo = (String)_headers.get(HEADER_IN_REPLY_TO);
+            if ( (inReplyTo != null) && (inReplyTo.trim().length() > 0) )
+                _postBodyBuffer.append(" <a href=\"").append(getPageURL(sanitizeTagParam(inReplyTo))).append("\">(view parent)</a>\n");
+            
             _postBodyBuffer.append("</td></tr>\n");
         } else {
             _postBodyBuffer.append("<tr class=\"syndieEntryAttachmentsCell\">\n");
@@ -486,6 +500,35 @@ public class HTMLRenderer extends EventReceiverImpl {
                 _postBodyBuffer.append("<br />\n");
             }
 
+            
+            if (_entry != null) {
+                List replies = _archive.getIndex().getReplies(_entry.getURI());
+                if ( (replies != null) && (replies.size() > 0) ) {
+                    _postBodyBuffer.append("<b>Replies:</b> ");
+                    for (int i = 0; i < replies.size(); i++) { 
+                        BlogURI reply = (BlogURI)replies.get(i);
+                        _postBodyBuffer.append("<a href=\"");
+                        _postBodyBuffer.append(getPageURL(reply.getKeyHash(), null, reply.getEntryId(), -1, -1, true, _user.getShowImages()));
+                        _postBodyBuffer.append("\">");
+                        BlogInfo replyAuthor = _archive.getBlogInfo(reply);
+                        if (replyAuthor != null) {
+                            _postBodyBuffer.append(sanitizeString(replyAuthor.getProperty(BlogInfo.NAME)));
+                        } else {
+                            _postBodyBuffer.append(reply.getKeyHash().toBase64().substring(0,16));
+                        }
+                        _postBodyBuffer.append(" on ");
+                        _postBodyBuffer.append(getEntryDate(reply.getEntryId()));
+                        _postBodyBuffer.append("</a> ");
+                    }
+                    _postBodyBuffer.append("<br />");
+                }
+            }
+        
+            String inReplyTo = (String)_headers.get(HEADER_IN_REPLY_TO);
+            if ( (inReplyTo != null) && (inReplyTo.trim().length() > 0) ) {
+                _postBodyBuffer.append(" <a href=\"").append(getPageURL(sanitizeTagParam(inReplyTo))).append("\">(view parent)</a><br />\n");
+            }
+                
             _postBodyBuffer.append("</td>\n</form>\n</tr>\n");
         }
         _postBodyBuffer.append("</table>\n");
@@ -525,6 +568,9 @@ public class HTMLRenderer extends EventReceiverImpl {
     }
     
     private void renderMetaCell() {
+        String tags[] = (_entry != null ? _entry.getTags() : null);
+        if ( (tags != null) && (tags.length > 0) )
+            _preBodyBuffer.append("<form action=\"index.jsp\">");
         _preBodyBuffer.append("<td nowrap=\"true\" align=\"right\" valign=\"top\" class=\"syndieEntryMetaCell\">\n");
         BlogInfo info = null;
         if (_entry != null) 
@@ -540,11 +586,16 @@ public class HTMLRenderer extends EventReceiverImpl {
         } else {
             _preBodyBuffer.append("[unknown blog]");
         }
-        String tags[] = (_entry != null ? _entry.getTags() : null);
         if ( (tags != null) && (tags.length > 0) ) {
             _preBodyBuffer.append(" Tags: ");
-            _preBodyBuffer.append("<i>");
+            _preBodyBuffer.append("<select name=\"selector\">");
             for (int i = 0; tags != null && i < tags.length; i++) {
+                _preBodyBuffer.append("<option value=\"blogtag://");
+                _preBodyBuffer.append(_entry.getURI().getKeyHash().toBase64());
+                _preBodyBuffer.append('/').append(Base64.encode(tags[i])).append("\">");
+                _preBodyBuffer.append(sanitizeString(tags[i]));
+                _preBodyBuffer.append("</option>\n");
+                /*
                 _preBodyBuffer.append("<a href=\"");
                 _preBodyBuffer.append(getPageURL(_entry.getURI().getKeyHash(), tags[i], -1, -1, -1, (_user != null ? _user.getShowExpanded() : false), (_user != null ? _user.getShowImages() : false)));
                 _preBodyBuffer.append("\">");
@@ -552,23 +603,32 @@ public class HTMLRenderer extends EventReceiverImpl {
                 _preBodyBuffer.append("</a>");
                 if (i + 1 < tags.length)
                     _preBodyBuffer.append(", ");
+                 */
             }
-            _preBodyBuffer.append("</i>");
+            _preBodyBuffer.append("</select>");
+            _preBodyBuffer.append("<input type=\"submit\" value=\"View\" />\n");
+            //_preBodyBuffer.append("</i>");
         }
         _preBodyBuffer.append(" ");
+        /*
+        String inReplyTo = (String)_headers.get(HEADER_IN_REPLY_TO);
+        if ( (inReplyTo != null) && (inReplyTo.trim().length() > 0) )
+            _preBodyBuffer.append(" <a href=\"").append(getPageURL(sanitizeTagParam(inReplyTo))).append("\">In reply to</a>\n");
+         */
+        
         if (_entry != null)
             _preBodyBuffer.append(getEntryDate(_entry.getURI().getEntryId()));
         else
             _preBodyBuffer.append(getEntryDate(new Date().getTime()));
-        String inReplyTo = (String)_headers.get(HEADER_IN_REPLY_TO);
-        if ( (inReplyTo != null) && (inReplyTo.trim().length() > 0) )
-            _preBodyBuffer.append(" <a href=\"").append(getPageURL(sanitizeTagParam(inReplyTo))).append("\">In reply to</a>\n");
         if ( (_user != null) && (_user.getAuthenticated()) )
             _preBodyBuffer.append(" <a href=\"").append(getPostURL(_user.getBlog(), true)).append("\">Reply</a>\n");
-        _preBodyBuffer.append("\n</td></tr>\n");
+        _preBodyBuffer.append("\n</td>");
+        if ( (tags != null) && (tags.length > 0) )
+            _preBodyBuffer.append("</form>");
+        _preBodyBuffer.append("</tr>\n");
     }
     
-    private final SimpleDateFormat _dateFormat = new SimpleDateFormat("yyyy/MM/dd");
+    private final SimpleDateFormat _dateFormat = new SimpleDateFormat("yyyy/MM/dd", Locale.UK);
     private final String getEntryDate(long when) {
         synchronized (_dateFormat) {
             try {
@@ -656,13 +716,19 @@ public class HTMLRenderer extends EventReceiverImpl {
         }
     }
 
-    public String getPageURL(String selector) {
-        return getPageURL(_user, selector);
-    }
-    
-    public static String getPageURL(User user, String selector) {
-        ArchiveViewerBean.Selector sel = new ArchiveViewerBean.Selector(selector);
-        return getPageURL(sel.blog, sel.tag, sel.entry, sel.group, -1, -1, user.getShowExpanded(), user.getShowImages());
+    public String getPageURL(String selector) { return getPageURL(_user, selector); }
+    public static String getPageURL(User user, String selector) { return getPageURL(user, selector, -1, -1); }
+    public static String getPageURL(User user, String selector, int numPerPage, int pageNum) {
+        StringBuffer buf = new StringBuffer(128);
+        buf.append("index.jsp?");
+        buf.append("selector=").append(sanitizeTagParam(selector)).append("&");
+        if ( (pageNum >= 0) && (numPerPage > 0) ) {
+            buf.append(ArchiveViewerBean.PARAM_PAGE_NUMBER).append('=').append(pageNum).append('&');
+            buf.append(ArchiveViewerBean.PARAM_NUM_PER_PAGE).append('=').append(numPerPage).append('&');
+        }
+        buf.append(ArchiveViewerBean.PARAM_EXPAND_ENTRIES).append('=').append(user.getShowExpanded()).append('&');
+        buf.append(ArchiveViewerBean.PARAM_SHOW_IMAGES).append('=').append(user.getShowImages()).append('&');
+        return buf.toString();
     }
     
     public static String getPageURL(Hash blog, String tag, long entryId, int numPerPage, int pageNum, boolean expandEntries, boolean showImages) {

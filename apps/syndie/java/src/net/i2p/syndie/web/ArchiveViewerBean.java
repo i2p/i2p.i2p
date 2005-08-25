@@ -25,8 +25,8 @@ public class ArchiveViewerBean {
         return getEntryTitleDate(name, entryId);
     }
     
-    private static final SimpleDateFormat _dateFormat = new SimpleDateFormat("yyyy/MM/dd");
-    private static final String getEntryTitleDate(String blogName, long when) {
+    private static final SimpleDateFormat _dateFormat = new SimpleDateFormat("yyyy/MM/dd", Locale.UK);
+    public static final String getEntryTitleDate(String blogName, long when) {
         synchronized (_dateFormat) {
             try {
                 String str = _dateFormat.format(new Date(when));
@@ -115,6 +115,22 @@ public class ArchiveViewerBean {
         
         Archive archive = BlogManager.instance().getArchive();
         ArchiveIndex index = archive.getIndex();
+        
+        for (int i = 0; i < index.getNewestBlogCount(); i++) {
+            Hash cur = index.getNewestBlog(i);
+            String blog = Base64.encode(cur.getData());
+            out.write("<option value=\"blog://" + blog + "\">");
+            out.write("New blog: ");
+            BlogInfo info = archive.getBlogInfo(cur);
+            String name = info.getProperty(BlogInfo.NAME);
+            if (name != null)
+                name = HTMLRenderer.sanitizeString(name);
+            else
+                name = Base64.encode(cur.getData());
+            out.write(name);
+            out.write("</option>\n");
+        }
+        
         List allTags = new ArrayList();
         // perhaps sort this by name (even though it isnt unique...)
         Set blogs = index.getUniqueBlogs();
@@ -178,7 +194,7 @@ public class ArchiveViewerBean {
             return user.getDefaultSelector();
     }
     
-    public static void renderBlogs(User user, Map parameters, Writer out) throws IOException {
+    public static void renderBlogs(User user, Map parameters, Writer out, String afterPagination) throws IOException {
         String blogStr = getString(parameters, PARAM_BLOG);
         Hash blog = null;
         if (blogStr != null) blog = new Hash(Base64.decode(blogStr));
@@ -211,7 +227,7 @@ public class ArchiveViewerBean {
         boolean showImages = getBool(parameters, PARAM_SHOW_IMAGES, (user != null ? user.getShowImages() : false));
         boolean regenerateIndex = getBool(parameters, PARAM_REGENERATE_INDEX, false);
         try {
-            renderBlogs(user, blog, tag, entryId, group, numPerPage, pageNum, expandEntries, showImages, regenerateIndex, out);
+            renderBlogs(user, blog, tag, entryId, group, numPerPage, pageNum, expandEntries, showImages, regenerateIndex, sel, out, afterPagination);
         } catch (IOException ioe) { 
             ioe.printStackTrace();
             throw ioe; 
@@ -263,8 +279,8 @@ public class ArchiveViewerBean {
         }
     }
     
-    public static void renderBlogs(User user, Hash blog, String tag, long entryId, String group, int numPerPage, int pageNum, 
-                                   boolean expandEntries, boolean showImages, boolean regenerateIndex, Writer out) throws IOException {
+    private static void renderBlogs(User user, Hash blog, String tag, long entryId, String group, int numPerPage, int pageNum, 
+                                   boolean expandEntries, boolean showImages, boolean regenerateIndex, String selector, Writer out, String afterPagination) throws IOException {
         Archive archive = BlogManager.instance().getArchive();
         if (regenerateIndex)
             archive.regenerateIndex();
@@ -293,7 +309,11 @@ public class ArchiveViewerBean {
                     pages++;
                 out.write("<i>");
                 if (pageNum > 0) {
-                    String prevURL = HTMLRenderer.getPageURL(blog, tag, entryId, group, numPerPage, pageNum-1, expandEntries, showImages);
+                    String prevURL = null;
+                    if ( (selector == null) || (selector.trim().length() <= 0) )
+                        prevURL = HTMLRenderer.getPageURL(blog, tag, entryId, group, numPerPage, pageNum-1, expandEntries, showImages);
+                    else
+                        prevURL = HTMLRenderer.getPageURL(user, selector, numPerPage, pageNum-1);
                     System.out.println("prevURL: " + prevURL);
                     out.write(" <a href=\"" + prevURL + "\">&lt;&lt;</a>");
                 } else {
@@ -301,7 +321,11 @@ public class ArchiveViewerBean {
                 }
                 out.write("Page " + (pageNum+1) + " of " + pages);
                 if (pageNum + 1 < pages) {
-                    String nextURL = HTMLRenderer.getPageURL(blog, tag, entryId, group, numPerPage, pageNum+1, expandEntries, showImages);
+                    String nextURL = null;
+                    if ( (selector == null) || (selector.trim().length() <= 0) )
+                        nextURL = HTMLRenderer.getPageURL(blog, tag, entryId, group, numPerPage, pageNum+1, expandEntries, showImages);
+                    else
+                        nextURL = HTMLRenderer.getPageURL(user, selector, numPerPage, pageNum+1);
                     System.out.println("nextURL: " + nextURL);
                     out.write(" <a href=\"" + nextURL + "\">&gt;&gt;</a>");
                 } else {
@@ -311,6 +335,7 @@ public class ArchiveViewerBean {
             }
         }
         
+        /*
         out.write(" <i>");
         
         if (showImages)
@@ -328,6 +353,10 @@ public class ArchiveViewerBean {
                       "\">Expand details</a>");
         
         out.write("</i>");
+        */
+        
+        if (afterPagination != null) 
+            out.write(afterPagination);
         
         if (entries.size() <= 0) end = -1;
         System.out.println("Entries.size: " + entries.size() + " start=" + start + " end=" + end);

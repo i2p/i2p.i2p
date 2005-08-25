@@ -31,6 +31,19 @@ public class BlogURI {
                     _entryId = -1;
                 }
             }
+        } else if (uri.startsWith("entry://")) {
+            int off = "entry://".length();
+            _blogHash = new Hash(Base64.decode(uri.substring(off, off+44))); // 44 chars == base64(32 bytes)
+            int entryStart = uri.indexOf('/', off+1);
+            if (entryStart < 0) {
+                _entryId = -1;
+            } else {
+                try {
+                    _entryId = Long.parseLong(uri.substring(entryStart+1).trim());
+                } catch (NumberFormatException nfe) {
+                    _entryId = -1;
+                }
+            }
         } else {
             _blogHash = null;
             _entryId = -1;
@@ -61,7 +74,10 @@ public class BlogURI {
                DataHelper.eq(_blogHash, ((BlogURI)obj)._blogHash);
     }
     public int hashCode() {
-        return (int)_entryId;
+        int rv = (int)_entryId;
+        if (_blogHash != null)
+            rv += _blogHash.hashCode();
+        return rv;
     }
     
     public static void main(String args[]) {
@@ -69,6 +85,8 @@ public class BlogURI {
         test("blog://Vq~AlW-r7OM763okVUFIDvVFzxOjpNNsAx0rFb2yaE8=");
         test("blog://Vq~AlW-r7OM763okVUFIDvVFzxOjpNNsAx0rFb2yaE8=/");
         test("blog://Vq~AlW-r7OM763okVUFIDvVFzxOjpNNsAx0rFb2yaE8=/123456789");
+        test("entry://Vq~AlW-r7OM763okVUFIDvVFzxOjpNNsAx0rFb2yaE8=/");
+        test("entry://Vq~AlW-r7OM763okVUFIDvVFzxOjpNNsAx0rFb2yaE8=/123456789");
     }
     private static void test(String uri) {
         BlogURI u = new BlogURI(uri);

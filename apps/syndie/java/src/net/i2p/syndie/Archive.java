@@ -40,6 +40,10 @@ public class Archive {
         public boolean accept(File dir, String name) { return name.endsWith(".snd"); }
     };    
     
+    static {
+        TimeZone.setDefault(TimeZone.getTimeZone("GMT"));
+    }
+
     public Archive(I2PAppContext ctx, String rootDir, String cacheDir) {
         _context = ctx;
         _rootDir = new File(rootDir);
@@ -319,7 +323,7 @@ public class Archive {
     
     public static String getEntryFilename(long entryId) { return entryId + ".snd"; }
     
-    private static SimpleDateFormat _dateFmt = new SimpleDateFormat("yyyyMMdd");
+    private static SimpleDateFormat _dateFmt = new SimpleDateFormat("yyyyMMdd", Locale.UK);
     public static String getIndexName(long entryId, int numBytes) {
         try {
             synchronized (_dateFmt) {

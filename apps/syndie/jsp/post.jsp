@@ -113,13 +113,13 @@ if ( (s != null) && (s.trim().length() > 0) ) {%>
 Attachment 0: <input type="file" name="entryfile0" /><br />
 Attachment 1: <input type="file" name="entryfile1" /><br />
 Attachment 2: <input type="file" name="entryfile2" /><br />
-Attachment 3: <input type="file" name="entryfile3" /><br />
+Attachment 3: <input type="file" name="entryfile3" /><br /><!--
 Attachment 4: <input type="file" name="entryfile4" /><br />
 Attachment 5: <input type="file" name="entryfile5" /><br />
 Attachment 6: <input type="file" name="entryfile6" /><br />
 Attachment 7: <input type="file" name="entryfile7" /><br />
 Attachment 8: <input type="file" name="entryfile8" /><br />
-Attachment 9: <input type="file" name="entryfile9" /><br />
+Attachment 9: <input type="file" name="entryfile9" /><br />-->
 <hr />
 <input type="submit" name="Post" value="Preview..." /> <input type="reset" value="Cancel" />
 <%

@@ -67,4 +67,36 @@ public class LocalArchiveIndex extends ArchiveIndex {
         if (!_newestEntries.contains(entry))
             _newestEntries.add(entry); 
     }
+
+    public void addReply(BlogURI parent, BlogURI reply) {
+        Set replies = (Set)_replies.get(parent);
+        if (replies == null) {
+            replies = Collections.synchronizedSet(new TreeSet(BlogURIComparator.HIGHEST_ID_FIRST));
+            _replies.put(parent, replies);
+        }
+        replies.add(reply);
+        System.err.println("Adding reply to " + parent + " from child " + reply + " (# replies: " + replies.size() + ")");
+    }
+
+    private static class BlogURIComparator implements Comparator {
+        public static final BlogURIComparator HIGHEST_ID_FIRST = new BlogURIComparator(true);
+        public static final BlogURIComparator HIGHEST_ID_LAST = new BlogURIComparator(false);
+        private boolean _highestFirst;
+        public BlogURIComparator(boolean highestFirst) {
+            _highestFirst = highestFirst;
+        }
+        
+        public int compare(Object lhs, Object rhs) {
+            if ( (lhs == null) || !(lhs instanceof BlogURI) ) return 1;
+            if ( (rhs == null) || !(rhs instanceof BlogURI) ) return -1;
+            BlogURI l = (BlogURI)lhs;
+            BlogURI r = (BlogURI)rhs;
+            if (l.getEntryId() > r.getEntryId())
+                return (_highestFirst ? 1 : -1);
+            else if (l.getEntryId() < r.getEntryId())
+                return (_highestFirst ? -1 : 1);
+            else
+                return DataHelper.compareTo(l.getKeyHash().getData(), r.getKeyHash().getData());
+        }
+    }
 }
