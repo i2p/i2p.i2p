@@ -1,6 +1,7 @@
 package net.i2p.syndie;
 
 import java.io.*;
+import java.text.*;
 import java.util.*;
 import net.i2p.I2PAppContext;
 import net.i2p.data.*;
@@ -415,17 +416,18 @@ public class BlogManager {
         if ( (schema == null) || (schema.trim().length() <= 0) ) return false;
         return "eep".equals(schema) || "i2p".equals(schema);
     }
-    
-    private final GregorianCalendar _cal = new GregorianCalendar();
-    private long getDayBegin(long now) {
-        synchronized (_cal) {
-            _cal.setTimeInMillis(now);
-            _cal.set(Calendar.MILLISECOND, 0);
-            _cal.set(Calendar.SECOND, 0);
-            _cal.set(Calendar.MINUTE, 0);
-            _cal.set(Calendar.HOUR, 0);
-            _cal.set(Calendar.HOUR_OF_DAY, 0);
-            return _cal.getTimeInMillis();
+
+    private final SimpleDateFormat _dateFormat = new SimpleDateFormat("yyyy/MM/dd", Locale.UK);    
+    private final long getDayBegin(long now) {
+        synchronized (_dateFormat) {
+            try {
+                String str = _dateFormat.format(new Date(now));
+                return _dateFormat.parse(str).getTime();
+            } catch (ParseException pe) {
+                pe.printStackTrace();
+                // wtf
+                return -1;
+            }
         }
     }
 }
