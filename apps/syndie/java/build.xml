@@ -14,7 +14,7 @@
             srcdir="./src" 
             debug="true" deprecation="on" source="1.3" target="1.3" 
             destdir="./build/obj" 
-            classpath="../../../core/java/build/i2p.jar:../../jetty/jettylib/org.mortbay.jetty.jar" />
+            classpath="../../../core/java/build/i2p.jar:../../jetty/jettylib/org.mortbay.jetty.jar:../../jetty/jettylib/javax.servlet.jar" />
     </target>
     <target name="jar" depends="builddep, compile">
         <jar destfile="./build/syndie.jar" basedir="./build/obj" includes="**/*.class">
@@ -46,6 +46,7 @@
                 <pathelement location="../../jetty/jettylib/commons-logging.jar" />
                 <pathelement location="../../jetty/jettylib/commons-el.jar" />
                 <pathelement location="../../jetty/jettylib/org.mortbay.jetty.jar" />
+                <pathelement location="../../jetty/jettylib/javax.servlet.jar" />
                 <pathelement location="../../jetty/jettylib/ant.jar" />
                 <pathelement location="build/obj" />
                 <pathelement location="../../../core/java/build/i2p.jar" />
@@ -67,6 +68,7 @@
                 <pathelement location="../../jetty/jettylib/commons-logging.jar" />
                 <pathelement location="../../jetty/jettylib/commons-el.jar" />
                 <pathelement location="../../jetty/jettylib/org.mortbay.jetty.jar" />
+                <pathelement location="../../jetty/jettylib/javax.servlet.jar" />
                 <pathelement location="build/obj" />
                 <pathelement location="../../../core/java/build/i2p.jar" />
             </classpath>
