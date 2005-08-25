@@ -40,10 +40,6 @@ public class Archive {
         public boolean accept(File dir, String name) { return name.endsWith(".snd"); }
     };    
     
-    static {
-        TimeZone.setDefault(TimeZone.getTimeZone("GMT"));
-    }
-
     public Archive(I2PAppContext ctx, String rootDir, String cacheDir) {
         _context = ctx;
         _rootDir = new File(rootDir);

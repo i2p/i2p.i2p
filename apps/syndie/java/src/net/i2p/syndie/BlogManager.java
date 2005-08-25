@@ -23,6 +23,7 @@ public class BlogManager {
     private Archive _archive;
     
     static {
+        TimeZone.setDefault(TimeZone.getTimeZone("GMT"));
         String rootDir = I2PAppContext.getGlobalContext().getProperty("syndie.rootDir");
         if (rootDir == null)
             rootDir = System.getProperty("user.home");
