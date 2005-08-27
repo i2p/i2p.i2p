@@ -156,11 +156,13 @@ public class DatabaseStoreMessage extends I2NPMessageImpl {
             int compressedSize = (int)DataHelper.fromLong(data, curIndex, 2);
             curIndex += 2;
             
-            byte decompressed[] = DataHelper.decompress(data, curIndex, compressedSize);
             try {
+                byte decompressed[] = DataHelper.decompress(data, curIndex, compressedSize);
                 _info.readBytes(new ByteArrayInputStream(decompressed));
             } catch (DataFormatException dfe) {
                 throw new I2NPMessageException("Error reading the routerInfo", dfe);
+            } catch (IOException ioe) {
+                throw new I2NPMessageException("Compressed routerInfo was corrupt", ioe);
             }
         } else {
             throw new I2NPMessageException("Invalid type of key read from the structure - " + _type);
