@@ -20,32 +20,39 @@ public class BlogManager {
     private File _userDir;
     private File _cacheDir;
     private File _tempDir;
+    private File _rootDir;
     private Archive _archive;
     
     static {
         TimeZone.setDefault(TimeZone.getTimeZone("GMT"));
         String rootDir = I2PAppContext.getGlobalContext().getProperty("syndie.rootDir");
-        if (rootDir == null)
-            rootDir = System.getProperty("user.home");
-        rootDir = rootDir + File.separatorChar + ".syndie";
+        if (false) {
+            if (rootDir == null)
+                rootDir = System.getProperty("user.home");
+            rootDir = rootDir + File.separatorChar + ".syndie";
+        } else {
+            if (rootDir == null)
+                rootDir = "./syndie";
+        }
         _instance = new BlogManager(I2PAppContext.getGlobalContext(), rootDir);
     }
     public static BlogManager instance() { return _instance; }
     
     public BlogManager(I2PAppContext ctx, String rootDir) {
         _context = ctx;
-        File root = new File(rootDir);
-        root.mkdirs();
-        _blogKeyDir = new File(root, "blogkeys");
-        _privKeyDir = new File(root, "privkeys");
+        _rootDir = new File(rootDir);
+        _rootDir.mkdirs();
+        readConfig();
+        _blogKeyDir = new File(_rootDir, "blogkeys");
+        _privKeyDir = new File(_rootDir, "privkeys");
         String archiveDir = _context.getProperty("syndie.archiveDir");
         if (archiveDir != null)
             _archiveDir = new File(archiveDir);
         else
-            _archiveDir = new File(root, "archive");
-        _userDir = new File(root, "users");
-        _cacheDir = new File(root, "cache");
-        _tempDir = new File(root, "temp");
+            _archiveDir = new File(_rootDir, "archive");
+        _userDir = new File(_rootDir, "users");
+        _cacheDir = new File(_rootDir, "cache");
+        _tempDir = new File(_rootDir, "temp");
         _blogKeyDir.mkdirs();
         _privKeyDir.mkdirs();
         _archiveDir.mkdirs();
@@ -54,6 +61,39 @@ public class BlogManager {
         _tempDir.mkdirs();
         _archive = new Archive(ctx, _archiveDir.getAbsolutePath(), _cacheDir.getAbsolutePath());
         _archive.regenerateIndex();
+    }
+    
+    private void readConfig() {
+        File config = new File(_rootDir, "syndie.config");
+        if (config.exists()) {
+            try {
+                Properties p = new Properties();
+                DataHelper.loadProps(p, config);
+                for (Iterator iter = p.keySet().iterator(); iter.hasNext(); ) {
+                    String key = (String)iter.next();
+                    System.setProperty(key, p.getProperty(key));
+                }
+            } catch (IOException ioe) {
+                ioe.printStackTrace();
+            }
+        }
+    }
+    
+    public void writeConfig() {
+        File config = new File(_rootDir, "syndie.config");
+        FileOutputStream out = null;
+        try {
+            out = new FileOutputStream(config);
+            for (Iterator iter = _context.getPropertyNames().iterator(); iter.hasNext(); ) {
+                String name = (String)iter.next();
+                if (name.startsWith("syndie."))
+                    out.write((name + '=' + _context.getProperty(name) + '\n').getBytes());
+            }
+        } catch (IOException ioe) {
+            ioe.printStackTrace();
+        } finally {
+            if (out != null) try { out.close(); } catch (IOException ioe) {}
+        }
     }
     
     public BlogInfo createBlog(String name, String description, String contactURL, String archives[]) {

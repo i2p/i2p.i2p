@@ -1,4 +1,10 @@
-$Id: history.txt,v 1.229 2005/08/23 16:25:49 jrandom Exp $
+$Id: history.txt,v 1.230 2005/08/24 17:55:27 jrandom Exp $
+
+2005-08-27  jrandom
+    * Minor logging and optimization tweaks in the router and SDK
+    * Use ISO-8859-1 in the XML files (thanks redzara!)
+    * The consolePassword config property can now be used to bypass the router
+      console's nonce checking, allowing CLI restarts
 
 2005-08-24  jrandom
     * Catch errors with corrupt tunnel messages more gracefully (no need to 

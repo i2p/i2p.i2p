@@ -84,7 +84,7 @@ public class RepublishLeaseSetJob extends JobImpl {
         public void runJob() { 
             if (_log.shouldLog(Log.WARN))
                 _log.warn("FAILED publishing of the leaseSet for " + _dest.toBase64());
-            RepublishLeaseSetJob.this.requeue(30*1000);
+            RepublishLeaseSetJob.this.requeue(getContext().random().nextInt(60*1000));
         }
     }
 }

@@ -141,14 +141,17 @@ public class LogManager {
     public Log getLog(Class cls, String name) {
         Log rv = null;
         String scope = Log.getScope(name, cls);
+        boolean isNew = false;
         synchronized (_logs) {
             rv = (Log)_logs.get(scope);
             if (rv == null) {
                 rv = new Log(this, cls, name);
                 _logs.put(scope, rv);
+                isNew = true;
             }
         }
-        updateLimit(rv);
+        if (isNew)
+            updateLimit(rv);
         return rv;
     }
     public List getLogs() {

@@ -20,6 +20,7 @@ public class FormHandler {
     protected Log _log;
     private String _nonce;
     protected String _action;
+    protected String _passphrase;
     private List _errors;
     private List _notices;
     private boolean _processed;
@@ -32,6 +33,7 @@ public class FormHandler {
         _processed = false;
         _valid = true;
         _nonce = null;
+        _passphrase = null;
     }
     
     /**
@@ -51,6 +53,7 @@ public class FormHandler {
 
     public void setNonce(String val) { _nonce = val; }
     public void setAction(String val) { _action = val; }
+    public void setPassphrase(String val) { _passphrase = val; }
     
     /**
      * Override this to perform the final processing (in turn, adding formNotice
@@ -119,8 +122,14 @@ public class FormHandler {
         String noncePrev = System.getProperty(getClass().getName() + ".noncePrev");
         if ( ( (nonce == null) || (!_nonce.equals(nonce)) ) &&
              ( (noncePrev == null) || (!_nonce.equals(noncePrev)) ) ) {
-            addFormError("Invalid nonce, are you being spoofed?");
-            _valid = false;
+                 
+            String expected = _context.getProperty("consolePassword");
+            if ( (expected != null) && (expected.trim().length() > 0) && (expected.equals(_passphrase)) ) {
+                // ok
+            } else {
+                addFormError("Invalid nonce, are you being spoofed?");
+                _valid = false;
+            }
         }
     }
     

@@ -146,7 +146,7 @@ public class ClientConnectionRunner {
     
     /** current client's sessionId */
     SessionId getSessionId() { return _sessionId; }
-    void setSessionId(SessionId id) { _sessionId = id; }
+    void setSessionId(SessionId id) { if (id != null) _sessionId = id; }
     /** data for the current leaseRequest, or null if there is no active leaseSet request */
     LeaseRequestState getLeaseRequest() { return _leaseRequest; }
     void setLeaseRequest(LeaseRequestState req) { _leaseRequest = req; }

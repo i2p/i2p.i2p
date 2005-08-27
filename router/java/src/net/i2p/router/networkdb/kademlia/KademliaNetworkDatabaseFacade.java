@@ -807,7 +807,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
     }
 
     /** smallest allowed period */
-    private static final int MIN_PER_PEER_TIMEOUT = 1*1000;
+    private static final int MIN_PER_PEER_TIMEOUT = 2*1000;
     private static final int MAX_PER_PEER_TIMEOUT = 5*1000;
     
     public int getPeerTimeout(Hash peer) {

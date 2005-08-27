@@ -71,9 +71,6 @@ public class GarlicMessageReceiver {
                 handleClove(clove);
             }
         } else {
-            if (_log.shouldLog(Log.ERROR))
-                _log.error("CloveMessageParser failed to decrypt the message [" + message.getUniqueId() 
-                           + "]");
             if (_log.shouldLog(Log.WARN))
                 _log.warn("CloveMessageParser failed to decrypt the message [" + message.getUniqueId() 
                            + "]", new Exception("Decrypt garlic failed"));

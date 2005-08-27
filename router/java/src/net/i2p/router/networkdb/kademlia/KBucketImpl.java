@@ -12,6 +12,8 @@ import java.math.BigInteger;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 import net.i2p.I2PAppContext;
 import net.i2p.data.DataHelper;
@@ -22,7 +24,7 @@ import net.i2p.util.RandomSource;
 class KBucketImpl implements KBucket {
     private Log _log;
     /** set of Hash objects for the peers in the kbucket */
-    private Set _entries;
+    private List _entries;
     /** we center the kbucket set on the given hash, and derive distances from this */
     private Hash _local;
     /** include if any bits equal or higher to this bit (in big endian order) */
@@ -34,7 +36,7 @@ class KBucketImpl implements KBucket {
     public KBucketImpl(I2PAppContext context, Hash local) {
         _context = context;
         _log = context.logManager().getLog(KBucketImpl.class);
-        _entries = new HashSet();
+        _entries = new ArrayList(64); //new HashSet();
         setLocal(local);
     }
     
@@ -193,14 +195,16 @@ class KBucketImpl implements KBucket {
     public Set getEntries() {
         Set entries = new HashSet(64);
         synchronized (_entries) {
-            entries.addAll(_entries);
+            for (int i = 0; i < _entries.size(); i++) 
+                entries.add((Hash)_entries.get(i));
         }
         return entries;
     }
     public Set getEntries(Set toIgnoreHashes) {
         Set entries = new HashSet(64);
         synchronized (_entries) {
-            entries.addAll(_entries);
+            for (int i = 0; i < _entries.size(); i++) 
+                entries.add((Hash)_entries.get(i));
             entries.removeAll(toIgnoreHashes);
         }
         return entries;
@@ -208,22 +212,26 @@ class KBucketImpl implements KBucket {
     
     public void getEntries(SelectionCollector collector) {
         synchronized (_entries) {
-            for (Iterator iter = _entries.iterator(); iter.hasNext(); ) {
-                collector.add((Hash)iter.next());
-            }
+            for (int i = 0; i < _entries.size(); i++) 
+                collector.add((Hash)_entries.get(i));
         }
     }
     
     public void setEntries(Set entries) {
         synchronized (_entries) {
             _entries.clear();
-            _entries.addAll(entries);
+            for (Iterator iter = entries.iterator(); iter.hasNext(); ) {
+                Hash entry = (Hash)iter.next();
+                if (!_entries.contains(entry))
+                    _entries.add(entry);
+            }
         }
     }
     
     public int add(Hash peer) {
         synchronized (_entries) {
-            _entries.add(peer);
+            if (!_entries.contains(peer))
+                _entries.add(peer);
             return _entries.size();
         }
     }

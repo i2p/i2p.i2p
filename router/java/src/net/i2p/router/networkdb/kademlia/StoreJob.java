@@ -39,8 +39,8 @@ class StoreJob extends JobImpl {
     private long _expiration;
     private PeerSelector _peerSelector;
 
-    private final static int PARALLELIZATION = 3; // how many sent at a time
-    private final static int REDUNDANCY = 6; // we want the data sent to 6 peers
+    private final static int PARALLELIZATION = 4; // how many sent at a time
+    private final static int REDUNDANCY = 4; // we want the data sent to 6 peers
     /**
      * additionally send to 1 outlier(s), in case all of the routers chosen in our
      * REDUNDANCY set are attacking us by accepting DbStore messages but dropping
@@ -75,6 +75,7 @@ class StoreJob extends JobImpl {
         getContext().statManager().createRateStat("netDb.storePeers", "How many peers each netDb must be sent to before success?", "NetworkDatabase", new long[] { 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
         getContext().statManager().createRateStat("netDb.storeFailedPeers", "How many peers each netDb must be sent to before failing completely?", "NetworkDatabase", new long[] { 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
         getContext().statManager().createRateStat("netDb.ackTime", "How long does it take for a peer to ack a netDb store?", "NetworkDatabase", new long[] { 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
+        getContext().statManager().createRateStat("netDb.replyTimeout", "How long after a netDb send does the timeout expire (when the peer doesn't reply in time)?", "NetworkDatabase", new long[] { 60*1000, 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
         _facade = facade;
         _state = new StoreState(getContext(), key, data, toSkip);
         _onSuccess = onSuccess;
@@ -154,8 +155,15 @@ class StoreJob extends JobImpl {
                     _state.addSkipped(peer);
                 } else {
                     int peerTimeout = _facade.getPeerTimeout(peer);
-                    //RateStat failing = prof.getDBHistory().getFailedLookupRate();
-                    //Rate failed = failing.getRate(60*60*1000);
+                    PeerProfile prof = getContext().profileOrganizer().getProfile(peer);
+                    RateStat failing = prof.getDBHistory().getFailedLookupRate();
+                    Rate failed = failing.getRate(60*60*1000);
+                    long failedCount = failed.getCurrentEventCount()+failed.getLastEventCount();
+                    if (failedCount > 10) {
+                        _state.addSkipped(peer);
+                        continue;
+                    }
+                    //
                     //if (failed.getCurrentEventCount() + failed.getLastEventCount() > avg) {
                     //    _state.addSkipped(peer);
                     //}
@@ -250,7 +258,7 @@ class StoreJob extends JobImpl {
         _state.addPending(peer.getIdentity().getHash());
         
         SendSuccessJob onReply = new SendSuccessJob(getContext(), peer);
-        FailedJob onFail = new FailedJob(getContext(), peer);
+        FailedJob onFail = new FailedJob(getContext(), peer, getContext().clock().now());
         StoreMessageSelector selector = new StoreMessageSelector(getContext(), getJobId(), peer, token, expiration);
         
         TunnelInfo outTunnel = selectOutboundTunnel();
@@ -321,10 +329,12 @@ class StoreJob extends JobImpl {
      */
     private class FailedJob extends JobImpl {
         private RouterInfo _peer;
+        private long _sendOn;
 
-        public FailedJob(RouterContext enclosingContext, RouterInfo peer) {
+        public FailedJob(RouterContext enclosingContext, RouterInfo peer, long sendOn) {
             super(enclosingContext);
             _peer = peer;
+            _sendOn = sendOn;
         }
         public void runJob() {
             if (_log.shouldLog(Log.WARN))
@@ -332,6 +342,7 @@ class StoreJob extends JobImpl {
                           + " timed out sending " + _state.getTarget());
             _state.replyTimeout(_peer.getIdentity().getHash());
             getContext().profileManager().dbStoreFailed(_peer.getIdentity().getHash());
+            getContext().statManager().addRateData("netDb.replyTimeout", getContext().clock().now() - _sendOn, 0);
             
             sendNext();
         }

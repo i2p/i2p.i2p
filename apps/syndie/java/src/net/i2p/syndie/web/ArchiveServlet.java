@@ -24,6 +24,8 @@ public class ArchiveServlet extends HttpServlet {
             return;
         } else if (path.endsWith(Archive.INDEX_FILE)) {
             renderSummary(resp);
+        } else if (path.endsWith("export.zip")) {
+            ExportServlet.export(req, resp);
         } else {
             String blog = getBlog(path);
             if (path.endsWith(Archive.METADATA_FILE)) {

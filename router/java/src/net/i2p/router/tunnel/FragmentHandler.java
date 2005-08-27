@@ -148,8 +148,8 @@ public class FragmentHandler {
         //Hash v = _context.sha().calculateHash(preV, 0, validLength);
         boolean eq = DataHelper.eq(v.getData(), 0, preprocessed, offset + HopProcessor.IV_LENGTH, 4);
         if (!eq) {
-            if (_log.shouldLog(Log.ERROR))
-                _log.error("Corrupt tunnel message - verification fails: \n" + Base64.encode(preprocessed, offset+HopProcessor.IV_LENGTH, 4)
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Corrupt tunnel message - verification fails: \n" + Base64.encode(preprocessed, offset+HopProcessor.IV_LENGTH, 4)
                            + "\n" + Base64.encode(v.getData(), 0, 4));
             if (_log.shouldLog(Log.WARN))
                 _log.warn("nomatching endpoint: # pad bytes: " + (paddingEnd-(HopProcessor.IV_LENGTH+4)-1) + "\n" 

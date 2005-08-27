@@ -261,6 +261,14 @@ public class HTMLRenderer extends EventReceiverImpl {
      *
      */
     public void receiveBlog(String name, String hash, String tag, long entryId, List locations, String description) {
+        if (!continueBody()) { return; }
+        if (hash == null) return;
+        
+        System.out.println("Receiving the blog: " + name + "/" + hash + "/" + tag + "/" + entryId +"/" + locations + ": "+ description);
+        byte blogData[] = Base64.decode(hash);
+        if ( (blogData == null) || (blogData.length != Hash.HASH_LENGTH) )
+            return;
+    
         Blog b = new Blog();
         b.name = name;
         b.hash = hash;
@@ -270,13 +278,6 @@ public class HTMLRenderer extends EventReceiverImpl {
         if (!_blogs.contains(b))
             _blogs.add(b);
     
-        if (!continueBody()) { return; }
-        if (hash == null) return;
-        
-        System.out.println("Receiving the blog: " + name + "/" + hash + "/" + tag + "/" + entryId +"/" + locations + ": "+ description);
-        byte blogData[] = Base64.decode(hash);
-        if ( (blogData == null) || (blogData.length != Hash.HASH_LENGTH) )
-            return;
         Hash blog = new Hash(blogData);
         if (entryId > 0) {
             String pageURL = getPageURL(blog, tag, entryId, -1, -1, true, (_user != null ? _user.getShowImages() : false));
@@ -306,13 +307,14 @@ public class HTMLRenderer extends EventReceiverImpl {
             _bodyBuffer.append("\">Tag: ").append(sanitizeString(tag)).append("</a>");
         }
         if ( (locations != null) && (locations.size() > 0) ) {
-            _bodyBuffer.append(" <select name=\"archiveLocation\">");
+            _bodyBuffer.append(" Archives: ");
             for (int i = 0; i < locations.size(); i++) {
                 SafeURL surl = (SafeURL)locations.get(i);
-                _bodyBuffer.append("<option value=\"").append(Base64.encode(surl.toString())).append("\">");
-                _bodyBuffer.append(sanitizeString(surl.toString())).append("</option>\n");
+                if (_user.getAuthenticated() && _user.getAllowAccessRemote())
+                    _bodyBuffer.append("<a href=\"").append(getArchiveURL(blog, surl)).append("\">").append(sanitizeString(surl.toString())).append("</a> ");
+                else
+                    _bodyBuffer.append(sanitizeString(surl.toString())).append(' ');
             }
-            _bodyBuffer.append("</select>");
         }
         _bodyBuffer.append("] ");
     }
@@ -656,8 +658,8 @@ public class HTMLRenderer extends EventReceiverImpl {
         }
         if (!unsafe) return str;
         
-        str = str.replace('<', '_');
-        str = str.replace('>', '-');
+        str = str.replace('<', '_'); // this should be &lt;
+        str = str.replace('>', '-'); // this should be &gt;
         if (!allowNL) {
             str = str.replace('\n', ' ');
             str = str.replace('\r', ' ');
@@ -668,6 +670,7 @@ public class HTMLRenderer extends EventReceiverImpl {
 
     public static final String sanitizeURL(String str) { return Base64.encode(str); }
     public static final String sanitizeTagParam(String str) {
+        str = str.replace('&', '_'); // this should be &amp;
         if (str.indexOf('\"') < 0)
             return sanitizeString(str);
         str = str.replace('\"', '\'');
@@ -752,5 +755,11 @@ public class HTMLRenderer extends EventReceiverImpl {
         buf.append(ArchiveViewerBean.PARAM_EXPAND_ENTRIES).append('=').append(expandEntries).append('&');
         buf.append(ArchiveViewerBean.PARAM_SHOW_IMAGES).append('=').append(showImages).append('&');
         return buf.toString();
+    }
+    public static String getArchiveURL(Hash blog, SafeURL archiveLocation) {
+        return "remote.jsp?" 
+               //+ "action=Continue..." // should this be the case?
+               + "&schema=" + sanitizeTagParam(archiveLocation.getSchema()) 
+               + "&location=" + sanitizeTagParam(archiveLocation.getLocation());
     }
 }

@@ -19,13 +19,14 @@ if (!user.getAuthenticated() || !user.getAllowAccessRemote()) {
 %>Sorry, you are not allowed to access remote archives from here.  Perhaps you should install Syndie yourself?<%
 } else { %>Import from: 
 <select name="schema">
- <option value="web">I2P/TOR/Freenet</option>
- <option value="mnet">MNet</option>
- <option value="feedspace">Feedspace</option>
- <option value="usenet">Usenet</option>
+ <option value="web" <%=("web".equals(request.getParameter("schema")) ? "selected=\"true\"" : "")%>>I2P/TOR/Freenet</option>
+ <option value="mnet" <%=("mnet".equals(request.getParameter("schema")) ? "selected=\"true\"" : "")%>>MNet</option>
+ <option value="feedspace" <%=("feedspace".equals(request.getParameter("schema")) ? "selected=\"true\"" : "")%>>Feedspace</option>
+ <option value="usenet" <%=("usenet".equals(request.getParameter("schema")) ? "selected=\"true\"" : "")%>>Usenet</option>
 </select> 
 Proxy <input type="text" size="10" name="proxyhost" value="localhost" />:<input type="text" size="4" name="proxyport" value="4444" />
-<input name="location" size="40" /> <input type="submit" name="action" value="Continue..." /><br />
+<input name="location" size="40" value="<%=(request.getParameter("location") != null ? request.getParameter("location") : "")%>" /> 
+<input type="submit" name="action" value="Continue..." /><br />
 <%
   String action = request.getParameter("action");
   if ("Continue...".equals(action)) {
@@ -33,9 +34,11 @@ Proxy <input type="text" size="10" name="proxyhost" value="localhost" />:<input 
   } else if ("Fetch metadata".equals(action)) {
     remote.fetchMetadata(user, request.getParameterMap());
   } else if ("Fetch selected entries".equals(action)) {
-    remote.fetchSelectedEntries(user, request.getParameterMap());
+    //remote.fetchSelectedEntries(user, request.getParameterMap());
+    remote.fetchSelectedBulk(user, request.getParameterMap());
   } else if ("Fetch all new entries".equals(action)) {
-    remote.fetchAllEntries(user, request.getParameterMap());
+    //remote.fetchAllEntries(user, request.getParameterMap());
+    remote.fetchSelectedBulk(user, request.getParameterMap());
   } else if ("Post selected entries".equals(action)) {
     remote.postSelectedEntries(user, request.getParameterMap());
   }
