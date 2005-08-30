@@ -386,7 +386,9 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     public PeerState getPeerState(char capacity) {
         long now = _context.clock().now();
         int index = _context.random().nextInt(1024);
-        List peers = _peersByCapacity[capacity-'A'];
+        int cap = capacity - 'A';
+        if ( (cap < 0) || (cap >= _peersByCapacity.length) ) return null;
+        List peers = _peersByCapacity[cap];
         int size = 0;
         int off = 0;
         PeerState rv = null;
@@ -447,7 +449,10 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                                 PeerState peer = getPeerState(from);
                                 for (int i = 0; i < capacities.length(); i++) {
                                     char capacity = capacities.charAt(i);
-                                    List peers = _peersByCapacity[capacity-'A'];
+                                    int cap = capacity - 'A';
+                                    if ( (cap < 0) || (cap >= _peersByCapacity.length) ) 
+                                        continue;
+                                    List peers = _peersByCapacity[cap];
                                     synchronized (peers) {
                                         if ( (peers.size() < MAX_PEERS_PER_CAPACITY) && (!peers.contains(peer)) )
                                             peers.add(peer);
@@ -605,7 +610,10 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             if (capacities != null) {
                 for (int i = 0; i < capacities.length(); i++) {
                     char capacity = capacities.charAt(i);
-                    List peers = _peersByCapacity[capacity-'A'];
+                    int cap = capacity - 'A';
+                    if ( (cap < 0) || (cap >= _peersByCapacity.length) ) 
+                        continue;
+                    List peers = _peersByCapacity[cap];
                     synchronized (peers) {
                         peers.remove(peer);
                     }
