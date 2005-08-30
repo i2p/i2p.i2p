@@ -25,6 +25,7 @@ import net.i2p.data.SigningPublicKey;
 import net.i2p.router.JobImpl;
 import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
+import net.i2p.router.networkdb.kademlia.FloodfillNetworkDatabaseFacade;
 import net.i2p.util.Log;
 
 /**
@@ -126,6 +127,8 @@ public class RebuildRouterInfoJob extends JobImpl {
                 Properties stats = getContext().statPublisher().publishStatistics();
                 stats.setProperty(RouterInfo.PROP_NETWORK_ID, ""+Router.NETWORK_ID);
                 info.setOptions(stats);
+                if (FloodfillNetworkDatabaseFacade.floodfillEnabled(getContext()))
+                    info.addCapability(FloodfillNetworkDatabaseFacade.CAPACITY_FLOODFILL);
                 // info.setPeers(new HashSet()); // this would have the trusted peers
                 info.setPublished(CreateRouterInfoJob.getCurrentPublishDate(getContext()));
                 

@@ -46,7 +46,7 @@ import net.i2p.util.Log;
  *
  */
 public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
-    private Log _log;
+    protected Log _log;
     private KBucketSet _kb; // peer hashes sorted into kbuckets, but within kbuckets, unsorted
     private DataStore _ds; // hash to DataStructure mapping, persisted when necessary
     /** where the data store is pushing the data */
@@ -62,8 +62,8 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
     private HarvesterJob _harvestJob;
     /** when was the last time an exploration found something new? */
     private long _lastExploreNew;
-    private PeerSelector _peerSelector;
-    private RouterContext _context;
+    protected PeerSelector _peerSelector;
+    protected RouterContext _context;
     /** 
      * Map of Hash to RepublishLeaseSetJob for leases we'realready managing.
      * This is added to when we create a new RepublishLeaseSetJob, and the values are 
@@ -93,8 +93,6 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         }
     }
     
-
-    
     /**
      * for the 10 minutes after startup, don't fail db entries so that if we were
      * offline for a while, we'll have a chance of finding some live peers with the
@@ -123,14 +121,17 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
     
     public KademliaNetworkDatabaseFacade(RouterContext context) {
         _context = context;
-        _log = _context.logManager().getLog(KademliaNetworkDatabaseFacade.class);
+        _log = _context.logManager().getLog(getClass());
         _initialized = false;
-        _peerSelector = new PeerSelector(_context);
+        _peerSelector = createPeerSelector();
         _publishingLeaseSets = new HashMap(8);
         _lastExploreNew = 0;
         _activeRequests = new HashMap(8);
         _enforceNetId = DEFAULT_ENFORCE_NETID;
     }
+    
+    protected PeerSelector createPeerSelector() { return new PeerSelector(_context); }
+    public PeerSelector getPeerSelector() { return _peerSelector; }
     
     KBucketSet getKBuckets() { return _kb; }
     DataStore getDataStore() { return _ds; }
@@ -266,8 +267,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         _lastSent = new HashMap(1024);
         _dbDir = dbDir;
         
-        _context.inNetMessagePool().registerHandlerJobBuilder(DatabaseLookupMessage.MESSAGE_TYPE, new DatabaseLookupMessageHandler(_context));
-        _context.inNetMessagePool().registerHandlerJobBuilder(DatabaseStoreMessage.MESSAGE_TYPE, new DatabaseStoreMessageHandler(_context));
+        createHandlers();
         
         _initialized = true;
         _started = System.currentTimeMillis();
@@ -305,6 +305,11 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
             _log.log(Log.CRIT, "Our local router info is b0rked, clearing from scratch", iae);
             _context.router().rebuildNewIdentity();
         }
+    }
+    
+    protected void createHandlers() {
+        _context.inNetMessagePool().registerHandlerJobBuilder(DatabaseLookupMessage.MESSAGE_TYPE, new DatabaseLookupMessageHandler(_context));
+        _context.inNetMessagePool().registerHandlerJobBuilder(DatabaseStoreMessage.MESSAGE_TYPE, new DatabaseStoreMessageHandler(_context));
     }
     
     /**
@@ -359,6 +364,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
     }
     
     public int getKnownRouters() { 
+        if (_kb == null) return 0;
         CountRouters count = new CountRouters();
         _kb.getAll(count);
         return count.size();
@@ -368,8 +374,27 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         private int _count;
         public int size() { return _count; }
         public void add(Hash entry) {
+            if (_ds == null) return;
             Object o = _ds.get(entry);
             if (o instanceof RouterInfo)
+                _count++;
+        }
+    }
+    
+    public int getKnownLeaseSets() {  
+        if (_kb == null) return 0;
+        CountLeaseSets count = new CountLeaseSets();
+        _kb.getAll(count);
+        return count.size();
+    }
+    
+    private class CountLeaseSets implements SelectionCollector {
+        private int _count;
+        public int size() { return _count; }
+        public void add(Hash entry) {
+            if (_ds == null) return;
+            Object o = _ds.get(entry);
+            if (o instanceof LeaseSet)
                 _count++;
         }
     }
@@ -818,6 +843,10 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         else if (responseTime > MAX_PER_PEER_TIMEOUT)
             responseTime = MAX_PER_PEER_TIMEOUT;
         return 4 * (int)responseTime;  // give it up to 4x the average response time
+    }
+
+    public void sendStore(Hash key, DataStructure ds, Job onSuccess, Job onFailure, long sendTimeout, Set toIgnore) {
+        _context.jobQueue().addJob(new StoreJob(_context, this, key, ds, onSuccess, onFailure, sendTimeout, toIgnore));
     }
     
     public void renderStatusHTML(Writer out) throws IOException {

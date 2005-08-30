@@ -19,6 +19,7 @@ import net.i2p.data.DataHelper;
 import net.i2p.stat.Rate;
 import net.i2p.stat.RateStat;
 import net.i2p.util.Log;
+import net.i2p.router.networkdb.kademlia.FloodfillNetworkDatabaseFacade;
 
 /**
  * Maintain the statistics about the router
@@ -147,6 +148,12 @@ public class StatisticsManager implements Service {
             //includeRate("stream.con.receiveDuplicateSize", stats, new long[] { 60*60*1000 });
             stats.setProperty("stat_uptime", DataHelper.formatDuration(_context.router().getUptime()));
             stats.setProperty("stat__rateKey", "avg;maxAvg;pctLifetime;[sat;satLim;maxSat;maxSatLim;][num;lifetimeFreq;maxFreq]");
+            
+            if (FloodfillNetworkDatabaseFacade.isFloodfill(_context.router().getRouterInfo())) {
+                stats.setProperty("netdb.knownRouters", ""+_context.netDb().getKnownRouters());
+                stats.setProperty("netdb.knownLeaseSets", ""+_context.netDb().getKnownLeaseSets());
+            }
+            
             _log.debug("Publishing peer rankings");
         } else {
             _log.debug("Not publishing peer rankings");

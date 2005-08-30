@@ -9,6 +9,7 @@ import net.i2p.data.Hash;
 import net.i2p.router.admin.AdminManager;
 import net.i2p.router.client.ClientManagerFacadeImpl;
 import net.i2p.router.networkdb.kademlia.KademliaNetworkDatabaseFacade;
+import net.i2p.router.networkdb.kademlia.FloodfillNetworkDatabaseFacade;
 import net.i2p.router.peermanager.Calculator;
 import net.i2p.router.peermanager.CapacityCalculator;
 import net.i2p.router.peermanager.IntegrationCalculator;
@@ -97,7 +98,7 @@ public class RouterContext extends I2PAppContext {
         _messageHistory = new MessageHistory(this);
         _messageRegistry = new OutboundMessageRegistry(this);
         _messageStateMonitor = new MessageStateMonitor(this);
-        _netDb = new KademliaNetworkDatabaseFacade(this);
+        _netDb = new FloodfillNetworkDatabaseFacade(this); // new KademliaNetworkDatabaseFacade(this);
         _keyManager = new KeyManager(this);
         if ("false".equals(getProperty("i2p.vmCommSystem", "false")))
             _commSystem = new CommSystemFacadeImpl(this);

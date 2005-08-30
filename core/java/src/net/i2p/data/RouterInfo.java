@@ -315,6 +315,17 @@ public class RouterInfo extends DataStructureImpl {
         else
             return "";
     }
+    
+    public void addCapability(char cap) {
+        if (_options == null) _options = new OrderedProperties();
+        synchronized (_options) {
+            String caps = _options.getProperty(PROP_CAPABILITIES);
+            if (caps == null)
+                _options.setProperty(PROP_CAPABILITIES, ""+cap);
+            else if (caps.indexOf(cap) == -1)
+                _options.setProperty(PROP_CAPABILITIES, caps + cap);
+        }
+    }
         
     /**
      * Get the routing key for the structure using the current modifier in the RoutingKeyGenerator.

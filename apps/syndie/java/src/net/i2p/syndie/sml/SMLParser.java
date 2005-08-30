@@ -196,6 +196,7 @@ public class SMLParser {
     private static final String T_HR = "hr";
     private static final String T_PRE = "pre";
     private static final String T_ATTACHMENT = "attachment";
+    private static final String T_ARCHIVE = "archive";
     
     private static final String P_ATTACHMENT = "attachment";
     private static final String P_WHO_QUOTED = "author";
@@ -211,6 +212,11 @@ public class SMLParser {
     private static final String P_ADDRESS_LOCATION = "location";
     private static final String P_ADDRESS_SCHEMA = "schema";
     private static final String P_ATTACHMENT_ID = "id";
+    private static final String P_ARCHIVE_NAME = "name";
+    private static final String P_ARCHIVE_DESCRIPTION = "description";
+    private static final String P_ARCHIVE_LOCATION_SCHEMA = "schema";
+    private static final String P_ARCHIVE_LOCATION = "location";
+    private static final String P_ARCHIVE_POSTING_KEY = "postingkey";
     
     private void parseTag(String tagName, Map attr, String body, EventReceiver receiver) {
         tagName = tagName.toLowerCase();
@@ -241,6 +247,10 @@ public class SMLParser {
             }
             receiver.receiveBlog(getString(P_BLOG_NAME, attr), getString(P_BLOG_HASH, attr), getString(P_BLOG_TAG, attr), 
                                  getLong(P_BLOG_ENTRY, attr), locations, body);
+        } else if (T_ARCHIVE.equals(tagName)) {
+            receiver.receiveArchive(getString(P_ARCHIVE_NAME, attr), getString(P_ARCHIVE_DESCRIPTION, attr), 
+                                    getString(P_ARCHIVE_LOCATION_SCHEMA, attr), getString(P_ARCHIVE_LOCATION, attr), 
+                                    getString(P_ARCHIVE_POSTING_KEY, attr), body);
         } else if (T_LINK.equals(tagName)) {
             receiver.receiveLink(getString(P_LINK_SCHEMA, attr), getString(P_LINK_LOCATION, attr), body);
         } else if (T_ADDRESS.equals(tagName)) {

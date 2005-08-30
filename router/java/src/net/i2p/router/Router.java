@@ -35,6 +35,7 @@ import net.i2p.data.i2np.GarlicMessage;
 //import net.i2p.data.i2np.TunnelMessage;
 import net.i2p.router.message.GarlicMessageHandler;
 //import net.i2p.router.message.TunnelMessageHandler;
+import net.i2p.router.networkdb.kademlia.FloodfillNetworkDatabaseFacade;
 import net.i2p.router.startup.StartupJob;
 import net.i2p.stat.Rate;
 import net.i2p.stat.RateStat;
@@ -291,6 +292,8 @@ public class Router {
             stats.setProperty(RouterInfo.PROP_NETWORK_ID, NETWORK_ID+"");
             ri.setOptions(stats);
             ri.setAddresses(_context.commSystem().createAddresses());
+            if (FloodfillNetworkDatabaseFacade.floodfillEnabled(_context))
+                ri.addCapability(FloodfillNetworkDatabaseFacade.CAPACITY_FLOODFILL);
             SigningPrivateKey key = _context.keyManager().getSigningPrivateKey();
             if (key == null) {
                 _log.log(Log.CRIT, "Internal error - signing private key not known?  wtf");

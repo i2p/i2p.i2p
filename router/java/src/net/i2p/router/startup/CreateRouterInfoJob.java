@@ -25,6 +25,7 @@ import net.i2p.router.Job;
 import net.i2p.router.JobImpl;
 import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
+import net.i2p.router.networkdb.kademlia.FloodfillNetworkDatabaseFacade;
 import net.i2p.util.Log;
 
 public class CreateRouterInfoJob extends JobImpl {
@@ -53,6 +54,8 @@ public class CreateRouterInfoJob extends JobImpl {
             info.setAddresses(getContext().commSystem().createAddresses());
             Properties stats = getContext().statPublisher().publishStatistics();
             stats.setProperty(RouterInfo.PROP_NETWORK_ID, Router.NETWORK_ID+"");
+            if (FloodfillNetworkDatabaseFacade.floodfillEnabled(getContext()))
+                info.addCapability(FloodfillNetworkDatabaseFacade.CAPACITY_FLOODFILL);
             info.setOptions(stats);
             info.setPeers(new HashSet());
             info.setPublished(getCurrentPublishDate(getContext()));

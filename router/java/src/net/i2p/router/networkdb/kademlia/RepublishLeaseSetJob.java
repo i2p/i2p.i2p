@@ -22,7 +22,7 @@ import net.i2p.util.Log;
  */
 public class RepublishLeaseSetJob extends JobImpl {
     private Log _log;
-    private final static long REPUBLISH_LEASESET_DELAY = 3*60*1000; // 3 mins
+    private final static long REPUBLISH_LEASESET_DELAY = 5*60*1000;
     private final static long REPUBLISH_LEASESET_TIMEOUT = 60*1000;
     private Hash _dest;
     private KademliaNetworkDatabaseFacade _facade;
@@ -48,14 +48,17 @@ public class RepublishLeaseSetJob extends JobImpl {
                             _log.warn("Not publishing a LOCAL lease that isn't current - " + _dest, new Exception("Publish expired LOCAL lease?"));
                     } else {
                         getContext().statManager().addRateData("netDb.republishLeaseSetCount", 1, 0);
-                        getContext().jobQueue().addJob(new StoreJob(getContext(), _facade, _dest, ls, new OnSuccess(getContext()), new OnFailure(getContext()), REPUBLISH_LEASESET_TIMEOUT));
+                        _facade.sendStore(_dest, ls, new OnSuccess(getContext()), new OnFailure(getContext()), REPUBLISH_LEASESET_TIMEOUT, null);
+                        //getContext().jobQueue().addJob(new StoreJob(getContext(), _facade, _dest, ls, new OnSuccess(getContext()), new OnFailure(getContext()), REPUBLISH_LEASESET_TIMEOUT));
                     }
                 } else {
                     if (_log.shouldLog(Log.WARN))
                         _log.warn("Client " + _dest + " is local, but we can't find a valid LeaseSet?  perhaps its being rebuilt?");
                 }
-                long republishDelay = getContext().random().nextLong(2*REPUBLISH_LEASESET_DELAY);
-                requeue(republishDelay);
+                if (false) { // floodfill doesnt require republishing
+                    long republishDelay = getContext().random().nextLong(2*REPUBLISH_LEASESET_DELAY);
+                    requeue(republishDelay);
+                }
                 return;
             } else {
                 if (_log.shouldLog(Log.INFO))

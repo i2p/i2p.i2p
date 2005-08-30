@@ -17,6 +17,7 @@ import net.i2p.data.SigningPrivateKey;
 import net.i2p.router.JobImpl;
 import net.i2p.router.RouterContext;
 import net.i2p.router.Router;
+import net.i2p.router.networkdb.kademlia.FloodfillNetworkDatabaseFacade;
 import net.i2p.util.Log;
 
 /**
@@ -44,6 +45,8 @@ public class PublishLocalRouterInfoJob extends JobImpl {
             ri.setPublished(getContext().clock().now());
             ri.setOptions(stats);
             ri.setAddresses(getContext().commSystem().createAddresses());
+            if (FloodfillNetworkDatabaseFacade.floodfillEnabled(getContext()))
+                ri.addCapability(FloodfillNetworkDatabaseFacade.CAPACITY_FLOODFILL);
             SigningPrivateKey key = getContext().keyManager().getSigningPrivateKey();
             if (key == null) {
                 _log.log(Log.CRIT, "Internal error - signing private key not known?  rescheduling publish for 30s");

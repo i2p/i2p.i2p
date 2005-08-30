@@ -26,6 +26,7 @@ public class HTMLRenderer extends EventReceiverImpl {
     protected List _addresses;
     protected List _links;
     protected List _blogs;
+    protected List _archives;
     protected StringBuffer _preBodyBuffer;
     protected StringBuffer _bodyBuffer;
     protected StringBuffer _postBodyBuffer;
@@ -93,6 +94,7 @@ public class HTMLRenderer extends EventReceiverImpl {
         _addresses = new ArrayList();
         _links = new ArrayList();
         _blogs = new ArrayList();
+        _archives = new ArrayList();
         _cutBody = cutBody;
         _showImages = showImages;
         _cutReached = false;
@@ -261,9 +263,6 @@ public class HTMLRenderer extends EventReceiverImpl {
      *
      */
     public void receiveBlog(String name, String hash, String tag, long entryId, List locations, String description) {
-        if (!continueBody()) { return; }
-        if (hash == null) return;
-        
         System.out.println("Receiving the blog: " + name + "/" + hash + "/" + tag + "/" + entryId +"/" + locations + ": "+ description);
         byte blogData[] = Base64.decode(hash);
         if ( (blogData == null) || (blogData.length != Hash.HASH_LENGTH) )
@@ -278,6 +277,9 @@ public class HTMLRenderer extends EventReceiverImpl {
         if (!_blogs.contains(b))
             _blogs.add(b);
     
+        if (!continueBody()) { return; }
+        if (hash == null) return;
+        
         Hash blog = new Hash(blogData);
         if (entryId > 0) {
             String pageURL = getPageURL(blog, tag, entryId, -1, -1, true, (_user != null ? _user.getShowImages() : false));
@@ -317,6 +319,45 @@ public class HTMLRenderer extends EventReceiverImpl {
             }
         }
         _bodyBuffer.append("] ");
+    }
+    
+    protected static class ArchiveRef {
+        public String name;
+        public String description;
+        public String locationSchema;
+        public String location;
+        public int hashCode() { return -1; }
+        public boolean equals(Object o) {
+            ArchiveRef a = (ArchiveRef)o;
+            return DataHelper.eq(name, a.name) && DataHelper.eq(description, a.description) 
+                   && DataHelper.eq(locationSchema, a.locationSchema) 
+                   && DataHelper.eq(location, a.location);
+        }
+    }
+    public void receiveArchive(String name, String description, String locationSchema, String location, 
+                               String postingKey, String anchorText) {        
+        ArchiveRef a = new ArchiveRef();
+        a.name = name;
+        a.description = description;
+        a.locationSchema = locationSchema;
+        a.location = location;
+        if (!_archives.contains(a))
+            _archives.add(a);
+    
+        if (!continueBody()) { return; }
+        
+        _bodyBuffer.append(sanitizeString(anchorText)).append(" [Archive ");
+        if (name != null)
+            _bodyBuffer.append(sanitizeString(name));
+        if (location != null) {
+            _bodyBuffer.append(" at ");
+            SafeURL surl = new SafeURL(locationSchema + "://" + location);
+            _bodyBuffer.append("<a href=\"").append(getArchiveURL(null, surl));
+            _bodyBuffer.append("\">").append(sanitizeString(surl.toString())).append("</a>");
+        }
+        if (description != null)
+            _bodyBuffer.append(": ").append(sanitizeString(description));
+        _bodyBuffer.append("]");
     }
     
     protected static class Link {
@@ -414,6 +455,12 @@ public class HTMLRenderer extends EventReceiverImpl {
             else if (addrs > 1)
                 _postBodyBuffer.append(addrs).append(" addresses ");
             
+            int archives = _archives.size();
+            if (archives == 1)
+                _postBodyBuffer.append("1 archive ");
+            else if (archives > 1)
+                _postBodyBuffer.append(archives).append(" archives ");
+            
             if (_entry != null) {
                 List replies = _archive.getIndex().getReplies(_entry.getURI());
                 if ( (replies != null) && (replies.size() > 0) ) {
@@ -490,10 +537,10 @@ public class HTMLRenderer extends EventReceiverImpl {
             }
 
             if (_addresses.size() > 0) {
-                _postBodyBuffer.append("<b>Addresses:</b> ");
+                _postBodyBuffer.append("<b>Addresses:</b>");
                 for (int i = 0; i < _addresses.size(); i++) {
                     Address a = (Address)_addresses.get(i);
-                    _postBodyBuffer.append("<a href=\"addaddress.jsp?schema=");
+                    _postBodyBuffer.append(" <a href=\"addaddress.jsp?schema=");
                     _postBodyBuffer.append(sanitizeURL(a.schema)).append("&location=");
                     _postBodyBuffer.append(sanitizeURL(a.location)).append("&name=");
                     _postBodyBuffer.append(sanitizeURL(a.name));
@@ -502,7 +549,18 @@ public class HTMLRenderer extends EventReceiverImpl {
                 _postBodyBuffer.append("<br />\n");
             }
 
-            
+            if (_archives.size() > 0) {
+                _postBodyBuffer.append("<b>Archives:</b>");
+                for (int i = 0; i < _archives.size(); i++) {
+                    ArchiveRef a = (ArchiveRef)_archives.get(i);
+                    _postBodyBuffer.append(" <a href=\"").append(getArchiveURL(null, new SafeURL(a.locationSchema + "://" + a.location)));
+                    _postBodyBuffer.append("\">").append(sanitizeString(a.name)).append("</a>");
+                    if (a.description != null)
+                        _postBodyBuffer.append(": ").append(sanitizeString(a.description));
+                }
+                _postBodyBuffer.append("<br />\n");
+            }
+
             if (_entry != null) {
                 List replies = _archive.getIndex().getReplies(_entry.getURI());
                 if ( (replies != null) && (replies.size() > 0) ) {

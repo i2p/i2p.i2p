@@ -88,9 +88,12 @@ public class TunnelCreatorConfig implements TunnelInfo {
         // H0:1235-->H1:2345-->H2:2345
         StringBuffer buf = new StringBuffer(128);
         if (_isInbound)
-            buf.append("inbound: ");
+            buf.append("inbound");
         else
-            buf.append("outbound: ");
+            buf.append("outbound");
+        if (_destination == null)
+            buf.append(" exploratory");
+        buf.append(": ");
         for (int i = 0; i < _peers.length; i++) {
             buf.append(_peers[i].toBase64().substring(0,4));
             buf.append(':');

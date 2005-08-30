@@ -103,6 +103,18 @@ public class HTMLPreviewRenderer extends HTMLRenderer {
             _postBodyBuffer.append("<br />\n");
         }
 
+        if (_archives.size() > 0) {
+            _postBodyBuffer.append("<b>Archives:</b>");
+            for (int i = 0; i < _archives.size(); i++) {
+                ArchiveRef a = (ArchiveRef)_archives.get(i);
+                _postBodyBuffer.append(" <a href=\"").append(getArchiveURL(null, new SafeURL(a.locationSchema + "://" + a.location)));
+                _postBodyBuffer.append("\">").append(sanitizeString(a.name)).append("</a>");
+                if (a.description != null)
+                    _postBodyBuffer.append(": ").append(sanitizeString(a.description));
+            }
+            _postBodyBuffer.append("<br />\n");
+        }
+
         _postBodyBuffer.append("</td>\n</form>\n</tr>\n");
         _postBodyBuffer.append("</table>\n");
     }

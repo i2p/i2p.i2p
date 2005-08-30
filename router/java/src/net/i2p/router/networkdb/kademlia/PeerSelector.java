@@ -27,12 +27,12 @@ import net.i2p.stat.RateStat;
 import net.i2p.util.Log;
 
 class PeerSelector {
-    private Log _log;
-    private RouterContext _context;
+    protected Log _log;
+    protected RouterContext _context;
     
     public PeerSelector(RouterContext ctx) {
         _context = ctx;
-        _log = _context.logManager().getLog(PeerSelector.class);
+        _log = _context.logManager().getLog(getClass());
     }
     
     /**

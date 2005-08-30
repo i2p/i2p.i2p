@@ -59,6 +59,8 @@ public class HandleDatabaseLookupMessageJob extends JobImpl {
         _fromHash = fromHash;
     }
     
+    protected boolean answerAllQueries() { return false; }
+    
     public void runJob() {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Handling database lookup message for " + _message.getSearchKey());
@@ -75,7 +77,7 @@ public class HandleDatabaseLookupMessageJob extends JobImpl {
         if (ls != null) {
             // only answer a request for a LeaseSet if it has been published
             // to us, or, if its local, if we would have published to ourselves
-            if (ls.getReceivedAsPublished()) {
+            if (answerAllQueries() || ls.getReceivedAsPublished()) {
                 getContext().statManager().addRateData("netDb.lookupsMatchedReceivedPublished", 1, 0);
                 sendData(_message.getSearchKey(), ls, fromKey, _message.getReplyTunnel());
             } else {

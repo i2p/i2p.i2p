@@ -97,6 +97,7 @@ Post content (in raw SML, no headers):<br />
 * [blog name="name" bloghash="base64hash" blogtag="tag"]description[/blog] = link to all posts in the blog with the specified tag
 * [blog name="name" blogtag="tag"]description[/blog] = link to all posts in all blogs with the specified tag
 * [link schema="eep" location="http://forum.i2p"]text[/link] = offer a link to an external resource (accessible with the given schema)
+* [archive name="name" description="they have good stuff" schema="eep" location="http://syndiemedia.i2p/archive/archive.txt"]foo![/archive] = offer an easy way to sync up with a new Syndie archive
 
 SML headers are newline delimited key=value pairs.  Example keys are:
 * bgcolor = background color of the post (e.g. bgcolor=#ffccaa or bgcolor=red)

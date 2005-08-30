@@ -4,6 +4,7 @@ import net.i2p.data.Hash;
 import net.i2p.data.TunnelId;
 import net.i2p.data.Payload;
 import net.i2p.data.i2np.DataMessage;
+import net.i2p.data.i2np.DatabaseStoreMessage;
 import net.i2p.data.i2np.DeliveryInstructions;
 import net.i2p.data.i2np.I2NPMessage;
 import net.i2p.data.i2np.GarlicMessage;
@@ -109,7 +110,17 @@ public class InboundMessageDistributor implements GarlicMessageReceiver.CloveRec
                     _receiver.receive((GarlicMessage)data);
                     return;
                 } else {
-                    _context.inNetMessagePool().add(data, null, null);
+                    if (data instanceof DatabaseStoreMessage) {
+                        // treat db store explicitly, since we don't want to republish (or flood)
+                        // unnecessarily
+                        DatabaseStoreMessage dsm = (DatabaseStoreMessage)data;
+                        if (dsm.getValueType() == DatabaseStoreMessage.KEY_TYPE_LEASESET)
+                            _context.netDb().store(dsm.getKey(), dsm.getLeaseSet());
+                        else
+                            _context.netDb().store(dsm.getKey(), dsm.getRouterInfo());
+                    } else {
+                        _context.inNetMessagePool().add(data, null, null);
+                    }
                     return;
                 }
             case DeliveryInstructions.DELIVERY_MODE_DESTINATION:

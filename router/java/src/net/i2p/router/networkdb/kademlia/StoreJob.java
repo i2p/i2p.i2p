@@ -32,7 +32,7 @@ import net.i2p.util.Log;
 class StoreJob extends JobImpl {
     private Log _log;
     private KademliaNetworkDatabaseFacade _facade;
-    private StoreState _state;
+    protected StoreState _state;
     private Job _onSuccess;
     private Job _onFailure;
     private long _timeoutMs;
@@ -82,7 +82,7 @@ class StoreJob extends JobImpl {
         _onFailure = onFailure;
         _timeoutMs = timeoutMs;
         _expiration = context.clock().now() + timeoutMs;
-        _peerSelector = new PeerSelector(context);
+        _peerSelector = facade.getPeerSelector();
     }
 
     public String getName() { return "Kademlia NetDb Store";}
@@ -112,6 +112,9 @@ class StoreJob extends JobImpl {
             continueSending();
         }
     }
+    
+    protected int getParallelization() { return PARALLELIZATION; }
+    protected int getRedundancy() { return REDUNDANCY; }
 
     /**
      * Send a series of searches to the next available peers as selected by
@@ -121,15 +124,15 @@ class StoreJob extends JobImpl {
      */
     private void continueSending() { 
         if (_state.completed()) return;
-        int toCheck = PARALLELIZATION - _state.getPending().size();
+        int toCheck = getParallelization() - _state.getPending().size();
         if (toCheck <= 0) {
             // too many already pending
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug(getJobId() + ": Too many store messages pending");
             return;
         } 
-        if (toCheck > PARALLELIZATION)
-            toCheck = PARALLELIZATION;
+        if (toCheck > getParallelization())
+            toCheck = getParallelization();
 
         List closestHashes = getClosestRouters(_state.getTarget(), toCheck, _state.getAttempted());
         if ( (closestHashes == null) || (closestHashes.size() <= 0) ) {
@@ -310,7 +313,7 @@ class StoreJob extends JobImpl {
             getContext().profileManager().dbStoreSent(_peer.getIdentity().getHash(), howLong);
             getContext().statManager().addRateData("netDb.ackTime", howLong, howLong);
 
-            if (_state.getCompleteCount() >= REDUNDANCY) {
+            if (_state.getCompleteCount() >= getRedundancy()) {
                 succeed();
             } else {
                 sendNext();
@@ -352,7 +355,7 @@ class StoreJob extends JobImpl {
     /**
      * Send was totally successful
      */
-    private void succeed() {
+    protected void succeed() {
         if (_log.shouldLog(Log.INFO))
             _log.info(getJobId() + ": Succeeded sending key " + _state.getTarget());
         if (_log.shouldLog(Log.DEBUG))
@@ -367,7 +370,7 @@ class StoreJob extends JobImpl {
     /**
      * Send totally failed
      */
-    private void fail() {
+    protected void fail() {
         if (_log.shouldLog(Log.WARN))
             _log.warn(getJobId() + ": Failed sending key " + _state.getTarget());
         if (_log.shouldLog(Log.DEBUG))

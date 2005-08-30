@@ -61,7 +61,7 @@ class SearchJob extends JobImpl {
      * How long will we give each peer to reply to our search? 
      *
      */
-    private static final int PER_PEER_TIMEOUT = 2*1000;
+    private static final int PER_PEER_TIMEOUT = 5*1000;
     
     /** 
      * give ourselves 30 seconds to send out the value found to the closest 
@@ -96,7 +96,7 @@ class SearchJob extends JobImpl {
         _isLease = isLease;
         _deferredSearches = new ArrayList(0);
         _deferredCleared = false;
-        _peerSelector = new PeerSelector(getContext());
+        _peerSelector = facade.getPeerSelector();
         _startedOn = -1;
         _expiration = getContext().clock().now() + timeoutMs;
         getContext().statManager().createRateStat("netDb.successTime", "How long a successful search takes", "NetworkDatabase", new long[] { 60*60*1000l, 24*60*60*1000l });
@@ -133,6 +133,8 @@ class SearchJob extends JobImpl {
      *
      */
     protected int getPerPeerTimeoutMs() {
+        if (true)
+            return PER_PEER_TIMEOUT;
         int rv = -1;
         RateStat rs = getContext().statManager().getRate("netDb.successTime");
         if (rs != null)
@@ -576,6 +578,7 @@ class SearchJob extends JobImpl {
     protected class FailedJob extends JobImpl {
         private Hash _peer;
         private boolean _penalizePeer;
+        private long _sentOn;
         public FailedJob(RouterContext enclosingContext, RouterInfo peer) {
             this(enclosingContext, peer, true);
         }
@@ -588,12 +591,14 @@ class SearchJob extends JobImpl {
             super(enclosingContext);
             _penalizePeer = penalizePeer;
             _peer = peer.getIdentity().getHash();
+            _sentOn = enclosingContext.clock().now();
         }
         public void runJob() {
+            if (_state.completed()) return;
             _state.replyTimeout(_peer);
             if (_penalizePeer) { 
                 if (_log.shouldLog(Log.WARN))
-                    _log.warn("Penalizing peer for timeout on search: " + _peer.toBase64());
+                    _log.warn("Penalizing peer for timeout on search: " + _peer.toBase64() + " after " + (getContext().clock().now() - _sentOn));
                 getContext().profileManager().dbLookupFailed(_peer);
             } else {
                 if (_log.shouldLog(Log.ERROR))
@@ -657,9 +662,7 @@ class SearchJob extends JobImpl {
             if (SHOULD_RESEND_ROUTERINFO) {
                 ds = _facade.lookupRouterInfoLocally(_state.getTarget());
                 if (ds != null)
-                    getContext().jobQueue().addJob(new StoreJob(getContext(), _facade, _state.getTarget(), 
-                                                                ds, null, null, RESEND_TIMEOUT,
-                                                                _state.getSuccessful()));
+                    _facade.sendStore(_state.getTarget(), ds, null, null, RESEND_TIMEOUT, _state.getSuccessful());
             }
         } else {
             Set sendTo = _state.getRepliedPeers(); // _state.getFailed();
