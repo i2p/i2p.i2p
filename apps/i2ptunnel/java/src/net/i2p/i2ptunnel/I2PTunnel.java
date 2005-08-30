@@ -109,8 +109,9 @@ public class I2PTunnel implements Logging, EventDispatcher {
         _tunnelId = ++__tunnelId;
         _log = _context.logManager().getLog(I2PTunnel.class);
         _event = new EventDispatcherImpl();
-        _clientOptions = new Properties();
-        _clientOptions.putAll(System.getProperties());
+        Properties p = new Properties();
+        p.putAll(System.getProperties());
+        _clientOptions = p;
         _sessions = new ArrayList(1);
         
         addConnectionEventListener(lsnr);
