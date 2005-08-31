@@ -21,7 +21,7 @@ class CachedEntry extends EntryContainer {
     private Entry _entry;
     private Attachment _attachments[];
     
-    public CachedEntry(File entryDir) {
+    public CachedEntry(File entryDir) throws IOException {
         _entryDir = entryDir;
         importMeta();
         _entry = new CachedEntryDetails();
@@ -107,7 +107,7 @@ class CachedEntry extends EntryContainer {
         Properties rv = new Properties();
         BufferedReader in = null;
         try {
-            in = new BufferedReader(new FileReader(propsFile));
+            in = new BufferedReader(new InputStreamReader(new FileInputStream(propsFile), "UTF-8"));
             String line = null;
             while ( (line = in.readLine()) != null) {
                 int split = line.indexOf('=');
@@ -152,7 +152,7 @@ class CachedEntry extends EntryContainer {
                     in = new FileInputStream(f);
                     int read = DataHelper.read(in, buf);
                     if (read != buf.length) throw new IOException("read: " + read + " file size: " + buf.length + " for " + f.getPath());
-                    _text = new String(buf);
+                    _text = DataHelper.getUTF8(buf);
                 } catch (IOException ioe) {
                     ioe.printStackTrace();
                 } finally {

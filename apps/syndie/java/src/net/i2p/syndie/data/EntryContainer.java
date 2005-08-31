@@ -58,7 +58,7 @@ public class EntryContainer {
     public EntryContainer(BlogURI uri, String tags[], byte smlData[]) {
         this();
         _entryURI = uri;
-        _entryData = new Entry(new String(smlData));
+        _entryData = new Entry(DataHelper.getUTF8(smlData));
         setHeader(HEADER_BLOGKEY, Base64.encode(uri.getKeyHash().getData()));
         StringBuffer buf = new StringBuffer();
         for (int i = 0; tags != null && i < tags.length; i++)
@@ -71,9 +71,34 @@ public class EntryContainer {
     
     public int getFormat() { return _format; }
     
+    private String readLine(InputStream in) throws IOException {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream(512);
+        int i = 0;
+        while (true) {
+            int c = in.read();
+            if ( (c == (int)'\n') || (c == (int)'\r') ) {
+                break;
+            } else if (c == -1) {
+                if (i == 0)
+                    return null;
+                else
+                    break;
+            } else {
+                baos.write(c);
+            }
+            i++;
+        }
+        
+        return DataHelper.getUTF8(baos.toByteArray());
+        //BufferedReader r = new BufferedReader(new InputStreamReader(in, "UTF-8"), 1);
+        //String line = r.readLine();
+        //return line;
+    }
+    
     public void load(InputStream source) throws IOException {
-        String line = DataHelper.readLine(source);
+        String line = readLine(source);
         if (line == null) throw new IOException("No format line in the entry");
+        //System.err.println("read container format line [" + line + "]");
         String fmt = line.trim();
         if (FORMAT_ZIP_UNENCRYPTED_STR.equals(fmt)) {
             _format = FORMAT_ZIP_UNENCRYPTED;
@@ -83,7 +108,8 @@ public class EntryContainer {
             throw new IOException("Unsupported entry format: " + fmt);
         }
         
-        while ( (line = DataHelper.readLine(source)) != null) {
+        while ( (line = readLine(source)) != null) {
+            //System.err.println("read container header line [" + line + "]");
             line = line.trim();
             int len = line.length();
             if (len <= 0)
@@ -99,7 +125,8 @@ public class EntryContainer {
         
         parseHeaders();
         
-        String sigStr = DataHelper.readLine(source);
+        String sigStr = readLine(source); 
+        //System.err.println("read container signature line [" + line + "]");
         if ( (sigStr == null) || (sigStr.indexOf("Signature:") == -1) )
             throw new IOException("No signature line");
         sigStr = sigStr.substring("Signature:".length()+1).trim();
@@ -107,7 +134,8 @@ public class EntryContainer {
         _signature = new Signature(Base64.decode(sigStr));
         //System.out.println("Sig: " + _signature.toBase64());
         
-        line = DataHelper.readLine(source);
+        line = readLine(source); 
+        //System.err.println("read container size line [" + line + "]");
         if (line == null)
             throw new IOException("No size line");
         line = line.trim();
@@ -165,7 +193,7 @@ public class EntryContainer {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         ZipOutputStream out = new ZipOutputStream(baos);
         ZipEntry ze = new ZipEntry(ZIP_ENTRY);
-        byte data[] = _entryData.getText().getBytes();
+        byte data[] = DataHelper.getUTF8(_entryData.getText());
         ze.setTime(0);
         out.putNextEntry(ze);
         out.write(data);
@@ -222,7 +250,7 @@ public class EntryContainer {
             
             String name = entry.getName();
             if (ZIP_ENTRY.equals(name)) {
-                _entryData = new Entry(new String(entryData));
+                _entryData = new Entry(DataHelper.getUTF8(entryData));
             } else if (name.startsWith(ZIP_ATTACHMENT_PREFIX)) {
                 attachments.put(name, (Object)entryData);
             } else if (name.startsWith(ZIP_ATTACHMENT_META_PREFIX)) {
@@ -311,14 +339,19 @@ public class EntryContainer {
         String keyHash = getHeader(HEADER_BLOGKEY);
         String idVal = getHeader(HEADER_ENTRYID);
         
-        if (keyHash == null)
+        if (keyHash == null) {
+            System.err.println("Headers: " + _rawKeys);
+            System.err.println("Values : " + _rawValues);
             throw new IOException("Missing " + HEADER_BLOGKEY + " header");
+        }
         
         long entryId = -1;
         if ( (idVal != null) && (idVal.length() > 0) ) {
             try {
                 entryId = Long.parseLong(idVal.trim());
             } catch (NumberFormatException nfe) {
+                System.err.println("Headers: " + _rawKeys);
+                System.err.println("Values : " + _rawValues);
                 throw new IOException("Invalid format of entryId (" + idVal + ")");
             }
         }
@@ -385,7 +418,7 @@ public class EntryContainer {
         String str = buf.toString();
         
         //System.out.println("Writing raw: \n[" + str + "] / " + I2PAppContext.getGlobalContext().sha().calculateHash(str.getBytes()) + ", raw data: " + I2PAppContext.getGlobalContext().sha().calculateHash(_rawData).toBase64() + "\n");
-        out.write(str.getBytes());
+        out.write(DataHelper.getUTF8(str));
         out.write(_rawData);
     }
     

@@ -75,7 +75,7 @@ public class LocalArchiveIndex extends ArchiveIndex {
             _replies.put(parent, replies);
         }
         replies.add(reply);
-        System.err.println("Adding reply to " + parent + " from child " + reply + " (# replies: " + replies.size() + ")");
+        //System.err.println("Adding reply to " + parent + " from child " + reply + " (# replies: " + replies.size() + ")");
     }
 
     private static class BlogURIComparator implements Comparator {

@@ -44,7 +44,7 @@ public class HTMLRenderer extends EventReceiverImpl {
             return;
         }
         HTMLRenderer renderer = new HTMLRenderer();
-        FileWriter out = null;
+        Writer out = null;
         try {
             ByteArrayOutputStream baos = new ByteArrayOutputStream(1024*512);
             FileInputStream in = new FileInputStream(args[0]);
@@ -52,8 +52,8 @@ public class HTMLRenderer extends EventReceiverImpl {
             int read = 0;
             while ( (read = in.read(buf)) != -1)
                 baos.write(buf, 0, read);
-            out = new FileWriter(args[1]);
-            renderer.render(new User(), BlogManager.instance().getArchive(), null, new String(baos.toByteArray()), out, false, true);   
+            out = new OutputStreamWriter(new FileOutputStream(args[1]), "UTF-8");
+            renderer.render(new User(), BlogManager.instance().getArchive(), null, DataHelper.getUTF8(baos.toByteArray()), out, false, true);   
         } catch (IOException ioe) {
             ioe.printStackTrace();
         } finally {
@@ -595,7 +595,7 @@ public class HTMLRenderer extends EventReceiverImpl {
     }
     
     public void receiveHeader(String header, String value) { 
-        System.err.println("Receive header [" + header + "] = [" + value + "]");
+        //System.err.println("Receive header [" + header + "] = [" + value + "]");
         _headers.put(header, value); 
     }
     
@@ -652,7 +652,7 @@ public class HTMLRenderer extends EventReceiverImpl {
             for (int i = 0; tags != null && i < tags.length; i++) {
                 _preBodyBuffer.append("<option value=\"blogtag://");
                 _preBodyBuffer.append(_entry.getURI().getKeyHash().toBase64());
-                _preBodyBuffer.append('/').append(Base64.encode(tags[i])).append("\">");
+                _preBodyBuffer.append('/').append(Base64.encode(DataHelper.getUTF8(tags[i]))).append("\">");
                 _preBodyBuffer.append(sanitizeString(tags[i]));
                 _preBodyBuffer.append("</option>\n");
                 /*
@@ -726,7 +726,7 @@ public class HTMLRenderer extends EventReceiverImpl {
         return str;
     }
 
-    public static final String sanitizeURL(String str) { return Base64.encode(str); }
+    public static final String sanitizeURL(String str) { return Base64.encode(DataHelper.getUTF8(str)); }
     public static final String sanitizeTagParam(String str) {
         str = str.replace('&', '_'); // this should be &amp;
         if (str.indexOf('\"') < 0)
@@ -801,11 +801,11 @@ public class HTMLRenderer extends EventReceiverImpl {
         if (blog != null)
             buf.append(ArchiveViewerBean.PARAM_BLOG).append('=').append(Base64.encode(blog.getData())).append('&');
         if (tag != null)
-            buf.append(ArchiveViewerBean.PARAM_TAG).append('=').append(Base64.encode(tag)).append('&');
+            buf.append(ArchiveViewerBean.PARAM_TAG).append('=').append(Base64.encode(DataHelper.getUTF8(tag))).append('&');
         if (entryId >= 0)
             buf.append(ArchiveViewerBean.PARAM_ENTRY).append('=').append(entryId).append('&');
         if (group != null)
-            buf.append(ArchiveViewerBean.PARAM_GROUP).append('=').append(Base64.encode(group)).append('&');
+            buf.append(ArchiveViewerBean.PARAM_GROUP).append('=').append(Base64.encode(DataHelper.getUTF8(group))).append('&');
         if ( (pageNum >= 0) && (numPerPage > 0) ) {
             buf.append(ArchiveViewerBean.PARAM_PAGE_NUMBER).append('=').append(pageNum).append('&');
             buf.append(ArchiveViewerBean.PARAM_NUM_PER_PAGE).append('=').append(numPerPage).append('&');

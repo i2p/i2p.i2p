@@ -581,7 +581,7 @@ public class RemoteArchiveBean {
         for (Iterator iter = localBlogs.iterator(); iter.hasNext(); ) {
             Hash blog = (Hash)iter.next();
             if (remoteBlogs.contains(blog)) {
-                System.err.println("Remote index has " + blog.toBase64());
+                //System.err.println("Remote index has " + blog.toBase64());
                 continue;
             }
             

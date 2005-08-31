@@ -116,7 +116,7 @@ public class CLI {
             boolean showImages = "true".equalsIgnoreCase(args[6]);
             try {
                 File f = File.createTempFile("syndie", ".html");
-                Writer out = new FileWriter(f);
+                Writer out = new OutputStreamWriter(new FileOutputStream(f), "UTF-8");
                 renderer.render(null, mgr.getArchive(), entry, out, summaryOnly, showImages);
                 out.flush();
                 out.close();

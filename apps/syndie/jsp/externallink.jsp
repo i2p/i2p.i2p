@@ -1,4 +1,5 @@
-<%@page import="net.i2p.data.Base64, net.i2p.syndie.web.*, net.i2p.syndie.sml.*" %>
+<%@page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" import="net.i2p.data.*, net.i2p.syndie.web.*, net.i2p.syndie.sml.*" %>
+<% request.setCharacterEncoding("UTF-8"); %>
 <html>
 <head>
 <title>SyndieMedia</title>
@@ -15,9 +16,9 @@
 String loc = request.getParameter("location");
 String schema = request.getParameter("schema");
 String desc = request.getParameter("description");
-if (loc != null) loc = HTMLRenderer.sanitizeString(new String(Base64.decode(loc)));
-if (schema != null) schema = HTMLRenderer.sanitizeString(new String(Base64.decode(schema)));
-if (desc != null) desc = HTMLRenderer.sanitizeString(new String(Base64.decode(desc)));
+if (loc != null) loc = HTMLRenderer.sanitizeString(DataHelper.getUTF8(Base64.decode(loc)));
+if (schema != null) schema = HTMLRenderer.sanitizeString(DataHelper.getUTF8(Base64.decode(schema)));
+if (desc != null) desc = HTMLRenderer.sanitizeString(DataHelper.getUTF8(Base64.decode(desc)));
 
 if ( (loc != null) && (schema != null) ) { 
   out.write(loc + " (" + schema + ")"); 

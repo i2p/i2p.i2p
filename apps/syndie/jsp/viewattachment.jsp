@@ -1,3 +1,4 @@
+<% request.setCharacterEncoding("UTF-8"); %>
 <%
 java.util.Map params = request.getParameterMap();
 response.setContentType(net.i2p.syndie.web.ArchiveViewerBean.getAttachmentContentType(params));

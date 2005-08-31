@@ -1,4 +1,5 @@
-<%@page import="net.i2p.data.Base64, net.i2p.syndie.web.*, net.i2p.syndie.sml.*, net.i2p.syndie.data.*, net.i2p.syndie.*, org.mortbay.servlet.MultiPartRequest, java.util.*" %>
+<%@page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" import="net.i2p.data.Base64, net.i2p.syndie.web.*, net.i2p.syndie.sml.*, net.i2p.syndie.data.*, net.i2p.syndie.*, org.mortbay.servlet.MultiPartRequest, java.util.*" %>
+<% request.setCharacterEncoding("UTF-8"); %>
 <jsp:useBean scope="session" class="net.i2p.syndie.User" id="user" />
 <jsp:useBean scope="session" class="net.i2p.syndie.web.PostBean" id="post" />
 <html>

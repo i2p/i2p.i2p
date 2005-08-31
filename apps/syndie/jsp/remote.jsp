@@ -1,4 +1,5 @@
-<%@page contentType="text/html" import="net.i2p.syndie.web.*" %>
+<%@page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" import="net.i2p.syndie.web.*" %>
+<% request.setCharacterEncoding("UTF-8"); %>
 <jsp:useBean scope="session" class="net.i2p.syndie.web.RemoteArchiveBean" id="remote" />
 <jsp:useBean scope="session" class="net.i2p.syndie.User" id="user" />
 <jsp:useBean scope="session" class="net.i2p.syndie.data.TransparentArchiveIndex" id="archive" />

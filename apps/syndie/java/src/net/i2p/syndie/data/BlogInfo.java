@@ -57,11 +57,12 @@ public class BlogInfo {
     public static final String EDITION = "Edition";
     
     public void load(InputStream in) throws IOException {
-        BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+        BufferedReader reader = new BufferedReader(new InputStreamReader(in, "UTF-8"));
         List names = new ArrayList();
         List vals = new ArrayList();
         String line = null;
         while ( (line = reader.readLine()) != null) {
+            System.err.println("Read info line [" + line + "]");
             line = line.trim();
             int len = line.length();
             int split = line.indexOf(':');
@@ -83,6 +84,7 @@ public class BlogInfo {
         for (int i = 0; i < _optionNames.length; i++) {
             _optionNames[i] = (String)names.get(i);
             _optionValues[i] = (String)vals.get(i);
+            System.out.println("Loaded info: [" + _optionNames[i] + "] = [" + _optionValues[i] + "]");
         }
         
         String keyStr = getProperty(OWNER_KEY);
@@ -110,13 +112,21 @@ public class BlogInfo {
                 buf.append(_optionNames[i]).append(':').append(_optionValues[i]).append('\n');
         }
         String s = buf.toString();
-        out.write(s.getBytes());
+        out.write(s.getBytes("UTF-8"));
     }
     
     public String getProperty(String name) {
         for (int i = 0; i < _optionNames.length; i++) {
-            if (_optionNames[i].equals(name))
-                return _optionValues[i];
+            if (_optionNames[i].equals(name)) {
+                String val = _optionValues[i];
+                System.out.println("getProperty[" + name + "] = [" + val + "] [sz=" + val.length() +"]");
+                for (int j = 0; j < val.length(); j++) {
+                    char c = (char)val.charAt(j);
+                    if (c != (c & 0x7F))
+                        System.out.println("char " + j + ": " + (int)c);
+                }
+                return val;
+            }
         }
         return null;
     }
@@ -214,31 +224,28 @@ public class BlogInfo {
         }
         return buf.toString();
     }
+
+    private static final String TEST_STRING = "\u20AC\u00DF\u6771\u10400\u00F6";
     
     public static void main(String args[]) {
         I2PAppContext ctx = I2PAppContext.getGlobalContext();
-        /*
+        if (true) {
         try {
             Object keys[] = ctx.keyGenerator().generateSigningKeypair();
             SigningPublicKey pub = (SigningPublicKey)keys[0];
             SigningPrivateKey priv = (SigningPrivateKey)keys[1];
 
             Properties opts = new Properties();
-            opts.setProperty("Name", "n4m3");
-            opts.setProperty("Description", "foo");
+            opts.setProperty("Name", TEST_STRING);
+            opts.setProperty("Description", TEST_STRING);
             opts.setProperty("Edition", "0");
-            opts.setProperty("ContactURL", "u@h.org");
+            opts.setProperty("ContactURL", TEST_STRING);
 
+            String nameOrig = opts.getProperty("Name");
             BlogInfo info = new BlogInfo(pub, null, opts);
-            System.err.println("\n");
-            System.err.println("\n");
             info.sign(ctx, priv);
-            System.err.println("\n");
             boolean ok = info.verify(ctx);
-            System.err.println("\n");
             System.err.println("sign&verify: " + ok);
-            System.err.println("\n");
-            System.err.println("\n");
             
             FileOutputStream o = new FileOutputStream("bloginfo-test.dat");
             info.write(o, true);
@@ -252,8 +259,12 @@ public class BlogInfo {
             System.err.println("write to disk, verify read: " + ok);
             System.err.println("Data: " + Base64.encode(buf, 0, sz));
             System.err.println("Str : " + new String(buf, 0, sz));
+            
+            System.err.println("Name ok? " + read.getProperty("Name").equals(TEST_STRING));
+            System.err.println("Desc ok? " + read.getProperty("Description").equals(TEST_STRING));
+            System.err.println("Name ok? " + read.getProperty("ContactURL").equals(TEST_STRING));
         } catch (Exception e) { e.printStackTrace(); }
-        */
+        } else {
         try {
             FileInputStream in = new FileInputStream(args[0]);
             BlogInfo info = new BlogInfo();
@@ -261,5 +272,6 @@ public class BlogInfo {
             boolean ok = info.verify(I2PAppContext.getGlobalContext());
             System.out.println("OK? " + ok + " :" + info);
         } catch (Exception e) { e.printStackTrace(); }
+        }
     }
 }

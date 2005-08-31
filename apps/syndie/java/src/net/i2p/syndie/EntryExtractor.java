@@ -65,36 +65,36 @@ public class EntryExtractor {
         }
     }
     private void extractHeaders(EntryContainer entry, File entryDir) throws IOException {
-        FileWriter out = null;
+        FileOutputStream out = null;
         try {
-            out = new FileWriter(new File(entryDir, HEADERS));
+            out = new FileOutputStream(new File(entryDir, HEADERS));
             Map headers = entry.getHeaders();
             for (Iterator iter = headers.keySet().iterator(); iter.hasNext(); ) {
                 String k = (String)iter.next();
                 String v = (String)headers.get(k);
-                out.write(k.trim() + '=' + v.trim() + '\n');
+                out.write(DataHelper.getUTF8(k.trim() + '=' + v.trim() + '\n'));
             }
         } finally {
             out.close();
         }
     }
     private void extractMeta(EntryContainer entry, File entryDir) throws IOException {
-        FileWriter out = null;
+        FileOutputStream out = null;
         try {
-            out = new FileWriter(new File(entryDir, META));
-            out.write("format=" + entry.getFormat() + '\n');
-            out.write("size=" + entry.getCompleteSize() + '\n');
-            out.write("blog=" + entry.getURI().getKeyHash().toBase64() + '\n');
-            out.write("entry=" + entry.getURI().getEntryId() + '\n');
+            out = new FileOutputStream(new File(entryDir, META));
+            out.write(DataHelper.getUTF8("format=" + entry.getFormat() + '\n'));
+            out.write(DataHelper.getUTF8("size=" + entry.getCompleteSize() + '\n'));
+            out.write(DataHelper.getUTF8("blog=" + entry.getURI().getKeyHash().toBase64() + '\n'));
+            out.write(DataHelper.getUTF8("entry=" + entry.getURI().getEntryId() + '\n'));
         } finally {
             out.close();
         }
     }
     private void extractEntry(EntryContainer entry, File entryDir) throws IOException {
-        FileWriter out = null;
+        FileOutputStream out = null;
         try {
-            out = new FileWriter(new File(entryDir, ENTRY));
-            out.write(entry.getEntry().getText());
+            out = new FileOutputStream(new File(entryDir, ENTRY));
+            out.write(DataHelper.getUTF8(entry.getEntry().getText()));
         } finally {
             out.close();
         }
@@ -115,16 +115,16 @@ public class EntryExtractor {
         }
     }
     private void extractAttachmentMetadata(int num, Attachment attachment, File entryDir) throws IOException {
-        FileWriter out = null;
+        FileOutputStream out = null;
         try {
-            out = new FileWriter(new File(entryDir, ATTACHMENT_PREFIX + num + ATTACHMENT_META_SUFFIX));
+            out = new FileOutputStream(new File(entryDir, ATTACHMENT_PREFIX + num + ATTACHMENT_META_SUFFIX));
             Map meta = attachment.getMeta();
             for (Iterator iter = meta.keySet().iterator(); iter.hasNext(); ) {
                 String k = (String)iter.next();
                 String v = (String)meta.get(k);
-                out.write(k + '=' + v + '\n');
+                out.write(DataHelper.getUTF8(k + '=' + v + '\n'));
             }
-            out.write(ATTACHMENT_DATA_SIZE + '=' + attachment.getDataLength());
+            out.write(DataHelper.getUTF8(ATTACHMENT_DATA_SIZE + '=' + attachment.getDataLength()));
         } finally {
             out.close();
         }

@@ -1,4 +1,5 @@
-<%@page import="net.i2p.data.Base64, net.i2p.syndie.web.*, net.i2p.syndie.sml.*, net.i2p.syndie.*" %>
+<%@page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" import="net.i2p.data.*, net.i2p.syndie.web.*, net.i2p.syndie.sml.*, net.i2p.syndie.*" %>
+<% request.setCharacterEncoding("UTF-8"); %>
 <jsp:useBean scope="session" class="net.i2p.syndie.User" id="user" />
 <html>
 <head>
@@ -19,9 +20,9 @@ String name = null;
 String location = null;
 String schema = null;
 try {
-    name = new String(Base64.decode(nameStr));
-    location = new String(Base64.decode(locStr));
-    schema = new String(Base64.decode(schemaStr));
+    name = DataHelper.getUTF8(Base64.decode(nameStr));
+    location = DataHelper.getUTF8(Base64.decode(locStr));
+    schema = DataHelper.getUTF8(Base64.decode(schemaStr));
 } catch (NullPointerException npe) {
     // ignore
 }

@@ -21,6 +21,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -880,5 +881,35 @@ public class DataHelper {
         ReusableGZIPInputStream.release(in);
         return rv;
     }
+
+    public static byte[] getUTF8(String orig) {
+        if (orig == null) return null;
+        try {
+            return orig.getBytes("UTF-8");
+        } catch (UnsupportedEncodingException uee) {
+            throw new RuntimeException("no utf8!?");
+        }
+    }
+    public static byte[] getUTF8(StringBuffer orig) {
+        if (orig == null) return null;
+        return getUTF8(orig.toString());
+    }
+    public static String getUTF8(byte orig[]) {
+        if (orig == null) return null;
+        try {
+            return new String(orig, "UTF-8");
+        } catch (UnsupportedEncodingException uee) {
+            throw new RuntimeException("no utf8!?");
+        }
+    }
+    public static String getUTF8(byte orig[], int offset, int len) {
+        if (orig == null) return null;
+        try {
+            return new String(orig, offset, len, "UTF-8");
+        } catch (UnsupportedEncodingException uee) {
+            throw new RuntimeException("No utf8!?");
+        }
+    }
+    
     
 }

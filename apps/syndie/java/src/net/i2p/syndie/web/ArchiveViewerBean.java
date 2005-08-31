@@ -108,7 +108,7 @@ public class ArchiveViewerBean {
         if (groups != null) {
             for (Iterator iter = groups.keySet().iterator(); iter.hasNext(); ) {
                 String name = (String)iter.next();
-                out.write("<option value=\"group://" + Base64.encode(name.getBytes()) + "\">" +
+                out.write("<option value=\"group://" + Base64.encode(DataHelper.getUTF8(name)) + "\">" +
                           "Group: " + HTMLRenderer.sanitizeString(name) + "</option>\n");
             }
         }
@@ -152,12 +152,38 @@ public class ArchiveViewerBean {
             List tags = index.getBlogTags(cur);
             for (int j = 0; j < tags.size(); j++) {
                 String tag = (String)tags.get(j);
+                if (false) {
+                    StringBuffer b = new StringBuffer(tag.length()*2);
+                    for (int k = 0; k < tag.length(); k++) {
+                        b.append((int)tag.charAt(k));
+                        b.append(' ');
+                    }
+                    System.out.println("tag in select: " + tag + ": " + b.toString());
+                }
+                
                 if (!allTags.contains(tag))
                     allTags.add(tag);
                 out.write("<option value=\"blogtag://");
                 out.write(blog);
                 out.write("/");
-                out.write(Base64.encode(tag));
+                byte utf8tag[] = DataHelper.getUTF8(tag);
+                String encoded = Base64.encode(utf8tag);
+                if (false) {
+                    byte utf8dec[] = Base64.decode(encoded);
+                    String travel = DataHelper.getUTF8(utf8dec);
+                    StringBuffer b = new StringBuffer();
+                    for (int k = 0; k < travel.length(); k++) {
+                        b.append((int)travel.charAt(k));
+                        b.append(' ');
+                    }
+                    b.append(" encoded into: ");
+                    for (int k = 0; k < encoded.length(); k++) {
+                        b.append((int)encoded.charAt(k));
+                        b.append(' ');
+                    }
+                    System.out.println("UTF8(unbase64(base64(UTF8(tag)))) == tag: " + b.toString());
+                }
+                out.write(encoded);
                 out.write("\">");
                 out.write(name);
                 out.write("- posts with the tag &quot;");
@@ -168,7 +194,7 @@ public class ArchiveViewerBean {
         for (int i = 0; i < allTags.size(); i++) {
             String tag = (String)allTags.get(i);
             out.write("<option value=\"tag://");
-            out.write(Base64.encode(tag));
+            out.write(Base64.encode(DataHelper.getUTF8(tag)));
             out.write("\">Posts in any blog with the tag &quot;");
             out.write(tag);
             out.write("&quot;</option>\n");
@@ -199,7 +225,7 @@ public class ArchiveViewerBean {
         Hash blog = null;
         if (blogStr != null) blog = new Hash(Base64.decode(blogStr));
         String tag = getString(parameters, PARAM_TAG);
-        if (tag != null) tag = new String(Base64.decode(tag));
+        if (tag != null) tag = DataHelper.getUTF8(Base64.decode(tag));
         long entryId = -1;
         if (blogStr != null) {
             String entryIdStr = getString(parameters, PARAM_ENTRY);
@@ -208,7 +234,7 @@ public class ArchiveViewerBean {
             } catch (NumberFormatException nfe) {}
         }
         String group = getString(parameters, PARAM_GROUP);
-        if (group != null) group = new String(Base64.decode(group));
+        if (group != null) group = DataHelper.getUTF8(Base64.decode(group));
         
         String sel = getString(parameters, PARAM_SELECTOR);
         if ( (sel == null) && (blog == null) && (group == null) && (tag == null) )
@@ -256,15 +282,48 @@ public class ArchiveViewerBean {
                     String blogStr = selector.substring(SEL_BLOGTAG.length(), tagStart);
                     blog = new Hash(Base64.decode(blogStr));
                     tag = selector.substring(tagStart+1);
-                    if (tag != null) tag = new String(Base64.decode(tag));
+                    String origTag = tag;
+                    byte rawDecode[] = null;
+                    if (tag != null) {
+                        rawDecode = Base64.decode(tag);
+                        tag = DataHelper.getUTF8(rawDecode);
+                    }
                     System.out.println("Selector [" + selector + "] blogString: [" + blogStr + "] tag: [" + tag + "]");
+                    if (false && tag != null) {
+                        StringBuffer b = new StringBuffer(tag.length()*2);
+                        for (int j = 0; j < tag.length(); j++) {
+                            b.append((int)tag.charAt(j));
+                            if (rawDecode.length > j)
+                                b.append('.').append((int)rawDecode[j]);
+                            b.append(' ');
+                        }
+                        b.append("encoded as ");
+                        for (int j = 0; j < origTag.length(); j++) {
+                            b.append((int)origTag.charAt(j)).append(' ');
+                        }
+                        System.out.println("selected tag: " + b.toString());
+                    }
                 } else if (selector.startsWith(SEL_TAG)) {
                     tag = selector.substring(SEL_TAG.length());
-                    if (tag != null) tag = new String(Base64.decode(tag));
+                    byte rawDecode[] = null;
+                    if (tag != null) {
+                        rawDecode = Base64.decode(tag);
+                        tag = DataHelper.getUTF8(rawDecode);
+                    }
                     System.out.println("Selector [" + selector + "] tag: [" + tag + "]");
+                    if (false && tag != null) {
+                        StringBuffer b = new StringBuffer(tag.length()*2);
+                        for (int j = 0; j < tag.length(); j++) {
+                            b.append((int)tag.charAt(j));
+                            if (rawDecode.length > j)
+                                b.append('.').append((int)rawDecode[j]);
+                            b.append(' ');
+                        }
+                        System.out.println("selected tag: " + b.toString());
+                    }
                 } else if (selector.startsWith(SEL_ENTRY)) {
                     int entryStart = selector.lastIndexOf('/');
-                    String blogStr = selector.substring(SEL_ENTRY.length(), entryStart);
+                    String blogStr = blogStr = selector.substring(SEL_ENTRY.length(), entryStart);
                     String entryStr = selector.substring(entryStart+1);
                     try {
                         entry = Long.parseLong(entryStr);
@@ -272,7 +331,7 @@ public class ArchiveViewerBean {
                         System.out.println("Selector [" + selector + "] blogString: [" + blogStr + "] entry: [" + entry + "]");
                     } catch (NumberFormatException nfe) {}
                 } else if (selector.startsWith(SEL_GROUP)) {
-                    group = new String(Base64.decode(selector.substring(SEL_GROUP.length())));
+                    group = DataHelper.getUTF8(Base64.decode(selector.substring(SEL_GROUP.length())));
                     System.out.println("Selector [" + selector + "] group: [" + group + "]");
                 }
             }
@@ -510,7 +569,7 @@ public class ArchiveViewerBean {
     }
     
     private static void renderInvalidAttachment(Map parameters, OutputStream out) throws IOException {
-        out.write("<b>No such entry, or no such attachment</b>".getBytes());
+        out.write(DataHelper.getUTF8("<b>No such entry, or no such attachment</b>"));
     }
     
     public static void renderMetadata(Map parameters, Writer out) throws IOException {

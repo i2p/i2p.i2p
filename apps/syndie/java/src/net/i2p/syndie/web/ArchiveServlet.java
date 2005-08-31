@@ -39,7 +39,7 @@ public class ArchiveServlet extends HttpServlet {
     }
     
     private String getBlog(String path) {
-        System.err.println("Blog: [" + path + "]");
+        //System.err.println("Blog: [" + path + "]");
         int start = 0;
         int end = -1;
         int len = path.length();
@@ -57,7 +57,7 @@ public class ArchiveServlet extends HttpServlet {
         }
         if (end < 0) end = len;
         String rv = path.substring(start, end);
-        System.err.println("Blog: [" + path + "] rv: [" + rv + "]");
+        //System.err.println("Blog: [" + path + "] rv: [" + rv + "]");
         return rv;
     }
     
@@ -66,7 +66,7 @@ public class ArchiveServlet extends HttpServlet {
         if (start < 0) return -1;
         if (!(path.endsWith(".snd"))) return -1;
         String rv = path.substring(start+1, path.length()-".snd".length());
-        System.err.println("Entry: [" + path + "] rv: [" + rv + "]");
+        //System.err.println("Entry: [" + path + "] rv: [" + rv + "]");
         try {
             return Long.parseLong(rv);
         } catch (NumberFormatException nfe) {
@@ -75,24 +75,26 @@ public class ArchiveServlet extends HttpServlet {
     }
     
     private void renderRootIndex(HttpServletResponse resp) throws ServletException, IOException {
-        resp.setContentType("text/html");
+        resp.setContentType("text/html;charset=utf-8");
+        //resp.setCharacterEncoding("UTF-8");
         OutputStream out = resp.getOutputStream();
-        out.write("<a href=\"archive.txt\">archive.txt</a><br />\n".getBytes());
+        out.write(DataHelper.getUTF8("<a href=\"archive.txt\">archive.txt</a><br />\n"));
         ArchiveIndex index = BlogManager.instance().getArchive().getIndex();
         Set blogs = index.getUniqueBlogs();
         for (Iterator iter = blogs.iterator(); iter.hasNext(); ) {
             Hash blog = (Hash)iter.next();
             String s = blog.toBase64();
-            out.write(("<a href=\"" + s + "/\">" + s + "</a><br />\n").getBytes());
+            out.write(DataHelper.getUTF8("<a href=\"" + s + "/\">" + s + "</a><br />\n"));
         }
         out.close();
     }
     
     private void renderSummary(HttpServletResponse resp) throws ServletException, IOException {
-        resp.setContentType("text/plain");
+        resp.setContentType("text/plain;charset=utf-8");
+        //resp.setCharacterEncoding("UTF-8");
         OutputStream out = resp.getOutputStream();
         ArchiveIndex index = BlogManager.instance().getArchive().getIndex();
-        out.write(index.toString().getBytes());
+        out.write(DataHelper.getUTF8(index.toString()));
         out.close();
     }
     
@@ -127,15 +129,16 @@ public class ArchiveServlet extends HttpServlet {
             resp.sendError(404, "Blog does not exist");
             return;
         }
-        resp.setContentType("text/html");
+        resp.setContentType("text/html;charset=utf-8");
+        //resp.setCharacterEncoding("UTF-8");
         OutputStream out = resp.getOutputStream();
-        out.write("<a href=\"..\">..</a><br />\n".getBytes());
-        out.write(("<a href=\"" + Archive.METADATA_FILE + "\">" + Archive.METADATA_FILE + "</a><br />\n").getBytes());
+        out.write(DataHelper.getUTF8("<a href=\"..\">..</a><br />\n"));
+        out.write(DataHelper.getUTF8("<a href=\"" + Archive.METADATA_FILE + "\">" + Archive.METADATA_FILE + "</a><br />\n"));
         List entries = new ArrayList(64);
         BlogManager.instance().getArchive().getIndex().selectMatchesOrderByEntryId(entries, h, null);
         for (int i = 0; i < entries.size(); i++) {
             BlogURI entry = (BlogURI)entries.get(i);
-            out.write(("<a href=\"" + entry.getEntryId() + ".snd\">" + entry.getEntryId() + ".snd</a><br />\n").getBytes());
+            out.write(DataHelper.getUTF8("<a href=\"" + entry.getEntryId() + ".snd\">" + entry.getEntryId() + ".snd</a><br />\n"));
         }
         out.close();
     }

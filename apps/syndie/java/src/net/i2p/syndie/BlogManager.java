@@ -87,7 +87,7 @@ public class BlogManager {
             for (Iterator iter = _context.getPropertyNames().iterator(); iter.hasNext(); ) {
                 String name = (String)iter.next();
                 if (name.startsWith("syndie."))
-                    out.write((name + '=' + _context.getProperty(name) + '\n').getBytes());
+                    out.write(DataHelper.getUTF8(name + '=' + _context.getProperty(name) + '\n'));
             }
         } catch (IOException ioe) {
             ioe.printStackTrace();
@@ -181,14 +181,17 @@ public class BlogManager {
     }
     
     public String login(User user, String login, String pass) {
-        File userFile = new File(_userDir, Base64.encode(_context.sha().calculateHash(login.getBytes()).getData()));
+        Hash userHash = _context.sha().calculateHash(DataHelper.getUTF8(login));
+        Hash passHash = _context.sha().calculateHash(DataHelper.getUTF8(pass));
+        File userFile = new File(_userDir, Base64.encode(userHash.getData()));
         System.out.println("Attempting to login to " + login + " w/ pass = " + pass 
                            + ": file = " + userFile.getAbsolutePath() + " passHash = "
-                           + Base64.encode(_context.sha().calculateHash(pass.getBytes()).getData()));
+                           + Base64.encode(passHash.getData()));
         if (userFile.exists()) {
             try {
                 Properties props = new Properties();
-                BufferedReader in = new BufferedReader(new FileReader(userFile));
+                FileInputStream fin = new FileInputStream(userFile);
+                BufferedReader in = new BufferedReader(new InputStreamReader(fin, "UTF-8"));
                 String line = null;
                 while ( (line = in.readLine()) != null) {
                     int split = line.indexOf('=');
@@ -216,12 +219,12 @@ public class BlogManager {
     
     public void saveUser(User user) {
         if (!user.getAuthenticated()) return;
-        String userHash = Base64.encode(_context.sha().calculateHash(user.getUsername().getBytes()).getData());
+        String userHash = Base64.encode(_context.sha().calculateHash(DataHelper.getUTF8(user.getUsername())).getData());
         File userFile = new File(_userDir, userHash);
-        FileWriter out = null;
+        FileOutputStream out = null;
         try {
-            out = new FileWriter(userFile);
-            out.write(user.export());
+            out = new FileOutputStream(userFile);
+            out.write(DataHelper.getUTF8(user.export()));
         } catch (IOException ioe) {
             ioe.printStackTrace();
         } finally {
@@ -229,28 +232,36 @@ public class BlogManager {
         }
     }
     public String register(User user, String login, String password, String registrationPassword, String blogName, String blogDescription, String contactURL) {
+        System.err.println("Register [" + login + "] pass [" + password + "] name [" + blogName + "] descr [" + blogDescription + "] contact [" + contactURL + "]");
+        System.err.println("reference bad string: [" + EncodingTestGenerator.TEST_STRING + "]");
         String hashedRegistrationPassword = getRegistrationPassword();
         if (hashedRegistrationPassword != null) {
-            if (!hashedRegistrationPassword.equals(Base64.encode(_context.sha().calculateHash(registrationPassword.getBytes()).getData())))
-                return "Invalid registration password";
+            try {
+                if (!hashedRegistrationPassword.equals(Base64.encode(_context.sha().calculateHash(registrationPassword.getBytes("UTF-8")).getData())))
+                    return "Invalid registration password";
+            } catch (UnsupportedEncodingException uee) {
+                return "Error registering";
+            }
         }
-        String userHash = Base64.encode(_context.sha().calculateHash(login.getBytes()).getData());
+        String userHash = Base64.encode(_context.sha().calculateHash(DataHelper.getUTF8(login)).getData());
         File userFile = new File(_userDir, userHash);
         if (userFile.exists()) {
             return "Cannot register the login " + login + ": it already exists";
         } else {
             BlogInfo info = createBlog(blogName, blogDescription, contactURL, null);
-            String hashedPassword = Base64.encode(_context.sha().calculateHash(password.getBytes()).getData());
-            FileWriter out = null;
+            String hashedPassword = Base64.encode(_context.sha().calculateHash(DataHelper.getUTF8(password)).getData());
+            FileOutputStream out = null;
             try {
-                out = new FileWriter(userFile);
-                out.write("password=" + hashedPassword + "\n");
-                out.write("blog=" + Base64.encode(info.getKey().calculateHash().getData()) + "\n");
-                out.write("lastid=-1\n");
-                out.write("lastmetaedition=0\n");
-                out.write("addressbook=userhosts-"+userHash + ".txt\n");
-                out.write("showimages=false\n");
-                out.write("showexpanded=false\n");
+                out = new FileOutputStream(userFile);
+                BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(out, "UTF-8"));
+                bw.write("password=" + hashedPassword + "\n");
+                bw.write("blog=" + Base64.encode(info.getKey().calculateHash().getData()) + "\n");
+                bw.write("lastid=-1\n");
+                bw.write("lastmetaedition=0\n");
+                bw.write("addressbook=userhosts-"+userHash + ".txt\n");
+                bw.write("showimages=false\n");
+                bw.write("showexpanded=false\n");
+                bw.flush();
             } catch (IOException ioe) {
                 ioe.printStackTrace();
                 return "Internal error registering - " + ioe.getMessage();
@@ -297,7 +308,7 @@ public class BlogManager {
             raw.append('\n');
             if ( (entryHeaders != null) && (entryHeaders.trim().length() > 0) ) {
                 System.out.println("Entry headers: " + entryHeaders);
-                BufferedReader userHeaders = new BufferedReader(new InputStreamReader(new ByteArrayInputStream(entryHeaders.getBytes())));
+                BufferedReader userHeaders = new BufferedReader(new InputStreamReader(new ByteArrayInputStream(DataHelper.getUTF8(entryHeaders)), "UTF-8"));
                 String line = null;
                 while ( (line = userHeaders.readLine()) != null) {
                     line = line.trim();
@@ -314,7 +325,7 @@ public class BlogManager {
             raw.append('\n');
             raw.append(sml);
             
-            EntryContainer c = new EntryContainer(uri, tagList, raw.toString().getBytes());
+            EntryContainer c = new EntryContainer(uri, tagList, DataHelper.getUTF8(raw));
             if ((fileNames != null) && (fileStreams != null) && (fileNames.size() == fileStreams.size()) ) {
                 for (int i = 0; i < fileNames.size(); i++) {
                     String name = (String)fileNames.get(i);
@@ -397,14 +408,14 @@ public class BlogManager {
         if (!validateAddressSchema(schema)) return "Unsupported schema: " + HTMLRenderer.sanitizeString(schema);
         // no need to quote user/location further, as they've been sanitized
         
-        FileWriter out = null;
+        FileOutputStream out = null;
         try {
             File userHostsFile = new File(user.getAddressbookLocation());
             Properties knownHosts = getKnownHosts(user, true);
             if (knownHosts.containsKey(name)) return "Name is already in use";
         
-            out = new FileWriter(userHostsFile, true);
-            out.write(name + "=" + location + '\n');
+            out = new FileOutputStream(userHostsFile, true);
+            out.write(DataHelper.getUTF8(name + "=" + location + '\n'));
             return "Address " + name + " written to your hosts file (" + userHostsFile.getName() + ")";
         } catch (IOException ioe) {
             return "Error writing out host entry: " + ioe.getMessage();

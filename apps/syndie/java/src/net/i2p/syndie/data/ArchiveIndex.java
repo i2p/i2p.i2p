@@ -190,7 +190,7 @@ public class ArchiveIndex {
         _newestBlogs = new ArrayList();
         _newestEntries = new ArrayList();
         _headers = new Properties();
-        BufferedReader in = new BufferedReader(new InputStreamReader(index));
+        BufferedReader in = new BufferedReader(new InputStreamReader(index, "UTF-8"));
         String line = null;
         line = in.readLine();
         if (line == null)
@@ -240,8 +240,8 @@ public class ArchiveIndex {
                 _newestBlogs = parseNewestBlogs(val);
             else if (key.equals("NewestEntries"))
                 _newestEntries = parseNewestEntries(val);
-            else
-                System.err.println("Key: " + key + " val: " + val);
+            //else
+            //    System.err.println("Key: " + key + " val: " + val);
         }
     }
     
@@ -265,6 +265,19 @@ public class ArchiveIndex {
             if (tag != null) {
                 if (!tag.equals(summary.tag)) {
                     System.out.println("Tag [" + summary.tag + "] does not match the requested [" + tag + "] in " + summary.blog.toBase64());
+                    if (false) {
+                        StringBuffer b = new StringBuffer(tag.length()*2);
+                        for (int j = 0; j < tag.length(); j++) {
+                            b.append((int)tag.charAt(j));
+                            b.append('.');
+                            if (summary.tag.length() > j+1)
+                                b.append((int)summary.tag.charAt(j));
+                            else
+                                b.append('_');
+                            b.append(' ');
+                        }
+                        System.out.println("tag.summary: " + b.toString());
+                    }
                     continue;
                 }
             }
@@ -273,7 +286,7 @@ public class ArchiveIndex {
                 EntrySummary entry = (EntrySummary)summary.entries.get(j);
                 String k = (Long.MAX_VALUE-entry.entry.getEntryId()) + "-" + entry.entry.getKeyHash().toBase64();
                 ordered.put(k, entry.entry);
-                System.err.println("Including match: " + k);
+                //System.err.println("Including match: " + k);
             }
         }
         for (Iterator iter = ordered.values().iterator(); iter.hasNext(); ) {
@@ -313,8 +326,10 @@ public class ArchiveIndex {
         if (tok.countTokens() < 4)
             return;
         tok.nextToken();
-        Hash keyHash = new Hash(Base64.decode(tok.nextToken()));
-        long when = getIndexDate(tok.nextToken());
+        String keyStr = tok.nextToken();
+        Hash keyHash = new Hash(Base64.decode(keyStr));
+        String whenStr = tok.nextToken();
+        long when = getIndexDate(whenStr);
         String tag = tok.nextToken();
         BlogSummary summary = new BlogSummary();
         summary.blog = keyHash;

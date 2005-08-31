@@ -70,6 +70,7 @@ public class Archive {
                             info.add(bi);
                         } else {
                             System.err.println("Invalid blog (but we're storing it anyway): " + bi);
+                            new Exception("foo").printStackTrace();
                             info.add(bi);
                         }
                     } catch (IOException ioe) {
@@ -104,6 +105,7 @@ public class Archive {
     public boolean storeBlogInfo(BlogInfo info) { 
         if (!info.verify(_context)) {
             System.err.println("Not storing the invalid blog " + info);
+            new Exception("foo!").printStackTrace();
             return false;
         }
         boolean isNew = true;
@@ -161,13 +163,17 @@ public class Archive {
         for (int j = 0; j < entries.length; j++) {
             try {
                 File entryDir = getEntryDir(entries[j]);
-                if (!entryDir.exists()) {
+                EntryContainer entry = null;
+                if (entryDir.exists())
+                    entry = getCachedEntry(entryDir);
+                if ( (entry == null) || (!entryDir.exists()) ) {
                     if (!extractEntry(entries[j], entryDir, info)) {
                         System.err.println("Entry " + entries[j].getPath() + " is not valid");
+                        new Exception("foo!!").printStackTrace();
                         continue;
                     }
+                    entry = getCachedEntry(entryDir);
                 }
-                EntryContainer entry = getCachedEntry(entryDir);
                 String tags[] = entry.getTags();
                 for (int t = 0; t < tags.length; t++) {
                     if (!rv.contains(tags[t])) {
@@ -202,7 +208,16 @@ public class Archive {
     }
     
     private EntryContainer getCachedEntry(File entryDir) {
-        return new CachedEntry(entryDir);
+        try {
+            return new CachedEntry(entryDir);
+        } catch (IOException ioe) {
+            ioe.printStackTrace();
+            File files[] = entryDir.listFiles();
+            for (int i = 0; i < files.length; i++)
+                files[i].delete();
+            entryDir.delete();
+            return null;
+        }
     }
     
     public EntryContainer getEntry(BlogURI uri) { return getEntry(uri, null); }
@@ -233,13 +248,16 @@ public class Archive {
                 if (blogKey == null) {
                     // no key, cache.
                     File entryDir = getEntryDir(entries[i]);
-                    if (!entryDir.exists()) {
+                    if (entryDir.exists())
+                        entry = getCachedEntry(entryDir);
+                    if ((entry == null) || !entryDir.exists()) {
                         if (!extractEntry(entries[i], entryDir, info)) {
                             System.err.println("Entry " + entries[i].getPath() + " is not valid");
+                            new Exception("foo!!!!").printStackTrace();
                             continue;
                         }
+                        entry = getCachedEntry(entryDir);
                     }
-                    entry = getCachedEntry(entryDir);
                 } else {
                     // we have an explicit key - no caching
                     entry = new EntryContainer();
@@ -247,6 +265,7 @@ public class Archive {
                     boolean ok = entry.verifySignature(_context, info);
                     if (!ok) {
                         System.err.println("Keyed entry " + entries[i].getPath() + " is not valid");
+                        new Exception("foo!!!!!!").printStackTrace();
                         continue;
                     }
 
@@ -389,8 +408,8 @@ public class Archive {
         reloadInfo();
         _index = ArchiveIndexer.index(_context, this);
         try {
-            PrintWriter out = new PrintWriter(new FileWriter(new File(_rootDir, INDEX_FILE)));
-            out.println(_index.toString());
+            FileOutputStream out = new FileOutputStream(new File(_rootDir, INDEX_FILE));
+            out.write(DataHelper.getUTF8(_index.toString()));
             out.flush();
         } catch (IOException ioe) {
             ioe.printStackTrace();

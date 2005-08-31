@@ -24,7 +24,7 @@ class ArchiveIndexer {
         File headerFile = new File(rootDir, Archive.HEADER_FILE);
         if (headerFile.exists()) {
             try {
-                BufferedReader in = new BufferedReader(new InputStreamReader(new FileInputStream(headerFile)));
+                BufferedReader in = new BufferedReader(new InputStreamReader(new FileInputStream(headerFile), "UTF-8"));
                 String line = null;
                 while ( (line = in.readLine()) != null) {
                     StringTokenizer tok = new StringTokenizer(line, ":");
@@ -79,6 +79,7 @@ class ArchiveIndexer {
                 for (int t = 0; t < entryTags.length; t++) {
                     if (!tags.containsKey(entryTags[t])) {
                         tags.put(entryTags[t], new TreeMap());
+                        //System.err.println("New tag [" + entryTags[t] + "]");
                     }
                     Map entriesByTag = (Map)tags.get(entryTags[t]);
                     entriesByTag.put(new Long(0-entry.getURI().getEntryId()), entry);

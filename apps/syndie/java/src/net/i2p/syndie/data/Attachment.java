@@ -2,6 +2,7 @@ package net.i2p.syndie.data;
 
 import java.io.*;
 import java.util.*;
+import net.i2p.data.DataHelper;
 
 /**
  *
@@ -85,7 +86,7 @@ public class Attachment {
         for (int i = 0; i < _keys.size(); i++) {
             meta.append(_keys.get(i)).append(':').append(_values.get(i)).append('\n');
         }
-        _rawMetadata = meta.toString().getBytes();
+        _rawMetadata = DataHelper.getUTF8(meta);
     }
     
     private void parseMeta() {
@@ -96,10 +97,10 @@ public class Attachment {
         int valBegin = -1;
         for (int i = 0; i < _rawMetadata.length; i++) {
             if (_rawMetadata[i] == ':') {
-                key = new String(_rawMetadata, keyBegin, i - keyBegin);
+                key = DataHelper.getUTF8(_rawMetadata, keyBegin, i - keyBegin);
                 valBegin = i + 1;
             } else if (_rawMetadata[i] == '\n') {
-                val = new String(_rawMetadata, valBegin, i - valBegin);
+                val = DataHelper.getUTF8(_rawMetadata, valBegin, i - valBegin);
                 _keys.add(key);
                 _values.add(val);
                 keyBegin = i + 1;

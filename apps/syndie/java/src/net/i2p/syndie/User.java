@@ -1,5 +1,6 @@
 package net.i2p.syndie;
 
+import java.io.UnsupportedEncodingException;
 import java.util.*;
 import net.i2p.I2PAppContext;
 import net.i2p.data.*;
@@ -98,7 +99,7 @@ public class User {
     
     public String login(String login, String pass, Properties props) {
         String expectedPass = props.getProperty("password");
-        String hpass = Base64.encode(_context.sha().calculateHash(pass.getBytes()).getData());
+        String hpass = Base64.encode(_context.sha().calculateHash(DataHelper.getUTF8(pass)).getData());
         if (!hpass.equals(expectedPass)) {
             _authenticated = false;
             return "Incorrect password";
@@ -195,12 +196,6 @@ public class User {
         buf.append("showexpanded=" + getShowExpanded() + "\n");
         buf.append("defaultselector=" + getDefaultSelector() + "\n");
         buf.append("allowaccessremote=" + _allowAccessRemote + "\n");
-        buf.append("eepproxyhost="+_eepProxyHost+"\n");
-        buf.append("eepproxyport="+_eepProxyPort+"\n");
-        buf.append("webproxyhost="+_webProxyHost+"\n");
-        buf.append("webproxyport="+_webProxyPort+"\n");
-        buf.append("torproxyhost="+_torProxyHost+"\n");
-        buf.append("torproxyport="+_torProxyPort+"\n");
         
         buf.append("groups=");
         Map groups = getBlogGroups();

@@ -1,5 +1,6 @@
 <%@page  import="net.i2p.syndie.web.ArchiveViewerBean" %><jsp:useBean 
 scope="session" class="net.i2p.syndie.web.PostBean" id="post" /><%
+request.setCharacterEncoding("UTF-8");
 String id = request.getParameter(ArchiveViewerBean.PARAM_ATTACHMENT);
 if (id != null) {
   try {

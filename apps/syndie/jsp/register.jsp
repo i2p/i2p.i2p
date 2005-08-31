@@ -1,4 +1,5 @@
-<%@page import="net.i2p.data.Base64, net.i2p.syndie.web.*, net.i2p.syndie.sml.*, net.i2p.syndie.*" %>
+<%@page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" import="net.i2p.data.Base64, net.i2p.syndie.web.*, net.i2p.syndie.sml.*, net.i2p.syndie.*" %>
+<% request.setCharacterEncoding("UTF-8"); %>
 <jsp:useBean scope="session" class="net.i2p.syndie.User" id="user" />
 <html>
 <head>
@@ -12,7 +13,6 @@
     <jsp:include page="_topnav.jsp" />
     <td valign="top" align="left" rowspan="2"><jsp:include page="_rightnav.jsp" /></td></tr>
 <tr><td valign="top" align="left" colspan="3"><%
-
 String regLogin = request.getParameter("login");
 boolean showForm = true;
 if ( (regLogin != null) && ("Register".equals(request.getParameter("Register"))) ) {
