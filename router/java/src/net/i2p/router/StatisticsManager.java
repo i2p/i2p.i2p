@@ -100,7 +100,8 @@ public class StatisticsManager implements Service {
         stats.setProperty("core.id", CoreVersion.ID);
 	
         if (_includePeerRankings) {
-            stats.putAll(_context.profileManager().summarizePeers(_publishedStats));
+            if (false)
+                stats.putAll(_context.profileManager().summarizePeers(_publishedStats));
 
             includeThroughput(stats);
             includeRate("router.invalidMessageTime", stats, new long[] { 10*60*1000 });

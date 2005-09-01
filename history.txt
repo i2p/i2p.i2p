@@ -1,4 +1,14 @@
-$Id: history.txt,v 1.231 2005/08/27 17:15:38 jrandom Exp $
+$Id: history.txt,v 1.232 2005/08/29 20:59:13 jrandom Exp $
+
+2005-08-31  jrandom
+    * Don't publish leaseSets to the netDb if they will never be looked for -
+      namely, if they are for destinations that only establish outbound
+      streams.  I2PTunnel's 'client' and 'httpclient' proxies have been 
+      modified to tell the router that it doesn't need to publish their 
+      leaseSet (by setting the I2CP config option 'i2cp.dontPublishLeaseSet'
+      to 'true').
+    * Don't publish the top 10 peer rankings of each router in the netdb, as
+      it isn't being watched right now.
 
 2005-08-29  jrandom
     * Added the new test Floodfill netDb
