@@ -39,7 +39,7 @@ class FloodfillPeerSelector extends PeerSelector {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Searching for " + maxNumRouters + " peers close to " + key + ": " 
                        + rv + " (not including " + peersToIgnore + ") [allHashes.size = " 
-                       + matches.size() + "]");
+                       + matches.size() + "]", new Exception("Search by"));
         return rv;
     }
     
@@ -71,6 +71,8 @@ class FloodfillPeerSelector extends PeerSelector {
             if ( (_toIgnore != null) && (_toIgnore.contains(entry)) )
                 return;
             if (entry.equals(_context.routerHash()))
+                return;
+            if (_context.shitlist().isShitlisted(entry))
                 return;
             RouterInfo info = _context.netDb().lookupRouterInfoLocally(entry);
             if (info == null)

@@ -557,7 +557,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Invalid leaseSet signature!  leaseSet = " + leaseSet);
             return "Invalid leaseSet signature on " + leaseSet.getDestination().calculateHash().toBase64();
-        } else if (leaseSet.getEarliestLeaseDate() <= _context.clock().now() - Router.CLOCK_FUDGE_FACTOR) {
+        } else if (leaseSet.getEarliestLeaseDate() <= _context.clock().now() - 2*Router.CLOCK_FUDGE_FACTOR) {
             long age = _context.clock().now() - leaseSet.getEarliestLeaseDate();
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Old leaseSet!  not storing it: " 
@@ -833,7 +833,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
     }
 
     /** smallest allowed period */
-    private static final int MIN_PER_PEER_TIMEOUT = 2*1000;
+    private static final int MIN_PER_PEER_TIMEOUT = 3*1000;
     private static final int MAX_PER_PEER_TIMEOUT = 5*1000;
     
     public int getPeerTimeout(Hash peer) {

@@ -1,4 +1,8 @@
-$Id: history.txt,v 1.232 2005/08/29 20:59:13 jrandom Exp $
+$Id: history.txt,v 1.233 2005/08/31 19:26:20 jrandom Exp $
+
+2005-09-01  jrandom
+    * Don't send out a netDb store of a router if it is more than a few hours
+      old, even if someone asked us for it.
 
 2005-08-31  jrandom
     * Don't publish leaseSets to the netDb if they will never be looked for -

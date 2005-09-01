@@ -52,7 +52,7 @@ class SearchJob extends JobImpl {
     private boolean _deferredCleared;
     private long _startedOn;
     
-    private static final int SEARCH_BREDTH = 3; // 3 peers at a time 
+    private static final int SEARCH_BREDTH = 10; // 10 peers at a time 
     private static final int SEARCH_PRIORITY = 400; // large because the search is probably for a real search
     /** only send the 10 closest "dont tell me about" refs */
     static final int MAX_CLOSEST = 10;

@@ -44,6 +44,13 @@ public class HandleDatabaseLookupMessageJob extends JobImpl {
     private final static int REPLY_TIMEOUT = 60*1000;
     private final static int MESSAGE_PRIORITY = 300;
     
+    /**
+     * If a routerInfo structure isn't updated within an hour, drop it
+     * and search for a later version.  This value should be large enough
+     * to deal with the Router.CLOCK_FUDGE_FACTOR.
+     */
+    public final static long EXPIRE_DELAY = 60*60*1000;
+    
     public HandleDatabaseLookupMessageJob(RouterContext ctx, DatabaseLookupMessage receivedMessage, RouterIdentity from, Hash fromHash) {
         super(ctx);
         _log = getContext().logManager().getLog(HandleDatabaseLookupMessageJob.class);
@@ -101,7 +108,7 @@ public class HandleDatabaseLookupMessageJob extends JobImpl {
             }
         } else {
             RouterInfo info = getContext().netDb().lookupRouterInfoLocally(_message.getSearchKey());
-            if (info != null) {
+            if ( (info != null) && (info.isCurrent(EXPIRE_DELAY)) ) {
                 // send that routerInfo to the _message.getFromHash peer
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("We do have key " + _message.getSearchKey().toBase64() 
