@@ -101,6 +101,10 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
         this.l = l;
         this.handlerName = handlerName + _clientId;
 
+        // no need to load the netDb with leaseSets for destinations that will never 
+        // be looked up
+        tunnel.getClientOptions().setProperty("i2cp.dontPublishLeaseSet", "true");
+        
         while (sockMgr == null) {
             synchronized (sockLock) {
                 if (ownDest) {

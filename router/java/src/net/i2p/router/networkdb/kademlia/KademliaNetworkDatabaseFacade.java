@@ -382,10 +382,8 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
     }
     
     public int getKnownLeaseSets() {  
-        if (_kb == null) return 0;
-        CountLeaseSets count = new CountLeaseSets();
-        _kb.getAll(count);
-        return count.size();
+        if (_ds == null) return 0;
+        return _ds.countLeaseSets();
     }
     
     private class CountLeaseSets implements SelectionCollector {
@@ -476,6 +474,9 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
             _log.error("wtf, locally published leaseSet is not valid?", iae);
             return;
         }
+        if (!_context.clientManager().shouldPublishLeaseSet(h))
+            return;
+        
         synchronized (_explicitSendKeys) {
             _explicitSendKeys.add(h);
         }

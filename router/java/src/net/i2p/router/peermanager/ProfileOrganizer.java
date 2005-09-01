@@ -743,8 +743,11 @@ public class ProfileOrganizer {
         // the CLI shouldn't depend upon the netDb
         if (netDb == null) return true;
         if (_context.router() == null) return true;
-        if ( (_context.shitlist() != null) && (_context.shitlist().isShitlisted(peer)) ) 
+        if ( (_context.shitlist() != null) && (_context.shitlist().isShitlisted(peer)) ) {
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Peer " + peer.toBase64() + " is shitlisted, dont select it");
             return false; // never select a shitlisted peer
+        }
             
         if (null != netDb.lookupRouterInfoLocally(peer)) {
             if (_log.shouldLog(Log.INFO))

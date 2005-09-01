@@ -135,6 +135,8 @@ class DataRepublishingSelectorJob extends JobImpl {
             } else {
                 LeaseSet ls = _facade.lookupLeaseSetLocally(key);
                 if (ls != null) {
+                    if (!getContext().clientManager().shouldPublishLeaseSet(ls.getDestination().calculateHash()))
+                        return -3;
                     if (ls.isCurrent(Router.CLOCK_FUDGE_FACTOR)) {
                         // last time it was sent was before the last send period
                         return KBucketSet.NUM_BUCKETS - bucket;

@@ -59,6 +59,9 @@ class TransientDataStore implements DataStore {
             return _data.containsKey(key);
         }
     }
+
+    public int countLeaseSets() { return 0; }
+
     
     /** nothing published more than 5 minutes in the future */
     private final static long MAX_FUTURE_PUBLISH_DATE = 5*60*1000;

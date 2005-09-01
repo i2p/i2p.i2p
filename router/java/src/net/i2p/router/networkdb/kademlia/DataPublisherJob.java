@@ -54,6 +54,8 @@ class DataPublisherJob extends JobImpl {
                         _log.warn("Not publishing a lease that isn't current - " + key, 
                                   new Exception("Publish expired lease?"));
                 }
+                if (!getContext().clientManager().shouldPublishLeaseSet(key))
+                    continue;
             }
             _facade.sendStore(key, data, null, null, STORE_TIMEOUT, null);
             //StoreJob store = new StoreJob(getContext(), _facade, key, data, null, null, STORE_TIMEOUT);

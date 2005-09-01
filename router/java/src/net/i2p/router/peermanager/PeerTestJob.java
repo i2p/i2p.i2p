@@ -30,7 +30,7 @@ public class PeerTestJob extends JobImpl {
     private Log _log;
     private PeerManager _manager;
     private boolean _keepTesting;
-    private static final long DEFAULT_PEER_TEST_DELAY = 60*1000;
+    private static final long DEFAULT_PEER_TEST_DELAY = 5*60*1000;
     private static final int TEST_PRIORITY = 100;
     
     /** Creates a new instance of PeerTestJob */
@@ -48,7 +48,7 @@ public class PeerTestJob extends JobImpl {
     /** how long to give each peer before marking them as unresponsive? */
     private int getTestTimeout() { return 30*1000; }
     /** number of peers to test each round */
-    private int getTestConcurrency() { return 2; }
+    private int getTestConcurrency() { return 1; }
     
     public void startTesting(PeerManager manager) { 
         _manager = manager;

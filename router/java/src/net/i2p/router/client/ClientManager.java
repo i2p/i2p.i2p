@@ -25,6 +25,7 @@ import net.i2p.data.TunnelId;
 import net.i2p.data.i2cp.MessageId;
 import net.i2p.data.i2cp.SessionConfig;
 import net.i2p.router.ClientMessage;
+import net.i2p.router.ClientManagerFacade;
 import net.i2p.router.Job;
 import net.i2p.router.JobImpl;
 import net.i2p.router.RouterContext;
@@ -269,6 +270,16 @@ public class ClientManager {
         return false;
     }
     
+    public boolean shouldPublishLeaseSet(Hash destHash) { 
+        if (destHash == null) return true;
+        ClientConnectionRunner runner = getRunner(destHash);
+        if (runner == null) return true;
+        String dontPublish = runner.getConfig().getOptions().getProperty(ClientManagerFacade.PROP_CLIENT_ONLY);
+        if ( (dontPublish != null) && ("true".equals(dontPublish)) )
+            return false;
+        return true;
+    }
+
     public Set listClients() {
         Set rv = new HashSet();
         synchronized (_runners) {

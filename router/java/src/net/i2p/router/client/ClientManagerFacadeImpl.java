@@ -164,6 +164,8 @@ public class ClientManagerFacadeImpl extends ClientManagerFacade {
             return false;
         }
     }
+
+    public boolean shouldPublishLeaseSet(Hash destinationHash) { return _manager.shouldPublishLeaseSet(destinationHash); }
     
     public void messageDeliveryStatusUpdate(Destination fromDest, MessageId id, boolean delivered) {
         if (_manager != null)

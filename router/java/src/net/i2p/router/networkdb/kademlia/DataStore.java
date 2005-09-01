@@ -20,4 +20,6 @@ public interface DataStore {
     public DataStructure remove(Hash key);
     public Set getKeys();
     public void restart();
+    public int countLeaseSets();
+
 }

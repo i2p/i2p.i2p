@@ -25,6 +25,7 @@ import net.i2p.data.i2cp.SessionConfig;
  * @author jrandom
  */
 public abstract class ClientManagerFacade implements Service {
+    public static final String PROP_CLIENT_ONLY = "i2cp.dontPublishLeaseSet";
     
     /**
      * Request that a particular client authorize the Leases contained in the 
@@ -71,6 +72,10 @@ public abstract class ClientManagerFacade implements Service {
     public abstract void messageReceived(ClientMessage msg);
     
     public boolean verifyClientLiveliness() { return true; }
+    /**
+     * Does the client specified want their leaseSet published?
+     */
+    public boolean shouldPublishLeaseSet(Hash destinationHash) { return true; }
 
 
     /**

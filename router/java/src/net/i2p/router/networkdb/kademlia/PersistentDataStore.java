@@ -59,6 +59,22 @@ class PersistentDataStore extends TransientDataStore {
         _context.jobQueue().addJob(new WriteJob(key, data));
     }
     
+    public int countLeaseSets() {
+        File dbDir = null;
+        try {
+            dbDir = getDbDir();
+        } catch (IOException ioe) { 
+            return 0;
+        }
+        if (dbDir == null)
+            return 0;
+        File leaseSetFiles[] = dbDir.listFiles(LeaseSetFilter.getInstance());
+        if (leaseSetFiles == null) 
+            return 0;
+        else
+            return leaseSetFiles.length;
+    }
+    
     private void accept(LeaseSet ls) {
         super.put(ls.getDestination().calculateHash(), ls);
     }

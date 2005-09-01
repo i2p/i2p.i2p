@@ -37,6 +37,9 @@ public class RepublishLeaseSetJob extends JobImpl {
     }
     public String getName() { return "Republish a local leaseSet"; }
     public void runJob() {
+        if (!getContext().clientManager().shouldPublishLeaseSet(_dest))
+            return;
+        
         try {
             if (getContext().clientManager().isLocal(_dest)) {
                 LeaseSet ls = _facade.lookupLeaseSetLocally(_dest);

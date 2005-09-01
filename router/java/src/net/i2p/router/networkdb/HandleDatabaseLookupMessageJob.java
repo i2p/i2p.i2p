@@ -75,9 +75,11 @@ public class HandleDatabaseLookupMessageJob extends JobImpl {
 
         LeaseSet ls = getContext().netDb().lookupLeaseSetLocally(_message.getSearchKey());
         if (ls != null) {
+            boolean publish = getContext().clientManager().shouldPublishLeaseSet(_message.getSearchKey());
+        
             // only answer a request for a LeaseSet if it has been published
             // to us, or, if its local, if we would have published to ourselves
-            if (answerAllQueries() || ls.getReceivedAsPublished()) {
+            if (publish && (answerAllQueries() || ls.getReceivedAsPublished())) {
                 getContext().statManager().addRateData("netDb.lookupsMatchedReceivedPublished", 1, 0);
                 sendData(_message.getSearchKey(), ls, fromKey, _message.getReplyTunnel());
             } else {
@@ -85,7 +87,7 @@ public class HandleDatabaseLookupMessageJob extends JobImpl {
                                                                             CLOSENESS_THRESHOLD,
                                                                             _message.getDontIncludePeers());
                 if (getContext().clientManager().isLocal(ls.getDestination())) {
-                    if (weAreClosest(routerInfoSet)) {
+                    if (publish && weAreClosest(routerInfoSet)) {
                         getContext().statManager().addRateData("netDb.lookupsMatchedLocalClosest", 1, 0);
                         sendData(_message.getSearchKey(), ls, fromKey, _message.getReplyTunnel());
                     } else {
