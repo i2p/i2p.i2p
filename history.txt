@@ -1,4 +1,6 @@
-$Id: history.txt,v 1.233 2005/08/31 19:26:20 jrandom Exp $
+$Id: history.txt,v 1.234 2005/09/01 01:55:02 jrandom Exp $
+
+* 2005-09-01  0.6.0.4 released
 
 2005-09-01  jrandom
     * Don't send out a netDb store of a router if it is more than a few hours
