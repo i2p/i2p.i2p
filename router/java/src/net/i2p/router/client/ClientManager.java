@@ -271,12 +271,16 @@ public class ClientManager {
     }
     
     public boolean shouldPublishLeaseSet(Hash destHash) { 
+        if (false) return true;
         if (destHash == null) return true;
         ClientConnectionRunner runner = getRunner(destHash);
         if (runner == null) return true;
         String dontPublish = runner.getConfig().getOptions().getProperty(ClientManagerFacade.PROP_CLIENT_ONLY);
-        if ( (dontPublish != null) && ("true".equals(dontPublish)) )
+        if ( (dontPublish != null) && ("true".equals(dontPublish)) ) {
+            if (_log.shouldLog(Log.INFO))
+                _log.info("Not publishing the leaseSet for " + destHash.toBase64());
             return false;
+        } 
         return true;
     }
 
