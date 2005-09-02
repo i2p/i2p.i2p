@@ -1,4 +1,6 @@
-$Id: history.txt,v 1.235 2005/09/01 15:27:35 jrandom Exp $
+$Id: history.txt,v 1.236 2005/09/02 13:34:14 jrandom Exp $
+
+* 2005-09-02  0.6.0.5 released
 
 2005-09-02  jrandom
     * Don't refuse to send a netDb store if the targetted peer has failed a 
