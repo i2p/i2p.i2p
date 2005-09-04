@@ -1,10 +1,10 @@
-$Id: history.txt,v 1.237 2005/09/02 14:10:05 jrandom Exp $
+$Id: history.txt,v 1.238 2005/09/04 14:15:51 jrandom Exp $
 
 2005-09-04  jrandom
     * Don't persist peer profiles until we are shutting down, as the 
       persistence process gobbles RAM and wall time.
     * Bugfix to allow you to check/uncheck the sharedClient setting on the
-      I2PTunnel web interface.
+      I2PTunnel web interface (thanks BarkerJr!)
     * Be more careful when expiring a failed tunnel message fragment so we 
       don't drop the data while attempting to read it.
 
