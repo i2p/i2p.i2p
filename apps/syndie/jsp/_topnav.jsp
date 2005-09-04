@@ -24,6 +24,7 @@ Logged in as: <b><jsp:getProperty property="username" name="user" />:</b>
 <a href="<%=HTMLRenderer.getPageURL(user.getBlog(), null, -1, -1, -1, user.getShowExpanded(), user.getShowImages())%>"><%=HTMLRenderer.sanitizeString(ArchiveViewerBean.getBlogName(user.getBlogStr()))%></a>
 <a href="<%=HTMLRenderer.getPostURL(user.getBlog())%>">Post</a>
 <a href="<%=HTMLRenderer.getMetadataURL(user.getBlog())%>">Metadata</a>
+<a href="addresses.jsp">Addressbook</a>
 <a href="index.jsp?logout=true">Logout</a><br />
 <%} else {%>
 Login: <input type="text" name="login" size="8" />

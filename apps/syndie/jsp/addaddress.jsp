@@ -14,13 +14,17 @@
     <td valign="top" align="left" rowspan="2"><jsp:include page="_rightnav.jsp" /></td></tr>
 <tr><td valign="top" align="left" colspan="3"><%
 String nameStr = request.getParameter("name");
+String protoStr = request.getParameter("proto");
 String locStr = request.getParameter("location");
 String schemaStr = request.getParameter("schema");
 String name = null;
+String proto = null;
 String location = null;
 String schema = null;
 try {
     name = DataHelper.getUTF8(Base64.decode(nameStr));
+    if ( (protoStr != null) && (protoStr.trim().length() > 0) )
+      proto = DataHelper.getUTF8(Base64.decode(protoStr));
     location = DataHelper.getUTF8(Base64.decode(locStr));
     schema = DataHelper.getUTF8(Base64.decode(schemaStr));
 } catch (NullPointerException npe) {
@@ -30,7 +34,7 @@ try {
 if ( (name == null) || (location == null) || (schema == null) ) {
   out.write("<b>No location specified</b>");
 } else if (user.getAuthenticated() && ("Add".equals(request.getParameter("action"))) ) {
-  out.write("<b>" + BlogManager.instance().addAddress(user, name, location, schema) + "</b>");
+  out.write("<b>" + BlogManager.instance().addAddress(user, name, proto, location, schema) + "</b>");
 } else { %>Are you sure you really want to add the
 addressbook mapping of <%=HTMLRenderer.sanitizeString(name)%> to
 <input type="text" size="20" value="<%=HTMLRenderer.sanitizeString(location)%>" />, applicable within the

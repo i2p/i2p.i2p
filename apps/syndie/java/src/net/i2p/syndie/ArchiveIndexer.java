@@ -158,7 +158,7 @@ class ArchiveIndexer {
             _headers.setProperty(header, value);
         }
         
-        public void receiveAddress(String name, String schema, String location, String anchorText) {}
+        public void receiveAddress(String name, String schema, String protocol, String location, String anchorText) {}
         public void receiveArchive(String name, String description, String locationSchema, String location, String postingKey, String anchorText) {}
         public void receiveAttachment(int id, String anchorText) {}
         public void receiveBegin() {}

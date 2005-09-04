@@ -353,6 +353,8 @@ public class FragmentHandler {
         _completed++;
         try {
             byte data[] = msg.toByteArray();
+            if (msg == null)
+                return;
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("RECV(" + data.length + "): " + Base64.encode(data)  
                            + " " + _context.sha().calculateHash(data).toBase64());

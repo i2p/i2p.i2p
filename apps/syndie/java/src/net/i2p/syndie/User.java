@@ -1,6 +1,7 @@
 package net.i2p.syndie;
 
 import java.io.UnsupportedEncodingException;
+import java.io.IOException;
 import java.util.*;
 import net.i2p.I2PAppContext;
 import net.i2p.data.*;
@@ -36,6 +37,7 @@ public class User {
     private int _webProxyPort;
     private String _torProxyHost;
     private int _torProxyPort;
+    private PetNameDB _petnames;
     
     public User() {
         _context = I2PAppContext.getGlobalContext();
@@ -62,6 +64,7 @@ public class User {
         _torProxyPort = -1;
         _lastLogin = -1;
         _lastMetaEntry = 0;
+        _petnames = new PetNameDB();
     }
     
     public boolean getAuthenticated() { return _authenticated; }
@@ -91,6 +94,8 @@ public class User {
     public int getWebProxyPort() { return _webProxyPort; }
     public String getTorProxyHost() { return _torProxyHost; }
     public int getTorProxyPort() { return _torProxyPort; }
+    
+    public PetNameDB getPetNameDB() { return _petnames; }
     
     public void invalidate() { 
         BlogManager.instance().saveUser(this);
@@ -156,8 +161,14 @@ public class User {
         }
         
         String addr = props.getProperty("addressbook", "userhosts.txt");
-        if (addr != null)
+        if (addr != null) {
             _addressbookLocation = addr;
+            try {
+                _petnames.load(addr);
+            } catch (IOException ioe) {
+                ioe.printStackTrace();
+            }
+        }
         
         String show = props.getProperty("showimages", "false");
         _showImagesByDefault = (show != null) && (show.equals("true"));

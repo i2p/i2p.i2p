@@ -479,8 +479,11 @@ public class IndexBean {
     public void setStartOnLoad(String moo) {
         _startOnLoad = true;
     }
-    public void setSharedClient(String moo) {
+    public void setShared(String moo) {
     	_sharedClient=true;
+    }
+    public void setShared(boolean val) {
+    	_sharedClient=val;
     }
     public void setConnectDelay(String moo) {
         _connectDelay = true;

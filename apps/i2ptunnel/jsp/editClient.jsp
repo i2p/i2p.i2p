@@ -166,9 +166,9 @@ if (curTunnel >= 0) {
 </td>
 <td>
 <% if (editBean.isSharedClient(curTunnel)) { %>
-<input type="checkbox" value="true" name="sharedClient" checked="true" />
+<input type="checkbox" value="true" name="shared" checked="true" />
 <% } else { %>
-<input type="checkbox" value="true" name="sharedClient" />
+<input type="checkbox" value="true" name="shared" />
 <% } %>
 <i>(Share tunnels with other clients and httpclients? Change requires restart of client proxy)</i>
 </td>

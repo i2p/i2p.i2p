@@ -214,15 +214,20 @@ public class FragmentedMessage {
         _completed = true;
     }
     public byte[] toByteArray() {
-        byte rv[] = new byte[getCompleteSize()];
-        writeComplete(rv, 0);
-        releaseFragments();
-        return rv;
+        synchronized (this) {
+            if (_releasedAfter > 0) return null;
+            byte rv[] = new byte[getCompleteSize()];
+            writeComplete(rv, 0);
+            releaseFragments();
+            return rv;
+        }
     }
     
     public long getReleasedAfter() { return _releasedAfter; }
     public void failed() {
-        releaseFragments();
+        synchronized (this) {
+            releaseFragments();
+        }
     }
 
     /**

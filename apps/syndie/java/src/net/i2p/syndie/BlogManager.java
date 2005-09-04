@@ -225,6 +225,7 @@ public class BlogManager {
         try {
             out = new FileOutputStream(userFile);
             out.write(DataHelper.getUTF8(user.export()));
+            user.getPetNameDB().store(user.getAddressbookLocation());
         } catch (IOException ioe) {
             ioe.printStackTrace();
         } finally {
@@ -399,7 +400,7 @@ public class BlogManager {
     }
     
     
-    public String addAddress(User user, String name, String location, String schema) {
+    public String addAddress(User user, String name, String protocol, String location, String schema) {
         if (!user.getAuthenticated()) return "Not logged in";
         boolean ok = validateAddressName(name);
         if (!ok) return "Invalid name: " + HTMLRenderer.sanitizeString(name);
@@ -408,19 +409,17 @@ public class BlogManager {
         if (!validateAddressSchema(schema)) return "Unsupported schema: " + HTMLRenderer.sanitizeString(schema);
         // no need to quote user/location further, as they've been sanitized
         
-        FileOutputStream out = null;
-        try {
-            File userHostsFile = new File(user.getAddressbookLocation());
-            Properties knownHosts = getKnownHosts(user, true);
-            if (knownHosts.containsKey(name)) return "Name is already in use";
+        PetNameDB names = user.getPetNameDB();
+        if (names.exists(name))
+            return "Name is already in use";
+        PetName pn = new PetName(name, schema, protocol, location);
+        names.set(name, pn);
         
-            out = new FileOutputStream(userHostsFile, true);
-            out.write(DataHelper.getUTF8(name + "=" + location + '\n'));
-            return "Address " + name + " written to your hosts file (" + userHostsFile.getName() + ")";
+        try {
+            names.store(user.getAddressbookLocation());
+            return "Address " + name + " written to your addressbook";
         } catch (IOException ioe) {
-            return "Error writing out host entry: " + ioe.getMessage();
-        } finally {
-            if (out != null) try { out.close(); } catch (IOException ioe) {}
+            return "Error writing out the name: " + ioe.getMessage();
         }
     }
     
@@ -455,12 +454,17 @@ public class BlogManager {
 
     private boolean validateAddressLocation(String location) {
         if ( (location == null) || (location.trim().length() <= 0) ) return false;
-        try {
-            Destination d = new Destination(location);
-            return (d.getPublicKey() != null);
-        } catch (DataFormatException dfe) {
-            dfe.printStackTrace();
-            return false;
+        if (false) {
+            try {
+                Destination d = new Destination(location);
+                return (d.getPublicKey() != null);
+            } catch (DataFormatException dfe) {
+                dfe.printStackTrace();
+                return false;
+            }
+        } else {
+            // not everything is an i2p destination...
+            return true;
         }
     }
 

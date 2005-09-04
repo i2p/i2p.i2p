@@ -25,7 +25,7 @@ public class EventReceiverImpl implements SMLParser.EventReceiver {
     public void receiveImage(String alternateText, int attachmentId) {
         System.out.println("Receive image [" + alternateText + "]/[" + attachmentId + "]");
     }
-    public void receiveAddress(String name, String schema, String location, String anchorText) {
+    public void receiveAddress(String name, String schema, String protocol, String location, String anchorText) {
         System.out.println("Receive address [" + name + "]/[" + schema + "]/[" + location + "]/[" + anchorText+ "]");
     }
     public void receiveBold(String text) { System.out.println("Receive bold [" + text+ "]"); }

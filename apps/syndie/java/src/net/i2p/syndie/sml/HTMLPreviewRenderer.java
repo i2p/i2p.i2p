@@ -94,11 +94,20 @@ public class HTMLPreviewRenderer extends HTMLRenderer {
             _postBodyBuffer.append("<b>Addresses:</b> ");
             for (int i = 0; i < _addresses.size(); i++) {
                 Address a = (Address)_addresses.get(i);
-                _postBodyBuffer.append("<a href=\"addaddress.jsp?schema=");
-                _postBodyBuffer.append(sanitizeURL(a.schema)).append("&location=");
-                _postBodyBuffer.append(sanitizeURL(a.location)).append("&name=");
-                _postBodyBuffer.append(sanitizeURL(a.name));
-                _postBodyBuffer.append("\">").append(sanitizeString(a.name));
+                
+                String knownName = null;
+                if (_user != null)
+                    knownName = _user.getPetNameDB().getNameByLocation(a.location);
+                if (knownName != null) {
+                    _postBodyBuffer.append(' ').append(sanitizeString(knownName));
+                } else {
+                    _postBodyBuffer.append(" <a href=\"addaddress.jsp?schema=");
+                    _postBodyBuffer.append(sanitizeURL(a.schema)).append("&location=");
+                    _postBodyBuffer.append(sanitizeURL(a.location)).append("&name=");
+                    _postBodyBuffer.append(sanitizeURL(a.protocol)).append("&protocol=");
+                    _postBodyBuffer.append(sanitizeURL(a.name));
+                    _postBodyBuffer.append("\">").append(sanitizeString(a.name));
+                }
             }
             _postBodyBuffer.append("<br />\n");
         }

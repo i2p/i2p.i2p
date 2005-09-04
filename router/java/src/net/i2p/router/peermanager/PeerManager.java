@@ -39,7 +39,7 @@ class PeerManager {
         _organizer.setUs(context.routerHash());
         loadProfiles();
         _context.jobQueue().addJob(new EvaluateProfilesJob(_context));
-        _context.jobQueue().addJob(new PersistProfilesJob(_context, this));
+        //_context.jobQueue().addJob(new PersistProfilesJob(_context, this));
     }
     
     void storeProfiles() {

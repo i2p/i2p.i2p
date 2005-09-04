@@ -211,6 +211,7 @@ public class SMLParser {
     private static final String P_ADDRESS_NAME = "name";
     private static final String P_ADDRESS_LOCATION = "location";
     private static final String P_ADDRESS_SCHEMA = "schema";
+    private static final String P_ADDRESS_PROTOCOL = "proto";
     private static final String P_ATTACHMENT_ID = "id";
     private static final String P_ARCHIVE_NAME = "name";
     private static final String P_ARCHIVE_DESCRIPTION = "description";
@@ -254,7 +255,7 @@ public class SMLParser {
         } else if (T_LINK.equals(tagName)) {
             receiver.receiveLink(getString(P_LINK_SCHEMA, attr), getString(P_LINK_LOCATION, attr), body);
         } else if (T_ADDRESS.equals(tagName)) {
-            receiver.receiveAddress(getString(P_ADDRESS_NAME, attr), getString(P_ADDRESS_SCHEMA, attr), getString(P_ADDRESS_LOCATION, attr), body);
+            receiver.receiveAddress(getString(P_ADDRESS_NAME, attr), getString(P_ADDRESS_SCHEMA, attr), getString(P_ADDRESS_PROTOCOL, attr), getString(P_ADDRESS_LOCATION, attr), body);
         } else if (T_H1.equals(tagName)) {
             receiver.receiveH1(body);
         } else if (T_H2.equals(tagName)) {
@@ -381,7 +382,7 @@ public class SMLParser {
         public void receiveArchive(String name, String description, String locationSchema, String location, 
                                    String postingKey, String anchorText);
         public void receiveImage(String alternateText, int attachmentId);
-        public void receiveAddress(String name, String schema, String location, String anchorText);
+        public void receiveAddress(String name, String schema, String protocol, String location, String anchorText);
         public void receiveAttachment(int id, String anchorText);
         public void receiveBold(String text);
         public void receiveItalic(String text);

@@ -102,12 +102,12 @@ public class ArchiveViewerBean {
         out.write(SEL_ALL);
         out.write("\">All posts from all blogs</option>\n");
         
-        Map groups = null;
+        List groups = null;
         if (user != null)
-            groups = user.getBlogGroups();
+            groups = user.getPetNameDB().getGroups();
         if (groups != null) {
-            for (Iterator iter = groups.keySet().iterator(); iter.hasNext(); ) {
-                String name = (String)iter.next();
+            for (int i = 0; i < groups.size(); i++) {
+                String name = (String)groups.get(i);
                 out.write("<option value=\"group://" + Base64.encode(DataHelper.getUTF8(name)) + "\">" +
                           "Group: " + HTMLRenderer.sanitizeString(name) + "</option>\n");
             }
@@ -226,6 +226,7 @@ public class ArchiveViewerBean {
         if (blogStr != null) blog = new Hash(Base64.decode(blogStr));
         String tag = getString(parameters, PARAM_TAG);
         if (tag != null) tag = DataHelper.getUTF8(Base64.decode(tag));
+        
         long entryId = -1;
         if (blogStr != null) {
             String entryIdStr = getString(parameters, PARAM_ENTRY);
@@ -237,6 +238,14 @@ public class ArchiveViewerBean {
         if (group != null) group = DataHelper.getUTF8(Base64.decode(group));
         
         String sel = getString(parameters, PARAM_SELECTOR);
+        
+        if (getString(parameters, "action") != null) {
+            tag = null;
+            blog = null;
+            sel = null;
+            group = null;
+        }
+        
         if ( (sel == null) && (blog == null) && (group == null) && (tag == null) )
             sel = getDefaultSelector(user, parameters);
         if (sel != null) {
@@ -453,11 +462,41 @@ public class ArchiveViewerBean {
                     else
                         index.selectMatchesOrderByEntryId(rv, s.blog, s.tag);
                 }
-                return rv;
             }
+            PetNameDB db = user.getPetNameDB();
+            for (Iterator iter = db.getNames().iterator(); iter.hasNext(); ) {
+                String name = (String)iter.next();
+                PetName pn = db.get(name);
+                if ("syndie".equals(pn.getNetwork()) && "syndieblog".equals(pn.getProtocol()) && pn.isMember(group)) {
+                    byte pnLoc[] = Base64.decode(pn.getLocation());
+                    if (pnLoc != null) {
+                        Hash pnHash = new Hash(pnLoc);
+                        index.selectMatchesOrderByEntryId(rv, pnHash, null);
+                    }
+                }
+            }
+            if (rv.size() > 0)
+                return rv;
         }
         index.selectMatchesOrderByEntryId(rv, blog, tag);
+        filterIgnored(user, rv);
         return rv;
+    }
+    
+    private static void filterIgnored(User user, List uris) {
+        for (int i = 0; i < uris.size(); i++) {
+            BlogURI uri = (BlogURI)uris.get(i);
+            Hash k = uri.getKeyHash();
+            if (k == null) continue;
+            String pname = user.getPetNameDB().getNameByLocation(k.toBase64());
+            if (pname != null) {
+                PetName pn = user.getPetNameDB().get(pname);
+                if ( (pn != null) && (pn.isMember("Ignore")) ) {
+                    uris.remove(i);
+                    i--;
+                }
+            }
+        }
     }
     
     public static final String getString(Map parameters, String param) {

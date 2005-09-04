@@ -408,7 +408,7 @@ class PeerTestManager {
                 charlieInfo = _context.netDb().lookupRouterInfoLocally(charlie.getRemotePeer());
         }
         
-        if (charlie == null) {
+        if ( (charlie == null) || (charlieInfo == null) ) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Unable to pick a charlie");
             return;

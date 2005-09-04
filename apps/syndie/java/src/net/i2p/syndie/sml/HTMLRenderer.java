@@ -387,25 +387,37 @@ public class HTMLRenderer extends EventReceiverImpl {
         public String name;
         public String schema;
         public String location;
+        public String protocol;
         public int hashCode() { return -1; }
         public boolean equals(Object o) {
             Address a = (Address)o;
-            return DataHelper.eq(schema, a.schema) && DataHelper.eq(location, a.location) && DataHelper.eq(name, a.name);
+            return DataHelper.eq(schema, a.schema) && DataHelper.eq(location, a.location) && DataHelper.eq(protocol, a.protocol) && DataHelper.eq(name, a.name);
         }
     }
-    public void receiveAddress(String name, String schema, String location, String anchorText) {
+    public void receiveAddress(String name, String schema, String protocol, String location, String anchorText) {
         Address a = new Address();
         a.name = name;
         a.schema = schema;
         a.location = location;
+        a.protocol = protocol;
         if (!_addresses.contains(a))
             _addresses.add(a);
         if (!continueBody()) { return; }
         if ( (schema == null) || (location == null) ) return;
-        _bodyBuffer.append("<a href=\"addaddress.jsp?schema=");
-        _bodyBuffer.append(sanitizeURL(schema)).append("&name=");
-        _bodyBuffer.append(sanitizeURL(name)).append("&location=");
-        _bodyBuffer.append(sanitizeURL(location)).append("\">").append(sanitizeString(anchorText)).append("</a>");
+        String knownName = null;
+        if (_user != null)
+            knownName = _user.getPetNameDB().getNameByLocation(location);
+        if (knownName != null) {
+            _bodyBuffer.append(sanitizeString(anchorText));
+            _bodyBuffer.append(" <i>(").append(sanitizeString(knownName)).append(")</i>");
+        } else {
+            System.err.println("Receiving address [" + location + "]");
+            _bodyBuffer.append("<a href=\"addaddress.jsp?schema=");
+            _bodyBuffer.append(sanitizeURL(schema)).append("&name=");
+            _bodyBuffer.append(sanitizeURL(name)).append("&protocol=");
+            _bodyBuffer.append(sanitizeURL(protocol)).append("&location=");
+            _bodyBuffer.append(sanitizeURL(location)).append("\">").append(sanitizeString(anchorText)).append("</a>");
+        }
     }
     
     public void receiveAttachment(int id, String anchorText) {
@@ -540,11 +552,20 @@ public class HTMLRenderer extends EventReceiverImpl {
                 _postBodyBuffer.append("<b>Addresses:</b>");
                 for (int i = 0; i < _addresses.size(); i++) {
                     Address a = (Address)_addresses.get(i);
-                    _postBodyBuffer.append(" <a href=\"addaddress.jsp?schema=");
-                    _postBodyBuffer.append(sanitizeURL(a.schema)).append("&location=");
-                    _postBodyBuffer.append(sanitizeURL(a.location)).append("&name=");
-                    _postBodyBuffer.append(sanitizeURL(a.name));
-                    _postBodyBuffer.append("\">").append(sanitizeString(a.name));
+                    
+                    String knownName = null;
+                    if (_user != null)
+                        knownName = _user.getPetNameDB().getNameByLocation(a.location);
+                    if (knownName != null) {
+                        _postBodyBuffer.append(' ').append(sanitizeString(knownName));
+                    } else {
+                        _postBodyBuffer.append(" <a href=\"addaddress.jsp?schema=");
+                        _postBodyBuffer.append(sanitizeURL(a.schema)).append("&location=");
+                        _postBodyBuffer.append(sanitizeURL(a.location)).append("&name=");
+                        _postBodyBuffer.append(sanitizeURL(a.name)).append("&protocol=");
+                        _postBodyBuffer.append(sanitizeURL(a.protocol));
+                        _postBodyBuffer.append("\">").append(sanitizeString(a.name));
+                    }
                 }
                 _postBodyBuffer.append("<br />\n");
             }
@@ -632,20 +653,47 @@ public class HTMLRenderer extends EventReceiverImpl {
         if ( (tags != null) && (tags.length > 0) )
             _preBodyBuffer.append("<form action=\"index.jsp\">");
         _preBodyBuffer.append("<td nowrap=\"true\" align=\"right\" valign=\"top\" class=\"syndieEntryMetaCell\">\n");
+        
+        String knownName = null;
+        if ( (_entry != null) && (_user != null) )
+            knownName = _user.getPetNameDB().getNameByLocation(_entry.getURI().getKeyHash().toBase64());
+        //if (knownName != null)
+        //    _preBodyBuffer.append("Pet name: ").append(sanitizeString(knownName)).append(" ");
+
         BlogInfo info = null;
         if (_entry != null) 
             info = _archive.getBlogInfo(_entry.getURI());
         if (info != null) {
             _preBodyBuffer.append("<a href=\"").append(getMetadataURL()).append("\">");
-            String nameStr = info.getProperty("Name");
-            if (nameStr == null)
-                _preBodyBuffer.append("[no name]");
-            else
-                _preBodyBuffer.append(sanitizeString(nameStr));
+            if (knownName != null) {
+                _preBodyBuffer.append(sanitizeString(knownName));
+            } else {
+                String nameStr = info.getProperty("Name");
+                if (nameStr == null)
+                    _preBodyBuffer.append("[no name]");
+                else
+                    _preBodyBuffer.append(sanitizeString(nameStr));
+            }
             _preBodyBuffer.append("</a>");
         } else {
             _preBodyBuffer.append("[unknown blog]");
         }
+
+        
+        if ( (_user != null) && (_user.getAuthenticated()) && (_entry != null) ) {
+            PetName pn = _user.getPetNameDB().get(knownName);
+            if ( (pn == null) || (!pn.isMember("Favorites")) )
+                _preBodyBuffer.append(" <input type=\"submit\" name=\"action\" value=\"Bookmark blog\" />");
+            if ( (pn == null) || (!pn.isMember("Ignore")) )
+                _preBodyBuffer.append(" <input type=\"submit\" name=\"action\" value=\"Ignore blog\" />");
+            else
+                _preBodyBuffer.append(" <input type=\"submit\" name=\"action\" value=\"Unignore blog\" />");
+            _preBodyBuffer.append(" <input type=\"hidden\" name=\"blog\" value=\"").append(_entry.getURI().getKeyHash().toBase64()).append("\" />");
+            if (info != null)
+                _preBodyBuffer.append(" <input type=\"hidden\" name=\"name\" value=\"").append(sanitizeTagParam(info.getProperty("Name"))).append("\" />");
+        }
+
+        
         if ( (tags != null) && (tags.length > 0) ) {
             _preBodyBuffer.append(" Tags: ");
             _preBodyBuffer.append("<select name=\"selector\">");
@@ -680,8 +728,9 @@ public class HTMLRenderer extends EventReceiverImpl {
             _preBodyBuffer.append(getEntryDate(_entry.getURI().getEntryId()));
         else
             _preBodyBuffer.append(getEntryDate(new Date().getTime()));
-        if ( (_user != null) && (_user.getAuthenticated()) )
+        if ( (_user != null) && (_user.getAuthenticated()) ) {
             _preBodyBuffer.append(" <a href=\"").append(getPostURL(_user.getBlog(), true)).append("\">Reply</a>\n");
+        }
         _preBodyBuffer.append("\n</td>");
         if ( (tags != null) && (tags.length > 0) )
             _preBodyBuffer.append("</form>");
@@ -694,7 +743,7 @@ public class HTMLRenderer extends EventReceiverImpl {
             try {
                 String str = _dateFormat.format(new Date(when));
                 long dayBegin = _dateFormat.parse(str).getTime();
-                return str + "." + (when - dayBegin);
+                return str + " [" + (when - dayBegin) + "]";
             } catch (ParseException pe) {
                 pe.printStackTrace();
                 // wtf
