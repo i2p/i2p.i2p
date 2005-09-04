@@ -141,11 +141,31 @@ if (!user.getAuthenticated()) {
         out.write(buf.toString());
         buf.setLength(0);
     }
+
+    String net = request.getParameter("network");
+    String proto = request.getParameter("protocol");
+    String name = request.getParameter("name");
+    String loc = request.getParameter("location");
+    boolean active = (request.getParameter("action") != null);
+    if (net == null || active) net = "";
+    if (proto == null || active) proto = "";
+    if (name == null || active) name = "";
+    if (loc == null || active) loc= "";
     %>
-    <tr><form action="addresses.jsp" method="POST"><td><input type="text" name="name" size="20" /></td>
-        <td><select name="network"><option value="i2p">I2P</option><option value="syndie">Syndie</option><option value="tor">Tor</option><option value="freenet">Freenet</option><option value="internet">Internet</option></select></td>
-        <td><select name="protocol"><option value="http">HTTP</option><option value="irc">IRC</option><option value="i2phex">I2Phex</option><option value="syndiearchive">Syndie archive</option><option value="syndieblog">Syndie blog</option></select></td>
-        <td><input type="text" size="50" name="location" /></td>
+    <tr><form action="addresses.jsp" method="POST"><td><input type="text" name="name" size="20" value="<%=name%>" /></td>
+        <td><select name="network">
+            <option value="i2p" <%="i2p".equals(net) ? " selected=\"true\" " : ""%>>I2P</option>
+            <option value="syndie" <%="syndie".equals(net) ? " selected=\"true\" " : ""%>>Syndie</option>
+            <option value="tor" <%="tor".equals(net) ? " selected=\"true\" " : ""%>>Tor</option>
+            <option value="freenet" <%="freenet".equals(net) ? " selected=\"true\" " : ""%>>Freenet</option>
+            <option value="internet" <%="internet".equals(net) ? " selected=\"true\" " : ""%>>Internet</option></select></td>
+        <td><select name="protocol">
+            <option value="http" <%="http".equals(proto) ? " selected=\"true\" " : ""%>>HTTP</option>
+            <option value="irc" <%="irc".equals(proto) ? " selected=\"true\" " : ""%>>IRC</option>
+            <option value="i2phex" <%="i2phex".equals(proto) ? " selected=\"true\" " : ""%>>I2Phex</option>
+            <option value="syndiearchive" <%="syndiearchive".equals(proto) ? " selected=\"true\" " : ""%>>Syndie archive</option>
+            <option value="syndieblog" <%="syndieblog".equals(proto) ? " selected=\"true\" " : ""%>>Syndie blog</option></select></td>
+        <td><input type="text" size="50" name="location" value="<%=loc%>" /></td>
         <td><input type="checkbox" name="isPublic" /></td>
         <td><input type="text" name="groups" size="10" /></td>
         <td><input type="submit" name="action" value="Add" /></td>

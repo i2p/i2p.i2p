@@ -578,6 +578,9 @@ public class HTMLRenderer extends EventReceiverImpl {
                     _postBodyBuffer.append("\">").append(sanitizeString(a.name)).append("</a>");
                     if (a.description != null)
                         _postBodyBuffer.append(": ").append(sanitizeString(a.description));
+                    _postBodyBuffer.append(" <a href=\"");
+                    _postBodyBuffer.append(getBookmarkURL(a.name, a.location, a.locationSchema, "syndiearchive"));
+                    _postBodyBuffer.append("\">bookmark</a>");
                 }
                 _postBodyBuffer.append("<br />\n");
             }
@@ -868,5 +871,12 @@ public class HTMLRenderer extends EventReceiverImpl {
                //+ "action=Continue..." // should this be the case?
                + "&schema=" + sanitizeTagParam(archiveLocation.getSchema()) 
                + "&location=" + sanitizeTagParam(archiveLocation.getLocation());
+    }
+    public static String getBookmarkURL(String name, String location, String schema, String protocol) {
+        return "addresses.jsp?name=" + sanitizeTagParam(name)
+               + "&network=" + sanitizeTagParam(schema)
+               + "&protocol=" + sanitizeTagParam(protocol)
+               + "&location=" + sanitizeTagParam(location);
+               
     }
 }

@@ -1,4 +1,4 @@
-<%@page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" import="net.i2p.syndie.web.*" %>
+<%@page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" import="net.i2p.syndie.web.*, net.i2p.syndie.*, net.i2p.syndie.sml.*, java.util.*" %>
 <% request.setCharacterEncoding("UTF-8"); %>
 <jsp:useBean scope="session" class="net.i2p.syndie.web.RemoteArchiveBean" id="remote" />
 <jsp:useBean scope="session" class="net.i2p.syndie.User" id="user" />
@@ -25,13 +25,27 @@ if (!user.getAuthenticated() || !user.getAllowAccessRemote()) {
  <option value="feedspace" <%=("feedspace".equals(request.getParameter("schema")) ? "selected=\"true\"" : "")%>>Feedspace</option>
  <option value="usenet" <%=("usenet".equals(request.getParameter("schema")) ? "selected=\"true\"" : "")%>>Usenet</option>
 </select> 
-Proxy <input type="text" size="10" name="proxyhost" value="localhost" />:<input type="text" size="4" name="proxyport" value="4444" />
-<input name="location" size="40" value="<%=(request.getParameter("location") != null ? request.getParameter("location") : "")%>" /> 
+Proxy <input type="text" size="10" name="proxyhost" value="localhost" />:<input type="text" size="4" name="proxyport" value="4444" /><br />
+Bookmarked archives: <select name="archivepetname"><option value="">Custom location</option><%
+for (Iterator iter = user.getPetNameDB().getNames().iterator(); iter.hasNext(); ) {
+  PetName pn = user.getPetNameDB().get((String)iter.next());
+  if ("syndiearchive".equals(pn.getProtocol())) {
+    %><option value="<%=HTMLRenderer.sanitizeTagParam(pn.getName())%>"><%=HTMLRenderer.sanitizeString(pn.getName())%></option><%
+  }
+}
+%></select> or 
+<input name="location" size="30" value="<%=(request.getParameter("location") != null ? request.getParameter("location") : "")%>" /> 
 <input type="submit" name="action" value="Continue..." /><br />
 <%
   String action = request.getParameter("action");
   if ("Continue...".equals(action)) {
-    remote.fetchIndex(user, request.getParameter("schema"), request.getParameter("location"), request.getParameter("proxyhost"), request.getParameter("proxyport"));
+    String location = request.getParameter("location");
+    String pn = request.getParameter("archivepetname");
+    if ( (pn != null) && (pn.trim().length() > 0) ) {
+      PetName pnval = user.getPetNameDB().get(pn);
+      if (pnval != null) location = pnval.getLocation();
+    }
+    remote.fetchIndex(user, request.getParameter("schema"), location, request.getParameter("proxyhost"), request.getParameter("proxyport"));
   } else if ("Fetch metadata".equals(action)) {
     remote.fetchMetadata(user, request.getParameterMap());
   } else if ("Fetch selected entries".equals(action)) {
