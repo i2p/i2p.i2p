@@ -72,10 +72,13 @@ public class BlogManager {
                 for (Iterator iter = p.keySet().iterator(); iter.hasNext(); ) {
                     String key = (String)iter.next();
                     System.setProperty(key, p.getProperty(key));
+                    System.out.println("Read config prop [" + key + "] = [" + p.getProperty(key) + "]");
                 }
             } catch (IOException ioe) {
                 ioe.printStackTrace();
             }
+        } else {
+            System.out.println("Config doesn't exist: " + config.getPath());
         }
     }
     
@@ -215,6 +218,30 @@ public class BlogManager {
         String pass = _context.getProperty("syndie.registrationPassword");
         if ( (pass == null) || (pass.trim().length() <= 0) ) return null;
         return pass; 
+    }
+    
+    /** Password required to access the remote syndication functinoality (null means no password required) */
+    public String getRemotePassword() { 
+        String pass = _context.getProperty("syndie.remotePassword");
+        
+        System.out.println("Remote password? [" + pass + "]");
+        if ( (pass == null) || (pass.trim().length() <= 0) ) return null;
+        return pass;
+    }
+    
+    public String authorizeRemoteAccess(User user, String password) {
+        if (!user.getAuthenticated()) return "Not logged in";
+        String remPass = getRemotePassword();
+        if (remPass == null)
+            return "Remote access password not configured - please specify 'syndie.remotePassword' in your syndie.config";
+        
+        if (remPass.equals(password)) {
+            user.setAllowAccessRemote(true);
+            saveUser(user);
+            return "Remote access authorized";
+        } else {
+            return "Remote access denied";
+        }
     }
     
     public void saveUser(User user) {
