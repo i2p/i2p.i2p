@@ -475,6 +475,7 @@ public class ArchiveViewerBean {
                     }
                 }
             }
+            sort(rv);
             if (rv.size() > 0)
                 return rv;
         }
@@ -497,6 +498,19 @@ public class ArchiveViewerBean {
                 }
             }
         }
+    }
+    
+    private static void sort(List uris) {
+        TreeMap ordered = new TreeMap();
+        while (uris.size() > 0) {
+            BlogURI uri = (BlogURI)uris.remove(0);
+            int off = 0;
+            while (ordered.containsKey(new Long(0 - off - uri.getEntryId())))
+                off++;
+            ordered.put(new Long(0-off-uri.getEntryId()), uri);
+        }
+        for (Iterator iter = ordered.values().iterator(); iter.hasNext(); )
+            uris.add(iter.next());
     }
     
     public static final String getString(Map parameters, String param) {
