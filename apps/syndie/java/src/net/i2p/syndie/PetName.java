@@ -76,15 +76,11 @@ public class PetName {
                 _groups.add(gtok.nextToken().trim());
             s = tok.nextToken(); // skip past the :
         }
-        if (tok.hasMoreTokens()) {
-            s = tok.nextToken();
-            if (":".equals(s)) {
-                _location = null;
-            } else {
-                _location = s;
-            }
-        } else {
-            _location = null;
+        while (tok.hasMoreTokens()) {
+            if (_location == null)
+                _location = tok.nextToken();
+            else
+                _location = _location + tok.nextToken();
         }
     }
     
@@ -161,15 +157,16 @@ public class PetName {
     }
     
     public static void main(String args[]) {
-        test("a:b:c:d:e:f");
-        test("a:::::d");
-        test("a:::::");
-        test("a:b::::");
-        test(":::::");
+        test("a:b:c:true:e:f");
+        test("a:::true::d");
+        test("a:::true::");
+        test("a:b::true::");
+        test(":::trye::");
+        test("a:b:c:true:e:http://foo.bar");
     }
     private static void test(String line) {
         PetName pn = new PetName(line);
         String val = pn.toString();
-        System.out.println("OK? " + val.equals(line) + ": " + line);
+        System.out.println("OK? " + val.equals(line) + ": " + line + " [" + val + "]");
     }
 }

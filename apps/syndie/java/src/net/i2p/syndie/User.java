@@ -98,7 +98,8 @@ public class User {
     public PetNameDB getPetNameDB() { return _petnames; }
     
     public void invalidate() { 
-        BlogManager.instance().saveUser(this);
+        if (_authenticated)
+            BlogManager.instance().saveUser(this);
         init(); 
     }
     
