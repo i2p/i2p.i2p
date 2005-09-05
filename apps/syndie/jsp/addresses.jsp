@@ -28,6 +28,8 @@ if (!user.getAuthenticated()) {
           cur.setIsPublic(null != request.getParameter("isPublic"));
           cur.setLocation(request.getParameter("location"));
           cur.setGroups(request.getParameter("groups"));
+          names.remove(oldPetname);
+          names.set(cur.getName(), cur);
           names.store(user.getAddressbookLocation());
           %><b>Address updated</b><%
         }

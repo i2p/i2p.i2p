@@ -118,11 +118,21 @@ public class ArchiveViewerBean {
         
         for (int i = 0; i < index.getNewestBlogCount(); i++) {
             Hash cur = index.getNewestBlog(i);
+            String knownName = user.getPetNameDB().getNameByLocation(cur.toBase64());
+            PetName pn = null;
+            if (knownName != null) {
+                pn = user.getPetNameDB().get(knownName);
+                knownName = pn.getName();
+            }
+            if ( (pn != null) && (pn.isMember("Ignore")) )
+                continue;
             String blog = Base64.encode(cur.getData());
             out.write("<option value=\"blog://" + blog + "\">");
             out.write("New blog: ");
             BlogInfo info = archive.getBlogInfo(cur);
-            String name = info.getProperty(BlogInfo.NAME);
+            String name = knownName;
+            if ( (name == null) && (info != null) ) 
+                name = info.getProperty(BlogInfo.NAME);
             if (name != null)
                 name = HTMLRenderer.sanitizeString(name);
             else
@@ -131,24 +141,43 @@ public class ArchiveViewerBean {
             out.write("</option>\n");
         }
         
-        List allTags = new ArrayList();
+        ////List allTags = new ArrayList();
         // perhaps sort this by name (even though it isnt unique...)
         Set blogs = index.getUniqueBlogs();
         for (Iterator iter = blogs.iterator(); iter.hasNext(); ) {
             Hash cur = (Hash)iter.next();
+            String knownName = user.getPetNameDB().getNameByLocation(cur.toBase64());
+            PetName pn = null;
+            if (knownName != null) {
+                pn = user.getPetNameDB().get(knownName);
+                knownName = pn.getName();
+            }
+            if ( (pn != null) && (pn.isMember("Ignore")) )
+                continue;
+         
             String blog = Base64.encode(cur.getData());
             out.write("<option value=\"blog://");
             out.write(blog);
             out.write("\">");
             BlogInfo info = archive.getBlogInfo(cur);
-            String name = info.getProperty(BlogInfo.NAME);
+            String name = knownName;
+            if ( (name == null) && (info != null) ) 
+                name = info.getProperty(BlogInfo.NAME);
             if (name != null)
                 name = HTMLRenderer.sanitizeString(name);
             else
                 name = Base64.encode(cur.getData());
             out.write(name);
-            out.write("- all posts</option>\n");
+            if (info != null) {
+                int howMany = index.getBlogEntryCount(info.getKey().calculateHash());
+                if (howMany == 1)
+                    out.write(" [1 post]");
+                else
+                    out.write(" [" + howMany + " posts]");
+            }
+            out.write("</option>\n");
             
+            /*
             List tags = index.getBlogTags(cur);
             for (int j = 0; j < tags.size(); j++) {
                 String tag = (String)tags.get(j);
@@ -190,7 +219,9 @@ public class ArchiveViewerBean {
                 out.write(tag);
                 out.write("&quot;</option>\n");
             }
+             */
         }
+        /*
         for (int i = 0; i < allTags.size(); i++) {
             String tag = (String)allTags.get(i);
             out.write("<option value=\"tag://");
@@ -199,6 +230,7 @@ public class ArchiveViewerBean {
             out.write(tag);
             out.write("&quot;</option>\n");
         }
+         */
         out.write("</select>");
         
         int numPerPage = getInt(parameters, PARAM_NUM_PER_PAGE, 5);
@@ -224,11 +256,12 @@ public class ArchiveViewerBean {
         String blogStr = getString(parameters, PARAM_BLOG);
         Hash blog = null;
         if (blogStr != null) blog = new Hash(Base64.decode(blogStr));
+        if ( (blog != null) && (blog.getData() == null) ) blog = null;
         String tag = getString(parameters, PARAM_TAG);
         if (tag != null) tag = DataHelper.getUTF8(Base64.decode(tag));
         
         long entryId = -1;
-        if (blogStr != null) {
+        if (blog != null) {
             String entryIdStr = getString(parameters, PARAM_ENTRY);
             try { 
                 entryId = Long.parseLong(entryIdStr); 
@@ -285,11 +318,20 @@ public class ArchiveViewerBean {
                 if (selector.startsWith(SEL_BLOG)) {
                     String blogStr = selector.substring(SEL_BLOG.length());
                     System.out.println("Selector [" + selector + "] blogString: [" + blogStr + "]");
-                    blog = new Hash(Base64.decode(blogStr));
+                    byte h[] = Base64.decode(blogStr);
+                    if (h != null)
+                        blog = new Hash(h);
+                    else
+                        System.out.println("blog string does not decode properly: [" + blogStr + "]");
                 } else if (selector.startsWith(SEL_BLOGTAG)) {
                     int tagStart = selector.lastIndexOf('/');
                     String blogStr = selector.substring(SEL_BLOGTAG.length(), tagStart);
                     blog = new Hash(Base64.decode(blogStr));
+                    if (blog.getData() == null) {
+                        System.out.println("Blog string [" + blogStr + "] does not decode");
+                        blog = null;
+                        return;
+                    }
                     tag = selector.substring(tagStart+1);
                     String origTag = tag;
                     byte rawDecode[] = null;
@@ -336,7 +378,11 @@ public class ArchiveViewerBean {
                     String entryStr = selector.substring(entryStart+1);
                     try {
                         entry = Long.parseLong(entryStr);
-                        blog = new Hash(Base64.decode(blogStr));
+                        Hash h = new Hash(Base64.decode(blogStr));
+                        if (h.getData() != null)
+                            blog = h;
+                        else
+                            System.out.println("Blog does not decode [" + blogStr + "]");
                         System.out.println("Selector [" + selector + "] blogString: [" + blogStr + "] entry: [" + entry + "]");
                     } catch (NumberFormatException nfe) {}
                 } else if (selector.startsWith(SEL_GROUP)) {
@@ -444,6 +490,8 @@ public class ArchiveViewerBean {
     }
     
     private static List pickEntryURIs(User user, ArchiveIndex index, Hash blog, String tag, long entryId, String group) {
+        if ( (blog != null) && ( (blog.getData() == null) || (blog.getData().length != Hash.HASH_LENGTH) ) ) 
+            blog = null;
         List rv = new ArrayList(16);
         if ( (blog != null) && (entryId >= 0) ) {
             rv.add(new BlogURI(blog, entryId));

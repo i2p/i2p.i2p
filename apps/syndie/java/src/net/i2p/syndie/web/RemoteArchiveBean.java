@@ -51,6 +51,12 @@ public class RemoteArchiveBean {
         return buf.toString();
     }
     
+    private boolean ignoreBlog(User user, Hash blog) {
+        PetNameDB db = user.getPetNameDB();
+        String name = db.getNameByLocation(blog.toBase64());
+        return ( (name != null) && (db.get(name).isMember("Ignore")) );
+    }
+    
     public void fetchMetadata(User user, Map parameters) {
         String meta = ArchiveViewerBean.getString(parameters, "blog");
         if (meta == null) return;
@@ -61,11 +67,17 @@ public class RemoteArchiveBean {
             for (Iterator iter = remoteBlogs.iterator(); iter.hasNext(); ) {
                 Hash blog = (Hash)iter.next();
                 if (!localBlogs.contains(blog)) {
-                    blogs.add(blog);
+                    if (!ignoreBlog(user, blog))
+                        blogs.add(blog);
                 }
             }
         } else {
-            blogs.add(new Hash(Base64.decode(meta.trim())));
+            byte h[] = Base64.decode(meta.trim());
+            if (h != null) {
+                Hash blog = new Hash(h);
+                if (!ignoreBlog(user, blog))
+                    blogs.add(blog);
+            }
         }
         List urls = new ArrayList(blogs.size());
         List tmpFiles = new ArrayList(blogs.size());
@@ -96,7 +108,10 @@ public class RemoteArchiveBean {
         List urls = new ArrayList(entries.length);
         List tmpFiles = new ArrayList(entries.length);
         for (int i = 0; i < entries.length; i++) {
-            urls.add(buildEntryURL(new BlogURI(entries[i])));
+            BlogURI uri = new BlogURI(entries[i]);
+            if (ignoreBlog(user, uri.getKeyHash()))
+                continue;
+            urls.add(buildEntryURL(uri));
             try {
                 tmpFiles.add(File.createTempFile("fetchBlog", ".txt", BlogManager.instance().getTempDir()));
             } catch (IOException ioe) {
@@ -118,6 +133,9 @@ public class RemoteArchiveBean {
             List matches = new ArrayList();
             for (Iterator iter = _remoteIndex.getUniqueBlogs().iterator(); iter.hasNext(); ) {
                 Hash blog = (Hash)iter.next();
+                if (ignoreBlog(user, blog))
+                    continue;
+                
                 _remoteIndex.selectMatchesOrderByEntryId(matches, blog, null);
                 for (int i = 0; i < matches.size(); i++) {
                     BlogURI uri = (BlogURI)matches.get(i);
@@ -177,6 +195,8 @@ public class RemoteArchiveBean {
         List entries = new ArrayList();
         for (Iterator iter = _remoteIndex.getUniqueBlogs().iterator(); iter.hasNext(); ) {
             Hash blog = (Hash)iter.next();
+            if (ignoreBlog(user, blog))
+                continue;
             _remoteIndex.selectMatchesOrderByEntryId(entries, blog, null);
             for (int i = 0; i < entries.size(); i++) {
                 BlogURI uri = (BlogURI)entries.get(i);
@@ -486,6 +506,8 @@ public class RemoteArchiveBean {
         int newBlogs = 0;
         for (Iterator iter = remoteBlogs.iterator(); iter.hasNext(); ) {
             Hash blog = (Hash)iter.next();
+            if (ignoreBlog(user, blog))
+                continue;
             if (!localBlogs.contains(blog)) {
                 buf.append("<option value=\"" + blog.toBase64() + "\">" + blog.toBase64() + "</option>\n");
                 newBlogs++;
@@ -502,6 +524,8 @@ public class RemoteArchiveBean {
         List entries = new ArrayList();
         for (Iterator iter = remoteBlogs.iterator(); iter.hasNext(); ) {
             Hash blog = (Hash)iter.next();
+            if (ignoreBlog(user, blog))
+                continue;
             buf.setLength(0);
             int shownEntries = 0;
             buf.append("<tr><td colspan=\"5\" align=\"left\" valign=\"top\">\n");

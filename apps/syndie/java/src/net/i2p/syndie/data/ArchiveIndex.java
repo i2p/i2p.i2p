@@ -117,6 +117,20 @@ public class ArchiveIndex {
         }
         return tags;
     }
+    public int getBlogEntryCount(Hash blog) {
+        Set uris = new HashSet(64);
+        for (int i = 0; i < _blogs.size(); i++) {
+            BlogSummary summary = (BlogSummary)_blogs.get(i);
+            if (summary.blog.equals(blog)) {
+                uris.addAll(summary.entries);
+                //for (int j = 0; j < summary.entries.size(); j++) {
+                //    EntrySummary entry = (EntrySummary)summary.entries.get(j);
+                //    uris.add(entry.entry);
+                //}
+            }
+        }
+        return uris.size();
+    }
     
     /** how many 'new' blogs are listed */
     public int getNewestBlogCount() { return _newestBlogs.size(); }
@@ -378,6 +392,14 @@ public class ArchiveIndex {
         public EntrySummary(BlogURI uri, long kb) {
             size = kb;
             entry = uri;
+        }
+        public int hashCode() {
+            return entry.hashCode();
+        }
+        public boolean equals(Object obj) {
+            if ( (obj instanceof EntrySummary) && (((EntrySummary)obj).entry.equals(entry)) )
+                return true;
+            return false;
         }
     }
     
