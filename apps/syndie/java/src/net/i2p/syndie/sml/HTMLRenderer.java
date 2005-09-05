@@ -83,6 +83,15 @@ public class HTMLRenderer extends EventReceiverImpl {
         render(user, archive, entry, entry.getEntry().getText(), out, cutBody, showImages);
     }
     public void render(User user, Archive archive, EntryContainer entry, String rawSML, Writer out, boolean cutBody, boolean showImages) throws IOException {
+        prepare(user, archive, entry, rawSML, out, cutBody, showImages);
+        
+        _out.write(_preBodyBuffer.toString());
+        _out.write(_bodyBuffer.toString());
+        _out.write(_postBodyBuffer.toString());
+        //int len = _preBodyBuffer.length() + _bodyBuffer.length() + _postBodyBuffer.length();
+        //System.out.println("Wrote " + len);
+    }
+    protected void prepare(User user, Archive archive, EntryContainer entry, String rawSML, Writer out, boolean cutBody, boolean showImages) throws IOException {
         _user = user;
         _archive = archive;
         _entry = entry;
@@ -100,11 +109,6 @@ public class HTMLRenderer extends EventReceiverImpl {
         _cutReached = false;
         _cutSize = 1024;
         _parser.parse(rawSML, this);
-        _out.write(_preBodyBuffer.toString());
-        _out.write(_bodyBuffer.toString());
-        _out.write(_postBodyBuffer.toString());
-        //int len = _preBodyBuffer.length() + _bodyBuffer.length() + _postBodyBuffer.length();
-        //System.out.println("Wrote " + len);
     }
     
     public void receivePlain(String text) { 
@@ -787,8 +791,30 @@ public class HTMLRenderer extends EventReceiverImpl {
         return sanitizeString(str);
     }
     
-    private String getEntryURL() { return getEntryURL(_user != null ? _user.getShowImages() : false); }
-    private String getEntryURL(boolean showImages) {
+    public static final String sanitizeXML(String orig) {
+        if (orig.indexOf('&') < 0) return orig;
+        StringBuffer rv = new StringBuffer(orig.length()+32);
+        for (int i = 0; i < orig.length(); i++) {
+            if (orig.charAt(i) == '&')
+                rv.append("&amp;");
+            else
+                rv.append(orig.charAt(i));
+        }
+        return rv.toString();
+    }
+    public static final String sanitizeXML(StringBuffer orig) {
+        if (orig.indexOf("&") < 0) return orig.toString();
+        for (int i = 0; i < orig.length(); i++) {
+            if (orig.charAt(i) == '&') {
+                orig = orig.replace(i, i+1, "&amp;");
+                i += "&amp;".length();
+            }
+        }
+        return orig.toString();
+    }
+    
+    protected String getEntryURL() { return getEntryURL(_user != null ? _user.getShowImages() : false); }
+    protected String getEntryURL(boolean showImages) {
         if (_entry == null) return "unknown";
         return "index.jsp?" + ArchiveViewerBean.PARAM_BLOG + "=" +
                Base64.encode(_entry.getURI().getKeyHash().getData()) +

@@ -9,6 +9,11 @@
      <servlet-class>net.i2p.syndie.web.ArchiveServlet</servlet-class>
     </servlet>
      
+    <servlet>
+     <servlet-name>net.i2p.syndie.web.RSSServlet</servlet-name>
+     <servlet-class>net.i2p.syndie.web.RSSServlet</servlet-class>
+    </servlet>
+     
     <!-- precompiled servlets -->
     
     <servlet-mapping> 
@@ -18,6 +23,10 @@
     <servlet-mapping> 
       <servlet-name>net.i2p.syndie.web.ArchiveServlet</servlet-name>
       <url-pattern>/archive/*</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping> 
+      <servlet-name>net.i2p.syndie.web.RSSServlet</servlet-name>
+      <url-pattern>/rss.jsp</url-pattern>
     </servlet-mapping>
     
     <session-config>

@@ -184,6 +184,7 @@ public class BlogManager {
     }
     
     public String login(User user, String login, String pass) {
+        if ( (login == null) || (pass == null) ) return "Login not specified";
         Hash userHash = _context.sha().calculateHash(DataHelper.getUTF8(login));
         Hash passHash = _context.sha().calculateHash(DataHelper.getUTF8(pass));
         File userFile = new File(_userDir, Base64.encode(userHash.getData()));

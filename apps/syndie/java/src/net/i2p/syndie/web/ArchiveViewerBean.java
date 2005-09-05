@@ -489,7 +489,7 @@ public class ArchiveViewerBean {
         }
     }
     
-    private static List pickEntryURIs(User user, ArchiveIndex index, Hash blog, String tag, long entryId, String group) {
+    public static List pickEntryURIs(User user, ArchiveIndex index, Hash blog, String tag, long entryId, String group) {
         if ( (blog != null) && ( (blog.getData() == null) || (blog.getData().length != Hash.HASH_LENGTH) ) ) 
             blog = null;
         List rv = new ArrayList(16);
