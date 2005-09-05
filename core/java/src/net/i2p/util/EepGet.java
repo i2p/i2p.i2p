@@ -168,6 +168,7 @@ public class EepGet {
         public void transferComplete(long alreadyTransferred, long bytesTransferred, long bytesRemaining, String url, String outputFile);
         public void attemptFailed(String url, long bytesTransferred, long bytesRemaining, int currentAttempt, int numRetries, Exception cause);
         public void transferFailed(String url, long bytesTransferred, long bytesRemaining, int currentAttempt);
+        public void headerReceived(String url, int currentAttempt, String key, String val);
     }
     private class CLIStatusListener implements StatusListener {
         private int _markSize;
@@ -270,6 +271,7 @@ public class EepGet {
             buf.append("KBps");
             System.out.println(buf.toString());
         }
+        public void headerReceived(String url, int currentAttempt, String key, String val) {}
     }
     
     public void addStatusListener(StatusListener lsnr) {
@@ -489,6 +491,9 @@ public class EepGet {
     }
 
     private void handle(String key, String val) {
+        for (int i = 0; i < _listeners.size(); i++) 
+            ((StatusListener)_listeners.get(i)).headerReceived(_url, _currentAttempt, key.trim(), val.trim());
+        
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Header line: [" + key + "] = [" + val + "]");
         if (key.equalsIgnoreCase("Content-length")) {

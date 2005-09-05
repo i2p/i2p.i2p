@@ -80,7 +80,12 @@ public class DSAEngine {
             BigInteger s = new NativeBigInteger(1, sbytes);
             BigInteger r = new NativeBigInteger(1, rbytes);
             BigInteger y = new NativeBigInteger(1, verifyingKey.getData());
-            BigInteger w = s.modInverse(CryptoConstants.dsaq);
+            BigInteger w = null;
+            try {
+                w = s.modInverse(CryptoConstants.dsaq);
+            } catch (ArithmeticException ae) {
+                return false;
+            }
             byte data[] = hash.getData();
             NativeBigInteger bi = new NativeBigInteger(1, data);
             BigInteger u1 = bi.multiply(w).mod(CryptoConstants.dsaq);

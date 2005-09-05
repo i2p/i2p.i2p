@@ -217,7 +217,7 @@ public class DataHelper {
     public static void loadProps(Properties props, InputStream inStr) throws IOException {
         BufferedReader in = null;
         try {
-            in = new BufferedReader(new InputStreamReader(inStr), 16*1024);
+            in = new BufferedReader(new InputStreamReader(inStr, "UTF-8"), 16*1024);
             String line = null;
             while ( (line = in.readLine()) != null) {
                 if (line.trim().length() <= 0) continue;

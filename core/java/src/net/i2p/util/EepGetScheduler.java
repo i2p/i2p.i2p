@@ -69,4 +69,5 @@ public class EepGetScheduler implements EepGet.StatusListener {
         fetchNext();
     }
     
+    public void headerReceived(String url, int attemptNum, String key, String val) {}
 }

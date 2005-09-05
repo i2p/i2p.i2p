@@ -1,4 +1,9 @@
-$Id: history.txt,v 1.238 2005/09/04 14:15:51 jrandom Exp $
+$Id: history.txt,v 1.239 2005/09/04 15:26:42 jrandom Exp $
+
+2005-09-05  jrandom
+    * Expose the HTTP headers to EepGet status listeners
+    * Handle DSA key failures properly (if the signature is not invertable, it
+      is obviously invalid)
 
 2005-09-04  jrandom
     * Don't persist peer profiles until we are shutting down, as the 
