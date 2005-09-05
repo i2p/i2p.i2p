@@ -2,6 +2,7 @@
 <jsp:useBean scope="session" class="net.i2p.syndie.User" id="user" />
 <td valign="top" align="left" class="syndieTopNavBlogsCell" height="10"><a href="index.jsp">Home</a></td>
 <td valign="top" align="left" class="syndieTopNavRemoteCell" height="10">
+<a href="admin.jsp">Syndie admin</a>
 <a href="remote.jsp">Remote archives</a>
 <a href="import.jsp">Import</a>
 </td>

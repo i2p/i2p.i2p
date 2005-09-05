@@ -90,6 +90,12 @@ public class Archive {
     }
     
     public String getDefaultSelector() { return _defaultSelector; }
+    public void setDefaultSelector(String sel) {
+        if (sel == null)
+            _defaultSelector = "";
+        else
+            _defaultSelector = sel;
+    }
         
     public BlogInfo getBlogInfo(BlogURI uri) {
         if (uri == null) return null;

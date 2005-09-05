@@ -25,7 +25,7 @@ if (!user.getAuthenticated() || !user.getAllowAccessRemote()) {
  <option value="feedspace" <%=("feedspace".equals(request.getParameter("schema")) ? "selected=\"true\"" : "")%>>Feedspace</option>
  <option value="usenet" <%=("usenet".equals(request.getParameter("schema")) ? "selected=\"true\"" : "")%>>Usenet</option>
 </select> 
-Proxy <input type="text" size="10" name="proxyhost" value="localhost" />:<input type="text" size="4" name="proxyport" value="4444" /><br />
+Proxy <input type="text" size="10" name="proxyhost" value="<%=BlogManager.instance().getDefaultProxyHost()%>" />:<input type="text" size="4" name="proxyport" value="<%=BlogManager.instance().getDefaultProxyPort()%>" /><br />
 Bookmarked archives: <select name="archivepetname"><option value="">Custom location</option><%
 for (Iterator iter = user.getPetNameDB().getNames().iterator(); iter.hasNext(); ) {
   PetName pn = user.getPetNameDB().get((String)iter.next());

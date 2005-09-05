@@ -63,8 +63,9 @@ public class BlogManager {
         _archive.regenerateIndex();
     }
     
+    private File getConfigFile() { return new File(_rootDir, "syndie.config"); }
     private void readConfig() {
-        File config = new File(_rootDir, "syndie.config");
+        File config = getConfigFile();
         if (config.exists()) {
             try {
                 Properties p = new Properties();
@@ -215,28 +216,92 @@ public class BlogManager {
     }
     
     /** hash of the password required to register and create a new blog (null means no password required) */
-    public String getRegistrationPassword() { 
+    public String getRegistrationPasswordHash() { 
         String pass = _context.getProperty("syndie.registrationPassword");
         if ( (pass == null) || (pass.trim().length() <= 0) ) return null;
         return pass; 
     }
     
     /** Password required to access the remote syndication functinoality (null means no password required) */
-    public String getRemotePassword() { 
+    public String getRemotePasswordHash() { 
         String pass = _context.getProperty("syndie.remotePassword");
         
         System.out.println("Remote password? [" + pass + "]");
         if ( (pass == null) || (pass.trim().length() <= 0) ) return null;
         return pass;
     }
+    public String getAdminPasswordHash() { 
+        String pass = _context.getProperty("syndie.adminPassword");
+        if ( (pass == null) || (pass.trim().length() <= 0) ) return "";
+        return pass;
+    }
+    
+    public boolean isConfigured() {
+        File cfg = getConfigFile();
+        return (cfg.exists());
+    }
+
+    public String getDefaultProxyHost() { return _context.getProperty("syndie.defaultProxyHost", "localhost"); }
+    public String getDefaultProxyPort() { return _context.getProperty("syndie.defaultProxyPort", "4444"); }
+    
+    public boolean authorizeAdmin(String pass) {
+        String admin = getAdminPasswordHash();
+        if ( (admin == null) || (admin.trim().length() <= 0) )
+            return false;
+        String hash = Base64.encode(_context.sha().calculateHash(DataHelper.getUTF8(pass.trim())).getData());
+        return (hash.equals(admin));
+    }
+    public boolean authorizeRemote(String pass) {
+        String rem = getRemotePasswordHash();
+        if ( (rem == null) || (rem.trim().length() <= 0) )
+            return false;
+        String hash = Base64.encode(_context.sha().calculateHash(DataHelper.getUTF8(pass.trim())).getData());
+        return (hash.equals(rem));
+    }
+    
+    public void configure(String registrationPassword, String remotePassword, String adminPass, String defaultSelector, 
+                          String defaultProxyHost, int defaultProxyPort, Properties opts) {
+        File cfg = getConfigFile();
+        Writer out = null;
+        try {
+            out = new OutputStreamWriter(new FileOutputStream(cfg), "UTF-8");
+            if (registrationPassword != null)
+                out.write("syndie.registrationPassword="+Base64.encode(_context.sha().calculateHash(DataHelper.getUTF8(registrationPassword.trim())).getData()) + "\n");
+            if (remotePassword != null)
+                out.write("syndie.remotePassword="+Base64.encode(_context.sha().calculateHash(DataHelper.getUTF8(remotePassword.trim())).getData()) + "\n");
+            if (adminPass != null)
+                out.write("syndie.adminPassword="+Base64.encode(_context.sha().calculateHash(DataHelper.getUTF8(adminPass.trim())).getData()) + "\n");
+            if (defaultSelector != null)
+                out.write("syndie.defaultSelector="+defaultSelector.trim() + "\n");
+            if (defaultProxyHost != null)
+                out.write("syndie.defaultProxyHost="+defaultProxyHost.trim() + "\n");
+            if (defaultProxyHost != null)
+                out.write("syndie.defaultProxyHost="+defaultProxyHost.trim() + "\n");
+            if (defaultProxyPort > 0)
+                out.write("syndie.defaultProxyPort="+defaultProxyPort + "\n");
+            if (opts != null) {
+                for (Iterator iter = opts.keySet().iterator(); iter.hasNext(); ) {
+                    String key = (String)iter.next();
+                    String val = opts.getProperty(key);
+                    out.write(key.trim() + "=" + val.trim() + "\n");
+                }
+            }
+            _archive.setDefaultSelector(defaultSelector);
+        } catch (IOException ioe) {
+            ioe.printStackTrace();
+        } finally {
+            if (out != null) try { out.close(); } catch (IOException ioe) {}
+            readConfig();
+        }
+    }
     
     public String authorizeRemoteAccess(User user, String password) {
         if (!user.getAuthenticated()) return "Not logged in";
-        String remPass = getRemotePassword();
+        String remPass = getRemotePasswordHash();
         if (remPass == null)
-            return "Remote access password not configured - please specify 'syndie.remotePassword' in your syndie.config";
+            return "Remote access password not configured - please specify a remote archive password in your syndie.config or on /admin.jsp";
         
-        if (remPass.equals(password)) {
+        if (authorizeRemote(password)) {
             user.setAllowAccessRemote(true);
             saveUser(user);
             return "Remote access authorized";
@@ -261,9 +326,8 @@ public class BlogManager {
         }
     }
     public String register(User user, String login, String password, String registrationPassword, String blogName, String blogDescription, String contactURL) {
-        System.err.println("Register [" + login + "] pass [" + password + "] name [" + blogName + "] descr [" + blogDescription + "] contact [" + contactURL + "]");
-        System.err.println("reference bad string: [" + EncodingTestGenerator.TEST_STRING + "]");
-        String hashedRegistrationPassword = getRegistrationPassword();
+        System.err.println("Register [" + login + "] pass [" + password + "] name [" + blogName + "] descr [" + blogDescription + "] contact [" + contactURL + "] regPass [" + registrationPassword + "]");
+        String hashedRegistrationPassword = getRegistrationPasswordHash();
         if (hashedRegistrationPassword != null) {
             try {
                 if (!hashedRegistrationPassword.equals(Base64.encode(_context.sha().calculateHash(registrationPassword.getBytes("UTF-8")).getData())))
