@@ -301,6 +301,43 @@ public class BlogManager {
             return loginResult;
         }
     }
+
+    public String exportHosts(User user) {
+        if (!user.getAuthenticated() || !user.getAllowAccessRemote())
+            return "Not authorized to export the hosts";
+        Map newNames = new HashMap();
+        PetNameDB db = user.getPetNameDB();
+        for (Iterator names = db.getNames().iterator(); names.hasNext(); ) {
+            PetName pn = db.get((String)names.next());
+            if (pn == null) continue;
+            if (pn.getNetwork().equalsIgnoreCase("i2p")) {
+                try {
+                    Destination d = new Destination(pn.getLocation().trim());
+                    newNames.put(pn.getName(), d);
+                } catch (DataFormatException dfe) {
+                    // ignore
+                }
+            }
+        }
+        // horribly inefficient...
+        for (Iterator iter = newNames.keySet().iterator(); iter.hasNext(); ) {
+            String name = (String)iter.next();
+            Destination existing = _context.namingService().lookup(name);
+            if (existing == null) {
+                Destination known = (Destination)newNames.get(name);
+                try {
+                    FileOutputStream fos = new FileOutputStream("userhosts.txt", true);
+                    OutputStreamWriter osw = new OutputStreamWriter(fos, "UTF-8");
+                    osw.write(name + "=" + known.toBase64() + "\n");
+                    osw.close();
+                } catch (IOException ioe) {
+                    ioe.printStackTrace();
+                    return "Error exporting the hosts: " + ioe.getMessage();
+                }
+            }
+        }
+        return "Hosts exported";
+    }
     
     public BlogURI createBlogEntry(User user, String subject, String tags, String entryHeaders, String sml) {
         return createBlogEntry(user, subject, tags, entryHeaders, sml, null, null, null);

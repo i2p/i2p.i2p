@@ -52,6 +52,8 @@ if (!user.getAuthenticated()) {
           names.store(user.getAddressbookLocation());
           %><b>Address removed</b><%
         }
+    } else if ( (action != null) && ("Export".equals(action)) ) {
+      %><%=BlogManager.instance().exportHosts(user)%><%
     }
     TreeSet sorted = new TreeSet(names.getNames());
     %><table border="0" width="100%">
@@ -170,7 +172,11 @@ if (!user.getAuthenticated()) {
         <td><input type="text" name="groups" size="10" /></td>
         <td><input type="submit" name="action" value="Add" /></td>
     </form></tr>
-    </table><%
+    <tr><form action="addresses.jsp" method="POST">
+        <td colspan="7">Export the eepsites to your router's userhosts.txt: <input type="submit" name="action" value="Export" /></td>
+        </form></tr>
+    </table>
+    <%
 }
 %>
 </td></tr>
