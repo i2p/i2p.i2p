@@ -3,6 +3,7 @@ package net.i2p.router.web;
 import java.io.File;
 import java.text.DecimalFormat;
 
+import net.i2p.I2PAppContext;
 import net.i2p.crypto.TrustedUpdate;
 import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
@@ -165,6 +166,7 @@ public class UpdateHandler {
             _status = "<b>Transfer failed</b><br />";
             System.setProperty("net.i2p.router.web.UpdateHandler.updateInProgress", "false");
         }
+        public void headerReceived(String url, int attemptNum, String key, String val) {}
     }
     
     private void restart() {

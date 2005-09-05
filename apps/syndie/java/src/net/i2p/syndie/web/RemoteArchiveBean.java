@@ -24,6 +24,7 @@ public class RemoteArchiveBean {
     private ArchiveIndex _remoteIndex;
     private List _statusMessages;
     private boolean _fetchIndexInProgress;
+    private boolean _exportCapable;
     
     public RemoteArchiveBean() {
         reinitialize();
@@ -35,6 +36,7 @@ public class RemoteArchiveBean {
         _fetchIndexInProgress = false;
         _proxyHost = null;
         _proxyPort = -1;
+        _exportCapable = false;
         _statusMessages = new ArrayList();
     }
     
@@ -149,31 +151,57 @@ public class RemoteArchiveBean {
                 entries[i] = ((BlogURI)uris.get(i)).toString();
         }
         if ( (entries == null) || (entries.length <= 0) ) return;
-        StringBuffer url = new StringBuffer(512);
-        url.append(buildExportURL());
-        Set meta = new HashSet();
-        for (int i = 0; i < entries.length; i++) {
-            BlogURI uri = new BlogURI(entries[i]);
-            if (uri.getEntryId() >= 0) {
-                url.append("entry=").append(uri.toString()).append('&');
-                meta.add(uri.getKeyHash());
-                _statusMessages.add("Scheduling blog post fetching for " + HTMLRenderer.sanitizeString(entries[i]));
+        if (_exportCapable) {
+            StringBuffer url = new StringBuffer(512);
+            url.append(buildExportURL());
+            Set meta = new HashSet();
+            for (int i = 0; i < entries.length; i++) {
+                BlogURI uri = new BlogURI(entries[i]);
+                if (uri.getEntryId() >= 0) {
+                    url.append("entry=").append(uri.toString()).append('&');
+                    meta.add(uri.getKeyHash());
+                    _statusMessages.add("Scheduling bulk blog post fetch of " + HTMLRenderer.sanitizeString(entries[i]));
+                }
             }
-        }
-        for (Iterator iter = meta.iterator(); iter.hasNext(); ) {
-            Hash blog = (Hash)iter.next();
-            url.append("meta=").append(blog.toBase64()).append('&');
-            _statusMessages.add("Scheduling blog metadata fetching for " + blog.toBase64());
-        }
-        List urls = new ArrayList(1);
-        urls.add(url.toString());
-        List tmpFiles = new ArrayList(1);
-        try {
-            File tmp = File.createTempFile("fetchBulk", ".zip", BlogManager.instance().getTempDir());
-            tmpFiles.add(tmp);
-            fetch(urls, tmpFiles, user, new BulkFetchListener(tmp));
-        } catch (IOException ioe) {
-            _statusMessages.add("Internal error creating temporary file to fetch " + HTMLRenderer.sanitizeString(url.toString()) + ": " + ioe.getMessage());
+            for (Iterator iter = meta.iterator(); iter.hasNext(); ) {
+                Hash blog = (Hash)iter.next();
+                url.append("meta=").append(blog.toBase64()).append('&');
+                _statusMessages.add("Scheduling bulk blog metadata fetch of " + blog.toBase64());
+            }
+            List urls = new ArrayList(1);
+            urls.add(url.toString());
+            List tmpFiles = new ArrayList(1);
+            try {
+                File tmp = File.createTempFile("fetchBulk", ".zip", BlogManager.instance().getTempDir());
+                tmpFiles.add(tmp);
+                fetch(urls, tmpFiles, user, new BulkFetchListener(tmp));
+            } catch (IOException ioe) {
+                _statusMessages.add("Internal error creating temporary file to fetch " + HTMLRenderer.sanitizeString(url.toString()) + ": " + ioe.getMessage());
+            }
+        } else {
+            List urls = new ArrayList(entries.length+8);
+            for (int i = 0; i < entries.length; i++) {
+                BlogURI uri = new BlogURI(entries[i]);
+                if (uri.getEntryId() >= 0) {
+                    String metaURL = buildMetaURL(uri.getKeyHash());
+                    if (!urls.contains(metaURL)) {
+                        urls.add(metaURL);
+                        _statusMessages.add("Scheduling blog metadata fetch of " + HTMLRenderer.sanitizeString(entries[i]));
+                    }
+                    urls.add(buildEntryURL(uri));
+                    _statusMessages.add("Scheduling blog post fetch of " + HTMLRenderer.sanitizeString(entries[i]));
+                }
+            }
+            List tmpFiles = new ArrayList(1);
+            try {
+                for (int i = 0; i < urls.size(); i++) {
+                    File t = File.createTempFile("fetchBulk", ".dat", BlogManager.instance().getTempDir());
+                    tmpFiles.add(t);
+                }
+                fetch(urls, tmpFiles, user, new BlogStatusListener());
+            } catch (IOException ioe) {
+                _statusMessages.add("Internal error creating temporary file to fetch posts: " + HTMLRenderer.sanitizeString(urls.toString()));
+            }
         }
     }
     
@@ -233,6 +261,7 @@ public class RemoteArchiveBean {
         _remoteSchema = schema;
         _proxyHost = null;
         _proxyPort = -1;
+        _exportCapable = false;
         
         if ( (schema == null) || (schema.trim().length() <= 0) ||
         (location == null) || (location.trim().length() <= 0) ) {
@@ -295,6 +324,14 @@ public class RemoteArchiveBean {
             _statusMessages.add("Fetch of " + HTMLRenderer.sanitizeString(url) + " failed after " + bytesTransferred);
             _fetchIndexInProgress = false;
         }
+        public void headerReceived(String url, int currentAttempt, String key, String val) {
+            if (ArchiveServlet.HEADER_EXPORT_CAPABLE.equals(key) && ("true".equals(val))) {
+                _statusMessages.add("Remote archive is bulk export capable");
+                _exportCapable = true;
+            } else {
+                System.err.println("Header received: [" + key + "] = [" + val + "]");
+            }
+        }
     }
     
     private class MetadataStatusListener implements EepGet.StatusListener {
@@ -305,29 +342,34 @@ public class RemoteArchiveBean {
         
         public void bytesTransferred(long alreadyTransferred, int currentWrite, long bytesTransferred, long bytesRemaining, String url) {}
         public void transferComplete(long alreadyTransferred, long bytesTransferred, long bytesRemaining, String url, String outputFile) {
-            _statusMessages.add("Fetch of " + HTMLRenderer.sanitizeString(url) + " successful");
-            File info = new File(outputFile);
-            FileInputStream in = null;
-            try {
-                BlogInfo i = new BlogInfo();
-                in = new FileInputStream(info);
-                i.load(in);
-                boolean ok = BlogManager.instance().getArchive().storeBlogInfo(i);
-                if (ok) {
-                    _statusMessages.add("Blog info for " + HTMLRenderer.sanitizeString(i.getProperty(BlogInfo.NAME)) + " imported");
-                    BlogManager.instance().getArchive().reloadInfo();
-                } else {
-                    _statusMessages.add("Blog info at " + HTMLRenderer.sanitizeString(url) + " was corrupt / invalid / forged");
-                }
-            } catch (IOException ioe) {
-                ioe.printStackTrace();
-            } finally {
-                if (in != null) try { in.close(); } catch (IOException ioe) {}
-                info.delete();
-            }
+            handleMetadata(url, outputFile);
         }
         public void transferFailed(String url, long bytesTransferred, long bytesRemaining, int currentAttempt) {
             _statusMessages.add("Fetch of " + HTMLRenderer.sanitizeString(url) + " failed after " + bytesTransferred);;
+        }
+        public void headerReceived(String url, int currentAttempt, String key, String val) {}
+    }
+    
+    private void handleMetadata(String url, String outputFile) {
+        _statusMessages.add("Fetch of " + HTMLRenderer.sanitizeString(url) + " successful");
+        File info = new File(outputFile);
+        FileInputStream in = null;
+        try {
+            BlogInfo i = new BlogInfo();
+            in = new FileInputStream(info);
+            i.load(in);
+            boolean ok = BlogManager.instance().getArchive().storeBlogInfo(i);
+            if (ok) {
+                _statusMessages.add("Blog info for " + HTMLRenderer.sanitizeString(i.getProperty(BlogInfo.NAME)) + " imported");
+                BlogManager.instance().getArchive().reloadInfo();
+            } else {
+                _statusMessages.add("Blog info at " + HTMLRenderer.sanitizeString(url) + " was corrupt / invalid / forged");
+            }
+        } catch (IOException ioe) {
+            ioe.printStackTrace();
+        } finally {
+            if (in != null) try { in.close(); } catch (IOException ioe) {}
+            info.delete();
         }
     }
     
@@ -339,6 +381,10 @@ public class RemoteArchiveBean {
         
         public void bytesTransferred(long alreadyTransferred, int currentWrite, long bytesTransferred, long bytesRemaining, String url) {}
         public void transferComplete(long alreadyTransferred, long bytesTransferred, long bytesRemaining, String url, String outputFile) {
+            if (url.endsWith(".snm")) {
+                handleMetadata(url, outputFile);
+                return;
+            }
             _statusMessages.add("Fetch of " + HTMLRenderer.sanitizeString(url) + " successful");
             File file = new File(outputFile);
             FileInputStream in = null;
@@ -375,6 +421,7 @@ public class RemoteArchiveBean {
         public void transferFailed(String url, long bytesTransferred, long bytesRemaining, int currentAttempt) {
             _statusMessages.add("Fetch of " + HTMLRenderer.sanitizeString(url) + " failed after " + bytesTransferred);
         }
+        public void headerReceived(String url, int currentAttempt, String key, String val) {}
     }
     
     /**
@@ -455,6 +502,7 @@ public class RemoteArchiveBean {
             _statusMessages.add("Fetch of " + HTMLRenderer.sanitizeString(url) + " failed after " + bytesTransferred);
             _tmp.delete();
         }
+        public void headerReceived(String url, int currentAttempt, String key, String val) {}
     }
     
     public void postSelectedEntries(User user, Map parameters) {

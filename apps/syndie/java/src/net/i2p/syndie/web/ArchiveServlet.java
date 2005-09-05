@@ -89,9 +89,12 @@ public class ArchiveServlet extends HttpServlet {
         out.close();
     }
     
+    public static final String HEADER_EXPORT_CAPABLE = "X-Syndie-Export-Capable";
+    
     private void renderSummary(HttpServletResponse resp) throws ServletException, IOException {
         resp.setContentType("text/plain;charset=utf-8");
         //resp.setCharacterEncoding("UTF-8");
+        resp.setHeader(HEADER_EXPORT_CAPABLE, "true");
         OutputStream out = resp.getOutputStream();
         ArchiveIndex index = BlogManager.instance().getArchive().getIndex();
         out.write(DataHelper.getUTF8(index.toString()));
