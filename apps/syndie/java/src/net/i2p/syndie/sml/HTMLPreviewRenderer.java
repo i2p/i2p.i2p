@@ -101,12 +101,12 @@ public class HTMLPreviewRenderer extends HTMLRenderer {
                 if (knownName != null) {
                     _postBodyBuffer.append(' ').append(sanitizeString(knownName));
                 } else {
-                    _postBodyBuffer.append(" <a href=\"addaddress.jsp?schema=");
-                    _postBodyBuffer.append(sanitizeURL(a.schema)).append("&location=");
-                    _postBodyBuffer.append(sanitizeURL(a.location)).append("&name=");
-                    _postBodyBuffer.append(sanitizeURL(a.protocol)).append("&protocol=");
-                    _postBodyBuffer.append(sanitizeURL(a.name));
-                    _postBodyBuffer.append("\">").append(sanitizeString(a.name));
+                    _postBodyBuffer.append(" <a href=\"addresses.jsp?network=");
+                    _postBodyBuffer.append(sanitizeTagParam(a.schema)).append("&location=");
+                    _postBodyBuffer.append(sanitizeTagParam(a.location)).append("&name=");
+                    _postBodyBuffer.append(sanitizeTagParam(a.protocol)).append("&protocol=");
+                    _postBodyBuffer.append(sanitizeTagParam(a.name));
+                    _postBodyBuffer.append("\">").append(sanitizeString(a.name)).append("</a>");
                 }
             }
             _postBodyBuffer.append("<br />\n");

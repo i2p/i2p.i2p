@@ -241,8 +241,8 @@ public class BlogManager {
         return (cfg.exists());
     }
 
-    public String getDefaultProxyHost() { return _context.getProperty("syndie.defaultProxyHost", "localhost"); }
-    public String getDefaultProxyPort() { return _context.getProperty("syndie.defaultProxyPort", "4444"); }
+    public String getDefaultProxyHost() { return _context.getProperty("syndie.defaultProxyHost", ""); }
+    public String getDefaultProxyPort() { return _context.getProperty("syndie.defaultProxyPort", ""); }
     
     public boolean authorizeAdmin(String pass) {
         String admin = getAdminPasswordHash();
@@ -273,8 +273,6 @@ public class BlogManager {
                 out.write("syndie.adminPassword="+Base64.encode(_context.sha().calculateHash(DataHelper.getUTF8(adminPass.trim())).getData()) + "\n");
             if (defaultSelector != null)
                 out.write("syndie.defaultSelector="+defaultSelector.trim() + "\n");
-            if (defaultProxyHost != null)
-                out.write("syndie.defaultProxyHost="+defaultProxyHost.trim() + "\n");
             if (defaultProxyHost != null)
                 out.write("syndie.defaultProxyHost="+defaultProxyHost.trim() + "\n");
             if (defaultProxyPort > 0)
@@ -527,8 +525,7 @@ public class BlogManager {
             return false;
         }
     }
-    
-    
+
     public String addAddress(User user, String name, String protocol, String location, String schema) {
         if (!user.getAuthenticated()) return "Not logged in";
         boolean ok = validateAddressName(name);
@@ -572,7 +569,7 @@ public class BlogManager {
     }
     
     private boolean validateAddressName(String name) {
-        if ( (name == null) || (name.trim().length() <= 0) || (!name.endsWith(".i2p")) ) return false;
+        if ( (name == null) || (name.trim().length() <= 0) ) return false;
         for (int i = 0; i < name.length(); i++) {
             char c = name.charAt(i);
             if (!Character.isLetterOrDigit(c) && ('.' != c) && ('-' != c) && ('_' != c) )
@@ -599,7 +596,11 @@ public class BlogManager {
 
     private boolean validateAddressSchema(String schema) {
         if ( (schema == null) || (schema.trim().length() <= 0) ) return false;
-        return "eep".equals(schema) || "i2p".equals(schema);
+        if (true) {
+            return true;
+        } else {
+            return "eep".equals(schema) || "i2p".equals(schema);
+        }
     }
 
     private final SimpleDateFormat _dateFormat = new SimpleDateFormat("yyyy/MM/dd", Locale.UK);    

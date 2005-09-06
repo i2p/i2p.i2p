@@ -250,11 +250,11 @@ public class RSSRenderer extends HTMLRenderer {
                     knownName = _user.getPetNameDB().getNameByLocation(a.location);
                 if (knownName == null) {
                     StringBuffer url = new StringBuffer(128);
-                    url.append("addaddress.jsp?schema=");
-                    url.append(sanitizeURL(a.schema)).append("&location=");
-                    url.append(sanitizeURL(a.location)).append("&name=");
-                    url.append(sanitizeURL(a.name)).append("&protocol=");
-                    url.append(sanitizeURL(a.protocol));
+                    url.append("addresses.jsp?network=");
+                    url.append(sanitizeTagParam(a.schema)).append("&location=");
+                    url.append(sanitizeTagParam(a.location)).append("&name=");
+                    url.append(sanitizeTagParam(a.name)).append("&protocol=");
+                    url.append(sanitizeTagParam(a.protocol));
                     out.write("    <enclosure url=\"" + urlPrefix + sanitizeXML(url) + "\" length=\"1\" type=\"text/html\" syndietype=\"address\" />\n");
                 }
             }

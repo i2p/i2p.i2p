@@ -264,7 +264,7 @@ public class RemoteArchiveBean {
         _exportCapable = false;
         
         if ( (schema == null) || (schema.trim().length() <= 0) ||
-        (location == null) || (location.trim().length() <= 0) ) {
+             (location == null) || (location.trim().length() <= 0) ) {
             _statusMessages.add("Location must be specified");
             _fetchIndexInProgress = false;
             return;
@@ -289,11 +289,11 @@ public class RemoteArchiveBean {
         }
         
         _statusMessages.add("Fetching index from " + HTMLRenderer.sanitizeString(_remoteLocation) +
-        (_proxyHost != null ? " via " + HTMLRenderer.sanitizeString(_proxyHost) + ":" + _proxyPort : ""));
+                            (_proxyHost != null ? " via " + HTMLRenderer.sanitizeString(_proxyHost) + ":" + _proxyPort : ""));
         File archiveFile = new File(BlogManager.instance().getTempDir(), user.getBlog().toBase64() + "_remoteArchive.txt");
         archiveFile.delete();
         EepGet eep = new EepGet(I2PAppContext.getGlobalContext(), ((_proxyHost != null) && (_proxyPort > 0)),
-        _proxyHost, _proxyPort, 0, archiveFile.getAbsolutePath(), location);
+                                _proxyHost, _proxyPort, 0, archiveFile.getAbsolutePath(), location);
         eep.addStatusListener(new IndexFetcherStatusListener(archiveFile));
         eep.fetch();
     }
@@ -506,12 +506,22 @@ public class RemoteArchiveBean {
     }
     
     public void postSelectedEntries(User user, Map parameters) {
+        postSelectedEntries(user, parameters, _proxyHost, _proxyPort, _remoteLocation);
+    }
+    public void postSelectedEntries(User user, Map parameters, String proxyHost, int proxyPort, String location) {
         String entries[] = ArchiveViewerBean.getStrings(parameters, "localentry");
         if ( (entries == null) || (entries.length <= 0) ) return;
         List uris = new ArrayList(entries.length);
         for (int i = 0; i < entries.length; i++)
             uris.add(new BlogURI(entries[i]));
-        
+        if ( (proxyPort > 0) && (proxyHost != null) && (proxyHost.trim().length() > 0) ) {
+            _proxyPort = proxyPort;
+            _proxyHost = proxyHost;
+        } else {
+            _proxyPort = -1;
+            _proxyHost = null;
+        }
+        _remoteLocation = location;
         post(uris, user);
     }
     

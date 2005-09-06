@@ -158,17 +158,17 @@ if (!user.getAuthenticated()) {
     %>
     <tr><form action="addresses.jsp" method="POST"><td><input type="text" name="name" size="20" value="<%=name%>" /></td>
         <td><select name="network">
-            <option value="i2p" <%="i2p".equals(net) ? " selected=\"true\" " : ""%>>I2P</option>
-            <option value="syndie" <%="syndie".equals(net) ? " selected=\"true\" " : ""%>>Syndie</option>
-            <option value="tor" <%="tor".equals(net) ? " selected=\"true\" " : ""%>>Tor</option>
-            <option value="freenet" <%="freenet".equals(net) ? " selected=\"true\" " : ""%>>Freenet</option>
-            <option value="internet" <%="internet".equals(net) ? " selected=\"true\" " : ""%>>Internet</option></select></td>
+            <option value="i2p" <%="i2p".equalsIgnoreCase(net) ? " selected=\"true\" " : ""%>>I2P</option>
+            <option value="syndie" <%="syndie".equalsIgnoreCase(net) ? " selected=\"true\" " : ""%>>Syndie</option>
+            <option value="tor" <%="tor".equalsIgnoreCase(net) ? " selected=\"true\" " : ""%>>Tor</option>
+            <option value="freenet" <%="freenet".equalsIgnoreCase(net) ? " selected=\"true\" " : ""%>>Freenet</option>
+            <option value="internet" <%="internet".equalsIgnoreCase(net) ? " selected=\"true\" " : ""%>>Internet</option></select></td>
         <td><select name="protocol">
-            <option value="http" <%="http".equals(proto) ? " selected=\"true\" " : ""%>>HTTP</option>
-            <option value="irc" <%="irc".equals(proto) ? " selected=\"true\" " : ""%>>IRC</option>
-            <option value="i2phex" <%="i2phex".equals(proto) ? " selected=\"true\" " : ""%>>I2Phex</option>
-            <option value="syndiearchive" <%="syndiearchive".equals(proto) ? " selected=\"true\" " : ""%>>Syndie archive</option>
-            <option value="syndieblog" <%="syndieblog".equals(proto) ? " selected=\"true\" " : ""%>>Syndie blog</option></select></td>
+            <option value="http" <%="http".equalsIgnoreCase(proto) ? " selected=\"true\" " : ""%>>HTTP</option>
+            <option value="irc" <%="irc".equalsIgnoreCase(proto) ? " selected=\"true\" " : ""%>>IRC</option>
+            <option value="i2phex" <%="i2phex".equalsIgnoreCase(proto) ? " selected=\"true\" " : ""%>>I2Phex</option>
+            <option value="syndiearchive" <%="syndiearchive".equalsIgnoreCase(proto) ? " selected=\"true\" " : ""%>>Syndie archive</option>
+            <option value="syndieblog" <%="syndieblog".equalsIgnoreCase(proto) ? " selected=\"true\" " : ""%>>Syndie blog</option></select></td>
         <td><input type="text" size="50" name="location" value="<%=loc%>" /></td>
         <td><input type="checkbox" name="isPublic" /></td>
         <td><input type="text" name="groups" size="10" /></td>

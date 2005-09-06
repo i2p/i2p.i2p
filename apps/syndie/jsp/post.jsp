@@ -18,8 +18,10 @@
 if (!user.getAuthenticated()) { 
   %>You must be logged in to post<%
 } else {
-  String confirm = request.getParameter("confirm");
-  if ( (confirm != null) && (confirm.equalsIgnoreCase("true")) ) {
+  String confirm = request.getParameter("action");
+  if ( (confirm != null) && (confirm.equalsIgnoreCase("confirm")) ) {
+    String archive = request.getParameter("archive");
+    post.setArchive(archive);
     BlogURI uri = post.postEntry(); 
     if (uri != null) {
       %>Blog entry <a href="<%=HTMLRenderer.getPageURL(user.getBlog(), null, uri.getEntryId(), -1, -1, 
@@ -43,17 +45,34 @@ if (!user.getAuthenticated()) {
         String entryTags = req.getString("entrytags");
         String entryText = req.getString("entrytext");
         String entryHeaders = req.getString("entryheaders");
+        String style = req.getString("style");
+        if ( (style != null) && (style.trim().length() > 0) ) {
+          if (entryHeaders == null) entryHeaders = HTMLRenderer.HEADER_STYLE + ": " + style;
+          else entryHeaders = entryHeaders + '\n' + HTMLRenderer.HEADER_STYLE + ": " + style;
+        }
         String replyTo = req.getString(ArchiveViewerBean.PARAM_IN_REPLY_TO);
         if ( (replyTo != null) && (replyTo.trim().length() > 0) ) {
           byte r[] = Base64.decode(replyTo);
           if (r != null) {
-            if (entryHeaders == null) entryHeaders = HTMLRenderer.HEADER_IN_REPLY_TO + ": " + new String(r);
-            else entryHeaders = entryHeaders + '\n' + HTMLRenderer.HEADER_IN_REPLY_TO + ": " + new String(r);
+            if (entryHeaders == null) entryHeaders = HTMLRenderer.HEADER_IN_REPLY_TO + ": " + new String(r, "UTF-8");
+            else entryHeaders = entryHeaders + '\n' + HTMLRenderer.HEADER_IN_REPLY_TO + ": " + new String(r, "UTF-8");
           } else {
             replyTo = null;
           }
         }
-
+        String includeNames = req.getString("includenames");
+        if ( (includeNames != null) && (includeNames.trim().length() > 0) ) {
+          PetNameDB db = user.getPetNameDB();
+          if (entryHeaders == null) entryHeaders = "";
+          for (Iterator iter = db.getNames().iterator(); iter.hasNext(); ) {
+            PetName pn = db.get((String)iter.next());
+            if ( (pn != null) && (pn.getIsPublic()) ) {
+              entryHeaders = entryHeaders + '\n' + HTMLRenderer.HEADER_PETNAME + ": " + 
+                             pn.getName() + "\t" + pn.getNetwork() + "\t" + pn.getProtocol() + "\t" + pn.getLocation();
+            }
+          }
+        }
+        
         post.setSubject(entrySubject);
         post.setTags(entryTags);
         post.setText(entryText);
@@ -76,13 +95,39 @@ if (!user.getAuthenticated()) {
         }
 
         post.renderPreview(out);
-        %><hr />Please <a href="post.jsp?confirm=true">confirm</a> that this is ok.  Otherwise, just go back and make changes.<%
+        %><hr /><form action="post.jsp" method="POST">
+Please confirm that the above is ok<% if (user.getAllowAccessRemote()) { %>, and select what additional archives you 
+want the post transmitted to.  Otherwise, just hit your browser's back arrow and
+make changes. 
+<select name="archive">
+<option name="">-None-</option>
+<% 
+PetNameDB db = user.getPetNameDB();
+TreeSet names = new TreeSet();
+for (Iterator iter = db.getNames().iterator(); iter.hasNext(); ) {
+  String name = (String)iter.next();
+  PetName pn = db.get(name);
+  if ("syndiearchive".equals(pn.getProtocol()))
+    names.add(pn.getName());
+}
+for (Iterator iter = names.iterator(); iter.hasNext(); ) {
+  String name = (String)iter.next();
+  out.write("<option value=\"" + HTMLRenderer.sanitizeTagParam(name) + "\">" + HTMLRenderer.sanitizeString(name) + "</option>\n");
+}
+%>
+</select><br /><% } %>
+<input type="submit" name="action" value="Confirm" /><%
     } else {
       // logged in and not confirmed because they didn't send us anything!  
       // give 'em a new form
 %><form action="post.jsp" method="POST" enctype="multipart/form-data"> 
 Post subject: <input type="text" size="80" name="entrysubject" value="<%=post.getSubject()%>" /><br />
 Post tags: <input type="text" size="20" name="entrytags" value="<%=post.getTags()%>" /><br />
+Post style: <select name="style">
+ <option value="default" selected="true">Default</option>
+ <option value="meta">Meta (hide everything but the metadata)</option>
+</select><br />
+Include public names? <input type="checkbox" name="includenames" value="true" /><br />
 Post content (in raw SML, no headers):<br />
 <textarea rows="6" cols="80" name="entrytext"><%=post.getText()%></textarea><br />
 <b>SML cheatsheet:</b><br /><textarea rows="6" cols="80" readonly="true">
@@ -111,7 +156,6 @@ String s = request.getParameter(ArchiveViewerBean.PARAM_IN_REPLY_TO);
 if ( (s != null) && (s.trim().length() > 0) ) {%>
 <input type="hidden" name="<%=ArchiveViewerBean.PARAM_IN_REPLY_TO%>" value="<%=request.getParameter(ArchiveViewerBean.PARAM_IN_REPLY_TO)%>" />
 <% } %>
-
 Attachment 0: <input type="file" name="entryfile0" /><br />
 Attachment 1: <input type="file" name="entryfile1" /><br />
 Attachment 2: <input type="file" name="entryfile2" /><br />

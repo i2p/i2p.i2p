@@ -15,6 +15,7 @@ public class PostBean {
     private String _tags;
     private String _headers;
     private String _text;
+    private String _archive;
     private List _filenames;
     private List _fileStreams;
     private List _localFiles;
@@ -30,6 +31,7 @@ public class PostBean {
         _tags = null;
         _text = null;
         _headers = null;
+        _archive = null;
         _filenames = new ArrayList();
         _fileStreams = new ArrayList();
         _fileTypes = new ArrayList();
@@ -51,6 +53,7 @@ public class PostBean {
     public void setTags(String tags) { _tags = tags; }
     public void setText(String text) { _text = text; }
     public void setHeaders(String headers) { _headers = headers; }
+    public void setArchive(String archive) { _archive = archive; }
     
     public String getContentType(int id) { 
         if ( (id >= 0) && (id < _fileTypes.size()) )
@@ -81,8 +84,26 @@ public class PostBean {
             File f = (File)_localFiles.get(i);
             localStreams.add(new FileInputStream(f));
         }
-        return BlogManager.instance().createBlogEntry(_user, _subject, _tags, _headers, _text, 
-                                                      _filenames, localStreams, _fileTypes);
+        BlogURI uri = BlogManager.instance().createBlogEntry(_user, _subject, _tags, _headers, _text, 
+                                                             _filenames, localStreams, _fileTypes);
+        System.err.println("Posted the entry " + uri.toString() + " (archive = " + _archive + ")");
+        if ( (uri != null) && (_user.getAllowAccessRemote()) ) {
+            PetName pn = _user.getPetNameDB().get(_archive);
+            System.err.println("Archive to petname? " + pn + " (protocol: " + (pn != null ? pn.getProtocol() : "") + ")");
+            if ( (pn != null) && ("syndiearchive".equals(pn.getProtocol())) ) {
+                RemoteArchiveBean r = new RemoteArchiveBean();
+                Map params = new HashMap();
+                params.put("localentry", new String[] { uri.toString() });
+                String proxyHost = BlogManager.instance().getDefaultProxyHost();
+                String port = BlogManager.instance().getDefaultProxyPort();
+                int proxyPort = 4444;
+                try { proxyPort = Integer.parseInt(port); } catch (NumberFormatException nfe) {}
+                System.err.println("Posting the entry " + uri.toString() + " to " + pn.getLocation());
+                r.postSelectedEntries(_user, params, proxyHost, proxyPort, pn.getLocation());
+                System.err.println("Post status: " + r.getStatus());
+            }
+        }
+        return uri;
     }
     
     public void renderPreview(Writer out) throws IOException {

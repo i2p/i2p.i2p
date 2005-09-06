@@ -416,11 +416,11 @@ public class HTMLRenderer extends EventReceiverImpl {
             _bodyBuffer.append(" <i>(").append(sanitizeString(knownName)).append(")</i>");
         } else {
             System.err.println("Receiving address [" + location + "]");
-            _bodyBuffer.append("<a href=\"addaddress.jsp?schema=");
-            _bodyBuffer.append(sanitizeURL(schema)).append("&name=");
-            _bodyBuffer.append(sanitizeURL(name)).append("&protocol=");
-            _bodyBuffer.append(sanitizeURL(protocol)).append("&location=");
-            _bodyBuffer.append(sanitizeURL(location)).append("\">").append(sanitizeString(anchorText)).append("</a>");
+            _bodyBuffer.append("<a href=\"addresses.jsp?network=");
+            _bodyBuffer.append(sanitizeTagParam(schema)).append("&name=");
+            _bodyBuffer.append(sanitizeTagParam(name)).append("&protocol=");
+            _bodyBuffer.append(sanitizeTagParam(protocol)).append("&location=");
+            _bodyBuffer.append(sanitizeTagParam(location)).append("\">").append(sanitizeString(anchorText)).append("</a>");
         }
     }
     
@@ -563,12 +563,12 @@ public class HTMLRenderer extends EventReceiverImpl {
                     if (knownName != null) {
                         _postBodyBuffer.append(' ').append(sanitizeString(knownName));
                     } else {
-                        _postBodyBuffer.append(" <a href=\"addaddress.jsp?schema=");
-                        _postBodyBuffer.append(sanitizeURL(a.schema)).append("&location=");
-                        _postBodyBuffer.append(sanitizeURL(a.location)).append("&name=");
-                        _postBodyBuffer.append(sanitizeURL(a.name)).append("&protocol=");
-                        _postBodyBuffer.append(sanitizeURL(a.protocol));
-                        _postBodyBuffer.append("\">").append(sanitizeString(a.name));
+                        _postBodyBuffer.append(" <a href=\"addresses.jsp?network=");
+                        _postBodyBuffer.append(sanitizeTagParam(a.schema)).append("&location=");
+                        _postBodyBuffer.append(sanitizeTagParam(a.location)).append("&name=");
+                        _postBodyBuffer.append(sanitizeTagParam(a.name)).append("&protocol=");
+                        _postBodyBuffer.append(sanitizeTagParam(a.protocol));
+                        _postBodyBuffer.append("\">").append(sanitizeString(a.name)).append("</a>");
                     }
                 }
                 _postBodyBuffer.append("<br />\n");
@@ -624,7 +624,23 @@ public class HTMLRenderer extends EventReceiverImpl {
     
     public void receiveHeader(String header, String value) { 
         //System.err.println("Receive header [" + header + "] = [" + value + "]");
-        _headers.put(header, value); 
+        if (HEADER_PETNAME.equals(header)) {
+            StringTokenizer tok = new StringTokenizer(value, "\t\n");
+            if (tok.countTokens() != 4)
+                return;
+            String name = tok.nextToken();
+            String net = tok.nextToken();
+            String proto = tok.nextToken();
+            String loc = tok.nextToken();
+            Address a = new Address();
+            a.name = sanitizeString(name, false);
+            a.schema = sanitizeString(net, false);
+            a.protocol = sanitizeString(proto, false);
+            a.location = sanitizeString(loc, false);
+            _addresses.add(a);
+        } else {
+            _headers.put(header, value); 
+        }
     }
     
     public void receiveHeaderEnd() {
@@ -637,6 +653,8 @@ public class HTMLRenderer extends EventReceiverImpl {
     public static final String HEADER_SUBJECT = "Subject";
     public static final String HEADER_BGCOLOR = "bgcolor";
     public static final String HEADER_IN_REPLY_TO = "InReplyTo";
+    public static final String HEADER_STYLE = "Style";
+    public static final String HEADER_PETNAME = "PetName";
     
     private void renderSubjectCell() {
         _preBodyBuffer.append("<tr class=\"syndieEntrySubjectCell\"><td align=\"left\" valign=\"top\" class=\"syndieEntrySubjectCell\" width=\"400\"> ");
