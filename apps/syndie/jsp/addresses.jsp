@@ -152,7 +152,7 @@ if (!user.getAuthenticated()) {
             if (j + 1 < name.getGroupCount()) 
                 buf.append(',');
         }
-        buf.append("\" /></td><td class=\"b_addrDetail\" nowrap=\"true\">");
+        buf.append("\" /></td><td class=\"b_addrDetail\" nowrap=\"nowrap\">");
         buf.append("<input class=\"b_addrChange\" type=\"submit\" name=\"action\" value=\"Change\" /> <input class=\"b_addrDelete\" type=\"submit\" name=\"action\" value=\"Delete\" />");
         buf.append("</td></form></tr>");
         out.write(buf.toString());

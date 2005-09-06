@@ -32,7 +32,7 @@ if (user.getAuthenticated() && (null != request.getParameter("action")) ) {
   }
 }
 %><table border="0" width="100%" class="b_content">
-<tr class="b_content"><form action="index.jsp"><td nowrap="true">
+<tr class="b_content"><form action="index.jsp"><td nowrap="nowrap">
 <em class="b_selectorTitle">Blogs:</em> <span class="b_selector"><%ArchiveViewerBean.renderBlogSelector(user, request.getParameterMap(), out);%></span>
 <input type="submit" value="Refresh" class="b_selectorRefresh" />
 <input type="submit" name="action" value="<%=ArchiveViewerBean.SEL_ACTION_SET_AS_DEFAULT%>" class="b_selectorDefault" />

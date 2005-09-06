@@ -480,7 +480,7 @@ public class HTMLRenderer extends EventReceiverImpl {
         _postBodyBuffer.append("</td></tr>\n<!-- end of the post body -->");
         if (_cutBody) {
             _postBodyBuffer.append("<!-- beginning of the post summary -->\n");
-            _postBodyBuffer.append("<tr ").append(getClass("summ")).append("\">\n");
+            _postBodyBuffer.append("<tr ").append(getClass("summ")).append(">\n");
             _postBodyBuffer.append("<td colspan=\"2\" valign=\"top\" align=\"left\" ").append(getClass("summ")).append(" >");
             _postBodyBuffer.append("<a ").append(getClass("summLink")).append(" href=\"").append(getEntryURL()).append("\">View details...</a> ");
             _postBodyBuffer.append(getSpan("summ"));
