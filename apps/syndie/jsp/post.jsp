@@ -1,22 +1,23 @@
-<%@page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" import="net.i2p.data.Base64, net.i2p.syndie.web.*, net.i2p.syndie.sml.*, net.i2p.syndie.data.*, net.i2p.syndie.*, org.mortbay.servlet.MultiPartRequest, java.util.*" %>
-<% request.setCharacterEncoding("UTF-8"); %>
-<jsp:useBean scope="session" class="net.i2p.syndie.User" id="user" />
-<jsp:useBean scope="session" class="net.i2p.syndie.web.PostBean" id="post" />
+<%@page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" import="net.i2p.data.Base64, net.i2p.syndie.web.*, net.i2p.syndie.sml.*, net.i2p.syndie.data.*, net.i2p.syndie.*, org.mortbay.servlet.MultiPartRequest, java.util.*" %><% 
+request.setCharacterEncoding("UTF-8"); 
+%><jsp:useBean scope="session" class="net.i2p.syndie.User" id="user" 
+/><jsp:useBean scope="session" class="net.i2p.syndie.web.PostBean" id="post" 
+/><!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 TRANSITIONAL//EN" "http://www.w3c.org/TR/1999/REC-html401-19991224/loose.dtd">
 <html>
 <head>
-<title>SyndieMedia</title>
-<link href="style.jsp" rel="stylesheet" type="text/css" />
+<title>SyndieMedia post</title>
+<link href="style.jsp" rel="stylesheet" type="text/css" >
 </head>
 <body>
 <table border="1" cellpadding="0" cellspacing="0" width="100%">
-<tr><td colspan="5" valign="top" align="left"><jsp:include page="_toplogo.jsp" /></td></tr>
-<tr><td valign="top" align="left" rowspan="2"><jsp:include page="_leftnav.jsp" /></td>
+<tr class="b_toplogo"><td colspan="5" valign="top" align="left" class="b_toplogo"><jsp:include page="_toplogo.jsp" /></td></tr>
+<tr><td valign="top" align="left" rowspan="2" class="b_leftnav"><jsp:include page="_leftnav.jsp" /></td>
     <jsp:include page="_topnav.jsp" />
-    <td valign="top" align="left" rowspan="2"><jsp:include page="_rightnav.jsp" /></td></tr>
-<tr><td valign="top" align="left" colspan="3"><%
+    <td valign="top" align="left" rowspan="2" class="b_rightnav"><jsp:include page="_rightnav.jsp" /></td></tr>
+<tr class="b_content"><td valign="top" align="left" colspan="3" class="b_content"><%
 
 if (!user.getAuthenticated()) { 
-  %>You must be logged in to post<%
+  %><span class="b_postMsgErr">You must be logged in to post</span><%
 } else {
   String confirm = request.getParameter("action");
   if ( (confirm != null) && (confirm.equalsIgnoreCase("confirm")) ) {
@@ -24,10 +25,10 @@ if (!user.getAuthenticated()) {
     post.setArchive(archive);
     BlogURI uri = post.postEntry(); 
     if (uri != null) {
-      %>Blog entry <a href="<%=HTMLRenderer.getPageURL(user.getBlog(), null, uri.getEntryId(), -1, -1, 
-                                                        user.getShowExpanded(), user.getShowImages())%>">posted</a>!<%
+      %><span class="b_postMsgOk">Blog entry <a class="b_postOkLink" href="<%=HTMLRenderer.getPageURL(user.getBlog(), null, uri.getEntryId(), -1, -1, 
+                                                        user.getShowExpanded(), user.getShowImages())%>">posted</a>!</span><%
     } else {
-      %>There was an unknown error posting the entry...<%
+      %><span class="b_postMsgErro">There was an unknown error posting the entry...</span><%
     }
     post.reinitialize();
     post.setUser(user);
@@ -95,11 +96,11 @@ if (!user.getAuthenticated()) {
         }
 
         post.renderPreview(out);
-        %><hr /><form action="post.jsp" method="POST">
+        %><hr /><span class="b_postConfirm"><form action="post.jsp" method="POST">
 Please confirm that the above is ok<% if (user.getAllowAccessRemote()) { %>, and select what additional archives you 
 want the post transmitted to.  Otherwise, just hit your browser's back arrow and
 make changes. 
-<select name="archive">
+<select class="b_postConfirm" name="archive">
 <option name="">-None-</option>
 <% 
 PetNameDB db = user.getPetNameDB();
@@ -115,22 +116,22 @@ for (Iterator iter = names.iterator(); iter.hasNext(); ) {
   out.write("<option value=\"" + HTMLRenderer.sanitizeTagParam(name) + "\">" + HTMLRenderer.sanitizeString(name) + "</option>\n");
 }
 %>
-</select><br /><% } %>
-<input type="submit" name="action" value="Confirm" /><%
+</select><br /><% } %></span>
+<input class="b_postConfirm" type="submit" name="action" value="Confirm" /><%
     } else {
       // logged in and not confirmed because they didn't send us anything!  
       // give 'em a new form
 %><form action="post.jsp" method="POST" enctype="multipart/form-data"> 
-Post subject: <input type="text" size="80" name="entrysubject" value="<%=post.getSubject()%>" /><br />
-Post tags: <input type="text" size="20" name="entrytags" value="<%=post.getTags()%>" /><br />
-Post style: <select name="style">
+<span class="b_postField">Post subject:</span> <input class="b_postSubject" type="text" size="80" name="entrysubject" value="<%=post.getSubject()%>" /><br />
+<span class="b_postField">Post tags:</span> <input class="b_postTags" type="text" size="20" name="entrytags" value="<%=post.getTags()%>" /><br />
+<span class="b_postField">Post style:</span> <select class="b_postStyle" name="style">
  <option value="default" selected="true">Default</option>
  <option value="meta">Meta (hide everything but the metadata)</option>
 </select><br />
-Include public names? <input type="checkbox" name="includenames" value="true" /><br />
-Post content (in raw SML, no headers):<br />
-<textarea rows="6" cols="80" name="entrytext"><%=post.getText()%></textarea><br />
-<b>SML cheatsheet:</b><br /><textarea rows="6" cols="80" readonly="true">
+<span class="b_postField">Include public names?</span> <input class="b_postNames" type="checkbox" name="includenames" value="true" /><br />
+<span class="b_postField">Post content (in raw SML, no headers):</span><br />
+<textarea class="b_postText" rows="6" cols="80" name="entrytext"><%=post.getText()%></textarea><br />
+<span class="b_postField">SML cheatsheet:</span><br /><textarea class="b_postCheatsheet" rows="6" cols="80" readonly="true">
 * newlines are newlines are newlines. 
 * all &lt; and &gt; are replaced with their &amp;symbol;
 * [b][/b] = <b>bold</b>
@@ -150,24 +151,18 @@ SML headers are newline delimited key=value pairs.  Example keys are:
 * bgimage = attachment number to place as the background image for the post (only shown if images are enabled) (e.g. bgimage=1)
 * textfont = font to put most text into
 </textarea><br />
-SML post headers:<br />
-<textarea rows="3" cols="80" name="entryheaders"><%=post.getHeaders()%></textarea><br /><%
+<span class="b_postField">SML post headers:</span><br />
+<textarea class="b_postHeaders" rows="3" cols="80" name="entryheaders"><%=post.getHeaders()%></textarea><br /><%
 String s = request.getParameter(ArchiveViewerBean.PARAM_IN_REPLY_TO);
 if ( (s != null) && (s.trim().length() > 0) ) {%>
 <input type="hidden" name="<%=ArchiveViewerBean.PARAM_IN_REPLY_TO%>" value="<%=request.getParameter(ArchiveViewerBean.PARAM_IN_REPLY_TO)%>" />
 <% } %>
-Attachment 0: <input type="file" name="entryfile0" /><br />
-Attachment 1: <input type="file" name="entryfile1" /><br />
-Attachment 2: <input type="file" name="entryfile2" /><br />
-Attachment 3: <input type="file" name="entryfile3" /><br /><!--
-Attachment 4: <input type="file" name="entryfile4" /><br />
-Attachment 5: <input type="file" name="entryfile5" /><br />
-Attachment 6: <input type="file" name="entryfile6" /><br />
-Attachment 7: <input type="file" name="entryfile7" /><br />
-Attachment 8: <input type="file" name="entryfile8" /><br />
-Attachment 9: <input type="file" name="entryfile9" /><br />-->
+<span class="b_postField">Attachment 0:</span> <input class="b_postField" type="file" name="entryfile0" /><br />
+<span class="b_postField">Attachment 1:</span> <input class="b_postField" type="file" name="entryfile1" /><br />
+<span class="b_postField">Attachment 2:</span> <input class="b_postField" type="file" name="entryfile2" /><br />
+<span class="b_postField">Attachment 3:</span> <input class="b_postField" type="file" name="entryfile3" /><br />
 <hr />
-<input type="submit" name="Post" value="Preview..." /> <input type="reset" value="Cancel" />
+<input class="b_postPreview" type="submit" name="Post" value="Preview..." /> <input class="b_postReset" type="reset" value="Cancel" />
 <%
     } // end of the 'logged in, not confirmed, nothing posted' section
   } // end of the 'logged in, not confirmed' section

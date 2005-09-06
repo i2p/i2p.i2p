@@ -131,6 +131,7 @@ public class FileUtil {
      *
      * @param startAtBeginning if true, read the first maxNumLines, otherwise read
      *                         the last maxNumLines
+     * @param maxNumLines max number of lines (or -1 for unlimited)
      *
      */
     public static String readTextFile(String filename, int maxNumLines, boolean startAtBeginning) {
@@ -140,11 +141,11 @@ public class FileUtil {
         try {
             fis = new FileInputStream(f);
             BufferedReader in = new BufferedReader(new InputStreamReader(fis));
-            List lines = new ArrayList(maxNumLines);
+            List lines = new ArrayList(maxNumLines > 0 ? maxNumLines : 64);
             String line = null;
             while ( (line = in.readLine()) != null) {
                 lines.add(line);
-                if (lines.size() >= maxNumLines) {
+                if ( (maxNumLines > 0) && (lines.size() >= maxNumLines) ) {
                     if (startAtBeginning)
                         break;
                     else

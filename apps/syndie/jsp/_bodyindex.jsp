@@ -31,10 +31,9 @@ if (user.getAuthenticated() && (null != request.getParameter("action")) ) {
     BlogManager.instance().saveUser(user);
   }
 }
-%><table border="0" width="100%">
-<tr><form action="index.jsp"><td nowrap="true">
-<b>Blogs:</b> <%ArchiveViewerBean.renderBlogSelector(user, request.getParameterMap(), out);%>
-<input type="submit" value="Refresh" />
-<input type="submit" name="action" value="<%=ArchiveViewerBean.SEL_ACTION_SET_AS_DEFAULT%>" />
-<!-- char encoding: [<%=response.getCharacterEncoding()%>] content type [<%=response.getContentType()%>] Locale [<%=response.getLocale()%>] -->
+%><table border="0" width="100%" class="b_content">
+<tr class="b_content"><form action="index.jsp"><td nowrap="true">
+<em class="b_selectorTitle">Blogs:</em> <span class="b_selector"><%ArchiveViewerBean.renderBlogSelector(user, request.getParameterMap(), out);%></span>
+<input type="submit" value="Refresh" class="b_selectorRefresh" />
+<input type="submit" name="action" value="<%=ArchiveViewerBean.SEL_ACTION_SET_AS_DEFAULT%>" class="b_selectorDefault" />
 <%ArchiveViewerBean.renderBlogs(user, request.getParameterMap(), out, "</td></form></tr><tr><td align=\"left\" valign=\"top\">");%></td></tr></table>

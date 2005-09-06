@@ -558,7 +558,7 @@ public class RemoteArchiveBean {
     public void renderDeltaForm(User user, ArchiveIndex localIndex, Writer out) throws IOException {
         Archive archive = BlogManager.instance().getArchive();
         StringBuffer buf = new StringBuffer(512);
-        buf.append("<b>New blogs:</b> <select name=\"blog\"><option value=\"ALL\">All</option>\n");
+        buf.append("<em class=\"b_remMeta\">New blogs:</em> <select class=\"b_remMeta\"name=\"blog\"><option value=\"ALL\">All</option>\n");
         Set localBlogs = archive.getIndex().getUniqueBlogs();
         Set remoteBlogs = _remoteIndex.getUniqueBlogs();
         int newBlogs = 0;
@@ -573,12 +573,12 @@ public class RemoteArchiveBean {
         }
         if (newBlogs > 0) {
             out.write(buf.toString());
-            out.write("</select> <input type=\"submit\" name=\"action\" value=\"Fetch metadata\" /><br />\n");
+            out.write("</select> <input class=\"b_remMetaFetch\" type=\"submit\" name=\"action\" value=\"Fetch metadata\" /><br />\n");
         }
         
         int newEntries = 0;
         int localNew = 0;
-        out.write("<table border=\"1\" width=\"100%\">\n");
+        out.write("<table class=\"b_remDelta\" border=\"1\" width=\"100%\">\n");
         List entries = new ArrayList();
         for (Iterator iter = remoteBlogs.iterator(); iter.hasNext(); ) {
             Hash blog = (Hash)iter.next();
@@ -586,37 +586,44 @@ public class RemoteArchiveBean {
                 continue;
             buf.setLength(0);
             int shownEntries = 0;
-            buf.append("<tr><td colspan=\"5\" align=\"left\" valign=\"top\">\n");
+            buf.append("<tr class=\"b_remBlog\"><td class=\"b_remBlog\" colspan=\"5\" align=\"left\" valign=\"top\">\n");
             BlogInfo info = archive.getBlogInfo(blog);
             if (info != null) {
-                buf.append("<a href=\"" + HTMLRenderer.getPageURL(blog, null, -1, -1, -1, user.getShowExpanded(), user.getShowImages()) + "\"><b>" + HTMLRenderer.sanitizeString(info.getProperty(BlogInfo.NAME)) + "</b></a>: " +
-                HTMLRenderer.sanitizeString(info.getProperty(BlogInfo.DESCRIPTION)) + "\n");
+                buf.append("<a class=\"b_remBlog\" href=\"");
+                buf.append(HTMLRenderer.getPageURL(blog, null, -1, -1, -1, user.getShowExpanded(), user.getShowImages()));
+                buf.append("\">").append(HTMLRenderer.sanitizeString(info.getProperty(BlogInfo.NAME))).append("</a>: ");
+                buf.append("<span class=\"b_remBlogDesc\">").append(HTMLRenderer.sanitizeString(info.getProperty(BlogInfo.DESCRIPTION)));
+                buf.append("</span>\n");
             } else {
-                buf.append("<b>" + blog.toBase64() + "</b>\n");
+                buf.append("<span class=\"b_remBlog\">" + blog.toBase64() + "</span>\n");
             }
             buf.append("</td></tr>\n");
-            buf.append("<tr><td>&nbsp;</td><td nowrap=\"true\"><b>Posted on</b></td><td nowrap=\"true\"><b>#</b></td><td nowrap=\"true\"><b>Size</b></td><td width=\"90%\" nowrap=\"true\"><b>Tags</b></td></tr>\n");
+            buf.append("<tr class=\"b_remHeader\"><td class=\"b_remHeader\">&nbsp;</td><td class=\"b_remHeader\" nowrap=\"nowrap\">");
+            buf.append("<em class=\"b_remHeader\">Posted on</em></td>");
+            buf.append("<td class=\"b_remHeader\" nowrap=\"nowrap\"><em class=\"b_remHeader\">#</em></td>");
+            buf.append("<td class=\"b_remHeader\" nowrap=\"nowrap\"><em class=\"b_remHeader\">Size</em></td>");
+            buf.append("<td class=\"b_remHeader\" width=\"90%\" nowrap=\"true\"><em class=\"b_remHeader\">Tags</em></td></tr>\n");
             entries.clear();
             _remoteIndex.selectMatchesOrderByEntryId(entries, blog, null);
             for (int i = 0; i < entries.size(); i++) {
                 BlogURI uri = (BlogURI)entries.get(i);
-                buf.append("<tr>\n");
+                buf.append("<tr class=\"b_remDetail\">\n");
                 if (!archive.getIndex().getEntryIsKnown(uri)) {
-                    buf.append("<td><input type=\"checkbox\" name=\"entry\" value=\"" + uri.toString() + "\" /></td>\n");
+                    buf.append("<td class=\"b_remDetail\"><input class=\"b_remSelect\" type=\"checkbox\" name=\"entry\" value=\"" + uri.toString() + "\" /></td>\n");
                     newEntries++;
                     shownEntries++;
                 } else {
                     String page = HTMLRenderer.getPageURL(blog, null, uri.getEntryId(), -1, -1,
                     user.getShowExpanded(), user.getShowImages());
-                    buf.append("<td><a href=\"" + page + "\">(local)</a></td>\n");
+                    buf.append("<td class=\"b_remDetail\"><a class=\"b_remLocal\" href=\"" + page + "\">(local)</a></td>\n");
                 }
-                buf.append("<td>" + getDate(uri.getEntryId()) + "</td>\n");
-                buf.append("<td>" + getId(uri.getEntryId()) + "</td>\n");
-                buf.append("<td>" + _remoteIndex.getBlogEntrySizeKB(uri) + "KB</td>\n");
-                buf.append("<td>");
+                buf.append("<td class=\"b_remDetail\"><span class=\"b_remDate\">" + getDate(uri.getEntryId()) + "</span></td>\n");
+                buf.append("<td class=\"b_remDetail\"><span class=\"b_remNum\">" + getId(uri.getEntryId()) + "</span></td>\n");
+                buf.append("<td class=\"b_remDetail\"><span class=\"b_remSize\">" + _remoteIndex.getBlogEntrySizeKB(uri) + "KB</span></td>\n");
+                buf.append("<td class=\"b_remDetail\">");
                 for (Iterator titer = new TreeSet(_remoteIndex.getBlogEntryTags(uri)).iterator(); titer.hasNext(); ) {
                     String tag = (String)titer.next();
-                    buf.append("<a href=\"" + HTMLRenderer.getPageURL(blog, tag, -1, -1, -1, user.getShowExpanded(), user.getShowImages()) + "\">" + tag + "</a> \n");
+                    buf.append("<a class=\"b_remTag\" href=\"" + HTMLRenderer.getPageURL(blog, tag, -1, -1, -1, user.getShowExpanded(), user.getShowImages()) + "\">" + tag + "</a> \n");
                 }
                 buf.append("</td>\n");
                 buf.append("</tr>\n");
@@ -630,22 +637,22 @@ public class RemoteArchiveBean {
             // now for posts in known blogs that we have and they don't
             entries.clear();
             localIndex.selectMatchesOrderByEntryId(entries, blog, null);
-            buf.append("<tr><td colspan=\"5\">Entries we have, but the remote Syndie doesn't:</td></tr>\n");
+            buf.append("<tr class=\"b_remLocalHeader\"><td class=\"b_remLocalHeader\" colspan=\"5\"><span class=\"b_remLocalHeader\">Entries we have, but the remote Syndie doesn't:</span></td></tr>\n");
             for (int i = 0; i < entries.size(); i++) {
                 BlogURI uri = (BlogURI)entries.get(i);
                 if (!_remoteIndex.getEntryIsKnown(uri)) {
-                    buf.append("<tr>\n");
-                    buf.append("<td><input type=\"checkbox\" name=\"localentry\" value=\"" + uri.toString() + "\" /></td>\n");
+                    buf.append("<tr class=\"b_remLocalDetail\">\n");
+                    buf.append("<td class=\"b_remLocalDetail\"><input class=\"b_remLocalSend\" type=\"checkbox\" name=\"localentry\" value=\"" + uri.toString() + "\" /></td>\n");
                     shownEntries++;
                     newEntries++;
                     localNew++;
-                    buf.append("<td>" + getDate(uri.getEntryId()) + "</td>\n");
-                    buf.append("<td>" + getId(uri.getEntryId()) + "</td>\n");
-                    buf.append("<td>" + localIndex.getBlogEntrySizeKB(uri) + "KB</td>\n");
-                    buf.append("<td>");
+                    buf.append("<td class=\"b_remLocalDate\"><span class=\"b_remLocalDate\">" + getDate(uri.getEntryId()) + "</span></td>\n");
+                    buf.append("<td class=\"b_remLocalNum\"><span class=\"b_remLocalNum\">" + getId(uri.getEntryId()) + "</span></td>\n");
+                    buf.append("<td class=\"b_remLocalSize\"><span class=\"b_remLocalSize\">" + localIndex.getBlogEntrySizeKB(uri) + "KB</span></td>\n");
+                    buf.append("<td class=\"b_remLocalTags\">");
                     for (Iterator titer = new TreeSet(localIndex.getBlogEntryTags(uri)).iterator(); titer.hasNext(); ) {
                         String tag = (String)titer.next();
-                        buf.append("<a href=\"" + HTMLRenderer.getPageURL(blog, tag, -1, -1, -1, user.getShowExpanded(), user.getShowImages()) + "\">" + tag + "</a> \n");
+                        buf.append("<a class=\"b_remLocalTag\" href=\"" + HTMLRenderer.getPageURL(blog, tag, -1, -1, -1, user.getShowExpanded(), user.getShowImages()) + "\">" + tag + "</a> \n");
                     }
                     buf.append("</td>\n");
                     buf.append("</tr>\n");
@@ -659,7 +666,7 @@ public class RemoteArchiveBean {
         // now for posts in blogs we have and they don't
         int newBefore = localNew;
         buf.setLength(0);
-        buf.append("<tr><td colspan=\"5\">Blogs the remote Syndie doesn't have</td></tr>\n");
+        buf.append("<tr class=\"b_remLocalHeader\"><td class=\"b_remLocalHeader\" colspan=\"5\"><span class=\"b_remLocalHeader\">Blogs the remote Syndie doesn't have</span></td></tr>\n");
         for (Iterator iter = localBlogs.iterator(); iter.hasNext(); ) {
             Hash blog = (Hash)iter.next();
             if (remoteBlogs.contains(blog)) {
@@ -672,15 +679,15 @@ public class RemoteArchiveBean {
             
             for (int i = 0; i < entries.size(); i++) {
                 BlogURI uri = (BlogURI)entries.get(i);
-                buf.append("<tr>\n");
-                buf.append("<td><input type=\"checkbox\" name=\"localentry\" value=\"" + uri.toString() + "\" /></td>\n");
-                buf.append("<td>" + getDate(uri.getEntryId()) + "</td>\n");
-                buf.append("<td>" + getId(uri.getEntryId()) + "</td>\n");
-                buf.append("<td>" + localIndex.getBlogEntrySizeKB(uri) + "KB</td>\n");
-                buf.append("<td>");
+                buf.append("<tr class=\"b_remLocalDetail\">\n");
+                buf.append("<td class=\"b_remLocalDetail\"><input class=\"b_remLocalSend\" type=\"checkbox\" name=\"localentry\" value=\"" + uri.toString() + "\" /></td>\n");
+                buf.append("<td class=\"b_remLocalDate\"><span class=\"b_remLocalDate\">" + getDate(uri.getEntryId()) + "</span></td>\n");
+                buf.append("<td class=\"b_remLocalNum\"><span class=\"b_remLocalNum\">" + getId(uri.getEntryId()) + "</span></td>\n");
+                buf.append("<td class=\"b_remLocalSize\"><span class=\"b_remLocalSize\">" + localIndex.getBlogEntrySizeKB(uri) + "KB</span></td>\n");
+                buf.append("<td class=\"b_remLocalTags\">");
                 for (Iterator titer = new TreeSet(localIndex.getBlogEntryTags(uri)).iterator(); titer.hasNext(); ) {
                     String tag = (String)titer.next();
-                    buf.append("<a href=\"" + HTMLRenderer.getPageURL(blog, tag, -1, -1, -1, user.getShowExpanded(), user.getShowImages()) + "\">" + tag + "</a> \n");
+                    buf.append("<a class=\"b_remLocalTag\" href=\"" + HTMLRenderer.getPageURL(blog, tag, -1, -1, -1, user.getShowExpanded(), user.getShowImages()) + "\">" + tag + "</a> \n");
                 }
                 buf.append("</td>\n");
                 buf.append("</tr>\n");
@@ -692,13 +699,13 @@ public class RemoteArchiveBean {
         
         out.write("</table>\n");
         if (newEntries > 0) {
-            out.write("<input type=\"submit\" name=\"action\" value=\"Fetch selected entries\" /> \n");
-            out.write("<input type=\"submit\" name=\"action\" value=\"Fetch all new entries\" /> \n");
+            out.write("<input class=\"b_remFetchSelected\" type=\"submit\" name=\"action\" value=\"Fetch selected entries\" /> \n");
+            out.write("<input class=\"b_remFetchAll\" type=\"submit\" name=\"action\" value=\"Fetch all new entries\" /> \n");
         } else {
-            out.write(HTMLRenderer.sanitizeString(_remoteLocation) + " has no new posts to offer us\n");
+            out.write("<span class=\"b_remNoRemotePosts\">" + HTMLRenderer.sanitizeString(_remoteLocation) + " has no new posts to offer us</span>\n");
         }
         if (localNew > 0) {
-            out.write("<input type=\"submit\" name=\"action\" value=\"Post selected entries\" /> \n");
+            out.write("<input class=\"b_remPostSelected\" type=\"submit\" name=\"action\" value=\"Post selected entries\" /> \n");
         }
         out.write("<hr />\n");
     }

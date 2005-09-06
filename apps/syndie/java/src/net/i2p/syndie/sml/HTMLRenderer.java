@@ -61,20 +61,49 @@ public class HTMLRenderer extends EventReceiverImpl {
         }
     }
     
+    /**
+     * Retrieve: class="s_summary_$element" or class="s_detail_$element ss_$style_detail_$element"
+     */
+    protected String getClass(String element) {
+        StringBuffer rv = new StringBuffer(64);
+        rv.append(" class=\"s_");
+        if (_cutBody)
+            rv.append("summary_");
+        else
+            rv.append("detail_");
+        rv.append(element);
+        if (_entry != null) {
+            String style = sanitizeStyle(_entry.getHeader(HEADER_STYLE));
+            if (style != null) {
+                rv.append(" ss_").append(style);
+                if (_cutBody)
+                    rv.append("summary_");
+                else
+                    rv.append("detail_");
+                rv.append(element);
+            }
+        }
+        rv.append("\" ");
+        return rv.toString();
+    }
+    protected String getSpan(String element) {
+        return "<span " + getClass(element) + ">";
+    }
+    
     public void renderUnknownEntry(User user, Archive archive, BlogURI uri, Writer out) throws IOException {
         BlogInfo info = archive.getBlogInfo(uri);
         if (info == null)
-            out.write("<br />The blog " + uri.getKeyHash().toBase64() + " is not known locally.  "
-                      + "Please get it from an archive and <a href=\"" 
+            out.write("<br /><span " + getClass("unknownBlog") + ">The blog <span " + getClass("blogURI") + ">" + uri.getKeyHash().toBase64() + "</span> is not known locally.  "
+                      + "Please get it from an archive and <a " + getClass("unknownRetry") + " href=\"" 
                       + getPageURL(uri.getKeyHash(), null, uri.getEntryId(), -1, -1, user.getShowExpanded(), user.getShowImages())
-                      + "\">try again</a>");
+                      + "\">try again</a></span>");
         else
-            out.write("<br />The blog <a href=\""
+            out.write("<br /><span " + getClass("unknownEntry") + ">The blog <a " + getClass("unknownRetry") + " href=\""
                       + getPageURL(uri.getKeyHash(), null, -1, -1, -1, user.getShowExpanded(), user.getShowImages())
                       + "\">" + info.getProperty(BlogInfo.NAME) + "</a> is known, but the entry " + uri.getEntryId() + " is not.  "
-                      + "Please get it from an archive and <a href=\"" 
+                      + "Please get it from an archive and <a " + getClass("unknownRetry") + " href=\"" 
                       + getPageURL(uri.getKeyHash(), null, uri.getEntryId(), -1, -1, user.getShowExpanded(), user.getShowImages())
-                      + "\">try again</a>");
+                      + "\">try again</a></span>");
     }
     
     public void render(User user, Archive archive, EntryContainer entry, Writer out, boolean cutBody, boolean showImages) throws IOException {
@@ -118,64 +147,64 @@ public class HTMLRenderer extends EventReceiverImpl {
     
     public void receiveBold(String text) { 
         if (!continueBody()) { return; }
-        _bodyBuffer.append("<b>").append(sanitizeString(text)).append("</b>");
+        _bodyBuffer.append("<em ").append(getClass("bold")).append(" >").append(sanitizeString(text)).append("</em>");
     }
     public void receiveItalic(String text) { 
         if (!continueBody()) { return; }
-        _bodyBuffer.append("<i>").append(sanitizeString(text)).append("</i>");
+        _bodyBuffer.append("<em ").append(getClass("italic")).append(" >").append(sanitizeString(text)).append("</em>");
     }
     public void receiveUnderline(String text) { 
         if (!continueBody()) { return; }
-        _bodyBuffer.append("<u>").append(sanitizeString(text)).append("</u>");
+        _bodyBuffer.append("<em ").append(getClass("underline")).append(" >").append(sanitizeString(text)).append("</em>");
     }
     public void receiveHR() {
         if (!continueBody()) { return; }
-        _bodyBuffer.append("<hr />");
+        _bodyBuffer.append(getSpan("hr")).append("<hr /></span>");
     }
     public void receiveH1(String body) {
         if (!continueBody()) { return; }
-        _bodyBuffer.append("<h1>").append(sanitizeString(body)).append("</h1>");
+        _bodyBuffer.append("<h1 ").append(getClass("h1")).append(" >").append(sanitizeString(body)).append("</span></h1>");
     }
     public void receiveH2(String body) {
         if (!continueBody()) { return; }
-        _bodyBuffer.append("<h2>").append(sanitizeString(body)).append("</h2>");
+        _bodyBuffer.append("<h2 ").append(getClass("h2")).append(" >").append(sanitizeString(body)).append("</span></h2>");
     }
     public void receiveH3(String body) {
         if (!continueBody()) { return; }
-        _bodyBuffer.append("<h3>").append(sanitizeString(body)).append("</h3>");
+        _bodyBuffer.append("<h3 ").append(getClass("h3")).append(" >").append(sanitizeString(body)).append("</span></h3>");
     }
     public void receiveH4(String body) {
         if (!continueBody()) { return; }
-        _bodyBuffer.append("<h4>").append(sanitizeString(body)).append("</h4>");
+        _bodyBuffer.append("<h4 ").append(getClass("h4")).append(" >").append(sanitizeString(body)).append("</span></h4>");
     }
     public void receiveH5(String body) {
         if (!continueBody()) { return; }
-        _bodyBuffer.append("<h5>").append(sanitizeString(body)).append("</h5>");
+        _bodyBuffer.append("<h5 ").append(getClass("h5")).append(" >").append(sanitizeString(body)).append("</span></h5>");
     }
     public void receivePre(String body) {
         if (!continueBody()) { return; }
-        _bodyBuffer.append("<pre>").append(sanitizeString(body)).append("</pre>");
+        _bodyBuffer.append("<pre ").append(getClass("pre")).append(" >").append(sanitizeString(body)).append("</pre>");
     }
     
     public void receiveQuote(String text, String whoQuoted, String quoteLocationSchema, String quoteLocation) {
         if (!continueBody()) { return; }
-        _bodyBuffer.append("<quote>").append(sanitizeString(text)).append("</quote>");
+        _bodyBuffer.append("<quote ").append(getClass("quote")).append(" >").append(sanitizeString(text)).append("</quote>");
     }
     public void receiveCode(String text, String codeLocationSchema, String codeLocation) { 
         if (!continueBody()) { return; }
-           _bodyBuffer.append("<code>").append(sanitizeString(text)).append("</code>");
+           _bodyBuffer.append("<code ").append(getClass("code")).append(" >").append(sanitizeString(text)).append("</code>");
     }
     public void receiveImage(String alternateText, int attachmentId) {
         if (!continueBody()) { return; }
         if (_showImages) {
-            _bodyBuffer.append("<img src=\"").append(getAttachmentURL(attachmentId)).append("\"");
+            _bodyBuffer.append("<img ").append(getClass("img")).append(" src=\"").append(getAttachmentURL(attachmentId)).append("\"");
             if (alternateText != null)
                 _bodyBuffer.append(" alt=\"").append(sanitizeTagParam(alternateText)).append("\"");
             _bodyBuffer.append(" />");
         } else {
-            _bodyBuffer.append("[image: attachment ").append(attachmentId);
-            _bodyBuffer.append(": ").append(sanitizeString(alternateText));
-            _bodyBuffer.append(" <a href=\"").append(getEntryURL(true)).append("\">view images</a>]");
+            _bodyBuffer.append(getSpan("imgSummary")).append("[image: ").append(getSpan("imgSummaryAttachment")).append(" attachment ").append(attachmentId);
+            _bodyBuffer.append(":</span> ").append(getSpan("imgSummaryAlt")).append(sanitizeString(alternateText));
+            _bodyBuffer.append("</span> <a ").append(getClass("imgSummaryLink")).append(" href=\"").append(getEntryURL(true)).append("\">view images</a>]</span>");
         }
     }
     
@@ -183,7 +212,7 @@ public class HTMLRenderer extends EventReceiverImpl {
         if (!continueBody()) { return; }
         _cutReached = true;
         if (_cutBody) {
-            _bodyBuffer.append("<a href=\"").append(getEntryURL()).append("\">");
+            _bodyBuffer.append("<a ").append(getClass("cutExplicit")).append(" href=\"").append(getEntryURL()).append("\">");
             if ( (summaryText != null) && (summaryText.length() > 0) )
                 _bodyBuffer.append(sanitizeString(summaryText));
             else
@@ -191,7 +220,7 @@ public class HTMLRenderer extends EventReceiverImpl {
             _bodyBuffer.append("</a>\n");
         } else {
             if (summaryText != null)
-                _bodyBuffer.append(sanitizeString(summaryText));
+                _bodyBuffer.append(getSpan("cutIgnore")).append(sanitizeString(summaryText)).append("</span>\n");
         }
     }
     
@@ -202,7 +231,7 @@ public class HTMLRenderer extends EventReceiverImpl {
         //    System.out.println("rv: " + rv + " Cut reached: " + _cutReached + " bodyBufferSize: " + _bodyBuffer.length() + " cutBody? " + _cutBody);
         if (!rv && !_cutReached) {
             // exceeded the allowed size
-            _bodyBuffer.append("<a href=\"").append(getEntryURL()).append("\">more inside...</a>");
+            _bodyBuffer.append("<a ").append(getClass("cutImplicit")).append(" href=\"").append(getEntryURL()).append("\">more inside...</a>\n");
             _cutReached = true;
         }
         return rv;
@@ -211,26 +240,26 @@ public class HTMLRenderer extends EventReceiverImpl {
     public void receiveNewline() { 
         if (!continueBody()) { return; }
         if (true || (_lastNewlineAt >= _bodyBuffer.length()))
-            _bodyBuffer.append("<br />\n");
+            _bodyBuffer.append(getSpan("nl")).append("<br /></span>\n");
         else
             _lastNewlineAt = _bodyBuffer.length();
     }
     public void receiveLT() { 
         if (!continueBody()) { return; }
-        _bodyBuffer.append("&lt;");
+        _bodyBuffer.append(getSpan("lt")).append("&lt;</span>");
     }
     public void receiveGT() { 
         if (!continueBody()) { return; }
-        _bodyBuffer.append("&gt;");
+        _bodyBuffer.append(getSpan("gt")).append("&gt;</span>");
     }
     public void receiveBegin() {}
     public void receiveLeftBracket() { 
         if (!continueBody()) { return; }
-        _bodyBuffer.append('[');
+        _bodyBuffer.append(getSpan("lb")).append("[</span>");
     }
     public void receiveRightBracket() { 
         if (!continueBody()) { return; }
-        _bodyBuffer.append(']');
+        _bodyBuffer.append(getSpan("rb")).append("]</span>");
     }
     
     protected static class Blog {
@@ -287,7 +316,7 @@ public class HTMLRenderer extends EventReceiverImpl {
         Hash blog = new Hash(blogData);
         if (entryId > 0) {
             String pageURL = getPageURL(blog, tag, entryId, -1, -1, true, (_user != null ? _user.getShowImages() : false));
-            _bodyBuffer.append("<a href=\"").append(pageURL).append("\">");
+            _bodyBuffer.append("<a ").append(getClass("blogEntryLink")).append(" href=\"").append(pageURL).append("\">");
             if ( (description != null) && (description.trim().length() > 0) ) {
                 _bodyBuffer.append(sanitizeString(description));
             } else if ( (name != null) && (name.trim().length() > 0) ) {
@@ -300,29 +329,30 @@ public class HTMLRenderer extends EventReceiverImpl {
         
         
         String url = getPageURL(blog, null, -1, -1, -1, (_user != null ? _user.getShowExpanded() : false), (_user != null ? _user.getShowImages() : false));
-        _bodyBuffer.append(" [<a href=\"").append(url);
+        _bodyBuffer.append(getSpan("blogEntrySummary")).append(" [<a ").append(getClass("blogLink")).append(" href=\"").append(url);
         _bodyBuffer.append("\">");
         if ( (name != null) && (name.trim().length() > 0) )
             _bodyBuffer.append(sanitizeString(name));
         else
             _bodyBuffer.append("view");
-        _bodyBuffer.append("</a> (<a href=\"").append(getMetadataURL(blog)).append("\">meta</a>)");
+        _bodyBuffer.append("</a> (<a ").append(getClass("blogMeta")).append(" href=\"").append(getMetadataURL(blog)).append("\">meta</a>)");
         if ( (tag != null) && (tag.trim().length() > 0) ) {
             url = getPageURL(blog, tag, -1, -1, -1, false, false);
-            _bodyBuffer.append(" <a href=\"").append(url);
+            _bodyBuffer.append(" <a ").append(getClass("blogTagLink")).append(" href=\"").append(url);
             _bodyBuffer.append("\">Tag: ").append(sanitizeString(tag)).append("</a>");
         }
         if ( (locations != null) && (locations.size() > 0) ) {
-            _bodyBuffer.append(" Archives: ");
+            _bodyBuffer.append(getSpan("blogArchive")).append(" Archives: ");
             for (int i = 0; i < locations.size(); i++) {
                 SafeURL surl = (SafeURL)locations.get(i);
                 if (_user.getAuthenticated() && _user.getAllowAccessRemote())
-                    _bodyBuffer.append("<a href=\"").append(getArchiveURL(blog, surl)).append("\">").append(sanitizeString(surl.toString())).append("</a> ");
+                    _bodyBuffer.append("<a ").append(getClass("blogArchiveView")).append(" href=\"").append(getArchiveURL(blog, surl)).append("\">").append(sanitizeString(surl.toString())).append("</a> ");
                 else
-                    _bodyBuffer.append(sanitizeString(surl.toString())).append(' ');
+                    _bodyBuffer.append(getSpan("blogArchiveURL")).append(sanitizeString(surl.toString())).append("</span> ");
             }
+            _bodyBuffer.append("</span>");
         }
-        _bodyBuffer.append("] ");
+        _bodyBuffer.append("]</span> ");
     }
     
     protected static class ArchiveRef {
@@ -350,18 +380,19 @@ public class HTMLRenderer extends EventReceiverImpl {
     
         if (!continueBody()) { return; }
         
-        _bodyBuffer.append(sanitizeString(anchorText)).append(" [Archive ");
+        _bodyBuffer.append(getSpan("archive")).append(sanitizeString(anchorText)).append("</span>");
+        _bodyBuffer.append(getSpan("archiveSummary")).append(" [Archive ");
         if (name != null)
-            _bodyBuffer.append(sanitizeString(name));
+            _bodyBuffer.append(getSpan("archiveSummaryName")).append(sanitizeString(name)).append("</span>");
         if (location != null) {
             _bodyBuffer.append(" at ");
             SafeURL surl = new SafeURL(locationSchema + "://" + location);
-            _bodyBuffer.append("<a href=\"").append(getArchiveURL(null, surl));
+            _bodyBuffer.append("<a ").append(getClass("archiveSummaryLink")).append(" href=\"").append(getArchiveURL(null, surl));
             _bodyBuffer.append("\">").append(sanitizeString(surl.toString())).append("</a>");
         }
         if (description != null)
-            _bodyBuffer.append(": ").append(sanitizeString(description));
-        _bodyBuffer.append("]");
+            _bodyBuffer.append(": ").append(getSpan("archiveSummaryDesc")).append(sanitizeString(description)).append("</span>");
+        _bodyBuffer.append("]</span>");
     }
     
     protected static class Link {
@@ -381,7 +412,7 @@ public class HTMLRenderer extends EventReceiverImpl {
             _links.add(l);
         if (!continueBody()) { return; }
         if ( (schema == null) || (location == null) ) return;
-        _bodyBuffer.append("<a href=\"externallink.jsp?schema=");
+        _bodyBuffer.append("<a ").append(getClass("externalLink")).append(" href=\"externallink.jsp?schema=");
         _bodyBuffer.append(sanitizeURL(schema)).append("&location=");
         _bodyBuffer.append(sanitizeURL(location)).append("&description=");
         _bodyBuffer.append(sanitizeURL(text)).append("\">").append(sanitizeString(text)).append("</a>");
@@ -412,15 +443,20 @@ public class HTMLRenderer extends EventReceiverImpl {
         if (_user != null)
             knownName = _user.getPetNameDB().getNameByLocation(location);
         if (knownName != null) {
-            _bodyBuffer.append(sanitizeString(anchorText));
-            _bodyBuffer.append(" <i>(").append(sanitizeString(knownName)).append(")</i>");
+            _bodyBuffer.append(getSpan("addr")).append(sanitizeString(anchorText)).append("</span>");
+            _bodyBuffer.append(getSpan("addrKnownName")).append("(").append(sanitizeString(knownName)).append(")</span>");
         } else {
             System.err.println("Receiving address [" + location + "]");
-            _bodyBuffer.append("<a href=\"addresses.jsp?network=");
-            _bodyBuffer.append(sanitizeTagParam(schema)).append("&name=");
-            _bodyBuffer.append(sanitizeTagParam(name)).append("&protocol=");
-            _bodyBuffer.append(sanitizeTagParam(protocol)).append("&location=");
-            _bodyBuffer.append(sanitizeTagParam(location)).append("\">").append(sanitizeString(anchorText)).append("</a>");
+            _bodyBuffer.append("<a ").append(getClass("addrAdd")).append(" href=\"addresses.jsp?");
+            if (schema != null)
+                _bodyBuffer.append("network=").append(sanitizeTagParam(schema)).append('&');
+            if (name != null)
+                _bodyBuffer.append("name=").append(sanitizeTagParam(name)).append('&');
+            if (protocol != null)
+                _bodyBuffer.append("protocol=").append(sanitizeTagParam(protocol)).append('&');
+            if (location != null)
+                _bodyBuffer.append("location=").append(sanitizeTagParam(location));
+            _bodyBuffer.append("\">").append(sanitizeString(anchorText)).append("</a>");
         }
     }
     
@@ -428,23 +464,26 @@ public class HTMLRenderer extends EventReceiverImpl {
         if (!continueBody()) { return; }
         Attachment attachments[] = _entry.getAttachments();
         if ( (id < 0) || (id >= attachments.length)) {
-            _bodyBuffer.append(sanitizeString(anchorText));
+            _bodyBuffer.append(getSpan("attachmentUnknown")).append(sanitizeString(anchorText)).append("</span>");
         } else {
-            _bodyBuffer.append("<a href=\"").append(getAttachmentURL(id)).append("\">");
+            _bodyBuffer.append("<a ").append(getClass("attachmentView")).append(" href=\"").append(getAttachmentURL(id)).append("\">");
             _bodyBuffer.append(sanitizeString(anchorText)).append("</a>");
-            _bodyBuffer.append(" (").append(attachments[id].getDataLength()/1024).append("KB, ");
-            _bodyBuffer.append(" \"").append(sanitizeString(attachments[id].getName())).append("\", ");
-            _bodyBuffer.append(sanitizeString(attachments[id].getMimeType())).append(")");
+            _bodyBuffer.append(getSpan("attachmentSummary")).append(" (");
+            _bodyBuffer.append(getSpan("attachmentSummarySize")).append(attachments[id].getDataLength()/1024).append("KB</span>, ");
+            _bodyBuffer.append(getSpan("attachmentSummaryName")).append(" \"").append(sanitizeString(attachments[id].getName())).append("\"</span>, ");
+            _bodyBuffer.append(getSpan("attachmentSummaryDesc")).append(" \"").append(sanitizeString(attachments[id].getDescription())).append("\"</span>, ");
+            _bodyBuffer.append(getSpan("attachmentSummaryType")).append(sanitizeString(attachments[id].getMimeType())).append("</span>)</span>");
         }
     }
     
     public void receiveEnd() { 
-        _postBodyBuffer.append("</td></tr>\n");
+        _postBodyBuffer.append("</td></tr>\n<!-- end of the post body -->");
         if (_cutBody) {
-            _postBodyBuffer.append("<tr class=\"syndieEntryAttachmentsCell\">\n");
-            _postBodyBuffer.append("<td colspan=\"2\" valign=\"top\" align=\"left\" class=\"syndieEntryAttachmentsCell\">");
-            _postBodyBuffer.append("<a href=\"").append(getEntryURL()).append("\">View details...</a> ");
-            
+            _postBodyBuffer.append("<!-- beginning of the post summary -->\n");
+            _postBodyBuffer.append("<tr ").append(getClass("summ")).append("\">\n");
+            _postBodyBuffer.append("<td colspan=\"2\" valign=\"top\" align=\"left\" ").append(getClass("summ")).append(" >");
+            _postBodyBuffer.append("<a ").append(getClass("summLink")).append(" href=\"").append(getEntryURL()).append("\">View details...</a> ");
+            _postBodyBuffer.append(getSpan("summ"));
             if ( (_entry != null) && (_entry.getAttachments() != null) && (_entry.getAttachments().length > 0) ) {
                 int num = _entry.getAttachments().length;
                 if (num == 1)
@@ -489,11 +528,13 @@ public class HTMLRenderer extends EventReceiverImpl {
         
             String inReplyTo = (String)_headers.get(HEADER_IN_REPLY_TO);
             if ( (inReplyTo != null) && (inReplyTo.trim().length() > 0) )
-                _postBodyBuffer.append(" <a href=\"").append(getPageURL(sanitizeTagParam(inReplyTo))).append("\">(view parent)</a>\n");
+                _postBodyBuffer.append(" <a ").append(getClass("summParent")).append(" href=\"").append(getPageURL(sanitizeTagParam(inReplyTo))).append("\">(view parent)</a>\n");
             
-            _postBodyBuffer.append("</td></tr>\n");
+            _postBodyBuffer.append("</span></td></tr>\n");
+            _postBodyBuffer.append("<!-- end of the post summary -->\n");
         } else {
-            _postBodyBuffer.append("<tr class=\"syndieEntryAttachmentsCell\">\n");
+            _postBodyBuffer.append("<!-- beginning of the post summary details -->\n");
+            _postBodyBuffer.append("<tr ").append(getClass("summDetail")).append(">\n");
             _postBodyBuffer.append("<form action=\"").append(getAttachmentURLBase()).append("\">\n");
             _postBodyBuffer.append("<input type=\"hidden\" name=\"").append(ArchiveViewerBean.PARAM_BLOG);
             _postBodyBuffer.append("\" value=\"");
@@ -509,11 +550,11 @@ public class HTMLRenderer extends EventReceiverImpl {
             else
                 _postBodyBuffer.append("unknown");
             _postBodyBuffer.append("\" />\n");
-            _postBodyBuffer.append("<td colspan=\"2\" valign=\"top\" align=\"left\" class=\"syndieEntryAttachmentsCell\">\n");
+            _postBodyBuffer.append("<td colspan=\"2\" valign=\"top\" align=\"left\" ").append(getClass("summDetail")).append(" >\n");
 
             if ( (_entry != null) && (_entry.getAttachments() != null) && (_entry.getAttachments().length > 0) ) {
-                _postBodyBuffer.append("<b>Attachments:</b> ");
-                _postBodyBuffer.append("<select name=\"").append(ArchiveViewerBean.PARAM_ATTACHMENT).append("\">\n");
+                _postBodyBuffer.append(getSpan("summDetailAttachment")).append("Attachments:</span> ");
+                _postBodyBuffer.append("<select ").append(getClass("summDetailAttachmentId")).append(" name=\"").append(ArchiveViewerBean.PARAM_ATTACHMENT).append("\">\n");
                 for (int i = 0; i < _entry.getAttachments().length; i++) {
                     _postBodyBuffer.append("<option value=\"").append(i).append("\">");
                     Attachment a = _entry.getAttachments()[i];
@@ -526,34 +567,39 @@ public class HTMLRenderer extends EventReceiverImpl {
                     _postBodyBuffer.append(", type ").append(sanitizeString(a.getMimeType())).append(")</option>\n");
                 }
                 _postBodyBuffer.append("</select>\n");
-                _postBodyBuffer.append("<input type=\"submit\" value=\"Download\" name=\"Download\" /><br />\n");
+                _postBodyBuffer.append("<input ").append(getClass("summDetailAttachmentDl")).append(" type=\"submit\" value=\"Download\" name=\"Download\" /><br />\n");
             }
 
             if (_blogs.size() > 0) {
-                _postBodyBuffer.append("<b>Blog references:</b> ");
+                _postBodyBuffer.append(getSpan("summDetailBlog")).append("Blog references:</span>");
                 for (int i = 0; i < _blogs.size(); i++) {
                     Blog b = (Blog)_blogs.get(i);
-                    _postBodyBuffer.append("<a href=\"").append(getPageURL(new Hash(Base64.decode(b.hash)), b.tag, b.entryId, -1, -1, (_user != null ? _user.getShowExpanded() : false), (_user != null ? _user.getShowImages() : false)));
+                    _postBodyBuffer.append("<a ").append(getClass("summDetailBlogLink")).append(" href=\"");
+                    boolean expanded = (_user != null ? _user.getShowExpanded() : false);
+                    boolean images = (_user != null ? _user.getShowImages() : false);
+                    _postBodyBuffer.append(getPageURL(new Hash(Base64.decode(b.hash)), b.tag, b.entryId, -1, -1, expanded, images));
                     _postBodyBuffer.append("\">").append(sanitizeString(b.name)).append("</a> ");
                 }
                 _postBodyBuffer.append("<br />\n");
             }
 
             if (_links.size() > 0) {
-                _postBodyBuffer.append("<b>External links:</b> ");
+                _postBodyBuffer.append(getSpan("summDetailExternal")).append("External links:</span> ");
                 for (int i = 0; i < _links.size(); i++) {
                     Link l = (Link)_links.get(i);
-                    _postBodyBuffer.append("<a href=\"externallink.jsp?schema=");
-                    _postBodyBuffer.append(sanitizeURL(l.schema)).append("&location=");
-                    _postBodyBuffer.append(sanitizeURL(l.location));
+                    _postBodyBuffer.append("<a ").append(getClass("summDetailExternalLink")).append(" href=\"externallink.jsp?");
+                    if (l.schema != null)
+                        _postBodyBuffer.append("schema=").append(sanitizeURL(l.schema)).append('&');
+                    if (l.location != null)
+                        _postBodyBuffer.append("location=").append(sanitizeURL(l.location)).append('&');
                     _postBodyBuffer.append("\">").append(sanitizeString(l.location));
-                    _postBodyBuffer.append(" (").append(sanitizeString(l.schema)).append(")</a> ");
+                    _postBodyBuffer.append(getSpan("summDetailExternalNet")).append(" (").append(sanitizeString(l.schema)).append(")</span></a> ");
                 }
                 _postBodyBuffer.append("<br />\n");
             }
 
             if (_addresses.size() > 0) {
-                _postBodyBuffer.append("<b>Addresses:</b>");
+                _postBodyBuffer.append(getSpan("summDetailAddr")).append("Addresses:</span>");
                 for (int i = 0; i < _addresses.size(); i++) {
                     Address a = (Address)_addresses.get(i);
                     
@@ -561,13 +607,18 @@ public class HTMLRenderer extends EventReceiverImpl {
                     if (_user != null)
                         knownName = _user.getPetNameDB().getNameByLocation(a.location);
                     if (knownName != null) {
-                        _postBodyBuffer.append(' ').append(sanitizeString(knownName));
+                        _postBodyBuffer.append(' ').append(getSpan("summDetailAddrKnown"));
+                        _postBodyBuffer.append(sanitizeString(knownName)).append("</span>");
                     } else {
-                        _postBodyBuffer.append(" <a href=\"addresses.jsp?network=");
-                        _postBodyBuffer.append(sanitizeTagParam(a.schema)).append("&location=");
-                        _postBodyBuffer.append(sanitizeTagParam(a.location)).append("&name=");
-                        _postBodyBuffer.append(sanitizeTagParam(a.name)).append("&protocol=");
-                        _postBodyBuffer.append(sanitizeTagParam(a.protocol));
+                        _postBodyBuffer.append(" <a ").append(getClass("summDetailAddrLink")).append(" href=\"addresses.jsp?");
+                        if (a.schema != null)
+                            _postBodyBuffer.append("network=").append(sanitizeTagParam(a.schema)).append('&');
+                        if (a.location != null)
+                            _postBodyBuffer.append("location=").append(sanitizeTagParam(a.location)).append('&');
+                        if (a.name != null)
+                            _postBodyBuffer.append("name=").append(sanitizeTagParam(a.name)).append('&');
+                        if (a.protocol != null)
+                            _postBodyBuffer.append("protocol=").append(sanitizeTagParam(a.protocol)).append('&');
                         _postBodyBuffer.append("\">").append(sanitizeString(a.name)).append("</a>");
                     }
                 }
@@ -575,16 +626,18 @@ public class HTMLRenderer extends EventReceiverImpl {
             }
 
             if (_archives.size() > 0) {
-                _postBodyBuffer.append("<b>Archives:</b>");
+                _postBodyBuffer.append(getSpan("summDetailArchive")).append("Archives:</span>");
                 for (int i = 0; i < _archives.size(); i++) {
                     ArchiveRef a = (ArchiveRef)_archives.get(i);
-                    _postBodyBuffer.append(" <a href=\"").append(getArchiveURL(null, new SafeURL(a.locationSchema + "://" + a.location)));
+                    _postBodyBuffer.append(" <a ").append(getClass("summDetailArchiveLink")).append(" href=\"").append(getArchiveURL(null, new SafeURL(a.locationSchema + "://" + a.location)));
                     _postBodyBuffer.append("\">").append(sanitizeString(a.name)).append("</a>");
                     if (a.description != null)
-                        _postBodyBuffer.append(": ").append(sanitizeString(a.description));
-                    _postBodyBuffer.append(" <a href=\"");
-                    _postBodyBuffer.append(getBookmarkURL(a.name, a.location, a.locationSchema, "syndiearchive"));
-                    _postBodyBuffer.append("\">bookmark</a>");
+                        _postBodyBuffer.append(": ").append(getSpan("summDetailArchiveDesc")).append(sanitizeString(a.description)).append("</span>");
+                    if (null == _user.getPetNameDB().getNameByLocation(a.location)) {
+                        _postBodyBuffer.append(" <a ").append(getClass("summDetailArchiveBookmark")).append(" href=\"");
+                        _postBodyBuffer.append(getBookmarkURL(a.name, a.location, a.locationSchema, "syndiearchive"));
+                        _postBodyBuffer.append("\">bookmark</a>");
+                    }
                 }
                 _postBodyBuffer.append("<br />\n");
             }
@@ -592,21 +645,23 @@ public class HTMLRenderer extends EventReceiverImpl {
             if (_entry != null) {
                 List replies = _archive.getIndex().getReplies(_entry.getURI());
                 if ( (replies != null) && (replies.size() > 0) ) {
-                    _postBodyBuffer.append("<b>Replies:</b> ");
+                    _postBodyBuffer.append(getSpan("summDetailReplies")).append("Replies:</span> ");
                     for (int i = 0; i < replies.size(); i++) { 
                         BlogURI reply = (BlogURI)replies.get(i);
-                        _postBodyBuffer.append("<a href=\"");
+                        _postBodyBuffer.append("<a ").append(getClass("summDetailReplyLink")).append(" href=\"");
                         _postBodyBuffer.append(getPageURL(reply.getKeyHash(), null, reply.getEntryId(), -1, -1, true, _user.getShowImages()));
                         _postBodyBuffer.append("\">");
+                        _postBodyBuffer.append(getSpan("summDetailReplyAuthor"));
                         BlogInfo replyAuthor = _archive.getBlogInfo(reply);
                         if (replyAuthor != null) {
                             _postBodyBuffer.append(sanitizeString(replyAuthor.getProperty(BlogInfo.NAME)));
                         } else {
                             _postBodyBuffer.append(reply.getKeyHash().toBase64().substring(0,16));
                         }
-                        _postBodyBuffer.append(" on ");
+                        _postBodyBuffer.append("</span> on ");
+                        _postBodyBuffer.append(getSpan("summDetailReplyDate"));
                         _postBodyBuffer.append(getEntryDate(reply.getEntryId()));
-                        _postBodyBuffer.append("</a> ");
+                        _postBodyBuffer.append("</a></span> ");
                     }
                     _postBodyBuffer.append("<br />");
                 }
@@ -614,10 +669,11 @@ public class HTMLRenderer extends EventReceiverImpl {
         
             String inReplyTo = (String)_headers.get(HEADER_IN_REPLY_TO);
             if ( (inReplyTo != null) && (inReplyTo.trim().length() > 0) ) {
-                _postBodyBuffer.append(" <a href=\"").append(getPageURL(sanitizeTagParam(inReplyTo))).append("\">(view parent)</a><br />\n");
+                _postBodyBuffer.append(" <a ").append(getClass("summDetailParent")).append(" href=\"").append(getPageURL(sanitizeTagParam(inReplyTo))).append("\">(view parent)</a><br />\n");
             }
                 
             _postBodyBuffer.append("</td>\n</form>\n</tr>\n");
+            _postBodyBuffer.append("<!-- end of the post summary details -->\n");
         }
         _postBodyBuffer.append("</table>\n");
     }
@@ -644,7 +700,7 @@ public class HTMLRenderer extends EventReceiverImpl {
     }
     
     public void receiveHeaderEnd() {
-        _preBodyBuffer.append("<table width=\"100%\" border=\"0\">\n");
+        _preBodyBuffer.append("<table ").append(getClass("overall")).append(" width=\"100%\" border=\"0\">\n");
         renderSubjectCell();
         renderMetaCell();
         renderPreBodyCell();
@@ -657,27 +713,28 @@ public class HTMLRenderer extends EventReceiverImpl {
     public static final String HEADER_PETNAME = "PetName";
     
     private void renderSubjectCell() {
-        _preBodyBuffer.append("<tr class=\"syndieEntrySubjectCell\"><td align=\"left\" valign=\"top\" class=\"syndieEntrySubjectCell\" width=\"400\"> ");
+        _preBodyBuffer.append("<form action=\"index.jsp\">");
+        _preBodyBuffer.append("<tr ").append(getClass("subject")).append(">");
+        _preBodyBuffer.append("<td ").append(getClass("subject")).append(" align=\"left\" valign=\"top\" width=\"400\"> ");
         String subject = (String)_headers.get(HEADER_SUBJECT);
         if (subject == null)
             subject = "[no subject]";
-        _preBodyBuffer.append(sanitizeString(subject));
-        _preBodyBuffer.append("</td>\n");
+        _preBodyBuffer.append(getSpan("subjectText")).append(sanitizeString(subject));
+        _preBodyBuffer.append("</span></td>\n");
     }
     
     private void renderPreBodyCell() {
+        _preBodyBuffer.append("</form>");
         String bgcolor = (String)_headers.get(HEADER_BGCOLOR);
-        if (_cutBody)
-            _preBodyBuffer.append("<tr class=\"syndieEntrySummaryCell\"><td colspan=\"2\" align=\"left\" valign=\"top\" class=\"syndieEntrySummaryCell\" " + (bgcolor != null ? "bgcolor=\"" + sanitizeTagParam(bgcolor) + "\"" : "") + "\">");
-        else
-            _preBodyBuffer.append("<tr class=\"syndieEntryBodyCell\"><td colspan=\"2\" align=\"left\" valign=\"top\" class=\"syndieEntryBodyCell\" " + (bgcolor != null ? "bgcolor=\"" + sanitizeTagParam(bgcolor) + "\"" : "") + "\">");
+        _preBodyBuffer.append("<tr ").append(getClass("body")).append(" >");
+        _preBodyBuffer.append("<td colspan=\"2\" align=\"left\" valign=\"top\" ").append(getClass("body"));
+        _preBodyBuffer.append((bgcolor != null ? " bgcolor=\"" + sanitizeTagParam(bgcolor) + "\"" : "") + ">");
     }
     
     private void renderMetaCell() {
         String tags[] = (_entry != null ? _entry.getTags() : null);
-        if ( (tags != null) && (tags.length > 0) )
-            _preBodyBuffer.append("<form action=\"index.jsp\">");
-        _preBodyBuffer.append("<td nowrap=\"true\" align=\"right\" valign=\"top\" class=\"syndieEntryMetaCell\">\n");
+        _preBodyBuffer.append("<td nowrap=\"nowrap\" align=\"right\" valign=\"top\" ");
+        _preBodyBuffer.append(getClass("meta")).append(">\n");
         
         String knownName = null;
         if ( (_entry != null) && (_user != null) )
@@ -689,30 +746,30 @@ public class HTMLRenderer extends EventReceiverImpl {
         if (_entry != null) 
             info = _archive.getBlogInfo(_entry.getURI());
         if (info != null) {
-            _preBodyBuffer.append("<a href=\"").append(getMetadataURL()).append("\">");
+            _preBodyBuffer.append("<a ").append(getClass("metaLink")).append(" href=\"").append(getMetadataURL()).append("\">");
             if (knownName != null) {
-                _preBodyBuffer.append(sanitizeString(knownName));
+                _preBodyBuffer.append(getSpan("metaKnown")).append(sanitizeString(knownName)).append("</span>");
             } else {
                 String nameStr = info.getProperty("Name");
                 if (nameStr == null)
-                    _preBodyBuffer.append("[no name]");
+                    _preBodyBuffer.append(getSpan("metaUnknown")).append("[no name]</span>");
                 else
-                    _preBodyBuffer.append(sanitizeString(nameStr));
+                    _preBodyBuffer.append(getSpan("metaUnknown")).append(sanitizeString(nameStr)).append("</span>");
             }
             _preBodyBuffer.append("</a>");
         } else {
-            _preBodyBuffer.append("[unknown blog]");
+            _preBodyBuffer.append(getSpan("metaUnknown")).append("[unknown blog]</span>");
         }
 
         
         if ( (_user != null) && (_user.getAuthenticated()) && (_entry != null) ) {
             PetName pn = _user.getPetNameDB().get(knownName);
             if ( (pn == null) || (!pn.isMember("Favorites")) )
-                _preBodyBuffer.append(" <input type=\"submit\" name=\"action\" value=\"Bookmark blog\" />");
+                _preBodyBuffer.append(" <input ").append(getClass("bookmark")).append(" type=\"submit\" name=\"action\" value=\"Bookmark blog\" />");
             if ( (pn == null) || (!pn.isMember("Ignore")) )
-                _preBodyBuffer.append(" <input type=\"submit\" name=\"action\" value=\"Ignore blog\" />");
+                _preBodyBuffer.append(" <input ").append(getClass("ignore")).append(" type=\"submit\" name=\"action\" value=\"Ignore blog\" />");
             else
-                _preBodyBuffer.append(" <input type=\"submit\" name=\"action\" value=\"Unignore blog\" />");
+                _preBodyBuffer.append(" <input ").append(getClass("unignore")).append(" type=\"submit\" name=\"action\" value=\"Unignore blog\" />");
             _preBodyBuffer.append(" <input type=\"hidden\" name=\"blog\" value=\"").append(_entry.getURI().getKeyHash().toBase64()).append("\" />");
             if (info != null)
                 _preBodyBuffer.append(" <input type=\"hidden\" name=\"name\" value=\"").append(sanitizeTagParam(info.getProperty("Name"))).append("\" />");
@@ -720,8 +777,8 @@ public class HTMLRenderer extends EventReceiverImpl {
 
         
         if ( (tags != null) && (tags.length > 0) ) {
-            _preBodyBuffer.append(" Tags: ");
-            _preBodyBuffer.append("<select name=\"selector\">");
+            _preBodyBuffer.append(getSpan("metaTags")).append(" Tags: ");
+            _preBodyBuffer.append("<select ").append(getClass("metaTagList")).append(" name=\"selector\">");
             for (int i = 0; tags != null && i < tags.length; i++) {
                 _preBodyBuffer.append("<option value=\"blogtag://");
                 _preBodyBuffer.append(_entry.getURI().getKeyHash().toBase64());
@@ -739,7 +796,7 @@ public class HTMLRenderer extends EventReceiverImpl {
                  */
             }
             _preBodyBuffer.append("</select>");
-            _preBodyBuffer.append("<input type=\"submit\" value=\"View\" />\n");
+            _preBodyBuffer.append("<input ").append(getClass("metaTagView")).append(" type=\"submit\" value=\"View\" /></span>\n");
             //_preBodyBuffer.append("</i>");
         }
         _preBodyBuffer.append(" ");
@@ -749,16 +806,18 @@ public class HTMLRenderer extends EventReceiverImpl {
             _preBodyBuffer.append(" <a href=\"").append(getPageURL(sanitizeTagParam(inReplyTo))).append("\">In reply to</a>\n");
          */
         
+        _preBodyBuffer.append(getSpan("metaDate"));
         if (_entry != null)
             _preBodyBuffer.append(getEntryDate(_entry.getURI().getEntryId()));
         else
             _preBodyBuffer.append(getEntryDate(new Date().getTime()));
+        _preBodyBuffer.append("</span>");
+        
         if ( (_user != null) && (_user.getAuthenticated()) ) {
-            _preBodyBuffer.append(" <a href=\"").append(getPostURL(_user.getBlog(), true)).append("\">Reply</a>\n");
+            _preBodyBuffer.append(" <a ").append(getClass("replyLink"));
+            _preBodyBuffer.append(" href=\"").append(getPostURL(_user.getBlog(), true)).append("\">Reply</a>\n");
         }
         _preBodyBuffer.append("\n</td>");
-        if ( (tags != null) && (tags.length > 0) )
-            _preBodyBuffer.append("</form>");
         _preBodyBuffer.append("</tr>\n");
     }
     
@@ -800,8 +859,12 @@ public class HTMLRenderer extends EventReceiverImpl {
         return str;
     }
 
-    public static final String sanitizeURL(String str) { return Base64.encode(DataHelper.getUTF8(str)); }
+    public static final String sanitizeURL(String str) { 
+        if (str == null) return "";
+        return Base64.encode(DataHelper.getUTF8(str)); 
+    }
     public static final String sanitizeTagParam(String str) {
+        if (str == null) return "";
         str = str.replace('&', '_'); // this should be &amp;
         if (str.indexOf('\"') < 0)
             return sanitizeString(str);
@@ -810,6 +873,7 @@ public class HTMLRenderer extends EventReceiverImpl {
     }
     
     public static final String sanitizeXML(String orig) {
+        if (orig == null) return "";
         if (orig.indexOf('&') < 0) return orig;
         StringBuffer rv = new StringBuffer(orig.length()+32);
         for (int i = 0; i < orig.length(); i++) {
@@ -821,6 +885,7 @@ public class HTMLRenderer extends EventReceiverImpl {
         return rv.toString();
     }
     public static final String sanitizeXML(StringBuffer orig) {
+        if (orig == null) return "";
         if (orig.indexOf("&") < 0) return orig.toString();
         for (int i = 0; i < orig.length(); i++) {
             if (orig.charAt(i) == '&') {
@@ -830,7 +895,17 @@ public class HTMLRenderer extends EventReceiverImpl {
         }
         return orig.toString();
     }
-    
+
+    private static final String STYLE_CHARS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_";
+    public static String sanitizeStyle(String style) {
+        if ( (style == null) || (style.trim().length() <= 0) ) return null;
+        char c[] = style.toCharArray();
+        for (int i = 0; i < c.length; i++)
+            if (STYLE_CHARS.indexOf(c[i]) < 0)
+                c[i] = '_';
+        return new String(c);
+    }
+        
     protected String getEntryURL() { return getEntryURL(_user != null ? _user.getShowImages() : false); }
     protected String getEntryURL(boolean showImages) {
         if (_entry == null) return "unknown";

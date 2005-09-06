@@ -20,25 +20,6 @@ public class ArchiveViewerBean {
         else
             return HTMLRenderer.sanitizeString(info.getProperty("Name"));
     }
-    public static String getEntryTitle(String keyHash, long entryId) {
-        String name = getBlogName(keyHash);
-        return getEntryTitleDate(name, entryId);
-    }
-    
-    private static final SimpleDateFormat _dateFormat = new SimpleDateFormat("yyyy/MM/dd", Locale.UK);
-    public static final String getEntryTitleDate(String blogName, long when) {
-        synchronized (_dateFormat) {
-            try {
-                String str = _dateFormat.format(new Date(when));
-                long dayBegin = _dateFormat.parse(str).getTime();
-                return blogName + ":<br /> <i>" + str + "-" + (when - dayBegin) + "</i>";
-            } catch (ParseException pe) {
-                pe.printStackTrace();
-                // wtf
-                return "unknown";
-            }
-        }
-    }
     
     /** base64 encoded hash of the blog's public key, or null for no filtering by blog */
     public static final String PARAM_BLOG = "blog";
@@ -91,13 +72,12 @@ public class ArchiveViewerBean {
             BlogManager.instance().saveUser(user);
         }
         
-        out.write("<select name=\"");
+        out.write("<select class=\"b_selector\" name=\"");
         out.write(PARAM_SELECTOR);
         out.write("\">");
         out.write("<option value=\"");
         out.write(getDefaultSelector(user, parameters));
         out.write("\">Default blog filter</option>\n");
-        out.write("\">");
         out.write("<option value=\"");
         out.write(SEL_ALL);
         out.write("\">All posts from all blogs</option>\n");
@@ -421,7 +401,6 @@ public class ArchiveViewerBean {
                 pages = entries.size() / numPerPage;
                 if (numPerPage * pages < entries.size())
                     pages++;
-                out.write("<i>");
                 if (pageNum > 0) {
                     String prevURL = null;
                     if ( (selector == null) || (selector.trim().length() <= 0) )
@@ -429,11 +408,11 @@ public class ArchiveViewerBean {
                     else
                         prevURL = HTMLRenderer.getPageURL(user, selector, numPerPage, pageNum-1);
                     System.out.println("prevURL: " + prevURL);
-                    out.write(" <a href=\"" + prevURL + "\">&lt;&lt;</a>");
+                    out.write(" <a class=\"b_selectorPrevMore\" href=\"" + prevURL + "\">&lt;&lt;</a>");
                 } else {
-                    out.write(" &lt;&lt; ");
+                    out.write(" <span class=\"b_selectorPrevNone\">&lt;&lt;</span> ");
                 }
-                out.write("Page " + (pageNum+1) + " of " + pages);
+                out.write("<span class=\"b_selectorPage\">Page " + (pageNum+1) + " of " + pages + "</span>");
                 if (pageNum + 1 < pages) {
                     String nextURL = null;
                     if ( (selector == null) || (selector.trim().length() <= 0) )
@@ -441,11 +420,10 @@ public class ArchiveViewerBean {
                     else
                         nextURL = HTMLRenderer.getPageURL(user, selector, numPerPage, pageNum+1);
                     System.out.println("nextURL: " + nextURL);
-                    out.write(" <a href=\"" + nextURL + "\">&gt;&gt;</a>");
+                    out.write(" <a class=\"b_selectorNextMore\" href=\"" + nextURL + "\">&gt;&gt;</a>");
                 } else {
-                    out.write(" &gt;&gt;");
+                    out.write(" <span class=\"b_selectorNextNone\">&gt;&gt;</span>");
                 }
-                out.write("</i>");
             }
         }
         
@@ -670,7 +648,7 @@ public class ArchiveViewerBean {
     }
     
     private static void renderInvalidAttachment(Map parameters, OutputStream out) throws IOException {
-        out.write(DataHelper.getUTF8("<b>No such entry, or no such attachment</b>"));
+        out.write(DataHelper.getUTF8("<span class=\"b_msgErr\">No such entry, or no such attachment</span>"));
     }
     
     public static void renderMetadata(Map parameters, Writer out) throws IOException {
@@ -684,43 +662,44 @@ public class ArchiveViewerBean {
                 return;
             }
             String props[] = info.getProperties();
-            out.write("<table border=\"0\">");
+            out.write("<table class=\"b_meta\" border=\"0\">");
             for (int i = 0; i < props.length; i++) {
                 if (props[i].equals(BlogInfo.OWNER_KEY)) {
-                    out.write("<tr><td><b>Blog:</b></td><td>");
+                    out.write("<tr class=\"b_metaBlog\"><td class=\"b_metaBlog\"><span class=\"b_metaBlog\">Blog:</span></td>");
                     String blogURL = HTMLRenderer.getPageURL(blog, null, -1, -1, -1, false, false);
-                    out.write("<a href=\"" + blogURL + "\">" + Base64.encode(blog.getData()) + "</td></tr>\n");
+                    out.write("<td class=\"b_metaBlog\"><a class=\"b_metaBlog\" href=\"" + blogURL + "\">" + Base64.encode(blog.getData()) + "</td></tr>\n");
                 } else if (props[i].equals(BlogInfo.SIGNATURE)) {
                     continue;
                 } else if (props[i].equals(BlogInfo.POSTERS)) {
                     SigningPublicKey keys[] = info.getPosters();
                     if ( (keys != null) && (keys.length > 0) ) {
-                        out.write("<tr><td><b>Allowed authors:</b></td><td>");
+                        out.write("<tr class=\"b_metaAuthor\"><td class=\"b_metaAuthor\"><span class=\"b_metaAuthor\">Allowed authors:</span></td>");
+                        out.write("<td class=\"b_metaAuthor\">");
                         for (int j = 0; j < keys.length; j++) {
-                            out.write(keys[j].calculateHash().toBase64());
+                            out.write("<span class=\"b_metaAuthor\">" + keys[j].calculateHash().toBase64() + "</span>");
                             if (j + 1 < keys.length)
                                 out.write("<br />\n");
                         }
                         out.write("</td></tr>\n");
                     }
                 } else {
-                    out.write("<tr><td>" + HTMLRenderer.sanitizeString(props[i]) + ":</td><td>" +
-                              HTMLRenderer.sanitizeString(info.getProperty(props[i])) + "</td></tr>\n");
+                    out.write("<tr class=\"b_metaField\"><td class=\"b_metaField\"><span class=\"b_metaField\">" + HTMLRenderer.sanitizeString(props[i]) 
+                              + ":</span></td><td class=\"b_metaValue\"><span class=\"b_metaValue\">" + HTMLRenderer.sanitizeString(info.getProperty(props[i])) + "</span></td></tr>\n");
                 }
             }
             List tags = BlogManager.instance().getArchive().getIndex().getBlogTags(blog);
             if ( (tags != null) && (tags.size() > 0) ) {
-                out.write("<tr><td>Known tags:</td><td>");
+                out.write("<tr class=\"b_metaTags\"><td class=\"b_metaTags\"><span class=\"b_metaTags\">Known tags:</span></td><td class=\"b_metaTags\">");
                 for (int i = 0; i < tags.size(); i++) {
                     String tag = (String)tags.get(i);
-                    out.write("<a href=\"" + HTMLRenderer.getPageURL(blog, tag, -1, -1, -1, false, false) + "\">" +
+                    out.write("<a class=\"b_metaTag\" href=\"" + HTMLRenderer.getPageURL(blog, tag, -1, -1, -1, false, false) + "\">" +
                               HTMLRenderer.sanitizeString(tag) + "</a> ");
                 }
                 out.write("</td></tr>");
             }
             out.write("</table>");
         } else {
-            out.write("Blog not specified");
+            out.write("<span class=\"b_metaMsgErr\">Blog not specified</span>");
         }
     }
 }

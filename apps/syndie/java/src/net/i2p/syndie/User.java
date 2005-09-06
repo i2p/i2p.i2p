@@ -108,7 +108,7 @@ public class User {
         String hpass = Base64.encode(_context.sha().calculateHash(DataHelper.getUTF8(pass)).getData());
         if (!hpass.equals(expectedPass)) {
             _authenticated = false;
-            return "Incorrect password";
+            return "<span class=\"b_loginMsgErr\">Incorrect password</span>";
         }
         
         _username = login;
@@ -194,7 +194,7 @@ public class User {
         try { return Integer.parseInt(val); } catch (NumberFormatException nfe) { return -1; }
     }
     
-    public static final String LOGIN_OK = "Logged in";
+    public static final String LOGIN_OK = "<span class=\"b_loginMsgOk\">Logged in</span>";
     
     public String export() {
         StringBuffer buf = new StringBuffer(512);

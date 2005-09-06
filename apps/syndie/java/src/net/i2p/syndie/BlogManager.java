@@ -185,7 +185,7 @@ public class BlogManager {
     }
     
     public String login(User user, String login, String pass) {
-        if ( (login == null) || (pass == null) ) return "Login not specified";
+        if ( (login == null) || (pass == null) ) return "<span class=\"b_loginMsgErr\">Login not specified</span>";
         Hash userHash = _context.sha().calculateHash(DataHelper.getUTF8(login));
         Hash passHash = _context.sha().calculateHash(DataHelper.getUTF8(pass));
         File userFile = new File(_userDir, Base64.encode(userHash.getData()));
@@ -208,10 +208,10 @@ public class BlogManager {
                 return user.login(login, pass, props);
             } catch (IOException ioe) {
                 ioe.printStackTrace();
-                return "Error logging in - corrupt userfile";
+                return "<span class=\"b_loginMsgErr\">Error logging in - corrupt userfile</span>";
             }
         } else {
-            return "User does not exist";
+            return "<span class=\"b_loginMsgErr\">User does not exist</span>";
         }
     }
     
@@ -294,17 +294,18 @@ public class BlogManager {
     }
     
     public String authorizeRemoteAccess(User user, String password) {
-        if (!user.getAuthenticated()) return "Not logged in";
+        if (!user.getAuthenticated()) return "<span class=\"b_remoteMsgErr\">Not logged in</span>";
         String remPass = getRemotePasswordHash();
         if (remPass == null)
-            return "Remote access password not configured - please specify a remote archive password in your syndie.config or on /admin.jsp";
+            return "<span class=\"b_remoteMsgErr\">Remote access password not configured - please <a href=\"admin.jsp\">specify</a> a remote " +
+                   "archive password</span>";
         
         if (authorizeRemote(password)) {
             user.setAllowAccessRemote(true);
             saveUser(user);
-            return "Remote access authorized";
+            return "<span class=\"b_remoteMsgOk\">Remote access authorized</span>";
         } else {
-            return "Remote access denied";
+            return "<span class=\"b_remoteMsgErr\">Remote access denied</span>";
         }
     }
     
@@ -329,15 +330,15 @@ public class BlogManager {
         if (hashedRegistrationPassword != null) {
             try {
                 if (!hashedRegistrationPassword.equals(Base64.encode(_context.sha().calculateHash(registrationPassword.getBytes("UTF-8")).getData())))
-                    return "Invalid registration password";
+                    return "<span class=\"b_regMsgErr\">Invalid registration password</span>";
             } catch (UnsupportedEncodingException uee) {
-                return "Error registering";
+                return "<span class=\"b_regMsgErr\">Error registering</span>";
             }
         }
         String userHash = Base64.encode(_context.sha().calculateHash(DataHelper.getUTF8(login)).getData());
         File userFile = new File(_userDir, userHash);
         if (userFile.exists()) {
-            return "Cannot register the login " + login + ": it already exists";
+            return "<span class=\"b_regMsgErr\">Cannot register the login " + login + ": it already exists</span>";
         } else {
             BlogInfo info = createBlog(blogName, blogDescription, contactURL, null);
             String hashedPassword = Base64.encode(_context.sha().calculateHash(DataHelper.getUTF8(password)).getData());
@@ -355,7 +356,7 @@ public class BlogManager {
                 bw.flush();
             } catch (IOException ioe) {
                 ioe.printStackTrace();
-                return "Internal error registering - " + ioe.getMessage();
+                return "<span class=\"b_regMsgErr\">Internal error registering - " + ioe.getMessage() + "</span>";
             } finally {
                 if (out != null) try { out.close(); } catch (IOException ioe) {}
             }
@@ -367,7 +368,7 @@ public class BlogManager {
 
     public String exportHosts(User user) {
         if (!user.getAuthenticated() || !user.getAllowAccessRemote())
-            return "Not authorized to export the hosts";
+            return "<span class=\"b_addrMsgErr\">Not authorized to export the hosts</span>";
         Map newNames = new HashMap();
         PetNameDB db = user.getPetNameDB();
         for (Iterator names = db.getNames().iterator(); names.hasNext(); ) {
@@ -395,11 +396,11 @@ public class BlogManager {
                     osw.close();
                 } catch (IOException ioe) {
                     ioe.printStackTrace();
-                    return "Error exporting the hosts: " + ioe.getMessage();
+                    return "<span class=\"b_addrMsgErr\">Error exporting the hosts: " + ioe.getMessage() + "</span>";
                 }
             }
         }
-        return "Hosts exported";
+        return "<span class=\"b_addrMsgOk\">Hosts exported</span>";
     }
     
     public BlogURI createBlogEntry(User user, String subject, String tags, String entryHeaders, String sml) {
@@ -527,25 +528,25 @@ public class BlogManager {
     }
 
     public String addAddress(User user, String name, String protocol, String location, String schema) {
-        if (!user.getAuthenticated()) return "Not logged in";
+        if (!user.getAuthenticated()) return "<span class=\"b_addrMsgErr\">Not logged in</span>";
         boolean ok = validateAddressName(name);
-        if (!ok) return "Invalid name: " + HTMLRenderer.sanitizeString(name);
+        if (!ok) return "<span class=\"b_addrMsgErr\">Invalid name: " + HTMLRenderer.sanitizeString(name) + "</span>";
         ok = validateAddressLocation(location);
-        if (!ok) return "Invalid location: " + HTMLRenderer.sanitizeString(location);
-        if (!validateAddressSchema(schema)) return "Unsupported schema: " + HTMLRenderer.sanitizeString(schema);
+        if (!ok) return "<span class=\"b_addrMsgErr\">Invalid location: " + HTMLRenderer.sanitizeString(location) + "</span>";
+        if (!validateAddressSchema(schema)) return "<span class=\"b_addrMsgErr\">Unsupported schema: " + HTMLRenderer.sanitizeString(schema) + "</span>";
         // no need to quote user/location further, as they've been sanitized
         
         PetNameDB names = user.getPetNameDB();
         if (names.exists(name))
-            return "Name is already in use";
+            return "<span class=\"b_addrMsgErr\">Name is already in use</span>";
         PetName pn = new PetName(name, schema, protocol, location);
         names.set(name, pn);
         
         try {
             names.store(user.getAddressbookLocation());
-            return "Address " + name + " written to your addressbook";
+            return "<span class=\"b_addrMsgOk\">Address " + name + " written to your addressbook</span>";
         } catch (IOException ioe) {
-            return "Error writing out the name: " + ioe.getMessage();
+            return "<span class=\"b_addrMsgErr\">Error writing out the name: " + ioe.getMessage() + "</span>";
         }
     }
     

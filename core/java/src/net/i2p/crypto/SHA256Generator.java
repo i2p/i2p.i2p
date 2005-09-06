@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.List;
 import net.i2p.I2PAppContext;
+import net.i2p.data.Base64;
 import net.i2p.data.Hash;
 
 import org.bouncycastle.crypto.digests.SHA256Digest;
@@ -72,5 +73,7 @@ public final class SHA256Generator {
         byte out[] = new byte[Hash.HASH_LENGTH];
         d.doFinal(out, 0);
         System.out.println("eq? " + net.i2p.data.DataHelper.eq(out, old.getData()));
+        for (int i = 0; i < args.length; i++)
+            System.out.println("SHA256 [" + args[i] + "] = [" + Base64.encode(ctx.sha().calculateHash(args[i].getBytes()).getData()) + "]");
     }
 }
