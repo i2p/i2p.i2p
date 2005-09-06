@@ -29,6 +29,21 @@ body {
 	border-width: 0px;
 	border: 0px;
 }
+.b_content {
+        border: 0px;
+        border-spacing: 0px;
+        margin: 0px;
+}
+.s_summary_overall {
+        border: 0px;
+        border-spacing: 0px;
+        margin: 0px;
+}
+.s_detail_overall {
+        border: 0px;
+        border-spacing: 0px;
+        margin: 0px;
+}
 .s_detail_subject {
 	font-size: 10px;
 	text-align: left;
