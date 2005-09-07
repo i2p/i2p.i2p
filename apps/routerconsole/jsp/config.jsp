@@ -48,7 +48,7 @@ this port from arbitrary peers (this requirement will be removed in i2p 0.6.1, b
     <input name="outboundrate" type="text" size="2" value="<jsp:getProperty name="nethelper" property="outboundRate" />" /> KBytes per second
  bursting up to 
   <jsp:getProperty name="nethelper" property="outboundBurstFactorBox" /><br />
- <i>A negative rate means there is no limit</i><br />
+ <i>A negative rate means a default limit of 16KBytes per second.</i><br />
  Bandwidth share percentage:
    <jsp:getProperty name="nethelper" property="sharePercentageBox" /><br />
  Sharing a higher percentage will improve your anonymity and help the network
