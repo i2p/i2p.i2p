@@ -3,7 +3,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 
 <html><head>
-<title>I2P Router Console - home</title>
+<title>I2P Router Console - statistics</title>
 <link rel="stylesheet" href="default.css" type="text/css" />
 </head><body>
 

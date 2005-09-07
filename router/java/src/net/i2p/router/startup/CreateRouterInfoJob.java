@@ -56,6 +56,7 @@ public class CreateRouterInfoJob extends JobImpl {
             stats.setProperty(RouterInfo.PROP_NETWORK_ID, Router.NETWORK_ID+"");
             if (FloodfillNetworkDatabaseFacade.floodfillEnabled(getContext()))
                 info.addCapability(FloodfillNetworkDatabaseFacade.CAPACITY_FLOODFILL);
+            getContext().router().addReachabilityCapability(info);
             info.setOptions(stats);
             info.setPeers(new HashSet());
             info.setPublished(getCurrentPublishDate(getContext()));

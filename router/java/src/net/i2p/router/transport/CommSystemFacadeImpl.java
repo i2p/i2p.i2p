@@ -75,7 +75,10 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
         return _manager.getMostRecentErrorMessages(); 
     }
 
-    public short getReachabilityStatus() { return _manager.getReachabilityStatus(); }
+    public short getReachabilityStatus() { 
+        if (_manager == null) return CommSystemFacade.STATUS_UNKNOWN;
+        return _manager.getReachabilityStatus(); 
+    }
     public void recheckReachability() { _manager.recheckReachability(); }
 
     public void renderStatusHTML(Writer out) throws IOException { 

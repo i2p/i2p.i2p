@@ -1,12 +1,9 @@
 package net.i2p.router.tunnel.pool;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Properties;
-import java.util.StringTokenizer;
+import java.util.*;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.Hash;
+import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
 import net.i2p.router.TunnelPoolSettings;
 import net.i2p.util.Log;
@@ -112,6 +109,49 @@ abstract class TunnelPeerSelector {
         
         if (log.shouldLog(Log.INFO))
             log.info(toString() + ": Selecting peers explicitly: " + rv);
+        return rv;
+    }
+    
+    /** 
+     * Pick peers that we want to avoid
+     */
+    public Set getExclude(RouterContext ctx, boolean isInbound, boolean isExploratory) {
+        if (filterUnreachable(ctx, isInbound, isExploratory)) {
+            List caps = ctx.peerManager().getPeersByCapability(Router.CAPABILITY_UNREACHABLE);
+            if (caps == null) return new HashSet(0);
+            HashSet rv = new HashSet(caps);
+            return rv;
+        } else {
+            return new HashSet(1);
+        }
+    }
+    
+    private static final String PROP_OUTBOUND_EXPLORATORY_EXCLUDE_UNREACHABLE = "router.outboundExploratoryExcludeUnreachable";
+    private static final String PROP_OUTBOUND_CLIENT_EXCLUDE_UNREACHABLE = "router.outboundClientExcludeUnreachable";
+    private static final String PROP_INBOUND_EXPLORATORY_EXCLUDE_UNREACHABLE = "router.inboundExploratoryExcludeUnreachable";
+    private static final String PROP_INBOUND_CLIENT_EXCLUDE_UNREACHABLE = "router.inboundClientExcludeUnreachable";
+    private static final boolean DEFAULT_OUTBOUND_EXPLORATORY_EXCLUDE_UNREACHABLE = false;
+    private static final boolean DEFAULT_OUTBOUND_CLIENT_EXCLUDE_UNREACHABLE = false;
+    private static final boolean DEFAULT_INBOUND_EXPLORATORY_EXCLUDE_UNREACHABLE = false;
+    private static final boolean DEFAULT_INBOUND_CLIENT_EXCLUDE_UNREACHABLE = false;
+    
+    protected boolean filterUnreachable(RouterContext ctx, boolean isInbound, boolean isExploratory) {
+        boolean def = false;
+        String val = null;
+        
+        if (isExploratory)
+            if (isInbound)
+                val = ctx.getProperty(PROP_INBOUND_EXPLORATORY_EXCLUDE_UNREACHABLE);
+            else
+                val = ctx.getProperty(PROP_OUTBOUND_EXPLORATORY_EXCLUDE_UNREACHABLE);
+        else
+            if (isInbound)
+                val = ctx.getProperty(PROP_INBOUND_CLIENT_EXCLUDE_UNREACHABLE);
+            else 
+                val = ctx.getProperty(PROP_OUTBOUND_CLIENT_EXCLUDE_UNREACHABLE);
+        
+        boolean rv = (val != null ? Boolean.valueOf(val).booleanValue() : def);
+        //System.err.println("Filter unreachable? " + rv + " (inbound? " + isInbound + ", exploratory? " + isExploratory);
         return rv;
     }
 }

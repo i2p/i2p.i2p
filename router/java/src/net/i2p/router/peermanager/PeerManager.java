@@ -10,11 +10,7 @@ package net.i2p.router.peermanager;
 
 import java.io.IOException;
 import java.io.Writer;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import net.i2p.data.Hash;
 import net.i2p.router.PeerSelectionCriteria;
@@ -30,6 +26,8 @@ class PeerManager {
     private RouterContext _context;
     private ProfileOrganizer _organizer;
     private ProfilePersistenceHelper _persistenceHelper;
+    private List _peersByCapability[];
+    private Map _capabilitiesByPeer;
     
     public PeerManager(RouterContext context) {
         _context = context;
@@ -37,6 +35,10 @@ class PeerManager {
         _persistenceHelper = new ProfilePersistenceHelper(context);
         _organizer = context.profileOrganizer();
         _organizer.setUs(context.routerHash());
+        _capabilitiesByPeer = new HashMap(128);
+        _peersByCapability = new List[26];
+        for (int i = 0; i < _peersByCapability.length; i++)
+            _peersByCapability[i] = new ArrayList(64);
         loadProfiles();
         _context.jobQueue().addJob(new EvaluateProfilesJob(_context));
         //_context.jobQueue().addJob(new PersistProfilesJob(_context, this));
@@ -116,6 +118,86 @@ class PeerManager {
         return new ArrayList(peers);
     }
     
+    public void setCapabilities(Hash peer, String caps) { 
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("Setting capabilities for " + peer.toBase64() + " to " + caps);
+        if (caps != null) caps = caps.toLowerCase();
+        synchronized (_capabilitiesByPeer) {
+            String oldCaps = null;
+            if (caps != null)
+                oldCaps = (String)_capabilitiesByPeer.put(peer, caps);
+            else
+                oldCaps = (String)_capabilitiesByPeer.remove(peer);
+            
+            if (oldCaps != null) {
+                for (int i = 0; i < oldCaps.length(); i++) {
+                    char c = oldCaps.charAt(i);
+                    if ( (caps == null) || (caps.indexOf(c) < 0) ) {
+                        List peers = locked_getPeers(c);
+                        if (peers != null)
+                            peers.remove(peer);
+                    }
+                }
+            }
+            if (caps != null) {
+                for (int i = 0; i < caps.length(); i++) {
+                    char c = caps.charAt(i);
+                    if ( (oldCaps != null) && (oldCaps.indexOf(c) >= 0) )
+                        continue;
+                    List peers = locked_getPeers(c);
+                    if ( (peers != null) && (!peers.contains(peer)) )
+                        peers.add(peer);
+                }
+            }
+        }
+    }
+    
+    private List locked_getPeers(char c) {
+        c = Character.toLowerCase(c);
+        int i = c - 'a';
+        if ( (i < 0) || (i >= _peersByCapability.length) ) {
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Invalid capability " + c + " (" + i + ")");
+            return null;
+        }
+        return _peersByCapability[i];
+    }
+    
+    public void removeCapabilities(Hash peer) { 
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("Removing capabilities from " + peer.toBase64());
+        synchronized (_capabilitiesByPeer) {
+            String oldCaps = (String)_capabilitiesByPeer.remove(peer);
+            if (oldCaps != null) {
+                for (int i = 0; i < oldCaps.length(); i++) {
+                    char c = oldCaps.charAt(i);
+                    List peers = locked_getPeers(c);
+                    if (peers != null)
+                        peers.remove(peer);
+                }
+            }
+        }
+    }
+    public Hash selectRandomByCapability(char capability) { 
+        int index = _context.random().nextInt(Integer.MAX_VALUE);
+        synchronized (_capabilitiesByPeer) {
+            List peers = locked_getPeers(capability);
+            if ( (peers != null) && (peers.size() > 0) ) {
+                index = index % peers.size();
+                return (Hash)peers.get(index);
+            }
+        }
+        return null;
+    }
+    public List getPeersByCapability(char capability) { 
+        synchronized (_capabilitiesByPeer) {
+            List peers = locked_getPeers(capability);
+            if (peers != null)
+                return new ArrayList(peers);
+        }
+        return null;
+    }
+
     public void renderStatusHTML(Writer out) throws IOException { 
         _organizer.renderStatusHTML(out); 
     }

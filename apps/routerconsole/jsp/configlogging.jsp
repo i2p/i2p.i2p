@@ -3,7 +3,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 
 <html><head>
-<title>I2P Router Console - config clients</title>
+<title>I2P Router Console - config logging</title>
 <link rel="stylesheet" href="default.css" type="text/css" />
 </head><body>
 <jsp:useBean class="net.i2p.router.web.ConfigLoggingHelper" id="logginghelper" scope="request" />

@@ -688,7 +688,8 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
             _log.info("RouterInfo " + key.toBase64() + " is stored with "
             + routerInfo.getOptions().size() + " options on "
             + new Date(routerInfo.getPublished()));
-        
+    
+        _context.peerManager().setCapabilities(key, routerInfo.getCapabilities());
         _ds.put(key, routerInfo);
         synchronized (_lastSent) {
             if (!_lastSent.containsKey(key))
@@ -721,6 +722,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
                 return;
             }
             
+            _context.peerManager().removeCapabilities(dbEntry);
             boolean removed = _kb.remove(dbEntry);
             if (removed) {
                 if (_log.shouldLog(Log.INFO))
@@ -737,6 +739,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         
         if (o == null) {
             boolean removed = _kb.remove(dbEntry);
+            _context.peerManager().removeCapabilities(dbEntry);
             // if we dont know the key, lets make sure it isn't a now-dead peer
         }
         

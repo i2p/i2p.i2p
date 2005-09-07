@@ -9,14 +9,7 @@ import java.io.Writer;
 
 import java.text.DecimalFormat;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Set;
+import java.util.*;
 
 import net.i2p.data.Base64;
 import net.i2p.data.DataHelper;
@@ -250,7 +243,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         _refiller.startup();
         _flooder.startup();
         _expireEvent.setIsAlive(true);
-        _testEvent.setIsAlive(true);
+        _testEvent.setIsAlive(true); // this queues it for 3-6 minutes in the future...
+        SimpleTimer.getInstance().addEvent(_testEvent, 10*1000); // lets requeue it for Real Soon
     }
     
     public void shutdown() {
@@ -832,19 +826,33 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         return active;
     }
     
+    private static class AlphaComparator implements Comparator {
+        private static final AlphaComparator _instance = new AlphaComparator();
+        public static final AlphaComparator instance() { return _instance; }
+        
+        public int compare(Object lhs, Object rhs) {
+            if ( (lhs == null) || (rhs == null) || !(lhs instanceof PeerState) || !(rhs instanceof PeerState)) 
+                throw new IllegalArgumentException("rhs = " + rhs + " lhs = " + lhs);
+            PeerState l = (PeerState)lhs;
+            PeerState r = (PeerState)rhs;
+            // base64 retains binary ordering
+            return DataHelper.compareTo(l.getRemotePeer().getData(), r.getRemotePeer().getData());
+        }
+        
+    }
     public void renderStatusHTML(Writer out) throws IOException {
-        List peers = null;
+        TreeSet peers = new TreeSet(AlphaComparator.instance());
         synchronized (_peersByIdent) {
-            peers = new ArrayList(_peersByIdent.values());
+            peers.addAll(_peersByIdent.values());
         }
         long offsetTotal = 0;
         
         StringBuffer buf = new StringBuffer(512);
         buf.append("<b>UDP connections: ").append(peers.size()).append("</b><br />\n");
         buf.append("<table border=\"1\">\n");
-        buf.append(" <tr><td><b>peer</b></td><td><b>activity (in/out)</b></td>");
-        buf.append("     <td><b>transfer (in/out)</b></td>\n");
-        buf.append("     <td><b>uptime</b></td><td><b>skew</b></td>\n");
+        buf.append(" <tr><td><b>peer</b></td><td><b>idle</b></td>");
+        buf.append("     <td><b>in/out</b></td>\n");
+        buf.append("     <td><b>up</b></td><td><b>skew</b></td>\n");
         buf.append("     <td><b>cwnd</b></td><td><b>ssthresh</b></td>\n");
         buf.append("     <td><b>rtt</b></td><td><b>dev</b></td><td><b>rto</b></td>\n");
         buf.append("     <td><b>send</b></td><td><b>recv</b></td>\n");
@@ -853,42 +861,67 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         out.write(buf.toString());
         buf.setLength(0);
         long now = _context.clock().now();
-        for (int i = 0; i < peers.size(); i++) {
-            PeerState peer = (PeerState)peers.get(i);
+        for (Iterator iter = peers.iterator(); iter.hasNext(); ) {
+            PeerState peer = (PeerState)iter.next();
             if (now-peer.getLastReceiveTime() > 60*60*1000)
                 continue; // don't include old peers
             
             buf.append("<tr>");
             
             String name = peer.getRemotePeer().toBase64().substring(0,6);
-            buf.append("<td nowrap>");
+            buf.append("<td valign=\"top\" nowrap><code>");
             buf.append("<a href=\"netdb.jsp#");
             buf.append(name);
             buf.append("\">");
             buf.append(name).append("@");
             byte ip[] = peer.getRemoteIP();
             for (int j = 0; j < ip.length; j++) {
-                buf.append(ip[j] & 0xFF);
+                int num = ip[j] & 0xFF;
+                if (num < 10)
+                    buf.append("00");
+                else if (num < 100)
+                    buf.append("0");
+                buf.append(num);
                 if (j + 1 < ip.length)
                     buf.append('.');
             }
-            buf.append(':').append(peer.getRemotePort());
+            buf.append(':');
+            int port = peer.getRemotePort();
+            if (port < 10)
+                buf.append("0000");
+            else if (port < 100)
+                buf.append("000");
+            else if (port < 1000)
+                buf.append("00");
+            else if (port < 10000)
+                buf.append("0");
+            buf.append(port);
             buf.append("</a>");
-            if (_activeThrottle.isChoked(peer.getRemotePeer()))
+            boolean appended = false;
+            if (_activeThrottle.isChoked(peer.getRemotePeer())) {
+                if (!appended) buf.append("<br />");
                 buf.append(" [choked]");
-            if (peer.getConsecutiveFailedSends() > 0)
+                appended = true;
+            }
+            if (peer.getConsecutiveFailedSends() > 0) {
+                if (!appended) buf.append("<br />");
                 buf.append(" [").append(peer.getConsecutiveFailedSends()).append(" failures]");
-            if (_context.shitlist().isShitlisted(peer.getRemotePeer()))
+                appended = true;
+            }
+            if (_context.shitlist().isShitlisted(peer.getRemotePeer())) {
+                if (!appended) buf.append("<br />");
                 buf.append(" [shitlisted]");
-            buf.append("</td>");
+                appended = true;
+            }
+            buf.append("</code></td>");
             
-            buf.append("<td>");
+            buf.append("<td valign=\"top\" ><code>");
             buf.append((now-peer.getLastReceiveTime())/1000);
             buf.append("s/");
             buf.append((now-peer.getLastSendTime())/1000);
-            buf.append("s</td>");
+            buf.append("s</code></td>");
     
-            buf.append("<td>");
+            buf.append("<td valign=\"top\" ><code>");
             buf.append(formatKBps(peer.getReceiveBps()));
             buf.append("KBps/");
             buf.append(formatKBps(peer.getSendBps()));
@@ -897,60 +930,60 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             //buf.append("KBps/");
             //buf.append(formatKBps(peer.getSendACKBps()));
             //buf.append("KBps ");
-            buf.append("</td>");
+            buf.append("</code></td>");
 
-            buf.append("<td>");
+            buf.append("<td valign=\"top\" ><code>");
             buf.append(DataHelper.formatDuration(now-peer.getKeyEstablishedTime()));
-            buf.append("</td>");
+            buf.append("</code></td>");
             
-            buf.append("<td>");
+            buf.append("<td valign=\"top\" ><code>");
             buf.append(peer.getClockSkew()/1000);
-            buf.append("s</td>");
+            buf.append("s</code></td>");
             offsetTotal = offsetTotal + peer.getClockSkew();
 
-            buf.append("<td>");
+            buf.append("<td valign=\"top\" ><code>");
             buf.append(peer.getSendWindowBytes()/1024);
-            buf.append("K</td>");
+            buf.append("K</code></td>");
 
-            buf.append("<td>");
+            buf.append("<td valign=\"top\" ><code>");
             buf.append(peer.getSlowStartThreshold()/1024);
-            buf.append("K</td>");
+            buf.append("K</code></td>");
 
-            buf.append("<td>");
+            buf.append("<td valign=\"top\" ><code>");
             buf.append(peer.getRTT());
-            buf.append("</td>");
+            buf.append("</code></td>");
             
-            buf.append("<td>");
+            buf.append("<td valign=\"top\" ><code>");
             buf.append(peer.getRTTDeviation());
-            buf.append("</td>");
+            buf.append("</code></td>");
 
-            buf.append("<td>");
+            buf.append("<td valign=\"top\" ><code>");
             buf.append(peer.getRTO());
-            buf.append("</td>");
+            buf.append("</code></td>");
             
-            buf.append("<td>");
+            buf.append("<td valign=\"top\" ><code>");
             buf.append(peer.getPacketsTransmitted());
-            buf.append("</td>");
+            buf.append("</code></td>");
             
-            buf.append("<td>");
+            buf.append("<td valign=\"top\" ><code>");
             buf.append(peer.getPacketsReceived());
-            buf.append("</td>");
+            buf.append("</code></td>");
             
             double sent = (double)peer.getPacketsPeriodTransmitted();
             double sendLostPct = 0;
             if (sent > 0)
                 sendLostPct = (double)peer.getPacketsRetransmitted()/(sent);
             
-            buf.append("<td>");
+            buf.append("<td valign=\"top\" ><code>");
             //buf.append(formatPct(sendLostPct));
             buf.append(peer.getPacketsRetransmitted()); // + "/" + peer.getPacketsPeriodRetransmitted() + "/" + sent);
             //buf.append(peer.getPacketRetransmissionRate());
-            buf.append("</td>");
+            buf.append("</code></td>");
             
             double recvDupPct = (double)peer.getPacketsReceivedDuplicate()/(double)peer.getPacketsReceived();
-            buf.append("<td>");
+            buf.append("<td valign=\"top\" ><code>");
             buf.append(formatPct(recvDupPct));
-            buf.append("</td>");
+            buf.append("</code></td>");
 
             buf.append("</tr>");
             out.write(buf.toString());

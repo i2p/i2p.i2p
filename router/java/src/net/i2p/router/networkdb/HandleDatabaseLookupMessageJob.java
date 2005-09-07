@@ -9,6 +9,7 @@ package net.i2p.router.networkdb;
  */
 
 import java.util.Iterator;
+import java.util.HashSet;
 import java.util.Set;
 
 import net.i2p.data.DataStructure;
@@ -25,6 +26,7 @@ import net.i2p.data.i2np.TunnelGatewayMessage;
 import net.i2p.router.Job;
 import net.i2p.router.JobImpl;
 import net.i2p.router.RouterContext;
+import net.i2p.router.Router;
 import net.i2p.router.TunnelInfo;
 import net.i2p.router.message.SendMessageDirectJob;
 import net.i2p.util.Log;
@@ -109,11 +111,19 @@ public class HandleDatabaseLookupMessageJob extends JobImpl {
         } else {
             RouterInfo info = getContext().netDb().lookupRouterInfoLocally(_message.getSearchKey());
             if ( (info != null) && (info.isCurrent(EXPIRE_DELAY)) ) {
-                // send that routerInfo to the _message.getFromHash peer
-                if (_log.shouldLog(Log.DEBUG))
-                    _log.debug("We do have key " + _message.getSearchKey().toBase64() 
-                               + " locally as a router info.  sending to " + fromKey.toBase64());
-                sendData(_message.getSearchKey(), info, fromKey, _message.getReplyTunnel());
+                if (isUnreachable(info) && !publishUnreachable()) {
+                    if (_log.shouldLog(Log.DEBUG))
+                        _log.debug("Not answering a query for a netDb peer who isn't reachable");
+                    Set us = new HashSet(1);
+                    us.add(getContext().router().getRouterInfo());
+                    sendClosest(_message.getSearchKey(), us, fromKey, _message.getReplyTunnel());
+                } else {
+                    // send that routerInfo to the _message.getFromHash peer
+                    if (_log.shouldLog(Log.DEBUG))
+                        _log.debug("We do have key " + _message.getSearchKey().toBase64() 
+                                   + " locally as a router info.  sending to " + fromKey.toBase64());
+                    sendData(_message.getSearchKey(), info, fromKey, _message.getReplyTunnel());
+                }
             } else {
                 // not found locally - return closest peer routerInfo structs
                 Set routerInfoSet = getContext().netDb().findNearestRouters(_message.getSearchKey(), 
@@ -125,6 +135,24 @@ public class HandleDatabaseLookupMessageJob extends JobImpl {
                 sendClosest(_message.getSearchKey(), routerInfoSet, fromKey, _message.getReplyTunnel());
             }
         }
+    }
+    
+    private boolean isUnreachable(RouterInfo info) {
+        if (info == null) return true;
+        String cap = info.getCapabilities();
+        if (cap == null) return false;
+        return cap.indexOf(Router.CAPABILITY_REACHABLE) >= 0;
+    }
+    
+    public static final String PROP_PUBLISH_UNREACHABLE = "router.publishUnreachableRouters";
+    public static final boolean DEFAULT_PUBLISH_UNREACHABLE = true;
+    
+    private boolean publishUnreachable() {
+        String publish = getContext().getProperty(PROP_PUBLISH_UNREACHABLE);
+        if (publish != null)
+            return Boolean.valueOf(publish).booleanValue();
+        else
+            return DEFAULT_PUBLISH_UNREACHABLE;
     }
     
     private boolean weAreClosest(Set routerInfoSet) {

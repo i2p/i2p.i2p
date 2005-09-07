@@ -47,6 +47,7 @@ public class PublishLocalRouterInfoJob extends JobImpl {
             ri.setAddresses(getContext().commSystem().createAddresses());
             if (FloodfillNetworkDatabaseFacade.floodfillEnabled(getContext()))
                 ri.addCapability(FloodfillNetworkDatabaseFacade.CAPACITY_FLOODFILL);
+            getContext().router().addReachabilityCapability(ri);
             SigningPrivateKey key = getContext().keyManager().getSigningPrivateKey();
             if (key == null) {
                 _log.log(Log.CRIT, "Internal error - signing private key not known?  rescheduling publish for 30s");

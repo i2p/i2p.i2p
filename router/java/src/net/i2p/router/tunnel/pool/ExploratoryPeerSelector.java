@@ -1,9 +1,6 @@
 package net.i2p.router.tunnel.pool;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 import net.i2p.router.RouterContext;
 import net.i2p.router.TunnelPoolSettings;
 import net.i2p.util.Log;
@@ -30,7 +27,7 @@ class ExploratoryPeerSelector extends TunnelPeerSelector {
             return rv;
         }
         
-        HashSet exclude = new HashSet(1);
+        Set exclude = getExclude(ctx, settings.isInbound(), settings.isExploratory());
         exclude.add(ctx.routerHash());
         HashSet matches = new HashSet(length);
         ctx.profileOrganizer().selectNotFailingPeers(length, exclude, matches, false);

@@ -1,4 +1,19 @@
-$Id: history.txt,v 1.239 2005/09/04 15:26:42 jrandom Exp $
+$Id: history.txt,v 1.240 2005/09/05 14:30:09 jrandom Exp $
+
+2005-09-07  BarkerJr
+    * HTML cleanup for the router console (thanks!)
+
+2005-09-07  jrandom
+    * Lay the foundation for 'client routers' - the ability for peers to opt 
+      out of participating in tunnels entirely due to firewall/NAT issues.  
+      Individual routers have control over where those peers are used in 
+      tunnels - in outbound or inbound, exploratory or client tunnels, or 
+      none at all.  The defaults with this build are to simply act as before -
+      placing everyone as potential participants in any tunnel.
+    * Another part of the foundation includes the option for netDb 
+      participants to refuse to answer queries regarding peers who are marked
+      as unreachable, though this too is disabled by default (meaning the 
+      routerInfo is retrievable from the netDb).
 
 2005-09-05  jrandom
     * Expose the HTTP headers to EepGet status listeners

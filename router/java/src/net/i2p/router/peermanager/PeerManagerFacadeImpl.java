@@ -10,8 +10,10 @@ package net.i2p.router.peermanager;
 
 import java.io.IOException;
 import java.io.Writer;
+import java.util.ArrayList;
 import java.util.List;
 
+import net.i2p.data.Hash;
 import net.i2p.router.PeerManagerFacade;
 import net.i2p.router.PeerSelectionCriteria;
 import net.i2p.router.RouterContext;
@@ -57,8 +59,26 @@ public class PeerManagerFacadeImpl implements PeerManagerFacade {
     public List selectPeers(PeerSelectionCriteria criteria) {
         return _manager.selectPeers(criteria);
     }
-    
+
+    public void setCapabilities(Hash peer, String caps) { 
+        if (_manager == null) return;
+        _manager.setCapabilities(peer, caps); 
+    }
+    public void removeCapabilities(Hash peer) { 
+        if (_manager == null) return;
+        _manager.removeCapabilities(peer); 
+    }
+    public Hash selectRandomByCapability(char capability) { 
+        if (_manager == null) return null;
+        return _manager.selectRandomByCapability(capability); 
+    }
+    public List getPeersByCapability(char capability) { 
+        if (_manager == null) return new ArrayList(0);
+        return _manager.getPeersByCapability(capability); 
+    }
+
     public void renderStatusHTML(Writer out) throws IOException { 
         _manager.renderStatusHTML(out); 
     }
+    
 }

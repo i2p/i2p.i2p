@@ -294,6 +294,7 @@ public class Router {
             ri.setAddresses(_context.commSystem().createAddresses());
             if (FloodfillNetworkDatabaseFacade.floodfillEnabled(_context))
                 ri.addCapability(FloodfillNetworkDatabaseFacade.CAPACITY_FLOODFILL);
+            addReachabilityCapability(ri);
             SigningPrivateKey key = _context.keyManager().getSigningPrivateKey();
             if (key == null) {
                 _log.log(Log.CRIT, "Internal error - signing private key not known?  wtf");
@@ -311,7 +312,31 @@ public class Router {
             _log.log(Log.CRIT, "Internal error - unable to sign our own address?!", dfe);
         }
     }
+    
+    public static final char CAPABILITY_REACHABLE = 'R';
+    public static final char CAPABILITY_UNREACHABLE = 'U';
+    public static final String PROP_FORCE_UNREACHABLE = "router.forceUnreachable";
 
+    public void addReachabilityCapability(RouterInfo ri) {
+        String forceUnreachable = _context.getProperty(PROP_FORCE_UNREACHABLE);
+        if ( (forceUnreachable != null) && ("true".equalsIgnoreCase(forceUnreachable)) ) {
+            ri.addCapability(CAPABILITY_UNREACHABLE);
+            return;
+        }
+        switch (_context.commSystem().getReachabilityStatus()) {
+            case CommSystemFacade.STATUS_OK:
+                ri.addCapability(CAPABILITY_REACHABLE);
+                break;
+            case CommSystemFacade.STATUS_DIFFERENT:
+            case CommSystemFacade.STATUS_REJECT_UNSOLICITED:
+                ri.addCapability(CAPABILITY_UNREACHABLE);
+                break;
+            case CommSystemFacade.STATUS_UNKNOWN:
+                // no explicit capability
+                break;
+        }
+    }
+    
     /**
      * Ugly list of files that we need to kill if we are building a new identity
      *

@@ -48,7 +48,7 @@ class FloodfillStoreJob extends StoreJob {
         _facade = facade;
     }
 
-    protected int getParallelization() { return 2; }
+    protected int getParallelization() { return 1; }
     protected int getRedundancy() { return 1; }
 
     /**

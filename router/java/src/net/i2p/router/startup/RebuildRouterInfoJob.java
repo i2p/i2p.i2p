@@ -129,6 +129,7 @@ public class RebuildRouterInfoJob extends JobImpl {
                 info.setOptions(stats);
                 if (FloodfillNetworkDatabaseFacade.floodfillEnabled(getContext()))
                     info.addCapability(FloodfillNetworkDatabaseFacade.CAPACITY_FLOODFILL);
+                getContext().router().addReachabilityCapability(info);
                 // info.setPeers(new HashSet()); // this would have the trusted peers
                 info.setPublished(CreateRouterInfoJob.getCurrentPublishDate(getContext()));
                 
