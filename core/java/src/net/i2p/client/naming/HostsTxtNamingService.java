@@ -39,7 +39,8 @@ public class HostsTxtNamingService extends NamingService {
     public final static String PROP_HOSTS_FILE = "i2p.hostsfilelist";
 
     /** default hosts.txt filename */
-    public final static String DEFAULT_HOSTS_FILE = "userhosts.txt,hosts.txt";
+    public final static String DEFAULT_HOSTS_FILE = 
+        "privatehosts.txt,userhosts.txt,hosts.txt";
 
     private final static Log _log = new Log(HostsTxtNamingService.class);
 
