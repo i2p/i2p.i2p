@@ -36,11 +36,17 @@ final class RemoteHostId {
         return (_port == id.getPort()) && DataHelper.eq(_ip, id.getIP());
     }
     
-    public String toString() {
+    public String toString() { return toString(true); }
+    public String toString(boolean includePort) {
         StringBuffer buf = new StringBuffer(_ip.length + 5);
-        for (int i = 0; i < _ip.length; i++)
-            buf.append(_ip[i]&0xFF).append('.');
-        buf.append(_port);
+        for (int i = 0; i < _ip.length; i++) {
+            buf.append(_ip[i]&0xFF);
+            if (i + 1 < _ip.length)
+                buf.append('.');
+        }
+        if (includePort) 
+            buf.append(':').append(_port);
         return buf.toString();
     }
+    public String toHostString() { return toString(false); }
 }

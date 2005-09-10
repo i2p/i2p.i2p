@@ -1,7 +1,12 @@
-$Id: history.txt,v 1.241 2005/09/07 17:32:06 jrandom Exp $
+$Id: history.txt,v 1.242 2005/09/09 20:13:50 cervantes Exp $
+
+2005-09-09  jrandom
+    * Added preliminary support for NAT hole punching through SSU introducers
+    * Honor peer test results from peers that we have an SSU session with if
+      those sessions are idle for 3 minutes or more.
 
 2005-09-09  cervantes
-	* New build due to change in build number :P (thanks ugha!)
+    * New build due to change in build number :P (thanks ugha!)
 
 2005-09-07  BarkerJr
     * HTML cleanup for the router console (thanks!)

@@ -125,6 +125,12 @@ class PeerTestManager {
         }
     }
     
+    /**
+     * If we have sent a packet to charlie within the last 3 minutes, ignore any test 
+     * results we get from them, as our NAT will have poked a hole anyway
+     *
+     */
+    private static final long CHARLIE_RECENT_PERIOD = 3*60*1000;
 
     /**
      * Receive a PeerTest message which contains the correct nonce for our current 
@@ -152,7 +158,10 @@ class PeerTestManager {
             }
         } else {
             PeerState charlieSession = _transport.getPeerState(from);
-            if (charlieSession != null) {
+            long recentBegin = _context.clock().now() - CHARLIE_RECENT_PERIOD;
+            if ( (charlieSession != null) && 
+                 (charlieSession.getLastACKSend() > recentBegin) &&
+                 (charlieSession.getLastSendTime() > recentBegin) ) {
                 if (_log.shouldLog(Log.WARN))
                     _log.warn("Bob chose a charlie we already have a session to, cancelling the test and rerunning (bob: " 
                               + _currentTest + ", charlie: " + from + ")");

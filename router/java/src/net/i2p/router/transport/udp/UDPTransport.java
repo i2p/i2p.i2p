@@ -40,8 +40,6 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     private Map _peersByIdent;
     /** RemoteHostId to PeerState */
     private Map _peersByRemoteHost;
-    /** Relay tag (base64 String) to PeerState */
-    private Map _peersByRelayTag;
     /**
      * Array of list of PeerState instances, where each list contains peers with one 
      * of the given capacities (from 0-25, referencing 'A'-'Z'). 
@@ -57,14 +55,13 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     private InboundMessageFragments _inboundFragments;
     private UDPFlooder _flooder;
     private PeerTestManager _testManager;
+    private IntroductionManager _introManager;
     private ExpirePeerEvent _expireEvent;
     private PeerTestEvent _testEvent;
     private short _reachabilityStatus;
     private long _reachabilityStatusLastUpdated;
+    private long _introducersSelectedOn;
     
-    /** list of RelayPeer objects for people who will relay to us */
-    private List _relayPeers;
-
     /** summary info to distribute */
     private RouterAddress _externalAddress;
     /** port number on which we can be reached, or -1 */
@@ -122,7 +119,6 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         _log = ctx.logManager().getLog(UDPTransport.class);
         _peersByIdent = new HashMap(128);
         _peersByRemoteHost = new HashMap(128);
-        _peersByRelayTag = new HashMap(128);
         _peersByCapacity = new ArrayList['Z'-'A'+1];
         for (int i = 0; i < _peersByCapacity.length; i++)
             _peersByCapacity[i] = new ArrayList(16);
@@ -131,7 +127,6 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         TimedWeightedPriorityMessageQueue mq = new TimedWeightedPriorityMessageQueue(ctx, PRIORITY_LIMITS, PRIORITY_WEIGHT, this);
         _outboundMessages = mq;
         _activeThrottle = mq;
-        _relayPeers = new ArrayList(1);
 
         _fastBid = new SharedBid(50);
         _slowBid = new SharedBid(1000);
@@ -143,6 +138,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         _expireEvent = new ExpirePeerEvent();
         _testEvent = new PeerTestEvent();
         _reachabilityStatus = CommSystemFacade.STATUS_UNKNOWN;
+        _introManager = new IntroductionManager(_context, this);
+        _introducersSelectedOn = -1;
         
         _context.statManager().createRateStat("udp.droppedPeer", "How long ago did we receive from a dropped peer (duration == session lifetime", "udp", new long[] { 60*60*1000, 24*60*60*1000 });
         _context.statManager().createRateStat("udp.droppedPeerInactive", "How long ago did we receive from a dropped peer (duration == session lifetime)", "udp", new long[] { 60*60*1000, 24*60*60*1000 });
@@ -172,6 +169,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             _inboundFragments.shutdown();
         if (_flooder != null)
             _flooder.shutdown();
+        _introManager.reset();
         
         _introKey = new SessionKey(new byte[SessionKey.KEYSIZE_BYTES]);
         System.arraycopy(_context.routerHash().getData(), 0, _introKey.getData(), 0, SessionKey.KEYSIZE_BYTES);
@@ -225,7 +223,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             _testManager = new PeerTestManager(_context, this);
         
         if (_handler == null)
-            _handler = new PacketHandler(_context, this, _endpoint, _establisher, _inboundFragments, _testManager);
+            _handler = new PacketHandler(_context, this, _endpoint, _establisher, _inboundFragments, _testManager, _introManager);
         
         if (_refiller == null)
             _refiller = new OutboundRefiller(_context, _fragments, _outboundMessages);
@@ -365,10 +363,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
      * get the state for the peer being introduced, or null if we aren't
      * offering to introduce anyone with that tag.
      */
-    public PeerState getPeerState(String relayTag) {
-        synchronized (_peersByRelayTag) {
-            return (PeerState)_peersByRelayTag.get(relayTag);
-        }
+    public PeerState getPeerState(long relayTag) {
+        return _introManager.get(relayTag);
     }
     
     /** 
@@ -486,8 +482,6 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             }
         }
         
-        if ( (oldPeer != null) && (_log.shouldLog(Log.WARN)) )
-            _log.warn("Peer already connected: old=" + oldPeer + " new=" + peer, new Exception("dup"));
         oldPeer = null;
         
         RemoteHostId remoteId = peer.getRemoteHostId();
@@ -513,9 +507,22 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         
         _expireEvent.add(peer);
         
+        _introManager.add(peer);
+        
         if (oldEstablishedOn > 0)
             _context.statManager().addRateData("udp.alreadyConnected", oldEstablishedOn, 0);
+        
+        // if we need introducers, try to shift 'em around every 10 minutes
+        if (introducersRequired() && (_introducersSelectedOn < _context.clock().now() - 10*60*1000))
+            rebuildExternalAddress();
         return true;
+    }
+    
+    public RouterAddress getCurrentAddress() {
+        // if we need introducers, try to shift 'em around every 10 minutes
+        if (introducersRequired() && (_introducersSelectedOn < _context.clock().now() - 10*60*1000))
+            rebuildExternalAddress(false);
+        return super.getCurrentAddress();
     }
     
     private void dropPeer(PeerState peer) {
@@ -561,6 +568,11 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             }
             _log.info(buf.toString(), new Exception("Dropped by"));
         }
+        
+        _introManager.remove(peer);
+        // a bit overzealous - perhaps we should only rebuild the external if the peer being dropped
+        // is one of our introducers?
+        rebuildExternalAddress();
         
         if (peer.getRemotePeer() != null) {
             dropPeerCapacities(peer);
@@ -701,21 +713,13 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     void setExternalListenHost(byte addr[]) throws UnknownHostException { 
         _externalListenHost = InetAddress.getByAddress(addr); 
     }
-    void addRelayPeer(String host, int port, byte tag[], SessionKey relayIntroKey) {
-        if ( (_externalListenPort > 0) && (_externalListenHost != null) ) 
-            return; // no need for relay peers, as we are reachable
-        
-        RelayPeer peer = new RelayPeer(host, port, tag, relayIntroKey);
-        synchronized (_relayPeers) {
-            _relayPeers.add(peer);
-        }
-    }
 
     private boolean explicitAddressSpecified() {
         return (_context.getProperty(PROP_EXTERNAL_HOST) != null);
     }
     
-    void rebuildExternalAddress() {
+    void rebuildExternalAddress() { rebuildExternalAddress(true); }
+    void rebuildExternalAddress(boolean allowRebuildRouterInfo) {
         // if the external port is specified, we want to use that to bind to even
         // if we don't know the external host.
         String port = _context.getProperty(PROP_EXTERNAL_PORT);
@@ -736,29 +740,49 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             }
         }
             
-        Properties options = new Properties();
+        Properties options = new Properties(); 
+        boolean introducersRequired = introducersRequired();
+        if (introducersRequired) {
+            List peers = new ArrayList(PUBLIC_RELAY_COUNT);
+            int found = 0;
+            _introManager.pickInbound(peers, PUBLIC_RELAY_COUNT);
+            if (_log.shouldLog(Log.INFO))
+                _log.info("Introducers required, picked peers: " + peers);
+            for (int i = 0; i < peers.size(); i++) {
+                PeerState peer = (PeerState)peers.get(i);
+                RouterInfo ri = _context.netDb().lookupRouterInfoLocally(peer.getRemotePeer());
+                if (ri == null) {
+                    if (_log.shouldLog(Log.INFO))
+                        _log.info("Picked peer has no local routerInfo: " + peer);
+                    continue;
+                }
+                RouterAddress ra = ri.getTargetAddress(STYLE);
+                if (ra == null) {
+                    if (_log.shouldLog(Log.INFO))
+                        _log.info("Picked peer has no SSU address: " + ri);
+                    continue;
+                }
+                UDPAddress ura = new UDPAddress(ra);
+                options.setProperty(UDPAddress.PROP_INTRO_HOST_PREFIX + i, peer.getRemoteHostId().toHostString());
+                options.setProperty(UDPAddress.PROP_INTRO_PORT_PREFIX + i, String.valueOf(peer.getRemotePort()));
+                options.setProperty(UDPAddress.PROP_INTRO_KEY_PREFIX + i, Base64.encode(ura.getIntroKey()));
+                options.setProperty(UDPAddress.PROP_INTRO_TAG_PREFIX + i, String.valueOf(peer.getTheyRelayToUsAs()));
+                found++;
+            }
+            if (found > 0) {
+                if (_log.shouldLog(Log.INFO))
+                    _log.info("Picked peers: " + found);
+                _introducersSelectedOn = _context.clock().now();
+            }
+        }
         if ( (_externalListenPort > 0) && (_externalListenHost != null) ) {
             options.setProperty(UDPAddress.PROP_PORT, String.valueOf(_externalListenPort));
             options.setProperty(UDPAddress.PROP_HOST, _externalListenHost.getHostAddress());
             // if we have explicit external addresses, they had better be reachable
-            options.setProperty(UDPAddress.PROP_CAPACITY, ""+UDPAddress.CAPACITY_TESTING);
-        } else {
-            // grab 3 relays randomly
-            synchronized (_relayPeers) {
-                Collections.shuffle(_relayPeers);
-                int numPeers = PUBLIC_RELAY_COUNT;
-                if (numPeers > _relayPeers.size())
-                    numPeers = _relayPeers.size();
-                for (int i = 0; i < numPeers; i++) {
-                    RelayPeer peer = (RelayPeer)_relayPeers.get(i);
-                    options.setProperty("relay." + i + ".host", peer.getHost());
-                    options.setProperty("relay." + i + ".port", String.valueOf(peer.getPort()));
-                    options.setProperty("relay." + i + ".tag", Base64.encode(peer.getTag()));
-                    options.setProperty("relay." + i + ".key", peer.getIntroKey().toBase64());
-                }
-            }
-            if (options.size() <= 0)
-                return;
+            if (introducersRequired)
+                options.setProperty(UDPAddress.PROP_CAPACITY, ""+UDPAddress.CAPACITY_TESTING);
+            else
+                options.setProperty(UDPAddress.PROP_CAPACITY, ""+UDPAddress.CAPACITY_TESTING + UDPAddress.CAPACITY_INTRODUCER);
         }
         options.setProperty(UDPAddress.PROP_INTRO_KEY, _introKey.toBase64());
         
@@ -768,10 +792,29 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         addr.setTransportStyle(STYLE);
         addr.setOptions(options);
         
+        boolean wantsRebuild = false;
+        if ( (_externalAddress == null) || !(_externalAddress.equals(addr)) )
+            wantsRebuild = true;
         _externalAddress = addr;
         if (_log.shouldLog(Log.INFO))
             _log.info("Address rebuilt: " + addr);
         replaceAddress(addr);
+        if (allowRebuildRouterInfo)
+            _context.router().rebuildRouterInfo();
+    }
+    
+    public static final String PROP_FORCE_INTRODUCERS = "i2np.udp.forceIntroducers";
+    public boolean introducersRequired() {
+        String forceIntroducers = _context.getProperty(PROP_FORCE_INTRODUCERS);
+        if ( (forceIntroducers != null) && (Boolean.valueOf(forceIntroducers).booleanValue()) )
+            return true;
+        switch (getReachabilityStatus()) {
+            case CommSystemFacade.STATUS_REJECT_UNSOLICITED:
+            case CommSystemFacade.STATUS_DIFFERENT:
+                return true;
+            default:
+                return false;
+        }
     }
     
     String getPacketHandlerStatus() {
@@ -869,7 +912,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             buf.append("<tr>");
             
             String name = peer.getRemotePeer().toBase64().substring(0,6);
-            buf.append("<td valign=\"top\" nowrap><code>");
+            buf.append("<td valign=\"top\" nowrap=\"nowrap\"><code>");
             buf.append("<a href=\"netdb.jsp#");
             buf.append(name);
             buf.append("\">");
@@ -897,6 +940,15 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                 buf.append("0");
             buf.append(port);
             buf.append("</a>");
+            if (peer.getWeRelayToThemAs() > 0)
+                buf.append("&gt;");
+            else
+                buf.append("&nbsp;");
+            if (peer.getTheyRelayToUsAs() > 0)
+                buf.append("&lt;");
+            else
+                buf.append("&nbsp;");
+            
             boolean appended = false;
             if (_activeThrottle.isChoked(peer.getRemotePeer())) {
                 if (!appended) buf.append("<br />");
@@ -1131,7 +1183,21 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                 break;
         }
     }
-    public short getReachabilityStatus() { return _reachabilityStatus; }
+    private static final String PROP_REACHABILITY_STATUS_OVERRIDE = "i2np.udp.status";
+    public short getReachabilityStatus() { 
+        String override = _context.getProperty(PROP_REACHABILITY_STATUS_OVERRIDE);
+        if (override == null)
+            return _reachabilityStatus;
+            
+        if ("ok".equals(override))
+            return CommSystemFacade.STATUS_OK;
+        else if ("err-reject".equals(override))
+            return CommSystemFacade.STATUS_REJECT_UNSOLICITED;
+        else if ("err-different".equals(override))
+            return CommSystemFacade.STATUS_DIFFERENT;
+        
+        return _reachabilityStatus; 
+    }
     public void recheckReachability() {
         _testEvent.runTest();
     }

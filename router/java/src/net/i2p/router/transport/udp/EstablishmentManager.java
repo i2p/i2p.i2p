@@ -1,6 +1,7 @@
 package net.i2p.router.transport.udp;
 
 import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -8,15 +9,18 @@ import java.util.Iterator;
 import java.util.Map;
 
 import net.i2p.crypto.DHSessionKeyBuilder;
+import net.i2p.data.Base64;
 import net.i2p.data.RouterAddress;
 import net.i2p.data.RouterIdentity;
 import net.i2p.data.SessionKey;
 import net.i2p.data.Signature;
 import net.i2p.data.i2np.DatabaseStoreMessage;
+import net.i2p.router.CommSystemFacade;
 import net.i2p.router.OutNetMessage;
 import net.i2p.router.RouterContext;
 import net.i2p.util.I2PThread;
 import net.i2p.util.Log;
+import net.i2p.util.SimpleTimer;
 
 /**
  * Coordinate the establishment of new sessions - both inbound and outbound.
@@ -35,6 +39,8 @@ public class EstablishmentManager {
     private Map _outboundStates;
     /** map of RemoteHostId to List of OutNetMessage for messages exceeding capacity */
     private Map _queuedOutbound;
+    /** map of nonce (Long) to OutboundEstablishState */
+    private Map _liveIntroductions;
     private boolean _alive;
     private Object _activityLock;
     private int _activity;
@@ -50,11 +56,15 @@ public class EstablishmentManager {
         _inboundStates = new HashMap(32);
         _outboundStates = new HashMap(32);
         _queuedOutbound = new HashMap(32);
+        _liveIntroductions = new HashMap(32);
         _activityLock = new Object();
         _context.statManager().createRateStat("udp.inboundEstablishTime", "How long it takes for a new inbound session to be established", "udp", new long[] { 60*60*1000, 24*60*60*1000 });
         _context.statManager().createRateStat("udp.outboundEstablishTime", "How long it takes for a new outbound session to be established", "udp", new long[] { 60*60*1000, 24*60*60*1000 });
         _context.statManager().createRateStat("udp.inboundEstablishFailedState", "What state a failed inbound establishment request fails in", "udp", new long[] { 60*60*1000, 24*60*60*1000 });
         _context.statManager().createRateStat("udp.outboundEstablishFailedState", "What state a failed outbound establishment request fails in", "udp", new long[] { 60*60*1000, 24*60*60*1000 });
+        _context.statManager().createRateStat("udp.sendIntroRelayRequest", "How often we send a relay request to reach a peer", "udp", new long[] { 60*60*1000, 24*60*60*1000 });
+        _context.statManager().createRateStat("udp.sendIntroRelayTimeout", "How often a relay request times out before getting a response (due to the target or intro peer being offline)", "udp", new long[] { 60*60*1000, 24*60*60*1000 });
+        _context.statManager().createRateStat("udp.receiveIntroRelayResponse", "How long it took to receive a relay response", "udp", new long[] { 60*60*1000, 24*60*60*1000 });
     }
     
     public void startup() {
@@ -134,7 +144,7 @@ public class EstablishmentManager {
                 } else {
                     state = new OutboundEstablishState(_context, remAddr, port, 
                                                        msg.getTarget().getIdentity(), 
-                                                       new SessionKey(addr.getIntroKey()));
+                                                       new SessionKey(addr.getIntroKey()), addr);
                     _outboundStates.put(to, state);
                 }
             }
@@ -155,15 +165,28 @@ public class EstablishmentManager {
      *
      */
     void receiveSessionRequest(RemoteHostId from, UDPPacketReader reader) {
+        boolean isNew = false;
         InboundEstablishState state = null;
         synchronized (_inboundStates) {
             state = (InboundEstablishState)_inboundStates.get(from);
             if (state == null) {
                 state = new InboundEstablishState(_context, from.getIP(), from.getPort(), _transport.getLocalPort());
+                isNew = true;
                 _inboundStates.put(from, state);
             }
         }
         state.receiveSessionRequest(reader.getSessionRequestReader());
+        if (isNew) {
+            if (!_transport.introducersRequired()) {
+                long tag = _context.random().nextLong(MAX_TAG_VALUE);
+                state.setSentRelayTag(tag);
+                if (_log.shouldLog(Log.INFO))
+                    _log.info("Received session request from " + from + ", sending relay tag " + tag);
+            } else {
+                if (_log.shouldLog(Log.INFO))
+                    _log.info("Received session request, but our status is " + _transport.getReachabilityStatus());
+            }
+        }
         
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Receive session request from: " + state.getRemoteHostId().toString());
@@ -265,7 +288,7 @@ public class EstablishmentManager {
 
             OutboundEstablishState qstate = new OutboundEstablishState(_context, remAddr, port, 
                                                msg.getTarget().getIdentity(), 
-                                               new SessionKey(addr.getIntroKey()));
+                                               new SessionKey(addr.getIntroKey()), addr);
             _outboundStates.put(to, qstate);
 
             for (int i = 0; i < queued.size(); i++)
@@ -304,10 +327,10 @@ public class EstablishmentManager {
         peer.setLastSendTime(now);
         peer.setRemoteAddress(state.getSentIP(), state.getSentPort());
         peer.setRemotePeer(remote.calculateHash());
-        if (true) // for now, only support direct
-            peer.setRemoteRequiresIntroduction(false);
-        peer.setTheyRelayToUsAs(0);
         peer.setWeRelayToThemAs(state.getSentRelayTag());
+        peer.setTheyRelayToUsAs(0);
+        //if (true) // for now, only support direct
+        //    peer.setRemoteRequiresIntroduction(false);
         
         _transport.addRemotePeerState(peer);
         
@@ -334,8 +357,6 @@ public class EstablishmentManager {
         peer.setLastSendTime(now);
         peer.setRemoteAddress(state.getSentIP(), state.getSentPort());
         peer.setRemotePeer(remote.calculateHash());
-        if (true) // for now, only support direct
-            peer.setRemoteRequiresIntroduction(false);
         peer.setTheyRelayToUsAs(state.getReceivedRelayTag());
         peer.setWeRelayToThemAs(0);
         
@@ -364,10 +385,19 @@ public class EstablishmentManager {
         _transport.send(m, peer);
     }
     
+    public static final long MAX_TAG_VALUE = 0xFFFFFFFFl;
+    
     private void sendCreated(InboundEstablishState state) {
         long now = _context.clock().now();
-        if (true) // for now, don't offer to relay
+        if (!_transport.introducersRequired()) {
+            // offer to relay
+            // (perhaps we should check our bw usage and/or how many peers we are 
+            //  already offering introducing?)
+            state.setSentRelayTag(_context.random().nextLong(MAX_TAG_VALUE));
+        } else {
+            // don't offer to relay
             state.setSentRelayTag(0);
+        }
         
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Send created to: " + state.getRemoteHostId().toString());
@@ -390,11 +420,87 @@ public class EstablishmentManager {
 
     private void sendRequest(OutboundEstablishState state) {
         long now = _context.clock().now();
-        state.prepareSessionRequest();
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Send request to: " + state.getRemoteHostId().toString());
         _transport.send(_builder.buildSessionRequestPacket(state));
         state.requestSent();
+    }
+    
+    private static final long MAX_NONCE = 0xFFFFFFFFl;
+    /** if we don't get a relayResponse in 3 seconds, try again with another intro peer */
+    private static final int INTRO_ATTEMPT_TIMEOUT = 3*1000;
+    
+    private void handlePendingIntro(OutboundEstablishState state) {
+        long nonce = _context.random().nextLong(MAX_NONCE);
+        while (true) {
+            synchronized (_liveIntroductions) {
+                OutboundEstablishState old = (OutboundEstablishState)_liveIntroductions.put(new Long(nonce), state);
+                if (old != null) {
+                    nonce = _context.random().nextLong(MAX_NONCE);
+                } else {
+                    break;
+                }
+            }
+        }
+        SimpleTimer.getInstance().addEvent(new FailIntroduction(state, nonce), INTRO_ATTEMPT_TIMEOUT);
+        state.setIntroNonce(nonce);
+        _context.statManager().addRateData("udp.sendIntroRelayRequest", 1, 0);
+        _transport.send(_builder.buildRelayRequest(state, _transport.getIntroKey()));
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("Send intro for " + state.getRemoteHostId().toString() + " with our intro key as " + _transport.getIntroKey().toBase64());
+        state.introSent();
+    }
+    private class FailIntroduction implements SimpleTimer.TimedEvent {
+        private long _nonce;
+        private OutboundEstablishState _state;
+        public FailIntroduction(OutboundEstablishState state, long nonce) {
+            _nonce = nonce;
+            _state = state;
+        }
+        public void timeReached() {
+            OutboundEstablishState removed = null;
+            synchronized (_liveIntroductions) {
+                removed = (OutboundEstablishState)_liveIntroductions.remove(new Long(_nonce));
+                if (removed != _state) {
+                    // another one with the same nonce in a very brief time...
+                    _liveIntroductions.put(new Long(_nonce), removed);
+                    removed = null;
+                }
+            }
+            if (removed != null) {
+                _context.statManager().addRateData("udp.sendIntroRelayTimeout", 1, 0);
+                notifyActivity();
+            }
+        }
+    }
+    
+    public void receiveRelayResponse(RemoteHostId bob, UDPPacketReader reader) {
+        long nonce = reader.getRelayResponseReader().readNonce();
+        OutboundEstablishState state = null;
+        synchronized (_liveIntroductions) {
+            state = (OutboundEstablishState)_liveIntroductions.remove(new Long(nonce));
+        }
+        if (state == null) 
+            return; // already established
+        
+        int sz = reader.getRelayResponseReader().readCharlieIPSize();
+        byte ip[] = new byte[sz];
+        reader.getRelayResponseReader().readCharlieIP(ip, 0);
+        InetAddress addr = null;
+        try {
+            addr = InetAddress.getByAddress(ip);
+        } catch (UnknownHostException uhe) {
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Introducer for " + state + " (" + bob + ") sent us an invalid IP for our targer: " + Base64.encode(ip), uhe);
+            // these two cause this peer to requeue for a new intro peer
+            state.introductionFailed();
+            notifyActivity();
+            return;
+        }
+        _context.statManager().addRateData("udp.receiveIntroRelayResponse", state.getLifetime(), 0);
+        int port = reader.getRelayResponseReader().readCharliePort();
+        state.introduced(addr, ip, port);
+        notifyActivity();
     }
     
     private void sendConfirmation(OutboundEstablishState state) {
@@ -594,6 +700,9 @@ public class EstablishmentManager {
                         case OutboundEstablishState.STATE_REQUEST_SENT:
                             err = "Took too long to establish remote connection (request sent)";
                             break;
+                        case OutboundEstablishState.STATE_PENDING_INTRO:
+                            err = "Took too long to establish remote connection (intro failed)";
+                            break;
                         case OutboundEstablishState.STATE_UNKNOWN: // fallthrough
                         default:
                             err = "Took too long to establish remote connection (unknown state)";
@@ -625,6 +734,9 @@ public class EstablishmentManager {
                         break;
                     case OutboundEstablishState.STATE_CONFIRMED_COMPLETELY:
                         handleCompletelyEstablished(outboundState);
+                        break;
+                    case OutboundEstablishState.STATE_PENDING_INTRO:
+                        handlePendingIntro(outboundState);
                         break;
                     default:
                         // wtf

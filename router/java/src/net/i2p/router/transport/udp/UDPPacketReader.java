@@ -1,5 +1,6 @@
 package net.i2p.router.transport.udp;
 
+import java.net.InetAddress;
 import net.i2p.I2PAppContext;
 import net.i2p.data.Base64;
 import net.i2p.data.DataHelper;
@@ -24,6 +25,9 @@ public class UDPPacketReader {
     private SessionConfirmedReader _sessionConfirmedReader;
     private DataReader _dataReader;
     private PeerTestReader _peerTestReader;
+    private RelayRequestReader _relayRequestReader;
+    private RelayIntroReader _relayIntroReader;
+    private RelayResponseReader _relayResponseReader;
     
     private static final int KEYING_MATERIAL_LENGTH = 64;
     
@@ -35,6 +39,9 @@ public class UDPPacketReader {
         _sessionConfirmedReader = new SessionConfirmedReader();
         _dataReader = new DataReader();
         _peerTestReader = new PeerTestReader();
+        _relayRequestReader = new RelayRequestReader();
+        _relayIntroReader = new RelayIntroReader();
+        _relayResponseReader = new RelayResponseReader();
     }
     
     public void initialize(UDPPacket packet) {
@@ -93,6 +100,9 @@ public class UDPPacketReader {
     public SessionConfirmedReader getSessionConfirmedReader() { return _sessionConfirmedReader; }
     public DataReader getDataReader() { return _dataReader; }
     public PeerTestReader getPeerTestReader() { return _peerTestReader; }
+    public RelayRequestReader getRelayRequestReader() { return _relayRequestReader; }
+    public RelayIntroReader getRelayIntroReader() { return _relayIntroReader; }
+    public RelayResponseReader getRelayResponseReader() { return _relayResponseReader; }
     
     public String toString() {
         switch (readPayloadType()) {
@@ -106,6 +116,12 @@ public class UDPPacketReader {
                 return "Session request packet";
             case UDPPacket.PAYLOAD_TYPE_TEST:
                 return "Peer test packet";
+            case UDPPacket.PAYLOAD_TYPE_RELAY_INTRO:
+                return "Relay intro packet";
+            case UDPPacket.PAYLOAD_TYPE_RELAY_REQUEST:
+                return "Relay request packet";
+            case UDPPacket.PAYLOAD_TYPE_RELAY_RESPONSE:
+                return "Relay response packet";
             default:
                 return "Other packet type...";
         }
@@ -537,5 +553,215 @@ public class UDPPacketReader {
             offset += 2; // skip the port
             System.arraycopy(_message, offset, target, targetOffset, SessionKey.KEYSIZE_BYTES);
         }
+    }
+    
+    /** Help read the RelayRequest payload */
+    public class RelayRequestReader {
+        public long readTag() { 
+            long rv = DataHelper.fromLong(_message, readBodyOffset(), 4); 
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("read alice tag: " + rv);
+            return rv;
+        }
+        public int readIPSize() {
+            int offset = readBodyOffset() + 4;
+            int rv = (int)DataHelper.fromLong(_message, offset, 1);
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("read alice ip size: " + rv);
+            return rv;
+        }
+        
+        /** what IP Alice is reachable on */
+        public void readIP(byte target[], int targetOffset) {
+            int offset = readBodyOffset() + 4;
+            int size = (int)DataHelper.fromLong(_message, offset, 1);
+            offset++;
+            System.arraycopy(_message, offset, target, targetOffset, size);
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("read alice ip: " + Base64.encode(target, targetOffset, size));
+        }
+        public int readPort() {
+            int offset = readBodyOffset() + 4;
+            offset += DataHelper.fromLong(_message, offset, 1);
+            offset++;
+            int rv = (int)DataHelper.fromLong(_message, offset, 2);
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("read alice port: " + rv);
+            return rv;
+        }
+        public int readChallengeSize() {
+            int offset = readBodyOffset() + 4;
+            offset += DataHelper.fromLong(_message, offset, 1);
+            offset++;
+            offset += 2;
+            int rv = (int)DataHelper.fromLong(_message, offset, 1);
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("read challenge size: " + rv);
+            return rv;
+        }
+        public void readChallengeSize(byte target[], int targetOffset) {
+            int offset = readBodyOffset() + 4;
+            offset += DataHelper.fromLong(_message, offset, 1);
+            offset++;
+            offset += 2;
+            int sz = (int)DataHelper.fromLong(_message, offset, 1);
+            offset++;
+            System.arraycopy(_message, offset, target, targetOffset, sz);
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("read challenge data: " + Base64.encode(target));
+        }
+        public void readAliceIntroKey(byte target[], int targetOffset) {
+            int offset = readBodyOffset() + 4;
+            offset += DataHelper.fromLong(_message, offset, 1);
+            offset++;
+            offset += 2;
+            int sz = (int)DataHelper.fromLong(_message, offset, 1);
+            offset++;
+            offset += sz;
+            System.arraycopy(_message, offset, target, targetOffset, SessionKey.KEYSIZE_BYTES);
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("read alice intro key: " + Base64.encode(target, targetOffset, SessionKey.KEYSIZE_BYTES)
+                          + " packet size: " + _payloadLength + " off: " + offset + " data: " + Base64.encode(_message));
+        }
+        public long readNonce() {
+            int offset = readBodyOffset() + 4;
+            offset += DataHelper.fromLong(_message, offset, 1);
+            offset++;
+            offset += 2;
+            int sz = (int)DataHelper.fromLong(_message, offset, 1);
+            offset++;
+            offset += sz;
+            offset += SessionKey.KEYSIZE_BYTES;
+            long rv = DataHelper.fromLong(_message, offset, 4);
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("read request nonce: " + rv);
+            return rv;
+        }
+    }
+    
+    /** Help read the RelayIntro payload */
+    public class RelayIntroReader {
+        public int readIPSize() {
+            int offset = readBodyOffset();
+            return (int)DataHelper.fromLong(_message, offset, 1);
+        }
+        
+        /** what IP Alice is reachable on */
+        public void readIP(byte target[], int targetOffset) {
+            int offset = readBodyOffset();
+            int size = (int)DataHelper.fromLong(_message, offset, 1);
+            offset++;
+            System.arraycopy(_message, offset, target, targetOffset, size);
+        }
+        public int readPort() {
+            int offset = readBodyOffset();
+            offset += DataHelper.fromLong(_message, offset, 1);
+            offset++;
+            return (int)DataHelper.fromLong(_message, offset, 2);
+        }
+        public int readChallengeSize() {
+            int offset = readBodyOffset();
+            offset += DataHelper.fromLong(_message, offset, 1);
+            offset++;
+            offset += 2;
+            return (int)DataHelper.fromLong(_message, offset, 1);
+        }
+        public void readChallengeSize(byte target[], int targetOffset) {
+            int offset = readBodyOffset();
+            offset += DataHelper.fromLong(_message, offset, 1);
+            offset++;
+            offset += 2;
+            int sz = (int)DataHelper.fromLong(_message, offset, 1);
+            offset++;
+            System.arraycopy(_message, offset, target, targetOffset, sz);
+        }
+    }
+    
+    
+    /** Help read the RelayResponse payload */
+    public class RelayResponseReader {
+        public int readCharlieIPSize() {
+            int offset = readBodyOffset();
+            return (int)DataHelper.fromLong(_message, offset, 1);
+        }
+        /** what IP charlie is reachable on */
+        public void readCharlieIP(byte target[], int targetOffset) {
+            int offset = readBodyOffset();
+            int size = (int)DataHelper.fromLong(_message, offset, 1);
+            offset++;
+            System.arraycopy(_message, offset, target, targetOffset, size);
+        }
+        /** what port charlie is reachable on */
+        public int readCharliePort() {
+            int offset = readBodyOffset();
+            offset += DataHelper.fromLong(_message, offset, 1);
+            offset++;
+            return (int)DataHelper.fromLong(_message, offset, 2);
+        }
+        
+        public int readAliceIPSize() {
+            int offset = readBodyOffset();
+            offset += DataHelper.fromLong(_message, offset, 1);
+            offset++;
+            offset += 2;
+            return (int)DataHelper.fromLong(_message, offset, 1);
+        }
+        public void readAliceIP(byte target[], int targetOffset) {
+            int offset = readBodyOffset();
+            offset += DataHelper.fromLong(_message, offset, 1);
+            offset++;
+            offset += 2;
+            int sz = (int)DataHelper.fromLong(_message, offset, 1);
+            offset++;
+            System.arraycopy(_message, offset, target, targetOffset, sz);
+        }
+        public int readAlicePort() {
+            int offset = readBodyOffset();
+            offset += DataHelper.fromLong(_message, offset, 1);
+            offset++;
+            offset += 2;
+            int sz = (int)DataHelper.fromLong(_message, offset, 1);
+            offset++;
+            offset += sz;
+            return (int)DataHelper.fromLong(_message, offset, 2);
+        }
+        public long readNonce() {
+            int offset = readBodyOffset();
+            offset += DataHelper.fromLong(_message, offset, 1);
+            offset++;
+            offset += 2;
+            int sz = (int)DataHelper.fromLong(_message, offset, 1);
+            offset++;
+            offset += sz;
+            offset += 2;
+            return DataHelper.fromLong(_message, offset, 4);
+        }
+    }
+    
+    
+    public static void main(String args[]) {
+        I2PAppContext ctx = I2PAppContext.getGlobalContext();
+        try {
+            PacketBuilder b = new PacketBuilder(ctx);
+            InetAddress introHost = InetAddress.getLocalHost();
+            int introPort = 1234;
+            byte introKey[] = new byte[SessionKey.KEYSIZE_BYTES];
+            ctx.random().nextBytes(introKey);
+            long introTag = ctx.random().nextLong(0xFFFFFFFFl);
+            long introNonce = ctx.random().nextLong(0xFFFFFFFFl);
+            SessionKey ourIntroKey = ctx.keyGenerator().generateSessionKey();
+            UDPPacket packet = b.buildRelayRequest(introHost, introPort, introKey, introTag, ourIntroKey, introNonce, false);
+            UDPPacketReader r = new UDPPacketReader(ctx);
+            r.initialize(packet);
+            RelayRequestReader reader = r.getRelayRequestReader();
+            System.out.println("Nonce: " + reader.readNonce() + " / " + introNonce);
+            System.out.println("Tag  : " + reader.readTag() + " / " + introTag);
+            byte readKey[] = new byte[SessionKey.KEYSIZE_BYTES];
+            reader.readAliceIntroKey(readKey, 0);
+            System.out.println("Key  : " + Base64.encode(readKey) + " / " + ourIntroKey.toBase64());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        
     }
 }

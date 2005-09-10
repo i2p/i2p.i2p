@@ -30,6 +30,7 @@ public class PacketHandler {
     private EstablishmentManager _establisher;
     private InboundMessageFragments _inbound;
     private PeerTestManager _testManager;
+    private IntroductionManager _introManager;
     private boolean _keepReading;
     private List _handlers;
     
@@ -38,7 +39,7 @@ public class PacketHandler {
     private static final long GRACE_PERIOD = Router.CLOCK_FUDGE_FACTOR + 30*1000;
     
     
-    public PacketHandler(RouterContext ctx, UDPTransport transport, UDPEndpoint endpoint, EstablishmentManager establisher, InboundMessageFragments inbound, PeerTestManager testManager) {
+    public PacketHandler(RouterContext ctx, UDPTransport transport, UDPEndpoint endpoint, EstablishmentManager establisher, InboundMessageFragments inbound, PeerTestManager testManager, IntroductionManager introManager) {
         _context = ctx;
         _log = ctx.logManager().getLog(PacketHandler.class);
         _transport = transport;
@@ -46,6 +47,7 @@ public class PacketHandler {
         _establisher = establisher;
         _inbound = inbound;
         _testManager = testManager;
+        _introManager = introManager;
         _handlers = new ArrayList(NUM_HANDLERS);
         for (int i = 0; i < NUM_HANDLERS; i++) {
             _handlers.add(new Handler());
@@ -193,8 +195,8 @@ public class PacketHandler {
                         // process, so try our intro key
                         // (after an outbound establishment process, there wouldn't
                         //  be any stray packets)
-                        if (_log.shouldLog(Log.INFO))
-                            _log.info("Validation with existing con failed, but validation as reestablish/stray passed");
+                        if (_log.shouldLog(Log.DEBUG))
+                            _log.debug("Validation with existing con failed, but validation as reestablish/stray passed");
                         packet.decrypt(_transport.getIntroKey());
                     } else {
                         _state = 21;
@@ -235,8 +237,8 @@ public class PacketHandler {
                 _state = 28;
                 return;
             } else {
-                if (_log.shouldLog(Log.INFO))
-                    _log.info("Valid introduction packet received: " + packet);
+                if (_log.shouldLog(Log.DEBUG))
+                    _log.debug("Valid introduction packet received: " + packet);
             }
 
             _state = 29;
@@ -392,15 +394,30 @@ public class PacketHandler {
                     _state = 50;
                     if (outState != null)
                         state = _establisher.receiveData(outState);
-                    if (_log.shouldLog(Log.INFO))
-                        _log.info("Received new DATA packet from " + state + ": " + packet);
+                    if (_log.shouldLog(Log.DEBUG))
+                        _log.debug("Received new DATA packet from " + state + ": " + packet);
                     _inbound.receiveData(state, reader.getDataReader());
                     break;
                 case UDPPacket.PAYLOAD_TYPE_TEST:
                     _state = 51;
-                    if (_log.shouldLog(Log.INFO))
-                        _log.info("Received test packet: " + reader + " from " + from);
+                    if (_log.shouldLog(Log.DEBUG))
+                        _log.debug("Received test packet: " + reader + " from " + from);
                     _testManager.receiveTest(from, reader);
+                    break;
+                case UDPPacket.PAYLOAD_TYPE_RELAY_REQUEST:
+                    if (_log.shouldLog(Log.INFO))
+                        _log.info("Received relay request packet: " + reader + " from " + from);
+                    _introManager.receiveRelayRequest(from, reader);
+                    break;
+                case UDPPacket.PAYLOAD_TYPE_RELAY_INTRO:
+                    if (_log.shouldLog(Log.INFO))
+                        _log.info("Received relay intro packet: " + reader + " from " + from);
+                    _introManager.receiveRelayIntro(from, reader);
+                    break;
+                case UDPPacket.PAYLOAD_TYPE_RELAY_RESPONSE:
+                    if (_log.shouldLog(Log.INFO))
+                        _log.info("Received relay response packet: " + reader + " from " + from);
+                    _establisher.receiveRelayResponse(from, reader);
                     break;
                 default:
                     _state = 52;

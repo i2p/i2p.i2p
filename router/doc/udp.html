@@ -1,4 +1,4 @@
-<code>$Id: udp.html,v 1.15 2005/08/03 13:58:13 jrandom Exp $</code>
+<code>$Id: udp.html,v 1.16 2005/08/17 15:05:02 jrandom Exp $</code>
 
 <h1>Secure Semireliable UDP (SSU)</h1>
 <b>DRAFT</b>
@@ -251,12 +251,12 @@ bits 4-7: total identity fragments</pre></li>
     <td><ul>
         <li>4 byte relay tag</li>
         <li>1 byte IP address size</li>
-        <li>that many byte representation of Bob's IP address</li>
-        <li>1 byte IP address size</li>
         <li>that many byte representation of Alice's IP address</li>
         <li>2 byte port number (of Alice)</li>
         <li>1 byte challenge size</li>
         <li>that many bytes to be relayed to Charlie in the intro</li>
+        <li>Alice's intro key (so Bob can reply with Charlie's info)</li>
+        <li>4 byte nonce of alice's relay request</li>
         <li>N bytes, currently uninterpreted</li>
 	</ul></td></tr>
 <tr><td align="right" valign="top"><b>Key used:</b></td>
@@ -267,14 +267,19 @@ bits 4-7: total identity fragments</pre></li>
  +----+----+----+----+----+----+----+----+
  |      relay tag    |size| that many    |
  +----+----+----+----+----+         +----|
- | bytes making up Bob's IP address |size|
+ | bytes for Alice's IP address     |port
  +----+----+----+----+----+----+----+----+
- | that many bytes making up Alice's IP  |
+  (A) |size| that many challenge bytes   |
+ +----+----+                             |
+ | to be delivered to Charlie            |
  +----+----+----+----+----+----+----+----+
- | Port (A)|size| that many challenge    |
- +----+----+----+                        |
- | bytes to be delivered to Charlie      |
+ | Alice's intro key                     |
+ |                                       |
+ |                                       |
+ |                                       |
  +----+----+----+----+----+----+----+----+
+ |       nonce       |                   |
+ +----+----+----+----+                   |
  | arbitrary amount of uninterpreted data|
  +----+----+----+----+----+----+----+----+
 </pre>
@@ -291,6 +296,7 @@ bits 4-7: total identity fragments</pre></li>
         <li>1 byte IP address size</li>
         <li>that many byte representation of Alice's IP address</li>
         <li>2 byte port number</li>
+        <li>4 byte nonce sent by Alice</li>
         <li>N bytes, currently uninterpreted</li>
 	</ul></td></tr>
 <tr><td align="right" valign="top"><b>Key used:</b></td>
@@ -307,6 +313,8 @@ bits 4-7: total identity fragments</pre></li>
  +----+                        +----+----+
  | Alice's IP address          | Port (A)|
  +----+----+----+----+----+----+----+----+
+ |       nonce       |                   |
+ +----+----+----+----+                   |
  | arbitrary amount of uninterpreted data|
  +----+----+----+----+----+----+----+----+
 </pre>
@@ -332,7 +340,7 @@ bits 4-7: total identity fragments</pre></li>
  +----+----+----+----+----+----+----+----+
  |size| that many bytes making up        |
  +----+                        +----+----+
- | Charlie's IP address        | Port (C)|
+ | Alice's IP address          | Port (A)|
  +----+----+----+----+----+----+----+----+
  |size| that many bytes of challenge     |
  +----+                                  |
@@ -562,6 +570,33 @@ the SSU transport and are passed through transparently.  These IDs
 are not in any particular order - in fact, they are likely to be
 entirely random.  The SSU layer makes no attempt at messageId 
 replay prevention - higher layers should take that into account.</p>
+
+<h2><a name="introduction">Introduction</a></h2>
+
+<p>Indirect session establishment by means of a third party introduction
+is necessary for efficient NAT traversal.  Charlie, a router behind a
+NAT or firewall which does not allow unsolicited inbound UDP packets,
+first contacts a few peers, choosing some to serve as introducers.  Each
+of these peers (Bob, Bill, Betty, etc) provide Charlie with an introduction
+tag - a 4 byte random number - which he then makes available to the public
+as methods of contacting him.  Alice, a router who has Charlie's published
+contact methods, first sends a RelayRequest packet to one or more of the 
+introducers, asking each to introduce her to Charlie (offering the 
+introduction tag to identify Charlie).  Bob then forwards a RelayIntro
+packet to Charlie including Alice's public IP and port number, then sends
+Alice back a RelayResponse packet containing Charlie's public IP and port
+number.  When Charlie receives the RelayIntro packet, he sends off a small
+random packet to Alice's IP and port (poking a hole in his NAT/firewall),
+and when Alice receive's Bob's RelayResponse packet, she begins a new 
+full direction session establishment with the specified IP and port.</p>
+
+<!-- 
+  should Bob wait for Charlie to ack the RelayIntro packet to avoid
+  situations where that packet is lost yet Alice gets Charlie's IP with
+  Charlie not yet punching a hole in his NAT for her to get through?  
+  Perhaps Alice should send to multiple Bobs at once, hoping that at
+  least one of them gets through
+-->
 
 <h2><a name="peerTesting">Peer testing</a></h2>
 

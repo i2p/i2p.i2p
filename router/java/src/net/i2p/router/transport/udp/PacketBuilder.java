@@ -628,6 +628,228 @@ public class PacketBuilder {
         return packet;
     }
     
+    /** 
+     * full flag info for a relay request message.  this can be fixed, 
+     * since we never rekey on relay request, and don't need any extended options
+     */
+    private static final byte PEER_RELAY_REQUEST_FLAG_BYTE = (UDPPacket.PAYLOAD_TYPE_RELAY_REQUEST << 4);
+
+    // specify these if we know what our external receive ip/port is and if its different
+    // from what bob is going to think
+    private byte[] getOurExplicitIP() { return null; }
+    private int getOurExplicitPort() { return 0; }
+    
+    public UDPPacket buildRelayRequest(OutboundEstablishState state, SessionKey ourIntroKey) {
+        UDPAddress addr = state.getRemoteAddress();
+        int index = _context.random().nextInt(UDPAddress.MAX_INTRODUCERS) % addr.getIntroducerCount();
+        InetAddress iaddr = addr.getIntroducerHost(index);
+        int iport = addr.getIntroducerPort(index);
+        byte ikey[] = addr.getIntroducerKey(index);
+        long tag = addr.getIntroducerTag(index);
+        return buildRelayRequest(iaddr, iport, ikey, tag, ourIntroKey, state.getIntroNonce(), true);
+    }
+    
+    public UDPPacket buildRelayRequest(InetAddress introHost, int introPort, byte introKey[], long introTag, SessionKey ourIntroKey, long introNonce, boolean encrypt) {
+        UDPPacket packet = UDPPacket.acquire(_context);
+        byte data[] = packet.getPacket().getData();
+        Arrays.fill(data, 0, data.length, (byte)0x0);
+        int off = UDPPacket.MAC_SIZE + UDPPacket.IV_SIZE;
+        
+        byte ourIP[] = getOurExplicitIP();
+        int ourPort = getOurExplicitPort();
+        
+        // header
+        data[off] = PEER_RELAY_REQUEST_FLAG_BYTE;
+        off++;
+        long now = _context.clock().now() / 1000;
+        DataHelper.toLong(data, off, 4, now);
+        if (_log.shouldLog(Log.INFO))
+            _log.info("Sending intro relay request to " + introHost + ":" + introPort); // + " regarding " + state.getRemoteIdentity().calculateHash().toBase64());
+        off += 4;
+        
+        // now for the body
+        DataHelper.toLong(data, off, 4, introTag);
+        off += 4;
+        if (ourIP != null) {
+            DataHelper.toLong(data, off, 1, ourIP.length);
+            off++;
+            System.arraycopy(ourIP, 0, data, off, ourIP.length);
+            off += ourIP.length;
+        } else {
+            DataHelper.toLong(data, off, 1, 0);
+            off++;
+        }
+        
+        DataHelper.toLong(data, off, 2, ourPort);
+        off += 2;
+        
+        // challenge...
+        DataHelper.toLong(data, off, 1, 0);
+        off++;
+        off += 0; // *cough*
+        
+        System.arraycopy(ourIntroKey.getData(), 0, data, off, SessionKey.KEYSIZE_BYTES);
+        off += SessionKey.KEYSIZE_BYTES;
+        
+        if (_log.shouldLog(Log.WARN))
+            _log.warn("wrote alice intro key: " + Base64.encode(data, off-SessionKey.KEYSIZE_BYTES, SessionKey.KEYSIZE_BYTES) 
+                      + " with nonce " + introNonce + " size=" + (off+4 + (16 - (off+4)%16))
+                      + " and data: " + Base64.encode(data, 0, off));
+        
+        DataHelper.toLong(data, off, 4, introNonce);
+        off += 4;
+        
+        // we can pad here if we want, maybe randomized?
+        
+        // pad up so we're on the encryption boundary
+        if ( (off % 16) != 0)
+            off += 16 - (off % 16);
+        packet.getPacket().setLength(off);
+        if (encrypt)
+            authenticate(packet, new SessionKey(introKey), new SessionKey(introKey));
+        setTo(packet, introHost, introPort);
+        return packet;
+    }
+
+    /** 
+     * full flag info for a relay intro message.  this can be fixed, 
+     * since we never rekey on relay request, and don't need any extended options
+     */
+    private static final byte PEER_RELAY_INTRO_FLAG_BYTE = (UDPPacket.PAYLOAD_TYPE_RELAY_INTRO << 4);
+    
+    public UDPPacket buildRelayIntro(RemoteHostId alice, PeerState charlie, UDPPacketReader.RelayRequestReader request) {
+        UDPPacket packet = UDPPacket.acquire(_context);
+        byte data[] = packet.getPacket().getData();
+        Arrays.fill(data, 0, data.length, (byte)0x0);
+        int off = UDPPacket.MAC_SIZE + UDPPacket.IV_SIZE;
+        
+        // header
+        data[off] = PEER_RELAY_INTRO_FLAG_BYTE;
+        off++;
+        long now = _context.clock().now() / 1000;
+        DataHelper.toLong(data, off, 4, now);
+        if (_log.shouldLog(Log.INFO))
+            _log.info("Sending intro to " + charlie + " for " + alice);
+        off += 4;
+        
+        // now for the body
+        byte ip[] = alice.getIP();
+        DataHelper.toLong(data, off, 1, ip.length);
+        off++;
+        System.arraycopy(ip, 0, data, off, ip.length);
+        off += ip.length;
+        DataHelper.toLong(data, off, 2, alice.getPort());
+        off += 2;
+        
+        int sz = request.readChallengeSize();
+        DataHelper.toLong(data, off, 1, sz);
+        off++;
+        if (sz > 0) {
+            request.readChallengeSize(data, off);
+            off += sz;
+        }
+        
+        // we can pad here if we want, maybe randomized?
+        
+        // pad up so we're on the encryption boundary
+        if ( (off % 16) != 0)
+            off += 16 - (off % 16);
+        packet.getPacket().setLength(off);
+        authenticate(packet, charlie.getCurrentCipherKey(), charlie.getCurrentMACKey());
+        setTo(packet, charlie.getRemoteIPAddress(), charlie.getRemotePort());
+        return packet;
+    }
+
+    /** 
+     * full flag info for a relay response message.  this can be fixed, 
+     * since we never rekey on relay response, and don't need any extended options
+     */
+    private static final byte PEER_RELAY_RESPONSE_FLAG_BYTE = (UDPPacket.PAYLOAD_TYPE_RELAY_RESPONSE << 4);
+    
+    public UDPPacket buildRelayResponse(RemoteHostId alice, PeerState charlie, long nonce, SessionKey aliceIntroKey) {
+        InetAddress aliceAddr = null;
+        try {
+            aliceAddr = InetAddress.getByAddress(alice.getIP());
+        } catch (UnknownHostException uhe) {
+            return null;
+        }
+        
+        UDPPacket packet = UDPPacket.acquire(_context);
+        byte data[] = packet.getPacket().getData();
+        Arrays.fill(data, 0, data.length, (byte)0x0);
+        int off = UDPPacket.MAC_SIZE + UDPPacket.IV_SIZE;
+        
+        // header
+        data[off] = PEER_RELAY_RESPONSE_FLAG_BYTE;
+        off++;
+        long now = _context.clock().now() / 1000;
+        DataHelper.toLong(data, off, 4, now);
+        off += 4;
+        
+        if (_log.shouldLog(Log.INFO))
+            _log.info("Sending relay response to " + alice + " for " + charlie + " with alice's intro key " + aliceIntroKey.toBase64());
+
+        // now for the body
+        byte charlieIP[] = charlie.getRemoteIP();
+        DataHelper.toLong(data, off, 1, charlieIP.length);
+        off++;
+        System.arraycopy(charlieIP, 0, data, off, charlieIP.length);
+        off += charlieIP.length;
+        DataHelper.toLong(data, off, 2, charlie.getRemotePort());
+        off += 2;
+        
+        byte aliceIP[] = alice.getIP();
+        DataHelper.toLong(data, off, 1, aliceIP.length);
+        off++;
+        System.arraycopy(aliceIP, 0, data, off, aliceIP.length);
+        off += aliceIP.length;
+        DataHelper.toLong(data, off, 2, alice.getPort());
+        off += 2;
+        
+        DataHelper.toLong(data, off, 4, nonce);
+        off += 4;
+        
+        // we can pad here if we want, maybe randomized?
+        
+        // pad up so we're on the encryption boundary
+        if ( (off % 16) != 0)
+            off += 16 - (off % 16);
+        packet.getPacket().setLength(off);
+        authenticate(packet, aliceIntroKey, aliceIntroKey);
+        setTo(packet, aliceAddr, alice.getPort());
+        return packet;
+    }
+    
+    public UDPPacket buildHolePunch(UDPPacketReader reader) {
+        UDPPacket packet = UDPPacket.acquire(_context);
+        byte data[] = packet.getPacket().getData();
+        Arrays.fill(data, 0, data.length, (byte)0x0);
+        int off = UDPPacket.MAC_SIZE + UDPPacket.IV_SIZE;
+        
+        int ipSize = reader.getRelayIntroReader().readIPSize();
+        byte ip[] = new byte[ipSize];
+        reader.getRelayIntroReader().readIP(ip, 0);
+        int port = reader.getRelayIntroReader().readPort();
+        
+        InetAddress to = null;
+        try {
+            to = InetAddress.getByAddress(ip);
+        } catch (UnknownHostException uhe) {
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("IP for alice to hole punch to is invalid", uhe);
+            return null;
+        }
+        
+        if (_log.shouldLog(Log.INFO))
+            _log.info("Sending relay hole punch to " + to + ":" + port);
+
+        // the packet is empty and does not need to be authenticated, since
+        // its just for hole punching
+        packet.getPacket().setLength(0);
+        setTo(packet, to, port);
+        return packet;
+    }
+    
     private void setTo(UDPPacket packet, InetAddress ip, int port) {
         packet.getPacket().setAddress(ip);
         packet.getPacket().setPort(port);

@@ -42,6 +42,7 @@ public class UDPReceiver {
         _context.statManager().createRateStat("udp.droppedInbound", "How many packet are queued up but not yet received when we drop", "udp", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
         _context.statManager().createRateStat("udp.droppedInboundProbabalistically", "How many packet we drop probabalistically (to simulate failures)", "udp", new long[] { 60*1000, 5*60*1000, 10*60*1000, 60*60*1000 });
         _context.statManager().createRateStat("udp.acceptedInboundProbabalistically", "How many packet we accept probabalistically (to simulate failures)", "udp", new long[] { 60*1000, 5*60*1000, 10*60*1000, 60*60*1000 });
+        _context.statManager().createRateStat("udp.receiveHolePunch", "How often we receive a NAT hole punch", "udp", new long[] { 60*1000, 5*60*1000, 10*60*1000, 60*60*1000 });
     }
     
     public void startup() {
@@ -212,10 +213,15 @@ public class UDPReceiver {
                         FIFOBandwidthLimiter.Request req = _context.bandwidthLimiter().requestInbound(size, "UDP receiver");
                         while (req.getPendingInboundRequested() > 0)
                             req.waitForNextAllocation();
+                        
+                        int queued = receive(packet);
+                        _context.statManager().addRateData("udp.receivePacketSize", size, queued);
+                    } else {
+                        _context.statManager().addRateData("udp.receiveHolePunch", 1, 0);
+                        // nat hole punch packets are 0 bytes
+                        if (_log.shouldLog(Log.INFO))
+                            _log.info("Received a 0 byte udp packet from " + packet.getPacket().getAddress() + ":" + packet.getPacket().getPort());
                     }
-                    
-                    int queued = receive(packet);
-                    _context.statManager().addRateData("udp.receivePacketSize", size, queued);
                 } catch (IOException ioe) {
                     if (_socketChanged) {
                         if (_log.shouldLog(Log.INFO))

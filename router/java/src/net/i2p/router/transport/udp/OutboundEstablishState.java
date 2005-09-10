@@ -56,6 +56,9 @@ public class OutboundEstablishState {
     private SessionKey _introKey;
     private List _queuedMessages;
     private int _currentState;
+    private long _introductionNonce;
+    // intro
+    private UDPAddress _remoteAddress;
     
     /** nothin sent yet */
     public static final int STATE_UNKNOWN = 0;
@@ -67,12 +70,14 @@ public class OutboundEstablishState {
     public static final int STATE_CONFIRMED_PARTIALLY = 3;
     /** we have received a data packet */
     public static final int STATE_CONFIRMED_COMPLETELY = 4;
+    /** we need to have someone introduce us to the peer, but haven't received a RelayResponse yet */
+    public static final int STATE_PENDING_INTRO = 5;
     
     public OutboundEstablishState(RouterContext ctx, InetAddress remoteHost, int remotePort, 
-                                  RouterIdentity remotePeer, SessionKey introKey) {
+                                  RouterIdentity remotePeer, SessionKey introKey, UDPAddress addr) {
         _context = ctx;
         _log = ctx.logManager().getLog(OutboundEstablishState.class);
-        _bobIP = remoteHost.getAddress();
+        _bobIP = (remoteHost != null ? remoteHost.getAddress() : null);
         _bobPort = remotePort;
         _remoteHostId = new RemoteHostId(_bobIP, _bobPort);
         _remotePeer = remotePeer;
@@ -81,10 +86,22 @@ public class OutboundEstablishState {
         _queuedMessages = new ArrayList(4);
         _currentState = STATE_UNKNOWN;
         _establishBegin = ctx.clock().now();
+        _remoteAddress = addr;
+        _introductionNonce = -1;
+        prepareSessionRequest();
+        if ( (addr != null) && (addr.getIntroducerCount() > 0) ) {
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("new outbound establish to " + remotePeer.calculateHash().toBase64() + ", with address: " + addr);
+            _currentState = STATE_PENDING_INTRO;
+        }
     }
     
     public synchronized int getState() { return _currentState; }
 
+    public UDPAddress getRemoteAddress() { return _remoteAddress; }
+    public void setIntroNonce(long nonce) { _introductionNonce = nonce; }
+    public long getIntroNonce() { return _introductionNonce; }
+    
     public void addMessage(OutNetMessage msg) {
         synchronized (_queuedMessages) {
             _queuedMessages.add(msg);
@@ -101,7 +118,7 @@ public class OutboundEstablishState {
     public RouterIdentity getRemoteIdentity() { return _remotePeer; }
     public SessionKey getIntroKey() { return _introKey; }
     
-    public synchronized void prepareSessionRequest() {
+    private void prepareSessionRequest() {
         _keyBuilder = new DHSessionKeyBuilder();
         byte X[] = _keyBuilder.getMyPublicValue().toByteArray();
         if (_sentX == null)
@@ -341,6 +358,31 @@ public class OutboundEstablishState {
             _log.debug("Send a request packet, nextSend = 5s");
         if (_currentState == STATE_UNKNOWN)
             _currentState = STATE_REQUEST_SENT;
+    }
+    public synchronized void introSent() {
+        _lastSend = _context.clock().now();
+        _nextSend = _lastSend + 5*1000;
+        if (_currentState == STATE_UNKNOWN)
+            _currentState = STATE_PENDING_INTRO;
+    }
+    public synchronized void introductionFailed() {
+        _nextSend = _context.clock().now();
+        // keep the state as STATE_PENDING_INTRO, so next time the EstablishmentManager asks us
+        // whats up, it'll try a new random intro peer
+    }
+    
+    public synchronized void introduced(InetAddress bob, byte bobIP[], int bobPort) {
+        if (_currentState != STATE_PENDING_INTRO)
+            return; // we've already successfully been introduced, so don't overwrite old settings
+        _nextSend = _context.clock().now() + 500; // wait briefly for the hole punching
+        if (_currentState == STATE_PENDING_INTRO) {
+            // STATE_UNKNOWN will probe the EstablishmentManager to send a new
+            // session request to this newly known address
+            _currentState = STATE_UNKNOWN; 
+        }
+        _bobIP = bobIP;
+        _bobPort = bobPort;
+        _remoteHostId = new RemoteHostId(bobIP, bobPort);
     }
     
     /** how long have we been trying to establish this session? */
