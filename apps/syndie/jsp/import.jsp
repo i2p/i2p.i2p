@@ -21,7 +21,7 @@ if ((contentType != null) && (contentType.indexOf("boundary=") != -1) ) {
     int metaId = 0;
     while (true) {
       InputStream meta = req.getInputStream("blogmeta" + metaId);
-      if (meta == null)
+      if ( (meta == null) || (meta.available() <= 0) )
         break;
       if (!BlogManager.instance().importBlogMetadata(meta)) {
         %><span class="b_importMsgErr">Metadata <%=metaId%> failed to be imported</span><br /><%
@@ -32,7 +32,7 @@ if ((contentType != null) && (contentType.indexOf("boundary=") != -1) ) {
     int entryId = 0;
     while (true) {
       InputStream entry = req.getInputStream("blogpost" + entryId);
-      if (entry == null)
+      if ( (entry == null) || (entry.available() <= 0) )
         break;
       if (!BlogManager.instance().importBlogEntry(entry)) {
         %><span class="b_importMsgErr">Entry <%=entryId%> failed to be imported</span><br /><%

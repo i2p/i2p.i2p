@@ -115,12 +115,19 @@ public class EntryContainer {
             if (len <= 0)
                 break;
             int split = line.indexOf(':');
-            if ( (split <= 0) || (split >= len - 2) ) 
+            if (split <= 0) {
                 throw new IOException("Invalid format of the syndie entry: line=" + line);
-            String key = line.substring(0, split);
-            String val = line.substring(split+1);
-            _rawKeys.add(key);
-            _rawValues.add(val);
+            } else if (split >= len - 2) {
+                // foo:\n
+                String key = line.substring(0, split);
+                _rawKeys.add(key);
+                _rawValues.add("");
+            } else {
+                String key = line.substring(0, split);
+                String val = line.substring(split+1);
+                _rawKeys.add(key);
+                _rawValues.add(val);
+            }
         }
         
         parseHeaders();
@@ -275,7 +282,8 @@ public class EntryContainer {
     }
     
     public BlogURI getURI() { return _entryURI; }
-    private static final String NO_TAGS[] = new String[0];
+    public static final String NO_TAGS_TAG = "[none]";
+    private static final String NO_TAGS[] = new String[] { NO_TAGS_TAG };
     public String[] getTags() { 
         String tags = getHeader(HEADER_BLOGTAGS);
         if ( (tags == null) || (tags.trim().length() <= 0) ) {
