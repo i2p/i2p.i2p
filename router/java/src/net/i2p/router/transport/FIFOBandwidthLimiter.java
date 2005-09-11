@@ -35,6 +35,11 @@ public class FIFOBandwidthLimiter {
     
     private static int __id = 0;
     
+    static long now() { 
+        // dont use the clock().now(), since that may jump
+        return System.currentTimeMillis(); 
+    }
+    
     public FIFOBandwidthLimiter(I2PAppContext context) {
         _context = context;
         _log = context.logManager().getLog(FIFOBandwidthLimiter.class);
@@ -50,7 +55,7 @@ public class FIFOBandwidthLimiter {
         _lastTotalReceived = _totalAllocatedInboundBytes;
         _sendBps = 0;
         _recvBps = 0;
-        _lastStatsUpdated = _context.clock().now();
+        _lastStatsUpdated = now();
         _lastRateUpdated = _lastStatsUpdated;
         _refiller = new FIFOBandwidthRefiller(_context, this);
         I2PThread t = new I2PThread(_refiller);
@@ -152,7 +157,7 @@ public class FIFOBandwidthLimiter {
     }
     
     private void updateStats() {
-        long now = _context.clock().now();
+        long now = now();
         long time = now - _lastStatsUpdated;
         if (time >= 1000) {
             long totS = _totalAllocatedOutboundBytes;
@@ -170,8 +175,9 @@ public class FIFOBandwidthLimiter {
                 _recvBps = ((float)recv*time)/1000f;
             else
                 _recvBps = (0.9f)*_recvBps + (0.1f)*((float)recv*time)/1000f;
-            if (_log.shouldLog(Log.INFO)) {
-                _log.info("BW: time = " + time + " sent: " + sent + " recv: " + recv);
+            if (_log.shouldLog(Log.WARN)) {
+                if (_log.shouldLog(Log.INFO))
+                    _log.info("BW: time = " + time + " sent: " + sent + " recv: " + recv);
                 _context.statManager().getStatLog().addData("bw", "bw.sendBps1s", (long)_sendBps, sent);
                 _context.statManager().getStatLog().addData("bw", "bw.recvBps1s", (long)_recvBps, recv);
             }
@@ -229,7 +235,7 @@ public class FIFOBandwidthLimiter {
         if (start == -1) 
             return 0;
         else
-            return _context.clock().now() - start;
+            return now() - start;
     }
     private long locked_getLongestOutboundWait() {
         long start = -1;
@@ -242,7 +248,7 @@ public class FIFOBandwidthLimiter {
         if (start == -1)
             return 0;
         else
-            return _context.clock().now() - start;
+            return now() - start;
     }
     
     /**
@@ -260,7 +266,7 @@ public class FIFOBandwidthLimiter {
             if (satisfied == null)
                 satisfied = new ArrayList(2);
             satisfied.add(req);
-            long waited = _context.clock().now() - req.getRequestTime();
+            long waited = now() - req.getRequestTime();
             if (_log.shouldLog(Log.DEBUG))
                  _log.debug("Granting inbound request " + req.getRequestName() + " fully for " 
                             + req.getTotalInboundRequested() + " bytes (waited " 
@@ -285,7 +291,7 @@ public class FIFOBandwidthLimiter {
         for (int i = 0; i < _pendingInboundRequests.size(); i++) {
             if (_availableInboundBytes <= 0) break;
             SimpleRequest req = (SimpleRequest)_pendingInboundRequests.get(i);
-            long waited = _context.clock().now() - req.getRequestTime();
+            long waited = now() - req.getRequestTime();
             if (req.getAborted()) {
                 // connection decided they dont want the data anymore
                 if (_log.shouldLog(Log.DEBUG))
@@ -384,7 +390,7 @@ public class FIFOBandwidthLimiter {
             if (satisfied == null)
                 satisfied = new ArrayList(2);
             satisfied.add(req);
-            long waited = _context.clock().now() - req.getRequestTime();
+            long waited = now() - req.getRequestTime();
             if (_log.shouldLog(Log.DEBUG))
                  _log.debug("Granting outbound request " + req.getRequestName() + " fully for " 
                             + req.getTotalOutboundRequested() + " bytes (waited " 
@@ -410,7 +416,7 @@ public class FIFOBandwidthLimiter {
         for (int i = 0; i < _pendingOutboundRequests.size(); i++) {
             if (_availableOutboundBytes <= 0) break;
             SimpleRequest req = (SimpleRequest)_pendingOutboundRequests.get(i);
-            long waited = _context.clock().now() - req.getRequestTime();
+            long waited = now() - req.getRequestTime();
             if (req.getAborted()) {
                 // connection decided they dont want the data anymore
                 if (_log.shouldLog(Log.DEBUG))
@@ -468,7 +474,7 @@ public class FIFOBandwidthLimiter {
     }
     
     public void renderStatusHTML(Writer out) throws IOException {
-        long now = _context.clock().now();
+        long now = now();
         StringBuffer buf = new StringBuffer(4096);
         buf.append("<br /><b>Pending bandwidth requests (with ");
         buf.append(_availableInboundBytes).append('/');
@@ -520,7 +526,7 @@ public class FIFOBandwidthLimiter {
             _aborted = false;
             _target = target;
             _requestId = ++__requestId;
-            _requestTime = _context.clock().now();
+            _requestTime = now();
         }
         public Object getAvailabilityMonitor() { return SimpleRequest.this; }
         public String getRequestName() { return "Req" + _requestId + " to " + _target; }

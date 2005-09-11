@@ -53,12 +53,12 @@ class FIFOBandwidthRefiller implements Runnable {
     }
     public void run() {
         // bootstrap 'em with nothing
-        _lastRefillTime = _context.clock().now();
+        _lastRefillTime = _limiter.now();
         while (true) {
-            long now = _context.clock().now();
+            long now = _limiter.now();
             if (now >= _lastCheckConfigTime + _configCheckPeriodMs) {
                 checkConfig();
-                now = _context.clock().now();
+                now = _limiter.now();
                 _lastCheckConfigTime = now;
             }
             
@@ -72,7 +72,7 @@ class FIFOBandwidthRefiller implements Runnable {
     }
     
     public void reinitialize() {
-        _lastRefillTime = _context.clock().now();
+        _lastRefillTime = _limiter.now();
         checkConfig();
         _lastCheckConfigTime = _lastRefillTime;
     }
@@ -260,5 +260,5 @@ class FIFOBandwidthRefiller implements Runnable {
             _limiter.setMaxOutboundBytes(DEFAULT_BURST_SECONDS * _outboundKBytesPerSecond * 1024);
         }
     }
-    
+
 }
