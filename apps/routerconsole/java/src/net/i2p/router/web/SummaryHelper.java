@@ -206,14 +206,12 @@ public class SummaryHelper {
         if (_context == null) 
             return "0.0";
         
-        RateStat receiveRate = _context.statManager().getRate("transport.receiveMessageSize");
+        RateStat receiveRate = _context.statManager().getRate("bw.recvRate");
         if (receiveRate == null) return "0.0";
         Rate rate = receiveRate.getRate(60*1000);
-        double bytes = rate.getLastTotalValue();
-        double bps = (bytes*1000.0d)/(rate.getPeriod()*1024.0d); 
-
-	DecimalFormat fmt = new DecimalFormat("##0.00");
-        return fmt.format(bps);
+        double kbps = rate.getAverageValue()/1024;
+        DecimalFormat fmt = new DecimalFormat("##0.00");
+        return fmt.format(kbps);
     }
     /**
      * How fast we have been sending data over the last minute (pretty printed
@@ -224,14 +222,12 @@ public class SummaryHelper {
         if (_context == null) 
             return "0.0";
         
-        RateStat receiveRate = _context.statManager().getRate("transport.sendMessageSize");
+        RateStat receiveRate = _context.statManager().getRate("bw.sendRate");
         if (receiveRate == null) return "0.0";
         Rate rate = receiveRate.getRate(60*1000);
-        double bytes = rate.getLastTotalValue();
-        double bps = (bytes*1000.0d)/(rate.getPeriod()*1024.0d); 
-
-	DecimalFormat fmt = new DecimalFormat("##0.00");
-        return fmt.format(bps);
+        double kbps = rate.getAverageValue()/1024;
+        DecimalFormat fmt = new DecimalFormat("##0.00");
+        return fmt.format(kbps);
     }
     
     /**
@@ -243,14 +239,12 @@ public class SummaryHelper {
         if (_context == null) 
             return "0.0";
         
-        RateStat receiveRate = _context.statManager().getRate("transport.receiveMessageSize");
+        RateStat receiveRate = _context.statManager().getRate("bw.recvBps");
         if (receiveRate == null) return "0.0";
         Rate rate = receiveRate.getRate(5*60*1000);
-        double bytes = rate.getLastTotalValue();
-        double bps = (bytes*1000.0d)/(rate.getPeriod()*1024.0d); 
-
-	DecimalFormat fmt = new DecimalFormat("##0.00");
-        return fmt.format(bps);
+        double kbps = rate.getAverageValue()/1024;
+        DecimalFormat fmt = new DecimalFormat("##0.00");
+        return fmt.format(kbps);
     }
     
     /**
@@ -262,14 +256,12 @@ public class SummaryHelper {
         if (_context == null) 
             return "0.0";
         
-        RateStat receiveRate = _context.statManager().getRate("transport.sendMessageSize");
+        RateStat receiveRate = _context.statManager().getRate("bw.sendBps");
         if (receiveRate == null) return "0.0";
         Rate rate = receiveRate.getRate(5*60*1000);
-        double bytes = rate.getLastTotalValue();
-        double bps = (bytes*1000.0d)/(rate.getPeriod()*1024.0d); 
-
-	DecimalFormat fmt = new DecimalFormat("##0.00");
-        return fmt.format(bps);
+        double kbps = rate.getAverageValue()/1024;
+        DecimalFormat fmt = new DecimalFormat("##0.00");
+        return fmt.format(kbps);
     }
     
     /**
@@ -281,20 +273,11 @@ public class SummaryHelper {
         if (_context == null) 
             return "0.0";
         
-        long received = _context.bandwidthLimiter().getTotalAllocatedInboundBytes();
-
+        RateStat receiveRate = _context.statManager().getRate("bw.recvBps");
+        if (receiveRate == null) return "0.0";
+        double kbps = receiveRate.getLifetimeAverageValue()/1024;
         DecimalFormat fmt = new DecimalFormat("##0.00");
-
-        // we use the unadjusted time, since thats what getWhenStarted is based off
-        long lifetime = _context.clock().now()-_context.clock().getOffset()
-                        - _context.router().getWhenStarted();
-        lifetime /= 1000;
-        if (received > 0) {
-            double receivedKBps = received / (lifetime*1024.0);
-            return fmt.format(receivedKBps);
-        } else {
-            return "0.0";
-        }
+        return fmt.format(kbps);
     }
     
     /**
@@ -306,20 +289,11 @@ public class SummaryHelper {
         if (_context == null) 
             return "0.0";
         
-        long sent = _context.bandwidthLimiter().getTotalAllocatedOutboundBytes();
-
+        RateStat sendRate = _context.statManager().getRate("bw.sendBps");
+        if (sendRate == null) return "0.0";
+        double kbps = sendRate.getLifetimeAverageValue()/1024;
         DecimalFormat fmt = new DecimalFormat("##0.00");
-
-        // we use the unadjusted time, since thats what getWhenStarted is based off
-        long lifetime = _context.clock().now()-_context.clock().getOffset() 
-                        - _context.router().getWhenStarted();
-        lifetime /= 1000;
-        if (sent > 0) {
-            double sendKBps = sent / (lifetime*1024.0);
-            return fmt.format(sendKBps);
-        } else {
-            return "0.0";
-        }
+        return fmt.format(kbps);
     }
     
     /**

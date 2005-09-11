@@ -282,8 +282,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
      *
      */
     void externalAddressReceived(byte ourIP[], int ourPort) {
-        if (_log.shouldLog(Log.DEBUG))
-            _log.debug("External address received: " + Base64.encode(ourIP) + ":" + ourPort);
+        if (_log.shouldLog(Log.INFO))
+            _log.info("External address received: " + RemoteHostId.toString(ourIP) + ":" + ourPort);
         
         if (explicitAddressSpecified()) 
             return;
@@ -294,7 +294,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         synchronized (this) {
             if ( (_externalListenHost == null) ||
                  (!eq(_externalListenHost.getAddress(), _externalListenPort, ourIP, ourPort)) ) {
-                if ( (_reachabilityStatus != CommSystemFacade.STATUS_OK) ||
+                if ( (_reachabilityStatus == CommSystemFacade.STATUS_UNKNOWN) ||
                      (_context.clock().now() - _reachabilityStatusLastUpdated > 2*TEST_FREQUENCY) ) {
                     // they told us something different and our tests are either old or failing
                     try {
@@ -515,6 +515,11 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         // if we need introducers, try to shift 'em around every 10 minutes
         if (introducersRequired() && (_introducersSelectedOn < _context.clock().now() - 10*60*1000))
             rebuildExternalAddress();
+        
+        if (getReachabilityStatus() != CommSystemFacade.STATUS_OK) {
+            _testEvent.forceRun();
+            SimpleTimer.getInstance().addEvent(_testEvent, 0);
+        }
         return true;
     }
     
@@ -1240,9 +1245,10 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                     _log.error("Unable to run a periodic test, as there are no peers with the capacity required");
             }
             _lastTested = _context.clock().now();
+            _forceRun = false;
         }
         
-        private void forceRun() { _forceRun = true; }
+        void forceRun() { _forceRun = true; }
         
         public void setIsAlive(boolean isAlive) {
             _alive = isAlive;

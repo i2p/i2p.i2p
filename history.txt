@@ -1,4 +1,12 @@
-$Id: history.txt,v 1.242 2005/09/09 20:13:50 cervantes Exp $
+$Id: history.txt,v 1.243 2005/09/09 23:30:37 jrandom Exp $
+
+2005-09-10  jrandom
+    * Test the router's reachability earlier and more aggressively
+    * Use the low level bandwidth limiter's rates for the router console, and
+      if the router has net.i2p.router.transport.FIFOBandwidthLimiter=INFO in
+      the logger config, keep track of the 1 second transfer rates as the stat
+      'bw.sendBps1s' and 'bw.recvBps1s', allowing closer monitoring of burst 
+      behavior.
 
 2005-09-09  jrandom
     * Added preliminary support for NAT hole punching through SSU introducers
