@@ -239,7 +239,7 @@ public class SummaryHelper {
         if (_context == null) 
             return "0.0";
         
-        RateStat receiveRate = _context.statManager().getRate("bw.recvBps");
+        RateStat receiveRate = _context.statManager().getRate("bw.recvRate");
         if (receiveRate == null) return "0.0";
         Rate rate = receiveRate.getRate(5*60*1000);
         double kbps = rate.getAverageValue()/1024;
@@ -256,7 +256,7 @@ public class SummaryHelper {
         if (_context == null) 
             return "0.0";
         
-        RateStat receiveRate = _context.statManager().getRate("bw.sendBps");
+        RateStat receiveRate = _context.statManager().getRate("bw.sendRate");
         if (receiveRate == null) return "0.0";
         Rate rate = receiveRate.getRate(5*60*1000);
         double kbps = rate.getAverageValue()/1024;
@@ -273,7 +273,7 @@ public class SummaryHelper {
         if (_context == null) 
             return "0.0";
         
-        RateStat receiveRate = _context.statManager().getRate("bw.recvBps");
+        RateStat receiveRate = _context.statManager().getRate("bw.recvRate");
         if (receiveRate == null) return "0.0";
         double kbps = receiveRate.getLifetimeAverageValue()/1024;
         DecimalFormat fmt = new DecimalFormat("##0.00");
@@ -289,7 +289,7 @@ public class SummaryHelper {
         if (_context == null) 
             return "0.0";
         
-        RateStat sendRate = _context.statManager().getRate("bw.sendBps");
+        RateStat sendRate = _context.statManager().getRate("bw.sendRate");
         if (sendRate == null) return "0.0";
         double kbps = sendRate.getLifetimeAverageValue()/1024;
         DecimalFormat fmt = new DecimalFormat("##0.00");
