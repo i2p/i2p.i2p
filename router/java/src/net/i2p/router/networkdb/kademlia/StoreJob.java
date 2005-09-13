@@ -8,9 +8,7 @@ package net.i2p.router.networkdb.kademlia;
  *
  */
 
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import net.i2p.data.DataStructure;
 import net.i2p.data.Hash;
@@ -21,6 +19,7 @@ import net.i2p.data.i2np.DatabaseStoreMessage;
 import net.i2p.data.i2np.I2NPMessage;
 import net.i2p.router.Job;
 import net.i2p.router.JobImpl;
+import net.i2p.router.OutNetMessage;
 import net.i2p.router.ReplyJob;
 import net.i2p.router.RouterContext;
 import net.i2p.router.TunnelInfo;
@@ -198,7 +197,9 @@ class StoreJob extends JobImpl {
         //if (_log.shouldLog(Log.DEBUG))
         //    _log.debug(getJobId() + ": Current routing key for " + key + ": " + rkey);
 
-        return _peerSelector.selectNearestExplicit(rkey, numClosest, alreadyChecked, _facade.getKBuckets());
+        KBucketSet ks = _facade.getKBuckets();
+        if (ks == null) return new ArrayList();
+        return _peerSelector.selectNearestExplicit(rkey, numClosest, alreadyChecked, ks);
     }
 
     /**
@@ -231,13 +232,43 @@ class StoreJob extends JobImpl {
     }
     
     private void sendStore(DatabaseStoreMessage msg, RouterInfo peer, long expiration) {
-        if (msg.getValueType() == DatabaseStoreMessage.KEY_TYPE_LEASESET)
+        if (msg.getValueType() == DatabaseStoreMessage.KEY_TYPE_LEASESET) {
             getContext().statManager().addRateData("netDb.storeLeaseSetSent", 1, 0);
-        else
+            sendStoreThroughGarlic(msg, peer, expiration);
+        } else {
             getContext().statManager().addRateData("netDb.storeRouterInfoSent", 1, 0);
-        sendStoreThroughGarlic(msg, peer, expiration);
+            sendDirect(msg, peer, expiration);
+        }
     }
 
+    private void sendDirect(DatabaseStoreMessage msg, RouterInfo peer, long expiration) {
+        long token = getContext().random().nextLong(I2NPMessage.MAX_ID_VALUE);
+        msg.setReplyToken(token);
+        msg.setReplyGateway(getContext().routerHash());
+
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug(getJobId() + ": send(dbStore) w/ token expected " + token);
+        
+        _state.addPending(peer.getIdentity().getHash());
+        
+        SendSuccessJob onReply = new SendSuccessJob(getContext(), peer);
+        FailedJob onFail = new FailedJob(getContext(), peer, getContext().clock().now());
+        StoreMessageSelector selector = new StoreMessageSelector(getContext(), getJobId(), peer, token, expiration);
+        
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("sending store directly to " + peer.getIdentity().getHash());
+        OutNetMessage m = new OutNetMessage(getContext());
+        m.setExpiration(expiration);
+        m.setMessage(msg);
+        m.setOnFailedReplyJob(onFail);
+        m.setOnFailedSendJob(onFail);
+        m.setOnReplyJob(onReply);
+        m.setPriority(STORE_PRIORITY);
+        m.setReplySelector(selector);
+        m.setTarget(peer);
+        getContext().commSystem().processMessage(m);
+    }
+    
     private void sendStoreThroughGarlic(DatabaseStoreMessage msg, RouterInfo peer, long expiration) {
         long token = getContext().random().nextLong(I2NPMessage.MAX_ID_VALUE);
         

@@ -34,6 +34,7 @@ class FloodfillPeerSelector extends PeerSelector {
             peersToIgnore = new HashSet(1);
         peersToIgnore.add(_context.router().getRouterInfo().getIdentity().getHash());
         FloodfillSelectionCollector matches = new FloodfillSelectionCollector(key, peersToIgnore, maxNumRouters);
+        if (kbuckets == null) return new ArrayList();
         kbuckets.getAll(matches);
         List rv = matches.get(maxNumRouters);
         if (_log.shouldLog(Log.DEBUG))
@@ -44,6 +45,7 @@ class FloodfillPeerSelector extends PeerSelector {
     }
     
     public List selectFloodfillParticipants(KBucketSet kbuckets) {
+        if (kbuckets == null) return new ArrayList();
         FloodfillSelectionCollector matches = new FloodfillSelectionCollector(null, null, 0);
         kbuckets.getAll(matches);
         return matches.getFloodfillParticipants();

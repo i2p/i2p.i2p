@@ -132,7 +132,9 @@ public class DatabaseStoreMessage extends I2NPMessageImpl {
         curIndex += 4;
         
         if (_replyToken > 0) {
-            _replyTunnel = new TunnelId(DataHelper.fromLong(data, curIndex, 4));
+            long tunnel = DataHelper.fromLong(data, curIndex, 4);
+            if (tunnel > 0)
+                _replyTunnel = new TunnelId(tunnel);
             curIndex += 4;
             
             byte gw[] = new byte[Hash.HASH_LENGTH];
@@ -202,7 +204,10 @@ public class DatabaseStoreMessage extends I2NPMessageImpl {
         curIndex += 4;
         
         if (_replyToken > 0) {
-            byte id[] = DataHelper.toLong(4, _replyTunnel.getTunnelId());
+            long replyTunnel = 0;
+            if (_replyTunnel != null)
+                replyTunnel = _replyTunnel.getTunnelId();
+            byte id[] = DataHelper.toLong(4, replyTunnel);
             System.arraycopy(id, 0, out, curIndex, 4);
             curIndex += 4;
             System.arraycopy(_replyGateway.getData(), 0, out, curIndex, Hash.HASH_LENGTH);

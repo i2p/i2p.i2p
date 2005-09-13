@@ -24,6 +24,16 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
         _context.inNetMessagePool().registerHandlerJobBuilder(DatabaseStoreMessage.MESSAGE_TYPE, new FloodfillDatabaseStoreMessageHandler(_context, this));
     }
     
+    private static final long PUBLISH_TIMEOUT = 30*1000;
+    
+    /**
+     * @throws IllegalArgumentException if the local router info is invalid
+     */
+    public void publish(RouterInfo localRouterInfo) throws IllegalArgumentException {
+        super.publish(localRouterInfo);
+        sendStore(localRouterInfo.getIdentity().calculateHash(), localRouterInfo, null, null, PUBLISH_TIMEOUT, null);
+    }
+    
     public void sendStore(Hash key, DataStructure ds, Job onSuccess, Job onFailure, long sendTimeout, Set toIgnore) {
         // if we are a part of the floodfill netDb, don't send out our own leaseSets as part 
         // of the flooding - instead, send them to a random floodfill peer so *they* can flood 'em out.

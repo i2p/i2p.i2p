@@ -26,6 +26,7 @@ public class IntroductionManager {
         _builder = new PacketBuilder(ctx);
         _outbound = Collections.synchronizedMap(new HashMap(128));
         _inbound = new ArrayList(128);
+        ctx.statManager().createRateStat("udp.receiveRelayIntro", "How often we get a relayed request for us to talk to someone?", "udp", new long[] { 60*1000, 5*60*1000, 10*60*1000 });
     }
     
     public void reset() {
@@ -81,6 +82,7 @@ public class IntroductionManager {
     }
     
     public void receiveRelayIntro(RemoteHostId bob, UDPPacketReader reader) {
+        _context.statManager().addRateData("udp.receiveRelayIntro", 1, 0);
         _transport.send(_builder.buildHolePunch(reader));
     }
     

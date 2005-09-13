@@ -2,6 +2,9 @@ package net.i2p.router.web;
 
 import net.i2p.time.Timestamper;
 import net.i2p.router.RouterContext;
+import net.i2p.router.CommSystemFacade;
+import net.i2p.data.RouterAddress;
+import net.i2p.router.transport.udp.UDPAddress;
 
 public class ConfigNetHelper {
     private RouterContext _context;
@@ -43,19 +46,12 @@ public class ConfigNetHelper {
         return "" + port;
     }
     
-    public String getUdpPort() {
-        int port = 8887;
-        String val = _context.getProperty(PROP_I2NP_UDP_PORT);
-        if (val == null)
-            val = _context.getProperty(PROP_I2NP_INTERNAL_UDP_PORT);
-        if (val != null) {
-            try {
-                port = Integer.parseInt(val);
-            } catch (NumberFormatException nfe) {
-                // ignore, use default from above
-            }
-        }
-        return "" + port;
+    public String getUdpAddress() {
+        RouterAddress addr = _context.router().getRouterInfo().getTargetAddress("SSU");
+        if (addr == null)
+            return "unknown";
+        UDPAddress ua = new UDPAddress(addr);
+        return ua.toString();
     }
     
     public String getEnableTimeSyncChecked() {
@@ -64,6 +60,21 @@ public class ConfigNetHelper {
             return "";
         else
             return " checked ";
+    }
+    
+    public String getRequireIntroductionsChecked() {
+        short status = _context.commSystem().getReachabilityStatus();
+        switch (status) {
+            case CommSystemFacade.STATUS_OK:
+                return "";
+            case CommSystemFacade.STATUS_DIFFERENT:
+            case CommSystemFacade.STATUS_REJECT_UNSOLICITED:
+                return "checked=\"true\"";
+            case CommSystemFacade.STATUS_UNKNOWN:
+                return "";
+            default:
+                return "checked=\"true\"";
+        }
     }
     
     public static final String PROP_INBOUND_KBPS = "i2np.bandwidth.inboundKBytesPerSecond";

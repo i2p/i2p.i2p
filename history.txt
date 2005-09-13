@@ -1,4 +1,11 @@
-$Id: history.txt,v 1.243 2005/09/09 23:30:37 jrandom Exp $
+$Id: history.txt,v 1.244 2005/09/10 22:22:52 jrandom Exp $
+
+2005-09-12  jrandom
+    * More aggressively publish updated routerInfo.
+    * Expose the flag to force SSU introductions on the router console
+    * Don't give people the option to disable SNTP time sync, at least not
+      through the router console, because there is no reason to disable it.
+      No, not even if your OS is "ntp synced", because chances are, its not.
 
 2005-09-10  jrandom
     * Test the router's reachability earlier and more aggressively

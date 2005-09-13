@@ -230,47 +230,26 @@ public class StatisticsManager implements Service {
         return buf.toString();
     }
 
-    private String renderThroughput(double bytes, long ms) {
-        if (bytes <= 0) 
-            return "0;0;0;0;";
-        else
-            return num(bytes/(ms/1000)) + ";0;0;0;";
-    }
-    
     private void includeThroughput(Properties stats) {
-        double sendBytes5m = 0;
-        double sendBytes60m = 0;
-        double recvBytes5m = 0;
-        double recvBytes60m = 0;
-        
-        RateStat sendRate = _context.statManager().getRate("transport.sendMessageSize");
+        RateStat sendRate = _context.statManager().getRate("bw.sendRate");
         if (sendRate != null) {
             Rate r = sendRate.getRate(5*60*1000);
             if (r != null)
-                sendBytes5m = r.getLastTotalValue();
+                stats.setProperty("stat_bandwidthSendBps.5m", num(r.getAverageValue()) + ';' + num(r.getExtremeAverageValue()) + ";0;0;");
             r = sendRate.getRate(60*60*1000);
             if (r != null)
-                sendBytes60m = r.getLastTotalValue();
+                stats.setProperty("stat_bandwidthSendBps.60m", num(r.getAverageValue()) + ';' + num(r.getExtremeAverageValue()) + ";0;0;");
         }
         
-        RateStat recvRate = _context.statManager().getRate("transport.receiveMessageSize");
+        RateStat recvRate = _context.statManager().getRate("bw.recvRate");
         if (recvRate != null) {
             Rate r = recvRate.getRate(5*60*1000);
             if (r != null)
-                recvBytes5m = r.getLastTotalValue();
+                stats.setProperty("stat_bandwidthReceiveBps.5m", num(r.getAverageValue()) + ';' + num(r.getExtremeAverageValue()) + ";0;0;");
             r = recvRate.getRate(60*60*1000);
             if (r != null)
-                recvBytes60m = r.getLastTotalValue();
+                stats.setProperty("stat_bandwidthReceiveBps.60m", num(r.getAverageValue()) + ';' + num(r.getExtremeAverageValue()) + ";0;0;");
         }
-        
-        String throughputRate = renderThroughput(sendBytes5m, 5*60*1000);
-        stats.setProperty("stat_bandwidthSendBps.5m", throughputRate);
-        //throughputRate = renderThroughput(sendBytes60m, 60*60*1000);
-        //stats.setProperty("stat_bandwidthSendBps.60m", throughputRate);
-        throughputRate = renderThroughput(recvBytes5m, 5*60*1000);
-        stats.setProperty("stat_bandwidthReceiveBps.5m", throughputRate);
-        //throughputRate = renderThroughput(recvBytes60m, 60*60*1000);
-        //stats.setProperty("stat_bandwidthReceiveBps.60m", throughputRate);
     }
 
     

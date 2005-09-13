@@ -97,7 +97,10 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     
     public static final String PROP_FIXED_PORT = "i2np.udp.fixedPort";
     private static final String DEFAULT_FIXED_PORT = "true";
-    
+
+    /** do we require introducers, regardless of our status? */
+    public static final String PROP_FORCE_INTRODUCERS = "i2np.udp.forceIntroducers";
+        
     /** how many relays offered to us will we use at a time? */
     public static final int PUBLIC_RELAY_COUNT = 3;
     
@@ -808,7 +811,6 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             _context.router().rebuildRouterInfo();
     }
     
-    public static final String PROP_FORCE_INTRODUCERS = "i2np.udp.forceIntroducers";
     public boolean introducersRequired() {
         String forceIntroducers = _context.getProperty(PROP_FORCE_INTRODUCERS);
         if ( (forceIntroducers != null) && (Boolean.valueOf(forceIntroducers).booleanValue()) )

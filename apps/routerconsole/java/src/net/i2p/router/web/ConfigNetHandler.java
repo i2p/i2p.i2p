@@ -16,6 +16,7 @@ import java.util.Iterator;
 import java.util.Set;
 
 import net.i2p.time.Timestamper;
+import net.i2p.router.transport.udp.UDPTransport;
 
 /**
  * Handler to deal with form submissions from the main config form and act
@@ -29,6 +30,7 @@ public class ConfigNetHandler extends FormHandler {
     private boolean _saveRequested;
     private boolean _recheckReachabilityRequested;
     private boolean _timeSyncEnabled;
+    private boolean _requireIntroductions;
     private String _tcpPort;
     private String _udpPort;
     private String _inboundRate;
@@ -57,6 +59,7 @@ public class ConfigNetHandler extends FormHandler {
     public void setSave(String moo) { _saveRequested = true; }
     public void setEnabletimesync(String moo) { _timeSyncEnabled = true; }
     public void setRecheckReachability(String moo) { _recheckReachabilityRequested = true; }
+    public void setRequireIntroductions(String moo) { _requireIntroductions = true; }
     
     public void setHostname(String hostname) { 
         _hostname = (hostname != null ? hostname.trim() : null); 
@@ -253,7 +256,14 @@ public class ConfigNetHandler extends FormHandler {
             }
         }
         
-        if (_timeSyncEnabled) {
+        if (_requireIntroductions) {
+            _context.router().setConfigSetting(UDPTransport.PROP_FORCE_INTRODUCERS, "true");
+            addFormNotice("Requiring SSU introduers");
+        } else {
+            _context.router().removeConfigSetting(UDPTransport.PROP_FORCE_INTRODUCERS);
+        }
+        
+        if (true || _timeSyncEnabled) {
             // Time sync enable, means NOT disabled 
             _context.router().setConfigSetting(Timestamper.PROP_DISABLED, "false");
         } else {
