@@ -114,10 +114,15 @@ public class InboundMessageDistributor implements GarlicMessageReceiver.CloveRec
                         // treat db store explicitly, since we don't want to republish (or flood)
                         // unnecessarily
                         DatabaseStoreMessage dsm = (DatabaseStoreMessage)data;
-                        if (dsm.getValueType() == DatabaseStoreMessage.KEY_TYPE_LEASESET)
-                            _context.netDb().store(dsm.getKey(), dsm.getLeaseSet());
-                        else
-                            _context.netDb().store(dsm.getKey(), dsm.getRouterInfo());
+                        try {
+                            if (dsm.getValueType() == DatabaseStoreMessage.KEY_TYPE_LEASESET)
+                                _context.netDb().store(dsm.getKey(), dsm.getLeaseSet());
+                            else
+                                _context.netDb().store(dsm.getKey(), dsm.getRouterInfo());
+                        } catch (IllegalArgumentException iae) {
+                            if (_log.shouldLog(Log.WARN))
+                                _log.warn("Bad store attempt", iae);
+                        }
                     } else {
                         _context.inNetMessagePool().add(data, null, null);
                     }

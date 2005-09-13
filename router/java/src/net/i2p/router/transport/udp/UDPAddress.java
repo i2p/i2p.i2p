@@ -42,20 +42,21 @@ public class UDPAddress {
     
     public String toString() {
         StringBuffer rv = new StringBuffer(64);
-        rv.append("[SSU ");
-        if (_host != null)
-            rv.append("host: ").append(_host).append(' ');
-        if (_port > 0)
-            rv.append("port: ").append(_port).append(' ');
-        if (_introKey != null)
-            rv.append("key: ").append(Base64.encode(_introKey)).append(' ');
         if (_introHosts != null) {
             for (int i = 0; i < _introHosts.length; i++) {
-                rv.append("intro[" + i + "]: ").append(_introHosts[i]);
-                rv.append(':').append(_introPorts[i]);
-                rv.append('/').append(Base64.encode(_introKeys[i])).append(' ');
+                rv.append("ssu://");
+                rv.append(_introTags[i]).append('@');
+                rv.append(_introHosts[i]).append(':').append(_introPorts[i]);
+                //rv.append('/').append(Base64.encode(_introKeys[i]));
+                if (i + 1 < _introKeys.length)
+                    rv.append(", ");
             }
-        }   
+        } else {
+            if ( (_host != null) && (_port > 0) )
+                rv.append("ssu://").append(_host).append(':').append(_port);//.append('/').append(Base64.encode(_introKey));
+            else
+                rv.append("ssu://autodetect.not.yet.complete:").append(_port);
+        }
         return rv.toString();
     }
     

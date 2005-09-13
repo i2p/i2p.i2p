@@ -1,4 +1,8 @@
-$Id: history.txt,v 1.244 2005/09/10 22:22:52 jrandom Exp $
+$Id: history.txt,v 1.245 2005/09/12 19:12:04 jrandom Exp $
+
+2005-09-12  jrandom
+    * Bugfix for skewed store which could kill a UDP thread (causing complete
+      comm failure and eventual OOM)
 
 2005-09-12  jrandom
     * More aggressively publish updated routerInfo.
