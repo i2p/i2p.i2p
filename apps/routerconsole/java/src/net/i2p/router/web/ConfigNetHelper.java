@@ -5,6 +5,7 @@ import net.i2p.router.RouterContext;
 import net.i2p.router.CommSystemFacade;
 import net.i2p.data.RouterAddress;
 import net.i2p.router.transport.udp.UDPAddress;
+import net.i2p.router.transport.udp.UDPTransport;
 
 public class ConfigNetHelper {
     private RouterContext _context;
@@ -66,11 +67,15 @@ public class ConfigNetHelper {
         short status = _context.commSystem().getReachabilityStatus();
         switch (status) {
             case CommSystemFacade.STATUS_OK:
+                if ("true".equalsIgnoreCase(_context.getProperty(UDPTransport.PROP_FORCE_INTRODUCERS, "false")))
+                    return "checked=\"true\"";
                 return "";
             case CommSystemFacade.STATUS_DIFFERENT:
             case CommSystemFacade.STATUS_REJECT_UNSOLICITED:
                 return "checked=\"true\"";
             case CommSystemFacade.STATUS_UNKNOWN:
+                if ("true".equalsIgnoreCase(_context.getProperty(UDPTransport.PROP_FORCE_INTRODUCERS, "false")))
+                    return "checked=\"true\"";
                 return "";
             default:
                 return "checked=\"true\"";

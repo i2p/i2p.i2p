@@ -1173,7 +1173,12 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             PeerState peer = (PeerState)peers.get(i);
             if ( (dontInclude != null) && (dontInclude.equals(peer.getRemoteHostId())) )
                 continue;
-            return peer;
+            RouterInfo peerInfo = _context.netDb().lookupRouterInfoLocally(peer.getRemotePeer());
+            if (peerInfo == null)
+                continue;
+            RouterAddress addr = peerInfo.getTargetAddress(STYLE);
+            if (addr != null)
+                return peer;
         }
         return null;
     }

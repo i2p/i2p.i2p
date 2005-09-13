@@ -422,7 +422,7 @@ class PeerTestManager {
             aliceIP = InetAddress.getByAddress(from.getIP());
             aliceIntroKey = new SessionKey(new byte[SessionKey.KEYSIZE_BYTES]);
             testInfo.readIntroKey(aliceIntroKey.getData(), 0);
-            
+
             UDPAddress addr = new UDPAddress(charlieInfo.getTargetAddress(UDPTransport.STYLE));
             SessionKey charlieIntroKey = new SessionKey(addr.getIntroKey());
             

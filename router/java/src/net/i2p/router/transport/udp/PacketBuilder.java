@@ -641,11 +641,20 @@ public class PacketBuilder {
     
     public UDPPacket buildRelayRequest(OutboundEstablishState state, SessionKey ourIntroKey) {
         UDPAddress addr = state.getRemoteAddress();
-        int index = _context.random().nextInt(UDPAddress.MAX_INTRODUCERS) % addr.getIntroducerCount();
+        int count = addr.getIntroducerCount();
+        if (count <= 0)
+            return null;
+        int index = _context.random().nextInt(count);
         InetAddress iaddr = addr.getIntroducerHost(index);
         int iport = addr.getIntroducerPort(index);
         byte ikey[] = addr.getIntroducerKey(index);
         long tag = addr.getIntroducerTag(index);
+        if ( (ikey == null) || (iport <= 0) || (iaddr == null) || (tag <= 0) ) {
+            if (_log.shouldLog(_log.ERROR))
+                _log.error("Cannot build a relay request to " + state.getRemoteIdentity().calculateHash().toBase64() 
+                           + ", as their UDP address is invalid: addr=" + addr + " index=" + index);
+            return null;
+        }
         return buildRelayRequest(iaddr, iport, ikey, tag, ourIntroKey, state.getIntroNonce(), true);
     }
     

@@ -764,36 +764,46 @@ public class EstablishmentManager {
     private class Establisher implements Runnable {
         public void run() {
             while (_alive) {
-                _activity = 0;
-                long now = _context.clock().now();
-                long nextSendTime = -1;
-                long nextSendInbound = handleInbound();
-                long nextSendOutbound = handleOutbound();
-                if (nextSendInbound > 0)
-                    nextSendTime = nextSendInbound;
-                if ( (nextSendTime < 0) || (nextSendOutbound < nextSendTime) )
-                    nextSendTime = nextSendOutbound;
-
-                long delay = nextSendTime - now;
-                if ( (nextSendTime == -1) || (delay > 0) ) {
-                    boolean interrupted = false;
-                    try {
-                        synchronized (_activityLock) {
-                            if (_activity > 0)
-                                continue;
-                            if (nextSendTime == -1)
-                                _activityLock.wait();
-                            else
-                                _activityLock.wait(delay);
-                        }
-                    } catch (InterruptedException ie) {
-                        interrupted = true;
-                    }
-                    if (_log.shouldLog(Log.DEBUG))
-                        _log.debug("After waiting w/ nextSend=" + nextSendTime 
-                                   + " and delay=" + delay + " and interrupted=" + interrupted);
+                try {
+                    doPass();
+                } catch (OutOfMemoryError oom) {
+                    throw oom;
+                } catch (RuntimeException re) {
+                    _log.log(Log.CRIT, "Error in the establisher", re);
                 }
             }
+        }
+    }
+    
+    private void doPass() {
+        _activity = 0;
+        long now = _context.clock().now();
+        long nextSendTime = -1;
+        long nextSendInbound = handleInbound();
+        long nextSendOutbound = handleOutbound();
+        if (nextSendInbound > 0)
+            nextSendTime = nextSendInbound;
+        if ( (nextSendTime < 0) || (nextSendOutbound < nextSendTime) )
+            nextSendTime = nextSendOutbound;
+
+        long delay = nextSendTime - now;
+        if ( (nextSendTime == -1) || (delay > 0) ) {
+            boolean interrupted = false;
+            try {
+                synchronized (_activityLock) {
+                    if (_activity > 0)
+                        return;
+                    if (nextSendTime == -1)
+                        _activityLock.wait();
+                    else
+                        _activityLock.wait(delay);
+                }
+            } catch (InterruptedException ie) {
+                interrupted = true;
+            }
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("After waiting w/ nextSend=" + nextSendTime 
+                           + " and delay=" + delay + " and interrupted=" + interrupted);
         }
     }
 }

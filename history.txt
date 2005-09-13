@@ -1,4 +1,9 @@
-$Id: history.txt,v 1.247 2005/09/12 22:32:30 jrandom Exp $
+$Id: history.txt,v 1.248 2005/09/13 04:06:07 comwiz Exp $
+
+2005-09-13  jrandom
+    * More careful error handling with introductions (thanks dust!)
+    * Fix the forceIntroducers checkbox on config.jsp (thanks Complication!)
+    * Hide the shitlist on the summary so it doesn't confuse new users.
 
 2005-09-12  comwiz
     * Migrated the router tests to junit

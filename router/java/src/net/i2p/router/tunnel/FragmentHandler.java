@@ -90,6 +90,8 @@ public class FragmentHandler {
                 }
                 offset = off;
             }
+        } catch (ArrayIndexOutOfBoundsException aioobe) {
+            _context.statManager().addRateData("tunnel.corruptMessage", 1, 1);
         } catch (RuntimeException e) {
             if (_log.shouldLog(Log.ERROR))
                 _log.error("Corrupt fragment received: offset = " + offset, e);
@@ -216,17 +218,23 @@ public class FragmentHandler {
         long messageId = -1;
         
         if (type == TYPE_TUNNEL) {
+            if (offset + 4 >= preprocessed.length)
+                return -1;
             long id = DataHelper.fromLong(preprocessed, offset, 4);
             tunnelId = new TunnelId(id);
             offset += 4;
         }
         if ( (type == TYPE_ROUTER) || (type == TYPE_TUNNEL) ) {
             byte h[] = new byte[Hash.HASH_LENGTH];
+            if (offset + Hash.HASH_LENGTH >= preprocessed.length)
+                return -1;
             System.arraycopy(preprocessed, offset, h, 0, Hash.HASH_LENGTH);
             router = new Hash(h);
             offset += Hash.HASH_LENGTH;
         }
         if (fragmented) {
+            if (offset + 4 >= preprocessed.length)
+                return -1;
             messageId = DataHelper.fromLong(preprocessed, offset, 4);
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("reading messageId " + messageId + " at offset "+ offset 
@@ -241,6 +249,8 @@ public class FragmentHandler {
             offset += extendedSize; // we don't interpret these yet, but skip them for now
         }
         
+        if (offset + 2 >= preprocessed.length)
+            return -1;
         int size = (int)DataHelper.fromLong(preprocessed, offset, 2);
         offset += 2;
         

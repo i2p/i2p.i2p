@@ -61,6 +61,7 @@ public class UDPAddress {
     }
     
     private void parse(RouterAddress addr) {
+        if (addr == null) return;
         Properties opts = addr.getOptions();
         _host = opts.getProperty(PROP_HOST);
         if (_host != null) _host = _host.trim();
