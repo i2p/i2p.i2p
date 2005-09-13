@@ -28,9 +28,6 @@ class MessageStatusMessageHandler extends HandlerImpl {
 
     public void handleMessage(I2CPMessage message, I2PSessionImpl session) {
         boolean skipStatus = true;
-        if (I2PClient.PROP_RELIABILITY_GUARANTEED.equals(session.getOptions().getProperty(I2PClient.PROP_RELIABILITY,
-                                                                                          I2PClient.PROP_RELIABILITY_BEST_EFFORT)))
-            skipStatus = false;
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Handle message " + message);
         MessageStatusMessage msg = (MessageStatusMessage) message;

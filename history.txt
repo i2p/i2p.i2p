@@ -1,4 +1,16 @@
-$Id: history.txt,v 1.245 2005/09/12 19:12:04 jrandom Exp $
+$Id: history.txt,v 1.246 2005/09/12 20:12:44 jrandom Exp $
+
+2005-09-12  jrandom
+    * Removed guaranteed delivery mode entirely (so existing i2phex clients
+      using it can get the benefits of mode=best_effort).  Guaranteed delivery
+      is offered at the streaming lib level.
+    * Improve the peer selection code for peer testing, as everyone now 
+      supports tests.
+    * Give the watchdog its fangs - if it detects obscene job lag or if 
+      clients have been unable to get a leaseSet for more than 5 minutes,
+      restart the router.  This was disabled a year ago due to spurious 
+      restarts, and can be disabled by "watchdog.haltOnHang=false", but the
+      cause of the spurious restarts should be gone.
 
 2005-09-12  jrandom
     * Bugfix for skewed store which could kill a UDP thread (causing complete

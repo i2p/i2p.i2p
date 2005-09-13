@@ -13,6 +13,7 @@ import net.i2p.router.CommSystemFacade;
 import net.i2p.router.RouterContext;
 import net.i2p.data.Base64;
 import net.i2p.data.DataHelper;
+import net.i2p.data.Hash;
 import net.i2p.data.RouterInfo;
 import net.i2p.data.SessionKey;
 import net.i2p.util.SimpleTimer;
@@ -400,17 +401,9 @@ class PeerTestManager {
         PeerState charlie = null;
         RouterInfo charlieInfo = null;
         if (state == null) { // pick a new charlie
-            for (int i = 0; i < 5; i++) {
-                charlie = _transport.getPeerState(UDPAddress.CAPACITY_TESTING);
-                if (_log.shouldLog(Log.DEBUG))
-                    _log.debug("Picking charlie as " + charlie + " for alice of " + from);
-                if ( (charlie != null) && (!DataHelper.eq(charlie.getRemoteHostId(), from)) ) {
-                    charlieInfo = _context.netDb().lookupRouterInfoLocally(charlie.getRemotePeer());
-                    if (charlieInfo != null)
-                        break;
-                }
-                charlie = null;
-            }
+            charlie = _transport.pickTestPeer(from);
+            if (charlie != null)
+                charlieInfo = _context.netDb().lookupRouterInfoLocally(charlie.getRemotePeer());
         } else {
             charlie = _transport.getPeerState(new RemoteHostId(state.getCharlieIP().getAddress(), state.getCharliePort()));
             if (charlie != null)

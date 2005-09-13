@@ -40,11 +40,6 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     private Map _peersByIdent;
     /** RemoteHostId to PeerState */
     private Map _peersByRemoteHost;
-    /**
-     * Array of list of PeerState instances, where each list contains peers with one 
-     * of the given capacities (from 0-25, referencing 'A'-'Z'). 
-     */
-    private List _peersByCapacity[];
     private PacketHandler _handler;
     private EstablishmentManager _establisher;
     private MessageQueue _outboundMessages;
@@ -122,9 +117,6 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         _log = ctx.logManager().getLog(UDPTransport.class);
         _peersByIdent = new HashMap(128);
         _peersByRemoteHost = new HashMap(128);
-        _peersByCapacity = new ArrayList['Z'-'A'+1];
-        for (int i = 0; i < _peersByCapacity.length; i++)
-            _peersByCapacity[i] = new ArrayList(16);
         _endpoint = null;
         
         TimedWeightedPriorityMessageQueue mq = new TimedWeightedPriorityMessageQueue(ctx, PRIORITY_LIMITS, PRIORITY_WEIGHT, this);
@@ -146,7 +138,6 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         
         _context.statManager().createRateStat("udp.droppedPeer", "How long ago did we receive from a dropped peer (duration == session lifetime", "udp", new long[] { 60*60*1000, 24*60*60*1000 });
         _context.statManager().createRateStat("udp.droppedPeerInactive", "How long ago did we receive from a dropped peer (duration == session lifetime)", "udp", new long[] { 60*60*1000, 24*60*60*1000 });
-        _context.statManager().createRateStat("udp.peersByCapacity", "How many peers of the given capacity were available to pick between? (duration == (int)capacity)", "udp", new long[] { 1*60*1000, 5*60*1000, 60*60*1000 });
         _context.statManager().createRateStat("udp.statusOK", "How many times the peer test returned OK", "udp", new long[] { 5*60*1000, 20*60*1000, 60*60*1000, 24*60*60*1000 });
         _context.statManager().createRateStat("udp.statusDifferent", "How many times the peer test returned different IP/ports", "udp", new long[] { 5*60*1000, 20*60*1000, 60*60*1000, 24*60*60*1000 });
         _context.statManager().createRateStat("udp.statusReject", "How many times the peer test returned reject unsolicited", "udp", new long[] { 5*60*1000, 20*60*1000, 60*60*1000, 24*60*60*1000 });
@@ -370,52 +361,12 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         return _introManager.get(relayTag);
     }
     
-    /** 
-     * if we haven't received anything in the last 5 minutes from a peer, don't 
-     * trust its known capacities
-     */
-    private static final int MAX_INACTIVITY_FOR_CAPACITY = 5*60*1000;
-    /** pick a random peer with the given capacity */
-    public PeerState getPeerState(char capacity) {
-        long now = _context.clock().now();
-        int index = _context.random().nextInt(1024);
-        int cap = capacity - 'A';
-        if ( (cap < 0) || (cap >= _peersByCapacity.length) ) return null;
-        List peers = _peersByCapacity[cap];
-        int size = 0;
-        int off = 0;
-        PeerState rv = null;
-        while (rv == null) {
-            synchronized (peers) {
-                size = peers.size();
-                if (size > 0) { 
-                    index = (index + off) % size;
-                    rv = (PeerState)peers.get(index);
-                }
-            }
-            if (rv == null) 
-                break;
-            if (_context.shitlist().isShitlisted(rv.getRemotePeer()))
-                rv = null;
-            else if (now - rv.getLastReceiveTime() > MAX_INACTIVITY_FOR_CAPACITY)
-                rv = null;
-            else
-                break;
-            off++;
-            if (off >= size)
-                break;
-        }
-        _context.statManager().addRateData("udp.peersByCapacity", size, capacity);
-        return rv;
-    }
-
-    private static final int MAX_PEERS_PER_CAPACITY = 64;
-    
     /**
      * Intercept RouterInfo entries received directly from a peer to inject them into
      * the PeersByCapacity listing.
      *
      */
+    /*
     public void messageReceived(I2NPMessage inMsg, RouterIdentity remoteIdent, Hash remoteIdentHash, long msToReceive, int bytesReceived) {
         
         if (inMsg instanceof DatabaseStoreMessage) {
@@ -461,6 +412,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         }
         super.messageReceived(inMsg, remoteIdent, remoteIdentHash, msToReceive, bytesReceived);
     }
+    */
     
     /** 
      * add the peer info, returning true if it went in properly, false if
@@ -618,6 +570,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
      *
      */
     private void dropPeerCapacities(PeerState peer) {
+        /*
         RouterInfo info = _context.netDb().lookupRouterInfoLocally(peer.getRemotePeer());
         if (info != null) {
             String capacities = info.getOptions().getProperty(UDPAddress.PROP_CAPACITY);
@@ -634,6 +587,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                 }
             }
         }
+         */
     }
     
     int send(UDPPacket packet) { 
@@ -1209,6 +1163,21 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         _testEvent.runTest();
     }
     
+    public PeerState pickTestPeer(RemoteHostId dontInclude) {
+        List peers = null;
+        synchronized (_peersByIdent) {
+            peers = new ArrayList(_peersByIdent.values());
+        }
+        Collections.shuffle(peers, _context.random());
+        for (int i = 0; i < peers.size(); i++) {
+            PeerState peer = (PeerState)peers.get(i);
+            if ( (dontInclude != null) && (dontInclude.equals(peer.getRemoteHostId())) )
+                continue;
+            return peer;
+        }
+        return null;
+    }
+    
     private static final String PROP_SHOULD_TEST = "i2np.udp.shouldTest";
     
     private boolean shouldTest() {
@@ -1237,16 +1206,18 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         }
         
         private void runTest() {
-            PeerState bob = getPeerState(UDPAddress.CAPACITY_TESTING);
+            PeerState bob = pickTestPeer(null);
             if (bob != null) {
                 if (_log.shouldLog(Log.INFO))
                     _log.info("Running periodic test with bob = " + bob);
                 _testManager.runTest(bob.getRemoteIPAddress(), bob.getRemotePort(), bob.getCurrentCipherKey(), bob.getCurrentMACKey());
-            } else {
-                if (_log.shouldLog(Log.ERROR))
-                    _log.error("Unable to run a periodic test, as there are no peers with the capacity required");
+                _lastTested = _context.clock().now();
+                _forceRun = false;
+                return;
             }
-            _lastTested = _context.clock().now();
+            
+            if (_log.shouldLog(Log.ERROR))
+                _log.error("Unable to run a periodic test, as there are no peers with the capacity required");
             _forceRun = false;
         }
         

@@ -233,6 +233,12 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
         notifier.setName("Notifier " + _myDestination.calculateHash().toBase64().substring(0,4));
         notifier.setDaemon(true);
         notifier.start();
+        
+        if ( (_options != null) && 
+             (I2PClient.PROP_RELIABILITY_GUARANTEED.equals(_options.getProperty(I2PClient.PROP_RELIABILITY, I2PClient.PROP_RELIABILITY_BEST_EFFORT))) ) {
+            if (_log.shouldLog(Log.ERROR))
+                _log.error("I2CP guaranteed delivery mode has been removed, using best effort.");
+        }
             
         long startConnect = _context.clock().now();
         try {
@@ -321,18 +327,6 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
                                         Set tagsSent) throws I2PSessionException;
 
     public abstract void receiveStatus(int msgId, long nonce, int status);
-
-    protected boolean isGuaranteed() {
-        if (_log.shouldLog(Log.DEBUG)) {
-            String str = _options.getProperty(I2PClient.PROP_RELIABILITY);
-            if (str == null)
-                _log.debug("reliability is not specified, fallback");
-            else
-                _log.debug("reliability is specified: " + str);
-        }
-        String reliability = _options.getProperty(I2PClient.PROP_RELIABILITY, I2PClient.PROP_RELIABILITY_GUARANTEED);
-        return I2PClient.PROP_RELIABILITY_GUARANTEED.equals(reliability);
-    }
 
     protected static final Set createNewTags(int num) {
         Set tags = new HashSet();
