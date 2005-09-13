@@ -144,7 +144,7 @@ public abstract class I2NPMessageImpl extends DataStructureImpl implements I2NPM
         if (size < 15 + CHECKSUM_LENGTH) throw new DataFormatException("Unable to build the message");
         byte buf[] = new byte[size];
         int read = toByteArray(buf);
-        if (read < 0)
+        if (read < 0) throw new DataFormatException("Unable to build the message");
         out.write(buf, 0, read);
     }
     

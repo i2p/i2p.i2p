@@ -10,10 +10,10 @@ package net.i2p.data.i2np;
 
 import java.util.Date;
 
+import net.i2p.I2PAppContext;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.DataStructure;
 import net.i2p.data.StructureTest;
-import net.i2p.data.TestData;
 import net.i2p.data.RouterInfo;
 import net.i2p.data.RouterInfoTest;
 import net.i2p.data.i2np.DatabaseStoreMessage;
@@ -24,20 +24,18 @@ import net.i2p.util.Clock;
  *
  * @author jrandom
  */
-class DatabaseStoreMessageTest extends StructureTest {
-    static {
-        TestData.registerTest(new DatabaseStoreMessageTest(), "DatabaseStoreMessage");
-    }
+public class DatabaseStoreMessageTest extends StructureTest {
     public DataStructure createDataStructure() throws DataFormatException {
-        DatabaseStoreMessage msg = new DatabaseStoreMessage(_context);
+        DatabaseStoreMessage msg = new DatabaseStoreMessage(I2PAppContext.getGlobalContext());
         RouterInfo info = (RouterInfo)new RouterInfoTest().createDataStructure();
         msg.setKey(info.getIdentity().getHash());
         msg.setMessageExpiration(Clock.getInstance().now());
-        msg.setUniqueId(42);
+        msg.setUniqueId(666);
         msg.setRouterInfo(info);
         return msg;
     }
-    public DataStructure createStructureToRead() { return new DatabaseStoreMessage(_context); }
     
-    public static void main(String args[]) { TestData.main(new String[] { "test", "i2np.DatabaseStoreMessage", "foo.dat" }); }
+    public DataStructure createStructureToRead() { 
+    	return new DatabaseStoreMessage(I2PAppContext.getGlobalContext()); 
+    }
 }

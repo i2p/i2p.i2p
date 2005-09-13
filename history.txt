@@ -1,4 +1,7 @@
-$Id: history.txt,v 1.246 2005/09/12 20:12:44 jrandom Exp $
+$Id: history.txt,v 1.247 2005/09/12 22:32:30 jrandom Exp $
+
+2005-09-12  comwiz
+    * Migrated the router tests to junit
 
 2005-09-12  jrandom
     * Removed guaranteed delivery mode entirely (so existing i2phex clients

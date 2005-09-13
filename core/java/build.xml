@@ -13,7 +13,7 @@
     <target name="compileTest">
         <mkdir dir="./build" />
         <mkdir dir="./build/obj" />
-        <javac srcdir="./src:./test" debug="true" source="1.3" target="1.3" deprecation="on" destdir="./build/obj" classpath="./lib/junit.jar" />
+        <javac srcdir="./src:./test" debug="true" source="1.3" target="1.3" deprecation="on" destdir="./build/obj" />
     </target>
     <target name="jar" depends="compile">
         <jar destfile="./build/i2p.jar" basedir="./build/obj" includes="**/*.class" />
@@ -31,7 +31,6 @@
             <classpath>
                 <pathelement path="${classpath}" />
                 <pathelement location="./build/obj" />
-                <pathelement location="./lib/junit.jar" />
                 <pathelement location="../../installer/lib/jbigi/jbigi.jar" />
                 <pathelement path="${ant.home}/lib/clover.jar"/>
             </classpath>
@@ -91,7 +90,8 @@
         <mkdir dir="../../reports/core/clover" />
         <clover-setup initString="../../reports/core/clover/coverage.db"/>
     </target>
-    <target name="fulltest" depends="useclover, test, test.report" />
+    <target name="fulltest" depends="test, junit.report" />
+    <target name="fullclovertest" depends="useclover, test, test.report" />
     <target name="clean">
         <delete dir="./build" />
     </target>

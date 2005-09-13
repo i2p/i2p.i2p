@@ -1,4 +1,12 @@
 package net.i2p.router.tunnel;
+/*
+ * free (adj.): unencumbered; not under the control of others
+ * Written by jrandom in 2003 and released into the public domain
+ * with no warranty of any kind, either expressed or implied.
+ * It probably won't make your computer catch on fire, or eat
+ * your children, but it might.  Use at your own risk.
+ *
+ */
 
 import java.util.ArrayList;
 import net.i2p.I2PAppContext;
@@ -10,18 +18,18 @@ import net.i2p.data.i2np.DataMessage;
 import net.i2p.data.i2np.I2NPMessage;
 import net.i2p.util.Log;
 
+import junit.framework.TestCase;
+
 /**
  * Simple test to see if the fragmentation is working, testing the preprocessor,
  * FragmentHandler, and FragmentedMessage operation.
  *
  */
-public class FragmentTest {
+public class FragmentTest extends TestCase{
     protected I2PAppContext _context;
-    protected Log _log;
     
-    public FragmentTest() {
+    public void setUp() {
         _context = I2PAppContext.getGlobalContext();
-        _log = _context.logManager().getLog(getClass());
         _context.random().nextBoolean();
         FragmentHandler.MAX_DEFRAGMENT_TIME = 10*1000;
     }
@@ -34,7 +42,7 @@ public class FragmentTest {
      * Send a message that fits inside a single fragment through
      *
      */
-    public void runSingle() {
+    public void testSingle() {
         TunnelGateway.Pending pending = createPending(949, false, false);
         ArrayList messages = new ArrayList();
         messages.add(pending);
@@ -45,23 +53,21 @@ public class FragmentTest {
         FragmentHandler handler = new FragmentHandler(_context, handleReceiver);
         ReceiverImpl receiver = new ReceiverImpl(handler, 0);
         byte msg[] = pending.getData();
-        _log.debug("SEND(" + msg.length + "): " + Base64.encode(msg) + " " + _context.sha().calculateHash(msg).toBase64());
-
+        
         boolean keepGoing = true;
         while (keepGoing) {
             keepGoing = pre.preprocessQueue(messages, new SenderImpl(), receiver);
             if (keepGoing)
                 try { Thread.sleep(100); } catch (InterruptedException ie) {}
         }
-        if (handleReceiver.receivedOk()) 
-            _log.info("received OK");
+        assertTrue(handleReceiver.receivedOk());
     }
     
     /**
      * Send a message with two fragments through with no delay
      *
      */
-    public void runMultiple() {
+    public void testMultiple() {
         TunnelGateway.Pending pending = createPending(2048, false, false);
         ArrayList messages = new ArrayList();
         messages.add(pending);
@@ -72,7 +78,6 @@ public class FragmentTest {
         FragmentHandler handler = new FragmentHandler(_context, handleReceiver);
         ReceiverImpl receiver = new ReceiverImpl(handler, 0);
         byte msg[] = pending.getData();
-        _log.debug("SEND(" + msg.length + "): " + Base64.encode(msg) + " " + _context.sha().calculateHash(msg).toBase64());
             
         boolean keepGoing = true;
         while (keepGoing) {
@@ -80,8 +85,7 @@ public class FragmentTest {
             if (keepGoing)
                 try { Thread.sleep(100); } catch (InterruptedException ie) {}
         }
-        if (handleReceiver.receivedOk()) 
-            _log.info("received OK");
+        assertTrue(handleReceiver.receivedOk());
     }
     
     /**
@@ -98,7 +102,7 @@ public class FragmentTest {
         FragmentHandler handler = new FragmentHandler(_context, new DefragmentedReceiverImpl(pending.getData()));
         ReceiverImpl receiver = new ReceiverImpl(handler, 11*1000);
         byte msg[] = pending.getData();
-        _log.debug("SEND(" + msg.length + "): " + Base64.encode(msg) + " " + _context.sha().calculateHash(msg).toBase64());
+        
         boolean keepGoing = true;
         while (keepGoing) {
             keepGoing = pre.preprocessQueue(messages, new SenderImpl(), receiver);
@@ -108,20 +112,11 @@ public class FragmentTest {
     }
     
     public void runVaried() {
-        int failures = 0;
         for (int i = 0; i <= 4096; i++) {
-            boolean ok = runVaried(i, false, false);
-            if (!ok) { _log.error("** processing " + i+ " w/ no router, no tunnel failed"); failures++; }
-            ok = runVaried(i, true, false);
-            if (!ok) { _log.error("** processing " + i+ " w/ router, no tunnel failed"); failures++; }
-            ok = runVaried(i, true, true);
-            if (!ok) { _log.error("** processing " + i+ " w/ router, tunnel failed"); failures++; }
-            else _log.info("Tests pass for size " + i);
+            assertTrue(runVaried(i, false, false));
+            assertTrue(runVaried(i, true, false));
+            assertTrue(runVaried(i, true, true));
         }
-        if (failures == 0) 
-            _log.info("** success after all varied tests");
-        else
-            _log.error("** failed " + failures +" varied tests");
     }
     
     protected boolean runVaried(int size, boolean includeRouter, boolean includeTunnel) {
@@ -135,7 +130,6 @@ public class FragmentTest {
         FragmentHandler handler = new FragmentHandler(_context, handleReceiver);
         ReceiverImpl receiver = new ReceiverImpl(handler, 0);
         byte msg[] = pending.getData();
-        _log.debug("SEND(" + msg.length + "): " + Base64.encode(msg) + " " + _context.sha().calculateHash(msg).toBase64());
             
         boolean keepGoing = true;
         while (keepGoing) {
@@ -225,21 +219,5 @@ public class FragmentTest {
             else
                 return _received == 0;
         }
-    }
-    
-    public void runTests() {
-        runVaried();
-        _log.info("\n===========================Begin runSingle()\n\n");
-        runSingle();
-        _log.info("\n===========================Begin runMultiple()\n\n");
-        runMultiple();
-        _log.info("\n===========================Begin runDelayed() (should have 3 errors)\n\n");
-        runDelayed();
-        _log.info("\n===========================After runDelayed()\n\n");
-    }
-    
-    public static void main(String args[]) {
-        FragmentTest t = new FragmentTest();
-        t.runTests();
     }
 }

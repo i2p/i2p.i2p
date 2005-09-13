@@ -1,4 +1,12 @@
 package net.i2p.router.tunnel;
+/*
+ * free (adj.): unencumbered; not under the control of others
+ * Written by jrandom in 2003 and released into the public domain
+ * with no warranty of any kind, either expressed or implied.
+ * It probably won't make your computer catch on fire, or eat
+ * your children, but it might.  Use at your own risk.
+ *
+ */
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,46 +19,32 @@ import net.i2p.data.i2np.DataMessage;
 import net.i2p.data.i2np.I2NPMessage;
 import net.i2p.util.Log;
 
+import junit.framework.TestCase;
+
 /**
  * Quick unit test for base functionality of outbound tunnel 
  * operation
  */
-public class OutboundGatewayTest {
+public class OutboundGatewayTest extends TestCase{
     private I2PAppContext _context;
-    private Log _log;
     private TunnelCreatorConfig _config;
     private TunnelGateway.QueuePreprocessor _preprocessor;
     private TunnelGateway.Sender _sender;
     private TestReceiver _receiver;
     private TunnelGateway _gw;
     
-    public OutboundGatewayTest() {
+    public void setUp() {
         _context = I2PAppContext.getGlobalContext();
-        _log = _context.logManager().getLog(OutboundGatewayTest.class);
-    }
-    
-    public void runTest() {
-        int numHops = 8;
-        int runCount = 1;
-        _config = prepareConfig(numHops);
+        _config = prepareConfig(8);
         _preprocessor = new TrivialPreprocessor(_context);
         _sender = new OutboundSender(_context, _config);
         _receiver = new TestReceiver(_config);
         _gw = new TunnelGateway(_context, _preprocessor, _sender, _receiver);
-        
-        // single fragment
-        testSmall(runCount);
-        // includes target router instructions
-        testRouter(runCount);
-        // includes target router & tunnel instructions
-        testTunnel(runCount);
-        // multiple fragments
-        testLarge(runCount);
-     
-        try { Thread.sleep(5*1000); } catch (Exception e) {}
     }
     
-    private void testSmall(int runCount) {
+    public void testSmall() {
+    	int runCount = 1;
+    	
         List messages = new ArrayList(runCount);
         long start = _context.clock().now();
     
@@ -60,25 +54,22 @@ public class OutboundGatewayTest {
             java.util.Arrays.fill(m.getData(), (byte)0xFF);
             m.setMessageExpiration(_context.clock().now() + 60*1000);
             m.setUniqueId(_context.random().nextLong(I2NPMessage.MAX_ID_VALUE));
-            _log.debug("Sending " + m.getUniqueId());
             byte data[] = m.toByteArray();
-            _log.debug("SEND(" + data.length + "): " + Base64.encode(data) + " " + _context.sha().calculateHash(data).toBase64());
             messages.add(m);
             _gw.add(m, null, null);
         }
         
         long time = _context.clock().now() - start;
-        _log.debug("Time for " + runCount + " messages: " + time);   
         
         List received = _receiver.clearReceived();
         for (int i = 0; i < messages.size(); i++) {
-            if (!received.contains(((I2NPMessage)messages.get(i)))) {
-                _log.error("Message " + i + " not received");
-            }
+            assertTrue(received.contains(((I2NPMessage)messages.get(i))));
         }
     }
     
-    private void testRouter(int runCount) {
+    public void testRouter() {
+    	int runCount = 1;
+    	
         List messages = new ArrayList(runCount);
         long start = _context.clock().now();
     
@@ -90,25 +81,22 @@ public class OutboundGatewayTest {
             m.setUniqueId(_context.random().nextLong(I2NPMessage.MAX_ID_VALUE));
             Hash to = new Hash(new byte[Hash.HASH_LENGTH]);
             java.util.Arrays.fill(to.getData(), (byte)0xFF);
-            _log.debug("Sending " + m.getUniqueId() + " to " + to);
             byte data[] = m.toByteArray();
-            _log.debug("SEND(" + data.length + "): " + Base64.encode(data) + " " + _context.sha().calculateHash(data).toBase64());
             messages.add(m);
             _gw.add(m, to, null);
         }
         
         long time = _context.clock().now() - start;
-        _log.debug("Time for " + runCount + " messages: " + time);   
         
         List received = _receiver.clearReceived();
         for (int i = 0; i < messages.size(); i++) {
-            if (!received.contains(((I2NPMessage)messages.get(i)))) {
-                _log.error("Message " + i + " not received");
-            }
+            assertTrue(received.contains(((I2NPMessage)messages.get(i))));
         }
     }
     
-    private void testTunnel(int runCount) {
+    public void testTunnel() {
+    	int runCount = 1;
+    	
         List messages = new ArrayList(runCount);
         long start = _context.clock().now();
     
@@ -121,25 +109,22 @@ public class OutboundGatewayTest {
             Hash to = new Hash(new byte[Hash.HASH_LENGTH]);
             java.util.Arrays.fill(to.getData(), (byte)0xFF);
             TunnelId tunnel = new TunnelId(42);
-            _log.debug("Sending " + m.getUniqueId() + " to " + to + "/" + tunnel);
             byte data[] = m.toByteArray();
-            _log.debug("SEND(" + data.length + "): " + Base64.encode(data) + " " + _context.sha().calculateHash(data).toBase64());
             messages.add(m);
             _gw.add(m, to, tunnel);
         }
         
         long time = _context.clock().now() - start;
-        _log.debug("Time for " + runCount + " messages: " + time);   
         
         List received = _receiver.clearReceived();
         for (int i = 0; i < messages.size(); i++) {
-            if (!received.contains(((I2NPMessage)messages.get(i)))) {
-                _log.error("Message " + i + " not received");
-            }
+            assertTrue(received.contains(((I2NPMessage)messages.get(i))));
         }
     }
     
-    private void testLarge(int runCount) {
+    public void testLarge() {
+    	int runCount = 1;
+    	
         List messages = new ArrayList(runCount);
         long start = _context.clock().now();
     
@@ -149,22 +134,17 @@ public class OutboundGatewayTest {
             java.util.Arrays.fill(m.getData(), (byte)0xFF);
             m.setMessageExpiration(_context.clock().now() + 60*1000);
             m.setUniqueId(_context.random().nextLong(I2NPMessage.MAX_ID_VALUE));
-            _log.debug("Sending " + m.getUniqueId());
             byte data[] = m.toByteArray();
-            _log.debug("SEND(" + data.length + "): " + Base64.encode(data) + " " + _context.sha().calculateHash(data).toBase64());
             messages.add(m);
             _gw.add(m, null, null);
         }
         
         long time = _context.clock().now() - start;
-        try { Thread.sleep(60*1000); } catch (Exception e) {}
-        _log.debug("Time for " + runCount + " messages: " + time);   
+        //try { Thread.sleep(60*1000); } catch (Exception e) {}
         
         List received = _receiver.clearReceived();
         for (int i = 0; i < messages.size(); i++) {
-            if (!received.contains(((I2NPMessage)messages.get(i)))) {
-                _log.error("Message " + i + " not received");
-            }
+            assertTrue(received.contains(((I2NPMessage)messages.get(i))));
         }
     }
     
@@ -182,22 +162,14 @@ public class OutboundGatewayTest {
             
             for (int i = 1; i < _config.getLength(); i++) {
                 HopProcessor hop = new HopProcessor(_context, _config.getConfig(i));
-                boolean ok = hop.process(encrypted, 0, encrypted.length, _config.getConfig(i).getReceiveFrom());
-                if (!ok)
-                    _log.error("Error processing at hop " + i);
-                //else
-                //    _log.info("Processing OK at hop " + i);
+                assertTrue(hop.process(encrypted, 0, encrypted.length, _config.getConfig(i).getReceiveFrom()));
+                
             }
             
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Received      " + Base64.encode(encrypted));
 
             _handler.receiveTunnelMessage(encrypted, 0, encrypted.length);
-            _log.debug("\n\ndone receiving message\n\n");
         }        
         public void receiveComplete(I2NPMessage msg, Hash toRouter, TunnelId toTunnel) {
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Completed     " + msg.getUniqueId() + " to " + toRouter + "/" + toTunnel);
             _received.add(msg);
         }
         public List clearReceived() { 
@@ -238,10 +210,5 @@ public class OutboundGatewayTest {
             }
         }
         return config;
-    }
-    
-    public static void main(String args[]) {
-        OutboundGatewayTest test = new OutboundGatewayTest();
-        test.runTest();
     }
 }

@@ -1,4 +1,12 @@
 package net.i2p.router.tunnel;
+/*
+ * free (adj.): unencumbered; not under the control of others
+ * Written by jrandom in 2003 and released into the public domain
+ * with no warranty of any kind, either expressed or implied.
+ * It probably won't make your computer catch on fire, or eat
+ * your children, but it might.  Use at your own risk.
+ *
+ */
 
 import net.i2p.I2PAppContext;
 import net.i2p.data.Base64;
@@ -6,45 +14,42 @@ import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
 import net.i2p.util.Log;
 
+import junit.framework.TestCase;
+
 /**
- * Quick unit test for base functionality of outbound tunnel 
+ * Quick unit test for base functionality of inbound tunnel 
  * operation
  *
  */
-public class OutboundTest {
+public class InboundTest extends TestCase{
     private I2PAppContext _context;
-    private Log _log;
     
-    public OutboundTest() {
+    public void setUp() {
         _context = I2PAppContext.getGlobalContext();
-        _log = _context.logManager().getLog(OutboundTest.class);
     }
     
-    public void runTest() {
-        int numHops = 8;
-        TunnelCreatorConfig config = prepareConfig(numHops);
-        
-        byte orig[] = new byte[1024];
-        byte message[] = new byte[1024];
+    public void testInbound() {
+    	int numHops = 8;
+    	TunnelCreatorConfig config = prepareConfig(numHops);
+    	
+        byte orig[] = new byte[128];
+        byte message[] = new byte[128];
         _context.random().nextBytes(orig); // might as well fill the IV
         System.arraycopy(orig, 0, message, 0, message.length);
         
-        OutboundGatewayProcessor p = new OutboundGatewayProcessor(_context, config);
-        p.process(message, 0, message.length);
+        InboundGatewayProcessor p = new InboundGatewayProcessor(_context, config.getConfig(0));
+        p.process(message, 0, message.length, null);
         
-        for (int i = 0; i < numHops; i++) {
+        for (int i = 1; i < numHops-1; i++) {
             HopProcessor hop = new HopProcessor(_context, config.getConfig(i));
             Hash prev = config.getConfig(i).getReceiveFrom();
-            boolean ok = hop.process(message, 0, message.length, prev);
-            if (!ok)
-                _log.error("Error processing at hop " + i);
-            //else
-            //    _log.info("Processing OK at hop " + i);
+            assertTrue(hop.process(message, 0, message.length, prev));
         }
         
-        _log.debug("After: " + Base64.encode(message, 16, orig.length-16));
-        boolean eq = DataHelper.eq(orig, 16, message, 16, orig.length - 16);
-        _log.info("equal? " + eq);
+        InboundEndpointProcessor end = new InboundEndpointProcessor(_context, config);
+        assertTrue(end.retrievePreprocessedData(message, 0, message.length, config.getPeer(numHops-2)));
+        
+        assertTrue(DataHelper.eq(orig, 16, message, 16, orig.length - 16));
     }
     
     private TunnelCreatorConfig prepareConfig(int numHops) {
@@ -59,6 +64,7 @@ public class OutboundTest {
         
         TunnelCreatorConfig config = new TunnelCreatorConfig(numHops, false);
         for (int i = 0; i < numHops; i++) {
+            config.setPeer(i, peers[i]);
             HopConfig cfg = config.getConfig(i);
             cfg.setExpiration(_context.clock().now() + 60000);
             cfg.setIVKey(_context.keyGenerator().generateSessionKey());
@@ -77,10 +83,5 @@ public class OutboundTest {
             }
         }
         return config;
-    }
-    
-    public static void main(String args[]) {
-        OutboundTest test = new OutboundTest();
-        test.runTest();
     }
 }

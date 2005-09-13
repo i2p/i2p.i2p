@@ -324,13 +324,12 @@
         <ant dir="core/java/" target="clover.report" />
     </target>
     <target name="test.report" depends="junit.report, clover.report"/>
-    <target name="useclover">
-        <taskdef resource="clovertasks"/>
-        <mkdir dir="reports/core/clover" />
-        <mkdir dir="reports/core/clover" />
-        <clover-setup initString="reports/core/clover/coverage.db"/>
-    </target>
     <target name="fulltest">
 		<ant dir="core/java/" target="fulltest" />
+		<ant dir="router/java/" target="fulltest" />
+    </target>
+    <target name="fullclovertest">
+		<ant dir="core/java/" target="fullclovertest" />
+		<ant dir="router/java/" target="fullclovertest" />
     </target>
 </project>

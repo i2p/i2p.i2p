@@ -1,4 +1,12 @@
 package net.i2p.router.tunnel;
+/*
+ * free (adj.): unencumbered; not under the control of others
+ * Written by jrandom in 2003 and released into the public domain
+ * with no warranty of any kind, either expressed or implied.
+ * It probably won't make your computer catch on fire, or eat
+ * your children, but it might.  Use at your own risk.
+ *
+ */
 
 import net.i2p.I2PAppContext;
 import net.i2p.data.Base64;
@@ -6,59 +14,39 @@ import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
 import net.i2p.util.Log;
 
+import junit.framework.TestCase;
+
 /**
- * Quick unit test for base functionality of inbound tunnel 
+ * Quick unit test for base functionality of outbound tunnel 
  * operation
+ *
  */
-public class InboundTest {
+public class OutboundTest extends TestCase{
     private I2PAppContext _context;
-    private Log _log;
     
-    public InboundTest() {
+    public void setUp() {
         _context = I2PAppContext.getGlobalContext();
-        _log = _context.logManager().getLog(InboundTest.class);
     }
     
-    public void runTest() {
+    public void testOutbound() {
         int numHops = 8;
         TunnelCreatorConfig config = prepareConfig(numHops);
-        long start = _context.clock().now();
-        for (int i = 0; i < 1; i++) 
-            runTest(numHops, config);
-        long time = _context.clock().now() - start;
-        _log.debug("Time for 1000 messages: " + time);
-    }
-    
-    private void runTest(int numHops, TunnelCreatorConfig config) {
-        byte orig[] = new byte[128];
-        byte message[] = new byte[128];
+        
+        byte orig[] = new byte[1024];
+        byte message[] = new byte[1024];
         _context.random().nextBytes(orig); // might as well fill the IV
         System.arraycopy(orig, 0, message, 0, message.length);
         
-        _log.debug("orig: \n" + Base64.encode(orig, 16, orig.length-16));
-        InboundGatewayProcessor p = new InboundGatewayProcessor(_context, config.getConfig(0));
-        p.process(message, 0, message.length, null);
+        OutboundGatewayProcessor p = new OutboundGatewayProcessor(_context, config);
+        p.process(message, 0, message.length);
         
-        for (int i = 1; i < numHops-1; i++) {
+        for (int i = 0; i < numHops; i++) {
             HopProcessor hop = new HopProcessor(_context, config.getConfig(i));
             Hash prev = config.getConfig(i).getReceiveFrom();
-            boolean ok = hop.process(message, 0, message.length, prev);
-            if (!ok)
-                _log.error("Error processing at hop " + i);
-            //else
-            //    _log.info("Processing OK at hop " + i);
+            assertTrue(hop.process(message, 0, message.length, prev));
         }
         
-        InboundEndpointProcessor end = new InboundEndpointProcessor(_context, config);
-        boolean ok = end.retrievePreprocessedData(message, 0, message.length, config.getPeer(numHops-2));
-        if (!ok) {
-            _log.error("Error retrieving cleartext at the endpoint");
-            try { Thread.sleep(5*1000); } catch (Exception e) {}
-        }
-        
-        //_log.debug("After: " + Base64.encode(message, 16, orig.length-16));
         boolean eq = DataHelper.eq(orig, 16, message, 16, orig.length - 16);
-        _log.info("equal? " + eq);
     }
     
     private TunnelCreatorConfig prepareConfig(int numHops) {
@@ -73,7 +61,7 @@ public class InboundTest {
         
         TunnelCreatorConfig config = new TunnelCreatorConfig(numHops, false);
         for (int i = 0; i < numHops; i++) {
-            config.setPeer(i, peers[i]);
+        	config.setPeer(i, peers[i]);
             HopConfig cfg = config.getConfig(i);
             cfg.setExpiration(_context.clock().now() + 60000);
             cfg.setIVKey(_context.keyGenerator().generateSessionKey());
@@ -92,10 +80,5 @@ public class InboundTest {
             }
         }
         return config;
-    }
-    
-    public static void main(String args[]) {
-        InboundTest test = new InboundTest();
-        test.runTest();
     }
 }

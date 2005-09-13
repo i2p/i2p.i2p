@@ -5,13 +5,24 @@
     <target name="builddep">
         <ant dir="../../core/java/" target="build" />
     </target>
+    <target name="builddeptest">
+        <ant dir="../../core/java/" target="jarTest" />
+    </target>
     <target name="compile">
         <mkdir dir="./build" />
         <mkdir dir="./build/obj" />
         <javac srcdir="./src" debug="true" source="1.3" target="1.3" deprecation="on" destdir="./build/obj" classpath="../../core/java/build/i2p.jar" />
     </target>
+    <target name="compileTest" depends="builddeptest">
+        <mkdir dir="./build" />
+        <mkdir dir="./build/obj" />
+        <javac srcdir="./src:./test" debug="true" source="1.3" target="1.3" deprecation="on" destdir="./build/obj" classpath="../../core/java/build/i2ptest.jar" />
+    </target>
     <target name="jar" depends="compile">
         <jar destfile="./build/router.jar" basedir="./build/obj" includes="**/*.class" />
+    </target>
+    <target name="jarTest" depends="compileTest">
+        <jar destfile="./build/routertest.jar" basedir="./build/obj" includes="**/*.class" />
     </target>
     <target name="javadoc">
         <mkdir dir="./build" />
@@ -23,6 +34,71 @@
             splitindex="true" 
             windowtitle="I2P Router" />
     </target>
+    <target name="test" depends="compileTest">
+        <junit printsummary="on" fork="yes">
+            <classpath>
+                <pathelement path="${classpath}" />
+                <pathelement location="./build/obj" />
+                <pathelement location="../../core/java/build/i2ptest.jar" />
+                <pathelement location="../../installer/lib/jbigi/jbigi.jar" />
+                <pathelement path="${ant.home}/lib/clover.jar"/>
+            </classpath>
+            <batchtest>
+                <fileset dir="./test/">
+                    <include name="**/*Test.java" />
+                </fileset>
+            </batchtest>
+            <formatter type="xml"/>
+        </junit>
+        <mkdir dir="../../reports/" />
+        <mkdir dir="../../reports/router/" />
+        <mkdir dir="../../reports/router/junit/" />
+        <delete>
+            <fileset dir="../../reports/router/junit">
+                <include name="TEST-*.xml"/>
+            </fileset>
+        </delete>
+        <copy todir="../../reports/router/junit">
+            <fileset dir=".">
+                <include name="TEST-*.xml"/>
+            </fileset>
+        </copy>
+        <delete>
+            <fileset dir=".">
+                <include name="TEST-*.xml"/>
+            </fileset>
+        </delete>
+    </target>
+    <target name="junit.report">
+        <junitreport todir="../../reports/router/junit">
+            <fileset dir="../../reports/router/junit">
+                <include name="TEST-*.xml"/>
+            </fileset>
+            <report format="frames" todir="../../reports/router/html/junit"/>
+        </junitreport>
+    </target>
+    <target name="clover.report">
+        <taskdef resource="clovertasks"/>
+        <mkdir dir="../../reports/" />
+        <mkdir dir="../../reports/router" />
+        <mkdir dir="../../reports/router/clover" />
+        <clover-setup initString="../../reports/router/clover/coverage.db"/>
+        <clover-report>
+            <current outfile="../../reports/router/html/clover">
+                <format type="html"/>
+            </current>
+        </clover-report>
+    </target>
+    <target name="test.report" depends="junit.report, clover.report"/>
+    <target name="useclover">
+        <taskdef resource="clovertasks"/>
+        <mkdir dir="../../reports/" />
+        <mkdir dir="../../reports/router/" />
+        <mkdir dir="../../reports/router/clover" />
+        <clover-setup initString="../../reports/router/clover/coverage.db"/>
+    </target>
+    <target name="fulltest" depends="cleandep, builddeptest, jarTest, test, junit.report" />
+    <target name="fullclovertest" depends="cleandep, builddeptest, useclover, jarTest, test, test.report" />
     <target name="clean">
         <delete dir="./build" />
     </target>

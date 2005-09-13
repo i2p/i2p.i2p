@@ -1,12 +1,24 @@
 package net.i2p.router.transport;
+/*
+ * free (adj.): unencumbered; not under the control of others
+ * Written by jrandom in 2003 and released into the public domain
+ * with no warranty of any kind, either expressed or implied.
+ * It probably won't make your computer catch on fire, or eat
+ * your children, but it might.  Use at your own risk.
+ *
+ */
 
 import net.i2p.router.RouterContext;
 import net.i2p.util.Log;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 
 import java.util.Random;
 import java.util.Properties;
+
+import junit.framework.TestCase;
 
 /**
  * Stress out the bandwidth limiter by running a series of push and pull tests
@@ -19,19 +31,19 @@ import java.util.Properties;
  * 10 concurrent threads is, well, slow.
  *
  */
-public class BandwidthLimiterTest {
+public class BandwidthLimiterTest extends TestCase{
     private RouterContext _context;
-    private Log _log;
-    private final static int NUM_MB = 1;
+    private final static int NUM_KB = 256;
     
-    public BandwidthLimiterTest() {
+    public void setUp() {
         _context = new RouterContext(null);
-        _log = _context.logManager().getLog(BandwidthLimiterTest.class);
-        //_context.jobQueue().runQueue(1);
     }
     
-    public void prepareLimiter(int inKBps, int outKBps, int inBurst, int outBurst) {
-        Properties props = new Properties();
+    public void tearDown(){
+    }
+    
+    private void prepareLimiter(int inKBps, int outKBps, int inBurst, int outBurst) {
+        Properties props = System.getProperties();
         props.setProperty(FIFOBandwidthRefiller.PROP_INBOUND_BANDWIDTH, ""+inKBps);
         props.setProperty(FIFOBandwidthRefiller.PROP_OUTBOUND_BANDWIDTH, ""+outKBps);
         props.setProperty(FIFOBandwidthRefiller.PROP_INBOUND_BANDWIDTH_PEAK, ""+inBurst);
@@ -39,7 +51,6 @@ public class BandwidthLimiterTest {
         //props.setProperty(TrivialBandwidthLimiter.PROP_REPLENISH_FREQUENCY, ""+10*1000);
         System.setProperties(props);
         _context.bandwidthLimiter().reinitialize();
-        _log.debug("Limiter prepared");
     }
     
     /**
@@ -48,7 +59,7 @@ public class BandwidthLimiterTest {
      * chunks.
      *
      */
-    public long testOutboundThrottle(int numBytes, int numBytesPerWrite) {
+    private long testOutboundThrottle(int numBytes, int numBytesPerWrite) {
         byte source[] = new byte[numBytesPerWrite];
         new Random().nextBytes(source);
         NullOutputStream target = new NullOutputStream();
@@ -73,7 +84,7 @@ public class BandwidthLimiterTest {
      * chunks.
      *
      */
-    public long testInboundThrottle(int numBytes, int numBytesPerRead) {
+    private long testInboundThrottle(int numBytes, int numBytesPerRead) {
         FakeInputStream source = new FakeInputStream(numBytes);
         BandwidthLimitedInputStream in = new BandwidthLimitedInputStream(_context, source, null);
         long before = System.currentTimeMillis();
@@ -95,20 +106,33 @@ public class BandwidthLimiterTest {
      *
      */
     public void testOutbound() {
+    	double error;
+    	double predict;
+    	
         prepareLimiter(-1, -1, -1, -1);
-        _log.info("Begin unlimited push of " + NUM_MB);
-        long ms = testOutboundThrottle(NUM_MB*1024*1024, 1*1024);
-        _log.info("** Unlimited pushed " + NUM_MB + "MB in " + ms + "ms");
-        prepareLimiter(-1, 4, -1, 4*1024);
-        ms = testOutboundThrottle(NUM_MB*1024*1024, 1*1024);
-        _log.info("** 4KBps pushed " + NUM_MB + "MB in " + ms + "ms");
+        long ms = testOutboundThrottle(NUM_KB*1024, 1*1024);
+        
+        /*prepareLimiter(-1, 4, -1, 4*1024);
+        ms = testOutboundThrottle(NUM_KB*1024, 1*1024);
+        predict = (NUM_KB/4)*1000;
+        error = predict/ms;
+        //assertTrue(error>.89);
+        assertTrue(error<1.05);*/
+        
         prepareLimiter(-1, 32, -1, 32*1024);
-        ms = testOutboundThrottle(NUM_MB*1024*1024, 1*1024);
-        _log.info("** 32KBps pushed " + NUM_MB + "MB in " + ms + "ms");
+        ms = testOutboundThrottle(NUM_KB*1024, 1*1024);
+        predict = (NUM_KB/32)*1000;
+        error = predict/ms;
+        //assertTrue(error>.89);
+        assertTrue(error<1.05);
+        
         prepareLimiter(-1, 256, -1, 256*1024);
-        _log.info("Begin 256KBps push of " + NUM_MB);
-        ms = testOutboundThrottle(NUM_MB*1024*1024, 1*1024);
-        _log.info("** 256KBps pushed " + NUM_MB + "MB in " + ms + "ms");
+        ms = testOutboundThrottle(NUM_KB*1024, 1*1024);
+        predict = (NUM_KB/256)*1000;
+        error = predict/ms;
+        //assertTrue(error>.89);
+        assertTrue(error<1.05);
+        
     }
     
     /**
@@ -117,52 +141,68 @@ public class BandwidthLimiterTest {
      *
      */
     public void testInbound() {
+        double predict;
+        double error;
+    	
         prepareLimiter(-1, -1, -1, -1);
-        long ms = testInboundThrottle(NUM_MB*1024*1024, 1*1024);
-        _log.info("** Unlimited pulled " + NUM_MB + "MB in " + ms + "ms");
-        prepareLimiter(4, -1, 4*1024, -1);
-        ms = testInboundThrottle(NUM_MB*1024*1024, 1*1024);
-        _log.info("** 4KBps pulled " + NUM_MB + "MB in " + ms + "ms");
+        long ms = testInboundThrottle(NUM_KB*1024, 1*1024);
+        
+        /*prepareLimiter(4, -1, 4*1024, -1);
+        ms = testInboundThrottle(NUM_KB*1024, 1*1024);
+        predict = (NUM_KB/4)*1000;
+        error = predict/ms;
+        //assertTrue(error>.89);
+        assertTrue(error<1.05);*/
+        
         prepareLimiter(32, -1, 32*1024, -1);
-        ms = testInboundThrottle(NUM_MB*1024*1024, 1*1024);
-        _log.info("** 32KBps pulled " + NUM_MB + "MB in " + ms + "ms");
+        ms = testInboundThrottle(NUM_KB*1024, 1*1024);
+        predict = (NUM_KB/32)*1000;
+        error = predict/ms;
+        //assertTrue(error>.89);
+        assertTrue(error<1.05);
+        
         prepareLimiter(256, -1, 256*1024, -1);
-        ms = testInboundThrottle(NUM_MB*1024*1024, 1*1024);
-        _log.info("** 256KBps pulled " + NUM_MB + "MB in " + ms + "ms");
+        ms = testInboundThrottle(NUM_KB*1024, 1*1024);
+        predict = (NUM_KB/256)*1000;
+        error = predict/ms;
+        //assertTrue(error>.89);
+        assertTrue(error<1.05);
+        
     }
     
     
     public void testOutboundContention() {
+    	double predict;
+    	double error;
+    	long ms;
+    	long end;
+    	long start;
+    	
         prepareLimiter(-1, -1, -1, -1);
-        long start = System.currentTimeMillis();
-        long runningTimes[] = testOutboundContention(10, NUM_MB*1024*1024);
-        long end = System.currentTimeMillis();
-        _log.info("** Done with unlimited " + NUM_MB + "MB test with 10 concurrent threads after " + (end-start) + "ms: " + displayTimes(runningTimes));
+        start = System.currentTimeMillis();
+        //long runningTimes[] = testOutboundContention(10, NUM_KB*1024);
+        end = System.currentTimeMillis();
+        
         //prepareLimiter(-1, 4, -1, 5*1024*1024);
         //start = System.currentTimeMillis();
-        //runningTimes = testOutboundContention(10, NUM_MB*1024*1024);
+        //runningTimes = testOutboundContention(10, NUM_KB*1024);
         //end = System.currentTimeMillis();
-        //_log.info("** Done with 4KBps " + NUM_MB + "MB test with 10 concurrent threads after " + (end-start) + "ms: " + displayTimes(runningTimes));
-        prepareLimiter(-1, 32, -1, 32*1024);
-        start = System.currentTimeMillis();
-        runningTimes = testOutboundContention(10, NUM_MB*1024*1024);
-        end = System.currentTimeMillis();
-        _log.info("** Done with 32KBps " + NUM_MB + "MB test with 10 concurrent threads after " + (end-start) + "ms: " + displayTimes(runningTimes));
+        
+        //prepareLimiter(-1, 32, -1, 32*1024);
+        //start = System.currentTimeMillis();
+        //runningTimes = testOutboundContention(10, NUM_KB*1024);
+        //end = System.currentTimeMillis();
+        
         prepareLimiter(-1, 256, -1, 256*1024);
         start = System.currentTimeMillis();
-        runningTimes = testOutboundContention(10, NUM_MB*1024*1024);
+        testOutboundContention(10, NUM_KB*1024);
         end = System.currentTimeMillis();
-        _log.info("** Done with 256KBps " + NUM_MB + "MB test with 10 concurrent threads after " + (end-start) + "ms: " + displayTimes(runningTimes));
-    }
-    
-    private String displayTimes(long times[]) {
-        StringBuffer rv = new StringBuffer();
-        for (int i = 0; i < times.length; i++) {
-            rv.append(times[i]);
-            if (i + 1 <= times.length)
-                rv.append(' ');
-        }
-        return rv.toString();
+        ms = end-start;
+        predict = (NUM_KB/256)*1000*10;
+        error = predict/ms;
+        //assertTrue(error>.89);
+        assertTrue(error<1.05);
+        
     }
     
     private long[] testOutboundContention(int numConcurrent, int numBytes) {
@@ -170,7 +210,7 @@ public class BandwidthLimiterTest {
         for (int i = 0; i < numConcurrent; i++) {
             threads[i] = new OutboundRunner(numBytes);
         }
-        _log.debug("Starting up outbound contention test for " + numBytes + " with " + numConcurrent + " runners");
+        
         for (int i = 0; i < numConcurrent; i++)
             threads[i].start();
         for (int i = 0; i < numConcurrent; i++) {
@@ -196,17 +236,30 @@ public class BandwidthLimiterTest {
         public void run() {
             Thread.currentThread().setName("Out" + _runnerNum);
             _runningTime = testOutboundThrottle(_numBytes, 8*1024);
-            _log.debug("Outbound runner " + _runnerNum + " pushed " + _numBytes + " in " + _runningTime + "ms");
         }
         public long getRunningTime() { return _runningTime; }
     }
-        
+}
+
+class NullOutputStream extends OutputStream {
+    public void write(int param) {}
+}
+
+class FakeInputStream extends InputStream {
+    private volatile int _numRead;
+    private int _size;
     
-    public static void main(String args[]) {
-        BandwidthLimiterTest test = new BandwidthLimiterTest();
-        test.testOutbound();
-        test.testInbound();
-        //test.testOutboundContention();
-        System.exit(0);
+    public FakeInputStream(int size) {
+        _size = size;
+        _numRead = 0;
+    }
+    public int read() {
+        int rv = 0;
+        if (_numRead >= _size) 
+            rv = -1;
+        else
+            rv = 42;
+        _numRead++;
+        return rv;
     }
 }
