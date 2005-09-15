@@ -114,6 +114,40 @@ public class UDPAddress {
             _introKeys[i] = ikey;
             _introTags[i] = tag;
         }
+        
+        int numOK = 0;
+        if (_introHosts != null) {
+            for (int i = 0; i < _introHosts.length; i++) {
+                if ( (_introKeys[i] != null) && 
+                     (_introPorts[i] > 0) &&
+                     (_introTags[i] > 0) &&
+                     (_introHosts[i] != null) )
+                    numOK++;
+            }
+            if (numOK != _introHosts.length) {
+                String hosts[] = new String[numOK];
+                int ports[] = new int[numOK];
+                long tags[] = new long[numOK];
+                byte keys[][] = new byte[numOK][];
+                int cur = 0;
+                for (int i = 0; i < _introHosts.length; i++) {
+                    if ( (_introKeys[i] != null) && 
+                         (_introPorts[i] > 0) &&
+                         (_introTags[i] > 0) &&
+                         (_introHosts[i] != null) ) {
+                        hosts[cur] = _introHosts[i];
+                        ports[cur] = _introPorts[i];
+                        tags[cur] = _introTags[i];
+                        keys[cur] = _introKeys[i];
+                    }
+                }
+                _introKeys = keys;
+                _introTags = tags;
+                _introPorts = ports;
+                _introHosts = hosts;
+                _introAddresses = new InetAddress[numOK];
+            }
+        }
     }
     
     public String getHost() { return _host; }

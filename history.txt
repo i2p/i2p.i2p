@@ -1,4 +1,8 @@
-$Id: history.txt,v 1.248 2005/09/13 04:06:07 comwiz Exp $
+$Id: history.txt,v 1.249 2005/09/13 18:02:44 jrandom Exp $
+
+2005-09-15  jrandom
+    * Error handling for failed intro packets (thanks red.hand!)
+    * More carefully verify intro addresses
 
 2005-09-13  jrandom
     * More careful error handling with introductions (thanks dust!)

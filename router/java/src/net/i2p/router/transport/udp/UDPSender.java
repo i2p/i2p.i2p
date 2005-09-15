@@ -107,6 +107,7 @@ public class UDPSender {
      * @return number of packets in the queue
      */
     public int add(UDPPacket packet) {
+        if (packet == null) return 0;
         int size = 0;
         long lifetime = -1;
         synchronized (_outboundQueue) {
