@@ -3,15 +3,18 @@ package net.i2p.syndie.sml;
 import java.io.*;
 import java.text.*;
 import java.util.*;
+import net.i2p.I2PAppContext;
 import net.i2p.data.*;
 import net.i2p.syndie.*;
 import net.i2p.syndie.data.*;
 import net.i2p.syndie.web.*;
+import net.i2p.util.Log;
 
 /**
  *
  */
 public class HTMLRenderer extends EventReceiverImpl {
+    private Log _log;
     protected SMLParser _parser;
     protected Writer _out;
     protected User _user;
@@ -31,8 +34,10 @@ public class HTMLRenderer extends EventReceiverImpl {
     protected StringBuffer _bodyBuffer;
     protected StringBuffer _postBodyBuffer;
     
-    public HTMLRenderer() {
-        _parser = new SMLParser();
+    public HTMLRenderer(I2PAppContext ctx) {
+        super(ctx);
+        _log = ctx.logManager().getLog(HTMLRenderer.class);
+        _parser = new SMLParser(ctx);
     }
 
     /**
@@ -43,7 +48,7 @@ public class HTMLRenderer extends EventReceiverImpl {
             System.err.println("Usage: HTMLRenderer smlFile outputFile");
             return;
         }
-        HTMLRenderer renderer = new HTMLRenderer();
+        HTMLRenderer renderer = new HTMLRenderer(I2PAppContext.getGlobalContext());
         Writer out = null;
         try {
             ByteArrayOutputStream baos = new ByteArrayOutputStream(1024*512);
@@ -296,7 +301,8 @@ public class HTMLRenderer extends EventReceiverImpl {
      *
      */
     public void receiveBlog(String name, String hash, String tag, long entryId, List locations, String description) {
-        System.out.println("Receiving the blog: " + name + "/" + hash + "/" + tag + "/" + entryId +"/" + locations + ": "+ description);
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("Receiving the blog: " + name + "/" + hash + "/" + tag + "/" + entryId +"/" + locations + ": "+ description);
         byte blogData[] = Base64.decode(hash);
         if ( (blogData == null) || (blogData.length != Hash.HASH_LENGTH) )
             return;
@@ -446,7 +452,8 @@ public class HTMLRenderer extends EventReceiverImpl {
             _bodyBuffer.append(getSpan("addr")).append(sanitizeString(anchorText)).append("</span>");
             _bodyBuffer.append(getSpan("addrKnownName")).append("(").append(sanitizeString(knownName)).append(")</span>");
         } else {
-            System.err.println("Receiving address [" + location + "]");
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Receiving address [" + location + "]");
             _bodyBuffer.append("<a ").append(getClass("addrAdd")).append(" href=\"addresses.jsp?");
             if (schema != null)
                 _bodyBuffer.append("network=").append(sanitizeTagParam(schema)).append('&');
@@ -829,7 +836,8 @@ public class HTMLRenderer extends EventReceiverImpl {
                 long dayBegin = _dateFormat.parse(str).getTime();
                 return str + " [" + (when - dayBegin) + "]";
             } catch (ParseException pe) {
-                pe.printStackTrace();
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("Error formatting", pe);
                 // wtf
                 return "unknown";
             }

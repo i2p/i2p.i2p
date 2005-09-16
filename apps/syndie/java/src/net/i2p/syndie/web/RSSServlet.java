@@ -8,6 +8,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.ServletException;
 
+import net.i2p.I2PAppContext;
 import net.i2p.data.*;
 import net.i2p.syndie.*;
 import net.i2p.syndie.data.*;
@@ -73,7 +74,7 @@ public class RSSServlet extends HttpServlet {
         if (count < 0) count = 10;
         if (count > 100) count = 100;
         
-        RSSRenderer r = new RSSRenderer();
+        RSSRenderer r = new RSSRenderer(I2PAppContext.getGlobalContext());
         for (int i = 0; i < count && i < entries.size(); i++) {
             BlogURI uri = (BlogURI)entries.get(i);
             EntryContainer entry = archive.getEntry(uri);

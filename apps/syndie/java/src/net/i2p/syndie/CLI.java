@@ -111,7 +111,7 @@ public class CLI {
             entryKey = new SessionKey(Base64.decode(args[5]));
         EntryContainer entry = mgr.getArchive().getEntry(new BlogURI(new Hash(Base64.decode(args[2])), id), entryKey);
         if (entry != null) {
-            HTMLRenderer renderer = new HTMLRenderer();
+            HTMLRenderer renderer = new HTMLRenderer(I2PAppContext.getGlobalContext());
             boolean summaryOnly = "true".equalsIgnoreCase(args[5]);
             boolean showImages = "true".equalsIgnoreCase(args[6]);
             try {

@@ -1,16 +1,19 @@
 package net.i2p.syndie.data;
 
 import java.util.*;
+import net.i2p.I2PAppContext;
 import net.i2p.data.*;
 import net.i2p.syndie.Archive;
+import net.i2p.util.Log;
 
 /**
  * writable archive index (most are readonly)
  */
 public class LocalArchiveIndex extends ArchiveIndex {
-    
-    public LocalArchiveIndex() {
-        super(false);
+    private Log _log;
+    public LocalArchiveIndex(I2PAppContext ctx) {
+        super(ctx, false);
+        _log = ctx.logManager().getLog(getClass());
     }
     
     public void setGeneratedOn(long when) { _generatedOn = when; }
@@ -46,7 +49,8 @@ public class LocalArchiveIndex extends ArchiveIndex {
             if (summary.blog.equals(key) && (summary.tag.equals(tag)) ) {
                 long entryId = Archive.getEntryIdFromIndexName(entry);
                 int kb = Archive.getSizeFromIndexName(entry);
-                System.out.println("Adding entry " + entryId + ", size=" + kb + "KB [" + entry + "]");
+                if (_log.shouldLog(Log.INFO))
+                    _log.info("Adding entry " + entryId + ", size=" + kb + "KB [" + entry + "]");
                 EntrySummary entrySummary = new EntrySummary(new BlogURI(key, entryId), kb);
                 for (int j = 0; j < summary.entries.size(); j++) {
                     EntrySummary cur = (EntrySummary)summary.entries.get(j);

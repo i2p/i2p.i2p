@@ -4,6 +4,7 @@ import java.io.*;
 import java.util.*;
 import net.i2p.data.*;
 import net.i2p.I2PAppContext;
+import net.i2p.util.Log;
 
 /**
  * Blog metadata.  Formatted as: <pre>
@@ -57,12 +58,14 @@ public class BlogInfo {
     public static final String EDITION = "Edition";
     
     public void load(InputStream in) throws IOException {
+        Log log = I2PAppContext.getGlobalContext().logManager().getLog(getClass());
         BufferedReader reader = new BufferedReader(new InputStreamReader(in, "UTF-8"));
         List names = new ArrayList();
         List vals = new ArrayList();
         String line = null;
         while ( (line = reader.readLine()) != null) {
-            System.err.println("Read info line [" + line + "]");
+            if (log.shouldLog(Log.DEBUG))
+                log.debug("Read info line [" + line + "]");
             line = line.trim();
             int len = line.length();
             int split = line.indexOf(':');
@@ -84,7 +87,7 @@ public class BlogInfo {
         for (int i = 0; i < _optionNames.length; i++) {
             _optionNames[i] = (String)names.get(i);
             _optionValues[i] = (String)vals.get(i);
-            System.out.println("Loaded info: [" + _optionNames[i] + "] = [" + _optionValues[i] + "]");
+            //System.out.println("Loaded info: [" + _optionNames[i] + "] = [" + _optionValues[i] + "]");
         }
         
         String keyStr = getProperty(OWNER_KEY);
@@ -119,12 +122,12 @@ public class BlogInfo {
         for (int i = 0; i < _optionNames.length; i++) {
             if (_optionNames[i].equals(name)) {
                 String val = _optionValues[i];
-                System.out.println("getProperty[" + name + "] = [" + val + "] [sz=" + val.length() +"]");
-                for (int j = 0; j < val.length(); j++) {
-                    char c = (char)val.charAt(j);
-                    if (c != (c & 0x7F))
-                        System.out.println("char " + j + ": " + (int)c);
-                }
+                //System.out.println("getProperty[" + name + "] = [" + val + "] [sz=" + val.length() +"]");
+                //for (int j = 0; j < val.length(); j++) {
+                //    char c = (char)val.charAt(j);
+                //    if (c != (c & 0x7F))
+                //        System.out.println("char " + j + ": " + (int)c);
+                //}
                 return val;
             }
         }

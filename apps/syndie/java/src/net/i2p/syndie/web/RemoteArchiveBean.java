@@ -12,11 +12,14 @@ import net.i2p.util.EepPost;
 import net.i2p.syndie.data.*;
 import net.i2p.syndie.sml.*;
 import net.i2p.syndie.*;
+import net.i2p.util.Log;
 
 /**
  *
  */
 public class RemoteArchiveBean {
+    private I2PAppContext _context;
+    private Log _log;
     private String _remoteSchema;
     private String _remoteLocation;
     private String _proxyHost;
@@ -27,6 +30,8 @@ public class RemoteArchiveBean {
     private boolean _exportCapable;
     
     public RemoteArchiveBean() {
+        _context = I2PAppContext.getGlobalContext();
+        _log = _context.logManager().getLog(RemoteArchiveBean.class);
         reinitialize();
     }
     public void reinitialize() {
@@ -311,7 +316,7 @@ public class RemoteArchiveBean {
         public void transferComplete(long alreadyTransferred, long bytesTransferred, long bytesRemaining, String url, String outputFile) {
             _statusMessages.add("Fetch of " + HTMLRenderer.sanitizeString(url) + " successful");
             _fetchIndexInProgress = false;
-            ArchiveIndex i = new ArchiveIndex(false);
+            ArchiveIndex i = new ArchiveIndex(I2PAppContext.getGlobalContext(), false);
             try {
                 i.load(_archiveFile);
                 _statusMessages.add("Archive fetched and loaded");
@@ -329,7 +334,8 @@ public class RemoteArchiveBean {
                 _statusMessages.add("Remote archive is bulk export capable");
                 _exportCapable = true;
             } else {
-                System.err.println("Header received: [" + key + "] = [" + val + "]");
+                if (_log.shouldLog(Log.DEBUG))
+                    _log.debug("Header received: [" + key + "] = [" + val + "]");
             }
         }
     }
@@ -366,7 +372,8 @@ public class RemoteArchiveBean {
                 _statusMessages.add("Blog info at " + HTMLRenderer.sanitizeString(url) + " was corrupt / invalid / forged");
             }
         } catch (IOException ioe) {
-            ioe.printStackTrace();
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Error handling metadata", ioe);
         } finally {
             if (in != null) try { in.close(); } catch (IOException ioe) {}
             info.delete();
@@ -412,7 +419,8 @@ public class RemoteArchiveBean {
                     BlogManager.instance().getArchive().regenerateIndex();
                 }
             } catch (IOException ioe) {
-                ioe.printStackTrace();
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("Error importing", ioe);
             } finally {
                 if (in != null) try { in.close(); } catch (IOException ioe) {}
                 file.delete();
@@ -491,7 +499,8 @@ public class RemoteArchiveBean {
                 
                 BlogManager.instance().getArchive().regenerateIndex();
             } catch (IOException ioe) {
-                ioe.printStackTrace();
+                if (_log.shouldLog(Log.WARN))
+                    _log.debug("Error importing", ioe);
                 _statusMessages.add("Error importing from " + HTMLRenderer.sanitizeString(url) + ": " + ioe.getMessage());
             } finally {
                 if (zi != null) try { zi.close(); } catch (IOException ioe) {}

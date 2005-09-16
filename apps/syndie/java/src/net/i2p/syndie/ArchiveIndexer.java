@@ -16,7 +16,7 @@ class ArchiveIndexer {
     private static final int RECENT_ENTRY_COUNT = 10;
     
     public static ArchiveIndex index(I2PAppContext ctx, Archive source) {
-        LocalArchiveIndex rv = new LocalArchiveIndex();
+        LocalArchiveIndex rv = new LocalArchiveIndex(ctx);
         rv.setGeneratedOn(ctx.clock().now());
         
         File rootDir = source.getArchiveDir();
@@ -54,7 +54,7 @@ class ArchiveIndexer {
         long totalSize = 0;
         int newBlogs = 0;
         
-        SMLParser parser = new SMLParser();
+        SMLParser parser = new SMLParser(ctx);
         
         for (int i = 0; i < blogs.size(); i++) {
             BlogInfo cur = (BlogInfo)blogs.get(i);

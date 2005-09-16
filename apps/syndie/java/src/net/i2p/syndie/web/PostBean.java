@@ -2,14 +2,18 @@ package net.i2p.syndie.web;
 
 import java.io.*;
 import java.util.*;
+import net.i2p.I2PAppContext;
 import net.i2p.syndie.*;
 import net.i2p.syndie.data.BlogURI;
 import net.i2p.syndie.sml.HTMLPreviewRenderer;
+import net.i2p.util.Log;
 
 /**
  *
  */
 public class PostBean {
+    private I2PAppContext _context;
+    private Log _log;
     private User _user;
     private String _subject;
     private String _tags;
@@ -22,10 +26,15 @@ public class PostBean {
     private List _fileTypes;
     private boolean _previewed;
     
-    public PostBean() { reinitialize(); }
+    public PostBean() { 
+        _context = I2PAppContext.getGlobalContext();
+        _log = _context.logManager().getLog(PostBean.class);
+        reinitialize(); 
+    }
     
     public void reinitialize() {
-        System.out.println("Reinitializing " + (_text != null ? "(with " + _text.length() + " bytes of sml!)" : ""));
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("Reinitializing " + (_text != null ? "(with " + _text.length() + " bytes of sml!)" : ""));
         _user = null;
         _subject = null;
         _tags = null;
@@ -86,10 +95,12 @@ public class PostBean {
         }
         BlogURI uri = BlogManager.instance().createBlogEntry(_user, _subject, _tags, _headers, _text, 
                                                              _filenames, localStreams, _fileTypes);
-        System.err.println("Posted the entry " + uri.toString() + " (archive = " + _archive + ")");
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("Posted the entry " + uri.toString() + " (archive = " + _archive + ")");
         if ( (uri != null) && (_user.getAllowAccessRemote()) ) {
             PetName pn = _user.getPetNameDB().get(_archive);
-            System.err.println("Archive to petname? " + pn + " (protocol: " + (pn != null ? pn.getProtocol() : "") + ")");
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Archive to petname? " + pn + " (protocol: " + (pn != null ? pn.getProtocol() : "") + ")");
             if ( (pn != null) && ("syndiearchive".equals(pn.getProtocol())) ) {
                 RemoteArchiveBean r = new RemoteArchiveBean();
                 Map params = new HashMap();
@@ -98,24 +109,29 @@ public class PostBean {
                 String port = BlogManager.instance().getDefaultProxyPort();
                 int proxyPort = 4444;
                 try { proxyPort = Integer.parseInt(port); } catch (NumberFormatException nfe) {}
-                System.err.println("Posting the entry " + uri.toString() + " to " + pn.getLocation());
+                if (_log.shouldLog(Log.DEBUG))
+                    _log.debug("Posting the entry " + uri.toString() + " to " + pn.getLocation());
                 r.postSelectedEntries(_user, params, proxyHost, proxyPort, pn.getLocation());
-                System.err.println("Post status: " + r.getStatus());
+                if (_log.shouldLog(Log.DEBUG))
+                    _log.debug("Post status: " + r.getStatus());
             }
         }
         return uri;
     }
     
     public void renderPreview(Writer out) throws IOException {
-        System.out.println("Subject: " + _subject);
-        System.out.println("Text: " + _text);
-        System.out.println("Headers: " + _headers);
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("Subject: " + _subject);
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("Text: " + _text);
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("Headers: " + _headers);
         // cache all the _fileStreams into temporary files, storing those files in _localFiles
         // then render the page accordingly with an HTMLRenderer, altered to use a different 
         // 'view attachment'
         cacheAttachments();
         String smlContent = renderSMLContent();
-        HTMLPreviewRenderer r = new HTMLPreviewRenderer(_filenames, _fileTypes, _localFiles);
+        HTMLPreviewRenderer r = new HTMLPreviewRenderer(_context, _filenames, _fileTypes, _localFiles);
         r.render(_user, BlogManager.instance().getArchive(), null, smlContent, out, false, true);
         _previewed = true;
     }
@@ -149,7 +165,8 @@ public class PostBean {
             o.close();
             in.close();
             _localFiles.add(f);
-            System.out.println("Caching attachment " + i + " temporarily in " 
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Caching attachment " + i + " temporarily in " 
                                + f.getAbsolutePath() + " w/ " + f.length() + "bytes");
         }
         _fileStreams.clear();

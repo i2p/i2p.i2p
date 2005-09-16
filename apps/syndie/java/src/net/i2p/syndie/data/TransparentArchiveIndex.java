@@ -12,7 +12,7 @@ import net.i2p.syndie.BlogManager;
  * Simple read-only summary of an archive, proxied to the BlogManager's instance
  */
 public class TransparentArchiveIndex extends ArchiveIndex {
-    public TransparentArchiveIndex() { super(false); }
+    public TransparentArchiveIndex() { super(I2PAppContext.getGlobalContext(), false); }
     
     private static ArchiveIndex index() { return BlogManager.instance().getArchive().getIndex(); }
     

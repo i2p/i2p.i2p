@@ -3,6 +3,7 @@ package net.i2p.syndie.sml;
 import java.io.*;
 import java.util.*;
 import java.text.SimpleDateFormat;
+import net.i2p.I2PAppContext;
 import net.i2p.data.*;
 import net.i2p.syndie.*;
 import net.i2p.syndie.data.*;
@@ -11,6 +12,10 @@ import net.i2p.syndie.data.*;
  *
  */
 public class RSSRenderer extends HTMLRenderer {
+    
+    public RSSRenderer(I2PAppContext ctx) {
+        super(ctx);
+    }
     
     public void render(User user, Archive archive, EntryContainer entry, String urlPrefix, Writer out) throws IOException {
         if (entry == null) return;

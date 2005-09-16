@@ -6,6 +6,7 @@ import java.util.zip.*;
 
 import net.i2p.data.*;
 import net.i2p.I2PAppContext;
+import net.i2p.util.Log;
 
 /**
  * Securely wrap up an entry and any attachments.  Container format:<pre>
@@ -166,7 +167,9 @@ public class EntryContainer {
     }
     
     public void seal(I2PAppContext ctx, SigningPrivateKey signingKey, SessionKey entryKey) throws IOException {
-        System.out.println("Sealing " + _entryURI);
+        Log l = ctx.logManager().getLog(getClass());
+        if (l.shouldLog(Log.DEBUG))
+            l.debug("Sealing " + _entryURI);
         if (entryKey == null)
             _format = FORMAT_ZIP_UNENCRYPTED;
         else
@@ -272,10 +275,13 @@ public class EntryContainer {
         for (int i = 0; i < attachments.size(); i++) {
             byte data[] = (byte[])attachments.get(ZIP_ATTACHMENT_PREFIX + i + ZIP_ATTACHMENT_SUFFIX);
             byte metadata[] = (byte[])attachmentMeta.get(ZIP_ATTACHMENT_META_PREFIX + i + ZIP_ATTACHMENT_META_SUFFIX);
-            if ( (data != null) && (metadata != null) )
+            if ( (data != null) && (metadata != null) ) {
                 _attachments[i] = new Attachment(data, metadata);
-            else
-                System.out.println("Unable to get " + i + ": " + data + "/" + metadata);
+            } else {
+                Log l = ctx.logManager().getLog(getClass());
+                if (l.shouldLog(Log.WARN))
+                    l.warn("Unable to get " + i + ": " + data + "/" + metadata);
+            }
         }
         
         //System.out.println("Attachments: " + _attachments.length + "/" + attachments.size() + ": " + attachments);
@@ -348,8 +354,6 @@ public class EntryContainer {
         String idVal = getHeader(HEADER_ENTRYID);
         
         if (keyHash == null) {
-            System.err.println("Headers: " + _rawKeys);
-            System.err.println("Values : " + _rawValues);
             throw new IOException("Missing " + HEADER_BLOGKEY + " header");
         }
         
@@ -358,8 +362,6 @@ public class EntryContainer {
             try {
                 entryId = Long.parseLong(idVal.trim());
             } catch (NumberFormatException nfe) {
-                System.err.println("Headers: " + _rawKeys);
-                System.err.println("Values : " + _rawValues);
                 throw new IOException("Invalid format of entryId (" + idVal + ")");
             }
         }

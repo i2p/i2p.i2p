@@ -7,11 +7,14 @@ import net.i2p.I2PAppContext;
 import net.i2p.data.*;
 import net.i2p.syndie.Archive;
 import net.i2p.syndie.BlogManager;
+import net.i2p.util.Log;
 
 /**
  * Simple read-only summary of an archive
  */
 public class ArchiveIndex {
+    private I2PAppContext _context;
+    private Log _log;
     protected String _version;
     protected long _generatedOn;
     protected int _allBlogs;
@@ -31,9 +34,14 @@ public class ArchiveIndex {
     protected Properties _headers;
     
     public ArchiveIndex() {
-        this(false); //true);
+        this(I2PAppContext.getGlobalContext(), false);
     }
-    public ArchiveIndex(boolean shouldLoad) {
+    public ArchiveIndex(I2PAppContext ctx) {
+        this(ctx, false); //true);
+    }
+    public ArchiveIndex(I2PAppContext ctx, boolean shouldLoad) {
+        _context = ctx;
+        _log = ctx.logManager().getLog(ArchiveIndex.class);
         _blogs = new ArrayList();
         _newestBlogs = new ArrayList();
         _newestEntries = new ArrayList();
@@ -278,7 +286,8 @@ public class ArchiveIndex {
             }
             if (tag != null) {
                 if (!tag.equals(summary.tag)) {
-                    System.out.println("Tag [" + summary.tag + "] does not match the requested [" + tag + "] in " + summary.blog.toBase64());
+                    if (_log.shouldLog(Log.DEBUG))
+                        _log.debug("Tag [" + summary.tag + "] does not match the requested [" + tag + "] in " + summary.blog.toBase64());
                     if (false) {
                         StringBuffer b = new StringBuffer(tag.length()*2);
                         for (int j = 0; j < tag.length(); j++) {
@@ -290,7 +299,8 @@ public class ArchiveIndex {
                                 b.append('_');
                             b.append(' ');
                         }
-                        System.out.println("tag.summary: " + b.toString());
+                        if (_log.shouldLog(Log.DEBUG))
+                            _log.debug("tag.summary: " + b.toString());
                     }
                     continue;
                 }

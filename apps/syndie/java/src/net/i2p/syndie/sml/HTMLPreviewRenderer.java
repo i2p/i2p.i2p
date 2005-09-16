@@ -3,6 +3,7 @@ package net.i2p.syndie.sml;
 import java.io.*;
 import java.text.*;
 import java.util.*;
+import net.i2p.I2PAppContext;
 import net.i2p.data.*;
 import net.i2p.syndie.*;
 import net.i2p.syndie.data.*;
@@ -16,8 +17,8 @@ public class HTMLPreviewRenderer extends HTMLRenderer {
     private List _fileTypes;
     private List _files;
     
-    public HTMLPreviewRenderer(List filenames, List fileTypes, List files) {
-        super();
+    public HTMLPreviewRenderer(I2PAppContext ctx, List filenames, List fileTypes, List files) {
+        super(ctx);
         _filenames = filenames;
         _fileTypes = fileTypes;
         _files = files;

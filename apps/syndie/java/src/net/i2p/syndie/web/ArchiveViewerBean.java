@@ -297,12 +297,12 @@ public class ArchiveViewerBean {
             if (selector != null) {
                 if (selector.startsWith(SEL_BLOG)) {
                     String blogStr = selector.substring(SEL_BLOG.length());
-                    System.out.println("Selector [" + selector + "] blogString: [" + blogStr + "]");
+                    //System.out.println("Selector [" + selector + "] blogString: [" + blogStr + "]");
                     byte h[] = Base64.decode(blogStr);
                     if (h != null)
                         blog = new Hash(h);
-                    else
-                        System.out.println("blog string does not decode properly: [" + blogStr + "]");
+                    //else
+                    //    System.out.println("blog string does not decode properly: [" + blogStr + "]");
                 } else if (selector.startsWith(SEL_BLOGTAG)) {
                     int tagStart = selector.lastIndexOf('/');
                     String blogStr = selector.substring(SEL_BLOGTAG.length(), tagStart);
@@ -319,7 +319,7 @@ public class ArchiveViewerBean {
                         rawDecode = Base64.decode(tag);
                         tag = DataHelper.getUTF8(rawDecode);
                     }
-                    System.out.println("Selector [" + selector + "] blogString: [" + blogStr + "] tag: [" + tag + "]");
+                    //System.out.println("Selector [" + selector + "] blogString: [" + blogStr + "] tag: [" + tag + "]");
                     if (false && tag != null) {
                         StringBuffer b = new StringBuffer(tag.length()*2);
                         for (int j = 0; j < tag.length(); j++) {
@@ -332,7 +332,7 @@ public class ArchiveViewerBean {
                         for (int j = 0; j < origTag.length(); j++) {
                             b.append((int)origTag.charAt(j)).append(' ');
                         }
-                        System.out.println("selected tag: " + b.toString());
+                        //System.out.println("selected tag: " + b.toString());
                     }
                 } else if (selector.startsWith(SEL_TAG)) {
                     tag = selector.substring(SEL_TAG.length());
@@ -341,7 +341,7 @@ public class ArchiveViewerBean {
                         rawDecode = Base64.decode(tag);
                         tag = DataHelper.getUTF8(rawDecode);
                     }
-                    System.out.println("Selector [" + selector + "] tag: [" + tag + "]");
+                    //System.out.println("Selector [" + selector + "] tag: [" + tag + "]");
                     if (false && tag != null) {
                         StringBuffer b = new StringBuffer(tag.length()*2);
                         for (int j = 0; j < tag.length(); j++) {
@@ -350,7 +350,7 @@ public class ArchiveViewerBean {
                                 b.append('.').append((int)rawDecode[j]);
                             b.append(' ');
                         }
-                        System.out.println("selected tag: " + b.toString());
+                        //System.out.println("selected tag: " + b.toString());
                     }
                 } else if (selector.startsWith(SEL_ENTRY)) {
                     int entryStart = selector.lastIndexOf('/');
@@ -361,13 +361,13 @@ public class ArchiveViewerBean {
                         Hash h = new Hash(Base64.decode(blogStr));
                         if (h.getData() != null)
                             blog = h;
-                        else
-                            System.out.println("Blog does not decode [" + blogStr + "]");
-                        System.out.println("Selector [" + selector + "] blogString: [" + blogStr + "] entry: [" + entry + "]");
+                        //else
+                        //    System.out.println("Blog does not decode [" + blogStr + "]");
+                        //System.out.println("Selector [" + selector + "] blogString: [" + blogStr + "] entry: [" + entry + "]");
                     } catch (NumberFormatException nfe) {}
                 } else if (selector.startsWith(SEL_GROUP)) {
                     group = DataHelper.getUTF8(Base64.decode(selector.substring(SEL_GROUP.length())));
-                    System.out.println("Selector [" + selector + "] group: [" + group + "]");
+                    //System.out.println("Selector [" + selector + "] group: [" + group + "]");
                 }
             }
         }
@@ -380,10 +380,10 @@ public class ArchiveViewerBean {
             archive.regenerateIndex();
         ArchiveIndex index = archive.getIndex();
         List entries = pickEntryURIs(user, index, blog, tag, entryId, group);
-        System.out.println("Searching for " + blog + "/" + tag + "/" + entryId + "/" + pageNum + "/" + numPerPage + "/" + group);
-        System.out.println("Entry URIs: " + entries);
+        //System.out.println("Searching for " + blog + "/" + tag + "/" + entryId + "/" + pageNum + "/" + numPerPage + "/" + group);
+        //System.out.println("Entry URIs: " + entries);
         
-        HTMLRenderer renderer = new HTMLRenderer();
+        HTMLRenderer renderer = new HTMLRenderer(I2PAppContext.getGlobalContext());
         int start = pageNum * numPerPage;
         int end = start + numPerPage;
         int pages = 1;
@@ -407,7 +407,7 @@ public class ArchiveViewerBean {
                         prevURL = HTMLRenderer.getPageURL(blog, tag, entryId, group, numPerPage, pageNum-1, expandEntries, showImages);
                     else
                         prevURL = HTMLRenderer.getPageURL(user, selector, numPerPage, pageNum-1);
-                    System.out.println("prevURL: " + prevURL);
+                    //System.out.println("prevURL: " + prevURL);
                     out.write(" <a class=\"b_selectorPrevMore\" href=\"" + prevURL + "\">&lt;&lt;</a>");
                 } else {
                     out.write(" <span class=\"b_selectorPrevNone\">&lt;&lt;</span> ");
@@ -419,7 +419,7 @@ public class ArchiveViewerBean {
                         nextURL = HTMLRenderer.getPageURL(blog, tag, entryId, group, numPerPage, pageNum+1, expandEntries, showImages);
                     else
                         nextURL = HTMLRenderer.getPageURL(user, selector, numPerPage, pageNum+1);
-                    System.out.println("nextURL: " + nextURL);
+                    //System.out.println("nextURL: " + nextURL);
                     out.write(" <a class=\"b_selectorNextMore\" href=\"" + nextURL + "\">&gt;&gt;</a>");
                 } else {
                     out.write(" <span class=\"b_selectorNextNone\">&gt;&gt;</span>");
@@ -451,7 +451,7 @@ public class ArchiveViewerBean {
             out.write(afterPagination);
         
         if (entries.size() <= 0) end = -1;
-        System.out.println("Entries.size: " + entries.size() + " start=" + start + " end=" + end);
+        //System.out.println("Entries.size: " + entries.size() + " start=" + start + " end=" + end);
         for (int i = start; i < end; i++) {
             BlogURI uri = (BlogURI)entries.get(i);
             EntryContainer c = archive.getEntry(uri);
@@ -479,7 +479,7 @@ public class ArchiveViewerBean {
         if ( (group != null) && (user != null) ) {
             List selectors = (List)user.getBlogGroups().get(group);
             if (selectors != null) {
-                System.out.println("Selectors for group " + group + ": " + selectors);
+                //System.out.println("Selectors for group " + group + ": " + selectors);
                 for (int i = 0; i < selectors.size(); i++) {
                     String sel = (String)selectors.get(i);
                     Selector s = new Selector(sel);

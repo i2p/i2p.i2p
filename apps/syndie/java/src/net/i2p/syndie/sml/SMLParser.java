@@ -3,6 +3,8 @@ package net.i2p.syndie.sml;
 import java.lang.String;
 import java.util.*;
 import net.i2p.syndie.data.*;
+import net.i2p.I2PAppContext;
+import net.i2p.util.Log;
 
 /**
  * Parse out the SML from the text, firing off info to the receiver whenever certain 
@@ -12,6 +14,7 @@ import net.i2p.syndie.data.*;
  * 
  */
 public class SMLParser {
+    private Log _log;
     private static final char TAG_BEGIN = '[';
     private static final char TAG_END = ']';
     private static final char LT = '<';
@@ -23,6 +26,10 @@ public class SMLParser {
     private static final char NL = '\n';
     private static final char CR = '\n';
     private static final char LF = '\f';
+    
+    public SMLParser(I2PAppContext ctx) {
+        _log = ctx.logManager().getLog(SMLParser.class);
+    }
 
     public void parse(String rawSML, EventReceiver receiver) {
         receiver.receiveBegin();
@@ -273,7 +280,8 @@ public class SMLParser {
         } else if (T_ATTACHMENT.equals(tagName)) {
             receiver.receiveAttachment((int)getLong(P_ATTACHMENT_ID, attr), body);
         } else {
-            System.out.println("need to learn how to parse the tag [" + tagName + "]");
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("need to learn how to parse the tag [" + tagName + "]");
         }
     }
     
@@ -437,7 +445,8 @@ public class SMLParser {
         test("A: B\n\n[b]This[/b] is [i]special[/i][cut]why?[/cut][u]because I say so[/u].\neven if you dont care");
     }
     private static void test(String rawSML) {
-        SMLParser parser = new SMLParser();
-        parser.parse(rawSML, new EventReceiverImpl());
+        I2PAppContext ctx = I2PAppContext.getGlobalContext();
+        SMLParser parser = new SMLParser(ctx);
+        parser.parse(rawSML, new EventReceiverImpl(ctx));
     }
 }
