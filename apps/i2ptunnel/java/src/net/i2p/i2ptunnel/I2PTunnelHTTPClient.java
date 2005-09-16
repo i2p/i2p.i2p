@@ -369,6 +369,13 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
                 }
                 
                 if (line.length() == 0) {
+                    
+                    String ok = getTunnel().getContext().getProperty("i2ptunnel.gzip");
+                    boolean gzip = true;
+                    if (ok != null)
+                        gzip = Boolean.valueOf(ok).booleanValue();
+                    if (gzip)
+                        newRequest.append("Accept-Encoding: x-i2p-gzip\r\n");
                     newRequest.append("User-Agent: MYOB/6.66 (AN/ON)\r\n");
                     newRequest.append("Connection: close\r\n\r\n");
                     break;

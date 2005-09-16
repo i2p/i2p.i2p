@@ -1,4 +1,20 @@
-$Id: history.txt,v 1.249 2005/09/13 18:02:44 jrandom Exp $
+$Id: history.txt,v 1.250 2005/09/15 00:39:31 jrandom Exp $
+
+2005-09-16  jrandom
+    * Added the i2p.exe and i2pinstall.exe for windows users, using launch4j.
+    * Added runplain.sh for *nix/osx users having problems using the java
+      service wrapper (called from the install dir as: sh runplain.sh)
+    * Bundle susidns and syndie, with links on the top nav
+    * Have I2PTunnelHTTPClient and I2PTunnelHTTPServer use the x-i2p-gzip 
+      content-encoding (if offered), reducing the payload size before it
+      reaches the streaming lib.  The existing compression is at the i2cp
+      level, so we've been packetizing 4KB of uncompressed data and then
+      compressing those messages, rather than compressing and then packetizing
+      4KB of compressed data.  This should reduce the number of round trips
+      to fetch web pages substantially.
+    * Adjust the startup and timing of the addressbook so that susidns always
+      has config to work off, and expose a method for susidns to tell it to
+      reload its config and rerun.
 
 2005-09-15  jrandom
     * Error handling for failed intro packets (thanks red.hand!)

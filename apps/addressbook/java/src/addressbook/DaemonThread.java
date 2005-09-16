@@ -44,10 +44,10 @@ public class DaemonThread extends Thread {
      * @see java.lang.Runnable#run()
      */
     public void run() {
-        try {
-            Thread.sleep(5 * 60 * 1000);
-        } catch (InterruptedException exp) {
-        }
+        //try {
+        //    Thread.sleep(5 * 60 * 1000);
+        //} catch (InterruptedException exp) {
+        //}
         Daemon.main(this.args);
     }
 }

@@ -64,6 +64,7 @@ rm -rf ./icons
 rm -rf ./lib/wrapper
 rm -f ./lib/*.dll
 rm -f ./*.bat
+rm -f ./*.exe
 ./i2prouter start
 exit 0
 

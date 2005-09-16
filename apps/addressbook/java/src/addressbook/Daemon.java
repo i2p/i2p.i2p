@@ -36,6 +36,7 @@ import java.io.File;
  */
 public class Daemon {
     public static final String VERSION = "2.0.3";
+    private static final Daemon _instance = new Daemon();
     
     /**
      * Update the router and published address books using remote data from the
@@ -56,7 +57,7 @@ public class Daemon {
      * @param log
      *            The log to write changes and conflicts to.
      */
-    public static void update(AddressBook master, AddressBook router,
+    public void update(AddressBook master, AddressBook router,
             File published, SubscriptionList subscriptions, Log log) {
         router.merge(master, true, null);
         Iterator iter = subscriptions.iterator();
@@ -77,7 +78,7 @@ public class Daemon {
      * @param home
      *            The directory containing addressbook's configuration files.
      */
-    public static void update(Map settings, String home) {
+    public void update(Map settings, String home) {
         File masterFile = new File(home, (String) settings
                 .get("master_addressbook"));
         File routerFile = new File(home, (String) settings
@@ -104,7 +105,7 @@ public class Daemon {
                 .get("proxy_host"), Integer.parseInt((String) settings.get("proxy_port")));
         Log log = new Log(logFile);
 
-        Daemon.update(master, router, published, subscriptions, log);
+        update(master, router, published, subscriptions, log);
     }
 
     /**
@@ -118,6 +119,10 @@ public class Daemon {
      *            others are ignored.
      */
     public static void main(String[] args) {
+        _instance.run(args);
+    }
+    
+    public void run(String[] args) {
         String settingsLocation = "config.txt";
         Map settings = new HashMap();
         String home;
@@ -151,19 +156,36 @@ public class Daemon {
         
         File settingsFile = new File(homeFile, settingsLocation);
         
+        settings = ConfigParser.parse(settingsFile, defaultSettings);
+        // wait
+        try {
+            Thread.currentThread().sleep(5*60*1000);
+        } catch (InterruptedException ie) {}
+        
         while (true) {
-            settings = ConfigParser.parse(settingsFile, defaultSettings);
-
             long delay = Long.parseLong((String) settings.get("update_delay"));
             if (delay < 1) {
                 delay = 1;
             }
             
-            Daemon.update(settings, home);
+            update(settings, home);
             try {
-                Thread.sleep(delay * 60 * 60 * 1000);
+                synchronized (this) {
+                    wait(delay * 60 * 60 * 1000);
+                }
             } catch (InterruptedException exp) {
             }
+            settings = ConfigParser.parse(settingsFile, defaultSettings);
+        }
+    }
+ 
+    /**
+     * Call this to get the addressbook to reread its config and 
+     * refetch its subscriptions.
+     */
+    public static void wakeup() {
+        synchronized (_instance) {
+            _instance.notifyAll();
         }
     }
 }

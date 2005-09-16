@@ -3,14 +3,13 @@
  */
 package net.i2p.i2ptunnel;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.net.SocketException;
 import java.util.Iterator;
 import java.util.Properties;
+import java.util.zip.GZIPOutputStream;
 
 import net.i2p.I2PAppContext;
 import net.i2p.I2PException;
@@ -24,7 +23,9 @@ import net.i2p.util.Log;
 /**
  * Simple extension to the I2PTunnelServer that filters the HTTP
  * headers sent from the client to the server, replacing the Host
- * header with whatever this instance has been configured with.
+ * header with whatever this instance has been configured with, and
+ * if the browser set Accept-encoding: x-i2p-gzip, gzip the http 
+ * message body and set Content-encoding: x-i2p-gzip.
  *
  */
 public class I2PTunnelHTTPServer extends I2PTunnelServer {
@@ -62,14 +63,35 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
         try {
             // give them 5 seconds to send in the HTTP request
             socket.setReadTimeout(5*1000);
-            String modifiedHeader = getModifiedHeader(socket);
+
+            InputStream in = socket.getInputStream();
+
+            StringBuffer command = new StringBuffer(128);
+            Properties headers = readHeaders(in, command);
+            headers.setProperty("Host", _spoofHost);
+            headers.setProperty("Connection", "close");
+            String modifiedHeader = formatHeaders(headers, command);
+            
+            //String modifiedHeader = getModifiedHeader(socket);
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Modified header: [" + modifiedHeader + "]");
 
             socket.setReadTimeout(readTimeout);
             Socket s = new Socket(remoteHost, remotePort);
             afterSocket = getTunnel().getContext().clock().now();
-            new I2PTunnelRunner(s, socket, slock, null, modifiedHeader.getBytes(), null);
+            // instead of i2ptunnelrunner, use something that reads the HTTP 
+            // request from the socket, modifies the headers, sends the request to the 
+            // server, reads the response headers, rewriting to include Content-encoding: x-i2p-gzip
+            // if it was one of the Accept-encoding: values, and gzip the payload       
+            String enc = headers.getProperty("Accept-encoding");
+            if (_log.shouldLog(Log.INFO))
+                _log.info("HTTP server encoding header: " + enc);
+            if ( (enc != null) && (enc.indexOf("x-i2p-gzip") >= 0) ) {
+                I2PThread req = new I2PThread(new CompressedRequestor(s, socket, modifiedHeader), "http compressor");
+                req.start();
+            } else {
+                new I2PTunnelRunner(s, socket, slock, null, modifiedHeader.getBytes(), null);
+            }
         } catch (SocketException ex) {
             try {
                 socket.close();
@@ -88,17 +110,107 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
         if ( (timeToHandle > 1000) && (_log.shouldLog(Log.WARN)) )
             _log.warn("Took a while to handle the request [" + timeToHandle + ", socket create: " + (afterSocket-afterAccept) + "]");
     }
-
-    private String getModifiedHeader(I2PSocket handleSocket) throws IOException {
-        InputStream in = handleSocket.getInputStream();
-
-        StringBuffer command = new StringBuffer(128);
-        Properties headers = readHeaders(in, command);
-        headers.setProperty("Host", _spoofHost);
-        headers.setProperty("Connection", "close");
-        return formatHeaders(headers, command);
-    }
     
+    private class CompressedRequestor implements Runnable {
+        private Socket _webserver;
+        private I2PSocket _browser;
+        private String _headers;
+        public CompressedRequestor(Socket webserver, I2PSocket browser, String headers) {
+            _webserver = webserver;
+            _browser = browser;
+            _headers = headers;
+        }
+        public void run() {
+            if (_log.shouldLog(Log.INFO))
+                _log.info("Compressed requestor running");
+            OutputStream serverout = null;
+            OutputStream browserout = null;
+            InputStream browserin = null;
+            InputStream serverin = null;
+            try {
+                serverout = _webserver.getOutputStream();
+                
+                if (_log.shouldLog(Log.INFO))
+                    _log.info("request headers: " + _headers);
+                serverout.write(_headers.getBytes());
+                browserin = _browser.getInputStream();
+                I2PThread sender = new I2PThread(new Sender(serverout, browserin, "server: browser to server"), "http compressed sender");
+                sender.start();
+                
+                browserout = _browser.getOutputStream();
+                serverin = _webserver.getInputStream(); 
+                Sender s = new Sender(new CompressedResponseOutputStream(browserout), serverin, "server: server to browser");
+                if (_log.shouldLog(Log.INFO))
+                    _log.info("Before pumping the compressed response");
+                s.run(); // same thread
+                if (_log.shouldLog(Log.INFO))
+                    _log.info("After pumping the compressed response");
+            } catch (IOException ioe) {
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("error compressing", ioe);
+            } finally {
+                if (browserout != null) try { browserout.close(); } catch (IOException ioe) {}
+                if (serverout != null) try { serverout.close(); } catch (IOException ioe) {}
+                if (browserin != null) try { browserin.close(); } catch (IOException ioe) {}
+                if (serverin != null) try { serverin.close(); } catch (IOException ioe) {}
+            }
+        }
+    }
+    private class Sender implements Runnable {
+        private OutputStream _out;
+        private InputStream _in;
+        private String _name;
+        public Sender(OutputStream out, InputStream in, String name) {
+            _out = out;
+            _in = in;
+            _name = name;
+        }
+        public void run() {
+            if (_log.shouldLog(Log.INFO))
+                _log.info(_name + ": Begin sending");
+            try {
+                byte buf[] = new byte[4096];
+                int read = 0;
+                int total = 0;
+                while ( (read = _in.read(buf)) != -1) {
+                    if (_log.shouldLog(Log.INFO))
+                        _log.info(_name + ": read " + read + " and sending through the stream");
+                    _out.write(buf, 0, read);
+                    total += read;
+                }
+                if (_log.shouldLog(Log.INFO))
+                    _log.info(_name + ": Done sending: " + total);
+                _out.flush();
+            } catch (IOException ioe) {
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("Error sending", ioe);
+            } finally {
+                if (_in != null) try { _in.close(); } catch (IOException ioe) {}
+                if (_out != null) try { _out.close(); } catch (IOException ioe) {}
+            }
+        }
+    }
+    private class CompressedResponseOutputStream extends HTTPResponseOutputStream {
+        public CompressedResponseOutputStream(OutputStream o) {
+            super(o);
+        }
+        
+        protected boolean shouldCompress() { return true; }
+        protected void finishHeaders() throws IOException {
+            if (_log.shouldLog(Log.INFO))
+                _log.info("Including x-i2p-gzip as the content encoding in the response");
+            out.write("Content-encoding: x-i2p-gzip\n".getBytes());
+            super.finishHeaders();
+        }
+
+        protected void beginProcessing() throws IOException {
+            if (_log.shouldLog(Log.INFO))
+                _log.info("Beginning compression processing");
+            out.flush();
+            out = new GZIPOutputStream(out);
+        }
+    }
+
     private String formatHeaders(Properties headers, StringBuffer command) {
         StringBuffer buf = new StringBuffer(command.length() + headers.size() * 64);
         buf.append(command.toString()).append('\n');
@@ -133,6 +245,8 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
                 if (split <= 0) throw new IOException("Invalid HTTP header, missing colon [" + buf.toString() + "]");
                 String name = buf.substring(0, split);
                 String value = buf.substring(split+2); // ": "
+                if ("Accept-encoding".equalsIgnoreCase(name))
+                    name = "Accept-encoding";
                 headers.setProperty(name, value);
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("Read the header [" + name + "] = [" + value + "]");

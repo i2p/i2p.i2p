@@ -1,0 +1,20 @@
+<launch4jConfig>
+  <headerType>0</headerType>
+  <jar>../install.jar</jar>
+  <outfile>../i2pinstall.exe</outfile>
+  <errTitle>I2P Installer</errTitle>
+  <chdir>.</chdir>
+  <customProcName>false</customProcName>
+  <!--<icon>SimpleApp.ico</icon>-->
+  <jre>
+    <minVersion>1.4.0</minVersion>
+  </jre>
+  <!--
+  <splash>
+    <file>splash.bmp</file>
+    <waitForWindow>true</waitForWindow>
+    <timeout>60</timeout>
+    <timeoutErr>true</timeoutErr>
+  </splash>
+  -->
+</launch4jConfig>

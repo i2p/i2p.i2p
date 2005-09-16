@@ -33,7 +33,7 @@ class PeerTestState {
     
     public synchronized long getNonce() { return _testNonce; }
     public synchronized void setNonce(long nonce) { _testNonce = nonce; }
-    /** who are we?  Alice, bob, or charlie? */
+    /** Are we Alice, bob, or Charlie. */
     public synchronized short getOurRole() { return _ourRole; }
     public synchronized void setOurRole(short role) { _ourRole = role; }
     /**

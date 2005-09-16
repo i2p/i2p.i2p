@@ -1,0 +1,23 @@
+<launch4jConfig>
+  <headerType>0</headerType>
+  <jar>../build/launchi2p.jar</jar>
+  <outfile>../i2p.exe</outfile>
+  <errTitle>I2P</errTitle>
+  <chdir>.</chdir>
+  <customProcName>false</customProcName>
+  <icon>resources/start.ico</icon>
+  <jre>
+    <minVersion>1.4.0</minVersion>
+    <!--
+    <minHeapSize>64</minHeapSize>
+    <maxHeapSize>64</maxHeapSize>
+    -->
+    <args>-Djava.library.path=. -DloggerFilenameOverride=logs/log-router-@.txt -Dorg.mortbay.http.Version.paranoid=true -Dorg.mortbay.util.FileResource.checkAliases=false</args>
+  </jre>
+  <splash>
+    <file>resources/i2plogo.bmp</file>
+    <waitForWindow>false</waitForWindow>
+    <timeout>10</timeout>
+    <timeoutErr>false</timeoutErr>
+  </splash>
+</launch4jConfig>

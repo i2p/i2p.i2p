@@ -12,7 +12,7 @@
     </target>
     <target name="dist" depends="pkg, javadoc">
     </target>
-    <target name="build" depends="builddep, jar, buildWEB" />
+    <target name="build" depends="builddep, jar, buildWEB, buildexe" />
     <target name="buildclean" depends="distclean, build" />
     <target name="builddep">
 	<!-- build *everything* here, but only once -->
@@ -28,6 +28,7 @@
         <ant dir="apps/routerconsole/java/" target="jar" />
         <ant dir="apps/addressbook/" target="war" />
         <ant dir="apps/susimail/" target="war" />
+        <ant dir="apps/susidns/src" target="all" />
         <ant dir="apps/syndie/java/" target="jar" /> <!-- not pushed in the update... yet -->
     </target>
     <target name="buildWEB">
@@ -44,6 +45,20 @@
         <copy file="apps/jetty/jettylib/xercesImpl.jar" todir="build/" />
         <copy file="apps/jetty/jettylib/javax.servlet.jar" todir="build/" />
     </target>
+    <target name="buildexe">
+        <jar destfile="./build/launchi2p.jar">
+            <manifest>
+	     <attribute name="Main-Class" value="net.i2p.router.RouterLaunch" />
+	     <attribute name="Class-Path" value="lib/i2p.jar lib/router.jar lib/jbigi.jar lib/sam.jar lib/mstreaming.jar lib/streaming.jar lib/routerconsole.jar lib/i2ptunnel.jar lib/org.mortbay.jetty.jar lib/javax.servlet.jar lib/jasper-compiler.jar lib/jasper-runtime.jar lib/commons-logging.jar lib/commons-el.jar lib/ant.jar lib/xercesImpl.jar lib/wrapper.jar lib/systray.jar lib/systray4j.jar" />
+	    </manifest>
+        </jar>
+	<!-- now the standalone launcher exe -->
+	<taskdef name="launch4j"
+                 classname="net.sf.launch4j.ant.Launch4jTask"
+                 classpath="${basedir}/installer/lib/launch4j/launch4j.jar:${basedir}/installer/lib/launch4j/lib/xstream.jar" />
+        <launch4j configFile="./installer/i2pstandalone.xml" />
+	<!-- thazzit -->
+    </target>
     <target name="compile" />
     <target name="jar" depends="compile" >
         <copy file="core/java/build/i2p.jar" todir="build/" />
@@ -59,6 +74,7 @@
         <copy file="installer/lib/jbigi/jbigi.jar" todir="build" />
         <copy file="apps/addressbook/dist/addressbook.war" todir="build/" />
         <copy file="apps/susimail/susimail.war" todir="build/" />
+        <copy file="apps/susidns/src/susidns.war" todir="build/" />
         <copy file="apps/syndie/syndie.war" todir="build/" />
         <copy file="apps/syndie/java/build/syndie.jar" todir="build/" />
         <copy file="apps/syndie/syndie.war" todir="build/" />
@@ -99,6 +115,8 @@
     </target>
     <target name="clean" depends="pkgclean" >
         <delete dir="./build" />
+        <delete file="i2pinstall.exe" />	
+        <delete file="i2p.exe" />	
     </target>
     <target name="distclean" depends="clean">
         <ant dir="core/java/" target="distclean" />
@@ -112,6 +130,7 @@
         <ant dir="apps/routerconsole/java/" target="distclean" />
         <ant dir="apps/addressbook/" target="distclean" />
         <ant dir="apps/susimail/" target="distclean" />
+        <ant dir="apps/susidns/src/" target="distclean" />
         <ant dir="apps/systray/java/" target="distclean" />
         <ant dir="installer/java/" target="distclean" />
         <delete>
@@ -180,6 +199,8 @@
         <copy file="build/routerconsole.jar" todir="pkg-temp/lib/" />
         <copy file="build/sam.jar" todir="pkg-temp/lib/" />
         <copy file="build/systray.jar" todir="pkg-temp/lib" />
+        <copy file="i2p.exe" todir="pkg-temp/" />
+        <copy file="installer/resources/runplain.sh" todir="pkg-temp/" />
         <copy file="apps/systray/java/lib/systray4j.jar" todir="pkg-temp/lib" />
         <copy file="apps/systray/java/lib/systray4j.dll" todir="pkg-temp/lib" />
         <copy file="apps/systray/java/resources/iggy.ico" todir="pkg-temp/icons" />
@@ -189,6 +210,7 @@
         <copy file="build/routerconsole.war" todir="pkg-temp/webapps/" />
         <copy file="build/addressbook.war" todir="pkg-temp/webapps/" />
         <copy file="build/susimail.war" todir="pkg-temp/webapps/" />
+        <copy file="build/susidns.war" todir="pkg-temp/webapps/" />
         <copy file="build/syndie.war" todir="pkg-temp/webapps/" />
         <copy file="installer/resources/clients.config" todir="pkg-temp/" />
         <copy file="installer/resources/eepget" todir="pkg-temp/" />
@@ -268,6 +290,8 @@
         <copy file="build/sam.jar" todir="pkg-temp/lib/" />
         <copy file="build/router.jar" todir="pkg-temp/lib/" />
         <copy file="build/routerconsole.jar" todir="pkg-temp/lib/" />
+        <copy file="i2p.exe" todir="pkg-temp/" />
+        <copy file="installer/resources/runplain.sh" todir="pkg-temp/" />
         
         <!-- for the i2p 0.5 release, push jetty 5.2.1 -->
         <!--
@@ -288,6 +312,7 @@
         <copy file="build/routerconsole.war" todir="pkg-temp/webapps/" />
         <copy file="build/addressbook.war" todir="pkg-temp/webapps/" />
         <copy file="build/susimail.war" todir="pkg-temp/webapps/" />
+        <copy file="build/susidns.war" todir="pkg-temp/webapps/" />
         <copy file="build/syndie.war" todir="pkg-temp/webapps/" />
         <copy file="history.txt" todir="pkg-temp/" />
         <mkdir dir="pkg-temp/docs/" />
@@ -313,6 +338,17 @@
             <manifest><attribute name="Main-Class" value="net.i2p.util.Exec" /></manifest>
         </jar>
         <izpack input="${basedir}/installer/install.xml" output="${basedir}/install.jar" installerType="standard" basedir="${basedir}" />
+
+        <ant target="installerexe" />
+    </target>
+    <target name="installerexe">
+	<!-- now the installer exe -->
+	<taskdef name="launch4j"
+                 classname="net.sf.launch4j.ant.Launch4jTask"
+                 classpath="${basedir}/installer/lib/launch4j/launch4j.jar:${basedir}/installer/lib/launch4j/lib/xstream.jar" />
+        <launch4j configFile="./installer/i2pinstaller.xml" />
+        <launch4j configFile="./installer/i2pstandalone.xml" />
+	<!-- thazzit -->
     </target>
     <target name="test">
         <ant dir="core/java/" target="test" />

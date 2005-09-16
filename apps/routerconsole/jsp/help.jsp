@@ -45,7 +45,7 @@ more information).</p>
 <p>The router by default also includes human's public domain <a href="http://www.i2p.net/sam">SAM</a> bridge,
 which other client applications (such the <a href="http://duck.i2p/i2p-bt/">bittorrent port</a>) can use.  
 There is also an optimized library for doing large number calculations - jbigi - which in turn uses the 
-LGPL licensed <a href="http://swox.com/gmp/">GMP</a> library, tuned for various PC architectures.  For 
+LGPL licensed <a href="http://swox.com/gmp/">GMP</a> library, tuned for various PC architectures.  Launchers for windows users are built with <a href="http://launch4j.sourceforge.net/">Launch4J</a>, and the installer is built with <a href="http://www.izforge.com/izpack/">IzPack</a>.  For 
 details on other applications available, as well as their licenses, please see the 
 <a href="http://www.i2p.net/licenses">license policy</a>.  Source for the I2P code and most bundled
 client applications can be found on our <a href="http://www.i2p.net/download">download page</a>, and is
