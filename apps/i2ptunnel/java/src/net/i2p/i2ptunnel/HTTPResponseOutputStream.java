@@ -42,9 +42,9 @@ class HTTPResponseOutputStream extends FilterOutputStream {
     public HTTPResponseOutputStream(OutputStream raw) {
         super(raw);
         _context = I2PAppContext.getGlobalContext();
-        _context.statManager().createRateStat("i2ptunnel.http.compressionRatio", "ratio of compressed size to decompressed size after transfer", "i2ptunnel", new long[] { 60*1000, 30*60*1000 });
-        _context.statManager().createRateStat("i2ptunnel.http.compressed", "compressed size transferred", "i2ptunnel", new long[] { 60*1000, 30*60*1000 });
-        _context.statManager().createRateStat("i2ptunnel.http.expanded", "size transferred after expansion", "i2ptunnel", new long[] { 60*1000, 30*60*1000 });
+        _context.statManager().createRateStat("i2ptunnel.httpCompressionRatio", "ratio of compressed size to decompressed size after transfer", "i2ptunnel", new long[] { 60*1000, 30*60*1000 });
+        _context.statManager().createRateStat("i2ptunnel.httpCompressed", "compressed size transferred", "i2ptunnel", new long[] { 60*1000, 30*60*1000 });
+        _context.statManager().createRateStat("i2ptunnel.httpExpanded", "size transferred after expansion", "i2ptunnel", new long[] { 60*1000, 30*60*1000 });
         _log = _context.logManager().getLog(getClass());
         _cache = ByteCache.getInstance(8, CACHE_SIZE);
         _headerBuffer = _cache.acquire();
@@ -175,15 +175,17 @@ class HTTPResponseOutputStream extends FilterOutputStream {
             out.write("Proxy-Connection: close\n".getBytes());
             
         finishHeaders();
+
+        boolean shouldCompress = shouldCompress();
+        if (_log.shouldLog(Log.INFO))
+            _log.info("After headers: gzip? " + _gzip + " compress? " + shouldCompress);
         
         // done, shove off
         if (_headerBuffer.getData().length == CACHE_SIZE)
             _cache.release(_headerBuffer);
         else
             _headerBuffer = null;
-        if (_log.shouldLog(Log.INFO))
-            _log.info("After headers: gzip? " + _gzip);
-        if (shouldCompress()) {
+        if (shouldCompress) {
             beginProcessing();
         }
     }
@@ -212,34 +214,37 @@ class HTTPResponseOutputStream extends FilterOutputStream {
         public void run() {
             OutputStream to = null;
             InternalGZIPInputStream in = null;
+            long start = System.currentTimeMillis();
+            long written = 0;
             try {
-                long start = System.currentTimeMillis();
                 in = new InternalGZIPInputStream(_in);
                 byte buf[] = new byte[8192];
                 int read = -1;
                 while ( (read = in.read(buf)) != -1) {
-                    if (_log.shouldLog(Log.INFO))
-                        _log.info("Read " + read + " and writing it to the browser/streams");
+                    if (_log.shouldLog(Log.DEBUG))
+                        _log.debug("Read " + read + " and writing it to the browser/streams");
                     _out.write(buf, 0, read);
+                    _out.flush();
+                    written += read;
                 }
                 if (_log.shouldLog(Log.INFO))
-                    _log.info("Decompressed: " + _dataWritten + ", " + in.getTotalRead() + "/" + in.getTotalExpanded());
-                long end = System.currentTimeMillis();
-                long compressed = in.getTotalRead();
-                long expanded = in.getTotalExpanded();
-                double ratio = 0;
-                if (expanded > 0)
-                    ratio = compressed/expanded;
-                
-                _context.statManager().addRateData("i2ptunnel.http.compressionRatio", (int)(100d*ratio), end-start);
-                _context.statManager().addRateData("i2ptunnel.http.compressed", compressed, end-start);
-                _context.statManager().addRateData("i2ptunnel.http.expanded", expanded, end-start);
+                    _log.info("Decompressed: " + written + ", " + in.getTotalRead() + "/" + in.getTotalExpanded());
             } catch (IOException ioe) {
                 if (_log.shouldLog(Log.WARN))
-                    _log.warn("Error decompressing: " + _dataWritten + ", " + in.getTotalRead() + "/" + in.getTotalExpanded(), ioe);
+                    _log.warn("Error decompressing: " + written + ", " + in.getTotalRead() + "/" + in.getTotalExpanded(), ioe);
             } finally {
                 if (_out != null) try { _out.close(); } catch (IOException ioe) {}
             }
+            long end = System.currentTimeMillis();
+            long compressed = in.getTotalRead();
+            long expanded = in.getTotalExpanded();
+            double ratio = 0;
+            if (expanded > 0)
+                ratio = compressed/expanded;
+
+            _context.statManager().addRateData("i2ptunnel.httpCompressionRatio", (int)(100d*ratio), end-start);
+            _context.statManager().addRateData("i2ptunnel.httpCompressed", compressed, end-start);
+            _context.statManager().addRateData("i2ptunnel.httpExpanded", expanded, end-start);
         }
     }
     private class InternalGZIPInputStream extends GZIPInputStream {

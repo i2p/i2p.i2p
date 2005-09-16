@@ -1,4 +1,13 @@
-$Id: history.txt,v 1.250 2005/09/15 00:39:31 jrandom Exp $
+$Id: history.txt,v 1.251 2005/09/15 23:12:27 jrandom Exp $
+
+2005-09-16  jrandom
+    * Adjust I2PTunnelHTTPServer so it can be used for outproxy operators 
+      (just specify the spoofed host as an empty string), allowing them to
+      honor x-i2p-gzip encoding.
+    * Let windows users build the exes too (thanks bar and redzara!)
+    * Allow I2PTunnel httpserver operators to disable gzip compression on 
+      individual tunnels with the i2ptunnel.gzip=false client option 
+      (good idea susi!)
 
 2005-09-16  jrandom
     * Added the i2p.exe and i2pinstall.exe for windows users, using launch4j.

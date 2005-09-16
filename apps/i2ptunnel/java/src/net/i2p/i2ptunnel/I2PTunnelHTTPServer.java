@@ -68,7 +68,8 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
 
             StringBuffer command = new StringBuffer(128);
             Properties headers = readHeaders(in, command);
-            headers.setProperty("Host", _spoofHost);
+            if ( (_spoofHost != null) && (_spoofHost.trim().length() > 0) )
+                headers.setProperty("Host", _spoofHost);
             headers.setProperty("Connection", "close");
             String modifiedHeader = formatHeaders(headers, command);
             
@@ -83,10 +84,17 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
             // request from the socket, modifies the headers, sends the request to the 
             // server, reads the response headers, rewriting to include Content-encoding: x-i2p-gzip
             // if it was one of the Accept-encoding: values, and gzip the payload       
+            Properties opts = getTunnel().getClientOptions();
+            boolean allowGZIP = true;
+            if (opts != null) {
+                String val = opts.getProperty("i2ptunnel.gzip");
+                if ( (val != null) && (!Boolean.valueOf(val).booleanValue()) ) 
+                    allowGZIP = false;
+            }
             String enc = headers.getProperty("Accept-encoding");
             if (_log.shouldLog(Log.INFO))
                 _log.info("HTTP server encoding header: " + enc);
-            if ( (enc != null) && (enc.indexOf("x-i2p-gzip") >= 0) ) {
+            if ( allowGZIP && (enc != null) && (enc.indexOf("x-i2p-gzip") >= 0) ) {
                 I2PThread req = new I2PThread(new CompressedRequestor(s, socket, modifiedHeader), "http compressor");
                 req.start();
             } else {
@@ -139,12 +147,13 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
                 
                 browserout = _browser.getOutputStream();
                 serverin = _webserver.getInputStream(); 
-                Sender s = new Sender(new CompressedResponseOutputStream(browserout), serverin, "server: server to browser");
+                CompressedResponseOutputStream compressedOut = new CompressedResponseOutputStream(browserout);
+                Sender s = new Sender(compressedOut, serverin, "server: server to browser");
                 if (_log.shouldLog(Log.INFO))
                     _log.info("Before pumping the compressed response");
                 s.run(); // same thread
                 if (_log.shouldLog(Log.INFO))
-                    _log.info("After pumping the compressed response");
+                    _log.info("After pumping the compressed response: " + compressedOut.getTotalRead() + "/" + compressedOut.getTotalCompressed());
             } catch (IOException ioe) {
                 if (_log.shouldLog(Log.WARN))
                     _log.warn("error compressing", ioe);
@@ -182,8 +191,8 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
                     _log.info(_name + ": Done sending: " + total);
                 _out.flush();
             } catch (IOException ioe) {
-                if (_log.shouldLog(Log.WARN))
-                    _log.warn("Error sending", ioe);
+                if (_log.shouldLog(Log.DEBUG))
+                    _log.debug("Error sending", ioe);
             } finally {
                 if (_in != null) try { _in.close(); } catch (IOException ioe) {}
                 if (_out != null) try { _out.close(); } catch (IOException ioe) {}
@@ -191,6 +200,7 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
         }
     }
     private class CompressedResponseOutputStream extends HTTPResponseOutputStream {
+        private InternalGZIPOutputStream _gzipOut;
         public CompressedResponseOutputStream(OutputStream o) {
             super(o);
         }
@@ -207,8 +217,18 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
             if (_log.shouldLog(Log.INFO))
                 _log.info("Beginning compression processing");
             out.flush();
-            out = new GZIPOutputStream(out);
+            _gzipOut = new InternalGZIPOutputStream(out);
+            out = _gzipOut;
         }
+        public long getTotalRead() { return _gzipOut.getTotalRead(); }
+        public long getTotalCompressed() { return _gzipOut.getTotalCompressed(); }
+    }
+    private class InternalGZIPOutputStream extends GZIPOutputStream {
+        public InternalGZIPOutputStream(OutputStream target) throws IOException {
+            super(target);
+        }
+        public long getTotalRead() { return super.def.getTotalIn(); }
+        public long getTotalCompressed() { return super.def.getTotalOut(); }
     }
 
     private String formatHeaders(Properties headers, StringBuffer command) {
