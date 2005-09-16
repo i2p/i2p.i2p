@@ -1,0 +1,33 @@
+# Project: consolehead
+# Makefile created by Dev-C++ 4.9.9.2
+
+CPP  = g++.exe
+CC   = gcc.exe
+WINDRES = windres.exe
+RES  = 
+OBJ  = consolehead.o ../head.o $(RES)
+LINKOBJ  = consolehead.o ../head.o $(RES)
+LIBS =  -L"lib"  -s 
+INCS =  -I"include" 
+CXXINCS =  -I"lib/gcc/mingw32/3.4.2/include"  -I"include/c++/3.4.2/backward"  -I"include/c++/3.4.2/mingw32"  -I"include/c++/3.4.2"  -I"include" 
+BIN  = consolehead.exe
+CXXFLAGS = $(CXXINCS)   -fexpensive-optimizations -O3
+CFLAGS = $(INCS)   -fexpensive-optimizations -O3
+RM = rm -f
+
+.PHONY: all all-before all-after clean clean-custom
+
+all: all-before consolehead.exe all-after
+
+
+clean: clean-custom
+	${RM} $(OBJ) $(BIN)
+
+$(BIN): $(OBJ)
+	$(CC) $(LINKOBJ) -o "consolehead.exe" $(LIBS)
+
+consolehead.o: consolehead.c
+	$(CC) -c consolehead.c -o consolehead.o $(CFLAGS)
+
+../head.o: ../head.c
+	$(CC) -c ../head.c -o ../head.o $(CFLAGS)

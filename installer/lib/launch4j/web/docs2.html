@@ -1,0 +1,394 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  
+  <title>Launch4j :: Cross-platform java application wrapper for creating Windows native executables</title><meta content="Grzegorz Kowal" name="author">
+  <meta content="Cross-platform java application wrapper for creating Windows native executables.
+Features native splash screen, application icon, small stub." name="description">
+  <meta name="Keywords" content="Java, java, exe, native, windows, Windows, jar, wrap, wrapper, launch,
+run, execute, executable, splash, icon, ico, ant, build, script, deploy, free, freeware, open source,
+gpl, GPL, lgpl, LGPL, sourceforge, c++, C++, W2K, WXP, W98, linux, Linux">
+  <link rel="stylesheet" type="text/css" href="layout.css">
+  <link rel="stylesheet" type="text/css" href="style.css"></head>
+
+<body>
+<div id="container">
+<div id="top"><img style="width: 249px; height: 58px;" alt="" src="launch4j.gif"><span style="color: rgb(48, 127, 225);"> <small><span style="font-weight: bold; font-family: Helvetica,Arial,sans-serif;">1.4.2,&nbsp;
+2.0.RC3</span></small></span>
+</div>
+<div id="leftnav">
+<ul id="navlist">
+  <li><a href="index.html"><span style="font-weight: bold;"></span>Home</a></li>
+  <li><a href="docs1.html"><span style="font-weight: bold;"></span>1.x
+docs</a></li>
+  <li><a href="docs2.html"><span style="font-weight: bold;"></span>2.x
+docs</a></li>
+  <li><a href="changelog.html"><span style="font-weight: bold;"></span>Changelog</a></li>
+  <li><a href="http://sourceforge.net/project/screenshots.php?group_id=95944"><span style="font-weight: bold;"></span>Screenshots</a></li>
+  <li><a href="http://sourceforge.net/project/showfiles.php?group_id=95944"><span style="font-weight: bold;"></span>Download</a></li>
+  <li><a href="http://sourceforge.net/forum/?group_id=95944"><span style="font-weight: bold;"></span>Support</a></li>
+  <li><a href="http://sourceforge.net/projects/launch4j"><span style="font-weight: bold;"></span>Project
+summary</a></li>
+  <li><a href="http://sourceforge.net/tracker/?atid=613100&amp;group_id=95944"><span style="font-weight: bold;"></span>Bug
+tracker</a></li>
+  <li><a href="links.html"><span style="font-weight: bold;"></span>Links</a></li>
+</ul>
+</div>
+<div id="content">
+<a href="#Running_launch4j">Running
+launch4j</a><br>
+<a href="#Configuration_file">Configuration
+file</a><br>
+<a href="#Importing_1.x_configuration">Importing
+1.x configuration</a><br>
+<a href="#Ant_task">Ant Task</a><br>
+<br>
+<br>
+<h2><a name="Running_launch4j"></a>Running
+launch4j<br>
+</h2>
+Run <em>launch4j.exe</em>
+or <em>launch4j</em>
+script without command
+line arguments to enter the GUI mode.<br>
+<pre>launch4j.exe<br></pre>
+To wrap a jar in console mode use <em>launch4jc.exe</em>&nbsp;<em></em>and
+specify the configuration file using an absolute path.<br>
+<pre>launch4jc.exe c:\src\demo\l4j\config.xml<br></pre>
+On linux use the <em>launch4j</em>
+script.<br>
+<pre>launch4j ~/src/demo/l4j/config.xml<br></pre>
+<br>
+<h2><a name="Configuration_file"></a>Configuration
+file</h2>
+Launch4j requires an xml configuration file for each output executable.
+You can create and edit it conveniently using the graphic user
+interface or your favorite editor. Alternatively it's possible to pass
+all of the configuration parameters through the Ant task. All files
+except for <em>&lt;jre&gt;&lt;path&gt;</em>
+may be absolute paths or
+relative to the configuration file path.<br>
+<pre>&lt;!-- <strong>Bold</strong> elements are required --&gt;<br><strong>&lt;launch4jConfig&gt;<br></strong>  &lt;!-- Header types: 0-GUI, 1-console --&gt;<strong><br></strong>  <strong>&lt;headerType&gt;</strong><span class="codeword">0|1</span><strong>&lt;/headerType&gt;</strong><br>&nbsp; <strong>&lt;jar&gt;</strong><span class="codeword">file</span><span class="codeword"></span><strong>&lt;/jar&gt;<br></strong>  <strong>&lt;outfile&gt;</strong><span class="codeword">file.exe</span><strong><span class="codeword"></span>&lt;/outfile&gt;</strong><br>  &lt;errTitle&gt;<span class="codeword">text</span>&lt;/errTitle&gt;<br>  &lt;jarArgs&gt;<span class="codeword">text</span>&lt;/jarArgs&gt;<br>  &lt;chdir&gt;<span class="codeword">path</span>&lt;/chdir&gt;<br>  &lt;customProcName&gt;<span class="codeword">true|<u>false</u></span>&lt;/customProcName&gt;<br>  &lt;stayAlive&gt;<span class="codeword">true|false</span>&lt;/stayAlive&gt;<br>  &lt;icon&gt;<span class="codeword">file</span>&lt;/icon&gt;<br>  <strong>&lt;jre&gt;<br></strong>    &lt;!-- Specify one of the following or both --&gt;<br>    <strong>&lt;path&gt;</strong><span class="codeword">path</span><strong>&lt;/path&gt;<br>    </strong><strong>&lt;minVersion&gt;</strong><span class="codeword">x.x.x[_xx]</span><strong>&lt;/minVersion&gt;<br></strong>    &lt;maxVersion&gt;<span class="codeword">x.x.x[_xx]</span>&lt;/maxVersion&gt;<br>    &lt;!-- Heap sizes in MB, 0-use default --&gt;<br>    &lt;initialHeapSize&gt;<span class="codeword">MB</span>&lt;/initialHeapSize&gt;<br>    &lt;maxHeapSize&gt;<span class="codeword">MB</span>&lt;/maxHeapSize&gt;<br>    &lt;args&gt;<span class="codeword">text</span>&lt;/args&gt;<br>  <strong>&lt;/jre&gt;</strong><br>  &lt;splash&gt;<br>    <strong>&lt;file&gt;</strong><span class="codeword">file</span><strong>&lt;/file&gt;</strong><br>    &lt;waitForWindow&gt;<span class="codeword"><u>true</u>|false</span>&lt;/waitForWindow&gt;<br>    &lt;timeout&gt;<span class="codeword">seconds [60]</span>&lt;/timeout&gt;<br>    &lt;timeoutErr&gt;<span class="codeword"><u>true</u>|false</span>&lt;/timeoutErr&gt;<br>  &lt;/splash&gt;<br>  &lt;versionInfo&gt;<br>    <strong>&lt;fileVersion&gt;</strong><span class="codeword">x.x.x.x</span><strong>&lt;/fileVersion&gt;</strong><br>    <strong>&lt;txtFileVersion&gt;</strong><span class="codeword">text</span><strong>&lt;/txtFileVersion&gt;</strong><br>    <strong>&lt;fileDescription&gt;</strong><span class="codeword">text</span><strong>&lt;/fileDescription&gt;</strong><br>    <strong>&lt;copyright&gt;</strong><span class="codeword">text</span><strong>&lt;/copyright&gt;</strong><br>    <strong>&lt;productVersion&gt;</strong><span class="codeword">x.x.x.x</span><strong>&lt;/productVersion&gt;</strong><br>    <strong>&lt;txtProductVersion&gt;</strong><span class="codeword">text</span><strong>&lt;/txtProductVersion&gt;</strong><br>    <strong>&lt;productName&gt;</strong><span class="codeword">text</span><strong>&lt;/productName&gt;</strong><br>    &lt;companyName&gt;<span class="codeword">text</span>&lt;/companyName&gt;<br>    <strong>&lt;internalName&gt;</strong><span class="codeword">filename</span><strong>&lt;/internalName&gt;</strong><br>    <strong>&lt;originalFilename&gt;</strong><span class="codeword">filename.exe</span><strong>&lt;/originalFilename&gt;</strong><br>  &lt;/versionInfo&gt;<br><strong>&lt;/launch4jConfig&gt;</strong><br></pre>
+<dl>
+  <dt>&lt;headerType&gt;</dt>
+  <dd>Type of the header used to
+wrap the application.</dd>
+</dl>
+<table style="text-align: left;" border="1" cellpadding="4" cellspacing="0">
+  <tbody>
+    <tr>
+      <td style="text-align: center;"><span style="font-weight: bold;">Header&nbsp;</span><span style="font-weight: bold;">type</span><br>
+      </td>
+      <td style="white-space: nowrap; text-align: center; font-weight: bold;">App
+type<br>
+      </td>
+      <td style="text-align: center;"><span style="font-weight: bold;">Launcher</span><br>
+      </td>
+      <td style="white-space: nowrap; text-align: center; font-weight: bold;">Splash
+screen</td>
+      <td style="text-align: center; font-weight: bold; white-space: nowrap;">Wait
+for the application to
+close </td>
+    </tr>
+    <tr>
+      <td style="text-align: center;">0<br>
+      </td>
+      <td style="text-align: center;">GUI<br>
+      </td>
+      <td style="text-align: center;">javaw<br>
+      </td>
+      <td style="text-align: center;">yes<br>
+      </td>
+      <td>wrapper
+waits only if <em>stayAlive</em>
+is set to true, otherwise it terminates immediately or after closing
+the splash screen.<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="text-align: center;">1<br>
+      </td>
+      <td style="text-align: center;">console<br>
+      </td>
+      <td style="text-align: center;">java<br>
+      </td>
+      <td style="text-align: center;">no<br>
+      </td>
+      <td>always waits and
+returns application's exit code.<br>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<br>
+<dl>
+  <dt>&lt;jar&gt;</dt>
+  <dd>Executable jar to wrap.</dd>
+</dl>
+<dl>
+  <dt>&lt;outfile&gt;</dt>
+  <dd>Output executable file.<strong></strong></dd>
+</dl>
+<dl>
+  <dt>&lt;errTitle&gt;</dt>
+  <dd>Optional,
+sets the title of the error message box that's displayed if Java cannot
+be found for instance. This usually should contain the name of your
+application. The console header prefixes error messages with this
+property (myapp: error...)</dd>
+</dl>
+<dl>
+  <dt>&lt;jarArgs&gt;</dt>
+  <dd>Optional, constant
+command line arguments.</dd>
+</dl>
+<dl>
+  <dt>&lt;chdir&gt;</dt>
+  <dd>Optional. Change current
+directory to an arbitrary path relative to the executable. <br>
+If you omit this property
+or leave it blank it will have no effect. Setting it to <em>.</em>
+will change the current dir to the same directory as the executable. <em>..</em>
+will change it to the parent directory, and so on.</dd>
+  <dd>
+    <pre>&lt;chdir&gt;.&lt;/chdir&gt;</pre>
+  </dd>
+  <dd>
+    <pre>&lt;chdir&gt;../somedir&lt;/chdir&gt;</pre>
+  </dd>
+</dl>
+<dl>
+  <dt>&lt;customProcName&gt;</dt>
+  <dd>Optional, defaults to
+false.
+Set the process name as the executable filename. Creates a temporary
+file in launch4j-tmp directory inside the used JRE. These files are
+deleted by
+any launch4j wrapped application, which sets the process name and uses
+the same JRE. The removal takes place when the application <strong>starts</strong>,
+so at least one copy of this file will always be present.</dd>
+</dl>
+<dl>
+  <dt>&lt;stayAlive&gt;</dt>
+  <dd>Optional, defaults to
+false
+in GUI header, <em></em>
+always true<span style="font-weight: bold;"> </span>in console header.
+When enabled the
+launcher waits for the Java application to finish and returns it's exit
+code.</dd>
+</dl>
+<dl>
+  <dt>&lt;icon&gt;</dt>
+  <dd>Application icon in ICO
+format. May contain multiple color depths/resolutions.<br>
+  </dd>
+</dl>
+<dl>
+  <dt>&lt;jre&gt;</dt>
+  <dd>Required element that groups
+JRE settings.</dd>
+</dl>
+<blockquote>
+  <dl>
+    <dt>&lt;path&gt;,
+&lt;minVersion&gt;, &lt;maxVersion&gt;<br>
+    </dt>
+    <dd>The <em>&lt;path&gt;</em>
+property
+is used
+to specify the relative path (to the executable) of an embedded JRE, it
+does not rely on the current directory or <em>&lt;chdir&gt;</em>.
+Note that this path is
+not checked until the actual application execution. If you'd like the
+wrapper to search for a JRE (public or SDK
+private) use the <em>&lt;minVersion&gt;</em>
+property, you may also specify the <em>&lt;maxVersion&gt;</em>
+to prevent it from using higher Java versions. Launch4j will always use
+the highest version available (in the min/max range of course). You can
+also combine these properties to change the startup process...</dd>
+  </dl>
+  <div style="margin-left: 40px;">
+  <dl>
+    <dt>&lt;path&gt;</dt>
+    <dd>Run if bundled JRE and
+javaw.exe
+are present, otherwise stop with error.</dd>
+    <dt>&lt;path&gt; +
+&lt;minVersion&gt;&nbsp; [+ &lt;maxVersion&gt;]</dt>
+    <dd>Use bundled JRE first,
+if it
+cannot be located search for Java, if that fails display error message
+and open the Java download page.</dd>
+    <dt>&lt;minVersion&gt;&nbsp;
+[+ &lt;maxVersion&gt;]</dt>
+    <dd>Search for Java, if an
+appropriate version cannot be found display error message and open the
+Java download page.</dd>
+  </dl>
+  </div>
+</blockquote>
+<blockquote>
+  <dl>
+    <dt>&lt;initialHeapSize&gt;</dt>
+    <dd>Optional, initial heap
+size in MB, 0 - use default.</dd>
+  </dl>
+  <dl>
+    <dt>&lt;maxHeapSize&gt;</dt>
+    <dd>Optional, max heap size in
+MB, 0 - use default.</dd>
+  </dl>
+  <dl>
+    <dt>&lt;args&gt;</dt>
+    <dd>Optional, accepts
+everything you would normally pass to
+java/javaw
+launcher: assertion options, system properties and X options.</dd>
+  </dl>
+</blockquote>
+<dl>
+  <dt>&lt;splash&gt;</dt>
+  <dd>Optional, groups the splash
+screen settings. Allowed only in GUI header.<br>
+  </dd>
+</dl>
+<blockquote>
+  <dl>
+    <dt>&lt;file&gt;</dt>
+    <dd>Splash screen image in BMP
+format.</dd>
+  </dl>
+  <dl>
+    <dt>&lt;waitForWindow&gt;</dt>
+    <dd>Optional,
+defaults to true. Close the splash screen when an application window or
+Java error message box appears. If set to false, the splash screen will
+be closed on timeout.<br>
+    </dd>
+    
+  </dl>
+  <dl>
+    <dt>&lt;timeout&gt;</dt>
+    <dd>Optional, defaults to
+60.
+Number of seconds after which the splash screen must be closed. Splash
+timeout may cause an error depending on <em>&lt;timeoutErr&gt;</em>.</dd>
+  </dl>
+  <dl>
+    <dt>&lt;timeoutErr&gt;</dt>
+    <dd>Optional, defaults to
+true.
+True signals
+an error on splash timeout, false
+closes the splash screen quietly.</dd>
+  </dl>
+</blockquote>
+<dl>
+  <dt>&lt;versionInfo&gt;</dt>
+  <dd>Optional, version
+information to be displayed by the Windows
+Explorer.</dd>
+</dl>
+<blockquote>
+  <dl>
+    <dt>&lt;fileVersion&gt;</dt>
+    <dd>Version number 'x.x.x.x'<br>
+    </dd>
+  </dl>
+  <dl>
+    <dt>&lt;txtFileVersion&gt;</dt>
+    <dd>Free form file version,
+for example '1.20.RC1'.<br>
+    </dd>
+  </dl>
+  <dl>
+    <dt>&lt;fileDescription&gt;</dt>
+    <dd>File description presented
+to the user.<br>
+    </dd>
+  </dl>
+  <dl>
+    <dt>&lt;copyright&gt;</dt>
+    <dd>Legal copyright.<br>
+    </dd>
+  </dl>
+  <dl>
+    <dt>&lt;productVersion&gt;</dt>
+    <dd>Version number 'x.x.x.x'<br>
+    </dd>
+  </dl>
+  <dl>
+    <dt>&lt;txtProductVersion&gt;</dt>
+    <dd>Free form file version,
+for example '1.20.RC1'.<br>
+    </dd>
+  </dl>
+  <dl>
+    <dt>&lt;productName&gt;</dt>
+    <dd>Text.<br>
+    </dd>
+  </dl>
+  <dl>
+    <dt>&lt;companyName&gt;</dt>
+    <dd>Optional text.<br>
+    </dd>
+  </dl>
+  <dl>
+    <dt>&lt;internalName&gt;</dt>
+    <dd>Internal name without
+extension, original filename or module
+name for example.<br>
+    </dd>
+  </dl>
+  <dl>
+    <dt>&lt;originalFilename&gt;</dt>
+    <dd>Original name of the file
+without the path. Allows to determine
+whether a file has been renamed by a user.<br>
+    </dd>
+  </dl>
+</blockquote>
+<br>
+<h2><a name="Importing_1.x_configuration"></a>Importing
+1.x
+configuration</h2>
+It's possible to import a 1.x configuration file using the GUI
+interface. Open the file, correct the paths and save it as a new xml
+configuration.<br>
+<br>
+<h2><a name="Ant_task"></a>Ant
+task</h2>
+You may set a launch4j directory property or change the task definition.
+<pre>&lt;property name="launch4j.dir" location="/opt/launch4j" /&gt;</pre>
+Define the task in your Ant build script.<br>
+<pre>&lt;taskdef name="launch4j"<br>  classname="net.sf.launch4j.ant.Launch4jTask"<br>  classpath="${launch4j.dir}/launch4j.jar<br>    :${launch4j.dir}/lib/xstream.jar" /&gt;<br></pre>
+Execute the task!<br>
+<pre>&lt;launch4j configFile="./l4j/demo.xml" /&gt;</pre>
+You can set or override the following configuration properties...<br>
+<em>&lt;jar&gt;<br>
+&lt;outfile&gt;<br>
+&lt;versionInfo&gt;<br>
+&nbsp;&nbsp;&nbsp; &lt;fileVersion&gt;<br>
+&nbsp;&nbsp;&nbsp; &lt;txtFileVersion&gt;<br>
+&nbsp;&nbsp;&nbsp; &lt;productVersion&gt;<br>
+&nbsp;&nbsp;&nbsp; &lt;txtProductVersion&gt;</em><em><br>
+</em>
+<pre>&lt;launch4j configFile="./l4j/demo.xml"<br>  outfile="mydemo.exe"<br> &nbsp;fileVersion="1.0.0.0" txtFileVersion="1.0 RC2" /&gt;<br></pre>
+You can also define the entire configuration in the task, but it will
+not be possible to edit such a file in the GUI mode. All paths except
+for <em>&lt;chdir&gt;</em> and <em>&lt;jre&gt;&lt;path&gt;</em> are
+calculated using the <em>basedir</em> project attribute.
+<pre>&lt;launch4j&gt;<br>  &lt;config headerType="0" jar="demo.jar" outfile="demo.exe"&gt;<br>    &lt;jre minVersion="1.4.0" /&gt;<br>  &lt;/config&gt;<br>&lt;/launch4j&gt;<br></pre>
+</div>
+<div id="footer">Copyright
+&copy; 2005 Grzegorz Kowal
+<br>
+<br>
+<p><a href="http://sourceforge.net"><img src="http://sourceforge.net/sflogo.php?group_id=95944&amp;type=4" alt="SourceForge.net Logo" border="0" height="37" width="125"></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<a href="http://www.nosoftwarepatents.com"><img alt="" src="http://www.nosoftwarepatents.com/banners/90x40_3.jpg" style="border: 0px solid ; width: 90px; height: 40px;"></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<a href="http://validator.w3.org/check?uri=referer"><img src="http://www.w3.org/Icons/valid-html401" alt="Valid HTML 4.01!" border="0" height="31" width="88"></a>
+</p>
+</div>
+</div>
+</body></html>

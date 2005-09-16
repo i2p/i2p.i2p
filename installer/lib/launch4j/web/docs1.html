@@ -1,0 +1,345 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta http-equiv="Content-Type"
+ content="text/html; charset=iso-8859-1">
+  <title>Launch4j :: Cross-platform java application wrapper for
+creating Windows native executables</title>
+  <meta content="Grzegorz Kowal" name="author">
+  <meta
+ content="Cross-platform java application wrapper for creating Windows native executables.
+Features native splash screen, application icon, small stub."
+ name="description">
+  <meta name="Keywords"
+ content="Java, java, exe, native, windows, Windows, jar, wrap, wrapper, launch,
+run, execute, executable, splash, icon, ico, ant, build, script, deploy, free, freeware, open source,
+gpl, GPL, lgpl, LGPL, sourceforge, c++, C++, W2K, WXP, W98, linux, Linux">
+  <link rel="stylesheet" type="text/css" href="layout.css">
+  <link rel="stylesheet" type="text/css" href="style.css">
+</head>
+<body>
+<div id="container">
+<div id="top"><img style="width: 249px; height: 58px;" alt=""
+ src="launch4j.gif"><span style="color: rgb(48, 127, 225);"> <small><span
+ style="font-weight: bold; font-family: Helvetica,Arial,sans-serif;">1.4.2,&nbsp;
+2.0.RC3</span></small></span>
+</div>
+<div id="leftnav">
+<ul id="navlist">
+  <li><a href="index.html"><span style="font-weight: bold;"></span>Home</a></li>
+  <li><a href="docs1.html"><span style="font-weight: bold;"></span>1.x
+docs</a></li>
+  <li><a href="docs2.html"><span style="font-weight: bold;"></span>2.x
+docs</a></li>
+  <li><a href="changelog.html"><span style="font-weight: bold;"></span>Changelog</a></li>
+  <li><a
+ href="http://sourceforge.net/project/screenshots.php?group_id=95944"><span
+ style="font-weight: bold;"></span>Screenshots</a></li>
+  <li><a
+ href="http://sourceforge.net/project/showfiles.php?group_id=95944"><span
+ style="font-weight: bold;"></span>Download</a></li>
+  <li><a href="http://sourceforge.net/forum/?group_id=95944"><span
+ style="font-weight: bold;"></span>Support</a></li>
+  <li><a href="http://sourceforge.net/projects/launch4j"><span
+ style="font-weight: bold;"></span>Project
+summary</a></li>
+  <li><a
+ href="http://sourceforge.net/tracker/?atid=613100&amp;group_id=95944"><span
+ style="font-weight: bold;"></span>Bug
+tracker</a></li>
+  <li><a href="links.html"><span style="font-weight: bold;"></span>Links</a></li>
+</ul>
+</div>
+<div id="content">
+<h2>How to wrap your
+application<br>
+</h2>
+<span style="font-weight: bold;"></span>Launch4j wraps only
+executable jars, which<em> </em>aren't
+very
+difficult
+to create. Package your application in a jar file and include a
+manifest with
+the <em>Main-Class</em>
+attribute
+defined. In order to use external jars, you must also define the <em>Class-Path</em>
+attribute. Create a
+configuration file and run launch4j (launch4j
+my_application.cfg). It's a good idea to run it inside a console
+window to see the output. If the configuration file is invalid,
+launch4j will provide useful information that will help you fix the
+problem. If everything goes fine, the output exe will be created and
+ready to run. All information provided in the config file is stored in
+the executable, so you don't need it to run the application.<br>
+<br>
+<h2><span style="font-weight: bold;">Faster way...<span
+ style="font-weight: bold;"><span style="font-weight: bold;"></span></span></span></h2>
+<span style="font-weight: bold;"><span style="font-weight: bold;"><span
+ style="font-weight: bold;"> </span></span></span>Create
+the
+configuration file and let Ant do
+the
+rest (SimpleApp/build.xml).<br>
+<br>
+<h2><span style="font-weight: bold;">Configuration file (1.x) </span></h2>
+<strong class="codeword">Bold</strong>
+elements are
+required.<br>
+<pre><span style="font-weight: bold;"></span><span class="codeword">header</span> headfile.bin<br><strong><span
+ class="codeword">jar</span></strong> application.jar<br><strong><span
+ class="codeword">outfile</span></strong> application.exe<br
+ style="font-family: monospace;"><strong><span class="codeword">jrepath</span></strong> ../jre<br> and/or<br><strong><span
+ class="codeword">javamin</span></strong> version<br><span
+ class="codeword">javamax</span> version&nbsp;&nbsp;&nbsp; // optional, use only in combination with <strong><span
+ class="codeword">javamin</span></strong>.<br><span class="codeword">jvmArgs</span> args<br><span
+ class="codeword">jarArgs</span> args<br><span class="codeword">chdir</span> true|<span
+ style="text-decoration: underline;">false</span><br><span
+ class="codeword">setProcName</span> true|<span
+ style="text-decoration: underline;">false</span><br><span
+ class="codeword">errTitle</span> application_name<br
+ style="font-family: monospace;"><span class="codeword">icon</span> icon.ico<br
+ style="font-family: monospace;"><span class="codeword">splash</span> splash.bmp<br
+ style="font-family: monospace;"><span class="codeword">waitfor</span> beginning_of_application_title<br
+ style="font-family: monospace;"><span class="codeword">splashTimeout</span> seconds<br
+ style="font-family: monospace;"><span class="codeword">splashTimeoutErr</span> <span
+ style="text-decoration: underline;">true</span>|false<br
+ style="font-family: monospace;"><span class="codeword">stayAlive</span> true|false</pre>
+<br>
+<h2>Configuration details<span style="font-weight: bold;"></span></h2>
+<span style="font-weight: bold;"> </span>
+<dl>
+  <dt>header</dt>
+  <dd>Optional, defaults to <em>guihead.bin</em>.
+Standard headers are: <em>guihead.bin</em>
+and <em>consolehead.bin</em>,
+you can
+also specify your own.</dd>
+</dl>
+<table style="text-align: left;" border="1" cellpadding="4"
+ cellspacing="0">
+  <tbody>
+    <tr>
+      <td style="text-align: center;"><span style="font-weight: bold;">Header</span><br>
+      </td>
+      <td
+ style="white-space: nowrap; text-align: center; font-weight: bold;">App&nbsp;
+type<br>
+      </td>
+      <td style="text-align: center;"><span style="font-weight: bold;">Launcher</span><br>
+      </td>
+      <td
+ style="white-space: nowrap; text-align: center; font-weight: bold;">Splash
+screen</td>
+      <td
+ style="text-align: center; font-weight: bold; white-space: nowrap;">Wait
+for the application to
+close </td>
+    </tr>
+    <tr>
+      <td style="text-align: center;">guihead.bin<br>
+      </td>
+      <td style="text-align: center;">GUI<br>
+      </td>
+      <td style="text-align: center;">javaw<br>
+      </td>
+      <td style="text-align: center;">yes<br>
+      </td>
+      <td>wrapper
+waits only if <span class="codeword">stayAlive</span>
+is set to true, otherwise it terminates immediately or after closing
+the splash screen.<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="text-align: center;">consolehead.bin<br>
+      </td>
+      <td style="text-align: center;">console<br>
+      </td>
+      <td style="text-align: center;">java<br>
+      </td>
+      <td style="text-align: center;">no<br>
+      </td>
+      <td>always waits and
+returns application's exit code.<br>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<br>
+<dl>
+  <dt>jrepath,
+javamin/javamax</dt>
+  <dd>The <span class="codeword">jrepath</span>
+property is used
+to specify the path (usually relative) of a JRE, note that this path is
+not checked until the actual application execution. If you'd like the
+wrapper to search for a JRE (public or SDK
+private) use the <span class="codeword">javamin</span>
+property, you may also specify the <span class="codeword">javamax</span>
+to prevent it from using higher Java versions. Launch4j will always use
+the highest version available (in the min/max range of course). You can
+also combine these properties to change the startup process...</dd>
+</dl>
+<div style="margin-left: 40px;">
+<dl>
+  <dt class="codeword">jrepath</dt>
+  <dd>Run if bundled JRE and
+javaw.exe
+are present, otherwise stop with error.</dd>
+  <dt class="codeword">jrepath
++ javamin [+ javamax]</dt>
+  <dd>Use bundled JRE first,
+if it
+cannot be located search for Java, if that fails display error message
+and open the Java download page.</dd>
+  <dt class="codeword">javamin
+[+ javamax]</dt>
+  <dd>Search for Java, if an
+appropriate version cannot be found display error message and open the
+Java download page.</dd>
+</dl>
+</div>
+<dl>
+  <dt>jvmArgs</dt>
+  <dd>Optional, accepts
+everything you would normally pass to
+java/javaw
+launcher: assertion options, system properties and X options.</dd>
+</dl>
+<dl>
+  <dt>jarArgs</dt>
+  <dd>Optional, constant
+command line arguments.</dd>
+</dl>
+<dl>
+  <dt>chdir</dt>
+  <dd>Optional, defaults to
+false.
+Change current directory to exe location. Set this property to true, if
+you have resources outside the jar or want to use a bundled JRE which
+location is relative to the executable.</dd>
+</dl>
+<dl>
+  <dt><span style="font-weight: bold;"></span>setProcName</dt>
+  <dd>Optional, defaults to
+false.
+Set the process name as the executable filename. Creates a temporary
+file in launch4j-tmp directory inside the used JRE. These files are
+deleted by
+any launch4j wrapped application, which sets the process name and uses
+the same JRE. The removal takes place when the application <strong>starts</strong>,
+so at least one copy of this file will always be present.</dd>
+</dl>
+<dl>
+  <dt>errTitle</dt>
+  <dd>Optional,
+sets the title of the error message box that's displayed if Java cannot
+be found for instance. This usually should contain the name of your
+application. The console header prefixes error messages with this
+property (myapp: error...)</dd>
+</dl>
+<span style="font-weight: bold;"> </span>
+<dl>
+  <dt>icon</dt>
+  <dd>Accepted file format:
+ICO</dd>
+  <dd>The first icon is used
+and rescaled when needed. </dd>
+</dl>
+<dl>
+  <dt>splash</dt>
+  <dd>Accepted file format:
+BMP<br>
+Ignored by <em>consolehead.bin</em></dd>
+</dl>
+<dl>
+  <dt>waitfor</dt>
+  <dd>Optional. Specifies
+the beginning of the application title,
+used to
+determine when the splash screen is to be closed. Don't include version
+numbers or other information (<strong>My
+Application</strong><span style="color: rgb(0, 0, 0);"> v1.20, </span><strong>My
+App</strong>
+- Program setup...). If omitted, the splash screen
+will
+close on timeout.<br>
+Ignored by <em>consolehead.bin</em></dd>
+</dl>
+<span style="font-style: italic;"></span>
+<dl>
+  <dt>splashTimeout</dt>
+  <dd>Optional, defaults to
+60.
+Number of seconds after which the splash screen must close. Splash
+timeout may cause an error depending on <span class="codeword">splashTimeoutErr</span>
+property.<span style="font-weight: bold;"> </span>Ignored by <em>consolehead.bin</em><span
+ style="font-style: italic;"></span></dd>
+</dl>
+<span style="font-weight: bold;"> </span><span
+ style="font-style: italic;"></span>
+<dl>
+  <dt>splashTimeoutErr</dt>
+  <dd>Optional, defaults to
+true.
+True signals
+an error on splash timeout, false
+closes the splash screen quietly.<br>
+    <span style="font-weight: bold;"></span>Ignored
+by <em>consolehead.bin</em></dd>
+</dl>
+<span style="font-style: italic;"></span>
+<dl>
+  <dt>stayAlive</dt>
+  <dd>Optional, defaults to
+false
+in <em>guihead.bin</em>
+/ always true<span style="font-weight: bold;"> </span>in <em>consolehead.bin</em>.
+When enabled the
+launcher waits for the Java application to finish and returns it's exit
+code.</dd>
+</dl>
+<h2>Example configurations</h2>
+<pre><span
+ style="font-weight: bold; font-family: monospace; color: rgb(51, 51, 255);"><span
+ style="font-weight: bold;"><span style="font-weight: bold;"><span
+ style="font-weight: bold;"><span style="font-weight: bold;"></span></span></span></span><span
+ style="font-weight: bold;"><span style="font-weight: bold;"><span
+ style="font-weight: bold;"><span style="font-weight: bold;"></span></span></span></span><span
+ style="font-weight: bold;"><span style="font-weight: bold;"><span
+ style="font-weight: bold;"><span style="font-weight: bold;"></span></span></span></span></span><span
+ class="codeword">jar</span> paint2\paint2.jar<br><span class="codeword">outfile</span> paint2\paint2.exe<br><span
+ class="codeword">javamin</span> 1.4.0<br><span class="codeword">javamax</span> 1.4.2<br><span
+ class="codeword">icon</span> paint2\paint2.ico<br><span
+ class="codeword">errTitle</span> Paint2 Error<br><span class="codeword">splash</span> paint2\paint2.bmp<br><span
+ class="codeword">waitfor</span> Paint2<br><span class="codeword">splashTimeout</span> 45<br><span
+ class="codeword">chdir</span> true<br><span class="codeword">setProcName</span> true</pre>
+<span style="font-family: monospace;"><span
+ style="color: rgb(51, 51, 255);"> </span></span>
+<pre><span class="codeword">header</span> consolehead.bin<br><span
+ class="codeword">jar</span> dist\ConsoleApp.jar<br><span
+ class="codeword">outfile</span> dist\ConsoleApp.exe<br><span
+ class="codeword">jrepath</span> ..\jre<br><span class="codeword">javamin</span> 1.4.2<br><span
+ class="codeword">icon</span> l4j\ConsoleApp.ico<br><span
+ class="codeword">chdir</span> true<br><span class="codeword">setProcName</span> true<br><span
+ class="codeword">errTitle</span> ConsoleApp<br><span class="codeword">jvmArgs</span> -Xloggc:gclog.txt</pre>
+</div>
+<div id="footer">
+Copyright
+&copy; 2005 Grzegorz Kowal
+<br>
+<br>
+<p><a href="http://sourceforge.net"><img
+ src="http://sourceforge.net/sflogo.php?group_id=95944&amp;type=4"
+ alt="SourceForge.net Logo" border="0" height="37" width="125"></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<a href="http://www.nosoftwarepatents.com"><img alt=""
+ src="http://www.nosoftwarepatents.com/banners/90x40_3.jpg"
+ style="border: 0px solid ; width: 90px; height: 40px;"></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<a href="http://validator.w3.org/check?uri=referer"><img
+ src="http://www.w3.org/Icons/valid-html401" alt="Valid HTML 4.01!"
+ border="0" height="31" width="88"></a>
+</p>
+</div>
+</div>
+</body>
+</html>
