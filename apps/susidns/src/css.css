@@ -1,0 +1,94 @@
+p {
+	font-family:Verdana,Tahoma,Arial,Helvetica;
+	color:black;
+	line-height:12pt;
+	margin-left:5mm;
+	margin-right:5mm;
+	font-size:10pt;
+}
+
+span.addrhlpr {
+	font-size:7pt;
+}
+	
+h3 {
+	font-family:Verdana,Tahoma,Arial,Helvetica;
+	color:black;
+	font-size:12pt;
+	letter-spacing:2pt;
+	line-height:18pt;
+	font-weight:bold;
+}
+
+body {
+	background-color: white;
+	color:black;
+}
+
+a {
+	color:#327BBF;
+	text-decoration:none;
+}
+
+a:hover {
+	text-decoration:underline;
+}
+
+th {
+	font-family:Verdana,Tahoma,Arial,Helvetica;
+	color:black;
+	line-height:12pt;
+	margin-left:5mm;
+	margin-right:5mm;
+	font-size:10pt;
+}
+
+td {
+	font-family:Verdana,Tahoma,Arial,Helvetica;
+	color:black;
+	line-height:12pt;
+	margin-left:5mm;
+	margin-right:5mm;
+	font-size:10pt;
+	vertical-align:center;
+}
+
+li {
+	font-family:Verdana,Tahoma,Arial,Helvetica;
+	color:black;
+	line-height:12pt;
+	margin-left:5mm;
+	margin-right:5mm;
+	font-size:10pt;
+}
+
+tr.list1 {
+	background-color:#E0E0E0;
+}
+
+tr.list0 {
+	background-color:white;
+}
+
+p.messages {
+	background-color:#92CAFF;
+	color:#327BBF;
+	color:black;
+	border-style:dotted;
+	padding-top: 5mm;
+	padding-right: 5mm;
+	padding-bottom: 5mm;
+	padding-left: 5mm;
+}
+
+#help {
+	border-style:dotted;
+	padding-top: 5mm;
+	padding-right: 5mm;
+	padding-bottom: 5mm;
+	padding-left: 5mm;
+}
+
+p.footer {
+	font-size:7pt;
+}

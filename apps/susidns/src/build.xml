@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="susidns" default="all" basedir=".">
+	<property name="jetty" value="../../jetty/" />
+	<property name="project" value="susidns" />
+	<property name="src" value="java/src" />
+	<property name="bin" value="./WEB-INF/classes" />
+	<property name="lib" value="${jetty}/jettylib" />
+	<property name="tmp" value="./tmp" />
+	<property name="jsp" value="./jsp" />
+	<path id="cp">
+		<pathelement path="${classpath}" />
+		<pathelement location="${bin}" />
+		<pathelement location="${lib}/javax.servlet.jar"/>
+		<pathelement location="${lib}/org.mortbay.jetty.jar"/>
+        <pathelement location="WEB-INF/lib/jstl.jar" />
+        <pathelement location="WEB-INF/lib/standard.jar" />
+        <pathelement location="${lib}/jasper-compiler.jar" />
+        <pathelement location="${lib}/jasper-runtime.jar" />
+        <pathelement location="${lib}/javax.servlet.jar" />
+        <pathelement location="${lib}/commons-logging.jar" />
+        <pathelement location="${lib}/commons-el.jar" />
+        <pathelement location="${lib}/ant.jar" />
+        <pathelement location="../../../core/java/build/i2p.jar" />
+ 	</path>
+ 	<target name="compile">
+		<mkdir dir="${bin}" />
+		<javac debug="true" deprecation="on" source="1.3" target="1.3"
+ 			classpathref="cp" destdir="${bin}" srcdir="${src}" includes="**/*.java" />
+	</target>
+    <target name="precompilejsp">
+        <delete file="WEB-INF/web-fragment.xml" />
+        <delete file="WEB-INF/web-out.xml" />
+    	<mkdir dir="${tmp}" />
+        <java classname="org.apache.jasper.JspC" fork="true" classpathref="cp">
+            <arg value="-d" />
+            <arg value="WEB-INF/classes" />
+            <arg value="-v" />
+            <arg value="-p" />
+            <arg value="i2p.susi.dns.jsp" />
+            <arg value="-webinc" />
+            <arg value="WEB-INF/web-fragment.xml" />
+            <arg value="-webapp" />
+            <arg value="./jsp" />
+        </java>
+        <javac debug="true" deprecation="on" source="1.3" target="1.3" 
+               destdir="${bin}" srcdir="./WEB-INF/classes" includes="**/*.java" classpathref="cp">
+         </javac>
+        <copy file="WEB-INF/web-template.xml" tofile="WEB-INF/web-out.xml" />
+        <loadfile property="jspc.web.fragment" srcfile="WEB-INF/web-fragment.xml" />
+        <replace file="WEB-INF//web-out.xml">
+            <replacefilter token="&lt;!-- precompiled servlets --&gt;" value="${jspc.web.fragment}" />
+        </replace>
+    </target>
+    <target name="all" depends="compile,precompilejsp,war"/> 
+    <target name="war"> 
+        <war destfile="${project}.war" webxml="WEB-INF/web-out.xml">
+        	<fileset dir=".">
+        		<include name="WEB-INF/**/*.class"/>
+        		<include name="WEB-INF/lib/*.jar"/>
+        		<include name="${src}/**/*.java"/>
+        		<include name="jsp/*.jsp"/>
+        		<include name="images/*.png"/>
+        		<include name="css.css"/>
+        		<include name="index.html"/>
+        		<include name="build.xml"/>
+        		<include name="WEB-INF/web-template.xml"/>
+        		<include name="WEB-INF/web-out.xml"/>
+        		<include name="WEB-INF/classes/${project}.properties"/>
+        	</fileset>
+        </war>
+    </target>
+    <target name="clean">
+      <delete file="susidns.war" />
+      <delete>
+        <fileset dir="." includes="**/*.class" />
+        <fileset dir="." includes="tmp" />
+      </delete>
+    </target>
+    <target name="distclean" depends="clean" />
+</project>
