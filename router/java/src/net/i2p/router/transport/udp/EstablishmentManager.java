@@ -128,6 +128,11 @@ public class EstablishmentManager {
         int port = addr.getPort();
         RemoteHostId to = new RemoteHostId(remAddr.getAddress(), port);
         
+        if (!_transport.isValid(to.getIP())) {
+            _transport.failed(msg);
+            return;
+        }
+        
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Add outobund establish state to: " + to);
         
@@ -165,6 +170,9 @@ public class EstablishmentManager {
      *
      */
     void receiveSessionRequest(RemoteHostId from, UDPPacketReader reader) {
+        if (!_transport.isValid(from.getIP()))
+            return;
+        
         boolean isNew = false;
         InboundEstablishState state = null;
         synchronized (_inboundStates) {
@@ -445,7 +453,7 @@ public class EstablishmentManager {
         SimpleTimer.getInstance().addEvent(new FailIntroduction(state, nonce), INTRO_ATTEMPT_TIMEOUT);
         state.setIntroNonce(nonce);
         _context.statManager().addRateData("udp.sendIntroRelayRequest", 1, 0);
-        _transport.send(_builder.buildRelayRequest(state, _transport.getIntroKey()));
+        _transport.send(_builder.buildRelayRequest(_transport, state, _transport.getIntroKey()));
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Send intro for " + state.getRemoteHostId().toString() + " with our intro key as " + _transport.getIntroKey().toBase64());
         state.introSent();

@@ -14,6 +14,7 @@ import java.util.Properties;
 
 import net.i2p.data.DataHelper;
 import net.i2p.data.RouterAddress;
+import net.i2p.router.transport.TransportImpl;
 import net.i2p.util.Log;
 
 /**
@@ -132,12 +133,7 @@ public class TCPAddress {
                                + " since not all peers support it, and we don't support restricted routes");
                 return false;
             }
-            if (quad[0] == (int)127) return false;
-            if (quad[0] == (int)10) return false; 
-            if ( (quad[0] == (int)172) && (quad[1] >= (int)16) && (quad[1] <= (int)31) ) return false;
-            if ( (quad[0] == (int)192) && (quad[1] == (int)168) ) return false;
-            if (quad[0] >= (int)224) return false; // no multicast
-            return true; // or at least possible to be true
+            return TransportImpl.isPubliclyRoutable(quad);
         } catch (Throwable t) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Error checking routability", t);

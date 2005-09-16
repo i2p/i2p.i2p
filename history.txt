@@ -1,4 +1,8 @@
-$Id: history.txt,v 1.251 2005/09/15 23:12:27 jrandom Exp $
+$Id: history.txt,v 1.252 2005/09/16 13:28:27 jrandom Exp $
+
+2005-09-16  jrandom
+    * Reject unroutable IPs in SSU like we do for the TCP transport (unless
+      you have i2np.udp.allowLocal=true defined - useful for private nets)
 
 2005-09-16  jrandom
     * Adjust I2PTunnelHTTPServer so it can be used for outproxy operators 

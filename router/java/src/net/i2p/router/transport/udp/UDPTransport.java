@@ -288,7 +288,9 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         synchronized (this) {
             if ( (_externalListenHost == null) ||
                  (!eq(_externalListenHost.getAddress(), _externalListenPort, ourIP, ourPort)) ) {
-                if ( (_reachabilityStatus == CommSystemFacade.STATUS_UNKNOWN) ||
+                if (!isValid(ourIP)) {
+                    // ignore them 
+                } else if ( (_reachabilityStatus == CommSystemFacade.STATUS_UNKNOWN) ||
                      (_context.clock().now() - _reachabilityStatusLastUpdated > 2*TEST_FREQUENCY) ) {
                     // they told us something different and our tests are either old or failing
                     try {
@@ -328,6 +330,14 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     
     private static final boolean eq(byte laddr[], int lport, byte raddr[], int rport) {
         return (rport == lport) && DataHelper.eq(laddr, raddr);
+    }
+    
+    public final boolean isValid(byte addr[]) {
+        if (addr == null) return false;
+        if (addr.length < 4) return false;
+        if (isPubliclyRoutable(addr)) 
+            return true;
+        return Boolean.valueOf(_context.getProperty("i2np.udp.allowLocal", "false")).booleanValue();
     }
     
     private boolean getIsPortFixed() {

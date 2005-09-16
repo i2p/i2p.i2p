@@ -120,6 +120,8 @@ public class InboundEstablishState {
     /** what port number do they appear to be coming from? */
     public synchronized int getSentPort() { return _alicePort; }
     
+    public synchronized byte[] getBobIP() { return _bobIP; }
+    
     public synchronized byte[] getSentY() {
         if (_sentY == null)
             _sentY = _keyBuilder.getMyPublicValueBytes();
