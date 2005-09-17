@@ -39,14 +39,17 @@
  
  <b>Bandwidth limiter</b><br />
  Inbound rate: 
-    <input name="inboundrate" type="text" size="2" value="<jsp:getProperty name="nethelper" property="inboundRate" />" /> KBytes per second
+    <input name="inboundrate" type="text" size="2" value="<jsp:getProperty name="nethelper" property="inboundRate" />" /> KBps
  bursting up to 
+    <input name="inboundburstrate" type="text" size="2" value="<jsp:getProperty name="nethelper" property="inboundBurstRate" />" /> KBps for
     <jsp:getProperty name="nethelper" property="inboundBurstFactorBox" /><br />
  Outbound rate:
-    <input name="outboundrate" type="text" size="2" value="<jsp:getProperty name="nethelper" property="outboundRate" />" /> KBytes per second
+    <input name="outboundrate" type="text" size="2" value="<jsp:getProperty name="nethelper" property="outboundRate" />" /> KBps
  bursting up to 
+    <input name="outboundburstrate" type="text" size="2" value="<jsp:getProperty name="nethelper" property="outboundBurstRate" />" /> KBps for
   <jsp:getProperty name="nethelper" property="outboundBurstFactorBox" /><br />
- <i>A negative rate means a default limit of 16KBytes per second.</i><br />
+ <i>KBps = kilibytes per second = 1024 bytes per second.<br />
+    A negative rate means a default limit of 16KBytes per second.</i><br />
  Bandwidth share percentage:
    <jsp:getProperty name="nethelper" property="sharePercentageBox" /><br />
  Sharing a higher percentage will improve your anonymity and help the network

@@ -1,6 +1,11 @@
-$Id: history.txt,v 1.254 2005/09/17 02:31:50 jrandom Exp $
+$Id: history.txt,v 1.255 2005/09/17 15:08:26 jrandom Exp $
 
 2005-09-17  jrandom
+    * Updated the bandwidth limiter to use two tiers of bandwidth - our normal
+      steady state rate, plus a new limit on how fast we transfer when 
+      bursting.  This is different from the old "burst as fast as possible 
+      until we're out of tokens" policy, and should help those with congested
+      networks.  See /config.jsp to manage this rate.
     * Bugfixes in Syndie to handle missing cache files (no data was lost, the
       old posts just didn't show up).
     * Log properly in EepPost

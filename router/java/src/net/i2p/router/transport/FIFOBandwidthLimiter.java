@@ -14,16 +14,34 @@ public class FIFOBandwidthLimiter {
     private I2PAppContext _context;
     private List _pendingInboundRequests;
     private List _pendingOutboundRequests;
-    private volatile int _availableInboundBytes;
-    private volatile int _availableOutboundBytes;
+    /** how many bytes we can consume for inbound transmission immediately */
+    private volatile int _availableInbound;
+    /** how many bytes we can consume for outbound transmission immediately */
+    private volatile int _availableOutbound;
+    /** how many bytes we can queue up for bursting */
+    private volatile int _unavailableInboundBurst;
+    /** how many bytes we can queue up for bursting */
+    private volatile int _unavailableOutboundBurst;
+    /** how large _unavailableInbound can get */
+    private int _maxInboundBurst;
+    /** how large _unavailableInbound can get */
+    private int _maxOutboundBurst;
+    /** how large _availableInbound can get - aka our inbound rate duringa burst */
+    private int _maxInbound;
+    /** how large _availableOutbound can get - aka our outbound rate during a burst */
+    private int _maxOutbound;
+    /** shortcut of whether our outbound rate is unlimited */
     private boolean _outboundUnlimited;
+    /** shortcut of whether our inbound rate is unlimited */
     private boolean _inboundUnlimited;
+    /** lifetime counter of bytes received */
     private volatile long _totalAllocatedInboundBytes;
+    /** lifetime counter of bytes sent */
     private volatile long _totalAllocatedOutboundBytes;
+    /** lifetime counter of tokens available for use but exceeded our maxInboundBurst size */
     private volatile long _totalWastedInboundBytes;
+    /** lifetime counter of tokens available for use but exceeded our maxOutboundBurst size */
     private volatile long _totalWastedOutboundBytes;
-    private int _maxInboundBytes;
-    private int _maxOutboundBytes;
     private FIFOBandwidthRefiller _refiller;
     
     private long _lastTotalSent;
@@ -65,16 +83,16 @@ public class FIFOBandwidthLimiter {
         t.start();
     }
 
-    public long getAvailableInboundBytes() { return _availableInboundBytes; }
-    public long getAvailableOutboundBytes() { return _availableOutboundBytes; }
+    //public long getAvailableInboundBytes() { return _availableInboundBytes; }
+    //public long getAvailableOutboundBytes() { return _availableOutboundBytes; }
     public long getTotalAllocatedInboundBytes() { return _totalAllocatedInboundBytes; }
     public long getTotalAllocatedOutboundBytes() { return _totalAllocatedOutboundBytes; }
     public long getTotalWastedInboundBytes() { return _totalWastedInboundBytes; }
     public long getTotalWastedOutboundBytes() { return _totalWastedOutboundBytes; }
-    public long getMaxInboundBytes() { return _maxInboundBytes; }
-    public void setMaxInboundBytes(int numBytes) { _maxInboundBytes = numBytes; }
-    public long getMaxOutboundBytes() { return _maxOutboundBytes; }
-    public void setMaxOutboundBytes(int numBytes) { _maxOutboundBytes = numBytes; }
+    //public long getMaxInboundBytes() { return _maxInboundBytes; }
+    //public void setMaxInboundBytes(int numBytes) { _maxInboundBytes = numBytes; }
+    //public long getMaxOutboundBytes() { return _maxOutboundBytes; }
+    //public void setMaxOutboundBytes(int numBytes) { _maxOutboundBytes = numBytes; }
     public boolean getInboundUnlimited() { return _inboundUnlimited; }
     public void setInboundUnlimited(boolean isUnlimited) { _inboundUnlimited = isUnlimited; }
     public boolean getOutboundUnlimited() { return _outboundUnlimited; }
@@ -83,8 +101,14 @@ public class FIFOBandwidthLimiter {
     public void reinitialize() {
         _pendingInboundRequests.clear();
         _pendingOutboundRequests.clear();
-        _availableInboundBytes = 0;
-        _availableOutboundBytes = 0;
+        _availableInbound = 0;
+        _availableOutbound = 0;
+        _maxInbound = 0;
+        _maxOutbound = 0;
+        _maxInboundBurst = 0;
+        _maxOutboundBurst = 0;
+        _unavailableInboundBurst = 0;
+        _unavailableOutboundBurst = 0;
         _inboundUnlimited = false;
         _outboundUnlimited = false;
         _refiller.reinitialize();
@@ -133,25 +157,94 @@ public class FIFOBandwidthLimiter {
         return req;
     }
     
+    void setInboundBurstKBps(int kbytesPerSecond) {
+        _maxInbound = kbytesPerSecond * 1024;
+    }
+    void setOutboundBurstKBps(int kbytesPerSecond) {
+        _maxOutbound = kbytesPerSecond * 1024;
+    }
+    int getInboundBurstBytes() { return _maxInboundBurst; }
+    int getOutboundBurstBytes() { return _maxOutboundBurst; }
+    void setInboundBurstBytes(int bytes) { _maxInboundBurst = bytes; }
+    void setOutboundBurstBytes(int bytes) { _maxOutboundBurst = bytes; }
+    
+    StringBuffer getStatus() {
+        StringBuffer rv = new StringBuffer(64);
+        rv.append("Available: ").append(_availableInbound).append('/').append(_availableOutbound).append(' ');
+        rv.append("Max: ").append(_maxInbound).append('/').append(_maxOutbound).append(' ');
+        rv.append("Burst: ").append(_unavailableInboundBurst).append('/').append(_unavailableOutboundBurst).append(' ');
+        rv.append("Burst max: ").append(_maxInboundBurst).append('/').append(_maxOutboundBurst).append(' ');
+        return rv;
+    }
+    
     /**
      * More bytes are available - add them to the queue and satisfy any requests
      * we can
      */
     final void refillBandwidthQueues(long bytesInbound, long bytesOutbound) {
         if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Refilling the queues with " + bytesInbound + "/" + bytesOutbound + ", available " + 
-                       _availableInboundBytes + '/' + _availableOutboundBytes + ", max " + 
-                       _maxInboundBytes + '/' + _maxOutboundBytes);
-        _availableInboundBytes += bytesInbound;
-        _availableOutboundBytes += bytesOutbound;
-        if (_availableInboundBytes > _maxInboundBytes) {
-            _totalWastedInboundBytes += (_availableInboundBytes - _maxInboundBytes);
-            _availableInboundBytes = _maxInboundBytes;
+            _log.debug("Refilling the queues with " + bytesInbound + "/" + bytesOutbound + ": " + getStatus().toString());
+        _availableInbound += bytesInbound;
+        _availableOutbound += bytesOutbound;
+        
+        if (_availableInbound > _maxInbound) {
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("available inbound (" + _availableInbound + ") exceeds our inbound burst (" + _maxInbound + "), so no supplement");
+            _unavailableInboundBurst += _availableInbound - _maxInbound;
+            _availableInbound = _maxInbound;
+            if (_unavailableInboundBurst > _maxInboundBurst) {
+                _totalWastedInboundBytes += _unavailableInboundBurst - _maxInboundBurst;
+                _unavailableInboundBurst = _maxInboundBurst;
+            }
+        } else {
+            // try to pull in up to 1/10th of the max inbound rate (aka burst rate), since 
+            // we refill every 100ms
+            int want = _maxInbound/10;
+            if (want > (_maxInbound - _availableInbound))
+                want = _maxInbound - _availableInbound;
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("want to pull " + want + " from the inbound burst (" + _unavailableInboundBurst + ") to supplement " + _availableInbound + " (max: " + _maxInbound + ")");
+            
+            if (want > 0) {
+                if (want <= _unavailableInboundBurst) {
+                    _availableInbound += want;
+                    _unavailableInboundBurst -= want;
+                } else {
+                    _availableInbound += _unavailableInboundBurst;
+                    _unavailableInboundBurst = 0;
+                }
+            }
         }
-        if (_availableOutboundBytes > _maxOutboundBytes) {
-            _totalWastedOutboundBytes += (_availableOutboundBytes - _maxOutboundBytes);
-            _availableOutboundBytes = _maxOutboundBytes;
+        
+        if (_availableOutbound > _maxOutbound) {
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("available outbound (" + _availableOutbound + ") exceeds our outbound burst (" + _maxOutbound + "), so no supplement");
+            _unavailableOutboundBurst += _availableOutbound - _maxOutbound;
+            _availableOutbound = _maxOutbound;
+            if (_unavailableOutboundBurst > _maxOutboundBurst) {
+                _totalWastedOutboundBytes += _unavailableOutboundBurst - _maxOutboundBurst;
+                _unavailableOutboundBurst = _maxOutboundBurst;
+            }
+        } else {
+            // try to pull in up to 1/10th of the max outbound rate (aka burst rate), since 
+            // we refill every 100ms
+            int want = _maxOutbound/10;
+            if (want > (_maxOutbound - _availableOutbound))
+                want = _maxOutbound - _availableOutbound;
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("want to pull " + want + " from the outbound burst (" + _unavailableOutboundBurst + ") to supplement " + _availableOutbound + " (max: " + _maxOutbound + ")");
+            
+            if (want > 0) {
+                if (want <= _unavailableOutboundBurst) {
+                    _availableOutbound += want;
+                    _unavailableOutboundBurst -= want;
+                } else {
+                    _availableOutbound += _unavailableOutboundBurst;
+                    _unavailableOutboundBurst = 0;
+                }
+            }
         }
+        
         satisfyRequests();
         updateStats();
     }
@@ -204,15 +297,14 @@ public class FIFOBandwidthLimiter {
             if (_inboundUnlimited) {
                 satisfied = locked_satisfyInboundUnlimited();
             } else {
-                if (_availableInboundBytes > 0) {
+                if (_availableInbound > 0) {
                     satisfied = locked_satisfyInboundAvailable();
                 } else {
                     // no bandwidth available
                     if (_log.shouldLog(Log.DEBUG))
                         _log.debug("Still denying the " + _pendingInboundRequests.size() 
-                                  + " pending inbound requests (available "
-                                  + _availableInboundBytes + "/" + _availableOutboundBytes 
-                                  + " in/out, longest waited " + locked_getLongestInboundWait() + " in)");
+                                  + " pending inbound requests (status: " + getStatus().toString()
+                                  + ", longest waited " + locked_getLongestInboundWait() + " in)");
                 }
             }
         }
@@ -289,7 +381,7 @@ public class FIFOBandwidthLimiter {
         List satisfied = null;
         
         for (int i = 0; i < _pendingInboundRequests.size(); i++) {
-            if (_availableInboundBytes <= 0) break;
+            if (_availableInbound <= 0) break;
             SimpleRequest req = (SimpleRequest)_pendingInboundRequests.get(i);
             long waited = now() - req.getRequestTime();
             if (req.getAborted()) {
@@ -313,11 +405,11 @@ public class FIFOBandwidthLimiter {
             // ok, they are really waiting for us to give them stuff
             int requested = req.getPendingInboundRequested();
             int allocated = 0;
-            if (_availableInboundBytes > requested) 
+            if (_availableInbound > requested) 
                 allocated = requested;
             else
-                allocated = _availableInboundBytes;
-            _availableInboundBytes -= allocated;
+                allocated = _availableInbound;
+            _availableInbound -= allocated;
             _totalAllocatedInboundBytes += allocated;
             req.allocateBytes(allocated, 0);
             if (satisfied == null)
@@ -354,15 +446,14 @@ public class FIFOBandwidthLimiter {
             if (_outboundUnlimited) {
                 satisfied = locked_satisfyOutboundUnlimited();
             } else {
-                if (_availableOutboundBytes > 0) {
+                if (_availableOutbound > 0) {
                     satisfied = locked_satisfyOutboundAvailable();
                 } else {
                     // no bandwidth available
                     if (_log.shouldLog(Log.DEBUG))
                         _log.debug("Still denying the " + _pendingOutboundRequests.size() 
-                                  + " pending outbound requests (available "
-                                  + _availableInboundBytes + "/" + _availableOutboundBytes + " in/out, "
-                                  + "longest waited " + locked_getLongestOutboundWait() + " out)");
+                                  + " pending outbound requests (status: " + getStatus().toString()
+                                  + ", longest waited " + locked_getLongestOutboundWait() + " out)");
                 }
             }
         }
@@ -414,7 +505,7 @@ public class FIFOBandwidthLimiter {
         List satisfied = null;
         
         for (int i = 0; i < _pendingOutboundRequests.size(); i++) {
-            if (_availableOutboundBytes <= 0) break;
+            if (_availableOutbound <= 0) break;
             SimpleRequest req = (SimpleRequest)_pendingOutboundRequests.get(i);
             long waited = now() - req.getRequestTime();
             if (req.getAborted()) {
@@ -438,11 +529,11 @@ public class FIFOBandwidthLimiter {
             // ok, they are really waiting for us to give them stuff
             int requested = req.getPendingOutboundRequested();
             int allocated = 0;
-            if (_availableOutboundBytes > requested) 
+            if (_availableOutbound > requested) 
                 allocated = requested;
             else
-                allocated = _availableOutboundBytes;
-            _availableOutboundBytes -= allocated;
+                allocated = _availableOutbound;
+            _availableOutbound -= allocated;
             _totalAllocatedOutboundBytes += allocated;
             req.allocateBytes(0, allocated);
             if (satisfied == null)
@@ -476,9 +567,8 @@ public class FIFOBandwidthLimiter {
     public void renderStatusHTML(Writer out) throws IOException {
         long now = now();
         StringBuffer buf = new StringBuffer(4096);
-        buf.append("<br /><b>Pending bandwidth requests (with ");
-        buf.append(_availableInboundBytes).append('/');
-        buf.append(_availableOutboundBytes).append(" bytes inbound/outbound available):</b><ul>");
+        buf.append("<br /><i>Limiter status: ").append(getStatus().toString()).append("</i><br />\n");
+        buf.append("<b>Pending bandwidth requests:</b><ul>");
         buf.append("<li>Inbound requests: <ol>");
         synchronized (_pendingInboundRequests) {
             for (int i = 0; i < _pendingInboundRequests.size(); i++) {

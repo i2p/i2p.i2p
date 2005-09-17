@@ -84,6 +84,8 @@ public class ConfigNetHelper {
     
     public static final String PROP_INBOUND_KBPS = "i2np.bandwidth.inboundKBytesPerSecond";
     public static final String PROP_OUTBOUND_KBPS = "i2np.bandwidth.outboundKBytesPerSecond";
+    public static final String PROP_INBOUND_BURST_KBPS = "i2np.bandwidth.inboundBurstKBytesPerSecond";
+    public static final String PROP_OUTBOUND_BURST_KBPS = "i2np.bandwidth.outboundBurstKBytesPerSecond";
     public static final String PROP_INBOUND_BURST = "i2np.bandwidth.inboundBurstKBytes";
     public static final String PROP_OUTBOUND_BURST = "i2np.bandwidth.outboundBurstKBytes";
     public static final String PROP_SHARE_PERCENTAGE = "router.sharePercentage";
@@ -94,14 +96,28 @@ public class ConfigNetHelper {
         if (rate != null)
             return rate;
         else
-            return "-1";
+            return "16";
     }
     public String getOutboundRate() {
         String rate = _context.getProperty(PROP_OUTBOUND_KBPS);
         if (rate != null)
             return rate;
         else
-            return "-1";
+            return "16";
+    }
+    public String getInboundBurstRate() {
+        String rate = _context.getProperty(PROP_INBOUND_BURST_KBPS);
+        if (rate != null)
+            return rate;
+        else
+            return "32";
+    }
+    public String getOutboundBurstRate() {
+        String rate = _context.getProperty(PROP_OUTBOUND_BURST_KBPS);
+        if (rate != null)
+            return rate;
+        else
+            return "32";
     }
     public String getInboundBurstFactorBox() {
         String rate = _context.getProperty(PROP_INBOUND_KBPS);

@@ -34,8 +34,10 @@ public class ConfigNetHandler extends FormHandler {
     private String _tcpPort;
     private String _udpPort;
     private String _inboundRate;
+    private String _inboundBurstRate;
     private String _inboundBurst;
     private String _outboundRate;
+    private String _outboundBurstRate;
     private String _outboundBurst;
     private String _reseedFrom;
     private String _sharePct;
@@ -73,11 +75,17 @@ public class ConfigNetHandler extends FormHandler {
     public void setInboundrate(String rate) { 
         _inboundRate = (rate != null ? rate.trim() : null); 
     }
+    public void setInboundburstrate(String rate) { 
+        _inboundBurstRate = (rate != null ? rate.trim() : null); 
+    }
     public void setInboundburstfactor(String factor) { 
         _inboundBurst = (factor != null ? factor.trim() : null); 
     }
     public void setOutboundrate(String rate) { 
         _outboundRate = (rate != null ? rate.trim() : null); 
+    }
+    public void setOutboundburstrate(String rate) { 
+        _outboundBurstRate = (rate != null ? rate.trim() : null); 
     }
     public void setOutboundburstfactor(String factor) { 
         _outboundBurst = (factor != null ? factor.trim() : null); 
@@ -293,14 +301,22 @@ public class ConfigNetHandler extends FormHandler {
             _context.router().setConfigSetting(ConfigNetHelper.PROP_OUTBOUND_KBPS, _outboundRate);
             updated = true;
         }
+        if ( (_inboundBurstRate != null) && (_inboundBurstRate.length() > 0) ) {
+            _context.router().setConfigSetting(ConfigNetHelper.PROP_INBOUND_BURST_KBPS, _inboundBurstRate);
+            updated = true;
+        }
+        if ( (_outboundBurstRate != null) && (_outboundBurstRate.length() > 0) ) {
+            _context.router().setConfigSetting(ConfigNetHelper.PROP_OUTBOUND_BURST_KBPS, _outboundBurstRate);
+            updated = true;
+        }
         
-        String inRate = _context.router().getConfigSetting(ConfigNetHelper.PROP_INBOUND_KBPS);
+        String inBurstRate = _context.router().getConfigSetting(ConfigNetHelper.PROP_INBOUND_BURST_KBPS);
         
         if (_inboundBurst != null) {
             int rateKBps = 0;
             int burstSeconds = 0;
             try {
-                rateKBps = Integer.parseInt(inRate);
+                rateKBps = Integer.parseInt(inBurstRate);
                 burstSeconds = Integer.parseInt(_inboundBurst);
             } catch (NumberFormatException nfe) {
                 // ignore
@@ -312,13 +328,13 @@ public class ConfigNetHandler extends FormHandler {
             }
         }
         
-        String outRate = _context.router().getConfigSetting(ConfigNetHelper.PROP_OUTBOUND_KBPS);
+        String outBurstRate = _context.router().getConfigSetting(ConfigNetHelper.PROP_OUTBOUND_BURST_KBPS);
         
         if (_outboundBurst != null) {
             int rateKBps = 0;
             int burstSeconds = 0;
             try {
-                rateKBps = Integer.parseInt(outRate);
+                rateKBps = Integer.parseInt(outBurstRate);
                 burstSeconds = Integer.parseInt(_outboundBurst);
             } catch (NumberFormatException nfe) {
                 // ignore
