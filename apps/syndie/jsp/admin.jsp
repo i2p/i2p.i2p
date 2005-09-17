@@ -25,11 +25,18 @@ if (!user.getAuthenticated()) {
     String proxyHost = request.getParameter("proxyhost");
     String proxyPort = request.getParameter("proxyport");
     String selector = request.getParameter("selector");
+    boolean isSingleUser = BlogManager.instance().isSingleUser();
+    String singleSet = request.getParameter("singleuser");
+    if (singleSet != null)
+      isSingleUser = true;
+    else
+      isSingleUser = false;
+    
     if (configured) {
-      if ( (adminPass != null) && (BlogManager.instance().authorizeAdmin(adminPass)) ) {
+      if (BlogManager.instance().authorizeAdmin(adminPass)) {
         int port = -1;
         try { port = Integer.parseInt(proxyPort); } catch (NumberFormatException nfe) { port = 4444; }
-        BlogManager.instance().configure(regPass, remotePass, adminPass, selector, proxyHost, port, null);
+        BlogManager.instance().configure(regPass, remotePass, adminPass, selector, proxyHost, port, isSingleUser, null);
         %><span class="b_adminMsgOk">Configuration updated</span><%
       } else {
         %><span class="b_adminMsgErr">Invalid admin password.  If you lost it, please update your syndie.config.</span><%
@@ -37,11 +44,15 @@ if (!user.getAuthenticated()) {
     } else {
       int port = -1;
       try { port = Integer.parseInt(proxyPort); } catch (NumberFormatException nfe) { port = 4444; }
-      BlogManager.instance().configure(regPass, remotePass, adminPass, selector, proxyHost, port, null);
+      BlogManager.instance().configure(regPass, remotePass, adminPass, selector, proxyHost, port, isSingleUser, null);
       %><span class="b_adminMsgOk">Configuration saved</span><%
     }
   } else {
 %><form action="admin.jsp" method="POST">
+<em class="b_adminField">Single user?</em> <input type="checkbox" class="b_adminField" name="singleuser" <%=BlogManager.instance().isSingleUser() ? " checked=\"true\" " : ""%> /><br />
+<span class="b_adminDescr">If this is checked, the registration, admin, and remote passwords are unnecessary - anyone
+can register and administer Syndie, as well as use any remote functionality.  This should not be checked if untrusted
+parties can access this web interface.</span><br />
 <em class="b_adminField">Registration password:</em> <input class="b_adminField" type="text" name="regpass" size="10" /><br />
 <span class="b_adminDescr">Users must specify this password on the registration form to proceed.  If this is
 blank, anyone can register.</span><br />

@@ -1,4 +1,16 @@
-$Id: history.txt,v 1.252 2005/09/16 13:28:27 jrandom Exp $
+$Id: history.txt,v 1.253 2005/09/16 16:24:43 jrandom Exp $
+
+2005-09-17  jrandom
+    * Added the natively compiled jbigi and patched java service wrapper for
+      OS X.  Thanks Bill Dorsey for letting me use your machine!
+    * Don't build i2p.exe or i2pinstall.exe when run on OS X machines, as we
+      don't bundle the binutils necessary (and there'd be a naming conflict
+      if we did).
+    * Added 'single user' functionality to syndie - if the single user 
+      checkbox on the admin page is checked, all users are allowed to control
+      the instance and sync up with remote syndie nodes.
+    * Temporarily disable the x-i2p-gzip in i2ptunnel until it is more closely
+      debugged.
 
 2005-09-16  jrandom
     * Reject unroutable IPs in SSU like we do for the TCP transport (unless

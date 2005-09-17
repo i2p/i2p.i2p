@@ -97,7 +97,7 @@ if (!user.getAuthenticated()) {
 
         post.renderPreview(out);
         %><hr /><span class="b_postConfirm"><form action="post.jsp" method="POST">
-Please confirm that the above is ok<% if (user.getAllowAccessRemote()) { %>, and select what additional archives you 
+Please confirm that the above is ok<% if (BlogManager.instance().authorizeRemote(user)) { %>, and select what additional archives you 
 want the post transmitted to.  Otherwise, just hit your browser's back arrow and
 make changes. 
 <select class="b_postConfirm" name="archive">

@@ -46,6 +46,12 @@
         <copy file="apps/jetty/jettylib/javax.servlet.jar" todir="build/" />
     </target>
     <target name="buildexe">
+        <condition property="osx">
+	    <os family="mac" />
+	</condition>
+	<ant target="doBuildEXE" />
+    </target>
+    <target name="doBuildEXE" unless="osx">
         <jar destfile="./build/launchi2p.jar">
             <manifest>
 	     <attribute name="Main-Class" value="net.i2p.router.RouterLaunch" />
@@ -115,8 +121,8 @@
     </target>
     <target name="clean" depends="pkgclean" >
         <delete dir="./build" />
-        <delete file="i2pinstall.exe" />	
-        <delete file="i2p.exe" />	
+        <delete file="i2pinstall.exe" failonerror="false" quiet="true" />	
+        <delete file="i2p.exe" failonerror="false" quiet="true" />	
     </target>
     <target name="distclean" depends="clean">
         <ant dir="core/java/" target="distclean" />
@@ -199,7 +205,7 @@
         <copy file="build/routerconsole.jar" todir="pkg-temp/lib/" />
         <copy file="build/sam.jar" todir="pkg-temp/lib/" />
         <copy file="build/systray.jar" todir="pkg-temp/lib" />
-        <copy file="i2p.exe" todir="pkg-temp/" />
+        <copy file="i2p.exe" todir="pkg-temp/" failonerror="false" />
         <copy file="installer/resources/runplain.sh" todir="pkg-temp/" />
         <copy file="apps/systray/java/lib/systray4j.jar" todir="pkg-temp/lib" />
         <copy file="apps/systray/java/lib/systray4j.dll" todir="pkg-temp/lib" />
@@ -289,7 +295,7 @@
         <copy file="build/sam.jar" todir="pkg-temp/lib/" />
         <copy file="build/router.jar" todir="pkg-temp/lib/" />
         <copy file="build/routerconsole.jar" todir="pkg-temp/lib/" />
-        <copy file="i2p.exe" todir="pkg-temp/" />
+        <copy file="i2p.exe" todir="pkg-temp/" failonerror="false" />
         <copy file="installer/resources/runplain.sh" todir="pkg-temp/" />
         
         <!-- for the i2p 0.5 release, push jetty 5.2.1 -->
@@ -341,6 +347,12 @@
         <ant target="installerexe" />
     </target>
     <target name="installerexe">
+        <condition property="osx">
+	    <os family="mac" />
+	</condition>
+	<ant target="doInstallerEXE" />
+    </target>
+    <target name="doInstallerEXE">
 	<!-- now the installer exe -->
 	<taskdef name="launch4j"
                  classname="net.sf.launch4j.ant.Launch4jTask"

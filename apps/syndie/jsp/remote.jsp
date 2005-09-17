@@ -16,7 +16,7 @@ request.setCharacterEncoding("UTF-8");
     <jsp:include page="_topnav.jsp" />
     <td valign="top" align="left" rowspan="2" class="b_rightnav"><jsp:include page="_rightnav.jsp" /></td></tr>
 <tr class="b_content"><td valign="top" align="left" colspan="3" class="b_content"><%
-if (!user.getAuthenticated() || !user.getAllowAccessRemote()) { 
+if (!BlogManager.instance().authorizeRemote(user)) { 
 %><span class="b_remoteMsgErr">Sorry, you are not allowed to access remote archives from here.  Perhaps you should install Syndie yourself?</span><%
 } else { %><form action="remote.jsp" method="POST"><span class="b_remoteChooser"><span class="b_remoteChooserField">Import from:</span>
 <select class="b_remoteChooserNet" name="schema">

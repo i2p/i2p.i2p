@@ -351,7 +351,7 @@ public class HTMLRenderer extends EventReceiverImpl {
             _bodyBuffer.append(getSpan("blogArchive")).append(" Archives: ");
             for (int i = 0; i < locations.size(); i++) {
                 SafeURL surl = (SafeURL)locations.get(i);
-                if (_user.getAuthenticated() && _user.getAllowAccessRemote())
+                if (_user.getAuthenticated() && BlogManager.instance().authorizeRemote(_user) )
                     _bodyBuffer.append("<a ").append(getClass("blogArchiveView")).append(" href=\"").append(getArchiveURL(blog, surl)).append("\">").append(sanitizeString(surl.toString())).append("</a> ");
                 else
                     _bodyBuffer.append(getSpan("blogArchiveURL")).append(sanitizeString(surl.toString())).append("</span> ");

@@ -240,11 +240,22 @@ public class BlogManager {
         File cfg = getConfigFile();
         return (cfg.exists());
     }
+    
+    /**
+     * If true, this syndie instance is meant for just one local user, so we don't need
+     * to password protect registration, remote.jsp, or admin.jsp
+     *
+     */
+    public boolean isSingleUser() {
+        String isSingle = _context.getProperty("syndie.singleUser");
+        return ( (isSingle != null) && (Boolean.valueOf(isSingle).booleanValue()) );
+    }
 
     public String getDefaultProxyHost() { return _context.getProperty("syndie.defaultProxyHost", ""); }
     public String getDefaultProxyPort() { return _context.getProperty("syndie.defaultProxyPort", ""); }
     
     public boolean authorizeAdmin(String pass) {
+        if (isSingleUser()) return true;
         String admin = getAdminPasswordHash();
         if ( (admin == null) || (admin.trim().length() <= 0) )
             return false;
@@ -252,15 +263,20 @@ public class BlogManager {
         return (hash.equals(admin));
     }
     public boolean authorizeRemote(String pass) {
+        if (isSingleUser()) return true;
         String rem = getRemotePasswordHash();
         if ( (rem == null) || (rem.trim().length() <= 0) )
             return false;
         String hash = Base64.encode(_context.sha().calculateHash(DataHelper.getUTF8(pass.trim())).getData());
         return (hash.equals(rem));
     }
+    public boolean authorizeRemote(User user) {
+        if (isSingleUser()) return true;
+        return (!user.getAuthenticated() || !user.getAllowAccessRemote());
+    }
     
     public void configure(String registrationPassword, String remotePassword, String adminPass, String defaultSelector, 
-                          String defaultProxyHost, int defaultProxyPort, Properties opts) {
+                          String defaultProxyHost, int defaultProxyPort, boolean isSingleUser, Properties opts) {
         File cfg = getConfigFile();
         Writer out = null;
         try {
@@ -277,6 +293,7 @@ public class BlogManager {
                 out.write("syndie.defaultProxyHost="+defaultProxyHost.trim() + "\n");
             if (defaultProxyPort > 0)
                 out.write("syndie.defaultProxyPort="+defaultProxyPort + "\n");
+            out.write("syndie.singleUser=" + isSingleUser + "\n");
             if (opts != null) {
                 for (Iterator iter = opts.keySet().iterator(); iter.hasNext(); ) {
                     String key = (String)iter.next();
@@ -327,7 +344,7 @@ public class BlogManager {
     public String register(User user, String login, String password, String registrationPassword, String blogName, String blogDescription, String contactURL) {
         System.err.println("Register [" + login + "] pass [" + password + "] name [" + blogName + "] descr [" + blogDescription + "] contact [" + contactURL + "] regPass [" + registrationPassword + "]");
         String hashedRegistrationPassword = getRegistrationPasswordHash();
-        if (hashedRegistrationPassword != null) {
+        if ( (hashedRegistrationPassword != null) && (!isSingleUser()) ) {
             try {
                 if (!hashedRegistrationPassword.equals(Base64.encode(_context.sha().calculateHash(registrationPassword.getBytes("UTF-8")).getData())))
                     return "<span class=\"b_regMsgErr\">Invalid registration password</span>";
