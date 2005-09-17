@@ -215,15 +215,19 @@ public class Archive {
     
     private EntryContainer getCachedEntry(File entryDir) {
         try {
-            return new CachedEntry(entryDir);
+            CachedEntry ce = new CachedEntry(entryDir);
+            if (ce.isValid())
+                return ce;
+            return null;
         } catch (IOException ioe) {
             ioe.printStackTrace();
-            File files[] = entryDir.listFiles();
-            for (int i = 0; i < files.length; i++)
-                files[i].delete();
-            entryDir.delete();
-            return null;
         }
+        
+        File files[] = entryDir.listFiles();
+        for (int i = 0; i < files.length; i++)
+            files[i].delete();
+        entryDir.delete();
+        return null;
     }
     
     public EntryContainer getEntry(BlogURI uri) { return getEntry(uri, null); }

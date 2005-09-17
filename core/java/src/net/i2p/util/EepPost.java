@@ -4,12 +4,24 @@ import java.io.*;
 import java.net.*;
 import java.util.*;
 import net.i2p.I2PAppContext;
+import net.i2p.util.Log;
 
 /**
  * Simple helper for uploading files and such via HTTP POST (rfc 1867)
  *
  */
 public class EepPost {
+    private I2PAppContext _context;
+    private Log _log;
+    
+    public EepPost() {
+        this(I2PAppContext.getGlobalContext());
+    }
+    public EepPost(I2PAppContext ctx) {
+        _context = ctx;
+        _log = ctx.logManager().getLog(EepPost.class);
+    }
+    
     public static void main(String args[]) {
         EepPost e = new EepPost();
         Map fields = new HashMap();
@@ -53,6 +65,7 @@ public class EepPost {
             _onCompletion = onCompletion;
         }
         public void run() {
+            Socket s = null;
             try {
                 URL u = new URL(_url);
                 String h = u.getHost();
@@ -68,12 +81,13 @@ public class EepPost {
                     _proxyPort = p;
                 }
 
-                Socket s = new Socket(_proxyHost, _proxyPort);
+                s = new Socket(_proxyHost, _proxyPort);
                 OutputStream out = s.getOutputStream();
                 String sep = getSeparator();
                 long length = calcContentLength(sep, _fields);
                 String header = getHeader(isProxy, path, h, p, sep, length);
-                System.out.println("Header: \n" + header);
+                if (_log.shouldLog(Log.DEBUG))
+                    _log.debug("Header: \n" + header);
                 out.write(header.getBytes());
                 out.flush();
                 if (false) {
@@ -82,14 +96,18 @@ public class EepPost {
                     sendFields(out, sep, _fields);
                 }
                 out.flush();
-                BufferedReader in = new BufferedReader(new InputStreamReader(s.getInputStream()));
-                String line = null;
-                while ( (line = in.readLine()) != null)
-                    System.out.println("recv: [" + line + "]");
+                if (_log.shouldLog(Log.DEBUG)) {
+                    BufferedReader in = new BufferedReader(new InputStreamReader(s.getInputStream()));
+                    String line = null;
+                    while ( (line = in.readLine()) != null) {
+                        _log.debug("recv: [" + line + "]");
+                    }
+                }
                 out.close();
             } catch (Exception e) {
                 e.printStackTrace();
             } finally {
+                if (s != null) try { s.close(); } catch (IOException ioe) {}
                 if (_onCompletion != null)
                     _onCompletion.run();
             }

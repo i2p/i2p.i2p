@@ -1,4 +1,9 @@
-$Id: history.txt,v 1.253 2005/09/16 16:24:43 jrandom Exp $
+$Id: history.txt,v 1.254 2005/09/17 02:31:50 jrandom Exp $
+
+2005-09-17  jrandom
+    * Bugfixes in Syndie to handle missing cache files (no data was lost, the
+      old posts just didn't show up).
+    * Log properly in EepPost
 
 2005-09-17  jrandom
     * Added the natively compiled jbigi and patched java service wrapper for

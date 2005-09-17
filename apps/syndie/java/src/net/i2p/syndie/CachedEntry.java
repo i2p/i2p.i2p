@@ -28,6 +28,10 @@ class CachedEntry extends EntryContainer {
         _attachments = null;
     }
     
+    public boolean isValid() { 
+        return (_entry != null) && (_blog != null);
+    }
+    
     // always available, loaded from meta
     public int getFormat() { return _format; }
     public BlogURI getURI() { return _blog; }
@@ -70,7 +74,7 @@ class CachedEntry extends EntryContainer {
     }
     
     // now the actual lazy loading code
-    private void importMeta() {
+    private void importMeta() throws IOException {
         Properties meta = readProps(new File(_entryDir, EntryExtractor.META));
         _format = getInt(meta, "format");
         _size = getInt(meta, "size");
@@ -78,8 +82,14 @@ class CachedEntry extends EntryContainer {
     }
     
     private Properties importHeaders() {
-        if (_headers == null) 
-            _headers = readProps(new File(_entryDir, EntryExtractor.HEADERS));
+        if (_headers == null) {
+            try {
+                _headers = readProps(new File(_entryDir, EntryExtractor.HEADERS));
+            } catch (IOException ioe) {
+                ioe.printStackTrace();
+                _headers = new Properties();
+            }
+        }
         return _headers;
     }
     
@@ -103,7 +113,7 @@ class CachedEntry extends EntryContainer {
         return;
     }
     
-    private static Properties readProps(File propsFile) {
+    private static Properties readProps(File propsFile) throws IOException {
         Properties rv = new Properties();
         BufferedReader in = null;
         try {
@@ -114,8 +124,6 @@ class CachedEntry extends EntryContainer {
                 if ( (split <= 0) || (split >= line.length()) ) continue;
                 rv.setProperty(line.substring(0, split).trim(), line.substring(split+1).trim());
             }
-        } catch (IOException ioe) {
-            ioe.printStackTrace();
         } finally {
             if (in != null) try { in.close(); } catch (IOException ioe) {}
         }
@@ -222,15 +230,20 @@ class CachedEntry extends EntryContainer {
 
         private void importAttachmentHeaders() {
             if (_attachmentHeaders == null) {
-                Properties props = readProps(_metaFile);
-                String sz = (String)props.remove(EntryExtractor.ATTACHMENT_DATA_SIZE);
-                if (sz != null) {
-                    try { 
-                        _dataSize = Integer.parseInt(sz);
-                    } catch (NumberFormatException nfe) {}
+                try {
+                    Properties props = readProps(_metaFile);
+                    String sz = (String)props.remove(EntryExtractor.ATTACHMENT_DATA_SIZE);
+                    if (sz != null) {
+                        try { 
+                            _dataSize = Integer.parseInt(sz);
+                        } catch (NumberFormatException nfe) {}
+                    }
+
+                    _attachmentHeaders = props;
+                } catch (IOException ioe) {
+                    ioe.printStackTrace();
+                    _attachmentHeaders = new Properties();
                 }
-                
-                _attachmentHeaders = props;
             }
         }
     }
