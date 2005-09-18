@@ -272,6 +272,11 @@
         <copy file="installer/resources/eepsite_index.html" tofile="pkg-temp/eepsite/docroot/index.html" />
         <copy file="installer/resources/favicon.ico" tofile="pkg-temp/eepsite/docroot/favicon.ico" />
         <copy file="installer/resources/jetty.xml" tofile="pkg-temp/eepsite/jetty.xml" />
+	<mkdir dir="pkg-temp/syndie" />
+	<mkdir dir="pkg-temp/syndie/archive" />
+	<mkdir dir="pkg-temp/syndie/archive/ovpBy2mpO1CQ7deYhQ1cDGAwI6pQzLbWOm1Sdd0W06c=" />
+	<copy file="installer/resources/blogMeta.snm" tofile="pkg-temp/syndie/archive/ovpBy2mpO1CQ7deYhQ1cDGAwI6pQzLbWOm1Sdd0W06c=/meta.snm" />
+	<copy file="installer/resources/blogPost.snd" tofile="pkg-temp/syndie/archive/ovpBy2mpO1CQ7deYhQ1cDGAwI6pQzLbWOm1Sdd0W06c=/1126915200003.snd" />
     </target>
     <target name="tarball" depends="preppkg">
         <tar compression="bzip2" destfile="i2p.tar.bz2">
@@ -330,6 +335,11 @@
         <mkdir dir="pkg-temp/eepsite" />
         <mkdir dir="pkg-temp/eepsite/webapps" />
         <mkdir dir="pkg-temp/eepsite/cgi-bin" />
+	<mkdir dir="pkg-temp/syndie" />
+	<mkdir dir="pkg-temp/syndie/archive" />
+	<mkdir dir="pkg-temp/syndie/archive/ovpBy2mpO1CQ7deYhQ1cDGAwI6pQzLbWOm1Sdd0W06c=" />
+	<copy file="installer/resources/blogMeta.snm" tofile="pkg-temp/syndie/archive/ovpBy2mpO1CQ7deYhQ1cDGAwI6pQzLbWOm1Sdd0W06c=/meta.snm" />
+	<copy file="installer/resources/blogPost.snd" tofile="pkg-temp/syndie/archive/ovpBy2mpO1CQ7deYhQ1cDGAwI6pQzLbWOm1Sdd0W06c=/1126915200003.snd" />
     </target>
     <taskdef name="izpack" classpath="${basedir}/installer/lib/izpack/standalone-compiler.jar" classname="com.izforge.izpack.ant.IzPackTask" />
     <target name="installer" depends="preppkg">

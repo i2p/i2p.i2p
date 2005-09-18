@@ -395,6 +395,11 @@ public class HTMLRenderer extends EventReceiverImpl {
             SafeURL surl = new SafeURL(locationSchema + "://" + location);
             _bodyBuffer.append("<a ").append(getClass("archiveSummaryLink")).append(" href=\"").append(getArchiveURL(null, surl));
             _bodyBuffer.append("\">").append(sanitizeString(surl.toString())).append("</a>");
+            if (_user.getAuthenticated()) {
+                _bodyBuffer.append(" <a ").append(getClass("archiveBookmarkLink")).append(" href=\"");
+                _bodyBuffer.append(getBookmarkURL(sanitizeString(name), surl.getLocation(), surl.getSchema(), "syndiearchive"));
+                _bodyBuffer.append("\">bookmark it</a>");
+            }
         }
         if (description != null)
             _bodyBuffer.append(": ").append(getSpan("archiveSummaryDesc")).append(sanitizeString(description)).append("</span>");
@@ -509,7 +514,7 @@ public class HTMLRenderer extends EventReceiverImpl {
             if (links == 1)
                 _postBodyBuffer.append("1 external link ");
             else if (links > 1)
-                _postBodyBuffer.append(links).append(" external links");
+                _postBodyBuffer.append(links).append(" external links ");
 
             int addrs = _addresses.size();
             if (addrs == 1)
@@ -643,7 +648,7 @@ public class HTMLRenderer extends EventReceiverImpl {
                     if (null == _user.getPetNameDB().getNameByLocation(a.location)) {
                         _postBodyBuffer.append(" <a ").append(getClass("summDetailArchiveBookmark")).append(" href=\"");
                         _postBodyBuffer.append(getBookmarkURL(a.name, a.location, a.locationSchema, "syndiearchive"));
-                        _postBodyBuffer.append("\">bookmark</a>");
+                        _postBodyBuffer.append("\">bookmark it</a>");
                     }
                 }
                 _postBodyBuffer.append("<br />\n");

@@ -53,7 +53,7 @@ public class User {
         _shitlistedBlogs = new ArrayList();
         _defaultSelector = null;
         _addressbookLocation = "userhosts.txt";
-        _showImagesByDefault = false;
+        _showImagesByDefault = true;
         _showExpandedByDefault = false;
         _allowAccessRemote = false;
         _eepProxyHost = null;
@@ -171,7 +171,7 @@ public class User {
             }
         }
         
-        String show = props.getProperty("showimages", "false");
+        String show = props.getProperty("showimages", "true");
         _showImagesByDefault = (show != null) && (show.equals("true"));
         show = props.getProperty("showexpanded", "false");
         _showExpandedByDefault = (show != null) && (show.equals("true"));

@@ -48,7 +48,7 @@
  bursting up to 
     <input name="outboundburstrate" type="text" size="2" value="<jsp:getProperty name="nethelper" property="outboundBurstRate" />" /> KBps for
   <jsp:getProperty name="nethelper" property="outboundBurstFactorBox" /><br />
- <i>KBps = kilibytes per second = 1024 bytes per second.<br />
+ <i>KBps = kilobytes per second = 1024 bytes per second.<br />
     A negative rate means a default limit of 16KBytes per second.</i><br />
  Bandwidth share percentage:
    <jsp:getProperty name="nethelper" property="sharePercentageBox" /><br />
