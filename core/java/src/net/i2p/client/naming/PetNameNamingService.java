@@ -17,7 +17,7 @@ public class PetNameNamingService extends NamingService {
     
     public PetNameNamingService(I2PAppContext context) {
         super(context);
-        _petnameDb = new PetNameDB();
+        _petnameDb = _context.petnameDb();
         String file = _context.getProperty(PROP_PETNAME_FILE, DEFAULT_PETNAME_FILE);
 
         //If the petnamedb file doesn't exist, create it, using the 
