@@ -1,4 +1,10 @@
-$Id: history.txt,v 1.256 2005/09/17 18:01:45 jrandom Exp $
+$Id: history.txt,v 1.257 2005/09/17 20:29:59 jrandom Exp $
+
+2005-09-17  Ragnarok
+    * Implemented a naming service using Syndie's petname db.  It's not enabled
+      by default, but you can try it out by setting
+      i2p.naming.impl=net.i2p.client.naming.PetNameNamingService in 
+      router.config.
 
 * 2005-09-17  0.6.0.6 released
 
