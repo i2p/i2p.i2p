@@ -1,4 +1,4 @@
-<%@page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" import="net.i2p.syndie.web.*, net.i2p.syndie.*, net.i2p.syndie.sml.*, java.util.*" %><% 
+<%@page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" import="net.i2p.client.naming.PetName, net.i2p.syndie.web.*, net.i2p.syndie.*, net.i2p.syndie.sml.*, java.util.*" %><% 
 request.setCharacterEncoding("UTF-8"); 
 %><jsp:useBean scope="session" class="net.i2p.syndie.web.RemoteArchiveBean" id="remote" 
 /><jsp:useBean scope="session" class="net.i2p.syndie.User" id="user" 

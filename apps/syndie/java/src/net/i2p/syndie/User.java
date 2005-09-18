@@ -4,6 +4,7 @@ import java.io.UnsupportedEncodingException;
 import java.io.IOException;
 import java.util.*;
 import net.i2p.I2PAppContext;
+import net.i2p.client.naming.PetNameDB;
 import net.i2p.data.*;
 
 /**

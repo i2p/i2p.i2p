@@ -1,4 +1,4 @@
-<%@page contentType="text/html; charset=UTF-8" import="net.i2p.syndie.web.ArchiveViewerBean, net.i2p.syndie.*" %>
+<%@page contentType="text/html; charset=UTF-8" import="net.i2p.syndie.web.ArchiveViewerBean, net.i2p.syndie.*, net.i2p.client.naming.PetName" %>
 <% request.setCharacterEncoding("UTF-8"); %>
 <jsp:useBean scope="session" class="net.i2p.syndie.User" id="user" /><%
 if (user.getAuthenticated() && (null != request.getParameter("action")) ) {

@@ -5,6 +5,7 @@ import java.text.*;
 import java.util.*;
 import java.util.zip.*;
 import net.i2p.I2PAppContext;
+import net.i2p.client.naming.PetNameDB;
 import net.i2p.data.*;
 import net.i2p.util.EepGet;
 import net.i2p.util.EepGetScheduler;

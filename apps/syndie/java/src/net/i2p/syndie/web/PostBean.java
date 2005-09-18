@@ -3,6 +3,7 @@ package net.i2p.syndie.web;
 import java.io.*;
 import java.util.*;
 import net.i2p.I2PAppContext;
+import net.i2p.client.naming.PetName;
 import net.i2p.syndie.*;
 import net.i2p.syndie.data.BlogURI;
 import net.i2p.syndie.sml.HTMLPreviewRenderer;

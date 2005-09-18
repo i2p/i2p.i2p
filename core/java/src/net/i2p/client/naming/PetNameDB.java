@@ -1,7 +1,8 @@
-package net.i2p.syndie;
+package net.i2p.client.naming;
 
 import java.io.*;
 import java.util.*;
+
 
 /**
  *

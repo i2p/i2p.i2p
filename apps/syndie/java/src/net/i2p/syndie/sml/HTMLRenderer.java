@@ -4,6 +4,7 @@ import java.io.*;
 import java.text.*;
 import java.util.*;
 import net.i2p.I2PAppContext;
+import net.i2p.client.naming.PetName;
 import net.i2p.data.*;
 import net.i2p.syndie.*;
 import net.i2p.syndie.data.*;

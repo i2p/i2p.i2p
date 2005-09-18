@@ -1,4 +1,4 @@
-package net.i2p.syndie;
+package net.i2p.client.naming;
 
 import java.util.*;
 import net.i2p.data.DataHelper;
