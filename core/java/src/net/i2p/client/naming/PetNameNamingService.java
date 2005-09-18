@@ -22,27 +22,27 @@ public class PetNameNamingService extends NamingService {
 
         //If the petnamedb file doesn't exist, create it, using the 
         //contents of hosts.txt.
-        File nameFile = new File(file);
-        if (!nameFile.exists()) {
-            Properties hosts = new Properties();
-            File hostsFile = new File("hosts.txt");
-            if (hostsFile.exists() && hostsFile.canRead()) {
-                try {
-                    DataHelper.loadProps(hosts, hostsFile);
-                } catch (IOException ioe) {
-                }
-            }
-            Iterator iter = hosts.keySet().iterator();
-            while (iter.hasNext()) {
-                String hostname = (String)iter.next();
-                PetName pn = new PetName(hostname, "i2p", "http", hosts.getProperty(hostname));
-                _petnameDb.set(hostname, pn);
-            }
-            try {
-                _petnameDb.store(file);
-            } catch (IOException ioe) {
-            }
-        }
+//        File nameFile = new File(file);
+//        if (!nameFile.exists()) {
+//            Properties hosts = new Properties();
+//            File hostsFile = new File("hosts.txt");
+//            if (hostsFile.exists() && hostsFile.canRead()) {
+//                try {
+//                    DataHelper.loadProps(hosts, hostsFile);
+//                } catch (IOException ioe) {
+//                }
+//            }
+//            Iterator iter = hosts.keySet().iterator();
+//            while (iter.hasNext()) {
+//                String hostname = (String)iter.next();
+//                PetName pn = new PetName(hostname, "i2p", "http", hosts.getProperty(hostname));
+//                _petnameDb.set(hostname, pn);
+//            }
+//            try {
+//                _petnameDb.store(file);
+//            } catch (IOException ioe) {
+//            }
+//        }
         
         try {
             _petnameDb.load(file);

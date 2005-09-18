@@ -1,11 +1,17 @@
-$Id: history.txt,v 1.257 2005/09/17 20:29:59 jrandom Exp $
+$Id: history.txt,v 1.258 2005/09/18 00:41:46 ragnarok Exp $
 
 2005-09-17  Ragnarok
     * Implemented a naming service using Syndie's petname db.  It's not enabled
       by default, but you can try it out by setting
       i2p.naming.impl=net.i2p.client.naming.PetNameNamingService in 
       router.config.
-
+    * Implemented a meta naming service that will first lookup names in the 
+      PetNameNamingService then fallback on the HostTxtNamingService.  Which
+      naming services are checked and in which order is specified by 
+      i2p.nameservicelist.  This will probably become the default naming service
+      so please help test it out by setting
+      i2p.naming.impl=net.i2p.client.naming.MetaNamingService in router.config.
+      
 * 2005-09-17  0.6.0.6 released
 
 2005-09-17  jrandom
