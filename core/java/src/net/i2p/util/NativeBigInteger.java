@@ -127,6 +127,10 @@ public class NativeBigInteger extends BigInteger {
       * @return A string containing the CPU-type or null if CPU type is unknown
       */
     private static String resolveCPUType() {
+        boolean is64 = (-1 != System.getProperty("os.arch").indexOf("64"));
+        if (is64)
+            return JBIGI_OPTIMIZATION_ATHLON64;
+        
         try {
             CPUInfo c = CPUID.getInfo();
             if (c instanceof AMDCPUInfo) {

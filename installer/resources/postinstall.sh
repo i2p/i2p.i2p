@@ -31,10 +31,18 @@ if [ "X$HOST_OS" = "X" -o $HOST_OS = "unknown" ]; then
     exit 1
 fi
 
+OS_ARCH=`uname -m`
+X86_64=`echo "$OS_ARCH" | grep x86_64`
+
 case $HOST_OS in
     debian | fedora | gentoo | linux | mandrake | redhat | suse )
-        wrapperpath="./lib/wrapper/linux"
-        cp $wrapperpath/libwrapper.so ./lib/
+        if [ "X$X86_64" = "X" ]; then
+            wrapperpath="./lib/wrapper/linux"
+            cp $wrapperpath/libwrapper.so ./lib/
+        else
+            wrapperpath="./lib/wrapper/linux64"
+            cp $wrapperpath/libwrapper.so ./lib
+        fi
         ;;
     freebsd )
         wrapperpath="./lib/wrapper/freebsd"

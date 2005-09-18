@@ -146,8 +146,8 @@ for (Iterator iter = names.iterator(); iter.hasNext(); ) {
 * [link schema="eep" location="http://forum.i2p"]text[/link] = offer a link to an external resource (accessible with the given schema)
 * [archive name="name" description="they have good stuff" schema="eep" location="http://syndiemedia.i2p/archive/archive.txt"]foo![/archive] = offer an easy way to sync up with a new Syndie archive
 
-SML headers are newline delimited key=value pairs.  Example keys are:
-* bgcolor = background color of the post (e.g. bgcolor=#ffccaa or bgcolor=red)
+SML headers are newline delimited key:value pairs.  Example keys are:
+* bgcolor = background color of the post (e.g. bgcolor:#ffccaa or bgcolor=red)
 * bgimage = attachment number to place as the background image for the post (only shown if images are enabled) (e.g. bgimage=1)
 * textfont = font to put most text into
 </textarea><br />

@@ -682,6 +682,8 @@ public class RemoteArchiveBean {
             if (remoteBlogs.contains(blog)) {
                 //System.err.println("Remote index has " + blog.toBase64());
                 continue;
+            } else if (ignoreBlog(user, blog)) {
+                continue;
             }
             
             entries.clear();
