@@ -238,6 +238,9 @@
         <copy todir="pkg-temp/lib/wrapper/linux/">
             <fileset dir="installer/lib/wrapper/linux/" />
         </copy>
+        <copy todir="pkg-temp/lib/wrapper/linux64/">
+            <fileset dir="installer/lib/wrapper/linux64/" />
+        </copy>
         <copy todir="pkg-temp/lib/wrapper/macosx/">
             <fileset dir="installer/lib/wrapper/macosx/" />
         </copy>
