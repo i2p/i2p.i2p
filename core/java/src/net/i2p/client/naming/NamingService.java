@@ -24,7 +24,7 @@ public abstract class NamingService {
 
     /** what classname should be used as the naming service impl? */
     public static final String PROP_IMPL = "i2p.naming.impl";
-    private static final String DEFAULT_IMPL = "net.i2p.client.naming.HostsTxtNamingService";
+    private static final String DEFAULT_IMPL = "net.i2p.client.naming.MetaNamingService";
 
     
     /** 
