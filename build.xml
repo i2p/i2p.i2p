@@ -12,7 +12,7 @@
     </target>
     <target name="dist" depends="pkg, javadoc">
     </target>
-    <target name="build" depends="builddep, jar, buildWEB, buildexe" />
+    <target name="build" depends="builddep, jar, buildWEB" />
     <target name="buildclean" depends="distclean, build" />
     <target name="builddep">
 	<!-- build *everything* here, but only once -->
@@ -191,7 +191,7 @@
             <fileset dir="." includes="i2p.tar.bz2 install.jar i2pupdate.zip" />
         </delete>
     </target>
-    <target name="preppkg" depends="build">
+    <target name="preppkg" depends="build buildexe">
         <delete dir="pkg-temp" />
         <copy file="build/ant.jar" todir="pkg-temp/lib/" />
         <copy file="build/heartbeat.jar" todir="pkg-temp/lib/" />
