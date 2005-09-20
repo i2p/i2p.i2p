@@ -191,7 +191,7 @@
             <fileset dir="." includes="i2p.tar.bz2 install.jar i2pupdate.zip" />
         </delete>
     </target>
-    <target name="preppkg" depends="build buildexe">
+    <target name="preppkg" depends="build, buildexe">
         <delete dir="pkg-temp" />
         <copy file="build/ant.jar" todir="pkg-temp/lib/" />
         <copy file="build/heartbeat.jar" todir="pkg-temp/lib/" />
