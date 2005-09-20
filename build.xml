@@ -46,12 +46,18 @@
         <copy file="apps/jetty/jettylib/javax.servlet.jar" todir="build/" />
     </target>
     <target name="buildexe">
-        <condition property="osx">
+        <condition property="noExe">
 	    <os family="mac" />
+	</condition>
+        <condition property="noExe">
+	    <os arch="x86_64" />
+	</condition>
+        <condition property="noExe">
+	    <os arch="amd64" />
 	</condition>
 	<ant target="doBuildEXE" />
     </target>
-    <target name="doBuildEXE" unless="osx">
+    <target name="doBuildEXE" unless="noExe">
         <jar destfile="./build/launchi2p.jar">
             <manifest>
 	     <attribute name="Main-Class" value="net.i2p.router.RouterLaunch" />
@@ -360,12 +366,18 @@
         <ant target="installerexe" />
     </target>
     <target name="installerexe">
-        <condition property="osx">
+        <condition property="noExe">
 	    <os family="mac" />
+	</condition>
+        <condition property="noExe">
+	    <os arch="x86_64" />
+	</condition>
+        <condition property="noExe">
+	    <os arch="amd64" />
 	</condition>
 	<ant target="doInstallerEXE" />
     </target>
-    <target name="doInstallerEXE">
+    <target name="doInstallerEXE" unless="noExe">
 	<!-- now the installer exe -->
 	<taskdef name="launch4j"
                  classname="net.sf.launch4j.ant.Launch4jTask"
