@@ -1,4 +1,7 @@
-$Id: history.txt,v 1.261 2005/09/18 19:56:47 ragnarok Exp $
+$Id: history.txt,v 1.262 2005/09/21 01:43:04 jrandom Exp $
+
+2005-09-21  redzara
+    * Use ISO-8859-1 for the susidns xml
 
 2005-09-21  susi
     * Bugfix in susidns for deleting entries
