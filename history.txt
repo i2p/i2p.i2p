@@ -1,4 +1,12 @@
-$Id: history.txt,v 1.260 2005/09/18 18:08:18 jrandom Exp $
+$Id: history.txt,v 1.261 2005/09/18 19:56:47 ragnarok Exp $
+
+2005-09-21  susi
+    * Bugfix in susidns for deleting entries
+
+2005-09-21  jrandom
+    * Add support for HTTP POST to EepGet
+    * Use HTTP POST for syndie bulk fetches, since there's a lot of data to 
+      put in that URL.
 
 2005-09-18  jrandom
     * Added support for pure 64bit linux with jbigi and the java service 

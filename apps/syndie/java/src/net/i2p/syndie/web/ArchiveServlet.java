@@ -17,14 +17,14 @@ import net.i2p.syndie.data.*;
  */
 public class ArchiveServlet extends HttpServlet {
     
-    public void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    public void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String path = req.getPathInfo();
         if ( (path == null) || (path.trim().length() <= 1) ) {
             renderRootIndex(resp);
             return;
         } else if (path.endsWith(Archive.INDEX_FILE)) {
             renderSummary(resp);
-        } else if (path.endsWith("export.zip")) {
+        } else if (path.indexOf("export.zip") != -1) {
             ExportServlet.export(req, resp);
         } else {
             String blog = getBlog(path);

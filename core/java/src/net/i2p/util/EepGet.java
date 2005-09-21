@@ -35,6 +35,7 @@ public class EepGet {
     private int _numRetries;
     private String _outputFile;
     private String _url;
+    private String _postData;
     private boolean _allowCaching;
     private List _listeners;
     
@@ -65,7 +66,13 @@ public class EepGet {
     public EepGet(I2PAppContext ctx, boolean shouldProxy, String proxyHost, int proxyPort, int numRetries, String outputFile, String url) {
         this(ctx, shouldProxy, proxyHost, proxyPort, numRetries, outputFile, url, true, null);
     }
+    public EepGet(I2PAppContext ctx, boolean shouldProxy, String proxyHost, int proxyPort, int numRetries, String outputFile, String url, String postData) {
+        this(ctx, shouldProxy, proxyHost, proxyPort, numRetries, outputFile, url, true, null, postData);
+    }
     public EepGet(I2PAppContext ctx, boolean shouldProxy, String proxyHost, int proxyPort, int numRetries, String outputFile, String url, boolean allowCaching, String etag) {
+        this(ctx, shouldProxy, proxyHost, proxyPort, numRetries, outputFile, url, allowCaching, etag, null);
+    }
+    public EepGet(I2PAppContext ctx, boolean shouldProxy, String proxyHost, int proxyPort, int numRetries, String outputFile, String url, boolean allowCaching, String etag, String postData) {
         _context = ctx;
         _log = ctx.logManager().getLog(EepGet.class);
         _shouldProxy = shouldProxy;
@@ -74,6 +81,7 @@ public class EepGet {
         _numRetries = numRetries;
         _outputFile = outputFile;
         _url = url;
+        _postData = postData;
         _alreadyTransferred = 0;
         _bytesTransferred = 0;
         _bytesRemaining = -1;
@@ -562,29 +570,40 @@ public class EepGet {
     
     private String getRequest() {
         StringBuffer buf = new StringBuffer(512);
-        buf.append("GET ").append(_url).append(" HTTP/1.1\n");
+        boolean post = false;
+        if ( (_postData != null) && (_postData.length() > 0) )
+            post = true;
+        if (post) {
+            buf.append("POST ").append(_url).append(" HTTP/1.1\r\n");
+        } else {
+            buf.append("GET ").append(_url).append(" HTTP/1.1\r\n");
+        }
         try {
             URL url = new URL(_url);
-            buf.append("Host: ").append(url.getHost()).append("\n");
+            buf.append("Host: ").append(url.getHost()).append("\r\n");
         } catch (MalformedURLException mue) {
             mue.printStackTrace();
         }
         if (_alreadyTransferred > 0) {
             buf.append("Range: bytes=");
             buf.append(_alreadyTransferred);
-            buf.append("-\n");
+            buf.append("-\r\n");
         }
-        buf.append("Accept-Encoding: identity;q=1, *;q=0\n");
+        buf.append("Accept-Encoding: identity;q=1, *;q=0\r\n");
         if (!_allowCaching) {
-            buf.append("Cache-control: no-cache\n");
-            buf.append("Pragma: no-cache\n");
+            buf.append("Cache-control: no-cache\r\n");
+            buf.append("Pragma: no-cache\r\n");
         }
         if (_etag != null) {
             buf.append("If-None-Match: ");
             buf.append(_etag);
-            buf.append("\n");
+            buf.append("\r\n");
         }
-        buf.append("Connection: close\n\n");
+        if (post)
+            buf.append("Content-length: ").append(_postData.length()).append("\r\n");
+        buf.append("Connection: close\r\n\r\n");
+        if (post)
+            buf.append(_postData);
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Request: [" + buf.toString() + "]");
         return buf.toString();

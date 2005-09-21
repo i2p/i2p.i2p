@@ -24,17 +24,98 @@ import net.i2p.syndie.data.*;
  */
 public class ExportServlet extends HttpServlet {
     
-    public void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    public void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         export(req, resp);
     }
     
     public static void export(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        String meta[] = req.getParameterValues("meta");
-        String entries[] = req.getParameterValues("entry");
+        try {
+            doExport(req, resp);
+        } catch (ServletException se) {
+            se.printStackTrace();
+            throw se;
+        } catch (IOException ioe) {
+            ioe.printStackTrace();
+            throw ioe;
+        }
+    }
+    private static void doExport(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        String meta[] = null;
+        String entries[] = null;
+        String type = req.getHeader("Content-Type");
+        if ( (type == null) || (type.indexOf("boundary") == -1) ) {
+            // it has to be POSTed with the request, name=value pairs.  the export servlet doesn't allow any
+            // free form fields, so no worry about newlines, so lets parse 'er up
+            List metaList = new ArrayList();
+            List entryList = new ArrayList();
+            StringBuffer key = new StringBuffer();
+            StringBuffer val = null;
+            String lenStr = req.getHeader("Content-length");
+            int len = -1;
+            if (lenStr != null)
+                try { len = Integer.valueOf(lenStr).intValue(); } catch (NumberFormatException nfe) {}
+
+            int read = 0;
+            int c = 0;
+            InputStream in = req.getInputStream();
+            while ( (len == -1) || (read < len) ){
+                c = in.read();
+                if ( (c == '=') && (val == null) ) {
+                    val = new StringBuffer(128);
+                } else if ( (c == -1) || (c == '&') ) {
+                    String k = (key == null ? "" : key.toString());
+                    String v = (val == null ? "" : val.toString());
+                    if ("meta".equals(k))
+                        metaList.add(v.trim());
+                    else if ("entry".equals(k))
+                        entryList.add(v.trim());
+                    key.setLength(0);
+                    val = null;
+                    // no newlines in the export servlet
+                    if (c == -1)
+                        break;
+                } else {
+                    if (val == null)
+                        key.append((char)c);
+                    else
+                        val.append((char)c);
+                }
+                read++;
+            }
+            if (metaList != null) {
+                meta = new String[metaList.size()];
+                for (int i = 0; i < metaList.size(); i++)
+                    meta[i] = (String)metaList.get(i);
+            }
+            if (entryList != null) {
+                entries = new String[entryList.size()];
+                for (int i = 0; i < entryList.size(); i++)
+                    entries[i] = (String)entryList.get(i);
+            }
+        } else {
+            meta = req.getParameterValues("meta");
+            entries = req.getParameterValues("entry");
+        }
         resp.setContentType("application/x-syndie-zip");
         resp.setStatus(200);
         OutputStream out = resp.getOutputStream();
-        ZipOutputStream zo = new ZipOutputStream(out);
+        
+        if (false) {
+            StringBuffer bbuf = new StringBuffer(1024);
+            bbuf.append("meta: ");
+            if (meta != null)
+                for (int i = 0; i < meta.length; i++)
+                    bbuf.append(meta[i]).append(", ");
+            bbuf.append("entries: ");
+            if (entries != null)
+                for (int i = 0; i < entries.length; i++)
+                    bbuf.append(entries[i]).append(", ");
+            System.out.println(bbuf.toString());
+        }
+        
+        ZipOutputStream zo = null;
+        if ( (meta != null) && (entries != null) && (meta.length + entries.length > 0) )
+            zo = new ZipOutputStream(out);
         
         List metaFiles = getMetaFiles(meta);
         
@@ -62,8 +143,10 @@ public class ExportServlet extends HttpServlet {
             zo.closeEntry();
         }
         
-        zo.finish();
-        zo.close();
+        if (zo != null) {
+            zo.finish();
+            zo.close();
+        }
     }
     
     private static List getMetaFiles(String blogHashes[]) {

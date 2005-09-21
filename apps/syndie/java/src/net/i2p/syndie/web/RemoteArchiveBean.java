@@ -160,27 +160,28 @@ public class RemoteArchiveBean {
         if (_exportCapable) {
             StringBuffer url = new StringBuffer(512);
             url.append(buildExportURL());
+            StringBuffer postData = new StringBuffer(512);
             Set meta = new HashSet();
             for (int i = 0; i < entries.length; i++) {
                 BlogURI uri = new BlogURI(entries[i]);
                 if (uri.getEntryId() >= 0) {
-                    url.append("entry=").append(uri.toString()).append('&');
+                    postData.append("entry=").append(uri.toString()).append('&');
                     meta.add(uri.getKeyHash());
                     _statusMessages.add("Scheduling bulk blog post fetch of " + HTMLRenderer.sanitizeString(entries[i]));
                 }
             }
             for (Iterator iter = meta.iterator(); iter.hasNext(); ) {
                 Hash blog = (Hash)iter.next();
-                url.append("meta=").append(blog.toBase64()).append('&');
+                postData.append("meta=").append(blog.toBase64()).append('&');
                 _statusMessages.add("Scheduling bulk blog metadata fetch of " + blog.toBase64());
             }
-            List urls = new ArrayList(1);
-            urls.add(url.toString());
-            List tmpFiles = new ArrayList(1);
             try {
                 File tmp = File.createTempFile("fetchBulk", ".zip", BlogManager.instance().getTempDir());
-                tmpFiles.add(tmp);
-                fetch(urls, tmpFiles, user, new BulkFetchListener(tmp));
+                
+                boolean shouldProxy = (_proxyHost != null) && (_proxyPort > 0);
+                EepGet get = new EepGet(_context, shouldProxy, _proxyHost, _proxyPort, 0, tmp.getAbsolutePath(), url.toString(), postData.toString());
+                get.addStatusListener(new BulkFetchListener(tmp));
+                get.fetch();
             } catch (IOException ioe) {
                 _statusMessages.add("Internal error creating temporary file to fetch " + HTMLRenderer.sanitizeString(url.toString()) + ": " + ioe.getMessage());
             }

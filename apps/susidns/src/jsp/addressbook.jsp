@@ -20,7 +20,7 @@
  *  along with this program; if not, write to the Free Software
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *  
- * $Revision: 1.22 $
+ * $Revision: 1.1 $
  */
 %>
 <%@ page contentType="text/html"%>
@@ -136,7 +136,7 @@
 </table>
 </div>
 
-<c:if test="${book.master}||${book.router}">
+<c:if test="${book.master || book.router}">
 <div id="buttons">
 <p class="buttons"><input type="image" name="action" value="delete" src="images/delete.png" alt="Delete checked" />
 </p>
