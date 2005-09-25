@@ -95,7 +95,7 @@ public class SummaryHelper {
     }
     
     public boolean allowReseed() {
-        return (_context.netDb().getKnownRouters() < 10);
+        return (_context.netDb().getKnownRouters() < 30);
     }
     
     public int getAllPeers() { return _context.netDb().getKnownRouters(); }
@@ -108,7 +108,7 @@ public class SummaryHelper {
             case CommSystemFacade.STATUS_DIFFERENT:
                 return "ERR-SymmetricNAT";
             case CommSystemFacade.STATUS_REJECT_UNSOLICITED:
-                return "ERR-Reject";
+                return "OK (NAT)";
             case CommSystemFacade.STATUS_UNKNOWN: // fallthrough
             default:
                 return "Unknown";

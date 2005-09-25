@@ -102,7 +102,7 @@ public class ConnectionOptions extends I2PSocketOptionsImpl {
         setResendDelay(getInt(opts, PROP_INITIAL_RESEND_DELAY, 1000));
         setSendAckDelay(getInt(opts, PROP_INITIAL_ACK_DELAY, 500));
         setWindowSize(getInt(opts, PROP_INITIAL_WINDOW_SIZE, INITIAL_WINDOW_SIZE));
-        setMaxResends(getInt(opts, PROP_MAX_RESENDS, 10));
+        setMaxResends(getInt(opts, PROP_MAX_RESENDS, 5));
         setWriteTimeout(getInt(opts, PROP_WRITE_TIMEOUT, -1));
         setInactivityTimeout(getInt(opts, PROP_INACTIVITY_TIMEOUT, 2*60*1000));
         setInactivityAction(getInt(opts, PROP_INACTIVITY_ACTION, INACTIVITY_ACTION_DISCONNECT));
@@ -135,7 +135,7 @@ public class ConnectionOptions extends I2PSocketOptionsImpl {
         if (opts.containsKey(PROP_INITIAL_WINDOW_SIZE))
             setWindowSize(getInt(opts, PROP_INITIAL_WINDOW_SIZE, INITIAL_WINDOW_SIZE));
         if (opts.containsKey(PROP_MAX_RESENDS))
-            setMaxResends(getInt(opts, PROP_MAX_RESENDS, 10));
+            setMaxResends(getInt(opts, PROP_MAX_RESENDS, 5));
         if (opts.containsKey(PROP_WRITE_TIMEOUT))
             setWriteTimeout(getInt(opts, PROP_WRITE_TIMEOUT, -1));
         if (opts.containsKey(PROP_INACTIVITY_TIMEOUT))

@@ -195,6 +195,8 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
         return opts;
     }
 
+    private static final boolean DEFAULT_GZIP = true;
+    
     private static long __requestId = 0;
     protected void clientConnectionRun(Socket s) {
         OutputStream out = null;
@@ -439,7 +441,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
                 if (line.length() == 0) {
                     
                     String ok = getTunnel().getContext().getProperty("i2ptunnel.gzip");
-                    boolean gzip = false;
+                    boolean gzip = DEFAULT_GZIP;
                     if (ok != null)
                         gzip = Boolean.valueOf(ok).booleanValue();
                     if (gzip)

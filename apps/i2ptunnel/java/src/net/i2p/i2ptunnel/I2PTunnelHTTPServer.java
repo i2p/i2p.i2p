@@ -178,7 +178,7 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
             if (_log.shouldLog(Log.INFO))
                 _log.info(_name + ": Begin sending");
             try {
-                byte buf[] = new byte[4096];
+                byte buf[] = new byte[16*1024];
                 int read = 0;
                 int total = 0;
                 while ( (read = _in.read(buf)) != -1) {
