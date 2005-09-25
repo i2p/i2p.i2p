@@ -135,6 +135,11 @@ public class Packet {
      * ping reply (if receiveStreamId is set).
      */
     public static final int FLAG_ECHO = (1 << 9);
+    
+    /** 
+     * If set, this packet doesn't really want to ack anything
+     */
+    public static final int FLAG_NO_ACK = (1 << 10);
 
     public static final int DEFAULT_MAX_SIZE = 32*1024;
     private static final int MAX_DELAY_REQUEST = 65535;
@@ -181,11 +186,21 @@ public class Packet {
     /** 
      * The highest packet sequence number that received
      * on the receiveStreamId.  This field is ignored on the initial
-     * connection packet (where receiveStreamId is the unknown id).
+     * connection packet (where receiveStreamId is the unknown id) or
+     * if FLAG_NO_ACK is set.
      *
      */
-    public long getAckThrough() { return _ackThrough; }
-    public void setAckThrough(long id) { _ackThrough = id; }
+    public long getAckThrough() { 
+        if (isFlagSet(FLAG_NO_ACK))
+            return -1;
+        else
+            return _ackThrough; 
+    }
+    public void setAckThrough(long id) { 
+        if (id < 0)
+            setFlag(FLAG_NO_ACK);
+        _ackThrough = id; 
+    }
     
     /**
      * List of packet sequence numbers below the getAckThrough() value
@@ -566,7 +581,7 @@ public class Packet {
         else
             buf.append('\t');
         buf.append(toFlagString());
-        buf.append(" ACK ").append(_ackThrough);
+        buf.append(" ACK ").append(getAckThrough());
         if (_nacks != null) {
             buf.append(" NACK");
             for (int i = 0; i < _nacks.length; i++) {

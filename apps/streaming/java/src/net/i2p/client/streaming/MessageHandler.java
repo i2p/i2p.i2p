@@ -44,6 +44,7 @@ public class MessageHandler implements I2PSessionListener {
                 _log.warn("Error receiving the message", ise);
             return;
         }
+        if (data == null) return;
         Packet packet = new Packet();
         try {
             packet.readPacket(data, 0, data.length);

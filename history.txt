@@ -1,4 +1,21 @@
-$Id: history.txt,v 1.262 2005/09/21 01:43:04 jrandom Exp $
+$Id: history.txt,v 1.263 2005/09/21 18:01:37 jrandom Exp $
+
+2005-09-25  Complication
+    * Better i2paddresshelper handling in the I2PTunnel httpclient, plus a new
+      conflict resolution page if the i2paddresshelper parameter differs from
+      an existing name to destination mapping.
+
+2005-09-25  jrandom
+    * Fix a long standing streaming lib bug (in the inactivity detection code)
+    * Improved handling of initial streaming lib packet retransmissions to 
+      kill the "lost first packet" bug (where a page shows up with the first
+      few KB missing)
+    * Add support for initial window sizes greater than 1 - useful for 
+      eepsites to transmit e.g. 4 packets full of data along with the initial
+      ACK, thereby cutting down on the rtt latency.  The congestion window 
+      size can and does still shrink down to 1 packet though.
+    * Adjusted the streaming lib retransmission calculation algorithm to be
+      more TCP-like.
 
 2005-09-21  redzara
     * Use ISO-8859-1 for the susidns xml

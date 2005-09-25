@@ -13,6 +13,8 @@ public class ConnectionOptions extends I2PSocketOptionsImpl {
     private int _receiveWindow;
     private int _profile;
     private int _rtt;
+    private int _rttDev;
+    private int _rto;
     private int _trend[];
     private int _resendDelay;
     private int _sendAckDelay;
@@ -52,6 +54,7 @@ public class ConnectionOptions extends I2PSocketOptionsImpl {
     public static final String PROP_SLOW_START_GROWTH_RATE_FACTOR = "i2p.streaming.slowStartGrowthRateFactor";
     
     private static final int TREND_COUNT = 3;
+    static final int INITIAL_WINDOW_SIZE = 4;
     
     public ConnectionOptions() {
         super();
@@ -68,6 +71,7 @@ public class ConnectionOptions extends I2PSocketOptionsImpl {
     public ConnectionOptions(ConnectionOptions opts) {
         super(opts);
         if (opts != null) {
+            setMaxWindowSize(opts.getMaxWindowSize());
             setConnectDelay(opts.getConnectDelay());
             setProfile(opts.getProfile());
             setRTT(opts.getRTT());
@@ -80,7 +84,6 @@ public class ConnectionOptions extends I2PSocketOptionsImpl {
             setInactivityTimeout(opts.getInactivityTimeout());
             setInactivityAction(opts.getInactivityAction());
             setInboundBufferSize(opts.getInboundBufferSize());
-            setMaxWindowSize(opts.getMaxWindowSize());
             setCongestionAvoidanceGrowthRateFactor(opts.getCongestionAvoidanceGrowthRateFactor());
             setSlowStartGrowthRateFactor(opts.getSlowStartGrowthRateFactor());
         }
@@ -90,6 +93,7 @@ public class ConnectionOptions extends I2PSocketOptionsImpl {
         super.init(opts);
         _trend = new int[TREND_COUNT];
         
+        setMaxWindowSize(getInt(opts, PROP_MAX_WINDOW_SIZE, Connection.MAX_WINDOW_SIZE));
         setConnectDelay(getInt(opts, PROP_CONNECT_DELAY, -1));
         setProfile(getInt(opts, PROP_PROFILE, PROFILE_BULK));
         setMaxMessageSize(getInt(opts, PROP_MAX_MESSAGE_SIZE, 4*1024));
@@ -97,22 +101,23 @@ public class ConnectionOptions extends I2PSocketOptionsImpl {
         setReceiveWindow(getInt(opts, PROP_INITIAL_RECEIVE_WINDOW, 1));
         setResendDelay(getInt(opts, PROP_INITIAL_RESEND_DELAY, 1000));
         setSendAckDelay(getInt(opts, PROP_INITIAL_ACK_DELAY, 500));
-        setWindowSize(getInt(opts, PROP_INITIAL_WINDOW_SIZE, 1));
+        setWindowSize(getInt(opts, PROP_INITIAL_WINDOW_SIZE, INITIAL_WINDOW_SIZE));
         setMaxResends(getInt(opts, PROP_MAX_RESENDS, 10));
         setWriteTimeout(getInt(opts, PROP_WRITE_TIMEOUT, -1));
-        setInactivityTimeout(getInt(opts, PROP_INACTIVITY_TIMEOUT, 5*60*1000));
+        setInactivityTimeout(getInt(opts, PROP_INACTIVITY_TIMEOUT, 2*60*1000));
         setInactivityAction(getInt(opts, PROP_INACTIVITY_ACTION, INACTIVITY_ACTION_DISCONNECT));
         setInboundBufferSize(getMaxMessageSize() * (Connection.MAX_WINDOW_SIZE + 2));
         setCongestionAvoidanceGrowthRateFactor(getInt(opts, PROP_CONGESTION_AVOIDANCE_GROWTH_RATE_FACTOR, 1));
         setSlowStartGrowthRateFactor(getInt(opts, PROP_SLOW_START_GROWTH_RATE_FACTOR, 1));
         
         setConnectTimeout(getInt(opts, PROP_CONNECT_TIMEOUT, Connection.DISCONNECT_TIMEOUT));
-        setMaxWindowSize(getInt(opts, PROP_MAX_WINDOW_SIZE, Connection.MAX_WINDOW_SIZE));
     }
     
     public void setProperties(Properties opts) {
         super.setProperties(opts);
         if (opts == null) return;
+        if (opts.containsKey(PROP_MAX_WINDOW_SIZE))
+            setMaxWindowSize(getInt(opts, PROP_MAX_WINDOW_SIZE, Connection.MAX_WINDOW_SIZE));
         if (opts.containsKey(PROP_CONNECT_DELAY))
             setConnectDelay(getInt(opts, PROP_CONNECT_DELAY, -1));
         if (opts.containsKey(PROP_PROFILE))
@@ -124,17 +129,17 @@ public class ConnectionOptions extends I2PSocketOptionsImpl {
         if (opts.containsKey(PROP_INITIAL_RECEIVE_WINDOW))
             setReceiveWindow(getInt(opts, PROP_INITIAL_RECEIVE_WINDOW, 1));
         if (opts.containsKey(PROP_INITIAL_RESEND_DELAY))
-            setResendDelay(getInt(opts, PROP_INITIAL_RESEND_DELAY, 500));
+            setResendDelay(getInt(opts, PROP_INITIAL_RESEND_DELAY, 1000));
         if (opts.containsKey(PROP_INITIAL_ACK_DELAY))
             setSendAckDelay(getInt(opts, PROP_INITIAL_ACK_DELAY, 500));
         if (opts.containsKey(PROP_INITIAL_WINDOW_SIZE))
-            setWindowSize(getInt(opts, PROP_INITIAL_WINDOW_SIZE, 1));
+            setWindowSize(getInt(opts, PROP_INITIAL_WINDOW_SIZE, INITIAL_WINDOW_SIZE));
         if (opts.containsKey(PROP_MAX_RESENDS))
             setMaxResends(getInt(opts, PROP_MAX_RESENDS, 10));
         if (opts.containsKey(PROP_WRITE_TIMEOUT))
             setWriteTimeout(getInt(opts, PROP_WRITE_TIMEOUT, -1));
         if (opts.containsKey(PROP_INACTIVITY_TIMEOUT))
-            setInactivityTimeout(getInt(opts, PROP_INACTIVITY_TIMEOUT, 5*60*1000));
+            setInactivityTimeout(getInt(opts, PROP_INACTIVITY_TIMEOUT, 2*60*1000));
         if (opts.containsKey(PROP_INACTIVITY_ACTION))
             setInactivityAction(getInt(opts, PROP_INACTIVITY_ACTION, INACTIVITY_ACTION_DISCONNECT));
         setInboundBufferSize(getMaxMessageSize() * (Connection.MAX_WINDOW_SIZE + 2));
@@ -145,8 +150,6 @@ public class ConnectionOptions extends I2PSocketOptionsImpl {
         
         if (opts.containsKey(PROP_CONNECT_TIMEOUT))
             setConnectTimeout(getInt(opts, PROP_CONNECT_TIMEOUT, Connection.DISCONNECT_TIMEOUT));
-        if (opts.containsKey(PROP_MAX_WINDOW_SIZE))
-            setMaxWindowSize(getInt(opts, PROP_MAX_WINDOW_SIZE, Connection.MAX_WINDOW_SIZE));
     }
     
     /** 
@@ -191,6 +194,10 @@ public class ConnectionOptions extends I2PSocketOptionsImpl {
      */
     public int getRTT() { return _rtt; }
     public void setRTT(int ms) { 
+        if (_rto == 0) {
+            _rttDev = ms;
+            _rto = (int)Connection.MAX_RESEND_DELAY;
+        }
         synchronized (_trend) {
             _trend[0] = _trend[1];
             _trend[1] = _trend[2];
@@ -201,10 +208,12 @@ public class ConnectionOptions extends I2PSocketOptionsImpl {
             else
                 _trend[2] = 0;
         }
+        
         _rtt = ms; 
         if (_rtt > 60*1000)
             _rtt = 60*1000;
     }
+    public int getRTO() { return _rto; }
     
     /**
      * If we have 3 consecutive rtt increases, we are trending upwards (1), or if we have
@@ -225,7 +234,15 @@ public class ConnectionOptions extends I2PSocketOptionsImpl {
     private static final double RTT_DAMPENING = 0.9;
     
     public void updateRTT(int measuredValue) {
-        setRTT((int)(RTT_DAMPENING*_rtt + (1-RTT_DAMPENING)*measuredValue));
+        _rttDev = _rttDev + (int)(0.25d*(Math.abs(measuredValue-_rtt)-_rttDev));
+        int smoothed = (int)(RTT_DAMPENING*_rtt + (1-RTT_DAMPENING)*measuredValue);        
+        _rto = smoothed + (_rttDev<<2);
+        if (_rto < Connection.MIN_RESEND_DELAY) 
+            _rto = (int)Connection.MIN_RESEND_DELAY;
+        else if (_rto > Connection.MAX_RESEND_DELAY)
+            _rto = (int)Connection.MAX_RESEND_DELAY;
+
+        setRTT(smoothed);
     }
     
     /** How long after sending a packet will we wait before resending? */

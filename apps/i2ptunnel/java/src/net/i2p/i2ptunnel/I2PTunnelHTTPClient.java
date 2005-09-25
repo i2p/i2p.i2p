@@ -96,6 +96,22 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
          "HTTP outproxy configured.  Please configure an outproxy in I2PTunnel")
          .getBytes();
     
+    private final static byte[] ERR_AHELPER_CONFLICT =
+        ("HTTP/1.1 409 Conflict\r\n"+
+         "Content-Type: text/html; charset=iso-8859-1\r\n"+
+         "Cache-control: no-cache\r\n"+
+         "\r\n"+
+         "<html><body><H1>I2P ERROR: Destination key conflict</H1>"+
+         "The addresshelper link you followed specifies a different destination key "+
+         "than a host entry in your host database. "+
+         "Someone could be trying to impersonate another eepsite, "+
+         "or people have given two eepsites identical names.<P/>"+
+         "You can resolve the conflict by considering which key you trust, "+
+         "and either discarding the addresshelper link, "+
+         "discarding the host entry from your host database, "+
+         "or naming one of them differently.<P/>")
+         .getBytes();
+    
     /** used to assign unique IDs to the threads / clients.  no logic or functionality */
     private static volatile long __clientId = 0;
 
@@ -243,50 +259,102 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
 
                     // Quick hack for foo.bar.i2p
                     if (host.toLowerCase().endsWith(".i2p")) {
+                        // Destination gets the host name
                         destination = host;
+                        // Host becomes the destination key
                         host = getHostName(destination);
-                        if ( (host != null) && ("i2p".equals(host)) ) {
-                            int pos2;
-                            if ((pos2 = request.indexOf("?")) != -1) {
-                                // Try to find an address helper in the fragments
-                                // and split the request into it's component parts for rebuilding later
-                                String fragments = request.substring(pos2 + 1);
-                                String uriPath = request.substring(0, pos2);
-                                pos2 = fragments.indexOf(" ");
-                                String protocolVersion = fragments.substring(pos2 + 1);
-                                String urlEncoding = "";
-                                fragments = fragments.substring(0, pos2);
-                                fragments = fragments + "&";
-                                String fragment;
-                                while(fragments.length() > 0) {
-                                    pos2 = fragments.indexOf("&");
-                                    fragment = fragments.substring(0, pos2);
-                                    fragments = fragments.substring(pos2 + 1);
-                                    if (fragment.startsWith("i2paddresshelper")) {
-                                        pos2 = fragment.indexOf("=");
-                                        if (pos2 >= 0) {
-                                            addressHelpers.put(destination,fragment.substring(pos2 + 1));
-                                        }
-                                    } else {
-                                        // append each fragment unless it's the address helper
-                                        if ("".equals(urlEncoding)) {
-                                            urlEncoding = "?" + fragment;
-                                        } else {
-                                            urlEncoding = urlEncoding + "&" + fragment; 
-                                        }
-				    }
-                                }
-                                // reconstruct the request minus the i2paddresshelper GET var
-                                request = uriPath + urlEncoding + " " + protocolVersion;
-                            }
 
-                            String addressHelper = (String) addressHelpers.get(destination);
-                            if (addressHelper != null) {
-                                destination = addressHelper;
-                                host = getHostName(destination);
-                                ahelper = 1;
+                        int pos2;
+                        if ((pos2 = request.indexOf("?")) != -1) {
+                            // Try to find an address helper in the fragments
+                            // and split the request into it's component parts for rebuilding later
+                            String ahelperKey = null;
+                            boolean ahelperConflict = false;
+                            
+                            String fragments = request.substring(pos2 + 1);
+                            String uriPath = request.substring(0, pos2);
+                            pos2 = fragments.indexOf(" ");
+                            String protocolVersion = fragments.substring(pos2 + 1);
+                            String urlEncoding = "";
+                            fragments = fragments.substring(0, pos2);
+                            String initialFragments = fragments;
+                            fragments = fragments + "&";
+                            String fragment;
+                            while(fragments.length() > 0) {
+                                pos2 = fragments.indexOf("&");
+                                fragment = fragments.substring(0, pos2);
+                                fragments = fragments.substring(pos2 + 1);
+                                
+                                // Fragment looks like addresshelper key
+                                if (fragment.startsWith("i2paddresshelper=")) {
+                                    pos2 = fragment.indexOf("=");
+                                    ahelperKey = fragment.substring(pos2 + 1);
+                                    
+                                    // Key contains data, lets not ignore it
+                                    if (ahelperKey != null) {
+                                        
+                                        // Host resolvable only with addresshelper
+                                        if ( (host == null) || ("i2p".equals(host)) )
+                                        {
+                                            // Cannot check, use addresshelper key
+                                            addressHelpers.put(destination,ahelperKey);
+                                        } else {
+                                            // Host resolvable from database, verify addresshelper key
+                                            // Silently bypass correct keys, otherwise alert
+                                            if (!host.equals(ahelperKey))
+                                            {
+                                                // Conflict: handle when URL reconstruction done
+                                                ahelperConflict = true;
+                                                if (_log.shouldLog(Log.WARN))
+                                                    _log.warn(getPrefix(requestId) + "Addresshelper key conflict for site [" + destination + "], trusted key [" + host + "], specified key [" + ahelperKey + "].");
+                                            }
+                                        }
+                                    }
+                                } else {
+                                    // Other fragments, just pass along
+                                    // Append each fragment to urlEncoding
+                                    if ("".equals(urlEncoding)) {
+                                        urlEncoding = "?" + fragment;
+                                    } else {
+                                        urlEncoding = urlEncoding + "&" + fragment; 
+                                    }
+                                }
+                            }
+                            // Reconstruct the request minus the i2paddresshelper GET var
+                            request = uriPath + urlEncoding + " " + protocolVersion;
+                            
+                            // Did addresshelper key conflict?
+                            if (ahelperConflict)
+                            {
+                                String str;
+                                byte[] header;
+                                str = FileUtil.readTextFile("docs/ahelper-conflict-header.ht", 100, true);
+                                if (str != null) header = str.getBytes();
+                                  else header = ERR_AHELPER_CONFLICT;
+
+                                if (out != null) {
+                                    long alias = I2PAppContext.getGlobalContext().random().nextLong();
+                                    String trustedURL = protocol + uriPath + urlEncoding;
+                                    String conflictURL = protocol + alias + ".i2p/?" + initialFragments;
+                                    out.write(header);
+                                    out.write(("To visit the destination in your host database, click <a href=\"" + trustedURL + "\">here</a>. To visit the conflicting addresshelper link by temporarily giving it a random alias, click <a href=\"" + conflictURL + "\">here</a>.<P/>").getBytes());
+                                    out.write("</div><p><i>I2P HTTP Proxy Server<br>Generated on: ".getBytes());
+                                    out.write(new Date().toString().getBytes());
+                                    out.write("</i></body></html>\n".getBytes());
+                                    out.flush();
+                                }
+                                s.close();
+                                return;
                             }
                         }
+
+                        String addressHelper = (String) addressHelpers.get(destination);
+                        if (addressHelper != null) {
+                            destination = addressHelper;
+                            host = getHostName(destination);
+                            ahelper = 1;
+                        }
+                        
                         line = method + " " + request.substring(pos);
                     } else if (host.indexOf(".") != -1) {
                         // The request must be forwarded to a WWW proxy

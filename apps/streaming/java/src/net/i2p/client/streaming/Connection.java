@@ -72,7 +72,7 @@ public class Connection {
     private long _lifetimeDupMessageSent;
     private long _lifetimeDupMessageReceived;
     
-    public static final long MAX_RESEND_DELAY = 5*1000;
+    public static final long MAX_RESEND_DELAY = 8*1000;
     public static final long MIN_RESEND_DELAY = 3*1000;
 
     /** wait up to 5 minutes after disconnection so we can ack/close packets */
@@ -257,13 +257,13 @@ public class Connection {
             if (packet.isFlagSet(Packet.FLAG_CLOSE) || (remaining < 2)) {
                 packet.setOptionalDelay(0);
             } else {
-                int delay = _options.getRTT() / 2;
+                int delay = _options.getRTO() / 2;
                 packet.setOptionalDelay(delay);
                 _log.debug("Requesting ack delay of " + delay + "ms for packet " + packet);
             }
             packet.setFlag(Packet.FLAG_DELAY_REQUESTED);
             
-            long timeout = _options.getRTT() + MIN_RESEND_DELAY;
+            long timeout = _options.getRTO();
             if (timeout > MAX_RESEND_DELAY)
                 timeout = MAX_RESEND_DELAY;
             if (_log.shouldLog(Log.DEBUG))
@@ -308,7 +308,7 @@ public class Connection {
     
     List ackPackets(long ackThrough, long nacks[]) {
         if (nacks == null) {
-            _highestAckedThrough = ackThrough;
+             _highestAckedThrough = ackThrough;
         } else {
             long lowest = -1;
             for (int i = 0; i < nacks.length; i++) {
@@ -463,7 +463,9 @@ public class Connection {
             _receiver.destroy();
         if (_activityTimer != null)
             SimpleTimer.getInstance().removeEvent(_activityTimer);
-        _activityTimer = null;
+        //_activityTimer = null;
+        if (_inputStream != null)
+            _inputStream.streamErrorOccurred(new IOException("disconnected!"));
         
         if (_disconnectScheduledOn < 0) {
             _disconnectScheduledOn = _context.clock().now();
@@ -695,11 +697,19 @@ public class Connection {
     }
     
     private void resetActivityTimer() {
-        if (_options.getInactivityTimeout() <= 0) return;
-        if (_activityTimer == null) return;
+        if (_options.getInactivityTimeout() <= 0) {
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Resetting the inactivity timer, but its gone!", new Exception("where did it go?"));
+            return;
+        }
+        if (_activityTimer == null) {
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Resetting the inactivity timer, but its gone!", new Exception("where did it go?"));
+            return;
+        }
         long howLong = _activityTimer.getTimeLeft();
         if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Resetting the inactivity timer to " + howLong);
+            _log.debug("Resetting the inactivity timer to " + howLong, new Exception("Reset by"));
         // this will get rescheduled, and rescheduled, and rescheduled...
         SimpleTimer.getInstance().addEvent(_activityTimer, howLong);
     }
@@ -707,15 +717,34 @@ public class Connection {
     private class ActivityTimer implements SimpleTimer.TimedEvent {
         public void timeReached() {
             // uh, nothing more to do...
-            if (!_connected) return;
+            if (!_connected) {
+                if (_log.shouldLog(Log.DEBUG)) _log.debug("Inactivity timeout reached, but we are already closed");
+                return;
+            }
             // we got rescheduled already
-            if (getTimeLeft() > 0) return;
+            long left = getTimeLeft();
+            if (left > 0) {
+                if (_log.shouldLog(Log.DEBUG)) _log.debug("Inactivity timeout reached, but there is time left (" + left + ")");
+                SimpleTimer.getInstance().addEvent(ActivityTimer.this, left);
+                return;
+            }
             // these are either going to time out or cause further rescheduling
-            if (getUnackedPacketsSent() > 0) return;
+            if (getUnackedPacketsSent() > 0) {
+                if (_log.shouldLog(Log.DEBUG)) _log.debug("Inactivity timeout reached, but there are unacked packets");
+                return;
+            }
             // wtf, this shouldn't have been scheduled
-            if (_options.getInactivityTimeout() <= 0) return;
+            if (_options.getInactivityTimeout() <= 0) {
+                if (_log.shouldLog(Log.DEBUG)) _log.debug("Inactivity timeout reached, but there is no timer...");
+                return;
+            }
             // if one of us can't talk...
-            if ( (_closeSentOn > 0) || (_closeReceivedOn > 0) ) return;
+            if ( (_closeSentOn > 0) || (_closeReceivedOn > 0) ) {
+                if (_log.shouldLog(Log.DEBUG)) _log.debug("Inactivity timeout reached, but we are closing");
+                return;
+            }
+            
+            if (_log.shouldLog(Log.DEBUG)) _log.debug("Inactivity timeout reached, with action=" + _options.getInactivityAction());
             
             // bugger it, might as well do the hard work now
             switch (_options.getInactivityAction()) {
@@ -741,7 +770,9 @@ public class Connection {
                         _log.debug(buf.toString());
                     }
                     
-                    disconnect(true);
+                    _inputStream.streamErrorOccurred(new IOException("Inactivity timeout"));
+                    _outputStream.streamErrorOccurred(new IOException("Inactivity timeout"));
+                    disconnect(false);
                     break;
             }
         }
@@ -774,6 +805,7 @@ public class Connection {
         buf.append(" wsize: ").append(_options.getWindowSize());
         buf.append(" cwin: ").append(_congestionWindowEnd - _highestAckedThrough);
         buf.append(" rtt: ").append(_options.getRTT());
+        buf.append(" rto: ").append(_options.getRTO());
         // not synchronized to avoid some kooky races
         buf.append(" unacked outbound: ").append(_outboundPackets.size()).append(" ");
         /*
@@ -950,10 +982,10 @@ public class Connection {
                     disconnect(false);
                 } else {
                     //long timeout = _options.getResendDelay() << numSends;
-                    long rtt = _options.getRTT();
-                    if (rtt < MIN_RESEND_DELAY)
-                        rtt = MIN_RESEND_DELAY;
-                    long timeout = rtt << (numSends-1);
+                    long rto = _options.getRTO();
+                    if (rto < MIN_RESEND_DELAY)
+                        rto = MIN_RESEND_DELAY;
+                    long timeout = rto << (numSends-1);
                     if ( (timeout > MAX_RESEND_DELAY) || (timeout <= 0) )
                         timeout = MAX_RESEND_DELAY;
                     if (_log.shouldLog(Log.DEBUG))

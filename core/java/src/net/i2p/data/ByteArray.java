@@ -37,7 +37,7 @@ public class ByteArray implements Serializable, Comparable {
         _valid = length;
     }
 
-    public final byte[] getData() {
+    public byte[] getData() {
         return _data;
     }
 
@@ -50,10 +50,10 @@ public class ByteArray implements Serializable, Comparable {
      * this property does not necessarily have meaning for all byte 
      * arrays.
      */
-    public final int getValid() { return _valid; }
-    public final void setValid(int valid) { _valid = valid; }
-    public final int getOffset() { return _offset; }
-    public final void setOffset(int offset) { _offset = offset; }
+    public int getValid() { return _valid; }
+    public void setValid(int valid) { _valid = valid; }
+    public int getOffset() { return _offset; }
+    public void setOffset(int offset) { _offset = offset; }
 
     public final boolean equals(Object o) {
         if (o == null) return false;
@@ -83,7 +83,7 @@ public class ByteArray implements Serializable, Comparable {
         return DataHelper.hashCode(getData());
     }
 
-    public final String toString() {
+    public String toString() {
         return super.toString() + "/" + DataHelper.toString(getData(), 32) + "." + _valid;
     }
     

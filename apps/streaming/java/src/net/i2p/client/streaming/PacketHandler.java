@@ -22,19 +22,26 @@ public class PacketHandler {
     private I2PAppContext _context;
     private Log _log;
     private int _lastDelay;
+    private int _dropped;
     
     public PacketHandler(I2PAppContext ctx, ConnectionManager mgr) {
         _manager = mgr;
         _context = ctx;
+        _dropped = 0;
         _log = ctx.logManager().getLog(PacketHandler.class);
         _lastDelay = _context.random().nextInt(30*1000);
     }
     
-    private boolean choke(Packet packet) {
-        if (false) {
-            // artificial choke: 2% random drop and a 0-30s
+    private boolean choke(Packet packet) { 
+        if (true) return true;
+        //if ( (_dropped == 0) && true ) { //&& (_manager.getSent() <= 0) ) {
+        //    _dropped++;
+        //    return false;
+        //}
+        if (true) {
+            // artificial choke: 2% random drop and a 0-5s
             // random tiered delay from 0-30s
-            if (_context.random().nextInt(100) >= 95) {
+            if (_context.random().nextInt(100) >= 98) {
                 displayPacket(packet, "DROP", null);
                 return false;
             } else {
@@ -42,7 +49,7 @@ public class PacketHandler {
                 /*
                 int delay = _context.random().nextInt(5*1000);
                 */
-                int delay = _context.random().nextInt(6*1000);
+                int delay = _context.random().nextInt(1*1000);
                 int delayFactor = _context.random().nextInt(100);
                 if (delayFactor > 80) {
                     if (delayFactor > 98)
@@ -97,7 +104,7 @@ public class PacketHandler {
         Connection con = (sendId != null ? _manager.getConnectionByInboundId(sendId) : null); 
         if (con != null) {
             receiveKnownCon(con, packet);
-            displayPacket(packet, "RECV", "wsize " + con.getOptions().getWindowSize());
+            displayPacket(packet, "RECV", "wsize " + con.getOptions().getWindowSize() + " rto " + con.getOptions().getRTO());
         } else {
             receiveUnknownCon(packet, sendId);
             displayPacket(packet, "UNKN", null);

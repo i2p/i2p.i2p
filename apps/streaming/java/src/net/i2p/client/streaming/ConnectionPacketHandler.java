@@ -187,6 +187,7 @@ public class ConnectionPacketHandler {
     }
     
     private boolean ack(Connection con, long ackThrough, long nacks[], Packet packet, boolean isNew, boolean choke) {
+        if (ackThrough < 0) return false;
         //if ( (nacks != null) && (nacks.length > 0) )
         //    con.getOptions().setRTT(con.getOptions().getRTT() + nacks.length*1000);
 
@@ -316,6 +317,12 @@ public class ConnectionPacketHandler {
     }
     
     /**
+     * If we don't know the send stream id yet (we're just creating a connection), allow
+     * the first three packets to come in.  The first of those should be the SYN, of course...
+     */
+    private static final int MAX_INITIAL_PACKETS = ConnectionOptions.INITIAL_WINDOW_SIZE;
+    
+    /**
      * Make sure this packet is ok and that we can continue processing its data.
      * 
      * @return true if the packet is ok for this connection, false if we shouldn't
@@ -335,7 +342,7 @@ public class ConnectionPacketHandler {
                     return true;
                 } else {
                     // neither RST nor SYN and we dont have the stream id yet?
-                    if (packet.getSequenceNum() <= 2) {
+                    if (packet.getSequenceNum() < MAX_INITIAL_PACKETS) {
                         return true;
                     } else {
                         if (_log.shouldLog(Log.ERROR))

@@ -125,7 +125,7 @@ class PacketQueue {
                 _log.debug(msg);
             }
             Connection c = packet.getConnection();
-            String suffix = (c != null ? "wsize " + c.getOptions().getWindowSize() : null);
+            String suffix = (c != null ? "wsize " + c.getOptions().getWindowSize() + " rto " + c.getOptions().getRTO() : null);
             _connectionManager.getPacketHandler().displayPacket(packet, "SEND", suffix);
         }
         

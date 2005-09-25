@@ -312,11 +312,16 @@ public class MessageOutputStream extends OutputStream {
     /** nonblocking close */
     public void closeInternal() {
         _closed = true;
-        _streamError = new IOException("Closed internally");
+        if (_streamError == null)
+            _streamError = new IOException("Closed internally");
+        clearData(true);
+    }
+    
+    private void clearData(boolean shouldFlush) {
         ByteArray ba = null;
         synchronized (_dataLock) {
             // flush any data, but don't wait for it
-            if (_dataReceiver != null)
+            if ( (_dataReceiver != null) && (_valid > 0) && shouldFlush)
                 _dataReceiver.writeData(_buf, 0, _valid);
             _written += _valid;
             _valid = 0;
@@ -345,7 +350,9 @@ public class MessageOutputStream extends OutputStream {
     }
     
     void streamErrorOccurred(IOException ioe) {
-        _streamError = ioe;
+        if (_streamError == null)
+            _streamError = ioe;
+        clearData(false);
     }
     
     /** 

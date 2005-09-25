@@ -93,8 +93,10 @@ class I2PSessionImpl2 extends I2PSessionImpl {
      */
     public byte[] receiveMessage(int msgId) throws I2PSessionException {
         byte compressed[] = super.receiveMessage(msgId);
-        if (_log.shouldLog(Log.DEBUG))
-            _log.debug("receiving message " + msgId + " with " + compressed.length + " compressed bytes");
+        if (compressed == null) {
+            _log.error("Error: message " + msgId + " already received!");
+            return null;
+        }
         if (SHOULD_COMPRESS) {
             try {
                 return DataHelper.decompress(compressed);

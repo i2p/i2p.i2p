@@ -435,7 +435,9 @@ public class MessageInputStream extends InputStream {
      *
      */
     void streamErrorOccurred(IOException ioe) {
-        _streamError = ioe;
+        if (_streamError == null)
+            _streamError = ioe;
+        _locallyClosed = true;
         synchronized (_dataLock) {
             _dataLock.notifyAll();
         }

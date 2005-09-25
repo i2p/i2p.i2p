@@ -2,6 +2,7 @@ package net.i2p.client.streaming;
 
 import net.i2p.I2PAppContext;
 import net.i2p.data.ByteArray;
+import net.i2p.data.DataHelper;
 import net.i2p.util.Log;
 
 /**
@@ -165,6 +166,9 @@ class ConnectionDataReceiver implements MessageOutputStream.DataReceiver {
             packet.setFlag(Packet.FLAG_SYNCHRONIZE);
             packet.setOptionalFrom(con.getSession().getMyDestination());
             packet.setOptionalMaxSize(con.getOptions().getMaxMessageSize());
+        }
+        if (DataHelper.eq(con.getSendStreamId(), Packet.STREAM_ID_UNKNOWN)) {
+            packet.setFlag(Packet.FLAG_NO_ACK);
         }
         
         // don't set the closed flag if this is a plain ACK and there are outstanding
