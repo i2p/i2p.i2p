@@ -153,11 +153,8 @@ public class I2PTunnelRunner extends I2PThread implements I2PSocket.SocketErrorL
                     onTimeout.run();
             }
             
-            // now one connection is dead - kill the other as well.
-            s.close();
-            i2ps.close();
-            t1.join(30*1000);
-            t2.join(30*1000);
+            // now one connection is dead - kill the other as well, after making sure we flush
+            close(out, in, i2pout, i2pin, s, i2ps, t1, t2);
         } catch (InterruptedException ex) {
             if (_log.shouldLog(Log.ERROR))
                 _log.error("Interrupted", ex);
@@ -186,6 +183,27 @@ public class I2PTunnelRunner extends I2PThread implements I2PSocket.SocketErrorL
                 i2ps.setSocketErrorListener(null);
             }
         }
+    }
+    
+    protected void close(OutputStream out, InputStream in, OutputStream i2pout, InputStream i2pin, Socket s, I2PSocket i2ps, Thread t1, Thread t2) throws InterruptedException, IOException {
+        try { 
+            out.flush(); 
+        } catch (IOException ioe) { 
+            // ignore
+        }
+        try { 
+            i2pout.flush();
+        } catch (IOException ioe) {
+            // ignore
+        }
+        in.close();
+        i2pin.close();
+        // ok, yeah, there's a race here in theory, if data comes in after flushing and before
+        // closing, but its better than before...
+        s.close();
+        i2ps.close();
+        t1.join(30*1000);
+        t2.join(30*1000);
     }
     
     public void errorOccurred() {

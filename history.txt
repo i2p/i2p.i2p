@@ -1,4 +1,13 @@
-$Id: history.txt,v 1.264 2005/09/25 04:29:01 jrandom Exp $
+$Id: history.txt,v 1.265 2005/09/25 18:52:58 jrandom Exp $
+
+2005-09-26  jrandom
+    * Reworded the SSU introductions config section (thanks duck!)
+    * Force identity content encoding for I2PTunnel httpserver requests 
+      (thanks redzara!)
+    * Further x-i2p-gzip bugfixes for the end of streams
+    * Reduce the minimum bandwidth limits to 3KBps steady and burst (though
+      I2P's performance at 3KBps is another issue)
+    * Cleaned up some streaming lib structures
 
 2005-09-25  jrandom
     * Allow reseeding on the console if the netDb knows less than 30 peers,

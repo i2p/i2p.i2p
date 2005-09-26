@@ -19,7 +19,7 @@ class SchedulerReceived extends SchedulerImpl {
     public boolean accept(Connection con) {
         return (con != null) && 
                (con.getLastSendId() < 0) &&
-               (con.getSendStreamId() != null);
+               (con.getSendStreamId() > 0);
     }
     
     public void eventOccurred(Connection con) {

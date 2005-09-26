@@ -97,11 +97,9 @@ public class PacketHandler {
         //if (_log.shouldLog(Log.DEBUG))
         //    _log.debug("packet received: " + packet);
         
-        byte sendId[] = packet.getSendStreamId();
-        if (!isNonZero(sendId))
-            sendId = null;
+        long sendId = packet.getSendStreamId();
         
-        Connection con = (sendId != null ? _manager.getConnectionByInboundId(sendId) : null); 
+        Connection con = (sendId > 0 ? _manager.getConnectionByInboundId(sendId) : null); 
         if (con != null) {
             receiveKnownCon(con, packet);
             displayPacket(packet, "RECV", "wsize " + con.getOptions().getWindowSize() + " rto " + con.getOptions().getRTO());
@@ -127,9 +125,9 @@ public class PacketHandler {
     
     private void receiveKnownCon(Connection con, Packet packet) {
         if (packet.isFlagSet(Packet.FLAG_ECHO)) {
-            if (packet.getSendStreamId() != null) {
+            if (packet.getSendStreamId() > 0) {
                 receivePing(packet);
-            } else if (packet.getReceiveStreamId() != null) {
+            } else if (packet.getReceiveStreamId() > 0) {
                 receivePong(packet);
             } else {
                 if (_log.shouldLog(Log.WARN))
@@ -162,9 +160,9 @@ public class PacketHandler {
                         _log.warn("Received forged reset for " + con, ie);
                 }
             } else {
-                if ( (con.getSendStreamId() == null) || 
+                if ( (con.getSendStreamId() <= 0) || 
                      (DataHelper.eq(con.getSendStreamId(), packet.getReceiveStreamId())) ) {
-                    byte oldId[] =con.getSendStreamId();
+                    long oldId =con.getSendStreamId();
                     if (packet.isFlagSet(Packet.FLAG_SYNCHRONIZE)) // con fully established, w00t
                         con.setSendStreamId(packet.getReceiveStreamId());
                     
@@ -214,11 +212,11 @@ public class PacketHandler {
         _manager.getPacketQueue().enqueue(reply);
     }
     
-    private void receiveUnknownCon(Packet packet, byte sendId[]) {
+    private void receiveUnknownCon(Packet packet, long sendId) {
         if (packet.isFlagSet(Packet.FLAG_ECHO)) {
-            if (packet.getSendStreamId() != null) {
+            if (packet.getSendStreamId() > 0) {
                 receivePing(packet);
-            } else if (packet.getReceiveStreamId() != null) {
+            } else if (packet.getReceiveStreamId() > 0) {
                 receivePong(packet);
             } else {
                 if (_log.shouldLog(Log.WARN))
@@ -228,7 +226,7 @@ public class PacketHandler {
         } else {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Packet received on an unknown stream (and not an ECHO): " + packet);
-            if (sendId == null) {
+            if (sendId <= 0) {
                 Connection con = _manager.getConnectionByOutboundId(packet.getReceiveStreamId());
                 if (con != null) {
                     if (con.getAckedPackets() <= 0) {
@@ -257,7 +255,7 @@ public class PacketHandler {
                     }
                     _log.warn("Packet belongs to no other cons: " + packet + " connections: " 
                               + buf.toString() + " sendId: " 
-                              + (sendId != null ? Base64.encode(sendId) : " unknown"));
+                              + (sendId > 0 ? Packet.toId(sendId) : " unknown"));
                 }
                 packet.releasePayload();
             }
@@ -289,25 +287,7 @@ public class PacketHandler {
         _manager.receivePong(packet.getReceiveStreamId());
     }
     
-    private static final boolean isValidMatch(byte conStreamId[], byte packetStreamId[]) {
-        if ( (conStreamId == null) || (packetStreamId == null) || 
-             (conStreamId.length != packetStreamId.length) ) 
-            return false;
-        
-        boolean nonZeroFound = false;
-        for (int i = 0; i < conStreamId.length; i++) {
-            if (conStreamId[i] != packetStreamId[i]) return false;
-            if (conStreamId[i] != 0x0) nonZeroFound = true;
-        }
-        return nonZeroFound;
-    }
-    
-    private static final boolean isNonZero(byte[] b) {
-        boolean nonZeroFound = false;
-        for (int i = 0; b != null && i < b.length; i++) {
-            if (b[i] != 0x0)
-                nonZeroFound = true;
-        }
-        return nonZeroFound;
+    private static final boolean isValidMatch(long conStreamId, long packetStreamId) {
+        return ( (conStreamId == packetStreamId) && (conStreamId != 0) );
     }
 }

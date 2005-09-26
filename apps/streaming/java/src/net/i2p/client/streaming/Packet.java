@@ -51,8 +51,8 @@ import net.i2p.util.ByteCache;
  *
  */
 public class Packet {
-    private byte _sendStreamId[];
-    private byte _receiveStreamId[];
+    private long _sendStreamId;
+    private long _receiveStreamId;
     private long _sequenceNum;
     private long _ackThrough;
     private long _nacks[];
@@ -72,7 +72,9 @@ public class Packet {
      * synchronize packet)
      *
      */
-    public static final byte STREAM_ID_UNKNOWN[] = new byte[] { 0x00, 0x00, 0x00, 0x00 };
+    public static final long STREAM_ID_UNKNOWN = 0l;
+    
+    public static final long MAX_STREAM_ID = 0xffffffffl;
     
     /**
      * This packet is creating a new socket connection (if the receiveStreamId
@@ -149,17 +151,8 @@ public class Packet {
     }
     
     /** what stream is this packet a part of? */
-    public byte[] getSendStreamId() { 
-        if ( (_sendStreamId == null) || (DataHelper.eq(_sendStreamId, STREAM_ID_UNKNOWN)) )
-            return null;
-        else
-            return _sendStreamId; 
-    }
-    public void setSendStreamId(byte[] id) { 
-        _sendStreamId = id; 
-        if ( (id != null) && (DataHelper.eq(id, STREAM_ID_UNKNOWN)) )
-            _sendStreamId = null;
-    }
+    public long getSendStreamId() { return _sendStreamId; }
+    public void setSendStreamId(long id) { _sendStreamId = id; }
     
     /** 
      * Stream that replies should be sent on.  if the 
@@ -167,17 +160,8 @@ public class Packet {
      * null.
      *
      */
-    public byte[] getReceiveStreamId() { 
-        if ( (_receiveStreamId == null) || (DataHelper.eq(_receiveStreamId, STREAM_ID_UNKNOWN)) )
-            return null;
-        else
-            return _receiveStreamId; 
-    }
-    public void setReceiveStreamId(byte[] id) { 
-        _receiveStreamId = id; 
-        if ( (id != null) && (DataHelper.eq(id, STREAM_ID_UNKNOWN)) )
-            _receiveStreamId = null;
-    }
+    public long getReceiveStreamId() { return _receiveStreamId; }
+    public void setReceiveStreamId(long id) { _receiveStreamId = id; }
     
     /** 0-indexed sequence number for this Packet in the sendStream */
     public long getSequenceNum() { return _sequenceNum; }
@@ -312,15 +296,9 @@ public class Packet {
      */
     private int writePacket(byte buffer[], int offset, boolean includeSig) throws IllegalStateException {
         int cur = offset;
-        if ( (_sendStreamId != null) && (_sendStreamId.length == 4) )
-            System.arraycopy(_sendStreamId, 0, buffer, cur, _sendStreamId.length);
-        else
-            System.arraycopy(STREAM_ID_UNKNOWN, 0, buffer, cur, STREAM_ID_UNKNOWN.length);
+        DataHelper.toLong(buffer, cur, 4, (_sendStreamId >= 0 ? _sendStreamId : STREAM_ID_UNKNOWN));
         cur += 4;
-        if ( (_receiveStreamId != null) && (_receiveStreamId.length == 4) )
-            System.arraycopy(_receiveStreamId, 0, buffer, cur, _receiveStreamId.length);
-        else
-            System.arraycopy(STREAM_ID_UNKNOWN, 0, buffer, cur, STREAM_ID_UNKNOWN.length);
+        DataHelper.toLong(buffer, cur, 4, (_receiveStreamId >= 0 ? _receiveStreamId : STREAM_ID_UNKNOWN));
         cur += 4;
         DataHelper.toLong(buffer, cur, 4, _sequenceNum > 0 ? _sequenceNum : 0);
         cur += 4;
@@ -398,7 +376,7 @@ public class Packet {
         size += 4; // sequenceNum
         size += 4; // ackThrough
         if (_nacks != null) {
-			size++; // nacks length
+            size++; // nacks length
             size += 4 * _nacks.length;
         } else {
             size++; // nacks length
@@ -440,11 +418,9 @@ public class Packet {
         if (length < 22) // min header size
             throw new IllegalArgumentException("Too small: len=" + buffer.length);
         int cur = offset;
-        _sendStreamId = new byte[4];
-        System.arraycopy(buffer, cur, _sendStreamId, 0, 4);
+        _sendStreamId = DataHelper.fromLong(buffer, cur, 4);
         cur += 4;
-        _receiveStreamId = new byte[4];
-        System.arraycopy(buffer, cur, _receiveStreamId, 0, 4);
+        _receiveStreamId = DataHelper.fromLong(buffer, cur, 4);
         cur += 4;
         _sequenceNum = DataHelper.fromLong(buffer, cur, 4);
         cur += 4;
@@ -593,11 +569,8 @@ public class Packet {
         return buf;
     }
     
-    static final String toId(byte id[]) {
-        if (id == null)
-            return Base64.encode(STREAM_ID_UNKNOWN);
-        else
-            return Base64.encode(id);
+    static final String toId(long id) {
+        return Base64.encode(DataHelper.toLong(4, id));
     }
     
     private final String toFlagString() {

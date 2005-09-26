@@ -96,10 +96,8 @@ public class ConnectionPacketHandler {
         boolean allowAck = true;
         
         if ( (!packet.isFlagSet(Packet.FLAG_SYNCHRONIZE)) && 
-             ( (packet.getSendStreamId() == null) ||  
-               (packet.getReceiveStreamId() == null) || 
-               (DataHelper.eq(packet.getSendStreamId(), Packet.STREAM_ID_UNKNOWN)) ||
-               (DataHelper.eq(packet.getReceiveStreamId(), Packet.STREAM_ID_UNKNOWN)) ) )
+             ( (packet.getSendStreamId() <= 0) ||  
+               (packet.getReceiveStreamId() <= 0) ) )
             allowAck = false;
 
         if (allowAck)
@@ -160,9 +158,7 @@ public class ConnectionPacketHandler {
             }
         }
 
-        if (packet.isFlagSet(Packet.FLAG_SYNCHRONIZE) && 
-            ((packet.getSendStreamId() == null) ||
-              DataHelper.eq(packet.getSendStreamId(), Packet.STREAM_ID_UNKNOWN) ) ) {
+        if (packet.isFlagSet(Packet.FLAG_SYNCHRONIZE) && (packet.getSendStreamId() <= 0) ) {
             // don't honor the ACK 0 in SYN packets received when the other side
             // has obviously not seen our messages
         } else {
@@ -197,8 +193,8 @@ public class ConnectionPacketHandler {
         // could actually be acking data (this fixes the buggered up ack of packet 0 problem).
         // this is called after packet verification, which places the stream IDs as necessary if
         // the SYN verifies (so if we're acking w/out stream IDs, no SYN has been received yet)
-        if ( (packet != null) && (packet.getSendStreamId() != null) && (packet.getReceiveStreamId() != null) &&
-             (con != null) && (con.getSendStreamId() != null) && (con.getReceiveStreamId() != null) &&
+        if ( (packet != null) && (packet.getSendStreamId() > 0) && (packet.getReceiveStreamId() > 0) &&
+             (con != null) && (con.getSendStreamId() > 0) && (con.getReceiveStreamId() > 0) &&
              (!DataHelper.eq(packet.getSendStreamId(), Packet.STREAM_ID_UNKNOWN)) &&
              (!DataHelper.eq(packet.getReceiveStreamId(), Packet.STREAM_ID_UNKNOWN)) &&
              (!DataHelper.eq(con.getSendStreamId(), Packet.STREAM_ID_UNKNOWN)) &&
@@ -335,7 +331,7 @@ public class ConnectionPacketHandler {
         } else {
             verifySignature(packet, con);
             
-            if (con.getSendStreamId() == null) {
+            if (con.getSendStreamId() <= 0) {
                 if (packet.isFlagSet(Packet.FLAG_SYNCHRONIZE)) {
                     con.setSendStreamId(packet.getReceiveStreamId());
                     con.setRemotePeer(packet.getOptionalFrom());

@@ -37,6 +37,7 @@ class HTTPResponseOutputStream extends FilterOutputStream {
     private byte _buf1[];
     protected boolean _gzip;
     private long _dataWritten;
+    private InternalGZIPInputStream _in;
     private static final int CACHE_SIZE = 8*1024;
     
     public HTTPResponseOutputStream(OutputStream raw) {
@@ -199,7 +200,7 @@ class HTTPResponseOutputStream extends FilterOutputStream {
     }
     
     protected void beginProcessing() throws IOException {
-        out.flush();
+        //out.flush();
         PipedInputStream pi = new PipedInputStream();
         PipedOutputStream po = new PipedOutputStream(pi);
         new I2PThread(new Pusher(pi, out), "HTTP decompresser").start();
@@ -207,22 +208,22 @@ class HTTPResponseOutputStream extends FilterOutputStream {
     }
     
     private class Pusher implements Runnable {
-        private InputStream _in;
+        private InputStream _inRaw;
         private OutputStream _out;
         public Pusher(InputStream in, OutputStream out) {
-            _in = in;
+            _inRaw = in;
             _out = out;
         }
         public void run() {
             OutputStream to = null;
-            InternalGZIPInputStream in = null;
+            _in = null;
             long start = System.currentTimeMillis();
             long written = 0;
             try {
-                in = new InternalGZIPInputStream(_in);
+                _in = new InternalGZIPInputStream(_inRaw);
                 byte buf[] = new byte[8192];
                 int read = -1;
-                while ( (read = in.read(buf)) != -1) {
+                while ( (read = _in.read(buf)) != -1) {
                     if (_log.shouldLog(Log.DEBUG))
                         _log.debug("Read " + read + " and writing it to the browser/streams");
                     _out.write(buf, 0, read);
@@ -230,16 +231,22 @@ class HTTPResponseOutputStream extends FilterOutputStream {
                     written += read;
                 }
                 if (_log.shouldLog(Log.INFO))
-                    _log.info("Decompressed: " + written + ", " + in.getTotalRead() + "/" + in.getTotalExpanded());
+                    _log.info("Decompressed: " + written + ", " + _in.getTotalRead() + "/" + _in.getTotalExpanded());
             } catch (IOException ioe) {
                 if (_log.shouldLog(Log.WARN))
-                    _log.warn("Error decompressing: " + written + ", " + in.getTotalRead() + "/" + in.getTotalExpanded(), ioe);
+                    _log.warn("Error decompressing: " + written + ", " + _in.getTotalRead() + "/" + _in.getTotalExpanded(), ioe);
             } finally {
-                if (_out != null) try { _out.close(); } catch (IOException ioe) {}
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("After decompression, written=" + written + " read=" + _in.getTotalRead() 
+                              + ", expanded=" + _in.getTotalExpanded() + ", remaining=" + _in.getRemaining() 
+                              + ", finished=" + _in.getFinished());
+                if (_out != null) try { 
+                    _out.close(); 
+                } catch (IOException ioe) {}
             }
             long end = System.currentTimeMillis();
-            double compressed = in.getTotalRead();
-            double expanded = in.getTotalExpanded();
+            double compressed = _in.getTotalRead();
+            double expanded = _in.getTotalExpanded();
             double ratio = 0;
             if (expanded > 0)
                 ratio = compressed/expanded;
@@ -255,6 +262,15 @@ class HTTPResponseOutputStream extends FilterOutputStream {
         }
         public long getTotalRead() { return super.inf.getTotalIn(); }
         public long getTotalExpanded() { return super.inf.getTotalOut(); }
+        public long getRemaining() { return super.inf.getRemaining(); }
+        public boolean getFinished() { return super.inf.finished(); }
+        public String toString() { 
+            return "Read: " + getTotalRead() + " expanded: " + getTotalExpanded() + " remaining: " + getRemaining() + " finished: " + getFinished();
+        }
+    }
+    
+    public String toString() {
+        return super.toString() + ": " + _in;
     }
     
     public static void main(String args[]) {

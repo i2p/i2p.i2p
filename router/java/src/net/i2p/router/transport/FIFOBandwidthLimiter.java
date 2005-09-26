@@ -567,7 +567,7 @@ public class FIFOBandwidthLimiter {
     public void renderStatusHTML(Writer out) throws IOException {
         long now = now();
         StringBuffer buf = new StringBuffer(4096);
-        buf.append("<br /><i>Limiter status: ").append(getStatus().toString()).append("</i><br />\n");
+        buf.append("<br /><i id=\"bwlim\">Limiter status: ").append(getStatus().toString()).append("</i><br />\n");
         buf.append("<b>Pending bandwidth requests:</b><ul>");
         buf.append("<li>Inbound requests: <ol>");
         synchronized (_pendingInboundRequests) {

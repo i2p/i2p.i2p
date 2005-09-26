@@ -36,7 +36,7 @@ class SchedulerDead extends SchedulerImpl {
         boolean nothingLeftToDo = (con.getDisconnectScheduledOn() > 0) && 
                                   (timeSinceClose >= Connection.DISCONNECT_TIMEOUT);
         boolean timedOut = (con.getOptions().getConnectTimeout() < con.getLifetime()) && 
-                           con.getSendStreamId() == null &&
+                           con.getSendStreamId() <= 0 &&
                            con.getLifetime() >= Connection.DISCONNECT_TIMEOUT;
         return nothingLeftToDo || timedOut;
     }

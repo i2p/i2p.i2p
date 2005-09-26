@@ -127,7 +127,7 @@ class ConnectionHandler {
         reply.setFlag(Packet.FLAG_SIGNATURE_INCLUDED);
         reply.setAckThrough(packet.getSequenceNum());
         reply.setSendStreamId(packet.getReceiveStreamId());
-        reply.setReceiveStreamId(null);
+        reply.setReceiveStreamId(0);
         reply.setOptionalFrom(_manager.getSession().getMyDestination());
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Sending RST: " + reply + " because of " + packet);

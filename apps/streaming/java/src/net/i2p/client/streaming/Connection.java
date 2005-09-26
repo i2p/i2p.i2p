@@ -24,8 +24,8 @@ public class Connection {
     private Log _log;
     private ConnectionManager _connectionManager;
     private Destination _remotePeer;
-    private byte _sendStreamId[];
-    private byte _receiveStreamId[];
+    private long _sendStreamId;
+    private long _receiveStreamId;
     private long _lastSendTime;
     private long _lastSendId;
     private boolean _resetReceived;
@@ -205,7 +205,7 @@ public class Connection {
         _resetSent = true;
         if (_resetSentOn <= 0)
             _resetSentOn = _context.clock().now();
-        if ( (_remotePeer == null) || (_sendStreamId == null) ) return;
+        if ( (_remotePeer == null) || (_sendStreamId <= 0) ) return;
         PacketLocal reply = new PacketLocal(_context, _remotePeer);
         reply.setFlag(Packet.FLAG_RESET);
         reply.setFlag(Packet.FLAG_SIGNATURE_INCLUDED);
@@ -521,12 +521,12 @@ public class Connection {
     public void setRemotePeer(Destination peer) { _remotePeer = peer; }
     
     /** what stream do we send data to the peer on? */
-    public byte[] getSendStreamId() { return _sendStreamId; }
-    public void setSendStreamId(byte[] id) { _sendStreamId = id; }
+    public long getSendStreamId() { return _sendStreamId; }
+    public void setSendStreamId(long id) { _sendStreamId = id; }
     
     /** stream the peer sends data to us on. (may be null) */
-    public byte[] getReceiveStreamId() { return _receiveStreamId; }
-    public void setReceiveStreamId(byte[] id) { 
+    public long getReceiveStreamId() { return _receiveStreamId; }
+    public void setReceiveStreamId(long id) { 
         _receiveStreamId = id; 
         synchronized (_connectLock) { _connectLock.notifyAll(); }
     }
@@ -653,7 +653,7 @@ public class Connection {
     void waitForConnect() {
         long expiration = _context.clock().now() + _options.getConnectTimeout();
         while (true) {
-            if (_connected && (_receiveStreamId != null) && (_sendStreamId != null) ) {
+            if (_connected && (_receiveStreamId > 0) && (_sendStreamId > 0) ) {
                 // w00t
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("waitForConnect(): Connected and we have stream IDs");
@@ -793,13 +793,13 @@ public class Connection {
     public String toString() { 
         StringBuffer buf = new StringBuffer(128);
         buf.append("[Connection ");
-        if (_receiveStreamId != null)
-            buf.append(Base64.encode(_receiveStreamId));
+        if (_receiveStreamId > 0)
+            buf.append(Packet.toId(_receiveStreamId));
         else
             buf.append("unknown");
         buf.append("<-->");
-        if (_sendStreamId != null)
-            buf.append(Base64.encode(_sendStreamId));
+        if (_sendStreamId > 0)
+            buf.append(Packet.toId(_sendStreamId));
         else
             buf.append("unknown");
         buf.append(" wsize: ").append(_options.getWindowSize());

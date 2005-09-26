@@ -33,19 +33,19 @@ class FIFOBandwidthRefiller implements Runnable {
     // no longer allow unlimited bandwidth - the user must specify a value, and if they do not, it is 16KBps
     public static final int DEFAULT_INBOUND_BANDWIDTH = 16;
     public static final int DEFAULT_OUTBOUND_BANDWIDTH = 16;
-    public static final int DEFAULT_INBOUND_BURST_BANDWIDTH = 32;
-    public static final int DEFAULT_OUTBOUND_BURST_BANDWIDTH = 32;
+    public static final int DEFAULT_INBOUND_BURST_BANDWIDTH = 16;
+    public static final int DEFAULT_OUTBOUND_BURST_BANDWIDTH = 16;
 
     public static final int DEFAULT_BURST_SECONDS = 60;
     
-    /** For now, until there is some tuning and safe throttling, we set the floor at 6KBps inbound */
-    public static final int MIN_INBOUND_BANDWIDTH = 5;
-    /** For now, until there is some tuning and safe throttling, we set the floor at 6KBps outbound */
-    public static final int MIN_OUTBOUND_BANDWIDTH = 5;
-    /** For now, until there is some tuning and safe throttling, we set the floor at a 10 second burst */
-    public static final int MIN_INBOUND_BANDWIDTH_PEAK = 10;
-    /** For now, until there is some tuning and safe throttling, we set the floor at a 10 second burst */
-    public static final int MIN_OUTBOUND_BANDWIDTH_PEAK = 10;
+    /** For now, until there is some tuning and safe throttling, we set the floor at 3KBps inbound */
+    public static final int MIN_INBOUND_BANDWIDTH = 3;
+    /** For now, until there is some tuning and safe throttling, we set the floor at 3KBps outbound */
+    public static final int MIN_OUTBOUND_BANDWIDTH = 3;
+    /** For now, until there is some tuning and safe throttling, we set the floor at a 3KBps during burst */
+    public static final int MIN_INBOUND_BANDWIDTH_PEAK = 3;
+    /** For now, until there is some tuning and safe throttling, we set the floor at a 3KBps during burst */
+    public static final int MIN_OUTBOUND_BANDWIDTH_PEAK = 3;
     
     /** 
      * how often we replenish the queues.  

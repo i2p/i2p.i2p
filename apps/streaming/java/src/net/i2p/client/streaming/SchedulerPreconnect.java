@@ -31,7 +31,7 @@ class SchedulerPreconnect extends SchedulerImpl {
     
     public boolean accept(Connection con) {
         return (con != null) && 
-               (con.getSendStreamId() == null) &&
+               (con.getSendStreamId() <= 0) &&
                (con.getLastSendId() < 0);
     }
     

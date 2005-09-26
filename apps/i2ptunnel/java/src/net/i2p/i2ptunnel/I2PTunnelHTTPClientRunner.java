@@ -3,16 +3,13 @@
  */
 package net.i2p.i2ptunnel;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.FilterOutputStream;
+import java.io.*;
 import java.net.Socket;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
 
+import net.i2p.I2PAppContext;
 import net.i2p.client.streaming.I2PSocket;
 import net.i2p.data.ByteArray;
 import net.i2p.data.DataHelper;
@@ -30,12 +27,38 @@ import net.i2p.util.Log;
  *
  */
 public class I2PTunnelHTTPClientRunner extends I2PTunnelRunner {
+    private Log _log;
     public I2PTunnelHTTPClientRunner(Socket s, I2PSocket i2ps, Object slock, byte[] initialI2PData, List sockList, Runnable onTimeout) {
         super(s, i2ps, slock, initialI2PData, sockList, onTimeout);
+        _log = I2PAppContext.getGlobalContext().logManager().getLog(I2PTunnelHTTPClientRunner.class);
     }
 
     protected OutputStream getSocketOut() throws IOException { 
         OutputStream raw = super.getSocketOut();
         return new HTTPResponseOutputStream(raw);
     }
+        
+    protected void close(OutputStream out, InputStream in, OutputStream i2pout, InputStream i2pin, Socket s, I2PSocket i2ps, Thread t1, Thread t2) throws InterruptedException, IOException {
+        try { 
+            i2pin.close();
+            i2pout.close();
+        } catch (IOException ioe) {
+            // ignore
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Unable to close the i2p socket output stream: " + i2pout, ioe);
+        }
+        try { 
+            in.close();
+            out.close(); 
+        } catch (IOException ioe) { 
+            // ignore
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Unable to close the browser output stream: " + out, ioe);
+        }
+        i2ps.close();
+        s.close();
+        t1.join(30*1000);
+        t2.join(30*1000);
+    }
+    
 }

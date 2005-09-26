@@ -71,6 +71,10 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
             if ( (_spoofHost != null) && (_spoofHost.trim().length() > 0) )
                 headers.setProperty("Host", _spoofHost);
             headers.setProperty("Connection", "close");
+            // we keep the enc sent by the browser before clobbering it, since it may have 
+            // been x-i2p-gzip
+            String enc = headers.getProperty("Accept-encoding");
+            headers.setProperty("Accept-encoding", "identity;q=1, *;q=0");
             String modifiedHeader = formatHeaders(headers, command);
             
             //String modifiedHeader = getModifiedHeader(socket);
@@ -91,7 +95,6 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
                 if ( (val != null) && (!Boolean.valueOf(val).booleanValue()) ) 
                     allowGZIP = false;
             }
-            String enc = headers.getProperty("Accept-encoding");
             if (_log.shouldLog(Log.INFO))
                 _log.info("HTTP server encoding header: " + enc);
             if ( allowGZIP && (enc != null) && (enc.indexOf("x-i2p-gzip") >= 0) ) {

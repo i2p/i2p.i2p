@@ -41,7 +41,7 @@ class SchedulerClosed extends SchedulerImpl {
                      (!con.getResetReceived()) &&
                      (timeSinceClose < Connection.DISCONNECT_TIMEOUT);
         boolean conTimeout = (con.getOptions().getConnectTimeout() < con.getLifetime()) && 
-                             con.getSendStreamId() == null &&
+                             con.getSendStreamId() <= 0 &&
                              con.getLifetime() < Connection.DISCONNECT_TIMEOUT;
         return (ok || conTimeout);
     }

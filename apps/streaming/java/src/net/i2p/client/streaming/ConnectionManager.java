@@ -31,9 +31,9 @@ public class ConnectionManager {
     private PacketQueue _outboundQueue;
     private SchedulerChooser _schedulerChooser;
     private ConnectionPacketHandler _conPacketHandler;
-    /** Inbound stream ID (ByteArray) to Connection map */
+    /** Inbound stream ID (Long) to Connection map */
     private Map _connectionByInboundId;
-    /** Ping ID (ByteArray) to PingRequest */
+    /** Ping ID (Long) to PingRequest */
     private Map _pendingPings;
     private boolean _allowIncoming;
     private int _maxConcurrentStreams;
@@ -71,16 +71,16 @@ public class ConnectionManager {
         _context.statManager().createRateStat("stream.receiveActive", "How many streams are active when a new one is received (period being not yet dropped)", "Stream", new long[] { 60*60*1000, 24*60*60*1000 });
     }
     
-    Connection getConnectionByInboundId(byte[] id) {
+    Connection getConnectionByInboundId(long id) {
         synchronized (_connectionLock) {
-            return (Connection)_connectionByInboundId.get(new ByteArray(id));
+            return (Connection)_connectionByInboundId.get(new Long(id));
         }
     }
     /** 
      * not guaranteed to be unique, but in case we receive more than one packet
      * on an inbound connection that we havent ack'ed yet...
      */
-    Connection getConnectionByOutboundId(byte[] id) {
+    Connection getConnectionByOutboundId(long id) {
         synchronized (_connectionLock) {
             for (Iterator iter = _connectionByInboundId.values().iterator(); iter.hasNext(); ) {
                 Connection con = (Connection)iter.next();
@@ -107,8 +107,7 @@ public class ConnectionManager {
      */
     public Connection receiveConnection(Packet synPacket) {
         Connection con = new Connection(_context, this, _schedulerChooser, _outboundQueue, _conPacketHandler, new ConnectionOptions(_defaultOptions));
-        byte receiveId[] = new byte[4];
-        _context.random().nextBytes(receiveId);
+        long receiveId = _context.random().nextLong(Packet.MAX_STREAM_ID-1)+1;
         boolean reject = false;
         int active = 0;
         int total = 0;
@@ -122,16 +121,13 @@ public class ConnectionManager {
                 reject = true;
             } else { 
                 while (true) {
-                    ByteArray ba = new ByteArray(receiveId);
-                    Connection oldCon = (Connection)_connectionByInboundId.put(ba, con);
+                    Connection oldCon = (Connection)_connectionByInboundId.put(new Long(receiveId), con);
                     if (oldCon == null) {
                         break;
                     } else { 
-                        _connectionByInboundId.put(ba, oldCon);
+                        _connectionByInboundId.put(new Long(receiveId), oldCon);
                         // receiveId already taken, try another
-                        // (need to realloc receiveId, as ba.getData() points to the old value)
-                        receiveId = new byte[4];
-                        _context.random().nextBytes(receiveId);
+                        receiveId = _context.random().nextLong(Packet.MAX_STREAM_ID-1)+1;
                     }
                 }
             }
@@ -148,7 +144,7 @@ public class ConnectionManager {
             reply.setFlag(Packet.FLAG_SIGNATURE_INCLUDED);
             reply.setAckThrough(synPacket.getSequenceNum());
             reply.setSendStreamId(synPacket.getReceiveStreamId());
-            reply.setReceiveStreamId(null);
+            reply.setReceiveStreamId(0);
             reply.setOptionalFrom(_session.getMyDestination());
             // this just sends the packet - no retries or whatnot
             _outboundQueue.enqueue(reply);
@@ -160,7 +156,7 @@ public class ConnectionManager {
             con.getPacketHandler().receivePacket(synPacket, con);
         } catch (I2PException ie) {
             synchronized (_connectionLock) {
-                _connectionByInboundId.remove(new ByteArray(receiveId));
+                _connectionByInboundId.remove(new Long(receiveId));
             }
             return null;
         }
@@ -179,8 +175,7 @@ public class ConnectionManager {
      */
     public Connection connect(Destination peer, ConnectionOptions opts) {
         Connection con = null;
-        byte receiveId[] = new byte[4];
-        _context.random().nextBytes(receiveId);
+        long receiveId = _context.random().nextLong(Packet.MAX_STREAM_ID-1)+1;
         long expiration = _context.clock().now() + opts.getConnectTimeout();
         if (opts.getConnectTimeout() <= 0)
             expiration = _context.clock().now() + DEFAULT_STREAM_DELAY_MAX;
@@ -213,11 +208,10 @@ public class ConnectionManager {
                     con = new Connection(_context, this, _schedulerChooser, _outboundQueue, _conPacketHandler, opts);
                     con.setRemotePeer(peer);
             
-                    ByteArray ba = new ByteArray(receiveId);
-                    while (_connectionByInboundId.containsKey(ba)) {
-                        _context.random().nextBytes(receiveId);
+                    while (_connectionByInboundId.containsKey(new Long(receiveId))) {
+                        receiveId = _context.random().nextLong(Packet.MAX_STREAM_ID-1)+1;
                     }
-                    _connectionByInboundId.put(ba, con);
+                    _connectionByInboundId.put(new Long(receiveId), con);
                     break; // stop looping as a psuedo-wait
                 }
             }
@@ -284,7 +278,7 @@ public class ConnectionManager {
     public void removeConnection(Connection con) {
         boolean removed = false;
         synchronized (_connectionLock) {
-            Object o = _connectionByInboundId.remove(new ByteArray(con.getReceiveStreamId()));
+            Object o = _connectionByInboundId.remove(new Long(con.getReceiveStreamId()));
             removed = (o == con);
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Connection removed? " + removed + " remaining: " 
@@ -320,11 +314,9 @@ public class ConnectionManager {
         return ping(peer, timeoutMs, blocking, null, null, null);
     }
     public boolean ping(Destination peer, long timeoutMs, boolean blocking, SessionKey keyToUse, Set tagsToSend, PingNotifier notifier) {
-        byte id[] = new byte[4];
-        _context.random().nextBytes(id);
-        ByteArray ba = new ByteArray(id);
+        Long id = new Long(_context.random().nextLong(Packet.MAX_STREAM_ID-1)+1);
         PacketLocal packet = new PacketLocal(_context, peer);
-        packet.setSendStreamId(id);
+        packet.setSendStreamId(id.longValue());
         packet.setFlag(Packet.FLAG_ECHO);
         packet.setFlag(Packet.FLAG_SIGNATURE_INCLUDED);
         packet.setOptionalFrom(_session.getMyDestination());
@@ -336,7 +328,7 @@ public class ConnectionManager {
         PingRequest req = new PingRequest(peer, packet, notifier);
         
         synchronized (_pendingPings) {
-            _pendingPings.put(ba, req);
+            _pendingPings.put(id, req);
         }
         
         _outboundQueue.enqueue(packet);
@@ -349,10 +341,10 @@ public class ConnectionManager {
             }
             
             synchronized (_pendingPings) {
-                _pendingPings.remove(ba);
+                _pendingPings.remove(id);
             }
         } else {
-            SimpleTimer.getInstance().addEvent(new PingFailed(ba, notifier), timeoutMs);
+            SimpleTimer.getInstance().addEvent(new PingFailed(id, notifier), timeoutMs);
         }
         
         boolean ok = req.pongReceived();
@@ -364,17 +356,17 @@ public class ConnectionManager {
     }
     
     private class PingFailed implements SimpleTimer.TimedEvent {
-        private ByteArray _ba;
+        private Long _id;
         private PingNotifier _notifier;
-        public PingFailed(ByteArray ba, PingNotifier notifier) { 
-            _ba = ba; 
+        public PingFailed(Long id, PingNotifier notifier) { 
+            _id = id;
             _notifier = notifier;
         }
         
         public void timeReached() {
             boolean removed = false;
             synchronized (_pendingPings) {
-                Object o = _pendingPings.remove(_ba);
+                Object o = _pendingPings.remove(_id);
                 if (o != null)
                     removed = true;
             }
@@ -411,11 +403,10 @@ public class ConnectionManager {
         public boolean pongReceived() { return _ponged; }
     }
     
-    void receivePong(byte pingId[]) {
-        ByteArray ba = new ByteArray(pingId);
+    void receivePong(long pingId) {
         PingRequest req = null;
         synchronized (_pendingPings) {
-            req = (PingRequest)_pendingPings.remove(ba);
+            req = (PingRequest)_pendingPings.remove(new Long(pingId));
         }
         if (req != null) 
             req.pong();
