@@ -1,4 +1,8 @@
-$Id: history.txt,v 1.266 2005/09/26 18:45:53 jrandom Exp $
+$Id: history.txt,v 1.267 2005/09/27 02:17:41 jrandom Exp $
+
+2005-09-27  jrandom
+    * Properly suggest filenames for attachments in Syndie (thanks all!)
+    * Fixed the Syndie authorization scheme for single user vs. multiuser
 
 2005-09-27  jrandom
     * I2PTunnel bugfix (thanks Complication!)

@@ -274,7 +274,7 @@ public class BlogManager {
     }
     public boolean authorizeRemote(User user) {
         if (isSingleUser()) return true;
-        return (!user.getAuthenticated() || !user.getAllowAccessRemote());
+        return (user.getAuthenticated() && user.getAllowAccessRemote());
     }
     
     public void configure(String registrationPassword, String remotePassword, String adminPass, String defaultSelector, 

@@ -620,12 +620,31 @@ public class ArchiveViewerBean {
         return "application/octet-stream";
     }
     
+    public static final boolean getAttachmentShouldShowInline(Map parameters) {
+        Attachment a = getAttachment(parameters);
+        if (a == null) 
+            return true;
+        String mime = a.getMimeType();
+        if ( (mime != null) && ((mime.startsWith("image/") || mime.startsWith("text/plain"))) )
+            return true;
+        else
+            return false;
+    }
+    
     public static final int getAttachmentContentLength(Map parameters) {
         Attachment a = getAttachment(parameters);
         if (a != null)
             return a.getDataLength();
         else
             return -1;
+    }
+    
+    public static final String getAttachmentFilename(Map parameters) {
+        Attachment a = getAttachment(parameters);
+        if (a != null)
+            return a.getName();
+        else
+            return "attachment.dat";
     }
     
     private static final Attachment getAttachment(Map parameters) {
