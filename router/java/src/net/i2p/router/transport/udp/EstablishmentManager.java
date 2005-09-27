@@ -166,6 +166,13 @@ public class EstablishmentManager {
     }
     
     /**
+     * How many concurrent inbound sessions to deal with
+     */
+    private int getMaxInboundEstablishers() { 
+        return getMaxConcurrentEstablish()/2; 
+    }
+    
+    /**
      * Got a SessionRequest (initiates an inbound establishment)
      *
      */
@@ -173,9 +180,14 @@ public class EstablishmentManager {
         if (!_transport.isValid(from.getIP()))
             return;
         
+        int maxInbound = getMaxInboundEstablishers();
+        
         boolean isNew = false;
         InboundEstablishState state = null;
         synchronized (_inboundStates) {
+            if (_inboundStates.size() >= maxInbound)
+                return; // drop the packet
+            
             state = (InboundEstablishState)_inboundStates.get(from);
             if (state == null) {
                 state = new InboundEstablishState(_context, from.getIP(), from.getPort(), _transport.getLocalPort());

@@ -171,7 +171,7 @@ public class PeerState {
      */
     private static final int DEFAULT_MTU = 608;//600; //1500;
     private static final int MIN_RTO = 800 + ACKSender.ACK_FREQUENCY;
-    private static final int MAX_RTO = 3000; // 5000;
+    private static final int MAX_RTO = 2000; // 5000;
     
     public PeerState(I2PAppContext ctx) {
         _context = ctx;
@@ -220,11 +220,11 @@ public class PeerState {
         _packetsReceived = 0;
         _packetsReceivedDuplicate = 0;
         _inboundMessages = new HashMap(8);
-        _context.statManager().createRateStat("udp.congestionOccurred", "How large the cwin was when congestion occurred (duration == sendBps)", "udp", new long[] { 60*60*1000, 24*60*60*1000 });
-        _context.statManager().createRateStat("udp.congestedRTO", "retransmission timeout after congestion (duration == rtt dev)", "udp", new long[] { 60*60*1000, 24*60*60*1000 });
-        _context.statManager().createRateStat("udp.sendACKPartial", "Number of partial ACKs sent (duration == number of full ACKs in that ack packet)", "udp", new long[] { 60*60*1000, 24*60*60*1000 });
-        _context.statManager().createRateStat("udp.sendBps", "How fast we are transmitting when a packet is acked", "udp", new long[] { 10*60*1000, 60*60*1000, 24*60*60*1000 });
-        _context.statManager().createRateStat("udp.receiveBps", "How fast we are receiving when a packet is fully received (at most one per second)", "udp", new long[] { 10*60*1000, 60*60*1000, 24*60*60*1000 });
+        _context.statManager().createRateStat("udp.congestionOccurred", "How large the cwin was when congestion occurred (duration == sendBps)", "udp", new long[] { 60*1000, 10*60*1000, 60*60*1000, 24*60*60*1000 });
+        _context.statManager().createRateStat("udp.congestedRTO", "retransmission timeout after congestion (duration == rtt dev)", "udp", new long[] { 60*1000, 10*60*1000, 60*60*1000, 24*60*60*1000 });
+        _context.statManager().createRateStat("udp.sendACKPartial", "Number of partial ACKs sent (duration == number of full ACKs in that ack packet)", "udp", new long[] { 60*1000, 10*60*1000, 60*60*1000, 24*60*60*1000 });
+        _context.statManager().createRateStat("udp.sendBps", "How fast we are transmitting when a packet is acked", "udp", new long[] { 60*1000, 10*60*1000, 60*60*1000, 24*60*60*1000 });
+        _context.statManager().createRateStat("udp.receiveBps", "How fast we are receiving when a packet is fully received (at most one per second)", "udp", new long[] { 60*1000, 10*60*1000, 60*60*1000, 24*60*60*1000 });
     }
     
     /**
@@ -458,7 +458,7 @@ public class PeerState {
             if (isForACK)
                 _receiveACKBytes += bytes;
         } else {
-            if (_retransmissionPeriodStart + 1000 < _context.clock().now()) {
+            if (true || _retransmissionPeriodStart + 1000 < _context.clock().now()) {
                 _packetsReceivedDuplicate++;
             } else {
                 _retransmissionPeriodStart = _context.clock().now();
@@ -505,8 +505,8 @@ public class PeerState {
      */
     private boolean congestionOccurred() {
         long now = _context.clock().now();
-        if (_lastCongestionOccurred + 5*1000 > now)
-            return false; // only shrink once every 5 seconds
+        if (_lastCongestionOccurred + _rto > now)
+            return false; // only shrink once every few seconds
         _lastCongestionOccurred = now;
         
         _context.statManager().addRateData("udp.congestionOccurred", _sendWindowBytes, _sendBps);
@@ -628,11 +628,11 @@ public class PeerState {
                 if (false) {
                     _sendWindowBytes += 16; // why 16?
                 } else {
-                    float prob = ((float)bytesACKed) / ((float)_sendWindowBytes);
+                    float prob = ((float)bytesACKed) / ((float)(_sendWindowBytes<<1));
                     float v = _context.random().nextFloat();
                     if (v < 0) v = 0-v;
                     if (v <= prob)
-                        _sendWindowBytes += bytesACKed;
+                        _sendWindowBytes += 512; // bytesACKed;
                 }
             }
         }
@@ -680,7 +680,7 @@ public class PeerState {
     /** we are resending a packet, so lets jack up the rto */
     public void messageRetransmitted(int packets) { 
         long now = _context.clock().now();
-        if (_retransmissionPeriodStart + 1000 <= now) {
+        if (true || _retransmissionPeriodStart + 1000 <= now) {
             _packetsRetransmitted += packets;
         } else {
             _packetRetransmissionRate = (int)((float)(0.9f*_packetRetransmissionRate) + (float)(0.1f*_packetsRetransmitted));
@@ -697,7 +697,7 @@ public class PeerState {
         long now = _context.clock().now();
         _packetsTransmitted += packets; 
         //_packetsPeriodTransmitted += packets;
-        if (_retransmissionPeriodStart + 1000 <= now) {
+        if (false && _retransmissionPeriodStart + 1000 <= now) {
             _packetRetransmissionRate = (int)((float)(0.9f*_packetRetransmissionRate) + (float)(0.1f*_packetsRetransmitted));
             _retransmissionPeriodStart = 0;
             _packetsPeriodRetransmitted = (int)_packetsRetransmitted;

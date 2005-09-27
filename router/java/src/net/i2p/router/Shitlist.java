@@ -75,7 +75,8 @@ public class Shitlist {
             Date oldDate = (Date)_shitlist.put(peer, new Date(_context.clock().now() + period));
             wasAlready = (null == oldDate);
             if (reason != null) {
-                _shitlistCause.put(peer, reason);
+                if (!wasAlready)
+                    _shitlistCause.put(peer, reason);
             } else {
                 _shitlistCause.remove(peer);
             }

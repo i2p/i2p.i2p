@@ -1,4 +1,14 @@
-$Id: history.txt,v 1.265 2005/09/25 18:52:58 jrandom Exp $
+$Id: history.txt,v 1.266 2005/09/26 18:45:53 jrandom Exp $
+
+2005-09-27  jrandom
+    * I2PTunnel bugfix (thanks Complication!)
+    * Increase the SSU cwin slower during congestion avoidance (at k/cwin^2 
+      instead of k/cwin)
+    * Limit the number of inbound SSU sessions being built at once (using
+      half of the i2np.udp.maxConcurrentEstablish config prop)
+    * Don't shitlist on a message send failure alone (unless there aren't any
+      common transports).
+    * More careful bandwidth bursting
 
 2005-09-26  jrandom
     * Reworded the SSU introductions config section (thanks duck!)

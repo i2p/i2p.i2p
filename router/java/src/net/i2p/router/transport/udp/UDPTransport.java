@@ -1006,7 +1006,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             
             double recvDupPct = (double)peer.getPacketsReceivedDuplicate()/(double)peer.getPacketsReceived();
             buf.append("<td valign=\"top\" ><code>");
-            buf.append(formatPct(recvDupPct));
+            buf.append(peer.getPacketsReceivedDuplicate()); //formatPct(recvDupPct));
             buf.append("</code></td>");
 
             buf.append("</tr>");

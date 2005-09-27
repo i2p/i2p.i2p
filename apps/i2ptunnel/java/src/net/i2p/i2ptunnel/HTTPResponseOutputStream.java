@@ -234,12 +234,15 @@ class HTTPResponseOutputStream extends FilterOutputStream {
                     _log.info("Decompressed: " + written + ", " + _in.getTotalRead() + "/" + _in.getTotalExpanded());
             } catch (IOException ioe) {
                 if (_log.shouldLog(Log.WARN))
-                    _log.warn("Error decompressing: " + written + ", " + _in.getTotalRead() + "/" + _in.getTotalExpanded(), ioe);
+                    _log.warn("Error decompressing: " + written + ", " + (_in != null ? _in.getTotalRead() + "/" + _in.getTotalExpanded() : ""), ioe);
             } finally {
                 if (_log.shouldLog(Log.WARN) && (_in != null))
-                    _log.warn("After decompression, written=" + written + " read=" + _in.getTotalRead() 
-                              + ", expanded=" + _in.getTotalExpanded() + ", remaining=" + _in.getRemaining() 
-                              + ", finished=" + _in.getFinished());
+                    _log.warn("After decompression, written=" + written + 
+                              (_in != null ?
+                                " read=" + _in.getTotalRead() 
+                                + ", expanded=" + _in.getTotalExpanded() + ", remaining=" + _in.getRemaining() 
+                                + ", finished=" + _in.getFinished()
+                               : ""));
                 if (_out != null) try { 
                     _out.close(); 
                 } catch (IOException ioe) {}

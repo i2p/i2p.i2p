@@ -180,8 +180,11 @@ public class FIFOBandwidthLimiter {
     /**
      * More bytes are available - add them to the queue and satisfy any requests
      * we can
+     *
+     * @param maxBurstIn allow up to this many bytes in from the burst section for this time period (may be negative)
+     * @param maxBurstOut allow up to this many bytes in from the burst section for this time period (may be negative)
      */
-    final void refillBandwidthQueues(long bytesInbound, long bytesOutbound) {
+    final void refillBandwidthQueues(long bytesInbound, long bytesOutbound, long maxBurstIn, long maxBurstOut) {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Refilling the queues with " + bytesInbound + "/" + bytesOutbound + ": " + getStatus().toString());
         _availableInbound += bytesInbound;
@@ -197,9 +200,8 @@ public class FIFOBandwidthLimiter {
                 _unavailableInboundBurst = _maxInboundBurst;
             }
         } else {
-            // try to pull in up to 1/10th of the max inbound rate (aka burst rate), since 
-            // we refill every 100ms
-            int want = _maxInbound/10;
+            // try to pull in up to 1/10th of the burst rate, since we refill every 100ms
+            int want = (int)maxBurstIn;
             if (want > (_maxInbound - _availableInbound))
                 want = _maxInbound - _availableInbound;
             if (_log.shouldLog(Log.DEBUG))
@@ -226,9 +228,8 @@ public class FIFOBandwidthLimiter {
                 _unavailableOutboundBurst = _maxOutboundBurst;
             }
         } else {
-            // try to pull in up to 1/10th of the max outbound rate (aka burst rate), since 
-            // we refill every 100ms
-            int want = _maxOutbound/10;
+            // try to pull in up to 1/10th of the burst rate, since we refill every 100ms
+            int want = (int)maxBurstOut;
             if (want > (_maxOutbound - _availableOutbound))
                 want = _maxOutbound - _availableOutbound;
             if (_log.shouldLog(Log.DEBUG))

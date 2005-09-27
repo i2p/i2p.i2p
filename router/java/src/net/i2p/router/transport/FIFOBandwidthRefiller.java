@@ -112,7 +112,9 @@ class FIFOBandwidthRefiller implements Runnable {
                 _limiter.setOutboundUnlimited(false);
             }
             
-            _limiter.refillBandwidthQueues(inboundToAdd, outboundToAdd);
+            long maxBurstIn = ((_inboundBurstKBytesPerSecond-_inboundKBytesPerSecond)*1024*numMs)/1000;
+            long maxBurstOut = ((_outboundBurstKBytesPerSecond-_outboundKBytesPerSecond)*1024*numMs)/1000;
+            _limiter.refillBandwidthQueues(inboundToAdd, outboundToAdd, maxBurstIn, maxBurstOut);
             
             if (_log.shouldLog(Log.DEBUG)) {
                 _log.debug("Adding " + inboundToAdd + " bytes to inboundAvailable");
