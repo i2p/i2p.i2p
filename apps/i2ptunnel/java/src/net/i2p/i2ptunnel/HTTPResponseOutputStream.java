@@ -236,7 +236,7 @@ class HTTPResponseOutputStream extends FilterOutputStream {
                 if (_log.shouldLog(Log.WARN))
                     _log.warn("Error decompressing: " + written + ", " + _in.getTotalRead() + "/" + _in.getTotalExpanded(), ioe);
             } finally {
-                if (_log.shouldLog(Log.WARN))
+                if (_log.shouldLog(Log.WARN) && (_in != null))
                     _log.warn("After decompression, written=" + written + " read=" + _in.getTotalRead() 
                               + ", expanded=" + _in.getTotalExpanded() + ", remaining=" + _in.getRemaining() 
                               + ", finished=" + _in.getFinished());
@@ -245,8 +245,8 @@ class HTTPResponseOutputStream extends FilterOutputStream {
                 } catch (IOException ioe) {}
             }
             long end = System.currentTimeMillis();
-            double compressed = _in.getTotalRead();
-            double expanded = _in.getTotalExpanded();
+            double compressed = (_in != null ? _in.getTotalRead() : 0);
+            double expanded = (_in != null ? _in.getTotalExpanded() : 0);
             double ratio = 0;
             if (expanded > 0)
                 ratio = compressed/expanded;
