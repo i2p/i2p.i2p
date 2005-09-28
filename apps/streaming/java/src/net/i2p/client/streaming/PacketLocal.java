@@ -5,7 +5,6 @@ import java.util.Set;
 import net.i2p.I2PAppContext;
 import net.i2p.data.Destination;
 import net.i2p.data.SessionKey;
-import net.i2p.util.ByteCache;
 import net.i2p.util.Log;
 import net.i2p.util.SimpleTimer;
 
@@ -27,7 +26,6 @@ public class PacketLocal extends Packet implements MessageOutputStream.WriteStat
     private long _ackOn;
     private long _cancelledOn;
     private SimpleTimer.TimedEvent _resendEvent;
-    private ByteCache _cache = ByteCache.getInstance(128, MAX_PAYLOAD_SIZE);
     
     public PacketLocal(I2PAppContext ctx, Destination to) {
         this(ctx, to, null);
@@ -71,8 +69,11 @@ public class PacketLocal extends Packet implements MessageOutputStream.WriteStat
     public void prepare() {
         if (_connection != null)
             _connection.getInputStream().updateAcks(this);
-        if (_numSends > 0) // so we can debug to differentiate resends
+        if (_numSends > 0) {
+            // so we can debug to differentiate resends
             setOptionalDelay(_numSends * 1000);
+            setFlag(FLAG_DELAY_REQUESTED);
+        }
     }
     
     public long getCreatedOn() { return _createdOn; }

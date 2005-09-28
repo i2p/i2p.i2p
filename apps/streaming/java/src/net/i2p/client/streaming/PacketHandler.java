@@ -169,8 +169,8 @@ public class PacketHandler {
                     try {
                         con.getPacketHandler().receivePacket(packet, con);
                     } catch (I2PException ie) {
-                        if (_log.shouldLog(Log.WARN))
-                            _log.warn("Received forged packet for " + con + ": " + packet, ie);
+                        if (_log.shouldLog(Log.ERROR))
+                            _log.error("Received forged packet for " + con + "/" + oldId + ": " + packet, ie);
                         con.setSendStreamId(oldId);
                     }
                 } else if (packet.isFlagSet(Packet.FLAG_SYNCHRONIZE)) {

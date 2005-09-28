@@ -256,10 +256,14 @@ public class Connection {
                 remaining = 0;
             if (packet.isFlagSet(Packet.FLAG_CLOSE) || (remaining < 2)) {
                 packet.setOptionalDelay(0);
+                packet.setFlag(Packet.FLAG_DELAY_REQUESTED);
             } else {
                 int delay = _options.getRTO() / 2;
                 packet.setOptionalDelay(delay);
-                _log.debug("Requesting ack delay of " + delay + "ms for packet " + packet);
+                if (delay > 0)
+                    packet.setFlag(Packet.FLAG_DELAY_REQUESTED);
+                if (_log.shouldLog(Log.DEBUG))
+                    _log.debug("Requesting ack delay of " + delay + "ms for packet " + packet);
             }
             packet.setFlag(Packet.FLAG_DELAY_REQUESTED);
             
@@ -516,17 +520,30 @@ public class Connection {
         synchronized (_connectLock) { _connectLock.notifyAll(); }
     }
     
+    private boolean _remotePeerSet = false;
     /** who are we talking with */
     public Destination getRemotePeer() { return _remotePeer; }
-    public void setRemotePeer(Destination peer) { _remotePeer = peer; }
+    public void setRemotePeer(Destination peer) { 
+        if (_remotePeerSet) throw new RuntimeException("Remote peer already set [" + _remotePeer + ", " + peer + "]");
+        _remotePeerSet = true;
+        _remotePeer = peer; 
+    }
     
+    private boolean _sendStreamIdSet = false;
     /** what stream do we send data to the peer on? */
     public long getSendStreamId() { return _sendStreamId; }
-    public void setSendStreamId(long id) { _sendStreamId = id; }
+    public void setSendStreamId(long id) { 
+        if (_sendStreamIdSet) throw new RuntimeException("Send stream ID already set [" + _sendStreamId + ", " + id + "]");
+        _sendStreamIdSet = true;
+        _sendStreamId = id; 
+    }
     
+    private boolean _receiveStreamIdSet = false;
     /** stream the peer sends data to us on. (may be null) */
     public long getReceiveStreamId() { return _receiveStreamId; }
     public void setReceiveStreamId(long id) { 
+        if (_receiveStreamIdSet) throw new RuntimeException("Receive stream ID already set [" + _receiveStreamId + ", " + id + "]");
+        _receiveStreamIdSet = true;
         _receiveStreamId = id; 
         synchronized (_connectLock) { _connectLock.notifyAll(); }
     }
@@ -909,11 +926,14 @@ public class Connection {
                 }
                 // revamp various fields, in case we need to ack more, etc
                 _inputStream.updateAcks(_packet);
-                _packet.setOptionalDelay(getOptions().getChoke());
+                int choke = getOptions().getChoke();
+                _packet.setOptionalDelay(choke);
+                if (choke > 0)
+                    _packet.setFlag(Packet.FLAG_DELAY_REQUESTED);
                 _packet.setOptionalMaxSize(getOptions().getMaxMessageSize());
                 _packet.setResendDelay(getOptions().getResendDelay());
-                _packet.setReceiveStreamId(_receiveStreamId);
-                _packet.setSendStreamId(_sendStreamId);
+                //_packet.setReceiveStreamId(_receiveStreamId);
+                //_packet.setSendStreamId(_sendStreamId);
                 
                 int newWindowSize = getOptions().getWindowSize();
 

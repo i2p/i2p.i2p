@@ -143,15 +143,18 @@ class ConnectionDataReceiver implements MessageOutputStream.DataReceiver {
         data.setValid(size);
         data.setOffset(0);
         packet.setPayload(data);
-		if ( (ackOnly && !forceIncrement) && (!isFirst) )
-			packet.setSequenceNum(0);
+        if ( (ackOnly && !forceIncrement) && (!isFirst) )
+            packet.setSequenceNum(0);
         else
             packet.setSequenceNum(con.getNextOutboundPacketNum());
         packet.setSendStreamId(con.getSendStreamId());
         packet.setReceiveStreamId(con.getReceiveStreamId());
         
         con.getInputStream().updateAcks(packet);
-        packet.setOptionalDelay(con.getOptions().getChoke());
+        int choke = con.getOptions().getChoke();
+        packet.setOptionalDelay(choke);
+        if (choke > 0)
+            packet.setFlag(Packet.FLAG_DELAY_REQUESTED);
         packet.setResendDelay(con.getOptions().getResendDelay());
         
         if (con.getOptions().getProfile() == ConnectionOptions.PROFILE_INTERACTIVE)

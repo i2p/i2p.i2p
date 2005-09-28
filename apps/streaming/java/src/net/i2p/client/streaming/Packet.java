@@ -10,6 +10,7 @@ import net.i2p.data.Destination;
 import net.i2p.data.Signature;
 import net.i2p.data.SigningPrivateKey;
 import net.i2p.util.ByteCache;
+import net.i2p.util.Log;
 
 /**
  * Contain a single packet transferred as part of a streaming connection.  
@@ -64,7 +65,6 @@ public class Packet {
     private Destination _optionFrom;
     private int _optionDelay;
     private int _optionMaxSize;
-    private ByteCache _cache;
     
     /** 
      * The receiveStreamId will be set to this when the packet doesn't know 
@@ -146,22 +146,28 @@ public class Packet {
     public static final int DEFAULT_MAX_SIZE = 32*1024;
     private static final int MAX_DELAY_REQUEST = 65535;
 
-    public Packet() {
-        _cache = ByteCache.getInstance(128, MAX_PAYLOAD_SIZE);
+    public Packet() { }
+    
+    private boolean _sendStreamIdSet = false;
+    /** what stream do we send data to the peer on? */
+    public long getSendStreamId() { return _sendStreamId; }
+    public void setSendStreamId(long id) { 
+        if (_sendStreamIdSet) throw new RuntimeException("Send stream ID already set [" + _sendStreamId + ", " + id + "]");
+        _sendStreamIdSet = true;
+        _sendStreamId = id; 
     }
     
-    /** what stream is this packet a part of? */
-    public long getSendStreamId() { return _sendStreamId; }
-    public void setSendStreamId(long id) { _sendStreamId = id; }
-    
+    private boolean _receiveStreamIdSet = false;
     /** 
-     * Stream that replies should be sent on.  if the 
-     * connection is still being built, this should be 
-     * null.
-     *
+     * stream the replies should be sent on.  this should be 0 if the
+     * connection is still being built.
      */
     public long getReceiveStreamId() { return _receiveStreamId; }
-    public void setReceiveStreamId(long id) { _receiveStreamId = id; }
+    public void setReceiveStreamId(long id) { 
+        if (_receiveStreamIdSet) throw new RuntimeException("Receive stream ID already set [" + _receiveStreamId + ", " + id + "]");
+        _receiveStreamIdSet = true;
+        _receiveStreamId = id; 
+    }
     
     /** 0-indexed sequence number for this Packet in the sendStream */
     public long getSequenceNum() { return _sequenceNum; }
@@ -208,8 +214,6 @@ public class Packet {
     /** get the actual payload of the message.  may be null */
     public ByteArray getPayload() { return _payload; }
     public void setPayload(ByteArray payload) { 
-        //if ( (_payload != null) && (_payload != payload) )
-        //    _cache.release(_payload);
         _payload = payload; 
         if ( (payload != null) && (payload.getValid() > MAX_PAYLOAD_SIZE) )
             throw new IllegalArgumentException("Too large payload: " + payload.getValid());
@@ -218,15 +222,11 @@ public class Packet {
         return (_payload == null ? 0 : _payload.getValid());
     }
     public void releasePayload() {
-        //if (_payload != null)
-        //    _cache.release(_payload);
         _payload = null;
     }
     public ByteArray acquirePayload() {
         ByteArray old = _payload;
-        _payload = new ByteArray(new byte[Packet.MAX_PAYLOAD_SIZE]); //_cache.acquire();
-        //if (old != null)
-        //    _cache.release(old);
+        _payload = new ByteArray(new byte[Packet.MAX_PAYLOAD_SIZE]);
         return _payload;
     }
 
@@ -239,6 +239,7 @@ public class Packet {
         else
             _flags &= ~flag;
     }
+    public void setFlags(int flags) { _flags = flags; } 
 
     /** the signature on the packet (only included if the flag for it is set) */
     public Signature getOptionalSignature() { return _optionSignature; }
@@ -262,7 +263,6 @@ public class Packet {
      */
     public int getOptionalDelay() { return _optionDelay; }
     public void setOptionalDelay(int delayMs) {
-        setFlag(FLAG_DELAY_REQUESTED, delayMs > 0); 
         if (delayMs > MAX_DELAY_REQUEST)
             _optionDelay = MAX_DELAY_REQUEST;
         else if (delayMs < 0)
@@ -418,30 +418,31 @@ public class Packet {
         if (length < 22) // min header size
             throw new IllegalArgumentException("Too small: len=" + buffer.length);
         int cur = offset;
-        _sendStreamId = DataHelper.fromLong(buffer, cur, 4);
+        setSendStreamId(DataHelper.fromLong(buffer, cur, 4));
         cur += 4;
-        _receiveStreamId = DataHelper.fromLong(buffer, cur, 4);
+        setReceiveStreamId(DataHelper.fromLong(buffer, cur, 4));
         cur += 4;
-        _sequenceNum = DataHelper.fromLong(buffer, cur, 4);
+        setSequenceNum(DataHelper.fromLong(buffer, cur, 4));
         cur += 4;
-        _ackThrough = DataHelper.fromLong(buffer, cur, 4);
+        setAckThrough(DataHelper.fromLong(buffer, cur, 4));
         cur += 4;
         int numNacks = (int)DataHelper.fromLong(buffer, cur, 1);
         cur++;
         if (length < 22 + numNacks*4)
             throw new IllegalArgumentException("Too small with " + numNacks + " nacks: " + length);
         if (numNacks > 0) {
-            _nacks = new long[numNacks];
+            long nacks[] = new long[numNacks];
             for (int i = 0; i < numNacks; i++) {
-                _nacks[i] = DataHelper.fromLong(buffer, cur, 4);
+                nacks[i] = DataHelper.fromLong(buffer, cur, 4);
                 cur += 4;
             }
+            setNacks(nacks);
         } else {
-            _nacks = null;
+            setNacks(null);
         }
-        _resendDelay = (int)DataHelper.fromLong(buffer, cur, 1);
+        setResendDelay((int)DataHelper.fromLong(buffer, cur, 1));
         cur++;
-        _flags = (int)DataHelper.fromLong(buffer, cur, 2);
+        setFlags((int)DataHelper.fromLong(buffer, cur, 2));
         cur += 2;
         
         int optionSize = (int)DataHelper.fromLong(buffer, cur, 2);
@@ -457,33 +458,36 @@ public class Packet {
             throw new IllegalArgumentException("length: " + length + " offset: " + offset + " begin: " + payloadBegin);
         
         // skip ahead to the payload
-        _payload = new ByteArray(new byte[payloadSize]); //_cache.acquire(); 
-        System.arraycopy(buffer, payloadBegin, _payload.getData(), 0, payloadSize);
-        _payload.setValid(payloadSize);
-        _payload.setOffset(0);
+        //_payload = new ByteArray(new byte[payloadSize]);
+        _payload = new ByteArray(buffer, payloadBegin, payloadSize);
+        //System.arraycopy(buffer, payloadBegin, _payload.getData(), 0, payloadSize);
+        //_payload.setValid(payloadSize);
+        //_payload.setOffset(0);
         
         // ok now lets go back and deal with the options
         if (isFlagSet(FLAG_DELAY_REQUESTED)) {
-            _optionDelay = (int)DataHelper.fromLong(buffer, cur, 2);
+            setOptionalDelay((int)DataHelper.fromLong(buffer, cur, 2));
             cur += 2;
         }
         if (isFlagSet(FLAG_FROM_INCLUDED)) {
-            _optionFrom = new Destination();
+            Destination optionFrom = new Destination();
             try {
-                cur += _optionFrom.readBytes(buffer, cur);
+                cur += optionFrom.readBytes(buffer, cur);
+                setOptionalFrom(optionFrom);
             } catch (DataFormatException dfe) {
                 throw new IllegalArgumentException("Bad from field: " + dfe.getMessage());
             }
         }
         if (isFlagSet(FLAG_MAX_PACKET_SIZE_INCLUDED)) {
-            _optionMaxSize = (int)DataHelper.fromLong(buffer, cur, 2);
+            setOptionalMaxSize((int)DataHelper.fromLong(buffer, cur, 2));
             cur += 2;
         }
         if (isFlagSet(FLAG_SIGNATURE_INCLUDED)) {
-            _optionSignature = new Signature();
+            Signature optionSignature = new Signature();
             byte buf[] = new byte[Signature.SIGNATURE_BYTES];
             System.arraycopy(buffer, cur, buf, 0, Signature.SIGNATURE_BYTES);
-            _optionSignature.setData(buf);
+            optionSignature.setData(buf);
+            setOptionalSignature(optionSignature);
             cur += Signature.SIGNATURE_BYTES;
         }
     }
@@ -509,7 +513,12 @@ public class Packet {
         }
         boolean ok = ctx.dsa().verifySignature(_optionSignature, buffer, 0, size, from.getSigningPublicKey());
         if (!ok) {
-            ctx.logManager().getLog(Packet.class).error("Signature failed on " + toString(), new Exception("moo"));
+            Log l = ctx.logManager().getLog(Packet.class);
+            l.error("Signature failed on " + toString(), new Exception("moo"));
+            if (false) {
+                l.error(Base64.encode(buffer, 0, size));
+                l.error("Signature: " + Base64.encode(_optionSignature.getData()));
+            }
         }
         return ok;
     }
@@ -524,6 +533,12 @@ public class Packet {
         setFlag(FLAG_SIGNATURE_INCLUDED);
         int size = writePacket(buffer, offset, false);
         _optionSignature = ctx.dsa().sign(buffer, offset, size, key);
+        if (false) {
+            Log l = ctx.logManager().getLog(Packet.class);
+            l.error("Signing: " + toString());
+            l.error(Base64.encode(buffer, 0, size));
+            l.error("Signature: " + Base64.encode(_optionSignature.getData()));
+        }
         // jump into the signed data and inject the signature where we 
         // previously placed a bunch of zeroes
         int signatureOffset = offset 

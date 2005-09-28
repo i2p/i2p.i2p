@@ -1,4 +1,8 @@
-$Id: history.txt,v 1.267 2005/09/27 02:17:41 jrandom Exp $
+$Id: history.txt,v 1.268 2005/09/27 17:42:49 jrandom Exp $
+
+2005-09-28  jrandom
+    * Fix for at least some (all?) of the wrong stream errors in the streaming
+      lib
 
 2005-09-27  jrandom
     * Properly suggest filenames for attachments in Syndie (thanks all!)
