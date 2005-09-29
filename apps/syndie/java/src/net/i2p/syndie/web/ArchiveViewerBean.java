@@ -672,7 +672,60 @@ public class ArchiveViewerBean {
         out.write(DataHelper.getUTF8("<span class=\"b_msgErr\">No such entry, or no such attachment</span>"));
     }
     
-    public static void renderMetadata(Map parameters, Writer out) throws IOException {
+    private static String getURL(String uri, Map parameters) {
+        StringBuffer rv = new StringBuffer(128);
+        rv.append(uri);
+        rv.append('?');
+        if (parameters != null) {
+            for (Iterator iter = parameters.keySet().iterator(); iter.hasNext(); ) {
+                String key = (String)iter.next();
+                String vals[] = getStrings(parameters, key);
+                // we are already looking at the page with the given parameters, no need to further sanitize
+                if ( (key != null) && (vals != null) ) 
+                    for (int i = 0; i < vals.length; i++)
+                        rv.append(key).append('=').append(vals[i]).append('&');
+            }
+        }
+        return rv.toString();
+    }
+    
+    private static void updateMetadata(User viewer, Map parameters, Writer out) throws IOException {
+        if ( (viewer == null) || (!viewer.getAuthenticated()) )
+            return;
+        String blogStr = getString(parameters, PARAM_BLOG);
+        if (blogStr != null) { 
+            Hash blog = new Hash(Base64.decode(blogStr));
+            Archive archive = BlogManager.instance().getArchive();
+            BlogInfo info = archive.getBlogInfo(blog);
+            if (info != null) {
+                boolean isUser = viewer.getBlog().equals(info.getKey().calculateHash());
+                if (!isUser)
+                    return;
+                Properties toSave = new Properties();
+                String existing[] = info.getProperties();
+                for (int i = 0; i < existing.length; i++) {
+                    String newVal = getString(parameters, existing[i]);
+                    if ( (newVal != null) && (newVal.length() > 0) )
+                        toSave.setProperty(existing[i], newVal.trim());
+                    else
+                        toSave.setProperty(existing[i], info.getProperty(existing[i]));
+                }
+                boolean saved = BlogManager.instance().updateMetadata(viewer, blog, toSave);
+                if (saved)
+                    out.write("<p><em class=\"b_msgOk\">Blog metadata saved</em></p>\n");
+                else
+                    out.write("<p><em class=\"b_msgErr\">Blog metadata could not be saved</em></p>\n");
+            }
+        }
+    }
+    
+    /**
+     * @param currentURI URI of the with current page without any parameters tacked on
+     */
+    public static void renderMetadata(User viewer, String currentURI, Map parameters, Writer out) throws IOException {
+        if (parameters.get("action") != null) {
+            updateMetadata(viewer, parameters, out);
+        }
         String blogStr = getString(parameters, PARAM_BLOG);
         if (blogStr != null) { 
             Hash blog = new Hash(Base64.decode(blogStr));
@@ -682,7 +735,12 @@ public class ArchiveViewerBean {
                 out.write("Blog " + blog.toBase64() + " does not exist");
                 return;
             }
+            boolean isUser = ( (viewer != null) && (viewer.getAuthenticated()) && (viewer.getBlog().equals(info.getKey().calculateHash())) );
             String props[] = info.getProperties();
+            if (isUser) {
+                out.write("<form action=\"" + getURL(currentURI, parameters) + "\" method=\"GET\">\n");
+                out.write("<input type=\"hidden\" name=\"submit_blog\" value=\"" + blog.toBase64() + "\" />\n");
+            }
             out.write("<table class=\"b_meta\" border=\"0\">");
             for (int i = 0; i < props.length; i++) {
                 if (props[i].equals(BlogInfo.OWNER_KEY)) {
@@ -704,8 +762,15 @@ public class ArchiveViewerBean {
                         out.write("</td></tr>\n");
                     }
                 } else {
-                    out.write("<tr class=\"b_metaField\"><td class=\"b_metaField\"><span class=\"b_metaField\">" + HTMLRenderer.sanitizeString(props[i]) 
-                              + ":</span></td><td class=\"b_metaValue\"><span class=\"b_metaValue\">" + HTMLRenderer.sanitizeString(info.getProperty(props[i])) + "</span></td></tr>\n");
+                    String field = HTMLRenderer.sanitizeString(props[i]);
+                    String val = HTMLRenderer.sanitizeString(info.getProperty(props[i]));
+                    out.write("<tr class=\"b_metaField\"><td class=\"b_metaField\"><span class=\"b_metaField\">" + field
+                              + ":</span></td><td class=\"b_metaValue\"><span class=\"b_metaValue\">" + val + "</span></td></tr>\n");
+                    
+                    if (isUser && (!field.equals("Edition")))
+                        out.write("<tr class=\"b_metaField\"><td>&nbsp;</td><td class=\"b_metaValue\"><input type=\"text\" name=\"" 
+                                  + HTMLRenderer.sanitizeTagParam(props[i]) + "\" value=\"" 
+                                  + HTMLRenderer.sanitizeTagParam(info.getProperty(props[i])) + "\" size=\"40\" ></td></tr>");
                 }
             }
             List tags = BlogManager.instance().getArchive().getIndex().getBlogTags(blog);
@@ -718,6 +783,8 @@ public class ArchiveViewerBean {
                 }
                 out.write("</td></tr>");
             }
+            if (isUser)
+                out.write("<tr class=\"b_metaField\"><td colspan=\"2\" class=\"b_metaField\"><input type=\"submit\" name=\"action\" value=\"Save changes\" class=\"b_metaSave\" /></td></tr>\n");
             out.write("</table>");
         } else {
             out.write("<span class=\"b_metaMsgErr\">Blog not specified</span>");

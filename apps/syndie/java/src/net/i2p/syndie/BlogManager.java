@@ -143,6 +143,27 @@ public class BlogManager {
         return info;
     }
     
+    public boolean updateMetadata(User user, Hash blog, Properties opts) {
+        if (!user.getAuthenticated()) return false;
+        BlogInfo oldInfo = getArchive().getBlogInfo(blog);
+        if (oldInfo == null) return false;
+        if (!user.getBlog().equals(oldInfo.getKey().calculateHash())) return false;
+        int oldEdition = 0;
+        try { 
+            String ed = oldInfo.getProperty("Edition");
+            if (ed != null)
+                oldEdition = Integer.parseInt(ed);
+        } catch (NumberFormatException nfe) {}
+        opts.setProperty("Edition", oldEdition + 1 + "");
+        BlogInfo info = new BlogInfo(oldInfo.getKey(), oldInfo.getPosters(), opts);
+        SigningPrivateKey key = getMyPrivateKey(oldInfo);
+        info.sign(_context, key);
+        getArchive().storeBlogInfo(info);
+        user.setLastMetaEntry(oldEdition+1);
+        saveUser(user);
+        return true;
+    }
+    
     public Archive getArchive() { return _archive; }
     public File getTempDir() { return _tempDir; }
     

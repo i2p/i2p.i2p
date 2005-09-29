@@ -1,17 +1,18 @@
-$Id: install-headless.txt,v 1.3 2004/09/29 14:38:15 jrandom Exp $
+$Id: install-headless.txt,v 1.4 2004/12/21 11:32:50 jrandom Exp $
 Headless I2P installation instructions
 
 1) tar xjf i2p.tar.bz2                     (you've already done this)
 2) cd i2p ; vi install-headless.txt        (you're doing this now)
-3) sh postinstall.sh                       (this launches the router)
-4) lynx http://localhost:7657/index.jsp    (configure the router)
+3) java -jar lib/reseed.jar                (optional)
+4) sh postinstall.sh                       (this launches the router)
+5) lynx http://localhost:7657/index.jsp    (configure the router)
 
 If you're having trouble, swing by http://forum.i2p.net/, check the
 website at http://www.i2p.net/, or get on irc://irc.freenode.net/#i2p
 
 To run I2P explicitly:
    (*nix): sh i2prouter start
-   (win*): I2Psvc.exe -c wrapper.config
+   (win*): I2P.exe
 
 To stop the router (gracefully):
    lynx http://localhost:7657/configservice.jsp ("Shutdown gracefully")

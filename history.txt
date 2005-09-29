@@ -1,4 +1,13 @@
-$Id: history.txt,v 1.268 2005/09/27 17:42:49 jrandom Exp $
+$Id: history.txt,v 1.269 2005/09/28 04:17:55 jrandom Exp $
+
+* 2005-09-29  0.6.1 released
+
+2005-09-29  jrandom
+    * Let syndie users modify their metadata.
+    * Reseed the router on startup if there aren't enough peer references 
+      known locally.  This can be disabled by creating the file .i2pnoreseed
+      in your home directory, and the existing detection and reseed handling
+      on the web interface is unchanged.
 
 2005-09-28  jrandom
     * Fix for at least some (all?) of the wrong stream errors in the streaming

@@ -14,7 +14,7 @@ request.setCharacterEncoding("UTF-8");
     <jsp:include page="_topnav.jsp" />
     <td valign="top" align="left" rowspan="2" class="b_rightnav"><jsp:include page="_rightnav.jsp" /></td></tr>
 <tr class="b_content"><td valign="top" align="left" colspan="3" class="b_content"><%
-ArchiveViewerBean.renderMetadata(request.getParameterMap(), out); 
+ArchiveViewerBean.renderMetadata(user, request.getRequestURI(), request.getParameterMap(), out); 
 if (user.getAuthenticated()) {
   if ("Authorize".equals(request.getParameter("action"))) {
     %><span class="b_metaStatus"><%=BlogManager.instance().authorizeRemoteAccess(user, request.getParameter("password"))%></span><%

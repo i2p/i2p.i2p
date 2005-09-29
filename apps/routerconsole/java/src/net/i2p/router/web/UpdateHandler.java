@@ -94,7 +94,7 @@ public class UpdateHandler {
         public void run() {
             _isRunning = true;
             update();
-            System.setProperty("net.i2p.router.web.ReseedHandler.updateInProgress", "false");
+            System.setProperty("net.i2p.router.web.UpdateHandler.updateInProgress", "false");
             _isRunning = false;
         }
         private void update() {

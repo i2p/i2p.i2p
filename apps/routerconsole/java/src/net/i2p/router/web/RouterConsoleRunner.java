@@ -72,6 +72,14 @@ public class RouterConsoleRunner {
         } catch (Throwable t) {
             t.printStackTrace();
         }
+
+        File noReseedFile = new File(new File(System.getProperty("user.home")), ".i2pnoreseed");
+        if (!noReseedFile.exists()) {
+            RouterContext ctx = (RouterContext)RouterContext.listContexts().get(0);
+            if (ctx.netDb().getKnownRouters() < 15) {
+                ReseedHandler.requestReseed();
+            }
+        }
         
         NewsFetcher fetcher = NewsFetcher.getInstance(I2PAppContext.getGlobalContext());
         I2PThread t = new I2PThread(fetcher, "NewsFetcher");

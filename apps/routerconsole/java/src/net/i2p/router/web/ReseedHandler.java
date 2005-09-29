@@ -28,14 +28,19 @@ public class ReseedHandler {
         if (nonce == null) return;
         if (nonce.equals(System.getProperty("net.i2p.router.web.ReseedHandler.nonce")) ||
             nonce.equals(System.getProperty("net.i2p.router.web.ReseedHandler.noncePrev"))) {
-            synchronized (_reseedRunner) {
-                if (_reseedRunner.isRunning()) {
-                    return;
-                } else {
-                    System.setProperty("net.i2p.router.web.ReseedHandler.reseedInProgress", "true");
-                    I2PThread reseed = new I2PThread(_reseedRunner, "Reseed");
-                    reseed.start();
-                }
+            requestReseed();
+        }
+    }
+    
+    public static void requestReseed() {
+        synchronized (_reseedRunner) {
+            if (_reseedRunner.isRunning()) {
+                return;
+            } else {
+                System.setProperty("net.i2p.router.web.ReseedHandler.reseedInProgress", "true");
+                System.out.println("Reseeding");
+                I2PThread reseed = new I2PThread(_reseedRunner, "Reseed");
+                reseed.start();
             }
         }
     }
@@ -46,7 +51,8 @@ public class ReseedHandler {
         public boolean isRunning() { return _isRunning; }
         public void run() {
             _isRunning = true;
-            reseed();
+            reseed(false);
+            System.out.println("Reseeding complete");
             System.setProperty("net.i2p.router.web.ReseedHandler.reseedInProgress", "false");
             _isRunning = false;
         }
@@ -59,7 +65,7 @@ public class ReseedHandler {
      * save them into this router's netDb dir.
      *
      */
-    private static void reseed() {
+    private static void reseed(boolean echoStatus) {
         String seedURL = System.getProperty("i2p.reseedURL", DEFAULT_SEED_URL);
         if ( (seedURL == null) || (seedURL.trim().length() <= 0) ) 
             seedURL = DEFAULT_SEED_URL;
@@ -85,10 +91,16 @@ public class ReseedHandler {
                 try {
                     fetchSeed(seedURL, (String)iter.next());
                     fetched++;
+                    if (echoStatus) {
+                        System.out.print(".");
+                        if (fetched % 60 == 0)
+                            System.out.println();
+                    }
                 } catch (Exception e) {
                     errors++;
                 }
             }
+            if (echoStatus) System.out.println();
         } catch (Throwable t) {
             I2PAppContext.getGlobalContext().logManager().getLog(ReseedHandler.class).error("Error reseeding", t);
         }
@@ -172,7 +184,11 @@ public class ReseedHandler {
     }
     
     public static void main(String args[]) {
-        reseed();
-        //System.out.println("Done reseeding");
+        if ( (args != null) && (args.length == 1) && (!Boolean.valueOf(args[0]).booleanValue()) ) {
+            System.out.println("Not reseeding, as requested");
+            return; // not reseeding on request
+        }
+        System.out.println("Reseeding");
+        reseed(true);
     }
 }
