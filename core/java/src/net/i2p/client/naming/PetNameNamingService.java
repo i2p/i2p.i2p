@@ -52,7 +52,7 @@ public class PetNameNamingService extends NamingService {
 
     public Destination lookup(String hostname) {
         PetName name = _petnameDb.get(hostname);
-        if (name != null && name.getNetwork().equals("i2p")) {
+        if (name != null && name.getNetwork().equalsIgnoreCase("i2p")) {
             return lookupBase64(name.getLocation());
         } else {
             return lookupBase64(hostname);
