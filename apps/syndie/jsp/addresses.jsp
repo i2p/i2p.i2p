@@ -190,7 +190,7 @@ if (!user.getAuthenticated()) {
     </form></tr>
     <tr class="b_addrExport"><form action="addresses.jsp" method="POST">
         <td class="b_addrExport" colspan="7">
-          <span class="b_addrExport">Export the eepsites to your router's userhosts.txt:</span>
+          <span class="b_addrExport">Export the eepsites to your router's petname db</span>
           <input class="b_addrExportSubmit" type="submit" name="action" value="Export" /></td>
         </form></tr>
     </table>

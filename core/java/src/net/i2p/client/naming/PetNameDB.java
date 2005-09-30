@@ -45,6 +45,7 @@ public class PetNameDB {
     }
     
     public void load(String location) throws IOException {
+        _path = location;
         File f = new File(location);
         if (!f.exists()) return;
         BufferedReader in = null;
@@ -56,7 +57,6 @@ public class PetNameDB {
                 if (name.getName() != null)
                     _names.put(name.getName(), name);
             }
-            _path = location;
         } finally {
             in.close();
         }

@@ -409,31 +409,17 @@ public class BlogManager {
     public String exportHosts(User user) {
         if (!user.getAuthenticated() || !user.getAllowAccessRemote())
             return "<span class=\"b_addrMsgErr\">Not authorized to export the hosts</span>";
-        Map newNames = new HashMap();
-        PetNameDB db = user.getPetNameDB();
-        for (Iterator names = db.getNames().iterator(); names.hasNext(); ) {
-            PetName pn = db.get((String)names.next());
-            if (pn == null) continue;
-            if (pn.getNetwork().equalsIgnoreCase("i2p")) {
-                try {
-                    Destination d = new Destination(pn.getLocation().trim());
-                    newNames.put(pn.getName(), d);
-                } catch (DataFormatException dfe) {
-                    // ignore
-                }
-            }
-        }
+        PetNameDB userDb = user.getPetNameDB();
+        PetNameDB routerDb = _context.petnameDb();
         // horribly inefficient...
-        for (Iterator iter = newNames.keySet().iterator(); iter.hasNext(); ) {
-            String name = (String)iter.next();
-            Destination existing = _context.namingService().lookup(name);
-            if (existing == null) {
-                Destination known = (Destination)newNames.get(name);
+        for (Iterator names = userDb.getNames().iterator(); names.hasNext();) {
+            PetName pn = userDb.get((String)names.next());
+            if (pn == null) continue;
+            Destination existing = _context.namingService().lookup(pn.getName());
+            if (existing == null && pn.getNetwork().equalsIgnoreCase("i2p")) {
+                routerDb.set(pn.getName(), pn);
                 try {
-                    FileOutputStream fos = new FileOutputStream("userhosts.txt", true);
-                    OutputStreamWriter osw = new OutputStreamWriter(fos, "UTF-8");
-                    osw.write(name + "=" + known.toBase64() + "\n");
-                    osw.close();
+                    routerDb.store();
                 } catch (IOException ioe) {
                     ioe.printStackTrace();
                     return "<span class=\"b_addrMsgErr\">Error exporting the hosts: " + ioe.getMessage() + "</span>";

@@ -1,5 +1,9 @@
 $Id: history.txt,v 1.270 2005/09/29 14:19:23 jrandom Exp $
 
+2005-09-29  ragnarok
+	* Export petnames from syndie to the router's petname db instead of 
+	  userhosts.txt.
+
 2005-09-29  jrandom
     * Support noreseed.i2p in addition to .i2pnoreseed for disabling automatic
       reseeding - useful on OSes that make it hard to create dot files.  
