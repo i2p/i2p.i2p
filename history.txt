@@ -1,8 +1,8 @@
-$Id: history.txt,v 1.270 2005/09/29 14:19:23 jrandom Exp $
+$Id: history.txt,v 1.272 2005/09/30 02:32:47 ragnarok Exp $
 
 2005-09-29  ragnarok
-	* Export petnames from syndie to the router's petname db instead of 
-	  userhosts.txt.
+    * Export petnames from syndie to the router's petname db instead of 
+      userhosts.txt.
 
 2005-09-29  jrandom
     * Support noreseed.i2p in addition to .i2pnoreseed for disabling automatic
