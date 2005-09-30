@@ -29,7 +29,7 @@ public class ACKSender implements Runnable {
         _log = ctx.logManager().getLog(ACKSender.class);
         _transport = transport;
         _peersToACK = new ArrayList(4);
-        _builder = new PacketBuilder(_context);
+        _builder = new PacketBuilder(_context, transport);
         _alive = true;
         _context.statManager().createRateStat("udp.sendACKCount", "how many ack messages were sent to a peer", "udp", new long[] { 60*1000, 60*60*1000 });
         _context.statManager().createRateStat("udp.ackFrequency", "how long ago did we send an ACK to this peer?", "udp", new long[] { 60*1000, 60*60*1000 });

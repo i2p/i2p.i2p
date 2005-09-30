@@ -742,7 +742,7 @@ public class UDPPacketReader {
     public static void main(String args[]) {
         I2PAppContext ctx = I2PAppContext.getGlobalContext();
         try {
-            PacketBuilder b = new PacketBuilder(ctx);
+            PacketBuilder b = new PacketBuilder(ctx, null);
             InetAddress introHost = InetAddress.getLocalHost();
             int introPort = 1234;
             byte introKey[] = new byte[SessionKey.KEYSIZE_BYTES];

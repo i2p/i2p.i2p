@@ -23,7 +23,7 @@ public class IntroductionManager {
         _context = ctx;
         _log = ctx.logManager().getLog(IntroductionManager.class);
         _transport = transport;
-        _builder = new PacketBuilder(ctx);
+        _builder = new PacketBuilder(ctx, transport);
         _outbound = Collections.synchronizedMap(new HashMap(128));
         _inbound = new ArrayList(128);
         ctx.statManager().createRateStat("udp.receiveRelayIntro", "How often we get a relayed request for us to talk to someone?", "udp", new long[] { 60*1000, 5*60*1000, 10*60*1000 });

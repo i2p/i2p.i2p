@@ -1,4 +1,14 @@
-$Id: history.txt,v 1.269 2005/09/28 04:17:55 jrandom Exp $
+$Id: history.txt,v 1.270 2005/09/29 14:19:23 jrandom Exp $
+
+2005-09-29  jrandom
+    * Support noreseed.i2p in addition to .i2pnoreseed for disabling automatic
+      reseeding - useful on OSes that make it hard to create dot files.  
+      Thanks Complication (and anon)!
+    * Fixed the installer version string (thanks Frontier!)
+    * Added cleaner rejection of invalid IP addresses, shitlist those who send
+      us invalid IP addresses, verify again that we are not sending invalid IP
+      addresses, and log an error if it happens. (Thanks Complication, ptm,
+      and adab!)
 
 * 2005-09-29  0.6.1 released
 

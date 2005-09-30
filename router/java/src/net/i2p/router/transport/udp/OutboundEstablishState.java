@@ -198,22 +198,26 @@ public class OutboundEstablishState {
         } else {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Session created failed validation, clearing state for " + _remoteHostId.toString());
-            _receivedY = null;
-            _aliceIP = null;
-            _receivedRelayTag = 0;
-            _receivedSignedOnTime = -1;
-            _receivedEncryptedSignature = null;
-            _receivedIV = null;
-            _receivedSignature = null;
-            
-            if ( (_currentState == STATE_UNKNOWN) || 
-                 (_currentState == STATE_REQUEST_SENT) || 
-                 (_currentState == STATE_CREATED_RECEIVED) )
-                _currentState = STATE_REQUEST_SENT;
-            
-            _nextSend = _context.clock().now();
+            fail();
             return false;
         }
+    }
+    
+    public synchronized void fail() {
+        _receivedY = null;
+        _aliceIP = null;
+        _receivedRelayTag = 0;
+        _receivedSignedOnTime = -1;
+        _receivedEncryptedSignature = null;
+        _receivedIV = null;
+        _receivedSignature = null;
+
+        if ( (_currentState == STATE_UNKNOWN) || 
+             (_currentState == STATE_REQUEST_SENT) || 
+             (_currentState == STATE_CREATED_RECEIVED) )
+            _currentState = STATE_REQUEST_SENT;
+
+        _nextSend = _context.clock().now();
     }
     
     private void generateSessionKey() throws DHSessionKeyBuilder.InvalidPublicParameterException {

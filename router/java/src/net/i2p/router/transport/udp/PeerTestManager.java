@@ -42,7 +42,7 @@ class PeerTestManager {
         _log = context.logManager().getLog(PeerTestManager.class);
         _activeTests = new HashMap(64);
         _recentTests = Collections.synchronizedList(new ArrayList(16));
-        _packetBuilder = new PacketBuilder(context);
+        _packetBuilder = new PacketBuilder(context, transport);
         _currentTest = null;
         _context.statManager().createRateStat("udp.statusKnownCharlie", "How often the bob we pick passes us to a charlie we already have a session with?", "udp", new long[] { 60*1000, 20*60*1000, 60*60*1000 });
     }

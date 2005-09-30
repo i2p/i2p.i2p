@@ -65,6 +65,8 @@ public class InboundEstablishState {
     public static final int STATE_CONFIRMED_PARTIALLY = 3;
     /** we have completely received all of the confirmation packets */
     public static final int STATE_CONFIRMED_COMPLETELY = 4;
+    /** we are explicitly failing it */
+    public static final int STATE_FAILED = 5;
     
     public InboundEstablishState(RouterContext ctx, byte remoteIP[], int remotePort, int localPort) {
         _context = ctx;
@@ -126,6 +128,10 @@ public class InboundEstablishState {
         if (_sentY == null)
             _sentY = _keyBuilder.getMyPublicValueBytes();
         return _sentY;
+    }
+    
+    public synchronized void fail() {
+        _currentState = STATE_FAILED;
     }
     
     public synchronized long getSentRelayTag() { return _sentRelayTag; }

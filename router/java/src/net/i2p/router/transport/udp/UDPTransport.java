@@ -276,9 +276,9 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
      * whim.  this is not good ;)
      *
      */
-    void externalAddressReceived(byte ourIP[], int ourPort) {
+    void externalAddressReceived(Hash from, byte ourIP[], int ourPort) {
         if (_log.shouldLog(Log.INFO))
-            _log.info("External address received: " + RemoteHostId.toString(ourIP) + ":" + ourPort);
+            _log.info("External address received: " + RemoteHostId.toString(ourIP) + ":" + ourPort + " from " + from.toBase64());
         
         if (explicitAddressSpecified()) 
             return;
@@ -286,31 +286,38 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         boolean fixedPort = getIsPortFixed();
         boolean updated = false;
         boolean fireTest = false;
-        synchronized (this) {
-            if ( (_externalListenHost == null) ||
-                 (!eq(_externalListenHost.getAddress(), _externalListenPort, ourIP, ourPort)) ) {
-                if (!isValid(ourIP)) {
-                    // ignore them 
-                } else if ( (_reachabilityStatus == CommSystemFacade.STATUS_UNKNOWN) ||
-                     (_context.clock().now() - _reachabilityStatusLastUpdated > 2*TEST_FREQUENCY) ) {
-                    // they told us something different and our tests are either old or failing
-                    try {
-                        _externalListenHost = InetAddress.getByAddress(ourIP);
-                        if (!fixedPort)
-                            _externalListenPort = ourPort;
-                        rebuildExternalAddress();
-                        replaceAddress(_externalAddress);
-                        updated = true;
-                    } catch (UnknownHostException uhe) {
-                        _externalListenHost = null;
+        if (!isValid(ourIP)) {
+            // ignore them 
+            if (_log.shouldLog(Log.ERROR))
+                _log.error("The router " + from.toBase64() + " told us we have an invalid IP - " 
+                           + RemoteHostId.toString(ourIP) + ".  Lets throw tomatoes at them");
+            _context.shitlist().shitlistRouter(from, "They said we had an invalid IP");
+            return;
+        } else {
+            synchronized (this) {
+                if ( (_externalListenHost == null) ||
+                     (!eq(_externalListenHost.getAddress(), _externalListenPort, ourIP, ourPort)) ) {
+                    if ( (_reachabilityStatus == CommSystemFacade.STATUS_UNKNOWN) ||
+                         (_context.clock().now() - _reachabilityStatusLastUpdated > 2*TEST_FREQUENCY) ) {
+                        // they told us something different and our tests are either old or failing
+                        try {
+                            _externalListenHost = InetAddress.getByAddress(ourIP);
+                            if (!fixedPort)
+                                _externalListenPort = ourPort;
+                            rebuildExternalAddress();
+                            replaceAddress(_externalAddress);
+                            updated = true;
+                        } catch (UnknownHostException uhe) {
+                            _externalListenHost = null;
+                        }
+                    } else {
+                        // they told us something different, but our tests are recent and positive,
+                        // so lets test again
+                        fireTest = true;
                     }
                 } else {
-                    // they told us something different, but our tests are recent and positive,
-                    // so lets test again
-                    fireTest = true;
+                    // matched what we expect
                 }
-            } else {
-                // matched what we expect
             }
         }
         
@@ -748,7 +755,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                 _introducersSelectedOn = _context.clock().now();
             }
         }
-        if ( (_externalListenPort > 0) && (_externalListenHost != null) ) {
+        if ( (_externalListenPort > 0) && (_externalListenHost != null) && (isValid(_externalListenHost.getAddress())) ) {
             options.setProperty(UDPAddress.PROP_PORT, String.valueOf(_externalListenPort));
             options.setProperty(UDPAddress.PROP_HOST, _externalListenHost.getHostAddress());
             // if we have explicit external addresses, they had better be reachable

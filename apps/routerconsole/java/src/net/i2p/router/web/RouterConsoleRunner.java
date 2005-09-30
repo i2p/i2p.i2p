@@ -73,10 +73,20 @@ public class RouterConsoleRunner {
             t.printStackTrace();
         }
 
+        // we check the i2p installation directory (.) for a flag telling us not to reseed, 
+        // but also check the home directory for that flag too, since new users installing i2p
+        // don't have an installation directory that they can put the flag in yet.
         File noReseedFile = new File(new File(System.getProperty("user.home")), ".i2pnoreseed");
-        if (!noReseedFile.exists()) {
-            RouterContext ctx = (RouterContext)RouterContext.listContexts().get(0);
-            if (ctx.netDb().getKnownRouters() < 15) {
+        File noReseedFileAlt1 = new File(new File(System.getProperty("user.home")), "noreseed.i2p");
+        File noReseedFileAlt2 = new File(".i2pnoreseed");
+        File noReseedFileAlt3 = new File("noreseed.i2p");
+        if (!noReseedFile.exists() && !noReseedFileAlt1.exists() && !noReseedFileAlt2.exists() && !noReseedFileAlt3.exists()) {
+            File netDb = new File("netDb");
+            // sure, some of them could be "my.info" or various leaseSet- files, but chances are, 
+            // if someone has those files, they've already been seeded (at least enough to let them
+            // get i2p started - they can reseed later in the web console)
+            String names[] = (netDb.exists() ? netDb.list() : null);
+            if ( (names == null) || (names.length < 15) ) {
                 ReseedHandler.requestReseed();
             }
         }

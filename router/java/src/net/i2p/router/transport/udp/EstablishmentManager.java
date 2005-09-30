@@ -52,7 +52,7 @@ public class EstablishmentManager {
         _context = ctx;
         _log = ctx.logManager().getLog(EstablishmentManager.class);
         _transport = transport;
-        _builder = new PacketBuilder(ctx);
+        _builder = new PacketBuilder(ctx, transport);
         _inboundStates = new HashMap(32);
         _outboundStates = new HashMap(32);
         _queuedOutbound = new HashMap(32);
@@ -130,6 +130,7 @@ public class EstablishmentManager {
         
         if (!_transport.isValid(to.getIP())) {
             _transport.failed(msg);
+            _context.shitlist().shitlistRouter(msg.getTarget().getIdentity().calculateHash(), "Invalid SSU address");
             return;
         }
         
@@ -529,8 +530,13 @@ public class EstablishmentManager {
         if (!valid) // validate clears fields on failure
             return;
         
+        if (!_transport.isValid(state.getReceivedIP()) || !_transport.isValid(state.getRemoteHostId().getIP())) {
+            state.fail();
+            return;
+        }
+        
         // gives us the opportunity to "detect" our external addr
-        _transport.externalAddressReceived(state.getReceivedIP(), state.getReceivedPort());
+        _transport.externalAddressReceived(state.getRemoteIdentity().calculateHash(), state.getReceivedIP(), state.getReceivedPort());
         
         // signs if we havent signed yet
         state.prepareSessionConfirmed();
@@ -573,6 +579,9 @@ public class EstablishmentManager {
                     _context.statManager().addRateData("udp.inboundEstablishFailedState", cur.getState(), cur.getLifetime());
                     if (_log.shouldLog(Log.DEBUG))
                         _log.debug("Removing expired inbound state");
+                } else if (cur.getState() == InboundEstablishState.STATE_FAILED) {
+                    iter.remove();
+                    _context.statManager().addRateData("udp.inboundEstablishFailedState", cur.getState(), cur.getLifetime());
                 } else {
                     if (cur.getNextSendTime() <= now) {
                         // our turn...
@@ -619,6 +628,8 @@ public class EstablishmentManager {
                             _log.warn("why are we confirmed with no identity? " + inboundState);
                         break;
                     }
+                case InboundEstablishState.STATE_FAILED:
+                    break; // already removed;
                 case InboundEstablishState.STATE_UNKNOWN: // fallthrough
                 default:
                     // wtf

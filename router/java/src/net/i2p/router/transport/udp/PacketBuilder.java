@@ -25,13 +25,15 @@ import net.i2p.util.Log;
 public class PacketBuilder {
     private I2PAppContext _context;
     private Log _log;
+    private UDPTransport _transport;
     
     private static final ByteCache _ivCache = ByteCache.getInstance(64, UDPPacket.IV_SIZE);
     private static final ByteCache _hmacCache = ByteCache.getInstance(64, Hash.HASH_LENGTH);
     private static final ByteCache _blockCache = ByteCache.getInstance(64, 16);
     
-    public PacketBuilder(I2PAppContext ctx) {
+    public PacketBuilder(I2PAppContext ctx, UDPTransport transport) {
         _context = ctx;
+        _transport = transport;
         _log = ctx.logManager().getLog(PacketBuilder.class);
     }
     
@@ -224,13 +226,20 @@ public class PacketBuilder {
         DataHelper.toLong(data, off, 4, now);
         off += 4;
         
+        byte sentIP[] = state.getSentIP();
+        if ( (sentIP == null) || (sentIP.length <= 0) || ( (_transport != null) && (!_transport.isValid(sentIP)) ) ) {
+            if (_log.shouldLog(Log.ERROR))
+                _log.error("How did our sent IP become invalid? " + state);
+            state.fail();
+            return null;
+        }
         // now for the body
         System.arraycopy(state.getSentY(), 0, data, off, state.getSentY().length);
         off += state.getSentY().length;
-        DataHelper.toLong(data, off, 1, state.getSentIP().length);
+        DataHelper.toLong(data, off, 1, sentIP.length);
         off += 1;
-        System.arraycopy(state.getSentIP(), 0, data, off, state.getSentIP().length);
-        off += state.getSentIP().length;
+        System.arraycopy(sentIP, 0, data, off, sentIP.length);
+        off += sentIP.length;
         DataHelper.toLong(data, off, 2, state.getSentPort());
         off += 2;
         DataHelper.toLong(data, off, 4, state.getSentRelayTag());
@@ -249,7 +258,7 @@ public class PacketBuilder {
         if (_log.shouldLog(Log.DEBUG)) {
             StringBuffer buf = new StringBuffer(128);
             buf.append("Sending sessionCreated:");
-            buf.append(" AliceIP: ").append(Base64.encode(state.getSentIP()));
+            buf.append(" AliceIP: ").append(Base64.encode(sentIP));
             buf.append(" AlicePort: ").append(state.getSentPort());
             buf.append(" BobIP: ").append(Base64.encode(state.getReceivedOurIP()));
             buf.append(" BobPort: ").append(externalPort);
@@ -294,9 +303,13 @@ public class PacketBuilder {
      */
     public UDPPacket buildSessionRequestPacket(OutboundEstablishState state) {
         UDPPacket packet = UDPPacket.acquire(_context);
+        byte toIP[] = state.getSentIP();
+        if ( (_transport !=null) && (!_transport.isValid(toIP)) ) {
+            return null;
+        }
         InetAddress to = null;
         try {
-            to = InetAddress.getByAddress(state.getSentIP());
+            to = InetAddress.getByAddress(toIP);
         } catch (UnknownHostException uhe) {
             if (_log.shouldLog(Log.ERROR))
                 _log.error("How did we think this was a valid IP?  " + state.getRemoteHostId().toString());
@@ -321,8 +334,8 @@ public class PacketBuilder {
         off += state.getSentX().length;
         DataHelper.toLong(data, off, 1, state.getSentIP().length);
         off += 1;
-        System.arraycopy(state.getSentIP(), 0, data, off, state.getSentIP().length);
-        off += state.getSentIP().length;
+        System.arraycopy(toIP, 0, data, off, state.getSentIP().length);
+        off += toIP.length;
         DataHelper.toLong(data, off, 2, state.getSentPort());
         off += 2;
         

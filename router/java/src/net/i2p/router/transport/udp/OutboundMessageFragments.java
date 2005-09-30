@@ -48,7 +48,7 @@ public class OutboundMessageFragments {
         _throttle = throttle;
         _activeMessages = new ArrayList(MAX_ACTIVE);
         _nextPacketMessage = 0;
-        _builder = new PacketBuilder(ctx);
+        _builder = new PacketBuilder(ctx, transport);
         _alive = true;
         _allowExcess = false;
         _context.statManager().createRateStat("udp.sendVolleyTime", "Long it takes to send a full volley", "udp", new long[] { 60*1000, 10*60*1000, 60*60*1000, 24*60*60*1000 });
