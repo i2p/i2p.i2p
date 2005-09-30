@@ -299,10 +299,27 @@ public class RemoteArchiveBean {
                             (_proxyHost != null ? " via " + HTMLRenderer.sanitizeString(_proxyHost) + ":" + _proxyPort : ""));
         File archiveFile = new File(BlogManager.instance().getTempDir(), user.getBlog().toBase64() + "_remoteArchive.txt");
         archiveFile.delete();
+        
+        Properties etags = new Properties();
+        try {
+            etags.load(new FileInputStream(new File(BlogManager.instance().getRootDir(), "etags")));
+        } catch (Exception exp) {
+            //ignore
+        }
+        
         EepGet eep = new EepGet(I2PAppContext.getGlobalContext(), ((_proxyHost != null) && (_proxyPort > 0)),
-                                _proxyHost, _proxyPort, 0, archiveFile.getAbsolutePath(), location);
+                                _proxyHost, _proxyPort, 0, archiveFile.getAbsolutePath(), location, etags.getProperty(location));
         eep.addStatusListener(new IndexFetcherStatusListener(archiveFile));
         eep.fetch();
+        
+        if (eep.getETag() != null) { 
+            etags.setProperty(location, eep.getETag());
+        }
+        try {
+            etags.store(new FileOutputStream(new File(BlogManager.instance().getRootDir(), "etags")), "etags");
+        } catch (Exception exp) {
+            //ignore
+        }
     }
     
     private class IndexFetcherStatusListener implements EepGet.StatusListener {

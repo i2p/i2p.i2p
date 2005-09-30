@@ -166,6 +166,7 @@ public class BlogManager {
     
     public Archive getArchive() { return _archive; }
     public File getTempDir() { return _tempDir; }
+    public File getRootDir() { return _rootDir; }
     
     public List listMyBlogs() {
         File files[] = _privKeyDir.listFiles();

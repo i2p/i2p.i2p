@@ -8,6 +8,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.ServletException;
 
+import net.i2p.I2PAppContext;
 import net.i2p.data.*;
 import net.i2p.syndie.*;
 import net.i2p.syndie.data.*;
@@ -94,10 +95,13 @@ public class ArchiveServlet extends HttpServlet {
     private void renderSummary(HttpServletResponse resp) throws ServletException, IOException {
         resp.setContentType("text/plain;charset=utf-8");
         //resp.setCharacterEncoding("UTF-8");
-        resp.setHeader(HEADER_EXPORT_CAPABLE, "true");
-        OutputStream out = resp.getOutputStream();
         ArchiveIndex index = BlogManager.instance().getArchive().getIndex();
-        out.write(DataHelper.getUTF8(index.toString()));
+        byte[] indexUTF8 = DataHelper.getUTF8(index.toString());
+        resp.setHeader(HEADER_EXPORT_CAPABLE, "true");
+        Hash hash = I2PAppContext.getGlobalContext().sha().calculateHash(indexUTF8);
+        resp.setHeader("ETag", "\"" + hash.toBase64() + "\"");
+        OutputStream out = resp.getOutputStream();
+        out.write(indexUTF8);
         out.close();
     }
     
