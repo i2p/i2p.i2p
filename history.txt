@@ -1,4 +1,10 @@
-$Id: history.txt,v 1.273 2005/09/30 12:51:32 ragnarok Exp $
+$Id: history.txt,v 1.274 2005/09/30 15:29:19 jrandom Exp $
+
+2005-09-30  jrandom
+    * Killed three more streaming lib bugs, one of which caused excess packets
+      to be transmitted (dupacking dupacks), one that was the root of many of
+      the old hung streams (shrinking highest received), and another that was
+      releasing data too soon.
 
 2005-09-30  jrandom
     * Only allow autodetection of our IP address if we haven't received an

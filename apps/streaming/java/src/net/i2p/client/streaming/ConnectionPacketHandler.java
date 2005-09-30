@@ -100,10 +100,12 @@ public class ConnectionPacketHandler {
                (packet.getReceiveStreamId() <= 0) ) )
             allowAck = false;
 
-        if (allowAck)
+        if (allowAck) {
             isNew = con.getInputStream().messageReceived(packet.getSequenceNum(), packet.getPayload());
-        else
-            isNew = con.getInputStream().messageReceived(con.getInputStream().getHighestReadyBockId(), null);
+        } else {
+            con.getInputStream().notifyActivity();
+            isNew = false;
+        }
         
         if ( (packet.getSequenceNum() == 0) && (packet.getPayloadSize() > 0) ) {
             if (_log.shouldLog(Log.DEBUG))
@@ -166,10 +168,16 @@ public class ConnectionPacketHandler {
         }
         con.eventOccurred();
         if (fastAck) {
-            if (con.getLastSendTime() + 2000 < _context.clock().now()) {
-                if (_log.shouldLog(Log.DEBUG))
-                    _log.debug("Fast ack for dup " + packet);
-                con.ackImmediately();
+            if (!isNew) {
+                // if we're congested (fastAck) but this is also a new packet, 
+                // we've already scheduled an ack above, so there is no need to schedule 
+                // a fast ack (we can wait a few ms)
+            } else {
+                if (con.getLastSendTime() + 2000 < _context.clock().now()) {
+                    if (_log.shouldLog(Log.DEBUG))
+                        _log.debug("Fast ack for dup " + packet);
+                    con.ackImmediately();
+                }
             }
         }
         

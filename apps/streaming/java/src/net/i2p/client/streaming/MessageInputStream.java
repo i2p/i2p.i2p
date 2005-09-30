@@ -193,6 +193,8 @@ public class MessageInputStream extends InputStream {
         }
     }
     
+    public void notifyActivity() { synchronized (_dataLock) { _dataLock.notifyAll(); } }
+    
     /**
      * A new message has arrived - toss it on the appropriate queue (moving 
      * previously pending messages to the ready queue if it fills the gap, etc).

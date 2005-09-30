@@ -311,16 +311,20 @@ public class Connection {
     }
     
     List ackPackets(long ackThrough, long nacks[]) {
-        if (nacks == null) {
-             _highestAckedThrough = ackThrough;
+        if (ackThrough < _highestAckedThrough) {
+            // dupack which won't tell us anything
         } else {
-            long lowest = -1;
-            for (int i = 0; i < nacks.length; i++) {
-                if ( (lowest < 0) || (nacks[i] < lowest) )
-                    lowest = nacks[i];
+           if (nacks == null) {
+                _highestAckedThrough = ackThrough;
+            } else {
+                long lowest = -1;
+                for (int i = 0; i < nacks.length; i++) {
+                    if ( (lowest < 0) || (nacks[i] < lowest) )
+                        lowest = nacks[i];
+                }
+                if (lowest - 1 > _highestAckedThrough)
+                    _highestAckedThrough = lowest - 1;
             }
-            if (lowest - 1 > _highestAckedThrough)
-                _highestAckedThrough = lowest - 1;
         }
         
         List acked = null;

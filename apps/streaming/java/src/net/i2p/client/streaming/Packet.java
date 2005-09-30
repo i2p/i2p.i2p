@@ -222,7 +222,7 @@ public class Packet {
         return (_payload == null ? 0 : _payload.getValid());
     }
     public void releasePayload() {
-        _payload = null;
+        //_payload = null;
     }
     public ByteArray acquirePayload() {
         ByteArray old = _payload;
