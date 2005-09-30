@@ -10,6 +10,7 @@ import java.util.*;
 public class PetNameDB {
     /** name (String) to PetName mapping */
     private Map _names;
+    private String _path;
     
     public PetNameDB() {
         _names = Collections.synchronizedMap(new HashMap());
@@ -55,10 +56,12 @@ public class PetNameDB {
                 if (name.getName() != null)
                     _names.put(name.getName(), name);
             }
+            _path = location;
         } finally {
             in.close();
         }
     }
+    
     public void store(String location) throws IOException {
         Writer out = null;
         try {
@@ -70,6 +73,12 @@ public class PetNameDB {
             }
         } finally {
             out.close();
+        }
+    }
+    
+    public void store() throws IOException {
+        if (_path != null) {
+            store(_path);
         }
     }
 }
