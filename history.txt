@@ -1,4 +1,10 @@
-$Id: history.txt,v 1.272 2005/09/30 02:32:47 ragnarok Exp $
+$Id: history.txt,v 1.273 2005/09/30 12:51:32 ragnarok Exp $
+
+2005-09-30  jrandom
+    * Only allow autodetection of our IP address if we haven't received an
+      inbound connection in the last two minutes.
+    * Increase the default max streaming resends to 8 from 5 (and down from
+      the earlier 10)
 
 2005-09-29  ragnarok
     * Export petnames from syndie to the router's petname db instead of 

@@ -56,6 +56,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     private short _reachabilityStatus;
     private long _reachabilityStatusLastUpdated;
     private long _introducersSelectedOn;
+    private long _lastInboundReceivedOn;
     
     /** summary info to distribute */
     private RouterAddress _externalAddress;
@@ -135,6 +136,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         _reachabilityStatus = CommSystemFacade.STATUS_UNKNOWN;
         _introManager = new IntroductionManager(_context, this);
         _introducersSelectedOn = -1;
+        _lastInboundReceivedOn = -1;
         
         _context.statManager().createRateStat("udp.alreadyConnected", "What is the lifetime of a reestablished session", "udp", new long[] { 60*1000, 10*60*1000, 60*60*1000, 24*60*60*1000 });
         _context.statManager().createRateStat("udp.droppedPeer", "How long ago did we receive from a dropped peer (duration == session lifetime", "udp", new long[] { 60*60*1000, 24*60*60*1000 });
@@ -271,28 +273,48 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     public int getExternalPort() { return _externalListenPort; }
     
     /**
+     * If we have received an inbound connection in the last 2 minutes, don't allow 
+     * our IP to change.
+     */
+    private static final int ALLOW_IP_CHANGE_INTERVAL = 2*60*1000;
+    
+    void inboundConnectionReceived() { 
+        // use OS clock since its an ordering thing, not a time thing
+        _lastInboundReceivedOn = System.currentTimeMillis(); 
+    }
+    
+    /**
      * Someone we tried to contact gave us what they think our IP address is.
      * Right now, we just blindly trust them, changing our IP and port on a
      * whim.  this is not good ;)
      *
      */
     void externalAddressReceived(Hash from, byte ourIP[], int ourPort) {
+        boolean isValid = isValid(ourIP);
+        boolean explicitSpecified = explicitAddressSpecified();
+        boolean inboundRecent = _lastInboundReceivedOn + ALLOW_IP_CHANGE_INTERVAL > System.currentTimeMillis();
         if (_log.shouldLog(Log.INFO))
-            _log.info("External address received: " + RemoteHostId.toString(ourIP) + ":" + ourPort + " from " + from.toBase64());
+            _log.info("External address received: " + RemoteHostId.toString(ourIP) + ":" + ourPort + " from " 
+                      + from.toBase64() + ", isValid? " + isValid + ", explicitSpecified? " + explicitSpecified 
+                      + ", receivedInboundRecent? " + inboundRecent);
         
-        if (explicitAddressSpecified()) 
+        if (explicitSpecified) 
             return;
             
         boolean fixedPort = getIsPortFixed();
         boolean updated = false;
         boolean fireTest = false;
-        if (!isValid(ourIP)) {
+        if (!isValid) {
             // ignore them 
             if (_log.shouldLog(Log.ERROR))
                 _log.error("The router " + from.toBase64() + " told us we have an invalid IP - " 
                            + RemoteHostId.toString(ourIP) + ".  Lets throw tomatoes at them");
             _context.shitlist().shitlistRouter(from, "They said we had an invalid IP");
             return;
+        } else if (inboundRecent) {
+            // use OS clock since its an ordering thing, not a time thing
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Ignoring IP address suggestion, since we have received an inbound con recently");
         } else {
             synchronized (this) {
                 if ( (_externalListenHost == null) ||

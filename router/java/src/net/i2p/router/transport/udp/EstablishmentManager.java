@@ -355,6 +355,8 @@ public class EstablishmentManager {
         
         _transport.addRemotePeerState(peer);
         
+        _transport.inboundConnectionReceived();
+        
         _context.statManager().addRateData("udp.inboundEstablishTime", state.getLifetime(), 0);
         sendOurInfo(peer);
     }
