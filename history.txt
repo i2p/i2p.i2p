@@ -1,4 +1,6 @@
-$Id: history.txt,v 1.275 2005/09/30 18:12:57 jrandom Exp $
+$Id: history.txt,v 1.276 2005/09/30 19:57:34 ragnarok Exp $
+
+* 2005-10-01  0.6.1.1 released
 
 2005-09-30  ragnarok
     * Implemented conditional get for syndie remote archive imports. 
