@@ -50,6 +50,7 @@ public class EepGet {
     private int _currentAttempt;
     private String _etag;
     private boolean _encodingChunked;
+    private boolean _notModified;
     
     public EepGet(I2PAppContext ctx, String proxyHost, int proxyPort, int numRetries, String outputFile, String url) {
         this(ctx, true, proxyHost, proxyPort, numRetries, outputFile, url);
@@ -173,7 +174,7 @@ public class EepGet {
     
     public static interface StatusListener {
         public void bytesTransferred(long alreadyTransferred, int currentWrite, long bytesTransferred, long bytesRemaining, String url);
-        public void transferComplete(long alreadyTransferred, long bytesTransferred, long bytesRemaining, String url, String outputFile);
+        public void transferComplete(long alreadyTransferred, long bytesTransferred, long bytesRemaining, String url, String outputFile, boolean notModified);
         public void attemptFailed(String url, long bytesTransferred, long bytesRemaining, int currentAttempt, int numRetries, Exception cause);
         public void transferFailed(String url, long bytesTransferred, long bytesRemaining, int currentAttempt);
         public void headerReceived(String url, int currentAttempt, String key, String val);
@@ -236,12 +237,16 @@ public class EepGet {
                 }
             }
         }
-        public void transferComplete(long alreadyTransferred, long bytesTransferred, long bytesRemaining, String url, String outputFile) {
+        public void transferComplete(long alreadyTransferred, long bytesTransferred, long bytesRemaining, String url, String outputFile, boolean notModified) {
             System.out.println();
             System.out.println("== " + new Date());
-            System.out.println("== Transfer of " + url + " completed with " + (alreadyTransferred+bytesTransferred)
-                               + " and " + (bytesRemaining - bytesTransferred) + " remaining");
-            System.out.println("== Output saved to " + outputFile);
+            if (notModified) {
+                System.out.println("== Source not modified since last download");
+            } else {
+                System.out.println("== Transfer of " + url + " completed with " + (alreadyTransferred+bytesTransferred)
+                        + " and " + (bytesRemaining - bytesTransferred) + " remaining");
+                System.out.println("== Output saved to " + outputFile);
+            }
             long timeToSend = _context.clock().now() - _startedOn;
             System.out.println("== Transfer time: " + DataHelper.formatDuration(timeToSend));
             System.out.println("== ETag: " + _etag);            
@@ -359,7 +364,7 @@ public class EepGet {
 
         if ( (_bytesRemaining == -1) || (remaining == 0) ){
             for (int i = 0; i < _listeners.size(); i++) 
-                ((StatusListener)_listeners.get(i)).transferComplete(_alreadyTransferred, _bytesTransferred, _bytesRemaining, _url, _outputFile);
+                ((StatusListener)_listeners.get(i)).transferComplete(_alreadyTransferred, _bytesTransferred, _bytesRemaining, _url, _outputFile, _notModified);
         } else {
             throw new IOException("Disconnection on attempt " + _currentAttempt + " after " + _bytesTransferred);
         }
@@ -386,6 +391,7 @@ public class EepGet {
             case 304: // not modified
                 _bytesRemaining = 0;
                 _keepFetching = false;
+                _notModified = true;
                 return;              
             case 416: // completed (or range out of reach)
                 _bytesRemaining = 0;
@@ -611,6 +617,10 @@ public class EepGet {
 
     public String getETag() {
         return _etag;
+    }
+    
+    public boolean getNotModified() {
+        return _notModified;
     }
 
 }

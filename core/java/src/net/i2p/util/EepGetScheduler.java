@@ -59,8 +59,8 @@ public class EepGetScheduler implements EepGet.StatusListener {
         _listener.bytesTransferred(alreadyTransferred, currentWrite, bytesTransferred, bytesRemaining, url);
     }
     
-    public void transferComplete(long alreadyTransferred, long bytesTransferred, long bytesRemaining, String url, String outputFile) {
-        _listener.transferComplete(alreadyTransferred, bytesTransferred, bytesRemaining, url, outputFile);
+    public void transferComplete(long alreadyTransferred, long bytesTransferred, long bytesRemaining, String url, String outputFile, boolean notModified) {
+        _listener.transferComplete(alreadyTransferred, bytesTransferred, bytesRemaining, url, outputFile, notModified);
         fetchNext();
     }
     

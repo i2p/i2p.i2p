@@ -198,7 +198,7 @@ public class NewsFetcher implements Runnable, EepGet.StatusListener {
     public void bytesTransferred(long alreadyTransferred, int currentWrite, long bytesTransferred, long bytesRemaining, String url) {
         // ignore
     }
-    public void transferComplete(long alreadyTransferred, long bytesTransferred, long bytesRemaining, String url, String outputFile) {
+    public void transferComplete(long alreadyTransferred, long bytesTransferred, long bytesRemaining, String url, String outputFile, boolean notModified) {
         if (_log.shouldLog(Log.INFO))
             _log.info("News fetched from " + url + " with " + (alreadyTransferred+bytesTransferred));
         

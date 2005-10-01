@@ -332,16 +332,18 @@ public class RemoteArchiveBean {
         }
         
         public void bytesTransferred(long alreadyTransferred, int currentWrite, long bytesTransferred, long bytesRemaining, String url) {}
-        public void transferComplete(long alreadyTransferred, long bytesTransferred, long bytesRemaining, String url, String outputFile) {
+        public void transferComplete(long alreadyTransferred, long bytesTransferred, long bytesRemaining, String url, String outputFile, boolean notModified) {
             _statusMessages.add("Fetch of " + HTMLRenderer.sanitizeString(url) + " successful");
             _fetchIndexInProgress = false;
             ArchiveIndex i = new ArchiveIndex(I2PAppContext.getGlobalContext(), false);
-            try {
-                i.load(_archiveFile);
-                _statusMessages.add("Archive fetched and loaded");
-                _remoteIndex = i;
-            } catch (IOException ioe) {
-                _statusMessages.add("Archive is corrupt: " + ioe.getMessage());
+            if (!notModified) {
+                try {
+                    i.load(_archiveFile);
+                    _statusMessages.add("Archive fetched and loaded");
+                    _remoteIndex = i;
+                } catch (IOException ioe) {
+                    _statusMessages.add("Archive is corrupt: " + ioe.getMessage());
+                }
             }
         }
         public void transferFailed(String url, long bytesTransferred, long bytesRemaining, int currentAttempt) {
@@ -366,7 +368,7 @@ public class RemoteArchiveBean {
         }
         
         public void bytesTransferred(long alreadyTransferred, int currentWrite, long bytesTransferred, long bytesRemaining, String url) {}
-        public void transferComplete(long alreadyTransferred, long bytesTransferred, long bytesRemaining, String url, String outputFile) {
+        public void transferComplete(long alreadyTransferred, long bytesTransferred, long bytesRemaining, String url, String outputFile, boolean notModified) {
             handleMetadata(url, outputFile);
         }
         public void transferFailed(String url, long bytesTransferred, long bytesRemaining, int currentAttempt) {
@@ -406,7 +408,7 @@ public class RemoteArchiveBean {
         }
         
         public void bytesTransferred(long alreadyTransferred, int currentWrite, long bytesTransferred, long bytesRemaining, String url) {}
-        public void transferComplete(long alreadyTransferred, long bytesTransferred, long bytesRemaining, String url, String outputFile) {
+        public void transferComplete(long alreadyTransferred, long bytesTransferred, long bytesRemaining, String url, String outputFile, boolean notModified) {
             if (url.endsWith(".snm")) {
                 handleMetadata(url, outputFile);
                 return;
@@ -465,7 +467,7 @@ public class RemoteArchiveBean {
         }
         
         public void bytesTransferred(long alreadyTransferred, int currentWrite, long bytesTransferred, long bytesRemaining, String url) {}
-        public void transferComplete(long alreadyTransferred, long bytesTransferred, long bytesRemaining, String url, String outputFile) {
+        public void transferComplete(long alreadyTransferred, long bytesTransferred, long bytesRemaining, String url, String outputFile, boolean notModified) {
             _statusMessages.add("Fetch of " + HTMLRenderer.sanitizeString(url.substring(0, url.indexOf('?'))) + " successful, importing the data");
             File file = new File(outputFile);
             ZipInputStream zi = null;

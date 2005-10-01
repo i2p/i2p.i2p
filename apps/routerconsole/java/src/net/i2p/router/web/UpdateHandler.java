@@ -144,7 +144,7 @@ public class UpdateHandler {
             buf.append(" transferred<br />");
             _status = buf.toString();
         }
-        public void transferComplete(long alreadyTransferred, long bytesTransferred, long bytesRemaining, String url, String outputFile) {
+        public void transferComplete(long alreadyTransferred, long bytesTransferred, long bytesRemaining, String url, String outputFile, boolean notModified) {
             _status = "<b>Update downloaded</b><br />";
             TrustedUpdate up = new TrustedUpdate(_context);
             boolean ok = up.migrateVerified(RouterVersion.VERSION, SIGNED_UPDATE_FILE, "i2pupdate.zip");

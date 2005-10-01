@@ -1,4 +1,7 @@
-$Id: history.txt,v 1.274 2005/09/30 15:29:19 jrandom Exp $
+$Id: history.txt,v 1.275 2005/09/30 18:12:57 jrandom Exp $
+
+2005-09-30  ragnarok
+    * Implemented conditional get for syndie remote archive imports. 
 
 2005-09-30  jrandom
     * Killed three more streaming lib bugs, one of which caused excess packets
