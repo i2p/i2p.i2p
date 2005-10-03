@@ -336,7 +336,9 @@ public class RemoteArchiveBean {
             _statusMessages.add("Fetch of " + HTMLRenderer.sanitizeString(url) + " successful");
             _fetchIndexInProgress = false;
             ArchiveIndex i = new ArchiveIndex(I2PAppContext.getGlobalContext(), false);
-            if (!notModified) {
+            if (notModified) {
+                _statusMessages.add("Archive unchanged since last fetch.");
+            } else {
                 try {
                     i.load(_archiveFile);
                     _statusMessages.add("Archive fetched and loaded");

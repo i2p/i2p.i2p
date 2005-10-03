@@ -24,7 +24,7 @@ public class ArchiveServlet extends HttpServlet {
             renderRootIndex(resp);
             return;
         } else if (path.endsWith(Archive.INDEX_FILE)) {
-            renderSummary(resp);
+            renderSummary(req.getHeader("If-None-Match"), resp);
         } else if (path.indexOf("export.zip") != -1) {
             ExportServlet.export(req, resp);
         } else {
@@ -92,14 +92,18 @@ public class ArchiveServlet extends HttpServlet {
     
     public static final String HEADER_EXPORT_CAPABLE = "X-Syndie-Export-Capable";
     
-    private void renderSummary(HttpServletResponse resp) throws ServletException, IOException {
+    private void renderSummary(String etag, HttpServletResponse resp) throws ServletException, IOException {
         resp.setContentType("text/plain;charset=utf-8");
         //resp.setCharacterEncoding("UTF-8");
         ArchiveIndex index = BlogManager.instance().getArchive().getIndex();
         byte[] indexUTF8 = DataHelper.getUTF8(index.toString());
+        String newEtag = "\"" + I2PAppContext.getGlobalContext().sha().calculateHash(indexUTF8).toBase64() + "\"";
+        if (etag != null && etag.equals(newEtag)) {
+            resp.sendError(304, "Archive not modified");
+            return;
+        }
         resp.setHeader(HEADER_EXPORT_CAPABLE, "true");
-        Hash hash = I2PAppContext.getGlobalContext().sha().calculateHash(indexUTF8);
-        resp.setHeader("ETag", "\"" + hash.toBase64() + "\"");
+        resp.setHeader("ETag", newEtag);
         OutputStream out = resp.getOutputStream();
         out.write(indexUTF8);
         out.close();
