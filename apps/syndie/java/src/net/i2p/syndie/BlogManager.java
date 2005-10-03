@@ -3,6 +3,7 @@ package net.i2p.syndie;
 import java.io.*;
 import java.text.*;
 import java.util.*;
+
 import net.i2p.I2PAppContext;
 import net.i2p.client.naming.PetName;
 import net.i2p.client.naming.PetNameDB;
@@ -277,6 +278,8 @@ public class BlogManager {
 
     public String getDefaultProxyHost() { return _context.getProperty("syndie.defaultProxyHost", ""); }
     public String getDefaultProxyPort() { return _context.getProperty("syndie.defaultProxyPort", ""); }
+    public int getUpdateDelay() { return Integer.parseInt(_context.getProperty("syndie.updateDelay", "1")); }
+    public String[] getUpdateArchives() { return _context.getProperty("syndie.updateArchives", "").split(","); } 
     
     public boolean authorizeAdmin(String pass) {
         if (isSingleUser()) return true;

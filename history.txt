@@ -1,4 +1,13 @@
-$Id: history.txt,v 1.276 2005/09/30 19:57:34 ragnarok Exp $
+$Id: history.txt,v 1.277 2005/10/01 14:20:10 jrandom Exp $
+
+2005-10-03  ragnarok
+    * Implemented a Syndie auto-updater.  It will automatically pull new posts
+      from selected syndie archives.  To try it out, add 
+      syndie.updateArchives=<comma seperated list of syndie archives> to your 
+      syndie.config.  Archives must be specified as the full url to archive.txt
+      (e.g. http://syndiemedia.i2p/archive/archive.txt).  By default, it checks
+      for new posts every hour.  This can be modified by setting 
+      syndie.updateDelay=<delay in hours> also in syndie.config. 
 
 * 2005-10-01  0.6.1.1 released
 

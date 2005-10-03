@@ -297,18 +297,24 @@ public class RemoteArchiveBean {
         
         _statusMessages.add("Fetching index from " + HTMLRenderer.sanitizeString(_remoteLocation) +
                             (_proxyHost != null ? " via " + HTMLRenderer.sanitizeString(_proxyHost) + ":" + _proxyPort : ""));
-        File archiveFile = new File(BlogManager.instance().getTempDir(), user.getBlog().toBase64() + "_remoteArchive.txt");
+        
+        File archiveFile;
+        if (user.getBlog() != null) {
+            archiveFile = new File(BlogManager.instance().getTempDir(), user.getBlog().toBase64() + "_remoteArchive.txt");
+        } else {
+            archiveFile = new File(BlogManager.instance().getTempDir(), "remoteArchive.txt");
+        }
         archiveFile.delete();
         
         Properties etags = new Properties();
         try {
-            etags.load(new FileInputStream(new File(BlogManager.instance().getRootDir(), "etags")));
-        } catch (Exception exp) {
+            DataHelper.loadProps(etags, new File(BlogManager.instance().getRootDir(), "etags"));
+        } catch (IOException ioe) {
             //ignore
         }
         
         EepGet eep = new EepGet(I2PAppContext.getGlobalContext(), ((_proxyHost != null) && (_proxyPort > 0)),
-                                _proxyHost, _proxyPort, 0, archiveFile.getAbsolutePath(), location, etags.getProperty(location));
+                                _proxyHost, _proxyPort, 0, archiveFile.getAbsolutePath(), location, true, etags.getProperty(location));
         eep.addStatusListener(new IndexFetcherStatusListener(archiveFile));
         eep.fetch();
         
@@ -316,8 +322,8 @@ public class RemoteArchiveBean {
             etags.setProperty(location, eep.getETag());
         }
         try {
-            etags.store(new FileOutputStream(new File(BlogManager.instance().getRootDir(), "etags")), "etags");
-        } catch (Exception exp) {
+            DataHelper.storeProps(etags, new File(BlogManager.instance().getRootDir(), "etags"));
+        } catch (IOException ioe) {
             //ignore
         }
     }

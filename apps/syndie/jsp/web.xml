@@ -14,6 +14,12 @@
      <servlet-class>net.i2p.syndie.web.RSSServlet</servlet-class>
     </servlet>
      
+    <servlet>
+	 <servlet-name>net.i2p.syndie.UpdaterServlet</servlet-name>
+	 <servlet-class>net.i2p.syndie.UpdaterServlet</servlet-class>
+     <load-on-startup>1</load-on-startup>
+	</servlet>
+     
     <!-- precompiled servlets -->
     
     <servlet-mapping> 
