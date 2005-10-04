@@ -1,4 +1,7 @@
-$Id: history.txt,v 1.278 2005/10/03 13:55:10 ragnarok Exp $
+$Id: history.txt,v 1.279 2005/10/03 19:27:35 ragnarok Exp $
+
+2005-10-03  jrandom
+    * Properly reject unroutable IP addresses *cough*
 
 2005-10-03  rangarok
     * Changed default update delay to twelve hours, and enforced a minimum 

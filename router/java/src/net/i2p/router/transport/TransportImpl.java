@@ -356,11 +356,11 @@ public abstract class TransportImpl implements Transport {
     public void recheckReachability() {}
 
     public static boolean isPubliclyRoutable(byte addr[]) {
-        if (addr[0] == (int)127) return false;
-        if (addr[0] == (int)10) return false; 
-        if ( (addr[0] == (int)172) && (addr[1] >= (int)16) && (addr[1] <= (int)31) ) return false;
-        if ( (addr[0] == (int)192) && (addr[1] == (int)168) ) return false;
-        if (addr[0] >= (int)224) return false; // no multicast
+        if ((addr[0]&0xFF) == 127) return false;
+        if ((addr[0]&0xFF) == 10) return false; 
+        if ( ((addr[0]&0xFF) == 172) && ((addr[1]&0xFF) >= 16) && ((addr[1]&0xFF) <= 31) ) return false;
+        if ( ((addr[0]&0xFF) == 192) && ((addr[1]&0xFF) == 168) ) return false;
+        if ((addr[0]&0xFF) >= 224) return false; // no multicast
         return true; // or at least possible to be true
     }
 }
