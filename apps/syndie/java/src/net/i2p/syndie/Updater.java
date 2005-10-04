@@ -46,6 +46,7 @@ public class Updater {
         
         while (true) {
             int delay = BlogManager.instance().getUpdateDelay();
+            if (delay < 1) delay = 1;
             update();
             try {
                 synchronized (this) {
