@@ -17,7 +17,7 @@ pre { font-size: 10; font-family: sans-serif }
 <center>
 <b class="title">Introducing I2P</b><br />
 <span class="subtitle">a scalable framework for anonymous communication</span><br />
-<i style="font-size: 8">$Id: techintro.html,v 1.1 2005/10/03 01:21:08 jrandom Exp $</i>
+<i style="font-size: 8">$Id: techintro.html,v 1.2 2005/10/04 15:18:18 jrandom Exp $</i>
 <br />
 <br />
 
@@ -971,19 +971,20 @@ system is fully functional.
 <p>
 I2Pmail is more a service than an application - postman offers both internal and
 external email with POP3 and SMTP service through I2PTunnel instances accessing a
-series of components developed with mastiejaner, allowing people to use their 
+series of components developed with mastiejaner, allowing people to use their
 preferred mail clients to send and receive mail pseudonymously.  However, as most
 mail clients expose substantial identifying information, I2P bundles susi23's
-web based susimail client which has been built specifically with I2P's anonymity 
-needs in mind.  The I2Pmail/mail.i2p service offers transparent virus and spam
-filtering as well as denial of service prevention with hashcash augmented quotas.
+web based susimail client which has been built specifically with I2P's anonymity
+needs in mind. The I2Pmail/mail.i2p service offers transparent virus filtering as
+well as denial of service prevention with hashcash augmented quotas.
 In addition, each user has control of their batching strategy prior to delivery
 through the mail.i2p outproxies, which are separate from the mail.i2p SMTP and
 POP3 servers - both the outproxies and inproxies communicate with the mail.i2p
-SMTP and POP3 servers through I2P itself, so compromising those non-anonymous 
+SMTP and POP3 servers through I2P itself, so compromising those non-anonymous
 locations does not give access to the mail accounts or activity patterns of the
-user.  Further details and plans for future refinements can be found on the
-eepsite <a href="http://www.postman.i2p/">www.postman.i2p</a>.
+user. At the moment the developers work on a decentralized mailsystem, called
+"v2mail2". More information can be found on the eepsite 
+<a href="http://hq.postman.i2p/">hq.postman.i2p</a>.
 </p>
 
 </body>
