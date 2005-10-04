@@ -192,13 +192,13 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
                 }
                 if (_log.shouldLog(Log.INFO))
                     _log.info(_name + ": Done sending: " + total);
-                _out.flush();
+                //_out.flush();
             } catch (IOException ioe) {
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("Error sending", ioe);
             } finally {
-                if (_in != null) try { _in.close(); } catch (IOException ioe) {}
                 if (_out != null) try { _out.close(); } catch (IOException ioe) {}
+                if (_in != null) try { _in.close(); } catch (IOException ioe) {}
             }
         }
     }

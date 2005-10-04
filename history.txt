@@ -1,4 +1,7 @@
-$Id: history.txt,v 1.279 2005/10/03 19:27:35 ragnarok Exp $
+$Id: history.txt,v 1.280 2005/10/03 21:05:52 jrandom Exp $
+
+2005-10-04  jrandom
+    * Further reduction in unnecessary streaming packets.
 
 2005-10-03  jrandom
     * Properly reject unroutable IP addresses *cough*

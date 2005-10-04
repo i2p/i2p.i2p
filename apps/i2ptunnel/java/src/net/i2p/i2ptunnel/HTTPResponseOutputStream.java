@@ -66,7 +66,7 @@ class HTTPResponseOutputStream extends FilterOutputStream {
         if (_headerWritten) {
             out.write(buf, off, len);
             _dataWritten += len;
-            out.flush();
+            //out.flush();
             return;
         }
 
@@ -82,7 +82,7 @@ class HTTPResponseOutputStream extends FilterOutputStream {
                     // write out the remaining
                     out.write(buf, off+i+1, len-i-1);
                     _dataWritten += len-i-1;
-                    out.flush();
+                    //out.flush();
                 }
                 return;
             }
@@ -197,6 +197,10 @@ class HTTPResponseOutputStream extends FilterOutputStream {
     
     protected void finishHeaders() throws IOException {
         out.write("\n".getBytes()); // end of the headers
+    }
+    
+    public void close() throws IOException {
+        out.close();
     }
     
     protected void beginProcessing() throws IOException {
