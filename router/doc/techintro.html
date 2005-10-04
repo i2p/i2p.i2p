@@ -17,7 +17,7 @@ pre { font-size: 10; font-family: sans-serif }
 <center>
 <b class="title">Introducing I2P</b><br />
 <span class="subtitle">a scalable framework for anonymous communication</span><br />
-<i style="font-size: 8">$Id: index.html,v 1.22 2005/10/03 00:31:27 jrandom Exp $</i>
+<i style="font-size: 8">$Id: techintro.html,v 1.1 2005/10/03 01:21:08 jrandom Exp $</i>
 <br />
 <br />
 
@@ -754,8 +754,16 @@ has been said the anonymity and scalability claims seem highly dubious.  In
 particular, the appropriateness for use in hostile regimes against state level
 adversaries has been tremendously overstated, and any analysis on the implications
 of resource scarcity upon the scalability of the network has seemingly been avoided.
-Further review of this "globally scalable darknet" will have to wait until the
-Freenet team makes more information available.
+Specifically, while publishing the "anonymous" topology in the darknet does not
+necessarily immediately expose all identities, it is equivilant to publishing an
+organizational chart for a covert group, which can in turn be used by an adversary
+along side existing knowledge of their target to narrow down or identify different
+participants.  In addition, by using only peers that are locally connected, the
+network's mixnet layer is vulnerable to a class of 
+<a href="http://www.im.pwr.wroc.pl/~klonowsk/LocalViewAttack.ps">local view attacks</a>.
+Further questions regarding suceptability to traffic analysis, trust, and other topics 
+do exist, but a more in depth review of this "globally scalable darknet" will have
+to wait until the Freenet team makes more information available.
 </p>
 
 <h1 id="app">Appendix A: Application layer</h1>
