@@ -30,6 +30,7 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
      * @throws IllegalArgumentException if the local router info is invalid
      */
     public void publish(RouterInfo localRouterInfo) throws IllegalArgumentException {
+        if (localRouterInfo == null) throw new IllegalArgumentException("wtf, null localRouterInfo?");
         super.publish(localRouterInfo);
         sendStore(localRouterInfo.getIdentity().calculateHash(), localRouterInfo, null, null, PUBLISH_TIMEOUT, null);
     }

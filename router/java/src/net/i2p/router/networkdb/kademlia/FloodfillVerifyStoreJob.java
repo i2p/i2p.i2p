@@ -130,7 +130,8 @@ public class FloodfillVerifyStoreJob extends JobImpl {
         ds = _facade.lookupLeaseSetLocally(_key);
         if (ds == null)
             ds = _facade.lookupRouterInfoLocally(_key);
-        _facade.sendStore(_key, ds, null, null, VERIFY_TIMEOUT, null);
+        if (ds != null)
+            _facade.sendStore(_key, ds, null, null, VERIFY_TIMEOUT, null);
     }
     
     private class VerifyTimeoutJob extends JobImpl {

@@ -1,4 +1,8 @@
-$Id: history.txt,v 1.280 2005/10/03 21:05:52 jrandom Exp $
+$Id: history.txt,v 1.281 2005/10/04 02:36:25 jrandom Exp $
+
+2005-10-04  jrandom
+    * Syndie patch for single user remote archives (thanks nickless_head!)
+    * Handle an invalid netDb store (thanks Complication!)
 
 2005-10-04  jrandom
     * Further reduction in unnecessary streaming packets.

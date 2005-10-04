@@ -269,6 +269,7 @@ public class RemoteArchiveBean {
         _proxyHost = null;
         _proxyPort = -1;
         _exportCapable = false;
+        if (user == null) user = new User();
         
         if ( (schema == null) || (schema.trim().length() <= 0) ||
              (location == null) || (location.trim().length() <= 0) ) {

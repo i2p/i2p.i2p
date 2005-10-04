@@ -850,6 +850,11 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
     }
 
     public void sendStore(Hash key, DataStructure ds, Job onSuccess, Job onFailure, long sendTimeout, Set toIgnore) {
+        if ( (ds == null) || (key == null) ) {
+            if (onFailure != null) 
+                _context.jobQueue().addJob(onFailure);
+            return;
+        }
         _context.jobQueue().addJob(new StoreJob(_context, this, key, ds, onSuccess, onFailure, sendTimeout, toIgnore));
     }
     
