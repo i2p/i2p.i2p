@@ -17,7 +17,7 @@ pre { font-size: 10; font-family: sans-serif }
 <center>
 <b class="title">Introducing I2P</b><br />
 <span class="subtitle">a scalable framework for anonymous communication</span><br />
-<i style="font-size: 8">$Id: techintro.html,v 1.6 2005/10/04 20:11:25 jrandom Exp $</i>
+<i style="font-size: 8">$Id: techintro.html,v 1.7 2005/10/04 20:45:21 jrandom Exp $</i>
 <br />
 <br />
 
@@ -452,14 +452,14 @@ with an additional SHA256 hash.  Various other messages are passed along inside
 
 <p>
 Garlic messages are an extension of "onion" layered encryption, allowing the contents
-of a single message to contain multiple "cloves" - fully formed messages along side
+of a single message to contain multiple "cloves" - fully formed messages alongside
 their own instructions for delivery.  Messages are wrapped into a garlic message whenever
 the message would otherwise be passing in cleartext through a peer who should not have
 access to the information - for instance, when a router wants to ask another router to
 participate in a tunnel, they wrap the request inside a garlic, encrypt that garlic to
 the receiving router's 2048bit ElGamal public key, and forward it through a tunnel. 
 Another example is when a client wants to send a message to a destination - the sender's
-router will wrap up that data message (along side some other messages) into a garlic,
+router will wrap up that data message (alongside some other messages) into a garlic,
 encrypt that garlic to the 2048bit ElGamal public key published in the recipient's
 leaseSet, and forward it through the appropriate tunnels.
 </p>
@@ -757,12 +757,12 @@ of resource scarcity upon the scalability of the network has seemingly been avoi
 Specifically, while publishing the "anonymous" topology in the darknet does not
 necessarily immediately expose all identities, it is equivalent to publishing an
 organizational chart for a covert group, which can in turn be used by an adversary
-along side existing knowledge of their target to narrow down or identify different
+alongside existing knowledge of their target to narrow down or identify different
 participants.  In addition, by using only peers that are locally connected, the
 network's mixnet layer is vulnerable to a class of 
 <a href="http://www.im.pwr.wroc.pl/~klonowsk/LocalViewAttack.ps">local view attacks</a>.
 Further questions regarding susceptibility to traffic analysis, trust, and other topics 
-do exist, but a more in depth review of this "globally scalable darknet" will have
+do exist, but a more in-depth review of this "globally scalable darknet" will have
 to wait until the Freenet team makes more information available.
 </p>
 
@@ -959,9 +959,9 @@ to be streamlined further.
 <p><i>Developed by: sirup</i></p>
 
 <p>
-I2Phex is a fairly direct port of the Phex gnutella filesharing client to run 
+I2Phex is a fairly direct port of the Phex Gnutella filesharing client to run 
 entirely on top of I2P.  While it has disabled some of Phex's functionality,
-such as integration with gnutella webcaches, the basic file sharing and chatting
+such as integration with Gnutella webcaches, the basic file sharing and chatting
 system is fully functional.
 </p>
 
