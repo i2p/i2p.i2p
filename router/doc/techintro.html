@@ -17,7 +17,7 @@ pre { font-size: 10; font-family: sans-serif }
 <center>
 <b class="title">Introducing I2P</b><br />
 <span class="subtitle">a scalable framework for anonymous communication</span><br />
-<i style="font-size: 8">$Id: techintro.html,v 1.3 2005/10/04 18:33:15 jrandom Exp $</i>
+<i style="font-size: 8">$Id: techintro.html,v 1.4 2005/10/04 18:34:19 jrandom Exp $</i>
 <br />
 <br />
 
@@ -677,7 +677,7 @@ traffic data than would be exposed with Tor's duplex circuits by simply looking 
 the flows themselves - an HTTP request and response would follow the same path in
 Tor, while in I2P the packets making up the request would go out through one or 
 more outbound tunnels and the packets making up the response would come back through
-one or more different inbound tunnels.  While I2P's per selection and ordering 
+one or more different inbound tunnels.  While I2P's peer selection and ordering 
 strategies should sufficiently address predecessor attacks, I2P can trivially 
 mimic Tor's non-redundant duplex tunnels by simply building an inbound and
 outbound tunnel along the same routers.</p>
@@ -755,13 +755,13 @@ particular, the appropriateness for use in hostile regimes against state level
 adversaries has been tremendously overstated, and any analysis on the implications
 of resource scarcity upon the scalability of the network has seemingly been avoided.
 Specifically, while publishing the "anonymous" topology in the darknet does not
-necessarily immediately expose all identities, it is equivilant to publishing an
+necessarily immediately expose all identities, it is equivalent to publishing an
 organizational chart for a covert group, which can in turn be used by an adversary
 along side existing knowledge of their target to narrow down or identify different
 participants.  In addition, by using only peers that are locally connected, the
 network's mixnet layer is vulnerable to a class of 
 <a href="http://www.im.pwr.wroc.pl/~klonowsk/LocalViewAttack.ps">local view attacks</a>.
-Further questions regarding suceptability to traffic analysis, trust, and other topics 
+Further questions regarding susceptibility to traffic analysis, trust, and other topics 
 do exist, but a more in depth review of this "globally scalable darknet" will have
 to wait until the Freenet team makes more information available.
 </p>
