@@ -152,7 +152,8 @@ public class Packet {
     /** what stream do we send data to the peer on? */
     public long getSendStreamId() { return _sendStreamId; }
     public void setSendStreamId(long id) { 
-        if (_sendStreamIdSet) throw new RuntimeException("Send stream ID already set [" + _sendStreamId + ", " + id + "]");
+        if ( (_sendStreamIdSet) && (_sendStreamId > 0) )
+            throw new RuntimeException("Send stream ID already set [" + _sendStreamId + ", " + id + "]");
         _sendStreamIdSet = true;
         _sendStreamId = id; 
     }
@@ -164,7 +165,8 @@ public class Packet {
      */
     public long getReceiveStreamId() { return _receiveStreamId; }
     public void setReceiveStreamId(long id) { 
-        if (_receiveStreamIdSet) throw new RuntimeException("Receive stream ID already set [" + _receiveStreamId + ", " + id + "]");
+        if ( (_receiveStreamIdSet) && (_receiveStreamId > 0) ) 
+            throw new RuntimeException("Receive stream ID already set [" + _receiveStreamId + ", " + id + "]");
         _receiveStreamIdSet = true;
         _receiveStreamId = id; 
     }

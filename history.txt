@@ -1,4 +1,9 @@
-$Id: history.txt,v 1.281 2005/10/04 02:36:25 jrandom Exp $
+$Id: history.txt,v 1.282 2005/10/04 18:43:05 jrandom Exp $
+
+2005-10-05  jrandom
+    * Allow the first few packets in the stream to fill in their IDs during
+      handshake (thanks cervantes, Complication, et al!)  This should fix at 
+      least some of the intermittent HTTP POST issues.
 
 2005-10-04  jrandom
     * Syndie patch for single user remote archives (thanks nickless_head!)

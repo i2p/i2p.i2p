@@ -161,7 +161,8 @@ public class PacketHandler {
                 }
             } else {
                 if ( (con.getSendStreamId() <= 0) || 
-                     (DataHelper.eq(con.getSendStreamId(), packet.getReceiveStreamId())) ) {
+                     (DataHelper.eq(con.getSendStreamId(), packet.getReceiveStreamId())) ||
+                     (packet.getSequenceNum() <= 5) ) { // its in flight from the first batch
                     long oldId =con.getSendStreamId();
                     if (packet.isFlagSet(Packet.FLAG_SYNCHRONIZE)) // con fully established, w00t
                         con.setSendStreamId(packet.getReceiveStreamId());
@@ -229,7 +230,7 @@ public class PacketHandler {
             if (sendId <= 0) {
                 Connection con = _manager.getConnectionByOutboundId(packet.getReceiveStreamId());
                 if (con != null) {
-                    if (con.getAckedPackets() <= 0) {
+                    if ( (con.getHighestAckedThrough() <= 5) && (packet.getSequenceNum() <= 5) ) {
                         if (_log.shouldLog(Log.DEBUG))
                             _log.debug("Received additional packets before the syn on " + con + ": " + packet);
                         receiveKnownCon(con, packet);

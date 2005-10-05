@@ -936,8 +936,10 @@ public class Connection {
                     _packet.setFlag(Packet.FLAG_DELAY_REQUESTED);
                 _packet.setOptionalMaxSize(getOptions().getMaxMessageSize());
                 _packet.setResendDelay(getOptions().getResendDelay());
-                //_packet.setReceiveStreamId(_receiveStreamId);
-                //_packet.setSendStreamId(_sendStreamId);
+                if (_packet.getReceiveStreamId() <= 0)
+                    _packet.setReceiveStreamId(_receiveStreamId);
+                if (_packet.getSendStreamId() <= 0)
+                    _packet.setSendStreamId(_sendStreamId);
                 
                 int newWindowSize = getOptions().getWindowSize();
 

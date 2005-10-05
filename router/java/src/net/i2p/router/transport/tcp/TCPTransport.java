@@ -488,8 +488,8 @@ public class TCPTransport extends TransportImpl {
             if (Boolean.valueOf(allowLocal).booleanValue()) {
                 return true;
             } else {
-                if (_log.shouldLog(Log.ERROR))
-                    _log.error("External address " + address + " is not publicly routable");
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("External address " + address + " is not publicly routable");
                 return false;
             }
         } else {
@@ -726,11 +726,12 @@ public class TCPTransport extends TransportImpl {
                         continue;
                     }
                     if (!allowAddress(tcpAddr)) {
-                        _log.error("Message points at illegal address! "  
-                                   + msg.getTarget().getIdentity().calculateHash().toBase64().substring(0,6));
+                        _log.error("Message points at illegal address! router "  
+                                   + msg.getTarget().getIdentity().calculateHash().toBase64().substring(0,6)
+                                   + " address " + tcpAddr.toString());
                         
                         iter.remove();
-                        _context.shitlist().shitlistRouter(peer, "Invalid addressaddress...");
+                        _context.shitlist().shitlistRouter(peer, "Invalid TCP address...");
                         _context.netDb().fail(peer);
                         for (int i = 0; i < msgs.size(); i++) {
                             OutNetMessage cur = (OutNetMessage)msgs.get(i);
