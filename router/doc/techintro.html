@@ -17,7 +17,7 @@ pre { font-size: 10; font-family: sans-serif }
 <center>
 <b class="title">Introducing I2P</b><br />
 <span class="subtitle">a scalable framework for anonymous communication</span><br />
-<i style="font-size: 8">$Id: techintro.html,v 1.5 2005/10/04 19:52:27 jrandom Exp $</i>
+<i style="font-size: 8">$Id: techintro.html,v 1.6 2005/10/04 20:11:25 jrandom Exp $</i>
 <br />
 <br />
 
@@ -378,7 +378,7 @@ through other means without ever going into the netDb.
 Bootstrapping the netDb itself is simple - once a router has at least one routerInfo
 of a reachable peer, they query that router for references to other routers in the
 network with the Kademlia healing algorithm.  Each routerInfo reference is stored in
-an individual file in the the router's netDb subdirectory, allowing people to easily
+an individual file in the router's netDb subdirectory, allowing people to easily
 share their references to bootstrap new users.
 </p>
 
@@ -415,10 +415,10 @@ another technique for securely distributing the network metadata.
 Communication between routers needs to provide confidentiality and integrity
 against external adversaries while authenticating that the router contacted
 is the one who should receive a given message.  The particulars of how routers
-communicate with other routers isn't critical - three separate protocols have
+communicate with other routers aren't critical - three separate protocols have
 been used at different points to provide those bare necessities.  To accommodate
 the need for high degree communication (as a number of routers will end up 
-speaking with many others), I2P is migrating from a TCP based transport
+speaking with many others), I2P moved from a TCP based transport
 to a UDP based one - "Secure Semireliable UDP", or "SSU".  As described in the
 <a href="http://dev.i2p.net/cgi-bin/cvsweb.cgi/i2p/router/doc/udp.html?rev=HEAD">SSU spec</a>:</p>
 
@@ -582,7 +582,7 @@ they see those tunnel gateways in the netDb and simply send the relevant message
 them through one of the published tunnels.  If the peer behind the restricted route
 wants to reply, it may do so either directly (if they are willing to expose their IP
 to the peer) or indirectly through their outbound tunnels.  When the routers that the
-peer has directly connections to want to reach it (to forward tunnel messages, for
+peer has direct connections to want to reach it (to forward tunnel messages, for
 instance), they simply prioritize their direct connection over the published tunnel
 gateway.  The concept of 'client routers' simply extends the restricted route by not
 publishing any router addresses.  Such a router would not even need to publish their
