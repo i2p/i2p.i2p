@@ -205,11 +205,7 @@ public class SummaryHelper {
     public String getInboundMinuteKBps() { 
         if (_context == null) 
             return "0.0";
-        
-        RateStat receiveRate = _context.statManager().getRate("bw.recvRate");
-        if (receiveRate == null) return "0.0";
-        Rate rate = receiveRate.getRate(60*1000);
-        double kbps = rate.getAverageValue()/1024;
+        double kbps = _context.bandwidthLimiter().getReceiveBps()/1024d;
         DecimalFormat fmt = new DecimalFormat("##0.00");
         return fmt.format(kbps);
     }
@@ -221,11 +217,7 @@ public class SummaryHelper {
     public String getOutboundMinuteKBps() { 
         if (_context == null) 
             return "0.0";
-        
-        RateStat receiveRate = _context.statManager().getRate("bw.sendRate");
-        if (receiveRate == null) return "0.0";
-        Rate rate = receiveRate.getRate(60*1000);
-        double kbps = rate.getAverageValue()/1024;
+        double kbps = _context.bandwidthLimiter().getSendBps()/1024d;
         DecimalFormat fmt = new DecimalFormat("##0.00");
         return fmt.format(kbps);
     }

@@ -97,6 +97,8 @@ public class FIFOBandwidthLimiter {
     public void setInboundUnlimited(boolean isUnlimited) { _inboundUnlimited = isUnlimited; }
     public boolean getOutboundUnlimited() { return _outboundUnlimited; }
     public void setOutboundUnlimited(boolean isUnlimited) { _outboundUnlimited = isUnlimited; }
+    public float getSendBps() { return _sendBps; }
+    public float getReceiveBps() { return _recvBps; }
     
     public void reinitialize() {
         _pendingInboundRequests.clear();
@@ -262,13 +264,13 @@ public class FIFOBandwidthLimiter {
             _lastTotalReceived = totR;
             _lastStatsUpdated = now;
             if (_sendBps <= 0)
-                _sendBps = ((float)sent*time)/1000f;
+                _sendBps = ((float)sent*1000f)/(float)time;
             else
-                _sendBps = (0.9f)*_sendBps + (0.1f)*((float)sent*time)/1000f;
+                _sendBps = (0.9f)*_sendBps + (0.1f)*((float)sent*1000f)/(float)time;
             if (_recvBps <= 0)
-                _recvBps = ((float)recv*time)/1000f;
+                _recvBps = ((float)recv*1000f)/(float)time;
             else
-                _recvBps = (0.9f)*_recvBps + (0.1f)*((float)recv*time)/1000f;
+                _recvBps = (0.9f)*_recvBps + (0.1f)*((float)recv*1000)/(float)time;
             if (_log.shouldLog(Log.WARN)) {
                 if (_log.shouldLog(Log.INFO))
                     _log.info("BW: time = " + time + " sent: " + sent + " recv: " + recv);

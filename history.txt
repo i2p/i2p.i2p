@@ -1,4 +1,11 @@
-$Id: history.txt,v 1.283 2005/10/05 18:24:33 jrandom Exp $
+$Id: history.txt,v 1.284 2005/10/07 05:23:01 jrandom Exp $
+
+* 2005-10-07  0.6.1.2 released
+
+2005-10-07  jrandom
+    * Include the 1 second bandwidth usage on the console rather than the 
+      1 minute rate, as the 1 second value doesn't have the 1m/5m quantization
+      issues.
 
 2005-10-07  jrandom
     * Allow the I2PTunnelHTTPServer to send back the first few packets of an
