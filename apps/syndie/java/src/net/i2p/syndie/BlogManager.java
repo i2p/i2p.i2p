@@ -647,4 +647,37 @@ public class BlogManager {
             }
         }
     }
+    
+    public void scheduleSyndication(String location) {
+        String archives[] = getUpdateArchives();
+        StringBuffer buf = new StringBuffer(64);
+        if ( (archives != null) && (archives.length > 0) ) {
+            for (int i = 0; i < archives.length; i++)
+                if ( (!archives[i].equals(location)) && (archives[i].trim().length() > 0) )
+                    buf.append(archives[i]).append(",");
+        }
+        if ( (location != null) && (location.trim().length() > 0) )
+            buf.append(location.trim());
+        System.setProperty("syndie.updateArchives", buf.toString());
+        Updater.wakeup();
+    }
+    public void unscheduleSyndication(String location) {
+        String archives[] = getUpdateArchives();
+        if ( (archives != null) && (archives.length > 0) ) {
+            StringBuffer buf = new StringBuffer(64);
+            for (int i = 0; i < archives.length; i++)
+                if ( (!archives[i].equals(location)) && (archives[i].trim().length() > 0) )
+                    buf.append(archives[i]).append(",");
+            System.setProperty("syndie.updateArchives", buf.toString());
+        }
+    }
+    public boolean syndicationScheduled(String location) {
+        String archives[] = getUpdateArchives();
+        if ( (location == null) || (archives == null) || (archives.length <= 0) )
+            return false;
+        for (int i = 0; i < archives.length; i++)
+            if (location.equals(archives[i]))
+                return true;
+        return false;
+    }
 }

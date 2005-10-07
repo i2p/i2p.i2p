@@ -6,7 +6,7 @@
 <title>SyndieMedia addressbook</title>
 <link href="style.jsp" rel="stylesheet" type="text/css" >
 </head>
-<body>
+<body><!-- auth? <%=user.getAuthenticated()%> remote? <%=user.getAllowAccessRemote()%> sched? <%=request.getParameter("scheduleSyndication")%> -->
 <table border="1" cellpadding="0" cellspacing="0" width="100%">
 <tr class="b_toplogo"><td colspan="5" valign="top" align="left" class="b_toplogo"><jsp:include page="_toplogo.jsp" /></td></tr>
 <tr><td valign="top" align="left" rowspan="2" class="b_leftnav"><jsp:include page="_leftnav.jsp" /></td>
@@ -31,6 +31,15 @@ if (!user.getAuthenticated()) {
           names.remove(oldPetname);
           names.set(cur.getName(), cur);
           names.store(user.getAddressbookLocation());
+          if ( ("syndiearchive".equals(cur.getProtocol())) && (BlogManager.instance().authorizeRemote(user)) ) {
+            if (null != request.getParameter("scheduleSyndication")) {
+              BlogManager.instance().scheduleSyndication(cur.getLocation());
+              BlogManager.instance().writeConfig();
+            } else {
+              BlogManager.instance().unscheduleSyndication(cur.getLocation());
+              BlogManager.instance().writeConfig();
+            }
+          }
           %><span class="b_addrMsgOk">Address updated</span><%
         }
     } else if ( (action != null) && ("Add".equals(action)) ) {
@@ -45,11 +54,21 @@ if (!user.getAuthenticated()) {
           cur.setGroups(request.getParameter("groups"));
           names.set(cur.getName(), cur);
           names.store(user.getAddressbookLocation());
+          if ( ("syndiearchive".equals(cur.getProtocol())) && (BlogManager.instance().authorizeRemote(user)) ) {
+            if (null != request.getParameter("scheduleSyndication")) {
+              BlogManager.instance().scheduleSyndication(cur.getLocation());
+              BlogManager.instance().writeConfig();
+            }
+          }
           %><span class="b_addrMsgOk">Address added</span><%
         }
     } else if ( (action != null) && ("Delete".equals(action)) ) {
         PetName cur = names.get(request.getParameter("name"));
         if (cur != null) { 
+          if ( ("syndiearchive".equals(cur.getProtocol())) && (BlogManager.instance().authorizeRemote(user)) ) {
+            BlogManager.instance().unscheduleSyndication(cur.getLocation());
+            BlogManager.instance().writeConfig();
+          }
           names.remove(cur.getName());
           names.store(user.getAddressbookLocation());
           %><span class="b_addrMsgOk">Address removed</span><%
@@ -65,6 +84,7 @@ if (!user.getAuthenticated()) {
  <td class="b_addrHeader"><em class="b_addrHeader">Protocol</em></td>
  <td class="b_addrHeader"><em class="b_addrHeader">Location</em></td>
  <td class="b_addrHeader"><em class="b_addrHeader">Public?</em></td>
+ <td class="b_addrHeader"><em class="b_addrHeader">Automated?</em></td>
  <td class="b_addrHeader"><em class="b_addrHeader">Groups</em></td> 
  <td class="b_addrHeader">&nbsp;</td></tr>
 <%
@@ -146,6 +166,10 @@ if (!user.getAuthenticated()) {
         if (name.getIsPublic())
             buf.append("checked=\"true\" ");
         buf.append(" /></td>");
+        buf.append("<td class=\"b_scheduled\"><input class=\"b_scheduled\" type=\"checkbox\" name=\"scheduleSyndication\" value=\"true\" ");
+        if (BlogManager.instance().syndicationScheduled(name.getLocation()))
+          buf.append("checked=\"true\" ");
+        buf.append(" /></td>");
         buf.append("<td class=\"b_addrGroup\"><input class=\"b_addrGroup\" type=\"text\" name=\"groups\" size=\"10\" value=\"");
         for (int j = 0; j < name.getGroupCount(); j++) {
             buf.append(HTMLRenderer.sanitizeTagParam(name.getGroup(j)));
@@ -185,6 +209,7 @@ if (!user.getAuthenticated()) {
             <option value="syndieblog" <%="syndieblog".equalsIgnoreCase(proto) ? " selected=\"true\" " : ""%>>Syndie blog</option></select></td>
         <td class="b_addrLoc"><input class="b_addrLoc" type="text" size="50" name="location" value="<%=loc%>" /></td>
         <td class="b_addrPublic"><input class="b_addrPublic" type="checkbox" name="isPublic" /></td>
+        <td class="b_scheduled"><input class="b_sheduled" type="checkbox" name="scheduleSyndication" value="true" /></td>
         <td class="b_addrGroup"><input class="b_addrGroup" type="text" name="groups" size="10" /></td>
         <td class="b_addrDetail"><input class="b_addrAdd" type="submit" name="action" value="Add" /></td>
     </form></tr>

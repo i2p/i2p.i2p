@@ -10,10 +10,15 @@ public class Updater {
     public static final String VERSION = "1.0";
     private static final Log _log = I2PAppContext.getGlobalContext().logManager().getLog(Updater.class);
     private static final Updater _instance = new Updater();
+    private long _lastUpdate;
     
     public void update() {
-        _log.debug("Update started.");
         BlogManager bm = BlogManager.instance();
+        if (_lastUpdate + bm.getUpdateDelay()*60*60*1000 > System.currentTimeMillis()) {
+            return;
+        }
+        _lastUpdate = System.currentTimeMillis();
+        _log.debug("Update started.");
         User user = new User();
         RemoteArchiveBean rab = new RemoteArchiveBean();
         String[] archives = bm.getUpdateArchives();

@@ -219,7 +219,7 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
         protected void beginProcessing() throws IOException {
             if (_log.shouldLog(Log.INFO))
                 _log.info("Beginning compression processing");
-            out.flush();
+            //out.flush();
             _gzipOut = new InternalGZIPOutputStream(out);
             out = _gzipOut;
         }

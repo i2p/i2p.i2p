@@ -163,9 +163,20 @@ public class PacketHandler {
                 if ( (con.getSendStreamId() <= 0) || 
                      (DataHelper.eq(con.getSendStreamId(), packet.getReceiveStreamId())) ||
                      (packet.getSequenceNum() <= 5) ) { // its in flight from the first batch
-                    long oldId =con.getSendStreamId();
-                    if (packet.isFlagSet(Packet.FLAG_SYNCHRONIZE)) // con fully established, w00t
-                        con.setSendStreamId(packet.getReceiveStreamId());
+                    long oldId = con.getSendStreamId();
+                    if (packet.isFlagSet(Packet.FLAG_SYNCHRONIZE)) {
+                        if (oldId <= 0) {
+                            // con fully established, w00t
+                            con.setSendStreamId(packet.getReceiveStreamId());
+                        } else if (oldId == packet.getReceiveStreamId()) {
+                            // ok, as expected...
+                        } else {
+                            if (_log.shouldLog(Log.ERROR))
+                                _log.error("Received a syn with the wrong IDs, con=" + con + " packet=" + packet);
+                            packet.releasePayload();
+                            return;
+                        }
+                    }
                     
                     try {
                         con.getPacketHandler().receivePacket(packet, con);

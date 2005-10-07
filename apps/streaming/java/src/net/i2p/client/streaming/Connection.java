@@ -102,7 +102,7 @@ public class Connection {
         _closeSentOn = -1;
         _closeReceivedOn = -1;
         _unackedPacketsReceived = 0;
-        _congestionWindowEnd = 0;
+        _congestionWindowEnd = _options.getWindowSize()-1;
         _highestAckedThrough = -1;
         _lastCongestionSeenAt = MAX_WINDOW_SIZE*2; // lets allow it to grow
         _lastCongestionTime = -1;
@@ -153,8 +153,12 @@ public class Connection {
             synchronized (_outboundPackets) {
                 if (!started)
                     _context.statManager().addRateData("stream.chokeSizeBegin", _outboundPackets.size(), timeoutMs);
-                if (!_connected) 
-                    return false;
+                
+                // no need to wait until the other side has ACKed us before sending the first few wsize
+                // packets through
+                //    if (!_connected)
+                //        return false;
+                
                 started = true;
                 if ( (_outboundPackets.size() >= _options.getWindowSize()) || (_activeResends > 0) ||
                      (_lastSendId - _highestAckedThrough > _options.getWindowSize()) ) {
