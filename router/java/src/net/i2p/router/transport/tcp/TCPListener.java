@@ -60,6 +60,9 @@ class TCPListener {
         _transport = transport;
         _pendingSockets = new ArrayList(10);
         _handlers = new ArrayList(CONCURRENT_HANDLERS);
+        _context.statManager().createRateStat("tcp.conReceiveOK", "How long does it take to receive a valid connection", "TCP", new long[] { 60*1000, 5*60*1000, 10*60*1000 });
+        _context.statManager().createRateStat("tcp.conReceiveFail", "How long does it take to receive a failed connection", "TCP", new long[] { 60*1000, 5*60*1000, 10*60*1000 });
+        _context.statManager().createRateStat("tcp.conUnhandled", "How often do we receive a connection but take too long on other ones to handle it", "TCP", new long[] { 60*1000, 5*60*1000, 10*60*1000 });
     }
         
     /** Make sure we are listening per the transport's config */
@@ -230,6 +233,7 @@ class TCPListener {
                 removed = _pendingSockets.remove(_cur);
             }
             if (removed) {
+                _context.statManager().addRateData("tcp.conUnhandled", 1, 0);
                 // handlers hadn't taken it yet, so close it
                 if (_log.shouldLog(Log.WARN))
                     _log.warn("Closing unhandled socket " + _cur);
@@ -294,7 +298,13 @@ class TCPListener {
             ConnectionHandler ch = new ConnectionHandler(_context, _transport, _socket);
             TCPConnection con = null;
             try {
+                long before = System.currentTimeMillis();
                 con = ch.receiveConnection();
+                long duration = System.currentTimeMillis() - before;
+                if (con != null)
+                    _context.statManager().addRateData("tcp.conReceiveOK", duration, duration);
+                else
+                    _context.statManager().addRateData("tcp.conReceiveFail", duration, duration);
             } catch (Exception e) {
                 _log.log(Log.CRIT, "Unhandled exception receiving a connection on " + _socket, e);
             }

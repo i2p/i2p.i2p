@@ -454,7 +454,10 @@ public class Rate {
     }
 
     private final static long now() {
-        return Clock.getInstance().now();
+        // "event time" is in the stat log (and uses Clock).
+        // we just want sequential and stable time here, so use the OS time, since it doesn't
+        // skew periodically
+        return System.currentTimeMillis(); //Clock.getInstance().now();
     }
 
     public static void main(String args[]) {

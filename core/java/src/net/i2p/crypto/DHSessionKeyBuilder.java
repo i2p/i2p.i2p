@@ -66,11 +66,13 @@ public class DHSessionKeyBuilder {
     public final static String PROP_DH_PRECALC_MAX = "crypto.dh.precalc.max";
     public final static String PROP_DH_PRECALC_DELAY = "crypto.dh.precalc.delay";
     public final static String DEFAULT_DH_PRECALC_MIN = "5";
-    public final static String DEFAULT_DH_PRECALC_MAX = "10";
-    public final static String DEFAULT_DH_PRECALC_DELAY = "1000";
+    public final static String DEFAULT_DH_PRECALC_MAX = "50";
+    public final static String DEFAULT_DH_PRECALC_DELAY = "10000";
 
     static {
         I2PAppContext ctx = _context;
+        ctx.statManager().createRateStat("crypto.dhGeneratePublicTime", "How long it takes to create x and X", "Encryption", new long[] { 60*1000, 5*60*1000, 60*60*1000 });
+        ctx.statManager().createRateStat("crypto.dhCalculateSessionTime", "How long it takes to create the session key", "Encryption", new long[] { 60*1000, 5*60*1000, 60*60*1000 });        
         try {
             int val = Integer.parseInt(ctx.getProperty(PROP_DH_PRECALC_MIN, DEFAULT_DH_PRECALC_MIN));
             MIN_NUM_BUILDERS = val;
@@ -225,11 +227,12 @@ public class DHSessionKeyBuilder {
      *
      */
     public BigInteger generateMyValue() {
-        long start = Clock.getInstance().now();
+        long start = System.currentTimeMillis();
         _myPrivateValue = new NativeBigInteger(2048, RandomSource.getInstance());
         BigInteger myValue = CryptoConstants.elgg.modPow(_myPrivateValue, CryptoConstants.elgp);
-        long end = Clock.getInstance().now();
+        long end = System.currentTimeMillis();
         long diff = end - start;
+        _context.statManager().addRateData("crypto.dhGeneratePublicTime", diff, diff);
         if (diff > 1000) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Took more than a second (" + diff + "ms) to generate local DH value");
@@ -339,7 +342,7 @@ public class DHSessionKeyBuilder {
      *
      */
     private final SessionKey calculateSessionKey(BigInteger myPrivateValue, BigInteger publicPeerValue) {
-        long start = Clock.getInstance().now();
+        long start = System.currentTimeMillis();
         SessionKey key = new SessionKey();
         BigInteger exchangedKey = publicPeerValue.modPow(myPrivateValue, CryptoConstants.elgp);
         byte buf[] = exchangedKey.toByteArray();
@@ -361,8 +364,10 @@ public class DHSessionKeyBuilder {
                 _log.debug("Storing " + remaining.length + " bytes from the end of the DH exchange");
         }
         key.setData(val);
-        long end = Clock.getInstance().now();
+        long end = System.currentTimeMillis();
         long diff = end - start;
+        
+        _context.statManager().addRateData("crypto.dhCalculateSessionTime", diff, diff);
         if (diff > 1000) {
             if (_log.shouldLog(Log.WARN)) _log.warn("Generating session key took too long (" + diff + " ms");
         } else {
@@ -490,10 +495,12 @@ public class DHSessionKeyBuilder {
                 curSize = startSize;
                 while (curSize < _minSize) {
                     while (curSize < _maxSize) {
+                        long curStart = System.currentTimeMillis();
                         curSize = addBuilder(precalc(curSize));
+                        long curCalc = System.currentTimeMillis() - curStart;
                         // for some relief...
                         try {
-                            Thread.sleep(CALC_DELAY);
+                            Thread.sleep(CALC_DELAY + curCalc * 10);
                         } catch (InterruptedException ie) { // nop
                         }
                     }

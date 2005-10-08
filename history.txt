@@ -1,4 +1,9 @@
-$Id: history.txt,v 1.284 2005/10/07 05:23:01 jrandom Exp $
+$Id: history.txt,v 1.285 2005/10/07 15:19:04 jrandom Exp $
+
+2005-10-08  jrandom
+    * Use the OS clock for stat timing, since it doesn't jump around (though
+      still use the NTP'ed clock for display)
+    * Added new DH stats
 
 * 2005-10-07  0.6.1.2 released
 
