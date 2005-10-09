@@ -732,10 +732,12 @@ public class Connection {
                 _log.debug("Resetting the inactivity timer, but its gone!", new Exception("where did it go?"));
             return;
         }
-        long howLong = _activityTimer.getTimeLeft();
+        long howLong = _options.getInactivityTimeout();
+        howLong += _context.random().nextInt(30*1000); // randomize it a bit, so both sides don't do it at once
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Resetting the inactivity timer to " + howLong, new Exception("Reset by"));
         // this will get rescheduled, and rescheduled, and rescheduled...
+        SimpleTimer.getInstance().removeEvent(_activityTimer);
         SimpleTimer.getInstance().addEvent(_activityTimer, howLong);
     }
     

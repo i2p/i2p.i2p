@@ -1,4 +1,12 @@
-$Id: history.txt,v 1.285 2005/10/07 15:19:04 jrandom Exp $
+$Id: history.txt,v 1.286 2005/10/08 17:05:49 jrandom Exp $
+
+2005-10-09  jrandom
+    * Now that the streaming lib works reasonably, set the default inactivity 
+      event to send a 0 byte keepalive payload, rather than disconnecting the
+      stream.  This should cut the irc netsplits and help out with other long
+      lived streams.  The default timeout is now less than the old timeout as
+      well, so the keepalive will be sent before earlier builds fire their
+      fatal timeouts.
 
 2005-10-08  jrandom
     * Use the OS clock for stat timing, since it doesn't jump around (though

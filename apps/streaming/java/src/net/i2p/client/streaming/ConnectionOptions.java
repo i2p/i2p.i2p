@@ -105,8 +105,8 @@ public class ConnectionOptions extends I2PSocketOptionsImpl {
         setWindowSize(getInt(opts, PROP_INITIAL_WINDOW_SIZE, INITIAL_WINDOW_SIZE));
         setMaxResends(getInt(opts, PROP_MAX_RESENDS, DEFAULT_MAX_SENDS));
         setWriteTimeout(getInt(opts, PROP_WRITE_TIMEOUT, -1));
-        setInactivityTimeout(getInt(opts, PROP_INACTIVITY_TIMEOUT, 2*60*1000));
-        setInactivityAction(getInt(opts, PROP_INACTIVITY_ACTION, INACTIVITY_ACTION_DISCONNECT));
+        setInactivityTimeout(getInt(opts, PROP_INACTIVITY_TIMEOUT, 90*1000));
+        setInactivityAction(getInt(opts, PROP_INACTIVITY_ACTION, INACTIVITY_ACTION_SEND));
         setInboundBufferSize(getMaxMessageSize() * (Connection.MAX_WINDOW_SIZE + 2));
         setCongestionAvoidanceGrowthRateFactor(getInt(opts, PROP_CONGESTION_AVOIDANCE_GROWTH_RATE_FACTOR, 1));
         setSlowStartGrowthRateFactor(getInt(opts, PROP_SLOW_START_GROWTH_RATE_FACTOR, 1));
@@ -140,9 +140,9 @@ public class ConnectionOptions extends I2PSocketOptionsImpl {
         if (opts.containsKey(PROP_WRITE_TIMEOUT))
             setWriteTimeout(getInt(opts, PROP_WRITE_TIMEOUT, -1));
         if (opts.containsKey(PROP_INACTIVITY_TIMEOUT))
-            setInactivityTimeout(getInt(opts, PROP_INACTIVITY_TIMEOUT, 2*60*1000));
+            setInactivityTimeout(getInt(opts, PROP_INACTIVITY_TIMEOUT, 90*1000));
         if (opts.containsKey(PROP_INACTIVITY_ACTION))
-            setInactivityAction(getInt(opts, PROP_INACTIVITY_ACTION, INACTIVITY_ACTION_DISCONNECT));
+            setInactivityAction(getInt(opts, PROP_INACTIVITY_ACTION, INACTIVITY_ACTION_SEND));
         setInboundBufferSize(getMaxMessageSize() * (Connection.MAX_WINDOW_SIZE + 2));
         if (opts.contains(PROP_CONGESTION_AVOIDANCE_GROWTH_RATE_FACTOR))
             setCongestionAvoidanceGrowthRateFactor(getInt(opts, PROP_CONGESTION_AVOIDANCE_GROWTH_RATE_FACTOR, 2));
