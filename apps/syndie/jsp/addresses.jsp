@@ -20,7 +20,7 @@ if (!user.getAuthenticated()) {
     String action = request.getParameter("action");
     if ( (action != null) && ("Change".equals(action)) ) {
         String oldPetname = request.getParameter("petname");
-        PetName cur = names.getName(oldPetname);
+        PetName cur = names.getByName(oldPetname);
         if (cur != null) {
           cur.setName(request.getParameter("name"));
           cur.setNetwork(request.getParameter("network"));
@@ -43,7 +43,7 @@ if (!user.getAuthenticated()) {
           %><span class="b_addrMsgOk">Address updated</span><%
         }
     } else if ( (action != null) && ("Add".equals(action)) ) {
-        PetName cur = names.getName(request.getParameter("name"));
+        PetName cur = names.getByName(request.getParameter("name"));
         if (cur != null) { %><span class="b_addrMsgErr">Address already exists</span><% } else {
           cur = new PetName();
           cur.setName(request.getParameter("name"));
@@ -63,7 +63,7 @@ if (!user.getAuthenticated()) {
           %><span class="b_addrMsgOk">Address added</span><%
         }
     } else if ( (action != null) && ("Delete".equals(action)) ) {
-        PetName cur = names.getName(request.getParameter("name"));
+        PetName cur = names.getByName(request.getParameter("name"));
         if (cur != null) { 
           if ( ("syndiearchive".equals(cur.getProtocol())) && (BlogManager.instance().authorizeRemote(user)) ) {
             BlogManager.instance().unscheduleSyndication(cur.getLocation());
@@ -90,7 +90,7 @@ if (!user.getAuthenticated()) {
 <%
     StringBuffer buf = new StringBuffer(128);
     for (Iterator iter = sorted.iterator(); iter.hasNext(); ) {
-        PetName name = names.getName((String)iter.next());
+        PetName name = names.getByName((String)iter.next());
         buf.append("<tr class=\"b_addrDetail\"><form action=\"addresses.jsp\" method=\"POST\">");
         buf.append("<input type=\"hidden\" name=\"petname\" value=\"").append(name.getName()).append("\" />");
         buf.append("<td class=\"b_addrName\"><input class=\"b_addrName\" type=\"text\" size=\"20\" name=\"name\" value=\"").append(name.getName()).append("\" /></td>");

@@ -45,7 +45,7 @@ for (Iterator iter = user.getPetNameDB().iterator(); iter.hasNext(); ) {
     String location = request.getParameter("location");
     String pn = request.getParameter("archivepetname");
     if ( (pn != null) && (pn.trim().length() > 0) ) {
-      PetName pnval = user.getPetNameDB().getName(pn);
+      PetName pnval = user.getPetNameDB().getByName(pn);
       if (pnval != null) location = pnval.getLocation();
     }
     remote.fetchIndex(user, request.getParameter("schema"), location, request.getParameter("proxyhost"), request.getParameter("proxyport"));

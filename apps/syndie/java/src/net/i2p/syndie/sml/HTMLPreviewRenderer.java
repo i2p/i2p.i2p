@@ -105,7 +105,7 @@ public class HTMLPreviewRenderer extends HTMLRenderer {
 
                 String knownName = null;
                 if (_user != null)
-                    knownName = _user.getPetNameDB().getLocation(a.location).getName();
+                    knownName = _user.getPetNameDB().getByLocation(a.location).getName();
                 if (knownName != null) {
                     _postBodyBuffer.append(' ').append(getSpan("summDetailAddrKnown"));
                     _postBodyBuffer.append(sanitizeString(knownName)).append("</span>");
@@ -134,7 +134,7 @@ public class HTMLPreviewRenderer extends HTMLRenderer {
                 _postBodyBuffer.append("\">").append(sanitizeString(a.name)).append("</a>");
                 if (a.description != null)
                     _postBodyBuffer.append(": ").append(getSpan("summDetailArchiveDesc")).append(sanitizeString(a.description)).append("</span>");
-                if (null == _user.getPetNameDB().getLocation(a.location)) {
+                if (null == _user.getPetNameDB().getByLocation(a.location)) {
                     _postBodyBuffer.append(" <a ").append(getClass("summDetailArchiveBookmark")).append(" href=\"");
                     _postBodyBuffer.append(getBookmarkURL(a.name, a.location, a.locationSchema, "syndiearchive"));
                     _postBodyBuffer.append("\">bookmark</a>");

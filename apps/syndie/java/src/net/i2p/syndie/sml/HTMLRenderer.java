@@ -468,7 +468,7 @@ public class HTMLRenderer extends EventReceiverImpl {
         if ( (schema == null) || (location == null) ) return;
         PetName pn = null;
         if (_user != null)
-            pn = _user.getPetNameDB().getLocation(location);
+            pn = _user.getPetNameDB().getByLocation(location);
         if (pn != null) {
             _bodyBuffer.append(getSpan("addr")).append(sanitizeString(anchorText)).append("</span>");
             _bodyBuffer.append(getSpan("addrKnownName")).append("(").append(sanitizeString(pn.getName())).append(")</span>");
@@ -633,7 +633,7 @@ public class HTMLRenderer extends EventReceiverImpl {
                     
                     PetName pn = null;
                     if (_user != null)
-                        pn = _user.getPetNameDB().getLocation(a.location);
+                        pn = _user.getPetNameDB().getByLocation(a.location);
                     if (pn != null) {
                         _postBodyBuffer.append(' ').append(getSpan("summDetailAddrKnown"));
                         _postBodyBuffer.append(sanitizeString(pn.getName())).append("</span>");
@@ -662,7 +662,7 @@ public class HTMLRenderer extends EventReceiverImpl {
                     _postBodyBuffer.append("\">").append(sanitizeString(a.name)).append("</a>");
                     if (a.description != null)
                         _postBodyBuffer.append(": ").append(getSpan("summDetailArchiveDesc")).append(sanitizeString(a.description)).append("</span>");
-                    if (null == _user.getPetNameDB().getLocation(a.location)) {
+                    if (null == _user.getPetNameDB().getByLocation(a.location)) {
                         _postBodyBuffer.append(" <a ").append(getClass("summDetailArchiveBookmark")).append(" href=\"");
                         _postBodyBuffer.append(getBookmarkURL(a.name, a.location, a.locationSchema, "syndiearchive"));
                         _postBodyBuffer.append("\">bookmark it</a>");
@@ -767,7 +767,7 @@ public class HTMLRenderer extends EventReceiverImpl {
         
         PetName pn = null;
         if ( (_entry != null) && (_user != null) )
-            pn = _user.getPetNameDB().getLocation(_entry.getURI().getKeyHash().toBase64());
+            pn = _user.getPetNameDB().getByLocation(_entry.getURI().getKeyHash().toBase64());
         //if (knownName != null)
         //    _preBodyBuffer.append("Pet name: ").append(sanitizeString(knownName)).append(" ");
 

@@ -62,7 +62,7 @@ public class RemoteArchiveBean {
     
     private boolean ignoreBlog(User user, Hash blog) {
         PetNameDB db = user.getPetNameDB();
-        PetName pn = db.getLocation(blog.toBase64());
+        PetName pn = db.getByLocation(blog.toBase64());
         return ( (pn!= null) && (pn.isMember("Ignore")) );
     }
     

@@ -11,7 +11,7 @@ if (user.getAuthenticated() && (null != request.getParameter("action")) ) {
     group = "Ignore";
   boolean unignore = ("Unignore blog".equals(request.getParameter("action")));
 
-  PetName pn = user.getPetNameDB().getLocation(blog);
+  PetName pn = user.getPetNameDB().getByLocation(blog);
   String name = null;
   if (pn != null) name = pn.getName();
   if (name == null)

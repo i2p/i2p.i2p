@@ -66,7 +66,7 @@ if (!user.getAuthenticated()) {
           PetNameDB db = user.getPetNameDB();
           if (entryHeaders == null) entryHeaders = "";
           for (Iterator iter = db.getNames().iterator(); iter.hasNext(); ) {
-            PetName pn = db.getName((String)iter.next());
+            PetName pn = db.getByName((String)iter.next());
             if ( (pn != null) && (pn.getIsPublic()) ) {
               entryHeaders = entryHeaders + '\n' + HTMLRenderer.HEADER_PETNAME + ": " + 
                              pn.getName() + "\t" + pn.getNetwork() + "\t" + pn.getProtocol() + "\t" + pn.getLocation();
@@ -107,7 +107,7 @@ PetNameDB db = user.getPetNameDB();
 TreeSet names = new TreeSet();
 for (Iterator iter = db.getNames().iterator(); iter.hasNext(); ) {
   String name = (String)iter.next();
-  PetName pn = db.getName(name);
+  PetName pn = db.getByName(name);
   if ("syndiearchive".equals(pn.getProtocol()))
     names.add(pn.getName());
 }

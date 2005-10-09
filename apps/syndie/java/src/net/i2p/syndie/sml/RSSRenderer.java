@@ -27,7 +27,7 @@ public class RSSRenderer extends HTMLRenderer {
         out.write("    <link>" + urlPrefix + sanitizeXML(getEntryURL()) + "</link>\n");
         out.write("    <guid isPermalink=\"false\">" + urlPrefix + entry.getURI().toString() + "</guid>\n");
         out.write("    <pubDate>" + getRFC822Date(entry.getURI().getEntryId()) + "</pubDate>\n");
-        PetName pn = user.getPetNameDB().getLocation(entry.getURI().getKeyHash().toBase64());
+        PetName pn = user.getPetNameDB().getByLocation(entry.getURI().getKeyHash().toBase64());
         String author = pn.getName();
         if (author == null) {
             BlogInfo info = archive.getBlogInfo(entry.getURI());
@@ -196,7 +196,7 @@ public class RSSRenderer extends HTMLRenderer {
         if ( (schema == null) || (location == null) ) return;
         PetName pn = null;
         if (_user != null)
-            pn = _user.getPetNameDB().getLocation(location);
+            pn = _user.getPetNameDB().getByLocation(location);
         if (pn != null) {
             _bodyBuffer.append(sanitizeString(anchorText));
         } else {
@@ -254,7 +254,7 @@ public class RSSRenderer extends HTMLRenderer {
 
                 PetName pn = null;
                 if (_user != null)
-                    pn = _user.getPetNameDB().getLocation(a.location);
+                    pn = _user.getPetNameDB().getByLocation(a.location);
                 if (pn == null) {
                     StringBuffer url = new StringBuffer(128);
                     url.append("addresses.jsp?network=");

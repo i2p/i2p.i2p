@@ -16,7 +16,7 @@ public class PetNameDB {
         _names = Collections.synchronizedMap(new HashMap());
     }
 
-    public PetName getName(String name) { return (PetName)_names.get(name); }
+    public PetName getByName(String name) { return (PetName)_names.get(name); }
     public void add(PetName pn) { _names.put(pn.getName(), pn); }
     public void clear() { _names.clear(); }
     public boolean contains(PetName pn) { return _names.containsValue(pn); }
@@ -38,7 +38,7 @@ public class PetNameDB {
         return rv;
     }
     
-    public PetName getLocation(String location) { 
+    public PetName getByLocation(String location) { 
         if (location == null) return null;
         synchronized (_names) {
             for (Iterator iter = iterator(); iter.hasNext(); ) {

@@ -100,7 +100,7 @@ public class ArchiveViewerBean {
         
         for (int i = 0; i < index.getNewestBlogCount(); i++) {
             Hash cur = index.getNewestBlog(i);
-            PetName pn = user.getPetNameDB().getLocation(cur.toBase64());
+            PetName pn = user.getPetNameDB().getByLocation(cur.toBase64());
             String knownName = null;
             if (pn != null) {
                 knownName = pn.getName();
@@ -127,7 +127,7 @@ public class ArchiveViewerBean {
         Set blogs = index.getUniqueBlogs();
         for (Iterator iter = blogs.iterator(); iter.hasNext(); ) {
             Hash cur = (Hash)iter.next();
-            PetName pn = user.getPetNameDB().getLocation(cur.toBase64());
+            PetName pn = user.getPetNameDB().getByLocation(cur.toBase64());
             String knownName = null;
             if (pn != null) {
                 knownName = pn.getName();
@@ -492,7 +492,7 @@ public class ArchiveViewerBean {
             PetNameDB db = user.getPetNameDB();
             for (Iterator iter = db.getNames().iterator(); iter.hasNext(); ) {
                 String name = (String)iter.next();
-                PetName pn = db.getName(name);
+                PetName pn = db.getByName(name);
                 if ("syndie".equals(pn.getNetwork()) && "syndieblog".equals(pn.getProtocol()) && pn.isMember(group)) {
                     byte pnLoc[] = Base64.decode(pn.getLocation());
                     if (pnLoc != null) {
@@ -515,7 +515,7 @@ public class ArchiveViewerBean {
             BlogURI uri = (BlogURI)uris.get(i);
             Hash k = uri.getKeyHash();
             if (k == null) continue;
-            PetName pn = user.getPetNameDB().getLocation(k.toBase64());
+            PetName pn = user.getPetNameDB().getByLocation(k.toBase64());
             if ( (pn != null) && (pn.isMember("Ignore")) ) {
                 uris.remove(i);
                 i--;
