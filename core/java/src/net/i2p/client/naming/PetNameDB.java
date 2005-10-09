@@ -16,15 +16,15 @@ public class PetNameDB {
         _names = Collections.synchronizedMap(new HashMap());
     }
 
-    public PetName getByName(String name) { return (PetName)_names.get(name); }
-    public void add(PetName pn) { _names.put(pn.getName(), pn); }
+    public PetName getByName(String name) { return (PetName)_names.get(name.toLowerCase()); }
+    public void add(PetName pn) { _names.put(pn.getName().toLowerCase(), pn); }
     public void clear() { _names.clear(); }
     public boolean contains(PetName pn) { return _names.containsValue(pn); }
-    public boolean containsName(String name) { return _names.containsKey(name); }
+    public boolean containsName(String name) { return _names.containsKey(name.toLowerCase()); }
     public boolean isEmpty() { return _names.isEmpty(); }
     public Iterator iterator() { return new LinkedList(_names.values()).iterator(); }
     public void remove(PetName pn) { _names.values().remove(pn); }
-    public void removeName(String name) { _names.remove(name); }
+    public void removeName(String name) { _names.remove(name.toLowerCase()); }
     public int size() { return _names.size(); }
     public Set getNames() { return new HashSet(_names.keySet()); }
     public List getGroups() {
