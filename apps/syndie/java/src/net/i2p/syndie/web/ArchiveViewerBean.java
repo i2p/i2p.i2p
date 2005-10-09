@@ -100,10 +100,9 @@ public class ArchiveViewerBean {
         
         for (int i = 0; i < index.getNewestBlogCount(); i++) {
             Hash cur = index.getNewestBlog(i);
-            String knownName = user.getPetNameDB().getNameByLocation(cur.toBase64());
-            PetName pn = null;
-            if (knownName != null) {
-                pn = user.getPetNameDB().get(knownName);
+            PetName pn = user.getPetNameDB().getLocation(cur.toBase64());
+            String knownName = null;
+            if (pn != null) {
                 knownName = pn.getName();
             }
             if ( (pn != null) && (pn.isMember("Ignore")) )
@@ -128,10 +127,9 @@ public class ArchiveViewerBean {
         Set blogs = index.getUniqueBlogs();
         for (Iterator iter = blogs.iterator(); iter.hasNext(); ) {
             Hash cur = (Hash)iter.next();
-            String knownName = user.getPetNameDB().getNameByLocation(cur.toBase64());
-            PetName pn = null;
-            if (knownName != null) {
-                pn = user.getPetNameDB().get(knownName);
+            PetName pn = user.getPetNameDB().getLocation(cur.toBase64());
+            String knownName = null;
+            if (pn != null) {
                 knownName = pn.getName();
             }
             if ( (pn != null) && (pn.isMember("Ignore")) )
@@ -494,7 +492,7 @@ public class ArchiveViewerBean {
             PetNameDB db = user.getPetNameDB();
             for (Iterator iter = db.getNames().iterator(); iter.hasNext(); ) {
                 String name = (String)iter.next();
-                PetName pn = db.get(name);
+                PetName pn = db.getName(name);
                 if ("syndie".equals(pn.getNetwork()) && "syndieblog".equals(pn.getProtocol()) && pn.isMember(group)) {
                     byte pnLoc[] = Base64.decode(pn.getLocation());
                     if (pnLoc != null) {
@@ -517,13 +515,10 @@ public class ArchiveViewerBean {
             BlogURI uri = (BlogURI)uris.get(i);
             Hash k = uri.getKeyHash();
             if (k == null) continue;
-            String pname = user.getPetNameDB().getNameByLocation(k.toBase64());
-            if (pname != null) {
-                PetName pn = user.getPetNameDB().get(pname);
-                if ( (pn != null) && (pn.isMember("Ignore")) ) {
-                    uris.remove(i);
-                    i--;
-                }
+            PetName pn = user.getPetNameDB().getLocation(k.toBase64());
+            if ( (pn != null) && (pn.isMember("Ignore")) ) {
+                uris.remove(i);
+                i--;
             }
         }
     }

@@ -29,8 +29,8 @@ if (!BlogManager.instance().authorizeRemote(user)) {
   <input class="b_remoteChooserHost" type="text" size="10" name="proxyhost" value="<%=BlogManager.instance().getDefaultProxyHost()%>" />
   <input class="b_remoteChooserPort" type="text" size="4" name="proxyport" value="<%=BlogManager.instance().getDefaultProxyPort()%>" /><br />
 <span class="b_remoteChooserField">Bookmarked archives:</span> <select class="b_remoteChooserPN" name="archivepetname"><option value="">Custom location</option><%
-for (Iterator iter = user.getPetNameDB().getNames().iterator(); iter.hasNext(); ) {
-  PetName pn = user.getPetNameDB().get((String)iter.next());
+for (Iterator iter = user.getPetNameDB().iterator(); iter.hasNext(); ) {
+  PetName pn = (PetName)iter.next();
   if ("syndiearchive".equals(pn.getProtocol())) {
     %><option value="<%=HTMLRenderer.sanitizeTagParam(pn.getName())%>"><%=HTMLRenderer.sanitizeString(pn.getName())%></option><%
   }
@@ -45,7 +45,7 @@ for (Iterator iter = user.getPetNameDB().getNames().iterator(); iter.hasNext(); 
     String location = request.getParameter("location");
     String pn = request.getParameter("archivepetname");
     if ( (pn != null) && (pn.trim().length() > 0) ) {
-      PetName pnval = user.getPetNameDB().get(pn);
+      PetName pnval = user.getPetNameDB().getName(pn);
       if (pnval != null) location = pnval.getLocation();
     }
     remote.fetchIndex(user, request.getParameter("schema"), location, request.getParameter("proxyhost"), request.getParameter("proxyport"));

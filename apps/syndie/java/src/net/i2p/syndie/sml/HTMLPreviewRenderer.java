@@ -4,6 +4,7 @@ import java.io.*;
 import java.text.*;
 import java.util.*;
 import net.i2p.I2PAppContext;
+import net.i2p.client.naming.PetName;
 import net.i2p.data.*;
 import net.i2p.syndie.*;
 import net.i2p.syndie.data.*;
@@ -104,7 +105,7 @@ public class HTMLPreviewRenderer extends HTMLRenderer {
 
                 String knownName = null;
                 if (_user != null)
-                    knownName = _user.getPetNameDB().getNameByLocation(a.location);
+                    knownName = _user.getPetNameDB().getLocation(a.location).getName();
                 if (knownName != null) {
                     _postBodyBuffer.append(' ').append(getSpan("summDetailAddrKnown"));
                     _postBodyBuffer.append(sanitizeString(knownName)).append("</span>");
@@ -119,7 +120,8 @@ public class HTMLPreviewRenderer extends HTMLRenderer {
                     if (a.protocol != null)
                         _postBodyBuffer.append("protocol=").append(sanitizeTagParam(a.protocol)).append('&');
                     _postBodyBuffer.append("\">").append(sanitizeString(a.name)).append("</a>");
-                }
+                } 
+                importAddress(a);
             }
             _postBodyBuffer.append("<br />\n");
         }
@@ -132,7 +134,7 @@ public class HTMLPreviewRenderer extends HTMLRenderer {
                 _postBodyBuffer.append("\">").append(sanitizeString(a.name)).append("</a>");
                 if (a.description != null)
                     _postBodyBuffer.append(": ").append(getSpan("summDetailArchiveDesc")).append(sanitizeString(a.description)).append("</span>");
-                if (null == _user.getPetNameDB().getNameByLocation(a.location)) {
+                if (null == _user.getPetNameDB().getLocation(a.location)) {
                     _postBodyBuffer.append(" <a ").append(getClass("summDetailArchiveBookmark")).append(" href=\"");
                     _postBodyBuffer.append(getBookmarkURL(a.name, a.location, a.locationSchema, "syndiearchive"));
                     _postBodyBuffer.append("\">bookmark</a>");

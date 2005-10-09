@@ -4,6 +4,7 @@ import java.io.*;
 import java.util.*;
 import java.text.SimpleDateFormat;
 import net.i2p.I2PAppContext;
+import net.i2p.client.naming.PetName;
 import net.i2p.data.*;
 import net.i2p.syndie.*;
 import net.i2p.syndie.data.*;
@@ -26,7 +27,8 @@ public class RSSRenderer extends HTMLRenderer {
         out.write("    <link>" + urlPrefix + sanitizeXML(getEntryURL()) + "</link>\n");
         out.write("    <guid isPermalink=\"false\">" + urlPrefix + entry.getURI().toString() + "</guid>\n");
         out.write("    <pubDate>" + getRFC822Date(entry.getURI().getEntryId()) + "</pubDate>\n");
-        String author = user.getPetNameDB().getNameByLocation(entry.getURI().getKeyHash().toBase64());
+        PetName pn = user.getPetNameDB().getLocation(entry.getURI().getKeyHash().toBase64());
+        String author = pn.getName();
         if (author == null) {
             BlogInfo info = archive.getBlogInfo(entry.getURI());
             if (info != null)
@@ -192,10 +194,10 @@ public class RSSRenderer extends HTMLRenderer {
             _addresses.add(a);
         if (!continueBody()) { return; }
         if ( (schema == null) || (location == null) ) return;
-        String knownName = null;
+        PetName pn = null;
         if (_user != null)
-            knownName = _user.getPetNameDB().getNameByLocation(location);
-        if (knownName != null) {
+            pn = _user.getPetNameDB().getLocation(location);
+        if (pn != null) {
             _bodyBuffer.append(sanitizeString(anchorText));
         } else {
             _bodyBuffer.append(sanitizeString(anchorText));
@@ -250,10 +252,10 @@ public class RSSRenderer extends HTMLRenderer {
             for (int i = 0; i < _addresses.size(); i++) {
                 Address a = (Address)_addresses.get(i);
 
-                String knownName = null;
+                PetName pn = null;
                 if (_user != null)
-                    knownName = _user.getPetNameDB().getNameByLocation(a.location);
-                if (knownName == null) {
+                    pn = _user.getPetNameDB().getLocation(a.location);
+                if (pn == null) {
                     StringBuffer url = new StringBuffer(128);
                     url.append("addresses.jsp?network=");
                     url.append(sanitizeTagParam(a.schema)).append("&location=");

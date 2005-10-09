@@ -6,6 +6,7 @@ import java.util.*;
 import java.util.zip.*;
 import net.i2p.I2PAppContext;
 import net.i2p.client.naming.PetNameDB;
+import net.i2p.client.naming.PetName;
 import net.i2p.data.*;
 import net.i2p.util.EepGet;
 import net.i2p.util.EepGetScheduler;
@@ -61,8 +62,8 @@ public class RemoteArchiveBean {
     
     private boolean ignoreBlog(User user, Hash blog) {
         PetNameDB db = user.getPetNameDB();
-        String name = db.getNameByLocation(blog.toBase64());
-        return ( (name != null) && (db.get(name).isMember("Ignore")) );
+        PetName pn = db.getLocation(blog.toBase64());
+        return ( (pn!= null) && (pn.isMember("Ignore")) );
     }
     
     public void fetchMetadata(User user, Map parameters) {

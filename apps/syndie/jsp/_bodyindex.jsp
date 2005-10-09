@@ -11,13 +11,14 @@ if (user.getAuthenticated() && (null != request.getParameter("action")) ) {
     group = "Ignore";
   boolean unignore = ("Unignore blog".equals(request.getParameter("action")));
 
-  String name = user.getPetNameDB().getNameByLocation(blog);
+  PetName pn = user.getPetNameDB().getLocation(blog);
+  String name = null;
+  if (pn != null) name = pn.getName();
   if (name == null)
     name = request.getParameter("name");
   if (name == null)
     name = blog;
   if ( (name != null) && (blog != null) && ( (group != null) || (unignore) ) ) {
-    PetName pn = user.getPetNameDB().get(name);
     if (pn != null) {
       if (unignore)
         pn.removeGroup("Ignore");
@@ -26,7 +27,7 @@ if (user.getAuthenticated() && (null != request.getParameter("action")) ) {
     } else {
       pn = new PetName(name, "syndie", "syndieblog", blog);
       pn.addGroup(group);
-      user.getPetNameDB().set(name, pn);
+      user.getPetNameDB().add(pn);
     }
     BlogManager.instance().saveUser(user);
   }

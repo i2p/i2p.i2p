@@ -416,12 +416,12 @@ public class BlogManager {
         PetNameDB userDb = user.getPetNameDB();
         PetNameDB routerDb = _context.petnameDb();
         // horribly inefficient...
-        for (Iterator names = userDb.getNames().iterator(); names.hasNext();) {
-            PetName pn = userDb.get((String)names.next());
+        for (Iterator iter = userDb.iterator(); iter.hasNext();) {
+            PetName pn = (PetName)iter.next();
             if (pn == null) continue;
             Destination existing = _context.namingService().lookup(pn.getName());
             if (existing == null && pn.getNetwork().equalsIgnoreCase("i2p")) {
-                routerDb.set(pn.getName(), pn);
+                routerDb.add(pn);
                 try {
                     routerDb.store();
                 } catch (IOException ioe) {
@@ -567,10 +567,10 @@ public class BlogManager {
         // no need to quote user/location further, as they've been sanitized
         
         PetNameDB names = user.getPetNameDB();
-        if (names.exists(name))
+        if (names.containsName(name))
             return "<span class=\"b_addrMsgErr\">Name is already in use</span>";
         PetName pn = new PetName(name, schema, protocol, location);
-        names.set(name, pn);
+        names.add(pn);
         
         try {
             names.store(user.getAddressbookLocation());

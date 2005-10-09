@@ -99,7 +99,7 @@ public class PostBean {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Posted the entry " + uri.toString() + " (archive = " + _archive + ")");
         if ( (uri != null) && BlogManager.instance().authorizeRemote(_user) ) {
-            PetName pn = _user.getPetNameDB().get(_archive);
+            PetName pn = _user.getPetNameDB().getName(_archive);
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Archive to petname? " + pn + " (protocol: " + (pn != null ? pn.getProtocol() : "") + ")");
             if ( (pn != null) && ("syndiearchive".equals(pn.getProtocol())) ) {
