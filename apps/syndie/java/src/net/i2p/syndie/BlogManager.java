@@ -10,12 +10,14 @@ import net.i2p.client.naming.PetNameDB;
 import net.i2p.data.*;
 import net.i2p.syndie.data.*;
 import net.i2p.syndie.sml.*;
+import net.i2p.util.Log;
 
 /**
  *
  */
 public class BlogManager {
     private I2PAppContext _context;
+    private Log _log;
     private static BlogManager _instance;
     private File _blogKeyDir;
     private File _privKeyDir;
@@ -28,21 +30,30 @@ public class BlogManager {
     
     static {
         TimeZone.setDefault(TimeZone.getTimeZone("GMT"));
-        String rootDir = I2PAppContext.getGlobalContext().getProperty("syndie.rootDir");
-        if (false) {
-            if (rootDir == null)
-                rootDir = System.getProperty("user.home");
-            rootDir = rootDir + File.separatorChar + ".syndie";
-        } else {
-            if (rootDir == null)
-                rootDir = "./syndie";
-        }
-        _instance = new BlogManager(I2PAppContext.getGlobalContext(), rootDir);
     }
-    public static BlogManager instance() { return _instance; }
     
-    public BlogManager(I2PAppContext ctx, String rootDir) {
+    public static BlogManager instance() { 
+        synchronized (BlogManager.class) {
+            if (_instance == null) {
+                String rootDir = I2PAppContext.getGlobalContext().getProperty("syndie.rootDir");
+                if (false) {
+                    if (rootDir == null)
+                        rootDir = System.getProperty("user.home");
+                    rootDir = rootDir + File.separatorChar + ".syndie";
+                } else {
+                    if (rootDir == null)
+                        rootDir = "./syndie";
+                }
+                _instance = new BlogManager(I2PAppContext.getGlobalContext(), rootDir);
+            }
+            return _instance; 
+        }
+    }
+    
+    public BlogManager(I2PAppContext ctx, String rootDir) { this(ctx, rootDir, true); }
+    public BlogManager(I2PAppContext ctx, String rootDir, boolean regenIndex) {
         _context = ctx;
+        _log = ctx.logManager().getLog(BlogManager.class);
         _rootDir = new File(rootDir);
         _rootDir.mkdirs();
         readConfig();
@@ -63,7 +74,8 @@ public class BlogManager {
         _userDir.mkdirs();
         _tempDir.mkdirs();
         _archive = new Archive(ctx, _archiveDir.getAbsolutePath(), _cacheDir.getAbsolutePath());
-        _archive.regenerateIndex();
+        if (regenIndex)
+            _archive.regenerateIndex();
     }
     
     private File getConfigFile() { return new File(_rootDir, "syndie.config"); }
@@ -76,13 +88,16 @@ public class BlogManager {
                 for (Iterator iter = p.keySet().iterator(); iter.hasNext(); ) {
                     String key = (String)iter.next();
                     System.setProperty(key, p.getProperty(key));
-                    System.out.println("Read config prop [" + key + "] = [" + p.getProperty(key) + "]");
+                    if (_log.shouldLog(Log.DEBUG))
+                        _log.debug("Read config prop [" + key + "] = [" + p.getProperty(key) + "]");
                 }
             } catch (IOException ioe) {
-                ioe.printStackTrace();
+                if (_log.shouldLog(Log.DEBUG))
+                        _log.debug("Err reading", ioe);
             }
         } else {
-            System.out.println("Config doesn't exist: " + config.getPath());
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Config doesn't exist: " + config.getPath());
         }
     }
     
@@ -97,7 +112,7 @@ public class BlogManager {
                     out.write(DataHelper.getUTF8(name + '=' + _context.getProperty(name) + '\n'));
             }
         } catch (IOException ioe) {
-            ioe.printStackTrace();
+            _log.error("Error writing the config", ioe);
         } finally {
             if (out != null) try { out.close(); } catch (IOException ioe) {}
         }
@@ -116,10 +131,10 @@ public class BlogManager {
             pub.writeBytes(out);
             priv.writeBytes(out);
         } catch (DataFormatException dfe) {
-            dfe.printStackTrace();
+            _log.error("Error creating the blog", dfe);
             return null;
         } catch (IOException ioe) {
-            ioe.printStackTrace();
+            _log.error("Error creating the blog", ioe);
             return null;
         }
         
@@ -181,9 +196,9 @@ public class BlogManager {
                     if (info != null)
                         rv.add(info);
                 } catch (IOException ioe) {
-                    ioe.printStackTrace();
+                    _log.error("Error listing the blog", ioe);
                 } catch (DataFormatException dfe) {
-                    dfe.printStackTrace();
+                    _log.error("Error listing the blog", dfe);
                 }
             }
         }
@@ -201,10 +216,66 @@ public class BlogManager {
             priv.readBytes(in);
             return priv;
         } catch (IOException ioe) {
-            ioe.printStackTrace();
+            _log.error("Error reading the blog key", ioe);
             return null;
         } catch (DataFormatException dfe) {
-            dfe.printStackTrace();
+            _log.error("Error reading the blog key", dfe);
+            return null;
+        }
+    }
+    
+    public User getUser(Hash blog) {
+        File files[] = _userDir.listFiles();
+        for (int i = 0; i < files.length; i++) {
+            if (files[i].isFile() && !files[i].isHidden()) {
+                Properties userProps = loadUserProps(files[i]);
+                if (userProps == null)
+                    continue;
+                User user = new User();
+                user.load(userProps);
+                if (blog.equals(user.getBlog()))
+                    return user;
+            }
+        }
+        return null;
+    }
+    
+    /**
+     * List of User instances
+     */
+    public List listUsers() {
+        File files[] = _userDir.listFiles();
+        List rv = new ArrayList();
+        for (int i = 0; i < files.length; i++) {
+            if (files[i].isFile() && !files[i].isHidden()) {
+                Properties userProps = loadUserProps(files[i]);
+                if (userProps == null)
+                    continue;
+                User user = new User();
+                user.load(userProps);
+                rv.add(user);
+            }
+        }
+        return rv;
+    }
+    
+    private Properties loadUserProps(File userFile) {
+        try {
+            Properties props = new Properties();
+            FileInputStream fin = new FileInputStream(userFile);
+            BufferedReader in = new BufferedReader(new InputStreamReader(fin, "UTF-8"));
+            String line = null;
+            while ( (line = in.readLine()) != null) {
+                int split = line.indexOf('=');
+                if (split <= 0) continue;
+                String key = line.substring(0, split);
+                String val = line.substring(split+1);
+                props.setProperty(key.trim(), val.trim());
+            }
+            String userHash = userFile.getName();
+            props.setProperty(User.PROP_USERHASH, userHash);
+            return props;
+        } catch (IOException ioe) {
             return null;
         }
     }
@@ -214,25 +285,17 @@ public class BlogManager {
         Hash userHash = _context.sha().calculateHash(DataHelper.getUTF8(login));
         Hash passHash = _context.sha().calculateHash(DataHelper.getUTF8(pass));
         File userFile = new File(_userDir, Base64.encode(userHash.getData()));
-        System.out.println("Attempting to login to " + login + " w/ pass = " + pass 
+        if (_log.shouldLog(Log.INFO))
+            _log.info("Attempting to login to " + login + " w/ pass = " + pass 
                            + ": file = " + userFile.getAbsolutePath() + " passHash = "
                            + Base64.encode(passHash.getData()));
         if (userFile.exists()) {
             try {
-                Properties props = new Properties();
-                FileInputStream fin = new FileInputStream(userFile);
-                BufferedReader in = new BufferedReader(new InputStreamReader(fin, "UTF-8"));
-                String line = null;
-                while ( (line = in.readLine()) != null) {
-                    int split = line.indexOf('=');
-                    if (split <= 0) continue;
-                    String key = line.substring(0, split);
-                    String val = line.substring(split+1);
-                    props.setProperty(key.trim(), val.trim());
-                }
+                Properties props = loadUserProps(userFile);
+                if (props == null) throw new IOException("Error reading " + userFile);
                 return user.login(login, pass, props);
             } catch (IOException ioe) {
-                ioe.printStackTrace();
+                _log.error("Error logging in", ioe);
                 return "<span class=\"b_loginMsgErr\">Error logging in - corrupt userfile</span>";
             }
         } else {
@@ -251,7 +314,6 @@ public class BlogManager {
     public String getRemotePasswordHash() { 
         String pass = _context.getProperty("syndie.remotePassword");
         
-        System.out.println("Remote password? [" + pass + "]");
         if ( (pass == null) || (pass.trim().length() <= 0) ) return null;
         return pass;
     }
@@ -330,7 +392,7 @@ public class BlogManager {
             }
             _archive.setDefaultSelector(defaultSelector);
         } catch (IOException ioe) {
-            ioe.printStackTrace();
+            _log.error("Error writing out the config", ioe);
         } finally {
             if (out != null) try { out.close(); } catch (IOException ioe) {}
             readConfig();
@@ -353,20 +415,29 @@ public class BlogManager {
         }
     }
     
-    public void saveUser(User user) {
-        if (!user.getAuthenticated()) return;
-        String userHash = Base64.encode(_context.sha().calculateHash(DataHelper.getUTF8(user.getUsername())).getData());
+    /**
+     * Store user info, regardless of whether they're logged in.  This lets you update a
+     * different user's info!
+     */
+    void storeUser(User user) {
+        String userHash = user.getUserHash();
         File userFile = new File(_userDir, userHash);
+        if (!userFile.exists()) return;
         FileOutputStream out = null;
         try {
             out = new FileOutputStream(userFile);
             out.write(DataHelper.getUTF8(user.export()));
             user.getPetNameDB().store(user.getAddressbookLocation());
         } catch (IOException ioe) {
-            ioe.printStackTrace();
+            _log.error("Error writing out the user", ioe);
         } finally {
             if (out != null) try { out.close(); } catch (IOException ioe){}
         }
+    }
+    
+    public void saveUser(User user) {
+        if (!user.getAuthenticated()) return;
+        storeUser(user);
     }
     public String register(User user, String login, String password, String registrationPassword, String blogName, String blogDescription, String contactURL) {
         System.err.println("Register [" + login + "] pass [" + password + "] name [" + blogName + "] descr [" + blogDescription + "] contact [" + contactURL + "] regPass [" + registrationPassword + "]");
@@ -399,7 +470,7 @@ public class BlogManager {
                 bw.write("showexpanded=false\n");
                 bw.flush();
             } catch (IOException ioe) {
-                ioe.printStackTrace();
+                _log.error("Error registering the user", ioe);
                 return "<span class=\"b_regMsgErr\">Internal error registering - " + ioe.getMessage() + "</span>";
             } finally {
                 if (out != null) try { out.close(); } catch (IOException ioe) {}
@@ -425,12 +496,27 @@ public class BlogManager {
                 try {
                     routerDb.store();
                 } catch (IOException ioe) {
-                    ioe.printStackTrace();
+                    _log.error("Error exporting the hosts", ioe);
                     return "<span class=\"b_addrMsgErr\">Error exporting the hosts: " + ioe.getMessage() + "</span>";
                 }
             }
         }
         return "<span class=\"b_addrMsgOk\">Hosts exported</span>";
+    }
+    
+    /**
+     * Guess what the next entry ID should be for the given user.  Rounds down to 
+     * midnight of the current day + 1 for each post in that day.
+     */
+    public long getNextBlogEntry(User user) {
+        long entryId = -1;
+        long now = _context.clock().now();
+        long dayBegin = getDayBegin(now);
+        if (user.getMostRecentEntry() >= dayBegin)
+            entryId = user.getMostRecentEntry() + 1;
+        else
+            entryId = dayBegin;
+        return entryId;
     }
     
     public BlogURI createBlogEntry(User user, String subject, String tags, String entryHeaders, String sml) {
@@ -443,13 +529,7 @@ public class BlogManager {
         SigningPrivateKey privkey = getMyPrivateKey(info);
         if (privkey == null) return null;
         
-        long entryId = -1;
-        long now = _context.clock().now();
-        long dayBegin = getDayBegin(now);
-        if (user.getMostRecentEntry() >= dayBegin)
-            entryId = user.getMostRecentEntry() + 1;
-        else
-            entryId = dayBegin;
+        long entryId = getNextBlogEntry(user);
         
         StringTokenizer tok = new StringTokenizer(tags, " ,\n\t");
         String tagList[] = new String[tok.countTokens()];
@@ -466,12 +546,14 @@ public class BlogManager {
                 raw.append(tagList[i]).append('\t');
             raw.append('\n');
             if ( (entryHeaders != null) && (entryHeaders.trim().length() > 0) ) {
-                System.out.println("Entry headers: " + entryHeaders);
+                if (_log.shouldLog(Log.DEBUG))
+                    _log.debug("Creating entry with headers: " + entryHeaders);
                 BufferedReader userHeaders = new BufferedReader(new InputStreamReader(new ByteArrayInputStream(DataHelper.getUTF8(entryHeaders)), "UTF-8"));
                 String line = null;
                 while ( (line = userHeaders.readLine()) != null) {
                     line = line.trim();
-                    System.out.println("Line: " + line);
+                    if (_log.shouldLog(Log.DEBUG))
+                        _log.debug("header line: " + line);
                     if (line.length() <= 0) continue;
                     int split = line.indexOf('=');
                     int split2 = line.indexOf(':');
@@ -520,7 +602,7 @@ public class BlogManager {
                 return null;
             }
         } catch (IOException ioe) {
-            ioe.printStackTrace();
+            _log.error("Error creating post", ioe);
             return null;
         }
     }
@@ -536,7 +618,7 @@ public class BlogManager {
             info.load(metadataStream);
             return _archive.storeBlogInfo(info);
         } catch (IOException ioe) {
-            ioe.printStackTrace();
+            _log.error("Error importing meta", ioe);
             return false;
         }
     }
@@ -552,7 +634,7 @@ public class BlogManager {
             c.load(entryStream);
             return _archive.storeEntry(c);
         } catch (IOException ioe) {
-            ioe.printStackTrace();
+            _log.error("Error importing entry", ioe);
             return false;
         }
     }
@@ -616,7 +698,7 @@ public class BlogManager {
                 Destination d = new Destination(location);
                 return (d.getPublicKey() != null);
             } catch (DataFormatException dfe) {
-                dfe.printStackTrace();
+                _log.error("Error validating address location", dfe);
                 return false;
             }
         } else {

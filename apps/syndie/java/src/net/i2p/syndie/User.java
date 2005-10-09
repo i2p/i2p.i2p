@@ -16,6 +16,7 @@ public class User {
     private String _username;
     private String _hashedPassword;
     private Hash _blog;
+    private String _userHash;
     private long _mostRecentEntry;
     /** Group name to List of blog selectors, where the selectors are of the form
      * blog://$key, entry://$key/$entryId, blogtag://$key/$tag, tag://$tag
@@ -39,6 +40,8 @@ public class User {
     private String _torProxyHost;
     private int _torProxyPort;
     private PetNameDB _petnames;
+
+    static final String PROP_USERHASH = "__userHash";
     
     public User() {
         _context = I2PAppContext.getGlobalContext();
@@ -47,6 +50,7 @@ public class User {
     private void init() {
         _authenticated = false;
         _username = null;
+        _userHash = null;
         _hashedPassword = null;
         _blog = null;
         _mostRecentEntry = -1;
@@ -70,6 +74,7 @@ public class User {
     
     public boolean getAuthenticated() { return _authenticated; }
     public String getUsername() { return _username; }
+    public String getUserHash() { return _userHash; }
     public Hash getBlog() { return _blog; }
     public String getBlogStr() { return Base64.encode(_blog.getData()); }
     public long getMostRecentEntry() { return _mostRecentEntry; }
@@ -105,15 +110,22 @@ public class User {
     }
     
     public String login(String login, String pass, Properties props) {
-        String expectedPass = props.getProperty("password");
+        _username = login;
+        load(props);
         String hpass = Base64.encode(_context.sha().calculateHash(DataHelper.getUTF8(pass)).getData());
-        if (!hpass.equals(expectedPass)) {
-            _authenticated = false;
+        if (!hpass.equals(_hashedPassword)) {
             return "<span class=\"b_loginMsgErr\">Incorrect password</span>";
         }
-        
-        _username = login;
-        _hashedPassword = expectedPass;
+        _lastLogin = _context.clock().now();
+        _authenticated = true;
+        return LOGIN_OK;
+    }
+    
+    
+    public void load(Properties props) {
+        _authenticated = false;
+        _hashedPassword = props.getProperty("password");
+        _userHash = props.getProperty(PROP_USERHASH);
         
         // blog=luS9d3uaf....HwAE=
         String b = props.getProperty("blog");
@@ -185,9 +197,6 @@ public class User {
         _eepProxyHost = props.getProperty("eepproxyhost");
         _webProxyHost = props.getProperty("webproxyhost");
         _torProxyHost = props.getProperty("torproxyhost");
-        _lastLogin = _context.clock().now();
-        _authenticated = true;
-        return LOGIN_OK;
     }
     
     private int getInt(String val) {

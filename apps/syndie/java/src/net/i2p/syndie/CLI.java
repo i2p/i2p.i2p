@@ -13,7 +13,7 @@ public class CLI {
     public static final String USAGE = "Usage: \n" +
         "rootDir regenerateIndex\n" +
         "rootDir createBlog name description contactURL[ archiveURL]*\n" +
-        "rootDir createEntry blogPublicKeyHash tag[,tag]* (NOW|entryId) (NONE|entryKeyBase64) smlFile[ attachmentFile]*\n" +
+        "rootDir createEntry blogPublicKeyHash tag[,tag]* (NEXT|NOW|entryId) (NONE|entryKeyBase64) smlFile[ attachmentFile attachmentName attachmentDescription mimeType]*\n" +
         "rootDir listMyBlogs\n" +
         "rootDir listTags blogPublicKeyHash\n" +
         "rootDir listEntries blogPublicKeyHash blogTag\n" +
@@ -130,50 +130,117 @@ public class CLI {
     }
 
     private static void createEntry(String args[]) {
-        // "rootDir createEntry blogPublicKey tag[,tag]* (NOW|entryId) (NONE|entryKeyBase64) smlFile[ attachmentFile]*\n" +
-
+        // "rootDir createEntry blogPublicKeyHash tag[,tag]* (NEXT|NOW|entryId) (NONE|entryKeyBase64) "
+        //  smlFile[ attachmentFile attachmentName attachmentDescription mimeType]*\n"
+        String rootDir = args[0];
+        String hashStr = args[2];
+        List tags = new ArrayList();
+        StringTokenizer tok = new StringTokenizer(args[3], ",");
+        while (tok.hasMoreTokens())
+            tags.add(tok.nextToken().trim());
+        String entryIdDef = args[4];
+        String entryKeyDef = args[5];
+        String smlFile = args[6];
+        List attachmentFilenames = new ArrayList();
+        List attachmentNames = new ArrayList();
+        List attachmentDescriptions = new ArrayList();
+        List attachmentMimeTypes = new ArrayList();
+        for (int i = 7; i + 3 < args.length; i += 4) {
+            attachmentFilenames.add(args[i].trim());
+            attachmentNames.add(args[i+1].trim());
+            attachmentDescriptions.add(args[i+2].trim());
+            attachmentMimeTypes.add(args[i+3].trim());
+        }
         I2PAppContext ctx = I2PAppContext.getGlobalContext();
-        BlogManager mgr = new BlogManager(ctx, args[0]);
+        BlogManager mgr = new BlogManager(ctx, rootDir);
+        EntryContainer entry = createEntry(ctx, mgr, hashStr, tags, entryIdDef, entryKeyDef, smlFile, true,
+                                           attachmentFilenames, attachmentNames, attachmentDescriptions, 
+                                           attachmentMimeTypes);
+        if (entry != null)
+            mgr.getArchive().regenerateIndex();
+    }
+    
+    /**
+     * Create a new entry, storing it into the blogManager's archive and incrementing the 
+     * blog's "most recent id" setting.  This does not however regenerate the manager's index.
+     *
+     * @param blogHashStr base64(SHA256(blog public key))
+     * @param tags list of tags/categories to post under (String elements
+     * @param entryIdDef NEXT (for next entry id for the blog, or midnight of the current day),
+     *                   NOW (current time), or an explicit entry id
+     * @param entryKeyDef session key under which the entry should be encrypted
+     * @param smlFilename file in which the sml entry is to be found
+     * @param storeLocal if true, should this entry be stored in the mgr.getArchive()
+     * @param attachmentFilenames list of filenames for attachments to load
+     * @param attachmentNames list of names to use for the given attachments
+     * @param attachmentDescriptions list of descriptions for the given attachments
+     * @param attachmentMimeTypes list of mime types to use for the given attachments
+     * @return blog URI posted, or null
+     */
+    public static EntryContainer createEntry(I2PAppContext ctx, BlogManager mgr, String blogHashStr, List tags, 
+                                             String entryIdDef, String entryKeyDef, String smlFilename, boolean storeLocal,
+                                             List attachmentFilenames, List attachmentNames, 
+                                             List attachmentDescriptions, List attachmentMimeTypes) {
+        Hash blogHash = new Hash(Base64.decode(blogHashStr));
+        User user = mgr.getUser(blogHash);
         long entryId = -1;
-        if ("NOW".equals(args[4])) {
+        if ("NOW".equalsIgnoreCase(entryIdDef)) {
             entryId = ctx.clock().now();
+        } else if ("NEXT".equalsIgnoreCase(entryIdDef) || (entryIdDef == null)) {
+            entryId = mgr.getNextBlogEntry(user);
         } else {
             try {
-                entryId = Long.parseLong(args[4]);
+                entryId = Long.parseLong(entryIdDef);
             } catch (NumberFormatException nfe) {
                 nfe.printStackTrace();
-                return;
+                return null;
             }
         }
-        StringTokenizer tok = new StringTokenizer(args[3], ",");
-        String tags[] = new String[tok.countTokens()];
-        for (int i = 0; i < tags.length; i++)
-            tags[i] = tok.nextToken();
-        BlogURI uri = new BlogURI(new Hash(Base64.decode(args[2])), entryId);
+        String tagVals[] = new String[(tags != null ? tags.size() : 0)];
+        if (tags != null)
+            for (int i = 0; i < tags.size(); i++)
+                tagVals[i] = ((String)tags.get(i)).trim();
+        BlogURI uri = new BlogURI(blogHash, entryId);
         BlogInfo blog = mgr.getArchive().getBlogInfo(uri);
         if (blog == null) {
             System.err.println("Blog does not exist: " + uri);
-            return;
+            return null;
         }
         SigningPrivateKey key = mgr.getMyPrivateKey(blog);
         
         try {
-            byte smlData[] = read(args[6]);
-            EntryContainer c = new EntryContainer(uri, tags, smlData);
-            for (int i = 7; i < args.length; i++) {
-                c.addAttachment(read(args[i]), new File(args[i]).getName(), 
-                                "Attached file", "application/octet-stream");
+            byte smlData[] = read(smlFilename);
+            EntryContainer c = new EntryContainer(uri, tagVals, smlData);
+            if ( (attachmentFilenames != null) && 
+                 (attachmentFilenames.size() == attachmentNames.size()) && 
+                 (attachmentFilenames.size() == attachmentDescriptions.size()) && 
+                 (attachmentFilenames.size() == attachmentMimeTypes.size()) ) {
+                for (int i = 0; i < attachmentFilenames.size(); i++) {
+                    File attachmentFile = new File((String)attachmentFilenames.get(i));
+                    String name = (String)attachmentNames.get(i);
+                    String descr = (String)attachmentDescriptions.get(i);
+                    String mimetype = (String)attachmentMimeTypes.get(i);
+                    c.addAttachment(read(attachmentFile.getAbsolutePath()), name, descr, mimetype);
+                }
             }
             SessionKey entryKey = null;
-            if (!"NONE".equals(args[5]))
-                entryKey = new SessionKey(Base64.decode(args[5]));
+            if ( (entryKeyDef != null) && (entryKeyDef.trim().length() > 0) && (!"NONE".equalsIgnoreCase(entryKeyDef)) )
+                entryKey = new SessionKey(Base64.decode(entryKeyDef));
             c.seal(ctx, key, entryKey);
-            boolean ok = mgr.getArchive().storeEntry(c);
-            System.out.println("Blog entry created: " + c+ "? " + ok);
-            if (ok)
-                mgr.getArchive().regenerateIndex();
+            if (storeLocal) {
+                boolean ok = mgr.getArchive().storeEntry(c);
+                //System.out.println("Blog entry created: " + c+ "? " + ok);
+                if (!ok) {
+                    System.err.println("Error: store failed");
+                    return null;
+                }
+            }
+            user.setMostRecentEntry(uri.getEntryId());
+            mgr.storeUser(user); // saves even if !user.getAuthenticated()
+            return c;
         } catch (IOException ioe) {
             ioe.printStackTrace();
+            return null;
         }
     }
     

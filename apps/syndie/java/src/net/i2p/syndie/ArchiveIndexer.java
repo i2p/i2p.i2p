@@ -7,6 +7,7 @@ import net.i2p.I2PAppContext;
 import net.i2p.data.*;
 import net.i2p.syndie.data.*;
 import net.i2p.syndie.sml.*;
+import net.i2p.util.Log;
 
 /**
  * Dig through the archive to build an index
@@ -16,6 +17,7 @@ class ArchiveIndexer {
     private static final int RECENT_ENTRY_COUNT = 10;
     
     public static ArchiveIndex index(I2PAppContext ctx, Archive source) {
+        Log log = ctx.logManager().getLog(ArchiveIndexer.class);
         LocalArchiveIndex rv = new LocalArchiveIndex(ctx);
         rv.setGeneratedOn(ctx.clock().now());
         
@@ -32,7 +34,7 @@ class ArchiveIndexer {
                         rv.setHeader(tok.nextToken(), tok.nextToken());
                 }
             } catch (IOException ioe) {
-                ioe.printStackTrace();
+                log.error("Error reading header file", ioe);
             }
         }
         
@@ -66,7 +68,8 @@ class ArchiveIndexer {
             long metadate = metaFile.lastModified();
 
             List entries = source.listEntries(key, -1, null, null);
-            System.out.println("Entries under " + key + ": " + entries);
+            if (log.shouldLog(Log.DEBUG))
+                log.debug("Entries under " + key + ": " + entries);
             /** tag name --> ordered map of entryId to EntryContainer */
             Map tags = new TreeMap();
             
@@ -83,7 +86,8 @@ class ArchiveIndexer {
                     }
                     Map entriesByTag = (Map)tags.get(entryTags[t]);
                     entriesByTag.put(new Long(0-entry.getURI().getEntryId()), entry);
-                    System.out.println("Entries under tag " + entryTags[t] + ":" + entriesByTag.values());
+                    if (log.shouldLog(Log.DEBUG))
+                        log.debug("Entries under tag " + entryTags[t] + ":" + entriesByTag.values());
                 }
                     
                 if (entry.getURI().getEntryId() >= newSince) {
@@ -97,8 +101,8 @@ class ArchiveIndexer {
                     BlogURI parent = new BlogURI(reply.trim());
                     if ( (parent.getKeyHash() != null) && (parent.getEntryId() >= 0) ) 
                         rv.addReply(parent, entry.getURI());
-                    else
-                        System.err.println("Parent of " + entry.getURI() + " is not valid: [" + reply.trim() + "]");
+                    else if (log.shouldLog(Log.WARN))
+                        log.warn("Parent of " + entry.getURI() + " is not valid: [" + reply.trim() + "]");
                 }
             }
             

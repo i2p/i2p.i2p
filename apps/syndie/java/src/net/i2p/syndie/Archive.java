@@ -6,6 +6,7 @@ import java.text.*;
 import net.i2p.I2PAppContext;
 import net.i2p.data.*;
 import net.i2p.syndie.data.*;
+import net.i2p.util.Log;
 
 /**
  * Store blog info in the local filesystem.
@@ -25,6 +26,7 @@ import net.i2p.syndie.data.*;
  */
 public class Archive {
     private I2PAppContext _context;
+    private Log _log;
     private File _rootDir;
     private File _cacheDir;
     private Map _blogInfo;
@@ -42,6 +44,7 @@ public class Archive {
     
     public Archive(I2PAppContext ctx, String rootDir, String cacheDir) {
         _context = ctx;
+        _log = ctx.logManager().getLog(Archive.class);
         _rootDir = new File(rootDir);
         if (!_rootDir.exists())
             _rootDir.mkdirs();
@@ -69,12 +72,11 @@ public class Archive {
                         if (bi.verify(_context)) {
                             info.add(bi);
                         } else {
-                            System.err.println("Invalid blog (but we're storing it anyway): " + bi);
-                            new Exception("foo").printStackTrace();
-                            info.add(bi);
+                            _log.error("BlogInfo is invalid: " + bi);
+                            meta.delete();
                         }
                     } catch (IOException ioe) {
-                        ioe.printStackTrace();
+                        _log.error("Error loading the blog", ioe);
                     }
                 }
             }
@@ -110,8 +112,7 @@ public class Archive {
     }
     public boolean storeBlogInfo(BlogInfo info) { 
         if (!info.verify(_context)) {
-            System.err.println("Not storing the invalid blog " + info);
-            new Exception("foo!").printStackTrace();
+            _log.warn("Not storing invalid blog " + info);
             return false;
         }
         boolean isNew = true;
@@ -130,10 +131,11 @@ public class Archive {
             FileOutputStream out = new FileOutputStream(blogFile);
             info.write(out);
             out.close();
-            System.out.println("Blog info written to " + blogFile.getPath());
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Blog info written to " + blogFile.getPath());
             return true;
         } catch (IOException ioe) {
-            ioe.printStackTrace();
+            _log.error("Error writing out info", ioe);
             return false;
         }
     }
@@ -174,8 +176,9 @@ public class Archive {
                     entry = getCachedEntry(entryDir);
                 if ( (entry == null) || (!entryDir.exists()) ) {
                     if (!extractEntry(entries[j], entryDir, info)) {
-                        System.err.println("Entry " + entries[j].getPath() + " is not valid");
-                        new Exception("foo!!").printStackTrace();
+                        if (_log.shouldLog(Log.ERROR))
+                            _log.error("Entry " + entries[j].getPath() + " is not valid");
+                        entries[j].delete();
                         continue;
                     }
                     entry = getCachedEntry(entryDir);
@@ -183,12 +186,13 @@ public class Archive {
                 String tags[] = entry.getTags();
                 for (int t = 0; t < tags.length; t++) {
                     if (!rv.contains(tags[t])) {
-                        System.out.println("Found a new tag in cached " + entry.getURI() + ": " + tags[t]);
+                        if (_log.shouldLog(Log.DEBUG))
+                            _log.debug("Found a new tag in cached " + entry.getURI() + ": " + tags[t]);
                         rv.add(tags[t]);
                     }
                 }
             } catch (IOException ioe) {
-                ioe.printStackTrace();
+                _log.error("Error listing tags", ioe);
             }
         } // end iterating over the entries 
         
@@ -220,7 +224,7 @@ public class Archive {
                 return ce;
             return null;
         } catch (IOException ioe) {
-            ioe.printStackTrace();
+            _log.warn("Error reading cached entry... deleting cache elements");
         }
         
         File files[] = entryDir.listFiles();
@@ -262,8 +266,8 @@ public class Archive {
                         entry = getCachedEntry(entryDir);
                     if ((entry == null) || !entryDir.exists()) {
                         if (!extractEntry(entries[i], entryDir, info)) {
-                            System.err.println("Entry " + entries[i].getPath() + " is not valid");
-                            new Exception("foo!!!!").printStackTrace();
+                            _log.error("Entry " + entries[i].getPath() + " is not valid");
+                            entries[i].delete();
                             continue;
                         }
                         entry = getCachedEntry(entryDir);
@@ -274,8 +278,8 @@ public class Archive {
                     entry.load(new FileInputStream(entries[i]));
                     boolean ok = entry.verifySignature(_context, info);
                     if (!ok) {
-                        System.err.println("Keyed entry " + entries[i].getPath() + " is not valid");
-                        new Exception("foo!!!!!!").printStackTrace();
+                        _log.error("Keyed entry " + entries[i].getPath() + " is not valid");
+                        entries[i].delete();
                         continue;
                     }
 
@@ -294,16 +298,18 @@ public class Archive {
                     for (int j = 0; j < tags.length; j++) {
                         if (tags[j].equals(tag)) {
                             rv.add(entry);
-                            System.out.println("cached entry matched requested tag [" + tag + "]: " + entry.getURI());
+                            if (_log.shouldLog(Log.DEBUG))
+                                _log.debug("cached entry matched requested tag [" + tag + "]: " + entry.getURI());
                             break;
                         }
                     }
                 } else {
-                    System.out.println("cached entry is ok and no id or tag was requested: " + entry.getURI());
+                    if (_log.shouldLog(Log.DEBUG))
+                        _log.debug("cached entry is ok and no id or tag was requested: " + entry.getURI());
                     rv.add(entry);
                 }
             } catch (IOException ioe) {
-                ioe.printStackTrace();
+                _log.error("Error listing entries", ioe);
             }
         }
         return rv;
@@ -322,11 +328,11 @@ public class Archive {
 
         BlogInfo info = getBlogInfo(uri);
         if (info == null) {
-            System.out.println("no blog metadata for the uri " + uri);
+            _log.error("no blog metadata for the uri " + uri);
             return false;
         }
         if (!container.verifySignature(_context, info)) {
-            System.out.println("Not storing the invalid blog entry at " + uri);
+            _log.error("Not storing the invalid blog entry at " + uri);
             return false;
         } else {
             //System.out.println("Signature is valid: " + container.getSignature() + " for info " + info);
@@ -341,7 +347,7 @@ public class Archive {
             container.setCompleteSize(data.length);
             return true;
         } catch (IOException ioe) {
-            ioe.printStackTrace();
+            _log.error("Error storing", ioe);
             return false;
         }
     }
@@ -422,7 +428,7 @@ public class Archive {
             out.write(DataHelper.getUTF8(_index.toString()));
             out.flush();
         } catch (IOException ioe) {
-            ioe.printStackTrace();
+            _log.error("Error writing out the index");
         }
     }
 }

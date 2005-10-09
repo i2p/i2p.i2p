@@ -19,7 +19,7 @@
     <target name="jar" depends="builddep, compile">
         <jar destfile="./build/syndie.jar" basedir="./build/obj" includes="**/*.class">
             <manifest>
-                <attribute name="Main-Class" value="net.i2p.syndie.CLI" />
+                <attribute name="Main-Class" value="net.i2p.syndie.CLIPost" />
                 <attribute name="Class-Path" value="i2p.jar" />
             </manifest>
         </jar>
