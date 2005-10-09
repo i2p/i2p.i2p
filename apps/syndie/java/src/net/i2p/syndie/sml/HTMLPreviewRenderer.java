@@ -103,12 +103,12 @@ public class HTMLPreviewRenderer extends HTMLRenderer {
             for (int i = 0; i < _addresses.size(); i++) {
                 Address a = (Address)_addresses.get(i);
 
-                String knownName = null;
+                PetName pn = null;
                 if (_user != null)
-                    knownName = _user.getPetNameDB().getByLocation(a.location).getName();
-                if (knownName != null) {
+                    pn = _user.getPetNameDB().getByLocation(a.location);
+                if (pn != null) {
                     _postBodyBuffer.append(' ').append(getSpan("summDetailAddrKnown"));
-                    _postBodyBuffer.append(sanitizeString(knownName)).append("</span>");
+                    _postBodyBuffer.append(sanitizeString(pn.getName())).append("</span>");
                 } else {
                     _postBodyBuffer.append(" <a ").append(getClass("summDetailAddrLink")).append(" href=\"addresses.jsp?");
                     if (a.schema != null)
