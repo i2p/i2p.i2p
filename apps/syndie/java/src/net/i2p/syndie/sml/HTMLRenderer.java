@@ -443,7 +443,16 @@ public class HTMLRenderer extends EventReceiverImpl {
     }
     
     public void importAddress(Address a) {
-        if (I2PAppContext.getGlobalContext().getProperty("syndie.addressExport", "false").equalsIgnoreCase("true") 
+        if (_user != null && _user.getImportAddresses() && !_user.getPetNameDB().containsName(a.name)) {
+            PetName pn = new PetName(a.name, a.schema, a.protocol, a.location);
+            _user.getPetNameDB().add(pn);
+            try {
+                _user.getPetNameDB().store(_user.getAddressbookLocation());
+            } catch (IOException ioe) {
+                //ignore
+            }
+        }
+        if (BlogManager.instance().getImportAddresses() 
                 && I2PAppContext.getGlobalContext().namingService().lookup(a.name) == null 
                 && a.schema.equalsIgnoreCase("i2p")) {
             PetName pn = new PetName(a.name, a.schema, a.protocol, a.location);
@@ -630,7 +639,7 @@ public class HTMLRenderer extends EventReceiverImpl {
                 _postBodyBuffer.append(getSpan("summDetailAddr")).append("Addresses:</span>");
                 for (int i = 0; i < _addresses.size(); i++) {
                     Address a = (Address)_addresses.get(i);
-                    
+                    importAddress(a);
                     PetName pn = null;
                     if (_user != null)
                         pn = _user.getPetNameDB().getByLocation(a.location);
@@ -649,7 +658,6 @@ public class HTMLRenderer extends EventReceiverImpl {
                             _postBodyBuffer.append("protocol=").append(sanitizeTagParam(a.protocol)).append('&');
                         _postBodyBuffer.append("\">").append(sanitizeString(a.name)).append("</a>");
                     }                    
-                    importAddress(a);
                 }
                 _postBodyBuffer.append("<br />\n");
             }

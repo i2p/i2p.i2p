@@ -102,7 +102,7 @@ public class HTMLPreviewRenderer extends HTMLRenderer {
             _postBodyBuffer.append(getSpan("summDetailAddr")).append("Addresses:</span>");
             for (int i = 0; i < _addresses.size(); i++) {
                 Address a = (Address)_addresses.get(i);
-
+                importAddress(a);
                 PetName pn = null;
                 if (_user != null)
                     pn = _user.getPetNameDB().getByLocation(a.location);
@@ -121,7 +121,6 @@ public class HTMLPreviewRenderer extends HTMLRenderer {
                         _postBodyBuffer.append("protocol=").append(sanitizeTagParam(a.protocol)).append('&');
                     _postBodyBuffer.append("\">").append(sanitizeString(a.name)).append("</a>");
                 } 
-                importAddress(a);
             }
             _postBodyBuffer.append("<br />\n");
         }

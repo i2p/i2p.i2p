@@ -40,6 +40,7 @@ public class User {
     private String _torProxyHost;
     private int _torProxyPort;
     private PetNameDB _petnames;
+    private boolean _importAddresses;
 
     static final String PROP_USERHASH = "__userHash";
     
@@ -70,6 +71,7 @@ public class User {
         _lastLogin = -1;
         _lastMetaEntry = 0;
         _petnames = new PetNameDB();
+        _importAddresses = false;
     }
     
     public boolean getAuthenticated() { return _authenticated; }
@@ -102,6 +104,7 @@ public class User {
     public int getTorProxyPort() { return _torProxyPort; }
     
     public PetNameDB getPetNameDB() { return _petnames; }
+    public boolean getImportAddresses() { return _importAddresses; }
     
     public void invalidate() { 
         if (_authenticated)
@@ -197,6 +200,8 @@ public class User {
         _eepProxyHost = props.getProperty("eepproxyhost");
         _webProxyHost = props.getProperty("webproxyhost");
         _torProxyHost = props.getProperty("torproxyhost");
+        String importadr = props.getProperty("importaddresses", "false");
+        _importAddresses = (importadr != null) && (importadr.equals("true"));
     }
     
     private int getInt(String val) {
@@ -218,7 +223,7 @@ public class User {
         buf.append("showexpanded=" + getShowExpanded() + "\n");
         buf.append("defaultselector=" + getDefaultSelector() + "\n");
         buf.append("allowaccessremote=" + _allowAccessRemote + "\n");
-        
+        buf.append("importaddresses=" + getImportAddresses() + "\n");
         buf.append("groups=");
         Map groups = getBlogGroups();
         for (Iterator iter = groups.keySet().iterator(); iter.hasNext(); ) {
