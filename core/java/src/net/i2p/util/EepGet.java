@@ -487,12 +487,14 @@ public class EepGet {
             _log.debug("Status line: [" + line + "]");
         StringTokenizer tok = new StringTokenizer(line, " ");
         if (!tok.hasMoreTokens()) {
-            System.err.println("ERR: status "+  line);
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("ERR: status "+  line);
             return -1;
         }
         String protocol = tok.nextToken(); // ignored
         if (!tok.hasMoreTokens()) {
-            System.err.println("ERR: status "+  line);
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("ERR: status "+  line);
             return -1;
         }
         String rc = tok.nextToken();

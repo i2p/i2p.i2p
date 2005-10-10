@@ -99,6 +99,8 @@ public class CLIPost {
                     out = new FileOutputStream(fData);
                     entry.write(out, true);
                     out.close();
+                    fMeta.deleteOnExit();
+                    fData.deleteOnExit();
                 } catch (IOException ioe) {
                     System.err.println("Error writing temp files: " + ioe.getMessage());
                     return;
