@@ -135,6 +135,8 @@ public class TunnelController implements Logging {
         }
         if ("httpclient".equals(type)) {
             startHttpClient();
+        }else if("ircclient".equals(type)) {
+            startIrcClient();
         } else if ("client".equals(type)) {
             startClient();
         } else if ("server".equals(type)) {
@@ -158,6 +160,18 @@ public class TunnelController implements Logging {
             _tunnel.runHttpClient(new String[] { listenPort, sharedClient }, this);
         else
             _tunnel.runHttpClient(new String[] { listenPort, sharedClient, proxyList }, this);
+        acquire();
+        _running = true;
+    }
+    
+    private void startIrcClient() {
+        setI2CPOptions();
+        setSessionOptions();
+        setListenOn();
+        String listenPort = getListenPort();
+        String dest = getTargetDestination();
+        String sharedClient = getSharedClient();
+        _tunnel.runIrcClient(new String[] { listenPort, dest, sharedClient }, this);
         acquire();
         _running = true;
     }

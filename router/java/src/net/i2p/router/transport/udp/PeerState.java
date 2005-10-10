@@ -170,8 +170,8 @@ public class PeerState {
      * of 608
      */
     private static final int DEFAULT_MTU = 608;//600; //1500;
-    private static final int MIN_RTO = 800 + ACKSender.ACK_FREQUENCY;
-    private static final int MAX_RTO = 2000; // 5000;
+    private static final int MIN_RTO = 500 + ACKSender.ACK_FREQUENCY;
+    private static final int MAX_RTO = 5000; // 5000;
     
     public PeerState(I2PAppContext ctx) {
         _context = ctx;
@@ -515,7 +515,7 @@ public class PeerState {
         //if (true)
         //    _sendWindowBytes -= 10000;
         //else
-            _sendWindowBytes = _sendWindowBytes/4; //(_sendWindowBytes*2) / 3;
+            _sendWindowBytes = _sendWindowBytes/2; //(_sendWindowBytes*2) / 3;
         if (_sendWindowBytes < MINIMUM_WINDOW_BYTES)
             _sendWindowBytes = MINIMUM_WINDOW_BYTES;
         //if (congestionAt/2 < _slowStartThreshold)
@@ -632,7 +632,7 @@ public class PeerState {
                     float v = _context.random().nextFloat();
                     if (v < 0) v = 0-v;
                     if (v <= prob)
-                        _sendWindowBytes += 512; // bytesACKed;
+                        _sendWindowBytes += bytesACKed; //512; // bytesACKed;
                 }
             }
         }
@@ -640,7 +640,7 @@ public class PeerState {
             _sendWindowBytes = MAX_SEND_WINDOW_BYTES;
         _lastReceiveTime = _context.clock().now();
         
-        if (false) {
+        if (true) {
             if (_sendWindowBytesRemaining + bytesACKed <= _sendWindowBytes)
                 _sendWindowBytesRemaining += bytesACKed;
             else

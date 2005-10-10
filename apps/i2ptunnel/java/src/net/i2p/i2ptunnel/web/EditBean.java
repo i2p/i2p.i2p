@@ -30,7 +30,9 @@ public class EditBean extends IndexBean {
         if (controllers.size() > tunnel) {
             TunnelController cur = (TunnelController)controllers.get(tunnel);
             if (cur == null) return false;
-            return ( ("client".equals(cur.getType())) || ("httpclient".equals(cur.getType())) );
+            return ( ("client".equals(cur.getType())) || 
+            		 ("httpclient".equals(cur.getType()))||
+            		 ("ircclient".equals(cur.getType())));
         } else {
             return false;
         }

@@ -1,4 +1,18 @@
-$Id: history.txt,v 1.287 2005/10/09 00:46:57 jrandom Exp $
+$Id: history.txt,v 1.288 2005/10/09 06:35:15 jrandom Exp $
+
+2005-10-10  dust
+    * Implemented a new I2PTunnelIRCClient which locally filters inbound and
+      outbound IRC commands for anonymity and security purposes, removing all
+      CTCP messages except ACTION, as well as stripping the hostname from the
+      USER message (while leaving the nick and 'full name').  The IRC proxy
+      doesn't use this by default, but you can enable it by creating a new 
+      "IRC proxy" tunnel on the web interface, or by changing the tunnel type
+      to "ircclient" in i2ptunnel.config.
+
+2005-10-10  jrandom
+    * I2PTunnel http client config cleanup and stats
+    * Minor SSU congestion tweaks and stats
+    * Reduced netDb exploration period
 
 2005-10-09  jrandom
     * Syndie CLI cleanup for simpler CLI posting.  Usage shown with

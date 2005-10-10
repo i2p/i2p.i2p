@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Properties;
 
 import net.i2p.I2PException;
+import net.i2p.I2PAppContext;
 import net.i2p.client.I2PSession;
 import net.i2p.client.streaming.I2PSocket;
 import net.i2p.client.streaming.I2PSocketManager;
@@ -31,6 +32,7 @@ import net.i2p.util.Log;
 public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runnable {
 
     private static final Log _log = new Log(I2PTunnelClientBase.class);
+    protected I2PAppContext _context;
     protected Logging l;
 
     static final long DEFAULT_CONNECT_TIMEOUT = 60 * 1000;
@@ -100,6 +102,12 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
         this.localPort = localPort;
         this.l = l;
         this.handlerName = handlerName + _clientId;
+
+        _context = tunnel.getContext();
+        _context.statManager().createRateStat("i2ptunnel.client.closeBacklog", "How many pending sockets remain when we close one due to backlog?", "I2PTunnel", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
+        _context.statManager().createRateStat("i2ptunnel.client.closeNoBacklog", "How many pending sockets remain when it was removed prior to backlog timeout?", "I2PTunnel", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
+        _context.statManager().createRateStat("i2ptunnel.client.manageTime", "How long it takes to accept a socket and fire it into an i2ptunnel runner (or queue it for the pool)?", "I2PTunnel", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
+        _context.statManager().createRateStat("i2ptunnel.client.buildRunTime", "How long it takes to run a queued socket into an i2ptunnel runner?", "I2PTunnel", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
 
         // no need to load the netDb with leaseSets for destinations that will never 
         // be looked up
@@ -362,7 +370,10 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
 
             while (true) {
                 Socket s = ss.accept();
+                long before = System.currentTimeMillis();
                 manageConnection(s);
+                long total = System.currentTimeMillis() - before;
+                _context.statManager().addRateData("i2ptunnel.client.manageTime", total, total);
             }
         } catch (IOException ex) {
             _log.error("Error listening for connections on " + localPort, ex);
@@ -422,14 +433,20 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
         private Socket _s;
         public CloseEvent(Socket s) { _s = s; }
         public void timeReached() {
+            int remaining = 0;
             boolean stillWaiting = false;
             synchronized (_waitingSockets) {
                 stillWaiting = _waitingSockets.remove(_s);
+                remaining = _waitingSockets.size();
             }
             if (stillWaiting) {
                 try { _s.close(); } catch (IOException ioe) {}
-                if (_log.shouldLog(Log.INFO))
+                if (_log.shouldLog(Log.INFO)) {
+                    _context.statManager().addRateData("i2ptunnel.client.closeBacklog", remaining, 0);
                     _log.info("Closed a waiting socket because of backlog");
+                }
+            } else {
+                _context.statManager().addRateData("i2ptunnel.client.closeNoBacklog", remaining, 0);
             }
         }
     }
@@ -496,8 +513,12 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
                     }
                 } catch (InterruptedException ie) {}
                 
-                if (s != null)
+                if (s != null) {
+                    long before = System.currentTimeMillis();
                     clientConnectionRun(s);
+                    long total = System.currentTimeMillis() - before;
+                    _context.statManager().addRateData("i2ptunnel.client.buildRunTime", total, 0);
+                }
                 s = null;
             }
         }

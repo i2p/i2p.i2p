@@ -27,8 +27,8 @@ class ExploreJob extends SearchJob {
     private Log _log;
     private PeerSelector _peerSelector;
     
-    /** how long each exploration should run for (currently a trivial 20 seconds) */
-    private static final long MAX_EXPLORE_TIME = 20*1000;
+    /** how long each exploration should run for (currently a trivial 10 seconds) */
+    private static final long MAX_EXPLORE_TIME = 10*1000;
     
     /** how many of the peers closest to the key being explored do we want to explicitly say "dont send me this"? */
     private static final int NUM_CLOSEST_TO_IGNORE = 3;

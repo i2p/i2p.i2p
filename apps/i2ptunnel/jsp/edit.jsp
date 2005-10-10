@@ -15,7 +15,7 @@
   } else {
     String type = request.getParameter("type");
     int curTunnel = -1;
-    if ("client".equals(type) || "httpclient".equals(type)) {
+    if ("client".equals(type) || "httpclient".equals(type) || "ircclient".equals(type)) {
       %><jsp:include page="editClient.jsp" /><%
     } else if ("server".equals(type) || "httpserver".equals(type)) {
       %><jsp:include page="editServer.jsp" /><%

@@ -170,7 +170,7 @@ if (curTunnel >= 0) {
 <% } else { %>
 <input type="checkbox" value="true" name="shared" />
 <% } %>
-<i>(Share tunnels with other clients and httpclients? Change requires restart of client proxy)</i>
+<i>(Share tunnels with other clients and irc/httpclients? Change requires restart of client proxy)</i>
 </td>
 </tr>
 <tr>

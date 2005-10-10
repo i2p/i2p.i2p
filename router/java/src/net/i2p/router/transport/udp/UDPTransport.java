@@ -890,6 +890,18 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             peers.addAll(_peersByIdent.values());
         }
         long offsetTotal = 0;
+
+        int bpsIn = 0;
+        int bpsOut = 0;
+        long uptimeMsTotal = 0;
+        long cwinTotal = 0;
+        long rttTotal = 0;
+        long rtoTotal = 0;
+        long sendTotal = 0;
+        long recvTotal = 0;
+        long resentTotal = 0;
+        long dupRecvTotal = 0;
+        int numPeers = 0;
         
         StringBuffer buf = new StringBuffer(512);
         buf.append("<b id=\"udpcon\">UDP connections: ").append(peers.size()).append("</b><br />\n");
@@ -968,16 +980,22 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             }
             buf.append("</code></td>");
             
+            long idleIn = (now-peer.getLastReceiveTime())/1000;
+            long idleOut = (now-peer.getLastSendTime())/1000;
+            
             buf.append("<td valign=\"top\" ><code>");
-            buf.append((now-peer.getLastReceiveTime())/1000);
+            buf.append(idleIn);
             buf.append("s/");
-            buf.append((now-peer.getLastSendTime())/1000);
+            buf.append(idleOut);
             buf.append("s</code></td>");
-    
+ 
+            int recvBps = (idleIn > 10 ? 0 : peer.getReceiveBps());
+            int sendBps = (idleOut > 10 ? 0 : peer.getSendBps());
+            
             buf.append("<td valign=\"top\" ><code>");
-            buf.append(formatKBps(peer.getReceiveBps()));
+            buf.append(formatKBps(recvBps));
             buf.append("KBps/");
-            buf.append(formatKBps(peer.getSendBps()));
+            buf.append(formatKBps(sendBps));
             buf.append("KBps ");
             //buf.append(formatKBps(peer.getReceiveACKBps()));
             //buf.append("KBps/");
@@ -985,8 +1003,10 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             //buf.append("KBps ");
             buf.append("</code></td>");
 
+            long uptime = now - peer.getKeyEstablishedTime();
+            
             buf.append("<td valign=\"top\" ><code>");
-            buf.append(DataHelper.formatDuration(now-peer.getKeyEstablishedTime()));
+            buf.append(DataHelper.formatDuration(uptime));
             buf.append("</code></td>");
             
             buf.append("<td valign=\"top\" ><code>");
@@ -994,16 +1014,21 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             buf.append("s</code></td>");
             offsetTotal = offsetTotal + peer.getClockSkew();
 
+            long sendWindow = peer.getSendWindowBytes();
+            
             buf.append("<td valign=\"top\" ><code>");
-            buf.append(peer.getSendWindowBytes()/1024);
+            buf.append(sendWindow/1024);
             buf.append("K</code></td>");
 
             buf.append("<td valign=\"top\" ><code>");
             buf.append(peer.getSlowStartThreshold()/1024);
             buf.append("K</code></td>");
 
+            int rtt = peer.getRTT();
+            int rto = peer.getRTO();
+            
             buf.append("<td valign=\"top\" ><code>");
-            buf.append(peer.getRTT());
+            buf.append(rtt);
             buf.append("</code></td>");
             
             buf.append("<td valign=\"top\" ><code>");
@@ -1011,37 +1036,80 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             buf.append("</code></td>");
 
             buf.append("<td valign=\"top\" ><code>");
-            buf.append(peer.getRTO());
+            buf.append(rto);
+            buf.append("</code></td>");
+        
+            long sent = peer.getPacketsTransmitted();
+            long recv = peer.getPacketsReceived();
+            
+            buf.append("<td valign=\"top\" ><code>");
+            buf.append(sent);
             buf.append("</code></td>");
             
             buf.append("<td valign=\"top\" ><code>");
-            buf.append(peer.getPacketsTransmitted());
+            buf.append(recv);
             buf.append("</code></td>");
             
-            buf.append("<td valign=\"top\" ><code>");
-            buf.append(peer.getPacketsReceived());
-            buf.append("</code></td>");
+            //double sent = (double)peer.getPacketsPeriodTransmitted();
+            //double sendLostPct = 0;
+            //if (sent > 0)
+            //    sendLostPct = (double)peer.getPacketsRetransmitted()/(sent);
             
-            double sent = (double)peer.getPacketsPeriodTransmitted();
-            double sendLostPct = 0;
-            if (sent > 0)
-                sendLostPct = (double)peer.getPacketsRetransmitted()/(sent);
+            long resent = peer.getPacketsRetransmitted();
+            long dupRecv = peer.getPacketsReceivedDuplicate();
             
             buf.append("<td valign=\"top\" ><code>");
             //buf.append(formatPct(sendLostPct));
-            buf.append(peer.getPacketsRetransmitted()); // + "/" + peer.getPacketsPeriodRetransmitted() + "/" + sent);
+            buf.append(resent); // + "/" + peer.getPacketsPeriodRetransmitted() + "/" + sent);
             //buf.append(peer.getPacketRetransmissionRate());
             buf.append("</code></td>");
             
             double recvDupPct = (double)peer.getPacketsReceivedDuplicate()/(double)peer.getPacketsReceived();
             buf.append("<td valign=\"top\" ><code>");
-            buf.append(peer.getPacketsReceivedDuplicate()); //formatPct(recvDupPct));
+            buf.append(dupRecv); //formatPct(recvDupPct));
             buf.append("</code></td>");
 
             buf.append("</tr>");
             out.write(buf.toString());
             buf.setLength(0);
+            
+            bpsIn += recvBps;
+            bpsOut += sendBps;
+        
+            uptimeMsTotal += uptime;
+            cwinTotal += sendWindow;
+            rttTotal += rtt;
+            rtoTotal += rto;
+        
+            sendTotal += sent;
+            recvTotal += recv;
+            resentTotal += resent;
+            dupRecvTotal += dupRecv;
+            
+            numPeers++;
         }
+        
+        buf.append("<tr><td colspan=\"14\"><hr /></td></tr>\n");
+        buf.append(" <tr><td colspan=\"2\"><b>Total</b></td>");
+        buf.append("     <td>");
+        buf.append(formatKBps(bpsIn)).append("KBps/").append(formatKBps(bpsOut));
+        buf.append("KBps</td>");
+        buf.append("     <td>").append(numPeers > 0 ? DataHelper.formatDuration(uptimeMsTotal/numPeers) : "0s");
+        buf.append("</td><td>&nbsp;</td>\n");
+        buf.append("     <td>");
+        buf.append(numPeers > 0 ? cwinTotal/(numPeers*1024) + "K" : "0K");
+        buf.append("</td><td>&nbsp;</td>\n");
+        buf.append("     <td>");
+        buf.append(numPeers > 0 ? rttTotal/numPeers : 0);
+        buf.append("</td><td>&nbsp;</td><td>");
+        buf.append(numPeers > 0 ? rtoTotal/numPeers : 0);
+        buf.append("</td>\n     <td>");
+        buf.append(sendTotal).append("</td><td>").append(recvTotal).append("</td>\n");
+        buf.append("     <td>").append(resentTotal);
+        buf.append("</td><td>").append(dupRecvTotal).append("</td>\n");
+        buf.append(" </tr>\n");
+        out.write(buf.toString());
+        buf.setLength(0);
         
         out.write("</table>\n");
         
@@ -1276,6 +1344,25 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             } else {
                 SimpleTimer.getInstance().removeEvent(PeerTestEvent.this);
             }
+        }
+    }
+    
+    private static final String BADIPS[] = new String[] { "192.168.0.1", "127.0.0.1", "10.3.4.5", "172.16.3.4", "224.5.6.7" };
+    private static final String GOODIPS[] = new String[] { "192.167.0.1", "126.0.0.1", "11.3.4.5", "172.15.3.4", "223.5.6.7" };
+    public static void main(String args[]) {
+        for (int i = 0; i < BADIPS.length; i++) {
+            try { 
+                InetAddress addr = InetAddress.getByName(BADIPS[i]);
+                boolean routable = isPubliclyRoutable(addr.getAddress());
+                System.out.println("Routable: " + routable + " (" + BADIPS[i] + ")");
+            } catch (Exception e) { e.printStackTrace(); }
+        }
+        for (int i = 0; i < GOODIPS.length; i++) {
+            try { 
+                InetAddress addr = InetAddress.getByName(GOODIPS[i]);
+                boolean routable = isPubliclyRoutable(addr.getAddress());
+                System.out.println("Routable: " + routable + " (" + GOODIPS[i] + ")");
+            } catch (Exception e) { e.printStackTrace(); }
         }
     }
 }

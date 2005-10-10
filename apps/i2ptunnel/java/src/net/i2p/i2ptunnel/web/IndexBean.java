@@ -198,7 +198,9 @@ public class IndexBean {
             cur.setConfig(config, "");
         }
         
-        if ("httpclient".equals(cur.getType()) || "client".equals(cur.getType())) {
+        if ("ircclient".equals(cur.getType()) || 
+        		"httpclient".equals(cur.getType()) || 
+        		"client".equals(cur.getType())) {
             // all clients use the same I2CP session, and as such, use the same
             // I2CP options
             List controllers = _group.getControllers();
@@ -206,7 +208,10 @@ public class IndexBean {
                 TunnelController c = (TunnelController)controllers.get(i);
                 if (c == cur) continue;
                 //only change when they really are declared of beeing a sharedClient
-                if (("httpclient".equals(c.getType()) || "client".equals(c.getType())) && "true".equalsIgnoreCase(c.getSharedClient())) {
+                if (("httpclient".equals(c.getType()) || 
+                		"ircclient".equals(c.getType())||
+                		"client".equals(c.getType()) 
+                		) && "true".equalsIgnoreCase(c.getSharedClient())) {
                     Properties cOpt = c.getConfig("");
                     if (_tunnelCount != null) {
                         cOpt.setProperty("option.inbound.quantity", _tunnelCount);
@@ -278,7 +283,9 @@ public class IndexBean {
     public boolean isClient(int tunnelNum) {
         TunnelController cur = getController(tunnelNum);
         if (cur == null) return false;
-        return ( ("client".equals(cur.getType())) || ("httpclient".equals(cur.getType())) );
+        return ( ("client".equals(cur.getType())) || 
+        		("httpclient".equals(cur.getType())) ||
+        		("ircclient".equals(cur.getType())));
     }
     
     public String getTunnelName(int tunnel) {
@@ -308,6 +315,7 @@ public class IndexBean {
     public String getTypeName(String internalType) {
         if ("client".equals(internalType)) return "Client proxy";
         else if ("httpclient".equals(internalType)) return "HTTP proxy";
+        else if ("ircclient".equals(internalType)) return "IRC proxy";
         else if ("server".equals(internalType)) return "Server";
         else if ("httpserver".equals(internalType)) return "HTTP server";
         else return internalType;
@@ -356,7 +364,7 @@ public class IndexBean {
     public String getClientDestination(int tunnel) {
         TunnelController tun = getController(tunnel);
         if (tun == null) return "";
-        if ("client".equals(tun.getType())) return tun.getTargetDestination();
+        if ("client".equals(tun.getType())||"ircclient".equals(tun.getType())) return tun.getTargetDestination();
         else return tun.getProxyList();
     }
     
@@ -386,7 +394,7 @@ public class IndexBean {
     ///
     
     /**
-     * What type of tunnel (httpclient, client, or server).  This is 
+     * What type of tunnel (httpclient, ircclient, client, or server).  This is 
      * required when adding a new tunnel.
      *
      */
@@ -427,12 +435,12 @@ public class IndexBean {
     public void setProxyList(String proxyList) { 
         _proxyList = (proxyList != null ? proxyList.trim() : null);
     }
-    /** what port should this client/httpclient listen on */
+    /** what port should this client/httpclient/ircclient listen on */
     public void setPort(String port) { 
         _port = (port != null ? port.trim() : null);
     }
     /** 
-     * what interface should this client/httpclient listen on (unless 
+     * what interface should this client/httpclient/ircclient listen on (unless 
      * overridden by the setReachableByOther() field)
      */
     public void setReachableBy(String reachableBy) { 
@@ -440,7 +448,7 @@ public class IndexBean {
     }
     /**
      * If specified, defines the exact IP interface to listen for requests
-     * on (in the case of client/httpclient tunnels)
+     * on (in the case of client/httpclient/ircclient tunnels)
      */
     public void setReachableByOther(String reachableByOther) { 
         _reachableByOther = (reachableByOther != null ? reachableByOther.trim() : null);
@@ -520,6 +528,24 @@ public class IndexBean {
             }
 
             config.setProperty("sharedClient", _sharedClient + "");
+        }else if ("ircclient".equals(_type)) {
+                if (_port != null)
+                    config.setProperty("listenPort", _port);
+                if (_reachableByOther != null)
+                    config.setProperty("interface", _reachableByOther);
+                else
+                    config.setProperty("interface", _reachableBy);
+                if (_targetDestination != null)
+                    config.setProperty("targetDestination", _targetDestination);
+
+            	config.setProperty("option.inbound.nickname", CLIENT_NICKNAME);
+            	config.setProperty("option.outbound.nickname", CLIENT_NICKNAME);
+                if (_name != null && !_sharedClient) {
+                     config.setProperty("option.inbound.nickname", _name);
+                     config.setProperty("option.outbound.nickname", _name);
+                }
+
+                config.setProperty("sharedClient", _sharedClient + "");
         } else if ("client".equals(_type)) {
             if (_port != null)
                 config.setProperty("listenPort", _port);
@@ -608,7 +634,7 @@ public class IndexBean {
         else
             config.setProperty("option.i2p.streaming.connectDelay", "0");
         if (_name != null) {
-            if ( ((!"client".equals(_type)) && (!"httpclient".equals(_type))) || (!_sharedClient) ) {
+            if ( ((!"client".equals(_type)) && (!"httpclient".equals(_type))&& (!"ircclient".equals(_type))) || (!_sharedClient) ) {
                 config.setProperty("option.inbound.nickname", _name);
                 config.setProperty("option.outbound.nickname", _name);
             } else {

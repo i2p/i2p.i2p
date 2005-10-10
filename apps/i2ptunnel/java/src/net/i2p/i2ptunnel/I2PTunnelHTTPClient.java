@@ -502,10 +502,10 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
             String remoteID;
             
             Properties opts = new Properties();
-            opts.setProperty("i2p.streaming.inactivityTimeout", ""+120*1000);
+            //opts.setProperty("i2p.streaming.inactivityTimeout", ""+120*1000);
             // 1 == disconnect.  see ConnectionOptions in the new streaming lib, which i
             // dont want to hard link to here
-            opts.setProperty("i2p.streaming.inactivityTimeoutAction", ""+1);
+            //opts.setProperty("i2p.streaming.inactivityTimeoutAction", ""+1);
             I2PSocket i2ps = createI2PSocket(dest, getDefaultOptions(opts));
             byte[] data = newRequest.toString().getBytes("ISO-8859-1");
             Runnable onTimeout = new OnTimeout(s, s.getOutputStream(), targetRequest, usingWWWProxy, currentProxy, requestId);

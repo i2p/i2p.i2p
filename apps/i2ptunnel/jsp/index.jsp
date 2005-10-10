@@ -169,6 +169,7 @@
 <b>Add new:</b> 
 <select name="type">
   <option value="httpclient">HTTP proxy</option>
+  <option value="ircclient">IRC proxy</option>
   <option value="client">Client tunnel</option>
   <option value="server">Server tunnel</option>
    <option value="httpserver">HTTP server tunnel</option>

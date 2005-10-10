@@ -291,6 +291,7 @@ public class I2PTunnel implements Logging, EventDispatcher {
         l.log("genkeys <privkeyfile> [<pubkeyfile>]");
         l.log("gentextkeys");
         l.log("client <port> <pubkey>[,<pubkey,...]|file:<pubkeyfile> [<sharedClient>]");
+        l.log("ircclient <port> <pubkey>[,<pubkey,...]|file:<pubkeyfile> [<sharedClient>]");
         l.log("httpclient <port> [<sharedClient>] [<proxy>]");
         l.log("lookup <name>");
         l.log("quit");
@@ -596,6 +597,60 @@ public class I2PTunnel implements Logging, EventDispatcher {
         }
     }
 
+    /**
+     * Run an IRC client on the given port number 
+     *
+     * Sets the event "ircclientTaskId" = Integer(taskId) after the tunnel has been started (or -1 on error).
+     * Also sets "ircclientStatus" = "ok" or "error" after the client tunnel has started.
+     * parameter sharedClient is a String, either "true" or "false"
+     *
+     * @param args {portNumber,destinationBase64 or "file:filename" [, sharedClient]}
+     * @param l logger to receive events and output
+     */
+    public void runIrcClient(String args[], Logging l) {
+        if (args.length >= 2 && args.length <= 3) {
+            int port = -1;
+            try {
+                port = Integer.parseInt(args[0]);
+            } catch (NumberFormatException nfe) {
+                l.log("invalid port");
+                _log.error(getPrefix() + "Port specified is not valid: " + args[0], nfe);
+                notifyEvent("ircclientTaskId", new Integer(-1));
+                return;
+            }
+            
+            boolean isShared = true;
+            if (args.length > 1) {
+                if ("true".equalsIgnoreCase(args[2].trim())) {
+                    isShared = true;
+                } else if ("false".equalsIgnoreCase(args[1].trim())) {
+                    _log.warn("args[1] == [" + args[1] + "] and rejected explicitly");
+                    isShared = false;
+                } else {
+                    // isShared not specified, default to true
+                    isShared = true;
+                }
+            }
+
+            I2PTunnelTask task;
+            ownDest = !isShared;
+            try {
+                task = new I2PTunnelIRCClient(port, args[1],l, ownDest, (EventDispatcher) this, this);
+                addtask(task);
+                notifyEvent("ircclientTaskId", new Integer(task.getId()));
+            } catch (IllegalArgumentException iae) {
+                _log.error(getPrefix() + "Invalid I2PTunnel config to create an ircclient [" + host + ":"+ port + "]", iae);
+                l.log("Invalid I2PTunnel configuration [" + host + ":" + port + "]");
+                notifyEvent("ircclientTaskId", new Integer(-1));
+            }
+        } else {
+            l.log("ircclient <port> [<sharedClient>]");
+            l.log("  creates a client that filter IRC protocol.");
+            l.log("  <sharedClient> (optional) indicates if this client shares tunnels with other clients (true of false)");
+            notifyEvent("ircclientTaskId", new Integer(-1));
+        }
+    }
+    
     /**
      * Run an SOCKS tunnel on the given port number 
      *
