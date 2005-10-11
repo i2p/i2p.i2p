@@ -18,9 +18,11 @@ public class RSSRenderer extends HTMLRenderer {
         super(ctx);
     }
     
+    private static final boolean RSS_EXCERPT_ONLY = false;
+    
     public void render(User user, Archive archive, EntryContainer entry, String urlPrefix, Writer out) throws IOException {
         if (entry == null) return;
-        prepare(user, archive, entry, entry.getEntry().getText(), out, true, false);
+        prepare(user, archive, entry, entry.getEntry().getText(), out, RSS_EXCERPT_ONLY, false);
         
         out.write("   <item>\n");
         out.write("    <title>" + sanitizeXML(sanitizeString((String)_headers.get(HEADER_SUBJECT))) + "</title>\n");
@@ -28,7 +30,9 @@ public class RSSRenderer extends HTMLRenderer {
         out.write("    <guid isPermalink=\"false\">" + urlPrefix + entry.getURI().toString() + "</guid>\n");
         out.write("    <pubDate>" + getRFC822Date(entry.getURI().getEntryId()) + "</pubDate>\n");
         PetName pn = user.getPetNameDB().getByLocation(entry.getURI().getKeyHash().toBase64());
-        String author = pn.getName();
+        String author = null;
+        if (pn != null)
+            author = pn.getName();
         if (author == null) {
             BlogInfo info = archive.getBlogInfo(entry.getURI());
             if (info != null)

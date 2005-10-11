@@ -1,4 +1,10 @@
-$Id: history.txt,v 1.289 2005/10/10 17:58:19 jrandom Exp $
+$Id: history.txt,v 1.290 2005/10/11 02:07:40 jrandom Exp $
+
+2005-10-11  jrandom
+    * Piggyback the SSU partial ACKs with data packets.  This is backwards
+      compatible.
+    * Syndie RSS renderer bugfix, plus now include the full entry instead of
+      just the blurb before the cut.
 
 2005-10-11  jrandom
     * Piggyback the SSU explicit ACKs with data packets (partial ACKs aren't

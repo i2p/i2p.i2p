@@ -597,7 +597,7 @@ public class PeerState {
         return rv;
     }
     
-    private void fetchPartialACKs(List rv) {
+    void fetchPartialACKs(List rv) {
         InboundMessageState states[] = null;
         int curState = 0;
         synchronized (_inboundMessages) {
