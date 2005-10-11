@@ -148,6 +148,7 @@ public class HTMLRenderer extends EventReceiverImpl {
     
     public void receivePlain(String text) { 
         if (!continueBody()) { return; }
+        if (_log.shouldLog(Log.DEBUG)) _log.debug("receive plain [" + text + "]");
         _bodyBuffer.append(sanitizeString(text)); 
     }
     
@@ -165,6 +166,7 @@ public class HTMLRenderer extends EventReceiverImpl {
     }
     public void receiveHR() {
         if (!continueBody()) { return; }
+        if (_log.shouldLog(Log.DEBUG)) _log.debug("receive HR");
         _bodyBuffer.append(getSpan("hr")).append("<hr /></span>");
     }
     public void receiveH1(String body) {
@@ -189,6 +191,7 @@ public class HTMLRenderer extends EventReceiverImpl {
     }
     public void receivePre(String body) {
         if (!continueBody()) { return; }
+        if (_log.shouldLog(Log.DEBUG)) _log.debug("receive pre: [" + sanitizeString(body) + "]");
         _bodyBuffer.append("<pre ").append(getClass("pre")).append(" >").append(sanitizeString(body)).append("</pre>");
     }
     
@@ -245,6 +248,7 @@ public class HTMLRenderer extends EventReceiverImpl {
     
     public void receiveNewline() { 
         if (!continueBody()) { return; }
+        if (_log.shouldLog(Log.DEBUG)) _log.debug("receive NL");
         if (true || (_lastNewlineAt >= _bodyBuffer.length()))
             _bodyBuffer.append(getSpan("nl")).append("<br /></span>\n");
         else
@@ -261,10 +265,12 @@ public class HTMLRenderer extends EventReceiverImpl {
     public void receiveBegin() {}
     public void receiveLeftBracket() { 
         if (!continueBody()) { return; }
+        if (_log.shouldLog(Log.DEBUG)) _log.debug("receive [");
         _bodyBuffer.append(getSpan("lb")).append("[</span>");
     }
     public void receiveRightBracket() { 
         if (!continueBody()) { return; }
+        if (_log.shouldLog(Log.DEBUG)) _log.debug("receive ]");
         _bodyBuffer.append(getSpan("rb")).append("]</span>");
     }
     
@@ -886,12 +892,17 @@ public class HTMLRenderer extends EventReceiverImpl {
         }
         if (!unsafe) return str;
         
-        str = str.replace('<', '_'); // this should be &lt;
-        str = str.replace('>', '-'); // this should be &gt;
+        //str = str.replace('<', '_'); // this should be &lt;
+        //str = str.replace('>', '-'); // this should be &gt;
+        str = str.replaceAll("<", "&lt;");
+        str = str.replaceAll(">", "&gt;");
         if (!allowNL) {
-            str = str.replace('\n', ' ');
-            str = str.replace('\r', ' ');
-            str = str.replace('\f', ' ');
+            //str = str.replace('\n', ' ');
+            //str = str.replace('\r', ' ');
+            //str = str.replace('\f', ' ');
+            str = str.replaceAll("\n", "<br />"); // no class
+            str = str.replaceAll("\r", "<br />"); // no class
+            str = str.replaceAll("\f", "<br />"); // no class
         }
         return str;
     }
@@ -902,7 +913,8 @@ public class HTMLRenderer extends EventReceiverImpl {
     }
     public static final String sanitizeTagParam(String str) {
         if (str == null) return "";
-        str = str.replace('&', '_'); // this should be &amp;
+        //str = str.replace('&', '_'); // this should be &amp;
+        str = str.replaceAll("&", "&amp;");
         if (str.indexOf('\"') < 0)
             return sanitizeString(str);
         str = str.replace('\"', '\'');
@@ -912,6 +924,7 @@ public class HTMLRenderer extends EventReceiverImpl {
     public static final String sanitizeXML(String orig) {
         if (orig == null) return "";
         if (orig.indexOf('&') < 0) return orig;
+        if (true) return orig.replaceAll("&", "&amp;");
         StringBuffer rv = new StringBuffer(orig.length()+32);
         for (int i = 0; i < orig.length(); i++) {
             if (orig.charAt(i) == '&')
@@ -923,14 +936,10 @@ public class HTMLRenderer extends EventReceiverImpl {
     }
     public static final String sanitizeXML(StringBuffer orig) {
         if (orig == null) return "";
-        if (orig.indexOf("&") < 0) return orig.toString();
-        for (int i = 0; i < orig.length(); i++) {
-            if (orig.charAt(i) == '&') {
-                orig = orig.replace(i, i+1, "&amp;");
-                i += "&amp;".length();
-            }
-        }
-        return orig.toString();
+        if (orig.indexOf("&") >= 0) 
+            return orig.toString().replaceAll("&", "&amp;");
+        else
+            return orig.toString();
     }
 
     private static final String STYLE_CHARS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_";

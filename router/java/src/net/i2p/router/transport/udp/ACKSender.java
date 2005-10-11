@@ -34,6 +34,7 @@ public class ACKSender implements Runnable {
         _context.statManager().createRateStat("udp.sendACKCount", "how many ack messages were sent to a peer", "udp", new long[] { 60*1000, 60*60*1000 });
         _context.statManager().createRateStat("udp.ackFrequency", "how long ago did we send an ACK to this peer?", "udp", new long[] { 60*1000, 60*60*1000 });
         _context.statManager().createRateStat("udp.sendACKRemaining", "when we ack a peer, how many peers are left waiting to ack?", "udp", new long[] { 60*1000, 60*60*1000 });
+        _context.statManager().createRateStat("udp.abortACK", "How often do we schedule up an ACK send only to find it had already been sent (through piggyback)?", "udp", new long[] { 60*1000, 60*60*1000 });
     }
     
     public void ackPeer(PeerState peer) {
@@ -121,6 +122,8 @@ public class ACKSender implements Runnable {
                             _log.warn("Rerequesting ACK for peer " + peer);
                         ackPeer(peer);
                     }
+                } else {
+                    _context.statManager().addRateData("udp.abortACK", 1, 0);
                 }
             }
         }

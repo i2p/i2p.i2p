@@ -86,6 +86,8 @@ public class SMLParser {
         while (off < len) {
             char c = rawSMLBody.charAt(off);
             if ( (c == NL) || (c == CR) || (c == LF) ) {
+                // we only deal with newlines outside of a tag, since this is a ghetto parser
+                // without a stack, and the tag event is fired only when the tag is completed.
                 if (openTagBegin < 0) {
                     if (begin < off)
                         receiver.receivePlain(rawSMLBody.substring(begin, off));
@@ -93,8 +95,6 @@ public class SMLParser {
                     off++;
                     begin = off;
                     continue;
-                } else {
-                    // ignore NL inside a tag or between tag blocks
                 }
             } else if (c == TAG_BEGIN) {
                 if ( (off + 1 < len) && (TAG_BEGIN == rawSMLBody.charAt(off+1))) {
@@ -142,19 +142,25 @@ public class SMLParser {
                     continue;
                 }
             } else if (c == LT) {
-                if (begin < off)
-                    receiver.receivePlain(rawSMLBody.substring(begin, off));
-                receiver.receiveLT();
-                off++;
-                begin = off;
-                continue;
+                // see above re: newlines inside tags for why we check openTagBegin<0
+                if (openTagBegin < 0) {
+                    if (begin < off)
+                        receiver.receivePlain(rawSMLBody.substring(begin, off));
+                    receiver.receiveLT();
+                    off++;
+                    begin = off;
+                    continue;
+                }
             } else if (c == GT) {
-                if (begin < off)
-                    receiver.receivePlain(rawSMLBody.substring(begin, off));
-                receiver.receiveGT();
-                off++;
-                begin = off;
-                continue;
+                // see above re: newlines inside tags for why we check openTagBegin<0
+                if (openTagBegin < 0) {
+                    if (begin < off)
+                        receiver.receivePlain(rawSMLBody.substring(begin, off));
+                    receiver.receiveGT();
+                    off++;
+                    begin = off;
+                    continue;
+                }
             }
             
             off++;
@@ -443,6 +449,7 @@ public class SMLParser {
         test("A: B\n\n[a   b=\"c\" ]d[/a]");
         
         test("A: B\n\n[b]This[/b] is [i]special[/i][cut]why?[/cut][u]because I say so[/u].\neven if you dont care");
+        test("A: B\n\nHi\n[pre]>foo&bar<>blah!blah\nblah\nblah[/pre]foo![pre]bar[/pre]");
     }
     private static void test(String rawSML) {
         I2PAppContext ctx = I2PAppContext.getGlobalContext();

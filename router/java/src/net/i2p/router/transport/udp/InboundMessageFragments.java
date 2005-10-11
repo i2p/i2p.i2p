@@ -49,6 +49,7 @@ public class InboundMessageFragments /*implements UDPTransport.PartialACKSource 
         _context.statManager().createRateStat("udp.ignoreRecentDuplicate", "Take note that we received a packet for a recently completed message", "udp", new long[] { 60*1000, 10*60*1000, 60*60*1000, 24*60*60*1000 });
         _context.statManager().createRateStat("udp.receiveMessagePeriod", "How long it takes to pull the message fragments out of a packet", "udp", new long[] { 60*1000, 10*60*1000, 60*60*1000, 24*60*60*1000 });
         _context.statManager().createRateStat("udp.receiveACKPeriod", "How long it takes to pull the ACKs out of a packet", "udp", new long[] { 60*1000, 10*60*1000, 60*60*1000, 24*60*60*1000 });
+        _context.statManager().createRateStat("udp.receivePiggyback", "How many acks were included in a packet with data fragments (time == # data fragments)", "udp", new long[] { 60*1000, 10*60*1000, 60*60*1000, 24*60*60*1000 });
     }
     
     public void startup() { 
@@ -75,14 +76,16 @@ public class InboundMessageFragments /*implements UDPTransport.PartialACKSource 
      */
     public void receiveData(PeerState from, UDPPacketReader.DataReader data) {
         long beforeMsgs = _context.clock().now();
-        receiveMessages(from, data);
+        int fragmentsIncluded = receiveMessages(from, data);
         long afterMsgs = _context.clock().now();
-        receiveACKs(from, data);
+        int acksIncluded = receiveACKs(from, data);
         long afterACKs = _context.clock().now();
         
         from.packetReceived();
         _context.statManager().addRateData("udp.receiveMessagePeriod", afterMsgs-beforeMsgs, afterACKs-beforeMsgs);
         _context.statManager().addRateData("udp.receiveACKPeriod", afterACKs-afterMsgs, afterACKs-beforeMsgs);
+        if ( (fragmentsIncluded > 0) && (acksIncluded > 0) )
+            _context.statManager().addRateData("udp.receivePiggyback", acksIncluded, fragmentsIncluded);
     }
     
     /**
@@ -90,10 +93,11 @@ public class InboundMessageFragments /*implements UDPTransport.PartialACKSource 
      * Along the way, if any state expires, or a full message arrives, move it
      * appropriately.
      *
+     * @return number of data fragments included
      */
-    private void receiveMessages(PeerState from, UDPPacketReader.DataReader data) {
+    private int receiveMessages(PeerState from, UDPPacketReader.DataReader data) {
         int fragments = data.readFragmentCount();
-        if (fragments <= 0) return;
+        if (fragments <= 0) return fragments;
         Hash fromPeer = from.getRemotePeer();
             
         Map messages = from.getInboundMessages();
@@ -170,13 +174,16 @@ public class InboundMessageFragments /*implements UDPTransport.PartialACKSource 
                     break;
             }
         }
+        return fragments;
     }
     
-    private void receiveACKs(PeerState from, UDPPacketReader.DataReader data) {
+    private int receiveACKs(PeerState from, UDPPacketReader.DataReader data) {
+        int rv = 0;
         if (data.readACKsIncluded()) {
             int fragments = 0;
             long acks[] = data.readACKs();
             if (acks != null) {
+                rv += acks.length;
                 _context.statManager().addRateData("udp.receivedACKs", acks.length, 0);
                 //_context.statManager().getStatLog().addData(from.getRemoteHostId().toString(), "udp.peer.receiveACKCount", acks.length, 0);
 
@@ -192,6 +199,7 @@ public class InboundMessageFragments /*implements UDPTransport.PartialACKSource 
         if (data.readACKBitfieldsIncluded()) {
             ACKBitfield bitfields[] = data.readACKBitfields();
             if (bitfields != null) {
+                rv += bitfields.length;
                 //_context.statManager().getStatLog().addData(from.getRemoteHostId().toString(), "udp.peer.receivePartialACKCount", bitfields.length, 0);
 
                 for (int i = 0; i < bitfields.length; i++) {
@@ -205,5 +213,6 @@ public class InboundMessageFragments /*implements UDPTransport.PartialACKSource 
             from.ECNReceived();
         else
             from.dataReceived();
+        return rv;
     }
 }

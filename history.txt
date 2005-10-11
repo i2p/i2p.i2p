@@ -1,4 +1,9 @@
-$Id: history.txt,v 1.288 2005/10/09 06:35:15 jrandom Exp $
+$Id: history.txt,v 1.289 2005/10/10 17:58:19 jrandom Exp $
+
+2005-10-11  jrandom
+    * Piggyback the SSU explicit ACKs with data packets (partial ACKs aren't
+      yet piggybacked).  This is backwards compatible.
+    * SML parser cleanup in Syndie
 
 2005-10-10  dust
     * Implemented a new I2PTunnelIRCClient which locally filters inbound and

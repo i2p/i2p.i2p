@@ -523,6 +523,25 @@ public class PeerState {
         return true;
     }
     
+    /**
+     * Grab a list of message ids (Long) that we want to send to the remote
+     * peer, regardless of the packet size, but don't remove it from our 
+     * "want to send" list.  If the message id is transmitted to the peer,
+     * removeACKMessage(Long) should be called.
+     *
+     */
+    public List getCurrentFullACKs() {
+        synchronized (_currentACKs) {
+            return new ArrayList(_currentACKs);
+        }
+    }
+    public void removeACKMessage(Long messageId) {
+        synchronized (_currentACKs) {
+            _currentACKs.remove(messageId);
+        }
+        _lastACKSend = _context.clock().now();
+    }
+    
     /** 
      * grab a list of ACKBitfield instances, some of which may fully 
      * ACK a message while others may only partially ACK a message.  

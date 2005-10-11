@@ -61,6 +61,7 @@ public class OutboundMessageFragments {
         _context.statManager().createRateStat("udp.sendRejected", "What volley are we on when the peer was throttled (time == message lifetime)", "udp", new long[] { 60*1000, 10*60*1000, 60*60*1000, 24*60*60*1000 });
         _context.statManager().createRateStat("udp.partialACKReceived", "How many fragments were partially ACKed (time == message lifetime)", "udp", new long[] { 60*1000, 10*60*1000, 60*60*1000, 24*60*60*1000 });
         _context.statManager().createRateStat("udp.sendSparse", "How many fragments were partially ACKed and hence not resent (time == message lifetime)", "udp", new long[] { 60*1000, 10*60*1000, 60*60*1000, 24*60*60*1000 });
+        _context.statManager().createRateStat("udp.sendPiggyback", "How many acks were piggybacked on a data packet (time == message lifetime)", "udp", new long[] { 60*1000, 10*60*1000, 60*60*1000, 24*60*60*1000 });
         _context.statManager().createRateStat("udp.activeDelay", "How often we wait blocking on the active queue", "udp", new long[] { 60*1000, 10*60*1000, 60*60*1000, 24*60*60*1000 });
     }
     
@@ -354,16 +355,34 @@ public class OutboundMessageFragments {
             if (fragments < 0)
                 return null;
             
+            // ok, simplest possible thing is to always tack on the bitfields if
+            List msgIds = peer.getCurrentFullACKs();
+            List partialACKBitfields = null; // fill in later...
+            List remaining = new ArrayList(msgIds);
             int sparseCount = 0;
             UDPPacket rv[] = new UDPPacket[fragments]; //sparse
             for (int i = 0; i < fragments; i++) {
                 if (state.needsSending(i))
-                    rv[i] = _builder.buildPacket(state, i, peer);
+                    rv[i] = _builder.buildPacket(state, i, peer, remaining, partialACKBitfields);
                 else
                     sparseCount++;
             }
+            
+            int piggybackedAck = 0;
+            if (msgIds.size() != remaining.size()) {
+                for (int i = 0; i < msgIds.size(); i++) {
+                    Long id = (Long)msgIds.get(i);
+                    if (!remaining.contains(id)) {
+                        peer.removeACKMessage(id);
+                        piggybackedAck++;
+                    }
+                }
+            }
+            
             if (sparseCount > 0)
                 _context.statManager().addRateData("udp.sendSparse", sparseCount, state.getLifetime());
+            if (piggybackedAck > 0)
+                _context.statManager().addRateData("udp.sendPiggyback", piggybackedAck, state.getLifetime());
             if (_log.shouldLog(Log.INFO))
                 _log.info("Building packet for " + state + " to " + peer + " with sparse count: " + sparseCount);
             peer.packetsTransmitted(fragments - sparseCount);

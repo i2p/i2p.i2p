@@ -38,11 +38,23 @@ public class PacketBuilder {
     }
     
     public UDPPacket buildPacket(OutboundMessageState state, int fragment, PeerState peer) {
+        return buildPacket(state, fragment, peer, null, null);
+    }
+    /**
+     * @param ackIdsRemaining list of messageIds (Long) that should be acked by this packet.  
+     *                        The list itself is passed by reference, and if a messageId is
+     *                        included, it should be removed from the list.
+     * @param partialACKsRemaining list of messageIds (ACKBitfield) that should be acked by this packet.  
+     *                        The list itself is passed by reference, and if a messageId is
+     *                        included, it should be removed from the list.
+     */
+    public UDPPacket buildPacket(OutboundMessageState state, int fragment, PeerState peer, List ackIdsRemaining, List partialACKsRemaining) {
         UDPPacket packet = UDPPacket.acquire(_context);
         
         byte data[] = packet.getPacket().getData();
         Arrays.fill(data, 0, data.length, (byte)0x0);
-        int off = UDPPacket.MAC_SIZE + UDPPacket.IV_SIZE;
+        int start = UDPPacket.MAC_SIZE + UDPPacket.IV_SIZE;
+        int off = start;
         
         // header
         data[off] |= (UDPPacket.PAYLOAD_TYPE_DATA << 4);
@@ -56,7 +68,54 @@ public class PacketBuilder {
         
         // just always ask for an ACK for now...
         data[off] |= UDPPacket.DATA_FLAG_WANT_REPLY;
+        // we should in theory only include explicit ACKs if the expected packet size
+        // is under the MTU, but for now, since the # of packets acked is so few (usually
+        // just one or two), and since the packets are so small anyway, an additional five
+        // or ten bytes doesn't hurt.
+        if ( (ackIdsRemaining != null) && (ackIdsRemaining.size() > 0) )
+            data[off] |= UDPPacket.DATA_FLAG_EXPLICIT_ACK;
+        if ( (partialACKsRemaining != null) && (partialACKsRemaining.size() > 0) )
+            data[off] |= UDPPacket.DATA_FLAG_ACK_BITFIELDS;
         off++;
+
+        if ( (ackIdsRemaining != null) && (ackIdsRemaining.size() > 0) ) {
+            DataHelper.toLong(data, off, 1, ackIdsRemaining.size());
+            off++;
+            while (ackIdsRemaining.size() > 0) {
+                Long ackId = (Long)ackIdsRemaining.remove(0);
+                DataHelper.toLong(data, off, 4, ackId.longValue());
+                off += 4;
+            }
+        }
+
+        if ( (partialACKsRemaining != null) && (partialACKsRemaining.size() > 0) ) {
+            int origNumRemaining = partialACKsRemaining.size();
+            int numPartialOffset = off;
+            // leave it blank for now, since we could skip some
+            off++;
+            for (int i = 0; i < partialACKsRemaining.size(); i++) {
+                ACKBitfield bitfield = (ACKBitfield)partialACKsRemaining.get(i);
+                if (bitfield.receivedComplete()) continue;
+                DataHelper.toLong(data, off, 4, bitfield.getMessageId());
+                off += 4;
+                int bits = bitfield.fragmentCount();
+                int size = (bits / 7) + 1;
+                for (int curByte = 0; curByte < size; curByte++) {
+                    if (curByte + 1 < size)
+                        data[off] |= (byte)(1 << 7);
+                    
+                    for (int curBit = 0; curBit < 7; curBit++) {
+                        if (bitfield.received(curBit + 7*curByte))
+                            data[off] |= (byte)(1 << curBit);
+                    }
+                    off++;
+                }
+                partialACKsRemaining.remove(i);
+                i--;
+            }
+            // now jump back and fill in the number of bitfields *actually* included
+            DataHelper.toLong(data, numPartialOffset, 1, origNumRemaining - partialACKsRemaining.size());
+        }
         
         DataHelper.toLong(data, off, 1, 1); // only one fragment in this message
         off++;

@@ -65,10 +65,12 @@ public class RequestTunnelJob extends JobImpl {
         ctx.statManager().createRateStat("tunnel.receiveRejectionTransient", "How often we are rejected due to transient overload?", "Tunnels", new long[] { 10*60*1000l, 60*60*1000l, 24*60*60*1000l });
         ctx.statManager().createRateStat("tunnel.receiveRejectionBandwidth", "How often we are rejected due to bandwidth overload?", "Tunnels", new long[] { 10*60*1000l, 60*60*1000l, 24*60*60*1000l });
         ctx.statManager().createRateStat("tunnel.receiveRejectionCritical", "How often we are rejected due to critical failure?", "Tunnels", new long[] { 10*60*1000l, 60*60*1000l, 24*60*60*1000l });
-        ctx.statManager().createRateStat("tunnel.buildFailure", "How often we fail to build a non-exploratory tunnel?", "Tunnels", new long[] { 10*60*1000l, 60*60*1000l, 24*60*60*1000l });
-        ctx.statManager().createRateStat("tunnel.buildExploratoryFailure", "How often we fail to build an exploratory tunnel?", "Tunnels", new long[] { 10*60*1000l, 60*60*1000l, 24*60*60*1000l });
+        ctx.statManager().createRateStat("tunnel.buildFailure", "What hop was being requested when a nonexploratory tunnel request failed?", "Tunnels", new long[] { 10*60*1000l, 60*60*1000l, 24*60*60*1000l });
+        ctx.statManager().createRateStat("tunnel.buildExploratoryFailure", "What hop was beiing requested when an exploratory tunnel request failed?", "Tunnels", new long[] { 10*60*1000l, 60*60*1000l, 24*60*60*1000l });
         ctx.statManager().createRateStat("tunnel.buildSuccess", "How often we succeed building a non-exploratory tunnel?", "Tunnels", new long[] { 10*60*1000l, 60*60*1000l, 24*60*60*1000l });
         ctx.statManager().createRateStat("tunnel.buildExploratorySuccess", "How often we succeed building an exploratory tunnel?", "Tunnels", new long[] { 10*60*1000l, 60*60*1000l, 24*60*60*1000l });
+        ctx.statManager().createRateStat("tunnel.buildPartialTime", "How long a non-exploratory request took to be accepted?", "Tunnels", new long[] { 10*60*1000l, 60*60*1000l, 24*60*60*1000l });
+        ctx.statManager().createRateStat("tunnel.buildExploratoryPartialTime", "How long an exploratory request took to be accepted?", "Tunnels", new long[] { 10*60*1000l, 60*60*1000l, 24*60*60*1000l });
 
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Requesting hop " + hop + " in " + cfg);
@@ -262,14 +264,20 @@ public class RequestTunnelJob extends JobImpl {
         if (_onFailed != null)
             getContext().jobQueue().addJob(_onFailed);
         if (_isExploratory)
-            getContext().statManager().addRateData("tunnel.buildExploratoryFailure", 1, 0);
+            getContext().statManager().addRateData("tunnel.buildExploratoryFailure", _currentHop, _config.getLength());
         else
-            getContext().statManager().addRateData("tunnel.buildFailure", 1, 0);
+            getContext().statManager().addRateData("tunnel.buildFailure", _currentHop, _config.getLength());
     }
     
     private void peerSuccess() {
+        long now = getContext().clock().now();
         getContext().profileManager().tunnelJoined(_currentPeer.getIdentity().calculateHash(), 
-                                                   getContext().clock().now() - _lastSendTime);
+                                                   now - _lastSendTime);
+        if (_isExploratory)
+            getContext().statManager().addRateData("tunnel.buildExploratoryPartialTime", now - _lastSendTime, 0);
+        else
+            getContext().statManager().addRateData("tunnel.buildPartialTime", now - _lastSendTime, 0);
+
         if (_currentHop > 0) {
             RequestTunnelJob j = new RequestTunnelJob(getContext(), _config, _onCreated, _onFailed, _currentHop - 1, _isFake, _isExploratory);
             getContext().jobQueue().addJob(j);
