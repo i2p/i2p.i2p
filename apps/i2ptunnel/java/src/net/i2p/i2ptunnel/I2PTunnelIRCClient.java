@@ -330,7 +330,7 @@ public class I2PTunnelIRCClient extends I2PTunnelClientBase implements Runnable 
                 "LIST",
                 "NAMES",
                 "NICK",
-                "QUIT",
+                // "QUIT", // replace with a filtered QUIT to hide client quit messages
                 "SILENCE",
                 "PART",
                 "OPER",
@@ -379,6 +379,8 @@ public class I2PTunnelIRCClient extends I2PTunnelClientBase implements Runnable 
             String realname = field[2].substring(idx+1);
             String ret = "USER "+field[1]+" hostname localhost :"+realname;
             return ret;
+        } else if ("QUIT".equals(command)) {
+            return "QUIT :leaving";
         }
         
         // Block the rest

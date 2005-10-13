@@ -1,4 +1,12 @@
-$Id: history.txt,v 1.290 2005/10/11 02:07:40 jrandom Exp $
+$Id: history.txt,v 1.291 2005/10/11 16:05:15 jrandom Exp $
+
+2005-10-12  jrandom
+    * Choke SSU retransmissions to a peer while there is already a
+      retransmission in flight to them.  This currently lets other initial
+      transmissions through, since packet loss is often sporadic, but maybe
+      this should block initial transmissions as well?
+    * Display the retransmission bytes stat on peers.jsp (thanks bar!)
+    * Filter QUIT messages in the I2PTunnelIRCClient proxy
 
 2005-10-11  jrandom
     * Piggyback the SSU partial ACKs with data packets.  This is backwards
