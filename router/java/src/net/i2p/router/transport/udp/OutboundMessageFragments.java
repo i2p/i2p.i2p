@@ -344,6 +344,14 @@ public class OutboundMessageFragments {
                     _log.info("Fragmenting " + state);
             }
 
+            OutboundMessageState curRetransMsg = (OutboundMessageState)_retransmitters.get(peer);
+            if ( (curRetransMsg != null) && (curRetransMsg != state) ) {
+                // choke it, since there's already another message retransmitting to this
+                // peer.
+                _context.statManager().addRateData("udp.blockedRetransmissions", peer.getPacketsRetransmitted(), peer.getPacketsTransmitted());
+                return false;
+            }
+
             int size = state.getUnackedSize();
             if (peer.allocateSendingBytes(size)) {
                 if (_log.shouldLog(Log.INFO))
@@ -354,17 +362,8 @@ public class OutboundMessageFragments {
                               + " for message " + state.getMessageId() + ": " + state);
 
                 if (state.getPushCount() > 0) {
-                    OutboundMessageState curRetransMsg = (OutboundMessageState)_retransmitters.get(peer);
-                    if ( (curRetransMsg != null) && (curRetransMsg == state) ) {
-                        // choke it, there's already another message to this peer in flight
-                        // perhaps we should release the sendingBytes?  or maybe not, since we
-                        // *do* want to choke the peer...
-                        _context.statManager().addRateData("udp.blockedRetransmissions", peer.getPacketsRetransmitted(), peer.getPacketsTransmitted());
-                        return false;
-                    } else {
-                        _retransmitters.put(peer, state);
-                    }
-                    
+                    _retransmitters.put(peer, state);
+
                     int fragments = state.getFragmentCount();
                     int toSend = 0;
                     for (int i = 0; i < fragments; i++) {
