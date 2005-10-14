@@ -21,7 +21,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 
-import sun.security.provider.SHA;
+//import sun.security.provider.SHA;
 
 import com.sun.syndication.feed.atom.Entry;
 import com.sun.syndication.feed.synd.SyndCategory;
