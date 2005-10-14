@@ -1111,6 +1111,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         buf.append("<tr><td colspan=\"14\" valign=\"top\" align=\"left\">");
         long bytesTransmitted = _context.bandwidthLimiter().getTotalAllocatedOutboundBytes();
         double averagePacketSize = _context.statManager().getRate("udp.sendPacketSize").getLifetimeAverageValue();
+        // lifetime value, not just the retransmitted packets of current connections
+        resentTotal = (long)_context.statManager().getRate("udp.packetsRetransmitted").getLifetimeEventCount();
         double nondupSent = ((double)bytesTransmitted - ((double)resentTotal)*averagePacketSize);
         double bwResent = (nondupSent <= 0 ? 0d : ((((double)resentTotal)*averagePacketSize) / nondupSent));
         buf.append("Percentage of bytes retransmitted (lifetime): ").append(formatPct(bwResent));

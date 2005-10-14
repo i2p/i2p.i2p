@@ -29,7 +29,7 @@
         <ant dir="apps/addressbook/" target="war" />
         <ant dir="apps/susimail/" target="war" />
         <ant dir="apps/susidns/src" target="all" />
-        <ant dir="apps/syndie/java/" target="jar" /> <!-- not pushed in the update... yet -->
+        <ant dir="apps/syndie/java/" target="jar" />
     </target>
     <target name="buildWEB">
         <ant dir="apps/jetty" target="fetchJettylib" />
@@ -89,7 +89,10 @@
         <copy file="apps/susidns/src/susidns.war" todir="build/" />
         <copy file="apps/syndie/syndie.war" todir="build/" />
         <copy file="apps/syndie/java/build/syndie.jar" todir="build/" />
+        <copy file="apps/syndie/java/build/sucker.jar" todir="build/" />
         <copy file="apps/syndie/syndie.war" todir="build/" />
+        <copy file="apps/jdom/jdom.jar" todir="build/" />
+        <copy file="apps/rome/rome-0.7.jar" todir="build/" />
     </target>
     <target name="javadoc">
         <mkdir dir="./build" />
@@ -211,6 +214,9 @@
         <copy file="build/routerconsole.jar" todir="pkg-temp/lib/" />
         <copy file="build/sam.jar" todir="pkg-temp/lib/" />
         <copy file="build/systray.jar" todir="pkg-temp/lib" />
+        <copy file="build/jdom.jar" todir="pkg-temp/lib" />
+        <copy file="build/rome-0.7.jar" todir="pkg-temp/lib" />
+        <copy file="build/sucker.jar" todir="pkg-temp/lib" />
         <copy file="i2p.exe" todir="pkg-temp/" failonerror="false" />
         <copy file="installer/resources/runplain.sh" todir="pkg-temp/" />
         <copy file="apps/systray/java/lib/systray4j.jar" todir="pkg-temp/lib" />
@@ -310,6 +316,12 @@
         <copy file="build/sam.jar" todir="pkg-temp/lib/" />
         <copy file="build/router.jar" todir="pkg-temp/lib/" />
         <copy file="build/routerconsole.jar" todir="pkg-temp/lib/" />
+        <!-- for the 0.6.1.3 release, push JDOM and ROME.  it can be
+             removed later updates (once people on earlier builds upgrade -->
+        <copy file="build/jdom.jar" todir="pkg-temp/lib" />
+        <copy file="build/rome-0.7.jar" todir="pkg-temp/lib" />
+        <copy file="build/sucker.jar" todir="pkg-temp/lib" />
+        
         <copy file="i2p.exe" todir="pkg-temp/" failonerror="false" />
         <copy file="installer/resources/runplain.sh" todir="pkg-temp/" />
         

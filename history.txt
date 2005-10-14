@@ -1,4 +1,10 @@
-$Id: history.txt,v 1.292 2005/10/12 22:54:54 jrandom Exp $
+$Id: history.txt,v 1.293 2005/10/13 04:18:37 jrandom Exp $
+
+2005-10-13  dust
+    * Bundled dust's Sucker for pulling RSS/Atom content into SML, which can
+      then be injected into Syndie with the Syndie CLI.
+    * Bundled ROME and JDOM (BSD and Apache licensed, respectively) for
+      RSS/Atom parsing.
 
 2005-10-13  jrandom
     * SSU retransmission choke bugfix (== != !=)
