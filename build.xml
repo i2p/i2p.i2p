@@ -53,6 +53,9 @@
 	    <os arch="x86_64" />
 	</condition>
         <condition property="noExe">
+	    <os arch="ppc" />
+	</condition>
+        <condition property="noExe">
 	    <os arch="amd64" />
 	</condition>
 	<ant target="doBuildEXE" />

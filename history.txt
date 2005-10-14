@@ -1,4 +1,7 @@
-$Id: history.txt,v 1.294 2005/10/13 21:15:40 jrandom Exp $
+$Id: history.txt,v 1.295 2005/10/14 08:48:05 jrandom Exp $
+
+2005-10-14  jrandom
+    * More explicit filter for linux/PPC building (thanks anon!)
 
 * 2005-10-14  0.6.1.3 released
 
