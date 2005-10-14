@@ -1,9 +1,10 @@
-$Id: history.txt,v 1.296 2005/10/14 10:05:26 jrandom Exp $
+$Id: history.txt,v 1.297 2005/10/14 11:02:38 jrandom Exp $
 
 2005-10-14  jrandom
     * More explicit filter for linux/PPC building (thanks anon!)
     * Fixed Syndie's Sucker to not explicitly reference something only found
       in sun's JVM (thanks cervantes!)
+    * Don't filter IRC "MAP" messages (not critical, but it doesn't hurt)
 
 * 2005-10-14  0.6.1.3 released
 

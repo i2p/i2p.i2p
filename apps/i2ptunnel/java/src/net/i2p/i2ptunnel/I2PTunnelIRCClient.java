@@ -332,6 +332,7 @@ public class I2PTunnelIRCClient extends I2PTunnelClientBase implements Runnable 
                 "NICK",
                 // "QUIT", // replace with a filtered QUIT to hide client quit messages
                 "SILENCE",
+                "MAP", // seems safe enough, the ircd should protect themselves though
                 "PART",
                 "OPER",
                 "PING",
