@@ -906,13 +906,13 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         StringBuffer buf = new StringBuffer(512);
         buf.append("<b id=\"udpcon\">UDP connections: ").append(peers.size()).append("</b><br />\n");
         buf.append("<table border=\"1\">\n");
-        buf.append(" <tr><td><b>peer</b></td><td><b>idle</b></td>");
-        buf.append("     <td><b>in/out</b></td>\n");
-        buf.append("     <td><b>up</b></td><td><b>skew</b></td>\n");
-        buf.append("     <td><b>cwnd</b></td><td><b>ssthresh</b></td>\n");
-        buf.append("     <td><b>rtt</b></td><td><b>dev</b></td><td><b>rto</b></td>\n");
-        buf.append("     <td><b>send</b></td><td><b>recv</b></td>\n");
-        buf.append("     <td><b>resent</b></td><td><b>dupRecv</b></td>\n");
+        buf.append(" <tr><td><b><a href=\"#def.peer\">peer</a></b></td><td><b><a href=\"#def.idle\">idle</a></b></td>");
+        buf.append("     <td><b><a href=\"#def.rate\">in/out</a></b></td>\n");
+        buf.append("     <td><b><a href=\"#def.up\">up</a></b></td><td><b><a href=\"#def.skew\">skew</a></b></td>\n");
+        buf.append("     <td><b><a href=\"#def.cwnd\">cwnd</a></b></td><td><b><a href=\"#def.ssthresh\">ssthresh</a></b></td>\n");
+        buf.append("     <td><b><a href=\"#def.rtt\">rtt</a></b></td><td><b><a href=\"#def.dev\">dev</a></b></td><td><b><a href=\"#def.rto\">rto</a></b></td>\n");
+        buf.append("     <td><b><a href=\"#def.send\">send</a></b></td><td><b><a href=\"#def.recv\">recv</a></b></td>\n");
+        buf.append("     <td><b><a href=\"#def.resent\">resent</a></b></td><td><b><a href=\"#def.dupRecv\">dupRecv</a></b></td>\n");
         buf.append(" </tr>\n");
         out.write(buf.toString());
         buf.setLength(0);
@@ -1095,7 +1095,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         buf.append(formatKBps(bpsIn)).append("KBps/").append(formatKBps(bpsOut));
         buf.append("KBps</td>");
         buf.append("     <td>").append(numPeers > 0 ? DataHelper.formatDuration(uptimeMsTotal/numPeers) : "0s");
-        buf.append("</td><td>&nbsp;</td>\n");
+        buf.append("</td><td>").append(numPeers > 0 ? DataHelper.formatDuration(offsetTotal/numPeers) : "0ms").append("</td>\n");
         buf.append("     <td>");
         buf.append(numPeers > 0 ? cwinTotal/(numPeers*1024) + "K" : "0K");
         buf.append("</td><td>&nbsp;</td>\n");
@@ -1120,17 +1120,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         buf.append("</td></tr>\n");
         out.write(buf.toString());
         buf.setLength(0);
-        
+        out.write(KEY);
         out.write("</table>\n");
-        
-        buf.append("<b>Average clock skew, UDP peers:");
-        if (peers.size() > 0)
-            buf.append(offsetTotal / peers.size()).append("ms</b><br><br>\n");
-        else
-            buf.append("n/a</b><br><br>\n");
-        
-        out.write(buf.toString());
-        buf.setLength(0);
     }
     
     private static final DecimalFormat _fmt = new DecimalFormat("#,##0.00");
@@ -1145,6 +1136,23 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             return _pctFmt.format(pct);
         }
     }
+    
+    private static final String KEY = "<tr><td colspan=\"14\" valign=\"top\" align=\"left\">" +
+        "<b id=\"def.peer\">peer</b>: the remote peer (&lt; means they offer to introduce us, &gt; means we offer to introduce them)<br />\n" +
+        "<b id=\"def.idle\">idle</b>: the idle time is how long since a packet has been received or sent<br />\n" +
+        "<b id=\"def.rate\">in/out</b>: the rates show a smoothed inbound and outbound transfer rate (KBytes per second)<br />\n" +
+        "<b id=\"def.up\">up</b>: the uptime is how long ago this session was established<br />\n" +
+        "<b id=\"def.skew\">skew</b>: the skew says how far off the other user's clock is, relative to your own<br />\n" +
+        "<b id=\"def.cwnd\">cwnd</b>: the congestion window is how many bytes in 'in flight' you can send without an acknowledgement<br />\n" +
+        "<b id=\"def.ssthresh\">ssthresh</b>: the slow start threshold help make sure the cwnd doesn't grow too fast<br />\n" +
+        "<b id=\"def.rtt\">rtt</b>: the round trip time is how long it takes to get an acknowledgement of a packet<br />\n" +
+        "<b id=\"def.dev\">dev</b>: the standard deviation of the round trip time, to help control the retransmit timeout<br />\n" +
+        "<b id=\"def.rto\">rto</b>: the retransmit timeout controls how frequently an unacknowledged packet will be retransmitted<br />\n" +
+        "<b id=\"def.send\">send</b>: the number of packets sent to the peer<br />\n" +
+        "<b id=\"def.recv\">recv</b>: the number of packets received from the peer<br />\n" +
+        "<b id=\"def.resent\">resent</b>: the number of packets retransmitted to the peer<br />\n" +
+        "<b id=\"def.dupRecv\">dupRecv</b>: the number of duplicate packets received from the peer" +
+        "</td></tr>\n";
     
     /**
      * Cache the bid to reduce object churn

@@ -1,4 +1,9 @@
-$Id: history.txt,v 1.293 2005/10/13 04:18:37 jrandom Exp $
+$Id: history.txt,v 1.294 2005/10/13 21:15:40 jrandom Exp $
+
+* 2005-10-14  0.6.1.3 released
+
+2005-10-14  jrandom
+    * Added a key explaining peers.jsp a bit (thanks tethra!)
 
 2005-10-13  dust
     * Bundled dust's Sucker for pulling RSS/Atom content into SML, which can
