@@ -340,6 +340,10 @@ public class I2PTunnelIRCClient extends I2PTunnelClientBase implements Runnable 
                 "HELPME",
                 "RULES"
         };
+
+        if(field[0].length()==0)
+	    return null; // W T F?
+	
         
         if(field[0].charAt(0)==':')
             return null; // wtf
