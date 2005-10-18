@@ -1,4 +1,8 @@
-$Id: history.txt,v 1.298 2005/10/14 11:26:31 jrandom Exp $
+$Id: history.txt,v 1.299 2005/10/17 19:39:46 jrandom Exp $
+
+2005-10-17  dust
+    * Exchange the remaining URL with EepGet in Sucker.
+    * Allow /TOPIC irc command.
 
 2005-10-17  jrandom
     * Allow an env prop to configure whether we want to use the backwards

@@ -14,6 +14,7 @@ import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
 import net.i2p.util.EventDispatcher;
+import net.i2p.util.I2PThread;
 import net.i2p.util.Log;
 
 public class I2PTunnelIRCClient extends I2PTunnelClientBase implements Runnable {
@@ -81,9 +82,9 @@ public class I2PTunnelIRCClient extends I2PTunnelClientBase implements Runnable 
         try {
             i2ps = createI2PSocket(dest);
             i2ps.setReadTimeout(readTimeout);
-            Thread in = new Thread(new IrcInboundFilter(s,i2ps));
+            Thread in = new I2PThread(new IrcInboundFilter(s,i2ps));
             in.start();
-            Thread out = new Thread(new IrcOutboundFilter(s,i2ps));
+            Thread out = new I2PThread(new IrcOutboundFilter(s,i2ps));
             out.start();
         } catch (Exception ex) {
             if (_log.shouldLog(Log.ERROR))
@@ -268,7 +269,8 @@ public class I2PTunnelIRCClient extends I2PTunnelClientBase implements Runnable 
                 "QUIT",
                 "PART",
                 "WALLOPS",
-                "ERROR"
+                "ERROR",
+                "TOPIC"
         };
         
         if(field[0].charAt(0)==':')
@@ -338,7 +340,8 @@ public class I2PTunnelIRCClient extends I2PTunnelClientBase implements Runnable 
                 "PING",
                 "KICK",
                 "HELPME",
-                "RULES"
+                "RULES",
+                "TOPIC"
         };
 
         if(field[0].length()==0)

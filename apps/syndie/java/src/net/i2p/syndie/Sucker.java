@@ -7,15 +7,9 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.MalformedURLException;
-import java.net.Socket;
-import java.net.SocketAddress;
-import java.net.URL;
-import java.net.URLConnection;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -23,7 +17,6 @@ import java.util.ListIterator;
 
 //import sun.security.provider.SHA;
 
-import com.sun.syndication.feed.atom.Entry;
 import com.sun.syndication.feed.synd.SyndCategory;
 import com.sun.syndication.feed.synd.SyndContent;
 import com.sun.syndication.feed.synd.SyndEntry;
@@ -50,6 +43,8 @@ public class Sucker {
     private boolean importEnclosures=true;
     private boolean importRefs=true;
     private boolean pendingEndLink;
+    private boolean shouldProxy;
+    private int proxyPortNum;
     
     public Sucker() {}
     
@@ -96,22 +91,14 @@ public class Sucker {
         if(idx==0)
             idx=x;
         baseUrl=urlToLoad.substring(0,idx);
-        System.out.println("BaseUrl: "+baseUrl);
+
+	System.out.println("Processing: "+urlToLoad);
 
         return true;
     }
     
     public void suck() {
-        URL feedUrl;
         SyndFeed feed;
-        int i;
-
-        //if (proxyHost != null && proxyPort != null) {
-        //    // Set proxy
-        //    System.setProperty("http.proxyHost", proxyHost);
-        //    System.setProperty("http.proxyPort", proxyPort);
-        //}
-
 
         //
         try {
@@ -141,8 +128,8 @@ public class Sucker {
 
             SyndFeedInput input = new SyndFeedInput();
 
-            boolean shouldProxy = false;
-            int proxyPortNum = -1;
+            shouldProxy = false;
+            proxyPortNum = -1;
             if ( (proxyHost != null) && (proxyPort != null) ) {
                 try {
                     proxyPortNum = Integer.parseInt(proxyPort);
@@ -206,14 +193,15 @@ public class Sucker {
                     System.out.println("new: " + messageId);
 
                     if (convertToSml(e, ""+messageNumber)) {
-                        hos.write(messageId.getBytes());
-                        hos.write("\n".getBytes());
 
                         if (pushScript != null) {
-                            if (!execPushScript(""+messageNumber, time))
-                                System.out.println("push failed");
-                            else
+                            if (!execPushScript(""+messageNumber, time)) {
+                                System.out.println("################## push failed");
+                            }else {
                                 System.out.println("push success");
+                                hos.write(messageId.getBytes());
+                                hos.write("\n".getBytes());
+                            }
                         }
                     }
                     messageNumber++;
@@ -285,7 +273,6 @@ public class Sucker {
     private boolean convertToSml(SyndEntry e, String messageName) {
 
         // Create message
-        File messageFile = new File(messageName);
         FileOutputStream fos;
         messagePath=outputDir+"/"+messageName;
         try {
@@ -376,14 +363,15 @@ public class Sucker {
 
     private String htmlTagToSmlTag(String htmlTag) {
         String ret="";
+        String htmlTagLowerCase=htmlTag.toLowerCase();
 
-        if(importEnclosures && htmlTag.startsWith("<img"))
+        if(importEnclosures && htmlTagLowerCase.startsWith("<img"))
         {
             System.out.println("Found image tag: "+htmlTag);
             int a,b;
-            a=htmlTag.indexOf("src=\"")+5;
+            a=htmlTagLowerCase.indexOf("src=\"")+5;
             b=a+1;
-            while(htmlTag.charAt(b)!='\"')
+            while(htmlTagLowerCase.charAt(b)!='\"')
                 b++;
             String imageLink=htmlTag.substring(a,b);
             
@@ -394,11 +382,11 @@ public class Sucker {
     
             ret += "[img attachment=\""+""+ attachmentCounter +"\"]";
             
-            a=htmlTag.indexOf("alt=\"")+5;
+            a=htmlTagLowerCase.indexOf("alt=\"")+5;
             if(a>=5)
             {
                 b=a+1;
-                while(htmlTag.charAt(b)!='\"')
+                while(htmlTagLowerCase.charAt(b)!='\"')
                     b++;
                 String altText=htmlTag.substring(a,b);
                 ret+=altText;
@@ -416,14 +404,14 @@ public class Sucker {
             return ret;
             
         }
-        if(importRefs && htmlTag.startsWith("<a "))
+        if(importRefs && htmlTagLowerCase.startsWith("<a "))
         {
             System.out.println("Found link tag: "+htmlTag);
             int a,b;
             
-            a=htmlTag.indexOf("href=\"")+6;
+            a=htmlTagLowerCase.indexOf("href=\"")+6;
             b=a+1;
-            while(htmlTag.charAt(b)!='\"')
+            while(htmlTagLowerCase.charAt(b)!='\"')
                 b++;
             String link=htmlTag.substring(a,b);
             if(link.indexOf("http")<0)
@@ -439,49 +427,44 @@ public class Sucker {
             return ret;
         }
         
-        if ("</a>".equals(htmlTag)) {
+        if ("</a>".equals(htmlTagLowerCase)) {
             if (pendingEndLink)
                 return "[/link]";
         }
         
-        if("<b>".equals(htmlTag))
+        if("<b>".equals(htmlTagLowerCase))
             return "[b]";
-        if("</b>".equals(htmlTag))
+        if("</b>".equals(htmlTagLowerCase))
             return "[/b]";
-        if("<i>".equals(htmlTag))
+        if("<i>".equals(htmlTagLowerCase))
             return "[i]";
-        if("</i>".equals(htmlTag))
+        if("</i>".equals(htmlTagLowerCase))
             return "[/i]";
         
         return null;
     }
 
     private void fetchAttachment(String link) {
-        System.out.println("Fetch attachment from: "+link);
-        String attachmentPath = messagePath+"."+attachmentCounter;
-        try {
-            link=link.replaceAll("&amp;","&");
-            URL attachmentUrl = new URL(link);
-            InputStream is = attachmentUrl.openStream();
-            
-            FileOutputStream fos = new FileOutputStream(attachmentPath);
-            
-            while(true)
-            {
-                int i =is.read();
-                if(i<0)
-                    break;
-                fos.write(i);
-            }
-            
-        } catch (MalformedURLException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
         
+        System.out.println("Fetch attachment from: "+link);
+        
+        String attachmentPath = messagePath+"."+attachmentCounter;
+            link=link.replaceAll("&amp;","&");
+            
+        int numRetries = 2;
+        File fetched = new File(attachmentPath);
+        // we use eepGet, since it retries and doesn't leak DNS requests like URL does
+        EepGet get = new EepGet(I2PAppContext.getGlobalContext(), shouldProxy, proxyHost, proxyPortNum, 
+                                numRetries, fetched.getAbsolutePath(), link);
+        SuckerFetchListener lsnr = new SuckerFetchListener();
+        get.addStatusListener(lsnr);
+        get.fetch();
+        boolean ok = lsnr.waitForSuccess();
+        if (!ok) {
+            System.err.println("Unable to retrieve the url after " + numRetries + " tries.");
+            fetched.delete();
+            return;
+        }
         attachmentCounter++;
     }
 
