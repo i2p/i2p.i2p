@@ -90,7 +90,10 @@ public class RouterContext extends I2PAppContext {
     }
     private void initAll() {
         _adminManager = new AdminManager(this);
-        _clientManagerFacade = new ClientManagerFacadeImpl(this);
+        if ("false".equals(getProperty("i2p.dummyClientFacade", "false")))
+            _clientManagerFacade = new ClientManagerFacadeImpl(this);
+        else
+            _clientManagerFacade = new DummyClientManagerFacade(this);
         _clientMessagePool = new ClientMessagePool(this);
         _jobQueue = new JobQueue(this);
         _inNetMessagePool = new InNetMessagePool(this);
@@ -98,17 +101,26 @@ public class RouterContext extends I2PAppContext {
         _messageHistory = new MessageHistory(this);
         _messageRegistry = new OutboundMessageRegistry(this);
         _messageStateMonitor = new MessageStateMonitor(this);
-        _netDb = new FloodfillNetworkDatabaseFacade(this); // new KademliaNetworkDatabaseFacade(this);
+        if ("false".equals(getProperty("i2p.dummyNetDb", "false")))
+            _netDb = new FloodfillNetworkDatabaseFacade(this); // new KademliaNetworkDatabaseFacade(this);
+        else
+            _netDb = new DummyNetworkDatabaseFacade(this);
         _keyManager = new KeyManager(this);
         if ("false".equals(getProperty("i2p.vmCommSystem", "false")))
             _commSystem = new CommSystemFacadeImpl(this);
         else
             _commSystem = new VMCommSystem(this);
         _profileOrganizer = new ProfileOrganizer(this);
-        _peerManagerFacade = new PeerManagerFacadeImpl(this);
+        if ("false".equals(getProperty("i2p.dummyPeerManager", "false")))
+            _peerManagerFacade = new PeerManagerFacadeImpl(this);
+        else
+            _peerManagerFacade = new DummyPeerManagerFacade();
         _profileManager = new ProfileManagerImpl(this);
         _bandwidthLimiter = new FIFOBandwidthLimiter(this);
-        _tunnelManager = new TunnelPoolManager(this);
+        if ("false".equals(getProperty("i2p.dummyTunnelManager", "false")))
+            _tunnelManager = new TunnelPoolManager(this);
+        else
+            _tunnelManager = new DummyTunnelManagerFacade();
         _tunnelDispatcher = new TunnelDispatcher(this);
         _statPublisher = new StatisticsManager(this);
         _shitlist = new Shitlist(this);

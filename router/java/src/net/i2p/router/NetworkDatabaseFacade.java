@@ -10,10 +10,7 @@ package net.i2p.router;
 
 import java.io.IOException;
 import java.io.Writer;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import net.i2p.data.Hash;
 import net.i2p.data.LeaseSet;
@@ -68,7 +65,7 @@ class DummyNetworkDatabaseFacade extends NetworkDatabaseFacade {
     private RouterContext _context;
     
     public DummyNetworkDatabaseFacade(RouterContext ctx) {
-        _routers = new HashMap();
+        _routers = Collections.synchronizedMap(new HashMap());
         _context = ctx;
     }
 
@@ -93,11 +90,13 @@ class DummyNetworkDatabaseFacade extends NetworkDatabaseFacade {
     public void publish(RouterInfo localRouterInfo) {}
     public LeaseSet store(Hash key, LeaseSet leaseSet) { return leaseSet; }
     public RouterInfo store(Hash key, RouterInfo routerInfo) {
-        _routers.put(key, routerInfo);
-        return routerInfo;
+        RouterInfo rv = (RouterInfo)_routers.put(key, routerInfo);
+        return rv;
     }
     public void unpublish(LeaseSet localLeaseSet) {}
-    public void fail(Hash dbEntry) {}    
+    public void fail(Hash dbEntry) {
+        _routers.remove(dbEntry);
+    }
     
     public Set findNearestRouters(Hash key, int maxNumRouters, Set peersToIgnore) { return new HashSet(_routers.values()); }
 

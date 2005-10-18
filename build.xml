@@ -31,6 +31,14 @@
         <ant dir="apps/susidns/src" target="all" />
         <ant dir="apps/syndie/java/" target="jar" />
     </target>
+    <target name="buildrouter">
+        <ant dir="core/java/" target="distclean" />
+        <ant dir="router/java/" target="distclean" />
+        <ant dir="core/java/" target="jar" />
+        <ant dir="router/java/" target="jar" />
+        <copy file="core/java/build/i2p.jar" todir="build/" />
+        <copy file="router/java/build/router.jar" todir="build/" />
+    </target>
     <target name="buildWEB">
         <ant dir="apps/jetty" target="fetchJettylib" />
         <ant dir="apps/routerconsole/java" target="build" />
@@ -367,8 +375,8 @@
 	<copy file="installer/resources/blogMeta.snm" tofile="pkg-temp/syndie/archive/ovpBy2mpO1CQ7deYhQ1cDGAwI6pQzLbWOm1Sdd0W06c=/meta.snm" />
 	<copy file="installer/resources/blogPost.snd" tofile="pkg-temp/syndie/archive/ovpBy2mpO1CQ7deYhQ1cDGAwI6pQzLbWOm1Sdd0W06c=/1126915200003.snd" />
     </target>
-    <taskdef name="izpack" classpath="${basedir}/installer/lib/izpack/standalone-compiler.jar" classname="com.izforge.izpack.ant.IzPackTask" />
     <target name="installer" depends="preppkg">
+        <taskdef name="izpack" classpath="${basedir}/installer/lib/izpack/standalone-compiler.jar" classname="com.izforge.izpack.ant.IzPackTask" />
         <jar destfile="./pkg-temp/lib/copy.jar" basedir="./core/java/build/obj" includes="net/i2p/util/*.class">
             <manifest><attribute name="Main-Class" value="net.i2p.util.Copy" /></manifest>
         </jar>

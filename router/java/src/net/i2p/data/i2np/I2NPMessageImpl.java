@@ -12,6 +12,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import net.i2p.I2PAppContext;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
@@ -35,6 +38,15 @@ public abstract class I2NPMessageImpl extends DataStructureImpl implements I2NPM
     public final static int CHECKSUM_LENGTH = 1; //Hash.HASH_LENGTH;
     
     private static final boolean RAW_FULL_SIZE = false;
+    
+    /** unsynchronized as its pretty much read only (except at startup) */
+    private static final Map _builders = new HashMap(8);
+    public static final void registerBuilder(Builder builder, int type) { _builders.put(new Integer(type), builder); }
+    /** interface for extending the types of messages handled */
+    public interface Builder {
+        /** instantiate a new I2NPMessage to be populated shortly */
+        public I2NPMessage build(I2PAppContext ctx);
+    }
     
     public I2NPMessageImpl(I2PAppContext context) {
         _context = context;
@@ -334,7 +346,11 @@ public abstract class I2NPMessageImpl extends DataStructureImpl implements I2NPM
             case TunnelCreateStatusMessage.MESSAGE_TYPE:
                 return new TunnelCreateStatusMessage(context);
             default:
-                return null;
+                Builder builder = (Builder)_builders.get(new Integer(type));
+                if (builder == null)
+                    return null;
+                else
+                    return builder.build(context);
         }
     }
 }

@@ -1,4 +1,16 @@
-$Id: history.txt,v 1.297 2005/10/14 11:02:38 jrandom Exp $
+$Id: history.txt,v 1.298 2005/10/14 11:26:31 jrandom Exp $
+
+2005-10-17  jrandom
+    * Allow an env prop to configure whether we want to use the backwards
+      compatible (but not standards compliant) HMAC-MD5, or whether we want
+      to use the not-backwards compatible (but standards compliant) one.  No
+      one should touch this setting, unless your name is toad or jrandom ;)
+    * Added some new dummy facades
+    * Be more aggressive on loading up the router.config before building the
+      router context
+    * Added new hooks for apps to deal with previously undefined I2NP message
+      types without having to modify any code.
+    * Demo code for using a castrated router for SSU comm (SSUDemo.java)
 
 2005-10-14  jrandom
     * More explicit filter for linux/PPC building (thanks anon!)

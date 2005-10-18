@@ -28,6 +28,7 @@ public class HMACSHA256Generator {
     /** set of available byte[] buffers for verify */
     private List _availableTmp;
     private boolean _useMD5;
+    private int _macSize;
     
     public static final boolean DEFAULT_USE_MD5 = true;
     
@@ -39,6 +40,10 @@ public class HMACSHA256Generator {
             _useMD5 = true;
         else
             _useMD5 = false;
+        if ("true".equals(context.getProperty("i2p.HMACBrokenSize", "true")))
+            _macSize = 32;
+        else
+            _macSize = (_useMD5 ? 16 : 32);
     }
     
     public static HMACSHA256Generator getInstance() {

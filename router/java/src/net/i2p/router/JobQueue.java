@@ -440,8 +440,8 @@ public class JobQueue {
                                 timeToWait = 10;
                             else if (timeToWait > 10*1000)
                                 timeToWait = 10*1000;
-                            if (_log.shouldLog(Log.DEBUG))
-                                _log.debug("Waiting " + timeToWait + " before rechecking the timed queue");
+                            //if (_log.shouldLog(Log.DEBUG))
+                            //    _log.debug("Waiting " + timeToWait + " before rechecking the timed queue");
                             try {
                                 _jobLock.wait(timeToWait);
                             } catch (InterruptedException ie) {}

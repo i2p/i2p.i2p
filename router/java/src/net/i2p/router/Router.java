@@ -106,11 +106,30 @@ public class Router {
         }
 
         _config = new Properties();
-        _context = new RouterContext(this, envProps);
-        if (configFilename == null)
-            _configFilename = _context.getProperty(PROP_CONFIG_FILE, "router.config");
-        else
+
+        if (configFilename == null) {
+            if (envProps != null) {
+                _configFilename = envProps.getProperty(PROP_CONFIG_FILE);
+            }
+            if (_configFilename == null)
+                _configFilename = System.getProperty(PROP_CONFIG_FILE, "router.config");
+        } else {
             _configFilename = configFilename;
+        }
+                    
+        readConfig();
+        if (envProps == null) {
+            envProps = _config;
+        } else {
+            for (Iterator iter = _config.keySet().iterator(); iter.hasNext(); ) {
+                String k = (String)iter.next();
+                String v = _config.getProperty(k);
+                envProps.setProperty(k, v);
+            }
+        }
+            
+
+        _context = new RouterContext(this, envProps);
         _routerInfo = null;
         _higherVersionSeen = false;
         _log = _context.logManager().getLog(Router.class);
@@ -248,9 +267,12 @@ public class Router {
     }
     
     private static Properties getConfig(RouterContext ctx, String filename) {
-        Log log = ctx.logManager().getLog(Router.class);
-        if (log.shouldLog(Log.DEBUG))
-            log.debug("Config file: " + filename);
+        Log log = null;
+        if (ctx != null) {
+            log = ctx.logManager().getLog(Router.class);
+            if (log.shouldLog(Log.DEBUG))
+                log.debug("Config file: " + filename, new Exception("location"));
+        }
         Properties props = new Properties();
         FileInputStream fis = null;
         try {
@@ -260,10 +282,12 @@ public class Router {
                 // dont be a wanker
                 props.remove(PROP_SHUTDOWN_IN_PROGRESS);
             } else {
-                log.warn("Configuration file " + filename + " does not exist");
+                if (log != null)
+                    log.warn("Configuration file " + filename + " does not exist");
             }
         } catch (Exception ioe) {
-            log.error("Error loading the router configuration from " + filename, ioe);
+            if (log != null)
+                log.error("Error loading the router configuration from " + filename, ioe);
         } finally {
             if (fis != null) try { fis.close(); } catch (IOException ioe) {}
         }
