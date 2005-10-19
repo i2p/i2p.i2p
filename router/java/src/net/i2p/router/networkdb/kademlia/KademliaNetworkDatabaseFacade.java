@@ -538,8 +538,10 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         }
     }
     
-    /** I don't think it'll ever make sense to have a lease last for a full day */
-    private static final long MAX_LEASE_FUTURE = 24*60*60*1000;
+    /**
+     * Don't let leaseSets go 20 minutes into the future 
+     */
+    static final long MAX_LEASE_FUTURE = 20*60*1000;
     
     /**
      * Determine whether this leaseSet will be accepted as valid and current

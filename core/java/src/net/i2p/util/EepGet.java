@@ -292,7 +292,11 @@ public class EepGet {
     }
     
     public void stopFetching() { _keepFetching = false; }
-    public void fetch() { 
+    /**
+     * Blocking fetch, returning true if the URL was retrieved, false if all retries failed
+     *
+     */
+    public boolean fetch() { 
         _keepFetching = true;
 
         if (_log.shouldLog(Log.DEBUG))
@@ -301,7 +305,7 @@ public class EepGet {
             try {
                 sendRequest();
                 doFetch();
-                return;
+                return true;
             } catch (IOException ioe) {
                 for (int i = 0; i < _listeners.size(); i++) 
                     ((StatusListener)_listeners.get(i)).attemptFailed(_url, _bytesTransferred, _bytesRemaining, _currentAttempt, _numRetries, ioe);
@@ -328,6 +332,7 @@ public class EepGet {
 
         for (int i = 0; i < _listeners.size(); i++) 
             ((StatusListener)_listeners.get(i)).transferFailed(_url, _bytesTransferred, _bytesRemaining, _currentAttempt);
+        return false;
     }
 
     /** return true if the URL was completely retrieved */

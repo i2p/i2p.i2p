@@ -66,7 +66,7 @@ class TransientDataStore implements DataStore {
     /** nothing published more than 5 minutes in the future */
     private final static long MAX_FUTURE_PUBLISH_DATE = 5*60*1000;
     /** don't accept tunnels set to expire more than 3 hours in the future, which is insane */
-    private final static long MAX_FUTURE_EXPIRATION_DATE = 3*60*60*1000;
+    private final static long MAX_FUTURE_EXPIRATION_DATE = KademliaNetworkDatabaseFacade.MAX_LEASE_FUTURE;
     
     public void put(Hash key, DataStructure data) {
         if (data == null) return;

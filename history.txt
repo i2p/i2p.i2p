@@ -1,4 +1,11 @@
-$Id: history.txt,v 1.300 2005/10/17 22:14:01 dust Exp $
+$Id: history.txt,v 1.301 2005/10/19 00:15:15 jrandom Exp $
+
+2005-10-19  jrandom
+    * Ported the snark bittorrent client to I2P such that it is compatible
+      with i2p-bt and azneti2p.  For usage information, grab an update and run
+      "java -jar lib/i2psnark.jar".  It isn't currently multitorrent capable,
+      but adding in support would be fairly easy (see PeerAcceptor.java:49)
+    * Don't allow leaseSets expiring too far in the future (thanks postman)
 
 2005-10-19  jrandom
     * Bugfix for the auto-update code to handle different usage patterns
