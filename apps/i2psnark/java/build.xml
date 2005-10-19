@@ -19,7 +19,7 @@
         <jar destfile="./build/i2psnark.jar" basedir="./build/obj" includes="**/*.class">
             <manifest>
                 <attribute name="Main-Class" value="org.klomp.snark.Snark" />
-                <attribute name="Class-Path" value="i2p.jar jbigi.jar mstreaming.jar streaming.jar" />
+                <attribute name="Class-Path" value="i2p.jar mstreaming.jar streaming.jar" />
             </manifest>
         </jar>
     </target>
