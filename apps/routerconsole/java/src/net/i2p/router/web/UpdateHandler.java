@@ -31,7 +31,9 @@ public class UpdateHandler {
     
     private static final String SIGNED_UPDATE_FILE = "i2pupdate.sud";
 
-    public UpdateHandler() {}
+    public UpdateHandler() {
+        this(ContextHelper.getContext(null));
+    }
     public UpdateHandler(RouterContext ctx) {
         _context = ctx;
         _log = ctx.logManager().getLog(UpdateHandler.class);

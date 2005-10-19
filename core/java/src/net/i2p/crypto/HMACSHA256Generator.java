@@ -128,10 +128,13 @@ public class HMACSHA256Generator {
             if (_available.size() > 0)
                 return (HMac)_available.remove(0);
         }
+        // the HMAC is hardcoded to use SHA256 digest size
+        // for backwards compatability.  next time we have a backwards
+        // incompatible change, we should update this by removing ", 32"
         if (_useMD5)
-            return new HMac(new MD5Digest());
+            return new HMac(new MD5Digest(), 32);
         else
-        return new HMac(new SHA256Digest());
+        return new HMac(new SHA256Digest(), 32);
     }
     private void release(HMac mac) {
         synchronized (_available) {

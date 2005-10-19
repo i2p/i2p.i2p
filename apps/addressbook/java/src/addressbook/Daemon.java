@@ -143,7 +143,7 @@ public class Daemon {
         defaultSettings.put("subscriptions", "subscriptions.txt");
         defaultSettings.put("etags", "etags");
         defaultSettings.put("last_modified", "last_modified");
-        defaultSettings.put("update_delay", "1");
+        defaultSettings.put("update_delay", "12");
         
         File homeFile = new File(home);
         if (!homeFile.exists()) {

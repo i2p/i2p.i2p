@@ -115,27 +115,29 @@ public class BufferedStatLog implements StatLog {
             int writeStart = -1;
             int writeEnd = -1;
             while (true) {
-                synchronized (_events) {
-                    if (_eventNext > _lastWrite) {
-                        if (_eventNext - _lastWrite < _flushFrequency)
-                            try { _events.wait(30*1000); } catch (InterruptedException ie) {}
-                    } else {
-                        if (_events.length - 1 - _lastWrite + _eventNext < _flushFrequency)
-                            try { _events.wait(30*1000); } catch (InterruptedException ie) {}
+                try {
+                    synchronized (_events) {
+                        if (_eventNext > _lastWrite) {
+                            if (_eventNext - _lastWrite < _flushFrequency)
+                                _events.wait(30*1000);
+                        } else {
+                            if (_events.length - 1 - _lastWrite + _eventNext < _flushFrequency)
+                                _events.wait(30*1000);
+                        }
+                        writeStart = (_lastWrite + 1) % _events.length;
+                        writeEnd = _eventNext;
+                        _lastWrite = (writeEnd == 0 ? _events.length-1 : writeEnd - 1);
                     }
-                    writeStart = (_lastWrite + 1) % _events.length;
-                    writeEnd = _eventNext;
-                    _lastWrite = (writeEnd == 0 ? _events.length-1 : writeEnd - 1);
-                }
-                if (writeStart != writeEnd) {
-                    try {
-                        if (_log.shouldLog(Log.DEBUG))
-                            _log.debug("writing " + writeStart +"->"+ writeEnd);
-                        writeEvents(writeStart, writeEnd);
-                    } catch (Exception e) {
-                        _log.error("error writing " + writeStart +"->"+ writeEnd, e);
+                    if (writeStart != writeEnd) {
+                        try {
+                            if (_log.shouldLog(Log.DEBUG))
+                                _log.debug("writing " + writeStart +"->"+ writeEnd);
+                            writeEvents(writeStart, writeEnd);
+                        } catch (Exception e) {
+                            _log.error("error writing " + writeStart +"->"+ writeEnd, e);
+                        }
                     }
-                }
+                } catch (InterruptedException ie) {}
             }
         }
         

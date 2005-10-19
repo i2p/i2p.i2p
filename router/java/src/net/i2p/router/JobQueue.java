@@ -135,6 +135,7 @@ public class JobQueue {
 
         long numReady = 0;
         boolean alreadyExists = false;
+        boolean dropped = false;
         synchronized (_jobLock) {
             if (_readyJobs.contains(job))
                 alreadyExists = true;
@@ -144,34 +145,33 @@ public class JobQueue {
                     alreadyExists = true;
             }
 
-            _context.statManager().addRateData("jobQueue.readyJobs", numReady, 0);
             if (shouldDrop(job, numReady)) {
-                if (_log.shouldLog(Log.WARN))
-                    _log.warn("Dropping job due to overload!  # ready jobs: " 
-                              + numReady + ": job = " + job);
                 job.dropped();
-                _context.statManager().addRateData("jobQueue.droppedJobs", 1, 1);
-                _jobLock.notifyAll();
-                return;
-            }
-
-            if (!alreadyExists) {
-                if (job.getTiming().getStartAfter() <= _context.clock().now()) {
-                    // don't skew us - its 'start after' its been queued, or later
-                    job.getTiming().setStartAfter(_context.clock().now());
-                    if (job instanceof JobImpl)
-                        ((JobImpl)job).madeReady();
-                    _readyJobs.add(job);
-                    _jobLock.notifyAll();
-                } else {
-                    _timedJobs.add(job);
-                    _jobLock.notifyAll();
-                }
+                dropped = true;
             } else {
-                if (_log.shouldLog(Log.DEBUG))
-                    _log.debug("Not adding already enqueued job " + job.getName());
+                if (!alreadyExists) {
+                    if (job.getTiming().getStartAfter() <= _context.clock().now()) {
+                        // don't skew us - its 'start after' its been queued, or later
+                        job.getTiming().setStartAfter(_context.clock().now());
+                        if (job instanceof JobImpl)
+                            ((JobImpl)job).madeReady();
+                        _readyJobs.add(job);
+                    } else {
+                        _timedJobs.add(job);
+                    }
+                }
             }
+            _jobLock.notifyAll();
         }
+        
+        _context.statManager().addRateData("jobQueue.readyJobs", numReady, 0);
+        if (dropped) {
+            _context.statManager().addRateData("jobQueue.droppedJobs", 1, 1);
+           if (_log.shouldLog(Log.WARN))
+                _log.warn("Dropping job due to overload!  # ready jobs: " 
+                          + numReady + ": job = " + job);
+        }
+
         return;
     }
     
@@ -329,13 +329,15 @@ public class JobQueue {
      */
     Job getNext() {
         while (_alive) {
-            synchronized (_jobLock) {
-                if (_readyJobs.size() > 0) {
-                    return (Job)_readyJobs.remove(0);
-                } else {
-                    try { _jobLock.wait(); } catch (InterruptedException ie) {}
+            try {
+                synchronized (_jobLock) {
+                    if (_readyJobs.size() > 0) {
+                        return (Job)_readyJobs.remove(0);
+                    } else {
+                        _jobLock.wait();
+                    }
                 }
-            }
+            } catch (InterruptedException ie) {}
         }
         if (_log.shouldLog(Log.WARN))
             _log.warn("No longer alive, returning null");
@@ -403,50 +405,50 @@ public class JobQueue {
                     long now = _context.clock().now();
                     long timeToWait = -1;
                     ArrayList toAdd = null;
-                    synchronized (_jobLock) {
-                        for (int i = 0; i < _timedJobs.size(); i++) {
-                            Job j = (Job)_timedJobs.get(i);
-                            // find jobs due to start before now
-                            long timeLeft = j.getTiming().getStartAfter() - now;
-                            if (timeLeft <= 0) {
-                                if (j instanceof JobImpl)
-                                    ((JobImpl)j).madeReady();
+                    try {
+                        synchronized (_jobLock) {
+                            for (int i = 0; i < _timedJobs.size(); i++) {
+                                Job j = (Job)_timedJobs.get(i);
+                                // find jobs due to start before now
+                                long timeLeft = j.getTiming().getStartAfter() - now;
+                                if (timeLeft <= 0) {
+                                    if (j instanceof JobImpl)
+                                        ((JobImpl)j).madeReady();
 
-                                if (toAdd == null) toAdd = new ArrayList(4);
-                                toAdd.add(j);
-                                _timedJobs.remove(i);
-                                i--; // so the index stays consistent
-                            } else {
-                                if ( (timeToWait <= 0) || (timeLeft < timeToWait) )
-                                    timeToWait = timeLeft;
+                                    if (toAdd == null) toAdd = new ArrayList(4);
+                                    toAdd.add(j);
+                                    _timedJobs.remove(i);
+                                    i--; // so the index stays consistent
+                                } else {
+                                    if ( (timeToWait <= 0) || (timeLeft < timeToWait) )
+                                        timeToWait = timeLeft;
+                                }
                             }
-                        }
 
-                        if (toAdd != null) {
-                            if (_log.shouldLog(Log.DEBUG))
-                                _log.debug("Not waiting - we have " + toAdd.size() + " newly ready jobs");
-                            // rather than addAll, which allocs a byte array rv before adding, 
-                            // we iterate, since toAdd is usually going to only be 1 or 2 entries
-                            // and since readyJobs will often have the space, we can avoid the
-                            // extra alloc.  (no, i'm not just being insane - i'm updating this based
-                            // on some profiling data ;)
-                            for (int i = 0; i < toAdd.size(); i++)
-                                _readyJobs.add(toAdd.get(i));
-                            _jobLock.notifyAll();
-                        } else {
-                            if (timeToWait < 0)
-                                timeToWait = 30*1000;
-                            else if (timeToWait < 10)
-                                timeToWait = 10;
-                            else if (timeToWait > 10*1000)
-                                timeToWait = 10*1000;
-                            //if (_log.shouldLog(Log.DEBUG))
-                            //    _log.debug("Waiting " + timeToWait + " before rechecking the timed queue");
-                            try {
+                            if (toAdd != null) {
+                                if (_log.shouldLog(Log.DEBUG))
+                                    _log.debug("Not waiting - we have " + toAdd.size() + " newly ready jobs");
+                                // rather than addAll, which allocs a byte array rv before adding, 
+                                // we iterate, since toAdd is usually going to only be 1 or 2 entries
+                                // and since readyJobs will often have the space, we can avoid the
+                                // extra alloc.  (no, i'm not just being insane - i'm updating this based
+                                // on some profiling data ;)
+                                for (int i = 0; i < toAdd.size(); i++)
+                                    _readyJobs.add(toAdd.get(i));
+                                _jobLock.notifyAll();
+                            } else {
+                                if (timeToWait < 0)
+                                    timeToWait = 30*1000;
+                                else if (timeToWait < 10)
+                                    timeToWait = 10;
+                                else if (timeToWait > 10*1000)
+                                    timeToWait = 10*1000;
+                                //if (_log.shouldLog(Log.DEBUG))
+                                //    _log.debug("Waiting " + timeToWait + " before rechecking the timed queue");
                                 _jobLock.wait(timeToWait);
-                            } catch (InterruptedException ie) {}
-                        }
-                    } // synchronize (_jobLock)
+                            }
+                        } // synchronize (_jobLock)
+                    } catch (InterruptedException ie) {}
                 } // while (_alive)
             } catch (Throwable t) {
                 _context.clock().removeUpdateListener(this);

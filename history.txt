@@ -1,4 +1,12 @@
-$Id: history.txt,v 1.299 2005/10/17 19:39:46 jrandom Exp $
+$Id: history.txt,v 1.300 2005/10/17 22:14:01 dust Exp $
+
+2005-10-19  jrandom
+    * Bugfix for the auto-update code to handle different usage patterns
+    * Decreased the addressbook recheck frequency to once every 12 hours
+      instead of hourly.
+    * Handle dynamically changing the HMAC size (again, unless your nym is
+      toad or jrandom, ignore this ;)
+    * Cleaned up some synchronization/locking code
 
 2005-10-17  dust
     * Exchange the remaining URL with EepGet in Sucker.

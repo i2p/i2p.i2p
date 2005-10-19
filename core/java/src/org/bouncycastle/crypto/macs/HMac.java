@@ -59,8 +59,13 @@ implements Mac
     public HMac(
         Digest digest)
     {
+        this(digest, digest.getDigestSize()); 
+    }
+    public HMac(
+        Digest digest, int sz)
+    {
         this.digest = digest;
-        digestSize = digest.getDigestSize();
+        this.digestSize = sz; 
     }
 
     public String getAlgorithmName()
@@ -141,7 +146,7 @@ implements Mac
         byte[] out,
         int outOff)
     {
-        byte[] tmp = acquireTmp();
+        byte[] tmp = acquireTmp(digestSize);
         //byte[] tmp = new byte[digestSize];
         digest.doFinal(tmp, 0);
 
@@ -156,23 +161,27 @@ implements Mac
         return len;
     }
     
-    private static ArrayList _tmpBuf = new ArrayList();
-    private static byte[] acquireTmp() {
+    /**
+     * list of buffers - index 0 is the cache for 32 byte arrays, while index 1 is the cache for 16 byte arrays
+     */
+    private static ArrayList _tmpBuf[] = new ArrayList[] { new ArrayList(), new ArrayList() };
+    private static byte[] acquireTmp(int sz) {
         byte rv[] = null;
-        synchronized (_tmpBuf) {
-            if (_tmpBuf.size() > 0)
-                rv = (byte[])_tmpBuf.remove(0);
+        synchronized (_tmpBuf[sz == 32 ? 0 : 1]) {
+            if (_tmpBuf[sz == 32 ? 0 : 1].size() > 0)
+                rv = (byte[])_tmpBuf[sz == 32 ? 0 : 1].remove(0);
         }
         if (rv != null)
             Arrays.fill(rv, (byte)0x0);
         else
-            rv = new byte[32]; // hard coded against SHA256 (should be digestSize)
+            rv = new byte[sz];
         return rv;
     }
     private static void releaseTmp(byte buf[]) {
-        synchronized (_tmpBuf) {
-            if (_tmpBuf.size() < 100) 
-                _tmpBuf.add((Object)buf);
+        if (buf == null) return;
+        synchronized (_tmpBuf[buf.length == 32 ? 0 : 1]) {
+            if (_tmpBuf[buf.length == 32 ? 0 : 1].size() < 100) 
+                _tmpBuf[buf.length == 32 ? 0 : 1].add((Object)buf);
         }
     }
 
