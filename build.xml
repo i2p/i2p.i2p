@@ -30,6 +30,7 @@
         <ant dir="apps/susimail/" target="war" />
         <ant dir="apps/susidns/src" target="all" />
         <ant dir="apps/syndie/java/" target="jar" />
+        <ant dir="apps/i2psnark/java/" target="jar" />
     </target>
     <target name="buildrouter">
         <ant dir="core/java/" target="distclean" />
@@ -102,6 +103,7 @@
         <copy file="apps/syndie/java/build/syndie.jar" todir="build/" />
         <copy file="apps/syndie/java/build/sucker.jar" todir="build/" />
         <copy file="apps/syndie/syndie.war" todir="build/" />
+        <copy file="apps/i2psnark/java/build/i2psnark.jar" todir="build/" />
         <copy file="apps/jdom/jdom.jar" todir="build/" />
         <copy file="apps/rome/rome-0.7.jar" todir="build/" />
     </target>
@@ -158,6 +160,7 @@
         <ant dir="apps/susimail/" target="distclean" />
         <ant dir="apps/susidns/src/" target="distclean" />
         <ant dir="apps/systray/java/" target="distclean" />
+        <ant dir="apps/i2psnark/java/" target="distclean" />
         <ant dir="installer/java/" target="distclean" />
         <delete>
             <fileset dir="." includes="**/*.class" />
@@ -228,6 +231,7 @@
         <copy file="build/jdom.jar" todir="pkg-temp/lib" />
         <copy file="build/rome-0.7.jar" todir="pkg-temp/lib" />
         <copy file="build/sucker.jar" todir="pkg-temp/lib" />
+        <copy file="build/i2psnark.jar" todir="pkg-temp/lib/" />
         <copy file="i2p.exe" todir="pkg-temp/" failonerror="false" />
         <copy file="installer/resources/runplain.sh" todir="pkg-temp/" />
         <copy file="apps/systray/java/lib/systray4j.jar" todir="pkg-temp/lib" />
@@ -332,6 +336,7 @@
         <copy file="build/jdom.jar" todir="pkg-temp/lib" />
         <copy file="build/rome-0.7.jar" todir="pkg-temp/lib" />
         <copy file="build/sucker.jar" todir="pkg-temp/lib" />
+        <copy file="build/i2psnark.jar" todir="pkg-temp/lib" />
         
         <copy file="i2p.exe" todir="pkg-temp/" failonerror="false" />
         <copy file="installer/resources/runplain.sh" todir="pkg-temp/" />
