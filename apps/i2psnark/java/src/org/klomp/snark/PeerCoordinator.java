@@ -69,13 +69,12 @@ public class PeerCoordinator implements PeerListener
     this.storage = storage;
     this.listener = listener;
 
-    // Make a random list of piece numbers
+    // Make a list of pieces
     wantedPieces = new ArrayList();
     BitField bitfield = storage.getBitField();
     for(int i = 0; i < metainfo.getPieces(); i++)
       if (!bitfield.get(i))
-        wantedPieces.add(new Integer(i));
-    Collections.shuffle(wantedPieces);
+        wantedPieces.add(new Piece(i));
 
     // Install a timer to check the uploaders.
     timer.schedule(new PeerCheckerTask(this), CHECK_PERIOD, CHECK_PERIOD);
@@ -288,7 +287,7 @@ public class PeerCoordinator implements PeerListener
 
     synchronized(wantedPieces)
       {
-        return wantedPieces.contains(new Integer(piece));
+        return wantedPieces.contains(new Piece(piece));
       }
   }
 
@@ -306,8 +305,10 @@ public class PeerCoordinator implements PeerListener
         Iterator it = wantedPieces.iterator();
         while (it.hasNext())
           {
-            int i = ((Integer)it.next()).intValue();
+            Piece p = (Piece)it.next();
+            int i = p.getId();
             if (bitfield.get(i))
+              p.addPeer(peer);
               return true;
           }
       }
@@ -325,28 +326,38 @@ public class PeerCoordinator implements PeerListener
 
     synchronized(wantedPieces)
       {
-        Integer piece = null;
+        Piece piece = null;
+        Collections.sort(wantedPieces); // Sort in order of rarest first.
+        List requested = new ArrayList(); 
         Iterator it = wantedPieces.iterator();
         while (piece == null && it.hasNext())
           {
-            Integer i = (Integer)it.next();
-            if (havePieces.get(i.intValue()))
+            Piece p = (Piece)it.next();
+            if (havePieces.get(p.getId()) && !p.isRequested())
               {
-                it.remove();
-                piece = i;
+                piece = p;
               }
+            else if (p.isRequested()) 
+            {
+                requested.add(p);
+            }
           }
-
-        if (piece == null)
-          return -1;
-
-        // We add it back at the back of the list. It will be removed
-        // if gotPiece is called later. This means that the last
-        // couple of pieces might very well be asked from multiple
-        // peers but that is OK.
-        wantedPieces.add(piece);
-
-        return piece.intValue();
+        
+        //Only request a piece we've requested before if there's no other choice.
+        if (piece == null) {
+            Iterator it2 = requested.iterator();
+            while (piece == null && it2.hasNext())
+              {
+                Piece p = (Piece)it2.next();
+                if (havePieces.get(p.getId()))
+                  {
+                    piece = p;
+                  }
+              }
+            if (piece == null) return -1; //If we still can't find a piece we want, so be it.
+        }
+        piece.setRequested(true);
+        return piece.getId();
       }
   }
 
@@ -404,7 +415,7 @@ public class PeerCoordinator implements PeerListener
     
     synchronized(wantedPieces)
       {
-        Integer p = new Integer(piece);
+        Piece p = new Piece(piece);
         if (!wantedPieces.contains(p))
           {
             if (Snark.debug >= Snark.INFO)
