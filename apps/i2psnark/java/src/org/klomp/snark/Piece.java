@@ -12,6 +12,7 @@ public class Piece implements Comparable {
     public Piece(int id) {
         this.id = id;
         this.peers = new HashSet();
+        this.requested = false;
     }
     
     public int compareTo(Object o) throws ClassCastException {

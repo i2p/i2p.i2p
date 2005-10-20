@@ -75,6 +75,7 @@ public class PeerCoordinator implements PeerListener
     for(int i = 0; i < metainfo.getPieces(); i++)
       if (!bitfield.get(i))
         wantedPieces.add(new Piece(i));
+    Collections.shuffle(wantedPieces);
 
     // Install a timer to check the uploaders.
     timer.schedule(new PeerCheckerTask(this), CHECK_PERIOD, CHECK_PERIOD);
