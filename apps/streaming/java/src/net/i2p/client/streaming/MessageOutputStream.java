@@ -77,6 +77,7 @@ public class MessageOutputStream extends OutputStream {
     }
     
     public void write(byte b[], int off, int len) throws IOException {
+        if (_closed) throw new IOException("Already closed");
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("write(b[], " + off + ", " + len + ") ");
         int cur = off;

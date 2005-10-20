@@ -460,6 +460,8 @@ public class Router {
         private long getTimeTillMidnight() {
             long now = Router.this._context.clock().now();
             _cal.setTime(new Date(now));
+            _cal.set(Calendar.YEAR, _cal.get(Calendar.YEAR));               // gcj <= 4.0 workaround
+            _cal.set(Calendar.DAY_OF_YEAR, _cal.get(Calendar.DAY_OF_YEAR)); // gcj <= 4.0 workaround
             _cal.add(Calendar.DATE, 1);
             _cal.set(Calendar.HOUR_OF_DAY, 0);
             _cal.set(Calendar.MINUTE, 0);
@@ -468,7 +470,7 @@ public class Router {
             long then = _cal.getTime().getTime();
             long howLong = then - now;
             if (howLong < 0) // hi kaffe
-                howLong = 24*60*60*1000 + howLong;
+                howLong = 24*60*60*1000l + howLong;
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Time till midnight: " + howLong + "ms");
             return howLong;

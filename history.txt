@@ -1,4 +1,10 @@
-$Id: history.txt,v 1.301 2005/10/19 00:15:15 jrandom Exp $
+$Id: history.txt,v 1.302 2005/10/19 17:38:46 jrandom Exp $
+
+2005-10-20  jrandom
+    * Workaround a bug in GCJ's Calendar implementation
+    * Propery throw an exception in the streaming lib if we try to write to a
+      closed stream.  This will hopefully help clear some I2Phex bugs (thanks
+      GregorK!)
 
 2005-10-19  jrandom
     * Ported the snark bittorrent client to I2P such that it is compatible

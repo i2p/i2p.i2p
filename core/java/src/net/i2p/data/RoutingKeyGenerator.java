@@ -71,14 +71,18 @@ public class RoutingKeyGenerator {
      */
     public void generateDateBasedModData() {
         Date today = null;
+        long now = _context.clock().now();
         synchronized (_cal) {
-            _cal.setTime(new Date(_context.clock().now()));
+            _cal.setTime(new Date(now));
+            _cal.set(Calendar.YEAR, _cal.get(Calendar.YEAR));               // gcj <= 4.0 workaround
+            _cal.set(Calendar.DAY_OF_YEAR, _cal.get(Calendar.DAY_OF_YEAR)); // gcj <= 4.0 workaround
             _cal.set(Calendar.HOUR_OF_DAY, 0);
             _cal.set(Calendar.MINUTE, 0);
             _cal.set(Calendar.SECOND, 0);
             _cal.set(Calendar.MILLISECOND, 0);
             today = _cal.getTime();
         }
+        
         byte mod[] = null;
         String modVal = null;
         synchronized (_fmt) {
@@ -91,7 +95,7 @@ public class RoutingKeyGenerator {
             _log.info("Routing modifier generated: " + modVal);
         setModData(mod);
     }
-
+    
     /**
      * Generate a modified (yet consistent) hash from the origKey by generating the
      * SHA256 of the targetKey with the current modData appended to it, *then* 
