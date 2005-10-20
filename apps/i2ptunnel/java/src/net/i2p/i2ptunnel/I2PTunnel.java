@@ -620,11 +620,11 @@ public class I2PTunnel implements Logging, EventDispatcher {
             }
             
             boolean isShared = true;
-            if (args.length > 1) {
+            if (args.length > 2) {
                 if ("true".equalsIgnoreCase(args[2].trim())) {
                     isShared = true;
-                } else if ("false".equalsIgnoreCase(args[1].trim())) {
-                    _log.warn("args[1] == [" + args[1] + "] and rejected explicitly");
+                } else if ("false".equalsIgnoreCase(args[2].trim())) {
+                    _log.warn("args[2] == [" + args[2] + "] and rejected explicitly");
                     isShared = false;
                 } else {
                     // isShared not specified, default to true

@@ -340,6 +340,11 @@ public class Sucker {
                 //System.out.println("html: "+html.substring(i));
                 
                 int tagLen = findTagLen(html.substring(i));
+                if(tagLen<=0)
+                {
+                        System.out.println("Bad html? ("+html+")");
+                        break;
+                }
                 //
                 String htmlTag = html.substring(i,i+tagLen);
                 
@@ -477,12 +482,12 @@ public class Sucker {
             if(s.charAt(i)=='"')
             {
                 i++;
-                while(s.charAt(i)!='"')
+                while(i<s.length() && s.charAt(i)!='"')
                     i++;
             }   
         }
         System.out.println("WTF");
-        return 0;
+        return -1;
     }
 
     private boolean existsInHistory(String messageId) {

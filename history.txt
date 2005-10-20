@@ -1,4 +1,9 @@
-$Id: history.txt,v 1.302 2005/10/19 17:38:46 jrandom Exp $
+$Id: history.txt,v 1.303 2005/10/20 03:56:40 jrandom Exp $
+
+2005-10-20  dust
+    * Fix bug in ircclient that prevented it to use its own dest (i.e. was
+      always shared. (thx for info Ragnarok)
+    * Fix crash in Sucker with some bad html.
 
 2005-10-20  jrandom
     * Workaround a bug in GCJ's Calendar implementation
