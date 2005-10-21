@@ -2,6 +2,7 @@ package org.klomp.snark;
 
 import java.util.Set;
 import java.util.HashSet;
+import java.util.Collections;
 
 public class Piece implements Comparable {
 
@@ -11,7 +12,7 @@ public class Piece implements Comparable {
     
     public Piece(int id) {
         this.id = id;
-        this.peers = new HashSet();
+        this.peers = Collections.synchronizedSet(new HashSet());
         this.requested = false;
     }
     

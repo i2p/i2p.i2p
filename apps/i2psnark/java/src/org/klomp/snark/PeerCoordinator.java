@@ -511,11 +511,12 @@ public class PeerCoordinator implements PeerListener
           {
             // Unchoke some random other peer
             unchokePeer();
-            
-            // Don't count disconnected peers for the rarest-first calculations
-            for(Iterator iter = wantedPieces.iterator(); iter.hasNext(); ) {
-                Piece piece = (Piece)iter.next();
-                piece.removePeer(peer);                
+            synchronized(wantedPieces) {
+                // Don't count disconnected peers for the rarest-first calculations
+                for(Iterator iter = wantedPieces.iterator(); iter.hasNext(); ) {
+                    Piece piece = (Piece)iter.next();
+                    piece.removePeer(peer);
+                }
             }
           }
       }
