@@ -153,6 +153,7 @@ public class PeerCoordinator implements PeerListener
             Peer peer = (Peer)it.next();
             peer.disconnect();
             it.remove();
+            removePeerFromPieces(peer);
           }
       }
   }
@@ -511,17 +512,23 @@ public class PeerCoordinator implements PeerListener
           {
             // Unchoke some random other peer
             unchokePeer();
-            synchronized(wantedPieces) {
-                // Don't count disconnected peers for the rarest-first calculations
-                for(Iterator iter = wantedPieces.iterator(); iter.hasNext(); ) {
-                    Piece piece = (Piece)iter.next();
-                    piece.removePeer(peer);
-                }
-            }
+            removePeerFromPieces(peer);
           }
       }
 
     if (listener != null)
       listener.peerChange(this, peer);
+  }
+  
+  /** Called when a peer is removed, to prevent it from being used in 
+   * rarest-first calculations.
+   */
+  public void removePeerFromPieces(Peer peer) {
+      synchronized(wantedPieces) {
+          for(Iterator iter = wantedPieces.iterator(); iter.hasNext(); ) {
+              Piece piece = (Piece)iter.next();
+              piece.removePeer(peer);
+          }
+      } 
   }
 }

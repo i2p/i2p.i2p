@@ -69,6 +69,7 @@ class PeerCheckerTask extends TimerTask
             if (!peer.isConnected())
               {
                 it.remove();
+                coordinator.removePeerFromPieces(peer);
                 continue;
               }
 
