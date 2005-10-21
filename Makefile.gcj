@@ -1,0 +1,73 @@
+# Makefile for building native I2P binaries and libraries with GCJ
+#
+# WARNING: Do not use this yet, as it may explode (etc).
+#
+GCJ=gcj #/usr/local/gcc-4.0.2/bin/gcj
+EXTRA_LD_PATH= #/usr/local/gcc-4.0.2/lib
+ANT=ant #/opt/apache-ant-1.6.5/bin/ant
+ANT_TARGET=buildclean
+NATIVE_DIR=native
+
+## 
+# Define what jar files get into libi2p.so.  The current setup is
+# *incredibly* lazy, throwing everything in the .so, rather than
+# give each .jar file its own .so.
+#  i2p.jar: base SDK
+#  mstreaming.jar: streaming API
+#  streaming.jar: full streaming lib implementation
+#  i2ptunnel.jar: I2PTunnel proxy
+#  sam.jar: SAM bridge and API
+#  i2psnark.jar: bittorrent client
+#  router.jar: full I2P router
+#  jbigi.jar: collection of native optimized GMP routines for crypto
+JAR_BASE=i2p.jar mstreaming.jar streaming.jar
+JAR_CLIENTS=i2ptunnel.jar sam.jar i2psnark.jar
+JAR_ROUTER=router.jar
+JAR_JBIGI=jbigi.jar
+LIBI2P_JARS=${JAR_BASE} ${JAR_CLIENTS} ${JAR_ROUTER} ${JAR_JBIGI}
+
+# The i2p.weakPRNG uses java.util.Random to generate random values from.
+# This is Not Good.  Remove this once java.security.SecureRandom works
+SYSTEM_PROPS=-Di2p.weakPRNG=true
+
+LD_LIBRARY_PATH=${EXTRA_LD_PATH}:.
+
+all: jars native
+	@echo "* Build complete"
+
+jars:
+	@${ANT} ${ANT_TARGET}
+
+clean: native_clean
+
+native: native_clean native_shared
+	@echo "* Native code build in ${NATIVE}"
+
+native_clean:
+	@rm -rf ${NATIVE_DIR}
+	@mkdir ${NATIVE_DIR}
+
+native_shared: libi2p.so
+	@cd build ; ${GCJ} -fjni -L../${NATIVE_DIR} -li2p ${SYSTEM_PROPS} -o ../${NATIVE_DIR}/i2p_dsa --main=net.i2p.crypto.DSAEngine 
+	@echo "* i2p_dsa is a simple test app with the weak PRNG to make sure crypto is working"
+	@cd build ; ${GCJ} -fjni -L../${NATIVE_DIR} -li2p -o ../${NATIVE_DIR}/i2p_dsa_prng --main=net.i2p.crypto.DSAEngine 
+	@echo "* i2p_dsa_prng is i2p_dsa with the real PRNG"
+	@echo "  it will hang forever until we get the PRNG issue solved"
+	@cd build ; ${GCJ} -fjni -L../${NATIVE_DIR} -li2p ${SYSTEM_PROPS} -o ../${NATIVE_DIR}/i2ptunnel --main=net.i2p.i2ptunnel.I2PTunnel 
+	@echo "* i2ptunnel is mihi's I2PTunnel CLI"
+	@echo "  run it as ./i2ptunnel -cli to avoid awt complaints"
+	@cd build ; ${GCJ} -fjni -L../${NATIVE_DIR} -li2p ${SYSTEM_PROPS} -o ../${NATIVE_DIR}/i2ptunnelctl --main=net.i2p.i2ptunnel.TunnelControllerGroup 
+	@echo "* i2ptunnelctl is a controller for I2PTunnel, reading i2ptunnel.config"
+	@echo "  and launching the appropriate proxies"
+	@cd build ; ${GCJ} -fjni -L../${NATIVE_DIR} -li2p ${SYSTEM_PROPS} -o ../${NATIVE_DIR}/i2psnark --main=org.klomp.snark.Snark
+	@echo "* i2psnark is an anonymous bittorrent client"
+	@cd build ; ${GCJ} -fjni -L../${NATIVE_DIR} -li2p ${SYSTEM_PROPS} -o ../${NATIVE_DIR}/i2prouter --main=net.i2p.router.Router 
+	@echo "* i2prouter is the main I2P router"
+	@echo "  it can be used, and while the router console won't load,"
+	@echo "  i2ptunnel will, so it will start all the proxies defined in i2ptunnel.config"
+
+libi2p.so:
+	@echo "* Building libi2p.so"
+	@(cd build ; ${GCJ} -fPIC -fjni -shared -o ../${NATIVE_DIR}/libi2p.so ${LIBI2P_JARS} ; cd .. )
+	@ls -l ${NATIVE_DIR}/libi2p.so
+	@echo "* libi2p.so built"
