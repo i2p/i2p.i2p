@@ -26,6 +26,7 @@ import net.i2p.util.Clock;
 import net.i2p.util.LogManager;
 import net.i2p.util.RandomSource;
 import net.i2p.util.PooledRandomSource;
+import net.i2p.util.FortunaRandomSource;
 
 /**
  * <p>Provide a base scope for accessing singletons that I2P exposes.  Rather than
@@ -456,7 +457,9 @@ public class I2PAppContext {
     private void initializeRandom() {
         synchronized (this) {
             if (_random == null) {
-                if ("true".equals(getProperty("i2p.weakPRNG", "false")))
+                if (true)
+                    _random = new FortunaRandomSource(this);
+                else if ("true".equals(getProperty("i2p.weakPRNG", "false")))
                     _random = new DummyPooledRandomSource(this);
                 else
                     _random = new PooledRandomSource(this);

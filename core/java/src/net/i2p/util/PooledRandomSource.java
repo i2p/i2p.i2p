@@ -11,6 +11,7 @@ package net.i2p.util;
 
 import net.i2p.I2PAppContext;
 import net.i2p.crypto.EntropyHarvester;
+import net.i2p.data.Base64;
 
 /**
  * Maintain a set of PRNGs to feed the apps
@@ -48,6 +49,9 @@ public class PooledRandomSource extends RandomSource {
                 totalSize = -1;
             }
         }
+
+        byte buf[] = new byte[1024];
+        initSeed(buf);
         for (int i = 0; i < POOL_SIZE; i++) {
             if (totalSize < 0)
                 _pool[i] = new BufferedRandomSource(context);
@@ -55,8 +59,14 @@ public class PooledRandomSource extends RandomSource {
                 _pool[i] = new BufferedRandomSource(context, (totalSize*1024) / POOL_SIZE);
             else
                 _pool[i] = new RandomSource(context);
-            _pool[i].nextBoolean();
+            _pool[i].setSeed(buf);
+            if (i > 0) {
+                _pool[i-1].nextBytes(buf);
+                _pool[i].setSeed(buf);
+            }
         }
+	_pool[0].nextBytes(buf);
+	System.out.println("seeded and initialized: " + Base64.encode(buf));
         _nextPool = 0;
     }
 
@@ -174,7 +184,11 @@ public class PooledRandomSource extends RandomSource {
     }
     
     public static void main(String args[]) {
-        PooledRandomSource prng = new PooledRandomSource(I2PAppContext.getGlobalContext());
+        //PooledRandomSource prng = new PooledRandomSource(I2PAppContext.getGlobalContext());
+        long start = System.currentTimeMillis();
+        RandomSource prng = I2PAppContext.getGlobalContext().random();
+        long created = System.currentTimeMillis();
+        System.out.println("prng type: " + prng.getClass().getName());
         int size = 8*1024*1024;
         try {
             java.io.FileOutputStream out = new java.io.FileOutputStream("random.file");
@@ -183,6 +197,8 @@ public class PooledRandomSource extends RandomSource {
             }
             out.close();
         } catch (Exception e) { e.printStackTrace(); }
-        System.out.println("Written to random.file");
+        long done = System.currentTimeMillis();
+        System.out.println("Written to random.file: create took " + (created-start) + ", generate took " + (done-created));
+	prng.saveSeed();
     }    
 }

@@ -770,6 +770,7 @@ public class Router {
     
     public void shutdown(int exitCode) {
         _isAlive = false;
+        _context.random().saveSeed();
         I2PThread.removeOOMEventListener(_oomListener);
         try { _context.jobQueue().shutdown(); } catch (Throwable t) { _log.log(Log.CRIT, "Error shutting down the job queue", t); }
         //try { _context.adminManager().shutdown(); } catch (Throwable t) { _log.log(Log.CRIT, "Error shutting down the admin manager", t); }        

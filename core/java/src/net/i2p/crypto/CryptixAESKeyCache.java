@@ -10,7 +10,7 @@ import java.util.List;
  * of code)
  *
  */
-final class CryptixAESKeyCache {
+public final class CryptixAESKeyCache {
     private List _availableKeys;
     
     private static final int KEYSIZE = 32; // 256bit AES
@@ -48,7 +48,7 @@ final class CryptixAESKeyCache {
         }
     }
     
-    private static final KeyCacheEntry createNew() {
+    public static final KeyCacheEntry createNew() {
         KeyCacheEntry e = new KeyCacheEntry();
         e.Ke = new int[ROUNDS + 1][BC]; // encryption round keys
         e.Kd = new int[ROUNDS + 1][BC]; // decryption round keys

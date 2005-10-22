@@ -130,9 +130,13 @@ public class DSAEngine {
         Signature sig = new Signature();
         BigInteger k;
 
+        boolean ok = false;
         do {
             k = new BigInteger(160, _context.random());
-        } while (k.compareTo(CryptoConstants.dsaq) != 1);
+            ok = k.compareTo(CryptoConstants.dsaq) != 1;
+            ok = ok && !k.equals(BigInteger.ZERO);
+            //System.out.println("K picked (ok? " + ok + "): " + k.bitLength() + ": " + k.toString());
+        } while (!ok);
 
         BigInteger r = CryptoConstants.dsag.modPow(k, CryptoConstants.dsap).mod(CryptoConstants.dsaq);
         BigInteger kinv = k.modInverse(CryptoConstants.dsaq);
@@ -145,6 +149,9 @@ public class DSAEngine {
         byte[] sbytes = s.toByteArray();
         byte[] out = new byte[40];
 
+        // (q^random)%p is computationally random
+        _context.random().harvester().feedEntropy("DSA.sign", rbytes, 0, rbytes.length);
+        
         if (rbytes.length == 20) {
             for (int i = 0; i < 20; i++) {
                 out[i] = rbytes[i];
@@ -202,5 +209,20 @@ public class DSAEngine {
         h.engineUpdate(source, offset, len);
         byte digested[] = h.digest();
         return new Hash(digested);
+    }
+
+    public static void main(String args[]) {
+        I2PAppContext ctx = I2PAppContext.getGlobalContext();
+        byte data[] = new byte[4096];
+        ctx.random().nextBytes(data);
+        Object keys[] = ctx.keyGenerator().generateSigningKeypair();
+        try {
+            for (int i = 0; i < 10; i++) {
+                Signature sig = ctx.dsa().sign(data, (SigningPrivateKey)keys[1]);
+                boolean ok = ctx.dsa().verifySignature(sig, data, (SigningPublicKey)keys[0]);
+                System.out.println("OK: " + ok);
+            }
+        } catch (Exception e) { e.printStackTrace(); }
+        ctx.random().saveSeed();
     }
 }

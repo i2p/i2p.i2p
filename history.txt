@@ -1,4 +1,15 @@
-$Id: history.txt,v 1.303 2005/10/20 03:56:40 jrandom Exp $
+$Id: history.txt,v 1.304 2005/10/20 14:42:13 dust Exp $
+
+2005-10-22  jrandom
+    * Integrated GNU-Crypto's Fortuna PRNG, seeding it off /dev/urandom and
+      ./prngseed.rnd (if they exist), and reseeding it with data out of
+      various crypto operations (unused bits in a DH exchange, intermediary
+      bits in a DSA signature generation, extra bits in an ElGamal decrypt).
+      The Fortuna implementation under gnu.crypto.prng has been modified to
+      use BouncyCastle's SHA256 and Cryptix's AES (since those are the ones
+      I2P uses), and the resulting gnu.crypto.prng.* are therefor available
+      under GPL+Classpath's linking exception (~= LGPL).  I2P's SecureRandom
+      wrapper around it is, of course, public domain.
 
 2005-10-20  dust
     * Fix bug in ircclient that prevented it to use its own dest (i.e. was

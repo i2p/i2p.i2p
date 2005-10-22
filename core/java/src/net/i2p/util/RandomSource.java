@@ -13,13 +13,19 @@ import java.security.SecureRandom;
 
 import net.i2p.I2PAppContext;
 import net.i2p.crypto.EntropyHarvester;
+import net.i2p.data.Base64;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 
 /**
  * Singleton for whatever PRNG i2p uses.  
  *
  * @author jrandom
  */
-public class RandomSource extends SecureRandom {
+public class RandomSource extends SecureRandom implements EntropyHarvester {
     private Log _log;
     private EntropyHarvester _entropyHarvester;
     protected I2PAppContext _context;
@@ -30,7 +36,7 @@ public class RandomSource extends SecureRandom {
         _log = context.logManager().getLog(RandomSource.class);
         // when we replace to have hooks for fortuna (etc), replace with
         // a factory (or just a factory method)
-        _entropyHarvester = new DummyEntropyHarvester();
+        _entropyHarvester = this;
     }
     public static RandomSource getInstance() {
         return I2PAppContext.getGlobalContext().random();
@@ -101,6 +107,102 @@ public class RandomSource extends SecureRandom {
     
     public EntropyHarvester harvester() { return _entropyHarvester; }
  
+    public void feedEntropy(String source, long data, int bitoffset, int bits) {
+        if (bitoffset == 0)
+            setSeed(data);
+    }
+    
+    public void feedEntropy(String source, byte[] data, int offset, int len) {
+        if ( (offset == 0) && (len == data.length) ) {
+            setSeed(data);
+        } else {
+            setSeed(_context.sha().calculateHash(data, offset, len).getData());
+        }
+    }
+
+    public void loadSeed() {
+        byte buf[] = new byte[1024];
+        if (initSeed(buf))
+            setSeed(buf);
+    }
+
+    public void saveSeed() {
+        byte buf[] = new byte[1024];
+        nextBytes(buf);
+        writeSeed(buf);
+    }
+    
+    private static final String SEEDFILE = "prngseed.rnd";
+    
+    public static final void writeSeed(byte buf[]) {
+        File f = new File(SEEDFILE);
+        FileOutputStream fos = null;
+        try {
+            fos = new FileOutputStream(f);
+            fos.write(buf);
+        } catch (IOException ioe) {
+            // ignore
+        } finally {
+            if (fos != null) try { fos.close(); } catch (IOException ioe) {}
+        }
+    }
+ 
+    public final boolean initSeed(byte buf[]) {
+        // why urandom?  because /dev/random blocks, and there are arguments
+        // suggesting such blockages are largely meaningless
+        boolean ok = seedFromFile("/dev/urandom", buf);
+        // we merge (XOR) in the data from /dev/urandom with our own seedfile
+        ok = seedFromFile("prngseed.rnd", buf) || ok;
+        return ok;
+    }
+    
+    private static final boolean seedFromFile(String filename, byte buf[]) {
+        File f = new File(filename);
+        if (f.exists()) {
+            FileInputStream fis = null;
+            try {
+                fis = new FileInputStream(f);
+                int read = 0;
+                byte tbuf[] = new byte[buf.length];
+                while (read < buf.length) {
+                    int curRead = fis.read(tbuf, read, tbuf.length - read);
+                    if (curRead < 0)
+                        break;
+                    read += curRead;
+                }
+                for (int i = 0; i < read; i++)
+                    buf[i] ^= tbuf[i];
+                return true;
+            } catch (IOException ioe) {
+                // ignore
+            } finally {
+                if (fis != null) try { fis.close(); } catch (IOException ioe) {}
+            }
+        }
+        return false;
+    }
+
+    public static void main(String args[]) {
+        for (int j = 0; j < 2; j++) {
+        RandomSource rs = new RandomSource(I2PAppContext.getGlobalContext());
+        byte buf[] = new byte[1024];
+        boolean seeded = rs.initSeed(buf);
+        System.out.println("PRNG class hierarchy: ");
+        Class c = rs.getClass();
+        while (c != null) {
+            System.out.println("\t" + c.getName());
+            c = c.getSuperclass();
+        }
+        System.out.println("Provider: \n" + rs.getProvider());
+        if (seeded) {
+            System.out.println("Initialized seed: " + Base64.encode(buf));
+            rs.setSeed(buf);
+        }
+        for (int i = 0; i < 64; i++) rs.nextBytes(buf);
+        rs.saveSeed();
+        }
+    }
+    
     // noop
     private static class DummyEntropyHarvester implements EntropyHarvester {
         public void feedEntropy(String source, long data, int bitoffset, int bits) {}
