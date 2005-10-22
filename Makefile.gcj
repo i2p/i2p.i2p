@@ -26,9 +26,8 @@ JAR_ROUTER=router.jar
 JAR_JBIGI=jbigi.jar
 LIBI2P_JARS=${JAR_BASE} ${JAR_CLIENTS} ${JAR_ROUTER} ${JAR_JBIGI}
 
-# The i2p.weakPRNG uses java.util.Random to generate random values from.
-# This is Not Good.  Remove this once java.security.SecureRandom works
-SYSTEM_PROPS=-Di2p.weakPRNG=true
+SYSTEM_PROPS=
+#SYSTEM_PROPS=-Di2p.weakPRNG=true
 
 LD_LIBRARY_PATH=${EXTRA_LD_PATH}:.
 
@@ -49,10 +48,7 @@ native_clean:
 
 native_shared: libi2p.so
 	@cd build ; ${GCJ} -fjni -L../${NATIVE_DIR} -li2p ${SYSTEM_PROPS} -o ../${NATIVE_DIR}/i2p_dsa --main=net.i2p.crypto.DSAEngine 
-	@echo "* i2p_dsa is a simple test app with the weak PRNG to make sure crypto is working"
-	@cd build ; ${GCJ} -fjni -L../${NATIVE_DIR} -li2p -o ../${NATIVE_DIR}/i2p_dsa_prng --main=net.i2p.crypto.DSAEngine 
-	@echo "* i2p_dsa_prng is i2p_dsa with the real PRNG"
-	@echo "  it will hang forever until we get the PRNG issue solved"
+	@echo "* i2p_dsa is a simple test app with the DSA engine and Fortuna PRNG to make sure crypto is working"
 	@cd build ; ${GCJ} -fjni -L../${NATIVE_DIR} -li2p ${SYSTEM_PROPS} -o ../${NATIVE_DIR}/i2ptunnel --main=net.i2p.i2ptunnel.I2PTunnel 
 	@echo "* i2ptunnel is mihi's I2PTunnel CLI"
 	@echo "  run it as ./i2ptunnel -cli to avoid awt complaints"
