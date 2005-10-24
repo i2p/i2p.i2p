@@ -28,9 +28,9 @@ public class Updater {
             if (rab.getRemoteIndex() != null) {
                 _log.debug("Index fetched, getting new entries.");
                 HashMap parameters = new HashMap();
-                parameters.put("action", "Fetch all new entries");
-                //rab.fetchSelectedBulk(user, parameters);
-                rab.fetchAllEntries(user, parameters);
+                parameters.put("action", new String[] {"Fetch all new entries"});
+                rab.fetchSelectedBulk(user, parameters);
+                _log.debug(rab.getStatus());
                 _log.debug("Update finished.");
             } else {
                 _log.debug("Index fetch failed.");

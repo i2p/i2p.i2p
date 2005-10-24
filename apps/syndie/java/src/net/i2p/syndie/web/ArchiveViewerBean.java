@@ -552,6 +552,8 @@ public class ArchiveViewerBean {
                 return (String)c.iterator().next();
             else
                 return null;
+        } else if (vals instanceof String) {
+            return (String)vals;
         } else {
             return null;
         }
