@@ -26,6 +26,7 @@ import com.sun.syndication.io.SyndFeedInput;
 import com.sun.syndication.io.XmlReader;
 
 import net.i2p.I2PAppContext;
+import net.i2p.data.Base64;
 import net.i2p.util.EepGet;
 
 public class Sucker {
@@ -536,7 +537,7 @@ public class Sucker {
             MessageDigest md = MessageDigest.getInstance("SHA");
             md.update(s.getBytes());
             byte[] buf = md.digest();
-            String ret = new sun.misc.BASE64Encoder().encode(buf);
+            String ret = Base64.encode(buf);
             return ret;
         } catch (NoSuchAlgorithmException ex) {
             ex.printStackTrace();
