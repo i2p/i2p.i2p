@@ -134,6 +134,10 @@ public class RemoteArchiveBean {
     }
     
     public void fetchSelectedBulk(User user, Map parameters) {
+        fetchSelectedBulk(user, parameters, false);
+    }
+    
+    public void fetchSelectedBulk(User user, Map parameters, boolean shouldBlock) {
         String entries[] = ArchiveViewerBean.getStrings(parameters, "entry");
         String action = ArchiveViewerBean.getString(parameters, "action");
         if ("Fetch all new entries".equals(action)) {
@@ -206,7 +210,7 @@ public class RemoteArchiveBean {
                     File t = File.createTempFile("fetchBulk", ".dat", BlogManager.instance().getTempDir());
                     tmpFiles.add(t);
                 }
-                fetch(urls, tmpFiles, user, new BlogStatusListener());
+                fetch(urls, tmpFiles, user, new BlogStatusListener(), shouldBlock);
             } catch (IOException ioe) {
                 _statusMessages.add("Internal error creating temporary file to fetch posts: " + HTMLRenderer.sanitizeString(urls.toString()));
             }
@@ -258,8 +262,12 @@ public class RemoteArchiveBean {
     }
     
     private void fetch(List urls, List tmpFiles, User user, EepGet.StatusListener lsnr) {
+        fetch(urls, tmpFiles, user, lsnr, false);
+    }
+    
+    private void fetch(List urls, List tmpFiles, User user, EepGet.StatusListener lsnr, boolean shouldBlock) {
         EepGetScheduler scheduler = new EepGetScheduler(I2PAppContext.getGlobalContext(), urls, tmpFiles, _proxyHost, _proxyPort, lsnr);
-        scheduler.fetch();
+        scheduler.fetch(shouldBlock);
     }
     
     public void fetchIndex(User user, String schema, String location, String proxyHost, String proxyPort) {

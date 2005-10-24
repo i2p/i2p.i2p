@@ -20,9 +20,9 @@ public class Updater {
         _lastUpdate = System.currentTimeMillis();
         _log.debug("Update started.");
         User user = new User();
-        RemoteArchiveBean rab = new RemoteArchiveBean();
         String[] archives = bm.getUpdateArchives();
         for (int i = 0; i < archives.length; i++) {
+            RemoteArchiveBean rab = new RemoteArchiveBean();
             _log.debug("Fetching " + archives[i]);
             rab.fetchIndex(user, "web", archives[i], bm.getDefaultProxyHost(), bm.getDefaultProxyPort());
             if (rab.getRemoteIndex() != null) {

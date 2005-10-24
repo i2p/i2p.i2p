@@ -33,6 +33,15 @@ public class EepGetScheduler implements EepGet.StatusListener {
         t.start();
     }
     
+    public void fetch(boolean shouldBlock) {
+        //Checking for a valid index is done in fetchNext, so we don't have to worry about it.
+        if (shouldBlock) {
+            fetchNext();
+        } else {
+            fetch();
+        }
+    }
+    
     private void fetchNext() {
         _curURL++;
         if (_curURL >= _urls.size()) return;
