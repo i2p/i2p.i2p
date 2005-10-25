@@ -340,9 +340,13 @@ public class BlogManager {
 
     public String getDefaultProxyHost() { return _context.getProperty("syndie.defaultProxyHost", ""); }
     public String getDefaultProxyPort() { return _context.getProperty("syndie.defaultProxyPort", ""); }
-    public int getUpdateDelay() { return Integer.parseInt(_context.getProperty("syndie.updateDelay", "12")); }
     public String[] getUpdateArchives() { return _context.getProperty("syndie.updateArchives", "").split(","); }
     public boolean getImportAddresses() { return _context.getProperty("syndie.importAddresses", "false").equals("true"); }
+    public int getUpdateDelay() { 
+        int delay = Integer.parseInt(_context.getProperty("syndie.updateDelay", "12"));
+        if (delay < 1) delay = 1;
+        return delay;
+    }
     
     public boolean authorizeAdmin(String pass) {
         if (isSingleUser()) return true;

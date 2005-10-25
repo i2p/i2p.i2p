@@ -19,7 +19,6 @@ public class Updater {
         }
         _lastUpdate = System.currentTimeMillis();
         _log.debug("Update started.");
-        User user = new User();
         String[] archives = bm.getUpdateArchives();
         for (int i = 0; i < archives.length; i++) {
             fetchArchive(archives[i]);
@@ -53,7 +52,6 @@ public class Updater {
         
         while (true) {
             int delay = BlogManager.instance().getUpdateDelay();
-            if (delay < 1) delay = 1;
             update();
             try {
                 synchronized (this) {
