@@ -57,7 +57,13 @@ class I2PSessionImpl2 extends I2PSessionImpl {
         //ctx.statManager().createRateStat("i2cp.sendBestEffortStage2", "third part of sendBestEffort?", "i2cp", new long[] { 10*60*1000 } );
         //ctx.statManager().createRateStat("i2cp.sendBestEffortStage3", "fourth part of sendBestEffort?", "i2cp", new long[] { 10*60*1000 } );
         //ctx.statManager().createRateStat("i2cp.sendBestEffortStage4", "fifth part of sendBestEffort?", "i2cp", new long[] { 10*60*1000 } );
-        
+        _context.statManager().createRateStat("i2cp.receiveStatusTime.0", "How long it took to get status=0 back", "i2cp", new long[] { 60*1000, 10*60*1000 });
+        _context.statManager().createRateStat("i2cp.receiveStatusTime.1", "How long it took to get status=1 back", "i2cp", new long[] { 60*1000, 10*60*1000 });
+        _context.statManager().createRateStat("i2cp.receiveStatusTime.2", "How long it took to get status=2 back", "i2cp", new long[] { 60*1000, 10*60*1000 });
+        _context.statManager().createRateStat("i2cp.receiveStatusTime.3", "How long it took to get status=3 back", "i2cp", new long[] { 60*1000, 10*60*1000 });
+        _context.statManager().createRateStat("i2cp.receiveStatusTime.4", "How long it took to get status=4 back", "i2cp", new long[] { 60*1000, 10*60*1000 });
+        _context.statManager().createRateStat("i2cp.receiveStatusTime.5", "How long it took to get status=5 back", "i2cp", new long[] { 60*1000, 10*60*1000 });
+        _context.statManager().createRateStat("i2cp.receiveStatusTime", "How long it took to get any status", "i2cp", new long[] { 60*1000, 10*60*1000 });
     }
 
     protected long getTimeout() {
@@ -296,6 +302,26 @@ class I2PSessionImpl2 extends I2PSessionImpl {
                 state.setMessageId(id);
             }
             state.receive(status);
+            
+            long lifetime = state.getElapsed();
+            switch (status) {
+                case 1:
+                    _context.statManager().addRateData("i2cp.receiveStatusTime.1", lifetime, 0);
+                    break;
+                case 2:
+                    _context.statManager().addRateData("i2cp.receiveStatusTime.2", lifetime, 0);
+                    break;
+                case 3:
+                    _context.statManager().addRateData("i2cp.receiveStatusTime.3", lifetime, 0);
+                    break;
+                case 4:
+                    _context.statManager().addRateData("i2cp.receiveStatusTime.4", lifetime, 0);
+                    break;
+                case 5:
+                    _context.statManager().addRateData("i2cp.receiveStatusTime.5", lifetime, 0);
+                    break;
+            }
+            
         } else {
             if (_log.shouldLog(Log.INFO))
                 _log.info(getPrefix() + "No matching state for messageId " + msgId + " / " + nonce

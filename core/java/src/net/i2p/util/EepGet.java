@@ -506,7 +506,8 @@ public class EepGet {
         try {
             return Integer.parseInt(rc); 
         } catch (NumberFormatException nfe) {
-            nfe.printStackTrace();
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("ERR: status is invalid: " + line, nfe);
             return -1;
         }
     }
