@@ -22,20 +22,22 @@ public class Updater {
         User user = new User();
         String[] archives = bm.getUpdateArchives();
         for (int i = 0; i < archives.length; i++) {
-            RemoteArchiveBean rab = new RemoteArchiveBean();
-            _log.debug("Fetching " + archives[i]);
-            rab.fetchIndex(user, "web", archives[i], bm.getDefaultProxyHost(), bm.getDefaultProxyPort());
-            if (rab.getRemoteIndex() != null) {
-                _log.debug("Index fetched, getting new entries.");
-                HashMap parameters = new HashMap();
-                parameters.put("action", new String[] {"Fetch all new entries"});
-                rab.fetchSelectedBulk(user, parameters);
-                _log.debug(rab.getStatus());
-                _log.debug("Update finished.");
-            } else {
-                _log.debug("Index fetch failed.");
-            }
+            fetchArchive(archives[i]);
         }
+    }
+    
+    public void fetchArchive(String archive) {
+        BlogManager bm = BlogManager.instance();
+        User user = new User();
+        RemoteArchiveBean rab = new RemoteArchiveBean();
+        
+        rab.fetchIndex(user, "web", archive, bm.getDefaultProxyHost(), bm.getDefaultProxyPort());
+        if (rab.getRemoteIndex() != null) {
+            HashMap parameters = new HashMap();
+            parameters.put("action", new String[] {"Fetch all new entries"});
+            rab.fetchSelectedBulk(user, parameters);
+        } 
+        _log.debug(rab.getStatus());
     }
 
     public static void main() {
