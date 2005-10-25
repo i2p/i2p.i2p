@@ -72,8 +72,8 @@ public class Connection {
     private long _lifetimeDupMessageSent;
     private long _lifetimeDupMessageReceived;
     
-    public static final long MAX_RESEND_DELAY = 8*1000;
-    public static final long MIN_RESEND_DELAY = 3*1000;
+    public static final long MAX_RESEND_DELAY = 15*1000;
+    public static final long MIN_RESEND_DELAY = 2*1000;
 
     /** wait up to 5 minutes after disconnection so we can ack/close packets */
     public static int DISCONNECT_TIMEOUT = 5*60*1000;
@@ -193,7 +193,28 @@ public class Connection {
     }
     
     void ackImmediately() {
-        PacketLocal packet = _receiver.send(null, 0, 0);
+        PacketLocal packet = null;
+        synchronized (_outboundPackets) {
+            if (_outboundPackets.size() > 0) {
+                // ordered, so pick the lowest to retransmit
+                Iterator iter = _outboundPackets.values().iterator();
+                packet = (PacketLocal)iter.next();
+                //iter.remove();
+            }
+        }
+        if (packet != null) {
+            ResendPacketEvent evt = (ResendPacketEvent)packet.getResendEvent();
+            if (evt != null) {
+                boolean sent = evt.retransmit(false);
+                if (sent) {
+                    return;
+                } else {
+                    //SimpleTimer.getInstance().addEvent(evt, evt.getNextSendTime());
+                }
+            }
+        }
+        // if we don't have anything to retransmit, send a small ack
+        packet = _receiver.send(null, 0, 0);
         //packet.releasePayload();
     }
 
@@ -277,7 +298,7 @@ public class Connection {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Resend in " + timeout + " for " + packet, new Exception("Sent by"));
 
-            SimpleTimer.getInstance().addEvent(new ResendPacketEvent(packet), timeout);
+            SimpleTimer.getInstance().addEvent(new ResendPacketEvent(packet, timeout + _context.clock().now()), timeout);
         }
 
         _context.statManager().getStatLog().addData(Packet.toId(_sendStreamId), "stream.rtt", _options.getRTT(), _options.getWindowSize());
@@ -899,18 +920,29 @@ public class Connection {
      */
     private class ResendPacketEvent implements SimpleTimer.TimedEvent {
         private PacketLocal _packet;
-        public ResendPacketEvent(PacketLocal packet) {
+        private long _nextSendTime;
+        public ResendPacketEvent(PacketLocal packet, long sendTime) {
             _packet = packet;
+            _nextSendTime = sendTime;
             packet.setResendPacketEvent(ResendPacketEvent.this);
         }
         
-        public void timeReached() {
+        public long getNextSendTime() { return _nextSendTime; }
+        public void timeReached() { retransmit(true); }
+        /**
+         * Retransmit the packet if we need to.  
+         *
+         * @param penalize true if this retransmission is caused by a timeout, false if we
+         *                 are just sending this packet instead of an ACK
+         * @return true if the packet was sent, false if it was not
+         */
+        public boolean retransmit(boolean penalize) {
             if (_packet.getAckTime() > 0) 
-                return;
+                return false;
             
             if (_resetSent || _resetReceived) {
                 _packet.cancelled();
-                return;
+                return false;
             }
             
             //if (_log.shouldLog(Log.DEBUG))
@@ -932,7 +964,8 @@ public class Connection {
                         _log.warn("Delaying resend of " + _packet + " as there are " 
                                   + _activeResends + " active resends already in play");
                     SimpleTimer.getInstance().addEvent(ResendPacketEvent.this, 1000);
-                    return;
+                    _nextSendTime = 1000 + _context.clock().now();
+                    return false;
                 }
                 // revamp various fields, in case we need to ack more, etc
                 _inputStream.updateAcks(_packet);
@@ -949,7 +982,7 @@ public class Connection {
                 
                 int newWindowSize = getOptions().getWindowSize();
 
-                if (_ackSinceCongestion) {
+                if (penalize && _ackSinceCongestion) {
                     // only shrink the window once per window
                     if (_packet.getSequenceNum() > _lastCongestionHighestUnacked) {
                         congestionOccurred();
@@ -1004,7 +1037,7 @@ public class Connection {
                     synchronized (_outboundPackets) {
                         _outboundPackets.notifyAll();
                     }
-                    return;
+                    return true;
                 }
                 
                 if (numSends - 1 > _options.getMaxResends()) {
@@ -1023,11 +1056,14 @@ public class Connection {
                     if (_log.shouldLog(Log.DEBUG))
                         _log.debug("Scheduling resend in " + timeout + "ms for " + _packet);
                     SimpleTimer.getInstance().addEvent(ResendPacketEvent.this, timeout);
+                    _nextSendTime = timeout + _context.clock().now();
                 }
+                return true;
             } else {
                 //if (_log.shouldLog(Log.DEBUG))
                 //    _log.debug("Packet acked before resend (resend="+ resend + "): " 
                 //               + _packet + " on " + Connection.this);
+                return false;
             }
         }
     }

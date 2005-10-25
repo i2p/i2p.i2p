@@ -104,6 +104,25 @@ class SearchState {
             _attemptedPeers.addAll(pending);
         }
     }
+    public void addPending(Hash peer) {
+        synchronized (_pendingPeers) {
+            _pendingPeers.add(peer);
+            _pendingPeerTimes.put(peer, new Long(_context.clock().now()));
+        }
+        synchronized (_attemptedPeers) {
+            _attemptedPeers.add(peer);
+        }
+    }
+    /** we didn't actually want to add this peer as part of the pending list... */
+    public void removePending(Hash peer) {
+        synchronized (_pendingPeers) {
+            _pendingPeers.remove(peer);
+            _pendingPeerTimes.remove(peer);
+        }
+        synchronized (_attemptedPeers) {
+            _attemptedPeers.remove(peer);
+        }
+    }
     
     /** how long did it take to get the reply, or -1 if we don't know */
     public long dataFound(Hash peer) {

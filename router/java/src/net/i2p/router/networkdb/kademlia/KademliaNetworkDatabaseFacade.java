@@ -128,6 +128,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         _lastExploreNew = 0;
         _activeRequests = new HashMap(8);
         _enforceNetId = DEFAULT_ENFORCE_NETID;
+        context.statManager().createRateStat("netDb.lookupLeaseSetDeferred", "how many lookups are deferred for a single leaseSet lookup?", "NetworkDatabase", new long[] { 60*1000, 5*60*1000 });
     }
     
     protected PeerSelector createPeerSelector() { return new PeerSelector(_context); }
@@ -808,7 +809,8 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         } else {
             if (_log.shouldLog(Log.INFO))
                 _log.info("Deferring search for " + key.toBase64() + " with " + onFindJob);
-            searchJob.addDeferred(onFindJob, onFailedLookupJob, timeoutMs, isLease);
+            int deferred = searchJob.addDeferred(onFindJob, onFailedLookupJob, timeoutMs, isLease);
+            _context.statManager().addRateData("netDb.lookupLeaseSetDeferred", deferred, searchJob.getExpiration()-_context.clock().now());
         }
     }
     

@@ -151,9 +151,6 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
     public void runJob() {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug(getJobId() + ": Send outbound client message job beginning");
-        buildClove();
-        if (_log.shouldLog(Log.DEBUG))
-            _log.debug(getJobId() + ": Clove built to " + _toString);
         long timeoutMs = _overallExpiration - getContext().clock().now();
         if (_log.shouldLog(Log.DEBUG))
             _log.debug(getJobId() + ": preparing to search for the leaseSet for " + _toString);
@@ -210,9 +207,9 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
                 getContext().statManager().addRateData("client.leaseSetFoundRemoteTime", lookupTime, lookupTime);
             }
             boolean ok = getNextLease();
-            if (ok)
+            if (ok) {
                 send();
-            else {
+            } else {
                 if (_log.shouldLog(Log.ERROR))
                     _log.error("Unable to send on a random lease, as getNext returned null (to=" + _toString + ")");
                 dieFatal();
@@ -258,19 +255,23 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
         // sort are randomly ordered)
         Collections.shuffle(leases);
         
-        // ordered by lease number of failures
-        TreeMap orderedLeases = new TreeMap();
-        for (Iterator iter = leases.iterator(); iter.hasNext(); ) {
-            Lease lease = (Lease)iter.next();
-            long id = lease.getNumFailure();
-            while (orderedLeases.containsKey(new Long(id)))
-                id++;
-            orderedLeases.put(new Long(id), lease);
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug(getJobId() + ": ranking lease we havent sent it down as " + id);
+        if (false) {
+            // ordered by lease number of failures
+            TreeMap orderedLeases = new TreeMap();
+            for (Iterator iter = leases.iterator(); iter.hasNext(); ) {
+                Lease lease = (Lease)iter.next();
+                long id = lease.getNumFailure();
+                while (orderedLeases.containsKey(new Long(id)))
+                    id++;
+                orderedLeases.put(new Long(id), lease);
+                if (_log.shouldLog(Log.DEBUG))
+                    _log.debug(getJobId() + ": ranking lease we havent sent it down as " + id);
+            }
+            
+            _lease = (Lease)orderedLeases.get(orderedLeases.firstKey());
+        } else {
+            _lease = (Lease)leases.get(0);
         }
-        
-        _lease = (Lease)orderedLeases.get(orderedLeases.firstKey());
         return true;
     }
 
@@ -320,7 +321,10 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
         }
         
         _inTunnel = selectInboundTunnel();
-        
+
+        buildClove();
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug(getJobId() + ": Clove built to " + _toString);
         GarlicMessage msg = OutboundClientMessageJobHelper.createGarlicMessage(getContext(), token, 
                                                                                _overallExpiration, key, 
                                                                                _clove, _from.calculateHash(), 
@@ -461,12 +465,12 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
         
         clove.setCertificate(new Certificate(Certificate.CERTIFICATE_TYPE_NULL, null));
         clove.setDeliveryInstructions(instructions);
-        clove.setExpiration(_overallExpiration);
+        clove.setExpiration(OVERALL_TIMEOUT_MS_DEFAULT+getContext().clock().now());
         clove.setId(getContext().random().nextLong(I2NPMessage.MAX_ID_VALUE));
         
         DataMessage msg = new DataMessage(getContext());
         msg.setData(_clientMessage.getPayload().getEncryptedData());
-        msg.setMessageExpiration(_overallExpiration);
+        msg.setMessageExpiration(clove.getExpiration());
         
         clove.setPayload(msg);
         clove.setRecipientPublicKey(null);

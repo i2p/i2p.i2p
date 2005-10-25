@@ -1,4 +1,24 @@
-$Id: history.txt,v 1.304 2005/10/20 14:42:13 dust Exp $
+$Id: history.txt,v 1.305 2005/10/22 13:06:03 jrandom Exp $
+
+2005-10-25  jrandom
+    * Defer netDb searches for newly referenced peers until we actually want
+      them
+    * Ignore netDb references to peers on our shitlist
+    * Set the timeout for end to end client messages to the max delay after
+      finding the leaseSet, so we don't have as many expired messages floating
+      around.
+    * Add a floor to the streaming lib window size
+    * When we need to send a streaming lib ACK, try to retransmit one of the
+      unacked packets instead (with updated ACK/NACK fields, of course).  The
+      bandwidth cost of an unnecessary retransmission should be minor as
+      compared to both an ACK packet (rounded up to 1KB in the tunnels) and
+      the probability of a necessary retransmission.
+    * Adjust the streaming lib cwin algorithm to allow growth after a full
+      cwin messages if the rtt is trending downwards.  If it is not, use the
+      existing algorithm.
+    * Increased the maximum rto size in the streaming lib.
+    * Load balancing bugfix on end to end messages to distribute across
+      tunnels more evenly.
 
 2005-10-22  jrandom
     * Integrated GNU-Crypto's Fortuna PRNG, seeding it off /dev/urandom and

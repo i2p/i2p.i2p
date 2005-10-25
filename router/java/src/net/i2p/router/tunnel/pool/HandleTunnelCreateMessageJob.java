@@ -72,7 +72,12 @@ public class HandleTunnelCreateMessageJob extends JobImpl {
         }
     }
     
+    /** don't accept requests to join for 15 minutes or more */
+    public static final int MAX_DURATION_SECONDS = 15*60;
+    
     private int shouldAccept() {
+        if (_request.getDurationSeconds() >= MAX_DURATION_SECONDS)
+            return TunnelHistory.TUNNEL_REJECT_CRIT;
         Hash nextRouter = _request.getNextRouter();
         if (nextRouter != null) {
             RouterInfo ri = getContext().netDb().lookupRouterInfoLocally(nextRouter);

@@ -52,6 +52,16 @@ public class ConnectionPacketHandler {
             packet.releasePayload();
             return;
         }
+        
+        if ( (con.getCloseSentOn() > 0) && (con.getUnackedPacketsSent() <= 0) && 
+             (packet.getSequenceNum() > 0) && (packet.getPayloadSize() > 0)) {
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Received new data when we've sent them data and all of our data is acked: " 
+                          + packet + " on " + con + "");
+            con.sendReset();
+            packet.releasePayload();
+            return;
+        }
 
         if (packet.isFlagSet(Packet.FLAG_MAX_PACKET_SIZE_INCLUDED)) {
             if (packet.getOptionalMaxSize() < con.getOptions().getMaxMessageSize()) {
@@ -285,8 +295,10 @@ public class ConnectionPacketHandler {
             _context.statManager().addRateData("stream.trend", trend, newWindowSize);
             
             if ( (!congested) && (acked > 0) && (numResends <= 0) ) {
-                if ( (newWindowSize > con.getLastCongestionSeenAt() / 2) ||
-                     (trend > 0) ) { // tcp vegas: avoidance if rtt is increasing, even if we arent at ssthresh/2 yet
+                if (trend < 0) {
+                    // rtt is shrinking, so lets increment the cwin
+                    newWindowSize++;
+                } else if (newWindowSize > con.getLastCongestionSeenAt() / 2) {
                     // congestion avoidance
 
                     // we can't use newWindowSize += 1/newWindowSize, since we're

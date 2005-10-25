@@ -125,8 +125,8 @@ class SearchJob extends JobImpl {
     
     protected SearchState getState() { return _state; }
     protected KademliaNetworkDatabaseFacade getFacade() { return _facade; }
-    protected long getExpiration() { return _expiration; }
-    protected long getTimeoutMs() { return _timeoutMs; }
+    public long getExpiration() { return _expiration; }
+    public long getTimeoutMs() { return _timeoutMs; }
     
     /**
      * Let each peer take up to the average successful search RTT
@@ -164,8 +164,8 @@ class SearchJob extends JobImpl {
             _state.complete(true);
             succeed();
         } else if (isExpired()) {
-            if (_log.shouldLog(Log.WARN))
-                _log.warn(getJobId() + ": Key search expired");
+            if (_log.shouldLog(Log.INFO))
+                _log.info(getJobId() + ": Key search expired");
             _state.complete(true);
             fail();
         } else {
@@ -208,51 +208,61 @@ class SearchJob extends JobImpl {
             requeuePending();
             return;
         } 
-        List closestHashes = getClosestRouters(_state.getTarget(), toCheck, _state.getAttempted());
-        if ( (closestHashes == null) || (closestHashes.size() <= 0) ) {
-            if (_state.getPending().size() <= 0) {
-                // we tried to find some peers, but there weren't any and no one else is going to answer
-                if (_log.shouldLog(Log.INFO))
-                    _log.info(getJobId() + ": No peers left, and none pending!  Already searched: " 
-                              + _state.getAttempted().size() + " failed: " + _state.getFailed().size());
-                fail();
-            } else {
-                // no more to try, but we might get data or close peers from some outstanding requests
-                if (_log.shouldLog(Log.INFO))
-                    _log.info(getJobId() + ": No peers left, but some are pending!  Pending: " 
-                              + _state.getPending().size() + " attempted: " + _state.getAttempted().size() 
-                              + " failed: " + _state.getFailed().size());
-                requeuePending();
-                return;
-            }
-        } else {
-            _state.addPending(closestHashes);
-            int sent = 0;
-            for (Iterator iter = closestHashes.iterator(); iter.hasNext(); ) {
-                Hash peer = (Hash)iter.next();
-                DataStructure ds = _facade.getDataStore().get(peer);
-                if ( (ds == null) || !(ds instanceof RouterInfo) ) {
-                    if (_log.shouldLog(Log.WARN))
-                        _log.warn(getJobId() + ": Error selecting closest hash that wasnt a router! " 
-                                  + peer + " : " + (ds == null ? "null" : ds.getClass().getName()));
-                    _state.replyTimeout(peer);
+        int sent = 0;
+        Set attempted = _state.getAttempted();
+        while (sent <= 0) {
+            List closestHashes = getClosestRouters(_state.getTarget(), toCheck, attempted);
+            if ( (closestHashes == null) || (closestHashes.size() <= 0) ) {
+                if (_state.getPending().size() <= 0) {
+                    // we tried to find some peers, but there weren't any and no one else is going to answer
+                    if (_log.shouldLog(Log.INFO))
+                        _log.info(getJobId() + ": No peers left, and none pending!  Already searched: " 
+                                  + _state.getAttempted().size() + " failed: " + _state.getFailed().size());
+                    fail();
                 } else {
-                    if (getContext().shitlist().isShitlisted(peer)) {
-                        // dont bother
+                    // no more to try, but we might get data or close peers from some outstanding requests
+                    if (_log.shouldLog(Log.INFO))
+                        _log.info(getJobId() + ": No peers left, but some are pending!  Pending: " 
+                                  + _state.getPending().size() + " attempted: " + _state.getAttempted().size() 
+                                  + " failed: " + _state.getFailed().size());
+                    requeuePending();
+                }
+                return;
+            } else {
+                attempted.addAll(closestHashes);
+                for (Iterator iter = closestHashes.iterator(); iter.hasNext(); ) {
+                    Hash peer = (Hash)iter.next();
+                    DataStructure ds = _facade.getDataStore().get(peer);
+                    if (ds == null) {
+                        if (_log.shouldLog(Log.INFO))
+                            _log.info("Next closest peer " + peer + " was only recently referred to us, sending a search for them");
+                        getContext().netDb().lookupRouterInfo(peer, null, null, _timeoutMs);
+                    } else if (!(ds instanceof RouterInfo)) {
+                        if (_log.shouldLog(Log.WARN))
+                            _log.warn(getJobId() + ": Error selecting closest hash that wasnt a router! " 
+                                      + peer + " : " + (ds == null ? "null" : ds.getClass().getName()));
+                        _state.replyTimeout(peer);
                     } else {
-                        sendSearch((RouterInfo)ds);
-                        sent++;
+                        if (getContext().shitlist().isShitlisted(peer)) {
+                            // dont bother
+                        } else {
+                            _state.addPending(peer);
+                            sendSearch((RouterInfo)ds);
+                            sent++;
+                        }
                     }
                 }
-            }
-            if (sent <= 0) {
-                // the (potentially) last peers being searched for could not be,
-                // er, searched for, so lets retry ASAP (causing either another 
-                // peer to be selected, or the whole search to fail)
-                if (_log.shouldLog(Log.WARN))
-                    _log.warn(getJobId() + ": No new peer queued up, so we are going to requeue " +
-                              "ourselves in our search for " + _state.getTarget().toBase64());
-                requeuePending(0);
+                /*
+                if (sent <= 0) {
+                    // the (potentially) last peers being searched for could not be,
+                    // er, searched for, so lets retry ASAP (causing either another 
+                    // peer to be selected, or the whole search to fail)
+                    if (_log.shouldLog(Log.INFO))
+                        _log.info(getJobId() + ": No new peer queued up, so we are going to requeue " +
+                                  "ourselves in our search for " + _state.getTarget().toBase64());
+                    requeuePending(0);
+                }
+                 */
             }
         }
     }
@@ -503,6 +513,8 @@ class SearchJob extends JobImpl {
             } else {
                 Hash peer = _msg.getReply(_curIndex);
                 
+                boolean shouldAdd = false;
+                
                 RouterInfo info = getContext().netDb().lookupRouterInfoLocally(peer);
                 if (info == null) {
                     // if the peer is giving us lots of bad peer references, 
@@ -512,11 +524,18 @@ class SearchJob extends JobImpl {
                     if (!sendsBadInfo) {
                         // we don't need to search for everthing we're given here - only ones that
                         // are next in our search path...
-                        getContext().netDb().lookupRouterInfo(peer, new ReplyVerifiedJob(getContext(), peer), new ReplyNotVerifiedJob(getContext(), peer), _timeoutMs);
-                        _repliesPendingVerification++;
+                        if (getContext().shitlist().isShitlisted(peer)) {
+                            if (_log.shouldLog(Log.INFO))
+                                _log.info("Not looking for a shitlisted peer...");
+                            getContext().statManager().addRateData("netDb.searchReplyValidationSkipped", 1, 0);
+                        } else {
+                            //getContext().netDb().lookupRouterInfo(peer, new ReplyVerifiedJob(getContext(), peer), new ReplyNotVerifiedJob(getContext(), peer), _timeoutMs);
+                            //_repliesPendingVerification++;
+                            shouldAdd = true;
+                        }
                     } else {
-                        if (_log.shouldLog(Log.WARN))
-                            _log.warn("Peer " + _peer.toBase64() + " sends us bad replies, so not verifying " + peer.toBase64());
+                        if (_log.shouldLog(Log.INFO))
+                            _log.info("Peer " + _peer.toBase64() + " sends us bad replies, so not verifying " + peer.toBase64());
                         getContext().statManager().addRateData("netDb.searchReplyValidationSkipped", 1, 0);
                     }
                 }
@@ -527,10 +546,12 @@ class SearchJob extends JobImpl {
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug(getJobId() + ": dbSearchReply received on search referencing router " 
                               + peer);
-                if (_facade.getKBuckets().add(peer))
-                    _newPeers++;
-                else
-                    _seenPeers++;
+                if (shouldAdd) {
+                    if (_facade.getKBuckets().add(peer))
+                        _newPeers++;
+                    else
+                        _seenPeers++;
+                }
                 
                 _curIndex++;
                 requeue(0);
@@ -597,8 +618,8 @@ class SearchJob extends JobImpl {
             if (_state.completed()) return;
             _state.replyTimeout(_peer);
             if (_penalizePeer) { 
-                if (_log.shouldLog(Log.WARN))
-                    _log.warn("Penalizing peer for timeout on search: " + _peer.toBase64() + " after " + (getContext().clock().now() - _sentOn));
+                if (_log.shouldLog(Log.INFO))
+                    _log.info("Penalizing peer for timeout on search: " + _peer.toBase64() + " after " + (getContext().clock().now() - _sentOn));
                 getContext().profileManager().dbLookupFailed(_peer);
             } else {
                 if (_log.shouldLog(Log.ERROR))
@@ -736,14 +757,16 @@ class SearchJob extends JobImpl {
         handleDeferred(false);
     }
 
-    public void addDeferred(Job onFind, Job onFail, long expiration, boolean isLease) {
+    public int addDeferred(Job onFind, Job onFail, long expiration, boolean isLease) {
         Search search = new Search(onFind, onFail, expiration, isLease);
         boolean ok = true;
+        int deferred = 0;
         synchronized (_deferredSearches) {
             if (_deferredCleared)
                 ok = false;
             else
                 _deferredSearches.add(search);
+            deferred = _deferredSearches.size();
         }
         
         if (!ok) {
@@ -754,6 +777,9 @@ class SearchJob extends JobImpl {
             // the following /shouldn't/ be necessary, but it doesnt hurt 
             _facade.searchComplete(_state.getTarget());
             _facade.search(_state.getTarget(), onFind, onFail, expiration - getContext().clock().now(), isLease);
+            return 0;
+        } else {
+            return deferred;
         }
     }
     

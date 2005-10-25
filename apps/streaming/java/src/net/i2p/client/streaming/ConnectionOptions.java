@@ -54,8 +54,10 @@ public class ConnectionOptions extends I2PSocketOptionsImpl {
     public static final String PROP_SLOW_START_GROWTH_RATE_FACTOR = "i2p.streaming.slowStartGrowthRateFactor";
     
     private static final int TREND_COUNT = 3;
-    static final int INITIAL_WINDOW_SIZE = 4;
+    static final int INITIAL_WINDOW_SIZE = 6;
     static final int DEFAULT_MAX_SENDS = 8;
+    
+    static final int MIN_WINDOW_SIZE = 6;
     
     public ConnectionOptions() {
         super();
@@ -183,6 +185,8 @@ public class ConnectionOptions extends I2PSocketOptionsImpl {
             numMsgs = _maxWindowSize;
         else if (numMsgs <= 0)
             numMsgs = 1;
+        if (numMsgs < MIN_WINDOW_SIZE)
+            numMsgs = MIN_WINDOW_SIZE;
         _windowSize = numMsgs; 
     }
     

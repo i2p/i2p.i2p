@@ -101,6 +101,7 @@ public class PacketLocal extends Packet implements MessageOutputStream.WriteStat
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Cancelled! " + toString(), new Exception("cancelled"));
     }
+    public SimpleTimer.TimedEvent getResendEvent() { return _resendEvent; }
     
     /** how long after packet creation was it acked? */
     public int getAckTime() {
