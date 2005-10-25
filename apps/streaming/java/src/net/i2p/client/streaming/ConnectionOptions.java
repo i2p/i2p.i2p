@@ -181,12 +181,15 @@ public class ConnectionOptions extends I2PSocketOptionsImpl {
      */
     public int getWindowSize() { return _windowSize; }
     public void setWindowSize(int numMsgs) { 
-        if (numMsgs > _maxWindowSize)
-            numMsgs = _maxWindowSize;
-        else if (numMsgs <= 0)
+        if (numMsgs <= 0)
             numMsgs = 1;
         if (numMsgs < MIN_WINDOW_SIZE)
             numMsgs = MIN_WINDOW_SIZE;
+        // the stream's max window size may be less than the min window size, for
+        // instance, with interactive streams of cwin=1.  This is why we test it here
+        // after checking MIN_WINDOW_SIZE
+        if (numMsgs > _maxWindowSize)
+            numMsgs = _maxWindowSize;
         _windowSize = numMsgs; 
     }
     
