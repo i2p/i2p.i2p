@@ -1,8 +1,6 @@
 package net.i2p.i2ptunnel;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
@@ -139,41 +137,43 @@ public class I2PTunnelIRCClient extends I2PTunnelClientBase implements Runnable 
             }
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("IrcInboundFilter: Running.");
-            while(true)
-            {
-                try {
-                    String inmsg = DataHelper.readLine(input);
-                    if(inmsg==null)
-                        break;
-                    if(inmsg.endsWith("\r"))
-                        inmsg=inmsg.substring(0,inmsg.length()-1);
-                    String outmsg = inboundFilter(inmsg);
-                    if(outmsg!=null)
-                    {
-                        if(!inmsg.equals(outmsg)) {
-                            if (_log.shouldLog(Log.WARN)) {
-                                _log.warn("inbound FILTERED: "+outmsg);
-                                _log.warn(" - inbound was: "+inmsg);
-                            }
-                        } else {
-                            if (_log.shouldLog(Log.INFO))
-                                _log.info("inbound: "+outmsg);
-                        }
-                        outmsg=outmsg+"\n";
-                        output.write(outmsg.getBytes());
-                    } else {
-                        if (_log.shouldLog(Log.WARN))
-                            _log.warn("inbound BLOCKED: "+inmsg);
-                    }
-                } catch (IOException e1) {
-                    if (_log.shouldLog(Log.ERROR))
-                        _log.error("IrcInboundFilter: disconnected",e1);
-                    break;
-                }
-            }
             try {
-                local.close();
-            } catch (IOException e) {
+                while(true)
+                {
+                    try {
+                        String inmsg = DataHelper.readLine(input);
+                        if(inmsg==null)
+                            break;
+                        if(inmsg.endsWith("\r"))
+                            inmsg=inmsg.substring(0,inmsg.length()-1);
+                        String outmsg = inboundFilter(inmsg);
+                        if(outmsg!=null)
+                        {
+                            if(!inmsg.equals(outmsg)) {
+                                if (_log.shouldLog(Log.WARN)) {
+                                    _log.warn("inbound FILTERED: "+outmsg);
+                                    _log.warn(" - inbound was: "+inmsg);
+                                }
+                            } else {
+                                if (_log.shouldLog(Log.INFO))
+                                    _log.info("inbound: "+outmsg);
+                            }
+                            outmsg=outmsg+"\n";
+                            output.write(outmsg.getBytes());
+                        } else {
+                            if (_log.shouldLog(Log.WARN))
+                                _log.warn("inbound BLOCKED: "+inmsg);
+                        }
+                    } catch (IOException e1) {
+                        if (_log.shouldLog(Log.WARN))
+                            _log.warn("IrcInboundFilter: disconnected",e1);
+                        break;
+                    }
+                }
+            } catch (RuntimeException re) {
+                _log.error("Error filtering inbound data", re);
+            } finally {
+                if (local != null) try { local.close(); } catch (IOException e) {}
             }
             if(_log.shouldLog(Log.DEBUG))
                 _log.debug("IrcInboundFilter: Done.");
@@ -207,41 +207,43 @@ public class I2PTunnelIRCClient extends I2PTunnelClientBase implements Runnable 
                 }
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("IrcOutboundFilter: Running.");
-                while(true)
-                {
-                    try {
-                        String inmsg = DataHelper.readLine(input);
-                        if(inmsg==null)
-                            break;
-                        if(inmsg.endsWith("\r"))
-                            inmsg=inmsg.substring(0,inmsg.length()-1);
-                        String outmsg = outboundFilter(inmsg);
-                        if(outmsg!=null)
-                        {
-                            if(!inmsg.equals(outmsg)) {
-                                if (_log.shouldLog(Log.WARN)) {
-                                    _log.warn("outbound FILTERED: "+outmsg);
-                                    _log.warn(" - outbound was: "+inmsg);
-                                }
-                            } else {
-                                if (_log.shouldLog(Log.INFO))
-                                    _log.info("outbound: "+outmsg);
-                            }
-                            outmsg=outmsg+"\n";
-                            output.write(outmsg.getBytes());
-                        } else {
-                            if (_log.shouldLog(Log.WARN))
-                                _log.warn("outbound BLOCKED: "+"\""+inmsg+"\"");
-                        }
-                    } catch (IOException e1) {
-                        if (_log.shouldLog(Log.ERROR))
-                            _log.error("IrcOutboundFilter: disconnected",e1);
-                        break;
-                    }
-                }
                 try {
-                    remote.close();
-                } catch (IOException e) {
+                    while(true)
+                    {
+                        try {
+                            String inmsg = DataHelper.readLine(input);
+                            if(inmsg==null)
+                                break;
+                            if(inmsg.endsWith("\r"))
+                                inmsg=inmsg.substring(0,inmsg.length()-1);
+                            String outmsg = outboundFilter(inmsg);
+                            if(outmsg!=null)
+                            {
+                                if(!inmsg.equals(outmsg)) {
+                                    if (_log.shouldLog(Log.WARN)) {
+                                        _log.warn("outbound FILTERED: "+outmsg);
+                                        _log.warn(" - outbound was: "+inmsg);
+                                    }
+                                } else {
+                                    if (_log.shouldLog(Log.INFO))
+                                        _log.info("outbound: "+outmsg);
+                                }
+                                outmsg=outmsg+"\n";
+                                output.write(outmsg.getBytes());
+                            } else {
+                                if (_log.shouldLog(Log.WARN))
+                                    _log.warn("outbound BLOCKED: "+"\""+inmsg+"\"");
+                            }
+                        } catch (IOException e1) {
+                            if (_log.shouldLog(Log.WARN))
+                                _log.warn("IrcOutboundFilter: disconnected",e1);
+                            break;
+                        }
+                    }
+                } catch (RuntimeException re) {
+                    _log.error("Error filtering outbound data", re);
+                } finally {
+                    if (remote != null) try { remote.close(); } catch (IOException e) {}
                 }
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("IrcOutboundFilter: Done.");

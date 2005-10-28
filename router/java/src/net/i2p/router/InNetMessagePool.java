@@ -168,6 +168,10 @@ public class InNetMessagePool implements Service {
                     if (job != null) {
                         _context.jobQueue().addJob(job);
                         jobFound = true;
+                    } else {
+                        // ok, we may not have *found* a job, per se, but we could have, the
+                        // job may have just executed inline
+                        jobFound = true;
                     }
                 }
             }

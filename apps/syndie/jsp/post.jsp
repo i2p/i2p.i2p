@@ -121,6 +121,21 @@ for (Iterator iter = names.iterator(); iter.hasNext(); ) {
     } else {
       // logged in and not confirmed because they didn't send us anything!  
       // give 'em a new form
+      String entrySubject = request.getParameter("replySubject");
+      String entryTags = request.getParameter("replyTags");
+      String parentURI = request.getParameter("parentURI");
+      if (entrySubject != null)
+        post.setSubject(new String(Base64.decode(entrySubject), "UTF-8"));
+      if (entryTags != null)
+        post.setTags(new String(Base64.decode(entryTags), "UTF-8"));
+
+      if (parentURI != null) {
+        parentURI = new String(Base64.decode(parentURI), "UTF-8");
+        %><span class="b_postField">Replying to
+        <a href="<%=HTMLRenderer.getPageURL(user, parentURI)%>">parent</a>
+        (text <a href="#parentText">below</a>).</span><br />
+        <%
+      }
 %><form action="post.jsp" method="POST" enctype="multipart/form-data"> 
 <span class="b_postField">Post subject:</span> <input class="b_postSubject" type="text" size="80" name="entrysubject" value="<%=post.getSubject()%>" /><br />
 <span class="b_postField">Post tags:</span> <input class="b_postTags" type="text" size="20" name="entrytags" value="<%=post.getTags()%>" /><br />
@@ -164,6 +179,12 @@ if ( (s != null) && (s.trim().length() > 0) ) {%>
 <hr />
 <input class="b_postPreview" type="submit" name="Post" value="Preview..." /> <input class="b_postReset" type="reset" value="Cancel" />
 <%
+      if (parentURI != null) {
+        %><hr /><span id="parentText" class="b_postParent"><%
+        post.renderReplyPreview(out, parentURI);
+        %></span><hr /><%
+      }
+
     } // end of the 'logged in, not confirmed, nothing posted' section
   } // end of the 'logged in, not confirmed' section
 } // end of the 'logged in' section

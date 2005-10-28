@@ -29,6 +29,12 @@ public class FloodfillDatabaseStoreMessageHandler implements HandlerJobBuilder {
         _facade = facade;
     }
     public Job createJob(I2NPMessage receivedMessage, RouterIdentity from, Hash fromHash) {
-        return new HandleFloodfillDatabaseStoreMessageJob(_context, (DatabaseStoreMessage)receivedMessage, from, fromHash, _facade);
+        Job j = new HandleFloodfillDatabaseStoreMessageJob(_context, (DatabaseStoreMessage)receivedMessage, from, fromHash, _facade);
+        if (true) {
+            j.runJob();
+            return null;
+        } else {
+            return j;
+        }
     }
 }

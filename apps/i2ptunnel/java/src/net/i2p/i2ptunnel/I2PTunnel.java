@@ -240,6 +240,8 @@ public class I2PTunnel implements Logging, EventDispatcher {
             runClient(args, l);
         } else if ("httpclient".equals(cmdname)) {
             runHttpClient(args, l);
+        } else if ("ircclient".equals(cmdname)) {
+            runIrcClient(args, l);
         } else if ("sockstunnel".equals(cmdname)) {
             runSOCKSTunnel(args, l);
         } else if ("config".equals(cmdname)) {

@@ -35,7 +35,14 @@ public class FloodfillDatabaseLookupMessageHandler implements HandlerJobBuilder 
         _context.statManager().addRateData("netDb.lookupsReceived", 1, 0);
 
         if (true || _context.throttle().acceptNetDbLookupRequest(((DatabaseLookupMessage)receivedMessage).getSearchKey())) {
-            return new HandleFloodfillDatabaseLookupMessageJob(_context, (DatabaseLookupMessage)receivedMessage, from, fromHash);
+            Job j = new HandleFloodfillDatabaseLookupMessageJob(_context, (DatabaseLookupMessage)receivedMessage, from, fromHash);
+            if (true) {
+                // might as well inline it, all the heavy lifting is queued up in later jobs, if necessary
+                j.runJob();
+                return null;
+            } else {                
+                return j;
+            }
         } else {
             if (_log.shouldLog(Log.INFO)) 
                 _log.info("Dropping lookup request as throttled");

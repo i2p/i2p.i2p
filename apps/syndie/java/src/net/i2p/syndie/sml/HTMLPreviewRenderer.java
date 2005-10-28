@@ -145,4 +145,6 @@ public class HTMLPreviewRenderer extends HTMLRenderer {
         _postBodyBuffer.append("</td>\n</form>\n</tr>\n");
         _postBodyBuffer.append("</table>\n");
     }
+    
+    protected void renderMetaCell() { _preBodyBuffer.append("<td></td></tr>"); }
 }

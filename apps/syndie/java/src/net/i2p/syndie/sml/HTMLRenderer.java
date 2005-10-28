@@ -754,6 +754,7 @@ public class HTMLRenderer extends EventReceiverImpl {
     public static final String HEADER_IN_REPLY_TO = "InReplyTo";
     public static final String HEADER_STYLE = "Style";
     public static final String HEADER_PETNAME = "PetName";
+    public static final String HEADER_TAGS = "Tags";
     
     private void renderSubjectCell() {
         _preBodyBuffer.append("<form action=\"index.jsp\">");
@@ -774,20 +775,7 @@ public class HTMLRenderer extends EventReceiverImpl {
         _preBodyBuffer.append((bgcolor != null ? " bgcolor=\"" + sanitizeTagParam(bgcolor) + "\"" : "") + ">");
     }
     
-    private void renderMetaCell() {
-        String tags[] = (_entry != null ? _entry.getTags() : null);
-        _preBodyBuffer.append("<td nowrap=\"nowrap\" align=\"right\" valign=\"top\" ");
-        _preBodyBuffer.append(getClass("meta")).append(">\n");
-        
-        PetName pn = null;
-        if ( (_entry != null) && (_user != null) )
-            pn = _user.getPetNameDB().getByLocation(_entry.getURI().getKeyHash().toBase64());
-        //if (knownName != null)
-        //    _preBodyBuffer.append("Pet name: ").append(sanitizeString(knownName)).append(" ");
-
-        BlogInfo info = null;
-        if (_entry != null) 
-            info = _archive.getBlogInfo(_entry.getURI());
+    private void renderMetaPetname(PetName pn, BlogInfo info) {        
         if (info != null) {
             _preBodyBuffer.append("<a ").append(getClass("metaLink")).append(" href=\"").append(getMetadataURL()).append("\">");
             if (pn != null) {
@@ -803,7 +791,23 @@ public class HTMLRenderer extends EventReceiverImpl {
         } else {
             _preBodyBuffer.append(getSpan("metaUnknown")).append("[unknown blog]</span>");
         }
+    }
+    
+    protected void renderMetaCell() {
+        String tags[] = (_entry != null ? _entry.getTags() : null);
+        _preBodyBuffer.append("<td nowrap=\"nowrap\" align=\"right\" valign=\"top\" ");
+        _preBodyBuffer.append(getClass("meta")).append(">\n");
+        
+        PetName pn = null;
+        if ( (_entry != null) && (_user != null) )
+            pn = _user.getPetNameDB().getByLocation(_entry.getURI().getKeyHash().toBase64());
+        //if (knownName != null)
+        //    _preBodyBuffer.append("Pet name: ").append(sanitizeString(knownName)).append(" ");
 
+        BlogInfo info = null;
+        if (_entry != null) 
+            info = _archive.getBlogInfo(_entry.getURI());
+        renderMetaPetname(pn, info);
         
         if ( (_user != null) && (_user.getAuthenticated()) && (_entry != null) ) {
             if ( (pn == null) || (!pn.isMember("Favorites")) )
@@ -857,7 +861,19 @@ public class HTMLRenderer extends EventReceiverImpl {
         
         if ( (_user != null) && (_user.getAuthenticated()) ) {
             _preBodyBuffer.append(" <a ").append(getClass("replyLink"));
-            _preBodyBuffer.append(" href=\"").append(getPostURL(_user.getBlog(), true)).append("\">Reply</a>\n");
+            String subject = (String)_headers.get(HEADER_SUBJECT);
+            if (subject != null) {
+                if (!subject.startsWith("re:"))
+                    subject = "re: " + subject;
+            } else {
+                subject = "re: ";
+            }
+            StringBuffer tagStr = new StringBuffer(32);
+            if ( (tags != null) && (tags.length > 0) )
+                for (int i = 0; i < tags.length; i++)
+                    tagStr.append(tags[i]).append('\t');
+            String replyURL = getPostURL(_user.getBlog(), true, subject, tagStr.toString());
+            _preBodyBuffer.append(" href=\"").append(replyURL).append("\">Reply</a>\n");
         }
         _preBodyBuffer.append("\n</td>");
         _preBodyBuffer.append("</tr>\n");
@@ -984,11 +1000,18 @@ public class HTMLRenderer extends EventReceiverImpl {
     public static String getPostURL(Hash blog) {
         return "post.jsp?" + ArchiveViewerBean.PARAM_BLOG + "=" + Base64.encode(blog.getData());
     }
-    public String getPostURL(Hash blog, boolean asReply) { 
+    public String getPostURL(Hash blog, boolean asReply, String subject, String tags) { 
         if (asReply && _entry != null) {
-            return "post.jsp?" + ArchiveViewerBean.PARAM_BLOG + "=" + Base64.encode(blog.getData())
-                   + "&" + ArchiveViewerBean.PARAM_IN_REPLY_TO + '=' 
-                   + Base64.encode("entry://" + _entry.getURI().getKeyHash().toBase64() + "/" + _entry.getURI().getEntryId());
+            StringBuffer rv = new StringBuffer(128);
+            rv.append("post.jsp?").append(ArchiveViewerBean.PARAM_BLOG).append("=").append(Base64.encode(blog.getData()));
+            rv.append('&').append(ArchiveViewerBean.PARAM_IN_REPLY_TO).append('=');
+            rv.append(Base64.encode("entry://" + _entry.getURI().getKeyHash().toBase64() + "/" + _entry.getURI().getEntryId()));
+            if (subject != null)
+                rv.append('&').append(ArchiveViewerBean.PARAM_SUBJECT).append('=').append(Base64.encode(subject));
+            if (tags != null)
+                rv.append('&').append(ArchiveViewerBean.PARAM_TAGS).append('=').append(Base64.encode(tags));
+            rv.append('&').append(ArchiveViewerBean.PARAM_PARENT).append('=').append(Base64.encode(_entry.getURI().toString()));
+            return rv.toString();
         } else {
             return getPostURL(blog);
         }

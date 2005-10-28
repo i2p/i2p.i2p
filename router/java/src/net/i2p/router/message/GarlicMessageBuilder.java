@@ -34,7 +34,7 @@ public class GarlicMessageBuilder {
         return buildMessage(ctx, config, new SessionKey(), new HashSet());
     }
     public static GarlicMessage buildMessage(RouterContext ctx, GarlicConfig config, SessionKey wrappedKey, Set wrappedTags) {
-        return buildMessage(ctx, config, wrappedKey, wrappedTags, 20);
+        return buildMessage(ctx, config, wrappedKey, wrappedTags, 50);
     }
     public static GarlicMessage buildMessage(RouterContext ctx, GarlicConfig config, SessionKey wrappedKey, Set wrappedTags, int numTagsToDeliver) {
         Log log = ctx.logManager().getLog(GarlicMessageBuilder.class);
@@ -68,7 +68,7 @@ public class GarlicMessageBuilder {
                 wrappedTags.add(new SessionTag(true));
             if (log.shouldLog(Log.INFO))
                 log.info("Less than 10 tags are available (" + availTags + "), so we're including more");
-        } else if (ctx.sessionKeyManager().getAvailableTimeLeft(key, curKey) < 30*1000) {
+        } else if (ctx.sessionKeyManager().getAvailableTimeLeft(key, curKey) < 60*1000) {
             // if we have > 10 tags, but they expire in under 30 seconds, we want more
             for (int i = 0; i < numTagsToDeliver; i++)
                 wrappedTags.add(new SessionTag(true));

@@ -6,7 +6,9 @@ import net.i2p.I2PAppContext;
 import net.i2p.client.naming.PetName;
 import net.i2p.syndie.*;
 import net.i2p.syndie.data.BlogURI;
+import net.i2p.syndie.data.EntryContainer;
 import net.i2p.syndie.sml.HTMLPreviewRenderer;
+import net.i2p.syndie.sml.HTMLRenderer;
 import net.i2p.util.Log;
 
 /**
@@ -135,6 +137,16 @@ public class PostBean {
         HTMLPreviewRenderer r = new HTMLPreviewRenderer(_context, _filenames, _fileTypes, _localFiles);
         r.render(_user, BlogManager.instance().getArchive(), null, smlContent, out, false, true);
         _previewed = true;
+    }
+    
+    public void renderReplyPreview(Writer out, String parentURI) throws IOException {
+        HTMLRenderer r = new HTMLRenderer(_context);
+        Archive a = BlogManager.instance().getArchive();
+        BlogURI uri = new BlogURI(parentURI);
+        if (uri.getEntryId() > 0) {
+            EntryContainer entry = a.getEntry(uri);
+            r.render(_user, a, entry, out, false, true);
+        }
     }
     
     private String renderSMLContent() {

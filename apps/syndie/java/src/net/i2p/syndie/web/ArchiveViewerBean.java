@@ -46,6 +46,13 @@ public class ArchiveViewerBean {
     /** we are replying to a particular blog/tag/entry/whatever (value == base64 encoded selector) */
     public static final String PARAM_IN_REPLY_TO = "inReplyTo";
     
+    /** prepopulate the subject field with the given value */
+    public static final String PARAM_SUBJECT = "replySubject";
+    /** prepopulate the tags with the given value */
+    public static final String PARAM_TAGS = "replyTags";
+    /** prepopulate the body with the given value */
+    public static final String PARAM_PARENT = "parentURI";
+    
     /**
      * Drop down multichooser:
      *  blog://base64(key)

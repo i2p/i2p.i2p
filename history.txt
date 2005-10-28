@@ -1,4 +1,11 @@
-$Id: history.txt,v 1.305 2005/10/22 13:06:03 jrandom Exp $
+$Id: history.txt,v 1.306 2005/10/25 14:13:54 jrandom Exp $
+
+2005-10-26  jrandom
+    * In Syndie, propogate the subject and tags in a reply, and show the parent
+      post on the edit page for easy quoting.  (thanks identiguy and CofE!)
+    * Streamline some netDb query handling to run outside the jobqueue -
+      which means they'll run on the particular SSU thread that handles the
+      message.  This should help out heavily loaded netDb peers.
 
 2005-10-25  jrandom
     * Defer netDb searches for newly referenced peers until we actually want
