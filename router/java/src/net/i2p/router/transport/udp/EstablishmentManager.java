@@ -45,7 +45,7 @@ public class EstablishmentManager {
     private Object _activityLock;
     private int _activity;
     
-    private static final int DEFAULT_MAX_CONCURRENT_ESTABLISH = 16;
+    private static final int DEFAULT_MAX_CONCURRENT_ESTABLISH = 4;
     public static final String PROP_MAX_CONCURRENT_ESTABLISH = "i2np.udp.maxConcurrentEstablish";
     
     public EstablishmentManager(RouterContext ctx, UDPTransport transport) {
