@@ -29,6 +29,7 @@ public class PeerHelper {
     public String getPeerSummary() {
         try {
             _context.commSystem().renderStatusHTML(_out);
+            _context.bandwidthLimiter().renderStatusHTML(_out);
         } catch (IOException ioe) {
             ioe.printStackTrace();
         }

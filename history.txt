@@ -1,4 +1,14 @@
-$Id: history.txt,v 1.306 2005/10/25 14:13:54 jrandom Exp $
+$Id: history.txt,v 1.307 2005/10/28 17:26:55 jrandom Exp $
+
+2005-10-29  jrandom
+    * Improved the bandwidth throtting on tunnel participation, especially for
+      low bandwidth peers.
+    * Improved failure handling in SSU with proactive reestablishment of
+      failing idle peers, and rather than shitlisting a peer who failed too
+      much, drop the SSU session and allow a new attempt (which, if it fails,
+      will cause a shitlisting)
+    * Clarify the cause of the shitlist on the profiles page, and include
+      bandwidth limiter info at the bottom of the peers page.
 
 2005-10-26  jrandom
     * In Syndie, propogate the subject and tags in a reply, and show the parent

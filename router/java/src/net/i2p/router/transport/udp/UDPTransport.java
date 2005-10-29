@@ -147,6 +147,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         _context.statManager().createRateStat("udp.statusUnknown", "How many times the peer test returned an unknown result", "udp", new long[] { 5*60*1000, 20*60*1000, 60*60*1000, 24*60*60*1000 });
         _context.statManager().createRateStat("udp.addressTestInsteadOfUpdate", "How many times we fire off a peer test of ourselves instead of adjusting our own reachable address?", "udp", new long[] { 1*60*1000, 20*60*1000, 60*60*1000, 24*60*60*1000 });
         _context.statManager().createRateStat("udp.addressUpdated", "How many times we adjust our own reachable IP address", "udp", new long[] { 1*60*1000, 20*60*1000, 60*60*1000, 24*60*60*1000 });
+        _context.statManager().createRateStat("udp.proactiveReestablish", "How long a session was idle for when we proactively reestablished it", "udp", new long[] { 1*60*1000, 20*60*1000, 60*60*1000, 24*60*60*1000 });
     }
     
     public void startup() {
@@ -661,6 +662,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         return (pref != null) && "true".equals(pref);
     }
     
+    private static final int MAX_IDLE_TIME = 60*1000;
+    
     public String getStyle() { return STYLE; }
     public void send(OutNetMessage msg) { 
         if (msg == null) return;
@@ -668,13 +671,24 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         if (msg.getTarget().getIdentity() == null) return;
         
         Hash to = msg.getTarget().getIdentity().calculateHash();
-        if (getPeerState(to) != null) {
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Sending outbound message to an established peer: " + to.toBase64());
+        PeerState peer = getPeerState(to);
+        if (peer != null) {
+            long lastSend = peer.getLastSendFullyTime();
+            long lastRecv = peer.getLastReceiveTime();
+            long now = _context.clock().now();
+            if ( (lastSend > 0) && (lastRecv > 0) ) {
+                if ( (now - lastSend > MAX_IDLE_TIME) && 
+                     (now - lastRecv > MAX_IDLE_TIME) && 
+                     (peer.getConsecutiveFailedSends() > 0) ) {
+                    // peer is waaaay idle, drop the con and queue it up as a new con
+                    dropPeer(peer, false);
+                    _establisher.establish(msg);
+                    _context.statManager().addRateData("udp.proactiveReestablish", now-lastSend, now-peer.getKeyEstablishedTime());
+                    return;
+                }
+            }
             _outboundMessages.add(msg);
         } else {
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Sending outbound message to an unestablished peer: " + to.toBase64());
             _establisher.establish(msg);
         }
     }
@@ -836,7 +850,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Consecutive failure #" + consecutive + " sending to " + msg.getPeer());
             if (consecutive > MAX_CONSECUTIVE_FAILED)
-                dropPeer(msg.getPeer());
+                dropPeer(msg.getPeer(), false);
         }
         failed(msg.getMessage());
     }

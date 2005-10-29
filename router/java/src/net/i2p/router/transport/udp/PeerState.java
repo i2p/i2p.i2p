@@ -65,6 +65,8 @@ public class PeerState {
     private long _currentReceiveSecond;
     /** when did we last send them a packet? */
     private long _lastSendTime;
+    /** when did we last send them a message that was ACKed */
+    private long _lastSendFullyTime;
     /** when did we last receive a packet from them? */
     private long _lastReceiveTime;
     /** how many consecutive messages have we sent and not received an ACK to */
@@ -270,6 +272,8 @@ public class PeerState {
     public long getCurrentReceiveSecond() { return _currentReceiveSecond; }
     /** when did we last send them a packet? */
     public long getLastSendTime() { return _lastSendTime; }
+    /** when did we last send them a message that was ACKed? */
+    public long getLastSendFullyTime() { return _lastSendFullyTime; }
     /** when did we last receive a packet from them? */
     public long getLastReceiveTime() { return _lastReceiveTime; }
     /** how many seconds have we sent packets without any ACKs received? */
@@ -658,6 +662,7 @@ public class PeerState {
         if (_sendWindowBytes > MAX_SEND_WINDOW_BYTES)
             _sendWindowBytes = MAX_SEND_WINDOW_BYTES;
         _lastReceiveTime = _context.clock().now();
+        _lastSendFullyTime = _lastReceiveTime;
         
         if (true) {
             if (_sendWindowBytesRemaining + bytesACKed <= _sendWindowBytes)

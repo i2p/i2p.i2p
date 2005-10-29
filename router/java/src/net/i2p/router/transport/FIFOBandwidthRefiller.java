@@ -328,4 +328,7 @@ class FIFOBandwidthRefiller implements Runnable {
             _limiter.setOutboundBurstBytes(DEFAULT_BURST_SECONDS * _outboundBurstKBytesPerSecond * 1024);
         }
     }
+    
+    int getOutboundKBytesPerSecond() { return _outboundKBytesPerSecond; } 
+    int getInboundKBytesPerSecond() { return _inboundKBytesPerSecond; } 
 }

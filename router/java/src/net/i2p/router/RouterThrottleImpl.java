@@ -50,6 +50,8 @@ class RouterThrottleImpl implements RouterThrottle {
         _context.statManager().createRateStat("router.throttleTunnelProbTooFast", "How many tunnels beyond the previous 1h average are we participating in when we throttle?", "Throttle", new long[] { 10*60*1000, 60*60*1000, 24*60*60*1000 });
         _context.statManager().createRateStat("router.throttleTunnelProbTestSlow", "How slow are our tunnel tests when our average exceeds the old average and we throttle?", "Throttle", new long[] { 10*60*1000, 60*60*1000, 24*60*60*1000 });
         _context.statManager().createRateStat("router.throttleTunnelBandwidthExceeded", "How much bandwidth is allocated when we refuse due to bandwidth allocation?", "Throttle", new long[] { 10*60*1000, 60*60*1000, 24*60*60*1000 });
+        _context.statManager().createRateStat("router.throttleTunnelBytesAllowed", "How many bytes are allowed to be sent when we get a tunnel request (period is how many are currently allocated)?", "Throttle", new long[] { 10*60*1000, 60*60*1000, 24*60*60*1000 });
+        _context.statManager().createRateStat("router.throttleTunnelBytesUsed", "Used Bps at request (period = max KBps)?", "Throttle", new long[] { 10*60*1000, 60*60*1000, 24*60*60*1000 });
     }
     
     public boolean acceptNetworkMessage() {
@@ -212,7 +214,13 @@ class RouterThrottleImpl implements RouterThrottle {
         r = null;
         if (rs != null)
             r = rs.getRate(10*60*1000);
-        double bytesAllocated = (r != null ? r.getCurrentTotalValue() * 1024 : 0);
+        double messagesPerTunnel = (r != null ? r.getAverageValue() : 0d);
+        if (messagesPerTunnel < DEFAULT_MESSAGES_PER_TUNNEL_ESTIMATE)
+            messagesPerTunnel = DEFAULT_MESSAGES_PER_TUNNEL_ESTIMATE;
+        int participatingTunnels = (r != null ? (int) (r.getLastEventCount() + r.getCurrentEventCount()) : 0);
+        if (participatingTunnels <= 0)
+            participatingTunnels = _context.tunnelManager().getParticipatingCount();
+        double bytesAllocated = messagesPerTunnel * participatingTunnels * 1024;
         
         if (!allowTunnel(bytesAllocated, numTunnels)) {
             _context.statManager().addRateData("router.throttleTunnelBandwidthExceeded", (long)bytesAllocated, 0);
@@ -227,6 +235,8 @@ class RouterThrottleImpl implements RouterThrottle {
         return TUNNEL_ACCEPT;
     }
     
+    private static final int DEFAULT_MESSAGES_PER_TUNNEL_ESTIMATE = 600; // 1KBps
+    
     /**
      * with bytesAllocated already accounted for across the numTunnels existing
      * tunnels we have agreed to, can we handle another tunnel with our existing
@@ -234,26 +244,33 @@ class RouterThrottleImpl implements RouterThrottle {
      *
      */
     private boolean allowTunnel(double bytesAllocated, int numTunnels) {
-        long bytesAllowed = getBytesAllowed();
-        
-        bytesAllowed *= getSharePercentage();
-        
-        double bytesPerTunnel = (numTunnels > 0 ? bytesAllocated / numTunnels : 0);
-        double toAllocate = (numTunnels > 0 ? bytesPerTunnel * (numTunnels + 1) : 0);
-        
-        double pctFull = toAllocate / bytesAllowed;
+        int maxKBps = Math.min(_context.bandwidthLimiter().getOutboundKBytesPerSecond(), _context.bandwidthLimiter().getInboundKBytesPerSecond());
+        int used = (int)Math.max(_context.bandwidthLimiter().getSendBps(), _context.bandwidthLimiter().getReceiveBps());
+        int availBps = (int)(((maxKBps*1024) - used) * getSharePercentage());
+
+        _context.statManager().addRateData("router.throttleTunnelBytesUsed", used, maxKBps);
+        _context.statManager().addRateData("router.throttleTunnelBytesAllowed", availBps, (long)bytesAllocated);
+
+        if (maxKBps <= 8) {
+            // lets be more conservative for dialup users and assume 1KBps per tunnel
+            return ( (numTunnels + 1)*1024 < availBps);
+        }
+
+        double growthFactor = ((double)(numTunnels+1))/(double)numTunnels;
+        double toAllocate = (numTunnels > 0 ? bytesAllocated * growthFactor : 0);
         
         double allocatedKBps = toAllocate / (10 * 60 * 1024);
+        double pctFull = allocatedKBps / availBps;
         
-        if (pctFull < 1.0) { // (_context.random().nextInt(100) > 100 * pctFull) {
+        if ( (pctFull < 1.0) && (pctFull >= 0.0) ) { // (_context.random().nextInt(100) > 100 * pctFull) {
             if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Probabalistically allowing the tunnel w/ " + pctFull + " of our " + bytesAllowed
-                           + "bytes/" + allocatedKBps + "KBps allocated through " + numTunnels + " tunnels");
+                _log.debug("Probabalistically allowing the tunnel w/ " + pctFull + " of our " + availBps
+                           + "Bps/" + allocatedKBps + "KBps allocated through " + numTunnels + " tunnels");
             return true;
         } else {
             if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Rejecting the tunnel w/ " + pctFull + " of our " + bytesAllowed 
-                           + "bytes allowed (" + toAllocate + "bytes / " + allocatedKBps 
+                _log.debug("Rejecting the tunnel w/ " + pctFull + " of our " + availBps 
+                           + "Bps allowed (" + toAllocate + "bytes / " + allocatedKBps 
                            + "KBps) through " + numTunnels + " tunnels");
             return false;
         }
@@ -268,7 +285,11 @@ class RouterThrottleImpl implements RouterThrottle {
         String pct = _context.getProperty(PROP_BANDWIDTH_SHARE_PERCENTAGE, "0.8");
         if (pct != null) {
             try {
-                return Double.parseDouble(pct);
+                double d = Double.parseDouble(pct);
+                if (d > 1)
+                    return d/100d; // *cough* sometimes its 80 instead of .8 (!stab jrandom)
+                else
+                    return d;
             } catch (NumberFormatException nfe) {
                 if (_log.shouldLog(Log.INFO))
                     _log.info("Unable to get the share percentage");
@@ -276,50 +297,7 @@ class RouterThrottleImpl implements RouterThrottle {
         }
         return 0.8;
     }
-        
-    /** 
-     * BytesPerSecond that we can pass along data
-     */
-    private long getBytesAllowed() {
-        String kbpsOutStr = _context.getProperty("i2np.bandwidth.outboundKBytesPerSecond");
-        long kbpsOut = -1;
-        if (kbpsOutStr != null) {
-            try {
-                kbpsOut = Integer.parseInt(kbpsOutStr);
-            } catch (NumberFormatException nfe) {
-                if (_log.shouldLog(Log.INFO))
-                    _log.info("Unable to get the bytes allowed (outbound)");
-            }
-        }
-        
-        String kbpsInStr = _context.getProperty("i2np.bandwidth.inboundKBytesPerSecond");
-        long kbpsIn = -1;
-        if (kbpsInStr != null) {
-            try {
-                kbpsIn = Integer.parseInt(kbpsInStr);
-            } catch (NumberFormatException nfe) {
-                if (_log.shouldLog(Log.INFO))
-                    _log.info("Unable to get the bytes allowed (inbound)");
-            }
-        }
-        
-        // whats our choke?
-        long kbps = (kbpsOut > kbpsIn ? kbpsIn : kbpsOut);
-        
-        if (kbps <= 0) {
-            try {
-                kbps = Integer.parseInt(_context.getProperty(PROP_DEFAULT_KBPS_THROTTLE, "64")); // absurd
-            } catch (NumberFormatException nfe) {
-                kbps = 64;
-            }
-        }
-        
-        return kbps
-               * 60 // per minute
-               * 10 // per 10 minute period
-               * 1024; // bytes;
-    }
-    
+
     /** dont ever probabalistically throttle tunnels if we have less than this many */
     private int getMinThrottleTunnels() { 
         try {

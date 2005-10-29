@@ -100,6 +100,9 @@ public class FIFOBandwidthLimiter {
     public float getSendBps() { return _sendBps; }
     public float getReceiveBps() { return _recvBps; }
     
+    public int getOutboundKBytesPerSecond() { return _refiller.getOutboundKBytesPerSecond(); } 
+    public int getInboundKBytesPerSecond() { return _refiller.getInboundKBytesPerSecond(); } 
+    
     public void reinitialize() {
         _pendingInboundRequests.clear();
         _pendingOutboundRequests.clear();
