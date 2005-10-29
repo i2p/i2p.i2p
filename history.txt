@@ -1,4 +1,6 @@
-$Id: history.txt,v 1.307 2005/10/28 17:26:55 jrandom Exp $
+$Id: history.txt,v 1.308 2005/10/29 16:35:27 jrandom Exp $
+
+* 2005-10-29  0.6.1.4 released
 
 2005-10-29  jrandom
     * Improved the bandwidth throtting on tunnel participation, especially for
