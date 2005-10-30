@@ -1,4 +1,10 @@
-$Id: history.txt,v 1.308 2005/10/29 16:35:27 jrandom Exp $
+$Id: history.txt,v 1.309 2005/10/29 18:20:04 jrandom Exp $
+
+2005-10-30  dust
+    * Merge sucker into syndie with a rssimport.jsp page.
+    * Add getContentType() to EepGet.
+    * Make chunked transfer work (better) with EepGet.
+    * Do replaceAll("<","&lt;") for logs.
 
 * 2005-10-29  0.6.1.4 released
 

@@ -324,8 +324,10 @@ public class BlogManager {
     }
     
     public boolean isConfigured() {
-        File cfg = getConfigFile();
-        return (cfg.exists());
+        String p = _context.getProperty("syndie.configurationCheck");
+        if(p==null)
+            return false;
+        return true;
     }
     
     /**
@@ -347,6 +349,73 @@ public class BlogManager {
         if (delay < 1) delay = 1;
         return delay;
     }
+    
+    public List getRssFeeds() {
+        List feedList = new ArrayList();
+        int i=0;
+        while(true) {
+            String url = _context.getProperty("syndie.rssFeed."+i+".url");
+            String blog = _context.getProperty("syndie.rssFeed."+i+".blog");
+            String tagPrefix = _context.getProperty("syndie.rssFeed."+i+".tagPrefix");
+            if(url==null || blog==null || tagPrefix==null)
+                break;
+            String feed[] = new String[3];
+            feed[0]=url.trim();
+            feed[1]=blog.trim();
+            feed[2]=tagPrefix.trim();
+            feedList.add(feed);
+            i++;
+        }
+        return feedList;
+    }
+    public boolean addRssFeed(String url, String blog, String tagPrefix) {
+        
+        List feedList = getRssFeeds();
+        int nextIdx=feedList.size();
+        
+        String baseFeedProp="syndie.rssFeed."+nextIdx;
+        System.setProperty(baseFeedProp+".url",url);
+        System.setProperty(baseFeedProp+".blog",blog);
+        System.setProperty(baseFeedProp+".tagPrefix",tagPrefix);
+        _log.info("addRssFeed("+nextIdx+"): "+url);
+        writeConfig();
+        Updater.wakeup();
+        return true;
+    }
+    public boolean deleteRssFeed(String url, String blog, String tagPrefix) {
+        List feedList = getRssFeeds();
+        Iterator iter = feedList.iterator();
+        int idx=0;
+        while(iter.hasNext()) {
+            String fields[] = (String[])iter.next();
+            if(fields[0].equals(url) &&
+               fields[1].equals(blog) &&
+               fields[2].equals(tagPrefix)) {
+                break;
+            }
+            idx++;
+        }
+        
+        // copy any remaining to idx-1
+        while(iter.hasNext()) {
+            String fields[] = (String[])iter.next();
+            String baseFeedProp="syndie.rssFeed."+idx;
+            System.setProperty(baseFeedProp+".url",fields[0]);
+            System.setProperty(baseFeedProp+".blog",fields[1]);
+            System.setProperty(baseFeedProp+".tagPrefix",fields[2]);
+            idx++;
+        }
+        
+        // Delete last idx from properties
+        String baseFeedProp="syndie.rssFeed."+idx;
+        System.getProperties().remove(baseFeedProp+".url");
+        System.getProperties().remove(baseFeedProp+".blog");
+        System.getProperties().remove(baseFeedProp+".tagPrefix");
+        _log.info("deleteRssFeed("+idx+"): "+url);
+        writeConfig();
+        return true;
+    }
+     
     
     public boolean authorizeAdmin(String pass) {
         if (isSingleUser()) return true;
@@ -388,6 +457,7 @@ public class BlogManager {
             if (defaultProxyPort > 0)
                 out.write("syndie.defaultProxyPort="+defaultProxyPort + "\n");
             out.write("syndie.singleUser=" + isSingleUser + "\n");
+            out.write("syndie.configurationCheck=foo\n");
             if (opts != null) {
                 for (Iterator iter = opts.keySet().iterator(); iter.hasNext(); ) {
                     String key = (String)iter.next();
@@ -525,10 +595,13 @@ public class BlogManager {
     }
     
     public BlogURI createBlogEntry(User user, String subject, String tags, String entryHeaders, String sml) {
-        return createBlogEntry(user, subject, tags, entryHeaders, sml, null, null, null);
+        return createBlogEntry(user, true, subject, tags, entryHeaders, sml, null, null, null);
     }
     public BlogURI createBlogEntry(User user, String subject, String tags, String entryHeaders, String sml, List fileNames, List fileStreams, List fileTypes) {
-        if (!user.getAuthenticated()) return null;
+        return createBlogEntry(user, true, subject, tags, entryHeaders, sml, fileNames, fileStreams, fileTypes);        
+    }
+    public BlogURI createBlogEntry(User user, boolean shouldAuthenticate, String subject, String tags, String entryHeaders, String sml, List fileNames, List fileStreams, List fileTypes) {
+        if (shouldAuthenticate && !user.getAuthenticated()) return null;
         BlogInfo info = getArchive().getBlogInfo(user.getBlog());
         if (info == null) return null;
         SigningPrivateKey privkey = getMyPrivateKey(info);
@@ -601,7 +674,10 @@ public class BlogManager {
             if (ok) {
                 getArchive().regenerateIndex();
                 user.setMostRecentEntry(entryId);
-                saveUser(user);
+                if(shouldAuthenticate)
+                    saveUser(user);
+                else
+                    storeUser(user);
                 return uri;
             } else {
                 return null;

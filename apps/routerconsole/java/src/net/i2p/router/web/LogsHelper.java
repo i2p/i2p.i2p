@@ -30,6 +30,7 @@ public class LogsHelper {
         buf.append("<code>\n");
         for (int i = msgs.size(); i > 0; i--) { 
             String msg = (String)msgs.get(i - 1);
+            msg = msg.replaceAll("<","&lt;");
             buf.append("<li>");
             buf.append(msg);
             buf.append("</li>\n");
@@ -46,6 +47,7 @@ public class LogsHelper {
         buf.append("<code>\n");
         for (int i = msgs.size(); i > 0; i--) { 
             String msg = (String)msgs.get(i - 1);
+            msg = msg.replaceAll("<","&lt;");
             buf.append("<li>");
             buf.append(msg);
             buf.append("</li>\n");
@@ -59,8 +61,10 @@ public class LogsHelper {
         String str = FileUtil.readTextFile("wrapper.log", 500, false);
         if (str == null) 
             return "";
-        else
+        else {
+            str = str.replaceAll("<","&lt;");
             return "<pre>" + str + "</pre>";
+        }
     }
     
     public String getConnectionLogs() {

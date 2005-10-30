@@ -51,6 +51,7 @@ public class EepGet {
     private String _etag;
     private boolean _encodingChunked;
     private boolean _notModified;
+    private String _contentType;
     
     public EepGet(I2PAppContext ctx, String proxyHost, int proxyPort, int numRetries, String outputFile, String url) {
         this(ctx, true, proxyHost, proxyPort, numRetries, outputFile, url);
@@ -209,11 +210,13 @@ public class EepGet {
                         if (timeToSend > 0) {
                             StringBuffer buf = new StringBuffer(50);
                             buf.append(" ");
-                            double pct = ((double)alreadyTransferred + (double)_written) / ((double)alreadyTransferred + (double)bytesRemaining);
-                            synchronized (_pct) {
-                                buf.append(_pct.format(pct));
+                            if ( bytesRemaining > 0 ) {
+                                double pct = ((double)alreadyTransferred + (double)_written) / ((double)alreadyTransferred + (double)bytesRemaining);
+                                synchronized (_pct) {
+                                    buf.append(_pct.format(pct));
+                                }
+                                buf.append(": ");
                             }
-                            buf.append(": ");
                             buf.append(_written+alreadyTransferred);
                             buf.append(" @ ");
                             double lineKBytes = ((double)_markSize * (double)_lineSize)/1024.0d;
@@ -243,9 +246,15 @@ public class EepGet {
             if (notModified) {
                 System.out.println("== Source not modified since last download");
             } else {
-                System.out.println("== Transfer of " + url + " completed with " + (alreadyTransferred+bytesTransferred)
-                        + " and " + (bytesRemaining - bytesTransferred) + " remaining");
-                System.out.println("== Output saved to " + outputFile);
+                if ( bytesRemaining > 0 ) {
+                    System.out.println("== Transfer of " + url + " completed with " + (alreadyTransferred+bytesTransferred)
+                            + " and " + (bytesRemaining - bytesTransferred) + " remaining");
+                    System.out.println("== Output saved to " + outputFile);
+                } else {
+                    System.out.println("== Transfer of " + url + " completed with " + (alreadyTransferred+bytesTransferred)
+                            + " bytes transferred");
+                    System.out.println("== Output saved to " + outputFile);
+                }
             }
             long timeToSend = _context.clock().now() - _startedOn;
             System.out.println("== Transfer time: " + DataHelper.formatDuration(timeToSend));
@@ -355,9 +364,19 @@ public class EepGet {
             _out.write(buf, 0, read);
             _bytesTransferred += read;
             remaining -= read;
+            if (remaining==0 && _encodingChunked) {
+                if(_proxyIn.read()=='\r' && _proxyIn.read()=='\n') {
+                    remaining = (int) readChunkLength();
+                }
+            }
             if (read > 0) 
                 for (int i = 0; i < _listeners.size(); i++) 
-                    ((StatusListener)_listeners.get(i)).bytesTransferred(_alreadyTransferred, read, _bytesTransferred, _bytesRemaining, _url);
+                    ((StatusListener)_listeners.get(i)).bytesTransferred(
+                            _alreadyTransferred, 
+                            read, 
+                            _bytesTransferred, 
+                            _encodingChunked?-1:_bytesRemaining, 
+                            _url);
         }
 
         if (_out != null)
@@ -369,7 +388,13 @@ public class EepGet {
 
         if ( (_bytesRemaining == -1) || (remaining == 0) ){
             for (int i = 0; i < _listeners.size(); i++) 
-                ((StatusListener)_listeners.get(i)).transferComplete(_alreadyTransferred, _bytesTransferred, _bytesRemaining, _url, _outputFile, _notModified);
+                ((StatusListener)_listeners.get(i)).transferComplete(
+                        _alreadyTransferred, 
+                        _bytesTransferred, 
+                        _encodingChunked?-1:_bytesRemaining, 
+                        _url, 
+                        _outputFile, 
+                        _notModified);
         } else {
             throw new IOException("Disconnection on attempt " + _currentAttempt + " after " + _bytesTransferred);
         }
@@ -387,6 +412,7 @@ public class EepGet {
         switch (responseCode) {
             case 200: // full
                 _out = new FileOutputStream(_outputFile, false);
+                _alreadyTransferred = 0;
                 rcOk = true;
                 break;
             case 206: // partial
@@ -405,7 +431,7 @@ public class EepGet {
             default:
                 rcOk = false;
         }
-
+        buf.setLength(0);
         byte lookahead[] = new byte[3];
         while (true) {
             int cur = _proxyIn.read();
@@ -435,7 +461,7 @@ public class EepGet {
                         if (!rcOk)
                             throw new IOException("Invalid HTTP response code: " + responseCode);
                         if (_encodingChunked) {
-                            readChunkLength();
+                            _bytesRemaining = readChunkLength();
                         }
                         return;
                     }
@@ -450,7 +476,7 @@ public class EepGet {
         }
     }
     
-    private void readChunkLength() throws IOException {
+    private long readChunkLength() throws IOException {
         StringBuffer buf = new StringBuffer(8);
         int nl = 0;
         while (true) {
@@ -472,9 +498,9 @@ public class EepGet {
         String len = buf.toString().trim();
         try {
             long bytes = Long.parseLong(len, 16);
-            _bytesRemaining = bytes;
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Chunked length: " + bytes);
+            return bytes;
         } catch (NumberFormatException nfe) {
             throw new IOException("Invalid chunk length [" + len + "]");
         }
@@ -529,6 +555,8 @@ public class EepGet {
         } else if (key.equalsIgnoreCase("Transfer-encoding")) {
             if (val.indexOf("chunked") != -1)
                 _encodingChunked = true;
+        } else if (key.equalsIgnoreCase("Content-Type")) {
+            _contentType=val;
         } else {
             // ignore the rest
         }
@@ -629,6 +657,10 @@ public class EepGet {
     
     public boolean getNotModified() {
         return _notModified;
+    }
+    
+    public String getContentType() {
+        return _contentType;
     }
 
 }

@@ -5,6 +5,7 @@
 <span class="b_topnavHome"><a href="index.jsp" class="b_topnavHome">Home</a></span>
 <a href="admin.jsp" class="b_topnavAdmin">Syndie admin</a>
 <a href="remote.jsp" class="b_topnavRemote">Remote archives</a>
+<a href="rssimport.jsp" class="b_topnavRSSImport">RSS imports</a>
 <a href="import.jsp" class="b_topnavImport">Import</a>
 </td><td nowrap="nowrap" height="10" class="b_topnavUser"><%
 if ("true".equals(request.getParameter("logout"))) {

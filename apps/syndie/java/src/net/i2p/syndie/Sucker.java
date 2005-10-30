@@ -6,16 +6,14 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
-import java.util.ListIterator;
-
-//import sun.security.provider.SHA;
+import java.util.Properties;
 
 import com.sun.syndication.feed.synd.SyndCategory;
 import com.sun.syndication.feed.synd.SyndContent;
@@ -27,9 +25,15 @@ import com.sun.syndication.io.XmlReader;
 
 import net.i2p.I2PAppContext;
 import net.i2p.data.Base64;
+import net.i2p.data.DataFormatException;
+import net.i2p.data.DataHelper;
+import net.i2p.data.Hash;
+import net.i2p.syndie.data.BlogURI;
 import net.i2p.util.EepGet;
+import net.i2p.util.Log;
 
 public class Sucker {
+    private static final Log _log = I2PAppContext.getGlobalContext().logManager().getLog(Sucker.class);
     private String urlToLoad;
     private String outputDir="./sucker_out";
     private String historyPath="./sucker.history";
@@ -46,9 +50,50 @@ public class Sucker {
     private boolean pendingEndLink;
     private boolean shouldProxy;
     private int proxyPortNum;
+    private String blog;
+    private boolean pushToSyndie;
+    private long messageNumber=0;
+    private BlogManager bm;
+    private User user;
     
-    public Sucker() {}
+    //
+    private List fileNames;
+    private List fileStreams;
+    private List fileTypes;
     
+    public Sucker() {
+    }
+    
+    /**
+     * Constructor for BlogManager. 
+     */
+    public Sucker(String[] strings) throws IllegalArgumentException {
+        pushToSyndie=true;
+        urlToLoad = strings[0];
+        blog = strings[1];
+        feedTag = strings[2];
+        outputDir = "blog-"+blog;
+        try {
+            historyPath=BlogManager.instance().getRootDir().getCanonicalPath()+"/rss.history";
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        proxyPort="4444";
+        proxyHost="localhost";
+
+        bm = BlogManager.instance();
+        Hash blogHash = new Hash();
+        try {
+            blogHash.fromBase64(blog);
+        } catch (DataFormatException e1) {
+            throw new IllegalArgumentException("ooh, bad $blog");
+        }
+     
+        user = bm.getUser(blogHash);
+        if(user==null)
+            throw new IllegalArgumentException("wtf, user==null? hash:"+blogHash);
+    }
+
     public boolean parseArgs(String args[]) {
         for (int i = 0; i < args.length; i++) {
             if ("--load".equals(args[i]))
@@ -77,57 +122,56 @@ public class Sucker {
 
         if (urlToLoad == null)
             return false;
-        
-        // Find base url, gah HELP
-        int idx=urlToLoad.length();
-        int x=urlToLoad.indexOf('?');
-        if(x>0)
-            idx=x;
-        while(idx>0)
-        {
-            idx--;
-            if(urlToLoad.charAt(idx)=='/')
-                break;
-        }
-        if(idx==0)
-            idx=x;
-        baseUrl=urlToLoad.substring(0,idx);
-
-	System.out.println("Processing: "+urlToLoad);
 
         return true;
     }
     
+    /**
+     * Fetch urlToLoad and call convertToHtml() on any new entries.
+     */
     public void suck() {
         SyndFeed feed;
+        
+        // Find base url
+        int idx=urlToLoad.lastIndexOf('/');
+        if(idx>0)
+            baseUrl=urlToLoad.substring(0,idx);
+        else
+            baseUrl=urlToLoad;
+
+        debugLog("Processing: "+urlToLoad);
+        debugLog("Base url: "+baseUrl);
 
         //
         try {
-            
-            // Create outputDir if missing
-            File f = new File(outputDir);
-            f.mkdirs();
+            File lastIdFile=null;
+         
+            // Get next message number to use (for messageId in history only)
+            if(!pushToSyndie) {
+                
+                lastIdFile = new File(historyPath + ".lastId");
+                if (!lastIdFile.exists())
+                    lastIdFile.createNewFile();
+                
+                FileInputStream fis = new FileInputStream(lastIdFile);
+                String number = readLine(fis);
+                try {
+                    messageNumber = Integer.parseInt(number);
+                } catch (NumberFormatException e) {
+                    messageNumber = 0;
+                }
+
+                // Create outputDir if missing
+                File f = new File(outputDir);
+                f.mkdirs();
+            } else {
+                messageNumber=bm.getNextBlogEntry(user);
+            }
 
             // Create historyFile if missing
             historyFile = new File(historyPath);
             if (!historyFile.exists())
                 historyFile.createNewFile();
-
-            int messageNumber;
-
-            File lastIdFile = new File(historyPath + ".lastId");
-            if (!lastIdFile.exists())
-                lastIdFile.createNewFile();
-
-            FileInputStream fis = new FileInputStream(lastIdFile);
-            String number = readLine(fis);
-            try {
-                messageNumber = Integer.parseInt(number);
-            } catch (NumberFormatException e) {
-                messageNumber = 0;
-            }
-
-            SyndFeedInput input = new SyndFeedInput();
 
             shouldProxy = false;
             proxyPortNum = -1;
@@ -140,11 +184,11 @@ public class Sucker {
                     nfe.printStackTrace();
                 }
             }
+            
+            // fetch
             int numRetries = 2;
-            // perhaps specify a temp dir?
             File fetched = File.createTempFile("sucker", ".fetch");
             fetched.deleteOnExit();
-            // we use eepGet, since it retries and doesn't leak DNS requests like URL does
             EepGet get = new EepGet(I2PAppContext.getGlobalContext(), shouldProxy, proxyHost, proxyPortNum, 
                                     numRetries, fetched.getAbsolutePath(), urlToLoad);
             SuckerFetchListener lsnr = new SuckerFetchListener();
@@ -155,89 +199,71 @@ public class Sucker {
                 System.err.println("Unable to retrieve the url after " + numRetries + " tries.");
                 return;
             }
-            
+            if(get.getNotModified()) {
+                debugLog("not modified, saving network bytes from useless fetch");
+                return;
+            }
+
+            // Build entry list from fetched rss file
+            SyndFeedInput input = new SyndFeedInput();
             feed = input.build(new XmlReader(fetched));
 
             List entries = feed.getEntries();
 
             FileOutputStream hos = new FileOutputStream(historyFile, true);
 
-            ListIterator iter = entries.listIterator();
-            while (iter.hasNext()) {
+            // Process list backwards to get syndie to display the 
+            // entries in the right order. (most recent at top)
+            for (int i = entries.size()-1; i >= 0; i--) { 
+                SyndEntry e = (SyndEntry) entries.get(i);
                 
                 attachmentCounter=0;
                 
-                SyndEntry e = (SyndEntry) iter.next();
-                // Calculate messageId
-                String feedHash = sha1(urlToLoad);
-                String itemHash = sha1(e.getTitle() + e.getDescription());
-                Date d = e.getPublishedDate();
-                String time;
-                if(d!=null)
-                    time = "" + d.getTime();
-                else
-                    time = "" + new Date().getTime();
-                    
-                String outputFileName = outputDir + "/" + messageNumber;
-
-                /*
-                 * $feedHash:$itemHash:$time:$outputfile. $feedHash would be the
-                 * hash (md5? sha1? sha2?) of the $urlToFeed, $itemHash is some
-                 * hash of the SyndEntry, $time would be the time that the entry
-                 * was posted $outputfile would be the $outputdir/$uniqueid
-                 */
-                String messageId = feedHash + ":" + itemHash + ":" + time + ":"
-                                   + outputFileName;
-
-                // Check if we already have this
-                if (!existsInHistory(messageId)) {
-                    System.out.println("new: " + messageId);
-
-                    if (convertToSml(e, ""+messageNumber)) {
-
-                        if (pushScript != null) {
-                            if (!execPushScript(""+messageNumber, time)) {
-                                System.out.println("################## push failed");
-                            }else {
-                                System.out.println("push success");
-                                hos.write(messageId.getBytes());
-                                hos.write("\n".getBytes());
-                            }
-                        }
-                    }
-                    messageNumber++;
+                String messageId = convertToSml(e);
+                if (messageId!=null) {
+                    hos.write(messageId.getBytes());
+                    hos.write("\n".getBytes());
                 }
             }
-
-            FileOutputStream fos = new FileOutputStream(lastIdFile);
-            fos.write(("" + messageNumber).getBytes());
+            
+            if(!pushToSyndie) {
+                FileOutputStream fos = new FileOutputStream(lastIdFile);
+                fos.write(("" + messageNumber).getBytes());
+            }
         } catch (MalformedURLException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         } catch (IllegalArgumentException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         } catch (FeedException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         } catch (IOException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
-        System.out.println("Done.");
+        debugLog("Done.");
     }
 
     public static void main(String[] args) {
         Sucker sucker = new Sucker();
         boolean ok = sucker.parseArgs(args);
         if (!ok) {
-            usage();
-            return;
+            System.out.println("sucker --load $urlToFeed \n"
+                    + "--proxyhost <host> \n" 
+                    + "--proxyport <port> \n"
+                    + "--importenclosures true \n" 
+                    + "--importrefs true \n"
+                    + "--tag feed \n" 
+                    + "--outputdir ./sucker_out \n"
+                    + "--exec pushscript.sh OUTPUTDIR UNIQUEID ENTRYTIMESTAMP \n"
+                    + "--history ./sucker.history");
+            System.exit(1);
         }
         
         sucker.suck();
     }
 
+    /**
+     * Call the specified script with "$outputDir $id and $time". 
+     */
     private boolean execPushScript(String id, String time) {
         try {
             String ls_str;
@@ -251,7 +277,7 @@ public class Sucker {
 
             try {
                 while ((ls_str = ls_in.readLine()) != null) {
-                    System.out.println(pushScript + ": " + ls_str);
+                    debugLog(pushScript + ": " + ls_str);
                 }
             } catch (IOException e) {
                 return false;
@@ -261,7 +287,6 @@ public class Sucker {
                 if(pushScript_proc.exitValue()==0)
                     return true;
             } catch (InterruptedException e) {
-                // TODO Auto-generated catch block
                 e.printStackTrace();
             }
             return false;
@@ -271,40 +296,57 @@ public class Sucker {
         }
     }
 
-    private boolean convertToSml(SyndEntry e, String messageName) {
-
-        // Create message
-        FileOutputStream fos;
-        messagePath=outputDir+"/"+messageName;
+    /** 
+     * Converts the SyndEntry e to sml and fetches any images as attachments 
+     */ 
+    private String convertToSml(SyndEntry e) {
+        String subject;
+        
+        // Calculate messageId, and check if we have got the message already
+        String feedHash = sha1(urlToLoad);
+        String itemHash = sha1(e.getTitle() + e.getDescription());
+        Date d = e.getPublishedDate();
+        String time;
+        if(d!=null)
+            time = "" + d.getTime();
+        else
+            time = "" + new Date().getTime();
+        String outputFileName = outputDir + "/" + messageNumber;
+        String messageId = feedHash + ":" + itemHash + ":" + time + ":" + outputFileName;
+        // Check if we already have this
+        if (existsInHistory(messageId))
+            return null;
+        
+        debugLog("new: " + messageId);
+            
         try {
-            fos = new FileOutputStream(messagePath);
 
-            String sml;
-            sml = "Subject: " + e.getTitle() + "\n";
+            String sml="";
+            subject=e.getTitle();
             List cats = e.getCategories();
             Iterator iter = cats.iterator();
             String tags = feedTag;
             while (iter.hasNext()) {
                 SyndCategory c = (SyndCategory) iter.next();
+                debugLog("Name: "+c.getName());
+                debugLog("uri:"+c.getTaxonomyUri());
                 String tag=c.getName();
                 tag=tag.replaceAll("[^a-zA-z.-_:]","_");
                 tags += "\t" + feedTag + "." + tag;
             }
-            sml += "Tags: " + tags + "\n";
-            sml += "\n";
 
             SyndContent content;
 
             List l = e.getContents();
             if(l!=null)
             {
-            System.out.println("There is content");
+            debugLog("There is content");
                 iter = l.iterator();
                 while(iter.hasNext())
                 {
                     content = (SyndContent)iter.next();
                     String c = content.getValue();
-                    System.out.println("Content: "+c);
+                    debugLog("Content: "+c);
                                   sml += htmlToSml(c);
                                   sml += "\n";
                 }
@@ -314,17 +356,53 @@ public class Sucker {
             source=baseUrl+source;
             sml += "[link schema=\"web\" location=\""+source+"\"]source[/link]\n";
 
-            fos.write(sml.getBytes());
+            if(pushToSyndie) {
+                debugLog("user.blog: "+user.getBlogStr());
+                debugLog("user.id: "+bm.getNextBlogEntry(user));
+                debugLog("subject: "+subject);
+                debugLog("tags: "+tags);
+                debugLog("sml: "+sml);
+                debugLog("");
+                BlogURI uri = bm.createBlogEntry(
+                        user, 
+                        false,
+                        subject, 
+                        tags, 
+                        null,
+                        sml, 
+                        fileNames, 
+                        fileStreams, 
+                        fileTypes);
 
-            return true;
+                if(uri==null) {
+                    debugLog("pushToSyndie failure.");
+                    return null;
+                }
+                else
+                    debugLog("pushToSyndie success, uri: "+uri.toString());
+            }
+            else
+            {
+                FileOutputStream fos;
+                fos = new FileOutputStream(messagePath);
+                sml=subject + "\nTags: " + tags + "\n\n" + sml;
+                fos.write(sml.getBytes());
+                if (pushScript != null) {
+                    if (!execPushScript(""+messageNumber, time)) {
+                        debugLog("################## push failed");
+                    } else {
+                        debugLog("push success");
+                    }
+                }
+            }
+            messageNumber++;
+            return messageId;
         } catch (FileNotFoundException e1) {
-            // TODO Auto-generated catch block
             e1.printStackTrace();
         } catch (IOException e2) {
-            // TODO Auto-generated catch block
             e2.printStackTrace();
         }
-        return false;
+        return null;
     }
 
     private String htmlToSml(String html) {
@@ -338,29 +416,32 @@ public class Sucker {
         {
             if(html.charAt(i)=='<')
             {
-                //System.out.println("html: "+html.substring(i));
+                //log("html: "+html.substring(i));
                 
                 int tagLen = findTagLen(html.substring(i));
                 if(tagLen<=0)
                 {
-                        System.out.println("Bad html? ("+html+")");
+                        debugLog("Bad html? ("+html+")");
                         break;
                 }
                 //
                 String htmlTag = html.substring(i,i+tagLen);
                 
-                //System.out.println("htmlTag: "+htmlTag);
+                //log("htmlTag: "+htmlTag);
                 
                 String smlTag = htmlTagToSmlTag(htmlTag);
                 if(smlTag!=null)
                     sml+=smlTag;
                 i+=tagLen;
-                //System.out.println("tagLen: "+tagLen);
+                //log("tagLen: "+tagLen);
                 sml+=" "; 
             }
             else
             {
-                sml+=html.charAt(i++);
+                char c=html.charAt(i++);
+                sml+=c;
+                if(c=='[' || c==']')
+                    sml+=c;
             }
         }
         
@@ -373,7 +454,7 @@ public class Sucker {
 
         if(importEnclosures && htmlTagLowerCase.startsWith("<img"))
         {
-            System.out.println("Found image tag: "+htmlTag);
+            debugLog("Found image tag: "+htmlTag);
             int a,b;
             a=htmlTagLowerCase.indexOf("src=\"")+5;
             b=a+1;
@@ -383,7 +464,7 @@ public class Sucker {
             
             if(pendingEndLink) {
                 ret="[/link]";
-            pendingEndLink=false;
+                pendingEndLink=false;
             }
     
             ret += "[img attachment=\""+""+ attachmentCounter +"\"]";
@@ -391,11 +472,13 @@ public class Sucker {
             a=htmlTagLowerCase.indexOf("alt=\"")+5;
             if(a>=5)
             {
-                b=a+1;
-                while(htmlTagLowerCase.charAt(b)!='\"')
-                    b++;
-                String altText=htmlTag.substring(a,b);
-                ret+=altText;
+                b=a;
+                if(htmlTagLowerCase.charAt(b)!='\"') {
+                    while(htmlTagLowerCase.charAt(b)!='\"')
+                        b++;
+                    String altText=htmlTag.substring(a,b);
+                    ret+=altText;
+                }
             }
             
             ret+="[/img]";
@@ -405,14 +488,14 @@ public class Sucker {
             
             fetchAttachment(imageLink);
 
-            System.out.println("Converted to: "+ret);
+            debugLog("Converted to: "+ret);
             
             return ret;
             
         }
         if(importRefs && htmlTagLowerCase.startsWith("<a "))
         {
-            System.out.println("Found link tag: "+htmlTag);
+            debugLog("Found link tag: "+htmlTag);
             int a,b;
             
             a=htmlTagLowerCase.indexOf("href=\"")+6;
@@ -426,9 +509,12 @@ public class Sucker {
             String schema="web";
             
             ret += "[link schema=\""+schema+"\" location=\""+link+"\"]";
-            pendingEndLink=true;
+            if(htmlTagLowerCase.endsWith("/>"))
+                ret += "[/link]";
+            else
+                pendingEndLink=true;
         
-            System.out.println("Converted to: "+ret);
+            debugLog("Converted to: "+ret);
 
             return ret;
         }
@@ -446,19 +532,36 @@ public class Sucker {
             return "[i]";
         if("</i>".equals(htmlTagLowerCase))
             return "[/i]";
+        if("<em>".equals(htmlTagLowerCase))
+            return "[i]";
+        if("</em>".equals(htmlTagLowerCase))
+            return "[/i]";
         
         return null;
     }
 
     private void fetchAttachment(String link) {
         
-        System.out.println("Fetch attachment from: "+link);
+        link=link.replaceAll("&amp;","&");
         
-        String attachmentPath = messagePath+"."+attachmentCounter;
-            link=link.replaceAll("&amp;","&");
-            
+        debugLog("Fetch attachment from: "+link);
+        
+        File fetched;
+        if(pushToSyndie) {
+            try {
+                // perhaps specify a temp dir?
+                fetched = File.createTempFile("sucker",".attachment");
+                fetched.deleteOnExit();
+            } catch (IOException e) {
+                e.printStackTrace();
+                return;
+            }
+            fetched.deleteOnExit();
+        } else {
+            String attachmentPath = messagePath+"."+attachmentCounter;
+            fetched = new File(attachmentPath);
+        }
         int numRetries = 2;
-        File fetched = new File(attachmentPath);
         // we use eepGet, since it retries and doesn't leak DNS requests like URL does
         EepGet get = new EepGet(I2PAppContext.getGlobalContext(), shouldProxy, proxyHost, proxyPortNum, 
                                 numRetries, fetched.getAbsolutePath(), link);
@@ -471,7 +574,29 @@ public class Sucker {
             fetched.delete();
             return;
         }
+        String filename=EepGet.suggestName(link);
+        String contentType = get.getContentType();
+        if(contentType==null)
+            contentType="text/plain";
+        debugLog("successful fetch of filename "+filename);
+        if(fileNames==null) fileNames = new ArrayList();
+        if(fileTypes==null) fileTypes = new ArrayList();
+        if(fileStreams==null) fileStreams = new ArrayList();
+        fileNames.add(filename);
+        fileTypes.add(contentType);
+        try {
+            fileStreams.add(new FileInputStream(fetched));
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
         attachmentCounter++;
+    }
+
+    private void debugLog(String string) {
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug(string);
+        if(!pushToSyndie)
+            System.out.println(string);
     }
 
     private static int findTagLen(String s) {
@@ -487,7 +612,7 @@ public class Sucker {
                     i++;
             }   
         }
-        System.out.println("WTF");
+        System.out.println("WTF in Sucker.findTagLen("+s+")");
         return -1;
     }
 
@@ -513,23 +638,9 @@ public class Sucker {
                     return true;
             }
         } catch (FileNotFoundException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
         return false;
-    }
-
-    private static void usage() {
-        System.out.println("sucker --load $urlToFeed \n"
-                + "--proxyhost <host> \n" 
-                + "--proxyport <port> \n"
-                + "--importenclosures true \n" 
-                + "--importrefs true \n"
-                + "--tag feed \n" 
-                + "--outputdir ./sucker_out \n"
-                + "--exec pushscript.sh OUTPUTDIR UNIQUEID ENTRYTIMESTAMP \n"
-                + "--history ./sucker.history");
-        System.exit(1);
     }
 
     private static String sha1(String s) {
@@ -552,7 +663,6 @@ public class Sucker {
             try {
                 c = in.read();
             } catch (IOException e) {
-                // TODO Auto-generated catch block
                 e.printStackTrace();
                 break;
             }
@@ -562,7 +672,6 @@ public class Sucker {
                 break;
             sb.append((char) c);
         }
-        // TODO Auto-generated method stub
         return sb.toString();
     }
 }

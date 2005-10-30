@@ -1,6 +1,8 @@
 package net.i2p.syndie;
 
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 
 import net.i2p.I2PAppContext;
 import net.i2p.util.Log;
@@ -22,6 +24,12 @@ public class Updater {
         String[] archives = bm.getUpdateArchives();
         for (int i = 0; i < archives.length; i++) {
             fetchArchive(archives[i]);
+        }
+        List rssFeeds = bm.getRssFeeds();
+        Iterator iter = rssFeeds.iterator();
+        while(iter.hasNext()) {
+            Sucker sucker = new Sucker((String[])iter.next());
+            sucker.suck();
         }
     }
     
