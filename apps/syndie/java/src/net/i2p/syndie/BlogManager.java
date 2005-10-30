@@ -324,7 +324,7 @@ public class BlogManager {
     }
     
     public boolean isConfigured() {
-        String p = _context.getProperty("syndie.configurationCheck");
+        String p = _context.getProperty("syndie.singleUser");
         if(p==null)
             return false;
         return true;
@@ -456,8 +456,7 @@ public class BlogManager {
                 out.write("syndie.defaultProxyHost="+defaultProxyHost.trim() + "\n");
             if (defaultProxyPort > 0)
                 out.write("syndie.defaultProxyPort="+defaultProxyPort + "\n");
-            out.write("syndie.singleUser=" + isSingleUser + "\n");
-            out.write("syndie.configurationCheck=foo\n");
+            out.write("syndie.singleUser=" + isSingleUser + "\n"); // Used also in isConfigured()
             if (opts != null) {
                 for (Iterator iter = opts.keySet().iterator(); iter.hasNext(); ) {
                     String key = (String)iter.next();
