@@ -56,9 +56,6 @@
     </target>
     <target name="buildexe">
         <condition property="noExe">
-	    <os family="mac" />
-	</condition>
-        <condition property="noExe">
 	    <os arch="x86_64" />
 	</condition>
         <condition property="noExe">
@@ -66,6 +63,14 @@
 	</condition>
         <condition property="noExe">
 	    <os arch="amd64" />
+	</condition>
+	<condition property="noExe">
+	   <not>
+	    <or>
+	     <os name="Linux" />
+	     <os family="windows" />
+	    </or>
+	   </not>
 	</condition>
 	<ant target="doBuildEXE" />
     </target>
@@ -397,13 +402,18 @@
     </target>
     <target name="installerexe">
         <condition property="noExe">
-	    <os family="mac" />
-	</condition>
-        <condition property="noExe">
 	    <os arch="x86_64" />
 	</condition>
         <condition property="noExe">
 	    <os arch="amd64" />
+	</condition>
+	<condition property="noExe">
+	   <not>
+	    <or>
+	     <os name="Linux" />
+	     <os family="windows" />
+	    </or>
+	   </not>
 	</condition>
 	<ant target="doInstallerEXE" />
     </target>
