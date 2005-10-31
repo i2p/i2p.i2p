@@ -1,4 +1,8 @@
-$Id: history.txt,v 1.309 2005/10/29 18:20:04 jrandom Exp $
+$Id: history.txt,v 1.310 2005/10/30 00:47:55 dust Exp $
+
+2005-10-31  jrandom
+    * Fix for some syndie reply scenarios (thanks identiguy and CofE!)
+    * Removed a potentially infinitely recursive call (oops)
 
 2005-10-30  dust
     * Merge sucker into syndie with a rssimport.jsp page.

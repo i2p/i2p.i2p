@@ -1027,8 +1027,10 @@ public class HTMLRenderer extends EventReceiverImpl {
             buf.append(ArchiveViewerBean.PARAM_PAGE_NUMBER).append('=').append(pageNum).append('&');
             buf.append(ArchiveViewerBean.PARAM_NUM_PER_PAGE).append('=').append(numPerPage).append('&');
         }
-        buf.append(ArchiveViewerBean.PARAM_EXPAND_ENTRIES).append('=').append(user.getShowExpanded()).append('&');
-        buf.append(ArchiveViewerBean.PARAM_SHOW_IMAGES).append('=').append(user.getShowImages()).append('&');
+        if (user != null) {
+            buf.append(ArchiveViewerBean.PARAM_EXPAND_ENTRIES).append('=').append(user.getShowExpanded()).append('&');
+            buf.append(ArchiveViewerBean.PARAM_SHOW_IMAGES).append('=').append(user.getShowImages()).append('&');
+        }
         return buf.toString();
     }
     

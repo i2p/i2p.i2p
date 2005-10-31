@@ -30,7 +30,7 @@ public class FloodfillDatabaseStoreMessageHandler implements HandlerJobBuilder {
     }
     public Job createJob(I2NPMessage receivedMessage, RouterIdentity from, Hash fromHash) {
         Job j = new HandleFloodfillDatabaseStoreMessageJob(_context, (DatabaseStoreMessage)receivedMessage, from, fromHash, _facade);
-        if (true) {
+        if (false) {
             j.runJob();
             return null;
         } else {

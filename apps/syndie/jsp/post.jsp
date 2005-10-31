@@ -121,6 +121,10 @@ for (Iterator iter = names.iterator(); iter.hasNext(); ) {
     } else {
       // logged in and not confirmed because they didn't send us anything!  
       // give 'em a new form
+
+      post.reinitialize();
+      post.setUser(user);
+
       String entrySubject = request.getParameter("replySubject");
       String entryTags = request.getParameter("replyTags");
       String parentURI = request.getParameter("parentURI");

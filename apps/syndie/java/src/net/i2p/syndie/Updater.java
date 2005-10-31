@@ -13,24 +13,33 @@ public class Updater {
     private static final Log _log = I2PAppContext.getGlobalContext().logManager().getLog(Updater.class);
     private static final Updater _instance = new Updater();
     private long _lastUpdate;
+    private static boolean _woken;
     
     public void update() {
         BlogManager bm = BlogManager.instance();
         if (_lastUpdate + bm.getUpdateDelay()*60*60*1000 > System.currentTimeMillis()) {
-            return;
+            if (!_woken)
+                return;
         }
         _lastUpdate = System.currentTimeMillis();
         _log.debug("Update started.");
         String[] archives = bm.getUpdateArchives();
         for (int i = 0; i < archives.length; i++) {
+            _log.debug("Fetching " + archives[i]);
             fetchArchive(archives[i]);
+            _log.debug("Done fetching " + archives[i]);
         }
+        _log.debug("Done fetching archives");
         List rssFeeds = bm.getRssFeeds();
         Iterator iter = rssFeeds.iterator();
         while(iter.hasNext()) {
-            Sucker sucker = new Sucker((String[])iter.next());
+            String args[] = (String[])iter.next();
+            _log.debug("rss feed begin: " + args[0]);
+            Sucker sucker = new Sucker(args);
             sucker.suck();
+            _log.debug("rss feed end: " + args[0]);
         }
+        _log.debug("Done with all updating");
     }
     
     public void fetchArchive(String archive) {
@@ -48,6 +57,7 @@ public class Updater {
     }
 
     public static void main() {
+        _woken = false;
         _instance.run();
     }
     
@@ -55,7 +65,7 @@ public class Updater {
 
         // wait
         try {
-            Thread.currentThread().sleep(5*60*1000);
+            Thread.currentThread().sleep(1*60*1000);
         } catch (InterruptedException ie) {}
         
         while (true) {
@@ -63,6 +73,7 @@ public class Updater {
             update();
             try {
                 synchronized (this) {
+                    _woken = false;
                     wait(delay * 60 * 60 * 1000);
                 }
             } catch (InterruptedException exp) {
@@ -73,6 +84,7 @@ public class Updater {
  
     public static void wakeup() {
         synchronized (_instance) {
+            _woken = true;
             _instance.notifyAll();
         }
     }

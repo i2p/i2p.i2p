@@ -36,7 +36,7 @@ public class FloodfillDatabaseLookupMessageHandler implements HandlerJobBuilder 
 
         if (true || _context.throttle().acceptNetDbLookupRequest(((DatabaseLookupMessage)receivedMessage).getSearchKey())) {
             Job j = new HandleFloodfillDatabaseLookupMessageJob(_context, (DatabaseLookupMessage)receivedMessage, from, fromHash);
-            if (true) {
+            if (false) {
                 // might as well inline it, all the heavy lifting is queued up in later jobs, if necessary
                 j.runJob();
                 return null;
