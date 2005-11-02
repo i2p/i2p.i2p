@@ -1,4 +1,7 @@
-$Id: history.txt,v 1.310 2005/10/30 00:47:55 dust Exp $
+$Id: history.txt,v 1.311 2005/10/31 15:03:11 jrandom Exp $
+
+2005-11-01  jrandom
+    * Added a few more css elements (thanks identiguy!)
 
 2005-10-31  jrandom
     * Fix for some syndie reply scenarios (thanks identiguy and CofE!)

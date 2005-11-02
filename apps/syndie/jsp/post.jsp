@@ -148,28 +148,8 @@ for (Iterator iter = names.iterator(); iter.hasNext(); ) {
  <option value="meta">Meta (hide everything but the metadata)</option>
 </select><br />
 <span class="b_postField">Include public names?</span> <input class="b_postNames" type="checkbox" name="includenames" value="true" /><br />
-<span class="b_postField">Post content (in raw SML, no headers):</span><br />
+<span class="b_postField">Post content (in raw <a href="smlref.jsp" target="_blank">SML</a>, no headers):</span><br />
 <textarea class="b_postText" rows="6" cols="80" name="entrytext"><%=post.getText()%></textarea><br />
-<span class="b_postField">SML cheatsheet:</span><br /><textarea class="b_postCheatsheet" rows="6" cols="80" readonly="true">
-* newlines are newlines are newlines. 
-* all &lt; and &gt; are replaced with their &amp;symbol;
-* [b][/b] = <b>bold</b>
-* [i][/i] = <i>italics</i>
-* [u][/u] = <i>underline</i>
-* [cut]more inside[/cut] = [<a href="#">more inside...</a>]
-* [img attachment="1"]alt[/img] = use attachment 1 as an image with 'alt' as the alt text
-* [blog name="name" bloghash="base64hash"]description[/blog] = link to all posts in the blog
-* [blog name="name" bloghash="base64hash" blogentry="1234"]description[/blog] = link to the specified post in the blog
-* [blog name="name" bloghash="base64hash" blogtag="tag"]description[/blog] = link to all posts in the blog with the specified tag
-* [blog name="name" blogtag="tag"]description[/blog] = link to all posts in all blogs with the specified tag
-* [link schema="eep" location="http://forum.i2p"]text[/link] = offer a link to an external resource (accessible with the given schema)
-* [archive name="name" description="they have good stuff" schema="eep" location="http://syndiemedia.i2p/archive/archive.txt"]foo![/archive] = offer an easy way to sync up with a new Syndie archive
-
-SML headers are newline delimited key:value pairs.  Example keys are:
-* bgcolor = background color of the post (e.g. bgcolor:#ffccaa or bgcolor=red)
-* bgimage = attachment number to place as the background image for the post (only shown if images are enabled) (e.g. bgimage=1)
-* textfont = font to put most text into
-</textarea><br />
 <span class="b_postField">SML post headers:</span><br />
 <textarea class="b_postHeaders" rows="3" cols="80" name="entryheaders"><%=post.getHeaders()%></textarea><br /><%
 String s = request.getParameter(ArchiveViewerBean.PARAM_IN_REPLY_TO);
