@@ -1,4 +1,8 @@
-$Id: history.txt,v 1.311 2005/10/31 15:03:11 jrandom Exp $
+$Id: history.txt,v 1.312 2005/11/01 19:35:21 jrandom Exp $
+
+2005-11-03  zzz
+    * Added a new error page to the eepproxy to differentiate the full 60
+      second timeout from the immediate "I don't know this base64" failure.
 
 2005-11-01  jrandom
     * Added a few more css elements (thanks identiguy!)

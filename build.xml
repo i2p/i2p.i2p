@@ -299,6 +299,7 @@
         <copy file="installer/resources/dnf-header.ht" todir="pkg-temp/docs/" />
         <copy file="installer/resources/dnfp-header.ht" todir="pkg-temp/docs/" />
         <copy file="installer/resources/dnfb-header.ht" todir="pkg-temp/docs/" />
+        <copy file="installer/resources/dnfh-header.ht" todir="pkg-temp/docs/" />
 	<copy file="installer/resources/ahelper-conflict-header.ht" todir="pkg-temp/docs/" />
         <mkdir dir="pkg-temp/eepsite" />
         <mkdir dir="pkg-temp/eepsite/webapps" />
@@ -373,6 +374,7 @@
         <copy file="installer/resources/dnf-header.ht" todir="pkg-temp/docs/" />
         <copy file="installer/resources/dnfp-header.ht" todir="pkg-temp/docs/" />
         <copy file="installer/resources/dnfb-header.ht" todir="pkg-temp/docs/" />
+        <copy file="installer/resources/dnfh-header.ht" todir="pkg-temp/docs/" />
 	<copy file="installer/resources/ahelper-conflict-header.ht" todir="pkg-temp/docs/" />
         <!-- the addressbook handles this for updates -->
         <!-- <copy file="hosts.txt" todir="pkg-temp/" /> -->

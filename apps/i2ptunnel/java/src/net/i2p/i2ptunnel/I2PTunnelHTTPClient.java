@@ -490,7 +490,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
                 else if(ahelper != 0)
                     str = FileUtil.readTextFile("docs/dnfb-header.ht", 100, true);
                 else
-                    str = FileUtil.readTextFile("docs/dnf-header.ht", 100, true);
+                    str = FileUtil.readTextFile("docs/dnfh-header.ht", 100, true);
                 if (str != null)
                     header = str.getBytes();
                 else
