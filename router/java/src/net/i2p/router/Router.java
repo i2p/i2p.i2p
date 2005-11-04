@@ -41,6 +41,7 @@ import net.i2p.stat.Rate;
 import net.i2p.stat.RateStat;
 import net.i2p.util.FileUtil;
 import net.i2p.util.I2PThread;
+import net.i2p.util.SimpleTimer;
 import net.i2p.util.Log;
 
 /**
@@ -326,14 +327,20 @@ public class Router {
             }
             ri.sign(key);
             setRouterInfo(ri);
+            SimpleTimer.getInstance().addEvent(new Republish(), 0);
+        } catch (DataFormatException dfe) {
+            _log.log(Log.CRIT, "Internal error - unable to sign our own address?!", dfe);
+        }
+    }
+    
+    private class Republish implements SimpleTimer.TimedEvent {
+        public void timeReached() {
             try {
-                _context.netDb().publish(ri);
+                _context.netDb().publish(getRouterInfo());
             } catch (IllegalArgumentException iae) {
                 _log.log(Log.CRIT, "Local router info is invalid?  rebuilding a new identity", iae);
                 rebuildNewIdentity();
             }
-        } catch (DataFormatException dfe) {
-            _log.log(Log.CRIT, "Internal error - unable to sign our own address?!", dfe);
         }
     }
     
