@@ -371,10 +371,15 @@ public class SMLParser {
                         valStart = off;
                     } else {
                         valEnd = off;
-                        
-                        String name = source.substring(nameStart, nameEnd);
-                        String val = source.substring(valStart+1, valEnd);
-                        rv.put(name.trim(), val.trim());
+
+                        if ( ( nameStart >= 0 ) && 
+                            ( nameEnd >= 0 ) && 
+                            ( valStart >= 0 ) && 
+                            ( valEnd >= 0 )) {
+                            String name = source.substring(nameStart, nameEnd);
+                            String val = source.substring(valStart+1, valEnd);
+                            rv.put(name.trim(), val.trim());
+                        }
                         nameStart = -1;
                         nameEnd = -1;
                         valStart = -1;
@@ -450,6 +455,7 @@ public class SMLParser {
         
         test("A: B\n\n[b]This[/b] is [i]special[/i][cut]why?[/cut][u]because I say so[/u].\neven if you dont care");
         test("A: B\n\nHi\n[pre]>foo&bar<>blah!blah\nblah\nblah[/pre]foo![pre]bar[/pre]");
+        //(openTagEnd seems wrong) test("A: B\n\n[link schema=\"web\" location=\"http://w.i2p?i2paddr...\"] Try it [[i2p]] [/link]");
     }
     private static void test(String rawSML) {
         I2PAppContext ctx = I2PAppContext.getGlobalContext();

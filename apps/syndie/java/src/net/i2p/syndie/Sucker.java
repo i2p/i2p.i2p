@@ -15,6 +15,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
 
+import org.apache.tools.ant.filters.TokenFilter.IgnoreBlank;
+
 import com.sun.syndication.feed.synd.SyndCategory;
 import com.sun.syndication.feed.synd.SyndContent;
 import com.sun.syndication.feed.synd.SyndEntry;
@@ -60,6 +62,8 @@ public class Sucker {
     private List fileNames;
     private List fileStreams;
     private List fileTypes;
+    private List tempFiles; // deleted after finished push 
+    private boolean stripNewlines;
     
     public Sucker() {
     }
@@ -131,6 +135,9 @@ public class Sucker {
      */
     public void suck() {
         SyndFeed feed;
+        File fetched=null;
+        
+        tempFiles = new ArrayList();
         
         // Find base url
         int idx=urlToLoad.lastIndexOf('/');
@@ -139,7 +146,7 @@ public class Sucker {
         else
             baseUrl=urlToLoad;
 
-        debugLog("Processing: "+urlToLoad);
+        infoLog("Processing: "+urlToLoad);
         debugLog("Base url: "+baseUrl);
 
         //
@@ -187,8 +194,7 @@ public class Sucker {
             
             // fetch
             int numRetries = 2;
-            File fetched = File.createTempFile("sucker", ".fetch");
-            fetched.deleteOnExit();
+            fetched = File.createTempFile("sucker", ".fetch");
             EepGet get = new EepGet(I2PAppContext.getGlobalContext(), shouldProxy, proxyHost, proxyPortNum, 
                                     numRetries, fetched.getAbsolutePath(), urlToLoad);
             SuckerFetchListener lsnr = new SuckerFetchListener();
@@ -197,10 +203,12 @@ public class Sucker {
             boolean ok = lsnr.waitForSuccess();
             if (!ok) {
                 System.err.println("Unable to retrieve the url after " + numRetries + " tries.");
+                fetched.delete();
                 return;
             }
             if(get.getNotModified()) {
                 debugLog("not modified, saving network bytes from useless fetch");
+                fetched.delete();
                 return;
             }
 
@@ -239,6 +247,8 @@ public class Sucker {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        if(fetched!=null)
+            fetched.delete();
         debugLog("Done.");
     }
 
@@ -277,7 +287,7 @@ public class Sucker {
 
             try {
                 while ((ls_str = ls_in.readLine()) != null) {
-                    debugLog(pushScript + ": " + ls_str);
+                    infoLog(pushScript + ": " + ls_str);
                 }
             } catch (IOException e) {
                 return false;
@@ -301,6 +311,8 @@ public class Sucker {
      */ 
     private String convertToSml(SyndEntry e) {
         String subject;
+
+        stripNewlines=false;
         
         // Calculate messageId, and check if we have got the message already
         String feedHash = sha1(urlToLoad);
@@ -317,7 +329,7 @@ public class Sucker {
         if (existsInHistory(messageId))
             return null;
         
-        debugLog("new: " + messageId);
+        infoLog("new: " + messageId);
             
         try {
 
@@ -375,11 +387,11 @@ public class Sucker {
                         fileTypes);
 
                 if(uri==null) {
-                    debugLog("pushToSyndie failure.");
+                    errorLog("pushToSyndie failure.");
                     return null;
                 }
                 else
-                    debugLog("pushToSyndie success, uri: "+uri.toString());
+                    infoLog("pushToSyndie success, uri: "+uri.toString());
             }
             else
             {
@@ -389,20 +401,30 @@ public class Sucker {
                 fos.write(sml.getBytes());
                 if (pushScript != null) {
                     if (!execPushScript(""+messageNumber, time)) {
-                        debugLog("################## push failed");
+                        errorLog("push script failed");
                     } else {
-                        debugLog("push success");
+                        infoLog("push script success: nr "+messageNumber);
                     }
                 }
             }
             messageNumber++;
+            deleteTempFiles();
             return messageId;
         } catch (FileNotFoundException e1) {
             e1.printStackTrace();
         } catch (IOException e2) {
             e2.printStackTrace();
         }
+        deleteTempFiles();
         return null;
+    }
+
+    private void deleteTempFiles() {
+        Iterator iter = tempFiles.iterator();
+        while(iter.hasNext()) {
+            File tempFile = (File)iter.next();
+            tempFile.delete();
+        }
     }
 
     private String htmlToSml(String html) {
@@ -414,15 +436,17 @@ public class Sucker {
 
         for(i=0;i<html.length();)
         {
-            if(html.charAt(i)=='<')
+            char c=html.charAt(i);
+            if(c=='<')
             {
                 //log("html: "+html.substring(i));
                 
                 int tagLen = findTagLen(html.substring(i));
-                if(tagLen<=0)
-                {
-                        debugLog("Bad html? ("+html+")");
-                        break;
+                if(tagLen<=0) {
+                    // did not find anything that looks like tag, treat it like text
+                    sml+="&lt;";
+                    i++;
+                    continue;
                 }
                 //
                 String htmlTag = html.substring(i,i+tagLen);
@@ -430,18 +454,25 @@ public class Sucker {
                 //log("htmlTag: "+htmlTag);
                 
                 String smlTag = htmlTagToSmlTag(htmlTag);
-                if(smlTag!=null)
+                if(smlTag!=null) {
                     sml+=smlTag;
-                i+=tagLen;
-                //log("tagLen: "+tagLen);
-                sml+=" "; 
+                    i+=tagLen;
+                    sml+=" "; 
+                } else {
+                    // Unrecognized tag, treat it as text
+                    sml+="&lt;";
+                    i++;
+                    continue;
+                }
             }
             else
             {
-                char c=html.charAt(i++);
-                sml+=c;
-                if(c=='[' || c==']')
+                if( !stripNewlines || (c!='\r' && c!='\n')) {
                     sml+=c;
+                    if(c=='[' || c==']')
+                        sml+=c;
+                }
+                i++;
             }
         }
         
@@ -449,10 +480,18 @@ public class Sucker {
     }
 
     private String htmlTagToSmlTag(String htmlTag) {
+        final String ignoreTags[] = {
+                "span",
+                "tr",
+                "td",
+                "th",
+                "div",
+                "input"
+        };
         String ret="";
         String htmlTagLowerCase=htmlTag.toLowerCase();
 
-        if(importEnclosures && htmlTagLowerCase.startsWith("<img"))
+        if(htmlTagLowerCase.startsWith("<img"))
         {
             debugLog("Found image tag: "+htmlTag);
             int a,b;
@@ -462,7 +501,7 @@ public class Sucker {
                 b++;
             String imageLink=htmlTag.substring(a,b);
             
-            if(pendingEndLink) {
+            if(pendingEndLink) { // <a href="..."><img src="..."></a> -> [link][/link][img][/img]
                 ret="[/link]";
                 pendingEndLink=false;
             }
@@ -493,7 +532,7 @@ public class Sucker {
             return ret;
             
         }
-        if(importRefs && htmlTagLowerCase.startsWith("<a "))
+        if(htmlTagLowerCase.startsWith("<a "))
         {
             debugLog("Found link tag: "+htmlTag);
             int a,b;
@@ -520,8 +559,10 @@ public class Sucker {
         }
         
         if ("</a>".equals(htmlTagLowerCase)) {
-            if (pendingEndLink)
+            if (pendingEndLink) {
+                pendingEndLink=false;
                 return "[/link]";
+            }
         }
         
         if("<b>".equals(htmlTagLowerCase))
@@ -536,6 +577,23 @@ public class Sucker {
             return "[i]";
         if("</em>".equals(htmlTagLowerCase))
             return "[/i]";
+        if(htmlTagLowerCase.startsWith("<br")) {
+            stripNewlines=true;
+            return "\n";
+        }
+        if("</br>".equals(htmlTagLowerCase))
+            return "";
+        if(htmlTagLowerCase.startsWith("<table") || "</table>".equals(htmlTagLowerCase)) // emulate table with hr
+            return "[hr][/hr]";
+
+        for(int i=0;i<ignoreTags.length;i++) {
+            String openTag = "<"+ignoreTags[i];
+            String closeTag = "</"+ignoreTags[i];
+            if(htmlTagLowerCase.startsWith(openTag))
+                return "";
+            if(htmlTagLowerCase.startsWith(closeTag))
+                return "";
+        }
         
         return null;
     }
@@ -544,7 +602,7 @@ public class Sucker {
         
         link=link.replaceAll("&amp;","&");
         
-        debugLog("Fetch attachment from: "+link);
+        infoLog("Fetch attachment from: "+link);
         
         File fetched;
         if(pushToSyndie) {
@@ -556,7 +614,7 @@ public class Sucker {
                 e.printStackTrace();
                 return;
             }
-            fetched.deleteOnExit();
+            tempFiles.add(fetched);
         } else {
             String attachmentPath = messagePath+"."+attachmentCounter;
             fetched = new File(attachmentPath);
@@ -574,6 +632,7 @@ public class Sucker {
             fetched.delete();
             return;
         }
+        tempFiles.add(fetched);
         String filename=EepGet.suggestName(link);
         String contentType = get.getContentType();
         if(contentType==null)
@@ -590,6 +649,20 @@ public class Sucker {
             e.printStackTrace();
         }
         attachmentCounter++;
+    }
+
+    private void errorLog(String string) {
+        if (_log.shouldLog(Log.ERROR))
+            _log.error(string);
+        if(!pushToSyndie)
+            System.out.println(string);
+    }
+
+    private void infoLog(String string) {
+        if (_log.shouldLog(Log.INFO))
+            _log.info(string);
+        if(!pushToSyndie)
+            System.out.println(string);
     }
 
     private void debugLog(String string) {
@@ -612,7 +685,6 @@ public class Sucker {
                     i++;
             }   
         }
-        System.out.println("WTF in Sucker.findTagLen("+s+")");
         return -1;
     }
 

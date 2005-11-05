@@ -1,4 +1,9 @@
-$Id: history.txt,v 1.312 2005/11/01 19:35:21 jrandom Exp $
+$Id: history.txt,v 1.313 2005/11/03 20:20:18 jrandom Exp $
+
+2005-11-05  dust
+    * Fix sucker to delete its temporary files.
+    * Improve sucker's sml output some.
+    * Fix Exception in SMLParser for weird sml.
 
 2005-11-03  zzz
     * Added a new error page to the eepproxy to differentiate the full 60
