@@ -75,6 +75,12 @@ public class PeerState {
     private long _lastFailedSendPeriod;
     /** list of messageIds (Long) that we have received but not yet sent */
     private List _currentACKs;
+    /** 
+     * list of the most recent messageIds (Long) that we have received and sent
+     * an ACK for.  We keep a few of these around to retransmit with _currentACKs,
+     * hopefully saving some spurious retransmissions
+     */
+    private List _currentACKsResend;
     /** when did we last send ACKs to the peer? */
     private volatile long _lastACKSend;
     /** when did we decide we need to ACK to this peer? */
@@ -173,7 +179,7 @@ public class PeerState {
      */
     private static final int DEFAULT_MTU = 608;//600; //1500;
     private static final int MIN_RTO = 500 + ACKSender.ACK_FREQUENCY;
-    private static final int MAX_RTO = 5000; // 5000;
+    private static final int MAX_RTO = 1200; // 5000;
     
     public PeerState(I2PAppContext ctx) {
         _context = ctx;
@@ -191,6 +197,7 @@ public class PeerState {
         _lastSendTime = -1;
         _lastReceiveTime = -1;
         _currentACKs = new ArrayList(8);
+        _currentACKsResend = new ArrayList(8);
         _currentSecondECNReceived = false;
         _remoteWantsPreviousACKs = false;
         _sendWindowBytes = DEFAULT_SEND_WINDOW_BYTES;
@@ -536,15 +543,24 @@ public class PeerState {
      */
     public List getCurrentFullACKs() {
         synchronized (_currentACKs) {
-            return new ArrayList(_currentACKs);
+            ArrayList rv = new ArrayList(_currentACKs);
+            // include some for retransmission
+            rv.addAll(_currentACKsResend);
+            return rv;
         }
     }
     public void removeACKMessage(Long messageId) {
         synchronized (_currentACKs) {
             _currentACKs.remove(messageId);
+            _currentACKsResend.add(messageId);
+            // trim down the resends
+            while (_currentACKsResend.size() > MAX_RESEND_ACKS)
+                _currentACKsResend.remove(0);
         }
         _lastACKSend = _context.clock().now();
     }
+    
+    private static final int MAX_RESEND_ACKS = 8;
     
     /** 
      * grab a list of ACKBitfield instances, some of which may fully 
@@ -555,20 +571,34 @@ public class PeerState {
      * will be unchanged if there are ACKs remaining.
      *
      */
-    public List retrieveACKBitfields() {
+    public List retrieveACKBitfields() { return retrieveACKBitfields(true); }
+    public List retrieveACKBitfields(boolean alwaysIncludeRetransmissions) {
         List rv = null;
         int bytesRemaining = countMaxACKData();
         synchronized (_currentACKs) {
             rv = new ArrayList(_currentACKs.size());
+            int oldIndex = _currentACKsResend.size();
             while ( (bytesRemaining >= 4) && (_currentACKs.size() > 0) ) {
-                long id = ((Long)_currentACKs.remove(0)).longValue();
+                Long val = (Long)_currentACKs.remove(0);
+                long id = val.longValue();
                 rv.add(new FullACKBitfield(id));
+                _currentACKsResend.add(val);
                 bytesRemaining -= 4;
             }
             if (_currentACKs.size() <= 0)
                 _wantACKSendSince = -1;
+            if (alwaysIncludeRetransmissions || rv.size() > 0) {
+                // now repeat by putting in some old ACKs
+                for (int i = 0; (i < oldIndex) && (bytesRemaining >= 4); i++) {
+                    rv.add(new FullACKBitfield(((Long)_currentACKsResend.get(i)).longValue()));
+                    bytesRemaining -= 4;
+                }
+            }
+            // trim down the resends
+            while (_currentACKsResend.size() > MAX_RESEND_ACKS)
+                _currentACKsResend.remove(0);
         }
-            
+
         int partialIncluded = 0;
         if (bytesRemaining > 4) {
             // ok, there's room to *try* to fit in some partial ACKs, so
@@ -674,7 +704,7 @@ public class PeerState {
         _messagesSent++;
         if (numSends < 2)
             recalculateTimeouts(lifetime);
-        else
+        else if (_log.shouldLog(Log.WARN))
             _log.warn("acked after numSends=" + numSends + " w/ lifetime=" + lifetime + " and size=" + bytesACKed);
         
         _context.statManager().addRateData("udp.sendBps", _sendBps, lifetime);

@@ -104,6 +104,7 @@ public class TimedWeightedPriorityMessageQueue implements MessageQueue, Outbound
             _addedSincePassBegan = true;
             _nextLock.notifyAll();
         }
+        message.timestamp("added to queue " + queue);
     }
     
     /**
@@ -138,10 +139,14 @@ public class TimedWeightedPriorityMessageQueue implements MessageQueue, Outbound
                             _messagesFlushed[currentQueue] = 0;
                             _nextQueue = (currentQueue + 1) % _queue.length;
                         }
-                        _context.statManager().addRateData("udp.messageQueueSize", _queue[currentQueue].size(), currentQueue);
+                        int sz = _queue[currentQueue].size();
+                        _context.statManager().addRateData("udp.messageQueueSize", sz, currentQueue);
                         if (_log.shouldLog(Log.DEBUG))
                             _log.debug("Pulling a message off queue " + currentQueue + " with " 
-                                       + _queue[currentQueue].size() + " remaining");
+                                       + sz + " remaining");
+                        
+                        
+                        msg.timestamp("made active with remaining queue size " + sz);
                         return msg;
                     }
                     
@@ -247,6 +252,7 @@ public class TimedWeightedPriorityMessageQueue implements MessageQueue, Outbound
                 
                 for (int i = 0; i < removed.size(); i++) {
                     OutNetMessage m = (OutNetMessage)removed.get(i);
+                    m.timestamp("expirer killed it");
                     _listener.failed(m);
                 }
                 removed.clear();

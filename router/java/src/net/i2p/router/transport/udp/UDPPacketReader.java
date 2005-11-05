@@ -506,9 +506,12 @@ public class UDPPacketReader {
             buf.append(getMessageId());
             buf.append(" with ACKs for: ");
             int numFrags = fragmentCount();
-            for (int i = 0; i < numFrags; i++)
+            for (int i = 0; i < numFrags; i++) {
                 if (received(i))
                     buf.append(i).append(" ");
+                else
+                    buf.append('!').append(i).append(" ");
+            }
             return buf.toString();
         }
     }

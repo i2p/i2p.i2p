@@ -1,4 +1,14 @@
-$Id: history.txt,v 1.313 2005/11/03 20:20:18 jrandom Exp $
+$Id: history.txt,v 1.314 2005/11/05 06:01:57 dust Exp $
+
+2005-11-05  jrandom
+    * Include the most recent ACKs with packets, rather than only sending an
+      ack exactly once.  SSU differs from TCP in this regard, as TCP has ever
+      increasing sequence numbers, while each message ID in SSU is random, so
+      we don't get the benefit of later ACKs implicitly ACKing earlier
+      messages.
+    * Reduced the max retransmission timeout for SSU
+    * Don't try to send messages queued up for a long time waiting for
+      establishment.
 
 2005-11-05  dust
     * Fix sucker to delete its temporary files.

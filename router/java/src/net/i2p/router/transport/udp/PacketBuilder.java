@@ -43,13 +43,24 @@ public class PacketBuilder {
     /**
      * @param ackIdsRemaining list of messageIds (Long) that should be acked by this packet.  
      *                        The list itself is passed by reference, and if a messageId is
-     *                        included, it should be removed from the list.
+     *                        transmitted and the sender does not want the ID to be included
+     *                        in subsequent acks, it should be removed from the list.  NOTE:
+     *                        right now this does NOT remove the IDs, which means it assumes
+     *                        that the IDs will be transmitted potentially multiple times,
+     *                        and should otherwise be removed from the list.
      * @param partialACKsRemaining list of messageIds (ACKBitfield) that should be acked by this packet.  
      *                        The list itself is passed by reference, and if a messageId is
      *                        included, it should be removed from the list.
      */
     public UDPPacket buildPacket(OutboundMessageState state, int fragment, PeerState peer, List ackIdsRemaining, List partialACKsRemaining) {
         UDPPacket packet = UDPPacket.acquire(_context);
+
+        StringBuffer msg = null;
+        boolean acksIncluded = false;
+        if (_log.shouldLog(Log.WARN)) {
+            msg = new StringBuffer(128);
+            msg.append("building data packet with acks to ").append(peer.getRemotePeer().toBase64().substring(0,6));
+        }
         
         byte data[] = packet.getPacket().getData();
         Arrays.fill(data, 0, data.length, (byte)0x0);
@@ -81,10 +92,14 @@ public class PacketBuilder {
         if ( (ackIdsRemaining != null) && (ackIdsRemaining.size() > 0) ) {
             DataHelper.toLong(data, off, 1, ackIdsRemaining.size());
             off++;
-            while (ackIdsRemaining.size() > 0) {
-                Long ackId = (Long)ackIdsRemaining.remove(0);
+            for (int i = 0; i < ackIdsRemaining.size(); i++) {
+            //while (ackIdsRemaining.size() > 0) {
+                Long ackId = (Long)ackIdsRemaining.get(i);//(Long)ackIdsRemaining.remove(0);
                 DataHelper.toLong(data, off, 4, ackId.longValue());
-                off += 4;
+                off += 4;        
+                if (msg != null) // logging it
+                    msg.append(" full ack: ").append(ackId.longValue());
+                acksIncluded = true;
             }
         }
 
@@ -111,11 +126,17 @@ public class PacketBuilder {
                     off++;
                 }
                 partialACKsRemaining.remove(i);
+                if (msg != null) // logging it
+                    msg.append(" partial ack: ").append(bitfield);
+                acksIncluded = true;
                 i--;
             }
             // now jump back and fill in the number of bitfields *actually* included
             DataHelper.toLong(data, numPartialOffset, 1, origNumRemaining - partialACKsRemaining.size());
         }
+        
+        if ( (msg != null) && (acksIncluded) )
+            _log.warn(msg.toString());
         
         DataHelper.toLong(data, off, 1, 1); // only one fragment in this message
         off++;
@@ -171,6 +192,12 @@ public class PacketBuilder {
     public UDPPacket buildACK(PeerState peer, List ackBitfields) {
         UDPPacket packet = UDPPacket.acquire(_context);
         
+        StringBuffer msg = null;
+        if (_log.shouldLog(Log.WARN)) {
+            msg = new StringBuffer(128);
+            msg.append("building ACK packet to ").append(peer.getRemotePeer().toBase64().substring(0,6));
+        }
+
         byte data[] = packet.getPacket().getData();
         Arrays.fill(data, 0, data.length, (byte)0x0);
         int off = UDPPacket.MAC_SIZE + UDPPacket.IV_SIZE;
@@ -207,6 +234,8 @@ public class PacketBuilder {
                 if (bf.receivedComplete()) {
                     DataHelper.toLong(data, off, 4, bf.getMessageId());
                     off += 4;
+                    if (msg != null) // logging it
+                        msg.append(" full ack: ").append(bf.getMessageId());
                 }
             }
         }
@@ -231,11 +260,17 @@ public class PacketBuilder {
                     }
                     off++;
                 }
+                
+                if (msg != null) // logging it
+                    msg.append(" partial ack: ").append(bitfield);
             }
         }
         
         DataHelper.toLong(data, off, 1, 0); // no fragments in this message
         off++;
+        
+        if (msg != null)
+            _log.warn(msg.toString());
         
         // we can pad here if we want, maybe randomized?
         
@@ -777,8 +812,8 @@ public class PacketBuilder {
         System.arraycopy(ourIntroKey.getData(), 0, data, off, SessionKey.KEYSIZE_BYTES);
         off += SessionKey.KEYSIZE_BYTES;
         
-        if (_log.shouldLog(Log.WARN))
-            _log.warn("wrote alice intro key: " + Base64.encode(data, off-SessionKey.KEYSIZE_BYTES, SessionKey.KEYSIZE_BYTES) 
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("wrote alice intro key: " + Base64.encode(data, off-SessionKey.KEYSIZE_BYTES, SessionKey.KEYSIZE_BYTES) 
                       + " with nonce " + introNonce + " size=" + (off+4 + (16 - (off+4)%16))
                       + " and data: " + Base64.encode(data, 0, off));
         

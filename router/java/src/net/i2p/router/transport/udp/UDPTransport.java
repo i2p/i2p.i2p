@@ -669,7 +669,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         if (msg == null) return;
         if (msg.getTarget() == null) return;
         if (msg.getTarget().getIdentity() == null) return;
-        
+    
+        msg.timestamp("sending on UDP transport");
         Hash to = msg.getTarget().getIdentity().calculateHash();
         PeerState peer = getPeerState(to);
         if (peer != null) {
@@ -682,13 +683,16 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                      (peer.getConsecutiveFailedSends() > 0) ) {
                     // peer is waaaay idle, drop the con and queue it up as a new con
                     dropPeer(peer, false);
+                    msg.timestamp("peer is really idle, dropping con and reestablishing");
                     _establisher.establish(msg);
                     _context.statManager().addRateData("udp.proactiveReestablish", now-lastSend, now-peer.getKeyEstablishedTime());
                     return;
                 }
             }
+            msg.timestamp("enqueueing for an already established peer");
             _outboundMessages.add(msg);
         } else {
+            msg.timestamp("establishing a new connection");
             _establisher.establish(msg);
         }
     }
@@ -846,6 +850,12 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         if ( (msg.getPeer() != null) && 
              ( (msg.getMaxSends() >= OutboundMessageFragments.MAX_VOLLEYS) ||
                (msg.isExpired())) ) {
+            OutNetMessage m = msg.getMessage();
+            if (m != null)
+                m.timestamp("message failure - volleys = " + msg.getMaxSends() 
+                            + " lastReceived: " + (_context.clock().now() - msg.getPeer().getLastReceiveTime())
+                            + " lastSentFully: " + (_context.clock().now() - msg.getPeer().getLastSendFullyTime())
+                            + " expired? " + msg.isExpired());
             consecutive = msg.getPeer().incrementConsecutiveFailedSends();
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Consecutive failure #" + consecutive + " sending to " + msg.getPeer());

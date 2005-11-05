@@ -92,7 +92,7 @@ public class ACKSender implements Runnable {
             if (peer != null) {
                 long lastSend = peer.getLastACKSend();
                 long wanted = peer.getWantedACKSendSince();
-                List ackBitfields = peer.retrieveACKBitfields();
+                List ackBitfields = peer.retrieveACKBitfields(false);
                 
                 if (wanted < 0)
                     _log.error("wtf, why are we acking something they dont want?  remaining=" + remaining + ", peer=" + peer + ", bitfields=" + ackBitfields);

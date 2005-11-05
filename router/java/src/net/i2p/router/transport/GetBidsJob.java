@@ -42,6 +42,7 @@ public class GetBidsJob extends JobImpl {
     static void getBids(RouterContext context, CommSystemFacadeImpl facade, OutNetMessage msg) {
         Log log = context.logManager().getLog(GetBidsJob.class);
         Hash to = msg.getTarget().getIdentity().getHash();
+        msg.timestamp("bid");
         
         if (context.shitlist().isShitlisted(to)) {
             if (log.shouldLog(Log.WARN))

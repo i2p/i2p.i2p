@@ -17,6 +17,7 @@ import net.i2p.data.Signature;
 import net.i2p.data.i2np.DatabaseStoreMessage;
 import net.i2p.router.CommSystemFacade;
 import net.i2p.router.OutNetMessage;
+import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
 import net.i2p.util.I2PThread;
 import net.i2p.util.Log;
@@ -137,8 +138,10 @@ public class EstablishmentManager {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Add outobund establish state to: " + to);
         
+        OutboundEstablishState state = null;
+        int deferred = 0;
         synchronized (_outboundStates) {
-            OutboundEstablishState state = (OutboundEstablishState)_outboundStates.get(to);
+            state = (OutboundEstablishState)_outboundStates.get(to);
             if (state == null) {
                 if (_outboundStates.size() >= getMaxConcurrentEstablish()) {
                     List queued = (List)_queuedOutbound.get(to);
@@ -147,6 +150,7 @@ public class EstablishmentManager {
                         _queuedOutbound.put(to, queued);
                     }
                     queued.add(msg);
+                    deferred = _queuedOutbound.size();
                 } else {
                     state = new OutboundEstablishState(_context, remAddr, port, 
                                                        msg.getTarget().getIdentity(), 
@@ -163,6 +167,10 @@ public class EstablishmentManager {
             }
         }
         
+        if (deferred > 0)
+            msg.timestamp("too many deferred establishers: " + deferred);
+        else if (state != null)
+            msg.timestamp("establish state already waiting " + state.getLifetime());
         notifyActivity();
     }
     
@@ -312,8 +320,11 @@ public class EstablishmentManager {
                                                new SessionKey(addr.getIntroKey()), addr);
             _outboundStates.put(to, qstate);
 
-            for (int i = 0; i < queued.size(); i++)
-                qstate.addMessage((OutNetMessage)queued.get(i));
+            for (int i = 0; i < queued.size(); i++) {
+                OutNetMessage m = (OutNetMessage)queued.get(i);
+                m.timestamp("no longer deferred... establishing");
+                qstate.addMessage(m);
+            }
             admitted++;
         }
         return admitted;
@@ -388,11 +399,19 @@ public class EstablishmentManager {
         _context.statManager().addRateData("udp.outboundEstablishTime", state.getLifetime(), 0);
         sendOurInfo(peer);
         
+        int i = 0;
         while (true) {
             OutNetMessage msg = state.getNextQueuedMessage();
             if (msg == null)
                 break;
-            _transport.send(msg);
+            if (now - Router.CLOCK_FUDGE_FACTOR > msg.getExpiration()) {
+                msg.timestamp("took too long but established...");
+                _transport.failed(msg);
+            } else {
+                msg.timestamp("session fully established and sent " + i);
+                _transport.send(msg);
+            }
+            i++;
         }
         return peer;
     }
