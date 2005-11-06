@@ -16,9 +16,9 @@
 
 <h4>
  <a href="susimail/susimail">Susimail</a> |
- <a href="susidns/">SusiDNS</a> |
+ <a href="susidns/index.jsp">SusiDNS</a> |
  <a href="syndie/">Syndie</a> |
- <a href="i2ptunnel/">I2PTunnel</a> |
+ <a href="i2ptunnel/index.jsp">I2PTunnel</a> |
  <a href="tunnels.jsp">Tunnels</a> |
  <a href="profiles.jsp">Profiles</a> |
  <a href="netdb.jsp">NetDB</a> |

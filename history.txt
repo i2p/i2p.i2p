@@ -1,4 +1,12 @@
-$Id: history.txt,v 1.314 2005/11/05 06:01:57 dust Exp $
+$Id: history.txt,v 1.315 2005/11/05 16:12:57 jrandom Exp $
+
+2005-11-06  jrandom
+    * Include SSU establishment failure in the peer profile as a commError,
+      as we do for TCP establishment failures.
+    * Don't throttle the initial transmission of a message because of ongoing
+      retransmissions to a peer, since the initial transmission of a message
+      is more valuable than a retransmission (since it has less latency).
+    * Cleaned up links to SusiDNS and I2PTunnel (thanks zzz!)
 
 2005-11-05  jrandom
     * Include the most recent ACKs with packets, rather than only sending an

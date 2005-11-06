@@ -359,6 +359,13 @@ public class OutboundMessageFragments {
      * message to a peer while a retransmission is going on.
      */
     private static final boolean THROTTLE_RESENDS = true;
+    /** 
+     * if true, throttle the initial volley of a message if there is a resend in progress.
+     * if false, always send the first volley, regardless of retransmissions (but keeping in
+     * mind bw/cwin throttle, etc)
+     *
+     */
+    private static final boolean THROTTLE_INITIAL_SEND = false;
     
     private boolean locked_shouldSend(OutboundMessageState state, PeerState peer) {
         long now = _context.clock().now();
@@ -373,17 +380,23 @@ public class OutboundMessageFragments {
             }
 
             OutboundMessageState curRetransMsg = (OutboundMessageState)_retransmitters.get(peer);
+            if ( (curRetransMsg != null) && ( (curRetransMsg.isExpired() || curRetransMsg.isComplete()) ) ) {
+                _retransmitters.remove(peer);
+                curRetransMsg = null;
+            }
+            
             if ( (curRetransMsg != null) && (curRetransMsg != state) ) {
                 // choke it, since there's already another message retransmitting to this
                 // peer.
                 _context.statManager().addRateData("udp.blockedRetransmissions", peer.getPacketsRetransmitted(), peer.getPacketsTransmitted());
-                if ( (state.getMaxSends() <= 0) || (THROTTLE_RESENDS) ) {
+                if ( (state.getMaxSends() <= 0) && (!THROTTLE_INITIAL_SEND) ) {
+                    if (state.getMessage() != null)
+                        state.getMessage().timestamp("another message is retransmitting, but we want to send our first volley...");
+                } else if ( (state.getMaxSends() <= 0) || (THROTTLE_RESENDS) ) {
                     if (state.getMessage() != null)
                         state.getMessage().timestamp("choked, with another message retransmitting");
                     return false;
                 } else {
-                    if (curRetransMsg.isExpired() || curRetransMsg.isComplete())
-                        _retransmitters.remove(peer);
                     if (state.getMessage() != null)
                         state.getMessage().timestamp("another message is retransmitting, but since we've already begun sending...");                    
                 }

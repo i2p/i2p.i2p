@@ -10,6 +10,7 @@ import java.util.Map;
 
 import net.i2p.crypto.DHSessionKeyBuilder;
 import net.i2p.data.Base64;
+import net.i2p.data.Hash;
 import net.i2p.data.RouterAddress;
 import net.i2p.data.RouterIdentity;
 import net.i2p.data.SessionKey;
@@ -760,7 +761,9 @@ public class EstablishmentManager {
                             err = "Took too long to establish remote connection (unknown state)";
                     }
                     
-                    _context.shitlist().shitlistRouter(outboundState.getRemoteIdentity().calculateHash(), err);
+                    Hash peer = outboundState.getRemoteIdentity().calculateHash();
+                    _context.shitlist().shitlistRouter(peer, err);
+                    _context.profileManager().commErrorOccurred(peer);
                 } else {
                     while (true) {
                         OutNetMessage msg = outboundState.getNextQueuedMessage();
