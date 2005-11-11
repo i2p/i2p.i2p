@@ -58,7 +58,6 @@ class WritableThreadIndex extends ThreadIndex {
         HeaderReceiver rec = new HeaderReceiver();
         Archive archive = BlogManager.instance().getArchive();
         
-        TreeSet roots = new TreeSet(new NewestNodeFirstComparator());
         for (Iterator iter = nodes.keySet().iterator(); iter.hasNext(); ) {
             BlogURI entry = (BlogURI)iter.next();
             ThreadNodeImpl node = (ThreadNodeImpl)nodes.get(entry);
@@ -95,6 +94,20 @@ class WritableThreadIndex extends ThreadIndex {
             }
         
             node.summarizeThread();
+        }
+        
+        // we do this in a second pass, since we need the data built by the
+        // summarizeThread() of a fully constructed tree
+        
+        TreeSet roots = new TreeSet(new NewestNodeFirstComparator());
+        for (Iterator iter = nodes.keySet().iterator(); iter.hasNext(); ) {
+            BlogURI entry = (BlogURI)iter.next();
+            ThreadNode node = (ThreadNode)nodes.get(entry);
+            int depth = 0;
+            // climb the tree
+            while (node.getParent() != null)
+                node = node.getParent();
+        
             roots.add(node);
         }
         
@@ -136,9 +149,11 @@ class WritableThreadIndex extends ThreadIndex {
         public int compare(Object lhs, Object rhs) {
             ThreadNodeImpl left = (ThreadNodeImpl)lhs;
             ThreadNodeImpl right = (ThreadNodeImpl)rhs;
-            if (left.getEntry().getEntryId() > right.getEntry().getEntryId()) {
+            long l = left.getMostRecentPostDate();
+            long r = right.getMostRecentPostDate();
+            if (l > r) { 
                 return -1;
-            } else if (left.getEntry().getEntryId() == right.getEntry().getEntryId()) {
+            } else if (l == r) {
                 return DataHelper.compareTo(left.getEntry().getKeyHash().getData(), right.getEntry().getKeyHash().getData());
             } else {
                 return 1;

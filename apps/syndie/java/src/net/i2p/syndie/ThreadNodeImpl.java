@@ -75,6 +75,7 @@ class ThreadNodeImpl implements ThreadNode {
         StringBuffer buf = new StringBuffer();
         buf.append("<node><entry>").append(getEntry().toString()).append("</entry>\n");
         buf.append("<tags>").append(getTags()).append("</tags>\n");
+        buf.append("<mostRecentPostDate>").append(getMostRecentPostDate()).append("</mostRecentPostDate>\n");
         buf.append("<recursiveTags>").append(getRecursiveTags()).append("</recursiveTags>\n");
         buf.append("<children>\n");
         for (int i = 0; i < _children.size(); i++)
