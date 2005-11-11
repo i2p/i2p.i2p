@@ -19,6 +19,7 @@ class ArchiveIndexer {
     public static ArchiveIndex index(I2PAppContext ctx, Archive source) {
         Log log = ctx.logManager().getLog(ArchiveIndexer.class);
         LocalArchiveIndex rv = new LocalArchiveIndex(ctx);
+        WritableThreadIndex threads = new WritableThreadIndex();
         rv.setGeneratedOn(ctx.clock().now());
         
         File rootDir = source.getArchiveDir();
@@ -79,6 +80,7 @@ class ArchiveIndexer {
                 allEntries++;
                 totalSize += entry.getCompleteSize();
                 String entryTags[] = entry.getTags();
+                threads.addEntry(entry.getURI(), entryTags);
                 for (int t = 0; t < entryTags.length; t++) {
                     if (!tags.containsKey(entryTags[t])) {
                         tags.put(entryTags[t], new TreeMap());
@@ -98,11 +100,18 @@ class ArchiveIndexer {
                 parser.parse(entry.getEntry().getText(), rec);
                 String reply = rec.getHeader(HTMLRenderer.HEADER_IN_REPLY_TO);
                 if (reply != null) {
-                    BlogURI parent = new BlogURI(reply.trim());
-                    if ( (parent.getKeyHash() != null) && (parent.getEntryId() >= 0) ) 
-                        rv.addReply(parent, entry.getURI());
-                    else if (log.shouldLog(Log.WARN))
-                        log.warn("Parent of " + entry.getURI() + " is not valid: [" + reply.trim() + "]");
+                    String forceNewThread = rec.getHeader(HTMLRenderer.HEADER_FORCE_NEW_THREAD);
+                    if ( (forceNewThread != null) && (Boolean.valueOf(forceNewThread).booleanValue()) ) {
+                        // ignore the parent
+                    } else {
+                        BlogURI parent = new BlogURI(reply.trim());
+                        if ( (parent.getKeyHash() != null) && (parent.getEntryId() >= 0) ) {
+                            rv.addReply(parent, entry.getURI());
+                            threads.addParent(parent, entry.getURI());
+                        } else if (log.shouldLog(Log.WARN)) {
+                            log.warn("Parent of " + entry.getURI() + " is not valid: [" + reply.trim() + "]");
+                        }
+                    }
                 }
             }
             
@@ -149,6 +158,11 @@ class ArchiveIndexer {
             BlogURI uri = (BlogURI)entriesByAge.get(when);
             rv.addNewestEntry(uri);
         }
+        
+        threads.organizeTree();
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("Tree: \n" + threads.toString());
+        rv.setThreadedIndex(threads);
         
         return rv;
     }

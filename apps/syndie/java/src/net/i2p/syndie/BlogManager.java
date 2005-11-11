@@ -44,7 +44,8 @@ public class BlogManager {
                     if (rootDir == null)
                         rootDir = "./syndie";
                 }
-                _instance = new BlogManager(I2PAppContext.getGlobalContext(), rootDir);
+                _instance = new BlogManager(I2PAppContext.getGlobalContext(), rootDir, false);
+                _instance.getArchive().regenerateIndex();
             }
             return _instance; 
         }

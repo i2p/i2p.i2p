@@ -74,7 +74,9 @@ public class BlogURI {
                DataHelper.eq(_blogHash, ((BlogURI)obj)._blogHash);
     }
     public int hashCode() {
-        int rv = (int)_entryId;
+        int rv = (int)((_entryId >>> 32) & 0x7FFFFFFF);
+        rv += (_entryId & 0x7FFFFFFF);
+        
         if (_blogHash != null)
             rv += _blogHash.hashCode();
         return rv;

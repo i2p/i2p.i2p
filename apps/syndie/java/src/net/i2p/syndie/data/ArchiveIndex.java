@@ -32,6 +32,7 @@ public class ArchiveIndex {
     /** parent message to a set of replies, ordered with the oldest first */
     protected Map _replies;
     protected Properties _headers;
+    private ThreadIndex _threadedIndex;
     
     public ArchiveIndex() {
         this(I2PAppContext.getGlobalContext(), false);
@@ -48,6 +49,7 @@ public class ArchiveIndex {
         _headers = new Properties();
         _replies = Collections.synchronizedMap(new HashMap());
         _generatedOn = -1;
+        _threadedIndex = null;
         if (shouldLoad)
             setIsLocal("true");
     }
@@ -61,6 +63,8 @@ public class ArchiveIndex {
     public long getTotalSize() { return _totalSize; }
     public long getNewSize() { return _newSize; }
     public long getGeneratedOn() { return _generatedOn; }
+    public ThreadIndex getThreadedIndex() { return _threadedIndex; }
+    public void setThreadedIndex(ThreadIndex index) { _threadedIndex = index; }
     
     public String getNewSizeStr() { 
         if (_newSize < 1024) return _newSize + "";

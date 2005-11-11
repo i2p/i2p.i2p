@@ -25,6 +25,7 @@ public class TransparentArchiveIndex extends ArchiveIndex {
     public long getTotalSize() { return index().getTotalSize(); }
     public long getNewSize() { return index().getNewSize(); }
     public long getGeneratedOn() { return index().getGeneratedOn(); }
+    public ThreadIndex getThreadedIndex() { return index().getThreadedIndex(); }
     
     public String getNewSizeStr() { return index().getNewSizeStr(); }
     public String getTotalSizeStr() { return index().getTotalSizeStr(); }

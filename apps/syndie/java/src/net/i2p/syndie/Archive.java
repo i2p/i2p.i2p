@@ -244,6 +244,7 @@ public class Archive {
     }
     
     public List listEntries(BlogURI uri, String tag, SessionKey blogKey) {
+        if (uri == null) return new ArrayList();
         return listEntries(uri.getKeyHash(), uri.getEntryId(), tag, blogKey);
     }
     public List listEntries(Hash blog, long entryId, String tag, SessionKey blogKey) { 

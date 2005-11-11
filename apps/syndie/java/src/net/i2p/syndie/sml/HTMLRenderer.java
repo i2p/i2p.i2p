@@ -755,6 +755,10 @@ public class HTMLRenderer extends EventReceiverImpl {
     public static final String HEADER_STYLE = "Style";
     public static final String HEADER_PETNAME = "PetName";
     public static final String HEADER_TAGS = "Tags";
+    /** if set to true, don't display the message in the same thread, though keep a parent reference */
+    public static final String HEADER_FORCE_NEW_THREAD = "ForceNewThread";
+    /** if set to true, don't let anyone else reply in the same thread (but let the original author reply) */
+    public static final String HEADER_REFUSE_REPLIES = "RefuseReplies";
     
     private void renderSubjectCell() {
         _preBodyBuffer.append("<form action=\"index.jsp\">");
@@ -880,7 +884,7 @@ public class HTMLRenderer extends EventReceiverImpl {
     }
     
     private final SimpleDateFormat _dateFormat = new SimpleDateFormat("yyyy/MM/dd", Locale.UK);
-    private final String getEntryDate(long when) {
+    public final String getEntryDate(long when) {
         synchronized (_dateFormat) {
             try {
                 String str = _dateFormat.format(new Date(when));

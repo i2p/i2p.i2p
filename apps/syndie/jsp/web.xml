@@ -15,17 +15,24 @@
     </servlet>
      
     <servlet>
+     <servlet-name>net.i2p.syndie.web.ViewThreadedServlet</servlet-name>
+     <servlet-class>net.i2p.syndie.web.ViewThreadedServlet</servlet-class>
+    </servlet>
+     
+    <servlet>
 	 <servlet-name>net.i2p.syndie.UpdaterServlet</servlet-name>
 	 <servlet-class>net.i2p.syndie.UpdaterServlet</servlet-class>
-     <load-on-startup>1</load-on-startup>
-	</servlet>
+         <load-on-startup>1</load-on-startup>
+    </servlet>
      
     <!-- precompiled servlets -->
     
+    <!--
     <servlet-mapping> 
       <servlet-name>net.i2p.syndie.jsp.index_jsp</servlet-name>
       <url-pattern>/</url-pattern>
     </servlet-mapping>
+    -->
     <servlet-mapping> 
       <servlet-name>net.i2p.syndie.web.ArchiveServlet</servlet-name>
       <url-pattern>/archive/*</url-pattern>
@@ -33,6 +40,10 @@
     <servlet-mapping> 
       <servlet-name>net.i2p.syndie.web.RSSServlet</servlet-name>
       <url-pattern>/rss.jsp</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping> 
+      <servlet-name>net.i2p.syndie.web.ViewThreadedServlet</servlet-name>
+      <url-pattern>/threads.jsp</url-pattern>
     </servlet-mapping>
     
     <session-config>
