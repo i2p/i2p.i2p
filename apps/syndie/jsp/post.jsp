@@ -25,8 +25,7 @@ if (!user.getAuthenticated()) {
     post.setArchive(archive);
     BlogURI uri = post.postEntry(); 
     if (uri != null) {
-      %><span class="b_postMsgOk">Blog entry <a class="b_postOkLink" href="<%=HTMLRenderer.getPageURL(user.getBlog(), null, uri.getEntryId(), -1, -1, 
-                                                        user.getShowExpanded(), user.getShowImages())%>">posted</a>!</span><%
+      %><span class="b_postMsgOk">Blog entry <a class="b_postOkLink" href="threads.jsp?regenerateIndex=true&post=<%=user.getBlog().toBase64() + '/' + uri.getEntryId()%>">posted</a>!</span><%
     } else {
       %><span class="b_postMsgErro">There was an unknown error posting the entry...</span><%
     }
@@ -135,10 +134,15 @@ for (Iterator iter = names.iterator(); iter.hasNext(); ) {
 
       if (parentURI != null) {
         parentURI = new String(Base64.decode(parentURI), "UTF-8");
-        %><span class="b_postField">Replying to
-        <a href="<%=HTMLRenderer.getPageURL(user, parentURI)%>">parent</a>
-        (text <a href="#parentText">below</a>).</span><br />
+        BlogURI parent = null;
+        try { 
+          parent = new BlogURI(parentURI);
+          %><span class="b_postField">Replying to
+            <a href="thread.jsp?post=<%=parent.getKeyHash().toBase64() + '/' + parent.getEntryId()%>">parent</a>
+            (text <a href="#parentText">below</a>).</span><br />
         <%
+        } catch (Exception e) {}
+        
       }
 %><form action="post.jsp" method="POST" enctype="multipart/form-data"> 
 <span class="b_postField">Post subject:</span> <input class="b_postSubject" type="text" size="80" name="entrysubject" value="<%=post.getSubject()%>" /><br />

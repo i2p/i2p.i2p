@@ -26,9 +26,9 @@ if ( (login != null) && (pass != null) && (loginSubmit != null) && (loginSubmit.
 %>
 <% if (user.getAuthenticated()) { %>
 <span class="b_topnavUsername">Logged in as:</span> <em class="b_topnavUsername"><jsp:getProperty property="username" name="user" />:</em>
-<a class="b_topnavBlog" href="<%=HTMLRenderer.getPageURL(user.getBlog(), null, -1, -1, -1, user.getShowExpanded(), user.getShowImages())%>"><%=HTMLRenderer.sanitizeString(ArchiveViewerBean.getBlogName(user.getBlogStr()))%></a>
-<a class="b_topnavPost" href="<%=HTMLRenderer.getPostURL(user.getBlog())%>">Post</a>
-<a class="b_topnavMeta" href="<%=HTMLRenderer.getMetadataURL(user.getBlog())%>">Metadata</a>
+<a class="b_topnavBlog" href="<%=""/*HTMLRenderer.getPageURL(user.getBlog(), null, -1, -1, -1, user.getShowExpanded(), user.getShowImages())*/%>"><%=HTMLRenderer.sanitizeString(ArchiveViewerBean.getBlogName(user.getBlogStr()))%></a>
+<a class="b_topnavPost" href="<%=""/*HTMLRenderer.getPostURL(user.getBlog())*/%>">Post</a>
+<a class="b_topnavMeta" href="<%=""/*HTMLRenderer.getMetadataURL(user.getBlog())*/%>">Metadata</a>
 <a class="b_topnavAddr" href="addresses.jsp">Addressbook</a>
 <a class="b_topnavLogout" href="index.jsp?logout=true">Logout</a>
 <%} else {%>

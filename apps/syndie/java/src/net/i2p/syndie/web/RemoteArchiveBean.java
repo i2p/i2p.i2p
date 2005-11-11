@@ -637,9 +637,7 @@ public class RemoteArchiveBean {
             buf.append("<tr class=\"b_remBlog\"><td class=\"b_remBlog\" colspan=\"5\" align=\"left\" valign=\"top\">\n");
             BlogInfo info = archive.getBlogInfo(blog);
             if (info != null) {
-                buf.append("<a class=\"b_remBlog\" href=\"");
-                buf.append(HTMLRenderer.getPageURL(blog, null, -1, -1, -1, user.getShowExpanded(), user.getShowImages()));
-                buf.append("\">").append(HTMLRenderer.sanitizeString(info.getProperty(BlogInfo.NAME))).append("</a>: ");
+                buf.append(HTMLRenderer.sanitizeString(info.getProperty(BlogInfo.NAME))).append(": ");
                 buf.append("<span class=\"b_remBlogDesc\">").append(HTMLRenderer.sanitizeString(info.getProperty(BlogInfo.DESCRIPTION)));
                 buf.append("</span>\n");
             } else {
@@ -661,8 +659,7 @@ public class RemoteArchiveBean {
                     newEntries++;
                     shownEntries++;
                 } else {
-                    String page = HTMLRenderer.getPageURL(blog, null, uri.getEntryId(), -1, -1,
-                    user.getShowExpanded(), user.getShowImages());
+                    String page = "threads.jsp?" + ThreadedHTMLRenderer.PARAM_VIEW_POST + '=' + blog.toBase64() + '/' + uri.getEntryId();
                     buf.append("<td class=\"b_remDetail\"><a class=\"b_remLocal\" href=\"" + page + "\">(local)</a></td>\n");
                 }
                 buf.append("<td class=\"b_remDetail\"><span class=\"b_remDate\">" + getDate(uri.getEntryId()) + "</span></td>\n");
@@ -671,7 +668,8 @@ public class RemoteArchiveBean {
                 buf.append("<td class=\"b_remDetail\">");
                 for (Iterator titer = new TreeSet(_remoteIndex.getBlogEntryTags(uri)).iterator(); titer.hasNext(); ) {
                     String tag = (String)titer.next();
-                    buf.append("<a class=\"b_remTag\" href=\"" + HTMLRenderer.getPageURL(blog, tag, -1, -1, -1, user.getShowExpanded(), user.getShowImages()) + "\">" + tag + "</a> \n");
+                    String page = "threads.jsp?" + ThreadedHTMLRenderer.PARAM_TAGS + '=' + HTMLRenderer.sanitizeTagParam(tag);
+                    buf.append("<a class=\"b_remTag\" href=\"" + page + "\">" + HTMLRenderer.sanitizeString(tag) + "</a> \n");
                 }
                 buf.append("</td>\n");
                 buf.append("</tr>\n");
@@ -700,7 +698,8 @@ public class RemoteArchiveBean {
                     buf.append("<td class=\"b_remLocalTags\">");
                     for (Iterator titer = new TreeSet(localIndex.getBlogEntryTags(uri)).iterator(); titer.hasNext(); ) {
                         String tag = (String)titer.next();
-                        buf.append("<a class=\"b_remLocalTag\" href=\"" + HTMLRenderer.getPageURL(blog, tag, -1, -1, -1, user.getShowExpanded(), user.getShowImages()) + "\">" + tag + "</a> \n");
+                        String page = "threads.jsp?" + ThreadedHTMLRenderer.PARAM_TAGS + '=' + HTMLRenderer.sanitizeTagParam(tag);
+                        buf.append("<a class=\"b_remLocalTag\" href=\"" + page + "\">" + HTMLRenderer.sanitizeString(tag) + "</a> \n");
                     }
                     buf.append("</td>\n");
                     buf.append("</tr>\n");
@@ -737,7 +736,8 @@ public class RemoteArchiveBean {
                 buf.append("<td class=\"b_remLocalTags\">");
                 for (Iterator titer = new TreeSet(localIndex.getBlogEntryTags(uri)).iterator(); titer.hasNext(); ) {
                     String tag = (String)titer.next();
-                    buf.append("<a class=\"b_remLocalTag\" href=\"" + HTMLRenderer.getPageURL(blog, tag, -1, -1, -1, user.getShowExpanded(), user.getShowImages()) + "\">" + tag + "</a> \n");
+                    String page = "threads.jsp?" + ThreadedHTMLRenderer.PARAM_TAGS + '=' + HTMLRenderer.sanitizeTagParam(tag);
+                    buf.append("<a class=\"b_remLocalTag\" href=\"" + page + "\">" + HTMLRenderer.sanitizeString(tag) + "</a> \n");
                 }
                 buf.append("</td>\n");
                 buf.append("</tr>\n");

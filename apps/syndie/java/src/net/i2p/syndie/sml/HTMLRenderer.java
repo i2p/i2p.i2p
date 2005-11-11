@@ -1001,7 +1001,7 @@ public class HTMLRenderer extends EventReceiverImpl {
                Base64.encode(blog.getData());
     }
 
-    public static String getPostURL(Hash blog) {
+    public String getPostURL(Hash blog) {
         return "post.jsp?" + ArchiveViewerBean.PARAM_BLOG + "=" + Base64.encode(blog.getData());
     }
     public String getPostURL(Hash blog, boolean asReply, String subject, String tags) { 
@@ -1022,8 +1022,8 @@ public class HTMLRenderer extends EventReceiverImpl {
     }
 
     public String getPageURL(String selector) { return getPageURL(_user, selector); }
-    public static String getPageURL(User user, String selector) { return getPageURL(user, selector, -1, -1); }
-    public static String getPageURL(User user, String selector, int numPerPage, int pageNum) {
+    public String getPageURL(User user, String selector) { return getPageURL(user, selector, -1, -1); }
+    public String getPageURL(User user, String selector, int numPerPage, int pageNum) {
         StringBuffer buf = new StringBuffer(128);
         buf.append("index.jsp?");
         buf.append("selector=").append(sanitizeTagParam(selector)).append("&");
@@ -1038,10 +1038,10 @@ public class HTMLRenderer extends EventReceiverImpl {
         return buf.toString();
     }
     
-    public static String getPageURL(Hash blog, String tag, long entryId, int numPerPage, int pageNum, boolean expandEntries, boolean showImages) {
+    public String getPageURL(Hash blog, String tag, long entryId, int numPerPage, int pageNum, boolean expandEntries, boolean showImages) {
         return getPageURL(blog, tag, entryId, null, numPerPage, pageNum, expandEntries, showImages);
     }
-    public static String getPageURL(Hash blog, String tag, long entryId, String group, int numPerPage, int pageNum, boolean expandEntries, boolean showImages) {
+    public String getPageURL(Hash blog, String tag, long entryId, String group, int numPerPage, int pageNum, boolean expandEntries, boolean showImages) {
         StringBuffer buf = new StringBuffer(128);
         buf.append("index.jsp?");
         if (blog != null)
@@ -1060,13 +1060,13 @@ public class HTMLRenderer extends EventReceiverImpl {
         buf.append(ArchiveViewerBean.PARAM_SHOW_IMAGES).append('=').append(showImages).append('&');
         return buf.toString();
     }
-    public static String getArchiveURL(Hash blog, SafeURL archiveLocation) {
+    public String getArchiveURL(Hash blog, SafeURL archiveLocation) {
         return "remote.jsp?" 
                //+ "action=Continue..." // should this be the case?
                + "&schema=" + sanitizeTagParam(archiveLocation.getSchema()) 
                + "&location=" + sanitizeTagParam(archiveLocation.getLocation());
     }
-    public static String getBookmarkURL(String name, String location, String schema, String protocol) {
+    public String getBookmarkURL(String name, String location, String schema, String protocol) {
         return "addresses.jsp?name=" + sanitizeTagParam(name)
                + "&network=" + sanitizeTagParam(schema)
                + "&protocol=" + sanitizeTagParam(protocol)

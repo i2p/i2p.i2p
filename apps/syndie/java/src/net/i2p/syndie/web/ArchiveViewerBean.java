@@ -405,15 +405,16 @@ public class ArchiveViewerBean {
                 start = 0;
                 end = entries.size() - 1;
             } else {
+                HTMLRenderer rend = new ThreadedHTMLRenderer(I2PAppContext.getGlobalContext());
                 pages = entries.size() / numPerPage;
                 if (numPerPage * pages < entries.size())
                     pages++;
                 if (pageNum > 0) {
                     String prevURL = null;
                     if ( (selector == null) || (selector.trim().length() <= 0) )
-                        prevURL = HTMLRenderer.getPageURL(blog, tag, entryId, group, numPerPage, pageNum-1, expandEntries, showImages);
+                        prevURL = rend.getPageURL(blog, tag, entryId, group, numPerPage, pageNum-1, expandEntries, showImages);
                     else
-                        prevURL = HTMLRenderer.getPageURL(user, selector, numPerPage, pageNum-1);
+                        prevURL = rend.getPageURL(user, selector, numPerPage, pageNum-1);
                     //System.out.println("prevURL: " + prevURL);
                     out.write(" <a class=\"b_selectorPrevMore\" href=\"" + prevURL + "\">&lt;&lt;</a>");
                 } else {
@@ -423,9 +424,9 @@ public class ArchiveViewerBean {
                 if (pageNum + 1 < pages) {
                     String nextURL = null;
                     if ( (selector == null) || (selector.trim().length() <= 0) )
-                        nextURL = HTMLRenderer.getPageURL(blog, tag, entryId, group, numPerPage, pageNum+1, expandEntries, showImages);
+                        nextURL = rend.getPageURL(blog, tag, entryId, group, numPerPage, pageNum+1, expandEntries, showImages);
                     else
-                        nextURL = HTMLRenderer.getPageURL(user, selector, numPerPage, pageNum+1);
+                        nextURL = rend.getPageURL(user, selector, numPerPage, pageNum+1);
                     //System.out.println("nextURL: " + nextURL);
                     out.write(" <a class=\"b_selectorNextMore\" href=\"" + nextURL + "\">&gt;&gt;</a>");
                 } else {
@@ -749,8 +750,7 @@ public class ArchiveViewerBean {
             for (int i = 0; i < props.length; i++) {
                 if (props[i].equals(BlogInfo.OWNER_KEY)) {
                     out.write("<tr class=\"b_metaBlog\"><td class=\"b_metaBlog\"><span class=\"b_metaBlog\">Blog:</span></td>");
-                    String blogURL = HTMLRenderer.getPageURL(blog, null, -1, -1, -1, false, false);
-                    out.write("<td class=\"b_metaBlog\"><a class=\"b_metaBlog\" href=\"" + blogURL + "\">" + Base64.encode(blog.getData()) + "</td></tr>\n");
+                    out.write("<td class=\"b_metaBlog\">" + Base64.encode(blog.getData()) + "</td></tr>\n");
                 } else if (props[i].equals(BlogInfo.SIGNATURE)) {
                     continue;
                 } else if (props[i].equals(BlogInfo.POSTERS)) {
@@ -782,7 +782,8 @@ public class ArchiveViewerBean {
                 out.write("<tr class=\"b_metaTags\"><td class=\"b_metaTags\"><span class=\"b_metaTags\">Known tags:</span></td><td class=\"b_metaTags\">");
                 for (int i = 0; i < tags.size(); i++) {
                     String tag = (String)tags.get(i);
-                    out.write("<a class=\"b_metaTag\" href=\"" + HTMLRenderer.getPageURL(blog, tag, -1, -1, -1, false, false) + "\">" +
+                    HTMLRenderer rend = new HTMLRenderer(I2PAppContext.getGlobalContext());
+                    out.write("<a class=\"b_metaTag\" href=\"" + rend.getPageURL(blog, tag, -1, -1, -1, false, false) + "\">" +
                               HTMLRenderer.sanitizeString(tag) + "</a> ");
                 }
                 out.write("</td></tr>");

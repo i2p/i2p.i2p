@@ -58,7 +58,12 @@ public class RSSServlet extends HttpServlet {
         out.write("<rss version=\"2.0\">\n");
         out.write(" <channel>\n");
         out.write("  <title>Syndie feed</title>\n");
-        out.write("  <link>" + urlPrefix + HTMLRenderer.sanitizeXML(HTMLRenderer.getPageURL(sel.blog, sel.tag, sel.entry, sel.group, 5, 0, false, false)) +"</link>\n");
+        String page = urlPrefix;
+        if (sel.tag != null)
+            page = page + "threads.jsp?" + ThreadedHTMLRenderer.PARAM_TAGS + '=' + HTMLRenderer.sanitizeXML(sel.tag);
+        else if ( (sel.blog != null) && (sel.entry > 0) )
+            page = page + "threads.jsp?" + ThreadedHTMLRenderer.PARAM_VIEW_POST + '=' + sel.blog.toBase64() + '/' + sel.entry;
+        out.write("  <link>" + page +"</link>\n");
         out.write("  <description>Summary of the latest Syndie posts</description>\n");
         out.write("  <generator>Syndie</generator>\n");
         
