@@ -1,4 +1,8 @@
-$Id: history.txt,v 1.315 2005/11/05 16:12:57 jrandom Exp $
+$Id: history.txt,v 1.316 2005/11/06 17:25:18 jrandom Exp $
+
+2005-11-10  jrandom
+    * First pass to a new threaded Syndie interface, which isn't enabled by
+      default, as its not done yet.
 
 2005-11-06  jrandom
     * Include SSU establishment failure in the peer profile as a commError,

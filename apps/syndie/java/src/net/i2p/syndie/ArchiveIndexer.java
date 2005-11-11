@@ -160,8 +160,8 @@ class ArchiveIndexer {
         }
         
         threads.organizeTree();
-        if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Tree: \n" + threads.toString());
+        if (log.shouldLog(Log.DEBUG))
+            log.debug("Tree: \n" + threads.toString());
         rv.setThreadedIndex(threads);
         
         return rv;
