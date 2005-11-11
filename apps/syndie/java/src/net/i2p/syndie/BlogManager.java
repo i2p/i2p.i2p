@@ -232,7 +232,7 @@ public class BlogManager {
                 Properties userProps = loadUserProps(files[i]);
                 if (userProps == null)
                     continue;
-                User user = new User();
+                User user = new User(_context);
                 user.load(userProps);
                 if (blog.equals(user.getBlog()))
                     return user;
@@ -252,7 +252,7 @@ public class BlogManager {
                 Properties userProps = loadUserProps(files[i]);
                 if (userProps == null)
                     continue;
-                User user = new User();
+                User user = new User(_context);
                 user.load(userProps);
                 rv.add(user);
             }
@@ -279,6 +279,15 @@ public class BlogManager {
         } catch (IOException ioe) {
             return null;
         }
+    }
+    
+    public User login(String login, String pass) {
+        User u = new User(_context);
+        String ok = login(u, login, pass);
+        if (User.LOGIN_OK.equals(ok))
+            return u;
+        else
+            return new User(_context);
     }
     
     public String login(User user, String login, String pass) {
@@ -331,12 +340,15 @@ public class BlogManager {
         return true;
     }
     
+    private static final boolean DEFAULT_IS_SINGLEUSER = true;
+    
     /**
      * If true, this syndie instance is meant for just one local user, so we don't need
      * to password protect registration, remote.jsp, or admin.jsp
      *
      */
     public boolean isSingleUser() {
+        if (!isConfigured()) return DEFAULT_IS_SINGLEUSER;
         String isSingle = _context.getProperty("syndie.singleUser");
         return ( (isSingle != null) && (Boolean.valueOf(isSingle).booleanValue()) );
     }
@@ -417,6 +429,51 @@ public class BlogManager {
         return true;
     }
      
+    private static final String DEFAULT_LOGIN = "default";
+    private static final String DEFAULT_PASS = "";
+    
+    public User getDefaultUser() {
+        User user = new User(_context);
+        getDefaultUser(user);
+        return user;
+    }
+    public void getDefaultUser(User user) {
+        if (isSingleUser()) {
+            Hash userHash = _context.sha().calculateHash(DataHelper.getUTF8(DEFAULT_LOGIN));
+            File userFile = new File(_userDir, Base64.encode(userHash.getData()));
+            if (_log.shouldLog(Log.INFO))
+                _log.info("Attempting to login to the default user: " + userFile.getAbsolutePath());
+            
+            if (userFile.exists()) {
+                Properties props = loadUserProps(userFile);
+                if (props == null) {
+                    user.invalidate();
+                    _log.error("Error reading the default user file: " + userFile);
+                    return;
+                }
+                String ok = user.login(DEFAULT_LOGIN, DEFAULT_PASS, props);
+                if (User.LOGIN_OK.equals(ok)) {
+                    return;
+                } else {
+                    user.invalidate();
+                    _log.error("Error logging into the default user: " + ok);
+                    return;
+                }
+            } else {
+                String ok = register(user, DEFAULT_LOGIN, DEFAULT_PASS, "", "default", "Default Syndie blog", "");
+                if (User.LOGIN_OK.equals(ok)) {
+                    _log.info("Default user created: " + user);
+                    return;
+                } else {
+                    user.invalidate();
+                    _log.error("Error registering the default user: " + ok);
+                    return;
+                }
+            }
+        } else {
+            return;
+        }
+    }
     
     public boolean authorizeAdmin(String pass) {
         if (isSingleUser()) return true;

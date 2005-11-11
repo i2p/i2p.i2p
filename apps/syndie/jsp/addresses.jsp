@@ -166,10 +166,14 @@ if (!user.getAuthenticated()) {
         if (name.getIsPublic())
             buf.append("checked=\"true\" ");
         buf.append(" /></td>");
-        buf.append("<td class=\"b_scheduled\"><input class=\"b_scheduled\" type=\"checkbox\" name=\"scheduleSyndication\" value=\"true\" ");
-        if (BlogManager.instance().syndicationScheduled(name.getLocation()))
-          buf.append("checked=\"true\" ");
-        buf.append(" /></td>");
+        if (BlogManager.instance().authorizeRemote(user)) {
+            buf.append("<td class=\"b_scheduled\"><input class=\"b_scheduled\" type=\"checkbox\" name=\"scheduleSyndication\" value=\"true\" ");
+            if (BlogManager.instance().syndicationScheduled(name.getLocation()))
+              buf.append("checked=\"true\" ");
+            buf.append(" /></td>");
+        } else {
+          buf.append("<td class=\"b_scheduled\"><input class=\"b_scheduled\" type=\"checkbox\" name=\"scheduleSyndication\" value=\"false\" disabled=\"true\" /></td>\n");
+        }
         buf.append("<td class=\"b_addrGroup\"><input class=\"b_addrGroup\" type=\"text\" name=\"groups\" size=\"10\" value=\"");
         for (int j = 0; j < name.getGroupCount(); j++) {
             buf.append(HTMLRenderer.sanitizeTagParam(name.getGroup(j)));

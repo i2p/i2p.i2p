@@ -28,8 +28,7 @@ public class RSSServlet extends HttpServlet {
         if (user == null) {
             String login = req.getParameter("login");
             String pass = req.getParameter("password");
-            user = new User();
-            BlogManager.instance().login(user, login, pass); // ignore failures - user will just be unauthorized
+            user = BlogManager.instance().login(login, pass); // ignore failures - user will just be unauthorized
             if (!user.getAuthenticated())
                 user.invalidate();
         }

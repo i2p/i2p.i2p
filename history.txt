@@ -1,4 +1,11 @@
-$Id: history.txt,v 1.316 2005/11/06 17:25:18 jrandom Exp $
+$Id: history.txt,v 1.317 2005/11/10 22:46:36 jrandom Exp $
+
+2005-11-11  jrandom
+    * Default Syndie to single user mode, and automatically log into a default
+      user account (additional accounts can be logged into with the 'switch'
+      or login pages, and new accounts can be created with the register page).
+    * Disable the 'automated' column on the Syndie addressbook unless the user
+      is appropriately authorized (good idea Polecat!)
 
 2005-11-10  jrandom
     * First pass to a new threaded Syndie interface, which isn't enabled by

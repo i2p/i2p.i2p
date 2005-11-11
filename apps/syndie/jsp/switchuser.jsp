@@ -12,5 +12,6 @@ Syndie login: <input type="text" name="login" /><br />
 Password: <input type="password" name="password" /><br />
 <input type="submit" name="action" value="Login" />
 <input type="submit" name="action" value="Cancel" />
+<input type="submit" name="action" value="Logout" />
 </form>
 </body>

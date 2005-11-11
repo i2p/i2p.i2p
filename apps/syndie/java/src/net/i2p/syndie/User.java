@@ -43,9 +43,24 @@ public class User {
     private boolean _importAddresses;
 
     static final String PROP_USERHASH = "__userHash";
-    
+
+    /**
+     * Ugly hack to fetch the default User instance - this is the default
+     * constructor so it can be used as a bean on the web interface.  If
+     * the Syndie instance isn't in single user mode, the default User 
+     * is an empty unauthenticated User.  If the instance IS in single user
+     * mode, this will contain the logged in 'default' user (creating a new
+     * one as necessary).  If you just want to create a User object, use the
+     * new User(I2PAppContext ctx) constructor.
+     *
+     */
     public User() {
-        _context = I2PAppContext.getGlobalContext();
+        this(I2PAppContext.getGlobalContext());
+        BlogManager.instance().getDefaultUser(this);
+    }
+    
+    public User(I2PAppContext ctx) {
+        _context = ctx;
         init();
     }
     private void init() {

@@ -35,20 +35,18 @@ public class ViewThreadedServlet extends HttpServlet {
         
         if (user == null) {
             if ("Login".equals(action)) {
-                user = new User();
-                BlogManager.instance().login(user, login, pass); // ignore failures - user will just be unauthorized
+                user = BlogManager.instance().login(login, pass); // ignore failures - user will just be unauthorized
                 if (!user.getAuthenticated())
                     user.invalidate();
             } else {
                 user = new User();
-                BlogManager.instance().login(user, login, pass); // ignore failures - user will just be unauthorized
             }
             forceNewIndex = true;
         } else if ("Login".equals(action)) {
+            user = BlogManager.instance().login(login, pass); // ignore failures - user will just be unauthorized
+            forceNewIndex = true;
+        } else if ("Logout".equals(action)) {
             user = new User();
-            BlogManager.instance().login(user, login, pass); // ignore failures - user will just be unauthorized
-            if (!user.getAuthenticated())
-                user.invalidate();
             forceNewIndex = true;
         }
         
