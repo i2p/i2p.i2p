@@ -31,12 +31,15 @@ if (!user.getAuthenticated()) {
       isSingleUser = true;
     else
       isSingleUser = false;
+
+    String defaultUser = request.getParameter("defaultUser");
+    String defaultPass = request.getParameter("defaultPass");
     
     if (configured) {
       if (BlogManager.instance().authorizeAdmin(adminPass)) {
         int port = -1;
         try { port = Integer.parseInt(proxyPort); } catch (NumberFormatException nfe) { port = 4444; }
-        BlogManager.instance().configure(regPass, remotePass, adminPass, selector, proxyHost, port, isSingleUser, null);
+        BlogManager.instance().configure(regPass, remotePass, adminPass, selector, proxyHost, port, isSingleUser, null, defaultUser, defaultPass);
         %><span class="b_adminMsgOk">Configuration updated</span><%
       } else {
         %><span class="b_adminMsgErr">Invalid admin password.  If you lost it, please update your syndie.config.</span><%
@@ -44,7 +47,7 @@ if (!user.getAuthenticated()) {
     } else {
       int port = -1;
       try { port = Integer.parseInt(proxyPort); } catch (NumberFormatException nfe) { port = 4444; }
-      BlogManager.instance().configure(regPass, remotePass, adminPass, selector, proxyHost, port, isSingleUser, null);
+      BlogManager.instance().configure(regPass, remotePass, adminPass, selector, proxyHost, port, isSingleUser, null, defaultUser, defaultPass);
       %><span class="b_adminMsgOk">Configuration saved</span><%
     }
   } else {
@@ -53,6 +56,11 @@ if (!user.getAuthenticated()) {
 <span class="b_adminDescr">If this is checked, the registration, admin, and remote passwords are unnecessary - anyone
 can register and administer Syndie, as well as use any remote functionality.  This should not be checked if untrusted
 parties can access this web interface.</span><br />
+<span class="b_adminField">Default user:</span> <input class="b_adminField" type="text" name="defaultUser" size="10" /> 
+      <span class="b_adminField">pass:</span> <input class="b_adminField" type="password" name="defaultPass" size="10" /><br />
+<span class="b_adminDescr">If Syndie is in single user mode, it will create a new 'default' user automatically and use that
+whenever you access Syndie unless you explicitly log in to another account.  If you want Syndie to use an existing account as
+your default account, you can specify them here, in which case it will automatically log you in under that account.</span><br />
 <em class="b_adminField">Registration password:</em> <input class="b_adminField" type="text" name="regpass" size="10" /><br />
 <span class="b_adminDescr">Users must specify this password on the registration form to proceed.  If this is
 blank, anyone can register.</span><br />

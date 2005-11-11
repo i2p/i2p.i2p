@@ -432,6 +432,22 @@ public class BlogManager {
     private static final String DEFAULT_LOGIN = "default";
     private static final String DEFAULT_PASS = "";
     
+    private static final String PROP_DEFAULT_LOGIN = "syndie.defaultSingleUserLogin";
+    private static final String PROP_DEFAULT_PASS = "syndie.defaultSingleUserPass";
+    
+    private String getDefaultLogin() {
+        String login = _context.getProperty(PROP_DEFAULT_LOGIN);
+        if ( (login == null) || (login.trim().length() <= 0) )
+            login = DEFAULT_LOGIN;
+        return login;
+    }
+    private String getDefaultPass() {
+        String pass = _context.getProperty(PROP_DEFAULT_PASS);
+        if ( (pass == null) || (pass.trim().length() <= 0) )
+            pass = DEFAULT_PASS;
+        return pass;
+    }
+    
     public User getDefaultUser() {
         User user = new User(_context);
         getDefaultUser(user);
@@ -439,7 +455,7 @@ public class BlogManager {
     }
     public void getDefaultUser(User user) {
         if (isSingleUser()) {
-            Hash userHash = _context.sha().calculateHash(DataHelper.getUTF8(DEFAULT_LOGIN));
+            Hash userHash = _context.sha().calculateHash(DataHelper.getUTF8(getDefaultLogin()));
             File userFile = new File(_userDir, Base64.encode(userHash.getData()));
             if (_log.shouldLog(Log.INFO))
                 _log.info("Attempting to login to the default user: " + userFile.getAbsolutePath());
@@ -451,7 +467,7 @@ public class BlogManager {
                     _log.error("Error reading the default user file: " + userFile);
                     return;
                 }
-                String ok = user.login(DEFAULT_LOGIN, DEFAULT_PASS, props);
+                String ok = user.login(getDefaultLogin(), getDefaultPass(), props);
                 if (User.LOGIN_OK.equals(ok)) {
                     return;
                 } else {
@@ -460,7 +476,7 @@ public class BlogManager {
                     return;
                 }
             } else {
-                String ok = register(user, DEFAULT_LOGIN, DEFAULT_PASS, "", "default", "Default Syndie blog", "");
+                String ok = register(user, getDefaultLogin(), getDefaultPass(), "", "default", "Default Syndie blog", "");
                 if (User.LOGIN_OK.equals(ok)) {
                     _log.info("Default user created: " + user);
                     return;
@@ -497,7 +513,8 @@ public class BlogManager {
     }
     
     public void configure(String registrationPassword, String remotePassword, String adminPass, String defaultSelector, 
-                          String defaultProxyHost, int defaultProxyPort, boolean isSingleUser, Properties opts) {
+                          String defaultProxyHost, int defaultProxyPort, boolean isSingleUser, Properties opts,
+                          String defaultUser, String defaultPass) {
         File cfg = getConfigFile();
         Writer out = null;
         try {
@@ -514,6 +531,14 @@ public class BlogManager {
                 out.write("syndie.defaultProxyHost="+defaultProxyHost.trim() + "\n");
             if (defaultProxyPort > 0)
                 out.write("syndie.defaultProxyPort="+defaultProxyPort + "\n");
+            
+            if ( (defaultUser == null) || (defaultUser.length() <= 0) )
+                defaultUser = getDefaultLogin();
+            if (defaultPass == null)
+                defaultPass = getDefaultPass();
+            out.write("syndie.defaultSingleUserLogin="+defaultUser+"\n");
+            out.write("syndie.defaultSingleUserPass="+defaultPass+"\n");
+            
             out.write("syndie.singleUser=" + isSingleUser + "\n"); // Used also in isConfigured()
             if (opts != null) {
                 for (Iterator iter = opts.keySet().iterator(); iter.hasNext(); ) {
