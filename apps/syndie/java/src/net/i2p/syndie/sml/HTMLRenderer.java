@@ -900,7 +900,9 @@ public class HTMLRenderer extends EventReceiverImpl {
     }
     
     public static final String sanitizeString(String str) { return sanitizeString(str, true); }
-    public static final String sanitizeString(String str, boolean allowNL) {
+    public static final String sanitizeString(String str, int maxLen) { return sanitizeString(str, true, maxLen); }
+    public static final String sanitizeString(String str, boolean allowNL) { return sanitizeString(str, allowNL, -1); }
+    public static final String sanitizeString(String str, boolean allowNL, int maxLen) {
         if (str == null) return null;
         boolean unsafe = false;
         unsafe = unsafe || str.indexOf('<') >= 0;
@@ -910,21 +912,24 @@ public class HTMLRenderer extends EventReceiverImpl {
             unsafe = unsafe || str.indexOf('\r') >= 0;
             unsafe = unsafe || str.indexOf('\f') >= 0;
         }
-        if (!unsafe) return str;
-        
-        //str = str.replace('<', '_'); // this should be &lt;
-        //str = str.replace('>', '-'); // this should be &gt;
-        str = str.replaceAll("<", "&lt;");
-        str = str.replaceAll(">", "&gt;");
-        if (!allowNL) {
-            //str = str.replace('\n', ' ');
-            //str = str.replace('\r', ' ');
-            //str = str.replace('\f', ' ');
-            str = str.replaceAll("\n", "<br />"); // no class
-            str = str.replaceAll("\r", "<br />"); // no class
-            str = str.replaceAll("\f", "<br />"); // no class
+        if (unsafe) {
+            //str = str.replace('<', '_'); // this should be &lt;
+            //str = str.replace('>', '-'); // this should be &gt;
+            str = str.replaceAll("<", "&lt;");
+            str = str.replaceAll(">", "&gt;");
+            if (!allowNL) {
+                //str = str.replace('\n', ' ');
+                //str = str.replace('\r', ' ');
+                //str = str.replace('\f', ' ');
+                str = str.replaceAll("\n", "<br />"); // no class
+                str = str.replaceAll("\r", "<br />"); // no class
+                str = str.replaceAll("\f", "<br />"); // no class
+            }
         }
-        return str;
+        if ( (maxLen > 0) && (str.length() > maxLen) )
+            return str.substring(0, maxLen) + "...";
+        else
+            return str;
     }
 
     public static final String sanitizeURL(String str) { 

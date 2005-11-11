@@ -32,7 +32,7 @@ public class PetName {
         _groups = new ArrayList();
         StringTokenizer tok = new StringTokenizer(dbLine, ":\n", true);
         int tokens = tok.countTokens();
-        System.out.println("Tokens: " + tokens);
+        //System.out.println("Tokens: " + tokens);
         if (tokens < 7) {
             return;
         }
