@@ -34,8 +34,9 @@ public class ThreadedHTMLRenderer extends HTMLRenderer {
     /** index into the nav tree to start displaying */
     public static final String PARAM_OFFSET = "offset";
     public static final String PARAM_TAGS = "tags";
+    public static final String PARAM_AUTHOR = "author";
     
-    public static String getFilterByTagLink(String uri, ThreadNode node, User user, String tag) { 
+    public static String getFilterByTagLink(String uri, ThreadNode node, User user, String tag, String author) { 
         StringBuffer buf = new StringBuffer(64);
         buf.append(uri).append('?');
         if (node != null) {
@@ -44,12 +45,16 @@ public class ThreadedHTMLRenderer extends HTMLRenderer {
             buf.append(node.getEntry().getEntryId()).append('&');
         }
         
-        if ( (tag != null) && (tag.trim().length() > 0) )
-            buf.append(PARAM_TAGS).append('=').append(tag);
+        if (!empty(tag))
+            buf.append(PARAM_TAGS).append('=').append(tag).append('&');
+        
+        if (!empty(author))
+            buf.append(PARAM_AUTHOR).append('=').append(author).append('&');
+        
         return buf.toString();
     }
     
-    public static String getNavLink(String uri, String viewPost, String viewThread, String tags, int offset) {
+    public static String getNavLink(String uri, String viewPost, String viewThread, String tags, String author, int offset) {
         StringBuffer buf = new StringBuffer(64);
         buf.append(uri);
         buf.append('?');
@@ -61,13 +66,16 @@ public class ThreadedHTMLRenderer extends HTMLRenderer {
         if (!empty(tags))
             buf.append(PARAM_TAGS).append('=').append(tags).append('&');
         
+        if (!empty(author))
+            buf.append(PARAM_AUTHOR).append('=').append(author).append('&');
+        
         buf.append(PARAM_OFFSET).append('=').append(offset).append('&');
         
         return buf.toString();
     }
     
     public static String getViewPostLink(String uri, ThreadNode node, User user, boolean isPermalink, 
-                                         String offset, String tags) {
+                                         String offset, String tags, String author) {
         StringBuffer buf = new StringBuffer(64);
         buf.append(uri);
         if (node.getChildCount() > 0) {
@@ -84,11 +92,14 @@ public class ThreadedHTMLRenderer extends HTMLRenderer {
         buf.append(node.getEntry().getKeyHash().toBase64()).append('/');
         buf.append(node.getEntry().getEntryId()).append('&');
         
-        if ( (!isPermalink) && (!empty(offset)) )
-            buf.append(PARAM_OFFSET).append('=').append(offset).append('&');
-        
-        if ( (!isPermalink) && (!empty(tags)) )
-            buf.append(PARAM_TAGS).append('=').append(tags).append('&');
+        if (!isPermalink) {
+            if (!empty(offset))
+                buf.append(PARAM_OFFSET).append('=').append(offset).append('&');
+            if (!empty(tags))
+                buf.append(PARAM_TAGS).append('=').append(tags).append('&');
+            if (!empty(author))
+                buf.append(PARAM_AUTHOR).append('=').append(author).append('&');
+        }
         
         return buf.toString();
     }
@@ -98,7 +109,7 @@ public class ThreadedHTMLRenderer extends HTMLRenderer {
     
     public void render(User user, Writer out, Archive archive, BlogURI post, 
                        boolean inlineReply, ThreadIndex index, String baseURI,
-                       String offset, String requestTags) throws IOException {
+                       String offset, String requestTags, String filteredAuthor) throws IOException {
         EntryContainer entry = archive.getEntry(post);
         if (entry == null) return;
         _entry = entry;
@@ -126,7 +137,7 @@ public class ThreadedHTMLRenderer extends HTMLRenderer {
         String subject = (String)_headers.get(HTMLRenderer.HEADER_SUBJECT);
         if (subject == null)
             subject = "";
-        out.write(" <td colspan=\"3\" class=\"postMetaSubject\">");
+        out.write(" <td colspan=\"3\" class=\"postMetaSubject\" id=\"bodySubject\">");
         out.write(subject);
         out.write("</td></tr>\n");
         out.write("<tr class=\"postMeta\"><td colspan=\"3\" class=\"postMetaLink\">\n");
@@ -158,7 +169,7 @@ public class ThreadedHTMLRenderer extends HTMLRenderer {
             for (Iterator tagIter = tags.iterator(); tagIter.hasNext(); ) {
                 String tag = (String)tagIter.next();
                 out.write("<a href=\"");
-                out.write(getFilterByTagLink(baseURI, node, user, tag));
+                out.write(getFilterByTagLink(baseURI, node, user, tag, filteredAuthor));
                 out.write("\" title=\"Filter threads to only include posts tagged as '");
                 out.write(tag);
                 out.write("'\">");
@@ -168,7 +179,7 @@ public class ThreadedHTMLRenderer extends HTMLRenderer {
         }
         
         out.write("\n<a href=\"");
-        out.write(getViewPostLink(baseURI, node, user, true, offset, requestTags));
+        out.write(getViewPostLink(baseURI, node, user, true, offset, requestTags, filteredAuthor));
         out.write("\" title=\"Select a shareable link directly to this post\">permalink</a>\n");
         
         out.write("</td>\n</tr>\n");

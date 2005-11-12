@@ -4,8 +4,10 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Enumeration;
@@ -162,6 +164,37 @@ public class FileUtil {
             if (fis != null) try { fis.close(); } catch (IOException ioe) {}
         }
     }
+    
+    /**
+     * Dump the contents of the given path (relative to the root) to the output 
+     * stream.  The path must not go above the root, either - if it does, it will
+     * throw a FileNotFoundException
+     */
+    public static void readFile(String path, String root, OutputStream out) throws IOException {
+        File rootDir = new File(root);
+        while (path.startsWith("/") && (path.length() > 0) )
+            path = path.substring(1);
+        if (path.length() <= 0) throw new FileNotFoundException("Not serving up the root dir");
+        File target = new File(rootDir, path);
+        if (!target.exists()) throw new FileNotFoundException("Requested file does not exist: " + path);
+        String targetStr = target.getCanonicalPath();
+        String rootDirStr = rootDir.getCanonicalPath();
+        if (!targetStr.startsWith(rootDirStr)) throw new FileNotFoundException("Requested file is outside the root dir: " + path);
+
+        byte buf[] = new byte[1024];
+        FileInputStream in = null;
+        try {
+            in = new FileInputStream(target);
+            int read = 0;
+            while ( (read = in.read(buf)) != -1) 
+                out.write(buf, 0, read);
+            out.close();
+        } finally {
+            if (in != null) 
+                in.close();
+        }
+    }
+
     
     /** return true if it was copied successfully */
     public static boolean copy(String source, String dest, boolean overwriteExisting) {

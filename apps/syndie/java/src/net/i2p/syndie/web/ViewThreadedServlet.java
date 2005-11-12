@@ -96,8 +96,9 @@ public class ViewThreadedServlet extends HttpServlet {
         FilteredThreadIndex index = (FilteredThreadIndex)req.getSession().getAttribute("threadIndex");
         
         Collection tags = getFilteredTags(req);
-        if (forceNewIndex || (index == null) || (!index.getFilteredTags().equals(tags)) ) {
-            index = new FilteredThreadIndex(user, BlogManager.instance().getArchive(), getFilteredTags(req));
+        Collection filteredAuthors = getFilteredAuthors(req);
+        if (forceNewIndex || (index == null) || (!index.getFilteredTags().equals(tags)) || (!index.getFilteredAuthors().equals(filteredAuthors))) {
+            index = new FilteredThreadIndex(user, BlogManager.instance().getArchive(), getFilteredTags(req), filteredAuthors);
             req.getSession().setAttribute("threadIndex", index);
         }
         
@@ -129,6 +130,7 @@ public class ViewThreadedServlet extends HttpServlet {
         renderNavBar(user, req, out, index);
         renderControlBar(user, req, out, index);
         renderBody(user, req, out, index);
+        
         renderThreadNav(user, req, out, threadOffset, index);
         renderThreadTree(user, req, out, threadOffset, visibleEntry, archive, index);
         renderThreadNav(user, req, out, threadOffset, index);
@@ -183,12 +185,15 @@ public class ViewThreadedServlet extends HttpServlet {
         out.write(req.getRequestURI());
         out.write("\" method=\"GET\">\n");
         String tags = "";
+        String author = "";
         Enumeration params = req.getParameterNames();
         while (params.hasMoreElements()) {
             String param = (String)params.nextElement();
             String val = req.getParameter(param);
             if (ThreadedHTMLRenderer.PARAM_TAGS.equals(param)) {
                 tags = val;
+            } else if (ThreadedHTMLRenderer.PARAM_AUTHOR.equals(param)) {
+                author = val;
             } else if (SKIP_TAGS.contains(param)) {
                 // skip
             } else if (param.length() <= 0) {
@@ -199,12 +204,30 @@ public class ViewThreadedServlet extends HttpServlet {
         }
         out.write("<tr class=\"controlBar\"><td colspan=\"2\">\n");
         out.write("<!-- control bar begin -->\n");
-        out.write("Filter: <select name=\"filter\" disabled=\"true\" >\n");
-        out.write(" <option value=\"all\">All posts in all threads</option>\n");
-        out.write(" <option value=\"self\">Threads you have posted in</option>\n");
-        out.write(" <option value=\"favorites\">Threads your friends have posted in</option>\n");
-        out.write(" </select>\n");
-        out.write("Tags: <input type=\"text\" name=\"" + ThreadedHTMLRenderer.PARAM_TAGS + "\" size=\"30\" value=\"" + tags + "\" />\n");
+        out.write("Filter: <select name=\"" + ThreadedHTMLRenderer.PARAM_AUTHOR + "\">\n");
+        
+        PetNameDB db = user.getPetNameDB();
+        TreeSet names = new TreeSet(db.getNames());
+        out.write("<option value=\"\">Any authors</option>\n");
+        if (author.equals(user.getBlog().toBase64()))
+            out.write("<option value=\"" + user.getBlog().toBase64() + "\" selected=\"true\">Threads you posted in</option>\n");
+        else
+            out.write("<option value=\"" + user.getBlog().toBase64() + "\">Threads you posted in</option>\n");
+        
+        for (Iterator iter = names.iterator(); iter.hasNext(); ) {
+            String name = (String) iter.next();
+            PetName pn = db.getByName(name);
+            if ("syndieblog".equals(pn.getProtocol())) {
+                if (author.equals(pn.getLocation()))
+                    out.write("<option value=\"" + pn.getLocation() + "\" selected=\"true\">Threads " + name + " posted in</option>\n");
+                else
+                    out.write("<option value=\"" + pn.getLocation() + "\">Threads " + name + " posted in</option>\n");
+            }
+        }
+        out.write("</select>\n");
+        
+        out.write("Tags: <input type=\"text\" name=\"" + ThreadedHTMLRenderer.PARAM_TAGS + "\" size=\"10\" value=\"" + tags + "\" />\n");
+
         out.write("<input type=\"submit\" name=\"action\" value=\"Go\" />\n");
         out.write("</td><td class=\"controlBarRight\"><a href=\"#threads\" title=\"Jump to the thread navigation\">Threads</a></td>\n");
         out.write("<!-- control bar end -->\n");
@@ -215,13 +238,15 @@ public class ViewThreadedServlet extends HttpServlet {
         ThreadedHTMLRenderer renderer = new ThreadedHTMLRenderer(I2PAppContext.getGlobalContext());
         Archive archive = BlogManager.instance().getArchive();
         List posts = getPosts(archive, req, index);
+        
         String uri = req.getRequestURI();
         String off = req.getParameter(ThreadedHTMLRenderer.PARAM_OFFSET);
         String tags = req.getParameter(ThreadedHTMLRenderer.PARAM_TAGS);
-        
+        String author = req.getParameter(ThreadedHTMLRenderer.PARAM_AUTHOR);
+
         for (int i = 0; i < posts.size(); i++) {
             BlogURI post = (BlogURI)posts.get(i);
-            renderer.render(user, out, archive, post, posts.size() == 1, index, uri, off, tags);
+            renderer.render(user, out, archive, post, posts.size() == 1, index, uri, off, tags, author);
         }
     }
     
@@ -261,9 +286,13 @@ public class ViewThreadedServlet extends HttpServlet {
     private void renderThreadNav(User user, HttpServletRequest req, PrintWriter out, int threadOffset, ThreadIndex index) throws IOException {
         out.write("<tr class=\"threadNav\" id=\"threads\"><td colspan=\"2\" nowrap=\"true\">\n");
         out.write("<!-- thread nav begin -->\n");
-        out.write("<a href=\"");
-        out.write(getNavLink(req, 0));
-        out.write("\">&lt;&lt; First Page</a> ");
+        if (threadOffset == 0) {
+            out.write("&lt;&lt; First Page ");
+        } else {
+            out.write("<a href=\"");
+            out.write(getNavLink(req, 0));
+            out.write("\">&lt;&lt; First Page</a> ");
+        }
         if (threadOffset > 0) {
             out.write("<a href=\"");
             int nxt = threadOffset - 10;
@@ -343,6 +372,24 @@ public class ViewThreadedServlet extends HttpServlet {
             return Collections.EMPTY_LIST;
         }
     }
+    
+    private Collection getFilteredAuthors(HttpServletRequest req) {
+        String authors = req.getParameter(ThreadedHTMLRenderer.PARAM_AUTHOR);
+        if (authors != null) {
+            StringTokenizer tok = new StringTokenizer(authors, "\n\t ");
+            ArrayList rv = new ArrayList();
+            while (tok.hasMoreTokens()) {
+                try {
+                    Hash h = new Hash();
+                    h.fromBase64(tok.nextToken().trim());
+                    rv.add(h);
+                } catch (DataFormatException dfe) {}
+            }
+            return rv;
+        } else {
+            return Collections.EMPTY_LIST;
+        }
+    }
 
     private void renderThreadTree(User user, PrintWriter out, ThreadIndex index, Archive archive, HttpServletRequest req,
                                   int threadOffset, int numThreads, BlogURI visibleEntry) {
@@ -359,13 +406,19 @@ public class ViewThreadedServlet extends HttpServlet {
             numThreads = index.getRootCount() - threadOffset;
         TreeRenderState state = new TreeRenderState(new ArrayList());
         
+        int written = 0;
         for (int curRoot = threadOffset; curRoot < numThreads + threadOffset; curRoot++) {
             ThreadNode node = index.getRoot(curRoot);
             out.write("<!-- thread begin node=" + node + " curRoot=" + curRoot + " threadOffset=" + threadOffset + " -->\n");
             renderThread(user, out, index, archive, req, node, 0, visibleEntry, state);
             out.write("<!-- thread end -->\n");
+            written++;
         }
-        out.write("<!-- threads begin -->\n");
+        
+        if (written <= 0)
+            out.write("<tr class=\"threadEven\"><td colspan=\"3\">No matching threads</td></tr>\n");
+        
+        out.write("<!-- threads end -->\n");
     }
     
     /**
@@ -418,11 +471,11 @@ public class ViewThreadedServlet extends HttpServlet {
             if (allowCollapse) {
                 out.write("<a href=\"");
                 out.write(getCollapseLink(req, node));
-                out.write("\" title=\"collapse thread\"><img border=\"0\" src=\"images/collapse.png\" alt=\"-\" /></a>\n");
+                out.write("\" title=\"collapse thread\"><img border=\"0\" src=\"images/collapse.png\" alt=\"collapse\" /></a>\n");
             } else {
                 out.write("<a href=\"");
                 out.write(getExpandLink(req, node));
-                out.write("\" title=\"expand thread\"><img border=\"0\" src=\"images/expand.png\" alt=\"+\" /></a>\n");
+                out.write("\" title=\"expand thread\"><img border=\"0\" src=\"images/expand.png\" alt=\"expand\" /></a>\n");
             }
         } else {
             out.write("<img src=\"images/noSubthread.png\" alt=\"\" border=\"0\" />\n");
@@ -539,10 +592,11 @@ public class ViewThreadedServlet extends HttpServlet {
         return getExpandLink(node, req.getRequestURI(), req.getParameter(ThreadedHTMLRenderer.PARAM_VIEW_POST), 
                              req.getParameter(ThreadedHTMLRenderer.PARAM_VIEW_THREAD), 
                              req.getParameter(ThreadedHTMLRenderer.PARAM_OFFSET),
-                             req.getParameter(ThreadedHTMLRenderer.PARAM_TAGS));
+                             req.getParameter(ThreadedHTMLRenderer.PARAM_TAGS),
+                             req.getParameter(ThreadedHTMLRenderer.PARAM_AUTHOR));
     }
     private static String getExpandLink(ThreadNode node, String uri, String viewPost, String viewThread, 
-                                        String offset, String tags) {
+                                        String offset, String tags, String author) {
         StringBuffer buf = new StringBuffer(64);
         buf.append(uri);
         buf.append('?');
@@ -565,6 +619,9 @@ public class ViewThreadedServlet extends HttpServlet {
         if (!empty(tags)) 
             buf.append(ThreadedHTMLRenderer.PARAM_TAGS).append('=').append(tags).append('&');
         
+        if (!empty(author)) 
+            buf.append(ThreadedHTMLRenderer.PARAM_AUTHOR).append('=').append(author).append('&');
+        
         return buf.toString();
     }
     private String getCollapseLink(HttpServletRequest req, ThreadNode node) {
@@ -572,11 +629,12 @@ public class ViewThreadedServlet extends HttpServlet {
                                req.getParameter(ThreadedHTMLRenderer.PARAM_VIEW_POST),
                                req.getParameter(ThreadedHTMLRenderer.PARAM_VIEW_THREAD),
                                req.getParameter(ThreadedHTMLRenderer.PARAM_OFFSET),
-                               req.getParameter(ThreadedHTMLRenderer.PARAM_TAGS));
+                               req.getParameter(ThreadedHTMLRenderer.PARAM_TAGS),
+                               req.getParameter(ThreadedHTMLRenderer.PARAM_AUTHOR));
     }
 
     private String getCollapseLink(ThreadNode node, String uri, String viewPost, String viewThread, 
-                                   String offset, String tags) { 
+                                   String offset, String tags, String author) { 
         StringBuffer buf = new StringBuffer(64);
         buf.append(uri);
         // collapse node == let the node be visible
@@ -595,6 +653,9 @@ public class ViewThreadedServlet extends HttpServlet {
         if (!empty(tags))
             buf.append(ThreadedHTMLRenderer.PARAM_TAGS).append('=').append(tags).append('&');
         
+        if (!empty(author))
+            buf.append(ThreadedHTMLRenderer.PARAM_AUTHOR).append('=').append(author).append('&');
+        
         return buf.toString();
     }
     private String getProfileLink(HttpServletRequest req, Hash author) {
@@ -608,10 +669,11 @@ public class ViewThreadedServlet extends HttpServlet {
                                  req.getParameter(ThreadedHTMLRenderer.PARAM_VIEW_POST), 
                                  req.getParameter(ThreadedHTMLRenderer.PARAM_VIEW_THREAD),
                                  req.getParameter(ThreadedHTMLRenderer.PARAM_OFFSET), 
-                                 req.getParameter(ThreadedHTMLRenderer.PARAM_TAGS));
+                                 req.getParameter(ThreadedHTMLRenderer.PARAM_TAGS), 
+                                 req.getParameter(ThreadedHTMLRenderer.PARAM_AUTHOR));
     }
     private String getAddToGroupLink(User user, Hash author, String group, String uri, String visible,
-                                     String viewPost, String viewThread, String offset, String tags) {
+                                     String viewPost, String viewThread, String offset, String tags, String filteredAuthor) {
         StringBuffer buf = new StringBuffer(64);
         buf.append(uri);
         buf.append('?');
@@ -631,19 +693,25 @@ public class ViewThreadedServlet extends HttpServlet {
         if (!empty(tags))
             buf.append(ThreadedHTMLRenderer.PARAM_TAGS).append('=').append(tags).append('&');
         
+        if (!empty(filteredAuthor))
+            buf.append(ThreadedHTMLRenderer.PARAM_AUTHOR).append('=').append(filteredAuthor).append('&');
+        
         return buf.toString();
     }
     private String getViewPostLink(HttpServletRequest req, ThreadNode node, User user, boolean isPermalink) {
         return ThreadedHTMLRenderer.getViewPostLink(req.getRequestURI(), node, user, isPermalink, 
                                                     req.getParameter(ThreadedHTMLRenderer.PARAM_OFFSET), 
-                                                    req.getParameter(ThreadedHTMLRenderer.PARAM_TAGS));
+                                                    req.getParameter(ThreadedHTMLRenderer.PARAM_TAGS), 
+                                                    req.getParameter(ThreadedHTMLRenderer.PARAM_AUTHOR));
     }
     private String getViewThreadLink(HttpServletRequest req, ThreadNode node, User user) {
         return getViewThreadLink(req.getRequestURI(), node, user,
                                  req.getParameter(ThreadedHTMLRenderer.PARAM_OFFSET),
-                                 req.getParameter(ThreadedHTMLRenderer.PARAM_TAGS));
+                                 req.getParameter(ThreadedHTMLRenderer.PARAM_TAGS),
+                                 req.getParameter(ThreadedHTMLRenderer.PARAM_AUTHOR));
     }
-    private static String getViewThreadLink(String uri, ThreadNode node, User user, String offset, String tags) {
+    private static String getViewThreadLink(String uri, ThreadNode node, User user, String offset,
+                                            String tags, String author) {
         StringBuffer buf = new StringBuffer(64);
         buf.append(uri);
         if (node.getChildCount() > 0) {
@@ -666,17 +734,21 @@ public class ViewThreadedServlet extends HttpServlet {
         if (!empty(tags))
             buf.append(ThreadedHTMLRenderer.PARAM_TAGS).append('=').append(tags).append('&');
         
+        if (!empty(author))
+            buf.append(ThreadedHTMLRenderer.PARAM_AUTHOR).append('=').append(author).append('&');
+        
         buf.append("#").append(node.getEntry().toString());
         return buf.toString();
     }
-    private String getFilterByTagLink(HttpServletRequest req, ThreadNode node, User user, String tag) { 
-        return ThreadedHTMLRenderer.getFilterByTagLink(req.getRequestURI(), node, user, tag);
+    private String getFilterByTagLink(HttpServletRequest req, ThreadNode node, User user, String tag, String author) { 
+        return ThreadedHTMLRenderer.getFilterByTagLink(req.getRequestURI(), node, user, tag, author);
     }
     private String getNavLink(HttpServletRequest req, int offset) {
-        return ThreadedHTMLRenderer.getNavLink(req.getRequestURI(), 
+        return ThreadedHTMLRenderer.getNavLink(req.getRequestURI(),
                                                req.getParameter(ThreadedHTMLRenderer.PARAM_VIEW_POST), 
                                                req.getParameter(ThreadedHTMLRenderer.PARAM_VIEW_THREAD), 
                                                req.getParameter(ThreadedHTMLRenderer.PARAM_TAGS), 
+                                               req.getParameter(ThreadedHTMLRenderer.PARAM_AUTHOR), 
                                                offset);
     }
     
@@ -763,21 +835,9 @@ public class ViewThreadedServlet extends HttpServlet {
 "<link href=\"rss.jsp\" rel=\"alternate\" type=\"application/rss+xml\" >\n" +
 "</head>\n" +
 "<body>\n" +
+"<span style=\"display: none\"><a href=\"#bodySubject\">Jump to the beginning of the first post rendered, if any</a>\n" +
+"<a href=\"#threads\">Jump to the thread navigation</a>\n</span>\n" +
 "<table border=\"0\" width=\"100%\" class=\"overallTable\">\n";
-
-   private static final String CONTROL_BAR_WITHOUT_TAGS = "<form>\n" +
-"<tr class=\"controlBar\"><td colspan=\"2\">\n" +
-"<!-- control bar begin -->\n" +
-"Filter: <select disabled=\"true\" name=\"filter\">\n" +
-" <option value=\"all\">All posts in all threads</option>\n" +
-" <option value=\"self\">Threads you have posted in</option>\n" +
-" <option value=\"favorites\">Threads your friends have posted in</option>\n" +
-" </select>\n" +
-"<input type=\"submit\" name=\"action\" value=\"Go\" />\n" +
-"</td><td class=\"controlBarRight\"><a href=\"#threads\" title=\"Jump to the thread navigation\">Threads</a></td>\n" +
-"<!-- control bar end -->\n" +
-"</tr>\n" +
-"</form>\n";
 
    private static final String END_HTML = "</table>\n" +
 "</body>\n";

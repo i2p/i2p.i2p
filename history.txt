@@ -1,25 +1,36 @@
-$Id: history.txt,v 1.318 2005/11/11 06:29:16 jrandom Exp $
+$Id: history.txt,v 1.319 2005/11/11 21:38:56 cervantes Exp $
+
+2005-11-11  jrandom
+    * Add filtering threads by author to Syndie, populated with authors in the
+      user's addressbook
+    * When creating the default user, add
+      "http://syndiemedia.i2p/archive/archive.txt" to their addressbook,
+      configured to automatically pull updates.  (what other archives should
+      be included?)
+    * Tiny servlet to help dole out the new routerconsole themes, and bundle
+      the installer/resources/themes/** into ./docs/themes/** on both install
+      and update.
 
 2005-11-11  cervantes
-	* Initial pass of the routerconsole revamp, starting with I2PTunnel and
-	  being progressively rolled out to other sections at later dates.
-	  Featuring abstracted W3C strict XHTML1.0 markup, with CSS providing
-	  layout and styling.
-	* Implemented console themes. Users can create their own themes by
-	  creating css files in: {i2pdir}/docs/themes/console/{themename}/
-	  and activating it using the routerconsole.theme={themename} advanced
-	  config property. Look at the example incomplete "defCon1" theme.
-	  Note: This is very much a work in progress. Folks might want to hold-off
-	  creating their own skins until the markup has solidified.
-	* Added "routerconsole.javascript.disabled=true" to disable console
-	  client-side scripting and "routerconsole.css.disabled=true" to remove 
-	  css styling (only rolled out in the i2ptunnel interface currently)
-	* Fixed long standing bug with i2ptunnel client and server edit screens
-	  where tunnel count and depth properties would fail to save. Added
-	  backup quantity and variance configuration options.
-	* Added basic accessibility support (key shortcuts, linear markup, alt and 
-	  title information and form labels).
-	* So far only tested on IE6, Firefox 1.0.6, Opera 8 and lynx.
+    * Initial pass of the routerconsole revamp, starting with I2PTunnel and
+      being progressively rolled out to other sections at later dates.
+      Featuring abstracted W3C strict XHTML1.0 markup, with CSS providing
+      layout and styling.
+    * Implemented console themes. Users can create their own themes by
+      creating css files in: {i2pdir}/docs/themes/console/{themename}/
+      and activating it using the routerconsole.theme={themename} advanced
+      config property. Look at the example incomplete "defCon1" theme.
+      Note: This is very much a work in progress. Folks might want to hold-off
+      creating their own skins until the markup has solidified.
+    * Added "routerconsole.javascript.disabled=true" to disable console
+      client-side scripting and "routerconsole.css.disabled=true" to remove 
+      css styling (only rolled out in the i2ptunnel interface currently)
+    * Fixed long standing bug with i2ptunnel client and server edit screens
+      where tunnel count and depth properties would fail to save. Added
+      backup quantity and variance configuration options.
+    * Added basic accessibility support (key shortcuts, linear markup, alt and 
+      title information and form labels).
+    * So far only tested on IE6, Firefox 1.0.6, Opera 8 and lynx.
 
 2005-11-11  jrandom
     * Default Syndie to single user mode, and automatically log into a default

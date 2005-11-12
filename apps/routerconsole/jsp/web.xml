@@ -5,6 +5,13 @@
 
 <web-app>
     <!-- precompiled servlets -->
+    
+    <!-- yeah, i'm lazy, using a jsp instead of a servlet.. -->
+    <servlet-mapping> 
+      <servlet-name>net.i2p.router.web.jsp.viewtheme_jsp</servlet-name>
+      <url-pattern>/themes/*</url-pattern>
+    </servlet-mapping>
+    
     <session-config>
         <session-timeout>
             30

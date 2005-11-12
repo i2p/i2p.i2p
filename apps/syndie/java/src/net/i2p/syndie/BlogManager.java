@@ -447,6 +447,15 @@ public class BlogManager {
             pass = DEFAULT_PASS;
         return pass;
     }
+
+    /**
+     * If we are a single user instance, when we create the default user, give them
+     * addressbook entries for each of the following, *and* schedule them for syndication
+     *
+     */
+    private static final String DEFAULT_SINGLE_USER_ARCHIVES[] = new String[] {
+        "http://syndiemedia.i2p/archive/archive.txt"
+    };
     
     public User getDefaultUser() {
         User user = new User(_context);
@@ -479,6 +488,10 @@ public class BlogManager {
                 String ok = register(user, getDefaultLogin(), getDefaultPass(), "", "default", "Default Syndie blog", "");
                 if (User.LOGIN_OK.equals(ok)) {
                     _log.info("Default user created: " + user);
+                    for (int i = 0; i < DEFAULT_SINGLE_USER_ARCHIVES.length; i++)
+                        user.getPetNameDB().add(new PetName("DefaultArchive" + i, "syndie", "syndiearchive", DEFAULT_SINGLE_USER_ARCHIVES[i]));
+                    scheduleSyndication(DEFAULT_SINGLE_USER_ARCHIVES);
+                    saveUser(user);
                     return;
                 } else {
                     user.invalidate();
@@ -903,6 +916,20 @@ public class BlogManager {
         }
         if ( (location != null) && (location.trim().length() > 0) )
             buf.append(location.trim());
+        System.setProperty("syndie.updateArchives", buf.toString());
+        Updater.wakeup();
+    }
+    public void scheduleSyndication(String locations[]) {
+        String archives[] = getUpdateArchives();
+        HashSet locs = new HashSet();
+        for (int i = 0; (archives != null) && (i < archives.length); i++)
+            locs.add(archives[i]);
+        for (int i = 0; (locations != null) && (i < locations.length); i++)
+            locs.add(locations[i]);
+        
+        StringBuffer buf = new StringBuffer(64);
+        for (Iterator iter = locs.iterator(); iter.hasNext(); )
+            buf.append(iter.next().toString().trim()).append(',');
         System.setProperty("syndie.updateArchives", buf.toString());
         Updater.wakeup();
     }
