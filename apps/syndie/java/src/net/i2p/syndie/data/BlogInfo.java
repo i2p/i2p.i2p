@@ -55,6 +55,7 @@ public class BlogInfo {
     public static final String SIGNATURE = "Signature";
     public static final String NAME = "Name";
     public static final String DESCRIPTION = "Description";
+    public static final String CONTACT_URL = "ContactURL";
     public static final String EDITION = "Edition";
     
     public void load(InputStream in) throws IOException {

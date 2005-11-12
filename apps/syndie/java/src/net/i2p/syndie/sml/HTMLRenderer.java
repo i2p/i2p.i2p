@@ -400,8 +400,12 @@ public class HTMLRenderer extends EventReceiverImpl {
         if (location != null) {
             _bodyBuffer.append(" at ");
             SafeURL surl = new SafeURL(locationSchema + "://" + location);
-            _bodyBuffer.append("<a ").append(getClass("archiveSummaryLink")).append(" href=\"").append(getArchiveURL(null, surl));
-            _bodyBuffer.append("\">").append(sanitizeString(surl.toString())).append("</a>");
+            if (BlogManager.instance().authorizeRemote(_user)) {
+                _bodyBuffer.append("<a ").append(getClass("archiveSummaryLink")).append(" href=\"").append(getArchiveURL(null, surl));
+                _bodyBuffer.append("\">").append(sanitizeString(surl.toString())).append("</a>");
+            } else {
+                _bodyBuffer.append(sanitizeString(surl.getLocation()));
+            }
             if (_user.getAuthenticated()) {
                 _bodyBuffer.append(" <a ").append(getClass("archiveBookmarkLink")).append(" href=\"");
                 _bodyBuffer.append(getBookmarkURL(sanitizeString(name), surl.getLocation(), surl.getSchema(), "syndiearchive"));
@@ -1001,7 +1005,7 @@ public class HTMLRenderer extends EventReceiverImpl {
         if (_entry == null) return "unknown";
         return getMetadataURL(_entry.getURI().getKeyHash()); 
     }
-    public static String getMetadataURL(Hash blog) {
+    public String getMetadataURL(Hash blog) {
         return "viewmetadata.jsp?" + ArchiveViewerBean.PARAM_BLOG + "=" +
                Base64.encode(blog.getData());
     }

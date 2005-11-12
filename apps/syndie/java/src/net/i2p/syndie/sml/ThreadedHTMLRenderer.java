@@ -31,10 +31,19 @@ public class ThreadedHTMLRenderer extends HTMLRenderer {
     public static final String PARAM_VISIBLE = "visible";
     public static final String PARAM_ADD_TO_GROUP_LOCATION = "addLocation";
     public static final String PARAM_ADD_TO_GROUP_NAME = "addGroup";
+    /** name of the bookmarked entry to remove */
+    public static final String PARAM_REMOVE_FROM_GROUP_NAME = "removeName";
+    /** group to remove from the bookmarked entry, or if blank, remove the entry itself */
+    public static final String PARAM_REMOVE_FROM_GROUP = "removeGroup";
     /** index into the nav tree to start displaying */
     public static final String PARAM_OFFSET = "offset";
     public static final String PARAM_TAGS = "tags";
     public static final String PARAM_AUTHOR = "author";
+    // parameters for editing one's profile
+    public static final String PARAM_PROFILE_NAME = "profileName";
+    public static final String PARAM_PROFILE_DESC = "profileDesc";
+    public static final String PARAM_PROFILE_URL = "profileURL";
+    public static final String PARAM_PROFILE_OTHER = "profileOther";
     
     public static String getFilterByTagLink(String uri, ThreadNode node, User user, String tag, String author) { 
         StringBuffer buf = new StringBuffer(64);
@@ -399,6 +408,13 @@ public class ThreadedHTMLRenderer extends HTMLRenderer {
         //renderPreBodyCell();
     }
     
+    public String getMetadataURL(Hash blog) {
+        return buildProfileURL(blog);
+    }
+    public static String buildProfileURL(Hash blog) {
+        return "profile.jsp?" + ThreadedHTMLRenderer.PARAM_AUTHOR + "=" +
+               Base64.encode(blog.getData());
+    }
     protected String getEntryURL() { return getEntryURL(_user != null ? _user.getShowImages() : false); }
     protected String getEntryURL(boolean showImages) {
         if (_entry == null) 

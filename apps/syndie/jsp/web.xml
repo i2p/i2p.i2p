@@ -18,6 +18,11 @@
      <servlet-name>net.i2p.syndie.web.ViewThreadedServlet</servlet-name>
      <servlet-class>net.i2p.syndie.web.ViewThreadedServlet</servlet-class>
     </servlet>
+    
+    <servlet>
+     <servlet-name>net.i2p.syndie.web.ProfileServlet</servlet-name>
+     <servlet-class>net.i2p.syndie.web.ProfileServlet</servlet-class>
+    </servlet>
      
     <servlet>
 	 <servlet-name>net.i2p.syndie.UpdaterServlet</servlet-name>
@@ -44,6 +49,10 @@
     <servlet-mapping> 
       <servlet-name>net.i2p.syndie.web.ViewThreadedServlet</servlet-name>
       <url-pattern>/threads.jsp</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping> 
+      <servlet-name>net.i2p.syndie.web.ProfileServlet</servlet-name>
+      <url-pattern>/profile.jsp</url-pattern>
     </servlet-mapping>
     
     <session-config>
