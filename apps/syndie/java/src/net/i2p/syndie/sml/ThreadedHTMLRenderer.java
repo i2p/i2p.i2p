@@ -412,8 +412,11 @@ public class ThreadedHTMLRenderer extends HTMLRenderer {
         return buildProfileURL(blog);
     }
     public static String buildProfileURL(Hash blog) {
-        return "profile.jsp?" + ThreadedHTMLRenderer.PARAM_AUTHOR + "=" +
-               Base64.encode(blog.getData());
+        if ( (blog != null) && (blog.getData() != null) )
+            return "profile.jsp?" + ThreadedHTMLRenderer.PARAM_AUTHOR + "=" +
+                   Base64.encode(blog.getData());
+        else
+            return "profile.jsp";
     }
     protected String getEntryURL() { return getEntryURL(_user != null ? _user.getShowImages() : false); }
     protected String getEntryURL(boolean showImages) {

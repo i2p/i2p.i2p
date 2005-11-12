@@ -33,6 +33,11 @@ public abstract class BaseServlet extends HttpServlet {
         
         if (req.getParameter("regenerateIndex") != null)
             forceNewIndex = true;
+
+        User oldUser = user;
+        user = handleRegister(user, req);
+        if (oldUser != user)
+            forceNewIndex = true;
         
         if (user == null) {
             if ("Login".equals(action)) {
@@ -199,6 +204,22 @@ public abstract class BaseServlet extends HttpServlet {
         boolean updated = BlogManager.instance().updateMetadata(user, user.getBlog(), opts);
     }
     
+    private User handleRegister(User user, HttpServletRequest req) {
+        String l = req.getParameter("login");
+        String p = req.getParameter("password");
+        String name = req.getParameter("accountName");
+        String desc = req.getParameter("description");
+        String contactURL = req.getParameter("url");
+        String regPass = req.getParameter("registrationPass");
+        String action = req.getParameter("action");
+        
+        if ( (action != null) && ("Register".equals(action)) && !empty(l) ) {
+            return BlogManager.instance().register(l, p, regPass, name, desc, contactURL);
+        } else {
+            return user;
+        }
+    }
+    
     protected void render(User user, HttpServletRequest req, PrintWriter out, ThreadIndex index) throws ServletException, IOException {
         Archive archive = BlogManager.instance().getArchive();
         int numThreads = 10;
@@ -248,7 +269,7 @@ public abstract class BaseServlet extends HttpServlet {
         }
         //out.write("</td><td class=\"topNav_admin\">\n");
         out.write("</span><span class=\"topNav_admin\">\n");
-        if (user.getAuthenticated() && user.getAllowAccessRemote()) {
+        if (BlogManager.instance().authorizeRemote(user)) {
             out.write("<a href=\"syndicate.jsp\" title=\"Syndicate data between other Syndie nodes\">Syndicate</a>\n");
             out.write("<a href=\"importfeed.jsp\" title=\"Import RSS/Atom data\">Import RSS/Atom</a>\n");
             out.write("<a href=\"admin.jsp\" title=\"Configure this Syndie node\">Admin</a>\n");
@@ -629,13 +650,12 @@ public abstract class BaseServlet extends HttpServlet {
 ".topNav_user {\n" +
 "	text-align: left;\n" +
 "	float: left;\n" +
-"	align: left;\n" +
 "	display: inline;\n" +
 "}\n" +
 ".topNav_admin {\n" +
 "	text-align: right;\n" +
 "	float: right;\n" +
-"	align: right;\n" +
+"	margin: 0 5px 0 0;\n" +
 "	display: inline;\n" +
 "}\n" +
 ".controlBar {\n" +

@@ -145,9 +145,12 @@ public class BlogManager {
     public BlogInfo createInfo(SigningPublicKey pub, SigningPrivateKey priv, String name, SigningPublicKey posters[], 
                                String description, String contactURL, String archives[], int edition) {
         Properties opts = new Properties();
+        if (name == null) name = "";
         opts.setProperty("Name", name);
+        if (description == null) description = "";
         opts.setProperty("Description", description);
         opts.setProperty("Edition", Integer.toString(edition));
+        if (contactURL == null) contactURL = "";
         opts.setProperty("ContactURL", contactURL);
         for (int i = 0; archives != null && i < archives.length; i++) 
             opts.setProperty("Archive." + i, archives[i]);
@@ -608,6 +611,13 @@ public class BlogManager {
     public void saveUser(User user) {
         if (!user.getAuthenticated()) return;
         storeUser(user);
+    }
+    public User register(String login, String password, String registrationPassword, String blogName, String blogDescription, String contactURL) {
+        User user = new User(_context);
+        if (User.LOGIN_OK.equals(register(user, login, password, registrationPassword, blogName, blogDescription, contactURL)))
+            return user;
+        else
+            return null;
     }
     public String register(User user, String login, String password, String registrationPassword, String blogName, String blogDescription, String contactURL) {
         System.err.println("Register [" + login + "] pass [" + password + "] name [" + blogName + "] descr [" + blogDescription + "] contact [" + contactURL + "] regPass [" + registrationPassword + "]");
