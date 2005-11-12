@@ -38,7 +38,9 @@ public class IndexBean {
     private String _i2cpHost;
     private String _i2cpPort;
     private String _tunnelDepth;
-    private String _tunnelCount;
+    private String _tunnelQuantity;
+    private String _tunnelVariance;
+    private String _tunnelBackupQuantity;
     private boolean _connectDelay;
     private String _customOptions;
     private String _proxyList;
@@ -63,6 +65,10 @@ public class IndexBean {
     public static final String PROP_TUNNEL_PASSPHRASE = "i2ptunnel.passphrase";
     static final String PROP_NONCE = IndexBean.class.getName() + ".nonce";
     static final String CLIENT_NICKNAME = "shared clients";
+    
+    public static final String PROP_THEME_NAME = "routerconsole.theme";
+    public static final String PROP_CSS_DISABLED = "routerconsole.css.disabled";
+    public static final String PROP_JS_DISABLED = "routerconsole.javascript.disabled";
     
     public IndexBean() {
         _context = I2PAppContext.getGlobalContext();
@@ -121,13 +127,13 @@ public class IndexBean {
             return "";
         if ( (_prevNonce != _curNonce) && (!validPassphrase(_passphrase)) )
             return "Invalid nonce, are you being spoofed?";
-        if ("Stop all tunnels".equals(_action)) 
+        if ("Stop all".equals(_action)) 
             return stopAll();
-        else if ("Start all tunnels".equals(_action))
+        else if ("Start all".equals(_action))
             return startAll();
         else if ("Restart all".equals(_action))
             return restartAll();
-        else if ("Reload config".equals(_action))
+        else if ("Reload configuration".equals(_action))
             return reloadConfig();
         else if ("stop".equals(_action))
             return stop();
@@ -213,13 +219,21 @@ public class IndexBean {
                 		"client".equals(c.getType()) 
                 		) && "true".equalsIgnoreCase(c.getSharedClient())) {
                     Properties cOpt = c.getConfig("");
-                    if (_tunnelCount != null) {
-                        cOpt.setProperty("option.inbound.quantity", _tunnelCount);
-                        cOpt.setProperty("option.outbound.quantity", _tunnelCount);
+                    if (_tunnelQuantity != null) {
+                        cOpt.setProperty("option.inbound.quantity", _tunnelQuantity);
+                        cOpt.setProperty("option.outbound.quantity", _tunnelQuantity);
                     }
                     if (_tunnelDepth != null) {
                         cOpt.setProperty("option.inbound.length", _tunnelDepth);
                         cOpt.setProperty("option.outbound.length", _tunnelDepth);
+                    }
+                    if (_tunnelVariance != null) {
+                        cOpt.setProperty("option.inbound.lengthVariance", _tunnelVariance);
+                        cOpt.setProperty("option.outbound.lengthVariance", _tunnelVariance);
+                    }
+                    if (_tunnelBackupQuantity != null) {
+                        cOpt.setProperty("option.inbound.backupQuantity", _tunnelBackupQuantity);
+                        cOpt.setProperty("option.outbound.backupQuantity", _tunnelBackupQuantity);
                     }
                     cOpt.setProperty("option.inbound.nickname", CLIENT_NICKNAME);
                     cOpt.setProperty("option.outbound.nickname", CLIENT_NICKNAME);
@@ -275,6 +289,24 @@ public class IndexBean {
     // The remaining methods are simple bean props for the jsp to query
     ////
     
+    public String getTheme() {
+    	String theme = _context.getProperty(PROP_THEME_NAME);
+    	if (theme != null)
+    		return "/themes/console/" + theme + "/";
+    	else
+    		return "/themes/console/";
+    }
+
+    public boolean allowCSS() {
+        String css = _context.getProperty(PROP_CSS_DISABLED);
+        return (css == null);
+    }
+    
+    public boolean allowJS() {
+        String js = _context.getProperty(PROP_JS_DISABLED);
+        return (js == null);
+    }
+    
     public int getTunnelCount() {
         if (_group == null) return 0;
         return _group.getControllers().size();
@@ -313,10 +345,10 @@ public class IndexBean {
     }
     
     public String getTypeName(String internalType) {
-        if ("client".equals(internalType)) return "Client proxy";
-        else if ("httpclient".equals(internalType)) return "HTTP proxy";
-        else if ("ircclient".equals(internalType)) return "IRC proxy";
-        else if ("server".equals(internalType)) return "Server";
+        if ("client".equals(internalType)) return "Standard client";
+        else if ("httpclient".equals(internalType)) return "HTTP client";
+        else if ("ircclient".equals(internalType)) return "IRC client";
+        else if ("server".equals(internalType)) return "Standard server";
         else if ("httpserver".equals(internalType)) return "HTTP server";
         else return internalType;
     }
@@ -424,8 +456,16 @@ public class IndexBean {
         _tunnelDepth = (tunnelDepth != null ? tunnelDepth.trim() : null);
     }
     /** how many parallel inbound tunnels to use */
-    public void setTunnelCount(String tunnelCount) { 
-        _tunnelCount = (tunnelCount != null ? tunnelCount.trim() : null);
+    public void setTunnelQuantity(String tunnelQuantity) { 
+        _tunnelQuantity = (tunnelQuantity != null ? tunnelQuantity.trim() : null);
+    }
+    /** how much randomisation to apply to the depth of tunnels */
+    public void setTunnelVariance(String tunnelVariance) { 
+        _tunnelVariance = (tunnelVariance != null ? tunnelVariance.trim() : null);
+    }
+    /** how many tunnels to hold in reserve to guard against failures */
+    public void setTunnelBackupQuantity(String tunnelBackupQuantity) { 
+        _tunnelBackupQuantity = (tunnelBackupQuantity != null ? tunnelBackupQuantity.trim() : null);
     }
     /** what I2P session overrides should be used */
     public void setCustomOptions(String customOptions) { 
@@ -582,6 +622,7 @@ public class IndexBean {
         } else {
             return null;
         }
+
         return config;
     }
     
@@ -611,6 +652,10 @@ public class IndexBean {
                 if ("outbound.length".equals(key)) continue;
                 if ("inbound.quantity".equals(key)) continue;
                 if ("outbound.quantity".equals(key)) continue;
+                if ("inbound.lengthVariance".equals(key)) continue;
+                if ("outbound.lengthVariance".equals(key)) continue;
+                if ("inbound.backupQuantity".equals(key)) continue;
+                if ("outbound.backupQuantity".equals(key)) continue;
                 if ("inbound.nickname".equals(key)) continue;
                 if ("outbound.nickname".equals(key)) continue;
                 if ("i2p.streaming.connectDelay".equals(key)) continue;
@@ -621,13 +666,21 @@ public class IndexBean {
 
         config.setProperty("startOnLoad", _startOnLoad + "");
 
-        if (_tunnelCount != null) {
-            config.setProperty("option.inbound.quantity", _tunnelCount);
-            config.setProperty("option.outbound.quantity", _tunnelCount);
+        if (_tunnelQuantity != null) {
+            config.setProperty("option.inbound.quantity", _tunnelQuantity);
+            config.setProperty("option.outbound.quantity", _tunnelQuantity);
         }
         if (_tunnelDepth != null) {
             config.setProperty("option.inbound.length", _tunnelDepth);
             config.setProperty("option.outbound.length", _tunnelDepth);
+        }
+        if (_tunnelVariance != null) {
+            config.setProperty("option.inbound.lengthVariance", _tunnelVariance);
+            config.setProperty("option.outbound.lengthVariance", _tunnelVariance);
+        }
+        if (_tunnelBackupQuantity != null) {
+            config.setProperty("option.inbound.backupQuantity", _tunnelBackupQuantity);
+            config.setProperty("option.outbound.backupQuantity", _tunnelBackupQuantity);
         }
         if (_connectDelay)
             config.setProperty("option.i2p.streaming.connectDelay", "1000");

@@ -139,23 +139,63 @@ public class EditBean extends IndexBean {
         }
     }
     
-    public int getTunnelCount(int tunnel, int defaultCount) {
+    public int getTunnelQuantity(int tunnel, int defaultQuantity) {
         TunnelController tun = getController(tunnel);
         if (tun != null) {
             Properties opts = getOptions(tun);
             if (opts != null) {
                 String len = opts.getProperty("inbound.quantity");
-                if (len == null) return defaultCount;
+                if (len == null) return defaultQuantity;
                 try {
                     return Integer.parseInt(len);
                 } catch (NumberFormatException nfe) {
-                    return defaultCount;
+                    return defaultQuantity;
                 }
             } else {
-                return defaultCount;
+                return defaultQuantity;
             }
         } else {
-            return defaultCount;
+            return defaultQuantity;
+        }
+    }
+   
+    public int getTunnelBackupQuantity(int tunnel, int defaultBackupQuantity) {
+        TunnelController tun = getController(tunnel);
+        if (tun != null) {
+            Properties opts = getOptions(tun);
+            if (opts != null) {
+                String len = opts.getProperty("inbound.backupQuantity");
+                if (len == null) return defaultBackupQuantity;
+                try {
+                    return Integer.parseInt(len);
+                } catch (NumberFormatException nfe) {
+                    return defaultBackupQuantity;
+                }
+            } else {
+                return defaultBackupQuantity;
+            }
+        } else {
+            return defaultBackupQuantity;
+        }
+    }
+  
+    public int getTunnelVariance(int tunnel, int defaultVariance) {
+        TunnelController tun = getController(tunnel);
+        if (tun != null) {
+            Properties opts = getOptions(tun);
+            if (opts != null) {
+                String len = opts.getProperty("inbound.lengthVariance");
+                if (len == null) return defaultVariance;
+                try {
+                    return Integer.parseInt(len);
+                } catch (NumberFormatException nfe) {
+                    return defaultVariance;
+                }
+            } else {
+                return defaultVariance;
+            }
+        } else {
+            return defaultVariance;
         }
     }
     
@@ -187,6 +227,10 @@ public class EditBean extends IndexBean {
                 String val = opts.getProperty(key);
                 if ("inbound.length".equals(key)) continue;
                 if ("outbound.length".equals(key)) continue;
+                if ("inbound.lengthVariance".equals(key)) continue;
+                if ("outbound.lengthVariance".equals(key)) continue;
+                if ("inbound.backupQuantity".equals(key)) continue;
+                if ("outbound.backupQuantity".equals(key)) continue;
                 if ("inbound.quantity".equals(key)) continue;
                 if ("outbound.quantity".equals(key)) continue;
                 if ("inbound.nickname".equals(key)) continue;

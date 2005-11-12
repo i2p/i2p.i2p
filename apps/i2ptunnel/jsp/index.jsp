@@ -1,185 +1,258 @@
-<%@page contentType="text/html" import="net.i2p.i2ptunnel.web.IndexBean" %>
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<%@page contentType="text/html" import="net.i2p.i2ptunnel.web.IndexBean"%><?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <jsp:useBean class="net.i2p.i2ptunnel.web.IndexBean" id="indexBean" scope="request" />
 <jsp:setProperty name="indexBean" property="*" />
-
-<html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
-<title>I2PTunnel Webmanager</title>
+    <title>I2PTunnel Webmanager - List</title>
+    
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
+    
+    <% if (indexBean.allowCSS()) {
+  %><link href="images/favicon.ico" type="image/x-icon" rel="shortcut icon" />
+    <link href="<%=indexBean.getTheme()%>default.css" rel="stylesheet" type="text/css" /> 
+    <link href="<%=indexBean.getTheme()%>i2ptunnel.css" rel="stylesheet" type="text/css" />
+    <% }
+  %>
 </head>
-<body style="font-family: Verdana, Tahoma, Helvetica, sans-serif;font-size:12px;">
-<table width="90%" align="center" border="0" cellpadding="1" cellspacing="1">
-<tr>
-<td style="background-color:#000">
-<div style="background-color:#ffffed">
-<table width="100%" align="center" border="0" cellpadding="4" cellspacing="1">
-<tr>
-<td nowrap="true"><b>New Messages: </b><br />
-<a href="index.jsp">refresh</a>
-</td>
-<td>
-<textarea rows="3" cols="60" readonly="true"><jsp:getProperty name="indexBean" property="messages" /></textarea>
-</td>
-</tr>
-</table>
-</td>
-</tr>
-</table>
-<br />
-<table width="90%" align="center" border="0" cellpadding="1" cellspacing="1">
-<tr>
-<td style="background-color:#000">
-<div style="background-color:#ffffed">
+<body id="tunnelListPage">
+    <div id="pageHeader">
+    </div>
+    
+    <div id="statusMessagePanel" class="panel">
+        <div class="header">
+            <h4>Status Messages</h4>
+        </div>
 
-<table width="100%" align="center" border="0" cellpadding="4" cellspacing="1">
-<tr>
-<td colspan="7" align="center" valign="middle" style="font-size:14px;">
-<b>Your Client Tunnels:</b><br />
-<hr size="1" />
-</td>
-</tr>
-<tr>
-<td width="15%"><b>Name:</b></td>
-<td><b>Port:</b></td>
-<td><b>Type:</b></td>
-<td><b>Interface:</b></td>
-<td><b>Status:</b></td>
-</tr>
-<% for (int curClient = 0; curClient < indexBean.getTunnelCount(); curClient++) {
-     if (!indexBean.isClient(curClient)) continue; %>
-<tr>
-<td valign="top" align="left">
-<b><a href="edit.jsp?tunnel=<%=curClient%>"><%=indexBean.getTunnelName(curClient) %></a></b></td>
-<td valign="top" align="left" nowrap="true"><%=indexBean.getClientPort(curClient) %></td>
-<td valign="top" align="left" nowrap="true"><%=indexBean.getTunnelType(curClient) %></td>
-<td valign="top" align="left" nowrap="true"><%=indexBean.getClientInterface(curClient) %></td>
-<td valign="top" align="left" nowrap="true"><%
- switch (indexBean.getTunnelStatus(curClient)) {
-     case IndexBean.STARTING:
-%><b><span style="color:#339933">Starting...</span></b>
-<a href="index.jsp?nonce=<%=indexBean.getNextNonce()%>&action=stop&tunnel=<%=curClient%>">[STOP]</a><%
-         break;
-     case IndexBean.RUNNING:
-%><b><span style="color:#00dd00">Running</span></b>
-<a href="index.jsp?nonce=<%=indexBean.getNextNonce()%>&action=stop&tunnel=<%=curClient%>">[STOP]</a><%
-         break;
-     case IndexBean.NOT_RUNNING:
-%><b><span style="color:#dd0000">Not Running</span></b>
-<a href="index.jsp?nonce=<%=indexBean.getNextNonce()%>&action=start&tunnel=<%=curClient%>">[START]</a><%
-         break;
-    }
-%></td>
-</tr>
-<tr><td align="right" valign="top">Destination:</td>
-    <td colspan="4"><input align="left" size="40" valign="top" style="overflow: hidden" readonly="true" value="<%=indexBean.getClientDestination(curClient) %>" /></td></tr>
-<tr>
-  <td valign="top" align="right">Description:</td>
-  <td valign="top" align="left" colspan="4"><%=indexBean.getTunnelDescription(curClient) %></td>
-</tr>
-<% } %>
-</table>
-</td>
-</tr>
-</table>
-<br />
+        <div class="separator">
+            <hr />
+        </div>
 
-<table width="90%" align="center" border="0" cellpadding="1" cellspacing="1">
-<tr>
-<td style="background-color:#000">
-<div style="background-color:#ffffed">
-<table width="100%" align="center" border="0" cellpadding="4" cellspacing="1">
-<tr>
-<td colspan="5" align="center" valign="middle" style="font-size:14px;">
-<b>Your Server Tunnels:</b><br />
-<hr size="1" />
-</td>
-</tr>
-<tr>
-<td width="15%"><b>Name: </b>
-</td>
-<td>
-<b>Points at:</b>
-</td>
-<td>
-<b>Status:</b>
-</td>
-</tr>
+        <textarea id="statusMessages" rows="3" cols="60" readonly="readonly"><jsp:getProperty name="indexBean" property="messages" /></textarea>
 
-<% for (int curServer = 0; curServer < indexBean.getTunnelCount(); curServer++) {
-     if (indexBean.isClient(curServer)) continue; %>
+        <div class="separator">
+            <hr />
+        </div>
 
-<tr>
-<td valign="top">
-<b><a href="edit.jsp?tunnel=<%=curServer%>"><%=indexBean.getTunnelName(curServer)%></a></b>
-</td>
-<td valign="top"><%=indexBean.getServerTarget(curServer)%></td>
-<td valign="top" nowrap="true"><%
- switch (indexBean.getTunnelStatus(curServer)) {
-     case IndexBean.RUNNING:
-%><b><span style="color:#00dd00">Running</span></b>
-<a href="index.jsp?nonce=<%=indexBean.getNextNonce()%>&action=stop&tunnel=<%=curServer%>">[STOP]</a><%
-         if ("httpserver".equals(indexBean.getInternalType(curServer))) { 
-%> (<a href="http://<%=(new java.util.Random()).nextLong()%>.i2p/?i2paddresshelper=<%=indexBean.getDestinationBase64(curServer)%>">preview</a>)<%
-         }
-         break;
-     case IndexBean.NOT_RUNNING:
-%><b><span style="color:#dd0000">Not Running</span></b>
-<a href="index.jsp?nonce=<%=indexBean.getNextNonce()%>&action=start&tunnel=<%=curServer%>">[START]</a><%
-         break;
-     case IndexBean.STARTING:
-%>
-<b><span style="color:#339933">Starting...</span></b>
-<a href="index.jsp?nonce=<%=indexBean.getNextNonce()%>&action=stop&tunnel=<%=curServer%>">[STOP]</a><%
-        break;
-    }
-%>
-</td>
-</tr>
-<tr><td valign="top" align="right">Description:</td>
-    <td valign="top" align="left" colspan="2"><%=indexBean.getTunnelDescription(curServer)%></td></tr>
-<% } %>
+        <div class="footer">
+            <div class="toolbox">
+                <a class="control" href="index.jsp">Refresh</a>
+            </div>
+        </div>    
+    </div>
 
-</table>
-</td>
-</tr>
-</table>
-<br />
-<table width="90%" align="center" border="0" cellpadding="1" cellspacing="1">
-<tr>
-<td style="background-color:#000">
-<div style="background-color:#ffffed">
-<table width="100%" align="center" border="0" cellpadding="4" cellspacing="1">
-<tr>
-<td colspan="2" align="center" valign="middle">
-<b>Operations Menu - Please chose from below!</b><br /><br />
-</td>
-</tr>
-<tr>
-<form action="index.jsp" method="GET">
-<td >
-<input type="hidden" name="nonce" value="<%=indexBean.getNextNonce()%>" />
-<input type="submit" name="action" value="Stop all tunnels" />
-<input type="submit" name="action" value="Start all tunnels" />
-<input type="submit" name="action" value="Restart all" />
-<input type="submit" name="action" value="Reload config" />
-</td>
-</form>
-<form action="edit.jsp">
-<td >
-<b>Add new:</b> 
-<select name="type">
-  <option value="httpclient">HTTP proxy</option>
-  <option value="ircclient">IRC proxy</option>
-  <option value="client">Client tunnel</option>
-  <option value="server">Server tunnel</option>
-   <option value="httpserver">HTTP server tunnel</option>
-</select> <input type="submit" value="Create" />
-</td>
-</form>
-</tr>
-</table>
-</td>
-</tr>
-</table>
+    <div id="localClientTunnelList" class="panel">
+        <div class="header">
+            <h4>Local Client Tunnels</h4>
+        </div>
+
+        <div class="separator">
+            <hr />
+        </div>
+        
+        <div class="nameHeaderField rowItem">
+            <label>Name:</label>
+        </div>
+        <div class="portHeaderField rowItem">
+            <label>Port:</label>
+        </div>
+        <div class="typeHeaderField rowItem">
+            <label>Type:</label>
+        </div>
+        <div class="interfaceHeaderField rowItem">
+            <label>Interface:</label>
+        </div>
+        <div class="statusHeaderField rowItem">
+            <label>Status:</label>
+        </div>
+
+        <div class="separator">
+            <hr />
+        </div>
+        <%
+        for (int curClient = 0; curClient < indexBean.getTunnelCount(); curClient++) {
+            if (!indexBean.isClient(curClient)) continue;
+      %>
+        <div class="nameField rowItem">
+            <label>Name:</label>
+            <span class="text"><a href="edit.jsp?tunnel=<%=curClient%>" title="Edit Tunnel Settings for <%=indexBean.getTunnelName(curClient)%>"><%=indexBean.getTunnelName(curClient)%></a></span>
+        </div>
+        <div class="portField rowItem">
+            <label>Port:</label>
+            <span class="text"><%=indexBean.getClientPort(curClient)%></span>
+        </div>
+        <div class="typeField rowItem">
+            <label>Type:</label>
+            <span class="text"><%=indexBean.getTunnelType(curClient)%></span>
+        </div>
+        <div class="interfaceField rowItem">
+            <label>Interface:</label>
+            <span class="text"><%=indexBean.getClientInterface(curClient)%></span>
+        </div>
+        <div class="statusField rowItem">
+            <label>Status:</label>
+            <%
+            switch (indexBean.getTunnelStatus(curClient)) {
+                case IndexBean.STARTING:
+          %><div class="statusStarting text">Starting...</div>
+            <a class="control" title="Stop this Tunnel" href="index.jsp?nonce=<%=indexBean.getNextNonce()%>&amp;action=stop&amp;tunnel=<%=curClient%>">Stop</a>
+        <%
+                break;
+                case IndexBean.RUNNING:
+          %><div class="statusRunning text">Running</div>
+            <a class="control" title="Stop this Tunnel" href="index.jsp?nonce=<%=indexBean.getNextNonce()%>&amp;action=stop&amp;tunnel=<%=curClient%>">Stop</a>
+        <%
+                break;
+                case IndexBean.NOT_RUNNING:
+          %><div class="statusNotRunning text">Stopped</div>
+            <a class="control" title="Start this Tunnel" href="index.jsp?nonce=<%=indexBean.getNextNonce()%>&amp;action=start&amp;tunnel=<%=curClient%>">Start</a>
+        <%
+                break;
+            }
+      %></div>
+
+        <div class="destinationField rowItem">
+            <label>Destination:</label>
+            <input class="freetext" size="40" readonly="readonly" value="<%=indexBean.getClientDestination(curClient)%>" />
+        </div>
+
+        <div class="descriptionField rowItem">
+            <label>Description:</label>
+            <div class="text"><%=indexBean.getTunnelDescription(curClient)%></div>
+        </div>
+
+        <div class="subdivider">
+            <hr />
+        </div>
+        <%
+        }
+      %>            
+        <div class="separator">
+            <hr />
+        </div>
+    
+        <div class="footer">
+            <form id="addNewClientTunnelForm" action="edit.jsp">
+                <div class="toolbox">
+                    <label>Add new client tunnel:</label>
+                    <select name="type">
+                        <option value="client">Standard</option>
+                        <option value="httpclient">HTTP</option>
+                    </select>
+                    <input class="control" type="submit" value="Create" />
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="localServerTunnelList" class="panel">
+        <div class="header">
+            <h4>Local Server Tunnels</h4>
+        </div>
+
+        <div class="separator">
+            <hr />
+        </div>
+
+        <div class="nameHeaderField rowItem">
+            <label>Name:</label>
+        </div>
+        <div class="targetHeaderField rowItem">
+            <label>Points at:</label>
+        </div>
+        <div class="previewHeaderField rowItem">
+            <label>Preview:</label>
+        </div>
+        <div class="statusHeaderField rowItem">
+            <label>Status:</label>
+        </div>
+        
+        <%
+        for (int curServer = 0; curServer < indexBean.getTunnelCount(); curServer++) {
+            if (indexBean.isClient(curServer)) continue;
+            
+      %>
+        <div class="nameField rowItem">
+            <label>Name:</label>
+            <span class="text"><a href="edit.jsp?tunnel=<%=curServer%>" title="Edit Server Tunnel Settings for <%=indexBean.getTunnelName(curServer)%>"><%=indexBean.getTunnelName(curServer)%></a></span>
+        </div>
+        <div class="targetField rowItem">
+            <label>Points at:</label>
+            <span class="text"><%=indexBean.getServerTarget(curServer)%></span>
+        </div>
+        <div class="previewField rowItem">
+            <%
+            if ("httpserver".equals(indexBean.getInternalType(curServer)) && indexBean.getTunnelStatus(curServer) == IndexBean.RUNNING) {
+          %><label>Preview:</label>    
+            <a class="control" title="Preview this Tunnel" href="http://<%=(new java.util.Random()).nextLong()%>.i2p/?i2paddresshelper=<%=indexBean.getDestinationBase64(curServer)%>" target="_new">Preview</a>     
+        <%
+            } else {
+          %><span class="comment">No Preview</span>
+        <%
+            }
+      %></div>
+        <div class="statusField rowItem">
+            <label>Status:</label>
+            <%
+            switch (indexBean.getTunnelStatus(curServer)) {
+                case IndexBean.STARTING:
+          %><div class="statusStarting text">Starting...</div>    
+            <a class="control" title="Stop this Tunnel" href="index.jsp?nonce=<%=indexBean.getNextNonce()%>&amp;action=stop&amp;tunnel=<%=curServer%>">Stop</a>
+        <%
+                break;
+                case IndexBean.RUNNING:
+          %><div class="statusRunning text">Running</div>    
+            <a class="control" title="Stop this Tunnel" href="index.jsp?nonce=<%=indexBean.getNextNonce()%>&amp;action=stop&amp;tunnel=<%=curServer%>">Stop</a>
+        <%
+                break;
+                case IndexBean.NOT_RUNNING:
+          %><div class="statusNotRunning text">Stopped</div>    
+            <a class="control" title="Start this Tunnel" href="index.jsp?nonce=<%=indexBean.getNextNonce()%>&amp;action=start&amp;tunnel=<%=curServer%>">Start</a>
+        <%
+                break;
+            }
+      %></div>
+
+        <div class="descriptionField rowItem">
+            <label>Description:</label>
+            <div class="text"><%=indexBean.getTunnelDescription(curServer)%></div>
+        </div>
+
+        <div class="subdivider">
+            <hr />
+        </div>
+        <%
+        }
+      %>
+        <div class="separator">
+            <hr />
+        </div>
+           
+        <div class="footer">
+            <form id="addNewServerTunnelForm" action="edit.jsp"> 
+            <div class="toolbox">
+                    <label>Add new server tunnel:</label>
+                    <select name="type">
+                        <option value="server">Standard</option>
+                        <option value="httpserver">HTTP</option>
+                    </select>
+                    <input class="control" type="submit" value="Create" />
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="globalOperationsPanel" class="panel">
+        <div class="header"></div>
+        <div class="footer">
+            <div class="toolbox">
+                <a class="control" href="index.jsp?nonce=<%=indexBean.getNextNonce()%>&amp;action=Stop%20all">Stop All</a><a class="control" href="index.jsp?nonce=<%=indexBean.getNextNonce()%>&amp;action=Start%20all">Start All</a><a class="control" href="index.jsp?nonce=<%=indexBean.getNextNonce()%>&amp;action=Restart%20all">Restart All</a><a class="control" href="index.jsp?nonce=<%=indexBean.getNextNonce()%>&amp;action=Reload%20configuration">Reload Config</a>
+            </div>
+        </div> 
+    </div>
+    
+    <div id="pageFooter">
+    </div>
 </body>
 </html>
