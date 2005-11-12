@@ -139,6 +139,7 @@
                     <select name="type">
                         <option value="client">Standard</option>
                         <option value="httpclient">HTTP</option>
+                        <option value="ircclient">IRC</option>
                     </select>
                     <input class="control" type="submit" value="Create" />
                 </div>
