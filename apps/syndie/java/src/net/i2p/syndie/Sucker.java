@@ -13,7 +13,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Properties;
 
 import com.sun.syndication.feed.synd.SyndCategory;
 import com.sun.syndication.feed.synd.SyndContent;
@@ -26,7 +25,6 @@ import com.sun.syndication.io.XmlReader;
 import net.i2p.I2PAppContext;
 import net.i2p.data.Base64;
 import net.i2p.data.DataFormatException;
-import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
 import net.i2p.syndie.data.BlogURI;
 import net.i2p.util.EepGet;
@@ -428,23 +426,22 @@ public class Sucker {
     private String htmlToSml(String html) {
 
         String sml="";
-        int i;
+        int i=0;
 
         pendingEndLink=false;
 
-        for(i=0;i<html.length();)
+        while(i<html.length())
         {
             char c=html.charAt(i);
-            if(c=='<')
-            {
+            switch(c) {
+            case '<':
                 //log("html: "+html.substring(i));
                 
                 int tagLen = findTagLen(html.substring(i));
                 if(tagLen<=0) {
                     // did not find anything that looks like tag, treat it like text
                     sml+="&lt;";
-                    i++;
-                    continue;
+                    break;
                 }
                 //
                 String htmlTag = html.substring(i,i+tagLen);
@@ -456,22 +453,30 @@ public class Sucker {
                     sml+=smlTag;
                     i+=tagLen;
                     sml+=" "; 
-                } else {
-                    // Unrecognized tag, treat it as text
-                    sml+="&lt;";
-                    i++;
                     continue;
                 }
+                // Unrecognized tag, treat it as text
+                sml+="&lt;";
+                break;
+            case '\r':
+                if(!stripNewlines)
+                    sml+='\r';
+                break;
+            case '\n':
+                if(!stripNewlines)
+                    sml+='\n';
+                break;
+            case '[':
+                sml+="&#91;";
+                break;
+            case ']':
+                sml+="&#93;";
+                break;
+            default:
+                sml+=c;
+                break;
             }
-            else
-            {
-                if( !stripNewlines || (c!='\r' && c!='\n')) {
-                    sml+=c;
-                    if(c=='[' || c==']')
-                        sml+=c;
-                }
-                i++;
-            }
+            i++;
         }
         
         return sml;
@@ -484,8 +489,10 @@ public class Sucker {
                 "td",
                 "th",
                 "div",
-                "input"
+                "input",
+                "ul"
         };
+        htmlTag = htmlTag.replaceAll("\\[","&#91;").replaceAll("\\]","&#93;");
         String ret="";
         String htmlTagLowerCase=htmlTag.toLowerCase();
 
@@ -575,10 +582,22 @@ public class Sucker {
             return "[i]";
         if("</em>".equals(htmlTagLowerCase))
             return "[/i]";
+        if("<strong>".equals(htmlTagLowerCase))
+            return "[b]";
+        if("</strong>".equals(htmlTagLowerCase))
+            return "[/b]";
         if(htmlTagLowerCase.startsWith("<br")) {
             stripNewlines=true;
             return "\n";
         }
+        if("<p>".equals(htmlTagLowerCase))
+            return "\n\n";
+        if("</p>".equals(htmlTagLowerCase))
+            return "";
+        if("<li>".equals(htmlTagLowerCase))
+            return "\n * ";
+        if("</li>".equals(htmlTagLowerCase))
+            return "";
         if("</br>".equals(htmlTagLowerCase))
             return "";
         if(htmlTagLowerCase.startsWith("<table") || "</table>".equals(htmlTagLowerCase)) // emulate table with hr
