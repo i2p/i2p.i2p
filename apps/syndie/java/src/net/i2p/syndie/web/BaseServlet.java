@@ -60,6 +60,8 @@ public abstract class BaseServlet extends HttpServlet {
         
         req.getSession().setAttribute("user", user);
         
+        handleAdmin(user, req);
+        
         forceNewIndex = handleAddressbook(user, req) || forceNewIndex;
         forceNewIndex = handleBookmarking(user, req) || forceNewIndex;
         handleUpdateProfile(user, req);
@@ -346,6 +348,31 @@ public abstract class BaseServlet extends HttpServlet {
         }
     }
     
+    private void handleAdmin(User user, HttpServletRequest req) throws IOException {
+        if (BlogManager.instance().authorizeRemote(user)) {
+            String action = req.getParameter("action");
+            if ( (action != null) && ("Save config".equals(action)) ) {
+                boolean wantSingle = !empty(req, "singleuser");
+                String defaultUser = req.getParameter("defaultUser");
+                String defaultPass = req.getParameter("defaultPass");
+                String regPass = req.getParameter("regpass");
+                String remotePass = req.getParameter("remotepass");
+                String proxyHost = req.getParameter("proxyhost");
+                String proxyPort = req.getParameter("proxyport");
+                
+                // default user cannot be empty, but the rest can be blank
+                if ( (!empty(defaultUser)) && (defaultPass != null) && (regPass != null) && (remotePass != null) && 
+                     (proxyHost != null) && (proxyPort != null) ) {
+                    int port = 4444;
+                    try { port = Integer.parseInt(proxyPort); } catch (NumberFormatException nfe) {}
+                    BlogManager.instance().configure(regPass, remotePass, null, null, proxyHost, port, wantSingle, 
+                                                     null, defaultUser, defaultPass);
+                }
+            }
+        }
+    }
+        
+    
     protected void render(User user, HttpServletRequest req, PrintWriter out, ThreadIndex index) throws ServletException, IOException {
         Archive archive = BlogManager.instance().getArchive();
         int numThreads = 10;
@@ -375,7 +402,7 @@ public abstract class BaseServlet extends HttpServlet {
     }
     
     protected void renderBegin(User user, HttpServletRequest req, PrintWriter out, ThreadIndex index) throws IOException {
-        out.write(BEGIN_HTML);
+        out.write("<html>\n<head><title>" + getTitle() + "</title>\n" + BEGIN_HTML);
     }
     protected void renderNavBar(User user, HttpServletRequest req, PrintWriter out, ThreadIndex index) throws IOException {
         //out.write("<tr class=\"topNav\"><td class=\"topNav_user\" colspan=\"2\" nowrap=\"true\">\n");
@@ -770,10 +797,7 @@ public abstract class BaseServlet extends HttpServlet {
         }
     }
     
-    private static final String BEGIN_HTML = "<html>\n" +
-"<head>\n" +
-"<title>Syndie</title>\n" +
-"<style>\n" +
+    private static final String BEGIN_HTML = "<style>\n" +
 ".overallTable {\n" +
 "	border-spacing: 0px;\n" +
 "	border-width: 0px;\n" +
@@ -855,6 +879,8 @@ public abstract class BaseServlet extends HttpServlet {
     private static final String END_HTML = "</table>\n" +
 "</body>\n";
    
+    protected String getTitle() { return "Syndie"; }
+    
     protected static class TreeRenderState {
         private int _rowsWritten;
         private int _rowsSkipped;

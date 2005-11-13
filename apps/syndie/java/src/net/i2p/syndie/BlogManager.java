@@ -452,7 +452,7 @@ public class BlogManager {
             login = DEFAULT_LOGIN;
         return login;
     }
-    private String getDefaultPass() {
+    public String getDefaultPass() {
         String pass = _context.getProperty(PROP_DEFAULT_PASS);
         if ( (pass == null) || (pass.trim().length() <= 0) )
             pass = DEFAULT_PASS;
