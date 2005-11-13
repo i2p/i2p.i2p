@@ -60,6 +60,7 @@ public abstract class BaseServlet extends HttpServlet {
         
         req.getSession().setAttribute("user", user);
         
+        forceNewIndex = handleAddressbook(user, req) || forceNewIndex;
         forceNewIndex = handleBookmarking(user, req) || forceNewIndex;
         handleUpdateProfile(user, req);
         
@@ -146,6 +147,123 @@ public abstract class BaseServlet extends HttpServlet {
         }
         
         return rv;
+    }
+    
+    private boolean handleAddressbook(User user, HttpServletRequest req) {
+        if ( (!user.getAuthenticated()) || (empty(AddressesServlet.PARAM_ACTION)) ) {
+            return false;
+        }
+        
+        String action = req.getParameter(AddressesServlet.PARAM_ACTION);
+        
+        if ( (AddressesServlet.ACTION_ADD_ARCHIVE.equals(action)) || 
+             (AddressesServlet.ACTION_ADD_BLOG.equals(action)) ||
+             (AddressesServlet.ACTION_ADD_EEPSITE.equals(action)) || 
+             (AddressesServlet.ACTION_ADD_OTHER.equals(action)) ||
+             (AddressesServlet.ACTION_ADD_PEER.equals(action)) ) {
+            PetName pn = buildNewAddress(req);
+            if ( (pn != null) && (pn.getName() != null) && (pn.getLocation() != null) && 
+                 (!user.getPetNameDB().containsName(pn.getName())) ) {
+                user.getPetNameDB().add(pn);
+                BlogManager.instance().saveUser(user);
+                
+                updateSyndication(user, pn.getLocation(), !empty(req, AddressesServlet.PARAM_SYNDICATE));
+                
+                if (pn.isMember(FilteredThreadIndex.GROUP_FAVORITE) ||
+                    pn.isMember(FilteredThreadIndex.GROUP_IGNORE))
+                    return true;
+                else
+                    return false;
+            } else {
+                // not valid, ignore
+                return false;
+            }
+        } else if ( (AddressesServlet.ACTION_UPDATE_ARCHIVE.equals(action)) || 
+             (AddressesServlet.ACTION_UPDATE_BLOG.equals(action)) ||
+             (AddressesServlet.ACTION_UPDATE_EEPSITE.equals(action)) || 
+             (AddressesServlet.ACTION_UPDATE_OTHER.equals(action)) ||
+             (AddressesServlet.ACTION_UPDATE_PEER.equals(action)) ) {
+            return updateAddress(user, req);
+        } else if ( (AddressesServlet.ACTION_DELETE_ARCHIVE.equals(action)) || 
+             (AddressesServlet.ACTION_DELETE_BLOG.equals(action)) ||
+             (AddressesServlet.ACTION_DELETE_EEPSITE.equals(action)) || 
+             (AddressesServlet.ACTION_DELETE_OTHER.equals(action)) ||
+             (AddressesServlet.ACTION_DELETE_PEER.equals(action)) ) {
+            PetName pn = user.getPetNameDB().getByName(req.getParameter(AddressesServlet.PARAM_NAME));
+            if (pn != null) {
+                user.getPetNameDB().remove(pn);
+                BlogManager.instance().saveUser(user);
+                updateSyndication(user, pn.getLocation(), false);
+                if (pn.isMember(FilteredThreadIndex.GROUP_FAVORITE) ||
+                    pn.isMember(FilteredThreadIndex.GROUP_IGNORE))
+                    return true;
+                else
+                    return false;
+            } else {
+                return false;
+            }
+        } else {
+            // not an addressbook op
+            return false;
+        }
+    }
+    
+    private boolean updateAddress(User user, HttpServletRequest req) {
+        PetName pn = user.getPetNameDB().getByName(req.getParameter(AddressesServlet.PARAM_NAME));
+        if (pn != null) {
+            boolean wasIgnored = pn.isMember(FilteredThreadIndex.GROUP_IGNORE);
+            boolean wasFavorite = pn.isMember(FilteredThreadIndex.GROUP_FAVORITE);
+            
+            pn.setIsPublic(!empty(req, AddressesServlet.PARAM_IS_PUBLIC));
+            pn.setLocation(req.getParameter(AddressesServlet.PARAM_LOC));
+            pn.setNetwork(req.getParameter(AddressesServlet.PARAM_NET));
+            pn.setProtocol(req.getParameter(AddressesServlet.PARAM_PROTO));
+            if (empty(req, AddressesServlet.PARAM_FAVORITE))
+                pn.removeGroup(FilteredThreadIndex.GROUP_FAVORITE);
+            else
+                pn.addGroup(FilteredThreadIndex.GROUP_FAVORITE);
+            if (empty(req, AddressesServlet.PARAM_IGNORE))
+                pn.removeGroup(FilteredThreadIndex.GROUP_IGNORE);
+            else
+                pn.addGroup(FilteredThreadIndex.GROUP_IGNORE);
+            
+            BlogManager.instance().saveUser(user);
+            
+            if (AddressesServlet.PROTO_ARCHIVE.equals(pn.getProtocol()))
+                updateSyndication(user, pn.getLocation(), !empty(req, AddressesServlet.PARAM_SYNDICATE));
+            
+            return (wasIgnored != pn.isMember(FilteredThreadIndex.GROUP_IGNORE)) ||
+                   (wasFavorite != pn.isMember(FilteredThreadIndex.GROUP_IGNORE));
+        } else {
+            return false;
+        }
+    }
+    
+    protected void updateSyndication(User user, String loc, boolean shouldAutomate) {
+        if (BlogManager.instance().authorizeRemote(user)) {
+            if (shouldAutomate)
+                BlogManager.instance().scheduleSyndication(loc);
+            else
+                BlogManager.instance().unscheduleSyndication(loc);
+        }
+    }
+    
+    protected PetName buildNewAddress(HttpServletRequest req) {
+        PetName pn = new PetName();
+        pn.setName(req.getParameter(AddressesServlet.PARAM_NAME));
+        pn.setIsPublic(!empty(req, AddressesServlet.PARAM_IS_PUBLIC));
+        pn.setLocation(req.getParameter(AddressesServlet.PARAM_LOC));
+        pn.setNetwork(req.getParameter(AddressesServlet.PARAM_NET));
+        pn.setProtocol(req.getParameter(AddressesServlet.PARAM_PROTO));
+        if (empty(req, AddressesServlet.PARAM_FAVORITE))
+            pn.removeGroup(FilteredThreadIndex.GROUP_FAVORITE);
+        else
+            pn.addGroup(FilteredThreadIndex.GROUP_FAVORITE);
+        if (empty(req, AddressesServlet.PARAM_IGNORE))
+            pn.removeGroup(FilteredThreadIndex.GROUP_IGNORE);
+        else
+            pn.addGroup(FilteredThreadIndex.GROUP_IGNORE);
+        return pn;
     }
     
     protected void handleUpdateProfile(User user, HttpServletRequest req) {
@@ -261,6 +379,7 @@ public abstract class BaseServlet extends HttpServlet {
             out.write("</a>\n");
             out.write("(<a href=\"switchuser.jsp\" title=\"Log in as another user\">switch</a>)\n");
             out.write("<a href=\"post.jsp\" title=\"Post a new thread\">Post a new thread</a>\n");
+            out.write("<a href=\"addresses.jsp\" title=\"View your addressbook\">Addressbook</a>\n");
         } else {
             out.write("<form action=\"" + req.getRequestURI() + "\" method=\"GET\">\n");
             out.write("Login: <input type=\"text\" name=\"login\" />\n");
@@ -270,11 +389,20 @@ public abstract class BaseServlet extends HttpServlet {
         //out.write("</td><td class=\"topNav_admin\">\n");
         out.write("</span><span class=\"topNav_admin\">\n");
         if (BlogManager.instance().authorizeRemote(user)) {
-            out.write("<a href=\"syndicate.jsp\" title=\"Syndicate data between other Syndie nodes\">Syndicate</a>\n");
+            out.write("<a href=\"" + getSyndicateLink(user, null) + "\" title=\"Syndicate data between other Syndie nodes\">Syndicate</a>\n");
             out.write("<a href=\"importfeed.jsp\" title=\"Import RSS/Atom data\">Import RSS/Atom</a>\n");
             out.write("<a href=\"admin.jsp\" title=\"Configure this Syndie node\">Admin</a>\n");
         }
         out.write("</span><!-- nav bar end -->\n</td></tr>\n");
+    }
+    
+    protected String getSyndicateLink(User user, String archiveName) { 
+        if ( (user != null) && (archiveName != null) ) {
+            PetName pn = user.getPetNameDB().getByName(archiveName);
+            if (pn != null)
+                return "syndicate.jsp?" + ThreadedHTMLRenderer.PARAM_ARCHIVE + "=" + pn.getLocation();
+        }
+        return "syndicate.jsp";
     }
     
     protected static final ArrayList SKIP_TAGS = new ArrayList();
@@ -317,7 +445,7 @@ public abstract class BaseServlet extends HttpServlet {
                 out.write("<input type=\"hidden\" name=\"" + param + "\" value=\"" + val + "\" />\n");
             }
         }
-        out.write("<tr class=\"controlBar\"><td colspan=\"2\">\n");
+        out.write("<tr class=\"controlBar\"><td colspan=\"2\" width=\"99%\">\n");
         out.write("<!-- control bar begin -->\n");
         out.write("Filter: <select name=\"" + ThreadedHTMLRenderer.PARAM_AUTHOR + "\">\n");
         
@@ -346,7 +474,7 @@ public abstract class BaseServlet extends HttpServlet {
         out.write("Tags: <input type=\"text\" name=\"" + ThreadedHTMLRenderer.PARAM_TAGS + "\" size=\"10\" value=\"" + tags + "\" />\n");
 
         out.write("<input type=\"submit\" name=\"action\" value=\"Go\" />\n");
-        out.write("</td><td class=\"controlBarRight\"><a href=\"#threads\" title=\"Jump to the thread navigation\">Threads</a></td>\n");
+        out.write("</td><td class=\"controlBarRight\" width=\"1%\"><a href=\"#threads\" title=\"Jump to the thread navigation\">Threads</a></td>\n");
         out.write("<!-- control bar end -->\n");
         out.write("</tr>\n");
         out.write("</form>\n");

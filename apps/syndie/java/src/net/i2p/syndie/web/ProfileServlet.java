@@ -135,22 +135,22 @@ public class ProfileServlet extends BaseServlet {
             out.write("<tr><td colspan=\"3\">Currently ignored - threads they create are hidden.</td></tr>\n");
             String remIgnore = getRemoveFromGroupLink(user, pn.getName(), FilteredThreadIndex.GROUP_IGNORE, 
                                                       baseURI, "", "", "", "", "", author.toBase64());
-            out.write("<tr><td></td><td colspan=\"2\"><a href=\"" + remIgnore + "\">Unignore " + pn.getName() + "</a></td></tr>\n");
+            out.write("<tr><td colspan=\"3\"><a href=\"" + remIgnore + "\">Unignore " + pn.getName() + "</a></td></tr>\n");
             String remCompletely = getRemoveFromGroupLink(user, pn.getName(), "", 
                                                           baseURI, "", "", "", "", "", author.toBase64());
-            out.write("<tr><td></td><td colspan=\"2\"><a href=\"" + remCompletely + "\">Forget about " + pn.getName() + " entirely</a></td></tr>\n");
+            out.write("<tr><td colspan=\"3\"><a href=\"" + remCompletely + "\">Forget about " + pn.getName() + " entirely</a></td></tr>\n");
         } else if (pn.isMember(FilteredThreadIndex.GROUP_FAVORITE)) {
             out.write("<tr><td colspan=\"3\">Currently marked as a favorite author - threads they participate in " +
                        "are highlighted.</td></tr>\n");
             String remIgnore = getRemoveFromGroupLink(user, pn.getName(), FilteredThreadIndex.GROUP_FAVORITE, 
                                                       baseURI, "", "", "", "", "", author.toBase64());
-            out.write("<tr><td></td><td colspan=\"2\"><a href=\"" + remIgnore + "\">Remove " + pn.getName() + " from the list of favorite authors</a></td></tr>\n");
+            out.write("<tr><td colspan=\"3\"><a href=\"" + remIgnore + "\">Remove " + pn.getName() + " from the list of favorite authors</a></td></tr>\n");
             String addIgnore = getAddToGroupLink(user, author, FilteredThreadIndex.GROUP_IGNORE, 
                                                  baseURI, "", "", "", "", "", author.toBase64());
-            out.write("<tr><td></td><td colspan=\"2\"><a href=\"" + addIgnore + "\" title=\"Threads by ignored authors are hidden from view\">Ignore the author</a></td></tr>");
+            out.write("<tr><td colspan=\"3\"><a href=\"" + addIgnore + "\" title=\"Threads by ignored authors are hidden from view\">Ignore the author</a></td></tr>");
             String remCompletely = getRemoveFromGroupLink(user, pn.getName(), "", 
                                                           baseURI, "", "", "", "", "", author.toBase64());
-            out.write("<tr><td></td><td colspan=\"2\"><a href=\"" + remCompletely + "\">Forget about " + pn.getName() + " entirely</a></td></tr>\n");
+            out.write("<tr><td colspan=\"3\"><a href=\"" + remCompletely + "\">Forget about " + pn.getName() + " entirely</a></td></tr>\n");
         } else {
             out.write("<tr><td colspan=\"3\">Currently bookmarked.  Add them to your ");
             String addFav = getAddToGroupLink(user, author, FilteredThreadIndex.GROUP_FAVORITE, 
@@ -161,7 +161,7 @@ public class ProfileServlet extends BaseServlet {
             out.write("<a href=\"" + addIgnore + "\" title=\"Threads by ignored authors are hidden from view\">ignored</a> list</td></tr>");
             String remCompletely = getRemoveFromGroupLink(user, pn.getName(), "", 
                                                           baseURI, "", "", "", "", "", author.toBase64());
-            out.write("<tr><td></td><td colspan=\"2\"><a href=\"" + remCompletely + "\">Forget about " + pn.getName() + " entirely</a></td></tr>\n");
+            out.write("<tr><td colspan=\"3\"><a href=\"" + remCompletely + "\">Forget about " + pn.getName() + " entirely</a></td></tr>\n");
         }
         
         if (info != null) {

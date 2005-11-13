@@ -25,6 +25,16 @@
     </servlet>
      
     <servlet>
+     <servlet-name>net.i2p.syndie.web.SwitchServlet</servlet-name>
+     <servlet-class>net.i2p.syndie.web.SwitchServlet</servlet-class>
+    </servlet>
+     
+    <servlet>
+     <servlet-name>net.i2p.syndie.web.AddressesServlet</servlet-name>
+     <servlet-class>net.i2p.syndie.web.AddressesServlet</servlet-class>
+    </servlet>
+     
+    <servlet>
 	 <servlet-name>net.i2p.syndie.UpdaterServlet</servlet-name>
 	 <servlet-class>net.i2p.syndie.UpdaterServlet</servlet-class>
          <load-on-startup>1</load-on-startup>
@@ -53,6 +63,14 @@
     <servlet-mapping> 
       <servlet-name>net.i2p.syndie.web.ProfileServlet</servlet-name>
       <url-pattern>/profile.jsp</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping> 
+      <servlet-name>net.i2p.syndie.web.SwitchServlet</servlet-name>
+      <url-pattern>/switchuser.jsp</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping> 
+      <servlet-name>net.i2p.syndie.web.AddressesServlet</servlet-name>
+      <url-pattern>/addresses.jsp</url-pattern>
     </servlet-mapping>
     
     <session-config>

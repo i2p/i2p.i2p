@@ -44,6 +44,8 @@ public class ThreadedHTMLRenderer extends HTMLRenderer {
     public static final String PARAM_PROFILE_DESC = "profileDesc";
     public static final String PARAM_PROFILE_URL = "profileURL";
     public static final String PARAM_PROFILE_OTHER = "profileOther";
+
+    public static final String PARAM_ARCHIVE = "archiveLocation";
     
     public static String getFilterByTagLink(String uri, ThreadNode node, User user, String tag, String author) { 
         StringBuffer buf = new StringBuffer(64);
