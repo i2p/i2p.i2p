@@ -386,7 +386,7 @@ public abstract class BaseServlet extends HttpServlet {
             out.write(user.getUsername());
             out.write("</a>\n");
             out.write("(<a href=\"switchuser.jsp\" title=\"Log in as another user\">switch</a>)\n");
-            out.write("<a href=\"post.jsp\" title=\"Post a new thread\">Post a new thread</a>\n");
+            out.write("<a href=\"" + getPostURI() + "\" title=\"Post a new thread\">Post a new thread</a>\n");
             out.write("<a href=\"addresses.jsp\" title=\"View your addressbook\">Addressbook</a>\n");
         } else {
             out.write("<form action=\"" + req.getRequestURI() + "\" method=\"GET\">\n");
@@ -429,6 +429,7 @@ public abstract class BaseServlet extends HttpServlet {
     
     private static final String CONTROL_TARGET = "threads.jsp";
     protected String getControlTarget() { return CONTROL_TARGET; }
+    protected String getPostURI() { return "post.jsp"; }
     
     protected void renderControlBar(User user, HttpServletRequest req, PrintWriter out, ThreadIndex index) throws IOException {
         out.write("<form action=\"");

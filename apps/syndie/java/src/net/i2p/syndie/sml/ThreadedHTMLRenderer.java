@@ -229,23 +229,25 @@ public class ThreadedHTMLRenderer extends HTMLRenderer {
                  (refuseReplies == null) || (!Boolean.valueOf(refuseReplies).booleanValue()) ) {
                 out.write("<!-- body reply begin -->\n");
                 out.write("<form action=\"post.jsp\" method=\"POST\" enctype=\"multipart/form-data\">\n");
-                out.write("<input type=\"hidden\" name=\"inReplyTo\" value=\"");
+                out.write("<input type=\"hidden\" name=\"" + PostServlet.PARAM_PARENT + "\" value=\"");
                 out.write(Base64.encode(post.toString()));
                 out.write("\" />");
-                out.write("<input type=\"hidden\" name=\"entrysubject\" value=\"re: ");
+                out.write("<input type=\"hidden\" name=\"" + PostServlet.PARAM_SUBJECT + "\" value=\"");
+                if (subject.indexOf("re: ") == -1)
+                    out.write("re: ");
                 out.write(HTMLRenderer.sanitizeTagParam(subject));
                 out.write("\" />");
                 out.write("<tr class=\"postReply\">\n");
-                out.write("<td colspan=\"3\">Reply: (<a href=\"smlref.jsp\" title=\"SML cheatsheet\">SML reference</a>)</td>\n</tr>\n");
+                out.write("<td colspan=\"3\">Reply: (<a href=\"smlref.jsp\" title=\"SML cheatsheet\" target=\"_blank\">SML reference</a>)</td>\n</tr>\n");
                 out.write("<tr class=\"postReplyText\">\n");
-                out.write("<td colspan=\"3\"><textarea name=\"entrytext\" rows=\"2\" cols=\"100\"></textarea></td>\n");
+                out.write("<td colspan=\"3\"><textarea name=\"" + PostServlet.PARAM_TEXT + "\" rows=\"2\" cols=\"100\"></textarea></td>\n");
                 out.write("</tr>\n");
                 out.write("<tr class=\"postReplyOptions\">\n");
                 out.write(" <td colspan=\"3\">\n");
                 out.write(" <input type=\"submit\" value=\"Preview...\" name=\"Post\" />\n");
-                out.write(" Tags: <input type=\"text\" size=\"10\" name=\"entrytags\" />\n");
-                out.write(" in a new thread? <input type=\"checkbox\" name=\"replyInNewThread\" />\n");
-                out.write(" allow replies? <input type=\"checkbox\" name=\"allowReplies\" checked=\"true\" />\n");
+                out.write(" Tags: <input type=\"text\" size=\"10\" name=\"" + PostServlet.PARAM_TAGS + "\" />\n");
+                out.write(" in a new thread? <input type=\"checkbox\" name=\"" + PostServlet.PARAM_IN_NEW_THREAD + "\" value=\"true\" />\n");
+                out.write(" refuse replies? <input type=\"checkbox\" name=\"" + PostServlet.PARAM_REFUSE_REPLIES + "\" value=\"true\" />\n");
                 out.write(" attachment: <input type=\"file\" name=\"entryfile0\" />\n");
                 out.write(" </td>\n</tr>\n</form>\n");
                 out.write("<!-- body reply end -->\n");

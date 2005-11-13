@@ -1017,7 +1017,7 @@ public class HTMLRenderer extends EventReceiverImpl {
         if (asReply && _entry != null) {
             StringBuffer rv = new StringBuffer(128);
             rv.append("post.jsp?").append(ArchiveViewerBean.PARAM_BLOG).append("=").append(Base64.encode(blog.getData()));
-            rv.append('&').append(ArchiveViewerBean.PARAM_IN_REPLY_TO).append('=');
+            rv.append('&').append(PostServlet.PARAM_PARENT).append('=');
             rv.append(Base64.encode("entry://" + _entry.getURI().getKeyHash().toBase64() + "/" + _entry.getURI().getEntryId()));
             if (subject != null)
                 rv.append('&').append(ArchiveViewerBean.PARAM_SUBJECT).append('=').append(Base64.encode(subject));
