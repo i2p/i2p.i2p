@@ -127,6 +127,22 @@ public class User {
         init(); 
     }
     
+    public boolean changePassword(String oldPass, String pass0, String pass1) {
+        String curPass = _hashedPassword;
+        Hash curPassHash = _context.sha().calculateHash(DataHelper.getUTF8(oldPass));
+        Hash newPassHash = _context.sha().calculateHash(DataHelper.getUTF8(pass0));
+        if (curPassHash.toBase64().equals(curPass)) {
+            if ( (pass0 != null) && (pass1 != null) && (pass0.equals(pass1)) ) {
+                _hashedPassword = newPassHash.toBase64();
+                return true;
+            } else {
+                return false;
+            }
+        } else {
+            return false;
+        }
+    }
+
     public String login(String login, String pass, Properties props) {
         _username = login;
         load(props);
