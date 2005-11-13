@@ -87,6 +87,16 @@ public class ProfileServlet extends BaseServlet {
         }
         out.write("</textarea></td></tr>\n");
 
+        if (user.getAuthenticated()) {
+            if ( (user.getUsername() == null) || (user.getUsername().equals(BlogManager.instance().getDefaultLogin())) ) {
+                // this is the default user, don't let them change the password
+            } else {
+                out.write("<tr><td colspan=\"3\">Old Password: <input type=\"password\" name=\"oldPassword\" /></td></tr>\n");
+                out.write("<tr><td colspan=\"3\">Password: <input type=\"password\" name=\"password\" /></td></tr>\n");
+                out.write("<tr><td colspan=\"3\">Password again: <input type=\"password\" name=\"passwordConfirm\" /></td></tr>\n");
+            }
+        }
+        
         out.write("<tr><td colspan=\"3\"><input type=\"submit\" name=\"action\" value=\"Update profile\" /></td></tr>\n");
         out.write("</form>\n");
     }

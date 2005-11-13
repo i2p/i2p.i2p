@@ -319,6 +319,14 @@ public abstract class BaseServlet extends HttpServlet {
             }
         }
         
+        String pass0 = req.getParameter("password");
+        String pass1 = req.getParameter("passwordConfirm");
+        String oldPass = req.getParameter("oldPassword");
+        
+        if ( (pass0 != null) && (pass1 != null) && (pass0.equals(pass1)) ) {
+            BlogManager.instance().changePasswrd(user, oldPass, pass0, pass1);
+        }
+        
         boolean updated = BlogManager.instance().updateMetadata(user, user.getBlog(), opts);
     }
     

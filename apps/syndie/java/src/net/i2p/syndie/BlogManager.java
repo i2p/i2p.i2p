@@ -284,6 +284,14 @@ public class BlogManager {
         }
     }
     
+    public boolean changePasswrd(User user, String oldPass, String pass0, String pass1) {
+        boolean ok = user.changePassword(oldPass, pass0, pass1);
+        if (ok)
+            saveUser(user);
+        return ok;
+    }
+
+    
     public User login(String login, String pass) {
         User u = new User(_context);
         String ok = login(u, login, pass);
@@ -438,7 +446,7 @@ public class BlogManager {
     private static final String PROP_DEFAULT_LOGIN = "syndie.defaultSingleUserLogin";
     private static final String PROP_DEFAULT_PASS = "syndie.defaultSingleUserPass";
     
-    private String getDefaultLogin() {
+    public String getDefaultLogin() {
         String login = _context.getProperty(PROP_DEFAULT_LOGIN);
         if ( (login == null) || (login.trim().length() <= 0) )
             login = DEFAULT_LOGIN;
