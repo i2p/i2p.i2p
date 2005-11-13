@@ -17,6 +17,7 @@ import net.i2p.util.Log;
 public class ThreadedHTMLRenderer extends HTMLRenderer {
     private Log _log;
     private String _baseURI;
+    private boolean _inlineReply;
     
     public ThreadedHTMLRenderer(I2PAppContext ctx) {
         super(ctx);
@@ -118,8 +119,11 @@ public class ThreadedHTMLRenderer extends HTMLRenderer {
     
     private static final boolean empty(String val) { return (val == null) || (val.trim().length() <= 0); }
     
+    /**
+     * @param replyHiddenFields HTML of hidden input fields necessary for the reply form to be honored
+     */
     public void render(User user, Writer out, Archive archive, BlogURI post, 
-                       boolean inlineReply, ThreadIndex index, String baseURI,
+                       boolean inlineReply, ThreadIndex index, String baseURI, String replyHiddenFields,
                        String offset, String requestTags, String filteredAuthor) throws IOException {
         EntryContainer entry = archive.getEntry(post);
         if (entry == null) return;
@@ -131,6 +135,7 @@ public class ThreadedHTMLRenderer extends HTMLRenderer {
         _archive = archive;
         _cutBody = false;
         _showImages = true;
+        _inlineReply = inlineReply;
         _headers = new HashMap();
         _bodyBuffer = new StringBuffer(1024);
         _postBodyBuffer = new StringBuffer(1024);
@@ -192,6 +197,30 @@ public class ThreadedHTMLRenderer extends HTMLRenderer {
         out.write("\n<a href=\"");
         out.write(getViewPostLink(baseURI, node, user, true, offset, requestTags, filteredAuthor));
         out.write("\" title=\"Select a shareable link directly to this post\">permalink</a>\n");
+
+
+        if (!inlineReply) {
+            String refuseReply = (String)_headers.get(HEADER_REFUSE_REPLIES);
+            boolean allowReply = false;
+            if ( (refuseReply != null) && (Boolean.valueOf(refuseReply).booleanValue()) ) {
+                if (_entry == null ) 
+                    allowReply = false;
+                else if ( (_user == null) || (_user.getBlog() == null) )
+                    allowReply = false;
+                else if (_entry.getURI().getKeyHash().equals(_user.getBlog()))
+                    allowReply = true;
+                else
+                    allowReply = false;
+            } else {
+                allowReply = true;
+            }
+            if (allowReply && (_entry != null) ) {
+                out.write("<a href=\"post.jsp?");
+                out.write(PostServlet.PARAM_PARENT + '=' + 
+                          Base64.encode(_entry.getURI().getKeyHash().toBase64() + '/' + _entry.getURI().getEntryId()));
+                out.write("\" title=\"Reply to the current post\" >Reply</a><br />\n");
+            }
+        }
         
         out.write("</td>\n</tr>\n");
         out.write("<!-- body meta end -->\n");
@@ -229,6 +258,7 @@ public class ThreadedHTMLRenderer extends HTMLRenderer {
                  (refuseReplies == null) || (!Boolean.valueOf(refuseReplies).booleanValue()) ) {
                 out.write("<!-- body reply begin -->\n");
                 out.write("<form action=\"post.jsp\" method=\"POST\" enctype=\"multipart/form-data\">\n");
+                out.write(replyHiddenFields);
                 out.write("<input type=\"hidden\" name=\"" + PostServlet.PARAM_PARENT + "\" value=\"");
                 out.write(Base64.encode(post.toString()));
                 out.write("\" />");

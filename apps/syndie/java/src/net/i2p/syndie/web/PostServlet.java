@@ -60,6 +60,13 @@ public class PostServlet extends BaseServlet {
     }
     
     private void previewPostedData(User user, HttpServletRequest rawRequest, Archive archive, String contentType, PostBean post, PrintWriter out) throws IOException {
+        MultiPartRequest req = new MultiPartRequest(rawRequest);
+        
+        if (!authAction(req.getString(PARAM_AUTH_ACTION))) {
+            out.write("<tr><td colspan=\"3\"><span class=\"b_postMsgErro\">Invalid form submission... stale data?</span></td></tr>");
+            return;
+        }
+        
         // not confirmed but they posted stuff... gobble up what they give
         // and display it as a prview (then we show the confirm form
         
@@ -67,8 +74,6 @@ public class PostServlet extends BaseServlet {
         
         post.reinitialize();
         post.setUser(user);
-        
-        MultiPartRequest req = new MultiPartRequest(rawRequest);
         
         boolean inNewThread = getInNewThread(req.getString(PARAM_IN_NEW_THREAD));
         boolean refuseReplies = getRefuseReplies(req.getString(PARAM_REFUSE_REPLIES));
@@ -86,8 +91,8 @@ public class PostServlet extends BaseServlet {
         if ( (replyTo != null) && (replyTo.trim().length() > 0) ) {
           byte r[] = Base64.decode(replyTo);
           if (r != null) {
-            if (entryHeaders == null) entryHeaders = HTMLRenderer.HEADER_IN_REPLY_TO + ": " + new String(r, "UTF-8");
-            else entryHeaders = entryHeaders + '\n' + HTMLRenderer.HEADER_IN_REPLY_TO + ": " + new String(r, "UTF-8");
+            if (entryHeaders == null) entryHeaders = HTMLRenderer.HEADER_IN_REPLY_TO + ": entry://" + new String(r, "UTF-8");
+            else entryHeaders = entryHeaders + '\n' + HTMLRenderer.HEADER_IN_REPLY_TO + ": entry://" + new String(r, "UTF-8");
           } else {
             replyTo = null;
           }
@@ -137,6 +142,7 @@ public class PostServlet extends BaseServlet {
 
         post.renderPreview(out);
         out.write("<hr /><span class=\"b_postConfirm\"><form action=\"" + getPostURI() + "\" method=\"POST\">\n");
+        writeAuthActionFields(out);
         out.write("Please confirm that the above is ok");
         if (BlogManager.instance().authorizeRemote(user)) { 
             out.write(", and select what additional archives you want the post transmitted to.");
@@ -166,6 +172,10 @@ public class PostServlet extends BaseServlet {
     }
     
     private void postEntry(User user, HttpServletRequest req, Archive archive, PostBean post, PrintWriter out) throws IOException {
+        if (!authAction(req)) {
+            out.write("<tr><td colspan=\"3\"><span class=\"b_postMsgErro\">Invalid form submission... stale data?</span></td></tr>");
+            return;
+        }
         String remArchive = req.getParameter(PARAM_REMOTE_ARCHIVE);
         post.setArchive(remArchive);
         BlogURI uri = post.postEntry(); 
@@ -185,6 +195,7 @@ public class PostServlet extends BaseServlet {
         post.setUser(user);
         
         out.write("<form action=\"" + getPostURI() + "\" method=\"POST\" enctype=\"multipart/form-data\">\n");
+        writeAuthActionFields(out);
         out.write("<tr><td colspan=\"3\">\n");
         out.write("<span class=\"b_postField\">Post subject:</span> ");
         out.write("<input type=\"text\" class=\"b_postSubject\" size=\"80\" name=\"" + PARAM_SUBJECT 
@@ -203,7 +214,7 @@ public class PostServlet extends BaseServlet {
         
         String parentURI = req.getParameter(PARAM_PARENT);
         if ( (parentURI != null) && (parentURI.trim().length() > 0) )
-            out.write("<input type=\"hidden\" name=\"" + PARAM_PARENT + " value=\"" + parentURI + "\" />\n");
+            out.write("<input type=\"hidden\" name=\"" + PARAM_PARENT + "\" value=\"" + parentURI + "\" />\n");
 
         out.write(" Tags: <input type=\"text\" size=\"10\" name=\"" + PARAM_TAGS + "\" value=\"" + getParam(req, PARAM_TAGS) + "\" />\n");
         
@@ -223,7 +234,8 @@ public class PostServlet extends BaseServlet {
         
         if (parentURI != null) {
             out.write("<hr /><span id=\"parentText\" class=\"b_postParent\">");
-            post.renderReplyPreview(out, DataHelper.getUTF8(Base64.decode(parentURI)));
+            String decoded = DataHelper.getUTF8(Base64.decode(parentURI));
+            post.renderReplyPreview(out, "entry://" + decoded);
             out.write("</span><hr/>\n");
         } 
         
@@ -273,4 +285,5 @@ public class PostServlet extends BaseServlet {
         + "<span class=\"b_postField\">Attachment 2:</span> <input class=\"b_postField\" type=\"file\" name=\"entryfile2\" /><br />"
         + "<span class=\"b_postField\">Attachment 3:</span> <input class=\"b_postField\" type=\"file\" name=\"entryfile3\" /><br />\n";
 
+    protected String getTitle() { return "Syndie :: Post new content"; }
 }

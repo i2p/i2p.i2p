@@ -96,6 +96,7 @@ public class AddressesServlet extends BaseServlet {
             out.write("<form action=\"" + baseURI + "\" method=\"POST\">");
             out.write("<input type=\"hidden\" name=\"" + PARAM_PROTO + "\" value=\"" + PROTO_BLOG + "\" />");
             out.write("<input type=\"hidden\" name=\"" + PARAM_NET + "\" value=\"" + NET_SYNDIE + "\" />");
+            writeAuthActionFields(out);
             out.write("<tr><td colspan=\"3\">");
             out.write("<input type=\"checkbox\" name=\"" + PARAM_IS_PUBLIC + "\" value=\"true\" " + (pn.getIsPublic() ? " checked=\"true\" " : "") + " />\n");
             out.write("Name: <input type=\"hidden\" name=\"" + PARAM_NAME + "\" value=\"" + pn.getName() + "\" />" + pn.getName() + " ");
@@ -120,6 +121,7 @@ public class AddressesServlet extends BaseServlet {
         }
         
         out.write("<form action=\"" + baseURI + "\" method=\"POST\">");
+        writeAuthActionFields(out);
         out.write("<input type=\"hidden\" name=\"" + PARAM_PROTO + "\" value=\"" + PROTO_BLOG + "\" />");
         out.write("<input type=\"hidden\" name=\"" + PARAM_NET + "\" value=\"" + NET_SYNDIE + "\" />");
         out.write("<tr><td colspan=\"3\">");
@@ -156,6 +158,7 @@ public class AddressesServlet extends BaseServlet {
         for (Iterator iter = names.iterator(); iter.hasNext(); ) {
             PetName pn = db.getByName((String)iter.next());
             out.write("<form action=\"" + baseURI + "\" method=\"POST\">");
+            writeAuthActionFields(out);
             out.write("<input type=\"hidden\" name=\"" + PARAM_PROTO + "\" value=\"" + PROTO_ARCHIVE + "\" />");
             out.write("<input type=\"hidden\" name=\"" + PARAM_NET + "\" value=\"" + NET_SYNDIE + "\" />");
             out.write("<tr><td colspan=\"3\">");
@@ -177,6 +180,7 @@ public class AddressesServlet extends BaseServlet {
         }
 
         out.write("<form action=\"" + baseURI + "\" method=\"POST\">");
+        writeAuthActionFields(out);
         out.write("<input type=\"hidden\" name=\"" + PARAM_PROTO + "\" value=\"" + PROTO_ARCHIVE + "\" />");
         out.write("<input type=\"hidden\" name=\"" + PARAM_NET + "\" value=\"" + NET_SYNDIE + "\" />");
         out.write("<tr><td colspan=\"3\">");
@@ -208,6 +212,7 @@ public class AddressesServlet extends BaseServlet {
         for (Iterator iter = names.iterator(); iter.hasNext(); ) {
             PetName pn = db.getByName((String)iter.next());
             out.write("<form action=\"" + baseURI + "\" method=\"POST\">");
+            writeAuthActionFields(out);
             out.write("<input type=\"hidden\" name=\"" + PARAM_PROTO + "\" value=\"" + PROTO_I2PHEX + "\" />");
             out.write("<input type=\"hidden\" name=\"" + PARAM_NET + "\" value=\"" + NET_I2P + "\" />");
             out.write("<tr><td colspan=\"3\">");
@@ -222,6 +227,7 @@ public class AddressesServlet extends BaseServlet {
         }
         
         out.write("<form action=\"" + baseURI + "\" method=\"POST\">");
+        writeAuthActionFields(out);
         out.write("<input type=\"hidden\" name=\"" + PARAM_PROTO + "\" value=\"" + PROTO_I2PHEX + "\" />");
         out.write("<input type=\"hidden\" name=\"" + PARAM_NET + "\" value=\"" + NET_I2P + "\" />");
         out.write("<tr><td colspan=\"3\">");
@@ -248,6 +254,7 @@ public class AddressesServlet extends BaseServlet {
         for (Iterator iter = names.iterator(); iter.hasNext(); ) {
             PetName pn = db.getByName((String)iter.next());
             out.write("<form action=\"" + baseURI + "\" method=\"POST\">");
+            writeAuthActionFields(out);
             out.write("<input type=\"hidden\" name=\"" + PARAM_PROTO + "\" value=\"" + PROTO_EEPSITE + "\" />");
             out.write("<input type=\"hidden\" name=\"" + PARAM_NET + "\" value=\"" + NET_I2P + "\" />");
             out.write("<tr><td colspan=\"3\">");
@@ -262,6 +269,7 @@ public class AddressesServlet extends BaseServlet {
         }
         
         out.write("<form action=\"" + baseURI + "\" method=\"POST\">");
+        writeAuthActionFields(out);
         out.write("<input type=\"hidden\" name=\"" + PARAM_PROTO + "\" value=\"" + PROTO_EEPSITE + "\" />");
         out.write("<input type=\"hidden\" name=\"" + PARAM_NET + "\" value=\"" + NET_I2P + "\" />");
         out.write("<tr><td colspan=\"3\">");
@@ -288,6 +296,7 @@ public class AddressesServlet extends BaseServlet {
         for (Iterator iter = names.iterator(); iter.hasNext(); ) {
             PetName pn = db.getByName((String)iter.next());
             out.write("<form action=\"" + baseURI + "\" method=\"POST\">");
+            writeAuthActionFields(out);
             out.write("<tr><td colspan=\"3\">");
             out.write("<input type=\"checkbox\" name=\"" + PARAM_IS_PUBLIC + "\" value=\"true\" " + (pn.getIsPublic() ? " checked=\"true\" " : "") + " />\n");
             out.write("Network: <input type=\"text\" name=\"" + PARAM_NET + "\" value=\"" + pn.getNetwork() + "\" /> ");
@@ -302,6 +311,7 @@ public class AddressesServlet extends BaseServlet {
         }
         
         out.write("<form action=\"" + baseURI + "\" method=\"POST\">");
+        writeAuthActionFields(out);
         
         out.write("<tr><td colspan=\"3\">");
         out.write("<input type=\"checkbox\" name=\"" + PARAM_IS_PUBLIC + "\" value=\"true\" " + (newName.getIsPublic() ? " checked=\"true\" " : "") + " />\n");
@@ -372,4 +382,6 @@ public class AddressesServlet extends BaseServlet {
             return proto.equals(reqProto);
         }
     }
+    
+    protected String getTitle() { return "Syndie :: Addressbook"; }
 }

@@ -20,6 +20,53 @@ import net.i2p.syndie.sml.*;
  *
  */
 public abstract class BaseServlet extends HttpServlet {
+    protected static final String PARAM_AUTH_ACTION = "syndie.auth";
+    private static long _authNonce;
+    
+    public void init() throws ServletException { 
+        super.init();
+        _authNonce = I2PAppContext.getGlobalContext().random().nextLong();
+    }
+    
+    protected boolean authAction(HttpServletRequest req) {
+        return authAction(req.getParameter(PARAM_AUTH_ACTION));
+    }
+    protected boolean authAction(String auth) {
+        if (auth == null) {
+            return false;
+        } else {
+            try { 
+                boolean rv = (Long.valueOf(auth).longValue() == _authNonce); 
+                return rv;
+            } catch (NumberFormatException nfe) {
+                return false;
+            }
+        }
+    }
+    
+    /**
+     * write out hidden fields for params that need to be tacked onto an http request that updates 
+     * data, to prevent spoofing
+     */
+    protected void writeAuthActionFields(Writer out) throws IOException {
+        out.write("<input type=\"hidden\" name=\"" + PARAM_AUTH_ACTION + "\" value=\"" + _authNonce + "\" />");
+    }
+    protected String getAuthActionFields() throws IOException {
+        return "<input type=\"hidden\" name=\"" + PARAM_AUTH_ACTION + "\" value=\"" + _authNonce + "\" />";
+    }
+    /** 
+     * key=value& of params that need to be tacked onto an http request that updates data, to 
+     * prevent spoofing 
+     */
+    protected String getAuthActionParams() { return PARAM_AUTH_ACTION + '=' + _authNonce + '&'; }
+    /** 
+     * key=value& of params that need to be tacked onto an http request that updates data, to 
+     * prevent spoofing 
+     */
+    protected void addAuthActionParams(StringBuffer buf) { 
+        buf.append(PARAM_AUTH_ACTION).append('=').append(_authNonce).append('&'); 
+    }
+    
     public void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         req.setCharacterEncoding("UTF-8");
         resp.setCharacterEncoding("UTF-8");
@@ -30,12 +77,15 @@ public abstract class BaseServlet extends HttpServlet {
         String pass = req.getParameter("password");
         String action = req.getParameter("action");
         boolean forceNewIndex = false;
+
+        boolean authAction = authAction(req);
         
         if (req.getParameter("regenerateIndex") != null)
             forceNewIndex = true;
 
         User oldUser = user;
-        user = handleRegister(user, req);
+        if (authAction)
+            user = handleRegister(user, req);
         if (oldUser != user)
             forceNewIndex = true;
         
@@ -48,23 +98,25 @@ public abstract class BaseServlet extends HttpServlet {
                 user = BlogManager.instance().getDefaultUser();
             }
             forceNewIndex = true;
-        } else if ("Login".equals(action)) {
+        } else if (authAction && "Login".equals(action)) {
             user = BlogManager.instance().login(login, pass); // ignore failures - user will just be unauthorized
             if (!user.getAuthenticated())
                 user = BlogManager.instance().getDefaultUser();
             forceNewIndex = true;
-        } else if ("Logout".equals(action)) {
+        } else if (authAction && "Logout".equals(action)) {
             user = BlogManager.instance().getDefaultUser();
             forceNewIndex = true;
         }
         
         req.getSession().setAttribute("user", user);
         
-        handleAdmin(user, req);
+        if (authAction) {
+            handleAdmin(user, req);
         
-        forceNewIndex = handleAddressbook(user, req) || forceNewIndex;
-        forceNewIndex = handleBookmarking(user, req) || forceNewIndex;
-        handleUpdateProfile(user, req);
+            forceNewIndex = handleAddressbook(user, req) || forceNewIndex;
+            forceNewIndex = handleBookmarking(user, req) || forceNewIndex;
+            handleUpdateProfile(user, req);
+        }
         
         FilteredThreadIndex index = (FilteredThreadIndex)req.getSession().getAttribute("threadIndex");
         
@@ -677,6 +729,7 @@ public abstract class BaseServlet extends HttpServlet {
         if (!empty(filteredAuthor))
             buf.append(ThreadedHTMLRenderer.PARAM_AUTHOR).append('=').append(filteredAuthor).append('&');
         
+        addAuthActionParams(buf);
         return buf.toString();
     }
     protected String getRemoveFromGroupLink(User user, String name, String group, String uri, String visible,
@@ -703,6 +756,7 @@ public abstract class BaseServlet extends HttpServlet {
         if (!empty(filteredAuthor))
             buf.append(ThreadedHTMLRenderer.PARAM_AUTHOR).append('=').append(filteredAuthor).append('&');
         
+        addAuthActionParams(buf);
         return buf.toString();
     }
     protected String getViewPostLink(HttpServletRequest req, ThreadNode node, User user, boolean isPermalink) {

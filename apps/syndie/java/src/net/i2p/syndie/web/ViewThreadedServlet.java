@@ -40,7 +40,7 @@ public class ViewThreadedServlet extends BaseServlet {
 
         for (int i = 0; i < posts.size(); i++) {
             BlogURI post = (BlogURI)posts.get(i);
-            renderer.render(user, out, archive, post, posts.size() == 1, index, uri, off, tags, author);
+            renderer.render(user, out, archive, post, posts.size() == 1, index, uri, getAuthActionFields(), off, tags, author);
         }
     }
     
@@ -136,7 +136,7 @@ public class ViewThreadedServlet extends BaseServlet {
         int written = 0;
         for (int curRoot = threadOffset; curRoot < numThreads + threadOffset; curRoot++) {
             ThreadNode node = index.getRoot(curRoot);
-            out.write("<!-- thread begin node=" + node + " curRoot=" + curRoot + " threadOffset=" + threadOffset + " -->\n");
+            out.write("<!-- thread begin curRoot=" + curRoot + " threadOffset=" + threadOffset + " -->\n");
             renderThread(user, out, index, archive, req, node, 0, visibleEntry, state);
             out.write("<!-- thread end -->\n");
             written++;
@@ -302,4 +302,5 @@ public class ViewThreadedServlet extends BaseServlet {
             return "&nbsp;"; 
     }
     
+    protected String getTitle() { return "Syndie :: View threads"; }
 }

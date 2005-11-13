@@ -749,6 +749,8 @@ public class BlogManager {
                     int split = line.indexOf('=');
                     int split2 = line.indexOf(':');
                     if ( (split < 0) || ( (split2 > 0) && (split2 < split) ) ) split = split2;
+                    if ( (split < 0) && (split2 < 0) )
+                        continue;
                     String key = line.substring(0,split).trim();
                     String val = line.substring(split+1).trim();
                     raw.append(key).append(": ").append(val).append('\n');

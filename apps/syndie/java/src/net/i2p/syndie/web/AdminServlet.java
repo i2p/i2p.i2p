@@ -31,6 +31,7 @@ public class AdminServlet extends BaseServlet {
     
     private void displayForm(User user, HttpServletRequest req, PrintWriter out) throws IOException {
         out.write("<form action=\"" + req.getRequestURI() + "\" method=\"POST\">\n");
+        writeAuthActionFields(out);
         out.write("<tr><td colspan=\"3\">");
 
         out.write("<em class=\"b_adminField\">Single user?</em> <input type=\"checkbox\" class=\"b_adminField\" name=\"singleuser\" ");
@@ -71,4 +72,6 @@ public class AdminServlet extends BaseServlet {
         out.write("</td></tr>\n");
         out.write("</form>\n");
     }
+   
+    protected String getTitle() { return "Syndie :: Configuration"; }
 }

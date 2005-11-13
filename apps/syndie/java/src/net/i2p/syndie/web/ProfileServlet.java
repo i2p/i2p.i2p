@@ -57,6 +57,7 @@ public class ProfileServlet extends BaseServlet {
         
         out.write("<!-- " + info.toString() + "-->\n");
         out.write("<form action=\"" + baseURI + "\" method=\"POST\">\n");
+        writeAuthActionFields(out);
         // now add the form to update
         out.write("<tr><td colspan=\"3\">Your profile</td></tr>\n");
         out.write("<tr><td colspan=\"3\">Name: <input type=\"text\" name=\"" 
@@ -214,6 +215,8 @@ public class ProfileServlet extends BaseServlet {
             }
         }
     }
+
+    protected String getTitle() { return "Syndie :: View profile"; }
     
     private static final String INVALID_PROFILE = "<tr><td colspan=\"3\">The profile requested is invalid</td></tr>\n";
 }
