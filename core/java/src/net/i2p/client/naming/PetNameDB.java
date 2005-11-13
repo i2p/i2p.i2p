@@ -16,15 +16,28 @@ public class PetNameDB {
         _names = Collections.synchronizedMap(new HashMap());
     }
 
-    public PetName getByName(String name) { return (PetName)_names.get(name.toLowerCase()); }
-    public void add(PetName pn) { _names.put(pn.getName().toLowerCase(), pn); }
+    public PetName getByName(String name) { 
+        if ( (name == null) || (name.length() <= 0) ) return null;
+        return (PetName)_names.get(name.toLowerCase()); 
+    }
+    public void add(PetName pn) { 
+        if ( (pn == null) || (pn.getName() == null) ) return;
+        _names.put(pn.getName().toLowerCase(), pn); 
+    }
     public void clear() { _names.clear(); }
     public boolean contains(PetName pn) { return _names.containsValue(pn); }
-    public boolean containsName(String name) { return _names.containsKey(name.toLowerCase()); }
+    public boolean containsName(String name) { 
+        if ( (name == null) || (name.length() <= 0) ) return false;
+        return _names.containsKey(name.toLowerCase()); 
+    }
     public boolean isEmpty() { return _names.isEmpty(); }
-    public Iterator iterator() { return new LinkedList(_names.values()).iterator(); }
-    public void remove(PetName pn) { _names.values().remove(pn); }
-    public void removeName(String name) { _names.remove(name.toLowerCase()); }
+    public Iterator iterator() { return new ArrayList(_names.values()).iterator(); }
+    public void remove(PetName pn) { 
+        if (pn != null) _names.remove(pn.getName());
+    }
+    public void removeName(String name) { 
+        if (name != null) _names.remove(name.toLowerCase()); 
+    }
     public int size() { return _names.size(); }
     public Set getNames() { return new HashSet(_names.keySet()); }
     public List getGroups() {
