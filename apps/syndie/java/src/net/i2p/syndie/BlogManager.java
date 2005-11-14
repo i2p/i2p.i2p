@@ -364,8 +364,8 @@ public class BlogManager {
         return ( (isSingle != null) && (Boolean.valueOf(isSingle).booleanValue()) );
     }
 
-    public String getDefaultProxyHost() { return _context.getProperty("syndie.defaultProxyHost", ""); }
-    public String getDefaultProxyPort() { return _context.getProperty("syndie.defaultProxyPort", ""); }
+    public String getDefaultProxyHost() { return _context.getProperty("syndie.defaultProxyHost", "localhost"); }
+    public String getDefaultProxyPort() { return _context.getProperty("syndie.defaultProxyPort", "4444"); }
     public String[] getUpdateArchives() { return _context.getProperty("syndie.updateArchives", "").split(","); }
     public boolean getImportAddresses() { return _context.getProperty("syndie.importAddresses", "false").equals("true"); }
     public int getUpdateDelay() { 

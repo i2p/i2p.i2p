@@ -50,6 +50,11 @@
     </servlet>
      
     <servlet>
+     <servlet-name>net.i2p.syndie.web.ImportFeedServlet</servlet-name>
+     <servlet-class>net.i2p.syndie.web.ImportFeedServlet</servlet-class>
+    </servlet>
+     
+    <servlet>
 	 <servlet-name>net.i2p.syndie.UpdaterServlet</servlet-name>
 	 <servlet-class>net.i2p.syndie.UpdaterServlet</servlet-class>
          <load-on-startup>1</load-on-startup>
@@ -98,6 +103,10 @@
     <servlet-mapping> 
       <servlet-name>net.i2p.syndie.web.SyndicateServlet</servlet-name>
       <url-pattern>/syndicate.jsp</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping> 
+      <servlet-name>net.i2p.syndie.web.ImportFeedServlet</servlet-name>
+      <url-pattern>/importfeed.jsp</url-pattern>
     </servlet-mapping>
     
     <session-config>

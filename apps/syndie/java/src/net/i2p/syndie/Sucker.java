@@ -78,8 +78,8 @@ public class Sucker {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        proxyPort="4444";
-        proxyHost="localhost";
+        proxyPort = BlogManager.instance().getDefaultProxyPort();
+        proxyHost = BlogManager.instance().getDefaultProxyHost();
 
         bm = BlogManager.instance();
         Hash blogHash = new Hash();
@@ -171,6 +171,8 @@ public class Sucker {
                 messageNumber=bm.getNextBlogEntry(user);
             }
 
+            _log.debug("message number: " + messageNumber);
+            
             // Create historyFile if missing
             historyFile = new File(historyPath);
             if (!historyFile.exists())
@@ -195,13 +197,19 @@ public class Sucker {
                                     numRetries, fetched.getAbsolutePath(), urlToLoad);
             SuckerFetchListener lsnr = new SuckerFetchListener();
             get.addStatusListener(lsnr);
+            
+            _log.debug("fetching [" + urlToLoad + "] / " + shouldProxy + "/" + proxyHost + "/" + proxyHost);
+            
             get.fetch();
+            _log.debug("fetched: " + get.getNotModified() + "/" + get.getETag());
             boolean ok = lsnr.waitForSuccess();
             if (!ok) {
+                _log.debug("success? " + ok);
                 System.err.println("Unable to retrieve the url after " + numRetries + " tries.");
                 fetched.delete();
                 return;
             }
+            _log.debug("fetched successfully? " + ok);
             if(get.getNotModified()) {
                 debugLog("not modified, saving network bytes from useless fetch");
                 fetched.delete();
@@ -214,6 +222,8 @@ public class Sucker {
 
             List entries = feed.getEntries();
 
+            _log.debug("entries: " + entries.size());
+            
             FileOutputStream hos = new FileOutputStream(historyFile, true);
 
             // Process list backwards to get syndie to display the 
@@ -222,6 +232,9 @@ public class Sucker {
                 SyndEntry e = (SyndEntry) entries.get(i);
                 
                 attachmentCounter=0;
+                
+                if (_log.shouldLog(Log.DEBUG))
+                    _log.debug("Syndicate entry: " + e.getLink());
                 
                 String messageId = convertToSml(e);
                 if (messageId!=null) {
@@ -234,6 +247,8 @@ public class Sucker {
                 FileOutputStream fos = new FileOutputStream(lastIdFile);
                 fos.write(("" + messageNumber).getBytes());
             }
+            
+            _log.debug("done fetching");
         } catch (MalformedURLException e) {
             e.printStackTrace();
         } catch (IllegalArgumentException e) {
