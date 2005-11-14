@@ -45,6 +45,11 @@
     </servlet>
      
     <servlet>
+     <servlet-name>net.i2p.syndie.web.SyndicateServlet</servlet-name>
+     <servlet-class>net.i2p.syndie.web.SyndicateServlet</servlet-class>
+    </servlet>
+     
+    <servlet>
 	 <servlet-name>net.i2p.syndie.UpdaterServlet</servlet-name>
 	 <servlet-class>net.i2p.syndie.UpdaterServlet</servlet-class>
          <load-on-startup>1</load-on-startup>
@@ -89,6 +94,10 @@
     <servlet-mapping> 
       <servlet-name>net.i2p.syndie.web.AdminServlet</servlet-name>
       <url-pattern>/admin.jsp</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping> 
+      <servlet-name>net.i2p.syndie.web.SyndicateServlet</servlet-name>
+      <url-pattern>/syndicate.jsp</url-pattern>
     </servlet-mapping>
     
     <session-config>
