@@ -311,8 +311,8 @@ class PeerTestManager {
                            (from.getPort() == state.getCharliePort()) ) {
                     receiveFromCharlieAsBob(from, state);
                 } else {
-                    if (_log.shouldLog(Log.ERROR))
-                        _log.error("Received from a fourth party as bob!  alice: " + state.getAliceIP() + ", charlie: " + state.getCharlieIP() + ", dave: " + from);
+                    if (_log.shouldLog(Log.WARN))
+                        _log.warn("Received from a fourth party as bob!  alice: " + state.getAliceIP() + ", charlie: " + state.getCharlieIP() + ", dave: " + from);
                 }
             } else if (state.getOurRole() == PeerTestState.CHARLIE) {
                 if ( (testIP == null) || (testPort <= 0) ) {

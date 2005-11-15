@@ -564,12 +564,15 @@ public class OutboundMessageFragments {
         
         if (state != null) {
             int numSends = state.getMaxSends();
-            if (state.getMessage() != null)
-                state.getMessage().timestamp("acked after " + numSends
-                                             + " lastReceived: " 
-                                             + (_context.clock().now() - state.getPeer().getLastReceiveTime())
-                                             + " lastSentFully: " 
-                                             + (_context.clock().now() - state.getPeer().getLastSendFullyTime()));
+            if (state.getMessage() != null) {
+                PeerState peer = state.getPeer();
+                if (peer != null)
+                    state.getMessage().timestamp("acked after " + numSends
+                                                 + " lastReceived: " 
+                                                 + (_context.clock().now() - peer.getLastReceiveTime())
+                                                 + " lastSentFully: " 
+                                                 + (_context.clock().now() - peer.getLastSendFullyTime()));
+            }
                             
             
             if (_log.shouldLog(Log.INFO))
