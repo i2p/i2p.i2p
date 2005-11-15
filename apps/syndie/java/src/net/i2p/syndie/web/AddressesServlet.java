@@ -70,14 +70,19 @@ public class AddressesServlet extends BaseServlet {
             String uri = req.getRequestURI();
             
             PetName pn = buildNewName(req, PROTO_BLOG);
+            _log.debug("pn for protoBlog [" + req.getParameter(PARAM_PROTO) + "]: " + pn);
             renderBlogs(user, db, uri, pn, out);
             pn = buildNewName(req, PROTO_ARCHIVE);
+            _log.debug("pn for protoArchive [" + req.getParameter(PARAM_PROTO) + "]: " + pn);
             renderArchives(user, db, uri, pn, out);
             pn = buildNewName(req, PROTO_I2PHEX);
+            _log.debug("pn for protoPhex [" + req.getParameter(PARAM_PROTO) + "]: " + pn);
             renderI2Phex(user, db, uri, pn, out);
             pn = buildNewName(req, PROTO_EEPSITE);
+            _log.debug("pn for protoEep [" + req.getParameter(PARAM_PROTO) + "]: " + pn);
             renderEepsites(user, db, uri, pn, out);
             pn = buildNewName(req);
+            _log.debug("pn for proto other [" + req.getParameter(PARAM_PROTO) + "]: " + pn);
             renderOther(user, db, uri, pn, out);
         }
     }
@@ -165,14 +170,16 @@ public class AddressesServlet extends BaseServlet {
             out.write("<input type=\"checkbox\" name=\"" + PARAM_IS_PUBLIC + "\" value=\"true\" " + (pn.getIsPublic() ? " checked=\"true\" " : "") + " />\n");
             out.write("Name: <input type=\"hidden\" name=\"" + PARAM_NAME + "\" size=\"10\" value=\"" + pn.getName() + "\" />" + pn.getName() + " ");
             out.write("Location: <input type=\"text\" name=\"" + PARAM_LOC + "\" size=\"20\" value=\"" + pn.getLocation() + "\" /> ");
-            if (BlogManager.instance().syndicationScheduled(pn.getLocation()))
-                out.write("Syndicate? <input type=\"checkbox\" name=\"" + PARAM_SYNDICATE + "\" checked=\"true\" value=\"true\" />");
-            else
-                out.write("Syndicate? <input type=\"checkbox\" name=\"" + PARAM_SYNDICATE + "\" value=\"true\" />");
-            
-            out.write("<a href=\"" + getSyndicateLink(user, pn.getName()) 
-                      + "\" title=\"Synchronize manually with the peer\">Sync manually</a> ");
-            
+            if (BlogManager.instance().authorizeRemote(user)) {
+
+                if (BlogManager.instance().syndicationScheduled(pn.getLocation()))
+                    out.write("Syndicate? <input type=\"checkbox\" name=\"" + PARAM_SYNDICATE + "\" checked=\"true\" value=\"true\" />");
+                else
+                    out.write("Syndicate? <input type=\"checkbox\" name=\"" + PARAM_SYNDICATE + "\" value=\"true\" />");
+
+                out.write("<a href=\"" + getSyndicateLink(user, pn.getLocation()) 
+                          + "\" title=\"Synchronize manually with the peer\">Sync manually</a> ");
+            }
             out.write("<input type=\"submit\" name=\"" + PARAM_ACTION + "\" value=\"" + ACTION_DELETE_ARCHIVE + "\" /> ");
             out.write("<input type=\"submit\" name=\"" + PARAM_ACTION + "\" value=\"" + ACTION_UPDATE_ARCHIVE + "\" /> ");
             out.write("</td></tr>\n");
@@ -187,10 +194,12 @@ public class AddressesServlet extends BaseServlet {
         out.write("<input type=\"checkbox\" name=\"" + PARAM_IS_PUBLIC + "\" value=\"true\" " + (newName.getIsPublic() ? " checked=\"true\" " : "") + " />\n");
         out.write("Name: <input type=\"text\" name=\"" + PARAM_NAME + "\" size=\"10\" value=\"" + newName.getName() + "\" /> ");
         out.write("Location: <input type=\"text\" name=\"" + PARAM_LOC + "\" size=\"20\" value=\"" + newName.getLocation() + "\" /> ");
-        if (BlogManager.instance().syndicationScheduled(newName.getLocation()))
-            out.write("Syndicate? <input type=\"checkbox\" name=\"" + PARAM_SYNDICATE + "\" checked=\"true\" value=\"true\" />");
-        else
-            out.write("Syndicate? <input type=\"checkbox\" name=\"" + PARAM_SYNDICATE + "\" value=\"true\" />");
+        if (BlogManager.instance().authorizeRemote(user)) {
+            if (BlogManager.instance().syndicationScheduled(newName.getLocation()))
+                out.write("Syndicate? <input type=\"checkbox\" name=\"" + PARAM_SYNDICATE + "\" checked=\"true\" value=\"true\" />");
+            else
+                out.write("Syndicate? <input type=\"checkbox\" name=\"" + PARAM_SYNDICATE + "\" value=\"true\" />");
+        }
 
         out.write("<input type=\"submit\" name=\"" + PARAM_ACTION + "\" value=\"" + ACTION_ADD_ARCHIVE + "\" /> ");
         out.write("</td></tr>\n");
@@ -344,7 +353,6 @@ public class AddressesServlet extends BaseServlet {
             return pn;
         } else {
             pn = buildNewAddress(req);
-            pn.setProtocol(protocol);
         }
         return pn;
     }

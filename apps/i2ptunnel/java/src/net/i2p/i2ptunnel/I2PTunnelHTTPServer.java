@@ -10,6 +10,7 @@ import java.net.SocketException;
 import java.util.Iterator;
 import java.util.Properties;
 import java.util.zip.GZIPOutputStream;
+import java.util.zip.Deflater;
 
 import net.i2p.I2PAppContext;
 import net.i2p.I2PException;
@@ -230,8 +231,22 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
         public InternalGZIPOutputStream(OutputStream target) throws IOException {
             super(target);
         }
-        public long getTotalRead() { return super.def.getTotalIn(); }
-        public long getTotalCompressed() { return super.def.getTotalOut(); }
+        public long getTotalRead() { 
+            try {
+                return def.getTotalIn();
+            } catch (Exception e) {
+                // j2se 1.4.2_08 on linux is sometimes throwing an NPE in the getTotalIn() implementation
+                return 0; 
+            }
+        }
+        public long getTotalCompressed() { 
+            try {
+                return def.getTotalOut();
+            } catch (Exception e) {
+                // j2se 1.4.2_08 on linux is sometimes throwing an NPE in the getTotalOut() implementation
+                return 0;
+            }
+        }
     }
 
     private String formatHeaders(Properties headers, StringBuffer command) {

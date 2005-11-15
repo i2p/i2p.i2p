@@ -267,10 +267,34 @@ class HTTPResponseOutputStream extends FilterOutputStream {
         public InternalGZIPInputStream(InputStream in) throws IOException {
             super(in);
         }
-        public long getTotalRead() { return super.inf.getTotalIn(); }
-        public long getTotalExpanded() { return super.inf.getTotalOut(); }
-        public long getRemaining() { return super.inf.getRemaining(); }
-        public boolean getFinished() { return super.inf.finished(); }
+        public long getTotalRead() { 
+            try {
+                return super.inf.getTotalIn(); 
+            } catch (Exception e) { 
+                return 0; 
+            }
+        }
+        public long getTotalExpanded() { 
+            try {
+                return super.inf.getTotalOut(); 
+            } catch (Exception e) {
+                return 0;
+            }
+        }
+        public long getRemaining() { 
+            try {
+                return super.inf.getRemaining(); 
+            } catch (Exception e) {
+                return 0;
+            }
+        }
+        public boolean getFinished() { 
+            try {
+                return super.inf.finished(); 
+            } catch (Exception e) {
+                return true;
+            }
+        }
         public String toString() { 
             return "Read: " + getTotalRead() + " expanded: " + getTotalExpanded() + " remaining: " + getRemaining() + " finished: " + getFinished();
         }

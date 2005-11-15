@@ -314,12 +314,19 @@ public class BlogManager {
             try {
                 Properties props = loadUserProps(userFile);
                 if (props == null) throw new IOException("Error reading " + userFile);
-                return user.login(login, pass, props);
+                String rv = user.login(login, pass, props);
+                if (User.LOGIN_OK.equals(rv))
+                    _log.info("Login successful");
+                else
+                    _log.info("Login failed: [" + rv + "]");
+                return rv;
             } catch (IOException ioe) {
                 _log.error("Error logging in", ioe);
                 return "<span class=\"b_loginMsgErr\">Error logging in - corrupt userfile</span>";
             }
         } else {
+            if (_log.shouldLog(Log.INFO))
+                _log.info("User does not exist");
             return "<span class=\"b_loginMsgErr\">User does not exist</span>";
         }
     }

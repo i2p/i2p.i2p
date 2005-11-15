@@ -408,7 +408,7 @@ public class HTMLRenderer extends EventReceiverImpl {
             }
             if (_user.getAuthenticated()) {
                 _bodyBuffer.append(" <a ").append(getClass("archiveBookmarkLink")).append(" href=\"");
-                _bodyBuffer.append(getBookmarkURL(sanitizeString(name), surl.getLocation(), surl.getSchema(), "syndiearchive"));
+                _bodyBuffer.append(getBookmarkURL(sanitizeString(name), surl.getLocation(), surl.getSchema(), AddressesServlet.PROTO_ARCHIVE));
                 _bodyBuffer.append("\">bookmark it</a>");
             }
         }
@@ -496,13 +496,13 @@ public class HTMLRenderer extends EventReceiverImpl {
                 _log.debug("Receiving address [" + location + "]");
             _bodyBuffer.append("<a ").append(getClass("addrAdd")).append(" href=\"addresses.jsp?");
             if (schema != null)
-                _bodyBuffer.append("network=").append(sanitizeTagParam(schema)).append('&');
+                _bodyBuffer.append(AddressesServlet.PARAM_NET).append('=').append(sanitizeTagParam(schema)).append('&');
             if (name != null)
-                _bodyBuffer.append("name=").append(sanitizeTagParam(name)).append('&');
+                _bodyBuffer.append(AddressesServlet.PARAM_NAME).append('=').append(sanitizeTagParam(name)).append('&');
             if (protocol != null)
-                _bodyBuffer.append("protocol=").append(sanitizeTagParam(protocol)).append('&');
+                _bodyBuffer.append(AddressesServlet.PARAM_PROTO).append('=').append(sanitizeTagParam(protocol)).append('&');
             if (location != null)
-                _bodyBuffer.append("location=").append(sanitizeTagParam(location));
+                _bodyBuffer.append(AddressesServlet.PARAM_LOC).append('=').append(sanitizeTagParam(location));
             _bodyBuffer.append("\">").append(sanitizeString(anchorText)).append("</a>");
         }
     }
@@ -659,13 +659,13 @@ public class HTMLRenderer extends EventReceiverImpl {
                     } else {
                         _postBodyBuffer.append(" <a ").append(getClass("summDetailAddrLink")).append(" href=\"addresses.jsp?");
                         if (a.schema != null)
-                            _postBodyBuffer.append("network=").append(sanitizeTagParam(a.schema)).append('&');
+                            _postBodyBuffer.append(AddressesServlet.PARAM_NET).append('=').append(sanitizeTagParam(a.schema)).append('&');
                         if (a.location != null)
-                            _postBodyBuffer.append("location=").append(sanitizeTagParam(a.location)).append('&');
+                            _postBodyBuffer.append(AddressesServlet.PARAM_LOC).append('=').append(sanitizeTagParam(a.location)).append('&');
                         if (a.name != null)
-                            _postBodyBuffer.append("name=").append(sanitizeTagParam(a.name)).append('&');
+                            _postBodyBuffer.append(AddressesServlet.PARAM_NAME).append('=').append(sanitizeTagParam(a.name)).append('&');
                         if (a.protocol != null)
-                            _postBodyBuffer.append("protocol=").append(sanitizeTagParam(a.protocol)).append('&');
+                            _postBodyBuffer.append(AddressesServlet.PARAM_PROTO).append('=').append(sanitizeTagParam(a.protocol)).append('&');
                         _postBodyBuffer.append("\">").append(sanitizeString(a.name)).append("</a>");
                     }                    
                 }
@@ -682,7 +682,7 @@ public class HTMLRenderer extends EventReceiverImpl {
                         _postBodyBuffer.append(": ").append(getSpan("summDetailArchiveDesc")).append(sanitizeString(a.description)).append("</span>");
                     if (null == _user.getPetNameDB().getByLocation(a.location)) {
                         _postBodyBuffer.append(" <a ").append(getClass("summDetailArchiveBookmark")).append(" href=\"");
-                        _postBodyBuffer.append(getBookmarkURL(a.name, a.location, a.locationSchema, "syndiearchive"));
+                        _postBodyBuffer.append(getBookmarkURL(a.name, a.location, a.locationSchema, AddressesServlet.PROTO_ARCHIVE));
                         _postBodyBuffer.append("\">bookmark it</a>");
                     }
                 }
@@ -1069,15 +1069,15 @@ public class HTMLRenderer extends EventReceiverImpl {
         return buf.toString();
     }
     public String getArchiveURL(Hash blog, SafeURL archiveLocation) {
-        return "remote.jsp?" 
+        return "syndicate.jsp?" 
                //+ "action=Continue..." // should this be the case?
-               + "&schema=" + sanitizeTagParam(archiveLocation.getSchema()) 
-               + "&location=" + sanitizeTagParam(archiveLocation.getLocation());
+               + "&" + SyndicateServlet.PARAM_SCHEMA + "=" + sanitizeTagParam(archiveLocation.getSchema()) 
+               + "&" + SyndicateServlet.PARAM_LOCATION + "=" + sanitizeTagParam(archiveLocation.getLocation());
     }
     public String getBookmarkURL(String name, String location, String schema, String protocol) {
-        return "addresses.jsp?name=" + sanitizeTagParam(name)
-               + "&network=" + sanitizeTagParam(schema)
-               + "&protocol=" + sanitizeTagParam(protocol)
-               + "&location=" + sanitizeTagParam(location);
+        return "addresses.jsp?" + AddressesServlet.PARAM_NAME + '=' + sanitizeTagParam(name)
+               + "&" + AddressesServlet.PARAM_NET + '=' + sanitizeTagParam(schema)
+               + "&" + AddressesServlet.PARAM_PROTO + '=' + sanitizeTagParam(protocol)
+               + "&" + AddressesServlet.PARAM_LOC + '=' + sanitizeTagParam(location);
     }
 }

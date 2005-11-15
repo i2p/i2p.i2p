@@ -8,6 +8,7 @@ import net.i2p.client.naming.PetName;
 import net.i2p.data.*;
 import net.i2p.syndie.*;
 import net.i2p.syndie.data.*;
+import net.i2p.syndie.web.AddressesServlet;
 
 /**
  *
@@ -261,10 +262,10 @@ public class RSSRenderer extends HTMLRenderer {
                     pn = _user.getPetNameDB().getByLocation(a.location);
                 if (pn == null) {
                     StringBuffer url = new StringBuffer(128);
-                    url.append("addresses.jsp?network=");
-                    url.append(sanitizeTagParam(a.schema)).append("&location=");
-                    url.append(sanitizeTagParam(a.location)).append("&name=");
-                    url.append(sanitizeTagParam(a.name)).append("&protocol=");
+                    url.append("addresses.jsp?").append(AddressesServlet.PARAM_NAME).append('=');
+                    url.append(sanitizeTagParam(a.schema)).append("&").append(AddressesServlet.PARAM_LOC).append("=");
+                    url.append(sanitizeTagParam(a.location)).append("&").append(AddressesServlet.PARAM_NAME).append("=");
+                    url.append(sanitizeTagParam(a.name)).append("&").append(AddressesServlet.PARAM_PROTO).append("=");
                     url.append(sanitizeTagParam(a.protocol));
                     out.write("    <enclosure url=\"" + urlPrefix + sanitizeXML(url) + "\" length=\"1\" type=\"text/html\" syndietype=\"address\" />\n");
                 }

@@ -41,6 +41,7 @@ public class User {
     private int _torProxyPort;
     private PetNameDB _petnames;
     private boolean _importAddresses;
+    private boolean _dataImported;
 
     static final String PROP_USERHASH = "__userHash";
 
@@ -87,6 +88,7 @@ public class User {
         _lastMetaEntry = 0;
         _petnames = new PetNameDB();
         _importAddresses = false;
+        _dataImported = false;
     }
     
     public boolean getAuthenticated() { return _authenticated; }
@@ -125,6 +127,13 @@ public class User {
         if (_authenticated)
             BlogManager.instance().saveUser(this);
         init(); 
+    }
+    
+    public void dataImported() { _dataImported = true; }
+    public boolean resetDataImported() { 
+        boolean rv = _dataImported;
+        _dataImported = false;
+        return rv;
     }
     
     public boolean changePassword(String oldPass, String pass0, String pass1) {

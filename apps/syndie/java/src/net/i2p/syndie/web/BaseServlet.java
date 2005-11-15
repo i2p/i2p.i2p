@@ -14,6 +14,7 @@ import net.i2p.data.*;
 import net.i2p.syndie.*;
 import net.i2p.syndie.data.*;
 import net.i2p.syndie.sml.*;
+import net.i2p.util.Log;
 
 /**
  * Base servlet for handling request and rendering the templates
@@ -22,10 +23,14 @@ import net.i2p.syndie.sml.*;
 public abstract class BaseServlet extends HttpServlet {
     protected static final String PARAM_AUTH_ACTION = "syndie.auth";
     private static long _authNonce;
+    private I2PAppContext _context;
+    protected Log _log;
     
     public void init() throws ServletException { 
         super.init();
-        _authNonce = I2PAppContext.getGlobalContext().random().nextLong();
+        _context = I2PAppContext.getGlobalContext();
+        _log = _context.logManager().getLog(getClass());
+        _authNonce = _context.random().nextLong();
     }
     
     protected boolean authAction(HttpServletRequest req) {
@@ -92,18 +97,34 @@ public abstract class BaseServlet extends HttpServlet {
         if (user == null) {
             if ("Login".equals(action)) {
                 user = BlogManager.instance().login(login, pass); // ignore failures - user will just be unauthorized
-                if (!user.getAuthenticated())
+                if (!user.getAuthenticated()) {
                     user = BlogManager.instance().getDefaultUser();
+                    if (_log.shouldLog(Log.INFO))
+                        _log.info("Explicit login failed for [" + login + "], using default login");
+                } else {
+                    if (_log.shouldLog(Log.INFO))
+                        _log.info("Explicit login successful for [" + login + "]");
+                }
             } else {
                 user = BlogManager.instance().getDefaultUser();
+                if (_log.shouldLog(Log.INFO))
+                    _log.info("Implicit login for the default user");
             }
             forceNewIndex = true;
         } else if (authAction && "Login".equals(action)) {
             user = BlogManager.instance().login(login, pass); // ignore failures - user will just be unauthorized
-            if (!user.getAuthenticated())
+            if (!user.getAuthenticated()) {
+                if (_log.shouldLog(Log.INFO))
+                    _log.info("Explicit relogin failed for [" + login + "] from [" + user.getUsername() + "], using default user");
                 user = BlogManager.instance().getDefaultUser();
+            } else {
+                if (_log.shouldLog(Log.INFO))
+                    _log.info("Explicit relogin successful for [" + login + "] from [" + user.getUsername() + "]");
+            }
             forceNewIndex = true;
         } else if (authAction && "Logout".equals(action)) {
+            if (_log.shouldLog(Log.INFO))
+                _log.info("Explicit logout successful for [" + user.getUsername() + "], using default login");
             user = BlogManager.instance().getDefaultUser();
             forceNewIndex = true;
         }
@@ -118,6 +139,13 @@ public abstract class BaseServlet extends HttpServlet {
             handleUpdateProfile(user, req);
         }
         
+        // the 'dataImported' flag is set by successful fetches in the SyndicateServlet/RemoteArchiveBean
+        if (user.resetDataImported()) {
+            forceNewIndex = true;
+            if (_log.shouldLog(Log.INFO))
+                _log.info("Data imported, force regenerate");
+        }
+        
         FilteredThreadIndex index = (FilteredThreadIndex)req.getSession().getAttribute("threadIndex");
         
         Collection tags = getFilteredTags(req);
@@ -125,6 +153,8 @@ public abstract class BaseServlet extends HttpServlet {
         if (forceNewIndex || (index == null) || (!index.getFilteredTags().equals(tags)) || (!index.getFilteredAuthors().equals(filteredAuthors))) {
             index = new FilteredThreadIndex(user, BlogManager.instance().getArchive(), getFilteredTags(req), filteredAuthors);
             req.getSession().setAttribute("threadIndex", index);
+            if (_log.shouldLog(Log.INFO))
+                _log.info("New filtered index created (forced? " + forceNewIndex + ")");
         }
         
         render(user, req, resp.getWriter(), index);
@@ -468,7 +498,8 @@ public abstract class BaseServlet extends HttpServlet {
             out.write("<a href=\"" + getPostURI() + "\" title=\"Post a new thread\">Post a new thread</a>\n");
             out.write("<a href=\"addresses.jsp\" title=\"View your addressbook\">Addressbook</a>\n");
         } else {
-            out.write("<form action=\"" + req.getRequestURI() + "\" method=\"GET\">\n");
+            out.write("<form action=\"" + req.getRequestURI() + "\" method=\"POST\">\n");
+            writeAuthActionFields(out);
             out.write("Login: <input type=\"text\" name=\"login\" />\n");
             out.write("Password: <input type=\"password\" name=\"password\" />\n");
             out.write("<input type=\"submit\" name=\"action\" value=\"Login\" /></form>\n");
@@ -483,12 +514,9 @@ public abstract class BaseServlet extends HttpServlet {
         out.write("</span><!-- nav bar end -->\n</td></tr>\n");
     }
     
-    protected String getSyndicateLink(User user, String archiveName) { 
-        if ( (user != null) && (archiveName != null) ) {
-            PetName pn = user.getPetNameDB().getByName(archiveName);
-            if (pn != null)
-                return "syndicate.jsp?" + ThreadedHTMLRenderer.PARAM_ARCHIVE + "=" + pn.getLocation();
-        }
+    protected String getSyndicateLink(User user, String location) { 
+        if (location != null)
+            return "syndicate.jsp?" + SyndicateServlet.PARAM_LOCATION + "=" + location;
         return "syndicate.jsp";
     }
     

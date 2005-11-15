@@ -131,7 +131,7 @@ public class RemoteArchiveBean {
         
         for (int i = 0; i < urls.size(); i++)
             _statusMessages.add("Scheduling blog post fetching for " + HTMLRenderer.sanitizeString(entries[i]));
-        fetch(urls, tmpFiles, user, new BlogStatusListener());
+        fetch(urls, tmpFiles, user, new BlogStatusListener(user));
     }
     
     public void fetchSelectedBulk(User user, Map parameters) {
@@ -186,7 +186,7 @@ public class RemoteArchiveBean {
                 
                 boolean shouldProxy = (_proxyHost != null) && (_proxyPort > 0);
                 final EepGet get = new EepGet(_context, shouldProxy, _proxyHost, _proxyPort, 0, tmp.getAbsolutePath(), url.toString(), postData.toString());
-                get.addStatusListener(new BulkFetchListener(tmp));
+                get.addStatusListener(new BulkFetchListener(user, tmp));
                 
                 if (shouldBlock) {
                     get.fetch();
@@ -218,7 +218,7 @@ public class RemoteArchiveBean {
                     File t = File.createTempFile("fetchBulk", ".dat", BlogManager.instance().getTempDir());
                     tmpFiles.add(t);
                 }
-                fetch(urls, tmpFiles, user, new BlogStatusListener(), shouldBlock);
+                fetch(urls, tmpFiles, user, new BlogStatusListener(user), shouldBlock);
             } catch (IOException ioe) {
                 _statusMessages.add("Internal error creating temporary file to fetch posts: " + HTMLRenderer.sanitizeString(urls.toString()));
             }
@@ -266,7 +266,7 @@ public class RemoteArchiveBean {
         
         for (int i = 0; i < urls.size(); i++)
             _statusMessages.add("Fetch all entries: " + HTMLRenderer.sanitizeString((String)urls.get(i)));
-        fetch(urls, tmpFiles, user, new BlogStatusListener());
+        fetch(urls, tmpFiles, user, new BlogStatusListener(user));
     }
     
     private void fetch(List urls, List tmpFiles, User user, EepGet.StatusListener lsnr) {
@@ -352,7 +352,7 @@ public class RemoteArchiveBean {
             _archiveFile = file;
         }
         public void attemptFailed(String url, long bytesTransferred, long bytesRemaining, int currentAttempt, int numRetries, Exception cause) {
-            _statusMessages.add("Attempt " + currentAttempt + " failed after " + bytesTransferred + (cause != null ? cause.getMessage() : ""));
+            _statusMessages.add("Attempt " + currentAttempt + " failed after " + bytesTransferred + (cause != null ? " " + cause.getMessage() : ""));
         }
         
         public void bytesTransferred(long alreadyTransferred, int currentWrite, long bytesTransferred, long bytesRemaining, String url) {}
@@ -390,7 +390,7 @@ public class RemoteArchiveBean {
     private class MetadataStatusListener implements EepGet.StatusListener {
         public MetadataStatusListener() {}
         public void attemptFailed(String url, long bytesTransferred, long bytesRemaining, int currentAttempt, int numRetries, Exception cause) {
-            _statusMessages.add("Attempt " + currentAttempt + " failed after " + bytesTransferred + (cause != null ? cause.getMessage() : ""));
+            _statusMessages.add("Attempt " + currentAttempt + " failed after " + bytesTransferred + (cause != null ? " " + cause.getMessage() : ""));
         }
         
         public void bytesTransferred(long alreadyTransferred, int currentWrite, long bytesTransferred, long bytesRemaining, String url) {}
@@ -428,9 +428,12 @@ public class RemoteArchiveBean {
     }
     
     private class BlogStatusListener implements EepGet.StatusListener {
-        public BlogStatusListener() {}
+        private User _user;
+        public BlogStatusListener(User user) {
+            _user = user;
+        }
         public void attemptFailed(String url, long bytesTransferred, long bytesRemaining, int currentAttempt, int numRetries, Exception cause) {
-            _statusMessages.add("Attempt " + currentAttempt + " failed after " + bytesTransferred + (cause != null ? cause.getMessage() : ""));
+            _statusMessages.add("Attempt " + currentAttempt + " failed after " + bytesTransferred + (cause != null ? " " + cause.getMessage() : ""));
         }
         
         public void bytesTransferred(long alreadyTransferred, int currentWrite, long bytesTransferred, long bytesRemaining, String url) {}
@@ -464,6 +467,7 @@ public class RemoteArchiveBean {
                 } else {
                     _statusMessages.add("Blog post " + uri.toString() + " imported");
                     BlogManager.instance().getArchive().regenerateIndex();
+                    _user.dataImported();
                 }
             } catch (IOException ioe) {
                 if (_log.shouldLog(Log.WARN))
@@ -485,11 +489,13 @@ public class RemoteArchiveBean {
      */
     private class BulkFetchListener implements EepGet.StatusListener {
         private File _tmp;
-        public BulkFetchListener(File tmp) {
+        private User _user;
+        public BulkFetchListener(User user, File tmp) {
+            _user = user;
             _tmp = tmp;
         }
         public void attemptFailed(String url, long bytesTransferred, long bytesRemaining, int currentAttempt, int numRetries, Exception cause) {
-            _statusMessages.add("Attempt " + currentAttempt + " failed after " + bytesTransferred + (cause != null ? cause.getMessage() : ""));
+            _statusMessages.add("Attempt " + currentAttempt + " failed after " + bytesTransferred + (cause != null ? " " + cause.getMessage() : ""));
         }
         
         public void bytesTransferred(long alreadyTransferred, int currentWrite, long bytesTransferred, long bytesRemaining, String url) {}
@@ -499,7 +505,7 @@ public class RemoteArchiveBean {
             ZipInputStream zi = null;
             try {
                 zi = new ZipInputStream(new FileInputStream(file));
-                
+                boolean postImported = false;
                 while (true) {
                     ZipEntry entry = zi.getNextEntry();
                     if (entry == null)
@@ -540,11 +546,14 @@ public class RemoteArchiveBean {
                             continue;
                         } else {
                             _statusMessages.add("Blog post " + uri.toString() + " imported");
+                            postImported = true;
                         }
                     }
                 }       
                 
                 BlogManager.instance().getArchive().regenerateIndex();
+                if (postImported)
+                    _user.dataImported();
             } catch (IOException ioe) {
                 if (_log.shouldLog(Log.WARN))
                     _log.debug("Error importing", ioe);

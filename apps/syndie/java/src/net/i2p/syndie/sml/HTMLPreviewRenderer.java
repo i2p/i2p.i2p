@@ -112,13 +112,13 @@ public class HTMLPreviewRenderer extends HTMLRenderer {
                 } else {
                     _postBodyBuffer.append(" <a ").append(getClass("summDetailAddrLink")).append(" href=\"addresses.jsp?");
                     if (a.schema != null)
-                        _postBodyBuffer.append("network=").append(sanitizeTagParam(a.schema)).append('&');
+                        _postBodyBuffer.append(AddressesServlet.PARAM_NET).append("=").append(sanitizeTagParam(a.schema)).append('&');
                     if (a.location != null)
-                        _postBodyBuffer.append("location=").append(sanitizeTagParam(a.location)).append('&');
+                        _postBodyBuffer.append(AddressesServlet.PARAM_LOC).append("=").append(sanitizeTagParam(a.location)).append('&');
                     if (a.name != null)
-                        _postBodyBuffer.append("name=").append(sanitizeTagParam(a.name)).append('&');
+                        _postBodyBuffer.append(AddressesServlet.PARAM_NAME).append("=").append(sanitizeTagParam(a.name)).append('&');
                     if (a.protocol != null)
-                        _postBodyBuffer.append("protocol=").append(sanitizeTagParam(a.protocol)).append('&');
+                        _postBodyBuffer.append(AddressesServlet.PARAM_PROTO).append("=").append(sanitizeTagParam(a.protocol)).append('&');
                     _postBodyBuffer.append("\">").append(sanitizeString(a.name)).append("</a>");
                 } 
             }

@@ -23,6 +23,8 @@ public class SyndicateServlet extends BaseServlet {
     protected String getTitle() { return "Syndie :: Syndicate"; }
     
     public static final String PARAM_SCHEMA = "schema";
+    public static final String PARAM_LOCATION = "location";
+    public static final String PARAM_PETNAME = "petname";
     
     protected void renderServletDetails(User user, HttpServletRequest req, PrintWriter out, ThreadIndex index, 
                                         int threadOffset, BlogURI visibleEntry, Archive archive) throws IOException {
@@ -40,14 +42,14 @@ public class SyndicateServlet extends BaseServlet {
         RemoteArchiveBean remote = getRemote(req);
         String action = req.getParameter("action");
         if ("Continue...".equals(action)) {
-            String location = req.getParameter("location");
-            String pn = req.getParameter("archivepetname");
+            String location = req.getParameter(PARAM_LOCATION);
+            String pn = req.getParameter(PARAM_PETNAME);
             if ( (pn != null) && (pn.trim().length() > 0) ) {
                 PetName pnval = user.getPetNameDB().getByName(pn);
                 if (pnval != null) location = pnval.getLocation();
             }
             
-            remote.fetchIndex(user, req.getParameter("schema"), location, 
+            remote.fetchIndex(user, req.getParameter(PARAM_SCHEMA), location, 
                               req.getParameter("proxyhost"), 
                               req.getParameter("proxyport"));
         } else if ("Fetch metadata".equals(action)) {
@@ -82,7 +84,7 @@ public class SyndicateServlet extends BaseServlet {
             out.write("</span>");
             out.write("<a class=\"b_remoteRefetch\" href=\"");
             out.write(req.getRequestURI());
-            out.write("?schema=" + remote.getRemoteSchema() + "&location=" + remote.getRemoteLocation());
+            out.write("?" + PARAM_SCHEMA + "=" + remote.getRemoteSchema() + "&" + PARAM_LOCATION + "=" + remote.getRemoteLocation());
             if (remote.getProxyHost() != null && remote.getProxyPort() > 0) { 
                 out.write("&proxyhost=" + remote.getProxyHost() + "&proxyport=" + remote.getProxyPort());
             } 
@@ -100,12 +102,12 @@ public class SyndicateServlet extends BaseServlet {
         writeAuthActionFields(out);
         out.write("<tr><td colspan=\"3\">");
         out.write("<span class=\"b_remoteChooser\"><span class=\"b_remoteChooserField\">Import from:</span>\n");
-        out.write("<select class=\"b_remoteChooserNet\" name=\"schema\">\n");
+        out.write("<select class=\"b_remoteChooserNet\" name=\"" + PARAM_SCHEMA + "\">\n");
         String schema = req.getParameter(PARAM_SCHEMA);
         out.write("<option value=\"web\" ");
         if ("web".equals(schema))
             out.write("selected=\"true\" ");
-        out.write(">I2P/Tor/Freenet</option>\n");
+        out.write(">I2P/Web/Tor/Freenet</option>\n");
 
         out.write("</select>\n");
         out.write("<span class=\"b_remoteChooserField\">Proxy</span>\n");
@@ -116,7 +118,7 @@ public class SyndicateServlet extends BaseServlet {
         out.write(BlogManager.instance().getDefaultProxyPort());
         out.write("\" /><br />\n");
         out.write("<span class=\"b_remoteChooserField\">Bookmarked archives:</span>\n");
-        out.write("<select class=\"b_remoteChooserPN\" name=\"archivepetname\">");
+        out.write("<select class=\"b_remoteChooserPN\" name=\"" + PARAM_PETNAME + "\">");
         out.write("<option value=\"\">Custom location</option>");
 
         for (Iterator iter = user.getPetNameDB().iterator(); iter.hasNext(); ) {
@@ -130,7 +132,7 @@ public class SyndicateServlet extends BaseServlet {
             }
         }
         out.write("</select> or ");
-        out.write("<input type=\"text\" class=\"b_remoteChooserLocation\" name=\"location\" size=\"30\" value=\"");
+        out.write("<input type=\"text\" class=\"b_remoteChooserLocation\" name=\"" + PARAM_LOCATION + "\" size=\"30\" value=\"");
         String reqLoc = req.getParameter("location");
         if (reqLoc != null)
             out.write(reqLoc);
