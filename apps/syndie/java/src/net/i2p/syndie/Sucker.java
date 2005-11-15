@@ -6,6 +6,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -25,6 +26,7 @@ import com.sun.syndication.io.XmlReader;
 import net.i2p.I2PAppContext;
 import net.i2p.data.Base64;
 import net.i2p.data.DataFormatException;
+import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
 import net.i2p.syndie.data.BlogURI;
 import net.i2p.util.EepGet;
@@ -294,11 +296,17 @@ public class Sucker {
 
             // get its output (your input) stream
 
-            DataInputStream ls_in = new DataInputStream(pushScript_proc.getInputStream());
+            InputStream ls_in = pushScript_proc.getInputStream();
 
             try {
-                while ((ls_str = ls_in.readLine()) != null) {
-                    infoLog(pushScript + ": " + ls_str);
+                StringBuffer buf = new StringBuffer();
+                while (true) {
+                    boolean eof = DataHelper.readLine(ls_in, buf);
+                    if (buf.length() > 0) 
+                        infoLog(pushScript + ": " + buf.toString());
+                    buf.setLength(0);
+                    if (eof)
+                        break;
                 }
             } catch (IOException e) {
                 return false;

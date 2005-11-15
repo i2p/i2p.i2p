@@ -32,7 +32,7 @@ public class I2PTunnelGUI extends Frame implements ActionListener, Logging {
         log.setEditable(false);
         log("enter 'help' for help.");
         pack();
-        show();
+        setVisible(true);
     }
 
     public void log(String s) {

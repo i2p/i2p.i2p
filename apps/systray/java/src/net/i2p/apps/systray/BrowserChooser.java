@@ -25,6 +25,6 @@ public class BrowserChooser extends FileDialog {
     }
 
     public void initialize(){
-        this.show();
+        this.setVisible(true);
     }
 }

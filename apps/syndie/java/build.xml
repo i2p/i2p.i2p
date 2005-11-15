@@ -32,10 +32,16 @@
         <ant target="war" />
     </target>
     <target name="war" depends="builddep, compile, precompilejsp"> 
+        <mkdir dir="./tmpwar" />
+        <copy file="../../jdom/jdom.jar" tofile="./tmpwar/jdom.jar" />
+        <copy file="../../rome/rome-0.7.jar" tofile="./tmpwar/rome-0.7.jar" />
+
         <war destfile="../syndie.war" webxml="../jsp/web-out.xml">
           <fileset dir="../jsp/" includes="**/*" excludes=".nbintdb, web.xml, web-out.xml, web-fragment.xml, **/*.java, **/*.jsp" />
           <classes dir="./build/obj" />
+          <lib dir="./tmpwar" />
         </war>
+	<delete dir="./tmpwar" />
     </target>
     <target name="precompilejsp">
         <delete dir="../jsp/WEB-INF/" />
