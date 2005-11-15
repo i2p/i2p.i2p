@@ -125,8 +125,6 @@ public class FragmentHandler {
         while (preprocessed[offset+paddingEnd] != (byte)0x00) {
             paddingEnd++;
             if (offset+paddingEnd >= length) {
-                if (_log.shouldLog(Log.ERROR))
-                    _log.error("Corrupt tunnel message padding");
                 if (_log.shouldLog(Log.WARN))
                     _log.warn("cannot verify, going past the end [off=" 
                               + offset + " len=" + length + " paddingEnd=" 

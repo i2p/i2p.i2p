@@ -375,7 +375,7 @@ public class TunnelDispatcher implements Service {
                 _context.statManager().addRateData("tunnel.dispatchEndpoint", 1, 0);
             } else {
                 _context.messageHistory().droppedTunnelDataMessageUnknown(msg.getUniqueId(), msg.getTunnelId());
-                int level = (_context.router().getUptime() > 10*60*1000 ? Log.ERROR : Log.WARN);
+                int level = (_context.router().getUptime() > 10*60*1000 ? Log.WARN : Log.DEBUG);
                 if (_log.shouldLog(level))
                     _log.log(level, "no matching participant/endpoint for id=" + msg.getTunnelId() 
                              + " expiring in " + DataHelper.formatDuration(msg.getMessageExpiration()-_context.clock().now())
