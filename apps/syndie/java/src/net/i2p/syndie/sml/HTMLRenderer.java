@@ -575,7 +575,7 @@ public class HTMLRenderer extends EventReceiverImpl {
         
             String inReplyTo = (String)_headers.get(HEADER_IN_REPLY_TO);
             if ( (inReplyTo != null) && (inReplyTo.trim().length() > 0) )
-                _postBodyBuffer.append(" <a ").append(getClass("summParent")).append(" href=\"").append(getPageURL(sanitizeTagParam(inReplyTo))).append("\">(view parent)</a>\n");
+                _postBodyBuffer.append(" <a ").append(getClass("summParent")).append(" href=\"threads.jsp?").append(ThreadedHTMLRenderer.PARAM_VIEW_POST).append('=').append(sanitizeTagParam(inReplyTo)).append("\">(view parent)</a>\n");
             
             _postBodyBuffer.append("</span></td></tr>\n");
             _postBodyBuffer.append("<!-- end of the post summary -->\n");
@@ -716,7 +716,7 @@ public class HTMLRenderer extends EventReceiverImpl {
         
             String inReplyTo = (String)_headers.get(HEADER_IN_REPLY_TO);
             if ( (inReplyTo != null) && (inReplyTo.trim().length() > 0) ) {
-                _postBodyBuffer.append(" <a ").append(getClass("summDetailParent")).append(" href=\"").append(getPageURL(sanitizeTagParam(inReplyTo))).append("\">(view parent)</a><br />\n");
+                _postBodyBuffer.append(" <a ").append(getClass("summDetailParent")).append(" href=\"threads.jsp?").append(ThreadedHTMLRenderer.PARAM_VIEW_POST).append('=').append(sanitizeTagParam(inReplyTo)).append("\">(view parent)</a>\n");
             }
                 
             _postBodyBuffer.append("</td>\n</form>\n</tr>\n");
@@ -984,11 +984,10 @@ public class HTMLRenderer extends EventReceiverImpl {
     protected String getEntryURL() { return getEntryURL(_user != null ? _user.getShowImages() : false); }
     protected String getEntryURL(boolean showImages) {
         if (_entry == null) return "unknown";
-        return "index.jsp?" + ArchiveViewerBean.PARAM_BLOG + "=" +
-               Base64.encode(_entry.getURI().getKeyHash().getData()) +
-               "&" + ArchiveViewerBean.PARAM_ENTRY + "=" + _entry.getURI().getEntryId() +
-               "&" + ArchiveViewerBean.PARAM_SHOW_IMAGES + (showImages ? "=true" : "=false") +
-               "&" + ArchiveViewerBean.PARAM_EXPAND_ENTRIES + "=true";
+        return "threads.jsp?" + ThreadedHTMLRenderer.PARAM_AUTHOR + '=' +
+               Base64.encode(_entry.getURI().getKeyHash().getData()) + '&' +
+               ThreadedHTMLRenderer.PARAM_VIEW_POST + '=' + _entry.getURI().getKeyHash().toBase64() + '/' + 
+               _entry.getURI().getEntryId();
     }
 
     protected String getAttachmentURLBase() { return "viewattachment.jsp"; }
@@ -1029,44 +1028,44 @@ public class HTMLRenderer extends EventReceiverImpl {
             return getPostURL(blog);
         }
     }
-
-    public String getPageURL(String selector) { return getPageURL(_user, selector); }
-    public String getPageURL(User user, String selector) { return getPageURL(user, selector, -1, -1); }
-    public String getPageURL(User user, String selector, int numPerPage, int pageNum) {
+    
+    /**
+     * entry may take the form of "base64/messageId", "entry://base64/messageId", or "blog://base64/messageId"
+     *
+     */
+    public String getPageURL(String entry) {
         StringBuffer buf = new StringBuffer(128);
-        buf.append("index.jsp?");
-        buf.append("selector=").append(sanitizeTagParam(selector)).append("&");
-        if ( (pageNum >= 0) && (numPerPage > 0) ) {
-            buf.append(ArchiveViewerBean.PARAM_PAGE_NUMBER).append('=').append(pageNum).append('&');
-            buf.append(ArchiveViewerBean.PARAM_NUM_PER_PAGE).append('=').append(numPerPage).append('&');
-        }
-        if (user != null) {
-            buf.append(ArchiveViewerBean.PARAM_EXPAND_ENTRIES).append('=').append(user.getShowExpanded()).append('&');
-            buf.append(ArchiveViewerBean.PARAM_SHOW_IMAGES).append('=').append(user.getShowImages()).append('&');
+        buf.append("threads.jsp?");
+        if (entry != null) {
+            if (entry.startsWith("entry://"))
+                entry = entry.substring("entry://".length());
+            else if (entry.startsWith("blog://"))
+                entry = entry.substring("blog://".length());
+            if (entry.length() > 0) {
+                buf.append(ThreadedHTMLRenderer.PARAM_VIEW_POST).append('=').append(entry).append('&');
+                buf.append(ThreadedHTMLRenderer.PARAM_VISIBLE).append('=').append(entry).append('&');
+            }
         }
         return buf.toString();
     }
-    
+
     public String getPageURL(Hash blog, String tag, long entryId, int numPerPage, int pageNum, boolean expandEntries, boolean showImages) {
         return getPageURL(blog, tag, entryId, null, numPerPage, pageNum, expandEntries, showImages);
     }
     public String getPageURL(Hash blog, String tag, long entryId, String group, int numPerPage, int pageNum, boolean expandEntries, boolean showImages) {
         StringBuffer buf = new StringBuffer(128);
-        buf.append("index.jsp?");
+        buf.append("threads.jsp?");
         if (blog != null)
-            buf.append(ArchiveViewerBean.PARAM_BLOG).append('=').append(Base64.encode(blog.getData())).append('&');
+            buf.append(ThreadedHTMLRenderer.PARAM_AUTHOR).append('=').append(blog.toBase64()).append('&');
         if (tag != null)
-            buf.append(ArchiveViewerBean.PARAM_TAG).append('=').append(Base64.encode(DataHelper.getUTF8(tag))).append('&');
-        if (entryId >= 0)
-            buf.append(ArchiveViewerBean.PARAM_ENTRY).append('=').append(entryId).append('&');
-        if (group != null)
-            buf.append(ArchiveViewerBean.PARAM_GROUP).append('=').append(Base64.encode(DataHelper.getUTF8(group))).append('&');
-        if ( (pageNum >= 0) && (numPerPage > 0) ) {
-            buf.append(ArchiveViewerBean.PARAM_PAGE_NUMBER).append('=').append(pageNum).append('&');
-            buf.append(ArchiveViewerBean.PARAM_NUM_PER_PAGE).append('=').append(numPerPage).append('&');
-        }
-        buf.append(ArchiveViewerBean.PARAM_EXPAND_ENTRIES).append('=').append(expandEntries).append('&');
-        buf.append(ArchiveViewerBean.PARAM_SHOW_IMAGES).append('=').append(showImages).append('&');
+            buf.append(ThreadedHTMLRenderer.PARAM_TAGS).append('=').append(sanitizeTagParam(tag)).append('&');
+        if (entryId >= 0) {
+            String entry = blog.toBase64() + '/' + entryId;
+            buf.append(ThreadedHTMLRenderer.PARAM_VIEW_POST).append('=').append(entry).append('&');
+            buf.append(ThreadedHTMLRenderer.PARAM_VISIBLE).append('=').append(entry).append('&');
+        }   
+        if ( (pageNum >= 0) && (numPerPage > 0) )
+            buf.append(ThreadedHTMLRenderer.PARAM_OFFSET).append('=').append(pageNum*numPerPage).append('&');
         return buf.toString();
     }
     public String getArchiveURL(Hash blog, SafeURL archiveLocation) {
@@ -1080,6 +1079,5 @@ public class HTMLRenderer extends EventReceiverImpl {
                + "&network=" + sanitizeTagParam(schema)
                + "&protocol=" + sanitizeTagParam(protocol)
                + "&location=" + sanitizeTagParam(location);
-               
     }
 }

@@ -29,19 +29,45 @@ public class RSSServlet extends HttpServlet {
             String login = req.getParameter("login");
             String pass = req.getParameter("password");
             user = BlogManager.instance().login(login, pass); // ignore failures - user will just be unauthorized
-            if (!user.getAuthenticated())
+            if (!user.getAuthenticated()) {
                 user.invalidate();
+                user = BlogManager.instance().getDefaultUser();
+            }
         }
         
-        String selector = req.getParameter("selector");
-        if ( (selector == null) || (selector.length() <= 0) ) {
-            selector = getDefaultSelector(user);
+        String tags = req.getParameter(ThreadedHTMLRenderer.PARAM_TAGS);
+        Set tagSet = new HashSet();
+        if (tags != null) {
+            StringTokenizer tok = new StringTokenizer(tags, " \n\t\r");
+            while (tok.hasMoreTokens()) {
+                String tag = (String)tok.nextToken();
+                tag = tag.trim();
+                if (tag.length() > 0)
+                    tagSet.add(tag);
+            }
         }
-        ArchiveViewerBean.Selector sel = new ArchiveViewerBean.Selector(selector);
+        
+        int count = 10;
+        String wanted = req.getParameter("wanted");
+        if (wanted != null) {
+            try {
+                count = Integer.parseInt(wanted);
+            } catch (NumberFormatException nfe) {
+                count = 10;
+            }
+        }
+        if (count < 0) count = 10;
+        if (count > 100) count = 100;
         
         Archive archive = BlogManager.instance().getArchive();
-        ArchiveIndex index = archive.getIndex();
-        List entries = ArchiveViewerBean.pickEntryURIs(user, index, sel.blog, sel.tag, sel.entry, sel.group);
+        FilteredThreadIndex index = new FilteredThreadIndex(user, archive, tagSet, null);
+        List entries = new ArrayList();
+        // depth first search of the most recent threads
+        for (int i = 0; i < count && i < index.getRootCount(); i++) {
+            ThreadNode node = index.getRoot(i);
+            if (node != null)
+                walkTree(entries, node);
+        }
         
         StringBuffer cur = new StringBuffer();
         cur.append(req.getScheme());
@@ -58,25 +84,11 @@ public class RSSServlet extends HttpServlet {
         out.write(" <channel>\n");
         out.write("  <title>Syndie feed</title>\n");
         String page = urlPrefix;
-        if (sel.tag != null)
-            page = page + "threads.jsp?" + ThreadedHTMLRenderer.PARAM_TAGS + '=' + HTMLRenderer.sanitizeXML(sel.tag);
-        else if ( (sel.blog != null) && (sel.entry > 0) )
-            page = page + "threads.jsp?" + ThreadedHTMLRenderer.PARAM_VIEW_POST + '=' + sel.blog.toBase64() + '/' + sel.entry;
+        if (tags != null)
+            page = page + "threads.jsp?" + ThreadedHTMLRenderer.PARAM_TAGS + '=' + HTMLRenderer.sanitizeXML(tags);
         out.write("  <link>" + page +"</link>\n");
         out.write("  <description>Summary of the latest Syndie posts</description>\n");
         out.write("  <generator>Syndie</generator>\n");
-        
-        int count = 10;
-        String wanted = req.getParameter("wanted");
-        if (wanted != null) {
-            try {
-                count = Integer.parseInt(wanted);
-            } catch (NumberFormatException nfe) {
-                count = 10;
-            }
-        }
-        if (count < 0) count = 10;
-        if (count > 100) count = 100;
         
         RSSRenderer r = new RSSRenderer(I2PAppContext.getGlobalContext());
         for (int i = 0; i < count && i < entries.size(); i++) {
@@ -90,10 +102,13 @@ public class RSSServlet extends HttpServlet {
         out.close();
     }
     
-    private static String getDefaultSelector(User user) {
-        if ( (user == null) || (user.getDefaultSelector() == null) )
-            return BlogManager.instance().getArchive().getDefaultSelector();
-        else
-            return user.getDefaultSelector();
+    private void walkTree(List uris, ThreadNode node) {
+        if (node == null)
+            return;
+        if (uris.contains(node))
+            return;
+        uris.add(node.getEntry());
+        for (int i = 0; i < node.getChildCount(); i++)
+            walkTree(uris, node.getChild(i));
     }
 }

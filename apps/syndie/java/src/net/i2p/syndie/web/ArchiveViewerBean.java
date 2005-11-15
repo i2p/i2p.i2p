@@ -411,10 +411,7 @@ public class ArchiveViewerBean {
                     pages++;
                 if (pageNum > 0) {
                     String prevURL = null;
-                    if ( (selector == null) || (selector.trim().length() <= 0) )
-                        prevURL = rend.getPageURL(blog, tag, entryId, group, numPerPage, pageNum-1, expandEntries, showImages);
-                    else
-                        prevURL = rend.getPageURL(user, selector, numPerPage, pageNum-1);
+                    prevURL = rend.getPageURL(blog, tag, entryId, group, numPerPage, pageNum-1, expandEntries, showImages);
                     //System.out.println("prevURL: " + prevURL);
                     out.write(" <a class=\"b_selectorPrevMore\" href=\"" + prevURL + "\">&lt;&lt;</a>");
                 } else {
@@ -423,10 +420,7 @@ public class ArchiveViewerBean {
                 out.write("<span class=\"b_selectorPage\">Page " + (pageNum+1) + " of " + pages + "</span>");
                 if (pageNum + 1 < pages) {
                     String nextURL = null;
-                    if ( (selector == null) || (selector.trim().length() <= 0) )
-                        nextURL = rend.getPageURL(blog, tag, entryId, group, numPerPage, pageNum+1, expandEntries, showImages);
-                    else
-                        nextURL = rend.getPageURL(user, selector, numPerPage, pageNum+1);
+                    nextURL = rend.getPageURL(blog, tag, entryId, group, numPerPage, pageNum+1, expandEntries, showImages);
                     //System.out.println("nextURL: " + nextURL);
                     out.write(" <a class=\"b_selectorNextMore\" href=\"" + nextURL + "\">&gt;&gt;</a>");
                 } else {

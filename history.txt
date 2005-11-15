@@ -1,4 +1,7 @@
-$Id: history.txt,v 1.319 2005/11/11 21:38:56 cervantes Exp $
+$Id: history.txt,v 1.320 2005/11/12 00:03:54 jrandom Exp $
+
+2005-11-14  jrandom
+    * Migrate to the new Syndie interface
 
 2005-11-11  jrandom
     * Add filtering threads by author to Syndie, populated with authors in the

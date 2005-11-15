@@ -14,7 +14,7 @@ request.setCharacterEncoding("UTF-8");
   <li>[b][/b] = &lt;b&gt;bold&lt;/b&gt;</li>
   <li>[i][/i] = &lt;i&gt;italics&lt;/i&gt;</li>
   <li>[u][/u] = &lt;i&gt;underline&lt;/i&gt;</li>
-  <li>[cut]more inside[/cut] = [&lt;a href="#"&gt;more inside...&lt;/a&gt;]</li>
+  <li>[cut]more inside[/cut] = &lt;a href="#"&gt;more inside...&lt;/a&gt;</li>
   <li>[quote][/quote] = Quoted text</li>
   <li>[img attachment="1"]alt[/img] = use attachment 1 as an image with 'alt' as the alt text</li>
   <li>[blog name="name" bloghash="base64hash"]description[/blog] = link to all posts in the blog</li>

@@ -25,7 +25,7 @@ public class Updater {
         _log.debug("Update started.");
         String[] archives = bm.getUpdateArchives();
         for (int i = 0; i < archives.length; i++) {
-            _log.debug("Fetching " + archives[i]);
+            _log.debug("Fetching [" + archives[i] + "]");
             fetchArchive(archives[i]);
             _log.debug("Done fetching " + archives[i]);
         }
@@ -43,6 +43,10 @@ public class Updater {
     }
     
     public void fetchArchive(String archive) {
+        if ( (archive == null) || (archive.trim().length() <= 0) ) {
+            _log.error("Fetch a null archive?" + new Exception("source"));
+            return;
+        }
         BlogManager bm = BlogManager.instance();
         User user = new User();
         RemoteArchiveBean rab = new RemoteArchiveBean();
@@ -51,7 +55,7 @@ public class Updater {
         if (rab.getRemoteIndex() != null) {
             HashMap parameters = new HashMap();
             parameters.put("action", new String[] {"Fetch all new entries"});
-            rab.fetchSelectedBulk(user, parameters);
+            rab.fetchSelectedBulk(user, parameters, true);
         } 
         _log.debug(rab.getStatus());
     }

@@ -145,10 +145,11 @@ public class PostServlet extends BaseServlet {
         writeAuthActionFields(out);
         out.write("Please confirm that the above is ok");
         if (BlogManager.instance().authorizeRemote(user)) { 
-            out.write(", and select what additional archives you want the post transmitted to.");
-            out.write("Otherwise, just hit your browser's back arrow and make changes.\n");
+            out.write(", and select what additional archives you want the post transmitted to.  ");
+            out.write("To make changes, hit your browser's back arrow and try again.\n");
+            out.write("Remote archive to push this post to: ");
             out.write("<select class=\"b_postConfirm\" name=\"" + PARAM_REMOTE_ARCHIVE + "\">\n");
-            out.write("<option name=\"\">-None-</option>\n");
+            out.write("<option name=\"\">None - don't push this post anywhere</option>\n");
             PetNameDB db = user.getPetNameDB();
             TreeSet names = new TreeSet();
             for (Iterator iter = db.getNames().iterator(); iter.hasNext(); ) {
@@ -164,6 +165,8 @@ public class PostServlet extends BaseServlet {
             }
             
             out.write("</select><br />\n");
+            out.write("If you don't push this post remotely now, you can do so later on the <a href=\"syndicate.jsp\">syndicate</a> screen ");
+            out.write("by choosing an archive, verifying that they don't already have the post, and selecting which posts to push.\n");
         }
         out.write("</span><input class=\"b_postConfirm\" type=\"submit\" name=\"" + PARAM_ACTION 
                   + "\" value=\"" + ACTION_CONFIRM + "\" />\n");

@@ -14,6 +14,7 @@ import net.i2p.util.EepPost;
 import net.i2p.syndie.data.*;
 import net.i2p.syndie.sml.*;
 import net.i2p.syndie.*;
+import net.i2p.util.I2PThread;
 import net.i2p.util.Log;
 
 /**
@@ -184,9 +185,16 @@ public class RemoteArchiveBean {
                 File tmp = File.createTempFile("fetchBulk", ".zip", BlogManager.instance().getTempDir());
                 
                 boolean shouldProxy = (_proxyHost != null) && (_proxyPort > 0);
-                EepGet get = new EepGet(_context, shouldProxy, _proxyHost, _proxyPort, 0, tmp.getAbsolutePath(), url.toString(), postData.toString());
+                final EepGet get = new EepGet(_context, shouldProxy, _proxyHost, _proxyPort, 0, tmp.getAbsolutePath(), url.toString(), postData.toString());
                 get.addStatusListener(new BulkFetchListener(tmp));
-                get.fetch();
+                
+                if (shouldBlock) {
+                    get.fetch();
+                } else {
+                    I2PThread t = new I2PThread(new Runnable() { public void run() { get.fetch(); } }, "Syndie fetcher");
+                    t.setDaemon(true);
+                    t.start();
+                }
             } catch (IOException ioe) {
                 _statusMessages.add("Internal error creating temporary file to fetch " + HTMLRenderer.sanitizeString(url.toString()) + ": " + ioe.getMessage());
             }
@@ -278,11 +286,11 @@ public class RemoteArchiveBean {
         _proxyHost = null;
         _proxyPort = -1;
         _exportCapable = false;
-        if (user == null) user = new User();
+        if (user == null) user = BlogManager.instance().getDefaultUser();
         
         if ( (schema == null) || (schema.trim().length() <= 0) ||
              (location == null) || (location.trim().length() <= 0) ) {
-            _statusMessages.add("Location must be specified");
+            _statusMessages.add("Location must be specified [" + location + "] [" + schema + "]");
             _fetchIndexInProgress = false;
             return;
         }
