@@ -518,7 +518,10 @@ public class HTMLRenderer extends EventReceiverImpl {
             _bodyBuffer.append(getSpan("attachmentSummary")).append(" (");
             _bodyBuffer.append(getSpan("attachmentSummarySize")).append(attachments[id].getDataLength()/1024).append("KB</span>, ");
             _bodyBuffer.append(getSpan("attachmentSummaryName")).append(" \"").append(sanitizeString(attachments[id].getName())).append("\"</span>, ");
-            _bodyBuffer.append(getSpan("attachmentSummaryDesc")).append(" \"").append(sanitizeString(attachments[id].getDescription())).append("\"</span>, ");
+            String descr = attachments[id].getDescription();
+            if ( (descr != null) && (descr.trim().length() > 0) ) {
+                _bodyBuffer.append(getSpan("attachmentSummaryDesc")).append(" \"").append(sanitizeString(descr.trim())).append("\"</span>, ");
+            }
             _bodyBuffer.append(getSpan("attachmentSummaryType")).append(sanitizeString(attachments[id].getMimeType())).append("</span>)</span>");
         }
     }

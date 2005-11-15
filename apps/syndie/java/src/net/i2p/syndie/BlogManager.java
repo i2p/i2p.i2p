@@ -479,6 +479,8 @@ public class BlogManager {
      */
     private static final String DEFAULT_SINGLE_USER_ARCHIVES[] = new String[] {
         "http://syndiemedia.i2p/archive/archive.txt"
+        , "http://gloinsblog.i2p/archive/archive.txt"
+        , "http://glog.i2p/archive/archive.txt"
     };
     
     public User getDefaultUser() {

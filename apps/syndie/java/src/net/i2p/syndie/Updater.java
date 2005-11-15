@@ -69,7 +69,7 @@ public class Updater {
 
         // wait
         try {
-            Thread.currentThread().sleep(1*60*1000);
+            Thread.currentThread().sleep(5*60*1000);
         } catch (InterruptedException ie) {}
         
         while (true) {

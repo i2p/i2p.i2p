@@ -163,6 +163,9 @@ public class PostBean {
         return raw.toString();
     }
     
+    /** until we have a good filtering/preferences system, lets try to keep the content small */
+    private static final int MAX_SIZE = 256*1024;
+    
     private void cacheAttachments() throws IOException {
         File postCacheDir = new File(BlogManager.instance().getTempDir(), _user.getBlog().toBase64());
         if (!postCacheDir.exists())
@@ -177,10 +180,14 @@ public class PostBean {
                 o.write(buf, 0, read);
             o.close();
             in.close();
-            _localFiles.add(f);
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Caching attachment " + i + " temporarily in " 
-                               + f.getAbsolutePath() + " w/ " + f.length() + "bytes");
+            if (f.length() > MAX_SIZE) {
+                _log.error("Refusing to post the attachment, because it is too big: " + f.length());
+            } else {
+                _localFiles.add(f);
+                if (_log.shouldLog(Log.DEBUG))
+                    _log.debug("Caching attachment " + i + " temporarily in " 
+                                   + f.getAbsolutePath() + " w/ " + f.length() + "bytes");
+            }
         }
         _fileStreams.clear();
     }

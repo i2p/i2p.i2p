@@ -510,6 +510,7 @@ public abstract class BaseServlet extends HttpServlet {
         }
         //out.write("</td><td class=\"topNav_admin\">\n");
         out.write("</span><span class=\"topNav_admin\">\n");
+        out.write("<a href=\"about.html\" title=\"Basic Syndie info\">About</a> ");
         if (BlogManager.instance().authorizeRemote(user)) {
             out.write("<a href=\"" + getSyndicateLink(user, null) + "\" title=\"Syndicate data between other Syndie nodes\">Syndicate</a>\n");
             out.write("<a href=\"importfeed.jsp\" title=\"Import RSS/Atom data\">Import RSS/Atom</a>\n");

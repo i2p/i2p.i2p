@@ -91,8 +91,11 @@ public class PostServlet extends BaseServlet {
         if ( (replyTo != null) && (replyTo.trim().length() > 0) ) {
           byte r[] = Base64.decode(replyTo);
           if (r != null) {
-            if (entryHeaders == null) entryHeaders = HTMLRenderer.HEADER_IN_REPLY_TO + ": entry://" + new String(r, "UTF-8");
-            else entryHeaders = entryHeaders + '\n' + HTMLRenderer.HEADER_IN_REPLY_TO + ": entry://" + new String(r, "UTF-8");
+            replyTo = new String(r, "UTF-8");
+            if (!replyTo.startsWith("entry://") && !replyTo.startsWith("blog://"))
+                replyTo = "entry://" + replyTo;
+            if (entryHeaders == null) entryHeaders = HTMLRenderer.HEADER_IN_REPLY_TO + ": " + replyTo;
+            else entryHeaders = entryHeaders + '\n' + HTMLRenderer.HEADER_IN_REPLY_TO + ": " + replyTo;
           } else {
             replyTo = null;
           }
