@@ -256,7 +256,7 @@ public class ViewThreadedServlet extends BaseServlet {
         String subject = rec.getHeader(HTMLRenderer.HEADER_SUBJECT);
         if (subject == null)
             subject = "";
-        out.write(trim(subject, 60));
+        out.write(trim(subject, 40));
         out.write("</a>\n</td><td class=\"threadRight\">\n");
         out.write("<a href=\"");
         out.write(getViewThreadLink(req, node, user));

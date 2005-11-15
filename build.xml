@@ -317,7 +317,7 @@
 	<mkdir dir="pkg-temp/syndie/archive" />
 	<mkdir dir="pkg-temp/syndie/archive/ovpBy2mpO1CQ7deYhQ1cDGAwI6pQzLbWOm1Sdd0W06c=" />
 	<copy file="installer/resources/blogMeta.snm" tofile="pkg-temp/syndie/archive/ovpBy2mpO1CQ7deYhQ1cDGAwI6pQzLbWOm1Sdd0W06c=/meta.snm" />
-	<copy file="installer/resources/blogPost.snd" tofile="pkg-temp/syndie/archive/ovpBy2mpO1CQ7deYhQ1cDGAwI6pQzLbWOm1Sdd0W06c=/1126915200003.snd" />
+	<copy file="installer/resources/blogPost.snd" tofile="pkg-temp/syndie/archive/ovpBy2mpO1CQ7deYhQ1cDGAwI6pQzLbWOm1Sdd0W06c=/1132012800001.snd" />
     </target>
     <target name="tarball" depends="preppkg">
         <tar compression="bzip2" destfile="i2p.tar.bz2">
@@ -395,7 +395,7 @@
 	<mkdir dir="pkg-temp/syndie/archive" />
 	<mkdir dir="pkg-temp/syndie/archive/ovpBy2mpO1CQ7deYhQ1cDGAwI6pQzLbWOm1Sdd0W06c=" />
 	<copy file="installer/resources/blogMeta.snm" tofile="pkg-temp/syndie/archive/ovpBy2mpO1CQ7deYhQ1cDGAwI6pQzLbWOm1Sdd0W06c=/meta.snm" />
-	<copy file="installer/resources/blogPost.snd" tofile="pkg-temp/syndie/archive/ovpBy2mpO1CQ7deYhQ1cDGAwI6pQzLbWOm1Sdd0W06c=/1126915200003.snd" />
+	<copy file="installer/resources/blogPost.snd" tofile="pkg-temp/syndie/archive/ovpBy2mpO1CQ7deYhQ1cDGAwI6pQzLbWOm1Sdd0W06c=/1132012800001.snd" />
     </target>
     <target name="installer" depends="preppkg">
         <taskdef name="izpack" classpath="${basedir}/installer/lib/izpack/standalone-compiler.jar" classname="com.izforge.izpack.ant.IzPackTask" />

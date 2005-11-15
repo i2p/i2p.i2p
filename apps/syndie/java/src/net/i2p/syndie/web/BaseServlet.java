@@ -150,11 +150,13 @@ public abstract class BaseServlet extends HttpServlet {
         
         Collection tags = getFilteredTags(req);
         Collection filteredAuthors = getFilteredAuthors(req);
-        if (forceNewIndex || (index == null) || (!index.getFilteredTags().equals(tags)) || (!index.getFilteredAuthors().equals(filteredAuthors))) {
+        boolean tagsChanged = ( (index != null) && (!index.getFilteredTags().equals(tags)) );
+        boolean authorsChanged = ( (index != null) && (!index.getFilteredAuthors().equals(filteredAuthors)) );
+        if (forceNewIndex || (index == null) || (tagsChanged) || (authorsChanged) ) {
             index = new FilteredThreadIndex(user, BlogManager.instance().getArchive(), getFilteredTags(req), filteredAuthors);
             req.getSession().setAttribute("threadIndex", index);
             if (_log.shouldLog(Log.INFO))
-                _log.info("New filtered index created (forced? " + forceNewIndex + ")");
+                _log.info("New filtered index created (forced? " + forceNewIndex + ", tagsChanged? " + tagsChanged + ", authorsChanged? " + authorsChanged + ")");
         }
         
         render(user, req, resp.getWriter(), index);
@@ -191,7 +193,7 @@ public abstract class BaseServlet extends HttpServlet {
                         name = name + i;
                     }
 
-                    pn = new PetName(name, "syndie", "syndieblog", loc);
+                    pn = new PetName(name, AddressesServlet.NET_SYNDIE, AddressesServlet.PROTO_BLOG, loc);
                 }
                 pn.addGroup(group);
                 if (isNew)
@@ -230,6 +232,8 @@ public abstract class BaseServlet extends HttpServlet {
                 BlogManager.instance().saveUser(user);
         }
         
+        if (rv)
+            _log.debug("Bookmarking required rebuild");
         return rv;
     }
     
@@ -530,6 +534,8 @@ public abstract class BaseServlet extends HttpServlet {
         //SKIP_TAGS.add("post");
         //SKIP_TAGS.add("thread");
         SKIP_TAGS.add("offset"); // if we are adjusting the filter, ignore the previous offset
+        SKIP_TAGS.add("addLocation");
+        SKIP_TAGS.add("addGroup");
         SKIP_TAGS.add("login");
         SKIP_TAGS.add("password");
     }
