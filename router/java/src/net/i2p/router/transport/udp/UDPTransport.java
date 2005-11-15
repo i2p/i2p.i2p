@@ -1371,8 +1371,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                 return;
             }
             
-            if (_log.shouldLog(Log.ERROR))
-                _log.error("Unable to run a periodic test, as there are no peers with the capacity required");
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Unable to run a periodic test, as there are no peers with the capacity required");
             _forceRun = false;
         }
         
