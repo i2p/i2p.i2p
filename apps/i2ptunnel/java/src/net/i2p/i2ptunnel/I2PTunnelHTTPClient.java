@@ -444,8 +444,13 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
                     boolean gzip = DEFAULT_GZIP;
                     if (ok != null)
                         gzip = Boolean.valueOf(ok).booleanValue();
-                    if (gzip)
-                        newRequest.append("Accept-Encoding: x-i2p-gzip\r\n");
+                    if (gzip) {
+                        // according to rfc2616 s14.3, this *should* force identity, even if
+                        // an explicit q=0 for gzip doesn't.  tested against orion.i2p, and it
+                        // seems to work.
+                        newRequest.append("Accept-Encoding: \r\n");
+                        newRequest.append("X-Accept-Encoding: x-i2p-gzip;q=1.0, identity;q=0.5, deflate;q=0, gzip;q=0, *;q=0\r\n");
+                    }
                     newRequest.append("User-Agent: MYOB/6.66 (AN/ON)\r\n");
                     newRequest.append("Connection: close\r\n\r\n");
                     break;

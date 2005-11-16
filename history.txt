@@ -1,4 +1,13 @@
-$Id: history.txt,v 1.321 2005/11/14 19:24:36 jrandom Exp $
+$Id: history.txt,v 1.322 2005/11/15 22:20:22 jrandom Exp $
+
+2005-11-16  jrandom
+    * More aggressive I2PTunnel content encoding munging to work around some
+      rare HTTP behavior (ignoring q values on Accept-encoding, using gzip
+      even when only identity is specified, etc).  I2PTunnelHTTPServer now
+      sends "Accept-encoding: \r\n" plus "X-Accept-encoding: x-i2p-gzip\r\n",
+      and I2PTunnelHTTPServer handles x-i2p-gzip in either the Accept-encoding
+      or X-Accept-encoding headers.  Eepsite operators who do not know to
+      check for X-Accept-encoding will simply use the identity encoding.
 
 * 2005-11-15  0.6.1.5 released
 

@@ -75,7 +75,11 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
             // we keep the enc sent by the browser before clobbering it, since it may have 
             // been x-i2p-gzip
             String enc = headers.getProperty("Accept-encoding");
-            headers.setProperty("Accept-encoding", "identity;q=1, *;q=0");
+            String altEnc = headers.getProperty("X-Accept-encoding");
+            
+            // according to rfc2616 s14.3, this *should* force identity, even if
+            // "identity;q=1, *;q=0" didn't.  
+            headers.setProperty("Accept-encoding", ""); 
             String modifiedHeader = formatHeaders(headers, command);
             
             //String modifiedHeader = getModifiedHeader(socket);
@@ -97,8 +101,12 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
                     allowGZIP = false;
             }
             if (_log.shouldLog(Log.INFO))
-                _log.info("HTTP server encoding header: " + enc);
-            if ( allowGZIP && (enc != null) && (enc.indexOf("x-i2p-gzip") >= 0) ) {
+                _log.info("HTTP server encoding header: " + enc + "/" + altEnc);
+            boolean useGZIP = ( (enc != null) && (enc.indexOf("x-i2p-gzip") >= 0) );
+            if ( (!useGZIP) && (altEnc != null) && (altEnc.indexOf("x-i2p-gzip") >= 0) )
+                useGZIP = true;
+            
+            if (allowGZIP && useGZIP) {
                 I2PThread req = new I2PThread(new CompressedRequestor(s, socket, modifiedHeader), "http compressor");
                 req.start();
             } else {
@@ -297,6 +305,8 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
                 String value = buf.substring(split+2); // ": "
                 if ("Accept-encoding".equalsIgnoreCase(name))
                     name = "Accept-encoding";
+                else if ("X-Accept-encoding".equalsIgnoreCase(name))
+                    name = "X-Accept-encoding";
                 headers.setProperty(name, value);
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("Read the header [" + name + "] = [" + value + "]");
