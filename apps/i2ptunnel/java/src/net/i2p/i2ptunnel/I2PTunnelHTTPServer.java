@@ -224,8 +224,20 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
             _gzipOut = new InternalGZIPOutputStream(out);
             out = _gzipOut;
         }
-        public long getTotalRead() { return _gzipOut.getTotalRead(); }
-        public long getTotalCompressed() { return _gzipOut.getTotalCompressed(); }
+        public long getTotalRead() { 
+            InternalGZIPOutputStream gzipOut = _gzipOut;
+            if (gzipOut != null)
+                return gzipOut.getTotalRead();
+            else
+                return 0;
+        }
+        public long getTotalCompressed() { 
+            InternalGZIPOutputStream gzipOut = _gzipOut;
+            if (gzipOut != null)
+                return gzipOut.getTotalCompressed();
+            else
+                return 0;
+        }
     }
     private class InternalGZIPOutputStream extends GZIPOutputStream {
         public InternalGZIPOutputStream(OutputStream target) throws IOException {

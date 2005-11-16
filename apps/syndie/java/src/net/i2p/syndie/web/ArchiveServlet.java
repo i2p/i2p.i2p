@@ -19,6 +19,20 @@ import net.i2p.syndie.data.*;
 public class ArchiveServlet extends HttpServlet {
     
     public void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        handle(req, resp);
+    }
+    
+    public void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        handle(req, resp);
+    }
+    public void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        handle(req, resp);
+    }
+    public void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        handle(req, resp);
+    }
+    
+    public void handle(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String path = req.getPathInfo();
         if ( (path == null) || (path.trim().length() <= 1) ) {
             renderRootIndex(resp);

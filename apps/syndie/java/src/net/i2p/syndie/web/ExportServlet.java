@@ -28,6 +28,16 @@ public class ExportServlet extends HttpServlet {
         export(req, resp);
     }
     
+    public void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        export(req, resp);
+    }
+    public void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        export(req, resp);
+    }
+    public void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        export(req, resp);
+    }
+    
     public static void export(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         try {
             doExport(req, resp);

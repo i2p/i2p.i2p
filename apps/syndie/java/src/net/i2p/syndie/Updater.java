@@ -71,7 +71,9 @@ public class Updater {
         try {
             Thread.currentThread().sleep(5*60*1000);
         } catch (InterruptedException ie) {}
-        
+
+        // creates the default user if necessary
+        BlogManager.instance().getDefaultUser();
         while (true) {
             int delay = BlogManager.instance().getUpdateDelay();
             update();

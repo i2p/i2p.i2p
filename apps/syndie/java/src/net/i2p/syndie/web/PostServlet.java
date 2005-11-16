@@ -152,7 +152,6 @@ public class PostServlet extends BaseServlet {
             out.write("To make changes, hit your browser's back arrow and try again.\n");
             out.write("Remote archive to push this post to: ");
             out.write("<select class=\"b_postConfirm\" name=\"" + PARAM_REMOTE_ARCHIVE + "\">\n");
-            out.write("<option name=\"\">None - don't push this post anywhere</option>\n");
             PetNameDB db = user.getPetNameDB();
             TreeSet names = new TreeSet();
             for (Iterator iter = db.getNames().iterator(); iter.hasNext(); ) {
@@ -166,6 +165,7 @@ public class PostServlet extends BaseServlet {
               out.write("<option value=\"" + HTMLRenderer.sanitizeTagParam(name) + "\">"
                         + HTMLRenderer.sanitizeString(name) + "</option>\n");
             }
+            out.write("<option name=\"\">None - don't push this post anywhere</option>\n");
             
             out.write("</select><br />\n");
             out.write("If you don't push this post remotely now, you can do so later on the <a href=\"syndicate.jsp\">syndicate</a> screen ");

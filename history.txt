@@ -1,4 +1,6 @@
-$Id: history.txt,v 1.320 2005/11/12 00:03:54 jrandom Exp $
+$Id: history.txt,v 1.321 2005/11/14 19:24:36 jrandom Exp $
+
+* 2005-11-15  0.6.1.5 released
 
 2005-11-14  jrandom
     * Migrate to the new Syndie interface
