@@ -67,8 +67,10 @@ public class Archive {
                 File meta = new File(f[i], METADATA_FILE);
                 if (meta.exists()) {
                     BlogInfo bi = new BlogInfo();
+                    FileInputStream fi = null;
                     try {
-                        bi.load(new FileInputStream(meta));
+                        fi = new FileInputStream(meta);
+                        bi.load(fi);
                         if (bi.verify(_context)) {
                             info.add(bi);
                         } else {
@@ -77,6 +79,8 @@ public class Archive {
                         }
                     } catch (IOException ioe) {
                         _log.error("Error loading the blog", ioe);
+                    } finally {
+                        if (fi != null) try { fi.close(); } catch (IOException ioe) {}
                     }
                 }
             }
@@ -276,7 +280,13 @@ public class Archive {
                 } else {
                     // we have an explicit key - no caching
                     entry = new EntryContainer();
-                    entry.load(new FileInputStream(entries[i]));
+                    FileInputStream fi = null;
+                    try {
+                        fi = new FileInputStream(entries[i]);
+                        entry.load(fi);
+                    } finally {
+                        if (fi != null) try { fi.close(); } catch (IOException ioe) {}
+                    }
                     boolean ok = entry.verifySignature(_context, info);
                     if (!ok) {
                         _log.error("Keyed entry " + entries[i].getPath() + " is not valid");

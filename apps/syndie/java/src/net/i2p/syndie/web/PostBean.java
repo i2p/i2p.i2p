@@ -74,12 +74,17 @@ public class PostBean {
     }
     
     public void writeAttachmentData(int id, OutputStream out) throws IOException {
-        FileInputStream in = new FileInputStream((File)_localFiles.get(id));
-        byte buf[] = new byte[1024];
-        int read = 0;
-        while ( (read = in.read(buf)) != -1) 
-            out.write(buf, 0, read);
-        out.close();
+        FileInputStream in = null;
+        try {
+            in = new FileInputStream((File)_localFiles.get(id));
+            byte buf[] = new byte[1024];
+            int read = 0;
+            while ( (read = in.read(buf)) != -1) 
+                out.write(buf, 0, read);
+            out.close();
+        } finally {
+            if (in != null) try { in.close(); } catch (IOException ioe) {}
+        }
     }
     
     public void addAttachment(String filename, InputStream fileStream, String mimeType) { 

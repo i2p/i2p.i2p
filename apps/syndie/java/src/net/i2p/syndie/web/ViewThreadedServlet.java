@@ -250,6 +250,7 @@ public class ViewThreadedServlet extends BaseServlet {
         out.write(rend.getEntryDate(node.getEntry().getEntryId()));
         out.write(": ");
         EntryContainer entry = archive.getEntry(node.getEntry());
+        if (entry == null) throw new RuntimeException("Unable to fetch the entry " + node.getEntry());
 
         HeaderReceiver rec = new HeaderReceiver();
         parser.parse(entry.getEntry().getText(), rec);

@@ -193,9 +193,11 @@ public class BlogManager {
         List rv = new ArrayList();
         for (int i = 0; i < files.length; i++) {
             if (files[i].isFile() && !files[i].isHidden()) {
+                FileInputStream in = null;
                 try {
                     SigningPublicKey pub = new SigningPublicKey();
-                    pub.readBytes(new FileInputStream(files[i]));
+                    in = new FileInputStream(files[i]);
+                    pub.readBytes(in);
                     BlogInfo info = _archive.getBlogInfo(pub.calculateHash());
                     if (info != null)
                         rv.add(info);
@@ -203,6 +205,8 @@ public class BlogManager {
                     _log.error("Error listing the blog", ioe);
                 } catch (DataFormatException dfe) {
                     _log.error("Error listing the blog", dfe);
+                } finally {
+                    if (in != null) try { in.close(); } catch (IOException ioe) {}
                 }
             }
         }
@@ -212,8 +216,9 @@ public class BlogManager {
     public SigningPrivateKey getMyPrivateKey(BlogInfo blog) {
         if (blog == null) return null;
         File keyFile = new File(_privKeyDir, Base64.encode(blog.getKey().calculateHash().getData()) + ".priv");
+        FileInputStream in = null;
         try {
-            FileInputStream in = new FileInputStream(keyFile);
+            in = new FileInputStream(keyFile);
             SigningPublicKey pub = new SigningPublicKey();
             pub.readBytes(in);
             SigningPrivateKey priv = new SigningPrivateKey();
@@ -225,6 +230,8 @@ public class BlogManager {
         } catch (DataFormatException dfe) {
             _log.error("Error reading the blog key", dfe);
             return null;
+        } finally {
+            if (in != null) try { in.close(); } catch (IOException ioe) {}
         }
     }
     
@@ -264,10 +271,11 @@ public class BlogManager {
     }
     
     private Properties loadUserProps(File userFile) {
+        BufferedReader in = null;
         try {
             Properties props = new Properties();
             FileInputStream fin = new FileInputStream(userFile);
-            BufferedReader in = new BufferedReader(new InputStreamReader(fin, "UTF-8"));
+            in = new BufferedReader(new InputStreamReader(fin, "UTF-8"));
             String line = null;
             while ( (line = in.readLine()) != null) {
                 int split = line.indexOf('=');
@@ -281,6 +289,8 @@ public class BlogManager {
             return props;
         } catch (IOException ioe) {
             return null;
+        } finally { 
+            if (in != null) try { in.close(); } catch (IOException ioe) {}
         }
     }
     
@@ -737,6 +747,8 @@ public class BlogManager {
         
         long entryId = getNextBlogEntry(user);
         
+        _log.debug("Next blog entry ID = " + entryId + " for user " + user.getUsername());
+        
         StringTokenizer tok = new StringTokenizer(tags, " ,\n\t");
         String tagList[] = new String[tok.countTokens()];
         for (int i = 0; i < tagList.length; i++) 
@@ -803,11 +815,14 @@ public class BlogManager {
             boolean ok = getArchive().storeEntry(c);
             if (ok) {
                 getArchive().regenerateIndex();
+                long prevEntryId = user.getMostRecentEntry();
                 user.setMostRecentEntry(entryId);
-                if(shouldAuthenticate)
+                if(shouldAuthenticate) {
                     saveUser(user);
-                else
+                } else {
                     storeUser(user);
+                }
+                _log.debug("New entry posted, entryId=" + entryId + " prev=" + prevEntryId);
                 return uri;
             } else {
                 return null;
@@ -887,7 +902,13 @@ public class BlogManager {
     private Properties getKnownHosts(File filename) throws IOException {
         Properties rv = new Properties();
         if (filename.exists()) {
-            rv.load(new FileInputStream(filename));
+            FileInputStream in = null;
+            try {
+                in = new FileInputStream(filename);
+                rv.load(in);
+            } finally {
+                if (in != null) try { in.close(); } catch (IOException ioe) {}
+            }
         }
         return rv;
     }

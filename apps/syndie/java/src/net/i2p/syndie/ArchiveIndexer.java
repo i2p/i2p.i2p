@@ -26,8 +26,9 @@ class ArchiveIndexer {
       
         File headerFile = new File(rootDir, Archive.HEADER_FILE);
         if (headerFile.exists()) {
+            BufferedReader in = null;
             try {
-                BufferedReader in = new BufferedReader(new InputStreamReader(new FileInputStream(headerFile), "UTF-8"));
+                 in = new BufferedReader(new InputStreamReader(new FileInputStream(headerFile), "UTF-8"));
                 String line = null;
                 while ( (line = in.readLine()) != null) {
                     StringTokenizer tok = new StringTokenizer(line, ":");
@@ -36,6 +37,8 @@ class ArchiveIndexer {
                 }
             } catch (IOException ioe) {
                 log.error("Error reading header file", ioe);
+            } finally {
+                if (in != null) try { in.close(); } catch (IOException ioe) {}
             }
         }
         

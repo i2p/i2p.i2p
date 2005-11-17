@@ -158,12 +158,15 @@ public class Sucker {
                 if (!lastIdFile.exists())
                     lastIdFile.createNewFile();
                 
-                FileInputStream fis = new FileInputStream(lastIdFile);
-                String number = readLine(fis);
+                FileInputStream fis = null;
                 try {
+                    fis = new FileInputStream(lastIdFile);
+                    String number = readLine(fis);
                     messageNumber = Integer.parseInt(number);
                 } catch (NumberFormatException e) {
                     messageNumber = 0;
+                } finally {
+                    if (fis != null) try { fis.close(); } catch (IOException ioe) {}
                 }
 
                 // Create outputDir if missing
@@ -226,28 +229,39 @@ public class Sucker {
 
             _log.debug("entries: " + entries.size());
             
-            FileOutputStream hos = new FileOutputStream(historyFile, true);
+            FileOutputStream hos = null;
 
-            // Process list backwards to get syndie to display the 
-            // entries in the right order. (most recent at top)
-            for (int i = entries.size()-1; i >= 0; i--) { 
-                SyndEntry e = (SyndEntry) entries.get(i);
+            try {
+                hos = new FileOutputStream(historyFile, true);
                 
-                attachmentCounter=0;
-                
-                if (_log.shouldLog(Log.DEBUG))
-                    _log.debug("Syndicate entry: " + e.getLink());
-                
-                String messageId = convertToSml(e);
-                if (messageId!=null) {
-                    hos.write(messageId.getBytes());
-                    hos.write("\n".getBytes());
+                // Process list backwards to get syndie to display the 
+                // entries in the right order. (most recent at top)
+                for (int i = entries.size()-1; i >= 0; i--) { 
+                    SyndEntry e = (SyndEntry) entries.get(i);
+
+                    attachmentCounter=0;
+
+                    if (_log.shouldLog(Log.DEBUG))
+                        _log.debug("Syndicate entry: " + e.getLink());
+
+                    String messageId = convertToSml(e);
+                    if (messageId!=null) {
+                        hos.write(messageId.getBytes());
+                        hos.write("\n".getBytes());
+                    }
                 }
+            } finally {
+                if (hos != null) try { hos.close(); } catch (IOException ioe) {}
             }
             
             if(!pushToSyndie) {
-                FileOutputStream fos = new FileOutputStream(lastIdFile);
-                fos.write(("" + messageNumber).getBytes());
+                FileOutputStream fos = null;
+                try {
+                    fos = new FileOutputStream(lastIdFile);
+                    fos.write(("" + messageNumber).getBytes());
+                } finally {
+                    if (fos != null) try { fos.close(); } catch (IOException ioe) {}
+                }
             }
             
             _log.debug("done fetching");
@@ -734,8 +748,9 @@ public class Sucker {
         String lineToCompare = messageId.substring(0, idx-1);
         idx = lineToCompare.lastIndexOf(":");
         lineToCompare = lineToCompare.substring(0, idx-1);
+        FileInputStream his = null;
         try {
-            FileInputStream his = new FileInputStream(historyFile);
+            his = new FileInputStream(historyFile);
             String line;
             while ((line = readLine(his)) != null) {
                 idx = line.lastIndexOf(":");
@@ -751,6 +766,8 @@ public class Sucker {
             }
         } catch (FileNotFoundException e) {
             e.printStackTrace();
+        } finally {
+            if (his != null) try { his.close(); } catch (IOException ioe) {}
         }
         return false;
     }

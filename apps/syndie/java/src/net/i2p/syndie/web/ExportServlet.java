@@ -136,10 +136,15 @@ public class ExportServlet extends HttpServlet {
             ze = new ZipEntry("meta" + i);
             ze.setTime(0);
             zo.putNextEntry(ze);
-            FileInputStream in = new FileInputStream((File)metaFiles.get(i));
-            while ( (read = in.read(buf)) != -1)
-                zo.write(buf, 0, read);
-            zo.closeEntry();
+            FileInputStream in = null;
+	    try {
+                in = new FileInputStream((File)metaFiles.get(i));
+                while ( (read = in.read(buf)) != -1)
+                    zo.write(buf, 0, read);
+                zo.closeEntry();
+            } finally {
+                if (in != null) try { in.close(); } catch (IOException ioe) {}
+            }
         }
         
         List entryFiles = getEntryFiles(entries);
@@ -147,10 +152,15 @@ public class ExportServlet extends HttpServlet {
             ze = new ZipEntry("entry" + i);
             ze.setTime(0);
             zo.putNextEntry(ze);
-            FileInputStream in = new FileInputStream((File)entryFiles.get(i));
-            while ( (read = in.read(buf)) != -1) 
-                zo.write(buf, 0, read);
-            zo.closeEntry();
+            FileInputStream in = null;
+	    try {
+                in = new FileInputStream((File)entryFiles.get(i));
+                while ( (read = in.read(buf)) != -1) 
+                    zo.write(buf, 0, read);
+                zo.closeEntry();
+	    } finally {
+                if (in != null) try { in.close(); } catch (IOException ioe) {}
+            }
         }
         
         if (zo != null) {

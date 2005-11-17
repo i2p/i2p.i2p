@@ -196,13 +196,20 @@ public class ArchiveServlet extends HttpServlet {
     }
     
     private void dump(File source, HttpServletResponse resp) throws ServletException, IOException {
-        FileInputStream in = new FileInputStream(source);
-        OutputStream out = resp.getOutputStream();
-        byte buf[] = new byte[1024];
-        int read = 0;
-        while ( (read = in.read(buf)) != -1) 
-            out.write(buf, 0, read);
-        out.close();
-        in.close();
+        FileInputStream in = null;
+        OutputStream out = null;
+        try {
+            in = new FileInputStream(source);
+            out = resp.getOutputStream();
+            byte buf[] = new byte[1024];
+            int read = 0;
+            while ( (read = in.read(buf)) != -1) 
+                out.write(buf, 0, read);
+            out.close();
+            in.close();
+        } finally {
+            if (in != null) try { in.close(); } catch (IOException ioe) {}
+            if (out != null) try { out.close(); } catch (IOException ioe) {}
+        }
     }
 }

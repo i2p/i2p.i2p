@@ -1,4 +1,7 @@
-$Id: history.txt,v 1.322 2005/11/15 22:20:22 jrandom Exp $
+$Id: history.txt,v 1.323 2005/11/16 06:50:56 jrandom Exp $
+
+2005-11-17  jrandom
+    * More cautious file handling in Syndie
 
 2005-11-16  jrandom
     * More aggressive I2PTunnel content encoding munging to work around some

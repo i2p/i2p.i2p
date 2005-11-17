@@ -37,7 +37,13 @@ public class EntryExtractor {
     
     public boolean extract(File entryFile, File entryDir, SessionKey entryKey, BlogInfo info) throws IOException {
         EntryContainer entry = new EntryContainer();
-        entry.load(new FileInputStream(entryFile));
+        FileInputStream in = null;
+        try {
+            in = new FileInputStream(entryFile);
+            entry.load(in);
+        } finally {
+            if (in != null) try { in.close(); } catch (IOException ioe) {}
+        }
         boolean ok = entry.verifySignature(_context, info);
         if (!ok) {
             return false;
