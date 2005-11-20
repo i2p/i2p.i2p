@@ -935,7 +935,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         buf.append("     <td><b><a href=\"#def.up\">up</a></b></td><td><b><a href=\"#def.skew\">skew</a></b></td>\n");
         buf.append("     <td><b><a href=\"#def.cwnd\">cwnd</a></b></td><td><b><a href=\"#def.ssthresh\">ssthresh</a></b></td>\n");
         buf.append("     <td><b><a href=\"#def.rtt\">rtt</a></b></td><td><b><a href=\"#def.dev\">dev</a></b></td><td><b><a href=\"#def.rto\">rto</a></b></td>\n");
-        buf.append("     <td><b><a href=\"#def.send\">send</a></b></td><td><b><a href=\"#def.recv\">recv</a></b></td>\n");
+        buf.append("     <td><b><a href=\"#def.mtu\">mtu</a></b></td><td><b><a href=\"#def.send\">send</a></b></td><td><b><a href=\"#def.recv\">recv</a></b></td>\n");
         buf.append("     <td><b><a href=\"#def.resent\">resent</a></b></td><td><b><a href=\"#def.dupRecv\">dupRecv</a></b></td>\n");
         buf.append(" </tr>\n");
         out.write(buf.toString());
@@ -1062,6 +1062,12 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             buf.append("<td valign=\"top\" ><code>");
             buf.append(rto);
             buf.append("</code></td>");
+            
+            buf.append("<td valign=\"top\" ><code>");
+            buf.append(peer.getMTU()).append('/');
+            buf.append(peer.getMTUIncreases()).append('/');
+            buf.append(peer.getMTUDecreases());
+            buf.append("</code></td>");
         
             long sent = peer.getPacketsTransmitted();
             long recv = peer.getPacketsReceived();
@@ -1113,7 +1119,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             numPeers++;
         }
         
-        buf.append("<tr><td colspan=\"14\"><hr /></td></tr>\n");
+        buf.append("<tr><td colspan=\"15\"><hr /></td></tr>\n");
         buf.append(" <tr><td colspan=\"2\"><b>Total</b></td>");
         buf.append("     <td>");
         buf.append(formatKBps(bpsIn)).append("KBps/").append(formatKBps(bpsOut));
@@ -1127,12 +1133,12 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         buf.append(numPeers > 0 ? rttTotal/numPeers : 0);
         buf.append("</td><td>&nbsp;</td><td>");
         buf.append(numPeers > 0 ? rtoTotal/numPeers : 0);
-        buf.append("</td>\n     <td>");
+        buf.append("</td>\n     <td>&nbsp;</td><td>");
         buf.append(sendTotal).append("</td><td>").append(recvTotal).append("</td>\n");
         buf.append("     <td>").append(resentTotal);
         buf.append("</td><td>").append(dupRecvTotal).append("</td>\n");
         buf.append(" </tr>\n");
-        buf.append("<tr><td colspan=\"14\" valign=\"top\" align=\"left\">");
+        buf.append("<tr><td colspan=\"15\" valign=\"top\" align=\"left\">");
         long bytesTransmitted = _context.bandwidthLimiter().getTotalAllocatedOutboundBytes();
         double averagePacketSize = _context.statManager().getRate("udp.sendPacketSize").getLifetimeAverageValue();
         // lifetime value, not just the retransmitted packets of current connections
@@ -1161,7 +1167,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         }
     }
     
-    private static final String KEY = "<tr><td colspan=\"14\" valign=\"top\" align=\"left\">" +
+    private static final String KEY = "<tr><td colspan=\"15\" valign=\"top\" align=\"left\">" +
         "<b id=\"def.peer\">peer</b>: the remote peer (&lt; means they offer to introduce us, &gt; means we offer to introduce them)<br />\n" +
         "<b id=\"def.idle\">idle</b>: the idle time is how long since a packet has been received or sent<br />\n" +
         "<b id=\"def.rate\">in/out</b>: the rates show a smoothed inbound and outbound transfer rate (KBytes per second)<br />\n" +
@@ -1172,6 +1178,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         "<b id=\"def.rtt\">rtt</b>: the round trip time is how long it takes to get an acknowledgement of a packet<br />\n" +
         "<b id=\"def.dev\">dev</b>: the standard deviation of the round trip time, to help control the retransmit timeout<br />\n" +
         "<b id=\"def.rto\">rto</b>: the retransmit timeout controls how frequently an unacknowledged packet will be retransmitted<br />\n" +
+        "<b id=\"def.mtu\">mtu</b>: current sending packet size/number of times it increased/number of times it decreased<br />\n" +
         "<b id=\"def.send\">send</b>: the number of packets sent to the peer<br />\n" +
         "<b id=\"def.recv\">recv</b>: the number of packets received from the peer<br />\n" +
         "<b id=\"def.resent\">resent</b>: the number of packets retransmitted to the peer<br />\n" +

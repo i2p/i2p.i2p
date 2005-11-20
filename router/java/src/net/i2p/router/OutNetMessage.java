@@ -35,6 +35,7 @@ public class OutNetMessage {
     private I2NPMessage _message;
     /** cached message class name, for use after we discard the message */
     private String _messageType;
+    private int _messageTypeId;
     /** cached message ID, for use after we discard the message */
     private long _messageId;
     private long _messageSize;
@@ -145,11 +146,13 @@ public class OutNetMessage {
         _message = msg;
         if (msg != null) {
             _messageType = msg.getClass().getName();
+            _messageTypeId = msg.getType();
             _messageId = msg.getUniqueId();
         }
     }
     
     public String getMessageType() { return _messageType; }
+    public int getMessageTypeId() { return _messageTypeId; }
     public long getMessageId() { return _messageId; }
     
     public long getMessageSize() {

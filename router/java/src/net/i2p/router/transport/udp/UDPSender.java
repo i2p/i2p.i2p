@@ -41,6 +41,19 @@ public class UDPSender {
         _context.statManager().createRateStat("udp.sendBWThrottleTime", "How long the send is blocked by the bandwidth throttle", "udp", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
         _context.statManager().createRateStat("udp.sendACKTime", "How long an ACK packet is blocked for (duration == lifetime)", "udp", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
         _context.statManager().createRateStat("udp.sendException", "How frequently we fail to send a packet (likely due to a windows exception)", "udp", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
+
+        _context.statManager().createRateStat("udp.sendPacketSize.1", "db store message size", "udp", new long[] { 60*1000, 5*60*1000, 30*60*1000 });
+        _context.statManager().createRateStat("udp.sendPacketSize.2", "db lookup message size", "udp", new long[] { 60*1000, 5*60*1000, 30*60*1000 });
+        _context.statManager().createRateStat("udp.sendPacketSize.3", "db search reply message size", "udp", new long[] { 60*1000, 5*60*1000, 30*60*1000 });
+        _context.statManager().createRateStat("udp.sendPacketSize.6", "tunnel create message size", "udp", new long[] { 60*1000, 5*60*1000, 30*60*1000 });
+        _context.statManager().createRateStat("udp.sendPacketSize.7", "tunnel create status message size", "udp", new long[] { 60*1000, 5*60*1000, 30*60*1000 });
+        _context.statManager().createRateStat("udp.sendPacketSize.10", "delivery status message size", "udp", new long[] { 60*1000, 5*60*1000, 30*60*1000 });
+        _context.statManager().createRateStat("udp.sendPacketSize.11", "garlic message size", "udp", new long[] { 60*1000, 5*60*1000, 30*60*1000 });
+        _context.statManager().createRateStat("udp.sendPacketSize.16", "date message size", "udp", new long[] { 60*1000, 5*60*1000, 30*60*1000 });
+        _context.statManager().createRateStat("udp.sendPacketSize.18", "tunnel data message size", "udp", new long[] { 60*1000, 5*60*1000, 30*60*1000 });
+        _context.statManager().createRateStat("udp.sendPacketSize.19", "tunnel gateway message size", "udp", new long[] { 60*1000, 5*60*1000, 30*60*1000 });
+        _context.statManager().createRateStat("udp.sendPacketSize.20", "data message size", "udp", new long[] { 60*1000, 5*60*1000, 30*60*1000 });
+        _context.statManager().createRateStat("udp.sendPacketSize.42", "ack-only packet size", "udp", new long[] { 60*1000, 5*60*1000, 30*60*1000 });
     }
     
     public void startup() {
@@ -154,6 +167,8 @@ public class UDPSender {
                         //    len = 128;
                         //_log.debug("Sending packet: (size="+size + "/"+size2 +")\nraw: " + Base64.encode(packet.getPacket().getData(), 0, size));
                     }
+                    
+                    _context.statManager().addRateData("udp.sendPacketSize." + packet.getMessageType(), size, packet.getFragmentCount());
                     
                     //packet.getPacket().setLength(size);
                     try {

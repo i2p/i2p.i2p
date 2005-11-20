@@ -74,10 +74,18 @@ public class UDPEndpoint {
      *
      * @return number of packets in the send queue
      */
-    public int send(UDPPacket packet) { return _sender.add(packet); }
+    public int send(UDPPacket packet) { 
+        if (_sender == null)
+            return 0;
+        return _sender.add(packet); 
+    }
     
     /**
      * Blocking call to receive the next inbound UDP packet from any peer.
      */
-    public UDPPacket receive() { return _receiver.receiveNext(); }
+    public UDPPacket receive() { 
+        if (_receiver == null)
+            return null;
+        return _receiver.receiveNext(); 
+    }
 }

@@ -480,10 +480,17 @@ public class OutboundMessageFragments {
             int sparseCount = 0;
             UDPPacket rv[] = new UDPPacket[fragments]; //sparse
             for (int i = 0; i < fragments; i++) {
-                if (state.needsSending(i))
+                if (state.needsSending(i)) {
                     rv[i] = _builder.buildPacket(state, i, peer, remaining, partialACKBitfields);
-                else
+                    rv[i].setFragmentCount(fragments);
+                    OutNetMessage msg = state.getMessage();
+                    if (msg != null)
+                        rv[i].setMessageType(msg.getMessageTypeId());
+                    else
+                        rv[i].setMessageType(-1);
+                } else {
                     sparseCount++;
+                }
             }
             if (sparseCount > 0)
                 remaining.clear();

@@ -108,6 +108,9 @@ public class ACKSender implements Runnable {
                     //_context.statManager().getStatLog().addData(peer.getRemoteHostId().toString(), "udp.peer.sendACKCount", ackBitfields.size(), 0);
                     UDPPacket ack = _builder.buildACK(peer, ackBitfields);
                     ack.markType(1);
+                    ack.setFragmentCount(-1);
+                    ack.setMessageType(42);
+                    
                     if (_log.shouldLog(Log.INFO))
                         _log.info("Sending ACK for " + ackBitfields);
                     boolean ok = peer.allocateSendingBytes(ack.getPacket().getLength(), true);

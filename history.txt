@@ -1,4 +1,9 @@
-$Id: history.txt,v 1.323 2005/11/16 06:50:56 jrandom Exp $
+$Id: history.txt,v 1.324 2005/11/17 03:23:46 jrandom Exp $
+
+2005-11-19  jrandom
+    * Implemented a trivial pure java PMTU backoff strategy, switching between
+      a 608 byte MTU and a 1350 byte MTU, depending upon retransmission rates.
+    * Fixed new user registration in Syndie (thanks Complication!)
 
 2005-11-17  jrandom
     * More cautious file handling in Syndie

@@ -138,6 +138,8 @@ public class PeerState {
     private int _mtu;
     /** when did we last check the MTU? */
     private long _mtuLastChecked;
+    private long _mtuIncreases;
+    private long _mtuDecreases;
     /** current round trip time estimate */
     private volatile int _rtt;
     /** smoothed mean deviation in the rtt */
@@ -177,9 +179,19 @@ public class PeerState {
      * for UDP, and 8 for IP, giving us 596.  round up to mod 16, giving a total
      * of 608
      */
-    private static final int DEFAULT_MTU = 608;//600; //1500;
+    private static final int MIN_MTU = 608;//600; //1500;
+    private static final int DEFAULT_MTU = MIN_MTU;
+    /* 
+     * based on measurements, 1350 fits nearly all reasonably small I2NP messages
+     * (larger I2NP messages may be up to 1900B-4500B, which isn't going to fit
+     * into a live network MTU anyway)
+     */
+    private static final int LARGE_MTU = 1350;
+    
     private static final int MIN_RTO = 500 + ACKSender.ACK_FREQUENCY;
     private static final int MAX_RTO = 1200; // 5000;
+    /** override the default MTU */
+    private static final String PROP_DEFAULT_MTU = "i2np.udp.mtu";
     
     public PeerState(I2PAppContext ctx) {
         _context = ctx;
@@ -214,7 +226,7 @@ public class PeerState {
         _remoteRequiresIntroduction = false;
         _weRelayToThemAs = 0;
         _theyRelayToUsAs = 0;
-        _mtu = DEFAULT_MTU;
+        _mtu = getDefaultMTU();
         _mtuLastChecked = -1;
         _lastACKSend = -1;
         _rtt = 1000;
@@ -234,6 +246,20 @@ public class PeerState {
         _context.statManager().createRateStat("udp.sendACKPartial", "Number of partial ACKs sent (duration == number of full ACKs in that ack packet)", "udp", new long[] { 60*1000, 10*60*1000, 60*60*1000, 24*60*60*1000 });
         _context.statManager().createRateStat("udp.sendBps", "How fast we are transmitting when a packet is acked", "udp", new long[] { 60*1000, 10*60*1000, 60*60*1000, 24*60*60*1000 });
         _context.statManager().createRateStat("udp.receiveBps", "How fast we are receiving when a packet is fully received (at most one per second)", "udp", new long[] { 60*1000, 10*60*1000, 60*60*1000, 24*60*60*1000 });
+        _context.statManager().createRateStat("udp.mtuIncrease", "How many retransmissions have there been to the peer when the MTU was increased (period is total packets transmitted)", "udp", new long[] { 60*1000, 10*60*1000, 60*60*1000, 24*60*60*1000 });
+        _context.statManager().createRateStat("udp.mtuDecrease", "How many retransmissions have there been to the peer when the MTU was decreased (period is total packets transmitted)", "udp", new long[] { 60*1000, 10*60*1000, 60*60*1000, 24*60*60*1000 });
+    }
+    
+    private int getDefaultMTU() {
+        String mtu = _context.getProperty(PROP_DEFAULT_MTU);
+        if (mtu != null) {
+            try {
+                return Integer.valueOf(mtu).intValue();
+            } catch (NumberFormatException nfe) {
+                // ignore
+            }
+        }
+        return DEFAULT_MTU;
     }
     
     /**
@@ -328,6 +354,8 @@ public class PeerState {
     public int getMTU() { return _mtu; }
     /** when did we last check the MTU? */
     public long getMTULastChecked() { return _mtuLastChecked; }
+    public long getMTUIncreases() { return _mtuIncreases; }
+    public long getMTUDecreases() { return _mtuDecreases; }
     
     
     /**
@@ -702,8 +730,16 @@ public class PeerState {
         }
         
         _messagesSent++;
-        if (numSends < 2)
+        if (numSends < 2) {
             recalculateTimeouts(lifetime);
+            if (_mtu <= MIN_MTU) {
+                if (_context.random().nextInt((int)_mtuDecreases) <= 0) {
+                    _context.statManager().addRateData("udp.mtuIncrease", _packetsRetransmitted, _packetsTransmitted);
+                    _mtu = LARGE_MTU;
+                    _mtuIncreases++;
+                }
+            }
+        }
         else if (_log.shouldLog(Log.WARN))
             _log.warn("acked after numSends=" + numSends + " w/ lifetime=" + lifetime + " and size=" + bytesACKed);
         
@@ -731,6 +767,17 @@ public class PeerState {
             _rto = MAX_RTO;
     }
     
+    private void reduceMTU() {
+        if (_mtu > MIN_MTU) {
+            double retransPct = (double)_packetsRetransmitted/(double)_packetsTransmitted;
+            if (retransPct >= 0.05) { // should we go for lower?
+                _context.statManager().addRateData("udp.mtuDecrease", _packetsRetransmitted, _packetsTransmitted);
+                _mtu = MIN_MTU;
+                _mtuDecreases++;
+            }
+        }
+    }
+    
     /** we are resending a packet, so lets jack up the rto */
     public void messageRetransmitted(int packets) { 
         long now = _context.clock().now();
@@ -745,6 +792,7 @@ public class PeerState {
         }
         congestionOccurred();
         _context.statManager().addRateData("udp.congestedRTO", _rto, _rttDeviation);
+        reduceMTU();
         //_rto *= 2; 
     }
     public void packetsTransmitted(int packets) { 

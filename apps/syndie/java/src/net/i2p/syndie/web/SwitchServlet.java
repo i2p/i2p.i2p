@@ -34,8 +34,9 @@ public class SwitchServlet extends BaseServlet {
                   "<input type=\"submit\" name=\"action\" value=\"Logout\" /></td></tr>\n" +
                   "</form>\n" +
                   "<tr><td colspan=\"3\"><hr /></td></tr>\n" +
-                  "<form action=\"" + ThreadedHTMLRenderer.buildProfileURL(null) + "\" method=\"POST\">\n" +
-                  "<tr><td colspan=\"3\"><b>Register a new account</b></td></tr>\n" +
+                  "<form action=\"" + ThreadedHTMLRenderer.buildProfileURL(null) + "\" method=\"POST\">\n");
+        writeAuthActionFields(out);
+        out.write("<tr><td colspan=\"3\"><b>Register a new account</b></td></tr>\n" +
                   "<tr><td colspan=\"3\">Login: <input type=\"text\" name=\"login\" /> (only known locally)</td></tr>\n" +
                   "<tr><td colspan=\"3\">Password: <input type=\"password\" name=\"password\" /></td></tr>\n" +
                   "<tr><td colspan=\"3\">Public name: <input type=\"text\" name=\"accountName\" /></td></tr>\n" +

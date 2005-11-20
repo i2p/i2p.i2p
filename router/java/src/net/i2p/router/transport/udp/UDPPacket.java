@@ -117,6 +117,13 @@ public class UDPPacket {
      */
     public int getMarkedType() { verifyNotReleased(); return _markedType; }
     
+    private int _messageType;
+    private int _fragmentCount;
+    int getMessageType() { return _messageType; }
+    void setMessageType(int type) { _messageType = type; }
+    int getFragmentCount() { return _fragmentCount; }
+    void setFragmentCount(int count) { _fragmentCount = count; }
+    
     public RemoteHostId getRemoteHost() {
         if (_remoteHost == null)
             _remoteHost = new RemoteHostId(_packet.getAddress().getAddress(), _packet.getPort());
