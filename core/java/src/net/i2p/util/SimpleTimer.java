@@ -26,19 +26,20 @@ public class SimpleTimer {
     private Map _eventTimes;
     private List _readyEvents;
     
-    private SimpleTimer() {
+    protected SimpleTimer() { this("SimpleTimer"); }
+    protected SimpleTimer(String name) {
         _context = I2PAppContext.getGlobalContext();
         _log = _context.logManager().getLog(SimpleTimer.class);
         _events = new TreeMap();
         _eventTimes = new HashMap(1024);
         _readyEvents = new ArrayList(4);
         I2PThread runner = new I2PThread(new SimpleTimerRunner());
-        runner.setName("SimpleTimer");
+        runner.setName(name);
         runner.setDaemon(true);
         runner.start();
         for (int i = 0; i < 3; i++) {
             I2PThread executor = new I2PThread(new Executor());
-            executor.setName("SimpleTimerExecutor " + i);
+            executor.setName(name + "Executor " + i);
             executor.setDaemon(true);
             executor.start();
         }
