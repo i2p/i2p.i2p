@@ -1,4 +1,18 @@
-$Id: history.txt,v 1.324 2005/11/17 03:23:46 jrandom Exp $
+$Id: history.txt,v 1.325 2005/11/19 23:42:17 jrandom Exp $
+
+2005-11-21  jrandom
+    * IE doesn't strip SPAN from <button> form fields, so add in a workaround
+      within I2PTunnel.
+    * Increase the maximum SSU retransmission timeout to accomodate slower or
+      more congested links (though SSU's RTO calculation will usually use a
+      much lower timeout)
+    * Moved the streaming lib timed events off the main timer queues and onto
+      a streaming lib specific set of timer queues.  Streaming lib timed
+      events are more likely to have lock contention on the I2CP socket while
+      other timed events in the router are (largely) independent.
+    * Fixed a case sensitive lookup bug (thanks tino!)
+    * Syndie cleanup - new edit form on the preview page, and fixed some blog
+      links (thanks tino!)
 
 2005-11-19  jrandom
     * Implemented a trivial pure java PMTU backoff strategy, switching between

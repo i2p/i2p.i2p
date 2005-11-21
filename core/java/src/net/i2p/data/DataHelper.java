@@ -212,9 +212,15 @@ public class DataHelper {
      *
      */
     public static void loadProps(Properties props, File file) throws IOException {
-        loadProps(props, new FileInputStream(file));
+        loadProps(props, file, false);
+    }
+    public static void loadProps(Properties props, File file, boolean forceLowerCase) throws IOException {
+        loadProps(props, new FileInputStream(file), forceLowerCase);
     }
     public static void loadProps(Properties props, InputStream inStr) throws IOException {
+        loadProps(props, inStr, false);
+    }
+    public static void loadProps(Properties props, InputStream inStr, boolean forceLowerCase) throws IOException {
         BufferedReader in = null;
         try {
             in = new BufferedReader(new InputStreamReader(inStr, "UTF-8"), 16*1024);
@@ -230,7 +236,10 @@ public class DataHelper {
                 String key = line.substring(0, split);
                 String val = line.substring(split+1);
                 if ( (key.length() > 0) && (val.length() > 0) )
-                    props.setProperty(key, val);
+                    if (forceLowerCase)
+                        props.setProperty(key.toLowerCase(), val);
+                    else
+                        props.setProperty(key, val);
             }
         } finally {
             if (in != null) try { in.close(); } catch (IOException ioe) {}

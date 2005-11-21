@@ -148,9 +148,7 @@ public class PostServlet extends BaseServlet {
         writeAuthActionFields(out);
         out.write("Please confirm that the above is ok");
         if (BlogManager.instance().authorizeRemote(user)) { 
-            out.write(", and select what additional archives you want the post transmitted to.  ");
-            out.write("To make changes, hit your browser's back arrow and try again.\n");
-            out.write("Remote archive to push this post to: ");
+            out.write(", and select what additional archive you want the post transmitted to: ");
             out.write("<select class=\"b_postConfirm\" name=\"" + PARAM_REMOTE_ARCHIVE + "\">\n");
             PetNameDB db = user.getPetNameDB();
             TreeSet names = new TreeSet();
@@ -173,6 +171,10 @@ public class PostServlet extends BaseServlet {
         }
         out.write("</span><input class=\"b_postConfirm\" type=\"submit\" name=\"" + PARAM_ACTION 
                   + "\" value=\"" + ACTION_CONFIRM + "\" />\n");
+        
+        out.write("</form>\n");
+        
+        displayEditForm(user, req, post, out);
         
         out.write("</td></tr>\n");
     }
@@ -200,37 +202,37 @@ public class PostServlet extends BaseServlet {
         post.reinitialize();
         post.setUser(user);
         
+        String parentURI = req.getParameter(PARAM_PARENT);
+        
+        String subject = getParam(req, PARAM_SUBJECT);
+        
         out.write("<form action=\"" + getPostURI() + "\" method=\"POST\" enctype=\"multipart/form-data\">\n");
         writeAuthActionFields(out);
         out.write("<tr><td colspan=\"3\">\n");
         out.write("<span class=\"b_postField\">Post subject:</span> ");
         out.write("<input type=\"text\" class=\"b_postSubject\" size=\"80\" name=\"" + PARAM_SUBJECT 
-                  + "\" value=\"" + getParam(req,PARAM_SUBJECT) + "\" /><br />\n");
-        out.write("<span class=\"b_postField\">Post tags:</span> ");
-        out.write("<input type=\"text\" class=\"b_postTags\" size=\"20\" name=\"" + PARAM_TAGS 
-                  + "\" value=\"" + getParam(req, PARAM_TAGS) + "\" /><br />\n");
-        out.write("<span class=\"b_postField\">Include public names?</span> ");
-        out.write("<input class=\"b_postNames\" type=\"checkbox\" name=\"" + PARAM_INCLUDENAMES 
-                  + "\" value=\"true\" /><br />\n");
+                  + "\" value=\"" + HTMLRenderer.sanitizeTagParam(subject) + "\" /><br />\n");
         out.write("<span class=\"b_postField\">Post content (in raw <a href=\"smlref.jsp\" target=\"_blank\">SML</a>, no headers):</span><br />\n");
         out.write("<textarea class=\"b_postText\" rows=\"6\" cols=\"80\" name=\"" + PARAM_TEXT + "\">" + getParam(req, PARAM_TEXT) + "</textarea><br />\n");
         out.write("<span class=\"b_postField\">SML post headers:</span><br />\n");
         out.write("<textarea class=\"b_postHeaders\" rows=\"3\" cols=\"80\" name=\"" + PARAM_HEADERS + "\">" + getParam(req, PARAM_HEADERS) + "</textarea><br />\n");
         
-        
-        String parentURI = req.getParameter(PARAM_PARENT);
         if ( (parentURI != null) && (parentURI.trim().length() > 0) )
             out.write("<input type=\"hidden\" name=\"" + PARAM_PARENT + "\" value=\"" + parentURI + "\" />\n");
 
-        out.write(" Tags: <input type=\"text\" size=\"10\" name=\"" + PARAM_TAGS + "\" value=\"" + getParam(req, PARAM_TAGS) + "\" />\n");
+        out.write(" Tags: <input type=\"text\" size=\"10\" name=\"" + PARAM_TAGS + "\" value=\"" + getParam(req, PARAM_TAGS) + "\" /><br />\n");
         
         boolean inNewThread = getInNewThread(req);
         boolean refuseReplies = getRefuseReplies(req);
 
-        out.write(" in a new thread? <input type=\"checkbox\" value=\"true\" name=\"" + PARAM_IN_NEW_THREAD + 
-                  (inNewThread ? "\" checked=\"true\" " : "\" " ) + " />\n");
-        out.write(" refuse replies? <input type=\"checkbox\" value=\"true\" name=\"" + PARAM_REFUSE_REPLIES + 
-                  (refuseReplies ? "\" checked=\"true\" " : "\" " ) + " />\n");
+        out.write("In a new thread? <input type=\"checkbox\" value=\"true\" name=\"" + PARAM_IN_NEW_THREAD + 
+                  (inNewThread ? "\" checked=\"true\" " : "\" " ) + " /><br />\n");
+        out.write("Refuse replies? <input type=\"checkbox\" value=\"true\" name=\"" + PARAM_REFUSE_REPLIES + 
+                  (refuseReplies ? "\" checked=\"true\" " : "\" " ) + " /><br />\n");
+        
+        out.write("<span class=\"b_postField\">Include public names?</span> ");
+        out.write("<input class=\"b_postNames\" type=\"checkbox\" name=\"" + PARAM_INCLUDENAMES 
+                  + "\" value=\"true\" /><br />\n");
         
         out.write(ATTACHMENT_FIELDS);
 
@@ -249,8 +251,67 @@ public class PostServlet extends BaseServlet {
         out.write("</form>\n");
     }
     
+    private void displayEditForm(User user, MultiPartRequest req, PostBean post, PrintWriter out) throws IOException {
+        String parentURI = req.getString(PARAM_PARENT);
+        
+        String subject = getParam(req, PARAM_SUBJECT);
+        
+        out.write("<hr />\n");
+        out.write("<form action=\"" + getPostURI() + "\" method=\"POST\" enctype=\"multipart/form-data\">\n");
+        writeAuthActionFields(out);
+        out.write("<tr><td colspan=\"3\">\n");
+        out.write("<span class=\"b_postField\">Post subject:</span> ");
+        out.write("<input type=\"text\" class=\"b_postSubject\" size=\"80\" name=\"" + PARAM_SUBJECT 
+                  + "\" value=\"" + HTMLRenderer.sanitizeTagParam(subject) + "\" /><br />\n");
+        out.write("<span class=\"b_postField\">Post content (in raw <a href=\"smlref.jsp\" target=\"_blank\">SML</a>, no headers):</span><br />\n");
+        out.write("<textarea class=\"b_postText\" rows=\"6\" cols=\"80\" name=\"" + PARAM_TEXT + "\">" + getParam(req, PARAM_TEXT) + "</textarea><br />\n");
+        out.write("<span class=\"b_postField\">SML post headers:</span><br />\n");
+        out.write("<textarea class=\"b_postHeaders\" rows=\"3\" cols=\"80\" name=\"" + PARAM_HEADERS + "\">" + getParam(req, PARAM_HEADERS) + "</textarea><br />\n");
+        
+        if ( (parentURI != null) && (parentURI.trim().length() > 0) )
+            out.write("<input type=\"hidden\" name=\"" + PARAM_PARENT + "\" value=\"" + parentURI + "\" />\n");
+
+        out.write(" Tags: <input type=\"text\" size=\"10\" name=\"" + PARAM_TAGS + "\" value=\"" + getParam(req, PARAM_TAGS) + "\" /><br />\n");
+        
+        boolean inNewThread = getInNewThread(req);
+        boolean refuseReplies = getRefuseReplies(req);
+
+        out.write("In a new thread? <input type=\"checkbox\" value=\"true\" name=\"" + PARAM_IN_NEW_THREAD + 
+                  (inNewThread ? "\" checked=\"true\" " : "\" " ) + " /><br />\n");
+        out.write("Refuse replies? <input type=\"checkbox\" value=\"true\" name=\"" + PARAM_REFUSE_REPLIES + 
+                  (refuseReplies ? "\" checked=\"true\" " : "\" " ) + " /><br />\n");
+        
+        out.write("<span class=\"b_postField\">Include public names?</span> ");
+        out.write("<input class=\"b_postNames\" type=\"checkbox\" name=\"" + PARAM_INCLUDENAMES 
+                  + "\" value=\"true\" /><br />\n");
+        
+        int newCount = 0;
+        for (int i = 0; i < 32 && newCount < 3; i++) {
+          String filename = req.getFilename("entryfile" + i);
+          if ( (filename != null) && (filename.trim().length() > 0) ) {
+              out.write("<span class=\"b_postField\">Attachment " + i + ":</span> ");
+              out.write(HTMLRenderer.sanitizeString(filename));
+              out.write("<br />");
+          } else {
+              out.write("<span class=\"b_postField\">Attachment " + i + ":</span> ");
+              out.write("<input class=\"b_postField\" type=\"file\" name=\"entryfile" + i + "\" ");
+              out.write("/><br />");
+              newCount++;
+          }
+        }
+
+        out.write("<hr />\n");
+        out.write("<input class=\"b_postPreview\" type=\"submit\" name=\"Post\" value=\"Preview...\" /> ");
+        out.write("<input class=\"b_postReset\" type=\"reset\" value=\"Cancel\" />\n");
+        
+        out.write("</form>\n");
+    }
+    
     private boolean getInNewThread(HttpServletRequest req) {
         return getInNewThread(req.getParameter(PARAM_IN_NEW_THREAD));
+    }
+    private boolean getInNewThread(MultiPartRequest req) {
+        return getInNewThread(getParam(req, PARAM_IN_NEW_THREAD));
     }
     private boolean getInNewThread(String val) {
         boolean rv = false;
@@ -261,6 +322,9 @@ public class PostServlet extends BaseServlet {
     }
     private boolean getRefuseReplies(HttpServletRequest req) {
         return getRefuseReplies(req.getParameter(PARAM_REFUSE_REPLIES));
+    }
+    private boolean getRefuseReplies(MultiPartRequest req) {
+        return getRefuseReplies(getParam(req, PARAM_REFUSE_REPLIES));
     }
     private boolean getRefuseReplies(String val) {
         boolean rv = false;
@@ -282,6 +346,11 @@ public class PostServlet extends BaseServlet {
     private String getParam(HttpServletRequest req, String param) {
         String val = req.getParameter(param);
         if (val == null) val = "";
+        return val;
+    }
+    private String getParam(MultiPartRequest req, String param) {
+        String val = req.getString(param);
+        if (val == null) return "";
         return val;
     }
     

@@ -139,9 +139,11 @@ public class IndexBean {
             return stop();
         else if ("start".equals(_action))
             return start();
-        else if ("Save changes".equals(_action))
+        else if ("Save changes".equals(_action) || // IE workaround:
+                (_action.toLowerCase().indexOf("s</span>ave") >= 0))
             return saveChanges();
-        else if ("Delete this proxy".equals(_action))
+        else if ("Delete this proxy".equals(_action) || // IE workaround:
+                (_action.toLowerCase().indexOf("d</span>elete") >= 0))
             return deleteTunnel();
         else
             return "Action " + _action + " unknown";

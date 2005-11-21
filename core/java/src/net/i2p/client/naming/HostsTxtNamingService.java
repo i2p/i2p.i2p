@@ -64,9 +64,9 @@ public class HostsTxtNamingService extends NamingService {
             try {
                 File f = new File(hostsfile);
                 if ( (f.exists()) && (f.canRead()) ) {
-                    DataHelper.loadProps(hosts, f);
+                    DataHelper.loadProps(hosts, f, true);
                     
-                    String key = hosts.getProperty(hostname);
+                    String key = hosts.getProperty(hostname.toLowerCase());
                     if ( (key != null) && (key.trim().length() > 0) ) {
                         return lookupBase64(key);
                     }

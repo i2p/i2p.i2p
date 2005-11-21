@@ -298,7 +298,7 @@ public class Connection {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Resend in " + timeout + " for " + packet, new Exception("Sent by"));
 
-            SimpleTimer.getInstance().addEvent(new ResendPacketEvent(packet, timeout + _context.clock().now()), timeout);
+            RetransmissionTimer.getInstance().addEvent(new ResendPacketEvent(packet, timeout + _context.clock().now()), timeout);
         }
 
         _context.statManager().getStatLog().addData(Packet.toId(_sendStreamId), "stream.rtt", _options.getRTT(), _options.getWindowSize());
@@ -758,8 +758,8 @@ public class Connection {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Resetting the inactivity timer to " + howLong, new Exception("Reset by"));
         // this will get rescheduled, and rescheduled, and rescheduled...
-        SimpleTimer.getInstance().removeEvent(_activityTimer);
-        SimpleTimer.getInstance().addEvent(_activityTimer, howLong);
+        RetransmissionTimer.getInstance().removeEvent(_activityTimer);
+        RetransmissionTimer.getInstance().addEvent(_activityTimer, howLong);
     }
     
     private class ActivityTimer implements SimpleTimer.TimedEvent {
@@ -773,7 +773,7 @@ public class Connection {
             long left = getTimeLeft();
             if (left > 0) {
                 if (_log.shouldLog(Log.DEBUG)) _log.debug("Inactivity timeout reached, but there is time left (" + left + ")");
-                SimpleTimer.getInstance().addEvent(ActivityTimer.this, left);
+                RetransmissionTimer.getInstance().addEvent(ActivityTimer.this, left);
                 return;
             }
             // these are either going to time out or cause further rescheduling
@@ -963,7 +963,7 @@ public class Connection {
                     if (_log.shouldLog(Log.WARN))
                         _log.warn("Delaying resend of " + _packet + " as there are " 
                                   + _activeResends + " active resends already in play");
-                    SimpleTimer.getInstance().addEvent(ResendPacketEvent.this, 1000);
+                    RetransmissionTimer.getInstance().addEvent(ResendPacketEvent.this, 1000);
                     _nextSendTime = 1000 + _context.clock().now();
                     return false;
                 }
@@ -1055,7 +1055,7 @@ public class Connection {
                         timeout = MAX_RESEND_DELAY;
                     if (_log.shouldLog(Log.DEBUG))
                         _log.debug("Scheduling resend in " + timeout + "ms for " + _packet);
-                    SimpleTimer.getInstance().addEvent(ResendPacketEvent.this, timeout);
+                    RetransmissionTimer.getInstance().addEvent(ResendPacketEvent.this, timeout);
                     _nextSendTime = timeout + _context.clock().now();
                 }
                 return true;

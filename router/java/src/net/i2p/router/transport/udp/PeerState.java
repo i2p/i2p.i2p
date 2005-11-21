@@ -189,7 +189,7 @@ public class PeerState {
     private static final int LARGE_MTU = 1350;
     
     private static final int MIN_RTO = 500 + ACKSender.ACK_FREQUENCY;
-    private static final int MAX_RTO = 1200; // 5000;
+    private static final int MAX_RTO = 2500; // 5000;
     /** override the default MTU */
     private static final String PROP_DEFAULT_MTU = "i2np.udp.mtu";
     
@@ -733,7 +733,7 @@ public class PeerState {
         if (numSends < 2) {
             recalculateTimeouts(lifetime);
             if (_mtu <= MIN_MTU) {
-                if (_context.random().nextInt((int)_mtuDecreases) <= 0) {
+                if (_context.random().nextInt(50*(int)_mtuDecreases) <= 0) {
                     _context.statManager().addRateData("udp.mtuIncrease", _packetsRetransmitted, _packetsTransmitted);
                     _mtu = LARGE_MTU;
                     _mtuIncreases++;

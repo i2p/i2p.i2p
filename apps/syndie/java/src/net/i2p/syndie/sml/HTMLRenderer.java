@@ -341,14 +341,16 @@ public class HTMLRenderer extends EventReceiverImpl {
         }
         
         
-        String url = getPageURL(blog, null, -1, -1, -1, (_user != null ? _user.getShowExpanded() : false), (_user != null ? _user.getShowImages() : false));
+        //String url = getPageURL(blog, null, -1, -1, -1, (_user != null ? _user.getShowExpanded() : false), (_user != null ? _user.getShowImages() : false));
+        String url = getMetadataURL(blog);
         _bodyBuffer.append(getSpan("blogEntrySummary")).append(" [<a ").append(getClass("blogLink")).append(" href=\"").append(url);
         _bodyBuffer.append("\">");
         if ( (name != null) && (name.trim().length() > 0) )
             _bodyBuffer.append(sanitizeString(name));
         else
             _bodyBuffer.append("view");
-        _bodyBuffer.append("</a> (<a ").append(getClass("blogMeta")).append(" href=\"").append(getMetadataURL(blog)).append("\">meta</a>)");
+        _bodyBuffer.append("</a> ");
+        //_bodyBuffer.append("</a> (<a ").append(getClass("blogMeta")).append(" href=\"").append(getMetadataURL(blog)).append("\">meta</a>)");
         if ( (tag != null) && (tag.trim().length() > 0) ) {
             url = getPageURL(blog, tag, -1, -1, -1, false, false);
             _bodyBuffer.append(" <a ").append(getClass("blogTagLink")).append(" href=\"").append(url);

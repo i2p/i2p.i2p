@@ -155,7 +155,7 @@ public class ConnectionPacketHandler {
                 // take note of congestion
                 if (_log.shouldLog(Log.WARN))
                     _log.warn("congestion.. dup " + packet);
-                SimpleTimer.getInstance().addEvent(new AckDup(con), con.getOptions().getSendAckDelay());
+                RetransmissionTimer.getInstance().addEvent(new AckDup(con), con.getOptions().getSendAckDelay());
                 //con.setNextSendTime(_context.clock().now() + con.getOptions().getSendAckDelay());
                 //fastAck = true;
             } else {

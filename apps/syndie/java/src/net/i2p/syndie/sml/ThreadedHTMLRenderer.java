@@ -468,6 +468,8 @@ public class ThreadedHTMLRenderer extends HTMLRenderer {
         if ( (blog != null) && (entryId > 0) ) {
             buf.append(PARAM_VIEW_POST).append('=').append(Base64.encode(blog.getData())).append('/').append(entryId).append('&');
             buf.append(PARAM_VISIBLE).append('=').append(Base64.encode(blog.getData())).append('/').append(entryId).append('&');
+        } else if (blog != null) {
+            buf.append(PARAM_AUTHOR).append('=').append(blog.toBase64()).append('&');
         }
         if (tag != null)
             buf.append(PARAM_TAGS).append('=').append(sanitizeTagParam(tag)).append('&');

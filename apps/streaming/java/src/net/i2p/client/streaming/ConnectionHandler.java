@@ -50,7 +50,7 @@ class ConnectionHandler {
         }
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Receive new SYN: " + packet + ": timeout in " + _acceptTimeout);
-        SimpleTimer.getInstance().addEvent(new TimeoutSyn(packet), _acceptTimeout);
+        RetransmissionTimer.getInstance().addEvent(new TimeoutSyn(packet), _acceptTimeout);
         synchronized (_synQueue) {
             _synQueue.add(packet);
             _synQueue.notifyAll();

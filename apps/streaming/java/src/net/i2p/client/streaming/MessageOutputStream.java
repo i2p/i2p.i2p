@@ -194,7 +194,7 @@ public class MessageOutputStream extends OutputStream {
             // no need to be overly worried about duplicates - it would just 
             // push it further out
             if (!_enqueued) {
-                SimpleTimer.getInstance().addEvent(_flusher, _passiveFlushDelay);
+                RetransmissionTimer.getInstance().addEvent(_flusher, _passiveFlushDelay);
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("Enqueueing the flusher for " + _passiveFlushDelay + "ms out");
             } else {
