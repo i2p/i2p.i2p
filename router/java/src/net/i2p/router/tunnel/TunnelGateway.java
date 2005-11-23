@@ -64,6 +64,8 @@ public class TunnelGateway {
         _flushFrequency = 500;
         _delayedFlush = new DelayedFlush();
         _lastFlush = _context.clock().now();
+        _context.statManager().createRateStat("tunnel.lockedGatewayAdd", "How long do we block when adding a message to a tunnel gateway's queue", "Tunnels", new long[] { 60*1000, 10*60*1000 });
+        _context.statManager().createRateStat("tunnel.lockedGatewayCheck", "How long do we block when flushing a tunnel gateway's queue", "Tunnels", new long[] { 60*1000, 10*60*1000 });
     }
     
     /**
@@ -87,11 +89,18 @@ public class TunnelGateway {
     public void add(I2NPMessage msg, Hash toRouter, TunnelId toTunnel) {
         _messagesSent++;
         boolean delayedFlush = false;
+        long delayAmount = -1;
         
+        int remaining = 0;
+        long beforeLock = _context.clock().now();
+        long afterAdded = -1;
         Pending cur = new PendingImpl(msg, toRouter, toTunnel);
         synchronized (_queue) {
             _queue.add(cur);
+            afterAdded = _context.clock().now();
             delayedFlush = _preprocessor.preprocessQueue(_queue, _sender, _receiver);
+            if (delayedFlush)
+                delayAmount = _preprocessor.getDelayAmount();
             _lastFlush = _context.clock().now();
             
             // expire any as necessary, even if its framented
@@ -104,11 +113,13 @@ public class TunnelGateway {
                     i--;
                 }
             }
+            remaining = _queue.size();
         }
         
         if (delayedFlush) {
-            SimpleTimer.getInstance().addEvent(_delayedFlush, _flushFrequency);
+            FlushTimer.getInstance().addEvent(_delayedFlush, delayAmount);
         }
+        _context.statManager().addRateData("tunnel.lockedGatewayAdd", afterAdded-beforeLock, remaining);
     }
     
     public int getMessagesSent() { return _messagesSent; }
@@ -131,6 +142,9 @@ public class TunnelGateway {
          * @return true if we should delay before preprocessing again 
          */
         public boolean preprocessQueue(List pending, Sender sender, Receiver receiver);
+        
+        /** how long do we want to wait before flushing */
+        public long getDelayAmount();
     }
     
     public interface Receiver {
@@ -148,8 +162,12 @@ public class TunnelGateway {
         protected byte _remaining[];
         protected int _offset;
         protected int _fragmentNumber;
+        protected long _created;
         
-        public Pending(I2NPMessage message, Hash toRouter, TunnelId toTunnel) {
+        public Pending(I2NPMessage message, Hash toRouter, TunnelId toTunnel) { 
+            this(message, toRouter, toTunnel, System.currentTimeMillis()); 
+        }
+        public Pending(I2NPMessage message, Hash toRouter, TunnelId toTunnel, long now) {
             _toRouter = toRouter;
             _toTunnel = toTunnel;
             _messageId = message.getUniqueId();
@@ -157,6 +175,7 @@ public class TunnelGateway {
             _remaining = message.toByteArray();
             _offset = 0;
             _fragmentNumber = 0;
+            _created = now;
         }
         /** may be null */
         public Hash getToRouter() { return _toRouter; }
@@ -170,17 +189,15 @@ public class TunnelGateway {
         public int getOffset() { return _offset; }
         /** move the offset */
         public void setOffset(int offset) { _offset = offset; }
+        public long getLifetime() { return System.currentTimeMillis()-_created; }
         /** which fragment are we working on (0 for the first fragment) */
         public int getFragmentNumber() { return _fragmentNumber; }
         /** ok, fragment sent, increment what the next will be */
         public void incrementFragmentNumber() { _fragmentNumber++; }
     }
     private class PendingImpl extends Pending {
-        private long _created;
-        
         public PendingImpl(I2NPMessage message, Hash toRouter, TunnelId toTunnel) {
-            super(message, toRouter, toTunnel);
-            _created = _context.clock().now();
+            super(message, toRouter, toTunnel, _context.clock().now());
         }        
         
         public String toString() {
@@ -203,20 +220,37 @@ public class TunnelGateway {
             buf.append(" frag ").append(_fragmentNumber);
             return buf.toString();
         }
+
+        public long getLifetime() { return _context.clock().now()-_created; }
     }
     
     private class DelayedFlush implements SimpleTimer.TimedEvent {
         public void timeReached() {
             boolean wantRequeue = false;
+            int remaining = 0;
+            long beforeLock = _context.clock().now();
+            long afterChecked = -1;
+            long delayAmount = -1;
+            if (_queue.size() > 10000) // stay out of the synchronized block
+                System.out.println("foo!");
             synchronized (_queue) {
-                if (_queue.size() > 0)
+                if (_queue.size() > 10000) // stay in the synchronized block
+                    System.out.println("foo!");
+                afterChecked = _context.clock().now();
+                if (_queue.size() > 0) {
                     wantRequeue = _preprocessor.preprocessQueue(_queue, _sender, _receiver);
+                    if (wantRequeue)
+                        delayAmount = _preprocessor.getDelayAmount();
+                }
+                remaining = _queue.size();
             }
             
             if (wantRequeue)
-                SimpleTimer.getInstance().addEvent(_delayedFlush, _flushFrequency);
+                FlushTimer.getInstance().addEvent(_delayedFlush, delayAmount);
             else
                 _lastFlush = _context.clock().now();
+            
+            _context.statManager().addRateData("tunnel.lockedGatewayCheck", afterChecked-beforeLock, remaining);
         }
     }
 }

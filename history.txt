@@ -1,4 +1,10 @@
-$Id: history.txt,v 1.325 2005/11/19 23:42:17 jrandom Exp $
+$Id: history.txt,v 1.326 2005/11/21 09:37:10 jrandom Exp $
+
+2005-11-23  jrandom
+    * Removed spurious streaming lib RTO increase (it wasn't helpful)
+    * Streamlined the tunnel batching to schedule batch transmissions more
+      appropriately.
+    * Default tunnel pool variance to 2 +0-1 hops
 
 2005-11-21  jrandom
     * IE doesn't strip SPAN from <button> form fields, so add in a workaround

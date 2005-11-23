@@ -80,7 +80,7 @@ public class ConnectionPacketHandler {
             if (packet.getOptionalDelay() > 60000) {
                 // requested choke 
                 choke = true;
-                con.getOptions().setRTT(con.getOptions().getRTT() + 10*1000);
+                //con.getOptions().setRTT(con.getOptions().getRTT() + 10*1000);
             }
         }
         
@@ -272,7 +272,7 @@ public class ConnectionPacketHandler {
                 oldSize = 1;
 
             // setRTT has its own ceiling
-            con.getOptions().setRTT(con.getOptions().getRTT() + 10*1000);
+            //con.getOptions().setRTT(con.getOptions().getRTT() + 10*1000);
             con.getOptions().setWindowSize(oldSize);
 
             if (_log.shouldLog(Log.DEBUG))

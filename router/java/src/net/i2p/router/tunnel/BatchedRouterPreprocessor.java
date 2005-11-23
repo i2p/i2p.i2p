@@ -18,20 +18,40 @@ public class BatchedRouterPreprocessor extends BatchedPreprocessor {
      */
     public static final String PROP_BATCH_FREQUENCY = "batchFrequency";
     public static final String PROP_ROUTER_BATCH_FREQUENCY = "router.batchFrequency";
-    public static final int DEFAULT_BATCH_FREQUENCY = 500;
+    public static final int DEFAULT_BATCH_FREQUENCY = 100;
     
     public BatchedRouterPreprocessor(RouterContext ctx) {
         this(ctx, (HopConfig)null);
     }
     public BatchedRouterPreprocessor(RouterContext ctx, TunnelCreatorConfig cfg) {
-        super(ctx);
+        super(ctx, getName(cfg));
         _routerContext = ctx;
         _config = cfg;
     }
     public BatchedRouterPreprocessor(RouterContext ctx, HopConfig cfg) {
-        super(ctx);
+        super(ctx, getName(cfg));
         _routerContext = ctx;
         _hopConfig = cfg;
+    }
+    
+    private static String getName(HopConfig cfg) {
+        if (cfg == null) return "[unknown]";
+        if (cfg.getReceiveTunnel() != null)
+            return cfg.getReceiveTunnel().getTunnelId() + "";
+        else if (cfg.getSendTunnel() != null)
+            return cfg.getSendTunnel().getTunnelId() + "";
+        else
+            return "[n/a]";
+    }
+    
+    private static String getName(TunnelCreatorConfig cfg) {
+        if (cfg == null) return "[unknown]";
+        if (cfg.getReceiveTunnelId(0) != null)
+            return cfg.getReceiveTunnelId(0).getTunnelId() + "";
+        else if (cfg.getSendTunnelId(0) != null)
+            return cfg.getSendTunnelId(0).getTunnelId() + "";
+        else
+            return "[n/a]";
     }
 
     /** how long should we wait before flushing */
@@ -41,9 +61,9 @@ public class BatchedRouterPreprocessor extends BatchedPreprocessor {
             Properties opts = _config.getOptions();
             if (opts != null)
                 freq = opts.getProperty(PROP_BATCH_FREQUENCY);
-        } else {
-            freq = _routerContext.getProperty(PROP_ROUTER_BATCH_FREQUENCY);
         }
+        if (freq == null)
+            freq = _routerContext.getProperty(PROP_ROUTER_BATCH_FREQUENCY);
         
         if (freq != null) {
             try {

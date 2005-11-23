@@ -32,7 +32,10 @@ public class TrivialPreprocessor implements TunnelGateway.QueuePreprocessor {
         _context = ctx;
         _log = ctx.logManager().getLog(TrivialPreprocessor.class);
     }
-    
+  
+    /** how long do we want to wait before flushing */
+    public long getDelayAmount() { return 0; }
+  
     /**
      * Return true if there were messages remaining, and we should queue up
      * a delayed flush to clear them

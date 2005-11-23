@@ -72,7 +72,7 @@ public class Connection {
     private long _lifetimeDupMessageSent;
     private long _lifetimeDupMessageReceived;
     
-    public static final long MAX_RESEND_DELAY = 15*1000;
+    public static final long MAX_RESEND_DELAY = 10*1000;
     public static final long MIN_RESEND_DELAY = 2*1000;
 
     /** wait up to 5 minutes after disconnection so we can ack/close packets */
@@ -992,7 +992,7 @@ public class Connection {
                             newWindowSize = 1;
                         
                         // setRTT has its own ceiling
-                        getOptions().setRTT(getOptions().getRTT() + 10*1000);
+                        //getOptions().setRTT(getOptions().getRTT() + 10*1000);
                         getOptions().setWindowSize(newWindowSize);
 
                         if (_log.shouldLog(Log.WARN))
