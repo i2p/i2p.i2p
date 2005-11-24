@@ -56,25 +56,33 @@ public class InboundMessageState {
             StringBuffer buf = new StringBuffer(1024);
             buf.append("Invalid fragment ").append(fragmentNum);
             buf.append(": ").append(data);
-            data.toRawString(buf);
-            _log.log(Log.CRIT, buf.toString(), new Exception("source"));
+            //data.toRawString(buf);
+            _log.error(buf.toString());
             return false;
         }
         if (_fragments[fragmentNum] == null) {
             // new fragment, read it
             ByteArray message = _fragmentCache.acquire();
-            data.readMessageFragment(dataFragment, message.getData(), 0);
-            int size = data.readMessageFragmentSize(dataFragment);
-            message.setValid(size);
-            _fragments[fragmentNum] = message;
-            boolean isLast = data.readMessageIsLast(dataFragment);
-            if (isLast)
-                _lastFragment = fragmentNum;
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("New fragment " + fragmentNum + " for message " + _messageId 
-                           + ", size=" + size
-                           + ", isLast=" + isLast
-                           + ", data=" + Base64.encode(message.getData(), 0, size));
+            try {
+                data.readMessageFragment(dataFragment, message.getData(), 0);
+                int size = data.readMessageFragmentSize(dataFragment);
+                message.setValid(size);
+                _fragments[fragmentNum] = message;
+                boolean isLast = data.readMessageIsLast(dataFragment);
+                if (isLast)
+                    _lastFragment = fragmentNum;
+                if (_log.shouldLog(Log.DEBUG))
+                    _log.debug("New fragment " + fragmentNum + " for message " + _messageId 
+                               + ", size=" + size
+                               + ", isLast=" + isLast
+                               + ", data=" + Base64.encode(message.getData(), 0, size));
+            } catch (ArrayIndexOutOfBoundsException aioobe) {
+                StringBuffer buf = new StringBuffer(1024);
+                buf.append("Corrupt SSU fragment ").append(fragmentNum);
+                buf.append(": ").append(data);
+                _log.error(buf.toString(), aioobe);
+                return false;
+            }
         } else {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Received fragment " + fragmentNum + " for message " + _messageId 

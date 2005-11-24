@@ -973,6 +973,7 @@ public class BlogManager {
         if ( (location != null) && (location.trim().length() > 0) )
             buf.append(location.trim());
         System.setProperty("syndie.updateArchives", buf.toString());
+        writeConfig();
         Updater.wakeup();
     }
     public void scheduleSyndication(String locations[]) {
@@ -987,6 +988,7 @@ public class BlogManager {
         for (Iterator iter = locs.iterator(); iter.hasNext(); )
             buf.append(iter.next().toString().trim()).append(',');
         System.setProperty("syndie.updateArchives", buf.toString());
+        writeConfig();
         Updater.wakeup();
     }
     public void unscheduleSyndication(String location) {
@@ -998,6 +1000,7 @@ public class BlogManager {
                     buf.append(archives[i]).append(",");
             System.setProperty("syndie.updateArchives", buf.toString());
         }
+        writeConfig();
     }
     public boolean syndicationScheduled(String location) {
         String archives[] = getUpdateArchives();

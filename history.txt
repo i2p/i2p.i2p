@@ -1,4 +1,7 @@
-$Id: history.txt,v 1.326 2005/11/21 09:37:10 jrandom Exp $
+$Id: history.txt,v 1.327 2005/11/23 11:04:56 jrandom Exp $
+
+2005-11-24  jrandom
+    * Fix to save syndication settings in Syndie (thanks spaetz!)
 
 2005-11-23  jrandom
     * Removed spurious streaming lib RTO increase (it wasn't helpful)
