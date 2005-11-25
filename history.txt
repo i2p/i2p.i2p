@@ -1,4 +1,9 @@
-$Id: history.txt,v 1.327 2005/11/23 11:04:56 jrandom Exp $
+$Id: history.txt,v 1.328 2005/11/24 03:45:57 jrandom Exp $
+
+2005-11-25  jrandom
+    * Don't publish stats for periods we haven't reached yet (thanks zzz!)
+    * Cleaned up the syndie threaded display to show the last updated date for
+      a subthread, and to highlight threads updated in the last two days.
 
 2005-11-24  jrandom
     * Fix to save syndication settings in Syndie (thanks spaetz!)

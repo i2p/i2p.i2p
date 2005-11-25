@@ -99,6 +99,7 @@ public class ViewThreadedServlet extends BaseServlet {
         }
         out.write("</td><td class=\"threadNavRight\" nowrap=\"true\">\n");
         
+        out.write("<span class=\"rightOffset\">");
         int max = index.getRootCount();
         if (threadOffset + 10 > max) {
             out.write("Next Page&gt; Last Page&gt;&gt;\n");
@@ -109,7 +110,8 @@ public class ViewThreadedServlet extends BaseServlet {
             out.write(getNavLink(req, -1));
             out.write("\">Last Page&gt;&gt;</a>\n");
         }
-        out.write("<!-- thread nav end -->\n");
+        out.write("</span>");
+        //out.write("<!-- thread nav end -->\n");
         out.write("</td></tr>\n");
     }
     
@@ -247,7 +249,17 @@ public class ViewThreadedServlet extends BaseServlet {
         out.write("<a href=\"");
         out.write(getViewPostLink(req, node, user, false));
         out.write("\" title=\"View post\">");
-        out.write(rend.getEntryDate(node.getEntry().getEntryId()));
+        long dayBegin = BlogManager.instance().getDayBegin();
+        long postId = node.getMostRecentPostDate();
+        if (postId >= dayBegin) {
+            out.write("<b>today</b>");
+        } else if (postId >= dayBegin - 24*60*60*1000) {
+            out.write("<b>yesterday</b>");
+        } else {
+            int daysAgo = (int)((dayBegin - postId + 24*60*60*1000-1)/(24*60*60*1000));
+            out.write(daysAgo + " days ago");
+        }
+        
         out.write(": ");
         EntryContainer entry = archive.getEntry(node.getEntry());
         if (entry == null) throw new RuntimeException("Unable to fetch the entry " + node.getEntry());
@@ -259,9 +271,15 @@ public class ViewThreadedServlet extends BaseServlet {
             subject = "";
         out.write(trim(subject, 40));
         out.write("</a>\n</td><td class=\"threadRight\">\n");
-        out.write("<a href=\"");
-        out.write(getViewThreadLink(req, node, user));
-        out.write("\" title=\"View all posts in the thread\">view thread</a>\n");
+        if (childCount > 0) {
+            out.write(" <a href=\"");
+            out.write(getViewThreadLink(req, node, user));
+            out.write("\" title=\"View all posts in the thread\">view thread</a>\n");
+        } else {
+            out.write("<a href=\"");
+            out.write(getViewPostLink(req, node, user, false));
+            out.write("\" title=\"View the post\">view post</a>\n");
+        }
         out.write("</td></tr>\n");
         
         boolean rendered = true;

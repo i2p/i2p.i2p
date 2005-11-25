@@ -949,7 +949,8 @@ public class BlogManager {
     }
 
     private final SimpleDateFormat _dateFormat = new SimpleDateFormat("yyyy/MM/dd", Locale.UK);    
-    private final long getDayBegin(long now) {
+    public final long getDayBegin() { return getDayBegin(_context.clock().now()); }
+    public final long getDayBegin(long now) {
         synchronized (_dateFormat) {
             try {
                 String str = _dateFormat.format(new Date(now));

@@ -934,7 +934,14 @@ public abstract class BaseServlet extends HttpServlet {
 "}\n" +
 ".threadNavRight {\n" +
 "	text-align: right;\n" +
+"	float: right;\n" +
+"	background-color: #BBBBBB;\n" +
 "}\n" +
+".rightOffset {\n" +
+"                   float: right;\n" +
+"                   margin: 0 5px 0 0;\n" +
+"	display: inline;\n" +
+"}\n" +    
 ".postMeta {\n" +
 "	background-color: #BBBBFF;\n" +
 "}\n" +
