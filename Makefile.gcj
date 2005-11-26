@@ -24,10 +24,40 @@ JAR_BASE=i2p.jar mstreaming.jar streaming.jar
 JAR_CLIENTS=i2ptunnel.jar sam.jar i2psnark.jar
 JAR_ROUTER=router.jar
 JAR_JBIGI=jbigi.jar
+JAR_XML=xml-apis.jar resolver.jar xercesImpl.jar
+JAR_CONSOLE=\
+            javax.servlet.jar \
+            commons-el.jar \
+            commons-logging.jar \
+	    jasper-runtime.jar \
+            ant-apache-bcel.jar \
+            ant.jar \
+            jasper-compiler.jar \
+            org.mortbay.jetty.jar \
+	    routerconsole.jar
+JAR_SUCKER=jdom.jar rome-0.7.jar sucker.jar
 LIBI2P_JARS=${JAR_BASE} ${JAR_CLIENTS} ${JAR_ROUTER} ${JAR_JBIGI}
+# unfortunately, its not quite ready for most end users, as the
+# ${JAR_CONSOLE} fails to compile with: 
+# org/apache/commons/logging/impl/LogKitLogger.java: In class 'org.apache.commons.logging.impl.LogKitLogger':
+# .../LogKitLogger.java: In constructor '(java.lang.String)':
+# .../LogKitLogger.java:91: error: cannot find file for class org.apache.log.Hierarchy
+# .../LogKitLogger.java:91: error: cannot find file for class org.apache.log.Hierarchy
+# .../LogKitLogger.java:104: error: cannot find file for class org.apache.log.Hierarchy
+# .../LogKitLogger.java:104: confused by earlier errors, bailing out
 
-SYSTEM_PROPS=
+#${JAR_CONSOLE}\
+#${JAR_XML} \
+#${JAR_SUCKER}
+#${JAR_CONSOLE}
+
+SYSTEM_PROPS=-DloggerFilenameOverride=logs/log-router-@.txt \
+             -Dorg.mortbay.http.Version.paranoid=true \
+	     -Dorg.mortbay.util.FileResource.checkAliases=false \
+	     -Dorg.mortbay.xml.XmlParser.NotValidating=true
 #SYSTEM_PROPS=-Di2p.weakPRNG=true
+OPTIMIZE=-O2
+#OPTIMIZE=-O3
 
 LD_LIBRARY_PATH=${EXTRA_LD_PATH}:.
 
@@ -47,23 +77,24 @@ native_clean:
 	@mkdir ${NATIVE_DIR}
 
 native_shared: libi2p.so
-	@cd build ; ${GCJ} -fjni -L../${NATIVE_DIR} -li2p ${SYSTEM_PROPS} -o ../${NATIVE_DIR}/i2p_dsa --main=net.i2p.crypto.DSAEngine 
+	@cd build ; ${GCJ} ${OPTIMIZE} -fjni -L../${NATIVE_DIR} -li2p ${SYSTEM_PROPS} -o ../${NATIVE_DIR}/i2p_dsa --main=net.i2p.crypto.DSAEngine 
 	@echo "* i2p_dsa is a simple test app with the DSA engine and Fortuna PRNG to make sure crypto is working"
-	@cd build ; ${GCJ} -fjni -L../${NATIVE_DIR} -li2p ${SYSTEM_PROPS} -o ../${NATIVE_DIR}/i2ptunnel --main=net.i2p.i2ptunnel.I2PTunnel 
+	@cd build ; ${GCJ} ${OPTIMIZE} -fjni -L../${NATIVE_DIR} -li2p ${SYSTEM_PROPS} -o ../${NATIVE_DIR}/prng --main=gnu.crypto.prng.Fortuna
+	@cd build ; ${GCJ} ${OPTIMIZE} -fjni -L../${NATIVE_DIR} -li2p ${SYSTEM_PROPS} -o ../${NATIVE_DIR}/i2ptunnel --main=net.i2p.i2ptunnel.I2PTunnel 
 	@echo "* i2ptunnel is mihi's I2PTunnel CLI"
 	@echo "  run it as ./i2ptunnel -cli to avoid awt complaints"
-	@cd build ; ${GCJ} -fjni -L../${NATIVE_DIR} -li2p ${SYSTEM_PROPS} -o ../${NATIVE_DIR}/i2ptunnelctl --main=net.i2p.i2ptunnel.TunnelControllerGroup 
+	@cd build ; ${GCJ} ${OPTIMIZE} -fjni -L../${NATIVE_DIR} -li2p ${SYSTEM_PROPS} -o ../${NATIVE_DIR}/i2ptunnelctl --main=net.i2p.i2ptunnel.TunnelControllerGroup 
 	@echo "* i2ptunnelctl is a controller for I2PTunnel, reading i2ptunnel.config"
 	@echo "  and launching the appropriate proxies"
-	@cd build ; ${GCJ} -fjni -L../${NATIVE_DIR} -li2p ${SYSTEM_PROPS} -o ../${NATIVE_DIR}/i2psnark --main=org.klomp.snark.Snark
+	@cd build ; ${GCJ} ${OPTIMIZE} -fjni -L../${NATIVE_DIR} -li2p ${SYSTEM_PROPS} -o ../${NATIVE_DIR}/i2psnark --main=org.klomp.snark.Snark
 	@echo "* i2psnark is an anonymous bittorrent client"
-	@cd build ; ${GCJ} -fjni -L../${NATIVE_DIR} -li2p ${SYSTEM_PROPS} -o ../${NATIVE_DIR}/i2prouter --main=net.i2p.router.Router 
+	@cd build ; ${GCJ} ${OPTIMIZE} -fjni -L../${NATIVE_DIR} -li2p ${SYSTEM_PROPS} -o ../${NATIVE_DIR}/i2prouter --main=net.i2p.router.Router 
 	@echo "* i2prouter is the main I2P router"
 	@echo "  it can be used, and while the router console won't load,"
 	@echo "  i2ptunnel will, so it will start all the proxies defined in i2ptunnel.config"
 
 libi2p.so:
 	@echo "* Building libi2p.so"
-	@(cd build ; ${GCJ} -fPIC -fjni -shared -o ../${NATIVE_DIR}/libi2p.so ${LIBI2P_JARS} ; cd .. )
+	@(cd build ; ${GCJ} ${OPTIMIZE} -fPIC -fjni -shared -o ../${NATIVE_DIR}/libi2p.so ${LIBI2P_JARS} ; cd .. )
 	@ls -l ${NATIVE_DIR}/libi2p.so
 	@echo "* libi2p.so built"
