@@ -211,28 +211,30 @@ public class PostServlet extends BaseServlet {
         out.write("<tr><td colspan=\"3\">\n");
         out.write("<span class=\"b_postField\">Post subject:</span> ");
         out.write("<input type=\"text\" class=\"b_postSubject\" size=\"80\" name=\"" + PARAM_SUBJECT 
-                  + "\" value=\"" + HTMLRenderer.sanitizeTagParam(subject) + "\" /><br />\n");
+                  + "\" value=\"" + HTMLRenderer.sanitizeTagParam(subject) + "\" title=\"One line summary\" /><br />\n");
         out.write("<span class=\"b_postField\">Post content (in raw <a href=\"smlref.jsp\" target=\"_blank\">SML</a>, no headers):</span><br />\n");
         out.write("<textarea class=\"b_postText\" rows=\"6\" cols=\"80\" name=\"" + PARAM_TEXT + "\">" + getParam(req, PARAM_TEXT) + "</textarea><br />\n");
         out.write("<span class=\"b_postField\">SML post headers:</span><br />\n");
-        out.write("<textarea class=\"b_postHeaders\" rows=\"3\" cols=\"80\" name=\"" + PARAM_HEADERS + "\">" + getParam(req, PARAM_HEADERS) + "</textarea><br />\n");
+        out.write("<textarea class=\"b_postHeaders\" rows=\"2\" cols=\"80\" name=\"" + PARAM_HEADERS + "\" title=\"Most people can leave this empty\" >" + getParam(req, PARAM_HEADERS) + "</textarea><br />\n");
         
         if ( (parentURI != null) && (parentURI.trim().length() > 0) )
             out.write("<input type=\"hidden\" name=\"" + PARAM_PARENT + "\" value=\"" + parentURI + "\" />\n");
 
-        out.write(" Tags: <input type=\"text\" size=\"10\" name=\"" + PARAM_TAGS + "\" value=\"" + getParam(req, PARAM_TAGS) + "\" /><br />\n");
+        out.write(" Tags: <input type=\"text\" size=\"10\" name=\"" + PARAM_TAGS + "\" value=\"" + getParam(req, PARAM_TAGS) + "\" title=\"Optional tags to categorize your response\" /><br />\n");
         
         boolean inNewThread = getInNewThread(req);
         boolean refuseReplies = getRefuseReplies(req);
 
         out.write("In a new thread? <input type=\"checkbox\" value=\"true\" name=\"" + PARAM_IN_NEW_THREAD + 
-                  (inNewThread ? "\" checked=\"true\" " : "\" " ) + " /><br />\n");
+                  (inNewThread ? "\" checked=\"true\" " : "\" " ) 
+                  + " title=\"If true, this will fork a new top level thread\" /><br />\n");
         out.write("Refuse replies? <input type=\"checkbox\" value=\"true\" name=\"" + PARAM_REFUSE_REPLIES + 
-                  (refuseReplies ? "\" checked=\"true\" " : "\" " ) + " /><br />\n");
+                  (refuseReplies ? "\" checked=\"true\" " : "\" " ) 
+                  + " title=\"If true, only you will be able to reply to the post\" /><br />\n");
         
         out.write("<span class=\"b_postField\">Include public names?</span> ");
         out.write("<input class=\"b_postNames\" type=\"checkbox\" name=\"" + PARAM_INCLUDENAMES 
-                  + "\" value=\"true\" /><br />\n");
+                  + "\" value=\"true\" title=\"If true, everything marked 'public' in your addressbook is shared\" /><br />\n");
         
         out.write(ATTACHMENT_FIELDS);
 

@@ -290,14 +290,10 @@ public class ViewThreadedServlet extends BaseServlet {
             }
             
             out.write("</a>\n");
-            out.write(" <a href=\"");
-            out.write(getViewThreadLink(req, node, user));
-            out.write("\" title=\"View all posts in the thread\">full thread</a>\n");
-        } else {
-            out.write("<a href=\"");
-            out.write(getViewPostLink(req, node, user, false));
-            out.write("\" title=\"View the post\">view post</a>\n");
         }
+        out.write(" <a href=\"");
+        out.write(getViewThreadLink(req, node, user));
+        out.write("\" title=\"View all posts in the thread\">full thread</a>\n");
         out.write("</span>");
         out.write("</td></tr>\n");
         

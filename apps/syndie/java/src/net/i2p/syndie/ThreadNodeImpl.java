@@ -61,7 +61,9 @@ class ThreadNodeImpl implements ThreadNode {
         for (int i = 0; i < _children.size(); i++) {
             ThreadNodeImpl node = (ThreadNodeImpl)_children.get(i);
             node.summarizeThread();
-            if (node.getMostRecentPostDate() > _mostRecentPostDate) {
+            // >= so we can give reasonable order when a child is a reply to a parent
+            // (since the child must have been posted after the parent)
+            if (node.getMostRecentPostDate() >= _mostRecentPostDate) {
                 _mostRecentPostDate = node.getMostRecentPostDate();
                 _mostRecentPostAuthor = node.getMostRecentPostAuthor();
             }

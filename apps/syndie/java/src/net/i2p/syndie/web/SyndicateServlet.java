@@ -111,12 +111,12 @@ public class SyndicateServlet extends BaseServlet {
 
         out.write("</select>\n");
         out.write("<span class=\"b_remoteChooserField\">Proxy</span>\n");
-        out.write("<input class=\"b_remoteChooserHost\" type=\"text\" size=\"10\" name=\"proxyhost\" value=\"");
+        out.write("<input class=\"b_remoteChooserHost\" type=\"text\" size=\"12\" name=\"proxyhost\" value=\"");
         out.write(BlogManager.instance().getDefaultProxyHost());
-        out.write("\" />\n");
+        out.write("\" title=\"hostname that your HTTP proxy is on, or blank for no proxy\" />\n");
         out.write("<input class=\"b_remoteChooserPort\" type=\"text\" size=\"4\" name=\"proxyport\" value=\"");
         out.write(BlogManager.instance().getDefaultProxyPort());
-        out.write("\" /><br />\n");
+        out.write("\" title=\"port number that your HTTP proxy is on, or blank for no proxy\" /><br />\n");
         out.write("<span class=\"b_remoteChooserField\">Bookmarked archives:</span>\n");
         out.write("<select class=\"b_remoteChooserPN\" name=\"" + PARAM_PETNAME + "\">");
         out.write("<option value=\"\">Custom location</option>");
@@ -136,7 +136,7 @@ public class SyndicateServlet extends BaseServlet {
         String reqLoc = req.getParameter("location");
         if (reqLoc != null)
             out.write(reqLoc);
-        out.write("\" />\n");
+        out.write("\" title=\"full URL to the remote location, to be sent to your HTTP proxy\" />\n");
         out.write("<input class=\"b_remoteChooserContinue\" type=\"submit\" name=\"action\" value=\"Continue...\" /><br />\n");
         out.write("</span>\n");
     }

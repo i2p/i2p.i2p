@@ -494,6 +494,7 @@ public abstract class BaseServlet extends HttpServlet {
         //out.write("<tr class=\"topNav\"><td class=\"topNav_user\" colspan=\"2\" nowrap=\"true\">\n");
         out.write("<tr class=\"topNav\"><td colspan=\"3\" nowrap=\"true\"><span class=\"topNav_user\">\n");
         out.write("<!-- nav bar begin -->\n");
+        out.write("<a href=\"threads.jsp\" title=\"Syndie home\">Home</a> ");
         if (user.getAuthenticated() && (user.getBlog() != null) ) {
             out.write("Logged in as <a href=\"" + getProfileLink(req, user.getBlog()) + "\" title=\"Edit your profile\">");
             out.write(user.getUsername());
@@ -504,8 +505,8 @@ public abstract class BaseServlet extends HttpServlet {
         } else {
             out.write("<form action=\"" + req.getRequestURI() + "\" method=\"POST\">\n");
             writeAuthActionFields(out);
-            out.write("Login: <input type=\"text\" name=\"login\" />\n");
-            out.write("Password: <input type=\"password\" name=\"password\" />\n");
+            out.write("Login: <input type=\"text\" name=\"login\" title=\"Login name for your Syndie account\" />\n");
+            out.write("Password: <input type=\"password\" name=\"password\" title=\"Password to get into your Syndie account\" />\n");
             out.write("<input type=\"submit\" name=\"action\" value=\"Login\" /></form>\n");
         }
         //out.write("</td><td class=\"topNav_admin\">\n");
@@ -594,10 +595,16 @@ public abstract class BaseServlet extends HttpServlet {
         }
         out.write("</select>\n");
         
-        out.write("Tags: <input type=\"text\" name=\"" + ThreadedHTMLRenderer.PARAM_TAGS + "\" size=\"10\" value=\"" + tags + "\" />\n");
+        out.write("Tags: <input type=\"text\" name=\"" + ThreadedHTMLRenderer.PARAM_TAGS + "\" size=\"10\" value=\"" + tags 
+                  + "\" title=\"Threads are filtered to include only ones with posts containing these tags\" />\n");
 
         out.write("<input type=\"submit\" name=\"action\" value=\"Go\" />\n");
-        out.write("</td><td class=\"controlBarRight\" width=\"1%\"><a href=\"#threads\" title=\"Jump to the thread navigation\">Threads</a></td>\n");
+        out.write("</td><td class=\"controlBarRight\" width=\"1%\">");
+        
+        if ( (req.getParameter(ThreadedHTMLRenderer.PARAM_VIEW_POST) != null) ||
+             (req.getParameter(ThreadedHTMLRenderer.PARAM_VIEW_THREAD) != null) )
+            out.write("<a href=\"#threads\" title=\"Jump to the thread navigation\">Threads</a>");
+        out.write("</td>\n");
         out.write("<!-- control bar end -->\n");
         out.write("</tr>\n");
         out.write("</form>\n");

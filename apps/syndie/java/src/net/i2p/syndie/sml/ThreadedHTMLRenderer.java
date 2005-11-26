@@ -295,9 +295,9 @@ public class ThreadedHTMLRenderer extends HTMLRenderer {
                 out.write("<tr class=\"postReplyOptions\">\n");
                 out.write(" <td colspan=\"3\">\n");
                 out.write(" <input type=\"submit\" value=\"Preview...\" name=\"Post\" />\n");
-                out.write(" Tags: <input type=\"text\" size=\"10\" name=\"" + PostServlet.PARAM_TAGS + "\" />\n");
-                out.write(" in a new thread? <input type=\"checkbox\" name=\"" + PostServlet.PARAM_IN_NEW_THREAD + "\" value=\"true\" />\n");
-                out.write(" refuse replies? <input type=\"checkbox\" name=\"" + PostServlet.PARAM_REFUSE_REPLIES + "\" value=\"true\" />\n");
+                out.write(" Tags: <input type=\"text\" size=\"10\" name=\"" + PostServlet.PARAM_TAGS + "\" title=\"Optional tags to categorize your response\" />\n");
+                out.write(" in a new thread? <input type=\"checkbox\" name=\"" + PostServlet.PARAM_IN_NEW_THREAD + "\" value=\"true\" title=\"If true, this will fork a new top level thread\" />\n");
+                out.write(" refuse replies? <input type=\"checkbox\" name=\"" + PostServlet.PARAM_REFUSE_REPLIES + "\" value=\"true\" title=\"If true, only you will be able to reply to the post\" />\n");
                 out.write(" attachment: <input type=\"file\" name=\"entryfile0\" />\n");
                 out.write(" </td>\n</tr>\n</form>\n");
                 out.write("<!-- body reply end -->\n");

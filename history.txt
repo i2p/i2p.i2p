@@ -1,4 +1,12 @@
-$Id: history.txt,v 1.331 2005/11/26 04:16:25 jrandom Exp $
+$Id: history.txt,v 1.332 2005/11/26 06:39:33 jrandom Exp $
+
+2005-11-26  jrandom
+    * Update the sorting in Syndie to consider children 'newer' than parents,
+      even if they have the same message ID (duh)
+    * Cleaned up some nav links in Syndie (good idea gloin, spaetz!)
+    * Added a bunch of tooltips to Syndie's fields (thanks polecat!)
+    * Force support for nonvalidating XML in Jetty (so we can handle GCJ/etc
+      better)
 
 2005-11-26  jrandom 
     * Be more explicit about what messages we will handle through a client

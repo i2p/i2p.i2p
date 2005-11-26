@@ -362,6 +362,7 @@ public class RemoteArchiveBean {
             ArchiveIndex i = new ArchiveIndex(I2PAppContext.getGlobalContext(), false);
             if (notModified) {
                 _statusMessages.add("Archive unchanged since last fetch.");
+                _statusMessages.add("If you want to force a refetch, make a trivial modification to the URL, such as adding a \"?\"");
             } else {
                 try {
                     i.load(_archiveFile);

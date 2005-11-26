@@ -103,18 +103,25 @@ public class AddressesServlet extends BaseServlet {
             out.write("<input type=\"hidden\" name=\"" + PARAM_NET + "\" value=\"" + NET_SYNDIE + "\" />");
             writeAuthActionFields(out);
             out.write("<tr><td colspan=\"3\">");
-            out.write("<input type=\"checkbox\" name=\"" + PARAM_IS_PUBLIC + "\" value=\"true\" " + (pn.getIsPublic() ? " checked=\"true\" " : "") + " />\n");
-            out.write("Name: <input type=\"hidden\" name=\"" + PARAM_NAME + "\" value=\"" + pn.getName() + "\" />" + pn.getName() + " ");
-            out.write("Location: <input type=\"text\" name=\"" + PARAM_LOC + "\" size=\"3\" value=\"" + pn.getLocation() + "\" /> ");
+            out.write("<input type=\"checkbox\" name=\"" + PARAM_IS_PUBLIC + "\" value=\"true\" " + (pn.getIsPublic() ? " checked=\"true\" " : "") 
+                      + " title=\"If checked, this name can be shared with one click when posting\" />\n");
+            out.write("Name: <input type=\"hidden\" name=\"" + PARAM_NAME + "\" value=\"" + pn.getName() 
+                      + "\" title=\"Short, locally unique 'pet name' for the author\" />" + pn.getName() + " ");
+            out.write("Location: <input type=\"text\" name=\"" + PARAM_LOC + "\" size=\"3\" value=\"" + pn.getLocation() 
+                      + "\" title=\"Blog hash for the author\" /> ");
             if (pn.isMember(FilteredThreadIndex.GROUP_FAVORITE))
-                out.write("Favorite? <input type=\"checkbox\" name=\"" + PARAM_FAVORITE + "\" checked=\"true\" value=\"true\" /> ");
+                out.write("Favorite? <input type=\"checkbox\" name=\"" + PARAM_FAVORITE 
+                          + "\" checked=\"true\" value=\"true\" title=\"If true, their posts are highlighted\" /> ");
             else
-                out.write("Favorite? <input type=\"checkbox\" name=\"" + PARAM_FAVORITE + "\" value=\"true\" /> ");
+                out.write("Favorite? <input type=\"checkbox\" name=\"" + PARAM_FAVORITE 
+                          + "\" value=\"true\" title=\"If true, their posts are highlighted\" /> ");
             
             if (pn.isMember(FilteredThreadIndex.GROUP_IGNORE)) {
-                out.write("Ignored? <input type=\"checkbox\" name=\"" + PARAM_IGNORE + "\" checked=\"true\" value=\"true\" /> ");
+                out.write("Ignored? <input type=\"checkbox\" name=\"" + PARAM_IGNORE 
+                          + "\" checked=\"true\" value=\"true\" title=\"If true, their threads are hidden\" /> ");
             } else {
-                out.write("Ignored? <input type=\"checkbox\" name=\"" + PARAM_IGNORE + "\" value=\"true\" /> ");
+                out.write("Ignored? <input type=\"checkbox\" name=\"" + PARAM_IGNORE 
+                          + "\" value=\"true\" title=\"If true, their threads are hidden\" /> ");
                 out.write("<a href=\"" + getControlTarget() + "?" + ThreadedHTMLRenderer.PARAM_AUTHOR + '=' 
                           + pn.getLocation() + "\" title=\"View threads by the given author\">View posts</a> ");
             }
@@ -130,18 +137,25 @@ public class AddressesServlet extends BaseServlet {
         out.write("<input type=\"hidden\" name=\"" + PARAM_PROTO + "\" value=\"" + PROTO_BLOG + "\" />");
         out.write("<input type=\"hidden\" name=\"" + PARAM_NET + "\" value=\"" + NET_SYNDIE + "\" />");
         out.write("<tr><td colspan=\"3\">");
-        out.write("<input type=\"checkbox\" name=\"" + PARAM_IS_PUBLIC + "\" value=\"true\" " + (newName.getIsPublic() ? " checked=\"true\" " : "") + " />\n");
-        out.write("Name: <input type=\"text\" name=\"" + PARAM_NAME + "\" size=\"10\" value=\"" + newName.getName() + "\" /> ");
-        out.write("Location: <input type=\"text\" name=\"" + PARAM_LOC + "\" size=\"3\" value=\"" + newName.getLocation() + "\" /> ");
+        out.write("<input type=\"checkbox\" name=\"" + PARAM_IS_PUBLIC + "\" value=\"true\" " + (newName.getIsPublic() ? " checked=\"true\" " : "") 
+                  + " title=\"If checked, this name can be shared with one click when posting\" />\n");
+        out.write("Name: <input type=\"text\" name=\"" + PARAM_NAME + "\" size=\"10\" value=\"" + newName.getName() 
+                  + "\" title=\"Short, locally unique 'pet name' for the author\" /> ");
+        out.write("Location: <input type=\"text\" name=\"" + PARAM_LOC + "\" size=\"3\" value=\"" + newName.getLocation() 
+                  + "\"  title=\"Blog hash for the author\" /> ");
         if (newName.isMember(FilteredThreadIndex.GROUP_FAVORITE))
-            out.write("Favorite? <input type=\"checkbox\" name=\"" + PARAM_FAVORITE + "\" checked=\"true\" value=\"true\" /> ");
+            out.write("Favorite? <input type=\"checkbox\" name=\"" + PARAM_FAVORITE 
+                      + "\" checked=\"true\" value=\"true\" title=\"If true, their posts are highlighted\" /> ");
         else
-            out.write("Favorite? <input type=\"checkbox\" name=\"" + PARAM_FAVORITE + "\" value=\"true\" /> ");
+            out.write("Favorite? <input type=\"checkbox\" name=\"" + PARAM_FAVORITE 
+                      + "\" value=\"true\" title=\"If true, their posts are highlighted\" /> ");
 
         if (newName.isMember(FilteredThreadIndex.GROUP_IGNORE)) {
-            out.write("Ignored? <input type=\"checkbox\" name=\"" + PARAM_IGNORE + "\" checked=\"true\" value=\"true\" /> ");
+            out.write("Ignored? <input type=\"checkbox\" name=\"" + PARAM_IGNORE 
+                      + "\" checked=\"true\" value=\"true\" title=\"If true, their threads are hidden\" /> ");
         } else {
-            out.write("Ignored? <input type=\"checkbox\" name=\"" + PARAM_IGNORE + "\" value=\"true\" /> ");
+            out.write("Ignored? <input type=\"checkbox\" name=\"" + PARAM_IGNORE 
+                      + "\" value=\"true\" title=\"If true, their threads are hidden\" /> ");
         }
 
         out.write("<input type=\"submit\" name=\"" + PARAM_ACTION + "\" value=\"" + ACTION_ADD_BLOG + "\" /> ");
@@ -167,18 +181,24 @@ public class AddressesServlet extends BaseServlet {
             out.write("<input type=\"hidden\" name=\"" + PARAM_PROTO + "\" value=\"" + PROTO_ARCHIVE + "\" />");
             out.write("<input type=\"hidden\" name=\"" + PARAM_NET + "\" value=\"" + NET_SYNDIE + "\" />");
             out.write("<tr><td colspan=\"3\">");
-            out.write("<input type=\"checkbox\" name=\"" + PARAM_IS_PUBLIC + "\" value=\"true\" " + (pn.getIsPublic() ? " checked=\"true\" " : "") + " />\n");
-            out.write("Name: <input type=\"hidden\" name=\"" + PARAM_NAME + "\" size=\"10\" value=\"" + pn.getName() + "\" />" + pn.getName() + " ");
-            out.write("Location: <input type=\"text\" name=\"" + PARAM_LOC + "\" size=\"20\" value=\"" + pn.getLocation() + "\" /> ");
+            out.write("<input type=\"checkbox\" name=\"" + PARAM_IS_PUBLIC + "\" value=\"true\" " + (pn.getIsPublic() ? " checked=\"true\" " : "") 
+                      + " title=\"If checked, this name can be shared with one click when posting\" />\n");
+            out.write("Name: <input type=\"hidden\" name=\"" + PARAM_NAME + "\" size=\"10\" value=\"" + pn.getName() 
+                      + "\" title=\"Short, locally unique 'pet name' for the remote archive\" />" + pn.getName() + " ");
+            out.write("Location: <input type=\"text\" name=\"" + PARAM_LOC + "\" size=\"20\" value=\"" + pn.getLocation() 
+                      + "\" title=\"URL to the remote archive's archive/archive.txt\" /> ");
             if (BlogManager.instance().authorizeRemote(user)) {
-
                 if (BlogManager.instance().syndicationScheduled(pn.getLocation()))
-                    out.write("Syndicate? <input type=\"checkbox\" name=\"" + PARAM_SYNDICATE + "\" checked=\"true\" value=\"true\" />");
+                    out.write("Syndicate? <input type=\"checkbox\" name=\"" + PARAM_SYNDICATE 
+                              + "\" checked=\"true\" value=\"true\" title=\"If true, periodically pull down posts they have\" />");
                 else
-                    out.write("Syndicate? <input type=\"checkbox\" name=\"" + PARAM_SYNDICATE + "\" value=\"true\" />");
+                    out.write("Syndicate? <input type=\"checkbox\" name=\"" + PARAM_SYNDICATE 
+                              + "\" value=\"true\" title=\"If true, periodically pull down posts they have\" />");
 
                 out.write("<a href=\"" + getSyndicateLink(user, pn.getLocation()) 
                           + "\" title=\"Synchronize manually with the peer\">Sync manually</a> ");
+            } else {
+                out.write("You are not <a href=\"admin.jsp\">authorized</a> to syndicate with the archive ");
             }
             out.write("<input type=\"submit\" name=\"" + PARAM_ACTION + "\" value=\"" + ACTION_DELETE_ARCHIVE + "\" /> ");
             out.write("<input type=\"submit\" name=\"" + PARAM_ACTION + "\" value=\"" + ACTION_UPDATE_ARCHIVE + "\" /> ");
@@ -191,14 +211,19 @@ public class AddressesServlet extends BaseServlet {
         out.write("<input type=\"hidden\" name=\"" + PARAM_PROTO + "\" value=\"" + PROTO_ARCHIVE + "\" />");
         out.write("<input type=\"hidden\" name=\"" + PARAM_NET + "\" value=\"" + NET_SYNDIE + "\" />");
         out.write("<tr><td colspan=\"3\">");
-        out.write("<input type=\"checkbox\" name=\"" + PARAM_IS_PUBLIC + "\" value=\"true\" " + (newName.getIsPublic() ? " checked=\"true\" " : "") + " />\n");
-        out.write("Name: <input type=\"text\" name=\"" + PARAM_NAME + "\" size=\"10\" value=\"" + newName.getName() + "\" /> ");
-        out.write("Location: <input type=\"text\" name=\"" + PARAM_LOC + "\" size=\"20\" value=\"" + newName.getLocation() + "\" /> ");
+        out.write("<input type=\"checkbox\" name=\"" + PARAM_IS_PUBLIC + "\" value=\"true\" " + (newName.getIsPublic() ? " checked=\"true\" " : "") 
+                  + " title=\"If checked, this name can be shared with one click when posting\" />\n");
+        out.write("Name: <input type=\"text\" name=\"" + PARAM_NAME + "\" size=\"10\" value=\"" + newName.getName() 
+                  + "\" title=\"Short, locally unique 'pet name' for the remote archive\" /> ");
+        out.write("Location: <input type=\"text\" name=\"" + PARAM_LOC + "\" size=\"20\" value=\"" + newName.getLocation() 
+                  + "\" title=\"URL to the remote archive's archive/archive.txt\" /> ");
         if (BlogManager.instance().authorizeRemote(user)) {
             if (BlogManager.instance().syndicationScheduled(newName.getLocation()))
-                out.write("Syndicate? <input type=\"checkbox\" name=\"" + PARAM_SYNDICATE + "\" checked=\"true\" value=\"true\" />");
+                out.write("Syndicate? <input type=\"checkbox\" name=\"" + PARAM_SYNDICATE 
+                          + "\" checked=\"true\" value=\"true\" title=\"If true, periodically pull down posts they have\" />");
             else
-                out.write("Syndicate? <input type=\"checkbox\" name=\"" + PARAM_SYNDICATE + "\" value=\"true\" />");
+                out.write("Syndicate? <input type=\"checkbox\" name=\"" + PARAM_SYNDICATE 
+                          + "\" value=\"true\" title=\"If true, periodically pull down posts they have\" />");
         }
 
         out.write("<input type=\"submit\" name=\"" + PARAM_ACTION + "\" value=\"" + ACTION_ADD_ARCHIVE + "\" /> ");
@@ -225,9 +250,12 @@ public class AddressesServlet extends BaseServlet {
             out.write("<input type=\"hidden\" name=\"" + PARAM_PROTO + "\" value=\"" + PROTO_I2PHEX + "\" />");
             out.write("<input type=\"hidden\" name=\"" + PARAM_NET + "\" value=\"" + NET_I2P + "\" />");
             out.write("<tr><td colspan=\"3\">");
-            out.write("<input type=\"checkbox\" name=\"" + PARAM_IS_PUBLIC + "\" value=\"true\" " + (pn.getIsPublic() ? " checked=\"true\" " : "") + " />\n");
-            out.write("Name: <input type=\"hidden\" name=\"" + PARAM_NAME + "\" value=\"" + pn.getName() + "\" />" + pn.getName() + " ");
-            out.write("Location: <input type=\"text\" name=\"" + PARAM_LOC + "\" size=\"3\" value=\"" + pn.getLocation() + "\" /> ");
+            out.write("<input type=\"checkbox\" name=\"" + PARAM_IS_PUBLIC + "\" value=\"true\" " + (pn.getIsPublic() ? " checked=\"true\" " : "") 
+                      + " title=\"If checked, this name can be shared with one click when posting\" />\n");
+            out.write("Name: <input type=\"hidden\" name=\"" + PARAM_NAME + "\" value=\"" + pn.getName() 
+                      + "\" title=\"Short, locally unique 'pet name' for the I2Phex peer\" />" + pn.getName() + " ");
+            out.write("Location: <input type=\"text\" name=\"" + PARAM_LOC + "\" size=\"3\" value=\"" + pn.getLocation() 
+                      + "\" title=\"I2P destination of the I2Phex peer\" /> ");
             
             out.write("<input type=\"submit\" name=\"" + PARAM_ACTION + "\" value=\"" + ACTION_DELETE_PEER + "\" /> ");
             out.write("<input type=\"submit\" name=\"" + PARAM_ACTION + "\" value=\"" + ACTION_UPDATE_PEER + "\" /> ");
@@ -240,9 +268,12 @@ public class AddressesServlet extends BaseServlet {
         out.write("<input type=\"hidden\" name=\"" + PARAM_PROTO + "\" value=\"" + PROTO_I2PHEX + "\" />");
         out.write("<input type=\"hidden\" name=\"" + PARAM_NET + "\" value=\"" + NET_I2P + "\" />");
         out.write("<tr><td colspan=\"3\">");
-        out.write("<input type=\"checkbox\" name=\"" + PARAM_IS_PUBLIC + "\" value=\"true\" " + (newName.getIsPublic() ? " checked=\"true\" " : "") + " />\n");
-        out.write("Name: <input type=\"text\" name=\"" + PARAM_NAME + "\" size=\"10\" value=\"" + newName.getName() + "\" /> ");
-        out.write("Location: <input type=\"text\" name=\"" + PARAM_LOC + "\" size=\"3\" value=\"" + newName.getLocation() + "\" /> ");
+        out.write("<input type=\"checkbox\" name=\"" + PARAM_IS_PUBLIC + "\" value=\"true\" " + (newName.getIsPublic() ? " checked=\"true\" " : "") 
+                  + " title=\"If checked, this name can be shared with one click when posting\" />\n");
+        out.write("Name: <input type=\"text\" name=\"" + PARAM_NAME + "\" size=\"10\" value=\"" + newName.getName() 
+                  + "\" title=\"Short, locally unique 'pet name' for the I2Phex peer\" /> ");
+        out.write("Location: <input type=\"text\" name=\"" + PARAM_LOC + "\" size=\"3\" value=\"" + newName.getLocation() 
+                  + "\" title=\"I2P destination of the I2Phex peer\" /> ");
 
         out.write("<input type=\"submit\" name=\"" + PARAM_ACTION + "\" value=\"" + ACTION_ADD_PEER + "\" /> ");
         out.write("</td></tr>\n");
@@ -267,9 +298,12 @@ public class AddressesServlet extends BaseServlet {
             out.write("<input type=\"hidden\" name=\"" + PARAM_PROTO + "\" value=\"" + PROTO_EEPSITE + "\" />");
             out.write("<input type=\"hidden\" name=\"" + PARAM_NET + "\" value=\"" + NET_I2P + "\" />");
             out.write("<tr><td colspan=\"3\">");
-            out.write("<input type=\"checkbox\" name=\"" + PARAM_IS_PUBLIC + "\" value=\"true\" " + (pn.getIsPublic() ? " checked=\"true\" " : "") + " />\n");
-            out.write("Name: <input type=\"hidden\" name=\"" + PARAM_NAME + "\" value=\"" + pn.getName() + "\" />" + pn.getName() + " ");
-            out.write("Location: <input type=\"text\" name=\"" + PARAM_LOC + "\" size=\"3\" value=\"" + pn.getLocation() + "\" /> ");
+            out.write("<input type=\"checkbox\" name=\"" + PARAM_IS_PUBLIC + "\" value=\"true\" " + (pn.getIsPublic() ? " checked=\"true\" " : "") 
+                      + " title=\"If checked, this name can be shared with one click when posting\" />\n");
+            out.write("Name: <input type=\"hidden\" name=\"" + PARAM_NAME + "\" value=\"" + pn.getName() 
+                      + "\" title=\"Short, locally unique 'pet name' for the eepsite\" />" + pn.getName() + " ");
+            out.write("Location: <input type=\"text\" name=\"" + PARAM_LOC + "\" size=\"3\" value=\"" + pn.getLocation() 
+                      + "\" title=\"I2P destination of the eepsite\" /> ");
             
             out.write("<input type=\"submit\" name=\"" + PARAM_ACTION + "\" value=\"" + ACTION_DELETE_EEPSITE + "\" /> ");
             out.write("<input type=\"submit\" name=\"" + PARAM_ACTION + "\" value=\"" + ACTION_UPDATE_EEPSITE + "\" /> ");
@@ -282,9 +316,12 @@ public class AddressesServlet extends BaseServlet {
         out.write("<input type=\"hidden\" name=\"" + PARAM_PROTO + "\" value=\"" + PROTO_EEPSITE + "\" />");
         out.write("<input type=\"hidden\" name=\"" + PARAM_NET + "\" value=\"" + NET_I2P + "\" />");
         out.write("<tr><td colspan=\"3\">");
-        out.write("<input type=\"checkbox\" name=\"" + PARAM_IS_PUBLIC + "\" value=\"true\" " + (newName.getIsPublic() ? " checked=\"true\" " : "") + " />\n");
-        out.write("Name: <input type=\"text\" name=\"" + PARAM_NAME + "\" size=\"10\" value=\"" + newName.getName() + "\" /> ");
-        out.write("Location: <input type=\"text\" name=\"" + PARAM_LOC + "\" size=\"3\" value=\"" + newName.getLocation() + "\" /> ");
+        out.write("<input type=\"checkbox\" name=\"" + PARAM_IS_PUBLIC + "\" value=\"true\" " + (newName.getIsPublic() ? " checked=\"true\" " : "") 
+                  + " title=\"If checked, this name can be shared with one click when posting\" />\n");
+        out.write("Name: <input type=\"text\" name=\"" + PARAM_NAME + "\" size=\"10\" value=\"" + newName.getName() 
+                  + "\" title=\"Short, locally unique 'pet name' for the eepsite\" /> ");
+        out.write("Location: <input type=\"text\" name=\"" + PARAM_LOC + "\" size=\"3\" value=\"" + newName.getLocation() 
+                  + "\" title=\"I2P destination of the eepsite\" /> ");
 
         out.write("<input type=\"submit\" name=\"" + PARAM_ACTION + "\" value=\"" + ACTION_ADD_EEPSITE + "\" /> ");
         out.write("</td></tr>\n");
@@ -307,11 +344,16 @@ public class AddressesServlet extends BaseServlet {
             out.write("<form action=\"" + baseURI + "\" method=\"POST\">");
             writeAuthActionFields(out);
             out.write("<tr><td colspan=\"3\">");
-            out.write("<input type=\"checkbox\" name=\"" + PARAM_IS_PUBLIC + "\" value=\"true\" " + (pn.getIsPublic() ? " checked=\"true\" " : "") + " />\n");
-            out.write("Network: <input type=\"text\" name=\"" + PARAM_NET + "\" value=\"" + pn.getNetwork() + "\" /> ");
-            out.write("Protocol: <input type=\"text\" name=\"" + PARAM_PROTO + "\" value=\"" + pn.getProtocol() + "\" /> ");
-            out.write("Name: <input type=\"hidden\" name=\"" + PARAM_NAME + "\" value=\"" + pn.getName() + "\" />" + pn.getName() +" ");
-            out.write("Location: <input type=\"text\" name=\"" + PARAM_LOC + "\" size=\"3\" value=\"" + pn.getLocation() + "\" /> ");
+            out.write("<input type=\"checkbox\" name=\"" + PARAM_IS_PUBLIC + "\" value=\"true\" " + (pn.getIsPublic() ? " checked=\"true\" " : "") 
+                      + " title=\"If checked, this name can be shared with one click when posting\" />\n");
+            out.write("Network: <input type=\"text\" name=\"" + PARAM_NET + "\" value=\"" + pn.getNetwork() 
+                      + "\" title=\"What network is this on - i2p, tor, internet, freenet, etc\" /> ");
+            out.write("Protocol: <input type=\"text\" name=\"" + PARAM_PROTO + "\" value=\"" + pn.getProtocol() 
+                      + "\" title=\"How do we access/interact with this resource\" /> ");
+            out.write("Name: <input type=\"hidden\" name=\"" + PARAM_NAME + "\" value=\"" + pn.getName() 
+                      + "\" title=\"Short, locally unique 'pet name' for the location\" />" + pn.getName() +" ");
+            out.write("Location: <input type=\"text\" name=\"" + PARAM_LOC + "\" size=\"3\" value=\"" + pn.getLocation() 
+                      + "\" title=\"URL\" /> ");
             
             out.write("<input type=\"submit\" name=\"" + PARAM_ACTION + "\" value=\"" + ACTION_DELETE_OTHER + "\" /> ");
             out.write("<input type=\"submit\" name=\"" + PARAM_ACTION + "\" value=\"" + ACTION_UPDATE_OTHER + "\" /> ");
@@ -323,11 +365,16 @@ public class AddressesServlet extends BaseServlet {
         writeAuthActionFields(out);
         
         out.write("<tr><td colspan=\"3\">");
-        out.write("<input type=\"checkbox\" name=\"" + PARAM_IS_PUBLIC + "\" value=\"true\" " + (newName.getIsPublic() ? " checked=\"true\" " : "") + " />\n");
-        out.write("Network: <input type=\"text\" name=\"" + PARAM_NET + "\" value=\"" + newName.getNetwork() + "\" /> ");
-        out.write("Protocol: <input type=\"text\" name=\"" + PARAM_PROTO + "\" value=\"" + newName.getProtocol() + "\" /> ");
-        out.write("Name: <input type=\"text\" name=\"" + PARAM_NAME + "\" size=\"10\" value=\"" + newName.getName() + "\" /> ");
-        out.write("Location: <input type=\"text\" name=\"" + PARAM_LOC + "\" size=\"3\" value=\"" + newName.getLocation() + "\" /> ");
+        out.write("<input type=\"checkbox\" name=\"" + PARAM_IS_PUBLIC + "\" value=\"true\" " + (newName.getIsPublic() ? " checked=\"true\" " : "") 
+                  + " title=\"If checked, this name can be shared with one click when posting\" />\n");
+        out.write("Network: <input type=\"text\" name=\"" + PARAM_NET + "\" value=\"" + newName.getNetwork() 
+                  + "\" title=\"What network is this on - i2p, tor, internet, freenet, etc\" /> ");
+        out.write("Protocol: <input type=\"text\" name=\"" + PARAM_PROTO + "\" value=\"" + newName.getProtocol() 
+                  + "\" title=\"How do we access/interact with this resource\" /> ");
+        out.write("Name: <input type=\"text\" name=\"" + PARAM_NAME + "\" size=\"10\" value=\"" + newName.getName() 
+                  + "\" title=\"Short, locally unique 'pet name' for the location\" /> ");
+        out.write("Location: <input type=\"text\" name=\"" + PARAM_LOC + "\" size=\"3\" value=\"" + newName.getLocation() 
+                  + "\" title=\"URL\" /> ");
 
         out.write("<input type=\"submit\" name=\"" + PARAM_ACTION + "\" value=\"" + ACTION_ADD_OTHER + "\" /> ");
         out.write("</td></tr>\n");
