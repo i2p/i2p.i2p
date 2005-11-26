@@ -800,6 +800,12 @@ public abstract class BaseServlet extends HttpServlet {
                                                     req.getParameter(ThreadedHTMLRenderer.PARAM_TAGS), 
                                                     req.getParameter(ThreadedHTMLRenderer.PARAM_AUTHOR));
     }
+    protected String getViewPostLink(HttpServletRequest req, BlogURI post, User user) {
+        return ThreadedHTMLRenderer.getViewPostLink(req.getRequestURI(), post, user, false, 
+                                                    req.getParameter(ThreadedHTMLRenderer.PARAM_OFFSET), 
+                                                    req.getParameter(ThreadedHTMLRenderer.PARAM_TAGS), 
+                                                    req.getParameter(ThreadedHTMLRenderer.PARAM_AUTHOR));
+    }
     protected String getViewThreadLink(HttpServletRequest req, ThreadNode node, User user) {
         return getViewThreadLink(req.getRequestURI(), node, user,
                                  req.getParameter(ThreadedHTMLRenderer.PARAM_OFFSET),
@@ -926,9 +932,6 @@ public abstract class BaseServlet extends HttpServlet {
 "	text-align: left;\n" +
 "	align: left;\n" +
 "}\n" +
-".threadRight {\n" +
-"	text-align: right;\n" +
-"}\n" +
 ".threadNav {\n" +
 "	background-color: #BBBBBB;\n" +
 "}\n" +
@@ -938,6 +941,16 @@ public abstract class BaseServlet extends HttpServlet {
 "	background-color: #BBBBBB;\n" +
 "}\n" +
 ".rightOffset {\n" +
+"                   float: right;\n" +
+"                   margin: 0 5px 0 0;\n" +
+"	display: inline;\n" +
+"}\n" +    
+".threadInfoLeft {\n" +
+"                   float: left;\n" +
+"                   margin: 5px 0px 0 0;\n" +
+"	display: inline;\n" +
+"}\n" +    
+".threadInfoRight {\n" +
 "                   float: right;\n" +
 "                   margin: 0 5px 0 0;\n" +
 "	display: inline;\n" +

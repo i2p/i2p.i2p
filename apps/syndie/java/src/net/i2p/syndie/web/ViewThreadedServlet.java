@@ -173,9 +173,11 @@ public class ViewThreadedServlet extends BaseServlet {
         else
             out.write("<tr class=\"threadOdd\">\n");
 
-        out.write("<td class=\"threadFlag\">");
+        out.write("<td class=\"thread\" colspan=\"3\">");
+        out.write("<span class=\"threadInfoLeft\">");
+        //out.write("<td class=\"threadFlag\">");
         out.write(getFlagHTML(user, node));
-        out.write("</td>\n<td class=\"threadLeft\">\n");
+        //out.write("</td>\n<td class=\"threadLeft\" colspan=\"2\">\n");
         for (int i = 0; i < depth; i++)
             out.write("<img src=\"images/threadIndent.png\" alt=\"\" border=\"0\" />");
         
@@ -250,7 +252,7 @@ public class ViewThreadedServlet extends BaseServlet {
         out.write(getViewPostLink(req, node, user, false));
         out.write("\" title=\"View post\">");
         long dayBegin = BlogManager.instance().getDayBegin();
-        long postId = node.getMostRecentPostDate();
+        long postId = node.getEntry().getEntryId();
         if (postId >= dayBegin) {
             out.write("<b>today</b>");
         } else if (postId >= dayBegin - 24*60*60*1000) {
@@ -270,16 +272,33 @@ public class ViewThreadedServlet extends BaseServlet {
         if (subject == null)
             subject = "";
         out.write(trim(subject, 40));
-        out.write("</a>\n</td><td class=\"threadRight\">\n");
+        //out.write("</a>\n</td><td class=\"threadRight\">\n");
+        out.write("</a></span><span class=\"threadInfoRight\">");
         if (childCount > 0) {
             out.write(" <a href=\"");
+            out.write(getViewPostLink(req, new BlogURI(node.getMostRecentPostAuthor(), node.getMostRecentPostDate()), user));
+            out.write("\" title=\"View the most recent post\">latest - ");
+         
+            postId = node.getMostRecentPostDate();
+            if (postId >= dayBegin) {
+                out.write("<b>today</b>");
+            } else if (postId >= dayBegin - 24*60*60*1000) {
+                out.write("<b>yesterday</b>");
+            } else {
+                int daysAgo = (int)((dayBegin - postId + 24*60*60*1000-1)/(24*60*60*1000));
+                out.write(daysAgo + " days ago");
+            }
+            
+            out.write("</a>\n");
+            out.write(" <a href=\"");
             out.write(getViewThreadLink(req, node, user));
-            out.write("\" title=\"View all posts in the thread\">view thread</a>\n");
+            out.write("\" title=\"View all posts in the thread\">full thread</a>\n");
         } else {
             out.write("<a href=\"");
             out.write(getViewPostLink(req, node, user, false));
             out.write("\" title=\"View the post\">view post</a>\n");
         }
+        out.write("</span>");
         out.write("</td></tr>\n");
         
         boolean rendered = true;

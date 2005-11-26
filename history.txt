@@ -1,4 +1,9 @@
-$Id: history.txt,v 1.328 2005/11/24 03:45:57 jrandom Exp $
+$Id: history.txt,v 1.329 2005/11/25 06:06:03 jrandom Exp $
+
+2005-11-25  jrandom
+    * Further Syndie UI cleanups
+    * Logging cleanup
+    * Fixed link to fproxy.tino.i2p (thanks zzz!)
 
 2005-11-25  jrandom
     * Don't publish stats for periods we haven't reached yet (thanks zzz!)

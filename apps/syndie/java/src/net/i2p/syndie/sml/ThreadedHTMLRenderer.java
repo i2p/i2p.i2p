@@ -114,6 +114,28 @@ public class ThreadedHTMLRenderer extends HTMLRenderer {
         return buf.toString();
     }
     
+    public static String getViewPostLink(String uri, BlogURI post, User user, boolean isPermalink, 
+                                         String offset, String tags, String author) {
+        StringBuffer buf = new StringBuffer(64);
+        buf.append(uri);
+        buf.append('?').append(PARAM_VISIBLE).append('=');
+        buf.append(post.getKeyHash().toBase64()).append('/');
+        buf.append(post.getEntryId()).append('&');
+        buf.append(PARAM_VIEW_POST).append('=');
+        buf.append(post.getKeyHash().toBase64()).append('/');
+        buf.append(post.getEntryId()).append('&');
+        
+        if (!isPermalink) {
+            if (!empty(offset))
+                buf.append(PARAM_OFFSET).append('=').append(offset).append('&');
+            if (!empty(tags))
+                buf.append(PARAM_TAGS).append('=').append(tags).append('&');
+            if (!empty(author))
+                buf.append(PARAM_AUTHOR).append('=').append(author).append('&');
+        }
+        
+        return buf.toString();
+    }
     
     private static final boolean empty(String val) { return (val == null) || (val.trim().length() <= 0); }
     

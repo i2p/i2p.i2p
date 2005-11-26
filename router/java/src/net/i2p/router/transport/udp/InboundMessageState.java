@@ -53,11 +53,7 @@ public class InboundMessageState {
     public boolean receiveFragment(UDPPacketReader.DataReader data, int dataFragment) {
         int fragmentNum = data.readMessageFragmentNum(dataFragment);
         if ( (fragmentNum < 0) || (fragmentNum > _fragments.length)) {
-            StringBuffer buf = new StringBuffer(1024);
-            buf.append("Invalid fragment ").append(fragmentNum);
-            buf.append(": ").append(data);
-            //data.toRawString(buf);
-            _log.error(buf.toString());
+            _log.error("Invalid fragment " + fragmentNum + "/" + _fragments.length);
             return false;
         }
         if (_fragments[fragmentNum] == null) {
@@ -77,10 +73,7 @@ public class InboundMessageState {
                                + ", isLast=" + isLast
                                + ", data=" + Base64.encode(message.getData(), 0, size));
             } catch (ArrayIndexOutOfBoundsException aioobe) {
-                StringBuffer buf = new StringBuffer(1024);
-                buf.append("Corrupt SSU fragment ").append(fragmentNum);
-                buf.append(": ").append(data);
-                _log.error(buf.toString(), aioobe);
+                _log.error("Corrupt SSU fragment " + fragmentNum, aioobe);
                 return false;
             }
         } else {
