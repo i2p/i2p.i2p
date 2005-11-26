@@ -1,4 +1,10 @@
-$Id: history.txt,v 1.330 2005/11/26 00:05:54 jrandom Exp $
+$Id: history.txt,v 1.331 2005/11/26 04:16:25 jrandom Exp $
+
+2005-11-26  jrandom 
+    * Be more explicit about what messages we will handle through a client
+      tunnel, and how we will handle them.  This cuts off a set of attacks
+      that an active adversary could mount, though they're probably nonobvious
+      and would require at least some sophistication.
 
 2005-11-26  Raccoon23
     * Added support for 'dynamic keys' mode, where the router creates a new

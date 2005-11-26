@@ -5,6 +5,7 @@ import net.i2p.data.TunnelId;
 import net.i2p.data.Payload;
 import net.i2p.data.i2np.DataMessage;
 import net.i2p.data.i2np.DatabaseStoreMessage;
+import net.i2p.data.i2np.DeliveryStatusMessage;
 import net.i2p.data.i2np.DeliveryInstructions;
 import net.i2p.data.i2np.I2NPMessage;
 import net.i2p.data.i2np.GarlicMessage;
@@ -32,6 +33,7 @@ public class InboundMessageDistributor implements GarlicMessageReceiver.CloveRec
         _client = client;
         _log = ctx.logManager().getLog(InboundMessageDistributor.class);
         _receiver = new GarlicMessageReceiver(ctx, this, client);
+        _context.statManager().createRateStat("tunnel.dropDangerousClientTunnelMessage", "How many tunnel messages come down a client tunnel that we shouldn't expect (lifetime is the 'I2NP type')", "Tunnels", new long[] { 10*60*1000, 60*60*1000 });
     }
     
     public void distribute(I2NPMessage msg, Hash target) {
@@ -48,6 +50,16 @@ public class InboundMessageDistributor implements GarlicMessageReceiver.CloveRec
             return;
         }
         */
+        
+        if ( (_client != null) && 
+             (msg.getType() != DeliveryStatusMessage.MESSAGE_TYPE) &&
+             (msg.getType() != GarlicMessage.MESSAGE_TYPE) ) {
+            // drop it, since we should only get tunnel test messages and garlic messages down
+            // client tunnels
+            _context.statManager().addRateData("tunnel.dropDangerousClientTunnelMessage", 1, msg.getType());
+            _log.error("Dropped dangerous message down a tunnel for " + _client.toBase64() + ": " + msg, new Exception("cause"));
+            return;
+        }
         
         if ( (target == null) || ( (tunnel == null) && (_context.routerHash().equals(target) ) ) ) {
             // targetting us either implicitly (no target) or explicitly (no tunnel)
@@ -115,16 +127,39 @@ public class InboundMessageDistributor implements GarlicMessageReceiver.CloveRec
                         // unnecessarily
                         DatabaseStoreMessage dsm = (DatabaseStoreMessage)data;
                         try {
-                            if (dsm.getValueType() == DatabaseStoreMessage.KEY_TYPE_LEASESET)
+                            if (dsm.getValueType() == DatabaseStoreMessage.KEY_TYPE_LEASESET) {
+                                // dont tell anyone else about it if we got it through a client tunnel
+                                // (though this is the default, but it doesn't hurt to make it explicit)
+                                if (_client != null)
+                                    dsm.getLeaseSet().setReceivedAsPublished(false);
                                 _context.netDb().store(dsm.getKey(), dsm.getLeaseSet());
-                            else
+                            } else {                                        
+                                if (_client != null) {
+                                    // drop it, since the data we receive shouldn't include router 
+                                    // references, as that might get us to talk to them (and therefore
+                                    // open an attack vector)
+                                    _context.statManager().addRateData("tunnel.dropDangerousClientTunnelMessage", 1, 
+                                                                       DatabaseStoreMessage.MESSAGE_TYPE);
+                                    _log.error("Dropped dangerous message down a tunnel for " + _client.toBase64() + ": " + dsm, new Exception("cause"));
+                                    return;
+                                }
                                 _context.netDb().store(dsm.getKey(), dsm.getRouterInfo());
+                            }
                         } catch (IllegalArgumentException iae) {
                             if (_log.shouldLog(Log.WARN))
                                 _log.warn("Bad store attempt", iae);
                         }
                     } else {
-                        _context.inNetMessagePool().add(data, null, null);
+                        if ( (_client != null) && (data.getType() != DeliveryStatusMessage.MESSAGE_TYPE) ) {
+                            // drop it, since the data we receive shouldn't include other stuff, 
+                            // as that might open an attack vector
+                            _context.statManager().addRateData("tunnel.dropDangerousClientTunnelMessage", 1, 
+                                                               data.getType());
+                            _log.error("Dropped dangerous message down a tunnel for " + _client.toBase64() + ": " + data, new Exception("cause"));
+                            return;
+                        } else {
+                            _context.inNetMessagePool().add(data, null, null);
+                        }
                     }
                     return;
                 }
