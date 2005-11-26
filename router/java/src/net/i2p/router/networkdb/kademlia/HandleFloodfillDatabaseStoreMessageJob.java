@@ -95,6 +95,8 @@ public class HandleFloodfillDatabaseStoreMessageJob extends JobImpl {
                 if (FloodfillNetworkDatabaseFacade.floodfillEnabled(getContext()) && (_message.getReplyToken() > 0) ) {
                     if (_message.getValueType() == DatabaseStoreMessage.KEY_TYPE_LEASESET)
                         _facade.flood(_message.getLeaseSet());
+                    // ERR: see comment in HandleDatabaseLookupMessageJob regarding hidden mode
+                    //else if (!_message.getRouterInfo().isHidden())
                     else
                         _facade.flood(_message.getRouterInfo());
                 }

@@ -58,6 +58,23 @@
    <jsp:getProperty name="nethelper" property="sharePercentageBox" /><br />
  Sharing a higher percentage will improve your anonymity and help the network
  <hr />
+ <b>Dynamic Router Keys: </b>
+ <input type="checkbox" name="dynamicKeys" value="true" <jsp:getProperty name="nethelper" property="dynamicKeysChecked" /> /><br />
+ <p>
+ This setting causes your router identity to be regenerated every time your IP address
+ changes. If you have a dynamic IP this option can speed up your reintegration into
+ the network (since people will have shitlisted your old router identity), and, for
+ very weak adversaries, help frustrate trivial
+ <a href="http://www.i2p.net/how_threatmodel#intersection">intersection
+ attacks</a> against the NetDB.  Your different router identities would only be 
+ 'hidden' among other I2P users at your ISP, and further analysis would link
+ the router identities further.</p>
+ <p>Note that when I2P detects an IP address change, it will automatically
+ initiate a restart in order to rekey and to disconnect from peers before they
+ update their profiles - any long lasting client connections will be disconnected,
+ though such would likely already be the case anyway, since the IP address changed.
+ </p>
+ <hr />
  <input type="submit" name="save" value="Save changes" /> <input type="reset" value="Cancel" /><br />
  </form>
 </div>

@@ -11,6 +11,8 @@ package net.i2p.router.startup;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.Collection;
+import java.util.Set;
 
 import net.i2p.data.DataFormatException;
 import net.i2p.data.PrivateKey;
@@ -76,6 +78,7 @@ public class LoadRouterInfoJob extends JobImpl {
                 fis1 = new FileInputStream(rif);
                 info = new RouterInfo();
                 info.readBytes(fis1);
+                getContext().router().updateExternalAddress(info.getAddresses(), false);
                 _log.debug("Reading in routerInfo from " + rif.getAbsolutePath() + " and it has " + info.getAddresses().size() + " addresses");
             }
             

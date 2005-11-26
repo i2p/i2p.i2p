@@ -54,10 +54,12 @@ public class CreateRouterInfoJob extends JobImpl {
             info.setAddresses(getContext().commSystem().createAddresses());
             Properties stats = getContext().statPublisher().publishStatistics();
             stats.setProperty(RouterInfo.PROP_NETWORK_ID, Router.NETWORK_ID+"");
-            if (FloodfillNetworkDatabaseFacade.floodfillEnabled(getContext()))
-                info.addCapability(FloodfillNetworkDatabaseFacade.CAPACITY_FLOODFILL);
             getContext().router().addReachabilityCapability(info);
             info.setOptions(stats);
+            if (FloodfillNetworkDatabaseFacade.floodfillEnabled(getContext()))
+                info.addCapability(FloodfillNetworkDatabaseFacade.CAPACITY_FLOODFILL);
+            if ("true".equalsIgnoreCase(getContext().getProperty(Router.PROP_HIDDEN, "false")))
+                info.addCapability(RouterInfo.CAPABILITY_HIDDEN);
             info.setPeers(new HashSet());
             info.setPublished(getCurrentPublishDate(getContext()));
             RouterIdentity ident = new RouterIdentity();

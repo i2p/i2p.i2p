@@ -815,12 +815,28 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         boolean wantsRebuild = false;
         if ( (_externalAddress == null) || !(_externalAddress.equals(addr)) )
             wantsRebuild = true;
+        RouterAddress oldAddress = _externalAddress;
         _externalAddress = addr;
         if (_log.shouldLog(Log.INFO))
             _log.info("Address rebuilt: " + addr);
-        replaceAddress(addr);
+        replaceAddress(addr, oldAddress);
         if (allowRebuildRouterInfo)
             _context.router().rebuildRouterInfo();
+    }
+
+    protected void replaceAddress(RouterAddress address, RouterAddress oldAddress) {
+        replaceAddress(address);
+        if (oldAddress != null) {
+            // fire a router.updateExternalAddress only if the address /really/ changed.
+            // updating the introducers doesn't require a real change, only updating the
+            // IP or port does.
+            UDPAddress old = new UDPAddress(oldAddress);
+            InetAddress oldHost = old.getHostAddress();
+            UDPAddress newAddr = new UDPAddress(address);
+            InetAddress newHost = newAddr.getHostAddress();
+            if ( (old.getPort() != newAddr.getPort()) || (!oldHost.equals(newHost)) )
+                _context.router().updateExternalAddress(address, true);
+        }
     }
     
     public boolean introducersRequired() {

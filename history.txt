@@ -1,4 +1,14 @@
-$Id: history.txt,v 1.329 2005/11/25 06:06:03 jrandom Exp $
+$Id: history.txt,v 1.330 2005/11/26 00:05:54 jrandom Exp $
+
+2005-11-26  Raccoon23
+    * Added support for 'dynamic keys' mode, where the router creates a new
+      router identity whenever it detects a substantial change in its public
+      address (read: SSU IP or port).  This only offers minimal additional
+      protection against trivial attackers, but should provide functional
+      improvement for people who have periodic IP changes, since their new
+      router address would not be shitlisted while their old one would be.
+    * Added further infrastructure for restricted route operation, but its use
+      is not recommended.
 
 2005-11-25  jrandom
     * Further Syndie UI cleanups

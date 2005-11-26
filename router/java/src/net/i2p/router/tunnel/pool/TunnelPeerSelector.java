@@ -116,7 +116,12 @@ abstract class TunnelPeerSelector {
      * Pick peers that we want to avoid
      */
     public Set getExclude(RouterContext ctx, boolean isInbound, boolean isExploratory) {
-        if (filterUnreachable(ctx, isInbound, isExploratory)) {
+        // we may want to update this to skip 'hidden' or 'unreachable' peers, but that
+        // isn't safe, since they may publish one set of routerInfo to us and another to
+        // other peers.  the defaults for filterUnreachable has always been to return false,
+        // but might as well make it explicit with a "false &&"
+        
+        if (false && filterUnreachable(ctx, isInbound, isExploratory)) {
             List caps = ctx.peerManager().getPeersByCapability(Router.CAPABILITY_UNREACHABLE);
             if (caps == null) return new HashSet(0);
             HashSet rv = new HashSet(caps);

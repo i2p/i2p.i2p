@@ -82,6 +82,15 @@ public class HandleDatabaseLookupMessageJob extends JobImpl {
                           + " (tunnel " + _message.getReplyTunnel() + ")");
         }
 
+        // If we are hidden we should not get queries, log and return
+        if (getContext().router().getRouterInfo().isHidden()) {
+            if (_log.shouldLog(Log.ERROR)) {
+                _log.error("Uninvited dbLookup received with replies going to " + fromKey
+                           + " (tunnel " + _message.getReplyTunnel() + ")");
+            }
+            return;
+        }
+
         LeaseSet ls = getContext().netDb().lookupLeaseSetLocally(_message.getSearchKey());
         if (ls != null) {
             boolean publish = getContext().clientManager().shouldPublishLeaseSet(_message.getSearchKey());
@@ -117,6 +126,14 @@ public class HandleDatabaseLookupMessageJob extends JobImpl {
                     Set us = new HashSet(1);
                     us.add(getContext().router().getRouterInfo());
                     sendClosest(_message.getSearchKey(), us, fromKey, _message.getReplyTunnel());
+                //} else if (info.isHidden()) {
+                //    // Don't return hidden nodes
+                //    ERR: we don't want to explicitly reject lookups for hidden nodes, since they
+                //         may have just sent the hidden mode to only us and bundled a lookup with
+                //         a payload targetting some hidden destination (and if we refused to answer,
+                //         yet answered the bundled data message [e.g. HTTP GET], they'd know that
+                //         *we* were hosting that destination).  To operate safely,
+                //         perhaps we should refuse to honor lookups bundled down client tunnels?
                 } else {
                     // send that routerInfo to the _message.getFromHash peer
                     if (_log.shouldLog(Log.DEBUG))
@@ -129,6 +146,16 @@ public class HandleDatabaseLookupMessageJob extends JobImpl {
                 Set routerInfoSet = getContext().netDb().findNearestRouters(_message.getSearchKey(), 
                                                                         MAX_ROUTERS_RETURNED, 
                                                                         _message.getDontIncludePeers());
+
+                // ERR: see above
+                // // Remove hidden nodes from set..
+                // for (Iterator iter = routerInfoSet.iterator(); iter.hasNext();) {
+                //     RouterInfo peer = (RouterInfo)iter.next();
+                //     if (peer.isHidden()) {
+                //         iter.remove();
+                //     }
+                // }
+
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("We do not have key " + _message.getSearchKey().toBase64() + 
                                " locally.  sending back " + routerInfoSet.size() + " peers to " + fromKey.toBase64());

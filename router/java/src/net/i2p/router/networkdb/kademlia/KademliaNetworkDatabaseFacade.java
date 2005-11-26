@@ -504,12 +504,13 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
      */
     public void publish(RouterInfo localRouterInfo) throws IllegalArgumentException {
         if (!_initialized) return;
+        writeMyInfo(localRouterInfo);
+        if (localRouterInfo.isHidden()) return; // DE-nied!
         Hash h = localRouterInfo.getIdentity().getHash();
         store(h, localRouterInfo);
         synchronized (_explicitSendKeys) {
             _explicitSendKeys.add(h);
         }
-        writeMyInfo(localRouterInfo);
     }
 
     /**

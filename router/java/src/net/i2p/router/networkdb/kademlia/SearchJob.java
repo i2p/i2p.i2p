@@ -243,7 +243,8 @@ class SearchJob extends JobImpl {
                                       + peer + " : " + (ds == null ? "null" : ds.getClass().getName()));
                         _state.replyTimeout(peer);
                     } else {
-                        if (getContext().shitlist().isShitlisted(peer)) {
+                        if (((RouterInfo)ds).isHidden() ||
+                            getContext().shitlist().isShitlisted(peer)) {
                             // dont bother
                         } else {
                             _state.addPending(peer);

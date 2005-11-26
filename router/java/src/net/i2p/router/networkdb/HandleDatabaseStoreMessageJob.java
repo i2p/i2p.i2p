@@ -47,6 +47,15 @@ public class HandleDatabaseStoreMessageJob extends JobImpl {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Handling database store message");
 
+        // ERR: see comments regarding hidden mode in HandleDatabaseLookupMessageJob.  
+        // // If we are a hidden peer, log and return
+        // if (getContext().router().getRouterInfo().isHidden()) {
+        //     if (_log.shouldLog(Log.ERROR)) {
+        //         _log.error("Uninvited dbStore received (tunnel " + _message.getReplyTunnel() + ")");
+        //     }
+        //     return;
+        // }
+
         String invalidMessage = null;
         boolean wasNew = false;
         if (_message.getValueType() == DatabaseStoreMessage.KEY_TYPE_LEASESET) {

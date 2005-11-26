@@ -47,6 +47,10 @@ public class PublishLocalRouterInfoJob extends JobImpl {
             ri.setAddresses(getContext().commSystem().createAddresses());
             if (FloodfillNetworkDatabaseFacade.floodfillEnabled(getContext()))
                 ri.addCapability(FloodfillNetworkDatabaseFacade.CAPACITY_FLOODFILL);
+
+            if ("true".equalsIgnoreCase(getContext().getProperty(Router.PROP_HIDDEN, "false")))
+                ri.addCapability(RouterInfo.CAPABILITY_HIDDEN);
+
             getContext().router().addReachabilityCapability(ri);
             SigningPrivateKey key = getContext().keyManager().getSigningPrivateKey();
             if (key == null) {

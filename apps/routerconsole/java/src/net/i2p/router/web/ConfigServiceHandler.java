@@ -33,6 +33,21 @@ public class ConfigServiceHandler extends FormHandler {
             }
         }
     }
+
+    public static class UpdateWrapperManagerAndRekeyTask implements Runnable {
+        private int _exitCode;
+        public UpdateWrapperManagerAndRekeyTask(int exitCode) {
+            _exitCode = exitCode;
+        }
+        public void run() {
+            try {
+                Router.killKeys();
+                WrapperManager.signalStopped(_exitCode);
+            } catch (Throwable t) {
+                t.printStackTrace();
+            }
+        }
+    }
     
     protected void processForm() {
         if (_action == null) return;
@@ -56,6 +71,14 @@ public class ConfigServiceHandler extends FormHandler {
             _context.router().addShutdownTask(new UpdateWrapperManagerTask(Router.EXIT_HARD_RESTART));
             _context.router().shutdown(Router.EXIT_HARD_RESTART);
             addFormNotice("Hard restart requested");
+        } else if ("Rekey and Restart".equals(_action)) {
+            addFormNotice("Rekeying after graceful restart");
+            _context.router().addShutdownTask(new UpdateWrapperManagerAndRekeyTask(Router.EXIT_GRACEFUL_RESTART));
+            _context.router().shutdownGracefully(Router.EXIT_GRACEFUL_RESTART);
+        } else if ("Rekey and Shutdown".equals(_action)) {
+            addFormNotice("Rekeying after graceful shutdown");
+            _context.router().addShutdownTask(new UpdateWrapperManagerAndRekeyTask(Router.EXIT_GRACEFUL));
+            _context.router().shutdownGracefully(Router.EXIT_GRACEFUL);
         } else if ("Run I2P on startup".equals(_action)) {
             installService();
         } else if ("Don't run I2P on startup".equals(_action)) {

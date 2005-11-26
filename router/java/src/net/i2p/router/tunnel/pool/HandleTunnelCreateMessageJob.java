@@ -16,6 +16,7 @@ import net.i2p.router.HandlerJobBuilder;
 import net.i2p.router.Job;
 import net.i2p.router.JobImpl;
 import net.i2p.router.RouterContext;
+import net.i2p.router.Router;
 import net.i2p.router.message.GarlicMessageBuilder;
 import net.i2p.router.message.PayloadGarlicConfig;
 import net.i2p.router.message.SendMessageDirectJob;
@@ -76,6 +77,11 @@ public class HandleTunnelCreateMessageJob extends JobImpl {
     public static final int MAX_DURATION_SECONDS = 15*60;
     
     private int shouldAccept() {
+        // Should not see any initiation requests in hidden mode
+        if ("true".equalsIgnoreCase(getContext().getProperty(Router.PROP_HIDDEN, "false"))) {
+            return TunnelHistory.TUNNEL_REJECT_CRIT;
+        }
+
         if (_request.getDurationSeconds() >= MAX_DURATION_SECONDS)
             return TunnelHistory.TUNNEL_REJECT_CRIT;
         Hash nextRouter = _request.getNextRouter();

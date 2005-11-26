@@ -6,6 +6,7 @@ import net.i2p.router.CommSystemFacade;
 import net.i2p.data.RouterAddress;
 import net.i2p.router.transport.udp.UDPAddress;
 import net.i2p.router.transport.udp.UDPTransport;
+import net.i2p.router.Router;
 
 public class ConfigNetHelper {
     private RouterContext _context;
@@ -63,6 +64,22 @@ public class ConfigNetHelper {
             return " checked ";
     }
     
+    public String getHiddenModeChecked() {
+        String enabled = _context.getProperty(Router.PROP_HIDDEN, "false");
+        if ( (enabled != null) && ("true".equalsIgnoreCase(enabled)) )
+            return " checked ";
+        else
+            return "";
+    }
+
+    public String getDynamicKeysChecked() {
+        String enabled = _context.getProperty(Router.PROP_DYNAMIC_KEYS, "false");
+        if ( (enabled != null) && ("true".equalsIgnoreCase(enabled)) )
+            return " checked ";
+        else
+            return "";
+    }
+
     public String getRequireIntroductionsChecked() {
         short status = _context.commSystem().getReachabilityStatus();
         switch (status) {

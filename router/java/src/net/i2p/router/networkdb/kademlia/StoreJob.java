@@ -176,6 +176,10 @@ class StoreJob extends JobImpl {
                     //if (getContext().shitlist().isShitlisted(((RouterInfo)ds).getIdentity().calculateHash())) {
                     //    _state.addSkipped(peer);
                     //} else {
+                    //
+                    // ERR: see hidden mode comments in HandleDatabaseLookupMessageJob
+                    // // Do not store to hidden nodes
+                    // if (!((RouterInfo)ds).isHidden()) {
                         _state.addPending(peer);
                         sendStore((RouterInfo)ds, peerTimeout);
                     //}

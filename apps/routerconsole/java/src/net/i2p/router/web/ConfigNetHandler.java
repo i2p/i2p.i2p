@@ -17,6 +17,10 @@ import java.util.Set;
 
 import net.i2p.time.Timestamper;
 import net.i2p.router.transport.udp.UDPTransport;
+import net.i2p.router.Router;
+import net.i2p.data.RouterInfo;
+import net.i2p.router.web.ConfigServiceHandler.UpdateWrapperManagerTask;
+import net.i2p.router.web.ConfigServiceHandler.UpdateWrapperManagerAndRekeyTask;
 
 /**
  * Handler to deal with form submissions from the main config form and act
@@ -31,6 +35,8 @@ public class ConfigNetHandler extends FormHandler {
     private boolean _recheckReachabilityRequested;
     private boolean _timeSyncEnabled;
     private boolean _requireIntroductions;
+    private boolean _hiddenMode;
+    private boolean _dynamicKeys;
     private String _tcpPort;
     private String _udpPort;
     private String _inboundRate;
@@ -62,6 +68,8 @@ public class ConfigNetHandler extends FormHandler {
     public void setEnabletimesync(String moo) { _timeSyncEnabled = true; }
     public void setRecheckReachability(String moo) { _recheckReachabilityRequested = true; }
     public void setRequireIntroductions(String moo) { _requireIntroductions = true; }
+    public void setHiddenMode(String moo) { _hiddenMode = true; }
+    public void setDynamicKeys(String moo) { _dynamicKeys = true; }
     
     public void setHostname(String hostname) { 
         _hostname = (hostname != null ? hostname.trim() : null); 
@@ -263,6 +271,28 @@ public class ConfigNetHandler extends FormHandler {
                 addFormNotice("Updating bandwidth share percentage");
             }
         }
+
+        // If hidden mode value changes, restart is required
+        if (_hiddenMode && "false".equalsIgnoreCase(_context.getProperty(Router.PROP_HIDDEN, "false"))) {
+            _context.router().setConfigSetting(Router.PROP_HIDDEN, "true");
+            _context.router().getRouterInfo().addCapability(RouterInfo.CAPABILITY_HIDDEN);
+            addFormNotice("Gracefully restarting into Hidden Router Mode. Make sure you have no 0-1 length "
+                          + "<a href=\"configtunnels.jsp\">tunnels!</a>");
+            hiddenSwitch();
+        }
+
+        if (!_hiddenMode && "true".equalsIgnoreCase(_context.getProperty(Router.PROP_HIDDEN, "false"))) {
+            _context.router().removeConfigSetting(Router.PROP_HIDDEN);
+            _context.router().getRouterInfo().delCapability(RouterInfo.CAPABILITY_HIDDEN);
+            addFormNotice("Gracefully restarting to exit Hidden Router Mode");
+            hiddenSwitch();
+        }
+
+        if (_dynamicKeys) {
+            _context.router().setConfigSetting(Router.PROP_DYNAMIC_KEYS, "true");
+        } else {
+            _context.router().removeConfigSetting(Router.PROP_DYNAMIC_KEYS);
+        }
         
         if (_requireIntroductions) {
             _context.router().setConfigSetting(UDPTransport.PROP_FORCE_INTRODUCERS, "true");
@@ -289,6 +319,12 @@ public class ConfigNetHandler extends FormHandler {
             _context.router().restart();
             addFormNotice("Soft restart complete");
         }
+    }
+
+    private void hiddenSwitch() {
+        // Full restart required to generate new keys
+        _context.router().addShutdownTask(new UpdateWrapperManagerAndRekeyTask(Router.EXIT_GRACEFUL_RESTART));
+        _context.router().shutdownGracefully(Router.EXIT_GRACEFUL_RESTART);
     }
     
     private void updateRates() {

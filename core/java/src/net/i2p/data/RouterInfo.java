@@ -51,6 +51,8 @@ public class RouterInfo extends DataStructureImpl {
 
     public static final String PROP_NETWORK_ID = "netId";
     public static final String PROP_CAPABILITIES = "caps";
+    public static final char CAPABILITY_HIDDEN = 'H';
+
     
     public RouterInfo() {
         setIdentity(null);
@@ -250,12 +252,21 @@ public class RouterInfo extends DataStructureImpl {
         try {
             _identity.writeBytes(out);
             DataHelper.writeDate(out, new Date(_published));
-            DataHelper.writeLong(out, 1, _addresses.size());
-            List addresses = DataHelper.sortStructures(_addresses);
-            for (Iterator iter = addresses.iterator(); iter.hasNext();) {
-                RouterAddress addr = (RouterAddress) iter.next();
-                addr.writeBytes(out);
+            if (isHidden()) {
+                // Do not send IP address to peers in hidden mode
+                DataHelper.writeLong(out, 1, 0);
+            } else {
+                DataHelper.writeLong(out, 1, _addresses.size());
+                List addresses = DataHelper.sortStructures(_addresses);
+                for (Iterator iter = addresses.iterator(); iter.hasNext();) {
+                    RouterAddress addr = (RouterAddress) iter.next();
+                    addr.writeBytes(out);
+                }
             }
+            // XXX: what about peers?
+            // answer: they're always empty... they're a placeholder for one particular
+            //         method of trusted links, which isn't implemented in the router
+            //         at the moment, and may not be later.
             DataHelper.writeLong(out, 1, _peers.size());
             List peers = DataHelper.sortStructures(_peers);
             for (Iterator iter = peers.iterator(); iter.hasNext();) {
@@ -315,7 +326,14 @@ public class RouterInfo extends DataStructureImpl {
         else
             return "";
     }
-    
+
+    /**
+     * Is this a hidden node?
+     */
+    public boolean isHidden() {
+        return (getCapabilities().indexOf(CAPABILITY_HIDDEN) != -1);
+    }
+
     public void addCapability(char cap) {
         if (_options == null) _options = new OrderedProperties();
         synchronized (_options) {
@@ -326,6 +344,25 @@ public class RouterInfo extends DataStructureImpl {
                 _options.setProperty(PROP_CAPABILITIES, caps + cap);
         }
     }
+
+    public void delCapability(char cap) {
+        if (_options == null) return;
+        synchronized (_options) {
+            String caps = _options.getProperty(PROP_CAPABILITIES);
+            int idx;
+            if (caps == null) {
+                return;
+            } else if ((idx = caps.indexOf(cap)) == -1) {
+                return;
+	    } else {
+                StringBuffer buf = new StringBuffer(caps);
+		while ( (idx = buf.indexOf(""+cap)) != -1)
+                    buf.deleteCharAt(idx);
+                _options.setProperty(PROP_CAPABILITIES, buf.toString());
+            }
+        }
+    }
+
         
     /**
      * Get the routing key for the structure using the current modifier in the RoutingKeyGenerator.
