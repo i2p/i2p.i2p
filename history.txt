@@ -1,4 +1,6 @@
-$Id: history.txt,v 1.332 2005/11/26 06:39:33 jrandom Exp $
+$Id: history.txt,v 1.333 2005/11/26 11:51:20 jrandom Exp $
+
+* 2005-11-26 0.6.1.6 released
 
 2005-11-26  jrandom
     * Update the sorting in Syndie to consider children 'newer' than parents,
