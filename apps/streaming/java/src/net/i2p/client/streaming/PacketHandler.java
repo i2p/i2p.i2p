@@ -236,14 +236,14 @@ public class PacketHandler {
             }
             packet.releasePayload();
         } else {
-            if (_log.shouldLog(Log.DEBUG) && !packet.isFlagSet(Packet.FLAG_SYNCHRONIZE))
-                _log.debug("Packet received on an unknown stream (and not an ECHO or SYN): " + packet);
+            //if (_log.shouldLog(Log.DEBUG) && !packet.isFlagSet(Packet.FLAG_SYNCHRONIZE))
+            //    _log.debug("Packet received on an unknown stream (and not an ECHO or SYN): " + packet);
             if (sendId <= 0) {
                 Connection con = _manager.getConnectionByOutboundId(packet.getReceiveStreamId());
                 if (con != null) {
                     if ( (con.getHighestAckedThrough() <= 5) && (packet.getSequenceNum() <= 5) ) {
-                        if (_log.shouldLog(Log.DEBUG))
-                            _log.debug("Received additional packets before the syn on " + con + ": " + packet);
+                        //if (_log.shouldLog(Log.DEBUG))
+                        //    _log.debug("Received additional packets before the syn on " + con + ": " + packet);
                         receiveKnownCon(con, packet);
                         return;
                     } else {

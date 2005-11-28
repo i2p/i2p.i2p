@@ -63,6 +63,8 @@ public class ConfigStatsHandler extends FormHandler {
         
         if (_explicitFilter) {
             _stats.clear();
+            if (_explicitFilterValue == null)
+                _explicitFilterValue = "";
             
             if (_explicitFilterValue.indexOf(',') != -1) {
                 StringTokenizer tok = new StringTokenizer(_explicitFilterValue, ",");

@@ -763,7 +763,8 @@ public class EstablishmentManager {
                     
                     Hash peer = outboundState.getRemoteIdentity().calculateHash();
                     _context.shitlist().shitlistRouter(peer, err);
-                    _context.profileManager().commErrorOccurred(peer);
+                    _transport.dropPeer(peer);
+                    //_context.profileManager().commErrorOccurred(peer);
                 } else {
                     while (true) {
                         OutNetMessage msg = outboundState.getNextQueuedMessage();

@@ -14,6 +14,7 @@ import net.i2p.data.*;
 import net.i2p.syndie.*;
 import net.i2p.syndie.data.*;
 import net.i2p.syndie.sml.*;
+import net.i2p.util.FileUtil;
 import net.i2p.util.Log;
 
 /**
@@ -75,7 +76,7 @@ public abstract class BaseServlet extends HttpServlet {
     public void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         req.setCharacterEncoding("UTF-8");
         resp.setCharacterEncoding("UTF-8");
-        resp.setContentType("text/html");
+        resp.setContentType("text/html;charset=UTF-8");
         
         User user = (User)req.getSession().getAttribute("user");
         String login = req.getParameter("login");
@@ -488,7 +489,27 @@ public abstract class BaseServlet extends HttpServlet {
     }
     
     protected void renderBegin(User user, HttpServletRequest req, PrintWriter out, ThreadIndex index) throws IOException {
-        out.write("<html>\n<head><title>" + getTitle() + "</title>\n" + BEGIN_HTML);
+        out.write("<html>\n<head><title>" + getTitle() + "</title>\n");
+        out.write("<style>");
+        out.write(STYLE_HTML);
+        Reader css = null;
+        try {
+            InputStream in = req.getSession().getServletContext().getResourceAsStream("/syndie.css");
+            if (in != null) {
+                css = new InputStreamReader(in, "UTF-8");
+                char buf[] = new char[1024];
+                int read = 0;
+                while ( (read = css.read(buf)) != -1) 
+                    out.write(buf, 0, read);
+            }
+        } finally {
+            if (css != null)
+                css.close();
+        }
+        String content = FileUtil.readTextFile("./docs/syndie_standard.css", -1, true); 
+        if (content != null) out.write(content);
+        out.write("</style>");
+        out.write(BEGIN_HTML);
     }
     protected void renderNavBar(User user, HttpServletRequest req, PrintWriter out, ThreadIndex index) throws IOException {
         //out.write("<tr class=\"topNav\"><td class=\"topNav_user\" colspan=\"2\" nowrap=\"true\">\n");
@@ -899,8 +920,13 @@ public abstract class BaseServlet extends HttpServlet {
         }
     }
     
-    private static final String BEGIN_HTML = "<style>\n" +
-".overallTable {\n" +
+    private static final String BEGIN_HTML = "<link href=\"rss.jsp\" rel=\"alternate\" type=\"application/rss+xml\" >\n" +
+"</head>\n" +
+"<body>\n" +
+"<span style=\"display: none\"><a href=\"#bodySubject\">Jump to the beginning of the first post rendered, if any</a>\n" +
+"<a href=\"#threads\">Jump to the thread navigation</a>\n</span>\n" +
+"<table border=\"0\" width=\"100%\" class=\"overallTable\">\n";
+    private static final String STYLE_HTML = ".overallTable {\n" +
 "	border-spacing: 0px;\n" +
 "	border-width: 0px;\n" +
 "	border: 0px;\n" +
@@ -982,15 +1008,8 @@ public abstract class BaseServlet extends HttpServlet {
 "}\n" +
 ".postReplyOptions {\n" +
 "	background-color: #BBBBFF;\n" +
-"}\n" +
-"</style>\n" +
-"<link href=\"style.jsp\" rel=\"stylesheet\" type=\"text/css\" >\n" +
-"<link href=\"rss.jsp\" rel=\"alternate\" type=\"application/rss+xml\" >\n" +
-"</head>\n" +
-"<body>\n" +
-"<span style=\"display: none\"><a href=\"#bodySubject\">Jump to the beginning of the first post rendered, if any</a>\n" +
-"<a href=\"#threads\">Jump to the thread navigation</a>\n</span>\n" +
-"<table border=\"0\" width=\"100%\" class=\"overallTable\">\n";
+"}\n";
+
     
     private static final String END_HTML = "</table>\n" +
 "</body>\n";

@@ -38,8 +38,6 @@ import net.i2p.data.i2np.GarlicMessage;
 import net.i2p.router.message.GarlicMessageHandler;
 //import net.i2p.router.message.TunnelMessageHandler;
 import net.i2p.router.networkdb.kademlia.FloodfillNetworkDatabaseFacade;
-import net.i2p.router.transport.udp.UDPTransport;
-import net.i2p.router.transport.udp.UDPAddress;
 import net.i2p.router.startup.StartupJob;
 import net.i2p.stat.Rate;
 import net.i2p.stat.RateStat;
@@ -218,51 +216,6 @@ public class Router {
             _context.jobQueue().addJob(new PersistRouterInfoJob());
     }
 
-    /**
-     * Called when our RouterInfo is loaded by LoadRouterInfoJob
-     * to store our most recently known address to determine if
-     * it has changed while we were down.
-     */
-    public boolean updateExternalAddress(Collection addrs, boolean reboot) {
-        if ("false".equalsIgnoreCase(_context.getProperty(Router.PROP_DYNAMIC_KEYS, "false")))
-            return false; // no one cares. pretend it didn't change
-        boolean ret = false;
-        for (Iterator i = addrs.iterator(); i.hasNext(); ) {
-            RouterAddress addr = (RouterAddress)i.next();
-            if (UDPTransport.STYLE.equalsIgnoreCase(addr.getTransportStyle()))
-                ret = updateExternalAddress(addr, reboot);
-        }
-        return ret;
-    }
-
-    /**
-     * Called by TransportImpl.replaceAddress to notify the router of an
-     * address change.  It is the caller's responsibility to make sure this
-     * really is a substantial change.
-     *
-     */
-    public boolean updateExternalAddress(RouterAddress addr, boolean rebootRouter) {
-        String newExternal = null;
-        // TCP is often incorrectly initialized to 83.246.74.28 for some
-        // reason. Numerous hosts in the netdb report this address for TCP.
-        // It is also easier to lie over the TCP transport. So only trust UDP.
-        if (!UDPTransport.STYLE.equalsIgnoreCase(addr.getTransportStyle()))
-            return false;
-
-        if ("false".equalsIgnoreCase(_context.getProperty(Router.PROP_DYNAMIC_KEYS, "false")))
-            return false; // no one cares. pretend it didn't change
-
-        if (_log.shouldLog(Log.WARN))
-            _log.warn("Rekeying and restarting due to " + addr.getTransportStyle()
-                      + " address update. new address: " + addr);
-        if (rebootRouter) {
-            _context.router().rebuildNewIdentity();
-        } else {
-            _context.router().killKeys();
-        }
-        return true;
-    }
-    
     /**
      * True if the router has tried to communicate with another router who is running a higher
      * incompatible protocol version.  
@@ -459,6 +412,14 @@ public class Router {
      */
     public void rebuildNewIdentity() {
         killKeys();
+        try {
+            for (Iterator iter = _shutdownTasks.iterator(); iter.hasNext(); ) {
+                Runnable task = (Runnable)iter.next();
+                task.run();
+            }
+        } catch (Throwable t) {
+            _log.log(Log.CRIT, "Error running shutdown task", t);
+        }
         // hard and ugly
         finalShutdown(EXIT_HARD_RESTART);
     }
@@ -870,6 +831,9 @@ public class Router {
     public void finalShutdown(int exitCode) {
         _log.log(Log.CRIT, "Shutdown(" + exitCode + ") complete", new Exception("Shutdown"));
         try { _context.logManager().shutdown(); } catch (Throwable t) { }
+        if ("true".equalsIgnoreCase(_context.getProperty(PROP_DYNAMIC_KEYS, "false")))
+            killKeys();
+
         File f = new File(getPingFile());
         f.delete();
         if (_killVMOnEnd) {

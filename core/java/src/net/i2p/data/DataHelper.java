@@ -818,7 +818,7 @@ public class DataHelper {
             return ms + "ms";
         } else if (ms < 5 * 60 * 1000) {
             return (ms / 1000) + "s";
-        } else if (ms < 90 * 60 * 1000) {
+        } else if (ms < 120 * 60 * 1000) {
             return (ms / (60 * 1000)) + "m";
         } else if (ms < 3 * 24 * 60 * 60 * 1000) {
             return (ms / (60 * 60 * 1000)) + "h";

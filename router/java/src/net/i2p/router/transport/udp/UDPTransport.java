@@ -23,6 +23,7 @@ import net.i2p.data.i2np.DatabaseStoreMessage;
 import net.i2p.router.CommSystemFacade;
 import net.i2p.router.OutNetMessage;
 import net.i2p.router.RouterContext;
+import net.i2p.router.Router;
 import net.i2p.router.transport.Transport;
 import net.i2p.router.transport.TransportImpl;
 import net.i2p.router.transport.TransportBid;
@@ -526,8 +527,10 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         return super.getCurrentAddress();
     }
     
-    private void dropPeer(PeerState peer) {
-        dropPeer(peer, true);
+    void dropPeer(Hash peer) {
+        PeerState state = getPeerState(peer);
+        if (state != null)
+            dropPeer(state, false);
     }
     private void dropPeer(PeerState peer, boolean shouldShitlist) {
         if (_log.shouldLog(Log.INFO)) {
@@ -827,15 +830,26 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     protected void replaceAddress(RouterAddress address, RouterAddress oldAddress) {
         replaceAddress(address);
         if (oldAddress != null) {
-            // fire a router.updateExternalAddress only if the address /really/ changed.
-            // updating the introducers doesn't require a real change, only updating the
-            // IP or port does.
             UDPAddress old = new UDPAddress(oldAddress);
             InetAddress oldHost = old.getHostAddress();
             UDPAddress newAddr = new UDPAddress(address);
             InetAddress newHost = newAddr.getHostAddress();
-            if ( (old.getPort() != newAddr.getPort()) || (!oldHost.equals(newHost)) )
-                _context.router().updateExternalAddress(address, true);
+            if ( (old.getPort() > 0) && (oldHost != null) && (isValid(oldHost.getAddress())) &&
+                 (newAddr.getPort() > 0) && (newHost != null) && (isValid(newHost.getAddress())) ) {
+                if ( (old.getPort() != newAddr.getPort()) || (!oldHost.equals(newHost)) ) {
+                    // substantial data has changed, so if we are in 'dynamic keys' mode, restart the 
+                    // router hard and regenerate a new identity
+                    if ("true".equalsIgnoreCase(_context.getProperty(Router.PROP_DYNAMIC_KEYS, "false"))) {
+                        if (_log.shouldLog(Log.ERROR))
+                            _log.error("SSU address updated. new address: " 
+                                       + newAddr.getHostAddress() + ":" + newAddr.getPort() + ", old address: " 
+                                       + old.getHostAddress() + ":" + old.getPort());
+                        // shutdown itself checks the DYNAMIC_KEYS flag, and if its set to true, deletes
+                        // the keys
+                        _context.router().shutdown(Router.EXIT_HARD_RESTART);              
+                    }
+                }
+            }
         }
     }
     
@@ -859,6 +873,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         else
             return "";
     }
+
+    private static final int DROP_INACTIVITY_TIME = 10*1000;
     
     public void failed(OutboundMessageState msg) {
         if (msg == null) return;
@@ -875,7 +891,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             consecutive = msg.getPeer().incrementConsecutiveFailedSends();
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Consecutive failure #" + consecutive + " sending to " + msg.getPeer());
-            if (consecutive > MAX_CONSECUTIVE_FAILED)
+            if ( (consecutive > MAX_CONSECUTIVE_FAILED) && (msg.getPeer().getInactivityTime() > DROP_INACTIVITY_TIME))
                 dropPeer(msg.getPeer(), false);
         }
         failed(msg.getMessage());

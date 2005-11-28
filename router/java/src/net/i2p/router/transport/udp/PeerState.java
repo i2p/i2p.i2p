@@ -418,6 +418,11 @@ public class PeerState {
         }
         return _consecutiveFailedSends;
     }
+    public long getInactivityTime() {
+        long now = _context.clock().now();
+        long lastActivity = Math.max(_lastReceiveTime, _lastSendFullyTime);
+        return now - lastActivity;
+    }
     
     /** how fast we are sending *ack* packets */
     public int getSendACKBps() { return _sendACKBps; }

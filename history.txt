@@ -1,4 +1,15 @@
-$Id: history.txt,v 1.333 2005/11/26 11:51:20 jrandom Exp $
+$Id: history.txt,v 1.334 2005/11/26 13:26:24 jrandom Exp $
+
+2005-11-27  jrandom
+    * Inlined the Syndie CSS to reduce the number of HTTP requests (and
+      because firefox [and others?] delay rendering until they fetch the css).
+    * Make sure we fire the shutdown tasks when regenerating a new identity
+      (thanks picsou!)
+    * Cleaned up some of the things I b0rked in the 'dynamic keys' mode
+    * Don't drop SSU sessions if they're still transmitting data successfully,
+      even if there are transmission failures
+    * Adjusted the time summarization to display hours after 119m, not 90m
+    * Further EepGet cleanup (grr)
 
 * 2005-11-26 0.6.1.6 released
 
