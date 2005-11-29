@@ -1,4 +1,13 @@
-$Id: history.txt,v 1.334 2005/11/26 13:26:24 jrandom Exp $
+$Id: history.txt,v 1.335 2005/11/28 11:02:41 jrandom Exp $
+
+2005-11-29  jrandom
+    * Added back in the OSX jbigi, which was accidentally removed a few revs
+      back (thanks for the bug report stoerte!)  New installs will get the
+      full jbigi, or you can pull the jbigi.jar from CVS by going to
+      http://dev.i2p.net/cgi-bin/cvsweb.cgi/i2p/installer/lib/jbigi/jbigi.jar
+      and clicking on the first "download" link, saving that jbigi.jar to
+      lib/jbigi.jar in your I2P installation directory.  After restarting your
+      router, it should load up fine.
 
 2005-11-27  jrandom
     * Inlined the Syndie CSS to reduce the number of HTTP requests (and
