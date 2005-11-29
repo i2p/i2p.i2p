@@ -490,17 +490,20 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
                     _log.warn("Unable to resolve " + destination + " (proxy? " + usingWWWProxy + ", request: " + targetRequest);
                 String str;
                 byte[] header;
+                boolean showAddrHelper = false;
                 if (usingWWWProxy)
                     str = FileUtil.readTextFile("docs/dnfp-header.ht", 100, true);
                 else if(ahelper != 0)
                     str = FileUtil.readTextFile("docs/dnfb-header.ht", 100, true);
-                else
+                else {
                     str = FileUtil.readTextFile("docs/dnfh-header.ht", 100, true);
+                    showAddrHelper = true;
+                }
                 if (str != null)
                     header = str.getBytes();
                 else
                     header = ERR_DESTINATION_UNKNOWN;
-                writeErrorMessage(header, out, targetRequest, usingWWWProxy, destination);
+                writeErrorMessage(header, out, targetRequest, usingWWWProxy, destination, showAddrHelper);
                 s.close();
                 return;
             }
@@ -569,7 +572,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
     }
     
     private static void writeErrorMessage(byte[] errMessage, OutputStream out, String targetRequest,
-                                          boolean usingWWWProxy, String wwwProxy) throws IOException {
+                                          boolean usingWWWProxy, String wwwProxy, boolean showAddrHelper) throws IOException {
         if (out != null) {
             out.write(errMessage);
             if (targetRequest != null) {
@@ -581,6 +584,13 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
                 out.write(uri.getBytes());
                 out.write("</a>".getBytes());
                 if (usingWWWProxy) out.write(("<br>WWW proxy: " + wwwProxy).getBytes());
+                if (showAddrHelper) {
+                    out.write("<br><br>Click below to try an address helper link:<br><br><a href=\"http://orion.i2p/jump/".getBytes());
+                    out.write(uri.getBytes());
+                    out.write("\">http://orion.i2p/jump/".getBytes());
+                    out.write(uri.getBytes());
+                    out.write("</a>".getBytes());
+                }
             }
             out.write("</div><p><i>I2P HTTP Proxy Server<br>Generated on: ".getBytes());
             out.write(new Date().toString().getBytes());
@@ -606,7 +616,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
                     header = str.getBytes();
                 else
                     header = ERR_DESTINATION_UNKNOWN;
-                writeErrorMessage(header, out, targetRequest, usingWWWProxy, wwwProxy);
+                writeErrorMessage(header, out, targetRequest, usingWWWProxy, wwwProxy, false);
             } catch (IOException ioe) {
                 _log.warn(getPrefix(requestId) + "Error writing out the 'destination was unknown' " + "message", ioe);
             }

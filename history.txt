@@ -1,4 +1,7 @@
-$Id: history.txt,v 1.336 2005/11/29 07:46:34 jrandom Exp $
+$Id: history.txt,v 1.337 2005/11/29 11:58:01 jrandom Exp $
+
+2005-11-29  zzz
+    * Added a link to orion's jump page on the 'key not found' error page.
 
 2005-11-29  jrandom
     * Further Syndie UI cleanup
