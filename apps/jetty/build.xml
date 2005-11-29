@@ -3,27 +3,27 @@
         
     <target name="all" depends="build" />
     <target name="fetchJettylib" >
-        <available property="jetty.available" file="jetty-5.1.2.zip" />
+        <available property="jetty.available" file="jetty-5.1.6.zip" />
         <ant target="doFetchJettylib" />
     </target>
     <target name="doFetchJettylib" unless="jetty.available" >
-        <echo message="The libraries contained within the fetched file are from Jetty's 5.1.2" />
+        <echo message="The libraries contained within the fetched file are from Jetty's 5.1.6" />
         <echo message="distribution (http://jetty.mortbay.org/).  These are not " />
         <echo message="necessary for using I2P, but are used by some applications on top of I2P," />
         <echo message="such as the routerconsole." />
-        <get src="http://mesh.dl.sourceforge.net/sourceforge/jetty/jetty-5.1.2.zip" verbose="true" dest="jetty-5.1.2.zip" />
+        <get src="http://mesh.dl.sourceforge.net/sourceforge/jetty/jetty-5.1.6.zip" verbose="true" dest="jetty-5.1.6.zip" />
         <ant target="doExtract" />
     </target>
     <target name="doExtract">
-        <unzip src="jetty-5.1.2.zip" dest="." />
+        <unzip src="jetty-5.1.6.zip" dest="." />
         <mkdir dir="jettylib" />
         <copy todir="jettylib">
-            <fileset dir="jetty-5.1.2/lib">
+            <fileset dir="jetty-5.1.6/lib">
                 <include name="*.jar" />
             </fileset>
         </copy>
         <copy todir="jettylib">
-            <fileset dir="jetty-5.1.2/ext">
+            <fileset dir="jetty-5.1.6/ext">
                 <include name="ant.jar" />
                 <include name="commons-el.jar" />
                 <include name="commons-logging.jar" />
@@ -34,7 +34,7 @@
                 <include name="xercesImpl.jar" />
             </fileset>
         </copy>
-        <delete dir="jetty-5.1.2" />
+        <delete dir="jetty-5.1.6" />
     </target>
     <target name="build" depends="fetchJettylib" />
     <target name="builddep" />

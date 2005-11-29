@@ -8,7 +8,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.ServletException;
 
-import org.mortbay.servlet.MultiPartRequest;
+// temporarily, we use our overwride, until jetty applies our patches
+//import org.mortbay.servlet.MultiPartRequest;
 
 import net.i2p.I2PAppContext;
 import net.i2p.client.naming.*;

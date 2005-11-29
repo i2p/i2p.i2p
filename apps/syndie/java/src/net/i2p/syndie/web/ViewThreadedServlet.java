@@ -247,12 +247,34 @@ public class ViewThreadedServlet extends BaseServlet {
             }
         }
 
-        out.write(" @ ");
+        out.write(": ");
         out.write("<a href=\"");
         out.write(getViewPostLink(req, node, user, false));
         out.write("\" title=\"View post\">");
+        EntryContainer entry = archive.getEntry(node.getEntry());
+        if (entry == null) throw new RuntimeException("Unable to fetch the entry " + node.getEntry());
+
+        HeaderReceiver rec = new HeaderReceiver();
+        parser.parse(entry.getEntry().getText(), rec);
+        String subject = rec.getHeader(HTMLRenderer.HEADER_SUBJECT);
+        if (subject == null)
+            subject = "(no subject)";
+        out.write(trim(subject, 40));
+        //out.write("</a>\n</td><td class=\"threadRight\">\n");
+        out.write("</a>");
+        
+        out.write(" (<a href=\"");
+        out.write(getViewThreadLink(req, node, user));
+        out.write("\" title=\"View all posts in the thread\">full thread</a>)\n");
+        
+        out.write("</span><span class=\"threadInfoRight\">");
+        
+        out.write(" <a href=\"");
+        out.write(getViewPostLink(req, new BlogURI(node.getMostRecentPostAuthor(), node.getMostRecentPostDate()), user));
+        out.write("\" title=\"View the most recent post\">latest - ");
+
         long dayBegin = BlogManager.instance().getDayBegin();
-        long postId = node.getEntry().getEntryId();
+        long postId = node.getMostRecentPostDate();
         if (postId >= dayBegin) {
             out.write("<b>today</b>");
         } else if (postId >= dayBegin - 24*60*60*1000) {
@@ -261,39 +283,13 @@ public class ViewThreadedServlet extends BaseServlet {
             int daysAgo = (int)((dayBegin - postId + 24*60*60*1000-1)/(24*60*60*1000));
             out.write(daysAgo + " days ago");
         }
-        
-        out.write(": ");
-        EntryContainer entry = archive.getEntry(node.getEntry());
-        if (entry == null) throw new RuntimeException("Unable to fetch the entry " + node.getEntry());
 
-        HeaderReceiver rec = new HeaderReceiver();
-        parser.parse(entry.getEntry().getText(), rec);
-        String subject = rec.getHeader(HTMLRenderer.HEADER_SUBJECT);
-        if (subject == null)
-            subject = "";
-        out.write(trim(subject, 40));
-        //out.write("</a>\n</td><td class=\"threadRight\">\n");
-        out.write("</a></span><span class=\"threadInfoRight\">");
-        if (childCount > 0) {
-            out.write(" <a href=\"");
-            out.write(getViewPostLink(req, new BlogURI(node.getMostRecentPostAuthor(), node.getMostRecentPostDate()), user));
-            out.write("\" title=\"View the most recent post\">latest - ");
-         
-            postId = node.getMostRecentPostDate();
-            if (postId >= dayBegin) {
-                out.write("<b>today</b>");
-            } else if (postId >= dayBegin - 24*60*60*1000) {
-                out.write("<b>yesterday</b>");
-            } else {
-                int daysAgo = (int)((dayBegin - postId + 24*60*60*1000-1)/(24*60*60*1000));
-                out.write(daysAgo + " days ago");
-            }
-            
-            out.write("</a>\n");
-        }
+        out.write("</a>\n");
+        /*
         out.write(" <a href=\"");
         out.write(getViewThreadLink(req, node, user));
         out.write("\" title=\"View all posts in the thread\">full thread</a>\n");
+         */
         out.write("</span>");
         out.write("</td></tr>\n");
         

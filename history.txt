@@ -1,4 +1,16 @@
-$Id: history.txt,v 1.335 2005/11/28 11:02:41 jrandom Exp $
+$Id: history.txt,v 1.336 2005/11/29 07:46:34 jrandom Exp $
+
+2005-11-29  jrandom
+    * Further Syndie UI cleanup
+    * Bundled our patched MultiPartRequest code from jetty (APL2 licensed),
+      since it hasn't been applied to the jetty CVS yet [1].  Its packaged
+      into syndie.jar and renamed to net.i2p.syndie.web.MultiPartRequest, but
+      will be removed as soon as its integrated into Jetty.  This patch allows
+      posting content in various character sets.
+      [1] http://article.gmane.org/gmane.comp.java.jetty.general/6031
+    * Upgraded new installs to the latest stable jetty (5.1.6), though this
+      isn't pushed as part of the update yet, as there aren't any critical
+      bugs.
 
 2005-11-29  jrandom
     * Added back in the OSX jbigi, which was accidentally removed a few revs
