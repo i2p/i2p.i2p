@@ -1,4 +1,16 @@
-$Id: history.txt,v 1.337 2005/11/29 11:58:01 jrandom Exp $
+$Id: history.txt,v 1.338 2005/11/29 12:56:03 jrandom Exp $
+
+2005-11-30  jrandom
+    * Don't let the TCP transport alone shitlist a peer, since other
+      transports may be working.  Also display whether TCP connections are
+      inbound or outbound on the peers page.
+    * Fixed some substantial bugs in the SSU introducers where we wouldn't
+      talk to anyone who didn't expose an IP (even if they had introducers),
+      among other goofy things.
+    * When dealing with SSU introducers, send them all a packet at 3s/6s/9s,
+      rather than sending one a packet at 3s, then another a packet at 6s,
+      and a third a packet at 9s.
+    * Fixed Syndie attachments (oops)
 
 2005-11-29  zzz
     * Added a link to orion's jump page on the 'key not found' error page.

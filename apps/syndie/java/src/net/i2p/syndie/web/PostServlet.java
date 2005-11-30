@@ -49,6 +49,8 @@ public class PostServlet extends BaseServlet {
             String action = req.getParameter(PARAM_ACTION);
             if (!empty(action) && ACTION_CONFIRM.equals(action)) {
                 postEntry(user, req, archive, post, out);
+                post.reinitialize();
+                post.setUser(user);
             } else {
                 String contentType = req.getContentType();
                 if (!empty(contentType) && (contentType.indexOf("boundary=") != -1)) {
@@ -73,8 +75,8 @@ public class PostServlet extends BaseServlet {
         
         out.write("<tr><td colspan=\"3\">");
         
-        post.reinitialize();
-        post.setUser(user);
+        //post.reinitialize();
+        //post.setUser(user);
         
         boolean inNewThread = getInNewThread(req.getString(PARAM_IN_NEW_THREAD));
         boolean refuseReplies = getRefuseReplies(req.getString(PARAM_REFUSE_REPLIES));
@@ -343,6 +345,7 @@ public class PostServlet extends BaseServlet {
             bean = new PostBean();
             req.getSession().setAttribute(ATTR_POST_BEAN, bean);
         }
+        bean.setUser(user);
         return bean;
     }
     

@@ -657,8 +657,8 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
             }
         } else if (routerInfo.getPublished() > now + Router.CLOCK_FUDGE_FACTOR) {
             long age = routerInfo.getPublished() - _context.clock().now();
-            if (_log.shouldLog(Log.WARN))
-                _log.warn("Peer " + key.toBase64() + " published their routerInfo in the future?! [" 
+            if (_log.shouldLog(Log.INFO))
+                _log.info("Peer " + key.toBase64() + " published their routerInfo in the future?! [" 
                           + new Date(routerInfo.getPublished()) + "]", new Exception("Rejecting store"));
             return "Peer " + key.toBase64() + " published " + DataHelper.formatDuration(age) + " in the future?!";
         } else if (_enforceNetId && (routerInfo.getNetworkId() != Router.NETWORK_ID) ){

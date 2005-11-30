@@ -97,6 +97,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
 
     /** do we require introducers, regardless of our status? */
     public static final String PROP_FORCE_INTRODUCERS = "i2np.udp.forceIntroducers";
+    /** do we allow direct SSU connections, sans introducers?  */
+    public static final String PROP_ALLOW_DIRECT = "i2np.udp.allowDirect";
         
     /** how many relays offered to us will we use at a time? */
     public static final int PUBLIC_RELAY_COUNT = 3;
@@ -797,8 +799,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                     _log.info("Picked peers: " + found);
                 _introducersSelectedOn = _context.clock().now();
             }
-        }
-        if ( (_externalListenPort > 0) && (_externalListenHost != null) && (isValid(_externalListenHost.getAddress())) ) {
+        } 
+        if ( allowDirectUDP() && (_externalListenPort > 0) && (_externalListenHost != null) && (isValid(_externalListenHost.getAddress())) ) {
             options.setProperty(UDPAddress.PROP_PORT, String.valueOf(_externalListenPort));
             options.setProperty(UDPAddress.PROP_HOST, _externalListenHost.getHostAddress());
             // if we have explicit external addresses, they had better be reachable
@@ -866,6 +868,11 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         }
     }
     
+    private boolean allowDirectUDP() {
+        String allowDirect = _context.getProperty(PROP_ALLOW_DIRECT);
+        return ( (allowDirect == null) || (Boolean.valueOf(allowDirect).booleanValue()) );
+    }
+
     String getPacketHandlerStatus() {
         PacketHandler handler = _handler;
         if (handler != null)

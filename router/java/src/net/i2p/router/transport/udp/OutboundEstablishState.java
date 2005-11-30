@@ -77,9 +77,15 @@ public class OutboundEstablishState {
                                   RouterIdentity remotePeer, SessionKey introKey, UDPAddress addr) {
         _context = ctx;
         _log = ctx.logManager().getLog(OutboundEstablishState.class);
-        _bobIP = (remoteHost != null ? remoteHost.getAddress() : null);
-        _bobPort = remotePort;
-        _remoteHostId = new RemoteHostId(_bobIP, _bobPort);
+        if ( (remoteHost != null) && (remotePort > 0) ) {
+            _bobIP = remoteHost.getAddress();
+            _bobPort = remotePort;
+            _remoteHostId = new RemoteHostId(_bobIP, _bobPort);
+        } else {
+            _bobIP = null;
+            _bobPort = -1;
+            _remoteHostId = new RemoteHostId(remotePeer.calculateHash().getData());
+        }
         _remotePeer = remotePeer;
         _introKey = introKey;
         _keyBuilder = null;
@@ -387,6 +393,8 @@ public class OutboundEstablishState {
         _bobIP = bobIP;
         _bobPort = bobPort;
         _remoteHostId = new RemoteHostId(bobIP, bobPort);
+        if (_log.shouldLog(Log.INFO))
+            _log.info("Introduced to " + _remoteHostId + ", now lets get on with establishing");
     }
     
     /** how long have we been trying to establish this session? */

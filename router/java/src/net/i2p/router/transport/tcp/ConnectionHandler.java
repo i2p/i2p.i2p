@@ -169,6 +169,7 @@ public class ConnectionHandler {
             if (_error == null) {
                 if (_log.shouldLog(Log.INFO))
                     _log.info("Establishment successful!  returning the con");
+                con.setIsOutbound(false);
                 return con;
             } else {
                 if (_log.shouldLog(Log.INFO))

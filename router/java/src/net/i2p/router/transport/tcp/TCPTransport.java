@@ -783,12 +783,21 @@ public class TCPTransport extends TransportImpl {
     /** Make this stuff pretty (only used in the old console) */
     public void renderStatusHTML(Writer out) throws IOException {
         StringBuffer buf = new StringBuffer(1024);
+        int outbound = 0;
+        int inbound = 0;
         synchronized (_connectionLock) {
             long offsetTotal = 0;
             buf.append("<b>Connections (").append(_connectionsByIdent.size()).append("):</b><ul>\n");
             for (Iterator iter = _connectionsByIdent.values().iterator(); iter.hasNext(); ) {
                 TCPConnection con = (TCPConnection)iter.next();
                 buf.append("<li>");
+                if (con.getIsOutbound()) {
+                    outbound++;
+                    buf.append("Outbound to ");
+                } else {
+                    inbound++;
+                    buf.append("Inbound from ");
+                }
                 buf.append(con.getRemoteRouterIdentity().getHash().toBase64().substring(0,6));
                 buf.append(": up for ").append(DataHelper.formatDuration(con.getLifetime()));
                 buf.append(" transferring at ");
@@ -817,6 +826,7 @@ public class TCPTransport extends TransportImpl {
                 buf.append("</li>\n");
             }
             buf.append("</ul>\n");
+            buf.append("<b>Inbound: ").append(inbound).append(", Outbound: ").append(outbound).append("</b><br />\n");
         }
         
         buf.append("<b>Most recent connection errors:</b><ul>");

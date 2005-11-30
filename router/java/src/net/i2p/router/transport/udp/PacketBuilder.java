@@ -746,28 +746,28 @@ public class PacketBuilder {
     private byte[] getOurExplicitIP() { return null; }
     private int getOurExplicitPort() { return 0; }
     
-    public UDPPacket buildRelayRequest(UDPTransport transport, OutboundEstablishState state, SessionKey ourIntroKey) {
+    /** build intro packets for each of the published introducers */
+    public UDPPacket[] buildRelayRequest(UDPTransport transport, OutboundEstablishState state, SessionKey ourIntroKey) {
         UDPAddress addr = state.getRemoteAddress();
         int count = addr.getIntroducerCount();
         if (count <= 0)
-            return null;
-        int index = _context.random().nextInt(count);
+            return new UDPPacket[0];
+        UDPPacket rv[] = new UDPPacket[count];
         for (int i = 0; i < count; i++) {
-            int cur = (i + index) % count;
-            InetAddress iaddr = addr.getIntroducerHost(cur);
-            int iport = addr.getIntroducerPort(cur);
-            byte ikey[] = addr.getIntroducerKey(cur);
-            long tag = addr.getIntroducerTag(cur);
+            InetAddress iaddr = addr.getIntroducerHost(i);
+            int iport = addr.getIntroducerPort(i);
+            byte ikey[] = addr.getIntroducerKey(i);
+            long tag = addr.getIntroducerTag(i);
             if ( (ikey == null) || (iport <= 0) || (iaddr == null) || (tag <= 0) ) {
                 if (_log.shouldLog(_log.WARN))
                     _log.warn("Cannot build a relay request to " + state.getRemoteIdentity().calculateHash().toBase64() 
-                               + ", as their UDP address is invalid: addr=" + addr + " index=" + cur);
+                               + ", as their UDP address is invalid: addr=" + addr + " index=" + i);
                 continue;
             }
             if (transport.isValid(iaddr.getAddress()))
-                return buildRelayRequest(iaddr, iport, ikey, tag, ourIntroKey, state.getIntroNonce(), true);
+                rv[i] = buildRelayRequest(iaddr, iport, ikey, tag, ourIntroKey, state.getIntroNonce(), true);
         }
-        return null;
+        return rv;
     }
     
     public UDPPacket buildRelayRequest(InetAddress introHost, int introPort, byte introKey[], long introTag, SessionKey ourIntroKey, long introNonce, boolean encrypt) {

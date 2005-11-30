@@ -172,6 +172,7 @@ public class PostBean {
     private static final int MAX_SIZE = 256*1024;
     
     private void cacheAttachments() throws IOException {
+        if (_user == null) throw new IOException("User not specified");
         File postCacheDir = new File(BlogManager.instance().getTempDir(), _user.getBlog().toBase64());
         if (!postCacheDir.exists())
             postCacheDir.mkdirs();

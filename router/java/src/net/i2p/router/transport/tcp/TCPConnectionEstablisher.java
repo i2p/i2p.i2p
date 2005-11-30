@@ -47,14 +47,17 @@ public class TCPConnectionEstablisher implements Runnable {
                                + info.getIdentity().getHash().toBase64(), e);
         }
         if (con != null) {
+            con.setIsOutbound(true);
             _transport.connectionEstablished(con);
         } else {
             if (!_context.router().isAlive()) return;
             _transport.addConnectionErrorMessage(cb.getError());
             Hash peer = info.getIdentity().getHash();
             _context.profileManager().commErrorOccurred(peer);
-            _context.shitlist().shitlistRouter(peer, "Unable to contact");
-            _context.netDb().fail(peer);
+            // disabling in preparation for dropping tcp, since other transports may work, and
+            // hence shitlisting is not appropriate
+            //_context.shitlist().shitlistRouter(peer, "Unable to contact");
+            //_context.netDb().fail(peer);
         }
 
         // this removes the _pending block on the address and 

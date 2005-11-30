@@ -126,18 +126,25 @@ public class EstablishmentManager {
             return;
         }
         UDPAddress addr = new UDPAddress(ra);
+        RemoteHostId to = null;
         InetAddress remAddr = addr.getHostAddress();
         int port = addr.getPort();
-        RemoteHostId to = new RemoteHostId(remAddr.getAddress(), port);
-        
-        if (!_transport.isValid(to.getIP())) {
-            _transport.failed(msg);
-            _context.shitlist().shitlistRouter(msg.getTarget().getIdentity().calculateHash(), "Invalid SSU address");
-            return;
+        if ( (remAddr != null) && (port > 0) ) {
+            to = new RemoteHostId(remAddr.getAddress(), port);
+
+            if (!_transport.isValid(to.getIP())) {
+                _transport.failed(msg);
+                _context.shitlist().shitlistRouter(msg.getTarget().getIdentity().calculateHash(), "Invalid SSU address");
+                return;
+            }
+            
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Add outbound establish state to: " + to);
+        } else {
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Add indirect outbound establish state to: " + addr);
+            to = new RemoteHostId(msg.getTarget().getIdentity().calculateHash().getData());
         }
-        
-        if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Add outobund establish state to: " + to);
         
         OutboundEstablishState state = null;
         int deferred = 0;
@@ -465,12 +472,18 @@ public class EstablishmentManager {
         long now = _context.clock().now();
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Send request to: " + state.getRemoteHostId().toString());
-        _transport.send(_builder.buildSessionRequestPacket(state));
+        UDPPacket packet = _builder.buildSessionRequestPacket(state);
+        if (packet != null) {
+            _transport.send(packet);
+        } else {
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Unable to build a session request packet for " + state.getRemoteHostId());
+        }
         state.requestSent();
     }
     
     private static final long MAX_NONCE = 0xFFFFFFFFl;
-    /** if we don't get a relayResponse in 3 seconds, try again with another intro peer */
+    /** if we don't get a relayResponse in 3 seconds, try again */
     private static final int INTRO_ATTEMPT_TIMEOUT = 3*1000;
     
     private void handlePendingIntro(OutboundEstablishState state) {
@@ -488,7 +501,11 @@ public class EstablishmentManager {
         SimpleTimer.getInstance().addEvent(new FailIntroduction(state, nonce), INTRO_ATTEMPT_TIMEOUT);
         state.setIntroNonce(nonce);
         _context.statManager().addRateData("udp.sendIntroRelayRequest", 1, 0);
-        _transport.send(_builder.buildRelayRequest(_transport, state, _transport.getIntroKey()));
+        UDPPacket requests[] = _builder.buildRelayRequest(_transport, state, _transport.getIntroKey());
+        for (int i = 0; i < requests.length; i++) {
+            if (requests[i] != null)
+                _transport.send(requests[i]);
+        }
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Send intro for " + state.getRemoteHostId().toString() + " with our intro key as " + _transport.getIntroKey().toBase64());
         state.introSent();
@@ -542,7 +559,15 @@ public class EstablishmentManager {
         }
         _context.statManager().addRateData("udp.receiveIntroRelayResponse", state.getLifetime(), 0);
         int port = reader.getRelayResponseReader().readCharliePort();
+        if (_log.shouldLog(Log.INFO))
+            _log.info("Received relay intro for " + state.getRemoteIdentity().calculateHash().toBase64() + " - they are on " 
+                      + addr.toString() + ":" + port + " (according to " + bob.toString(true) + ")");
+        RemoteHostId oldId = state.getRemoteHostId();
         state.introduced(addr, ip, port);
+        synchronized (_outboundStates) {
+            _outboundStates.remove(oldId);
+            _outboundStates.put(state.getRemoteHostId(), state);
+        }
         notifyActivity();
     }
     

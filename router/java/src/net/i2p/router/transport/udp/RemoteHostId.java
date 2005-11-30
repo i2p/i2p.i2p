@@ -1,28 +1,37 @@
 package net.i2p.router.transport.udp;
 
+import net.i2p.data.Base64;
 import net.i2p.data.DataHelper;
 
 /**
  * Unique ID for a peer - its IP + port, all bundled into a tidy obj.
- * Aint it cute?
+ * If the remote peer is not reachabe through an IP+port, this contains
+ * the hash of their identity.
  *
  */
 final class RemoteHostId {
     private byte _ip[];
     private int _port;
+    private byte _peerHash[];
     
     public RemoteHostId(byte ip[], int port) {
         _ip = ip;
         _port = port;
     }
+    public RemoteHostId(byte peerHash[]) {
+        _peerHash = peerHash;
+    }
     
     public byte[] getIP() { return _ip; }
     public int getPort() { return _port; }
+    public byte[] getPeerHash() { return _peerHash; }
     
     public int hashCode() {
         int rv = 0;
-        for (int i = 0; i < _ip.length; i++)
+        for (int i = 0; _ip != null && i < _ip.length; i++)
             rv += _ip[i] << i;
+        for (int i = 0; _peerHash != null && i < _peerHash.length; i++)
+            rv += _peerHash[i] << i;
         rv += _port;
         return rv;
     }
@@ -33,15 +42,19 @@ final class RemoteHostId {
         if (!(obj instanceof RemoteHostId)) 
             throw new ClassCastException("obj is a " + obj.getClass().getName());
         RemoteHostId id = (RemoteHostId)obj;
-        return (_port == id.getPort()) && DataHelper.eq(_ip, id.getIP());
+        return (_port == id.getPort()) && DataHelper.eq(_ip, id.getIP()) && DataHelper.eq(_peerHash, id.getPeerHash());
     }
     
     public String toString() { return toString(true); }
     public String toString(boolean includePort) {
-        if (includePort)
-            return toString(_ip) + ':' + _port;
-        else
-            return toString(_ip);
+        if (_ip != null) {
+            if (includePort)
+                return toString(_ip) + ':' + _port;
+            else
+                return toString(_ip);
+        } else {
+            return Base64.encode(_peerHash);
+        }
     }
     public static String toString(byte ip[]) {
         StringBuffer buf = new StringBuffer(ip.length+5);

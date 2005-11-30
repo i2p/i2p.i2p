@@ -68,8 +68,8 @@ class FloodfillPeerSelector extends PeerSelector {
         }
         public List getFloodfillParticipants() { return _floodfillMatches; }
         public void add(Hash entry) {
-            if (_context.profileOrganizer().isFailing(entry))
-                return;
+            //if (_context.profileOrganizer().isFailing(entry))
+            //    return;
             if ( (_toIgnore != null) && (_toIgnore.contains(entry)) )
                 return;
             if (entry.equals(_context.routerHash()))
