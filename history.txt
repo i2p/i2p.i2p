@@ -1,4 +1,10 @@
-$Id: history.txt,v 1.338 2005/11/29 12:56:03 jrandom Exp $
+$Id: history.txt,v 1.339 2005/11/30 15:48:27 jrandom Exp $
+
+2005-11-30  jrandom
+    * Cleaned up the build process to deal with Jetty 5.1.6 and rename the
+      new commons-logging-api.jar to commons-logging.jar, which it replaces.
+      Jetty 5.1.6 is pushed with all updates.  Also, no need to push a
+      separate jdom or rome, as they're inside syndie.war.
 
 2005-11-30  jrandom
     * Don't let the TCP transport alone shitlist a peer, since other

@@ -26,7 +26,6 @@
             <fileset dir="jetty-5.1.6/ext">
                 <include name="ant.jar" />
                 <include name="commons-el.jar" />
-                <include name="commons-logging.jar" />
                 <include name="jasper-compiler.jar" />
                 <include name="jasper-runtime.jar" />
                 <include name="javax.servlet.jar" />
@@ -34,6 +33,8 @@
                 <include name="xercesImpl.jar" />
             </fileset>
         </copy>
+	<!-- note the rename, to keep compat with old rev, since we only used the API anyway -->
+	<copy file="jetty-5.1.6/ext/commons-logging-api.jar" tofile="jettylib/commons-logging.jar" />
         <delete dir="jetty-5.1.6" />
     </target>
     <target name="build" depends="fetchJettylib" />

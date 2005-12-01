@@ -233,8 +233,6 @@
         <copy file="build/routerconsole.jar" todir="pkg-temp/lib/" />
         <copy file="build/sam.jar" todir="pkg-temp/lib/" />
         <copy file="build/systray.jar" todir="pkg-temp/lib" />
-        <copy file="build/jdom.jar" todir="pkg-temp/lib" />
-        <copy file="build/rome-0.7.jar" todir="pkg-temp/lib" />
         <copy file="build/sucker.jar" todir="pkg-temp/lib" />
         <copy file="build/i2psnark.jar" todir="pkg-temp/lib/" />
         <copy file="i2p.exe" todir="pkg-temp/" failonerror="false" />
@@ -341,30 +339,14 @@
         <copy file="build/sam.jar" todir="pkg-temp/lib/" />
         <copy file="build/router.jar" todir="pkg-temp/lib/" />
         <copy file="build/routerconsole.jar" todir="pkg-temp/lib/" />
-        <!-- for the 0.6.1.3 release, push JDOM and ROME.  it can be
-             removed later updates (once people on earlier builds upgrade -->
-        <copy file="build/jdom.jar" todir="pkg-temp/lib" />
-        <copy file="build/rome-0.7.jar" todir="pkg-temp/lib" />
         <copy file="build/sucker.jar" todir="pkg-temp/lib" />
         <copy file="build/i2psnark.jar" todir="pkg-temp/lib" />
         
-        <copy file="i2p.exe" todir="pkg-temp/" failonerror="false" />
         <copy file="installer/resources/runplain.sh" todir="pkg-temp/" />
         
-        <!-- for the i2p 0.5 release, push jetty 5.2.1 -->
-        <!--
-        <copy file="build/jasper-compiler.jar" todir="pkg-temp/lib/" />
-        <copy file="build/jasper-runtime.jar" todir="pkg-temp/lib/" />
+	<!-- for 0.6.1.7, push jetty 5.1.6 -->
         <copy file="build/commons-logging.jar" todir="pkg-temp/lib/" />
-        <copy file="build/commons-el.jar" todir="pkg-temp/lib/" />
         <copy file="build/org.mortbay.jetty.jar" todir="pkg-temp/lib/" />
-        <copy file="build/javax.servlet.jar" todir="pkg-temp/lib/" />
-        -->
-        <!-- requires commons-* to be added to the classpath (boo, hiss) -->
-        <!--
-        <copy file="installer/resources/wrapper.config" todir="pkg-temp/" />
-        <touch file="pkg-temp/wrapper.config.updated" />
-        -->
         
         <copy file="build/i2ptunnel.war" todir="pkg-temp/webapps/" />
         <copy file="build/routerconsole.war" todir="pkg-temp/webapps/" />
