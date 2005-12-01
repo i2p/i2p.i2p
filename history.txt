@@ -1,4 +1,10 @@
-$Id: history.txt,v 1.339 2005/11/30 15:48:27 jrandom Exp $
+$Id: history.txt,v 1.340 2005/11/30 20:13:45 jrandom Exp $
+
+* 2005-12-01  0.6.1.7 released
+
+2005-12-01  jrandom
+    * Add a new criteria to the tunnel join throttle, backing off people if we
+      are failing to talk to our peers more than usual.
 
 2005-11-30  jrandom
     * Cleaned up the build process to deal with Jetty 5.1.6 and rename the

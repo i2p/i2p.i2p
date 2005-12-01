@@ -52,6 +52,7 @@ class RouterThrottleImpl implements RouterThrottle {
         _context.statManager().createRateStat("router.throttleTunnelBandwidthExceeded", "How much bandwidth is allocated when we refuse due to bandwidth allocation?", "Throttle", new long[] { 10*60*1000, 60*60*1000, 24*60*60*1000 });
         _context.statManager().createRateStat("router.throttleTunnelBytesAllowed", "How many bytes are allowed to be sent when we get a tunnel request (period is how many are currently allocated)?", "Throttle", new long[] { 10*60*1000, 60*60*1000, 24*60*60*1000 });
         _context.statManager().createRateStat("router.throttleTunnelBytesUsed", "Used Bps at request (period = max KBps)?", "Throttle", new long[] { 10*60*1000, 60*60*1000, 24*60*60*1000 });
+        _context.statManager().createRateStat("router.throttleTunnelFailCount1m", "How many messages failed to be sent in the last 2 minutes when we throttle based on a spike in failures (period = 10 minute average failure count)?", "Throttle", new long[] { 60*1000, 10*60*1000, 60*60*1000});
     }
     
     public boolean acceptNetworkMessage() {
@@ -79,6 +80,12 @@ class RouterThrottleImpl implements RouterThrottle {
     }
     
     public int acceptTunnelRequest(TunnelCreateMessage msg) { 
+        if (_context.getProperty(Router.PROP_SHUTDOWN_IN_PROGRESS) != null) {
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Refusing tunnel request since we are shutting down ASAP");
+            return TunnelHistory.TUNNEL_REJECT_CRIT;
+        }
+        
         long lag = _context.jobQueue().getMaxLag();
         RateStat rs = _context.statManager().getRate("router.throttleNetworkCause");
         Rate r = null;
@@ -117,14 +124,27 @@ class RouterThrottleImpl implements RouterThrottle {
             return TunnelHistory.TUNNEL_REJECT_TRANSIENT_OVERLOAD;
         }
         
-        int numTunnels = _context.tunnelManager().getParticipatingCount();
-
-        if (_context.getProperty(Router.PROP_SHUTDOWN_IN_PROGRESS) != null) {
-            if (_log.shouldLog(Log.WARN))
-                _log.warn("Refusing tunnel request since we are shutting down ASAP");
-            return TunnelHistory.TUNNEL_REJECT_CRIT;
+        rs = _context.statManager().getRate("transport.sendMessageFailureLifetime");
+        r = null;
+        if (rs != null)
+            r = rs.getRate(60*1000);
+        double failCount = (r != null ? r.getCurrentEventCount() + r.getLastEventCount() : 0);
+        if (failCount > 100) {
+            long periods = r.getLifetimePeriods();
+            long maxFailCount = r.getExtremeEventCount();
+            if ( (periods > 0) && (maxFailCount > 100) ) {
+                if (_context.random().nextInt((int)maxFailCount) <= failCount) {
+                    if (_log.shouldLog(Log.DEBUG))
+                        _log.debug("Refusing tunnel request with the job lag of " + lag 
+                                   + "since the 1 minute message failure count is too high (" + failCount + "/" + maxFailCount + ")");
+                    _context.statManager().addRateData("router.throttleTunnelFailCount1m", (long)failCount, (long)maxFailCount);
+                    return TunnelHistory.TUNNEL_REJECT_TRANSIENT_OVERLOAD;                    
+                }
+            }
         }
         
+        int numTunnels = _context.tunnelManager().getParticipatingCount();
+
         if (numTunnels > getMinThrottleTunnels()) {
             double growthFactor = getTunnelGrowthFactor();
             Rate avgTunnels = _context.statManager().getRate("tunnel.participatingTunnels").getRate(60*60*1000);
