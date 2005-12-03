@@ -1,4 +1,9 @@
-$Id: history.txt,v 1.341 2005/12/01 12:16:53 jrandom Exp $
+$Id: history.txt,v 1.342 2005/12/03 00:41:25 jrandom Exp $
+
+2005-12-03  jrandom
+    * Adjusted Syndie to use the threaded view that cervantes suggested, which
+      displays a a single thread path at a time - from root to leaf - rather
+      than a depth first traversal.
 
 2005-12-03  jrandom
     * Package up a standalone Syndie install into a "syndie-standalone.zip",

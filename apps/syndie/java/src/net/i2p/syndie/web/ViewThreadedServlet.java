@@ -21,17 +21,16 @@ import net.i2p.syndie.sml.*;
 public class ViewThreadedServlet extends BaseServlet {
     protected void renderServletDetails(User user, HttpServletRequest req, PrintWriter out, ThreadIndex index, 
                                         int threadOffset, BlogURI visibleEntry, Archive archive) throws IOException {
-        renderBody(user, req, out, index);
+        List posts = getPosts(archive, req, index);
+        renderBody(user, req, out, index, archive, posts);
         
         renderThreadNav(user, req, out, threadOffset, index);
-        renderThreadTree(user, req, out, threadOffset, visibleEntry, archive, index);
+        renderThreadTree(user, req, out, threadOffset, visibleEntry, archive, index, posts);
         renderThreadNav(user, req, out, threadOffset, index);
-    }   
+    }
     
-    private void renderBody(User user, HttpServletRequest req, PrintWriter out, ThreadIndex index) throws IOException  {
+    private void renderBody(User user, HttpServletRequest req, PrintWriter out, ThreadIndex index, Archive archive, List posts) throws IOException  {
         ThreadedHTMLRenderer renderer = new ThreadedHTMLRenderer(I2PAppContext.getGlobalContext());
-        Archive archive = BlogManager.instance().getArchive();
-        List posts = getPosts(archive, req, index);
         
         String uri = req.getRequestURI();
         String off = req.getParameter(ThreadedHTMLRenderer.PARAM_OFFSET);
@@ -40,7 +39,10 @@ public class ViewThreadedServlet extends BaseServlet {
 
         for (int i = 0; i < posts.size(); i++) {
             BlogURI post = (BlogURI)posts.get(i);
-            renderer.render(user, out, archive, post, posts.size() == 1, index, uri, getAuthActionFields(), off, tags, author);
+            boolean inlineReply = (posts.size() == 1);
+            //if (true)
+            //    inlineReply = true;
+            renderer.render(user, out, archive, post, inlineReply, index, uri, getAuthActionFields(), off, tags, author);
         }
     }
     
@@ -56,10 +58,33 @@ public class ViewThreadedServlet extends BaseServlet {
             if ( (uri != null) && (uri.getEntryId() > 0) ) {
                 ThreadNode node = index.getNode(uri);
                 if (node != null) {
-                    while (node.getParent() != null)
-                        node = node.getParent(); // hope the structure is loopless...
-                    // depth first traversal
-                    walkTree(rv, node);
+                    if (false) {
+                        // entire thread, as a depth first search
+                        while (node.getParent() != null)
+                            node = node.getParent(); // hope the structure is loopless...
+                        // depth first traversal
+                        walkTree(rv, node);
+                    } else {
+                        // only the "current" unforked thread, as suggested by cervantes.
+                        // e.g.
+                        //  a--b--c--d
+                        //   \-e--f--g
+                        //         \-h
+                        // would show "a--e--f--g" if node == {e, f, or g}, 
+                        // or "a--b--c--d" if node == {a, b, c, or d},
+                        // or "a--e--f--h" if node == h
+                        rv.add(node.getEntry());
+                        ThreadNode cur = node;
+                        while (cur.getParent() != null) {
+                            cur = cur.getParent();
+                            rv.add(0, cur.getEntry()); // parents go before children...
+                        }
+                        cur = node;
+                        while ( (cur != null) && (cur.getChildCount() > 0) ) {
+                            cur = cur.getChild(0);
+                            rv.add(cur.getEntry()); // and children after parents
+                        }
+                    }
                 } else {
                     rv.add(uri);
                 }
@@ -115,13 +140,13 @@ public class ViewThreadedServlet extends BaseServlet {
         out.write("</td></tr>\n");
     }
     
-    private void renderThreadTree(User user, HttpServletRequest req, PrintWriter out, int threadOffset, BlogURI visibleEntry, Archive archive, ThreadIndex index) throws IOException {
+    private void renderThreadTree(User user, HttpServletRequest req, PrintWriter out, int threadOffset, BlogURI visibleEntry, Archive archive, ThreadIndex index, List visibleURIs) throws IOException {
         int numThreads = 10;
-        renderThreadTree(user, out, index, archive, req, threadOffset, numThreads, visibleEntry);
+        renderThreadTree(user, out, index, archive, req, threadOffset, numThreads, visibleEntry, visibleURIs);
     }
      
     private void renderThreadTree(User user, PrintWriter out, ThreadIndex index, Archive archive, HttpServletRequest req,
-                                  int threadOffset, int numThreads, BlogURI visibleEntry) {
+                                  int threadOffset, int numThreads, BlogURI visibleEntry, List visibleURIs) {
         
         if ( (visibleEntry != null) && (empty(req, ThreadedHTMLRenderer.PARAM_OFFSET)) ) {
             // we want to jump to a specific thread in the nav
@@ -139,7 +164,7 @@ public class ViewThreadedServlet extends BaseServlet {
         for (int curRoot = threadOffset; curRoot < numThreads + threadOffset; curRoot++) {
             ThreadNode node = index.getRoot(curRoot);
             out.write("<!-- thread begin curRoot=" + curRoot + " threadOffset=" + threadOffset + " -->\n");
-            renderThread(user, out, index, archive, req, node, 0, visibleEntry, state);
+            renderThread(user, out, index, archive, req, node, 0, visibleEntry, state, visibleURIs);
             out.write("<!-- thread end -->\n");
             written++;
         }
@@ -151,9 +176,13 @@ public class ViewThreadedServlet extends BaseServlet {
     }
     
     private boolean renderThread(User user, PrintWriter out, ThreadIndex index, Archive archive, HttpServletRequest req,
-                                 ThreadNode node, int depth, BlogURI visibleEntry, TreeRenderState state) {
+                                 ThreadNode node, int depth, BlogURI visibleEntry, TreeRenderState state, List visibleURIs) {
         boolean isFavorite = false;
         boolean ignored = false;
+        boolean displayed = false;
+        
+        if ( (visibleURIs != null) && (visibleURIs.contains(node.getEntry())) )
+            displayed = true;
         
         HTMLRenderer rend = new HTMLRenderer(I2PAppContext.getGlobalContext());
         SMLParser parser = new SMLParser(I2PAppContext.getGlobalContext());
@@ -216,6 +245,8 @@ public class ViewThreadedServlet extends BaseServlet {
         out.write(getProfileLink(req, node.getEntry().getKeyHash()));
         out.write("\" title=\"View the user's profile\">");
 
+        if (displayed) out.write("<b>");
+        
         if (pn == null) {
             BlogInfo info = archive.getBlogInfo(node.getEntry().getKeyHash());
             String name = null;
@@ -227,6 +258,9 @@ public class ViewThreadedServlet extends BaseServlet {
         } else {
             out.write(trim(pn.getName(), 30));
         }
+        
+        if (displayed) out.write("</b>");
+        
         out.write("</a>\n");
 
         if ( (user.getBlog() != null) && (node.getEntry().getKeyHash().equals(user.getBlog())) ) {
@@ -249,7 +283,11 @@ public class ViewThreadedServlet extends BaseServlet {
 
         out.write(": ");
         out.write("<a href=\"");
-        out.write(getViewPostLink(req, node, user, false));
+        if (false) {
+            out.write(getViewPostLink(req, node, user, false));
+        } else {
+            out.write(getViewThreadLink(req, node, user));
+        }
         out.write("\" title=\"View post\">");
         EntryContainer entry = archive.getEntry(node.getEntry());
         if (entry == null) throw new RuntimeException("Unable to fetch the entry " + node.getEntry());
@@ -259,18 +297,44 @@ public class ViewThreadedServlet extends BaseServlet {
         String subject = rec.getHeader(HTMLRenderer.HEADER_SUBJECT);
         if ( (subject == null) || (subject.trim().length() <= 0) )
             subject = "(no subject)";
-        out.write(trim(subject, 40));
+        if (displayed) {
+            // currently being rendered
+            out.write("<b>");
+            out.write(trim(subject, 40));
+            out.write("</b>");
+        } else {
+            out.write(trim(subject, 40));
+        }
         //out.write("</a>\n</td><td class=\"threadRight\">\n");
         out.write("</a>");
-        
-        out.write(" (<a href=\"");
-        out.write(getViewThreadLink(req, node, user));
-        out.write("\" title=\"View all posts in the thread\">full thread</a>)\n");
+        if (false) {
+            out.write(" (<a href=\"");
+            out.write(getViewThreadLink(req, node, user));
+            out.write("\" title=\"View all posts in the thread\">full thread</a>)\n");
+        }
         
         out.write("</span><span class=\"threadInfoRight\">");
         
         out.write(" <a href=\"");
-        out.write(getViewPostLink(req, new BlogURI(node.getMostRecentPostAuthor(), node.getMostRecentPostDate()), user));
+        BlogURI newestURI = new BlogURI(node.getMostRecentPostAuthor(), node.getMostRecentPostDate());
+        if (false) {
+            out.write(getViewPostLink(req, newestURI, user));
+        } else {
+            List paths = new ArrayList();
+            paths.add(node);
+            ThreadNode cur = null;
+            while (paths.size() > 0) {
+                cur = (ThreadNode)paths.remove(0);
+                if (cur.getEntry().equals(newestURI))
+                    break;
+                for (int i = cur.getChildCount() - 1; i >= 0; i--)
+                    paths.add(cur.getChild(i));
+                if (paths.size() <= 0)
+                    cur = null;
+            }
+            if (cur != null)
+                out.write(getViewThreadLink(req, cur, user));
+        }
         out.write("\" title=\"View the most recent post\">latest - ");
 
         long dayBegin = BlogManager.instance().getDayBegin();
@@ -298,7 +362,7 @@ public class ViewThreadedServlet extends BaseServlet {
         if (showChildren) {
             for (int i = 0; i < node.getChildCount(); i++) {
                 ThreadNode child = node.getChild(i);
-                boolean childRendered = renderThread(user, out, index, archive, req, child, depth+1, visibleEntry, state);
+                boolean childRendered = renderThread(user, out, index, archive, req, child, depth+1, visibleEntry, state, visibleURIs);
                 rendered = rendered || childRendered;
             }
         }

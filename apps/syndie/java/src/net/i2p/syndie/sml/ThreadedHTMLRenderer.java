@@ -219,7 +219,7 @@ public class ThreadedHTMLRenderer extends HTMLRenderer {
         out.write("\" title=\"Select a shareable link directly to this post\">permalink</a>\n");
 
 
-        if (!inlineReply) {
+        if (true || (!inlineReply) ) {
             String refuseReply = (String)_headers.get(HEADER_REFUSE_REPLIES);
             boolean allowReply = false;
             if ( (refuseReply != null) && (Boolean.valueOf(refuseReply).booleanValue()) ) {
