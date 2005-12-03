@@ -8,6 +8,7 @@
         <echo message="  tarball:   tar the full install into i2p.tar.bz2 (extracts to build a new clean install)" />
         <echo message="  updater:   tar the built i2p specific files into an i2pupdate.zip (extracts safely over existing installs)" />
         <echo message="  distclean: clean up all derived files" />
+        <echo message="  syndie:    generate a standalone syndie install" />
         <echo message="  javadoc:   generate javadoc for the entire project into ./build/javadoc" />
     </target>
     <target name="dist" depends="pkg, javadoc">
@@ -149,7 +150,8 @@
     <target name="clean" depends="pkgclean" >
         <delete dir="./build" />
         <delete file="i2pinstall.exe" failonerror="false" quiet="true" />	
-        <delete file="i2p.exe" failonerror="false" quiet="true" />	
+        <delete file="i2p.exe" failonerror="false" quiet="true" />
+        <delete file="syndie-standalone.zip" failonerror="false" quiet="true" />
     </target>
     <target name="distclean" depends="clean">
         <ant dir="core/java/" target="distclean" />
@@ -437,5 +439,9 @@
     <target name="fullclovertest">
 		<ant dir="core/java/" target="fullclovertest" />
 		<ant dir="router/java/" target="fullclovertest" />
+    </target>
+    <target name="syndie" >
+        <ant dir="apps/syndie/java/" target="standalone" />
+        <copy file="apps/syndie/java/syndie-standalone.zip" todir="." />
     </target>
 </project>

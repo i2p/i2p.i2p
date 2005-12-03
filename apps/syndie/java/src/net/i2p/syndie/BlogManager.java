@@ -524,9 +524,22 @@ public class BlogManager {
                 String ok = register(user, getDefaultLogin(), getDefaultPass(), "", "default", "Default Syndie blog", "");
                 if (User.LOGIN_OK.equals(ok)) {
                     _log.info("Default user created: " + user);
-                    for (int i = 0; i < DEFAULT_SINGLE_USER_ARCHIVES.length; i++)
-                        user.getPetNameDB().add(new PetName("DefaultArchive" + i, "syndie", "syndiearchive", DEFAULT_SINGLE_USER_ARCHIVES[i]));
-                    scheduleSyndication(DEFAULT_SINGLE_USER_ARCHIVES);
+                    String altArchives = _context.getProperty("syndie.defaultSingleUserArchives");
+                    String archives[] = DEFAULT_SINGLE_USER_ARCHIVES;
+                    if ( (altArchives != null) && (altArchives.trim().length() > 0) ) {
+                        ArrayList list = new ArrayList();
+                        StringTokenizer tok = new StringTokenizer(altArchives, ",\t ");
+                        while (tok.hasMoreTokens())
+                            list.add(tok.nextToken());
+                        if (list.size() > 0) {
+                            archives = new String[list.size()];
+                            for (int i = 0; i < list.size(); i++)
+                                archives[i] = (String)list.get(i);
+                        }
+                    }
+                    for (int i = 0; i < archives.length; i++)
+                        user.getPetNameDB().add(new PetName("DefaultArchive" + i, "syndie", "syndiearchive", archives[i]));
+                    scheduleSyndication(archives);
                     saveUser(user);
                     return;
                 } else {

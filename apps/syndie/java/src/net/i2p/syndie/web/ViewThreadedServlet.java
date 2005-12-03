@@ -257,7 +257,7 @@ public class ViewThreadedServlet extends BaseServlet {
         HeaderReceiver rec = new HeaderReceiver();
         parser.parse(entry.getEntry().getText(), rec);
         String subject = rec.getHeader(HTMLRenderer.HEADER_SUBJECT);
-        if (subject == null)
+        if ( (subject == null) || (subject.trim().length() <= 0) )
             subject = "(no subject)";
         out.write(trim(subject, 40));
         //out.write("</a>\n</td><td class=\"threadRight\">\n");

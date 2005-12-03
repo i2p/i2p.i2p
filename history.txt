@@ -1,4 +1,13 @@
-$Id: history.txt,v 1.340 2005/11/30 20:13:45 jrandom Exp $
+$Id: history.txt,v 1.341 2005/12/01 12:16:53 jrandom Exp $
+
+2005-12-03  jrandom
+    * Package up a standalone Syndie install into a "syndie-standalone.zip",
+      buildable with "ant syndie".  It extracts into ./syndie/, launches with
+      "java -jar launchsyndie.jar" (or javaw, on windows, to avoid a dos box),
+      running a single user Syndie instance (by default).  It also creates a
+      default subscription to syndiemedia without any anonymity (using no
+      proxy).  Upgrades can be done by just replacing the syndie.war with the
+      one from I2P.
 
 * 2005-12-01  0.6.1.7 released
 

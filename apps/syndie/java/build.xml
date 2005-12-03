@@ -11,7 +11,7 @@
         <mkdir dir="./build" />
         <mkdir dir="./build/obj" />
         <javac 
-            srcdir="./src" 
+            srcdir="./src"
             debug="true" deprecation="on" source="1.3" target="1.3" 
             destdir="./build/obj" 
             classpath="../../../core/java/build/i2p.jar:../../jetty/jettylib/org.mortbay.jetty.jar:../../jetty/jettylib/javax.servlet.jar:../../jdom/jdom.jar:../../rome/rome-0.7.jar" />
@@ -42,6 +42,55 @@
           <lib dir="./tmpwar" />
         </war>
 	<delete dir="./tmpwar" />
+    </target>
+    <target name="standalone" depends="standalone_prep">
+        <zip destfile="syndie-standalone.zip">
+          <zipfileset dir="./dist/" prefix="syndie/" />
+        </zip>
+    </target>
+    <target name="standalone_prep" depends="war">
+        <javac debug="true" deprecation="on" source="1.3" target="1.3" 
+               destdir="./build" srcdir="src/" includes="net/i2p/syndie/web/RunStandalone.java" >
+            <classpath>
+                <pathelement location="../../jetty/jettylib/commons-logging.jar" />
+                <pathelement location="../../jetty/jettylib/commons-el.jar" />
+                <pathelement location="../../jetty/jettylib/org.mortbay.jetty.jar" />
+                <pathelement location="../../jetty/jettylib/javax.servlet.jar" />
+                <pathelement location="../../../core/java/build/i2p.jar" />
+            </classpath>
+        </javac>
+    
+        <jar destfile="./build/launch-syndie.jar" basedir="./build/" includes="net/i2p/syndie/web/RunStandalone.class">
+            <manifest>
+                <attribute name="Main-Class" value="net.i2p.syndie.web.RunStandalone" />
+                <attribute name="Class-Path" value="lib/i2p.jar lib/commons-el.jar lib/commons-logging.jar lib/jasper-compiler.jar lib/jasper-runtime.jar lib/javax.servlet.jar lib/org.mortbay.jetty.jar" />
+            </manifest>
+        </jar>
+
+        <delete dir="./dist" />
+        <mkdir dir="./dist" />
+        <copy file="./build/launch-syndie.jar" tofile="./dist/launch-syndie.jar" />
+        <copy file="../syndie.war" tofile="./dist/syndie.war" />
+        <mkdir dir="./dist/lib" />
+        <copy file="../../../core/java/build/i2p.jar" tofile="./dist/lib/i2p.jar" />
+        <copy file="../../jetty/jettylib/commons-el.jar" tofile="./dist/lib/commons-el.jar" />
+        <copy file="../../jetty/jettylib/commons-logging.jar" tofile="./dist/lib/commons-logging.jar" />
+        <copy file="../../jetty/jettylib/javax.servlet.jar" tofile="./dist/lib/javax.servlet.jar" />
+        <copy file="../../jetty/jettylib/org.mortbay.jetty.jar" tofile="./dist/lib/org.mortbay.jetty.jar" />
+        <copy file="../../jetty/jettylib/jasper-compiler.jar" tofile="./dist/lib/jasper-compiler.jar" />
+        <copy file="../../jetty/jettylib/jasper-runtime.jar" tofile="./dist/lib/jasper-runtime.jar" />
+        <copy file="../jetty-syndie.xml" tofile="./dist/jetty-syndie.xml" />
+        <copy file="../doc/readme-standalone.txt" tofile="./dist/readme.txt" />
+        <mkdir dir="./dist/work" />
+        <mkdir dir="./dist/logs" />
+        <mkdir dir="./dist/archive" />
+
+	<copy file="../../../installer/resources/blogMeta.snm" tofile="dist/archive/ovpBy2mpO1CQ7deYhQ1cDGAwI6pQzLbWOm1Sdd0W06c=/meta.snm" />
+	<copy file="../../../installer/resources/blogPost.snd" tofile="dist/archive/ovpBy2mpO1CQ7deYhQ1cDGAwI6pQzLbWOm1Sdd0W06c=/1132012800001.snd" />
+        
+        <zip destfile="syndie-standalone.zip">
+         <zipfileset dir="./dist/" prefix="syndie/" />
+        </zip>
     </target>
     <target name="precompilejsp">
         <delete dir="../jsp/WEB-INF/" />
@@ -107,6 +156,8 @@
     </target>
     <target name="clean">
         <delete dir="./build" />
+        <delete dir="./dist" />
+        <delete file="./syndie-standalone.zip" />
     </target>
     <target name="cleandep" depends="clean">
         <ant dir="../../../core/java/" target="distclean" />
