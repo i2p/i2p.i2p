@@ -281,6 +281,9 @@ public class ArchiveIndex {
      *
      */
     public void selectMatchesOrderByEntryId(List out, Hash blog, String tag) {
+        selectMatchesOrderByEntryId(out, blog, tag, 0);
+    }
+    public void selectMatchesOrderByEntryId(List out, Hash blog, String tag, long lowestEntryId) {
         TreeMap ordered = new TreeMap();
         for (int i = 0; i < _blogs.size(); i++) {
             BlogSummary summary = (BlogSummary)_blogs.get(i);
@@ -288,7 +291,7 @@ public class ArchiveIndex {
                 if (!blog.equals(summary.blog))
                     continue;
             }
-            if (tag != null) {
+            if ( (tag != null) && (tag.trim().length() > 0) ) {
                 if (!tag.equals(summary.tag)) {
                     if (_log.shouldLog(Log.DEBUG))
                         _log.debug("Tag [" + summary.tag + "] does not match the requested [" + tag + "] in " + summary.blog.toBase64());
@@ -312,6 +315,8 @@ public class ArchiveIndex {
             
             for (int j = 0; j < summary.entries.size(); j++) {
                 EntrySummary entry = (EntrySummary)summary.entries.get(j);
+                if (entry.entry.getEntryId() < lowestEntryId)
+                    continue;
                 String k = (Long.MAX_VALUE-entry.entry.getEntryId()) + "-" + entry.entry.getKeyHash().toBase64();
                 ordered.put(k, entry.entry);
                 //System.err.println("Including match: " + k);
@@ -319,6 +324,8 @@ public class ArchiveIndex {
         }
         for (Iterator iter = ordered.values().iterator(); iter.hasNext(); ) {
             BlogURI entry = (BlogURI)iter.next();
+            if (entry.getEntryId() < lowestEntryId)
+                continue;
             if (!out.contains(entry))
                 out.add(entry);
         }

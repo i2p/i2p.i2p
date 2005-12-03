@@ -1,4 +1,9 @@
-$Id: history.txt,v 1.342 2005/12/03 00:41:25 jrandom Exp $
+$Id: history.txt,v 1.343 2005/12/03 12:33:35 jrandom Exp $
+
+2005-12-03  jrandom
+    * Added support for a 'most recent posts' view that CofE requested, which
+      includes the ability to filter by age (e.g. posts by your favorite
+      authors in the last 5 days).
 
 2005-12-03  jrandom
     * Adjusted Syndie to use the threaded view that cervantes suggested, which

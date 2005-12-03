@@ -40,6 +40,8 @@ public class ThreadedHTMLRenderer extends HTMLRenderer {
     public static final String PARAM_OFFSET = "offset";
     public static final String PARAM_TAGS = "tags";
     public static final String PARAM_AUTHOR = "author";
+    /** search back through the blog for entries this many days */
+    public static final String PARAM_DAYS_BACK = "daysBack";
     // parameters for editing one's profile
     public static final String PARAM_PROFILE_NAME = "profileName";
     public static final String PARAM_PROFILE_DESC = "profileDesc";
@@ -446,8 +448,12 @@ public class ThreadedHTMLRenderer extends HTMLRenderer {
         String inReplyTo = (String)_headers.get(HEADER_IN_REPLY_TO);
         if ( (inReplyTo != null) && (inReplyTo.trim().length() > 0) ) {
             BlogURI replyURI = new BlogURI(inReplyTo);
-            if (replyURI.getEntryId() > 0)
-                _postBodyBuffer.append(" <a ").append(getClass("summDetailParent")).append(" href=\"").append(getPageURL(replyURI.getKeyHash(), null, replyURI.getEntryId(), 0, 0, true, true)).append("\">(view parent)</a><br />\n");
+            if (replyURI.getEntryId() > 0) {
+                _postBodyBuffer.append(" <a ").append(getClass("summDetailParent"));
+                _postBodyBuffer.append(" href=\"");
+                _postBodyBuffer.append(getPageURL(replyURI.getKeyHash(), null, replyURI.getEntryId(), 0, 0, true, true));
+                _postBodyBuffer.append("\">(view parent)</a><br />\n");
+            }
         }
 
         _postBodyBuffer.append(" </td>\n");
@@ -487,14 +493,18 @@ public class ThreadedHTMLRenderer extends HTMLRenderer {
     public String getPageURL(Hash blog, String tag, long entryId, String group, int numPerPage, int pageNum, boolean expandEntries, boolean showImages) {
         StringBuffer buf = new StringBuffer(128);
         buf.append(_baseURI).append('?');
+        String entry = null;
         if ( (blog != null) && (entryId > 0) ) {
-            buf.append(PARAM_VIEW_POST).append('=').append(Base64.encode(blog.getData())).append('/').append(entryId).append('&');
+            entry = blog.toBase64() + '/' + entryId;
+            buf.append(PARAM_VIEW_THREAD).append('=').append(entry).append('&');
             buf.append(PARAM_VISIBLE).append('=').append(Base64.encode(blog.getData())).append('/').append(entryId).append('&');
         } else if (blog != null) {
             buf.append(PARAM_AUTHOR).append('=').append(blog.toBase64()).append('&');
         }
         if (tag != null)
             buf.append(PARAM_TAGS).append('=').append(sanitizeTagParam(tag)).append('&');
+        if ( (blog != null) && (entryId > 0) )
+            buf.append("#blog://").append(entry);
         return buf.toString();
     }
 }

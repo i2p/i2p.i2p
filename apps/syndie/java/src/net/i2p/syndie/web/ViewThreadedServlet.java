@@ -21,7 +21,7 @@ import net.i2p.syndie.sml.*;
 public class ViewThreadedServlet extends BaseServlet {
     protected void renderServletDetails(User user, HttpServletRequest req, PrintWriter out, ThreadIndex index, 
                                         int threadOffset, BlogURI visibleEntry, Archive archive) throws IOException {
-        List posts = getPosts(archive, req, index);
+        List posts = getPosts(user, archive, req, index);
         renderBody(user, req, out, index, archive, posts);
         
         renderThreadNav(user, req, out, threadOffset, index);
@@ -46,8 +46,47 @@ public class ViewThreadedServlet extends BaseServlet {
         }
     }
     
-    private List getPosts(Archive archive, HttpServletRequest req, ThreadIndex index) {
+    private List getPosts(User user, Archive archive, HttpServletRequest req, ThreadIndex index) {
         List rv = new ArrayList(1);
+        String author = req.getParameter(ThreadedHTMLRenderer.PARAM_AUTHOR);
+        String tags = req.getParameter(ThreadedHTMLRenderer.PARAM_TAGS);
+        if (author != null) {
+            long dayBegin = BlogManager.instance().getDayBegin();
+            String daysStr = req.getParameter(ThreadedHTMLRenderer.PARAM_DAYS_BACK);
+            int days = 1;
+            try {
+                if (daysStr != null)
+                    days = Integer.parseInt(daysStr);
+            } catch (NumberFormatException nfe) {
+                days = 1;
+            }
+            dayBegin -= (days-1) * 24*60*60*1000;
+            
+            ArchiveIndex aindex = archive.getIndex();
+            PetNameDB db = user.getPetNameDB();
+            if ("favorites".equals(author)) {
+                for (Iterator nameIter = db.getNames().iterator(); nameIter.hasNext(); ) {
+                    PetName pn = db.getByName((String)nameIter.next());
+                    if (pn.isMember(FilteredThreadIndex.GROUP_FAVORITE) && AddressesServlet.PROTO_BLOG.equals(pn.getProtocol()) ) {
+                        Hash loc = new Hash();
+                        byte key[] = Base64.decode(pn.getLocation());
+                        if ( (key != null) && (key.length == Hash.HASH_LENGTH) ) {
+                            loc.setData(key);
+                            aindex.selectMatchesOrderByEntryId(rv, loc, tags, dayBegin);
+                        }
+                    }
+                }
+                Collections.sort(rv, BlogURI.COMPARATOR);
+            } else {
+                Hash loc = new Hash();
+                byte key[] = Base64.decode(author);
+                if ( (key != null) && (key.length == Hash.HASH_LENGTH) ) {
+                    loc.setData(key);
+                    aindex.selectMatchesOrderByEntryId(rv, loc, tags, dayBegin);
+                }
+            }
+        }
+        
         String post = req.getParameter(ThreadedHTMLRenderer.PARAM_VIEW_POST);
         BlogURI uri = getAsBlogURI(post);
         if ( (uri != null) && (uri.getEntryId() > 0) ) {

@@ -77,6 +77,8 @@ public abstract class BaseServlet extends HttpServlet {
         req.setCharacterEncoding("UTF-8");
         resp.setCharacterEncoding("UTF-8");
         resp.setContentType("text/html;charset=UTF-8");
+        resp.setHeader("cache-control", "no-cache");
+        resp.setHeader("pragma", "no-cache");
         
         User user = (User)req.getSession().getAttribute("user");
         String login = req.getParameter("login");
@@ -490,6 +492,8 @@ public abstract class BaseServlet extends HttpServlet {
     
     protected void renderBegin(User user, HttpServletRequest req, PrintWriter out, ThreadIndex index) throws IOException {
         out.write("<html>\n<head><title>" + getTitle() + "</title>\n");
+        out.write("<meta http-equiv=\"cache-control\" content=\"no-cache\" />");
+        out.write("<meta http-equiv=\"pragma\" content=\"no-cache\" />");
         out.write("<style>");
         out.write(STYLE_HTML);
         Reader css = null;
@@ -553,10 +557,11 @@ public abstract class BaseServlet extends HttpServlet {
         SKIP_TAGS.add("filter");
         // post and visible are skipped since we aren't good at filtering by tag when the offset will
         // skip around randomly.  at least, not yet.
-        SKIP_TAGS.add("visible");
+        SKIP_TAGS.add(ThreadedHTMLRenderer.PARAM_VISIBLE);
         //SKIP_TAGS.add("post");
         //SKIP_TAGS.add("thread");
-        SKIP_TAGS.add("offset"); // if we are adjusting the filter, ignore the previous offset
+        SKIP_TAGS.add(ThreadedHTMLRenderer.PARAM_OFFSET); // if we are adjusting the filter, ignore the previous offset
+        SKIP_TAGS.add(ThreadedHTMLRenderer.PARAM_DAYS_BACK);
         SKIP_TAGS.add("addLocation");
         SKIP_TAGS.add("addGroup");
         SKIP_TAGS.add("login");
@@ -597,6 +602,12 @@ public abstract class BaseServlet extends HttpServlet {
         PetNameDB db = user.getPetNameDB();
         TreeSet names = new TreeSet(db.getNames());
         out.write("<option value=\"\">Any authors</option>\n");
+        if (user.getAuthenticated()) {
+            if ("favorites".equals(author))
+                out.write("<option selected=\"true\" value=\"favorites\">All recent posts by favorite authors</option>\n");
+            else
+                out.write("<option value=\"favorites\">All recent posts by favorite authors</option>\n");
+        }
         if (user.getBlog() != null) {
             if ( (author != null) && (author.equals(user.getBlog().toBase64())) )
                 out.write("<option value=\"" + user.getBlog().toBase64() + "\" selected=\"true\">Threads you posted in</option>\n");
@@ -619,6 +630,12 @@ public abstract class BaseServlet extends HttpServlet {
         out.write("Tags: <input type=\"text\" name=\"" + ThreadedHTMLRenderer.PARAM_TAGS + "\" size=\"10\" value=\"" + tags 
                   + "\" title=\"Threads are filtered to include only ones with posts containing these tags\" />\n");
 
+        String days = req.getParameter(ThreadedHTMLRenderer.PARAM_DAYS_BACK);
+        if (days == null)
+            days = "";
+        out.write("Age: <input type=\"text\" name=\"" + ThreadedHTMLRenderer.PARAM_DAYS_BACK + "\" size=\"2\" value=\"" + days
+                  + "\" title=\"Posts are filtered to include only ones which were made within this many days ago\" /> days\n");
+        
         out.write("<input type=\"submit\" name=\"action\" value=\"Go\" />\n");
         out.write("</td><td class=\"controlBarRight\" width=\"1%\">");
         

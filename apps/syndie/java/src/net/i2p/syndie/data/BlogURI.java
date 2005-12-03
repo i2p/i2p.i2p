@@ -10,6 +10,8 @@ public class BlogURI {
     private Hash _blogHash;
     private long _entryId;
     
+    public static final Comparator COMPARATOR = new NewestFirstComparator();
+    
     public BlogURI() {
         this(null, -1);
     }
@@ -94,5 +96,21 @@ public class BlogURI {
         BlogURI u = new BlogURI(uri);
         if (!u.toString().equals(uri))
             System.err.println("Not a match: [" + uri + "] != [" + u.toString() + "]");
+    }
+
+    /**
+     * Order the BlogURIs by entryId, with the highest entryId first
+     */
+    private static class NewestFirstComparator implements Comparator {        
+        public int compare(Object lhs, Object rhs) {
+            BlogURI l = (BlogURI)lhs;
+            BlogURI r = (BlogURI)rhs;
+            if (l.getEntryId() > r.getEntryId())
+                return -1;
+            else if (l.getEntryId() < r.getEntryId())
+                return 1;
+            else // same date, compare by blog hash (aka randomly)
+                return DataHelper.compareTo(l.getKeyHash().getData(), r.getKeyHash().getData());
+        }
     }
 }
