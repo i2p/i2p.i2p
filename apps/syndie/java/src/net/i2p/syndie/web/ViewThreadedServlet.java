@@ -50,7 +50,10 @@ public class ViewThreadedServlet extends BaseServlet {
         List rv = new ArrayList(1);
         String author = req.getParameter(ThreadedHTMLRenderer.PARAM_AUTHOR);
         String tags = req.getParameter(ThreadedHTMLRenderer.PARAM_TAGS);
-        if (author != null) {
+        String post = req.getParameter(ThreadedHTMLRenderer.PARAM_VIEW_POST);
+        String thread = req.getParameter(ThreadedHTMLRenderer.PARAM_VIEW_THREAD);
+        
+        if ( (author != null) && empty(post) && empty(thread) ) {
             long dayBegin = BlogManager.instance().getDayBegin();
             String daysStr = req.getParameter(ThreadedHTMLRenderer.PARAM_DAYS_BACK);
             int days = 1;
@@ -87,12 +90,10 @@ public class ViewThreadedServlet extends BaseServlet {
             }
         }
         
-        String post = req.getParameter(ThreadedHTMLRenderer.PARAM_VIEW_POST);
         BlogURI uri = getAsBlogURI(post);
         if ( (uri != null) && (uri.getEntryId() > 0) ) {
             rv.add(uri);
         } else {
-            String thread = req.getParameter(ThreadedHTMLRenderer.PARAM_VIEW_THREAD);
             uri = getAsBlogURI(thread);
             if ( (uri != null) && (uri.getEntryId() > 0) ) {
                 ThreadNode node = index.getNode(uri);

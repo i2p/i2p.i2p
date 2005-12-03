@@ -1064,8 +1064,9 @@ public class HTMLRenderer extends EventReceiverImpl {
             buf.append(ThreadedHTMLRenderer.PARAM_AUTHOR).append('=').append(blog.toBase64()).append('&');
         if (tag != null)
             buf.append(ThreadedHTMLRenderer.PARAM_TAGS).append('=').append(sanitizeTagParam(tag)).append('&');
+        String entry = null;
         if (entryId >= 0) {
-            String entry = blog.toBase64() + '/' + entryId;
+            entry = blog.toBase64() + '/' + entryId;
             buf.append(ThreadedHTMLRenderer.PARAM_VIEW_POST).append('=').append(entry).append('&');
             buf.append(ThreadedHTMLRenderer.PARAM_VISIBLE).append('=').append(entry).append('&');
         }   
