@@ -79,6 +79,9 @@ public class ViewThreadedServlet extends BaseServlet {
                         }
                     }
                 }
+                // always include ourselves...
+                aindex.selectMatchesOrderByEntryId(rv, user.getBlog(), tags, dayBegin);
+   
                 Collections.sort(rv, BlogURI.COMPARATOR);
             } else {
                 Hash loc = new Hash();

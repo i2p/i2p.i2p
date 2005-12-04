@@ -84,6 +84,7 @@ class ArchiveIndexer {
                 totalSize += entry.getCompleteSize();
                 String entryTags[] = entry.getTags();
                 threads.addEntry(entry.getURI(), entryTags);
+                log.debug("Adding entry " + entry.getURI() + " to the threads, with tag count " + (entryTags != null ? entryTags.length : 0));
                 for (int t = 0; t < entryTags.length; t++) {
                     if (!tags.containsKey(entryTags[t])) {
                         tags.put(entryTags[t], new TreeMap());
@@ -106,6 +107,7 @@ class ArchiveIndexer {
                     String forceNewThread = rec.getHeader(HTMLRenderer.HEADER_FORCE_NEW_THREAD);
                     if ( (forceNewThread != null) && (Boolean.valueOf(forceNewThread).booleanValue()) ) {
                         // ignore the parent
+                        log.warn("Ignore the parent of " + entry.getURI() + ": " + reply);
                     } else {
                         BlogURI parent = new BlogURI(reply.trim());
                         if ( (parent.getKeyHash() != null) && (parent.getEntryId() >= 0) ) {

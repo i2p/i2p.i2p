@@ -1,4 +1,9 @@
-$Id: history.txt,v 1.344 2005/12/03 14:03:46 jrandom Exp $
+$Id: history.txt,v 1.345 2005/12/03 22:18:09 jrandom Exp $
+
+2005-12-04  jrandom
+    * Bugfix in Syndie for a problem in the threaded indexer (thanks CofE!)
+    * Always include ourselves in the favorite authors (since we don't
+      bookmark ourselves)
 
 2005-12-03  jrandom
     * Use newgroup-like tags by default in Syndie's interface

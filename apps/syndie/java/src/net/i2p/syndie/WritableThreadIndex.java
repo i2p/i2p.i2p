@@ -29,7 +29,12 @@ class WritableThreadIndex extends ThreadIndex {
     void addParent(BlogURI parent, BlogURI child) { _parents.put(child, parent); }
     void addEntry(BlogURI entry, String tags[]) { 
         if (tags == null) tags = NO_TAGS;
-        String oldTags[] = (String[])_tags.put(entry, tags);
+        Object old = _tags.get(entry);
+        if (old != null) {
+            System.err.println("Old value: " + old + " new tags: " + tags + " entry: " + entry);
+        } else {
+            _tags.put(entry, tags);
+        }
     }
     
     /** 
@@ -108,7 +113,9 @@ class WritableThreadIndex extends ThreadIndex {
             while (node.getParent() != null)
                 node = node.getParent();
         
-            roots.add(node);
+            if (!roots.contains(node)) {
+                roots.add(node);
+            }
         }
         
         // store them, sorted by most recently updated thread first
@@ -154,7 +161,16 @@ class WritableThreadIndex extends ThreadIndex {
             if (l > r) { 
                 return -1;
             } else if (l == r) {
-                return DataHelper.compareTo(left.getEntry().getKeyHash().getData(), right.getEntry().getKeyHash().getData());
+                // ok, the newest responses match, so lets fall back and compare the roots themselves
+                l = left.getEntry().getEntryId();
+                r = right.getEntry().getEntryId();
+                if (l > r) {
+                    return -1;
+                } else if (l == r) {
+                    return DataHelper.compareTo(left.getEntry().getKeyHash().getData(), right.getEntry().getKeyHash().getData());
+                } else {
+                    return 1;
+                }
             } else {
                 return 1;
             }
