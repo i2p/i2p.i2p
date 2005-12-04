@@ -27,7 +27,7 @@ public class PostServlet extends BaseServlet {
     public static final String ACTION_CONFIRM = "confirm";
     
     public static final String PARAM_SUBJECT = "entrysubject";
-    public static final String PARAM_TAGS = "entrytags";
+    public static final String PARAM_TAGS = ThreadedHTMLRenderer.PARAM_TAGS;
     public static final String PARAM_INCLUDENAMES = "includenames";
     public static final String PARAM_TEXT = "entrytext";
     public static final String PARAM_HEADERS = "entryheaders";
@@ -103,6 +103,8 @@ public class PostServlet extends BaseServlet {
             replyTo = null;
           }
         }
+        
+        if (entryTags == null) entryTags = "";
         
         if ( (entryHeaders == null) || (entryHeaders.trim().length() <= 0) )
             entryHeaders = ThreadedHTMLRenderer.HEADER_FORCE_NEW_THREAD + ": " + inNewThread + '\n' +
@@ -223,7 +225,10 @@ public class PostServlet extends BaseServlet {
         if ( (parentURI != null) && (parentURI.trim().length() > 0) )
             out.write("<input type=\"hidden\" name=\"" + PARAM_PARENT + "\" value=\"" + parentURI + "\" />\n");
 
-        out.write(" Tags: <input type=\"text\" size=\"10\" name=\"" + PARAM_TAGS + "\" value=\"" + getParam(req, PARAM_TAGS) + "\" title=\"Optional tags to categorize your response\" /><br />\n");
+        out.write(" Tags: ");
+        BaseServlet.writeTagField(user, getParam(req, PARAM_TAGS), out, "Optional tags to categorize your post", "No tags", false);
+        //<input type=\"text\" size=\"10\" name=\"" + PARAM_TAGS + "\" value=\"" + getParam(req, PARAM_TAGS) + "\" title=\"Optional tags to categorize your response\" /><br />\n");
+        out.write("<br />\n");
         
         boolean inNewThread = getInNewThread(req);
         boolean refuseReplies = getRefuseReplies(req);
@@ -276,7 +281,11 @@ public class PostServlet extends BaseServlet {
         if ( (parentURI != null) && (parentURI.trim().length() > 0) )
             out.write("<input type=\"hidden\" name=\"" + PARAM_PARENT + "\" value=\"" + parentURI + "\" />\n");
 
-        out.write(" Tags: <input type=\"text\" size=\"10\" name=\"" + PARAM_TAGS + "\" value=\"" + getParam(req, PARAM_TAGS) + "\" /><br />\n");
+        out.write(" Tags: ");
+        //<input type=\"text\" size=\"10\" name=\"" + PARAM_TAGS + "\" value=\"" + getParam(req, PARAM_TAGS) + "\" /><br />\n");
+        out.write(" Tags: ");
+        BaseServlet.writeTagField(user, getParam(req, PARAM_TAGS), out, "Optional tags to categorize your post", "No tags", false);
+        out.write("<br />\n");
         
         boolean inNewThread = getInNewThread(req);
         boolean refuseReplies = getRefuseReplies(req);

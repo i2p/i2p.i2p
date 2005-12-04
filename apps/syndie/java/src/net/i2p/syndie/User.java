@@ -5,7 +5,9 @@ import java.io.IOException;
 import java.util.*;
 import net.i2p.I2PAppContext;
 import net.i2p.client.naming.PetNameDB;
+import net.i2p.client.naming.PetName;
 import net.i2p.data.*;
+import net.i2p.syndie.web.AddressesServlet;
 
 /**
  * User session state and preferences.
@@ -44,6 +46,14 @@ public class User {
     private boolean _dataImported;
 
     static final String PROP_USERHASH = "__userHash";
+    
+    private static final String DEFAULT_FAVORITE_TAGS[] = {
+      "syndie", "syndie.tech", "syndie.intro", "syndie.bugs", "syndie.featurerequest", "syndie.announce", 
+      "i2p", "i2p.tech", "i2p.bugs", "i2p.i2phex", "i2p.susimail", "i2p.irc",
+      "security.misc",
+      "chat",
+      "test"
+    };
 
     /**
      * Ugly hack to fetch the default User instance - this is the default
@@ -99,6 +109,24 @@ public class User {
     public long getMostRecentEntry() { return _mostRecentEntry; }
     public Map getBlogGroups() { return _blogGroups; }
     public List getShitlistedBlogs() { return _shitlistedBlogs; }
+    public List getFavoriteTags() { 
+        List rv = new ArrayList();
+        for (Iterator iter = _petnames.getNames().iterator(); iter.hasNext(); ) {
+            String name = (String)iter.next();
+            PetName pn = _petnames.getByName(name);
+            if (AddressesServlet.PROTO_TAG.equals(pn.getProtocol()))
+                rv.add(pn.getLocation());
+        }
+        if (rv.size() <= 0) {
+            for (int i = 0; i < DEFAULT_FAVORITE_TAGS.length; i++) {
+                if (!_petnames.containsName(DEFAULT_FAVORITE_TAGS[i])) {
+                    _petnames.add(new PetName(DEFAULT_FAVORITE_TAGS[i], AddressesServlet.NET_SYNDIE,
+                                              AddressesServlet.PROTO_TAG, DEFAULT_FAVORITE_TAGS[i]));
+                }
+            }
+        }
+        return rv;
+    }
     public String getAddressbookLocation() { return _addressbookLocation; }
     public boolean getShowImages() { return _showImagesByDefault; }
     public boolean getShowExpanded() { return _showExpandedByDefault; }
@@ -282,7 +310,7 @@ public class User {
         // shitlist=hash,hash,hash
         List shitlistedBlogs = getShitlistedBlogs();
         if (shitlistedBlogs.size() > 0) {
-            buf.setLength(0);
+            //buf.setLength(0);
             buf.append("shitlistedblogs=");
             for (int i = 0; i < shitlistedBlogs.size(); i++) {
                 Hash blog = (Hash)shitlistedBlogs.get(i);
@@ -290,6 +318,13 @@ public class User {
                 if (i + 1 < shitlistedBlogs.size())
                     buf.append(',');
             }
+            buf.append('\n');
+        }
+        List favoriteTags = getFavoriteTags();
+        if (favoriteTags.size() > 0) {
+            buf.append("favoritetags=");
+            for (int i = 0; i < favoriteTags.size(); i++)
+                buf.append(((String)favoriteTags.get(i)).trim()).append(" ");
             buf.append('\n');
         }
 

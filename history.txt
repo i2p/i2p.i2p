@@ -1,4 +1,7 @@
-$Id: history.txt,v 1.343 2005/12/03 12:33:35 jrandom Exp $
+$Id: history.txt,v 1.344 2005/12/03 14:03:46 jrandom Exp $
+
+2005-12-03  jrandom
+    * Use newgroup-like tags by default in Syndie's interface
 
 2005-12-03  jrandom
     * Added support for a 'most recent posts' view that CofE requested, which

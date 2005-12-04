@@ -36,6 +36,8 @@ public class ThreadedHTMLRenderer extends HTMLRenderer {
     public static final String PARAM_REMOVE_FROM_GROUP_NAME = "removeName";
     /** group to remove from the bookmarked entry, or if blank, remove the entry itself */
     public static final String PARAM_REMOVE_FROM_GROUP = "removeGroup";
+    /** add the specified tag to the favorites list */
+    public static final String PARAM_ADD_TAG = "addTag";
     /** index into the nav tree to start displaying */
     public static final String PARAM_OFFSET = "offset";
     public static final String PARAM_TAGS = "tags";
@@ -63,6 +65,32 @@ public class ThreadedHTMLRenderer extends HTMLRenderer {
         if (!empty(author))
             buf.append(PARAM_AUTHOR).append('=').append(author).append('&');
         
+        return buf.toString();
+    }
+    
+    public static String getAddTagToFavoritesLink(String uri, String tag, String author, String visible, String viewPost, 
+                                                  String viewThread, String offset) {   
+    //protected String getAddToGroupLink(User user, Hash author, String group, String uri, String visible,
+    //                                 String viewPost, String viewThread, String offset, String tags, String filteredAuthor) {
+        StringBuffer buf = new StringBuffer(64);
+        buf.append(uri);
+        buf.append('?');
+        if (!empty(visible))
+            buf.append(PARAM_VISIBLE).append('=').append(visible).append('&');
+        buf.append(PARAM_ADD_TAG).append('=').append(sanitizeTagParam(tag)).append('&');
+
+        if (!empty(viewPost))
+            buf.append(PARAM_VIEW_POST).append('=').append(viewPost).append('&');
+        else if (!empty(viewThread))
+            buf.append(PARAM_VIEW_THREAD).append('=').append(viewThread).append('&');
+        
+        if (!empty(offset))
+            buf.append(PARAM_OFFSET).append('=').append(offset).append('&');
+
+        if (!empty(author))
+            buf.append(PARAM_AUTHOR).append('=').append(author).append('&');
+        
+        BaseServlet.addAuthActionParams(buf);
         return buf.toString();
     }
     
@@ -213,6 +241,16 @@ public class ThreadedHTMLRenderer extends HTMLRenderer {
                 out.write("'\">");
                 out.write(" " + tag);
                 out.write("</a>\n");
+                if (user.getAuthenticated() && (!user.getFavoriteTags().contains(tag)) && (!"[none]".equals(tag)) ) {
+                    out.write("<a href=\"");
+                    String cur = node.getEntry().getKeyHash().toBase64() + '/' + node.getEntry().getEntryId();
+                    out.write(getAddTagToFavoritesLink(baseURI, tag, filteredAuthor, cur, null, cur, offset));
+                    out.write("\" title=\"Add the tag '");
+                    out.write(tag);
+                    out.write("' to your favorites list\">");
+                    out.write("<img src=\"images/addToFavorites.png\" alt=\":)\" border=\"0\" />");
+                    out.write("</a>\n");
+                }
             }
         }
         
@@ -297,7 +335,9 @@ public class ThreadedHTMLRenderer extends HTMLRenderer {
                 out.write("<tr class=\"postReplyOptions\">\n");
                 out.write(" <td colspan=\"3\">\n");
                 out.write(" <input type=\"submit\" value=\"Preview...\" name=\"Post\" />\n");
-                out.write(" Tags: <input type=\"text\" size=\"10\" name=\"" + PostServlet.PARAM_TAGS + "\" title=\"Optional tags to categorize your response\" />\n");
+                out.write(" Tags: ");
+                BaseServlet.writeTagField(_user, "", out, "Optional tags to categorize your response", "No tags", false);
+                // <input type=\"text\" size=\"10\" name=\"" + PostServlet.PARAM_TAGS + "\" title=\"Optional tags to categorize your response\" />\n");
                 out.write(" in a new thread? <input type=\"checkbox\" name=\"" + PostServlet.PARAM_IN_NEW_THREAD + "\" value=\"true\" title=\"If true, this will fork a new top level thread\" />\n");
                 out.write(" refuse replies? <input type=\"checkbox\" name=\"" + PostServlet.PARAM_REFUSE_REPLIES + "\" value=\"true\" title=\"If true, only you will be able to reply to the post\" />\n");
                 out.write(" attachment: <input type=\"file\" name=\"entryfile0\" />\n");

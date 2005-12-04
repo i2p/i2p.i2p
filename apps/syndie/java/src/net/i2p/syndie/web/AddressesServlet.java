@@ -28,12 +28,14 @@ public class AddressesServlet extends BaseServlet {
     public static final String PARAM_NET = "addrNet";
     public static final String PARAM_PROTO = "addrProto";
     public static final String PARAM_SYNDICATE = "addrSyndicate";
+    public static final String PARAM_TAG = "addrTag";
     public static final String PARAM_ACTION = "action";
     
     public static final String PROTO_BLOG = "syndieblog";
     public static final String PROTO_ARCHIVE = "syndiearchive";
     public static final String PROTO_I2PHEX = "i2phex";
     public static final String PROTO_EEPSITE = "eep";
+    public static final String PROTO_TAG = "syndietag";
 
     public static final String NET_SYNDIE = "syndie";
     public static final String NET_I2P = "i2p";
@@ -57,6 +59,10 @@ public class AddressesServlet extends BaseServlet {
     public static final String ACTION_UPDATE_EEPSITE = "Update eepsite";
     public static final String ACTION_ADD_EEPSITE = "Add eepsite";
     
+    public static final String ACTION_DELETE_TAG = "Delete tag";
+    public static final String ACTION_UPDATE_TAG = "Update tag";
+    public static final String ACTION_ADD_TAG = "Add tag";
+    
     public static final String ACTION_DELETE_OTHER = "Delete address";
     public static final String ACTION_UPDATE_OTHER = "Update address";
     public static final String ACTION_ADD_OTHER = "Add other address";
@@ -75,6 +81,9 @@ public class AddressesServlet extends BaseServlet {
             pn = buildNewName(req, PROTO_ARCHIVE);
             _log.debug("pn for protoArchive [" + req.getParameter(PARAM_PROTO) + "]: " + pn);
             renderArchives(user, db, uri, pn, out);
+            pn = buildNewName(req, PROTO_TAG);
+            _log.debug("pn for protoTag [" + req.getParameter(PARAM_TAG) + "]: " + pn);
+            renderTags(user, db, uri, pn, out);
             pn = buildNewName(req, PROTO_I2PHEX);
             _log.debug("pn for protoPhex [" + req.getParameter(PARAM_PROTO) + "]: " + pn);
             renderI2Phex(user, db, uri, pn, out);
@@ -329,6 +338,53 @@ public class AddressesServlet extends BaseServlet {
         
         out.write("<tr><td colspan=\"3\"><hr /></td></tr>\n");
     }
+    
+    private void renderTags(User user, PetNameDB db, String baseURI, PetName newName, PrintWriter out) throws IOException {
+        TreeSet names = new TreeSet();
+        for (Iterator iter = db.getNames().iterator(); iter.hasNext(); ) {
+            String name = (String)iter.next();
+            PetName pn = db.getByName(name);
+            if (PROTO_TAG.equals(pn.getProtocol()))
+                names.add(name);
+        }
+        out.write("<tr><td colspan=\"3\"><b>Favorite tags</b></td></tr>\n");
+        
+        for (Iterator iter = names.iterator(); iter.hasNext(); ) {
+            PetName pn = db.getByName((String)iter.next());
+            out.write("<form action=\"" + baseURI + "\" method=\"POST\">");
+            writeAuthActionFields(out);
+            out.write("<input type=\"hidden\" name=\"" + PARAM_PROTO + "\" value=\"" + PROTO_TAG + "\" />");
+            out.write("<input type=\"hidden\" name=\"" + PARAM_NET + "\" value=\"" + NET_SYNDIE + "\" />");
+            out.write("<tr><td colspan=\"3\">");
+            out.write("<input type=\"checkbox\" name=\"" + PARAM_IS_PUBLIC + "\" value=\"true\" " + (pn.getIsPublic() ? " checked=\"true\" " : "") 
+                      + " title=\"If checked, this name can be shared with one click when posting\" />\n");
+            out.write("Name: <input type=\"hidden\" name=\"" + PARAM_NAME + "\" value=\"" + pn.getName() 
+                      + "\" />" + pn.getName() + " ");
+            out.write("<input type=\"hidden\" name=\"" + PARAM_LOC + "\" value=\"" + pn.getLocation() 
+                      + "\" /> ");
+            
+            out.write("<input type=\"submit\" name=\"" + PARAM_ACTION + "\" value=\"" + ACTION_DELETE_TAG + "\" /> ");
+            out.write("</td></tr>\n");
+            out.write("</form>\n");
+        }
+        
+        out.write("<form action=\"" + baseURI + "\" method=\"POST\">");
+        writeAuthActionFields(out);
+        out.write("<input type=\"hidden\" name=\"" + PARAM_PROTO + "\" value=\"" + PROTO_TAG + "\" />");
+        out.write("<input type=\"hidden\" name=\"" + PARAM_NET + "\" value=\"" + NET_SYNDIE + "\" />");
+        out.write("<tr><td colspan=\"3\">");
+        out.write("<input type=\"checkbox\" name=\"" + PARAM_IS_PUBLIC + "\" value=\"true\" " + (newName.getIsPublic() ? " checked=\"true\" " : "") 
+                  + " title=\"If checked, this name can be shared with one click when posting\" />\n");
+        out.write("Name: <input type=\"text\" name=\"" + PARAM_NAME + "\" size=\"10\" value=\"" + newName.getName() 
+                  + "\" title=\"Tag (or group of tags)\" /> ");
+
+        out.write("<input type=\"submit\" name=\"" + PARAM_ACTION + "\" value=\"" + ACTION_ADD_TAG + "\" /> ");
+        out.write("</td></tr>\n");
+        out.write("</form>\n");
+        
+        out.write("<tr><td colspan=\"3\"><hr /></td></tr>\n");
+    }
+    
     private void renderOther(User user, PetNameDB db, String baseURI, PetName newName, PrintWriter out) throws IOException {
         TreeSet names = new TreeSet();
         for (Iterator iter = db.getNames().iterator(); iter.hasNext(); ) {
@@ -429,6 +485,7 @@ public class AddressesServlet extends BaseServlet {
             if (PROTO_ARCHIVE.equals(reqProto) || 
                 PROTO_BLOG.equals(reqProto) ||
                 PROTO_EEPSITE.equals(reqProto) ||
+                PROTO_TAG.equals(reqProto) ||
                 PROTO_I2PHEX.equals(reqProto))
                 return false;
             else // its something other than the four default types

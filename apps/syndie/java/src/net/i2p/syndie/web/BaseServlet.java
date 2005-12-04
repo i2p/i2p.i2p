@@ -64,12 +64,12 @@ public abstract class BaseServlet extends HttpServlet {
      * key=value& of params that need to be tacked onto an http request that updates data, to 
      * prevent spoofing 
      */
-    protected String getAuthActionParams() { return PARAM_AUTH_ACTION + '=' + _authNonce + '&'; }
+    protected static String getAuthActionParams() { return PARAM_AUTH_ACTION + '=' + _authNonce + '&'; }
     /** 
      * key=value& of params that need to be tacked onto an http request that updates data, to 
      * prevent spoofing 
      */
-    protected void addAuthActionParams(StringBuffer buf) { 
+    public static void addAuthActionParams(StringBuffer buf) { 
         buf.append(PARAM_AUTH_ACTION).append('=').append(_authNonce).append('&'); 
     }
     
@@ -139,6 +139,7 @@ public abstract class BaseServlet extends HttpServlet {
         
             forceNewIndex = handleAddressbook(user, req) || forceNewIndex;
             forceNewIndex = handleBookmarking(user, req) || forceNewIndex;
+            forceNewIndex = handleManageTags(user, req) || forceNewIndex;
             handleUpdateProfile(user, req);
         }
         
@@ -240,6 +241,35 @@ public abstract class BaseServlet extends HttpServlet {
         return rv;
     }
     
+    private boolean handleManageTags(User user, HttpServletRequest req) {
+        if (!user.getAuthenticated())
+            return false;
+        
+        boolean rv = false;
+        
+        String tag = req.getParameter(ThreadedHTMLRenderer.PARAM_ADD_TAG);
+        if ( (tag != null) && (tag.trim().length() > 0) ) {
+            tag = HTMLRenderer.sanitizeString(tag, false);
+            String name = tag;
+            PetNameDB db = user.getPetNameDB();
+            PetName pn = db.getByLocation(tag);
+            if (pn == null) {
+                if (db.containsName(name)) {
+                    int i = 0;
+                    while (db.containsName(name + i))
+                        i++;
+                    name = tag + i;
+                }
+
+                pn = new PetName(name, AddressesServlet.NET_SYNDIE, AddressesServlet.PROTO_TAG, tag);
+                db.add(pn);
+                BlogManager.instance().saveUser(user);
+            }
+        }
+        
+        return false;
+    }
+    
     private boolean handleAddressbook(User user, HttpServletRequest req) {
         if ( (!user.getAuthenticated()) || (empty(AddressesServlet.PARAM_ACTION)) ) {
             return false;
@@ -247,7 +277,15 @@ public abstract class BaseServlet extends HttpServlet {
         
         String action = req.getParameter(AddressesServlet.PARAM_ACTION);
         
-        if ( (AddressesServlet.ACTION_ADD_ARCHIVE.equals(action)) || 
+        if (AddressesServlet.ACTION_ADD_TAG.equals(action)) {
+            String name = req.getParameter(AddressesServlet.PARAM_NAME);
+            if (!user.getPetNameDB().containsName(name)) {
+                PetName pn = new PetName(name, AddressesServlet.NET_SYNDIE, AddressesServlet.PROTO_TAG, name);
+                user.getPetNameDB().add(pn);
+                BlogManager.instance().saveUser(user);
+            }
+            return false;
+        } else if ( (AddressesServlet.ACTION_ADD_ARCHIVE.equals(action)) || 
              (AddressesServlet.ACTION_ADD_BLOG.equals(action)) ||
              (AddressesServlet.ACTION_ADD_EEPSITE.equals(action)) || 
              (AddressesServlet.ACTION_ADD_OTHER.equals(action)) ||
@@ -279,6 +317,7 @@ public abstract class BaseServlet extends HttpServlet {
              (AddressesServlet.ACTION_DELETE_BLOG.equals(action)) ||
              (AddressesServlet.ACTION_DELETE_EEPSITE.equals(action)) || 
              (AddressesServlet.ACTION_DELETE_OTHER.equals(action)) ||
+             (AddressesServlet.ACTION_DELETE_TAG.equals(action)) ||
              (AddressesServlet.ACTION_DELETE_PEER.equals(action)) ) {
             PetName pn = user.getPetNameDB().getByName(req.getParameter(AddressesServlet.PARAM_NAME));
             if (pn != null) {
@@ -525,7 +564,7 @@ public abstract class BaseServlet extends HttpServlet {
             out.write(user.getUsername());
             out.write("</a>\n");
             out.write("(<a href=\"switchuser.jsp\" title=\"Log in as another user\">switch</a>)\n");
-            out.write("<a href=\"" + getPostURI() + "\" title=\"Post a new thread\">Post a new thread</a>\n");
+            out.write("<a href=\"" + getPostURI() + "\" title=\"Post a new thread\">Post</a>\n");
             out.write("<a href=\"addresses.jsp\" title=\"View your addressbook\">Addressbook</a>\n");
         } else {
             out.write("<form action=\"" + req.getRequestURI() + "\" method=\"POST\">\n");
@@ -627,8 +666,8 @@ public abstract class BaseServlet extends HttpServlet {
         }
         out.write("</select>\n");
         
-        out.write("Tags: <input type=\"text\" name=\"" + ThreadedHTMLRenderer.PARAM_TAGS + "\" size=\"10\" value=\"" + tags 
-                  + "\" title=\"Threads are filtered to include only ones with posts containing these tags\" />\n");
+        out.write("Tags: ");
+        writeTagField(user, tags, out);
 
         String days = req.getParameter(ThreadedHTMLRenderer.PARAM_DAYS_BACK);
         if (days == null)
@@ -646,6 +685,52 @@ public abstract class BaseServlet extends HttpServlet {
         out.write("<!-- control bar end -->\n");
         out.write("</tr>\n");
         out.write("</form>\n");
+    }
+    
+    protected void writeTagField(User user, String selectedTags, PrintWriter out) throws IOException {
+        writeTagField(user, selectedTags, out, "Threads are filtered to include only ones with posts containing these tags", "Any tags - no filtering", true);
+    }
+    public static void writeTagField(User user, String selectedTags, Writer out, String title, String blankTitle, boolean includeFavoritesTag) throws IOException {
+        Set favoriteTags = new TreeSet(user.getFavoriteTags());
+        if (favoriteTags.size() <= 0) {
+            out.write("<input type=\"text\" name=\"" + ThreadedHTMLRenderer.PARAM_TAGS + "\" size=\"10\" value=\"" + selectedTags
+                      + "\" title=\"" + title + "\" />\n");
+        } else {
+            out.write("<select name=\"" + ThreadedHTMLRenderer.PARAM_TAGS 
+                      + "\" title=\"" + title + "\">");
+            out.write("<option value=\"\">" + blankTitle + "</option>\n");
+            if (includeFavoritesTag) {
+                out.write("<option value=\"");
+                StringBuffer combinedBuf = new StringBuffer();
+                for (Iterator iter = favoriteTags.iterator(); iter.hasNext(); ) {
+                    String curFavTag = (String)iter.next();
+                    combinedBuf.append(HTMLRenderer.sanitizeTagParam(curFavTag)).append(" ");
+                }
+                String combined = combinedBuf.toString();
+                if (selectedTags.equals(combined))
+                    out.write(combined + "\" selected=\"true\" >All favorite tags</option>\n");
+                else
+                    out.write(combined + "\" >All favorite tags</option>\n");
+            }
+            
+            boolean matchFound = false;
+            for (Iterator iter = favoriteTags.iterator(); iter.hasNext(); ) {
+                String curFavTag = (String)iter.next();
+                if (selectedTags.equals(curFavTag)) {
+                    out.write("<option value=\"" + HTMLRenderer.sanitizeTagParam(curFavTag) + "\" selected=\"true\" >" 
+                              + HTMLRenderer.sanitizeString(curFavTag)  + "</option>\n");
+                    matchFound = true;
+                } else {
+                    out.write("<option value=\"" + HTMLRenderer.sanitizeTagParam(curFavTag) + "\">" 
+                              + HTMLRenderer.sanitizeString(curFavTag)  + "</option>\n");
+                }
+            }
+            if ( (!matchFound) && (selectedTags != null) && (selectedTags.trim().length() > 0) )
+                out.write("<option value=\"" + HTMLRenderer.sanitizeTagParam(selectedTags) 
+                          + "\" selected=\"true\">" + HTMLRenderer.sanitizeString(selectedTags) + "</option>\n");
+            
+            out.write("</select>\n");
+        }
     }
    
     protected abstract void renderServletDetails(User user, HttpServletRequest req, PrintWriter out, 
