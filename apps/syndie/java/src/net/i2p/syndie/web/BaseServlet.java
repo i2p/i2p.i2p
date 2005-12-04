@@ -699,6 +699,7 @@ public abstract class BaseServlet extends HttpServlet {
             out.write("<select name=\"" + ThreadedHTMLRenderer.PARAM_TAGS 
                       + "\" title=\"" + title + "\">");
             out.write("<option value=\"\">" + blankTitle + "</option>\n");
+            boolean matchFound = false;
             if (includeFavoritesTag) {
                 out.write("<option value=\"");
                 StringBuffer combinedBuf = new StringBuffer();
@@ -707,13 +708,14 @@ public abstract class BaseServlet extends HttpServlet {
                     combinedBuf.append(HTMLRenderer.sanitizeTagParam(curFavTag)).append(" ");
                 }
                 String combined = combinedBuf.toString();
-                if (selectedTags.equals(combined))
+                if (selectedTags.equals(combined)) {
                     out.write(combined + "\" selected=\"true\" >All favorite tags</option>\n");
-                else
+                    matchFound = true;
+                } else {
                     out.write(combined + "\" >All favorite tags</option>\n");
+                }
             }
             
-            boolean matchFound = false;
             for (Iterator iter = favoriteTags.iterator(); iter.hasNext(); ) {
                 String curFavTag = (String)iter.next();
                 if (selectedTags.equals(curFavTag)) {
