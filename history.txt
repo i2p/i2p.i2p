@@ -1,4 +1,7 @@
-$Id: history.txt,v 1.345 2005/12/03 22:18:09 jrandom Exp $
+$Id: history.txt,v 1.346 2005/12/04 15:02:25 jrandom Exp $
+
+2005-12-04  TLorD
+    * Patch for the C SAM library to null terminate strings on copy (thanks!)
 
 2005-12-04  jrandom
     * Bugfix in Syndie for a problem in the threaded indexer (thanks CofE!)

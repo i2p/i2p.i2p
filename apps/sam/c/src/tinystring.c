@@ -90,6 +90,7 @@ void string_copy(string_t src,string_t dest) {
 void string_copy_raw(string_t src, void* dest,size_t size) {
     size = min(src->size,size);
     memcpy(dest,src->data,size);
+    ((char*)dest)[size] = '\0';
 }
 
 const char* string_data(string_t self) {
