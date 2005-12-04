@@ -436,10 +436,20 @@ public class HTMLRenderer extends EventReceiverImpl {
             _links.add(l);
         if (!continueBody()) { return; }
         if ( (schema == null) || (location == null) ) return;
-        _bodyBuffer.append("<a ").append(getClass("externalLink")).append(" href=\"externallink.jsp?schema=");
-        _bodyBuffer.append(sanitizeURL(schema)).append("&location=");
-        _bodyBuffer.append(sanitizeURL(location)).append("&description=");
-        _bodyBuffer.append(sanitizeURL(text)).append("\">").append(sanitizeString(text)).append("</a>");
+        _bodyBuffer.append("<a ");
+        if ( schema.equals("attachment") ) {
+                int attachmentID = Integer.parseInt(location);
+                _bodyBuffer.append("href=\"").
+                        append(getAttachmentURL(attachmentID));
+        } else {
+                _bodyBuffer.append(getClass("externalLink")).append(" href=\"externallink.jsp?schema=");
+                _bodyBuffer.append(sanitizeURL(schema)).append("&location=");
+                _bodyBuffer.append(sanitizeURL(location)).append("&description=");
+                _bodyBuffer.append(sanitizeURL(text));
+        }
+        _bodyBuffer.append("\">").
+                    append(sanitizeString(text)).
+                    append("</a>");
     }
 
     protected static class Address {
@@ -639,12 +649,21 @@ public class HTMLRenderer extends EventReceiverImpl {
                 _postBodyBuffer.append(getSpan("summDetailExternal")).append("External links:</span> ");
                 for (int i = 0; i < _links.size(); i++) {
                     Link l = (Link)_links.get(i);
-                    _postBodyBuffer.append("<a ").append(getClass("summDetailExternalLink")).append(" href=\"externallink.jsp?");
-                    if (l.schema != null)
-                        _postBodyBuffer.append("schema=").append(sanitizeURL(l.schema)).append('&');
-                    if (l.location != null)
-                        _postBodyBuffer.append("location=").append(sanitizeURL(l.location)).append('&');
-                    _postBodyBuffer.append("\">").append(sanitizeString(l.location));
+                    String schema = l.schema;
+                    _postBodyBuffer.append("<a ");
+                    if(schema.equals("attachment")) {
+                            /* No need for externallink double checker */
+                            int ID = Integer.parseInt(l.location);
+                            _postBodyBuffer.append(" href=\"").append(getAttachmentURL(ID));
+                            _postBodyBuffer.append("\">").append(sanitizeString(l.location));
+                    } else {
+                            _postBodyBuffer.append(getClass("summDetailExternalLink")).append(" href=\"externallink.jsp?");
+                            if (l.schema != null)
+                                _postBodyBuffer.append("schema=").append(sanitizeURL(l.schema)).append('&');
+                            if (l.location != null)
+                                _postBodyBuffer.append("location=").append(sanitizeURL(l.location)).append('&');
+                            _postBodyBuffer.append("\">").append(sanitizeString(l.location));
+                    }
                     _postBodyBuffer.append(getSpan("summDetailExternalNet")).append(" (").append(sanitizeString(l.schema)).append(")</span></a> ");
                 }
                 _postBodyBuffer.append("<br />\n");

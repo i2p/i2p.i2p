@@ -17,11 +17,12 @@ request.setCharacterEncoding("UTF-8");
   <li>[cut]more inside[/cut] = &lt;a href="#"&gt;more inside...&lt;/a&gt;</li>
   <li>[quote][/quote] = Quoted text</li>
   <li>[img attachment="1"]alt[/img] = use attachment 1 as an image with 'alt' as the alt text</li>
+  <li>[link schema="attachment" location="0"]text[/link] = offer a link to one of the attachments in your post (redundant, but useful in context sometimes)
+  <li>[link schema="eep" location="http://forum.i2p"]text[/link] = offer a link to an external resource (accessible with the given schema)</li>
   <li>[blog name="name" bloghash="base64hash"]description[/blog] = link to all posts in the blog</li>
   <li>[blog name="name" bloghash="base64hash" blogentry="1234"]description[/blog] = link to the specified post in the blog</li>
   <li>[blog name="name" bloghash="base64hash" blogtag="tag"]description[/blog] = link to all posts in the blog with the specified tag</li>
   <li>[blog name="name" blogtag="tag"]description[/blog] = link to all posts in all blogs with the specified tag</li>
-  <li>[link schema="eep" location="http://forum.i2p"]text[/link] = offer a link to an external resource (accessible with the given schema)</li>
   <li>[archive name="name" description="they have good stuff" schema="eep" location="http://syndiemedia.i2p/archive/archive.txt"]foo![/archive] = offer an easy way to sync up with a new Syndie archive</li>
 </ul>
 SML headers are newline delimited key:value pairs.  Example keys are:
