@@ -1,4 +1,10 @@
-$Id: history.txt,v 1.346 2005/12/04 15:02:25 jrandom Exp $
+$Id: history.txt,v 1.347 2005/12/04 15:12:19 jrandom Exp $
+
+2005-12-05  jrandom
+    * Added an RDF and XML thread export to Syndie, reachable at 
+      .../threadnav/rdf or .../threadnav/xml, accepting the parameters
+      count=$numThreads and offset=$threadIndex.  If the $numThreads is -1, it
+      displays all threads.
 
 2005-12-04  TLorD
     * Patch for the C SAM library to null terminate strings on copy (thanks!)

@@ -60,6 +60,11 @@
     </servlet>
      
     <servlet>
+     <servlet-name>net.i2p.syndie.web.ThreadNavServlet</servlet-name>
+     <servlet-class>net.i2p.syndie.web.ThreadNavServlet</servlet-class>
+    </servlet>
+     
+    <servlet>
 	 <servlet-name>net.i2p.syndie.UpdaterServlet</servlet-name>
 	 <servlet-class>net.i2p.syndie.UpdaterServlet</servlet-class>
          <load-on-startup>1</load-on-startup>
@@ -116,6 +121,10 @@
     <servlet-mapping> 
       <servlet-name>net.i2p.syndie.web.ExternalLinkServlet</servlet-name>
       <url-pattern>/externallink.jsp</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping> 
+      <servlet-name>net.i2p.syndie.web.ThreadNavServlet</servlet-name>
+      <url-pattern>/threadnav/*</url-pattern>
     </servlet-mapping>
     
     <session-config>

@@ -981,6 +981,13 @@ public class HTMLRenderer extends EventReceiverImpl {
         else
             return orig.toString();
     }
+    public static final String sanitizeStrippedXML(String orig) {
+        if (orig == null) return "";
+        orig = orig.replaceAll("&", "&amp;");
+        orig = orig.replaceAll("<", "&lt;");
+        orig = orig.replaceAll(">", "&gt;");
+        return orig;
+    }
 
     private static final String STYLE_CHARS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_";
     public static String sanitizeStyle(String style) {

@@ -163,6 +163,9 @@ public abstract class BaseServlet extends HttpServlet {
                 _log.info("New filtered index created (forced? " + forceNewIndex + ", tagsChanged? " + tagsChanged + ", authorsChanged? " + authorsChanged + ")");
         }
         
+        render(user, req, resp, index);
+    }
+    protected void render(User user, HttpServletRequest req, HttpServletResponse resp, ThreadIndex index) throws IOException, ServletException {
         render(user, req, resp.getWriter(), index);
     }
     
