@@ -1,4 +1,8 @@
-$Id: history.txt,v 1.347 2005/12/04 15:12:19 jrandom Exp $
+$Id: history.txt,v 1.348 2005/12/05 01:14:16 jrandom Exp $
+
+2005-12-07  jrandom
+    * Expand the thread we're viewing to its leaf
+    * Bugfix on intraday ordering (children are always newer than parents)
 
 2005-12-05  jrandom
     * Added an RDF and XML thread export to Syndie, reachable at 

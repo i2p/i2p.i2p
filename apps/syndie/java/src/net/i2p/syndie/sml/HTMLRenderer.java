@@ -650,7 +650,7 @@ public class HTMLRenderer extends EventReceiverImpl {
                             _postBodyBuffer.append("schema=").append(sanitizeURL(l.schema)).append('&');
                     if (l.location != null)
                             _postBodyBuffer.append("location=").append(sanitizeURL(l.location)).append('&');
-                    _postBodyBuffer.append("\">").append(sanitizeString(l.location));
+                    _postBodyBuffer.append("\">").append(sanitizeString(l.location, 30));
                     _postBodyBuffer.append(getSpan("summDetailExternalNet")).append(" (").append(sanitizeString(l.schema)).append(")</span></a> ");
                 }
                 _postBodyBuffer.append("<br />\n");

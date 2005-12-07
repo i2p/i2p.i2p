@@ -53,8 +53,10 @@ class ThreadNodeImpl implements ThreadNode {
     void summarizeThread() {
         _recursiveAuthors.add(_entry.getKeyHash());
         _recursiveEntries.add(_entry);
-        _mostRecentPostDate = _entry.getEntryId();
-        _mostRecentPostAuthor = _entry.getKeyHash();
+        // children are always 'newer' than parents, even if their dates are older
+        // (e.g. post #1 for a child on tuesday is 'newer' than post #5 for the parent on tuesday)
+        _mostRecentPostDate = -1;
+        _mostRecentPostAuthor = null;
         
         // we need to go through all children (recursively), in case the 
         // tree is out of order (which it shouldn't be, if its built carefully...)
@@ -71,6 +73,22 @@ class ThreadNodeImpl implements ThreadNode {
             _recursiveAuthors.addAll(node.getRecursiveAuthors());
             _recursiveEntries.addAll(node.getRecursiveEntries());
         }
+        
+        if (_mostRecentPostDate < 0) {
+            _mostRecentPostDate = _entry.getEntryId();
+            _mostRecentPostAuthor = _entry.getKeyHash();
+        }
+        
+        // now reorder the children
+        TreeSet ordered = new TreeSet(new WritableThreadIndex.NewestNodeFirstComparator());
+        for (int i = 0; i < _children.size(); i++) {
+            ThreadNodeImpl kid = (ThreadNodeImpl)_children.get(i);
+            ordered.add(kid);
+        }
+        List kids = new ArrayList(ordered.size());
+        for (Iterator iter = ordered.iterator(); iter.hasNext(); ) 
+            kids.add(iter.next());
+        _children = kids;
     }
     
     public String toString() {

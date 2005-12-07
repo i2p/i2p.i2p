@@ -152,7 +152,7 @@ class WritableThreadIndex extends ThreadIndex {
         }
     }
     /** sort ThreadNodeImpl instances with the highest entryId first */
-    private class NewestNodeFirstComparator implements Comparator {
+    public static class NewestNodeFirstComparator implements Comparator {
         public int compare(Object lhs, Object rhs) {
             ThreadNodeImpl left = (ThreadNodeImpl)lhs;
             ThreadNodeImpl right = (ThreadNodeImpl)rhs;

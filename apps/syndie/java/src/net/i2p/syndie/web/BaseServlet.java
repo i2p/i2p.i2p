@@ -951,16 +951,20 @@ public abstract class BaseServlet extends HttpServlet {
                                             String tags, String author) {
         StringBuffer buf = new StringBuffer(64);
         buf.append(uri);
+        BlogURI expandTo = node.getEntry();
         if (node.getChildCount() > 0) {
-            buf.append('?').append(ThreadedHTMLRenderer.PARAM_VISIBLE).append('=');
-            ThreadNode child = node.getChild(0);
-            buf.append(child.getEntry().getKeyHash().toBase64()).append('/');
-            buf.append(child.getEntry().getEntryId()).append('&');
-        } else {
-            buf.append('?').append(ThreadedHTMLRenderer.PARAM_VISIBLE).append('=');
-            buf.append(node.getEntry().getKeyHash().toBase64()).append('/');
-            buf.append(node.getEntry().getEntryId()).append('&');
-        }
+            if (true) {
+                // lets expand to the leaf
+                expandTo = new BlogURI(node.getMostRecentPostAuthor(), node.getMostRecentPostDate());
+            } else {
+                // only expand one level
+                expandTo = node.getChild(0).getEntry();
+            }
+        } 
+        buf.append('?').append(ThreadedHTMLRenderer.PARAM_VISIBLE).append('=');
+        buf.append(expandTo.getKeyHash().toBase64()).append('/');
+        buf.append(expandTo.getEntryId()).append('&');
+        
         buf.append(ThreadedHTMLRenderer.PARAM_VIEW_THREAD).append('=');
         buf.append(node.getEntry().getKeyHash().toBase64()).append('/');
         buf.append(node.getEntry().getEntryId()).append('&');

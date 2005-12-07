@@ -376,10 +376,10 @@ public class ThreadedHTMLRenderer extends HTMLRenderer {
             for (int i = 0; i < _entry.getAttachments().length; i++) {
                 _postBodyBuffer.append("<option value=\"").append(i).append("\">");
                 Attachment a = _entry.getAttachments()[i];
-                _postBodyBuffer.append(sanitizeString(a.getName()));
+                _postBodyBuffer.append(sanitizeString(a.getName(), 30));
                 if ( (a.getDescription() != null) && (a.getDescription().trim().length() > 0) ) {
                     _postBodyBuffer.append(": ");
-                    _postBodyBuffer.append(sanitizeString(a.getDescription()));
+                    _postBodyBuffer.append(sanitizeString(a.getDescription(), 30));
                 }
                 _postBodyBuffer.append(" (").append(a.getDataLength()/1024).append("KB");
                 _postBodyBuffer.append(", type ").append(sanitizeString(a.getMimeType())).append(")</option>\n");
@@ -396,7 +396,7 @@ public class ThreadedHTMLRenderer extends HTMLRenderer {
                 boolean expanded = (_user != null ? _user.getShowExpanded() : false);
                 boolean images = (_user != null ? _user.getShowImages() : false);
                 _postBodyBuffer.append(getPageURL(new Hash(Base64.decode(b.hash)), b.tag, b.entryId, -1, -1, expanded, images));
-                _postBodyBuffer.append("\">").append(sanitizeString(b.name)).append("</a> ");
+                _postBodyBuffer.append("\">").append(sanitizeString(b.name, 30)).append("</a> ");
             }
             _postBodyBuffer.append("<br />\n");
         }
@@ -412,7 +412,7 @@ public class ThreadedHTMLRenderer extends HTMLRenderer {
                         _postBodyBuffer.append("schema=").append(sanitizeURL(l.schema)).append('&');
                 if (l.location != null)
                         _postBodyBuffer.append("location=").append(sanitizeURL(l.location)).append('&');
-                _postBodyBuffer.append("\">").append(sanitizeString(l.location));
+                _postBodyBuffer.append("\">").append(sanitizeString(l.location, 30));
                 _postBodyBuffer.append(getSpan("summDetailExternalNet")).append(" (").append(sanitizeString(l.schema)).append(")</span></a> ");
             }
             _postBodyBuffer.append("<br />\n");
@@ -439,7 +439,7 @@ public class ThreadedHTMLRenderer extends HTMLRenderer {
                         _postBodyBuffer.append(AddressesServlet.PARAM_NAME).append("=").append(sanitizeTagParam(a.name)).append('&');
                     if (a.protocol != null)
                         _postBodyBuffer.append(AddressesServlet.PARAM_PROTO).append("=").append(sanitizeTagParam(a.protocol)).append('&');
-                    _postBodyBuffer.append("\">").append(sanitizeString(a.name)).append("</a>");
+                    _postBodyBuffer.append("\">").append(sanitizeString(a.name, 30)).append("</a>");
                 }                    
             }
             _postBodyBuffer.append("<br />\n");
