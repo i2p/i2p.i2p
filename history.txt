@@ -1,4 +1,8 @@
-$Id: history.txt,v 1.349 2005/12/07 15:19:43 jrandom Exp $
+$Id: history.txt,v 1.350 2005/12/07 19:50:35 jrandom Exp $
+
+2005-12-08  jrandom
+    * Minor bugfix in SSU for dealing with corrupt packets
+    * Added some hooks for load testing
 
 2005-12-07  jrandom
     * Added a first pass at a blog view in Syndie

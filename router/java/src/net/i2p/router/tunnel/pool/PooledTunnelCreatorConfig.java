@@ -2,6 +2,7 @@ package net.i2p.router.tunnel.pool;
 
 import java.util.Properties;
 import net.i2p.data.Hash;
+import net.i2p.router.Job;
 import net.i2p.router.RouterContext;
 import net.i2p.router.tunnel.TunnelCreatorConfig;
 
@@ -14,7 +15,7 @@ public class PooledTunnelCreatorConfig extends TunnelCreatorConfig {
     private boolean _failed;
     private TestJob _testJob;
     private RebuildJob _rebuildJob;
-    private ExpireJob _expireJob;
+    private Job _expireJob;
     
     /** Creates a new instance of PooledTunnelCreatorConfig */
     
@@ -63,5 +64,5 @@ public class PooledTunnelCreatorConfig extends TunnelCreatorConfig {
     
     public void setTestJob(TestJob job) { _testJob = job; }
     public void setRebuildJob(RebuildJob job) { _rebuildJob = job; }
-    public void setExpireJob(ExpireJob job) { _expireJob = job; }
+    public void setExpireJob(Job job) { _expireJob = job; }
 }

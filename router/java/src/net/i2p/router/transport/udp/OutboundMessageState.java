@@ -268,12 +268,17 @@ public class OutboundMessageState {
         int end = start + fragmentSize(fragmentNum);
         if (_messageBuf == null) return -1;
         int toSend = end - start;
-        System.arraycopy(_messageBuf.getData(), start, out, outOffset, toSend);
-        if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Raw fragment[" + fragmentNum + "] for " + _messageId 
-                       + "[" + start + "-" + (start+toSend) + "/" + _messageBuf.getValid() + "/" + _fragmentSize + "]: " 
-                       + Base64.encode(out, outOffset, toSend));
-        return toSend;
+        byte buf[] = _messageBuf.getData();
+        if ( (buf != null) && (start + toSend < buf.length) && (out != null) && (outOffset + toSend < out.length) ) {
+            System.arraycopy(_messageBuf.getData(), start, out, outOffset, toSend);
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Raw fragment[" + fragmentNum + "] for " + _messageId 
+                           + "[" + start + "-" + (start+toSend) + "/" + _messageBuf.getValid() + "/" + _fragmentSize + "]: " 
+                           + Base64.encode(out, outOffset, toSend));
+            return toSend;
+        } else {
+            return -1;
+        }
     }
     
     public String toString() {

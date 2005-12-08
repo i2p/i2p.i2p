@@ -151,6 +151,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         _context.statManager().createRateStat("udp.addressTestInsteadOfUpdate", "How many times we fire off a peer test of ourselves instead of adjusting our own reachable address?", "udp", new long[] { 1*60*1000, 20*60*1000, 60*60*1000, 24*60*60*1000 });
         _context.statManager().createRateStat("udp.addressUpdated", "How many times we adjust our own reachable IP address", "udp", new long[] { 1*60*1000, 20*60*1000, 60*60*1000, 24*60*60*1000 });
         _context.statManager().createRateStat("udp.proactiveReestablish", "How long a session was idle for when we proactively reestablished it", "udp", new long[] { 1*60*1000, 20*60*1000, 60*60*1000, 24*60*60*1000 });
+        
+        __instance = this;
     }
     
     public void startup() {
@@ -947,6 +949,27 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         }
         
     }
+    
+    private static UDPTransport __instance;
+    /** **internal, do not use** */
+    public static final UDPTransport _instance() { return __instance; }
+    /** **internal, do not use** return the peers (Hash) of active peers. */
+    public List _getActivePeers() {
+        List peers = new ArrayList(128);
+        synchronized (_peersByIdent) {
+            peers.addAll(_peersByIdent.keySet());
+        }
+        
+        long now = _context.clock().now();
+        for (Iterator iter = peers.iterator(); iter.hasNext(); ) {
+            Hash peer = (Hash)iter.next();
+            PeerState state = getPeerState(peer);
+            if (now-state.getLastReceiveTime() > 5*60*1000)
+                iter.remove(); // don't include old peers
+        }
+        return peers;
+    }
+    
     public void renderStatusHTML(Writer out) throws IOException {
         TreeSet peers = new TreeSet(AlphaComparator.instance());
         synchronized (_peersByIdent) {
