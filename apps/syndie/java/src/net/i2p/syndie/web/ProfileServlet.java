@@ -103,14 +103,13 @@ public class ProfileServlet extends BaseServlet {
     }
     
     private void renderProfile(User user, String baseURI, PrintWriter out, Hash author, Archive archive) throws IOException {
-        out.write("<tr><td colspan=\"3\">Profile for <a href=\"" + getControlTarget() + "?" 
-                  + ThreadedHTMLRenderer.PARAM_AUTHOR + '=' + author.toBase64() 
-                  + "\" title=\"View threads by the profiled author\">");
+        out.write("<tr><td colspan=\"3\">Profile for ");
         PetName pn = user.getPetNameDB().getByLocation(author.toBase64());
+        String name = null;
         BlogInfo info = archive.getBlogInfo(author);
         if (pn != null) {
             out.write(pn.getName());
-            String name = null;
+            name = null;
             if (info != null)
                 name = info.getProperty(BlogInfo.NAME);
             
@@ -119,7 +118,6 @@ public class ProfileServlet extends BaseServlet {
             
             out.write(" (" + name + ")");
         } else {
-            String name = null;
             if (info != null)
                 name = info.getProperty(BlogInfo.NAME);
             
@@ -130,6 +128,12 @@ public class ProfileServlet extends BaseServlet {
         out.write("</a>");
         if (info != null)
             out.write(" [edition " + info.getEdition() + "]");
+        out.write("<br />\n");
+        out.write("<a href=\"" + getControlTarget() + "?" + ThreadedHTMLRenderer.PARAM_AUTHOR 
+                  + '=' + author.toBase64() + "&" + ThreadedHTMLRenderer.PARAM_THREAD_AUTHOR + "=true&\""
+                  + " title=\"View '" + HTMLRenderer.sanitizeTagParam(name) + "'s blog\">View their blog</a> or ");
+        out.write("<a href=\"" + getControlTarget() + "?" + ThreadedHTMLRenderer.PARAM_AUTHOR
+                  + '=' + author.toBase64() + "&\">threads they have participated in</a>\n");
         out.write("</td></tr>\n");
         
         out.write("<tr><td colspan=\"3\"><hr /></td></tr>\n");

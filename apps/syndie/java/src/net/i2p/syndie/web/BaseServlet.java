@@ -152,12 +152,20 @@ public abstract class BaseServlet extends HttpServlet {
         
         FilteredThreadIndex index = (FilteredThreadIndex)req.getSession().getAttribute("threadIndex");
         
+        boolean authorOnly = Boolean.valueOf(req.getParameter(ThreadedHTMLRenderer.PARAM_THREAD_AUTHOR)).booleanValue();
+        if ( (index != null) && (authorOnly != index.getFilterAuthorsByRoot()) )
+            forceNewIndex = true;
+        
         Collection tags = getFilteredTags(req);
         Collection filteredAuthors = getFilteredAuthors(req);
         boolean tagsChanged = ( (index != null) && (!index.getFilteredTags().equals(tags)) );
         boolean authorsChanged = ( (index != null) && (!index.getFilteredAuthors().equals(filteredAuthors)) );
+        
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("authorOnly=" + authorOnly + " forceNewIndex? " + forceNewIndex + " authors=" + filteredAuthors);
+        
         if (forceNewIndex || (index == null) || (tagsChanged) || (authorsChanged) ) {
-            index = new FilteredThreadIndex(user, BlogManager.instance().getArchive(), getFilteredTags(req), filteredAuthors);
+            index = new FilteredThreadIndex(user, BlogManager.instance().getArchive(), getFilteredTags(req), filteredAuthors, authorOnly);
             req.getSession().setAttribute("threadIndex", index);
             if (_log.shouldLog(Log.INFO))
                 _log.info("New filtered index created (forced? " + forceNewIndex + ", tagsChanged? " + tagsChanged + ", authorsChanged? " + authorsChanged + ")");
@@ -561,7 +569,7 @@ public abstract class BaseServlet extends HttpServlet {
         //out.write("<tr class=\"topNav\"><td class=\"topNav_user\" colspan=\"2\" nowrap=\"true\">\n");
         out.write("<tr class=\"topNav\"><td colspan=\"3\" nowrap=\"true\"><span class=\"topNav_user\">\n");
         out.write("<!-- nav bar begin -->\n");
-        out.write("<a href=\"threads.jsp\" title=\"Syndie home\">Home</a> ");
+        out.write("<a href=\"threads.jsp\" title=\"Syndie home\">Home</a> <a href=\"blogs.jsp\" title=\"Blog summary\">Blogs</a> ");
         if (user.getAuthenticated() && (user.getBlog() != null) ) {
             out.write("Logged in as <a href=\"" + getProfileLink(req, user.getBlog()) + "\" title=\"Edit your profile\">");
             out.write(user.getUsername());
@@ -933,22 +941,25 @@ public abstract class BaseServlet extends HttpServlet {
         return ThreadedHTMLRenderer.getViewPostLink(req.getRequestURI(), node, user, isPermalink, 
                                                     req.getParameter(ThreadedHTMLRenderer.PARAM_OFFSET), 
                                                     req.getParameter(ThreadedHTMLRenderer.PARAM_TAGS), 
-                                                    req.getParameter(ThreadedHTMLRenderer.PARAM_AUTHOR));
+                                                    req.getParameter(ThreadedHTMLRenderer.PARAM_AUTHOR),
+                                                    Boolean.valueOf(req.getParameter(ThreadedHTMLRenderer.PARAM_THREAD_AUTHOR)).booleanValue());
     }
     protected String getViewPostLink(HttpServletRequest req, BlogURI post, User user) {
         return ThreadedHTMLRenderer.getViewPostLink(req.getRequestURI(), post, user, false, 
                                                     req.getParameter(ThreadedHTMLRenderer.PARAM_OFFSET), 
                                                     req.getParameter(ThreadedHTMLRenderer.PARAM_TAGS), 
-                                                    req.getParameter(ThreadedHTMLRenderer.PARAM_AUTHOR));
+                                                    req.getParameter(ThreadedHTMLRenderer.PARAM_AUTHOR),
+                                                    Boolean.valueOf(req.getParameter(ThreadedHTMLRenderer.PARAM_THREAD_AUTHOR)).booleanValue());
     }
     protected String getViewThreadLink(HttpServletRequest req, ThreadNode node, User user) {
         return getViewThreadLink(req.getRequestURI(), node, user,
                                  req.getParameter(ThreadedHTMLRenderer.PARAM_OFFSET),
                                  req.getParameter(ThreadedHTMLRenderer.PARAM_TAGS),
-                                 req.getParameter(ThreadedHTMLRenderer.PARAM_AUTHOR));
+                                 req.getParameter(ThreadedHTMLRenderer.PARAM_AUTHOR),
+                                 Boolean.valueOf(req.getParameter(ThreadedHTMLRenderer.PARAM_THREAD_AUTHOR)).booleanValue());
     }
     protected static String getViewThreadLink(String uri, ThreadNode node, User user, String offset,
-                                            String tags, String author) {
+                                            String tags, String author, boolean authorOnly) {
         StringBuffer buf = new StringBuffer(64);
         buf.append(uri);
         BlogURI expandTo = node.getEntry();
@@ -975,8 +986,11 @@ public abstract class BaseServlet extends HttpServlet {
         if (!empty(tags))
             buf.append(ThreadedHTMLRenderer.PARAM_TAGS).append('=').append(tags).append('&');
         
-        if (!empty(author))
+        if (!empty(author)) {
             buf.append(ThreadedHTMLRenderer.PARAM_AUTHOR).append('=').append(author).append('&');
+            if (authorOnly)
+                buf.append(ThreadedHTMLRenderer.PARAM_THREAD_AUTHOR).append("=true&");
+        }
         
         buf.append("#").append(node.getEntry().toString());
         return buf.toString();
@@ -990,6 +1004,7 @@ public abstract class BaseServlet extends HttpServlet {
                                                req.getParameter(ThreadedHTMLRenderer.PARAM_VIEW_THREAD), 
                                                req.getParameter(ThreadedHTMLRenderer.PARAM_TAGS), 
                                                req.getParameter(ThreadedHTMLRenderer.PARAM_AUTHOR), 
+                                               Boolean.valueOf(req.getParameter(ThreadedHTMLRenderer.PARAM_THREAD_AUTHOR)).booleanValue(), 
                                                offset);
     }
     
@@ -1014,7 +1029,13 @@ public abstract class BaseServlet extends HttpServlet {
     }
     
     protected Collection getFilteredAuthors(HttpServletRequest req) {
-        String authors = req.getParameter(ThreadedHTMLRenderer.PARAM_AUTHOR);
+        List rv = new ArrayList();
+        rv.addAll(getAuthors(req.getParameter(ThreadedHTMLRenderer.PARAM_AUTHOR)));
+        //rv.addAll(getAuthors(req.getParameter(ThreadedHTMLRenderer.PARAM_THREAD_AUTHOR)));
+        return rv;
+    }
+    
+    private Collection getAuthors(String authors) {
         if (authors != null) {
             StringTokenizer tok = new StringTokenizer(authors, "\n\t ");
             ArrayList rv = new ArrayList();

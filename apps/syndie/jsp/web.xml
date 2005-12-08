@@ -65,6 +65,11 @@
     </servlet>
      
     <servlet>
+     <servlet-name>net.i2p.syndie.web.ViewBlogsServlet</servlet-name>
+     <servlet-class>net.i2p.syndie.web.ViewBlogsServlet</servlet-class>
+    </servlet>
+     
+    <servlet>
 	 <servlet-name>net.i2p.syndie.UpdaterServlet</servlet-name>
 	 <servlet-class>net.i2p.syndie.UpdaterServlet</servlet-class>
          <load-on-startup>1</load-on-startup>
@@ -125,6 +130,10 @@
     <servlet-mapping> 
       <servlet-name>net.i2p.syndie.web.ThreadNavServlet</servlet-name>
       <url-pattern>/threadnav/*</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping> 
+      <servlet-name>net.i2p.syndie.web.ViewBlogsServlet</servlet-name>
+      <url-pattern>/blogs.jsp</url-pattern>
     </servlet-mapping>
     
     <session-config>

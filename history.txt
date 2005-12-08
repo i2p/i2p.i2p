@@ -1,4 +1,7 @@
-$Id: history.txt,v 1.348 2005/12/05 01:14:16 jrandom Exp $
+$Id: history.txt,v 1.349 2005/12/07 15:19:43 jrandom Exp $
+
+2005-12-07  jrandom
+    * Added a first pass at a blog view in Syndie
 
 2005-12-07  jrandom
     * Expand the thread we're viewing to its leaf

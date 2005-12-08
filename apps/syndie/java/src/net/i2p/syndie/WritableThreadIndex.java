@@ -136,44 +136,4 @@ class WritableThreadIndex extends ThreadIndex {
         buf.append("</threadIndex>\n");
         return buf.toString();
     }
-    
-    /** sort BlogURI instances with the highest entryId first */
-    private class NewestEntryFirstComparator implements Comparator {
-        public int compare(Object lhs, Object rhs) {
-            BlogURI left = (BlogURI)lhs;
-            BlogURI right = (BlogURI)rhs;
-            if (left.getEntryId() > right.getEntryId()) {
-                return -1;
-            } else if (left.getEntryId() == right.getEntryId()) {
-                return DataHelper.compareTo(left.getKeyHash().getData(), right.getKeyHash().getData());
-            } else {
-                return 1;
-            }
-        }
-    }
-    /** sort ThreadNodeImpl instances with the highest entryId first */
-    public static class NewestNodeFirstComparator implements Comparator {
-        public int compare(Object lhs, Object rhs) {
-            ThreadNodeImpl left = (ThreadNodeImpl)lhs;
-            ThreadNodeImpl right = (ThreadNodeImpl)rhs;
-            long l = left.getMostRecentPostDate();
-            long r = right.getMostRecentPostDate();
-            if (l > r) { 
-                return -1;
-            } else if (l == r) {
-                // ok, the newest responses match, so lets fall back and compare the roots themselves
-                l = left.getEntry().getEntryId();
-                r = right.getEntry().getEntryId();
-                if (l > r) {
-                    return -1;
-                } else if (l == r) {
-                    return DataHelper.compareTo(left.getEntry().getKeyHash().getData(), right.getEntry().getKeyHash().getData());
-                } else {
-                    return 1;
-                }
-            } else {
-                return 1;
-            }
-        }
-    }
 }

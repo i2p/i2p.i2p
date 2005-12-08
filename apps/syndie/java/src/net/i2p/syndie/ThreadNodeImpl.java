@@ -80,7 +80,7 @@ class ThreadNodeImpl implements ThreadNode {
         }
         
         // now reorder the children
-        TreeSet ordered = new TreeSet(new WritableThreadIndex.NewestNodeFirstComparator());
+        TreeSet ordered = new TreeSet(new NewestNodeFirstComparator());
         for (int i = 0; i < _children.size(); i++) {
             ThreadNodeImpl kid = (ThreadNodeImpl)_children.get(i);
             ordered.add(kid);

@@ -36,13 +36,15 @@ public class ViewThreadedServlet extends BaseServlet {
         String off = req.getParameter(ThreadedHTMLRenderer.PARAM_OFFSET);
         String tags = req.getParameter(ThreadedHTMLRenderer.PARAM_TAGS);
         String author = req.getParameter(ThreadedHTMLRenderer.PARAM_AUTHOR);
+        
+        boolean authorOnly = Boolean.valueOf(req.getParameter(ThreadedHTMLRenderer.PARAM_THREAD_AUTHOR)).booleanValue(); 
 
         for (int i = 0; i < posts.size(); i++) {
             BlogURI post = (BlogURI)posts.get(i);
             boolean inlineReply = (posts.size() == 1);
             //if (true)
             //    inlineReply = true;
-            renderer.render(user, out, archive, post, inlineReply, index, uri, getAuthActionFields(), off, tags, author);
+            renderer.render(user, out, archive, post, inlineReply, index, uri, getAuthActionFields(), off, tags, author, authorOnly);
         }
     }
     

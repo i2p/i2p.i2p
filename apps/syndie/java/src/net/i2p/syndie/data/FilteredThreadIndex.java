@@ -16,11 +16,12 @@ public class FilteredThreadIndex extends ThreadIndex {
     private List _roots;
     private List _ignoredAuthors;
     private Collection _filteredAuthors;
+    private boolean _filterAuthorsByRoot;
 
     public static final String GROUP_FAVORITE = "Favorite";
     public static final String GROUP_IGNORE = "Ignore";
 
-    public FilteredThreadIndex(User user, Archive archive, Collection tags, Collection authors) {
+    public FilteredThreadIndex(User user, Archive archive, Collection tags, Collection authors, boolean filterAuthorsByRoot) {
         super();
         _user = user;
         _archive = archive;
@@ -31,6 +32,7 @@ public class FilteredThreadIndex extends ThreadIndex {
         _filteredAuthors = authors;
         if (_filteredAuthors == null)
             _filteredAuthors = Collections.EMPTY_SET;
+        _filterAuthorsByRoot = filterAuthorsByRoot;
         
         _ignoredAuthors = new ArrayList();
         for (Iterator iter = user.getPetNameDB().iterator(); iter.hasNext(); ) {
@@ -53,12 +55,12 @@ public class FilteredThreadIndex extends ThreadIndex {
         _roots = new ArrayList(_baseIndex.getRootCount());
         for (int i = 0; i < _baseIndex.getRootCount(); i++) {
             ThreadNode node = _baseIndex.getRoot(i);
-            if (!isIgnored(node, _ignoredAuthors, _filteredTags, _filteredAuthors))
+            if (!isIgnored(node, _ignoredAuthors, _filteredTags, _filteredAuthors, _filterAuthorsByRoot))
                 _roots.add(node);
         }
     }
     
-    private boolean isIgnored(ThreadNode node, List ignoredAuthors, Collection requestedTags, Collection filteredAuthors) {
+    private boolean isIgnored(ThreadNode node, List ignoredAuthors, Collection requestedTags, Collection filteredAuthors, boolean filterAuthorsByRoot) {
         if (filteredAuthors.size() <= 0) {
             boolean allAuthorsIgnored = true;
             for (Iterator iter = node.getRecursiveAuthorIterator(); iter.hasNext(); ) {
@@ -75,9 +77,16 @@ public class FilteredThreadIndex extends ThreadIndex {
             boolean filteredAuthorMatches = false;
             for (Iterator iter = filteredAuthors.iterator(); iter.hasNext(); ) {
                 Hash author = (Hash)iter.next();
-                if (node.containsAuthor(author)) {
-                    filteredAuthorMatches = true;
-                    break;
+                if (filterAuthorsByRoot) {
+                    if (node.getEntry().getKeyHash().equals(author)) {
+                        filteredAuthorMatches = true;
+                        break;
+                    }
+                } else { 
+                    if (node.containsAuthor(author)) {
+                        filteredAuthorMatches = true;
+                        break;
+                    }
                 }
             }
             if (!filteredAuthorMatches)
@@ -107,4 +116,5 @@ public class FilteredThreadIndex extends ThreadIndex {
     public ThreadNode getNode(BlogURI uri) { return _baseIndex.getNode(uri); }
     public Collection getFilteredTags() { return _filteredTags; }
     public Collection getFilteredAuthors() { return _filteredAuthors; }
+    public boolean getFilterAuthorsByRoot() { return _filterAuthorsByRoot; }
 }

@@ -60,7 +60,7 @@ public class RSSServlet extends HttpServlet {
         if (count > 100) count = 100;
         
         Archive archive = BlogManager.instance().getArchive();
-        FilteredThreadIndex index = new FilteredThreadIndex(user, archive, tagSet, null);
+        FilteredThreadIndex index = new FilteredThreadIndex(user, archive, tagSet, null, false);
         List entries = new ArrayList();
         // depth first search of the most recent threads
         for (int i = 0; i < count && i < index.getRootCount(); i++) {
