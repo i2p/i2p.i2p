@@ -83,7 +83,7 @@ public class ViewBlogsServlet extends BaseServlet {
         out.write("<tr><td colspan=\"3\">");
         for (Iterator iter = tags.iterator(); iter.hasNext(); ) {
             String tag = (String)iter.next();
-            out.write("<a href=\"" + getFilterByTagLink(req, null, user, tag, null) 
+            out.write("<a href=\"" + ThreadedHTMLRenderer.getFilterByTagLink(getControlTarget(), null, user, tag, null) 
                       + "\" title=\"View threads flagged with the tag '" + HTMLRenderer.sanitizeTagParam(tag) + "'\">");
             out.write(HTMLRenderer.sanitizeString(tag, 32));
             out.write("</a> ");
