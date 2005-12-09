@@ -18,6 +18,7 @@ public class TunnelPoolSettings {
     private int _duration;
     private int _length;
     private int _lengthVariance;
+    private int _lengthOverride;
     private boolean _isInbound;
     private boolean _isExploratory;
     private boolean _allowZeroHop;
@@ -54,6 +55,7 @@ public class TunnelPoolSettings {
         _duration = DEFAULT_DURATION;
         _length = DEFAULT_LENGTH;
         _lengthVariance = DEFAULT_LENGTH_VARIANCE;
+        _lengthOverride = 0;
         _allowZeroHop = DEFAULT_ALLOW_ZERO_HOP;
         _isInbound = false;
         _isExploratory = false;
@@ -90,6 +92,10 @@ public class TunnelPoolSettings {
      */
     public int getLengthVariance() { return _lengthVariance; }
     public void setLengthVariance(int variance) { _lengthVariance = variance; }
+
+    /* Set to a nonzero value to override the length setting */
+    public int getLengthOverride() { return _lengthOverride; }
+    public void setLengthOverride(int variance) { _lengthOverride = variance; }
     
     /** is this an inbound tunnel? */
     public boolean isInbound() { return _isInbound; }

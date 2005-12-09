@@ -72,9 +72,9 @@
  
  <jsp:getProperty name="helper" property="destinations" />
  
- <u><b>Tunnels</b></u><br />
- <b>Inbound:</b> <jsp:getProperty name="helper" property="inboundTunnels" /><br />
- <b>Outbound:</b> <jsp:getProperty name="helper" property="outboundTunnels" /><br />
+ <u><b>Tunnels in/out</b></u><br />
+ <b>Exploratory:</b> <jsp:getProperty name="helper" property="inboundTunnels" />/<jsp:getProperty name="helper" property="outboundTunnels" /><br />
+ <b>Client:</b> <jsp:getProperty name="helper" property="inboundClientTunnels" />/<jsp:getProperty name="helper" property="outboundClientTunnels" /><br />
  <b>Participating:</b> <jsp:getProperty name="helper" property="participatingTunnels" /><br />
  <hr />
  

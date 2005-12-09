@@ -66,9 +66,15 @@ public class RequestTunnelJob extends JobImpl {
         ctx.statManager().createRateStat("tunnel.receiveRejectionBandwidth", "How often we are rejected due to bandwidth overload?", "Tunnels", new long[] { 10*60*1000l, 60*60*1000l, 24*60*60*1000l });
         ctx.statManager().createRateStat("tunnel.receiveRejectionCritical", "How often we are rejected due to critical failure?", "Tunnels", new long[] { 10*60*1000l, 60*60*1000l, 24*60*60*1000l });
         ctx.statManager().createRateStat("tunnel.buildFailure", "What hop was being requested when a nonexploratory tunnel request failed?", "Tunnels", new long[] { 10*60*1000l, 60*60*1000l, 24*60*60*1000l });
-        ctx.statManager().createRateStat("tunnel.buildExploratoryFailure", "What hop was beiing requested when an exploratory tunnel request failed?", "Tunnels", new long[] { 10*60*1000l, 60*60*1000l, 24*60*60*1000l });
+        ctx.statManager().createRateStat("tunnel.buildExploratoryFailure", "What hop was being requested when an exploratory tunnel request failed?", "Tunnels", new long[] { 10*60*1000l, 60*60*1000l, 24*60*60*1000l });
+        ctx.statManager().createRateStat("tunnel.buildExploratoryFailure1Hop", "What hop was being requested when a 1 hop exploratory tunnel request failed?", "Tunnels", new long[] { 10*60*1000l, 60*60*1000l, 24*60*60*1000l });
+        ctx.statManager().createRateStat("tunnel.buildExploratoryFailure2Hop", "What hop was being requested when a 2 hop exploratory tunnel request failed?", "Tunnels", new long[] { 10*60*1000l, 60*60*1000l, 24*60*60*1000l });
+        ctx.statManager().createRateStat("tunnel.buildExploratoryFailure3Hop", "What hop was being requested when a 3 hop exploratory tunnel request failed?", "Tunnels", new long[] { 10*60*1000l, 60*60*1000l, 24*60*60*1000l });
         ctx.statManager().createRateStat("tunnel.buildSuccess", "How often we succeed building a non-exploratory tunnel?", "Tunnels", new long[] { 10*60*1000l, 60*60*1000l, 24*60*60*1000l });
         ctx.statManager().createRateStat("tunnel.buildExploratorySuccess", "How often we succeed building an exploratory tunnel?", "Tunnels", new long[] { 10*60*1000l, 60*60*1000l, 24*60*60*1000l });
+        ctx.statManager().createRateStat("tunnel.buildExploratorySuccess1Hop", "How often we succeed building a 1 hop exploratory tunnel?", "Tunnels", new long[] { 10*60*1000l, 60*60*1000l, 24*60*60*1000l });
+        ctx.statManager().createRateStat("tunnel.buildExploratorySuccess2Hop", "How often we succeed building a 2 hop exploratory tunnel?", "Tunnels", new long[] { 10*60*1000l, 60*60*1000l, 24*60*60*1000l });
+        ctx.statManager().createRateStat("tunnel.buildExploratorySuccess3Hop", "How often we succeed building a 3 hop exploratory tunnel?", "Tunnels", new long[] { 10*60*1000l, 60*60*1000l, 24*60*60*1000l });
         ctx.statManager().createRateStat("tunnel.buildPartialTime", "How long a non-exploratory request took to be accepted?", "Tunnels", new long[] { 10*60*1000l, 60*60*1000l, 24*60*60*1000l });
         ctx.statManager().createRateStat("tunnel.buildExploratoryPartialTime", "How long an exploratory request took to be accepted?", "Tunnels", new long[] { 10*60*1000l, 60*60*1000l, 24*60*60*1000l });
 
@@ -263,9 +269,16 @@ public class RequestTunnelJob extends JobImpl {
             _log.info("tunnel building failed: " + _config + " at hop " + _currentHop);
         if (_onFailed != null)
             getContext().jobQueue().addJob(_onFailed);
-        if (_isExploratory)
-            getContext().statManager().addRateData("tunnel.buildExploratoryFailure", _currentHop, _config.getLength());
-        else
+        if (_isExploratory) {
+            int i = _config.getLength();
+            getContext().statManager().addRateData("tunnel.buildExploratoryFailure", _currentHop, i);
+            if (i == 2)
+                getContext().statManager().addRateData("tunnel.buildExploratoryFailure1Hop", _currentHop, i);
+            else if (i == 3)
+                getContext().statManager().addRateData("tunnel.buildExploratoryFailure2Hop", _currentHop, i);
+            else if (i == 4)
+                getContext().statManager().addRateData("tunnel.buildExploratoryFailure3Hop", _currentHop, i);
+        } else
             getContext().statManager().addRateData("tunnel.buildFailure", _currentHop, _config.getLength());
     }
     
@@ -284,9 +297,16 @@ public class RequestTunnelJob extends JobImpl {
         } else {
             if (_onCreated != null)
                 getContext().jobQueue().addJob(_onCreated);
-            if (_isExploratory)
+            if (_isExploratory) {
+                int i = _config.getLength();
                 getContext().statManager().addRateData("tunnel.buildExploratorySuccess", 1, 0);
-            else
+                if (i == 2)
+                    getContext().statManager().addRateData("tunnel.buildExploratorySuccess1Hop", 1, 0);
+                else if (i == 3)
+                    getContext().statManager().addRateData("tunnel.buildExploratorySuccess2Hop", 1, 0);
+                else if (i == 4)
+                    getContext().statManager().addRateData("tunnel.buildExploratorySuccess3Hop", 1, 0);
+            } else
                 getContext().statManager().addRateData("tunnel.buildSuccess", 1, 0);
         }
     }

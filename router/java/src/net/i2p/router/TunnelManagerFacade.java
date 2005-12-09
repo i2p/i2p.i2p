@@ -48,6 +48,10 @@ public interface TunnelManagerFacade extends Service {
     public int getFreeTunnelCount();
     /** how many outbound tunnels do we have available? */
     public int getOutboundTunnelCount();
+    /** how many free inbound client tunnels do we have available? */
+    public int getInboundClientTunnelCount();
+    /** how many outbound client tunnels do we have available? */
+    public int getOutboundClientTunnelCount();
     
     /** When does the last tunnel we are participating in expire? */
     public long getLastParticipatingExpiration();
@@ -81,6 +85,8 @@ class DummyTunnelManagerFacade implements TunnelManagerFacade {
     public int getParticipatingCount() { return 0; }
     public int getFreeTunnelCount() { return 0; }
     public int getOutboundTunnelCount() { return 0; }
+    public int getInboundClientTunnelCount() { return 0; }
+    public int getOutboundClientTunnelCount() { return 0; }
     public long getLastParticipatingExpiration() { return -1; }
     public void buildTunnels(Destination client, ClientTunnelSettings settings) {}
     public TunnelPoolSettings getInboundSettings() { return null; }

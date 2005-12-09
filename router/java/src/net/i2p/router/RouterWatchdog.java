@@ -90,7 +90,9 @@ class RouterWatchdog implements Runnable {
     
     public void monitorRouter() {
         boolean ok = verifyJobQueueLiveliness();
-        ok = ok && verifyClientLiveliness();
+        // If we aren't connected to the network that's why there's nobody to talk to
+        int netErrors = (int) _context.statManager().getRate("udp.sendException").getRate(60*1000).getLastEventCount();
+        ok = ok && (verifyClientLiveliness() || netErrors >= 5);
         
         if (!ok) {
             dumpStatus();

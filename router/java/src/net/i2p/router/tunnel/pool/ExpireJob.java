@@ -25,11 +25,16 @@ class ExpireJob extends JobImpl {
                 return "Expire exploratory outbound tunnel";
             }
         } else {
-            if (_pool.getSettings().isInbound()) {
-                return "Expire client inbound tunnel";
-            } else {
-                return "Expire client outbound tunnel";
-            }
+            StringBuffer rv = new StringBuffer(32);
+            if (_pool.getSettings().isInbound())
+                rv.append("Expire inbound client tunnel for ");
+            else
+                rv.append("Expire outbound client tunnel for ");
+            if (_pool.getSettings().getDestinationNickname() != null)
+                rv.append(_pool.getSettings().getDestinationNickname());
+            else
+                rv.append(_pool.getSettings().getDestination().toBase64().substring(0,4));
+            return rv.toString();
         }
     }
     public void runJob() {

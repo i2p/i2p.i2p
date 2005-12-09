@@ -18,11 +18,13 @@
  <a href="susimail/susimail">Susimail</a> |
  <a href="susidns/index.jsp">SusiDNS</a> |
  <a href="syndie/">Syndie</a> |
+ <a href="http://localhost:7658/">My Eepsite</a> <br>
  <a href="i2ptunnel/index.jsp">I2PTunnel</a> |
  <a href="tunnels.jsp">Tunnels</a> |
  <a href="profiles.jsp">Profiles</a> |
  <a href="netdb.jsp">NetDB</a> |
  <a href="logs.jsp">Logs</a> |
+ <a href="jobs.jsp">Jobs</a> |
  <a href="oldstats.jsp">Stats</a> |
  <a href="oldconsole.jsp">Internals</a>
  <jsp:useBean class="net.i2p.router.web.NavHelper" id="navhelper" scope="request" />

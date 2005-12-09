@@ -110,7 +110,7 @@ public class TunnelBuilder {
         public void runJob() {
             // yikes, nothing left, lets get some backup (if we're allowed)
             _pool.getManager().buildComplete();
-            _pool.refreshBuilders();
+            _pool.refreshBuilders(1, 4);
         }
     }
 }

@@ -154,6 +154,38 @@ public class TunnelPoolManager implements TunnelManagerFacade {
         else
             return _outboundExploratory.size(); 
     }
+    public int getInboundClientTunnelCount() { 
+        int count = 0;
+        List destinations = null;
+        synchronized (_clientInboundPools) {
+            destinations = new ArrayList(_clientInboundPools.keySet());
+        }
+        for (int i = 0; i < destinations.size(); i++) {
+            Hash client = (Hash)destinations.get(i);
+            TunnelPool pool = null;
+            synchronized (_clientInboundPools) {
+                pool = (TunnelPool)_clientInboundPools.get(client);
+            }
+            count += pool.listTunnels().size();
+        }
+        return count;
+    }
+    public int getOutboundClientTunnelCount() { 
+        int count = 0;
+        List destinations = null;
+        synchronized (_clientInboundPools) {
+            destinations = new ArrayList(_clientOutboundPools.keySet());
+        }
+        for (int i = 0; i < destinations.size(); i++) {
+            Hash client = (Hash)destinations.get(i);
+            TunnelPool pool = null;
+            synchronized (_clientOutboundPools) {
+                pool = (TunnelPool)_clientOutboundPools.get(client);
+            }
+            count += pool.listTunnels().size();
+        }
+        return count;
+    }
     public int getParticipatingCount() { return _context.tunnelDispatcher().getParticipatingCount(); }
     public long getLastParticipatingExpiration() { return _context.tunnelDispatcher().getLastParticipatingExpiration(); }
     
@@ -240,6 +272,7 @@ public class TunnelPoolManager implements TunnelManagerFacade {
             }
         }
         inbound.startup();
+        try { Thread.sleep(3*1000); } catch (InterruptedException ie) {}
         outbound.startup();
     }
     
@@ -316,6 +349,7 @@ public class TunnelPoolManager implements TunnelManagerFacade {
         _inboundExploratory = new TunnelPool(_context, this, inboundSettings, selector, builder);
         _inboundExploratory.startup();
         
+        try { Thread.sleep(3*1000); } catch (InterruptedException ie) {}
         TunnelPoolSettings outboundSettings = new TunnelPoolSettings();
         outboundSettings.setIsExploratory(true);
         outboundSettings.setIsInbound(false);
@@ -406,10 +440,10 @@ public class TunnelPoolManager implements TunnelManagerFacade {
                 out.write("<td>n/a</td>");
             long timeLeft = cfg.getExpiration()-_context.clock().now();
             if (timeLeft > 0)
-                out.write("<td>" + DataHelper.formatDuration(timeLeft) + "</td>");
+                out.write("<td align=right>" + DataHelper.formatDuration(timeLeft) + "</td>");
             else
-                out.write("<td>(grace period)</td>");
-            out.write("<td>" + cfg.getProcessedMessagesCount() + "KB</td>");
+                out.write("<td align=right>(grace period)</td>");
+            out.write("<td align=right>" + cfg.getProcessedMessagesCount() + "KB</td>");
             out.write("</tr>\n");
             processed += cfg.getProcessedMessagesCount();
         }
@@ -441,8 +475,8 @@ public class TunnelPoolManager implements TunnelManagerFacade {
                 out.write("<tr><td><b>inbound</b></td>");
             else
                 out.write("<tr><td><b>outbound</b></td>");
-            out.write("<td>" + DataHelper.formatDuration(timeLeft) + "</td>\n");
-            out.write("<td>" + info.getProcessedMessagesCount() + "KB</td>\n");
+            out.write("<td align=right>" + DataHelper.formatDuration(timeLeft) + "</td>\n");
+            out.write("<td align=right>" + info.getProcessedMessagesCount() + "KB</td>\n");
             for (int j = 0; j < info.getLength(); j++) {
                 Hash peer = info.getPeer(j);
                 TunnelId id = (info.isInbound() ? info.getReceiveTunnelId(j) : info.getSendTunnelId(j));

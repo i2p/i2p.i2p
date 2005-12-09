@@ -1,4 +1,25 @@
-$Id: history.txt,v 1.350 2005/12/07 19:50:35 jrandom Exp $
+$Id: history.txt,v 1.351 2005/12/08 15:53:43 jrandom Exp $
+
+2005-12-09  zzz
+    * Create different strategies for exploratory tunnels (which are difficult
+      to create) and client tunnels (which are much easier)
+    * Gradually increase number of parallel build attempts as tunnel expiry
+      nears.
+    * Temporarily shorten attempted build tunnel length if builds using
+      configured tunnel length are unsuccessful
+    * React more aggressively to tunnel failure than routine tunnel
+      replacement
+    * Make tunnel creation times randomized - there is existing code to
+      randomize the tunnels but it isn't effective due to the tunnel creation 
+      strategy. Currently, most tunnels get built all at once, at about 2 1/2
+      to 3 minutes before expiration. The patch fixes this by fixing the 
+      randomization, and by changing the overlap time (with old tunnels) to a
+      range of 2 to 4 minutes.
+    * Reduce number of excess tunnels. Lots of excess tunnels get created due
+      to overlapping calls. Just about anything generated a call which could
+      build many tunnels all at once, even if tunnel building was already in
+      process.
+    * Miscellaneous router console enhancements
 
 2005-12-08  jrandom
     * Minor bugfix in SSU for dealing with corrupt packets

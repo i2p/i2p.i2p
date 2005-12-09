@@ -37,7 +37,7 @@ public class TunnelPool {
     private long _lastSelectionPeriod;
     
     /**
-     * Only 5 builds per minute per pool, even if we have failing tunnels,
+     * Only 10 builds per minute per pool, even if we have failing tunnels,
      * etc.  On overflow, the necessary additional tunnels are built by the
      * RefreshJob
      */
@@ -65,7 +65,7 @@ public class TunnelPool {
         _alive = true;
         _refreshJob.getTiming().setStartAfter(_context.clock().now() + 60*1000);
         _context.jobQueue().addJob(_refreshJob);
-        int added = refreshBuilders();
+        int added = refreshBuilders(0, 0);
         if (added <= 0) {
             // we just reconnected and didn't require any new tunnel builders.
             // however, we /do/ want a leaseSet, so build one
@@ -85,12 +85,17 @@ public class TunnelPool {
         _lastSelected = null;
     }
 
-    private int countUsableTunnels() {
+    /**
+     * Return number of tunnels expiring greater than
+     * timeFactor * RebuildPeriod from now
+     *
+     */
+    private int countUsableTunnels(int timeFactor) {
         int valid = 0;
         synchronized (_tunnels) {
             for (int i = 0; i < _tunnels.size(); i++) {
                 TunnelInfo info = (TunnelInfo)_tunnels.get(i);
-                if (info.getExpiration() > _context.clock().now() + 3*_settings.getRebuildPeriod())
+                if (info.getExpiration() > _context.clock().now() + (timeFactor * _settings.getRebuildPeriod()))
                     valid++;
             }
         }
@@ -99,21 +104,31 @@ public class TunnelPool {
     
     /**
      * Fire up as many buildTunnel tasks as necessary, returning how many
-     * were added
+     * were added.
+     * Build maxBuild tunnels (0 = unlimited), use timeFactor * RebuildPeriod.
+     * Fire off up to six extra jobs if an exploratory tunnel is
+     * requested by RebuildJob or tunnelFailed (maxBuild > 1).
+     * Throttle builds to a maximum per minute; reduce maximum if job lag is high,
+     * or if we have network errors which indicate we are disconnected from the network.
+     * Override pool length setting and build a 1-hop tunnel if time is short.
      *
      */
-    int refreshBuilders() {
+    int refreshBuilders(int maxBuild, int timeFactor) {
         if ( (_settings.getDestination() != null) && (!_context.clientManager().isLocal(_settings.getDestination())) )
             _alive = false;
         if (!_alive) return 0;
         // only start up new build tasks if we need more of 'em
-        int target = _settings.getQuantity() + _settings.getBackupQuantity();
-        int usableTunnels = countUsableTunnels();
+        int baseTarget = _settings.getQuantity() + _settings.getBackupQuantity();
+        int target = baseTarget;
+        int usableTunnels = countUsableTunnels(timeFactor);
+        if (_settings.isExploratory() && target > 0 && maxBuild > 1)
+            target+= 6;
         
-        if ( (target > usableTunnels) && (_log.shouldLog(Log.INFO)) )
-            _log.info(toString() + ": refreshing builders, previously had " + usableTunnels
+        if ( (target > usableTunnels)  )
+            if ( (target > usableTunnels) && (_log.shouldLog(Log.INFO)) )
+                _log.info(toString() + ": refreshing builders, previously had " + usableTunnels
                           + ", want a total of " + target + ", creating " 
-                          + (target-usableTunnels) + " new ones.");
+                          + (target-usableTunnels) + " new ones (" + maxBuild + " max).");
 
         if (target > usableTunnels) {
             long minute = _context.clock().now();
@@ -123,9 +138,34 @@ public class TunnelPool {
                 _buildsThisMinute = 0;
             }
             int build = (target - usableTunnels);
-            if (build > (MAX_BUILDS_PER_MINUTE - _buildsThisMinute))
-                build = (MAX_BUILDS_PER_MINUTE - _buildsThisMinute);
-            
+            if (maxBuild > 0 && build > maxBuild)
+                build = maxBuild;
+            int buildThrottle = MAX_BUILDS_PER_MINUTE;
+            int lag = (int) _context.statManager().getRate("jobQueue.jobLag").getRate(60*1000).getAverageValue();
+            int netErrors = (int) _context.statManager().getRate("udp.sendException").getRate(60*1000).getLastEventCount();
+            if (lag > 3 * 1000 || netErrors > 5) {
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("Throttling tunnel builds lag = " + lag + "; net errors = " + netErrors);
+                if (_settings.isExploratory())
+                    buildThrottle = 3;
+                else
+                    buildThrottle = 1;
+            } else if (lag > 1 * 1000) {
+                if (_settings.isExploratory())
+                    buildThrottle = 5;
+                else
+                    buildThrottle = 2;
+            }
+            if (build > (buildThrottle - _buildsThisMinute))
+                build = (buildThrottle - _buildsThisMinute);
+            if (build <= 0) return 0;
+
+            if ((_settings.isExploratory() && baseTarget > countUsableTunnels(1)) ||
+                ((!_settings.isExploratory()) && baseTarget > countUsableTunnels(0)))
+                    _settings.setLengthOverride(1);
+                else
+                    _settings.setLengthOverride(0);
+
             int wanted = build;
             build = _manager.allocateBuilds(build);
             
@@ -255,7 +295,7 @@ public class TunnelPool {
         if (_settings != null) {
             if (_log.shouldLog(Log.INFO))
                 _log.info(toString() + ": Settings updated on the pool: " + settings);
-            refreshBuilders(); // to start/stop new sequences, in case the quantities changed
+            refreshBuilders(1, 4); // to start/stop new sequences, in case the quantities changed
         }
     }
     public TunnelPeerSelector getSelector() { return _peerSelector; }
@@ -278,8 +318,6 @@ public class TunnelPool {
         
         if (ls != null)
             _context.clientManager().requestLeaseSet(_settings.getDestination(), ls);
-        
-        refreshBuilders();
     }
     
     public void removeTunnel(TunnelInfo info) {
@@ -319,7 +357,6 @@ public class TunnelPool {
             _manager.removeTunnels(_settings.getDestination());
             return;
         }
-        refreshBuilders();
     }
 
     public void tunnelFailed(PooledTunnelCreatorConfig cfg) {
@@ -343,15 +380,27 @@ public class TunnelPool {
         if (_settings.isInbound() && (_settings.getDestination() != null) ) {
             if (ls != null) {
                 _context.clientManager().requestLeaseSet(_settings.getDestination(), ls);
+                if (_settings.isExploratory())
+                    refreshBuilders(3, 4);
+                else
+                    refreshBuilders(1, 4);
             } else {
                 if (_log.shouldLog(Log.WARN))
                     _log.warn(toString() + ": unable to build a new leaseSet on failure (" + remaining 
                               + " remaining), request a new tunnel");
                 if (remaining < _settings.getBackupQuantity() + _settings.getQuantity())
-                    buildFallback();
+                    if (!buildFallback())
+                        if (_settings.isExploratory())
+                            refreshBuilders(3, 4);
+                        else
+                            refreshBuilders(1, 4);
             }
+        } else {
+            if (_settings.isExploratory())
+                refreshBuilders(3, 4);
+            else
+                refreshBuilders(1, 4);
         }
-        refreshBuilders();
     }
 
     void refreshLeaseSet() {
@@ -377,18 +426,24 @@ public class TunnelPool {
         }
     }
 
-    void buildFallback() {
+    /**
+     * Return true if a fallback tunnel is built
+     *
+     */
+    boolean buildFallback() {
         int quantity = _settings.getBackupQuantity() + _settings.getQuantity();
-        int usable = countUsableTunnels();
-        if (usable >= quantity) return;
+        int usable = countUsableTunnels(1);
+        if (usable >= quantity) return false;
 
-        if (_log.shouldLog(Log.INFO))
-            _log.info(toString() + ": building a fallback tunnel (usable: " + usable + " needed: " + quantity + ")");
-        if ( (usable == 0) && (_settings.getAllowZeroHop()) )
+        if ( (usable == 0) && (_settings.getAllowZeroHop()) ) {
+            if (_log.shouldLog(Log.INFO))
+                _log.info(toString() + ": building a fallback tunnel (usable: " + usable + " needed: " + quantity + ")");
             _builder.buildTunnel(_context, this, true);
+            return true;
+        }
         //else
         //    _builder.buildTunnel(_context, this);
-        refreshBuilders();
+        return false;
     }
     
     /**
@@ -476,12 +531,16 @@ public class TunnelPool {
         public RefreshJob(RouterContext ctx) {
             super(ctx);
         }
-        public String getName() { return "Refresh pool"; }
+        public String getName() { return "Refresh " + TunnelPool.this.toString(); }
         public void runJob() {
             if (!_alive) return;
-            int added = refreshBuilders();
+            int added;
+            if (_settings.isExploratory())
+                added = refreshBuilders(0, 2);
+            else
+                added = refreshBuilders(0, 1);
             if ( (added > 0) && (_log.shouldLog(Log.WARN)) )
-                _log.warn("Passive rebuilding a tunnel for " + TunnelPool.this.toString());
+                _log.warn("Additional parallel rebuilding of tunnel for " + TunnelPool.this.toString());
             requeue(30*1000);
         }
     }

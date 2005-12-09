@@ -83,14 +83,23 @@ public class SummaryHelper {
         
         long ms = _context.clock().getOffset();
         
-        if (ms < 60 * 1000) {
-            return now + " (" + (ms / 1000) + "s)";
-        } else if (ms < 60 * 60 * 1000) {
-            return now + " (" + (ms / (60 * 1000)) + "m)";
-        } else if (ms < 24 * 60 * 60 * 1000) {
-            return now + " (" + (ms / (60 * 60 * 1000)) + "h)";
+        long diff = ms;
+        if (diff < 0)
+            diff = 0 - diff;
+        if (diff == 0) {
+            return now + " (no skew)";
+        } else if (diff < 1000) {
+            return now + " (" + ms + "ms skew)";
+        } else if (diff < 5 * 1000) {
+            return now + " (" + (ms / 1000) + "s skew)";
+        } else if (diff < 60 * 1000) {
+            return now + " <b>(" + (ms / 1000) + "s skew)</b>";
+        } else if (diff < 60 * 60 * 1000) {
+            return now + " <b>(" + (ms / (60 * 1000)) + "m skew)</b>";
+        } else if (diff < 24 * 60 * 60 * 1000) {
+            return now + " <b>(" + (ms / (60 * 60 * 1000)) + "h skew)</b>";
         } else {
-            return now + " (" + (ms / (24 * 60 * 60 * 1000)) + "d)";
+            return now + " <b>(" + (ms / (24 * 60 * 60 * 1000)) + "d skew)</b>";
         }
     }
     
@@ -406,6 +415,28 @@ public class SummaryHelper {
             return 0;
         else
             return _context.tunnelManager().getOutboundTunnelCount();
+    }
+    
+    /**
+     * How many inbound client tunnels we have.
+     *
+     */
+    public int getInboundClientTunnels() { 
+        if (_context == null) 
+            return 0;
+        else
+            return _context.tunnelManager().getInboundClientTunnelCount();
+    }
+    
+    /**
+     * How many active outbound client tunnels we have.
+     *
+     */
+    public int getOutboundClientTunnels() { 
+        if (_context == null) 
+            return 0;
+        else
+            return _context.tunnelManager().getOutboundClientTunnelCount();
     }
     
     /**

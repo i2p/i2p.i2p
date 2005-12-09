@@ -26,7 +26,10 @@ abstract class TunnelPeerSelector {
     
     protected int getLength(RouterContext ctx, TunnelPoolSettings settings) {
         int length = settings.getLength();
-        if (settings.getLengthVariance() != 0) {
+        int override = settings.getLengthOverride();
+        if (override != 0)
+            length = override;
+        else if (settings.getLengthVariance() != 0) {
             int skew = settings.getLengthVariance();
             if (skew > 0)
                 length += ctx.random().nextInt(skew+1);
