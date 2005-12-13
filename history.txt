@@ -1,4 +1,9 @@
-$Id: history.txt,v 1.351 2005/12/08 15:53:43 jrandom Exp $
+$Id: history.txt,v 1.352 2005/12/09 03:05:48 jrandom Exp $
+
+2005-12-13  jrandom
+    * Fixed I2PSnark's handling of some torrent files to deal with those
+      created by Azureus and I2PRufus (it didn't know how to deal with
+      additional meta info, such as path.utf-8 or name.utf-8).
 
 2005-12-09  zzz
     * Create different strategies for exploratory tunnels (which are difficult

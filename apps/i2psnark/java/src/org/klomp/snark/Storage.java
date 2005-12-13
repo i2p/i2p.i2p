@@ -121,7 +121,7 @@ public class Storage
       }
 
     // Note that the piece_hashes are not correctly setup yet.
-    metainfo = new MetaInfo(announce, baseFile.getName(), files,
+    metainfo = new MetaInfo(announce, baseFile.getName(), null, files,
                             lengthsList, piece_size, piece_hashes, total);
 
   }

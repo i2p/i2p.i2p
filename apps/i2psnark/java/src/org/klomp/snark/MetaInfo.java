@@ -33,13 +33,24 @@ import java.util.Map;
 import java.util.HashMap;
 
 import org.klomp.snark.bencode.*;
+import net.i2p.data.Base64;
+import net.i2p.util.Log;
 
+/**
+ * Note: this class is buggy, as it doesn't propogate custom meta fields into the bencoded
+ * info data, and from there to the info_hash.  At the moment, though, it seems to work with
+ * torrents created by I2P-BT, I2PRufus and Azureus.
+ *
+ */
 public class MetaInfo
-{
+{  
+  private static final Log _log = new Log(MetaInfo.class);
   private final String announce;
   private final byte[] info_hash;
   private final String name;
+  private final String name_utf8;
   private final List files;
+  private final List files_utf8;
   private final List lengths;
   private final int piece_length;
   private final byte[] piece_hashes;
@@ -47,12 +58,14 @@ public class MetaInfo
 
   private byte[] torrentdata;
 
-  MetaInfo(String announce, String name, List files, List lengths,
+  MetaInfo(String announce, String name, String name_utf8, List files, List lengths,
            int piece_length, byte[] piece_hashes, long length)
   {
     this.announce = announce;
     this.name = name;
+    this.name_utf8 = name_utf8;
     this.files = files;
+    this.files_utf8 = null;
     this.lengths = lengths;
     this.piece_length = piece_length;
     this.piece_hashes = piece_hashes;
@@ -90,6 +103,7 @@ public class MetaInfo
    */
   public MetaInfo(Map m) throws InvalidBEncodingException
   {
+    _log.debug("Creating a metaInfo: " + m, new Exception("source"));
     BEValue val = (BEValue)m.get("announce");
     if (val == null)
         throw new InvalidBEncodingException("Missing announce string");
@@ -105,6 +119,12 @@ public class MetaInfo
         throw new InvalidBEncodingException("Missing name string");
     name = val.getString();
 
+    val = (BEValue)info.get("name.utf-8");
+    if (val != null)
+        name_utf8 = val.getString();
+    else
+        name_utf8 = null;
+    
     val = (BEValue)info.get("piece length");
     if (val == null)
         throw new InvalidBEncodingException("Missing piece length number");
@@ -121,6 +141,7 @@ public class MetaInfo
         // Single file case.
         length = val.getLong();
         files = null;
+        files_utf8 = null;
         lengths = null;
       }
     else
@@ -137,6 +158,7 @@ public class MetaInfo
           throw new InvalidBEncodingException("zero size files list");
 
         files = new ArrayList(size);
+        files_utf8 = new ArrayList(size);
         lengths = new ArrayList(size);
         long l = 0;
         for (int i = 0; i < list.size(); i++)
@@ -163,6 +185,19 @@ public class MetaInfo
               file.add(((BEValue)it.next()).getString());
 
             files.add(file);
+            
+            val = (BEValue)desc.get("path.utf-8");
+            if (val != null) {
+                path_list = val.getList();
+                path_length = path_list.size();
+                if (path_length > 0) {
+                    file = new ArrayList(path_length);
+                    it = path_list.iterator();
+                    while (it.hasNext())
+                        file.add(((BEValue)it.next()).getString());
+                    files_utf8.add(file);
+                }
+            }
           }
         length = l;
       }
@@ -322,7 +357,7 @@ public class MetaInfo
    */
   public MetaInfo reannounce(String announce)
   {
-    return new MetaInfo(announce, name, files,
+    return new MetaInfo(announce, name, name_utf8, files,
                         lengths, piece_length,
                         piece_hashes, length);
   }
@@ -344,6 +379,8 @@ public class MetaInfo
   {
     Map info = new HashMap();
     info.put("name", name);
+    if (name_utf8 != null)
+        info.put("name.utf-8", name_utf8);
     info.put("piece length", new Integer(piece_length));
     info.put("pieces", piece_hashes);
     if (files == null)
@@ -355,6 +392,8 @@ public class MetaInfo
           {
             Map file = new HashMap();
             file.put("path", files.get(i));
+            if ( (files_utf8 != null) && (files_utf8.size() > i) )
+                file.put("path.utf-8", files_utf8.get(i));
             file.put("length", lengths.get(i));
             l.add(file);
           }
@@ -366,11 +405,26 @@ public class MetaInfo
   private byte[] calculateInfoHash()
   {
     Map info = createInfoMap();
+    StringBuffer buf = new StringBuffer(128);
+    buf.append("info: ");
+    for (Iterator iter = info.keySet().iterator(); iter.hasNext(); ) {
+        String key = (String)iter.next();
+        Object val = info.get(key);
+        buf.append(key).append('=');
+        if (val instanceof byte[])
+            buf.append(Base64.encode((byte[])val, true));
+        else
+            buf.append(val.toString());
+    }
+    _log.debug(buf.toString());
     byte[] infoBytes = BEncoder.bencode(info);
+    _log.debug("info bencoded: [" + Base64.encode(infoBytes, true) + "]");
     try
       {
         MessageDigest digest = MessageDigest.getInstance("SHA");
-        return digest.digest(infoBytes);
+        byte hash[] = digest.digest(infoBytes);
+        _log.debug("info hash: [" + net.i2p.data.Base64.encode(hash) + "]");
+        return hash;
       }
     catch(NoSuchAlgorithmException nsa)
       {

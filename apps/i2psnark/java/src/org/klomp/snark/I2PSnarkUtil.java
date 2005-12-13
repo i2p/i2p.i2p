@@ -86,17 +86,23 @@ public class I2PSnarkUtil {
      * fetch the given URL, returning the file it is stored in, or null on error
      */
     File get(String url) {
+        _log.debug("Fetching [" + url + "] proxy=" + _proxyHost + ":" + _proxyPort + ": " + _shouldProxy);
         File out = null;
         try {
             out = File.createTempFile("i2psnark", "url");
         } catch (IOException ioe) {
             ioe.printStackTrace();
+            out.delete();
             return null;
         }
-        EepGet get = new EepGet(_context, _shouldProxy, _proxyHost, _proxyPort, 1, out.getAbsolutePath(), url);
+        String fetchURL = rewriteAnnounce(url);
+        _log.debug("Rewritten url [" + fetchURL + "]");
+        EepGet get = new EepGet(_context, _shouldProxy, _proxyHost, _proxyPort, 1, out.getAbsolutePath(), fetchURL);
         if (get.fetch()) {
+            _log.debug("Fetch successful [" + url + "]: size=" + out.length());
             return out;
         } else {
+            _log.warn("Fetch failed [" + url + "]");
             out.delete();
             return null;
         }
@@ -138,7 +144,9 @@ public class I2PSnarkUtil {
         int destStart = "http://".length();
         int destEnd = origAnnounce.indexOf(".i2p");
         int pathStart = origAnnounce.indexOf('/', destEnd);
-        return "http://i2p/" + origAnnounce.substring(destStart, destEnd) + origAnnounce.substring(pathStart);
+        String rv = "http://i2p/" + origAnnounce.substring(destStart, destEnd) + origAnnounce.substring(pathStart);
+        _log.debug("Rewriting [" + origAnnounce + "] as [" + rv + "]");
+        return rv;
     }
     
     /** hook between snark's logger and an i2p log */

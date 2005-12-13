@@ -25,6 +25,7 @@ import java.net.*;
 import java.util.*;
 
 import org.klomp.snark.bencode.*;
+import net.i2p.util.Log;
 
 /**
  * Informs metainfo tracker of events and gets new peers for peer
@@ -34,6 +35,7 @@ import org.klomp.snark.bencode.*;
  */
 public class TrackerClient extends Thread
 {
+  private static final Log _log = new Log(TrackerClient.class);
   private static final String NO_EVENT = "";
   private static final String STARTED_EVENT = "started";
   private static final String COMPLETED_EVENT = "completed";
@@ -74,10 +76,13 @@ public class TrackerClient extends Thread
   public void run()
   {
     // XXX - Support other IPs
-    String announce = I2PSnarkUtil.instance().rewriteAnnounce(meta.getAnnounce());
+    String announce = meta.getAnnounce(); //I2PSnarkUtil.instance().rewriteAnnounce(meta.getAnnounce());
     String infoHash = urlencode(meta.getInfoHash());
     String peerID = urlencode(coordinator.getID());
 
+    _log.debug("Announce: [" + meta.getAnnounce() + "] infoHash: " + infoHash 
+               + " xmitAnnounce: [" + announce + "]");
+    
     long uploaded = coordinator.getUploaded();
     long downloaded = coordinator.getDownloaded();
     long left = coordinator.getLeft();
@@ -203,7 +208,7 @@ public class TrackerClient extends Thread
       + "?info_hash=" + infoHash
       + "&peer_id=" + peerID
       + "&port=" + port
-      + "&ip=" + I2PSnarkUtil.instance().getOurIPString()
+      + "&ip=" + I2PSnarkUtil.instance().getOurIPString() + ".i2p"
       + "&uploaded=" + uploaded
       + "&downloaded=" + downloaded
       + "&left=" + left
