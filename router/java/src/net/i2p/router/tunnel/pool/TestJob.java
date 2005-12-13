@@ -50,6 +50,14 @@ class TestJob extends JobImpl {
     }
     public String getName() { return "Test tunnel"; }
     public void runJob() {
+        long lag = getContext().jobQueue().getMaxLag();
+        if (lag > 3000) {
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Deferring test of " + _cfg + " due to job lag = " + lag);
+            getContext().statManager().addRateData("tunnel.testAborted", _cfg.getLength(), 0);
+            scheduleRetest();
+            return;
+        }
         _found = false;
         // note: testing with exploratory tunnels always, even if the tested tunnel
         // is a client tunnel (per _cfg.getDestination())
@@ -166,7 +174,7 @@ class TestJob extends JobImpl {
         _outTunnel = null;
         _replyTunnel = null;
         int delay = getDelay();
-        if (_cfg.getExpiration() > getContext().clock().now() + delay)
+        if (_cfg.getExpiration() > getContext().clock().now() + delay + (3 * getTestPeriod()) + 30*1000)
             requeue(delay);
     }
     

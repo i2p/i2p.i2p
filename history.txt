@@ -1,4 +1,13 @@
-$Id: history.txt,v 1.352 2005/12/09 03:05:48 jrandom Exp $
+$Id: history.txt,v 1.353 2005/12/13 04:38:52 jrandom Exp $
+
+2005-12-13  zzz
+    * Don't test tunnels expiring within 90 seconds
+    * Defer Test Tunnel jobs if job lag too large
+    * Use JobQueue.getMaxLag() rather than the jobQueue.jobLag stat to measure
+      job lag for tunnel build backoff, allowing for more agile handling
+      (since the stat is only updated once a minute)
+    * Use tunnel length override if all tunnels are expiring within one
+      minute.
 
 2005-12-13  jrandom
     * Fixed I2PSnark's handling of some torrent files to deal with those

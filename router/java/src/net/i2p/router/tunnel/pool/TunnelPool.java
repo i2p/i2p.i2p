@@ -141,7 +141,7 @@ public class TunnelPool {
             if (maxBuild > 0 && build > maxBuild)
                 build = maxBuild;
             int buildThrottle = MAX_BUILDS_PER_MINUTE;
-            int lag = (int) _context.statManager().getRate("jobQueue.jobLag").getRate(60*1000).getAverageValue();
+            long lag = _context.jobQueue().getMaxLag();
             int netErrors = (int) _context.statManager().getRate("udp.sendException").getRate(60*1000).getLastEventCount();
             if (lag > 3 * 1000 || netErrors > 5) {
                 if (_log.shouldLog(Log.WARN))
@@ -161,10 +161,11 @@ public class TunnelPool {
             if (build <= 0) return 0;
 
             if ((_settings.isExploratory() && baseTarget > countUsableTunnels(1)) ||
-                ((!_settings.isExploratory()) && baseTarget > countUsableTunnels(0)))
-                    _settings.setLengthOverride(1);
-                else
-                    _settings.setLengthOverride(0);
+                ((!_settings.isExploratory()) && baseTarget > countUsableTunnels(0)) ||
+                ((!_settings.isExploratory()) && countUsableTunnels(1) == 0))
+                _settings.setLengthOverride(1);
+            else
+                _settings.setLengthOverride(0);
 
             int wanted = build;
             build = _manager.allocateBuilds(build);
@@ -540,7 +541,7 @@ public class TunnelPool {
             else
                 added = refreshBuilders(0, 1);
             if ( (added > 0) && (_log.shouldLog(Log.WARN)) )
-                _log.warn("Additional parallel rebuilding of tunnel for " + TunnelPool.this.toString());
+                _log.warn(added + " additional parallel rebuild(s) for " + TunnelPool.this.toString());
             requeue(30*1000);
         }
     }
