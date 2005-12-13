@@ -17,7 +17,8 @@ request.setCharacterEncoding("UTF-8");
   <li>[cut]more inside[/cut] = &lt;a href="#"&gt;more inside...&lt;/a&gt;</li>
   <li>[quote][/quote] = Quoted text</li>
   <li>[img attachment="1"]alt[/img] = use attachment 1 as an image with 'alt' as the alt text</li>
-  <li>[attachment id="0"]text[/attachment] = offer the attachment as a link in your post
+  <li>[attachment id="0"]text[/attachment] = offer attachment 0 as a link in your post</li>
+  <li>[attachment thumbnail="0" id="1"]text[/attachment] = offer attachment 1 as a link around a thumbnail image using attachment 0</li>
   <li>[link schema="eep" location="http://forum.i2p"]text[/link] = offer a link to an external resource (accessible with the given schema)</li>
   <li>[blog name="name" bloghash="base64hash"]description[/blog] = link to all posts in the blog</li>
   <li>[blog name="name" bloghash="base64hash" blogentry="1234"]description[/blog] = link to the specified post in the blog</li>

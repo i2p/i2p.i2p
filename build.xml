@@ -291,6 +291,7 @@
         <copy file="core/perl/i2ptest.sh" todir="pkg-temp/scripts/" />
         <mkdir dir="pkg-temp/docs" />
         <copy file="readme.html" todir="pkg-temp/docs/" />
+        <copy file="toolbar.html" todir="pkg-temp/docs/" />
         <copy file="initialNews.xml" tofile="pkg-temp/docs/news.xml" />
         <copy file="installer/resources/startconsole.html" todir="pkg-temp/docs/" />
         <copy file="installer/resources/start.ico" todir="pkg-temp/docs/" />

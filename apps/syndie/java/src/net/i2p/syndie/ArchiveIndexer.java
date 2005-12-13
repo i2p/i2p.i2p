@@ -183,7 +183,7 @@ class ArchiveIndexer {
         
         public void receiveAddress(String name, String schema, String protocol, String location, String anchorText) {}
         public void receiveArchive(String name, String description, String locationSchema, String location, String postingKey, String anchorText) {}
-        public void receiveAttachment(int id, String anchorText) {}
+        public void receiveAttachment(int id, int thumbnail, String anchorText) {}
         public void receiveBegin() {}
         public void receiveBlog(String name, String blogKeyHash, String blogPath, long blogEntryId, List blogArchiveLocations, String anchorText) {}
         public void receiveBold(String text) {}

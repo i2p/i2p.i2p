@@ -513,14 +513,23 @@ public class HTMLRenderer extends EventReceiverImpl {
         }
     }
     
-    public void receiveAttachment(int id, String anchorText) {
+    public void receiveAttachment(int id, int thumb, String anchorText) {
         if (!continueBody()) { return; }
         Attachment attachments[] = _entry.getAttachments();
         if ( (id < 0) || (id >= attachments.length)) {
             _bodyBuffer.append(getSpan("attachmentUnknown")).append(sanitizeString(anchorText)).append("</span>");
         } else {
-            _bodyBuffer.append("<a ").append(getClass("attachmentView")).append(" href=\"").append(getAttachmentURL(id)).append("\">");
-            _bodyBuffer.append(sanitizeString(anchorText)).append("</a>");
+            _bodyBuffer.append("<a ").append(getClass("attachmentView")).append(" href=\"").append(getAttachmentURL(id)).append("\">");            
+            if(thumb >= 0) {
+                _bodyBuffer.append("<img src=\"").
+                    append(getAttachmentURL(thumb)).
+                    append("\" alt=\"").append(anchorText).
+                    append("\" title=\"").append(anchorText).
+                    append("\" />");
+            } else {
+                _bodyBuffer.append(anchorText);
+            }
+            _bodyBuffer.append("</a>");
             _bodyBuffer.append(getSpan("attachmentSummary")).append(" (");
             _bodyBuffer.append(getSpan("attachmentSummarySize")).append(attachments[id].getDataLength()/1024).append("KB</span>, ");
             _bodyBuffer.append(getSpan("attachmentSummaryName")).append(" \"").append(sanitizeString(attachments[id].getName())).append("\"</span>, ");

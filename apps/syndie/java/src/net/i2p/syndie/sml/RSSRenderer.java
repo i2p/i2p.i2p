@@ -208,7 +208,7 @@ public class RSSRenderer extends HTMLRenderer {
             _bodyBuffer.append(sanitizeString(anchorText));
         }
     }
-    public void receiveAttachment(int id, String anchorText) {
+    public void receiveAttachment(int id, int thumb, String anchorText) {
         if (!continueBody()) { return; }
         _bodyBuffer.append(sanitizeString(anchorText));
     }

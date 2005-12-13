@@ -1,3 +1,4 @@
+<%@page import="java.io.File" %>
 <% response.setHeader("Pragma", "no-cache");
    response.setHeader("Cache-Control","no-cache");
    response.setDateHeader("Expires", 0);
@@ -13,8 +14,14 @@
  <a href="index.jsp"><img src="i2plogo.png" alt="Router Console" width="187" height="35" /></a><br />
  [<a href="config.jsp">configuration</a> | <a href="help.jsp">help</a>]
 </div>
-
-<h4>
+<div class="toolbar">
+ <% if (new File("docs/toolbar.html").exists()) { %>
+   <jsp:useBean class="net.i2p.router.web.ContentHelper" id="toolbarhelper" scope="request" />
+   <jsp:setProperty name="toolbarhelper" property="page" value="docs/toolbar.html" />
+   <jsp:setProperty name="toolbarhelper" property="maxLines" value="300" />
+   <jsp:getProperty name="toolbarhelper" property="content" />
+<% } else { %>
+ <!-- Could not find docs/toolbar.html! -->
  <a href="susimail/susimail">Susimail</a> |
  <a href="susidns/index.jsp">SusiDNS</a> |
  <a href="syndie/">Syndie</a> |
@@ -27,10 +34,11 @@
  <a href="jobs.jsp">Jobs</a> |
  <a href="oldstats.jsp">Stats</a> |
  <a href="oldconsole.jsp">Internals</a>
+<% } %>
  <jsp:useBean class="net.i2p.router.web.NavHelper" id="navhelper" scope="request" />
  <jsp:setProperty name="navhelper" property="contextId" value="<%=(String)session.getAttribute("i2p.contextId")%>" />
  <jsp:getProperty name="navhelper" property="clientAppLinks" />
-</h4>
+</div>
 
 <jsp:useBean class="net.i2p.router.web.NoticeHelper" id="noticehelper" scope="request" />
 <jsp:setProperty name="noticehelper" property="contextId" value="<%=(String)session.getAttribute("i2p.contextId")%>" />

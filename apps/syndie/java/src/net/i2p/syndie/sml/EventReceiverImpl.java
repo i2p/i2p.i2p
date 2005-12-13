@@ -111,5 +111,5 @@ public class EventReceiverImpl implements SMLParser.EventReceiver {
     public void receiveH5(String text) {}
     public void receivePre(String text) {}
     public void receiveHR() {}
-    public void receiveAttachment(int id, String anchorText) {}
+    public void receiveAttachment(int id, int thumbnail, String anchorText) {}
 }

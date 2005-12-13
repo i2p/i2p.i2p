@@ -211,6 +211,7 @@ public class SMLParser {
     private static final String T_ATTACHMENT = "attachment";
     private static final String T_ARCHIVE = "archive";
     
+    private static final String P_THUMBNAIL = "thumbnail";
     private static final String P_ATTACHMENT = "attachment";
     private static final String P_WHO_QUOTED = "author";
     private static final String P_QUOTE_LOCATION = "location";
@@ -284,7 +285,10 @@ public class SMLParser {
         } else if (T_PRE.equals(tagName)) {
             receiver.receivePre(body);
         } else if (T_ATTACHMENT.equals(tagName)) {
-            receiver.receiveAttachment((int)getLong(P_ATTACHMENT_ID, attr), body);
+            receiver.receiveAttachment(
+                            (int)getLong(P_ATTACHMENT_ID, attr),
+                            (int)getLong(P_THUMBNAIL, attr),
+                            body);
         } else {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("need to learn how to parse the tag [" + tagName + "]");
@@ -402,7 +406,7 @@ public class SMLParser {
                                    String postingKey, String anchorText);
         public void receiveImage(String alternateText, int attachmentId);
         public void receiveAddress(String name, String schema, String protocol, String location, String anchorText);
-        public void receiveAttachment(int id, String anchorText);
+        public void receiveAttachment(int id, int thumb, String anchorText);
         public void receiveBold(String text);
         public void receiveItalic(String text);
         public void receiveUnderline(String text);

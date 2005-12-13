@@ -31,16 +31,27 @@ public class HTMLPreviewRenderer extends HTMLRenderer {
                ArchiveViewerBean.PARAM_ATTACHMENT + "=" + id;
     }    
     
-    public void receiveAttachment(int id, String anchorText) {
+    public void receiveAttachment(int id, int thumb, String anchorText) {
+        anchorText = sanitizeString(anchorText);
         if (!continueBody()) { return; }
         if ( (id < 0) || (_files == null) || (id >= _files.size()) ) {
-            _bodyBuffer.append(sanitizeString(anchorText));
+            _bodyBuffer.append(anchorText);
         } else {
             File f = (File)_files.get(id);
             String name = (String)_filenames.get(id);
             String type = (String)_fileTypes.get(id);
             _bodyBuffer.append("<a ").append(getClass("attachmentView")).append(" href=\"").append(getAttachmentURL(id)).append("\">");
-            _bodyBuffer.append(sanitizeString(anchorText)).append("</a>");
+            if(thumb >= 0) {
+                _bodyBuffer.append("<img src=\"").
+                    append(getAttachmentURL(thumb)).
+                    append("\" alt=\"").append(anchorText).
+                    append("\" title=\"").append(anchorText).
+                    append("\" />");
+            } else {
+                _bodyBuffer.append(anchorText);
+            }
+                    
+            _bodyBuffer.append("</a>");
             _bodyBuffer.append(getSpan("attachmentSummary")).append(" (");
             _bodyBuffer.append(getSpan("attachmentSummarySize")).append(f.length()/1024).append("KB</span>, ");
             _bodyBuffer.append(getSpan("attachmentSummaryName")).append(" \"").append(sanitizeString(name)).append("\"</span>, ");

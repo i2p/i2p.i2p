@@ -25,6 +25,10 @@ div.logo {
 	text-align: left;
 }
 
+div.toolbar {
+    font-weight: bold
+}
+
 div.routersummary {
 	/* width: 8em; */
 	/* height: 5em; */
