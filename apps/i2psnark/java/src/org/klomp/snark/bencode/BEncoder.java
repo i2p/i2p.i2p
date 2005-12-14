@@ -62,6 +62,8 @@ public class BEncoder
       bencode((List)o, out);
     else if (o instanceof Map)
       bencode((Map)o, out);
+    else if (o instanceof BEValue)
+      bencode(((BEValue)o).getValue(), out);
     else
       throw new IllegalArgumentException("Cannot bencode: " + o.getClass());
   }

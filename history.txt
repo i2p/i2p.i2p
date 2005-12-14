@@ -1,4 +1,9 @@
-$Id: history.txt,v 1.353 2005/12/13 04:38:52 jrandom Exp $
+$Id: history.txt,v 1.354 2005/12/13 16:56:41 jrandom Exp $
+
+2005-12-14  jrandom
+    * Fix to drop peer references when we shitlist people again (thanks zzz!)
+    * Further I2PSnark fixes to deal with arbitrary torrent info attributes
+      (thanks Complication!)
 
 2005-12-13  zzz
     * Don't test tunnels expiring within 90 seconds

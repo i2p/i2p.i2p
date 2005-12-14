@@ -55,6 +55,7 @@ public class MetaInfo
   private final int piece_length;
   private final byte[] piece_hashes;
   private final long length;
+  private final Map infoMap;
 
   private byte[] torrentdata;
 
@@ -72,6 +73,7 @@ public class MetaInfo
     this.length = length;
 
     this.info_hash = calculateInfoHash();
+    infoMap = null;
   }
 
   /**
@@ -113,6 +115,7 @@ public class MetaInfo
     if (val == null)
         throw new InvalidBEncodingException("Missing info map");
     Map info = val.getMap();
+    infoMap = info;
 
     val = (BEValue)info.get("name");
     if (val == null)
@@ -124,7 +127,7 @@ public class MetaInfo
         name_utf8 = val.getString();
     else
         name_utf8 = null;
-    
+
     val = (BEValue)info.get("piece length");
     if (val == null)
         throw new InvalidBEncodingException("Missing piece length number");
@@ -378,6 +381,10 @@ public class MetaInfo
   private Map createInfoMap()
   {
     Map info = new HashMap();
+    if (infoMap != null) {
+        info.putAll(infoMap);
+        return info;
+    }
     info.put("name", name);
     if (name_utf8 != null)
         info.put("name.utf-8", name_utf8);

@@ -170,6 +170,9 @@ public class BEValue
       }
   }
 
+  /** return the untyped value */
+  public Object getValue() { return value; }
+  
   public String toString()
   {
     String valueString;
