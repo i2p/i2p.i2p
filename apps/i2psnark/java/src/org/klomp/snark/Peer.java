@@ -28,9 +28,11 @@ import java.util.Map;
 import org.klomp.snark.bencode.*;
 
 import net.i2p.client.streaming.I2PSocket;
+import net.i2p.util.Log;
 
 public class Peer implements Comparable
 {
+  private Log _log = new Log(Peer.class);
   // Identifying property, the peer id of the other side.
   private final PeerID peerID;
 
@@ -58,6 +60,7 @@ public class Peer implements Comparable
     this.peerID = peerID;
     this.my_id = my_id;
     this.metainfo = metainfo;
+    _log.debug("Creating a new peer with " + peerID.getAddress().calculateHash().toBase64(), new Exception("creating"));
   }
 
   /**
@@ -78,6 +81,7 @@ public class Peer implements Comparable
 
     byte[] id  = handshake(bis, bos);
     this.peerID = new PeerID(id, sock.getPeerDestination());
+    _log.debug("Creating a new peer with " + peerID.getAddress().calculateHash().toBase64(), new Exception("creating"));
   }
 
   /**
@@ -145,6 +149,7 @@ public class Peer implements Comparable
     if (state != null)
       throw new IllegalStateException("Peer already started");
 
+    _log.debug("Running connection to " + peerID.getAddress().calculateHash().toBase64(), new Exception("connecting"));    
     try
       {
         // Do we need to handshake?

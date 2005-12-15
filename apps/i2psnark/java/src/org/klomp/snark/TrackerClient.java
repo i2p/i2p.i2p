@@ -64,6 +64,13 @@ public class TrackerClient extends Thread
     stop = false;
   }
 
+  public void start() {
+      stop = false;
+      super.start();
+  }
+  
+  public boolean halted() { return stop; }
+  
   /**
    * Interrupts this Thread to stop it.
    */
@@ -100,9 +107,16 @@ public class TrackerClient extends Thread
                 TrackerInfo info = doRequest(announce, infoHash, peerID,
                                              uploaded, downloaded, left,
                                              STARTED_EVENT);
-                Iterator it = info.getPeers().iterator();
-                while (it.hasNext())
-                  coordinator.addPeer((Peer)it.next());
+                if (!completed) {
+                    Iterator it = info.getPeers().iterator();
+                    while (it.hasNext()) {
+                      Peer cur = (Peer)it.next();
+                      coordinator.addPeer(cur);
+                      int delay = 3000;
+                      int c = ((int)cur.getPeerID().getAddress().calculateHash().toBase64().charAt(0)) % 10;
+                      try { Thread.sleep(delay * c); } catch (InterruptedException ie) {}
+                    }
+                }
                 started = true;
               }
             catch (IOException ioe)
@@ -168,9 +182,18 @@ public class TrackerClient extends Thread
                                                  uploaded, downloaded, left,
                                                  event);
 
-                    Iterator it = info.getPeers().iterator();
-                    while (it.hasNext())
-                      coordinator.addPeer((Peer)it.next());
+                    if ( (left > 0) && (!completed) ) {
+                        // we only want to talk to new people if we need things
+                        // from them (duh)
+                        Iterator it = info.getPeers().iterator();
+                        while (it.hasNext()) {
+                          Peer cur = (Peer)it.next();
+                          coordinator.addPeer(cur);
+                          int delay = 3000;
+                          int c = ((int)cur.getPeerID().getAddress().calculateHash().toBase64().charAt(0)) % 10;
+                          try { Thread.sleep(delay * c); } catch (InterruptedException ie) {}
+                        }
+                    }
                   }
                 catch (IOException ioe)
                   {

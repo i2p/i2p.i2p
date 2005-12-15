@@ -1,4 +1,13 @@
-$Id: history.txt,v 1.354 2005/12/13 16:56:41 jrandom Exp $
+$Id: history.txt,v 1.355 2005/12/14 04:32:52 jrandom Exp $
+
+2005-12-15  jrandom
+    * Added multitorrent support to I2PSnark, accessible currently by running
+      "i2psnark.jar --config i2psnark.config" (which may or may not exist).
+      It then joins the swarm for any torrents in ./i2psnark/*.torrent, saving
+      their data in that directory as well.  Removing the .torrent file stops
+      participation, and it is currently set to seed indefinitely.  Completion
+      is logged to the logger and standard output, with further UI interaction
+      left to the (work in progress) web UI.
 
 2005-12-14  jrandom
     * Fix to drop peer references when we shitlist people again (thanks zzz!)

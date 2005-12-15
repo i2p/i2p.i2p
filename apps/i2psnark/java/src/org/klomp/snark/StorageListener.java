@@ -49,4 +49,10 @@ public interface StorageListener
    * storage is known.
    */
   void storageAllChecked(Storage storage);
+  
+  /**
+   * Called the one time when the data is completely received and checked.
+   *
+   */
+  void storageCompleted(Storage storage);
 }

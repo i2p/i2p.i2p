@@ -85,13 +85,27 @@ public class Snark
   "Commands: 'info', 'list', 'quit'.";
 
   // String indicating main activity
-  static String activity = "Not started";
+  String activity = "Not started";
   
   public static void main(String[] args)
   {
     System.out.println(copyright);
     System.out.println();
 
+    if ( (args.length > 0) && ("--config".equals(args[0])) ) {
+        SnarkManager sm = SnarkManager.instance();
+        if (args.length > 1)
+            sm.loadConfig(args[1]);
+        System.out.println("Running in multitorrent mode");
+        while (true) {
+            try {
+                synchronized (sm) {
+                    sm.wait();
+                }
+            } catch (InterruptedException ie) {}
+        }
+    }
+    
     // Parse debug, share/ip and torrent file options.
     Snark snark = parseArguments(args);
 
@@ -101,7 +115,7 @@ public class Snark
                           snark.acceptor,
                           snark.trackerclient,
                           snark);
-    Runtime.getRuntime().addShutdownHook(snarkhook);
+    //Runtime.getRuntime().addShutdownHook(snarkhook);
 
     Timer timer = new Timer(true);
     TimerTask monitor = new PeerMonitorTask(snark.coordinator);
@@ -130,15 +144,15 @@ public class Snark
                   quit = true;
                 else if ("list".equals(line))
                   {
-                    synchronized(coordinator.peers)
+                    synchronized(snark.coordinator.peers)
                       {
-                        System.out.println(coordinator.peers.size()
+                        System.out.println(snark.coordinator.peers.size()
                                            + " peers -"
                                            + " (i)nterested,"
                                            + " (I)nteresting,"
                                            + " (c)hoking,"
                                            + " (C)hoked:");
-                        Iterator it = coordinator.peers.iterator();
+                        Iterator it = snark.coordinator.peers.iterator();
                         while (it.hasNext())
                           {
                             Peer peer = (Peer)it.next();
@@ -152,18 +166,18 @@ public class Snark
                   }
                 else if ("info".equals(line))
                   {
-                    System.out.println("Name: " + meta.getName());
-                    System.out.println("Torrent: " + torrent);
-                    System.out.println("Tracker: " + meta.getAnnounce());
-                    List files = meta.getFiles();
+                    System.out.println("Name: " + snark.meta.getName());
+                    System.out.println("Torrent: " + snark.torrent);
+                    System.out.println("Tracker: " + snark.meta.getAnnounce());
+                    List files = snark.meta.getFiles();
                     System.out.println("Files: "
                                        + ((files == null) ? 1 : files.size()));
-                    System.out.println("Pieces: " + meta.getPieces());
+                    System.out.println("Pieces: " + snark.meta.getPieces());
                     System.out.println("Piece size: "
-                                       + meta.getPieceLength(0) / 1024
+                                       + snark.meta.getPieceLength(0) / 1024
                                        + " KB");
                     System.out.println("Total size: "
-                                       + meta.getTotalLength() / (1024 * 1024)
+                                       + snark.meta.getTotalLength() / (1024 * 1024)
                                        + " MB");
                   }
                 else if ("".equals(line) || "help".equals(line))
@@ -195,15 +209,20 @@ public class Snark
       }
   }
 
-  static String torrent;
-  static MetaInfo meta;
-  static Storage storage;
-  static PeerCoordinator coordinator;
-  static ConnectionAcceptor acceptor;
-  static TrackerClient trackerclient;
+  String torrent;
+  MetaInfo meta;
+  Storage storage;
+  PeerCoordinator coordinator;
+  ConnectionAcceptor acceptor;
+  TrackerClient trackerclient;
+  String rootDataDir = ".";
 
-  private Snark(String torrent, String ip, int user_port,
-                StorageListener slistener, CoordinatorListener clistener)
+  Snark(String torrent, String ip, int user_port,
+        StorageListener slistener, CoordinatorListener clistener) { 
+    this(torrent, ip, user_port, slistener, clistener, true, "."); 
+  }
+  Snark(String torrent, String ip, int user_port,
+        StorageListener slistener, CoordinatorListener clistener, boolean start, String rootDir)
   {
     if (slistener == null)
       slistener = this;
@@ -212,6 +231,7 @@ public class Snark
       clistener = this;
 
     this.torrent = torrent;
+    this.rootDataDir = rootDir;
 
     activity = "Network setup";
 
@@ -319,7 +339,7 @@ public class Snark
           {
             activity = "Checking storage";
             storage = new Storage(meta, slistener);
-            storage.check();
+            storage.check(rootDataDir);
           }
         catch (IOException ioe)
           {
@@ -329,13 +349,53 @@ public class Snark
 
     activity = "Collecting pieces";
     coordinator = new PeerCoordinator(id, meta, storage, clistener);
-    PeerAcceptor peeracceptor = new PeerAcceptor(coordinator);
+    PeerCoordinatorSet set = PeerCoordinatorSet.instance();
+    set.add(coordinator);
+    PeerAcceptor peeracceptor = new PeerAcceptor(set); //coordinator);
     ConnectionAcceptor acceptor = new ConnectionAcceptor(serversocket,
                                                          peeracceptor);
 
     trackerclient = new TrackerClient(meta, coordinator);
+    if (start)
+        startTorrent();
+  }
+  /**
+   * Start up contacting peers and querying the tracker
+   */
+  public void startTorrent() {
+    boolean coordinatorChanged = false;
+    if (coordinator.halted()) {
+        // ok, we have already started and stopped, but the coordinator seems a bit annoying to
+        // restart safely, so lets build a new one to replace the old
+        PeerCoordinatorSet set = PeerCoordinatorSet.instance();
+        set.remove(coordinator);
+        PeerCoordinator newCoord = new PeerCoordinator(coordinator.getID(), coordinator.getMetaInfo(), 
+                                                       coordinator.getStorage(), coordinator.getListener());
+        set.add(newCoord);
+        coordinator = newCoord;
+        coordinatorChanged = true;
+    }
+    if (trackerclient.halted() || coordinatorChanged) {
+        TrackerClient newClient = new TrackerClient(coordinator.getMetaInfo(), coordinator);
+        if (!trackerclient.halted())
+            trackerclient.halt();
+        trackerclient = newClient;
+    }
     trackerclient.start();
-
+  }
+  /**
+   * Stop contacting the tracker and talking with peers
+   */
+  public void stopTorrent() {
+    trackerclient.halt();
+    coordinator.halt();
+    try { 
+        storage.close(); 
+    } catch (IOException ioe) {
+        System.out.println("Error closing " + torrent);
+        ioe.printStackTrace();
+    }
+    PeerCoordinatorSet.instance().remove(coordinator);
   }
 
   static Snark parseArguments(String[] args)
@@ -587,6 +647,13 @@ public class Snark
 
     allChecked = true;
     checking = false;
+  }
+  
+  public void storageCompleted(Storage storage)
+  {
+    Snark.debug("Completely received " + torrent, Snark.INFO);
+    //storage.close();
+    System.out.println("Completely received: " + torrent);
   }
 
   public void shutdown()

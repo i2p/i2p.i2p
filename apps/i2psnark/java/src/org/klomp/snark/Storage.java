@@ -127,7 +127,7 @@ public class Storage
   }
 
   // Creates piece hases for a new storage.
-  public void create() throws IOException
+  private void create() throws IOException
   {
     // Calculate piece_hashes
     MessageDigest digest = null;
@@ -240,9 +240,9 @@ public class Storage
   /**
    * Creates (and/or checks) all files from the metainfo file list.
    */
-  public void check() throws IOException
+  public void check(String rootDir) throws IOException
   {
-    File base = new File(filterName(metainfo.getName()));
+    File base = new File(rootDir, filterName(metainfo.getName()));
 
     List files = metainfo.getFiles();
     if (files == null)
@@ -368,8 +368,11 @@ public class Storage
           }
       }
 
-    if (listener != null)
+    if (listener != null) {
       listener.storageAllChecked(this);
+      if (needed <= 0)
+        listener.storageCompleted(this);
+    }
   }
 
   private void allocateFile(int nr) throws IOException
@@ -482,6 +485,12 @@ public class Storage
             start = 0;
           }
       }
+
+    if (complete) {
+      listener.storageCompleted(this);
+      // do we also need to close all of the files and reopen
+      // them readonly?
+    }
 
     return true;
   }

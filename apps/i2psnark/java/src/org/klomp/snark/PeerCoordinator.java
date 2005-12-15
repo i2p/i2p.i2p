@@ -23,11 +23,14 @@ package org.klomp.snark;
 import java.util.*;
 import java.io.IOException;
 
+import net.i2p.util.Log;
+
 /**
  * Coordinates what peer does what.
  */
 public class PeerCoordinator implements PeerListener
 {
+  private final Log _log = new Log(PeerCoordinator.class);
   final MetaInfo metainfo;
   final Storage storage;
 
@@ -80,6 +83,9 @@ public class PeerCoordinator implements PeerListener
     // Install a timer to check the uploaders.
     timer.schedule(new PeerCheckerTask(this), CHECK_PERIOD, CHECK_PERIOD);
   }
+  
+  public Storage getStorage() { return storage; }
+  public CoordinatorListener getListener() { return listener; }
 
   public byte[] getID()
   {
@@ -137,6 +143,8 @@ public class PeerCoordinator implements PeerListener
         return !halted && peers.size() < MAX_CONNECTIONS;
       }
   }
+  
+  public boolean halted() { return halted; }
 
   public void halt()
   {
@@ -215,6 +223,8 @@ public class PeerCoordinator implements PeerListener
 
     if (need_more)
       {
+        _log.debug("Addng a peer " + peer.getPeerID().getAddress().calculateHash().toBase64(), new Exception("add/run"));
+
         // Run the peer with us as listener and the current bitfield.
         final PeerListener listener = this;
         final BitField bitfield = storage.getBitField();

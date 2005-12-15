@@ -145,7 +145,7 @@ public class I2PSnarkUtil {
         int destEnd = origAnnounce.indexOf(".i2p");
         int pathStart = origAnnounce.indexOf('/', destEnd);
         String rv = "http://i2p/" + origAnnounce.substring(destStart, destEnd) + origAnnounce.substring(pathStart);
-        _log.debug("Rewriting [" + origAnnounce + "] as [" + rv + "]");
+        //_log.debug("Rewriting [" + origAnnounce + "] as [" + rv + "]");
         return rv;
     }
     
