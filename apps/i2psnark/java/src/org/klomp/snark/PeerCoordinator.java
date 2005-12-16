@@ -51,6 +51,8 @@ public class PeerCoordinator implements PeerListener
 
   // synchronize on this when changing peers or downloaders
   final List peers = new ArrayList();
+  /** estimate of the peers, without requiring any synchronization */
+  volatile int peerCount;
 
   /** Timer to handle all periodical tasks. */
   private final Timer timer = new Timer(true);
@@ -63,6 +65,9 @@ public class PeerCoordinator implements PeerListener
   private boolean halted = false;
 
   private final CoordinatorListener listener;
+  
+  public String trackerProblems = null;
+  public int trackerSeenPeers = 0;
 
   public PeerCoordinator(byte[] id, MetaInfo metainfo, Storage storage,
                          CoordinatorListener listener)
@@ -97,12 +102,15 @@ public class PeerCoordinator implements PeerListener
     return storage.complete();
   }
 
+  public int getPeerCount() { return peerCount; }
 
   public int getPeers()
   {
     synchronized(peers)
       {
-        return peers.size();
+        int rv = peers.size();
+        peerCount = rv;
+        return rv;
       }
   }
 
@@ -163,6 +171,7 @@ public class PeerCoordinator implements PeerListener
             it.remove();
             removePeerFromPieces(peer);
           }
+        peerCount = peers.size();
       }
   }
 
@@ -187,9 +196,11 @@ public class PeerCoordinator implements PeerListener
             if (Snark.debug >= Snark.INFO)
               Snark.debug("New connection to peer: " + peer, Snark.INFO);
 
+            _log.info("New connection to peer " + peer + " for " + metainfo.getName());
             // Add it to the beginning of the list.
             // And try to optimistically make it a uploader.
             peers.add(0, peer);
+            peerCount = peers.size();
             unchokePeer();
 
             if (listener != null)
@@ -223,7 +234,7 @@ public class PeerCoordinator implements PeerListener
 
     if (need_more)
       {
-        _log.debug("Addng a peer " + peer.getPeerID().getAddress().calculateHash().toBase64(), new Exception("add/run"));
+        _log.debug("Adding a peer " + peer.getPeerID().getAddress().calculateHash().toBase64() + " for " + metainfo.getName(), new Exception("add/run"));
 
         // Run the peer with us as listener and the current bitfield.
         final PeerListener listener = this;
@@ -281,6 +292,7 @@ public class PeerCoordinator implements PeerListener
         // Put peer back at the end of the list.
         peers.remove(peer);
         peers.add(peer);
+        peerCount = peers.size();
       }
   }
 
@@ -422,8 +434,10 @@ public class PeerCoordinator implements PeerListener
    */
   public boolean gotPiece(Peer peer, int piece, byte[] bs)
   {
-    if (halted)
+    if (halted) {
+      _log.info("Got while-halted piece " + piece + "/" + metainfo.getPieces() +" from " + peer + " for " + metainfo.getName());
       return true; // We don't actually care anymore.
+    }
     
     synchronized(wantedPieces)
       {
@@ -433,6 +447,8 @@ public class PeerCoordinator implements PeerListener
             if (Snark.debug >= Snark.INFO)
               Snark.debug(peer + " piece " + piece + " no longer needed",
                           Snark.INFO);
+
+            _log.info("Got unwanted piece " + piece + "/" + metainfo.getPieces() +" from " + peer + " for " + metainfo.getName());
             
             // No need to announce have piece to peers.
             // Assume we got a good piece, we don't really care anymore.
@@ -445,6 +461,7 @@ public class PeerCoordinator implements PeerListener
               {
                 if (Snark.debug >= Snark.INFO)
                   Snark.debug("Recv p" + piece + " " + peer, Snark.INFO);
+                _log.info("Got valid piece " + piece + "/" + metainfo.getPieces() +" from " + peer + " for " + metainfo.getName());
               }
             else
               {
@@ -453,6 +470,7 @@ public class PeerCoordinator implements PeerListener
                 if (Snark.debug >= Snark.NOTICE)
                   Snark.debug("Got BAD piece " + piece + " from " + peer,
                               Snark.NOTICE);
+                _log.warn("Got BAD piece " + piece + "/" + metainfo.getPieces() + " from " + peer + " for " + metainfo.getName());
                 return false; // No need to announce BAD piece to peers.
               }
           }
@@ -524,6 +542,7 @@ public class PeerCoordinator implements PeerListener
             unchokePeer();
             removePeerFromPieces(peer);
           }
+        peerCount = peers.size();
       }
 
     if (listener != null)

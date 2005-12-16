@@ -13,7 +13,7 @@ import net.i2p.client.streaming.I2PSocketManagerFactory;
 import net.i2p.util.Log;
 
 import java.io.*;
-import java.util.Properties;
+import java.util.*;
 
 /**
  * I2P specific helpers for I2PSnark
@@ -29,14 +29,17 @@ public class I2PSnarkUtil {
     private int _proxyPort;
     private String _i2cpHost;
     private int _i2cpPort;
-    private Properties _opts;
+    private Map _opts;
     private I2PSocketManager _manager;
+    private boolean _configured;
     
     private I2PSnarkUtil() {
         _context = I2PAppContext.getGlobalContext();
         _log = _context.logManager().getLog(Snark.class);
+        _opts = new HashMap();
         setProxy("127.0.0.1", 4444);
         setI2CPConfig("127.0.0.1", 7654, null);
+        _configured = false;
     }
     
     /**
@@ -54,23 +57,53 @@ public class I2PSnarkUtil {
             _proxyHost = null;
             _proxyPort = -1;
         }
+        _configured = true;
     }
     
-    public void setI2CPConfig(String i2cpHost, int i2cpPort, Properties opts) {
+    public boolean configured() { return _configured; }
+    
+    public void setI2CPConfig(String i2cpHost, int i2cpPort, Map opts) {
         _i2cpHost = i2cpHost;
         _i2cpPort = i2cpPort;
         if (opts != null)
-            _opts = opts;
+            _opts.putAll(opts);
+        _configured = true;
     }
+    
+    public String getI2CPHost() { return _i2cpHost; }
+    public int getI2CPPort() { return _i2cpPort; }
+    public Map getI2CPOptions() { return _opts; }
+    public String getEepProxyHost() { return _proxyHost; }
+    public int getEepProxyPort() { return _proxyPort; }
+    public boolean getEepProxySet() { return _shouldProxy; }
     
     /**
      * Connect to the router, if we aren't already
      */
-    boolean connect() {
+    public boolean connect() {
         if (_manager == null) {
-            _manager = I2PSocketManagerFactory.createManager(_i2cpHost, _i2cpPort, _opts);
+            Properties opts = new Properties();
+            if (_opts != null) {
+                for (Iterator iter = _opts.keySet().iterator(); iter.hasNext(); ) {
+                    String key = (String)iter.next();
+                    opts.setProperty(key, _opts.get(key).toString());
+                }
+            }
+            if (opts.getProperty("inbound.nickname") == null)
+                opts.setProperty("inbound.nickname", "I2PSnark");
+            _manager = I2PSocketManagerFactory.createManager(_i2cpHost, _i2cpPort, opts);
         }
         return (_manager != null);
+    }
+    
+    public boolean connected() { return _manager != null; }
+    /**
+     * Destroy the destination itself
+     */
+    public void disconnect() {
+        I2PSocketManager mgr = _manager;
+        _manager = null;
+        mgr.destroySocketManager();
     }
     
     /** connect to the given destination */
@@ -85,7 +118,8 @@ public class I2PSnarkUtil {
     /**
      * fetch the given URL, returning the file it is stored in, or null on error
      */
-    File get(String url) {
+    public File get(String url) { return get(url, true); }
+    public File get(String url, boolean rewrite) {
         _log.debug("Fetching [" + url + "] proxy=" + _proxyHost + ":" + _proxyPort + ": " + _shouldProxy);
         File out = null;
         try {
@@ -95,8 +129,10 @@ public class I2PSnarkUtil {
             out.delete();
             return null;
         }
-        String fetchURL = rewriteAnnounce(url);
-        _log.debug("Rewritten url [" + fetchURL + "]");
+        String fetchURL = url;
+        if (rewrite)
+            fetchURL = rewriteAnnounce(url);
+        //_log.debug("Rewritten url [" + fetchURL + "]");
         EepGet get = new EepGet(_context, _shouldProxy, _proxyHost, _proxyPort, 1, out.getAbsolutePath(), fetchURL);
         if (get.fetch()) {
             _log.debug("Fetch successful [" + url + "]: size=" + out.length());
@@ -108,7 +144,7 @@ public class I2PSnarkUtil {
         }
     }
     
-    I2PServerSocket getServerSocket() { 
+    public I2PServerSocket getServerSocket() { 
         return _manager.getServerSocket();
     }
     

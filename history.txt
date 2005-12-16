@@ -1,4 +1,7 @@
-$Id: history.txt,v 1.355 2005/12/14 04:32:52 jrandom Exp $
+$Id: history.txt,v 1.356 2005/12/15 03:58:31 jrandom Exp $
+
+2005-12-15  jrandom
+    * Added a first pass to the I2PSnark web UI (see /i2psnark/)
 
 2005-12-15  jrandom
     * Added multitorrent support to I2PSnark, accessible currently by running

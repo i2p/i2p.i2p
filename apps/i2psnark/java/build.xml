@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project basedir="." default="all" name="i2psnark">
     <target name="all" depends="clean, build" />
-    <target name="build" depends="builddep, jar" />
+    <target name="build" depends="builddep, jar, war" />
     <target name="builddep">
+        <ant dir="../../jetty/" target="build" />
         <ant dir="../../ministreaming/java/" target="build" />
 	<!-- ministreaming will build core -->
     </target>
@@ -13,18 +14,24 @@
             srcdir="./src" 
             debug="true" deprecation="on" source="1.3" target="1.3" 
             destdir="./build/obj" 
-            classpath="../../../core/java/build/i2p.jar:../../ministreaming/java/build/mstreaming.jar" />
+            classpath="../../../core/java/build/i2p.jar:../../jetty/jettylib/org.mortbay.jetty.jar:../../jetty/jettylib/javax.servlet.jar:../../ministreaming/java/build/mstreaming.jar" />
     </target>
     <target name="jar" depends="builddep, compile">
-        <jar destfile="./build/i2psnark.jar" basedir="./build/obj" includes="**/*.class">
+        <jar destfile="./build/i2psnark.jar" basedir="./build/obj" includes="**/*.class" excludes="**/*Servlet.class">
             <manifest>
                 <attribute name="Main-Class" value="org.klomp.snark.Snark" />
                 <attribute name="Class-Path" value="i2p.jar mstreaming.jar streaming.jar" />
             </manifest>
         </jar>
+    </target>    
+    <target name="war" depends="jar"> 
+        <war destfile="../i2psnark.war" webxml="../web.xml">
+          <classes dir="./build/obj" includes="**/*" />
+        </war>
     </target>
     <target name="clean">
         <delete dir="./build" />
+        <delete file="../i2psnark.war" />
     </target>
     <target name="cleandep" depends="clean">
         <ant dir="../../ministreaming/java/" target="distclean" />

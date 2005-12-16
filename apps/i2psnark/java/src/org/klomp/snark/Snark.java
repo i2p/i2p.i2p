@@ -209,13 +209,15 @@ public class Snark
       }
   }
 
-  String torrent;
-  MetaInfo meta;
-  Storage storage;
-  PeerCoordinator coordinator;
-  ConnectionAcceptor acceptor;
-  TrackerClient trackerclient;
-  String rootDataDir = ".";
+  public String torrent;
+  public MetaInfo meta;
+  public Storage storage;
+  public PeerCoordinator coordinator;
+  public ConnectionAcceptor acceptor;
+  public TrackerClient trackerclient;
+  public String rootDataDir = ".";
+  public CompleteListener completeListener;
+  public boolean stopped;
 
   Snark(String torrent, String ip, int user_port,
         StorageListener slistener, CoordinatorListener clistener) { 
@@ -233,6 +235,7 @@ public class Snark
     this.torrent = torrent;
     this.rootDataDir = rootDir;
 
+    stopped = true;
     activity = "Network setup";
 
     // "Taking Three as the subject to reason about--
@@ -363,6 +366,7 @@ public class Snark
    * Start up contacting peers and querying the tracker
    */
   public void startTorrent() {
+    stopped = false;
     boolean coordinatorChanged = false;
     if (coordinator.halted()) {
         // ok, we have already started and stopped, but the coordinator seems a bit annoying to
@@ -375,18 +379,21 @@ public class Snark
         coordinator = newCoord;
         coordinatorChanged = true;
     }
-    if (trackerclient.halted() || coordinatorChanged) {
+    if (!trackerclient.started() && !coordinatorChanged) {
+        trackerclient.start();
+    } else if (trackerclient.halted() || coordinatorChanged) {
         TrackerClient newClient = new TrackerClient(coordinator.getMetaInfo(), coordinator);
         if (!trackerclient.halted())
             trackerclient.halt();
         trackerclient = newClient;
+        trackerclient.start();
     }
-    trackerclient.start();
   }
   /**
    * Stop contacting the tracker and talking with peers
    */
   public void stopTorrent() {
+    stopped = true;
     trackerclient.halt();
     coordinator.halt();
     try { 
@@ -417,6 +424,8 @@ public class Snark
     String ip = null;
     String torrent = null;
 
+    boolean configured = I2PSnarkUtil.instance().configured();
+    
     int i = 0;
     while (i < args.length)
       {
@@ -463,7 +472,8 @@ public class Snark
           {
             String proxyHost = args[i+1];
             String proxyPort = args[i+2];
-            I2PSnarkUtil.instance().setProxy(proxyHost, Integer.parseInt(proxyPort));
+            if (!configured)
+                I2PSnarkUtil.instance().setProxy(proxyHost, Integer.parseInt(proxyPort));
             i += 3;
           }
         else if (args[i].equals("--i2cp"))
@@ -484,7 +494,8 @@ public class Snark
                     }
                 }
             }
-            I2PSnarkUtil.instance().setI2CPConfig(i2cpHost, Integer.parseInt(i2cpPort), opts);
+            if (!configured)
+                I2PSnarkUtil.instance().setI2CPConfig(i2cpHost, Integer.parseInt(i2cpPort), opts);
             i += 3 + (opts != null ? 1 : 0);
           }
         else
@@ -654,6 +665,8 @@ public class Snark
     Snark.debug("Completely received " + torrent, Snark.INFO);
     //storage.close();
     System.out.println("Completely received: " + torrent);
+    if (completeListener != null)
+        completeListener.torrentComplete(this);
   }
 
   public void shutdown()
@@ -661,5 +674,9 @@ public class Snark
     // Should not be necessary since all non-deamon threads should
     // have died. But in reality this does not always happen.
     System.exit(0);
+  }
+  
+  public interface CompleteListener {
+    public void torrentComplete(Snark snark);
   }
 }

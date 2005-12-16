@@ -37,7 +37,7 @@ public class Peer implements Comparable
   private final PeerID peerID;
 
   private final byte[] my_id;
-  private final MetaInfo metainfo;
+  final MetaInfo metainfo;
 
   // The data in/output streams set during the handshake and used by
   // the actual connections.

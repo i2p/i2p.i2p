@@ -24,8 +24,11 @@ import java.io.*;
 import java.net.*;
 import java.util.*;
 
+import net.i2p.util.Log;
+
 class PeerConnectionIn implements Runnable
 {
+  private Log _log = new Log(PeerConnectionIn.class);
   private final Peer peer;
   private final DataInputStream din;
 
@@ -72,6 +75,8 @@ class PeerConnectionIn implements Runnable
             if (i == 0)
               {
                 ps.keepAliveMessage();
+                if (_log.shouldLog(Log.DEBUG)) 
+                    _log.debug("Received keepalive from " + peer + " on " + peer.metainfo.getName());
                 continue;
               }
             
@@ -82,30 +87,44 @@ class PeerConnectionIn implements Runnable
               {
               case 0:
                 ps.chokeMessage(true);
+                if (_log.shouldLog(Log.DEBUG)) 
+                    _log.debug("Received choke from " + peer + " on " + peer.metainfo.getName());
                 break;
               case 1:
                 ps.chokeMessage(false);
+                if (_log.shouldLog(Log.DEBUG)) 
+                    _log.debug("Received unchoke from " + peer + " on " + peer.metainfo.getName());
                 break;
               case 2:
                 ps.interestedMessage(true);
+                if (_log.shouldLog(Log.DEBUG)) 
+                    _log.debug("Received interested from " + peer + " on " + peer.metainfo.getName());
                 break;
               case 3:
                 ps.interestedMessage(false);
+                if (_log.shouldLog(Log.DEBUG)) 
+                    _log.debug("Received not interested from " + peer + " on " + peer.metainfo.getName());
                 break;
               case 4:
                 piece = din.readInt();
                 ps.haveMessage(piece);
+                if (_log.shouldLog(Log.DEBUG)) 
+                    _log.debug("Received havePiece(" + piece + ") from " + peer + " on " + peer.metainfo.getName());
                 break;
               case 5:
                 byte[] bitmap = new byte[i-1];
                 din.readFully(bitmap);
                 ps.bitfieldMessage(bitmap);
+                if (_log.shouldLog(Log.DEBUG)) 
+                    _log.debug("Received bitmap from " + peer + " on " + peer.metainfo.getName());
                 break;
               case 6:
                 piece = din.readInt();
                 begin = din.readInt();
                 len = din.readInt();
                 ps.requestMessage(piece, begin, len);
+                if (_log.shouldLog(Log.DEBUG)) 
+                    _log.debug("Received request(" + piece + "," + begin + ") from " + peer + " on " + peer.metainfo.getName());
                 break;
               case 7:
                 piece = din.readInt();
@@ -118,12 +137,16 @@ class PeerConnectionIn implements Runnable
                     piece_bytes = req.bs;
                     din.readFully(piece_bytes, begin, len);
                     ps.pieceMessage(req);
+                    if (_log.shouldLog(Log.DEBUG)) 
+                        _log.debug("Received data(" + piece + "," + begin + ") from " + peer + " on " + peer.metainfo.getName());
                   }
                 else
                   {
                     // XXX - Consume but throw away afterwards.
                     piece_bytes = new byte[len];
                     din.readFully(piece_bytes);
+                    if (_log.shouldLog(Log.DEBUG)) 
+                        _log.debug("Received UNWANTED data(" + piece + "," + begin + ") from " + peer + " on " + peer.metainfo.getName());
                   }
                 break;
               case 8:
@@ -131,11 +154,15 @@ class PeerConnectionIn implements Runnable
                 begin = din.readInt();
                 len = din.readInt();
                 ps.cancelMessage(piece, begin, len);
+                if (_log.shouldLog(Log.DEBUG)) 
+                    _log.debug("Received cancel(" + piece + "," + begin + ") from " + peer + " on " + peer.metainfo.getName());
                 break;
               default:
                 byte[] bs = new byte[i-1];
                 din.readFully(bs);
                 ps.unknownMessage(b, bs);
+                if (_log.shouldLog(Log.DEBUG)) 
+                    _log.debug("Received unknown message from " + peer + " on " + peer.metainfo.getName());
               }
           }
       }

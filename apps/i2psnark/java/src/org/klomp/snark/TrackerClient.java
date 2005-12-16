@@ -48,6 +48,7 @@ public class TrackerClient extends Thread
   private final int port;
 
   private boolean stop;
+  private boolean started;
 
   private long interval;
   private long lastRequestTime;
@@ -62,14 +63,17 @@ public class TrackerClient extends Thread
     this.port = 6881; //(port == -1) ? 9 : port;
 
     stop = false;
+    started = false;
   }
 
   public void start() {
-      stop = false;
+      if (stop) throw new RuntimeException("Dont rerun me, create a copy");
       super.start();
+      started = true;
   }
   
   public boolean halted() { return stop; }
+  public boolean started() { return started; }
   
   /**
    * Interrupts this Thread to stop it.
@@ -107,8 +111,10 @@ public class TrackerClient extends Thread
                 TrackerInfo info = doRequest(announce, infoHash, peerID,
                                              uploaded, downloaded, left,
                                              STARTED_EVENT);
+                Set peers = info.getPeers();
+                coordinator.trackerSeenPeers = peers.size();
                 if (!completed) {
-                    Iterator it = info.getPeers().iterator();
+                    Iterator it = peers.iterator();
                     while (it.hasNext()) {
                       Peer cur = (Peer)it.next();
                       coordinator.addPeer(cur);
@@ -118,6 +124,7 @@ public class TrackerClient extends Thread
                     }
                 }
                 started = true;
+                coordinator.trackerProblems = null;
               }
             catch (IOException ioe)
               {
@@ -125,6 +132,7 @@ public class TrackerClient extends Thread
                 Snark.debug
                   ("WARNING: Could not contact tracker at '"
                    + announce + "': " + ioe, Snark.WARNING);
+                coordinator.trackerProblems = ioe.getMessage();
               }
 
             if (!started && !stop)
@@ -182,10 +190,12 @@ public class TrackerClient extends Thread
                                                  uploaded, downloaded, left,
                                                  event);
 
+                    Set peers = info.getPeers();
+                    coordinator.trackerSeenPeers = peers.size();
                     if ( (left > 0) && (!completed) ) {
                         // we only want to talk to new people if we need things
                         // from them (duh)
-                        Iterator it = info.getPeers().iterator();
+                        Iterator it = peers.iterator();
                         while (it.hasNext()) {
                           Peer cur = (Peer)it.next();
                           coordinator.addPeer(cur);
@@ -244,21 +254,24 @@ public class TrackerClient extends Thread
         throw new IOException("Error fetching " + s);
     }
     
-    fetched.deleteOnExit();
-    InputStream in = new FileInputStream(fetched);
+    try {
+        InputStream in = new FileInputStream(fetched);
 
-    TrackerInfo info = new TrackerInfo(in, coordinator.getID(),
-                                       coordinator.getMetaInfo());
-    if (Snark.debug >= Snark.INFO)
-      Snark.debug("TrackerClient response: " + info, Snark.INFO);
-    lastRequestTime = System.currentTimeMillis();
-    
-    String failure = info.getFailureReason();
-    if (failure != null)
-      throw new IOException(failure);
-    
-    interval = info.getInterval() * 1000;
-    return info;
+        TrackerInfo info = new TrackerInfo(in, coordinator.getID(),
+                                           coordinator.getMetaInfo());
+        if (Snark.debug >= Snark.INFO)
+          Snark.debug("TrackerClient response: " + info, Snark.INFO);
+        lastRequestTime = System.currentTimeMillis();
+
+        String failure = info.getFailureReason();
+        if (failure != null)
+          throw new IOException(failure);
+
+        interval = info.getInterval() * 1000;
+        return info;
+    } finally {
+        fetched.delete();
+    }
   }
 
   /**

@@ -32,11 +32,12 @@ import net.i2p.client.streaming.I2PSocket;
  */
 public class ConnectionAcceptor implements Runnable
 {
-  private final I2PServerSocket serverSocket;
+  private I2PServerSocket serverSocket;
   private final PeerAcceptor peeracceptor;
   private Thread thread;
 
   private boolean stop;
+  private boolean socketChanged;
 
   public ConnectionAcceptor(I2PServerSocket serverSocket,
                             PeerAcceptor peeracceptor)
@@ -44,8 +45,10 @@ public class ConnectionAcceptor implements Runnable
     this.serverSocket = serverSocket;
     this.peeracceptor = peeracceptor;
     
+    socketChanged = false;
     stop = false;
-    thread = new Thread(this);
+    thread = new Thread(this, "I2PSnark acceptor");
+    thread.setDaemon(true);
     thread.start();
   }
 
@@ -65,6 +68,14 @@ public class ConnectionAcceptor implements Runnable
     if (t != null)
       t.interrupt();
   }
+  
+  public void restart() {
+      serverSocket = I2PSnarkUtil.instance().getServerSocket();
+      socketChanged = true;
+      Thread t = thread;
+      if (t != null)
+          t.interrupt();
+  }
 
   public int getPort()
   {
@@ -75,57 +86,35 @@ public class ConnectionAcceptor implements Runnable
   {
     while(!stop)
       {
+        if (socketChanged) {
+            // ok, already updated
+            socketChanged = false;
+        }
+        if (serverSocket == null) {
+            Snark.debug("Server socket went away.. boo hiss", Snark.ERROR);
+            stop = true;
+            return;
+        }
         try
           {
-            final I2PSocket socket = serverSocket.accept();
-            Thread t = new Thread("Connection-" + socket)
-              {
-                public void run()
-                {
-                  try
-                    {
-                      InputStream in = socket.getInputStream();
-                      OutputStream out = socket.getOutputStream();
-                      BufferedInputStream bis = new BufferedInputStream(in);
-                      BufferedOutputStream bos = new BufferedOutputStream(out);
-                      
-                      // See what kind of connection it is.
-                      /*
-                      if (httpacceptor != null)
-                        {
-                          byte[] scratch = new byte[4];
-                          bis.mark(4);
-                          int len = bis.read(scratch);
-                          if (len != 4)
-                            throw new IOException("Need at least 4 bytes");
-                          bis.reset();
-                          if (scratch[0] == 19 && scratch[1] == 'B'
-                              && scratch[2] == 'i' && scratch[3] == 't')
-                            peeracceptor.connection(socket, bis, bos);
-                          else if (scratch[0] == 'G' && scratch[1] == 'E'
-                                   && scratch[2] == 'T' && scratch[3] == ' ')
-                            httpacceptor.connection(socket, bis, bos);
-                        }
-                      else
-                       */
-                        peeracceptor.connection(socket, bis, bos);
-                    }
-                  catch (IOException ioe)
-                    {
-                      try
-                        {
-                          socket.close();
-                        }
-                      catch (IOException ignored) { }
-                    }
+            I2PSocket socket = serverSocket.accept();
+            if (socket == null) {
+                if (socketChanged) {
+                    continue;
+                } else {
+                    Snark.debug("Null socket accepted, but socket wasn't changed?", Snark.ERROR);
                 }
-              };
-            t.start();
+            } else {
+                Thread t = new Thread(new Handler(socket), "Connection-" + socket);
+                t.start();
+            }
           }
         catch (I2PException ioe)
           {
-            Snark.debug("Error while accepting: " + ioe, Snark.ERROR);
-            stop = true;
+            if (!socketChanged) {
+                Snark.debug("Error while accepting: " + ioe, Snark.ERROR);
+                stop = true;
+            }
           }
         catch (IOException ioe)
           {
@@ -139,5 +128,24 @@ public class ConnectionAcceptor implements Runnable
         serverSocket.close();
       }
     catch (I2PException ignored) { }
+  }
+  
+  private class Handler implements Runnable {
+      private I2PSocket _socket;
+      public Handler(I2PSocket socket) {
+          _socket = socket;
+      }
+      public void run() {
+          try {
+              InputStream in = _socket.getInputStream();
+              OutputStream out = _socket.getOutputStream();
+              BufferedInputStream bis = new BufferedInputStream(in);
+              BufferedOutputStream bos = new BufferedOutputStream(out);
+
+              peeracceptor.connection(_socket, bis, bos);
+          } catch (IOException ioe) {
+              try { _socket.close(); } catch (IOException ignored) { }
+          }
+      }
   }
 }

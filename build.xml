@@ -31,7 +31,7 @@
         <ant dir="apps/susimail/" target="war" />
         <ant dir="apps/susidns/src" target="all" />
         <ant dir="apps/syndie/java/" target="jar" />
-        <ant dir="apps/i2psnark/java/" target="jar" />
+        <ant dir="apps/i2psnark/java/" target="war" />
     </target>
     <target name="buildrouter">
         <ant dir="core/java/" target="distclean" />
@@ -108,7 +108,7 @@
         <copy file="apps/syndie/syndie.war" todir="build/" />
         <copy file="apps/syndie/java/build/syndie.jar" todir="build/" />
         <copy file="apps/syndie/java/build/sucker.jar" todir="build/" />
-        <copy file="apps/syndie/syndie.war" todir="build/" />
+        <copy file="apps/i2psnark/i2psnark.war" todir="build/" />
         <copy file="apps/i2psnark/java/build/i2psnark.jar" todir="build/" />
         <copy file="apps/jdom/jdom.jar" todir="build/" />
         <copy file="apps/rome/rome-0.7.jar" todir="build/" />
@@ -250,6 +250,7 @@
         <copy file="build/susimail.war" todir="pkg-temp/webapps/" />
         <copy file="build/susidns.war" todir="pkg-temp/webapps/" />
         <copy file="build/syndie.war" todir="pkg-temp/webapps/" />
+        <copy file="build/i2psnark.war" todir="pkg-temp/webapps/" />
         <copy file="installer/resources/clients.config" todir="pkg-temp/" />
         <copy file="installer/resources/eepget" todir="pkg-temp/" />
         <copy file="installer/resources/i2prouter" todir="pkg-temp/" />
@@ -359,6 +360,7 @@
         <copy file="build/susimail.war" todir="pkg-temp/webapps/" />
         <copy file="build/susidns.war" todir="pkg-temp/webapps/" />
         <copy file="build/syndie.war" todir="pkg-temp/webapps/" />
+        <copy file="build/i2psnark.war" todir="pkg-temp/webapps/" />
         <copy file="history.txt" todir="pkg-temp/" />
         <mkdir dir="pkg-temp/docs/" />
         <copy file="news.xml" todir="pkg-temp/docs/" />

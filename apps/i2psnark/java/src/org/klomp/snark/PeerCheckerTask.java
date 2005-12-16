@@ -70,6 +70,7 @@ class PeerCheckerTask extends TimerTask
               {
                 it.remove();
                 coordinator.removePeerFromPieces(peer);
+                coordinator.peerCount = coordinator.peers.size();
                 continue;
               }
 
@@ -185,6 +186,7 @@ class PeerCheckerTask extends TimerTask
 
             // Put it at the back of the list
             coordinator.peers.remove(worstDownloader);
+            coordinator.peerCount = coordinator.peers.size();
             removed.add(worstDownloader);
           }
         
@@ -193,6 +195,7 @@ class PeerCheckerTask extends TimerTask
 
         // Put peers back at the end of the list that we removed earlier.
         coordinator.peers.addAll(removed);
+        coordinator.peerCount = coordinator.peers.size();
       }
   }
 }

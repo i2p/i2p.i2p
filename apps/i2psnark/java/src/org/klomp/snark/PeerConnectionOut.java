@@ -24,8 +24,11 @@ import java.io.*;
 import java.net.*;
 import java.util.*;
 
+import net.i2p.util.Log;
+
 class PeerConnectionOut implements Runnable
 {
+  private Log _log = new Log(PeerConnectionOut.class);
   private final Peer peer;
   private final DataOutputStream dout;
 
@@ -34,14 +37,18 @@ class PeerConnectionOut implements Runnable
 
   // Contains Messages.
   private List sendQueue = new ArrayList();
+  
+  private static long __id = 0;
+  private long _id;
 
   public PeerConnectionOut(Peer peer, DataOutputStream dout)
   {
     this.peer = peer;
     this.dout = dout;
+    _id = ++__id;
 
     quit = false;
-    thread = new Thread(this);
+    thread = new Thread(this, "Snark sender " + _id);
     thread.start();
   }
 
@@ -64,6 +71,8 @@ class PeerConnectionOut implements Runnable
                     try
                       {
                         // Make sure everything will reach the other side.
+                        // i2p flushes passively, no need to force it
+                        // ... maybe not though
                         dout.flush();
                         
                         // Wait till more data arrives.
@@ -114,6 +123,8 @@ class PeerConnectionOut implements Runnable
               {
                 if (Snark.debug >= Snark.ALL)
                   Snark.debug("Send " + peer + ": " + m, Snark.ALL);
+                if (_log.shouldLog(Log.DEBUG))
+                    _log.debug("Send " + peer + ": " + m + " on " + peer.metainfo.getName());
                 m.sendMessage(dout);
 
                 // Remove all piece messages after sending a choke message.
